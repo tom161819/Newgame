@@ -14,10 +14,11 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 - [Krok 9 — soubojový systém HP, DPS a Armor](requests/step-09.md): commit `a6c29fa`, Pages úspěšně nasazeno.
 
+- [Krok 10 — herní čas, regenerace, zlato a poklady](requests/step-10.md): commit `cd77265`, Pages run `41548867995` úspěšně nasazeno; 75 automatických testů a skutečný 120sekundový den ověřeny.
+
 ## Následuje
 
-1. **Dokončeno v této verzi, ověřuje se nasazení:** [Krok 10 — herní čas, regenerace HP, zlato a poklady](requests/step-10.md). 75 automatických testů; skutečný 120sekundový den, tři hrady = 15 Gold jednou, regenerace, poklad/vybavení, původní pohyb a stavby i produkční sestavení ověřeny v prohlížeči.
-2. **Následuje po nasazení:** [Krok 11 — Main Menu a Save/Load](requests/step-11.md).
+1. **Právě probíhá:** [Krok 11 — Main Menu a Save/Load](requests/step-11.md).
 3. [Krok 12 — dynamické vyšlapávání cest](requests/step-12.md).
 4. [Krok 13 — univerzální XP a levely 1–50](requests/step-13.md).
 5. [Krok 14 — individuální skilly a profese poddaných](requests/step-14.md).
