@@ -28,7 +28,9 @@ Horní inventář a spodní Buildings jsou mimo herní kameru a při pohybu nebo
 - Každých **20 sekund herního času** vznikne jeden nový kámen. Na mapě může současně ležet nejvýše **80 nesebraných kamenů**, včetně těch mimo aktuální obraz kamery.
 - Generátor vždy znovu ověří dosažitelnost po změnách mapy. Vynechá budovy, překážky, existující kameny a aktuální i právě procházené políčko krále. Pokud není dostupné místo, daný pokus přeskočí. Po uvolnění limitu pokračuje při dalším dvacetisekundovém intervalu.
 - Kameny neblokují pohyb. Sbírá se pouze kámen vybraný kliknutím. Nový levý klik zruší původní požadavek i při neplatném cíli; pravý klik mimo stavění ho nemění.
-- Věž stojí přesně **10 kamenů**, obsadí přesně **2 × 2 logická políčka** a vytvoří neprůchozí překážku pro BFS. Nesmí překrývat kameny, budovy, překážky ani krále a jeho probíhající krok.
+- Král chodí v **osmi logických směrech**. Diagonála je plynulý přímý úsek, nikoli střídání vodorovných a svislých kroků. Rychlost 3,5 políčka/s se vztahuje k logické délce pohybu: diagonální krok délky √2 trvá odpovídajícím způsobem déle než přímý krok délky 1.
+- Cestu hledá **A*** s osmi sousedy a heuristikou octile. Diagonála je povolená pouze tehdy, když jsou průchozí cíl i obě sousední boční políčka. Mezi rohy zdí ani věží proto nelze projít.
+- Věž stojí přesně **10 kamenů**, obsadí přesně **2 × 2 logická políčka** a vytvoří neprůchozí překážku pro A*. Nesmí překrývat kameny, budovy, překážky ani krále a jeho probíhající krok; u diagonály se chrání také obě boční políčka.
 - Lze postavit více věží. Výběr stavby zruší zbývající cestu a sběr; už rozběhnutý krok se dokončí plynule. Po postavení jedné věže režim stavění skončí.
 - Ke vstupu se vybírá sousední políčko s nejkratší dosažitelnou cestou. Následuje animace lezení, ne přesun z dálky. Král nahoře nechodí po mapě ani nesbírá. Sestup vybere sousední políčko s dostupnou cestou k cíli; pokud takové není, král zůstane nahoře.
 - Během animace výstupu a sestupu se nové příkazy nepřijímají. Vstup/výstup lze opakovat, včetně přechodu z jedné věže do druhé.
@@ -46,7 +48,7 @@ npm run dev
 Otevři adresu vypsanou Vite. V cloudovém prostředí lze použít `npm run dev -- --host 0.0.0.0`.
 
 ```sh
-npm test                         # souřadnice, BFS, generování, inventář, stavby a stavy krále
+npm test                         # souřadnice, A*, směry, generování, inventář, stavby a stavy krále
 npm run build                    # produkční soubory do dist/
 npm run build -- --base=/Newgame/ # sestavení pro projektovou cestu GitHub Pages
 npm run preview                  # místní kontrola produkčního buildu
@@ -64,9 +66,10 @@ Upozornění Vite na velikost balíčku souvisí s přibaleným Phaserem a nebr�
 | `src/game/isometric.js` | Projekce, inverze, středy/polygony políček a hranice světa. |
 | `src/game/TerrainRenderer.js` | Sdílené textury terénu, cache bloků 10 × 10 a fond viditelných bloků/překážek kolem kamery. |
 | `src/game/WorldCamera.js` | Plynulé sledování, WASD/šipky, zoom a omezení hranic. |
-| `src/game/pathfinding.js` | BFS s číselnými indexy a typed arrays; také hledání dosažitelné oblasti pro generátor. |
+| `src/game/pathfinding.js` | Osmisměrné A* s minimální haldou, cenami 1/√2 a zákazem průchodu rohy; také hledání dosažitelné oblasti pro generátor. |
 | `src/game/PlayerController.js` | Logická desetinná poloha, cesta a stavy `ground`, `enteringTower`, `onTower`, `exitingTower`. |
-| `src/game/KingView.js` | Koruna, plášť, končetiny, směry, chůze a klid. Lze nahradit profesionálním spritem bez změny herní logiky. |
+| `src/game/directions.js` | Osm názvů logických směrů a jejich převod na izometrické pózy. |
+| `src/game/KingView.js` | Koruna, plášť, končetiny a osm odlišných natočení s chůzí a klidem. Lze nahradit profesionálním spritem bez změny herní logiky. |
 | `src/game/stones.js` | Náhodné dosažitelné pozice, dvacetisekundový generátor, limit a vlastní kresba kamene se stínem. |
 | `src/game/inventory.js` | Počty surovin podle názvu a bezpečná platba; připraveno i pro další suroviny. |
 | `src/game/buildings.js` | Cena, půdorys, validace, blokování mapy a plánování vstupu/výstupu. |
@@ -86,6 +89,10 @@ worldY = originY + (gridX + gridY) * 16
 ```
 
 Při kliknutí se nejprve odstraní posun a zoom kamery pomocí `camera.getWorldPoint` / `pointer.updateWorldPoint`. Inverzní projekce vrátí logickou polohu, ze které se vezme příslušné políčko. Stejná projekce určuje pohyb, kameny, půdorys i náhled věže. Rychlost krále je **3,5 logického políčka za sekundu** a na zoomu nezávisí.
+
+Natočení se určuje z posledního skutečného logického vektoru pohybu. Například logické `NE` se na obrazovce promítá doprava, `SE` dolů a `NW` nahoru. Vzhled nabízí čelní, zadní, profilové i částečně otočené pózy; končetiny se při chůzi pohybují ve směru jejich projekce. Při zastavení zůstane poslední natočení zachované. Nový příkaz uprostřed úseku nejprve dokončí tento úsek a další cestu naplánuje z jeho konce, bez poskočení.
+
+Výběr vstupu a výstupu věže porovnává skutečnou délku cesty s diagonálami, nikoli pouhý počet políček. Testy kontrolují i shodu A* s nezávislou Dijkstrou, všechny čtyři rohy věže, normalizovanou rychlost a ochranu rohů během stavění.
 
 Objekty se řadí podle promítnuté polohy nohou či přední části základny. Věž má zvlášť zadní část a přední parapet; král na plošině je mezi nimi. Výška objektu proto nemění jeho logickou polohu nebo obsazená políčka.
 

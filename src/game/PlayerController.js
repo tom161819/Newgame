@@ -30,7 +30,12 @@ export class PlayerController {
   reservedTiles() {
     // Chráníme oba konce právě procházeného úseku, nejen zaokrouhlenou polohu.
     if (this.state === PLAYER_STATE.ON_TOWER) return [];
-    return [this.tile, this.nextTile, this.exitTile].filter(Boolean);
+    const tiles = [this.tile, this.nextTile, this.exitTile].filter(Boolean);
+    if (this.nextTile && this.nextTile.x !== this.tile.x && this.nextTile.y !== this.tile.y) {
+      // Stavba nesmí zavřít ani jeden roh právě procházené diagonály.
+      tiles.push({ x: this.nextTile.x, y: this.tile.y }, { x: this.tile.x, y: this.nextTile.y });
+    }
+    return tiles;
   }
 
   stopForBuilding() {
@@ -145,7 +150,7 @@ export class PlayerController {
       const distance = Math.hypot(dx, dy);
       if (distance > 0) {
         this.walking = true;
-        this.direction = { x: (dx - dy) * 32, y: (dx + dy) * 16 };
+        this.direction = { x: dx / distance, y: dy / distance };
       }
       if (distance <= distanceLeft) {
         this.position = target;

@@ -86,3 +86,29 @@ test('okrajová věž poskytuje jen sousedy ležící v mapě', () => {
   assert.ok(route);
   assert.ok(route.destination.x < 10 && route.destination.y < 10);
 });
+
+test('všechny čtyři rohy věže 2 × 2 se obcházejí bez průchodu mezi rohy', () => {
+  const world=setup();
+  placeTower({...world,anchor:{x:3,y:3}});
+  for(const [start,goal] of [
+    [{x:2,y:3},{x:3,y:2}], [{x:4,y:2},{x:5,y:3}],
+    [{x:5,y:4},{x:4,y:5}], [{x:3,y:5},{x:2,y:4}],
+  ]){
+    const path=findPath(world.map,start,goal);
+    assert.equal(path.length,2);
+    let previous=start;
+    for(const point of path){
+      assert.equal(Math.abs(point.x-previous.x)+Math.abs(point.y-previous.y),1);
+      assert.equal(world.map[point.y][point.x],0);previous=point;
+    }
+    assert.deepEqual(previous,goal);
+  }
+});
+
+test('výstup porovnává délku cesty s diagonálami, ne počet políček', () => {
+  const map=['000000000','011000000','001001000','000110110','000110001',
+    '000000000','100000100','100000000','101110110'].map(row=>[...row].map(Number));
+  const route=planTowerExit(map,{x:3,y:3},{kind:'move',goal:{x:6,y:7}});
+  assert.deepEqual(route.exit,{x:4,y:5});
+  assert.ok(Math.abs(route.cost-(2+Math.SQRT2))<1e-9);
+});

@@ -1,6 +1,6 @@
 import { isWalkable } from './map.js';
 import { gridToWorld } from './isometric.js';
-import { findPath, findPathToAny } from './pathfinding.js';
+import { findPathToAny } from './pathfinding.js';
 import { tileKey } from './stones.js';
 
 export const TOWER_COST = 10;
@@ -59,8 +59,7 @@ export function approachTower(map, start, tower) {
 
 export function planGroundOrder(map, start, order) {
   if (order.kind === 'enter') return approachTower(map, start, order.tower);
-  const path = findPath(map, start, order.goal);
-  return path === null ? null : { path, destination: order.goal };
+  return findPathToAny(map, start, [order.goal]);
 }
 
 export function planTowerExit(map, tower, order) {
@@ -68,7 +67,7 @@ export function planTowerExit(map, tower, order) {
   for (const exit of towerNeighbors(tower)) {
     if (!isWalkable(map, exit.x, exit.y)) continue;
     const route = planGroundOrder(map, exit, order);
-    if (route && (!best || route.path.length < best.path.length)) best = { ...route, exit };
+    if (route && (!best || route.cost < best.cost)) best = { ...route, exit };
   }
   return best;
 }

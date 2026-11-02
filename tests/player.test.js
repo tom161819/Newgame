@@ -4,6 +4,8 @@ import { PlayerController, PLAYER_STATE } from '../src/game/PlayerController.js'
 import { towerTiles, towerNeighbors, towerTop } from '../src/game/buildings.js';
 import { tileCenter } from '../src/game/map.js';
 import { gridToWorld } from '../src/game/isometric.js';
+import { Inventory } from '../src/game/inventory.js';
+import { placeTower, placementError } from '../src/game/buildings.js';
 
 function setup() {
   const tower = { id: 1, x: 4, y: 4, tiles: towerTiles({ x: 4, y: 4 }) };
@@ -96,4 +98,48 @@ test('plynulý pohyb používá logickou pozici; změna cíle neposkočí a př�
   w.character.update(10000);
   assert.deepEqual(w.character.tile,{x:0,y:2});
   assert.equal(w.character.walking,false);
+});
+
+test('diagonální a přímý pohyb mají shodnou rychlost a diagonála mění obě osy současně', () => {
+  const straight=setup(),diagonal=setup();
+  straight.character.command({kind:'move',goal:{x:3,y:0}});
+  diagonal.character.command({kind:'move',goal:{x:3,y:3}});
+  for(let frame=0;frame<10;frame++){
+    straight.character.update(20);diagonal.character.update(20);
+    const p=diagonal.character.position;
+    assert.ok(Math.abs(p.x-p.y)<1e-9,'Žádné střídání vodorovných a svislých úseků.');
+    assert.equal(diagonal.sprite.x,tileCenter({x:0,y:0}).x);
+  }
+  const s=straight.character.position,d=diagonal.character.position;
+  assert.ok(Math.abs(Math.hypot(s.x-0.5,s.y-0.5)-0.7)<1e-9);
+  assert.ok(Math.abs(Math.hypot(d.x-0.5,d.y-0.5)-0.7)<1e-9);
+  assert.ok(Math.abs(diagonal.character.direction.x-Math.SQRT1_2)<1e-9);
+  diagonal.character.update(10000);
+  const direction={...diagonal.character.direction};
+  diagonal.character.update(500);
+  assert.equal(diagonal.character.walking,false);
+  assert.deepEqual(diagonal.character.direction,direction);
+});
+
+test('při změně cíle uprostřed diagonály král dokončí právě procházený úsek', () => {
+  const w=setup();w.character.command({kind:'move',goal:{x:3,y:3}});w.character.update(50);
+  const before={...w.character.position};
+  w.character.command({kind:'move',goal:{x:0,y:3}});
+  assert.deepEqual(w.character.position,before);
+  assert.deepEqual(w.character.nextTile,{x:1,y:1});
+  w.character.update(10000);assert.deepEqual(w.character.tile,{x:0,y:3});
+});
+
+test('stavba nesmí uzavřít boční roh rozběhnuté diagonály', () => {
+  const w=setup();w.character.command({kind:'move',goal:{x:2,y:2}});w.character.update(10000);
+  w.character.command({kind:'move',goal:{x:3,y:3}});w.character.update(50);
+  const inventory=new Inventory();inventory.add('stone',10);
+  const anchor={x:3,y:1},stones=new Map(),buildings=[w.tower];
+  assert.equal(placementError(w.scene.map,anchor,stones,[w.character.tile,w.character.nextTile]),null);
+  assert.ok(placeTower({map:w.scene.map,anchor,stones,inventory,buildings,reservedTiles:w.character.reservedTiles()}).error);
+  assert.equal(inventory.count('stone'),10);
+  w.character.stopForBuilding();w.character.update(10000);
+  assert.deepEqual(w.character.tile,{x:3,y:3});
+  assert.ok(placeTower({map:w.scene.map,anchor,stones,inventory,buildings,reservedTiles:w.character.reservedTiles()}).tower);
+  assert.equal(inventory.count('stone'),0);
 });

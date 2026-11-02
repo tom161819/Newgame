@@ -1,29 +1,98 @@
 import { isWalkable } from './map.js';
 
-const DIRECTIONS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+const DIRECTIONS = [[1, 0], [0, 1], [-1, 0], [0, -1], [1, 1], [-1, 1], [-1, -1], [1, -1]];
+const EPSILON = 1e-9;
 
-// BFS na celé logické mapě. Číselné indexy omezují alokace i na 10 000 políčkách.
+// Diagonála je bezpečná jen se dvěma volnými bočními políčky.
+export function canStep(map, from, to) {
+  if (!isWalkable(map, from.x, from.y) || !isWalkable(map, to.x, to.y)) return false;
+  const dx = to.x - from.x, dy = to.y - from.y;
+  if (Math.abs(dx) > 1 || Math.abs(dy) > 1 || (!dx && !dy)) return false;
+  return !dx || !dy || (isWalkable(map, from.x + dx, from.y) && isWalkable(map, from.x, from.y + dy));
+}
+
+// Přípustný odhad délky při cenách 1 za přímý krok a √2 za diagonálu.
+export function octileDistance(a, b) {
+  const dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y);
+  return Math.max(dx, dy) + (Math.SQRT2 - 1) * Math.min(dx, dy);
+}
+
+class MinHeap {
+  constructor() { this.items = []; }
+
+  before(a, b) {
+    return a.estimate < b.estimate || (a.estimate === b.estimate
+      && (a.heuristic < b.heuristic || (a.heuristic === b.heuristic && a.index < b.index)));
+  }
+
+  push(item) {
+    const items = this.items;
+    let index = items.length;
+    items.push(item);
+    while (index > 0) {
+      const parent = Math.floor((index - 1) / 2);
+      if (!this.before(item, items[parent])) break;
+      items[index] = items[parent]; index = parent;
+    }
+    items[index] = item;
+  }
+
+  pop() {
+    const items = this.items, first = items[0], last = items.pop();
+    if (!items.length) return first;
+    let index = 0;
+    while (index * 2 + 1 < items.length) {
+      let child = index * 2 + 1;
+      if (child + 1 < items.length && this.before(items[child + 1], items[child])) child++;
+      if (!this.before(items[child], last)) break;
+      items[index] = items[child]; index = child;
+    }
+    items[index] = last;
+    return first;
+  }
+}
+
+// A* pro celou mapu i několik možných vstupů/výstupů věže.
+// Souřadnice a ceny jsou logické; kamera a izometrická projekce je neovlivňují.
 export function findPathToAny(map, start, goals) {
   if (!isWalkable(map, start.x, start.y)) return null;
   const width = map[0].length, length = width * map.length;
-  const targets = new Set(goals.filter(p => isWalkable(map, p.x, p.y)).map(p => p.y * width + p.x));
-  if (!targets.size) return null;
+  const validGoals = goals.filter(p => isWalkable(map, p.x, p.y));
+  if (!validGoals.length) return null;
+  const targets = new Set(validGoals.map(p => p.y * width + p.x));
+  const heuristic = point => {
+    let best = Infinity;
+    for (const goal of validGoals) best = Math.min(best, octileDistance(point, goal));
+    return best;
+  };
+  const costs = new Float64Array(length).fill(Infinity);
   const parents = new Int32Array(length).fill(-1);
-  const queue = new Int32Array(length);
-  const first = start.y * width + start.x;
-  parents[first] = first; queue[0] = first;
-  let head = 0, tail = 1;
-  while (head < tail) {
-    const index = queue[head++], x = index % width, y = Math.floor(index / width);
+  const closed = new Uint8Array(length);
+  const open = new MinHeap();
+  const first = start.y * width + start.x, initialHeuristic = heuristic(start);
+  costs[first] = 0; parents[first] = first;
+  open.push({ index: first, cost: 0, estimate: initialHeuristic, heuristic: initialHeuristic });
+  while (open.items.length) {
+    const current = open.pop(), index = current.index;
+    if (closed[index] || current.cost > costs[index] + EPSILON) continue;
+    const x = index % width, y = Math.floor(index / width);
     if (targets.has(index)) {
       const path = [];
-      for (let step = index; step !== first; step = parents[step]) path.push({ x: step % width, y: Math.floor(step / width) });
-      return { path: path.reverse(), destination: { x, y } };
+      for (let step = index; step !== first; step = parents[step]) {
+        path.push({ x: step % width, y: Math.floor(step / width) });
+      }
+      return { path: path.reverse(), destination: { x, y }, cost: costs[index] };
     }
+    closed[index] = 1;
     for (const [dx, dy] of DIRECTIONS) {
-      const nx = x + dx, ny = y + dy, next = ny * width + nx;
-      if (nx < 0 || nx >= width || ny < 0 || ny >= map.length || map[ny][nx] !== 0 || parents[next] !== -1) continue;
-      parents[next] = index; queue[tail++] = next;
+      const to = { x: x + dx, y: y + dy };
+      if (!canStep(map, { x, y }, to)) continue;
+      const next = to.y * width + to.x;
+      const cost = costs[index] + (dx && dy ? Math.SQRT2 : 1);
+      if (closed[next] || cost + EPSILON >= costs[next]) continue;
+      costs[next] = cost; parents[next] = index;
+      const h = heuristic(to);
+      open.push({ index: next, cost, estimate: cost + h, heuristic: h });
     }
   }
   return null;
@@ -33,6 +102,7 @@ export function findPath(map, start, goal) {
   return findPathToAny(map, start, [goal])?.path ?? null;
 }
 
+// Dostupnost pro generátor kamenů používá stejných osm sousedů a pravidlo rohů.
 export function reachableTiles(map, origins) {
   const width = map[0]?.length ?? 0;
   const seen = new Uint8Array(width * map.length), queue = new Int32Array(seen.length);
@@ -46,8 +116,10 @@ export function reachableTiles(map, origins) {
     const index = queue[head++], x = index % width, y = Math.floor(index / width);
     tiles.push({ x, y });
     for (const [dx, dy] of DIRECTIONS) {
-      const nx = x + dx, ny = y + dy, next = ny * width + nx;
-      if (nx < 0 || nx >= width || ny < 0 || ny >= map.length || map[ny][nx] !== 0 || seen[next]) continue;
+      const to = { x: x + dx, y: y + dy };
+      if (!canStep(map, { x, y }, to)) continue;
+      const next = to.y * width + to.x;
+      if (seen[next]) continue;
       seen[next] = 1; queue[tail++] = next;
     }
   }
