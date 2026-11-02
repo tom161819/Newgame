@@ -1,6 +1,6 @@
 # Přidávání objektů a grafiky
 
-Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soubory v `public/assets/`; Vite je kopíruje do sestavení beze změny. Současná hra má jedenáct typů: grass, dirt, stone, meat, tower, king, rock_outcrop, rabbit, deer, wild_boar a horse. Prázdné složky pro vodu, dřevo, železo, stromy a keře jsou příprava, nepřidávají nové herní mechaniky.
+Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soubory v `public/assets/`; Vite je kopíruje do sestavení beze změny. Současná hra má třináct typů: grass, dirt, stone, meat, tower, castle, wall, king, rock_outcrop, rabbit, deer, wild_boar a horse. Prázdné složky pro vodu, dřevo, železo, stromy a keře jsou příprava, nepřidávají nové herní mechaniky.
 
 ## Soubory a registr
 
@@ -119,3 +119,13 @@ Definice masa má `consumption: { amount: 1, interval: 60000 }`. `FoodSystem` pr
 Základní čtverec dohledu určuje `king.gameplay.baseSight`. Věž má `visibility: { multiplier: 2 }`; jezdecký kůň má `gameplay.visionMultiplier: 1.5` a `mountedSpeedMultiplier: 2`. `VisibilityModifiers` vybírá právě jeden bonus podle aktuálního stavu, nikoli součet. Nová budova s plošinou může používat stejnou definici bonusu. Fog of War mění jen vykreslení a možnost nového výběru, nikoli navigaci či spawn.
 
 Kůň je registrovaný jako `animal` s `interactions: ['mount']`, `huntable: false` a `meatDrop: 0`. Při jízdě zůstává stejná instance v AnimalSystem, pouze má `mounted: true`, její vlastní pohyb a původní pohled se skryjí a poloha se synchronizuje s králem. Jezdecká kresba je jen grafickou vrstvou krále.
+
+## Hrad a propojené hradby
+
+Castle používá původní stavění a interakci `enter`/`exit`, s půdorysem 3 × 3 a vlastní plošinou. `FortificationView` generuje z rozměrů a `visual.wallHeight` kamenné stěny, horní plochu a cimbuří ve dvou hloubkových vrstvách. Nové SVG soubory mají origin zarovnaný k přednímu rohu skutečného izometrického půdorysu, takže je lze vyměnit bez změny logiky.
+
+Wall přidává `construction: { mode: 'line' }`, `navigation: { walkableTop: true }` a interakci `walk_top`. Tyto příznaky vyžadují půdorys 1 × 1. `wallLine` přichytí náhled k dominantní ose logické mapy. `wallLinePlan` nejprve validuje celou řadu a cenu, `placeWallLine` provede jednu platbu a teprve potom vytvoří modely všech nových segmentů. Již existující segmenty stejné sítě se vynechají bez platby.
+
+Propojení N/E/S/W vzniká z logických sousedů a určuje obvodové cimbuří. Stěny sousedních těles se překrývají podle hloubky; zachované plochy zabraňují otevřenému řezu při skrytí souseda za hranicí Fog of War. Síť vrcholů je oddělená od neprůchozí zemní mapy; používá jen společné hrany. Pohyb po ní používá stejný normalizovaný posun jako král na zemi, s projekcí na výšku plošiny. Data o obsazených políčkách a modely budov zůstávají společné pro všechny systémy. Připojování bran nebo věží může v budoucnu rozšířit stejné vyhledávání sousedů.
+
+Castle i Wall mají `visibility: { multiplier: 1.75 }`; skutečný pobyt na vrcholu tedy mění základní dohled 20 na 35. Při výstupu/sestupu se bonus neuplatňuje.

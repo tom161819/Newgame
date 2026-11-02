@@ -7,7 +7,7 @@ export class FogOfWarSystem {
     const {size,center}=visibilityProfile(this.character);
     this.size=size;this.left=Math.ceil(center.x-size/2-.5);this.top=Math.ceil(center.y-size/2-.5);
     this.right=this.left+size;this.bottom=this.top+size;
-    this.signature=`${this.enabled}:${size}:${this.left},${this.top}`;
+    this.signature=this.enabled?`on:${size}:${this.left},${this.top}`:'off';
   }
   setEnabled(value){this.enabled=!!value;this.update();}
   isVisiblePosition(position){return !this.enabled||(position.x>=this.left&&position.x<this.right&&position.y>=this.top&&position.y<this.bottom);}

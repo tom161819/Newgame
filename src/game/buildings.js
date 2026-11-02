@@ -47,7 +47,7 @@ export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,
   const error=placementError(map,anchor,resources,reservedTiles,definition,buildings);
   if(error)return {error};
   if(!inventory.pay(definition.cost))return {error:'Na tuto budovu nemáš dostatek surovin.'};
-  const building={id:buildings.length+1,type:definition.id,definition,x:anchor.x,y:anchor.y,tiles:buildingTiles(anchor,definition)};
+  const building={id:buildings.reduce((n,b)=>Math.max(n,b.id),0)+1,type:definition.id,definition,x:anchor.x,y:anchor.y,tiles:buildingTiles(anchor,definition)};
   for(const tile of building.tiles)map[tile.y][tile.x]=definition.walkable?0:1;
   buildings.push(building);
   return {building};

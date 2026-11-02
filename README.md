@@ -21,6 +21,8 @@ Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3
 | Mezerník nebo „Na krále“ | Znovu zapne plynulé sledování krále. Nový platný příkaz k pohybu ho také obnoví. |
 | Kolečko myši nad mapou | Zoom od 0,45× do 1,8×. |
 | Asset Library | Otevře prohlížeč definic objektů s kategoriemi, náhledy a podrobnými údaji. |
+| Buildings → Castle | Náhled hradu 3 × 3 políčka za 10 kamenů; vstup a sestup fungují jako u věže. |
+| Buildings → Stone Wall | Kliknutím postaví jeden segment, tažením rovnou řadu v dominantní logické ose. Platí se 1 kámen za nový segment. |
 | Buildings → Tower | Zapne náhled stavby 2 × 2 políčka za 10 kamenů. |
 | Levý klik v režimu stavění | Postaví věž na platném místě. Zelená = lze stavět, červená = neplatné místo nebo málo surovin. |
 | Esc, pravý klik nebo Zrušit | Zruší režim stavění bez platby. |
@@ -37,10 +39,20 @@ Horní inventář a spodní Buildings jsou mimo herní kameru a při pohybu nebo
 - Král chodí v **osmi logických směrech**. Diagonála je plynulý přímý úsek, nikoli střídání vodorovných a svislých kroků. Rychlost 3,5 políčka/s se vztahuje k logické délce pohybu: diagonální krok délky √2 trvá odpovídajícím způsobem déle než přímý krok délky 1.
 - Cestu hledá **A*** s osmi sousedy a heuristikou octile. Diagonála je povolená pouze tehdy, když jsou průchozí cíl i obě sousední boční políčka. Mezi rohy zdí ani věží proto nelze projít.
 - Věž stojí přesně **10 kamenů**, obsadí přesně **2 × 2 logická políčka** a vytvoří neprůchozí překážku pro A*. Nesmí překrývat kameny, budovy, překážky ani krále a jeho probíhající krok; u diagonály se chrání také obě boční políčka.
-- Lze postavit více věží. Výběr stavby zruší zbývající cestu a sběr; už rozběhnutý krok se dokončí plynule. Po postavení jedné věže režim stavění skončí.
+- Lze postavit více věží, hradů i řad hradeb. Výběr stavby zruší zbývající cestu a sběr; už rozběhnutý krok se dokončí plynule. Po postavení jedné věže režim stavění skončí.
 - Ke vstupu se vybírá sousední políčko s nejkratší dosažitelnou cestou. Následuje animace lezení, ne přesun z dálky. Král nahoře nechodí po mapě ani nesbírá. Sestup vybere sousední políčko s dostupnou cestou k cíli; pokud takové není, král zůstane nahoře.
 - Během animace výstupu a sestupu se nové příkazy nepřijímají. Vstup/výstup lze opakovat, včetně přechodu z jedné věže do druhé.
 - Po obnovení stránky začíná nová hra: inventář je nulový, budovy zmizí a kameny se vygenerují znovu. Zatím používá okamžitý lov bez HP, bojových statistik a penalizací za nedostatek jídla.
+
+## Hrad a hradby
+
+Castle obsadí **3 × 3** neprůchozí políčka a stojí **10 kamenů**. Král k němu přijde po zemi, vystoupí na viditelnou horní plošinu a může z ní znovu sestoupit. Před vstupem z koně automaticky sesedne.
+
+Stone Wall zabírá **1 × 1** a stojí **1 kámen za nový segment**. Držení a tažení levého tlačítka vytvoří náhled rovné řady podle dominantní osy logické mapy. Stavba se potvrdí až uvolněním tlačítka: všechny nové segmenty musí být platné a hráč musí mít na celou řadu. Jinak nevznikne nic a nic se nezaplatí. Existující segmenty hradeb v řadě se použijí bez opakované platby. Po úspěšné řadě režim stavění skončí, stejně jako u ostatních budov.
+
+Sousední segmenty sdílející hranu se vizuálně spojí; cimbuří se vykreslí po vnějším obvodu a změna aktualizuje i sousedy. Fungují konce, rovné úseky, rohy, T i křížení. Zemní navigace přes hradby neprochází.
+
+Kliknutím na hradbu král dojde k dostupnému sousednímu políčku a vyleze. Pak lze klikat na propojené segmenty a chodit po jejich vrcholu. Navigace po hradbách má vlastní síť sdílených hran: diagonálně se dotýkající segmenty ani mezery nelze přejít vzduchem. Klik na nespojenou hradbu vyžaduje sestup a běžnou cestu. Pro návrat na zem se hledá dostupný výstup i na dalších propojených segmentech, takže král nezůstane uvězněný uprostřed velké souvislé konstrukce.
 
 ## Zvěř, lov a potrava
 
@@ -54,13 +66,13 @@ Každých 60 sekund aktivní hry se spotřebuje jedno maso, nejvýše do nuly. H
 
 Fog of War je ve výchozím stavu **OFF**. Zapíná se v levém panelu Settings. Terén mapy zůstává celý viditelný; mimo aktuální logický dohled se skrývají pouze objekty, včetně skal, budov, surovin a zvěře. Skryté objekty nelze nově vybrat. Jejich pohyb, časovače a ostatní logika pokračují. Posun a zoom kamery dohled nemění.
 
-Dohled pěšího krále je **20 × 20 políček**, na koni **30 × 30**, na horní plošině věže **40 × 40**. Bonusy se nesčítají. Král na koni automaticky sesedne před příkazem ke vstupu do věže; pokud pro koně není vhodné sousední políčko, vstup se neprovede. Při nedostatku místa nelze ani ručně sesednout.
+Dohled pěšího krále je **20 × 20 políček**, na koni **30 × 30**, na horní plošině věže **40 × 40**, na hradě a hradbě **35 × 35**. Bonusy se nesčítají. Král na koni automaticky sesedne před příkazem ke vstupu do věže; pokud pro koně není vhodné sousední políčko, vstup se neprovede. Při nedostatku místa nelze ani ručně sesednout.
 
 Při nové hře vznikne jeden nelovitelný kůň. Kliknutí zahájí pronásledování, nasednutí nastane až zblízka. Jezdec a kůň pak používají králův původní osmisměrný pohyb s rychlostí **7 místo 3,5 políčka/s**; lze dále lovit a sbírat. Nasedání nepřidává další instanci koně. Po sesednutí se obnoví původní rychlost a dohled a na stejného koně lze znovu nasednout.
 
 ## Knihovna objektů
 
-Jedenáct současných typů (grass, dirt, stone, meat, tower, king, rock_outcrop, rabbit, deer, wild_boar, horse) má centrální definice v `src/data/objects/`. Registr kontroluje unikátní ID a platné parametry; stejná cena a půdorys budovy řídí galerii, nabídku Buildings, platbu i kolize. Galerie je pouze prohlížeč a nemění mapu nebo inventář.
+Třináct současných typů (grass, dirt, stone, meat, tower, castle, wall, king, rock_outcrop, rabbit, deer, wild_boar, horse) má centrální definice v `src/data/objects/`. Registr kontroluje unikátní ID a platné parametry; stejná cena a půdorys budovy řídí galerii, nabídku Buildings, platbu i kolize. Galerie je pouze prohlížeč a nemění mapu nebo inventář.
 
 `AssetManager` načítá sdílené PNG/WebP textury a spritesheety se správným základem URL pro GitHub Pages. Chybějící obrázek použije procedurální kresbu nebo společný náhradní obrázek. Nová surovina či budova používající stávající mechanismy se přidává definicí a obrázkem; inventář i nabídka se přizpůsobí automaticky. Podrobný postup, origin, vrstvy věže a animace postavy popisuje **[ASSET_GUIDE.md](ASSET_GUIDE.md)**.
 
@@ -95,12 +107,14 @@ Upozornění Vite na velikost balíčku souvisí s přibaleným Phaserem a nebr�
 | `src/game/TerrainRenderer.js` | Sdílené textury terénu, cache bloků 10 × 10 a fond viditelných bloků/překážek kolem kamery. |
 | `src/game/WorldCamera.js` | Plynulé sledování, WASD/šipky, zoom a omezení hranic. |
 | `src/game/pathfinding.js` | Osmisměrné A* s minimální haldou, cenami 1/√2 a zákazem průchodu rohy; také hledání dosažitelné oblasti pro generátor. |
-| `src/game/PlayerController.js` | Logická desetinná poloha, cesta a stavy `ground`, `enteringTower`, `onTower`, `exitingTower`. |
+| `src/game/PlayerController.js` | Logická desetinná poloha, cesta a stavy `ground`, `enteringTower`, `onTower`, `onWall`, `exitingTower`. |
 | `src/game/directions.js` | Osm názvů logických směrů a jejich převod na izometrické pózy. |
 | `src/game/KingView.js` | Koruna, plášť, končetiny a osm odlišných natočení s chůzí a klidem. Lze nahradit profesionálním spritem bez změny herní logiky. |
 | `src/game/stones.js` | Náhodné dosažitelné pozice, dvacetisekundový generátor, limit a vlastní kresba kamene se stínem. |
 | `src/game/inventory.js` | Počty surovin podle názvu a bezpečná platba; připraveno i pro další suroviny. |
 | `src/game/buildings.js` | Cena, půdorys, validace, blokování mapy a plánování vstupu/výstupu. |
+| `src/game/walls.js` | Atomická stavba řad, propojení podle sousedů a samostatná navigace/výstupy po vrcholu hradeb. |
+| `src/game/FortificationView.js` | Parametrická geometrie hradu a spojených hradeb s předním/zadním cimbuřím. |
 | `src/game/TowerView.js` | Izometrické stěny, plošina, cimbuří, stín, zásah myší a průhledný náhled. |
 | `src/game/GameScene.js` | Propojení vstupu, kamery, krále, sběru, generátoru, stavby a UI. |
 | `src/data/objects/` | Datové definice terénu, surovin, budov, postav, dekorací a zvířat, včetně jediné ceny věže. |

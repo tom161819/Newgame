@@ -4,9 +4,11 @@ import { tileKey } from './stones.js';
 import { planGroundOrder, planTowerExit, towerNeighbors, buildingDepth, towerTop, buildingDefinition } from './buildings.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { advanceMovement } from './movement.js';
+import { isWall,wallIndex,findRoofPath,planRoofExit } from './walls.js';
 
 export const PLAYER_STATE = Object.freeze({
   GROUND: 'ground', ENTERING: 'enteringTower', ON_TOWER: 'onTower', EXITING: 'exitingTower',
+  ON_WALL: 'onWall',
 });
 
 export class PlayerController {
@@ -45,6 +47,7 @@ export class PlayerController {
   stopForBuilding() {
     this.path = [];
     this.order = null;
+    this.roofContinuation = null;
     this.scene.marker.setVisible(false);
     // Probíhající krok doběhne do středu; král se při otevření lišty neposune skokem.
   }
@@ -55,6 +58,7 @@ export class PlayerController {
       return false;
     }
     this.order = null;
+    if(this.state===PLAYER_STATE.ON_WALL)return this.commandOnWall(order);
     if (this.state === PLAYER_STATE.ON_TOWER) {
       if (order.kind === 'enter' && order.tower === this.currentTower) {
         this.scene.setStatus('Jsi na této věži. Pro sestup klikni na volné políčko.');
@@ -84,6 +88,33 @@ export class PlayerController {
       : order.pickupKey ? 'Jdu sebrat kámen. Dalším kliknutím změníš cíl.' : 'Mířím do cíle.');
     if (!this.nextTile && this.path.length === 0) this.arrive();
     return true;
+  }
+
+  wallAt(tile){return (this.scene.wallMap??wallIndex(this.scene.buildings)).get(tileKey(tile));}
+  commandOnWall(order){
+    const start=this.nextTile?this.wallAt(this.nextTile):this.currentTower;
+    if(order.kind==='enter'&&isWall(order.tower)){
+      const route=findRoofPath(this.scene.buildings,start,order.tower);
+      if(route!==null){this.startRoofRoute(route,null);return true;}
+    }
+    const route=planRoofExit(this.scene.map,this.scene.buildings,start,order);
+    if(!route){
+      this.path=[];this.roofContinuation=null;this.scene.marker.setVisible(false);
+      this.scene.setStatus('Z propojených hradeb nevede dostupná cesta k cíli.');return false;
+    }
+    this.startRoofRoute(route.roofPath,{order,path:route.path,destination:route.destination,exit:route.exit});return true;
+  }
+  startRoofRoute(buildings,continuation){
+    this.path=buildings.map(b=>({x:b.x,y:b.y}));this.roofContinuation=continuation;
+    this.scene.marker.setVisible(false);this.scene.setStatus('Král jde po propojené hradbě.');
+    if(!this.nextTile&&!this.path.length)this.finishRoofRoute();
+  }
+  finishRoofRoute(){
+    this.walking=false;
+    const continuation=this.roofContinuation;this.roofContinuation=null;
+    if(continuation){
+      this.order=continuation.order;this.path=continuation.path;this.scene.showMarker(continuation.destination);this.descend(continuation.exit);
+    }else this.scene.setStatus('Král stojí na hradbě. Klikni na spojený segment nebo na zem pro sestup.');
   }
 
   arrive() {
@@ -122,8 +153,14 @@ export class PlayerController {
     this.scene.tweens.add({
       targets: this.sprite, ...towerTop(tower), duration: 900, ease: 'Sine.InOut',
       onComplete: () => {
-        this.setState(PLAYER_STATE.ON_TOWER);
-        this.scene.setStatus('Jsi na věži. Klikni na průchozí políčko a král nejprve sleze dolů.');
+        if(isWall(tower)){
+          this.tile={x:tower.x,y:tower.y};this.position={x:tower.x+.5,y:tower.y+.5};this.path=[];this.nextTile=null;
+          this.setState(PLAYER_STATE.ON_WALL);
+          this.scene.setStatus('Jsi na hradbě. Klikni na spojený segment nebo na zem pro sestup.');
+        }else{
+          this.setState(PLAYER_STATE.ON_TOWER);
+          this.scene.setStatus('Jsi na horní plošině. Kliknutím na průchozí políčko král nejprve sleze dolů.');
+        }
       },
     });
   }
@@ -149,6 +186,14 @@ export class PlayerController {
 
   update(delta) {
     this.walking = false;
+    if(this.state===PLAYER_STATE.ON_WALL){
+      advanceMovement(this,delta);
+      this.currentTower=this.wallAt(this.tile)??this.currentTower;
+      const point=gridToWorld(this.position.x,this.position.y),center=tileCenter(this.currentTower),top=towerTop(this.currentTower);
+      this.sprite.setPosition(point.x+top.x-center.x,point.y+top.y-center.y).setDepth(buildingDepth(this.currentTower)+point.y-center.y+.2);
+      if(!this.nextTile&&!this.path.length){this.walking=false;if(this.roofContinuation)this.finishRoofRoute();}
+      return;
+    }
     if (this.state !== PLAYER_STATE.GROUND) return;
     advanceMovement(this,delta);
     const projected = gridToWorld(this.position.x, this.position.y);
