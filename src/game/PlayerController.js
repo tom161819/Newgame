@@ -1,7 +1,8 @@
 import { tileCenter, isWalkable } from './map.js';
 import { gridToWorld } from './isometric.js';
 import { tileKey } from './stones.js';
-import { planGroundOrder, planTowerExit, towerNeighbors, towerBase, towerTop } from './buildings.js';
+import { planGroundOrder, planTowerExit, towerNeighbors, buildingDepth, towerTop, buildingDefinition } from './buildings.js';
+import { objectRegistry } from '../systems/ObjectRegistry.js';
 
 export const PLAYER_STATE = Object.freeze({
   GROUND: 'ground', ENTERING: 'enteringTower', ON_TOWER: 'onTower', EXITING: 'exitingTower',
@@ -15,7 +16,9 @@ export class PlayerController {
     this.position = { x: start.x + 0.5, y: start.y + 0.5 };
     this.nextTile = null;
     this.path = [];
-    this.speed = 3.5; // Logická políčka za sekundu, nezávisle na projekci a zoomu.
+    this.definition = sprite.getData?.('definition') ?? objectRegistry.require(sprite.getData?.('objectId') ?? 'king');
+    this.speed = this.definition.gameplay?.movementSpeed ?? 3.5;
+    this.depthOffset = this.definition.depth?.offset ?? 0;
     this.walking = false;
     this.direction = { x: 0, y: 1 };
     this.state = PLAYER_STATE.GROUND;
@@ -89,6 +92,8 @@ export class PlayerController {
     this.scene.marker.setVisible(false);
     if (order?.kind === 'enter') {
       this.climb(order.tower);
+    } else if (order?.kind === 'collect' && this.scene.collectResource(order.pickupKey,this.tile)) {
+      this.scene.setStatus('Surovina sebrána.');
     } else if (order?.pickupKey === tileKey(this.tile) && this.scene.collectStone(this.tile)) {
       this.scene.setStatus('Kámen sebrán! Vyber další kámen nebo volné políčko.');
     } else {
@@ -103,11 +108,11 @@ export class PlayerController {
 
   climb(tower) {
     // Animaci nelze spustit z dálky, z obsazeného políčka ani během kroku.
-    if (this.nextTile || !isWalkable(this.scene.map, this.tile.x, this.tile.y)
+    if (!buildingDefinition(tower).interactions.includes('enter') || this.nextTile || !isWalkable(this.scene.map, this.tile.x, this.tile.y)
       || !towerNeighbors(tower).some(tile => tileKey(tile) === tileKey(this.tile))) return;
     this.currentTower = tower;
     this.setState(PLAYER_STATE.ENTERING);
-    this.sprite.setDepth(towerBase(tower).y + 0.2);
+    this.sprite.setDepth(buildingDepth(tower) + 0.2);
     this.scene.setStatus('Král šplhá na plošinu věže…');
     this.scene.tweens.add({
       targets: this.sprite, ...towerTop(tower), duration: 900, ease: 'Sine.InOut',
@@ -129,7 +134,7 @@ export class PlayerController {
         this.exitTile = null;
         this.position = { x: exit.x + 0.5, y: exit.y + 0.5 };
         this.currentTower = null;
-        this.sprite.setDepth(this.sprite.y + 0.1);
+        this.sprite.setDepth(this.sprite.y + this.depthOffset);
         this.setState(PLAYER_STATE.GROUND);
         if (this.path.length === 0) this.arrive();
         else this.scene.setStatus('Král je dole a pokračuje k cíli.');
@@ -165,7 +170,7 @@ export class PlayerController {
     }
     const projected = gridToWorld(this.position.x, this.position.y);
     this.sprite.setPosition(projected.x, projected.y);
-    this.sprite.setDepth(this.sprite.y + 0.1);
+    this.sprite.setDepth(this.sprite.y + this.depthOffset);
     if (!this.nextTile && this.path.length === 0 && this.scene.marker.visible) this.arrive();
   }
 }

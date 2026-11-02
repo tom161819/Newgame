@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { tilePolygon } from './isometric.js';
-import { towerBase } from './buildings.js';
+import { towerBase, buildingDepth, buildingDefinition } from './buildings.js';
 
 function polygon(g,color,points){g.fillStyle(color);g.fillPoints(points.map(([x,y])=>({x,y})),true);}
 function merlon(g,x,y,tint){
@@ -20,12 +20,15 @@ export class TowerView {
 
   paint(tower,tint=null){
     this.base=towerBase(tower);const {x,y}=this.base;
-    const g=this.back.clear().setPosition(x,y).setDepth(this.preview?10001:y);
-    const front=this.front.clear().setPosition(x,y).setDepth(this.preview?10002:y+0.3);
+    this.definition=buildingDefinition(tower);
+    const depth=buildingDepth(tower);
+    const g=this.back.clear().setPosition(x,y).setDepth(this.preview?10001:depth);
+    const front=this.front.clear().setPosition(x,y).setDepth(this.preview?10002:depth+0.3);
     const floor=this.footprint.clear().setDepth(this.preview?10000:-90);
     floor.fillStyle(tint??0x777450,this.preview?0.3:0.25);floor.lineStyle(1,tint??0xb3a477,0.8);
     for(const tile of tower.tiles){floor.fillPoints(tilePolygon(tile),true);floor.strokePoints(tilePolygon(tile),true);}
-    g.fillStyle(0x30291c,0.3);g.fillEllipse(8,-20,114,43);
+    const shadow=this.definition.shadow;
+    if(shadow){g.fillStyle(shadow.color,shadow.alpha);g.fillEllipse(shadow.x,shadow.y,shadow.width,shadow.height);}
     polygon(g,tint??0x777765,[[0,-64],[64,-32],[0,1],[-64,-32]]);
     polygon(g,tint??0xada691,[[-50,-25],[0,0],[0,-94],[-50,-119]]);
     polygon(g,tint??0x818373,[[0,0],[50,-25],[50,-119],[0,-94]]);
@@ -48,5 +51,6 @@ export class TowerView {
 
   contains(x,y){return Phaser.Geom.Polygon.Contains(this.hitArea,x-this.base.x,y-this.base.y);}
   setVisible(value){this.footprint.setVisible(value);this.back.setVisible(value);this.front.setVisible(value);}
-  inView(view){return this.base.x+70>=view.x&&this.base.x-70<=view.right&&this.base.y+10>=view.y&&this.base.y-175<=view.bottom;}
+  inView(view){return this.base.x+70>=view.x&&this.base.x-70<=view.right&&this.base.y+10>=view.y&&this.base.y-(this.definition.visualHeight??166)-9<=view.bottom;}
+  destroy(){this.footprint.destroy();this.back.destroy();this.front.destroy();}
 }

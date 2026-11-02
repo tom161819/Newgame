@@ -1,17 +1,21 @@
 import { COLUMNS, ROWS } from './config.js';
 import { tileCenter, worldToGrid, gridToWorld } from './isometric.js';
+import { objectRegistry } from '../systems/ObjectRegistry.js';
 
 const CHUNK_SIZE = 10;
 
 function terrainHash(x, y) { return ((Math.imul(x + 17, 374761393) ^ Math.imul(y + 29, 668265263)) >>> 0); }
 
 export class TerrainRenderer {
-  constructor(scene, map) {
+  constructor(scene, map, registry=objectRegistry, assets=null) {
     this.scene = scene; this.map = map;
+    this.registry=registry;this.assets=assets;
     this.tiles = new Map(); this.wallPool = [];
     this.chunks = new Map(); this.chunkPool = [];
     this.lastView = '';
     this.createTextures();
+    this.outcrop=registry.require('rock_outcrop');
+    this.wallTexture=assets?.textureFor(this.outcrop.id,'terrain-wall')??'terrain-wall';
   }
 
   chunkTexture(cx, cy) {
@@ -26,8 +30,9 @@ export class TerrainRenderer {
       for (let y = cy * CHUNK_SIZE; y < (cy + 1) * CHUNK_SIZE; y++) {
         for (let x = cx * CHUNK_SIZE; x < (cx + 1) * CHUNK_SIZE; x++) {
           const point = tileCenter({ x, y });
-          const source = this.scene.textures.get(`terrain-${terrainHash(x,y)%6}`).getSourceImage();
-          context.drawImage(source, point.x - left - 32, point.y - origin.y - 16);
+          const entry=this.groundTextures[terrainHash(x,y)%this.groundTextures.length];
+          const frame=this.scene.textures.get(entry.key).get(entry.frame);
+          context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,point.x-left-32,point.y-origin.y-16,64,32);
         }
       }
       texture.refresh();
@@ -36,7 +41,15 @@ export class TerrainRenderer {
   }
 
   createTextures() {
-    const palette = [0xaaa375, 0xa6a06e, 0xb4a578, 0x9fa06c, 0xb2aa7c, 0xa4a271];
+    this.groundTextures=[];
+    const palette=[];
+    for(const id of ['grass','dirt']){
+      const definition=this.registry.require(id);
+      if(this.assets?.usesSprite(definition))this.groundTextures.push({key:this.assets.textureKey(id),frame:definition.spritesheet?definition.visual?.previewFrame??0:undefined});
+      else for(const color of definition.visual?.colors??[0xaaa375]){
+        const key=`terrain-${palette.length}`;palette.push(color);this.groundTextures.push({key});
+      }
+    }
     for (let i = 0; i < palette.length; i++) {
       if (this.scene.textures.exists(`terrain-${i}`)) continue;
       const g = this.scene.make.graphics({ x: 0, y: 0, add: false });
@@ -85,8 +98,8 @@ export class TerrainRenderer {
       if (!this.map[y][x]) continue;
       const key=`${x},${y}`; visible.add(key);
       if(this.tiles.has(key))continue;
-      const wall=this.wallPool.pop()??this.scene.add.image(0,0,'terrain-wall').setOrigin(0.5,0.72);
-      wall.setPosition(p.x,p.y).setDepth(p.y+0.05).setVisible(true);
+      const wall=this.wallPool.pop()??this.scene.add.image(0,0,this.wallTexture).setOrigin(this.outcrop.origin?.x??0.5,this.outcrop.origin?.y??1);
+      wall.setPosition(p.x,p.y).setDepth(p.y+(this.outcrop.depth?.offset??0)).setVisible(true);
       this.tiles.set(key,wall);
     }
     for(const [key,tile] of this.tiles) if(!visible.has(key)) {

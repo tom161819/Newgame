@@ -1,232 +1,205 @@
 import Phaser from 'phaser';
 import { COLUMNS, ROWS, PLAYER_START, grid, isWalkable, tileCenter } from './map.js';
-import { tilePolygon, worldToTile } from './isometric.js';
+import { tilePolygon, worldToTile, gridToWorld } from './isometric.js';
 import { TerrainRenderer } from './TerrainRenderer.js';
 import { WorldCamera } from './WorldCamera.js';
 import { Inventory } from './inventory.js';
-import { drawStone, generateStones, tileKey, StoneSpawner, MAX_STONES } from './stones.js';
-import { placeTower, placementError, towerTiles, towerBase, towerNeighbors, TOWER_COST } from './buildings.js';
+import { drawStone, generateResourcePositions, resourceTiles, tileKey, ResourceSpawner } from './stones.js';
+import { placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors, buildingDefinition } from './buildings.js';
 import { TowerView } from './TowerView.js';
 import { KingView } from './KingView.js';
 import { PlayerController, PLAYER_STATE } from './PlayerController.js';
 import { BuildingBar } from '../ui/BuildingBar.js';
+import { InventoryBar } from '../ui/InventoryBar.js';
+import { AssetGallery } from '../ui/AssetGallery.js';
+import { formatCost } from '../ui/objectLabels.js';
+import { objectRegistry } from '../systems/ObjectRegistry.js';
+import { AssetManager } from '../systems/AssetManager.js';
 
 export class GameScene extends Phaser.Scene {
-  constructor() {
-    super('Game');
+  constructor() { super('Game'); }
+
+  preload() {
+    this.objectRegistry=objectRegistry;
+    this.assets=new AssetManager(this,this.objectRegistry);
+    this.assets.queue();
   }
 
   create() {
-    // Každá nová hra dostane vlastní mapu, do které lze zapisovat budovy.
-    this.map = grid.map(row => [...row]);
-    this.terrain = new TerrainRenderer(this, grid);
-    const start = PLAYER_START;
-    this.inventory = new Inventory();
-    this.stones = new Map(generateStones(this.map, start).map(tile => [tileKey(tile), drawStone(this, tile)]));
-    this.buildings = [];
-    this.towerViews = new Map();
-    this.buildMode = false;
-    this.previewAnchor = null;
-    this.previewTracking = false;
-    this.previewKey = null;
-    this.preview = new TowerView(this, { x: 0, y: 0, tiles: towerTiles({ x: 0, y: 0 }) }, true);
-    this.preview.setVisible(false);
-    this.marker = this.add.graphics().setDepth(9998).setVisible(false);
-    const position = tileCenter(start);
-    this.player = new KingView(this, position.x, position.y);
-    this.character = new PlayerController(this, this.player, start);
-    this.worldCamera = new WorldCamera(this, this.player);
-    this.spawner = new StoneSpawner({
-      map: this.map, stones: this.stones,
-      getOrigins: () => {
-        const character = this.character;
-        if (character.exitTile) return [character.exitTile];
-        if (character.currentTower) return towerNeighbors(character.currentTower);
-        return [character.nextTile ?? character.tile];
-      },
-      getReserved: () => this.character.reservedTiles(),
-      spawn: tile => {
-        this.stones.set(tileKey(tile), drawStone(this, tile));
-        this.updateWorldCount();
-      },
-    });
-    this.buildingBar = new BuildingBar({
-      onSelect: () => this.startBuilding(),
-      onCancel: () => this.cancelBuilding(),
-    });
-    this.buildingBar.close();
-    this.updateInventory();
-    this.setStatus('Vyber kámen, volné políčko nebo otevři Buildings.');
-    this.input.mouse.disableContextMenu();
-    this.input.on('pointerdown', pointer => this.handleClick(pointer));
-    this.input.on('pointermove', pointer => {
-      if (!this.buildMode) return;
-      this.previewTracking = true;
-      this.previewAnchor = this.pointerTile(pointer);
-      this.updateBuildingPreview();
-    });
-    this.input.on('gameout', () => {
-      this.previewAnchor = null;
-      this.previewTracking = false;
-      this.preview.setVisible(false);
-      this.previewKey = null;
-    });
-    const onEscape = () => { if (this.buildMode) this.cancelBuilding(); };
-    this.input.keyboard.on('keydown-ESC', onEscape);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.buildingBar.destroy();
-      this.worldCamera.destroy();
-      this.input.keyboard.off('keydown-ESC', onEscape);
-      this.game.canvas.style.cursor = '';
-    });
-  }
-
-  pointerTile(pointer) {
-    pointer.updateWorldPoint(this.cameras.main);
-    return worldToTile(pointer.worldX, pointer.worldY);
-  }
-
-  handleClick(pointer) {
-    if (pointer.rightButtonDown()) {
-      if (this.buildMode) this.cancelBuilding();
-      return;
-    }
-    if (!pointer.leftButtonDown()) return;
-    let goal = this.pointerTile(pointer);
-    if (this.buildMode) {
-      this.previewAnchor = goal;
-      const result = placeTower({ map: this.map, anchor: goal, stones: this.stones,
-        reservedTiles: this.character.reservedTiles(), inventory: this.inventory, buildings: this.buildings });
-      if (result.error) {
-        this.previewKey = null;
-        this.updateBuildingPreview();
-        this.setStatus(result.error);
-      } else {
-        this.towerViews.set(result.tower.id, new TowerView(this, result.tower));
-        this.updateInventory();
-        this.cancelBuilding('Věž postavena za 10 kamenů. Klikni na ni a král dojde ke vstupu.');
+    this.assets.initialize();
+    this.assets.registerRenderer('stone',(definition,context)=>drawStone(this,context.tile,definition));
+    this.assets.registerRenderer('king',(definition,context)=>new KingView(this,context.x,context.y,definition));
+    this.assets.registerRenderer('tower',(_definition,context)=>new TowerView(this,context.building,context.preview));
+    const base=this.objectRegistry.require('grass'),obstacle=this.objectRegistry.require('rock_outcrop');
+    this.map=grid.map(row=>row.map(value=>(value?obstacle:base).walkable?0:1));
+    this.terrain=new TerrainRenderer(this,grid,this.objectRegistry,this.assets);
+    this.inventory=new Inventory();
+    this.resources=new Map();this.stones=this.resources; // Kompatibilní označení původního seznamu kamenů.
+    this.resourceOccupancy=new Map();
+    this.buildings=[];this.towerViews=new Map();
+    this.buildMode=false;this.selectedBuilding=null;this.previewAnchor=null;this.previewTracking=false;this.previewKey=null;
+    this.preview=this.createBuildingView(this.objectRegistry.require('tower'),{x:0,y:0},true);this.preview.setVisible(false);
+    this.marker=this.add.graphics().setDepth(9998).setVisible(false);
+    const position=tileCenter(PLAYER_START);
+    this.player=this.assets.createView('king',position);
+    this.character=new PlayerController(this,this.player,PLAYER_START);
+    this.worldCamera=new WorldCamera(this,this.player);
+    this.resourceSpawners=[];
+    for(const definition of this.objectRegistry.byCategory('resource').filter(d=>d.spawn)){
+      const spawner=new ResourceSpawner({
+        map:this.map,resources:this.resourceOccupancy,definition,
+        getOrigins:()=>this.resourceOrigins(),getReserved:()=>this.character.reservedTiles(),
+        getCount:()=>this.resourceCount(definition.id),spawn:tile=>this.addResource(definition,tile),
+      });
+      this.resourceSpawners.push(spawner);
+      if(definition.walkable){
+        const candidates=generateResourcePositions(this.map,PLAYER_START,definition.spawn.initial,Math.random,this.resourceOccupancy,definition);
+        for(const tile of candidates)if(resourceTiles(tile,definition).every(p=>!this.resourceOccupancy.has(tileKey(p))))this.addResource(definition,tile);
       }
-      return;
+      while(this.resourceCount(definition.id)<definition.spawn.initial&&spawner.spawnOne()){}
     }
-    if (this.character.transitioning) {
-      this.setStatus('Počkej, až král dokončí výstup nebo sestup.');
-      return;
-    }
-    // Nový levý klik ruší předchozí sběr i plánovaný vstup, ne právě probíhající animaci.
-    this.character.order = null;
-    const tower = this.towerAtPoint(pointer.worldX, pointer.worldY, goal);
-    let accepted = false;
-    if (tower) {
-      accepted = this.character.command({ kind: 'enter', tower });
-    } else {
-      // I horní plocha kamene může trochu přesahovat kosočtverec jeho políčka.
-      const hit = [...this.stones.values()].find(stone => stone.visible
-        && Math.abs(pointer.worldX-stone.x)<14 && pointer.worldY>stone.y-12 && pointer.worldY<stone.y+10);
-      if (hit) goal = hit.getData('tile');
-      if (!isWalkable(this.map, goal.x, goal.y)) this.setStatus('Tady je překážka nebo okraj mapy. Vyber volné políčko.');
-      else accepted = this.character.command({ kind: 'move', goal, pickupKey: this.stones.has(tileKey(goal)) ? tileKey(goal) : null });
-    }
-    if (accepted) this.worldCamera.follow();
+    this.spawner=this.resourceSpawners.find(s=>s.definition.id==='stone');
+    this.inventoryBar=new InventoryBar(this.objectRegistry,this.assets,this.inventory);
+    this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
+    this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
+    this.buildingBar.close();this.updateInventory();
+    this.setStatus('Vyber surovinu, volné políčko, Buildings nebo Asset Library.');
+    this.input.mouse.disableContextMenu();
+    this.input.on('pointerdown',pointer=>this.handleClick(pointer));
+    this.input.on('pointermove',pointer=>{if(this.buildMode&&!this.assetGallery.isOpen){this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
+    this.input.on('gameout',()=>{this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;});
+    const onEscape=()=>{if(this.buildMode&&!this.assetGallery.isOpen)this.cancelBuilding();};
+    this.input.keyboard.on('keydown-ESC',onEscape);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
+      this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
+      this.input.keyboard.off('keydown-ESC',onEscape);this.game.canvas.style.cursor='';
+    });
   }
 
-  towerAtPoint(x, y, tile) {
-    return [...this.buildings].sort((a, b) => towerBase(b).y - towerBase(a).y).find(tower =>
-      this.towerViews.get(tower.id).contains(x, y) || tower.tiles.some(part => tileKey(part) === tileKey(tile)));
+  setGalleryInput(enabled) {
+    this.input.enabled=enabled;this.input.keyboard.enabled=enabled;
+    for(const key of Object.values(this.worldCamera.keys))key.reset();
+    this.previewTracking=false;this.preview.setVisible(false);
   }
 
-  startBuilding() {
-    if (this.character.transitioning) {
-      this.setStatus('Nejdřív dokonči výstup nebo sestup z věže.');
-      return false;
-    }
-    this.character.stopForBuilding();
-    this.buildMode = true;
-    this.previewKey = null;
-    this.previewAnchor = null;
-    this.previewTracking = false;
-    this.game.canvas.style.cursor = 'crosshair';
-    this.updateBuildingUI();
-    this.setStatus('Tower: vyber 2 × 2 volná políčka. Cena 10 kamenů. Esc nebo pravý klik stavbu zruší.');
-    return true;
+  resourceOrigins() {
+    const c=this.character;
+    if(c.exitTile)return [c.exitTile];
+    return c.currentTower?towerNeighbors(c.currentTower):[c.nextTile??c.tile];
   }
-
-  cancelBuilding(message = 'Režim stavění zrušen. Můžeš se znovu pohybovat a sbírat kameny.') {
-    this.buildMode = false;
-    this.previewAnchor = null;
-    this.previewTracking = false;
-    this.previewKey = null;
-    this.preview.setVisible(false);
-    this.game.canvas.style.cursor = '';
-    this.updateBuildingUI();
-    this.setStatus(message);
-  }
-
-  updateBuildingPreview() {
-    const anchor = this.previewAnchor;
-    if (!this.buildMode || !anchor || anchor.x < 0 || anchor.y < 0 || anchor.x >= COLUMNS || anchor.y >= ROWS) {
-      this.preview.setVisible(false);
-      return;
-    }
-    const error = placementError(this.map, anchor, this.stones, this.character.reservedTiles())
-      ?? (this.inventory.count('stone') < TOWER_COST ? 'Na věž potřebuješ 10 kamenů.' : null);
-    const key = `${tileKey(anchor)}:${error}`;
-    if (key !== this.previewKey) {
-      this.preview.paint({ ...anchor, tiles: towerTiles(anchor) }, error ? 0xf27777 : 0x71dba6);
-      this.previewKey = key;
-      this.setStatus(error ?? 'Platné místo: levým kliknutím postavíš věž za 10 kamenů.');
-    }
-    this.preview.setVisible(true);
-  }
-
-  showMarker(tile) {
-    this.marker.clear().lineStyle(2, 0xe3c879, 1).strokePoints(tilePolygon(tile), true).setVisible(true);
-  }
-
-  collectStone(tile) {
-    if (this.character.state !== PLAYER_STATE.GROUND) return false;
-    const key = tileKey(tile);
-    const stone = this.stones.get(key);
-    if (!stone) return false;
-    stone.destroy();
-    this.stones.delete(key);
-    this.inventory.add('stone');
-    this.updateInventory();
-    return true;
-  }
-
-  updateInventory() {
-    for (const element of document.querySelectorAll('[data-resource-count]')) {
-      element.textContent = this.inventory.count(element.dataset.resourceCount);
-    }
-    this.updateBuildingUI();
+  resourceCount(id) { let count=0;for(const view of this.resources.values())if(view.getData('objectId')===id)count++;return count; }
+  addResource(definition,tile) {
+    const point=gridToWorld(tile.x+definition.width/2,tile.y+definition.height/2),key=tileKey(tile);
+    const view=this.assets.createView(definition.id,{...point,tile});
+    const object={x:tile.x,y:tile.y,type:definition.id,definition,tiles:resourceTiles(tile,definition)};
+    view.setData('tile',{...tile});view.setData('object',object);
+    this.resources.set(key,view);
+    for(const part of object.tiles){this.resourceOccupancy.set(tileKey(part),key);if(!definition.walkable)this.map[part.y][part.x]=1;}
     this.updateWorldCount();
   }
 
-  updateWorldCount() {
-    document.querySelector('#world-stones').textContent = `Mapa 100 × 100 · kameny ${this.stones.size} / ${MAX_STONES}`;
-  }
-
-  updateBuildingUI() {
-    this.buildingBar.update(this.inventory.count('stone'), this.buildMode);
-  }
-
-  setStatus(message) {
-    document.querySelector('#status').textContent = message;
-  }
-
-  update(_time, delta) {
-    this.character.update(delta);
-    this.player.animate(delta, this.character.walking && this.character.state === PLAYER_STATE.GROUND, this.character.direction);
-    this.spawner.update(delta);
-    this.worldCamera.update(delta);
-    this.terrain.update(this.cameras.main);
-    const view = this.cameras.main.worldView;
-    for (const stone of this.stones.values()) stone.setVisible(stone.x>view.x-40&&stone.x<view.right+40&&stone.y>view.y-40&&stone.y<view.bottom+40);
-    for (const tower of this.towerViews.values()) tower.setVisible(tower.inView(view));
-    this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
-    if (this.buildMode) {
-      if (this.previewTracking) this.previewAnchor = this.pointerTile(this.input.activePointer);
-      this.updateBuildingPreview();
+  pointerTile(pointer) { pointer.updateWorldPoint(this.cameras.main);return worldToTile(pointer.worldX,pointer.worldY); }
+  handleClick(pointer) {
+    if(this.assetGallery.isOpen)return;
+    if(pointer.rightButtonDown()){if(this.buildMode)this.cancelBuilding();return;}
+    if(!pointer.leftButtonDown())return;
+    let goal=this.pointerTile(pointer);
+    if(this.buildMode){
+      this.previewAnchor=goal;
+      const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.character.reservedTiles(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding});
+      if(result.error){this.previewKey=null;this.updateBuildingPreview();this.setStatus(result.error);}
+      else{
+        this.towerViews.set(result.building.id,this.createBuildingView(this.selectedBuilding,result.building));
+        this.updateInventory();this.cancelBuilding(`${this.selectedBuilding.name} postavena. Cena: ${formatCost(this.selectedBuilding.cost,this.objectRegistry)}.`);
+      }
+      return;
     }
+    if(this.character.transitioning){this.setStatus('Počkej, až král dokončí výstup nebo sestup.');return;}
+    this.character.order=null;
+    const building=this.towerAtPoint(pointer.worldX,pointer.worldY,goal);
+    let accepted=false;
+    if(building){
+      if(buildingDefinition(building).interactions.includes('enter'))accepted=this.character.command({kind:'enter',tower:building});
+      else this.setStatus(buildingDefinition(building).description);
+    }else{
+      const hit=[...this.resources.values()].sort((a,b)=>b.depth-a.depth).find(view=>this.assets.hitTest(view,pointer.worldX,pointer.worldY));
+      let resource=hit??this.resources.get(this.resourceOccupancy.get(tileKey(goal)));
+      if(resource){
+        const object=resource.getData('object'),definition=object.definition;
+        if(!definition.collectible){this.setStatus(definition.description);return;}
+        goal=resource.getData('tile');
+        if(!definition.walkable)accepted=this.character.command({kind:'collect',resource:object,pickupKey:tileKey(goal)});
+        else accepted=this.character.command({kind:'move',goal,pickupKey:tileKey(goal)});
+      }else if(!isWalkable(this.map,goal.x,goal.y))this.setStatus('Tady je překážka nebo okraj mapy. Vyber volné políčko.');
+      else accepted=this.character.command({kind:'move',goal,pickupKey:null});
+    }
+    if(accepted)this.worldCamera.follow();
+  }
+
+  createBuildingView(definition,building,preview=false) {
+    const object={...building,type:definition.id,definition,tiles:building.tiles??buildingTiles(building,definition)};
+    return this.assets.createView(definition.id,{building:object,preview});
+  }
+  towerAtPoint(x,y,tile) {
+    return [...this.buildings].sort((a,b)=>towerBase(b).y-towerBase(a).y).find(building=>this.towerViews.get(building.id).contains(x,y)||building.tiles.some(part=>tileKey(part)===tileKey(tile)));
+  }
+  startBuilding(definition=this.objectRegistry.require('tower')) {
+    if(this.character.transitioning){this.setStatus('Nejdřív dokonči výstup nebo sestup z věže.');return false;}
+    if(!definition.buildable)return false;
+    this.character.stopForBuilding();this.selectedBuilding=definition;
+    this.preview.destroy();this.preview=this.createBuildingView(definition,{x:0,y:0},true);this.preview.setVisible(false);
+    this.buildMode=true;this.previewKey=null;this.previewAnchor=null;this.previewTracking=false;this.game.canvas.style.cursor='crosshair';
+    this.updateBuildingUI();this.setStatus(`${definition.name}: ${definition.width} × ${definition.height} políčka. Cena: ${formatCost(definition.cost,this.objectRegistry)}. Esc nebo pravý klik stavbu zruší.`);
+    return true;
+  }
+  cancelBuilding(message='Režim stavění zrušen. Můžeš se znovu pohybovat a sbírat suroviny.') {
+    this.buildMode=false;this.selectedBuilding=null;this.previewAnchor=null;this.previewTracking=false;this.previewKey=null;
+    this.preview.setVisible(false);this.game.canvas.style.cursor='';this.updateBuildingUI();this.setStatus(message);
+  }
+  updateBuildingPreview() {
+    const anchor=this.previewAnchor,definition=this.selectedBuilding;
+    if(!this.buildMode||!anchor||anchor.x<0||anchor.y<0||anchor.x>=COLUMNS||anchor.y>=ROWS){this.preview.setVisible(false);return;}
+    const error=placementError(this.map,anchor,this.resourceOccupancy,this.character.reservedTiles(),definition,this.buildings)
+      ??(!this.inventory.canAfford(definition.cost)?'Na tuto budovu nemáš dostatek surovin.':null);
+    const key=`${tileKey(anchor)}:${error}`;
+    if(key!==this.previewKey){
+      this.preview.paint({x:anchor.x,y:anchor.y,type:definition.id,definition,tiles:buildingTiles(anchor,definition)},error?0xf27777:0x71dba6);
+      this.previewKey=key;this.setStatus(error??`Platné místo: levým kliknutím postavíš ${definition.name}. Cena: ${formatCost(definition.cost,this.objectRegistry)}.`);
+    }
+    this.preview.setVisible(true);
+  }
+  showMarker(tile) { this.marker.clear().lineStyle(2,0xe3c879,1).strokePoints(tilePolygon(tile),true).setVisible(true); }
+
+  collectResource(key,standingTile) {
+    if(this.character.state!==PLAYER_STATE.GROUND)return false;
+    const view=this.resources.get(key);if(!view)return false;
+    const object=view.getData('object'),definition=object.definition;
+    if(!definition.collectible)return false;
+    const reachable=definition.walkable?key===tileKey(standingTile):towerNeighbors(object).some(p=>tileKey(p)===tileKey(standingTile));
+    if(!reachable)return false;
+    view.destroy();this.resources.delete(key);
+    for(const tile of object.tiles){this.resourceOccupancy.delete(tileKey(tile));if(!definition.walkable)this.map[tile.y][tile.x]=0;}
+    this.inventory.add(definition.id);this.updateInventory();return true;
+  }
+  collectStone(tile) { return this.collectResource(tileKey(tile),this.character.tile); }
+  updateInventory() { this.inventoryBar.update();this.updateBuildingUI();this.updateWorldCount(); }
+  updateBuildingUI() { this.buildingBar.update(this.inventory,this.buildMode?this.selectedBuilding:null); }
+  updateWorldCount() {
+    const definition=this.objectRegistry.require('stone');
+    document.querySelector('#world-stones').textContent=`Mapa ${COLUMNS} × ${ROWS} · kameny ${this.resourceCount('stone')} / ${definition.spawn.max}`;
+  }
+  setStatus(message) { document.querySelector('#status').textContent=message; }
+  update(_time,delta) {
+    this.character.update(delta);this.player.animate(delta,this.character.walking&&this.character.state===PLAYER_STATE.GROUND,this.character.direction);
+    for(const spawner of this.resourceSpawners)spawner.update(delta);
+    this.worldCamera.update(delta);this.terrain.update(this.cameras.main);
+    const view=this.cameras.main.worldView;
+    for(const resource of this.resources.values()){
+      const definition=this.objectRegistry.require(resource.getData('objectId'));
+      resource.setVisible(resource.x>view.x-64&&resource.x<view.right+64&&resource.y>view.y-40&&resource.y<view.bottom+(definition.visualHeight??40));
+    }
+    for(const building of this.towerViews.values())building.setVisible(building.inView(view));
+    this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
+    if(this.buildMode&&!this.assetGallery.isOpen){if(this.previewTracking)this.previewAnchor=this.pointerTile(this.input.activePointer);this.updateBuildingPreview();}
   }
 }

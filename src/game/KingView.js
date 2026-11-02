@@ -1,13 +1,16 @@
 import Phaser from 'phaser';
 import { directionName, DIRECTION_POSES } from './directions.js';
+import { objectRegistry } from '../systems/ObjectRegistry.js';
 
 // Grafická vrstva krále. Controller dodává logický směr, nikoli úhel obrazovky.
 // Každý z osmi směrů má vlastní pózu; později ji může nahradit animovaný sprite.
 export class KingView extends Phaser.GameObjects.Container {
-  constructor(scene, x, y) {
+  constructor(scene, x, y, definition=objectRegistry.require('king')) {
     super(scene, x, y);
     scene.add.existing(this);
-    this.shadow = scene.add.ellipse(0, 1, 27, 12, 0x30291c, 0.32);
+    this.setData('objectId',definition.id);
+    const shadow=definition.shadow;
+    this.shadow = scene.add.ellipse(shadow?.x??0,shadow?.y??0,shadow?.width??1,shadow?.height??1,shadow?.color??0x30291c,shadow?.alpha??0);
     this.torsoGroup = scene.add.container(0, 0);
     this.leftLeg = scene.add.rectangle(-4, -5, 5, 11, 0x374858);
     this.rightLeg = scene.add.rectangle(4, -5, 5, 11, 0x374858);

@@ -1,6 +1,6 @@
 # První cesta — Královská hlídka
 
-Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3.5**. Vlastní procedurální středověká grafika: písčitá krajina, kamenné překážky, korunovaný král s červeným pláštěm a strážní věže. Bez backendu, databáze a externích obrázků.
+Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3.5**. Vlastní procedurální středověká grafika: písčitá krajina, kamenné překážky, korunovaný král s červeným pláštěm a strážní věže. Bez backendu a databáze. Vlastní PNG/WebP grafika a náhledy jsou součástí projektu.
 
 **[Hrát v prohlížeči](https://tom161819.github.io/Newgame/)** — bez instalace a přihlášení.
 
@@ -15,6 +15,7 @@ Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3
 | WASD nebo šipky | Ručně posouvají kameru a pozastaví její sledování krále. |
 | Mezerník nebo „Na krále“ | Znovu zapne plynulé sledování krále. Nový platný příkaz k pohybu ho také obnoví. |
 | Kolečko myši nad mapou | Zoom od 0,45× do 1,8×. |
+| Asset Library | Otevře prohlížeč definic objektů s kategoriemi, náhledy a podrobnými údaji. |
 | Buildings → Tower | Zapne náhled stavby 2 × 2 políčka za 10 kamenů. |
 | Levý klik v režimu stavění | Postaví věž na platném místě. Zelená = lze stavět, červená = neplatné místo nebo málo surovin. |
 | Esc, pravý klik nebo Zrušit | Zruší režim stavění bez platby. |
@@ -35,6 +36,12 @@ Horní inventář a spodní Buildings jsou mimo herní kameru a při pohybu nebo
 - Ke vstupu se vybírá sousední políčko s nejkratší dosažitelnou cestou. Následuje animace lezení, ne přesun z dálky. Král nahoře nechodí po mapě ani nesbírá. Sestup vybere sousední políčko s dostupnou cestou k cíli; pokud takové není, král zůstane nahoře.
 - Během animace výstupu a sestupu se nové příkazy nepřijímají. Vstup/výstup lze opakovat, včetně přechodu z jedné věže do druhé.
 - Po obnovení stránky začíná nová hra: inventář je nulový, budovy zmizí a kameny se vygenerují znovu. Hra nepřidává boj, nepřátele ani jiné budovy.
+
+## Knihovna objektů
+
+Šest současných typů (grass, dirt, stone, tower, king, rock_outcrop) má centrální definice v `src/data/objects/`. Registr kontroluje unikátní ID a platné parametry; stejná cena a půdorys budovy řídí galerii, nabídku Buildings, platbu i kolize. Galerie je pouze prohlížeč a nemění mapu nebo inventář.
+
+`AssetManager` načítá sdílené PNG/WebP textury a spritesheety se správným základem URL pro GitHub Pages. Chybějící obrázek použije procedurální kresbu nebo společný náhradní obrázek. Nová surovina či budova používající stávající mechanismy se přidává definicí a obrázkem; inventář i nabídka se přizpůsobí automaticky. Podrobný postup, origin, vrstvy věže a animace postavy popisuje **[ASSET_GUIDE.md](ASSET_GUIDE.md)**.
 
 ## Instalace a spuštění pro vývoj
 
@@ -75,7 +82,11 @@ Upozornění Vite na velikost balíčku souvisí s přibaleným Phaserem a nebr�
 | `src/game/buildings.js` | Cena, půdorys, validace, blokování mapy a plánování vstupu/výstupu. |
 | `src/game/TowerView.js` | Izometrické stěny, plošina, cimbuří, stín, zásah myší a průhledný náhled. |
 | `src/game/GameScene.js` | Propojení vstupu, kamery, krále, sběru, generátoru, stavby a UI. |
-| `src/ui/BuildingBar.js` | Spodní záložka Buildings, nabídka Tower a dostupnost kamenů. |
+| `src/data/objects/` | Pět kategorií datových definic, včetně jediné ceny věže. |
+| `src/systems/ObjectRegistry.js` | Validace a vyhledávání neměnných definic. |
+| `src/systems/AssetManager.js`, `SpriteViews.js` | Sdílené obrázky/animace, fallback, origin a obecné sprite pohledy. |
+| `src/ui/BuildingBar.js`, `InventoryBar.js` | Nabídka a inventář sestavené z registru objektů. |
+| `src/ui/AssetGallery.js` | Prohlížeč knihovny s filtry a detailem. |
 | `index.html`, `src/style.css` | Pevné rozhraní kolem mapy. Žádné CSS otáčení herního světa. |
 | `tests/` | Testy souřadnic, navigace, generování, časování, limitů, inventáře, stavby a vstupu/výstupu. |
 
@@ -109,3 +120,5 @@ Kamera je omezená obdélníkovými hranicemi promítnutého světa; její stře
 GitHub Pages je nastavené na **GitHub Actions**. Push do `main` spustí `.github/workflows/pages.yml`: instalaci z lockfilu, testy, build se správnou základní cestou a nasazení. Web je nezávislý na publikování cloudového prostředí Codexu.
 
 Před převodem na izometrii byl vytvořen checkpoint commit **`bf049d5`**. Obsahuje původní funkční verzi se sběrem, inventářem a věžemi; lze jej použít pro porovnání nebo návrat.
+
+Před zavedením Asset Library vznikl checkpoint **`4d3d63f`** s funkčním osmisměrným pohybem.

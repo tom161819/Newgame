@@ -1,0 +1,106 @@
+# Přidávání objektů a grafiky
+
+Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soubory v `public/assets/`; Vite je kopíruje do sestavení beze změny. Současná hra má šest typů: grass, dirt, stone, tower, king a rock_outcrop. Prázdné složky pro vodu, dřevo, železo, stromy a keře jsou příprava, nepřidávají nové herní mechaniky.
+
+## Soubory a registr
+
+| Kategorie | Definice | Obrázky |
+|---|---|---|
+| Terén | `src/data/objects/terrain.js` | `public/assets/terrain/{grass,dirt,water}/` |
+| Suroviny | `src/data/objects/resources.js` | `public/assets/resources/{stone,wood,iron}/` |
+| Budovy | `src/data/objects/buildings.js` | `public/assets/buildings/tower/` a další podsložky |
+| Postavy | `src/data/objects/characters.js` | `public/assets/characters/king/` a další podsložky |
+| Dekorace | `src/data/objects/decorations.js` | `public/assets/decorations/{rocks,trees,bushes}/` |
+
+`src/data/objects/index.js` spojí pět seznamů. `ObjectRegistry` zkontroluje definice, odmítne chybějící údaje, neplatné hodnoty a duplicitní ID a uloží neměnné kopie. Nabízí `get(id)`, `require(id)`, `all()`, `byCategory(category)`, `buildables()` a `forGallery(category)`. `get` vrací pro neznámé ID `null`; `require` ohlásí chybu.
+
+## Definice objektu
+
+Každý objekt obsahuje:
+
+```js
+{
+  id: 'tower',                    // jedinečné ID, malé znaky, čísla, _ a -
+  name: 'Stone Tower',
+  category: 'building',          // terrain/resource/building/character/decoration
+  sprite: '/assets/buildings/tower/tower.png',
+  width: 2, height: 2,           // logická políčka, nikoli pixely obrázku
+  walkable: false,
+  collectible: false,
+  buildable: true,
+  cost: { stone: 10 },           // klíče jsou ID surovin
+  interactions: ['enter', 'exit'],
+  description: 'Kamenná strážní věž s horní plošinou.',
+  renderMode: 'sprite',
+  origin: { x: 0.5, y: 0.91 },
+  visualHeight: 166,
+  depth: { offset: 0 },
+  platform: { x: 0, y: -118 },  // nutné pro budovu s interakcí enter
+}
+```
+
+Cena, rozměry, průchodnost a interakce se čtou ze stejné definice v galerii, Buildings i při platbě a umístění. Cena věže 10 je zapsána v jediné definici. `Inventory.pay(cost)` odečte všechny požadované suroviny až tehdy, pokud jsou všechny dostupné.
+
+`renderMode: 'procedural'` a `renderer` ponechávají původní animovanou kresbu krále, kámen a rozdělené cimbuří věže. Jejich PNG slouží i jako náhledy v UI. Pro přechod na obrázek nastav `renderMode: 'sprite'`; logika pohybu, sběru a obsazení se nemění. Je podporováno PNG, WebP a SVG. Animované spritesheety používají PNG nebo WebP a stejně velké snímky.
+
+## Nová budova
+
+1. Vlož obrázek do `public/assets/buildings/<id>/`.
+2. Přidej definici do pole v `buildings.js`, s `category: 'building'`, `buildable: true` a `renderMode: 'sprite'`.
+3. Nastav půdorys, cenu a origin. Nabídka Buildings i galerie ji zahrnou automaticky. Není potřeba měnit UI ani `GameScene`.
+4. Pro prostou blokující stavbu použij `walkable: false` a `interactions: []`. Pro vstup na plošinu přidej `enter`, `exit` a `platform`.
+
+Náhled se přichytí na mřížku, kontroluje celý půdorys a nepřekryje suroviny, jinou budovu ani probíhající krok krále. Po stavbě se zaplatí cena z definice a neprůchozí políčka se ihned promítnou do A*. Tato rozšíření používají stávající mechanismy; produkce, boj nebo jiné nové chování vyžadují samostatný systém.
+
+## Nová sběratelná surovina
+
+Vlož obrázek do `public/assets/resources/<id>/` a přidej definici do `resources.js`. Použij `category: 'resource'`, `collectible: true`, `interactions: ['collect']`, `buildable: false`, `cost: {}` a `renderMode: 'sprite'`. Volitelné `symbol`, `inventoryLabel` a `quantityNames: [jednotné, malé_množné, velké_množné]` ovlivňují text inventáře a ceny.
+
+```js
+spawn: { initial: 10, interval: 20000, max: 40 }
+```
+
+`spawn` je volitelné. Pokud je uvedeno, stejný generátor vytvoří počáteční objekty a později další do limitu daného typu. Kontroluje dosažitelnost, celý půdorys, všechny ostatní suroviny a chráněná políčka krále. Průchozí suroviny se sbírají po dojití na políčko; neprůchozí po dojití k sousednímu políčku. Sběr přidá jednu jednotku podle ID do existujícího inventáře, jehož lišta se sestaví z registrovaných sběratelných surovin.
+
+## Origin, výška, stín a překrývání
+
+Origin je relativní bod obrázku: `{x: 0.5, y: 1}` znamená dolní střed. U postavy jej nastav k chodidlům. U budovy se váže k přednímu rohu půdorysu `gridToWorld(x + width, y + height)`. U suroviny se váže ke středu půdorysu. Rozměry obrázku neurčují obsazená políčka.
+
+`visualHeight` pomáhá ponechat v záběru vysoké objekty, jejichž základna leží mimo obraz. `depth.offset` jemně rozliší vrstvy ve stejné hloubce. Volitelné `visual.displayWidth/displayHeight` mění zobrazovanou velikost obrázku, nikoli kolize.
+
+Stín lze dodat v obrázku (`shadow.baked: true`) nebo vykreslit zvlášť:
+
+```js
+shadow: { x: 0, y: 3, width: 28, height: 12, color: 0x30291c, alpha: 0.25, baked: false }
+```
+
+Pro sprite věže s postavou za předním cimbuřím rozděl kresbu na zadní obrázek `sprite` a průhledný `frontSprite` se stejnými rozměry a originem. Volitelný `frontOrigin` dovolí jiný origin přední vrstvy. Zadní část se kreslí v hloubce základny, král na plošině v `+0.2`, přední část v `+0.3`. Bez přední vrstvy stojí král před celým obrázkem budovy. Současná procedurální věž už má obě vrstvy.
+
+## Animovaná postava
+
+V definici postavy nastav `renderMode: 'sprite'`, cestu k spritesheetu a velikost snímku. Pro každý logický směr N, NE, E, SE, S, SW, W, NW definuj stavy idle a walk, například:
+
+```js
+spritesheet: { frameWidth: 64, frameHeight: 80 },
+animations: {
+  mode: 'spritesheet',
+  clips: [
+    { name: 'idle-s', state: 'idle', direction: 'S', frames: [0], frameRate: 1, repeat: -1 },
+    { name: 'walk-s', state: 'walk', direction: 'S', frames: [1, 2, 3, 4], frameRate: 8, repeat: -1 },
+    // Totéž pro dalších sedm směrů podle rozložení vlastního spritesheetu.
+  ],
+},
+visual: { previewFrame: 0 },
+```
+
+Čísla snímků začínají nulou. Směry jsou logické směry mapy, nikoli směr nahoru/dolů na obrazovce. Otočení zůstane po zastavení zachováno. Nahrazením grafiky definice `king` zůstává použité současné ovládání a osmisměrný pohyb.
+
+`AssetManager` vytváří sdílené textury a animační klipy jednou pro každý typ. Padesát instancí stejné budovy proto nenačítá padesát obrázků. Galerie získá náhled z už načtené textury, u spritesheetu ze zvoleného snímku. Cesty automaticky respektují Vite `BASE_URL`, včetně `/Newgame/` na GitHub Pages.
+
+## Chybějící obrázky a kontrola
+
+Při chybě načtení se hra nezastaví: známý procedurální typ použije svou kresbu, ostatní typy sdílený náhradní obrázek. Galerie ukáže upozornění u chybějícího souboru. Chybnou definici však registr odmítne s uvedením ID, aby nenastala skrytá změna pravidel.
+
+Po změně spusť `npm test` a `npm run build -- --base=/Newgame/`. V prohlížeči ověř Asset Library → All a pět kategorií, detail objektu, sběr, cenu/půdorys stavby, chůzi kolem budovy a vstup/sestup z věže. Pro nový spritesheet zkontroluj všechny směry a klidovou animaci. Pro fallback dočasně změň cestu obrázku na neexistující místní soubor a po kontrole ji vrať.
+
+Terén stále používá blokovou cache a culling; knihovna nepřidává tisíce samostatných obrázků políček. Galerie je pouze prohlížeč definic, bez editace a vkládání objektů do mapy.
