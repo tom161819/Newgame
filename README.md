@@ -41,6 +41,10 @@ Workflow používá Node.js 24, instaluje závislosti z lockfilu, spouští test
 
 Levým tlačítkem klikni na volné políčko. Modrý kruh se plynule přesune do jeho středu a obejde šedé překážky. Další kliknutí změní cíl i za pohybu. Pravé tlačítko a kliknutí mimo mapu či na překážku nemění cestu.
 
+Při každém načtení hry se náhodně rozmístí **15 kamenů** na různá volná políčka mimo start hráče. Kliknutím na kámen zahájíš cestu k němu. Po příchodu do středu jeho políčka zmizí a horní inventář se okamžitě zvýší o jeden kámen. Kameny jsou kreslené geometricky: tři šedé plochy a stín jim dávají prostorový vzhled. Stávající mapa a pohled shora zůstávají zachované.
+
+Každý další levý klik do mapy zruší předchozí požadavek na sběr, včetně kliknutí na překážku či nedosažitelný cíl. Pokud nový cíl není platný, původní pohyb se dokončí, ale původní kámen se nesebere. Pravé tlačítko požadavek nemění. Nedosažitelný kámen zůstane na místě. Kameny neblokují cestu a pouhé projití přes jiný, nevybraný kámen ho nesebere. Inventář po obnovení stránky začíná znovu od nuly; ukládání ani další suroviny zatím nejsou přidané.
+
 Mapa má přesně **20 × 15 políček po 32 × 32 px**, tedy 640 × 480 herních pixelů. Na menším displeji se plátno úměrně zmenší. Hráč začíná na souřadnicích `(2, 2)`, počítaných od nuly.
 
 ## Struktura
@@ -50,8 +54,11 @@ Mapa má přesně **20 × 15 políček po 32 × 32 px**, tedy 640 × 480 herníc
 - `src/game/map.js` – mapa (`0` = volno, `1` = překážka), rozměry a převod na středy políček.
 - `src/game/pathfinding.js` – BFS nezávislé na vykreslování.
 - `src/game/GameScene.js` – geometrické vykreslení, klikání a pohyb hráče.
+- `src/game/stones.js` – náhodné rozmístění bez opakování a geometrické vykreslení kamenů.
+- `src/game/inventory.js` – počty surovin podle názvu; stejným rozhraním lze později evidovat dřevo, železo nebo zlato.
 - `src/style.css` – jednoduché rozvržení stránky.
 - `tests/pathfinding.test.js` – nejkratší obchůzka, neplatné a nedosažitelné cíle, platnost cest do všech volných políček.
+- `tests/stones.test.js` – pravidla náhodného rozmístění a počítání surovin v inventáři.
 - `package-lock.json` – přesné verze pro opakovatelnou instalaci přes `npm ci`.
 
 ## Jak to funguje
