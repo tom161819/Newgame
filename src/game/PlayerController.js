@@ -3,6 +3,7 @@ import { gridToWorld } from './isometric.js';
 import { tileKey } from './stones.js';
 import { planGroundOrder, planTowerExit, towerNeighbors, buildingDepth, towerTop, buildingDefinition } from './buildings.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
+import { advanceMovement } from './movement.js';
 
 export const PLAYER_STATE = Object.freeze({
   GROUND: 'ground', ENTERING: 'enteringTower', ON_TOWER: 'onTower', EXITING: 'exitingTower',
@@ -79,7 +80,7 @@ export class PlayerController {
     this.order = order;
     this.path = route.path;
     this.scene.showMarker(route.destination);
-    this.scene.setStatus(order.kind === 'enter' ? 'Jdu k dostupnému vstupu do věže.'
+    if(!order.silent)this.scene.setStatus(order.kind === 'enter' ? 'Jdu k dostupnému vstupu do věže.'
       : order.pickupKey ? 'Jdu sebrat kámen. Dalším kliknutím změníš cíl.' : 'Mířím do cíle.');
     if (!this.nextTile && this.path.length === 0) this.arrive();
     return true;
@@ -90,7 +91,11 @@ export class PlayerController {
     const order = this.order;
     this.order = null;
     this.scene.marker.setVisible(false);
-    if (order?.kind === 'enter') {
+    if(order?.kind==='approachAnimal'){
+      // Zvíře mohlo během cesty změnit polohu; dosah ověří HuntingSystem.
+    } else if(order?.kind==='drop'){
+      this.scene.dropSystem.collect(order.dropId,this.tile);
+    } else if (order?.kind === 'enter') {
       this.climb(order.tower);
     } else if (order?.kind === 'collect' && this.scene.collectResource(order.pickupKey,this.tile)) {
       this.scene.setStatus('Surovina sebrána.');
@@ -145,29 +150,7 @@ export class PlayerController {
   update(delta) {
     this.walking = false;
     if (this.state !== PLAYER_STATE.GROUND) return;
-    let distanceLeft = this.speed * delta / 1000;
-    while (distanceLeft > 0) {
-      if (!this.nextTile) this.nextTile = this.path.shift();
-      if (!this.nextTile) break;
-      const target = { x: this.nextTile.x + 0.5, y: this.nextTile.y + 0.5 };
-      const dx = target.x - this.position.x;
-      const dy = target.y - this.position.y;
-      const distance = Math.hypot(dx, dy);
-      if (distance > 0) {
-        this.walking = true;
-        this.direction = { x: dx / distance, y: dy / distance };
-      }
-      if (distance <= distanceLeft) {
-        this.position = target;
-        distanceLeft -= distance;
-        this.tile = this.nextTile;
-        this.nextTile = null;
-      } else {
-        this.position.x += dx / distance * distanceLeft;
-        this.position.y += dy / distance * distanceLeft;
-        break;
-      }
-    }
+    advanceMovement(this,delta);
     const projected = gridToWorld(this.position.x, this.position.y);
     this.sprite.setPosition(projected.x, projected.y);
     this.sprite.setDepth(this.sprite.y + this.depthOffset);

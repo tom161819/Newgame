@@ -1,6 +1,6 @@
 import { objectDefinitions } from '../data/objects/index.js';
 
-export const OBJECT_CATEGORIES = Object.freeze(['terrain', 'resource', 'building', 'character', 'decoration']);
+export const OBJECT_CATEGORIES = Object.freeze(['terrain', 'resource', 'building', 'character', 'decoration', 'animal']);
 const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 const plainObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const finite = value => typeof value === 'number' && Number.isFinite(value);
@@ -37,6 +37,12 @@ export function validateDefinition(definition) {
   if (d.spritesheet !== undefined && (!plainObject(d.spritesheet) || ![d.spritesheet.frameWidth,d.spritesheet.frameHeight].every(v => Number.isSafeInteger(v) && v > 0))) fail(id, 'neplatné rozměry spritesheetu.');
   if (d.frontSprite && !/^\/assets\/(?!.*\.\.)[^?#]+\.(png|webp|svg)$/i.test(d.frontSprite)) fail(id, 'neplatná přední vrstva.');
   if (d.visual !== undefined && !plainObject(d.visual)) fail(id, 'neplatné vizuální parametry.');
+  if (d.consumption !== undefined && (!plainObject(d.consumption) || !Number.isSafeInteger(d.consumption.amount)
+    || d.consumption.amount<=0 || !finite(d.consumption.interval) || d.consumption.interval<=0)) fail(id, 'neplatná spotřeba suroviny.');
+  if (d.category==='animal' && (!plainObject(d.gameplay) || !finite(d.gameplay.movementSpeed) || d.gameplay.movementSpeed<=0
+    || !Number.isSafeInteger(d.gameplay.initialCount) || d.gameplay.initialCount<0 || d.gameplay.behavior!=='wander'
+    || typeof d.gameplay.huntable!=='boolean' || !Number.isSafeInteger(d.gameplay.meatDrop) || d.gameplay.meatDrop<0
+    || !Number.isSafeInteger(d.gameplay.wanderRadius) || d.gameplay.wanderRadius<=0)) fail(id, 'neplatné chování zvířete.');
   if (d.visual?.previewFrame !== undefined && (!Number.isSafeInteger(d.visual.previewFrame) || d.visual.previewFrame < 0)) fail(id, 'neplatný snímek náhledu.');
   for (const key of ['displayWidth','displayHeight']) if (d.visual?.[key] !== undefined && (!finite(d.visual[key]) || d.visual[key] <= 0)) fail(id, 'neplatná velikost obrázku.');
   if (d.animations !== undefined) {

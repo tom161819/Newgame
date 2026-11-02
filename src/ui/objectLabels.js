@@ -1,4 +1,4 @@
-export const CATEGORY_LABELS={terrain:'Terrain',resource:'Resources',building:'Buildings',character:'Characters',decoration:'Decorations'};
+export const CATEGORY_LABELS={terrain:'Terrain',resource:'Resources',building:'Buildings',character:'Characters',decoration:'Decorations',animal:'Animals'};
 export function element(tag,className,text) {
   const node=document.createElement(tag);if(className)node.className=className;if(text!==undefined)node.textContent=text;return node;
 }

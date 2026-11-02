@@ -15,6 +15,11 @@ import { AssetGallery } from '../ui/AssetGallery.js';
 import { formatCost } from '../ui/objectLabels.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { AssetManager } from '../systems/AssetManager.js';
+import { AnimalView } from './AnimalView.js';
+import { AnimalSystem } from '../systems/AnimalSystem.js';
+import { HuntingSystem } from '../systems/HuntingSystem.js';
+import { DropSystem } from '../systems/DropSystem.js';
+import { FoodSystem } from '../systems/FoodSystem.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -30,6 +35,7 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('stone',(definition,context)=>drawStone(this,context.tile,definition));
     this.assets.registerRenderer('king',(definition,context)=>new KingView(this,context.x,context.y,definition));
     this.assets.registerRenderer('tower',(_definition,context)=>new TowerView(this,context.building,context.preview));
+    this.assets.registerRenderer('animal',(definition,context)=>new AnimalView(this,context.x,context.y,definition));
     const base=this.objectRegistry.require('grass'),obstacle=this.objectRegistry.require('rock_outcrop');
     this.map=grid.map(row=>row.map(value=>(value?obstacle:base).walkable?0:1));
     this.terrain=new TerrainRenderer(this,grid,this.objectRegistry,this.assets);
@@ -43,12 +49,11 @@ export class GameScene extends Phaser.Scene {
     const position=tileCenter(PLAYER_START);
     this.player=this.assets.createView('king',position);
     this.character=new PlayerController(this,this.player,PLAYER_START);
-    this.worldCamera=new WorldCamera(this,this.player);
     this.resourceSpawners=[];
     for(const definition of this.objectRegistry.byCategory('resource').filter(d=>d.spawn)){
       const spawner=new ResourceSpawner({
         map:this.map,resources:this.resourceOccupancy,definition,
-        getOrigins:()=>this.resourceOrigins(),getReserved:()=>this.character.reservedTiles(),
+        getOrigins:()=>this.resourceOrigins(),getReserved:()=>this.reservedTiles(),
         getCount:()=>this.resourceCount(definition.id),spawn:tile=>this.addResource(definition,tile),
       });
       this.resourceSpawners.push(spawner);
@@ -59,19 +64,25 @@ export class GameScene extends Phaser.Scene {
       while(this.resourceCount(definition.id)<definition.spawn.initial&&spawner.spawnOne()){}
     }
     this.spawner=this.resourceSpawners.find(s=>s.definition.id==='stone');
+    this.dropSystem=new DropSystem(this);
+    this.animalSystem=new AnimalSystem(this);this.animalSystem.spawn(PLAYER_START);
+    this.huntingSystem=new HuntingSystem(this);
+    this.foodSystem=new FoodSystem(this.inventory,this.objectRegistry.require('meat'),()=>this.updateInventory());
     this.inventoryBar=new InventoryBar(this.objectRegistry,this.assets,this.inventory);
     this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
     this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
     this.buildingBar.close();this.updateInventory();
     this.setStatus('Vyber surovinu, volné políčko, Buildings nebo Asset Library.');
+    this.worldCamera=new WorldCamera(this,this.player);
     this.input.mouse.disableContextMenu();
     this.input.on('pointerdown',pointer=>this.handleClick(pointer));
-    this.input.on('pointermove',pointer=>{if(this.buildMode&&!this.assetGallery.isOpen){this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
-    this.input.on('gameout',()=>{this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;});
+    this.input.on('pointermove',pointer=>{this.updateHover(pointer);if(this.buildMode&&!this.assetGallery.isOpen){this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
+    this.input.on('gameout',()=>{this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;document.querySelector('#object-tooltip').hidden=true;});
     const onEscape=()=>{if(this.buildMode&&!this.assetGallery.isOpen)this.cancelBuilding();};
     this.input.keyboard.on('keydown-ESC',onEscape);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
       this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
+      this.animalSystem.destroy();this.dropSystem.destroy();document.querySelector('#object-tooltip').hidden=true;
       this.input.keyboard.off('keydown-ESC',onEscape);this.game.canvas.style.cursor='';
     });
   }
@@ -80,6 +91,22 @@ export class GameScene extends Phaser.Scene {
     this.input.enabled=enabled;this.input.keyboard.enabled=enabled;
     for(const key of Object.values(this.worldCamera.keys))key.reset();
     this.previewTracking=false;this.preview.setVisible(false);
+    document.querySelector('#object-tooltip').hidden=true;
+  }
+
+  reservedTiles(){return [...this.character.reservedTiles(),...(this.animalSystem?.reservedTiles()??[])];}
+  updateHover(pointer){
+    const tooltip=document.querySelector('#object-tooltip');
+    if(this.buildMode||this.assetGallery.isOpen){tooltip.hidden=true;return;}
+    pointer.updateWorldPoint(this.cameras.main);
+    const drop=this.dropSystem.atPoint(pointer.worldX,pointer.worldY);
+    tooltip.hidden=!drop;
+    if(drop){
+      tooltip.textContent=`${this.objectRegistry.require(drop.resource).name} ×${drop.amount}`;
+      const rect=this.game.canvas.getBoundingClientRect();
+      tooltip.style.left=`${Math.min(window.innerWidth-110,rect.left+pointer.x*rect.width/this.scale.width+14)}px`;
+      tooltip.style.top=`${Math.max(4,rect.top+pointer.y*rect.height/this.scale.height-32)}px`;
+    }
   }
 
   resourceOrigins() {
@@ -106,7 +133,7 @@ export class GameScene extends Phaser.Scene {
     let goal=this.pointerTile(pointer);
     if(this.buildMode){
       this.previewAnchor=goal;
-      const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.character.reservedTiles(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding});
+      const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding});
       if(result.error){this.previewKey=null;this.updateBuildingPreview();this.setStatus(result.error);}
       else{
         this.towerViews.set(result.building.id,this.createBuildingView(this.selectedBuilding,result.building));
@@ -116,11 +143,18 @@ export class GameScene extends Phaser.Scene {
     }
     if(this.character.transitioning){this.setStatus('Počkej, až král dokončí výstup nebo sestup.');return;}
     this.character.order=null;
+    this.huntingSystem.cancel();
     const building=this.towerAtPoint(pointer.worldX,pointer.worldY,goal);
+    const animal=!building&&this.animalSystem.atPoint(pointer.worldX,pointer.worldY);
+    const drop=!building&&!animal&&(this.dropSystem.atPoint(pointer.worldX,pointer.worldY)??this.dropSystem.atTile(goal));
     let accepted=false;
     if(building){
       if(buildingDefinition(building).interactions.includes('enter'))accepted=this.character.command({kind:'enter',tower:building});
       else this.setStatus(buildingDefinition(building).description);
+    }else if(animal){
+      accepted=this.huntingSystem.command(animal);
+    }else if(drop){
+      accepted=this.character.command({kind:'drop',goal:drop.tile,dropId:drop.id});
     }else{
       const hit=[...this.resources.values()].sort((a,b)=>b.depth-a.depth).find(view=>this.assets.hitTest(view,pointer.worldX,pointer.worldY));
       let resource=hit??this.resources.get(this.resourceOccupancy.get(tileKey(goal)));
@@ -146,6 +180,7 @@ export class GameScene extends Phaser.Scene {
   startBuilding(definition=this.objectRegistry.require('tower')) {
     if(this.character.transitioning){this.setStatus('Nejdřív dokonči výstup nebo sestup z věže.');return false;}
     if(!definition.buildable)return false;
+    this.huntingSystem.cancel();
     this.character.stopForBuilding();this.selectedBuilding=definition;
     this.preview.destroy();this.preview=this.createBuildingView(definition,{x:0,y:0},true);this.preview.setVisible(false);
     this.buildMode=true;this.previewKey=null;this.previewAnchor=null;this.previewTracking=false;this.game.canvas.style.cursor='crosshair';
@@ -159,7 +194,7 @@ export class GameScene extends Phaser.Scene {
   updateBuildingPreview() {
     const anchor=this.previewAnchor,definition=this.selectedBuilding;
     if(!this.buildMode||!anchor||anchor.x<0||anchor.y<0||anchor.x>=COLUMNS||anchor.y>=ROWS){this.preview.setVisible(false);return;}
-    const error=placementError(this.map,anchor,this.resourceOccupancy,this.character.reservedTiles(),definition,this.buildings)
+    const error=placementError(this.map,anchor,this.resourceOccupancy,this.reservedTiles(),definition,this.buildings)
       ??(!this.inventory.canAfford(definition.cost)?'Na tuto budovu nemáš dostatek surovin.':null);
     const key=`${tileKey(anchor)}:${error}`;
     if(key!==this.previewKey){
@@ -178,11 +213,16 @@ export class GameScene extends Phaser.Scene {
     const reachable=definition.walkable?key===tileKey(standingTile):towerNeighbors(object).some(p=>tileKey(p)===tileKey(standingTile));
     if(!reachable)return false;
     view.destroy();this.resources.delete(key);
-    for(const tile of object.tiles){this.resourceOccupancy.delete(tileKey(tile));if(!definition.walkable)this.map[tile.y][tile.x]=0;}
+    for(const tile of object.tiles){this.dropSystem.refreshOccupancy(tile);if(!definition.walkable)this.map[tile.y][tile.x]=0;}
     this.inventory.add(definition.id);this.updateInventory();return true;
   }
   collectStone(tile) { return this.collectResource(tileKey(tile),this.character.tile); }
-  updateInventory() { this.inventoryBar.update();this.updateBuildingUI();this.updateWorldCount(); }
+  updateInventory() { this.inventoryBar.update();this.updateBuildingUI();this.updateWorldCount();this.updateFoodDisplay(); }
+  updateFoodDisplay(){
+    const seconds=this.foodSystem.remainingSeconds,text=`Food: ${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
+    const output=document.querySelector('#food-countdown');if(output.textContent!==text)output.textContent=text;
+    document.querySelector('#food-warning').hidden=this.inventory.count('meat')>0;
+  }
   updateBuildingUI() { this.buildingBar.update(this.inventory,this.buildMode?this.selectedBuilding:null); }
   updateWorldCount() {
     const definition=this.objectRegistry.require('stone');
@@ -191,9 +231,13 @@ export class GameScene extends Phaser.Scene {
   setStatus(message) { document.querySelector('#status').textContent=message; }
   update(_time,delta) {
     this.character.update(delta);this.player.animate(delta,this.character.walking&&this.character.state===PLAYER_STATE.GROUND,this.character.direction);
+    this.animalSystem.update(delta);this.huntingSystem.update(delta);this.foodSystem.update(delta);this.updateFoodDisplay();
     for(const spawner of this.resourceSpawners)spawner.update(delta);
     this.worldCamera.update(delta);this.terrain.update(this.cameras.main);
     const view=this.cameras.main.worldView;
+    this.dropSystem.update(view);
+    if(this.input.manager.isOver)this.updateHover(this.input.activePointer);
+    for(const animal of this.animalSystem.animals.values())animal.view.setVisible(animal.view.x>view.x-60&&animal.view.x<view.right+60&&animal.view.y>view.y-40&&animal.view.y<view.bottom+70);
     for(const resource of this.resources.values()){
       const definition=this.objectRegistry.require(resource.getData('objectId'));
       resource.setVisible(resource.x>view.x-64&&resource.x<view.right+64&&resource.y>view.y-40&&resource.y<view.bottom+(definition.visualHeight??40));

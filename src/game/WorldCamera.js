@@ -8,6 +8,15 @@ export class WorldCamera {
     this.scene = scene;
     this.camera = scene.cameras.main;
     this.target = target;
+    // Lišta může změnit výšku i bez změny okna (např. další surovina na mobilu).
+    // Rozměry plátna a vstupní souřadnice musí odpovídat aktuálnímu layoutu.
+    this.syncSize=()=>{
+      if(scene.scale.getParentBounds())scene.scale.refresh();
+      else scene.scale.updateBounds();
+    };
+    this.syncSize();
+    this.resizeObserver=new ResizeObserver(this.syncSize);
+    this.resizeObserver.observe(scene.scale.parent);
     this.following = true;
     this.keys = scene.input.keyboard.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,SPACE');
     this.camera.setBounds(WORLD_BOUNDS.x, WORLD_BOUNDS.y, WORLD_BOUNDS.width, WORLD_BOUNDS.height);
@@ -52,6 +61,7 @@ export class WorldCamera {
   }
 
   destroy() {
+    this.resizeObserver.disconnect();
     this.scene.input.off('wheel', this.wheel);
     this.scene.input.keyboard.off('keydown-SPACE', this.recenter);
     document.querySelector('#follow-king').removeEventListener('click', this.recenter);

@@ -3,6 +3,7 @@ import { gridToWorld } from './isometric.js';
 import { findPathToAny } from './pathfinding.js';
 import { tileKey } from './stones.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
+import { adjacentTiles } from './interaction.js';
 
 const towerDefinition = () => objectRegistry.require('tower');
 export const TOWER_COST = towerDefinition().cost.stone;
@@ -37,7 +38,7 @@ export function placementError(map,anchor,resources,reservedTiles=[],definition=
   const tiles=buildingTiles(anchor,definition);
   if(tiles.some(tile=>!isWalkable(map,tile.x,tile.y)))return `Budova potřebuje ${definition.width} × ${definition.height} volných políček uvnitř mapy.`;
   if(tiles.some(tile=>resources.has(tileKey(tile))))return 'Na tomto místě leží surovina.';
-  if(tiles.some(tile=>reservedTiles.some(p=>tileKey(p)===tileKey(tile))))return 'Tady stojí král nebo právě dokončuje krok.';
+  if(tiles.some(tile=>reservedTiles.some(p=>tileKey(p)===tileKey(tile))))return 'Tady stojí král nebo zvíře, případně právě dokončuje krok.';
   if(tiles.some(tile=>buildings.some(building=>building.tiles.some(p=>tileKey(p)===tileKey(tile)))))return 'Tady už stojí budova.';
   return null;
 }
@@ -58,6 +59,7 @@ export function placeTower(options) {
 
 export function approachTower(map,start,building) { return findPathToAny(map,start,towerNeighbors(building)); }
 export function planGroundOrder(map,start,order) {
+  if(order.kind==='approachAnimal')return findPathToAny(map,start,adjacentTiles(order.animal));
   if(order.kind==='enter')return approachTower(map,start,order.tower);
   if(order.kind==='collect')return approachTower(map,start,order.resource);
   return findPathToAny(map,start,[order.goal]);

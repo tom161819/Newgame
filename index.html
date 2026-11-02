@@ -8,11 +8,12 @@
   <body>
     <main>
       <header><span class="eyebrow">KRÁLOVSKÁ HLÍDKA · IZOMETRICKÁ STRATEGIE</span><h1>První cesta</h1>
-        <p>Veď krále kliknutím, sbírej kámen a stav strážní věže.</p></header>
+        <p>Veď krále kliknutím, lov zvěř, sbírej suroviny a stav strážní věže.</p></header>
       <section class="inventory" aria-label="Inventář">
         <span class="inventory-label">Inventář</span>
         <small id="world-stones">Mapa 100 × 100 · kameny 30 / 80</small>
         <div id="inventory-items"></div>
+        <span class="food-status"><output id="food-countdown">Food: 01:00</output><small id="food-warning">Out of food</small></span>
       </section>
       <div class="camera-controls"><span id="camera-mode">Kamera sleduje krále</span><button id="follow-king" type="button">Na krále · mezerník</button></div>
       <div id="game" aria-label="Izometrická herní mapa 100 × 100 políček"></div>
@@ -35,6 +36,7 @@
       <p id="asset-count"></p>
       <div class="asset-layout"><div id="asset-grid" aria-label="Objekty"></div><aside id="asset-detail" aria-label="Detail objektu"></aside></div>
     </dialog>
+    <div id="object-tooltip" role="tooltip" hidden></div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

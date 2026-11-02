@@ -1,6 +1,6 @@
 # Přidávání objektů a grafiky
 
-Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soubory v `public/assets/`; Vite je kopíruje do sestavení beze změny. Současná hra má šest typů: grass, dirt, stone, tower, king a rock_outcrop. Prázdné složky pro vodu, dřevo, železo, stromy a keře jsou příprava, nepřidávají nové herní mechaniky.
+Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soubory v `public/assets/`; Vite je kopíruje do sestavení beze změny. Současná hra má deset typů: grass, dirt, stone, meat, tower, king, rock_outcrop, rabbit, deer a wild_boar. Prázdné složky pro vodu, dřevo, železo, stromy a keře jsou příprava, nepřidávají nové herní mechaniky.
 
 ## Soubory a registr
 
@@ -10,9 +10,10 @@ Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soub
 | Suroviny | `src/data/objects/resources.js` | `public/assets/resources/{stone,wood,iron}/` |
 | Budovy | `src/data/objects/buildings.js` | `public/assets/buildings/tower/` a další podsložky |
 | Postavy | `src/data/objects/characters.js` | `public/assets/characters/king/` a další podsložky |
+| Zvířata | `src/data/objects/animals.js` | `public/assets/characters/{rabbit,deer,wild_boar}/` |
 | Dekorace | `src/data/objects/decorations.js` | `public/assets/decorations/{rocks,trees,bushes}/` |
 
-`src/data/objects/index.js` spojí pět seznamů. `ObjectRegistry` zkontroluje definice, odmítne chybějící údaje, neplatné hodnoty a duplicitní ID a uloží neměnné kopie. Nabízí `get(id)`, `require(id)`, `all()`, `byCategory(category)`, `buildables()` a `forGallery(category)`. `get` vrací pro neznámé ID `null`; `require` ohlásí chybu.
+`src/data/objects/index.js` spojí seznamy kategorií. `ObjectRegistry` zkontroluje definice, odmítne chybějící údaje, neplatné hodnoty a duplicitní ID a uloží neměnné kopie. Nabízí `get(id)`, `require(id)`, `all()`, `byCategory(category)`, `buildables()` a `forGallery(category)`. `get` vrací pro neznámé ID `null`; `require` ohlásí chybu.
 
 ## Definice objektu
 
@@ -22,7 +23,7 @@ Každý objekt obsahuje:
 {
   id: 'tower',                    // jedinečné ID, malé znaky, čísla, _ a -
   name: 'Stone Tower',
-  category: 'building',          // terrain/resource/building/character/decoration
+  category: 'building',          // terrain/resource/building/character/decoration/animal
   sprite: '/assets/buildings/tower/tower.png',
   width: 2, height: 2,           // logická políčka, nikoli pixely obrázku
   walkable: false,
@@ -101,6 +102,14 @@ visual: { previewFrame: 0 },
 
 Při chybě načtení se hra nezastaví: známý procedurální typ použije svou kresbu, ostatní typy sdílený náhradní obrázek. Galerie ukáže upozornění u chybějícího souboru. Chybnou definici však registr odmítne s uvedením ID, aby nenastala skrytá změna pravidel.
 
-Po změně spusť `npm test` a `npm run build -- --base=/Newgame/`. V prohlížeči ověř Asset Library → All a pět kategorií, detail objektu, sběr, cenu/půdorys stavby, chůzi kolem budovy a vstup/sestup z věže. Pro nový spritesheet zkontroluj všechny směry a klidovou animaci. Pro fallback dočasně změň cestu obrázku na neexistující místní soubor a po kontrole ji vrať.
+Po změně spusť `npm test` a `npm run build -- --base=/Newgame/`. V prohlížeči ověř Asset Library → All a šest kategorií, detail objektu, sběr, cenu/půdorys stavby, chůzi kolem budovy a vstup/sestup z věže. Pro nový spritesheet zkontroluj všechny směry a klidovou animaci. Pro fallback dočasně změň cestu obrázku na neexistující místní soubor a po kontrole ji vrať.
 
 Terén stále používá blokovou cache a culling; knihovna nepřidává tisíce samostatných obrázků políček. Galerie je pouze prohlížeč definic, bez editace a vkládání objektů do mapy.
+
+## Zvířata, balíčky a spotřeba
+
+`animals.js` registruje typy v kategorii `animal`. Jejich `gameplay` obsahuje `movementSpeed`, `initialCount`, `behavior: 'wander'`, `huntable`, `meatDrop` a `wanderRadius`. Pohled `AnimalView` používá vlastní jednoduché tvary; SVG poskytuje náhledy. `AnimalSystem` eviduje samostatná ID a pohyb instancí a `HuntingSystem.attack(animal)` odděluje okamžitý lov od budoucích bojových statistik.
+
+`DropSystem.create(resourceId, tile, amount)` vytvoří ručně sběratelný balíček nebo sloučí množství se stejným typem na stejném políčku. Množství není v definici typu masa: patří do konkrétní instance dropu. Dropy sdílí původní inventář a evidenci obsazených políček pro stavění a generování surovin. Nemají časový limit zmizení.
+
+Definice masa má `consumption: { amount: 1, interval: 60000 }`. `FoodSystem` pracuje s uplynulým aktivním časem hry a zbytkem intervalu; nevyužívá opakované prohlížečové `setInterval`. Při prázdném inventáři zůstává počet nulový.

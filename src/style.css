@@ -46,6 +46,10 @@ button:focus-visible { outline: 2px solid #e2c673; outline-offset: 2px; }
 @media(max-width:600px) { body { padding: 8px; } .inventory { gap: 7px 12px; } .inventory-label { display: none; } h1 { font-size: 24px; } footer span:last-child { width: 100%; margin-left: 0; } }
 @media(max-height:650px) { header p, footer, .eyebrow { display: none; } h1 { font-size: 20px; } #status { min-height: 1.5em; } }
 #inventory-items { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
+.food-status { display: grid; gap: 2px; font-size: 11px; }
+.inventory #food-countdown { font-size: 12px; text-align: left; color: #d5c78d; font-weight: 400; }
+#food-warning { color: #c6aa81; font-size: 10px; }
+#object-tooltip { position: fixed; z-index: 20; pointer-events: none; padding: 6px 9px; border: 1px solid #978657; border-radius: 4px; background: #252c1cef; font-size: 12px; }
 .stone-icon, .tower-icon { object-fit: contain; }
 .buildings-panel { max-height: 60dvh; overflow-y: auto; }
 .building-option + .building-option { border-top: 1px solid #77714e; margin-top: 14px; padding-top: 14px; }

@@ -9,6 +9,8 @@ Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3
 | Ovládání | Akce |
 |---|---|
 | Levý klik na průchozí políčko | Král k němu dojde po nejkratší cestě. Další klik změní cíl. |
+| Levý klik na zvíře | Pronásleduje pohybující se zvěř a uloví ji až z dosahu sousedního políčka. |
+| Levý klik na maso | Dojde k balíčku a přidá jeho skutečné množství. Najeď myší pro údaj Meat ×N. |
 | Levý klik na kámen | Dojde ke kameni a přičte jej do inventáře. |
 | Levý klik na věž nebo její střechu | Dojde k dostupnému sousednímu políčku a vyleze na plošinu. |
 | Klik na mapu z věže | Nejprve sleze, potom dojde k cíli. Kámen sebere až po sestupu. |
@@ -35,11 +37,19 @@ Horní inventář a spodní Buildings jsou mimo herní kameru a při pohybu nebo
 - Lze postavit více věží. Výběr stavby zruší zbývající cestu a sběr; už rozběhnutý krok se dokončí plynule. Po postavení jedné věže režim stavění skončí.
 - Ke vstupu se vybírá sousední políčko s nejkratší dosažitelnou cestou. Následuje animace lezení, ne přesun z dálky. Král nahoře nechodí po mapě ani nesbírá. Sestup vybere sousední políčko s dostupnou cestou k cíli; pokud takové není, král zůstane nahoře.
 - Během animace výstupu a sestupu se nové příkazy nepřijímají. Vstup/výstup lze opakovat, včetně přechodu z jedné věže do druhé.
-- Po obnovení stránky začíná nová hra: inventář je nulový, budovy zmizí a kameny se vygenerují znovu. Hra nepřidává boj, nepřátele ani jiné budovy.
+- Po obnovení stránky začíná nová hra: inventář je nulový, budovy zmizí a kameny se vygenerují znovu. Zatím používá okamžitý lov bez HP, bojových statistik a penalizací za nedostatek jídla.
+
+## Zvěř, lov a potrava
+
+Při nové hře vzniknou tři zajíci, tři srny a tři divočáci na různých volných dosažitelných políčkách. Pomalu putují k náhodným blízkým cílům a mezi cestami odpočívají. Sdílí s králem osmisměrné A* i normalizovaný pohyb bez průchodu rohy; nová stavba nesmí překrýt zvíře nebo jeho probíhající krok.
+
+Kliknutí na zvíře zahájí pronásledování se změnami cesty podle pohybu cíle. Lov proběhne až ze sousedství, bez teleportace. Jiný klik lov zruší. Zajíc zanechá balíček 5 masa, srna 10 a divočák 15. Odměna se nepřipíše automaticky: balíček zůstane ležet až do ručního sběru. Stejné suroviny na jednom políčku se sloučí.
+
+Každých 60 sekund aktivní hry se spotřebuje jedno maso, nejvýše do nuly. Horní lišta ukazuje zbývající čas a nenápadné Out of food; hlad zatím nemá žádné další následky. Přehled knihovny nepozastavuje běžící hru.
 
 ## Knihovna objektů
 
-Šest současných typů (grass, dirt, stone, tower, king, rock_outcrop) má centrální definice v `src/data/objects/`. Registr kontroluje unikátní ID a platné parametry; stejná cena a půdorys budovy řídí galerii, nabídku Buildings, platbu i kolize. Galerie je pouze prohlížeč a nemění mapu nebo inventář.
+Deset současných typů (grass, dirt, stone, meat, tower, king, rock_outcrop, rabbit, deer, wild_boar) má centrální definice v `src/data/objects/`. Registr kontroluje unikátní ID a platné parametry; stejná cena a půdorys budovy řídí galerii, nabídku Buildings, platbu i kolize. Galerie je pouze prohlížeč a nemění mapu nebo inventář.
 
 `AssetManager` načítá sdílené PNG/WebP textury a spritesheety se správným základem URL pro GitHub Pages. Chybějící obrázek použije procedurální kresbu nebo společný náhradní obrázek. Nová surovina či budova používající stávající mechanismy se přidává definicí a obrázkem; inventář i nabídka se přizpůsobí automaticky. Podrobný postup, origin, vrstvy věže a animace postavy popisuje **[ASSET_GUIDE.md](ASSET_GUIDE.md)**.
 
@@ -82,10 +92,13 @@ Upozornění Vite na velikost balíčku souvisí s přibaleným Phaserem a nebr�
 | `src/game/buildings.js` | Cena, půdorys, validace, blokování mapy a plánování vstupu/výstupu. |
 | `src/game/TowerView.js` | Izometrické stěny, plošina, cimbuří, stín, zásah myší a průhledný náhled. |
 | `src/game/GameScene.js` | Propojení vstupu, kamery, krále, sběru, generátoru, stavby a UI. |
-| `src/data/objects/` | Pět kategorií datových definic, včetně jediné ceny věže. |
+| `src/data/objects/` | Datové definice terénu, surovin, budov, postav, dekorací a zvířat, včetně jediné ceny věže. |
 | `src/systems/ObjectRegistry.js` | Validace a vyhledávání neměnných definic. |
 | `src/systems/AssetManager.js`, `SpriteViews.js` | Sdílené obrázky/animace, fallback, origin a obecné sprite pohledy. |
 | `src/ui/BuildingBar.js`, `InventoryBar.js` | Nabídka a inventář sestavené z registru objektů. |
+| `src/systems/AnimalSystem.js`, `HuntingSystem.js` | Spawn a pohyb zvěře, zaměření, pronásledování a samostatná funkce lovu. |
+| `src/systems/DropSystem.js`, `FoodSystem.js` | Obecné balíčky s množstvím, slučování, ruční sběr a pravidelná spotřeba potravy. |
+| `src/game/movement.js` | Společný krok pohybu pro krále i zvěř. |
 | `src/ui/AssetGallery.js` | Prohlížeč knihovny s filtry a detailem. |
 | `index.html`, `src/style.css` | Pevné rozhraní kolem mapy. Žádné CSS otáčení herního světa. |
 | `tests/` | Testy souřadnic, navigace, generování, časování, limitů, inventáře, stavby a vstupu/výstupu. |
