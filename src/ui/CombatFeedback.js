@@ -15,7 +15,8 @@ export class CombatFeedback {
   }
   refresh(){
     const s=this.scene,king=s.character,output=document.querySelector('#king-health');
-    const text=`HP: ${Math.ceil(king.currentHP)} / ${king.maxHP}`;if(output.textContent!==text)output.textContent=text;
+    const hp=king.currentHP>0?Math.max(.01,Math.round(king.currentHP*100)/100):0;
+    const text=`HP: ${hp} / ${king.maxHP}`;if(output.textContent!==text)output.textContent=text;
     const progress=document.querySelector('#king-health-bar');progress.max=king.maxHP;progress.value=king.currentHP;
     for(const animal of s.animalSystem.animals.values()){
       const fighting=s.combat.attacks.has(animal)||[...s.combat.attacks.values()].includes(animal);

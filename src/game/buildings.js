@@ -62,6 +62,7 @@ export function planGroundOrder(map,start,order) {
   if(order.kind==='approachAnimal')return findPathToAny(map,start,adjacentTiles(order.animal,map));
   if(order.kind==='enter')return approachTower(map,start,order.tower);
   if(order.kind==='collect')return approachTower(map,start,order.resource);
+  if(order.kind==='openChest')return approachTower(map,start,order.chest);
   return findPathToAny(map,start,[order.goal]);
 }
 export function planTowerExit(map,building,order) {

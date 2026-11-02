@@ -11,6 +11,7 @@ export const buildings = [
   {
     id:'castle',name:'Castle',category:'building',sprite:'/assets/buildings/castle/castle.svg',
     width:3,height:3,walkable:false,collectible:false,buildable:true,cost:{stone:10},
+    production:{resource:'gold',amount:5,interval:'day',label:'Castle income'},
     interactions:['enter','exit'],description:'Kamenná pevnost s horní plošinou a cimbuřím. Z plošiny poskytuje o 75 % větší dohled.',
     visibility:{multiplier:1.75},renderMode:'procedural',renderer:'fortification',
     origin:{x:.5,y:238/250},visualHeight:235,platform:{x:0,y:-168},depth:{offset:0},

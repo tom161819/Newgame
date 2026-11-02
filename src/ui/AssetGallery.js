@@ -1,4 +1,4 @@
-import { element,formatCost,CATEGORY_LABELS } from './objectLabels.js';
+import { element,formatCost,formatModifiers,CATEGORY_LABELS } from './objectLabels.js';
 
 export class AssetGallery {
   constructor({registry,assets,onOpen,onClose}) {
@@ -52,6 +52,10 @@ export class AssetGallery {
       ['Průchozí',definition.walkable?'Ano':'Ne'],['Sběratelný',definition.collectible?'Ano':'Ne'],['Postavitelný',definition.buildable?'Ano':'Ne'],
       ['Cena',formatCost(definition.cost,this.registry)],['Interakce',definition.interactions.join(', ')||'Žádné']];
     if(definition.stats)rows.push(['Max HP',String(definition.stats.maxHP)],['DPS',String(definition.stats.attackDPS)],['Armor',`${definition.stats.armor} %`],['Attack Range',`${definition.stats.attackRange} políčko`]);
+    if(definition.stats)rows.push(['HP Regeneration',`${definition.stats.hpRegenPerSecond??0} HP/s`]);
+    if(definition.equipment)rows.push(['Slot',definition.equipment.slot],['Bonus',formatModifiers(definition.equipment.modifiers)]);
+    if(definition.production)rows.push(['Produkce',`${definition.production.amount} ${this.registry.require(definition.production.resource).name} / day`]);
+    if(definition.treasure)rows.push(['Obsah',`${definition.treasure.goldMin}–${definition.treasure.goldMax} Gold + ${definition.treasure.equipment.map(id=>this.registry.require(id).name).join(', ')}`]);
     for(const [name,value]of rows)list.append(element('dt','',name),element('dd','',value));
     this.detail.append(list);
     const technical=element('details','asset-technical');technical.append(element('summary','','Grafika a animace'));

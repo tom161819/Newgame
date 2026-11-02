@@ -11,7 +11,7 @@ export class InventoryBar {
   }
   render() {
     this.outputs=new Map();
-    const items=this.registry.byCategory('resource').filter(d=>d.collectible).map(definition=>{
+    const items=this.registry.byCategory('resource').filter(d=>d.collectible).sort((a,b)=>(a.inventoryOrder??100)-(b.inventoryOrder??100)).map(definition=>{
       const item=element('div','inventory-item'),image=element('img','stone-icon');
       image.src=this.assets.previewURL(definition);image.alt='';
       const output=element('output','',String(this.inventory.count(definition.id)));

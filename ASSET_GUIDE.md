@@ -1,6 +1,6 @@
 # Přidávání objektů a grafiky
 
-Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soubory v `public/assets/`; Vite je kopíruje do sestavení beze změny. Současná hra má třináct typů: grass, dirt, stone, meat, tower, castle, wall, king, rock_outcrop, rabbit, deer, wild_boar a horse. Prázdné složky pro vodu, dřevo, železo, stromy a keře jsou příprava, nepřidávají nové herní mechaniky.
+Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soubory v `public/assets/`; Vite je kopíruje do sestavení beze změny. Současná hra má sedmnáct typů: grass, dirt, stone, meat, gold, tower, castle, wall, king, rock_outcrop, rabbit, deer, wild_boar, horse, basic_sword, basic_armor a treasure_chest. Prázdné složky pro vodu, dřevo, železo, stromy a keře jsou příprava, nepřidávají nové herní mechaniky.
 
 ## Soubory a registr
 
@@ -23,7 +23,7 @@ Každý objekt obsahuje:
 {
   id: 'tower',                    // jedinečné ID, malé znaky, čísla, _ a -
   name: 'Stone Tower',
-  category: 'building',          // terrain/resource/building/character/decoration/animal
+  category: 'building',          // terrain/resource/building/character/decoration/animal/equipment/treasure
   sprite: '/assets/buildings/tower/tower.png',
   width: 2, height: 2,           // logická políčka, nikoli pixely obrázku
   walkable: false,
@@ -102,7 +102,7 @@ visual: { previewFrame: 0 },
 
 Při chybě načtení se hra nezastaví: známý procedurální typ použije svou kresbu, ostatní typy sdílený náhradní obrázek. Galerie ukáže upozornění u chybějícího souboru. Chybnou definici však registr odmítne s uvedením ID, aby nenastala skrytá změna pravidel.
 
-Po změně spusť `npm test` a `npm run build -- --base=/Newgame/`. V prohlížeči ověř Asset Library → All a šest kategorií, detail objektu, sběr, cenu/půdorys stavby, chůzi kolem budovy a vstup/sestup z věže. Pro nový spritesheet zkontroluj všechny směry a klidovou animaci. Pro fallback dočasně změň cestu obrázku na neexistující místní soubor a po kontrole ji vrať.
+Po změně spusť `npm test` a `npm run build -- --base=/Newgame/`. V prohlížeči ověř Asset Library → All a osm kategorií, detail objektu, sběr, cenu/půdorys stavby, chůzi kolem budovy a vstup/sestup z věže. Pro nový spritesheet zkontroluj všechny směry a klidovou animaci. Pro fallback dočasně změň cestu obrázku na neexistující místní soubor a po kontrole ji vrať.
 
 Terén stále používá blokovou cache a culling; knihovna nepřidává tisíce samostatných obrázků políček. Galerie je pouze prohlížeč definic, bez editace a vkládání objektů do mapy.
 
@@ -139,3 +139,23 @@ Každý typ `character` nebo `animal` musí obsahovat `stats: { maxHP, attackDPS
 Současné útoky se integrují až k okamžiku nejbližší smrti, takže odvetný zásah netrvá o celý snímek déle nebo kratší dobu podle pořadí a FPS. Smrt se oznámí pouze jednou. Herní scéna na událost naváže odstranění zvířete a vytvoření dropu nebo Game Over pro krále.
 
 Pro sprite animace lze nově použít i `state: 'attack'` s osmi logickými směry. Procedurální král má vlastní jednoduchou útočnou pózu. Volitelné `visual.healthBarOffset` upravuje výšku health baru nového obrázku zvířete. Krátká odezva zásahu nemění statistiky ani délku útoku.
+
+## Čas, regenerace, produkce a vybavení
+
+`GameTimeSystem` má centrální `DAY_DURATION = 120000`, den, čas v aktuálním dni a celkový aktivní čas. `onNewDay(listener)` vrací odpojení listeneru. Delší aktualizace se rozdělí na jednotlivé hranice dní; callback vidí právě začínající den s nulovým elapsed. Pauza zastaví aktualizace přes `GameScene.setPaused(true)` včetně pohybu, soubojů, časovačů a animací. Stejné aktivní delta řídí potravu a generování kamenů.
+
+Simulace používá skutečné `game.loop.rawDelta`; vyhlazené a ořezané Phaser delta by při nižším FPS prodlužovalo den. První snímek po vytvoření scény, zrušení pauzy nebo návratu z neaktivní záložky nezapočítává čekání. Skrytá záložka pozastaví simulaci a animace; nevzniká zpětná produkce za dobu mimo hru.
+
+`stats.hpRegenPerSecond` je univerzální vlastnost: King má 0.2, ostatní typy výchozí 0. `RegenerationSystem` nehojí mrtvé a omezí HP maximem. Během DPS souboje se regenerace integruje současně s příchozím poškozením; CombatSystem vrací pokryté časy jednotek, aby se zbytek snímku nevynechal ani neléčil dvakrát. Výsledek tak odpovídá i různému FPS a smrti útočníka uvnitř časového kroku.
+
+Castle má `production: { resource: 'gold', amount: 5, interval: 'day', label: 'Castle income' }`. `ProductionSystem` sčítá všechny aktuální budovy podle těchto dat a eviduje poslední zpracovaný den. Stejný den se nevyplatí dvakrát, nová budova nemá zpětný příjem. `dailyIncome()` poskytuje přehled pro budoucí ekonomické UI.
+
+`UnitStats` uchovává neměnný základ a skupiny modifikátorů `unit.statModifiers`. `EquipmentSystem` zapisuje jen skupinu `equipment` a vše znovu odvodí, nikoli vynásobí již upravené DPS. Položka Equipment obsahuje například `equipment: { slot: 'weapon', modifiers: { attackBonus: 100 } }`; brnění má slot `armor` a `modifiers: { armor: 30 }`. Modifikátory mohou ovlivnit maxHP, attackBonus, Armor nebo hpRegenPerSecond. Vlastnictví předmětů používá původní Inventory, slot pouze odkazuje na ID. Odložení nemaže vlastnictví a opakované equip nevrství bonus.
+
+Pořadí surovin v UI řídí `inventoryOrder`: Gold 0, Stone 10, Meat 20 a ostatní implicitně 100. Kategorie Equipment a Treasure jsou také v galerii. Registr kontroluje platnost produkce, modifikátorů, obsahu pokladu i odkazů na jiné definice ještě před změnou celé dávky.
+
+## Truhly
+
+Definice `treasure_chest` používá kategorii `treasure`, interakci `open`, neprůchozí půdorys 1 × 1 a metadata `treasure: { initial: 1, goldMin: 50, goldMax: 100, equipment: ['basic_sword', 'basic_armor'] }`. Každá instance má jedinečné ID, vygenerovaný neměnný obsah, `opened`, `opening` a `looted`. Až Take All jednou přidá obsah do inventáře a automaticky vybaví získané položky.
+
+Truhla zůstává po vyzvednutí neprůchozí. Navigace k ní používá stejné hledání dostupných sousedních políček jako ostatní interakce. `ChestView` má samostatné animované víko a přesný zásah myší i v otevřené poloze. Při přechodu na obecný sprite může `visual.openFrame` označit otevřený snímek; logika jednorázového vyzvednutí zůstává stejná. Nepoužívá se nové losování při otevření či změně dohledu.

@@ -1,6 +1,6 @@
 import { objectDefinitions } from '../data/objects/index.js';
 
-export const OBJECT_CATEGORIES = Object.freeze(['terrain', 'resource', 'building', 'character', 'decoration', 'animal']);
+export const OBJECT_CATEGORIES = Object.freeze(['terrain', 'resource', 'building', 'character', 'decoration', 'animal', 'equipment', 'treasure']);
 const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 const plainObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const finite = value => typeof value === 'number' && Number.isFinite(value);
@@ -46,6 +46,15 @@ export function validateDefinition(definition) {
   if(['character','animal'].includes(d.category)&&d.stats===undefined)fail(id,'živá jednotka vyžaduje bojové statistiky.');
   if (d.stats !== undefined && (!plainObject(d.stats) || !['maxHP','attackDPS','armor','attackRange'].every(key=>finite(d.stats[key]))
     || d.stats.maxHP<=0 || d.stats.attackDPS<0 || d.stats.armor<0 || d.stats.armor>90 || d.stats.attackRange<0)) fail(id, 'neplatné bojové statistiky.');
+  if(d.stats?.hpRegenPerSecond!==undefined&&(!finite(d.stats.hpRegenPerSecond)||d.stats.hpRegenPerSecond<0))fail(id,'neplatná regenerace.');
+  if(d.inventoryOrder!==undefined&&(!Number.isSafeInteger(d.inventoryOrder)||d.inventoryOrder<0))fail(id,'neplatné pořadí inventáře.');
+  if(d.production!==undefined&&(!plainObject(d.production)||d.category!=='building'||typeof d.production.resource!=='string'
+    ||!Number.isSafeInteger(d.production.amount)||d.production.amount<=0||d.production.interval!=='day'))fail(id,'neplatná produkce.');
+  if(d.category==='equipment'&&(!plainObject(d.equipment)||!['weapon','armor'].includes(d.equipment.slot)||!plainObject(d.equipment.modifiers)
+    ||Object.entries(d.equipment.modifiers).some(([key,value])=>!['maxHP','attackBonus','armor','hpRegenPerSecond'].includes(key)||!finite(value))))fail(id,'neplatné vybavení.');
+  if(d.category==='treasure'&&(!plainObject(d.treasure)||d.width!==1||d.height!==1||!Number.isSafeInteger(d.treasure.initial)||d.treasure.initial<0
+    ||!Number.isSafeInteger(d.treasure.goldMin)||!Number.isSafeInteger(d.treasure.goldMax)||d.treasure.goldMin<0||d.treasure.goldMax<d.treasure.goldMin
+    ||!Array.isArray(d.treasure.equipment)||d.treasure.equipment.some(id=>typeof id!=='string')||new Set(d.treasure.equipment).size!==d.treasure.equipment.length))fail(id,'neplatný obsah pokladu.');
   if (d.consumption !== undefined && (!plainObject(d.consumption) || !Number.isSafeInteger(d.consumption.amount)
     || d.consumption.amount<=0 || !finite(d.consumption.interval) || d.consumption.interval<=0)) fail(id, 'neplatná spotřeba suroviny.');
   if (d.category==='animal' && (!plainObject(d.gameplay) || !finite(d.gameplay.movementSpeed) || d.gameplay.movementSpeed<=0
@@ -79,6 +88,12 @@ export class ObjectRegistry {
       validateDefinition(definition);
       if (this.definitions.has(definition.id) || pending.has(definition.id)) throw new Error(`Duplicitní ID objektu: ${definition.id}`);
       pending.set(definition.id, freezeDeep(structuredClone(definition)));
+    }
+    const known=new Map([...this.definitions,...pending]);
+    for(const definition of pending.values()){
+      for(const id of [...Object.keys(definition.cost),...(definition.production?[definition.production.resource]:[])])
+        if(known.get(id)?.category!=='resource')fail(definition.id,`neznámá surovina ${id}.`);
+      for(const id of definition.treasure?.equipment??[])if(known.get(id)?.category!=='equipment')fail(definition.id,`neznámé vybavení ${id}.`);
     }
     for (const [id, definition] of pending) this.definitions.set(id, definition);
     if (pending.size) for (const listener of this.listeners) listener();

@@ -14,6 +14,8 @@ Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3
 | ⚙ Settings | Zasouvací panel s přepínačem Fog of War. Volba se pamatuje mezi obnoveními stránky. |
 | Levý klik na zvíře | Pronásleduje cíl a ze sousedního políčka zahájí souboj. Napadené zvíře se brání. |
 | Levý klik na maso | Dojde k balíčku a přidá jeho skutečné množství. Najeď myší pro údaj Meat ×N. |
+| Levý klik na truhlu | Dojde k sousednímu políčku a otevře ji. Take All převezme obsah a automaticky vybaví meč a brnění. |
+| Weapon / Armor v inventáři | Otevře dvě místa vybavení a přehled základních a konečných statistik. Předměty lze odložit a znovu vybavit. |
 | Levý klik na kámen | Dojde ke kameni a přičte jej do inventáře. |
 | Levý klik na věž nebo její střechu | Dojde k dostupnému sousednímu políčku a vyleze na plošinu. |
 | Klik na mapu z věže | Nejprve sleze, potom dojde k cíli. Kámen sebere až po sestupu. |
@@ -70,7 +72,17 @@ Král pronásleduje jeden vybraný cíl a při změně polohy obnoví cestu. Dos
 
 Horní lišta zobrazuje HP krále. Nad poškozenými nebo bojujícími zvířaty se ukáže malý health bar, který se skryje spolu se zvířetem podle Fog of War. Útok krále doprovází pohyb zbraně a zásah krátké bliknutí. Zvíře po smrti zmizí a zanechá ručně sběratelné maso. Ze zvýšených plošin král po mapě nebojuje.
 
-Po smrti krále se zastaví ovládání, pohyb a herní časovače a objeví se Game Over. Restart Game vytvoří čistou hru s plnými HP, nulovým inventářem a novými objekty. Volba Fog of War zůstává nastavením hráče. Automatické léčení zatím není zavedené.
+Po smrti krále se zastaví ovládání, pohyb a herní časovače a objeví se Game Over. Restart Game vytvoří čistou hru s plnými HP, nulovým inventářem a novými objekty. Volba Fog of War zůstává nastavením hráče. Král během aktivní hry regeneruje 0,2 HP/s (1 HP za 5 sekund), včetně chůze, souboje, jízdy a pobytu nahoře. Regenerace nepřekročí maximum a mrtvou postavu neoživí.
+
+## Herní čas, zlato, poklad a vybavení
+
+Hra začíná **Day 1**. Jeden den trvá **120 sekund aktivní hry** a horní lišta ukazuje zbývající čas. Událost přechodu dne se spustí právě jednou pro každý překročený den, včetně většího časového kroku. Game Over nebo pozastavení čas zastaví; katalog objektů a přehled vybavení zůstávají běžícím prohlížečem nad hrou.
+
+Inventář začíná na nule v pořadí **Gold → Stone → Meat**. Každý hotový Castle při nejbližším dalším přechodu dne přidá **5 Gold**; tři hrady tedy 15. Nezáleží na kameře, dohledu ani poloze krále. Příjem doprovází krátké oznámení. Nově postavený hrad nedostane příjem za předchozí dny. Zlato se zatím neutrácí.
+
+Při nové hře vznikne **jedna neprůchozí dostupná truhla** mimo krále, suroviny a ostatní objekty. Obsah se vylosuje jednou: **50–100 Gold**, **1 Sword** a **1 Armor**. Po dojití vedle truhly se víko animovaně otevře a zobrazí obsah. Teprve tlačítko **Take All** přidá věci do původního inventáře. Prázdná otevřená truhla zůstane na mapě a další vyzvednutí nic nepřidá. Respektuje Fog of War.
+
+Sword přidává **+100 % základního DPS**, tedy z 15 na 30. Armor přidává **30 procentních bodů Armor**, takže příchozích 12 DPS divočáka sníží na 8,4 DPS před regenerací. Předměty se po získání automaticky vybaví do slotů Weapon a Armor. Opakované vybavení bonus nesčítá, odložení vrátí příslušnou základní hodnotu. Detail ukazuje Base/Final DPS, Base/Final Armor, HP a regeneraci. Základní definice zůstávají neměnné.
 
 ## Zvěř, lov a potrava
 
@@ -90,7 +102,7 @@ Při nové hře vznikne jeden nelovitelný kůň. Kliknutí zahájí pronásledo
 
 ## Knihovna objektů
 
-Třináct současných typů (grass, dirt, stone, meat, tower, castle, wall, king, rock_outcrop, rabbit, deer, wild_boar, horse) má centrální definice v `src/data/objects/`. Registr kontroluje unikátní ID a platné parametry; stejná cena a půdorys budovy řídí galerii, nabídku Buildings, platbu i kolize. Galerie je pouze prohlížeč a nemění mapu nebo inventář.
+Sedmnáct současných typů (grass, dirt, stone, meat, gold, tower, castle, wall, king, rock_outcrop, rabbit, deer, wild_boar, horse, basic_sword, basic_armor, treasure_chest) má centrální definice v `src/data/objects/`. Registr kontroluje unikátní ID a platné parametry; stejná cena a půdorys budovy řídí galerii, nabídku Buildings, platbu i kolize. Galerie je pouze prohlížeč a nemění mapu nebo inventář.
 
 `AssetManager` načítá sdílené PNG/WebP textury a spritesheety se správným základem URL pro GitHub Pages. Chybějící obrázek použije procedurální kresbu nebo společný náhradní obrázek. Nová surovina či budova používající stávající mechanismy se přidává definicí a obrázkem; inventář i nabídka se přizpůsobí automaticky. Podrobný postup, origin, vrstvy věže a animace postavy popisuje **[ASSET_GUIDE.md](ASSET_GUIDE.md)**.
 
@@ -146,6 +158,10 @@ Upozornění Vite na velikost balíčku souvisí s přibaleným Phaserem a nebr�
 | `src/systems/MountSystem.js`, `src/ui/SettingsPanel.js` | Nasedání/sesedání bez duplicit, levé nastavení s bezpečným localStorage. |
 | `src/systems/CombatSystem.js` | Společné DPS, dosah, Armor, souběžné útoky a jedinečná událost smrti. |
 | `src/ui/CombatFeedback.js` | HP krále, health bary zvířat a krátké bliknutí při zásahu. |
+| `src/systems/GameTimeSystem.js`, `ProductionSystem.js` | Aktivní čas, denní událost a produkce podle definic budov. |
+| `src/systems/UnitStats.js`, `RegenerationSystem.js`, `EquipmentSystem.js` | Základní/odvozené statistiky, regenerace a dva sloty vybavení bez opakovaného násobení. |
+| `src/systems/TreasureSystem.js`, `src/game/ChestView.js` | Unikátní truhly s pevným obsahem, animace, přístup a jednorázové vyzvednutí. |
+| `src/ui/EquipmentPanel.js`, `TreasurePanel.js` | Přehled vybavení/statistik a okno Take All. |
 | `src/ui/AssetGallery.js` | Prohlížeč knihovny s filtry a detailem. |
 | `index.html`, `src/style.css` | Pevné rozhraní kolem mapy. Žádné CSS otáčení herního světa. |
 | `tests/` | Testy souřadnic, navigace, generování, časování, limitů, inventáře, stavby a vstupu/výstupu. |

@@ -126,7 +126,9 @@ export class PlayerController {
     const order = this.order;
     this.order = null;
     this.scene.marker.setVisible(false);
-    if(order?.kind==='approachAnimal'){
+    if(order?.kind==='openChest'){
+      this.scene.treasureSystem.requestOpen(order.chest);
+    } else if(order?.kind==='approachAnimal'){
       // Zvíře mohlo během cesty změnit polohu; dosah ověří HuntingSystem.
     } else if(order?.kind==='drop'){
       this.scene.dropSystem.collect(order.dropId,this.tile);

@@ -1,13 +1,6 @@
 import { isWalkable } from '../game/map.js';
-
-export const clampArmor = value => Math.max(0,Math.min(90,Number.isFinite(value)?value:0));
-
-export function createCombatStats(definition) {
-  if(!definition.stats)throw new TypeError(`Chybí bojové statistiky: ${definition.id}`);
-  const baseStats=Object.freeze({...definition.stats});
-  return {baseStats,maxHP:baseStats.maxHP,currentHP:baseStats.maxHP,attackDPS:baseStats.attackDPS,
-    armor:clampArmor(baseStats.armor),attackRange:baseStats.attackRange,isAlive:true,attackTarget:null};
-}
+import { clampArmor } from './UnitStats.js';
+export { clampArmor,createCombatStats } from './UnitStats.js';
 
 export function inAttackRange(attacker,target,map=null) {
   const dx=Math.abs(attacker.position.x-target.position.x),dy=Math.abs(attacker.position.y-target.position.y);
@@ -22,8 +15,8 @@ export function inAttackRange(attacker,target,map=null) {
 // Integruje DPS po časových úsecích až k nejbližší smrti. Odvetný útok tak
 // nekončí o celý snímek dříve nebo později podle FPS či pořadí jednotek.
 export class CombatSystem {
-  constructor({map=null,canFight=()=>true}={}) {
-    this.map=map;this.canFight=canFight;this.attacks=new Map();this.listeners=new Map();this.dead=new WeakSet();
+  constructor({map=null,canFight=()=>true,regenerationRate=()=>0}={}) {
+    this.map=map;this.canFight=canFight;this.regenerationRate=regenerationRate;this.attacks=new Map();this.listeners=new Map();this.dead=new WeakSet();
   }
   on(event,listener){if(!this.listeners.has(event))this.listeners.set(event,new Set());this.listeners.get(event).add(listener);return()=>this.listeners.get(event)?.delete(listener);}
   emit(event,...args){for(const listener of this.listeners.get(event)??[])listener(...args);}
@@ -48,6 +41,7 @@ export class CombatSystem {
     this.emit('death',unit);
   }
   update(delta){
+    const covered=new Map();
     let remaining=Number.isFinite(delta)?Math.max(0,delta)/1000:0;
     while(remaining>1e-9){
       const rates=new Map();
@@ -59,12 +53,18 @@ export class CombatSystem {
       }
       if(!rates.size)break;
       let step=remaining;
-      for(const [target,rate]of rates)step=Math.min(step,target.currentHP/rate);
-      for(const [target,rate]of rates)this.applyEffectiveDamage(target,rate*step,true);
+      for(const [target,rate]of rates){const net=rate-this.regenerationRate(target);if(net>0)step=Math.min(step,target.currentHP/net);}
+      for(const [target,rate]of rates){
+        const regeneration=this.regenerationRate(target)*step;
+        target.currentHP=Math.max(0,Math.min(target.maxHP,target.currentHP+regeneration-rate*step));
+        covered.set(target,(covered.get(target)??0)+step*1000);
+        this.emit('damage',target,rate*step);
+      }
       for(const target of rates.keys())if(target.currentHP<=1e-9)this.handleDeath(target);
       remaining-=step;
       if(step<=1e-12)break;
     }
+    return covered;
   }
   clear(){for(const attacker of this.attacks.keys())attacker.attackTarget=null;this.attacks.clear();this.listeners.clear();}
 }
