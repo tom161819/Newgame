@@ -1,79 +1,52 @@
 import Phaser from 'phaser';
-import { TILE_SIZE } from './map.js';
+import { tilePolygon } from './isometric.js';
 import { towerBase } from './buildings.js';
 
-function polygon(graphics, color, points) {
-  graphics.fillStyle(color);
-  graphics.fillPoints(points.map(([x, y]) => ({ x, y })), true);
-}
-
-function merlon(g, x, y, tint) {
-  polygon(g, tint ?? 0x9aa8b3, [[x - 4, y - 2], [x, y], [x, y - 10], [x - 4, y - 12]]);
-  polygon(g, tint ?? 0x657787, [[x, y], [x + 4, y - 2], [x + 4, y - 12], [x, y - 10]]);
-  polygon(g, tint ?? 0xc5d0d7, [[x - 4, y - 12], [x, y - 14], [x + 4, y - 12], [x, y - 10]]);
+function polygon(g,color,points){g.fillStyle(color);g.fillPoints(points.map(([x,y])=>({x,y})),true);}
+function merlon(g,x,y,tint){
+  polygon(g,tint??0xb3ad97,[[x-6,y-3],[x,y],[x,y-14],[x-6,y-17]]);
+  polygon(g,tint??0x858778,[[x,y],[x+6,y-3],[x+6,y-17],[x,y-14]]);
+  polygon(g,tint??0xd7ccb2,[[x-6,y-17],[x,y-20],[x+6,y-17],[x,y-14]]);
 }
 
 export class TowerView {
-  constructor(scene, tower, preview = false) {
-    this.preview = preview;
-    this.footprint = scene.add.graphics();
-    this.back = scene.add.graphics();
-    this.front = scene.add.graphics();
-    this.hitArea = new Phaser.Geom.Polygon([
-      -32, 4, -32, -16, -28, -94, 0, -108, 28, -94, 32, -16, 32, 4,
-    ]);
+  constructor(scene,tower,preview=false){
+    this.preview=preview;
+    this.footprint=scene.add.graphics();this.back=scene.add.graphics();this.front=scene.add.graphics();
+    this.hitArea=new Phaser.Geom.Polygon([-64,3,-64,-34,-56,-146,0,-166,56,-146,64,-34,64,3]);
     this.paint(tower);
-    if (preview) {
-      this.back.setAlpha(0.5);
-      this.front.setAlpha(0.5);
-    }
+    if(preview){this.back.setAlpha(0.5);this.front.setAlpha(0.5);}
   }
 
-  paint(tower, tint = null) {
-    this.base = towerBase(tower);
-    const { x, y } = this.base;
-    const g = this.back.clear().setPosition(x, y).setDepth(this.preview ? 10001 : y);
-    const front = this.front.clear().setPosition(x, y).setDepth(this.preview ? 10002 : y + 0.3);
-    const floor = this.footprint.clear().setDepth(this.preview ? 10000 : 0.5);
-    floor.fillStyle(tint ?? 0x637987, this.preview ? 0.28 : 0.2);
-    floor.lineStyle(1, tint ?? 0x879aa8, 0.7);
-    for (const tile of tower.tiles) {
-      floor.fillRect(tile.x * TILE_SIZE, tile.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-      floor.strokeRect(tile.x * TILE_SIZE, tile.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  paint(tower,tint=null){
+    this.base=towerBase(tower);const {x,y}=this.base;
+    const g=this.back.clear().setPosition(x,y).setDepth(this.preview?10001:y);
+    const front=this.front.clear().setPosition(x,y).setDepth(this.preview?10002:y+0.3);
+    const floor=this.footprint.clear().setDepth(this.preview?10000:-90);
+    floor.fillStyle(tint??0x777450,this.preview?0.3:0.25);floor.lineStyle(1,tint??0xb3a477,0.8);
+    for(const tile of tower.tiles){floor.fillPoints(tilePolygon(tile),true);floor.strokePoints(tilePolygon(tile),true);}
+    g.fillStyle(0x30291c,0.3);g.fillEllipse(8,-20,114,43);
+    polygon(g,tint??0x777765,[[0,-64],[64,-32],[0,1],[-64,-32]]);
+    polygon(g,tint??0xada691,[[-50,-25],[0,0],[0,-94],[-50,-119]]);
+    polygon(g,tint??0x818373,[[0,0],[50,-25],[50,-119],[0,-94]]);
+    g.lineStyle(1,tint??0x656b5d,0.7);
+    for(let level=-15;level>=-90;level-=15){
+      g.lineBetween(-50,level-25,0,level);g.lineBetween(0,level,50,level-25);
+      const offset=level%30===0?12:30;
+      g.lineBetween(-offset,level-offset/2,-offset,level-offset/2-15);
+      g.lineBetween(offset,level-offset/2,offset,level-offset/2-15);
     }
-    g.fillStyle(0x08141c, 0.4);
-    g.fillEllipse(0, -6, 62, 16);
-    polygon(g, tint ?? 0x4b606e, [[0, -30], [32, -14], [0, 3], [-32, -14]]);
-    polygon(g, tint ?? 0x8999a6, [[-24, -16], [0, -3], [0, -67], [-24, -80]]);
-    polygon(g, tint ?? 0x637888, [[0, -3], [24, -16], [24, -80], [0, -67]]);
-    g.lineStyle(1, tint ?? 0x425966, 0.7);
-    for (let level = -18; level >= -63; level -= 15) {
-      g.lineBetween(-24, level - 13, 0, level);
-      g.lineBetween(0, level, 24, level - 13);
-      g.lineBetween(-12, level - 6, -12, level - 18);
-      g.lineBetween(12, level - 6, 12, level - 18);
-    }
-    polygon(g, tint ?? 0x263d4b, [[5, -9], [14, -14], [14, -34], [5, -29]]);
-    // Jednoduchý žebřík na přední straně.
-    g.lineStyle(2, tint ?? 0xc6b38a, 1);
-    g.lineBetween(-4, -7, -4, -65);
-    g.lineBetween(4, -7, 4, -65);
-    for (let rung = -12; rung > -65; rung -= 8) g.lineBetween(-4, rung, 4, rung);
-    polygon(g, tint ?? 0xb3c1ca, [[0, -94], [28, -80], [0, -66], [-28, -80]]);
-    for (const [mx, my] of [[-23, -82], [-12, -88], [0, -94], [12, -88], [23, -82]]) merlon(g, mx, my, tint);
-    // Přední parapet se kreslí až před postavou stojící na plošině.
-    polygon(front, tint ?? 0x8da0ae, [[-28, -80], [0, -66], [0, -59], [-28, -73]]);
-    polygon(front, tint ?? 0x5d7484, [[0, -66], [28, -80], [28, -73], [0, -59]]);
-    for (const [mx, my] of [[-23, -76], [-12, -70], [0, -64], [12, -70], [23, -76]]) merlon(front, mx, my, tint);
+    polygon(g,tint??0x3f493d,[[25,-17],[38,-24],[38,-53],[25,-46]]);
+    g.lineStyle(2,tint??0xc1a46e,1);g.lineBetween(-4,-5,-4,-94);g.lineBetween(4,-5,4,-94);
+    for(let rung=-10;rung>-94;rung-=9)g.lineBetween(-4,rung,4,rung);
+    polygon(g,tint??0xc9c0a8,[[0,-146],[56,-118],[0,-90],[-56,-118]]);
+    for(const [mx,my]of[[-48,-122],[-24,-134],[0,-146],[24,-134],[48,-122]])merlon(g,mx,my,tint);
+    polygon(front,tint??0xa8a18a,[[-56,-118],[0,-90],[0,-81],[-56,-109]]);
+    polygon(front,tint??0x7c8270,[[0,-90],[56,-118],[56,-109],[0,-81]]);
+    for(const [mx,my]of[[-48,-114],[-24,-102],[0,-90],[24,-102],[48,-114]])merlon(front,mx,my,tint);
   }
 
-  contains(x, y) {
-    return Phaser.Geom.Polygon.Contains(this.hitArea, x - this.base.x, y - this.base.y);
-  }
-
-  setVisible(visible) {
-    this.footprint.setVisible(visible);
-    this.back.setVisible(visible);
-    this.front.setVisible(visible);
-  }
+  contains(x,y){return Phaser.Geom.Polygon.Contains(this.hitArea,x-this.base.x,y-this.base.y);}
+  setVisible(value){this.footprint.setVisible(value);this.back.setVisible(value);this.front.setVisible(value);}
+  inView(view){return this.base.x+70>=view.x&&this.base.x-70<=view.right&&this.base.y+10>=view.y&&this.base.y-175<=view.bottom;}
 }

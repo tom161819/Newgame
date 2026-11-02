@@ -1,5 +1,6 @@
-import { isWalkable, TILE_SIZE } from './map.js';
-import { findPath } from './pathfinding.js';
+import { isWalkable } from './map.js';
+import { gridToWorld } from './isometric.js';
+import { findPath, findPathToAny } from './pathfinding.js';
 import { tileKey } from './stones.js';
 
 export const TOWER_COST = 10;
@@ -20,12 +21,12 @@ export function towerNeighbors(tower) {
 }
 
 export function towerBase(tower) {
-  return { x: (tower.x + 1) * TILE_SIZE, y: (tower.y + 2) * TILE_SIZE - 4 };
+  return gridToWorld(tower.x + 2, tower.y + 2);
 }
 
 export function towerTop(tower) {
   const base = towerBase(tower);
-  return { x: base.x, y: base.y - 83 };
+  return { x: base.x, y: base.y - 118 };
 }
 
 export function placementError(map, anchor, stones, reservedTiles = []) {
@@ -35,7 +36,7 @@ export function placementError(map, anchor, stones, reservedTiles = []) {
   }
   if (tiles.some(tile => stones.has(tileKey(tile)))) return 'Na tomto místě leží kámen.';
   if (tiles.some(tile => reservedTiles.some(reserved => tileKey(tile) === tileKey(reserved)))) {
-    return 'Tady stojí hráč nebo právě dokončuje krok.';
+    return 'Tady stojí král nebo právě dokončuje krok.';
   }
   return null;
 }
@@ -53,12 +54,7 @@ export function placeTower({ map, anchor, stones, reservedTiles, inventory, buil
 
 // Zvolíme sousední políčko s nejkratší skutečně dostupnou cestou, ne vzdušnou vzdáleností.
 export function approachTower(map, start, tower) {
-  let best = null;
-  for (const tile of towerNeighbors(tower)) {
-    const path = findPath(map, start, tile);
-    if (path !== null && (!best || path.length < best.path.length)) best = { path, destination: tile };
-  }
-  return best;
+  return findPathToAny(map, start, towerNeighbors(tower));
 }
 
 export function planGroundOrder(map, start, order) {

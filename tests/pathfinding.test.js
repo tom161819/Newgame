@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { findPath } from '../src/game/pathfinding.js';
-import { grid, COLUMNS, ROWS, isWalkable } from '../src/game/map.js';
+import { findPath, reachableTiles } from '../src/game/pathfinding.js';
+import { grid, COLUMNS, ROWS, PLAYER_START, isWalkable } from '../src/game/map.js';
 
 test('BFS najde nejkratší obchůzku překážky', () => {
   const map = [[0, 1, 0], [0, 1, 0], [0, 0, 0]];
@@ -18,13 +18,14 @@ test('neprůchozí, nedosažitelný cíl a hranice mapy', () => {
   assert.deepEqual(findPath(map, { x: 0, y: 0 }, { x: 0, y: 0 }), []);
 });
 
-test('všechna volná políčka mapy jsou dosažitelná platnými kroky', () => {
+test('mapa má 100 × 100 políček a BFS vede platné cesty přes celou mapu', () => {
   assert.equal(grid.length, ROWS);
   assert.ok(grid.every(row => row.length === COLUMNS));
-  const start = { x: 2, y: 2 };
-  for (let y = 0; y < ROWS; y++) {
-    for (let x = 0; x < COLUMNS; x++) {
-      if (!isWalkable(grid, x, y)) continue;
+  assert.equal(COLUMNS * ROWS, 10000);
+  const start = PLAYER_START;
+  const reachable = reachableTiles(grid, [start]);
+  assert.equal(reachable.length, grid.flat().filter(value => value === 0).length);
+  for (const { x, y } of reachable.filter((_, i) => i % 251 === 0)) {
       const path = findPath(grid, start, { x, y });
       assert.notEqual(path, null);
       let previous = start;
@@ -34,6 +35,5 @@ test('všechna volná políčka mapy jsou dosažitelná platnými kroky', () => 
         previous = step;
       }
       assert.deepEqual(previous, { x, y });
-    }
   }
 });

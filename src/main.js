@@ -1,14 +1,14 @@
 import Phaser from 'phaser';
 import { GameScene } from './game/GameScene.js';
-import { COLUMNS, ROWS, TILE_SIZE, MAP_HEADROOM } from './game/map.js';
 import './style.css';
 
 new Phaser.Game({
-  type: Phaser.AUTO,
+  // Sdílené textury terénu a jednoduché tvary jsou v Canvasu rychlé i bez GPU.
+  type: Phaser.CANVAS,
   parent: 'game',
-  width: COLUMNS * TILE_SIZE,
-  height: ROWS * TILE_SIZE + MAP_HEADROOM,
-  backgroundColor: '#1e303b',
+  width: 1024,
+  height: 640,
+  backgroundColor: '#3a3c2b',
   scene: GameScene,
-  scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+  scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.CENTER_BOTH },
 });

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { PlayerController, PLAYER_STATE } from '../src/game/PlayerController.js';
 import { towerTiles, towerNeighbors, towerTop } from '../src/game/buildings.js';
 import { tileCenter } from '../src/game/map.js';
+import { gridToWorld } from '../src/game/isometric.js';
 
 function setup() {
   const tower = { id: 1, x: 4, y: 4, tiles: towerTiles({ x: 4, y: 4 }) };
@@ -78,4 +79,21 @@ test('obklíčený hráč zůstane nahoře; po uvolnění lze vstup a výstup op
     w.character.command({ kind: 'enter', tower: w.tower });w.character.update(10000);w.completeAnimation();
     assert.equal(w.character.state, PLAYER_STATE.ON_TOWER);
   }
+});
+
+test('plynulý pohyb používá logickou pozici; změna cíle neposkočí a příjezd ukončí chůzi', () => {
+  const w=setup();
+  w.character.command({kind:'move',goal:{x:3,y:0}});
+  w.character.update(100);
+  assert.ok(Math.abs(w.character.position.x-0.85)<1e-9);
+  assert.equal(w.character.position.y,0.5);
+  assert.deepEqual({x:w.sprite.x,y:w.sprite.y},gridToWorld(0.85,0.5));
+  assert.equal(w.character.walking,true);
+  const before={...w.character.position};
+  w.character.command({kind:'move',goal:{x:0,y:2}});
+  assert.deepEqual(w.character.position,before);
+  assert.deepEqual(w.character.nextTile,{x:1,y:0});
+  w.character.update(10000);
+  assert.deepEqual(w.character.tile,{x:0,y:2});
+  assert.equal(w.character.walking,false);
 });

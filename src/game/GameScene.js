@@ -1,9 +1,13 @@
 import Phaser from 'phaser';
-import { COLUMNS, ROWS, TILE_SIZE, MAP_HEADROOM, grid, isWalkable, tileCenter } from './map.js';
+import { COLUMNS, ROWS, PLAYER_START, grid, isWalkable, tileCenter } from './map.js';
+import { tilePolygon, worldToTile } from './isometric.js';
+import { TerrainRenderer } from './TerrainRenderer.js';
+import { WorldCamera } from './WorldCamera.js';
 import { Inventory } from './inventory.js';
-import { drawStone, generateStones, tileKey } from './stones.js';
-import { placeTower, placementError, towerTiles, towerBase, TOWER_COST } from './buildings.js';
+import { drawStone, generateStones, tileKey, StoneSpawner, MAX_STONES } from './stones.js';
+import { placeTower, placementError, towerTiles, towerBase, towerNeighbors, TOWER_COST } from './buildings.js';
 import { TowerView } from './TowerView.js';
+import { KingView } from './KingView.js';
 import { PlayerController, PLAYER_STATE } from './PlayerController.js';
 import { BuildingBar } from '../ui/BuildingBar.js';
 
@@ -13,30 +17,39 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.cameras.main.setScroll(0, -MAP_HEADROOM);
     // Každá nová hra dostane vlastní mapu, do které lze zapisovat budovy.
     this.map = grid.map(row => [...row]);
-    for (let y = 0; y < ROWS; y++) {
-      for (let x = 0; x < COLUMNS; x++) {
-        const position = tileCenter({ x, y });
-        const color = this.map[y][x] ? 0x586b79 : (x + y) % 2 ? 0x1e303b : 0x223540;
-        this.add.rectangle(position.x, position.y, TILE_SIZE - 1, TILE_SIZE - 1, color);
-      }
-    }
-    const start = { x: 2, y: 2 };
+    this.terrain = new TerrainRenderer(this, grid);
+    const start = PLAYER_START;
     this.inventory = new Inventory();
     this.stones = new Map(generateStones(this.map, start).map(tile => [tileKey(tile), drawStone(this, tile)]));
     this.buildings = [];
     this.towerViews = new Map();
     this.buildMode = false;
     this.previewAnchor = null;
+    this.previewTracking = false;
     this.previewKey = null;
     this.preview = new TowerView(this, { x: 0, y: 0, tiles: towerTiles({ x: 0, y: 0 }) }, true);
     this.preview.setVisible(false);
-    this.marker = this.add.rectangle(0, 0, 26, 26).setStrokeStyle(2, 0x85d6ce).setDepth(9998).setVisible(false);
+    this.marker = this.add.graphics().setDepth(9998).setVisible(false);
     const position = tileCenter(start);
-    this.player = this.add.circle(position.x, position.y, 10, 0x388dff).setStrokeStyle(2, 0xa8d1ff);
+    this.player = new KingView(this, position.x, position.y);
     this.character = new PlayerController(this, this.player, start);
+    this.worldCamera = new WorldCamera(this, this.player);
+    this.spawner = new StoneSpawner({
+      map: this.map, stones: this.stones,
+      getOrigins: () => {
+        const character = this.character;
+        if (character.exitTile) return [character.exitTile];
+        if (character.currentTower) return towerNeighbors(character.currentTower);
+        return [character.nextTile ?? character.tile];
+      },
+      getReserved: () => this.character.reservedTiles(),
+      spawn: tile => {
+        this.stones.set(tileKey(tile), drawStone(this, tile));
+        this.updateWorldCount();
+      },
+    });
     this.buildingBar = new BuildingBar({
       onSelect: () => this.startBuilding(),
       onCancel: () => this.cancelBuilding(),
@@ -48,11 +61,13 @@ export class GameScene extends Phaser.Scene {
     this.input.on('pointerdown', pointer => this.handleClick(pointer));
     this.input.on('pointermove', pointer => {
       if (!this.buildMode) return;
+      this.previewTracking = true;
       this.previewAnchor = this.pointerTile(pointer);
       this.updateBuildingPreview();
     });
     this.input.on('gameout', () => {
       this.previewAnchor = null;
+      this.previewTracking = false;
       this.preview.setVisible(false);
       this.previewKey = null;
     });
@@ -60,6 +75,7 @@ export class GameScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-ESC', onEscape);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.buildingBar.destroy();
+      this.worldCamera.destroy();
       this.input.keyboard.off('keydown-ESC', onEscape);
       this.game.canvas.style.cursor = '';
     });
@@ -67,7 +83,7 @@ export class GameScene extends Phaser.Scene {
 
   pointerTile(pointer) {
     pointer.updateWorldPoint(this.cameras.main);
-    return { x: Math.floor(pointer.worldX / TILE_SIZE), y: Math.floor(pointer.worldY / TILE_SIZE) };
+    return worldToTile(pointer.worldX, pointer.worldY);
   }
 
   handleClick(pointer) {
@@ -76,7 +92,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     if (!pointer.leftButtonDown()) return;
-    const goal = this.pointerTile(pointer);
+    let goal = this.pointerTile(pointer);
     if (this.buildMode) {
       this.previewAnchor = goal;
       const result = placeTower({ map: this.map, anchor: goal, stones: this.stones,
@@ -88,24 +104,29 @@ export class GameScene extends Phaser.Scene {
       } else {
         this.towerViews.set(result.tower.id, new TowerView(this, result.tower));
         this.updateInventory();
-        this.cancelBuilding('Věž postavena za 10 kamenů. Klikni na ni a hráč dojde ke vstupu.');
+        this.cancelBuilding('Věž postavena za 10 kamenů. Klikni na ni a král dojde ke vstupu.');
       }
       return;
     }
     if (this.character.transitioning) {
-      this.setStatus('Počkej, až hráč dokončí výstup nebo sestup.');
+      this.setStatus('Počkej, až král dokončí výstup nebo sestup.');
       return;
     }
     // Nový levý klik ruší předchozí sběr i plánovaný vstup, ne právě probíhající animaci.
     this.character.order = null;
     const tower = this.towerAtPoint(pointer.worldX, pointer.worldY, goal);
+    let accepted = false;
     if (tower) {
-      this.character.command({ kind: 'enter', tower });
-    } else if (!isWalkable(this.map, goal.x, goal.y)) {
-      this.setStatus('Tady je překážka nebo okraj mapy. Vyber volné políčko.');
+      accepted = this.character.command({ kind: 'enter', tower });
     } else {
-      this.character.command({ kind: 'move', goal, pickupKey: this.stones.has(tileKey(goal)) ? tileKey(goal) : null });
+      // I horní plocha kamene může trochu přesahovat kosočtverec jeho políčka.
+      const hit = [...this.stones.values()].find(stone => stone.visible
+        && Math.abs(pointer.worldX-stone.x)<14 && pointer.worldY>stone.y-12 && pointer.worldY<stone.y+10);
+      if (hit) goal = hit.getData('tile');
+      if (!isWalkable(this.map, goal.x, goal.y)) this.setStatus('Tady je překážka nebo okraj mapy. Vyber volné políčko.');
+      else accepted = this.character.command({ kind: 'move', goal, pickupKey: this.stones.has(tileKey(goal)) ? tileKey(goal) : null });
     }
+    if (accepted) this.worldCamera.follow();
   }
 
   towerAtPoint(x, y, tile) {
@@ -122,6 +143,7 @@ export class GameScene extends Phaser.Scene {
     this.buildMode = true;
     this.previewKey = null;
     this.previewAnchor = null;
+    this.previewTracking = false;
     this.game.canvas.style.cursor = 'crosshair';
     this.updateBuildingUI();
     this.setStatus('Tower: vyber 2 × 2 volná políčka. Cena 10 kamenů. Esc nebo pravý klik stavbu zruší.');
@@ -131,6 +153,7 @@ export class GameScene extends Phaser.Scene {
   cancelBuilding(message = 'Režim stavění zrušen. Můžeš se znovu pohybovat a sbírat kameny.') {
     this.buildMode = false;
     this.previewAnchor = null;
+    this.previewTracking = false;
     this.previewKey = null;
     this.preview.setVisible(false);
     this.game.canvas.style.cursor = '';
@@ -156,8 +179,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   showMarker(tile) {
-    const center = tileCenter(tile);
-    this.marker.setPosition(center.x, center.y).setVisible(true);
+    this.marker.clear().lineStyle(2, 0xe3c879, 1).strokePoints(tilePolygon(tile), true).setVisible(true);
   }
 
   collectStone(tile) {
@@ -177,6 +199,11 @@ export class GameScene extends Phaser.Scene {
       element.textContent = this.inventory.count(element.dataset.resourceCount);
     }
     this.updateBuildingUI();
+    this.updateWorldCount();
+  }
+
+  updateWorldCount() {
+    document.querySelector('#world-stones').textContent = `Mapa 100 × 100 · kameny ${this.stones.size} / ${MAX_STONES}`;
   }
 
   updateBuildingUI() {
@@ -189,6 +216,17 @@ export class GameScene extends Phaser.Scene {
 
   update(_time, delta) {
     this.character.update(delta);
-    if (this.buildMode) this.updateBuildingPreview();
+    this.player.animate(delta, this.character.walking && this.character.state === PLAYER_STATE.GROUND, this.character.direction);
+    this.spawner.update(delta);
+    this.worldCamera.update(delta);
+    this.terrain.update(this.cameras.main);
+    const view = this.cameras.main.worldView;
+    for (const stone of this.stones.values()) stone.setVisible(stone.x>view.x-40&&stone.x<view.right+40&&stone.y>view.y-40&&stone.y<view.bottom+40);
+    for (const tower of this.towerViews.values()) tower.setVisible(tower.inView(view));
+    this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
+    if (this.buildMode) {
+      if (this.previewTracking) this.previewAnchor = this.pointerTile(this.input.activePointer);
+      this.updateBuildingPreview();
+    }
   }
 }

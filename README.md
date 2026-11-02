@@ -1,91 +1,104 @@
-# První cesta
+# První cesta — Královská hlídka
 
-Jednoduchý 2D top-down prototyp pro výuku JavaScriptu a Phaseru. Používá Phaser **4.2.1** a Vite **8.3.5** (stabilní verze při vytvoření). Bez backendu, databáze a externích obrázků.
+Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3.5**. Vlastní procedurální středověká grafika: písčitá krajina, kamenné překážky, korunovaný král s červeným pláštěm a strážní věže. Bez backendu, databáze a externích obrázků.
 
-## Instalace a spuštění
+**[Hrát v prohlížeči](https://tom161819.github.io/Newgame/)** — bez instalace a přihlášení.
 
-Potřebuješ Node.js **22.12+** (doporučeno Node.js 24 LTS) a npm.
+## Ovládání
+
+| Ovládání | Akce |
+|---|---|
+| Levý klik na průchozí políčko | Král k němu dojde po nejkratší cestě. Další klik změní cíl. |
+| Levý klik na kámen | Dojde ke kameni a přičte jej do inventáře. |
+| Levý klik na věž nebo její střechu | Dojde k dostupnému sousednímu políčku a vyleze na plošinu. |
+| Klik na mapu z věže | Nejprve sleze, potom dojde k cíli. Kámen sebere až po sestupu. |
+| WASD nebo šipky | Ručně posouvají kameru a pozastaví její sledování krále. |
+| Mezerník nebo „Na krále“ | Znovu zapne plynulé sledování krále. Nový platný příkaz k pohybu ho také obnoví. |
+| Kolečko myši nad mapou | Zoom od 0,45× do 1,8×. |
+| Buildings → Tower | Zapne náhled stavby 2 × 2 políčka za 10 kamenů. |
+| Levý klik v režimu stavění | Postaví věž na platném místě. Zelená = lze stavět, červená = neplatné místo nebo málo surovin. |
+| Esc, pravý klik nebo Zrušit | Zruší režim stavění bez platby. |
+
+Horní inventář a spodní Buildings jsou mimo herní kameru a při pohybu nebo zoomu mapy zůstávají na obrazovce. Informace o věži lze otevřít i s prázdným inventářem.
+
+## Mapa, kameny a stavby
+
+- Logická mapa má **100 × 100 políček**. Každé se kreslí jako kosočtverec **64 × 32 px**. Král začíná na `(50, 50)`.
+- Při načtení vznikne **30 náhodných kamenů** na různých dosažitelných průchozích políčkách mimo start krále.
+- Každých **20 sekund herního času** vznikne jeden nový kámen. Na mapě může současně ležet nejvýše **80 nesebraných kamenů**, včetně těch mimo aktuální obraz kamery.
+- Generátor vždy znovu ověří dosažitelnost po změnách mapy. Vynechá budovy, překážky, existující kameny a aktuální i právě procházené políčko krále. Pokud není dostupné místo, daný pokus přeskočí. Po uvolnění limitu pokračuje při dalším dvacetisekundovém intervalu.
+- Kameny neblokují pohyb. Sbírá se pouze kámen vybraný kliknutím. Nový levý klik zruší původní požadavek i při neplatném cíli; pravý klik mimo stavění ho nemění.
+- Věž stojí přesně **10 kamenů**, obsadí přesně **2 × 2 logická políčka** a vytvoří neprůchozí překážku pro BFS. Nesmí překrývat kameny, budovy, překážky ani krále a jeho probíhající krok.
+- Lze postavit více věží. Výběr stavby zruší zbývající cestu a sběr; už rozběhnutý krok se dokončí plynule. Po postavení jedné věže režim stavění skončí.
+- Ke vstupu se vybírá sousední políčko s nejkratší dosažitelnou cestou. Následuje animace lezení, ne přesun z dálky. Král nahoře nechodí po mapě ani nesbírá. Sestup vybere sousední políčko s dostupnou cestou k cíli; pokud takové není, král zůstane nahoře.
+- Během animace výstupu a sestupu se nové příkazy nepřijímají. Vstup/výstup lze opakovat, včetně přechodu z jedné věže do druhé.
+- Po obnovení stránky začíná nová hra: inventář je nulový, budovy zmizí a kameny se vygenerují znovu. Hra nepřidává boj, nepřátele ani jiné budovy.
+
+## Instalace a spuštění pro vývoj
+
+Potřebuješ **Node.js 22.12+**, doporučeno Node.js 24 LTS, a npm.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Otevři adresu vypsanou Vite v terminálu. V cloudovém prostředí lze server spustit příkazem `npm run dev -- --host 0.0.0.0`.
+Otevři adresu vypsanou Vite. V cloudovém prostředí lze použít `npm run dev -- --host 0.0.0.0`.
 
 ```sh
-npm test          # testy BFS, surovin, stavby a pohybu mezi mapou a věží
-npm run build    # produkční soubory do dist/
-npm run preview  # lokální kontrola produkčního buildu
+npm test                         # souřadnice, BFS, generování, inventář, stavby a stavy krále
+npm run build                    # produkční soubory do dist/
+npm run build -- --base=/Newgame/ # sestavení pro projektovou cestu GitHub Pages
+npm run preview                  # místní kontrola produkčního buildu
 ```
 
-Vite může při buildu upozornit na velikost balíčku: prototyp zahrnuje celý Phaser. Upozornění nebrání sestavení.
+Upozornění Vite na velikost balíčku souvisí s přibaleným Phaserem a nebrání sestavení.
 
-## Hraní v prohlížeči přes GitHub Pages
+## Struktura projektu
 
-Pro hraní bez instalace je připraven postup v `.github/workflows/pages.yml`.
-Samotná přítomnost tohoto souboru hru ještě nezveřejňuje.
+| Soubor | Odpovědnost |
+|---|---|
+| `src/main.js` | Phaser, velikost plátna podle dostupného místa a spuštění scény. |
+| `src/game/config.js` | Velikost mapy, rozměry kosočtverce a start krále. |
+| `src/game/map.js` | Logická mapa, původní překážky a průchodnost. Budovy se zapisují jen do kopie mapy konkrétní hry. |
+| `src/game/isometric.js` | Projekce, inverze, středy/polygony políček a hranice světa. |
+| `src/game/TerrainRenderer.js` | Sdílené textury terénu, cache bloků 10 × 10 a fond viditelných bloků/překážek kolem kamery. |
+| `src/game/WorldCamera.js` | Plynulé sledování, WASD/šipky, zoom a omezení hranic. |
+| `src/game/pathfinding.js` | BFS s číselnými indexy a typed arrays; také hledání dosažitelné oblasti pro generátor. |
+| `src/game/PlayerController.js` | Logická desetinná poloha, cesta a stavy `ground`, `enteringTower`, `onTower`, `exitingTower`. |
+| `src/game/KingView.js` | Koruna, plášť, končetiny, směry, chůze a klid. Lze nahradit profesionálním spritem bez změny herní logiky. |
+| `src/game/stones.js` | Náhodné dosažitelné pozice, dvacetisekundový generátor, limit a vlastní kresba kamene se stínem. |
+| `src/game/inventory.js` | Počty surovin podle názvu a bezpečná platba; připraveno i pro další suroviny. |
+| `src/game/buildings.js` | Cena, půdorys, validace, blokování mapy a plánování vstupu/výstupu. |
+| `src/game/TowerView.js` | Izometrické stěny, plošina, cimbuří, stín, zásah myší a průhledný náhled. |
+| `src/game/GameScene.js` | Propojení vstupu, kamery, krále, sběru, generátoru, stavby a UI. |
+| `src/ui/BuildingBar.js` | Spodní záložka Buildings, nabídka Tower a dostupnost kamenů. |
+| `index.html`, `src/style.css` | Pevné rozhraní kolem mapy. Žádné CSS otáčení herního světa. |
+| `tests/` | Testy souřadnic, navigace, generování, časování, limitů, inventáře, stavby a vstupu/výstupu. |
 
-Po schválení veřejného zveřejnění:
+## Souřadnice a pořadí kreslení
 
-1. Nahraj projekt do větve `main` repozitáře `tom161819/Newgame`.
-2. Na GitHubu otevři **Settings → Pages** a jako **Source** nastav **GitHub Actions**.
-3. V záložce **Actions** otevři **Publish game to GitHub Pages** a spusť **Run workflow**, pokud poslední běh neproběhl úspěšně. Další změny v `main` už spustí publikování automaticky.
-4. Po úspěšném dokončení otevři adresu webu uvedenou v **Settings → Pages** nebo u nasazení `github-pages`.
+Logické rohy políček používají jednotky mřížky; středy jsou `(x + 0.5, y + 0.5)`. Projekce do herního světa je:
 
-Hra i kód budou veřejné. Hráčům stačí odkaz a webový prohlížeč; nepotřebují účet, Node.js ani stahovat projekt. GitHub Pages je nezávislé na publikování cloudového prostředí Codexu.
+```text
+worldX = originX + (gridX - gridY) * 32
+worldY = originY + (gridX + gridY) * 16
+```
 
-Workflow používá Node.js 24, instaluje závislosti z lockfilu, spouští testy a sestavuje hru se správnou cestou k souborům. Stejný build pro projektovou adresu lze lokálně ověřit příkazem `npm run build -- --base=/Newgame/`.
+Při kliknutí se nejprve odstraní posun a zoom kamery pomocí `camera.getWorldPoint` / `pointer.updateWorldPoint`. Inverzní projekce vrátí logickou polohu, ze které se vezme příslušné políčko. Stejná projekce určuje pohyb, kameny, půdorys i náhled věže. Rychlost krále je **3,5 logického políčka za sekundu** a na zoomu nezávisí.
 
-## Ovládání
+Objekty se řadí podle promítnuté polohy nohou či přední části základny. Věž má zvlášť zadní část a přední parapet; král na plošině je mezi nimi. Výška objektu proto nemění jeho logickou polohu nebo obsazená políčka.
 
-Levým tlačítkem klikni na volné políčko. Modrý kruh se plynule přesune do jeho středu a obejde šedé překážky. Další kliknutí změní cíl i za pohybu. Pravé tlačítko a kliknutí mimo mapu či na překážku nemění cestu.
+## Výkon
 
-Při každém načtení hry se náhodně rozmístí **15 kamenů** na různá volná políčka mimo start hráče. Kliknutím na kámen zahájíš cestu k němu. Po příchodu do středu jeho políčka zmizí a horní inventář se okamžitě zvýší o jeden kámen. Kameny jsou kreslené geometricky: tři šedé plochy a stín jim dávají prostorový vzhled. Stávající mapa a pohled shora zůstávají zachované.
+Existuje celá logická mapa a pathfinding na všech 10 000 políčkách. Šest procedurálních textur země se jednou skládá do bloků **10 × 10 políček**. Vykreslují se jen viditelné bloky s rezervou pro okraje; obrazy bloků i překážek se skrývají a znovu používají. Statický výřez se nepřestavuje každý snímek. Kameny a věže mimo kameru se také nekreslí.
 
-Každý další levý klik do mapy zruší předchozí požadavek na sběr, včetně kliknutí na překážku či nedosažitelný cíl. Pokud nový cíl není platný, původní pohyb se dokončí, ale původní kámen se nesebere. Pravé tlačítko požadavek nemění. Nedosažitelný kámen zůstane na místě. Kameny neblokují cestu a pouhé projití přes jiný, nevybraný kámen ho nesebere. Inventář po obnovení stránky začíná znovu od nuly; ukládání ani další suroviny zatím nejsou přidané.
+Pro tento procedurální prototyp je vybraný renderer **Phaser Canvas**, který s cache terénu dobře funguje také na strojích bez hardwarové akcelerace WebGL. Místo tisíců objektů země tak scéna kreslí desítky obrazových bloků. Logické kolize a cesta nadále rozlišují každé jednotlivé políčko.
 
-Mapa má přesně **20 × 15 políček po 32 × 32 px**, tedy 640 × 480 herních pixelů. Nad mapou je navíc 56 px pro střechy věží u severního okraje; celé plátno proto měří 640 × 536 px. Na menším displeji se úměrně zmenší. Hráč začíná na souřadnicích `(2, 2)`, počítaných od nuly.
+Kamera je omezená obdélníkovými hranicemi promítnutého světa; její střed se navíc drží uvnitř kosočtverce mapy. U okrajů tak lze vidět obrys světa, ale kamerou nelze odjet do nekonečného prázdna. Inventář a Buildings patří do HTML, nikoli do posouvané kamery.
 
-## Buildings a Tower
+## Zveřejnění a návrat k původní verzi
 
-1. Nasbírej alespoň **10 kamenů**.
-2. Ve spodní liště otevři **Buildings** a vyber **Tower**. Informace i náhled si můžeš otevřít také bez dostatku surovin; samotná stavba pak neprojde.
-3. Myší vyber levé horní políčko půdorysu **2 × 2**. Náhled se přichytává k mřížce. Zelená znamená platné místo i dostatek surovin, červená neplatné umístění nebo nedostatek kamenů.
-4. Levým kliknutím potvrď. Odečte se přesně 10 kamenů a režim stavění skončí. Neplatný pokus nic nestojí. **Esc**, **pravý klik** nebo **Zrušit** ukončí stavění bez platby.
+GitHub Pages je nastavené na **GitHub Actions**. Push do `main` spustí `.github/workflows/pages.yml`: instalaci z lockfilu, testy, build se správnou základní cestou a nasazení. Web je nezávislý na publikování cloudového prostředí Codexu.
 
-Věž nelze postavit přes překážku, jinou budovu, kámen, hráče ani právě dokončovaný krok. Výběr stavby zruší zbytek naplánované cesty a sběr; probíhající krok hráč plynule dokončí. Obsazená čtyři políčka jsou neprůchozí a BFS hledá cestu kolem nich. Postavené věže jsou samostatné objekty s vlastní pozicí, identifikátorem a půdorysem.
-
-Klikni na postavenou věž nebo její plošinu. Hráč dojde k dostupnému sousednímu políčku po nejkratší cestě a potom animovaně vyleze nahoru. Z dálky se nepřesouvá skokem. Na plošině nechodí po mapě a nesbírá. Kliknutím na volné políčko nebo kámen nejprve sleze na dostupné sousední políčko a až pak pokračuje. Pokud neexistuje dostupný výstup s cestou k cíli, zůstane nahoře. Kliknutí na jinou věž naplánuje sestup, chůzi a vstup do druhé věže. Během samotného lezení a slézání se další příkazy nepřijímají, aby se animace nepřerušila do neplatného stavu.
-
-Věže používají procedurální stěny, plošinu, žebřík a cimbuří. Pořadí překrývání vychází z pozice základny; hráč na plošině se kreslí mezi zadní částí a předním parapetem. Stávající mřížka i její pohled zůstávají zachované.
-
-Systém podporuje více věží, pokud má hráč dost kamenů. Na současné mapě je stále původních **15 kamenů**, takže běžná hra zatím umožní jednu věž a zůstane 5 kamenů. Žádné nové zdroje ani obnovování kamenů nejsou přidané. Po obnovení stránky zmizí také budovy a inventář začíná znovu od nuly.
-
-## Struktura
-
-- `index.html` – stránka, kontejner hry a české pokyny.
-- `src/main.js` – vytvoření Phaser hry, rozměry a přizpůsobení plátna.
-- `src/game/map.js` – mapa (`0` = volno, `1` = překážka), rozměry a převod na středy políček.
-- `src/game/pathfinding.js` – BFS nezávislé na vykreslování.
-- `src/game/GameScene.js` – propojení mapy, klikání, sběru, stavby a uživatelského rozhraní.
-- `src/game/PlayerController.js` – původní plynulý pohyb a stavy `ground`, `enteringTower`, `onTower`, `exitingTower`.
-- `src/game/buildings.js` – cena a půdorys věže, validace umístění, blokování mapy a plánování vstupu/výstupu.
-- `src/game/TowerView.js` – procedurální věž, náhled, zásah myší a pořadí překrývání.
-- `src/ui/BuildingBar.js` – spodní záložka Buildings, nabídka Tower a dostupnost surovin.
-- `src/game/stones.js` – náhodné rozmístění bez opakování a geometrické vykreslení kamenů.
-- `src/game/inventory.js` – počty surovin podle názvu; stejným rozhraním lze později evidovat dřevo, železo nebo zlato.
-- `src/style.css` – jednoduché rozvržení stránky.
-- `tests/pathfinding.test.js` – nejkratší obchůzka, neplatné a nedosažitelné cíle, platnost cest do všech volných políček.
-- `tests/stones.test.js` – pravidla náhodného rozmístění a počítání surovin v inventáři.
-- `tests/buildings.test.js` – platba, půdorys, překážky, více věží a dosažitelnost vstupu/výstupu.
-- `tests/player.test.js` – postupné stavy chůze a lezení, zákaz sběru nahoře a opakovaný vstup/výstup.
-- `package-lock.json` – přesné verze pro opakovatelnou instalaci přes `npm ci`.
-
-## Jak to funguje
-
-Kliknutí převede souřadnice myši na políčko pomocí dělení velikostí dlaždice. BFS prochází sousedy ve čtyřech směrech, pamatuje si jejich předchůdce a z nich sestaví nejkratší cestu. Diagonály nepoužívá; všechny kroky mají stejnou délku.
-
-`PlayerController` v každém snímku posune hráče směrem ke středu následujícího políčka. Rychlost 144 px/s se násobí časem snímku, takže nezávisí na FPS. Po dosažení středu pokračuje dalším krokem. Při změně cíle dokončí pouze právě probíhající krok a z jeho konce naplánuje novou cestu. Díky tomu nikdy neřeže roh překážky ani neposkočí. Nedosažitelný cíl zobrazí zprávu a zachová původní cestu.
-
-Pro první úpravy změň rozmístění překážek v `map.js` nebo `speed` v `PlayerController.js`. Poloměr hráče ponech menší než polovinu políčka. Cena věže je v `buildings.js` jako `TOWER_COST`.
+Před převodem na izometrii byl vytvořen checkpoint commit **`bf049d5`**. Obsahuje původní funkční verzi se sběrem, inventářem a věžemi; lze jej použít pro porovnání nebo návrat.
