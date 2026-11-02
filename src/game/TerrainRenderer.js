@@ -76,9 +76,9 @@ export class TerrainRenderer {
     }
   }
 
-  update(camera) {
+  update(camera,fog=null) {
     const view = camera.worldView;
-    const cacheKey = [Math.floor(view.x / 16), Math.floor(view.y / 16), Math.ceil(view.width), Math.ceil(view.height)].join(',');
+    const cacheKey = [Math.floor(view.x / 16), Math.floor(view.y / 16), Math.ceil(view.width), Math.ceil(view.height),fog?.signature??''].join(',');
     if (cacheKey === this.lastView) return;
     this.lastView = cacheKey;
     const padding = 100;
@@ -96,6 +96,7 @@ export class TerrainRenderer {
       visibleCount++;
       neededChunks.add(`${Math.floor(x/CHUNK_SIZE)},${Math.floor(y/CHUNK_SIZE)}`);
       if (!this.map[y][x]) continue;
+      if(fog&&!fog.isVisibleTile({x,y}))continue;
       const key=`${x},${y}`; visible.add(key);
       if(this.tiles.has(key))continue;
       const wall=this.wallPool.pop()??this.scene.add.image(0,0,this.wallTexture).setOrigin(this.outcrop.origin?.x??0.5,this.outcrop.origin?.y??1);

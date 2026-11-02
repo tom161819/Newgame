@@ -37,6 +37,7 @@ export function validateDefinition(definition) {
   if (d.spritesheet !== undefined && (!plainObject(d.spritesheet) || ![d.spritesheet.frameWidth,d.spritesheet.frameHeight].every(v => Number.isSafeInteger(v) && v > 0))) fail(id, 'neplatné rozměry spritesheetu.');
   if (d.frontSprite && !/^\/assets\/(?!.*\.\.)[^?#]+\.(png|webp|svg)$/i.test(d.frontSprite)) fail(id, 'neplatná přední vrstva.');
   if (d.visual !== undefined && !plainObject(d.visual)) fail(id, 'neplatné vizuální parametry.');
+  if (d.visibility !== undefined && (!plainObject(d.visibility) || !finite(d.visibility.multiplier) || d.visibility.multiplier<=0)) fail(id, 'neplatný bonus dohledu.');
   if (d.consumption !== undefined && (!plainObject(d.consumption) || !Number.isSafeInteger(d.consumption.amount)
     || d.consumption.amount<=0 || !finite(d.consumption.interval) || d.consumption.interval<=0)) fail(id, 'neplatná spotřeba suroviny.');
   if (d.category==='animal' && (!plainObject(d.gameplay) || !finite(d.gameplay.movementSpeed) || d.gameplay.movementSpeed<=0

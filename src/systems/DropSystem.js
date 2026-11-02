@@ -29,8 +29,8 @@ export class DropSystem {
     this.scene.inventory.add(drop.resource,drop.amount);this.scene.updateInventory();
     this.scene.setStatus(`${this.scene.objectRegistry.require(drop.resource).name} ×${drop.amount} sebráno.`);return true;
   }
-  atPoint(x,y){return [...this.drops.values()].sort((a,b)=>b.view.depth-a.view.depth).find(d=>this.scene.assets.hitTest(d.view,x,y))??null;}
-  atTile(tile){return [...this.drops.values()].find(d=>tileKey(d.tile)===tileKey(tile)&&d.view.visible)??null;}
-  update(view){for(const drop of this.drops.values()){const v=drop.view;v.setVisible(v.x>view.x-40&&v.x<view.right+40&&v.y>view.y-40&&v.y<view.bottom+40);}}
+  atPoint(x,y){return [...this.drops.values()].sort((a,b)=>b.view.depth-a.view.depth).find(d=>(!this.scene.fog||this.scene.fog.isVisibleTile(d.tile))&&this.scene.assets.hitTest(d.view,x,y))??null;}
+  atTile(tile){return [...this.drops.values()].find(d=>tileKey(d.tile)===tileKey(tile)&&d.view.visible&&(!this.scene.fog||this.scene.fog.isVisibleTile(d.tile)))??null;}
+  update(view,fog=null){for(const drop of this.drops.values()){const v=drop.view;v.setVisible((!fog||fog.isVisibleTile(drop.tile))&&v.x>view.x-40&&v.x<view.right+40&&v.y>view.y-40&&v.y<view.bottom+40);}}
   destroy(){for(const drop of this.drops.values())drop.view.destroy();this.drops.clear();}
 }

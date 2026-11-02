@@ -25,7 +25,7 @@ export class HuntingSystem {
   }
   attack(animal){
     const king=this.scene.character;
-    if(!animal.active||king.state!=='ground'||!canInteractAdjacent(this.scene.map,king,animal))return false;
+    if(!animal.active||!animal.definition.gameplay.huntable||king.state!=='ground'||!canInteractAdjacent(this.scene.map,king,animal))return false;
     const dx=animal.position.x-king.position.x,dy=animal.position.y-king.position.y,length=Math.hypot(dx,dy);
     if(length)king.direction={x:dx/length,y:dy/length};
     const tile={x:Math.floor(animal.position.x),y:Math.floor(animal.position.y)};

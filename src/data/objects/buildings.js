@@ -1,6 +1,7 @@
 export const buildings = [
   {
     id: 'tower', name: 'Stone Tower', category: 'building', sprite: '/assets/buildings/tower/tower.png',
+    visibility: { multiplier: 2 },
     width: 2, height: 2, walkable: false, collectible: false, buildable: true,
     cost: { stone: 10 }, interactions: ['enter', 'exit'], description: 'Kamenná strážní věž s horní plošinou a cimbuřím.',
     renderMode: 'procedural', renderer: 'tower', origin: { x: 0.5, y: 0.91 }, visualHeight: 166,

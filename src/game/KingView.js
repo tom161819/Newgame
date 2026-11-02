@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { directionName, DIRECTION_POSES } from './directions.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
+import { AnimalView } from './AnimalView.js';
 
 // Grafická vrstva krále. Controller dodává logický směr, nikoli úhel obrazovky.
 // Každý z osmi směrů má vlastní pózu; později ji může nahradit animovaný sprite.
@@ -80,6 +81,12 @@ export class KingView extends Phaser.GameObjects.Container {
     if (horizontal <= 0) this.torsoGroup.bringToTop(this.leftArm);
   }
 
+  setMounted(definition){
+    this.mount?.destroy();this.mount=null;
+    if(definition){this.mount=new AnimalView(this.scene,0,0,definition);this.addAt(this.mount,1);}
+    this.shadow.setVisible(!definition);
+  }
+
   animate(delta, moving, direction) {
     this.isWalking = moving;
     // Směr je poslední skutečný pohyb z controlleru. Platí i při příjezdu
@@ -87,6 +94,7 @@ export class KingView extends Phaser.GameObjects.Container {
     const facing = directionName(direction);
     if (facing && facing !== this.facing) { this.facing = facing; this.paint(); }
     this.phase += delta * (moving ? 0.013 : 0.002);
+    this.mount?.animate(delta,moving,direction);
     const stride = moving ? Math.sin(this.phase) * 2.6 : 0;
     const length = Math.hypot(this.pose.screenX, this.pose.screenY);
     const sx = this.pose.screenX / length, sy = this.pose.screenY / length;
@@ -103,5 +111,10 @@ export class KingView extends Phaser.GameObjects.Container {
     this.leftArm.rotation = moving ? Math.sin(this.phase) * 0.22 : 0.02;
     this.rightArm.rotation = -this.leftArm.rotation;
     this.torsoGroup.y = moving ? -Math.abs(Math.sin(this.phase)) * 1.3 : Math.sin(this.phase) * 0.4;
+    if(this.mount){
+      this.torsoGroup.y-=19;
+      this.leftLeg.y-=18;this.rightLeg.y-=18;this.leftBoot.y-=18;this.rightBoot.y-=18;
+    }
+    this.leftLeg.rotation=this.mount?0.65:0;this.rightLeg.rotation=this.mount?-0.65:0;
   }
 }

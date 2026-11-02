@@ -16,6 +16,21 @@ header p { margin: 0 0 9px; color: #bdb99d; font-size: 12px; line-height: 1.5; }
 #game canvas { display: block; }
 .camera-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 7px; font-size: 11px; color: #bdb99d; }
 .camera-controls button { padding: 5px 9px; font-size: 11px; }
+.camera-controls { flex-wrap: wrap; gap: 6px 12px; }
+#vision-status { margin-left: auto; font-size: 10px; color: #d5c78d; }
+.settings-button { position: fixed; left: 8px; top: 45%; z-index: 25; width: 38px; height: 38px; padding: 0; font-size: 24px; box-shadow: 0 2px 12px #0005; }
+.settings-panel { position: fixed; left: 52px; top: clamp(90px,25vh,200px); z-index: 24; width: min(270px,calc(100vw - 64px)); max-height: 65dvh; overflow: auto; padding: 16px; border: 1px solid #978657; border-radius: 4px; background: #303625fa; box-shadow: 0 6px 30px #0007; transform: translateX(calc(-100% - 60px)); visibility: hidden; transition: transform .22s ease,visibility .22s; }
+.settings-panel.open { transform: translateX(0); visibility: visible; }
+.settings-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.settings-heading h2 { font-size: 18px; margin: 0; }
+.settings-heading button { padding: 4px 10px; font-size: 20px; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; font-size: 14px; cursor: pointer; }
+.setting-row input { appearance: none; width: 44px; height: 25px; border: 1px solid #8a8057; border-radius: 20px; background: #242a1c; position: relative; cursor: pointer; }
+.setting-row input::before { content: ''; position: absolute; top: 3px; left: 3px; width: 17px; height: 17px; border-radius: 50%; background: #a6aa91; transition: transform .15s; }
+.setting-row input:checked { background: #827143; }
+.setting-row input:checked::before { transform: translateX(18px); background: #f0d78b; }
+.setting-row input:focus-visible { outline: 2px solid #e2c673; outline-offset: 3px; }
+.settings-panel p { font-size: 11px; line-height: 1.5; color: #bdb99d; }
 footer { display: flex; flex-wrap: wrap; gap: 6px 16px; padding-top: 8px; font-size: 11px; color: #bdb99d; }
 footer span { display: flex; align-items: center; gap: 7px; }
 footer span:last-child { margin-left: auto; }

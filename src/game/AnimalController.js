@@ -12,9 +12,9 @@ export class AnimalController {
     const route=findPathToAny(this.scene.map,this.nextTile??this.tile,goals);
     this.path=route?.path??[];return !!route;
   }
-  reservedTiles(){return movementReservations(this);}
+  reservedTiles(){return this.mounted?[]:movementReservations(this);}
   update(delta){
-    if(!this.active)return;
+    if(!this.active||this.mounted)return;
     // Nová budova může zneplatnit vzdálenější část staré cesty.
     if(this.path.length){
       let previous=this.nextTile??this.tile;

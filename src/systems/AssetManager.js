@@ -88,6 +88,7 @@ export class AssetManager {
 
   hitTest(view,x,y) {
     if(!view.visible)return false;
+    if(view.containsPoint)return view.containsPoint(x,y);
     if(view instanceof SpriteObjectView)return view.getBounds().contains(x,y);
     const definition=this.registry.require(view.getData('objectId')),area=definition.visual?.hitArea;
     return area?x>=view.x+area.x&&x<=view.x+area.x+area.width&&y>=view.y+area.y&&y<=view.y+area.y+area.height:false;

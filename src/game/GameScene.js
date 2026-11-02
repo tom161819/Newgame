@@ -20,6 +20,9 @@ import { AnimalSystem } from '../systems/AnimalSystem.js';
 import { HuntingSystem } from '../systems/HuntingSystem.js';
 import { DropSystem } from '../systems/DropSystem.js';
 import { FoodSystem } from '../systems/FoodSystem.js';
+import { FogOfWarSystem } from '../systems/FogOfWarSystem.js';
+import { MountSystem } from '../systems/MountSystem.js';
+import { SettingsPanel } from '../ui/SettingsPanel.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -67,6 +70,9 @@ export class GameScene extends Phaser.Scene {
     this.dropSystem=new DropSystem(this);
     this.animalSystem=new AnimalSystem(this);this.animalSystem.spawn(PLAYER_START);
     this.huntingSystem=new HuntingSystem(this);
+    this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
+    this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.refreshVisibility();});
+    this.fog.setEnabled(this.settingsPanel.settings.fogOfWar);
     this.foodSystem=new FoodSystem(this.inventory,this.objectRegistry.require('meat'),()=>this.updateInventory());
     this.inventoryBar=new InventoryBar(this.objectRegistry,this.assets,this.inventory);
     this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
@@ -74,6 +80,11 @@ export class GameScene extends Phaser.Scene {
     this.buildingBar.close();this.updateInventory();
     this.setStatus('Vyber surovinu, volné políčko, Buildings nebo Asset Library.');
     this.worldCamera=new WorldCamera(this,this.player);
+    this.controls=new AbortController();
+    const dismount=()=>this.mountSystem.dismount();
+    document.querySelector('#dismount').addEventListener('click',dismount,{signal:this.controls.signal});
+    const onDismount=event=>{if(!event.repeat&&!this.assetGallery.isOpen)dismount();};
+    this.input.keyboard.on('keydown-H',onDismount);this.updateMountUI();
     this.input.mouse.disableContextMenu();
     this.input.on('pointerdown',pointer=>this.handleClick(pointer));
     this.input.on('pointermove',pointer=>{this.updateHover(pointer);if(this.buildMode&&!this.assetGallery.isOpen){this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
@@ -83,6 +94,7 @@ export class GameScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
       this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
       this.animalSystem.destroy();this.dropSystem.destroy();document.querySelector('#object-tooltip').hidden=true;
+      this.settingsPanel.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
       this.input.keyboard.off('keydown-ESC',onEscape);this.game.canvas.style.cursor='';
     });
   }
@@ -143,21 +155,25 @@ export class GameScene extends Phaser.Scene {
     }
     if(this.character.transitioning){this.setStatus('Počkej, až král dokončí výstup nebo sestup.');return;}
     this.character.order=null;
-    this.huntingSystem.cancel();
+    this.huntingSystem.cancel();this.mountSystem.cancel();
     const building=this.towerAtPoint(pointer.worldX,pointer.worldY,goal);
     const animal=!building&&this.animalSystem.atPoint(pointer.worldX,pointer.worldY);
     const drop=!building&&!animal&&(this.dropSystem.atPoint(pointer.worldX,pointer.worldY)??this.dropSystem.atTile(goal));
     let accepted=false;
     if(building){
-      if(buildingDefinition(building).interactions.includes('enter'))accepted=this.character.command({kind:'enter',tower:building});
+      if(buildingDefinition(building).interactions.includes('enter')){
+        if(this.character.mountedHorse&&!this.mountSystem.dismount())return;
+        accepted=this.character.command({kind:'enter',tower:building});
+      }
       else this.setStatus(buildingDefinition(building).description);
     }else if(animal){
-      accepted=this.huntingSystem.command(animal);
+      accepted=animal.definition.interactions.includes('mount')?this.mountSystem.command(animal):this.huntingSystem.command(animal);
     }else if(drop){
       accepted=this.character.command({kind:'drop',goal:drop.tile,dropId:drop.id});
     }else{
-      const hit=[...this.resources.values()].sort((a,b)=>b.depth-a.depth).find(view=>this.assets.hitTest(view,pointer.worldX,pointer.worldY));
+      const hit=[...this.resources.values()].sort((a,b)=>b.depth-a.depth).find(view=>this.fog.isVisibleObject(view.getData('object'))&&this.assets.hitTest(view,pointer.worldX,pointer.worldY));
       let resource=hit??this.resources.get(this.resourceOccupancy.get(tileKey(goal)));
+      if(resource&&!this.fog.isVisibleObject(resource.getData('object')))resource=null;
       if(resource){
         const object=resource.getData('object'),definition=object.definition;
         if(!definition.collectible){this.setStatus(definition.description);return;}
@@ -175,12 +191,12 @@ export class GameScene extends Phaser.Scene {
     return this.assets.createView(definition.id,{building:object,preview});
   }
   towerAtPoint(x,y,tile) {
-    return [...this.buildings].sort((a,b)=>towerBase(b).y-towerBase(a).y).find(building=>this.towerViews.get(building.id).contains(x,y)||building.tiles.some(part=>tileKey(part)===tileKey(tile)));
+    return [...this.buildings].filter(building=>this.fog.isVisibleObject(building)).sort((a,b)=>towerBase(b).y-towerBase(a).y).find(building=>this.towerViews.get(building.id).contains(x,y)||building.tiles.some(part=>tileKey(part)===tileKey(tile)));
   }
   startBuilding(definition=this.objectRegistry.require('tower')) {
     if(this.character.transitioning){this.setStatus('Nejdřív dokonči výstup nebo sestup z věže.');return false;}
     if(!definition.buildable)return false;
-    this.huntingSystem.cancel();
+    this.huntingSystem.cancel();this.mountSystem.cancel();
     this.character.stopForBuilding();this.selectedBuilding=definition;
     this.preview.destroy();this.preview=this.createBuildingView(definition,{x:0,y:0},true);this.preview.setVisible(false);
     this.buildMode=true;this.previewKey=null;this.previewAnchor=null;this.previewTracking=false;this.game.canvas.style.cursor='crosshair';
@@ -229,21 +245,29 @@ export class GameScene extends Phaser.Scene {
     document.querySelector('#world-stones').textContent=`Mapa ${COLUMNS} × ${ROWS} · kameny ${this.resourceCount('stone')} / ${definition.spawn.max}`;
   }
   setStatus(message) { document.querySelector('#status').textContent=message; }
+  updateMountUI(){
+    document.querySelector('#dismount').hidden=!this.character.mountedHorse;
+    const text=this.fog.enabled?`Dohled ${this.fog.size} × ${this.fog.size}`:'Fog of War: OFF';
+    const output=document.querySelector('#vision-status');if(output.textContent!==text)output.textContent=text;
+  }
   update(_time,delta) {
     this.character.update(delta);this.player.animate(delta,this.character.walking&&this.character.state===PLAYER_STATE.GROUND,this.character.direction);
-    this.animalSystem.update(delta);this.huntingSystem.update(delta);this.foodSystem.update(delta);this.updateFoodDisplay();
+    this.animalSystem.update(delta);this.huntingSystem.update(delta);this.mountSystem.update(delta);this.foodSystem.update(delta);this.updateFoodDisplay();
     for(const spawner of this.resourceSpawners)spawner.update(delta);
-    this.worldCamera.update(delta);this.terrain.update(this.cameras.main);
+    this.worldCamera.update(delta);this.refreshVisibility();
+    if(this.buildMode&&!this.assetGallery.isOpen){if(this.previewTracking)this.previewAnchor=this.pointerTile(this.input.activePointer);this.updateBuildingPreview();}
+  }
+  refreshVisibility(){
+    this.fog.update();this.updateMountUI();this.terrain.update(this.cameras.main,this.fog);
     const view=this.cameras.main.worldView;
-    this.dropSystem.update(view);
+    this.dropSystem.update(view,this.fog);
     if(this.input.manager.isOver)this.updateHover(this.input.activePointer);
-    for(const animal of this.animalSystem.animals.values())animal.view.setVisible(animal.view.x>view.x-60&&animal.view.x<view.right+60&&animal.view.y>view.y-40&&animal.view.y<view.bottom+70);
+    for(const animal of this.animalSystem.animals.values())animal.view.setVisible(!animal.mounted&&this.fog.isVisibleObject(animal)&&animal.view.x>view.x-60&&animal.view.x<view.right+60&&animal.view.y>view.y-40&&animal.view.y<view.bottom+70);
     for(const resource of this.resources.values()){
       const definition=this.objectRegistry.require(resource.getData('objectId'));
-      resource.setVisible(resource.x>view.x-64&&resource.x<view.right+64&&resource.y>view.y-40&&resource.y<view.bottom+(definition.visualHeight??40));
+      resource.setVisible(this.fog.isVisibleObject(resource.getData('object'))&&resource.x>view.x-64&&resource.x<view.right+64&&resource.y>view.y-40&&resource.y<view.bottom+(definition.visualHeight??40));
     }
-    for(const building of this.towerViews.values())building.setVisible(building.inView(view));
+    for(const building of this.buildings){const visual=this.towerViews.get(building.id);visual.setVisible(this.fog.isVisibleObject(building)&&visual.inView(view));}
     this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
-    if(this.buildMode&&!this.assetGallery.isOpen){if(this.previewTracking)this.previewAnchor=this.pointerTile(this.input.activePointer);this.updateBuildingPreview();}
   }
 }

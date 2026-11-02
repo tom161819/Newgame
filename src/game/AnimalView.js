@@ -34,4 +34,10 @@ export class AnimalView extends Phaser.GameObjects.Container {
     }
     g.fillStyle(0x181e19);g.fillCircle(hx+sx*3-2,hy-2,1.4);g.fillCircle(hx+sx*3+2,hy-2,1.4);
   }
+  containsPoint(worldX,worldY){
+    const x=worldX-this.x,y=worldY-this.y,scale=this.definition.visual.bodyScale??1,pose=DIRECTION_POSES[this.facing];
+    const hx=pose.screenX*11*scale,hy=-22*scale+pose.screenY*5*scale;
+    return (x/(15*scale))**2+((y+13*scale)/(9.5*scale))**2<=1
+      ||((x-hx)/(7*scale))**2+((y-hy)/(7*scale))**2<=1;
+  }
 }

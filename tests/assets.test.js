@@ -9,10 +9,10 @@ import { ResourceSpawner, resourceCandidates, generateResourcePositions, tileKey
 const definition = (id, changes = {}) => ({ ...structuredClone(objectRegistry.require('stone')), id, ...changes });
 
 test('registry exposes the existing game objects, categories and buildable menu', () => {
-  assert.equal(objectRegistry.all().length, 10);
+  assert.equal(objectRegistry.all().length, 11);
   assert.deepEqual(objectRegistry.buildables().map(d => d.id), ['tower']);
   assert.deepEqual(objectRegistry.byCategory('terrain').map(d => d.id), ['grass', 'dirt']);
-  assert.equal(objectRegistry.forGallery('all').length, 10);
+  assert.equal(objectRegistry.forGallery('all').length, 11);
   assert.equal(objectRegistry.forGallery('resource')[0].id, 'stone');
   assert.equal(objectRegistry.require('tower').cost.stone, 10);
   assert.equal(objectRegistry.get('missing'), null);
@@ -108,8 +108,8 @@ test('asset URLs retain the Pages prefix; PNG/WebP/sheets load once per object t
     spritesheet:{frameWidth:32,frameHeight:48},renderMode:'sprite'}));
   const calls=[], scene={load:{on(){},image(...args){calls.push(['image',...args]);},spritesheet(...args){calls.push(['sheet',...args]);}},textures:{exists:()=>false}};
   const manager = new AssetManager(scene,registry,{baseURL:'/Newgame/'});
-  assert.equal(manager.queue(),11);assert.equal(manager.queue(),0);
-  assert.equal(calls.length,11);
+  assert.equal(manager.queue(),12);assert.equal(manager.queue(),0);
+  assert.equal(calls.length,12);
   assert.ok(calls.some(c=>c[2].endsWith('.webp')));
   assert.deepEqual(calls.find(c=>c[0]==='sheet'),['sheet','asset:animated:main','/Newgame/assets/resources/stone/stone.png',{frameWidth:32,frameHeight:48}]);
 });

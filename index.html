@@ -15,7 +15,7 @@
         <div id="inventory-items"></div>
         <span class="food-status"><output id="food-countdown">Food: 01:00</output><small id="food-warning">Out of food</small></span>
       </section>
-      <div class="camera-controls"><span id="camera-mode">Kamera sleduje krále</span><button id="follow-king" type="button">Na krále · mezerník</button></div>
+      <div class="camera-controls"><span id="camera-mode">Kamera sleduje krále</span><span id="vision-status">Fog of War: OFF</span><button id="dismount" type="button" hidden>Dismount · H</button><button id="follow-king" type="button">Na krále · mezerník</button></div>
       <div id="game" aria-label="Izometrická herní mapa 100 × 100 políček"></div>
       <footer><span><i class="player-key"></i> Král</span><span><i class="wall-key"></i> Překážka</span><span><i class="stone-key"></i> Kámen</span><span>WASD / šipky: kamera · kolečko: zoom</span></footer>
       <p id="status" role="status">Vyber kámen nebo volné políčko.</p>
@@ -30,6 +30,12 @@
         <button id="cancel-building" type="button" hidden>Zrušit (Esc)</button>
       </section>
     </main>
+    <button id="settings-button" class="settings-button" type="button" aria-label="Settings" aria-controls="settings-panel" aria-expanded="false">⚙</button>
+    <aside id="settings-panel" class="settings-panel" aria-labelledby="settings-title" aria-hidden="true" inert>
+      <div class="settings-heading"><h2 id="settings-title">Settings</h2><button id="close-settings" type="button" aria-label="Zavřít nastavení">×</button></div>
+      <label class="setting-row" for="fog-toggle"><span>Fog of War</span><input id="fog-toggle" type="checkbox" role="switch" /></label>
+      <p>Omezí viditelnost objektů podle dohledu krále. Terén zůstává viditelný.</p>
+    </aside>
     <dialog id="asset-gallery" aria-labelledby="asset-gallery-title">
       <header class="asset-gallery-header"><div><h2 id="asset-gallery-title">Asset Library</h2><p>Prohlížení registrovaných objektů · bez úprav a vkládání do mapy</p></div><button id="close-asset-gallery" type="button" aria-label="Zavřít knihovnu">Zavřít ×</button></header>
       <nav id="asset-categories" aria-label="Kategorie objektů"></nav>

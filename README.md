@@ -9,6 +9,9 @@ Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3
 | Ovládání | Akce |
 |---|---|
 | Levý klik na průchozí políčko | Král k němu dojde po nejkratší cestě. Další klik změní cíl. |
+| Levý klik na koně | Dojde k pohybujícímu se koni a nasedne. Rychlost vzroste přesně na dvojnásobek. |
+| Dismount nebo H | Sesedne na volné sousední místo; stejný kůň se vrátí k putování. |
+| ⚙ Settings | Zasouvací panel s přepínačem Fog of War. Volba se pamatuje mezi obnoveními stránky. |
 | Levý klik na zvíře | Pronásleduje pohybující se zvěř a uloví ji až z dosahu sousedního políčka. |
 | Levý klik na maso | Dojde k balíčku a přidá jeho skutečné množství. Najeď myší pro údaj Meat ×N. |
 | Levý klik na kámen | Dojde ke kameni a přičte jej do inventáře. |
@@ -47,9 +50,17 @@ Kliknutí na zvíře zahájí pronásledování se změnami cesty podle pohybu c
 
 Každých 60 sekund aktivní hry se spotřebuje jedno maso, nejvýše do nuly. Horní lišta ukazuje zbývající čas a nenápadné Out of food; hlad zatím nemá žádné další následky. Přehled knihovny nepozastavuje běžící hru.
 
+## Dohled a kůň
+
+Fog of War je ve výchozím stavu **OFF**. Zapíná se v levém panelu Settings. Terén mapy zůstává celý viditelný; mimo aktuální logický dohled se skrývají pouze objekty, včetně skal, budov, surovin a zvěře. Skryté objekty nelze nově vybrat. Jejich pohyb, časovače a ostatní logika pokračují. Posun a zoom kamery dohled nemění.
+
+Dohled pěšího krále je **20 × 20 políček**, na koni **30 × 30**, na horní plošině věže **40 × 40**. Bonusy se nesčítají. Král na koni automaticky sesedne před příkazem ke vstupu do věže; pokud pro koně není vhodné sousední políčko, vstup se neprovede. Při nedostatku místa nelze ani ručně sesednout.
+
+Při nové hře vznikne jeden nelovitelný kůň. Kliknutí zahájí pronásledování, nasednutí nastane až zblízka. Jezdec a kůň pak používají králův původní osmisměrný pohyb s rychlostí **7 místo 3,5 políčka/s**; lze dále lovit a sbírat. Nasedání nepřidává další instanci koně. Po sesednutí se obnoví původní rychlost a dohled a na stejného koně lze znovu nasednout.
+
 ## Knihovna objektů
 
-Deset současných typů (grass, dirt, stone, meat, tower, king, rock_outcrop, rabbit, deer, wild_boar) má centrální definice v `src/data/objects/`. Registr kontroluje unikátní ID a platné parametry; stejná cena a půdorys budovy řídí galerii, nabídku Buildings, platbu i kolize. Galerie je pouze prohlížeč a nemění mapu nebo inventář.
+Jedenáct současných typů (grass, dirt, stone, meat, tower, king, rock_outcrop, rabbit, deer, wild_boar, horse) má centrální definice v `src/data/objects/`. Registr kontroluje unikátní ID a platné parametry; stejná cena a půdorys budovy řídí galerii, nabídku Buildings, platbu i kolize. Galerie je pouze prohlížeč a nemění mapu nebo inventář.
 
 `AssetManager` načítá sdílené PNG/WebP textury a spritesheety se správným základem URL pro GitHub Pages. Chybějící obrázek použije procedurální kresbu nebo společný náhradní obrázek. Nová surovina či budova používající stávající mechanismy se přidává definicí a obrázkem; inventář i nabídka se přizpůsobí automaticky. Podrobný postup, origin, vrstvy věže a animace postavy popisuje **[ASSET_GUIDE.md](ASSET_GUIDE.md)**.
 
@@ -99,6 +110,8 @@ Upozornění Vite na velikost balíčku souvisí s přibaleným Phaserem a nebr�
 | `src/systems/AnimalSystem.js`, `HuntingSystem.js` | Spawn a pohyb zvěře, zaměření, pronásledování a samostatná funkce lovu. |
 | `src/systems/DropSystem.js`, `FoodSystem.js` | Obecné balíčky s množstvím, slučování, ruční sběr a pravidelná spotřeba potravy. |
 | `src/game/movement.js` | Společný krok pohybu pro krále i zvěř. |
+| `src/systems/FogOfWarSystem.js`, `VisibilityModifiers.js` | Logický čtverec dohledu a nesčítané bonusy koně a budov. |
+| `src/systems/MountSystem.js`, `src/ui/SettingsPanel.js` | Nasedání/sesedání bez duplicit, levé nastavení s bezpečným localStorage. |
 | `src/ui/AssetGallery.js` | Prohlížeč knihovny s filtry a detailem. |
 | `index.html`, `src/style.css` | Pevné rozhraní kolem mapy. Žádné CSS otáčení herního světa. |
 | `tests/` | Testy souřadnic, navigace, generování, časování, limitů, inventáře, stavby a vstupu/výstupu. |
@@ -135,3 +148,5 @@ GitHub Pages je nastavené na **GitHub Actions**. Push do `main` spustí `.githu
 Před převodem na izometrii byl vytvořen checkpoint commit **`bf049d5`**. Obsahuje původní funkční verzi se sběrem, inventářem a věžemi; lze jej použít pro porovnání nebo návrat.
 
 Před zavedením Asset Library vznikl checkpoint **`4d3d63f`** s funkčním osmisměrným pohybem.
+
+Fronta dalších zadaných úkolů a jejich původní znění jsou v **[docs/TASK_QUEUE.md](docs/TASK_QUEUE.md)**.

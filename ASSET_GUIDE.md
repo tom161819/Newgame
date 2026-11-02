@@ -1,6 +1,6 @@
 # Přidávání objektů a grafiky
 
-Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soubory v `public/assets/`; Vite je kopíruje do sestavení beze změny. Současná hra má deset typů: grass, dirt, stone, meat, tower, king, rock_outcrop, rabbit, deer a wild_boar. Prázdné složky pro vodu, dřevo, železo, stromy a keře jsou příprava, nepřidávají nové herní mechaniky.
+Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soubory v `public/assets/`; Vite je kopíruje do sestavení beze změny. Současná hra má jedenáct typů: grass, dirt, stone, meat, tower, king, rock_outcrop, rabbit, deer, wild_boar a horse. Prázdné složky pro vodu, dřevo, železo, stromy a keře jsou příprava, nepřidávají nové herní mechaniky.
 
 ## Soubory a registr
 
@@ -10,7 +10,7 @@ Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soub
 | Suroviny | `src/data/objects/resources.js` | `public/assets/resources/{stone,wood,iron}/` |
 | Budovy | `src/data/objects/buildings.js` | `public/assets/buildings/tower/` a další podsložky |
 | Postavy | `src/data/objects/characters.js` | `public/assets/characters/king/` a další podsložky |
-| Zvířata | `src/data/objects/animals.js` | `public/assets/characters/{rabbit,deer,wild_boar}/` |
+| Zvířata | `src/data/objects/animals.js` | `public/assets/characters/{rabbit,deer,wild_boar,horse}/` |
 | Dekorace | `src/data/objects/decorations.js` | `public/assets/decorations/{rocks,trees,bushes}/` |
 
 `src/data/objects/index.js` spojí seznamy kategorií. `ObjectRegistry` zkontroluje definice, odmítne chybějící údaje, neplatné hodnoty a duplicitní ID a uloží neměnné kopie. Nabízí `get(id)`, `require(id)`, `all()`, `byCategory(category)`, `buildables()` a `forGallery(category)`. `get` vrací pro neznámé ID `null`; `require` ohlásí chybu.
@@ -113,3 +113,9 @@ Terén stále používá blokovou cache a culling; knihovna nepřidává tisíce
 `DropSystem.create(resourceId, tile, amount)` vytvoří ručně sběratelný balíček nebo sloučí množství se stejným typem na stejném políčku. Množství není v definici typu masa: patří do konkrétní instance dropu. Dropy sdílí původní inventář a evidenci obsazených políček pro stavění a generování surovin. Nemají časový limit zmizení.
 
 Definice masa má `consumption: { amount: 1, interval: 60000 }`. `FoodSystem` pracuje s uplynulým aktivním časem hry a zbytkem intervalu; nevyužívá opakované prohlížečové `setInterval`. Při prázdném inventáři zůstává počet nulový.
+
+## Dohled a jezdecká zvířata
+
+Základní čtverec dohledu určuje `king.gameplay.baseSight`. Věž má `visibility: { multiplier: 2 }`; jezdecký kůň má `gameplay.visionMultiplier: 1.5` a `mountedSpeedMultiplier: 2`. `VisibilityModifiers` vybírá právě jeden bonus podle aktuálního stavu, nikoli součet. Nová budova s plošinou může používat stejnou definici bonusu. Fog of War mění jen vykreslení a možnost nového výběru, nikoli navigaci či spawn.
+
+Kůň je registrovaný jako `animal` s `interactions: ['mount']`, `huntable: false` a `meatDrop: 0`. Při jízdě zůstává stejná instance v AnimalSystem, pouze má `mounted: true`, její vlastní pohyb a původní pohled se skryjí a poloha se synchronizuje s králem. Jezdecká kresba je jen grafickou vrstvou krále.

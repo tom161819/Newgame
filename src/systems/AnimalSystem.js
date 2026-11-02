@@ -16,9 +16,10 @@ export class AnimalSystem {
   }
   remove(animal){if(!animal.active)return;animal.active=false;animal.path=[];animal.nextTile=null;animal.view.destroy();this.animals.delete(animal.id);}
   reservedTiles(){return [...this.animals.values()].flatMap(a=>a.reservedTiles());}
-  atPoint(x,y){return [...this.animals.values()].sort((a,b)=>b.view.depth-a.view.depth).find(a=>this.scene.assets.hitTest(a.view,x,y))??null;}
+  atPoint(x,y){return [...this.animals.values()].sort((a,b)=>b.view.depth-a.view.depth).find(a=>!a.mounted&&(!this.scene.fog||this.scene.fog.isVisibleObject(a))&&this.scene.assets.hitTest(a.view,x,y))??null;}
   update(delta){
     for(const animal of this.animals.values()){
+      if(animal.mounted)continue;
       if(!animal.nextTile&&!animal.path.length){
         animal.wanderWait-=delta;
         if(animal.wanderWait<=0){

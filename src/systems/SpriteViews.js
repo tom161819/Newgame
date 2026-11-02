@@ -43,7 +43,13 @@ export class SpriteObjectView {
 
 export class SpriteCharacterView extends SpriteObjectView {
   constructor(...args) { super(...args); this.facing='S'; this.isWalking=false; }
+  setMounted(definition){
+    this.mount?.destroy();this.mount=null;
+    if(definition){this.mount=this.manager.createView(definition.id,{x:0,y:0});this.container.addAt(this.mount.container??this.mount,0);}
+    this.sprite.y=definition?-19:0;
+  }
   animate(_delta,moving,direction) {
+    this.mount?.animate?.(_delta,moving,direction);
     const facing=directionName(direction),changed=facing&&facing!==this.facing;
     if(facing)this.facing=facing;
     this.isWalking=moving;

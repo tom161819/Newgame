@@ -27,11 +27,12 @@ function scene(){
   return s;
 }
 
-test('animal spawn creates three of each species with unique instances on free reachable tiles',()=>{
+test('animal spawn creates three of each hunted species and one horse on free reachable tiles',()=>{
   const s=scene();s.map[5][5]=1;s.resourceOccupancy.set('7,7','7,7');s.animalSystem.spawn({x:1,y:1});
-  const animals=[...s.animalSystem.animals.values()];assert.equal(animals.length,9);
+  const animals=[...s.animalSystem.animals.values()];assert.equal(animals.length,10);
   for(const id of ['rabbit','deer','wild_boar'])assert.equal(animals.filter(a=>a.type===id).length,3);
-  assert.equal(new Set(animals.map(a=>a.id)).size,9);assert.equal(new Set(animals.map(a=>tileKey(a.tile))).size,9);
+  assert.equal(animals.filter(a=>a.type==='horse').length,1);
+  assert.equal(new Set(animals.map(a=>a.id)).size,10);assert.equal(new Set(animals.map(a=>tileKey(a.tile))).size,10);
   for(const animal of animals){assert.equal(s.map[animal.tile.y][animal.tile.x],0);assert.notEqual(tileKey(animal.tile),'1,1');assert.notEqual(tileKey(animal.tile),'7,7');}
 });
 
