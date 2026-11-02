@@ -12,6 +12,7 @@
       <section class="inventory" aria-label="Inventář">
         <span class="inventory-label">Inventář</span>
         <small id="world-stones">Mapa 100 × 100 · kameny 30 / 80</small>
+        <div class="health-status"><progress id="king-health-bar" max="100" value="100" aria-label="Životy krále"></progress><output id="king-health">HP: 100 / 100</output></div>
         <div id="inventory-items"></div>
         <span class="food-status"><output id="food-countdown">Food: 01:00</output><small id="food-warning">Out of food</small></span>
       </section>
@@ -43,6 +44,7 @@
       <div class="asset-layout"><div id="asset-grid" aria-label="Objekty"></div><aside id="asset-detail" aria-label="Detail objektu"></aside></div>
     </dialog>
     <div id="object-tooltip" role="tooltip" hidden></div>
+    <dialog id="game-over" aria-labelledby="game-over-title"><h2 id="game-over-title">Game Over</h2><p>Král padl. Začni znovu s novým světem a plnými životy.</p><button id="restart-game" type="button">Restart Game</button></dialog>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

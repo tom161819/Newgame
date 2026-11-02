@@ -43,6 +43,9 @@ export function validateDefinition(definition) {
   if (d.construction !== undefined && (!plainObject(d.construction) || !['single','line'].includes(d.construction.mode)
     || (d.construction.mode==='line'&&(d.category!=='building'||d.width!==1||d.height!==1)))) fail(id, 'neplatný režim stavění.');
   if (d.renderer==='fortification'&&(!finite(d.visual?.wallHeight)||d.visual.wallHeight<=0)) fail(id, 'opevnění vyžaduje kladnou výšku stěn.');
+  if(['character','animal'].includes(d.category)&&d.stats===undefined)fail(id,'živá jednotka vyžaduje bojové statistiky.');
+  if (d.stats !== undefined && (!plainObject(d.stats) || !['maxHP','attackDPS','armor','attackRange'].every(key=>finite(d.stats[key]))
+    || d.stats.maxHP<=0 || d.stats.attackDPS<0 || d.stats.armor<0 || d.stats.armor>90 || d.stats.attackRange<0)) fail(id, 'neplatné bojové statistiky.');
   if (d.consumption !== undefined && (!plainObject(d.consumption) || !Number.isSafeInteger(d.consumption.amount)
     || d.consumption.amount<=0 || !finite(d.consumption.interval) || d.consumption.interval<=0)) fail(id, 'neplatná spotřeba suroviny.');
   if (d.category==='animal' && (!plainObject(d.gameplay) || !finite(d.gameplay.movementSpeed) || d.gameplay.movementSpeed<=0
@@ -57,7 +60,7 @@ export function validateDefinition(definition) {
       if (!d.spritesheet || !Array.isArray(d.animations.clips) || !d.animations.clips.length) fail(id, 'animace vyžadují spritesheet a clips.');
       const names = new Set();
       for (const clip of d.animations.clips) {
-        if (!plainObject(clip) || typeof clip.name !== 'string' || !clip.name.trim() || names.has(clip.name) || !['idle','walk'].includes(clip.state) || !DIRECTIONS.includes(clip.direction)
+        if (!plainObject(clip) || typeof clip.name !== 'string' || !clip.name.trim() || names.has(clip.name) || !['idle','walk','attack'].includes(clip.state) || !DIRECTIONS.includes(clip.direction)
           || !Array.isArray(clip.frames) || !clip.frames.length || clip.frames.some(n => !Number.isInteger(n) || n < 0)
           || !finite(clip.frameRate) || clip.frameRate <= 0 || (clip.repeat !== undefined && (!Number.isInteger(clip.repeat) || clip.repeat < -1))) fail(id, 'neplatný animační klip.');
         names.add(clip.name);

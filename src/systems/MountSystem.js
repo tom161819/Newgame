@@ -8,7 +8,7 @@ export class MountSystem {
   cancel(){if(this.target)this.scene.character.stopForBuilding();this.target=null;}
   command(horse){
     this.cancel();
-    if(this.scene.character.mountedHorse||!horse.active||horse.mounted||!horse.definition.interactions.includes('mount'))return false;
+    if(this.scene.character.mountedHorse||!horse.active||!horse.isAlive||horse.mounted||!horse.definition.interactions.includes('mount'))return false;
     this.target=horse;this.repath=0;
     if(!this.plan()){this.cancel();return false;}
     this.scene.setStatus('Král jde ke koni. Kliknutím jinam příkaz zrušíš.');return true;
@@ -16,7 +16,7 @@ export class MountSystem {
   plan(){return this.scene.character.command({kind:'approachAnimal',animal:this.target,silent:true});}
   mount(horse){
     const king=this.scene.character;
-    if(king.mountedHorse||king.state!=='ground'||!horse.active||horse.mounted||!horse.definition.interactions.includes('mount')||king.nextTile||!canInteractAdjacent(this.scene.map,king,horse))return false;
+    if(!king.isAlive||king.mountedHorse||king.state!=='ground'||!horse.active||!horse.isAlive||horse.mounted||!horse.definition.interactions.includes('mount')||king.nextTile||!canInteractAdjacent(this.scene.map,king,horse))return false;
     king.stopForBuilding();this.target=null;
     horse.mounted=true;horse.path=[];horse.nextTile=null;horse.walking=false;horse.view.setVisible(false);
     king.mountedHorse=horse;king.speed=king.definition.gameplay.movementSpeed*horse.definition.gameplay.mountedSpeedMultiplier;
@@ -43,10 +43,16 @@ export class MountSystem {
     const king=this.scene.character,horse=king.mountedHorse;
     if(horse){horse.position={...king.position};horse.tile={...king.tile};horse.view.setVisible(false);}
     const target=this.target;if(!target)return;
-    if(!target.active||target.mounted){this.cancel();return;}
+    if(!target.active||!target.isAlive||target.mounted){this.cancel();return;}
     if(king.state!=='ground')return;
     if(!king.nextTile&&canInteractAdjacent(this.scene.map,king,target)){this.mount(target);return;}
     this.repath-=delta;
     if(this.repath<=0){this.repath=350;if(!this.plan()){this.cancel();this.scene.setStatus('Ke koni nevede dostupná cesta.');}}
+  }
+  onDeath(horse){
+    if(this.target===horse)this.cancel();
+    const king=this.scene.character;if(king.mountedHorse!==horse)return;
+    king.mountedHorse=null;king.speed=king.definition.gameplay.movementSpeed;this.scene.player.setMounted?.(null);
+    this.scene.updateMountUI?.();
   }
 }

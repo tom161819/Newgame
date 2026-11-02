@@ -48,6 +48,12 @@ export class SpriteCharacterView extends SpriteObjectView {
     if(definition){this.mount=this.manager.createView(definition.id,{x:0,y:0});this.container.addAt(this.mount.container??this.mount,0);}
     this.sprite.y=definition?-19:0;
   }
+  setAttackPose(_delta,active,direction){
+    if(!active)return;
+    const facing=directionName(direction);if(facing)this.facing=facing;
+    const clip=this.definition.animations?.clips?.find(c=>c.state==='attack'&&c.direction===this.facing);
+    if(clip&&this.manager.scene.anims.exists(this.manager.animationKey(this.definition.id,clip.name)))this.sprite.play(this.manager.animationKey(this.definition.id,clip.name),true);
+  }
   animate(_delta,moving,direction) {
     this.mount?.animate?.(_delta,moving,direction);
     const facing=directionName(direction),changed=facing&&facing!==this.facing;

@@ -108,7 +108,7 @@ Terén stále používá blokovou cache a culling; knihovna nepřidává tisíce
 
 ## Zvířata, balíčky a spotřeba
 
-`animals.js` registruje typy v kategorii `animal`. Jejich `gameplay` obsahuje `movementSpeed`, `initialCount`, `behavior: 'wander'`, `huntable`, `meatDrop` a `wanderRadius`. Pohled `AnimalView` používá vlastní jednoduché tvary; SVG poskytuje náhledy. `AnimalSystem` eviduje samostatná ID a pohyb instancí a `HuntingSystem.attack(animal)` odděluje okamžitý lov od budoucích bojových statistik.
+`animals.js` registruje typy v kategorii `animal`. Jejich `gameplay` obsahuje `movementSpeed`, `initialCount`, `behavior: 'wander'`, `huntable`, `meatDrop` a `wanderRadius`. Pohled `AnimalView` používá vlastní jednoduché tvary; SVG poskytuje náhledy. `AnimalSystem` eviduje samostatná ID a pohyb instancí a `HuntingSystem.attack(animal)` zahajuje univerzální souboj spravovaný CombatSystem. Přirozený pohyb a odvetné pronásledování patří do AnimalSystem.
 
 `DropSystem.create(resourceId, tile, amount)` vytvoří ručně sběratelný balíček nebo sloučí množství se stejným typem na stejném políčku. Množství není v definici typu masa: patří do konkrétní instance dropu. Dropy sdílí původní inventář a evidenci obsazených políček pro stavění a generování surovin. Nemají časový limit zmizení.
 
@@ -129,3 +129,13 @@ Wall přidává `construction: { mode: 'line' }`, `navigation: { walkableTop: tr
 Propojení N/E/S/W vzniká z logických sousedů a určuje obvodové cimbuří. Stěny sousedních těles se překrývají podle hloubky; zachované plochy zabraňují otevřenému řezu při skrytí souseda za hranicí Fog of War. Síť vrcholů je oddělená od neprůchozí zemní mapy; používá jen společné hrany. Pohyb po ní používá stejný normalizovaný posun jako král na zemi, s projekcí na výšku plošiny. Data o obsazených políčkách a modely budov zůstávají společné pro všechny systémy. Připojování bran nebo věží může v budoucnu rozšířit stejné vyhledávání sousedů.
 
 Castle i Wall mají `visibility: { multiplier: 1.75 }`; skutečný pobyt na vrcholu tedy mění základní dohled 20 na 35. Při výstupu/sestupu se bonus neuplatňuje.
+
+## Bojové statistiky živých objektů
+
+Každý typ `character` nebo `animal` musí obsahovat `stats: { maxHP, attackDPS, armor, attackRange }`. HP musí být kladné, DPS a dosah nezáporné, základní Armor mezi 0 a 90. Registry odmítne neúplné nebo neplatné hodnoty. Tyto údaje jsou viditelné v Asset Library.
+
+`createCombatStats` vytvoří vlastní currentHP a další aktuální hodnoty instance a neměnnou kopii základních statistik. Definice typu se během souboje nemění. `CombatSystem.startAttack`, `stopAttack`, `applyDamage` a událost `death` fungují pro všechny jednotky. Veřejné `applyDamage` přijímá příchozí poškození před Armor; vnitřní DPS integrátor používá již zredukované poškození, aby se obrana nepočítala dvakrát.
+
+Současné útoky se integrují až k okamžiku nejbližší smrti, takže odvetný zásah netrvá o celý snímek déle nebo kratší dobu podle pořadí a FPS. Smrt se oznámí pouze jednou. Herní scéna na událost naváže odstranění zvířete a vytvoření dropu nebo Game Over pro krále.
+
+Pro sprite animace lze nově použít i `state: 'attack'` s osmi logickými směry. Procedurální král má vlastní jednoduchou útočnou pózu. Volitelné `visual.healthBarOffset` upravuje výšku health baru nového obrázku zvířete. Krátká odezva zásahu nemění statistiky ani délku útoku.

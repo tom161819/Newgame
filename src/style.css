@@ -62,6 +62,16 @@ button:focus-visible { outline: 2px solid #e2c673; outline-offset: 2px; }
 @media(max-height:650px) { header p, footer, .eyebrow { display: none; } h1 { font-size: 20px; } #status { min-height: 1.5em; } }
 #inventory-items { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
 .food-status { display: grid; gap: 2px; font-size: 11px; }
+.health-status { display: grid; gap: 4px; }
+.inventory #king-health { font-size: 11px; font-weight: 400; color: #e6d9b2; text-align: left; }
+#king-health-bar { width: 106px; height: 9px; appearance: none; border: 1px solid #77714e; border-radius: 3px; background: #743c30; }
+#king-health-bar::-webkit-progress-bar { background: #743c30; }
+#king-health-bar::-webkit-progress-value { background: #85aa64; }
+#king-health-bar::-moz-progress-bar { background: #85aa64; }
+#game-over { width: min(420px,92vw); padding: 28px; border: 1px solid #978657; border-radius: 5px; background: #303625; color: #ece2c4; text-align: center; }
+#game-over::backdrop { background: #10170ed9; }
+#game-over h2 { font: 30px Georgia,serif; color: #e0bd74; margin: 0 0 14px; }
+#game-over p { font-size: 13px; line-height: 1.6; margin-bottom: 22px; }
 .inventory #food-countdown { font-size: 12px; text-align: left; color: #d5c78d; font-weight: 400; }
 #food-warning { color: #c6aa81; font-size: 10px; }
 #object-tooltip { position: fixed; z-index: 20; pointer-events: none; padding: 6px 9px; border: 1px solid #978657; border-radius: 4px; background: #252c1cef; font-size: 12px; }

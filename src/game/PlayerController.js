@@ -5,10 +5,12 @@ import { planGroundOrder, planTowerExit, towerNeighbors, buildingDepth, towerTop
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { advanceMovement } from './movement.js';
 import { isWall,wallIndex,findRoofPath,planRoofExit } from './walls.js';
+import { createCombatStats } from '../systems/CombatSystem.js';
 
 export const PLAYER_STATE = Object.freeze({
   GROUND: 'ground', ENTERING: 'enteringTower', ON_TOWER: 'onTower', EXITING: 'exitingTower',
   ON_WALL: 'onWall',
+  DEAD: 'dead',
 });
 
 export class PlayerController {
@@ -20,6 +22,7 @@ export class PlayerController {
     this.nextTile = null;
     this.path = [];
     this.definition = sprite.getData?.('definition') ?? objectRegistry.require(sprite.getData?.('objectId') ?? 'king');
+    Object.assign(this,createCombatStats(this.definition),{id:'king',type:'king'});
     this.speed = this.definition.gameplay?.movementSpeed ?? 3.5;
     this.depthOffset = this.definition.depth?.offset ?? 0;
     this.walking = false;
@@ -53,6 +56,7 @@ export class PlayerController {
   }
 
   command(order) {
+    if(!this.isAlive||this.state===PLAYER_STATE.DEAD)return false;
     if (this.transitioning) {
       this.scene.setStatus('Počkej, až král dokončí výstup nebo sestup.');
       return false;

@@ -12,7 +12,7 @@ Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3
 | Levý klik na koně | Dojde k pohybujícímu se koni a nasedne. Rychlost vzroste přesně na dvojnásobek. |
 | Dismount nebo H | Sesedne na volné sousední místo; stejný kůň se vrátí k putování. |
 | ⚙ Settings | Zasouvací panel s přepínačem Fog of War. Volba se pamatuje mezi obnoveními stránky. |
-| Levý klik na zvíře | Pronásleduje pohybující se zvěř a uloví ji až z dosahu sousedního políčka. |
+| Levý klik na zvíře | Pronásleduje cíl a ze sousedního políčka zahájí souboj. Napadené zvíře se brání. |
 | Levý klik na maso | Dojde k balíčku a přidá jeho skutečné množství. Najeď myší pro údaj Meat ×N. |
 | Levý klik na kámen | Dojde ke kameni a přičte jej do inventáře. |
 | Levý klik na věž nebo její střechu | Dojde k dostupnému sousednímu políčku a vyleze na plošinu. |
@@ -42,7 +42,7 @@ Horní inventář a spodní Buildings jsou mimo herní kameru a při pohybu nebo
 - Lze postavit více věží, hradů i řad hradeb. Výběr stavby zruší zbývající cestu a sběr; už rozběhnutý krok se dokončí plynule. Po postavení jedné věže režim stavění skončí.
 - Ke vstupu se vybírá sousední políčko s nejkratší dosažitelnou cestou. Následuje animace lezení, ne přesun z dálky. Král nahoře nechodí po mapě ani nesbírá. Sestup vybere sousední políčko s dostupnou cestou k cíli; pokud takové není, král zůstane nahoře.
 - Během animace výstupu a sestupu se nové příkazy nepřijímají. Vstup/výstup lze opakovat, včetně přechodu z jedné věže do druhé.
-- Po obnovení stránky začíná nová hra: inventář je nulový, budovy zmizí a kameny se vygenerují znovu. Zatím používá okamžitý lov bez HP, bojových statistik a penalizací za nedostatek jídla.
+- Po obnovení stránky začíná nová hra: inventář je nulový, budovy zmizí a kameny se vygenerují znovu. Král začíná znovu se 100 HP; hlad nemá další penalizace.
 
 ## Hrad a hradby
 
@@ -54,11 +54,29 @@ Sousední segmenty sdílející hranu se vizuálně spojí; cimbuří se vykresl
 
 Kliknutím na hradbu král dojde k dostupnému sousednímu políčku a vyleze. Pak lze klikat na propojené segmenty a chodit po jejich vrcholu. Navigace po hradbách má vlastní síť sdílených hran: diagonálně se dotýkající segmenty ani mezery nelze přejít vzduchem. Klik na nespojenou hradbu vyžaduje sestup a běžnou cestu. Pro návrat na zem se hledá dostupný výstup i na dalších propojených segmentech, takže král nezůstane uvězněný uprostřed velké souvislé konstrukce.
 
+## Souboje a životy
+
+| Jednotka | Max HP | DPS | Armor | Dosah |
+|---|---:|---:|---:|---:|
+| King | 100 | 15 | 0 % | 1 |
+| Rabbit | 15 | 1 | 0 % | 1 |
+| Deer | 40 | 4 | 0 % | 1 |
+| Wild Boar | 70 | 12 | 0 % | 1 |
+| Horse | 90 | 0 | 0 % | 1 |
+
+Statistiky jsou centrálně v definicích, ale každá instance má vlastní HP. Poškození je `DPS × (1 − armor / 100) × čas v sekundách`, nezávislé na FPS. Armor se při výpočtu omezí na 0–90 %. Zajíc tak vydrží jednu sekundu nepřerušeného útoku, srna přibližně 2,67 a divočák 4,67 sekundy. HP nikdy neklesne pod nulu.
+
+Král pronásleduje jeden vybraný cíl a při změně polohy obnoví cestu. Dosah zahrnuje i diagonální sousedy, ovšem nelze útočit přes blokující roh. Také poslední políčko přístupové cesty musí umožňovat skutečný útok. Zvěř nezaútočí první; po napadení se brání a může se bezpečnou cestou přiblížit. Kůň zůstává nelovitelný a jízda nemění DPS krále.
+
+Horní lišta zobrazuje HP krále. Nad poškozenými nebo bojujícími zvířaty se ukáže malý health bar, který se skryje spolu se zvířetem podle Fog of War. Útok krále doprovází pohyb zbraně a zásah krátké bliknutí. Zvíře po smrti zmizí a zanechá ručně sběratelné maso. Ze zvýšených plošin král po mapě nebojuje.
+
+Po smrti krále se zastaví ovládání, pohyb a herní časovače a objeví se Game Over. Restart Game vytvoří čistou hru s plnými HP, nulovým inventářem a novými objekty. Volba Fog of War zůstává nastavením hráče. Automatické léčení zatím není zavedené.
+
 ## Zvěř, lov a potrava
 
 Při nové hře vzniknou tři zajíci, tři srny a tři divočáci na různých volných dosažitelných políčkách. Pomalu putují k náhodným blízkým cílům a mezi cestami odpočívají. Sdílí s králem osmisměrné A* i normalizovaný pohyb bez průchodu rohy; nová stavba nesmí překrýt zvíře nebo jeho probíhající krok.
 
-Kliknutí na zvíře zahájí pronásledování se změnami cesty podle pohybu cíle. Lov proběhne až ze sousedství, bez teleportace. Jiný klik lov zruší. Zajíc zanechá balíček 5 masa, srna 10 a divočák 15. Odměna se nepřipíše automaticky: balíček zůstane ležet až do ručního sběru. Stejné suroviny na jednom políčku se sloučí.
+Kliknutí na zvíře zahájí pronásledování se změnami cesty podle pohybu cíle. Souboj začne až ze sousedství, bez teleportace. Cíl postupně ztrácí HP a při napadení útočí zpět. Jiný klik lov i odvetný útok daného zvířete zruší. Zajíc zanechá balíček 5 masa, srna 10 a divočák 15. Odměna se nepřipíše automaticky: balíček zůstane ležet až do ručního sběru. Stejné suroviny na jednom políčku se sloučí.
 
 Každých 60 sekund aktivní hry se spotřebuje jedno maso, nejvýše do nuly. Horní lišta ukazuje zbývající čas a nenápadné Out of food; hlad zatím nemá žádné další následky. Přehled knihovny nepozastavuje běžící hru.
 
@@ -126,6 +144,8 @@ Upozornění Vite na velikost balíčku souvisí s přibaleným Phaserem a nebr�
 | `src/game/movement.js` | Společný krok pohybu pro krále i zvěř. |
 | `src/systems/FogOfWarSystem.js`, `VisibilityModifiers.js` | Logický čtverec dohledu a nesčítané bonusy koně a budov. |
 | `src/systems/MountSystem.js`, `src/ui/SettingsPanel.js` | Nasedání/sesedání bez duplicit, levé nastavení s bezpečným localStorage. |
+| `src/systems/CombatSystem.js` | Společné DPS, dosah, Armor, souběžné útoky a jedinečná událost smrti. |
+| `src/ui/CombatFeedback.js` | HP krále, health bary zvířat a krátké bliknutí při zásahu. |
 | `src/ui/AssetGallery.js` | Prohlížeč knihovny s filtry a detailem. |
 | `index.html`, `src/style.css` | Pevné rozhraní kolem mapy. Žádné CSS otáčení herního světa. |
 | `tests/` | Testy souřadnic, navigace, generování, časování, limitů, inventáře, stavby a vstupu/výstupu. |

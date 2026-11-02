@@ -105,7 +105,7 @@ test('asset URLs retain the Pages prefix; PNG/WebP/sheets load once per object t
   assert.equal(assetURL('/assets/test.webp','/Newgame'),'/Newgame/assets/test.webp');
   const registry = new ObjectRegistry(objectRegistry.all());
   registry.register(definition('animated',{category:'character',collectible:false,spawn:undefined,
-    spritesheet:{frameWidth:32,frameHeight:48},renderMode:'sprite'}));
+    spritesheet:{frameWidth:32,frameHeight:48},renderMode:'sprite',stats:structuredClone(objectRegistry.require('king').stats)}));
   const calls=[], scene={load:{on(){},image(...args){calls.push(['image',...args]);},spritesheet(...args){calls.push(['sheet',...args]);}},textures:{exists:()=>false}};
   const manager = new AssetManager(scene,registry,{baseURL:'/Newgame/'});
   assert.equal(manager.queue(),14);assert.equal(manager.queue(),0);

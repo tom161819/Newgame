@@ -1,8 +1,12 @@
 import { isWalkable } from './map.js';
+import { canStep } from './pathfinding.js';
 
-export function adjacentTiles(unit){
+export function adjacentTiles(unit,map=null){
   const center=unit.nextTile??unit.tile,tiles=[];
-  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)if(dx||dy)tiles.push({x:center.x+dx,y:center.y+dy});
+  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)if(dx||dy){
+    const tile={x:center.x+dx,y:center.y+dy};
+    if(!map||canStep(map,tile,center))tiles.push(tile);
+  }
   return tiles;
 }
 export function canInteractAdjacent(map,actor,target){

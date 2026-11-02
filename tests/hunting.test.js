@@ -11,6 +11,7 @@ import { PlayerController } from '../src/game/PlayerController.js';
 import { tileCenter } from '../src/game/map.js';
 import { tileKey } from '../src/game/stones.js';
 import { canStep } from '../src/game/pathfinding.js';
+import { CombatSystem } from '../src/systems/CombatSystem.js';
 
 function view(position={x:0,y:0}){
   return {...position,visible:true,data:new Map(),setData(k,v){this.data.set(k,v);return this;},getData(k){return this.data.get(k);},
@@ -24,6 +25,14 @@ function scene(){
   };
   s.character=new PlayerController(s,view(tileCenter({x:1,y:1})),{x:1,y:1});
   s.animalSystem=new AnimalSystem(s,()=>.7);s.dropSystem=new DropSystem(s);s.huntingSystem=new HuntingSystem(s);
+  s.combat=new CombatSystem({map:s.map});
+  s.combat.on('attack',(attacker,target)=>{if(s.animalSystem.animals.has(target.id))s.animalSystem.onAttacked(target,attacker);});
+  s.combat.on('death',unit=>{
+    if(unit===s.character){s.character.state='dead';return;}
+    const tile={x:Math.floor(unit.position.x),y:Math.floor(unit.position.y)};
+    s.animalSystem.remove(unit);s.dropSystem.create('meat',tile,unit.definition.gameplay.meatDrop);
+    if(s.huntingSystem.target===unit)s.huntingSystem.cancel();
+  });
   return s;
 }
 
@@ -51,7 +60,7 @@ test('hunting follows a moving target, kills only in reach and drops the right q
     const s=scene(),definition=objectRegistry.require(type),a=new AnimalController(s,definition,'test',{x:8,y:8},view());
     s.animalSystem.animals.set(a.id,a);assert.equal(s.huntingSystem.attack(a),false);
     assert.equal(s.huntingSystem.command(a),true);a.moveTo([{x:12,y:9}]);
-    for(let i=0;i<600&&a.active;i++){s.character.update(50);a.update(50);s.huntingSystem.update(50);}
+    for(let i=0;i<600&&a.active;i++){s.character.update(50);s.animalSystem.update(50);s.huntingSystem.update(50);s.combat.update(50);}
     assert.equal(a.active,false);assert.equal(s.animalSystem.animals.size,0);assert.equal(s.inventory.count('meat'),0);
     const drop=[...s.dropSystem.drops.values()][0];assert.equal(drop.amount,quantity);
     assert.deepEqual(drop.tile,{x:Math.floor(a.position.x),y:Math.floor(a.position.y)});
@@ -68,6 +77,17 @@ test('cancelling a hunt prevents a kill; unreachable animals never cause telepor
   for(let y=0;y<20;y++)s.map[y][5]=1;
   const before={...s.character.position};assert.equal(s.huntingSystem.command(a),false);
   assert.deepEqual(s.character.position,before);assert.equal(s.huntingSystem.target,null);
+});
+
+test('approach leaves a blocked diagonal corner and reaches an actually attackable neighbor',()=>{
+  const s=scene(),a=new AnimalController(s,objectRegistry.require('rabbit'),'corner-target',{x:4,y:4},view());
+  s.animalSystem.animals.set(a.id,a);s.map[3][4]=1;
+  s.character.tile={x:3,y:3};s.character.position={x:3.5,y:3.5};s.character.nextTile=null;s.character.path=[];
+  assert.equal(s.huntingSystem.attack(a),false);assert.equal(s.huntingSystem.command(a),true);
+  assert.ok(s.character.path.length>0,'The current diagonal cell cannot be the final attack position.');
+  s.character.update(1000);s.huntingSystem.update(1);s.combat.update(1000);
+  assert.equal(a.isAlive,false);assert.equal(s.dropSystem.drops.size,1);
+  assert.deepEqual(s.character.tile,{x:3,y:4});
 });
 
 test('generic drops merge by resource and tile and preserve other resource occupancy',()=>{

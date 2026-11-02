@@ -25,6 +25,8 @@ import { MountSystem } from '../systems/MountSystem.js';
 import { SettingsPanel } from '../ui/SettingsPanel.js';
 import { FortificationView } from './FortificationView.js';
 import { wallLine,wallLinePlan,placeWallLine,wallIndex,connectionsFor,connectedWalls,isWall } from './walls.js';
+import { CombatSystem } from '../systems/CombatSystem.js';
+import { CombatFeedback } from '../ui/CombatFeedback.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -36,6 +38,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.gameOver=false;this.input.enabled=true;this.input.keyboard.enabled=true;this.tweens.resumeAll();
     this.assets.initialize();
     this.assets.registerRenderer('stone',(definition,context)=>drawStone(this,context.tile,definition));
     this.assets.registerRenderer('king',(definition,context)=>new KingView(this,context.x,context.y,definition));
@@ -56,6 +59,7 @@ export class GameScene extends Phaser.Scene {
     const position=tileCenter(PLAYER_START);
     this.player=this.assets.createView('king',position);
     this.character=new PlayerController(this,this.player,PLAYER_START);
+    this.combat=new CombatSystem({map:this.map,canFight:unit=>unit.isAlive&&!unit.mounted&&(unit!==this.character||unit.state===PLAYER_STATE.GROUND)});
     this.resourceSpawners=[];
     for(const definition of this.objectRegistry.byCategory('resource').filter(d=>d.spawn)){
       const spawner=new ResourceSpawner({
@@ -74,6 +78,10 @@ export class GameScene extends Phaser.Scene {
     this.dropSystem=new DropSystem(this);
     this.animalSystem=new AnimalSystem(this);this.animalSystem.spawn(PLAYER_START);
     this.huntingSystem=new HuntingSystem(this);
+    this.combatFeedback=new CombatFeedback(this);
+    this.combat.on('attack',(attacker,target)=>{if(this.animalSystem.animals.has(target.id))this.animalSystem.onAttacked(target,attacker);});
+    this.combat.on('damage',unit=>this.combatFeedback.hit(unit));
+    this.combat.on('death',unit=>this.onUnitDeath(unit));
     this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
     this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.refreshVisibility();});
     this.fog.setEnabled(this.settingsPanel.settings.fogOfWar);
@@ -87,8 +95,12 @@ export class GameScene extends Phaser.Scene {
     this.controls=new AbortController();
     const dismount=()=>this.mountSystem.dismount();
     document.querySelector('#dismount').addEventListener('click',dismount,{signal:this.controls.signal});
+    this.gameOverDialog=document.querySelector('#game-over');
+    this.gameOverDialog.addEventListener('cancel',event=>event.preventDefault(),{signal:this.controls.signal});
+    document.querySelector('#restart-game').addEventListener('click',()=>{this.gameOverDialog.close();this.scene.restart();},{signal:this.controls.signal});
     const onDismount=event=>{if(!event.repeat&&!this.assetGallery.isOpen)dismount();};
     this.input.keyboard.on('keydown-H',onDismount);this.updateMountUI();
+    this.combatFeedback.refresh();
     this.input.mouse.disableContextMenu();
     this.input.on('pointerdown',pointer=>this.handleClick(pointer));
     this.input.on('pointerup',pointer=>{if(this.dragAnchor&&pointer.leftButtonReleased())this.confirmWallLine(pointer);});
@@ -102,11 +114,13 @@ export class GameScene extends Phaser.Scene {
       this.animalSystem.destroy();this.dropSystem.destroy();document.querySelector('#object-tooltip').hidden=true;
       this.settingsPanel.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
       this.clearWallPreviews();
+      this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
       this.input.keyboard.off('keydown-ESC',onEscape);this.game.canvas.style.cursor='';
     });
   }
 
   setGalleryInput(enabled) {
+    enabled=enabled&&!this.gameOver;
     this.input.enabled=enabled;this.input.keyboard.enabled=enabled;
     for(const key of Object.values(this.worldCamera.keys))key.reset();
     this.previewTracking=false;this.preview.setVisible(false);
@@ -148,7 +162,7 @@ export class GameScene extends Phaser.Scene {
 
   pointerTile(pointer) { pointer.updateWorldPoint(this.cameras.main);return worldToTile(pointer.worldX,pointer.worldY); }
   handleClick(pointer) {
-    if(this.assetGallery.isOpen)return;
+    if(this.gameOver||this.assetGallery.isOpen)return;
     if(pointer.rightButtonDown()){if(this.buildMode)this.cancelBuilding();return;}
     if(!pointer.leftButtonDown())return;
     let goal=this.pointerTile(pointer);
@@ -206,6 +220,7 @@ export class GameScene extends Phaser.Scene {
     return [...this.buildings].filter(building=>this.fog.isVisibleObject(building)).sort((a,b)=>towerBase(b).y-towerBase(a).y).find(building=>this.towerViews.get(building.id).contains(x,y)||building.tiles.some(part=>tileKey(part)===tileKey(tile)));
   }
   startBuilding(definition=this.objectRegistry.require('tower')) {
+    if(this.gameOver)return false;
     if(this.character.transitioning){this.setStatus('Nejdřív dokonči výstup nebo sestup z věže.');return false;}
     if(!definition.buildable)return false;
     this.huntingSystem.cancel();this.mountSystem.cancel();
@@ -299,14 +314,35 @@ export class GameScene extends Phaser.Scene {
     document.querySelector('#world-stones').textContent=`Mapa ${COLUMNS} × ${ROWS} · kameny ${this.resourceCount('stone')} / ${definition.spawn.max}`;
   }
   setStatus(message) { document.querySelector('#status').textContent=message; }
+  onUnitDeath(unit){
+    if(unit===this.character){this.finishGame();return;}
+    const tile={x:Math.floor(unit.position.x),y:Math.floor(unit.position.y)},amount=unit.definition.gameplay.meatDrop;
+    this.mountSystem.onDeath(unit);this.animalSystem.remove(unit);this.combatFeedback.remove(unit.id);
+    if(amount>0)this.dropSystem.create('meat',tile,amount);
+    if(this.huntingSystem.target===unit)this.huntingSystem.cancel();
+    if(amount>0)this.setStatus(`${unit.definition.name} uloveno. Na zemi je Meat ×${amount}; seber ho kliknutím.`);
+  }
+  finishGame(){
+    if(this.gameOver)return;
+    this.gameOver=true;this.huntingSystem.cancel();this.mountSystem.cancel();this.cancelBuilding('Král padl.');
+    this.character.stopForBuilding();this.character.nextTile=null;this.character.walking=false;this.character.state=PLAYER_STATE.DEAD;
+    for(const attacker of [...this.combat.attacks.keys()])this.combat.stopAttack(attacker);
+    this.assetGallery.close();this.settingsPanel.setOpen(false);this.input.enabled=false;this.input.keyboard.enabled=false;
+    for(const key of Object.values(this.worldCamera.keys))key.reset();
+    this.tweens.pauseAll();this.combatFeedback.refresh();this.gameOverDialog.showModal();
+    document.querySelector('#restart-game').focus();
+  }
   updateMountUI(){
     document.querySelector('#dismount').hidden=!this.character.mountedHorse;
     const text=this.fog.enabled?`Dohled ${this.fog.size} × ${this.fog.size}`:'Fog of War: OFF';
     const output=document.querySelector('#vision-status');if(output.textContent!==text)output.textContent=text;
   }
   update(_time,delta) {
+    if(this.gameOver)return;
     this.character.update(delta);this.player.animate(delta,this.character.walking&&[PLAYER_STATE.GROUND,PLAYER_STATE.ON_WALL].includes(this.character.state),this.character.direction);
-    this.animalSystem.update(delta);this.huntingSystem.update(delta);this.mountSystem.update(delta);this.foodSystem.update(delta);this.updateFoodDisplay();
+    this.animalSystem.update(delta);this.huntingSystem.update(delta);this.mountSystem.update(delta);this.combat.update(delta);
+    if(this.gameOver)return;
+    this.combatFeedback.update(delta);this.foodSystem.update(delta);this.updateFoodDisplay();
     for(const spawner of this.resourceSpawners)spawner.update(delta);
     this.worldCamera.update(delta);this.refreshVisibility();
     if(this.buildMode&&!this.assetGallery.isOpen){if(this.previewTracking)this.previewAnchor=this.pointerTile(this.input.activePointer);this.updateBuildingPreview();}
@@ -323,5 +359,6 @@ export class GameScene extends Phaser.Scene {
     }
     for(const building of this.buildings){const visual=this.towerViews.get(building.id);visual.setVisible(this.fog.isVisibleObject(building)&&visual.inView(view));}
     this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
+    this.combatFeedback?.refresh();
   }
 }

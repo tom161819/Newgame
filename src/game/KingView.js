@@ -20,7 +20,8 @@ export class KingView extends Phaser.GameObjects.Container {
     this.figure = scene.add.graphics();
     this.leftArm = scene.add.rectangle(-9, -20, 4, 14, 0xc6a17c);
     this.rightArm = scene.add.rectangle(9, -20, 4, 14, 0xc6a17c);
-    this.torsoGroup.add([this.figure, this.leftArm, this.rightArm]);
+    this.weapon = scene.add.graphics().setVisible(false);
+    this.torsoGroup.add([this.figure, this.leftArm, this.rightArm, this.weapon]);
     this.add([this.shadow, this.leftLeg, this.rightLeg, this.leftBoot, this.rightBoot, this.torsoGroup]);
     this.phase = 0;
     this.facing = 'S';
@@ -85,6 +86,16 @@ export class KingView extends Phaser.GameObjects.Container {
     this.mount?.destroy();this.mount=null;
     if(definition){this.mount=new AnimalView(this.scene,0,0,definition);this.addAt(this.mount,1);}
     this.shadow.setVisible(!definition);
+  }
+  setAttackPose(delta,active,direction){
+    this.weapon.setVisible(active);if(!active)return;
+    const facing=directionName(direction);if(facing&&facing!==this.facing){this.facing=facing;this.paint();}
+    this.attackPhase=(this.attackPhase??0)+delta*.012;
+    const pose=DIRECTION_POSES[this.facing],swing=Math.sin(this.attackPhase),hx=pose.screenX*9,hy=-23;
+    const tx=hx+pose.screenX*18+swing*7,ty=hy+pose.screenY*12-7-Math.abs(swing)*9;
+    const g=this.weapon.clear();g.lineStyle(3,0xd9dbc8);g.lineBetween(hx,hy,tx,ty);
+    g.lineStyle(3,0xb4944f);g.lineBetween(hx-4,hy+2,hx+4,hy-2);
+    this.rightArm.rotation=-.4+swing*.55;this.torsoGroup.bringToTop(g);
   }
 
   animate(delta, moving, direction) {

@@ -51,6 +51,7 @@ export class AssetGallery {
     const rows=[['ID',definition.id],['Kategorie',CATEGORY_LABELS[definition.category]],['Rozměry',`${definition.width} × ${definition.height} políčka`],
       ['Průchozí',definition.walkable?'Ano':'Ne'],['Sběratelný',definition.collectible?'Ano':'Ne'],['Postavitelný',definition.buildable?'Ano':'Ne'],
       ['Cena',formatCost(definition.cost,this.registry)],['Interakce',definition.interactions.join(', ')||'Žádné']];
+    if(definition.stats)rows.push(['Max HP',String(definition.stats.maxHP)],['DPS',String(definition.stats.attackDPS)],['Armor',`${definition.stats.armor} %`],['Attack Range',`${definition.stats.attackRange} políčko`]);
     for(const [name,value]of rows)list.append(element('dt','',name),element('dd','',value));
     this.detail.append(list);
     const technical=element('details','asset-technical');technical.append(element('summary','','Grafika a animace'));
