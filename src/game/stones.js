@@ -24,7 +24,7 @@ export function generateStones(map, start, count = STONE_COUNT, random = Math.ra
 
 export function drawStone(scene, tile) {
   const position = tileCenter(tile);
-  const stone = scene.add.graphics({ x: position.x, y: position.y }).setDepth(1);
+  const stone = scene.add.graphics({ x: position.x, y: position.y }).setDepth(position.y + 8);
   // Stín a tři šedé plochy naznačují malý prostorový kámen bez obrázku.
   stone.fillStyle(0x08141c, 0.45);
   stone.fillEllipse(0, 8, 25, 9);

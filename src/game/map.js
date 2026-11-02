@@ -1,6 +1,8 @@
 export const TILE_SIZE = 32;
 export const COLUMNS = 20;
 export const ROWS = 15;
+// Prostor nad mapou pro střechy věží v nejsevernější řadě.
+export const MAP_HEADROOM = 56;
 
 // 0 = volné políčko, 1 = překážka. Souřadnice začínají vlevo nahoře.
 export const grid = Array.from({ length: ROWS }, () => Array(COLUMNS).fill(0));

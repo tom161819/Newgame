@@ -13,4 +13,11 @@ export class Inventory {
     this.resources.set(resource, count);
     return count;
   }
+
+  spend(resource, amount) {
+    if (!Number.isSafeInteger(amount) || amount < 0) throw new RangeError('Neplatná cena.');
+    if (this.count(resource) < amount) return false;
+    this.resources.set(resource, this.count(resource) - amount);
+    return true;
+  }
 }

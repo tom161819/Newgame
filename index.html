@@ -8,7 +8,7 @@
   <body>
     <main>
       <header><span class="eyebrow">PHASER · 2D PROTOTYP</span><h1>První cesta</h1>
-        <p>Klikni na kámen a hráč ho sebere. Dalším kliknutím změníš cíl.</p></header>
+        <p>Sbírej kameny, postav věž a vylez na její plošinu. Cíl určíš kliknutím.</p></header>
       <section class="inventory" aria-label="Inventář">
         <span class="inventory-label">Inventář</span>
         <div class="inventory-item">
@@ -25,6 +25,28 @@
       <div id="game" aria-label="Herní mapa 20 × 15 políček"></div>
       <footer><span><i class="player-key"></i> Hráč</span><span><i class="wall-key"></i> Překážka</span><span><i class="stone-key"></i> Kámen</span><span>Levým kliknutím změníš cíl</span></footer>
       <p id="status" role="status">Vyber kámen nebo volné políčko.</p>
+      <section class="buildings-bar" aria-label="Stavění budov">
+        <div id="buildings-panel" class="buildings-panel" hidden>
+          <h2>Buildings</h2>
+          <button id="tower-choice" class="building-choice" type="button" aria-pressed="false" aria-describedby="tower-description tower-availability">
+            <svg class="tower-icon" viewBox="0 0 56 70" aria-hidden="true">
+              <path d="M9 26 28 36 28 65 9 55Z" fill="#9aaab6" />
+              <path d="M28 36 47 26 47 55 28 65Z" fill="#657c8c" />
+              <path d="M5 23 28 11 51 23 28 36Z" fill="#c3ced5" />
+              <path d="M5 23V12L12 9V18L21 23V14L28 18V29Z" fill="#98acba" />
+              <path d="M28 29V18L35 14V23L44 18V9L51 12V23L28 36Z" fill="#718b9e" />
+              <path d="M32 48 39 44V56L32 60Z" fill="#263d4b" />
+            </svg>
+            <span class="building-name"><strong>Tower</strong><small>Strážní věž · 2 × 2 políčka</small></span>
+            <span class="building-price">🪨 10</span>
+          </button>
+          <p id="tower-description">Vyber věž a umísti ji na mapu. Do hotové věže vstoupíš kliknutím.</p>
+          <p id="tower-availability" class="shortage" role="status">Chybí 10 kamenů.</p>
+        </div>
+        <button id="buildings-tab" type="button" aria-expanded="false" aria-controls="buildings-panel">Buildings</button>
+        <span id="building-selection"></span>
+        <button id="cancel-building" type="button" hidden>Zrušit (Esc)</button>
+      </section>
     </main>
     <script type="module" src="/src/main.js"></script>
   </body>
