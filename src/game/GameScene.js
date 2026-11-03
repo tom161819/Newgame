@@ -54,6 +54,8 @@ import { ConstructionSystem } from '../systems/ConstructionSystem.js';
 import { ConstructionView } from './ConstructionView.js';
 import { ConstructionUI } from '../ui/ConstructionUI.js';
 import { gameSettings,resourceSpawnSettings } from '../systems/GameSettings.js';
+import { createStartingCastle } from '../systems/WorldGenerationConfig.js';
+import { WildlifeRespawnSystem } from '../systems/WildlifeRespawnSystem.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -86,8 +88,8 @@ export class GameScene extends Phaser.Scene {
     this.terrainGrid=this.loadState?this.loadState.terrain.map(row=>[...row]):createMap(Math.random);
     this.map=this.terrainGrid.map(row=>row.map(value=>(value?obstacle:base).walkable?0:1));
     this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
-    this.inventory=new Inventory();
-    this.gameTime=new GameTimeSystem();this.regeneration=new RegenerationSystem();
+    this.inventory=new Inventory();if(!this.loadState)this.inventory.add('gold',this.gameSettings.startingGold);
+    this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);this.regeneration=new RegenerationSystem();
     this.activities=new GameActivityBus();this.experienceSystem=new ExperienceSystem(this.activities);
     this.skillSystem=new SkillSystem(this);
     this.pathWear=new PathWearSystem({map:this.map,terrain:this.terrainGrid,time:this.gameTime});this.terrain.setPathWear(this.pathWear);
@@ -103,6 +105,7 @@ export class GameScene extends Phaser.Scene {
     const position=tileCenter(PLAYER_START);
     this.player=this.assets.createView('king',position);
     this.character=new PlayerController(this,this.player,PLAYER_START);
+    if(!this.loadState)createStartingCastle(this);
     this.skillSystem.initialize(this.character);
     this.equipment=new EquipmentSystem(this.character,this.objectRegistry,this.inventory,()=>{this.equipmentPanel?.refresh();this.combatFeedback?.refresh();});
     this.combat=new CombatSystem({map:this.map,canFight:unit=>unit.isAlive&&!unit.mounted&&(unit!==this.character||unit.state===PLAYER_STATE.GROUND),regenerationRate:unit=>this.regeneration.rateFor(unit)});
@@ -134,6 +137,7 @@ export class GameScene extends Phaser.Scene {
     this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
     this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.terrain.setDebug(settings.pathWearDebug);this.refreshVisibility();},open=>this.pauseManager.set('settings',open));
     this.fog.setEnabled(this.settingsPanel.settings.fogOfWar);
+    if(!this.loadState){this.settingsPanel.applySettings({...this.settingsPanel.settings,fogOfWar:this.gameSettings.fogOfWar});this.fog.setEnabled(this.gameSettings.fogOfWar);}
     this.terrain.setDebug(this.settingsPanel.settings.pathWearDebug);
     this.foodSystem=new FoodSystem(this.inventory,this.objectRegistry.require('meat'),()=>this.updateInventory());
     this.inventoryBar=new InventoryBar(this.objectRegistry,this.assets,this.inventory);
@@ -149,6 +153,7 @@ export class GameScene extends Phaser.Scene {
     this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
     this.treasurePanel=new TreasurePanel(this);if(!this.loadState)this.treasureSystem.spawn(PLAYER_START);
+    this.wildlifeRespawn=new WildlifeRespawnSystem(this,this.animalSystem);
     this.production=new ProductionSystem(this.gameTime,this.inventory,()=>this.buildings,(day,totals)=>this.onDailyIncome(day,totals));
     this.wageSystem=new WageSystem(this,{onPayroll:()=>this.updateInventory()});this.economyPanel=new EconomyPanel(this);
     this.buildingBar.close();this.updateInventory();
@@ -466,6 +471,9 @@ export class GameScene extends Phaser.Scene {
     const raw=this.game.loop.rawDelta;
     delta=this.activeFramePending?0:Number.isFinite(raw)?Math.max(0,raw):Math.max(0,delta);
     this.activeFramePending=false;
+    // První snímek po Load/Resume pouze obnoví obraz. Nulový čas nesmí
+    // změnit uloženou animaci, rozpracovanou AI ani příkazy jednotek.
+    if(!delta){this.refreshVisibility();return;}
     // Časové úseky uzavírají mzdy před novou prací, změnou skillu nebo úmrtím tohoto snímku.
     const activeDelta=this.gameTime.update(delta);this.updateTimeDisplay();
     this.character.update(delta);this.player.animate(delta,this.character.walking&&[PLAYER_STATE.GROUND,PLAYER_STATE.ON_WALL].includes(this.character.state),this.character.direction);
@@ -476,6 +484,7 @@ export class GameScene extends Phaser.Scene {
     this.combatFeedback.update(activeDelta);this.foodSystem.update(activeDelta);this.updateFoodDisplay();
     this.experienceFeedback.update(activeDelta);
     for(const spawner of this.resourceSpawners)spawner.update(activeDelta);
+    this.wildlifeRespawn.update(activeDelta);
     this.noticeRemaining=Math.max(0,this.noticeRemaining-activeDelta);if(!this.noticeRemaining)document.querySelector('#day-notice').hidden=true;
     this.worldCamera.update(delta);this.refreshVisibility();
     if(this.buildMode&&!document.querySelector('dialog[open]')){if(this.previewTracking)this.previewAnchor=this.pointerTile(this.input.activePointer);this.updateBuildingPreview();}

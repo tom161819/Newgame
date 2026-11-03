@@ -8,7 +8,7 @@ import { BuilderAI } from './BuilderAI.js';
 
 export class ConstructionSystem {
   constructor(scene,{onProgress=()=>{},onComplete=()=>{},onCancel=()=>{}}={}){
-    Object.assign(this,{scene,onProgress,onComplete,onCancel});this.sites=new Map();this.assignments=new Map();this.nextId=1;this.revision=0;
+    Object.assign(this,{scene,onProgress,onComplete,onCancel});this.sites=new Map();this.assignments=new Map();this.nextId=Math.max(0,...scene.buildings.map(b=>b.id))+1;this.revision=0;
     this.builderAI=new BuilderAI(this);scene.workerSystem.jobs.setConstructionProvider(this.builderAI);
     this.kingWorking=false;
   }

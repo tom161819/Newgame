@@ -17,6 +17,7 @@ import { SkillSystem } from '../../src/systems/SkillSystem.js';
 import { WageSystem } from '../../src/systems/WageSystem.js';
 import { WorkplaceSystem } from '../../src/systems/WorkplaceSystem.js';
 import { ConstructionSystem } from '../../src/systems/ConstructionSystem.js';
+import { WildlifeRespawnSystem } from '../../src/systems/WildlifeRespawnSystem.js';
 import { WorkerSystem } from '../../src/systems/WorkerSystem.js';
 import { ResourceSpawner } from '../../src/game/stones.js';
 import { tileCenter } from '../../src/game/isometric.js';
@@ -38,10 +39,11 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   scene.assets={createView:view};scene.createBuildingView=(d,b)=>{scene.workplaceSystem?.register(b);return view(d.id,tileCenter(b));};
   scene.tweens={add(config){const t={...config,elapsed:0};scene.animations.push(t);return t;}};
   scene.player=view('king',tileCenter({x:40,y:40}));scene.character=new PlayerController(scene,scene.player,{x:40,y:40});
-  scene.gameTime=new GameTimeSystem();scene.activities=new GameActivityBus();scene.experienceSystem=new ExperienceSystem(scene.activities);scene.skillSystem=new SkillSystem(scene);scene.skillSystem.initialize(scene.character);
+  scene.gameTime=new GameTimeSystem((gameSettings?.dayLengthSeconds??120)*1000);scene.activities=new GameActivityBus();scene.experienceSystem=new ExperienceSystem(scene.activities);scene.skillSystem=new SkillSystem(scene);scene.skillSystem.initialize(scene.character);
   scene.pathWear=new PathWearSystem({map:scene.map,terrain:scene.terrainGrid,time:scene.gameTime});scene.regeneration=new RegenerationSystem();
   scene.equipment=new EquipmentSystem(scene.character,objectRegistry,scene.inventory);scene.combat=new CombatSystem({map:scene.map,regenerationRate:u=>scene.regeneration.rateFor(u)});scene.skillSystem.attachCombat(scene.combat);
   scene.animalSystem=new AnimalSystem(scene);scene.dropSystem=new DropSystem(scene);scene.treasureSystem=new TreasureSystem(scene);scene.workerSystem=new WorkerSystem(scene);
+  scene.wildlifeRespawn=new WildlifeRespawnSystem(scene,scene.animalSystem);
   if(!randomizeTalents){const create=scene.workerSystem.create.bind(scene.workerSystem);scene.workerSystem.create=(tile,options={})=>{const w=create(tile,{...options,randomize:false});w.naturalTalent='woodcutting';w.initialSkills=structuredClone(w.skills);return w;};}
   scene.foodSystem=new FoodSystem(scene.inventory,objectRegistry.require('meat'));scene.production=new ProductionSystem(scene.gameTime,scene.inventory,()=>scene.buildings);scene.wageSystem=new WageSystem(scene);
   if(workplaces||construction)scene.workplaceSystem=new WorkplaceSystem(scene);

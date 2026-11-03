@@ -304,3 +304,11 @@ Fronta dalších zadaných úkolů a jejich původní znění jsou v **[docs/TAS
 ### Nastavení nové hry
 
 New Game otevře Game Setup: obtížnost Easy/Normal/Hard, 3/9/24 lovitelných zvířat, 0–10 pokladů a 0–100 počátečních kamenů. Mapa a časovače vznikají až tlačítkem Start Game. Obtížnost mění základní HP/DPS krále a zvěře, kůň zůstává beze změny; vybavení a skilly se přidávají poté. Kameny zachovávají 20sekundový interval a kapacitu max(80, počáteční počet). Save/Load obnovuje konfiguraci, skutečné objekty a časovače; starší hry používají Normal bez nového generování.
+
+### Pokročilé nastavení světa
+
+Advanced Settings jsou standardně sbalené. Nová hra používá Fog of War ON (přednost před starou preferencí prohlížeče), volitelný hotový hrad 3 × 3 zdarma, den 60/120/240 sekund, obnovu zvěře Off/120/60/30 sekund a počáteční zlato 0–500 po 25. Reset to Defaults obnoví jen formulář; přehled pod ním ukazuje všech devět voleb. Hra ani uložené pozice se při nastavování nemění.
+
+Denní příjem, poměrné mzdy, zarůstání cest i migrace používají zvolenou délku dne. Spotřeba masa po minutě a kameny po 20 sekundách zůstávají stejné. WildlifeRespawnSystem doplňuje jeden nejvíce chybějící druh na interval do cíle 3/9/24; hledá dosažitelné volné místo a přednostně místo mimo králův dohled. Pauza a Game Over jej zastaví. Koně nedoplňuje.
+
+Save v2 zachovává konfiguraci odděleně od aktuálního nastavení dohledu, zbývající respawn a skutečný svět. Save v1 se bezpečně převádí bez opětovného vytvoření hradu, zlata, zvěře či truhel a bez změny uložených základních statistik.

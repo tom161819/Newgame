@@ -22,6 +22,8 @@ export function restoreOrder(data,scene){
 export function loadGameState(scene,input){
   const state=validateGameState(input,scene.objectRegistry),p=state.player,c=scene.character;
   scene.gameSettings=gameSettings(state.gameSettings);
+  scene.gameTime.dayDuration=scene.gameSettings.dayLengthSeconds*1000;
+  scene.wildlifeRespawn?.importState(state.wildlifeRespawn);
   for(const spawner of scene.resourceSpawners)spawner.spawnSettings=resourceSpawnSettings(spawner.definition,scene.gameSettings);
   scene.inventory.importState(state.inventory);
   for(const data of state.buildings){

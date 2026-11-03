@@ -58,5 +58,5 @@ test('repeated save/load preserves settings, damaged health, bonuses, exact obje
 });
 test('legacy saves default to Normal without respawning objects or changing existing saved statistics',()=>{
   const s=workerScene();s.animalSystem.create(objectRegistry.require('rabbit'),{x:3,y:3});const data=serializeGameState(s);delete data.gameSettings;
-  const r=workerScene();loadGameState(r,data);assert.deepEqual(r.gameSettings,DEFAULT_GAME_SETTINGS);assert.equal(r.animalSystem.animals.size,1);assert.equal(r.treasureSystem.chests.size,0);assert.equal(r.resources.size,0);assert.equal(r.character.maxHP,100);
+  const r=workerScene();loadGameState(r,data);assert.deepEqual(r.gameSettings,{...DEFAULT_GAME_SETTINGS,fogOfWar:false});assert.equal(r.animalSystem.animals.size,1);assert.equal(r.treasureSystem.chests.size,0);assert.equal(r.resources.size,0);assert.equal(r.character.maxHP,100);
 });

@@ -1,14 +1,13 @@
 import { objectRegistry } from './ObjectRegistry.js';
-import { DAY_DURATION } from './GameTimeSystem.js';
 import { COLUMNS,ROWS } from '../game/config.js';
 import { wearLevel } from '../data/pathWear.js';
 import { getXPRequired,totalXPForLevel } from '../data/experience.js';
 import { JOBS,SKILL_IDS,WORK_RULES } from '../data/jobs.js';
 import { CONSTRUCTION_RULES } from '../data/construction.js';
 import { buildingIsComplete,towerNeighbors } from '../game/buildings.js';
-import { gameSettings } from './GameSettings.js';
+import { gameSettings,WILDLIFE_INTERVALS } from './GameSettings.js';
 
-export const SAVE_VERSION=1;
+export const SAVE_VERSION=2;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -51,7 +50,7 @@ export function serializeGameState(scene){
     animals:[...scene.animalSystem.animals.values()].map(a=>({...serializeActor(a),retaliationId:a.retaliationTarget?.id??null})),
     chests:[...scene.treasureSystem.chests.values()].map(c=>({id:c.id,tile:point(c.tile),opened:c.opened,opening:c.opening,looted:c.looted,contents:copy(c.contents),
       animation:c.opening?{elapsed:c.view.openTween?.elapsed??0,lid:c.view.lid?{y:c.view.lid.y,rotation:c.view.lid.rotation}:null}:null})),
-    time:scene.gameTime.exportState(),food:scene.foodSystem.exportState(),
+    time:scene.gameTime.exportState(),food:scene.foodSystem.exportState(),wildlifeRespawn:scene.wildlifeRespawn?.exportState()??{elapsed:0},
     spawners:scene.resourceSpawners.map(s=>({id:s.definition.id,...s.exportState()})),production:scene.production.exportState(),
     camera:{zoom:camera.zoom,x:camera.scrollX+camera.width/2,y:camera.scrollY+camera.height/2,following:scene.worldCamera.following},
     settings:{...scene.settingsPanel.settings},
@@ -73,9 +72,12 @@ export function validateGameState(input,registry=objectRegistry){
   const array=(a,max=20000)=>check(Array.isArray(a)&&a.length<=max);
   const definition=(id,category)=>{const d=registry.get(id);check(d&&(!category||d.category===category));return d;};
   const unique=(array)=>{const ids=new Set();for(const a of array){check(a.id!=null&&!ids.has(a.id));ids.add(a.id);}return ids;};
-  check(input&&input.saveVersion===SAVE_VERSION);
+  check(input&&[1,SAVE_VERSION].includes(input.saveVersion));
   let s;try{s=JSON.parse(JSON.stringify(input));}catch{fail();}
-  try{s.gameSettings={...gameSettings(s.gameSettings)};}catch{fail();}
+  try{const settings=gameSettings(s.gameSettings);s.gameSettings={...settings,fogOfWar:s.gameSettings?.fogOfWar??s.settings?.fogOfWar??settings.fogOfWar};}catch{fail();}
+  s.saveVersion=SAVE_VERSION;
+  const dayDuration=s.gameSettings.dayLengthSeconds*1000;
+  s.wildlifeRespawn??={elapsed:0};number(s.wildlifeRespawn.elapsed,0,(WILDLIFE_INTERVALS[s.gameSettings.wildlifeRespawn]||1)-1e-7);
   array(s.terrain,ROWS);check(s.terrain.length===ROWS);for(const row of s.terrain){array(row,COLUMNS);check(row.length===COLUMNS&&row.every(n=>n===0||n===1));}
   for(const key of ['buildings','resources','animals','drops','chests','spawners'])array(s[key]);
   if(s.workers!==undefined)array(s.workers);
@@ -200,7 +202,8 @@ export function validateGameState(input,registry=objectRegistry){
   order(p.order);if(p.roofContinuation){order(p.roofContinuation.order);tile(p.roofContinuation.exit);tile(p.roofContinuation.destination);array(p.roofContinuation.path);p.roofContinuation.path.forEach(tile);}
   check(s.inventory&&typeof s.inventory==='object');for(const [id,count]of Object.entries(s.inventory)){const d=definition(id);check(['resource','equipment'].includes(d.category));if(id==='gold')number(count);else integer(count);}
   check(s.equipment&&Object.keys(s.equipment).length===2);for(const slot of ['weapon','armor'])if(s.equipment[slot]!=null){const id=s.equipment[slot];check(definition(id,'equipment').equipment.slot===slot&&(s.inventory[id]??0)>0);}
-  integer(s.time?.day,1);number(s.time.elapsed,0,DAY_DURATION-1e-7);number(s.time.totalElapsed);check(Math.abs(s.time.totalElapsed-((s.time.day-1)*DAY_DURATION+s.time.elapsed))<.01);
+  integer(s.time?.day,1);number(s.time.elapsed,0,dayDuration-1e-7);number(s.time.totalElapsed);check(Math.abs(s.time.totalElapsed-((s.time.day-1)*dayDuration+s.time.elapsed))<.01);
+  s.time.compensation??=0;number(s.time.compensation,-1e-6,1e-6);
   number(s.food?.elapsed,0,registry.require('meat').consumption.interval-1e-7);
   const spawnIds=new Set();for(const t of s.spawners){const d=definition(t.id,'resource');check(d.spawn&&!spawnIds.has(t.id));spawnIds.add(t.id);number(t.elapsed,0,d.spawn.interval-1e-7);}
   check(registry.byCategory('resource').filter(d=>d.spawn).every(d=>spawnIds.has(d.id)));

@@ -1,6 +1,38 @@
 [
   {
     "schema": 1,
+    "commit": "e571ab705acd594edabb177c84fff6a5e1899cde",
+    "tree": "534d8745ba02da30f7c51ccae0e491006838327a",
+    "date": "2026-11-03T08:21:45Z",
+    "sequence": 40,
+    "subject": "Checkpoint published new game setup before advanced world configuration",
+    "name": "Nastavení nové hry · kontrolní bod",
+    "description": "Kontrolní verze připravená před následujícím rozšířením.",
+    "basePath": "/Newgame/versions/e571ab705acd594edabb177c84fff6a5e1899cde/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "ed58610b326ce27743957e9aee83ed2fb683ae72",
+    "tree": "d97a45036fce0cee9a6cc053defe25a07541c804",
+    "date": "2026-11-03T08:19:39Z",
+    "sequence": 39,
+    "subject": "Add deferred new game setup, difficulty and configurable starting populations",
+    "name": "Nastavení nové hry",
+    "description": "Add deferred new game setup, difficulty and configurable starting populations",
+    "basePath": "/Newgame/versions/ed58610b326ce27743957e9aee83ed2fb683ae72/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
     "commit": "09ad285cdbec95edaf468fd115a81432c60b6354",
     "tree": "1b5b45f8847146e309563dddbc0b81286271ee25",
     "date": "2026-11-03T08:14:12Z",

@@ -12,12 +12,20 @@
     </section>
     <section id="game-setup" class="main-menu game-setup" aria-labelledby="setup-title" hidden>
       <form id="game-setup-form" class="setup-card">
-        <span class="eyebrow">NOVÉ KRÁLOVSTVÍ</span><h1 id="setup-title">Game Setup</h1><p>Zvol podmínky své výpravy. Svět vznikne až po spuštění hry.</p>
-        <label for="setup-difficulty">Difficulty</label><select id="setup-difficulty" name="difficulty"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select>
+        <span class="eyebrow">NOVÉ KRÁLOVSTVÍ</span><h1 id="setup-title">New Game Setup</h1><p>Zvol podmínky své výpravy. Svět vznikne až po spuštění hry.</p>
+        <fieldset><legend>Basic Settings</legend><label for="setup-difficulty">Difficulty</label><select id="setup-difficulty" name="difficulty"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select>
         <label for="setup-wildlife">Wildlife Population <output data-setup-output="wildlife"></output></label><input id="setup-wildlife" name="wildlifePopulation" type="range" min="0" max="2" value="1" step="1"/>
         <label for="setup-treasure">Treasure Chests <output data-setup-output="treasureCount">1</output></label><input id="setup-treasure" name="treasureCount" type="range" min="0" max="10" value="1" step="1"/>
         <label for="setup-stones">Initial Stones <output data-setup-output="initialStoneCount">30</output></label><input id="setup-stones" name="initialStoneCount" type="range" min="0" max="100" value="30" step="5"/>
-        <p class="setup-help">Kameny se doplňují každých 20 sekund. Obtížnost upraví životy a sílu krále i lovitelné zvěře.</p><div class="setup-actions"><button id="setup-back" type="button">Back</button><button id="start-game" type="submit">Start Game</button></div>
+        </fieldset>
+        <details class="setup-advanced"><summary>Advanced Settings</summary><div class="advanced-fields">
+          <label for="setup-fog">Fog of War <input id="setup-fog" name="fogOfWar" type="checkbox" role="switch" checked/></label>
+          <label for="setup-castle">Starting Castle <input id="setup-castle" name="startingCastle" type="checkbox" role="switch"/></label>
+          <label for="setup-day">Day Length</label><select id="setup-day" name="dayLengthSeconds"><option value="60">Fast · 60 sekund</option><option value="120" selected>Normal · 120 sekund</option><option value="240">Slow · 240 sekund</option></select>
+          <label for="setup-respawn">Wildlife Respawn</label><select id="setup-respawn" name="wildlifeRespawn"><option value="off">Off</option><option value="slow">Slow · 120 sekund</option><option value="normal" selected>Normal · 60 sekund</option><option value="fast">Fast · 30 sekund</option></select>
+          <label for="setup-gold">Starting Gold <output data-setup-output="startingGold">0</output></label><input id="setup-gold" name="startingGold" type="range" min="0" max="500" step="25" value="0"/>
+        </div></details>
+        <p id="setup-summary" class="setup-help" aria-live="polite"></p><div class="setup-actions"><button id="setup-back" type="button">Back</button><button id="start-game" type="submit">Start Game</button></div><button id="setup-reset" type="button">Reset to Defaults</button>
       </form>
     </section>
     <main inert>

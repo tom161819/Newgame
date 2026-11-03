@@ -1,6 +1,5 @@
 import { JOBS } from '../data/jobs.js';
 import { BASE_DAILY_WAGES,WAGE_LEVEL_INTERVAL } from '../data/economy.js';
-import { DAY_DURATION } from './GameTimeSystem.js';
 
 export class WageSystem {
   constructor(scene,{onPayroll=()=>{}}={}){
@@ -25,7 +24,7 @@ export class WageSystem {
   }
   processDay(day){
     if(day<=this.lastProcessedDay)return false;
-    for(const [workerId,cost]of this.accruals)if(cost.rateMilliseconds>0)this.arrears.push({workerId,day:day-1,amount:cost.rateMilliseconds/DAY_DURATION});
+    for(const [workerId,cost]of this.accruals)if(cost.rateMilliseconds>0)this.arrears.push({workerId,day:day-1,amount:cost.rateMilliseconds/this.scene.gameTime.dayDuration});
     this.accruals.clear();this.lastProcessedDay=day;
     this.arrears.sort((a,b)=>a.day-b.day||a.workerId.localeCompare(b.workerId,undefined,{numeric:true}));
     for(const debt of this.arrears){
@@ -36,7 +35,7 @@ export class WageSystem {
   }
   unpaid(worker){return this.arrears.filter(d=>d.workerId===worker.id).reduce((sum,d)=>sum+d.amount,0);}
   totalUnpaid(){return this.arrears.reduce((sum,d)=>sum+d.amount,0);}
-  accrued(worker){return (this.accruals.get(worker.id)?.rateMilliseconds??0)/DAY_DURATION;}
+  accrued(worker){return (this.accruals.get(worker.id)?.rateMilliseconds??0)/this.scene.gameTime.dayDuration;}
   overview(){
     const income=this.scene.production.dailyIncome().gold??0,wages=this.scene.workerSystem.liveWorkers().reduce((sum,w)=>sum+this.dailyWage(w),0);
     return {gold:this.scene.inventory.count('gold'),income,wages,balance:income-wages,unpaid:this.totalUnpaid()};

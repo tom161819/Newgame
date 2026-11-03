@@ -203,3 +203,14 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 .setup-actions button { flex:1; padding:14px; }
 #start-game { background:#716033; border-color:#d0b063; }
 @media(max-width:440px) { .setup-card { padding:20px 16px; } .setup-card label { font-size:13px; } }
+
+.game-setup { display:flex; align-items:safe center; justify-content:center; }
+.setup-card { flex-shrink:0; }
+.setup-card fieldset { margin:24px 0; padding:0; border:0; min-width:0; }
+.setup-card legend, .setup-advanced summary { font:20px Georgia,serif; color:#d9c48d; }
+.setup-advanced { border-top:1px solid #666c4f; border-bottom:1px solid #666c4f; padding:18px 0; }
+.setup-advanced summary { cursor:pointer; }
+.advanced-fields { padding-bottom:12px; }
+.setup-card input[type=checkbox] { accent-color:#c9a85d; width:20px; height:20px; }
+#setup-reset { display:block; margin:16px auto 0; font-size:13px; padding:9px 18px; }
+#setup-summary { background:#172621; padding:12px; border-radius:4px; }
