@@ -1,7 +1,8 @@
 import { FOOD_RESOURCE_IDS } from '../foodProduction.js';
+import { WORKPLACES } from '../workplaces.js';
 export const logisticsBuildings=[
   {id:'warehouse',name:'Warehouse',width:3,height:3,cost:{stone:10},constructionTime:30000,visualHeight:125,buildable:true,
-    storage:{capacity:200,resources:['stone','wood','iron'],accepts:'materials',workerSlots:3},description:'A physical store for 200 building materials. Stone, Wood and Iron share its capacity.'},
+    workplace:WORKPLACES.warehouse,storage:{capacity:200,resources:['stone','wood','iron'],accepts:'materials',workerSlots:3},description:'A physical store for 200 building materials with three Hauler workplaces.'},
   {id:'starter_stockpile',name:'Starter Stockpile',width:2,height:2,cost:{},visualHeight:55,buildable:false,starter:true,
     storage:{capacity:40,resources:['stone','wood','iron',...FOOD_RESOURCE_IDS],accepts:'all'},description:'A small starting store with space for 40 materials and food units combined.'},
 ].map(d=>({...d,category:'building',sprite:`/assets/buildings/${d.id}/${d.id}.svg`,walkable:false,collectible:false,

@@ -6,4 +6,6 @@ export const WORKPLACES=Object.freeze({
   farmhouse:Object.freeze({capacity:3,profession:'farmer',skill:'farming'}),
   mill:Object.freeze({capacity:2,profession:'miller',skill:'milling'}),
   bakery:Object.freeze({capacity:2,profession:'baker',skill:'baking'}),
+  warehouse:Object.freeze({capacity:3,profession:'hauler',skill:'logistics'}),
+  granary:Object.freeze({capacity:2,profession:'hauler',skill:'logistics'}),
 });

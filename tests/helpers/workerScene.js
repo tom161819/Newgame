@@ -24,6 +24,7 @@ import { FoodProductionSystem } from '../../src/systems/FoodProductionSystem.js'
 import { SeasonSystem } from '../../src/systems/SeasonSystem.js';
 import { KingdomAttractivenessSystem } from '../../src/systems/KingdomAttractivenessSystem.js';
 import { KingLogisticsSystem } from '../../src/systems/KingLogisticsSystem.js';
+import { LogisticsTaskManager } from '../../src/systems/LogisticsTaskManager.js';
 import { createStartingStockpile,createStartingCastle } from '../../src/systems/WorldGenerationConfig.js';
 import { WorkerSystem } from '../../src/systems/WorkerSystem.js';
 import { ResourceSpawner } from '../../src/game/stones.js';
@@ -58,7 +59,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   if(workplaces||construction||farming||foodProduction||logistics)scene.workplaceSystem=new WorkplaceSystem(scene);
   if(construction)scene.constructionSystem=new ConstructionSystem(scene,{onComplete:b=>{scene.towerViews.set(b.id,scene.createBuildingView(b.definition,b));scene.refreshWallConnections();},onCancel:b=>{scene.towerViews.delete(b.id);scene.refreshWallConnections();}});
   if(logistics&&starter){if(scene.gameSettings?.startingCastle)createStartingCastle(scene,scene.character.tile);createStartingStockpile(scene,scene.character.tile);}
-  if(foodProduction||logistics){scene.foodStorage=new FoodStorageSystem(scene,{physicalMaterials:logistics});scene.foodProduction=new FoodProductionSystem(scene);if(logistics)scene.kingLogistics=new KingLogisticsSystem(scene);}
+  if(foodProduction||logistics){scene.foodStorage=new FoodStorageSystem(scene,{physicalMaterials:logistics});scene.foodProduction=new FoodProductionSystem(scene);if(logistics){scene.kingLogistics=new KingLogisticsSystem(scene);scene.logisticsTasks=new LogisticsTaskManager(scene);}}
   if(farming||foodProduction||logistics)scene.farmingSystem=new FarmingSystem(scene,{growthModifier:()=>scene.seasons?.growthMultiplier()??1,onHarvest:foodProduction||logistics?result=>scene.foodProduction.harvest(result):null});
   scene.addResource=(d,tile)=>{const v=view(d.id,tileCenter(tile)),key=`${tile.x},${tile.y}`;v.setData('tile',{...tile}).setData('object',{type:d.id,definition:d,x:tile.x,y:tile.y,tiles:[{...tile}]});scene.resources.set(key,v);scene.resourceOccupancy.set(key,key);};
   scene.collectResource=(key,tile,actor)=>{const v=scene.resources.get(key);if(!v||key!==`${tile.x},${tile.y}`||actor.state!=='ground')return false;
@@ -74,7 +75,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
     const tile={x:Math.floor(target.position.x),y:Math.floor(target.position.y)};if(killer){const event={type:'animalKilled',objectType:target.type,quantity:1};if(!scene.workplaceSystem?.deferReward(killer,event))scene.activities.emit(event.type,{...event,actor:killer});}
     scene.animalSystem.remove(target);const amount=target.definition.gameplay.meatDrop,drop=amount>0?scene.dropSystem.create('meat',tile,amount):null;if(amount>0)scene.foodSystem.recordProduction('meat',amount,`meat-${target.id}`);scene.workerSystem.ai.animalDied(target,killer,drop);
   });
-  scene.tick=delta=>{if(scene.gameTime.paused||scene.gameOver)return;scene.gameTime.update(delta);if(scene.constructionSystem)scene.character.update(delta);scene.kingLogistics?.update(delta);scene.animalSystem.update(delta);scene.workerSystem.update(delta);const covered=scene.combat.update(delta);scene.constructionSystem?.update(delta);scene.farmingSystem?.update(delta);scene.foodProduction?.update(delta);scene.regeneration.update(delta,[scene.character,...scene.animalSystem.animals.values(),...scene.workerSystem.liveWorkers()],covered);};
+  scene.tick=delta=>{if(scene.gameTime.paused||scene.gameOver)return;scene.gameTime.update(delta);if(scene.constructionSystem)scene.character.update(delta);scene.kingLogistics?.update(delta);scene.logisticsTasks?.update();scene.animalSystem.update(delta);scene.workerSystem.update(delta);const covered=scene.combat.update(delta);scene.constructionSystem?.update(delta);scene.farmingSystem?.update(delta);scene.foodProduction?.update(delta);scene.regeneration.update(delta,[scene.character,...scene.animalSystem.animals.values(),...scene.workerSystem.liveWorkers()],covered);};
   scene.simulate=(ms,step=50)=>{let elapsed=0;while(elapsed<ms){const delta=Math.min(step,ms-elapsed);scene.tick(delta);elapsed+=delta;}};
   return scene;
 }

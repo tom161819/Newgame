@@ -28,11 +28,12 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     const e=expected.get(l.id);check(e&&!locations.has(l.id));locations.set(l.id,l);
     for(const [key,value]of Object.entries(e))check(JSON.stringify(l[key])===JSON.stringify(value));
     check(l.stock&&typeof l.stock==='object'&&!Array.isArray(l.stock));for(const [id,n]of Object.entries(l.stock)){check(l.allowed.includes(id));integer(n,1);}
+    if(l.haulExcluded!==undefined){check(l.haulExcluded&&typeof l.haulExcluded==='object'&&!Array.isArray(l.haulExcluded));for(const [id,n]of Object.entries(l.haulExcluded)){check(l.allowed.includes(id));integer(n,1,l.stock[id]??0);}}
     integer(l.legacyOverflow);check(l.legacyOverflow===Math.max(0,used(l)-l.capacity));check(l.kind==='fallback'&&l.buildingId==null||l.legacyOverflow===0);
   }
   for(const r of storage.reservations){
     const l=locations.get(r.locationId);check(l&&!reservations.has(r.id)&&['stock','capacity'].includes(r.kind)&&l.allowed.includes(r.resource));reservations.set(r.id,r);
-    const id=String(r.id).match(/^food-reservation-(\d+)$/);check(id);integer(Number(id[1]),1,storage.nextReservation-1);integer(r.amount,1,FOOD_RULES.carryCapacity);check(typeof r.owner==='string');
+    const id=String(r.id).match(/^food-reservation-(\d+)$/);check(id);integer(Number(id[1]),1,storage.nextReservation-1);integer(r.amount,1,38);check(typeof r.owner==='string');
   }
   for(const l of locations.values()){
     const incoming=[...reservations.values()].filter(r=>r.locationId===l.id&&r.kind==='capacity').reduce((n,r)=>n+r.amount,0);check(used(l)+incoming<=l.capacity+l.legacyOverflow);
@@ -66,9 +67,13 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     }
     if(!['foodPickup','foodDeliver'].includes(t.kind))continue;
     check(resources.includes(t.resource)&&locations.has(t.destinationId));integer(t.amount,1,carryCapacity(w));
-    check(adjacent(locations.get(t.kind==='foodPickup'?t.sourceId:t.destinationId),t.goal));
+    const sourceDrop=t.sourceDropId&&s.drops.find(d=>d.id===t.sourceDropId);
+    if(t.kind==='foodPickup'&&t.sourceDropId)check(sourceDrop&&sourceDrop.resource===t.resource&&sourceDrop.amount>=t.amount&&t.goal.x===sourceDrop.tile.x&&t.goal.y===sourceDrop.tile.y);
+    else check(adjacent(locations.get(t.kind==='foodPickup'?t.sourceId:t.destinationId),t.goal));
+    if(t.hauling!==undefined){check(t.hauling===true&&w.profession==='hauler');if(t.kind==='foodDeliver'){number(t.loadedDistance);number(t.loadedPosition?.x,0,100);number(t.loadedPosition?.y,0,100);}}
     if(t.kind==='foodPickup'){
-      const stock=reservations.get(t.stockReservation);check(stock?.kind==='stock'&&stock.locationId===t.sourceId&&stock.resource===t.resource&&stock.amount===t.amount&&stock.owner===t.transferId&&!stockRefs.has(stock.id));stockRefs.add(stock.id);check(!w.cargo);
+      if(t.sourceDropId)check(!t.stockReservation&&t.hauling);
+      else{const stock=reservations.get(t.stockReservation);check(stock?.kind==='stock'&&stock.locationId===t.sourceId&&stock.resource===t.resource&&stock.amount===t.amount&&stock.owner===t.transferId&&!stockRefs.has(stock.id));stockRefs.add(stock.id);}check(!w.cargo);
     }else check(w.cargo?.resource===t.resource&&w.cargo.amount>=t.amount);
     const cap=reservations.get(t.capacityReservation);
     if(t.outputBuildingId&&t.kind==='foodPickup'&&records.get(t.outputBuildingId)?.outputReservation===t.capacityReservation){check(cap?.resource===t.resource&&cap.amount===t.amount);}
@@ -78,6 +83,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   if(physical){
     const royal=s.kingLogistics;check(royal);integer(royal.nextId,1);
     const cargo=s.player.cargo;if(cargo){check(resources.includes(cargo.resource));integer(cargo.amount,1,20);}
+    if(cargo?.transportCancelled!==undefined)check(typeof cargo.transportCancelled==='boolean');
     array(s.player.pendingWorkRewards,100000);for(const event of s.player.pendingWorkRewards){check(cargo&&['resourceCollected','dropCollected'].includes(event.type)&&resources.includes(event.objectType));integer(event.quantity,1);if(event.contributionRatio!==undefined)number(event.contributionRatio);}
     const t=royal.task;if(t){check(cargo&&t.kind==='deposit'&&cargo.resource===t.resource&&locations.has(t.destinationId));integer(t.amount,1,cargo.amount);number(t.retryAt);check(adjacent(locations.get(t.destinationId),t.goal));
       const match=String(t.id).match(/^king-transfer-(\d+)$/);check(match);integer(Number(match[1]),1,royal.nextId-1);capacity(t.capacityReservation,t.id,t.resource,t.amount);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);

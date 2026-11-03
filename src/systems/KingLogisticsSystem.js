@@ -30,7 +30,7 @@ export class KingLogisticsSystem {
       if(route){task.goal={...route.destination};actor.command({kind:'move',goal:route.destination,silent:true});}return;
     }
     if(!actor.cargo||actor.cargo.resource!==task.resource||actor.cargo.amount<task.amount){this.cancel();return;}
-    if(!this.storage.put(task.capacityReservation,task.amount))return;
+    if(!this.storage.put(task.capacityReservation,task.amount,{transportCancelled:actor.cargo.transportCancelled}))return;
     actor.cargo.amount-=task.amount;this.task=null;
     if(!actor.cargo.amount){actor.cargo=null;const events=actor.pendingWorkRewards;actor.pendingWorkRewards=[];for(const event of events){const{type,...data}=event;this.scene.activities.emit(type,{...data,actor});}}
     this.scene.updateInventory();if(actor.cargo)this.startDelivery();else this.scene.setStatus('Cargo delivered to storage.');

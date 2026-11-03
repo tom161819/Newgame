@@ -10,7 +10,7 @@ export class SkillSystem {
       scene.activities.on(event=>{if(event.type==='combatDamage')this.damageEvent(event);}),
     ];
   }
-  initialize(actor){if(actor.definition.category!=='character')return null;if(!actor.skills)actor.skills=Object.fromEntries(SKILL_IDS.map(id=>[id,createProgress()]));actor.activitySkill??=null;actor.statModifiers.activitySkill??={};return actor.skills;}
+  initialize(actor){if(actor.definition.category!=='character')return null;actor.skills??={};for(const id of SKILL_IDS)actor.skills[id]??=createProgress();actor.activitySkill??=null;actor.statModifiers.activitySkill??={};return actor.skills;}
   importCharacter(actor,data){if(actor.definition.category!=='character')return;actor.skills=data?structuredClone(data):null;this.initialize(actor);}
   efficiency(actor,skill){const skills=this.initialize(actor);return 1+((skills?.[skill]?.level??1)-1)*WORK_RULES.efficiencyPerLevel;}
   workEfficiency(actor,skill){return this.efficiency(actor,skill)*(this.scene.foodSystem?.workMultiplier(actor)??1);}
@@ -20,7 +20,7 @@ export class SkillSystem {
   }
   completed(event,reward){
     const skill=event.type==='resourceCollected'&&event.objectType==='stone'?'mining':event.type==='animalKilled'?'hunting':event.type==='buildingCompleted'?'construction':event.type==='cropHarvested'?'farming':null;
-    const productionSkill=event.type==='foodProduced'?{mill:'milling',bakery:'baking'}[event.objectType]:null;
+    const productionSkill=event.type==='transportDelivered'?'logistics':event.type==='foodProduced'?{mill:'milling',bakery:'baking'}[event.objectType]:null;
     if(skill??productionSkill)this.addXP(event.actor,skill??productionSkill,reward);
   }
   attachCombat(combat){

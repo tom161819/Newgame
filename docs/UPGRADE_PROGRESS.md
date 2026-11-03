@@ -2,7 +2,7 @@
 
 ## Aktuální práce
 
-Krok 24, fáze A je dokončená; následuje fáze B. Master zatím NEBYL zahájen. Kroky 22 a 23 jsou publikované, poslední veřejná hra je commit `74628eb` (Pages `41669016548`, Success). Před krokem 24 existuje checkpoint `e2fe98c`. Fáze A ověřena 228/228 testy (13 nových cílených scénářů), produkčním buildem a skutečným prohlížečem: nové skladiště, sběr před doručením bez zásob/XP, načtení rozneseného nákladu, dokončení Warehouse, 39 assetů a mobilní UI bez JS/HTTP chyb. Commit fáze obsahuje tento záznam. Fáze B–D zbývají; zásobování staveb není hotové. Průběžné commity chrání větev `backup/step-24-progress`; publikace celé logistiky na main následuje až po D.
+Krok 24: fáze A (`fb5aaf2`) a B jsou dokončené; následuje fáze C. Master zatím NEBYL zahájen. Kroky 22 a 23 jsou publikované, poslední veřejná hra je commit `74628eb` (Pages `41669016548`, Success). Před krokem 24 existuje checkpoint `e2fe98c`. Fáze A ověřena 228/228 testy, buildem a prohlížečem. Fáze B ověřena 242/242 testy (14 nových), buildem, skutečným přiřazením dvou nosičů přes UI, přepravou 38+2 Iron, přesným plným Save/Load přes IndexedDB během cesty a mobilním UI bez JS/HTTP chyb. Skutečný save z Git commitu `fb5aaf2` migruje osm skillů na devět a přidá prázdná pracovní místa bez změny zásob, talentů či králova nákladu. Commit fáze B obsahuje tento záznam. Zásobování staveb a fáze C–D zbývají. Průběžné commity chrání větev `backup/step-24-progress`; publikace celé logistiky na main následuje až po D.
 
 ## Master: 15 etap, 5 milníků
 

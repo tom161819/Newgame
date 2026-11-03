@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Assign Haulers to Warehouses or Granaries to reserve and carry supplies, earn Logistics experience and increase their load from 20 to 38 units.
 - Start with a reachable 40-unit stockpile and build 200-unit Warehouses for construction materials; the king carries collected resources to storage before they become available.
 - Experience five-day seasons and daily weather that affect crop growth, with autumn foliage and snow-covered winter landscapes.
 - Feed the king and villagers from stored apples, bread and meat; track food supply, hunger and its effects on work and settlement.

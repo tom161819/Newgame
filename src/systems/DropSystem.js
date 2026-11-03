@@ -6,14 +6,14 @@ import { carryCapacity } from '../data/logistics.js';
 // se slučuje; inventář se mění teprve při skutečném příchodu ke dropu.
 export class DropSystem {
   constructor(scene){this.scene=scene;this.drops=new Map();this.nextId=1;}
-  create(resource,tile,amount,savedId=null,{rewardRemaining=1,rewardUnits=resource==='stone'?amount:0}={}){
+  create(resource,tile,amount,savedId=null,{rewardRemaining=1,rewardUnits=resource==='stone'?amount:0,haulEligible=true}={}){
     if(!Number.isSafeInteger(amount)||amount<=0)throw new RangeError('Neplatné množství dropu.');
     const definition=this.scene.objectRegistry.require(resource);
     if(!definition.collectible)throw new TypeError('Drop musí být sběratelná surovina.');
     const existing=[...this.drops.values()].find(d=>d.resource===resource&&tileKey(d.tile)===tileKey(tile));
-    if(existing){existing.amount+=amount;existing.rewardRemaining=(existing.rewardRemaining??1)+rewardRemaining;existing.rewardUnits=(existing.rewardUnits??0)+rewardUnits;return existing;}
+    if(existing){existing.amount+=amount;existing.rewardRemaining=(existing.rewardRemaining??1)+rewardRemaining;existing.rewardUnits=(existing.rewardUnits??0)+rewardUnits;existing.haulEligible=existing.haulEligible!==false&&haulEligible;return existing;}
     const id=savedId??`drop-${this.nextId++}`,view=this.scene.assets.createView(resource,{...tileCenter(tile),tile});
-    const drop={id,resource,tile:{...tile},amount,rewardRemaining,rewardUnits,view};view.setData('drop',drop);this.drops.set(id,drop);
+    const drop={id,resource,tile:{...tile},amount,rewardRemaining,rewardUnits,haulEligible,view};view.setData('drop',drop);this.drops.set(id,drop);
     this.refreshOccupancy(tile);return drop;
   }
   refreshOccupancy(tile){
@@ -23,10 +23,16 @@ export class DropSystem {
     else if(drop)this.scene.resourceOccupancy.set(key,drop.id);
     else this.scene.resourceOccupancy.delete(key);
   }
+  takeForTransport(id,amount){
+    const drop=this.drops.get(id);if(!drop||!Number.isSafeInteger(amount)||amount<1||amount>drop.amount)return null;
+    const cargo={resource:drop.resource,amount,...(drop.haulEligible===false?{transportCancelled:true}:{})},fraction=amount/drop.amount;
+    drop.rewardRemaining*=1-fraction;drop.rewardUnits*=1-fraction;drop.amount-=amount;
+    if(!drop.amount){this.drops.delete(id);drop.view.destroy();this.refreshOccupancy(drop.tile);}return cargo;
+  }
   collect(id,standingTile,actor=this.scene.character){
     const drop=this.drops.get(id);
     if(!drop||actor.state!=='ground'||tileKey(standingTile)!==tileKey(drop.tile))return false;
-    const royal=actor===this.scene.character&&this.scene.foodStorage?.manages(drop.resource)&&this.scene.kingLogistics,capacity=royal?royal.room(drop.resource):carryCapacity(actor);
+    const cancelledTransport=drop.haulEligible===false,royal=actor===this.scene.character&&this.scene.foodStorage?.manages(drop.resource)&&this.scene.kingLogistics,capacity=royal?royal.room(drop.resource):carryCapacity(actor);
     if(royal&&!capacity){this.scene.setStatus('Cargo is full. Deliver it to storage first.');return false;}
     const limited=royal||this.scene.foodStorage?.manages(drop.resource)&&this.scene.workerSystem?.workers.has(actor.id),amount=limited?Math.min(capacity,drop.amount):drop.amount;
     const packageRatio=amount/drop.amount*(drop.rewardRemaining??1),units=amount/drop.amount*(drop.rewardUnits??(drop.resource==='stone'?drop.amount:0)),contributionRatio=drop.resource==='stone'?units/amount:packageRatio,event={type:drop.resource==='stone'?'resourceCollected':'dropCollected',objectType:drop.resource,quantity:amount,objectId:drop.id,contributionRatio};
@@ -36,6 +42,7 @@ export class DropSystem {
     else if(!this.scene.workplaceSystem?.carryCollection(actor,{resource:drop.resource,amount,event})){
       this.scene.inventory.add(drop.resource,amount);this.scene.activities?.emit(event.type,{...event,actor});
     }
+    if(actor.cargo&&cancelledTransport)actor.cargo.transportCancelled=true;
     this.scene.updateInventory();
     this.scene.setStatus(`${this.scene.objectRegistry.require(drop.resource).name} ×${amount} sebráno.`);return true;
   }

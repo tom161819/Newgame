@@ -39,6 +39,7 @@ export class FoodStorageSystem {
   available(resource){return [...this.locations.values()].filter(l=>this.isStock(l)).reduce((n,l)=>n+this.free(l.id,resource),0);}
   inventorySummary(){const result={};for(const id of this.resourceIds())if([...this.locations.values()].some(l=>this.isStock(l)&&(l.stock[id]??0)>0))result[id]=this.available(id);return result;}
   goals(location){
+    if(location.kind==='ground')return this.scene.map[location.y]?.[location.x]===0?[{x:location.x,y:location.y}]:[];
     const tiles=[];for(let dx=0;dx<location.width;dx++)tiles.push({x:location.x+dx,y:location.y-1},{x:location.x+dx,y:location.y+location.height});
     for(let dy=0;dy<location.height;dy++)tiles.push({x:location.x-1,y:location.y+dy},{x:location.x+location.width,y:location.y+dy});
     if(location.kind==='fallback')tiles.push({x:location.x,y:location.y});
@@ -67,18 +68,25 @@ export class FoodStorageSystem {
   }
   release(id){if(this.reservations.delete(id))this.changed();}
   releaseOwner(owner){for(const r of [...this.reservations.values()])if(r.owner===owner)this.release(r.id);}
+  consumeHaulExclusion(location,resource,amount){
+    const excluded=Math.min(amount,location.haulExcluded?.[resource]??0);if(!excluded)return false;
+    location.haulExcluded[resource]-=excluded;if(!location.haulExcluded[resource])delete location.haulExcluded[resource];
+    if(!Object.keys(location.haulExcluded).length)delete location.haulExcluded;return true;
+  }
   take(id){
     const r=this.reservations.get(id),l=r&&this.locations.get(r.locationId);if(!l||r.kind!=='stock'||(l.stock[r.resource]??0)<r.amount)return null;
-    const cargo={resource:r.resource,amount:r.amount};l.stock[r.resource]-=r.amount;if(!l.stock[r.resource])delete l.stock[r.resource];this.reservations.delete(id);this.changed();return cargo;
+    const cargo={resource:r.resource,amount:r.amount};if(this.consumeHaulExclusion(l,r.resource,r.amount))cargo.transportCancelled=true;
+    l.stock[r.resource]-=r.amount;if(!l.stock[r.resource])delete l.stock[r.resource];this.reservations.delete(id);this.changed();return cargo;
   }
-  put(id,amount){
+  put(id,amount,{transportCancelled=false}={}){
     const r=this.reservations.get(id),l=r&&this.locations.get(r.locationId);
     if(!l||r.kind!=='capacity'||!positive(amount)||amount>r.amount||this.used(l)+amount>l.capacity)return false;
-    l.stock[r.resource]=(l.stock[r.resource]??0)+amount;r.amount-=amount;if(!r.amount)this.reservations.delete(id);this.changed();return true;
+    l.stock[r.resource]=(l.stock[r.resource]??0)+amount;if(transportCancelled){l.haulExcluded??={};l.haulExcluded[r.resource]=(l.haulExcluded[r.resource]??0)+amount;}
+    r.amount-=amount;if(!r.amount)this.reservations.delete(id);this.changed();return true;
   }
   withdraw(locationId,resource,amount){
     const l=this.locations.get(locationId);if(!l||!positive(amount)||this.free(locationId,resource)<amount)return false;
-    l.stock[resource]-=amount;if(!l.stock[resource])delete l.stock[resource];this.changed();return true;
+    this.consumeHaulExclusion(l,resource,amount);l.stock[resource]-=amount;if(!l.stock[resource])delete l.stock[resource];this.changed();return true;
   }
   deposit(locationId,resource,amount){
     const l=this.locations.get(locationId);if(!l||!positive(amount)||!l.allowed.includes(resource)||this.room(locationId)<amount)return false;
@@ -99,7 +107,7 @@ export class FoodStorageSystem {
   spill(resource,amount,origin){
     if(!amount)return;
     for(let radius=0;radius<=12;radius++)for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
-      const tile={x:origin.x+dx,y:origin.y+dy};if(this.scene.map[tile.y]?.[tile.x]===0){this.scene.dropSystem.create(resource,tile,amount,null,{rewardRemaining:0,rewardUnits:0});return;}
+      const tile={x:origin.x+dx,y:origin.y+dy};if(this.scene.map[tile.y]?.[tile.x]===0){this.scene.dropSystem.create(resource,tile,amount,null,{rewardRemaining:0,rewardUnits:0,haulEligible:false});return;}
     }
     throw new Error('No safe ground tile for preserved food.');
   }

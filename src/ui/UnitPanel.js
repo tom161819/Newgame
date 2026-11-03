@@ -1,6 +1,7 @@
 import { SKILLS,JOBS,WORK_RULES } from '../data/jobs.js';
 import { element } from './objectLabels.js';
 import { TALENTS,TALENT_XP_BONUS } from '../data/economy.js';
+import { carryCapacity } from '../data/logistics.js';
 
 export class UnitPanel {
   constructor(scene){
@@ -32,7 +33,7 @@ export class UnitPanel {
     }
     const signature=JSON.stringify([u.skills,u.naturalTalent]);
     if(this.skillSignature!==`${u.id}:${signature}`){
-      const rows=Object.entries(SKILLS).map(([id,name])=>{const skill=u.skills[id],talented=id===u.naturalTalent,row=element('div',`skill-row${talented?' talented-skill':''}`);row.dataset.skill=id;row.append(element('strong','',`${name}${talented?' ★':''}`),element('span','',`LVL ${skill.level}`),element('span','',skill.level===skill.maxLevel?'XP MAX':`${format(skill.currentXP)} / ${skill.xpToNextLevel} XP`),element('small','',`${Math.round((1+(skill.level-1)*WORK_RULES.efficiencyPerLevel)*100)} %${talented?' · +20 % XP':''}`));return row;});
+      const rows=Object.entries(SKILLS).map(([id,name])=>{const skill=u.skills[id],talented=id===u.naturalTalent,row=element('div',`skill-row${talented?' talented-skill':''}`);row.dataset.skill=id;row.append(element('strong','',`${name}${talented?' ★':''}`),element('span','',`LVL ${skill.level}`),element('span','',skill.level===skill.maxLevel?'XP MAX':`${format(skill.currentXP)} / ${skill.xpToNextLevel} XP`),element('small','',id==='logistics'?`Hauler capacity: ${carryCapacity({...u,profession:'hauler'})}`:`${Math.round((1+(skill.level-1)*WORK_RULES.efficiencyPerLevel)*100)} %${talented?' · +20 % XP':''}`));return row;});
       document.querySelector('#unit-skills').replaceChildren(...rows);this.skillSignature=`${u.id}:${signature}`;
     }
   }
