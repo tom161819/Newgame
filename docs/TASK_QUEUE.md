@@ -40,11 +40,12 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 - [Krok 21 — Farming & Orchards](requests/step-21.md): commit `339904f`, Pages run `41638781414` úspěšně nasazeno. 185 testů; fyzická výstavba, skutečné růstové cykly 120/180 sekund při dni 60 sekund, sklizeň 8 Wheat / 6 Apple, Farming XP a talenty, Save/Load během růstu a sklizně, skutečný starší save a mobilní rozhraní ověřeny. Optimalizovaná scéna s 20 farmáři a 45 pozemky běží kolem 54–60 FPS. Archiv obsahuje 49 verzí.
 
+- [Krok 22 — Food Production & Storage](requests/step-22.md): commit `5e9b134`, Pages run `41645613844` úspěšně nasazeno (41 s). 200 testů; skutečné blueprinty, fyzická přeprava a 30sekundové výrobní cykly mlýna/pekárny, sklady 200/30, náklady do 20, rezervace, skilly/mzdy, přesné Save/Load a migrace skutečné starší hry ověřeny. Mobilní UI bez chyb; 20 pracovníků, 6 výrobních budov a 22 pozemků kolem 60 FPS. Archiv obsahuje 52 verzí.
+
 ## Následuje
 
-1. **Právě probíhá:** [Krok 22 — Food Production & Storage](requests/step-22.md).
-2. [Krok 23 — Seasons, Weather & Food Consumption](requests/step-23.md).
-3. [Krok 24 — Logistics, Warehouses & Physical Resource Transport](requests/step-24.md).
+1. **Právě probíhá:** [Krok 23 — Seasons, Weather & Food Consumption](requests/step-23.md).
+2. [Krok 24 — Logistics, Warehouses & Physical Resource Transport](requests/step-24.md).
 
 Předchozí fronta do kroku 19 včetně archivu 41 verzí byla dokončená a publikovaná (`e0c4f54`, Pages `41620923762`). Nové požadavky se dokončují v uvedeném pořadí, každý po ověření a nasazení před zahájením následujícího.
 
