@@ -49,7 +49,7 @@ export function loadGameState(scene,input){
     if(worker.workTask)scene.workerSystem.reservations.reserve(worker.workTask.reservation,worker.id);
     if(!worker.isAlive)worker.view.destroy();else{const pos=gridToWorld(worker.position.x,worker.position.y);worker.view.setPosition(pos.x,pos.y).setDepth(pos.y+.1);worker.view.animate?.(0,worker.walking,worker.direction);}
   }
-  for(const d of state.drops)scene.dropSystem.create(d.resource,d.tile,d.amount,d.id,{rewardRemaining:d.rewardRemaining??1});
+  for(const d of state.drops)scene.dropSystem.create(d.resource,d.tile,d.amount,d.id,{rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0)});
   for(const saved of state.chests){
     const chest=scene.treasureSystem.create(saved.tile,saved);
     if(saved.opening){
@@ -69,6 +69,7 @@ export function loadGameState(scene,input){
     }
   }
   restoreActor(c,p);c.state=p.state;c.currentTower=scene.buildings.find(b=>b.id===p.currentTowerId)??null;
+  if(scene.kingLogistics){c.cargo=structuredClone(p.cargo??null);c.pendingWorkRewards=structuredClone(p.pendingWorkRewards??[]);}
   c.exitTile=p.exitTile?{...p.exitTile}:null;c.order=restoreOrder(p.order,scene);
   c.roofContinuation=p.roofContinuation?{...structuredClone({...p.roofContinuation,order:null}),order:restoreOrder(p.roofContinuation.order,scene)}:null;
   c.mountedHorse=scene.animalSystem.animals.get(p.horseId)??null;
@@ -102,13 +103,14 @@ export function loadGameState(scene,input){
   scene.farmingSystem?.importState(state.farming);
   scene.foodStorage?.importState(state.foodStorage,state.inventory);
   scene.foodProduction?.importState(state.foodProduction);
+  scene.kingLogistics?.importState(state.kingLogistics);
   if(scene.seasons&&!state.seasons)for(const worker of scene.workerSystem.liveWorkers())if(worker.workTask?.kind==='harvest'){
     const plot=scene.farmingSystem.building(worker.workTask.targetId);if(plot&&!scene.farmingSystem.ripe(plot)){scene.workerSystem.ai.cancel(worker);worker.workState='Waiting';worker.workMessage='Waiting for the harvest season';}
   }
-  if(scene.foodStorage&&!state.foodStorage)for(const worker of scene.workerSystem.liveWorkers())if(scene.foodStorage.manages(worker.cargo?.resource)&&worker.cargo.amount>20){
+  if(scene.foodStorage&&!state.foodStorage?.physicalMaterials)for(const worker of scene.workerSystem.liveWorkers())if(scene.foodStorage.manages(worker.cargo?.resource)&&worker.cargo.amount>20){
     const original=worker.cargo.amount,remainder=original-20;worker.cargo.amount=20;let rewardRemaining=0;
-    for(const event of worker.pendingWorkRewards??[])if(event.type==='dropCollected'){const ratio=event.contributionRatio??1;event.contributionRatio=ratio*20/original;rewardRemaining+=ratio*remainder/original;}
-    scene.dropSystem.create(worker.cargo.resource,worker.tile,remainder,null,{rewardRemaining});
+    let rewardUnits=0;for(const event of worker.pendingWorkRewards??[])if(['dropCollected','resourceCollected'].includes(event.type)){const ratio=event.contributionRatio??1;event.contributionRatio=ratio*20/original;if(event.type==='dropCollected')rewardRemaining+=ratio*remainder/original;else rewardUnits+=(event.quantity??1)*ratio*remainder/original;}
+    scene.dropSystem.create(worker.cargo.resource,worker.tile,remainder,null,{rewardRemaining,rewardUnits});
   }
   scene.pathWear?.importState(state.pathWear);
   for(const t of state.spawners)scene.resourceSpawners.find(s=>s.definition.id===t.id).importState(t);

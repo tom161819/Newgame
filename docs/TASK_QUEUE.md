@@ -47,7 +47,7 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 ## Následuje
 
 1. **Právě probíhá:** [Krok 24 — Logistics, Warehouses & Physical Resource Transport](requests/step-24.md).
-   - Fáze A: fyzické suroviny, sklady a migrace inventáře.
+   - Fáze A dokončena: fyzické suroviny, sklady a migrace inventáře; 228/228 testů, produkční build a skutečný browser smoke včetně mobilního UI a obnovení králova nákladu. Commit fáze obsahuje tento záznam.
    - Fáze B: Hauler, přepravní AI a rezervace.
    - Fáze C: zásobování stavenišť, zemědělství a výroby.
    - Fáze D: UI, Save/Load, optimalizace a integrační testy.

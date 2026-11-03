@@ -1,16 +1,25 @@
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
 import { PLAYER_START } from '../game/config.js';
 import { buildingIsComplete } from '../game/buildings.js';
+import { physicalResources,materialResources,storageResources,stockLocationId,carryCapacity } from '../data/logistics.js';
 
 export function validateFoodState(s,registry,{check,number,integer,array}){
   const storage=s.foodStorage,production=s.foodProduction;
   if(!storage){check(!production&&!s.buildings.some(b=>buildingIsComplete(b)&&(registry.require(b.type).storage||registry.require(b.type).recipe))&&!(s.workers??[]).some(w=>['foodPickup','foodDeliver','produce'].includes(w.workTask?.kind)));return;}
   check(storage&&production);array(storage.locations);array(storage.reservations);array(production.records);integer(storage.nextReservation,1);integer(production.nextTransfer,1);
-  const expected=new Map([['food-camp',{kind:'fallback',buildingId:null,x:PLAYER_START.x,y:PLAYER_START.y,width:1,height:1,capacity:FOOD_RULES.fallbackCapacity,allowed:[...FOOD_RESOURCE_IDS]}]]);
+  const physical=storage.physicalMaterials===true,resources=physical?physicalResources(registry):[...FOOD_RESOURCE_IDS];
+  const expected=physical?new Map():new Map([['food-camp',{kind:'fallback',buildingId:null,x:PLAYER_START.x,y:PLAYER_START.y,width:1,height:1,capacity:FOOD_RULES.fallbackCapacity,allowed:[...FOOD_RESOURCE_IDS]}]]);
+  if(physical){
+    check(s.buildings.filter(b=>b.type==='starter_stockpile').length<=1);
+    for(const l of storage.locations)if(l.kind==='fallback'&&l.buildingId==null){
+      check(['food-camp','legacy-materials'].includes(l.id));integer(l.x,0,99);integer(l.y,0,99);
+      expected.set(l.id,{kind:'fallback',buildingId:null,x:l.x,y:l.y,width:1,height:1,capacity:l.id==='legacy-materials'?40:30,allowed:l.id==='legacy-materials'?materialResources(registry):[...FOOD_RESOURCE_IDS]});
+    }
+  }
   const producers=s.buildings.filter(b=>buildingIsComplete(b)&&registry.require(b.type).recipe);
   for(const b of s.buildings)if(buildingIsComplete(b)){
     const d=registry.require(b.type),base={buildingId:b.id,x:b.x,y:b.y,width:d.width,height:d.height};
-    if(d.storage)expected.set(`granary-${b.id}`,{...base,kind:'storage',capacity:d.storage.capacity,allowed:d.storage.resources});
+    if(d.storage&&(physical||!d.storage.accepts))expected.set(stockLocationId(b),{...base,kind:d.starter?'fallback':'storage',capacity:d.storage.capacity,allowed:storageResources(d,registry)});
     if(d.recipe)for(const kind of ['input','output'])expected.set(`${kind}-${b.id}`,{...base,kind,capacity:d.bufferCapacity,allowed:Object.keys(d.recipe[kind])});
   }
   const locations=new Map(),reservations=new Map(),used=l=>Object.values(l.stock).reduce((n,v)=>n+v,0);
@@ -19,7 +28,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     const e=expected.get(l.id);check(e&&!locations.has(l.id));locations.set(l.id,l);
     for(const [key,value]of Object.entries(e))check(JSON.stringify(l[key])===JSON.stringify(value));
     check(l.stock&&typeof l.stock==='object'&&!Array.isArray(l.stock));for(const [id,n]of Object.entries(l.stock)){check(l.allowed.includes(id));integer(n,1);}
-    integer(l.legacyOverflow);check(l.legacyOverflow===Math.max(0,used(l)-l.capacity));check(l.kind==='fallback'||l.legacyOverflow===0);
+    integer(l.legacyOverflow);check(l.legacyOverflow===Math.max(0,used(l)-l.capacity));check(l.kind==='fallback'&&l.buildingId==null||l.legacyOverflow===0);
   }
   for(const r of storage.reservations){
     const l=locations.get(r.locationId);check(l&&!reservations.has(r.id)&&['stock','capacity'].includes(r.kind)&&l.allowed.includes(r.resource));reservations.set(r.id,r);
@@ -56,7 +65,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
       const crop=registry.require(s.buildings.find(b=>b.id===t.targetId).type).crop;check(t.capacityReservation&&locations.has(t.destinationId));capacity(t.capacityReservation,t.transferId,crop.resource,crop.yield);continue;
     }
     if(!['foodPickup','foodDeliver'].includes(t.kind))continue;
-    check(FOOD_RESOURCE_IDS.includes(t.resource)&&locations.has(t.destinationId));integer(t.amount,1,FOOD_RULES.carryCapacity);
+    check(resources.includes(t.resource)&&locations.has(t.destinationId));integer(t.amount,1,carryCapacity(w));
     check(adjacent(locations.get(t.kind==='foodPickup'?t.sourceId:t.destinationId),t.goal));
     if(t.kind==='foodPickup'){
       const stock=reservations.get(t.stockReservation);check(stock?.kind==='stock'&&stock.locationId===t.sourceId&&stock.resource===t.resource&&stock.amount===t.amount&&stock.owner===t.transferId&&!stockRefs.has(stock.id));stockRefs.add(stock.id);check(!w.cargo);
@@ -65,6 +74,14 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     if(t.outputBuildingId&&t.kind==='foodPickup'&&records.get(t.outputBuildingId)?.outputReservation===t.capacityReservation){check(cap?.resource===t.resource&&cap.amount===t.amount);}
     else capacity(t.capacityReservation,t.transferId,t.resource,t.amount);
     check(cap?.locationId===t.destinationId);
+  }
+  if(physical){
+    const royal=s.kingLogistics;check(royal);integer(royal.nextId,1);
+    const cargo=s.player.cargo;if(cargo){check(resources.includes(cargo.resource));integer(cargo.amount,1,20);}
+    array(s.player.pendingWorkRewards,100000);for(const event of s.player.pendingWorkRewards){check(cargo&&['resourceCollected','dropCollected'].includes(event.type)&&resources.includes(event.objectType));integer(event.quantity,1);if(event.contributionRatio!==undefined)number(event.contributionRatio);}
+    const t=royal.task;if(t){check(cargo&&t.kind==='deposit'&&cargo.resource===t.resource&&locations.has(t.destinationId));integer(t.amount,1,cargo.amount);number(t.retryAt);check(adjacent(locations.get(t.destinationId),t.goal));
+      const match=String(t.id).match(/^king-transfer-(\d+)$/);check(match);integer(Number(match[1]),1,royal.nextId-1);capacity(t.capacityReservation,t.id,t.resource,t.amount);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);
+    }
   }
   for(const r of reservations.values())check(r.kind==='stock'?stockRefs.has(r.id):capacityRefs.has(r.id));
 }

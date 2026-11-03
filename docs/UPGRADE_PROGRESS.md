@@ -2,7 +2,7 @@
 
 ## Aktuální práce
 
-Nejdříve probíhá krok 24, fáze A; master zatím NEBYL zahájen. Kroky 22 a 23 jsou dokončené a publikované, poslední veřejný commit `74628eb` (Pages `41669016548`, Success). Před krokem 24 existuje checkpoint `e2fe98c`. Fáze A má rozpracovaný kód, 10 cílených testů a funkční browser smoke; dokončení a commit vyžadují závěrečnou regresní kontrolu. Aktuální přesný stav viz `docs/TASK_QUEUE.md` a příští commit.
+Krok 24, fáze A je dokončená; následuje fáze B. Master zatím NEBYL zahájen. Kroky 22 a 23 jsou publikované, poslední veřejná hra je commit `74628eb` (Pages `41669016548`, Success). Před krokem 24 existuje checkpoint `e2fe98c`. Fáze A ověřena 228/228 testy (13 nových cílených scénářů), produkčním buildem a skutečným prohlížečem: nové skladiště, sběr před doručením bez zásob/XP, načtení rozneseného nákladu, dokončení Warehouse, 39 assetů a mobilní UI bez JS/HTTP chyb. Commit fáze obsahuje tento záznam. Fáze B–D zbývají; zásobování staveb není hotové. Průběžné commity chrání větev `backup/step-24-progress`; publikace celé logistiky na main následuje až po D.
 
 ## Master: 15 etap, 5 milníků
 

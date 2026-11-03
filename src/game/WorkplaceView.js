@@ -12,14 +12,17 @@ export class WorkplaceView {
     g.fillStyle(0x292d20,.3);g.fillEllipse(12,-15,w*59,h*21);
     const a=point(x+.1,y+.1),b=point(x+w-.1,y+.1),c=point(x+w-.1,y+h-.1),e=point(x+.1,y+h-.1);
     polygon(g,tint??0x8f8773,[a,b,c,e]);
-    if(d.id==='quarry'){
+    if(d.id==='starter_stockpile'){
+      for(const [dx,dy]of [[.45,.45],[1.4,.45],[.45,1.4],[1.4,1.4]]){const p=point(x+dx,y+dy);g.fillStyle(tint??0x806642);g.fillRect(p.x-13,p.y-26,26,25);g.lineStyle(2,tint??0xb09a62);g.strokeRect(p.x-13,p.y-26,26,25);g.lineBetween(p.x-12,p.y-25,p.x+12,p.y-2);}
+      const p=point(x+.8,y+1.7);g.fillStyle(tint??0x999d8b);g.fillEllipse(p.x,p.y-8,32,17);
+    }else if(d.id==='quarry'){
       polygon(g,tint??0x706f61,[point(x+.35,y+.35,16),point(x+w-.35,y+.35,16),point(x+w-.35,y+.35,44),point(x+.35,y+.35,44)]);
       for(const [dx,dy,size]of [[.6,1.1,24],[1.3,1.1,29],[1.9,1.1,22],[.6,2,22],[1.35,2,26]]){
         const p=point(x+dx,y+dy);polygon(g,tint??0x777b70,[{x:p.x-size/2,y:p.y},{x:p.x,y:p.y-size},{x:p.x+size/2,y:p.y-3},{x:p.x,y:p.y+7}]);polygon(g,tint??0xb8b7a4,[{x:p.x-size/2,y:p.y},{x:p.x,y:p.y-size},{x:p.x+size/2,y:p.y-3},{x:p.x,y:p.y-5}]);
       }
       const post=point(x+2.4,y+1.5);g.lineStyle(5,tint??0x725735);g.lineBetween(post.x,post.y,post.x,post.y-68);g.lineBetween(post.x-26,post.y-55,post.x+32,post.y-72);g.lineStyle(1,0xbab18d);g.lineBetween(post.x+30,post.y-71,post.x+30,post.y-24);g.strokeCircle(post.x+30,post.y-20,4);
     }else{
-      const height=d.id==='mill'?77:d.id==='granary'?65:d.id==='barracks'?57:43,roof=height+36,raise=p=>({...p,y:p.y-height});
+      const height=d.id==='mill'?77:['granary','warehouse'].includes(d.id)?65:d.id==='barracks'?57:43,roof=height+36,raise=p=>({...p,y:p.y-height});
       polygon(g,tint??0xa29676,[e,c,raise(c),raise(e)]);polygon(g,tint??0x746f5a,[c,b,raise(b),raise(c)]);
       for(let z=12;z<height;z+=12){g.lineStyle(1,0x524f3e,.45);g.lineBetween(e.x,e.y-z,c.x,c.y-z);g.lineBetween(c.x,c.y-z,b.x,b.y-z);}
       const near=point(x+w/2,y+h-.1,roof),far=point(x+w/2,y+.1,roof);
@@ -41,6 +44,6 @@ export class WorkplaceView {
   contains(x,y){return Phaser.Geom.Polygon.Contains(this.hitArea,x-this.base.x,y-this.base.y);}
   setAlpha(value){this.body.setAlpha(value);this.footprint.setAlpha(value);return this;}
   setVisible(value){this.body.setVisible(value);this.footprint.setVisible(value);return this;}
-  inView(view){const width=(this.definition.width+this.definition.height)*32;return this.base.x+width>=view.x&&this.base.x-width<=view.right&&this.base.y+10>=view.y&&this.base.y-this.definition.visualHeight<=view.bottom;}
+  inView(view){const width=(this.definition.width+this.definition.height)*32;return this.base.x+width>=view.x&&this.base.x-width<=view.right&&this.base.y+10>=view.y&&this.base.y-this.definition.visualHeight-width/2<=view.bottom;}
   destroy(){this.body.destroy();this.footprint.destroy();}
 }

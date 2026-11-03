@@ -3,25 +3,31 @@ import { PLAYER_START } from '../game/config.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { findPathToAny } from '../game/pathfinding.js';
 import { tileKey } from '../game/stones.js';
+import { physicalResources,materialResources,storageResources,stockLocationId } from '../data/logistics.js';
 
 const sum=values=>Object.values(values).reduce((a,b)=>a+b,0);
 const positive=n=>Number.isSafeInteger(n)&&n>0;
 export class FoodStorageSystem {
-  constructor(scene){
-    this.scene=scene;this.locations=new Map();this.reservations=new Map();this.nextReservation=1;this.revision=0;this.listeners=new Set();
+  constructor(scene,{physicalMaterials=false}={}){
+    this.scene=scene;this.physicalMaterials=physicalMaterials;this.locations=new Map();this.reservations=new Map();this.nextReservation=1;this.revision=0;this.listeners=new Set();
     this.locations.set('food-camp',{id:'food-camp',kind:'fallback',buildingId:null,x:PLAYER_START.x,y:PLAYER_START.y,width:1,height:1,capacity:FOOD_RULES.fallbackCapacity,allowed:[...FOOD_RESOURCE_IDS],stock:{},legacyOverflow:0});
     const legacy=Object.fromEntries([...scene.inventory.resources].filter(([id])=>this.manages(id)));
     this.migrateInventory(legacy);scene.inventory.useStorage(this);
     for(const building of scene.buildings)this.register(building);
   }
-  manages(resource){return FOOD_RESOURCE_IDS.includes(resource);}
+  manages(resource){return this.physicalMaterials?resource!=='gold'&&this.scene.objectRegistry.get(resource)?.category==='resource':FOOD_RESOURCE_IDS.includes(resource);}
+  resourceIds(){return this.physicalMaterials?physicalResources(this.scene.objectRegistry):[...FOOD_RESOURCE_IDS];}
+  reservedTiles(){return [...this.locations.values()].filter(l=>l.kind==='fallback'&&l.buildingId==null).map(l=>({x:l.x,y:l.y}));}
   changed(){for(const l of this.locations.values())l.legacyOverflow=Math.max(0,this.used(l)-l.capacity);this.revision++;for(const listener of this.listeners)listener();}
   subscribe(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   register(building){
     if(!buildingIsComplete(building))return;
     const d=buildingDefinition(building),base={buildingId:building.id,x:building.x,y:building.y,width:d.width,height:d.height,stock:{},legacyOverflow:0};
     const add=(id,kind,capacity,allowed)=>{if(!this.locations.has(id)){this.locations.set(id,{...base,id,kind,capacity,allowed:[...allowed],stock:{}});this.changed();}};
-    if(d.storage)add(`granary-${building.id}`,'storage',d.storage.capacity,d.storage.resources);
+    if(d.storage&&(this.physicalMaterials||!d.storage.accepts)){
+      add(stockLocationId(building),d.starter?'fallback':'storage',d.storage.capacity,storageResources(d,this.scene.objectRegistry));
+      if(d.starter){const camp=this.locations.get('food-camp');if(camp&&!this.used(camp)&&!this.incoming(camp.id)){this.locations.delete(camp.id);this.changed();}}
+    }
     if(d.recipe){add(`input-${building.id}`,'input',d.bufferCapacity,Object.keys(d.recipe.input));add(`output-${building.id}`,'output',d.bufferCapacity,Object.keys(d.recipe.output));}
   }
   isStock(location){return location.kind==='storage'||location.kind==='fallback';}
@@ -31,7 +37,7 @@ export class FoodStorageSystem {
   free(locationId,resource){const l=this.locations.get(locationId);return l?Math.max(0,(l.stock[resource]??0)-this.reserved(locationId,resource)):0;}
   room(locationId){const l=this.locations.get(locationId);return l?Math.max(0,l.capacity-this.used(l)-this.incoming(locationId)):0;}
   available(resource){return [...this.locations.values()].filter(l=>this.isStock(l)).reduce((n,l)=>n+this.free(l.id,resource),0);}
-  inventorySummary(){const result={};for(const id of FOOD_RESOURCE_IDS)if([...this.locations.values()].some(l=>this.isStock(l)&&(l.stock[id]??0)>0))result[id]=this.available(id);return result;}
+  inventorySummary(){const result={};for(const id of this.resourceIds())if([...this.locations.values()].some(l=>this.isStock(l)&&(l.stock[id]??0)>0))result[id]=this.available(id);return result;}
   goals(location){
     const tiles=[];for(let dx=0;dx<location.width;dx++)tiles.push({x:location.x+dx,y:location.y-1},{x:location.x+dx,y:location.y+location.height});
     for(let dy=0;dy<location.height;dy++)tiles.push({x:location.x-1,y:location.y+dy},{x:location.x+location.width,y:location.y+dy});
@@ -49,8 +55,8 @@ export class FoodStorageSystem {
     const withRoom=granaries.filter(l=>this.room(l.id)>=(partial?1:amount)),route=this.route(actor,withRoom);
     if(route)return route;
     // A reachable full granary stops production rather than creating extra camp capacity.
-    if(granaries.length&&this.route(actor,granaries))return null;
-    const camp=this.locations.get('food-camp');return camp?.allowed.includes(resource)&&this.room(camp.id)>=(partial?1:amount)?this.route(actor,[camp]):null;
+    if(!this.physicalMaterials&&granaries.length&&this.route(actor,granaries))return null;
+    return this.route(actor,[...this.locations.values()].filter(l=>l.kind==='fallback'&&l.allowed.includes(resource)&&this.room(l.id)>=(partial?1:amount)));
   }
   findSource(actor,resource){return this.route(actor,[...this.locations.values()].filter(l=>this.isStock(l)&&this.free(l.id,resource)>0));}
   atLocation(actor,id){const l=this.locations.get(id);return !!l&&!actor.nextTile&&!actor.path.length&&this.goals(l).some(t=>tileKey(t)===tileKey(actor.tile));}
@@ -93,7 +99,7 @@ export class FoodStorageSystem {
   spill(resource,amount,origin){
     if(!amount)return;
     for(let radius=0;radius<=12;radius++)for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){
-      const tile={x:origin.x+dx,y:origin.y+dy};if(this.scene.map[tile.y]?.[tile.x]===0){this.scene.dropSystem.create(resource,tile,amount,null,{rewardRemaining:0});return;}
+      const tile={x:origin.x+dx,y:origin.y+dy};if(this.scene.map[tile.y]?.[tile.x]===0){this.scene.dropSystem.create(resource,tile,amount,null,{rewardRemaining:0,rewardUnits:0});return;}
     }
     throw new Error('No safe ground tile for preserved food.');
   }
@@ -101,11 +107,26 @@ export class FoodStorageSystem {
     for(const l of [...this.locations.values()])if(l.buildingId===building.id){for(const [resource,amount]of Object.entries(l.stock))this.spill(resource,amount,{x:building.x-1,y:building.y});
       for(const r of [...this.reservations.values()])if(r.locationId===l.id)this.release(r.id);this.locations.delete(l.id);this.changed();}
   }
-  migrateInventory(inventory){const camp=this.locations.get('food-camp');for(const id of FOOD_RESOURCE_IDS)if(inventory[id]>0)camp.stock[id]=(camp.stock[id]??0)+inventory[id];camp.legacyOverflow=Math.max(0,this.used(camp)-camp.capacity);}
-  exportState(){return {locations:structuredClone([...this.locations.values()]),reservations:structuredClone([...this.reservations.values()]),nextReservation:this.nextReservation};}
+  safeLegacyPosition(){
+    const origin=this.scene.character.tile;for(let radius=0;radius<100;radius++)for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){const tile={x:origin.x+dx,y:origin.y+dy};if(this.scene.map[tile.y]?.[tile.x]===0)return tile;}throw new Error('No safe location for preserved legacy stock.');
+  }
+  migrateMaterials(inventory,{ensure=false}={}){
+    const allowed=materialResources(this.scene.objectRegistry);if(!ensure&&!allowed.some(id=>inventory[id]>0))return;
+    let location=this.locations.get('legacy-materials');if(!location){location={id:'legacy-materials',kind:'fallback',buildingId:null,...this.safeLegacyPosition(),width:1,height:1,capacity:40,allowed,stock:{},legacyOverflow:0};this.locations.set(location.id,location);}
+    for(const id of allowed)if(inventory[id]>0)location.stock[id]=(location.stock[id]??0)+inventory[id];
+  }
+  migrateInventory(inventory){const camp=this.locations.get('food-camp');if(camp){for(const id of FOOD_RESOURCE_IDS)if(inventory[id]>0)camp.stock[id]=(camp.stock[id]??0)+inventory[id];camp.legacyOverflow=Math.max(0,this.used(camp)-camp.capacity);}if(this.physicalMaterials)this.migrateMaterials(inventory);}
+  exportState(){return {...(this.physicalMaterials?{physicalMaterials:true}:{}),locations:structuredClone([...this.locations.values()]),reservations:structuredClone([...this.reservations.values()]),nextReservation:this.nextReservation};}
   importState(data,legacyInventory={}){
     this.reservations.clear();if(data){this.locations=new Map(data.locations.map(l=>[l.id,structuredClone(l)]));this.reservations=new Map(data.reservations.map(r=>[r.id,structuredClone(r)]));this.nextReservation=data.nextReservation;}
     else{for(const l of this.locations.values())l.stock={};this.migrateInventory(legacyInventory);}
+    if(this.physicalMaterials){
+      if(!data?.physicalMaterials)this.migrateMaterials(data?legacyInventory:{},{ensure:true});
+      for(const l of this.locations.values())if(l.kind==='fallback'&&l.buildingId==null&&!this.goals(l).length){Object.assign(l,this.safeLegacyPosition());
+        for(const worker of this.scene.workerSystem?.liveWorkers()??[])if([worker.workTask?.sourceId,worker.workTask?.destinationId].includes(l.id))this.scene.workerSystem.ai.cancel(worker);
+      }
+    }
+    this.scene.inventory.useStorage(this);
     this.changed();
   }
   destroy(){this.listeners.clear();this.reservations.clear();this.locations.clear();}

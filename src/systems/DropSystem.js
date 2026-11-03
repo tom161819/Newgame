@@ -1,18 +1,19 @@
 import { tileKey } from '../game/stones.js';
 import { tileCenter } from '../game/map.js';
+import { carryCapacity } from '../data/logistics.js';
 
 // Typ suroviny a množství patří do instance. Stejný typ na stejném políčku
 // se slučuje; inventář se mění teprve při skutečném příchodu ke dropu.
 export class DropSystem {
   constructor(scene){this.scene=scene;this.drops=new Map();this.nextId=1;}
-  create(resource,tile,amount,savedId=null,{rewardRemaining=1}={}){
+  create(resource,tile,amount,savedId=null,{rewardRemaining=1,rewardUnits=resource==='stone'?amount:0}={}){
     if(!Number.isSafeInteger(amount)||amount<=0)throw new RangeError('Neplatné množství dropu.');
     const definition=this.scene.objectRegistry.require(resource);
     if(!definition.collectible)throw new TypeError('Drop musí být sběratelná surovina.');
     const existing=[...this.drops.values()].find(d=>d.resource===resource&&tileKey(d.tile)===tileKey(tile));
-    if(existing){existing.amount+=amount;existing.rewardRemaining=(existing.rewardRemaining??1)+rewardRemaining;return existing;}
+    if(existing){existing.amount+=amount;existing.rewardRemaining=(existing.rewardRemaining??1)+rewardRemaining;existing.rewardUnits=(existing.rewardUnits??0)+rewardUnits;return existing;}
     const id=savedId??`drop-${this.nextId++}`,view=this.scene.assets.createView(resource,{...tileCenter(tile),tile});
-    const drop={id,resource,tile:{...tile},amount,rewardRemaining,view};view.setData('drop',drop);this.drops.set(id,drop);
+    const drop={id,resource,tile:{...tile},amount,rewardRemaining,rewardUnits,view};view.setData('drop',drop);this.drops.set(id,drop);
     this.refreshOccupancy(tile);return drop;
   }
   refreshOccupancy(tile){
@@ -25,11 +26,14 @@ export class DropSystem {
   collect(id,standingTile,actor=this.scene.character){
     const drop=this.drops.get(id);
     if(!drop||actor.state!=='ground'||tileKey(standingTile)!==tileKey(drop.tile))return false;
-    const limited=this.scene.foodStorage?.manages(drop.resource)&&this.scene.workerSystem?.workers.has(actor.id),amount=limited?Math.min(20,drop.amount):drop.amount;
-    const contributionRatio=amount/drop.amount*(drop.rewardRemaining??1),event={type:drop.resource==='stone'?'resourceCollected':'dropCollected',objectType:drop.resource,quantity:amount,objectId:drop.id,contributionRatio};
-    drop.rewardRemaining=(drop.rewardRemaining??1)-contributionRatio;drop.amount-=amount;
+    const royal=actor===this.scene.character&&this.scene.foodStorage?.manages(drop.resource)&&this.scene.kingLogistics,capacity=royal?royal.room(drop.resource):carryCapacity(actor);
+    if(royal&&!capacity){this.scene.setStatus('Cargo is full. Deliver it to storage first.');return false;}
+    const limited=royal||this.scene.foodStorage?.manages(drop.resource)&&this.scene.workerSystem?.workers.has(actor.id),amount=limited?Math.min(capacity,drop.amount):drop.amount;
+    const packageRatio=amount/drop.amount*(drop.rewardRemaining??1),units=amount/drop.amount*(drop.rewardUnits??(drop.resource==='stone'?drop.amount:0)),contributionRatio=drop.resource==='stone'?units/amount:packageRatio,event={type:drop.resource==='stone'?'resourceCollected':'dropCollected',objectType:drop.resource,quantity:amount,objectId:drop.id,contributionRatio};
+    drop.rewardRemaining=(drop.rewardRemaining??1)-packageRatio;drop.rewardUnits=Math.max(0,(drop.rewardUnits??0)-units);drop.amount-=amount;
     if(!drop.amount){this.drops.delete(id);drop.view.destroy();this.refreshOccupancy(drop.tile);}
-    if(!this.scene.workplaceSystem?.carryCollection(actor,{resource:drop.resource,amount,event})){
+    if(royal)royal.receive({resource:drop.resource,amount,event});
+    else if(!this.scene.workplaceSystem?.carryCollection(actor,{resource:drop.resource,amount,event})){
       this.scene.inventory.add(drop.resource,amount);this.scene.activities?.emit(event.type,{...event,actor});
     }
     this.scene.updateInventory();

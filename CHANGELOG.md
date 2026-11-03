@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Start with a reachable 40-unit stockpile and build 200-unit Warehouses for construction materials; the king carries collected resources to storage before they become available.
 - Experience five-day seasons and daily weather that affect crop growth, with autumn foliage and snow-covered winter landscapes.
 - Feed the king and villagers from stored apples, bread and meat; track food supply, hunger and its effects on work and settlement.
 - Build Mills, Bakeries and 200-unit Granaries; Millers and Bakers physically collect inputs, share production work and return finished flour and bread to storage.
@@ -15,6 +16,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Earn Farming experience for completed harvests, eat apples through the existing food cycle, and save growing crops and reserved work without duplicate harvests.
 
 ### Improved
+- Preserve existing materials, in-transit loads and collection rewards when loading older kingdoms, without duplicating stock or experience.
 - Share cached crop textures while preserving per-tile depth so villagers can walk through fields and among fruit trees smoothly.
 
 ## [0.1.0] - 2026-11-03

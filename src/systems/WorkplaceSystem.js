@@ -33,7 +33,7 @@ export class WorkplaceSystem {
   remove(worker){this.detach(worker);if(worker.isAlive)this.scene.workerSystem.jobs.assign(worker,'idle');}
   dropCargo(worker){
     if(worker.cargo)this.scene.dropSystem.create(worker.cargo.resource,{x:Math.floor(worker.position.x),y:Math.floor(worker.position.y)},worker.cargo.amount,null,
-      {rewardRemaining:(worker.pendingWorkRewards??[]).filter(e=>e.type==='dropCollected').reduce((n,e)=>n+(e.contributionRatio??1),0)});
+      {rewardRemaining:(worker.pendingWorkRewards??[]).filter(e=>e.type==='dropCollected').reduce((n,e)=>n+(e.contributionRatio??1),0),rewardUnits:(worker.pendingWorkRewards??[]).filter(e=>e.type==='resourceCollected'&&e.objectType==='stone').reduce((n,e)=>n+(e.quantity??1)*(e.contributionRatio??1),0)});
     worker.cargo=null;worker.pendingWorkRewards=[];
   }
   carryCollection(worker,{resource,amount,event}){

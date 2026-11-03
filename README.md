@@ -22,7 +22,7 @@ Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3
 | Levý klik na maso | Dojde k balíčku a přidá jeho skutečné množství. Najeď myší pro údaj Meat ×N. |
 | Levý klik na truhlu | Dojde k sousednímu políčku a otevře ji. Take All převezme obsah a automaticky vybaví meč a brnění. |
 | Weapon / Armor v inventáři | Otevře dvě místa vybavení a přehled základních a konečných statistik. Předměty lze odložit a znovu vybavit. |
-| Levý klik na kámen | Dojde ke kameni a přičte jej do inventáře. |
+| Levý klik na kámen | Dojde ke kameni, naloží jej a odnese do dostupného skladu; zásoby a XP se přičtou po doručení. |
 | Levý klik na věž nebo její střechu | Dojde k dostupnému sousednímu políčku a vyleze na plošinu. |
 | Klik na mapu z věže | Nejprve sleze, potom dojde k cíli. Kámen sebere až po sestupu. |
 | WASD nebo šipky | Ručně posouvají kameru a pozastaví její sledování krále. |
@@ -329,7 +329,9 @@ Rostliny rostou i bez obsluhy, ale sklizeň vyžaduje rezervovaný pozemek, fyzi
 
 Mill (2 × 2, 12 Stone) a Bakery (2 × 2, 10 Stone) mají po dvou pracovních místech. Mlynář dopraví 4 Wheat do mlýna a za 30 sekund aktivní práce vzniknou 3 Flour. Pekař dopraví 2 Flour do pekárny a stejným množstvím práce vyrobí 4 Bread. Dva pracovníci se na práci podílejí; Milling/Baking zrychlují aktivní výrobu stejným vzorcem jako ostatní skilly. Profese využívají původní XP i mzdy. Auto Production lze v panelu vypnout a rozpracovanou dávku později dokončit.
 
-Granary (3 × 3, 10 Stone) ukládá nejvýše 200 jednotek Meat, Wheat, Flour, Bread a Apple dohromady. Další sýpky přidávají kapacitu. Pokud není dosažitelná sýpka, slouží tábor u počáteční pozice jako sklad pro 30 jednotek. Plná dostupná sýpka se neobchází ukládáním do tábora. Starší nadlimitní zásoby zůstávají zachované a nové dodávky počkají na volné místo.
+Granary (3 × 3, 10 Stone) ukládá nejvýše 200 jednotek Meat, Wheat, Flour, Bread a Apple dohromady. Další sýpky přidávají kapacitu. Nová hra má poblíž krále dostupný hotový Starter Stockpile (2 × 2) pro 40 jednotek materiálů a potravin. Starší hry zachovávají původní tábor pro 30 potravin a dostanou fyzické místo pro dosavadní materiály; nadlimitní zásoby se neztrácejí a nové dodávky počkají na volné místo.
+
+Warehouse (3 × 3, 10 Stone) po fyzickém dokončení poskytuje 200 míst pro Stone, Wood, Iron a budoucí stavební materiály. Každý sklad má vlastní obsah a polohu; existující zásoby se do nové budovy nepřenesou samy. Král unese 20 jednotek jedné suroviny a vyloží je až po skutečném příchodu. Nový příkaz přeruší cestu a zachová nesený náklad; Resources & Storage umožňuje doručení znovu nařídit. Zlato zůstává centrální měnou. Save Schema 6 ukládá také králův náklad, cíl a rezervované místo; načtení nevytváří další počáteční skladiště.
 
 Farmáři odnášejí sklizeň do skladu; mlynáři a pekaři fyzicky převážejí vstupy i výstupy. Pracovník unese nejvýše 20 jednotek. Sklad, země, náklad a omezené výrobní zásobníky jsou různé stavy stejných surovin. Horní inventář ukazuje odvozené dostupné skladové zásoby po odečtení rezervací; Resources & Storage a kliknutí na sýpku ukazují fyzický obsah a kapacitu. Suroviny v nákladu nebo výrobním zásobníku se zde znovu nezapočítávají.
 
