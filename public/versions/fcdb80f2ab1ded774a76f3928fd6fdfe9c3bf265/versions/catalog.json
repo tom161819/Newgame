@@ -1,0 +1,1500 @@
+{
+  "schema": 1,
+  "gameVersion": "0.1.0",
+  "projectBase": "/Newgame/",
+  "currentBuild": {
+    "version": "0.1.0+git.fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265",
+    "gameVersion": "0.1.0",
+    "title": "Archived build",
+    "date": "2026-11-03",
+    "commit": "fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265",
+    "archiveURL": "/Newgame/versions/fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265/",
+    "available": true,
+    "description": "The original game build preserved at this commit.",
+    "releaseType": "development",
+    "historical": true,
+    "reconstructed": false,
+    "current": false,
+    "dirty": false
+  },
+  "versions": [
+    {
+      "version": "0.1.0+archive.26",
+      "title": "Physical logistics",
+      "date": "2026-11-03",
+      "commit": "9e93982740685b0bd18543e1ce7f707b2102b7f1",
+      "archiveURL": "/Newgame/versions/9e93982740685b0bd18543e1ce7f707b2102b7f1/",
+      "available": true,
+      "description": "Use Haulers, Warehouses and royal cargo to deliver reserved supplies, fund construction physically and inspect every resource location.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Use Haulers, Warehouses and royal cargo to deliver reserved supplies, fund construction physically and inspect every resource location."
+        ]
+      },
+      "sequence": 62,
+      "commitDate": "2026-11-03T18:27:46Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.25",
+      "title": "Seasons, weather and meals",
+      "date": "2026-11-03",
+      "commit": "ddc9168972667cd3c969fd256e1ec7035f78072a",
+      "archiveURL": "/Newgame/versions/ddc9168972667cd3c969fd256e1ec7035f78072a/",
+      "available": true,
+      "description": "Grow crops under seasons and daily weather, feed villagers from stored food and track shortages and food economy.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Grow crops under seasons and daily weather, feed villagers from stored food and track shortages and food economy."
+        ]
+      },
+      "sequence": 55,
+      "commitDate": "2026-11-03T15:53:51Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.24",
+      "title": "Food production and storage",
+      "date": "2026-11-03",
+      "commit": "66311391900df17e0755bdac7e51db40a5516d13",
+      "archiveURL": "/Newgame/versions/66311391900df17e0755bdac7e51db40a5516d13/",
+      "available": true,
+      "description": "Mill wheat into flour, bake bread and physically transport food through limited production buffers and granaries.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Mill wheat into flour, bake bread and physically transport food through limited production buffers and granaries."
+        ]
+      },
+      "sequence": 52,
+      "commitDate": "2026-11-03T13:32:39Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.23",
+      "title": "Farming and orchards",
+      "date": "2026-11-03",
+      "commit": "339904f717e767cc1af4459e541cbb4b6edb867a",
+      "archiveURL": "/Newgame/versions/339904f717e767cc1af4459e541cbb4b6edb867a/",
+      "available": true,
+      "description": "Grow wheat and apples through distinct stages, assign farmers and preserve growth and harvest tasks in saves.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Grow wheat and apples through distinct stages, assign farmers and preserve growth and harvest tasks in saves."
+        ]
+      },
+      "sequence": 50,
+      "commitDate": "2026-11-03T12:48:08Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0",
+      "title": "Initial Alpha",
+      "date": "2026-11-03",
+      "commit": "e8d41eb8ec75f12d7cb72b6f139becd023b8715d",
+      "archiveURL": "/Newgame/versions/e8d41eb8ec75f12d7cb72b6f139becd023b8715d/",
+      "available": true,
+      "description": "Explore an isometric 100 × 100 kingdom with eight-direction movement, camera controls and zoom.",
+      "releaseType": "initial",
+      "historical": false,
+      "reconstructed": false,
+      "label": "Official release",
+      "changes": {
+        "added": [
+          "Explore an isometric 100 × 100 kingdom with eight-direction movement, camera controls and zoom.",
+          "Collect stones, hunt wildlife, ride a horse and discover treasure with weapons and armor.",
+          "Build towers, castles, walls and staffed workplaces through blueprints and physical construction.",
+          "Climb fortifications, manage villagers, assign professions and develop individual skills and natural talents.",
+          "Track gold, daily castle income, worker wages and unpaid salaries.",
+          "Configure difficulty, wildlife, treasures, starting resources, fog of war, an optional starting castle, day length and wildlife respawn.",
+          "Save and load multiple kingdoms in the browser, and play historical game builds from the version archive.",
+          "View the released update history from the main menu, with the current game version shown in the menu and Settings."
+        ],
+        "improved": [
+          "Villagers carry mined stone and hunted meat back to their workplaces before crediting resources and experience.",
+          "Frequently travelled ground develops paths that recover when unused."
+        ],
+        "fixed": [
+          "Loading a game preserves moving units and active timers without duplicating rewards, construction, wages or difficulty bonuses."
+        ]
+      },
+      "sequence": 46,
+      "commitDate": "2026-11-03T11:06:22Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.22",
+      "title": "Advanced world configuration",
+      "date": "2026-11-03",
+      "commit": "f22ded073c30f1e0fd60dceff2a244bb8f6cb087",
+      "archiveURL": "/Newgame/versions/f22ded073c30f1e0fd60dceff2a244bb8f6cb087/",
+      "available": true,
+      "description": "Configure an optional starting castle, initial gold, day length and wildlife respawn without changing loaded kingdoms.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Configure an optional starting castle, initial gold, day length and wildlife respawn without changing loaded kingdoms."
+        ]
+      },
+      "sequence": 41,
+      "commitDate": "2026-11-03T08:34:35Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.21",
+      "title": "New Game Setup",
+      "date": "2026-11-03",
+      "commit": "ed58610b326ce27743957e9aee83ed2fb683ae72",
+      "archiveURL": "/Newgame/versions/ed58610b326ce27743957e9aee83ed2fb683ae72/",
+      "available": true,
+      "description": "Choose difficulty, wildlife, treasure and initial stone populations before generating a new kingdom.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Choose difficulty, wildlife, treasure and initial stone populations before generating a new kingdom."
+        ]
+      },
+      "sequence": 39,
+      "commitDate": "2026-11-03T08:19:39Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.20",
+      "title": "Playable historical archive",
+      "date": "2026-11-03",
+      "commit": "e4f092fcc20e93f8a276515fd779732c65bca596",
+      "archiveURL": "/Newgame/versions/e4f092fcc20e93f8a276515fd779732c65bca596/",
+      "available": true,
+      "description": "Launch verified builds from actual Git commits with immutable URLs and isolated browser saves.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Launch verified builds from actual Git commits with immutable URLs and isolated browser saves."
+        ]
+      },
+      "sequence": 37,
+      "commitDate": "2026-11-03T08:12:22Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.19",
+      "title": "Blueprint construction",
+      "date": "2026-11-03",
+      "commit": "43766dcac74b8c528b6219878a8ee217c796d84b",
+      "archiveURL": "/Newgame/versions/43766dcac74b8c528b6219878a8ee217c796d84b/",
+      "available": true,
+      "description": "Plan blueprints, send the king or builders to construct them and share completion rewards by actual work.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Plan blueprints, send the king or builders to construct them and share completion rewards by actual work."
+        ]
+      },
+      "sequence": 35,
+      "commitDate": "2026-11-03T07:23:11Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.18",
+      "title": "Injured hunter deliveries",
+      "date": "2026-11-03",
+      "commit": "5636967ecddcc998e4e6cf48ea9e52bd90993ef6",
+      "archiveURL": "/Newgame/versions/5636967ecddcc998e4e6cf48ea9e52bd90993ef6/",
+      "available": true,
+      "description": "An injured hunter hands in carried goods on reaching safety before recovering.",
+      "releaseType": "fix",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "fixed": [
+          "An injured hunter hands in carried goods on reaching safety before recovering."
+        ]
+      },
+      "sequence": 33,
+      "commitDate": "2026-11-03T06:21:24Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.17",
+      "title": "Staffed workplaces",
+      "date": "2026-11-03",
+      "commit": "0af9b89608654944b5fadbdde3d0907fd4a59dd8",
+      "archiveURL": "/Newgame/versions/0af9b89608654944b5fadbdde3d0907fd4a59dd8/",
+      "available": true,
+      "description": "Assign employees to quarries, hunting lodges and barracks, with real cargo returns and workplace management.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Assign employees to quarries, hunting lodges and barracks, with real cargo returns and workplace management."
+        ]
+      },
+      "sequence": 32,
+      "commitDate": "2026-11-03T06:18:55Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.16",
+      "title": "Talents and wages",
+      "date": "2026-11-03",
+      "commit": "124414727907ac0e082cb225fd2190c9f55882bd",
+      "archiveURL": "/Newgame/versions/124414727907ac0e082cb225fd2190c9f55882bd/",
+      "available": true,
+      "description": "Recruit villagers with permanent talents and varied starting skills, and pay prorated wages or track unpaid debt.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Recruit villagers with permanent talents and varied starting skills, and pay prorated wages or track unpaid debt."
+        ]
+      },
+      "sequence": 30,
+      "commitDate": "2026-11-03T05:54:33Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.15",
+      "title": "Villagers, skills and professions",
+      "date": "2026-11-03",
+      "commit": "fc979b15a2663298d3a05f65e573579e8bab9d7c",
+      "archiveURL": "/Newgame/versions/fc979b15a2663298d3a05f65e573579e8bab9d7c/",
+      "available": true,
+      "description": "Assign villagers professions, develop individual skills and watch workers mine or hunt on the map.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Assign villagers professions, develop individual skills and watch workers mine or hunt on the map."
+        ]
+      },
+      "sequence": 28,
+      "commitDate": "2026-11-03T05:42:58Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.14",
+      "title": "Individual experience",
+      "date": "2026-11-03",
+      "commit": "c8a87c72733494f5f312dca09a3c5af99254ed44",
+      "archiveURL": "/Newgame/versions/c8a87c72733494f5f312dca09a3c5af99254ed44/",
+      "available": true,
+      "description": "Earn individual completion experience through fifty levels with persistent safeguards against repeated rewards.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Earn individual completion experience through fifty levels with persistent safeguards against repeated rewards."
+        ]
+      },
+      "sequence": 26,
+      "commitDate": "2026-11-03T00:57:36Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.13",
+      "title": "Worn paths",
+      "date": "2026-11-03",
+      "commit": "29a9cec61de6dd5b3de4f52c154e8ebbabad3907",
+      "archiveURL": "/Newgame/versions/29a9cec61de6dd5b3de4f52c154e8ebbabad3907/",
+      "available": true,
+      "description": "Repeated travel wears connected trails into grass, improves walking speed and recovers when unused.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Repeated travel wears connected trails into grass, improves walking speed and recovers when unused."
+        ]
+      },
+      "sequence": 24,
+      "commitDate": "2026-11-03T00:32:09Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.12",
+      "title": "Main menu and saved kingdoms",
+      "date": "2026-11-03",
+      "commit": "574ef6be24993b0ab8b5efc27320fe562be455c2",
+      "archiveURL": "/Newgame/versions/574ef6be24993b0ab8b5efc27320fe562be455c2/",
+      "available": true,
+      "description": "Save multiple kingdoms in the browser and restore their world, movement and active commands.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Save multiple kingdoms in the browser and restore their world, movement and active commands."
+        ]
+      },
+      "sequence": 22,
+      "commitDate": "2026-11-03T00:13:47Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.11",
+      "title": "Time, gold and treasure",
+      "date": "2026-11-02",
+      "commit": "cd77265f9fb7ea44df8da58e72bae88872b8c7b4",
+      "archiveURL": "/Newgame/versions/cd77265f9fb7ea44df8da58e72bae88872b8c7b4/",
+      "available": true,
+      "description": "Track game days, earn castle gold, regenerate health and recover equipment from treasure chests.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Track game days, earn castle gold, regenerate health and recover equipment from treasure chests."
+        ]
+      },
+      "sequence": 20,
+      "commitDate": "2026-11-02T23:53:49Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.10",
+      "title": "Combat and survival",
+      "date": "2026-11-02",
+      "commit": "a6c29fac54447bcf9147c3ddf961d6d6326debb5",
+      "archiveURL": "/Newgame/versions/a6c29fac54447bcf9147c3ddf961d6d6326debb5/",
+      "available": true,
+      "description": "Fight using health, damage and armor, face animal retaliation and restart after the king falls.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Fight using health, damage and armor, face animal retaliation and restart after the king falls."
+        ]
+      },
+      "sequence": 18,
+      "commitDate": "2026-11-02T23:12:41Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.9",
+      "title": "Castles and connected walls",
+      "date": "2026-11-02",
+      "commit": "6d189b0ab7f0f13cacbc989ee91ecd8080e9a981",
+      "archiveURL": "/Newgame/versions/6d189b0ab7f0f13cacbc989ee91ecd8080e9a981/",
+      "available": true,
+      "description": "Build castles and dragged wall lines, then traverse connected wall tops and descend to ground destinations.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Build castles and dragged wall lines, then traverse connected wall tops and descend to ground destinations."
+        ]
+      },
+      "sequence": 16,
+      "commitDate": "2026-11-02T22:49:04Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.8",
+      "title": "Fog and horseback riding",
+      "date": "2026-11-02",
+      "commit": "c3614997c019fee254ce02f5efe255dc054d669d",
+      "archiveURL": "/Newgame/versions/c3614997c019fee254ce02f5efe255dc054d669d/",
+      "available": true,
+      "description": "Toggle fog of war, ride a horse and use the corresponding movement and sight bonuses.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Toggle fog of war, ride a horse and use the corresponding movement and sight bonuses."
+        ]
+      },
+      "sequence": 14,
+      "commitDate": "2026-11-02T22:03:11Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.7",
+      "title": "Hunting and meat",
+      "date": "2026-11-02",
+      "commit": "81ab03ed4c007d30eda7b7ffc793d7c0483ff474",
+      "archiveURL": "/Newgame/versions/81ab03ed4c007d30eda7b7ffc793d7c0483ff474/",
+      "available": true,
+      "description": "Hunt wandering rabbits, deer and boars, collect meat and consume food over active game time.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Hunt wandering rabbits, deer and boars, collect meat and consume food over active game time."
+        ]
+      },
+      "sequence": 12,
+      "commitDate": "2026-11-02T21:47:04Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.6",
+      "title": "Asset Library",
+      "date": "2026-11-02",
+      "commit": "6ae12dc3e0c07a5b64ef04f14565cae3acdc94cb",
+      "archiveURL": "/Newgame/versions/6ae12dc3e0c07a5b64ef04f14565cae3acdc94cb/",
+      "available": true,
+      "description": "Browse a shared object library with validated definitions, reusable graphics and asset fallbacks.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Browse a shared object library with validated definitions, reusable graphics and asset fallbacks."
+        ]
+      },
+      "sequence": 9,
+      "commitDate": "2026-11-02T21:28:59Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.5",
+      "title": "Eight-direction movement",
+      "date": "2026-11-02",
+      "commit": "2e0974c8dd812c0d77b3bdb2ad1963d1a457419f",
+      "archiveURL": "/Newgame/versions/2e0974c8dd812c0d77b3bdb2ad1963d1a457419f/",
+      "available": true,
+      "description": "Walk smooth normalized diagonals with eight facing poses and safe obstacle corners.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "improved": [
+          "Walk smooth normalized diagonals with eight facing poses and safe obstacle corners."
+        ]
+      },
+      "sequence": 7,
+      "commitDate": "2026-11-02T20:47:46Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.4",
+      "title": "Isometric kingdom",
+      "date": "2026-11-02",
+      "commit": "6714fc5338f101e4bddf6c21033d2754527dbd90",
+      "archiveURL": "/Newgame/versions/6714fc5338f101e4bddf6c21033d2754527dbd90/",
+      "available": true,
+      "description": "Explore a 100-by-100 isometric map with a crowned king, camera movement, zoom and timed stone replenishment.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "changed": [
+          "Explore a 100-by-100 isometric map with a crowned king, camera movement, zoom and timed stone replenishment."
+        ]
+      },
+      "sequence": 6,
+      "commitDate": "2026-11-02T20:22:43Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.3",
+      "title": "Towers and traversal",
+      "date": "2026-11-02",
+      "commit": "162efeb202028e9235e0711e1937a766b7e5a8de",
+      "archiveURL": "/Newgame/versions/162efeb202028e9235e0711e1937a766b7e5a8de/",
+      "available": true,
+      "description": "Place two-by-two towers for ten stones, preview their footprint and climb up or down.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Place two-by-two towers for ten stones, preview their footprint and climb up or down."
+        ]
+      },
+      "sequence": 4,
+      "commitDate": "2026-11-02T19:38:56Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.2",
+      "title": "Stones and inventory",
+      "date": "2026-11-02",
+      "commit": "f94d77a74ca921d47f50a3f7b86fa5b83eed01d7",
+      "archiveURL": "/Newgame/versions/f94d77a74ca921d47f50a3f7b86fa5b83eed01d7/",
+      "available": true,
+      "description": "Click stones to collect them and track the collected resource in the inventory.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Click stones to collect them and track the collected resource in the inventory."
+        ]
+      },
+      "sequence": 3,
+      "commitDate": "2026-11-02T19:17:05Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.1",
+      "title": "Click-to-move prototype",
+      "date": "2026-11-02",
+      "commit": "7291dc37059af80a0f3c5c801c0c4918206205f2",
+      "archiveURL": "/Newgame/versions/7291dc37059af80a0f3c5c801c0c4918206205f2/",
+      "available": true,
+      "description": "Move across the first playable map with click-to-move pathfinding.",
+      "releaseType": "initial",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Move across the first playable map with click-to-move pathfinding."
+        ]
+      },
+      "sequence": 1,
+      "commitDate": "2026-11-02T19:00:01Z",
+      "tag": null,
+      "current": false
+    }
+  ],
+  "builds": [
+    {
+      "version": "0.1.0+git.9e93982740685b0bd18543e1ce7f707b2102b7f1",
+      "gameVersion": "0.1.0",
+      "commit": "9e93982740685b0bd18543e1ce7f707b2102b7f1",
+      "date": "2026-11-03T18:27:46Z",
+      "title": "Step 24D: logistics UI, safe task restoration, weighted routes and verified integration",
+      "description": "Step 24D: logistics UI, safe task restoration, weighted routes and verified integration",
+      "archiveURL": "/Newgame/versions/9e93982740685b0bd18543e1ce7f707b2102b7f1/",
+      "available": true,
+      "sequence": 62,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.a454fe9d3cbe9df36871d95d835a228e723fa870",
+      "gameVersion": "0.1.0",
+      "commit": "a454fe9d3cbe9df36871d95d835a228e723fa870",
+      "date": "2026-11-03T17:46:31Z",
+      "title": "Step 24C: reserved physical construction supplies, royal deliveries and safe site refunds",
+      "description": "Step 24C: reserved physical construction supplies, royal deliveries and safe site refunds",
+      "archiveURL": "/Newgame/versions/a454fe9d3cbe9df36871d95d835a228e723fa870/",
+      "available": true,
+      "sequence": 61,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.f4e621b816c4177103157b711d22fbdb3dcf9ea1",
+      "gameVersion": "0.1.0",
+      "commit": "f4e621b816c4177103157b711d22fbdb3dcf9ea1",
+      "date": "2026-11-03T17:28:29Z",
+      "title": "Step 24B: shared Hauler transport AI, exclusive reservations and Logistics progression",
+      "description": "Step 24B: shared Hauler transport AI, exclusive reservations and Logistics progression",
+      "archiveURL": "/Newgame/versions/f4e621b816c4177103157b711d22fbdb3dcf9ea1/",
+      "available": true,
+      "sequence": 60,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.fb5aaf24c7fb77793f43b4725df438ae359abde2",
+      "gameVersion": "0.1.0",
+      "commit": "fb5aaf24c7fb77793f43b4725df438ae359abde2",
+      "date": "2026-11-03T17:08:35Z",
+      "title": "Step 24A: physical material stores, royal cargo and safe inventory migration",
+      "description": "Step 24A: physical material stores, royal cargo and safe inventory migration",
+      "archiveURL": "/Newgame/versions/fb5aaf24c7fb77793f43b4725df438ae359abde2/",
+      "available": true,
+      "sequence": 59,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.e864b0b05852548dc990f317a3bca1f6badf80f6",
+      "gameVersion": "0.1.0",
+      "commit": "e864b0b05852548dc990f317a3bca1f6badf80f6",
+      "date": "2026-11-03T16:59:24Z",
+      "title": "Persist fifteen ordered upgrade stages, milestone release authorization and final art pass",
+      "description": "Persist fifteen ordered upgrade stages, milestone release authorization and final art pass",
+      "archiveURL": "/Newgame/versions/e864b0b05852548dc990f317a3bca1f6badf80f6/",
+      "available": true,
+      "sequence": 58,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.e2fe98cafab5d03ce203c7437ccaea5c90ed8f48",
+      "gameVersion": "0.1.0",
+      "commit": "e2fe98cafab5d03ce203c7437ccaea5c90ed8f48",
+      "date": "2026-11-03T16:15:32Z",
+      "title": "Checkpoint published seasons and food consumption before physical logistics",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/e2fe98cafab5d03ce203c7437ccaea5c90ed8f48/",
+      "available": true,
+      "sequence": 57,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.74628eb60c7c0ee921f1274a9e418cead73985fa",
+      "gameVersion": "0.1.0",
+      "commit": "74628eb60c7c0ee921f1274a9e418cead73985fa",
+      "date": "2026-11-03T15:56:18Z",
+      "title": "Publish verified seasons, weather and food economy with 55 archived versions",
+      "description": "Publish verified seasons, weather and food economy with 55 archived versions",
+      "archiveURL": "/Newgame/versions/74628eb60c7c0ee921f1274a9e418cead73985fa/",
+      "available": true,
+      "sequence": 56,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.ddc9168972667cd3c969fd256e1ec7035f78072a",
+      "gameVersion": "0.1.0",
+      "commit": "ddc9168972667cd3c969fd256e1ec7035f78072a",
+      "date": "2026-11-03T15:53:51Z",
+      "title": "Add seasonal growth, daily weather and persistent resident food consumption",
+      "description": "Add seasonal growth, daily weather and persistent resident food consumption",
+      "archiveURL": "/Newgame/versions/ddc9168972667cd3c969fd256e1ec7035f78072a/",
+      "available": true,
+      "sequence": 55,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.1545aea42ece4f7ad448789650e61fb3c43d8116",
+      "gameVersion": "0.1.0",
+      "commit": "1545aea42ece4f7ad448789650e61fb3c43d8116",
+      "date": "2026-11-03T13:36:37Z",
+      "title": "Checkpoint published food production before seasons and daily food consumption",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/1545aea42ece4f7ad448789650e61fb3c43d8116/",
+      "available": true,
+      "sequence": 54,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.5e9b134ac2734550ed8ac19fe4f50a94a9cd58e7",
+      "gameVersion": "0.1.0",
+      "commit": "5e9b134ac2734550ed8ac19fe4f50a94a9cd58e7",
+      "date": "2026-11-03T13:34:56Z",
+      "title": "Publish verified food production and preserve 52 playable versions",
+      "description": "Publish verified food production and preserve 52 playable versions",
+      "archiveURL": "/Newgame/versions/5e9b134ac2734550ed8ac19fe4f50a94a9cd58e7/",
+      "available": true,
+      "sequence": 53,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.66311391900df17e0755bdac7e51db40a5516d13",
+      "gameVersion": "0.1.0",
+      "commit": "66311391900df17e0755bdac7e51db40a5516d13",
+      "date": "2026-11-03T13:32:39Z",
+      "title": "Add physical food production, granaries and persistent resource transfers",
+      "description": "Add physical food production, granaries and persistent resource transfers",
+      "archiveURL": "/Newgame/versions/66311391900df17e0755bdac7e51db40a5516d13/",
+      "available": true,
+      "sequence": 52,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.4ecbf0939353cf4ab3226423bdb0ee1b6d564039",
+      "gameVersion": "0.1.0",
+      "commit": "4ecbf0939353cf4ab3226423bdb0ee1b6d564039",
+      "date": "2026-11-03T12:52:53Z",
+      "title": "Checkpoint published farming and orchards before food production and storage",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/4ecbf0939353cf4ab3226423bdb0ee1b6d564039/",
+      "available": true,
+      "sequence": 51,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.339904f717e767cc1af4459e541cbb4b6edb867a",
+      "gameVersion": "0.1.0",
+      "commit": "339904f717e767cc1af4459e541cbb4b6edb867a",
+      "date": "2026-11-03T12:48:08Z",
+      "title": "Complete farming, physical crop harvests and persistent orchards with cached isometric graphics",
+      "description": "Complete farming, physical crop harvests and persistent orchards with cached isometric graphics",
+      "archiveURL": "/Newgame/versions/339904f717e767cc1af4459e541cbb4b6edb867a/",
+      "available": true,
+      "sequence": 50,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.d859f3cdea7056de79dcd97b16be322f38733f64",
+      "gameVersion": "0.1.0",
+      "commit": "d859f3cdea7056de79dcd97b16be322f38733f64",
+      "date": "2026-11-03T12:34:05Z",
+      "title": "Cache crop graphics while preserving per-tile depth and farming animation",
+      "description": "Cache crop graphics while preserving per-tile depth and farming animation",
+      "archiveURL": "/Newgame/versions/d859f3cdea7056de79dcd97b16be322f38733f64/",
+      "available": true,
+      "sequence": 49,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.4dd41fb2bfb9b1f58fb237d64a01f1049abb444e",
+      "gameVersion": "0.1.0",
+      "commit": "4dd41fb2bfb9b1f58fb237d64a01f1049abb444e",
+      "date": "2026-11-03T12:25:43Z",
+      "title": "Checkpoint farming implementation after cloud recovery; browser verification pending",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/4dd41fb2bfb9b1f58fb237d64a01f1049abb444e/",
+      "available": true,
+      "sequence": 48,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.fbba1d91bfff2dba946586fd74fd9d48ae0ece9b",
+      "gameVersion": "0.1.0",
+      "commit": "fbba1d91bfff2dba946586fd74fd9d48ae0ece9b",
+      "date": "2026-11-03T11:08:09Z",
+      "title": "Checkpoint published versioning system before farming and orchards",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/fbba1d91bfff2dba946586fd74fd9d48ae0ece9b/",
+      "available": true,
+      "sequence": 47,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.e8d41eb8ec75f12d7cb72b6f139becd023b8715d",
+      "gameVersion": "0.1.0",
+      "commit": "e8d41eb8ec75f12d7cb72b6f139becd023b8715d",
+      "date": "2026-11-03T11:06:22Z",
+      "title": "Add central game versioning, generated in-game changelog and local release workflow",
+      "description": "Add central game versioning, generated in-game changelog and local release workflow",
+      "archiveURL": "/Newgame/versions/e8d41eb8ec75f12d7cb72b6f139becd023b8715d/",
+      "available": true,
+      "sequence": 46,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.2d72b21609b4148421d24563b77bec76e4a0f2be",
+      "gameVersion": "0.1.0",
+      "commit": "2d72b21609b4148421d24563b77bec76e4a0f2be",
+      "date": "2026-11-03T10:54:40Z",
+      "title": "Checkpoint completed world configuration and queue upgrades 20 through 23",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/2d72b21609b4148421d24563b77bec76e4a0f2be/",
+      "available": true,
+      "sequence": 45,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.e0c4f5462905dea15bd8ca0ff7553cdee9ad7d41",
+      "gameVersion": "0.1.0",
+      "commit": "e0c4f5462905dea15bd8ca0ff7553cdee9ad7d41",
+      "date": "2026-11-03T10:38:12Z",
+      "title": "Confirm completed upgrade queue and successful 41-version archive publication",
+      "description": "Confirm completed upgrade queue and successful 41-version archive publication",
+      "archiveURL": "/Newgame/versions/e0c4f5462905dea15bd8ca0ff7553cdee9ad7d41/",
+      "available": true,
+      "sequence": 44,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.0b2377a442ef338d8d8b09da4f4b5c62c38870b6",
+      "gameVersion": "0.1.0",
+      "commit": "0b2377a442ef338d8d8b09da4f4b5c62c38870b6",
+      "date": "2026-11-03T08:38:32Z",
+      "title": "Record final archive publication blocked by GitHub authentication",
+      "description": "Record final archive publication blocked by GitHub authentication",
+      "archiveURL": "/Newgame/versions/0b2377a442ef338d8d8b09da4f4b5c62c38870b6/",
+      "available": true,
+      "sequence": 43,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.6570b7e4f4cbdd7e44942b7d953db2286a5199f6",
+      "gameVersion": "0.1.0",
+      "commit": "6570b7e4f4cbdd7e44942b7d953db2286a5199f6",
+      "date": "2026-11-03T08:36:36Z",
+      "title": "Complete upgrade queue and preserve advanced world release in version archive",
+      "description": "Complete upgrade queue and preserve advanced world release in version archive",
+      "archiveURL": "/Newgame/versions/6570b7e4f4cbdd7e44942b7d953db2286a5199f6/",
+      "available": true,
+      "sequence": 42,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.f22ded073c30f1e0fd60dceff2a244bb8f6cb087",
+      "gameVersion": "0.1.0",
+      "commit": "f22ded073c30f1e0fd60dceff2a244bb8f6cb087",
+      "date": "2026-11-03T08:34:35Z",
+      "title": "Add advanced world setup, daily economy configuration and wildlife respawn",
+      "description": "Add advanced world setup, daily economy configuration and wildlife respawn",
+      "archiveURL": "/Newgame/versions/f22ded073c30f1e0fd60dceff2a244bb8f6cb087/",
+      "available": true,
+      "sequence": 41,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.e571ab705acd594edabb177c84fff6a5e1899cde",
+      "gameVersion": "0.1.0",
+      "commit": "e571ab705acd594edabb177c84fff6a5e1899cde",
+      "date": "2026-11-03T08:21:45Z",
+      "title": "Checkpoint published new game setup before advanced world configuration",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/e571ab705acd594edabb177c84fff6a5e1899cde/",
+      "available": true,
+      "sequence": 40,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.ed58610b326ce27743957e9aee83ed2fb683ae72",
+      "gameVersion": "0.1.0",
+      "commit": "ed58610b326ce27743957e9aee83ed2fb683ae72",
+      "date": "2026-11-03T08:19:39Z",
+      "title": "Add deferred new game setup, difficulty and configurable starting populations",
+      "description": "Add deferred new game setup, difficulty and configurable starting populations",
+      "archiveURL": "/Newgame/versions/ed58610b326ce27743957e9aee83ed2fb683ae72/",
+      "available": true,
+      "sequence": 39,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.09ad285cdbec95edaf468fd115a81432c60b6354",
+      "gameVersion": "0.1.0",
+      "commit": "09ad285cdbec95edaf468fd115a81432c60b6354",
+      "date": "2026-11-03T08:14:12Z",
+      "title": "Checkpoint published archive before new game setup",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/09ad285cdbec95edaf468fd115a81432c60b6354/",
+      "available": true,
+      "sequence": 38,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.e4f092fcc20e93f8a276515fd779732c65bca596",
+      "gameVersion": "0.1.0",
+      "commit": "e4f092fcc20e93f8a276515fd779732c65bca596",
+      "date": "2026-11-03T08:12:22Z",
+      "title": "Archive 36 verified historical game commits with immutable Pages URLs",
+      "description": "Archive 36 verified historical game commits with immutable Pages URLs",
+      "archiveURL": "/Newgame/versions/e4f092fcc20e93f8a276515fd779732c65bca596/",
+      "available": true,
+      "sequence": 37,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.e104791dda5b4db6b79f4b5c757d4ff91256ff55",
+      "gameVersion": "0.1.0",
+      "commit": "e104791dda5b4db6b79f4b5c757d4ff91256ff55",
+      "date": "2026-11-03T07:26:02Z",
+      "title": "Checkpoint verified blueprint construction before historical version archive",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/e104791dda5b4db6b79f4b5c757d4ff91256ff55/",
+      "available": true,
+      "sequence": 36,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.43766dcac74b8c528b6219878a8ee217c796d84b",
+      "gameVersion": "0.1.0",
+      "commit": "43766dcac74b8c528b6219878a8ee217c796d84b",
+      "date": "2026-11-03T07:23:11Z",
+      "title": "Add blueprint construction, physical builders, shared work rewards and persistent sites",
+      "description": "Blueprinty, fyzická výstavba, spolupráce a dělení odměn.",
+      "archiveURL": "/Newgame/versions/43766dcac74b8c528b6219878a8ee217c796d84b/",
+      "available": true,
+      "sequence": 35,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.b09d5681cfb0a837ac2db6e6e27b001102789120",
+      "gameVersion": "0.1.0",
+      "commit": "b09d5681cfb0a837ac2db6e6e27b001102789120",
+      "date": "2026-11-03T06:24:04Z",
+      "title": "Checkpoint verified workplaces before blueprint construction upgrade",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/b09d5681cfb0a837ac2db6e6e27b001102789120/",
+      "available": true,
+      "sequence": 34,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.5636967ecddcc998e4e6cf48ea9e52bd90993ef6",
+      "gameVersion": "0.1.0",
+      "commit": "5636967ecddcc998e4e6cf48ea9e52bd90993ef6",
+      "date": "2026-11-03T06:21:24Z",
+      "title": "Deliver an injured hunter cargo on arrival before recovery",
+      "description": "Zraněný lovec předá nesený náklad před odpočinkem.",
+      "archiveURL": "/Newgame/versions/5636967ecddcc998e4e6cf48ea9e52bd90993ef6/",
+      "available": true,
+      "sequence": 33,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.0af9b89608654944b5fadbdde3d0907fd4a59dd8",
+      "gameVersion": "0.1.0",
+      "commit": "0af9b89608654944b5fadbdde3d0907fd4a59dd8",
+      "date": "2026-11-03T06:18:55Z",
+      "title": "Add staffed workplaces, physical deliveries, patrols and persistent worker management",
+      "description": "Kamenolom, lovecká chata, kasárna a fyzické doručování surovin.",
+      "archiveURL": "/Newgame/versions/0af9b89608654944b5fadbdde3d0907fd4a59dd8/",
+      "available": true,
+      "sequence": 32,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.dbdaeb9e2768efac36dfc625a22d5e379d6f739c",
+      "gameVersion": "0.1.0",
+      "commit": "dbdaeb9e2768efac36dfc625a22d5e379d6f739c",
+      "date": "2026-11-03T05:56:11Z",
+      "title": "Checkpoint verified talents and wage economy before workplace management upgrade",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/dbdaeb9e2768efac36dfc625a22d5e379d6f739c/",
+      "available": true,
+      "sequence": 31,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.124414727907ac0e082cb225fd2190c9f55882bd",
+      "gameVersion": "0.1.0",
+      "commit": "124414727907ac0e082cb225fd2190c9f55882bd",
+      "date": "2026-11-03T05:54:33Z",
+      "title": "Add permanent natural talents, prorated wages, debt ledger and economic overview",
+      "description": "Trvalé talenty, rozdílné počáteční skilly, mzdy a dluhy.",
+      "archiveURL": "/Newgame/versions/124414727907ac0e082cb225fd2190c9f55882bd/",
+      "available": true,
+      "sequence": 30,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.eb69116629b4f95de83da76c95f6dd233e4961a9",
+      "gameVersion": "0.1.0",
+      "commit": "eb69116629b4f95de83da76c95f6dd233e4961a9",
+      "date": "2026-11-03T05:44:08Z",
+      "title": "Checkpoint verified skills and professions before talents and wage economy",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/eb69116629b4f95de83da76c95f6dd233e4961a9/",
+      "available": true,
+      "sequence": 29,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.fc979b15a2663298d3a05f65e573579e8bab9d7c",
+      "gameVersion": "0.1.0",
+      "commit": "fc979b15a2663298d3a05f65e573579e8bab9d7c",
+      "date": "2026-11-03T05:42:58Z",
+      "title": "Add individual skills, professions and physical worker AI with persistent tasks",
+      "description": "Poddaní, šest skillů, profese, pracovní AI a migrace.",
+      "archiveURL": "/Newgame/versions/fc979b15a2663298d3a05f65e573579e8bab9d7c/",
+      "available": true,
+      "sequence": 28,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.1899d3a5059b70881c7d2e9c4b5a2dbba9b90111",
+      "gameVersion": "0.1.0",
+      "commit": "1899d3a5059b70881c7d2e9c4b5a2dbba9b90111",
+      "date": "2026-11-03T01:06:10Z",
+      "title": "Checkpoint verified individual experience before skills and professions upgrade",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/1899d3a5059b70881c7d2e9c4b5a2dbba9b90111/",
+      "available": true,
+      "sequence": 27,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.c8a87c72733494f5f312dca09a3c5af99254ed44",
+      "gameVersion": "0.1.0",
+      "commit": "c8a87c72733494f5f312dca09a3c5af99254ed44",
+      "date": "2026-11-03T00:57:36Z",
+      "title": "Add individual experience, completion rewards, level feedback and persistent replay guards",
+      "description": "Individuální XP a levely, odměny a ochrana před opakováním.",
+      "archiveURL": "/Newgame/versions/c8a87c72733494f5f312dca09a3c5af99254ed44/",
+      "available": true,
+      "sequence": 26,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.b8daafb9791990ac10a23badeb9ecbdcec19c1d7",
+      "gameVersion": "0.1.0",
+      "commit": "b8daafb9791990ac10a23badeb9ecbdcec19c1d7",
+      "date": "2026-11-03T00:36:11Z",
+      "title": "Checkpoint verified path wear before universal experience upgrade",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/b8daafb9791990ac10a23badeb9ecbdcec19c1d7/",
+      "available": true,
+      "sequence": 25,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.29a9cec61de6dd5b3de4f52c154e8ebbabad3907",
+      "gameVersion": "0.1.0",
+      "commit": "29a9cec61de6dd5b3de4f52c154e8ebbabad3907",
+      "date": "2026-11-03T00:32:09Z",
+      "title": "Add persistent terrain path wear, connected trails, recovery and surface speeds",
+      "description": "Vyšlapávání, spojování a zarůstání pěšin.",
+      "archiveURL": "/Newgame/versions/29a9cec61de6dd5b3de4f52c154e8ebbabad3907/",
+      "available": true,
+      "sequence": 24,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.af5077ace77bdfd4c89e93615f09af64369b612a",
+      "gameVersion": "0.1.0",
+      "commit": "af5077ace77bdfd4c89e93615f09af64369b612a",
+      "date": "2026-11-03T00:17:49Z",
+      "title": "Checkpoint verified save load systems before terrain path wear upgrade",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/af5077ace77bdfd4c89e93615f09af64369b612a/",
+      "available": true,
+      "sequence": 23,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.574ef6be24993b0ab8b5efc27320fe562be455c2",
+      "gameVersion": "0.1.0",
+      "commit": "574ef6be24993b0ab8b5efc27320fe562be455c2",
+      "date": "2026-11-03T00:13:47Z",
+      "title": "Add main menu and validated IndexedDB save load with precise world restoration",
+      "description": "Hlavní menu a místní Save/Load přes IndexedDB.",
+      "archiveURL": "/Newgame/versions/574ef6be24993b0ab8b5efc27320fe562be455c2/",
+      "available": true,
+      "sequence": 22,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.72bdb4177e7e3391aed529e2324cb015457d5d8b",
+      "gameVersion": "0.1.0",
+      "commit": "72bdb4177e7e3391aed529e2324cb015457d5d8b",
+      "date": "2026-11-02T23:55:06Z",
+      "title": "Checkpoint verified time and treasure systems before save load upgrade",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/72bdb4177e7e3391aed529e2324cb015457d5d8b/",
+      "available": true,
+      "sequence": 21,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.cd77265f9fb7ea44df8da58e72bae88872b8c7b4",
+      "gameVersion": "0.1.0",
+      "commit": "cd77265f9fb7ea44df8da58e72bae88872b8c7b4",
+      "date": "2026-11-02T23:53:49Z",
+      "title": "Add active game time, regeneration, castle income and treasure equipment",
+      "description": "Herní čas, regenerace, příjem zlata, poklad a vybavení.",
+      "archiveURL": "/Newgame/versions/cd77265f9fb7ea44df8da58e72bae88872b8c7b4/",
+      "available": true,
+      "sequence": 20,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.f379c5110a494be6121439cc42cad943e14100c3",
+      "gameVersion": "0.1.0",
+      "commit": "f379c5110a494be6121439cc42cad943e14100c3",
+      "date": "2026-11-02T23:16:57Z",
+      "title": "Checkpoint combat and game over before time economy and treasure upgrade",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/f379c5110a494be6121439cc42cad943e14100c3/",
+      "available": true,
+      "sequence": 19,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.a6c29fac54447bcf9147c3ddf961d6d6326debb5",
+      "gameVersion": "0.1.0",
+      "commit": "a6c29fac54447bcf9147c3ddf961d6d6326debb5",
+      "date": "2026-11-02T23:12:41Z",
+      "title": "Add frame-independent combat, unit health, retaliation and game over restart",
+      "description": "HP, DPS, zbroj, odveta, smrt a restart hry.",
+      "archiveURL": "/Newgame/versions/a6c29fac54447bcf9147c3ddf961d6d6326debb5/",
+      "available": true,
+      "sequence": 18,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.c967ce8487c73ed6916746f008194fdcd6aa09a4",
+      "gameVersion": "0.1.0",
+      "commit": "c967ce8487c73ed6916746f008194fdcd6aa09a4",
+      "date": "2026-11-02T22:50:56Z",
+      "title": "Checkpoint castle and wall networks before combat upgrade",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/c967ce8487c73ed6916746f008194fdcd6aa09a4/",
+      "available": true,
+      "sequence": 17,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.6d189b0ab7f0f13cacbc989ee91ecd8080e9a981",
+      "gameVersion": "0.1.0",
+      "commit": "6d189b0ab7f0f13cacbc989ee91ecd8080e9a981",
+      "date": "2026-11-02T22:49:04Z",
+      "title": "Add castle construction, atomic wall dragging and connected roof navigation",
+      "description": "Hrady, tažení hradeb a chůze po propojených vrcholech.",
+      "archiveURL": "/Newgame/versions/6d189b0ab7f0f13cacbc989ee91ecd8080e9a981/",
+      "available": true,
+      "sequence": 16,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.b0018a326f97a6f5a6774c96a36a2c0992cf1144",
+      "gameVersion": "0.1.0",
+      "commit": "b0018a326f97a6f5a6774c96a36a2c0992cf1144",
+      "date": "2026-11-02T22:27:20Z",
+      "title": "Checkpoint fog settings and riding before castles and wall networks",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/b0018a326f97a6f5a6774c96a36a2c0992cf1144/",
+      "available": true,
+      "sequence": 15,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.c3614997c019fee254ce02f5efe255dc054d669d",
+      "gameVersion": "0.1.0",
+      "commit": "c3614997c019fee254ce02f5efe255dc054d669d",
+      "date": "2026-11-02T22:03:11Z",
+      "title": "Add persistent fog settings, mounted king movement and vision modifiers",
+      "description": "Fog of War, nastavení a opakované nasedání na koně.",
+      "archiveURL": "/Newgame/versions/c3614997c019fee254ce02f5efe255dc054d669d/",
+      "available": true,
+      "sequence": 14,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.9c814838783e73b5979bbab8ebfd9b2523b63491",
+      "gameVersion": "0.1.0",
+      "commit": "9c814838783e73b5979bbab8ebfd9b2523b63491",
+      "date": "2026-11-02T21:51:02Z",
+      "title": "Checkpoint hunting and food before fog settings and riding upgrade",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/9c814838783e73b5979bbab8ebfd9b2523b63491/",
+      "available": true,
+      "sequence": 13,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.81ab03ed4c007d30eda7b7ffc793d7c0483ff474",
+      "gameVersion": "0.1.0",
+      "commit": "81ab03ed4c007d30eda7b7ffc793d7c0483ff474",
+      "date": "2026-11-02T21:47:04Z",
+      "title": "Add wandering wildlife, click-to-hunt meat drops and timed food consumption",
+      "description": "Pohybující se zvěř, lov, maso a spotřeba potravy.",
+      "archiveURL": "/Newgame/versions/81ab03ed4c007d30eda7b7ffc793d7c0483ff474/",
+      "available": true,
+      "sequence": 12,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.e1f70f7b3cbcacfb333e667116c9998176efe0ee",
+      "gameVersion": "0.1.0",
+      "commit": "e1f70f7b3cbcacfb333e667116c9998176efe0ee",
+      "date": "2026-11-02T21:36:37Z",
+      "title": "Checkpoint published asset library before hunting and food upgrade",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/e1f70f7b3cbcacfb333e667116c9998176efe0ee/",
+      "available": true,
+      "sequence": 11,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.3d1c2f2488166c60e83e06a2e207fb4745657ed1",
+      "gameVersion": "0.1.0",
+      "commit": "3d1c2f2488166c60e83e06a2e207fb4745657ed1",
+      "date": "2026-11-02T21:32:34Z",
+      "title": "Checkpoint asset library before combat and wildlife upgrade",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/3d1c2f2488166c60e83e06a2e207fb4745657ed1/",
+      "available": true,
+      "sequence": 10,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.6ae12dc3e0c07a5b64ef04f14565cae3acdc94cb",
+      "gameVersion": "0.1.0",
+      "commit": "6ae12dc3e0c07a5b64ef04f14565cae3acdc94cb",
+      "date": "2026-11-02T21:28:59Z",
+      "title": "Add validated asset registry, shared assets and read-only object gallery",
+      "description": "Univerzální knihovna objektů a vlastní grafické podklady.",
+      "archiveURL": "/Newgame/versions/6ae12dc3e0c07a5b64ef04f14565cae3acdc94cb/",
+      "available": true,
+      "sequence": 9,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.4d3d63fa7432736dc2e7248ff81e9bc20bbef559",
+      "gameVersion": "0.1.0",
+      "commit": "4d3d63fa7432736dc2e7248ff81e9bc20bbef559",
+      "date": "2026-11-02T20:57:38Z",
+      "title": "Checkpoint working eight-direction game before asset library",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/4d3d63fa7432736dc2e7248ff81e9bc20bbef559/",
+      "available": true,
+      "sequence": 8,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.2e0974c8dd812c0d77b3bdb2ad1963d1a457419f",
+      "gameVersion": "0.1.0",
+      "commit": "2e0974c8dd812c0d77b3bdb2ad1963d1a457419f",
+      "date": "2026-11-02T20:47:46Z",
+      "title": "Add eight-direction A* movement and king animation with safe diagonal corners",
+      "description": "Osm směrů pohybu a animace, normalizovaná rychlost a bezpečné rohy.",
+      "archiveURL": "/Newgame/versions/2e0974c8dd812c0d77b3bdb2ad1963d1a457419f/",
+      "available": true,
+      "sequence": 7,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.6714fc5338f101e4bddf6c21033d2754527dbd90",
+      "gameVersion": "0.1.0",
+      "commit": "6714fc5338f101e4bddf6c21033d2754527dbd90",
+      "date": "2026-11-02T20:22:43Z",
+      "title": "Convert game to isometric 100x100 world with king, camera and timed stone spawns",
+      "description": "Izometrická mapa 100 × 100, král, kamera a doplňování kamenů.",
+      "archiveURL": "/Newgame/versions/6714fc5338f101e4bddf6c21033d2754527dbd90/",
+      "available": true,
+      "sequence": 6,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.bf049d5ecacbc9301dc4e04dd6d05534a94fd5e5",
+      "gameVersion": "0.1.0",
+      "commit": "bf049d5ecacbc9301dc4e04dd6d05534a94fd5e5",
+      "date": "2026-11-02T19:42:49Z",
+      "title": "Checkpoint working tower prototype before isometric upgrade",
+      "description": "Kontrolní verze připravená před následujícím rozšířením.",
+      "archiveURL": "/Newgame/versions/bf049d5ecacbc9301dc4e04dd6d05534a94fd5e5/",
+      "available": true,
+      "sequence": 5,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.162efeb202028e9235e0711e1937a766b7e5a8de",
+      "gameVersion": "0.1.0",
+      "commit": "162efeb202028e9235e0711e1937a766b7e5a8de",
+      "date": "2026-11-02T19:38:56Z",
+      "title": "Add tower construction, placement preview and animated tower traversal",
+      "description": "Věže 2 × 2, náhled stavby a animovaný vstup i sestup.",
+      "archiveURL": "/Newgame/versions/162efeb202028e9235e0711e1937a766b7e5a8de/",
+      "available": true,
+      "sequence": 4,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.f94d77a74ca921d47f50a3f7b86fa5b83eed01d7",
+      "gameVersion": "0.1.0",
+      "commit": "f94d77a74ca921d47f50a3f7b86fa5b83eed01d7",
+      "date": "2026-11-02T19:17:05Z",
+      "title": "Add collectible stones and resource inventory",
+      "description": "Sbírání kamenů kliknutím a společný inventář.",
+      "archiveURL": "/Newgame/versions/f94d77a74ca921d47f50a3f7b86fa5b83eed01d7/",
+      "available": true,
+      "sequence": 3,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.1c078de6c892990164867548ee55cafd21f03eb2",
+      "gameVersion": "0.1.0",
+      "commit": "1c078de6c892990164867548ee55cafd21f03eb2",
+      "date": "2026-11-02T19:04:48Z",
+      "title": "Trigger Pages deployment after enabling GitHub Pages",
+      "description": "Zprovoznění publikování prvního prototypu přes GitHub Pages.",
+      "archiveURL": "/Newgame/versions/1c078de6c892990164867548ee55cafd21f03eb2/",
+      "available": true,
+      "sequence": 2,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.7291dc37059af80a0f3c5c801c0c4918206205f2",
+      "gameVersion": "0.1.0",
+      "commit": "7291dc37059af80a0f3c5c801c0c4918206205f2",
+      "date": "2026-11-02T19:00:01Z",
+      "title": "Create Phaser click-to-move prototype and Pages workflow",
+      "description": "První hratelná mapa s klikáním a hledáním cesty.",
+      "archiveURL": "/Newgame/versions/7291dc37059af80a0f3c5c801c0c4918206205f2/",
+      "available": true,
+      "sequence": 1,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    }
+  ]
+}

@@ -1,6 +1,54 @@
 [
   {
     "schema": 1,
+    "commit": "fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265",
+    "tree": "13d3a77775634d96d684bc73aaa19841cbe75b70",
+    "date": "2026-11-03T19:26:57Z",
+    "sequence": 65,
+    "subject": "Add verified historical version catalog and milestone release gates",
+    "name": "Roční období, počasí a potrava",
+    "description": "Add verified historical version catalog and milestone release gates",
+    "basePath": "/Newgame/versions/fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "8ba14e17f85cb97275c3a47996bb44a6d5ba1864",
+    "tree": "8c31947aa83e0ce2b91cd8df0aef96a141dc3fef",
+    "date": "2026-11-03T18:40:05Z",
+    "sequence": 64,
+    "subject": "Record successful logistics deployment and begin ordered master milestone M1",
+    "name": "Roční období, počasí a potrava",
+    "description": "Record successful logistics deployment and begin ordered master milestone M1",
+    "basePath": "/Newgame/versions/8ba14e17f85cb97275c3a47996bb44a6d5ba1864/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "e721a68f45ecd91f0eed1d321f40a6d8b59100ea",
+    "tree": "d502822cde1a7db3fd944a51ec4920cd215daa0f",
+    "date": "2026-11-03T18:32:29Z",
+    "sequence": 63,
+    "subject": "Publish verified physical logistics and 62 immutable playable game versions",
+    "name": "Roční období, počasí a potrava",
+    "description": "Publish verified physical logistics and 62 immutable playable game versions",
+    "basePath": "/Newgame/versions/e721a68f45ecd91f0eed1d321f40a6d8b59100ea/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
     "commit": "9e93982740685b0bd18543e1ce7f707b2102b7f1",
     "tree": "8878097c222485a7309b355aee8e1555fdda1fa9",
     "date": "2026-11-03T18:27:46Z",

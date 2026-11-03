@@ -4,16 +4,16 @@
 
 Krok24 je dokončen a publikován: `e721a68`, Pages `41694834348` **Success** (58 s), původní adresa hry zachována. A `fb5aaf2`, B `f4e621b`, C `a454fe9`, D `9e93982`;271/271 testů, build, skutečné UI/IndexedDB, starší savy5/6, fyzický potravinový řetězec, ruční přeprava, zimní20NPC kolem57 FPS a62 neměnných archivů ověřeny. Podrobnosti: [step24 verification](verification/step-24.md).
 
-Právě začíná master, etapa01/29A. Výchozí zdroje/testy/build/Pages jsou ověřené a checkpoint je publikovaný commit výše. Katalog skutečné historie, menu archivů, propojený rozbalovací Changelog a spustitelný release gate jsou implementované. 282/282 testů, čisté npm ci, build a skutečný browser/IndexedDB smoke prošly. Zbývá sestavit vlastní historický archiv nového zdrojového commitu a uzavřít report. Menší etapy se ukládají a zálohují do `backup/master-progress`; veřejná MINOR vydání/tagy následují až po M1–M5 release gate. Aktuální package0.1.0 a Save7 zůstávají oddělené.
+Master etapa01/29A je dokončena: zdroj `fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265`,282/282 testů, čisté npm ci, build, skutečný browser/IndexedDB včetně starého savu2→7,65 neměnných archivů (3 nové,0 vynechaných). [Report etapy01](verification/master-01.md). Právě následuje etapa02/36; předchozí funkce i veřejné Pages zůstávají funkční. Pracovní etapy se zálohují do `backup/master-progress`; MINOR/tagy následují pouze po M1–M5 gate. Package0.1.0 a Save7 zůstávají oddělené.
 
 ## Master: 15 etap, 5 milníků
 
-Etapa01 právě probíhá (PARTIAL); ostatní jsou PENDING. U dokončené etapy doplnit konkrétní chování, testy (passed/failed/skipped), commit, stav milníku a další etapu. DONE lze zapsat pouze po implementaci a skutečné kontrole.
+Etapa01 je DONE; etapa02 právě začíná, ostatní jsou PENDING. U dokončené etapy doplnit konkrétní chování, testy (passed/failed/skipped), commit, stav milníku a další etapu. DONE lze zapsat pouze po implementaci a skutečné kontrole.
 
 | Etapa | Krok | Milník | Stav | Commit / ověření |
 |---|---|---|---|---|
-| 01 | 29A: Version Archive, Changelog & Release Foundation | M1 | PARTIAL | Implementováno;282/282 testů, npm ci, build a browser/IndexedDB. Čeká vlastní archiv ze zdrojového commitu a finální report. |
-| 02 | 36: Building Categories & Unlock Requirements | M1 | PENDING | Nezahájeno |
+| 01 | 29A: Version Archive, Changelog & Release Foundation | M1 | DONE | `fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265`;282/282, npm ci/build/browser/Save2→7,65 SHA-256 archivů;[report](verification/master-01.md) |
+| 02 | 36: Building Categories & Unlock Requirements | M1 | PARTIAL | Začíná analýza současných kategorií, registru a dokončených budov; implementace zbývá |
 | 03 | 33: Seasons ON/OFF | M1 | PENDING | Nezahájeno |
 | 04 | 28: Circular Fog of War & Map Memory | M1 | PENDING | Nezahájeno |
 | 05 | 30: Population Sidebar & Skill Sorting | M1 | PENDING | Nezahájeno |
