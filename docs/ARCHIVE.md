@@ -4,6 +4,8 @@ Archiv je na **https://tom161819.github.io/Newgame/versions/**. Aktuální hra z
 
 První archiv obsahuje 36 skutečných commitů hlavní vývojové historie od `7291dc3` po `e104791`, včetně kontrolních bodů. Každý prošel svými původními testy, vlastním Vite buildem a spuštěním v Chromium. Kontrolovaly se vstupní stránka, vykreslená mapa, načítané obrázky a chyby HTTP či JavaScriptu. Nevydané pracovní stash commity se nepublikují.
 
+Po dokončení kroků 18b a 19 byl archiv rozšířen na **41 verzí**, nejnovější je `f22ded0` (pokročilá konfigurace světa). Dřívější snapshoty zůstaly beze změny.
+
 ## Co je neměnné
 
 Každá verze má adresu `versions/<celý-commit-sha>/` a vlastní soubory v `public/versions/<celý-commit-sha>/`. `snapshot.json` zaznamenává commit, Git tree, datum, popis, výsledky kontrol a SHA-256 každého herního souboru.

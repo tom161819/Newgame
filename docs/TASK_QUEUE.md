@@ -34,8 +34,10 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 - [Krok 18b — New Game Setup](requests/step-18b.md): commit `ed58610`, Pages run `41602452485` úspěšně nasazeno. 157 testů; nastavení, obtížnosti, počty objektů, skutečný respawn 100 kamenů, přesné Save/Load a mobilní i produkční rozhraní ověřeny. Archiv rozšířen na 38 skutečných commitů.
 
+- [Krok 19 — Advanced New Game Setup & World Configuration](requests/step-19.md): commit `f22ded0`, Pages run `41604307007` úspěšně nasazeno. 166 testů; pokročilé nastavení, hotový hrad zdarma, počáteční zlato a dohled, délky dne včetně mezd, skutečný 30sekundový respawn a 60sekundový den, přesné Save/Load v2 i migrace skutečné verze v1 ověřeny. Archiv obsahuje 41 funkčních verzí ze skutečných commitů včetně tohoto kroku.
+
 ## Následuje
 
-1. **Právě probíhá:** [Krok 19 — Advanced New Game Setup & World Configuration](requests/step-19.md).
+**Fronta je dokončená.** Žádný z dosud dodaných úkolů nezůstává rozpracovaný. Další požadavky se přidávají na konec a dokončují jednotlivě s ověřením, commitem a nasazením na GitHub Pages.
 
 Číslo 18 bylo použité u dvou různých zadání; obě se zachovávají v pořadí doručení jako 18a a 18b. Neaplikovat budoucí mechaniky před jejich krokem: krok 6 má okamžitý lov bez HP, krok 7 přidává koně/FoW, krok 8 Castle/Wall, skutečné souboje až krok 9.

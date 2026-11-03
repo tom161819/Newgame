@@ -1,6 +1,22 @@
 [
   {
     "schema": 1,
+    "commit": "f22ded073c30f1e0fd60dceff2a244bb8f6cb087",
+    "tree": "471558ec4574153e492b530adc1d1c1fad58366d",
+    "date": "2026-11-03T08:34:35Z",
+    "sequence": 41,
+    "subject": "Add advanced world setup, daily economy configuration and wildlife respawn",
+    "name": "Pokročilá konfigurace světa",
+    "description": "Add advanced world setup, daily economy configuration and wildlife respawn",
+    "basePath": "/Newgame/versions/f22ded073c30f1e0fd60dceff2a244bb8f6cb087/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
     "commit": "e571ab705acd594edabb177c84fff6a5e1899cde",
     "tree": "534d8745ba02da30f7c51ccae0e491006838327a",
     "date": "2026-11-03T08:21:45Z",
