@@ -1,6 +1,70 @@
 [
   {
     "schema": 1,
+    "commit": "d859f3cdea7056de79dcd97b16be322f38733f64",
+    "tree": "4b41fd262c926299fe0f6f86a535aab87e7a89b0",
+    "date": "2026-11-03T12:34:05Z",
+    "sequence": 49,
+    "subject": "Cache crop graphics while preserving per-tile depth and farming animation",
+    "name": "Zemědělství a sady",
+    "description": "Cache crop graphics while preserving per-tile depth and farming animation",
+    "basePath": "/Newgame/versions/d859f3cdea7056de79dcd97b16be322f38733f64/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "4dd41fb2bfb9b1f58fb237d64a01f1049abb444e",
+    "tree": "a43dba55daf1f9e76fb9fda8d9d12c0084cdecc8",
+    "date": "2026-11-03T12:25:43Z",
+    "sequence": 48,
+    "subject": "Checkpoint farming implementation after cloud recovery; browser verification pending",
+    "name": "Zemědělství a sady · kontrolní bod",
+    "description": "Kontrolní verze připravená před následujícím rozšířením.",
+    "basePath": "/Newgame/versions/4dd41fb2bfb9b1f58fb237d64a01f1049abb444e/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "fbba1d91bfff2dba946586fd74fd9d48ae0ece9b",
+    "tree": "8b593b04a23c714f624bd02624727f9dc0477040",
+    "date": "2026-11-03T11:08:09Z",
+    "sequence": 47,
+    "subject": "Checkpoint published versioning system before farming and orchards",
+    "name": "Verzování a Changelog · kontrolní bod",
+    "description": "Kontrolní verze připravená před následujícím rozšířením.",
+    "basePath": "/Newgame/versions/fbba1d91bfff2dba946586fd74fd9d48ae0ece9b/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "e8d41eb8ec75f12d7cb72b6f139becd023b8715d",
+    "tree": "26d390402cdbd4cf45f0c0d76cbf813dc88328c7",
+    "date": "2026-11-03T11:06:22Z",
+    "sequence": 46,
+    "subject": "Add central game versioning, generated in-game changelog and local release workflow",
+    "name": "Verzování a Changelog",
+    "description": "Add central game versioning, generated in-game changelog and local release workflow",
+    "basePath": "/Newgame/versions/e8d41eb8ec75f12d7cb72b6f139becd023b8715d/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
     "commit": "2d72b21609b4148421d24563b77bec76e4a0f2be",
     "tree": "d1e5b22ab5f6f2a8e566af16016423f61f81004d",
     "date": "2026-11-03T10:54:40Z",

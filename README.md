@@ -318,3 +318,9 @@ Save v2 zachovává konfiguraci odděleně od aktuálního nastavení dohledu, z
 Aktuální verzi určuje pouze `package.json.version`; hlavní menu a Settings ji zobrazují automaticky. `CHANGELOG.md` obsahuje jedinou autoritativní historii, kterou Vite při buildu převádí na hráčská data bez backendu. Changelog v hlavním menu podporuje Back/Escape, scrollování a lokální indikátor NEW při přechodu na novější vydání. Sekce Unreleased zůstává skrytá.
 
 Dokončené změny zapisuj anglicky do Unreleased. Číslované vydání se připravuje jen na výslovný pokyn: `npm run release:prepare -- minor` (nebo patch/major), potom validace, testy, build a kontrola změn. Skript sám neprovádí commit, tag ani publikování. Podrobnosti jsou v [docs/RELEASING.md](docs/RELEASING.md); pravidla pro Codex v [AGENTS.md](AGENTS.md). Save Schema Version je samostatná a tento krok ji nemění.
+
+### Zemědělství a sady
+
+Farmhouse (2 × 2, 10 Stone) zaměstná tři existující Farmáře v rádiusu 15 políček. Wheat Field (3 × 3, 3 Stone) roste dva herní dny a poskytuje 8 Wheat; Orchard (3 × 3, 6 Stone) roste tři dny a poskytuje 6 Apple. Všechny objekty se staví původními blueprinty. Dokončenými pozemky lze procházet; rozestavěné pozemky blokují pohyb a nerostou.
+
+Rostliny rostou i bez obsluhy, ale sklizeň vyžaduje rezervovaný pozemek, fyzický příchod farmáře a aktivní práci. Farming zrychluje pouze tuto práci, nikoli biologický růst. XP a suroviny vznikají jednou za sklizeň. Růstové fáze a rozpracovaná sklizeň se obnovují Save/Load; starší schémata 1/2 se migrují na schéma 3. Verze hry zůstává nezávisle určená package.json. Apple je jedlé v původním jediném minutovém potravinovém cyklu, Wheat se přímo nekonzumuje.

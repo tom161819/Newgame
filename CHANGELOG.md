@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+### Added
+- Build Farmhouses, Wheat Fields and Orchards, and assign up to three Farmers to each Farmhouse.
+- Grow wheat through four stages over two game days and fruit over three game days; farmers physically harvest 8 Wheat or 6 Apple within their workplace radius.
+- Earn Farming experience for completed harvests, eat apples through the existing food cycle, and save growing crops and reserved work without duplicate harvests.
+
+### Improved
+- Share cached crop textures while preserving per-tile depth so villagers can walk through fields and among fruit trees smoothly.
+
 ## [0.1.0] - 2026-11-03
 
 ### Added
