@@ -152,6 +152,16 @@ Simulace používá skutečné `game.loop.rawDelta`; vyhlazené a ořezané Phas
 
 `serializeGameState(scene)` vrací pouze JSON data s `saveVersion`. `validateGameState` kontroluje verzi, rozměry mapy, definice, ID/reference, obsazení, rozsahy statistik a časovačů. `loadGameState` rekonstruuje instance a jejich vzájemné reference před prvním aktivním snímkem. Při obnovení se přeskočí všechny počáteční spawny; obsah truhly se nepřegeneruje. `Inventory`, čas, potrava, spawny, produkce a vybavení mají `exportState`/`importState`; serializace jednotek a příkazů převádí reference na ID. Nové trvalé vlastnosti přidej do DTO, validace, obnovy a testů v `tests/save-load.test.js`. Phaser GameObjects, textury a callbacky se nikdy neukládají.
 
+## Individuální zkušenosti
+
+`src/data/experience.js` obsahuje jedinou křivku levelů 1–50, celkové prahy a tabulku odměn. Definice lidské postavy může zadat `experience: {initialLevel: 1, maxLevel: 50, enabled: true, gainMultiplier: 1}`. Model `character.experience` drží celkový postup a slovník budoucích násobitelů; samostatné skilly zatím nejsou aktivní. Zvířata zkušenosti nezískávají.
+
+Dokončující systém publikuje na `GameActivityBus` událost s konkrétním `actor`, typem činnosti a objektu. Sběr se hlásí až po odstranění položky a připsání inventáře, lov až při skutečné smrti se známým původcem útoku a stavba až po úspěšné platbě a dokončení. Řada hradeb posílá počet nových segmentů. `ExperienceSystem` má `addXP`, `getXPRequired`, `checkLevelUp`, `getLevelProgress`, `on('levelUp', listener)` a `on('xp', listener)`. Ostatní systémy nepřepisují XP přímo.
+
+Bus přiděluje monotónní ID `activity-N`. Experience System si zpracované ID pamatuje i v save, takže opakované doručení téže události nic nepřidá. Nové akce na stejném políčku dostanou nové ID a fungují běžně. `CombatSystem` posílá `damage(target, amount, attacker)` a `death(target, killer)`; rozhodující příspěvek při smrti je deterministický při shodě podle ID a nezávisí na pořadí ani FPS. Prozatím se odměňuje dokončený lov; částečné poškození nepřidává celkové XP.
+
+`ExperienceFeedback` vykresluje HUD a krátké efekty s viditelností podle kamery a Fog of War. `UnitPanel` je společný přehled lidských jednotek; král ho otevírá z horní lišty, budoucí poddané poskytne `GameScene.selectableHumans()`. Panel nemění aktuální příkaz. `exportState`/`importState` systému uchovává čítač a zpracované události, jednotlivé postavy ukládají vlastní XP model. Import bez XP bezpečně použije level 1 a žádné historické odměny.
+
 ## Vyšlapávání terénu
 
 `src/data/pathWear.js` obsahuje prahy, rychlosti, dobu zarůstání a ID čtyř povrchů. `PathWearSystem` drží číselná pole skóre, úrovní a posledních průchodů pro 10 000 buněk a množinu aktivních buněk pro denní zarůstání. Při změně dne zpracuje pouze tuto množinu. Podklad `terrainGrid === 0` je nyní tráva; pro budoucí typy terénu lze předat `isGrass`.

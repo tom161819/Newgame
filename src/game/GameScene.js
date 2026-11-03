@@ -38,6 +38,10 @@ import { ChestView } from './ChestView.js';
 import { PauseManager } from '../systems/PauseManager.js';
 import { loadGameState } from '../systems/GameStateLoader.js';
 import { PathWearSystem } from '../systems/PathWearSystem.js';
+import { GameActivityBus } from '../systems/GameActivityBus.js';
+import { ExperienceSystem } from '../systems/ExperienceSystem.js';
+import { ExperienceFeedback } from '../ui/ExperienceFeedback.js';
+import { UnitPanel } from '../ui/UnitPanel.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -66,6 +70,7 @@ export class GameScene extends Phaser.Scene {
     this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
     this.inventory=new Inventory();
     this.gameTime=new GameTimeSystem();this.regeneration=new RegenerationSystem();
+    this.activities=new GameActivityBus();this.experienceSystem=new ExperienceSystem(this.activities);
     this.pathWear=new PathWearSystem({map:this.map,terrain:this.terrainGrid,time:this.gameTime});this.terrain.setPathWear(this.pathWear);
     this.pauseManager=new PauseManager(this);
     this.noticeRemaining=0;document.querySelector('#day-notice').hidden=true;
@@ -102,7 +107,7 @@ export class GameScene extends Phaser.Scene {
     this.combatFeedback=new CombatFeedback(this);
     this.combat.on('attack',(attacker,target)=>{if(this.animalSystem.animals.has(target.id))this.animalSystem.onAttacked(target,attacker);});
     this.combat.on('damage',unit=>this.combatFeedback.hit(unit));
-    this.combat.on('death',unit=>this.onUnitDeath(unit));
+    this.combat.on('death',(unit,killer)=>this.onUnitDeath(unit,killer));
     this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
     this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.terrain.setDebug(settings.pathWearDebug);this.refreshVisibility();},open=>this.pauseManager.set('settings',open));
     this.fog.setEnabled(this.settingsPanel.settings.fogOfWar);
@@ -112,6 +117,7 @@ export class GameScene extends Phaser.Scene {
     this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
     this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
     this.equipmentPanel=new EquipmentPanel(this);
+    this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
     this.treasurePanel=new TreasurePanel(this);if(!this.loadState)this.treasureSystem.spawn(PLAYER_START);
     this.production=new ProductionSystem(this.gameTime,this.inventory,()=>this.buildings,(day,totals)=>this.onDailyIncome(day,totals));
@@ -145,6 +151,7 @@ export class GameScene extends Phaser.Scene {
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
       this.equipmentPanel.destroy();this.treasurePanel.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
+      this.experienceFeedback.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
       this.game.events.off(Phaser.Core.Events.PAUSE,onBackground);this.game.events.off(Phaser.Core.Events.RESUME,onForeground);
       this.game.canvas.style.cursor='';
     });
@@ -174,8 +181,13 @@ export class GameScene extends Phaser.Scene {
     }
     if(this.buildMode||document.querySelector('dialog[open]')){tooltip.hidden=true;return;}
     pointer.updateWorldPoint(this.cameras.main);
+    const hoverHit=this.pickInteraction(pointer.worldX,pointer.worldY,this.pointerTile(pointer));
+    if(hoverHit?.kind==='human'){
+      const unit=hoverHit.object;tooltip.hidden=false;tooltip.textContent=`${unit.name??unit.definition.name} — Level ${unit.experience.level}`;
+      const rect=this.game.canvas.getBoundingClientRect();tooltip.style.left=`${Math.min(window.innerWidth-150,rect.left+pointer.x*rect.width/this.scale.width+14)}px`;tooltip.style.top=`${Math.max(4,rect.top+pointer.y*rect.height/this.scale.height-32)}px`;return;
+    }
     const drop=this.dropSystem.atPoint(pointer.worldX,pointer.worldY);
-    tooltip.hidden=!drop||(this.pickInteraction(pointer.worldX,pointer.worldY,this.pointerTile(pointer))?.kind!=='drop');
+    tooltip.hidden=!drop||hoverHit?.kind!=='drop';
     if(drop){
       tooltip.textContent=`${this.objectRegistry.require(drop.resource).name} ×${drop.amount}`;
       const rect=this.game.canvas.getBoundingClientRect();
@@ -217,14 +229,17 @@ export class GameScene extends Phaser.Scene {
       if(result.error){this.previewKey=null;this.updateBuildingPreview();this.setStatus(result.error);}
       else{
         this.towerViews.set(result.building.id,this.createBuildingView(this.selectedBuilding,result.building));
+        this.activities.emit('buildingCompleted',{actor:this.character,objectType:this.selectedBuilding.id,quantity:1,objectIds:[result.building.id]});
         this.updateInventory();this.cancelBuilding(`${this.selectedBuilding.name} postavena. Cena: ${formatCost(this.selectedBuilding.cost,this.objectRegistry)}.`);
       }
       return;
     }
+    const selected=this.pickInteraction(pointer.worldX,pointer.worldY,goal);
+    if(selected?.kind==='human'){this.unitPanel.open(selected.object);return;}
     if(this.character.transitioning){this.setStatus('Počkej, až král dokončí výstup nebo sestup.');return;}
     this.character.order=null;
     this.huntingSystem.cancel();this.mountSystem.cancel();
-    const hit=this.pickInteraction(pointer.worldX,pointer.worldY,goal),building=hit?.kind==='building'?hit.object:null;
+    const hit=selected,building=hit?.kind==='building'?hit.object:null;
     const animal=hit?.kind==='animal'?hit.object:null,drop=hit?.kind==='drop'?hit.object:null;
     let accepted=false;
     if(building){
@@ -259,6 +274,9 @@ export class GameScene extends Phaser.Scene {
     let resource=resourceHit??this.resources.get(this.resourceOccupancy.get(tileKey(tile)));
     if(resource&&!this.fog.isVisibleObject(resource.getData('object')))resource=null;
     if(building)hits.push({kind:'building',object:building,depth:buildingDepth(building)+.3});
+    for(const unit of this.selectableHumans()){
+      const view=unit.view??unit.sprite;if(this.fog.isVisibleObject(unit)&&this.assets.hitTest(view,x,y))hits.push({kind:'human',object:unit,depth:view.depth});
+    }
     if(animal)hits.push({kind:'animal',object:animal,depth:animal.view.depth});
     if(chest)hits.push({kind:'chest',object:chest,depth:chest.view.depth});
     if(drop)hits.push({kind:'drop',object:drop,depth:drop.view.depth});
@@ -271,6 +289,7 @@ export class GameScene extends Phaser.Scene {
     if(!preview)this.terrain.invalidateArea(object.tiles);
     return this.assets.createView(definition.id,{building:object,preview});
   }
+  selectableHumans(){return [];}
   towerAtPoint(x,y,tile) {
     return [...this.buildings].filter(building=>this.fog.isVisibleObject(building)).sort((a,b)=>towerBase(b).y-towerBase(a).y).find(building=>this.towerViews.get(building.id).contains(x,y)||building.tiles.some(part=>tileKey(part)===tileKey(tile)));
   }
@@ -335,6 +354,7 @@ export class GameScene extends Phaser.Scene {
     if(result.error){this.wallLastLine=tiles;this.previewTracking=false;this.previewKey=null;this.updateBuildingPreview();return;}
     for(const building of result.buildings)this.towerViews.set(building.id,this.createBuildingView(this.selectedBuilding,building));
     this.refreshWallConnections();this.updateInventory();
+    this.activities.emit('buildingCompleted',{actor:this.character,objectType:this.selectedBuilding.id,quantity:result.buildings.length,objectIds:result.buildings.map(b=>b.id)});
     this.cancelBuilding(`Hradba postavena: ${result.buildings.length} segmentů. Cena: ${formatCost(result.cost,this.objectRegistry)}.`);
   }
   refreshWallConnections(){
@@ -346,8 +366,8 @@ export class GameScene extends Phaser.Scene {
   }
   showMarker(tile) { this.marker.clear().lineStyle(2,0xe3c879,1).strokePoints(tilePolygon(tile),true).setVisible(true); }
 
-  collectResource(key,standingTile) {
-    if(this.character.state!==PLAYER_STATE.GROUND)return false;
+  collectResource(key,standingTile,actor=this.character) {
+    if(actor.state!==PLAYER_STATE.GROUND)return false;
     const view=this.resources.get(key);if(!view)return false;
     const object=view.getData('object'),definition=object.definition;
     if(!definition.collectible)return false;
@@ -355,7 +375,7 @@ export class GameScene extends Phaser.Scene {
     if(!reachable)return false;
     view.destroy();this.resources.delete(key);
     for(const tile of object.tiles){this.dropSystem.refreshOccupancy(tile);if(!definition.walkable)this.map[tile.y][tile.x]=0;}
-    this.inventory.add(definition.id);this.updateInventory();return true;
+    this.inventory.add(definition.id);this.updateInventory();this.activities.emit('resourceCollected',{actor,objectType:definition.id,quantity:1});return true;
   }
   collectStone(tile) { return this.collectResource(tileKey(tile),this.character.tile); }
   updateInventory() { this.inventoryBar.update();this.updateBuildingUI();this.updateWorldCount();this.updateFoodDisplay();this.equipmentPanel?.refresh(); }
@@ -377,9 +397,10 @@ export class GameScene extends Phaser.Scene {
     document.querySelector('#world-stones').textContent=`Mapa ${COLUMNS} × ${ROWS} · kameny ${this.resourceCount('stone')} / ${definition.spawn.max}`;
   }
   setStatus(message) { document.querySelector('#status').textContent=message; }
-  onUnitDeath(unit){
+  onUnitDeath(unit,killer=null){
     if(unit===this.character){this.finishGame();return;}
     const tile={x:Math.floor(unit.position.x),y:Math.floor(unit.position.y)},amount=unit.definition.gameplay.meatDrop;
+    if(killer)this.activities.emit('animalKilled',{actor:killer,objectType:unit.type,quantity:1,objectId:unit.id});
     this.mountSystem.onDeath(unit);this.animalSystem.remove(unit);this.combatFeedback.remove(unit.id);
     if(amount>0)this.dropSystem.create('meat',tile,amount);
     if(this.huntingSystem.target===unit)this.huntingSystem.cancel();
@@ -391,6 +412,7 @@ export class GameScene extends Phaser.Scene {
     this.character.stopForBuilding();this.character.nextTile=null;this.character.walking=false;this.character.state=PLAYER_STATE.DEAD;
     for(const attacker of [...this.combat.attacks.keys()])this.combat.stopAttack(attacker);
     this.assetGallery.close();this.equipmentPanel.close();this.treasurePanel.close();this.settingsPanel.setOpen(false);this.input.enabled=false;this.input.keyboard.enabled=false;
+    this.unitPanel.close();
     for(const key of Object.values(this.worldCamera.keys))key.reset();
     this.tweens.pauseAll();this.combatFeedback.refresh();this.gameOverDialog.showModal();
     document.querySelector('#restart-game').focus();
@@ -413,6 +435,7 @@ export class GameScene extends Phaser.Scene {
     this.regeneration.update(delta,[this.character,...this.animalSystem.animals.values()],covered);
     const activeDelta=this.gameTime.update(delta);this.updateTimeDisplay();
     this.combatFeedback.update(activeDelta);this.foodSystem.update(activeDelta);this.updateFoodDisplay();
+    this.experienceFeedback.update(activeDelta);
     for(const spawner of this.resourceSpawners)spawner.update(activeDelta);
     this.noticeRemaining=Math.max(0,this.noticeRemaining-activeDelta);if(!this.noticeRemaining)document.querySelector('#day-notice').hidden=true;
     this.worldCamera.update(delta);this.refreshVisibility();
@@ -432,6 +455,7 @@ export class GameScene extends Phaser.Scene {
     for(const building of this.buildings){const visual=this.towerViews.get(building.id);visual.setVisible(this.fog.isVisibleObject(building)&&visual.inView(view));}
     this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
     this.combatFeedback?.refresh();
+    this.experienceFeedback?.refreshVisibility();this.unitPanel?.refresh();
     this.treasureSystem?.update(view,this.fog);if(this.equipmentPanel?.dialog.open)this.equipmentPanel.updateStats();
   }
 }

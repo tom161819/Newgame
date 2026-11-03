@@ -6,6 +6,7 @@ import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { advanceMovement } from './movement.js';
 import { isWall,wallIndex,findRoofPath,planRoofExit } from './walls.js';
 import { createCombatStats } from '../systems/CombatSystem.js';
+import { createExperience } from '../data/experience.js';
 
 export const PLAYER_STATE = Object.freeze({
   GROUND: 'ground', ENTERING: 'enteringTower', ON_TOWER: 'onTower', EXITING: 'exitingTower',
@@ -23,6 +24,7 @@ export class PlayerController {
     this.path = [];
     this.definition = sprite.getData?.('definition') ?? objectRegistry.require(sprite.getData?.('objectId') ?? 'king');
     Object.assign(this,createCombatStats(this.definition),{id:'king',type:'king'});
+    this.experience=createExperience(this.definition);
     this.speed = this.definition.gameplay?.movementSpeed ?? 3.5;
     this.depthOffset = this.definition.depth?.offset ?? 0;
     this.walking = false;

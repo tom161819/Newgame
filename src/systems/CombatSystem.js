@@ -26,30 +26,30 @@ export class CombatSystem {
     this.attacks.set(attacker,target);attacker.attackTarget=target;this.emit('attack',attacker,target);return true;
   }
   stopAttack(attacker){this.attacks.delete(attacker);attacker.attackTarget=null;}
-  applyDamage(target,amount){return this.applyEffectiveDamage(target,amount*(1-clampArmor(target.armor)/100));}
-  applyEffectiveDamage(target,amount,deferDeath=false){
+  applyDamage(target,amount,attacker=null){return this.applyEffectiveDamage(target,amount*(1-clampArmor(target.armor)/100),false,attacker);}
+  applyEffectiveDamage(target,amount,deferDeath=false,attacker=null){
     if(!target.isAlive||!Number.isFinite(amount)||amount<=0)return 0;
     const applied=Math.min(target.currentHP,amount);target.currentHP=Math.max(0,target.currentHP-applied);
-    this.emit('damage',target,applied);
-    if(target.currentHP<=1e-9&&!deferDeath)this.handleDeath(target);
+    this.emit('damage',target,applied,attacker);
+    if(target.currentHP<=1e-9&&!deferDeath)this.handleDeath(target,attacker);
     return applied;
   }
-  handleDeath(unit){
+  handleDeath(unit,killer=null){
     if(this.dead.has(unit))return;
     this.dead.add(unit);unit.currentHP=0;unit.isAlive=false;this.stopAttack(unit);
     for(const [attacker,target]of this.attacks)if(target===unit)this.stopAttack(attacker);
-    this.emit('death',unit);
+    this.emit('death',unit,killer);
   }
   update(delta){
     const covered=new Map();
     let remaining=Number.isFinite(delta)?Math.max(0,delta)/1000:0;
     while(remaining>1e-9){
-      const rates=new Map();
+      const rates=new Map(),contributors=new Map();
       for(const [attacker,target]of this.attacks){
         if(!attacker.isAlive||!target.isAlive){this.stopAttack(attacker);continue;}
         if(!this.canFight(attacker)||!this.canFight(target)||!inAttackRange(attacker,target,this.map))continue;
         const rate=Math.max(0,attacker.attackDPS)*(1-clampArmor(target.armor)/100);
-        if(rate>0)rates.set(target,(rates.get(target)??0)+rate);
+        if(rate>0){rates.set(target,(rates.get(target)??0)+rate);if(!contributors.has(target))contributors.set(target,[]);contributors.get(target).push({attacker,rate});}
       }
       if(!rates.size)break;
       let step=remaining;
@@ -58,9 +58,14 @@ export class CombatSystem {
         const regeneration=this.regenerationRate(target)*step;
         target.currentHP=Math.max(0,Math.min(target.maxHP,target.currentHP+regeneration-rate*step));
         covered.set(target,(covered.get(target)??0)+step*1000);
-        this.emit('damage',target,rate*step);
+        for(const contribution of contributors.get(target))this.emit('damage',target,contribution.rate*step,contribution.attacker);
       }
-      for(const target of rates.keys())if(target.currentHP<=1e-9)this.handleDeath(target);
+      for(const target of rates.keys())if(target.currentHP<=1e-9){
+        // Dokončující útok: nejvyšší příspěvek v rozhodujícím okamžiku,
+        // shoda je deterministická podle ID a nezávisí na pořadí Map/FPS.
+        const killer=contributors.get(target).sort((a,b)=>b.rate-a.rate||String(a.attacker.id).localeCompare(String(b.attacker.id)))[0].attacker;
+        this.handleDeath(target,killer);
+      }
       remaining-=step;
       if(step<=1e-12)break;
     }

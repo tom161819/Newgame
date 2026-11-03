@@ -15,6 +15,8 @@ import { ProductionSystem } from '../src/systems/ProductionSystem.js';
 import { FoodSystem } from '../src/systems/FoodSystem.js';
 import { CombatSystem } from '../src/systems/CombatSystem.js';
 import { PathWearSystem } from '../src/systems/PathWearSystem.js';
+import { ExperienceSystem } from '../src/systems/ExperienceSystem.js';
+import { GameActivityBus } from '../src/systems/GameActivityBus.js';
 import { ResourceSpawner } from '../src/game/stones.js';
 import { placeBuilding } from '../src/game/buildings.js';
 import { wallIndex,connectionsFor } from '../src/game/walls.js';
@@ -42,6 +44,7 @@ function scene(terrain=Array.from({length:100},()=>Array(100).fill(0))){
   s.player=view('king',tileCenter({x:50,y:50}));s.character=new PlayerController(s,s.player,{x:50,y:50});
   s.gameTime=new GameTimeSystem();s.foodSystem=new FoodSystem(s.inventory,objectRegistry.require('meat'));
   s.pathWear=new PathWearSystem({map:s.map,terrain:s.terrainGrid,time:s.gameTime});
+  s.activities=new GameActivityBus();s.experienceSystem=new ExperienceSystem(s.activities);
   s.equipment=new EquipmentSystem(s.character,objectRegistry,s.inventory);s.production=new ProductionSystem(s.gameTime,s.inventory,()=>s.buildings);
   s.animalSystem=new AnimalSystem(s);s.dropSystem=new DropSystem(s);s.treasureSystem=new TreasureSystem(s);
   s.huntingSystem={target:null,repath:0};s.mountSystem={target:null,repath:0};s.combat=new CombatSystem();
@@ -132,4 +135,16 @@ test('wear scores, levels and last passage survive world save/load; old saves de
   }
   const legacy=structuredClone(data);delete legacy.pathWear;delete legacy.settings.pathWearDebug;
   const old=restore(legacy);assert.ok(old.pathWear.scores.every(n=>n===0));assert.equal(old.gameTime.day,data.time.day);
+});
+
+test('individual XP and processed events roundtrip; older saves get level one and malformed XP is rejected',()=>{
+  const s=fixture();s.experienceSystem.addXP(s.character,101);const event=s.activities.emit('resourceCollected',{actor:s.character,objectType:'stone'});
+  const data=serializeGameState(s),r=restore(data);assert.deepEqual(r.character.experience,s.character.experience);assert.deepEqual(r.experienceSystem.exportState(),s.experienceSystem.exportState());
+  r.activities.emit(event.type,{actor:r.character,objectType:'stone'},event.id);assert.equal(r.character.experience.totalXP,104);
+  for(const corrupt of [s=>s.player.experience.level=51,s=>s.player.experience.totalXP=999,s=>s.player.experience.currentXP=139,s=>s.player.experience.modifiers.invalid=-1,
+    s=>s.experienceSystem.processedEventIds.push(s.experienceSystem.processedEventIds[0]),s=>s.experienceSystem.nextEventId=1]){
+    const bad=structuredClone(data);corrupt(bad);assert.throws(()=>validateGameState(bad));
+  }
+  const legacy=structuredClone(data);delete legacy.player.experience;delete legacy.experienceSystem;const old=restore(legacy);
+  assert.equal(old.character.experience.level,1);assert.equal(old.character.experience.totalXP,0);assert.equal(old.experienceSystem.exportState().processedEventIds.length,0);
 });

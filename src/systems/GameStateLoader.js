@@ -2,11 +2,13 @@ import { validateGameState } from './GameStateSerializer.js';
 import { recalculateStats } from './UnitStats.js';
 import { buildingTiles,buildingDepth,towerTop } from '../game/buildings.js';
 import { gridToWorld,tileCenter } from '../game/isometric.js';
+import { importCharacterExperience } from './ExperienceSystem.js';
 
 export function restoreActor(unit,data){
   for(const key of ['currentHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'])if(data[key]!==undefined)unit[key]=data[key];
   for(const key of ['tile','position','nextTile','direction','path','statModifiers'])unit[key]=structuredClone(data[key]);
   unit.baseStats=Object.freeze({...data.baseStats});recalculateStats(unit);
+  importCharacterExperience(unit,data.experience);
 }
 export function restoreOrder(data,scene){
   if(!data)return null;
@@ -69,6 +71,7 @@ export function loadGameState(scene,input){
   scene.treasureSystem.pending=state.commands.pendingChest;
   scene.animalSystem.nextId=state.counters.animal;scene.dropSystem.nextId=state.counters.drop;scene.treasureSystem.nextId=state.counters.chest;
   scene.gameTime.importState(state.time);scene.foodSystem.importState(state.food);scene.production.importState(state.production);
+  scene.experienceSystem?.importState(state.experienceSystem);
   scene.pathWear?.importState(state.pathWear);
   for(const t of state.spawners)scene.resourceSpawners.find(s=>s.definition.id===t.id).importState(t);
   scene.settingsPanel.applySettings(state.settings);scene.fog.setEnabled(state.settings.fogOfWar);
@@ -78,5 +81,6 @@ export function loadGameState(scene,input){
   scene.worldCamera.following=state.camera.following;
   document.querySelector('#camera-mode').textContent=state.camera.following?'Kamera sleduje krále':'Ruční posun · mezerník vrátí krále';
   scene.updateInventory();scene.updateTimeDisplay();scene.refreshVisibility();scene.activeFramePending=true;
+  scene.experienceFeedback?.refresh();
   scene.setStatus('Uložená hra načtena.');
 }

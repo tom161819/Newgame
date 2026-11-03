@@ -157,3 +157,7 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 #save-load-dialog[aria-busy="true"] .save-actions button, #save-load-dialog[aria-busy="true"] #new-save-form button { opacity:.6; pointer-events:none; }
 #application-notice { position:fixed; z-index:110; top:20px; left:50%; transform:translateX(-50%); max-width:90vw; padding:16px 24px; border:1px solid #c5ae6a; border-radius:5px; background:#263629; color:#f0e5bf; box-shadow:0 8px 30px #0006; }
 @media(max-width:600px) { .save-row { align-items:flex-start; flex-direction:column; } .main-menu-content { padding:24px 12px; } }
+.experience-status { display:grid; gap:3px; min-width:130px; }
+.inventory .experience-status output { text-align:left; font-size:10px; color:#dfd8b6; font-weight:400; }
+#king-xp-bar { width:130px; height:7px; accent-color:#ceb56d; }
+#unit-xp-bar { width:100%; accent-color:#ceb56d; }

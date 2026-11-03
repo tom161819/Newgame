@@ -47,6 +47,9 @@ export function validateDefinition(definition) {
   if (d.stats !== undefined && (!plainObject(d.stats) || !['maxHP','attackDPS','armor','attackRange'].every(key=>finite(d.stats[key]))
     || d.stats.maxHP<=0 || d.stats.attackDPS<0 || d.stats.armor<0 || d.stats.armor>90 || d.stats.attackRange<0)) fail(id, 'neplatné bojové statistiky.');
   if(d.stats?.hpRegenPerSecond!==undefined&&(!finite(d.stats.hpRegenPerSecond)||d.stats.hpRegenPerSecond<0))fail(id,'neplatná regenerace.');
+  if(d.experience!==undefined&&(!plainObject(d.experience)||d.category!=='character'||typeof d.experience.enabled!=='boolean'
+    ||!Number.isSafeInteger(d.experience.initialLevel)||!Number.isSafeInteger(d.experience.maxLevel)||d.experience.initialLevel<1
+    ||d.experience.maxLevel>50||d.experience.initialLevel>d.experience.maxLevel||!finite(d.experience.gainMultiplier)||d.experience.gainMultiplier<0))fail(id,'neplatné nastavení zkušeností.');
   if(d.inventoryOrder!==undefined&&(!Number.isSafeInteger(d.inventoryOrder)||d.inventoryOrder<0))fail(id,'neplatné pořadí inventáře.');
   if(d.production!==undefined&&(!plainObject(d.production)||d.category!=='building'||typeof d.production.resource!=='string'
     ||!Number.isSafeInteger(d.production.amount)||d.production.amount<=0||d.production.interval!=='day'))fail(id,'neplatná produkce.');

@@ -22,7 +22,7 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 ## Následuje
 
-1. **Právě probíhá:** [Krok 13 — univerzální XP a levely 1–50](requests/step-13.md).
+1. **Dokončeno v této verzi, ověřuje se nasazení:** [Krok 13 — univerzální XP a levely 1–50](requests/step-13.md). 98 testů; skutečné odměny a nulové odměny za neúspěšné akce, level-up, limit 50, individuální XP, viditelnost, přesný Save/Load a starší save ověřeny.
 5. [Krok 14 — individuální skilly a profese poddaných](requests/step-14.md).
 6. [Krok 15 — přirozené talenty a mzdy](requests/step-15.md).
 7. [Krok 16 — pracovní budovy a zaměstnanci](requests/step-16.md).

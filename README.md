@@ -16,6 +16,7 @@ Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3
 | Dismount nebo H | Sesedne na volné sousední místo; stejný kůň se vrátí k putování. |
 | ⚙ Settings | Zasouvací panel s přepínačem Fog of War. Volba se pamatuje mezi obnoveními stránky. |
 | Settings → Show Path Wear Debug | Barevně označí úrovně pěšin a ukáže skóre políčka pod myší. Funguje i s posunutou kamerou a zoomem. |
+| King / LVL / XP v horní liště | Otevře přehled krále: level, XP, HP, DPS a Armor. Samotné otevření přehledu nemění cíl pohybu. |
 | Levý klik na zvíře | Pronásleduje cíl a ze sousedního políčka zahájí souboj. Napadené zvíře se brání. |
 | Levý klik na maso | Dojde k balíčku a přidá jeho skutečné množství. Najeď myší pro údaj Meat ×N. |
 | Levý klik na truhlu | Dojde k sousednímu políčku a otevře ji. Take All převezme obsah a automaticky vybaví meč a brnění. |
@@ -57,6 +58,14 @@ Settings nebo Game Menu → **Save Game** otevře seznam místních pozic. Lze v
 Save/Load zachovává logickou mapu, překážky, budovy a spojení hradeb, kameny, množství dropů, zvířata a jejich HP, obsah a vybrání truhly, inventář a vybavení. Obnovuje i probíhající krok, natočení, cíl, souboj, stejný osedlaný kůň, pobyt na plošině či rozpracované lezení, kameru, zoom, Fog of War, herní čas a zbytky časovačů. Načtení znovu negeneruje objekty ani příjem zlata za dokončený den. Doba se zavřenou hrou se nezapočítává.
 
 Data mají `saveVersion` a před nahrazením světa procházejí kontrolou. Poškozený save zobrazí chybu a ponechá současnou hru. Zápis do IndexedDB je atomický: při chybě zůstane předchozí save. Samotné ukládání a načítání již otevřené hry funguje i bez internetu; stažení hry při prvním otevření vyžaduje připojení.
+
+## Zkušenosti a levely
+
+Král začíná na **levelu 1 s 0 XP**. Odměnu získá až po dokončení činnosti: kámen **3 XP**, sebraný balíček masa **2 XP** bez ohledu na jeho množství, zajíc **10 XP**, srna **20 XP**, divočák **35 XP**, nový segment hradby **2 XP**, věž **15 XP** a hrad **30 XP**. Řada hradeb odmění jen skutečně nové segmenty. Neúspěšná nebo zrušená akce nic nepřidá; chůze, čekání, regenerace ani produkce zlata XP nevytvářejí.
+
+Další úroveň vyžaduje `100 + 35 × (level − 1) + 4 × (level − 1)²` XP. Přebytek se přenáší, takže větší odměna může přidat více levelů. Strop je **level 50**; další postup se zastaví a lišta ukáže MAX. Level sám nemění HP, DPS, Armor ani rychlost. Po odměně se nad postavou objeví XP; zvýšení levelu doprovází zlatý efekt a oznámení.
+
+Zkušenosti patří konkrétní postavě a ukládají se společně se zpracovanými událostmi. Načtení nerozdává staré odměny znovu. Savy vytvořené před tímto rozšířením začnou na levelu 1 a zachovají ostatní herní stav.
 
 ## Přirozené pěšiny
 

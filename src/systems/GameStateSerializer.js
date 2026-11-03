@@ -2,6 +2,7 @@ import { objectRegistry } from './ObjectRegistry.js';
 import { DAY_DURATION } from './GameTimeSystem.js';
 import { COLUMNS,ROWS } from '../game/config.js';
 import { wearLevel } from '../data/pathWear.js';
+import { getXPRequired,totalXPForLevel } from '../data/experience.js';
 
 export const SAVE_VERSION=1;
 const copy=value=>value==null?null:structuredClone(value);
@@ -9,6 +10,7 @@ const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
 export function serializeActor(unit){
   return {...Object.fromEntries(actorFields.filter(k=>unit[k]!==undefined).map(k=>[k,unit[k]])),
+    ...(unit.experience?{experience:copy(unit.experience)}:{}),
     baseStats:copy(unit.baseStats),statModifiers:copy(unit.statModifiers),tile:point(unit.tile),position:point(unit.position),
     nextTile:point(unit.nextTile),direction:point(unit.direction),path:unit.path.map(point)};
 }
@@ -22,6 +24,7 @@ export function serializeGameState(scene){
   const c=scene.character,camera=scene.cameras.main;
   return {
     saveVersion:SAVE_VERSION,terrain:scene.terrainGrid.map(row=>[...row]),
+    ...(scene.experienceSystem?{experienceSystem:scene.experienceSystem.exportState()}:{}),
     ...(scene.pathWear?{pathWear:scene.pathWear.exportState()}:{}),
     player:{...serializeActor(c),state:c.state,currentTowerId:c.currentTower?.id??null,horseId:c.mountedHorse?.id??null,
       exitTile:point(c.exitTile),order:serializeOrder(c.order),
@@ -84,6 +87,13 @@ export function validateGameState(input,registry=objectRegistry){
     const b=a.baseStats;check(b);number(b.maxHP,1,1e9);number(b.attackDPS,0,1e9);number(b.armor,0,90);number(b.attackRange,0,100);number(b.hpRegenPerSecond,0,1e6);
     check(a.statModifiers&&typeof a.statModifiers==='object'&&!Array.isArray(a.statModifiers));
     for(const [name,m]of Object.entries(a.statModifiers)){check(!['__proto__','prototype','constructor'].includes(name)&&m&&typeof m==='object');for(const [key,v]of Object.entries(m)){check(['maxHP','attackBonus','armor','hpRegenPerSecond'].includes(key));number(v,-1e6,1e6);}}
+    if(a.experience!==undefined){
+      const e=a.experience;check(definition(a.type).category==='character'&&e&&typeof e.enabled==='boolean');
+      integer(e.maxLevel,1,50);integer(e.level,1,e.maxLevel);number(e.gainMultiplier,0,1e6);number(e.currentXP);number(e.totalXP,0,totalXPForLevel(e.maxLevel));
+      const required=e.level===e.maxLevel?0:getXPRequired(e.level);check(e.xpToNextLevel===required);check(required?e.currentXP<required:e.currentXP===0);
+      check(Math.abs(e.totalXP-totalXPForLevel(e.level)-e.currentXP)<1e-6);check(e.modifiers&&typeof e.modifiers==='object'&&!Array.isArray(e.modifiers));
+      for(const [key,value]of Object.entries(e.modifiers)){check(!['__proto__','constructor','prototype'].includes(key));number(value,0,1e6);}
+    }
   };
   const p=s.player;actor(p);check(p.id==='king'&&p.type==='king'&&p.isAlive);
   check(['ground','enteringTower','onTower','onWall','exitingTower'].includes(p.state));
@@ -119,5 +129,9 @@ export function validateGameState(input,registry=objectRegistry){
     for(const object of objects){const match=String(object.id).match(new RegExp(`^${prefix}-(\\d+)$`));check(match&&Number(match[1])>0&&Number(match[1])<s.counters[key]);}
   }
   const dropKeys=s.drops.map(d=>`${d.resource}:${d.tile.x},${d.tile.y}`);check(new Set(dropKeys).size===dropKeys.length);
+  if(s.experienceSystem!==undefined){
+    const e=s.experienceSystem;check(e);integer(e.nextEventId,1);array(e.processedEventIds,1000000);check(new Set(e.processedEventIds).size===e.processedEventIds.length);
+    for(const id of e.processedEventIds){check(typeof id==='string'&&id.length>0&&id.length<=128);const match=id.match(/^activity-(\d+)$/);if(match)integer(Number(match[1]),1,e.nextEventId-1);}
+  }
   return s;
 }
