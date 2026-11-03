@@ -14,7 +14,7 @@ import { validateSeasonFoodState } from './SeasonFoodStateValidation.js';
 import { seasonalCropStage } from '../data/seasons.js';
 import { carryCapacity } from '../data/logistics.js';
 
-export const SAVE_VERSION=6;
+export const SAVE_VERSION=7;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -43,7 +43,7 @@ export function serializeGameState(scene){
     ...(scene.farmingSystem?{farming:scene.farmingSystem.exportState()}:{}),
     ...(scene.seasons?{seasons:scene.seasons.exportState()}:{}),
     ...(scene.kingLogistics?{kingLogistics:scene.kingLogistics.exportState()}:{}),
-    ...(scene.logisticsTasks?{logistics:{version:1}}:{}),
+    ...(scene.logisticsTasks?{logistics:{version:1,...(scene.constructionSystem?.materials.enabled?{materialsVersion:1}:{})}}:{}),
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
     ...(scene.workerSystem?{population:scene.workerSystem.exportState(),workers:[...scene.workerSystem.workers.values()].map(w=>({...serializeActor(w),name:w.name,profession:w.profession,
       ...(w.naturalTalent?{naturalTalent:w.naturalTalent,initialSkills:copy(w.initialSkills)}:{}),
@@ -57,9 +57,9 @@ export function serializeGameState(scene){
       render:{x:scene.player.x,y:scene.player.y,depth:scene.player.depth},
       transition:c.transitioning?{remaining:Math.max(1,(c.transitionTween?.duration??900)-(c.transitionTween?.elapsed??0))}:null},
     inventory:scene.inventory.exportState(),equipment:scene.equipment.exportState(),
-    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.construction?{construction:copy(b.construction)}:{})})),
+    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.construction?{construction:copy(b.construction)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
     resources:[...scene.resources.values()].map(v=>({type:v.getData('objectId'),tile:point(v.getData('tile'))})),
-    drops:[...scene.dropSystem.drops.values()].map(d=>({id:d.id,resource:d.resource,tile:point(d.tile),amount:d.amount,rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0),haulEligible:d.haulEligible!==false})),
+    drops:[...scene.dropSystem.drops.values()].map(d=>({id:d.id,resource:d.resource,tile:point(d.tile),amount:d.amount,rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0),haulEligible:d.haulEligible!==false,...(d.siteId!=null?{siteId:d.siteId}:{})})),
     animals:[...scene.animalSystem.animals.values()].map(a=>({...serializeActor(a),retaliationId:a.retaliationTarget?.id??null})),
     chests:[...scene.treasureSystem.chests.values()].map(c=>({id:c.id,tile:point(c.tile),opened:c.opened,opening:c.opening,looted:c.looted,contents:copy(c.contents),
       animation:c.opening?{elapsed:c.view.openTween?.elapsed??0,lid:c.view.lid?{y:c.view.lid.y,rotation:c.view.lid.rotation}:null}:null})),
@@ -85,7 +85,7 @@ export function validateGameState(input,registry=objectRegistry){
   const array=(a,max=20000)=>check(Array.isArray(a)&&a.length<=max);
   const definition=(id,category)=>{const d=registry.get(id);check(d&&(!category||d.category===category));return d;};
   const unique=(array)=>{const ids=new Set();for(const a of array){check(a.id!=null&&!ids.has(a.id));ids.add(a.id);}return ids;};
-  check(input&&[1,2,3,4,5,SAVE_VERSION].includes(input.saveVersion));
+  check(input&&[1,2,3,4,5,6,SAVE_VERSION].includes(input.saveVersion));
   let s;try{s=JSON.parse(JSON.stringify(input));}catch{fail();}
   if(input.saveVersion<4)for(const actor of [s.player,...(s.workers??[])])for(const key of ['skills','initialSkills'])if(actor?.[key])for(const id of ['milling','baking'])actor[key][id]??=createProgress();
   if(!s.logistics){

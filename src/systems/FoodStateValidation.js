@@ -22,6 +22,14 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     if(d.storage&&(physical||!d.storage.accepts))expected.set(stockLocationId(b),{...base,kind:d.starter?'fallback':'storage',capacity:d.storage.capacity,allowed:storageResources(d,registry)});
     if(d.recipe)for(const kind of ['input','output'])expected.set(`${kind}-${b.id}`,{...base,kind,capacity:d.bufferCapacity,allowed:Object.keys(d.recipe[kind])});
   }
+  const sites=new Map();
+  if(physical)for(const b of s.buildings){
+    if(!buildingIsComplete(b)&&s.logistics?.materialsVersion===1)check(b.materialSupply);
+    if(!b.materialSupply)continue;check(!buildingIsComplete(b));
+    const d=registry.require(b.type),supply=b.materialSupply,required=Object.fromEntries(Object.entries(d.cost).filter(([id])=>resources.includes(id)));
+    check(supply.version===1&&typeof supply.legacyPaid==='boolean'&&JSON.stringify(supply.required)===JSON.stringify(required));sites.set(b.id,b);
+    expected.set(`site-${b.id}`,{kind:'site',buildingId:b.id,x:b.x,y:b.y,width:d.width,height:d.height,capacity:Object.values(required).reduce((n,v)=>n+v,0),allowed:Object.keys(required)});
+  }
   const locations=new Map(),reservations=new Map(),used=l=>Object.values(l.stock).reduce((n,v)=>n+v,0);
   check(storage.locations.length===expected.size);
   for(const l of storage.locations){
@@ -33,7 +41,8 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   }
   for(const r of storage.reservations){
     const l=locations.get(r.locationId);check(l&&!reservations.has(r.id)&&['stock','capacity'].includes(r.kind)&&l.allowed.includes(r.resource));reservations.set(r.id,r);
-    const id=String(r.id).match(/^food-reservation-(\d+)$/);check(id);integer(Number(id[1]),1,storage.nextReservation-1);integer(r.amount,1,38);check(typeof r.owner==='string');
+    const id=String(r.id).match(/^food-reservation-(\d+)$/);check(id);integer(Number(id[1]),1,storage.nextReservation-1);integer(r.amount,1,r.siteId!=null&&r.owner===`site-${r.siteId}`?Number.MAX_SAFE_INTEGER:38);check(typeof r.owner==='string');
+    if(r.siteId!=null)check(sites.has(r.siteId)&&(sites.get(r.siteId).materialSupply.required[r.resource]??0)>0);
   }
   for(const l of locations.values()){
     const incoming=[...reservations.values()].filter(r=>r.locationId===l.id&&r.kind==='capacity').reduce((n,r)=>n+r.amount,0);check(used(l)+incoming<=l.capacity+l.legacyOverflow);
@@ -43,7 +52,8 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
       check((s.inventory[resource]??0)===count);
     }
   }
-  const capacityRefs=new Set(),stockRefs=new Set(),records=new Map();
+  const capacityRefs=new Set(),stockRefs=new Set(),records=new Map(),groundRefs=new Set((s.workers??[]).filter(w=>['mineDrop','collectMeat'].includes(w.workTask?.kind)).map(w=>w.workTask.targetId));
+  for(const r of reservations.values())if(r.siteId!=null&&r.owner===`site-${r.siteId}`){check(r.kind==='stock'&&['storage','fallback'].includes(locations.get(r.locationId)?.kind));stockRefs.add(r.id);}
   const adjacent=(l,t)=>l&&((t.x>=l.x&&t.x<l.x+l.width&&(t.y===l.y-1||t.y===l.y+l.height))||(t.y>=l.y&&t.y<l.y+l.height&&(t.x===l.x-1||t.x===l.x+l.width))||(l.kind==='fallback'&&t.x===l.x&&t.y===l.y));
   const capacity=(id,owner,resource,amount)=>{if(id==null)return;const r=reservations.get(id);check(r?.kind==='capacity'&&r.owner===owner&&r.resource===resource&&r.amount===amount&&!capacityRefs.has(id));capacityRefs.add(id);};
   check(production.records.length===producers.length);
@@ -68,7 +78,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     if(!['foodPickup','foodDeliver'].includes(t.kind))continue;
     check(resources.includes(t.resource)&&locations.has(t.destinationId));integer(t.amount,1,carryCapacity(w));
     const sourceDrop=t.sourceDropId&&s.drops.find(d=>d.id===t.sourceDropId);
-    if(t.kind==='foodPickup'&&t.sourceDropId)check(sourceDrop&&sourceDrop.resource===t.resource&&sourceDrop.amount>=t.amount&&t.goal.x===sourceDrop.tile.x&&t.goal.y===sourceDrop.tile.y);
+    if(t.kind==='foodPickup'&&t.sourceDropId){check(sourceDrop&&sourceDrop.resource===t.resource&&sourceDrop.amount>=t.amount&&t.goal.x===sourceDrop.tile.x&&t.goal.y===sourceDrop.tile.y&&!groundRefs.has(t.sourceDropId));groundRefs.add(t.sourceDropId);}
     else check(adjacent(locations.get(t.kind==='foodPickup'?t.sourceId:t.destinationId),t.goal));
     if(t.hauling!==undefined){check(t.hauling===true&&w.profession==='hauler');if(t.kind==='foodDeliver'){number(t.loadedDistance);number(t.loadedPosition?.x,0,100);number(t.loadedPosition?.y,0,100);}}
     if(t.kind==='foodPickup'){
@@ -76,6 +86,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
       else{const stock=reservations.get(t.stockReservation);check(stock?.kind==='stock'&&stock.locationId===t.sourceId&&stock.resource===t.resource&&stock.amount===t.amount&&stock.owner===t.transferId&&!stockRefs.has(stock.id));stockRefs.add(stock.id);}check(!w.cargo);
     }else check(w.cargo?.resource===t.resource&&w.cargo.amount>=t.amount);
     const cap=reservations.get(t.capacityReservation);
+    if(t.siteId!=null){check(sites.has(t.siteId)&&t.destinationId===`site-${t.siteId}`&&cap?.siteId===t.siteId);if(t.kind==='foodPickup')check(t.sourceDropId?sourceDrop?.siteId===t.siteId:reservations.get(t.stockReservation)?.siteId===t.siteId);else check(w.cargo?.siteId===t.siteId);}
     if(t.outputBuildingId&&t.kind==='foodPickup'&&records.get(t.outputBuildingId)?.outputReservation===t.capacityReservation){check(cap?.resource===t.resource&&cap.amount===t.amount);}
     else capacity(t.capacityReservation,t.transferId,t.resource,t.amount);
     check(cap?.locationId===t.destinationId);
@@ -85,8 +96,24 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     const cargo=s.player.cargo;if(cargo){check(resources.includes(cargo.resource));integer(cargo.amount,1,20);}
     if(cargo?.transportCancelled!==undefined)check(typeof cargo.transportCancelled==='boolean');
     array(s.player.pendingWorkRewards,100000);for(const event of s.player.pendingWorkRewards){check(cargo&&['resourceCollected','dropCollected'].includes(event.type)&&resources.includes(event.objectType));integer(event.quantity,1);if(event.contributionRatio!==undefined)number(event.contributionRatio);}
-    const t=royal.task;if(t){check(cargo&&t.kind==='deposit'&&cargo.resource===t.resource&&locations.has(t.destinationId));integer(t.amount,1,cargo.amount);number(t.retryAt);check(adjacent(locations.get(t.destinationId),t.goal));
+    if(royal.workflowSiteId!=null)check(sites.has(royal.workflowSiteId));if(royal.nextRetry!==undefined)number(royal.nextRetry);
+    const t=royal.task;if(t){check(['deposit','stockPickup','siteDeposit'].includes(t.kind)&&resources.includes(t.resource)&&locations.has(t.destinationId));integer(t.amount,1,20);number(t.retryAt);
+      if(t.kind==='stockPickup'){
+        check(!cargo&&sites.has(t.siteId)&&t.destinationId===`site-${t.siteId}`);
+        if(t.sourceDropId){const drop=s.drops.find(d=>d.id===t.sourceDropId);check(drop&&drop.siteId===t.siteId&&drop.resource===t.resource&&drop.amount>=t.amount&&t.goal.x===drop.tile.x&&t.goal.y===drop.tile.y&&!groundRefs.has(drop.id));groundRefs.add(drop.id);}
+        else{const r=reservations.get(t.stockReservation);check(r?.kind==='stock'&&r.owner===t.id&&r.siteId===t.siteId&&r.resource===t.resource&&r.amount===t.amount&&r.locationId===t.sourceId&&!stockRefs.has(r.id)&&adjacent(locations.get(t.sourceId),t.goal));stockRefs.add(r.id);}
+      }else{check(cargo&&cargo.resource===t.resource&&cargo.amount>=t.amount&&adjacent(locations.get(t.destinationId),t.goal));if(t.kind==='siteDeposit')check(cargo.siteId===t.siteId&&t.destinationId===`site-${t.siteId}`);}
+      if(t.siteId!=null)check(sites.has(t.siteId));
       const match=String(t.id).match(/^king-transfer-(\d+)$/);check(match);integer(Number(match[1]),1,royal.nextId-1);capacity(t.capacityReservation,t.id,t.resource,t.amount);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);
+    }
+  }
+  const actors=[s.player,...(s.workers??[])];
+  for(const actor of actors)if(actor.cargo?.siteId!=null)check(sites.has(actor.cargo.siteId)&&(sites.get(actor.cargo.siteId).materialSupply.required[actor.cargo.resource]??0)>0);
+  const dropKeys=new Set();for(const drop of s.drops){if(drop.siteId!=null)check(sites.has(drop.siteId)&&(sites.get(drop.siteId).materialSupply.required[drop.resource]??0)>0);const key=`${drop.tile.x},${drop.tile.y}:${drop.resource}:${drop.siteId??'free'}`;check(!dropKeys.has(key));dropKeys.add(key);}
+  for(const [id,b]of sites){
+    const location=locations.get(`site-${id}`);for(const [resource,required]of Object.entries(b.materialSupply.required)){
+      const held=[...reservations.values()].filter(r=>r.kind==='stock'&&r.siteId===id&&r.resource===resource).reduce((n,r)=>n+r.amount,0),carried=actors.reduce((n,a)=>n+(a.cargo?.siteId===id&&a.cargo.resource===resource?a.cargo.amount:0),0),ground=s.drops.filter(d=>d.siteId===id&&d.resource===resource).reduce((n,d)=>n+d.amount,0),delivered=location.stock[resource]??0;
+      check(held+carried+ground+delivered===required);if(b.construction.workDone>0)check(delivered===required);
     }
   }
   for(const r of reservations.values())check(r.kind==='stock'?stockRefs.has(r.id):capacityRefs.has(r.id));

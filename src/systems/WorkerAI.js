@@ -106,7 +106,7 @@ export class WorkerAI {
       if(worker.aiCooldown>0)return;worker.aiCooldown=WORK_RULES.searchInterval;worker.workState='Searching for Work';
       const candidates=[...this.scene.resources.entries()].filter(([key,view])=>view.getData('objectId')==='stone'
         &&this.withinRange(worker,view.getData('tile'))&&this.system.reservations.available(`resource:${key}`,worker.id)&&this.scene.character.order?.pickupKey!==key);
-      const drops=this.scene.workplaceSystem?[...this.scene.dropSystem.drops.values()].filter(d=>d.resource==='stone'&&this.withinRange(worker,d.tile)&&this.system.reservations.available(`drop:${d.id}`,worker.id)&&this.scene.character.order?.dropId!==d.id):[];
+      const drops=this.scene.workplaceSystem?[...this.scene.dropSystem.drops.values()].filter(d=>d.siteId==null&&d.resource==='stone'&&this.withinRange(worker,d.tile)&&this.system.reservations.available(`drop:${d.id}`,worker.id)&&this.scene.character.order?.dropId!==d.id):[];
       const route=this.route(worker,[...candidates.map(([,view])=>view.getData('tile')),...drops.map(d=>d.tile)]);
       if(!route){worker.workState='Waiting';worker.workMessage='No reachable stone';return;}
       const target=candidates.find(([,v])=>tileKey(v.getData('tile'))===tileKey(route.destination));
@@ -123,7 +123,7 @@ export class WorkerAI {
   hunter(worker,delta){
     let task=worker.workTask;
     if(!task){if(worker.aiCooldown>0)return;worker.aiCooldown=WORK_RULES.searchInterval;worker.workState='Searching for Work';
-      const drops=[...this.scene.dropSystem.drops.values()].filter(d=>d.resource==='meat'&&this.withinRange(worker,d.tile)
+      const drops=[...this.scene.dropSystem.drops.values()].filter(d=>d.siteId==null&&d.resource==='meat'&&this.withinRange(worker,d.tile)
         &&this.system.reservations.available(`drop:${d.id}`,worker.id)&&this.scene.character.order?.dropId!==d.id);
       const dropRoute=this.route(worker,drops.map(d=>d.tile));
       if(dropRoute){const drop=drops.find(d=>tileKey(d.tile)===tileKey(dropRoute.destination));this.reserve(worker,`drop:${drop.id}`,{kind:'collectMeat',targetId:drop.id},dropRoute);}

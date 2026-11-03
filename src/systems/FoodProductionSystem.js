@@ -17,7 +17,7 @@ export class FoodProductionSystem {
   cancelWorker(worker){
     const task=worker.workTask;if(!['foodPickup','foodDeliver','produce','harvest'].includes(task?.kind))return;
     if(task.hauling&&task.kind==='foodDeliver'&&worker.cargo)worker.cargo.transportCancelled=true;
-    if(task.stockReservation)this.storage.release(task.stockReservation);
+    if(task.stockReservation){if(task.siteId!=null)this.scene.constructionSystem.materials.returnAllocation(task.stockReservation);else this.storage.release(task.stockReservation);}
     const capacity=this.storage.reservations.get(task.capacityReservation);
     if(capacity?.owner===task.transferId||task.kind==='harvest')this.storage.release(task.capacityReservation);
   }
@@ -27,16 +27,18 @@ export class FoodProductionSystem {
     worker.workTask={...data,kind,goal:{...route.destination},progressMs:0,reservation,transferId:id};worker.path=route.path;
     worker.workState=kind==='produce'?'Working':'Traveling to Target';worker.workMessage=kind==='produce'?'Producing food':'Transporting food';return true;
   }
-  move(worker,sourceId,destinationId,resource,amount,{capacityReservation=null,outputBuildingId=null,hauling=false}={}){
+  move(worker,sourceId,destinationId,resource,amount,{capacityReservation=null,outputBuildingId=null,hauling=false,siteId=null,allocationId=null}={}){
     const source=this.storage.locations.get(sourceId),destination=this.storage.locations.get(destinationId);if(!source||!destination)return false;
     if(sourceId===destinationId||amount>carryCapacity(worker))return false;
     const route=this.storage.route(worker,[source]);if(!route)return false;
     const transferId=`food-transfer-${this.nextTransfer++}`;
-    const stockReservation=this.storage.reserve('stock',sourceId,resource,amount,transferId);if(!stockReservation)return false;
+    const allocation=allocationId&&this.storage.reservations.get(allocationId);if(allocationId&&(!allocation||allocation.owner!==`site-${siteId}`||allocation.siteId!==siteId||allocation.locationId!==sourceId||allocation.resource!==resource))return false;
+    const stockReservation=allocationId?this.storage.splitStock(allocationId,amount,transferId):this.storage.reserve('stock',sourceId,resource,amount,transferId);if(!stockReservation)return false;
     const capacity=capacityReservation??this.storage.reserve('capacity',destinationId,resource,amount,transferId);
-    if(!capacity){this.storage.release(stockReservation);return false;}
-    if(!this.setTask(worker,'foodPickup',route,{transferId,sourceId,destinationId,resource,amount,stockReservation,capacityReservation:capacity,outputBuildingId,...(hauling?{hauling:true}: {})})){
-      this.storage.release(stockReservation);if(!capacityReservation)this.storage.release(capacity);return false;
+    if(!capacity){if(allocationId)this.scene.constructionSystem.materials.returnAllocation(stockReservation);else this.storage.release(stockReservation);return false;}
+    if(siteId!=null)this.storage.reservations.get(capacity).siteId=siteId;
+    if(!this.setTask(worker,'foodPickup',route,{transferId,sourceId,destinationId,resource,amount,stockReservation,capacityReservation:capacity,outputBuildingId,...(hauling?{hauling:true}: {}),...(siteId!=null?{siteId}:{})})){
+      if(allocationId)this.scene.constructionSystem.materials.returnAllocation(stockReservation);else this.storage.release(stockReservation);if(!capacityReservation)this.storage.release(capacity);return false;
     }
     return true;
   }
@@ -44,12 +46,13 @@ export class FoodProductionSystem {
     if(!task.sourceDropId)return this.storage.locations.get(task.sourceId);
     const drop=this.scene.dropSystem.drops.get(task.sourceDropId);return drop?{id:drop.id,kind:'ground',...drop.tile,width:1,height:1}:null;
   }
-  moveGround(worker,drop,destinationId,amount,{hauling=true}={}){
+  moveGround(worker,drop,destinationId,amount,{hauling=true,siteId=drop.siteId??null}={}){
     if(amount>carryCapacity(worker)||amount>drop.amount||this.scene.character.order?.dropId===drop.id)return false;
     const source=this.source({sourceDropId:drop.id}),route=source&&this.storage.route(worker,[source]);if(!route)return false;
     const reservation=`drop:${drop.id}`;if(!this.scene.workerSystem.reservations.reserve(reservation,worker.id))return false;
     const transferId=`food-transfer-${this.nextTransfer++}`,capacityReservation=this.storage.reserve('capacity',destinationId,drop.resource,amount,transferId);
-    if(!capacityReservation||!this.setTask(worker,'foodPickup',route,{transferId,sourceDropId:drop.id,destinationId,resource:drop.resource,amount,capacityReservation,hauling})){
+    if(capacityReservation&&siteId!=null)this.storage.reservations.get(capacityReservation).siteId=siteId;
+    if(!capacityReservation||!this.setTask(worker,'foodPickup',route,{transferId,sourceDropId:drop.id,destinationId,resource:drop.resource,amount,capacityReservation,hauling,...(siteId!=null?{siteId}:{})})){
       this.storage.release(capacityReservation);this.scene.workerSystem.reservations.release(reservation,worker.id);return false;
     }
     return true;
@@ -64,10 +67,13 @@ export class FoodProductionSystem {
   }
   startDelivery(worker){
     const cargo=worker.cargo;if(!cargo)return false;
-    const route=this.storage.findDestination(worker,cargo.resource,cargo.amount,{partial:true});if(!route){worker.workState='Waiting';worker.workMessage='Waiting for reachable food storage capacity';worker.aiCooldown=FOOD_RULES.searchInterval;return false;}
+    const site=cargo.siteId!=null&&this.scene.constructionSystem?.materials.site(cargo.siteId),siteLocation=site&&this.storage.locations.get(`site-${site.id}`);
+    if(cargo.siteId!=null&&!site)delete cargo.siteId;
+    const route=siteLocation?this.storage.route(worker,[siteLocation]):this.storage.findDestination(worker,cargo.resource,cargo.amount,{partial:true});if(!route){worker.workState='Waiting';worker.workMessage='Waiting for reachable storage capacity';worker.aiCooldown=FOOD_RULES.searchInterval;return false;}
     const amount=Math.min(cargo.amount,this.storage.room(route.location.id),carryCapacity(worker)),transferId=`food-transfer-${this.nextTransfer++}`;
     const capacityReservation=this.storage.reserve('capacity',route.location.id,cargo.resource,amount,transferId);if(!capacityReservation)return false;
-    if(!this.setTask(worker,'foodDeliver',route,{transferId,destinationId:route.location.id,resource:cargo.resource,amount,capacityReservation})){this.storage.release(capacityReservation);return false;}
+    if(site)this.storage.reservations.get(capacityReservation).siteId=site.id;
+    if(!this.setTask(worker,'foodDeliver',route,{transferId,destinationId:route.location.id,resource:cargo.resource,amount,capacityReservation,...(site?{siteId:site.id}:{})})){this.storage.release(capacityReservation);return false;}
     return true;
   }
   handles(worker){return ['foodPickup','foodDeliver'].includes(worker.workTask?.kind)||!!worker.cargo&&this.storage.manages(worker.cargo.resource);}
@@ -104,11 +110,12 @@ export class FoodProductionSystem {
     if(outputAvailable){
       let cap=this.storage.reservations.get(record.outputReservation),destination=cap&&this.storage.locations.get(cap.locationId);
       if(!destination){const route=this.storage.findDestination(worker,outputResource,Math.min(outputAvailable,FOOD_RULES.carryCapacity));if(route)destination=route.location;}
-      if(destination&&this.move(worker,outputId,destination.id,outputResource,Math.min(outputAvailable,FOOD_RULES.carryCapacity),{capacityReservation:cap?.id,outputBuildingId:building.id}))return;
+      if(destination&&!this.scene.logisticsTasks?.waitForHauler(building,'output')&&this.move(worker,outputId,destination.id,outputResource,Math.min(outputAvailable,FOOD_RULES.carryCapacity),{capacityReservation:cap?.id,outputBuildingId:building.id}))return;
     }
     if(!record.auto){worker.workState='Waiting';worker.workMessage='Auto Production OFF';return;}
     const [resource,needed]=first(recipe.input),input=this.storage.locations.get(inputId),incoming=[...this.scene.workerSystem.liveWorkers()].reduce((n,w)=>n+(w.workTask?.destinationId===inputId?w.workTask.amount:0),0);
     if(!record.cycle&&(input.stock[resource]??0)+incoming<needed){
+      if(this.scene.logisticsTasks?.waitForHauler(building,'input')){worker.workState='Waiting';worker.workMessage=`Waiting for Hauler delivery of ${resource}`;return;}
       const source=this.storage.findSource(worker,resource),destinationRoute=this.storage.route(worker,[input]);
       if(source&&destinationRoute){const amount=Math.min(needed-(input.stock[resource]??0)-incoming,this.storage.free(source.location.id,resource),FOOD_RULES.carryCapacity);
         if(amount>0&&this.move(worker,source.location.id,inputId,resource,amount))return;}
@@ -144,6 +151,7 @@ export class FoodProductionSystem {
     if(!capacity||!destination){this.scene.workerSystem.ai.cancel(worker);return;}
     const amount=Math.min(worker.cargo.amount,capacity.amount);
     if(!this.storage.put(task.capacityReservation,amount,{transportCancelled:worker.cargo.transportCancelled})){worker.workState='Waiting';worker.workMessage='Waiting for storage capacity';return;}
+    if(destination.kind==='site')this.scene.constructionSystem.materials.delivered();
     const resource=worker.cargo.resource,haulReward=task.hauling&&worker.profession==='hauler'&&!worker.cargo.transportCancelled&&Number.isFinite(task.loadedDistance);worker.cargo.amount-=amount;
     if(this.storage.isStock(destination)){
       const workplace=this.scene.workplaceSystem.records.get(worker.assignedWorkplaceId);if(workplace)workplace.delivered[resource]=(workplace.delivered[resource]??0)+amount;

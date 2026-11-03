@@ -287,7 +287,7 @@ export class GameScene extends Phaser.Scene {
       if(this.selectedBuilding.construction?.mode==='line'){
         this.dragAnchor={...goal};this.wallLastLine=null;this.previewTracking=true;this.previewKey=null;this.updateBuildingPreview();return;
       }
-      const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding});
+      const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding,reserveMaterials:true});
       if(result.error){this.previewKey=null;this.updateBuildingPreview();this.setStatus(result.error);}
       else{
         this.constructionSystem.plan(result.building);
@@ -298,7 +298,7 @@ export class GameScene extends Phaser.Scene {
     }
     const selected=this.pickInteraction(pointer.worldX,pointer.worldY,goal);
     if(selected?.kind==='human'){this.unitPanel.open(selected.object);return;}
-    if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){this.constructionSystem.commandKing(selected.object);this.constructionUI.open(selected.object);return;}
+    if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){this.kingLogistics.cancel();this.constructionSystem.commandKing(selected.object);this.constructionUI.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).crop){this.farmingPanel.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).storage){this.storagePanel.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).workplace){this.workplacePanel.open(selected.object);return;}
@@ -398,7 +398,7 @@ export class GameScene extends Phaser.Scene {
   clearWallPreviews(){
     for(const view of this.wallPreviews.values())view.destroy();this.wallPreviews.clear();this.dragAnchor=null;this.wallLastLine=null;
   }
-  wallOptions(tiles){return {map:this.map,tiles,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),buildings:this.buildings,definition:this.selectedBuilding,inventory:this.inventory};}
+  wallOptions(tiles){return {map:this.map,tiles,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),buildings:this.buildings,definition:this.selectedBuilding,inventory:this.inventory,reserveMaterials:true};}
   updateWallPreview(anchor){
     this.preview.setVisible(false);
     const tiles=this.dragAnchor?wallLine(this.dragAnchor,anchor):this.wallLastLine??[anchor],plan=wallLinePlan(this.wallOptions(tiles));

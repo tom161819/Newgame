@@ -5,22 +5,24 @@ import { CONSTRUCTION_RULES } from '../data/construction.js';
 import { initializeConstructionSite } from './ConstructionSite.js';
 import { advanceConstruction } from './ConstructionProgress.js';
 import { BuilderAI } from './BuilderAI.js';
+import { ConstructionMaterialsSystem } from './ConstructionMaterialsSystem.js';
 
 export class ConstructionSystem {
   constructor(scene,{onProgress=()=>{},onComplete=()=>{},onCancel=()=>{}}={}){
     Object.assign(this,{scene,onProgress,onComplete,onCancel});this.sites=new Map();this.assignments=new Map();this.nextId=Math.max(0,...scene.buildings.map(b=>b.id))+1;this.revision=0;
     this.builderAI=new BuilderAI(this);scene.workerSystem.jobs.setConstructionProvider(this.builderAI);
     this.kingWorking=false;
+    this.materials=new ConstructionMaterialsSystem(this);
   }
   plan(building){
     if(building.construction)return building;
-    building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;initializeConstructionSite(building);for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.revision++;return building;
+    building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;initializeConstructionSite(building);this.materials.registerLegacy(building);for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.revision++;return building;
   }
   actor(id){return id==='king'?this.scene.character:this.scene.workerSystem.workers.get(id);}
   slotKey(goal){return `construction-slot:${tileKey(goal)}`;}
   goals(site,actor){return towerNeighbors(site).filter(t=>this.scene.map[t.y]?.[t.x]===0&&this.scene.workerSystem.reservations.available(this.slotKey(t),actor.id));}
   reserve(site,actor,goal){
-    if(!this.sites.has(site.id)||!actor.isAlive||this.assignments.has(actor.id)||site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders)return false;
+    if(!this.sites.has(site.id)||!this.materials.ready(site)||!actor.isAlive||this.assignments.has(actor.id)||site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders)return false;
     if(!this.scene.workerSystem.reservations.reserve(this.slotKey(goal),actor.id))return false;
     this.assignments.set(actor.id,{siteId:site.id,goal:{...goal}});site.construction.assignedBuilders.push(actor.id);
     if(actor.id!=='king')actor.workTask={kind:'build',targetId:site.id,reservation:this.slotKey(goal),goal:{...goal},progressMs:0};
@@ -37,6 +39,8 @@ export class ConstructionSystem {
     this.stopKing();const king=this.scene.character;
     this.scene.huntingSystem.cancel?.();this.scene.mountSystem.cancel?.();this.scene.treasureSystem.cancelRequest?.();
     if(!this.sites.has(site.id)||this.scene.gameOver||king.transitioning)return false;
+    if(!this.materials.ready(site)){this.scene.setStatus('Waiting for construction materials. Use Deliver Materials.');return false;}
+    this.scene.kingLogistics?.cancel();
     if(site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders){this.scene.setStatus('Na staveništi není volné pracovní místo (3 / 3).');return false;}
     if(king.mountedHorse&&!this.scene.mountSystem.dismount())return false;
     const goals=this.goals(site,king).sort((a,b)=>octileDistance(king.tile,a)-octileDistance(king.tile,b));
@@ -53,6 +57,7 @@ export class ConstructionSystem {
   }
   update(delta){
     for(const site of [...this.sites.values()]){
+      if(!this.materials.ready(site))continue;
       const participants=[];
       for(const id of [...site.construction.assignedBuilders]){
         const actor=this.actor(id),assignment=this.assignments.get(id);
@@ -69,6 +74,7 @@ export class ConstructionSystem {
   }
   finish(site){
     const c=site.construction;if(!this.sites.has(site.id)||c.rewardsGranted||c.workDone<c.requiredWork)return false;
+    if(!this.materials.complete(site))return false;
     c.state='complete';c.progress=100;c.rewardsGranted=true;
     if(buildingDefinition(site).walkable)for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=0;
     for(const id of [...c.assignedBuilders]){const actor=this.actor(id);if(!actor)continue;if(id==='king')this.stopKing();else{this.scene.workerSystem.ai.cancel(actor);actor.workState='Searching for Work';actor.aiCooldown=0;}}
@@ -86,7 +92,7 @@ export class ConstructionSystem {
     for(const id of [...c.assignedBuilders]){const actor=this.actor(id);if(!actor)continue;if(id==='king')this.stopKing();else this.scene.workerSystem.ai.cancel(actor);}
     this.sites.delete(site.id);this.scene.buildings.splice(this.scene.buildings.indexOf(site),1);
     for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=this.scene.terrainGrid[tile.y][tile.x];
-    for(const [id,n]of Object.entries(refund))this.scene.inventory.add(id,n);this.revision++;this.onCancel(site,refund);return true;
+    if(!this.materials.cancel(site,refund))for(const [id,n]of Object.entries(refund))this.scene.inventory.add(id,n);this.revision++;this.onCancel(site,refund);return true;
   }
   estimatedSeconds(site){const rate=this.activeBuilders(site).reduce((sum,p)=>sum+this.scene.skillSystem.workEfficiency(p.actor,'construction'),0);return rate?(site.construction.requiredWork-site.construction.workDone)/rate/1000:null;}
   exportState(){const king=this.assignments.get('king');return {nextId:Math.max(this.nextId,Math.max(0,...this.scene.buildings.map(b=>b.id))+1),kingSiteId:king?.siteId??null,kingGoal:king?.goal?{...king.goal}:null};}

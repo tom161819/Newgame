@@ -68,6 +68,11 @@ export class FoodStorageSystem {
   }
   release(id){if(this.reservations.delete(id))this.changed();}
   releaseOwner(owner){for(const r of [...this.reservations.values()])if(r.owner===owner)this.release(r.id);}
+  splitStock(id,amount,owner){
+    const r=this.reservations.get(id);if(!r||r.kind!=='stock'||!positive(amount)||amount>r.amount)return null;
+    if(amount===r.amount){r.owner=owner;this.changed();return id;}
+    r.amount-=amount;const next=`food-reservation-${this.nextReservation++}`;this.reservations.set(next,{...r,id:next,amount,owner});this.changed();return next;
+  }
   consumeHaulExclusion(location,resource,amount){
     const excluded=Math.min(amount,location.haulExcluded?.[resource]??0);if(!excluded)return false;
     location.haulExcluded[resource]-=excluded;if(!location.haulExcluded[resource])delete location.haulExcluded[resource];
@@ -75,7 +80,7 @@ export class FoodStorageSystem {
   }
   take(id){
     const r=this.reservations.get(id),l=r&&this.locations.get(r.locationId);if(!l||r.kind!=='stock'||(l.stock[r.resource]??0)<r.amount)return null;
-    const cargo={resource:r.resource,amount:r.amount};if(this.consumeHaulExclusion(l,r.resource,r.amount))cargo.transportCancelled=true;
+    const cargo={resource:r.resource,amount:r.amount,...(r.siteId!=null?{siteId:r.siteId}:{})};if(this.consumeHaulExclusion(l,r.resource,r.amount))cargo.transportCancelled=true;
     l.stock[r.resource]-=r.amount;if(!l.stock[r.resource])delete l.stock[r.resource];this.reservations.delete(id);this.changed();return cargo;
   }
   put(id,amount,{transportCancelled=false}={}){

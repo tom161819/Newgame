@@ -1,11 +1,13 @@
 import { buildingDefinition } from '../game/buildings.js';
 import { constructionPhase,CONSTRUCTION_RULES } from '../data/construction.js';
+import { element } from './objectLabels.js';
 
 export class ConstructionUI {
   constructor(scene){
     this.scene=scene;this.dialog=document.querySelector('#construction-dialog');this.controller=new AbortController();const options={signal:this.controller.signal};this.restored=true;
     document.querySelector('#close-construction').addEventListener('click',()=>this.close(),options);
     document.querySelector('#construction-king-work').addEventListener('click',()=>{scene.constructionSystem.commandKing(this.site);this.refresh();},options);
+    document.querySelector('#construction-deliver').addEventListener('click',()=>{scene.kingLogistics.startMaterials(this.site);this.refresh();},options);
     document.querySelector('#construction-king-stop').addEventListener('click',()=>{scene.constructionSystem.stopKing();this.refresh();},options);
     document.querySelector('#cancel-construction').addEventListener('click',()=>{scene.constructionSystem.cancel(this.site);this.close();},options);
     this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.close();},options);this.dialog.addEventListener('close',()=>this.restoreInput(),options);
@@ -19,7 +21,10 @@ export class ConstructionUI {
     document.querySelector('#construction-builders').textContent=`Builders: ${active.length} working / ${CONSTRUCTION_RULES.maximumBuilders} slots · ${c.assignedBuilders.length} reserved`;
     document.querySelector('#construction-eta').textContent=estimate==null?'Waiting for builders':`Remaining: ${Math.ceil(estimate)} s`;
     document.querySelector('#construction-king-task').textContent=kingHere?(system.atSite(s.character,king)?'King: Building':'King: Travelling to construction site'):'King: Not assigned';
-    const button=document.querySelector('#construction-king-work');button.disabled=kingHere||c.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders;document.querySelector('#construction-king-stop').hidden=!kingHere;
+    const ready=system.materials.ready(site),summary=system.materials.summary(site);
+    document.querySelector('#construction-materials').replaceChildren(...summary.map(row=>element('p','',`${s.objectRegistry.require(row.resource).name}: Required ${row.required} · Reserved ${row.reserved} · Carried ${row.carried} · Delivered ${row.delivered} · Missing ${row.missing}`)));
+    const delivery=document.querySelector('#construction-deliver');delivery.hidden=ready;delivery.disabled=s.kingLogistics.workflowSiteId===site.id;
+    const button=document.querySelector('#construction-king-work');button.disabled=!ready||kingHere||c.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders;document.querySelector('#construction-king-stop').hidden=!kingHere;
     document.querySelector('#construction-refund').textContent=`Cancel refund: ${c.workDone>0?'50 % (rounded down)':'100 %'}`;document.querySelector('#construction-unreachable').textContent=site.unreachableReason??'';
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}

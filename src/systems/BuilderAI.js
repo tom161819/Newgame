@@ -25,6 +25,7 @@ export class BuilderAI {
     worker.workState='Waiting';worker.workMessage='Waiting for construction';if(worker.aiCooldown>0)return;worker.aiCooldown=CONSTRUCTION_RULES.retryInterval;
     const choices=new Map(),start=worker.nextTile??worker.tile;
     for(const site of system.sites.values()){
+      if(!system.materials.ready(site))continue;
       if(site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders||this.blocked.get(`${worker.id}:${site.id}`)===system.revision)continue;
       const goals=system.goals(site,worker);if(!goals.length){
         if(!towerNeighbors(site).some(t=>scene.map[t.y]?.[t.x]===0)){this.blocked.set(`${worker.id}:${site.id}`,system.revision);site.unreachableReason='Staveniště nemá průchozí přístup.';}

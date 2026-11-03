@@ -44,11 +44,12 @@ export function placementError(map,anchor,resources,reservedTiles=[],definition=
   return null;
 }
 
-export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,inventory,buildings,definition=towerDefinition()}) {
+export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,inventory,buildings,definition=towerDefinition(),reserveMaterials=false}) {
   const error=placementError(map,anchor,resources,reservedTiles,definition,buildings);
   if(error)return {error};
-  if(!inventory.pay(definition.cost))return {error:'Na tuto budovu nemáš dostatek surovin.'};
-  const building={id:buildings.reduce((n,b)=>Math.max(n,b.id),0)+1,type:definition.id,definition,x:anchor.x,y:anchor.y,tiles:buildingTiles(anchor,definition)};
+  const construction=inventory.storage?.scene.constructionSystem,materials=reserveMaterials&&construction?.materials.enabled?construction.materials:null;
+  const building={id:Math.max(buildings.reduce((n,b)=>Math.max(n,b.id),0)+1,materials?construction.nextId:1),type:definition.id,definition,x:anchor.x,y:anchor.y,tiles:buildingTiles(anchor,definition)};
+  if(!(materials?materials.prepare(building):inventory.pay(definition.cost)))return {error:'Na tuto budovu nemáš dostatek surovin.'};
   for(const tile of building.tiles)map[tile.y][tile.x]=definition.walkable?0:1;
   buildings.push(building);
   return {building};

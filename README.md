@@ -88,7 +88,7 @@ Pracovní AI funguje i mimo záběr kamery a pod Fog of War; skryté jednotky ne
 
 ## Blueprinty a výstavba
 
-Buildings nejprve umístí **blueprint**, nikoli hotovou budovu. Materiál se odečte jednou a celý půdorys je od této chvíle obsazený. Trvalý průhledný návrh a ukazatel na mapě ukazují, co se chystá postavit. Nedokončená budova neposkytuje příjem, pracoviště, vstup na plošinu ani chůzi po hradbě.
+Buildings nejprve umístí **blueprint**, nikoli hotovou budovu. Materiál se rezervuje pro konkrétní staveniště a fyzicky zůstává ve skladu až do vyzvednutí; přestane být dostupný pro jiné zakázky. Nosič nebo král jej skutečně dopraví na místo. Stavitelé začnou až po dodání celé ceny a při dokončení se doručený materiál spotřebuje bez dalšího odečtu ze skladu. Půdorys je od umístění obsazený. Nedokončená budova neposkytuje příjem, pracoviště, vstup na plošinu ani chůzi po hradbě.
 
 | Budova | Základní doba při Construction 1 |
 |---|---:|
@@ -101,13 +101,13 @@ Buildings nejprve umístí **blueprint**, nikoli hotovou budovu. Materiál se od
 
 Poddanému přiřaď **Builder**. Vyhledá nejbližší dosažitelné staveniště, rezervuje si sousední pracovní místo a začne až po skutečném příchodu. Na jednom staveništi jsou nejvýše **tři místa včetně krále**. Rychlosti se sčítají a Construction přidává 1 % za každý level nad 1, nejvýše 149 %. Doba chůze se do postupu nezapočítává. Nedostupné staveniště čeká na změnu mapy a nevyvolává opakované hledání každým snímkem.
 
-**Kliknutím na blueprint pošleš krále stavět** a otevřeš přehled postupu, fáze, pracovníků a zbývajícího času. Král případně sesedne z koně nebo sleze z hotové plošiny. Může stavět sám i pomáhat ostatním. Zavřením přehledu pokračuje v práci; **Stop King's work** nebo příkaz k jinému cíli práci přeruší a zachová postup. V panelu lze práci znovu zahájit.
+**Kliknutím na blueprint otevřeš přehled materiálu a postupu.** Pokud cena není doručená, použij **Deliver Materials**: král postupně vyzvedne rezervované suroviny a dopraví je na místo v nákladech do 20 jednotek. Změna příkazu zachová náklad i jeho závazek vůči původní stavbě. Po doručení následuje samostatný příkaz **Build with King**; také kliknutí na již zásobený blueprint pošle krále stavět. Král případně sesedne z koně nebo sleze z hotové plošiny. Může stavět sám i pomáhat ostatním. Zavřením přehledu pokračuje v práci; **Stop King's work** nebo příkaz k jinému cíli práci přeruší a zachová postup.
 
-**Cancel Construction** vrátí 100 % původního materiálu, pokud ještě nikdo nezačal skutečně pracovat. Po zahájení vrátí 50 % každé suroviny, zaokrouhleno dolů. Zrušená stavba neudělí XP a uvolní místa i půdorys. Hradby tažením vytvářejí jednotlivá staveniště; opakovaně naplánované segmenty se znovu neplatí. Teprve hotové segmenty se propojí a lze po nich chodit.
+**Cancel Construction** uvolní dosud nevyzvednuté rezervace a zachová skutečný materiál v nákladech či na zemi. Doručené zásoby z nezasahované stavby zanechá na zemi v plném množství; po zahájení práce vrátí 50 % každé suroviny, zaokrouhleno dolů. Refundace se nepřičte vzdáleně do inventáře ani znovu neudělí Mining XP. Zrušená stavba neudělí Construction XP a uvolní místa i půdorys. Hradby tažením rezervují celou řadu atomicky a vytvářejí jednotlivá staveniště. Teprve hotové segmenty se propojí a lze po nich chodit.
 
 Fáze přecházejí od průhledného blueprintu přes základy, konstrukci a téměř hotovou budovu k plné grafice. Odměna se přidělí jednou až při dokončení. **Základní XP odměna** se rozdělí podle skutečného příspěvku každého stavitele; osobní talent následně přidá svému majiteli původních 20 % skillových XP. Celkový level nepřebírá tento osobní bonus. Pouhá rezervace, chůze, čekání ani zrušení XP nepřidávají.
 
-Save/Load zachovává zaplacený materiál, postup, příspěvky, pracovní místa, rozpracované cesty i úkol krále. Starší uložené budovy zůstanou hotové; nic se znovu neplatí, nestaví ani neodměňuje.
+Save Schema 7 zachovává zdrojové rezervace, doručené zásoby, závazky neseného i odloženého materiálu, postup, příspěvky, pracovní místa, cesty i vícecestnou přepravu krále. Starší rozestavěné budovy dostanou už zaplacený materiál jako doručený; ze skladu se znovu nic neodečte. Starší hotové budovy zůstanou hotové.
 
 ## Pracovní budovy a zaměstnanci
 

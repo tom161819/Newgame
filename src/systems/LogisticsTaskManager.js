@@ -3,13 +3,15 @@ import { buildingDefinition } from '../game/buildings.js';
 
 // Derived catalog only: physical ownership stays in storage, drops and cargo.
 export class LogisticsTaskManager {
-  constructor(scene){this.scene=scene;this.catalog=[];this.nextRefresh=0;this.failedRoutes=new Map();}
+  constructor(scene){this.scene=scene;this.catalog=[];this.nextRefresh=0;this.failedRoutes=new Map();this.producerWaits=new Map();}
   get storage(){return this.scene.foodStorage;}
   update(){
     const now=this.scene.gameTime.totalElapsed;if(now<this.nextRefresh)return;
     this.nextRefresh=now+LOGISTICS_RULES.planningInterval;this.catalog=[];
     for(const [key,expires]of this.failedRoutes)if(expires<=now)this.failedRoutes.delete(key);
+    for(const key of this.producerWaits.keys())if(!this.scene.foodProduction.records.has(Number(key.split(':')[0])))this.producerWaits.delete(key);
     const storage=this.storage,stores=[...storage.locations.values()].filter(l=>storage.isStock(l));
+    this.catalog.push(...(this.scene.constructionSystem?.materials.candidates()??[]));
     for(const record of this.scene.foodProduction.records.values()){
       const building=this.scene.foodProduction.building(record.buildingId);if(!building)continue;
       const recipe=buildingDefinition(building).recipe,[resource,needed]=Object.entries(recipe.input)[0],input=storage.locations.get(`input-${building.id}`);
@@ -27,6 +29,7 @@ export class LogisticsTaskManager {
     for(const source of stores.filter(l=>l.kind==='fallback'))for(const [resource]of Object.entries(source.stock))if(storage.free(source.id,resource)>0)
       for(const destination of stores.filter(l=>l.kind==='storage'&&l.allowed.includes(resource)&&storage.room(l.id)>0))this.catalog.push({priority:40,sourceId:source.id,destinationId:destination.id,resource,amount:storage.free(source.id,resource)});
     for(const drop of this.scene.dropSystem.drops.values())if(storage.manages(drop.resource)&&this.scene.character.order?.dropId!==drop.id){
+      if(drop.siteId!=null&&this.scene.constructionSystem?.materials.site(drop.siteId))continue;
       const edible=this.scene.objectRegistry.require(drop.resource).edible||drop.resource==='meat';
       for(const destination of stores)if(destination.allowed.includes(drop.resource)&&storage.room(destination.id)>0)this.catalog.push({priority:edible&&this.scene.foodSystem.shortage?10:35,sourceDropId:drop.id,destinationId:destination.id,resource:drop.resource,amount:drop.amount});
     }
@@ -42,7 +45,7 @@ export class LogisticsTaskManager {
     let attempts=0;
     for(const {task}of candidates){
       const destination=storage.locations.get(task.destinationId),drop=task.sourceDropId&&this.scene.dropSystem.drops.get(task.sourceDropId),existingCap=storage.reservations.get(task.capacityReservation);
-      const available=drop?.amount??storage.free(task.sourceId,task.resource),room=existingCap?.amount??storage.room(task.destinationId);
+      const allocation=task.allocationId&&storage.reservations.get(task.allocationId),available=task.allocationId?(allocation?.owner===`site-${task.siteId}`?allocation.amount:0):drop?.amount??storage.free(task.sourceId,task.resource),room=existingCap?.amount??storage.room(task.destinationId);
       let missing=task.amount;if(destination?.kind==='input'){const b=this.scene.buildings.find(b=>b.id===destination.buildingId),recipe=b&&buildingDefinition(b).recipe;missing=(recipe?.input[task.resource]??0)-(destination.stock[task.resource]??0)-storage.incoming(destination.id);}
       const amount=Math.min(cap,available,room,missing);if(amount<=0||!destination||drop&&!this.scene.workerSystem.reservations.available(`drop:${drop.id}`,worker.id))continue;
       const routeKey=`${worker.id}:${task.sourceDropId??task.sourceId}:${task.destinationId}`;
@@ -53,5 +56,14 @@ export class LogisticsTaskManager {
       if(success)return;this.failedRoutes.set(routeKey,this.scene.gameTime.totalElapsed+2000);
     }
   }
-  destroy(){this.catalog=[];this.failedRoutes.clear();}
+  waitForHauler(building,kind){
+    const record=this.scene.foodProduction.records.get(building.id),now=this.scene.gameTime.totalElapsed,key=`${building.id}:${kind}`;
+    let wait=this.producerWaits.get(key);if(!wait||wait.cycle!==record.nextCycle){wait={cycle:record.nextCycle,since:now,checkedAt:-Infinity,available:false};this.producerWaits.set(key,wait);}
+    if(now-wait.since>=3000)return false;
+    if(now-wait.checkedAt>=500){
+      wait.checkedAt=now;const location=this.storage.locations.get(`${kind}-${building.id}`);
+      wait.available=this.scene.workerSystem.liveWorkers().filter(w=>w.profession==='hauler'&&!w.arriving&&this.scene.workplaceSystem.building(w)).slice(0,6).some(w=>!!this.storage.route(w,[location]));
+    }return wait.available;
+  }
+  destroy(){this.catalog=[];this.failedRoutes.clear();this.producerWaits.clear();}
 }

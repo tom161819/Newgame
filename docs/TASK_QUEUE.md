@@ -49,7 +49,7 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 1. **Právě probíhá:** [Krok 24 — Logistics, Warehouses & Physical Resource Transport](requests/step-24.md).
    - Fáze A dokončena: fyzické suroviny, sklady a migrace inventáře; 228/228 testů, produkční build a skutečný browser smoke včetně mobilního UI a obnovení králova nákladu. Commit fáze obsahuje tento záznam.
    - Fáze B dokončena: Hauler, Logistics 1–50, nosnost 20–38, mzdy, prioritní přepravní AI a rezervace. 242/242 testů (14 nových), build, skutečné UI/IndexedDB a migrace skutečného commitu fáze A ověřeny; commit fáze obsahuje tento záznam.
-   - Fáze C: zásobování stavenišť, zemědělství a výroby.
+   - Fáze C dokončena: rezervace ceny, fyzické zásobování stavenišť nosiči/králem, více cest, zahájení práce po doručení, bezpečné refundace a přednost nosičů ve výrobě. 259/259 testů (17 nových), build, skutečné UI/IndexedDB a skutečný schema6 save z commitu B ověřeny. Commit fáze obsahuje tento záznam.
    - Fáze D: UI, Save/Load, optimalizace a integrační testy.
    - Každou dokončenou a otestovanou fázi uložit samostatným commitem.
 2. **Po dokončení kroku 24:** [Master prompt 25–37 — 15 etap / 5 milníků](requests/master-25-37.md). Přesné pořadí a samostatné specifikace jsou v [roadmapě](UPGRADE_ROADMAP_25_37.md); stav v [progress](UPGRADE_PROGRESS.md). Každá etapa testy/opravit/build/Unreleased/commit, automaticky další. M1–M5 po release gate automatický MINOR, skutečný Git tag a neměnný archiv; uživatel tato vydání výslovně autorizoval bez dalšího potvrzení.

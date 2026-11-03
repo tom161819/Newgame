@@ -50,7 +50,7 @@ export function loadGameState(scene,input){
     if(worker.workTask?.kind==='foodPickup'&&worker.workTask.sourceDropId)scene.workerSystem.reservations.reserve(`drop:${worker.workTask.sourceDropId}`,worker.id);
     if(!worker.isAlive)worker.view.destroy();else{const pos=gridToWorld(worker.position.x,worker.position.y);worker.view.setPosition(pos.x,pos.y).setDepth(pos.y+.1);worker.view.animate?.(0,worker.walking,worker.direction);}
   }
-  for(const d of state.drops)scene.dropSystem.create(d.resource,d.tile,d.amount,d.id,{rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0),haulEligible:d.haulEligible!==false});
+  for(const d of state.drops)scene.dropSystem.create(d.resource,d.tile,d.amount,d.id,{rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0),haulEligible:d.haulEligible!==false,siteId:d.siteId??null});
   for(const saved of state.chests){
     const chest=scene.treasureSystem.create(saved.tile,saved);
     if(saved.opening){
@@ -103,6 +103,7 @@ export function loadGameState(scene,input){
   if(scene.seasons&&!state.seasons&&state.farming)for(const record of state.farming.records){const b=scene.buildings.find(b=>b.id===record.buildingId);record.stage=seasonalCropStage(b.type,record.growthDays,b.definition.crop.growthDays,scene.seasons.season);}
   scene.farmingSystem?.importState(state.farming);
   scene.foodStorage?.importState(state.foodStorage,state.inventory);
+  scene.constructionSystem?.materials.importLegacySites();
   scene.foodProduction?.importState(state.foodProduction);
   scene.kingLogistics?.importState(state.kingLogistics);
   if(scene.seasons&&!state.seasons)for(const worker of scene.workerSystem.liveWorkers())if(worker.workTask?.kind==='harvest'){

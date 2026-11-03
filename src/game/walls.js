@@ -24,14 +24,15 @@ export function wallLinePlan({map,tiles,resources,reservedTiles=[],buildings,def
 }
 export function placeWallLine(options){
   const plan=wallLinePlan(options);if(plan.error)return plan;
-  // Validace celé řady a jedna společná platba před první změnou mapy.
-  if(!options.inventory.pay(plan.cost))return {...plan,error:'Na celou řadu hradeb nemáš dostatek surovin.'};
+  const construction=options.inventory.storage?.scene.constructionSystem,materials=options.reserveMaterials&&construction?.materials.enabled?construction.materials:null;
+  if(!materials&&!options.inventory.pay(plan.cost))return {...plan,error:'Na celou řadu hradeb nemáš dostatek surovin.'};
   const {buildings,map,definition}=options,created=[];
-  let id=buildings.reduce((n,b)=>Math.max(n,b.id),0)+1;
+  let id=Math.max(buildings.reduce((n,b)=>Math.max(n,b.id),0)+1,materials?construction.nextId:1);
   for(const tile of plan.tiles){
     const building={...tile,id:id++,type:definition.id,definition,tiles:buildingTiles(tile,definition)};
-    map[tile.y][tile.x]=definition.walkable?0:1;buildings.push(building);created.push(building);
+    if(materials&&!materials.prepare(building)){for(const prepared of created)materials.discardPrepared(prepared);return {...plan,error:'Na celou řadu hradeb nemáš dostatek surovin.'};}created.push(building);
   }
+  for(const building of created){map[building.y][building.x]=definition.walkable?0:1;buildings.push(building);}
   return {...plan,buildings:created};
 }
 
