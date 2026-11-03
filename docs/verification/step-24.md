@@ -1,0 +1,18 @@
+# Step 24 — physical logistics verification
+
+Implementation checkpoints: A `fb5aaf2`, B `f4e621b`, C `a454fe9`, D `9e93982`.
+
+- Automated regression: **271 passed, 0 failed, 0 skipped** (`node --test --test-isolation=none --test-reporter=spec`). Actual commit archive builds also ran their own `npm test` successfully.
+- Production build: `npm run build -- --base=/Newgame/` passed. Phaser remains bundled; Vite's large-chunk notice is unchanged.
+- Browser: Chromium with the production build and `/Newgame/` base. Actual mouse collection, stock availability only after delivery, Warehouse blueprint reservation, king's physical supply trip, separate Build order and 30,000 ms construction verified. Another Tower was supplied by a UI-assigned Hauler and completed by an existing Builder, with correct cost and XP.
+- Persistence: full exact IndexedDB roundtrips during royal cargo, Hauler38/40 Iron and site supply. A genuine schema6 save produced from Git `fb5aaf2` preserved XP/talent/stock and gained Logistics/empty carrier workplaces. A genuine partial paid Tower from `f4e621b` gained its already-paid10 Stone as delivered, retained20 stored and its progress, and completed without a second debit.
+- Published legacy migration: a genuine schema5 save from Git `74628eb` preserved85 Stone,30 Apple,77 Gold, talent and XP. Legacy storage markers and45 preserved overflow units were visible; no extra Starter Stockpile appeared.
+- Recovery: invalid loaded destination retained10 committed Stone, reset only the instruction/bookings, physically delivered it and awarded no cancelled-trip XP. Corrupt physical stock, capacity and duplicated reservation quantities still fail before replacing the current kingdom.
+- Resource accounting: six disjoint locations (available storage, reserved storage, cargo, site stock, production buffers, ground). Incoming capacity bookings add no material. The full farm→Granary→Mill→Granary→Bakery→Granary chain produced12 Bread from8 Wheat across a production save without duplicated inputs/output.
+- Manual king transport: real Collect with King UI reserves20 units, debits only at arrival, restores the exact journey via IndexedDB, leaves the cargo carried and safely sets it down. Previously stored materials grant no repeated collection/return-trip XP. A full40-food starter can be freed physically to fund the first Warehouse without Haulers.
+- Pathfinding: weighted8-direction A* matched an independent Dijkstra oracle across50 random maps, matched actual movement time across terrain boundaries, chose modest faster detours and preserved corner safety.
+- Desktop/mobile: cargo bundles/HUD, source/destination, carrier capacity/Logistics, warehouse workforce/tasks, site requirements and resource breakdown checked;390px layout had no horizontal overflow. No browser JS or HTTP errors in these scenarios.
+- Performance: winter100×100 map,20 living NPC,6 Haulers,3 Granaries,2 Warehouses,4 sites,4 production buildings and22 plots.600 frame intervals averaged**17.6103 ms (~56.8 FPS)**, p95**33.3 ms**, maximum66.7 ms.16 actors had active work/movement,6 carried cargo,3 production cycles ran; snapshot validated and no JS errors occurred. This is a measured test scenario, not a universal device FPS guarantee.
+- Archive:62 actual commits,7 newly added,0 skipped. Every new snapshot passed its own tests/build/browser startup. SHA-256 verification passed and no previously existing snapshot changed.
+
+Public deployment status is recorded in `docs/TASK_QUEUE.md` after GitHub Actions verification. No numbered release/tag is created for this ordinary queued step; the user authorized MINOR releases at the later master M1–M5 gates.

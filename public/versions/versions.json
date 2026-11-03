@@ -1,6 +1,118 @@
 [
   {
     "schema": 1,
+    "commit": "9e93982740685b0bd18543e1ce7f707b2102b7f1",
+    "tree": "8878097c222485a7309b355aee8e1555fdda1fa9",
+    "date": "2026-11-03T18:27:46Z",
+    "sequence": 62,
+    "subject": "Step 24D: logistics UI, safe task restoration, weighted routes and verified integration",
+    "name": "Roční období, počasí a potrava",
+    "description": "Step 24D: logistics UI, safe task restoration, weighted routes and verified integration",
+    "basePath": "/Newgame/versions/9e93982740685b0bd18543e1ce7f707b2102b7f1/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "a454fe9d3cbe9df36871d95d835a228e723fa870",
+    "tree": "797ab6d1eba0f1f23ab10cb96101a7f4d798525b",
+    "date": "2026-11-03T17:46:31Z",
+    "sequence": 61,
+    "subject": "Step 24C: reserved physical construction supplies, royal deliveries and safe site refunds",
+    "name": "Roční období, počasí a potrava",
+    "description": "Step 24C: reserved physical construction supplies, royal deliveries and safe site refunds",
+    "basePath": "/Newgame/versions/a454fe9d3cbe9df36871d95d835a228e723fa870/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "f4e621b816c4177103157b711d22fbdb3dcf9ea1",
+    "tree": "8fbe9e95bc949ef5b2566c190dec3c1de8da0421",
+    "date": "2026-11-03T17:28:29Z",
+    "sequence": 60,
+    "subject": "Step 24B: shared Hauler transport AI, exclusive reservations and Logistics progression",
+    "name": "Roční období, počasí a potrava",
+    "description": "Step 24B: shared Hauler transport AI, exclusive reservations and Logistics progression",
+    "basePath": "/Newgame/versions/f4e621b816c4177103157b711d22fbdb3dcf9ea1/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "fb5aaf24c7fb77793f43b4725df438ae359abde2",
+    "tree": "13b2377ff99ba3a778f20512c518d0acdc593041",
+    "date": "2026-11-03T17:08:35Z",
+    "sequence": 59,
+    "subject": "Step 24A: physical material stores, royal cargo and safe inventory migration",
+    "name": "Roční období, počasí a potrava",
+    "description": "Step 24A: physical material stores, royal cargo and safe inventory migration",
+    "basePath": "/Newgame/versions/fb5aaf24c7fb77793f43b4725df438ae359abde2/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "e864b0b05852548dc990f317a3bca1f6badf80f6",
+    "tree": "10664f9791e14d556a9e8ca50b14c6ebf4dabce2",
+    "date": "2026-11-03T16:59:24Z",
+    "sequence": 58,
+    "subject": "Persist fifteen ordered upgrade stages, milestone release authorization and final art pass",
+    "name": "Roční období, počasí a potrava",
+    "description": "Persist fifteen ordered upgrade stages, milestone release authorization and final art pass",
+    "basePath": "/Newgame/versions/e864b0b05852548dc990f317a3bca1f6badf80f6/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "e2fe98cafab5d03ce203c7437ccaea5c90ed8f48",
+    "tree": "67d3de0243c0144055f79fce0b4a2517a6a90993",
+    "date": "2026-11-03T16:15:32Z",
+    "sequence": 57,
+    "subject": "Checkpoint published seasons and food consumption before physical logistics",
+    "name": "Roční období, počasí a potrava · kontrolní bod",
+    "description": "Kontrolní verze připravená před následujícím rozšířením.",
+    "basePath": "/Newgame/versions/e2fe98cafab5d03ce203c7437ccaea5c90ed8f48/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "74628eb60c7c0ee921f1274a9e418cead73985fa",
+    "tree": "73d11fa772b8bc2fecc4fcd0cfb2e7b19b0275c7",
+    "date": "2026-11-03T15:56:18Z",
+    "sequence": 56,
+    "subject": "Publish verified seasons, weather and food economy with 55 archived versions",
+    "name": "Roční období, počasí a potrava",
+    "description": "Publish verified seasons, weather and food economy with 55 archived versions",
+    "basePath": "/Newgame/versions/74628eb60c7c0ee921f1274a9e418cead73985fa/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
     "commit": "ddc9168972667cd3c969fd256e1ec7035f78072a",
     "tree": "c7b98e06be1fe398ee1897d40991f8ef6f2bfb3d",
     "date": "2026-11-03T15:53:51Z",
