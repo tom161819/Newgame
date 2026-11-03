@@ -38,8 +38,11 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 ## Následuje
 
-**Fronta je dokončená včetně publikování.** Všechna dosud dodaná herní rozšíření do kroku 19 jsou nasazená. Archiv obsahuje 41 ověřených verzí ze skutečných commitů, včetně `f22ded0`. Čekající doplnění bylo po obnovení připojení GitHub odeslané v commitu `0b2377a`; Pages run `41620706525` skončil úspěšně. Žádný úkol ani čekající publikační krok nezůstává rozpracovaný.
+1. **Právě probíhá:** [Krok 20 — Versioning System & In-Game Changelog](requests/step-20.md).
+2. [Krok 21 — Farming & Orchards](requests/step-21.md).
+3. [Krok 22 — Food Production & Storage](requests/step-22.md).
+4. [Krok 23 — Seasons, Weather & Food Consumption](requests/step-23.md).
 
-Další požadavky se přidávají na konec a dokončují jednotlivě s ověřením, commitem a nasazením na GitHub Pages.
+Předchozí fronta do kroku 19 včetně archivu 41 verzí byla dokončená a publikovaná (`e0c4f54`, Pages `41620923762`). Nové požadavky se dokončují v uvedeném pořadí, každý po ověření a nasazení před zahájením následujícího.
 
 Číslo 18 bylo použité u dvou různých zadání; obě se zachovávají v pořadí doručení jako 18a a 18b. Neaplikovat budoucí mechaniky před jejich krokem: krok 6 má okamžitý lov bez HP, krok 7 přidává koně/FoW, krok 8 Castle/Wall, skutečné souboje až krok 9.
