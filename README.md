@@ -312,3 +312,9 @@ Advanced Settings jsou standardně sbalené. Nová hra používá Fog of War ON 
 Denní příjem, poměrné mzdy, zarůstání cest i migrace používají zvolenou délku dne. Spotřeba masa po minutě a kameny po 20 sekundách zůstávají stejné. WildlifeRespawnSystem doplňuje jeden nejvíce chybějící druh na interval do cíle 3/9/24; hledá dosažitelné volné místo a přednostně místo mimo králův dohled. Pauza a Game Over jej zastaví. Koně nedoplňuje.
 
 Save v2 zachovává konfiguraci odděleně od aktuálního nastavení dohledu, zbývající respawn a skutečný svět. Save v1 se bezpečně převádí bez opětovného vytvoření hradu, zlata, zvěře či truhel a bez změny uložených základních statistik.
+
+### Verze hry a Changelog
+
+Aktuální verzi určuje pouze `package.json.version`; hlavní menu a Settings ji zobrazují automaticky. `CHANGELOG.md` obsahuje jedinou autoritativní historii, kterou Vite při buildu převádí na hráčská data bez backendu. Changelog v hlavním menu podporuje Back/Escape, scrollování a lokální indikátor NEW při přechodu na novější vydání. Sekce Unreleased zůstává skrytá.
+
+Dokončené změny zapisuj anglicky do Unreleased. Číslované vydání se připravuje jen na výslovný pokyn: `npm run release:prepare -- minor` (nebo patch/major), potom validace, testy, build a kontrola změn. Skript sám neprovádí commit, tag ani publikování. Podrobnosti jsou v [docs/RELEASING.md](docs/RELEASING.md); pravidla pro Codex v [AGENTS.md](AGENTS.md). Save Schema Version je samostatná a tento krok ji nemění.

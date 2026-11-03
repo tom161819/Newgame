@@ -56,6 +56,7 @@ const descriptions={
 };
 export async function releaseMetadata(directory,commit,subject){
   const signatures=[
+    ['src/ui/ChangelogPanel.js','Verzování a Changelog'],
     ['src/systems/WorldGenerationConfig.js','Pokročilá konfigurace světa'],['src/ui/NewGameSetup.js','Nastavení nové hry'],
     ['scripts/build-archive.mjs','Archiv herních verzí'],['src/systems/ConstructionSystem.js','Blueprinty a výstavba'],
     ['src/systems/WorkplaceSystem.js','Pracovní budovy'],['src/systems/NaturalTalentSystem.js','Talenty a mzdy'],

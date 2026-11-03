@@ -42,6 +42,7 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 2. [Krok 21 — Farming & Orchards](requests/step-21.md).
 3. [Krok 22 — Food Production & Storage](requests/step-22.md).
 4. [Krok 23 — Seasons, Weather & Food Consumption](requests/step-23.md).
+5. [Krok 24 — Logistics, Warehouses & Physical Resource Transport](requests/step-24.md).
 
 Předchozí fronta do kroku 19 včetně archivu 41 verzí byla dokončená a publikovaná (`e0c4f54`, Pages `41620923762`). Nové požadavky se dokončují v uvedeném pořadí, každý po ověření a nasazení před zahájením následujícího.
 

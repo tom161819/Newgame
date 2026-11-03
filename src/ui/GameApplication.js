@@ -2,11 +2,14 @@ import { SaveGameManager } from '../systems/SaveGameManager.js';
 import { serializeGameState,validateGameState } from '../systems/GameStateSerializer.js';
 import { SaveLoadMenu } from './SaveLoadMenu.js';
 import { NewGameSetup } from './NewGameSetup.js';
+import { ChangelogPanel } from './ChangelogPanel.js';
+import { gameVersion,releases } from 'virtual:game-release';
 
 export class GameApplication {
   constructor(game){
     this.game=game;this.scene=null;this.saves=new SaveGameManager();this.saveMenu=new SaveLoadMenu(this);
     this.main=document.querySelector('#main-menu');this.pauseDialog=document.querySelector('#pause-menu');
+    this.changelog=new ChangelogPanel({version:gameVersion,releases});
     this.setup=new NewGameSetup({onStart:settings=>this.start(null,settings),onBack:()=>{this.setup.close();this.showMainMenu();}});
     document.querySelector('#new-game').addEventListener('click',()=>{this.main.hidden=true;this.setup.open();});
     document.querySelector('#main-load-game').addEventListener('click',()=>this.openSaves('load'));
@@ -25,6 +28,7 @@ export class GameApplication {
   }
   showMainMenu(){this.scene=null;this.main.hidden=false;document.body.classList.remove('in-game');document.querySelector('main').inert=true;document.querySelector('#new-game').disabled=false;document.querySelector('#main-load-game').disabled=false;document.querySelector('#new-game').focus();}
   start(state=null,settings){
+    this.changelog.close(false);
     this.setup.close();
     this.pauseDialog.close();this.main.hidden=true;document.body.classList.add('in-game');document.querySelector('main').inert=false;
     this.game.scene.stop('MainMenu');this.game.scene.stop('Game');this.scene=null;this.game.scene.start('Game',{state,settings});

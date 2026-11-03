@@ -1,6 +1,70 @@
 [
   {
     "schema": 1,
+    "commit": "2d72b21609b4148421d24563b77bec76e4a0f2be",
+    "tree": "d1e5b22ab5f6f2a8e566af16016423f61f81004d",
+    "date": "2026-11-03T10:54:40Z",
+    "sequence": 45,
+    "subject": "Checkpoint completed world configuration and queue upgrades 20 through 23",
+    "name": "Pokročilá konfigurace světa · kontrolní bod",
+    "description": "Kontrolní verze připravená před následujícím rozšířením.",
+    "basePath": "/Newgame/versions/2d72b21609b4148421d24563b77bec76e4a0f2be/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "e0c4f5462905dea15bd8ca0ff7553cdee9ad7d41",
+    "tree": "62f87f610fa2966842d61ad90a1ccb293724f4b8",
+    "date": "2026-11-03T10:38:12Z",
+    "sequence": 44,
+    "subject": "Confirm completed upgrade queue and successful 41-version archive publication",
+    "name": "Pokročilá konfigurace světa",
+    "description": "Confirm completed upgrade queue and successful 41-version archive publication",
+    "basePath": "/Newgame/versions/e0c4f5462905dea15bd8ca0ff7553cdee9ad7d41/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "0b2377a442ef338d8d8b09da4f4b5c62c38870b6",
+    "tree": "ab24a4e98600d65ae485816d11f9ba206509d488",
+    "date": "2026-11-03T08:38:32Z",
+    "sequence": 43,
+    "subject": "Record final archive publication blocked by GitHub authentication",
+    "name": "Pokročilá konfigurace světa",
+    "description": "Record final archive publication blocked by GitHub authentication",
+    "basePath": "/Newgame/versions/0b2377a442ef338d8d8b09da4f4b5c62c38870b6/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "6570b7e4f4cbdd7e44942b7d953db2286a5199f6",
+    "tree": "96b7aed271b98b77a8ab5f83f0dcd8188dc76b53",
+    "date": "2026-11-03T08:36:36Z",
+    "sequence": 42,
+    "subject": "Complete upgrade queue and preserve advanced world release in version archive",
+    "name": "Pokročilá konfigurace světa",
+    "description": "Complete upgrade queue and preserve advanced world release in version archive",
+    "basePath": "/Newgame/versions/6570b7e4f4cbdd7e44942b7d953db2286a5199f6/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
     "commit": "f22ded073c30f1e0fd60dceff2a244bb8f6cb087",
     "tree": "471558ec4574153e492b530adc1d1c1fad58366d",
     "date": "2026-11-03T08:34:35Z",

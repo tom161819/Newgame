@@ -12,7 +12,9 @@
     "preview": "vite preview",
     "test": "node --test",
     "archive:build": "node scripts/build-archive.mjs",
-    "archive:verify": "node scripts/verify-archive.mjs"
+    "archive:verify": "node scripts/verify-archive.mjs",
+    "changelog:validate": "node scripts/validate-changelog.mjs",
+    "release:prepare": "node scripts/prepare-release.mjs"
   },
   "dependencies": {
     "phaser": "4.2.1"

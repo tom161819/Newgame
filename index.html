@@ -8,8 +8,12 @@
   <body>
     <section id="main-menu" class="main-menu" aria-labelledby="main-menu-title">
       <svg class="menu-castle" viewBox="0 0 1000 500" aria-hidden="true"><path d="M0 440L80 400L180 425L280 375L400 410L530 370L700 400L820 370L1000 425V500H0Z" fill="#172523"/><g fill="#253330" stroke="#697260" stroke-width="2"><path d="M320 430V190H345V165H370V190H395V165H420V190H445V430Z"/><path d="M555 430V190H580V165H605V190H630V165H655V190H680V430Z"/><path d="M420 430V275H445V255H470V275H495V255H520V275H545V255H570V430Z"/><path d="M455 275V90H475V65H495V90H515V65H535V275Z"/></g><g fill="#a2935d"><path d="M480 145Q495 120 510 145V180H480Z"/><path d="M360 235Q375 210 390 235V270H360Z"/><path d="M605 235Q620 210 635 235V270H605Z"/></g><path d="M470 430V355Q495 315 520 355V430Z" fill="#0b1414"/><path d="M495 65V15L565 33L495 45" fill="#8a4538" stroke="#9c8454" stroke-width="2"/></svg>
-      <div class="main-menu-content"><span class="eyebrow">KRÁLOVSKÁ HLÍDKA</span><h1 id="main-menu-title">Medieval Kingdom</h1><p>Vybuduj své království.</p><div class="main-menu-buttons"><button id="new-game" type="button" disabled>New Game</button><button id="main-load-game" type="button" disabled>Load Game</button></div><small>Uložené hry zůstávají v tomto prohlížeči.</small><a class="version-archive-link" data-version-archive href="./versions/" target="_blank" rel="noopener noreferrer">Starší verze hry ↗</a></div>
+      <div class="main-menu-content"><span class="eyebrow">KRÁLOVSKÁ HLÍDKA</span><h1 id="main-menu-title">Medieval Kingdom<span class="menu-game-version" data-game-version aria-label="Game version"></span></h1><p>Vybuduj své království.</p><div class="main-menu-buttons"><button id="new-game" type="button" disabled>New Game</button><button id="main-load-game" type="button" disabled>Load Game</button><button id="main-changelog" type="button">Changelog <span id="changelog-new" class="changelog-new" hidden>NEW</span></button></div><small>Uložené hry zůstávají v tomto prohlížeči.</small><a class="version-archive-link" data-version-archive href="./versions/" target="_blank" rel="noopener noreferrer">Starší verze hry ↗</a></div>
     </section>
+    <dialog id="changelog-dialog" class="game-dialog changelog-dialog" aria-labelledby="changelog-title">
+      <header class="dialog-heading"><div><span class="eyebrow">MEDIEVAL KINGDOM</span><h2 id="changelog-title">Changelog</h2></div><button id="changelog-back" type="button">Back</button></header>
+      <div id="changelog-releases" tabindex="0" aria-label="Released updates"></div>
+    </dialog>
     <section id="game-setup" class="main-menu game-setup" aria-labelledby="setup-title" hidden>
       <form id="game-setup-form" class="setup-card">
         <span class="eyebrow">NOVÉ KRÁLOVSTVÍ</span><h1 id="setup-title">New Game Setup</h1><p>Zvol podmínky své výpravy. Svět vznikne až po spuštění hry.</p>
@@ -64,6 +68,7 @@
       <label class="setting-row" for="path-wear-toggle"><span>Show Path Wear Debug</span><input id="path-wear-toggle" type="checkbox" role="switch" /></label>
       <p>Barvy vyšlapání a počet průchodů pod ukazatelem myši.</p>
       <nav class="settings-actions" aria-label="Herní menu"><button type="button" data-game-menu="save">Save Game</button><button type="button" data-game-menu="load">Load Game</button><button type="button" data-game-menu="main">Main Menu</button></nav>
+      <p class="settings-version">Medieval Kingdom · <span data-game-version></span></p>
     </aside>
     <dialog id="asset-gallery" aria-labelledby="asset-gallery-title">
       <header class="asset-gallery-header"><div><h2 id="asset-gallery-title">Asset Library</h2><p>Prohlížení registrovaných objektů · bez úprav a vkládání do mapy</p></div><button id="close-asset-gallery" type="button" aria-label="Zavřít knihovnu">Zavřít ×</button></header>
