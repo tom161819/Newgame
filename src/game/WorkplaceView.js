@@ -31,6 +31,7 @@ export class WorkplaceView {
     this.hitArea=new Phaser.Geom.Polygon([point(x,y,d.visualHeight),point(x+w,y,d.visualHeight),b,c,e,point(x,y+h,d.visualHeight)]);
   }
   contains(x,y){return Phaser.Geom.Polygon.Contains(this.hitArea,x-this.base.x,y-this.base.y);}
+  setAlpha(value){this.body.setAlpha(value);this.footprint.setAlpha(value);return this;}
   setVisible(value){this.body.setVisible(value);this.footprint.setVisible(value);return this;}
   inView(view){const width=(this.definition.width+this.definition.height)*32;return this.base.x+width>=view.x&&this.base.x-width<=view.right&&this.base.y+10>=view.y&&this.base.y-this.definition.visualHeight<=view.bottom;}
   destroy(){this.body.destroy();this.footprint.destroy();}

@@ -15,13 +15,14 @@ export class AnimalController {
   }
   reservedTiles(){return this.mounted?[]:movementReservations(this);}
   update(delta){
+    this.availableWorkMs=0;
     if(!this.active||!this.isAlive||this.mounted)return;
     // Nová budova může zneplatnit vzdálenější část staré cesty.
     if(this.path.length){
       let previous=this.nextTile??this.tile;
       for(const tile of this.path){if(!canStep(this.scene.map,previous,tile)){this.path=[];break;}previous=tile;}
     }
-    advanceMovement(this,delta);
+    this.availableWorkMs=advanceMovement(this,delta);
     const p=gridToWorld(this.position.x,this.position.y);
     this.view.setPosition(p.x,p.y).setDepth(p.y+(this.definition.depth?.offset??0));
     this.view.animate?.(delta,this.walking,this.direction);

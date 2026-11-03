@@ -1,9 +1,9 @@
-import { buildingDefinition,placementError,buildingTiles,planTowerExit } from './buildings.js';
+import { buildingDefinition,buildingIsComplete,placementError,buildingTiles,planTowerExit } from './buildings.js';
 import { tileKey } from './stones.js';
 
 export const WALL_DIRECTIONS=Object.freeze([{name:'N',x:0,y:-1},{name:'E',x:1,y:0},{name:'S',x:0,y:1},{name:'W',x:-1,y:0}]);
 export const isWall=building=>buildingDefinition(building).navigation?.walkableTop===true;
-export const wallIndex=buildings=>new Map(buildings.filter(isWall).map(b=>[tileKey(b),b]));
+export const wallIndex=(buildings,includeUnfinished=false)=>new Map(buildings.filter(b=>isWall(b)&&(includeUnfinished||buildingIsComplete(b))).map(b=>[tileKey(b),b]));
 
 export function wallLine(start,end){
   const dx=end.x-start.x,dy=end.y-start.y,horizontal=Math.abs(dx)>=Math.abs(dy);
@@ -15,7 +15,7 @@ export function connectionsFor(index,building){
   return Object.fromEntries(WALL_DIRECTIONS.map(d=>[d.name,index.has(tileKey({x:building.x+d.x,y:building.y+d.y}))]));
 }
 export function wallLinePlan({map,tiles,resources,reservedTiles=[],buildings,definition,inventory}){
-  const existing=wallIndex(buildings),fresh=tiles.filter(tile=>!existing.has(tileKey(tile)));
+  const existing=wallIndex(buildings,true),fresh=tiles.filter(tile=>!existing.has(tileKey(tile)));
   if(!fresh.length)return {error:'Na celé této řadě už hradby stojí.',tiles:[],cost:{}};
   for(const tile of fresh){const error=placementError(map,tile,resources,reservedTiles,definition,buildings);if(error)return {error,tiles:fresh,cost:{}};}
   const cost=Object.fromEntries(Object.entries(definition.cost).map(([id,amount])=>[id,amount*fresh.length]));

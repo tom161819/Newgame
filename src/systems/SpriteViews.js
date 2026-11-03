@@ -93,6 +93,7 @@ export class SpriteBuildingView {
     for(const tile of building.tiles){floor.fillPoints(tilePolygon(tile),true);floor.strokePoints(tilePolygon(tile),true);}
   }
   contains(x,y) { return this.back.getBounds().contains(x,y); }
+  setAlpha(value) { this.back.setAlpha(value);this.front.setAlpha(value);this.footprint.setAlpha(value);return this; }
   setVisible(value) { this.back.setVisible(value);this.front.setVisible(value);this.footprint.setVisible(value); }
   inView(view) { const b=this.back.getBounds();return b.right>=view.x&&b.x<=view.right&&b.bottom>=view.y&&b.y<=view.bottom; }
   destroy() { this.back.destroy();this.front.destroy();this.footprint.destroy(); }

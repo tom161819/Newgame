@@ -50,6 +50,7 @@ export class TowerView {
   }
 
   contains(x,y){return Phaser.Geom.Polygon.Contains(this.hitArea,x-this.base.x,y-this.base.y);}
+  setAlpha(value){this.footprint.setAlpha(value);this.back.setAlpha(value);this.front.setAlpha(value);return this;}
   setVisible(value){this.footprint.setVisible(value);this.back.setVisible(value);this.front.setVisible(value);}
   inView(view){return this.base.x+70>=view.x&&this.base.x-70<=view.right&&this.base.y+10>=view.y&&this.base.y-(this.definition.visualHeight??166)-9<=view.bottom;}
   destroy(){this.footprint.destroy();this.back.destroy();this.front.destroy();}

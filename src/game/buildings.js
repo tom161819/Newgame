@@ -9,6 +9,7 @@ const towerDefinition = () => objectRegistry.require('tower');
 export const TOWER_COST = towerDefinition().cost.stone;
 export const TOWER_SIZE = towerDefinition().width;
 export const buildingDefinition = building => building.definition ?? objectRegistry.require(building.type ?? 'tower');
+export const buildingIsComplete = building => !!building&&(!building.construction||building.construction.state==='complete');
 
 export function buildingTiles({x,y},definition) {
   const tiles=[];

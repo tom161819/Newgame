@@ -5,7 +5,7 @@ import { TerrainRenderer } from './TerrainRenderer.js';
 import { WorldCamera } from './WorldCamera.js';
 import { Inventory } from './inventory.js';
 import { drawStone, generateResourcePositions, resourceTiles, tileKey, ResourceSpawner } from './stones.js';
-import { placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors, buildingDefinition,buildingDepth } from './buildings.js';
+import { placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors, buildingDefinition,buildingDepth,buildingIsComplete } from './buildings.js';
 import { TowerView } from './TowerView.js';
 import { KingView } from './KingView.js';
 import { PlayerController, PLAYER_STATE } from './PlayerController.js';
@@ -50,6 +50,9 @@ import { EconomyPanel } from '../ui/EconomyPanel.js';
 import { WorkplaceSystem } from '../systems/WorkplaceSystem.js';
 import { WorkplaceView } from './WorkplaceView.js';
 import { WorkplacePanel } from '../ui/WorkplacePanel.js';
+import { ConstructionSystem } from '../systems/ConstructionSystem.js';
+import { ConstructionView } from './ConstructionView.js';
+import { ConstructionUI } from '../ui/ConstructionUI.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -66,6 +69,7 @@ export class GameScene extends Phaser.Scene {
     this.workerSystem=null;
     this.wageSystem=null;this.economyPanel=null;
     this.workplaceSystem=null;
+    this.constructionSystem=null;
     this.gameOver=false;this.input.enabled=true;this.input.keyboard.enabled=true;this.tweens.resumeAll();
     this.activeFramePending=true;this.visibilityPaused=document.hidden;
     this.assets.initialize();
@@ -136,6 +140,10 @@ export class GameScene extends Phaser.Scene {
     this.equipmentPanel=new EquipmentPanel(this);
     this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=`Poddaní ${count} / ${maximum}`;}});if(!this.loadState)this.workerSystem.spawnInitial();
     this.workplaceSystem=new WorkplaceSystem(this);this.workplacePanel=new WorkplacePanel(this);
+    this.constructionSystem=new ConstructionSystem(this,{onProgress:site=>this.towerViews.get(site.id)?.updateProgress?.(site),
+      onComplete:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(`${buildingDefinition(site).name}: stavba dokončena.`);},
+      onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus('Stavba zrušena. Materiál je vrácen podle její rozpracovanosti.');}});
+    this.constructionUI=new ConstructionUI(this);
     this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
     this.treasurePanel=new TreasurePanel(this);if(!this.loadState)this.treasureSystem.spawn(PLAYER_START);
@@ -172,7 +180,7 @@ export class GameScene extends Phaser.Scene {
       this.equipmentPanel.destroy();this.treasurePanel.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
-      this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
+      this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
       this.game.events.off(Phaser.Core.Events.PAUSE,onBackground);this.game.events.off(Phaser.Core.Events.RESUME,onForeground);
       this.game.canvas.style.cursor='';
     });
@@ -249,16 +257,18 @@ export class GameScene extends Phaser.Scene {
       const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding});
       if(result.error){this.previewKey=null;this.updateBuildingPreview();this.setStatus(result.error);}
       else{
+        this.constructionSystem.plan(result.building);
         this.towerViews.set(result.building.id,this.createBuildingView(this.selectedBuilding,result.building));
-        this.activities.emit('buildingCompleted',{actor:this.character,objectType:this.selectedBuilding.id,quantity:1,objectIds:[result.building.id]});
-        this.updateInventory();this.cancelBuilding(`${this.selectedBuilding.name} postavena. Cena: ${formatCost(this.selectedBuilding.cost,this.objectRegistry)}.`);
+        this.updateInventory();this.cancelBuilding(`${this.selectedBuilding.name}: blueprint připraven. Materiál: ${formatCost(this.selectedBuilding.cost,this.objectRegistry)}. Klikni na něj a král může stavět.`);
       }
       return;
     }
     const selected=this.pickInteraction(pointer.worldX,pointer.worldY,goal);
     if(selected?.kind==='human'){this.unitPanel.open(selected.object);return;}
+    if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){this.constructionSystem.commandKing(selected.object);this.constructionUI.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).workplace){this.workplacePanel.open(selected.object);return;}
     if(this.character.transitioning){this.setStatus('Počkej, až král dokončí výstup nebo sestup.');return;}
+    this.constructionSystem.stopKing();
     this.character.order=null;
     this.huntingSystem.cancel();this.mountSystem.cancel();
     const hit=selected,building=hit?.kind==='building'?hit.object:null;
@@ -309,7 +319,8 @@ export class GameScene extends Phaser.Scene {
   createBuildingView(definition,building,preview=false) {
     const object={...building,type:definition.id,definition,tiles:building.tiles??buildingTiles(building,definition)};
     if(!preview){this.terrain.invalidateArea(object.tiles);this.workplaceSystem?.register(building);}
-    return this.assets.createView(definition.id,{building:object,preview});
+    const view=this.assets.createView(definition.id,{building:object,preview});
+    return !preview&&!buildingIsComplete(building)?new ConstructionView(this,building,view):view;
   }
   selectableHumans(){return this.workerSystem?.liveWorkers()??[];}
   towerAtPoint(x,y,tile) {
@@ -322,7 +333,7 @@ export class GameScene extends Phaser.Scene {
     this.huntingSystem.cancel();this.mountSystem.cancel();
     this.treasureSystem.cancelRequest();
     this.clearWallPreviews();
-    this.character.stopForBuilding();this.selectedBuilding=definition;
+    this.constructionSystem.stopKing();this.character.stopForBuilding();this.selectedBuilding=definition;
     this.preview.destroy();this.preview=this.createBuildingView(definition,{x:0,y:0},true);this.preview.setVisible(false);
     this.buildMode=true;this.previewKey=null;this.previewAnchor=null;this.previewTracking=false;this.game.canvas.style.cursor='crosshair';
     this.updateBuildingUI();this.setStatus(`${definition.name}: ${definition.width} × ${definition.height} políčka. Cena: ${formatCost(definition.cost,this.objectRegistry)}. Esc nebo pravý klik stavbu zruší.`);
@@ -355,11 +366,11 @@ export class GameScene extends Phaser.Scene {
     const tiles=this.dragAnchor?wallLine(this.dragAnchor,anchor):this.wallLastLine??[anchor],plan=wallLinePlan(this.wallOptions(tiles));
     const key=`walls:${tiles.map(tileKey).join(';')}:${plan.error}`;
     if(key===this.previewKey){for(const view of this.wallPreviews.values())view.setVisible(true);return;}
-    const definition=this.selectedBuilding,index=new Map(this.wallMap);
+    const definition=this.selectedBuilding,existing=wallIndex(this.buildings,true),index=new Map(existing);
     for(const tile of tiles)index.set(tileKey(tile),{...tile,type:definition.id,definition});
     const needed=new Set();
     for(const tile of tiles){
-      const tileId=tileKey(tile);if(this.wallMap.has(tileId))continue;needed.add(tileId);
+      const tileId=tileKey(tile);if(existing.has(tileId))continue;needed.add(tileId);
       const object={...tile,type:definition.id,definition,tiles:buildingTiles(tile,definition),connections:connectionsFor(index,tile)};
       let view=this.wallPreviews.get(tileId);
       if(!view){view=this.createBuildingView(definition,object,true);this.wallPreviews.set(tileId,view);}
@@ -374,10 +385,9 @@ export class GameScene extends Phaser.Scene {
     const tiles=wallLine(this.dragAnchor,this.pointerTile(pointer)),result=placeWallLine(this.wallOptions(tiles));
     this.dragAnchor=null;
     if(result.error){this.wallLastLine=tiles;this.previewTracking=false;this.previewKey=null;this.updateBuildingPreview();return;}
-    for(const building of result.buildings)this.towerViews.set(building.id,this.createBuildingView(this.selectedBuilding,building));
+    for(const building of result.buildings){this.constructionSystem.plan(building);this.towerViews.set(building.id,this.createBuildingView(this.selectedBuilding,building));}
     this.refreshWallConnections();this.updateInventory();
-    this.activities.emit('buildingCompleted',{actor:this.character,objectType:this.selectedBuilding.id,quantity:result.buildings.length,objectIds:result.buildings.map(b=>b.id)});
-    this.cancelBuilding(`Hradba postavena: ${result.buildings.length} segmentů. Cena: ${formatCost(result.cost,this.objectRegistry)}.`);
+    this.cancelBuilding(`Blueprinty hradeb: ${result.buildings.length} segmentů. Materiál: ${formatCost(result.cost,this.objectRegistry)}.`);
   }
   refreshWallConnections(){
     this.wallMap=wallIndex(this.buildings);
@@ -459,6 +469,7 @@ export class GameScene extends Phaser.Scene {
     this.character.update(delta);this.player.animate(delta,this.character.walking&&[PLAYER_STATE.GROUND,PLAYER_STATE.ON_WALL].includes(this.character.state),this.character.direction);
     this.animalSystem.update(delta);this.huntingSystem.update(delta);this.mountSystem.update(delta);this.workerSystem.update(delta);const covered=this.combat.update(delta);
     if(this.gameOver)return;
+    this.constructionSystem.update(delta);
     this.regeneration.update(delta,[this.character,...this.animalSystem.animals.values(),...this.workerSystem.liveWorkers()],covered);
     this.combatFeedback.update(activeDelta);this.foodSystem.update(activeDelta);this.updateFoodDisplay();
     this.experienceFeedback.update(activeDelta);
@@ -485,6 +496,7 @@ export class GameScene extends Phaser.Scene {
     this.experienceFeedback?.refreshVisibility();this.unitPanel?.refresh();
     this.economyPanel?.update();
     this.workplacePanel?.refresh();
+    this.constructionUI?.refresh();
     this.treasureSystem?.update(view,this.fog);if(this.equipmentPanel?.dialog.open)this.equipmentPanel.updateStats();
   }
 }

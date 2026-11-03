@@ -91,6 +91,7 @@ export function loadGameState(scene,input){
   if(scene.workerSystem&&state.workers===undefined)scene.workerSystem.spawnInitial();
   scene.wageSystem?.importState(state.wages);
   scene.workplaceSystem?.importState(state.workplaces);
+  scene.constructionSystem?.importState(state.constructionSystem);
   scene.pathWear?.importState(state.pathWear);
   for(const t of state.spawners)scene.resourceSpawners.find(s=>s.definition.id===t.id).importState(t);
   scene.settingsPanel.applySettings(state.settings);scene.fog.setEnabled(state.settings.fogOfWar);

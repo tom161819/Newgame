@@ -38,6 +38,7 @@ export function advanceMovement(actor, delta) {
     if(distance-amount<1e-10){actor.position=target;actor.tile=actor.nextTile;actor.nextTile=null;}
     if(wear)for(const entered of enteredTiles(from,actor.position))wear.enter(actor,entered);
   }
+  return remaining*1000;
 }
 
 export function movementReservations(actor) {

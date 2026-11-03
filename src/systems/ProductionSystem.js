@@ -1,4 +1,4 @@
-import { buildingDefinition } from '../game/buildings.js';
+import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 
 export class ProductionSystem {
   constructor(time,inventory,getBuildings,onIncome=()=>{}){
@@ -8,6 +8,7 @@ export class ProductionSystem {
   dailyIncome(){
     const totals={};
     for(const building of this.getBuildings()){
+      if(!buildingIsComplete(building))continue;
       const production=buildingDefinition(building).production;
       if(production?.interval==='day')totals[production.resource]=(totals[production.resource]??0)+production.amount;
     }

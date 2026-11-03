@@ -56,6 +56,7 @@ export class AssetGallery {
     if(definition.experience)rows.push(['Počáteční level',String(definition.experience.initialLevel)],['Max level',String(definition.experience.maxLevel)],['Získává XP',definition.experience.enabled?'Ano':'Ne'],['XP multiplier',`${definition.experience.gainMultiplier}×`]);
     if(definition.skills)rows.push(['Skilly',definition.skills.join(', ')],['Efektivita / level',`${definition.workEfficiencyPerLevel*100} %`]);
     if(definition.availableJobs)rows.push(['Profese',definition.availableJobs.join(', ')]);
+    if(definition.constructionTime)rows.push(['Doba výstavby',`${definition.constructionTime/1000} s`]);
     if(definition.workplace)rows.push(['Pracovní místa',String(definition.workplace.capacity)],['Profese',definition.workplace.profession],['Pracovní skill',definition.workplace.skill]);
     if(definition.equipment)rows.push(['Slot',definition.equipment.slot],['Bonus',formatModifiers(definition.equipment.modifiers)]);
     if(definition.production)rows.push(['Produkce',`${definition.production.amount} ${this.registry.require(definition.production.resource).name} / day`]);

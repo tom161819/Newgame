@@ -7,6 +7,7 @@ import { WORKPLACE_RULES } from '../data/workplaces.js';
 export class WorkerAI {
   constructor(system){this.system=system;this.scene=system.scene;}
   cancel(worker){
+    if(worker.workTask?.kind==='build')this.system.jobs.constructionProvider?.releaseWorker?.(worker);
     const task=worker.workTask,animal=(task?.kind==='hunt'?this.scene.animalSystem.animals.get(task.targetId):null)??this.scene.combat.attacks.get(worker);
     if(animal?.retaliationTarget===worker)this.scene.animalSystem.stopRetaliation(animal);
     this.scene.combat.stopAttack(worker);this.system.reservations.releaseActor(worker.id);worker.workTask=null;worker.path=[];worker.aiCooldown=0;worker.workMessage='';

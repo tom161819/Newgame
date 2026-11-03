@@ -47,7 +47,7 @@ Horní inventář a spodní Buildings jsou mimo herní kameru a při pohybu nebo
 - Král chodí v **osmi logických směrech**. Diagonála je plynulý přímý úsek, nikoli střídání vodorovných a svislých kroků. Rychlost 3,5 políčka/s se vztahuje k logické délce pohybu: diagonální krok délky √2 trvá odpovídajícím způsobem déle než přímý krok délky 1.
 - Cestu hledá **A*** s osmi sousedy a heuristikou octile. Diagonála je povolená pouze tehdy, když jsou průchozí cíl i obě sousední boční políčka. Mezi rohy zdí ani věží proto nelze projít.
 - Věž stojí přesně **10 kamenů**, obsadí přesně **2 × 2 logická políčka** a vytvoří neprůchozí překážku pro A*. Nesmí překrývat kameny, budovy, překážky ani krále a jeho probíhající krok; u diagonály se chrání také obě boční políčka.
-- Lze postavit více věží, hradů i řad hradeb. Výběr stavby zruší zbývající cestu a sběr; už rozběhnutý krok se dokončí plynule. Po postavení jedné věže režim stavění skončí.
+- Lze naplánovat a postupně postavit více věží, hradů i řad hradeb. Výběr stavby zruší zbývající cestu a sběr; už rozběhnutý krok se dokončí plynule. Po umístění jednoho blueprintu režim umisťování skončí.
 - Ke vstupu se vybírá sousední políčko s nejkratší dosažitelnou cestou. Následuje animace lezení, ne přesun z dálky. Král nahoře nechodí po mapě ani nesbírá. Sestup vybere sousední políčko s dostupnou cestou k cíli; pokud takové není, král zůstane nahoře.
 - Během animace výstupu a sestupu se nové příkazy nepřijímají. Vstup/výstup lze opakovat, včetně přechodu z jedné věže do druhé.
 - Po obnovení stránky se zobrazí hlavní menu. New Game vytvoří novou náhodnou mapu, vynuluje inventář i vybavení, nastaví Day 1 a 100 HP. Nastavení zůstává zachované. Load Game obnoví vybranou rozehranou pozici.
@@ -74,11 +74,34 @@ Nová hra začíná se **třemi poddanými**. Každý další herní den může 
 
 Klikni na postavu a použij **Assign Job**, nebo ji přiřaď přímo v panelu pracovní budovy. Nezaměstnaní se procházejí po osadě. **Miner** pracuje v kamenolomu a **Hunter** v lovecké chatě; bez přiřazeného pracoviště čekají. Nejprve dojdou k budově, potom k reálnému cíli a se surovinou se fyzicky vrátí. Inventář a pracovní XP se připíší až při návratu. Lovec používá skutečný boj a původní množství masa. Pracovníci si rezervují cíle, takže dva nesbírají tentýž předmět. Při změně práce se rozpracovaný úkol bezpečně zruší bez odměny. Lovec pod 30 % HP přeruší útok, vrátí se domů a zotavuje se alespoň na 80 % HP.
 
-Woodcutter a Farmer zatím ukazují **Waiting for workplace**. Builder čeká na skutečnou výstavbu; dosavadní okamžité stavění králem funguje dál. Soldier přiřazený do kasáren hlídkuje v jejich okolí a brání se při napadení; sám nenapadá neutrální zvěř.
+Woodcutter a Farmer zatím ukazují **Waiting for workplace**. Builder automaticky vyhledává skutečná staveniště a fyzicky je staví. Pokud nejsou dostupná, čeká bez fiktivní práce. Soldier přiřazený do kasáren hlídkuje v jejich okolí a brání se při napadení; sám nenapadá neutrální zvěř.
 
 Každý skill level nad 1 zvyšuje efektivitu příslušné činnosti o **1 %**, nejvýše na **149 %**. Mining zrychluje pracovní dobu 1500 ms; Hunting zrychluje příslušné DPS a krátké sbírání masa (700 ms), Combat bojové DPS. Nemění základní statistiky, pohyb ani množství surovin. Dokončená činnost přidá stejné základní XP do příslušného skillu i celkového postupu. Skutečné poškození rozvíjí Combat, nejvýše 40 základních XP na protivníka; tento přírůstek neduplikuje celkovou odměnu za lov.
 
 Pracovní AI funguje i mimo záběr kamery a pod Fog of War; skryté jednotky nemají viditelné panely ani efekty. Save/Load uchovává skilly, profese, pohyb, rozpracovanou práci a rezervace. Starší save zachová původní svět a XP. Existujícím poddaným ponechá dosažené skilly a přidělí stabilní talent bez nového losování. Save bez poddaných jednou přidá tři nové obyvatele; královy nové skilly začnou na 1.
+
+## Blueprinty a výstavba
+
+Buildings nejprve umístí **blueprint**, nikoli hotovou budovu. Materiál se odečte jednou a celý půdorys je od této chvíle obsazený. Trvalý průhledný návrh a ukazatel na mapě ukazují, co se chystá postavit. Nedokončená budova neposkytuje příjem, pracoviště, vstup na plošinu ani chůzi po hradbě.
+
+| Budova | Základní doba při Construction 1 |
+|---|---:|
+| Wall | 5 s za segment |
+| Tower | 20 s |
+| Castle | 45 s |
+| Hunting Lodge | 25 s |
+| Quarry | 30 s |
+| Barracks | 40 s |
+
+Poddanému přiřaď **Builder**. Vyhledá nejbližší dosažitelné staveniště, rezervuje si sousední pracovní místo a začne až po skutečném příchodu. Na jednom staveništi jsou nejvýše **tři místa včetně krále**. Rychlosti se sčítají a Construction přidává 1 % za každý level nad 1, nejvýše 149 %. Doba chůze se do postupu nezapočítává. Nedostupné staveniště čeká na změnu mapy a nevyvolává opakované hledání každým snímkem.
+
+**Kliknutím na blueprint pošleš krále stavět** a otevřeš přehled postupu, fáze, pracovníků a zbývajícího času. Král případně sesedne z koně nebo sleze z hotové plošiny. Může stavět sám i pomáhat ostatním. Zavřením přehledu pokračuje v práci; **Stop King's work** nebo příkaz k jinému cíli práci přeruší a zachová postup. V panelu lze práci znovu zahájit.
+
+**Cancel Construction** vrátí 100 % původního materiálu, pokud ještě nikdo nezačal skutečně pracovat. Po zahájení vrátí 50 % každé suroviny, zaokrouhleno dolů. Zrušená stavba neudělí XP a uvolní místa i půdorys. Hradby tažením vytvářejí jednotlivá staveniště; opakovaně naplánované segmenty se znovu neplatí. Teprve hotové segmenty se propojí a lze po nich chodit.
+
+Fáze přecházejí od průhledného blueprintu přes základy, konstrukci a téměř hotovou budovu k plné grafice. Odměna se přidělí jednou až při dokončení. **Základní XP odměna** se rozdělí podle skutečného příspěvku každého stavitele; osobní talent následně přidá svému majiteli původních 20 % skillových XP. Celkový level nepřebírá tento osobní bonus. Pouhá rezervace, chůze, čekání ani zrušení XP nepřidávají.
+
+Save/Load zachovává zaplacený materiál, postup, příspěvky, pracovní místa, rozpracované cesty i úkol krále. Starší uložené budovy zůstanou hotové; nic se znovu neplatí, nestaví ani neodměňuje.
 
 ## Pracovní budovy a zaměstnanci
 

@@ -1,4 +1,4 @@
-import { buildingDefinition,towerNeighbors } from '../game/buildings.js';
+import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { WORKPLACES } from '../data/workplaces.js';
 import { tileKey } from '../game/stones.js';
 
@@ -9,11 +9,11 @@ export class WorkplaceSystem {
   }
   requiresWorkplace(profession){return Object.values(WORKPLACES).some(w=>w.profession===profession);}
   register(building){
-    const spec=buildingDefinition(building).workplace;if(!spec)return null;
+    const spec=buildingDefinition(building).workplace;if(!spec||!buildingIsComplete(building))return null;
     if(!this.records.has(building.id))this.records.set(building.id,{buildingId:building.id,capacity:spec.capacity,workerIds:[],delivered:{}});
     return this.records.get(building.id);
   }
-  building(worker){return this.scene.buildings.find(b=>b.id===worker?.assignedWorkplaceId&&buildingDefinition(b).workplace)??null;}
+  building(worker){return this.scene.buildings.find(b=>b.id===worker?.assignedWorkplaceId&&buildingIsComplete(b)&&buildingDefinition(b).workplace)??null;}
   goals(worker){const building=this.building(worker);return building?towerNeighbors(building).filter(t=>this.scene.map[t.y]?.[t.x]===0):[];}
   atWorkplace(worker){return !worker.nextTile&&!worker.path.length&&this.goals(worker).some(t=>tileKey(t)===tileKey(worker.tile));}
   employees(building){return (this.register(building)?.workerIds??[]).map(id=>this.scene.workerSystem.workers.get(id)).filter(w=>w?.isAlive);}

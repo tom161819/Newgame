@@ -58,6 +58,7 @@ export class FortificationView {
     this.hitArea=new Phaser.Geom.Polygon([{x:a.x,y:a.y-h-14},{x:b.x,y:b.y-h-14},b,c,e,{x:e.x,y:e.y-h-14}]);
   }
   contains(x,y){return Phaser.Geom.Polygon.Contains(this.hitArea,x-this.base.x,y-this.base.y);}
+  setAlpha(value){this.footprint.setAlpha(value);this.back.setAlpha(value);this.front.setAlpha(value);return this;}
   setVisible(value){this.back.setVisible(value);this.front.setVisible(value);this.footprint.setVisible(value);return this;}
   inView(view){const width=(this.definition.width+this.definition.height)*32;return this.base.x+width>=view.x&&this.base.x-width<=view.right&&this.base.y+10>=view.y&&this.base.y-this.definition.visualHeight<=view.bottom;}
   destroy(){this.back.destroy();this.front.destroy();this.footprint.destroy();}

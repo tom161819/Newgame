@@ -1,7 +1,7 @@
 import { WorkerController } from '../game/WorkerController.js';
 import { tileCenter,PLAYER_START } from '../game/map.js';
 import { reachableTiles } from '../game/pathfinding.js';
-import { towerNeighbors,buildingDefinition } from '../game/buildings.js';
+import { towerNeighbors,buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
 import { POPULATION } from '../data/jobs.js';
 import { TaskReservationSystem } from './TaskReservationSystem.js';
@@ -20,7 +20,7 @@ export class WorkerSystem {
   reservedTiles(){return this.liveWorkers().flatMap(w=>w.reservedTiles());}
   origin(worker=null){
     const workplace=worker?.assignedWorkplaceId?this.scene.buildings.find(b=>b.id===worker.assignedWorkplaceId):null;
-    const castle=workplace??this.scene.buildings.find(b=>b.type==='castle');
+    const castle=workplace??this.scene.buildings.find(b=>b.type==='castle'&&buildingIsComplete(b));
     if(!castle)return {...PLAYER_START};const d=buildingDefinition(castle);return {x:castle.x+(d.width-1)/2,y:castle.y+(d.height-1)/2};
   }
   navigationMap(worker){
@@ -33,7 +33,7 @@ export class WorkerSystem {
     return map;
   }
   homeGoals(worker=null){
-    const castle=this.scene.workplaceSystem?.building(worker)??this.scene.buildings.find(b=>b.type==='castle');
+    const castle=this.scene.workplaceSystem?.building(worker)??this.scene.buildings.find(b=>b.type==='castle'&&buildingIsComplete(b));
     if(castle)return towerNeighbors(castle).filter(t=>this.scene.map[t.y]?.[t.x]===0);
     const goals=[];for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const t={x:PLAYER_START.x+dx,y:PLAYER_START.y+dy};if(this.scene.map[t.y]?.[t.x]===0)goals.push(t);}return goals;
   }

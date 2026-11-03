@@ -26,7 +26,7 @@ export class MountSystem {
   dismount(){
     const king=this.scene.character,horse=king.mountedHorse;if(!horse)return false;
     const origin=king.nextTile??king.tile,reserved=new Set([
-      ...king.reservedTiles(),...this.scene.animalSystem.reservedTiles(),
+      ...king.reservedTiles(),...this.scene.animalSystem.reservedTiles(),...(this.scene.workerSystem?.reservedTiles()??[]),
     ].map(tileKey));
     const exits=adjacentTiles({tile:origin}).filter(tile=>canStep(this.scene.map,origin,tile)
       &&!reserved.has(tileKey(tile))&&!this.scene.resourceOccupancy.has(tileKey(tile)));

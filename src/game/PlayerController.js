@@ -1,7 +1,7 @@
 import { tileCenter, isWalkable } from './map.js';
 import { gridToWorld } from './isometric.js';
 import { tileKey } from './stones.js';
-import { planGroundOrder, planTowerExit, towerNeighbors, buildingDepth, towerTop, buildingDefinition } from './buildings.js';
+import { planGroundOrder, planTowerExit, towerNeighbors, buildingDepth, towerTop, buildingDefinition,buildingIsComplete } from './buildings.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { advanceMovement } from './movement.js';
 import { isWall,wallIndex,findRoofPath,planRoofExit } from './walls.js';
@@ -59,6 +59,7 @@ export class PlayerController {
 
   command(order) {
     if(!this.isAlive||this.state===PLAYER_STATE.DEAD)return false;
+    if(order.kind==='enter'&&!buildingIsComplete(order.tower))return false;
     if (this.transitioning) {
       this.scene.setStatus('Počkej, až král dokončí výstup nebo sestup.');
       return false;
@@ -152,7 +153,7 @@ export class PlayerController {
 
   climb(tower) {
     // Animaci nelze spustit z dálky, z obsazeného políčka ani během kroku.
-    if (!buildingDefinition(tower).interactions.includes('enter') || this.nextTile || !isWalkable(this.scene.map, this.tile.x, this.tile.y)
+    if (!buildingIsComplete(tower)||!buildingDefinition(tower).interactions.includes('enter') || this.nextTile || !isWalkable(this.scene.map, this.tile.x, this.tile.y)
       || !towerNeighbors(tower).some(tile => tileKey(tile) === tileKey(this.tile))) return;
     this.currentTower = tower;
     this.setState(PLAYER_STATE.ENTERING);
@@ -199,6 +200,7 @@ export class PlayerController {
   }
 
   update(delta) {
+    this.availableWorkMs=0;
     this.walking = false;
     if(this.state===PLAYER_STATE.ON_WALL){
       advanceMovement(this,delta);
@@ -209,7 +211,7 @@ export class PlayerController {
       return;
     }
     if (this.state !== PLAYER_STATE.GROUND) return;
-    advanceMovement(this,delta);
+    this.availableWorkMs=advanceMovement(this,delta);
     const projected = gridToWorld(this.position.x, this.position.y);
     this.sprite.setPosition(projected.x, projected.y);
     this.sprite.setDepth(this.sprite.y + this.depthOffset);

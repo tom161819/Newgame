@@ -25,6 +25,7 @@ export function validateDefinition(definition) {
   if (!Array.isArray(d.interactions) || d.interactions.some(value => typeof value !== 'string' || !value.trim())
     || new Set(d.interactions).size !== d.interactions.length) fail(id, 'neplatné interakce.');
   if (d.buildable && d.category !== 'building') fail(id, 'postavitelný objekt musí být budova.');
+  if(d.constructionTime!==undefined&&(!finite(d.constructionTime)||d.constructionTime<=0||d.category!=='building'))fail(id,'neplatná doba výstavby.');
   if (d.collectible && d.category !== 'resource') fail(id, 'sběratelný objekt musí být surovina.');
   if (d.renderMode !== undefined && !['sprite', 'procedural'].includes(d.renderMode)) fail(id, 'neplatný renderMode.');
   for (const origin of [d.origin,d.frontOrigin]) if (origin !== undefined && (!plainObject(origin) || ![origin.x,origin.y].every(v => finite(v) && v >= 0 && v <= 1))) fail(id, 'origin musí ležet mezi 0 a 1.');
