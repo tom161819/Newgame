@@ -56,6 +56,7 @@ const descriptions={
 };
 export async function releaseMetadata(directory,commit,subject){
   const signatures=[
+    ['src/systems/FoodProductionSystem.js','Výroba a skladování potravin'],
     ['src/systems/FarmingSystem.js','Zemědělství a sady'],
     ['src/ui/ChangelogPanel.js','Verzování a Changelog'],
     ['src/systems/WorldGenerationConfig.js','Pokročilá konfigurace světa'],['src/ui/NewGameSetup.js','Nastavení nové hry'],

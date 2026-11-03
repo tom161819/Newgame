@@ -1,6 +1,54 @@
 [
   {
     "schema": 1,
+    "commit": "66311391900df17e0755bdac7e51db40a5516d13",
+    "tree": "51881357f51362f868c1efb78c5ae2bb1b7abc94",
+    "date": "2026-11-03T13:32:39Z",
+    "sequence": 52,
+    "subject": "Add physical food production, granaries and persistent resource transfers",
+    "name": "Zemědělství a sady",
+    "description": "Add physical food production, granaries and persistent resource transfers",
+    "basePath": "/Newgame/versions/66311391900df17e0755bdac7e51db40a5516d13/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "4ecbf0939353cf4ab3226423bdb0ee1b6d564039",
+    "tree": "dfdc453a90347416433616a6c39590f29753e366",
+    "date": "2026-11-03T12:52:53Z",
+    "sequence": 51,
+    "subject": "Checkpoint published farming and orchards before food production and storage",
+    "name": "Zemědělství a sady · kontrolní bod",
+    "description": "Kontrolní verze připravená před následujícím rozšířením.",
+    "basePath": "/Newgame/versions/4ecbf0939353cf4ab3226423bdb0ee1b6d564039/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "339904f717e767cc1af4459e541cbb4b6edb867a",
+    "tree": "f9581774deca6d6737b52526428b86963a8a97da",
+    "date": "2026-11-03T12:48:08Z",
+    "sequence": 50,
+    "subject": "Complete farming, physical crop harvests and persistent orchards with cached isometric graphics",
+    "name": "Zemědělství a sady",
+    "description": "Complete farming, physical crop harvests and persistent orchards with cached isometric graphics",
+    "basePath": "/Newgame/versions/339904f717e767cc1af4459e541cbb4b6edb867a/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
     "commit": "d859f3cdea7056de79dcd97b16be322f38733f64",
     "tree": "4b41fd262c926299fe0f6f86a535aab87e7a89b0",
     "date": "2026-11-03T12:34:05Z",
