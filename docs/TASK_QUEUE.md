@@ -53,7 +53,7 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 ## Následuje
 
-1. **Etapy01–03 a audit archivu dokončeny; probíhá04:** [Master prompt 25–37 — 15 etap / 5 milníků](requests/master-25-37.md). Přesné pořadí a samostatné specifikace jsou v [roadmapě](UPGRADE_ROADMAP_25_37.md); stav v [progress](UPGRADE_PROGRESS.md). Každá etapa testy/opravit/build/Unreleased/commit, automaticky další. M1–M5 po release gate automatický MINOR, skutečný Git tag a neměnný archiv; uživatel tato vydání výslovně autorizoval bez dalšího potvrzení.
+1. **Etapy01–04 a audit archivu dokončeny; následuje05:** [Master prompt 25–37 — 15 etap / 5 milníků](requests/master-25-37.md). Přesné pořadí a samostatné specifikace jsou v [roadmapě](UPGRADE_ROADMAP_25_37.md); stav v [progress](UPGRADE_PROGRESS.md). Každá etapa testy/opravit/build/Unreleased/commit, automaticky další. M1–M5 po release gate automatický MINOR, skutečný Git tag a neměnný archiv; uživatel tato vydání výslovně autorizoval bez dalšího potvrzení.
 2. **DONE — po03, před04:** [Kontrola a optimalizace archivu](requests/archive-optimization.md), nové zadání uživatele. Zachovat všechny snapshoty/URL/historii/savy; audit, měření a bezpečná optimalizace, čísla a skutečné názvy/verzní Changelog. Publikace `0135b6e`, [Pages41733540087](https://github.com/tom161819/Newgame/actions/runs/41733540087) **Success**;317/317 testů,69 původních URL/2212 HTTP souborů, Save2/7→8 a neměnnost všech původních snapshotů ověřeny. Pokračovat masterem04–15.
 3. **Až po celém masteru:** [Visual Polish & Art Pass](requests/visual-polish-art-pass.md), sekvenční fáze A–E (UI, terén, postavy, efekty stavby, budovy), testy/opravy/Changelog/commit po každé fázi, nakonec integrační testy a build.
 
