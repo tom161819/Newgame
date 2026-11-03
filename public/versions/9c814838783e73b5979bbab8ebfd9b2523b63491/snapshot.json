@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "commit": "9c814838783e73b5979bbab8ebfd9b2523b63491",
+  "tree": "2b8660006d046325c154cdf863ba300bd378dd7f",
+  "date": "2026-11-02T21:51:02Z",
+  "sequence": 13,
+  "subject": "Checkpoint hunting and food before fog settings and riding upgrade",
+  "name": "Lov a potrava · kontrolní bod",
+  "description": "Kontrolní verze připravená před následujícím rozšířením.",
+  "basePath": "/Newgame/versions/9c814838783e73b5979bbab8ebfd9b2523b63491/",
+  "verification": {
+    "tests": true,
+    "build": true,
+    "browser": true
+  },
+  "files": {
+    "archive-runtime.js": "a2baa67e5d09e81a8910ef2fc32853c496bb1c45d8d5f602ba88ba62e2cd6b49",
+    "assets/buildings/tower/tower.png": "5f2fbf7221ecf086e8ad6e9126f96841930859d23ef8da2e558bef5ebcb9530d",
+    "assets/characters/deer/deer.svg": "555c162e68e928215c7692e70a33e9da260df61b58d93e9ae262616e69e36038",
+    "assets/characters/king/king.png": "e165ede84f080122e0d7afb7adaa2607a260a45f213a5a7703e364e9dc84f6ca",
+    "assets/characters/rabbit/rabbit.svg": "6f808e14adc5fca3c0e0052d0a2cec2a051bb6fd8ad0ca1c5a75fc5bf42975ef",
+    "assets/characters/wild_boar/wild_boar.svg": "77778cddbd853043bf6d618e59c17fba74c957c3594c75a21bcaba314f33dd64",
+    "assets/decorations/bushes/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/decorations/rocks/rock-outcrop.webp": "d6a5a36070bf3b5b303c4ccdc78e6ad5441031ed7b15c43a9b3822862898869f",
+    "assets/decorations/trees/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/index-C_fSk7WE.css": "04f37dacda29a6dff40efdbf419a69fb591d3abeceaff8732ecede8955febcb7",
+    "assets/index-Ct5d8qRf.js": "4742e0f3b0c4445518dc9af4ba144e70a5dfb5e5e0f15c28dc9852e1133ef165",
+    "assets/resources/iron/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/resources/meat/meat.svg": "9667797ca9e4da24911703cd981995457debf5b18d176e176d90ddb4d2ba50d8",
+    "assets/resources/stone/stone.png": "effb7da1e34befff333c2cd6d3b36fca519a755dc4a3c9d823719d20bb5a7dfa",
+    "assets/resources/wood/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/terrain/dirt/dirt.webp": "858c7e69134495e63efc3dcee21b409e464ea0186471302f3efc59d3fe323dad",
+    "assets/terrain/grass/grass.png": "209e8e590e72f06030ca164606e993b5bf0e188fe86a287ff54314cba4a67641",
+    "assets/terrain/water/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "index.html": "91468844c2edad1b096cbb9a6bed7ffa189b1fc95795c36d755e30c6c1e96ec1"
+  }
+}

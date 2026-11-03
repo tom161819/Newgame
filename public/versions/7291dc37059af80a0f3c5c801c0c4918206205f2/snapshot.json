@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "commit": "7291dc37059af80a0f3c5c801c0c4918206205f2",
+  "tree": "7c201c700255bf3cfe80f4f1ba7da92be4844a00",
+  "date": "2026-11-02T19:00:01Z",
+  "sequence": 1,
+  "subject": "Create Phaser click-to-move prototype and Pages workflow",
+  "name": "První prototyp pohybu",
+  "description": "První hratelná mapa s klikáním a hledáním cesty.",
+  "basePath": "/Newgame/versions/7291dc37059af80a0f3c5c801c0c4918206205f2/",
+  "verification": {
+    "tests": true,
+    "build": true,
+    "browser": true
+  },
+  "files": {
+    "archive-runtime.js": "f5f980bfeb160b8b52d8c06ce09b3d65b9800b483ceb939fc3c81b3e34e9828c",
+    "assets/index-BINmiwYu.css": "7041b946f2ae69bde2f0e17900336caf179ec56fd6bc030303df2caae9f85b62",
+    "assets/index-YwmbLBQ_.js": "a15b0125f30adeaaa94d6bf2132816598f688d7c43a69e170ffce12416085d8f",
+    "index.html": "b57c42ec46f1ee399444575613f5f10938db39777d051cbd4979d4c4e460af94"
+  }
+}

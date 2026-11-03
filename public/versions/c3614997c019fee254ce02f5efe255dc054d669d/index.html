@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="cs">
+  <head><link rel="icon" href="data:,"><script src="/Newgame/versions/c3614997c019fee254ce02f5efe255dc054d669d/archive-runtime.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>První cesta | Královská hlídka</title>
+    <script type="module" crossorigin src="/Newgame/versions/c3614997c019fee254ce02f5efe255dc054d669d/assets/index-CJIQaP5W.js"></script>
+    <link rel="stylesheet" crossorigin href="/Newgame/versions/c3614997c019fee254ce02f5efe255dc054d669d/assets/index-BBS3KJNs.css">
+  </head>
+  <body>
+    <main>
+      <header><span class="eyebrow">KRÁLOVSKÁ HLÍDKA · IZOMETRICKÁ STRATEGIE</span><h1>První cesta</h1>
+        <p>Veď krále kliknutím, lov zvěř, sbírej suroviny a stav strážní věže.</p></header>
+      <section class="inventory" aria-label="Inventář">
+        <span class="inventory-label">Inventář</span>
+        <small id="world-stones">Mapa 100 × 100 · kameny 30 / 80</small>
+        <div id="inventory-items"></div>
+        <span class="food-status"><output id="food-countdown">Food: 01:00</output><small id="food-warning">Out of food</small></span>
+      </section>
+      <div class="camera-controls"><span id="camera-mode">Kamera sleduje krále</span><span id="vision-status">Fog of War: OFF</span><button id="dismount" type="button" hidden>Dismount · H</button><button id="follow-king" type="button">Na krále · mezerník</button></div>
+      <div id="game" aria-label="Izometrická herní mapa 100 × 100 políček"></div>
+      <footer><span><i class="player-key"></i> Král</span><span><i class="wall-key"></i> Překážka</span><span><i class="stone-key"></i> Kámen</span><span>WASD / šipky: kamera · kolečko: zoom</span></footer>
+      <p id="status" role="status">Vyber kámen nebo volné políčko.</p>
+      <section class="buildings-bar" aria-label="Stavění budov">
+        <div id="buildings-panel" class="buildings-panel" hidden>
+          <h2>Buildings</h2>
+          <div id="building-options"></div>
+        </div>
+        <button id="buildings-tab" type="button" aria-expanded="false" aria-controls="buildings-panel">Buildings</button>
+        <button id="asset-library-button" type="button">Asset Library</button>
+        <span id="building-selection"></span>
+        <button id="cancel-building" type="button" hidden>Zrušit (Esc)</button>
+      </section>
+    </main>
+    <button id="settings-button" class="settings-button" type="button" aria-label="Settings" aria-controls="settings-panel" aria-expanded="false">⚙</button>
+    <aside id="settings-panel" class="settings-panel" aria-labelledby="settings-title" aria-hidden="true" inert>
+      <div class="settings-heading"><h2 id="settings-title">Settings</h2><button id="close-settings" type="button" aria-label="Zavřít nastavení">×</button></div>
+      <label class="setting-row" for="fog-toggle"><span>Fog of War</span><input id="fog-toggle" type="checkbox" role="switch" /></label>
+      <p>Omezí viditelnost objektů podle dohledu krále. Terén zůstává viditelný.</p>
+    </aside>
+    <dialog id="asset-gallery" aria-labelledby="asset-gallery-title">
+      <header class="asset-gallery-header"><div><h2 id="asset-gallery-title">Asset Library</h2><p>Prohlížení registrovaných objektů · bez úprav a vkládání do mapy</p></div><button id="close-asset-gallery" type="button" aria-label="Zavřít knihovnu">Zavřít ×</button></header>
+      <nav id="asset-categories" aria-label="Kategorie objektů"></nav>
+      <p id="asset-count"></p>
+      <div class="asset-layout"><div id="asset-grid" aria-label="Objekty"></div><aside id="asset-detail" aria-label="Detail objektu"></aside></div>
+    </dialog>
+    <div id="object-tooltip" role="tooltip" hidden></div>
+  </body>
+</html>

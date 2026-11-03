@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "commit": "6ae12dc3e0c07a5b64ef04f14565cae3acdc94cb",
+  "tree": "fc5659b126b2d3e9efd6f9f8fc1cc3181e5f8b88",
+  "date": "2026-11-02T21:28:59Z",
+  "sequence": 9,
+  "subject": "Add validated asset registry, shared assets and read-only object gallery",
+  "name": "Asset Library",
+  "description": "Univerzální knihovna objektů a vlastní grafické podklady.",
+  "basePath": "/Newgame/versions/6ae12dc3e0c07a5b64ef04f14565cae3acdc94cb/",
+  "verification": {
+    "tests": true,
+    "build": true,
+    "browser": true
+  },
+  "files": {
+    "archive-runtime.js": "e09b715d576fc68cab892f4c077267c2a8ae62b733b19c5c9f6ba21be245ec9d",
+    "assets/buildings/tower/tower.png": "5f2fbf7221ecf086e8ad6e9126f96841930859d23ef8da2e558bef5ebcb9530d",
+    "assets/characters/king/king.png": "e165ede84f080122e0d7afb7adaa2607a260a45f213a5a7703e364e9dc84f6ca",
+    "assets/decorations/bushes/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/decorations/rocks/rock-outcrop.webp": "d6a5a36070bf3b5b303c4ccdc78e6ad5441031ed7b15c43a9b3822862898869f",
+    "assets/decorations/trees/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/index-D-gFcc4v.js": "6f2256d9ed9a4c8d14bd292ba030338e2fb0d472d6fc5e61c3fb8025e9806c91",
+    "assets/index-PlYVdmKu.css": "5bf2184a9957ba5c8ab0a44e5658601a57084e8f6254ca51669df84945e2bdcc",
+    "assets/resources/iron/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/resources/stone/stone.png": "effb7da1e34befff333c2cd6d3b36fca519a755dc4a3c9d823719d20bb5a7dfa",
+    "assets/resources/wood/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/terrain/dirt/dirt.webp": "858c7e69134495e63efc3dcee21b409e464ea0186471302f3efc59d3fe323dad",
+    "assets/terrain/grass/grass.png": "209e8e590e72f06030ca164606e993b5bf0e188fe86a287ff54314cba4a67641",
+    "assets/terrain/water/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "index.html": "6cc876c00e59c84a5807b00c848f59282f307bdd4922ccf91c05b490d9e166e8"
+  }
+}

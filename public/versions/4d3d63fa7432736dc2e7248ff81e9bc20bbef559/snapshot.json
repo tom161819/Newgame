@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "commit": "4d3d63fa7432736dc2e7248ff81e9bc20bbef559",
+  "tree": "85487d62fab1d9286238df3527562dee8562ddd0",
+  "date": "2026-11-02T20:57:38Z",
+  "sequence": 8,
+  "subject": "Checkpoint working eight-direction game before asset library",
+  "name": "Pohyb v osmi směrech · kontrolní bod",
+  "description": "Kontrolní verze připravená před následujícím rozšířením.",
+  "basePath": "/Newgame/versions/4d3d63fa7432736dc2e7248ff81e9bc20bbef559/",
+  "verification": {
+    "tests": true,
+    "build": true,
+    "browser": true
+  },
+  "files": {
+    "archive-runtime.js": "e468183c8f822bd4587b3805f0f45ea02f82c7225f9c06cb850ad1eb574ae230",
+    "assets/index-B5W0mN3m.css": "6b00d281eec5e7e1d9b7ad9aeca2797fbb51ce3611f254834e6fc5753a670572",
+    "assets/index-DmuPkODs.js": "d2ae8fff56e03187a9a6b9a4ec47757306c5993e6244d5dbaacb6619e3816262",
+    "index.html": "d975b91e50a34c998062ff5285a284af6c929653154ac1469bf66d8c1e007235"
+  }
+}

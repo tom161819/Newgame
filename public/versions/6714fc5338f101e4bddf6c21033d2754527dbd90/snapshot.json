@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "commit": "6714fc5338f101e4bddf6c21033d2754527dbd90",
+  "tree": "329ac952367c92bb803b750a4afc5307b3b3b6b2",
+  "date": "2026-11-02T20:22:43Z",
+  "sequence": 6,
+  "subject": "Convert game to isometric 100x100 world with king, camera and timed stone spawns",
+  "name": "Izometrický svět",
+  "description": "Izometrická mapa 100 × 100, král, kamera a doplňování kamenů.",
+  "basePath": "/Newgame/versions/6714fc5338f101e4bddf6c21033d2754527dbd90/",
+  "verification": {
+    "tests": true,
+    "build": true,
+    "browser": true
+  },
+  "files": {
+    "archive-runtime.js": "66c16da0f4fda55459fcc79c253750fdadce57ab3d49705ee0f1dce30af40ce8",
+    "assets/index-B5W0mN3m.css": "6b00d281eec5e7e1d9b7ad9aeca2797fbb51ce3611f254834e6fc5753a670572",
+    "assets/index-CxPPvxgr.js": "3c1795480a4397fb90e55433a1f4f74a2b8de553fecf7a5fcdb93fa96f855a43",
+    "index.html": "aae4a74ce185b5ed057a2958a7cc425c1e40e0af5ab420277eff154bd63b65fd"
+  }
+}

@@ -186,3 +186,6 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 #construction-progress { width:100%; height:10px; accent-color:#d4b66a; }
 .construction-actions { display:flex; flex-wrap:wrap; gap:8px; }
 #construction-dialog button:disabled { opacity:.5; cursor:default; }
+.version-archive-link { color:#d8c286; font-size:12px; text-underline-offset:3px; }
+.main-menu-content .version-archive-link { display:block; margin-top:16px; }
+.buildings-bar .version-archive-link { padding:7px 4px; }

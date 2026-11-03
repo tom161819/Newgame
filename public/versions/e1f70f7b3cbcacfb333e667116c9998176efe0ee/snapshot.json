@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "commit": "e1f70f7b3cbcacfb333e667116c9998176efe0ee",
+  "tree": "fc5659b126b2d3e9efd6f9f8fc1cc3181e5f8b88",
+  "date": "2026-11-02T21:36:37Z",
+  "sequence": 11,
+  "subject": "Checkpoint published asset library before hunting and food upgrade",
+  "name": "Asset Library · kontrolní bod",
+  "description": "Kontrolní verze připravená před následujícím rozšířením.",
+  "basePath": "/Newgame/versions/e1f70f7b3cbcacfb333e667116c9998176efe0ee/",
+  "verification": {
+    "tests": true,
+    "build": true,
+    "browser": true
+  },
+  "files": {
+    "archive-runtime.js": "aa424732fce0c61219b94a7acd6f00c671177fea600f97abe35ade1afbe1d9e6",
+    "assets/buildings/tower/tower.png": "5f2fbf7221ecf086e8ad6e9126f96841930859d23ef8da2e558bef5ebcb9530d",
+    "assets/characters/king/king.png": "e165ede84f080122e0d7afb7adaa2607a260a45f213a5a7703e364e9dc84f6ca",
+    "assets/decorations/bushes/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/decorations/rocks/rock-outcrop.webp": "d6a5a36070bf3b5b303c4ccdc78e6ad5441031ed7b15c43a9b3822862898869f",
+    "assets/decorations/trees/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/index-4OBlvYGD.js": "dc093d15664c4c844b54854488d497e11f9de1370b00cf134dd1d337a4f7c8d7",
+    "assets/index-PlYVdmKu.css": "5bf2184a9957ba5c8ab0a44e5658601a57084e8f6254ca51669df84945e2bdcc",
+    "assets/resources/iron/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/resources/stone/stone.png": "effb7da1e34befff333c2cd6d3b36fca519a755dc4a3c9d823719d20bb5a7dfa",
+    "assets/resources/wood/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/terrain/dirt/dirt.webp": "858c7e69134495e63efc3dcee21b409e464ea0186471302f3efc59d3fe323dad",
+    "assets/terrain/grass/grass.png": "209e8e590e72f06030ca164606e993b5bf0e188fe86a287ff54314cba4a67641",
+    "assets/terrain/water/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "index.html": "af37222c3d3d8ea989563ae3dafacab320d5356150e5397413958b2e79952b8d"
+  }
+}

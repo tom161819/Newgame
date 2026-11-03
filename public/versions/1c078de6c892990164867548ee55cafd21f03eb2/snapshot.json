@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "commit": "1c078de6c892990164867548ee55cafd21f03eb2",
+  "tree": "7c201c700255bf3cfe80f4f1ba7da92be4844a00",
+  "date": "2026-11-02T19:04:48Z",
+  "sequence": 2,
+  "subject": "Trigger Pages deployment after enabling GitHub Pages",
+  "name": "První prototyp pohybu",
+  "description": "Zprovoznění publikování prvního prototypu přes GitHub Pages.",
+  "basePath": "/Newgame/versions/1c078de6c892990164867548ee55cafd21f03eb2/",
+  "verification": {
+    "tests": true,
+    "build": true,
+    "browser": true
+  },
+  "files": {
+    "archive-runtime.js": "f256bdea5e39708a39f500a4b3d8170f17aa194930167dfa6f9335373ddfcb61",
+    "assets/index-BINmiwYu.css": "7041b946f2ae69bde2f0e17900336caf179ec56fd6bc030303df2caae9f85b62",
+    "assets/index-YwmbLBQ_.js": "a15b0125f30adeaaa94d6bf2132816598f688d7c43a69e170ffce12416085d8f",
+    "index.html": "cf7bcf428a01a3c2759237a58a1387dad54ce373e6f933726cd0f4e956ffc8fb"
+  }
+}

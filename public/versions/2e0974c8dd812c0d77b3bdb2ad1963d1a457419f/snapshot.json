@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "commit": "2e0974c8dd812c0d77b3bdb2ad1963d1a457419f",
+  "tree": "85487d62fab1d9286238df3527562dee8562ddd0",
+  "date": "2026-11-02T20:47:46Z",
+  "sequence": 7,
+  "subject": "Add eight-direction A* movement and king animation with safe diagonal corners",
+  "name": "Pohyb v osmi směrech",
+  "description": "Osm směrů pohybu a animace, normalizovaná rychlost a bezpečné rohy.",
+  "basePath": "/Newgame/versions/2e0974c8dd812c0d77b3bdb2ad1963d1a457419f/",
+  "verification": {
+    "tests": true,
+    "build": true,
+    "browser": true
+  },
+  "files": {
+    "archive-runtime.js": "8e8ef0c1a5ae3e6228fb8afa46f7730c132922135e741a0a7e5b0f65c7600297",
+    "assets/index-B5W0mN3m.css": "6b00d281eec5e7e1d9b7ad9aeca2797fbb51ce3611f254834e6fc5753a670572",
+    "assets/index-DmuPkODs.js": "d2ae8fff56e03187a9a6b9a4ec47757306c5993e6244d5dbaacb6619e3816262",
+    "index.html": "ad3626c5dceef72a4a5dc2ef6d34aeb81f41a530fd69fd459b220800df53429b"
+  }
+}

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="cs">
+  <head><link rel="icon" href="data:,"><script src="/Newgame/versions/e1f70f7b3cbcacfb333e667116c9998176efe0ee/archive-runtime.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>První cesta | Královská hlídka</title>
+    <script type="module" crossorigin src="/Newgame/versions/e1f70f7b3cbcacfb333e667116c9998176efe0ee/assets/index-4OBlvYGD.js"></script>
+    <link rel="stylesheet" crossorigin href="/Newgame/versions/e1f70f7b3cbcacfb333e667116c9998176efe0ee/assets/index-PlYVdmKu.css">
+  </head>
+  <body>
+    <main>
+      <header><span class="eyebrow">KRÁLOVSKÁ HLÍDKA · IZOMETRICKÁ STRATEGIE</span><h1>První cesta</h1>
+        <p>Veď krále kliknutím, sbírej kámen a stav strážní věže.</p></header>
+      <section class="inventory" aria-label="Inventář">
+        <span class="inventory-label">Inventář</span>
+        <small id="world-stones">Mapa 100 × 100 · kameny 30 / 80</small>
+        <div id="inventory-items"></div>
+      </section>
+      <div class="camera-controls"><span id="camera-mode">Kamera sleduje krále</span><button id="follow-king" type="button">Na krále · mezerník</button></div>
+      <div id="game" aria-label="Izometrická herní mapa 100 × 100 políček"></div>
+      <footer><span><i class="player-key"></i> Král</span><span><i class="wall-key"></i> Překážka</span><span><i class="stone-key"></i> Kámen</span><span>WASD / šipky: kamera · kolečko: zoom</span></footer>
+      <p id="status" role="status">Vyber kámen nebo volné políčko.</p>
+      <section class="buildings-bar" aria-label="Stavění budov">
+        <div id="buildings-panel" class="buildings-panel" hidden>
+          <h2>Buildings</h2>
+          <div id="building-options"></div>
+        </div>
+        <button id="buildings-tab" type="button" aria-expanded="false" aria-controls="buildings-panel">Buildings</button>
+        <button id="asset-library-button" type="button">Asset Library</button>
+        <span id="building-selection"></span>
+        <button id="cancel-building" type="button" hidden>Zrušit (Esc)</button>
+      </section>
+    </main>
+    <dialog id="asset-gallery" aria-labelledby="asset-gallery-title">
+      <header class="asset-gallery-header"><div><h2 id="asset-gallery-title">Asset Library</h2><p>Prohlížení registrovaných objektů · bez úprav a vkládání do mapy</p></div><button id="close-asset-gallery" type="button" aria-label="Zavřít knihovnu">Zavřít ×</button></header>
+      <nav id="asset-categories" aria-label="Kategorie objektů"></nav>
+      <p id="asset-count"></p>
+      <div class="asset-layout"><div id="asset-grid" aria-label="Objekty"></div><aside id="asset-detail" aria-label="Detail objektu"></aside></div>
+    </dialog>
+  </body>
+</html>

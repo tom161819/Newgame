@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "commit": "f94d77a74ca921d47f50a3f7b86fa5b83eed01d7",
+  "tree": "6be7b2411351ef96e2a423ef2fe1efbf029088b6",
+  "date": "2026-11-02T19:17:05Z",
+  "sequence": 3,
+  "subject": "Add collectible stones and resource inventory",
+  "name": "Kameny a inventář",
+  "description": "Sbírání kamenů kliknutím a společný inventář.",
+  "basePath": "/Newgame/versions/f94d77a74ca921d47f50a3f7b86fa5b83eed01d7/",
+  "verification": {
+    "tests": true,
+    "build": true,
+    "browser": true
+  },
+  "files": {
+    "archive-runtime.js": "120fe17f5b2b0acf11ae0347c074c8a6551cecf2fba1913b107424a266d77f22",
+    "assets/index-BsG53Lca.css": "3206c48b17a8e10e1f0398e0656c06a82503fdee2ed8aa2a7eab1c6e73c0afc0",
+    "assets/index-DH8Sotlb.js": "458a7c6ba6313784ebcee5ccf6410267ba7174c60bd9929634b6a2573ac11a05",
+    "index.html": "ae029a71b781e235b205447e4e3ccf92a01fdede077080fdf55baacaa32f9d20"
+  }
+}

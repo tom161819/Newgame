@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "commit": "162efeb202028e9235e0711e1937a766b7e5a8de",
+  "tree": "35a013bfe631f01a002a00b492b2145cb08951f0",
+  "date": "2026-11-02T19:38:56Z",
+  "sequence": 4,
+  "subject": "Add tower construction, placement preview and animated tower traversal",
+  "name": "Stavění věží",
+  "description": "Věže 2 × 2, náhled stavby a animovaný vstup i sestup.",
+  "basePath": "/Newgame/versions/162efeb202028e9235e0711e1937a766b7e5a8de/",
+  "verification": {
+    "tests": true,
+    "build": true,
+    "browser": true
+  },
+  "files": {
+    "archive-runtime.js": "ef0f8d82f0153190ff4b4a2ad5d4866ef1a82b452f9316a3c3c1d8e02b2a7cbb",
+    "assets/index-B58q7TzL.css": "ea80d16d96812d002737d2657fda482a9ce9a371497964717b020b2a99d1618c",
+    "assets/index-D1g4Rwap.js": "506d7c6112c2df579c8372afef73e1109983a35acb132518dd6f5f333905d272",
+    "index.html": "faa7ce78a0ef0503e3d7126a09a6feda8e55488798f459e6011a43c62ac3dc1f"
+  }
+}

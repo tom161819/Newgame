@@ -3,6 +3,8 @@ import { GameScene } from './game/GameScene.js';
 import { MainMenu } from './game/MainMenu.js';
 import './style.css';
 
+for(const link of document.querySelectorAll('[data-version-archive]'))link.href=window.__NEWGAME_ARCHIVE_ROOT__??`${import.meta.env.BASE_URL}versions/`;
+
 new Phaser.Game({
   // Sdílené textury terénu a jednoduché tvary jsou v Canvasu rychlé i bez GPU.
   type: Phaser.CANVAS,

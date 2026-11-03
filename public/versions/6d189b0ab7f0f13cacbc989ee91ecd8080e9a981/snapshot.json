@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "commit": "6d189b0ab7f0f13cacbc989ee91ecd8080e9a981",
+  "tree": "8622c8b893aef839dae68b233b3fb108942aeb91",
+  "date": "2026-11-02T22:49:04Z",
+  "sequence": 16,
+  "subject": "Add castle construction, atomic wall dragging and connected roof navigation",
+  "name": "Hrady a hradby",
+  "description": "Hrady, tažení hradeb a chůze po propojených vrcholech.",
+  "basePath": "/Newgame/versions/6d189b0ab7f0f13cacbc989ee91ecd8080e9a981/",
+  "verification": {
+    "tests": true,
+    "build": true,
+    "browser": true
+  },
+  "files": {
+    "archive-runtime.js": "38ca28afce2fadeab8e8ed7d8e3c9982db618ec7753df0432b48ec20bc353f7f",
+    "assets/buildings/castle/castle.svg": "5aac8b6684826197ec4877d214e049a06fe349d8d2e1d491123ed52388390ef6",
+    "assets/buildings/tower/tower.png": "5f2fbf7221ecf086e8ad6e9126f96841930859d23ef8da2e558bef5ebcb9530d",
+    "assets/buildings/wall/wall.svg": "7e3bc77db593b4ec1940f30acb3e29533bfe88276e210d4c77a94486975db64e",
+    "assets/characters/deer/deer.svg": "555c162e68e928215c7692e70a33e9da260df61b58d93e9ae262616e69e36038",
+    "assets/characters/horse/horse.svg": "130246b0e37054e2c719801bb153be2304cc01c905b730a8432d4145f705b8d3",
+    "assets/characters/king/king.png": "e165ede84f080122e0d7afb7adaa2607a260a45f213a5a7703e364e9dc84f6ca",
+    "assets/characters/rabbit/rabbit.svg": "6f808e14adc5fca3c0e0052d0a2cec2a051bb6fd8ad0ca1c5a75fc5bf42975ef",
+    "assets/characters/wild_boar/wild_boar.svg": "77778cddbd853043bf6d618e59c17fba74c957c3594c75a21bcaba314f33dd64",
+    "assets/decorations/bushes/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/decorations/rocks/rock-outcrop.webp": "d6a5a36070bf3b5b303c4ccdc78e6ad5441031ed7b15c43a9b3822862898869f",
+    "assets/decorations/trees/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/index-BBS3KJNs.css": "0d875a642ae8b9b19e5f2345cb5e9a5b51f8b5b919b5e14cbdd9760135d0f5b0",
+    "assets/index-BxCk2KJu.js": "38eb7bb80de98691a848852b5ffa8f2c4995158b3739664c8b95892f1fc5cf19",
+    "assets/resources/iron/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/resources/meat/meat.svg": "9667797ca9e4da24911703cd981995457debf5b18d176e176d90ddb4d2ba50d8",
+    "assets/resources/stone/stone.png": "effb7da1e34befff333c2cd6d3b36fca519a755dc4a3c9d823719d20bb5a7dfa",
+    "assets/resources/wood/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/terrain/dirt/dirt.webp": "858c7e69134495e63efc3dcee21b409e464ea0186471302f3efc59d3fe323dad",
+    "assets/terrain/grass/grass.png": "209e8e590e72f06030ca164606e993b5bf0e188fe86a287ff54314cba4a67641",
+    "assets/terrain/water/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "index.html": "1e4d35fb5783439c54f2db085e319574d9604e70f1990cac9fa218dc065b9b98"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "commit": "f379c5110a494be6121439cc42cad943e14100c3",
+  "tree": "d49d1e2dd99445530dc74c381c6e1e553777bf35",
+  "date": "2026-11-02T23:16:57Z",
+  "sequence": 19,
+  "subject": "Checkpoint combat and game over before time economy and treasure upgrade",
+  "name": "Soubojový systém · kontrolní bod",
+  "description": "Kontrolní verze připravená před následujícím rozšířením.",
+  "basePath": "/Newgame/versions/f379c5110a494be6121439cc42cad943e14100c3/",
+  "verification": {
+    "tests": true,
+    "build": true,
+    "browser": true
+  },
+  "files": {
+    "archive-runtime.js": "28baac0aec022a9eb4192535df581a93d6b221c86daf8660487d5c359703e6c6",
+    "assets/buildings/castle/castle.svg": "5aac8b6684826197ec4877d214e049a06fe349d8d2e1d491123ed52388390ef6",
+    "assets/buildings/tower/tower.png": "5f2fbf7221ecf086e8ad6e9126f96841930859d23ef8da2e558bef5ebcb9530d",
+    "assets/buildings/wall/wall.svg": "7e3bc77db593b4ec1940f30acb3e29533bfe88276e210d4c77a94486975db64e",
+    "assets/characters/deer/deer.svg": "555c162e68e928215c7692e70a33e9da260df61b58d93e9ae262616e69e36038",
+    "assets/characters/horse/horse.svg": "130246b0e37054e2c719801bb153be2304cc01c905b730a8432d4145f705b8d3",
+    "assets/characters/king/king.png": "e165ede84f080122e0d7afb7adaa2607a260a45f213a5a7703e364e9dc84f6ca",
+    "assets/characters/rabbit/rabbit.svg": "6f808e14adc5fca3c0e0052d0a2cec2a051bb6fd8ad0ca1c5a75fc5bf42975ef",
+    "assets/characters/wild_boar/wild_boar.svg": "77778cddbd853043bf6d618e59c17fba74c957c3594c75a21bcaba314f33dd64",
+    "assets/decorations/bushes/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/decorations/rocks/rock-outcrop.webp": "d6a5a36070bf3b5b303c4ccdc78e6ad5441031ed7b15c43a9b3822862898869f",
+    "assets/decorations/trees/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/index-CcnZ8CpH.js": "26aa534f0bffb7fddf2d005463cd26fb7425a0466a2f7249cc69dd4739d04b67",
+    "assets/index-DxVKW94T.css": "f44ea091152603c3d4a71f2ca75ea369e866f8d9fcc86a69a675e32c11700c2a",
+    "assets/resources/iron/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/resources/meat/meat.svg": "9667797ca9e4da24911703cd981995457debf5b18d176e176d90ddb4d2ba50d8",
+    "assets/resources/stone/stone.png": "effb7da1e34befff333c2cd6d3b36fca519a755dc4a3c9d823719d20bb5a7dfa",
+    "assets/resources/wood/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/terrain/dirt/dirt.webp": "858c7e69134495e63efc3dcee21b409e464ea0186471302f3efc59d3fe323dad",
+    "assets/terrain/grass/grass.png": "209e8e590e72f06030ca164606e993b5bf0e188fe86a287ff54314cba4a67641",
+    "assets/terrain/water/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "index.html": "42f45fa0ee7e775a89aa216aaaa634578efe6d8333c0a015bfa151da1ecb2c3d"
+  }
+}

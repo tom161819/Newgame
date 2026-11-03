@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "commit": "bf049d5ecacbc9301dc4e04dd6d05534a94fd5e5",
+  "tree": "35a013bfe631f01a002a00b492b2145cb08951f0",
+  "date": "2026-11-02T19:42:49Z",
+  "sequence": 5,
+  "subject": "Checkpoint working tower prototype before isometric upgrade",
+  "name": "Stavění věží · kontrolní bod",
+  "description": "Kontrolní verze připravená před následujícím rozšířením.",
+  "basePath": "/Newgame/versions/bf049d5ecacbc9301dc4e04dd6d05534a94fd5e5/",
+  "verification": {
+    "tests": true,
+    "build": true,
+    "browser": true
+  },
+  "files": {
+    "archive-runtime.js": "7b3df2d60defd8f0e835939f24bb3628b4eff6e5757bb6b819380799da2bf794",
+    "assets/index-B58q7TzL.css": "ea80d16d96812d002737d2657fda482a9ce9a371497964717b020b2a99d1618c",
+    "assets/index-D1g4Rwap.js": "506d7c6112c2df579c8372afef73e1109983a35acb132518dd6f5f333905d272",
+    "index.html": "67a58a85975e49327435774aeb400bf665f26d043a4b555b9b6e0ea355af9d34"
+  }
+}

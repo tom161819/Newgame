@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="cs">
+  <head><link rel="icon" href="data:,"><script src="/Newgame/versions/e104791dda5b4db6b79f4b5c757d4ff91256ff55/archive-runtime.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Medieval Kingdom</title>
+    <script type="module" crossorigin src="/Newgame/versions/e104791dda5b4db6b79f4b5c757d4ff91256ff55/assets/index-crfe8gYy.js"></script>
+    <link rel="stylesheet" crossorigin href="/Newgame/versions/e104791dda5b4db6b79f4b5c757d4ff91256ff55/assets/index-D5rPz5PM.css">
+  </head>
+  <body>
+    <section id="main-menu" class="main-menu" aria-labelledby="main-menu-title">
+      <svg class="menu-castle" viewBox="0 0 1000 500" aria-hidden="true"><path d="M0 440L80 400L180 425L280 375L400 410L530 370L700 400L820 370L1000 425V500H0Z" fill="#172523"/><g fill="#253330" stroke="#697260" stroke-width="2"><path d="M320 430V190H345V165H370V190H395V165H420V190H445V430Z"/><path d="M555 430V190H580V165H605V190H630V165H655V190H680V430Z"/><path d="M420 430V275H445V255H470V275H495V255H520V275H545V255H570V430Z"/><path d="M455 275V90H475V65H495V90H515V65H535V275Z"/></g><g fill="#a2935d"><path d="M480 145Q495 120 510 145V180H480Z"/><path d="M360 235Q375 210 390 235V270H360Z"/><path d="M605 235Q620 210 635 235V270H605Z"/></g><path d="M470 430V355Q495 315 520 355V430Z" fill="#0b1414"/><path d="M495 65V15L565 33L495 45" fill="#8a4538" stroke="#9c8454" stroke-width="2"/></svg>
+      <div class="main-menu-content"><span class="eyebrow">KRÁLOVSKÁ HLÍDKA</span><h1 id="main-menu-title">Medieval Kingdom</h1><p>Vybuduj své království.</p><div class="main-menu-buttons"><button id="new-game" type="button" disabled>New Game</button><button id="main-load-game" type="button" disabled>Load Game</button></div><small>Uložené hry zůstávají v tomto prohlížeči.</small></div>
+    </section>
+    <main inert>
+      <header><span class="eyebrow">KRÁLOVSKÁ HLÍDKA · IZOMETRICKÁ STRATEGIE</span><h1>První cesta</h1>
+        <p>Veď krále kliknutím, lov zvěř, sbírej suroviny a stav strážní věže.</p></header>
+      <section class="inventory" aria-label="Inventář">
+        <span class="inventory-label">Inventář</span>
+        <small id="population-count">Poddaní 0 / 20</small><small id="world-stones">Mapa 100 × 100 · kameny 30 / 80</small>
+        <div class="health-status"><progress id="king-health-bar" max="100" value="100" aria-label="Životy krále"></progress><output id="king-health">HP: 100 / 100</output></div>
+        <button id="king-profile" type="button" class="experience-status" aria-label="Přehled krále"><output id="king-level">King | LVL 1</output><progress id="king-xp-bar" max="100" value="0" aria-label="Zkušenosti krále"></progress><output id="king-xp">XP 0 / 100</output></button>
+        <div id="inventory-items"></div>
+        <span class="food-status"><output id="food-countdown">Food: 01:00</output><small id="food-warning">Out of food</small></span>
+        <span id="game-time" class="game-time">Day 1</span><div id="equipment-summary" aria-label="Equipment"></div>
+      </section>
+      <section id="economy-overview" class="economy-overview" aria-label="Economy"><strong>Economy</strong><span>Gold: <output data-economy="gold">0.00</output></span><span>Castle Income: <output data-economy="income">+0.00</output> Gold/day</span><span>Worker Wages: <output data-economy="wages">-0.00</output> Gold/day</span><span>Balance: <output data-economy="balance">+0.00</output> Gold/day</span><span>Unpaid wages: <output data-economy="unpaid">0.00</output></span><small id="wage-warning" role="status" hidden>Insufficient Gold to pay wages.</small></section>
+      <div class="camera-controls"><span id="camera-mode">Kamera sleduje krále</span><span id="path-wear-info" hidden></span><span id="vision-status">Fog of War: OFF</span><button id="dismount" type="button" hidden>Dismount · H</button><button id="follow-king" type="button">Na krále · mezerník</button></div>
+      <div id="game" aria-label="Izometrická herní mapa 100 × 100 políček"></div>
+      <footer><span><i class="player-key"></i> Král</span><span><i class="wall-key"></i> Překážka</span><span><i class="stone-key"></i> Kámen</span><span>WASD / šipky: kamera · kolečko: zoom</span></footer>
+      <p id="status" role="status">Vyber kámen nebo volné políčko.</p>
+      <section class="buildings-bar" aria-label="Stavění budov">
+        <div id="buildings-panel" class="buildings-panel" hidden>
+          <h2>Buildings</h2>
+          <div id="building-options"></div>
+        </div>
+        <button id="buildings-tab" type="button" aria-expanded="false" aria-controls="buildings-panel">Buildings</button>
+        <button id="asset-library-button" type="button">Asset Library</button>
+        <span id="building-selection"></span>
+        <button id="cancel-building" type="button" hidden>Zrušit (Esc)</button>
+      </section>
+    </main>
+    <button id="settings-button" class="settings-button" type="button" aria-label="Settings" aria-controls="settings-panel" aria-expanded="false">⚙</button>
+    <aside id="settings-panel" class="settings-panel" aria-labelledby="settings-title" aria-hidden="true" inert>
+      <div class="settings-heading"><h2 id="settings-title">Settings</h2><button id="close-settings" type="button" aria-label="Zavřít nastavení">×</button></div>
+      <label class="setting-row" for="fog-toggle"><span>Fog of War</span><input id="fog-toggle" type="checkbox" role="switch" /></label>
+      <p>Omezí viditelnost objektů podle dohledu krále. Terén zůstává viditelný.</p>
+      <label class="setting-row" for="path-wear-toggle"><span>Show Path Wear Debug</span><input id="path-wear-toggle" type="checkbox" role="switch" /></label>
+      <p>Barvy vyšlapání a počet průchodů pod ukazatelem myši.</p>
+      <nav class="settings-actions" aria-label="Herní menu"><button type="button" data-game-menu="save">Save Game</button><button type="button" data-game-menu="load">Load Game</button><button type="button" data-game-menu="main">Main Menu</button></nav>
+    </aside>
+    <dialog id="asset-gallery" aria-labelledby="asset-gallery-title">
+      <header class="asset-gallery-header"><div><h2 id="asset-gallery-title">Asset Library</h2><p>Prohlížení registrovaných objektů · bez úprav a vkládání do mapy</p></div><button id="close-asset-gallery" type="button" aria-label="Zavřít knihovnu">Zavřít ×</button></header>
+      <nav id="asset-categories" aria-label="Kategorie objektů"></nav>
+      <p id="asset-count"></p>
+      <div class="asset-layout"><div id="asset-grid" aria-label="Objekty"></div><aside id="asset-detail" aria-label="Detail objektu"></aside></div>
+    </dialog>
+    <div id="object-tooltip" role="tooltip" hidden></div>
+    <dialog id="game-over" aria-labelledby="game-over-title"><h2 id="game-over-title">Game Over</h2><p>Král padl. Začni znovu s novým světem a plnými životy.</p><button id="restart-game" type="button">Restart Game</button></dialog>
+    <dialog id="equipment-dialog" class="game-dialog" aria-labelledby="equipment-title">
+      <div class="dialog-heading"><h2 id="equipment-title">Equipment</h2><button id="close-equipment" type="button">Zavřít ×</button></div>
+      <div id="equipment-slots"></div>
+      <dl class="equipment-stats"><dt>Base DPS</dt><dd data-stat="baseDPS"></dd><dt>Final DPS</dt><dd data-stat="finalDPS"></dd><dt>Base Armor (%)</dt><dd data-stat="baseArmor"></dd><dt>Final Armor (%)</dt><dd data-stat="finalArmor"></dd><dt>HP</dt><dd data-stat="hp"></dd><dt>HP Regeneration</dt><dd data-stat="regeneration"></dd></dl>
+    </dialog>
+    <dialog id="treasure-dialog" class="game-dialog" aria-labelledby="treasure-title">
+      <div class="dialog-heading"><h2 id="treasure-title">Treasure Chest</h2><button id="close-treasure" type="button">Zavřít ×</button></div>
+      <ul id="treasure-contents"></ul><button id="take-all" type="button">Take All</button>
+    </dialog>
+    <div id="day-notice" role="status" hidden></div>
+    <dialog id="construction-dialog" class="game-dialog" aria-labelledby="construction-name"><div class="dialog-heading"><h2 id="construction-name">Construction</h2><button id="close-construction" type="button">Zavřít ×</button></div><p id="construction-percentage"></p><progress id="construction-progress" max="100" value="0" aria-label="Postup výstavby"></progress><p id="construction-builders"></p><p id="construction-eta"></p><p id="construction-king-task"></p><p id="construction-unreachable" role="status"></p><div class="construction-actions"><button id="construction-king-work" type="button">Build with King</button><button id="construction-king-stop" type="button" hidden>Stop King's work</button></div><p id="construction-refund"></p><button id="cancel-construction" type="button">Cancel Construction</button></dialog>
+    <dialog id="workplace-dialog" class="game-dialog workplace-dialog" aria-labelledby="workplace-name"><div class="dialog-heading"><h2 id="workplace-name">Workplace</h2><button id="close-workplace" type="button">Zavřít ×</button></div><img id="workplace-image" alt=""/><p id="workplace-count"></p><p id="workplace-wages"></p><p id="workplace-average"></p><p id="workplace-production"></p><ul id="workplace-workers"></ul><button id="assign-workplace-worker" type="button">Assign Worker</button><ul id="workplace-candidates" hidden></ul></dialog>
+    <dialog id="unit-dialog" class="game-dialog" aria-labelledby="unit-name"><div class="dialog-heading"><h2 id="unit-name">Character</h2><button id="close-unit" type="button">Zavřít ×</button></div><p id="unit-level"></p><progress id="unit-xp-bar" max="100" value="0" aria-label="Zkušenosti postavy"></progress><p id="unit-xp"></p><dl class="equipment-stats"><dt>Total XP</dt><dd data-unit-stat="totalXP"></dd><dt>HP</dt><dd data-unit-stat="hp"></dd><dt>DPS</dt><dd data-unit-stat="dps"></dd><dt>Armor</dt><dd data-unit-stat="armor"></dd></dl><section id="unit-job-controls" hidden><h3 id="unit-profession"></h3><p id="unit-work-state"></p><p id="unit-talent"></p><p id="unit-wage"></p><p id="unit-unpaid"></p><p id="unit-workplace"></p><label for="assign-job">Assign Job</label><select id="assign-job"></select></section><h3>Skills</h3><div id="unit-skills"></div></dialog>
+    <dialog id="pause-menu" class="game-dialog pause-menu" aria-labelledby="pause-title"><h2 id="pause-title">Game Menu</h2><p>Hra je pozastavená.</p><nav class="settings-actions"><button id="resume-game" type="button">Resume Game</button><button type="button" data-game-menu="save">Save Game</button><button type="button" data-game-menu="load">Load Game</button><button type="button" data-game-menu="main">Main Menu</button></nav></dialog>
+    <dialog id="save-load-dialog" class="game-dialog save-load-dialog" aria-labelledby="save-load-title"><div class="dialog-heading"><h2 id="save-load-title">Load Game</h2><button id="close-save-load" type="button">Zavřít ×</button></div><p>Uložené pozice jsou dostupné na tomto zařízení a v tomto prohlížeči.</p><form id="new-save-form" hidden><label for="save-name">Název nové hry</label><input id="save-name" maxlength="80" required/><button type="submit">Vytvořit nový save</button></form><p id="save-error" role="alert"></p><p id="save-notice" role="status"></p><div id="save-list"></div></dialog>
+    <dialog id="save-confirm" class="game-dialog" aria-labelledby="save-confirm-title"><h2 id="save-confirm-title">Potvrzení</h2><p id="save-confirm-text"></p><button id="confirm-save-no" type="button" autofocus>Zrušit</button><button id="confirm-save-yes" type="button">Potvrdit</button></dialog>
+    <div id="application-notice" role="status" hidden></div>
+  </body>
+</html>

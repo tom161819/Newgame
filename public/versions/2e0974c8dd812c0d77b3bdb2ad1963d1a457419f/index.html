@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="cs">
+  <head><link rel="icon" href="data:,"><script src="/Newgame/versions/2e0974c8dd812c0d77b3bdb2ad1963d1a457419f/archive-runtime.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>První cesta | Královská hlídka</title>
+    <script type="module" crossorigin src="/Newgame/versions/2e0974c8dd812c0d77b3bdb2ad1963d1a457419f/assets/index-DmuPkODs.js"></script>
+    <link rel="stylesheet" crossorigin href="/Newgame/versions/2e0974c8dd812c0d77b3bdb2ad1963d1a457419f/assets/index-B5W0mN3m.css">
+  </head>
+  <body>
+    <main>
+      <header><span class="eyebrow">KRÁLOVSKÁ HLÍDKA · IZOMETRICKÁ STRATEGIE</span><h1>První cesta</h1>
+        <p>Veď krále kliknutím, sbírej kámen a stav strážní věže.</p></header>
+      <section class="inventory" aria-label="Inventář">
+        <span class="inventory-label">Inventář</span>
+        <small id="world-stones">Mapa 100 × 100 · kameny 30 / 80</small>
+        <div class="inventory-item">
+          <svg class="stone-icon" viewBox="0 0 28 28" aria-hidden="true">
+            <ellipse cx="14" cy="23" rx="12" ry="4" fill="#08141c" opacity=".45" />
+            <path d="M3 12 11 16 11 23 4 18Z" fill="#7d8c98" />
+            <path d="M11 16 24 11 23 19 11 23Z" fill="#586a79" />
+            <path d="M3 12 9 4 17 3 24 11 11 16Z" fill="#a9b5c0" />
+          </svg>
+          <span>Kameny</span>
+          <output id="stone-count" data-resource-count="stone" aria-label="Počet kamenů" aria-live="polite" aria-atomic="true">0</output>
+        </div>
+      </section>
+      <div class="camera-controls"><span id="camera-mode">Kamera sleduje krále</span><button id="follow-king" type="button">Na krále · mezerník</button></div>
+      <div id="game" aria-label="Izometrická herní mapa 100 × 100 políček"></div>
+      <footer><span><i class="player-key"></i> Král</span><span><i class="wall-key"></i> Překážka</span><span><i class="stone-key"></i> Kámen</span><span>WASD / šipky: kamera · kolečko: zoom</span></footer>
+      <p id="status" role="status">Vyber kámen nebo volné políčko.</p>
+      <section class="buildings-bar" aria-label="Stavění budov">
+        <div id="buildings-panel" class="buildings-panel" hidden>
+          <h2>Buildings</h2>
+          <button id="tower-choice" class="building-choice" type="button" aria-pressed="false" aria-describedby="tower-description tower-availability">
+            <svg class="tower-icon" viewBox="0 0 56 70" aria-hidden="true">
+              <path d="M9 26 28 36 28 65 9 55Z" fill="#9aaab6" />
+              <path d="M28 36 47 26 47 55 28 65Z" fill="#657c8c" />
+              <path d="M5 23 28 11 51 23 28 36Z" fill="#c3ced5" />
+              <path d="M5 23V12L12 9V18L21 23V14L28 18V29Z" fill="#98acba" />
+              <path d="M28 29V18L35 14V23L44 18V9L51 12V23L28 36Z" fill="#718b9e" />
+              <path d="M32 48 39 44V56L32 60Z" fill="#263d4b" />
+            </svg>
+            <span class="building-name"><strong>Tower</strong><small>Strážní věž · 2 × 2 políčka</small></span>
+            <span class="building-price">🪨 10</span>
+          </button>
+          <p id="tower-description">Vyber věž a umísti ji na mapu. Do hotové věže vstoupíš kliknutím.</p>
+          <p id="tower-availability" class="shortage" role="status">Chybí 10 kamenů.</p>
+        </div>
+        <button id="buildings-tab" type="button" aria-expanded="false" aria-controls="buildings-panel">Buildings</button>
+        <span id="building-selection"></span>
+        <button id="cancel-building" type="button" hidden>Zrušit (Esc)</button>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "commit": "81ab03ed4c007d30eda7b7ffc793d7c0483ff474",
+  "tree": "2b8660006d046325c154cdf863ba300bd378dd7f",
+  "date": "2026-11-02T21:47:04Z",
+  "sequence": 12,
+  "subject": "Add wandering wildlife, click-to-hunt meat drops and timed food consumption",
+  "name": "Lov a potrava",
+  "description": "Pohybující se zvěř, lov, maso a spotřeba potravy.",
+  "basePath": "/Newgame/versions/81ab03ed4c007d30eda7b7ffc793d7c0483ff474/",
+  "verification": {
+    "tests": true,
+    "build": true,
+    "browser": true
+  },
+  "files": {
+    "archive-runtime.js": "c29a2c7634121467a448c293c3b95259950a2e7733a4adae8bc5366dafb79886",
+    "assets/buildings/tower/tower.png": "5f2fbf7221ecf086e8ad6e9126f96841930859d23ef8da2e558bef5ebcb9530d",
+    "assets/characters/deer/deer.svg": "555c162e68e928215c7692e70a33e9da260df61b58d93e9ae262616e69e36038",
+    "assets/characters/king/king.png": "e165ede84f080122e0d7afb7adaa2607a260a45f213a5a7703e364e9dc84f6ca",
+    "assets/characters/rabbit/rabbit.svg": "6f808e14adc5fca3c0e0052d0a2cec2a051bb6fd8ad0ca1c5a75fc5bf42975ef",
+    "assets/characters/wild_boar/wild_boar.svg": "77778cddbd853043bf6d618e59c17fba74c957c3594c75a21bcaba314f33dd64",
+    "assets/decorations/bushes/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/decorations/rocks/rock-outcrop.webp": "d6a5a36070bf3b5b303c4ccdc78e6ad5441031ed7b15c43a9b3822862898869f",
+    "assets/decorations/trees/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/index-BdvjQspE.js": "765d531d22676129baee7f73a5fb80e49c90f3e44bd393aaaa1ba3267ddbc891",
+    "assets/index-C_fSk7WE.css": "04f37dacda29a6dff40efdbf419a69fb591d3abeceaff8732ecede8955febcb7",
+    "assets/resources/iron/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/resources/meat/meat.svg": "9667797ca9e4da24911703cd981995457debf5b18d176e176d90ddb4d2ba50d8",
+    "assets/resources/stone/stone.png": "effb7da1e34befff333c2cd6d3b36fca519a755dc4a3c9d823719d20bb5a7dfa",
+    "assets/resources/wood/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "assets/terrain/dirt/dirt.webp": "858c7e69134495e63efc3dcee21b409e464ea0186471302f3efc59d3fe323dad",
+    "assets/terrain/grass/grass.png": "209e8e590e72f06030ca164606e993b5bf0e188fe86a287ff54314cba4a67641",
+    "assets/terrain/water/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "index.html": "f7fe58475225812d153b7f074d7793873d496c4e201ba6b52a4d373514d4f23f"
+  }
+}

@@ -52,6 +52,12 @@ Horní inventář a spodní Buildings jsou mimo herní kameru a při pohybu nebo
 - Během animace výstupu a sestupu se nové příkazy nepřijímají. Vstup/výstup lze opakovat, včetně přechodu z jedné věže do druhé.
 - Po obnovení stránky se zobrazí hlavní menu. New Game vytvoří novou náhodnou mapu, vynuluje inventář i vybavení, nastaví Day 1 a 100 HP. Nastavení zůstává zachované. Load Game obnoví vybranou rozehranou pozici.
 
+## Starší verze hry
+
+**Starší verze** v hlavním menu nebo spodní liště otevřou [archiv verzí](https://tom161819.github.io/Newgame/versions/). Obsahuje všechny předchozí ověřené commity včetně kontrolních bodů, název, datum, popis a odkaz na spuštění. Každá hra se otevírá v nové záložce, aktuální adresa hry zůstává stejná.
+
+Historické verze jsou skutečná sestavení příslušného Git commitu, nikoli přepnuté nastavení současné hry. Jejich soubory a URL se při dalších aktualizacích nepřepisují. Každý commit má oddělené uložené pozice a nastavení, takže starší Save/Load neovlivní aktuální pozice. Podrobnosti sestavení a přidávání verzí jsou v [docs/ARCHIVE.md](docs/ARCHIVE.md).
+
 ## Ukládání a načítání
 
 Settings nebo Game Menu → **Save Game** otevře seznam místních pozic. Lze vytvořit nový save s vlastním názvem, přepsat existující nebo jej odstranit; přepsání i smazání vyžadují potvrzení. Počet slotů není omezen na pět. Každá pozice ukazuje datum vytvoření a posledního uložení, den a aktivní dobu hraní. Úložiště je samostatné pro každý prohlížeč a adresu webu; smazání dat webu smaže také místní savy.

@@ -10,7 +10,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test"
+    "test": "node --test",
+    "archive:build": "node scripts/build-archive.mjs",
+    "archive:verify": "node scripts/verify-archive.mjs"
   },
   "dependencies": {
     "phaser": "4.2.1"
