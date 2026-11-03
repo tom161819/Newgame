@@ -71,6 +71,8 @@ import { FoodEconomyPanel } from '../ui/FoodEconomyPanel.js';
 import { KingLogisticsSystem } from '../systems/KingLogisticsSystem.js';
 import { BuildingUnlockManager } from '../systems/BuildingUnlockManager.js';
 import { MapMemory } from '../systems/MapMemory.js';
+import { staticMemoryEntries } from './mapMemoryObjects.js';
+import { MapMemoryRenderer } from './MapMemoryRenderer.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -159,8 +161,8 @@ export class GameScene extends Phaser.Scene {
     this.combat.on('damage',(unit,amount,attacker)=>{this.combatFeedback.hit(unit);this.skillSystem.creditDamage(attacker,unit,amount);});
     this.combat.on('death',(unit,killer)=>this.onUnitDeath(unit,killer));
     this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
-    this.mapMemory=new MapMemory(this.fog);
-    this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.fog.setExplorationEnabled(settings.explorationMode);this.terrain.setDebug(settings.pathWearDebug);this.refreshVisibility();},open=>this.pauseManager.set('settings',open),{seasons:this.seasons,onSeasonsChange:enabled=>{this.gameSettings=gameSettings({...this.gameSettings,seasonsEnabled:enabled});this.seasons.setEnabled(enabled);}});
+    this.mapMemory=new MapMemory(this.fog);this.memoryRenderer=new MapMemoryRenderer(this,this.mapMemory);
+    this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.fog.setExplorationEnabled(settings.explorationMode);this.terrain.setDebug(settings.pathWearDebug);this.refreshVisibility();},open=>this.pauseManager.set('settings',open),{seasons:this.seasons,onSeasonsChange:enabled=>{this.gameSettings=gameSettings({...this.gameSettings,seasonsEnabled:enabled});this.seasons.setEnabled(enabled);this.refreshVisibility();}});
     this.fog.setEnabled(this.settingsPanel.settings.fogOfWar);
     if(!this.loadState){this.settingsPanel.applySettings({...this.settingsPanel.settings,fogOfWar:this.gameSettings.fogOfWar,explorationMode:this.gameSettings.explorationMode});this.fog.setEnabled(this.gameSettings.fogOfWar);}
     this.fog.setExplorationEnabled(this.settingsPanel.settings.explorationMode);
@@ -210,6 +212,7 @@ export class GameScene extends Phaser.Scene {
     this.input.on('gameout',()=>{this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;this.clearWallPreviews();document.querySelector('#object-tooltip').hidden=true;});
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
       this.kingLogistics.destroy();
+      this.memoryRenderer.destroy();
       this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
       this.buildingUnlocks.destroy();
       this.animalSystem.destroy();this.dropSystem.destroy();document.querySelector('#object-tooltip').hidden=true;
@@ -543,9 +546,11 @@ export class GameScene extends Phaser.Scene {
     document.querySelector('#path-wear-info').hidden=!this.settingsPanel.settings.pathWearDebug;
     this.fog.update();this.updateMountUI();
     this.terrain.invalidateArea(this.mapMemory.observeTerrain(this.terrainGrid,this.pathWear,this.seasons.season,this.map));
+    this.mapMemory.observeObjects(staticMemoryEntries(this));
     this.terrain.update(this.cameras.main,this.fog,this.mapMemory);
     const view=this.cameras.main.worldView;
     this.legacyStockpiles?.update(view,this.fog);
+    this.memoryRenderer.update(view);
     this.player.setCargo?.(this.character.cargo);for(const worker of this.workerSystem?.liveWorkers()??[])worker.view.setCargo?.(worker.cargo);
     const cargoStatus=document.querySelector('#king-cargo-status');cargoStatus.hidden=!this.character.cargo&&!this.kingLogistics.task;
     const cargoText=`${cargoLabel(this,this.character)} · ${transportLabel(this,this.character)}`;if(cargoStatus.textContent!==cargoText)cargoStatus.textContent=cargoText;

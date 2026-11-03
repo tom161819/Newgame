@@ -59,10 +59,12 @@ export class FogOfWarSystem {
   isVisiblePosition(position){return !this.enabled||this.isInSightPosition(position);}
   isVisibleTile(tile){return !this.enabled||this.isInSightTile(tile);}
   isVisibleObject(object){
-    if(!this.enabled)return true;
+    return !this.enabled||this.isInSightObject(object);
+  }
+  isInSightObject(object){
     if(object.position)return this.isInSightPosition(object.position);
-    const d=object.definition??{width:1,height:1};
-    for(let y=0;y<d.height;y++)for(let x=0;x<d.width;x++)if(this.isInSightTile({x:object.x+x,y:object.y+y}))return true;
+    const d=object.definition??object;
+    for(let y=0;y<(d.height??1);y++)for(let x=0;x<(d.width??1);x++)if(this.isInSightTile({x:object.x+x,y:object.y+y}))return true;
     return false;
   }
 }

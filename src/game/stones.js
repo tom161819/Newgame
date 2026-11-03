@@ -65,10 +65,15 @@ export function drawStone(scene,tile,definition=stoneDefinition()) {
   const position=tileCenter(tile),visual=definition.visual??{};
   const stone=scene.add.graphics({x:position.x,y:position.y+(visual.offsetY??0)}).setDepth(position.y+(definition.depth?.offset??0));
   stone.setData('tile',{...tile});stone.setData('objectId',definition.id);
+  stone.paint=()=>{
+  stone.clear();
   const shadow=definition.shadow;
   if(shadow){stone.fillStyle(shadow.color,shadow.alpha);stone.fillEllipse(shadow.x,shadow.y,shadow.width,shadow.height);}
   stone.fillStyle(0x868c88);stone.fillPoints([{x:-11,y:-1},{x:-3,y:3},{x:-3,y:9},{x:-10,y:5}],true);
   stone.fillStyle(0x606d70);stone.fillPoints([{x:-3,y:3},{x:10,y:-2},{x:9,y:6},{x:-3,y:9}],true);
   stone.fillStyle(0xb4b9b1);stone.fillPoints([{x:-11,y:-1},{x:-5,y:-9},{x:3,y:-10},{x:10,y:-2},{x:-3,y:3}],true);
+  return stone;
+  };
+  stone.paint();
   return stone;
 }

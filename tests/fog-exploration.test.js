@@ -52,3 +52,33 @@ test('terrain memory never records unknown areas while exploration or fog displa
   memory.observeTerrain(grid,null,'Summer');assert.equal(memory.terrain.size,317);assert.equal(memory.terrain.has(9090),false);
   const revision=memory.revision;assert.deepEqual(memory.observeTerrain(grid,null,'Summer'),[]);assert.equal(memory.revision,revision);
 });
+
+const entry=(key,type,x,y,visual={},width=1,height=1)=>({key,kind:'building',type,x,y,width,height,visual});
+
+test('known static objects remain frozen through hidden removal, replacement and construction until revisited',()=>{
+  const {king,fog,memory}=world(),stone=entry('resource:22,20','stone',22,20),field=entry('building:field','wheat_field',24,20,{stage:1,season:'Spring'},3,3);
+  memory.observeObjects([stone,field]);const known=structuredClone([...memory.objects]);
+  king.position={x:80.5,y:80.5};fog.update();
+  const replacement=entry('resource:22,20','stone',22,20,{depleted:true}),built=entry('building:new','tower',26,20,{construction:{state:'complete',progress:100,workDone:20}},2,2);
+  memory.observeObjects([replacement,built]);assert.deepEqual([...memory.objects],known);assert.equal(memory.objects.has('building:new'),false);
+  fog.setEnabled(false);fog.setExplorationEnabled(false);memory.observeObjects([replacement,built]);assert.deepEqual([...memory.objects],known);
+  fog.setEnabled(true);king.position={x:20.5,y:20.5};fog.update();memory.observeObjects([replacement,built]);
+  assert.equal(memory.objects.has('building:field'),false);assert.deepEqual(memory.objects.get(stone.key).visual,{depleted:true});assert.equal(memory.objects.has('building:new'),true);
+});
+
+test('visible snapshots own their visual data and stationary unchanged observations are cached',()=>{
+  const {memory}=world(),source=entry('building:tower','tower',22,20,{construction:{state:'building',progress:20,workDone:4}},2,2);
+  memory.observeObjects([source]);const frozen=memory.objects.get(source.key),revision=memory.revision;
+  assert.equal(memory.observeObjects([source]),false);assert.equal(memory.revision,revision);assert.equal(memory.objects.get(source.key),frozen);
+  source.visual.construction.progress=60;assert.equal(frozen.visual.construction.progress,20);
+  assert.equal(memory.observeObjects([source]),true);assert.equal(memory.objects.get(source.key).visual.construction.progress,60);
+});
+
+test('rediscovering an empty remembered footprint removes only stale visual knowledge',()=>{
+  const {king,fog,memory}=world(),tower=entry('building:tower','tower',23,20,{construction:{state:'complete',progress:100,workDone:20}},2,2);
+  const actualMap=Array.from({length:100},()=>Array(100).fill(0));actualMap[20][23]=1;
+  memory.observeObjects([tower]);king.position={x:80.5,y:80.5};fog.update();actualMap[20][23]=0;
+  memory.observeObjects([]);assert.equal(memory.objects.has(tower.key),true);assert.equal(actualMap[20][23],0);
+  king.position={x:20.5,y:20.5};fog.update();memory.observeObjects([]);
+  assert.equal(memory.objects.has(tower.key),false);assert.equal(actualMap[20][23],0);
+});

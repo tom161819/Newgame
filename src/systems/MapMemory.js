@@ -3,7 +3,22 @@ export const MEMORY_DIRECTIONS=Object.freeze([[-1,-1],[0,-1],[1,-1],[-1,0],[1,0]
 
 // Visual knowledge only. Pathfinding, work, resources and collision never read it.
 export class MapMemory {
-  constructor(fog){this.fog=fog;this.terrain=new Map();this.objects=new Map();this.revision=0;}
+  constructor(fog){this.fog=fog;this.terrain=new Map();this.objects=new Map();this.objectSignatures=new Map();this.revision=0;}
+  observeObjects(entries){
+    const actual=new Map(entries.map(entry=>[entry.key,entry]));let changed=false;
+    for(const [key,known]of this.objects)if(this.fog.isInSightObject(known)){
+      const now=actual.get(key);
+      if(!now||!this.fog.isInSightObject(now)){this.objects.delete(key);this.objectSignatures.delete(key);changed=true;}
+    }
+    for(const entry of entries){
+      if(!this.fog.isInSightObject(entry))continue;
+      const signature=JSON.stringify(entry);
+      if(signature===this.objectSignatures.get(entry.key))continue;
+      this.objects.set(entry.key,structuredClone(entry));this.objectSignatures.set(entry.key,signature);changed=true;
+    }
+    if(changed)this.revision++;
+    return changed;
+  }
   observeTerrain(grid,wear,season,map=grid){
     const changed=[];
     for(const index of this.fog.visibleIndices){

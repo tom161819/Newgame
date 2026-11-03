@@ -23,3 +23,21 @@ export async function explorationMenuSmoke(page){
   await page.evaluate(()=>{window.__game.registry.get('application').scene.pauseManager.set('fog-smoke',false);delete window.__fogSmoke;});
   console.log('PASS native circular exploration, black/grey/normal terrain pixels, independent runtime switches, unchanged discovery on test reveal and frozen known terrain');
 }
+
+export async function staticMemoryRendererSmoke(page){
+  const result=await page.evaluate(()=>{
+    const app=window.__game.registry.get('application'),s=app.scene;s.pauseManager.set('memory-smoke',true);
+    const position={...s.character.position},enabled=s.fog.enabled,before=app.snapshot(),memory=new s.mapMemory.constructor(s.fog),renderer=new s.memoryRenderer.constructor(s,memory);
+    const types=['tower','castle','wall','granary','wheat_field','orchard','stone','treasure_chest'];
+    const entries=types.map((type,index)=>{const d=s.objectRegistry.require(type),kind=d.category==='building'?'building':type==='treasure_chest'?'chest':'resource';return {key:`fixture:${type}`,kind,type,x:s.character.tile.x+2,y:s.character.tile.y+2,width:d.width,height:d.height,visual:{...(d.crop?{stage:3,season:'Summer'}:{}),...(type==='tower'?{construction:{state:'building',progress:50,workDone:10}}:{}),...(type==='treasure_chest'?{opened:true,lid:{y:-38,rotation:-.65}}:{})}};});
+    s.fog.setEnabled(true);memory.observeObjects(entries);s.character.position={x:80.5,y:80.5};s.fog.update();renderer.update(s.cameras.main.worldView);
+    const rendered=[...renderer.views.keys()],chest=renderer.views.get('fixture:treasure_chest')?.view,field=renderer.views.get('fixture:wheat_field')?.view;
+    const visual={chestOpened:chest?.opened,chestLid:chest?.lid?.rotation,fieldStage:field?.stage,fieldSeason:field?.season,fieldTexture:field?.plants[0].texture.key};
+    renderer.destroy();s.character.position=position;s.fog.setEnabled(enabled);s.refreshVisibility();const after=app.snapshot();
+    const keys=['inventory','buildings','workers','resources','drops','foodStorage','foodProduction','farming','production','constructionSystem'];
+    const unchanged=keys.every(key=>JSON.stringify(before[key])===JSON.stringify(after[key]));s.pauseManager.set('memory-smoke',false);
+    return {rendered,visual,unchanged};
+  });
+  assert.equal(result.rendered.length,8);assert.equal(result.unchanged,true);assert.equal(result.visual.chestOpened,true);assert.ok(Math.abs(result.visual.chestLid+.65)<1e-12);assert.equal(result.visual.fieldStage,3);assert.equal(result.visual.fieldSeason,'Summer');assert.match(result.visual.fieldTexture,/^memory-texture:/);
+  console.log('PASS native frozen tower/scaffold, castle, wall, granary, crops, orchard, stone and opened chest; muted full-height copies leave actual world, workers, stocks and production unchanged');
+}

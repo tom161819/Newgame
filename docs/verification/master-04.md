@@ -14,7 +14,12 @@ Sight uses squared Euclidean distance in logical grid coordinates. Former20-tile
 
 New exploration persistence and static-object snapshots remain explicitly incomplete until C–D. Public main stays at the completed archive optimization; this partial stage is backed up only.
 
+## Phase C — verified
+
+327/327 tests,0 failed,0 skipped; build and native --current-only --fog smoke passed. MapMemory stores detached visual snapshots, including construction progress, crop stage/season, wall links and chest lid pose. Hidden removal/replacement/new construction stays unknown until ordinary sight returns; rediscovering an empty old footprint removes the stale copy. Dynamic actors, loot, inventories and production state are excluded. The same actual asset/rendering factories create camera-culled visual copies, with no registry/occupation/stock/work registration. Full-height graphics and shared texture derivatives are desaturated/darkened without per-object GPU filters.
+
+Native Chromium rendered eight actual graphics types: tower scaffold, castle, wall, granary, wheat, orchard, stone and opened chest; frozen crop season/stage and lid pose matched. All live buildings/workers/resources/stocks/farming/production remained unchanged. Existing collection/delivery/XP/exact IndexedDB regression also passed after these checks. New memory persistence remains pending D and this partial stage is not public main.
+
 ## Remaining phases
 
-C: Persistent frozen static-object/terrain memory, never render live hidden changes.
 D: Save migration, strict model validation, interaction/UI leak prevention and full browser/performance integration. Overall stage04 is PARTIAL, never claimed complete before these checks.
