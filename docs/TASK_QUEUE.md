@@ -18,10 +18,11 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 - [Krok 11 — Main Menu a Save/Load](requests/step-11.md): commit `574ef6b`, Pages run `41551343872` úspěšně nasazeno. 81 automatických testů a ověření IndexedDB, přesné obnovy i chybových stavů v prohlížeči.
 
+- [Krok 12 — dynamické pěšiny](requests/step-12.md): commit `29a9cec`, Pages run `41553554118` úspěšně nasazeno. 90 testů, skutečné průchody, zarůstání, legacy Save/Load a výkon kolem 60 FPS ověřeny.
+
 ## Následuje
 
-1. **Dokončeno v této verzi, ověřuje se nasazení:** [Krok 12 — dynamické vyšlapávání cest](requests/step-12.md). 90 testů; skutečné průchody, prahy 5/15/30, koně, povrchy a debug, zarůstání a Save/Load včetně skutečného save předchozí verze ověřeny.
-4. [Krok 13 — univerzální XP a levely 1–50](requests/step-13.md).
+1. **Právě probíhá:** [Krok 13 — univerzální XP a levely 1–50](requests/step-13.md).
 5. [Krok 14 — individuální skilly a profese poddaných](requests/step-14.md).
 6. [Krok 15 — přirozené talenty a mzdy](requests/step-15.md).
 7. [Krok 16 — pracovní budovy a zaměstnanci](requests/step-16.md).
