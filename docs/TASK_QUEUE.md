@@ -16,10 +16,11 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 - [Krok 10 — herní čas, regenerace, zlato a poklady](requests/step-10.md): commit `cd77265`, Pages run `41548867995` úspěšně nasazeno; 75 automatických testů a skutečný 120sekundový den ověřeny.
 
+- [Krok 11 — Main Menu a Save/Load](requests/step-11.md): commit `574ef6b`, Pages run `41551343872` úspěšně nasazeno. 81 automatických testů a ověření IndexedDB, přesné obnovy i chybových stavů v prohlížeči.
+
 ## Následuje
 
-1. **Dokončeno v této verzi, ověřuje se nasazení:** [Krok 11 — Main Menu a Save/Load](requests/step-11.md). 81 automatických testů; skutečné IndexedDB, pět pozic, potvrzení, chyba úložiště, zavření a otevření prohlížeče, offline režim, přesná obnova během pohybu/lezení/souboje a časovače ověřeny.
-3. [Krok 12 — dynamické vyšlapávání cest](requests/step-12.md).
+1. **Právě probíhá:** [Krok 12 — dynamické vyšlapávání cest](requests/step-12.md).
 4. [Krok 13 — univerzální XP a levely 1–50](requests/step-13.md).
 5. [Krok 14 — individuální skilly a profese poddaných](requests/step-14.md).
 6. [Krok 15 — přirozené talenty a mzdy](requests/step-15.md).
