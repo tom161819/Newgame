@@ -19,4 +19,4 @@ Game version remains `0.1.0`; save schema remains `7`. Availability is derived f
 
 A camera-coordinate test initially clicked before the resize observer settled after changing viewport size. The smoke now waits for browser layout and synchronizes the actual game camera before measuring click coordinates; the complete scenario then passed. Legacy component fixtures and the restore fixture were updated for the new prerequisites and the existing empty-world load contract, respectively; none of the resulting failures were skipped.
 
-Source commit is recorded in the completion checkpoint in [UPGRADE_PROGRESS.md](../UPGRADE_PROGRESS.md). The stage is backed up on `backup/master-progress`; public milestone M1 remains pending until stages 03–06 and its full release gate. Next: stage 03, Seasons ON/OFF.
+Implementation source: `5074450fe57321ac71b7ded1cedcaf2281d2f216`. The completion checkpoint is recorded in [UPGRADE_PROGRESS.md](../UPGRADE_PROGRESS.md). The stage is backed up on `backup/master-progress`; public milestone M1 remains pending until stages 03–06 and its full release gate. Next: stage 03, Seasons ON/OFF.
