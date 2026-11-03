@@ -36,13 +36,14 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 - [Krok 19 — Advanced New Game Setup & World Configuration](requests/step-19.md): commit `f22ded0`, Pages run `41604307007` úspěšně nasazeno. 166 testů; pokročilé nastavení, hotový hrad zdarma, počáteční zlato a dohled, délky dne včetně mezd, skutečný 30sekundový respawn a 60sekundový den, přesné Save/Load v2 i migrace skutečné verze v1 ověřeny. Archiv obsahuje 41 funkčních verzí ze skutečných commitů včetně tohoto kroku.
 
+- [Krok 20 — Versioning System & In-Game Changelog](requests/step-20.md): commit `e8d41eb`, Pages run `41624768761` úspěšně nasazeno. Zachovaná alpha 0.1.0; 172 testů, generování/validace historie, lokální release workflow, menu/Settings, NEW, Save/Load i skutečný build jiné verze ověřeny. Archiv rozšířen na 45 ověřených commitů.
+
 ## Následuje
 
-1. **Právě probíhá:** [Krok 20 — Versioning System & In-Game Changelog](requests/step-20.md).
-2. [Krok 21 — Farming & Orchards](requests/step-21.md).
-3. [Krok 22 — Food Production & Storage](requests/step-22.md).
-4. [Krok 23 — Seasons, Weather & Food Consumption](requests/step-23.md).
-5. [Krok 24 — Logistics, Warehouses & Physical Resource Transport](requests/step-24.md).
+1. **Právě probíhá:** [Krok 21 — Farming & Orchards](requests/step-21.md).
+2. [Krok 22 — Food Production & Storage](requests/step-22.md).
+3. [Krok 23 — Seasons, Weather & Food Consumption](requests/step-23.md).
+4. [Krok 24 — Logistics, Warehouses & Physical Resource Transport](requests/step-24.md).
 
 Předchozí fronta do kroku 19 včetně archivu 41 verzí byla dokončená a publikovaná (`e0c4f54`, Pages `41620923762`). Nové požadavky se dokončují v uvedeném pořadí, každý po ověření a nasazení před zahájením následujícího.
 
