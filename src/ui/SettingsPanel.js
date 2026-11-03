@@ -8,7 +8,8 @@ export function saveSettings(storage,settings){
   catch{/* Hra funguje i při zakázaném úložišti. */}
 }
 export class SettingsPanel {
-  constructor(onChange){
+  constructor(onChange,onOpenChange=()=>{}){
+    this.onOpenChange=onOpenChange;
     this.button=document.querySelector('#settings-button');this.panel=document.querySelector('#settings-panel');
     this.toggle=document.querySelector('#fog-toggle');this.controller=new AbortController();const options={signal:this.controller.signal};
     let storage;try{storage=window.localStorage;}catch{}
@@ -18,6 +19,7 @@ export class SettingsPanel {
     for(const event of ['pointerdown','mousedown','mouseup','click','wheel'])this.panel.addEventListener(event,e=>e.stopPropagation(),options);
     this.toggle.addEventListener('change',()=>{this.settings.fogOfWar=this.toggle.checked;saveSettings(storage,this.settings);onChange(this.settings);},options);
   }
-  setOpen(value){this.open=value;this.panel.classList.toggle('open',value);this.panel.inert=!value;this.panel.setAttribute('aria-hidden',String(!value));this.button.setAttribute('aria-expanded',String(value));}
+  applySettings(settings){this.settings={...settings};this.toggle.checked=settings.fogOfWar;let storage;try{storage=window.localStorage;}catch{}saveSettings(storage,this.settings);}
+  setOpen(value){const previous=this.open;this.open=value;this.panel.classList.toggle('open',value);this.panel.inert=!value;this.panel.setAttribute('aria-hidden',String(!value));this.button.setAttribute('aria-expanded',String(value));if(previous!==undefined&&previous!==value)this.onOpenChange(value);}
   destroy(){this.controller.abort();this.setOpen(false);}
 }

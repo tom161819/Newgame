@@ -11,10 +11,13 @@ export class AnimalSystem {
     const positions=generateResourcePositions(this.scene.map,start,total,this.random,this.scene.resourceOccupancy);
     for(const definition of definitions)for(let i=0;i<definition.gameplay.initialCount;i++){
       const tile=positions.pop();if(!tile)break;
-      const id=`animal-${this.nextId++}`,view=this.scene.assets.createView(definition.id,{...tileCenter(tile),tile});
-      const animal=new AnimalController(this.scene,definition,id,tile,view);
-      view.setData('animal',animal);this.animals.set(id,animal);
+      this.create(definition,tile);
     }
+  }
+  create(definition,tile,id=`animal-${this.nextId++}`){
+    const view=this.scene.assets.createView(definition.id,{...tileCenter(tile),tile});
+    const animal=new AnimalController(this.scene,definition,id,tile,view);
+    view.setData('animal',animal);this.animals.set(id,animal);return animal;
   }
   remove(animal){if(!animal.active)return;animal.active=false;animal.path=[];animal.nextTile=null;animal.view.destroy();this.animals.delete(animal.id);}
   reservedTiles(){return [...this.animals.values()].flatMap(a=>a.reservedTiles());}

@@ -156,38 +156,44 @@ export class PlayerController {
     this.setState(PLAYER_STATE.ENTERING);
     this.sprite.setDepth(buildingDepth(tower) + 0.2);
     this.scene.setStatus('Král šplhá na plošinu věže…');
-    this.scene.tweens.add({
+    this.transitionTween=this.scene.tweens.add({
       targets: this.sprite, ...towerTop(tower), duration: 900, ease: 'Sine.InOut',
-      onComplete: () => {
-        if(isWall(tower)){
-          this.tile={x:tower.x,y:tower.y};this.position={x:tower.x+.5,y:tower.y+.5};this.path=[];this.nextTile=null;
-          this.setState(PLAYER_STATE.ON_WALL);
-          this.scene.setStatus('Jsi na hradbě. Klikni na spojený segment nebo na zem pro sestup.');
-        }else{
-          this.setState(PLAYER_STATE.ON_TOWER);
-          this.scene.setStatus('Jsi na horní plošině. Kliknutím na průchozí políčko král nejprve sleze dolů.');
-        }
-      },
+      onComplete: () => {this.completeClimb(tower);},
     });
+  }
+
+  completeClimb(tower){
+    this.transitionTween=null;
+    if(isWall(tower)){
+      this.tile={x:tower.x,y:tower.y};this.position={x:tower.x+.5,y:tower.y+.5};this.path=[];this.nextTile=null;
+      this.setState(PLAYER_STATE.ON_WALL);
+      this.scene.setStatus('Jsi na hradbě. Klikni na spojený segment nebo na zem pro sestup.');
+    }else{
+      this.setState(PLAYER_STATE.ON_TOWER);
+      this.scene.setStatus('Jsi na horní plošině. Kliknutím na průchozí políčko král nejprve sleze dolů.');
+    }
   }
 
   descend(exit) {
     this.exitTile = exit;
     this.setState(PLAYER_STATE.EXITING);
     this.scene.setStatus('Král slézá z věže…');
-    this.scene.tweens.add({
+    this.transitionTween=this.scene.tweens.add({
       targets: this.sprite, ...tileCenter(exit), duration: 900, ease: 'Sine.InOut',
-      onComplete: () => {
-        this.tile = exit;
-        this.exitTile = null;
-        this.position = { x: exit.x + 0.5, y: exit.y + 0.5 };
-        this.currentTower = null;
-        this.sprite.setDepth(this.sprite.y + this.depthOffset);
-        this.setState(PLAYER_STATE.GROUND);
-        if (this.path.length === 0) this.arrive();
-        else this.scene.setStatus('Král je dole a pokračuje k cíli.');
-      },
+      onComplete: () => {this.completeDescent(exit);},
     });
+  }
+
+  completeDescent(exit){
+    this.transitionTween=null;
+    this.tile = exit;
+    this.exitTile = null;
+    this.position = { x: exit.x + 0.5, y: exit.y + 0.5 };
+    this.currentTower = null;
+    this.sprite.setDepth(this.sprite.y + this.depthOffset);
+    this.setState(PLAYER_STATE.GROUND);
+    if (this.path.length === 0) this.arrive();
+    else this.scene.setStatus('Král je dole a pokračuje k cíli.');
   }
 
   update(delta) {

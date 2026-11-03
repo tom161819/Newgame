@@ -1,0 +1,80 @@
+import { validateGameState } from './GameStateSerializer.js';
+import { recalculateStats } from './UnitStats.js';
+import { buildingTiles,buildingDepth,towerTop } from '../game/buildings.js';
+import { gridToWorld,tileCenter } from '../game/isometric.js';
+
+export function restoreActor(unit,data){
+  for(const key of ['currentHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'])if(data[key]!==undefined)unit[key]=data[key];
+  for(const key of ['tile','position','nextTile','direction','path','statModifiers'])unit[key]=structuredClone(data[key]);
+  unit.baseStats=Object.freeze({...data.baseStats});recalculateStats(unit);
+}
+export function restoreOrder(data,scene){
+  if(!data)return null;
+  return {kind:data.kind,goal:data.goal?{...data.goal}:null,pickupKey:data.pickupKey,dropId:data.dropId,silent:data.silent,
+    tower:scene.buildings.find(b=>b.id===data.buildingId),animal:scene.animalSystem.animals.get(data.animalId),
+    chest:scene.treasureSystem.chests.get(data.chestId),resource:scene.resources.get(data.resourceKey)?.getData('object')};
+}
+export function loadGameState(scene,input){
+  const state=validateGameState(input,scene.objectRegistry),p=state.player,c=scene.character;
+  scene.inventory.importState(state.inventory);
+  for(const data of state.buildings){
+    const definition=scene.objectRegistry.require(data.type),building={...data,definition,tiles:buildingTiles(data,definition)};
+    for(const t of building.tiles)scene.map[t.y][t.x]=definition.walkable?0:1;
+    scene.buildings.push(building);scene.towerViews.set(building.id,scene.createBuildingView(definition,building));
+  }
+  scene.refreshWallConnections();
+  for(const r of state.resources)scene.addResource(scene.objectRegistry.require(r.type),r.tile);
+  for(const a of state.animals){
+    const animal=scene.animalSystem.create(scene.objectRegistry.require(a.type),a.tile,a.id);restoreActor(animal,a);
+    const pos=gridToWorld(animal.position.x,animal.position.y);animal.view.setPosition(pos.x,pos.y).setDepth(pos.y+(animal.definition.depth?.offset??0));
+    animal.view.animate?.(0,animal.walking,animal.direction);
+  }
+  for(const d of state.drops)scene.dropSystem.create(d.resource,d.tile,d.amount,d.id);
+  for(const saved of state.chests){
+    const chest=scene.treasureSystem.create(saved.tile,saved);
+    if(saved.opening){
+      chest.opening=true;
+      const done=()=>{chest.opening=false;chest.opened=true;};
+      if(chest.view.open){
+        chest.view.open(done);
+        const tween=chest.view.openTween;
+        if(tween){
+          // První Phaser update pouze zahájí tween a spotřebuje nula času.
+          // Samotné seek(ms) by proto obnovilo o jeden snímek méně.
+          tween.seek(0);tween.update(0);tween.update(saved.animation.elapsed);
+        }
+        if(saved.animation.lid)Object.assign(chest.view.lid,saved.animation.lid);
+      }
+      else scene.tweens.add({targets:chest.view.container??chest.view,alpha:1,duration:Math.max(1,350-saved.animation.elapsed),onComplete:done});
+    }
+  }
+  restoreActor(c,p);c.state=p.state;c.currentTower=scene.buildings.find(b=>b.id===p.currentTowerId)??null;
+  c.exitTile=p.exitTile?{...p.exitTile}:null;c.order=restoreOrder(p.order,scene);
+  c.roofContinuation=p.roofContinuation?{...structuredClone({...p.roofContinuation,order:null}),order:restoreOrder(p.roofContinuation.order,scene)}:null;
+  c.mountedHorse=scene.animalSystem.animals.get(p.horseId)??null;
+  scene.equipment.importState(state.equipment);scene.player.setMounted?.(c.mountedHorse?.definition??null);
+  scene.player.setPosition(p.render.x,p.render.y).setDepth(p.render.depth);scene.player.animate?.(0,c.walking,c.direction);
+  if(p.state==='enteringTower'||p.state==='exitingTower'){
+    const entering=p.state==='enteringTower',to=entering?towerTop(c.currentTower):tileCenter(c.exitTile);
+    c.transitionTween=scene.tweens.add({targets:scene.player,...to,duration:p.transition.remaining,ease:'Sine.InOut',
+      onComplete:()=>entering?c.completeClimb(c.currentTower):c.completeDescent(c.exitTile)});
+  }
+  if(c.state==='onTower')scene.player.setDepth(buildingDepth(c.currentTower)+.2);
+  if(c.state==='ground'&&(c.path.length||c.nextTile||c.order))scene.showMarker(c.path.at(-1)??c.nextTile??c.tile);
+  const units=new Map([['king',c],...[...scene.animalSystem.animals].map(([id,a])=>[id,a])]);
+  for(const a of state.animals)scene.animalSystem.animals.get(a.id).retaliationTarget=units.get(a.retaliationId)??null;
+  for(const [a,t]of state.commands.attacks){const attacker=units.get(a),target=units.get(t);scene.combat.attacks.set(attacker,target);attacker.attackTarget=target;}
+  scene.huntingSystem.target=units.get(state.commands.hunt)??null;scene.huntingSystem.repath=state.commands.huntRepath;
+  scene.mountSystem.target=units.get(state.commands.mount)??null;scene.mountSystem.repath=state.commands.mountRepath;
+  scene.treasureSystem.pending=state.commands.pendingChest;
+  scene.animalSystem.nextId=state.counters.animal;scene.dropSystem.nextId=state.counters.drop;scene.treasureSystem.nextId=state.counters.chest;
+  scene.gameTime.importState(state.time);scene.foodSystem.importState(state.food);scene.production.importState(state.production);
+  for(const t of state.spawners)scene.resourceSpawners.find(s=>s.definition.id===t.id).importState(t);
+  scene.settingsPanel.applySettings(state.settings);scene.fog.setEnabled(state.settings.fogOfWar);
+  scene.updateInventory();scene.worldCamera.syncSize?.();
+  const camera=scene.cameras.main;camera.setZoom(state.camera.zoom).centerOn(state.camera.x,state.camera.y);camera.preRender();
+  scene.worldCamera.following=state.camera.following;
+  document.querySelector('#camera-mode').textContent=state.camera.following?'Kamera sleduje krále':'Ruční posun · mezerník vrátí krále';
+  scene.updateInventory();scene.updateTimeDisplay();scene.refreshVisibility();scene.activeFramePending=true;
+  scene.setStatus('Uložená hra načtena.');
+}

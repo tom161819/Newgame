@@ -4,6 +4,8 @@ export class FoodSystem {
     this.amount=definition.consumption.amount;this.elapsed=0;this.onChange=onChange;
   }
   get remainingSeconds(){return Math.ceil((this.interval-this.elapsed)/1000);}
+  exportState(){return {elapsed:this.elapsed};}
+  importState(data){this.elapsed=data.elapsed;}
   update(delta){
     this.elapsed+=Math.max(0,delta);
     const cycles=Math.floor(this.elapsed/this.interval);

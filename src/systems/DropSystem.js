@@ -5,13 +5,13 @@ import { tileCenter } from '../game/map.js';
 // se slučuje; inventář se mění teprve při skutečném příchodu ke dropu.
 export class DropSystem {
   constructor(scene){this.scene=scene;this.drops=new Map();this.nextId=1;}
-  create(resource,tile,amount){
+  create(resource,tile,amount,savedId=null){
     if(!Number.isSafeInteger(amount)||amount<=0)throw new RangeError('Neplatné množství dropu.');
     const definition=this.scene.objectRegistry.require(resource);
     if(!definition.collectible)throw new TypeError('Drop musí být sběratelná surovina.');
     const existing=[...this.drops.values()].find(d=>d.resource===resource&&tileKey(d.tile)===tileKey(tile));
     if(existing){existing.amount+=amount;return existing;}
-    const id=`drop-${this.nextId++}`,view=this.scene.assets.createView(resource,{...tileCenter(tile),tile});
+    const id=savedId??`drop-${this.nextId++}`,view=this.scene.assets.createView(resource,{...tileCenter(tile),tile});
     const drop={id,resource,tile:{...tile},amount,view};view.setData('drop',drop);this.drops.set(id,drop);
     this.refreshOccupancy(tile);return drop;
   }

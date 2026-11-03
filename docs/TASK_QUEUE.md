@@ -18,7 +18,7 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 ## Následuje
 
-1. **Právě probíhá:** [Krok 11 — Main Menu a Save/Load](requests/step-11.md).
+1. **Dokončeno v této verzi, ověřuje se nasazení:** [Krok 11 — Main Menu a Save/Load](requests/step-11.md). 81 automatických testů; skutečné IndexedDB, pět pozic, potvrzení, chyba úložiště, zavření a otevření prohlížeče, offline režim, přesná obnova během pohybu/lezení/souboje a časovače ověřeny.
 3. [Krok 12 — dynamické vyšlapávání cest](requests/step-12.md).
 4. [Krok 13 — univerzální XP a levely 1–50](requests/step-13.md).
 5. [Krok 14 — individuální skilly a profese poddaných](requests/step-14.md).

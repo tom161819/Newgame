@@ -13,6 +13,8 @@ export class ProductionSystem {
     }
     return totals;
   }
+  exportState(){return {lastProcessedDay:this.lastProcessedDay};}
+  importState(data){this.lastProcessedDay=data.lastProcessedDay;}
   processDay(day){
     if(day<=this.lastProcessedDay)return {};
     this.lastProcessedDay=day;

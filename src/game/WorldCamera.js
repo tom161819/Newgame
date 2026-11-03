@@ -11,8 +11,10 @@ export class WorldCamera {
     // Lišta může změnit výšku i bez změny okna (např. další surovina na mobilu).
     // Rozměry plátna a vstupní souřadnice musí odpovídat aktuálnímu layoutu.
     this.syncSize=()=>{
+      const center={x:this.camera.scrollX+this.camera.width/2,y:this.camera.scrollY+this.camera.height/2};
       if(scene.scale.getParentBounds())scene.scale.refresh();
       else scene.scale.updateBounds();
+      this.camera.centerOn(center.x,center.y);this.camera.preRender();
     };
     this.syncSize();
     this.resizeObserver=new ResizeObserver(this.syncSize);

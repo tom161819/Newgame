@@ -146,6 +146,12 @@ Pro sprite animace lze nově použít i `state: 'attack'` s osmi logickými smě
 
 Simulace používá skutečné `game.loop.rawDelta`; vyhlazené a ořezané Phaser delta by při nižším FPS prodlužovalo den. První snímek po vytvoření scény, zrušení pauzy nebo návratu z neaktivní záložky nezapočítává čekání. Skrytá záložka pozastaví simulaci a animace; nevzniká zpětná produkce za dobu mimo hru.
 
+## Save/Load a životní cyklus scény
+
+`MainMenu` spouští `GameScene` až po New Game nebo úspěšné validaci save. `GameApplication` spravuje stálé DOM nabídky a jediný `SaveGameManager`. IndexedDB `newgame-saves` obsahuje samostatné záznamy v úložišti `saves`; jeden atomický zápis uchovává metadata i stav. Potvrzení přepsání/smazání je součástí `SaveLoadMenu`. Nastavení a herní menu používají `PauseManager` s množinou důvodů.
+
+`serializeGameState(scene)` vrací pouze JSON data s `saveVersion`. `validateGameState` kontroluje verzi, rozměry mapy, definice, ID/reference, obsazení, rozsahy statistik a časovačů. `loadGameState` rekonstruuje instance a jejich vzájemné reference před prvním aktivním snímkem. Při obnovení se přeskočí všechny počáteční spawny; obsah truhly se nepřegeneruje. `Inventory`, čas, potrava, spawny, produkce a vybavení mají `exportState`/`importState`; serializace jednotek a příkazů převádí reference na ID. Nové trvalé vlastnosti přidej do DTO, validace, obnovy a testů v `tests/save-load.test.js`. Phaser GameObjects, textury a callbacky se nikdy neukládají.
+
 `stats.hpRegenPerSecond` je univerzální vlastnost: King má 0.2, ostatní typy výchozí 0. `RegenerationSystem` nehojí mrtvé a omezí HP maximem. Během DPS souboje se regenerace integruje současně s příchozím poškozením; CombatSystem vrací pokryté časy jednotek, aby se zbytek snímku nevynechal ani neléčil dvakrát. Výsledek tak odpovídá i různému FPS a smrti útočníka uvnitř časového kroku.
 
 Castle má `production: { resource: 'gold', amount: 5, interval: 'day', label: 'Castle income' }`. `ProductionSystem` sčítá všechny aktuální budovy podle těchto dat a eviduje poslední zpracovaný den. Stejný den se nevyplatí dvakrát, nová budova nemá zpětný příjem. `dailyIncome()` poskytuje přehled pro budoucí ekonomické UI.

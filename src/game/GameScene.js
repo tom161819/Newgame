@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { COLUMNS, ROWS, PLAYER_START, grid, isWalkable, tileCenter } from './map.js';
+import { COLUMNS, ROWS, PLAYER_START, createMap, isWalkable, tileCenter } from './map.js';
 import { tilePolygon, worldToTile, gridToWorld } from './isometric.js';
 import { TerrainRenderer } from './TerrainRenderer.js';
 import { WorldCamera } from './WorldCamera.js';
@@ -35,9 +35,12 @@ import { TreasureSystem } from '../systems/TreasureSystem.js';
 import { EquipmentPanel } from '../ui/EquipmentPanel.js';
 import { TreasurePanel } from '../ui/TreasurePanel.js';
 import { ChestView } from './ChestView.js';
+import { PauseManager } from '../systems/PauseManager.js';
+import { loadGameState } from '../systems/GameStateLoader.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
+  init({state=null}={}){this.loadState=state;}
 
   preload() {
     this.objectRegistry=objectRegistry;
@@ -46,6 +49,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.worldCamera=null;
     this.gameOver=false;this.input.enabled=true;this.input.keyboard.enabled=true;this.tweens.resumeAll();
     this.activeFramePending=true;this.visibilityPaused=document.hidden;
     this.assets.initialize();
@@ -56,10 +60,12 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('fortification',(_definition,context)=>new FortificationView(this,context.building,context.preview));
     this.assets.registerRenderer('chest',(_definition,context)=>new ChestView(this,context.x,context.y));
     const base=this.objectRegistry.require('grass'),obstacle=this.objectRegistry.require('rock_outcrop');
-    this.map=grid.map(row=>row.map(value=>(value?obstacle:base).walkable?0:1));
-    this.terrain=new TerrainRenderer(this,grid,this.objectRegistry,this.assets);
+    this.terrainGrid=this.loadState?this.loadState.terrain.map(row=>[...row]):createMap(Math.random);
+    this.map=this.terrainGrid.map(row=>row.map(value=>(value?obstacle:base).walkable?0:1));
+    this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
     this.inventory=new Inventory();
     this.gameTime=new GameTimeSystem();this.regeneration=new RegenerationSystem();
+    this.pauseManager=new PauseManager(this);
     this.noticeRemaining=0;document.querySelector('#day-notice').hidden=true;
     this.resources=new Map();this.stones=this.resources; // Kompatibilní označení původního seznamu kamenů.
     this.resourceOccupancy=new Map();
@@ -81,22 +87,22 @@ export class GameScene extends Phaser.Scene {
         getCount:()=>this.resourceCount(definition.id),spawn:tile=>this.addResource(definition,tile),
       });
       this.resourceSpawners.push(spawner);
-      if(definition.walkable){
+      if(!this.loadState&&definition.walkable){
         const candidates=generateResourcePositions(this.map,PLAYER_START,definition.spawn.initial,Math.random,this.resourceOccupancy,definition);
         for(const tile of candidates)if(resourceTiles(tile,definition).every(p=>!this.resourceOccupancy.has(tileKey(p))))this.addResource(definition,tile);
       }
-      while(this.resourceCount(definition.id)<definition.spawn.initial&&spawner.spawnOne()){}
+      if(!this.loadState)while(this.resourceCount(definition.id)<definition.spawn.initial&&spawner.spawnOne()){}
     }
     this.spawner=this.resourceSpawners.find(s=>s.definition.id==='stone');
     this.dropSystem=new DropSystem(this);
-    this.animalSystem=new AnimalSystem(this);this.animalSystem.spawn(PLAYER_START);
+    this.animalSystem=new AnimalSystem(this);if(!this.loadState)this.animalSystem.spawn(PLAYER_START);
     this.huntingSystem=new HuntingSystem(this);
     this.combatFeedback=new CombatFeedback(this);
     this.combat.on('attack',(attacker,target)=>{if(this.animalSystem.animals.has(target.id))this.animalSystem.onAttacked(target,attacker);});
     this.combat.on('damage',unit=>this.combatFeedback.hit(unit));
     this.combat.on('death',unit=>this.onUnitDeath(unit));
     this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
-    this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.refreshVisibility();});
+    this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.refreshVisibility();},open=>this.pauseManager.set('settings',open));
     this.fog.setEnabled(this.settingsPanel.settings.fogOfWar);
     this.foodSystem=new FoodSystem(this.inventory,this.objectRegistry.require('meat'),()=>this.updateInventory());
     this.inventoryBar=new InventoryBar(this.objectRegistry,this.assets,this.inventory);
@@ -104,7 +110,7 @@ export class GameScene extends Phaser.Scene {
     this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
     this.equipmentPanel=new EquipmentPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
-    this.treasurePanel=new TreasurePanel(this);this.treasureSystem.spawn(PLAYER_START);
+    this.treasurePanel=new TreasurePanel(this);if(!this.loadState)this.treasureSystem.spawn(PLAYER_START);
     this.production=new ProductionSystem(this.gameTime,this.inventory,()=>this.buildings,(day,totals)=>this.onDailyIncome(day,totals));
     this.buildingBar.close();this.updateInventory();
     this.updateTimeDisplay();
@@ -128,8 +134,6 @@ export class GameScene extends Phaser.Scene {
     this.input.on('pointerupoutside',()=>this.clearWallPreviews());
     this.input.on('pointermove',pointer=>{this.updateHover(pointer);if(this.buildMode&&!this.assetGallery.isOpen){if(!this.dragAnchor)this.wallLastLine=null;this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
     this.input.on('gameout',()=>{this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;this.clearWallPreviews();document.querySelector('#object-tooltip').hidden=true;});
-    const onEscape=()=>{if(this.buildMode&&!this.assetGallery.isOpen)this.cancelBuilding();};
-    this.input.keyboard.on('keydown-ESC',onEscape);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
       this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
       this.animalSystem.destroy();this.dropSystem.destroy();document.querySelector('#object-tooltip').hidden=true;
@@ -138,14 +142,16 @@ export class GameScene extends Phaser.Scene {
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
       this.equipmentPanel.destroy();this.treasurePanel.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.game.events.off(Phaser.Core.Events.PAUSE,onBackground);this.game.events.off(Phaser.Core.Events.RESUME,onForeground);
-      this.input.keyboard.off('keydown-ESC',onEscape);this.game.canvas.style.cursor='';
+      this.game.canvas.style.cursor='';
     });
+    if(this.loadState){loadGameState(this,this.loadState);this.loadState=null;}
+    this.game.registry.get('application')?.onGameReady(this);
   }
 
   setGalleryInput(enabled) {
     enabled=enabled&&!this.gameOver&&!this.gameTime.paused&&!this.visibilityPaused&&!document.querySelector('dialog[open]');
     this.input.enabled=enabled;this.input.keyboard.enabled=enabled;
-    for(const key of Object.values(this.worldCamera.keys))key.reset();
+    for(const key of Object.values(this.worldCamera?.keys??{}))key.reset();
     this.previewTracking=false;this.preview.setVisible(false);
     this.dragAnchor=null;for(const preview of this.wallPreviews.values())preview.setVisible(false);
     document.querySelector('#object-tooltip').hidden=true;

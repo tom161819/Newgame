@@ -11,6 +11,8 @@ export class EquipmentSystem {
   }
   unequip(slot){if(!Object.hasOwn(this.slots,slot))return false;this.slots[slot]=null;this.recalculate();return true;}
   owned(slot){return this.registry.byCategory('equipment').filter(d=>d.equipment.slot===slot&&this.inventory.count(d.id)>0);}
+  exportState(){return {...this.slots};}
+  importState(slots){this.slots={...slots};this.recalculate();}
   recalculate(){
     const total={};
     for(const id of Object.values(this.slots))if(id){

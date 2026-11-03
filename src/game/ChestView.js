@@ -19,8 +19,9 @@ export class ChestView extends Phaser.GameObjects.Container {
   }
   open(onComplete){
     if(this.opened){onComplete();return;}
-    this.scene.tweens.add({targets:this.lid,y:-38,rotation:-.65,duration:350,ease:'Sine.Out',onComplete:()=>{this.opened=true;onComplete();}});
+    this.openTween=this.scene.tweens.add({targets:this.lid,y:-38,rotation:-.65,duration:350,ease:'Sine.Out',onComplete:()=>{this.openTween=null;this.opened=true;onComplete();}});
   }
+  setOpened(value){this.opened=value;this.lid.setPosition(0,value?-38:-26).setRotation(value?-.65:0);}
   containsPoint(worldX,worldY){
     const x=worldX-this.x,y=worldY-this.y;
     if(Phaser.Geom.Polygon.Contains(this.bodyHitArea,x,y))return true;

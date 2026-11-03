@@ -4,6 +4,8 @@ export class GameTimeSystem {
   constructor(){this.day=1;this.elapsed=0;this.totalElapsed=0;this.paused=false;this.listeners=new Set();}
   onNewDay(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   setPaused(value){this.paused=!!value;}
+  exportState(){return {day:this.day,elapsed:this.elapsed,totalElapsed:this.totalElapsed};}
+  importState(data){Object.assign(this,data);}
   update(delta){
     if(this.paused||!Number.isFinite(delta)||delta<=0)return 0;
     let remaining=delta;

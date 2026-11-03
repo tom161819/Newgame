@@ -3,11 +3,11 @@ export { COLUMNS, ROWS, MAP_HEADROOM, PLAYER_START, TILE_WIDTH, TILE_HEIGHT } fr
 export { tileCenter } from './isometric.js';
 
 // Logická mapa: 0 = volno, 1 = překážka. Neobsahuje obrazové souřadnice.
-export function createMap() {
+export function createMap(random=null) {
   const map = Array.from({ length: ROWS }, () => Array(COLUMNS).fill(0));
   for (let i = 0; i < 65; i++) {
-    const x = 2 + (i * 37 + 11) % 94;
-    const y = 2 + (i * 61 + 29) % 94;
+    const x = 2 + (random?Math.floor(random()*94):(i * 37 + 11) % 94);
+    const y = 2 + (random?Math.floor(random()*94):(i * 61 + 29) % 94);
     for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2 + i % 2; dx++) {
       if (Math.abs(x + dx - PLAYER_START.x) < 5 && Math.abs(y + dy - PLAYER_START.y) < 5) continue;
       map[y + dy][x + dx] = 1;

@@ -13,11 +13,12 @@ export class TreasureSystem {
     const positions=generateResourcePositions(this.scene.map,start,count,this.random,occupied);
     for(const tile of positions)this.create(tile);
   }
-  create(tile){
-    const definition=this.definition,data=definition.treasure,id=`treasure-${this.nextId++}`;
+  create(tile,saved=null){
+    const definition=this.definition,data=definition.treasure,id=saved?.id??`treasure-${this.nextId++}`;
     const view=this.scene.assets.createView(definition.id,{...tileCenter(tile),tile});
     const chest={id,type:definition.id,definition,x:tile.x,y:tile.y,tile:{...tile},view,opened:false,opening:false,looted:false,
-      contents:{gold:data.goldMin+Math.floor(this.random()*(data.goldMax-data.goldMin+1)),equipment:[...data.equipment]}};
+      contents:saved?structuredClone(saved.contents):{gold:data.goldMin+Math.floor(this.random()*(data.goldMax-data.goldMin+1)),equipment:[...data.equipment]}};
+    if(saved){chest.opened=saved.opened;chest.looted=saved.looted;view.setOpened?.(saved.opened);}
     view.setData('chest',chest);this.scene.map[tile.y][tile.x]=1;this.chests.set(id,chest);return chest;
   }
   adjacent(chest){return this.scene.character.state==='ground'&&towerNeighbors(chest).some(tile=>tileKey(tile)===tileKey(this.scene.character.tile));}

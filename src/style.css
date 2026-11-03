@@ -131,3 +131,29 @@ button:focus-visible { outline: 2px solid #e2c673; outline-offset: 2px; }
 .asset-technical p { overflow-wrap: anywhere; color: #c6bd9c; }
 .asset-fallback-note { color: #efd08b; }
 @media(max-width:760px) { .asset-layout { grid-template-columns: 1fr; grid-template-rows: minmax(160px,1fr) minmax(120px,0.75fr); } #asset-detail { border-left: 0; border-top: 1px solid #77714e; padding-top: 12px; } .asset-detail-image { width: 90px; height: 105px; float: right; margin-left: 12px; } .asset-gallery-header { padding: 12px; } #asset-grid { grid-template-columns: repeat(auto-fill,minmax(140px,1fr)); padding: 0 12px 12px; } .asset-thumbnail { height: 90px; } }
+#main-menu[hidden] { display:none; }
+body:not(.in-game) > main { visibility:hidden; }
+body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { display:none; }
+.main-menu { position:fixed; inset:0; z-index:100; display:grid; place-items:center; overflow:auto; background:radial-gradient(ellipse at 50% 25%,#334340,#111d1e 65%); }
+.menu-castle { position:absolute; width:max(100%,900px); height:85%; bottom:0; opacity:.65; pointer-events:none; }
+.main-menu-content { position:relative; text-align:center; padding:45px 20px; width:min(90%,660px); text-shadow:0 2px 8px #0a1616; }
+.main-menu-content h1 { font-size:clamp(36px,6vw,64px); color:#e1ce97; margin:16px 0; }
+.main-menu-content p { color:#c7ccbc; margin-bottom:35px; }
+.main-menu-buttons { display:grid; gap:16px; max-width:310px; margin:0 auto 40px; }
+.main-menu-buttons button { font-size:19px; padding:17px; border-color:#9e8b51; background:#263431ed; box-shadow:0 5px 20px #09151580; }
+.main-menu-content small { color:#a9b4a7; }
+.settings-actions { display:grid; gap:12px; margin-top:24px; }
+.pause-menu { max-width:400px; }
+.save-load-dialog { width:min(880px,calc(100vw - 28px)); }
+#new-save-form { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:24px 0; }
+#new-save-form[hidden] { display:none; }
+#save-name { min-width:150px; flex:1; font:inherit; background:#20291e; color:#f0e6c9; border:1px solid #8c8256; padding:12px; }
+.save-row { display:flex; gap:16px; justify-content:space-between; align-items:center; padding:18px 0; border-top:1px solid #666446; }
+.save-description h3 { margin:0 0 7px; overflow-wrap:anywhere; }
+.save-description p { margin:5px 0; }
+.save-description small { color:#b3b99f; }
+.save-actions { display:flex; flex-wrap:wrap; gap:8px; }
+#save-error { color:#ffb3a2; }
+#save-load-dialog[aria-busy="true"] .save-actions button, #save-load-dialog[aria-busy="true"] #new-save-form button { opacity:.6; pointer-events:none; }
+#application-notice { position:fixed; z-index:110; top:20px; left:50%; transform:translateX(-50%); max-width:90vw; padding:16px 24px; border:1px solid #c5ae6a; border-radius:5px; background:#263629; color:#f0e5bf; box-shadow:0 8px 30px #0006; }
+@media(max-width:600px) { .save-row { align-items:flex-start; flex-direction:column; } .main-menu-content { padding:24px 12px; } }

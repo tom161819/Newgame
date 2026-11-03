@@ -8,6 +8,9 @@ export class Inventory {
     return this.resources.get(resource) ?? 0;
   }
 
+  exportState(){return Object.fromEntries(this.resources);}
+  importState(data){this.resources=new Map(Object.entries(data));}
+
   add(resource, amount = 1) {
     const count = this.count(resource) + amount;
     this.resources.set(resource, count);

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { GameScene } from './game/GameScene.js';
+import { MainMenu } from './game/MainMenu.js';
 import './style.css';
 
 new Phaser.Game({
@@ -9,6 +10,6 @@ new Phaser.Game({
   width: 1024,
   height: 640,
   backgroundColor: '#3a3c2b',
-  scene: GameScene,
+  scene: [MainMenu,GameScene],
   scale: { mode: Phaser.Scale.RESIZE, autoCenter: Phaser.Scale.CENTER_BOTH },
 });

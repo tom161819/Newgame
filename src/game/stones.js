@@ -40,6 +40,8 @@ export function generateStones(map,start,count=STONE_COUNT,random=Math.random) {
 }
 
 export class ResourceSpawner {
+  exportState(){return {elapsed:this.elapsed};}
+  importState(data){this.elapsed=data.elapsed;}
   constructor({map,stones,resources=stones,getOrigins,getReserved,spawn,random=Math.random,definition=stoneDefinition(),getCount}) {
     Object.assign(this,{map,stones:resources,getOrigins,getReserved,spawn,random,definition});
     this.getCount=getCount??(()=>this.stones.size);this.elapsed=0;

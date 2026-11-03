@@ -1,6 +1,6 @@
-# První cesta — Královská hlídka
+# Medieval Kingdom — Královská hlídka
 
-Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3.5**. Vlastní procedurální středověká grafika: písčitá krajina, kamenné překážky, korunovaný král s červeným pláštěm a strážní věže. Bez backendu a databáze. Vlastní PNG/WebP grafika a náhledy jsou součástí projektu.
+Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3.5**. Vlastní procedurální středověká grafika: písčitá krajina, kamenné překážky, korunovaný král s červeným pláštěm a strážní věže. Bez backendu; uložené hry používají místní IndexedDB v prohlížeči. Vlastní PNG/WebP grafika a náhledy jsou součástí projektu.
 
 **[Hrát v prohlížeči](https://tom161819.github.io/Newgame/)** — bez instalace a přihlášení.
 
@@ -8,6 +8,9 @@ Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3
 
 | Ovládání | Akce |
 |---|---|
+| New Game / Load Game | Úvodní menu se zobrazí při každém otevření či obnovení stránky. Nová hra nepřepisuje uložené pozice. |
+| Esc mimo stavění a dialogy | Pozastaví hru a otevře Game Menu. Resume Game nebo Esc pokračuje bez časového skoku. |
+| Settings → Save Game / Load Game / Main Menu | Správa uložených her nebo návrat do úvodní nabídky. Settings i herní menu pozastaví simulaci. |
 | Levý klik na průchozí políčko | Král k němu dojde po nejkratší cestě. Další klik změní cíl. |
 | Levý klik na koně | Dojde k pohybujícímu se koni a nasedne. Rychlost vzroste přesně na dvojnásobek. |
 | Dismount nebo H | Sesedne na volné sousední místo; stejný kůň se vrátí k putování. |
@@ -44,7 +47,15 @@ Horní inventář a spodní Buildings jsou mimo herní kameru a při pohybu nebo
 - Lze postavit více věží, hradů i řad hradeb. Výběr stavby zruší zbývající cestu a sběr; už rozběhnutý krok se dokončí plynule. Po postavení jedné věže režim stavění skončí.
 - Ke vstupu se vybírá sousední políčko s nejkratší dosažitelnou cestou. Následuje animace lezení, ne přesun z dálky. Král nahoře nechodí po mapě ani nesbírá. Sestup vybere sousední políčko s dostupnou cestou k cíli; pokud takové není, král zůstane nahoře.
 - Během animace výstupu a sestupu se nové příkazy nepřijímají. Vstup/výstup lze opakovat, včetně přechodu z jedné věže do druhé.
-- Po obnovení stránky začíná nová hra: inventář je nulový, budovy zmizí a kameny se vygenerují znovu. Král začíná znovu se 100 HP; hlad nemá další penalizace.
+- Po obnovení stránky se zobrazí hlavní menu. New Game vytvoří novou náhodnou mapu, vynuluje inventář i vybavení, nastaví Day 1 a 100 HP. Nastavení zůstává zachované. Load Game obnoví vybranou rozehranou pozici.
+
+## Ukládání a načítání
+
+Settings nebo Game Menu → **Save Game** otevře seznam místních pozic. Lze vytvořit nový save s vlastním názvem, přepsat existující nebo jej odstranit; přepsání i smazání vyžadují potvrzení. Počet slotů není omezen na pět. Každá pozice ukazuje datum vytvoření a posledního uložení, den a aktivní dobu hraní. Úložiště je samostatné pro každý prohlížeč a adresu webu; smazání dat webu smaže také místní savy.
+
+Save/Load zachovává logickou mapu, překážky, budovy a spojení hradeb, kameny, množství dropů, zvířata a jejich HP, obsah a vybrání truhly, inventář a vybavení. Obnovuje i probíhající krok, natočení, cíl, souboj, stejný osedlaný kůň, pobyt na plošině či rozpracované lezení, kameru, zoom, Fog of War, herní čas a zbytky časovačů. Načtení znovu negeneruje objekty ani příjem zlata za dokončený den. Doba se zavřenou hrou se nezapočítává.
+
+Data mají `saveVersion` a před nahrazením světa procházejí kontrolou. Poškozený save zobrazí chybu a ponechá současnou hru. Zápis do IndexedDB je atomický: při chybě zůstane předchozí save. Samotné ukládání a načítání již otevřené hry funguje i bez internetu; stažení hry při prvním otevření vyžaduje připojení.
 
 ## Hrad a hradby
 

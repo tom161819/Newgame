@@ -3,10 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>První cesta | Královská hlídka</title>
+    <title>Medieval Kingdom</title>
   </head>
   <body>
-    <main>
+    <section id="main-menu" class="main-menu" aria-labelledby="main-menu-title">
+      <svg class="menu-castle" viewBox="0 0 1000 500" aria-hidden="true"><path d="M0 440L80 400L180 425L280 375L400 410L530 370L700 400L820 370L1000 425V500H0Z" fill="#172523"/><g fill="#253330" stroke="#697260" stroke-width="2"><path d="M320 430V190H345V165H370V190H395V165H420V190H445V430Z"/><path d="M555 430V190H580V165H605V190H630V165H655V190H680V430Z"/><path d="M420 430V275H445V255H470V275H495V255H520V275H545V255H570V430Z"/><path d="M455 275V90H475V65H495V90H515V65H535V275Z"/></g><g fill="#a2935d"><path d="M480 145Q495 120 510 145V180H480Z"/><path d="M360 235Q375 210 390 235V270H360Z"/><path d="M605 235Q620 210 635 235V270H605Z"/></g><path d="M470 430V355Q495 315 520 355V430Z" fill="#0b1414"/><path d="M495 65V15L565 33L495 45" fill="#8a4538" stroke="#9c8454" stroke-width="2"/></svg>
+      <div class="main-menu-content"><span class="eyebrow">KRÁLOVSKÁ HLÍDKA</span><h1 id="main-menu-title">Medieval Kingdom</h1><p>Vybuduj své království.</p><div class="main-menu-buttons"><button id="new-game" type="button" disabled>New Game</button><button id="main-load-game" type="button" disabled>Load Game</button></div><small>Uložené hry zůstávají v tomto prohlížeči.</small></div>
+    </section>
+    <main inert>
       <header><span class="eyebrow">KRÁLOVSKÁ HLÍDKA · IZOMETRICKÁ STRATEGIE</span><h1>První cesta</h1>
         <p>Veď krále kliknutím, lov zvěř, sbírej suroviny a stav strážní věže.</p></header>
       <section class="inventory" aria-label="Inventář">
@@ -37,6 +41,7 @@
       <div class="settings-heading"><h2 id="settings-title">Settings</h2><button id="close-settings" type="button" aria-label="Zavřít nastavení">×</button></div>
       <label class="setting-row" for="fog-toggle"><span>Fog of War</span><input id="fog-toggle" type="checkbox" role="switch" /></label>
       <p>Omezí viditelnost objektů podle dohledu krále. Terén zůstává viditelný.</p>
+      <nav class="settings-actions" aria-label="Herní menu"><button type="button" data-game-menu="save">Save Game</button><button type="button" data-game-menu="load">Load Game</button><button type="button" data-game-menu="main">Main Menu</button></nav>
     </aside>
     <dialog id="asset-gallery" aria-labelledby="asset-gallery-title">
       <header class="asset-gallery-header"><div><h2 id="asset-gallery-title">Asset Library</h2><p>Prohlížení registrovaných objektů · bez úprav a vkládání do mapy</p></div><button id="close-asset-gallery" type="button" aria-label="Zavřít knihovnu">Zavřít ×</button></header>
@@ -56,6 +61,10 @@
       <ul id="treasure-contents"></ul><button id="take-all" type="button">Take All</button>
     </dialog>
     <div id="day-notice" role="status" hidden></div>
+    <dialog id="pause-menu" class="game-dialog pause-menu" aria-labelledby="pause-title"><h2 id="pause-title">Game Menu</h2><p>Hra je pozastavená.</p><nav class="settings-actions"><button id="resume-game" type="button">Resume Game</button><button type="button" data-game-menu="save">Save Game</button><button type="button" data-game-menu="load">Load Game</button><button type="button" data-game-menu="main">Main Menu</button></nav></dialog>
+    <dialog id="save-load-dialog" class="game-dialog save-load-dialog" aria-labelledby="save-load-title"><div class="dialog-heading"><h2 id="save-load-title">Load Game</h2><button id="close-save-load" type="button">Zavřít ×</button></div><p>Uložené pozice jsou dostupné na tomto zařízení a v tomto prohlížeči.</p><form id="new-save-form" hidden><label for="save-name">Název nové hry</label><input id="save-name" maxlength="80" required/><button type="submit">Vytvořit nový save</button></form><p id="save-error" role="alert"></p><p id="save-notice" role="status"></p><div id="save-list"></div></dialog>
+    <dialog id="save-confirm" class="game-dialog" aria-labelledby="save-confirm-title"><h2 id="save-confirm-title">Potvrzení</h2><p id="save-confirm-text"></p><button id="confirm-save-no" type="button" autofocus>Zrušit</button><button id="confirm-save-yes" type="button">Potvrdit</button></dialog>
+    <div id="application-notice" role="status" hidden></div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
