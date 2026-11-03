@@ -1,6 +1,23 @@
 [
   {
     "schema": 1,
+    "commit": "a4f51ecd936af7678c0822ead4e15c91c0b3e780",
+    "tree": "e087457df21b5bd25fef2ff9ec51d2fd50274c15",
+    "date": "2026-11-03T22:38:40Z",
+    "sequence": 71,
+    "subject": "Separate current builds from immutable archives and load version history on demand",
+    "name": "Separate current builds from immutable archives and load version history on demand",
+    "description": "Separate current builds from immutable archives and load version history on demand",
+    "basePath": "/Newgame/versions/a4f51ecd936af7678c0822ead4e15c91c0b3e780/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    },
+    "originalVersion": "0.1.0"
+  },
+  {
+    "schema": 1,
     "commit": "8b796271fd452f60cd1f66725d6ce68b8ef67746",
     "tree": "409ce67e7cdf795084dc2b48ee65b7d18fc876f4",
     "date": "2026-11-03T21:41:16Z",

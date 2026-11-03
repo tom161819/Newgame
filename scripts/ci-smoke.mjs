@@ -3,8 +3,9 @@ import { execFileSync,spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 export function smokeScope({paths=[],previousVersion,currentVersion,manual=false}){
-  if(manual||previousVersion!==currentVersion||paths.some(file=>/^src\/(game|systems)\//.test(file)))return 'full';
-  if(paths.some(file=>/^public\/versions\//.test(file)||/^(CHANGELOG\.md|vite\.config\.js|index\.html|src\/style\.css)$/.test(file)||/^src\/ui\/(VersionArchivePanel|ChangelogPanel|GameApplication)\.js$/.test(file)||/^scripts\/(.*archive.*|version-catalog|git-source-facts|browser-smoke|ci-smoke).*\.mjs$/.test(file)))return 'archive';
+  const historyData=new Set(['src/data/semver.js','src/data/changelogCategories.js']);
+  if(manual||previousVersion!==currentVersion||paths.some(file=>/^src\/(game|systems)\//.test(file)||file.startsWith('src/data/')&&!historyData.has(file)))return 'full';
+  if(paths.some(file=>historyData.has(file)||/^public\/versions\//.test(file)||/^(CHANGELOG\.md|vite\.config\.js|index\.html|src\/style\.css)$/.test(file)||/^src\/ui\/(VersionArchivePanel|ChangelogPanel|GameApplication)\.js$/.test(file)||/^scripts\/(.*archive.*|version-catalog|git-source-facts|browser-smoke|ci-smoke).*\.mjs$/.test(file)))return 'archive';
   return 'current';
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){

@@ -54,6 +54,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ### Fixed
 - Loading a game preserves moving units and active timers without duplicating rewards, construction, wages or difficulty bonuses.
 
+## [0.1.0+archive.30] - 2026-11-03
+
+<!-- version: {"title": "Faster archives and clearer version history", "commit": "a4f51ecd936af7678c0822ead4e15c91c0b3e780", "type": "feature", "reconstructed": true, "evidence": ["scripts/archive-source.mjs", "scripts/stage-archive.mjs", "src/ui/VersionArchivePanel.js"]} -->
+
+### Improved
+- Open version history only when requested, browse distinct numbered milestones and expandable source commits, and preserve every original playable URL and archived save namespace.
+
 ## [0.1.0+archive.29] - 2026-11-03
 
 <!-- version: {"title": "Permanent Summer and resumable seasons", "commit": "1d9dd4610a5690db8348b2743ec376b668266fcf", "type": "feature", "reconstructed": true, "evidence": ["src/systems/SeasonSystem.js", "src/systems/GameTimeSystem.js", "src/ui/SettingsPanel.js"]} -->

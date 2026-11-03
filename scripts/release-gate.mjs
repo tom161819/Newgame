@@ -14,10 +14,13 @@ const run=(command,params)=>{const result=spawnSync(command,params,{cwd:root,std
 if(!['check','verify'].includes(mode))throw new Error('Usage: release:gate -- M1 --pages-run=ID --pages-commit=FULL_SHA [--report=/tmp/file.json]; release:verify -- --pages-run=ID --pages-commit=FULL_SHA');
 const head=git('rev-parse','HEAD'),deployed=option('pages-commit'),pagesRun=option('pages-run');
 if(!deployed||!pagesRun)throw new Error('An actual successful Pages deployment is required; no release was prepared.');
+if(!/^\d+$/.test(pagesRun))throw new Error('Expected a numeric actual Pages run ID.');
 if(git('status','--porcelain'))throw new Error('Commit verified work before running a release gate.');
 const url=`https://github.com/tom161819/Newgame/actions/runs/${encodeURIComponent(pagesRun)}`;
-const response=await fetch(url);if(!response.ok)throw new Error(`Cannot verify actual Pages run: HTTP ${response.status}.`);
-const pages=pagesEvidence(await response.text(),{run:pagesRun,commit:deployed});
+// curl honors the managed runtime's HTTPS proxy and CA settings on supported
+// Node versions; raw Node fetch does not necessarily use that proxy.
+let html;try{html=execFileSync('curl',['--fail','--silent','--show-error','--location','--max-time','30',url],{encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:8*1024*1024});}catch{throw new Error('Cannot read actual Pages evidence through the configured HTTPS connection.');}
+const pages=pagesEvidence(html,{run:pagesRun,commit:deployed});
 git('merge-base','--is-ancestor',deployed,head);
 const sourcePaths=['src','scripts','index.html','vite.config.js','package.json','package-lock.json','CHANGELOG.md','public/assets','.github/workflows'];
 if(git('diff','--name-only',deployed,head,'--',...sourcePaths))throw new Error('The source under review differs from the successfully deployed game.');

@@ -1,6 +1,6 @@
 # Archive storage, build and runtime review
 
-Additional request after master03. Implementation/publication checkpoint is recorded in UPGRADE_PROGRESS; do not mistake the measurements here for an already completed public deployment.
+Additional request after master03. Implementation source: `a4f51ecd936af7678c0822ead4e15c91c0b3e780`. Final public deployment evidence is recorded in UPGRADE_PROGRESS after its actual success. Game version remains0.1.0, Save8; no premature official M1 MINOR/tag.
 
 ## Findings
 
@@ -48,3 +48,11 @@ The final complete Pages artifact still includes every frozen game: Pages replac
 Public-domain HTTP access is restricted by the execution environment. The final public confirmation must cite the actual successful Pages run/exact deployment SHA, separately from these local HTTP checks. No direct public-domain HTTP request is claimed.
 
 Detailed operating commands: [ARCHIVE_WORKFLOW.md](../ARCHIVE_WORKFLOW.md). After verified publication, resume master04–15 and then Visual without waiting for confirmation.
+
+## Final local candidate
+
+317/317 tests, production build, metadata validation and immutable snapshots pass. The final site contains69 actual source builds and31 logical history entries (1 preserved official alpha plus30 explicitly reconstructed milestones). The optimization's owna4f51ec snapshot ran its own317 tests/build/real browser successfully; zero skipped source builds. All69 canonical play URLs and2212 HTTP file requests pass originalSHA/MIME checks (112632096 bytes received). The final menu/source/IDB/actualold2/7→8/race/mobile regression passes with31/69 counts. The earlier full source integration also passed physical Granary/Farmhouse/field supply/build and cancellation plus live seasons. No original65 snapshot file changed.
+
+The current site composes2212 independent frozen files (112141341 bytes,1261 ms in the final69-build run). Ordinary source builds retain the measured small-output path. Public artifacts must retain that archival payload. All69 aggregate names are derived from actual subjects; source versions remain0.1.0, with unique semantic archive labels.
+
+The release proof's raw Node fetch did not honor this environment's DNS/proxy route. It now uses curl with the configured proxy/CA settings; reading and validating the actual old successful Pages41694834348/e721a68 was proven. This does not bypass the restricted public Pages domain. No confirmation, new environment publication or browser-password login is required for the authorized GitHub publication.

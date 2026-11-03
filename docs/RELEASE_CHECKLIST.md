@@ -12,7 +12,7 @@ Automatická vydání M1–M5 jsou uživatelem výslovně zadaná. Běžné prac
 
 ## Spustitelný postup
 
-Vyžaduje Node dle package.json, úplnou Git historii (`fetch-depth: 0`), `npm ci` a instalovaný Chrome/Chromium. `CHROMIUM_EXECUTABLE` může určit vlastní binárku; `playwright-core` je uzamčen v lockfile. Chybějící prohlížeč znamená chybu, nikoliv přeskočený smoke test.
+Vyžaduje Node dle package.json, úplnou Git historii (`fetch-depth: 0`), `npm ci` a instalovaný Chrome/Chromium a curl. `CHROMIUM_EXECUTABLE` může určit vlastní binárku; `playwright-core` je uzamčen v lockfile. Chybějící prohlížeč znamená chybu, nikoliv přeskočený smoke test.
 
 - Po poslední etapě milníku zveřejni otestovaný vývojový zdroj na main a ověř skutečný Pages run. Progress tabulka musí mít všechny příslušné a předchozí etapy DONE s existujícími implementačními commity.
 - `npm run release:gate -- M1 --pages-run=RUN_ID --pages-commit=FULL_DEPLOYED_SHA --report=/tmp/m1-gate.json` ověří čistý checkout, historii, dokončení etap, skutečný Pages Success a shodu nasazených zdrojů. Potom spustí čistou instalaci, validace, všechny testy včetně migrací/logistiky/staveb, SHA-256 archivy, build a skutečný browser/IndexedDB smoke. Nemění číslo, Git ani publikaci. Analogicky M2–M5.

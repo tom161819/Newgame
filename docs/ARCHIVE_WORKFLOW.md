@@ -35,3 +35,5 @@ The source exporter selects the actual commit's code, metadata and current asset
 - `npm run smoke -- --base=/Newgame/ --full`: additional live seasons and full physical construction/cancellation. Required at M1–M5 gates.
 
 The public Pages domain is restricted from this execution environment. Local production HTTP checks and the actual successful GitHub Pages run are separate evidence; do not claim a direct public-domain request which did not occur.
+
+Release proof reads the public GitHub Actions run with curl so the managed runtime HTTPS proxy/CA settings are honored. Raw Node fetch can fail DNS in that environment; do not bypass its network policy or claim unverified public access.
