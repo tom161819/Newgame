@@ -1,5 +1,4 @@
 import { execFileSync,spawnSync } from 'node:child_process';
-import { createRequire } from 'node:module';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -7,7 +6,9 @@ import { fileURLToPath } from 'node:url';
 import { createReadStream } from 'node:fs';
 import { openSync,closeSync } from 'node:fs';
 import { mkdir,readFile,writeFile,cp,rm,symlink,stat,mkdtemp,rename } from 'node:fs/promises';
-import { projectBase,digest,fileHashes,verifySnapshot,recordsIn,archiveRuntime,archiveIndex,releaseMetadata } from './archive-lib.mjs';
+import { projectBase,digest,fileHashes,verifySnapshot,recordsIn,archiveRuntime,releaseMetadata } from './archive-lib.mjs';
+import { browserRuntime } from './browser-runtime.mjs';
+import { readVersionCatalog,catalogHTML } from './version-catalog.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
 const option=(name,fallback)=>{const i=args.indexOf(name);return i<0?fallback:args[i+1];};
@@ -15,8 +16,8 @@ const base=projectBase(option('--base','/Newgame/')),ref=option('--through','HEA
 const git=(...params)=>execFileSync('git',params,{cwd:root,encoding:'utf8',maxBuffer:16*1024*1024}).trim();
 if(git('rev-parse','--is-shallow-repository')==='true')throw new Error('Archiv vyžaduje úplnou historii Git; použij checkout s fetch-depth: 0.');
 const through=git('rev-parse','--verify',`${ref}^{commit}`),commits=git('rev-list','--reverse','--first-parent',through).split('\n');
-const {chromium}=createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE??'playwright');
-const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_EXECUTABLE?{executablePath:process.env.CHROMIUM_EXECUTABLE}:{}),args:['--no-sandbox']});
+const {chromium,executablePath}=await browserRuntime();
+const browser=await chromium.launch({headless:true,executablePath,args:['--no-sandbox']});
 const workspace=await mkdtemp(path.join(tmpdir(),'newgame-version-archive-')),logs=path.join(workspace,'logs');await mkdir(logs);
 const rootLock=digest(await readFile(path.join(root,'package-lock.json'))),existing=new Map((await recordsIn(archives)).map(r=>[r.commit,r]));
 const results=[],skipped=[];
@@ -32,8 +33,8 @@ const server=createServer(async(request,response)=>{
   }catch{response.writeHead(404).end();}
 });
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const port=server.address().port;
-function run(command,params,cwd,log){
-  const fd=openSync(log,'a');try{const result=spawnSync(command,params,{cwd,stdio:['ignore',fd,fd],env:process.env});if(result.status!==0)throw new Error(`${command} ${params.join(' ')} selhal (${result.status??result.error?.message}); log ${log}`);}finally{closeSync(fd);}
+function run(command,params,cwd,log,environment={}){
+  const fd=openSync(log,'a');try{const result=spawnSync(command,params,{cwd,stdio:['ignore',fd,fd],env:{...process.env,...environment}});if(result.status!==0)throw new Error(`${command} ${params.join(' ')} selhal (${result.status??result.error?.message}); log ${log}`);}finally{closeSync(fd);}
 }
 async function dependencies(source){
   const lock=digest(await readFile(path.join(source,'package-lock.json')));
@@ -70,8 +71,14 @@ try{
       const pkg=JSON.parse(await readFile(path.join(source,'package.json'),'utf8'));if(!pkg.scripts?.build)throw new Error('Commit neobsahuje sestavitelnou hru.');
       const subject=git('show','-s','--format=%s',commit),metadata=await releaseMetadata(source,commit,subject);
       // Archiv nesmí při budoucím archivování obsahovat další vnořený archiv.
-      await rm(path.join(source,'public/versions'),{recursive:true,force:true});await dependencies(source);
-      if(pkg.scripts.test)run('npm',['test'],source,log);run('npm',['run','build','--',`--base=${url}`],source,log);
+      let archiveMetadata;try{archiveMetadata=JSON.parse(await readFile(path.join(source,'public/versions/versions.json'),'utf8'));}catch(error){if(error.code!=='ENOENT')throw error;}
+      await rm(path.join(source,'public/versions'),{recursive:true,force:true});
+      // Preserve only verified build metadata for the historical catalog; never
+      // nest other playable archives inside this immutable source build.
+      if(archiveMetadata){for(const record of archiveMetadata){const original=JSON.parse(git('show',`${record.commit}:package.json`));record.originalVersion=original.version;}await mkdir(path.join(source,'public/versions'),{recursive:true});await writeFile(path.join(source,'public/versions/versions.json'),JSON.stringify(archiveMetadata));}
+      await dependencies(source);
+      const environment={GAME_BUILD_COMMIT:commit,GAME_BUILD_DATE:git('show','-s','--format=%aI',commit),GAME_BUILD_TAG:git('tag','--points-at',commit).split('\n').find(tag=>tag===`v${pkg.version}`)??''};
+      if(pkg.scripts.test)run('npm',['test'],source,log,environment);run('npm',['run','build','--',`--base=${url}`],source,log,environment);
       const built=path.join(source,'dist');await writeFile(path.join(built,'archive-runtime.js'),archiveRuntime(commit,base));
       const index=path.join(built,'index.html'),html=await readFile(index,'utf8');if(!/<head(?:\s[^>]*)?>/i.test(html))throw new Error('Chybí HTML head.');
       await writeFile(index,html.replace(/<head(?:\s[^>]*)?>/i,head=>`${head}<link rel="icon" href="data:,"><script src="${url}archive-runtime.js"></script>`));
@@ -83,8 +90,9 @@ try{
     }catch(error){skipped.push({commit,error:error.message,log});console.log(`[${i+1}/${commits.length}] ${short} NEDOSTUPNÉ: ${error.message}`);}
     await rm(source,{recursive:true,force:true});
   }
-  const records=await recordsIn(archives);await writeFile(path.join(archives,'index.html'),archiveIndex(records,base));
+  const records=await recordsIn(archives);
   await writeFile(path.join(archives,'versions.json'),JSON.stringify(records.map(({files,...record})=>record).sort((a,b)=>b.sequence-a.sequence),null,2)+'\n');
+  const catalog=await readVersionCatalog(root,{base});await writeFile(path.join(archives,'index.html'),catalogHTML(catalog));await writeFile(path.join(archives,'catalog.json'),JSON.stringify(catalog,null,2)+'\n');
   await writeFile(path.join(workspace,'report.json'),JSON.stringify({through,records:records.length,created:results.map(r=>r.commit),skipped},null,2));
   console.log(`Dokončeno: ${records.length} verzí, ${results.length} nových, ${skipped.length} vynechaných. Report a logy: ${workspace}`);
   if(skipped.length)process.exitCode=1;

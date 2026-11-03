@@ -3,13 +3,16 @@ import { serializeGameState,validateGameState } from '../systems/GameStateSerial
 import { SaveLoadMenu } from './SaveLoadMenu.js';
 import { NewGameSetup } from './NewGameSetup.js';
 import { ChangelogPanel } from './ChangelogPanel.js';
-import { gameVersion,releases } from 'virtual:game-release';
+import { VersionArchivePanel } from './VersionArchivePanel.js';
+import { gameVersion,releases,versionCatalog } from 'virtual:game-release';
 
 export class GameApplication {
   constructor(game){
     this.game=game;this.scene=null;this.saves=new SaveGameManager();this.saveMenu=new SaveLoadMenu(this);
     this.main=document.querySelector('#main-menu');this.pauseDialog=document.querySelector('#pause-menu');
-    this.changelog=new ChangelogPanel({version:gameVersion,releases});
+    this.changelog=new ChangelogPanel({version:gameVersion,releases,catalog:versionCatalog});
+    this.archive=new VersionArchivePanel({catalog:versionCatalog,onChanges:version=>this.changelog.open(version)});
+    const requestedChanges=new URLSearchParams(window.location.search).get('changelog');if(versionCatalog.versions.some(v=>v.version===requestedChanges))this.changelog.open(requestedChanges);
     this.setup=new NewGameSetup({onStart:settings=>this.start(null,settings),onBack:()=>{this.setup.close();this.showMainMenu();}});
     document.querySelector('#new-game').addEventListener('click',()=>{this.main.hidden=true;this.setup.open();});
     document.querySelector('#main-load-game').addEventListener('click',()=>this.openSaves('load'));
@@ -28,6 +31,7 @@ export class GameApplication {
   }
   showMainMenu(){this.scene=null;this.main.hidden=false;document.body.classList.remove('in-game');document.querySelector('main').inert=true;document.querySelector('#new-game').disabled=false;document.querySelector('#main-load-game').disabled=false;document.querySelector('#new-game').focus();}
   start(state=null,settings){
+    this.archive.close(false);
     this.changelog.close(false);
     this.setup.close();
     this.pauseDialog.close();this.main.hidden=true;document.body.classList.add('in-game');document.querySelector('main').inert=false;

@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { compareVersions, versionParts, nextVersion } from '../src/data/semver.js';
+import { compareVersions, versionParts, nextVersion,semanticVersion } from '../src/data/semver.js';
 import { CHANGELOG_CATEGORIES } from '../src/data/changelogCategories.js';
 
 export function validateDate(value) {
@@ -28,14 +28,21 @@ export function parseChangelog(markdown, currentVersion) {
         if (unreleased || releases.length || header[2]) fail(i, 'Unreleased must occur once, at the top, without a release date.');
         section = unreleased = { changes: {} };
       } else {
-        versionParts(header[1]);
+        semanticVersion(header[1]);
         if (seen.has(header[1])) fail(i, `Duplicate release ${header[1]}.`);
         seen.add(header[1]);
         section = { version: header[1], date: validateDate(header[2] ?? ''), changes: {} };
         releases.push(section);
       }
     } else if (section) {
-      if (line.startsWith('### ')) {
+      if(line.startsWith('<!-- version: ')){
+        if(section===unreleased||section.metadata)fail(i,'Version metadata must occur once in a version entry.');
+        let metadata;try{metadata=JSON.parse(line.slice(14).replace(/\s*-->\s*$/,''));}catch{fail(i,'Invalid version metadata JSON.');}
+        if(!metadata||typeof metadata.title!=='string'||!metadata.title.trim()||metadata.title.length>160||typeof metadata.reconstructed!=='boolean'||!['initial','feature','fix','milestone'].includes(metadata.type))fail(i,'Invalid version title, type or reconstructed label.');
+        if(metadata.commit!==undefined&&!/^[a-f0-9]{40}$/.test(metadata.commit))fail(i,'Expected a full actual Git commit SHA.');
+        if(metadata.tag!==undefined&&metadata.tag!==`v${section.version}`)fail(i,'The release tag must match its version.');
+        section.metadata=metadata;
+      }else if (line.startsWith('### ')) {
         const label = line.slice(4).trim();
         category = Object.keys(CHANGELOG_CATEGORIES).find(key => CHANGELOG_CATEGORIES[key] === label);
         if (!category) fail(i, `Unknown category ${label}.`);
@@ -55,12 +62,14 @@ export function parseChangelog(markdown, currentVersion) {
     const release = releases[i];
     for (const key of Object.keys(release.changes)) if (!release.changes[key].length) delete release.changes[key];
     if (!Object.keys(release.changes).length) throw new Error(`Release ${release.version} has no completed changes.`);
-    if (i && (compareVersions(releases[i - 1].version, release.version) <= 0 || releases[i - 1].date < release.date)) {
-      throw new Error('CHANGELOG.md releases must be in descending version and date order.');
-    }
+    if(release.metadata?.reconstructed){if(!release.metadata.commit||!/^\d+\.\d+\.\d+\+archive\.[1-9]\d*$/.test(release.version))throw new Error('Reconstructed versions require a commit and an explicit +archive label.');}
+    else versionParts(release.version);
   }
-  if (releases[0].version !== currentVersion) {
-    throw new Error(`package.json version ${currentVersion} does not match latest CHANGELOG.md release ${releases[0].version}.`);
+  const official=releases.filter(r=>!r.metadata?.reconstructed);
+  if(!official.length)throw new Error('CHANGELOG.md has no released versions.');
+  for(let i=1;i<official.length;i++)if(compareVersions(official[i-1].version,official[i].version)<=0||official[i-1].date<official[i].date)throw new Error('CHANGELOG.md releases must be in descending version and date order.');
+  if (official[0].version !== currentVersion) {
+    throw new Error(`package.json version ${currentVersion} does not match latest CHANGELOG.md release ${official[0].version}.`);
   }
   return { version: currentVersion, releases, unreleased };
 }
@@ -80,7 +89,7 @@ export function prepareRelease({ markdown, pkg, lock }, type, date) {
   if (!Object.values(current.unreleased.changes).some(changes => changes.length)) throw new Error('Unreleased has no completed changes to release.');
   const version = nextVersion(pkg.version, type);
   validateDate(date);
-  if (date < current.releases[0].date) throw new Error('The new release date precedes the latest release.');
+  if (date < current.releases.find(r=>!r.metadata?.reconstructed).date) throw new Error('The new release date precedes the latest release.');
   const nextMarkdown = markdown.replace(/^## \[Unreleased\]\s*$/m, `## [Unreleased]\n\n## [${version}] - ${date}`);
   const nextPackage = { ...pkg, version }, nextLock = structuredClone(lock);
   nextLock.version = version; nextLock.packages[''].version = version;

@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Browse verified historical milestones and original development snapshots from the main menu, with linked, collapsible release notes and isolated archived saves.
 - Inspect available, reserved, carried, on-site, buffered and ground resources, see carried bundles, and physically collect or set down the king's stored supplies.
 - Deliver reserved building materials to construction sites with Haulers or the king before builders can begin; the king can supply a site over multiple trips.
 - Assign Haulers to Warehouses or Granaries to reserve and carry supplies, earn Logistics experience and increase their load from 20 to 38 units.
@@ -29,6 +30,8 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [0.1.0] - 2026-11-03
 
+<!-- version: {"title": "Initial Alpha", "commit": "e8d41eb8ec75f12d7cb72b6f139becd023b8715d", "type": "initial", "reconstructed": false, "evidence": ["scripts/changelog-lib.mjs", "src/ui/ChangelogPanel.js"]} -->
+
 ### Added
 - Explore an isometric 100 × 100 kingdom with eight-direction movement, camera controls and zoom.
 - Collect stones, hunt wildlife, ride a horse and discover treasure with weapons and armor.
@@ -45,3 +48,185 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ### Fixed
 - Loading a game preserves moving units and active timers without duplicating rewards, construction, wages or difficulty bonuses.
+
+## [0.1.0+archive.26] - 2026-11-03
+
+<!-- version: {"title": "Physical logistics", "commit": "9e93982740685b0bd18543e1ce7f707b2102b7f1", "type": "feature", "reconstructed": true, "evidence": ["src/systems/LogisticsTaskManager.js", "src/systems/ConstructionMaterialsSystem.js", "src/systems/TransportStateMigration.js"]} -->
+
+### Added
+- Use Haulers, Warehouses and royal cargo to deliver reserved supplies, fund construction physically and inspect every resource location.
+
+## [0.1.0+archive.25] - 2026-11-03
+
+<!-- version: {"title": "Seasons, weather and meals", "commit": "ddc9168972667cd3c969fd256e1ec7035f78072a", "type": "feature", "reconstructed": true, "evidence": ["src/systems/SeasonSystem.js", "src/systems/FoodSystem.js"]} -->
+
+### Added
+- Grow crops under seasons and daily weather, feed villagers from stored food and track shortages and food economy.
+
+## [0.1.0+archive.24] - 2026-11-03
+
+<!-- version: {"title": "Food production and storage", "commit": "66311391900df17e0755bdac7e51db40a5516d13", "type": "feature", "reconstructed": true, "evidence": ["src/systems/FoodStorageSystem.js", "src/systems/FoodProductionSystem.js"]} -->
+
+### Added
+- Mill wheat into flour, bake bread and physically transport food through limited production buffers and granaries.
+
+## [0.1.0+archive.23] - 2026-11-03
+
+<!-- version: {"title": "Farming and orchards", "commit": "339904f717e767cc1af4459e541cbb4b6edb867a", "type": "feature", "reconstructed": true, "evidence": ["src/systems/FarmingSystem.js", "src/data/farming.js"]} -->
+
+### Added
+- Grow wheat and apples through distinct stages, assign farmers and preserve growth and harvest tasks in saves.
+
+## [0.1.0+archive.22] - 2026-11-03
+
+<!-- version: {"title": "Advanced world configuration", "commit": "f22ded073c30f1e0fd60dceff2a244bb8f6cb087", "type": "feature", "reconstructed": true, "evidence": ["src/systems/WorldGenerationConfig.js", "src/systems/WildlifeRespawnSystem.js"]} -->
+
+### Added
+- Configure an optional starting castle, initial gold, day length and wildlife respawn without changing loaded kingdoms.
+
+## [0.1.0+archive.21] - 2026-11-03
+
+<!-- version: {"title": "New Game Setup", "commit": "ed58610b326ce27743957e9aee83ed2fb683ae72", "type": "feature", "reconstructed": true, "evidence": ["src/ui/NewGameSetup.js", "src/systems/GameSettings.js"]} -->
+
+### Added
+- Choose difficulty, wildlife, treasure and initial stone populations before generating a new kingdom.
+
+## [0.1.0+archive.20] - 2026-11-03
+
+<!-- version: {"title": "Playable historical archive", "commit": "e4f092fcc20e93f8a276515fd779732c65bca596", "type": "feature", "reconstructed": true, "evidence": ["scripts/build-archive.mjs", "scripts/archive-lib.mjs"]} -->
+
+### Added
+- Launch verified builds from actual Git commits with immutable URLs and isolated browser saves.
+
+## [0.1.0+archive.19] - 2026-11-03
+
+<!-- version: {"title": "Blueprint construction", "commit": "43766dcac74b8c528b6219878a8ee217c796d84b", "type": "feature", "reconstructed": true, "evidence": ["src/systems/ConstructionSystem.js", "src/systems/BuilderAI.js"]} -->
+
+### Added
+- Plan blueprints, send the king or builders to construct them and share completion rewards by actual work.
+
+## [0.1.0+archive.18] - 2026-11-03
+
+<!-- version: {"title": "Injured hunter deliveries", "commit": "5636967ecddcc998e4e6cf48ea9e52bd90993ef6", "type": "fix", "reconstructed": true, "evidence": ["src/systems/WorkerAI.js"]} -->
+
+### Fixed
+- An injured hunter hands in carried goods on reaching safety before recovering.
+
+## [0.1.0+archive.17] - 2026-11-03
+
+<!-- version: {"title": "Staffed workplaces", "commit": "0af9b89608654944b5fadbdde3d0907fd4a59dd8", "type": "feature", "reconstructed": true, "evidence": ["src/systems/WorkplaceSystem.js", "src/data/workplaces.js"]} -->
+
+### Added
+- Assign employees to quarries, hunting lodges and barracks, with real cargo returns and workplace management.
+
+## [0.1.0+archive.16] - 2026-11-03
+
+<!-- version: {"title": "Talents and wages", "commit": "124414727907ac0e082cb225fd2190c9f55882bd", "type": "feature", "reconstructed": true, "evidence": ["src/systems/NaturalTalentSystem.js", "src/systems/WageSystem.js"]} -->
+
+### Added
+- Recruit villagers with permanent talents and varied starting skills, and pay prorated wages or track unpaid debt.
+
+## [0.1.0+archive.15] - 2026-11-03
+
+<!-- version: {"title": "Villagers, skills and professions", "commit": "fc979b15a2663298d3a05f65e573579e8bab9d7c", "type": "feature", "reconstructed": true, "evidence": ["src/systems/WorkerSystem.js", "src/systems/SkillSystem.js"]} -->
+
+### Added
+- Assign villagers professions, develop individual skills and watch workers mine or hunt on the map.
+
+## [0.1.0+archive.14] - 2026-11-03
+
+<!-- version: {"title": "Individual experience", "commit": "c8a87c72733494f5f312dca09a3c5af99254ed44", "type": "feature", "reconstructed": true, "evidence": ["src/systems/ExperienceSystem.js", "src/data/experience.js"]} -->
+
+### Added
+- Earn individual completion experience through fifty levels with persistent safeguards against repeated rewards.
+
+## [0.1.0+archive.13] - 2026-11-03
+
+<!-- version: {"title": "Worn paths", "commit": "29a9cec61de6dd5b3de4f52c154e8ebbabad3907", "type": "feature", "reconstructed": true, "evidence": ["src/systems/PathWearSystem.js", "src/game/movement.js"]} -->
+
+### Added
+- Repeated travel wears connected trails into grass, improves walking speed and recovers when unused.
+
+## [0.1.0+archive.12] - 2026-11-03
+
+<!-- version: {"title": "Main menu and saved kingdoms", "commit": "574ef6be24993b0ab8b5efc27320fe562be455c2", "type": "feature", "reconstructed": true, "evidence": ["src/systems/SaveGameManager.js", "src/systems/GameStateSerializer.js"]} -->
+
+### Added
+- Save multiple kingdoms in the browser and restore their world, movement and active commands.
+
+## [0.1.0+archive.11] - 2026-11-02
+
+<!-- version: {"title": "Time, gold and treasure", "commit": "cd77265f9fb7ea44df8da58e72bae88872b8c7b4", "type": "feature", "reconstructed": true, "evidence": ["src/systems/GameTimeSystem.js", "src/systems/ProductionSystem.js", "src/systems/TreasureSystem.js"]} -->
+
+### Added
+- Track game days, earn castle gold, regenerate health and recover equipment from treasure chests.
+
+## [0.1.0+archive.10] - 2026-11-02
+
+<!-- version: {"title": "Combat and survival", "commit": "a6c29fac54447bcf9147c3ddf961d6d6326debb5", "type": "feature", "reconstructed": true, "evidence": ["src/systems/CombatSystem.js"]} -->
+
+### Added
+- Fight using health, damage and armor, face animal retaliation and restart after the king falls.
+
+## [0.1.0+archive.9] - 2026-11-02
+
+<!-- version: {"title": "Castles and connected walls", "commit": "6d189b0ab7f0f13cacbc989ee91ecd8080e9a981", "type": "feature", "reconstructed": true, "evidence": ["src/game/walls.js", "src/game/buildings.js"]} -->
+
+### Added
+- Build castles and dragged wall lines, then traverse connected wall tops and descend to ground destinations.
+
+## [0.1.0+archive.8] - 2026-11-02
+
+<!-- version: {"title": "Fog and horseback riding", "commit": "c3614997c019fee254ce02f5efe255dc054d669d", "type": "feature", "reconstructed": true, "evidence": ["src/systems/FogOfWarSystem.js", "src/systems/MountSystem.js"]} -->
+
+### Added
+- Toggle fog of war, ride a horse and use the corresponding movement and sight bonuses.
+
+## [0.1.0+archive.7] - 2026-11-02
+
+<!-- version: {"title": "Hunting and meat", "commit": "81ab03ed4c007d30eda7b7ffc793d7c0483ff474", "type": "feature", "reconstructed": true, "evidence": ["src/systems/HuntingSystem.js", "src/systems/FoodSystem.js"]} -->
+
+### Added
+- Hunt wandering rabbits, deer and boars, collect meat and consume food over active game time.
+
+## [0.1.0+archive.6] - 2026-11-02
+
+<!-- version: {"title": "Asset Library", "commit": "6ae12dc3e0c07a5b64ef04f14565cae3acdc94cb", "type": "feature", "reconstructed": true, "evidence": ["src/systems/ObjectRegistry.js", "src/systems/AssetManager.js"]} -->
+
+### Added
+- Browse a shared object library with validated definitions, reusable graphics and asset fallbacks.
+
+## [0.1.0+archive.5] - 2026-11-02
+
+<!-- version: {"title": "Eight-direction movement", "commit": "2e0974c8dd812c0d77b3bdb2ad1963d1a457419f", "type": "feature", "reconstructed": true, "evidence": ["src/game/pathfinding.js", "src/game/directions.js"]} -->
+
+### Improved
+- Walk smooth normalized diagonals with eight facing poses and safe obstacle corners.
+
+## [0.1.0+archive.4] - 2026-11-02
+
+<!-- version: {"title": "Isometric kingdom", "commit": "6714fc5338f101e4bddf6c21033d2754527dbd90", "type": "feature", "reconstructed": true, "evidence": ["src/game/isometric.js", "src/game/GameScene.js"]} -->
+
+### Changed
+- Explore a 100-by-100 isometric map with a crowned king, camera movement, zoom and timed stone replenishment.
+
+## [0.1.0+archive.3] - 2026-11-02
+
+<!-- version: {"title": "Towers and traversal", "commit": "162efeb202028e9235e0711e1937a766b7e5a8de", "type": "feature", "reconstructed": true, "evidence": ["src/game/PlayerController.js", "src/game/buildings.js"]} -->
+
+### Added
+- Place two-by-two towers for ten stones, preview their footprint and climb up or down.
+
+## [0.1.0+archive.2] - 2026-11-02
+
+<!-- version: {"title": "Stones and inventory", "commit": "f94d77a74ca921d47f50a3f7b86fa5b83eed01d7", "type": "feature", "reconstructed": true, "evidence": ["src/game/stones.js", "src/game/inventory.js"]} -->
+
+### Added
+- Click stones to collect them and track the collected resource in the inventory.
+
+## [0.1.0+archive.1] - 2026-11-02
+
+<!-- version: {"title": "Click-to-move prototype", "commit": "7291dc37059af80a0f3c5c801c0c4918206205f2", "type": "initial", "reconstructed": true, "evidence": ["src/game/GameScene.js", "src/game/pathfinding.js"]} -->
+
+### Added
+- Move across the first playable map with click-to-move pathfinding.

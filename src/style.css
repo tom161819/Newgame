@@ -244,3 +244,12 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 .resource-location-counts { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .2rem .8rem; }
 .resource-location-counts dd { margin: 0; font-variant-numeric: tabular-nums; }
 #king-cargo-status { font-size: .8rem; color: #e0c98c; }
+
+.version-archive-dialog { width: min(860px, calc(100vw - 2rem)); }
+.archive-version { border: 1px solid #73734d; padding: .8rem; margin: .8rem 0; }
+.archive-version h3 { margin: .2rem 0; overflow-wrap: anywhere; }
+.archive-version-label, .archive-version-meta { color: #c8c29c; font-size: .85rem; }
+.archive-version-actions { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+.archive-play { color: #ead18a; }
+.changelog-release > summary { cursor: pointer; }
+.changelog-release > summary h3 { display: inline; overflow-wrap: anywhere; }

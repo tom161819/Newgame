@@ -8,7 +8,7 @@ export function seenVersionState(version, stored) {
 }
 
 export class ChangelogPanel {
-  constructor({ version, releases }) {
+  constructor({ version, releases,catalog=null }) {
     this.version = version;
     this.dialog = document.querySelector('#changelog-dialog');
     this.button = document.querySelector('#main-changelog');
@@ -22,7 +22,7 @@ export class ChangelogPanel {
     this.badge.hidden = !initial.isNew;
     for (const label of document.querySelectorAll('[data-game-version]')) label.textContent = `v${version}`;
     document.title = `Medieval Kingdom · v${version}`;
-    this.render(releases);
+    this.render(catalog?.versions??releases);
     this.button.addEventListener('click', () => this.open());
     document.querySelector('#changelog-back').addEventListener('click', () => this.close());
     this.dialog.addEventListener('cancel', event => { event.preventDefault(); this.close(); });
@@ -38,10 +38,12 @@ export class ChangelogPanel {
       return node;
     };
     const entries = releases.map(release => {
-      const entry = element('article', '', 'changelog-release');
+      const entry = element('details', '', 'changelog-release');
       entry.dataset.release = release.version;
-      const heading = element('h3', `v${release.version} `), date = element('time', release.date);
-      date.dateTime = release.date; heading.append(date); entry.append(heading);
+      const summary=element('summary'),heading = element('h3', `v${release.version}${release.title?` — ${release.title}`:''} `), date = element('time', release.date);
+      date.dateTime = release.date; heading.append(date);summary.append(heading);entry.append(summary);
+      if(release.historical)entry.append(element('p','Reconstructed archive label; the original build version and commit are preserved.','archive-version-label'));
+      if(release.available&&release.archiveURL){const play=element('a','Play this archived build ↗','archive-play');play.href=release.archiveURL;play.target='_blank';play.rel='noopener noreferrer';entry.append(play);}
       for (const [key, label] of Object.entries(CHANGELOG_CATEGORIES)) {
         const changes = release.changes[key];
         if (!changes?.length) continue;
@@ -55,11 +57,12 @@ export class ChangelogPanel {
     document.querySelector('#changelog-releases').replaceChildren(...entries);
   }
 
-  open() {
+  open(version=null) {
     if (compareVersions(this.version, this.seen) > 0) this.seen = this.version;
     this.persistSeen(); this.badge.hidden = true;
     if (!this.dialog.open) this.dialog.showModal();
     document.querySelector('#changelog-releases').scrollTop = 0;
+    const entries=[...document.querySelectorAll('.changelog-release')],entry=entries.find(e=>e.dataset.release===version)??entries[0];if(entry){entry.open=true;if(version)entry.scrollIntoView({block:'start'});}
     document.querySelector('#changelog-back').focus();
   }
 

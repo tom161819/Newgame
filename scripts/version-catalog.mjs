@@ -1,0 +1,70 @@
+import { readFile,stat } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+import path from 'node:path';
+import { readRelease } from './changelog-lib.mjs';
+import { projectBase,escapeHTML } from './archive-lib.mjs';
+import { semanticVersion,versionParts } from '../src/data/semver.js';
+
+const sha=value=>typeof value==='string'&&/^[a-f0-9]{40}$/.test(value);
+const git=(root,...args)=>{try{return execFileSync('git',args,{cwd:root,encoding:'utf8',stdio:['ignore','pipe','ignore'],timeout:5000,maxBuffer:1024*1024}).trim();}catch{return null;}};
+export function catalogContext(base='/Newgame/'){
+  projectBase(base);const match=base.match(/^(.*\/)versions\/([a-f0-9]{40})\/$/);return {base,projectBase:match?.[1]??base,archiveCommit:match?.[2]??null};
+}
+export function sourceBuild(root,environment=process.env){
+  const exported=sha(environment.GAME_BUILD_COMMIT)?environment.GAME_BUILD_COMMIT:null,top=git(root,'rev-parse','--show-toplevel'),repository=top===path.resolve(root);
+  const commit=exported??(repository?git(root,'rev-parse','HEAD'):null),date=exported?environment.GAME_BUILD_DATE??null:repository?git(root,'show','-s','--format=%aI',commit):null;
+  const paths=['src','scripts','index.html','vite.config.js','package.json','package-lock.json','CHANGELOG.md','public/assets','.github/workflows'];
+  const dirty=exported?false:repository?!!git(root,'status','--porcelain','--untracked-files=normal','--',...paths):true;
+  const tags=exported?(environment.GAME_BUILD_TAG?[environment.GAME_BUILD_TAG]:[]):repository?(git(root,'tag','--points-at',commit)??'').split('\n').filter(Boolean):[];
+  return {commit:sha(commit)?commit:null,date,dirty,tags,repository};
+}
+export function assembleVersionCatalog({data,records,build,base='/Newgame/'}){
+  const context=catalogContext(base),byCommit=new Map(),seenVersions=new Set(),anchors=new Set();
+  for(const record of records){if(!sha(record.commit)||byCommit.has(record.commit))throw new Error('Archive commit IDs must be real and unique.');projectBase(record.basePath);if(!record.basePath.endsWith(`/versions/${record.commit}/`))throw new Error('Archive URL does not match its commit.');byCommit.set(record.commit,record);}
+  const versions=data.releases.map(release=>{
+    const metadata=release.metadata??{},historical=metadata.reconstructed===true,commit=metadata.commit??release.resolvedCommit??null,record=byCommit.get(commit),self=commit===context.archiveCommit;
+    if(seenVersions.has(release.version))throw new Error('Duplicate catalog version.');seenVersions.add(release.version);semanticVersion(release.version);
+    if(commit&&anchors.has(commit))throw new Error('A commit cannot represent two distinct version milestones.');if(commit)anchors.add(commit);
+    if(historical&&record&&release.date!==record.date.slice(0,10))throw new Error(`Historical date does not match its original commit: ${release.version}.`);
+    const available=self||!!record?.available,changes=structuredClone(release.changes),description=Object.values(changes).flat()[0]??'';
+    return {version:release.version,title:metadata.title??`Release ${release.version}`,date:release.date,commit,archiveURL:available?(record?.basePath??base):null,available,description,releaseType:metadata.type??'feature',historical,reconstructed:historical,label:historical?'Reconstructed archive label':'Official release',changes,sequence:record?.sequence??0,commitDate:record?.date??null,tag:release.resolvedTag??null};
+  }).sort((a,b)=>(b.commitDate??b.date).localeCompare(a.commitDate??a.date)||b.sequence-a.sequence);
+  const development=Object.values(data.unreleased.changes).some(items=>items.length)||build.dirty,identifier=context.archiveCommit?`${data.version}+git.${context.archiveCommit}`:development?`${data.version}+dev.${build.commit??'working'}`:data.version;
+  const currentBuild={version:identifier,gameVersion:data.version,title:context.archiveCommit?'Archived build':development?'Current development build':'Current Version',date:build.date?.slice(0,10)??null,commit:build.commit,archiveURL:base,available:true,description:context.archiveCommit?'The original game build preserved at this commit.':development?'Current development build; released changes are listed separately.':'Current released game.',releaseType:development?'development':'release',historical:!!context.archiveCommit,reconstructed:false,current:!context.archiveCommit,dirty:build.dirty};
+  for(const entry of versions)entry.current=!context.archiveCommit&&entry.version===identifier;
+  const builds=records.map(record=>({version:`${record.originalVersion??data.version}+git.${record.commit}`,gameVersion:record.originalVersion??data.version,commit:record.commit,date:record.date,title:record.subject??record.name,description:record.description,archiveURL:record.available?record.basePath:null,available:record.available,sequence:record.sequence,releaseType:'snapshot',historical:true,reconstructed:true})).sort((a,b)=>b.sequence-a.sequence);
+  for(const entry of [...versions,...builds,currentBuild])semanticVersion(entry.version);
+  return {schema:1,gameVersion:data.version,projectBase:context.projectBase,currentBuild,versions,builds};
+}
+export async function readVersionCatalog(root,{base='/Newgame/',environment=process.env,release=null}={}){
+  const {data}=release??await readRelease(root),context=catalogContext(base),build=sourceBuild(root,environment);let records=[];
+  if(context.archiveCommit&&build.commit!==context.archiveCommit)throw new Error('An archive must be built from its actual source commit.');
+  try{records=JSON.parse(await readFile(path.join(root,'public/versions/versions.json'),'utf8'));}catch(error){if(error.code!=='ENOENT')throw error;}
+  if(!Array.isArray(records))throw new Error('Archive build catalog must be an array.');
+  records=await Promise.all(records.map(async record=>{
+    let available=false;
+    if(context.archiveCommit)available=record.verification?.build===true&&record.verification?.browser===true;
+    else try{available=(await stat(path.join(root,'public/versions',record.commit,'index.html'))).isFile()&&record.verification?.build===true&&record.verification?.browser===true;}catch(error){if(error.code!=='ENOENT')throw error;}
+    let originalVersion=build.repository?git(root,'show',`${record.commit}:package.json`):null;try{originalVersion=JSON.parse(originalVersion??'null')?.version??record.originalVersion??data.version;}catch{throw new Error('Invalid source package metadata.');}versionParts(originalVersion);
+    return {...record,available,originalVersion};
+  }));
+  const releases=[];
+  for(const entry of data.releases){
+    const metadata=entry.metadata??{};let commit=metadata.commit??null,resolvedTag=null;
+    if(metadata.evidence){if(!Array.isArray(metadata.evidence)||metadata.evidence.some(file=>typeof file!=='string'||file.includes('..')||!file.match(/^[A-Za-z0-9_./-]+$/)))throw new Error('Unsafe historical source evidence.');}
+    if(commit&&build.repository){
+      if(git(root,'rev-parse','--verify',`${commit}^{commit}`)!==commit)throw new Error(`Unknown historical commit ${commit}.`);
+      for(const file of metadata.evidence??[])if(git(root,'cat-file','-t',`${commit}:${file}`)!=='blob')throw new Error(`Missing historical source ${commit}:${file}.`);
+      if(metadata.reconstructed&&git(root,'show','-s','--format=%aI',commit)?.slice(0,10)!==entry.date)throw new Error('Historical date differs from the original Git commit.');
+    }
+    if(!commit&&!metadata.reconstructed){const tag=metadata.tag??`v${entry.version}`;commit=build.repository?git(root,'rev-parse','--verify',`${tag}^{commit}`):build.tags.includes(tag)?build.commit:null;if(sha(commit))resolvedTag=tag;else commit=null;}
+    releases.push({...entry,resolvedCommit:commit,resolvedTag});
+  }
+  return assembleVersionCatalog({data:{...data,releases},records,build,base});
+}
+export function catalogHTML(catalog){
+  const entryHTML=entry=>`<article data-version-label="${escapeHTML(entry.version)}"><h2>v${escapeHTML(entry.version)} — ${escapeHTML(entry.title)}</h2><p>${escapeHTML(entry.description)}</p><small>${escapeHTML(entry.date??'Date unavailable')} · ${escapeHTML(entry.label??entry.releaseType)}${entry.commit?` · ${entry.commit.slice(0,7)}`:''}</small><p>${entry.available?`<a href="${escapeHTML(entry.archiveURL)}" target="_blank" rel="noopener noreferrer">Play ↗</a>`:'Archive unavailable'} · <a href="${escapeHTML(catalog.projectBase)}?changelog=${encodeURIComponent(catalog.versions.some(v=>v.version===entry.version)?entry.version:catalog.gameVersion)}">View Changes</a></p></article>`;
+  const entries=catalog.versions.some(v=>v.version===catalog.currentBuild.version)?catalog.versions:[catalog.currentBuild,...catalog.versions];
+  const rows=entries.map(entryHTML).join('\n'),snapshots=catalog.builds.map(entry=>`<article data-version="${entry.commit}"><h3>${escapeHTML(entry.title)}</h3><p>${escapeHTML(entry.description??'')}</p><small>${escapeHTML(entry.date)} · Build ${entry.commit.slice(0,7)} · original v${escapeHTML(entry.gameVersion)}</small><p>${entry.available?`<a href="${escapeHTML(entry.archiveURL)}" target="_blank" rel="noopener noreferrer">Play snapshot ↗</a>`:'Snapshot unavailable'} · <a href="https://github.com/tom161819/Newgame/commit/${entry.commit}" target="_blank" rel="noopener noreferrer">View actual changes ↗</a></p></article>`).join('\n');
+  return `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Medieval Kingdom · Version Archive</title><style>body{font:16px system-ui;max-width:940px;margin:2rem auto;padding:0 1rem;background:#20271e;color:#eee4c4}article{border:1px solid #77734e;padding:1rem;margin:1rem 0}a{color:#e8cb7a}small{color:#c0bea2}summary{cursor:pointer}h2,h3{overflow-wrap:anywhere}</style><h1>Version Archive</h1><p><a href="${escapeHTML(catalog.projectBase)}">Current game ↗</a></p><p>Reconstructed archive labels identify verified historical milestones. They are not original release numbers. Original builds, dates and URLs are preserved.</p>${rows}<details><summary>All verified development snapshots (${catalog.builds.length})</summary>${snapshots}</details></html>\n`;
+}
