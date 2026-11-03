@@ -30,10 +30,11 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 - [Krok 17 — blueprinty a skutečná výstavba](requests/step-17.md): commit `43766dc`, Pages run `41596025285` úspěšně nasazeno. 145 testů, stavba králem i více staviteli, dělení odměn, rušení a materiál, hradby/sestupy, přesné Save/Load, starší hotové budovy, produkční/mobilní UI a 20 stavitelů s 28 blueprinty kolem 60 FPS ověřeny.
 
+- [Krok 18a — archiv historických verzí](requests/step-18a.md): commit `e4f092f`, Pages run `41601566466` úspěšně nasazeno. 36 skutečných commitů sestaveno, otestováno a spuštěno v prohlížeči; 150 testů, SHA-256 neměnnost, vlastní úložiště verzí a mobilní přehled ověřeny.
+
 ## Následuje
 
-1. **Právě probíhá:** [Krok 18a — archiv skutečných historických verzí](requests/step-18a.md).
-2. [Krok 18b — New Game Setup, obtížnost a parametry mapy](requests/step-18b.md).
-3. [Krok 19 — Advanced New Game Setup & World Configuration](requests/step-19.md).
+1. **Právě probíhá:** [Krok 18b — New Game Setup, obtížnost a parametry mapy](requests/step-18b.md).
+2. [Krok 19 — Advanced New Game Setup & World Configuration](requests/step-19.md).
 
 Číslo 18 bylo použité u dvou různých zadání; obě se zachovávají v pořadí doručení jako 18a a 18b. Neaplikovat budoucí mechaniky před jejich krokem: krok 6 má okamžitý lov bez HP, krok 7 přidává koně/FoW, krok 8 Castle/Wall, skutečné souboje až krok 9.
