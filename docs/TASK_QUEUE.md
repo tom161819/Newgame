@@ -32,9 +32,10 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 - [Krok 18a — archiv historických verzí](requests/step-18a.md): commit `e4f092f`, Pages run `41601566466` úspěšně nasazeno. 36 skutečných commitů sestaveno, otestováno a spuštěno v prohlížeči; 150 testů, SHA-256 neměnnost, vlastní úložiště verzí a mobilní přehled ověřeny.
 
+- [Krok 18b — New Game Setup](requests/step-18b.md): commit `ed58610`, Pages run `41602452485` úspěšně nasazeno. 157 testů; nastavení, obtížnosti, počty objektů, skutečný respawn 100 kamenů, přesné Save/Load a mobilní i produkční rozhraní ověřeny. Archiv rozšířen na 38 skutečných commitů.
+
 ## Následuje
 
-1. **Právě probíhá:** [Krok 18b — New Game Setup, obtížnost a parametry mapy](requests/step-18b.md).
-2. [Krok 19 — Advanced New Game Setup & World Configuration](requests/step-19.md).
+1. **Právě probíhá:** [Krok 19 — Advanced New Game Setup & World Configuration](requests/step-19.md).
 
 Číslo 18 bylo použité u dvou různých zadání; obě se zachovávají v pořadí doručení jako 18a a 18b. Neaplikovat budoucí mechaniky před jejich krokem: krok 6 má okamžitý lov bez HP, krok 7 přidává koně/FoW, krok 8 Castle/Wall, skutečné souboje až krok 9.
