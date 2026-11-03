@@ -1,27 +1,47 @@
 import Phaser from 'phaser';
-import { tileCenter,tilePolygon,gridToWorld } from './isometric.js';
+import { tileCenter,gridToWorld } from './isometric.js';
 import { buildingDefinition,towerBase } from './buildings.js';
 
 // Ground and per-cell plants sort independently, so people can walk among them.
 export class CropPlotView {
   constructor(scene,building,preview=false){
-    this.scene=scene;this.preview=preview;this.floor=scene.add.graphics();this.plants=building.tiles.map(()=>scene.add.graphics());
+    this.scene=scene;this.preview=preview;this.floor=scene.add.image(0,0,'__WHITE');this.plants=building.tiles.map(()=>scene.add.image(0,0,'__WHITE').setOrigin(.5,92/112));
     this.stage=preview?3:0;this.alpha=preview?.55:1;this.paint(building);
   }
   paint(building,tint=null){
     this.building=building;this.definition=buildingDefinition(building);this.base=towerBase(building);this.tint=tint;
-    const floor=this.floor.clear().setDepth(this.preview?10000:-90);
+    const back=gridToWorld(building.x,building.y);
+    this.floor.setTexture(this.groundTexture(tint)).setOrigin(this.definition.height/(this.definition.width+this.definition.height),0).setPosition(back.x,back.y).setDepth(this.preview?10000:-90);
+    const plantTexture=this.plantTexture(tint);
     for(const [index,tile]of building.tiles.entries()){
-      const position=tileCenter(tile),g=this.plants[index].clear().setPosition(position.x,position.y).setDepth(this.preview?10001:position.y+.03);
-      floor.fillStyle(tint??(this.definition.id==='orchard'?0x777044:0x695239),.95);floor.fillPoints(tilePolygon(tile),true);
-      floor.lineStyle(1,tint??0x453e2c,.6);floor.strokePoints(tilePolygon(tile),true);
-      if(this.definition.id==='wheat_field')this.wheat(g,tint);else this.tree(g,tint);
+      const position=tileCenter(tile);this.plants[index].setTexture(plantTexture).setPosition(position.x,position.y).setDepth(this.preview?10001:position.y+.03);
     }
     const b=building,d=this.definition;
     this.hitArea=new Phaser.Geom.Polygon([
       gridToWorld(b.x,b.y),gridToWorld(b.x+d.width,b.y),gridToWorld(b.x+d.width,b.y+d.height),gridToWorld(b.x,b.y+d.height),
     ]);
     this.setAlpha(this.alpha);
+  }
+  groundTexture(tint){
+    const d=this.definition,key=`crop-ground:${d.id}:${tint??'normal'}`;
+    if(!this.scene.textures.exists(key)){
+      const g=this.scene.make.graphics({x:0,y:0,add:false}),point=(x,y)=>({x:d.height*32+(x-y)*32,y:(x+y)*16});
+      for(let y=0;y<d.height;y++)for(let x=0;x<d.width;x++){
+        const points=[point(x,y),point(x+1,y),point(x+1,y+1),point(x,y+1)];
+        g.fillStyle(tint??(d.id==='orchard'?0x777044:0x695239),.95);g.fillPoints(points,true);g.lineStyle(1,tint??0x453e2c,.6);g.strokePoints(points,true);
+      }
+      g.generateTexture(key,(d.width+d.height)*32,(d.width+d.height)*16);g.destroy();
+    }
+    return key;
+  }
+  plantTexture(tint){
+    const key=`crop-plants:${this.definition.id}:${this.stage}:${tint??'normal'}`;
+    if(!this.scene.textures.exists(key)){
+      const g=this.scene.make.graphics({x:0,y:0,add:false});g.translateCanvas(32,92);
+      if(this.definition.id==='wheat_field')this.wheat(g,tint);else this.tree(g,tint);
+      g.generateTexture(key,64,112);g.destroy();
+    }
+    return key;
   }
   wheat(g,tint){
     g.lineStyle(1,tint??0x3d3928,.6);

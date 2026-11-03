@@ -232,3 +232,6 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 .changelog-release ul { margin:0; padding-left:20px; color:#c9cbb8; font-size:14px; line-height:1.7; }
 .changelog-release li { margin:6px 0; overflow-wrap:anywhere; }
 @media(max-width:480px) { .changelog-dialog > header { padding:16px; } #changelog-releases { padding:0 16px 16px; } .changelog-release h3 { font-size:21px; } .changelog-release li { font-size:13px; } }
+
+#farming-growth { width:100%; height:10px; accent-color:#d4b66a; }
+#farming-worker { line-height:1.6; color:#d1c59f; }
