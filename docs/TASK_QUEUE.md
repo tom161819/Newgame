@@ -22,14 +22,17 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 - [Krok 13 — individuální XP a levely](requests/step-13.md): commit `c8a87c7`, Pages run `41556504872` úspěšně nasazeno. 98 testů a kontrola skutečných odměn, UI, opakovaných událostí i starších savů.
 
+## Dokončeno, probíhá publikování
+
+- [Krok 14 — individuální skilly a profese poddaných](requests/step-14.md): 109 testů, ověřené skutečné pracovní AI, Save/Load včetně starších her, původní mechaniky a výkon 20 poddaných kolem 60 FPS. Commit a nasazení této verze se ověřují před zahájením kroku 15.
+
 ## Následuje
 
-1. **Právě probíhá:** [Krok 14 — individuální skilly a profese poddaných](requests/step-14.md).
-2. [Krok 15 — přirozené talenty a mzdy](requests/step-15.md).
-3. [Krok 16 — pracovní budovy a zaměstnanci](requests/step-16.md).
-4. [Krok 17 — blueprinty a skutečná výstavba](requests/step-17.md).
-5. [Krok 18a — archiv skutečných historických verzí](requests/step-18a.md).
-6. [Krok 18b — New Game Setup, obtížnost a parametry mapy](requests/step-18b.md).
-7. [Krok 19 — Advanced New Game Setup & World Configuration](requests/step-19.md).
+1. [Krok 15 — přirozené talenty a mzdy](requests/step-15.md).
+2. [Krok 16 — pracovní budovy a zaměstnanci](requests/step-16.md).
+3. [Krok 17 — blueprinty a skutečná výstavba](requests/step-17.md).
+4. [Krok 18a — archiv skutečných historických verzí](requests/step-18a.md).
+5. [Krok 18b — New Game Setup, obtížnost a parametry mapy](requests/step-18b.md).
+6. [Krok 19 — Advanced New Game Setup & World Configuration](requests/step-19.md).
 
 Číslo 18 bylo použité u dvou různých zadání; obě se zachovávají v pořadí doručení jako 18a a 18b. Neaplikovat budoucí mechaniky před jejich krokem: krok 6 má okamžitý lov bez HP, krok 7 přidává koně/FoW, krok 8 Castle/Wall, skutečné souboje až krok 9.

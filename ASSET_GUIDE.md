@@ -1,6 +1,6 @@
 # Přidávání objektů a grafiky
 
-Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soubory v `public/assets/`; Vite je kopíruje do sestavení beze změny. Současná hra má 21 typů, včetně čtyř povrchů pěšin: grass, dirt, stone, meat, gold, tower, castle, wall, king, rock_outcrop, rabbit, deer, wild_boar, horse, basic_sword, basic_armor, treasure_chest, grass_normal, grass_trampled_1, grass_trampled_2 a grass_trampled_3. Prázdné složky pro vodu, dřevo, železo, stromy a keře jsou příprava, nepřidávají nové herní mechaniky.
+Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soubory v `public/assets/`; Vite je kopíruje do sestavení beze změny. Současná hra má 22 typů, včetně čtyř povrchů pěšin: grass, dirt, stone, meat, gold, tower, castle, wall, king, peasant, rock_outcrop, rabbit, deer, wild_boar, horse, basic_sword, basic_armor, treasure_chest, grass_normal, grass_trampled_1, grass_trampled_2 a grass_trampled_3. Prázdné složky pro vodu, dřevo, železo, stromy a keře jsou příprava, nepřidávají nové herní mechaniky.
 
 ## Soubory a registr
 
@@ -154,13 +154,25 @@ Simulace používá skutečné `game.loop.rawDelta`; vyhlazené a ořezané Phas
 
 ## Individuální zkušenosti
 
-`src/data/experience.js` obsahuje jedinou křivku levelů 1–50, celkové prahy a tabulku odměn. Definice lidské postavy může zadat `experience: {initialLevel: 1, maxLevel: 50, enabled: true, gainMultiplier: 1}`. Model `character.experience` drží celkový postup a slovník budoucích násobitelů; samostatné skilly zatím nejsou aktivní. Zvířata zkušenosti nezískávají.
+`src/data/experience.js` obsahuje jedinou křivku levelů 1–50, celkové prahy a tabulku odměn. Definice lidské postavy může zadat `experience: {initialLevel: 1, maxLevel: 50, enabled: true, gainMultiplier: 1}`. Model `character.experience` drží celkový postup a slovník budoucích násobitelů; `character.skills` obsahuje nezávislé skilly. Oba používají stejné `createProgress`/`addProgressXP`/`checkProgressLevelUp`. Zvířata zkušenosti nezískávají.
 
 Dokončující systém publikuje na `GameActivityBus` událost s konkrétním `actor`, typem činnosti a objektu. Sběr se hlásí až po odstranění položky a připsání inventáře, lov až při skutečné smrti se známým původcem útoku a stavba až po úspěšné platbě a dokončení. Řada hradeb posílá počet nových segmentů. `ExperienceSystem` má `addXP`, `getXPRequired`, `checkLevelUp`, `getLevelProgress`, `on('levelUp', listener)` a `on('xp', listener)`. Ostatní systémy nepřepisují XP přímo.
 
 Bus přiděluje monotónní ID `activity-N`. Experience System si zpracované ID pamatuje i v save, takže opakované doručení téže události nic nepřidá. Nové akce na stejném políčku dostanou nové ID a fungují běžně. `CombatSystem` posílá `damage(target, amount, attacker)` a `death(target, killer)`; rozhodující příspěvek při smrti je deterministický při shodě podle ID a nezávisí na pořadí ani FPS. Prozatím se odměňuje dokončený lov; částečné poškození nepřidává celkové XP.
 
-`ExperienceFeedback` vykresluje HUD a krátké efekty s viditelností podle kamery a Fog of War. `UnitPanel` je společný přehled lidských jednotek; král ho otevírá z horní lišty, budoucí poddané poskytne `GameScene.selectableHumans()`. Panel nemění aktuální příkaz. `exportState`/`importState` systému uchovává čítač a zpracované události, jednotlivé postavy ukládají vlastní XP model. Import bez XP bezpečně použije level 1 a žádné historické odměny.
+`ExperienceFeedback` vykresluje HUD a krátké efekty s viditelností podle kamery a Fog of War. `UnitPanel` je společný přehled lidských jednotek; král ho otevírá z horní lišty, poddané poskytuje `GameScene.selectableHumans()`. Panel nemění králův aktuální příkaz. `exportState`/`importState` systému uchovává čítač a zpracované události, jednotlivé postavy ukládají vlastní XP model. Import bez XP bezpečně použije level 1 a žádné historické odměny.
+
+## Poddaní a pracovní AI
+
+`src/data/jobs.js` je společná konfigurace šesti skillů, sedmi profesí, pracovních rychlostí, zotavování a migrace. Peasant má v registry vlastní procedurální pohled a SVG náhled, statistiky, dostupné profese a seznam skillů. `WorkerController` používá původní živý controller a sdílené hledání cesty, pohyb i rezervace probíhajícího kroku; nevzniká druhá implementace navigace.
+
+`WorkerSystem` drží jednotlivé fyzické poddané a jejich ID, počáteční tři obyvatele a každodenní příchod jednoho nového do kapacity 20. Migrant se vytvoří na dosažitelném okraji a dojde domů. Domovem je první hrad nebo původní osada. `JobSystem.assign` ruší starý úkol, útok a cíle, ale zachová skilly a celkové XP. Nabízí změnový hook pro budoucí mzdy a `setConstructionProvider` pro skutečná staveniště. `assignedWorkplaceId` je připravené pro další krok s pracovními budovami.
+
+`WorkerAI` rozlišuje hledání, přesun, práci, čekání, návrat a zotavování. Miner zpracuje kámen až po příchodu a odpracování 1500 ms upravených efektivitou. Hunter používá stejný CombatSystem jako král a po skutečné smrti dojde k dropu. `TaskReservationSystem` přiděluje cíl právě jednomu pracovníkovi a uvolňuje ho při dokončení, změně profese, nedostupnosti nebo smrti. Nezaměstnaní se procházejí, ostatní dosud nepodporované práce čekají bez fiktivní produkce. Poddaní jsou zahrnutí do rezervací pro stavění/spawny, regenerace, překrývání, health barů, Fog of War a vyšlapávání cest.
+
+`SkillSystem` poslouchá již přijaté dokončené aktivity a udělí Mining, Hunting nebo Construction XP. Události poškození rozvíjejí Combat, nejvýše 40 základních XP na dvojici útočník/protivník; neudělují navíc celkovou odměnu za tentýž lov. Všechny kanály sdílejí ledger událostí ExperienceSystem. `activitySkill.attackMultiplier` se aplikuje pouze při příslušném útoku a po jeho ukončení se zruší; násobí DPS až po vybavení. Například Sword a Hunting 50 dávají `15 × 2 × 1.49 = 44.7 DPS`. Základní statistiky a množství surovin zůstanou stejné.
+
+Save obsahuje každý skill, pracovní stav a úkol, rezervaci, postup práce, cíle, migraci a damage XP limity. Obnova znovu naváže reference a rezervace před první aktualizací. Starší save bez poddaných inicializuje tři nové obyvatele a nové skilly na levelu 1; další načtení již jejich uložená data obnovuje. Smrt poddaného ponechá datový záznam pro zachování historie, ale odstraní pohled, práci i rezervace.
 
 ## Vyšlapávání terénu
 
@@ -172,7 +184,7 @@ Registry povrchy `grass_normal`, `grass_trampled_1/2/3` používají vlastní SV
 
 Save data `pathWear` obsahují skóre, odvozené úrovně, den posledního průchodu a poslední zpracovaný den. Import nevyvolává průchody ani denní události. Nepřítomná položka ve starším save bezpečně obnoví nuly. Při změně prahů v budoucí verzi doplň migraci odvozených úrovní.
 
-`stats.hpRegenPerSecond` je univerzální vlastnost: King má 0.2, ostatní typy výchozí 0. `RegenerationSystem` nehojí mrtvé a omezí HP maximem. Během DPS souboje se regenerace integruje současně s příchozím poškozením; CombatSystem vrací pokryté časy jednotek, aby se zbytek snímku nevynechal ani neléčil dvakrát. Výsledek tak odpovídá i různému FPS a smrti útočníka uvnitř časového kroku.
+`stats.hpRegenPerSecond` je univerzální vlastnost: King a Peasant mají 0.2, zvířata mají výchozí 0. `RegenerationSystem` nehojí mrtvé a omezí HP maximem. Během DPS souboje se regenerace integruje současně s příchozím poškozením; CombatSystem vrací pokryté časy jednotek, aby se zbytek snímku nevynechal ani neléčil dvakrát. Výsledek tak odpovídá i různému FPS a smrti útočníka uvnitř časového kroku.
 
 Castle má `production: { resource: 'gold', amount: 5, interval: 'day', label: 'Castle income' }`. `ProductionSystem` sčítá všechny aktuální budovy podle těchto dat a eviduje poslední zpracovaný den. Stejný den se nevyplatí dvakrát, nová budova nemá zpětný příjem. `dailyIncome()` poskytuje přehled pro budoucí ekonomické UI.
 

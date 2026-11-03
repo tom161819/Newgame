@@ -3,6 +3,7 @@ import { DAY_DURATION } from './GameTimeSystem.js';
 import { COLUMNS,ROWS } from '../game/config.js';
 import { wearLevel } from '../data/pathWear.js';
 import { getXPRequired,totalXPForLevel } from '../data/experience.js';
+import { JOBS,SKILL_IDS,WORK_RULES } from '../data/jobs.js';
 
 export const SAVE_VERSION=1;
 const copy=value=>value==null?null:structuredClone(value);
@@ -11,6 +12,7 @@ const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','
 export function serializeActor(unit){
   return {...Object.fromEntries(actorFields.filter(k=>unit[k]!==undefined).map(k=>[k,unit[k]])),
     ...(unit.experience?{experience:copy(unit.experience)}:{}),
+    ...(unit.skills?{skills:copy(unit.skills),activitySkill:unit.activitySkill??null}:{}),
     baseStats:copy(unit.baseStats),statModifiers:copy(unit.statModifiers),tile:point(unit.tile),position:point(unit.position),
     nextTile:point(unit.nextTile),direction:point(unit.direction),path:unit.path.map(point)};
 }
@@ -25,6 +27,9 @@ export function serializeGameState(scene){
   return {
     saveVersion:SAVE_VERSION,terrain:scene.terrainGrid.map(row=>[...row]),
     ...(scene.experienceSystem?{experienceSystem:scene.experienceSystem.exportState()}:{}),
+    ...(scene.skillSystem?{skillSystem:scene.skillSystem.exportState()}:{}),
+    ...(scene.workerSystem?{population:scene.workerSystem.exportState(),workers:[...scene.workerSystem.workers.values()].map(w=>({...serializeActor(w),name:w.name,profession:w.profession,
+      workState:w.workState,workMessage:w.workMessage??'',workTask:copy(w.workTask),assignedWorkplaceId:w.assignedWorkplaceId,arriving:w.arriving,aiCooldown:w.aiCooldown}))}:{}),
     ...(scene.pathWear?{pathWear:scene.pathWear.exportState()}:{}),
     player:{...serializeActor(c),state:c.state,currentTowerId:c.currentTower?.id??null,horseId:c.mountedHorse?.id??null,
       exitTile:point(c.exitTile),order:serializeOrder(c.order),
@@ -64,7 +69,9 @@ export function validateGameState(input,registry=objectRegistry){
   let s;try{s=JSON.parse(JSON.stringify(input));}catch{fail();}
   array(s.terrain,ROWS);check(s.terrain.length===ROWS);for(const row of s.terrain){array(row,COLUMNS);check(row.length===COLUMNS&&row.every(n=>n===0||n===1));}
   for(const key of ['buildings','resources','animals','drops','chests','spawners'])array(s[key]);
+  if(s.workers!==undefined)array(s.workers);
   const bIds=unique(s.buildings),aIds=unique(s.animals),dIds=unique(s.drops),cIds=unique(s.chests);
+  const wIds=unique(s.workers??[]),unitIds=new Set(['king',...aIds,...wIds]);
   const occupied=new Set();
   const occupy=(p,w=1,h=1)=>{tile(p);for(let dy=0;dy<h;dy++)for(let dx=0;dx<w;dx++){
     const x=p.x+dx,y=p.y+dy,key=`${x},${y}`;check(s.terrain[y]?.[x]===0&&!occupied.has(key));occupied.add(key);
@@ -86,13 +93,21 @@ export function validateGameState(input,registry=objectRegistry){
     number(a.maxHP,1,1e9);number(a.currentHP,0,a.maxHP);check(a.isAlive?a.currentHP>0:a.currentHP===0);
     const b=a.baseStats;check(b);number(b.maxHP,1,1e9);number(b.attackDPS,0,1e9);number(b.armor,0,90);number(b.attackRange,0,100);number(b.hpRegenPerSecond,0,1e6);
     check(a.statModifiers&&typeof a.statModifiers==='object'&&!Array.isArray(a.statModifiers));
-    for(const [name,m]of Object.entries(a.statModifiers)){check(!['__proto__','prototype','constructor'].includes(name)&&m&&typeof m==='object');for(const [key,v]of Object.entries(m)){check(['maxHP','attackBonus','armor','hpRegenPerSecond'].includes(key));number(v,-1e6,1e6);}}
+    for(const [name,m]of Object.entries(a.statModifiers)){check(!['__proto__','prototype','constructor'].includes(name)&&m&&typeof m==='object');for(const [key,v]of Object.entries(m)){check(['maxHP','attackBonus','attackMultiplier','armor','hpRegenPerSecond'].includes(key));number(v,key==='attackMultiplier'?0:-1e6,1e6);}}
     if(a.experience!==undefined){
       const e=a.experience;check(definition(a.type).category==='character'&&e&&typeof e.enabled==='boolean');
       integer(e.maxLevel,1,50);integer(e.level,1,e.maxLevel);number(e.gainMultiplier,0,1e6);number(e.currentXP);number(e.totalXP,0,totalXPForLevel(e.maxLevel));
       const required=e.level===e.maxLevel?0:getXPRequired(e.level);check(e.xpToNextLevel===required);check(required?e.currentXP<required:e.currentXP===0);
       check(Math.abs(e.totalXP-totalXPForLevel(e.level)-e.currentXP)<1e-6);check(e.modifiers&&typeof e.modifiers==='object'&&!Array.isArray(e.modifiers));
       for(const [key,value]of Object.entries(e.modifiers)){check(!['__proto__','constructor','prototype'].includes(key));number(value,0,1e6);}
+    }
+    if(a.skills!==undefined){
+      check(definition(a.type).category==='character'&&a.skills&&typeof a.skills==='object'&&Object.keys(a.skills).length===SKILL_IDS.length);
+      for(const id of SKILL_IDS){const e=a.skills[id];check(e&&typeof e.enabled==='boolean');integer(e.maxLevel,1,50);integer(e.level,1,e.maxLevel);number(e.gainMultiplier,0,1e6);number(e.currentXP);number(e.totalXP,0,totalXPForLevel(e.maxLevel));
+        const required=e.level===e.maxLevel?0:getXPRequired(e.level);check(e.xpToNextLevel===required);check(required?e.currentXP<required:e.currentXP===0);check(Math.abs(e.totalXP-totalXPForLevel(e.level)-e.currentXP)<1e-6);
+        check(e.modifiers&&typeof e.modifiers==='object'&&!Array.isArray(e.modifiers));for(const [key,value]of Object.entries(e.modifiers)){check(!['__proto__','constructor','prototype'].includes(key));number(value,0,1e6);}
+      }
+      check(a.activitySkill==null||SKILL_IDS.includes(a.activitySkill));
     }
   };
   const p=s.player;actor(p);check(p.id==='king'&&p.type==='king'&&p.isAlive);
@@ -102,7 +117,24 @@ export function validateGameState(input,registry=objectRegistry){
   if(p.exitTile)tile(p.exitTile);
   if(['enteringTower','exitingTower'].includes(p.state)){number(p.transition?.remaining,1,900);if(p.state==='exitingTower')tile(p.exitTile);}
   number(p.render?.x,-1e6,1e6);number(p.render?.y,-1e6,1e6);number(p.render?.depth,-1e6,1e6);
-  for(const a of s.animals){definition(a.type,'animal');check(typeof a.id==='string');actor(a);number(a.wanderWait,-1e9,1e9);check(a.retaliationId==null||a.retaliationId==='king');if(a.mounted)check(p.horseId===a.id&&a.type==='horse');}
+  for(const a of s.animals){definition(a.type,'animal');check(typeof a.id==='string');actor(a);number(a.wanderWait,-1e9,1e9);check(a.retaliationId==null||a.retaliationId==='king'||wIds.has(a.retaliationId));if(a.mounted)check(p.horseId===a.id&&a.type==='horse');}
+  const reservations=new Set();
+  if(s.workers!==undefined){
+    integer(s.population?.nextId,1);integer(s.population.lastMigrationDay,1,s.time?.day??Number.MAX_SAFE_INTEGER);
+    for(const w of s.workers){
+      check(w.type==='peasant');actor(w);check(typeof w.name==='string'&&w.name.length>0&&w.name.length<100&&Object.hasOwn(JOBS,w.profession));
+      const match=String(w.id).match(/^worker-(\d+)$/);check(match&&Number(match[1])>0&&Number(match[1])<s.population.nextId);
+      check(typeof w.arriving==='boolean');number(w.aiCooldown,-1e9,1e9);number(w.wanderWait,-1e9,1e9);check(w.assignedWorkplaceId==null||bIds.has(w.assignedWorkplaceId));
+      check(['Idle','Searching for Work','Moving to Target','Working','Returning','Waiting','Fleeing','Recovering','Arriving','Dead'].includes(w.workState));
+      check(typeof w.workMessage==='string'&&w.workMessage.length<200);if(!w.isAlive)check(w.workState==='Dead'&&!w.workTask&&!w.arriving);
+      const t=w.workTask;if(t){
+        check(w.isAlive&&['mine','hunt','collectMeat'].includes(t.kind));tile(t.goal);number(t.progressMs,0,WORK_RULES.miningDuration);
+        const prefix=t.kind==='mine'?'resource':t.kind==='hunt'?'animal':'drop';check(t.reservation===`${prefix}:${t.targetId}`&&!reservations.has(t.reservation));reservations.add(t.reservation);
+        if(t.kind==='mine')check(w.profession==='miner'&&s.resources.some(r=>r.type==='stone'&&`${r.tile.x},${r.tile.y}`===t.targetId));
+        if(t.kind==='hunt')check(w.profession==='hunter'&&aIds.has(t.targetId));if(t.kind==='collectMeat')check(w.profession==='hunter'&&dIds.has(t.targetId));
+      }
+    }
+  }
   if(p.horseId)check(s.animals.some(a=>a.id===p.horseId&&a.type==='horse'&&a.mounted&&a.isAlive));
   const order=o=>{if(!o)return;check(['move','enter','collect','drop','openChest','approachAnimal'].includes(o.kind));if(o.kind==='move'||o.kind==='drop')tile(o.goal);
     if(o.kind==='enter')check(bIds.has(o.buildingId));if(o.kind==='approachAnimal')check(aIds.has(o.animalId));if(o.kind==='drop')check(dIds.has(o.dropId));
@@ -123,7 +155,7 @@ export function validateGameState(input,registry=objectRegistry){
   number(s.camera?.zoom,.45,1.8);number(s.camera.x,-1e6,1e6);number(s.camera.y,-1e6,1e6);check(typeof s.camera.following==='boolean');
   check(typeof s.settings?.fogOfWar==='boolean');if(s.settings.pathWearDebug!==undefined)check(typeof s.settings.pathWearDebug==='boolean');const c=s.commands;check(c);check(c.hunt==null||aIds.has(c.hunt));check(c.mount==null||aIds.has(c.mount));
   number(c.huntRepath,-1e9,1e9);number(c.mountRepath,-1e9,1e9);check(c.pendingChest==null||cIds.has(c.pendingChest));array(c.attacks,1000);
-  for(const pair of c.attacks){array(pair,2);check(pair.length===2&&pair[0]!==pair[1]&&pair.every(id=>id==='king'||aIds.has(id)));}
+  for(const pair of c.attacks){array(pair,2);check(pair.length===2&&pair[0]!==pair[1]&&pair.every(id=>unitIds.has(id)));}
   for(const [key,objects,prefix]of [['animal',s.animals,'animal'],['drop',s.drops,'drop'],['chest',s.chests,'treasure']]){
     integer(s.counters?.[key],1);
     for(const object of objects){const match=String(object.id).match(new RegExp(`^${prefix}-(\\d+)$`));check(match&&Number(match[1])>0&&Number(match[1])<s.counters[key]);}
@@ -132,6 +164,10 @@ export function validateGameState(input,registry=objectRegistry){
   if(s.experienceSystem!==undefined){
     const e=s.experienceSystem;check(e);integer(e.nextEventId,1);array(e.processedEventIds,1000000);check(new Set(e.processedEventIds).size===e.processedEventIds.length);
     for(const id of e.processedEventIds){check(typeof id==='string'&&id.length>0&&id.length<=128);const match=id.match(/^activity-(\d+)$/);if(match)integer(Number(match[1]),1,e.nextEventId-1);}
+  }
+  if(s.skillSystem!==undefined){
+    check(s.skillSystem?.damageAwards&&typeof s.skillSystem.damageAwards==='object'&&!Array.isArray(s.skillSystem.damageAwards));
+    for(const [key,amount]of Object.entries(s.skillSystem.damageAwards)){const [actorId,targetId]=key.split(':');check((actorId==='king'||wIds.has(actorId))&&/^animal-\d+$/.test(targetId));number(amount,0,WORK_RULES.combatXPPerTarget+1e-7);}
   }
   return s;
 }

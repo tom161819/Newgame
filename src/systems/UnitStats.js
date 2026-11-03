@@ -8,10 +8,11 @@ export function createCombatStats(definition){
 }
 export function recalculateStats(unit){
   const total={maxHP:0,attackBonus:0,armor:0,hpRegenPerSecond:0};
-  for(const modifier of Object.values(unit.statModifiers))for(const key of Object.keys(total))total[key]+=modifier[key]??0;
+  let attackMultiplier=1;
+  for(const modifier of Object.values(unit.statModifiers)){for(const key of Object.keys(total))total[key]+=modifier[key]??0;attackMultiplier*=modifier.attackMultiplier??1;}
   const base=unit.baseStats;
   unit.maxHP=Math.max(1,base.maxHP+total.maxHP);
-  unit.attackDPS=Math.max(0,base.attackDPS*(1+total.attackBonus/100));
+  unit.attackDPS=Math.max(0,base.attackDPS*(1+total.attackBonus/100)*attackMultiplier);
   unit.armor=clampArmor(base.armor+total.armor);unit.attackRange=base.attackRange;
   unit.hpRegenPerSecond=Math.max(0,base.hpRegenPerSecond+total.hpRegenPerSecond);
   unit.currentHP=unit.isAlive?Math.min(unit.currentHP,unit.maxHP):0;

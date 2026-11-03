@@ -1,0 +1,62 @@
+import { WorkerController } from '../game/WorkerController.js';
+import { tileCenter,PLAYER_START } from '../game/map.js';
+import { reachableTiles } from '../game/pathfinding.js';
+import { towerNeighbors,buildingDefinition } from '../game/buildings.js';
+import { tileKey } from '../game/stones.js';
+import { POPULATION } from '../data/jobs.js';
+import { TaskReservationSystem } from './TaskReservationSystem.js';
+import { JobSystem } from './JobSystem.js';
+import { WorkerAI } from './WorkerAI.js';
+
+const names=['Matěj','Anna','Jakub','Eliška','Pavel','Marie','Jan','Tereza','Ondřej','Klára'];
+export class WorkerSystem {
+  constructor(scene,{onChange=()=>{}}={}){
+    this.scene=scene;this.onChange=onChange;this.workers=new Map();this.nextId=1;this.lastMigrationDay=scene.gameTime.day;
+    this.reservations=new TaskReservationSystem();this.ai=new WorkerAI(this);this.jobs=new JobSystem(this);
+    this.unsubscribe=scene.gameTime.onNewDay(day=>this.onNewDay(day));
+  }
+  liveWorkers(){return [...this.workers.values()].filter(w=>w.isAlive);}
+  reservedTiles(){return this.liveWorkers().flatMap(w=>w.reservedTiles());}
+  origin(worker=null){
+    const workplace=worker?.assignedWorkplaceId?this.scene.buildings.find(b=>b.id===worker.assignedWorkplaceId):null;
+    const castle=workplace??this.scene.buildings.find(b=>b.type==='castle');
+    if(!castle)return {...PLAYER_START};const d=buildingDefinition(castle);return {x:castle.x+(d.width-1)/2,y:castle.y+(d.height-1)/2};
+  }
+  homeGoals(){
+    const castle=this.scene.buildings.find(b=>b.type==='castle');
+    if(castle)return towerNeighbors(castle).filter(t=>this.scene.map[t.y]?.[t.x]===0);
+    const goals=[];for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const t={x:PLAYER_START.x+dx,y:PLAYER_START.y+dy};if(this.scene.map[t.y]?.[t.x]===0)goals.push(t);}return goals;
+  }
+  candidates(){
+    const occupied=new Set([...this.scene.resourceOccupancy.keys(),...this.scene.reservedTiles().map(tileKey)]);
+    return reachableTiles(this.scene.map,this.homeGoals()).filter(t=>!occupied.has(tileKey(t)));
+  }
+  create(tile,{id=null,name=null}={}){
+    id??=`worker-${this.nextId++}`;const number=Number(id.split('-')[1]),definition=this.scene.objectRegistry.require('peasant');
+    const view=this.scene.assets.createView(definition.id,{...tileCenter(tile),tile});
+    const worker=new WorkerController(this.scene,definition,id,tile,view,name??`${names[(number-1)%names.length]}${number>names.length?` ${Math.ceil(number/names.length)}`:''}`);
+    view.setData('worker',worker);this.workers.set(id,worker);return worker;
+  }
+  spawnInitial(){
+    const origin=this.origin();
+    for(let i=0;i<POPULATION.initial;i++){
+      const candidates=this.candidates().filter(t=>Math.max(Math.abs(t.x-origin.x),Math.abs(t.y-origin.y))<=5);
+      if(!candidates.length)break;this.create(candidates[Math.floor(Math.random()*candidates.length)]);
+    }
+    this.updateUI();
+  }
+  onNewDay(day){
+    if(day<=this.lastMigrationDay)return;this.lastMigrationDay=day;
+    for(let i=0;i<POPULATION.migrantsPerDay&&this.liveWorkers().length<POPULATION.maximum;i++){
+      const map=this.scene.map,origin=this.origin(),candidates=this.candidates().filter(t=>(t.x<=1||t.y<=1||t.x>=map[0].length-2||t.y>=map.length-2)&&Math.hypot(t.x-origin.x,t.y-origin.y)>25);
+      if(!candidates.length)break;const worker=this.create(candidates[Math.floor(Math.random()*candidates.length)]);worker.arriving=true;worker.workState='Arriving';worker.moveTo(this.homeGoals());
+    }
+    this.updateUI();
+  }
+  update(delta){for(const worker of this.liveWorkers())this.ai.update(worker,delta);}
+  onDeath(worker){this.ai.cancel(worker);worker.active=false;worker.path=[];worker.nextTile=null;worker.walking=false;worker.workState='Dead';worker.arriving=false;worker.view.destroy();this.scene.combatFeedback.remove(worker.id);this.updateUI();}
+  updateUI(){this.onChange(this.liveWorkers().length,POPULATION.maximum);}
+  exportState(){return {nextId:this.nextId,lastMigrationDay:this.lastMigrationDay};}
+  importState(data){this.nextId=data?.nextId??1;this.lastMigrationDay=data?.lastMigrationDay??this.scene.gameTime.day;this.updateUI();}
+  destroy(){this.unsubscribe();this.jobs.destroy();this.reservations.clear();for(const worker of this.workers.values())worker.view.destroy();this.workers.clear();}
+}

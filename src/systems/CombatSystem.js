@@ -25,7 +25,7 @@ export class CombatSystem {
     if(this.attacks.get(attacker)===target)return true;
     this.attacks.set(attacker,target);attacker.attackTarget=target;this.emit('attack',attacker,target);return true;
   }
-  stopAttack(attacker){this.attacks.delete(attacker);attacker.attackTarget=null;}
+  stopAttack(attacker){const existed=this.attacks.delete(attacker);attacker.attackTarget=null;if(existed)this.emit('attackStopped',attacker);}
   applyDamage(target,amount,attacker=null){return this.applyEffectiveDamage(target,amount*(1-clampArmor(target.armor)/100),false,attacker);}
   applyEffectiveDamage(target,amount,deferDeath=false,attacker=null){
     if(!target.isAlive||!Number.isFinite(amount)||amount<=0)return 0;

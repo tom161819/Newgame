@@ -42,6 +42,9 @@ import { GameActivityBus } from '../systems/GameActivityBus.js';
 import { ExperienceSystem } from '../systems/ExperienceSystem.js';
 import { ExperienceFeedback } from '../ui/ExperienceFeedback.js';
 import { UnitPanel } from '../ui/UnitPanel.js';
+import { HumanView } from './HumanView.js';
+import { WorkerSystem } from '../systems/WorkerSystem.js';
+import { SkillSystem } from '../systems/SkillSystem.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -55,6 +58,7 @@ export class GameScene extends Phaser.Scene {
 
   create() {
     this.worldCamera=null;
+    this.workerSystem=null;
     this.gameOver=false;this.input.enabled=true;this.input.keyboard.enabled=true;this.tweens.resumeAll();
     this.activeFramePending=true;this.visibilityPaused=document.hidden;
     this.assets.initialize();
@@ -64,6 +68,7 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('animal',(definition,context)=>new AnimalView(this,context.x,context.y,definition));
     this.assets.registerRenderer('fortification',(_definition,context)=>new FortificationView(this,context.building,context.preview));
     this.assets.registerRenderer('chest',(_definition,context)=>new ChestView(this,context.x,context.y));
+    this.assets.registerRenderer('human',(definition,context)=>new HumanView(this,context.x,context.y,definition));
     const base=this.objectRegistry.require('grass'),obstacle=this.objectRegistry.require('rock_outcrop');
     this.terrainGrid=this.loadState?this.loadState.terrain.map(row=>[...row]):createMap(Math.random);
     this.map=this.terrainGrid.map(row=>row.map(value=>(value?obstacle:base).walkable?0:1));
@@ -71,6 +76,7 @@ export class GameScene extends Phaser.Scene {
     this.inventory=new Inventory();
     this.gameTime=new GameTimeSystem();this.regeneration=new RegenerationSystem();
     this.activities=new GameActivityBus();this.experienceSystem=new ExperienceSystem(this.activities);
+    this.skillSystem=new SkillSystem(this);
     this.pathWear=new PathWearSystem({map:this.map,terrain:this.terrainGrid,time:this.gameTime});this.terrain.setPathWear(this.pathWear);
     this.pauseManager=new PauseManager(this);
     this.noticeRemaining=0;document.querySelector('#day-notice').hidden=true;
@@ -84,8 +90,10 @@ export class GameScene extends Phaser.Scene {
     const position=tileCenter(PLAYER_START);
     this.player=this.assets.createView('king',position);
     this.character=new PlayerController(this,this.player,PLAYER_START);
+    this.skillSystem.initialize(this.character);
     this.equipment=new EquipmentSystem(this.character,this.objectRegistry,this.inventory,()=>{this.equipmentPanel?.refresh();this.combatFeedback?.refresh();});
     this.combat=new CombatSystem({map:this.map,canFight:unit=>unit.isAlive&&!unit.mounted&&(unit!==this.character||unit.state===PLAYER_STATE.GROUND),regenerationRate:unit=>this.regeneration.rateFor(unit)});
+    this.skillSystem.attachCombat(this.combat);
     this.resourceSpawners=[];
     for(const definition of this.objectRegistry.byCategory('resource').filter(d=>d.spawn)){
       const spawner=new ResourceSpawner({
@@ -106,7 +114,7 @@ export class GameScene extends Phaser.Scene {
     this.huntingSystem=new HuntingSystem(this);
     this.combatFeedback=new CombatFeedback(this);
     this.combat.on('attack',(attacker,target)=>{if(this.animalSystem.animals.has(target.id))this.animalSystem.onAttacked(target,attacker);});
-    this.combat.on('damage',unit=>this.combatFeedback.hit(unit));
+    this.combat.on('damage',(unit,amount,attacker)=>{this.combatFeedback.hit(unit);this.skillSystem.creditDamage(attacker,unit,amount);});
     this.combat.on('death',(unit,killer)=>this.onUnitDeath(unit,killer));
     this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
     this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.terrain.setDebug(settings.pathWearDebug);this.refreshVisibility();},open=>this.pauseManager.set('settings',open));
@@ -117,6 +125,7 @@ export class GameScene extends Phaser.Scene {
     this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
     this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
     this.equipmentPanel=new EquipmentPanel(this);
+    this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=`Poddaní ${count} / ${maximum}`;}});if(!this.loadState)this.workerSystem.spawnInitial();
     this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
     this.treasurePanel=new TreasurePanel(this);if(!this.loadState)this.treasureSystem.spawn(PLAYER_START);
@@ -152,6 +161,7 @@ export class GameScene extends Phaser.Scene {
       this.equipmentPanel.destroy();this.treasurePanel.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
+      this.workerSystem.destroy();this.skillSystem.destroy();
       this.game.events.off(Phaser.Core.Events.PAUSE,onBackground);this.game.events.off(Phaser.Core.Events.RESUME,onForeground);
       this.game.canvas.style.cursor='';
     });
@@ -172,7 +182,7 @@ export class GameScene extends Phaser.Scene {
     this.gameTime.setPaused(value);if(value||this.visibilityPaused)this.tweens.pauseAll();else{this.activeFramePending=true;this.tweens.resumeAll();}this.setGalleryInput(!value);
   }
 
-  reservedTiles(){return [...this.character.reservedTiles(),...(this.animalSystem?.reservedTiles()??[])];}
+  reservedTiles(){return [...this.character.reservedTiles(),...(this.animalSystem?.reservedTiles()??[]),...(this.workerSystem?.reservedTiles()??[])];}
   updateHover(pointer){
     const tooltip=document.querySelector('#object-tooltip');
     const wearInfo=document.querySelector('#path-wear-info');wearInfo.hidden=!this.settingsPanel.settings.pathWearDebug;
@@ -289,7 +299,7 @@ export class GameScene extends Phaser.Scene {
     if(!preview)this.terrain.invalidateArea(object.tiles);
     return this.assets.createView(definition.id,{building:object,preview});
   }
-  selectableHumans(){return [];}
+  selectableHumans(){return this.workerSystem?.liveWorkers()??[];}
   towerAtPoint(x,y,tile) {
     return [...this.buildings].filter(building=>this.fog.isVisibleObject(building)).sort((a,b)=>towerBase(b).y-towerBase(a).y).find(building=>this.towerViews.get(building.id).contains(x,y)||building.tiles.some(part=>tileKey(part)===tileKey(tile)));
   }
@@ -399,10 +409,11 @@ export class GameScene extends Phaser.Scene {
   setStatus(message) { document.querySelector('#status').textContent=message; }
   onUnitDeath(unit,killer=null){
     if(unit===this.character){this.finishGame();return;}
+    if(this.workerSystem.workers.has(unit.id)){this.workerSystem.onDeath(unit);return;}
     const tile={x:Math.floor(unit.position.x),y:Math.floor(unit.position.y)},amount=unit.definition.gameplay.meatDrop;
     if(killer)this.activities.emit('animalKilled',{actor:killer,objectType:unit.type,quantity:1,objectId:unit.id});
     this.mountSystem.onDeath(unit);this.animalSystem.remove(unit);this.combatFeedback.remove(unit.id);
-    if(amount>0)this.dropSystem.create('meat',tile,amount);
+    const drop=amount>0?this.dropSystem.create('meat',tile,amount):null;this.workerSystem.ai.animalDied(unit,killer,drop);
     if(this.huntingSystem.target===unit)this.huntingSystem.cancel();
     if(amount>0)this.setStatus(`${unit.definition.name} uloveno. Na zemi je Meat ×${amount}; seber ho kliknutím.`);
   }
@@ -430,9 +441,9 @@ export class GameScene extends Phaser.Scene {
     delta=this.activeFramePending?0:Number.isFinite(raw)?Math.max(0,raw):Math.max(0,delta);
     this.activeFramePending=false;
     this.character.update(delta);this.player.animate(delta,this.character.walking&&[PLAYER_STATE.GROUND,PLAYER_STATE.ON_WALL].includes(this.character.state),this.character.direction);
-    this.animalSystem.update(delta);this.huntingSystem.update(delta);this.mountSystem.update(delta);const covered=this.combat.update(delta);
+    this.animalSystem.update(delta);this.huntingSystem.update(delta);this.mountSystem.update(delta);this.workerSystem.update(delta);const covered=this.combat.update(delta);
     if(this.gameOver)return;
-    this.regeneration.update(delta,[this.character,...this.animalSystem.animals.values()],covered);
+    this.regeneration.update(delta,[this.character,...this.animalSystem.animals.values(),...this.workerSystem.liveWorkers()],covered);
     const activeDelta=this.gameTime.update(delta);this.updateTimeDisplay();
     this.combatFeedback.update(activeDelta);this.foodSystem.update(activeDelta);this.updateFoodDisplay();
     this.experienceFeedback.update(activeDelta);
@@ -448,6 +459,7 @@ export class GameScene extends Phaser.Scene {
     this.dropSystem.update(view,this.fog);
     if(this.input.manager.isOver)this.updateHover(this.input.activePointer);
     for(const animal of this.animalSystem.animals.values())animal.view.setVisible(!animal.mounted&&this.fog.isVisibleObject(animal)&&animal.view.x>view.x-60&&animal.view.x<view.right+60&&animal.view.y>view.y-40&&animal.view.y<view.bottom+70);
+    for(const worker of this.workerSystem?.liveWorkers()??[])worker.view.setVisible(this.fog.isVisibleObject(worker)&&worker.view.x>view.x-40&&worker.view.x<view.right+40&&worker.view.y>view.y-20&&worker.view.y<view.bottom+60);
     for(const resource of this.resources.values()){
       const definition=this.objectRegistry.require(resource.getData('objectId'));
       resource.setVisible(this.fog.isVisibleObject(resource.getData('object'))&&resource.x>view.x-64&&resource.x<view.right+64&&resource.y>view.y-40&&resource.y<view.bottom+(definition.visualHeight??40));

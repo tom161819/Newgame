@@ -9,6 +9,7 @@ export function restoreActor(unit,data){
   for(const key of ['tile','position','nextTile','direction','path','statModifiers'])unit[key]=structuredClone(data[key]);
   unit.baseStats=Object.freeze({...data.baseStats});recalculateStats(unit);
   importCharacterExperience(unit,data.experience);
+  unit.scene?.skillSystem?.importCharacter(unit,data.skills);unit.activitySkill=data.activitySkill??null;
 }
 export function restoreOrder(data,scene){
   if(!data)return null;
@@ -30,6 +31,13 @@ export function loadGameState(scene,input){
     const animal=scene.animalSystem.create(scene.objectRegistry.require(a.type),a.tile,a.id);restoreActor(animal,a);
     const pos=gridToWorld(animal.position.x,animal.position.y);animal.view.setPosition(pos.x,pos.y).setDepth(pos.y+(animal.definition.depth?.offset??0));
     animal.view.animate?.(0,animal.walking,animal.direction);
+  }
+  for(const data of state.workers??[]){
+    const worker=scene.workerSystem.create(data.tile,{id:data.id,name:data.name});restoreActor(worker,data);
+    for(const key of ['profession','workState','workMessage','assignedWorkplaceId','arriving','aiCooldown'])worker[key]=data[key];
+    worker.workTask=structuredClone(data.workTask);worker.active=worker.isAlive;
+    if(worker.workTask)scene.workerSystem.reservations.reserve(worker.workTask.reservation,worker.id);
+    if(!worker.isAlive)worker.view.destroy();else{const pos=gridToWorld(worker.position.x,worker.position.y);worker.view.setPosition(pos.x,pos.y).setDepth(pos.y+.1);worker.view.animate?.(0,worker.walking,worker.direction);}
   }
   for(const d of state.drops)scene.dropSystem.create(d.resource,d.tile,d.amount,d.id);
   for(const saved of state.chests){
@@ -63,15 +71,20 @@ export function loadGameState(scene,input){
   }
   if(c.state==='onTower')scene.player.setDepth(buildingDepth(c.currentTower)+.2);
   if(c.state==='ground'&&(c.path.length||c.nextTile||c.order))scene.showMarker(c.path.at(-1)??c.nextTile??c.tile);
-  const units=new Map([['king',c],...[...scene.animalSystem.animals].map(([id,a])=>[id,a])]);
+  const units=new Map([['king',c],...[...scene.animalSystem.animals].map(([id,a])=>[id,a]),...(scene.workerSystem?[...scene.workerSystem.workers]:[])]);
   for(const a of state.animals)scene.animalSystem.animals.get(a.id).retaliationTarget=units.get(a.retaliationId)??null;
   for(const [a,t]of state.commands.attacks){const attacker=units.get(a),target=units.get(t);scene.combat.attacks.set(attacker,target);attacker.attackTarget=target;}
+  if(scene.skillSystem)for(const unit of units.values())if(unit.definition.category==='character'){
+    const target=scene.combat.attacks.get(unit);unit.activitySkill=target?(unit.profession==='soldier'?'combat':target.definition.gameplay?.huntable?'hunting':'combat'):null;scene.skillSystem.refreshModifier(unit);
+  }
   scene.huntingSystem.target=units.get(state.commands.hunt)??null;scene.huntingSystem.repath=state.commands.huntRepath;
   scene.mountSystem.target=units.get(state.commands.mount)??null;scene.mountSystem.repath=state.commands.mountRepath;
   scene.treasureSystem.pending=state.commands.pendingChest;
   scene.animalSystem.nextId=state.counters.animal;scene.dropSystem.nextId=state.counters.drop;scene.treasureSystem.nextId=state.counters.chest;
   scene.gameTime.importState(state.time);scene.foodSystem.importState(state.food);scene.production.importState(state.production);
   scene.experienceSystem?.importState(state.experienceSystem);
+  scene.skillSystem?.importState(state.skillSystem);scene.workerSystem?.importState(state.population);
+  if(scene.workerSystem&&state.workers===undefined)scene.workerSystem.spawnInitial();
   scene.pathWear?.importState(state.pathWear);
   for(const t of state.spawners)scene.resourceSpawners.find(s=>s.definition.id===t.id).importState(t);
   scene.settingsPanel.applySettings(state.settings);scene.fog.setEnabled(state.settings.fogOfWar);

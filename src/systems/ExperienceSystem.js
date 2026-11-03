@@ -1,4 +1,4 @@
-import { createExperience,getXPRequired,totalXPForLevel,XP_REWARDS } from '../data/experience.js';
+import { createExperience,getXPRequired,checkProgressLevelUp,addProgressXP,XP_REWARDS } from '../data/experience.js';
 export { getXPRequired } from '../data/experience.js';
 export function importCharacterExperience(character,data){if(character.definition.category==='character')character.experience=data?structuredClone(data):createExperience(character.definition);}
 
@@ -13,26 +13,23 @@ export class ExperienceSystem {
     const reward=XP_REWARDS[event.type]?.[event.objectType];if(!reward)return 0;
     const quantity=event.type==='buildingCompleted'?(event.quantity??1):1;
     if(!Number.isSafeInteger(quantity)||quantity<1)return 0;
-    return this.addXP(event.actor,reward*quantity,{eventId:event.id,type:event.type,objectType:event.objectType});
+    const actor=event.actor,e=this.initialize(actor);if(!e?.enabled||actor.isAlive===false||!this.claimEvent(event.id))return 0;
+    const added=this.addXP(actor,reward*quantity,{type:event.type,objectType:event.objectType});
+    this.emit('activity',event,reward*quantity);return added;
   }
+  claimEvent(id){if(!id)return true;if(this.processed.has(id))return false;this.processed.add(id);return true;}
   addXP(character,amount,source=null){
     if(!character||!Number.isFinite(amount)||amount<=0)return 0;
     const e=this.initialize(character);if(!e||!e.enabled||character.isAlive===false)return 0;
-    const id=source?.eventId;if(id){if(this.processed.has(id))return 0;this.processed.add(id);}
-    if(e.level>=e.maxLevel)return 0;
-    const multiplier=e.gainMultiplier*Object.values(e.modifiers).reduce((factor,value)=>factor*value,1);
-    const accepted=Math.min(amount*multiplier,totalXPForLevel(e.maxLevel)-e.totalXP);if(accepted<=0||!Number.isFinite(accepted))return 0;
-    const oldLevel=e.level,oldTotal=e.totalXP;e.currentXP+=accepted;e.totalXP+=accepted;this.checkLevelUp(character);
-    const added=e.totalXP-oldTotal;this.emit('xp',character,added,{source,levelsGained:e.level-oldLevel});return added;
+    if(!this.claimEvent(source?.eventId))return 0;
+    const oldLevel=e.level,added=addProgressXP(e,amount,level=>this.emit('levelUp',character,level));
+    if(added)this.emit('xp',character,added,{source,levelsGained:e.level-oldLevel});return added;
   }
   checkLevelUp(character){
     const e=this.initialize(character);if(!e)return;
-    while(e.level<e.maxLevel&&e.currentXP>=getXPRequired(e.level)-1e-8){
-      e.currentXP=Math.max(0,e.currentXP-getXPRequired(e.level));e.level++;e.xpToNextLevel=e.level<e.maxLevel?getXPRequired(e.level):0;
-      if(e.level===e.maxLevel)e.currentXP=0;
-      e.totalXP=totalXPForLevel(e.level)+e.currentXP;this.emit('levelUp',character,e.level);
-    }
+    checkProgressLevelUp(e,level=>this.emit('levelUp',character,level));
   }
+  addTrackXP(track,amount,onLevel=()=>{}){return addProgressXP(track,amount,onLevel);}
   setModifier(character,key,multiplier){
     if(!key||['__proto__','constructor','prototype'].includes(key)||!Number.isFinite(multiplier)||multiplier<0)throw new TypeError('Neplatný XP modifikátor.');
     const e=this.initialize(character);if(e)e.modifiers[key]=multiplier;

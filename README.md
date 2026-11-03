@@ -17,6 +17,7 @@ Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3
 | ⚙ Settings | Zasouvací panel s přepínačem Fog of War. Volba se pamatuje mezi obnoveními stránky. |
 | Settings → Show Path Wear Debug | Barevně označí úrovně pěšin a ukáže skóre políčka pod myší. Funguje i s posunutou kamerou a zoomem. |
 | King / LVL / XP v horní liště | Otevře přehled krále: level, XP, HP, DPS a Armor. Samotné otevření přehledu nemění cíl pohybu. |
+| Levý klik na poddaného → Assign Job | Otevře jeho skilly a pracovní stav a umožní přiřadit právě jednu profesi. |
 | Levý klik na zvíře | Pronásleduje cíl a ze sousedního políčka zahájí souboj. Napadené zvíře se brání. |
 | Levý klik na maso | Dojde k balíčku a přidá jeho skutečné množství. Najeď myší pro údaj Meat ×N. |
 | Levý klik na truhlu | Dojde k sousednímu políčku a otevře ji. Take All převezme obsah a automaticky vybaví meč a brnění. |
@@ -67,9 +68,21 @@ Další úroveň vyžaduje `100 + 35 × (level − 1) + 4 × (level − 1)²` XP
 
 Zkušenosti patří konkrétní postavě a ukládají se společně se zpracovanými událostmi. Načtení nerozdává staré odměny znovu. Savy vytvořené před tímto rozšířením začnou na levelu 1 a zachovají ostatní herní stav.
 
+## Poddaní, skilly a profese
+
+Nová hra začíná se **třemi poddanými**. Každý další herní den může z dosažitelného okraje mapy přijít jeden nový obyvatel, dokud populace nedosáhne **20**. Příchozí fyzicky dojde do osady. Poddaní mají vlastní jména, HP, celkový level a šest nezávislých skillů: Woodcutting, Mining, Hunting, Construction, Farming a Combat. Všechny začínají na levelu 1; změna profese zkušenosti zachová.
+
+Klikni na postavu a použij **Assign Job**. Nezaměstnaní se procházejí po osadě. **Miner** hledá dosažitelné volné kameny, dojde k nim a těží do společného inventáře. **Hunter** pronásleduje zvěř, bojuje a sebere skutečně vytvořené maso. Pracovníci si rezervují cíle, takže dva nesbírají tentýž předmět. Při změně práce se rozpracovaný úkol bezpečně zruší bez odměny. Lovec pod 30 % HP přeruší útok, vrátí se domů a zotavuje se alespoň na 80 % HP.
+
+Woodcutter a Farmer zatím ukazují **Waiting for workplace**. Builder čeká na skutečnou výstavbu; dosavadní okamžité stavění králem funguje dál. Soldier stojí na stráži a sám nenapadá neutrální zvěř.
+
+Každý skill level nad 1 zvyšuje efektivitu příslušné činnosti o **1 %**, nejvýše na **149 %**. Mining zrychluje pracovní dobu, Hunting a Combat příslušné DPS. Nemění základní statistiky, pohyb ani množství surovin. Dokončená činnost přidá stejné základní XP do příslušného skillu i celkového postupu. Skutečné poškození rozvíjí Combat, nejvýše 40 základních XP na protivníka; tento přírůstek neduplikuje celkovou odměnu za lov.
+
+Pracovní AI funguje i mimo záběr kamery a pod Fog of War; skryté jednotky nemají viditelné panely ani efekty. Save/Load uchovává skilly, profese, pohyb, rozpracovanou práci a rezervace. Starší save zachová původní svět a XP, doplní nové skilly na level 1 a jednou přidá tři počáteční obyvatele.
+
 ## Přirozené pěšiny
 
-Každý skutečný vstup krále na travnaté políčko přidá jeden bod vyšlapání, na koni dva. Stání ani samotná zvířata skóre nemění; na střechách, překážkách a pod budovami se pěšiny nevytvářejí. Sdílený pohyb zaznamená i více překročených buněk za snímek a plynulé diagonály.
+Každý skutečný vstup lidské postavy na travnaté políčko přidá jeden bod vyšlapání, král na koni přidá dva. Stání ani samotná zvířata skóre nemění; na střechách, překážkách a pod budovami se pěšiny nevytvářejí. Sdílený pohyb zaznamená i více překročených buněk za snímek a plynulé diagonály.
 
 | Průchody | Povrch | Bonus rychlosti |
 |---|---|---|

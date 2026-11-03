@@ -5,20 +5,21 @@ export class CombatFeedback {
   hit(unit){if(!(unit.hitCooldown>0)){unit.hitFlash=110;unit.hitCooldown=350;}}
   update(delta){
     const s=this.scene,king=s.character;
-    for(const unit of [king,...s.animalSystem.animals.values()]){
+    for(const unit of [king,...s.animalSystem.animals.values(),...(s.workerSystem?.liveWorkers()??[])]){
       unit.hitFlash=Math.max(0,(unit.hitFlash??0)-delta);unit.hitCooldown=Math.max(0,(unit.hitCooldown??0)-delta);
       (unit===king?s.player:unit.view).setAlpha(unit.hitFlash>0?0.45:1);
     }
     const target=s.combat.attacks.get(king),attacking=!!target&&s.combat.canFight(king)&&inAttackRange(king,target,s.map);
     const direction=target?{x:target.position.x-king.position.x,y:target.position.y-king.position.y}:king.direction;
     s.player.setAttackPose?.(delta,attacking,direction);
+    for(const worker of s.workerSystem?.liveWorkers()??[]){const target=s.combat.attacks.get(worker),active=!!target&&s.combat.canFight(worker)&&inAttackRange(worker,target,s.map);worker.view.setAttackPose?.(delta,active,target?{x:target.position.x-worker.position.x,y:target.position.y-worker.position.y}:worker.direction);}
   }
   refresh(){
     const s=this.scene,king=s.character,output=document.querySelector('#king-health');
     const hp=king.currentHP>0?Math.max(.01,Math.round(king.currentHP*100)/100):0;
     const text=`HP: ${hp} / ${king.maxHP}`;if(output.textContent!==text)output.textContent=text;
     const progress=document.querySelector('#king-health-bar');progress.max=king.maxHP;progress.value=king.currentHP;
-    for(const animal of s.animalSystem.animals.values()){
+    for(const animal of [...s.animalSystem.animals.values(),...(s.workerSystem?.liveWorkers()??[])]){
       const fighting=s.combat.attacks.has(animal)||[...s.combat.attacks.values()].includes(animal);
       const visible=animal.isAlive&&!animal.mounted&&animal.view.visible&&(animal.currentHP<animal.maxHP-1e-9||fighting);
       let bar=this.bars.get(animal.id);

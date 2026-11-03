@@ -161,3 +161,9 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 .inventory .experience-status output { text-align:left; font-size:10px; color:#dfd8b6; font-weight:400; }
 #king-xp-bar { width:130px; height:7px; accent-color:#ceb56d; }
 #unit-xp-bar { width:100%; accent-color:#ceb56d; }
+.skill-row { display:grid; grid-template-columns:minmax(105px,1fr) 55px minmax(90px,1fr) 48px; gap:8px; align-items:center; padding:9px 0; border-bottom:1px solid #646344; font-size:12px; }
+.skill-row small { color:#c5c898; text-align:right; }
+#assign-job { margin-left:12px; padding:9px; font:inherit; background:#26321f; color:#ece2c4; border:1px solid #91835b; }
+#unit-work-state { color:#c8c5a1; font-size:13px; }
+#population-count { font-size:11px; color:#c4bf9c; }
+@media(max-width:440px) { .skill-row { grid-template-columns:minmax(95px,1fr) 52px 1fr; } .skill-row small { grid-column:3; } }
