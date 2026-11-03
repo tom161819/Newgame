@@ -52,6 +52,8 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
    - Fáze C: zásobování stavenišť, zemědělství a výroby.
    - Fáze D: UI, Save/Load, optimalizace a integrační testy.
    - Každou dokončenou a otestovanou fázi uložit samostatným commitem.
+2. **Po dokončení kroku 24:** [Master prompt 25–37 — 15 etap / 5 milníků](requests/master-25-37.md). Přesné pořadí a samostatné specifikace jsou v [roadmapě](UPGRADE_ROADMAP_25_37.md); stav v [progress](UPGRADE_PROGRESS.md). Každá etapa testy/opravit/build/Unreleased/commit, automaticky další. M1–M5 po release gate automatický MINOR, skutečný Git tag a neměnný archiv; uživatel tato vydání výslovně autorizoval bez dalšího potvrzení.
+3. **Až po celém masteru:** [Visual Polish & Art Pass](requests/visual-polish-art-pass.md), sekvenční fáze A–E (UI, terén, postavy, efekty stavby, budovy), testy/opravy/Changelog/commit po každé fázi, nakonec integrační testy a build.
 
 Předchozí fronta do kroku 19 včetně archivu 41 verzí byla dokončená a publikovaná (`e0c4f54`, Pages `41620923762`). Nové požadavky se dokončují v uvedeném pořadí, každý po ověření a nasazení před zahájením následujícího.
 
