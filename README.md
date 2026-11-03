@@ -15,6 +15,7 @@ Izometrická 2.5D strategická hra v JavaScriptu s **Phaser 4.2.1** a **Vite 8.3
 | Levý klik na koně | Dojde k pohybujícímu se koni a nasedne. Rychlost vzroste přesně na dvojnásobek. |
 | Dismount nebo H | Sesedne na volné sousední místo; stejný kůň se vrátí k putování. |
 | ⚙ Settings | Zasouvací panel s přepínačem Fog of War. Volba se pamatuje mezi obnoveními stránky. |
+| Settings → Show Path Wear Debug | Barevně označí úrovně pěšin a ukáže skóre políčka pod myší. Funguje i s posunutou kamerou a zoomem. |
 | Levý klik na zvíře | Pronásleduje cíl a ze sousedního políčka zahájí souboj. Napadené zvíře se brání. |
 | Levý klik na maso | Dojde k balíčku a přidá jeho skutečné množství. Najeď myší pro údaj Meat ×N. |
 | Levý klik na truhlu | Dojde k sousednímu políčku a otevře ji. Take All převezme obsah a automaticky vybaví meč a brnění. |
@@ -56,6 +57,19 @@ Settings nebo Game Menu → **Save Game** otevře seznam místních pozic. Lze v
 Save/Load zachovává logickou mapu, překážky, budovy a spojení hradeb, kameny, množství dropů, zvířata a jejich HP, obsah a vybrání truhly, inventář a vybavení. Obnovuje i probíhající krok, natočení, cíl, souboj, stejný osedlaný kůň, pobyt na plošině či rozpracované lezení, kameru, zoom, Fog of War, herní čas a zbytky časovačů. Načtení znovu negeneruje objekty ani příjem zlata za dokončený den. Doba se zavřenou hrou se nezapočítává.
 
 Data mají `saveVersion` a před nahrazením světa procházejí kontrolou. Poškozený save zobrazí chybu a ponechá současnou hru. Zápis do IndexedDB je atomický: při chybě zůstane předchozí save. Samotné ukládání a načítání již otevřené hry funguje i bez internetu; stažení hry při prvním otevření vyžaduje připojení.
+
+## Přirozené pěšiny
+
+Každý skutečný vstup krále na travnaté políčko přidá jeden bod vyšlapání, na koni dva. Stání ani samotná zvířata skóre nemění; na střechách, překážkách a pod budovami se pěšiny nevytvářejí. Sdílený pohyb zaznamená i více překročených buněk za snímek a plynulé diagonály.
+
+| Průchody | Povrch | Bonus rychlosti |
+|---|---|---|
+| 0–4 | Původní tráva | 0 % |
+| 5–14 | Sešlapaná tráva | +5 % |
+| 15–29 | Travnatohlinitá pěšina | +10 % |
+| 30+ | Hlinitá cesta | +15 % |
+
+Úseky se propojují se sousedy. Bonus platí pouze v právě procházeném políčku a násobí běžnou rychlost; kůň si zachová základní dvojnásobnou rychlost. Třetí herní den bez použití začne skóre klesat o pět a potom klesá o pět každý další den. Nový průchod tuto lhůtu odloží. Save/Load zachovává skóre, úroveň i den posledního průchodu; za zavřenou hru tráva navíc nedorůstá. Starší savy začnou s nevyšlapanou trávou.
 
 ## Hrad a hradby
 

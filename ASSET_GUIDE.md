@@ -1,6 +1,6 @@
 # Přidávání objektů a grafiky
 
-Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soubory v `public/assets/`; Vite je kopíruje do sestavení beze změny. Současná hra má sedmnáct typů: grass, dirt, stone, meat, gold, tower, castle, wall, king, rock_outcrop, rabbit, deer, wild_boar, horse, basic_sword, basic_armor a treasure_chest. Prázdné složky pro vodu, dřevo, železo, stromy a keře jsou příprava, nepřidávají nové herní mechaniky.
+Herní pravidla objektů jsou v `src/data/objects/`. Obrázky jsou vlastní soubory v `public/assets/`; Vite je kopíruje do sestavení beze změny. Současná hra má 21 typů, včetně čtyř povrchů pěšin: grass, dirt, stone, meat, gold, tower, castle, wall, king, rock_outcrop, rabbit, deer, wild_boar, horse, basic_sword, basic_armor, treasure_chest, grass_normal, grass_trampled_1, grass_trampled_2 a grass_trampled_3. Prázdné složky pro vodu, dřevo, železo, stromy a keře jsou příprava, nepřidávají nové herní mechaniky.
 
 ## Soubory a registr
 
@@ -151,6 +151,16 @@ Simulace používá skutečné `game.loop.rawDelta`; vyhlazené a ořezané Phas
 `MainMenu` spouští `GameScene` až po New Game nebo úspěšné validaci save. `GameApplication` spravuje stálé DOM nabídky a jediný `SaveGameManager`. IndexedDB `newgame-saves` obsahuje samostatné záznamy v úložišti `saves`; jeden atomický zápis uchovává metadata i stav. Potvrzení přepsání/smazání je součástí `SaveLoadMenu`. Nastavení a herní menu používají `PauseManager` s množinou důvodů.
 
 `serializeGameState(scene)` vrací pouze JSON data s `saveVersion`. `validateGameState` kontroluje verzi, rozměry mapy, definice, ID/reference, obsazení, rozsahy statistik a časovačů. `loadGameState` rekonstruuje instance a jejich vzájemné reference před prvním aktivním snímkem. Při obnovení se přeskočí všechny počáteční spawny; obsah truhly se nepřegeneruje. `Inventory`, čas, potrava, spawny, produkce a vybavení mají `exportState`/`importState`; serializace jednotek a příkazů převádí reference na ID. Nové trvalé vlastnosti přidej do DTO, validace, obnovy a testů v `tests/save-load.test.js`. Phaser GameObjects, textury a callbacky se nikdy neukládají.
+
+## Vyšlapávání terénu
+
+`src/data/pathWear.js` obsahuje prahy, rychlosti, dobu zarůstání a ID čtyř povrchů. `PathWearSystem` drží číselná pole skóre, úrovní a posledních průchodů pro 10 000 buněk a množinu aktivních buněk pro denní zarůstání. Při změně dne zpracuje pouze tuto množinu. Podklad `terrainGrid === 0` je nyní tráva; pro budoucí typy terénu lze předat `isGrass`.
+
+Sdílené `advanceMovement` dělí čas na hranicích skutečných logických buněk, respektuje rychlost aktuálního povrchu a volá `enteredTiles`. Diagonální překročení rohu nepočítá boční buňky a vysoká rychlost nevynechá navštívené buňky. Jednotky kategorie `character` na zemi vytvářejí pěšiny; vlastnost `gameplay.tramplesTerrain` může toto chování výslovně upravit. Stejný hook je připravený pro budoucí NPC; zvířata a volní koně ho nepoužívají. Při přidání NPC používej tentýž pohyb, nevytvářej druhé počítání průchodů.
+
+Registry povrchy `grass_normal`, `grass_trampled_1/2/3` používají vlastní SVG 64 × 32 a metadata barvy/šířky propojení. Obrázky lze vyměnit v definici bez změny pravidel. `TerrainRenderer` překreslí při změně úrovně jen dotčené bloky 10 × 10 a bloky sousedních spojů; ostatní změny skóre neinvalidují běžný terén. Neviditelné bloky čekají na příchod kamery. Debug používá jednu sdílenou vrstvu Graphics a výpis pod myší, nikoli tisíce textových objektů.
+
+Save data `pathWear` obsahují skóre, odvozené úrovně, den posledního průchodu a poslední zpracovaný den. Import nevyvolává průchody ani denní události. Nepřítomná položka ve starším save bezpečně obnoví nuly. Při změně prahů v budoucí verzi doplň migraci odvozených úrovní.
 
 `stats.hpRegenPerSecond` je univerzální vlastnost: King má 0.2, ostatní typy výchozí 0. `RegenerationSystem` nehojí mrtvé a omezí HP maximem. Během DPS souboje se regenerace integruje současně s příchozím poškozením; CombatSystem vrací pokryté časy jednotek, aby se zbytek snímku nevynechal ani neléčil dvakrát. Výsledek tak odpovídá i různému FPS a smrti útočníka uvnitř časového kroku.
 

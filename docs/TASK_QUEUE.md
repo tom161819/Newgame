@@ -20,7 +20,7 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 ## Následuje
 
-1. **Právě probíhá:** [Krok 12 — dynamické vyšlapávání cest](requests/step-12.md).
+1. **Dokončeno v této verzi, ověřuje se nasazení:** [Krok 12 — dynamické vyšlapávání cest](requests/step-12.md). 90 testů; skutečné průchody, prahy 5/15/30, koně, povrchy a debug, zarůstání a Save/Load včetně skutečného save předchozí verze ověřeny.
 4. [Krok 13 — univerzální XP a levely 1–50](requests/step-13.md).
 5. [Krok 14 — individuální skilly a profese poddaných](requests/step-14.md).
 6. [Krok 15 — přirozené talenty a mzdy](requests/step-15.md).

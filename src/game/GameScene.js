@@ -37,6 +37,7 @@ import { TreasurePanel } from '../ui/TreasurePanel.js';
 import { ChestView } from './ChestView.js';
 import { PauseManager } from '../systems/PauseManager.js';
 import { loadGameState } from '../systems/GameStateLoader.js';
+import { PathWearSystem } from '../systems/PathWearSystem.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -65,6 +66,7 @@ export class GameScene extends Phaser.Scene {
     this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
     this.inventory=new Inventory();
     this.gameTime=new GameTimeSystem();this.regeneration=new RegenerationSystem();
+    this.pathWear=new PathWearSystem({map:this.map,terrain:this.terrainGrid,time:this.gameTime});this.terrain.setPathWear(this.pathWear);
     this.pauseManager=new PauseManager(this);
     this.noticeRemaining=0;document.querySelector('#day-notice').hidden=true;
     this.resources=new Map();this.stones=this.resources; // Kompatibilní označení původního seznamu kamenů.
@@ -102,8 +104,9 @@ export class GameScene extends Phaser.Scene {
     this.combat.on('damage',unit=>this.combatFeedback.hit(unit));
     this.combat.on('death',unit=>this.onUnitDeath(unit));
     this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
-    this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.refreshVisibility();},open=>this.pauseManager.set('settings',open));
+    this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.terrain.setDebug(settings.pathWearDebug);this.refreshVisibility();},open=>this.pauseManager.set('settings',open));
     this.fog.setEnabled(this.settingsPanel.settings.fogOfWar);
+    this.terrain.setDebug(this.settingsPanel.settings.pathWearDebug);
     this.foodSystem=new FoodSystem(this.inventory,this.objectRegistry.require('meat'),()=>this.updateInventory());
     this.inventoryBar=new InventoryBar(this.objectRegistry,this.assets,this.inventory);
     this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
@@ -141,6 +144,7 @@ export class GameScene extends Phaser.Scene {
       this.clearWallPreviews();
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
       this.equipmentPanel.destroy();this.treasurePanel.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
+      this.pathWear.destroy();this.terrain.destroy();
       this.game.events.off(Phaser.Core.Events.PAUSE,onBackground);this.game.events.off(Phaser.Core.Events.RESUME,onForeground);
       this.game.canvas.style.cursor='';
     });
@@ -164,6 +168,10 @@ export class GameScene extends Phaser.Scene {
   reservedTiles(){return [...this.character.reservedTiles(),...(this.animalSystem?.reservedTiles()??[])];}
   updateHover(pointer){
     const tooltip=document.querySelector('#object-tooltip');
+    const wearInfo=document.querySelector('#path-wear-info');wearInfo.hidden=!this.settingsPanel.settings.pathWearDebug;
+    if(!wearInfo.hidden){const tile=this.pointerTile(pointer),grass=this.pathWear.isGrass(tile),score=grass?this.pathWear.scores[this.pathWear.index(tile)]:0;
+      const text=grass?`Path Wear (${tile.x}, ${tile.y}): ${score} · Level ${this.pathWear.level(tile)}`:'Path Wear: mimo travnatý povrch';if(wearInfo.textContent!==text)wearInfo.textContent=text;
+    }
     if(this.buildMode||document.querySelector('dialog[open]')){tooltip.hidden=true;return;}
     pointer.updateWorldPoint(this.cameras.main);
     const drop=this.dropSystem.atPoint(pointer.worldX,pointer.worldY);
@@ -260,6 +268,7 @@ export class GameScene extends Phaser.Scene {
 
   createBuildingView(definition,building,preview=false) {
     const object={...building,type:definition.id,definition,tiles:building.tiles??buildingTiles(building,definition)};
+    if(!preview)this.terrain.invalidateArea(object.tiles);
     return this.assets.createView(definition.id,{building:object,preview});
   }
   towerAtPoint(x,y,tile) {
@@ -410,6 +419,7 @@ export class GameScene extends Phaser.Scene {
     if(this.buildMode&&!document.querySelector('dialog[open]')){if(this.previewTracking)this.previewAnchor=this.pointerTile(this.input.activePointer);this.updateBuildingPreview();}
   }
   refreshVisibility(){
+    document.querySelector('#path-wear-info').hidden=!this.settingsPanel.settings.pathWearDebug;
     this.fog.update();this.updateMountUI();this.terrain.update(this.cameras.main,this.fog);
     const view=this.cameras.main.worldView;
     this.dropSystem.update(view,this.fog);

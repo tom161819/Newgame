@@ -78,10 +78,10 @@ test('mounted movement remains normalized and horses cannot be hunted',()=>{
 
 test('settings persist the FoW toggle, retain other fields and tolerate unavailable or malformed storage',()=>{
   const values=new Map(),storage={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,v)};
-  assert.deepEqual(readSettings(storage),{fogOfWar:false});
+  assert.deepEqual(readSettings(storage),{fogOfWar:false,pathWearDebug:false});
   storage.setItem('newgame.settings',JSON.stringify({futureSetting:42}));saveSettings(storage,{fogOfWar:true});
-  assert.deepEqual(readSettings(storage),{fogOfWar:true});assert.equal(JSON.parse(storage.getItem('newgame.settings')).futureSetting,42);
-  saveSettings(storage,{fogOfWar:false});assert.deepEqual(readSettings(storage),{fogOfWar:false});
-  storage.setItem('newgame.settings','invalid');assert.deepEqual(readSettings(storage),{fogOfWar:false});
-  assert.deepEqual(readSettings(undefined),{fogOfWar:false});assert.doesNotThrow(()=>saveSettings(undefined,{fogOfWar:true}));
+  assert.deepEqual(readSettings(storage),{fogOfWar:true,pathWearDebug:false});assert.equal(JSON.parse(storage.getItem('newgame.settings')).futureSetting,42);
+  saveSettings(storage,{fogOfWar:false,pathWearDebug:false});assert.deepEqual(readSettings(storage),{fogOfWar:false,pathWearDebug:false});
+  storage.setItem('newgame.settings','invalid');assert.deepEqual(readSettings(storage),{fogOfWar:false,pathWearDebug:false});
+  assert.deepEqual(readSettings(undefined),{fogOfWar:false,pathWearDebug:false});assert.doesNotThrow(()=>saveSettings(undefined,{fogOfWar:true}));
 });

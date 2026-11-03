@@ -14,6 +14,7 @@ import { GameTimeSystem } from '../src/systems/GameTimeSystem.js';
 import { ProductionSystem } from '../src/systems/ProductionSystem.js';
 import { FoodSystem } from '../src/systems/FoodSystem.js';
 import { CombatSystem } from '../src/systems/CombatSystem.js';
+import { PathWearSystem } from '../src/systems/PathWearSystem.js';
 import { ResourceSpawner } from '../src/game/stones.js';
 import { placeBuilding } from '../src/game/buildings.js';
 import { wallIndex,connectionsFor } from '../src/game/walls.js';
@@ -40,6 +41,7 @@ function scene(terrain=Array.from({length:100},()=>Array(100).fill(0))){
   };
   s.player=view('king',tileCenter({x:50,y:50}));s.character=new PlayerController(s,s.player,{x:50,y:50});
   s.gameTime=new GameTimeSystem();s.foodSystem=new FoodSystem(s.inventory,objectRegistry.require('meat'));
+  s.pathWear=new PathWearSystem({map:s.map,terrain:s.terrainGrid,time:s.gameTime});
   s.equipment=new EquipmentSystem(s.character,objectRegistry,s.inventory);s.production=new ProductionSystem(s.gameTime,s.inventory,()=>s.buildings);
   s.animalSystem=new AnimalSystem(s);s.dropSystem=new DropSystem(s);s.treasureSystem=new TreasureSystem(s);
   s.huntingSystem={target:null,repath:0};s.mountSystem={target:null,repath:0};s.combat=new CombatSystem();
@@ -120,4 +122,14 @@ test('central pause retains independent menu/settings reasons and resumes only a
   const calls=[],manager=new PauseManager({setPaused:value=>calls.push(value)});
   manager.set('settings',true);manager.set('menu',true);manager.set('settings',false);assert.equal(manager.paused,true);
   manager.set('menu',false);assert.equal(manager.paused,false);assert.deepEqual(calls,[true,true,true,false]);
+});
+
+test('wear scores, levels and last passage survive world save/load; old saves default to untouched grass',()=>{
+  const s=fixture();for(let i=0;i<16;i++)s.pathWear.enter(s.character,{x:55,y:55});
+  const data=serializeGameState(s),r=restore(data);assert.deepEqual(r.pathWear.exportState(),s.pathWear.exportState());assert.equal(r.pathWear.level({x:55,y:55}),2);
+  for(const corrupt of [s=>s.pathWear.scores.pop(),s=>s.pathWear.levels[5555]=3,s=>s.pathWear.lastPassDays[5555]=999,s=>s.pathWear.lastDecayDay=999]){
+    const bad=structuredClone(data);corrupt(bad);assert.throws(()=>validateGameState(bad));
+  }
+  const legacy=structuredClone(data);delete legacy.pathWear;delete legacy.settings.pathWearDebug;
+  const old=restore(legacy);assert.ok(old.pathWear.scores.every(n=>n===0));assert.equal(old.gameTime.day,data.time.day);
 });

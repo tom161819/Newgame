@@ -21,7 +21,7 @@
         <span class="food-status"><output id="food-countdown">Food: 01:00</output><small id="food-warning">Out of food</small></span>
         <span id="game-time" class="game-time">Day 1</span><div id="equipment-summary" aria-label="Equipment"></div>
       </section>
-      <div class="camera-controls"><span id="camera-mode">Kamera sleduje krále</span><span id="vision-status">Fog of War: OFF</span><button id="dismount" type="button" hidden>Dismount · H</button><button id="follow-king" type="button">Na krále · mezerník</button></div>
+      <div class="camera-controls"><span id="camera-mode">Kamera sleduje krále</span><span id="path-wear-info" hidden></span><span id="vision-status">Fog of War: OFF</span><button id="dismount" type="button" hidden>Dismount · H</button><button id="follow-king" type="button">Na krále · mezerník</button></div>
       <div id="game" aria-label="Izometrická herní mapa 100 × 100 políček"></div>
       <footer><span><i class="player-key"></i> Král</span><span><i class="wall-key"></i> Překážka</span><span><i class="stone-key"></i> Kámen</span><span>WASD / šipky: kamera · kolečko: zoom</span></footer>
       <p id="status" role="status">Vyber kámen nebo volné políčko.</p>
@@ -41,6 +41,8 @@
       <div class="settings-heading"><h2 id="settings-title">Settings</h2><button id="close-settings" type="button" aria-label="Zavřít nastavení">×</button></div>
       <label class="setting-row" for="fog-toggle"><span>Fog of War</span><input id="fog-toggle" type="checkbox" role="switch" /></label>
       <p>Omezí viditelnost objektů podle dohledu krále. Terén zůstává viditelný.</p>
+      <label class="setting-row" for="path-wear-toggle"><span>Show Path Wear Debug</span><input id="path-wear-toggle" type="checkbox" role="switch" /></label>
+      <p>Barvy vyšlapání a počet průchodů pod ukazatelem myši.</p>
       <nav class="settings-actions" aria-label="Herní menu"><button type="button" data-game-menu="save">Save Game</button><button type="button" data-game-menu="load">Load Game</button><button type="button" data-game-menu="main">Main Menu</button></nav>
     </aside>
     <dialog id="asset-gallery" aria-labelledby="asset-gallery-title">

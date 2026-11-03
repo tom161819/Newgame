@@ -1,6 +1,7 @@
 import { objectRegistry } from './ObjectRegistry.js';
 import { DAY_DURATION } from './GameTimeSystem.js';
 import { COLUMNS,ROWS } from '../game/config.js';
+import { wearLevel } from '../data/pathWear.js';
 
 export const SAVE_VERSION=1;
 const copy=value=>value==null?null:structuredClone(value);
@@ -21,6 +22,7 @@ export function serializeGameState(scene){
   const c=scene.character,camera=scene.cameras.main;
   return {
     saveVersion:SAVE_VERSION,terrain:scene.terrainGrid.map(row=>[...row]),
+    ...(scene.pathWear?{pathWear:scene.pathWear.exportState()}:{}),
     player:{...serializeActor(c),state:c.state,currentTowerId:c.currentTower?.id??null,horseId:c.mountedHorse?.id??null,
       exitTile:point(c.exitTile),order:serializeOrder(c.order),
       roofContinuation:c.roofContinuation?{...copy({...c.roofContinuation,order:null}),order:serializeOrder(c.roofContinuation.order)}:null,
@@ -103,8 +105,13 @@ export function validateGameState(input,registry=objectRegistry){
   const spawnIds=new Set();for(const t of s.spawners){const d=definition(t.id,'resource');check(d.spawn&&!spawnIds.has(t.id));spawnIds.add(t.id);number(t.elapsed,0,d.spawn.interval-1e-7);}
   check(registry.byCategory('resource').filter(d=>d.spawn).every(d=>spawnIds.has(d.id)));
   integer(s.production?.lastProcessedDay,1,s.time.day);
+  if(s.pathWear){
+    const w=s.pathWear;for(const key of ['scores','levels','lastPassDays']){array(w[key],COLUMNS*ROWS);check(w[key].length===COLUMNS*ROWS);}
+    integer(w.lastDecayDay,1,s.time.day);
+    for(let i=0;i<COLUMNS*ROWS;i++){integer(w.scores[i]);integer(w.levels[i],0,3);integer(w.lastPassDays[i],0,s.time.day);check(w.levels[i]===wearLevel(w.scores[i]));if(w.scores[i])check(w.lastPassDays[i]>0);}
+  }
   number(s.camera?.zoom,.45,1.8);number(s.camera.x,-1e6,1e6);number(s.camera.y,-1e6,1e6);check(typeof s.camera.following==='boolean');
-  check(typeof s.settings?.fogOfWar==='boolean');const c=s.commands;check(c);check(c.hunt==null||aIds.has(c.hunt));check(c.mount==null||aIds.has(c.mount));
+  check(typeof s.settings?.fogOfWar==='boolean');if(s.settings.pathWearDebug!==undefined)check(typeof s.settings.pathWearDebug==='boolean');const c=s.commands;check(c);check(c.hunt==null||aIds.has(c.hunt));check(c.mount==null||aIds.has(c.mount));
   number(c.huntRepath,-1e9,1e9);number(c.mountRepath,-1e9,1e9);check(c.pendingChest==null||cIds.has(c.pendingChest));array(c.attacks,1000);
   for(const pair of c.attacks){array(pair,2);check(pair.length===2&&pair[0]!==pair[1]&&pair.every(id=>id==='king'||aIds.has(id)));}
   for(const [key,objects,prefix]of [['animal',s.animals,'animal'],['drop',s.drops,'drop'],['chest',s.chests,'treasure']]){

@@ -69,8 +69,10 @@ export function loadGameState(scene,input){
   scene.treasureSystem.pending=state.commands.pendingChest;
   scene.animalSystem.nextId=state.counters.animal;scene.dropSystem.nextId=state.counters.drop;scene.treasureSystem.nextId=state.counters.chest;
   scene.gameTime.importState(state.time);scene.foodSystem.importState(state.food);scene.production.importState(state.production);
+  scene.pathWear?.importState(state.pathWear);
   for(const t of state.spawners)scene.resourceSpawners.find(s=>s.definition.id===t.id).importState(t);
   scene.settingsPanel.applySettings(state.settings);scene.fog.setEnabled(state.settings.fogOfWar);
+  scene.terrain?.setDebug(!!state.settings.pathWearDebug);
   scene.updateInventory();scene.worldCamera.syncSize?.();
   const camera=scene.cameras.main;camera.setZoom(state.camera.zoom).centerOn(state.camera.x,state.camera.y);camera.preRender();
   scene.worldCamera.following=state.camera.following;

@@ -1,6 +1,8 @@
 import { COLUMNS, ROWS } from './config.js';
 import { tileCenter, worldToGrid, gridToWorld } from './isometric.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
+import { PATH_WEAR } from '../data/pathWear.js';
+import { canStep } from './pathfinding.js';
 
 const CHUNK_SIZE = 10;
 
@@ -13,29 +15,60 @@ export class TerrainRenderer {
     this.tiles = new Map(); this.wallPool = [];
     this.chunks = new Map(); this.chunkPool = [];
     this.lastView = '';
+    this.dirtyChunks=new Set();this.debugEnabled=false;this.debugGraphics=scene.add.graphics().setDepth(-99);
+    for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);
     this.createTextures();
     this.outcrop=registry.require('rock_outcrop');
     this.wallTexture=assets?.textureFor(this.outcrop.id,'terrain-wall')??'terrain-wall';
+    this.wearTextures=PATH_WEAR.terrainIds.map(id=>({key:assets?.hasTexture(id)?assets.textureKey(id):this.groundTextures[0].key}));
+  }
+
+  setPathWear(system){this.wear=system;this.unsubscribeWear=system.subscribe(tile=>this.invalidateArea([tile]));}
+  setDebug(value){this.debugEnabled=!!value;this.lastView='';if(!value)this.debugGraphics.clear();}
+  invalidateArea(tiles){
+    for(const tile of tiles)for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+      const x=tile.x+dx,y=tile.y+dy;if(x>=0&&x<COLUMNS&&y>=0&&y<ROWS)this.dirtyChunks.add(`${Math.floor(x/CHUNK_SIZE)},${Math.floor(y/CHUNK_SIZE)}`);
+    }
+    this.lastView='';
+  }
+  drawConnections(context,x,y,left,top){
+    const tile={x,y},level=this.wear?.level(tile)??0;if(!level)return;
+    const visual=this.registry.require(PATH_WEAR.terrainIds[level]).visual,center=tileCenter(tile);
+    context.save();context.translate(center.x-left,center.y-top);
+    context.beginPath();context.moveTo(-32,0);context.lineTo(0,-16);context.lineTo(32,0);context.lineTo(0,16);context.closePath();context.clip();context.scale(1,.5);context.lineCap='round';
+    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+      if(!dx&&!dy)continue;const neighbor={x:x+dx,y:y+dy},other=this.wear.level(neighbor);
+      if(!other||!canStep(this.scene.map,tile,neighbor))continue;
+      const neighborVisual=this.registry.require(PATH_WEAR.terrainIds[other]).visual,width=Math.min(visual.pathWidth,neighborVisual.pathWidth);
+      const end={x:(dx-dy)*16,y:(dx+dy)*16},bend=((terrainHash(x+dx,y+dy)%5)-2)*.35;
+      const line=()=>{context.beginPath();context.moveTo(0,0);context.quadraticCurveTo(end.x*.5+bend,end.y*.5-bend,end.x,end.y);context.stroke();};
+      context.strokeStyle=visual.pathEdge;context.lineWidth=width+3;context.globalAlpha=.6;line();
+      context.strokeStyle=visual.pathColor;context.lineWidth=width;context.globalAlpha=1;line();
+    }
+    context.restore();
   }
 
   chunkTexture(cx, cy) {
     const key = `terrain-chunk-${cx}-${cy}`;
     const origin = gridToWorld(cx * CHUNK_SIZE, cy * CHUNK_SIZE);
     const left = origin.x - CHUNK_SIZE * 32;
-    if (!this.scene.textures.exists(key)) {
+    if (!this.scene.textures.exists(key)||this.dirtyChunks.has(`${cx},${cy}`)) {
       // Sto statických diamantů se jednou složí do jedné textury. Při posouvání
       // kamery se pak kreslí desítky bloků, ne tisíce samostatných obrázků.
-      const texture = this.scene.textures.createCanvas(key, CHUNK_SIZE * 64, CHUNK_SIZE * 32);
+      const texture = this.scene.textures.exists(key)?this.scene.textures.get(key):this.scene.textures.createCanvas(key, CHUNK_SIZE * 64, CHUNK_SIZE * 32);
       const context = texture.getContext();
+      context.clearRect(0,0,texture.width,texture.height);
       for (let y = cy * CHUNK_SIZE; y < (cy + 1) * CHUNK_SIZE; y++) {
         for (let x = cx * CHUNK_SIZE; x < (cx + 1) * CHUNK_SIZE; x++) {
           const point = tileCenter({ x, y });
-          const entry=this.groundTextures[terrainHash(x,y)%this.groundTextures.length];
+          const entry=this.wear?this.wearTextures[this.wear.level({x,y})]:this.groundTextures[terrainHash(x,y)%this.groundTextures.length];
           const frame=this.scene.textures.get(entry.key).get(entry.frame);
           context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,point.x-left-32,point.y-origin.y-16,64,32);
+          if(this.wear)this.drawConnections(context,x,y,left,origin.y);
         }
       }
       texture.refresh();
+      this.dirtyChunks.delete(`${cx},${cy}`);
     }
     return { key, x: left, y: origin.y };
   }
@@ -78,9 +111,10 @@ export class TerrainRenderer {
 
   update(camera,fog=null) {
     const view = camera.worldView;
-    const cacheKey = [Math.floor(view.x / 16), Math.floor(view.y / 16), Math.ceil(view.width), Math.ceil(view.height),fog?.signature??''].join(',');
+    const cacheKey = [Math.floor(view.x / 16), Math.floor(view.y / 16), Math.ceil(view.width), Math.ceil(view.height),fog?.signature??'',this.wear?.levelRevision??0,this.debugEnabled?this.wear?.revision:0,this.debugEnabled].join(',');
     if (cacheKey === this.lastView) return;
     this.lastView = cacheKey;
+    this.debugGraphics.clear();
     const padding = 100;
     const corners = [[view.x-padding,view.y-padding],[view.right+padding,view.y-padding],
       [view.x-padding,view.bottom+padding],[view.right+padding,view.bottom+padding]].map(([x,y])=>worldToGrid(x,y));
@@ -94,6 +128,10 @@ export class TerrainRenderer {
       const p=tileCenter({x,y});
       if(p.x<view.x-padding||p.x>view.right+padding||p.y<view.y-padding||p.y>view.bottom+padding)continue;
       visibleCount++;
+      if(this.debugEnabled&&this.wear?.isGrass({x,y})&&(!fog||fog.isVisibleTile({x,y}))){
+        const colors=[0x87a18a,0xc6cf75,0xdfac67,0xe38b57],level=this.wear.level({x,y});
+        this.debugGraphics.fillStyle(colors[level],level ? .36 : .08);this.debugGraphics.fillPoints([{x:p.x-31,y:p.y},{x:p.x,y:p.y-15},{x:p.x+31,y:p.y},{x:p.x,y:p.y+15}],true);
+      }
       neededChunks.add(`${Math.floor(x/CHUNK_SIZE)},${Math.floor(y/CHUNK_SIZE)}`);
       if (!this.map[y][x]) continue;
       if(fog&&!fog.isVisibleTile({x,y}))continue;
@@ -110,12 +148,13 @@ export class TerrainRenderer {
     for (const [key, chunk] of this.chunks) if (!neededChunks.has(key)) {
       chunk.setVisible(false); this.chunkPool.push(chunk); this.chunks.delete(key);
     }
-    for (const key of neededChunks) if (!this.chunks.has(key)) {
+    for (const key of neededChunks) if (!this.chunks.has(key)||this.dirtyChunks.has(key)) {
       const [cx,cy] = key.split(',').map(Number), texture = this.chunkTexture(cx,cy);
-      const image = this.chunkPool.pop() ?? this.scene.add.image(0,0,texture.key).setOrigin(0,0).setDepth(-100);
+      const image = this.chunks.get(key)??this.chunkPool.pop() ?? this.scene.add.image(0,0,texture.key).setOrigin(0,0).setDepth(-100);
       image.setTexture(texture.key).setPosition(texture.x,texture.y).setVisible(true);
       this.chunks.set(key,image);
     }
     this.visibleCount=visibleCount;
   }
+  destroy(){this.unsubscribeWear?.();this.debugGraphics.destroy();}
 }
