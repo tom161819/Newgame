@@ -14,7 +14,7 @@ export class ConstructionSystem {
   }
   plan(building){
     if(building.construction)return building;
-    building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;initializeConstructionSite(building);this.sites.set(building.id,building);this.revision++;return building;
+    building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;initializeConstructionSite(building);for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.revision++;return building;
   }
   actor(id){return id==='king'?this.scene.character:this.scene.workerSystem.workers.get(id);}
   slotKey(goal){return `construction-slot:${tileKey(goal)}`;}
@@ -70,6 +70,7 @@ export class ConstructionSystem {
   finish(site){
     const c=site.construction;if(!this.sites.has(site.id)||c.rewardsGranted||c.workDone<c.requiredWork)return false;
     c.state='complete';c.progress=100;c.rewardsGranted=true;
+    if(buildingDefinition(site).walkable)for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=0;
     for(const id of [...c.assignedBuilders]){const actor=this.actor(id);if(!actor)continue;if(id==='king')this.stopKing();else{this.scene.workerSystem.ai.cancel(actor);actor.workState='Searching for Work';actor.aiCooldown=0;}}
     c.assignedBuilders=[];this.sites.delete(site.id);this.revision++;
     const contributors=Object.entries(c.contributions).filter(([,work])=>work>0),total=contributors.reduce((sum,[,work])=>sum+work,0);let allocated=0;

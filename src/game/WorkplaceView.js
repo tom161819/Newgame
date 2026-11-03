@@ -24,7 +24,7 @@ export class WorkplaceView {
       for(let z=12;z<height;z+=12){g.lineStyle(1,0x524f3e,.45);g.lineBetween(e.x,e.y-z,c.x,c.y-z);g.lineBetween(c.x,c.y-z,b.x,b.y-z);}
       const near=point(x+w/2,y+h-.1,roof),far=point(x+w/2,y+.1,roof);
       polygon(g,tint??0xa29676,[raise(e),near,raise(c)]);polygon(g,tint??0x80795f,[raise(a),far,raise(b)]);
-      polygon(g,tint??(d.id==='barracks'?0x675748:0x98724b),[raise(e),near,far,raise(a)]);polygon(g,tint??(d.id==='barracks'?0x494d44:0x654e35),[near,raise(c),raise(b),far]);
+      polygon(g,tint??(d.id==='barracks'?0x675748:d.id==='farmhouse'?0xc3a25a:0x98724b),[raise(e),near,far,raise(a)]);polygon(g,tint??(d.id==='barracks'?0x494d44:d.id==='farmhouse'?0x92733c:0x654e35),[near,raise(c),raise(b),far]);
       const door=point(x+w*.65,y+h-.1);g.fillStyle(0x393a2b);g.fillRect(door.x-10,door.y-32,20,32);g.lineStyle(1,0xc4a66a);g.lineBetween(door.x,door.y-30,door.x,door.y);
       if(d.id==='barracks'){const p=point(x+w*.6,y+h*.6,roof);g.lineStyle(2,0xb9a268);g.lineBetween(p.x,p.y,p.x,p.y-30);polygon(g,tint??0x9d4e3b,[{x:p.x,y:p.y-30},{x:p.x+25,y:p.y-22},{x:p.x,y:p.y-15}]);}
     }

@@ -3,4 +3,5 @@ export const WORKPLACES=Object.freeze({
   quarry:Object.freeze({capacity:3,profession:'miner',skill:'mining'}),
   hunting_lodge:Object.freeze({capacity:2,profession:'hunter',skill:'hunting'}),
   barracks:Object.freeze({capacity:5,profession:'soldier',skill:'combat'}),
+  farmhouse:Object.freeze({capacity:3,profession:'farmer',skill:'farming'}),
 });

@@ -8,7 +8,7 @@ export class HumanView extends Phaser.GameObjects.Container {
     this.shadow=scene.add.ellipse(0,1,23,10,0x26301e,.25);
     this.leftLeg=scene.add.rectangle(-3,-5,4,11,0x454334);this.rightLeg=scene.add.rectangle(3,-5,4,11,0x454334);
     this.body=scene.add.graphics();this.arms=[scene.add.rectangle(-7,-21,4,14,0xc6a37d),scene.add.rectangle(7,-21,4,14,0xc6a37d)];
-    this.weapon=scene.add.graphics().setVisible(false);this.add([this.shadow,this.leftLeg,this.rightLeg,this.body,...this.arms,this.weapon]);this.paint();
+    this.weapon=scene.add.graphics().setVisible(false);this.tool=scene.add.graphics().setVisible(false);this.add([this.shadow,this.leftLeg,this.rightLeg,this.body,...this.arms,this.weapon,this.tool]);this.paint();
   }
   paint(){
     const pose=DIRECTION_POSES[this.facing],g=this.body.clear(),width=pose.profile?4:6,hx=pose.screenX;
@@ -28,5 +28,11 @@ export class HumanView extends Phaser.GameObjects.Container {
     this.weapon.setVisible(active);if(!active)return;const face=directionName(direction);if(face&&face!==this.facing){this.facing=face;this.paint();}
     this.attackPhase=(this.attackPhase??0)+delta*.011;const pose=DIRECTION_POSES[this.facing],swing=Math.sin(this.attackPhase)*7;
     this.weapon.clear().lineStyle(3,0x82704e).lineBetween(6,-21,6+pose.screenX*18+swing,-26+pose.screenY*11-Math.abs(swing));
+  }
+  setWorkPose(delta,active){
+    this.tool.setVisible(active);if(!active)return;
+    this.workPhase=(this.workPhase??0)+delta*.008;const swing=Math.sin(this.workPhase),x=11+swing*5,y=-14+Math.abs(swing)*7;
+    this.arms[0].rotation=-.5+swing*.3;this.arms[1].rotation=-.6+swing*.4;
+    this.tool.clear().lineStyle(2,0x9e814e).lineBetween(6,-26,x+8,y+7).lineStyle(4,0x8e9586).lineBetween(x+3,y+4,x+11,y+4);
   }
 }

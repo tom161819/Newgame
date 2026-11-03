@@ -47,6 +47,10 @@ export function validateDefinition(definition) {
   if (d.renderer==='fortification'&&(!finite(d.visual?.wallHeight)||d.visual.wallHeight<=0)) fail(id, 'opevnění vyžaduje kladnou výšku stěn.');
   if(d.workplace!==undefined&&(!plainObject(d.workplace)||d.category!=='building'||!Number.isSafeInteger(d.workplace.capacity)||d.workplace.capacity<1
     ||!Object.hasOwn(JOBS,d.workplace.profession)||!SKILL_IDS.includes(d.workplace.skill)||JOBS[d.workplace.profession].skill!==d.workplace.skill))fail(id,'neplatné pracoviště.');
+  if(d.crop!==undefined&&(!plainObject(d.crop)||d.category!=='building'||!d.walkable||typeof d.crop.resource!=='string'||!finite(d.crop.growthDays)||d.crop.growthDays<=0
+    ||!Number.isSafeInteger(d.crop.yield)||d.crop.yield<=0||!finite(d.crop.workDuration)||d.crop.workDuration<=0||!Array.isArray(d.crop.stages)||d.crop.stages.length!==4))fail(id,'neplatné pěstování plodin.');
+  if(d.workRadius!==undefined&&(!finite(d.workRadius)||d.workRadius<=0))fail(id,'neplatný pracovní rádius.');
+  if(d.edible!==undefined&&(d.category!=='resource'||typeof d.edible!=='boolean'))fail(id,'neplatné označení potraviny.');
   if(['character','animal'].includes(d.category)&&d.stats===undefined)fail(id,'živá jednotka vyžaduje bojové statistiky.');
   if (d.stats !== undefined && (!plainObject(d.stats) || !['maxHP','attackDPS','armor','attackRange'].every(key=>finite(d.stats[key]))
     || d.stats.maxHP<=0 || d.stats.attackDPS<0 || d.stats.armor<0 || d.stats.armor>90 || d.stats.attackRange<0)) fail(id, 'neplatné bojové statistiky.');
@@ -98,7 +102,7 @@ export class ObjectRegistry {
     }
     const known=new Map([...this.definitions,...pending]);
     for(const definition of pending.values()){
-      for(const id of [...Object.keys(definition.cost),...(definition.production?[definition.production.resource]:[])])
+      for(const id of [...Object.keys(definition.cost),...(definition.production?[definition.production.resource]:[]),...(definition.crop?[definition.crop.resource]:[])])
         if(known.get(id)?.category!=='resource')fail(definition.id,`neznámá surovina ${id}.`);
       for(const id of definition.treasure?.equipment??[])if(known.get(id)?.category!=='equipment')fail(definition.id,`neznámé vybavení ${id}.`);
     }

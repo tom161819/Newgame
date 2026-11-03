@@ -28,7 +28,7 @@ export function loadGameState(scene,input){
   scene.inventory.importState(state.inventory);
   for(const data of state.buildings){
     const definition=scene.objectRegistry.require(data.type),building={...data,definition,tiles:buildingTiles(data,definition)};
-    for(const t of building.tiles)scene.map[t.y][t.x]=definition.walkable?0:1;
+    for(const t of building.tiles)scene.map[t.y][t.x]=definition.walkable&&(!building.construction||building.construction.state==='complete')?0:1;
     scene.buildings.push(building);scene.towerViews.set(building.id,scene.createBuildingView(definition,building));
   }
   scene.refreshWallConnections();
@@ -97,6 +97,7 @@ export function loadGameState(scene,input){
   scene.wageSystem?.importState(state.wages);
   scene.workplaceSystem?.importState(state.workplaces);
   scene.constructionSystem?.importState(state.constructionSystem);
+  scene.farmingSystem?.importState(state.farming);
   scene.pathWear?.importState(state.pathWear);
   for(const t of state.spawners)scene.resourceSpawners.find(s=>s.definition.id===t.id).importState(t);
   scene.settingsPanel.applySettings(state.settings);scene.fog.setEnabled(state.settings.fogOfWar);

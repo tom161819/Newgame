@@ -9,6 +9,6 @@ export const JOBS=Object.freeze({
   miner:Object.freeze({name:'Miner',skill:'mining',workplace:'quarry',requiresWorkplace:false}),
   hunter:Object.freeze({name:'Hunter',skill:'hunting',workplace:'hunting_lodge',requiresWorkplace:false}),
   builder:Object.freeze({name:'Builder',skill:'construction',workplace:null,requiresWorkplace:false}),
-  farmer:Object.freeze({name:'Farmer',skill:'farming',workplace:'farm',requiresWorkplace:true}),
+  farmer:Object.freeze({name:'Farmer',skill:'farming',workplace:'farmhouse',requiresWorkplace:true}),
   soldier:Object.freeze({name:'Soldier',skill:'combat',workplace:'barracks',requiresWorkplace:false}),
 });

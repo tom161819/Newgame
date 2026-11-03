@@ -18,16 +18,17 @@ import { WageSystem } from '../../src/systems/WageSystem.js';
 import { WorkplaceSystem } from '../../src/systems/WorkplaceSystem.js';
 import { ConstructionSystem } from '../../src/systems/ConstructionSystem.js';
 import { WildlifeRespawnSystem } from '../../src/systems/WildlifeRespawnSystem.js';
+import { FarmingSystem } from '../../src/systems/FarmingSystem.js';
 import { WorkerSystem } from '../../src/systems/WorkerSystem.js';
 import { ResourceSpawner } from '../../src/game/stones.js';
 import { tileCenter } from '../../src/game/isometric.js';
 import { wallIndex,connectionsFor } from '../../src/game/walls.js';
 
-export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,workplaces=false,construction=false,gameSettings}={}){
+export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,workplaces=false,construction=false,farming=false,gameSettings}={}){
   const scene={objectRegistry,gameSettings,terrainGrid:terrain.map(r=>[...r]),map:terrain.map(r=>[...r]),inventory:new Inventory(),gameOver:false,
     resources:new Map(),resourceOccupancy:new Map(),buildings:[],towerViews:new Map(),animations:[],
     marker:{visible:false,setVisible(v){this.visible=v;}},showMarker(){this.marker.visible=true;},setStatus(){},updateBuildingUI(){},updateInventory(){},updateTimeDisplay(){},refreshVisibility(){},
-    reservedTiles(){return [...this.character.reservedTiles(),...this.animalSystem.reservedTiles(),...(this.workerSystem?.reservedTiles()??[])];},
+    reservedTiles(){return [...this.character.reservedTiles(),...this.animalSystem.reservedTiles(),...(this.workerSystem?.reservedTiles()??[]),...this.buildings.flatMap(b=>b.tiles??[])];},
     huntingSystem:{target:null,repath:0},mountSystem:{target:null,repath:0},combatFeedback:{hit(){},remove(){}},
     settingsPanel:{settings:{fogOfWar:false,pathWearDebug:false},applySettings(d){this.settings={...d};}},fog:{setEnabled(){}},worldCamera:{following:false},
     cameras:{main:{zoom:1,scrollX:2500,scrollY:1300,width:1000,height:640,setZoom(z){this.zoom=z;return this;},centerOn(x,y){this.scrollX=x-this.width/2;this.scrollY=y-this.height/2;return this;},preRender(){}}},
@@ -36,7 +37,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   function view(type,p){const data={objectId:type,definition:objectRegistry.require(type)};return {...p,scene,visible:true,depth:p.y,
     setData(k,v){data[k]=v;return this;},getData(k){return data[k];},setVisible(v){this.visible=v;return this;},setPosition(x,y){this.x=x;this.y=y;return this;},setDepth(d){this.depth=d;return this;},
     animate(){},setMounted(){},setOpened(){},destroy(){this.scene=null;}};}
-  scene.assets={createView:view};scene.createBuildingView=(d,b)=>{scene.workplaceSystem?.register(b);return view(d.id,tileCenter(b));};
+  scene.assets={createView:view};scene.createBuildingView=(d,b)=>{scene.workplaceSystem?.register(b);scene.farmingSystem?.register(b);return view(d.id,tileCenter(b));};
   scene.tweens={add(config){const t={...config,elapsed:0};scene.animations.push(t);return t;}};
   scene.player=view('king',tileCenter({x:40,y:40}));scene.character=new PlayerController(scene,scene.player,{x:40,y:40});
   scene.gameTime=new GameTimeSystem((gameSettings?.dayLengthSeconds??120)*1000);scene.activities=new GameActivityBus();scene.experienceSystem=new ExperienceSystem(scene.activities);scene.skillSystem=new SkillSystem(scene);scene.skillSystem.initialize(scene.character);
@@ -46,8 +47,9 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   scene.wildlifeRespawn=new WildlifeRespawnSystem(scene,scene.animalSystem);
   if(!randomizeTalents){const create=scene.workerSystem.create.bind(scene.workerSystem);scene.workerSystem.create=(tile,options={})=>{const w=create(tile,{...options,randomize:false});w.naturalTalent='woodcutting';w.initialSkills=structuredClone(w.skills);return w;};}
   scene.foodSystem=new FoodSystem(scene.inventory,objectRegistry.require('meat'));scene.production=new ProductionSystem(scene.gameTime,scene.inventory,()=>scene.buildings);scene.wageSystem=new WageSystem(scene);
-  if(workplaces||construction)scene.workplaceSystem=new WorkplaceSystem(scene);
+  if(workplaces||construction||farming)scene.workplaceSystem=new WorkplaceSystem(scene);
   if(construction)scene.constructionSystem=new ConstructionSystem(scene,{onComplete:b=>{scene.towerViews.set(b.id,scene.createBuildingView(b.definition,b));scene.refreshWallConnections();},onCancel:b=>{scene.towerViews.delete(b.id);scene.refreshWallConnections();}});
+  if(farming)scene.farmingSystem=new FarmingSystem(scene);
   scene.addResource=(d,tile)=>{const v=view(d.id,tileCenter(tile)),key=`${tile.x},${tile.y}`;v.setData('tile',{...tile}).setData('object',{type:d.id,definition:d,x:tile.x,y:tile.y,tiles:[{...tile}]});scene.resources.set(key,v);scene.resourceOccupancy.set(key,key);};
   scene.collectResource=(key,tile,actor)=>{const v=scene.resources.get(key);if(!v||key!==`${tile.x},${tile.y}`||actor.state!=='ground')return false;
     const type=v.getData('objectId');scene.resources.delete(key);v.destroy();scene.dropSystem.refreshOccupancy(tile);const event={type:'resourceCollected',objectType:type,quantity:1};if(!scene.workplaceSystem?.carryCollection(actor,{resource:type,amount:1,event})){scene.inventory.add(type);scene.activities.emit(event.type,{...event,actor});}return true;};
@@ -61,7 +63,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
     const tile={x:Math.floor(target.position.x),y:Math.floor(target.position.y)};if(killer){const event={type:'animalKilled',objectType:target.type,quantity:1};if(!scene.workplaceSystem?.deferReward(killer,event))scene.activities.emit(event.type,{...event,actor:killer});}
     scene.animalSystem.remove(target);const drop=scene.dropSystem.create('meat',tile,target.definition.gameplay.meatDrop);scene.workerSystem.ai.animalDied(target,killer,drop);
   });
-  scene.tick=delta=>{if(scene.gameTime.paused||scene.gameOver)return;scene.gameTime.update(delta);if(scene.constructionSystem)scene.character.update(delta);scene.animalSystem.update(delta);scene.workerSystem.update(delta);const covered=scene.combat.update(delta);scene.constructionSystem?.update(delta);scene.regeneration.update(delta,[scene.character,...scene.animalSystem.animals.values(),...scene.workerSystem.liveWorkers()],covered);};
+  scene.tick=delta=>{if(scene.gameTime.paused||scene.gameOver)return;scene.gameTime.update(delta);if(scene.constructionSystem)scene.character.update(delta);scene.animalSystem.update(delta);scene.workerSystem.update(delta);const covered=scene.combat.update(delta);scene.constructionSystem?.update(delta);scene.farmingSystem?.update(delta);scene.regeneration.update(delta,[scene.character,...scene.animalSystem.animals.values(),...scene.workerSystem.liveWorkers()],covered);};
   scene.simulate=(ms,step=50)=>{let elapsed=0;while(elapsed<ms){const delta=Math.min(step,ms-elapsed);scene.tick(delta);elapsed+=delta;}};
   return scene;
 }

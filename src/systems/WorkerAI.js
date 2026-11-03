@@ -7,6 +7,7 @@ import { WORKPLACE_RULES } from '../data/workplaces.js';
 export class WorkerAI {
   constructor(system){this.system=system;this.scene=system.scene;}
   cancel(worker){
+    this.scene.farmingSystem?.release(worker);
     if(worker.workTask?.kind==='build')this.system.jobs.constructionProvider?.releaseWorker?.(worker);
     const task=worker.workTask,animal=(task?.kind==='hunt'?this.scene.animalSystem.animals.get(task.targetId):null)??this.scene.combat.attacks.get(worker);
     if(animal?.retaliationTarget===worker)this.scene.animalSystem.stopRetaliation(animal);
@@ -38,6 +39,7 @@ export class WorkerAI {
     }
     if(worker.profession==='miner')this.miner(worker,delta);
     else if(worker.profession==='hunter')this.hunter(worker,delta);
+    else if(worker.profession==='farmer'&&this.scene.farmingSystem)this.scene.farmingSystem.updateWorker(worker,delta);
     else if(worker.profession==='builder'){
       // Budovy jsou dosud okamžité. Staveniště dodá až skutečný construction provider.
       worker.workState='Waiting';worker.workMessage='Waiting for construction';

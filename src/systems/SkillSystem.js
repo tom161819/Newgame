@@ -18,7 +18,7 @@ export class SkillSystem {
     return this.scene.experienceSystem.addTrackXP(skills[skill],amount*talentXPMultiplier(actor,skill),()=>{if(actor.activitySkill===skill)this.refreshModifier(actor);});
   }
   completed(event,reward){
-    const skill=event.type==='resourceCollected'&&event.objectType==='stone'?'mining':event.type==='animalKilled'?'hunting':event.type==='buildingCompleted'?'construction':null;
+    const skill=event.type==='resourceCollected'&&event.objectType==='stone'?'mining':event.type==='animalKilled'?'hunting':event.type==='buildingCompleted'?'construction':event.type==='cropHarvested'?'farming':null;
     if(skill)this.addXP(event.actor,skill,reward);
   }
   attachCombat(combat){

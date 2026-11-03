@@ -17,4 +17,5 @@ export class WorkerController extends AnimalController {
     this.path=[];this.aiCooldown=Math.min(this.aiCooldown,100);return false;
   }
   stop(){this.path=[];}
+  update(delta){super.update(delta);this.view.setWorkPose?.(delta,this.profession==='farmer'&&this.workState==='Working'&&!this.walking);}
 }
