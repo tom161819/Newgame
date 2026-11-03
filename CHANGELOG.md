@@ -24,6 +24,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Group Buildings into themed categories and require a completed Granary for new Farmhouses, then a completed Farmhouse for new Wheat Fields and Orchards; existing structures and valid blueprints remain intact.
 
 ### Improved
+- Open numbered version archives on demand, browse descriptive historical milestones and development commits, and keep frozen games out of ordinary source builds.
 - Choose faster walking routes over worn paths while keeping diagonal corners safe and avoiding excessive detours.
 - Prefer Haulers for production deliveries while letting producers carry their own supplies when no carrier can serve them.
 - Preserve existing materials, in-transit loads and collection rewards when loading older kingdoms, without duplicating stock or experience.
@@ -52,6 +53,27 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ### Fixed
 - Loading a game preserves moving units and active timers without duplicating rewards, construction, wages or difficulty bonuses.
+
+## [0.1.0+archive.29] - 2026-11-03
+
+<!-- version: {"title": "Permanent Summer and resumable seasons", "commit": "1d9dd4610a5690db8348b2743ec376b668266fcf", "type": "feature", "reconstructed": true, "evidence": ["src/systems/SeasonSystem.js", "src/systems/GameTimeSystem.js", "src/ui/SettingsPanel.js"]} -->
+
+### Added
+- Turn seasonal changes on or off in New Game and Settings. Permanent Summer preserves the exact remembered season and partial day while weather, food and the economy continue.
+
+## [0.1.0+archive.28] - 2026-11-03
+
+<!-- version: {"title": "Building categories and farm prerequisites", "commit": "5074450fe57321ac71b7ded1cedcaf2281d2f216", "type": "feature", "reconstructed": true, "evidence": ["src/systems/BuildingUnlockManager.js", "src/ui/BuildingBar.js"]} -->
+
+### Changed
+- Browse themed building categories. New Farmhouses require a completed Granary, and new fields or orchards require a completed Farmhouse; existing buildings and valid blueprints stay intact.
+
+## [0.1.0+archive.27] - 2026-11-03
+
+<!-- version: {"title": "Version Archive and linked release notes", "commit": "fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265", "type": "feature", "reconstructed": true, "evidence": ["scripts/version-catalog.mjs", "src/ui/VersionArchivePanel.js"]} -->
+
+### Added
+- Browse source-verified historical milestones and original development snapshots from the main menu, with linked, collapsible change notes and isolated archived saves.
 
 ## [0.1.0+archive.26] - 2026-11-03
 

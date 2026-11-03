@@ -3,11 +3,11 @@
   "gameVersion": "0.1.0",
   "projectBase": "/Newgame/",
   "currentBuild": {
-    "version": "0.1.0+dev.fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265",
+    "version": "0.1.0+dev.8b796271fd452f60cd1f66725d6ce68b8ef67746",
     "gameVersion": "0.1.0",
     "title": "Current development build",
     "date": "2026-11-03",
-    "commit": "fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265",
+    "commit": "8b796271fd452f60cd1f66725d6ce68b8ef67746",
     "archiveURL": "/Newgame/",
     "available": true,
     "description": "Current development build; released changes are listed separately.",
@@ -15,9 +15,75 @@
     "historical": false,
     "reconstructed": false,
     "current": true,
-    "dirty": false
+    "dirty": true
   },
   "versions": [
+    {
+      "version": "0.1.0+archive.29",
+      "title": "Permanent Summer and resumable seasons",
+      "date": "2026-11-03",
+      "commit": "1d9dd4610a5690db8348b2743ec376b668266fcf",
+      "archiveURL": "/Newgame/versions/1d9dd4610a5690db8348b2743ec376b668266fcf/",
+      "available": true,
+      "description": "Turn seasonal changes on or off in New Game and Settings. Permanent Summer preserves the exact remembered season and partial day while weather, food and the economy continue.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Turn seasonal changes on or off in New Game and Settings. Permanent Summer preserves the exact remembered season and partial day while weather, food and the economy continue."
+        ]
+      },
+      "sequence": 69,
+      "commitDate": "2026-11-03T21:40:46Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.28",
+      "title": "Building categories and farm prerequisites",
+      "date": "2026-11-03",
+      "commit": "5074450fe57321ac71b7ded1cedcaf2281d2f216",
+      "archiveURL": "/Newgame/versions/5074450fe57321ac71b7ded1cedcaf2281d2f216/",
+      "available": true,
+      "description": "Browse themed building categories. New Farmhouses require a completed Granary, and new fields or orchards require a completed Farmhouse; existing buildings and valid blueprints stay intact.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "changed": [
+          "Browse themed building categories. New Farmhouses require a completed Granary, and new fields or orchards require a completed Farmhouse; existing buildings and valid blueprints stay intact."
+        ]
+      },
+      "sequence": 67,
+      "commitDate": "2026-11-03T21:03:23Z",
+      "tag": null,
+      "current": false
+    },
+    {
+      "version": "0.1.0+archive.27",
+      "title": "Version Archive and linked release notes",
+      "date": "2026-11-03",
+      "commit": "fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265",
+      "archiveURL": "/Newgame/versions/fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265/",
+      "available": true,
+      "description": "Browse source-verified historical milestones and original development snapshots from the main menu, with linked, collapsible change notes and isolated archived saves.",
+      "releaseType": "feature",
+      "historical": true,
+      "reconstructed": true,
+      "label": "Reconstructed archive label",
+      "changes": {
+        "added": [
+          "Browse source-verified historical milestones and original development snapshots from the main menu, with linked, collapsible change notes and isolated archived saves."
+        ]
+      },
+      "sequence": 65,
+      "commitDate": "2026-11-03T19:26:57Z",
+      "tag": null,
+      "current": false
+    },
     {
       "version": "0.1.0+archive.26",
       "title": "Physical logistics",
@@ -628,6 +694,48 @@
     }
   ],
   "builds": [
+    {
+      "version": "0.1.0+git.8b796271fd452f60cd1f66725d6ce68b8ef67746",
+      "gameVersion": "0.1.0",
+      "commit": "8b796271fd452f60cd1f66725d6ce68b8ef67746",
+      "date": "2026-11-03T21:41:16Z",
+      "title": "Record completed master stage 03 and begin requested archive optimization",
+      "description": "Record completed master stage 03 and begin requested archive optimization",
+      "archiveURL": "/Newgame/versions/8b796271fd452f60cd1f66725d6ce68b8ef67746/",
+      "available": true,
+      "sequence": 70,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.1d9dd4610a5690db8348b2743ec376b668266fcf",
+      "gameVersion": "0.1.0",
+      "commit": "1d9dd4610a5690db8348b2743ec376b668266fcf",
+      "date": "2026-11-03T21:40:46Z",
+      "title": "Allow permanent Summer with precise saved seasonal progress",
+      "description": "Allow permanent Summer with precise saved seasonal progress",
+      "archiveURL": "/Newgame/versions/1d9dd4610a5690db8348b2743ec376b668266fcf/",
+      "available": true,
+      "sequence": 69,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
+    {
+      "version": "0.1.0+git.5074450fe57321ac71b7ded1cedcaf2281d2f216",
+      "gameVersion": "0.1.0",
+      "commit": "5074450fe57321ac71b7ded1cedcaf2281d2f216",
+      "date": "2026-11-03T21:03:23Z",
+      "title": "Group registered buildings and enforce completed construction prerequisites",
+      "description": "Group registered buildings and enforce completed construction prerequisites",
+      "archiveURL": "/Newgame/versions/5074450fe57321ac71b7ded1cedcaf2281d2f216/",
+      "available": true,
+      "sequence": 67,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
     {
       "version": "0.1.0+git.fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265",
       "gameVersion": "0.1.0",

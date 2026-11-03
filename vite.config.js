@@ -1,27 +1,35 @@
 import { defineConfig } from 'vite';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { cp,readdir } from 'node:fs/promises';
 import { readRelease } from './scripts/changelog-lib.mjs';
 import { readVersionCatalog,catalogHTML } from './scripts/version-catalog.mjs';
+import { stageArchivedSnapshots } from './scripts/stage-archive.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
 const moduleId = 'virtual:game-release', resolvedId = `\0${moduleId}`;
 const watched = ['package.json', 'package-lock.json', 'CHANGELOG.md', 'public/versions/versions.json'].map(file => path.join(root, file));
-let release,catalog,base='/';
+let release,catalog,base='/',outputDirectory;
 
-export default defineConfig({
+export default defineConfig(({command})=>({
+  publicDir:command==='build'?false:'public',
+  build:{copyPublicDir:false},
+  server:{watch:{ignored:['**/public/versions/[a-f0-9]*/**']}},
   plugins: [{
     name: 'game-release-data',
-    configResolved(config){base=config.base;},
+    configResolved(config){base=config.base;outputDirectory=path.resolve(root,config.build.outDir);},
     resolveId(id) { if (id === moduleId) return resolvedId; },
     async buildStart() { for (const file of watched) this.addWatchFile(file);release=await readRelease(root);catalog=await readVersionCatalog(root,{base,release}); },
     async load(id) {
       if (id !== resolvedId) return;
       release??=await readRelease(root);catalog??=await readVersionCatalog(root,{base,release});
-      const {data}=release;return `export const gameVersion = ${JSON.stringify(data.version)};\nexport const releases = ${JSON.stringify(data.releases)};\nexport const versionCatalog = ${JSON.stringify(catalog)};`;
+      const {data}=release;return `export const gameVersion = ${JSON.stringify(data.version)};\nexport const releases = ${JSON.stringify(catalog.versions)};`;
     },
     generateBundle(){this.emitFile({type:'asset',fileName:'versions/catalog.json',source:JSON.stringify(catalog,null,2)+'\n'});this.emitFile({type:'asset',fileName:'versions/index.html',source:catalogHTML(catalog)});},
-    configureServer(server) {
+    async writeBundle(){for(const entry of await readdir(path.join(root,'public/assets')))await cp(path.join(root,'public/assets',entry),path.join(outputDirectory,'assets',entry),{recursive:true,force:false,errorOnExist:true});},
+    async configurePreviewServer(){await stageArchivedSnapshots({source:path.join(root,'public/versions'),target:path.join(outputDirectory,'versions')});},
+    async configureServer(server) {
+      catalog??=await readVersionCatalog(root,{base});
       server.middlewares.use(async(req,res,next)=>{
         const canonical=(catalog?.builds??[]).find(b=>b.archiveURL)?.archiveURL?.replace(/versions\/.*$/,'');
         if(canonical&&canonical!==base&&req.url.startsWith(`${canonical}versions/`))req.url=base+req.url.slice(canonical.length);
@@ -40,4 +48,4 @@ export default defineConfig({
       });
     },
   }],
-});
+}));

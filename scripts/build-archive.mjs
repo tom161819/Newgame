@@ -9,13 +9,19 @@ import { mkdir,readFile,writeFile,cp,rm,symlink,stat,mkdtemp,rename } from 'node
 import { projectBase,digest,fileHashes,verifySnapshot,recordsIn,archiveRuntime,releaseMetadata } from './archive-lib.mjs';
 import { browserRuntime } from './browser-runtime.mjs';
 import { readVersionCatalog,catalogHTML } from './version-catalog.mjs';
+import { archiveSourcePaths,selectArchiveCommits,archiveOptions } from './archive-source.mjs';
+import { readSourceFacts } from './git-source-facts.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
-const option=(name,fallback)=>{const i=args.indexOf(name);return i<0?fallback:args[i+1];};
-const base=projectBase(option('--base','/Newgame/')),ref=option('--through','HEAD'),archives=path.join(root,'public/versions');
+const options=archiveOptions(args),base=projectBase(options.base),ref=options.through,archives=path.join(root,'public/versions');
 const git=(...params)=>execFileSync('git',params,{cwd:root,encoding:'utf8',maxBuffer:16*1024*1024}).trim();
 if(git('rev-parse','--is-shallow-repository')==='true')throw new Error('Archiv vyžaduje úplnou historii Git; použij checkout s fetch-depth: 0.');
-const through=git('rev-parse','--verify',`${ref}^{commit}`),commits=git('rev-list','--reverse','--first-parent',through).split('\n');
+const through=git('rev-parse','--verify',`${ref}^{commit}`),history=git('rev-list','--reverse','--first-parent',through).split('\n');
+const sourceCatalog=await readVersionCatalog(root,{base}),known=new Set(history),milestones=sourceCatalog.versions.map(v=>v.commit).filter(commit=>commit&&known.has(commit));
+const tags=git('tag','--merged',through).split('\n').filter(tag=>/^v\d+\.\d+\.\d+$/.test(tag)).map(tag=>git('rev-parse',`${tag}^{commit}`)).filter(commit=>known.has(commit));
+const requested=options.commits.map(commit=>git('rev-parse','--verify',`${commit}^{commit}`));
+const commits=selectArchiveCommits({history,through,milestones,tags,requested,all:options.all});
+const packageVersions=readSourceFacts(root,{packages:sourceCatalog.builds.map(record=>record.commit)}).packages;
 const {chromium,executablePath}=await browserRuntime();
 const browser=await chromium.launch({headless:true,executablePath,args:['--no-sandbox']});
 const workspace=await mkdtemp(path.join(tmpdir(),'newgame-version-archive-')),logs=path.join(workspace,'logs');await mkdir(logs);
@@ -67,15 +73,15 @@ try{
     const commit=commits[i],short=commit.slice(0,7);if(existing.has(commit)){console.log(`[${i+1}/${commits.length}] ${short} existující neměnný archiv ověřen`);continue;}
     const source=path.join(workspace,short),log=path.join(logs,`${short}.log`),url=`${base}versions/${commit}/`;await mkdir(source);
     try{
-      const tar=path.join(workspace,`${short}.tar`);execFileSync('git',['archive','--format=tar','--output',tar,commit],{cwd:root});execFileSync('tar',['-xf',tar,'-C',source]);await rm(tar);
+      const tar=path.join(workspace,`${short}.tar`);execFileSync('git',['archive','--format=tar','--output',tar,commit,'--',...archiveSourcePaths(root,commit)],{cwd:root});execFileSync('tar',['-xf',tar,'-C',source]);await rm(tar);
       const pkg=JSON.parse(await readFile(path.join(source,'package.json'),'utf8'));if(!pkg.scripts?.build)throw new Error('Commit neobsahuje sestavitelnou hru.');
       const subject=git('show','-s','--format=%s',commit),metadata=await releaseMetadata(source,commit,subject);
       // Archiv nesmí při budoucím archivování obsahovat další vnořený archiv.
-      let archiveMetadata;try{archiveMetadata=JSON.parse(await readFile(path.join(source,'public/versions/versions.json'),'utf8'));}catch(error){if(error.code!=='ENOENT')throw error;}
+      let archiveMetadata;if(git('ls-tree',commit,'--','public/versions/versions.json'))archiveMetadata=JSON.parse(git('show',`${commit}:public/versions/versions.json`));
       await rm(path.join(source,'public/versions'),{recursive:true,force:true});
       // Preserve only verified build metadata for the historical catalog; never
       // nest other playable archives inside this immutable source build.
-      if(archiveMetadata){for(const record of archiveMetadata){const original=JSON.parse(git('show',`${record.commit}:package.json`));record.originalVersion=original.version;}await mkdir(path.join(source,'public/versions'),{recursive:true});await writeFile(path.join(source,'public/versions/versions.json'),JSON.stringify(archiveMetadata));}
+      if(archiveMetadata){for(const record of archiveMetadata){const original=packageVersions.get(record.commit)??JSON.parse(git('show',`${record.commit}:package.json`));record.originalVersion=original.version;}await mkdir(path.join(source,'public/versions'),{recursive:true});await writeFile(path.join(source,'public/versions/versions.json'),JSON.stringify(archiveMetadata));}
       await dependencies(source);
       const environment={GAME_BUILD_COMMIT:commit,GAME_BUILD_DATE:git('show','-s','--format=%aI',commit),GAME_BUILD_TAG:git('tag','--points-at',commit).split('\n').find(tag=>tag===`v${pkg.version}`)??''};
       if(pkg.scripts.test)run('npm',['test'],source,log,environment);run('npm',['run','build','--',`--base=${url}`],source,log,environment);
@@ -83,7 +89,7 @@ try{
       const index=path.join(built,'index.html'),html=await readFile(index,'utf8');if(!/<head(?:\s[^>]*)?>/i.test(html))throw new Error('Chybí HTML head.');
       await writeFile(index,html.replace(/<head(?:\s[^>]*)?>/i,head=>`${head}<link rel="icon" href="data:,"><script src="${url}archive-runtime.js"></script>`));
       await browserCheck(built,url);
-      const record={schema:1,commit,tree:git('rev-parse',`${commit}^{tree}`),date:git('show','-s','--format=%aI',commit),sequence:i+1,subject,...metadata,basePath:url,
+      const record={schema:1,commit,tree:git('rev-parse',`${commit}^{tree}`),date:git('show','-s','--format=%aI',commit),sequence:history.indexOf(commit)+1,subject,...metadata,basePath:url,
         verification:{tests:!!pkg.scripts.test,build:true,browser:true},files:await fileHashes(built)};
       await writeFile(path.join(built,'snapshot.json'),JSON.stringify(record,null,2)+'\n');const temporary=path.join(archives,`.pending-${commit}`);await cp(built,temporary,{recursive:true});await rename(temporary,path.join(archives,commit));
       await verifySnapshot(path.join(archives,commit),commit);results.push(record);console.log(`[${i+1}/${commits.length}] ${short} build + testy + skutečný prohlížeč OK · ${metadata.name}`);
@@ -91,7 +97,9 @@ try{
     await rm(source,{recursive:true,force:true});
   }
   const records=await recordsIn(archives);
-  await writeFile(path.join(archives,'versions.json'),JSON.stringify(records.map(({files,...record})=>record).sort((a,b)=>b.sequence-a.sequence),null,2)+'\n');
+  const facts=readSourceFacts(root,{packages:records.map(record=>record.commit)});
+  const listed=records.map(({files,...record})=>({...record,name:facts.subjects.get(record.commit),subject:facts.subjects.get(record.commit),originalVersion:facts.packages.get(record.commit).version})).sort((a,b)=>b.sequence-a.sequence);
+  await writeFile(path.join(archives,'versions.json'),JSON.stringify(listed,null,2)+'\n');
   const catalog=await readVersionCatalog(root,{base});await writeFile(path.join(archives,'index.html'),catalogHTML(catalog));await writeFile(path.join(archives,'catalog.json'),JSON.stringify(catalog,null,2)+'\n');
   await writeFile(path.join(workspace,'report.json'),JSON.stringify({through,records:records.length,created:results.map(r=>r.commit),skipped},null,2));
   console.log(`Dokončeno: ${records.length} verzí, ${results.length} nových, ${skipped.length} vynechaných. Report a logy: ${workspace}`);

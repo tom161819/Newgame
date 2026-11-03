@@ -4,15 +4,15 @@ import { SaveLoadMenu } from './SaveLoadMenu.js';
 import { NewGameSetup } from './NewGameSetup.js';
 import { ChangelogPanel } from './ChangelogPanel.js';
 import { VersionArchivePanel } from './VersionArchivePanel.js';
-import { gameVersion,releases,versionCatalog } from 'virtual:game-release';
+import { gameVersion,releases } from 'virtual:game-release';
 
 export class GameApplication {
   constructor(game){
     this.game=game;this.scene=null;this.saves=new SaveGameManager();this.saveMenu=new SaveLoadMenu(this);
     this.main=document.querySelector('#main-menu');this.pauseDialog=document.querySelector('#pause-menu');
-    this.changelog=new ChangelogPanel({version:gameVersion,releases,catalog:versionCatalog});
-    this.archive=new VersionArchivePanel({catalog:versionCatalog,onChanges:version=>this.changelog.open(version)});
-    const requestedChanges=new URLSearchParams(window.location.search).get('changelog');if(versionCatalog.versions.some(v=>v.version===requestedChanges))this.changelog.open(requestedChanges);
+    this.changelog=new ChangelogPanel({version:gameVersion,releases});
+    this.archive=new VersionArchivePanel({catalogURL:`${import.meta.env.BASE_URL}versions/catalog.json`,onChanges:version=>{if(version&&!releases.some(r=>r.version===version))window.open(`${import.meta.env.BASE_URL}?changelog=${encodeURIComponent(version)}`,'_blank','noopener,noreferrer');else this.changelog.open(version);}});
+    const requestedChanges=new URLSearchParams(window.location.search).get('changelog');if(releases.some(v=>v.version===requestedChanges))this.changelog.open(requestedChanges);
     this.setup=new NewGameSetup({onStart:settings=>this.start(null,settings),onBack:()=>{this.setup.close();this.showMainMenu();}});
     document.querySelector('#new-game').addEventListener('click',()=>{this.main.hidden=true;this.setup.open();});
     document.querySelector('#main-load-game').addEventListener('click',()=>this.openSaves('load'));

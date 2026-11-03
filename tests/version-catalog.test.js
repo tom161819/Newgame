@@ -34,6 +34,10 @@ test('missing verified build is unavailable everywhere, without a fake Play link
   const catalog=assemble({records:[{...record,available:false}]});const historical=catalog.versions.find(v=>v.reconstructed);
   assert.equal(historical.available,false);assert.equal(historical.archiveURL,null);assert.equal(catalog.builds[0].archiveURL,null);assert.ok(!catalogHTML(catalog).includes(`href="${record.basePath}"`));
 });
+test('unavailable milestones still sort by their actual commit time, rather than falling below older builds from the same day',()=>{
+  const data=parseChangelog(markdown,'0.1.0');data.releases.push({version:'0.1.0+archive.2',date:'2026-11-01',metadata:{...metadata,commit:b,title:'Later same-day milestone'},resolvedCommitDate:'2026-11-01T13:00:00Z',changes:{added:['A real later change.']}});
+  const catalog=assemble({data});assert.deepEqual(catalog.versions.filter(v=>v.reconstructed).map(v=>v.commit),[b,a]);assert.equal(catalog.versions.find(v=>v.commit===b).available,false);
+});
 test('catalog refuses duplicate commits, unsafe or mismatching URLs, duplicate anchors and inaccurate dates',()=>{
   assert.throws(()=>assemble({records:[record,record]}),/unique/);
   for(const basePath of [`https://example.com/versions/${a}/`,`/Newgame/versions/${b}/`,'/../versions/'])assert.throws(()=>assemble({records:[{...record,basePath}]}));
@@ -50,6 +54,7 @@ test('static archive escapes authored text, preserves every canonical URL and li
   const catalog=assemble();catalog.versions[0].title='<img src=x onerror=alert(1)>';const html=catalogHTML(catalog);
   assert.ok(html.includes('&lt;img'));assert.ok(!html.includes('<img'));assert.ok(html.includes('?changelog=0.1.0%2Barchive.1'));assert.ok(html.includes(`href="${record.basePath}"`));
   assert.ok(html.includes('Reconstructed archive labels'));assert.ok(html.includes('original v0.1.0'));
+  assert.ok(html.includes('v0.1.0+git.aaaaaaa'));
 });
 test('git-archive builds use exact exported provenance and original metadata without nested archives',async()=>{
   const root=await mkdtemp(path.join(tmpdir(),'newgame-catalog-'));

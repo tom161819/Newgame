@@ -1,11 +1,13 @@
 import { element } from './objectLabels.js';
-
-export const displayBuildVersion=version=>version.replace(/(\+(?:git|dev)\.)([a-f0-9]{40})$/,(_match,prefix,commit)=>prefix+commit.slice(0,7));
+import { displayBuildVersion } from '../data/semver.js';
+export { displayBuildVersion } from '../data/semver.js';
 export class VersionArchivePanel {
-  constructor({catalog,onChanges}){
-    this.catalog=catalog;this.onChanges=onChanges;this.dialog=document.querySelector('#version-archive-dialog');this.button=document.querySelector('#main-archive');
+  constructor({catalog=null,catalogURL,onChanges}){
+    this.catalog=catalog;this.catalogURL=catalogURL;this.onChanges=onChanges;this.dialog=document.querySelector('#version-archive-dialog');this.button=document.querySelector('#main-archive');this.requested=false;
+    this.snapshots=document.querySelector('#archive-snapshot-count').closest('details');
     this.button.addEventListener('click',()=>this.open());document.querySelector('#archive-back').addEventListener('click',()=>this.close());
-    this.dialog.addEventListener('cancel',event=>{event.preventDefault();this.close();});this.render();
+    this.dialog.addEventListener('cancel',event=>{event.preventDefault();this.close();});
+    this.snapshots.addEventListener('toggle',()=>{if(this.snapshots.open&&this.catalog)document.querySelector('#archive-snapshot-list').replaceChildren(...this.catalog.builds.map(entry=>this.entry(entry,true)));});
   }
   entry(entry,snapshot=false){
     const row=element('article','archive-version'),heading=element('h3','',`v${displayBuildVersion(entry.version)} — ${entry.title}`);heading.title=entry.version;row.dataset.catalogVersion=entry.version;
@@ -22,9 +24,20 @@ export class VersionArchivePanel {
   render(){
     const catalog=this.catalog,entries=catalog.versions.some(v=>v.version===catalog.currentBuild.version)?catalog.versions:[catalog.currentBuild,...catalog.versions];
     document.querySelector('#archive-version-list').replaceChildren(...entries.map(entry=>this.entry(entry)));
-    document.querySelector('#archive-snapshot-list').replaceChildren(...catalog.builds.map(entry=>this.entry(entry,true)));
+    document.querySelector('#archive-snapshot-list').replaceChildren();this.snapshots.open=false;
     document.querySelector('#archive-snapshot-count').textContent=`All verified development snapshots (${catalog.builds.length})`;
   }
-  open(){if(!this.dialog.open)this.dialog.showModal();this.dialog.scrollTop=0;document.querySelector('#archive-back').focus();}
-  close(focus=true){if(!this.dialog.open)return;this.dialog.close();if(focus)this.button.focus();}
+  async open(){
+    this.requested=true;this.button.disabled=true;this.button.setAttribute('aria-busy','true');
+    const message=document.querySelector('#archive-load-message');message.hidden=true;
+    try{
+      if(!this.catalog){this.pending??=fetch(this.catalogURL).then(async response=>{if(!response.ok)throw new Error('Archive catalog is unavailable.');const catalog=await response.json();if(catalog.schema!==1||!Array.isArray(catalog.versions)||!Array.isArray(catalog.builds))throw new Error('Invalid archive catalog.');return catalog;});this.catalog=await this.pending;}
+      if(!this.requested)return;this.render();if(!this.dialog.open)this.dialog.showModal();this.dialog.scrollTop=0;document.querySelector('#archive-back').focus();
+    }catch(error){this.pending=null;if(this.requested){message.textContent=error.message;message.hidden=false;if(!this.dialog.open)this.dialog.showModal();}}
+    finally{this.button.disabled=false;this.button.removeAttribute('aria-busy');}
+  }
+  close(focus=true){
+    this.requested=false;this.snapshots.open=false;document.querySelector('#archive-version-list').replaceChildren();document.querySelector('#archive-snapshot-list').replaceChildren();
+    if(!this.dialog.open)return;this.dialog.close();if(focus)this.button.focus();
+  }
 }

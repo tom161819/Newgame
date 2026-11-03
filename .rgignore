@@ -1,0 +1,3 @@
+# Immutable generated games are not current source. Inspect metadata explicitly
+# when working on archives; never load minified historical bundles into searches.
+/public/versions/
