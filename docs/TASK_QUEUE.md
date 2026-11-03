@@ -42,10 +42,16 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 - [Krok 22 — Food Production & Storage](requests/step-22.md): commit `5e9b134`, Pages run `41645613844` úspěšně nasazeno (41 s). 200 testů; skutečné blueprinty, fyzická přeprava a 30sekundové výrobní cykly mlýna/pekárny, sklady 200/30, náklady do 20, rezervace, skilly/mzdy, přesné Save/Load a migrace skutečné starší hry ověřeny. Mobilní UI bez chyb; 20 pracovníků, 6 výrobních budov a 22 pozemků kolem 60 FPS. Archiv obsahuje 52 verzí.
 
+- [Krok 23 — Seasons, Weather & Food Consumption](requests/step-23.md): commit `74628eb`, Pages run `41669016548` úspěšně nasazeno (48 s). 215 testů; čtyři pětidenní sezóny, denní počasí, zimní růst a grafika, sezónní sady, jednotná osobní spotřeba, hlad/pracovní efektivita/atraktivita, Food Economy, přesné Save/Load a skutečný starší save ověřeny. V prohlížeči skutečný 60sekundový den odečetl přesně 5 porcí pro krále a 3 poddané; regenerace beze změny. Zimní scéna s 20 NPC, 6 výrobními budovami a 22 pozemky běží kolem 57–60 FPS. Archiv obsahuje 55 verzí.
+
 ## Následuje
 
-1. **Právě probíhá:** [Krok 23 — Seasons, Weather & Food Consumption](requests/step-23.md).
-2. [Krok 24 — Logistics, Warehouses & Physical Resource Transport](requests/step-24.md).
+1. **Právě probíhá:** [Krok 24 — Logistics, Warehouses & Physical Resource Transport](requests/step-24.md).
+   - Fáze A: fyzické suroviny, sklady a migrace inventáře.
+   - Fáze B: Hauler, přepravní AI a rezervace.
+   - Fáze C: zásobování stavenišť, zemědělství a výroby.
+   - Fáze D: UI, Save/Load, optimalizace a integrační testy.
+   - Každou dokončenou a otestovanou fázi uložit samostatným commitem.
 
 Předchozí fronta do kroku 19 včetně archivu 41 verzí byla dokončená a publikovaná (`e0c4f54`, Pages `41620923762`). Nové požadavky se dokončují v uvedeném pořadí, každý po ověření a nasazení před zahájením následujícího.
 
