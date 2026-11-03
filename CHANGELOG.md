@@ -24,6 +24,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Group Buildings into themed categories and require a completed Granary for new Farmhouses, then a completed Farmhouse for new Wheat Fields and Orchards; existing structures and valid blueprints remain intact.
 
 ### Improved
+- Use circular logical sight with the existing mounted and fortification bonuses; stationary vision is cached and active vision sources can combine without revealing unrelated structures.
 - Open numbered version archives on demand, browse descriptive historical milestones and development commits, and keep frozen games out of ordinary source builds.
 - Choose faster walking routes over worn paths while keeping diagonal corners safe and avoiding excessive detours.
 - Prefer Haulers for production deliveries while letting producers carry their own supplies when no carrier can serve them.

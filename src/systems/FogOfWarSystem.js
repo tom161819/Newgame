@@ -1,21 +1,54 @@
 import { visibilityProfile } from './VisibilityModifiers.js';
+import { COLUMNS, ROWS } from '../game/config.js';
 
-// Pouze logická oblast viditelnosti, žádná černá vrstva nad terénem.
+const contains = (source, position) => (position.x-source.center.x)**2+(position.y-source.center.y)**2<=source.radius**2;
+
+// Sight always uses logical grid coordinates. Rendering overrides do not change
+// this ordinary sight calculation; exploration can safely consume it separately.
 export class FogOfWarSystem {
-  constructor(character,enabled=false){this.character=character;this.enabled=enabled;this.update();}
+  constructor(character,enabled=false,{width=COLUMNS,height=ROWS}={}){
+    Object.assign(this,{character,enabled,width,height});
+    this.providers=new Map();this.visibleIndices=new Set();this.revision=0;this.update();
+  }
+  registerSource(id,provider){
+    if(typeof provider!=='function')throw new TypeError('A vision source requires a profile provider.');
+    this.providers.set(id,provider);this.update();
+    return ()=>{this.providers.delete(id);this.update();};
+  }
   update(){
-    const {size,center}=visibilityProfile(this.character);
-    this.size=size;this.left=Math.ceil(center.x-size/2-.5);this.top=Math.ceil(center.y-size/2-.5);
-    this.right=this.left+size;this.bottom=this.top+size;
-    this.signature=this.enabled?`on:${size}:${this.left},${this.top}`:'off';
+    const profile=visibilityProfile(this.character);
+    this.size=profile.size;this.radius=profile.radius;
+    const sources=[profile,...[...this.providers.values()].map(provider=>provider()).filter(Boolean)];
+    for(const source of sources)if(!Number.isFinite(source.radius)||source.radius<0||!Number.isFinite(source.center?.x)||!Number.isFinite(source.center?.y))throw new TypeError('Invalid logical vision source.');
+    const key=sources.map(s=>`${s.center.x},${s.center.y},${s.radius}`).join(';');
+    if(key!==this.sourceKey){
+      this.sourceKey=key;this.sources=sources.map(s=>({center:{...s.center},radius:s.radius}));
+      this.left=Math.ceil(Math.min(...sources.map(s=>s.center.x-s.radius))-.5);
+      this.top=Math.ceil(Math.min(...sources.map(s=>s.center.y-s.radius))-.5);
+      this.right=Math.floor(Math.max(...sources.map(s=>s.center.x+s.radius))-.5)+1;
+      this.bottom=Math.floor(Math.max(...sources.map(s=>s.center.y+s.radius))-.5)+1;
+      const next=new Set();
+      for(const source of this.sources){
+        const minX=Math.max(0,Math.ceil(source.center.x-source.radius-.5)),maxX=Math.min(this.width-1,Math.floor(source.center.x+source.radius-.5));
+        const minY=Math.max(0,Math.ceil(source.center.y-source.radius-.5)),maxY=Math.min(this.height-1,Math.floor(source.center.y+source.radius-.5));
+        for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++)if(contains(source,{x:x+.5,y:y+.5}))next.add(y*this.width+x);
+      }
+      this.added=[...next].filter(index=>!this.visibleIndices.has(index));
+      this.removed=[...this.visibleIndices].filter(index=>!next.has(index));
+      this.visibleIndices=next;this.revision++;
+    }
+    this.signature=`${this.enabled?'on':'off'}:${this.revision}`;
   }
   setEnabled(value){this.enabled=!!value;this.update();}
-  isVisiblePosition(position){return !this.enabled||(position.x>=this.left&&position.x<this.right&&position.y>=this.top&&position.y<this.bottom);}
-  isVisibleTile(tile){return this.isVisiblePosition({x:tile.x+.5,y:tile.y+.5});}
+  isInSightPosition(position){return this.sources.some(source=>contains(source,position));}
+  isInSightTile(tile){return tile.x>=0&&tile.x<this.width&&tile.y>=0&&tile.y<this.height&&this.visibleIndices.has(tile.y*this.width+tile.x);}
+  isVisiblePosition(position){return !this.enabled||this.isInSightPosition(position);}
+  isVisibleTile(tile){return !this.enabled||this.isInSightTile(tile);}
   isVisibleObject(object){
     if(!this.enabled)return true;
-    if(object.position)return this.isVisiblePosition(object.position);
+    if(object.position)return this.isInSightPosition(object.position);
     const d=object.definition??{width:1,height:1};
-    return object.x+.5<this.right&&object.x+d.width-.5>=this.left&&object.y+.5<this.bottom&&object.y+d.height-.5>=this.top;
+    for(let y=0;y<d.height;y++)for(let x=0;x<d.width;x++)if(this.isInSightTile({x:object.x+x,y:object.y+y}))return true;
+    return false;
   }
 }

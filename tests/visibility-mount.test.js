@@ -20,13 +20,14 @@ function world(){
   const horse=new AnimalController(s,objectRegistry.require('horse'),'horse-1',{x:6,y:5},view());s.animalSystem.animals.set(horse.id,horse);return {s,horse};
 }
 
-test('FoW is off by default, uses an exact square in logical coordinates and includes building footprints',()=>{
+test('FoW uses an exact logical circle with the former diameter and includes visible footprint tiles',()=>{
   const king={definition:objectRegistry.require('king'),position:{x:50.5,y:50.5},state:'ground'};
   const fog=new FogOfWarSystem(king);assert.equal(fog.enabled,false);assert.equal(fog.isVisibleTile({x:99,y:99}),true);
   fog.setEnabled(true);let count=0;
   for(let y=0;y<100;y++)for(let x=0;x<100;x++)if(fog.isVisibleTile({x,y}))count++;
-  assert.equal(count,400);assert.equal(fog.size,20);
-  assert.equal(fog.isVisibleTile({x:40,y:40}),true);assert.equal(fog.isVisibleTile({x:60,y:50}),false);
+  assert.equal(count,317);assert.equal(fog.size,20);assert.equal(fog.radius,10);
+  assert.equal(fog.isVisibleTile({x:40,y:40}),false);assert.equal(fog.isVisibleTile({x:60,y:50}),true);
+  assert.equal(fog.isVisibleTile({x:61,y:50}),false);assert.equal(fog.isVisibleTile({x:50,y:40}),true);
   assert.equal(fog.isVisibleObject({x:39,y:50,definition:{width:2,height:2}}),true);
   assert.equal(fog.isVisibleObject({x:38,y:50,definition:{width:2,height:2}}),false);
   const signature=fog.signature;king.position={x:51.5,y:50.5};fog.update();assert.notEqual(fog.signature,signature);
@@ -84,4 +85,41 @@ test('settings persist the FoW toggle, retain other fields and tolerate unavaila
   saveSettings(storage,{fogOfWar:false,pathWearDebug:false});assert.deepEqual(readSettings(storage),{fogOfWar:false,pathWearDebug:false});
   storage.setItem('newgame.settings','invalid');assert.deepEqual(readSettings(storage),{fogOfWar:false,pathWearDebug:false});
   assert.deepEqual(readSettings(undefined),{fogOfWar:false,pathWearDebug:false});assert.doesNotThrow(()=>saveSettings(undefined,{fogOfWar:true}));
+});
+
+test('circular sight follows fractional logical movement, clips boundaries and caches stationary sources',()=>{
+  const king={definition:objectRegistry.require('king'),position:{x:50.5,y:50.5},state:'ground'};
+  const fog=new FogOfWarSystem(king,true),visible=fog.visibleIndices,revision=fog.revision;
+  for(let i=0;i<100;i++)fog.update();assert.equal(fog.revision,revision);assert.equal(fog.visibleIndices,visible);
+  assert.equal(fog.isVisibleTile({x:60,y:50}),true);assert.equal(fog.isVisibleTile({x:60,y:51}),false);
+  king.position={x:50.56,y:50.5};fog.update();assert.equal(fog.isVisibleTile({x:60,y:51}),true);
+  assert.ok(fog.added.includes(51*100+60));assert.equal(fog.isVisibleTile({x:40,y:50}),false);
+  king.position={x:.5,y:.5};fog.update();assert.equal(fog.isVisibleTile({x:-1,y:0}),false);
+  assert.ok([...fog.visibleIndices].every(index=>index>=0&&index<10000));
+  for(const index of fog.visibleIndices)assert.ok((index%100)**2+Math.floor(index/100)**2<=100);
+});
+
+test('explicit active vision sources form a union without revealing unrelated buildings',()=>{
+  const king={definition:objectRegistry.require('king'),position:{x:20.5,y:20.5},state:'ground'};
+  const fog=new FogOfWarSystem(king,true);let active=true;
+  const remove=fog.registerSource('test-scout',()=>active?{center:{x:70.5,y:70.5},radius:2}:null);
+  assert.equal(fog.isVisibleTile({x:20,y:20}),true);assert.equal(fog.isVisibleTile({x:72,y:70}),true);
+  assert.equal(fog.isVisibleTile({x:72,y:72}),false);assert.equal(fog.isVisibleTile({x:45,y:45}),false);
+  active=false;fog.update();assert.equal(fog.isVisibleTile({x:70,y:70}),false);
+  active=true;fog.update();remove();assert.equal(fog.isVisibleTile({x:70,y:70}),false);
+  assert.throws(()=>fog.registerSource('invalid',42),TypeError);
+});
+
+test('testing Fog OFF does not alter ordinary circular sight or activate roof bonuses while climbing',()=>{
+  const king={definition:objectRegistry.require('king'),position:{x:50.5,y:50.5},state:'ground'};
+  const fog=new FogOfWarSystem(king,true),revision=fog.revision,visible=[...fog.visibleIndices];
+  fog.setEnabled(false);assert.equal(fog.isVisibleTile({x:99,y:99}),true);assert.equal(fog.isInSightTile({x:99,y:99}),false);
+  assert.equal(fog.revision,revision);assert.deepEqual([...fog.visibleIndices],visible);
+  fog.setEnabled(true);assert.equal(fog.isVisibleTile({x:99,y:99}),false);
+  for(const [type,diameter]of [['tower',40],['castle',35],['wall',35]]){
+    const definition=objectRegistry.require(type);king.currentTower={x:40,y:40,definition};
+    king.state='enteringTower';fog.update();assert.equal(fog.radius,10);
+    king.state=type==='wall'?'onWall':'onTower';fog.update();assert.equal(fog.radius,diameter/2);
+    king.state='exitingTower';fog.update();assert.equal(fog.radius,10);
+  }
 });

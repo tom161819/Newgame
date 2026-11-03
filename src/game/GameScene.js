@@ -503,7 +503,7 @@ export class GameScene extends Phaser.Scene {
   }
   updateMountUI(){
     document.querySelector('#dismount').hidden=!this.character.mountedHorse;
-    const text=this.fog.enabled?`Dohled ${this.fog.size} × ${this.fog.size}`:'Fog of War: OFF';
+    const text=this.fog.enabled?`Dohled: ${this.fog.radius} polí · kruh`:'Fog of War: OFF';
     const output=document.querySelector('#vision-status');if(output.textContent!==text)output.textContent=text;
   }
   update(_time,delta) {
