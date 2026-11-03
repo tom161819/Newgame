@@ -1,6 +1,54 @@
 [
   {
     "schema": 1,
+    "commit": "ddc9168972667cd3c969fd256e1ec7035f78072a",
+    "tree": "c7b98e06be1fe398ee1897d40991f8ef6f2bfb3d",
+    "date": "2026-11-03T15:53:51Z",
+    "sequence": 55,
+    "subject": "Add seasonal growth, daily weather and persistent resident food consumption",
+    "name": "Roční období, počasí a potrava",
+    "description": "Add seasonal growth, daily weather and persistent resident food consumption",
+    "basePath": "/Newgame/versions/ddc9168972667cd3c969fd256e1ec7035f78072a/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "1545aea42ece4f7ad448789650e61fb3c43d8116",
+    "tree": "3dd0f98350d195e10b0596f99027dbb875df500a",
+    "date": "2026-11-03T13:36:37Z",
+    "sequence": 54,
+    "subject": "Checkpoint published food production before seasons and daily food consumption",
+    "name": "Výroba a skladování potravin · kontrolní bod",
+    "description": "Kontrolní verze připravená před následujícím rozšířením.",
+    "basePath": "/Newgame/versions/1545aea42ece4f7ad448789650e61fb3c43d8116/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "5e9b134ac2734550ed8ac19fe4f50a94a9cd58e7",
+    "tree": "510561a0bc25e33ba16c56fec20882ad023cb2a5",
+    "date": "2026-11-03T13:34:56Z",
+    "sequence": 53,
+    "subject": "Publish verified food production and preserve 52 playable versions",
+    "name": "Výroba a skladování potravin",
+    "description": "Publish verified food production and preserve 52 playable versions",
+    "basePath": "/Newgame/versions/5e9b134ac2734550ed8ac19fe4f50a94a9cd58e7/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
     "commit": "66311391900df17e0755bdac7e51db40a5516d13",
     "tree": "51881357f51362f868c1efb78c5ae2bb1b7abc94",
     "date": "2026-11-03T13:32:39Z",
