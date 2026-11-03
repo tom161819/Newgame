@@ -7,6 +7,7 @@ import { POPULATION } from '../data/jobs.js';
 import { TaskReservationSystem } from './TaskReservationSystem.js';
 import { JobSystem } from './JobSystem.js';
 import { WorkerAI } from './WorkerAI.js';
+import { initializeNaturalTalent } from './NaturalTalentSystem.js';
 
 const names=['Matěj','Anna','Jakub','Eliška','Pavel','Marie','Jan','Tereza','Ondřej','Klára'];
 export class WorkerSystem {
@@ -31,10 +32,11 @@ export class WorkerSystem {
     const occupied=new Set([...this.scene.resourceOccupancy.keys(),...this.scene.reservedTiles().map(tileKey)]);
     return reachableTiles(this.scene.map,this.homeGoals()).filter(t=>!occupied.has(tileKey(t)));
   }
-  create(tile,{id=null,name=null}={}){
+  create(tile,{id=null,name=null,randomize=true}={}){
     id??=`worker-${this.nextId++}`;const number=Number(id.split('-')[1]),definition=this.scene.objectRegistry.require('peasant');
     const view=this.scene.assets.createView(definition.id,{...tileCenter(tile),tile});
     const worker=new WorkerController(this.scene,definition,id,tile,view,name??`${names[(number-1)%names.length]}${number>names.length?` ${Math.ceil(number/names.length)}`:''}`);
+    if(randomize)initializeNaturalTalent(worker);
     view.setData('worker',worker);this.workers.set(id,worker);return worker;
   }
   spawnInitial(){

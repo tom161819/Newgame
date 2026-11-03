@@ -18,7 +18,7 @@ export class Inventory {
   }
 
   spend(resource, amount) {
-    if (!Number.isSafeInteger(amount) || amount < 0) throw new RangeError('Neplatná cena.');
+    if (!(resource==='gold'?Number.isFinite(amount)&&amount<=Number.MAX_SAFE_INTEGER:Number.isSafeInteger(amount)) || amount < 0) throw new RangeError('Neplatná cena.');
     if (this.count(resource) < amount) return false;
     this.resources.set(resource, this.count(resource) - amount);
     return true;

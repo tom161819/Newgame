@@ -70,7 +70,7 @@ Zkušenosti patří konkrétní postavě a ukládají se společně se zpracovan
 
 ## Poddaní, skilly a profese
 
-Nová hra začíná se **třemi poddanými**. Každý další herní den může z dosažitelného okraje mapy přijít jeden nový obyvatel, dokud populace nedosáhne **20**. Příchozí fyzicky dojde do osady. Poddaní mají vlastní jména, HP, celkový level a šest nezávislých skillů: Woodcutting, Mining, Hunting, Construction, Farming a Combat. Všechny začínají na levelu 1; změna profese zkušenosti zachová.
+Nová hra začíná se **třemi poddanými**. Každý další herní den může z dosažitelného okraje mapy přijít jeden nový obyvatel, dokud populace nedosáhne **20**. Příchozí fyzicky dojde do osady. Poddaní mají vlastní jména, HP, celkový level a šest nezávislých skillů: Woodcutting, Mining, Hunting, Construction, Farming a Combat. Nový poddaný má jeden trvalý přirozený talent: příslušný skill začíná na levelu 3–8, jeden další náhodný skill na 1–4 a ostatní na 1. Celkový level začíná nezávisle na 1. Talent přidává pouze **20 % XP** do odpovídajícího skillu; změna profese talent ani zkušenosti nemaže.
 
 Klikni na postavu a použij **Assign Job**. Nezaměstnaní se procházejí po osadě. **Miner** hledá dosažitelné volné kameny, dojde k nim a těží do společného inventáře. **Hunter** pronásleduje zvěř, bojuje a sebere skutečně vytvořené maso. Pracovníci si rezervují cíle, takže dva nesbírají tentýž předmět. Při změně práce se rozpracovaný úkol bezpečně zruší bez odměny. Lovec pod 30 % HP přeruší útok, vrátí se domů a zotavuje se alespoň na 80 % HP.
 
@@ -78,7 +78,17 @@ Woodcutter a Farmer zatím ukazují **Waiting for workplace**. Builder čeká na
 
 Každý skill level nad 1 zvyšuje efektivitu příslušné činnosti o **1 %**, nejvýše na **149 %**. Mining zrychluje pracovní dobu, Hunting a Combat příslušné DPS. Nemění základní statistiky, pohyb ani množství surovin. Dokončená činnost přidá stejné základní XP do příslušného skillu i celkového postupu. Skutečné poškození rozvíjí Combat, nejvýše 40 základních XP na protivníka; tento přírůstek neduplikuje celkovou odměnu za lov.
 
-Pracovní AI funguje i mimo záběr kamery a pod Fog of War; skryté jednotky nemají viditelné panely ani efekty. Save/Load uchovává skilly, profese, pohyb, rozpracovanou práci a rezervace. Starší save zachová původní svět a XP, doplní nové skilly na level 1 a jednou přidá tři počáteční obyvatele.
+Pracovní AI funguje i mimo záběr kamery a pod Fog of War; skryté jednotky nemají viditelné panely ani efekty. Save/Load uchovává skilly, profese, pohyb, rozpracovanou práci a rezervace. Starší save zachová původní svět a XP. Existujícím poddaným ponechá dosažené skilly a přidělí stabilní talent bez nového losování. Save bez poddaných jednou přidá tři nové obyvatele; královy nové skilly začnou na 1.
+
+## Talenty a ekonomika mezd
+
+Horní přehled Economy ukazuje Gold, příjmy hradů, očekávané denní mzdy, bilanci a nezaplacené mzdy. Detail poddaného zvýrazňuje talentovaný skill a ukazuje talent, bonus XP, sazbu a dluh.
+
+Nezaměstnaní mají sazbu 0, běžné profese 1 Gold/den a Soldier 2 Gold/den. Každých deset dokončených levelů příslušného pracovního skillu přidá 1: levely 1–10 mají základ, 11–20 základ +1 až po 41–50 základ +4. Talent sazbu přímo nemění. Zaměstnanec dostává mzdu i při čekání na práci; smrt zastaví nové náklady, ale nesmaže již vydělanou mzdu.
+
+Den trvá 120 aktivních sekund. Mzdové náklady se počítají poměrně podle skutečného času v profesi a při dané sazbě. Na přelomu dne se nejdříve přičte příjem hradů a poté zaplatí nejstarší dluhy a nové mzdy. Nedostatek Gold zanechá dluh konkrétním poddaným a upozornění; Gold nikdy neklesne pod nulu. Částky jsou interně bez zaokrouhlování a UI zobrazuje dvě desetinná místa. Pauza a zavřená hra nové mzdy nevytvářejí.
+
+Save/Load uchovává talenty, původní i aktuální skilly, poměrné náklady rozehraného dne, dluhy a poslední výplatu. Starší save neúčtuje zpětné mzdy. Zatím nejsou stávky, morálka ani odchody kvůli dluhu.
 
 ## Přirozené pěšiny
 
@@ -125,7 +135,7 @@ Po smrti krále se zastaví ovládání, pohyb a herní časovače a objeví se 
 
 Hra začíná **Day 1**. Jeden den trvá **120 sekund aktivní hry** a horní lišta ukazuje zbývající čas. Událost přechodu dne se spustí právě jednou pro každý překročený den, včetně většího časového kroku. Game Over nebo pozastavení čas zastaví; katalog objektů a přehled vybavení zůstávají běžícím prohlížečem nad hrou.
 
-Inventář začíná na nule v pořadí **Gold → Stone → Meat**. Každý hotový Castle při nejbližším dalším přechodu dne přidá **5 Gold**; tři hrady tedy 15. Nezáleží na kameře, dohledu ani poloze krále. Příjem doprovází krátké oznámení. Nově postavený hrad nedostane příjem za předchozí dny. Zlato se zatím neutrácí.
+Inventář začíná na nule v pořadí **Gold → Stone → Meat**. Každý hotový Castle při nejbližším dalším přechodu dne přidá **5 Gold**; tři hrady tedy 15. Nezáleží na kameře, dohledu ani poloze krále. Příjem doprovází krátké oznámení. Nově postavený hrad nedostane příjem za předchozí dny. Zlato se používá na denní mzdy poddaných.
 
 Při nové hře vznikne **jedna neprůchozí dostupná truhla** mimo krále, suroviny a ostatní objekty. Obsah se vylosuje jednou: **50–100 Gold**, **1 Sword** a **1 Armor**. Po dojití vedle truhly se víko animovaně otevře a zobrazí obsah. Teprve tlačítko **Take All** přidá věci do původního inventáře. Prázdná otevřená truhla zůstane na mapě a další vyzvednutí nic nepřidá. Respektuje Fog of War.
 

@@ -3,6 +3,7 @@ import { recalculateStats } from './UnitStats.js';
 import { buildingTiles,buildingDepth,towerTop } from '../game/buildings.js';
 import { gridToWorld,tileCenter } from '../game/isometric.js';
 import { importCharacterExperience } from './ExperienceSystem.js';
+import { initializeNaturalTalent } from './NaturalTalentSystem.js';
 
 export function restoreActor(unit,data){
   for(const key of ['currentHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'])if(data[key]!==undefined)unit[key]=data[key];
@@ -33,7 +34,9 @@ export function loadGameState(scene,input){
     animal.view.animate?.(0,animal.walking,animal.direction);
   }
   for(const data of state.workers??[]){
-    const worker=scene.workerSystem.create(data.tile,{id:data.id,name:data.name});restoreActor(worker,data);
+    const worker=scene.workerSystem.create(data.tile,{id:data.id,name:data.name,randomize:false});restoreActor(worker,data);
+    if(data.naturalTalent){worker.naturalTalent=data.naturalTalent;worker.initialSkills=structuredClone(data.initialSkills);}
+    else initializeNaturalTalent(worker,{legacy:true});
     for(const key of ['profession','workState','workMessage','assignedWorkplaceId','arriving','aiCooldown'])worker[key]=data[key];
     worker.workTask=structuredClone(data.workTask);worker.active=worker.isAlive;
     if(worker.workTask)scene.workerSystem.reservations.reserve(worker.workTask.reservation,worker.id);
@@ -85,6 +88,7 @@ export function loadGameState(scene,input){
   scene.experienceSystem?.importState(state.experienceSystem);
   scene.skillSystem?.importState(state.skillSystem);scene.workerSystem?.importState(state.population);
   if(scene.workerSystem&&state.workers===undefined)scene.workerSystem.spawnInitial();
+  scene.wageSystem?.importState(state.wages);
   scene.pathWear?.importState(state.pathWear);
   for(const t of state.spawners)scene.resourceSpawners.find(s=>s.definition.id===t.id).importState(t);
   scene.settingsPanel.applySettings(state.settings);scene.fog.setEnabled(state.settings.fogOfWar);

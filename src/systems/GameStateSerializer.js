@@ -28,7 +28,9 @@ export function serializeGameState(scene){
     saveVersion:SAVE_VERSION,terrain:scene.terrainGrid.map(row=>[...row]),
     ...(scene.experienceSystem?{experienceSystem:scene.experienceSystem.exportState()}:{}),
     ...(scene.skillSystem?{skillSystem:scene.skillSystem.exportState()}:{}),
+    ...(scene.wageSystem?{wages:scene.wageSystem.exportState()}:{}),
     ...(scene.workerSystem?{population:scene.workerSystem.exportState(),workers:[...scene.workerSystem.workers.values()].map(w=>({...serializeActor(w),name:w.name,profession:w.profession,
+      ...(w.naturalTalent?{naturalTalent:w.naturalTalent,initialSkills:copy(w.initialSkills)}:{}),
       workState:w.workState,workMessage:w.workMessage??'',workTask:copy(w.workTask),assignedWorkplaceId:w.assignedWorkplaceId,arriving:w.arriving,aiCooldown:w.aiCooldown}))}:{}),
     ...(scene.pathWear?{pathWear:scene.pathWear.exportState()}:{}),
     player:{...serializeActor(c),state:c.state,currentTowerId:c.currentTower?.id??null,horseId:c.mountedHorse?.id??null,
@@ -87,6 +89,13 @@ export function validateGameState(input,registry=objectRegistry){
     if(c.opening){number(c.animation?.elapsed,0,350);if(c.animation.lid){number(c.animation.lid.y,-100,100);number(c.animation.lid.rotation,-10,10);}}
   }
   for(const d of s.drops){check(typeof d.id==='string');check(definition(d.resource,'resource').collectible);tile(d.tile);integer(d.amount,1);check(s.terrain[d.tile.y][d.tile.x]===0&&!occupied.has(`${d.tile.x},${d.tile.y}`));}
+  const skillsState=skills=>{
+    check(skills&&typeof skills==='object'&&!Array.isArray(skills)&&Object.keys(skills).length===SKILL_IDS.length);
+      for(const id of SKILL_IDS){const e=skills[id];check(e&&typeof e.enabled==='boolean');integer(e.maxLevel,1,50);integer(e.level,1,e.maxLevel);number(e.gainMultiplier,0,1e6);number(e.currentXP);number(e.totalXP,0,totalXPForLevel(e.maxLevel));
+        const required=e.level===e.maxLevel?0:getXPRequired(e.level);check(e.xpToNextLevel===required);check(required?e.currentXP<required:e.currentXP===0);check(Math.abs(e.totalXP-totalXPForLevel(e.level)-e.currentXP)<1e-6);
+        check(e.modifiers&&typeof e.modifiers==='object'&&!Array.isArray(e.modifiers));for(const [key,value]of Object.entries(e.modifiers)){check(!['__proto__','constructor','prototype'].includes(key));number(value,0,1e6);}
+      }
+  };
   const actor=a=>{
     check(a&&typeof a.isAlive==='boolean');definition(a.type);tile(a.tile);position(a.position);if(a.nextTile)tile(a.nextTile);array(a.path,20000);a.path.forEach(tile);
     number(a.direction?.x,-1,1);number(a.direction?.y,-1,1);number(a.speed,0,100);
@@ -102,11 +111,7 @@ export function validateGameState(input,registry=objectRegistry){
       for(const [key,value]of Object.entries(e.modifiers)){check(!['__proto__','constructor','prototype'].includes(key));number(value,0,1e6);}
     }
     if(a.skills!==undefined){
-      check(definition(a.type).category==='character'&&a.skills&&typeof a.skills==='object'&&Object.keys(a.skills).length===SKILL_IDS.length);
-      for(const id of SKILL_IDS){const e=a.skills[id];check(e&&typeof e.enabled==='boolean');integer(e.maxLevel,1,50);integer(e.level,1,e.maxLevel);number(e.gainMultiplier,0,1e6);number(e.currentXP);number(e.totalXP,0,totalXPForLevel(e.maxLevel));
-        const required=e.level===e.maxLevel?0:getXPRequired(e.level);check(e.xpToNextLevel===required);check(required?e.currentXP<required:e.currentXP===0);check(Math.abs(e.totalXP-totalXPForLevel(e.level)-e.currentXP)<1e-6);
-        check(e.modifiers&&typeof e.modifiers==='object'&&!Array.isArray(e.modifiers));for(const [key,value]of Object.entries(e.modifiers)){check(!['__proto__','constructor','prototype'].includes(key));number(value,0,1e6);}
-      }
+      check(definition(a.type).category==='character');skillsState(a.skills);
       check(a.activitySkill==null||SKILL_IDS.includes(a.activitySkill));
     }
   };
@@ -122,6 +127,10 @@ export function validateGameState(input,registry=objectRegistry){
   if(s.workers!==undefined){
     integer(s.population?.nextId,1);integer(s.population.lastMigrationDay,1,s.time?.day??Number.MAX_SAFE_INTEGER);
     for(const w of s.workers){
+      if(w.naturalTalent!==undefined||w.initialSkills!==undefined){
+        check(SKILL_IDS.includes(w.naturalTalent)&&w.skills);skillsState(w.initialSkills);
+        for(const id of SKILL_IDS)check(w.initialSkills[id].totalXP<=w.skills[id].totalXP+1e-6);
+      }
       check(w.type==='peasant');actor(w);check(typeof w.name==='string'&&w.name.length>0&&w.name.length<100&&Object.hasOwn(JOBS,w.profession));
       const match=String(w.id).match(/^worker-(\d+)$/);check(match&&Number(match[1])>0&&Number(match[1])<s.population.nextId);
       check(typeof w.arriving==='boolean');number(w.aiCooldown,-1e9,1e9);number(w.wanderWait,-1e9,1e9);check(w.assignedWorkplaceId==null||bIds.has(w.assignedWorkplaceId));
@@ -140,13 +149,20 @@ export function validateGameState(input,registry=objectRegistry){
     if(o.kind==='enter')check(bIds.has(o.buildingId));if(o.kind==='approachAnimal')check(aIds.has(o.animalId));if(o.kind==='drop')check(dIds.has(o.dropId));
     if(o.kind==='openChest')check(cIds.has(o.chestId));if(o.kind==='collect')check(s.resources.some(r=>`${r.tile.x},${r.tile.y}`===o.resourceKey));};
   order(p.order);if(p.roofContinuation){order(p.roofContinuation.order);tile(p.roofContinuation.exit);tile(p.roofContinuation.destination);array(p.roofContinuation.path);p.roofContinuation.path.forEach(tile);}
-  check(s.inventory&&typeof s.inventory==='object');for(const [id,count]of Object.entries(s.inventory)){const d=definition(id);check(['resource','equipment'].includes(d.category));integer(count);}
+  check(s.inventory&&typeof s.inventory==='object');for(const [id,count]of Object.entries(s.inventory)){const d=definition(id);check(['resource','equipment'].includes(d.category));if(id==='gold')number(count);else integer(count);}
   check(s.equipment&&Object.keys(s.equipment).length===2);for(const slot of ['weapon','armor'])if(s.equipment[slot]!=null){const id=s.equipment[slot];check(definition(id,'equipment').equipment.slot===slot&&(s.inventory[id]??0)>0);}
   integer(s.time?.day,1);number(s.time.elapsed,0,DAY_DURATION-1e-7);number(s.time.totalElapsed);check(Math.abs(s.time.totalElapsed-((s.time.day-1)*DAY_DURATION+s.time.elapsed))<.01);
   number(s.food?.elapsed,0,registry.require('meat').consumption.interval-1e-7);
   const spawnIds=new Set();for(const t of s.spawners){const d=definition(t.id,'resource');check(d.spawn&&!spawnIds.has(t.id));spawnIds.add(t.id);number(t.elapsed,0,d.spawn.interval-1e-7);}
   check(registry.byCategory('resource').filter(d=>d.spawn).every(d=>spawnIds.has(d.id)));
   integer(s.production?.lastProcessedDay,1,s.time.day);
+  if(s.wages!==undefined){
+    const wages=s.wages;check(wages&&s.workers);integer(wages.lastProcessedDay,1,s.time.day);check(wages.lastProcessedDay===s.time.day);
+    check(wages.accruals&&typeof wages.accruals==='object'&&!Array.isArray(wages.accruals));
+    for(const [id,cost]of Object.entries(wages.accruals)){check(wIds.has(id)&&cost);number(cost.rateMilliseconds,0,s.time.elapsed*6+1e-6);number(cost.compensation,-1e-6,1e-6);}
+    array(wages.arrears,1000000);const debts=new Set();
+    for(const debt of wages.arrears){check(wIds.has(debt.workerId));integer(debt.day,1,s.time.day-1);number(debt.amount,Number.MIN_VALUE,6);const key=`${debt.workerId}:${debt.day}`;check(!debts.has(key));debts.add(key);}
+  }
   if(s.pathWear){
     const w=s.pathWear;for(const key of ['scores','levels','lastPassDays']){array(w[key],COLUMNS*ROWS);check(w[key].length===COLUMNS*ROWS);}
     integer(w.lastDecayDay,1,s.time.day);

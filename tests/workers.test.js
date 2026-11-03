@@ -103,7 +103,7 @@ test('save/load restores moving/working subjects, skill XP, combat targets and r
   r.simulate(8000);assert.equal(r.inventory.count('stone'),1);assert.ok(r.workerSystem.workers.get(a.id).skills.mining.totalXP===3);
   const duplicate=structuredClone(saved);duplicate.workers[1].workTask={...duplicate.workers[0].workTask};duplicate.workers[1].profession='miner';assert.throws(()=>validateGameState(duplicate));
   const malformed=structuredClone(saved);malformed.workers[0].skills.mining.level=51;assert.throws(()=>validateGameState(malformed));
-  const legacy=structuredClone(saved);delete legacy.workers;delete legacy.population;delete legacy.skillSystem;delete legacy.player.skills;delete legacy.player.activitySkill;
+  const legacy=structuredClone(saved);delete legacy.workers;delete legacy.population;delete legacy.wages;delete legacy.skillSystem;delete legacy.player.skills;delete legacy.player.activitySkill;
   // Starší verze neměla poddané ani boj proti nim.
   legacy.animals[0].retaliationId=null;legacy.commands.attacks=[];legacy.skillSystem=undefined;
   const old=workerScene(saved.terrain);loadGameState(old,legacy);assert.equal(old.workerSystem.liveWorkers().length,3);assert.ok(Object.values(old.character.skills).every(t=>t.level===1));

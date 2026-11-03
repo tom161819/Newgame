@@ -14,7 +14,7 @@ export class InventoryBar {
     const items=this.registry.byCategory('resource').filter(d=>d.collectible).sort((a,b)=>(a.inventoryOrder??100)-(b.inventoryOrder??100)).map(definition=>{
       const item=element('div','inventory-item'),image=element('img','stone-icon');
       image.src=this.assets.previewURL(definition);image.alt='';
-      const output=element('output','',String(this.inventory.count(definition.id)));
+      const output=element('output','',this.format(definition.id));
       output.id=`${definition.id}-count`;output.dataset.resourceCount=definition.id;
       output.setAttribute('aria-label',definition.inventoryLabel??definition.name);
       output.setAttribute('aria-live','polite');output.setAttribute('aria-atomic','true');
@@ -23,6 +23,7 @@ export class InventoryBar {
     });
     this.root.replaceChildren(...items);
   }
-  update() { for(const [id,output]of this.outputs)output.textContent=this.inventory.count(id); }
+  format(id){return id==='gold'?this.inventory.count(id).toFixed(2):String(this.inventory.count(id));}
+  update() { for(const [id,output]of this.outputs)output.textContent=this.format(id); }
   destroy() { this.unsubscribe();this.unsubscribeAssets(); }
 }

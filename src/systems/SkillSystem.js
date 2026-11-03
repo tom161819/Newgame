@@ -1,6 +1,7 @@
 import { SKILL_IDS,WORK_RULES } from '../data/jobs.js';
 import { createProgress } from '../data/experience.js';
 import { recalculateStats } from './UnitStats.js';
+import { talentXPMultiplier } from './NaturalTalentSystem.js';
 
 export class SkillSystem {
   constructor(scene){
@@ -14,7 +15,7 @@ export class SkillSystem {
   efficiency(actor,skill){const skills=this.initialize(actor);return 1+((skills?.[skill]?.level??1)-1)*WORK_RULES.efficiencyPerLevel;}
   addXP(actor,skill,amount){
     const skills=this.initialize(actor);if(!skills?.[skill]||actor.isAlive===false||actor.experience?.enabled===false)return 0;
-    return this.scene.experienceSystem.addTrackXP(skills[skill],amount,()=>{if(actor.activitySkill===skill)this.refreshModifier(actor);});
+    return this.scene.experienceSystem.addTrackXP(skills[skill],amount*talentXPMultiplier(actor,skill),()=>{if(actor.activitySkill===skill)this.refreshModifier(actor);});
   }
   completed(event,reward){
     const skill=event.type==='resourceCollected'&&event.objectType==='stone'?'mining':event.type==='animalKilled'?'hunting':event.type==='buildingCompleted'?'construction':null;

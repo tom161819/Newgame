@@ -14,12 +14,13 @@ import { PathWearSystem } from '../../src/systems/PathWearSystem.js';
 import { ExperienceSystem } from '../../src/systems/ExperienceSystem.js';
 import { GameActivityBus } from '../../src/systems/GameActivityBus.js';
 import { SkillSystem } from '../../src/systems/SkillSystem.js';
+import { WageSystem } from '../../src/systems/WageSystem.js';
 import { WorkerSystem } from '../../src/systems/WorkerSystem.js';
 import { ResourceSpawner } from '../../src/game/stones.js';
 import { tileCenter } from '../../src/game/isometric.js';
 import { wallIndex,connectionsFor } from '../../src/game/walls.js';
 
-export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0))){
+export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false}={}){
   const scene={objectRegistry,terrainGrid:terrain.map(r=>[...r]),map:terrain.map(r=>[...r]),inventory:new Inventory(),gameOver:false,
     resources:new Map(),resourceOccupancy:new Map(),buildings:[],towerViews:new Map(),animations:[],
     marker:{visible:false,setVisible(v){this.visible=v;}},showMarker(){this.marker.visible=true;},setStatus(){},updateBuildingUI(){},updateInventory(){},updateTimeDisplay(){},refreshVisibility(){},
@@ -39,7 +40,8 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   scene.pathWear=new PathWearSystem({map:scene.map,terrain:scene.terrainGrid,time:scene.gameTime});scene.regeneration=new RegenerationSystem();
   scene.equipment=new EquipmentSystem(scene.character,objectRegistry,scene.inventory);scene.combat=new CombatSystem({map:scene.map,regenerationRate:u=>scene.regeneration.rateFor(u)});scene.skillSystem.attachCombat(scene.combat);
   scene.animalSystem=new AnimalSystem(scene);scene.dropSystem=new DropSystem(scene);scene.treasureSystem=new TreasureSystem(scene);scene.workerSystem=new WorkerSystem(scene);
-  scene.foodSystem=new FoodSystem(scene.inventory,objectRegistry.require('meat'));scene.production=new ProductionSystem(scene.gameTime,scene.inventory,()=>scene.buildings);
+  if(!randomizeTalents){const create=scene.workerSystem.create.bind(scene.workerSystem);scene.workerSystem.create=(tile,options={})=>{const w=create(tile,{...options,randomize:false});w.naturalTalent='woodcutting';w.initialSkills=structuredClone(w.skills);return w;};}
+  scene.foodSystem=new FoodSystem(scene.inventory,objectRegistry.require('meat'));scene.production=new ProductionSystem(scene.gameTime,scene.inventory,()=>scene.buildings);scene.wageSystem=new WageSystem(scene);
   scene.addResource=(d,tile)=>{const v=view(d.id,tileCenter(tile)),key=`${tile.x},${tile.y}`;v.setData('tile',{...tile}).setData('object',{type:d.id,definition:d,x:tile.x,y:tile.y,tiles:[{...tile}]});scene.resources.set(key,v);scene.resourceOccupancy.set(key,key);};
   scene.collectResource=(key,tile,actor)=>{const v=scene.resources.get(key);if(!v||key!==`${tile.x},${tile.y}`||actor.state!=='ground')return false;
     const type=v.getData('objectId');scene.resources.delete(key);v.destroy();scene.dropSystem.refreshOccupancy(tile);scene.inventory.add(type);scene.activities.emit('resourceCollected',{actor,objectType:type});return true;};
@@ -52,7 +54,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
     const tile={x:Math.floor(target.position.x),y:Math.floor(target.position.y)};if(killer)scene.activities.emit('animalKilled',{actor:killer,objectType:target.type});
     scene.animalSystem.remove(target);const drop=scene.dropSystem.create('meat',tile,target.definition.gameplay.meatDrop);scene.workerSystem.ai.animalDied(target,killer,drop);
   });
-  scene.tick=delta=>{scene.animalSystem.update(delta);scene.workerSystem.update(delta);const covered=scene.combat.update(delta);scene.regeneration.update(delta,[scene.character,...scene.animalSystem.animals.values(),...scene.workerSystem.liveWorkers()],covered);scene.gameTime.update(delta);};
+  scene.tick=delta=>{scene.gameTime.update(delta);scene.animalSystem.update(delta);scene.workerSystem.update(delta);const covered=scene.combat.update(delta);scene.regeneration.update(delta,[scene.character,...scene.animalSystem.animals.values(),...scene.workerSystem.liveWorkers()],covered);};
   scene.simulate=(ms,step=50)=>{let elapsed=0;while(elapsed<ms){const delta=Math.min(step,ms-elapsed);scene.tick(delta);elapsed+=delta;}};
   return scene;
 }

@@ -45,6 +45,8 @@ import { UnitPanel } from '../ui/UnitPanel.js';
 import { HumanView } from './HumanView.js';
 import { WorkerSystem } from '../systems/WorkerSystem.js';
 import { SkillSystem } from '../systems/SkillSystem.js';
+import { WageSystem } from '../systems/WageSystem.js';
+import { EconomyPanel } from '../ui/EconomyPanel.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -59,6 +61,7 @@ export class GameScene extends Phaser.Scene {
   create() {
     this.worldCamera=null;
     this.workerSystem=null;
+    this.wageSystem=null;this.economyPanel=null;
     this.gameOver=false;this.input.enabled=true;this.input.keyboard.enabled=true;this.tweens.resumeAll();
     this.activeFramePending=true;this.visibilityPaused=document.hidden;
     this.assets.initialize();
@@ -130,6 +133,7 @@ export class GameScene extends Phaser.Scene {
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
     this.treasurePanel=new TreasurePanel(this);if(!this.loadState)this.treasureSystem.spawn(PLAYER_START);
     this.production=new ProductionSystem(this.gameTime,this.inventory,()=>this.buildings,(day,totals)=>this.onDailyIncome(day,totals));
+    this.wageSystem=new WageSystem(this,{onPayroll:()=>this.updateInventory()});this.economyPanel=new EconomyPanel(this);
     this.buildingBar.close();this.updateInventory();
     this.updateTimeDisplay();
     this.setStatus('Vyber surovinu, volné políčko, Buildings nebo Asset Library.');
@@ -161,7 +165,7 @@ export class GameScene extends Phaser.Scene {
       this.equipmentPanel.destroy();this.treasurePanel.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
-      this.workerSystem.destroy();this.skillSystem.destroy();
+      this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
       this.game.events.off(Phaser.Core.Events.PAUSE,onBackground);this.game.events.off(Phaser.Core.Events.RESUME,onForeground);
       this.game.canvas.style.cursor='';
     });
@@ -388,7 +392,7 @@ export class GameScene extends Phaser.Scene {
     this.inventory.add(definition.id);this.updateInventory();this.activities.emit('resourceCollected',{actor,objectType:definition.id,quantity:1});return true;
   }
   collectStone(tile) { return this.collectResource(tileKey(tile),this.character.tile); }
-  updateInventory() { this.inventoryBar.update();this.updateBuildingUI();this.updateWorldCount();this.updateFoodDisplay();this.equipmentPanel?.refresh(); }
+  updateInventory() { this.inventoryBar.update();this.updateBuildingUI();this.updateWorldCount();this.updateFoodDisplay();this.equipmentPanel?.refresh();this.economyPanel?.update(); }
   updateTimeDisplay(){const output=document.querySelector('#game-time');if(output.textContent!==this.gameTime.label)output.textContent=this.gameTime.label;}
   onDailyIncome(day,totals){
     const labels=new Set(this.buildings.map(b=>buildingDefinition(b).production).filter(p=>p?.interval==='day'&&totals[p.resource]).map(p=>p.label).filter(Boolean));
@@ -440,11 +444,12 @@ export class GameScene extends Phaser.Scene {
     const raw=this.game.loop.rawDelta;
     delta=this.activeFramePending?0:Number.isFinite(raw)?Math.max(0,raw):Math.max(0,delta);
     this.activeFramePending=false;
+    // Časové úseky uzavírají mzdy před novou prací, změnou skillu nebo úmrtím tohoto snímku.
+    const activeDelta=this.gameTime.update(delta);this.updateTimeDisplay();
     this.character.update(delta);this.player.animate(delta,this.character.walking&&[PLAYER_STATE.GROUND,PLAYER_STATE.ON_WALL].includes(this.character.state),this.character.direction);
     this.animalSystem.update(delta);this.huntingSystem.update(delta);this.mountSystem.update(delta);this.workerSystem.update(delta);const covered=this.combat.update(delta);
     if(this.gameOver)return;
     this.regeneration.update(delta,[this.character,...this.animalSystem.animals.values(),...this.workerSystem.liveWorkers()],covered);
-    const activeDelta=this.gameTime.update(delta);this.updateTimeDisplay();
     this.combatFeedback.update(activeDelta);this.foodSystem.update(activeDelta);this.updateFoodDisplay();
     this.experienceFeedback.update(activeDelta);
     for(const spawner of this.resourceSpawners)spawner.update(activeDelta);
@@ -468,6 +473,7 @@ export class GameScene extends Phaser.Scene {
     this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
     this.combatFeedback?.refresh();
     this.experienceFeedback?.refreshVisibility();this.unitPanel?.refresh();
+    this.economyPanel?.update();
     this.treasureSystem?.update(view,this.fog);if(this.equipmentPanel?.dialog.open)this.equipmentPanel.updateStats();
   }
 }

@@ -1,5 +1,6 @@
 import { SKILLS,JOBS,WORK_RULES } from '../data/jobs.js';
 import { element } from './objectLabels.js';
+import { TALENTS,TALENT_XP_BONUS } from '../data/economy.js';
 
 export class UnitPanel {
   constructor(scene){
@@ -23,10 +24,14 @@ export class UnitPanel {
     const values={hp:`${format(u.currentHP)} / ${u.maxHP}`,dps:format(u.attackDPS),armor:`${format(u.armor)} %`,totalXP:format(e.totalXP)};
     for(const [key,value]of Object.entries(values))document.querySelector(`[data-unit-stat="${key}"]`).textContent=value;
     const worker=s.workerSystem?.workers.has(u.id);document.querySelector('#unit-job-controls').hidden=!worker;
-    if(worker){this.jobSelect.value=u.profession;document.querySelector('#unit-profession').textContent=JOBS[u.profession].name;document.querySelector('#unit-work-state').textContent=`${u.workState}${u.workMessage?` · ${u.workMessage}`:''}`;}
-    const signature=JSON.stringify(u.skills);
+    if(worker){this.jobSelect.value=u.profession;document.querySelector('#unit-profession').textContent=JOBS[u.profession].name;document.querySelector('#unit-work-state').textContent=`${u.workState}${u.workMessage?` · ${u.workMessage}`:''}`;
+      document.querySelector('#unit-wage').textContent=`${s.wageSystem.dailyWage(u).toFixed(2)} Gold/day`;
+      document.querySelector('#unit-talent').textContent=`${TALENTS[u.naturalTalent]} · +${TALENT_XP_BONUS*100} % ${SKILLS[u.naturalTalent]} XP`;
+      document.querySelector('#unit-unpaid').textContent=`Unpaid wages: ${s.wageSystem.unpaid(u).toFixed(2)} Gold`;
+    }
+    const signature=JSON.stringify([u.skills,u.naturalTalent]);
     if(this.skillSignature!==`${u.id}:${signature}`){
-      const rows=Object.entries(SKILLS).map(([id,name])=>{const skill=u.skills[id],row=element('div','skill-row');row.dataset.skill=id;row.append(element('strong','',name),element('span','',`LVL ${skill.level}`),element('span','',skill.level===skill.maxLevel?'XP MAX':`${format(skill.currentXP)} / ${skill.xpToNextLevel} XP`),element('small','',`${Math.round((1+(skill.level-1)*WORK_RULES.efficiencyPerLevel)*100)} %`));return row;});
+      const rows=Object.entries(SKILLS).map(([id,name])=>{const skill=u.skills[id],talented=id===u.naturalTalent,row=element('div',`skill-row${talented?' talented-skill':''}`);row.dataset.skill=id;row.append(element('strong','',`${name}${talented?' ★':''}`),element('span','',`LVL ${skill.level}`),element('span','',skill.level===skill.maxLevel?'XP MAX':`${format(skill.currentXP)} / ${skill.xpToNextLevel} XP`),element('small','',`${Math.round((1+(skill.level-1)*WORK_RULES.efficiencyPerLevel)*100)} %${talented?' · +20 % XP':''}`));return row;});
       document.querySelector('#unit-skills').replaceChildren(...rows);this.skillSignature=`${u.id}:${signature}`;
     }
   }
