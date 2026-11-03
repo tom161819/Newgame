@@ -20,15 +20,16 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 - [Krok 12 — dynamické pěšiny](requests/step-12.md): commit `29a9cec`, Pages run `41553554118` úspěšně nasazeno. 90 testů, skutečné průchody, zarůstání, legacy Save/Load a výkon kolem 60 FPS ověřeny.
 
+- [Krok 13 — individuální XP a levely](requests/step-13.md): commit `c8a87c7`, Pages run `41556504872` úspěšně nasazeno. 98 testů a kontrola skutečných odměn, UI, opakovaných událostí i starších savů.
+
 ## Následuje
 
-1. **Dokončeno v této verzi, ověřuje se nasazení:** [Krok 13 — univerzální XP a levely 1–50](requests/step-13.md). 98 testů; skutečné odměny a nulové odměny za neúspěšné akce, level-up, limit 50, individuální XP, viditelnost, přesný Save/Load a starší save ověřeny.
-5. [Krok 14 — individuální skilly a profese poddaných](requests/step-14.md).
-6. [Krok 15 — přirozené talenty a mzdy](requests/step-15.md).
-7. [Krok 16 — pracovní budovy a zaměstnanci](requests/step-16.md).
-8. [Krok 17 — blueprinty a skutečná výstavba](requests/step-17.md).
-9. [Krok 18a — archiv skutečných historických verzí](requests/step-18a.md).
-10. [Krok 18b — New Game Setup, obtížnost a parametry mapy](requests/step-18b.md).
-11. [Krok 19 — Advanced New Game Setup & World Configuration](requests/step-19.md).
+1. **Právě probíhá:** [Krok 14 — individuální skilly a profese poddaných](requests/step-14.md).
+2. [Krok 15 — přirozené talenty a mzdy](requests/step-15.md).
+3. [Krok 16 — pracovní budovy a zaměstnanci](requests/step-16.md).
+4. [Krok 17 — blueprinty a skutečná výstavba](requests/step-17.md).
+5. [Krok 18a — archiv skutečných historických verzí](requests/step-18a.md).
+6. [Krok 18b — New Game Setup, obtížnost a parametry mapy](requests/step-18b.md).
+7. [Krok 19 — Advanced New Game Setup & World Configuration](requests/step-19.md).
 
 Číslo 18 bylo použité u dvou různých zadání; obě se zachovávají v pořadí doručení jako 18a a 18b. Neaplikovat budoucí mechaniky před jejich krokem: krok 6 má okamžitý lov bez HP, krok 7 přidává koně/FoW, krok 8 Castle/Wall, skutečné souboje až krok 9.
