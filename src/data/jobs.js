@@ -1,4 +1,4 @@
-export const SKILLS=Object.freeze({woodcutting:'Woodcutting',mining:'Mining',hunting:'Hunting',construction:'Construction',farming:'Farming',combat:'Combat'});
+export const SKILLS=Object.freeze({woodcutting:'Woodcutting',mining:'Mining',hunting:'Hunting',construction:'Construction',farming:'Farming',combat:'Combat',milling:'Milling',baking:'Baking'});
 export const SKILL_IDS=Object.freeze(Object.keys(SKILLS));
 export const WORK_RULES=Object.freeze({efficiencyPerLevel:.01,miningDuration:1500,searchInterval:500,workRadius:24,
   fleeRatio:.3,recoverRatio:.8,combatXPPerDamage:1,combatXPPerTarget:40});
@@ -10,5 +10,7 @@ export const JOBS=Object.freeze({
   hunter:Object.freeze({name:'Hunter',skill:'hunting',workplace:'hunting_lodge',requiresWorkplace:false}),
   builder:Object.freeze({name:'Builder',skill:'construction',workplace:null,requiresWorkplace:false}),
   farmer:Object.freeze({name:'Farmer',skill:'farming',workplace:'farmhouse',requiresWorkplace:true}),
+  miller:Object.freeze({name:'Miller',skill:'milling',workplace:'mill',requiresWorkplace:true}),
+  baker:Object.freeze({name:'Baker',skill:'baking',workplace:'bakery',requiresWorkplace:true}),
   soldier:Object.freeze({name:'Soldier',skill:'combat',workplace:'barracks',requiresWorkplace:false}),
 });

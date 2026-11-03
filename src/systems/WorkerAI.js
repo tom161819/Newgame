@@ -7,6 +7,7 @@ import { WORKPLACE_RULES } from '../data/workplaces.js';
 export class WorkerAI {
   constructor(system){this.system=system;this.scene=system.scene;}
   cancel(worker){
+    this.scene.foodProduction?.cancelWorker(worker);
     this.scene.farmingSystem?.release(worker);
     if(worker.workTask?.kind==='build')this.system.jobs.constructionProvider?.releaseWorker?.(worker);
     const task=worker.workTask,animal=(task?.kind==='hunt'?this.scene.animalSystem.animals.get(task.targetId):null)??this.scene.combat.attacks.get(worker);
@@ -27,6 +28,7 @@ export class WorkerAI {
     if((worker.profession==='hunter'&&worker.currentHP<worker.maxHP*WORK_RULES.fleeRatio)||['Fleeing','Recovering'].includes(worker.workState)){
       this.recover(worker);worker.update(delta);return;
     }
+    if(this.scene.foodProduction?.handleTransport(worker)){worker.update(delta);return;}
     if(worker.profession==='idle'){this.idle(worker);worker.update(delta);return;}
     const job=JOBS[worker.profession];
     const workplace=this.scene.workplaceSystem;
@@ -40,6 +42,7 @@ export class WorkerAI {
     if(worker.profession==='miner')this.miner(worker,delta);
     else if(worker.profession==='hunter')this.hunter(worker,delta);
     else if(worker.profession==='farmer'&&this.scene.farmingSystem)this.scene.farmingSystem.updateWorker(worker,delta);
+    else if(['miller','baker'].includes(worker.profession)&&this.scene.foodProduction)this.scene.foodProduction.updateWorker(worker);
     else if(worker.profession==='builder'){
       // Budovy jsou dosud okamžité. Staveniště dodá až skutečný construction provider.
       worker.workState='Waiting';worker.workMessage='Waiting for construction';

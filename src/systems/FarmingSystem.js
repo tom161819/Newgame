@@ -62,6 +62,7 @@ export class FarmingSystem {
       if(!route){worker.workState='Waiting';worker.workMessage='No reachable ripe crops within 15 tiles';return;}
       const building=goals.get(tileKey(route.destination)).building,record=this.records.get(building.id);
       if(!ai.reserve(worker,`crop:${building.id}`,{kind:'harvest',targetId:building.id,cycle:record.cycle,startedAt:this.scene.gameTime.totalElapsed},route))return;
+      if(this.scene.foodProduction&&!this.scene.foodProduction.prepareHarvest(worker,building,worker.workTask)){ai.cancel(worker);worker.workState='Waiting';worker.workMessage='Food storage is full or unreachable';worker.aiCooldown=WORK_RULES.searchInterval;return;}
       record.reservedBy=worker.id;task=worker.workTask;
     }
     const building=this.building(task.targetId),record=this.records.get(task.targetId);

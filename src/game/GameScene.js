@@ -59,6 +59,9 @@ import { WildlifeRespawnSystem } from '../systems/WildlifeRespawnSystem.js';
 import { FarmingSystem } from '../systems/FarmingSystem.js';
 import { CropPlotView } from './CropPlotView.js';
 import { FarmingPanel } from '../ui/FarmingPanel.js';
+import { FoodStorageSystem } from '../systems/FoodStorageSystem.js';
+import { FoodProductionSystem } from '../systems/FoodProductionSystem.js';
+import { StoragePanel } from '../ui/StoragePanel.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -77,6 +80,7 @@ export class GameScene extends Phaser.Scene {
     this.workplaceSystem=null;
     this.constructionSystem=null;
     this.farmingSystem=null;
+    this.foodStorage=null;this.foodProduction=null;
     this.gameOver=false;this.input.enabled=true;this.input.keyboard.enabled=true;this.tweens.resumeAll();
     this.activeFramePending=true;this.visibilityPaused=document.hidden;
     this.assets.initialize();
@@ -88,6 +92,7 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('chest',(_definition,context)=>new ChestView(this,context.x,context.y));
     this.assets.registerRenderer('human',(definition,context)=>new HumanView(this,context.x,context.y,definition));
     this.assets.registerRenderer('workplace',(_definition,context)=>new WorkplaceView(this,context.building,context.preview));
+    this.assets.registerRenderer('food_building',(_definition,context)=>new WorkplaceView(this,context.building,context.preview));
     this.assets.registerRenderer('crop',(_definition,context)=>new CropPlotView(this,context.building,context.preview));
     const base=this.objectRegistry.require('grass'),obstacle=this.objectRegistry.require('rock_outcrop');
     this.terrainGrid=this.loadState?this.loadState.terrain.map(row=>[...row]):createMap(Math.random);
@@ -132,6 +137,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.spawner=this.resourceSpawners.find(s=>s.definition.id==='stone');
     this.dropSystem=new DropSystem(this);
+    this.foodStorage=new FoodStorageSystem(this);
     this.animalSystem=new AnimalSystem(this);if(!this.loadState)this.animalSystem.spawn(PLAYER_START);
     this.huntingSystem=new HuntingSystem(this);
     this.combatFeedback=new CombatFeedback(this);
@@ -155,7 +161,8 @@ export class GameScene extends Phaser.Scene {
       onComplete:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(`${buildingDefinition(site).name}: stavba dokončena.`);},
       onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus('Stavba zrušena. Materiál je vrácen podle její rozpracovanosti.');}});
     this.constructionUI=new ConstructionUI(this);
-    this.farmingSystem=new FarmingSystem(this);this.farmingPanel=new FarmingPanel(this);
+    this.foodProduction=new FoodProductionSystem(this);this.storagePanel=new StoragePanel(this);
+    this.farmingSystem=new FarmingSystem(this,{onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);
     this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
     this.treasurePanel=new TreasurePanel(this);if(!this.loadState)this.treasureSystem.spawn(PLAYER_START);
@@ -194,6 +201,7 @@ export class GameScene extends Phaser.Scene {
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
       this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
+      this.storagePanel.destroy();this.foodProduction.destroy();this.foodStorage.destroy();
       this.game.events.off(Phaser.Core.Events.PAUSE,onBackground);this.game.events.off(Phaser.Core.Events.RESUME,onForeground);
       this.game.canvas.style.cursor='';
     });
@@ -280,6 +288,7 @@ export class GameScene extends Phaser.Scene {
     if(selected?.kind==='human'){this.unitPanel.open(selected.object);return;}
     if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){this.constructionSystem.commandKing(selected.object);this.constructionUI.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).crop){this.farmingPanel.open(selected.object);return;}
+    if(selected?.kind==='building'&&buildingDefinition(selected.object).storage){this.storagePanel.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).workplace){this.workplacePanel.open(selected.object);return;}
     if(this.character.transitioning){this.setStatus('Počkej, až král dokončí výstup nebo sestup.');return;}
     this.constructionSystem.stopKing();
@@ -332,7 +341,7 @@ export class GameScene extends Phaser.Scene {
 
   createBuildingView(definition,building,preview=false) {
     const object={...building,type:definition.id,definition,tiles:building.tiles??buildingTiles(building,definition)};
-    if(!preview){this.terrain.invalidateArea(object.tiles);this.workplaceSystem?.register(building);this.farmingSystem?.register(building);}
+    if(!preview){this.terrain.invalidateArea(object.tiles);this.workplaceSystem?.register(building);this.farmingSystem?.register(building);this.foodStorage?.register(building);this.foodProduction?.register(building);}
     const view=this.assets.createView(definition.id,{building:object,preview});
     if(!preview&&definition.crop&&buildingIsComplete(building))view.setGrowth?.(this.farmingSystem?.records.get(building.id)?.stage??0);
     return !preview&&!buildingIsComplete(building)?new ConstructionView(this,building,view):view;
@@ -489,6 +498,7 @@ export class GameScene extends Phaser.Scene {
     if(this.gameOver)return;
     this.constructionSystem.update(delta);
     this.farmingSystem.update(delta);
+    this.foodProduction.update(delta);
     this.regeneration.update(delta,[this.character,...this.animalSystem.animals.values(),...this.workerSystem.liveWorkers()],covered);
     this.combatFeedback.update(activeDelta);this.foodSystem.update(activeDelta);this.updateFoodDisplay();
     this.experienceFeedback.update(activeDelta);
@@ -518,6 +528,7 @@ export class GameScene extends Phaser.Scene {
     this.workplacePanel?.refresh();
     this.constructionUI?.refresh();
     this.farmingPanel?.refresh();
+    this.storagePanel?.refresh();
     this.treasureSystem?.update(view,this.fog);if(this.equipmentPanel?.dialog.open)this.equipmentPanel.updateStats();
   }
 }

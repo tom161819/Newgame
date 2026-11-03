@@ -4,7 +4,7 @@ export class FoodSystem {
     this.amount=definition.consumption.amount;this.elapsed=0;this.onChange=onChange;
   }
   get remainingSeconds(){return Math.ceil((this.interval-this.elapsed)/1000);}
-  get availablePortions(){return this.inventory.count(this.resource)+this.inventory.count('apple');}
+  get availablePortions(){return this.inventory.count(this.resource)+this.inventory.count('apple')+this.inventory.count('bread');}
   exportState(){return {elapsed:this.elapsed};}
   importState(data){this.elapsed=data.elapsed;}
   update(delta){
@@ -16,6 +16,8 @@ export class FoodSystem {
     this.inventory.spend(this.resource,meat);
     const apples=Math.min(this.inventory.count('apple'),cycles*this.amount-meat);
     if(apples>0)this.inventory.spend('apple',apples);
+    const bread=Math.min(this.inventory.count('bread'),cycles*this.amount-meat-apples);
+    if(bread>0)this.inventory.spend('bread',bread);
     this.onChange();
   }
 }

@@ -8,6 +8,7 @@ export class WorkplacePanel {
     this.scene=scene;this.dialog=document.querySelector('#workplace-dialog');this.controller=new AbortController();const options={signal:this.controller.signal};this.restored=true;
     document.querySelector('#close-workplace').addEventListener('click',()=>this.close(),options);
     document.querySelector('#assign-workplace-worker').addEventListener('click',()=>{document.querySelector('#workplace-candidates').hidden=!document.querySelector('#workplace-candidates').hidden;},options);
+    document.querySelector('#toggle-food-production').addEventListener('click',()=>{const record=scene.foodProduction.records.get(this.building?.id);if(record)scene.foodProduction.toggle(this.building.id,!record.auto);this.refresh();},options);
     this.dialog.addEventListener('click',e=>{
       const button=e.target.closest('button');if(!button)return;
       const assign=button.dataset.assignWorker,remove=button.dataset.removeWorker;
@@ -21,7 +22,19 @@ export class WorkplacePanel {
     if(!this.dialog.open||!this.building)return;
     const s=this.scene,b=this.building;if(!s.buildings.includes(b)||!s.fog.isVisibleObject(b)){this.close();return;}
     const spec=buildingDefinition(b),summary=s.workplaceSystem.summary(b),employees=s.workplaceSystem.employees(b),candidates=s.workerSystem.liveWorkers().filter(w=>w.assignedWorkplaceId!==b.id);
-    const signature=JSON.stringify([summary,employees.map(w=>[w.id,w.workState,w.workMessage,w.skills[spec.workplace.skill].level]),candidates.map(w=>[w.id,w.profession,w.naturalTalent,w.skills[spec.workplace.skill].level])]);if(signature===this.signature)return;this.signature=signature;
+    const production=spec.recipe?s.foodProduction.records.get(b.id):null;
+    const signature=JSON.stringify([summary,production,production?s.foodStorage.revision:0,employees.map(w=>[w.id,w.workState,w.workMessage,w.skills[spec.workplace.skill].level]),candidates.map(w=>[w.id,w.profession,w.naturalTalent,w.skills[spec.workplace.skill].level])]);if(signature===this.signature)return;this.signature=signature;
+    const recipePanel=document.querySelector('#food-production-details');recipePanel.hidden=!production;
+    if(production){
+      const format=items=>Object.entries(items).map(([id,n])=>`${n} ${s.objectRegistry.require(id).name}`).join(' + '),cycle=production.cycle;
+      document.querySelector('#food-production-recipe').textContent=`${format(spec.recipe.input)} → ${format(spec.recipe.output)} · 30 seconds of active work`;
+      document.querySelector('#food-production-status').textContent=`${!production.auto?'Paused':cycle?'Producing':employees[0]?.workMessage||'Waiting for Worker'} · ${production.completed} batches completed`;
+      document.querySelector('#food-production-progress').value=cycle?.progress??0;
+      const input=s.foodStorage.locations.get(`input-${b.id}`),output=s.foodStorage.locations.get(`output-${b.id}`);
+      document.querySelector('#food-production-buffers').textContent=`Input: ${format(input.stock)||'empty'} · Output: ${format(output.stock)||'empty'}`;
+      document.querySelector('#food-production-missing').textContent=cycle?`Current batch: ${format(cycle.inputs)}`:`Missing: ${format(Object.fromEntries(Object.entries(spec.recipe.input).map(([id,n])=>[id,Math.max(0,n-(input.stock[id]??0))])))}`;
+      const toggle=document.querySelector('#toggle-food-production');toggle.textContent=`Auto Production: ${production.auto?'ON':'OFF'}`;toggle.setAttribute('aria-pressed',String(production.auto));
+    }
     document.querySelector('#workplace-name').textContent=spec.name;const image=document.querySelector('#workplace-image');image.src=s.assets.previewURL(spec);image.alt=spec.name;
     document.querySelector('#workplace-count').textContent=`Workers: ${summary.count} / ${summary.capacity}`;
     document.querySelector('#workplace-wages').textContent=`Worker Wages: ${summary.wages.toFixed(2)} Gold/day`;

@@ -19,7 +19,7 @@ export class WorkplaceView {
       }
       const post=point(x+2.4,y+1.5);g.lineStyle(5,tint??0x725735);g.lineBetween(post.x,post.y,post.x,post.y-68);g.lineBetween(post.x-26,post.y-55,post.x+32,post.y-72);g.lineStyle(1,0xbab18d);g.lineBetween(post.x+30,post.y-71,post.x+30,post.y-24);g.strokeCircle(post.x+30,post.y-20,4);
     }else{
-      const height=d.id==='barracks'?57:43,roof=height+36,raise=p=>({...p,y:p.y-height});
+      const height=d.id==='mill'?77:d.id==='granary'?65:d.id==='barracks'?57:43,roof=height+36,raise=p=>({...p,y:p.y-height});
       polygon(g,tint??0xa29676,[e,c,raise(c),raise(e)]);polygon(g,tint??0x746f5a,[c,b,raise(b),raise(c)]);
       for(let z=12;z<height;z+=12){g.lineStyle(1,0x524f3e,.45);g.lineBetween(e.x,e.y-z,c.x,c.y-z);g.lineBetween(c.x,c.y-z,b.x,b.y-z);}
       const near=point(x+w/2,y+h-.1,roof),far=point(x+w/2,y+.1,roof);
@@ -27,6 +27,14 @@ export class WorkplaceView {
       polygon(g,tint??(d.id==='barracks'?0x675748:d.id==='farmhouse'?0xc3a25a:0x98724b),[raise(e),near,far,raise(a)]);polygon(g,tint??(d.id==='barracks'?0x494d44:d.id==='farmhouse'?0x92733c:0x654e35),[near,raise(c),raise(b),far]);
       const door=point(x+w*.65,y+h-.1);g.fillStyle(0x393a2b);g.fillRect(door.x-10,door.y-32,20,32);g.lineStyle(1,0xc4a66a);g.lineBetween(door.x,door.y-30,door.x,door.y);
       if(d.id==='barracks'){const p=point(x+w*.6,y+h*.6,roof);g.lineStyle(2,0xb9a268);g.lineBetween(p.x,p.y,p.x,p.y-30);polygon(g,tint??0x9d4e3b,[{x:p.x,y:p.y-30},{x:p.x+25,y:p.y-22},{x:p.x,y:p.y-15}]);}
+      if(d.id==='mill'){
+        const p=point(x+w*.55,y+h-.05,roof-8);g.lineStyle(5,tint??0x4c3c28);g.lineBetween(p.x-39,p.y-39,p.x+39,p.y+39);g.lineBetween(p.x-39,p.y+39,p.x+39,p.y-39);
+        g.lineStyle(10,tint??0xdfd3a9);for(const [dx,dy]of [[-1,-1],[1,1],[-1,1],[1,-1]])g.lineBetween(p.x+dx*14,p.y+dy*14,p.x+dx*36,p.y+dy*36);g.fillStyle(0x634b30);g.fillCircle(p.x,p.y,6);
+      }
+      if(d.id==='bakery'){
+        const p=point(x+.4,y+.5,roof);g.fillStyle(tint??0x8c7963);g.fillRect(p.x-7,p.y-25,15,38);const oven=point(x+w-.18,y+h-.1);g.fillStyle(tint??0x55452f);g.fillCircle(oven.x,oven.y-13,12);g.fillStyle(tint??0xf1a13e);g.fillEllipse(oven.x,oven.y-10,12,11);
+      }
+      if(d.id==='granary')for(const [dx,dy]of [[.5,2.8],[1,2.8],[1.5,2.8]]){const p=point(x+dx,y+dy);g.fillStyle(tint??0xc2a66c);g.fillEllipse(p.x,p.y-9,13,21);g.lineStyle(2,tint??0x78603b);g.lineBetween(p.x-5,p.y-15,p.x+5,p.y-15);}
     }
     this.hitArea=new Phaser.Geom.Polygon([point(x,y,d.visualHeight),point(x+w,y,d.visualHeight),b,c,e,point(x,y+h,d.visualHeight)]);
   }

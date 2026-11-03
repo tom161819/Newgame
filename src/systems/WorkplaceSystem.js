@@ -32,7 +32,8 @@ export class WorkplaceSystem {
   }
   remove(worker){this.detach(worker);if(worker.isAlive)this.scene.workerSystem.jobs.assign(worker,'idle');}
   dropCargo(worker){
-    if(worker.cargo)this.scene.dropSystem.create(worker.cargo.resource,{x:Math.floor(worker.position.x),y:Math.floor(worker.position.y)},worker.cargo.amount);
+    if(worker.cargo)this.scene.dropSystem.create(worker.cargo.resource,{x:Math.floor(worker.position.x),y:Math.floor(worker.position.y)},worker.cargo.amount,null,
+      {rewardRemaining:(worker.pendingWorkRewards??[]).filter(e=>e.type==='dropCollected').reduce((n,e)=>n+(e.contributionRatio??1),0)});
     worker.cargo=null;worker.pendingWorkRewards=[];
   }
   carryCollection(worker,{resource,amount,event}){
@@ -42,6 +43,7 @@ export class WorkplaceSystem {
   deferReward(worker,event){if(worker.profession!=='hunter'||!this.building(worker))return false;(worker.pendingWorkRewards??=[]).push(event);return true;}
   deliver(worker){
     if(!worker.cargo||!this.atWorkplace(worker))return false;
+    if(this.scene.foodStorage?.manages(worker.cargo.resource))return false;
     const record=this.records.get(worker.assignedWorkplaceId),cargo=worker.cargo,rewards=worker.pendingWorkRewards??[];
     // Náklad je odstraněn před událostmi: další snímek nebo save nemůže zásilku zopakovat.
     worker.cargo=null;worker.pendingWorkRewards=[];record.delivered[cargo.resource]=(record.delivered[cargo.resource]??0)+cargo.amount;

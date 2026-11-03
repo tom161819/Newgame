@@ -324,3 +324,13 @@ Dokončené změny zapisuj anglicky do Unreleased. Číslované vydání se při
 Farmhouse (2 × 2, 10 Stone) zaměstná tři existující Farmáře v rádiusu 15 políček. Wheat Field (3 × 3, 3 Stone) roste dva herní dny a poskytuje 8 Wheat; Orchard (3 × 3, 6 Stone) roste tři dny a poskytuje 6 Apple. Všechny objekty se staví původními blueprinty. Dokončenými pozemky lze procházet; rozestavěné pozemky blokují pohyb a nerostou.
 
 Rostliny rostou i bez obsluhy, ale sklizeň vyžaduje rezervovaný pozemek, fyzický příchod farmáře a aktivní práci. Farming zrychluje pouze tuto práci, nikoli biologický růst. XP a suroviny vznikají jednou za sklizeň. Růstové fáze a rozpracovaná sklizeň se obnovují Save/Load; starší schémata 1/2 se migrují na schéma 3. Verze hry zůstává nezávisle určená package.json. Apple je jedlé v původním jediném minutovém potravinovém cyklu, Wheat se přímo nekonzumuje.
+
+## Výroba a skladování potravin
+
+Mill (2 × 2, 12 Stone) a Bakery (2 × 2, 10 Stone) mají po dvou pracovních místech. Mlynář dopraví 4 Wheat do mlýna a za 30 sekund aktivní práce vzniknou 3 Flour. Pekař dopraví 2 Flour do pekárny a stejným množstvím práce vyrobí 4 Bread. Dva pracovníci se na práci podílejí; Milling/Baking zrychlují aktivní výrobu stejným vzorcem jako ostatní skilly. Profese využívají původní XP i mzdy. Auto Production lze v panelu vypnout a rozpracovanou dávku později dokončit.
+
+Granary (3 × 3, 10 Stone) ukládá nejvýše 200 jednotek Meat, Wheat, Flour, Bread a Apple dohromady. Další sýpky přidávají kapacitu. Pokud není dosažitelná sýpka, slouží tábor u počáteční pozice jako sklad pro 30 jednotek. Plná dostupná sýpka se neobchází ukládáním do tábora. Starší nadlimitní zásoby zůstávají zachované a nové dodávky počkají na volné místo.
+
+Farmáři odnášejí sklizeň do skladu; mlynáři a pekaři fyzicky převážejí vstupy i výstupy. Pracovník unese nejvýše 20 jednotek. Sklad, země, náklad a omezené výrobní zásobníky jsou různé stavy stejných surovin. Horní inventář ukazuje odvozené dostupné skladové zásoby po odečtení rezervací; Resources & Storage a kliknutí na sýpku ukazují fyzický obsah a kapacitu. Suroviny v nákladu nebo výrobním zásobníku se zde znovu nezapočítávají.
+
+Blueprinty musejí být fyzicky dokončené před zaměstnáváním, skladováním nebo výrobou. Plný sklad zastaví nové sklizně a výrobní dávky. Přerušené dodávky zachovají náklad; změna profese či úmrtí zanechá skutečný drop. Save Schema 4 zachovává sklady, rezervace, náklady i jednou spotřebované vstupy rozpracovaných dávek. Schémata 1–3 se migrují bez opakovaného převodu zásob, změny talentů či XP; nové skilly začínají na levelu 1. Bread a Apple jsou jedlé v jediném původním potravinovém cyklu, Wheat a Flour jedlé nejsou.

@@ -13,7 +13,7 @@ export class ExperienceSystem {
     const reward=XP_REWARDS[event.type]?.[event.objectType];if(!reward)return 0;
     const quantity=['buildingCompleted','resourceCollected'].includes(event.type)?(event.quantity??1):1;
     if(!Number.isSafeInteger(quantity)||quantity<1)return 0;
-    const ratio=event.type==='buildingCompleted'?(event.contributionRatio??1):1;if(!Number.isFinite(ratio)||ratio<=0||ratio>1)return 0;
+    const ratio=['buildingCompleted','foodProduced','dropCollected'].includes(event.type)?(event.contributionRatio??1):1;if(!Number.isFinite(ratio)||ratio<=0||(event.type!=='dropCollected'&&ratio>1))return 0;
     const actor=event.actor,e=this.initialize(actor);if(!e?.enabled||actor.isAlive===false||!this.claimEvent(event.id))return 0;
     const added=this.addXP(actor,reward*quantity*ratio,{type:event.type,objectType:event.objectType});
     this.emit('activity',event,reward*quantity*ratio);return added;

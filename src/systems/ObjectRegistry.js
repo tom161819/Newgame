@@ -50,6 +50,11 @@ export function validateDefinition(definition) {
   if(d.crop!==undefined&&(!plainObject(d.crop)||d.category!=='building'||!d.walkable||typeof d.crop.resource!=='string'||!finite(d.crop.growthDays)||d.crop.growthDays<=0
     ||!Number.isSafeInteger(d.crop.yield)||d.crop.yield<=0||!finite(d.crop.workDuration)||d.crop.workDuration<=0||!Array.isArray(d.crop.stages)||d.crop.stages.length!==4))fail(id,'neplatné pěstování plodin.');
   if(d.workRadius!==undefined&&(!finite(d.workRadius)||d.workRadius<=0))fail(id,'neplatný pracovní rádius.');
+  if(d.storage!==undefined&&(!plainObject(d.storage)||d.category!=='building'||!Number.isSafeInteger(d.storage.capacity)||d.storage.capacity<=0||!Array.isArray(d.storage.resources)||!d.storage.resources.length||new Set(d.storage.resources).size!==d.storage.resources.length))fail(id,'neplatný sklad.');
+  if(d.recipe!==undefined){
+    const r=d.recipe,quantities=value=>plainObject(value)&&Object.keys(value).length>0&&Object.values(value).every(n=>Number.isSafeInteger(n)&&n>0);
+    if(d.category!=='building'||!plainObject(r)||!quantities(r.input)||!quantities(r.output)||!finite(r.duration)||r.duration<=0||!SKILL_IDS.includes(r.skill)||!d.workplace||!Number.isSafeInteger(d.bufferCapacity)||d.bufferCapacity<Math.max(...Object.values(r.input),...Object.values(r.output)))fail(id,'neplatný výrobní recept.');
+  }
   if(d.edible!==undefined&&(d.category!=='resource'||typeof d.edible!=='boolean'))fail(id,'neplatné označení potraviny.');
   if(['character','animal'].includes(d.category)&&d.stats===undefined)fail(id,'živá jednotka vyžaduje bojové statistiky.');
   if (d.stats !== undefined && (!plainObject(d.stats) || !['maxHP','attackDPS','armor','attackRange'].every(key=>finite(d.stats[key]))
@@ -102,7 +107,7 @@ export class ObjectRegistry {
     }
     const known=new Map([...this.definitions,...pending]);
     for(const definition of pending.values()){
-      for(const id of [...Object.keys(definition.cost),...(definition.production?[definition.production.resource]:[]),...(definition.crop?[definition.crop.resource]:[])])
+      for(const id of [...Object.keys(definition.cost),...(definition.production?[definition.production.resource]:[]),...(definition.crop?[definition.crop.resource]:[]),...(definition.storage?.resources??[]),...Object.keys(definition.recipe?.input??{}),...Object.keys(definition.recipe?.output??{})])
         if(known.get(id)?.category!=='resource')fail(definition.id,`neznámá surovina ${id}.`);
       for(const id of definition.treasure?.equipment??[])if(known.get(id)?.category!=='equipment')fail(definition.id,`neznámé vybavení ${id}.`);
     }

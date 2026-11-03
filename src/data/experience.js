@@ -1,9 +1,11 @@
 import { FARMING_RULES } from './farming.js';
+import { FOOD_RECIPES } from './foodProduction.js';
 export const EXPERIENCE_MAX_LEVEL=50;
 export const XP_REWARDS=Object.freeze({
   resourceCollected:Object.freeze({stone:3}),dropCollected:Object.freeze({meat:2}),
   animalKilled:Object.freeze({rabbit:10,deer:20,wild_boar:35}),
-  buildingCompleted:Object.freeze({wall:2,tower:15,castle:30,house:10,quarry:15,hunting_lodge:10,barracks:20,farmhouse:10,wheat_field:5,orchard:8}),
+  buildingCompleted:Object.freeze({wall:2,tower:15,castle:30,house:10,quarry:15,hunting_lodge:10,barracks:20,farmhouse:10,wheat_field:5,orchard:8,mill:12,bakery:10,granary:10}),
+  foodProduced:Object.freeze(Object.fromEntries(Object.entries(FOOD_RECIPES).map(([id,recipe])=>[id,recipe.xp]))),
   cropHarvested:Object.freeze(Object.fromEntries(Object.entries(FARMING_RULES.crops).map(([id,crop])=>[id,crop.xp]))),
 });
 export function getXPRequired(level){

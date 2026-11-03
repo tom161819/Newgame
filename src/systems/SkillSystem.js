@@ -19,7 +19,8 @@ export class SkillSystem {
   }
   completed(event,reward){
     const skill=event.type==='resourceCollected'&&event.objectType==='stone'?'mining':event.type==='animalKilled'?'hunting':event.type==='buildingCompleted'?'construction':event.type==='cropHarvested'?'farming':null;
-    if(skill)this.addXP(event.actor,skill,reward);
+    const productionSkill=event.type==='foodProduced'?{mill:'milling',bakery:'baking'}[event.objectType]:null;
+    if(skill??productionSkill)this.addXP(event.actor,skill??productionSkill,reward);
   }
   attachCombat(combat){
     this.unsubscribers.push(combat.on('attack',(actor,target)=>{

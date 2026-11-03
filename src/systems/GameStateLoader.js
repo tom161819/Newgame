@@ -48,7 +48,7 @@ export function loadGameState(scene,input){
     if(worker.workTask)scene.workerSystem.reservations.reserve(worker.workTask.reservation,worker.id);
     if(!worker.isAlive)worker.view.destroy();else{const pos=gridToWorld(worker.position.x,worker.position.y);worker.view.setPosition(pos.x,pos.y).setDepth(pos.y+.1);worker.view.animate?.(0,worker.walking,worker.direction);}
   }
-  for(const d of state.drops)scene.dropSystem.create(d.resource,d.tile,d.amount,d.id);
+  for(const d of state.drops)scene.dropSystem.create(d.resource,d.tile,d.amount,d.id,{rewardRemaining:d.rewardRemaining??1});
   for(const saved of state.chests){
     const chest=scene.treasureSystem.create(saved.tile,saved);
     if(saved.opening){
@@ -98,6 +98,13 @@ export function loadGameState(scene,input){
   scene.workplaceSystem?.importState(state.workplaces);
   scene.constructionSystem?.importState(state.constructionSystem);
   scene.farmingSystem?.importState(state.farming);
+  scene.foodStorage?.importState(state.foodStorage,state.inventory);
+  scene.foodProduction?.importState(state.foodProduction);
+  if(scene.foodStorage&&!state.foodStorage)for(const worker of scene.workerSystem.liveWorkers())if(scene.foodStorage.manages(worker.cargo?.resource)&&worker.cargo.amount>20){
+    const original=worker.cargo.amount,remainder=original-20;worker.cargo.amount=20;let rewardRemaining=0;
+    for(const event of worker.pendingWorkRewards??[])if(event.type==='dropCollected'){const ratio=event.contributionRatio??1;event.contributionRatio=ratio*20/original;rewardRemaining+=ratio*remainder/original;}
+    scene.dropSystem.create(worker.cargo.resource,worker.tile,remainder,null,{rewardRemaining});
+  }
   scene.pathWear?.importState(state.pathWear);
   for(const t of state.spawners)scene.resourceSpawners.find(s=>s.definition.id===t.id).importState(t);
   scene.settingsPanel.applySettings(state.settings);scene.fog.setEnabled(state.settings.fogOfWar);
