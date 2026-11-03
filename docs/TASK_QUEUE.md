@@ -38,6 +38,8 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 ## Následuje
 
-**Herní úkoly fronty jsou dokončené a krok 19 je nasazený.** Zbývá odeslat závěrečný záznam fronty a 41. archivní snapshot (`f22ded0`): commit `6570b7e` je zatím jen v pracovním prostředí, protože GitHub při posledním push odmítl přihlašovací token. Veřejný archiv má zatím 40 verzí. Po obnovení připojení GitHub odešli čekající commity do main a ověř Pages; žádné herní rozšíření se nemusí dělat znovu. Další požadavky se přidávají na konec a dokončují jednotlivě s ověřením, commitem a nasazením na GitHub Pages.
+**Fronta je dokončená včetně publikování.** Všechna dosud dodaná herní rozšíření do kroku 19 jsou nasazená. Archiv obsahuje 41 ověřených verzí ze skutečných commitů, včetně `f22ded0`. Čekající doplnění bylo po obnovení připojení GitHub odeslané v commitu `0b2377a`; Pages run `41620706525` skončil úspěšně. Žádný úkol ani čekající publikační krok nezůstává rozpracovaný.
+
+Další požadavky se přidávají na konec a dokončují jednotlivě s ověřením, commitem a nasazením na GitHub Pages.
 
 Číslo 18 bylo použité u dvou různých zadání; obě se zachovávají v pořadí doručení jako 18a a 18b. Neaplikovat budoucí mechaniky před jejich krokem: krok 6 má okamžitý lov bez HP, krok 7 přidává koně/FoW, krok 8 Castle/Wall, skutečné souboje až krok 9.
