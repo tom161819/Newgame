@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { workerScene } from './helpers/workerScene.js';
+import { workerScene,ensureBuildingPrerequisites } from './helpers/workerScene.js';
 import { gameSettings } from '../src/systems/GameSettings.js';
 import { objectRegistry } from '../src/systems/ObjectRegistry.js';
 import { FARMING_RULES,cropStage } from '../src/data/farming.js';
-import { placeBuilding,buildingIsComplete } from '../src/game/buildings.js';
+import { placeBuilding,buildingIsComplete,buildingTiles } from '../src/game/buildings.js';
 import { serializeGameState,validateGameState,SAVE_VERSION } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
 import { totalXPForLevel } from '../src/data/experience.js';
@@ -12,7 +12,11 @@ import { resourceCandidates,tileKey } from '../src/game/stones.js';
 globalThis.document={querySelector:()=>({textContent:''})};
 
 const scene=(options={})=>workerScene(undefined,{construction:true,farming:true,gameSettings:gameSettings({dayLengthSeconds:60,wildlifeRespawn:'off',...options})});
-function building(s,type,x,y,blueprint=false){const definition=objectRegistry.require(type);s.inventory.add('stone',definition.cost.stone);
+function building(s,type,x,y,blueprint=false){const definition=objectRegistry.require(type);
+  // Completed structures are legacy world fixtures, deliberately permitted
+  // without a Granary. New blueprint placement uses the current requirements.
+  if(!blueprint){const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition,x,y,tiles:buildingTiles({x,y},definition)};s.buildings.push(b);for(const t of b.tiles)s.map[t.y][t.x]=definition.walkable?0:1;s.towerViews.set(b.id,s.createBuildingView(definition,b));return b;}
+  ensureBuildingPrerequisites(s,definition);s.inventory.add('stone',definition.cost.stone);
   const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition});assert.ifError(result.error);const b=result.building;
   if(blueprint)s.constructionSystem.plan(b);s.towerViews.set(b.id,s.createBuildingView(definition,b));return b;
 }
@@ -26,7 +30,7 @@ test('farm buildings retain exact costs, 2x2/3x3 footprints and original physica
     assert.equal(s.farmingSystem.records.has(b.id),false);const w=s.workerSystem.create({x:x-1,y:43});assert.equal(s.workplaceSystem.assign(b,w),false);
   }
   s.gameTime.update(600000);assert.equal(s.farmingSystem.records.size,0);assert.equal(s.inventory.count('wheat'),0);assert.equal(s.inventory.count('apple'),0);
-  for(const b of s.buildings){assert.equal(s.constructionSystem.commandKing(b),true);until(s,()=>buildingIsComplete(b),40000);if(b.definition.crop){assert.ok(s.farmingSystem.records.has(b.id));for(const t of b.tiles)assert.equal(s.map[t.y][t.x],0);assert.equal(s.farmingSystem.records.get(b.id).growthDays,0);}}
+  for(const b of s.buildings.filter(b=>!buildingIsComplete(b))){assert.equal(s.constructionSystem.commandKing(b),true);until(s,()=>buildingIsComplete(b),40000);if(b.definition.crop){assert.ok(s.farmingSystem.records.has(b.id));for(const t of b.tiles)assert.equal(s.map[t.y][t.x],0);assert.equal(s.farmingSystem.records.get(b.id).growthDays,0);}}
 });
 test('Farmhouse assigns exactly three existing Farmers, preserves their skill/talent, and never shares an employee between workplaces',()=>{
   const {s,home}=farm(),other=building(s,'farmhouse',45,47),workers=[0,1,2,3].map(i=>s.workerSystem.create({x:43,y:40+i}));

@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { workerScene } from './helpers/workerScene.js';
+import { workerScene,ensureBuildingPrerequisites } from './helpers/workerScene.js';
 import { placeBuilding,buildingIsComplete } from '../src/game/buildings.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
 import { totalXPForLevel } from '../src/data/experience.js';
 globalThis.document={querySelector:()=>({textContent:''})};
 const scene=()=>workerScene(undefined,{construction:true,foodProduction:true});
-function building(s,type,x,y,blueprint=false){const definition=s.objectRegistry.require(type);s.inventory.add('stone',definition.cost.stone);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition});assert.ifError(result.error);if(blueprint)s.constructionSystem.plan(result.building);s.towerViews.set(result.building.id,s.createBuildingView(definition,result.building));return result.building;}
+function building(s,type,x,y,blueprint=false){const definition=s.objectRegistry.require(type);ensureBuildingPrerequisites(s,definition);s.inventory.add('stone',definition.cost.stone);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition});assert.ifError(result.error);if(blueprint)s.constructionSystem.plan(result.building);s.towerViews.set(result.building.id,s.createBuildingView(definition,result.building));return result.building;}
 function worker(s,home,tile={x:53,y:44}){const w=s.workerSystem.create(tile);assert.equal(s.workplaceSystem.assign(home,w),true);return w;}
 function until(s,predicate,maximum=60000){let elapsed=0;while(!predicate()&&elapsed<maximum){s.tick(25);elapsed+=25;}assert.ok(predicate(),`Condition not reached after ${elapsed}ms: ${JSON.stringify(s.workerSystem.liveWorkers().map(w=>({job:w.profession,task:w.workTask,cargo:w.cargo,message:w.workMessage})))}`);return elapsed;}
 function millFixture({employees=1}={}){const s=scene(),granary=building(s,'granary',48,45),mill=building(s,'mill',54,45),workers=[];for(let i=0;i<employees;i++)workers.push(worker(s,mill,{x:53+i,y:44}));return {s,granary,mill,workers,stock:`granary-${granary.id}`,input:`input-${mill.id}`,output:`output-${mill.id}`,record:s.foodProduction.records.get(mill.id)};}

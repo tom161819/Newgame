@@ -30,6 +30,23 @@ import { WorkerSystem } from '../../src/systems/WorkerSystem.js';
 import { ResourceSpawner } from '../../src/game/stones.js';
 import { tileCenter } from '../../src/game/isometric.js';
 import { wallIndex,connectionsFor } from '../../src/game/walls.js';
+import { placeBuilding,buildingIsComplete,placementError } from '../../src/game/buildings.js';
+
+// Existing component scenarios use completed world fixtures. Seed their actual
+// prerequisites first; placement itself still enforces the production rules.
+export function ensureBuildingPrerequisites(scene,definition){
+  for(const type of definition.requiresCompletedBuildings??[]){
+    if(scene.buildings.some(b=>b.type===type&&buildingIsComplete(b)))continue;
+    const prerequisite=scene.objectRegistry.require(type);ensureBuildingPrerequisites(scene,prerequisite);let anchor;
+    for(let y=4;y<scene.map.length-prerequisite.height&&!anchor;y++)for(let x=4;x<scene.map[0].length-prerequisite.width;x++){
+      const candidate={x,y};if(!placementError(scene.map,candidate,scene.resourceOccupancy,scene.reservedTiles(),prerequisite,scene.buildings)){anchor=candidate;break;}
+    }
+    if(!anchor)throw new Error('No space for the test world prerequisite.');
+    for(const [resource,amount]of Object.entries(prerequisite.cost))scene.inventory.add(resource,amount);
+    const result=placeBuilding({map:scene.map,anchor,resources:scene.resourceOccupancy,reservedTiles:scene.reservedTiles(),inventory:scene.inventory,buildings:scene.buildings,definition:prerequisite});
+    if(result.error)throw new Error(result.error);scene.towerViews.set(result.building.id,scene.createBuildingView(prerequisite,result.building));
+  }
+}
 
 export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,workplaces=false,construction=false,farming=false,foodProduction=false,seasons=false,logistics=false,starter=true,gameSettings}={}){
   const scene={objectRegistry,gameSettings,terrainGrid:terrain.map(r=>[...r]),map:terrain.map(r=>[...r]),inventory:new Inventory(),gameOver:false,

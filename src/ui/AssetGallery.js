@@ -1,4 +1,5 @@
 import { element,formatCost,formatModifiers,CATEGORY_LABELS } from './objectLabels.js';
+import { buildingCategoryLabel } from '../data/buildingCategories.js';
 
 export class AssetGallery {
   constructor({registry,assets,onOpen,onClose}) {
@@ -51,6 +52,8 @@ export class AssetGallery {
     const rows=[['ID',definition.id],['Kategorie',CATEGORY_LABELS[definition.category]],['Rozměry',`${definition.width} × ${definition.height} políčka`],
       ['Průchozí',definition.walkable?'Ano':'Ne'],['Sběratelný',definition.collectible?'Ano':'Ne'],['Postavitelný',definition.buildable?'Ano':'Ne'],
       ['Cena',formatCost(definition.cost,this.registry)],['Interakce',definition.interactions.join(', ')||'Žádné']];
+    if(definition.category==='building')rows.push(['Building Category',buildingCategoryLabel(definition)]);
+    if(definition.category==='building')rows.push(['Unlock Requirements',(definition.requiresCompletedBuildings??[]).map(id=>this.registry.require(id).name).join(', ')||'None'],['Unlock Description',definition.unlockDescription??'Available from the start.']);
     if(definition.stats)rows.push(['Max HP',String(definition.stats.maxHP)],['DPS',String(definition.stats.attackDPS)],['Armor',`${definition.stats.armor} %`],['Attack Range',`${definition.stats.attackRange} políčko`]);
     if(definition.stats)rows.push(['HP Regeneration',`${definition.stats.hpRegenPerSecond??0} HP/s`]);
     if(definition.experience)rows.push(['Počáteční level',String(definition.experience.initialLevel)],['Max level',String(definition.experience.maxLevel)],['Získává XP',definition.experience.enabled?'Ano':'Ne'],['XP multiplier',`${definition.experience.gainMultiplier}×`]);

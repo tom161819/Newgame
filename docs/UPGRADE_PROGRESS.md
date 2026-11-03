@@ -4,7 +4,7 @@
 
 Krok24 je dokončen a publikován: `e721a68`, Pages `41694834348` **Success** (58 s), původní adresa hry zachována. A `fb5aaf2`, B `f4e621b`, C `a454fe9`, D `9e93982`;271/271 testů, build, skutečné UI/IndexedDB, starší savy5/6, fyzický potravinový řetězec, ruční přeprava, zimní20NPC kolem57 FPS a62 neměnných archivů ověřeny. Podrobnosti: [step24 verification](verification/step-24.md).
 
-Master etapa01/29A je dokončena: zdroj `fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265`,282/282 testů, čisté npm ci, build, skutečný browser/IndexedDB včetně starého savu2→7,65 neměnných archivů (3 nové,0 vynechaných). [Report etapy01](verification/master-01.md). Právě následuje etapa02/36; předchozí funkce i veřejné Pages zůstávají funkční. Pracovní etapy se zálohují do `backup/master-progress`; MINOR/tagy následují pouze po M1–M5 gate. Package0.1.0 a Save7 zůstávají oddělené.
+Master etapa01/29A je dokončena: zdroj `fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265`,282/282 testů, čisté npm ci, build, skutečný browser/IndexedDB včetně starého savu2→7,65 neměnných archivů (3 nové,0 vynechaných). [Report etapy01](verification/master-01.md). Etapa02/36 je implementována a ověřena, zbývá dokončovací commit/report; předchozí funkce i veřejné Pages zůstávají funkční. Pracovní etapy se zálohují do `backup/master-progress`; MINOR/tagy následují pouze po M1–M5 gate. Package0.1.0 a Save7 zůstávají oddělené.
 
 ## Master: 15 etap, 5 milníků
 
@@ -13,7 +13,7 @@ Etapa01 je DONE; etapa02 právě začíná, ostatní jsou PENDING. U dokončené
 | Etapa | Krok | Milník | Stav | Commit / ověření |
 |---|---|---|---|---|
 | 01 | 29A: Version Archive, Changelog & Release Foundation | M1 | DONE | `fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265`;282/282, npm ci/build/browser/Save2→7,65 SHA-256 archivů;[report](verification/master-01.md) |
-| 02 | 36: Building Categories & Unlock Requirements | M1 | PARTIAL | Začíná analýza současných kategorií, registru a dokončených budov; implementace zbývá |
+| 02 | 36: Building Categories & Unlock Requirements | M1 | PARTIAL | Kategorie, eventové odemykání a integrace implementovány; plný fyzický browser průchod a Save/Load prošly; probíhá závěrečný regresní build/checkpoint |
 | 03 | 33: Seasons ON/OFF | M1 | PENDING | Nezahájeno |
 | 04 | 28: Circular Fog of War & Map Memory | M1 | PENDING | Nezahájeno |
 | 05 | 30: Population Sidebar & Skill Sorting | M1 | PENDING | Nezahájeno |

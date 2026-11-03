@@ -118,6 +118,7 @@ export function loadGameState(scene,input){
   for(const t of state.spawners)scene.resourceSpawners.find(s=>s.definition.id===t.id).importState(t);
   scene.settingsPanel.applySettings(state.settings);scene.fog.setEnabled(state.settings.fogOfWar);
   scene.terrain?.setDebug(!!state.settings.pathWearDebug);
+  scene.events?.emit('buildings:changed');
   scene.updateInventory();scene.worldCamera.syncSize?.();
   const camera=scene.cameras.main;camera.setZoom(state.camera.zoom).centerOn(state.camera.x,state.camera.y);camera.preRender();
   scene.worldCamera.following=state.camera.following;

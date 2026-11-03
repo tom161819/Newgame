@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { browserRuntime } from './browser-runtime.mjs';
 import { projectBase } from './archive-lib.mjs';
+import { buildingMenuSmoke,buildingUnlockGameplaySmoke } from './building-menu-smoke.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
 const base=projectBase(args.find(a=>a.startsWith('--base='))?.slice(7)??'/Newgame/'),dist=path.join(root,'dist');
@@ -56,6 +57,7 @@ try{
   await page.locator('#new-game').click();await page.locator('.setup-advanced summary').click();await page.locator('#setup-fog').uncheck();await page.locator('#setup-respawn').selectOption('off');
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
+  await buildingMenuSmoke(page);
   const point=await page.evaluate(()=>{
     const s=window.__game.registry.get('application').scene;
     for(const a of s.animalSystem.animals.values())a.wanderWait=1e8;for(const w of s.workerSystem.liveWorkers())w.aiCooldown=1e8;
@@ -77,6 +79,7 @@ try{
   await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('test',false));await page.waitForFunction(()=>window.__game.registry.get('application').scene.inventory.count('stone')===1,null,{timeout:20000});
   assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.character.experience.totalXP),3);
   console.log('PASS New Game, real mouse movement/pickup, physical delivery, exact IndexedDB Save/Load in transit, no duplicated stock or XP');
+  if(args.includes('--full'))await buildingUnlockGameplaySmoke(page);
 
   const original=catalog.versions.find(v=>v.version==='0.1.0'&&v.available);assert.ok(original,'Original official archive is required.');
   const old=await context.newPage();await instrument(old);await old.goto(origin+original.archiveURL);await old.locator('#new-game').click();await old.locator('#start-game').click();

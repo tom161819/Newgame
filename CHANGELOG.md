@@ -19,6 +19,9 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Grow wheat through four stages over two game days and fruit over three game days; farmers physically harvest 8 Wheat or 6 Apple within their workplace radius.
 - Earn Farming experience for completed harvests, eat apples through the existing food cycle, and save growing crops and reserved work without duplicate harvests.
 
+### Changed
+- Group Buildings into themed categories and require a completed Granary for new Farmhouses, then a completed Farmhouse for new Wheat Fields and Orchards; existing structures and valid blueprints remain intact.
+
 ### Improved
 - Choose faster walking routes over worn paths while keeping diagonal corners safe and avoiding excessive detours.
 - Prefer Haulers for production deliveries while letting producers carry their own supplies when no carrier can serve them.

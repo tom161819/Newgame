@@ -8,7 +8,7 @@ export const foodBuildings=[
     workplace:WORKPLACES.bakery,recipe:FOOD_RECIPES.bakery,description:'Two Bakers turn 2 Flour into 4 Bread with 30 seconds of active work and physical deliveries.'},
   {id:'granary',name:'Granary',width:3,height:3,cost:{stone:10},constructionTime:30000,visualHeight:125,
     workplace:WORKPLACES.granary,storage:{capacity:200,resources:FOOD_RESOURCE_IDS},description:'A physical store with room for 200 food units and two Hauler workplaces.'},
-].map(d=>({...d,category:'building',sprite:`/assets/buildings/${d.id}/${d.id}.svg`,walkable:false,collectible:false,buildable:true,
+].map(d=>({...d,category:'building',buildingCategory:'food',sprite:`/assets/buildings/${d.id}/${d.id}.svg`,walkable:false,collectible:false,buildable:true,
   interactions:d.storage?['inspect_storage']:['manage_workers'],renderMode:'procedural',renderer:'food_building',origin:{x:.5,y:.9},depth:{offset:0},
   bufferCapacity:d.recipe?FOOD_RULES.bufferCapacity:undefined,
   shadow:{baked:true,x:10,y:-10,width:d.width*59,height:d.height*21,color:0x30291c,alpha:.3}}));

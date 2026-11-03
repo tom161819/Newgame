@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { workerScene } from './helpers/workerScene.js';
+import { workerScene,ensureBuildingPrerequisites } from './helpers/workerScene.js';
 import { calendar,SEASONS,SEASON_GROWTH,WEATHER_GROWTH,WEATHER_PROBABILITIES } from '../src/data/seasons.js';
 import { SeasonSystem } from '../src/systems/SeasonSystem.js';
 import { GameTimeSystem } from '../src/systems/GameTimeSystem.js';
@@ -10,7 +10,7 @@ import { loadGameState } from '../src/systems/GameStateLoader.js';
 globalThis.document={querySelector:()=>({textContent:''})};
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-6,`${a} != ${b}`);
 function scene(seconds=120,{migration=false}={}){const s=workerScene(undefined,{construction:true,foodProduction:true,seasons:true,gameSettings:{dayLengthSeconds:seconds}});s.seasons.random=()=>0;s.seasons.weather='Sunny';if(!migration)s.workerSystem.unsubscribe();return s;}
-function building(s,type,x,y){const definition=s.objectRegistry.require(type);s.inventory.add('stone',definition.cost.stone);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition});assert.ifError(result.error);s.towerViews.set(result.building.id,s.createBuildingView(definition,result.building));return result.building;}
+function building(s,type,x,y){const definition=s.objectRegistry.require(type);ensureBuildingPrerequisites(s,definition);s.inventory.add('stone',definition.cost.stone);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition});assert.ifError(result.error);s.towerViews.set(result.building.id,s.createBuildingView(definition,result.building));return result.building;}
 function stock(s,items){let b=s.buildings.find(b=>b.type==='granary')??building(s,'granary',48,45);for(const [id,n]of Object.entries(items))assert.equal(s.foodStorage.deposit(`granary-${b.id}`,id,n),true);return b;}
 function until(s,predicate,max=15000){let elapsed=0;while(!predicate()&&elapsed<max){s.tick(25);elapsed+=25;}assert.ok(predicate(),`Condition not reached at ${elapsed}`);return elapsed;}
 

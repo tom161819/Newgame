@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {workerScene} from './helpers/workerScene.js';
+import {workerScene,ensureBuildingPrerequisites} from './helpers/workerScene.js';
 import {gameSettings} from '../src/systems/GameSettings.js';
 import {placeBuilding} from '../src/game/buildings.js';
 import {findPathToAny,canStep} from '../src/game/pathfinding.js';
@@ -10,7 +10,7 @@ import {loadGameState} from '../src/systems/GameStateLoader.js';
 globalThis.document={querySelector:()=>({textContent:''})};
 const scene=()=>workerScene(undefined,{construction:true,logistics:true,gameSettings:gameSettings()});
 const starter=s=>`stockpile-${s.buildings.find(b=>b.type==='starter_stockpile').id}`;
-function building(s,type,x=50,y=45,blueprint=false){const definition=s.objectRegistry.require(type);if(!blueprint)s.inventory.add('stone',definition.cost.stone??0);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition,reserveMaterials:blueprint});assert.ifError(result.error);if(blueprint)s.constructionSystem.plan(result.building);s.towerViews.set(result.building.id,s.createBuildingView(definition,result.building));return result.building;}
+function building(s,type,x=50,y=45,blueprint=false){const definition=s.objectRegistry.require(type);ensureBuildingPrerequisites(s,definition);if(!blueprint)s.inventory.add('stone',definition.cost.stone??0);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition,reserveMaterials:blueprint});assert.ifError(result.error);if(blueprint)s.constructionSystem.plan(result.building);s.towerViews.set(result.building.id,s.createBuildingView(definition,result.building));return result.building;}
 function until(s,p,max=50000){let n=0;while(!p()&&n<max){s.tick(25);n+=25;}assert.ok(p(),`Condition not reached (${n}ms)`);}
 function restore(data){const s=workerScene(undefined,{construction:true,logistics:true,starter:false,gameSettings:gameSettings()});loadGameState(s,data);return s;}
 const snapshot=s=>validateGameState(serializeGameState(s));

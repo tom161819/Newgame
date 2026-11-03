@@ -1,5 +1,6 @@
 import { objectDefinitions } from '../data/objects/index.js';
 import { JOBS,SKILL_IDS } from '../data/jobs.js';
+import { BUILDING_CATEGORIES } from '../data/buildingCategories.js';
 
 export const OBJECT_CATEGORIES = Object.freeze(['terrain', 'resource', 'building', 'character', 'decoration', 'animal', 'equipment', 'treasure']);
 const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
@@ -25,6 +26,9 @@ export function validateDefinition(definition) {
   if (!Array.isArray(d.interactions) || d.interactions.some(value => typeof value !== 'string' || !value.trim())
     || new Set(d.interactions).size !== d.interactions.length) fail(id, 'neplatné interakce.');
   if (d.buildable && d.category !== 'building') fail(id, 'postavitelný objekt musí být budova.');
+  if(d.buildingCategory!==undefined&&(d.category!=='building'||!Object.hasOwn(BUILDING_CATEGORIES,d.buildingCategory)))fail(id,'neplatná stavební kategorie.');
+  if(d.requiresCompletedBuildings!==undefined&&(d.category!=='building'||!Array.isArray(d.requiresCompletedBuildings)||new Set(d.requiresCompletedBuildings).size!==d.requiresCompletedBuildings.length||d.requiresCompletedBuildings.some(value=>typeof value!=='string'||!value)))fail(id,'neplatné stavební podmínky.');
+  if(d.unlockDescription!==undefined&&(d.category!=='building'||typeof d.unlockDescription!=='string'||!d.unlockDescription.trim()))fail(id,'neplatný popis odemčení.');
   if(d.constructionTime!==undefined&&(!finite(d.constructionTime)||d.constructionTime<=0||d.category!=='building'))fail(id,'neplatná doba výstavby.');
   if (d.collectible && d.category !== 'resource') fail(id, 'sběratelný objekt musí být surovina.');
   if (d.renderMode !== undefined && !['sprite', 'procedural'].includes(d.renderMode)) fail(id, 'neplatný renderMode.');
@@ -110,7 +114,11 @@ export class ObjectRegistry {
       for(const id of [...Object.keys(definition.cost),...(definition.production?[definition.production.resource]:[]),...(definition.crop?[definition.crop.resource]:[]),...(definition.storage?.resources??[]),...Object.keys(definition.recipe?.input??{}),...Object.keys(definition.recipe?.output??{})])
         if(known.get(id)?.category!=='resource')fail(definition.id,`neznámá surovina ${id}.`);
       for(const id of definition.treasure?.equipment??[])if(known.get(id)?.category!=='equipment')fail(definition.id,`neznámé vybavení ${id}.`);
+      for(const id of definition.requiresCompletedBuildings??[])if(id===definition.id||known.get(id)?.category!=='building')fail(definition.id,`neplatná požadovaná budova ${id}.`);
     }
+    const visited=new Set(),visiting=new Set();
+    const visit=id=>{if(visiting.has(id))fail(id,'cyklické stavební podmínky.');if(visited.has(id))return;visiting.add(id);for(const requirement of known.get(id)?.requiresCompletedBuildings??[])visit(requirement);visiting.delete(id);visited.add(id);};
+    for(const id of pending.keys())visit(id);
     for (const [id, definition] of pending) this.definitions.set(id, definition);
     if (pending.size) for (const listener of this.listeners) listener();
     return this;

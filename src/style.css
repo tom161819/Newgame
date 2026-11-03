@@ -102,6 +102,13 @@ button:focus-visible { outline: 2px solid #e2c673; outline-offset: 2px; }
 .building-option + .building-option { border-top: 1px solid #77714e; margin-top: 14px; padding-top: 14px; }
 .building-availability { color: #b8d895 !important; }
 .building-availability.shortage { color: #efa18a !important; }
+#building-categories { display:flex; gap:6px; overflow-x:auto; padding:2px 2px 10px; margin-bottom:12px; overscroll-behavior-x:contain; }
+.building-category { flex:0 0 auto; white-space:nowrap; font-size:12px; padding:7px 9px; }
+.building-category[aria-pressed="true"] { border-color:#e2c673; background:#555b3c; }
+.building-empty { padding:12px 0; }
+.building-locked .tower-icon { filter:grayscale(1); opacity:.5; }
+.building-locked .building-choice { color:#a6a58e; cursor:not-allowed; }
+.building-lock { font-size:11px; color:#c4bca0; }
 #asset-library-button { font-size: 13px; }
 #asset-gallery { position: fixed; inset: 0; width: min(1200px,96vw); height: min(840px,92dvh); max-width: none; max-height: none; margin: auto; padding: 0; border: 1px solid #978657; border-radius: 6px; color: #ece2c4; background: #303625; box-shadow: 0 16px 90px #0009; }
 #asset-gallery[open] { display: flex; flex-direction: column; }

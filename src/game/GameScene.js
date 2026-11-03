@@ -69,6 +69,7 @@ import { SeasonSystem } from '../systems/SeasonSystem.js';
 import { KingdomAttractivenessSystem } from '../systems/KingdomAttractivenessSystem.js';
 import { FoodEconomyPanel } from '../ui/FoodEconomyPanel.js';
 import { KingLogisticsSystem } from '../systems/KingLogisticsSystem.js';
+import { BuildingUnlockManager } from '../systems/BuildingUnlockManager.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -164,7 +165,8 @@ export class GameScene extends Phaser.Scene {
     this.foodSystem=new FoodSystem(this.inventory,this.objectRegistry.require('meat'),()=>this.updateInventory(),{time:this.gameTime,scene:this,subscribe:true});
     this.attractiveness=new KingdomAttractivenessSystem(this);this.foodEconomyPanel=new FoodEconomyPanel(this);
     this.inventoryBar=new InventoryBar(this.objectRegistry,this.assets,this.inventory);
-    this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
+    this.buildingUnlocks=new BuildingUnlockManager(this);
+    this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,unlocks:this.buildingUnlocks,onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
     this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
     this.equipmentPanel=new EquipmentPanel(this);
     this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=`Poddaní ${count} / ${maximum}`;}});if(!this.loadState)this.workerSystem.spawnInitial();
@@ -206,6 +208,7 @@ export class GameScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
       this.kingLogistics.destroy();
       this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
+      this.buildingUnlocks.destroy();
       this.animalSystem.destroy();this.dropSystem.destroy();document.querySelector('#object-tooltip').hidden=true;
       this.settingsPanel.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
       this.clearWallPreviews();
@@ -368,10 +371,11 @@ export class GameScene extends Phaser.Scene {
     return [...this.buildings].filter(building=>this.fog.isVisibleObject(building)).sort((a,b)=>towerBase(b).y-towerBase(a).y).find(building=>this.towerViews.get(building.id).contains(x,y)||building.tiles.some(part=>tileKey(part)===tileKey(tile)));
   }
   startBuilding(definition=this.objectRegistry.require('tower')) {
-    this.kingLogistics?.cancel();
     if(this.gameOver||this.gameTime.paused)return false;
     if(this.character.transitioning){this.setStatus('Nejdřív dokonči výstup nebo sestup z věže.');return false;}
-    if(!definition.buildable)return false;
+    definition=this.objectRegistry.get(definition.id);if(!definition?.buildable)return false;
+    const status=this.buildingUnlocks.status(definition,{live:true});if(!status.unlocked){this.setStatus(status.description);return false;}
+    this.kingLogistics?.cancel();
     this.huntingSystem.cancel();this.mountSystem.cancel();
     this.treasureSystem.cancelRequest();
     this.clearWallPreviews();
@@ -390,7 +394,7 @@ export class GameScene extends Phaser.Scene {
     const anchor=this.previewAnchor,definition=this.selectedBuilding;
     if(this.buildMode&&anchor&&definition.construction?.mode==='line'){this.updateWallPreview(anchor);return;}
     if(!this.buildMode||!anchor||anchor.x<0||anchor.y<0||anchor.x>=COLUMNS||anchor.y>=ROWS){this.preview.setVisible(false);return;}
-    const error=placementError(this.map,anchor,this.resourceOccupancy,this.reservedTiles(),definition,this.buildings)
+    const error=placementError(this.map,anchor,this.resourceOccupancy,this.reservedTiles(),definition,this.buildings,this.buildingUnlocks)
       ??(!this.inventory.canAfford(definition.cost)?'Na tuto budovu nemáš dostatek surovin.':null);
     const key=`${tileKey(anchor)}:${error}`;
     if(key!==this.previewKey){

@@ -4,12 +4,13 @@ import { findPathToAny } from './pathfinding.js';
 import { tileKey } from './stones.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { adjacentTiles } from './interaction.js';
+import { buildingUnlockStatus } from '../systems/BuildingUnlockManager.js';
+export { buildingIsComplete } from './buildingState.js';
 
 const towerDefinition = () => objectRegistry.require('tower');
 export const TOWER_COST = towerDefinition().cost.stone;
 export const TOWER_SIZE = towerDefinition().width;
 export const buildingDefinition = building => building.definition ?? objectRegistry.require(building.type ?? 'tower');
-export const buildingIsComplete = building => !!building&&(!building.construction||building.construction.state==='complete');
 
 export function buildingTiles({x,y},definition) {
   const tiles=[];
@@ -34,8 +35,9 @@ export function towerTop(building) {
   return {x:base.x+platform.x,y:base.y+platform.y};
 }
 
-export function placementError(map,anchor,resources,reservedTiles=[],definition=towerDefinition(),buildings=[]) {
+export function placementError(map,anchor,resources,reservedTiles=[],definition=towerDefinition(),buildings=[],unlocks=null) {
   if(!definition.buildable||definition.category!=='building')return 'Tento objekt není určený ke stavbě.';
+  const status=unlocks?.status(definition)??buildingUnlockStatus(definition,buildings,objectRegistry);if(!status.unlocked)return status.description;
   const tiles=buildingTiles(anchor,definition);
   if(tiles.some(tile=>!isWalkable(map,tile.x,tile.y)))return `Budova potřebuje ${definition.width} × ${definition.height} volných políček uvnitř mapy.`;
   if(tiles.some(tile=>resources.has(tileKey(tile))))return 'Na tomto místě leží surovina.';
