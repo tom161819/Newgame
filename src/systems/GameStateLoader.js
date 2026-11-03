@@ -4,6 +4,7 @@ import { buildingTiles,buildingDepth,towerTop } from '../game/buildings.js';
 import { gridToWorld,tileCenter } from '../game/isometric.js';
 import { importCharacterExperience } from './ExperienceSystem.js';
 import { initializeNaturalTalent } from './NaturalTalentSystem.js';
+import { gameSettings,resourceSpawnSettings } from './GameSettings.js';
 
 export function restoreActor(unit,data){
   for(const key of ['currentHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'])if(data[key]!==undefined)unit[key]=data[key];
@@ -20,6 +21,8 @@ export function restoreOrder(data,scene){
 }
 export function loadGameState(scene,input){
   const state=validateGameState(input,scene.objectRegistry),p=state.player,c=scene.character;
+  scene.gameSettings=gameSettings(state.gameSettings);
+  for(const spawner of scene.resourceSpawners)spawner.spawnSettings=resourceSpawnSettings(spawner.definition,scene.gameSettings);
   scene.inventory.importState(state.inventory);
   for(const data of state.buildings){
     const definition=scene.objectRegistry.require(data.type),building={...data,definition,tiles:buildingTiles(data,definition)};

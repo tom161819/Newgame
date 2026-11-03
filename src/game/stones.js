@@ -42,20 +42,20 @@ export function generateStones(map,start,count=STONE_COUNT,random=Math.random) {
 export class ResourceSpawner {
   exportState(){return {elapsed:this.elapsed};}
   importState(data){this.elapsed=data.elapsed;}
-  constructor({map,stones,resources=stones,getOrigins,getReserved,spawn,random=Math.random,definition=stoneDefinition(),getCount}) {
+  constructor({map,stones,resources=stones,getOrigins,getReserved,spawn,random=Math.random,definition=stoneDefinition(),getCount,spawnSettings=definition.spawn}) {
     Object.assign(this,{map,stones:resources,getOrigins,getReserved,spawn,random,definition});
-    this.getCount=getCount??(()=>this.stones.size);this.elapsed=0;
+    this.getCount=getCount??(()=>this.stones.size);this.elapsed=0;this.spawnSettings=spawnSettings;
   }
   spawnOne() {
-    if(!this.definition.spawn||this.getCount()>=this.definition.spawn.max)return false;
+    if(!this.spawnSettings||this.getCount()>=this.spawnSettings.max)return false;
     const candidates=resourceCandidates(this.map,this.getOrigins(),this.getReserved(),this.stones,this.definition);
     if(!candidates.length)return false;
     this.spawn(candidates[Math.floor(this.random()*candidates.length)]);return true;
   }
   update(delta) {
-    if(!this.definition.spawn)return;
+    if(!this.spawnSettings)return;
     this.elapsed+=delta;
-    while(this.elapsed>=this.definition.spawn.interval){this.elapsed-=this.definition.spawn.interval;this.spawnOne();}
+    while(this.elapsed>=this.spawnSettings.interval){this.elapsed-=this.spawnSettings.interval;this.spawnOne();}
   }
 }
 // Původní rozhraní zůstává aliasem stejného systému, nikoli druhým generátorem.

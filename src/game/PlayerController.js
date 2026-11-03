@@ -23,7 +23,7 @@ export class PlayerController {
     this.nextTile = null;
     this.path = [];
     this.definition = sprite.getData?.('definition') ?? objectRegistry.require(sprite.getData?.('objectId') ?? 'king');
-    Object.assign(this,createCombatStats(this.definition),{id:'king',type:'king'});
+    Object.assign(this,createCombatStats(this.definition,scene.gameSettings),{id:'king',type:'king'});
     this.experience=createExperience(this.definition);
     this.speed = this.definition.gameplay?.movementSpeed ?? 3.5;
     this.depthOffset = this.definition.depth?.offset ?? 0;

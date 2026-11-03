@@ -300,3 +300,7 @@ Před převodem na izometrii byl vytvořen checkpoint commit **`bf049d5`**. Obsa
 Před zavedením Asset Library vznikl checkpoint **`4d3d63f`** s funkčním osmisměrným pohybem.
 
 Fronta dalších zadaných úkolů a jejich původní znění jsou v **[docs/TASK_QUEUE.md](docs/TASK_QUEUE.md)**.
+
+### Nastavení nové hry
+
+New Game otevře Game Setup: obtížnost Easy/Normal/Hard, 3/9/24 lovitelných zvířat, 0–10 pokladů a 0–100 počátečních kamenů. Mapa a časovače vznikají až tlačítkem Start Game. Obtížnost mění základní HP/DPS krále a zvěře, kůň zůstává beze změny; vybavení a skilly se přidávají poté. Kameny zachovávají 20sekundový interval a kapacitu max(80, počáteční počet). Save/Load obnovuje konfiguraci, skutečné objekty a časovače; starší hry používají Normal bez nového generování.

@@ -5,7 +5,7 @@ import { createCombatStats } from '../systems/CombatSystem.js';
 
 export class AnimalController {
   constructor(scene,definition,id,tile,view){
-    Object.assign(this,createCombatStats(definition),{scene,definition,id,type:definition.id,tile:{...tile},view,active:true,
+    Object.assign(this,createCombatStats(definition,scene.gameSettings),{scene,definition,id,type:definition.id,tile:{...tile},view,active:true,
       position:{x:tile.x+.5,y:tile.y+.5},path:[],nextTile:null,direction:{x:0,y:1},
       speed:definition.gameplay.movementSpeed,walking:false,wanderWait:1000+Math.random()*3000});
   }

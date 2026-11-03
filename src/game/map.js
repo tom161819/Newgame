@@ -19,8 +19,6 @@ export function createMap(random=null) {
   return map;
 }
 
-export const grid = createMap();
-
 export function isWalkable(map, x, y) {
   return Number.isInteger(x) && Number.isInteger(y) && map[y]?.[x] === 0;
 }

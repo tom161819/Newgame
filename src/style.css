@@ -189,3 +189,17 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 .version-archive-link { color:#d8c286; font-size:12px; text-underline-offset:3px; }
 .main-menu-content .version-archive-link { display:block; margin-top:16px; }
 .buildings-bar .version-archive-link { padding:7px 4px; }
+
+.game-setup[hidden] { display:none; }
+.game-setup { padding:24px 16px; }
+.setup-card { margin:auto; width:min(100%,600px); padding:28px; background:#24332fec; border:1px solid #99834d; border-radius:10px; box-shadow:0 20px 70px #081110b0; }
+.setup-card h1 { font:36px Georgia,serif; color:#e5cf97; margin:10px 0; }
+.setup-card p { color:#bfc5b3; font-size:14px; line-height:1.6; }
+.setup-card label { display:flex; justify-content:space-between; gap:16px; margin-top:24px; color:#e5dcbf; }
+.setup-card output { color:#d6bb77; text-align:right; }
+.setup-card select { width:100%; padding:12px; margin-top:10px; color:#e5dcbf; background:#172622; border:1px solid #6b7253; border-radius:4px; font:inherit; }
+.setup-card input[type=range] { width:100%; accent-color:#c9a85d; margin:15px 0 3px; }
+.setup-actions { display:flex; justify-content:space-between; gap:20px; margin-top:24px; }
+.setup-actions button { flex:1; padding:14px; }
+#start-game { background:#716033; border-color:#d0b063; }
+@media(max-width:440px) { .setup-card { padding:20px 16px; } .setup-card label { font-size:13px; } }

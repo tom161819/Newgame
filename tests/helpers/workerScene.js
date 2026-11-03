@@ -22,8 +22,8 @@ import { ResourceSpawner } from '../../src/game/stones.js';
 import { tileCenter } from '../../src/game/isometric.js';
 import { wallIndex,connectionsFor } from '../../src/game/walls.js';
 
-export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,workplaces=false,construction=false}={}){
-  const scene={objectRegistry,terrainGrid:terrain.map(r=>[...r]),map:terrain.map(r=>[...r]),inventory:new Inventory(),gameOver:false,
+export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,workplaces=false,construction=false,gameSettings}={}){
+  const scene={objectRegistry,gameSettings,terrainGrid:terrain.map(r=>[...r]),map:terrain.map(r=>[...r]),inventory:new Inventory(),gameOver:false,
     resources:new Map(),resourceOccupancy:new Map(),buildings:[],towerViews:new Map(),animations:[],
     marker:{visible:false,setVisible(v){this.visible=v;}},showMarker(){this.marker.visible=true;},setStatus(){},updateBuildingUI(){},updateInventory(){},updateTimeDisplay(){},refreshVisibility(){},
     reservedTiles(){return [...this.character.reservedTiles(),...this.animalSystem.reservedTiles(),...(this.workerSystem?.reservedTiles()??[])];},

@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { findPath, findPathToAny, reachableTiles, canStep } from '../src/game/pathfinding.js';
-import { grid, COLUMNS, ROWS, PLAYER_START, isWalkable } from '../src/game/map.js';
+import { createMap, COLUMNS, ROWS, PLAYER_START, isWalkable } from '../src/game/map.js';
+const grid=createMap();
 
 const costOf = (start, path) => {
   let previous = start, cost = 0;

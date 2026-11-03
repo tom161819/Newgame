@@ -53,10 +53,11 @@ import { WorkplacePanel } from '../ui/WorkplacePanel.js';
 import { ConstructionSystem } from '../systems/ConstructionSystem.js';
 import { ConstructionView } from './ConstructionView.js';
 import { ConstructionUI } from '../ui/ConstructionUI.js';
+import { gameSettings,resourceSpawnSettings } from '../systems/GameSettings.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
-  init({state=null}={}){this.loadState=state;}
+  init({state=null,settings}={}){this.loadState=state;this.gameSettings=gameSettings(state?.gameSettings??settings);}
 
   preload() {
     this.objectRegistry=objectRegistry;
@@ -108,17 +109,18 @@ export class GameScene extends Phaser.Scene {
     this.skillSystem.attachCombat(this.combat);
     this.resourceSpawners=[];
     for(const definition of this.objectRegistry.byCategory('resource').filter(d=>d.spawn)){
+      const spawnSettings=resourceSpawnSettings(definition,this.gameSettings);
       const spawner=new ResourceSpawner({
-        map:this.map,resources:this.resourceOccupancy,definition,
+        map:this.map,resources:this.resourceOccupancy,definition,spawnSettings,
         getOrigins:()=>this.resourceOrigins(),getReserved:()=>this.reservedTiles(),
         getCount:()=>this.resourceCount(definition.id),spawn:tile=>this.addResource(definition,tile),
       });
       this.resourceSpawners.push(spawner);
       if(!this.loadState&&definition.walkable){
-        const candidates=generateResourcePositions(this.map,PLAYER_START,definition.spawn.initial,Math.random,this.resourceOccupancy,definition);
+        const candidates=generateResourcePositions(this.map,PLAYER_START,spawnSettings.initial,Math.random,this.resourceOccupancy,definition);
         for(const tile of candidates)if(resourceTiles(tile,definition).every(p=>!this.resourceOccupancy.has(tileKey(p))))this.addResource(definition,tile);
       }
-      if(!this.loadState)while(this.resourceCount(definition.id)<definition.spawn.initial&&spawner.spawnOne()){}
+      if(!this.loadState)while(this.resourceCount(definition.id)<spawnSettings.initial&&spawner.spawnOne()){}
     }
     this.spawner=this.resourceSpawners.find(s=>s.definition.id==='stone');
     this.dropSystem=new DropSystem(this);
@@ -161,7 +163,7 @@ export class GameScene extends Phaser.Scene {
     document.querySelector('#dismount').addEventListener('click',dismount,{signal:this.controls.signal});
     this.gameOverDialog=document.querySelector('#game-over');
     this.gameOverDialog.addEventListener('cancel',event=>event.preventDefault(),{signal:this.controls.signal});
-    document.querySelector('#restart-game').addEventListener('click',()=>{this.gameOverDialog.close();this.scene.restart();},{signal:this.controls.signal});
+    document.querySelector('#restart-game').addEventListener('click',()=>{this.gameOverDialog.close();this.scene.restart({settings:this.gameSettings});},{signal:this.controls.signal});
     const onDismount=event=>{if(!event.repeat&&!this.assetGallery.isOpen)dismount();};
     this.input.keyboard.on('keydown-H',onDismount);this.updateMountUI();
     this.combatFeedback.refresh();
@@ -427,8 +429,8 @@ export class GameScene extends Phaser.Scene {
   }
   updateBuildingUI() { this.buildingBar.update(this.inventory,this.buildMode?this.selectedBuilding:null); }
   updateWorldCount() {
-    const definition=this.objectRegistry.require('stone');
-    document.querySelector('#world-stones').textContent=`Mapa ${COLUMNS} × ${ROWS} · kameny ${this.resourceCount('stone')} / ${definition.spawn.max}`;
+    const capacity=resourceSpawnSettings(this.objectRegistry.require('stone'),this.gameSettings).max;
+    document.querySelector('#world-stones').textContent=`Mapa ${COLUMNS} × ${ROWS} · kameny ${this.resourceCount('stone')} / ${capacity}`;
   }
   setStatus(message) { document.querySelector('#status').textContent=message; }
   onUnitDeath(unit,killer=null){

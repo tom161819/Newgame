@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { grid, PLAYER_START, isWalkable } from '../src/game/map.js';
+import { createMap, PLAYER_START, isWalkable } from '../src/game/map.js';
+const grid=createMap();
 import { generateStones, STONE_COUNT, tileKey, StoneSpawner, stoneCandidates, MAX_STONES, STONE_INTERVAL } from '../src/game/stones.js';
 import { Inventory } from '../src/game/inventory.js';
 

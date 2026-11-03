@@ -7,7 +7,7 @@ export class TreasureSystem {
     Object.assign(this,{scene,random,onReady,canShow,onChange});this.chests=new Map();this.nextId=1;this.pending=null;
     this.definition=scene.objectRegistry.require('treasure_chest');
   }
-  spawn(start,count=this.definition.treasure.initial){
+  spawn(start,count=this.scene.gameSettings?.treasureCount??this.definition.treasure.initial){
     const occupied=new Map(this.scene.resourceOccupancy);
     for(const tile of this.scene.reservedTiles())occupied.set(tileKey(tile),'reserved');
     const positions=generateResourcePositions(this.scene.map,start,count,this.random,occupied);

@@ -1,6 +1,38 @@
 [
   {
     "schema": 1,
+    "commit": "09ad285cdbec95edaf468fd115a81432c60b6354",
+    "tree": "1b5b45f8847146e309563dddbc0b81286271ee25",
+    "date": "2026-11-03T08:14:12Z",
+    "sequence": 38,
+    "subject": "Checkpoint published archive before new game setup",
+    "name": "Archiv herních verzí · kontrolní bod",
+    "description": "Kontrolní verze připravená před následujícím rozšířením.",
+    "basePath": "/Newgame/versions/09ad285cdbec95edaf468fd115a81432c60b6354/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
+    "commit": "e4f092fcc20e93f8a276515fd779732c65bca596",
+    "tree": "44b191a546fb9aad8eeb66f5067b6862e3054b8e",
+    "date": "2026-11-03T08:12:22Z",
+    "sequence": 37,
+    "subject": "Archive 36 verified historical game commits with immutable Pages URLs",
+    "name": "Archiv herních verzí",
+    "description": "Archive 36 verified historical game commits with immutable Pages URLs",
+    "basePath": "/Newgame/versions/e4f092fcc20e93f8a276515fd779732c65bca596/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    }
+  },
+  {
+    "schema": 1,
     "commit": "e104791dda5b4db6b79f4b5c757d4ff91256ff55",
     "tree": "3d28c57d72f0caac46b0f8880d6836b44329375e",
     "date": "2026-11-03T07:26:02Z",

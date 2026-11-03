@@ -1,8 +1,9 @@
+import { configuredStats } from './GameSettings.js';
 export const clampArmor=value=>Math.max(0,Math.min(90,Number.isFinite(value)?value:0));
 
-export function createCombatStats(definition){
+export function createCombatStats(definition,settings){
   if(!definition.stats)throw new TypeError(`Chybí bojové statistiky: ${definition.id}`);
-  const baseStats=Object.freeze({hpRegenPerSecond:0,...definition.stats});
+  const baseStats=Object.freeze({hpRegenPerSecond:0,...configuredStats(definition,settings)});
   return {baseStats,statModifiers:{},maxHP:baseStats.maxHP,currentHP:baseStats.maxHP,attackDPS:baseStats.attackDPS,
     armor:clampArmor(baseStats.armor),attackRange:baseStats.attackRange,hpRegenPerSecond:baseStats.hpRegenPerSecond,isAlive:true,attackTarget:null};
 }

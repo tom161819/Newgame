@@ -6,6 +6,7 @@ import { getXPRequired,totalXPForLevel } from '../data/experience.js';
 import { JOBS,SKILL_IDS,WORK_RULES } from '../data/jobs.js';
 import { CONSTRUCTION_RULES } from '../data/construction.js';
 import { buildingIsComplete,towerNeighbors } from '../game/buildings.js';
+import { gameSettings } from './GameSettings.js';
 
 export const SAVE_VERSION=1;
 const copy=value=>value==null?null:structuredClone(value);
@@ -27,7 +28,7 @@ export function serializeOrder(order){
 export function serializeGameState(scene){
   const c=scene.character,camera=scene.cameras.main;
   return {
-    saveVersion:SAVE_VERSION,terrain:scene.terrainGrid.map(row=>[...row]),
+    saveVersion:SAVE_VERSION,gameSettings:{...gameSettings(scene.gameSettings)},terrain:scene.terrainGrid.map(row=>[...row]),
     ...(scene.experienceSystem?{experienceSystem:scene.experienceSystem.exportState()}:{}),
     ...(scene.skillSystem?{skillSystem:scene.skillSystem.exportState()}:{}),
     ...(scene.wageSystem?{wages:scene.wageSystem.exportState()}:{}),
@@ -74,6 +75,7 @@ export function validateGameState(input,registry=objectRegistry){
   const unique=(array)=>{const ids=new Set();for(const a of array){check(a.id!=null&&!ids.has(a.id));ids.add(a.id);}return ids;};
   check(input&&input.saveVersion===SAVE_VERSION);
   let s;try{s=JSON.parse(JSON.stringify(input));}catch{fail();}
+  try{s.gameSettings={...gameSettings(s.gameSettings)};}catch{fail();}
   array(s.terrain,ROWS);check(s.terrain.length===ROWS);for(const row of s.terrain){array(row,COLUMNS);check(row.length===COLUMNS&&row.every(n=>n===0||n===1));}
   for(const key of ['buildings','resources','animals','drops','chests','spawners'])array(s[key]);
   if(s.workers!==undefined)array(s.workers);

@@ -3,13 +3,14 @@ import { generateResourcePositions } from '../game/stones.js';
 import { tileCenter,isWalkable } from '../game/map.js';
 import { adjacentTiles } from '../game/interaction.js';
 import { inAttackRange } from './CombatSystem.js';
+import { animalInitialCount } from './GameSettings.js';
 
 export class AnimalSystem {
   constructor(scene,random=Math.random){this.scene=scene;this.random=random;this.animals=new Map();this.nextId=1;}
   spawn(start){
-    const definitions=this.scene.objectRegistry.byCategory('animal'),total=definitions.reduce((n,d)=>n+d.gameplay.initialCount,0);
+    const definitions=this.scene.objectRegistry.byCategory('animal'),total=definitions.reduce((n,d)=>n+animalInitialCount(d,this.scene.gameSettings),0);
     const positions=generateResourcePositions(this.scene.map,start,total,this.random,this.scene.resourceOccupancy);
-    for(const definition of definitions)for(let i=0;i<definition.gameplay.initialCount;i++){
+    for(const definition of definitions)for(let i=0;i<animalInitialCount(definition,this.scene.gameSettings);i++){
       const tile=positions.pop();if(!tile)break;
       this.create(definition,tile);
     }

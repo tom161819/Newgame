@@ -50,6 +50,7 @@ async function browserCheck(directory,url){
   try{
     await page.goto(`http://127.0.0.1:${port}${url}`,{waitUntil:'networkidle',timeout:30000});
     if(await page.locator('#new-game').count())await page.locator('#new-game').click();
+    if(await page.locator('#start-game').isVisible())await page.locator('#start-game').click();
     await page.locator('canvas').waitFor({state:'visible',timeout:30000});await page.waitForTimeout(450);
     await page.waitForFunction(()=>[...document.images].filter(image=>image.getAttribute('src')).every(image=>image.complete&&image.naturalWidth>0));
     const rendered=await page.locator('canvas').evaluate(canvas=>{
