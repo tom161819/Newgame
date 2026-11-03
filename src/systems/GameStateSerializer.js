@@ -15,7 +15,7 @@ import { seasonalCropStage } from '../data/seasons.js';
 import { carryCapacity } from '../data/logistics.js';
 import { repairTransportInstructions } from './TransportStateMigration.js';
 
-export const SAVE_VERSION=7;
+export const SAVE_VERSION=8;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -35,7 +35,7 @@ export function serializeOrder(order){
 export function serializeGameState(scene){
   const c=scene.character,camera=scene.cameras.main;
   return {
-    saveVersion:SAVE_VERSION,gameSettings:{...gameSettings(scene.gameSettings)},terrain:scene.terrainGrid.map(row=>[...row]),
+    saveVersion:SAVE_VERSION,gameSettings:{...gameSettings(scene.gameSettings),...(scene.seasons?{seasonsEnabled:scene.seasons.enabled}:{})},terrain:scene.terrainGrid.map(row=>[...row]),
     ...(scene.experienceSystem?{experienceSystem:scene.experienceSystem.exportState()}:{}),
     ...(scene.skillSystem?{skillSystem:scene.skillSystem.exportState()}:{}),
     ...(scene.wageSystem?{wages:scene.wageSystem.exportState()}:{}),
@@ -86,7 +86,7 @@ export function validateGameState(input,registry=objectRegistry){
   const array=(a,max=20000)=>check(Array.isArray(a)&&a.length<=max);
   const definition=(id,category)=>{const d=registry.get(id);check(d&&(!category||d.category===category));return d;};
   const unique=(array)=>{const ids=new Set();for(const a of array){check(a.id!=null&&!ids.has(a.id));ids.add(a.id);}return ids;};
-  check(input&&[1,2,3,4,5,6,SAVE_VERSION].includes(input.saveVersion));
+  check(input&&[1,2,3,4,5,6,7,SAVE_VERSION].includes(input.saveVersion));
   let s;try{s=JSON.parse(JSON.stringify(input));}catch{fail();}
   if(input.saveVersion<4)for(const actor of [s.player,...(s.workers??[])])for(const key of ['skills','initialSkills'])if(actor?.[key])for(const id of ['milling','baking'])actor[key][id]??=createProgress();
   if(!s.logistics){
@@ -95,6 +95,7 @@ export function validateGameState(input,registry=objectRegistry){
   }else check(s.logistics.version===1);
   for(const d of s.drops??[]){d.haulEligible??=true;check(typeof d.haulEligible==='boolean');}
   try{const settings=gameSettings(s.gameSettings);s.gameSettings={...settings,fogOfWar:s.gameSettings?.fogOfWar??s.settings?.fogOfWar??settings.fogOfWar};}catch{fail();}
+  if(input.saveVersion<8&&s.seasons&&s.seasons.enabled===undefined){const data=s.seasons;data.enabled=true;data.cycleDay=data.lastProcessedDay;data.cycleElapsed=s.time?.elapsed;data.cycleCompensation=0;data.rememberedSeason=data.season;}
   s.saveVersion=SAVE_VERSION;
   const dayDuration=s.gameSettings.dayLengthSeconds*1000;
   s.wildlifeRespawn??={elapsed:0};number(s.wildlifeRespawn.elapsed,0,(WILDLIFE_INTERVALS[s.gameSettings.wildlifeRespawn]||1)-1e-7);

@@ -110,8 +110,8 @@ export class GameScene extends Phaser.Scene {
     this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
     this.inventory=new Inventory();if(!this.loadState)this.inventory.add('gold',this.gameSettings.startingGold);
     this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);this.regeneration=new RegenerationSystem();
-    this.seasons=new SeasonSystem(this.gameTime);this.terrain.setSeason(this.seasons.season);
-    this.unsubscribeSeason=this.seasons.onChange(()=>{this.terrain.setSeason(this.seasons.season);this.updateTimeDisplay();});
+    this.seasons=new SeasonSystem(this.gameTime,{enabled:this.gameSettings.seasonsEnabled,initialWeather:this.loadState?(this.loadState.seasons?.weather??'Sunny'):undefined});this.terrain.setSeason(this.seasons.season);
+    this.unsubscribeSeason=this.seasons.onChange(()=>{const changed=this.terrain.season!==this.seasons.season;this.terrain.setSeason(this.seasons.season);if(changed&&this.worldCamera)this.terrain.update(this.cameras.main,this.fog);this.updateTimeDisplay();this.settingsPanel?.syncSeasons();});
     this.activities=new GameActivityBus();this.experienceSystem=new ExperienceSystem(this.activities);
     this.skillSystem=new SkillSystem(this);
     this.pathWear=new PathWearSystem({map:this.map,terrain:this.terrainGrid,time:this.gameTime});this.terrain.setPathWear(this.pathWear);
@@ -158,7 +158,7 @@ export class GameScene extends Phaser.Scene {
     this.combat.on('damage',(unit,amount,attacker)=>{this.combatFeedback.hit(unit);this.skillSystem.creditDamage(attacker,unit,amount);});
     this.combat.on('death',(unit,killer)=>this.onUnitDeath(unit,killer));
     this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
-    this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.terrain.setDebug(settings.pathWearDebug);this.refreshVisibility();},open=>this.pauseManager.set('settings',open));
+    this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.terrain.setDebug(settings.pathWearDebug);this.refreshVisibility();},open=>this.pauseManager.set('settings',open),{seasons:this.seasons,onSeasonsChange:enabled=>{this.gameSettings=gameSettings({...this.gameSettings,seasonsEnabled:enabled});this.seasons.setEnabled(enabled);}});
     this.fog.setEnabled(this.settingsPanel.settings.fogOfWar);
     if(!this.loadState){this.settingsPanel.applySettings({...this.settingsPanel.settings,fogOfWar:this.gameSettings.fogOfWar});this.fog.setEnabled(this.gameSettings.fogOfWar);}
     this.terrain.setDebug(this.settingsPanel.settings.pathWearDebug);

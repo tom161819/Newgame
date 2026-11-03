@@ -4,7 +4,7 @@
 
 Krok24 je dokončen a publikován: `e721a68`, Pages `41694834348` **Success** (58 s), původní adresa hry zachována. A `fb5aaf2`, B `f4e621b`, C `a454fe9`, D `9e93982`;271/271 testů, build, skutečné UI/IndexedDB, starší savy5/6, fyzický potravinový řetězec, ruční přeprava, zimní20NPC kolem57 FPS a62 neměnných archivů ověřeny. Podrobnosti: [step24 verification](verification/step-24.md).
 
-Master etapa01/29A je dokončena: zdroj `fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265`,282/282 testů, čisté npm ci, build, skutečný browser/IndexedDB včetně starého savu2→7,65 neměnných archivů (3 nové,0 vynechaných). [Report etapy01](verification/master-01.md). Etapa02/36 je DONE: `5074450fe57321ac71b7ded1cedcaf2281d2f216`,294/294 testů, build, plný fyzický browser/Save/Load a65 neměnných archivů;[report](verification/master-02.md). Právě začíná etapa03/33 (Seasons ON/OFF); předchozí funkce i veřejné Pages zůstávají funkční. Pracovní etapy se zálohují do `backup/master-progress`; MINOR/tagy následují pouze po M1–M5 gate. Package0.1.0 a Save7 zůstávají oddělené.
+Master etapa01/29A je dokončena: zdroj `fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265`,282/282 testů, čisté npm ci, build, skutečný browser/IndexedDB včetně starého savu2→7,65 neměnných archivů (3 nové,0 vynechaných). [Report etapy01](verification/master-01.md). Etapa02/36 je DONE: `5074450fe57321ac71b7ded1cedcaf2281d2f216`,294/294 testů, build, plný fyzický browser/Save/Load a65 neměnných archivů;[report](verification/master-02.md). Etapa03/33 je implementována a ověřena (307/307, build, plný browser/IndexedDB, skutečné savy2/7→8); dokončuje se checkpoint. Potom následuje dodatečný audit/optimalizace archivu před04; předchozí funkce i veřejné Pages zůstávají funkční. Pracovní etapy se zálohují do `backup/master-progress`; MINOR/tagy následují pouze po M1–M5 gate. Package0.1.0 a nové Save8 zůstávají oddělené.
 
 ## Master: 15 etap, 5 milníků
 
@@ -14,7 +14,7 @@ Etapy01–02 jsou DONE; etapa03 právě začíná, ostatní jsou PENDING. U doko
 |---|---|---|---|---|
 | 01 | 29A: Version Archive, Changelog & Release Foundation | M1 | DONE | `fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265`;282/282, npm ci/build/browser/Save2→7,65 SHA-256 archivů;[report](verification/master-01.md) |
 | 02 | 36: Building Categories & Unlock Requirements | M1 | DONE | `5074450fe57321ac71b7ded1cedcaf2281d2f216`;294/294, build, plný browser fyzické výstavby/rušení, Save/Load;[report](verification/master-02.md) |
-| 03 | 33: Seasons ON/OFF | M1 | PARTIAL | Začíná analýza centrálních sezón, nastavení, růstu a Save/Load |
+| 03 | 33: Seasons ON/OFF | M1 | PARTIAL | Implementováno;307/307 testů, build a plný browser/IndexedDB, skutečné2/7→8. Zbývá dokončovací commit/report |
 | 04 | 28: Circular Fog of War & Map Memory | M1 | PENDING | Nezahájeno |
 | 05 | 30: Population Sidebar & Skill Sorting | M1 | PENDING | Nezahájeno |
 | 06 | 32: Missing Workers Indicator | M1 | PENDING | Nezahájeno |

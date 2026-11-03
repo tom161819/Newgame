@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { browserRuntime } from './browser-runtime.mjs';
 import { projectBase } from './archive-lib.mjs';
 import { buildingMenuSmoke,buildingUnlockGameplaySmoke } from './building-menu-smoke.mjs';
+import { seasonsMenuSmoke } from './seasons-menu-smoke.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
 const base=projectBase(args.find(a=>a.startsWith('--base='))?.slice(7)??'/Newgame/'),dist=path.join(root,'dist');
@@ -55,8 +56,10 @@ try{
   console.log(`PASS main-menu archive, ${catalog.versions.length} milestones / ${catalog.builds.length} actual snapshots, linked collapsible changelog, mobile`);
 
   await page.locator('#new-game').click();await page.locator('.setup-advanced summary').click();await page.locator('#setup-fog').uncheck();await page.locator('#setup-respawn').selectOption('off');
+  if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full'))await page.locator('#setup-seasons').uncheck();}
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
+  if(args.includes('--full'))await seasonsMenuSmoke(page);
   await buildingMenuSmoke(page);
   const point=await page.evaluate(()=>{
     const s=window.__game.registry.get('application').scene;
@@ -93,6 +96,14 @@ try{
   await page.waitForFunction(()=>window.__restored);const migrated=await page.evaluate(()=>window.__game.registry.get('application').snapshot());
   assert.equal(migrated.saveVersion,record.saveVersion);assert.deepEqual(migrated.time,isolated.state.time);assert.deepEqual(migrated.player.tile,isolated.state.player.tile);assert.equal(migrated.inventory.stone??0,isolated.state.inventory.stone??0);assert.equal(migrated.player.experience.totalXP,isolated.state.player.experience.totalXP);
   console.log(`PASS actual historical save schema ${isolated.schema} migrates to ${migrated.saveVersion} with preserved time, royal position, stock and experience`);
+  if(migrated.saveVersion>=8){
+    const previous=catalog.builds.find(b=>b.commit==='fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265');assert.ok(previous?.available,'The actual previous schema-7 source archive must remain available.');
+    const legacyPage=await context.newPage();await instrument(legacyPage);await legacyPage.goto(origin+previous.archiveURL);await legacyPage.locator('#new-game').click();await legacyPage.locator('#start-game').click();await legacyPage.waitForFunction(()=>window.__game?.registry.get('application').scene?.seasons);
+    const legacyState=await legacyPage.evaluate(()=>{const app=window.__game.registry.get('application'),s=app.scene;s.pauseManager.set('test',true);s.workerSystem.unsubscribe();s.seasons.random=()=>0;s.gameTime.setPaused(false);s.gameTime.update(15*s.gameTime.dayDuration+23456);s.gameTime.setPaused(true);return app.snapshot();});assert.equal(legacyState.saveVersion,7);assert.equal(legacyState.seasons.season,'Winter');
+    await legacyPage.close();await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(state);},legacyState);await page.waitForFunction(()=>window.__restored);
+    const restored=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.deepEqual(restored.time,legacyState.time);assert.equal(restored.seasons.enabled,true);assert.equal(restored.seasons.rememberedSeason,'Winter');assert.equal(restored.seasons.cycleDay,legacyState.time.day);assert.equal(restored.seasons.cycleElapsed,legacyState.time.elapsed);assert.deepEqual(restored.inventory,legacyState.inventory);
+    console.log(`PASS actual source fcdb80f schema-7 winter save migrates to ${restored.saveVersion} without resetting its partial day, stocks or weather`);
+  }
   const archivePage=await context.newPage();await instrument(archivePage);await archivePage.goto(origin+base+'versions/');assert.equal(await archivePage.locator('[data-version-label]').count(),catalog.versions.length+(catalog.versions.some(v=>v.current)?0:1));
   await archivePage.setViewportSize({width:390,height:844});assert.equal(await archivePage.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   const first=catalog.builds.at(-1);await archivePage.goto(origin+first.archiveURL);await archivePage.locator('canvas').waitFor();

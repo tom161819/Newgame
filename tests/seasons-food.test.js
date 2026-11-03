@@ -24,10 +24,10 @@ test('central calendar advances four five-day seasons, then a new year, with one
 });
 test('seasonal weather distributions sum to one, vary by season, and multiply growth without reviving winter',()=>{
   const s=scene();for(let i=0;i<4;i++){
-    s.seasons.lastProcessedDay=i*5+1;near(Object.values(WEATHER_PROBABILITIES[s.seasons.season]).reduce((n,v)=>n+v,0),1);
+    if(i)s.gameTime.update(5*s.gameTime.dayDuration);assert.equal(s.seasons.season,SEASONS[i]);near(Object.values(WEATHER_PROBABILITIES[s.seasons.season]).reduce((n,v)=>n+v,0),1);
     for(const [weather,multiplier]of Object.entries(WEATHER_GROWTH)){s.seasons.weather=weather;near(s.seasons.growthMultiplier(),SEASON_GROWTH[s.seasons.season]*multiplier);assert.ok(s.seasons.growthMultiplier()>=0);if(i===3)assert.equal(s.seasons.growthMultiplier(),0);}
   }
-  assert.notDeepEqual(WEATHER_PROBABILITIES.Spring,WEATHER_PROBABILITIES.Summer);s.seasons.lastProcessedDay=6;s.seasons.random=()=>.99;assert.equal(s.seasons.rollWeather(),'Drought');s.seasons.lastProcessedDay=16;assert.equal(s.seasons.rollWeather(),'Frost');
+  assert.notDeepEqual(WEATHER_PROBABILITIES.Spring,WEATHER_PROBABILITIES.Summer);const probe=scene();probe.gameTime.update(5*probe.gameTime.dayDuration);probe.seasons.random=()=>.99;assert.equal(probe.seasons.rollWeather(),'Drought');probe.gameTime.update(10*probe.gameTime.dayDuration);assert.equal(probe.seasons.rollWeather(),'Frost');
 });
 test('orchards blossom during spring, develop ripe fruit only in summer/autumn and retain progress through winter without automatic yield',()=>{
   const s=scene(),plot=building(s,'orchard',44,50),f=s.farmingSystem;stock(s,{apple:100});s.gameTime.update(5*s.gameTime.dayDuration);const record=f.sync(plot);assert.equal(s.seasons.season,'Summer');assert.equal(record.growthDays,1);assert.equal(f.ripe(plot),false);

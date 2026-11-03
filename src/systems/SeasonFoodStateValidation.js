@@ -2,8 +2,11 @@ import { calendar,WEATHER_GROWTH } from '../data/seasons.js';
 export function validateSeasonFoodState(s,{check,number,integer,array}){
   if(s.seasons){
     const data=s.seasons;integer(data.lastProcessedDay,1,s.time.day);check(data.lastProcessedDay===s.time.day&&Object.hasOwn(WEATHER_GROWTH,data.weather));
-    for(const [key,value]of Object.entries(calendar(s.time.day)))check(data[key]===value);
-  }
+    check(typeof data.enabled==='boolean'&&data.enabled===s.gameSettings.seasonsEnabled);integer(data.cycleDay,1,s.time.day);number(data.cycleElapsed,0,s.gameSettings.dayLengthSeconds*1000-1e-7);number(data.cycleCompensation,-1e-6,1e-6);
+    check((data.cycleDay-1)*s.gameSettings.dayLengthSeconds*1000+data.cycleElapsed<=s.time.totalElapsed+1e-5);
+    const real=calendar(data.cycleDay);check(data.rememberedSeason===real.season);
+    for(const [key,value]of Object.entries(real))check(data[key]===(key==='season'&&!data.enabled?'Summer':value));
+  }else check(s.gameSettings.seasonsEnabled);
   const food=s.food;if(!food.residents)return;
   array(food.residents,20001);const ids=new Set();
   for(const r of food.residents){check(!ids.has(r.id)&&(r.id==='king'||s.workers?.some(w=>w.id===r.id)));ids.add(r.id);number(r.progress,0,1);check(r.progress<1);number(r.compensation,-1e-6,1e-6);check(typeof r.hungry==='boolean');}

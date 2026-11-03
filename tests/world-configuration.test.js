@@ -18,8 +18,8 @@ const counts=s=>Object.fromEntries(['rabbit','deer','wild_boar'].map(type=>[type
 const remove=(s,type,n=1)=>{for(const a of [...s.animalSystem.animals.values()].filter(a=>a.type===type).slice(0,n))s.animalSystem.remove(a);};
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} != ${b}`);
 
-test('advanced central defaults validate all nine fields and reject malformed day, toggle, gold and respawn settings',()=>{
-  assert.deepEqual(DEFAULT_GAME_SETTINGS,{difficulty:'normal',wildlifePopulation:'normal',treasureCount:1,initialStoneCount:30,fogOfWar:true,startingCastle:false,dayLengthSeconds:120,wildlifeRespawn:'normal',startingGold:0});
+test('advanced central defaults validate all ten fields and reject malformed day, toggle, gold and respawn settings',()=>{
+  assert.deepEqual(DEFAULT_GAME_SETTINGS,{difficulty:'normal',wildlifePopulation:'normal',treasureCount:1,initialStoneCount:30,fogOfWar:true,seasonsEnabled:true,startingCastle:false,dayLengthSeconds:120,wildlifeRespawn:'normal',startingGold:0});
   for(const bad of [null,[],42,{fogOfWar:'true'},{startingCastle:1},{dayLengthSeconds:0},{dayLengthSeconds:90},{wildlifeRespawn:'bad'},{startingGold:-25},{startingGold:501},{startingGold:1}])assert.throws(()=>gameSettings(bad));
   assert.doesNotThrow(()=>gameSettings({startingGold:500,dayLengthSeconds:240,wildlifeRespawn:'off',startingCastle:true,fogOfWar:false}));
 });

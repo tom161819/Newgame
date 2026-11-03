@@ -52,6 +52,7 @@ async function supplyAndBuild(page,{id,point}){
   // A normal second map click issues the existing royal Build order.
   await clickWorld(page,point);await page.locator('#construction-dialog[open]').waitFor();assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.constructionSystem.assignments.get('king')?.siteId===id,id),true);await page.locator('#close-construction').click();
   await page.waitForFunction(id=>window.__game.registry.get('application').scene.buildings.find(b=>b.id===id)?.construction?.state==='complete',id,{timeout:65000});
+  console.log(`PASS physical construction and material delivery for site ${id}`);
 }
 export async function buildingUnlockGameplaySmoke(page){
   if(!await page.evaluate(()=>!!window.__game.registry.get('application').scene.buildingUnlocks))return;

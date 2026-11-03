@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Choose permanent Summer in New Game or Settings while preserving the exact seasonal cycle, daily weather and crop progress for later resumption.
 - Browse verified historical milestones and original development snapshots from the main menu, with linked, collapsible release notes and isolated archived saves.
 - Inspect available, reserved, carried, on-site, buffered and ground resources, see carried bundles, and physically collect or set down the king's stored supplies.
 - Deliver reserved building materials to construction sites with Haulers or the king before builders can begin; the king can supply a site over multiple trips.
