@@ -2,15 +2,17 @@
 
 ## Aktuální práce
 
-Krok 24: fáze A (`fb5aaf2`), B (`f4e621b`), C (`a454fe9`) a D (`9e93982`) jsou dokončené. Archiv62 skutečných verzí je ověřen; právě se publikuje celek s ověřením Pages, poté začne master. Poslední veřejná hra je zatím krok 23, commit `74628eb` (Pages `41669016548`, Success). Checkpoint před 24: `e2fe98c`. A: 228/228 testů; B: 242/242; C: 259/259 a skutečný schema6 save; D: 271/271 (12 nových integračních scénářů), build, skutečná hra/UI/IndexedDB/mobil, viditelné náklady a šest disjunktních kategorií, plný potravinový řetězec 8 Wheat → 12 Bread, bezpečná obnova přerušených pokynů, ruční královo vyzvednutí/odložení. Skutečný publikovaný schema5 save z `74628eb` zachoval 85 Stone, 30 Apple, 77 Gold, talent i XP, bez dalšího Starter Stockpile; neplatný úkol s 10 nesenými Stone se v prohlížeči obnovil a doručil bez odměny za zrušenou cestu. Zimní mapa 100×100 s 20 NPC / 6 Hauler / 3 Granary / 2 Warehouse / 4 staveništi / 4 výrobami / 22 pozemky: průměr 17,61 ms (~57 FPS), p95 33,3 ms, bez JS chyb, validní snapshot. Commit D obsahuje tento záznam. Průběžné commity chrání `backup/step-24-progress`; na main se nyní připraví ověřený archiv a celé nasazení. Master dosud NEBYL zahájen.
+Krok24 je dokončen a publikován: `e721a68`, Pages `41694834348` **Success** (58 s), původní adresa hry zachována. A `fb5aaf2`, B `f4e621b`, C `a454fe9`, D `9e93982`;271/271 testů, build, skutečné UI/IndexedDB, starší savy5/6, fyzický potravinový řetězec, ruční přeprava, zimní20NPC kolem57 FPS a62 neměnných archivů ověřeny. Podrobnosti: [step24 verification](verification/step-24.md).
+
+Právě začíná master, etapa01/29A. Výchozí zdroje/testy/build/Pages jsou ověřené a checkpoint je publikovaný commit výše. Probíhá analýza skutečné Git historie, archivu, Changelogu a release workflow; kód etapy ještě nebyl dokončen. Menší etapy se ukládají a zálohují do `backup/master-progress`; veřejná MINOR vydání/tagy následují až po M1–M5 release gate. Aktuální package0.1.0 a Save7 zůstávají oddělené.
 
 ## Master: 15 etap, 5 milníků
 
-Všechny etapy jsou PENDING za krokem 24. U dokončené etapy doplnit konkrétní chování, testy (passed/failed/skipped), commit, stav milníku a další etapu. DONE lze zapsat pouze po implementaci a skutečné kontrole.
+Etapa01 právě probíhá (PARTIAL); ostatní jsou PENDING. U dokončené etapy doplnit konkrétní chování, testy (passed/failed/skipped), commit, stav milníku a další etapu. DONE lze zapsat pouze po implementaci a skutečné kontrole.
 
 | Etapa | Krok | Milník | Stav | Commit / ověření |
 |---|---|---|---|---|
-| 01 | 29A: Version Archive, Changelog & Release Foundation | M1 | PENDING | Nezahájeno |
+| 01 | 29A: Version Archive, Changelog & Release Foundation | M1 | PARTIAL | Analýza skutečné historie a stávajícího workflow, navazuje na publikovaný `e721a68`; implementace/testy etapy zbývají |
 | 02 | 36: Building Categories & Unlock Requirements | M1 | PENDING | Nezahájeno |
 | 03 | 33: Seasons ON/OFF | M1 | PENDING | Nezahájeno |
 | 04 | 28: Circular Fog of War & Map Memory | M1 | PENDING | Nezahájeno |
