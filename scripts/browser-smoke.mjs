@@ -9,7 +9,7 @@ import { projectBase } from './archive-lib.mjs';
 import { buildingMenuSmoke,buildingUnlockGameplaySmoke } from './building-menu-smoke.mjs';
 import { seasonsMenuSmoke } from './seasons-menu-smoke.mjs';
 import { stageArchivedSnapshots } from './stage-archive.mjs';
-import { explorationMenuSmoke,staticMemoryRendererSmoke } from './fog-smoke.mjs';
+import { explorationMenuSmoke,staticMemoryRendererSmoke,hiddenInteractionSmoke } from './fog-smoke.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
 const base=projectBase(args.find(a=>a.startsWith('--base='))?.slice(7)??'/Newgame/'),dist=path.join(root,'dist');
@@ -69,7 +69,7 @@ try{
   if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full'))await page.locator('#setup-seasons').uncheck();}
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
-  if(args.includes('--full')||args.includes('--fog')){await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);}
+  if(args.includes('--full')||args.includes('--fog')){await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);await hiddenInteractionSmoke(page);}
   if(args.includes('--full'))await seasonsMenuSmoke(page);
   await buildingMenuSmoke(page);
   const point=await page.evaluate(()=>{
@@ -115,6 +115,14 @@ try{
     await legacyPage.close();await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(state);},legacyState);await page.waitForFunction(()=>window.__restored);
     const restored=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.deepEqual(restored.time,legacyState.time);assert.equal(restored.seasons.enabled,true);assert.equal(restored.seasons.rememberedSeason,'Winter');assert.equal(restored.seasons.cycleDay,legacyState.time.day);assert.equal(restored.seasons.cycleElapsed,legacyState.time.elapsed);assert.deepEqual(restored.inventory,legacyState.inventory);
     console.log(`PASS actual source fcdb80f schema-7 winter save migrates to ${restored.saveVersion} without resetting its partial day, stocks or weather`);
+  }
+  if(migrated.saveVersion>=9){
+    const previous=catalog.builds.find(b=>b.commit==='a4f51ecd936af7678c0822ead4e15c91c0b3e780');assert.ok(previous?.available);
+    const legacyPage=await context.newPage();await instrument(legacyPage);await legacyPage.goto(origin+previous.archiveURL);await legacyPage.locator('#new-game').click();await legacyPage.locator('.setup-advanced summary').click();await legacyPage.locator('#setup-seasons').uncheck();await legacyPage.locator('#start-game').click();await legacyPage.waitForFunction(()=>window.__game?.registry.get('application').scene?.seasons);
+    const legacy=await legacyPage.evaluate(()=>{const app=window.__game.registry.get('application'),s=app.scene;s.pauseManager.set('test',true);s.workerSystem.unsubscribe();s.gameTime.setPaused(false);s.gameTime.update(5*s.gameTime.dayDuration+12345);s.gameTime.setPaused(true);return app.snapshot();});assert.equal(legacy.saveVersion,8);assert.equal(legacy.seasons.enabled,false);await legacyPage.close();
+    await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(state);},legacy);await page.waitForFunction(()=>window.__restored);
+    const restored=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.deepEqual(restored.time,legacy.time);assert.deepEqual(restored.seasons,legacy.seasons);assert.deepEqual(restored.inventory,legacy.inventory);assert.deepEqual(restored.player.experience,legacy.player.experience);assert.equal(restored.exploration.explored.length,317);assert.equal(restored.settings.explorationMode,true);
+    console.log('PASS actual a4f51ec schema-8 permanent Summer save preserves time, frozen seasonal cycle, stock and XP; migration discovers only the loaded king circle');
   }
   const archivePage=await context.newPage();await instrument(archivePage);await archivePage.goto(origin+base+'versions/');assert.equal(await archivePage.locator('[data-version-label]').count(),catalog.versions.length+(catalog.versions.some(v=>v.current)?0:1));
   await archivePage.setViewportSize({width:390,height:844});assert.equal(await archivePage.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);

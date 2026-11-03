@@ -17,7 +17,7 @@ export class TerrainRenderer {
     this.tiles = new Map(); this.wallPool = [];
     this.chunks = new Map(); this.chunkPool = [];
     this.lastView = '';
-    this.dirtyChunks=new Set();this.debugEnabled=false;this.debugGraphics=scene.add.graphics().setDepth(-99);
+    this.dirtyChunks=new Set();this.dirtyTiles=new Map();this.paintStats={tiles:0,chunks:0};this.debugEnabled=false;this.debugGraphics=scene.add.graphics().setDepth(-99);
     for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);
     this.createTextures();
     this.outcrop=registry.require('rock_outcrop');
@@ -27,11 +27,16 @@ export class TerrainRenderer {
 
   setPathWear(system){this.wear=system;this.unsubscribeWear=system.subscribe(tile=>this.invalidateArea([tile]));}
   setDebug(value){this.debugEnabled=!!value;this.lastView='';if(!value)this.debugGraphics.clear();}
-  setSeason(season){if(season===this.season)return;this.season=season;for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
-  invalidateArea(tiles){
+  setSeason(season){if(season===this.season)return;this.season=season;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
+  invalidateArea(tiles,neighbors=true){
     if(!tiles.length)return;
-    for(const tile of tiles)for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
-      const x=tile.x+dx,y=tile.y+dy;if(x>=0&&x<COLUMNS&&y>=0&&y<ROWS)this.dirtyChunks.add(`${Math.floor(x/CHUNK_SIZE)},${Math.floor(y/CHUNK_SIZE)}`);
+    const range=neighbors?1:0;
+    for(const tile of tiles)for(let dy=-range;dy<=range;dy++)for(let dx=-range;dx<=range;dx++){
+      const x=tile.x+dx,y=tile.y+dy;if(x<0||x>=COLUMNS||y<0||y>=ROWS)continue;
+      const key=`${Math.floor(x/CHUNK_SIZE)},${Math.floor(y/CHUNK_SIZE)}`;
+      if(this.dirtyChunks.has(key)&&!this.dirtyTiles.has(key))continue;
+      if(!this.dirtyTiles.has(key))this.dirtyTiles.set(key,new Set());
+      this.dirtyTiles.get(key).add(y*COLUMNS+x);this.dirtyChunks.add(key);
     }
     this.lastView='';
   }
@@ -64,16 +69,19 @@ export class TerrainRenderer {
       // kamery se pak kreslí desítky bloků, ne tisíce samostatných obrázků.
       const texture = this.scene.textures.exists(key)?this.scene.textures.get(key):this.scene.textures.createCanvas(key, CHUNK_SIZE * 64, CHUNK_SIZE * 32);
       const context = texture.getContext();
-      context.clearRect(0,0,texture.width,texture.height);
+      const dirty=this.dirtyTiles.get(`${cx},${cy}`);
+      if(!dirty)context.clearRect(0,0,texture.width,texture.height);
       for (let y = cy * CHUNK_SIZE; y < (cy + 1) * CHUNK_SIZE; y++) {
         for (let x = cx * CHUNK_SIZE; x < (cx + 1) * CHUNK_SIZE; x++) {
+          if(dirty&&!dirty.has(y*COLUMNS+x))continue;
+          this.paintStats.tiles++;
           const point = tileCenter({ x, y });
           const tile={x,y},state=this.fog?.displayState(tile)??VISIBILITY.VISIBLE,[,level,season]=this.tileData(tile);
           const polygon=()=>{context.beginPath();context.moveTo(point.x-left-32,point.y-origin.y);context.lineTo(point.x-left,point.y-origin.y-16);context.lineTo(point.x-left+32,point.y-origin.y);context.lineTo(point.x-left,point.y-origin.y+16);context.closePath();};
-          if(state===VISIBILITY.UNEXPLORED){context.fillStyle='#000';polygon();context.fill();continue;}
+          context.save();polygon();context.clip();context.clearRect(point.x-left-32,point.y-origin.y-16,64,32);
+          if(state===VISIBILITY.UNEXPLORED){context.fillStyle='#000';polygon();context.fill();context.restore();continue;}
           const entry=this.wear?this.wearTextures[level]:this.groundTextures[terrainHash(x,y)%this.groundTextures.length];
           const frame=this.scene.textures.get(entry.key).get(entry.frame);
-          context.save();
           if(state===VISIBILITY.EXPLORED)context.filter=`grayscale(${(1-FOG_STYLE.saturation)*100}%) brightness(${(this.fog?.brightness(tile)??FOG_STYLE.brightness)*100}%)`;
           context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,point.x-left-32,point.y-origin.y-16,64,32);
           if(this.wear)this.drawConnections(context,x,y,left,origin.y);
@@ -83,7 +91,9 @@ export class TerrainRenderer {
         }
       }
       texture.refresh();
+      this.paintStats.chunks++;
       this.dirtyChunks.delete(`${cx},${cy}`);
+      this.dirtyTiles.delete(`${cx},${cy}`);
     }
     return { key, x: left, y: origin.y };
   }
@@ -127,8 +137,14 @@ export class TerrainRenderer {
   update(camera,fog=null,memory=this.memory) {
     this.fog=fog;this.memory=memory;
     const mode=`${fog?.enabled}:${fog?.explorationEnabled}`;
-    if(mode!==this.fogMode){this.fogMode=mode;for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
-    if(fog&&this.fogRevision!==fog.revision){this.fogRevision=fog.revision;this.invalidateArea([...fog.added,...fog.removed].map(index=>({x:index%fog.width,y:Math.floor(index/fog.width)})));}
+    if(mode!==this.fogMode){
+      this.originalBackground??=camera.backgroundColor?.rgba??'#3a3c2b';
+      // Diamond edges are antialiased. Their transparent seams must reveal
+      // black, never the normal olive scene background in undiscovered areas.
+      camera.setBackgroundColor?.(fog?.enabled?'#000':this.originalBackground);
+      this.fogMode=mode;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';
+    }
+    if(fog&&this.fogRevision!==fog.revision){this.fogRevision=fog.revision;if(fog.enabled)this.invalidateArea([...fog.added,...fog.removed].map(index=>({x:index%fog.width,y:Math.floor(index/fog.width)})),false);}
     const view = camera.worldView;
     const cacheKey = [Math.floor(view.x / 16), Math.floor(view.y / 16), Math.ceil(view.width), Math.ceil(view.height),fog?.signature??'',this.wear?.levelRevision??0,this.debugEnabled?this.wear?.revision:0,this.debugEnabled].join(',');
     if (cacheKey === this.lastView) return;

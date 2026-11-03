@@ -20,7 +20,7 @@ import { AnimalSystem } from '../systems/AnimalSystem.js';
 import { HuntingSystem } from '../systems/HuntingSystem.js';
 import { DropSystem } from '../systems/DropSystem.js';
 import { FoodSystem } from '../systems/FoodSystem.js';
-import { FogOfWarSystem } from '../systems/FogOfWarSystem.js';
+import { FogOfWarSystem,OUTSIDE_SIGHT,visibilityPlacementError } from '../systems/FogOfWarSystem.js';
 import { MountSystem } from '../systems/MountSystem.js';
 import { SettingsPanel } from '../ui/SettingsPanel.js';
 import { FortificationView } from './FortificationView.js';
@@ -71,7 +71,7 @@ import { FoodEconomyPanel } from '../ui/FoodEconomyPanel.js';
 import { KingLogisticsSystem } from '../systems/KingLogisticsSystem.js';
 import { BuildingUnlockManager } from '../systems/BuildingUnlockManager.js';
 import { MapMemory } from '../systems/MapMemory.js';
-import { staticMemoryEntries } from './mapMemoryObjects.js';
+import { captureMapKnowledge } from './mapMemoryObjects.js';
 import { MapMemoryRenderer } from './MapMemoryRenderer.js';
 
 export class GameScene extends Phaser.Scene {
@@ -94,6 +94,7 @@ export class GameScene extends Phaser.Scene {
     this.foodStorage=null;this.foodProduction=null;this.logisticsTasks=null;this.legacyStockpiles=null;
     this.seasons=null;
     this.kingLogistics=null;
+    this.fog=null;this.mapMemory=null;this.memoryRenderer=null;
     this.gameOver=false;this.input.enabled=true;this.input.keyboard.enabled=true;this.tweens.resumeAll();
     this.activeFramePending=true;this.visibilityPaused=document.hidden;
     this.assets.initialize();
@@ -249,9 +250,9 @@ export class GameScene extends Phaser.Scene {
   updateHover(pointer){
     const tooltip=document.querySelector('#object-tooltip');
     const wearInfo=document.querySelector('#path-wear-info');wearInfo.hidden=!this.settingsPanel.settings.pathWearDebug;
-    if(!wearInfo.hidden){const tile=this.pointerTile(pointer),grass=this.pathWear.isGrass(tile),score=grass?this.pathWear.scores[this.pathWear.index(tile)]:0;
+    if(!wearInfo.hidden){const tile=this.pointerTile(pointer);if(!this.fog.isVisibleTile(tile)){wearInfo.textContent='Path Wear: outside current sight.';}else{const grass=this.pathWear.isGrass(tile),score=grass?this.pathWear.scores[this.pathWear.index(tile)]:0;
       const text=grass?`Path Wear (${tile.x}, ${tile.y}): ${score} · Level ${this.pathWear.level(tile)}`:'Path Wear: mimo travnatý povrch';if(wearInfo.textContent!==text)wearInfo.textContent=text;
-    }
+    }}
     if(this.buildMode||document.querySelector('dialog[open]')){tooltip.hidden=true;return;}
     pointer.updateWorldPoint(this.cameras.main);
     const hoverHit=this.pickInteraction(pointer.worldX,pointer.worldY,this.pointerTile(pointer));
@@ -298,6 +299,7 @@ export class GameScene extends Phaser.Scene {
       if(this.selectedBuilding.construction?.mode==='line'){
         this.dragAnchor={...goal};this.wallLastLine=null;this.previewTracking=true;this.previewKey=null;this.updateBuildingPreview();return;
       }
+      const hidden=visibilityPlacementError(this.fog,buildingTiles(goal,this.selectedBuilding));if(hidden){this.setStatus(hidden);return;}
       const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding,reserveMaterials:true});
       if(result.error){this.previewKey=null;this.updateBuildingPreview();this.setStatus(result.error);}
       else{
@@ -308,6 +310,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     const selected=this.pickInteraction(pointer.worldX,pointer.worldY,goal);
+    if(!selected&&!this.fog.isVisibleTile(goal)){this.setStatus(OUTSIDE_SIGHT);return;}
     if(selected?.kind==='human'){this.unitPanel.open(selected.object);return;}
     if(selected?.kind==='stockpile'){this.storagePanel.open(null,selected.object.location.id);return;}
     if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){this.kingLogistics.cancel();this.constructionSystem.commandKing(selected.object);this.constructionUI.open(selected.object);return;}
@@ -400,7 +403,7 @@ export class GameScene extends Phaser.Scene {
     const anchor=this.previewAnchor,definition=this.selectedBuilding;
     if(this.buildMode&&anchor&&definition.construction?.mode==='line'){this.updateWallPreview(anchor);return;}
     if(!this.buildMode||!anchor||anchor.x<0||anchor.y<0||anchor.x>=COLUMNS||anchor.y>=ROWS){this.preview.setVisible(false);return;}
-    const error=placementError(this.map,anchor,this.resourceOccupancy,this.reservedTiles(),definition,this.buildings,this.buildingUnlocks)
+    const error=visibilityPlacementError(this.fog,buildingTiles(anchor,definition))??placementError(this.map,anchor,this.resourceOccupancy,this.reservedTiles(),definition,this.buildings,this.buildingUnlocks)
       ??(!this.inventory.canAfford(definition.cost)?'Na tuto budovu nemáš dostatek surovin.':null);
     const key=`${tileKey(anchor)}:${error}`;
     if(key!==this.previewKey){
@@ -415,10 +418,10 @@ export class GameScene extends Phaser.Scene {
   wallOptions(tiles){return {map:this.map,tiles,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),buildings:this.buildings,definition:this.selectedBuilding,inventory:this.inventory,reserveMaterials:true};}
   updateWallPreview(anchor){
     this.preview.setVisible(false);
-    const tiles=this.dragAnchor?wallLine(this.dragAnchor,anchor):this.wallLastLine??[anchor],plan=wallLinePlan(this.wallOptions(tiles));
+    const tiles=this.dragAnchor?wallLine(this.dragAnchor,anchor):this.wallLastLine??[anchor],hidden=visibilityPlacementError(this.fog,tiles),plan=hidden?{error:hidden,tiles:[],cost:{}}:wallLinePlan(this.wallOptions(tiles));
     const key=`walls:${tiles.map(tileKey).join(';')}:${plan.error}`;
     if(key===this.previewKey){for(const view of this.wallPreviews.values())view.setVisible(true);return;}
-    const definition=this.selectedBuilding,existing=wallIndex(this.buildings,true),index=new Map(existing);
+    const definition=this.selectedBuilding,existing=hidden?new Map():wallIndex(this.buildings,true),index=new Map(existing);
     for(const tile of tiles)index.set(tileKey(tile),{...tile,type:definition.id,definition});
     const needed=new Set();
     for(const tile of tiles){
@@ -434,7 +437,9 @@ export class GameScene extends Phaser.Scene {
   }
   confirmWallLine(pointer){
     if(!this.buildMode||this.selectedBuilding.construction?.mode!=='line'||!this.dragAnchor)return;
-    const tiles=wallLine(this.dragAnchor,this.pointerTile(pointer)),result=placeWallLine(this.wallOptions(tiles));
+    const tiles=wallLine(this.dragAnchor,this.pointerTile(pointer)),hidden=visibilityPlacementError(this.fog,tiles);
+    if(hidden){this.clearWallPreviews();this.setStatus(hidden);return;}
+    const result=placeWallLine(this.wallOptions(tiles));
     this.dragAnchor=null;
     if(result.error){this.wallLastLine=tiles;this.previewTracking=false;this.previewKey=null;this.updateBuildingPreview();return;}
     for(const building of result.buildings){this.constructionSystem.plan(building);this.towerViews.set(building.id,this.createBuildingView(this.selectedBuilding,building));}
@@ -482,7 +487,9 @@ export class GameScene extends Phaser.Scene {
   updateBuildingUI() { this.buildingBar.update(this.inventory,this.buildMode?this.selectedBuilding:null); }
   updateWorldCount() {
     const capacity=resourceSpawnSettings(this.objectRegistry.require('stone'),this.gameSettings).max;
-    document.querySelector('#world-stones').textContent=`Mapa ${COLUMNS} × ${ROWS} · kameny ${this.resourceCount('stone')} / ${capacity}`;
+    const count=this.fog?.enabled?[...this.mapMemory.objects.values()].filter(entry=>entry.kind==='resource'&&entry.type==='stone').length:this.resourceCount('stone');
+    const text=`Mapa ${COLUMNS} × ${ROWS} · ${this.fog?.enabled?'známé kameny':'kameny'} ${count}${this.fog?.enabled?'':` / ${capacity}`}`;
+    const output=document.querySelector('#world-stones');if(output.textContent!==text)output.textContent=text;
   }
   setStatus(message) { document.querySelector('#status').textContent=message; }
   onUnitDeath(unit,killer=null){
@@ -544,9 +551,7 @@ export class GameScene extends Phaser.Scene {
   refreshVisibility(){
     if(this.inventoryRevision!==this.foodStorage.revision){this.inventoryRevision=this.foodStorage.revision;this.updateInventory();}
     document.querySelector('#path-wear-info').hidden=!this.settingsPanel.settings.pathWearDebug;
-    this.fog.update();this.updateMountUI();
-    this.terrain.invalidateArea(this.mapMemory.observeTerrain(this.terrainGrid,this.pathWear,this.seasons.season,this.map));
-    this.mapMemory.observeObjects(staticMemoryEntries(this));
+    captureMapKnowledge(this);this.updateMountUI();this.updateWorldCount();
     this.terrain.update(this.cameras.main,this.fog,this.mapMemory);
     const view=this.cameras.main.worldView;
     this.legacyStockpiles?.update(view,this.fog);

@@ -14,8 +14,10 @@ import { validateSeasonFoodState } from './SeasonFoodStateValidation.js';
 import { seasonalCropStage } from '../data/seasons.js';
 import { carryCapacity } from '../data/logistics.js';
 import { repairTransportInstructions } from './TransportStateMigration.js';
+import { captureMapKnowledge } from '../game/mapMemoryObjects.js';
+import { validateMapMemory } from './MapMemoryValidation.js';
 
-export const SAVE_VERSION=8;
+export const SAVE_VERSION=9;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -33,9 +35,11 @@ export function serializeOrder(order){
     resourceKey:order.resource?`${order.resource.x},${order.resource.y}`:null};
 }
 export function serializeGameState(scene){
+  captureMapKnowledge(scene);
   const c=scene.character,camera=scene.cameras.main;
   return {
     saveVersion:SAVE_VERSION,gameSettings:{...gameSettings(scene.gameSettings),...(scene.seasons?{seasonsEnabled:scene.seasons.enabled}:{})},terrain:scene.terrainGrid.map(row=>[...row]),
+    exploration:scene.mapMemory.exportState(),
     ...(scene.experienceSystem?{experienceSystem:scene.experienceSystem.exportState()}:{}),
     ...(scene.skillSystem?{skillSystem:scene.skillSystem.exportState()}:{}),
     ...(scene.wageSystem?{wages:scene.wageSystem.exportState()}:{}),
@@ -86,8 +90,10 @@ export function validateGameState(input,registry=objectRegistry){
   const array=(a,max=20000)=>check(Array.isArray(a)&&a.length<=max);
   const definition=(id,category)=>{const d=registry.get(id);check(d&&(!category||d.category===category));return d;};
   const unique=(array)=>{const ids=new Set();for(const a of array){check(a.id!=null&&!ids.has(a.id));ids.add(a.id);}return ids;};
-  check(input&&[1,2,3,4,5,6,7,SAVE_VERSION].includes(input.saveVersion));
+  check(input&&[1,2,3,4,5,6,7,8,SAVE_VERSION].includes(input.saveVersion));
   let s;try{s=JSON.parse(JSON.stringify(input));}catch{fail();}
+  if(input.saveVersion<9&&s.settings)s.settings.explorationMode??=true;
+  if(input.saveVersion<9&&s.exploration===undefined)s.exploration={version:1,explored:[],terrain:[],objects:[]};
   if(input.saveVersion<4)for(const actor of [s.player,...(s.workers??[])])for(const key of ['skills','initialSkills'])if(actor?.[key])for(const id of ['milling','baking'])actor[key][id]??=createProgress();
   if(!s.logistics){
     for(const actor of [s.player,...(s.workers??[])])for(const key of ['skills','initialSkills'])if(actor?.[key])actor[key].logistics??=createProgress();
@@ -278,5 +284,7 @@ export function validateGameState(input,registry=objectRegistry){
   }
   validateFoodState(s,registry,{check,number,integer,array});
   validateSeasonFoodState(s,{check,number,integer,array});
+  check(typeof s.settings.explorationMode==='boolean');
+  validateMapMemory(s.exploration,registry,{check,number,integer,array});
   return s;
 }

@@ -7,14 +7,15 @@ import { objectRegistry } from '../src/systems/ObjectRegistry.js';
 function world(){
   const king={definition:objectRegistry.require('king'),state:'ground',position:{x:20.5,y:20.5}};
   const fog=new FogOfWarSystem(king,true),memory=new MapMemory(fog),grid=Array.from({length:100},()=>Array(100).fill(0));
+  memory.observeTerrain(grid,null,'Spring');
   return {king,fog,memory,grid};
 }
 
 test('exploration distinguishes exact current sight, persistent discovery and never-seen tiles',()=>{
-  const {king,fog}=world(),old={x:20,y:20},next={x:50,y:50},corner={x:30,y:30};
+  const {king,fog,memory,grid}=world(),old={x:20,y:20},next={x:50,y:50},corner={x:30,y:30};
   assert.equal(fog.state(old),VISIBILITY.VISIBLE);assert.equal(fog.state(next),VISIBILITY.UNEXPLORED);
   assert.equal(fog.state(corner),VISIBILITY.UNEXPLORED);
-  king.position={x:50.5,y:50.5};fog.update();
+  king.position={x:50.5,y:50.5};fog.update();memory.observeTerrain(grid,null,'Spring');
   assert.equal(fog.state(old),VISIBILITY.EXPLORED);assert.equal(fog.state(next),VISIBILITY.VISIBLE);
   assert.equal(fog.state({x:-1,y:20}),VISIBILITY.UNEXPLORED);
   assert.equal(fog.explored.reduce((sum,value)=>sum+value,0),634);
@@ -81,4 +82,12 @@ test('rediscovering an empty remembered footprint removes only stale visual know
   memory.observeObjects([]);assert.equal(memory.objects.has(tower.key),true);assert.equal(actualMap[20][23],0);
   king.position={x:20.5,y:20.5};fog.update();memory.observeObjects([]);
   assert.equal(memory.objects.has(tower.key),false);assert.equal(actualMap[20][23],0);
+});
+
+test('a visible diagonal path cannot disclose an unseen corner blocker through its connecting stroke',()=>{
+  const {fog,memory,grid}=world(),tile={x:27,y:27},neighbor={x:28,y:26},corner={x:28,y:27},wear={level:()=>1};
+  assert.equal(fog.isInSightTile(tile),true);assert.equal(fog.isInSightTile(neighbor),true);assert.equal(fog.isInSightTile(corner),false);
+  memory.observeTerrain(grid,wear,'Spring',grid);const before=[...memory.terrain.get(2727)];
+  assert.equal(before[3]&(1<<2),0);grid[27][28]=1;memory.observeTerrain(grid,wear,'Spring',grid);
+  assert.deepEqual(memory.terrain.get(2727),before);
 });

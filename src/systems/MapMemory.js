@@ -24,10 +24,12 @@ export class MapMemory {
     for(const index of this.fog.visibleIndices){
       const tile={x:index%this.fog.width,y:Math.floor(index/this.fog.width)},value=grid[tile.y]?.[tile.x];
       if(value===undefined)continue;
+      this.fog.explored[index]=1;
       const previous=this.terrain.get(index);let connections=0;
       if(wear)for(const [bit,[dx,dy]]of MEMORY_DIRECTIONS.entries()){
         const next={x:tile.x+dx,y:tile.y+dy};
-        if(this.fog.isInSightTile(next)?wear.level(next)>0&&canStep(map,tile,next):(previous?.[3]??0)&(1<<bit))connections|=1<<bit;
+        const cornersVisible=!dx||!dy||this.fog.isInSightTile({x:tile.x+dx,y:tile.y})&&this.fog.isInSightTile({x:tile.x,y:tile.y+dy});
+        if(this.fog.isInSightTile(next)?cornersVisible&&wear.level(next)>0&&canStep(map,tile,next):(previous?.[3]??0)&(1<<bit))connections|=1<<bit;
       }
       const data=[value,wear?.level(tile)??0,season,connections];
       if(!previous||data.some((value,i)=>value!==previous[i])){this.terrain.set(index,data);changed.push(tile);}
@@ -41,5 +43,20 @@ export class MapMemory {
       const remembered=this.terrain.get(tile.y*fog.width+tile.x);if(remembered)return remembered;
     }
     return [grid[tile.y]?.[tile.x]??0,wear?.level(tile)??0,season];
+  }
+  exportState(){
+    return {version:1,explored:Array.from(this.fog.explored.entries()).filter(([,value])=>value).map(([index])=>index),
+      terrain:[...this.terrain].sort(([a],[b])=>a-b).map(([index,value])=>[index,[...value]]),
+      objects:[...this.objects.values()].sort((a,b)=>a.key.localeCompare(b.key)).map(entry=>structuredClone(entry))};
+  }
+  importState(data){
+    this.fog.explored.fill(0);this.terrain.clear();this.objects.clear();this.objectSignatures.clear();
+    for(const index of data?.explored??[])this.fog.explored[index]=1;
+    for(const [index,value]of data?.terrain??[])this.terrain.set(index,[...value]);
+    for(const entry of data?.objects??[]){const snapshot=structuredClone(entry);this.objects.set(entry.key,snapshot);this.objectSignatures.set(entry.key,JSON.stringify(snapshot));}
+    // Recalculate the actual loaded king before calling this method. Legacy
+    // saves discover only this circle, even if their testing Fog switch is OFF.
+    for(const index of this.fog.visibleIndices)this.fog.explored[index]=1;
+    this.revision++;
   }
 }

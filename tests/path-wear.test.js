@@ -78,7 +78,7 @@ test('saved numeric wear state restores unchanged, never recounts standing units
 });
 
 test('level changes invalidate only local terrain chunks including neighbors across chunk boundaries',()=>{
-  const renderer=Object.create(TerrainRenderer.prototype);renderer.dirtyChunks=new Set();renderer.lastView='cached';
+  const renderer=Object.create(TerrainRenderer.prototype);renderer.dirtyChunks=new Set();renderer.dirtyTiles=new Map();renderer.lastView='cached';
   renderer.invalidateArea([{x:9,y:9}]);assert.deepEqual([...renderer.dirtyChunks].sort(),['0,0','0,1','1,0','1,1']);assert.equal(renderer.lastView,'');
   renderer.dirtyChunks.clear();renderer.invalidateArea([{x:0,y:0},{x:99,y:99}]);assert.deepEqual([...renderer.dirtyChunks].sort(),['0,0','9,9']);
   const {wear,scene}=setup(),king=actor(scene);renderer.dirtyChunks.clear();wear.subscribe(tile=>renderer.invalidateArea([tile]));

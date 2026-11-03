@@ -1,3 +1,6 @@
+import { captureMapKnowledge } from '../src/game/mapMemoryObjects.js';
+import { FogOfWarSystem } from '../src/systems/FogOfWarSystem.js';
+import { MapMemory } from '../src/systems/MapMemory.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
@@ -37,11 +40,12 @@ function scene(terrain=Array.from({length:100},()=>Array(100).fill(0))){
     addResource(d,tile){const v=view(d.id,tileCenter(tile));v.setData('tile',{...tile}).setData('object',{type:d.id,definition:d,x:tile.x,y:tile.y,tiles:[{...tile}]});this.resources.set(`${tile.x},${tile.y}`,v);this.resourceOccupancy.set(`${tile.x},${tile.y}`,`${tile.x},${tile.y}`);},
     createBuildingView(d,b){return view(d.id,tileCenter(b));},
     refreshWallConnections(){this.wallMap=wallIndex(this.buildings);for(const b of this.wallMap.values())b.connections=connectionsFor(this.wallMap,b);},
-    settingsPanel:{settings:{fogOfWar:true},applySettings(settings){this.settings={...settings};}},fog:{setEnabled(){}},
+    settingsPanel:{settings:{fogOfWar:true,explorationMode:true},applySettings(settings){this.settings={...settings};}},fog:{setEnabled(){}},
     worldCamera:{following:false},cameras:{main:{zoom:.8,scrollX:3000,scrollY:2000,width:1000,height:640,
       setZoom(z){this.zoom=z;return this;},centerOn(x,y){this.scrollX=x-this.width/2;this.scrollY=y-this.height/2;return this;},preRender(){}}},
   };
   s.player=view('king',tileCenter({x:50,y:50}));s.character=new PlayerController(s,s.player,{x:50,y:50});
+  s.fog=new FogOfWarSystem(s.character,true);s.mapMemory=new MapMemory(s.fog);
   s.gameTime=new GameTimeSystem();s.foodSystem=new FoodSystem(s.inventory,objectRegistry.require('meat'),()=>{},{time:s.gameTime});
   s.pathWear=new PathWearSystem({map:s.map,terrain:s.terrainGrid,time:s.gameTime});
   s.activities=new GameActivityBus();s.experienceSystem=new ExperienceSystem(s.activities);
@@ -49,6 +53,7 @@ function scene(terrain=Array.from({length:100},()=>Array(100).fill(0))){
   s.animalSystem=new AnimalSystem(s);s.dropSystem=new DropSystem(s);s.treasureSystem=new TreasureSystem(s);
   s.huntingSystem={target:null,repath:0};s.mountSystem={target:null,repath:0};s.combat=new CombatSystem();
   s.resourceSpawners=[new ResourceSpawner({map:s.map,resources:s.resourceOccupancy,getCount:()=>s.resources.size,getOrigins:()=>[s.character.tile],getReserved:()=>[],spawn:tile=>s.addResource(objectRegistry.require('stone'),tile)})];
+  captureMapKnowledge(s);
   return s;
 }
 function fixture(){
@@ -63,6 +68,7 @@ function fixture(){
   s.dropSystem.create('meat',{x:57,y:50},15);const chest=s.treasureSystem.create({x:65,y:65});chest.opened=true;chest.looted=true;
   s.character.currentHP=62.75;s.character.command({kind:'move',goal:{x:60,y:60},pickupKey:'60,60'});s.character.update(90);
   s.gameTime.update(445000);s.foodSystem.elapsed=32123.45;s.resourceSpawners[0].elapsed=18456.78;
+  captureMapKnowledge(s);
   return s;
 }
 function restore(data){const s=scene(data.terrain);loadGameState(s,data);return s;}

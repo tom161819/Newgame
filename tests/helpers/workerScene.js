@@ -1,3 +1,6 @@
+import { captureMapKnowledge } from '../../src/game/mapMemoryObjects.js';
+import { FogOfWarSystem } from '../../src/systems/FogOfWarSystem.js';
+import { MapMemory } from '../../src/systems/MapMemory.js';
 import { objectRegistry } from '../../src/systems/ObjectRegistry.js';
 import { Inventory } from '../../src/game/inventory.js';
 import { PlayerController } from '../../src/game/PlayerController.js';
@@ -54,7 +57,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
     marker:{visible:false,setVisible(v){this.visible=v;}},showMarker(){this.marker.visible=true;},setStatus(){},updateBuildingUI(){},updateInventory(){},updateTimeDisplay(){},refreshVisibility(){},
     reservedTiles(){return [...this.character.reservedTiles(),...this.animalSystem.reservedTiles(),...(this.workerSystem?.reservedTiles()??[]),...(this.foodStorage?.reservedTiles()??[]),...this.buildings.flatMap(b=>b.tiles??[])];},
     huntingSystem:{target:null,repath:0},mountSystem:{target:null,repath:0},combatFeedback:{hit(){},remove(){}},
-    settingsPanel:{settings:{fogOfWar:false,pathWearDebug:false},applySettings(d){this.settings={...d};}},fog:{setEnabled(){}},worldCamera:{following:false},
+    settingsPanel:{settings:{fogOfWar:gameSettings?.fogOfWar??false,explorationMode:gameSettings?.explorationMode??true,pathWearDebug:false},applySettings(d){this.settings={...d};}},fog:{setEnabled(){}},worldCamera:{following:false},
     cameras:{main:{zoom:1,scrollX:2500,scrollY:1300,width:1000,height:640,setZoom(z){this.zoom=z;return this;},centerOn(x,y){this.scrollX=x-this.width/2;this.scrollY=y-this.height/2;return this;},preRender(){}}},
     refreshWallConnections(){this.wallMap=wallIndex(this.buildings);for(const b of this.wallMap.values())b.connections=connectionsFor(this.wallMap,b);},
   };
@@ -64,6 +67,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   scene.assets={createView:view};scene.createBuildingView=(d,b)=>{scene.workplaceSystem?.register(b);scene.farmingSystem?.register(b);scene.foodStorage?.register(b);scene.foodProduction?.register(b);return view(d.id,tileCenter(b));};
   scene.tweens={add(config){const t={...config,elapsed:0};scene.animations.push(t);return t;}};
   scene.player=view('king',tileCenter({x:40,y:40}));scene.character=new PlayerController(scene,scene.player,{x:40,y:40});
+  scene.fog=new FogOfWarSystem(scene.character,scene.settingsPanel.settings.fogOfWar,{explorationEnabled:scene.settingsPanel.settings.explorationMode});scene.mapMemory=new MapMemory(scene.fog);
   scene.gameTime=new GameTimeSystem((gameSettings?.dayLengthSeconds??120)*1000);scene.activities=new GameActivityBus();scene.experienceSystem=new ExperienceSystem(scene.activities);scene.skillSystem=new SkillSystem(scene);scene.skillSystem.initialize(scene.character);
   if(seasons)scene.seasons=new SeasonSystem(scene.gameTime,{enabled:gameSettings?.seasonsEnabled??true});
   scene.pathWear=new PathWearSystem({map:scene.map,terrain:scene.terrainGrid,time:scene.gameTime});scene.regeneration=new RegenerationSystem();
@@ -94,5 +98,6 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   });
   scene.tick=delta=>{if(scene.gameTime.paused||scene.gameOver)return;scene.gameTime.update(delta);if(scene.constructionSystem)scene.character.update(delta);scene.kingLogistics?.update(delta);scene.logisticsTasks?.update();scene.animalSystem.update(delta);scene.workerSystem.update(delta);const covered=scene.combat.update(delta);scene.constructionSystem?.update(delta);scene.farmingSystem?.update(delta);scene.foodProduction?.update(delta);scene.regeneration.update(delta,[scene.character,...scene.animalSystem.animals.values(),...scene.workerSystem.liveWorkers()],covered);};
   scene.simulate=(ms,step=50)=>{let elapsed=0;while(elapsed<ms){const delta=Math.min(step,ms-elapsed);scene.tick(delta);elapsed+=delta;}};
+  captureMapKnowledge(scene);
   return scene;
 }

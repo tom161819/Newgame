@@ -11,10 +11,18 @@ export function staticMemoryEntries(scene){
   for(const building of scene.buildings)add('building',building.id,building.type,building,()=>({
     ...(building.construction?{construction:{state:building.construction.state,progress:building.construction.progress,workDone:building.construction.workDone}}:{}),
     ...(building.connections?{connections:{...building.connections}}:{}),
-    ...(building.definition.crop?{stage:scene.farmingSystem?.records.get(building.id)?.stage??0,season:scene.seasons.season}:{}),
+    ...(building.definition.crop?{stage:scene.farmingSystem?.records.get(building.id)?.stage??0,season:scene.seasons?.season??'Spring'}:{}),
   }));
   for(const chest of scene.treasureSystem?.chests.values()??[])add('chest',chest.id,chest.type,chest,()=>({opened:chest.opened,lid:chest.view.lid?{y:chest.view.lid.y,rotation:chest.view.lid.rotation}:null}));
   for(const drop of scene.dropSystem.drops.values())add('drop',drop.id,drop.resource,drop);
-  for(const location of scene.foodStorage.locations.values())if(location.kind==='fallback'&&location.buildingId==null)add('stockpile',location.id,'starter_stockpile',location,()=>({id:location.id}));
+  for(const location of scene.foodStorage?.locations.values()??[])if(location.kind==='fallback'&&location.buildingId==null)add('stockpile',location.id,'starter_stockpile',location,()=>({id:location.id}));
   return entries;
+}
+
+export function captureMapKnowledge(scene){
+  if(!scene.mapMemory)return;
+  scene.fog.update();
+  const changed=scene.mapMemory.observeTerrain(scene.terrainGrid,scene.pathWear,scene.seasons?.season??'Spring',scene.map);
+  if(scene.fog.enabled)scene.terrain?.invalidateArea(changed,false);
+  scene.mapMemory.observeObjects(staticMemoryEntries(scene));
 }

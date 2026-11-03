@@ -11,7 +11,7 @@ globalThis.document={querySelector:()=>({textContent:''})};
 const scene=()=>workerScene(undefined,{construction:true,logistics:true,gameSettings:gameSettings()});
 const starter=s=>`stockpile-${s.buildings.find(b=>b.type==='starter_stockpile').id}`;
 function building(s,type,x=50,y=45,blueprint=false){const definition=s.objectRegistry.require(type);ensureBuildingPrerequisites(s,definition);if(!blueprint)s.inventory.add('stone',definition.cost.stone??0);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition,reserveMaterials:blueprint});assert.ifError(result.error);if(blueprint)s.constructionSystem.plan(result.building);s.towerViews.set(result.building.id,s.createBuildingView(definition,result.building));return result.building;}
-function until(s,p,max=50000){let n=0;while(!p()&&n<max){s.tick(25);n+=25;}assert.ok(p(),`Condition not reached (${n}ms)`);}
+function until(s,p,max=50000){let n=0;while(!p()&&n<max){s.tick(25);n+=25;}assert.ok(p(),`Condition not reached (${n}ms): ${JSON.stringify({day:s.gameTime.day,elapsed:s.gameTime.elapsed,food:s.foodStorage.resourceBreakdown().filter(r=>r.total),production:s.foodProduction.exportState(),workers:s.workerSystem.liveWorkers().map(w=>({id:w.id,profession:w.profession,tile:w.tile,next:w.nextTile,path:w.path.length,state:w.workState,message:w.workMessage,cargo:w.cargo,task:w.workTask}))})}`);}
 function restore(data){const s=workerScene(undefined,{construction:true,logistics:true,starter:false,gameSettings:gameSettings()});loadGameState(s,data);return s;}
 const snapshot=s=>validateGameState(serializeGameState(s));
 const length=(start,path)=>{let n=0,p=start;for(const t of path){n+=Math.hypot(t.x-p.x,t.y-p.y);p=t;}return n;};
@@ -58,7 +58,8 @@ test('repairing an instruction never hides corrupt physical stock, invented capa
   const {s,worker}=deliveryFixture();until(s,()=>worker.workTask?.kind==='foodPickup');const data=snapshot(s);for(const change of [d=>d.foodStorage.locations[0].capacity=999,d=>d.inventory.stone++,d=>d.foodStorage.reservations.push(structuredClone(d.foodStorage.reservations[0]))]){const bad=structuredClone(data);bad.workers.find(w=>w.id===worker.id).workTask.destinationId='missing';change(bad);assert.throws(()=>validateGameState(bad));}
 });
 
-test('physical farming→Granary→Mill→Granary→Bakery→Granary chain survives an in-production save with Haulers and exact8Wheat→12Bread',()=>{
+test('physical farming→Granary→Mill→Granary→Bakery→Granary chain survives an in-production save with Haulers and exact8Wheat→12Bread',t=>{
+  let seed=77123;t.mock.method(Math,'random',()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/2**32));
   const s=workerScene(undefined,{construction:true,logistics:true,seasons:true,gameSettings:gameSettings()}),farm=building(s,'farmhouse',44,45),field=building(s,'wheat_field',44,50),granary=building(s,'granary',50,45),mill=building(s,'mill',58,45),bakery=building(s,'bakery',64,45);
   const employee=(b,t)=>{const w=s.workerSystem.create(t);assert.equal(s.workplaceSystem.assign(b,w),true);return w;};
   const farmer=employee(farm,{x:43,y:45}),miller=employee(mill,{x:57,y:45}),baker=employee(bakery,{x:63,y:45}),a=employee(granary,{x:53,y:45}),b=employee(granary,{x:53,y:47});s.foodStorage.deposit(`granary-${granary.id}`,'apple',100);s.inventory.add('gold',100);

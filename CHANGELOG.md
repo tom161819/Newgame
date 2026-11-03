@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Save discovered terrain and last-known static visuals independently of the real world, with safe migration of older kingdoms that reveals only the loaded king’s actual sight.
 - Keep muted last-seen copies of static objects, crop stages and construction outside sight; hidden changes appear only when rediscovered, while moving units remain hidden and the actual world continues normally.
 - Explore circular areas with black undiscovered ground and dark, desaturated remembered terrain; switch Fog of War and Exploration independently in New Game and Settings without revealing hidden objects or changing discovery history.
 - Choose permanent Summer in New Game or Settings while preserving the exact seasonal cycle, daily weather and crop progress for later resumption.
@@ -26,6 +27,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Group Buildings into themed categories and require a completed Granary for new Farmhouses, then a completed Farmhouse for new Wheat Fields and Orchards; existing structures and valid blueprints remain intact.
 
 ### Improved
+- Repaint only changed terrain cells as circular sight moves, keeping exploration responsive with twenty residents and avoiding whole-chunk redraws.
 - Use circular logical sight with the existing mounted and fortification bonuses; stationary vision is cached and active vision sources can combine without revealing unrelated structures.
 - Open numbered version archives on demand, browse descriptive historical milestones and development commits, and keep frozen games out of ordinary source builds.
 - Choose faster walking routes over worn paths while keeping diagonal corners safe and avoiding excessive detours.
@@ -34,6 +36,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Share cached crop textures while preserving per-tile depth so villagers can walk through fields and among fruit trees smoothly.
 
 ### Fixed
+- Prevent hidden map clicks, building previews, path-debug details and stone totals from revealing unseen changes; keep undiscovered tile seams completely black.
 - Recover outdated delivery instructions on load while preserving cargo, construction allocations and earned experience.
 
 ## [0.1.0] - 2026-11-03

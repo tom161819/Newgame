@@ -4,6 +4,8 @@ import { COLUMNS, ROWS } from '../game/config.js';
 const contains = (source, position) => (position.x-source.center.x)**2+(position.y-source.center.y)**2<=source.radius**2;
 export const VISIBILITY=Object.freeze({UNEXPLORED:0,EXPLORED:1,VISIBLE:2});
 export const FOG_STYLE=Object.freeze({brightness:.3,saturation:.15,edgeWidth:1,edgeBrightness:.08});
+export const OUTSIDE_SIGHT='Outside current sight. Explore this area first.';
+export const visibilityPlacementError=(fog,tiles)=>fog?.enabled&&tiles.some(tile=>!fog.isInSightTile(tile))?OUTSIDE_SIGHT:null;
 
 // Sight always uses logical grid coordinates. Rendering overrides do not change
 // this ordinary sight calculation; exploration can safely consume it separately.
@@ -38,7 +40,7 @@ export class FogOfWarSystem {
       }
       this.added=[...next].filter(index=>!this.visibleIndices.has(index));
       this.removed=[...this.visibleIndices].filter(index=>!next.has(index));
-      this.visibleIndices=next;for(const index of next)this.explored[index]=1;this.revision++;
+      this.visibleIndices=next;this.revision++;
     }
     this.signature=`${this.enabled?'on':'off'}:${this.explorationEnabled}:${this.revision}`;
   }
