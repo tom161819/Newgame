@@ -1,3 +1,4 @@
+import { WORKPLACES } from '../workplaces.js';
 export const buildings = [
   {
     id: 'tower', name: 'Stone Tower', category: 'building', sprite: '/assets/buildings/tower/tower.png',
@@ -27,4 +28,11 @@ export const buildings = [
     platform:{x:0,y:-84},depth:{offset:0},visual:{wallHeight:68},
     shadow:{baked:true,x:8,y:-8,width:65,height:24,color:0x30291c,alpha:.3},
   },
+  ...[
+    {id:'quarry',name:'Quarry',width:3,height:3,cost:{stone:15},visualHeight:95,description:'Kamenolom se třemi místy pro horníky. Zpracovává pouze skutečné kameny v okolí.'},
+    {id:'hunting_lodge',name:'Hunting Lodge',width:2,height:2,cost:{stone:10},visualHeight:110,description:'Lovecká chata pro dva lovce. Lovci přinášejí maso ze skutečných úlovků.'},
+    {id:'barracks',name:'Barracks',width:3,height:3,cost:{stone:20},visualHeight:125,description:'Kasárna s pěti místy pro stávající poddané. Vojáci hlídkují v okolí.'},
+  ].map(d=>({...d,category:'building',sprite:`/assets/buildings/${d.id}/${d.id}.svg`,walkable:false,collectible:false,buildable:true,
+    interactions:['manage_workers'],renderMode:'procedural',renderer:'workplace',origin:{x:.5,y:.9},depth:{offset:0},
+    workplace:WORKPLACES[d.id],shadow:{baked:true,x:12,y:-15,width:d.width*59,height:d.height*21,color:0x30291c,alpha:.3}})),
 ];

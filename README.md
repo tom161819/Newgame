@@ -62,7 +62,7 @@ Data mají `saveVersion` a před nahrazením světa procházejí kontrolou. Poš
 
 ## Zkušenosti a levely
 
-Král začíná na **levelu 1 s 0 XP**. Odměnu získá až po dokončení činnosti: kámen **3 XP**, sebraný balíček masa **2 XP** bez ohledu na jeho množství, zajíc **10 XP**, srna **20 XP**, divočák **35 XP**, nový segment hradby **2 XP**, věž **15 XP** a hrad **30 XP**. Řada hradeb odmění jen skutečně nové segmenty. Neúspěšná nebo zrušená akce nic nepřidá; chůze, čekání, regenerace ani produkce zlata XP nevytvářejí.
+Král začíná na **levelu 1 s 0 XP**. Odměnu získá až po dokončení činnosti: kámen **3 XP**, sebraný balíček masa **2 XP** bez ohledu na jeho množství, zajíc **10 XP**, srna **20 XP**, divočák **35 XP**, nový segment hradby **2 XP**, věž **15 XP**, hrad **30 XP**, kamenolom **15 XP**, lovecká chata **10 XP** a kasárna **20 XP**. Řada hradeb odmění jen skutečně nové segmenty. Neúspěšná nebo zrušená akce nic nepřidá; chůze, čekání, regenerace ani produkce zlata XP nevytvářejí.
 
 Další úroveň vyžaduje `100 + 35 × (level − 1) + 4 × (level − 1)²` XP. Přebytek se přenáší, takže větší odměna může přidat více levelů. Strop je **level 50**; další postup se zastaví a lišta ukáže MAX. Level sám nemění HP, DPS, Armor ani rychlost. Po odměně se nad postavou objeví XP; zvýšení levelu doprovází zlatý efekt a oznámení.
 
@@ -72,13 +72,27 @@ Zkušenosti patří konkrétní postavě a ukládají se společně se zpracovan
 
 Nová hra začíná se **třemi poddanými**. Každý další herní den může z dosažitelného okraje mapy přijít jeden nový obyvatel, dokud populace nedosáhne **20**. Příchozí fyzicky dojde do osady. Poddaní mají vlastní jména, HP, celkový level a šest nezávislých skillů: Woodcutting, Mining, Hunting, Construction, Farming a Combat. Nový poddaný má jeden trvalý přirozený talent: příslušný skill začíná na levelu 3–8, jeden další náhodný skill na 1–4 a ostatní na 1. Celkový level začíná nezávisle na 1. Talent přidává pouze **20 % XP** do odpovídajícího skillu; změna profese talent ani zkušenosti nemaže.
 
-Klikni na postavu a použij **Assign Job**. Nezaměstnaní se procházejí po osadě. **Miner** hledá dosažitelné volné kameny, dojde k nim a těží do společného inventáře. **Hunter** pronásleduje zvěř, bojuje a sebere skutečně vytvořené maso. Pracovníci si rezervují cíle, takže dva nesbírají tentýž předmět. Při změně práce se rozpracovaný úkol bezpečně zruší bez odměny. Lovec pod 30 % HP přeruší útok, vrátí se domů a zotavuje se alespoň na 80 % HP.
+Klikni na postavu a použij **Assign Job**, nebo ji přiřaď přímo v panelu pracovní budovy. Nezaměstnaní se procházejí po osadě. **Miner** pracuje v kamenolomu a **Hunter** v lovecké chatě; bez přiřazeného pracoviště čekají. Nejprve dojdou k budově, potom k reálnému cíli a se surovinou se fyzicky vrátí. Inventář a pracovní XP se připíší až při návratu. Lovec používá skutečný boj a původní množství masa. Pracovníci si rezervují cíle, takže dva nesbírají tentýž předmět. Při změně práce se rozpracovaný úkol bezpečně zruší bez odměny. Lovec pod 30 % HP přeruší útok, vrátí se domů a zotavuje se alespoň na 80 % HP.
 
-Woodcutter a Farmer zatím ukazují **Waiting for workplace**. Builder čeká na skutečnou výstavbu; dosavadní okamžité stavění králem funguje dál. Soldier stojí na stráži a sám nenapadá neutrální zvěř.
+Woodcutter a Farmer zatím ukazují **Waiting for workplace**. Builder čeká na skutečnou výstavbu; dosavadní okamžité stavění králem funguje dál. Soldier přiřazený do kasáren hlídkuje v jejich okolí a brání se při napadení; sám nenapadá neutrální zvěř.
 
-Každý skill level nad 1 zvyšuje efektivitu příslušné činnosti o **1 %**, nejvýše na **149 %**. Mining zrychluje pracovní dobu, Hunting a Combat příslušné DPS. Nemění základní statistiky, pohyb ani množství surovin. Dokončená činnost přidá stejné základní XP do příslušného skillu i celkového postupu. Skutečné poškození rozvíjí Combat, nejvýše 40 základních XP na protivníka; tento přírůstek neduplikuje celkovou odměnu za lov.
+Každý skill level nad 1 zvyšuje efektivitu příslušné činnosti o **1 %**, nejvýše na **149 %**. Mining zrychluje pracovní dobu 1500 ms; Hunting zrychluje příslušné DPS a krátké sbírání masa (700 ms), Combat bojové DPS. Nemění základní statistiky, pohyb ani množství surovin. Dokončená činnost přidá stejné základní XP do příslušného skillu i celkového postupu. Skutečné poškození rozvíjí Combat, nejvýše 40 základních XP na protivníka; tento přírůstek neduplikuje celkovou odměnu za lov.
 
 Pracovní AI funguje i mimo záběr kamery a pod Fog of War; skryté jednotky nemají viditelné panely ani efekty. Save/Load uchovává skilly, profese, pohyb, rozpracovanou práci a rezervace. Starší save zachová původní svět a XP. Existujícím poddaným ponechá dosažené skilly a přidělí stabilní talent bez nového losování. Save bez poddaných jednou přidá tři nové obyvatele; královy nové skilly začnou na 1.
+
+## Pracovní budovy a zaměstnanci
+
+| Budova | Půdorys | Cena | Místa | Profese |
+|---|---|---|---|---|
+| Quarry | 3 × 3 | 15 Stone | 3 | Miner |
+| Hunting Lodge | 2 × 2 | 10 Stone | 2 | Hunter |
+| Barracks | 3 × 3 | 20 Stone | 5 | Soldier |
+
+Kliknutím na pracovní budovu otevřeš obrázek, obsazená a volná místa, pracovní stavy, skilly, průměrný skill, celkové denní mzdy a dosud přinesené suroviny. **Assign Worker** nabídne živé poddané včetně současné profese, vhodného skillu, talentu a budoucí sazby. Přiřazení změní profesi stejné postavy; nevytváří jednotku. Jeden poddaný patří nejvýše jednomu pracovišti a kapacitu nelze překročit. **Remove Worker** ho vrátí do Idle. Klikání v panelu nepřikazuje králi pohyb.
+
+Kamenolom nevytváří kameny a lovecká chata neobnovuje zvěř. Pracovníci používají skutečné objekty, sdílené rezervace a osmisměrné cesty kolem překážek, budov i rezervovaných polí ostatních postav. Když není dosažitelný cíl, čekají a zkoušejí ho znovu. Nedostupná cesta zpět ponechá náklad u pracovníka. Při odebrání, změně práce nebo smrti se nedoručený náklad bezpečně položí jako existující typ dropu; nezíská za něj odměnu. Jiný horník nebo lovec ho může jednou přinést.
+
+Lovec s nízkým HP se vrací k vlastní chatě a léčí se. Vojáci pouze hlídkují a brání sebe. Žádná pracovní budova nevytváří obyvatele a neposkytuje pasivní suroviny. Save/Load obnoví místa, výrobu, cesty, náklad, rezervace i dosud nepřipsané pracovní odměny bez opakovaného přičtení. Starší save bez pracovišť převede zaměstnané nepřiřazené poddané do Idle, zachová jejich profily a již naběhlé mzdy.
 
 ## Talenty a ekonomika mezd
 

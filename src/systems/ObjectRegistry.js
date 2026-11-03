@@ -1,4 +1,5 @@
 import { objectDefinitions } from '../data/objects/index.js';
+import { JOBS,SKILL_IDS } from '../data/jobs.js';
 
 export const OBJECT_CATEGORIES = Object.freeze(['terrain', 'resource', 'building', 'character', 'decoration', 'animal', 'equipment', 'treasure']);
 const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
@@ -43,6 +44,8 @@ export function validateDefinition(definition) {
   if (d.construction !== undefined && (!plainObject(d.construction) || !['single','line'].includes(d.construction.mode)
     || (d.construction.mode==='line'&&(d.category!=='building'||d.width!==1||d.height!==1)))) fail(id, 'neplatný režim stavění.');
   if (d.renderer==='fortification'&&(!finite(d.visual?.wallHeight)||d.visual.wallHeight<=0)) fail(id, 'opevnění vyžaduje kladnou výšku stěn.');
+  if(d.workplace!==undefined&&(!plainObject(d.workplace)||d.category!=='building'||!Number.isSafeInteger(d.workplace.capacity)||d.workplace.capacity<1
+    ||!Object.hasOwn(JOBS,d.workplace.profession)||!SKILL_IDS.includes(d.workplace.skill)||JOBS[d.workplace.profession].skill!==d.workplace.skill))fail(id,'neplatné pracoviště.');
   if(['character','animal'].includes(d.category)&&d.stats===undefined)fail(id,'živá jednotka vyžaduje bojové statistiky.');
   if (d.stats !== undefined && (!plainObject(d.stats) || !['maxHP','attackDPS','armor','attackRange'].every(key=>finite(d.stats[key]))
     || d.stats.maxHP<=0 || d.stats.attackDPS<0 || d.stats.armor<0 || d.stats.armor>90 || d.stats.attackRange<0)) fail(id, 'neplatné bojové statistiky.');

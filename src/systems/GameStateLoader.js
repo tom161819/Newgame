@@ -38,6 +38,7 @@ export function loadGameState(scene,input){
     if(data.naturalTalent){worker.naturalTalent=data.naturalTalent;worker.initialSkills=structuredClone(data.initialSkills);}
     else initializeNaturalTalent(worker,{legacy:true});
     for(const key of ['profession','workState','workMessage','assignedWorkplaceId','arriving','aiCooldown'])worker[key]=data[key];
+    worker.workplaceReached=data.workplaceReached??false;worker.cargo=structuredClone(data.cargo??null);worker.pendingWorkRewards=structuredClone(data.pendingWorkRewards??[]);
     worker.workTask=structuredClone(data.workTask);worker.active=worker.isAlive;
     if(worker.workTask)scene.workerSystem.reservations.reserve(worker.workTask.reservation,worker.id);
     if(!worker.isAlive)worker.view.destroy();else{const pos=gridToWorld(worker.position.x,worker.position.y);worker.view.setPosition(pos.x,pos.y).setDepth(pos.y+.1);worker.view.animate?.(0,worker.walking,worker.direction);}
@@ -89,6 +90,7 @@ export function loadGameState(scene,input){
   scene.skillSystem?.importState(state.skillSystem);scene.workerSystem?.importState(state.population);
   if(scene.workerSystem&&state.workers===undefined)scene.workerSystem.spawnInitial();
   scene.wageSystem?.importState(state.wages);
+  scene.workplaceSystem?.importState(state.workplaces);
   scene.pathWear?.importState(state.pathWear);
   for(const t of state.spawners)scene.resourceSpawners.find(s=>s.definition.id===t.id).importState(t);
   scene.settingsPanel.applySettings(state.settings);scene.fog.setEnabled(state.settings.fogOfWar);

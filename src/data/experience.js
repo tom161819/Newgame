@@ -2,7 +2,7 @@ export const EXPERIENCE_MAX_LEVEL=50;
 export const XP_REWARDS=Object.freeze({
   resourceCollected:Object.freeze({stone:3}),dropCollected:Object.freeze({meat:2}),
   animalKilled:Object.freeze({rabbit:10,deer:20,wild_boar:35}),
-  buildingCompleted:Object.freeze({wall:2,tower:15,castle:30,house:10}),
+  buildingCompleted:Object.freeze({wall:2,tower:15,castle:30,house:10,quarry:15,hunting_lodge:10,barracks:20}),
 });
 export function getXPRequired(level){
   if(!Number.isInteger(level)||level<1||level>EXPERIENCE_MAX_LEVEL)throw new RangeError('Neplatný level.');

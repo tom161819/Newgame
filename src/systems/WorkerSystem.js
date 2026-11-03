@@ -23,8 +23,17 @@ export class WorkerSystem {
     const castle=workplace??this.scene.buildings.find(b=>b.type==='castle');
     if(!castle)return {...PLAYER_START};const d=buildingDefinition(castle);return {x:castle.x+(d.width-1)/2,y:castle.y+(d.height-1)/2};
   }
-  homeGoals(){
-    const castle=this.scene.buildings.find(b=>b.type==='castle');
+  navigationMap(worker){
+    if(!this.scene.workplaceSystem)return this.scene.map;
+    const map=[...this.scene.map],rows=new Set(),units=[this.scene.character,...this.scene.animalSystem.animals.values(),...this.liveWorkers()];
+    for(const unit of units)if(unit!==worker&&unit.isAlive&&!unit.mounted&&(!unit.state||unit.state==='ground'))for(const tile of unit.reservedTiles()){
+      if(!map[tile.y]||map[tile.y][tile.x]===undefined)continue;
+      if(!rows.has(tile.y)){rows.add(tile.y);map[tile.y]=[...map[tile.y]];}map[tile.y][tile.x]=1;
+    }
+    return map;
+  }
+  homeGoals(worker=null){
+    const castle=this.scene.workplaceSystem?.building(worker)??this.scene.buildings.find(b=>b.type==='castle');
     if(castle)return towerNeighbors(castle).filter(t=>this.scene.map[t.y]?.[t.x]===0);
     const goals=[];for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const t={x:PLAYER_START.x+dx,y:PLAYER_START.y+dy};if(this.scene.map[t.y]?.[t.x]===0)goals.push(t);}return goals;
   }
@@ -56,7 +65,7 @@ export class WorkerSystem {
     this.updateUI();
   }
   update(delta){for(const worker of this.liveWorkers())this.ai.update(worker,delta);}
-  onDeath(worker){this.ai.cancel(worker);worker.active=false;worker.path=[];worker.nextTile=null;worker.walking=false;worker.workState='Dead';worker.arriving=false;worker.view.destroy();this.scene.combatFeedback.remove(worker.id);this.updateUI();}
+  onDeath(worker){this.scene.workplaceSystem?.detach(worker);this.ai.cancel(worker);worker.active=false;worker.path=[];worker.nextTile=null;worker.walking=false;worker.workState='Dead';worker.arriving=false;worker.view.destroy();this.scene.combatFeedback.remove(worker.id);this.updateUI();}
   updateUI(){this.onChange(this.liveWorkers().length,POPULATION.maximum);}
   exportState(){return {nextId:this.nextId,lastMigrationDay:this.lastMigrationDay};}
   importState(data){this.nextId=data?.nextId??1;this.lastMigrationDay=data?.lastMigrationDay??this.scene.gameTime.day;this.updateUI();}

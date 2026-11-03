@@ -11,7 +11,7 @@ export class ExperienceSystem {
   getLevelProgress(character){const e=this.initialize(character);return e?{...e,ratio:e.level>=e.maxLevel?1:e.currentXP/e.xpToNextLevel}:null;}
   onActivity(event){
     const reward=XP_REWARDS[event.type]?.[event.objectType];if(!reward)return 0;
-    const quantity=event.type==='buildingCompleted'?(event.quantity??1):1;
+    const quantity=['buildingCompleted','resourceCollected'].includes(event.type)?(event.quantity??1):1;
     if(!Number.isSafeInteger(quantity)||quantity<1)return 0;
     const actor=event.actor,e=this.initialize(actor);if(!e?.enabled||actor.isAlive===false||!this.claimEvent(event.id))return 0;
     const added=this.addXP(actor,reward*quantity,{type:event.type,objectType:event.objectType});

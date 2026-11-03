@@ -26,8 +26,11 @@ export class DropSystem {
     const drop=this.drops.get(id);
     if(!drop||actor.state!=='ground'||tileKey(standingTile)!==tileKey(drop.tile))return false;
     this.drops.delete(id);drop.view.destroy();this.refreshOccupancy(drop.tile);
-    this.scene.inventory.add(drop.resource,drop.amount);this.scene.updateInventory();
-    this.scene.activities?.emit('dropCollected',{actor,objectType:drop.resource,quantity:drop.amount,objectId:drop.id});
+    const event={type:drop.resource==='stone'?'resourceCollected':'dropCollected',objectType:drop.resource,quantity:drop.amount,objectId:drop.id};
+    if(!this.scene.workplaceSystem?.carryCollection(actor,{resource:drop.resource,amount:drop.amount,event})){
+      this.scene.inventory.add(drop.resource,drop.amount);this.scene.activities?.emit(event.type,{...event,actor});
+    }
+    this.scene.updateInventory();
     this.scene.setStatus(`${this.scene.objectRegistry.require(drop.resource).name} ×${drop.amount} sebráno.`);return true;
   }
   atPoint(x,y){return [...this.drops.values()].sort((a,b)=>b.view.depth-a.view.depth).find(d=>(!this.scene.fog||this.scene.fog.isVisibleTile(d.tile))&&this.scene.assets.hitTest(d.view,x,y))??null;}

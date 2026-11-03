@@ -47,6 +47,9 @@ import { WorkerSystem } from '../systems/WorkerSystem.js';
 import { SkillSystem } from '../systems/SkillSystem.js';
 import { WageSystem } from '../systems/WageSystem.js';
 import { EconomyPanel } from '../ui/EconomyPanel.js';
+import { WorkplaceSystem } from '../systems/WorkplaceSystem.js';
+import { WorkplaceView } from './WorkplaceView.js';
+import { WorkplacePanel } from '../ui/WorkplacePanel.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -62,6 +65,7 @@ export class GameScene extends Phaser.Scene {
     this.worldCamera=null;
     this.workerSystem=null;
     this.wageSystem=null;this.economyPanel=null;
+    this.workplaceSystem=null;
     this.gameOver=false;this.input.enabled=true;this.input.keyboard.enabled=true;this.tweens.resumeAll();
     this.activeFramePending=true;this.visibilityPaused=document.hidden;
     this.assets.initialize();
@@ -72,6 +76,7 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('fortification',(_definition,context)=>new FortificationView(this,context.building,context.preview));
     this.assets.registerRenderer('chest',(_definition,context)=>new ChestView(this,context.x,context.y));
     this.assets.registerRenderer('human',(definition,context)=>new HumanView(this,context.x,context.y,definition));
+    this.assets.registerRenderer('workplace',(_definition,context)=>new WorkplaceView(this,context.building,context.preview));
     const base=this.objectRegistry.require('grass'),obstacle=this.objectRegistry.require('rock_outcrop');
     this.terrainGrid=this.loadState?this.loadState.terrain.map(row=>[...row]):createMap(Math.random);
     this.map=this.terrainGrid.map(row=>row.map(value=>(value?obstacle:base).walkable?0:1));
@@ -117,6 +122,7 @@ export class GameScene extends Phaser.Scene {
     this.huntingSystem=new HuntingSystem(this);
     this.combatFeedback=new CombatFeedback(this);
     this.combat.on('attack',(attacker,target)=>{if(this.animalSystem.animals.has(target.id))this.animalSystem.onAttacked(target,attacker);});
+    this.combat.on('attack',(attacker,target)=>{if(this.workerSystem?.workers.has(target.id)&&target.profession==='soldier'&&target.isAlive)this.combat.startAttack(target,attacker);});
     this.combat.on('damage',(unit,amount,attacker)=>{this.combatFeedback.hit(unit);this.skillSystem.creditDamage(attacker,unit,amount);});
     this.combat.on('death',(unit,killer)=>this.onUnitDeath(unit,killer));
     this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
@@ -129,6 +135,7 @@ export class GameScene extends Phaser.Scene {
     this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
     this.equipmentPanel=new EquipmentPanel(this);
     this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=`Poddaní ${count} / ${maximum}`;}});if(!this.loadState)this.workerSystem.spawnInitial();
+    this.workplaceSystem=new WorkplaceSystem(this);this.workplacePanel=new WorkplacePanel(this);
     this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
     this.treasurePanel=new TreasurePanel(this);if(!this.loadState)this.treasureSystem.spawn(PLAYER_START);
@@ -165,7 +172,7 @@ export class GameScene extends Phaser.Scene {
       this.equipmentPanel.destroy();this.treasurePanel.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
-      this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
+      this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
       this.game.events.off(Phaser.Core.Events.PAUSE,onBackground);this.game.events.off(Phaser.Core.Events.RESUME,onForeground);
       this.game.canvas.style.cursor='';
     });
@@ -250,6 +257,7 @@ export class GameScene extends Phaser.Scene {
     }
     const selected=this.pickInteraction(pointer.worldX,pointer.worldY,goal);
     if(selected?.kind==='human'){this.unitPanel.open(selected.object);return;}
+    if(selected?.kind==='building'&&buildingDefinition(selected.object).workplace){this.workplacePanel.open(selected.object);return;}
     if(this.character.transitioning){this.setStatus('Počkej, až král dokončí výstup nebo sestup.');return;}
     this.character.order=null;
     this.huntingSystem.cancel();this.mountSystem.cancel();
@@ -300,7 +308,7 @@ export class GameScene extends Phaser.Scene {
 
   createBuildingView(definition,building,preview=false) {
     const object={...building,type:definition.id,definition,tiles:building.tiles??buildingTiles(building,definition)};
-    if(!preview)this.terrain.invalidateArea(object.tiles);
+    if(!preview){this.terrain.invalidateArea(object.tiles);this.workplaceSystem?.register(building);}
     return this.assets.createView(definition.id,{building:object,preview});
   }
   selectableHumans(){return this.workerSystem?.liveWorkers()??[];}
@@ -389,7 +397,9 @@ export class GameScene extends Phaser.Scene {
     if(!reachable)return false;
     view.destroy();this.resources.delete(key);
     for(const tile of object.tiles){this.dropSystem.refreshOccupancy(tile);if(!definition.walkable)this.map[tile.y][tile.x]=0;}
-    this.inventory.add(definition.id);this.updateInventory();this.activities.emit('resourceCollected',{actor,objectType:definition.id,quantity:1});return true;
+    const event={type:'resourceCollected',objectType:definition.id,quantity:1};
+    if(!this.workplaceSystem?.carryCollection(actor,{resource:definition.id,amount:1,event})){this.inventory.add(definition.id);this.activities.emit(event.type,{...event,actor});}
+    this.updateInventory();return true;
   }
   collectStone(tile) { return this.collectResource(tileKey(tile),this.character.tile); }
   updateInventory() { this.inventoryBar.update();this.updateBuildingUI();this.updateWorldCount();this.updateFoodDisplay();this.equipmentPanel?.refresh();this.economyPanel?.update(); }
@@ -415,7 +425,7 @@ export class GameScene extends Phaser.Scene {
     if(unit===this.character){this.finishGame();return;}
     if(this.workerSystem.workers.has(unit.id)){this.workerSystem.onDeath(unit);return;}
     const tile={x:Math.floor(unit.position.x),y:Math.floor(unit.position.y)},amount=unit.definition.gameplay.meatDrop;
-    if(killer)this.activities.emit('animalKilled',{actor:killer,objectType:unit.type,quantity:1,objectId:unit.id});
+    if(killer){const event={type:'animalKilled',objectType:unit.type,quantity:1,objectId:unit.id};if(!this.workplaceSystem?.deferReward(killer,event))this.activities.emit(event.type,{...event,actor:killer});}
     this.mountSystem.onDeath(unit);this.animalSystem.remove(unit);this.combatFeedback.remove(unit.id);
     const drop=amount>0?this.dropSystem.create('meat',tile,amount):null;this.workerSystem.ai.animalDied(unit,killer,drop);
     if(this.huntingSystem.target===unit)this.huntingSystem.cancel();
@@ -474,6 +484,7 @@ export class GameScene extends Phaser.Scene {
     this.combatFeedback?.refresh();
     this.experienceFeedback?.refreshVisibility();this.unitPanel?.refresh();
     this.economyPanel?.update();
+    this.workplacePanel?.refresh();
     this.treasureSystem?.update(view,this.fog);if(this.equipmentPanel?.dialog.open)this.equipmentPanel.updateStats();
   }
 }

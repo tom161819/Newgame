@@ -173,3 +173,12 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 #wage-warning { color:#f4ab91; width:100%; }
 .talented-skill { border-color:#d3b564; background:#b38a2820; }
 .talented-skill strong { color:#f0d78b; }
+
+.workplace-dialog { width:min(760px,calc(100vw - 24px)); }
+.buildings-panel { max-height:min(70dvh,600px); overflow:auto; }
+#workplace-image { width:105px; height:100px; object-fit:contain; float:right; }
+#workplace-workers, #workplace-candidates { list-style:none; padding:0; display:grid; gap:8px; }
+.workplace-worker { display:flex; gap:12px; align-items:center; justify-content:space-between; padding:9px; background:#252d22; border:1px solid #615f42; font-size:12px; line-height:1.6; }
+.workplace-worker button { flex-shrink:0; font-size:11px; padding:6px 9px; }
+.empty-slot { color:#a9ad92; border:1px dashed #615f42; padding:10px; font-size:12px; }
+@media(max-width:480px){.workplace-worker { flex-wrap:wrap; }.workplace-worker button { margin-left:auto; } }

@@ -28,6 +28,7 @@ export class UnitPanel {
       document.querySelector('#unit-wage').textContent=`${s.wageSystem.dailyWage(u).toFixed(2)} Gold/day`;
       document.querySelector('#unit-talent').textContent=`${TALENTS[u.naturalTalent]} · +${TALENT_XP_BONUS*100} % ${SKILLS[u.naturalTalent]} XP`;
       document.querySelector('#unit-unpaid').textContent=`Unpaid wages: ${s.wageSystem.unpaid(u).toFixed(2)} Gold`;
+      document.querySelector('#unit-workplace').textContent=`Workplace: ${s.workplaceSystem?.building(u)?.definition.name??'Not assigned'}`;
     }
     const signature=JSON.stringify([u.skills,u.naturalTalent]);
     if(this.skillSignature!==`${u.id}:${signature}`){

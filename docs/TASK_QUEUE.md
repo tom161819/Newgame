@@ -26,12 +26,15 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 - [Krok 15 — přirozené talenty a mzdy](requests/step-15.md): commit `1244147`, Pages run `41586655076` úspěšně nasazeno. 119 testů, skutečný 120sekundový den s příjmem a výplatou, poměrné mzdy a dluhy, Save/Load včetně starší hry, produkční a mobilní UI i původní mechaniky ověřeny.
 
+## Dokončeno, probíhá publikování
+
+- [Krok 16 — pracovní budovy a zaměstnanci](requests/step-16.md): 130 testů, skutečné stavění a přiřazování přes UI, doprava kamenů a masa před připsáním odměn, hlídky a sebeobrana, přesné Save/Load i starší save, produkční/mobilní rozhraní a 20 zaměstnanců kolem 60 FPS ověřeny. Nasazení se kontroluje před zahájením kroku 17.
+
 ## Následuje
 
-1. **Právě probíhá:** [Krok 16 — pracovní budovy a zaměstnanci](requests/step-16.md).
-2. [Krok 17 — blueprinty a skutečná výstavba](requests/step-17.md).
-3. [Krok 18a — archiv skutečných historických verzí](requests/step-18a.md).
-4. [Krok 18b — New Game Setup, obtížnost a parametry mapy](requests/step-18b.md).
-5. [Krok 19 — Advanced New Game Setup & World Configuration](requests/step-19.md).
+1. [Krok 17 — blueprinty a skutečná výstavba](requests/step-17.md).
+2. [Krok 18a — archiv skutečných historických verzí](requests/step-18a.md).
+3. [Krok 18b — New Game Setup, obtížnost a parametry mapy](requests/step-18b.md).
+4. [Krok 19 — Advanced New Game Setup & World Configuration](requests/step-19.md).
 
 Číslo 18 bylo použité u dvou různých zadání; obě se zachovávají v pořadí doručení jako 18a a 18b. Neaplikovat budoucí mechaniky před jejich krokem: krok 6 má okamžitý lov bez HP, krok 7 přidává koně/FoW, krok 8 Castle/Wall, skutečné souboje až krok 9.

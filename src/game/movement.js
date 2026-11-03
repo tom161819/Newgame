@@ -22,6 +22,7 @@ export function advanceMovement(actor, delta) {
   let remaining = Number.isFinite(delta)?Math.max(0,delta)/1000:0;
   const wear=actor.scene?.pathWear;
   while (remaining > 1e-12 && actor.speed>0) {
+    if (!actor.nextTile&&actor.path.length&&actor.canEnterTile&&!actor.canEnterTile(actor.path[0]))break;
     if (!actor.nextTile) actor.nextTile = actor.path.shift();
     if (!actor.nextTile) break;
     const target = {x:actor.nextTile.x+0.5,y:actor.nextTile.y+0.5};
