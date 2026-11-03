@@ -21,12 +21,14 @@ import { WildlifeRespawnSystem } from '../../src/systems/WildlifeRespawnSystem.j
 import { FarmingSystem } from '../../src/systems/FarmingSystem.js';
 import { FoodStorageSystem } from '../../src/systems/FoodStorageSystem.js';
 import { FoodProductionSystem } from '../../src/systems/FoodProductionSystem.js';
+import { SeasonSystem } from '../../src/systems/SeasonSystem.js';
+import { KingdomAttractivenessSystem } from '../../src/systems/KingdomAttractivenessSystem.js';
 import { WorkerSystem } from '../../src/systems/WorkerSystem.js';
 import { ResourceSpawner } from '../../src/game/stones.js';
 import { tileCenter } from '../../src/game/isometric.js';
 import { wallIndex,connectionsFor } from '../../src/game/walls.js';
 
-export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,workplaces=false,construction=false,farming=false,foodProduction=false,gameSettings}={}){
+export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,workplaces=false,construction=false,farming=false,foodProduction=false,seasons=false,gameSettings}={}){
   const scene={objectRegistry,gameSettings,terrainGrid:terrain.map(r=>[...r]),map:terrain.map(r=>[...r]),inventory:new Inventory(),gameOver:false,
     resources:new Map(),resourceOccupancy:new Map(),buildings:[],towerViews:new Map(),animations:[],
     marker:{visible:false,setVisible(v){this.visible=v;}},showMarker(){this.marker.visible=true;},setStatus(){},updateBuildingUI(){},updateInventory(){},updateTimeDisplay(){},refreshVisibility(){},
@@ -43,16 +45,18 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   scene.tweens={add(config){const t={...config,elapsed:0};scene.animations.push(t);return t;}};
   scene.player=view('king',tileCenter({x:40,y:40}));scene.character=new PlayerController(scene,scene.player,{x:40,y:40});
   scene.gameTime=new GameTimeSystem((gameSettings?.dayLengthSeconds??120)*1000);scene.activities=new GameActivityBus();scene.experienceSystem=new ExperienceSystem(scene.activities);scene.skillSystem=new SkillSystem(scene);scene.skillSystem.initialize(scene.character);
+  if(seasons)scene.seasons=new SeasonSystem(scene.gameTime);
   scene.pathWear=new PathWearSystem({map:scene.map,terrain:scene.terrainGrid,time:scene.gameTime});scene.regeneration=new RegenerationSystem();
   scene.equipment=new EquipmentSystem(scene.character,objectRegistry,scene.inventory);scene.combat=new CombatSystem({map:scene.map,regenerationRate:u=>scene.regeneration.rateFor(u)});scene.skillSystem.attachCombat(scene.combat);
   scene.animalSystem=new AnimalSystem(scene);scene.dropSystem=new DropSystem(scene);scene.treasureSystem=new TreasureSystem(scene);scene.workerSystem=new WorkerSystem(scene);
   scene.wildlifeRespawn=new WildlifeRespawnSystem(scene,scene.animalSystem);
   if(!randomizeTalents){const create=scene.workerSystem.create.bind(scene.workerSystem);scene.workerSystem.create=(tile,options={})=>{const w=create(tile,{...options,randomize:false});w.naturalTalent='woodcutting';w.initialSkills=structuredClone(w.skills);return w;};}
-  scene.foodSystem=new FoodSystem(scene.inventory,objectRegistry.require('meat'));scene.production=new ProductionSystem(scene.gameTime,scene.inventory,()=>scene.buildings);scene.wageSystem=new WageSystem(scene);
+  scene.foodSystem=new FoodSystem(scene.inventory,objectRegistry.require('meat'),()=>{},{time:scene.gameTime,scene,subscribe:seasons});scene.production=new ProductionSystem(scene.gameTime,scene.inventory,()=>scene.buildings);scene.wageSystem=new WageSystem(scene);
+  if(seasons)scene.attractiveness=new KingdomAttractivenessSystem(scene);
   if(workplaces||construction||farming||foodProduction)scene.workplaceSystem=new WorkplaceSystem(scene);
   if(construction)scene.constructionSystem=new ConstructionSystem(scene,{onComplete:b=>{scene.towerViews.set(b.id,scene.createBuildingView(b.definition,b));scene.refreshWallConnections();},onCancel:b=>{scene.towerViews.delete(b.id);scene.refreshWallConnections();}});
   if(foodProduction){scene.foodStorage=new FoodStorageSystem(scene);scene.foodProduction=new FoodProductionSystem(scene);}
-  if(farming||foodProduction)scene.farmingSystem=new FarmingSystem(scene,{onHarvest:foodProduction?result=>scene.foodProduction.harvest(result):null});
+  if(farming||foodProduction)scene.farmingSystem=new FarmingSystem(scene,{growthModifier:()=>scene.seasons?.growthMultiplier()??1,onHarvest:foodProduction?result=>scene.foodProduction.harvest(result):null});
   scene.addResource=(d,tile)=>{const v=view(d.id,tileCenter(tile)),key=`${tile.x},${tile.y}`;v.setData('tile',{...tile}).setData('object',{type:d.id,definition:d,x:tile.x,y:tile.y,tiles:[{...tile}]});scene.resources.set(key,v);scene.resourceOccupancy.set(key,key);};
   scene.collectResource=(key,tile,actor)=>{const v=scene.resources.get(key);if(!v||key!==`${tile.x},${tile.y}`||actor.state!=='ground')return false;
     const type=v.getData('objectId');scene.resources.delete(key);v.destroy();scene.dropSystem.refreshOccupancy(tile);const event={type:'resourceCollected',objectType:type,quantity:1};if(!scene.workplaceSystem?.carryCollection(actor,{resource:type,amount:1,event})){scene.inventory.add(type);scene.activities.emit(event.type,{...event,actor});}return true;};
@@ -64,7 +68,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
     if(scene.workerSystem.workers.has(target.id)){scene.workerSystem.onDeath(target);return;}
     if(!scene.animalSystem.animals.has(target.id))return;
     const tile={x:Math.floor(target.position.x),y:Math.floor(target.position.y)};if(killer){const event={type:'animalKilled',objectType:target.type,quantity:1};if(!scene.workplaceSystem?.deferReward(killer,event))scene.activities.emit(event.type,{...event,actor:killer});}
-    scene.animalSystem.remove(target);const drop=scene.dropSystem.create('meat',tile,target.definition.gameplay.meatDrop);scene.workerSystem.ai.animalDied(target,killer,drop);
+    scene.animalSystem.remove(target);const amount=target.definition.gameplay.meatDrop,drop=amount>0?scene.dropSystem.create('meat',tile,amount):null;if(amount>0)scene.foodSystem.recordProduction('meat',amount,`meat-${target.id}`);scene.workerSystem.ai.animalDied(target,killer,drop);
   });
   scene.tick=delta=>{if(scene.gameTime.paused||scene.gameOver)return;scene.gameTime.update(delta);if(scene.constructionSystem)scene.character.update(delta);scene.animalSystem.update(delta);scene.workerSystem.update(delta);const covered=scene.combat.update(delta);scene.constructionSystem?.update(delta);scene.farmingSystem?.update(delta);scene.foodProduction?.update(delta);scene.regeneration.update(delta,[scene.character,...scene.animalSystem.animals.values(),...scene.workerSystem.liveWorkers()],covered);};
   scene.simulate=(ms,step=50)=>{let elapsed=0;while(elapsed<ms){const delta=Math.min(step,ms-elapsed);scene.tick(delta);elapsed+=delta;}};

@@ -103,7 +103,7 @@ test('generic drops merge by resource and tile and preserve other resource occup
   s.dropSystem.collect(wood.id,wood.tile);assert.equal(s.inventory.count('stone'),3);assert.equal(s.resourceOccupancy.has('6,6'),false);
 });
 
-test('food consumes once per elapsed minute, carries remainder, never becomes negative and is independent of FPS',()=>{
+test('the king eats twice per standard 120-second day, preserves partial meals, never overdraws food and is independent of FPS',()=>{
   const inventory=new Inventory();inventory.add('meat',4);let changes=0;
   const food=new FoodSystem(inventory,objectRegistry.require('meat'),()=>changes++);
   food.update(59999);assert.equal(inventory.count('meat'),4);assert.equal(food.remainingSeconds,1);

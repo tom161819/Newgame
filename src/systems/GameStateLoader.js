@@ -5,6 +5,7 @@ import { gridToWorld,tileCenter } from '../game/isometric.js';
 import { importCharacterExperience } from './ExperienceSystem.js';
 import { initializeNaturalTalent } from './NaturalTalentSystem.js';
 import { gameSettings,resourceSpawnSettings } from './GameSettings.js';
+import { seasonalCropStage } from '../data/seasons.js';
 
 export function restoreActor(unit,data){
   for(const key of ['currentHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'])if(data[key]!==undefined)unit[key]=data[key];
@@ -90,16 +91,20 @@ export function loadGameState(scene,input){
   scene.mountSystem.target=units.get(state.commands.mount)??null;scene.mountSystem.repath=state.commands.mountRepath;
   scene.treasureSystem.pending=state.commands.pendingChest;
   scene.animalSystem.nextId=state.counters.animal;scene.dropSystem.nextId=state.counters.drop;scene.treasureSystem.nextId=state.counters.chest;
-  scene.gameTime.importState(state.time);scene.foodSystem.importState(state.food);scene.production.importState(state.production);
+  scene.gameTime.importState(state.time);scene.seasons?.importState(state.seasons);scene.foodSystem.importState(state.food);scene.production.importState(state.production);
   scene.experienceSystem?.importState(state.experienceSystem);
   scene.skillSystem?.importState(state.skillSystem);scene.workerSystem?.importState(state.population);
   if(scene.workerSystem&&state.workers===undefined)scene.workerSystem.spawnInitial();
   scene.wageSystem?.importState(state.wages);
   scene.workplaceSystem?.importState(state.workplaces);
   scene.constructionSystem?.importState(state.constructionSystem);
+  if(scene.seasons&&!state.seasons&&state.farming)for(const record of state.farming.records){const b=scene.buildings.find(b=>b.id===record.buildingId);record.stage=seasonalCropStage(b.type,record.growthDays,b.definition.crop.growthDays,scene.seasons.season);}
   scene.farmingSystem?.importState(state.farming);
   scene.foodStorage?.importState(state.foodStorage,state.inventory);
   scene.foodProduction?.importState(state.foodProduction);
+  if(scene.seasons&&!state.seasons)for(const worker of scene.workerSystem.liveWorkers())if(worker.workTask?.kind==='harvest'){
+    const plot=scene.farmingSystem.building(worker.workTask.targetId);if(plot&&!scene.farmingSystem.ripe(plot)){scene.workerSystem.ai.cancel(worker);worker.workState='Waiting';worker.workMessage='Waiting for the harvest season';}
+  }
   if(scene.foodStorage&&!state.foodStorage)for(const worker of scene.workerSystem.liveWorkers())if(scene.foodStorage.manages(worker.cargo?.resource)&&worker.cargo.amount>20){
     const original=worker.cargo.amount,remainder=original-20;worker.cargo.amount=20;let rewardRemaining=0;
     for(const event of worker.pendingWorkRewards??[])if(event.type==='dropCollected'){const ratio=event.contributionRatio??1;event.contributionRatio=ratio*20/original;rewardRemaining+=ratio*remainder/original;}

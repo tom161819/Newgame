@@ -6,12 +6,14 @@ import { JOBS,SKILL_IDS,WORK_RULES } from '../data/jobs.js';
 import { CONSTRUCTION_RULES } from '../data/construction.js';
 import { buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { gameSettings,WILDLIFE_INTERVALS } from './GameSettings.js';
-import { FARMING_RULES,cropStage } from '../data/farming.js';
+import { FARMING_RULES } from '../data/farming.js';
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
 import { TALENTS } from '../data/economy.js';
 import { validateFoodState } from './FoodStateValidation.js';
+import { validateSeasonFoodState } from './SeasonFoodStateValidation.js';
+import { seasonalCropStage } from '../data/seasons.js';
 
-export const SAVE_VERSION=4;
+export const SAVE_VERSION=5;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -38,6 +40,7 @@ export function serializeGameState(scene){
     ...(scene.workplaceSystem?{workplaces:scene.workplaceSystem.exportState()}:{}),
     ...(scene.constructionSystem?{constructionSystem:scene.constructionSystem.exportState()}:{}),
     ...(scene.farmingSystem?{farming:scene.farmingSystem.exportState()}:{}),
+    ...(scene.seasons?{seasons:scene.seasons.exportState()}:{}),
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
     ...(scene.workerSystem?{population:scene.workerSystem.exportState(),workers:[...scene.workerSystem.workers.values()].map(w=>({...serializeActor(w),name:w.name,profession:w.profession,
       ...(w.naturalTalent?{naturalTalent:w.naturalTalent,initialSkills:copy(w.initialSkills)}:{}),
@@ -78,7 +81,7 @@ export function validateGameState(input,registry=objectRegistry){
   const array=(a,max=20000)=>check(Array.isArray(a)&&a.length<=max);
   const definition=(id,category)=>{const d=registry.get(id);check(d&&(!category||d.category===category));return d;};
   const unique=(array)=>{const ids=new Set();for(const a of array){check(a.id!=null&&!ids.has(a.id));ids.add(a.id);}return ids;};
-  check(input&&[1,2,3,SAVE_VERSION].includes(input.saveVersion));
+  check(input&&[1,2,3,4,SAVE_VERSION].includes(input.saveVersion));
   let s;try{s=JSON.parse(JSON.stringify(input));}catch{fail();}
   if(input.saveVersion<4)for(const actor of [s.player,...(s.workers??[])])for(const key of ['skills','initialSkills'])if(actor?.[key])for(const id of ['milling','baking'])actor[key][id]??=createProgress();
   try{const settings=gameSettings(s.gameSettings);s.gameSettings={...settings,fogOfWar:s.gameSettings?.fogOfWar??s.settings?.fogOfWar??settings.fogOfWar};}catch{fail();}
@@ -214,7 +217,7 @@ export function validateGameState(input,registry=objectRegistry){
     const f=s.farming;check(f&&f.clocks&&typeof f.clocks==='object'&&Object.keys(f.clocks).length===Object.keys(FARMING_RULES.crops).length);
     for(const id of Object.keys(FARMING_RULES.crops))number(f.clocks[id]);number(f.refreshElapsed,0,FARMING_RULES.refreshInterval);array(f.records);check(f.records.length===plots.length);const recorded=new Set();
     for(const r of f.records){const plot=plots.find(b=>b.id===r.buildingId);check(plot&&!recorded.has(r.buildingId));recorded.add(r.buildingId);const crop=definition(plot.type).crop;
-      number(r.growthDays,0,crop.growthDays);number(r.lastClock,0,f.clocks[plot.type]);integer(r.stage,0,3);check(r.stage===cropStage(r.growthDays,crop.growthDays));integer(r.cycle);
+      number(r.growthDays,0,crop.growthDays);number(r.lastClock,0,f.clocks[plot.type]);integer(r.stage,0,3);check(r.stage===seasonalCropStage(plot.type,r.growthDays,crop.growthDays,s.seasons?.season));integer(r.cycle);
       check(r.reservedBy==null||s.workers?.some(w=>w.isAlive&&w.id===r.reservedBy&&w.profession==='farmer'&&w.workTask?.kind==='harvest'&&w.workTask.targetId===r.buildingId));
     }
   }else check(!plots.length);
@@ -227,7 +230,7 @@ export function validateGameState(input,registry=objectRegistry){
   check(s.equipment&&Object.keys(s.equipment).length===2);for(const slot of ['weapon','armor'])if(s.equipment[slot]!=null){const id=s.equipment[slot];check(definition(id,'equipment').equipment.slot===slot&&(s.inventory[id]??0)>0);}
   integer(s.time?.day,1);number(s.time.elapsed,0,dayDuration-1e-7);number(s.time.totalElapsed);check(Math.abs(s.time.totalElapsed-((s.time.day-1)*dayDuration+s.time.elapsed))<.01);
   s.time.compensation??=0;number(s.time.compensation,-1e-6,1e-6);
-  number(s.food?.elapsed,0,registry.require('meat').consumption.interval-1e-7);
+  number(s.food?.elapsed,0,(s.food?.residents?dayDuration/2:registry.require('meat').consumption.interval)-1e-7);
   const spawnIds=new Set();for(const t of s.spawners){const d=definition(t.id,'resource');check(d.spawn&&!spawnIds.has(t.id));spawnIds.add(t.id);number(t.elapsed,0,d.spawn.interval-1e-7);}
   check(registry.byCategory('resource').filter(d=>d.spawn).every(d=>spawnIds.has(d.id)));
   integer(s.production?.lastProcessedDay,1,s.time.day);
@@ -261,5 +264,6 @@ export function validateGameState(input,registry=objectRegistry){
     for(const [key,amount]of Object.entries(s.skillSystem.damageAwards)){const [actorId,targetId]=key.split(':');check((actorId==='king'||wIds.has(actorId))&&(targetId==='king'||wIds.has(targetId)||/^animal-\d+$/.test(targetId)));number(amount,0,WORK_RULES.combatXPPerTarget+1e-7);}
   }
   validateFoodState(s,registry,{check,number,integer,array});
+  validateSeasonFoodState(s,{check,number,integer,array});
   return s;
 }

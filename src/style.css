@@ -78,6 +78,8 @@ button:focus-visible { outline: 2px solid #e2c673; outline-offset: 2px; }
 .equipment-summary-button img { width: 18px; height: 23px; object-fit: contain; }
 .game-dialog { width: min(640px,94vw); max-height: 90dvh; overflow: auto; padding: 20px; border: 1px solid #978657; border-radius: 5px; background: #303625; color: #ece2c4; }
 .game-dialog::backdrop { background: #10170ebd; }
+#food-economy-dialog .equipment-stats { grid-template-columns:minmax(0,1fr) minmax(80px,1fr); }
+#food-economy-dialog dd { overflow-wrap:anywhere; }
 .dialog-heading { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 16px; }
 .dialog-heading h2 { margin: 0; font: 22px Georgia,serif; }
 .dialog-heading button { font-size: 12px; }

@@ -59,6 +59,7 @@ export class WorkerSystem {
   onNewDay(day){
     if(day<=this.lastMigrationDay)return;this.lastMigrationDay=day;
     for(let i=0;i<POPULATION.migrantsPerDay&&this.liveWorkers().length<POPULATION.maximum;i++){
+      if(this.scene.attractiveness&&!this.scene.attractiveness.shouldSettle())continue;
       const map=this.scene.map,origin=this.origin(),candidates=this.candidates().filter(t=>(t.x<=1||t.y<=1||t.x>=map[0].length-2||t.y>=map.length-2)&&Math.hypot(t.x-origin.x,t.y-origin.y)>25);
       if(!candidates.length)break;const worker=this.create(candidates[Math.floor(Math.random()*candidates.length)]);worker.arriving=true;worker.workState='Arriving';worker.moveTo(this.homeGoals());
     }

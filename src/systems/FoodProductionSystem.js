@@ -144,7 +144,7 @@ export class FoodProductionSystem {
         if(!this.storage.withdraw(inputId,inputResource,inputAmount)){this.storage.release(capacity);continue;}
         record.cycle={id,requiredWork:recipe.duration,workDone:0,progress:0,state:'building',contributions:{},inputs:{...recipe.input},outputReservation:capacity,startedAt:this.scene.gameTime.totalElapsed};
       }
-      const cycle=record.cycle,participants=workers.map(w=>({id:w.id,speed:this.scene.skillSystem.efficiency(w,recipe.skill),available:Math.min(delta,w.availableWorkMs??0,Math.max(0,this.scene.gameTime.totalElapsed-cycle.startedAt))}));
+      const cycle=record.cycle,participants=workers.map(w=>({id:w.id,speed:this.scene.skillSystem.workEfficiency(w,recipe.skill),available:Math.min(delta,w.availableWorkMs??0,Math.max(0,this.scene.gameTime.totalElapsed-cycle.startedAt))}));
       if(advanceConstruction({construction:cycle},participants,delta))this.finish(record,building);
     }
     for(const location of [...this.storage.locations.values()])if(location.buildingId!=null&&!this.scene.buildings.some(b=>b.id===location.buildingId)){
@@ -161,6 +161,7 @@ export class FoodProductionSystem {
     const recipe=buildingDefinition(building).recipe,[resource,amount]=first(recipe.output);
     if(!this.storage.deposit(`output-${building.id}`,resource,amount))return false;
     record.cycle=null;record.outputReservation=cycle.outputReservation;record.completed++;
+    this.scene.foodSystem?.recordProduction(resource,amount,cycle.id);
     const contributors=Object.entries(cycle.contributions),total=contributors.reduce((n,[,work])=>n+work,0);let allocated=0;
     for(let i=0;i<contributors.length;i++){const[id,work]=contributors[i],ratio=i===contributors.length-1?1-allocated:work/total;allocated+=ratio;const worker=this.scene.workerSystem.workers.get(id);
       if(worker?.isAlive)this.scene.activities.emit('foodProduced',{actor:worker,objectType:building.type,contributionRatio:ratio,quantity:1},`${cycle.id}-${id}`);}

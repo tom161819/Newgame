@@ -62,6 +62,9 @@ import { FarmingPanel } from '../ui/FarmingPanel.js';
 import { FoodStorageSystem } from '../systems/FoodStorageSystem.js';
 import { FoodProductionSystem } from '../systems/FoodProductionSystem.js';
 import { StoragePanel } from '../ui/StoragePanel.js';
+import { SeasonSystem } from '../systems/SeasonSystem.js';
+import { KingdomAttractivenessSystem } from '../systems/KingdomAttractivenessSystem.js';
+import { FoodEconomyPanel } from '../ui/FoodEconomyPanel.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -81,6 +84,7 @@ export class GameScene extends Phaser.Scene {
     this.constructionSystem=null;
     this.farmingSystem=null;
     this.foodStorage=null;this.foodProduction=null;
+    this.seasons=null;
     this.gameOver=false;this.input.enabled=true;this.input.keyboard.enabled=true;this.tweens.resumeAll();
     this.activeFramePending=true;this.visibilityPaused=document.hidden;
     this.assets.initialize();
@@ -100,6 +104,8 @@ export class GameScene extends Phaser.Scene {
     this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
     this.inventory=new Inventory();if(!this.loadState)this.inventory.add('gold',this.gameSettings.startingGold);
     this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);this.regeneration=new RegenerationSystem();
+    this.seasons=new SeasonSystem(this.gameTime);this.terrain.setSeason(this.seasons.season);
+    this.unsubscribeSeason=this.seasons.onChange(()=>{this.terrain.setSeason(this.seasons.season);this.updateTimeDisplay();});
     this.activities=new GameActivityBus();this.experienceSystem=new ExperienceSystem(this.activities);
     this.skillSystem=new SkillSystem(this);
     this.pathWear=new PathWearSystem({map:this.map,terrain:this.terrainGrid,time:this.gameTime});this.terrain.setPathWear(this.pathWear);
@@ -150,7 +156,8 @@ export class GameScene extends Phaser.Scene {
     this.fog.setEnabled(this.settingsPanel.settings.fogOfWar);
     if(!this.loadState){this.settingsPanel.applySettings({...this.settingsPanel.settings,fogOfWar:this.gameSettings.fogOfWar});this.fog.setEnabled(this.gameSettings.fogOfWar);}
     this.terrain.setDebug(this.settingsPanel.settings.pathWearDebug);
-    this.foodSystem=new FoodSystem(this.inventory,this.objectRegistry.require('meat'),()=>this.updateInventory());
+    this.foodSystem=new FoodSystem(this.inventory,this.objectRegistry.require('meat'),()=>this.updateInventory(),{time:this.gameTime,scene:this,subscribe:true});
+    this.attractiveness=new KingdomAttractivenessSystem(this);this.foodEconomyPanel=new FoodEconomyPanel(this);
     this.inventoryBar=new InventoryBar(this.objectRegistry,this.assets,this.inventory);
     this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
     this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
@@ -162,7 +169,7 @@ export class GameScene extends Phaser.Scene {
       onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus('Stavba zrušena. Materiál je vrácen podle její rozpracovanosti.');}});
     this.constructionUI=new ConstructionUI(this);
     this.foodProduction=new FoodProductionSystem(this);this.storagePanel=new StoragePanel(this);
-    this.farmingSystem=new FarmingSystem(this,{onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);
+    this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);
     this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
     this.treasurePanel=new TreasurePanel(this);if(!this.loadState)this.treasureSystem.spawn(PLAYER_START);
@@ -202,6 +209,7 @@ export class GameScene extends Phaser.Scene {
       this.experienceFeedback.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
       this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
       this.storagePanel.destroy();this.foodProduction.destroy();this.foodStorage.destroy();
+      this.foodEconomyPanel.destroy();this.foodSystem.destroy();this.unsubscribeSeason();this.seasons.destroy();
       this.game.events.off(Phaser.Core.Events.PAUSE,onBackground);this.game.events.off(Phaser.Core.Events.RESUME,onForeground);
       this.game.canvas.style.cursor='';
     });
@@ -437,7 +445,7 @@ export class GameScene extends Phaser.Scene {
   }
   collectStone(tile) { return this.collectResource(tileKey(tile),this.character.tile); }
   updateInventory() { this.inventoryBar.update();this.updateBuildingUI();this.updateWorldCount();this.updateFoodDisplay();this.equipmentPanel?.refresh();this.economyPanel?.update(); }
-  updateTimeDisplay(){const output=document.querySelector('#game-time');if(output.textContent!==this.gameTime.label)output.textContent=this.gameTime.label;}
+  updateTimeDisplay(){const output=document.querySelector('#game-time');if(output.textContent!==this.gameTime.label)output.textContent=this.gameTime.label;const seasons=document.querySelector('#season-weather');if(seasons.textContent!==this.seasons.label)seasons.textContent=this.seasons.label;}
   onDailyIncome(day,totals){
     const labels=new Set(this.buildings.map(b=>buildingDefinition(b).production).filter(p=>p?.interval==='day'&&totals[p.resource]).map(p=>p.label).filter(Boolean));
     const details=Object.entries(totals).map(([id,amount])=>`+${amount} ${this.objectRegistry.require(id).name}`).join(' · ');
@@ -445,9 +453,9 @@ export class GameScene extends Phaser.Scene {
     notice.hidden=false;this.noticeRemaining=4000;this.updateInventory();
   }
   updateFoodDisplay(){
-    const seconds=this.foodSystem.remainingSeconds,text=`Food: ${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
+    const text=`Food: ${this.foodSystem.dailyConsumption} portions/day`;
     const output=document.querySelector('#food-countdown');if(output.textContent!==text)output.textContent=text;
-    document.querySelector('#food-warning').hidden=this.foodSystem.availablePortions>0;
+    const warning=document.querySelector('#food-warning');warning.hidden=!this.foodSystem.shortage;warning.textContent=`Food shortage · ${this.foodSystem.hungryCount} unfed`;
   }
   updateBuildingUI() { this.buildingBar.update(this.inventory,this.buildMode?this.selectedBuilding:null); }
   updateWorldCount() {
@@ -462,6 +470,7 @@ export class GameScene extends Phaser.Scene {
     if(killer){const event={type:'animalKilled',objectType:unit.type,quantity:1,objectId:unit.id};if(!this.workplaceSystem?.deferReward(killer,event))this.activities.emit(event.type,{...event,actor:killer});}
     this.mountSystem.onDeath(unit);this.animalSystem.remove(unit);this.combatFeedback.remove(unit.id);
     const drop=amount>0?this.dropSystem.create('meat',tile,amount):null;this.workerSystem.ai.animalDied(unit,killer,drop);
+    if(amount>0)this.foodSystem.recordProduction('meat',amount,`meat-${unit.id}`);
     if(this.huntingSystem.target===unit)this.huntingSystem.cancel();
     if(amount>0)this.setStatus(`${unit.definition.name} uloveno. Na zemi je Meat ×${amount}; seber ho kliknutím.`);
   }
@@ -529,6 +538,7 @@ export class GameScene extends Phaser.Scene {
     this.constructionUI?.refresh();
     this.farmingPanel?.refresh();
     this.storagePanel?.refresh();
+    this.foodEconomyPanel?.refresh();
     this.treasureSystem?.update(view,this.fog);if(this.equipmentPanel?.dialog.open)this.equipmentPanel.updateStats();
   }
 }

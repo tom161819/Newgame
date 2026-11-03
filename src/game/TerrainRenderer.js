@@ -25,6 +25,7 @@ export class TerrainRenderer {
 
   setPathWear(system){this.wear=system;this.unsubscribeWear=system.subscribe(tile=>this.invalidateArea([tile]));}
   setDebug(value){this.debugEnabled=!!value;this.lastView='';if(!value)this.debugGraphics.clear();}
+  setSeason(season){if(season===this.season)return;this.season=season;for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
   invalidateArea(tiles){
     for(const tile of tiles)for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
       const x=tile.x+dx,y=tile.y+dy;if(x>=0&&x<COLUMNS&&y>=0&&y<ROWS)this.dirtyChunks.add(`${Math.floor(x/CHUNK_SIZE)},${Math.floor(y/CHUNK_SIZE)}`);
@@ -67,6 +68,8 @@ export class TerrainRenderer {
           if(this.wear)this.drawConnections(context,x,y,left,origin.y);
         }
       }
+      const tint={Spring:'rgba(95,145,65,.08)',Summer:'rgba(185,159,70,.09)',Autumn:'rgba(158,105,45,.17)',Winter:'rgba(232,237,220,.83)'}[this.season];
+      if(tint){context.save();context.globalCompositeOperation='source-atop';context.fillStyle=tint;context.fillRect(0,0,texture.width,texture.height);context.restore();}
       texture.refresh();
       this.dirtyChunks.delete(`${cx},${cy}`);
     }

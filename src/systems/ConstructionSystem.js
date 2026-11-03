@@ -58,7 +58,7 @@ export class ConstructionSystem {
         const actor=this.actor(id),assignment=this.assignments.get(id);
         if(!actor?.isAlive||(id!=='king'&&actor.profession!=='builder')){if(actor)this.release(actor);continue;}
         if(assignment&&this.atSite(actor,assignment)){
-          participants.push({id,speed:this.scene.skillSystem.efficiency(actor,'construction'),available:Math.min(delta,actor.availableWorkMs??0)});
+          participants.push({id,speed:this.scene.skillSystem.workEfficiency(actor,'construction'),available:Math.min(delta,actor.availableWorkMs??0)});
           if(id==='king'&&!this.kingWorking){this.kingWorking=true;this.scene.setStatus(`Král staví ${buildingDefinition(site).name}. Jiným příkazem práci přerušíš.`);}
           if(id!=='king'){actor.workState='Working';actor.workMessage=`Building ${buildingDefinition(site).name}`;}
         }
@@ -88,7 +88,7 @@ export class ConstructionSystem {
     for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=this.scene.terrainGrid[tile.y][tile.x];
     for(const [id,n]of Object.entries(refund))this.scene.inventory.add(id,n);this.revision++;this.onCancel(site,refund);return true;
   }
-  estimatedSeconds(site){const rate=this.activeBuilders(site).reduce((sum,p)=>sum+this.scene.skillSystem.efficiency(p.actor,'construction'),0);return rate?(site.construction.requiredWork-site.construction.workDone)/rate/1000:null;}
+  estimatedSeconds(site){const rate=this.activeBuilders(site).reduce((sum,p)=>sum+this.scene.skillSystem.workEfficiency(p.actor,'construction'),0);return rate?(site.construction.requiredWork-site.construction.workDone)/rate/1000:null;}
   exportState(){const king=this.assignments.get('king');return {nextId:Math.max(this.nextId,Math.max(0,...this.scene.buildings.map(b=>b.id))+1),kingSiteId:king?.siteId??null,kingGoal:king?.goal?{...king.goal}:null};}
   importState(data){
     this.sites=new Map(this.scene.buildings.filter(b=>!buildingIsComplete(b)).map(b=>[b.id,b]));this.assignments.clear();this.nextId=data?.nextId??Math.max(0,...this.scene.buildings.map(b=>b.id))+1;

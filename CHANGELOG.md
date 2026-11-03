@@ -6,6 +6,8 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Experience five-day seasons and daily weather that affect crop growth, with autumn foliage and snow-covered winter landscapes.
+- Feed the king and villagers from stored apples, bread and meat; track food supply, hunger and its effects on work and settlement.
 - Build Mills, Bakeries and 200-unit Granaries; Millers and Bakers physically collect inputs, share production work and return finished flour and bread to storage.
 - Manage automatic production, storage contents and reservations, with 20-unit worker loads, a 30-unit camp fallback and persistent in-transit supplies.
 - Build Farmhouses, Wheat Fields and Orchards, and assign up to three Farmers to each Farmhouse.

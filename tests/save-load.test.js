@@ -42,7 +42,7 @@ function scene(terrain=Array.from({length:100},()=>Array(100).fill(0))){
       setZoom(z){this.zoom=z;return this;},centerOn(x,y){this.scrollX=x-this.width/2;this.scrollY=y-this.height/2;return this;},preRender(){}}},
   };
   s.player=view('king',tileCenter({x:50,y:50}));s.character=new PlayerController(s,s.player,{x:50,y:50});
-  s.gameTime=new GameTimeSystem();s.foodSystem=new FoodSystem(s.inventory,objectRegistry.require('meat'));
+  s.gameTime=new GameTimeSystem();s.foodSystem=new FoodSystem(s.inventory,objectRegistry.require('meat'),()=>{},{time:s.gameTime});
   s.pathWear=new PathWearSystem({map:s.map,terrain:s.terrainGrid,time:s.gameTime});
   s.activities=new GameActivityBus();s.experienceSystem=new ExperienceSystem(s.activities);
   s.equipment=new EquipmentSystem(s.character,objectRegistry,s.inventory);s.production=new ProductionSystem(s.gameTime,s.inventory,()=>s.buildings);

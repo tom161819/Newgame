@@ -56,6 +56,7 @@ const descriptions={
 };
 export async function releaseMetadata(directory,commit,subject){
   const signatures=[
+    ['src/systems/SeasonSystem.js','Roční období, počasí a potrava'],
     ['src/systems/FoodProductionSystem.js','Výroba a skladování potravin'],
     ['src/systems/FarmingSystem.js','Zemědělství a sady'],
     ['src/ui/ChangelogPanel.js','Verzování a Changelog'],

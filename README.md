@@ -190,7 +190,7 @@ Při nové hře vzniknou tři zajíci, tři srny a tři divočáci na různých 
 
 Kliknutí na zvíře zahájí pronásledování se změnami cesty podle pohybu cíle. Souboj začne až ze sousedství, bez teleportace. Cíl postupně ztrácí HP a při napadení útočí zpět. Jiný klik lov i odvetný útok daného zvířete zruší. Zajíc zanechá balíček 5 masa, srna 10 a divočák 15. Odměna se nepřipíše automaticky: balíček zůstane ležet až do ručního sběru. Stejné suroviny na jednom políčku se sloučí.
 
-Každých 60 sekund aktivní hry se spotřebuje jedno maso, nejvýše do nuly. Horní lišta ukazuje zbývající čas a nenápadné Out of food; hlad zatím nemá žádné další následky. Přehled knihovny nepozastavuje běžící hru.
+Jediný centrální Food System průběžně spotřebovává dvě porce za den pro krále a jednu pro každého živého poddaného. Nejprve používá Apple, pak Bread a Meat ze skutečně dostupných skladových zásob. Horní lišta ukazuje denní spotřebu a Food shortage s počtem nenasycených obyvatel. Přehled knihovny nepozastavuje běžící hru.
 
 ## Dohled a kůň
 
@@ -323,7 +323,7 @@ Dokončené změny zapisuj anglicky do Unreleased. Číslované vydání se při
 
 Farmhouse (2 × 2, 10 Stone) zaměstná tři existující Farmáře v rádiusu 15 políček. Wheat Field (3 × 3, 3 Stone) roste dva herní dny a poskytuje 8 Wheat; Orchard (3 × 3, 6 Stone) roste tři dny a poskytuje 6 Apple. Všechny objekty se staví původními blueprinty. Dokončenými pozemky lze procházet; rozestavěné pozemky blokují pohyb a nerostou.
 
-Rostliny rostou i bez obsluhy, ale sklizeň vyžaduje rezervovaný pozemek, fyzický příchod farmáře a aktivní práci. Farming zrychluje pouze tuto práci, nikoli biologický růst. XP a suroviny vznikají jednou za sklizeň. Růstové fáze a rozpracovaná sklizeň se obnovují Save/Load; starší schémata 1/2 se migrují na schéma 3. Verze hry zůstává nezávisle určená package.json. Apple je jedlé v původním jediném minutovém potravinovém cyklu, Wheat se přímo nekonzumuje.
+Rostliny rostou i bez obsluhy, ale sklizeň vyžaduje rezervovaný pozemek, fyzický příchod farmáře a aktivní práci. Farming zrychluje pouze tuto práci, nikoli biologický růst. XP a suroviny vznikají jednou za sklizeň. Růstové fáze a rozpracovaná sklizeň se obnovují Save/Load. Verze hry zůstává nezávisle určená package.json. Apple je jedlé, Wheat se přímo nekonzumuje. Základní délku růstu dále upravují roční období a počasí.
 
 ## Výroba a skladování potravin
 
@@ -333,4 +333,14 @@ Granary (3 × 3, 10 Stone) ukládá nejvýše 200 jednotek Meat, Wheat, Flour, B
 
 Farmáři odnášejí sklizeň do skladu; mlynáři a pekaři fyzicky převážejí vstupy i výstupy. Pracovník unese nejvýše 20 jednotek. Sklad, země, náklad a omezené výrobní zásobníky jsou různé stavy stejných surovin. Horní inventář ukazuje odvozené dostupné skladové zásoby po odečtení rezervací; Resources & Storage a kliknutí na sýpku ukazují fyzický obsah a kapacitu. Suroviny v nákladu nebo výrobním zásobníku se zde znovu nezapočítávají.
 
-Blueprinty musejí být fyzicky dokončené před zaměstnáváním, skladováním nebo výrobou. Plný sklad zastaví nové sklizně a výrobní dávky. Přerušené dodávky zachovají náklad; změna profese či úmrtí zanechá skutečný drop. Save Schema 4 zachovává sklady, rezervace, náklady i jednou spotřebované vstupy rozpracovaných dávek. Schémata 1–3 se migrují bez opakovaného převodu zásob, změny talentů či XP; nové skilly začínají na levelu 1. Bread a Apple jsou jedlé v jediném původním potravinovém cyklu, Wheat a Flour jedlé nejsou.
+Blueprinty musejí být fyzicky dokončené před zaměstnáváním, skladováním nebo výrobou. Plný sklad zastaví nové sklizně a výrobní dávky. Přerušené dodávky zachovají náklad; změna profese či úmrtí zanechá skutečný drop. Save/Load zachovává sklady, rezervace, náklady i jednou spotřebované vstupy rozpracovaných dávek. Starší hry se migrují bez opakovaného převodu zásob, změny talentů či XP; nové skilly začínají na levelu 1. Bread a Apple jsou jedlé, Wheat a Flour jedlé nejsou.
+
+## Sezóny, počasí a jídlo
+
+Spring, Summer, Autumn a Winter trvají po pěti herních dnech; rok má 20 dnů. Délku dne určuje Game Setup (60/120/240 sekund). Denní počasí se losuje z rozdílných sezónních pravděpodobností. Sezónní růst 1,20 / 1,30 / 1,00 / 0,00 se násobí počasím Sunny 1,10, Rainy 1,15, Drought 0,65 a Frost 0,30. V zimě zůstává růst nulový a rozpracované obilí pokračuje na jaře. Sady na jaře dosáhnou kvetení, ovoce dozrává a sklízí se pouze v létě a na podzim; zima zachová postup a zobrazí bezlisté stromy. Zásoby se při změně sezóny nemažou.
+
+Král jí dvakrát a každý živý poddaný jednou během herního dne. Porce jsou celé jednotky Apple → Bread → Meat. Náklad, potraviny na zemi, výrobní zásobníky ani rezervované zásoby se současně nekonzumují. Nově příchozí poddaný začíná vlastní průběžnou jídelní fázi. Starý minutový časovač masa již neběží.
+
+Nevyřízené jídlo označí obyvatele za nenasyceného. Nenasycení poddaní pracují s 80 % své běžné pracovní efektivity; bojové statistiky, rychlost chůze a regenerace krále se nemění. Doplněné jídlo nejprve nasytí hladové obyvatele, bez hromadění neomezeného dluhu jídla. Nedostatečné zásoby snižují atraktivitu království ze 100 na 60 a snižují šanci usazení v původní denní migrační smyčce. Hlad nikoho automaticky nezabije ani nevyžene.
+
+Food Economy ukazuje dostupné porce, denní spotřebu, skutečnou produkci jedlých potravin za posledních pět dnů, počet nenasycených, sezónu, počasí a atraktivitu. Odhad dnů zásob používá pouze současné dostupné skladové jídlo. Save Schema 5 obnovuje počasí, kalendář, jídelní fáze, hlad, statistiky i růst bez nového losování, duplicitní spotřeby nebo další sklizně. Schémata 1–4 dostanou bezpečné sezónní výchozí hodnoty a zachovají dosavadní zásoby i fázi starého potravinového cyklu bez okamžitého stržení porcí.

@@ -12,11 +12,11 @@ export const resources = [
     id:'meat',name:'Meat',inventoryLabel:'Meat',symbol:'🥩',inventoryOrder:20,quantityNames:['maso','masa','masa'],
     category:'resource',sprite:'/assets/resources/meat/meat.svg',width:1,height:1,
     walkable:true,collectible:true,buildable:false,cost:{},interactions:['collect'],
-    description:'Maso z ulovené zvěře. Množství je uložené v každém balíčku a připíše se až po sebrání.',
+    description:'Jedlá potrava z ulovené zvěře. Zásoby jsou dostupné po doručení do skladu.',edible:true,
     renderMode:'sprite',origin:{x:.5,y:.75},visualHeight:24,
     visual:{displayWidth:28,displayHeight:28},depth:{offset:.08},
     shadow:{baked:false,x:0,y:3,width:28,height:11,color:0x30291c,alpha:.3},
-    consumption:{amount:1,interval:60000},
+    consumption:{amount:1,interval:60000}, // Legacy save phase; active meals use the central daily Food System.
   },
   {
     id:'gold',name:'Gold',inventoryLabel:'Gold',symbol:'🪙',inventoryOrder:0,quantityNames:['Gold','Gold','Gold'],

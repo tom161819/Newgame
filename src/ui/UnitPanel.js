@@ -24,7 +24,7 @@ export class UnitPanel {
     const values={hp:`${format(u.currentHP)} / ${u.maxHP}`,dps:format(u.attackDPS),armor:`${format(u.armor)} %`,totalXP:format(e.totalXP)};
     for(const [key,value]of Object.entries(values))document.querySelector(`[data-unit-stat="${key}"]`).textContent=value;
     const worker=s.workerSystem?.workers.has(u.id);document.querySelector('#unit-job-controls').hidden=!worker;
-    if(worker){this.jobSelect.value=u.profession;document.querySelector('#unit-profession').textContent=JOBS[u.profession].name;document.querySelector('#unit-work-state').textContent=`${u.workState}${u.workMessage?` · ${u.workMessage}`:''}`;
+    if(worker){this.jobSelect.value=u.profession;document.querySelector('#unit-profession').textContent=JOBS[u.profession].name;document.querySelector('#unit-work-state').textContent=`${u.workState}${u.workMessage?` · ${u.workMessage}`:''}${s.foodSystem.workMultiplier(u)<1?' · Hungry (−20% work efficiency)':''}`;
       document.querySelector('#unit-wage').textContent=`${s.wageSystem.dailyWage(u).toFixed(2)} Gold/day`;
       document.querySelector('#unit-talent').textContent=`${TALENTS[u.naturalTalent]} · +${TALENT_XP_BONUS*100} % ${SKILLS[u.naturalTalent]} XP`;
       document.querySelector('#unit-unpaid').textContent=`Unpaid wages: ${s.wageSystem.unpaid(u).toFixed(2)} Gold`;

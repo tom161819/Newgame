@@ -1,7 +1,8 @@
-import { FARMING_RULES,cropStage } from '../data/farming.js';
+import { FARMING_RULES } from '../data/farming.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
 import { WORK_RULES } from '../data/jobs.js';
+import { seasonalCropStage } from '../data/seasons.js';
 
 export class FarmingSystem {
   constructor(scene,{growthModifier=()=>1,onHarvest=null}={}) {
@@ -9,6 +10,7 @@ export class FarmingSystem {
     this.clocks=Object.fromEntries(Object.keys(FARMING_RULES.crops).map(id=>[id,0]));
     this.records=new Map();this.refreshElapsed=0;
     this.unsubscribe=scene.gameTime.onAdvance(delta=>this.advanceGrowth(delta));
+    if(scene.seasons){this.unsubscribeBefore=scene.seasons.onBeforeChange(()=>this.refreshSeason());this.unsubscribeSeason=scene.seasons.onChange(()=>this.refreshSeason());}
     for(const building of scene.buildings)this.register(building);
   }
   register(building) {
@@ -20,13 +22,15 @@ export class FarmingSystem {
   sync(building) {
     const record=this.register(building);if(!record)return null;
     const spec=buildingDefinition(building).crop,previous=record.stage;
-    record.growthDays=Math.min(spec.growthDays,record.growthDays+Math.max(0,this.clocks[building.type]-record.lastClock));
+    const ceiling=building.type==='orchard'&&this.scene.seasons?.season==='Spring'?spec.growthDays/3:spec.growthDays;
+    record.growthDays=Math.max(record.growthDays,Math.min(ceiling,record.growthDays+Math.max(0,this.clocks[building.type]-record.lastClock)));
     if(spec.growthDays-record.growthDays<1e-8)record.growthDays=spec.growthDays;
-    record.lastClock=this.clocks[building.type];record.stage=cropStage(record.growthDays,spec.growthDays);
+    record.lastClock=this.clocks[building.type];record.stage=seasonalCropStage(building.type,record.growthDays,spec.growthDays,this.scene.seasons?.season);
     if(previous!==record.stage)this.paint(building,record);
     return record;
   }
-  paint(building,record=this.records.get(building.id)){this.scene.towerViews.get(building.id)?.setGrowth?.(record.stage);}
+  paint(building,record=this.records.get(building.id)){const view=this.scene.towerViews.get(building.id);view?.setSeason?.(this.scene.seasons?.season??'Spring');view?.setGrowth?.(record.stage);}
+  refreshSeason(){for(const record of this.records.values()){const building=this.building(record.buildingId);if(building){this.sync(building);this.paint(building,record);}}}
   advanceGrowth(delta) {
     if(this.scene.gameOver)return;
     for(const id of Object.keys(this.clocks)){
@@ -36,7 +40,7 @@ export class FarmingSystem {
     this.refreshElapsed+=delta;
     if(this.refreshElapsed>=FARMING_RULES.refreshInterval){this.refreshElapsed%=FARMING_RULES.refreshInterval;for(const record of this.records.values()){const building=this.building(record.buildingId);if(building)this.sync(building);}}
   }
-  ripe(building){const record=this.sync(building);return record&&record.growthDays>=buildingDefinition(building).crop.growthDays;}
+  ripe(building){const record=this.sync(building);return record&&record.growthDays>=buildingDefinition(building).crop.growthDays&&(this.scene.seasons?.canHarvest(building.type)??true);}
   inRange(worker,building) {
     const home=this.scene.workplaceSystem?.building(worker);if(home?.type!=='farmhouse')return false;
     const origin={x:home.x+buildingDefinition(home).width/2,y:home.y+buildingDefinition(home).height/2};
@@ -77,7 +81,7 @@ export class FarmingSystem {
       const building=this.building(task.targetId),record=this.records.get(task.targetId);
       if(!building||record?.reservedBy!==worker.id||record.cycle!==task.cycle||!this.inRange(worker,building)||!this.scene.workerSystem.ai.atGoal(worker,task.goal))continue;
       const available=Math.min(delta,worker.availableWorkMs??0,Math.max(0,this.scene.gameTime.totalElapsed-task.startedAt));
-      task.progressMs+=available*this.scene.skillSystem.efficiency(worker,'farming');
+      task.progressMs+=available*this.scene.skillSystem.workEfficiency(worker,'farming');
       worker.workState='Working';worker.workMessage=`Harvesting ${buildingDefinition(building).name}`;
       if(task.progressMs>=buildingDefinition(building).crop.workDuration)this.harvest(worker,building,record);
     }
@@ -91,6 +95,7 @@ export class FarmingSystem {
     this.scene.workerSystem.ai.cancel(worker);worker.workState='Searching for Work';
     const result={worker,building,resource:spec.resource,amount:spec.yield,cycle};
     if(this.onHarvest)this.onHarvest(result);else this.scene.inventory.add(spec.resource,spec.yield);
+    this.scene.foodSystem?.recordProduction(spec.resource,spec.yield,`harvest-${building.id}-${cycle}`);
     this.scene.activities.emit('cropHarvested',{actor:worker,objectType:building.type,quantity:1,objectId:building.id,cycle},`harvest-${building.id}-${cycle}`);
     this.paint(building,record);this.scene.updateInventory();return true;
   }
@@ -100,5 +105,5 @@ export class FarmingSystem {
     else for(const building of this.scene.buildings)this.register(building);
     for(const record of this.records.values()){const building=this.building(record.buildingId);if(building)this.paint(building,record);}
   }
-  destroy(){this.unsubscribe();this.records.clear();}
+  destroy(){this.unsubscribe();this.unsubscribeBefore?.();this.unsubscribeSeason?.();this.records.clear();}
 }
