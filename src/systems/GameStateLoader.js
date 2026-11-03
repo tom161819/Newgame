@@ -117,6 +117,7 @@ export function loadGameState(scene,input){
   scene.pathWear?.importState(state.pathWear);
   for(const t of state.spawners)scene.resourceSpawners.find(s=>s.definition.id===t.id).importState(t);
   scene.settingsPanel.applySettings(state.settings);scene.fog.setEnabled(state.settings.fogOfWar);
+  scene.fog.setExplorationEnabled?.(state.settings.explorationMode??true);
   scene.terrain?.setDebug(!!state.settings.pathWearDebug);
   scene.events?.emit('buildings:changed');
   scene.updateInventory();scene.worldCamera.syncSize?.();

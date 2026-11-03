@@ -9,6 +9,7 @@ import { projectBase } from './archive-lib.mjs';
 import { buildingMenuSmoke,buildingUnlockGameplaySmoke } from './building-menu-smoke.mjs';
 import { seasonsMenuSmoke } from './seasons-menu-smoke.mjs';
 import { stageArchivedSnapshots } from './stage-archive.mjs';
+import { explorationMenuSmoke } from './fog-smoke.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
 const base=projectBase(args.find(a=>a.startsWith('--base='))?.slice(7)??'/Newgame/'),dist=path.join(root,'dist');
@@ -68,6 +69,7 @@ try{
   if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full'))await page.locator('#setup-seasons').uncheck();}
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
+  if(args.includes('--full')||args.includes('--fog'))await explorationMenuSmoke(page);
   if(args.includes('--full'))await seasonsMenuSmoke(page);
   await buildingMenuSmoke(page);
   const point=await page.evaluate(()=>{

@@ -3,6 +3,8 @@ import { tileCenter, worldToGrid, gridToWorld } from './isometric.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { PATH_WEAR } from '../data/pathWear.js';
 import { canStep } from './pathfinding.js';
+import { VISIBILITY, FOG_STYLE } from '../systems/FogOfWarSystem.js';
+import { MEMORY_DIRECTIONS } from '../systems/MapMemory.js';
 
 const CHUNK_SIZE = 10;
 
@@ -27,19 +29,21 @@ export class TerrainRenderer {
   setDebug(value){this.debugEnabled=!!value;this.lastView='';if(!value)this.debugGraphics.clear();}
   setSeason(season){if(season===this.season)return;this.season=season;for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
   invalidateArea(tiles){
+    if(!tiles.length)return;
     for(const tile of tiles)for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
       const x=tile.x+dx,y=tile.y+dy;if(x>=0&&x<COLUMNS&&y>=0&&y<ROWS)this.dirtyChunks.add(`${Math.floor(x/CHUNK_SIZE)},${Math.floor(y/CHUNK_SIZE)}`);
     }
     this.lastView='';
   }
   drawConnections(context,x,y,left,top){
-    const tile={x,y},level=this.wear?.level(tile)??0;if(!level)return;
+    const tile={x,y},remembered=this.fog?.enabled&&this.memory,level=remembered?this.tileData(tile)[1]:this.wear?.level(tile)??0;if(!level)return;
     const visual=this.registry.require(PATH_WEAR.terrainIds[level]).visual,center=tileCenter(tile);
     context.save();context.translate(center.x-left,center.y-top);
     context.beginPath();context.moveTo(-32,0);context.lineTo(0,-16);context.lineTo(32,0);context.lineTo(0,16);context.closePath();context.clip();context.scale(1,.5);context.lineCap='round';
     for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
-      if(!dx&&!dy)continue;const neighbor={x:x+dx,y:y+dy},other=this.wear.level(neighbor);
-      if(!other||!canStep(this.scene.map,tile,neighbor))continue;
+      if(!dx&&!dy)continue;const neighbor={x:x+dx,y:y+dy},other=remembered?(this.memory.terrain.get(neighbor.y*this.fog.width+neighbor.x)?.[1]??0):this.wear.level(neighbor);
+      const bit=MEMORY_DIRECTIONS.findIndex(([nx,ny])=>nx===dx&&ny===dy);
+      if(!other||(remembered?!((this.tileData(tile)[3]??0)&(1<<bit)):!canStep(this.scene.map,tile,neighbor)))continue;
       const neighborVisual=this.registry.require(PATH_WEAR.terrainIds[other]).visual,width=Math.min(visual.pathWidth,neighborVisual.pathWidth);
       const end={x:(dx-dy)*16,y:(dx+dy)*16},bend=((terrainHash(x+dx,y+dy)%5)-2)*.35;
       const line=()=>{context.beginPath();context.moveTo(0,0);context.quadraticCurveTo(end.x*.5+bend,end.y*.5-bend,end.x,end.y);context.stroke();};
@@ -48,6 +52,8 @@ export class TerrainRenderer {
     }
     context.restore();
   }
+
+  tileData(tile){return this.memory?.terrainAt(tile,this.map,this.wear,this.season)??[this.map[tile.y]?.[tile.x]??0,this.wear?.level(tile)??0,this.season];}
 
   chunkTexture(cx, cy) {
     const key = `terrain-chunk-${cx}-${cy}`;
@@ -62,14 +68,20 @@ export class TerrainRenderer {
       for (let y = cy * CHUNK_SIZE; y < (cy + 1) * CHUNK_SIZE; y++) {
         for (let x = cx * CHUNK_SIZE; x < (cx + 1) * CHUNK_SIZE; x++) {
           const point = tileCenter({ x, y });
-          const entry=this.wear?this.wearTextures[this.wear.level({x,y})]:this.groundTextures[terrainHash(x,y)%this.groundTextures.length];
+          const tile={x,y},state=this.fog?.displayState(tile)??VISIBILITY.VISIBLE,[,level,season]=this.tileData(tile);
+          const polygon=()=>{context.beginPath();context.moveTo(point.x-left-32,point.y-origin.y);context.lineTo(point.x-left,point.y-origin.y-16);context.lineTo(point.x-left+32,point.y-origin.y);context.lineTo(point.x-left,point.y-origin.y+16);context.closePath();};
+          if(state===VISIBILITY.UNEXPLORED){context.fillStyle='#000';polygon();context.fill();continue;}
+          const entry=this.wear?this.wearTextures[level]:this.groundTextures[terrainHash(x,y)%this.groundTextures.length];
           const frame=this.scene.textures.get(entry.key).get(entry.frame);
+          context.save();
+          if(state===VISIBILITY.EXPLORED)context.filter=`grayscale(${(1-FOG_STYLE.saturation)*100}%) brightness(${(this.fog?.brightness(tile)??FOG_STYLE.brightness)*100}%)`;
           context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,point.x-left-32,point.y-origin.y-16,64,32);
           if(this.wear)this.drawConnections(context,x,y,left,origin.y);
+          const tint={Spring:'rgba(95,145,65,.08)',Summer:'rgba(185,159,70,.09)',Autumn:'rgba(158,105,45,.17)',Winter:'rgba(232,237,220,.83)'}[season];
+          if(tint){context.globalCompositeOperation='source-atop';context.fillStyle=tint;polygon();context.fill();}
+          context.restore();
         }
       }
-      const tint={Spring:'rgba(95,145,65,.08)',Summer:'rgba(185,159,70,.09)',Autumn:'rgba(158,105,45,.17)',Winter:'rgba(232,237,220,.83)'}[this.season];
-      if(tint){context.save();context.globalCompositeOperation='source-atop';context.fillStyle=tint;context.fillRect(0,0,texture.width,texture.height);context.restore();}
       texture.refresh();
       this.dirtyChunks.delete(`${cx},${cy}`);
     }
@@ -112,7 +124,11 @@ export class TerrainRenderer {
     }
   }
 
-  update(camera,fog=null) {
+  update(camera,fog=null,memory=this.memory) {
+    this.fog=fog;this.memory=memory;
+    const mode=`${fog?.enabled}:${fog?.explorationEnabled}`;
+    if(mode!==this.fogMode){this.fogMode=mode;for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
+    if(fog&&this.fogRevision!==fog.revision){this.fogRevision=fog.revision;this.invalidateArea([...fog.added,...fog.removed].map(index=>({x:index%fog.width,y:Math.floor(index/fog.width)})));}
     const view = camera.worldView;
     const cacheKey = [Math.floor(view.x / 16), Math.floor(view.y / 16), Math.ceil(view.width), Math.ceil(view.height),fog?.signature??'',this.wear?.levelRevision??0,this.debugEnabled?this.wear?.revision:0,this.debugEnabled].join(',');
     if (cacheKey === this.lastView) return;
@@ -136,12 +152,13 @@ export class TerrainRenderer {
         this.debugGraphics.fillStyle(colors[level],level ? .36 : .08);this.debugGraphics.fillPoints([{x:p.x-31,y:p.y},{x:p.x,y:p.y-15},{x:p.x+31,y:p.y},{x:p.x,y:p.y+15}],true);
       }
       neededChunks.add(`${Math.floor(x/CHUNK_SIZE)},${Math.floor(y/CHUNK_SIZE)}`);
-      if (!this.map[y][x]) continue;
-      if(fog&&!fog.isVisibleTile({x,y}))continue;
+      const state=fog?.displayState({x,y})??VISIBILITY.VISIBLE;
+      if(!this.tileData({x,y})[0]||state===VISIBILITY.UNEXPLORED)continue;
+      if(fog?.enabled&&!fog.isInSightTile({x,y})&&!fog.explored[y*fog.width+x])continue;
       const key=`${x},${y}`; visible.add(key);
-      if(this.tiles.has(key))continue;
+      if(this.tiles.has(key)){this.tiles.get(key).setTint(state===VISIBILITY.EXPLORED?0x4d504d:0xffffff);continue;}
       const wall=this.wallPool.pop()??this.scene.add.image(0,0,this.wallTexture).setOrigin(this.outcrop.origin?.x??0.5,this.outcrop.origin?.y??1);
-      wall.setPosition(p.x,p.y).setDepth(p.y+(this.outcrop.depth?.offset??0)).setVisible(true);
+      wall.setPosition(p.x,p.y).setDepth(p.y+(this.outcrop.depth?.offset??0)).setTint(state===VISIBILITY.EXPLORED?0x4d504d:0xffffff).setVisible(true);
       this.tiles.set(key,wall);
     }
     for(const [key,tile] of this.tiles) if(!visible.has(key)) {

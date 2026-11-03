@@ -25,6 +25,7 @@
         </fieldset>
         <details class="setup-advanced"><summary>Advanced Settings</summary><div class="advanced-fields">
           <label for="setup-fog">Fog of War <input id="setup-fog" name="fogOfWar" type="checkbox" role="switch" checked/></label>
+          <label for="setup-exploration">Exploration <input id="setup-exploration" name="explorationMode" type="checkbox" role="switch" checked/></label>
           <label for="setup-seasons" title="Disable seasonal changes and keep permanent summer. Game days continue normally.">Seasons <input id="setup-seasons" name="seasonsEnabled" type="checkbox" role="switch" checked/></label>
           <label for="setup-castle">Starting Castle <input id="setup-castle" name="startingCastle" type="checkbox" role="switch"/></label>
           <label for="setup-day">Day Length</label><select id="setup-day" name="dayLengthSeconds"><option value="60">Fast · 60 sekund</option><option value="120" selected>Normal · 120 sekund</option><option value="240">Slow · 240 sekund</option></select>
@@ -70,6 +71,7 @@
     <aside id="settings-panel" class="settings-panel" aria-labelledby="settings-title" aria-hidden="true" inert>
       <div class="settings-heading"><h2 id="settings-title">Settings</h2><button id="close-settings" type="button" aria-label="Zavřít nastavení">×</button></div>
       <label class="setting-row" for="fog-toggle"><span>Fog of War</span><input id="fog-toggle" type="checkbox" role="switch" /></label>
+      <label class="setting-row" for="exploration-toggle"><span>Exploration</span><input id="exploration-toggle" type="checkbox" role="switch" checked/></label>
       <p>Omezí viditelnost objektů podle dohledu krále. Terén zůstává viditelný.</p>
       <label class="setting-row" for="seasons-toggle" title="Disable seasonal changes and keep permanent summer. Game days continue normally."><span>Seasons</span><input id="seasons-toggle" type="checkbox" role="switch" checked/></label>
       <p>OFF keeps permanent summer and remembers the seasonal cycle. Weather and game days continue.</p>

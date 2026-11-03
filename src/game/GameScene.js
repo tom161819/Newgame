@@ -70,6 +70,7 @@ import { KingdomAttractivenessSystem } from '../systems/KingdomAttractivenessSys
 import { FoodEconomyPanel } from '../ui/FoodEconomyPanel.js';
 import { KingLogisticsSystem } from '../systems/KingLogisticsSystem.js';
 import { BuildingUnlockManager } from '../systems/BuildingUnlockManager.js';
+import { MapMemory } from '../systems/MapMemory.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -111,7 +112,7 @@ export class GameScene extends Phaser.Scene {
     this.inventory=new Inventory();if(!this.loadState)this.inventory.add('gold',this.gameSettings.startingGold);
     this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);this.regeneration=new RegenerationSystem();
     this.seasons=new SeasonSystem(this.gameTime,{enabled:this.gameSettings.seasonsEnabled,initialWeather:this.loadState?(this.loadState.seasons?.weather??'Sunny'):undefined});this.terrain.setSeason(this.seasons.season);
-    this.unsubscribeSeason=this.seasons.onChange(()=>{const changed=this.terrain.season!==this.seasons.season;this.terrain.setSeason(this.seasons.season);if(changed&&this.worldCamera)this.terrain.update(this.cameras.main,this.fog);this.updateTimeDisplay();this.settingsPanel?.syncSeasons();});
+    this.unsubscribeSeason=this.seasons.onChange(()=>{const changed=this.terrain.season!==this.seasons.season;this.terrain.setSeason(this.seasons.season);if(changed&&this.worldCamera){this.terrain.invalidateArea(this.mapMemory.observeTerrain(this.terrainGrid,this.pathWear,this.seasons.season,this.map));this.terrain.update(this.cameras.main,this.fog,this.mapMemory);}this.updateTimeDisplay();this.settingsPanel?.syncSeasons();});
     this.activities=new GameActivityBus();this.experienceSystem=new ExperienceSystem(this.activities);
     this.skillSystem=new SkillSystem(this);
     this.pathWear=new PathWearSystem({map:this.map,terrain:this.terrainGrid,time:this.gameTime});this.terrain.setPathWear(this.pathWear);
@@ -158,9 +159,11 @@ export class GameScene extends Phaser.Scene {
     this.combat.on('damage',(unit,amount,attacker)=>{this.combatFeedback.hit(unit);this.skillSystem.creditDamage(attacker,unit,amount);});
     this.combat.on('death',(unit,killer)=>this.onUnitDeath(unit,killer));
     this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
-    this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.terrain.setDebug(settings.pathWearDebug);this.refreshVisibility();},open=>this.pauseManager.set('settings',open),{seasons:this.seasons,onSeasonsChange:enabled=>{this.gameSettings=gameSettings({...this.gameSettings,seasonsEnabled:enabled});this.seasons.setEnabled(enabled);}});
+    this.mapMemory=new MapMemory(this.fog);
+    this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.fog.setExplorationEnabled(settings.explorationMode);this.terrain.setDebug(settings.pathWearDebug);this.refreshVisibility();},open=>this.pauseManager.set('settings',open),{seasons:this.seasons,onSeasonsChange:enabled=>{this.gameSettings=gameSettings({...this.gameSettings,seasonsEnabled:enabled});this.seasons.setEnabled(enabled);}});
     this.fog.setEnabled(this.settingsPanel.settings.fogOfWar);
-    if(!this.loadState){this.settingsPanel.applySettings({...this.settingsPanel.settings,fogOfWar:this.gameSettings.fogOfWar});this.fog.setEnabled(this.gameSettings.fogOfWar);}
+    if(!this.loadState){this.settingsPanel.applySettings({...this.settingsPanel.settings,fogOfWar:this.gameSettings.fogOfWar,explorationMode:this.gameSettings.explorationMode});this.fog.setEnabled(this.gameSettings.fogOfWar);}
+    this.fog.setExplorationEnabled(this.settingsPanel.settings.explorationMode);
     this.terrain.setDebug(this.settingsPanel.settings.pathWearDebug);
     this.foodSystem=new FoodSystem(this.inventory,this.objectRegistry.require('meat'),()=>this.updateInventory(),{time:this.gameTime,scene:this,subscribe:true});
     this.attractiveness=new KingdomAttractivenessSystem(this);this.foodEconomyPanel=new FoodEconomyPanel(this);
@@ -538,7 +541,9 @@ export class GameScene extends Phaser.Scene {
   refreshVisibility(){
     if(this.inventoryRevision!==this.foodStorage.revision){this.inventoryRevision=this.foodStorage.revision;this.updateInventory();}
     document.querySelector('#path-wear-info').hidden=!this.settingsPanel.settings.pathWearDebug;
-    this.fog.update();this.updateMountUI();this.terrain.update(this.cameras.main,this.fog);
+    this.fog.update();this.updateMountUI();
+    this.terrain.invalidateArea(this.mapMemory.observeTerrain(this.terrainGrid,this.pathWear,this.seasons.season,this.map));
+    this.terrain.update(this.cameras.main,this.fog,this.mapMemory);
     const view=this.cameras.main.worldView;
     this.legacyStockpiles?.update(view,this.fog);
     this.player.setCargo?.(this.character.cargo);for(const worker of this.workerSystem?.liveWorkers()??[])worker.view.setCargo?.(worker.cargo);
