@@ -33,7 +33,7 @@ export class BuilderAI {
       }
       for(const goal of goals)choices.set(tileKey(goal),{goal,site});
     }
-    const route=findPathToAny(scene.workerSystem.navigationMap(worker),start,[...choices.values()].map(c=>c.goal));
+    const route=findPathToAny(scene.workerSystem.navigationMap(worker),start,[...choices.values()].map(c=>c.goal),scene.pathWear?.routingOptions(worker));
     if(!route){
       for(const site of new Set([...choices.values()].map(c=>c.site)))if(!findPathToAny(scene.map,start,system.goals(site,worker))){this.blocked.set(`${worker.id}:${site.id}`,system.revision);site.unreachableReason='Staveniště je pro některé stavitele nedostupné.';}
       return;

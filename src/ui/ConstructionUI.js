@@ -19,10 +19,10 @@ export class ConstructionUI {
     document.querySelector('#construction-name').textContent=buildingDefinition(site).name;
     document.querySelector('#construction-percentage').textContent=`${c.progress.toFixed(1)} % · ${constructionPhase(site)}`;document.querySelector('#construction-progress').value=c.progress;
     document.querySelector('#construction-builders').textContent=`Builders: ${active.length} working / ${CONSTRUCTION_RULES.maximumBuilders} slots · ${c.assignedBuilders.length} reserved`;
-    document.querySelector('#construction-eta').textContent=estimate==null?'Waiting for builders':`Remaining: ${Math.ceil(estimate)} s`;
-    document.querySelector('#construction-king-task').textContent=kingHere?(system.atSite(s.character,king)?'King: Building':'King: Travelling to construction site'):'King: Not assigned';
+    document.querySelector('#construction-eta').textContent=!system.materials.ready(site)?'Waiting for delivered materials':estimate==null?'Waiting for builders':`Remaining: ${Math.ceil(estimate)} s`;
+    document.querySelector('#construction-king-task').textContent=s.kingLogistics.workflowSiteId===site.id?'King: Delivering materials':kingHere?(system.atSite(s.character,king)?'King: Building':'King: Travelling to construction site'):'King: Not assigned';
     const ready=system.materials.ready(site),summary=system.materials.summary(site);
-    document.querySelector('#construction-materials').replaceChildren(...summary.map(row=>element('p','',`${s.objectRegistry.require(row.resource).name}: Required ${row.required} · Reserved ${row.reserved} · Carried ${row.carried} · Delivered ${row.delivered} · Missing ${row.missing}`)));
+    document.querySelector('#construction-materials').replaceChildren(...summary.map(row=>element('p','',`${s.objectRegistry.require(row.resource).name}: Required ${row.required} · Reserved ${row.reserved} · Carried ${row.carried} · On ground ${row.ground} · Delivered ${row.delivered} · Missing ${row.missing}`)));
     const delivery=document.querySelector('#construction-deliver');delivery.hidden=ready;delivery.disabled=s.kingLogistics.workflowSiteId===site.id;
     const button=document.querySelector('#construction-king-work');button.disabled=!ready||kingHere||c.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders;document.querySelector('#construction-king-stop').hidden=!kingHere;
     document.querySelector('#construction-refund').textContent=`Cancel refund: ${c.workDone>0?'50 % (rounded down)':'100 %'}`;document.querySelector('#construction-unreachable').textContent=site.unreachableReason??'';

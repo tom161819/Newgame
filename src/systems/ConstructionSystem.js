@@ -44,7 +44,7 @@ export class ConstructionSystem {
     if(site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders){this.scene.setStatus('Na staveništi není volné pracovní místo (3 / 3).');return false;}
     if(king.mountedHorse&&!this.scene.mountSystem.dismount())return false;
     const goals=this.goals(site,king).sort((a,b)=>octileDistance(king.tile,a)-octileDistance(king.tile,b));
-    const groundRoute=king.state==='ground'?findPathToAny(this.scene.map,king.nextTile??king.tile,goals):null;
+    const groundRoute=king.state==='ground'?findPathToAny(this.scene.map,king.nextTile??king.tile,goals,this.scene.pathWear?.routingOptions(king)):null;
     const candidates=groundRoute?[groundRoute.destination]:king.state==='ground'?[]:goals;
     for(const goal of candidates)if(this.reserve(site,king,goal)){
       if(king.command({kind:'move',goal,silent:true})){this.scene.worldCamera?.follow?.();site.unreachableReason='';this.scene.setStatus('Král jde na staveniště. Stavět začne až po příchodu.');return true;}

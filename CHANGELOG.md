@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Inspect available, reserved, carried, on-site, buffered and ground resources, see carried bundles, and physically collect or set down the king's stored supplies.
 - Deliver reserved building materials to construction sites with Haulers or the king before builders can begin; the king can supply a site over multiple trips.
 - Assign Haulers to Warehouses or Granaries to reserve and carry supplies, earn Logistics experience and increase their load from 20 to 38 units.
 - Start with a reachable 40-unit stockpile and build 200-unit Warehouses for construction materials; the king carries collected resources to storage before they become available.
@@ -18,9 +19,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Earn Farming experience for completed harvests, eat apples through the existing food cycle, and save growing crops and reserved work without duplicate harvests.
 
 ### Improved
+- Choose faster walking routes over worn paths while keeping diagonal corners safe and avoiding excessive detours.
 - Prefer Haulers for production deliveries while letting producers carry their own supplies when no carrier can serve them.
 - Preserve existing materials, in-transit loads and collection rewards when loading older kingdoms, without duplicating stock or experience.
 - Share cached crop textures while preserving per-tile depth so villagers can walk through fields and among fruit trees smoothly.
+
+### Fixed
+- Recover outdated delivery instructions on load while preserving cargo, construction allocations and earned experience.
 
 ## [0.1.0] - 2026-11-03
 

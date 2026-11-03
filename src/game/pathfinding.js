@@ -54,16 +54,18 @@ class MinHeap {
 
 // A* pro celou mapu i několik možných vstupů/výstupů věže.
 // Souřadnice a ceny jsou logické; kamera a izometrická projekce je neovlivňují.
-export function findPathToAny(map, start, goals) {
+export function findPathToAny(map, start, goals, {speedMultiplier=null,maxSpeed=1}={}) {
   if (!isWalkable(map, start.x, start.y)) return null;
   const width = map[0].length, length = width * map.length;
   const validGoals = goals.filter(p => isWalkable(map, p.x, p.y));
   if (!validGoals.length) return null;
   const targets = new Set(validGoals.map(p => p.y * width + p.x));
+  const maximum=Number.isFinite(maxSpeed)&&maxSpeed>=1?maxSpeed:1;
+  const speed=point=>{const value=speedMultiplier?.(point)??1;return Number.isFinite(value)&&value>0?Math.min(maximum,value):1;};
   const heuristic = point => {
     let best = Infinity;
     for (const goal of validGoals) best = Math.min(best, octileDistance(point, goal));
-    return best;
+    return best/maximum;
   };
   const costs = new Float64Array(length).fill(Infinity);
   const parents = new Int32Array(length).fill(-1);
@@ -88,7 +90,9 @@ export function findPathToAny(map, start, goals) {
       const to = { x: x + dx, y: y + dy };
       if (!canStep(map, { x, y }, to)) continue;
       const next = to.y * width + to.x;
-      const cost = costs[index] + (dx && dy ? Math.SQRT2 : 1);
+      // Center-to-center motion spends half the step in each tile, matching
+      // advanceMovement's real boundary-based speed changes.
+      const cost = costs[index] + (dx && dy ? Math.SQRT2 : 1)*.5*(1/speed({x,y})+1/speed(to));
       if (closed[next] || cost + EPSILON >= costs[next]) continue;
       costs[next] = cost; parents[next] = index;
       const h = heuristic(to);

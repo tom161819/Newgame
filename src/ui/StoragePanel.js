@@ -1,4 +1,5 @@
 import { element } from './objectLabels.js';
+import { cargoLabel,transportLabel,storageName } from './transportLabels.js';
 
 export class StoragePanel {
   constructor(scene){
@@ -6,28 +7,45 @@ export class StoragePanel {
     document.querySelector('#open-storage').addEventListener('click',()=>this.open(),options);
     document.querySelector('#close-storage').addEventListener('click',()=>this.close(),options);
     document.querySelector('#storage-king-deposit').addEventListener('click',()=>scene.kingLogistics?.startDelivery(this.building?.id??null),options);
+    document.querySelector('#storage-king-drop').addEventListener('click',()=>scene.kingLogistics?.dropCargo(),options);
     this.dialog.addEventListener('cancel',event=>{event.preventDefault();this.close();},options);
     this.dialog.addEventListener('close',()=>{if(!document.querySelector('dialog[open]'))scene.setGalleryInput(true);},options);
   }
-  open(building=null){this.building=building;this.signature=null;this.scene.setGalleryInput(false);this.dialog.showModal();this.refresh();}
+  open(building=null,locationId=null){this.building=building;this.locationId=locationId;this.signature=null;this.breakdownOpen=false;this.scene.setGalleryInput(false);this.dialog.showModal();this.refresh();}
+  breakdown(rows){
+    const details=element('details','resource-breakdown'),summary=element('summary','','Resource locations & reservations');details.open=this.breakdownOpen;details.append(summary);details.addEventListener('toggle',()=>{this.breakdownOpen=details.open;});
+    details.append(element('p','','Each unit is counted in exactly one location. Incoming capacity reservations are space, not extra resources.'));
+    for(const row of rows){
+      const section=element('section','resource-location-row'),dl=element('dl','resource-location-counts');section.dataset.breakdownResource=row.resource;section.append(element('h3','',`${this.scene.objectRegistry.require(row.resource).name} · Total ${row.total}`));
+      for(const [label,key]of [['Available in storage','freeStored'],['Reserved in storage','reservedStored'],['Carried','carried'],['Delivered to sites','sites'],['Production buffers','buffers'],['On ground','ground']]){const count=element('dd','',String(row[key]));count.dataset.resourceLocation=key;dl.append(element('dt','',label),count);}section.append(dl);details.append(section);
+    }return details;
+  }
   refresh(){
     if(!this.dialog.open)return;
-    const storage=this.scene.foodStorage,signature=JSON.stringify([storage.revision,this.scene.character.cargo,this.scene.workerSystem.liveWorkers().map(w=>[w.id,w.assignedWorkplaceId,w.workState,w.workMessage])]);if(this.signature===signature)return;this.signature=signature;
-    document.querySelector('#storage-title').textContent=this.building?.definition.name??'Resources & Storage';
-    document.querySelector('#storage-king-deposit').hidden=!this.scene.kingLogistics||!this.scene.character.cargo;
-    const locations=[...storage.locations.values()].filter(l=>storage.isStock(l)&&(!this.building||l.buildingId===this.building.id));
-    document.querySelector('#storage-details').replaceChildren(...locations.map(l=>{
-      const building=this.scene.buildings.find(b=>b.id===l.buildingId),section=element('section','storage-location'),title=element('h3','',building?`${building.definition.name} #${building.id}`:l.id==='legacy-materials'?'Legacy Stockpile':'Camp Storage');
+    const scene=this.scene,storage=scene.foodStorage,actors=[scene.character,...scene.workerSystem.liveWorkers()],breakdown=!this.building&&!this.locationId?storage.resourceBreakdown():null;
+    const signature=JSON.stringify([storage.revision,breakdown,actors.map(w=>[w.id,w.assignedWorkplaceId,w.workState,w.workMessage,w.cargo,w.workTask?.kind,w.skills?.logistics.level]),scene.kingLogistics.task,scene.character.state]);if(this.signature===signature)return;this.signature=signature;
+    document.querySelector('#storage-title').textContent=this.building?.definition.name??(this.locationId?storageName(scene,this.locationId):'Resources & Storage');
+    document.querySelector('#storage-king-deposit').hidden=!scene.kingLogistics||!scene.character.cargo;
+    const dropButton=document.querySelector('#storage-king-drop');dropButton.hidden=!scene.character.cargo;dropButton.disabled=scene.character.state!=='ground'||!!scene.character.nextTile;
+    const locations=[...storage.locations.values()].filter(l=>storage.isStock(l)&&(!this.building||l.buildingId===this.building.id)&&(!this.locationId||l.id===this.locationId));
+    const sections=locations.map(l=>{
+      const building=scene.buildings.find(b=>b.id===l.buildingId),section=element('section','storage-location'),title=element('h3','',storageName(scene,l.id));
       const used=storage.used(l),incoming=storage.incoming(l.id);
       section.append(title,element('p','',`Stored: ${used} / ${l.capacity} · Free: ${storage.room(l.id)} · Reserved incoming: ${incoming}`));
       if(l.legacyOverflow)section.append(element('p','',`Preserved legacy surplus: ${l.legacyOverflow}. New deliveries wait for room.`));
-      for(const resource of l.allowed)section.append(element('p','',`${this.scene.objectRegistry.require(resource).name}: ${l.stock[resource]??0} · Reserved: ${storage.reserved(l.id,resource)}`));
-      if(building?.definition.workplace?.profession==='hauler'){
-        const workers=this.scene.workplaceSystem.employees(building),button=element('button','','Manage Haulers');button.type='button';button.addEventListener('click',()=>{this.close();this.scene.workplacePanel.open(building);});
-        section.append(element('p','',`Haulers: ${workers.length} / ${building.definition.workplace.capacity}`),button);
+      for(const resource of l.allowed){
+        const row=element('p','',`${scene.objectRegistry.require(resource).name}: ${l.stock[resource]??0} · Reserved: ${storage.reserved(l.id,resource)} `),collect=element('button','','Collect with King');collect.type='button';collect.dataset.kingCollect=resource;collect.dataset.storageId=l.id;collect.disabled=!!scene.character.cargo||storage.free(l.id,resource)<1;
+        collect.addEventListener('click',()=>scene.kingLogistics.startPickup(l.id,resource));row.append(collect);section.append(row);
       }
-      return section;
-    }));
+      if(building?.definition.workplace?.profession==='hauler'){
+        const workers=scene.workplaceSystem.employees(building),button=element('button','','Manage Haulers');button.type='button';button.addEventListener('click',()=>{this.close();scene.workplacePanel.open(building);});
+        section.append(element('p','',`Haulers: ${workers.length} / ${building.definition.workplace.capacity}`));
+        for(const worker of workers)section.append(element('p','',`${worker.name} · ${cargoLabel(scene,worker)} · ${transportLabel(scene,worker)}`));section.append(button);
+      }
+      const tasks=actors.filter(actor=>{const t=actor===scene.character?scene.kingLogistics.task:actor.workTask;return t&&(t.sourceId===l.id||t.destinationId===l.id);});
+      section.append(element('h4','',`Active deliveries: ${tasks.length}`));for(const actor of tasks)section.append(element('p','',`${actor.name??actor.definition.name}: ${transportLabel(scene,actor)}`));return section;
+    });
+    document.querySelector('#storage-details').replaceChildren(...(breakdown?[this.breakdown(breakdown),...sections]:sections));
   }
   close(){this.dialog.close();this.scene.setGalleryInput(true);}
   destroy(){this.close();this.controller.abort();}

@@ -59,19 +59,19 @@ export function placeTower(options) {
   return result.error?result:{tower:result.building};
 }
 
-export function approachTower(map,start,building) { return findPathToAny(map,start,towerNeighbors(building)); }
-export function planGroundOrder(map,start,order) {
-  if(order.kind==='approachAnimal')return findPathToAny(map,start,adjacentTiles(order.animal,map));
-  if(order.kind==='enter')return approachTower(map,start,order.tower);
-  if(order.kind==='collect')return approachTower(map,start,order.resource);
-  if(order.kind==='openChest')return approachTower(map,start,order.chest);
-  return findPathToAny(map,start,[order.goal]);
+export function approachTower(map,start,building,options) { return findPathToAny(map,start,towerNeighbors(building),options); }
+export function planGroundOrder(map,start,order,options) {
+  if(order.kind==='approachAnimal')return findPathToAny(map,start,adjacentTiles(order.animal,map),options);
+  if(order.kind==='enter')return approachTower(map,start,order.tower,options);
+  if(order.kind==='collect')return approachTower(map,start,order.resource,options);
+  if(order.kind==='openChest')return approachTower(map,start,order.chest,options);
+  return findPathToAny(map,start,[order.goal],options);
 }
-export function planTowerExit(map,building,order) {
+export function planTowerExit(map,building,order,options) {
   let best=null;
   for(const exit of towerNeighbors(building)){
     if(!isWalkable(map,exit.x,exit.y))continue;
-    const route=planGroundOrder(map,exit,order);
+    const route=planGroundOrder(map,exit,order,options);
     if(route&&(!best||route.cost<best.cost))best={...route,exit};
   }
   return best;

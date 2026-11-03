@@ -97,14 +97,16 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     if(cargo?.transportCancelled!==undefined)check(typeof cargo.transportCancelled==='boolean');
     array(s.player.pendingWorkRewards,100000);for(const event of s.player.pendingWorkRewards){check(cargo&&['resourceCollected','dropCollected'].includes(event.type)&&resources.includes(event.objectType));integer(event.quantity,1);if(event.contributionRatio!==undefined)number(event.contributionRatio);}
     if(royal.workflowSiteId!=null)check(sites.has(royal.workflowSiteId));if(royal.nextRetry!==undefined)number(royal.nextRetry);
-    const t=royal.task;if(t){check(['deposit','stockPickup','siteDeposit'].includes(t.kind)&&resources.includes(t.resource)&&locations.has(t.destinationId));integer(t.amount,1,20);number(t.retryAt);
-      if(t.kind==='stockPickup'){
+    const t=royal.task;if(t){check(['deposit','stockPickup','siteDeposit','withdraw'].includes(t.kind)&&resources.includes(t.resource)&&(t.kind==='withdraw'||locations.has(t.destinationId)));integer(t.amount,1,20);number(t.retryAt);
+      if(t.kind==='withdraw'){
+        const r=reservations.get(t.stockReservation),source=locations.get(t.sourceId);check(!cargo&&r?.kind==='stock'&&r.siteId==null&&r.owner===t.id&&r.locationId===t.sourceId&&r.resource===t.resource&&r.amount===t.amount&&!stockRefs.has(r.id)&&['storage','fallback'].includes(source?.kind)&&adjacent(source,t.goal)&&t.capacityReservation==null);stockRefs.add(r.id);
+      }else if(t.kind==='stockPickup'){
         check(!cargo&&sites.has(t.siteId)&&t.destinationId===`site-${t.siteId}`);
         if(t.sourceDropId){const drop=s.drops.find(d=>d.id===t.sourceDropId);check(drop&&drop.siteId===t.siteId&&drop.resource===t.resource&&drop.amount>=t.amount&&t.goal.x===drop.tile.x&&t.goal.y===drop.tile.y&&!groundRefs.has(drop.id));groundRefs.add(drop.id);}
         else{const r=reservations.get(t.stockReservation);check(r?.kind==='stock'&&r.owner===t.id&&r.siteId===t.siteId&&r.resource===t.resource&&r.amount===t.amount&&r.locationId===t.sourceId&&!stockRefs.has(r.id)&&adjacent(locations.get(t.sourceId),t.goal));stockRefs.add(r.id);}
       }else{check(cargo&&cargo.resource===t.resource&&cargo.amount>=t.amount&&adjacent(locations.get(t.destinationId),t.goal));if(t.kind==='siteDeposit')check(cargo.siteId===t.siteId&&t.destinationId===`site-${t.siteId}`);}
       if(t.siteId!=null)check(sites.has(t.siteId));
-      const match=String(t.id).match(/^king-transfer-(\d+)$/);check(match);integer(Number(match[1]),1,royal.nextId-1);capacity(t.capacityReservation,t.id,t.resource,t.amount);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);
+      const match=String(t.id).match(/^king-transfer-(\d+)$/);check(match);integer(Number(match[1]),1,royal.nextId-1);if(t.kind!=='withdraw'){capacity(t.capacityReservation,t.id,t.resource,t.amount);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);}
     }
   }
   const actors=[s.player,...(s.workers??[])];

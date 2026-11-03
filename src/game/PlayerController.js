@@ -71,7 +71,7 @@ export class PlayerController {
         this.scene.setStatus('Jsi na této věži. Pro sestup klikni na volné políčko.');
         return false;
       }
-      const route = planTowerExit(this.scene.map, this.currentTower, order);
+      const route = planTowerExit(this.scene.map, this.currentTower, order,this.scene.pathWear?.routingOptions(this));
       if (!route) {
         this.scene.setStatus('Z věže nevede dostupná cesta k tomuto cíli. Král zůstává nahoře.');
         return false;
@@ -83,7 +83,7 @@ export class PlayerController {
       return true;
     }
 
-    const route = planGroundOrder(this.scene.map, this.nextTile ?? this.tile, order);
+    const route = planGroundOrder(this.scene.map, this.nextTile ?? this.tile, order,this.scene.pathWear?.routingOptions(this));
     if (!route) {
       this.scene.setStatus('K tomuto cíli nevede cesta.');
       return false;
@@ -104,7 +104,7 @@ export class PlayerController {
       const route=findRoofPath(this.scene.buildings,start,order.tower);
       if(route!==null){this.startRoofRoute(route,null);return true;}
     }
-    const route=planRoofExit(this.scene.map,this.scene.buildings,start,order);
+    const route=planRoofExit(this.scene.map,this.scene.buildings,start,order,this.scene.pathWear?.routingOptions(this));
     if(!route){
       this.path=[];this.roofContinuation=null;this.scene.marker.setVisible(false);
       this.scene.setStatus('Z propojených hradeb nevede dostupná cesta k cíli.');return false;

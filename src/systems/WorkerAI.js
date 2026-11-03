@@ -15,7 +15,7 @@ export class WorkerAI {
     this.scene.combat.stopAttack(worker);this.system.reservations.releaseActor(worker.id);worker.workTask=null;worker.path=[];worker.aiCooldown=0;worker.workMessage='';
   }
   origin(worker){return this.system.origin(worker);}
-  route(worker,goals){return findPathToAny(this.system.navigationMap(worker),worker.nextTile??worker.tile,goals);}
+  route(worker,goals){return findPathToAny(this.system.navigationMap(worker),worker.nextTile??worker.tile,goals,this.scene.pathWear?.routingOptions(worker));}
   withinRange(worker,tile){const origin=this.origin(worker);return Math.max(Math.abs(tile.x-origin.x),Math.abs(tile.y-origin.y))<=WORK_RULES.workRadius;}
   reserve(worker,key,task,route){
     if(!this.system.reservations.reserve(key,worker.id))return false;

@@ -56,10 +56,10 @@ export function findRoofPath(buildings,start,end){
   if(!isWall(start)||!isWall(end))return null;
   const tree=roofTree(buildings,start);return tree.parents.has(tileKey(end))?reconstruct(tree,end):null;
 }
-export function planRoofExit(map,buildings,start,order){
+export function planRoofExit(map,buildings,start,order,options){
   const tree=roofTree(buildings,start);let best=null;
   for(const [key,roofCost]of tree.distances){
-    const wall=tree.index.get(key),route=planTowerExit(map,wall,order);if(!route)continue;
+    const wall=tree.index.get(key),route=planTowerExit(map,wall,order,options);if(!route)continue;
     const totalCost=roofCost+route.cost;
     if(!best||totalCost<best.totalCost)best={...route,totalCost,wall,roofPath:reconstruct(tree,wall)};
   }

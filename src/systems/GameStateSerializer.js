@@ -13,6 +13,7 @@ import { validateFoodState } from './FoodStateValidation.js';
 import { validateSeasonFoodState } from './SeasonFoodStateValidation.js';
 import { seasonalCropStage } from '../data/seasons.js';
 import { carryCapacity } from '../data/logistics.js';
+import { repairTransportInstructions } from './TransportStateMigration.js';
 
 export const SAVE_VERSION=7;
 const copy=value=>value==null?null:structuredClone(value);
@@ -121,6 +122,7 @@ export function validateGameState(input,registry=objectRegistry){
       for(const id of c.assignedBuilders){check((id==='king'||wIds.has(id))&&!siteAssignments.has(id));siteAssignments.add(id);}
     }
   }
+  repairTransportInstructions(s,registry,check);
   const resourceTiles=new Set();
   for(const r of s.resources){const d=definition(r.type,'resource');tile(r.tile);for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){
     const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`;check(s.terrain[y]?.[x]===0&&!occupied.has(key)&&!resourceTiles.has(key));resourceTiles.add(key);

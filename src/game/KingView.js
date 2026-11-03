@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { directionName, DIRECTION_POSES } from './directions.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { AnimalView } from './AnimalView.js';
+import { CargoBundleView } from './CargoBundleView.js';
 
 // Grafická vrstva krále. Controller dodává logický směr, nikoli úhel obrazovky.
 // Každý z osmi směrů má vlastní pózu; později ji může nahradit animovaný sprite.
@@ -23,6 +24,7 @@ export class KingView extends Phaser.GameObjects.Container {
     this.weapon = scene.add.graphics().setVisible(false);
     this.torsoGroup.add([this.figure, this.leftArm, this.rightArm, this.weapon]);
     this.add([this.shadow, this.leftLeg, this.rightLeg, this.leftBoot, this.rightBoot, this.torsoGroup]);
+    this.cargoBundle=new CargoBundleView(scene,this.torsoGroup);
     this.phase = 0;
     this.facing = 'S';
     this.isWalking = false;
@@ -128,4 +130,5 @@ export class KingView extends Phaser.GameObjects.Container {
     }
     this.leftLeg.rotation=this.mount?0.65:0;this.rightLeg.rotation=this.mount?-0.65:0;
   }
+  setCargo(cargo){this.cargoBundle.update(cargo);}
 }

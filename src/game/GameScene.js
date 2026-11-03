@@ -62,6 +62,8 @@ import { FarmingPanel } from '../ui/FarmingPanel.js';
 import { FoodStorageSystem } from '../systems/FoodStorageSystem.js';
 import { FoodProductionSystem } from '../systems/FoodProductionSystem.js';
 import { LogisticsTaskManager } from '../systems/LogisticsTaskManager.js';
+import { LegacyStockpileMarkers } from './LegacyStockpileMarkers.js';
+import { cargoLabel,transportLabel } from '../ui/transportLabels.js';
 import { StoragePanel } from '../ui/StoragePanel.js';
 import { SeasonSystem } from '../systems/SeasonSystem.js';
 import { KingdomAttractivenessSystem } from '../systems/KingdomAttractivenessSystem.js';
@@ -85,7 +87,7 @@ export class GameScene extends Phaser.Scene {
     this.workplaceSystem=null;
     this.constructionSystem=null;
     this.farmingSystem=null;
-    this.foodStorage=null;this.foodProduction=null;this.logisticsTasks=null;
+    this.foodStorage=null;this.foodProduction=null;this.logisticsTasks=null;this.legacyStockpiles=null;
     this.seasons=null;
     this.kingLogistics=null;
     this.gameOver=false;this.input.enabled=true;this.input.keyboard.enabled=true;this.tweens.resumeAll();
@@ -171,7 +173,7 @@ export class GameScene extends Phaser.Scene {
       onComplete:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(`${buildingDefinition(site).name}: stavba dokončena.`);},
       onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus('Stavba zrušena. Materiál je vrácen podle její rozpracovanosti.');}});
     this.constructionUI=new ConstructionUI(this);
-    this.foodProduction=new FoodProductionSystem(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);
+    this.foodProduction=new FoodProductionSystem(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
     this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);
     this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
@@ -212,7 +214,7 @@ export class GameScene extends Phaser.Scene {
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
       this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
-      this.storagePanel.destroy();this.logisticsTasks.destroy();this.foodProduction.destroy();this.foodStorage.destroy();
+      this.storagePanel.destroy();this.legacyStockpiles.destroy();this.logisticsTasks.destroy();this.foodProduction.destroy();this.foodStorage.destroy();
       this.foodEconomyPanel.destroy();this.foodSystem.destroy();this.unsubscribeSeason();this.seasons.destroy();
       this.game.events.off(Phaser.Core.Events.PAUSE,onBackground);this.game.events.off(Phaser.Core.Events.RESUME,onForeground);
       this.game.canvas.style.cursor='';
@@ -298,6 +300,7 @@ export class GameScene extends Phaser.Scene {
     }
     const selected=this.pickInteraction(pointer.worldX,pointer.worldY,goal);
     if(selected?.kind==='human'){this.unitPanel.open(selected.object);return;}
+    if(selected?.kind==='stockpile'){this.storagePanel.open(null,selected.object.location.id);return;}
     if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){this.kingLogistics.cancel();this.constructionSystem.commandKing(selected.object);this.constructionUI.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).crop){this.farmingPanel.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).storage){this.storagePanel.open(selected.object);return;}
@@ -342,6 +345,7 @@ export class GameScene extends Phaser.Scene {
     let resource=resourceHit??this.resources.get(this.resourceOccupancy.get(tileKey(tile)));
     if(resource&&!this.fog.isVisibleObject(resource.getData('object')))resource=null;
     if(building)hits.push({kind:'building',object:building,depth:buildingDefinition(building).crop?tileCenter(tile).y-.2:buildingDepth(building)+.3});
+    const stockpile=this.legacyStockpiles.atPoint(x,y);if(stockpile)hits.push({kind:'stockpile',object:stockpile,depth:stockpile.depth});
     for(const unit of this.selectableHumans()){
       const view=unit.view??unit.sprite;if(this.fog.isVisibleObject(unit)&&this.assets.hitTest(view,x,y))hits.push({kind:'human',object:unit,depth:view.depth});
     }
@@ -532,6 +536,10 @@ export class GameScene extends Phaser.Scene {
     document.querySelector('#path-wear-info').hidden=!this.settingsPanel.settings.pathWearDebug;
     this.fog.update();this.updateMountUI();this.terrain.update(this.cameras.main,this.fog);
     const view=this.cameras.main.worldView;
+    this.legacyStockpiles?.update(view,this.fog);
+    this.player.setCargo?.(this.character.cargo);for(const worker of this.workerSystem?.liveWorkers()??[])worker.view.setCargo?.(worker.cargo);
+    const cargoStatus=document.querySelector('#king-cargo-status');cargoStatus.hidden=!this.character.cargo&&!this.kingLogistics.task;
+    const cargoText=`${cargoLabel(this,this.character)} · ${transportLabel(this,this.character)}`;if(cargoStatus.textContent!==cargoText)cargoStatus.textContent=cargoText;
     this.dropSystem.update(view,this.fog);
     if(this.input.manager.isOver)this.updateHover(this.input.activePointer);
     for(const animal of this.animalSystem.animals.values())animal.view.setVisible(!animal.mounted&&this.fog.isVisibleObject(animal)&&animal.view.x>view.x-60&&animal.view.x<view.right+60&&animal.view.y>view.y-40&&animal.view.y<view.bottom+70);

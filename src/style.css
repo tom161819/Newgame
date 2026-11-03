@@ -237,3 +237,10 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 
 #farming-growth { width:100%; height:10px; accent-color:#d4b66a; }
 #farming-worker { line-height:1.6; color:#d1c59f; }
+
+.resource-breakdown { margin: 1rem 0; padding: .65rem; border: 1px solid #77734e; }
+.resource-breakdown > summary { cursor: pointer; font-weight: 600; }
+.resource-location-row { padding: .4rem 0; border-top: 1px solid #55583e; }
+.resource-location-counts { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .2rem .8rem; }
+.resource-location-counts dd { margin: 0; font-variant-numeric: tabular-nums; }
+#king-cargo-status { font-size: .8rem; color: #e0c98c; }

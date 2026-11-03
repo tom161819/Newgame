@@ -2,6 +2,7 @@ import { SKILLS,JOBS,WORK_RULES } from '../data/jobs.js';
 import { element } from './objectLabels.js';
 import { TALENTS,TALENT_XP_BONUS } from '../data/economy.js';
 import { carryCapacity } from '../data/logistics.js';
+import { cargoLabel,transportLabel } from './transportLabels.js';
 
 export class UnitPanel {
   constructor(scene){
@@ -21,6 +22,7 @@ export class UnitPanel {
     document.querySelector('#unit-name').textContent=u.name??u.definition.name;
     document.querySelector('#unit-level').textContent=`Level ${e.level} / ${e.maxLevel}`;
     document.querySelector('#unit-xp').textContent=e.level===e.maxLevel?'XP MAX':`XP ${format(e.currentXP)} / ${e.xpToNextLevel}`;
+    document.querySelector('#unit-cargo').textContent=cargoLabel(s,u);document.querySelector('#unit-transport').textContent=transportLabel(s,u);
     const bar=document.querySelector('#unit-xp-bar');bar.max=e.xpToNextLevel||1;bar.value=e.level===e.maxLevel?1:e.currentXP;
     const values={hp:`${format(u.currentHP)} / ${u.maxHP}`,dps:format(u.attackDPS),armor:`${format(u.armor)} %`,totalXP:format(e.totalXP)};
     for(const [key,value]of Object.entries(values))document.querySelector(`[data-unit-stat="${key}"]`).textContent=value;

@@ -38,6 +38,18 @@ export class FoodStorageSystem {
   room(locationId){const l=this.locations.get(locationId);return l?Math.max(0,l.capacity-this.used(l)-this.incoming(locationId)):0;}
   available(resource){return [...this.locations.values()].filter(l=>this.isStock(l)).reduce((n,l)=>n+this.free(l.id,resource),0);}
   inventorySummary(){const result={};for(const id of this.resourceIds())if([...this.locations.values()].some(l=>this.isStock(l)&&(l.stock[id]??0)>0))result[id]=this.available(id);return result;}
+  resourceBreakdown(){
+    const rows=new Map(this.resourceIds().map(resource=>[resource,{resource,freeStored:0,reservedStored:0,carried:0,sites:0,buffers:0,ground:0}]));
+    for(const location of this.locations.values())for(const [resource,amount]of Object.entries(location.stock)){
+      const row=rows.get(resource);if(!row)continue;
+      if(this.isStock(location)){const reserved=this.reserved(location.id,resource);row.reservedStored+=reserved;row.freeStored+=amount-reserved;}
+      else if(location.kind==='site')row.sites+=amount;else row.buffers+=amount;
+    }
+    for(const actor of [this.scene.character,...(this.scene.workerSystem?.liveWorkers()??[])])if(actor.cargo&&rows.has(actor.cargo.resource))rows.get(actor.cargo.resource).carried+=actor.cargo.amount;
+    for(const drop of this.scene.dropSystem.drops.values())if(rows.has(drop.resource))rows.get(drop.resource).ground+=drop.amount;
+    for(const view of this.scene.resources.values()){const row=rows.get(view.getData('objectId'));if(row)row.ground+=view.getData('object')?.amount??1;}
+    return [...rows.values()].map(row=>({...row,total:row.freeStored+row.reservedStored+row.carried+row.sites+row.buffers+row.ground}));
+  }
   goals(location){
     if(location.kind==='ground')return this.scene.map[location.y]?.[location.x]===0?[{x:location.x,y:location.y}]:[];
     const tiles=[];for(let dx=0;dx<location.width;dx++)tiles.push({x:location.x+dx,y:location.y-1},{x:location.x+dx,y:location.y+location.height});
@@ -48,7 +60,7 @@ export class FoodStorageSystem {
   route(actor,locations){
     const goals=new Map();for(const location of locations)for(const tile of this.goals(location))goals.set(tileKey(tile),location);
     const map=this.scene.workerSystem?.workers.has(actor.id)?this.scene.workerSystem.navigationMap(actor):this.scene.map;
-    const route=findPathToAny(map,actor.nextTile??actor.tile,[...goals.keys()].map(key=>{const[x,y]=key.split(',').map(Number);return{x,y};}));
+    const route=findPathToAny(map,actor.nextTile??actor.tile,[...goals.keys()].map(key=>{const[x,y]=key.split(',').map(Number);return{x,y};}),this.scene.pathWear?.routingOptions(actor));
     return route?{...route,location:goals.get(tileKey(route.destination))}:null;
   }
   findDestination(actor,resource,amount,{partial=false}={}){

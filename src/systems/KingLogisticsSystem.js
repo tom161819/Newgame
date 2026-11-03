@@ -33,6 +33,14 @@ export class KingLogisticsSystem {
     this.storage.reservations.get(capacityReservation).siteId=siteId;
     return this.move({id,kind:'siteDeposit',siteId,destinationId:location.id,resource:cargo.resource,amount,capacityReservation,goal:{...route.destination},retryAt:0},route);
   }
+  startPickup(locationId,resource,amount=20){
+    const source=this.storage.locations.get(locationId);if(this.actor.cargo||!source||!this.storage.isStock(source)||!this.storage.manages(resource)||this.actor.transitioning||this.scene.gameOver)return false;
+    amount=Math.min(20,amount,this.storage.free(locationId,resource));if(!Number.isSafeInteger(amount)||amount<1)return false;
+    this.cancel();this.scene.constructionSystem.stopKing();this.actor.stopForBuilding();this.scene.huntingSystem.cancel?.();this.scene.mountSystem.cancel?.();this.scene.treasureSystem.cancelRequest?.();
+    const route=this.storage.route(this.actor,[source]);if(!route)return false;
+    const id=`king-transfer-${this.nextId++}`,stockReservation=this.storage.reserve('stock',locationId,resource,amount,id);if(!stockReservation)return false;
+    return this.move({id,kind:'withdraw',sourceId:locationId,resource,amount,stockReservation,goal:{...route.destination},retryAt:0},route);
+  }
   startMaterials(building){
     if(!this.materials?.enabled||!this.materials.site(building?.id)||this.actor.transitioning||this.scene.gameOver)return false;
     this.cancel();this.scene.constructionSystem.stopKing();this.actor.stopForBuilding();this.scene.huntingSystem.cancel?.();this.scene.mountSystem.cancel?.();this.scene.treasureSystem.cancelRequest?.();
@@ -78,15 +86,19 @@ export class KingLogisticsSystem {
   update(){
     const actor=this.actor;if(this.scene.gameOver||this.scene.gameTime.paused)return;
     if(!this.task){if(this.workflowSiteId!=null&&this.scene.gameTime.totalElapsed>=this.nextRetry){this.nextRetry=this.scene.gameTime.totalElapsed+500;this.continueMaterials();}return;}
-    const task=this.task,location=task.kind==='stockPickup'?this.source(task):this.storage.locations.get(task.destinationId);
-    if(!location||!this.storage.reservations.has(task.capacityReservation)){
+    const task=this.task,pickup=['stockPickup','withdraw'].includes(task.kind),location=pickup?this.source(task):this.storage.locations.get(task.destinationId);
+    if(!location||task.kind!=='withdraw'&&!this.storage.reservations.has(task.capacityReservation)||task.kind==='withdraw'&&!this.storage.reservations.has(task.stockReservation)){
       const workflow=this.workflowSiteId;this.cancel();if(this.materials?.site(workflow))this.workflowSiteId=workflow;return;
     }
     if(actor.state!=='ground'||actor.nextTile||actor.path.length)return;
-    const arrived=task.kind==='stockPickup'?this.atSource(task):this.storage.atLocation(actor,location.id);
+    const arrived=pickup?this.atSource(task):this.storage.atLocation(actor,location.id);
     if(!arrived){
       if(this.scene.gameTime.totalElapsed<task.retryAt)return;task.retryAt=this.scene.gameTime.totalElapsed+500;const route=this.storage.route(actor,[location]);
       if(route){task.goal={...route.destination};actor.command({kind:'move',goal:route.destination,silent:true});}return;
+    }
+    if(task.kind==='withdraw'){
+      const cargo=this.storage.take(task.stockReservation);if(!cargo){this.cancel();return;}
+      actor.cargo={...cargo,transportCancelled:true};actor.pendingWorkRewards=[];this.task=null;this.scene.updateInventory();this.scene.setStatus('Cargo collected. Deliver it elsewhere or set it down on free ground.');return;
     }
     if(task.kind==='stockPickup'){
       const destination=this.storage.locations.get(task.destinationId),route=destination&&this.storage.route(actor,[destination]);if(!route)return;

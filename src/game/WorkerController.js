@@ -10,7 +10,7 @@ export class WorkerController extends AnimalController {
     scene.skillSystem.initialize(this);
   }
   reservedTiles(){return this.isAlive?super.reservedTiles():[];}
-  moveTo(goals){const route=findPathToAny(this.scene.workerSystem?.navigationMap(this)??this.scene.map,this.nextTile??this.tile,goals);this.path=route?.path??[];return !!route;}
+  moveTo(goals){const route=findPathToAny(this.scene.workerSystem?.navigationMap(this)??this.scene.map,this.nextTile??this.tile,goals,this.scene.pathWear?.routingOptions(this));this.path=route?.path??[];return !!route;}
   canEnterTile(tile){
     if(!this.scene.workplaceSystem)return true;
     if(canStep(this.scene.workerSystem.navigationMap(this),this.tile,tile))return true;
