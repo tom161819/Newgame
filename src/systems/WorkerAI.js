@@ -82,6 +82,7 @@ export class WorkerAI {
       }
     }
     if(worker.workState==='Recovering'){
+      if(worker.cargo)this.scene.workplaceSystem?.deliver(worker);
       worker.workMessage='Recovering HP';
       if(worker.currentHP>=worker.maxHP*WORK_RULES.recoverRatio){worker.workState='Searching for Work';worker.aiCooldown=0;}
     }

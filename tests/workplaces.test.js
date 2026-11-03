@@ -70,6 +70,11 @@ test('injured hunter returns to the assigned lodge for recovery without teleport
   const position={...w.position};s.tick(0);assert.deepEqual(w.position,position);assert.equal(w.workState,'Fleeing');until(s,()=>w.workState==='Recovering');assert.equal(s.workplaceSystem.atWorkplace(w),true);assert.equal(w.experience.totalXP,0);assert.equal(w.assignedWorkplaceId,l.id);
 });
 
+test('an injured hunter deposits already gathered meat immediately on reaching the lodge before resting to full health',()=>{
+  const s=scene(),l=build(s,'hunting_lodge'),w=worker(s,53,50),rabbit=s.animalSystem.create(s.objectRegistry.require('rabbit'),{x:60,y:50});rabbit.wanderWait=1e8;s.workplaceSystem.assign(l,w);until(s,()=>!!w.cargo);w.currentHP=17;
+  assert.equal(s.inventory.count('meat'),0);until(s,()=>w.workState==='Recovering');assert.equal(s.inventory.count('meat'),5);assert.equal(w.cargo,null);assert.equal(w.experience.totalXP,12);assert.equal(w.skills.hunting.totalXP,10);assert.ok(w.currentHP<48);s.simulate(500);assert.equal(s.inventory.count('meat'),5);assert.equal(w.experience.totalXP,12);
+});
+
 test('barracks patrols reuse the same subject, never initiate neutral combat and defend only when attacked; death releases the slot',()=>{
   const s=scene(),b=build(s,'barracks'),w=worker(s,53,50);s.workplaceSystem.assign(b,w);until(s,()=>w.workState==='Patrolling');const position={...w.position};until(s,()=>Math.hypot(w.position.x-position.x,w.position.y-position.y)>1,15000);
   assert.equal(s.combat.attacks.size,0);assert.equal(w.skills.combat.totalXP,0);assert.equal(s.workerSystem.workers.size,1);

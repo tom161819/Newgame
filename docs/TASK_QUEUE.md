@@ -28,7 +28,7 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
 
 ## Dokončeno, probíhá publikování
 
-- [Krok 16 — pracovní budovy a zaměstnanci](requests/step-16.md): 130 testů, skutečné stavění a přiřazování přes UI, doprava kamenů a masa před připsáním odměn, hlídky a sebeobrana, přesné Save/Load i starší save, produkční/mobilní rozhraní a 20 zaměstnanců kolem 60 FPS ověřeny. Nasazení se kontroluje před zahájením kroku 17.
+- [Krok 16 — pracovní budovy a zaměstnanci](requests/step-16.md): 131 testů, skutečné stavění a přiřazování přes UI, doprava kamenů a masa před připsáním odměn, hlídky a sebeobrana, přesné Save/Load i starší save, produkční/mobilní rozhraní a 20 zaměstnanců kolem 60 FPS ověřeny. Nasazení se kontroluje před zahájením kroku 17.
 
 ## Následuje
 

@@ -92,7 +92,7 @@ Kliknutím na pracovní budovu otevřeš obrázek, obsazená a volná místa, pr
 
 Kamenolom nevytváří kameny a lovecká chata neobnovuje zvěř. Pracovníci používají skutečné objekty, sdílené rezervace a osmisměrné cesty kolem překážek, budov i rezervovaných polí ostatních postav. Když není dosažitelný cíl, čekají a zkoušejí ho znovu. Nedostupná cesta zpět ponechá náklad u pracovníka. Při odebrání, změně práce nebo smrti se nedoručený náklad bezpečně položí jako existující typ dropu; nezíská za něj odměnu. Jiný horník nebo lovec ho může jednou přinést.
 
-Lovec s nízkým HP se vrací k vlastní chatě a léčí se. Vojáci pouze hlídkují a brání sebe. Žádná pracovní budova nevytváří obyvatele a neposkytuje pasivní suroviny. Save/Load obnoví místa, výrobu, cesty, náklad, rezervace i dosud nepřipsané pracovní odměny bez opakovaného přičtení. Starší save bez pracovišť převede zaměstnané nepřiřazené poddané do Idle, zachová jejich profily a již naběhlé mzdy.
+Lovec s nízkým HP se vrací k vlastní chatě, ihned odevzdá případný náklad a léčí se. Vojáci pouze hlídkují a brání sebe. Žádná pracovní budova nevytváří obyvatele a neposkytuje pasivní suroviny. Save/Load obnoví místa, výrobu, cesty, náklad, rezervace i dosud nepřipsané pracovní odměny bez opakovaného přičtení. Starší save bez pracovišť převede zaměstnané nepřiřazené poddané do Idle, zachová jejich profily a již naběhlé mzdy.
 
 ## Talenty a ekonomika mezd
 
