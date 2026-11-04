@@ -345,6 +345,8 @@ test('untouched grass uses the approved season-ground tiles for spring, autumn a
   }
   // Summer is the lush set already used for grass_normal.
   assert.equal(json('art/sprites/season-ground/season-ground-summer.v1.json').specHash, json('art/sprites/grass-ground/grass-ground-lush.v1.json').specHash);
+});
+
 test('villagers use the approved looks in eight directions, chosen by profession and name', async () => {
   const { APPROVED_VILLAGER_ART, PROFESSION_LOOKS, FACING_INDEX, villagerSex } = await import('../src/data/objects/approvedArt.js');
   assert.deepEqual(Object.values(FACING_INDEX).sort(), [0, 1, 2, 3, 4, 5, 6, 7]);
