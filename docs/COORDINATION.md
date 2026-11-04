@@ -1,10 +1,10 @@
 # Coordination: Claude and Codex
 
-Shared register of active work. Rules are in [AGENTS.md](../AGENTS.md) (section *Collaboration between Claude and Codex*). Update this file in your own task branch: add a row before editing, update it when the pull request opens, move it to *Done* after the developer merges.
+Shared register of active work. Rules are in [AGENTS.md](../AGENTS.md) (section *Collaboration between Claude and Codex*). Update this file in your own task branch: add a row before editing, update it when the pull request opens, move it to *Done* after the merge.
 
 Files held lists the files a task changes. Another task avoids them unless necessary, and then says so here and in its pull request.
 
-## Merge order awaiting the developer
+## Agreed merge order
 
 1. [#1](https://github.com/tom161819/Newgame/pull/1) Stages 07–08 (Codex) → `main`.
 2. [#2](https://github.com/tom161819/Newgame/pull/2) Collaboration rules (this file, `AGENTS.md`, `CLAUDE.md`); independent, may merge earlier.
