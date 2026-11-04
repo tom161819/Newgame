@@ -33,8 +33,17 @@ export class WorldCamera {
   }
 
   follow() {
-    this.following = true;
+    this.following = true;this.panTarget=null;
     document.querySelector('#camera-mode').textContent = 'Kamera sleduje krále';
+  }
+
+  locate(unit){
+    const view=unit.view??unit.sprite;
+    if(!unit.isAlive||!view||!this.scene.fog.isVisibleObject(unit))return false;
+    // Capture an allowed, currently seen point. Never track a hidden actor.
+    this.panTarget=clampMapCenter(view.x,view.y-25);this.following=false;
+    document.querySelector('#camera-mode').textContent=`Vybraný poddaný: ${unit.name??unit.definition.name}`;
+    return true;
   }
 
   zoom(delta) {
@@ -50,8 +59,12 @@ export class WorldCamera {
     if (dx || dy) {
       if (this.following) document.querySelector('#camera-mode').textContent = 'Ruční posun · mezerník vrátí krále';
       this.following = false;
+      this.panTarget=null;
       const amount = 650 * delta / 1000 / camera.zoom / Math.hypot(dx, dy);
       x += dx * amount; y += dy * amount;
+    } else if(this.panTarget){
+      const ease=1-Math.exp(-delta/140);x+=(this.panTarget.x-x)*ease;y+=(this.panTarget.y-y)*ease;
+      if(Math.hypot(x-this.panTarget.x,y-this.panTarget.y)<.5)this.panTarget=null;
     } else if (this.following) {
       const ease = 1 - Math.exp(-delta / 140);
       x += (this.target.x - x) * ease;

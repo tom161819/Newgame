@@ -297,3 +297,11 @@ body:not(.in-game) > .population-tab, body:not(.in-game) > .population-panel { d
 .population-skill small { color:#c7c8a7; grid-column:1/-1; }
 .population-skill progress { grid-column:1/-1; width:100%; height:5px; accent-color:#c9b06e; }
 body:not(.in-game) > .population-tooltip { display:none; }
+.population-controls { display:grid; gap:7px; margin-bottom:7px; }
+.population-controls label { display:flex; flex-direction:column; gap:3px; min-width:0; font-size:10px; color:#c9c4a3; }
+.population-controls input, .population-controls select { width:100%; min-width:0; padding:6px; font:11px system-ui,sans-serif; color:#e8dfbc; border:1px solid #77714e; border-radius:3px; background:#222e22; }
+.population-sort-controls { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:6px; }
+#population-filter-count { color:#acae8e; font-size:10px; margin-bottom:5px; }
+.population-row { display:flex; gap:4px; }
+.population-select { min-width:0; flex:1; }
+.population-locate { flex-shrink:0; width:42px; padding:2px; font-size:9px; }

@@ -13,11 +13,12 @@ export class UnitPanel {
     this.jobSelect.addEventListener('change',()=>{if(this.unit)scene.workerSystem.jobs.assign(this.unit,this.jobSelect.value);this.refresh();},options);
     this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.close();},options);this.dialog.addEventListener('close',()=>this.restoreInput(),options);
   }
-  open(unit){this.unit=unit;this.restored=false;this.scene.setGalleryInput(false);this.dialog.showModal();this.refresh();}
+  open(unit,{management=false}={}){this.unit=unit;this.management=management&&this.scene.workerSystem?.workers.get(unit.id)===unit&&unit.isSubject!==false;this.restored=false;this.scene.setGalleryInput(false);this.dialog.showModal();this.refresh();}
   refresh(){
     if(!this.dialog.open||!this.unit)return;
     const s=this.scene,u=this.unit,view=u.view??u.sprite;
-    if(!view?.scene||!s.fog.isVisibleObject(u)){this.close();return;}
+    const managed=this.management&&s.workerSystem?.workers.get(u.id)===u&&u.isSubject!==false&&u.isAlive;
+    if((!view?.scene||!s.fog.isVisibleObject(u))&&!managed){this.close();return;}
     const e=s.experienceSystem.getLevelProgress(u),format=n=>String(Math.round(n*100)/100);
     document.querySelector('#unit-name').textContent=u.name??u.definition.name;
     document.querySelector('#unit-level').textContent=`Level ${e.level} / ${e.maxLevel}`;

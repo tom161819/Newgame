@@ -1,8 +1,26 @@
-import { JOBS,SKILLS } from '../data/jobs.js';
+import { JOBS,SKILLS,SKILL_IDS } from '../data/jobs.js';
 import { HUMAN_APPEARANCE } from '../data/humanAppearance.js';
 import { TALENTS } from '../data/economy.js';
 
 export const POPULATION_ROW_HEIGHT=60;
+export const POPULATION_SORTS=Object.freeze(['level','xp','name','profession',...SKILL_IDS.map(id=>`skill:${id}`)]);
+const names=new Intl.Collator('cs',{numeric:true,sensitivity:'base'});
+export function populationPreferences(input){return {sortBy:POPULATION_SORTS.includes(input?.sortBy)?input.sortBy:'level',direction:input?.direction==='asc'?'asc':'desc',profession:input?.profession==='all'||Object.hasOwn(JOBS,input?.profession)?input.profession:'all'};}
+export function readPopulationPreferences(storage){try{return populationPreferences(JSON.parse(storage.getItem('newgame.population')??'null'));}catch{return populationPreferences();}}
+export function writePopulationPreferences(storage,value){try{storage.setItem('newgame.population',JSON.stringify(populationPreferences(value)));}catch{/* Preferences are optional when browser storage is unavailable. */}}
+const fold=value=>String(value??'').normalize('NFD').replace(/\p{Diacritic}/gu,'').toLocaleLowerCase('cs');
+export function sortedPopulation(workers,preferences,query=''){
+  const p=populationPreferences(preferences),direction=p.direction==='desc'?-1:1,search=fold(query.trim()),skill=p.sortBy.startsWith('skill:')?p.sortBy.slice(6):null;
+  return [...workers].filter(w=>w.isAlive&&w.isSubject!==false&&(p.profession==='all'||w.profession===p.profession)&&fold(w.name).includes(search)).sort((a,b)=>{
+    let primary=0;
+    if(skill)primary=(a.skills[skill]?.level??1)-(b.skills[skill]?.level??1)||(a.skills[skill]?.currentXP??0)-(b.skills[skill]?.currentXP??0)||a.experience.level-b.experience.level;
+    else if(p.sortBy==='level')primary=a.experience.level-b.experience.level||a.experience.totalXP-b.experience.totalXP;
+    else if(p.sortBy==='xp')primary=a.experience.totalXP-b.experience.totalXP||a.experience.level-b.experience.level;
+    else if(p.sortBy==='name')primary=names.compare(a.name,b.name);
+    else primary=names.compare(JOBS[a.profession]?.name??a.profession,JOBS[b.profession]?.name??b.profession)||a.experience.level-b.experience.level;
+    return primary*direction||names.compare(a.name,b.name)||names.compare(a.id,b.id);
+  });
+}
 export function populationSummary(workers){
   const residents=[...workers].filter(worker=>worker.isAlive&&worker.isSubject!==false),employed=residents.filter(worker=>worker.profession!=='idle').length;
   return {residents,total:residents.length,employed,unemployed:residents.length-employed};

@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Search and filter residents, rank them by overall progress or any real skill, and inspect or locate them without interrupting their work or revealing hidden positions.
 - Inspect actual villager XP, skills, natural talents, current work and hunger in a scrollable desktop tooltip, with touch-friendly character details on small screens.
 - Open a compact Population sidebar with profession-coloured portraits, live resident and employment totals, and a virtual list that stays bounded for large kingdoms.
 - Save discovered terrain and last-known static visuals independently of the real world, with safe migration of older kingdoms that reveals only the loaded king’s actual sight.

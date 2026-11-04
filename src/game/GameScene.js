@@ -294,6 +294,7 @@ export class GameScene extends Phaser.Scene {
     if(this.gameOver||this.gameTime.paused||document.querySelector('dialog[open]'))return;
     if(pointer.rightButtonDown()){if(this.buildMode)this.cancelBuilding();return;}
     if(!pointer.leftButtonDown())return;
+    this.populationSidebar?.clearSelection();
     this.treasureSystem.cancelRequest();
     let goal=this.pointerTile(pointer);
     if(this.buildMode){
@@ -573,7 +574,7 @@ export class GameScene extends Phaser.Scene {
     this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
     this.combatFeedback?.refresh();
     this.experienceFeedback?.refreshVisibility();this.unitPanel?.refresh();
-    this.populationSidebar?.refresh();
+    this.populationSidebar?.update();
     this.economyPanel?.update();
     this.workplacePanel?.refresh();
     this.constructionUI?.refresh();

@@ -1,11 +1,21 @@
-import { JOBS } from '../data/jobs.js';
+import { JOBS,SKILLS } from '../data/jobs.js';
 import { element } from './objectLabels.js';
-import { populationSummary,populationWindow,professionColor,humanPortrait,POPULATION_ROW_HEIGHT,populationDetails,residentWarnings } from './populationData.js';
+import { populationSummary,populationWindow,professionColor,humanPortrait,POPULATION_ROW_HEIGHT,populationDetails,residentWarnings,sortedPopulation,readPopulationPreferences,writePopulationPreferences } from './populationData.js';
 
 export class PopulationSidebar {
   constructor(scene){
     this.scene=scene;this.root=document.querySelector('#population-panel');this.button=document.querySelector('#population-tab');this.viewport=document.querySelector('#population-viewport');this.list=document.querySelector('#population-list');
     this.rows=new Map();this.portraits=new Map();this.records=[];this.lastRefresh=-Infinity;this.controller=new AbortController();const options={signal:this.controller.signal};
+    try{this.storage=window.localStorage;}catch{}this.preferences=readPopulationPreferences(this.storage);
+    this.search=document.querySelector('#population-search');this.sort=document.querySelector('#population-sort');this.order=document.querySelector('#population-order');this.profession=document.querySelector('#population-profession');
+    const option=(value,name)=>{const node=element('option','',name);node.value=value;return node;},skills=element('optgroup');skills.label='Individual Skills';skills.append(...Object.entries(SKILLS).map(([id,name])=>option(`skill:${id}`,name)));
+    this.sort.replaceChildren(...Object.entries({level:'Overall Level',xp:'Overall XP',name:'Name',profession:'Profession'}).map(([value,name])=>option(value,name)),skills);
+    this.profession.replaceChildren(option('all','All'),...Object.entries(JOBS).map(([id,job])=>option(id,job.name)));
+    this.sort.value=this.preferences.sortBy;this.order.value=this.preferences.direction;this.profession.value=this.preferences.profession;this.search.value='';
+    const change=()=>{clearTimeout(this.inspectTimer);this.hideDetails();this.preferences={sortBy:this.sort.value,direction:this.order.value,profession:this.profession.value};writePopulationPreferences(this.storage,this.preferences);this.viewport.scrollTop=0;this.refresh(true);};
+    for(const control of [this.sort,this.order,this.profession])control.addEventListener('change',change,options);this.search.addEventListener('input',change,options);
+    this.root.addEventListener('focusin',()=>{for(const key of Object.values(scene.worldCamera?.keys??{}))key.reset();},options);
+    this.selection=scene.add.graphics().lineStyle(2,0xf0d78b,.95).strokeEllipse(0,-1,34,17).setVisible(false);
     this.tooltip=document.querySelector('#population-tooltip');
     this.tooltip.addEventListener('pointerenter',()=>clearTimeout(this.hideTimer),options);this.tooltip.addEventListener('pointerleave',()=>this.hideDetails(),options);
     for(const event of ['pointerdown','mousedown','mouseup','click','wheel','keydown','keyup'])this.tooltip.addEventListener(event,e=>e.stopPropagation(),options);
@@ -23,7 +33,7 @@ export class PopulationSidebar {
   updateCount(count){document.querySelector('#population-tab-count').textContent=count;this.lastRefresh=-Infinity;}
   setOpen(value){
     this.open=!!value;this.root.classList.toggle('open',this.open);this.root.inert=!this.open;this.root.setAttribute('aria-hidden',String(!this.open));this.button.setAttribute('aria-expanded',String(this.open));
-    if(this.open)this.refresh(true);else{this.hideDetails();for(const record of this.rows.values())record.controller.abort();this.list.replaceChildren();this.rows.clear();}
+    if(this.open)this.refresh(true);else{clearTimeout(this.inspectTimer);this.hideDetails();for(const record of this.rows.values())record.controller.abort();this.list.replaceChildren();this.rows.clear();this.visibleOrder=null;}
   }
   portrait(worker){
     const key=worker.definition.id;if(this.portraits.has(key))return this.portraits.get(key);
@@ -32,10 +42,10 @@ export class PopulationSidebar {
   }
   refresh(force=false){
     if(!this.open)return;const now=performance.now();if(!force&&now-this.lastRefresh<200)return;this.lastRefresh=now;
-    const summary=populationSummary(this.scene.workerSystem.workers.values());this.records=summary.residents;
+    const summary=populationSummary(this.scene.workerSystem.workers.values());this.records=sortedPopulation(summary.residents,this.preferences,this.search.value);
     const text=`Population: ${summary.total} · Employed: ${summary.employed} · Unemployed: ${summary.unemployed}`;
     const output=document.querySelector('#population-summary');if(output.textContent!==text)output.textContent=text;
-    document.querySelector('#population-empty').hidden=summary.total>0;
+    document.querySelector('#population-empty').hidden=this.records.length>0;document.querySelector('#population-filter-count').textContent=`${this.records.length} / ${summary.total} shown`;
     this.list.style.height=`${this.records.length*POPULATION_ROW_HEIGHT}px`;this.renderVisible();this.refreshDetails();
   }
   createRow(id){
@@ -43,28 +53,46 @@ export class PopulationSidebar {
     const row=element('article','population-row');row.dataset.workerId=id;row.setAttribute('role','listitem');
     const select=element('button','population-select');select.type='button';const portrait=element('img','population-portrait');portrait.width=44;portrait.height=44;
     const portraitFrame=element('span','population-portrait-frame'),status=element('span','population-state-icon');portraitFrame.append(portrait,status);
-    const text=element('span','population-row-text'),name=element('strong'),job=element('small'),progress=element('small','population-row-progress');text.append(name,job,progress);select.append(portraitFrame,text);row.append(select);
+    const text=element('span','population-row-text'),name=element('strong'),job=element('small'),progress=element('small','population-row-progress');text.append(name,job,progress);select.append(portraitFrame,text);
+    const locate=element('button','population-locate','Locate');locate.type='button';locate.setAttribute('aria-label',`Locate villager ${id}`);row.append(select,locate);
     const options={signal:controller.signal};
     select.addEventListener('pointerenter',()=>this.showDetails(id,row),options);select.addEventListener('pointerleave',()=>this.deferHideDetails(),options);
     select.addEventListener('focus',()=>this.showDetails(id,row),options);select.addEventListener('blur',event=>{if(!this.tooltip.contains(event.relatedTarget))this.deferHideDetails();},options);
-    select.addEventListener('click',()=>{const worker=this.scene.workerSystem.workers.get(id);if(!worker?.isAlive||worker.isSubject===false)return;this.hideDetails();if(!this.scene.fog.isVisibleObject(worker)){this.scene.setStatus('This villager is outside current sight.');return;}this.scene.unitPanel.open(worker);},options);
-    return {row,portrait,name,job,progress,select,status,controller};
+    select.addEventListener('click',()=>{clearTimeout(this.inspectTimer);this.hideDetails();if(!this.selectResident(id))return;this.inspectTimer=setTimeout(()=>{const worker=this.resident(id);if(worker&&this.open)this.scene.unitPanel.open(worker,{management:true});},240);},options);
+    select.addEventListener('dblclick',()=>this.locateResident(id),options);locate.addEventListener('click',()=>this.locateResident(id),options);
+    return {row,portrait,name,job,progress,select,locate,status,controller};
   }
   renderVisible(){
-    const range=populationWindow(this.records.length,this.viewport.scrollTop,this.viewport.clientHeight||300),needed=new Set();
+    const range=populationWindow(this.records.length,this.viewport.scrollTop,this.viewport.clientHeight||300),needed=new Set(),ordered=[];
     for(let index=range.start;index<range.end;index++){
       const worker=this.records[index];needed.add(worker.id);let record=this.rows.get(worker.id);
       if(!record){record=this.createRow(worker.id);this.rows.set(worker.id,record);this.list.append(record.row);}
+      ordered.push(record.row);
       record.row.style.top=`${index*POPULATION_ROW_HEIGHT}px`;
-      const warnings=residentWarnings(this.scene,worker),signature=JSON.stringify([worker.name,worker.profession,worker.experience,worker.definition.id,worker.workState,warnings]);if(signature===record.signature)continue;record.signature=signature;
+      const skill=this.preferences.sortBy.startsWith('skill:')?this.preferences.sortBy.slice(6):null,warnings=residentWarnings(this.scene,worker),signature=JSON.stringify([worker.name,worker.profession,worker.experience,worker.definition.id,worker.workState,warnings,skill,skill?worker.skills[skill]:null]);if(signature===record.signature)continue;record.signature=signature;
       record.name.textContent=worker.name;record.job.textContent=JOBS[worker.profession]?.name??worker.profession;
-      const e=worker.experience;record.progress.textContent=`LVL ${e.level} · ${e.level===e.maxLevel?'XP MAX':`${Math.round(e.currentXP*100)/100} / ${e.xpToNextLevel} XP`}`;
+      const e=worker.experience;record.progress.textContent=`LVL ${e.level} · ${skill?`${SKILLS[skill]} ${worker.skills[skill]?.level??1}`:e.level===e.maxLevel?'XP MAX':`${Math.round(e.currentXP*100)/100} / ${e.xpToNextLevel} XP`}`;
       record.portrait.src=this.portrait(worker);record.portrait.alt=`Portrait of ${worker.name}`;record.portrait.style.backgroundColor=professionColor(worker.profession);record.select.setAttribute('aria-label',`Inspect ${worker.name}`);
       record.status.hidden=!warnings.length;record.status.textContent=warnings[0]?.icon??'';record.status.title=[worker.workState,...warnings.map(warning=>warning.text)].join(' · ');
+      record.locate.setAttribute('aria-label',`Locate ${worker.name}`);
     }
     for(const [id,record]of this.rows)if(!needed.has(id)){if(this.tooltipWorkerId===id)this.hideDetails();record.controller.abort();record.row.remove();this.rows.delete(id);}
+    const order=ordered.map(row=>row.dataset.workerId).join('|');if(order!==this.visibleOrder){this.visibleOrder=order;this.list.replaceChildren(...ordered);}
     this.positionTooltip();
   }
+  resident(id){const worker=this.scene.workerSystem.workers.get(id);return worker?.isAlive&&worker.isSubject!==false?worker:null;}
+  selectResident(id,duration=Infinity){const worker=this.resident(id);if(!worker)return false;this.selectedId=id;this.selectionExpires=this.scene.gameTime.totalElapsed+duration;this.refreshSelection();return true;}
+  locateResident(id){
+    clearTimeout(this.inspectTimer);this.hideDetails();const worker=this.resident(id);if(!worker)return false;
+    if(!this.scene.worldCamera.locate(worker)){this.clearSelection();this.scene.setStatus('This villager’s position is outside current sight.');return false;}
+    this.selectResident(id,2000);return true;
+  }
+  clearSelection(){this.selectedId=null;this.selection.setVisible(false);}
+  refreshSelection(){
+    const worker=this.resident(this.selectedId),visible=worker&&this.scene.gameTime.totalElapsed<this.selectionExpires&&this.scene.fog.isVisibleObject(worker)&&worker.view.visible;
+    this.selection.setVisible(!!visible);if(visible)this.selection.setPosition(worker.view.x,worker.view.y).setDepth(worker.view.depth+.2);
+  }
+  update(){this.refreshSelection();this.refresh();}
   showDetails(id,anchor){
     if(!this.open||innerWidth<600||matchMedia('(hover: none)').matches)return;
     clearTimeout(this.hideTimer);this.rows.get(this.tooltipWorkerId)?.select.removeAttribute('aria-describedby');this.tooltipWorkerId=id;this.tooltipAnchor=anchor;this.rows.get(id)?.select.setAttribute('aria-describedby',this.tooltip.id);this.refreshDetails();
@@ -96,5 +124,5 @@ export class PopulationSidebar {
     this.tooltip.style.left=`${Math.max(leftMargin,Math.min(innerWidth-width-rightMargin,panel.left-width-10))}px`;
     this.tooltip.style.top=`${Math.max(safeTop,Math.min(anchor.top,innerHeight-height-76))}px`;
   }
-  destroy(){this.controller.abort();this.unsubscribePopulation();this.unsubscribeJobs();this.unsubscribeAssets();this.setOpen(false);this.portraits.clear();}
+  destroy(){this.controller.abort();this.unsubscribePopulation();this.unsubscribeJobs();this.unsubscribeAssets();this.setOpen(false);this.portraits.clear();this.selection.destroy();}
 }
