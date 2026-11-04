@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Improved
+- Quarries have a new painted look: a stepped stone pit with a timber hoist, stacked blocks and a tool shed. Placing one still outlines its deposit in gold.
 - Villagers dress for their job: woodcutters, miners, hunters, builders, farmers, millers, bakers, haulers and soldiers each have their own clothes, headgear and tools, as men and women, facing all eight walking directions with a light walking and working motion.
 - Construction sites show painted scaffolding that grows in three stages with the work: a first lift around low stone courses, a second lift (a timber frame for wooden buildings) and a tall third lift, sized to the building.
 - Oaks and pines have new painted looks for young and mature trees: oaks blossom in spring, turn ochre and gold in autumn and stand bare with snow on their branches in winter, pines carry snow in winter, and summer oaks come in two crown shapes. Stumps and saplings keep their simple look.
