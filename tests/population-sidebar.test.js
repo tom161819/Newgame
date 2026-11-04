@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { populationSummary,populationWindow,professionColor,humanPortrait } from '../src/ui/populationData.js';
+import { populationSummary,populationWindow,professionColor,humanPortrait,populationDetails,residentWarnings } from '../src/ui/populationData.js';
 import { HUMAN_APPEARANCE } from '../src/data/humanAppearance.js';
 import { JOBS } from '../src/data/jobs.js';
 import { workerScene } from './helpers/workerScene.js';
+import { SKILL_IDS } from '../src/data/jobs.js';
 
 test('population reuses living permanent residents, excludes strangers/deaths and preserves individual progress',()=>{
   const scene=workerScene(),system=scene.workerSystem,a=system.create({x:40,y:41}),b=system.create({x:41,y:41}),dead=system.create({x:42,y:41}),visitor=system.create({x:43,y:41});
@@ -33,4 +34,19 @@ test('every actual profession has a distinct central portrait colour and fallbac
   const colors=Object.keys(JOBS).map(professionColor);assert.equal(new Set(colors).size,Object.keys(JOBS).length);for(const color of colors)assert.match(color,/^#[a-f0-9]{6}$/i);
   assert.equal(professionColor('future-unconfigured-job'),JOBS.idle.portraitColor);
   const svg=decodeURIComponent(humanPortrait().split(',').slice(1).join(','));assert.ok(svg.startsWith('<svg'));for(const key of ['skin','hair','tunic'])assert.ok(svg.includes('#'+HUMAN_APPEARANCE[key].toString(16)));
+});
+
+test('resident details read actual skill XP, talent, task and hunger without adding overall XP or invented needs',()=>{
+  const scene=workerScene(),worker=scene.workerSystem.create({x:41,y:40});worker.naturalTalent='mining';scene.skillSystem.addXP(worker,'mining',200);
+  worker.workState='Working';worker.workMessage='Mining stone';scene.foodSystem.syncResidents();scene.foodSystem.residents.get(worker.id).hungry=true;
+  const before=structuredClone({experience:worker.experience,skills:worker.skills}),details=populationDetails(scene,worker),mining=details.skills.find(skill=>skill.id==='mining');
+  assert.equal(mining.level,worker.skills.mining.level);assert.equal(mining.currentXP,worker.skills.mining.currentXP);assert.equal(mining.xpToNextLevel,worker.skills.mining.xpToNextLevel);assert.equal(mining.talented,true);
+  assert.deepEqual(details.skills.map(skill=>skill.id),SKILL_IDS);assert.equal(details.talent,'Natural Miner');assert.equal(details.job,'Working');assert.equal(details.task,'Mining stone');assert.equal(details.workplace,'Not assigned');
+  assert.ok(details.warnings.some(warning=>warning.text.startsWith('Hungry:')));assert.equal(Object.hasOwn(details,'happiness'),false);assert.deepEqual({experience:worker.experience,skills:worker.skills},before);
+});
+
+test('status badges use only existing unemployment, individual hunger and low health states',()=>{
+  const scene=workerScene(),worker=scene.workerSystem.create({x:41,y:40});assert.deepEqual(residentWarnings(scene,worker).map(warning=>warning.text),['Unemployed']);
+  scene.workerSystem.jobs.assign(worker,'builder');assert.deepEqual(residentWarnings(scene,worker),[]);
+  worker.currentHP=1;assert.deepEqual(residentWarnings(scene,worker).map(warning=>warning.text),['Low health']);
 });

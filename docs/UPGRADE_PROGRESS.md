@@ -16,7 +16,7 @@ Etapy01–04 i dodatečný audit archivu jsou DONE; etapa05 je PARTIAL a další
 | 02 | 36: Building Categories & Unlock Requirements | M1 | DONE | `5074450fe57321ac71b7ded1cedcaf2281d2f216`;294/294, build, plný browser fyzické výstavby/rušení, Save/Load;[report](verification/master-02.md) |
 | 03 | 33: Seasons ON/OFF | M1 | DONE | `1d9dd4610a5690db8348b2743ec376b668266fcf`;307/307, build, plný browser/IndexedDB, skutečné2/7→8;[report](verification/master-03.md) |
 | 04 | 28: Circular Fog of War & Map Memory | M1 | DONE | `0024c16c803a91b151cff08300665076f8b67b35`;335/335, build, plný browser/pixely/interakce, IndexedDB a skutečné2/7/8→9;20 NPC s pohybem a mlhou60FPS;[report](verification/master-04.md) |
-| 05 | 30: Population Sidebar & Skill Sorting | M1 | PARTIAL | FázeA DONE: pravý panel, skuteční poddaní, portréty/barvy a virtualizace200;339/339, build, skutečný browser/mobile/scroll/Save9; B–D následují;[report](verification/master-05.md) |
+| 05 | 30: Population Sidebar & Skill Sorting | M1 | PARTIAL | FázeA–B DONE: pravý panel, skuteční poddaní, portréty/barvy, virtualizace200 a skutečné XP/skills/talent/task tooltipy;341/341, build, browser/mobile/aktivní scroll/Save9; C–D následují;[report](verification/master-05.md) |
 | 06 | 32: Missing Workers Indicator | M1 | PENDING | Nezahájeno |
 | 07 | 25: Forestry & Natural Resources | M2 | PENDING | Nezahájeno |
 | 08 | 31A: Extended Zoom Out | M2 | PENDING | Nezahájeno |
