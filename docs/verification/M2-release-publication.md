@@ -1,6 +1,22 @@
 # M2 publication checkpoint — verified candidate, public release pending
 
-## Current state — 2026-11-04
+## Latest integration and queue update — 2026-11-04
+
+Main2ce3cd7/PR25 approved tree art was normally merged as46cd448; only the
+coordination register conflicted, both histories preserved. Actual game/art
+paths match main byte-for-byte. This follow-up passes475/475models, validators,
+Pages build and targeted native `--zoom --fog --season-transition --forestry`,
+including real tree clicks/chopping/cargo, last-seen visuals, seasons, current
+IndexedDB and historical games. The prior full production/construction suite
+below applies to main14071b1; unchanged production logic was not rerun needlessly.
+New logs: Newgame-M2-tree-integration-{tests,pages,smoke}.log in workspace/scratch.
+Frozen02a and all73archive directories stay unchanged.
+
+The user then reordered the queue: finish M2, then C01–C08, then master11–15.
+Task IDs and M3–M5 gates are retained; the Stables/Knight dependency is explicit
+in CODEX_PROGRESS. No queued task was marked implemented by this documentation.
+
+## Verified prior ground/building integration — 2026-11-04
 
 Work is uploaded to [PR22](https://github.com/tom161819/Newgame/pull/22), branch
 `codex/m2-smelting-smoke`. Main14071b1 (Claude PR19–24: seasonal transitions,
@@ -23,11 +39,11 @@ and33logical milestones. No additional MINOR bump or duplicate archive is needed
 |---|---|
 | Frozen source02a | Own459/459 tests, build and real Chromium startup; exact source tree. |
 | Corrected native fixtures | Full combined source8b suite passed, including real40s Smelter, late Hauler, UI obstruction, seasons and current-save restoration. See M2-smelter-smoke.md. |
-| Current source after approved ground/building merges | 474/474 tests,0failed/0skipped; changelog/catalog validation; production Pages build passed. |
+| Prior source after approved ground/building merges | 474/474 tests,0failed/0skipped; changelog/catalog validation; production Pages build passed. |
 | All73 local canonical archives | 2456HTTP files,121455383bytes, correct MIME/SHA-256; immutable archive validator passed. |
 | Updated Studio | Canvas/WebGL/export/mobile smoke exit0; no console/network errors. |
 | New actual-deployment archive proof | 13/13 targeted Git/gate tests; all71 actual02a Git files at local integration3d5ac80 verified. Current public main correctly refused. |
-| Full current-game native integration with approved art | Exit0: ledger/Smelter/mines/forestry/zoom/Fog/Population200/staffing/seasons/real construction and cancellation/current Save14/historical games/mobile. |
+| Full native integration through main14071b1 with approved ground/buildings | Exit0: ledger/Smelter/mines/forestry/zoom/Fog/Population200/staffing/seasons/real construction and cancellation/current Save14/historical games/mobile. |
 
 Logs in `/workspace/scratch/`: `Newgame-M2-deployed-archive-final-tests.log`,
 `Newgame-M2-deployed-archive-pages.log`, `Newgame-M2-approved-art-http.log`,
@@ -73,7 +89,7 @@ merging may have worked in an earlier runtime. No repository-rights change or
 network-policy bypass is justified by this evidence.
 
 M2 is **not RELEASED**. Master11–15 and C01–C08 are unstarted; the latter remains
-queued after the original15. No further release authorization is required.
+queued before deferred master11–15, after M2, per the latest user reorder. No further release authorization is required.
 
 ## Resume without another permission request
 
@@ -88,7 +104,7 @@ queued after the original15. No further release authorization is required.
    MINOR:0.3.0 is already prepared,0.4.0 belongs to the next milestone.
 5. Ensure a tag-aware Pages build refreshes the generated catalog. Verify its
    actual Success and run `release:verify` with the exact deployed SHA/run.
-6. Only then record M2 RELEASED and begin master11 automatically. Save real
+6. Only then record M2 RELEASED and begin C01 automatically, followed by C02–C08 and then master11–15. Save real
    technical blockers; never fabricate publication or promise background work.
 
 ## Earlier formal gate failures, retained as evidence

@@ -42,7 +42,7 @@ The real Git fixtures cover binary PNG bytes, newer live development, an old
 deployment missing the archive, a corrupted deployed image hidden by a restored
 local copy, missing/extra files, symlinks, incorrect published metadata, a false
 source tree and a mismatched package version. Together with existing gate tests:
-13/13 pass. The complete current suite passes474/474,0failed/0skipped.
+13/13 pass. The complete current suite passes475/475,0failed/0skipped.
 The live-catalog regression rejects unavailable/missing/duplicate releases,
 wrong source/tag/link/notes and a stale served manifest; newer live development
 is allowed. Actual public release verification remains pending, not simulated.

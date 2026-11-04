@@ -1,6 +1,6 @@
 Finalizes M2 v0.3.0 with a frozen playable archive of actual source
 02a3a43ace8adc993aea7a392424d7cdf4e7dec9. Preserves Claude’s merged seasonal,
-ground and production-building graphics through main14071b1, plus the military
+ground and production-building graphics and approved trees through main2ce3cd7, plus the military
 Studio concepts. The later ground/building work stays Unreleased; M2 source02a
 and its archive remain unchanged. No extra MINOR bump.
 
@@ -18,7 +18,7 @@ The actual public catalog/manifest must also match, so a pre-tag build cannot
 pass using only a local catalog. Preflight still requires matching deployed live
 source and all nine checks.
 
-Validation:474/474 tests,0fail/skip; changelog/catalog/archive SHA validation;
+Validation:475/475 tests,0fail/skip after the tree integration; changelog/catalog/archive SHA validation;
 Pages production build;73canonical URLs/2456HTTP files/121455383bytes/MIME/SHA;
 Studio Canvas/WebGL/export/mobile smoke. Real Git fixtures cover corrupted,
 missing/extra/symlink archive files and stale deployment metadata. All71files
@@ -26,10 +26,12 @@ of the actual02a archive pass the new Git-blob verifier locally. The frozen
 source independently passed459tests/build/Chromium. Full current-game native
 integration after approved-ground/building merges exits0, including production,
 Fog/zoom,Population200,seasons,physical construction/cancellation,Save14 and
-historical-game storage isolation. No current gameplay path changed afterward.
+historical-game storage isolation. The later tree-only merge also passes targeted native zoom/Fog/season-transition/
+forestry plus current Save14/historical games; production logic stayed unchanged.
 
 All72previous snapshots/URLs/save namespaces are unchanged. No public tag was
 pushed or moved; local v0.3.0 remains prepared at02a. After actual main merge and
 Pages/gates, publish only that tag, run a tag-aware Pages build and release:verify,
-then mark M2 RELEASED and continue master11. Master11–15 and queued C01–C08 remain
-unstarted. Autonomous milestone publication is already authorized.
+then mark M2 RELEASED and continue C01–C08 before deferred master11–15. The user reordered the queue to M2 → C01–C08 → master11–15; all future tasks
+remain unstarted, with the deferred Stables/Knight dependency recorded.
+Autonomous milestone publication is already authorized.

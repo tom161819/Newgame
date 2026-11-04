@@ -15,7 +15,16 @@ Claude (Claude Code, reads `CLAUDE.md`, which imports this file) and Codex (read
 6. Before finishing: `npm test`, `npm run changelog:validate`, the production build (`npm run build:pages`) and the browser smoke tests relevant to the change (`npm run smoke -- --base=/Newgame/`, with `--current-only` or `--full` as appropriate). Report real results, including anything not verified.
 7. Describe every pull request briefly: what changed, tests and smoke results, Save/Load impact, files touched.
 8. No force push, no history rewriting, never discard unfinished work. Save interrupted work as a clearly marked WIP commit on your own branch and push it.
-9. Milestone releases M1–M5 are explicitly authorized in advance (user renewed this instruction on 2026-11-04). After the milestone gate passes, autonomously prepare the next MINOR version, changelog and source-verified archive in a branch, merge through a pull request, publish the real tag for the merged release source, verify GitHub Pages success and continue the next master stage. Do not wait for another release instruction or confirmation, including after Stage10/M2; this supersedes the earlier uploaded handoff requiring a stop there. Keep all required tests and release/deployment checks. Stop only for a genuine unresolved technical blocker or environment limitation, save a recoverable checkpoint, and never claim a blocked publication succeeded.
+9. Milestone releases M1–M5 are explicitly authorized in advance (user renewed this instruction on 2026-11-04). After the milestone gate passes, autonomously prepare the next MINOR version, changelog and source-verified archive in a branch, merge through a pull request, publish the real tag for the merged release source, verify GitHub Pages success and continue the next task in `docs/TASK_QUEUE.md`. Do not wait for another release instruction or confirmation, including after Stage10/M2; this supersedes the earlier uploaded handoff requiring a stop there. Keep all required tests and release/deployment checks. Stop only for a genuine unresolved technical blocker or environment limitation, save a recoverable checkpoint, and never claim a blocked publication succeeded.
+
+# Current queue priority — explicit user reorder, 2026-11-04
+
+Finish the active M2 publication, then C01–C08 in order, then original master
+11–15 in order. The user moved Stone Pavement, Wheelwright/Wagons/Stables/Housing,
+Needs/Happiness, Trade and Background Simulation behind those eight tasks.
+Keep original IDs and M3–M5 release gates; this order overrides older requests
+that put C01–C08 after master15. Follow `docs/TASK_QUEUE.md` and
+`docs/CODEX_PROGRESS.md`, including the deferred Stables/Knight dependency.
 
 # Project workflow
 

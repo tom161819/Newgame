@@ -80,4 +80,4 @@ refining the local final tag; never move or force-push any published tag. Keep
 all72existing snapshots immutable, including candidate f053be1. If a new final
 source archive is needed, add it from that real commit and verify it normally.
 Do not weaken the source comparison or mark M2 RELEASED early. Master11 and
-C01–C08 have not started; the new queue remains after the original master15.
+C01–C08 have not started; the latest user reorder puts C01–C08 after M2 and before master11–15.

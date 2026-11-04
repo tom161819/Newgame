@@ -1,9 +1,14 @@
 # M2 — Resources, economy and iron — local preflight verified
 
+Latest update: main2ce3cd7 trees preserved;475/475models, production build and
+native zoom/Fog/season-transition/forestry/current Save14/historical games pass.
+Prior full suite through main14071b1 remains recorded below. New user order:
+M2 publication → C01–C08 → master11–15 (IDs and later milestone gates unchanged).
+
 Status: FROZEN RELEASE CANDIDATE; public publication pending in
 [PR22](https://github.com/tom161819/Newgame/pull/22). Source02a has its own459-test
 archive (73total,72older unchanged),0.3.0/Save14 and coherent release notes.
-The current working branch preserves approved ground/building art through
+The previously verified ground/building integration preserved approved art through
 main14071b1:474models, validators, Pages build,73canonical archive URLs/2456HTTP
 files and Studio smoke pass. The complete current-game native suite also exits0, including physical
 production/construction, Fog/zoom, seasons, current Save14 and historical games.
@@ -63,7 +68,7 @@ publication is already authorized; no new approval is needed.
 5. Only then prepare the next MINOR using the established workflow, verify metadata,
    commit/tag the real release source and build its immutable archive from that
    exact commit. Preserve all71existing snapshots/URLs and verify real deployment.
-   Then record RELEASED and continue Stage11. No premature0.3.0claim.
+   Then record RELEASED and continue C01–C08, then deferred master11–15. No premature0.3.0claim.
 
 Visual Polish & Art Pass is cancelled from Codex's queue, owned by Claude. Routine
 merge conflicts are now resolved autonomously while preserving both authors.
