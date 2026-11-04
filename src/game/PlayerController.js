@@ -1,7 +1,7 @@
 import { tileCenter, isWalkable } from './map.js';
 import { gridToWorld } from './isometric.js';
 import { tileKey } from './stones.js';
-import { planGroundOrder, planTowerExit, towerNeighbors, buildingDepth, towerTop, buildingDefinition,buildingIsComplete } from './buildings.js';
+import { groundDepthAbove,planGroundOrder, planTowerExit, towerNeighbors, buildingDepth, towerTop, buildingDefinition,buildingIsComplete } from './buildings.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { advanceMovement } from './movement.js';
 import { isWall,wallIndex,findRoofPath,planRoofExit } from './walls.js';
@@ -195,7 +195,7 @@ export class PlayerController {
     this.exitTile = null;
     this.position = { x: exit.x + 0.5, y: exit.y + 0.5 };
     this.currentTower = null;
-    this.sprite.setDepth(this.sprite.y + this.depthOffset);
+    this.sprite.setDepth(groundDepthAbove(this.scene.buildings,{x:Math.floor(this.position.x),y:Math.floor(this.position.y)},this.sprite.y + this.depthOffset));
     this.setState(PLAYER_STATE.GROUND);
     if (this.path.length === 0) this.arrive();
     else this.scene.setStatus('Král je dole a pokračuje k cíli.');
@@ -216,7 +216,7 @@ export class PlayerController {
     this.availableWorkMs=advanceMovement(this,delta);
     const projected = gridToWorld(this.position.x, this.position.y);
     this.sprite.setPosition(projected.x, projected.y);
-    this.sprite.setDepth(this.sprite.y + this.depthOffset);
+    this.sprite.setDepth(groundDepthAbove(this.scene.buildings,{x:Math.floor(this.position.x),y:Math.floor(this.position.y)},this.sprite.y + this.depthOffset));
     if (!this.nextTile && this.path.length === 0 && this.scene.marker.visible) this.arrive();
   }
 }
