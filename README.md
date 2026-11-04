@@ -287,6 +287,8 @@ Objekty se řadí podle promítnuté polohy nohou či přední části základny
 
 Existuje celá logická mapa a pathfinding na všech 10 000 políčkách. Šest procedurálních textur země se jednou skládá do bloků **10 × 10 políček**. Vykreslují se jen viditelné bloky s rezervou pro okraje; obrazy bloků i překážek se skrývají a znovu používají. Statický výřez se nepřestavuje každý snímek. Kameny a věže mimo kameru se také nekreslí.
 
+Výchozí renderer lze pro testování přepnout parametrem adresy: `?renderer=canvas` (výchozí), `?renderer=webgl` (WebGL, je-li dostupné, jinak Canvas) nebo `?renderer=auto` (WebGL jen s hardwarovou akcelerací). Aktivní renderer ukazuje Settings. Volba platí pro dané načtení stránky a neukládá se.
+
 Pro tento procedurální prototyp je vybraný renderer **Phaser Canvas**, který s cache terénu dobře funguje také na strojích bez hardwarové akcelerace WebGL. Místo tisíců objektů země tak scéna kreslí desítky obrazových bloků. Logické kolize a cesta nadále rozlišují každé jednotlivé políčko.
 
 Kamera je omezená obdélníkovými hranicemi promítnutého světa; její střed se navíc drží uvnitř kosočtverce mapy. U okrajů tak lze vidět obrys světa, ale kamerou nelze odjet do nekonečného prázdna. Inventář a Buildings patří do HTML, nikoli do posouvané kamery.
