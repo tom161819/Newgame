@@ -108,9 +108,10 @@ test('asset URLs retain the Pages prefix; PNG/WebP/sheets load once per object t
     spritesheet:{frameWidth:32,frameHeight:48},renderMode:'sprite',stats:structuredClone(objectRegistry.require('king').stats)}));
   const calls=[], scene={load:{on(){},image(...args){calls.push(['image',...args]);},spritesheet(...args){calls.push(['sheet',...args]);}},textures:{exists:()=>false}};
   const manager = new AssetManager(scene,registry,{baseURL:'/Newgame/'});
-  // 49 registered objects + the animated test object, plus the tower's front layer and the four approved grass tile variants.
-  assert.equal(manager.queue(),55);assert.equal(manager.queue(),0);
-  assert.equal(calls.length,55);
+  // 49 registered objects + the animated test object, plus the tower's front layer, the four approved grass tiles
+  // and the nine approved tree looks (six oak, three pine).
+  assert.equal(manager.queue(),64);assert.equal(manager.queue(),0);
+  assert.equal(calls.length,64);
   assert.ok(calls.some(c=>c[2].endsWith('.webp')));
   assert.deepEqual(calls.find(c=>c[0]==='sheet'),['sheet','asset:animated:main','/Newgame/assets/resources/stone/stone.png',{frameWidth:32,frameHeight:48}]);
 });
