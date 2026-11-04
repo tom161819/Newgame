@@ -13,7 +13,7 @@ import { explorationMenuSmoke,staticMemoryRendererSmoke,hiddenInteractionSmoke }
 import { populationSidebarSmoke,populationNavigationSmoke,populationIntegrationSmoke } from './population-smoke.mjs';
 import { staffingIndicatorsSmoke } from './staffing-smoke.mjs';
 import { emptyNaturalState } from '../src/data/naturalResources.js';
-import { forestrySmoke } from './forestry-smoke.mjs';
+import { forestrySmoke,forestryHutSmoke } from './forestry-smoke.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
 const base=projectBase(args.find(a=>a.startsWith('--base='))?.slice(7)??'/Newgame/'),dist=path.join(root,'dist');
@@ -75,6 +75,7 @@ try{
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
   if(args.includes('--full')||args.includes('--forestry'))await forestrySmoke(page);
+  if(args.includes('--full')||args.includes('--forestry-workers'))await forestryHutSmoke(page);
   if(args.includes('--full')||args.includes('--population')){await populationSidebarSmoke(page);await populationNavigationSmoke(page);await populationIntegrationSmoke(page);}
   if(args.includes('--full')||args.includes('--staffing'))await staffingIndicatorsSmoke(page);
   if(args.includes('--full')||args.includes('--fog')){await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);await hiddenInteractionSmoke(page);}

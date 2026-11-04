@@ -70,11 +70,12 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   }
   for(const w of s.workers??[]){
     const t=w.workTask;if(!t)continue;
-    if(['foodPickup','foodDeliver','produce','harvest'].includes(t.kind)&&t.transferId){const match=t.transferId.match(/^food-transfer-(\d+)$/);check(match);integer(Number(match[1]),1,production.nextTransfer-1);}
+    if(['foodPickup','foodDeliver','produce','harvest','chopTree'].includes(t.kind)&&t.transferId){const match=t.transferId.match(/^food-transfer-(\d+)$/);check(match);integer(Number(match[1]),1,production.nextTransfer-1);}
     if(t.kind==='produce'){const b=producers.find(b=>b.id===t.targetId);check(b&&w.assignedWorkplaceId===b.id&&registry.require(b.type).workplace.profession===w.profession&&adjacent(locations.get(`input-${b.id}`),t.goal));continue;}
     if(t.kind==='harvest'){
       const crop=registry.require(s.buildings.find(b=>b.id===t.targetId).type).crop;check(t.capacityReservation&&locations.has(t.destinationId));capacity(t.capacityReservation,t.transferId,crop.resource,crop.yield);continue;
     }
+    if(t.kind==='chopTree'){const tree=s.resources.find(r=>r.natural?.id===t.targetId),yieldAmount=registry.require(tree?.type).tree.wood;check(t.amount===yieldAmount&&locations.has(t.destinationId)&&['fallback','storage'].includes(locations.get(t.destinationId).kind));capacity(t.capacityReservation,t.transferId,'wood',yieldAmount);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);continue;}
     if(!['foodPickup','foodDeliver'].includes(t.kind))continue;
     check(resources.includes(t.resource)&&locations.has(t.destinationId));integer(t.amount,1,carryCapacity(w));
     const sourceDrop=t.sourceDropId&&s.drops.find(d=>d.id===t.sourceDropId);
@@ -82,9 +83,10 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     else check(adjacent(locations.get(t.kind==='foodPickup'?t.sourceId:t.destinationId),t.goal));
     if(t.hauling!==undefined){check(t.hauling===true&&w.profession==='hauler');if(t.kind==='foodDeliver'){number(t.loadedDistance);number(t.loadedPosition?.x,0,100);number(t.loadedPosition?.y,0,100);}}
     if(t.kind==='foodPickup'){
-      if(t.sourceDropId)check(!t.stockReservation&&t.hauling);
+      if(t.sourceDropId)check(!t.stockReservation&&(t.hauling||t.naturalHarvest===true));
       else{const stock=reservations.get(t.stockReservation);check(stock?.kind==='stock'&&stock.locationId===t.sourceId&&stock.resource===t.resource&&stock.amount===t.amount&&stock.owner===t.transferId&&!stockRefs.has(stock.id));stockRefs.add(stock.id);}check(!w.cargo);
     }else check(w.cargo?.resource===t.resource&&w.cargo.amount>=t.amount);
+    if(t.naturalHarvest!==undefined)check(t.naturalHarvest===true&&w.profession==='woodcutter'&&s.buildings.some(b=>b.id===w.assignedWorkplaceId&&b.type==='lumberjack_hut')&&t.resource==='wood');
     const cap=reservations.get(t.capacityReservation);
     if(t.siteId!=null){check(sites.has(t.siteId)&&t.destinationId===`site-${t.siteId}`&&cap?.siteId===t.siteId);if(t.kind==='foodPickup')check(t.sourceDropId?sourceDrop?.siteId===t.siteId:reservations.get(t.stockReservation)?.siteId===t.siteId);else check(w.cargo?.siteId===t.siteId);}
     if(t.outputBuildingId&&t.kind==='foodPickup'&&records.get(t.outputBuildingId)?.outputReservation===t.capacityReservation){check(cap?.resource===t.resource&&cap.amount===t.amount);}

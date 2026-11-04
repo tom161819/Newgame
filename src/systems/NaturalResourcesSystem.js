@@ -2,17 +2,21 @@ import { FORESTRY,treeBlocks,treeState } from '../data/naturalResources.js';
 import { reachableTiles,findPathToAny } from '../game/pathfinding.js';
 import { tileKey } from '../game/stones.js';
 import { buildingIsComplete,buildingDefinition } from '../game/buildings.js';
+import { ForestryWork } from './ForestryWork.js';
 
 export class NaturalResourcesSystem {
   constructor(scene){
     this.scene=scene;this.nextId=1;this.growthClock=0;this.ageClock=0;this.refreshElapsed=0;this.byId=new Map();this.kingTask=null;
     this.unsubscribe=scene.gameTime.onAdvance(delta=>this.advance(delta));
+    this.forestry=new ForestryWork(scene,this);
     for(const view of scene.resources.values())this.register(view.getData('object'));
   }
   register(object){if(object?.natural)this.byId.set(object.natural.id,object);}
   view(object){return this.scene.resources.get(tileKey(object));}
   growthModifier(){return this.scene.seasons?FORESTRY.seasonGrowth[this.scene.seasons.season]:1;}
-  reserved(){return new Set(this.scene.reservedTiles().map(tileKey));}
+  reserved(){const reserved=new Set([...this.scene.reservedTiles().map(tileKey),...[...(this.scene.dropSystem?.drops.values()??[])].map(d=>tileKey(d.tile))]);for(const key of this.scene.workerSystem.reservations.owners.keys())if(key.startsWith('natural-slot:'))reserved.add(key.slice('natural-slot:'.length));return reserved;}
+  updateWorker(worker,delta){this.forestry.update(worker,delta);}
+  releaseWorker(worker){this.forestry.release(worker);}
   origins(){return this.scene.resourceOrigins?.()??[this.scene.character.nextTile??this.scene.character.tile];}
   blockedByBuilding(object){return this.scene.buildings.some(b=>b.tiles.some(t=>t.x===object.x&&t.y===object.y)&&(!buildingDefinition(b).walkable||!buildingIsComplete(b)));}
   refreshMap(object){

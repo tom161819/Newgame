@@ -42,7 +42,7 @@ async function clickBuilding(page,id){
     throw Error(`No exposed clickable surface for building ${id}.`);
   },id);await clickWorld(page,point);
 }
-async function placeBlueprint(page,type){
+export async function placeBlueprint(page,type){
   const point=await page.evaluate(type=>{
     const s=window.__game.registry.get('application').scene,d=s.objectRegistry.require(type),occupied=new Set(s.reservedTiles().map(t=>`${t.x},${t.y}`)),start=s.character.tile;
     for(let y=35;y<70;y++)for(let x=35;x<70;x++){
@@ -55,7 +55,7 @@ async function placeBlueprint(page,type){
   await page.waitForFunction(type=>window.__game.registry.get('application').scene.buildings.some(b=>b.type===type&&b.construction?.state==='planned'),type);
   const id=await page.evaluate(type=>window.__game.registry.get('application').scene.buildings.filter(b=>b.type===type&&b.construction?.state==='planned').at(-1).id,type);return {id,point};
 }
-async function supplyAndBuild(page,{id,point}){
+export async function supplyAndBuild(page,{id,point}){
   await clickBuilding(page,id);await page.locator('#construction-dialog[open]').waitFor();assert.equal(await page.locator('#construction-king-work').isDisabled(),true);await page.locator('#construction-deliver').click();await page.locator('#close-construction').click();
   await page.waitForFunction(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id);return s.constructionSystem.materials.ready(b)&&s.kingLogistics.workflowSiteId==null;},id,{timeout:35000});
   // A normal second map click issues the existing royal Build order.

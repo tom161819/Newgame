@@ -6,6 +6,7 @@ import { element } from './objectLabels.js';
 export class WorkplacePanel {
   constructor(scene){
     this.scene=scene;this.dialog=document.querySelector('#workplace-dialog');this.controller=new AbortController();const options={signal:this.controller.signal};this.restored=true;
+    this.forestryDetails=element('section');this.forestryDetails.id='forestry-details';this.forestryDetails.hidden=true;this.forestryTrees=element('p');this.forestryTrees.id='forestry-tree-count';this.forestryTotal=element('p');this.forestryTotal.id='forestry-output-total';this.forestryToday=element('p');this.forestryToday.id='forestry-output-today';this.forestryDetails.append(this.forestryTrees,this.forestryTotal,this.forestryToday);this.dialog.insertBefore(this.forestryDetails,document.querySelector('#food-production-details'));
     document.querySelector('#close-workplace').addEventListener('click',()=>this.close(),options);
     document.querySelector('#assign-workplace-worker').addEventListener('click',()=>{document.querySelector('#workplace-candidates').hidden=!document.querySelector('#workplace-candidates').hidden;},options);
     document.querySelector('#toggle-food-production').addEventListener('click',()=>{const record=scene.foodProduction.records.get(this.building?.id);if(record)scene.foodProduction.toggle(this.building.id,!record.auto);this.refresh();},options);
@@ -23,7 +24,9 @@ export class WorkplacePanel {
     const s=this.scene,b=this.building;if(!s.buildings.includes(b)||!s.fog.isVisibleObject(b)){this.close();return;}
     const spec=buildingDefinition(b),summary=s.workplaceSystem.summary(b),employees=s.workplaceSystem.employees(b),candidates=s.workerSystem.liveSubjects().filter(w=>w.assignedWorkplaceId!==b.id);
     const production=spec.recipe?s.foodProduction.records.get(b.id):null;
-    const signature=JSON.stringify([summary,production,production?s.foodStorage.revision:0,employees.map(w=>[w.id,w.workState,w.workMessage,w.skills[spec.workplace.skill].level]),candidates.map(w=>[w.id,w.profession,w.naturalTalent,w.skills[spec.workplace.skill].level])]);if(signature===this.signature)return;this.signature=signature;
+    const forestry=spec.id==='lumberjack_hut'?s.naturalResources.forestry.summary(b):null;this.forestryDetails.hidden=!forestry;
+    const signature=JSON.stringify([summary,production,forestry,production?s.foodStorage.revision:0,employees.map(w=>[w.id,w.workState,w.workMessage,w.skills[spec.workplace.skill].level]),candidates.map(w=>[w.id,w.profession,w.naturalTalent,w.skills[spec.workplace.skill].level])]);if(signature===this.signature)return;this.signature=signature;
+    if(forestry){this.forestryTrees.textContent=`${forestry.known?'Known mature':'Mature'} trees in working radius: ${forestry.trees}`;this.forestryTotal.textContent=`Timber cut: ${forestry.harvested} Wood`;this.forestryToday.textContent=`Wood production today: ${forestry.today}`;}
     const recipePanel=document.querySelector('#food-production-details');recipePanel.hidden=!production;
     if(production){
       const format=items=>Object.entries(items).map(([id,n])=>`${n} ${s.objectRegistry.require(id).name}`).join(' + '),cycle=production.cycle;
@@ -48,5 +51,5 @@ export class WorkplacePanel {
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){this.dialog.close();this.restoreInput();}
-  destroy(){this.close();this.controller.abort();}
+  destroy(){this.close();this.controller.abort();this.forestryDetails.remove();}
 }
