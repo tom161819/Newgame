@@ -117,7 +117,16 @@
     "grass_frost": "#7f8c6c",
     "snow": "#e6ebee",
     "snow_shade": "#c6d0d8",
-    "twigs": "#6f6052"
+    "twigs": "#6f6052",
+    "horse_bay": "#7a4b2c",
+    "horse_dark": "#3e2c22",
+    "horse_grey": "#a49c90",
+    "horse_chestnut": "#94552c",
+    "steel": "#9aa1a6",
+    "steel_dark": "#5f666b",
+    "gold_trim": "#c4a24a",
+    "banner_blue": "#2f4d7a",
+    "coals": "#c4472a"
   },
   "materials": {
     "stone": {
@@ -420,6 +429,69 @@
       "repeat": 0.8,
       "variation": 0.22,
       "description": "Bare winter crown: a grey-brown haze of twigs."
+    },
+    "horse_bay": {
+      "color": "horse_bay",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.06,
+      "description": "Bay horse coat."
+    },
+    "horse_dark": {
+      "color": "horse_dark",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.06,
+      "description": "Dark horse coat, manes and tails."
+    },
+    "horse_grey": {
+      "color": "horse_grey",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.06,
+      "description": "Grey horse coat."
+    },
+    "horse_chestnut": {
+      "color": "horse_chestnut",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.06,
+      "description": "Chestnut horse coat."
+    },
+    "steel": {
+      "color": "steel",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Polished blades, plate armour and helmets."
+    },
+    "steel_dark": {
+      "color": "steel_dark",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Mail, blackened plates and tools."
+    },
+    "gold_trim": {
+      "color": "gold_trim",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.03,
+      "description": "Knightly trim, hilts and buckles."
+    },
+    "banner_blue": {
+      "color": "banner_blue",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Royal blue cloth for shields, surcoats and pennants."
+    },
+    "coals": {
+      "color": "coals",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.2,
+      "description": "Glowing forge coals (lit by a runtime light)."
     }
   },
   "light": {
@@ -519,5 +591,8 @@
   "seasons": {
     "rule": "Seasons change the colour of grass, leaves and ground, never the silhouette of buildings. Spring is fresh light green with sparse blossom; summer is the lush base; autumn turns grass olive and leaves ochre, gold and russet (muted, never neon orange); winter dulls grass, bares broadleaf trees and adds snow in patches before full cover.",
     "transition": "A new season spreads over the first 10–25 % of its length, unevenly: each tile starts a little earlier or later by a stable hash and a slow large-scale noise, so the map never flips in one frame and shows no checkerboard. Paths, buildings and Fog of War memory keep their own rules."
+  },
+  "military": {
+    "rule": "Military trades read through metal and order: racks of identical weapons, forges with glowing coals, stone and iron-banded doors. Soldiers differ by silhouette first (bow, spear-and-shield, sword-and-plate, horse), colour second (red for the crown, blue trim for knights)."
   }
 }

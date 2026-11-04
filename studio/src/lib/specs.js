@@ -11,6 +11,7 @@ export const CATEGORIES = Object.freeze([
   { id: 'nature', label: 'Nature' },
   { id: 'resources', label: 'Resources' },
   { id: 'decorations', label: 'Decorations' },
+  { id: 'equipment', label: 'Equipment' },
 ]);
 export const CATEGORY_IDS = Object.freeze(CATEGORIES.map(c => c.id));
 const ID = /^[a-z][a-z0-9-]*$/;

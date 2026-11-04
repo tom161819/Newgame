@@ -366,7 +366,7 @@ function detailsView(asset) {
     h('section', { class: 'panel' }, h('h2', {}, 'Asset'), rows([
       ['ID', h('span', { class: 'mono' }, asset.id)], ['Name', asset.name], ['Category', asset.category],
       ['Footprint', `${asset.footprint.width} × ${asset.footprint.height} tiles`], ['Generator', `${generator.label} v${generator.version}`],
-      ['Style guide', `${style.name} v${style.version}`], ['Replaces in game', asset.gameObjectId ? h('span', { class: 'mono' }, asset.gameObjectId) : '—'],
+      ['Style guide', `${style.name} v${style.version}`], ['Replaces in game', asset.gameObjectId ? h('span', { class: 'mono' }, asset.gameObjectId) : asset.plannedGameObjectId ? h('span', {}, h('span', { class: 'mono' }, asset.plannedGameObjectId), ' (planned, not in the game yet)') : '—'],
       ['Spec file', repoLink(asset.paths.spec)], ['Recipe source', repoLink(asset.paths.generator)], ['Review manifest', repoLink('art/approvals.json')],
     ])),
     h('section', { class: 'panel' }, h('h2', {}, 'Recipe parameters'), rows(generator.params.map(p => [h('span', { class: 'mono' }, p.key), `${p.description}${p.values ? ` (${p.values.join(' | ')})` : ''}${p.unit ? ` [${p.unit}]` : ''}`])))),
@@ -415,6 +415,7 @@ function styleGuideView() {
       h('li', {}, style.light.rule), h('li', {}, style.detail.silhouette), h('li', {}, style.detail.outline), h('li', {}, style.detail.textureScale), h('li', {}, style.detail.colour), h('li', {}, `Smallest readable feature: ${style.detail.minimumFeaturePx} px at 1×.`))),
     style.units ? h('section', { class: 'panel' }, h('h2', {}, 'Figures'), h('ul', { class: 'rules' }, ['rule', 'readability', 'sexes'].map(key => h('li', {}, style.units[key])))) : null,
     style.props ? h('section', { class: 'panel' }, h('h2', {}, 'Props'), h('ul', { class: 'rules' }, h('li', {}, style.props.rule))) : null,
+    style.military ? h('section', { class: 'panel' }, h('h2', {}, 'Military'), h('ul', { class: 'rules' }, h('li', {}, style.military.rule))) : null,
     style.seasons ? h('section', { class: 'panel' }, h('h2', {}, 'Seasons'), h('ul', { class: 'rules' }, ['rule', 'transition'].map(key => h('li', {}, style.seasons[key])))) : null,
     style.terrain ? h('section', { class: 'panel' }, h('h2', {}, 'Terrain'), h('ul', { class: 'rules' }, ['rule', 'grass', 'paths', 'overgrowth'].map(key => h('li', {}, style.terrain[key])))) : null,
     h('section', { class: 'panel' }, h('h2', {}, 'Time of day'), h('p', { class: 'feedback' }, style.lightingModel), h('div', { class: 'times' },

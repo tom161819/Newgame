@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "equipment-horse",
+  "name": "Horse",
+  "category": "equipment",
+  "description": "Horse as a physical item (C06 Equipment Registry: horse). Shown on a stand so it reads on the map and in the Armory; also the reference for its UI icon.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "workshop",
+  "variants": [
+    {
+      "id": "equipment-horse-bay",
+      "name": "Bay horse with saddle",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "horse",
+            "at": [
+              0,
+              0
+            ],
+            "saddle": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "equipment-horse-grey",
+      "name": "Grey horse",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "horse",
+            "at": [
+              0,
+              0
+            ],
+            "coat": "horse_grey",
+            "saddle": true
+          }
+        ]
+      }
+    }
+  ]
+}

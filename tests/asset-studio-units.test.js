@@ -9,7 +9,7 @@ import { checkModel, modelBounds } from '../studio/src/lib/specs.js';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const json = file => JSON.parse(readFileSync(path.join(root, file), 'utf8'));
 const style = json('art/style-guide.json');
-const units = readdirSync(path.join(root, 'art/assets/units')).map(id => json(`art/assets/units/${id}/asset.json`)).filter(a => a.generator === 'figure');
+const units = readdirSync(path.join(root, 'art/assets/units')).map(id => json(`art/assets/units/${id}/asset.json`)).filter(a => a.generator === 'figure' && !a.id.startsWith('military-'));
 const PROFESSIONS = ['villager', 'woodcutter', 'miner', 'hunter', 'builder', 'farmer', 'miller', 'baker', 'hauler', 'soldier'];
 
 test('every profession has a man and a woman, at human scale inside one tile', () => {

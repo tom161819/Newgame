@@ -1,0 +1,158 @@
+{
+  "schema": 1,
+  "id": "military-directions",
+  "name": "Soldier directions",
+  "category": "units",
+  "description": "Reference sheet for eight-direction movement: the kite-shield Swordsman turned in eighths. Shows that recipes can export every direction a unit needs; animation frames are still to come.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "military-directions-0",
+      "name": "Facing 0: south-east (towards the viewer)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_red",
+        "armor": "mail",
+        "tabard": "cloth_red",
+        "headgear": "greathelm",
+        "tool": "sword",
+        "shield": true,
+        "shieldShape": "kite",
+        "shieldMaterial": "banner",
+        "build": 1.12,
+        "facing": 0
+      }
+    },
+    {
+      "id": "military-directions-1",
+      "name": "Facing 1: south",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_red",
+        "armor": "mail",
+        "tabard": "cloth_red",
+        "headgear": "greathelm",
+        "tool": "sword",
+        "shield": true,
+        "shieldShape": "kite",
+        "shieldMaterial": "banner",
+        "build": 1.12,
+        "facing": 1
+      }
+    },
+    {
+      "id": "military-directions-2",
+      "name": "Facing 2: south-west",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_red",
+        "armor": "mail",
+        "tabard": "cloth_red",
+        "headgear": "greathelm",
+        "tool": "sword",
+        "shield": true,
+        "shieldShape": "kite",
+        "shieldMaterial": "banner",
+        "build": 1.12,
+        "facing": 2
+      }
+    },
+    {
+      "id": "military-directions-3",
+      "name": "Facing 3: west",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_red",
+        "armor": "mail",
+        "tabard": "cloth_red",
+        "headgear": "greathelm",
+        "tool": "sword",
+        "shield": true,
+        "shieldShape": "kite",
+        "shieldMaterial": "banner",
+        "build": 1.12,
+        "facing": 3
+      }
+    },
+    {
+      "id": "military-directions-4",
+      "name": "Facing 4: north-west (away)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_red",
+        "armor": "mail",
+        "tabard": "cloth_red",
+        "headgear": "greathelm",
+        "tool": "sword",
+        "shield": true,
+        "shieldShape": "kite",
+        "shieldMaterial": "banner",
+        "build": 1.12,
+        "facing": 4
+      }
+    },
+    {
+      "id": "military-directions-5",
+      "name": "Facing 5: north",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_red",
+        "armor": "mail",
+        "tabard": "cloth_red",
+        "headgear": "greathelm",
+        "tool": "sword",
+        "shield": true,
+        "shieldShape": "kite",
+        "shieldMaterial": "banner",
+        "build": 1.12,
+        "facing": 5
+      }
+    },
+    {
+      "id": "military-directions-6",
+      "name": "Facing 6: north-east",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_red",
+        "armor": "mail",
+        "tabard": "cloth_red",
+        "headgear": "greathelm",
+        "tool": "sword",
+        "shield": true,
+        "shieldShape": "kite",
+        "shieldMaterial": "banner",
+        "build": 1.12,
+        "facing": 6
+      }
+    },
+    {
+      "id": "military-directions-7",
+      "name": "Facing 7: east",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_red",
+        "armor": "mail",
+        "tabard": "cloth_red",
+        "headgear": "greathelm",
+        "tool": "sword",
+        "shield": true,
+        "shieldShape": "kite",
+        "shieldMaterial": "banner",
+        "build": 1.12,
+        "facing": 7
+      }
+    }
+  ]
+}

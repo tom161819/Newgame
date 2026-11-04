@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "military-knight",
+  "variantId": "military-knight-red",
+  "name": "Knight on a grey, red caparison, lance",
+  "category": "units",
+  "version": 1,
+  "specHash": "00dd5720",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 84,
+  "height": 96,
+  "anchor": {
+    "x": 33,
+    "y": 78
+  },
+  "origin": {
+    "x": 0.39286,
+    "y": 0.8125
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 94
+  },
+  "baseOrigin": {
+    "x": 0.39286,
+    "y": 0.97917
+  },
+  "visualHeight": 94,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.863,
+  "lights": []
+}

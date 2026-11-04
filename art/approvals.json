@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-04T19:00:00.000Z",
+  "updatedAt": "2026-11-04T21:00:00.000Z",
   "note": "Committed review state for Asset Studio. Export it from the studio and commit it through a pull request; the studio never writes to GitHub.",
   "assets": {
     "watchtower": {
@@ -158,6 +158,66 @@
           "specHash": "50ccd563",
           "note": "Proposed by Claude for review; not used by the game until approved.",
           "updatedAt": "2026-11-04T19:00:00.000Z"
+        }
+      }
+    },
+    "bowyer": {
+      "preferred": "bowyer-timber",
+      "variants": {
+        "bowyer-timber": {
+          "status": "review",
+          "version": 1,
+          "specHash": "2a9e5b47",
+          "note": "Proposed by Claude for review; the building is not in the game yet (Codex C07).",
+          "updatedAt": "2026-11-04T21:00:00.000Z"
+        }
+      }
+    },
+    "swordsmith": {
+      "preferred": "swordsmith-stone",
+      "variants": {
+        "swordsmith-stone": {
+          "status": "review",
+          "version": 1,
+          "specHash": "85e2ce33",
+          "note": "Proposed by Claude for review; the building is not in the game yet (Codex C07).",
+          "updatedAt": "2026-11-04T21:00:00.000Z"
+        }
+      }
+    },
+    "armorer": {
+      "preferred": "armorer-timber",
+      "variants": {
+        "armorer-timber": {
+          "status": "review",
+          "version": 1,
+          "specHash": "b358728f",
+          "note": "Proposed by Claude for review; the building is not in the game yet (Codex C07).",
+          "updatedAt": "2026-11-04T21:00:00.000Z"
+        }
+      }
+    },
+    "armory": {
+      "preferred": "armory-stone",
+      "variants": {
+        "armory-stone": {
+          "status": "review",
+          "version": 1,
+          "specHash": "3609b6ed",
+          "note": "Proposed by Claude for review; the building is not in the game yet (Codex C07).",
+          "updatedAt": "2026-11-04T21:00:00.000Z"
+        }
+      }
+    },
+    "stables": {
+      "preferred": "stables-timber",
+      "variants": {
+        "stables-timber": {
+          "status": "review",
+          "version": 1,
+          "specHash": "c12a6ce9",
+          "note": "Proposed by Claude for review; the building is not in the game yet (Codex C07).",
+          "updatedAt": "2026-11-04T21:00:00.000Z"
         }
       }
     }

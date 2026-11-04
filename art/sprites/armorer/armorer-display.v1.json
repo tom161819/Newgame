@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "armorer",
+  "variantId": "armorer-display",
+  "name": "Workshop with armour display",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "c24421f6",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 124,
+  "anchor": {
+    "x": 65,
+    "y": 90
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.72581
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 122
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98387
+  },
+  "visualHeight": 122,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.74,
+  "lights": []
+}
