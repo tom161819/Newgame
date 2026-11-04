@@ -17,7 +17,7 @@ Etapy01–06 i dodatečný audit archivu jsou DONE; probíhá release gate M1,07
 | 03 | 33: Seasons ON/OFF | M1 | DONE | `1d9dd4610a5690db8348b2743ec376b668266fcf`;307/307, build, plný browser/IndexedDB, skutečné2/7→8;[report](verification/master-03.md) |
 | 04 | 28: Circular Fog of War & Map Memory | M1 | DONE | `0024c16c803a91b151cff08300665076f8b67b35`;335/335, build, plný browser/pixely/interakce, IndexedDB a skutečné2/7/8→9;20 NPC s pohybem a mlhou60FPS;[report](verification/master-04.md) |
 | 05 | 30: Population Sidebar & Skill Sorting | M1 | DONE | FázeA–D dokončeny;351/351, build, plný browser/mobile/Fog/200 obyvatel, skutečné Save2/7/8/9→10,70 SHA archivů/2263 HTTP souborů. `ead4d006a39685c53e3de79f7ad33e991e34acbe`;[report](verification/master-05.md) |
-| 06 | 32: Missing Workers Indicator | M1 | DONE | Dokončené pracovní budovy: červená/oranžová, skutečná místa/události, tooltip/Assign Worker, Fog/zoom/Save10;356/356/build/browser,200 budov~50FPS bez přepočtu míst za snímek. Implementační commit doplní checkpoint;[report](verification/master-06.md) |
+| 06 | 32: Missing Workers Indicator | M1 | DONE | Dokončené pracovní budovy: červená/oranžová, skutečná místa/události, tooltip/Assign Worker, Fog/zoom/Save10;356/356/build/browser,200 budov~50FPS bez přepočtu míst za snímek. `7a5a6662c7d619c7e86960d6f71cf5c68b035483`;[report](verification/master-06.md) |
 | 07 | 25: Forestry & Natural Resources | M2 | PENDING | Nezahájeno |
 | 08 | 31A: Extended Zoom Out | M2 | PENDING | Nezahájeno |
 | 09 | 31B: Daily Resource Statistics & Ledger | M2 | PENDING | Nezahájeno |
@@ -34,7 +34,7 @@ Nové [zadání](requests/archive-optimization.md) po03, před04. Zjištěno65 l
 
 ## Release gates
 
-M1 (01–06), M2 (07–10), M3 (11–12), M4 (13–14), M5 (15): PENDING. Žádné nové číslo ani tag zatím nevydáno. Současná hra má `0.1.0`; budoucí číslo určit z aktuálního package.json a existujících tagů až při úspěšném gate.
+M1 (01–06): gate zahájen po dokončení06, implementace `7a5a6662c7d619c7e86960d6f71cf5c68b035483`; čeká první nasazení přesného zdroje a integrační gate. M2 (07–10), M3 (11–12), M4 (13–14), M5 (15): PENDING. Žádné nové číslo ani tag zatím nevydáno. Současná hra má `0.1.0`; budoucí číslo určit z aktuálního package.json a existujících tagů až při úspěšném gate.
 
 ## Následující vizuální upgrade
 
