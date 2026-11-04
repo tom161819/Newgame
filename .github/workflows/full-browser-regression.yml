@@ -1,0 +1,46 @@
+name: Full browser regression (nightly)
+
+on:
+  schedule:
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# This intentionally runs separately from the fast Pages deployment.
+# Full simulation, historical isolation and archive checks remain covered daily.
+concurrency:
+  group: full-browser-regression
+  cancel-in-progress: true
+
+jobs:
+  full-regression:
+    name: Full game and archive smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out source history
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Test current systems and versions
+        run: |
+          npm run changelog:validate
+          npm run versions:validate
+          npm test
+      - name: Verify immutable source archives
+        run: npm run archive:verify
+      - name: Build and stage complete Pages site
+        run: npm run build:pages
+      - name: Verify original archive URLs and file hashes
+        run: npm run archive:verify-site
+      - name: Run full browser simulation and historical Save/Load isolation
+        run: npm run smoke -- --base=/Newgame/ --full
