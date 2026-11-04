@@ -382,6 +382,7 @@ function styleGuideView() {
     h('section', { class: 'panel' }, h('h2', {}, 'Materials'), h('div', { class: 'materials' }, materials)),
     h('section', { class: 'panel' }, h('h2', {}, 'Light, shadow and detail'), h('ul', { class: 'rules' },
       h('li', {}, style.light.rule), h('li', {}, style.detail.silhouette), h('li', {}, style.detail.outline), h('li', {}, style.detail.textureScale), h('li', {}, style.detail.colour), h('li', {}, `Smallest readable feature: ${style.detail.minimumFeaturePx} px at 1×.`))),
+    style.units ? h('section', { class: 'panel' }, h('h2', {}, 'Figures'), h('ul', { class: 'rules' }, ['rule', 'readability', 'sexes'].map(key => h('li', {}, style.units[key])))) : null,
     style.terrain ? h('section', { class: 'panel' }, h('h2', {}, 'Terrain'), h('ul', { class: 'rules' }, ['rule', 'grass', 'paths', 'overgrowth'].map(key => h('li', {}, style.terrain[key])))) : null,
     h('section', { class: 'panel' }, h('h2', {}, 'Time of day'), h('p', { class: 'feedback' }, style.lightingModel), h('div', { class: 'times' },
       TIMES.map(t => h('div', { class: 'time' }, h('span', { style: `background:${style.timeOfDay[t].ambient}` }), h('p', {}, h('strong', {}, style.timeOfDay[t].label), ` · light ×${style.timeOfDay[t].lightScale}`, h('br'), style.timeOfDay[t].description))))),

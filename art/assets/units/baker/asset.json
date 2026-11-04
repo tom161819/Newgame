@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "baker",
+  "name": "Baker",
+  "category": "units",
+  "description": "Bakery: white apron and tall cap, bread peel or bread basket. Concept for worker looks by profession; the game still draws one worker figure.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "baker-male",
+      "name": "Baker (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_blue",
+        "sleeves": "cloth_linen",
+        "legs": "cloth_brown",
+        "headgear": "baker",
+        "hair": "hair_dark",
+        "apron": "cloth_linen",
+        "tool": "peel",
+        "build": 1.15
+      }
+    },
+    {
+      "id": "baker-female",
+      "name": "Baker (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_red",
+        "sleeves": "cloth_linen",
+        "headgear": "coif",
+        "headgearMaterial": "cloth_linen",
+        "hair": "hair_auburn",
+        "apron": "cloth_linen",
+        "tool": "basket"
+      }
+    }
+  ]
+}

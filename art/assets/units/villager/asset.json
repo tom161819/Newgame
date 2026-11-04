@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "id": "villager",
+  "name": "Villager",
+  "category": "units",
+  "description": "Settler without a job: plain undyed clothes, no tool. Concept for worker looks by profession; the game still draws one worker figure.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "gameObjectId": "peasant",
+  "variants": [
+    {
+      "id": "villager-male",
+      "name": "Villager (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_wool",
+        "legs": "cloth_brown",
+        "headgear": "none",
+        "hair": "hair_brown",
+        "tool": "none"
+      }
+    },
+    {
+      "id": "villager-female",
+      "name": "Villager (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_blue",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_linen",
+        "hair": "hair_auburn",
+        "apron": "cloth_linen",
+        "tool": "none"
+      }
+    }
+  ]
+}

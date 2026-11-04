@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "miller",
+  "name": "Miller",
+  "category": "units",
+  "description": "Mill worker: dusty white linen, cap and a flour sack on the shoulder. Concept for worker looks by profession; the game still draws one worker figure.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "miller-male",
+      "name": "Miller (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_linen",
+        "legs": "cloth_linen",
+        "headgear": "cap",
+        "headgearMaterial": "cloth_linen",
+        "hair": "hair_grey",
+        "beard": true,
+        "tool": "sack",
+        "build": 1.15
+      }
+    },
+    {
+      "id": "miller-female",
+      "name": "Miller (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_linen",
+        "headgear": "coif",
+        "headgearMaterial": "cloth_linen",
+        "hair": "hair_brown",
+        "apron": "cloth_wool",
+        "tool": "sack"
+      }
+    }
+  ]
+}

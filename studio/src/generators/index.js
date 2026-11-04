@@ -7,6 +7,7 @@ import tree from './tree.js';
 import wall from './wall.js';
 import quarry from './quarry.js';
 import ground from './ground.js';
+import figure from './figure.js';
 
 export const GENERATORS = Object.freeze({
   [watchtower.id]: watchtower,
@@ -16,4 +17,5 @@ export const GENERATORS = Object.freeze({
   [wall.id]: wall,
   [quarry.id]: quarry,
   [ground.id]: ground,
+  [figure.id]: figure,
 });

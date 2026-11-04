@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "builder",
+  "name": "Builder",
+  "category": "units",
+  "description": "Construction worker: ochre tunic, leather apron, felt cap, hammer. Concept for worker looks by profession; the game still draws one worker figure.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "builder-male",
+      "name": "Builder (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_ochre",
+        "legs": "cloth_brown",
+        "headgear": "cap",
+        "headgearMaterial": "cloth_brown",
+        "hair": "hair_brown",
+        "apron": "leather",
+        "tool": "hammer",
+        "build": 1.1
+      }
+    },
+    {
+      "id": "builder-female",
+      "name": "Builder (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_ochre",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_brown",
+        "hair": "hair_brown",
+        "apron": "leather",
+        "tool": "hammer"
+      }
+    }
+  ]
+}

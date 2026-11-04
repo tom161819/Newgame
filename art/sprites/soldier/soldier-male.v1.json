@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "soldier",
+  "variantId": "soldier-male",
+  "name": "Soldier (man)",
+  "category": "units",
+  "version": 1,
+  "specHash": "6944185c",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 74,
+  "anchor": {
+    "x": 33,
+    "y": 56
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.75676
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 72
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.97297
+  },
+  "visualHeight": 72,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.45,
+  "lights": []
+}

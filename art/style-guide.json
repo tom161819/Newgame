@@ -88,7 +88,24 @@
     "soil": "#62553b",
     "clover": "#eeeadb",
     "buttercup": "#e2c656",
-    "heather": "#b6a2d2"
+    "heather": "#b6a2d2",
+    "skin": "#d9a782",
+    "skin_tan": "#b07c5a",
+    "hair_dark": "#3b2a1e",
+    "hair_brown": "#6b4528",
+    "hair_auburn": "#8a4a2a",
+    "hair_blond": "#c9a560",
+    "hair_grey": "#9a958c",
+    "linen": "#e3dcc8",
+    "wool": "#8a6d4e",
+    "cloth_brown": "#6b5038",
+    "cloth_green": "#5b7640",
+    "cloth_forest": "#3f5a35",
+    "cloth_blue": "#4a5f80",
+    "cloth_red": "#8d3a2e",
+    "cloth_ochre": "#b88a3e",
+    "cloth_grey": "#7c7a72",
+    "leather": "#6e4a2c"
   },
   "materials": {
     "stone": {
@@ -216,6 +233,125 @@
       "repeat": 1.0,
       "variation": 0.2,
       "description": "Natural rock outcrops and quarry faces."
+    },
+    "skin": {
+      "color": "skin",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.02,
+      "description": "Faces and hands."
+    },
+    "skin_tan": {
+      "color": "skin_tan",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.02,
+      "description": "Weathered, sun-tanned skin."
+    },
+    "hair_dark": {
+      "color": "hair_dark",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Dark hair and beards."
+    },
+    "hair_brown": {
+      "color": "hair_brown",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Brown hair."
+    },
+    "hair_auburn": {
+      "color": "hair_auburn",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Auburn hair."
+    },
+    "hair_blond": {
+      "color": "hair_blond",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Fair hair."
+    },
+    "hair_grey": {
+      "color": "hair_grey",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Grey hair of elders."
+    },
+    "cloth_linen": {
+      "color": "linen",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Undyed linen: shirts, aprons, coifs, millers and bakers."
+    },
+    "cloth_wool": {
+      "color": "wool",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Undyed brown wool, the common tunic."
+    },
+    "cloth_brown": {
+      "color": "cloth_brown",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Dark brown hose and cloaks."
+    },
+    "cloth_green": {
+      "color": "cloth_green",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Green dye: foresters and hunters."
+    },
+    "cloth_forest": {
+      "color": "cloth_forest",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Deep green: woodcutters."
+    },
+    "cloth_blue": {
+      "color": "cloth_blue",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Woad blue, worn by townsfolk."
+    },
+    "cloth_red": {
+      "color": "cloth_red",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Madder red: royal soldiers."
+    },
+    "cloth_ochre": {
+      "color": "cloth_ochre",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Ochre: builders and farm workers."
+    },
+    "cloth_grey": {
+      "color": "cloth_grey",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Grey wool: miners and haulers."
+    },
+    "leather": {
+      "color": "leather",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Belts, boots, aprons, quivers and straps."
     }
   },
   "light": {
@@ -303,5 +439,10 @@
     "grass": "Lively mid-greens with darker patches; blades 2–9 px at 1×, drawn as small tufts; flowers sparse and pale. Avoid yellow-brown dry grass as the default.",
     "paths": "Wear goes from green through flattened dark green and olive to muted dark brown soil. Each stage is darker than the one before; no orange, red or bright tan (chroma at most 0.24).",
     "overgrowth": "An unused path recovers stage by stage back to grass (src/data/pathWear.js: recovery after 3 days, 5 points a day), so every stage must also read as a path growing over."
+  },
+  "units": {
+    "rule": "Figures are 1.2 units tall (1.12 for women), face the camera and keep every part inside one tile.",
+    "readability": "A profession must read at 1× from three cues at once: headgear, the tool or load in hand, and the main garment colour. Avoid recoloured clones.",
+    "sexes": "Men wear a tunic over hose and may have a beard; women wear a long dress or kirtle, a coif or kerchief, often an apron. Tools and colours follow the profession, not the sex."
   }
 }

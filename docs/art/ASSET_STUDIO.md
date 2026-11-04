@@ -47,6 +47,15 @@ Povrch hry je plochá textura dlaždic 64 × 32 px, proto ho nekreslí 3D render
 
 Po schválení: rozřezat `.tiles.png` na jednotlivé dlaždice do `public/assets/terrain/…`, nastavit `spriteVariants` u `grass_normal` (a dlaždice úrovní u `grass_trampled_1..3`) a převzít `gameWear` do `wearSurfaces`.
 
+## Postavy podle profese
+
+Recept `figure` (`studio/src/generators/figure.js`) skládá postavu z nízkopolygonových tvarů: boty, nohavice nebo dlouhá sukně, tunika, opasek, ruce, hlava, vlasy, vousy, pokrývka hlavy, zástěra a nástroj či náklad. Všechny barvy jsou látky a kůže ze Style Guide (`cloth_*`, `leather`, `skin*`, `hair_*`).
+
+- `art/assets/units/<profese>/asset.json`: villager, woodcutter, miner, hunter, builder, farmer, miller, baker, hauler, soldier; každá má variantu muže a ženy.
+- Profese se pozná podle tří znaků zároveň: pokrývka hlavy, nástroj nebo náklad, hlavní barva oděvu (pravidlo `units` ve Style Guide). Test hlídá, že žádné dvě profese nejsou jen přebarvený klon a že postavy mají lidské měřítko 1,2 jednotky v jedné dlaždici.
+- Nové profese a barevné varianty vznikají jen úpravou `spec` (parametry ukazuje záložka **Spec & files**).
+- Hra zatím kreslí jednu postavu poddaného (`peasant`). Návrhy jsou ve stavu Draft. Až budou schválené, bude potřeba převzít sprity a vybírat je podle profese a pohlaví pracovníka; animace chůze a práce zatím recept nemá.
+
 ## Výběr a schválení varianty
 
 1. V záložce **Compare variants** porovnej varianty vedle sebe: zoom 0,5–4×, pozadí, mřížka, půdorys, ohraničení s rozměry v pixelech, člověk 1,2 jednotky, přepínač *Game pixels* (přesně 1×) a denní doba.
@@ -110,7 +119,7 @@ Takto se do hry dostala věž `watchtower-square` a pánev `torch-post-brazier`:
 
 ## Omezení MVP
 
-- Generátory: `watchtower`, `torch-post`, `house`, `tree` (dub, borovice), `wall` (kamenná hradba, palisáda), `quarry` a 2D `ground` (tráva, cesty). Jednotky a animace postav zatím nemají recept.
+- Generátory: `watchtower`, `torch-post`, `house`, `tree` (dub, borovice), `wall` (kamenná hradba, palisáda), `quarry`, 2D `ground` (tráva, cesty) a `figure` (postavy). Postavy jsou zatím statické, bez snímků animace.
 - Animovaný je jen plamen, a to procedurálně v kompozitoru. Snímky animací se zatím neexportují.
 - Export je deterministický v jednom prostředí. Jiný prohlížeč nebo GPU může dát drobně odlišné pixely, proto je autoritou commitnutý PNG.
 - Schválení do repozitáře vyžaduje ruční krok přes GitHub (vložit JSON a otevřít PR). Studio nemá token a na GitHub nezapisuje.
