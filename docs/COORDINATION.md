@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| M2 release and standing automatic milestone publication | Codex | `codex/m2-release-candidate` (includes main c2c2862 and verified Stage10 follow-up) | Creation/merge blocked: GitHub API returns Forbidden | v0.3.0 prepared and uploaded; publication authorized without another prompt. Latest user asks to upload first and test afterwards. Preserve all archives, Save14 and Claude graphics. | AGENTS, release/queue/progress docs, version/changelog metadata, final Quarry fix/test. Supported API/Pages network draft saved but not active. |
+| M2 release and standing automatic milestone publication | Codex | `codex/m2-release-candidate` (includes main c2c2862 and verified Stage10 follow-up) | [#15](https://github.com/tom161819/Newgame/pull/15), OPEN; merge command blocked by GitHub API Forbidden | v0.3.0 uploaded; 455 tests, Pages build and current native Save14 smoke pass after integration. Publication authorized without another prompt. PR15 supersedes the older preflight PR14. | AGENTS, release/queue/progress docs, version/changelog metadata, final Quarry fix/test. Supported API/Pages network draft saved but not active. |
 | V01 runtime, V02, V03 (visual master tasks) | Claude | not started | — | Waiting for Codex C01 (V01), C06/C07 (V02), C08 (V03) | will hold `src/game/TerrainRenderer.js`, `src/game/TreeView.js`, `src/game/MapMemoryRenderer.js` for V01; see `docs/art/VISUAL_PROGRESS.md` |
 
 ## Kept backups (do not delete without the developer)

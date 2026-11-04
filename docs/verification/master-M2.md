@@ -1,9 +1,12 @@
 # M2 — Resources, economy and iron — local preflight verified
 
-Status: LOCAL PREFLIGHT VERIFIED; formal deployment/release gate pending.
-Game version0.2.0, Save schema14. Proposed next MINOR would be0.3.0 only after the
-real gate and explicit release instruction. Remote tagv0.3.0 was absent when
-checked; no tag/version/archive was created. This is not a released milestone.
+Status: LOCAL PREFLIGHT VERIFIED; publication IN PROGRESS, external merge blocked.
+Candidate game0.3.0, Save14, is uploaded in PR15. The user authorized this release
+and automatic milestone releases without another prompt, then explicitly asked
+to upload first and test afterwards. The previous approval hold is superseded.
+Latest main c2c2862 is integrated normally at f053be1;455 tests, Pages build and
+current native Save14 smoke pass. No v0.3.0 tag, final archive or successful
+deployment is claimed. See [the current publication checkpoint](M2-release-publication.md).
 
 ## Verified implementation commits
 
@@ -37,7 +40,7 @@ checked; no tag/version/archive was created. This is not a released milestone.
  integrated main. No force push, history rewrite or direct main push. Existing
  historical saves/namespaces are untouched; alpha schemas are not migrated.
 
-## Remaining release steps
+## Earlier preflight sequence (superseded by the publication checkpoint above)
 
 1. Merge the final small Quarry validation/evidence follow-up through PR into main.
    Main7012635 already contains the main Stage10 feature through PR11.
