@@ -34,6 +34,19 @@ test('missing fuel or Ore prevents the atomic batch without consuming its delive
 test('Haulers reserve Ore and fuel independently and physically return the finished Bar; Operators keep one production task',()=>{
  const {s,b,warehouse,stock,record,ws:[w]}=fixture(),h=worker(s,warehouse,{x:49,y:44});s.foodStorage.deposit(stock,'iron_ore',3);s.foodStorage.deposit(stock,'wood',2);const transported=new Set();until(s,()=>{if(h.cargo)transported.add(h.cargo.resource);return s.inventory.count('iron_bar')===1;});assert.deepEqual(transported,new Set(['iron_ore','wood','iron_bar']));assert.equal(record.completed,1);assert.equal(w.skills.smelting.totalXP,10);assert.ok(h.skills.logistics.totalXP>0);assert.equal(w.cargo,null);assert.equal(s.foodStorage.reservations.size,0);assert.equal(s.workerSystem.reservations.owners.size,0);assert.equal(receipts(s,'Smelter Production').length,1);snapshot(s);
 });
+test('a distant Hauler can first carry the finished Bar after Operators supplied the batch, including loaded Save/Load',()=>{
+ const {s,warehouse,stock,record,ws}=fixture(2),h=worker(s,warehouse,{x:70,y:65});
+ s.foodStorage.deposit(stock,'iron_ore',3);s.foodStorage.deposit(stock,'wood',2);
+ let sawPartial=false;
+ until(s,()=>{if(record.cycle?.workDone>1000)sawPartial=true;return !!h.cargo;});
+ assert.equal(sawPartial,true);assert.equal(h.cargo.resource,'iron_bar');
+ assert.equal(record.completed,1);assert.equal(record.cycle,null);
+ assert.ok(Math.abs(ws.reduce((n,w)=>n+w.experience.totalXP,0)-10)<1e-7);
+ const saved=snapshot(s),r=restore(saved);assert.deepEqual(serializeGameState(r),saved);
+ until(r,()=>r.inventory.count('iron_bar')===1);
+ assert.equal(amount(r,'iron_ore'),0);assert.equal(amount(r,'wood'),0);assert.equal(amount(r,'iron_bar'),1);
+ assert.equal(receipts(r,'Smelting').length,1);assert.equal(receipts(r,'Smelting Fuel').length,1);assert.equal(receipts(r,'Smelter Production').length,1);
+});
 test('current-schema Save/Load preserves pickup, both cargo types, partial work, output and Bar cargo without replaying consumption or XP',()=>{
  const {s,b,stock,record,ws:[w]}=fixture();s.foodStorage.deposit(stock,'iron_ore',3);s.foodStorage.deposit(stock,'wood',2);
  for(const phase of [()=>w.workTask?.kind==='foodPickup',()=>w.cargo?.resource==='iron_ore',()=>w.cargo?.resource==='wood',()=>record.cycle?.workDone>=5000,()=>record.completed===1,()=>w.cargo?.resource==='iron_bar']){until(s,phase);const saved=snapshot(s),r=restore(saved);assert.equal(saved.saveVersion,SAVE_VERSION);assert.deepEqual(serializeGameState(r),saved);until(r,()=>r.inventory.count('iron_bar')===1);assert.equal(amount(r,'iron_bar'),1);assert.equal(amount(r,'iron_ore'),0);assert.equal(amount(r,'wood'),0);assert.equal(r.workerSystem.workers.get(w.id).experience.totalXP,10);assert.equal(receipts(r,'Smelter Production').length,1);snapshot(r);}
