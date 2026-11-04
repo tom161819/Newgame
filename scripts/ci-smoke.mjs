@@ -4,8 +4,19 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 export function smokeScope({paths=[],previousVersion,currentVersion,manual=false}){
   const historyData=new Set(['src/data/semver.js','src/data/changelogCategories.js']);
-  if(manual||previousVersion!==currentVersion||paths.some(file=>/^src\/(game|systems)\//.test(file)||file.startsWith('src/data/')&&!historyData.has(file)||/^src\/ui\/(PopulationSidebar|populationData|MissingWorkersIndicators|NaturalResourcePanel|WorkplacePanel|InventoryBar|ResourceEconomyTooltip|resourceEconomy)\.js$/.test(file)||(/^scripts\/(population|staffing|fog|forestry|mineral|zoom|ledger|smelting)-smoke\.mjs$/.test(file)||file==='src/ui/resourceLedger.css')))return 'full';
+  // Rendering-only changes exercise the current game plus visual browser scenarios.
+  // Core simulation, gameplay data, UI contracts and releases still run the full suite.
+  const visualOnly=new Set([
+    'src/game/KingView.js',
+    'src/game/TerrainRenderer.js',
+    'src/game/SeasonTransition.js',
+    'src/systems/SpriteViews.js',
+    'src/data/objects/approvedArt.js',
+  ]);
+  const isVisual=file=>visualOnly.has(file)||file.startsWith('public/assets/');
+  if(manual||previousVersion!==currentVersion||paths.some(file=>(/^src\/(game|systems)\//.test(file)||file.startsWith('src/data/')&&!historyData.has(file))&&!isVisual(file)||/^src\/ui\/(PopulationSidebar|populationData|MissingWorkersIndicators|NaturalResourcePanel|WorkplacePanel|InventoryBar|ResourceEconomyTooltip|resourceEconomy)\.js$/.test(file)||(/^scripts\/(population|staffing|fog|forestry|mineral|zoom|ledger|smelting)-smoke\.mjs$/.test(file)||file==='src/ui/resourceLedger.css')))return 'full';
   if(paths.some(file=>historyData.has(file)||/^public\/versions\//.test(file)||/^(CHANGELOG\.md|vite\.config\.js|index\.html|src\/style\.css)$/.test(file)||/^src\/ui\/(VersionArchivePanel|ChangelogPanel|GameApplication)\.js$/.test(file)||/^scripts\/(.*archive.*|version-catalog|git-source-facts|browser-smoke|ci-smoke).*\.mjs$/.test(file)))return 'archive';
+  if(paths.some(isVisual))return 'visual';
   return 'current';
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
@@ -16,5 +27,6 @@ if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.ur
   const mode=smokeScope({paths,previousVersion,currentVersion,manual:!previous}),base=process.argv.slice(2).find(arg=>arg.startsWith('--base='))??'--base=/Newgame/';
   console.log(`Browser scope: ${mode}; ${paths.length} changed paths. Full archive checks remain mandatory at release gates.`);
   if(mode!=='current'){const check=spawnSync(process.execPath,['scripts/verify-site-archives.mjs'],{cwd:root,stdio:'inherit'});if(check.error)throw check.error;if(check.status!==0)throw new Error('The composed archive failed its original URL/byte checks.');}
-  const args=['scripts/browser-smoke.mjs',base,...(mode==='full'?['--full']:mode==='current'?['--current-only']:[])],result=spawnSync(process.execPath,args,{cwd:root,stdio:'inherit'});if(result.error)throw result.error;process.exitCode=result.status??1;
+  const selection=mode==='full'?['--full']:mode==='visual'?['--current-only','--zoom','--season-transition']:mode==='current'?['--current-only']:[];
+  const args=['scripts/browser-smoke.mjs',base,...selection],result=spawnSync(process.execPath,args,{cwd:root,stdio:'inherit'});if(result.error)throw result.error;process.exitCode=result.status??1;
 }
