@@ -22,8 +22,8 @@ Etapy01–06 i dodatečný audit archivu jsou DONE; M1 RELEASED0.2.0,07–08 jso
 | 06 | 32: Missing Workers Indicator | M1 | DONE | Dokončené pracovní budovy: červená/oranžová, skutečná místa/události, tooltip/Assign Worker, Fog/zoom/Save10;356/356/build/browser,200 budov~50FPS bez přepočtu míst za snímek. `7a5a6662c7d619c7e86960d6f71cf5c68b035483`;[report](verification/master-06.md) |
 | 07 | 25: Forestry & Natural Resources | M2 | DONE | FázeA DONE `0596b517e38919c672c0856f9fd7f3d927cc848b`:200 seskupených Oak/Pine/růst/král/kácení/fyzické dřevo/Save11/Fog;365/365/build/plný browser/2,7,8,9,10→11;20NPC+mlha~60FPS,71 archivů beze změny. FázeB DONE `328c3a63858f3cd92c910f101809c7c20fe13b6c`: chata8 Stone/2×2/3 místa/18 radius, fyzické dřevo, rezervace skladu, Save/Load a známé počty stromů;374/374/build/plný browser, finální nativní chata/cargo. FázeC DONE `e8ea0ce4970c67b1b6b0a89851b44a24f1275eae`: konečná ložiska5 Stone/4 Iron, striktní Quarry, Iron Mine12 Stone+8 Wood, fyzická těžba/transport/Save12/Fog;388/388/build/nativní obě stavby a skutečný Save11→12,20NPC~59–60FPS. FázeD DONE `d195a39f5090643c7785c9c9b56db746e57f9991`:389/389, plný browser a skutečné Save2/7/8/9/10/11→12; celý fyzický řetězec stromy→dřevo→vícesurovinová stavba dolu→ruda→Warehouse přes Save/Load. Následuje08;[report](verification/master-07.md). |
 | 08 | 31A: Extended Zoom Out | M2 | DONE | Plynulý zoom0.25–1.8/default1, bezpečné vysoké okno, přesné klikání/blueprint/Fog/Save12;395/395/build/nativní0.25 a vysoké okno,20NPC+mlha58.7–60FPS;[report](verification/master-08.md). |
-| 09 | 31B: Daily Resource Statistics & Ledger | M2 | DONE — PR BLOCKED | `codex/stage-09-ledger`, integrovaný main69e5e57; journal/Save13/lišta/tooltipy,419/419 testů/Pages build/plný i cílený browser/71 SHA archivů/2314 HTTP souborů prošly. Main i větev ve stejném světě59.51–59.84FPS. PR1/3 již merged; založení PR09 blokuje síťová politika;[report](verification/master-09.md). |
-| 10 | 35: Quarry Placement & Iron Smelter | M2 | PENDING | Nezahájeno |
+| 09 | 31B: Daily Resource Statistics & Ledger | M2 | DONE — merged PR #9 | `codex/stage-09-ledger`, integrovaný main69e5e57; journal/Save13/lišta/tooltipy,419/419 testů/Pages build/plný i cílený browser/71 SHA archivů/2314 HTTP souborů prošly. Main i větev ve stejném světě59.51–59.84FPS. PR1/3 již merged; založení PR09 blokuje síťová politika;[report](verification/master-09.md). |
+| 10 | 35: Quarry Placement & Iron Smelter | M2 | IN PROGRESS | `codex/stage-10-smelter` z main97b3381 (PR9 merged); ověřit existující Quarry, pak fyzická vícevstupová výroba Iron Bar a integrace;[report](verification/master-10.md). |
 | 11 | 37: Stone Pavement & Courtyards | M3 | PENDING | Nezahájeno |
 | 12 | 34: Wheelwright, Wagons, Stables & Housing | M3 | PENDING | Nezahájeno |
 | 13 | 26: Villager Needs & Happiness | M4 | PENDING | Nezahájeno |
@@ -40,7 +40,7 @@ M1 (01–06): **RELEASED0.2.0**, source `fa56c96113fdad8097d641ad87c06e74d532efa
 
 ## Následující vizuální upgrade
 
-Visual Polish & Art Pass, fáze A–E: PENDING až po celém masteru. Úplné zadání je v `docs/requests/visual-polish-art-pass.md`.
+Visual Polish & Art Pass: VYŘAZENO Z FRONTY CODEXU podle uživatele2026-11-04, přebírá Claude. Codex neprovádí souběžný art pass; původní zadání je zachováno v `docs/requests/visual-polish-art-pass.md`.
 
 
 ## Nová pravidla spolupráce (pokyn vývojáře po etapě08)
@@ -65,3 +65,7 @@ main stále69e5e57. Claudova větev `claude/approved-tower-brazier`2c95aec zůst
 nedotčená; preview odhalilo jen konflikt sousedních řádků evidence, nikoli kódu.
 GitHub API znovu vrací Forbidden, takže PR/merge z tohoto prostředí stále blokuje
 síť. Připravený PR lze založit a sloučit přes web GitHubu; nic není sloučeno přímo.
+
+### Navázání masteru — 2026-11-04
+
+Etapa09 byla sloučena přes PR9 do main97b3381; předchozí síťová blokace předání již nebrání základu etapy10. Etapa10 začíná v nové codex/stage-10-smelter z tohoto main. Visual Polish & Art Pass převzal Claude a je z fronty Codexu vyřazen. Zachovat všechny jeho grafické větve. Po etapě10 připravit M2 gate ve větvi a zastavit pro výslovný pokyn k vydání podle nahraných pravidel spolupráce.

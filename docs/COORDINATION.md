@@ -13,7 +13,7 @@ None pending. Add entries here when one pull request must wait for another.
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | Asset Studio recipes: house, oak, pine, wall, quarry | Claude | `claude/studio-recipes` | — | In progress | `studio/**`, `art/**`, `docs/art/**`, `tests/asset-studio.test.js` |
-| Stage 09 Daily Resource Statistics & Ledger | Codex | `codex/stage-09-ledger` (ALPHA base, normal merge of current main69e5e57) | Prepared body: [report](verification/master-09-pr.md); creation blocked by network API policy | Implementation verified:419/419 tests, full browser, Pages build, archive/catalog/71-URL HTTP checks passed on integrated main. Save13, no migrations. User authorized merging Stage09 through a PR on2026-11-04; previous HOLD lifted. No release/tag authorization added. WIP preserved in codex/stage-09-ledger-wip feb19d2. Stage10 waits for merge or actual PR09. | Ledger data/system/validator/tests; GameScene/buildings/inventory; GameTime/serializer/loader; existing production/food/storage/treasure/wages/construction/drop/workplace source owners; InventoryBar/new tooltip/CSS; browser/CI/forestry/mineral/ledger smokes and helper; Unreleased/progress/verification and this task row. No Studio/art/renderer/main-entry/save-menu changes. Remote claude/approved-tower-brazier2c95aec is preserved; dry-run integration conflicts only in this register, not game code. |
+| Stage10 Quarry Placement & Iron Smelter | Codex | `codex/stage-10-smelter` from main97b3381 | Not yet created; API policy unchanged | PhaseA verify existing finite Quarry; PhaseB/C extend existing production/logistics for Smelter. Visual Polish is Claude-owned by user instruction. | New smelting definitions/assets/tests; data jobs/workplaces/recipes/economy; existing production/logistics/storage/skill/validation/panel; smokes and own progress/docs. Necessary shared edits: objects/index registry and experience reward table, preserving Claude graphics/brazier changes. Avoid Studio/art, SpriteViews/renderer, tower definition and GameScene graphics. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -22,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#9](https://github.com/tom161819/Newgame/pull/9) Stage09 Daily Resource Statistics & Ledger (Codex), merged main97b3381;419 tests/full browser/Pages build/71 archives verified.
 - 2026-11-04 [#7](https://github.com/tom161819/Newgame/pull/7) Asset Studio published on GitHub Pages under `/studio/` (Claude).
 - 2026-11-04 [#1](https://github.com/tom161819/Newgame/pull/1) Stages 07 Forestry and 08 Extended Zoom Out (Codex).
 - 2026-11-04 [#2](https://github.com/tom161819/Newgame/pull/2) Collaboration rules, `CLAUDE.md` and this register (Claude).
