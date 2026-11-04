@@ -72,7 +72,13 @@ Nic z toho tento MVP nedělá.
 ## Náhled a nasazení
 
 - Build používá relativní cesty a funguje z libovolné podcesty, například `/Newgame/studio/`. Smoke test ho servíruje právě tam a blokuje všechny požadavky mimo vlastní soubory.
-- GitHub Pages workflow se v tomto MVP **nemění**, takže studio se zatím veřejně nenasazuje. Bezpečné nasazení po schválení: do `.github/workflows/pages.yml` za krok „Build for Pages“ přidat `npm run studio:build` a zkopírovat `dist-studio/` do `dist/studio/`. Hra i její archivy zůstanou beze změny.
+- Studio je na GitHub Pages na adrese **https://tom161819.github.io/Newgame/studio/** (Phaser demo na `.../studio/phaser-demo.html`).
+- Workflow `.github/workflows/pages.yml` ho nasazuje takto:
+  1. Až po všech kontrolách hry ho sestaví (`npm run studio:build`).
+  2. Otestuje ho (`scripts/studio-smoke.mjs`).
+  3. Zkopíruje ho do `dist/studio/`.
+
+  Když smoke studia selže, nenasadí se nic. Hra ani archivy se tím nemění.
 
 ## Omezení MVP
 
