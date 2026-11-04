@@ -41,7 +41,10 @@ export class WorkerAI {
       if(worker.profession==='soldier'){this.patrol(worker);worker.update(delta);return;}
     }
     if(worker.profession==='woodcutter'&&this.scene.naturalResources)this.scene.naturalResources.updateWorker(worker,delta);
-    else if(worker.profession==='miner')this.miner(worker,delta);
+    else if(worker.profession==='miner'){
+      const home=workplace?.building(worker);
+      if(this.scene.naturalResources&&home?.definition.mining&&home.quarryMode!=='legacy')this.scene.naturalResources.miningWork.update(worker,delta);else this.miner(worker,delta);
+    }
     else if(worker.profession==='hunter')this.hunter(worker,delta);
     else if(worker.profession==='farmer'&&this.scene.farmingSystem)this.scene.farmingSystem.updateWorker(worker,delta);
     else if(['miller','baker'].includes(worker.profession)&&this.scene.foodProduction)this.scene.foodProduction.updateWorker(worker);

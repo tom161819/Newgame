@@ -17,8 +17,9 @@ import { repairTransportInstructions } from './TransportStateMigration.js';
 import { captureMapKnowledge } from '../game/mapMemoryObjects.js';
 import { validateMapMemory } from './MapMemoryValidation.js';
 import { FORESTRY,emptyNaturalState } from '../data/naturalResources.js';
+import { migrateNaturalState } from './NaturalStateMigration.js';
 
-export const SAVE_VERSION=11;
+export const SAVE_VERSION=12;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -66,7 +67,7 @@ export function serializeGameState(scene){
       render:{x:scene.player.x,y:scene.player.y,depth:scene.player.depth},
       transition:c.transitioning?{remaining:Math.max(1,(c.transitionTween?.duration??900)-(c.transitionTween?.elapsed??0))}:null},
     inventory:scene.inventory.exportState(),equipment:scene.equipment.exportState(),
-    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.construction?{construction:copy(b.construction)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
+    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
     resources:[...scene.resources.values()].map(v=>({type:v.getData('objectId'),tile:point(v.getData('tile')),...(v.getData('object').natural?{natural:copy(v.getData('object').natural)}:{})})),
     drops:[...scene.dropSystem.drops.values()].map(d=>({id:d.id,resource:d.resource,tile:point(d.tile),amount:d.amount,rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0),haulEligible:d.haulEligible!==false,...(d.siteId!=null?{siteId:d.siteId}:{})})),
     animals:[...scene.animalSystem.animals.values()].map(a=>({...serializeActor(a),retaliationId:a.retaliationTarget?.id??null})),
@@ -94,12 +95,13 @@ export function validateGameState(input,registry=objectRegistry){
   const array=(a,max=20000)=>check(Array.isArray(a)&&a.length<=max);
   const definition=(id,category)=>{const d=registry.get(id);check(d&&(!category||d.category===category));return d;};
   const unique=(array)=>{const ids=new Set();for(const a of array){check(a.id!=null&&!ids.has(a.id));ids.add(a.id);}return ids;};
-  check(input&&[1,2,3,4,5,6,7,8,9,10,SAVE_VERSION].includes(input.saveVersion));
+  check(input&&[1,2,3,4,5,6,7,8,9,10,11,SAVE_VERSION].includes(input.saveVersion));
   let s;try{s=JSON.parse(JSON.stringify(input));}catch{fail();}
   if(input.saveVersion<9&&s.settings)s.settings.explorationMode??=true;
   if(input.saveVersion<9&&s.exploration===undefined)s.exploration={version:1,explored:[],terrain:[],objects:[]};
   if(input.saveVersion<10)for(const worker of s.workers??[]){worker.isSubject??=true;worker.diedAt??=worker.isAlive?null:s.time?.totalElapsed;}
   if(input.saveVersion<11)s.naturalResources??=emptyNaturalState();
+  if(input.saveVersion<12)migrateNaturalState(s,registry);
   if(input.saveVersion<4)for(const actor of [s.player,...(s.workers??[])])for(const key of ['skills','initialSkills'])if(actor?.[key])for(const id of ['milling','baking'])actor[key][id]??=createProgress();
   if(!s.logistics){
     for(const actor of [s.player,...(s.workers??[])])for(const key of ['skills','initialSkills'])if(actor?.[key])actor[key].logistics??=createProgress();
@@ -136,13 +138,20 @@ export function validateGameState(input,registry=objectRegistry){
     }
   }
   repairTransportInstructions(s,registry,check);
-  const natural=s.naturalResources;check(natural&&Object.keys(natural).every(key=>['nextId','growthClock','ageClock','refreshElapsed','kingTask'].includes(key)));integer(natural.nextId,1);number(natural.ageClock,0,s.time.totalElapsed/dayDuration+1e-6);number(natural.growthClock,0,natural.ageClock*1.25+1e-6);number(natural.refreshElapsed,0,FORESTRY.refreshInterval);check(natural.refreshElapsed<FORESTRY.refreshInterval);
-  const resourceTiles=new Set(),treeIds=new Map();
+  const natural=s.naturalResources;check(natural&&Object.keys(natural).every(key=>['nextId','nextDepositId','growthClock','ageClock','refreshElapsed','kingTask'].includes(key)));integer(natural.nextId,1);integer(natural.nextDepositId,1);number(natural.ageClock,0,s.time.totalElapsed/dayDuration+1e-6);number(natural.growthClock,0,natural.ageClock*1.25+1e-6);number(natural.refreshElapsed,0,FORESTRY.refreshInterval);check(natural.refreshElapsed<FORESTRY.refreshInterval);
+  const resourceTiles=new Set(),treeIds=new Map(),depositIds=new Map();
   for(const r of s.resources){const d=definition(r.type,'resource');tile(r.tile);
-    if(d.tree){const n=r.natural;check(n&&n.kind==='tree'&&Object.keys(n).every(key=>['id','kind','stage','ageDays','growthDays','cycle','workDone','growthCheckpoint','ageCheckpoint'].includes(key)));const id=String(n.id).match(/^tree-([1-9]\d*)$/);check(id&&Number(id[1])<natural.nextId&&!treeIds.has(n.id));treeIds.set(n.id,r);integer(n.stage,0,3);integer(n.cycle,0);number(n.ageDays);number(n.growthDays,0,n.stage===3?0:FORESTRY.stageDays[n.stage]);number(n.workDone,0,n.stage===3?d.tree.chopDuration:0);number(n.growthCheckpoint,0,natural.growthClock+1e-8);number(n.ageCheckpoint,0,natural.ageClock+1e-8);}else check(r.natural===undefined);
+    if(d.tree){const n=r.natural;check(n&&n.kind==='tree'&&Object.keys(n).every(key=>['id','kind','stage','ageDays','growthDays','cycle','workDone','growthCheckpoint','ageCheckpoint'].includes(key)));const id=String(n.id).match(/^tree-([1-9]\d*)$/);check(id&&Number(id[1])<natural.nextId&&!treeIds.has(n.id));treeIds.set(n.id,r);integer(n.stage,0,3);integer(n.cycle,0);number(n.ageDays);number(n.growthDays,0,n.stage===3?0:FORESTRY.stageDays[n.stage]);number(n.workDone,0,n.stage===3?d.tree.chopDuration:0);number(n.growthCheckpoint,0,natural.growthClock+1e-8);number(n.ageCheckpoint,0,natural.ageClock+1e-8);}
+    else if(d.deposit){const n=r.natural;check(n&&n.kind==='deposit'&&Object.keys(n).every(key=>['id','kind','remaining','max','boundBuildingId'].includes(key)));const id=String(n.id).match(/^deposit-([1-9]\d*)$/);check(id&&Number(id[1])<natural.nextDepositId&&!depositIds.has(n.id));depositIds.set(n.id,r);integer(n.max,d.deposit.min,d.deposit.max);integer(n.remaining,0,n.max);check(n.boundBuildingId==null||bIds.has(n.boundBuildingId));}
+    else check(r.natural===undefined);
     for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){
-    const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`;check(s.terrain[y]?.[x]===0&&!occupied.has(key)&&!resourceTiles.has(key));resourceTiles.add(key);
+    const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`,overlap=s.buildings.find(b=>x>=b.x&&x<b.x+definition(b.type).width&&y>=b.y&&y<b.y+definition(b.type).height),allowedOverlap=d.tree&&r.natural.stage===0||d.deposit&&overlap?.type==='quarry'&&overlap.quarryMode==='finite'&&overlap.depositId===r.natural.id&&r.natural.boundBuildingId===overlap.id;check(s.terrain[y]?.[x]===0&&(!occupied.has(key)||allowedOverlap)&&!resourceTiles.has(key));resourceTiles.add(key);if(d.deposit||d.tree&&r.natural.stage===3)solid.add(key);
   }}
+  const boundDeposits=new Set();for(const b of s.buildings){
+    if(b.type==='quarry'){check(['finite','legacy','unbound'].includes(b.quarryMode));if(b.quarryMode==='legacy')check(buildingIsComplete(b)&&b.depositId===undefined);if(b.quarryMode==='unbound')check(b.depositId===undefined);}
+    if(b.type==='iron_mine'||b.type==='quarry'&&b.quarryMode==='finite'){const r=depositIds.get(b.depositId),spec=definition(b.type).mining;check(r&&r.type===spec.depositType&&r.natural.boundBuildingId===b.id&&!boundDeposits.has(b.depositId));boundDeposits.add(b.depositId);if(spec.overlap)check(r.tile.x<b.x+3&&r.tile.x+2>b.x&&r.tile.y<b.y+3&&r.tile.y+2>b.y);else{const dx=Math.max(0,b.x-r.tile.x-1,r.tile.x-b.x-2),dy=Math.max(0,b.y-r.tile.y-1,r.tile.y-b.y-2);check(Math.hypot(dx,dy)<=spec.range);}}
+  }
+  for(const r of depositIds.values())if(r.natural.boundBuildingId!=null)check(boundDeposits.has(r.natural.id));
   if(natural.kingTask!=null){const task=natural.kingTask,r=treeIds.get(task.treeId);check(r&&r.natural.stage===3&&!s.player.horseId&&typeof task.arrived==='boolean'&&Object.keys(task).every(key=>['treeId','goal','arrived'].includes(key)));tile(task.goal);check(Math.abs(task.goal.x-r.tile.x)+Math.abs(task.goal.y-r.tile.y)===1);}
   for(const c of s.chests){check(typeof c.id==='string');occupy(c.tile);solid.add(`${c.tile.x},${c.tile.y}`);check(!resourceTiles.has(`${c.tile.x},${c.tile.y}`));
     check(typeof c.opened==='boolean'&&typeof c.opening==='boolean'&&typeof c.looted==='boolean'&&(!c.looted||c.opened));
@@ -184,7 +193,7 @@ export function validateGameState(input,registry=objectRegistry){
   if(['enteringTower','exitingTower'].includes(p.state)){number(p.transition?.remaining,1,900);if(p.state==='exitingTower')tile(p.exitTile);}
   number(p.render?.x,-1e6,1e6);number(p.render?.y,-1e6,1e6);number(p.render?.depth,-1e6,1e6);
   for(const a of s.animals){definition(a.type,'animal');check(typeof a.id==='string');actor(a);number(a.wanderWait,-1e9,1e9);check(a.retaliationId==null||a.retaliationId==='king'||wIds.has(a.retaliationId));if(a.mounted)check(p.horseId===a.id&&a.type==='horse');}
-  const reservations=new Set(natural.kingTask?[`natural:${natural.kingTask.treeId}`]:[]);
+  const depositClaims=new Map(),reservations=new Set(natural.kingTask?[`natural:${natural.kingTask.treeId}`]:[]);
   if(s.workers!==undefined){
     integer(s.population?.nextId,1);integer(s.population.lastMigrationDay,1,s.time?.day??Number.MAX_SAFE_INTEGER);
     for(const w of s.workers){
@@ -200,13 +209,20 @@ export function validateGameState(input,registry=objectRegistry){
       check(['Idle','Searching for Work','Moving to Target','Working','Returning','Waiting','Fleeing','Recovering','Arriving','Dead','Going to Workplace','Searching for Target','Traveling to Target','Returning to Workplace','Patrolling'].includes(w.workState));
       check(typeof w.workMessage==='string'&&w.workMessage.length<200);if(!w.isAlive)check(w.workState==='Dead'&&!w.workTask&&!w.arriving);
       const t=w.workTask;if(t){
-        check(w.isAlive&&['mine','mineDrop','hunt','collectMeat','build','harvest','chopTree','foodPickup','foodDeliver','produce'].includes(t.kind));tile(t.goal);number(t.progressMs,0,t.kind==='harvest'?(definition(s.buildings.find(b=>b.id===t.targetId)?.type).crop?.workDuration??0):WORK_RULES.miningDuration);
-        const prefix=t.kind==='mine'?'resource':t.kind==='hunt'?'animal':'drop',expected=t.kind==='chopTree'?`natural:${t.targetId}`:t.kind==='produce'?`production-slot:${t.goal.x},${t.goal.y}`:['foodPickup','foodDeliver'].includes(t.kind)?`food-task:${t.transferId}`:t.kind==='build'?`construction-slot:${t.goal.x},${t.goal.y}`:t.kind==='harvest'?`crop:${t.targetId}`:`${prefix}:${t.targetId}`;check(t.reservation===expected&&!reservations.has(t.reservation));reservations.add(t.reservation);
+        check(w.isAlive&&['mine','mineDrop','hunt','collectMeat','build','harvest','chopTree','mineDeposit','foodPickup','foodDeliver','produce'].includes(t.kind));tile(t.goal);number(t.progressMs,0,t.kind==='mineDeposit'?(definition(s.buildings.find(b=>b.id===w.assignedWorkplaceId)?.type).mining?.duration??0):t.kind==='harvest'?(definition(s.buildings.find(b=>b.id===t.targetId)?.type).crop?.workDuration??0):WORK_RULES.miningDuration);
+        const prefix=t.kind==='mine'?'resource':t.kind==='hunt'?'animal':'drop',expected=t.kind==='mineDeposit'?`mineral:${t.targetId}:${w.id}`:t.kind==='chopTree'?`natural:${t.targetId}`:t.kind==='produce'?`production-slot:${t.goal.x},${t.goal.y}`:['foodPickup','foodDeliver'].includes(t.kind)?`food-task:${t.transferId}`:t.kind==='build'?`construction-slot:${t.goal.x},${t.goal.y}`:t.kind==='harvest'?`crop:${t.targetId}`:`${prefix}:${t.targetId}`;check(t.reservation===expected&&!reservations.has(t.reservation));reservations.add(t.reservation);
         if(t.kind==='foodPickup'&&t.sourceDropId){check(!reservations.has(`drop:${t.sourceDropId}`));reservations.add(`drop:${t.sourceDropId}`);}
+        if(['mine','mineDrop'].includes(t.kind)){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);check(home?.type!=='iron_mine'&&!['finite','unbound'].includes(home?.quarryMode));}
         if(t.kind==='mine')check(w.profession==='miner'&&s.resources.some(r=>r.type==='stone'&&`${r.tile.x},${r.tile.y}`===t.targetId));
         if(t.kind==='hunt')check(w.profession==='hunter'&&aIds.has(t.targetId));if(t.kind==='collectMeat')check(w.profession==='hunter'&&dIds.has(t.targetId));
         if(t.kind==='mineDrop')check(w.profession==='miner'&&s.drops.some(d=>d.id===t.targetId&&d.resource==='stone'));
         if(t.kind==='chopTree'){const target=treeIds.get(t.targetId),home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),slot=`natural-slot:${t.goal.x},${t.goal.y}`;check(w.profession==='woodcutter'&&home?.type==='lumberjack_hut'&&buildingIsComplete(home)&&target?.natural.stage===3&&Math.abs(target.tile.x-t.goal.x)+Math.abs(target.tile.y-t.goal.y)===1&&!reservations.has(slot));reservations.add(slot);}
+        if(t.kind==='mineDeposit'){
+          const target=depositIds.get(t.targetId),home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),spec=home&&definition(home.type).mining,slot=`natural-slot:${t.goal.x},${t.goal.y}`;
+          check(w.profession==='miner'&&home&&buildingIsComplete(home)&&spec&&home.depositId===t.targetId&&target?.natural.remaining>0&&!reservations.has(slot)&&!solid.has(`${t.goal.x},${t.goal.y}`));reservations.add(slot);
+          const workObject=spec.overlap?{...home,definition:definition(home.type)}:{...target.tile,definition:definition(target.type)};check(towerNeighbors(workObject).some(p=>p.x===t.goal.x&&p.y===t.goal.y));
+          const count=(depositClaims.get(t.targetId)??0)+1;depositClaims.set(t.targetId,count);check(count<=target.natural.remaining);
+        }
         if(t.kind==='build'){
           const site=s.buildings.find(b=>b.id===t.targetId);check(w.profession==='builder'&&site&&!buildingIsComplete(site)&&site.construction.assignedBuilders.includes(w.id));
           check(towerNeighbors(site).some(p=>p.x===t.goal.x&&p.y===t.goal.y));

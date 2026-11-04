@@ -47,7 +47,7 @@ export function loadGameState(scene,input){
     worker.workplaceReached=data.workplaceReached??false;worker.cargo=structuredClone(data.cargo??null);worker.pendingWorkRewards=structuredClone(data.pendingWorkRewards??[]);
     worker.workTask=structuredClone(data.workTask);worker.active=worker.isAlive;
     if(worker.workTask)scene.workerSystem.reservations.reserve(worker.workTask.reservation,worker.id);
-    if(worker.workTask?.kind==='chopTree')scene.workerSystem.reservations.reserve(`natural-slot:${worker.workTask.goal.x},${worker.workTask.goal.y}`,worker.id);
+    if(['chopTree','mineDeposit'].includes(worker.workTask?.kind))scene.workerSystem.reservations.reserve(`natural-slot:${worker.workTask.goal.x},${worker.workTask.goal.y}`,worker.id);
     if(worker.workTask?.kind==='foodPickup'&&worker.workTask.sourceDropId)scene.workerSystem.reservations.reserve(`drop:${worker.workTask.sourceDropId}`,worker.id);
     if(!worker.isAlive)worker.view.destroy();else{const pos=gridToWorld(worker.position.x,worker.position.y);worker.view.setPosition(pos.x,pos.y).setDepth(pos.y+.1);worker.view.animate?.(0,worker.walking,worker.direction);}
   }

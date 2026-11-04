@@ -28,12 +28,12 @@ export async function buildingMenuSmoke(page){
   console.log('PASS registered building categories, All/empty tabs, preview cancellation, camera controls and mobile horizontal tabs');
 }
 
-async function clickWorld(page,point){
+export async function clickWorld(page,point){
   await page.evaluate(async point=>{await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));const s=window.__game.registry.get('application').scene;s.worldCamera.syncSize();s.worldCamera.following=false;s.cameras.main.setZoom(.9).centerOn(point.x,point.y);s.cameras.main.preRender();},point);
   const camera=await page.evaluate(()=>{const c=window.__game.registry.get('application').scene.cameras.main;return{x:c.scrollX+c.width/2,y:c.scrollY+c.height/2,w:c.width,h:c.height,z:c.zoom};}),bounds=await page.locator('canvas').boundingBox();
   await page.mouse.click(bounds.x+((point.x-camera.x)*camera.z+camera.w/2)*bounds.width/camera.w,bounds.y+((point.y-camera.y)*camera.z+camera.h/2)*bounds.height/camera.h);
 }
-async function clickBuilding(page,id){
+export async function clickBuilding(page,id){
   // A ground tile can be covered by a neighbouring isometric roof. Click an
   // actually exposed part of this building through the ordinary mouse path.
   const point=await page.evaluate(id=>{

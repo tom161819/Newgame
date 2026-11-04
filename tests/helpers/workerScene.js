@@ -31,7 +31,8 @@ import { LogisticsTaskManager } from '../../src/systems/LogisticsTaskManager.js'
 import { createStartingStockpile,createStartingCastle } from '../../src/systems/WorldGenerationConfig.js';
 import { WorkerSystem } from '../../src/systems/WorkerSystem.js';
 import { NaturalResourcesSystem } from '../../src/systems/NaturalResourcesSystem.js';
-import { treeBlocks } from '../../src/data/naturalResources.js';
+import { resourceBlocks } from '../../src/data/minerals.js';
+import { buildingTiles } from '../../src/game/buildings.js';
 import { ResourceSpawner } from '../../src/game/stones.js';
 import { tileCenter } from '../../src/game/isometric.js';
 import { wallIndex,connectionsFor } from '../../src/game/walls.js';
@@ -66,7 +67,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   function view(type,p){const data={objectId:type,definition:objectRegistry.require(type)};return {...p,scene,visible:true,depth:p.y,
     setData(k,v){data[k]=v;return this;},getData(k){return data[k];},setVisible(v){this.visible=v;return this;},setPosition(x,y){this.x=x;this.y=y;return this;},setDepth(d){this.depth=d;return this;},
     animate(){},setMounted(){},setOpened(){},destroy(){this.scene=null;}};}
-  scene.assets={createView:view};scene.createBuildingView=(d,b)=>{scene.workplaceSystem?.register(b);scene.farmingSystem?.register(b);scene.foodStorage?.register(b);scene.foodProduction?.register(b);return view(d.id,tileCenter(b));};
+  scene.assets={createView:view};scene.createBuildingView=(d,b)=>{scene.naturalResources?.mining.registerBuilding(b);scene.workplaceSystem?.register(b);scene.farmingSystem?.register(b);scene.foodStorage?.register(b);scene.foodProduction?.register(b);return view(d.id,tileCenter(b));};
   scene.tweens={add(config){const t={...config,elapsed:0};scene.animations.push(t);return t;}};
   scene.player=view('king',tileCenter({x:40,y:40}));scene.character=new PlayerController(scene,scene.player,{x:40,y:40});
   scene.fog=new FogOfWarSystem(scene.character,scene.settingsPanel.settings.fogOfWar,{explorationEnabled:scene.settingsPanel.settings.explorationMode});scene.mapMemory=new MapMemory(scene.fog);
@@ -84,7 +85,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   if(logistics&&starter){if(scene.gameSettings?.startingCastle)createStartingCastle(scene,scene.character.tile);createStartingStockpile(scene,scene.character.tile);}
   if(foodProduction||logistics){scene.foodStorage=new FoodStorageSystem(scene,{physicalMaterials:logistics});scene.foodProduction=new FoodProductionSystem(scene);if(logistics){scene.kingLogistics=new KingLogisticsSystem(scene);scene.logisticsTasks=new LogisticsTaskManager(scene);}}
   if(farming||foodProduction||logistics)scene.farmingSystem=new FarmingSystem(scene,{growthModifier:()=>scene.seasons?.growthMultiplier()??1,onHarvest:foodProduction||logistics?result=>scene.foodProduction.harvest(result):null});
-  scene.addResource=(d,tile,natural=null)=>{const v=view(d.id,tileCenter(tile)),key=`${tile.x},${tile.y}`,object={type:d.id,definition:d,x:tile.x,y:tile.y,tiles:[{...tile}],...(natural?{natural:structuredClone(natural)}:{})};v.setData('tile',{...tile}).setData('object',object);if(natural)v.getMemoryState=()=>({stage:object.natural.stage,season:scene.seasons?.season??'Spring'});scene.resources.set(key,v);scene.resourceOccupancy.set(key,key);if(natural?treeBlocks(object):!d.walkable)scene.map[tile.y][tile.x]=1;scene.naturalResources?.register(object);};
+  scene.addResource=(d,tile,natural=null)=>{const v=view(d.id,tileCenter(tile)),key=`${tile.x},${tile.y}`,object={type:d.id,definition:d,x:tile.x,y:tile.y,tiles:buildingTiles(tile,d),...(natural?{natural:structuredClone(natural)}:{})};v.setData('tile',{...tile}).setData('object',object);if(natural)v.getMemoryState=()=>d.tree?{stage:object.natural.stage,season:scene.seasons?.season??'Spring'}:{depleted:object.natural.remaining===0};scene.resources.set(key,v);for(const t of object.tiles){scene.resourceOccupancy.set(`${t.x},${t.y}`,key);if(resourceBlocks(object))scene.map[t.y][t.x]=1;}scene.naturalResources?.register(object);};
   if(naturalResources)scene.naturalResources=new NaturalResourcesSystem(scene);
   scene.collectResource=(key,tile,actor)=>{const v=scene.resources.get(key);if(!v||key!==`${tile.x},${tile.y}`||actor.state!=='ground')return false;
     const type=v.getData('objectId');if(actor===scene.character&&scene.foodStorage?.manages(type)&&scene.kingLogistics?.room(type)<1)return false;scene.resources.delete(key);v.destroy();scene.dropSystem.refreshOccupancy(tile);const event={type:'resourceCollected',objectType:type,quantity:1};if(actor===scene.character&&scene.kingLogistics&&scene.foodStorage.manages(type))scene.kingLogistics.receive({resource:type,amount:1,event});else if(!scene.workplaceSystem?.carryCollection(actor,{resource:type,amount:1,event})){scene.inventory.add(type);scene.activities.emit(event.type,{...event,actor});}return true;};

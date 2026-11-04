@@ -3,24 +3,30 @@ import { reachableTiles,findPathToAny } from '../game/pathfinding.js';
 import { tileKey } from '../game/stones.js';
 import { buildingIsComplete,buildingDefinition } from '../game/buildings.js';
 import { ForestryWork } from './ForestryWork.js';
+import { MineralSystem } from './MineralSystem.js';
+import { resourceBlocks } from '../data/minerals.js';
+import { MiningWork } from './MiningWork.js';
 
 export class NaturalResourcesSystem {
   constructor(scene){
-    this.scene=scene;this.nextId=1;this.growthClock=0;this.ageClock=0;this.refreshElapsed=0;this.byId=new Map();this.kingTask=null;
+    this.scene=scene;this.nextId=1;this.nextDepositId=1;this.growthClock=0;this.ageClock=0;this.refreshElapsed=0;this.byId=new Map();this.kingTask=null;this.topologyRevision=0;
     this.unsubscribe=scene.gameTime.onAdvance(delta=>this.advance(delta));
     this.forestry=new ForestryWork(scene,this);
+    this.miningWork=new MiningWork(scene,this);
+    this.mining=new MineralSystem(scene,this);Object.defineProperty(scene.resourceOccupancy,'naturalContext',{value:this,configurable:true});this.worldChanged=()=>{this.topologyRevision++;this.mining.reconcile();};scene.events?.on('buildings:changed',this.worldChanged);
     for(const view of scene.resources.values())this.register(view.getData('object'));
   }
-  register(object){if(object?.natural)this.byId.set(object.natural.id,object);}
+  register(object){if(object?.natural){this.byId.set(object.natural.id,object);this.topologyRevision++;}}
   view(object){return this.scene.resources.get(tileKey(object));}
   growthModifier(){return this.scene.seasons?FORESTRY.seasonGrowth[this.scene.seasons.season]:1;}
   reserved(){const reserved=new Set([...this.scene.reservedTiles().map(tileKey),...[...(this.scene.dropSystem?.drops.values()??[])].map(d=>tileKey(d.tile))]);for(const key of this.scene.workerSystem.reservations.owners.keys())if(key.startsWith('natural-slot:'))reserved.add(key.slice('natural-slot:'.length));return reserved;}
   updateWorker(worker,delta){this.forestry.update(worker,delta);}
-  releaseWorker(worker){this.forestry.release(worker);}
+  releaseWorker(worker){this.forestry.release(worker);this.miningWork.release(worker);}
   origins(){return this.scene.resourceOrigins?.()??[this.scene.character.nextTile??this.scene.character.tile];}
   blockedByBuilding(object){return this.scene.buildings.some(b=>b.tiles.some(t=>t.x===object.x&&t.y===object.y)&&(!buildingDefinition(b).walkable||!buildingIsComplete(b)));}
+  occupiedByBuilding(object){return this.scene.buildings.some(b=>b.tiles.some(t=>t.x===object.x&&t.y===object.y));}
   refreshMap(object){
-    const s=this.scene;s.map[object.y][object.x]=s.terrainGrid[object.y][object.x]||this.blockedByBuilding(object)||treeBlocks(object)?1:0;s.terrain?.invalidateArea([{x:object.x,y:object.y}]);
+    this.mining.restoreTiles(object.tiles);
   }
   preservesRoutes(tile){
     const s=this.scene,origins=this.origins(),before=reachableTiles(s.map,origins).length,old=s.map[tile.y][tile.x];if(old!==0)return false;s.map[tile.y][tile.x]=1;
@@ -45,8 +51,9 @@ export class NaturalResourcesSystem {
   flushGrowth(){
     const reserved=this.reserved();
     for(const object of this.byId.values()){
+      if(!object.definition.tree)continue;
       const n=object.natural;n.ageDays+=Math.max(0,this.ageClock-n.ageCheckpoint);n.ageCheckpoint=this.ageClock;const growth=Math.max(0,this.growthClock-n.growthCheckpoint);n.growthCheckpoint=this.growthClock;
-      if(n.stage===3||this.blockedByBuilding(object))continue;n.growthDays+=growth;
+      if(n.stage===3||this.occupiedByBuilding(object))continue;n.growthDays+=growth;
       while(n.stage<3&&n.growthDays+1e-9>=FORESTRY.stageDays[n.stage]){
         if(this.growthModifier()===0)break;
         if(n.stage===2&&(reserved.has(tileKey(object))||this.scene.map[object.y][object.x]!==0||!this.preservesRoutes(object))){n.growthDays=FORESTRY.stageDays[n.stage];break;}
@@ -86,7 +93,7 @@ export class NaturalResourcesSystem {
     this.scene.dropSystem.create('wood',{x:object.x,y:object.y},rule.wood,null,{rewardRemaining:0,rewardUnits:0});
     this.scene.activities.emit('treeChopped',{actor,objectType:object.type,quantity:1,objectIds:[n.id]},`tree:${n.id}:${n.cycle}`);this.scene.setStatus(`${rule.wood} Wood lies beside the stump. Carry it to storage.`);return true;
   }
-  exportState(){this.flushGrowth();return{nextId:this.nextId,growthClock:this.growthClock,ageClock:this.ageClock,refreshElapsed:this.refreshElapsed,kingTask:structuredClone(this.kingTask)};}
+  exportState(){this.flushGrowth();return{nextId:this.nextId,nextDepositId:this.nextDepositId,growthClock:this.growthClock,ageClock:this.ageClock,refreshElapsed:this.refreshElapsed,kingTask:structuredClone(this.kingTask)};}
   importState(data){this.cancelKing();Object.assign(this,structuredClone(data));if(this.kingTask){const object=this.byId.get(this.kingTask.treeId);this.scene.workerSystem.reservations.reserve(this.reservation(object),'king');}this.refreshSeason();}
-  destroy(){this.cancelKing();this.unsubscribe();this.byId.clear();}
+  destroy(){this.cancelKing();this.unsubscribe();this.scene.events?.off('buildings:changed',this.worldChanged);if(this.scene.resourceOccupancy.naturalContext===this)delete this.scene.resourceOccupancy.naturalContext;this.byId.clear();}
 }

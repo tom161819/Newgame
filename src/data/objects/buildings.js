@@ -1,4 +1,5 @@
 import { WORKPLACES } from '../workplaces.js';
+import { MINING_WORK } from '../minerals.js';
 export const buildings = [
   {
     id: 'tower', name: 'Stone Tower', category: 'building', buildingCategory:'defense', sprite: '/assets/buildings/tower/tower.png',
@@ -37,5 +38,5 @@ export const buildings = [
     {id:'barracks',name:'Barracks',buildingCategory:'defense',width:3,height:3,cost:{stone:20},constructionTime:40000,visualHeight:125,description:'Kasárna s pěti místy pro stávající poddané. Vojáci hlídkují v okolí.'},
   ].map(d=>({...d,category:'building',sprite:`/assets/buildings/${d.id}/${d.id}.svg`,walkable:false,collectible:false,buildable:true,
     interactions:['manage_workers'],renderMode:'procedural',renderer:'workplace',origin:{x:.5,y:.9},depth:{offset:0},
-    workplace:WORKPLACES[d.id],shadow:{baked:true,x:12,y:-15,width:d.width*59,height:d.height*21,color:0x30291c,alpha:.3}})),
+    workplace:WORKPLACES[d.id],...(d.id==='quarry'?{mining:MINING_WORK.quarry}:{}),shadow:{baked:true,x:12,y:-15,width:d.width*59,height:d.height*21,color:0x30291c,alpha:.3}})),
 ];

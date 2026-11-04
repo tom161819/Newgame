@@ -39,11 +39,13 @@ export function placementError(map,anchor,resources,reservedTiles=[],definition=
   if(!definition.buildable||definition.category!=='building')return 'Tento objekt není určený ke stavbě.';
   const status=unlocks?.status(definition)??buildingUnlockStatus(definition,buildings,objectRegistry);if(!status.unlocked)return status.description;
   const tiles=buildingTiles(anchor,definition);
-  if(tiles.some(tile=>!isWalkable(map,tile.x,tile.y)))return `Budova potřebuje ${definition.width} × ${definition.height} volných políček uvnitř mapy.`;
-  if(tiles.some(tile=>resources.has(tileKey(tile))))return 'Na tomto místě leží surovina.';
+  if(tiles.some(tile=>tile.x<0||tile.y<0||tile.y>=map.length||tile.x>=map[0].length))return 'Budova musí zůstat uvnitř mapy.';
+  const natural=resources.naturalContext,special=natural?.mining.placementError(definition,anchor);if(special)return special;
+  if(tiles.some(tile=>!isWalkable(map,tile.x,tile.y)&&!natural?.mining.canBuildOver(definition,tile)))return `Budova potřebuje ${definition.width} × ${definition.height} volných políček uvnitř mapy.`;
+  if(tiles.some(tile=>resources.has(tileKey(tile))&&!natural?.mining.canBuildOver(definition,tile)))return 'Na tomto místě leží surovina.';
   if(tiles.some(tile=>reservedTiles.some(p=>tileKey(p)===tileKey(tile))))return 'Tady stojí král nebo zvíře, případně právě dokončuje krok.';
   if(tiles.some(tile=>buildings.some(building=>building.tiles.some(p=>tileKey(p)===tileKey(tile)))))return 'Tady už stojí budova.';
-  return null;
+  return natural?.mining.accessError(map,definition,anchor)??null;
 }
 
 export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,inventory,buildings,definition=towerDefinition(),reserveMaterials=false}) {
@@ -54,6 +56,7 @@ export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,
   if(!(materials?materials.prepare(building):inventory.pay(definition.cost)))return {error:'Na tuto budovu nemáš dostatek surovin.'};
   for(const tile of building.tiles)map[tile.y][tile.x]=definition.walkable?0:1;
   buildings.push(building);
+  if(resources.naturalContext){resources.naturalContext.mining.bind(building);resources.naturalContext.topologyRevision++;}else if(definition.id==='quarry')building.quarryMode=reserveMaterials?'unbound':'legacy';
   return {building};
 }
 export function placeTower(options) {

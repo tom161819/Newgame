@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 export function smokeScope({paths=[],previousVersion,currentVersion,manual=false}){
   const historyData=new Set(['src/data/semver.js','src/data/changelogCategories.js']);
-  if(manual||previousVersion!==currentVersion||paths.some(file=>/^src\/(game|systems)\//.test(file)||file.startsWith('src/data/')&&!historyData.has(file)||/^src\/ui\/(PopulationSidebar|populationData|MissingWorkersIndicators|NaturalResourcePanel|WorkplacePanel)\.js$/.test(file)||/^scripts\/(population|staffing|fog|forestry)-smoke\.mjs$/.test(file)))return 'full';
+  if(manual||previousVersion!==currentVersion||paths.some(file=>/^src\/(game|systems)\//.test(file)||file.startsWith('src/data/')&&!historyData.has(file)||/^src\/ui\/(PopulationSidebar|populationData|MissingWorkersIndicators|NaturalResourcePanel|WorkplacePanel)\.js$/.test(file)||/^scripts\/(population|staffing|fog|forestry|mineral)-smoke\.mjs$/.test(file)))return 'full';
   if(paths.some(file=>historyData.has(file)||/^public\/versions\//.test(file)||/^(CHANGELOG\.md|vite\.config\.js|index\.html|src\/style\.css)$/.test(file)||/^src\/ui\/(VersionArchivePanel|ChangelogPanel|GameApplication)\.js$/.test(file)||/^scripts\/(.*archive.*|version-catalog|git-source-facts|browser-smoke|ci-smoke).*\.mjs$/.test(file)))return 'archive';
   return 'current';
 }

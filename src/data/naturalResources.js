@@ -6,5 +6,5 @@ export const FORESTRY=Object.freeze({
 });
 export const TREE_STAGES=Object.freeze(['Stump','Sapling','Young tree','Mature tree']);
 export const treeBlocks=object=>!!object?.natural&&object.natural.stage===3;
-export const emptyNaturalState=()=>({nextId:1,growthClock:0,ageClock:0,refreshElapsed:0,kingTask:null});
+export const emptyNaturalState=()=>({nextId:1,nextDepositId:1,growthClock:0,ageClock:0,refreshElapsed:0,kingTask:null});
 export function treeState(id,{stage=3,growthDays=0,ageDays=8,cycle=0}={}){return{id,kind:'tree',stage,growthDays,ageDays,cycle,workDone:0,growthCheckpoint:0,ageCheckpoint:0};}

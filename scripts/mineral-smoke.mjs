@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import { clickWorld,clickBuilding,supplyAndBuild } from './building-menu-smoke.mjs';
+
+export async function mineralSmoke(page){
+  const baseline=await page.evaluate(()=>{const app=window.__game.registry.get('application');app.scene.pauseManager.set('mineral-smoke',true);return app.snapshot();});
+  const load=async state=>{await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__mineralReady=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('mineral-smoke',true);window.__mineralReady=true;app.onGameReady=ready;};await app.load(state);},state);await page.waitForFunction(()=>window.__mineralReady);};
+  assert.equal(baseline.resources.filter(r=>r.type==='stone_deposit').length,5);assert.equal(baseline.resources.filter(r=>r.type==='iron_deposit').length,4);
+  for(const type of ['quarry','iron_mine']){
+    await page.evaluate(type=>{const s=window.__game.registry.get('application').scene;for(const [id,n]of Object.entries(s.objectRegistry.require(type).cost))s.inventory.add(id,n);s.updateInventory();s.pauseManager.set('mineral-smoke',false);},type);
+    await page.locator('#buildings-tab').click();await page.locator('[data-building-category="industry"]').click();await page.locator(`#${type}-choice`).click();
+    const fixture=await page.evaluate(type=>{
+      const s=window.__game.registry.get('application').scene,d=s.objectRegistry.require(type),deposits=s.naturalResources.mining.deposits().filter(o=>o.type===d.mining.depositType).sort((a,b)=>Math.hypot(a.x-s.character.tile.x,a.y-s.character.tile.y)-Math.hypot(b.x-s.character.tile.x,b.y-s.character.tile.y));
+      for(const rock of deposits)for(let y=Math.max(1,rock.y-6);y<=Math.min(96,rock.y+3);y++)for(let x=Math.max(1,rock.x-6);x<=Math.min(96,rock.x+3);x++){
+        s.previewAnchor={x,y};s.previewKey=null;s.updateBuildingPreview();if(s.previewKey!==`${x},${y}:null`)continue;
+        const actual=s.naturalResources.mining.select(d,{x,y});actual.natural.remaining=1;return{point:{x:3200+(x-y)*32,y:128+(x+y+1)*16},depositId:actual.natural.id,resource:d.mining.resource,xp:d.mining.xp};
+      }throw Error(`No legal actual ${type} site`);
+    },type);
+    await clickWorld(page,fixture.point);await page.waitForFunction(type=>window.__game.registry.get('application').scene.buildings.some(b=>b.type===type&&b.construction?.state==='planned'),type);
+    const site={point:fixture.point,id:await page.evaluate(type=>window.__game.registry.get('application').scene.buildings.find(b=>b.type===type&&b.construction?.state==='planned').id,type)};
+    await supplyAndBuild(page,site);await clickBuilding(page,site.id);await page.locator('#workplace-dialog[open]').waitFor();assert.match(await page.locator('#mining-details').textContent(),/1 \/ /);
+    const worker=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,w=s.workerSystem.liveSubjects().find(w=>w.profession==='idle');return{id:w.id,overall:w.experience.totalXP,skill:w.skills.mining.totalXP,multiplier:w.naturalTalent==='mining'?1.2:1};});
+    await page.locator('#assign-workplace-worker').click();await page.locator(`[data-assign-worker="${worker.id}"]`).click();await page.locator('#close-workplace').click();
+    await page.waitForFunction(id=>{const w=window.__game.registry.get('application').scene.workerSystem.workers.get(id);return w.workTask?.kind==='mineDeposit'&&w.workTask.progressMs>1500;},worker.id,{timeout:90000});
+    const partial=await page.evaluate(()=>{const app=window.__game.registry.get('application');app.scene.pauseManager.set('mineral-smoke',true);return app.snapshot();});await load(partial);assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').snapshot()),partial);
+    await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('mineral-smoke',false));await page.waitForFunction(id=>window.__game.registry.get('application').scene.workerSystem.workers.get(id).cargo?.amount===1,worker.id,{timeout:30000});
+    const cargo=await page.evaluate(()=>{const app=window.__game.registry.get('application');app.scene.pauseManager.set('mineral-smoke',true);return app.snapshot();});assert.equal(cargo.workers.find(w=>w.id===worker.id).cargo.resource,fixture.resource);assert.equal(cargo.resources.find(r=>r.natural?.id===fixture.depositId).natural.remaining,0);assert.equal(cargo.inventory[fixture.resource]??0,0);
+    await load(cargo);assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').snapshot()),cargo);await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('mineral-smoke',false));await page.waitForFunction(r=>window.__game.registry.get('application').scene.inventory.count(r)===1,fixture.resource,{timeout:90000});
+    const result=await page.evaluate(f=>{const s=window.__game.registry.get('application').scene,w=s.workerSystem.workers.get(f.id),d=s.naturalResources.byId.get(f.depositId);return{overall:w.experience.totalXP,skill:w.skills.mining.totalXP,remaining:d.natural.remaining,depleted:s.naturalResources.view(d).getMemoryState().depleted,ore:s.inventory.count('iron_ore'),iron:s.inventory.count('iron')};},{id:worker.id,depositId:fixture.depositId});assert.equal(result.overall,worker.overall+fixture.xp);assert.ok(Math.abs(result.skill-worker.skill-fixture.xp*worker.multiplier)<1e-8);assert.equal(result.remaining,0);assert.equal(result.depleted,true);assert.equal(result.iron,0);
+    await clickBuilding(page,site.id);assert.equal(await page.locator('#mining-details').textContent(),'Deposit Depleted');await page.locator('#close-workplace').click();
+    if(process.env.SMOKE_MINERALS_SCREENSHOT&&type==='iron_mine')await page.screenshot({path:process.env.SMOKE_MINERALS_SCREENSHOT});console.log(`PASS native ${type} actual deposit placement, multi-material physical blueprint/build, staffing, partial extraction and loaded-cargo Save/Load, single finite output, real storage delivery/Mining XP and depleted graphics/panel`);
+    await load(baseline);assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').snapshot()),baseline);
+  }
+  const frozen=await page.evaluate(()=>{
+    const s=window.__game.registry.get('application').scene,d=s.naturalResources.mining.deposits().find(d=>Math.hypot(d.x-s.character.position.x,d.y-s.character.position.y)>20),key=`resource:${d.x},${d.y}`,view=s.naturalResources.view(d);s.fog.setEnabled(true);
+    const remove=s.fog.registerSource('mineral-fixture',()=>({center:{x:d.x+1,y:d.y+1},radius:3}));s.cameras.main.centerOn(view.x,view.y-40).preRender();s.refreshVisibility();remove();s.refreshVisibility();const before=structuredClone(s.mapMemory.objects.get(key).visual);d.natural.remaining=0;view.setNaturalState(d);s.refreshVisibility();return{before,known:s.mapMemory.objects.get(key).visual,copy:s.memoryRenderer.views.get(key)?.view.getMemoryState(),actual:view.getMemoryState(),visible:view.visible};
+  });assert.deepEqual(frozen.before,{depleted:false});assert.deepEqual(frozen.known,frozen.before);assert.deepEqual(frozen.copy,frozen.before);assert.deepEqual(frozen.actual,{depleted:true});assert.equal(frozen.visible,false);
+  await load(baseline);assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').snapshot()),baseline);await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('mineral-smoke',false));console.log('PASS native depleted mineral renderer stays frozen at its last-seen shape outside sight; no live quantity enters map memory');
+}

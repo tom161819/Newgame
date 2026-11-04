@@ -60,6 +60,8 @@ export function validateDefinition(definition) {
     if(d.category!=='building'||!plainObject(r)||!quantities(r.input)||!quantities(r.output)||!finite(r.duration)||r.duration<=0||!SKILL_IDS.includes(r.skill)||!d.workplace||!Number.isSafeInteger(d.bufferCapacity)||d.bufferCapacity<Math.max(...Object.values(r.input),...Object.values(r.output)))fail(id,'neplatný výrobní recept.');
   }
   if(d.edible!==undefined&&(d.category!=='resource'||typeof d.edible!=='boolean'))fail(id,'neplatné označení potraviny.');
+  if(d.deposit!==undefined&&(!plainObject(d.deposit)||d.category!=='resource'||d.collectible||!Number.isSafeInteger(d.deposit.min)||!Number.isSafeInteger(d.deposit.max)||d.deposit.min<1||d.deposit.max<d.deposit.min))fail(id,'invalid finite deposit.');
+  if(d.mining!==undefined&&(!plainObject(d.mining)||d.category!=='building'||d.workplace?.profession!=='miner'||!finite(d.mining.duration)||d.mining.duration<=0||!finite(d.mining.xp)||d.mining.xp<=0||typeof d.mining.overlap!=='boolean'||!d.mining.overlap&&(!finite(d.mining.range)||d.mining.range<0)))fail(id,'invalid mining workplace.');
   if(d.tree!==undefined&&(!plainObject(d.tree)||d.category!=='resource'||d.collectible||!Number.isSafeInteger(d.tree.wood)||d.tree.wood<1||!finite(d.tree.xp)||d.tree.xp<=0||!finite(d.tree.chopDuration)||d.tree.chopDuration<=0||!Array.isArray(d.tree.stages)||d.tree.stages.length!==4))fail(id,'neplatný obnovitelný strom.');
   if(['character','animal'].includes(d.category)&&d.stats===undefined)fail(id,'živá jednotka vyžaduje bojové statistiky.');
   if (d.stats !== undefined && (!plainObject(d.stats) || !['maxHP','attackDPS','armor','attackRange'].every(key=>finite(d.stats[key]))
@@ -112,8 +114,9 @@ export class ObjectRegistry {
     }
     const known=new Map([...this.definitions,...pending]);
     for(const definition of pending.values()){
-      for(const id of [...Object.keys(definition.cost),...(definition.production?[definition.production.resource]:[]),...(definition.crop?[definition.crop.resource]:[]),...(definition.storage?.resources??[]),...Object.keys(definition.recipe?.input??{}),...Object.keys(definition.recipe?.output??{})])
+      for(const id of [...Object.keys(definition.cost),...(definition.deposit?[definition.deposit.resource]:[]),...(definition.mining?[definition.mining.resource]:[]),...(definition.production?[definition.production.resource]:[]),...(definition.crop?[definition.crop.resource]:[]),...(definition.storage?.resources??[]),...Object.keys(definition.recipe?.input??{}),...Object.keys(definition.recipe?.output??{})])
         if(known.get(id)?.category!=='resource')fail(definition.id,`neznámá surovina ${id}.`);
+      if(definition.mining&&known.get(definition.mining.depositType)?.deposit?.resource!==definition.mining.resource)fail(definition.id,'incompatible mineral deposit.');
       for(const id of definition.treasure?.equipment??[])if(known.get(id)?.category!=='equipment')fail(definition.id,`neznámé vybavení ${id}.`);
       for(const id of definition.requiresCompletedBuildings??[])if(id===definition.id||known.get(id)?.category!=='building')fail(definition.id,`neplatná požadovaná budova ${id}.`);
     }

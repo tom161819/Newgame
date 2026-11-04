@@ -53,7 +53,8 @@ import { WorkplacePanel } from '../ui/WorkplacePanel.js';
 import { MissingWorkersIndicators } from '../ui/MissingWorkersIndicators.js';
 import { NaturalResourcesSystem } from '../systems/NaturalResourcesSystem.js';
 import { TreeView } from './TreeView.js';
-import { treeBlocks } from '../data/naturalResources.js';
+import { resourceBlocks } from '../data/minerals.js';
+import { DepositView } from './DepositView.js';
 import { NaturalResourcePanel } from '../ui/NaturalResourcePanel.js';
 import { ConstructionSystem } from '../systems/ConstructionSystem.js';
 import { ConstructionView } from './ConstructionView.js';
@@ -107,6 +108,7 @@ export class GameScene extends Phaser.Scene {
     this.assets.initialize();
     this.assets.registerRenderer('stone',(definition,context)=>drawStone(this,context.tile,definition));
     this.assets.registerRenderer('tree',(definition,context)=>new TreeView(this,definition,context));
+    this.assets.registerRenderer('deposit',(definition,context)=>new DepositView(this,definition,context));
     this.assets.registerRenderer('king',(definition,context)=>new KingView(this,context.x,context.y,definition));
     this.assets.registerRenderer('tower',(_definition,context)=>new TowerView(this,context.building,context.preview));
     this.assets.registerRenderer('animal',(definition,context)=>new AnimalView(this,context.x,context.y,definition));
@@ -201,7 +203,7 @@ export class GameScene extends Phaser.Scene {
     this.updateTimeDisplay();
     this.setStatus('Vyber surovinu, volné políčko, Buildings nebo Asset Library.');
     this.worldCamera=new WorldCamera(this,this.player);this.staffingIndicators=new MissingWorkersIndicators(this);
-    this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState)this.naturalResources.generate();
+    this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState){this.naturalResources.generate();this.naturalResources.mining.generate();}
     const onBackground=()=>{this.visibilityPaused=true;this.tweens.pauseAll();this.setGalleryInput(false);};
     const onForeground=()=>{this.visibilityPaused=false;this.activeFramePending=true;if(!this.gameOver&&!this.gameTime.paused)this.tweens.resumeAll();this.setGalleryInput(true);};
     this.game.events.on(Phaser.Core.Events.PAUSE,onBackground);this.game.events.on(Phaser.Core.Events.RESUME,onForeground);
@@ -295,7 +297,7 @@ export class GameScene extends Phaser.Scene {
     const view=this.assets.createView(definition.id,{...point,tile,object});
     view.setData('tile',{...tile});view.setData('object',object);
     this.resources.set(key,view);
-    for(const part of object.tiles){this.resourceOccupancy.set(tileKey(part),key);if(natural?treeBlocks(object):!definition.walkable)this.map[part.y][part.x]=1;}
+    for(const part of object.tiles){this.resourceOccupancy.set(tileKey(part),key);if(resourceBlocks(object))this.map[part.y][part.x]=1;}
     this.naturalResources?.register(object);
     this.updateWorldCount();
   }
@@ -356,7 +358,7 @@ export class GameScene extends Phaser.Scene {
       const resource=hit?.kind==='resource'?hit.object:null;
       if(resource){
         const object=resource.getData('object'),definition=object.definition;
-        if(definition.tree){this.naturalResourcePanel.open(object);return;}
+        if(definition.tree||definition.deposit){this.naturalResourcePanel.open(object);return;}
         if(!definition.collectible){this.setStatus(definition.description);return;}
         goal=resource.getData('tile');
         if(!definition.walkable)accepted=this.character.command({kind:'collect',resource:object,pickupKey:tileKey(goal)});
@@ -386,7 +388,7 @@ export class GameScene extends Phaser.Scene {
 
   createBuildingView(definition,building,preview=false) {
     const object={...building,type:definition.id,definition,tiles:building.tiles??buildingTiles(building,definition)};
-    if(!preview){this.terrain.invalidateArea(object.tiles);this.workplaceSystem?.register(building);this.farmingSystem?.register(building);this.foodStorage?.register(building);this.foodProduction?.register(building);}
+    if(!preview){this.naturalResources?.mining.registerBuilding(building);this.terrain.invalidateArea(object.tiles);this.workplaceSystem?.register(building);this.farmingSystem?.register(building);this.foodStorage?.register(building);this.foodProduction?.register(building);}
     const view=this.assets.createView(definition.id,{building:object,preview});
     if(!preview&&definition.crop&&buildingIsComplete(building))view.setGrowth?.(this.farmingSystem?.records.get(building.id)?.stage??0);
     return !preview&&!buildingIsComplete(building)?new ConstructionView(this,building,view):view;
