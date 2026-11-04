@@ -21,6 +21,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Saves from another save schema are no longer converted during alpha development. Load Game marks them as incompatible, explains why and offers a new game; the old save stays stored until you delete it.
 
 ### Fixed
+- Save and load neighbouring Quarries over separate deposits even when a secondary rock edge lies beneath the other building; primary deposit ownership stays unique.
 - Saved forestry jobs resume intact, and deposits never regenerate in a loaded kingdom. Cleared stumps can be built over, and trees cannot regrow beneath finished fields or buildings.
 
 ### Improved
