@@ -5,6 +5,8 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-04
+<!-- version: {"title": "M1: Exploration and kingdom management", "tag": "v0.2.0", "type": "milestone", "reconstructed": false, "evidence": ["src/systems/MapMemory.js", "src/ui/PopulationSidebar.js", "src/ui/MissingWorkersIndicators.js", "docs/verification/master-M1.md"]} -->
 ### Added
 - Spot missing staff above completed workplaces: red when empty, orange when partly staffed, with visible-only vacancy details and one-click access to Assign Worker.
 - Keep recently deceased residents in a separate read-only list for three complete game days, with saved death dates and safe migration of older kingdoms; their records remain available for unpaid wages without occupying jobs or counting as living residents.
