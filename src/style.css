@@ -237,6 +237,7 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 
 .menu-game-version { display:block; margin-top:10px; font:20px Georgia,serif; color:#c7ad70; letter-spacing:.08em; }
 .settings-version { border-top:1px solid #626346; margin-top:28px; padding-top:16px; color:#b4b79d; font-size:12px; }
+.settings-renderer { margin-top:6px; color:#b4b79d; font-size:12px; overflow-wrap:anywhere; }
 .changelog-new { margin-left:10px; padding:3px 6px; border:1px solid #d2b16b; border-radius:3px; color:#f3d58c; font:10px system-ui,sans-serif; letter-spacing:.12em; vertical-align:middle; }
 .changelog-new[hidden] { display:none; }
 .changelog-dialog { width:min(780px,calc(100vw - 28px)); max-height:calc(100dvh - 40px); padding:0; overflow:hidden; }
