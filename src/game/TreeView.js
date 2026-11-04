@@ -3,13 +3,28 @@ import { treeState } from '../data/naturalResources.js';
 
 export class TreeView extends Phaser.GameObjects.Container {
   constructor(scene,definition,context){
-    super(scene,context.x,context.y);scene.add.existing(this);this.definition=definition;this.object=context.object??{natural:treeState('preview')};this.body=scene.add.graphics();this.bar=scene.add.graphics();this.add([this.body,this.bar]);this.season=context.season??scene.seasons?.season??'Spring';this.setDepth(context.y+(definition.depth?.offset??0));this.paint();
+    super(scene,context.x,context.y);scene.add.existing(this);this.definition=definition;this.object=context.object??{natural:treeState('preview')};this.body=scene.add.graphics();this.bar=scene.add.graphics();this.art=scene.add.image(0,0,'__DEFAULT').setVisible(false);this.add([this.body,this.art,this.bar]);this.tile=context.tile??null;this.season=context.season??scene.seasons?.season??'Spring';this.setDepth(context.y+(definition.depth?.offset??0));this.paint();
   }
   setNaturalState(object){this.object=object;this.paint();return this;}
   // Live trees follow the gradual season change of their tile; remembered (map memory) trees keep what was seen.
   setSeason(value){this.targetSeason=value;return this.applySeason();}
   applySeason(){const target=this.targetSeason??this.season,o=this.object,value=Number.isFinite(o?.x)?this.scene.seasonTransition?.seasonAt(o,target)??target:target;if(value!==this.season){this.season=value;this.paint();}return this;}
+  // Approved Asset Studio art for this stage, season and tile, or null (procedural drawing).
+  artKey(){
+    const art=this.definition.artSprites,assets=this.scene.assets,stage=this.object.natural.stage;if(!art||!assets||stage<2)return null;
+    const pine=this.definition.id==='pine_tree',season=this.season,tile=this.tile??this.object,hash=((Math.imul((tile?.x??0)+17,374761393)^Math.imul((tile?.y??0)+29,668265263))>>>0)%2;
+    const look=stage===2?(pine||season==='Spring'||season==='Summer'?'young':null):season==='Winter'?'winter':pine?'mature':season==='Spring'?'spring':season==='Autumn'?'autumn':hash&&art.broad?'broad':'mature';
+    return look&&art[look]&&assets.hasTexture(this.definition.id,`art-${look}`)?look:null;
+  }
   paint(){
+    const look=this.artKey();
+    if(look){
+      const art=this.definition.artSprites[look],key=this.scene.assets.key(this.definition.id,`art-${look}`);
+      this.art.setTexture(key).setOrigin(art.origin.x,art.origin.y).setVisible(true);this.artLook=look;this.body.clear();
+      this.setDepth(this.y+(this.object.natural.stage<3?-.15:this.definition.depth?.offset??0));
+      return;
+    }
+    this.art.setVisible(false);this.artLook=null;
     const stage=this.object.natural.stage,g=this.body.clear(),pine=this.definition.id==='pine_tree',winter=this.season==='Winter',autumn=this.season==='Autumn',scale=stage===1?.25:stage===2?.58:1,height=(pine?100:84)*scale;
     this.setDepth(this.y+(stage<3?-.15:this.definition.depth?.offset??0));
     g.fillStyle(0x243023,.23);g.fillEllipse(8,3,stage===0?25:45*scale,stage===0?10:20*scale);
@@ -26,6 +41,7 @@ export class TreeView extends Phaser.GameObjects.Container {
   showWork(ratio=null){const g=this.bar.clear();if(ratio==null)return;const y=-this.definition.visualHeight-9;g.fillStyle(0x20291e,.95);g.fillRect(-20,y,40,6);g.fillStyle(0xd9bd73);g.fillRect(-19,y+1,38*Math.max(0,Math.min(1,ratio)),4);}
   getMemoryState(){return{stage:this.object.natural.stage,season:this.season};}
   containsPoint(x,y){
+    if(this.artLook){const frame=this.art.frame,px=Math.floor(x-this.x+this.art.originX*frame.width),py=Math.floor(y-this.y+this.art.originY*frame.height);return px>=0&&py>=0&&px<frame.width&&py<frame.height&&(this.scene.textures.getPixelAlpha(px,py,this.art.texture.key)??0)>=128;}
     const stage=this.object.natural.stage,dx=x-this.x,dy=y-this.y;if(stage===0)return Math.abs(dx)<12&&dy>=-15&&dy<=8;const scale=stage===1?.25:stage===2?.58:1,pine=this.definition.id==='pine_tree',height=(pine?100:84)*scale;
     if(Math.abs(dx)<=6*scale&&dy>=-height*.7&&dy<=8)return true;
     if(pine){for(let tier=0;tier<3;tier++){const distance=dy+height*(1-tier*.22);if(distance>=0&&distance<=height*.38&&Math.abs(dx)<=(13+tier*7)*scale*distance/(height*.38))return true;}return false;}

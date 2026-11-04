@@ -302,3 +302,21 @@ test('approved production buildings use their Asset Studio exports byte for byte
     assert.deepEqual(definition.lights ?? [], meta.gameLights);
   }
 });
+
+test('trees use the approved Asset Studio art for each look, byte for byte with the studio anchor', async () => {
+  const { APPROVED_TREE_ART } = await import('../src/data/objects/approvedArt.js');
+  const definitions = new Map(objectDefinitions.map(d => [d.id, d]));
+  for (const [gameId, looks] of Object.entries(APPROVED_TREE_ART)) {
+    const definition = definitions.get(gameId);
+    assert.equal(definition.renderer, 'tree', `${gameId}: TreeView keeps stumps, saplings and the fallback`);
+    assert.deepEqual(Object.keys(definition.artSprites).sort(), Object.keys(looks).sort());
+    for (const [look, art] of Object.entries(looks)) {
+      const meta = json(art.artSource), repo = approvals.assets[meta.assetId];
+      assert.equal(repo.variants[meta.variantId]?.status, 'approved', `${gameId} ${look}`);
+      assert.equal(repo.variants[meta.variantId].specHash, meta.specHash);
+      assert.ok(readFileSync(path.join(root, `public${art.sprite}`)).equals(readFileSync(path.join(root, `art/sprites/${meta.assetId}/${meta.variantId}.v1.png`))), `${gameId} ${look}`);
+      assert.deepEqual(art.origin, meta.origin, `${gameId} ${look}: trees stand on the tile centre, the studio anchor`);
+    }
+  }
+  assert.ok(APPROVED_TREE_ART.oak_tree.spring && APPROVED_TREE_ART.oak_tree.autumn && APPROVED_TREE_ART.oak_tree.winter && APPROVED_TREE_ART.pine_tree.winter);
+});
