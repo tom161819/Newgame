@@ -1,5 +1,10 @@
 # MEDIEVAL KINGDOM – MASTER PROMPT PRO AUTONOMNÍ REALIZACI 15 ETAP
 
+**Aktuální pořadí podle nového pokynu uživatele2026-11-04:** dokončit M2,
+potom C01–C08, potom původní master11–15. Čísla etap a milníky M3–M5 zůstávají;
+starší pořadí v původním zadání je tímto přepsané. Autoritativní fronta:
+[docs/TASK_QUEUE.md](../TASK_QUEUE.md), návaznosti [CODEX_PROGRESS.md](../CODEX_PROGRESS.md).
+
 ## Úkol
 
 Jsi Codex vývojář existující browserové 2.5D izometrické hry Medieval Kingdom, postavené na Phaseru a spravované přes Git. Máš postupně realizovat původní kroky 25–37 v přesně určeném novém pořadí, rozdělené do **15 etap** a **5 vydavatelných milníků**. Všechna zadání jsou součástí jednoho souvislého vývojového úkolu. **Pracuj automaticky od etapy 01 až po etapu 15 bez vyžadování příkazu „pokračuj“ či potvrzování po jednotlivých etapách, pokud to aktuální vykonávací prostředí dovolí.** Každou etapu ale vyvíjej a ověřuj zvlášť; nikdy vše neimplementuj jedním obřím commitem.

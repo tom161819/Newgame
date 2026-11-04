@@ -11,7 +11,6 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Oaks and pines have new painted looks for young and mature trees: oaks blossom in spring, turn ochre and gold in autumn and stand bare with snow on their branches in winter, pines carry snow in winter, and summer oaks come in two crown shapes. Stumps and saplings keep their simple look.
 - Farmhouse, Granary, Bakery, Mill, Warehouse, Hunting Lodge, Lumberjack Hut and Smelter have new painted looks with yards that show their trade: hay and a trough, a raised granary with sacks, a bread oven, a windmill, crates and barrels, drying hides, a log pile, and a furnace with a living flame.
 - Lusher grass in four interchangeable tile designs with tufts and small flowers, and footpaths that wear from flattened green through dark olive to muted dark earth with soft edges, instead of orange-tan strips.
-- Seasons now change gradually: during the first day of a new season the grass tint and the trees turn patch by patch across the map instead of all at once. The change follows game time, so loading a save mid-change shows the same picture, and Seasons OFF stays plain summer.
 
 ## [0.3.0] - 2026-11-04
 <!-- version: {"title": "M2: Resources, economy and iron", "tag": "v0.3.0", "type": "milestone", "reconstructed": false, "evidence": ["src/systems/NaturalResourcesSystem.js", "src/systems/MineralSystem.js", "src/systems/ResourceTransactionLedger.js", "src/data/objects/smelting.js", "docs/verification/master-10.md"]} -->
@@ -35,6 +34,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Saved forestry jobs resume intact, and deposits never regenerate in a loaded kingdom. Cleared stumps can be built over, and trees cannot regrow beneath finished fields or buildings.
 
 ### Improved
+- Seasons now change gradually: during the first day of a new season the grass tint and the trees turn patch by patch across the map instead of all at once. The change follows game time, so loading a save mid-change shows the same picture, and Seasons OFF stays plain summer.
 - Place a Quarry across one or more rock formations with one stable primary deposit; a gold outline identifies that deposit in a valid preview, and depletion never switches mining to another rock.
 - Smoothly zoom out to 0.25× with the mouse wheel while keeping accurate map clicks, building previews and Fog of War. Camera limits also adapt safely to tall windows, and saved views retain their actual zoom.
 - Try the WebGL renderer by adding ?renderer=webgl to the game address, or ?renderer=auto to use WebGL only with hardware acceleration. Canvas remains the default, and Settings show the active renderer.
