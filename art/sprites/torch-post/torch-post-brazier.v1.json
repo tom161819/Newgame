@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "torch-post",
+  "variantId": "torch-post-brazier",
+  "name": "Stone brazier",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "8fdb895d",
+  "generator": "torch-post",
+  "generatorVersion": 2,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 40,
+  "height": 52,
+  "anchor": {
+    "x": 17,
+    "y": 43
+  },
+  "origin": {
+    "x": 0.425,
+    "y": 0.82692
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "modelHeight": 0.91,
+  "lights": [
+    {
+      "type": "brazier",
+      "x": 17,
+      "y": 2.63,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    }
+  ]
+}

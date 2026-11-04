@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "watchtower",
+  "variantId": "watchtower-timber",
+  "name": "Stone base with timber hoarding",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "b5b8950e",
+  "generator": "watchtower",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 158,
+  "height": 201,
+  "anchor": {
+    "x": 60,
+    "y": 174
+  },
+  "origin": {
+    "x": 0.37975,
+    "y": 0.86567
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "modelHeight": 4.4,
+  "lights": [
+    {
+      "type": "torch",
+      "x": 22.24,
+      "y": 125.67,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

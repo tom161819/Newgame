@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Asset Studio Phaser Demo</title>
+    <meta name="claude:viewport-fit-sides" content="cover" />
+    <link rel="icon" href="data:," />
+  </head>
+  <body class="demo">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><strong>Phaser integration demo</strong><span class="brand-sub">Exported sprites placed exactly as the game would place them</span></div></div>
+      <nav class="views" aria-label="Studio views"><a href="./index.html#assets">Assets</a><a href="./index.html#style-guide">Style guide</a><a href="./phaser-demo.html" aria-current="page">Phaser demo</a></nav>
+    </header>
+    <main class="workspace demo-main">
+      <div class="toolbar" role="toolbar" aria-label="Demo options">
+        <div class="tool"><span>Time</span><div class="segmented" role="group" aria-label="Time of day" id="demo-time"></div></div>
+        <div class="tool"><span>Renderer</span><div class="segmented" role="group" aria-label="Renderer" id="demo-renderer"></div></div>
+        <span class="feedback" id="demo-status" aria-live="polite"></span>
+      </div>
+      <div id="demo-game" class="scene-wrap demo-game"></div>
+      <section class="panel">
+        <h2>What this demo uses</h2>
+        <ul class="rules" id="demo-notes"></ul>
+      </section>
+    </main>
+    <script type="module" src="./src/demo/phaser-demo.js"></script>
+  </body>
+</html>

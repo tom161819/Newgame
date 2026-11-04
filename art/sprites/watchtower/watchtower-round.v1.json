@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "assetId": "watchtower",
+  "variantId": "watchtower-round",
+  "name": "Round tower with cone roof",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "efafb039",
+  "generator": "watchtower",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 121,
+  "height": 214,
+  "anchor": {
+    "x": 41,
+    "y": 193
+  },
+  "origin": {
+    "x": 0.33884,
+    "y": 0.90187
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "modelHeight": 4.91,
+  "lights": [
+    {
+      "type": "torch",
+      "x": 3.17,
+      "y": 136.1,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    },
+    {
+      "type": "torch",
+      "x": 78.83,
+      "y": 136.1,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

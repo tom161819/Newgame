@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "updatedAt": null,
+  "note": "Committed review state for Asset Studio. Export it from the studio and commit it through a pull request; the studio never writes to GitHub.",
+  "assets": {}
+}

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "assetId": "watchtower",
+  "variantId": "watchtower-square",
+  "name": "Square stone keep",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "91b92f67",
+  "generator": "watchtower",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 156,
+  "height": 219,
+  "anchor": {
+    "x": 57,
+    "y": 190
+  },
+  "origin": {
+    "x": 0.36538,
+    "y": 0.86758
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "modelHeight": 4.14,
+  "lights": [
+    {
+      "type": "torch",
+      "x": 41.12,
+      "y": 149.85,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}
