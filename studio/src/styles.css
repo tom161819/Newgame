@@ -66,7 +66,7 @@ a { color: var(--accent); }
 .studio-alert { margin: 12px max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); padding: 10px 14px; border-radius: var(--radius); border: 1px solid var(--danger); color: var(--danger); background: var(--surface); }
 
 .shell { display: grid; grid-template-columns: minmax(250px, 300px) minmax(0, 1fr); min-height: calc(100% - 60px); }
-.library { border-right: 1px solid var(--line); background: var(--surface); padding: 14px 12px 14px max(12px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.library { border-right: 1px solid var(--line); background: var(--surface); padding-block: 14px; padding-right: 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .workspace { min-width: 0; padding-block: 18px 40px; padding-left: 24px; padding-right: max(24px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 18px; outline: none; }
 
 .search input { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font: inherit; }
