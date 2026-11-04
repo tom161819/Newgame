@@ -29,6 +29,16 @@ export function towerBase(building) {
   const definition=buildingDefinition(building);
   return gridToWorld(building.x+definition.width,building.y+definition.height);
 }
+// Izometrické třídění: budova se řadí podle rohu (x+w,y+h); jednotka na dlaždici před čelní stěnou musí být nad ní.
+export function groundDepthAbove(buildings,tile,depth){
+  let result=depth;
+  for(const b of buildings??[]){
+    const d=buildingDefinition(b),w=d.width,h=d.height;
+    const front=(tile.x>=b.x+w&&tile.y>=b.y&&tile.y<b.y+h+1)||(tile.y>=b.y+h&&tile.x>=b.x&&tile.x<b.x+w+1);
+    if(front)result=Math.max(result,buildingDepth(b)+.05);
+  }
+  return result;
+}
 export function buildingDepth(building) { return towerBase(building).y+(buildingDefinition(building).depth?.offset??0); }
 export function towerTop(building) {
   const base=towerBase(building),platform=buildingDefinition(building).platform??{x:0,y:0};
