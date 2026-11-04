@@ -4,13 +4,15 @@ import { tileKey } from '../game/stones.js';
 
 export class WorkplaceSystem {
   constructor(scene){
-    this.scene=scene;this.records=new Map();
+    this.scene=scene;this.records=new Map();this.listeners=new Set();
     this.unsubscribe=scene.workerSystem.jobs.onChange(worker=>{if(worker.assignedWorkplaceId!=null)this.detach(worker);});
   }
   requiresWorkplace(profession){return Object.values(WORKPLACES).some(w=>w.profession===profession);}
+  onChange(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
+  changed(buildingId=null){for(const listener of this.listeners)listener(buildingId);}
   register(building){
     const spec=buildingDefinition(building).workplace;if(!spec||!buildingIsComplete(building))return null;
-    if(!this.records.has(building.id))this.records.set(building.id,{buildingId:building.id,capacity:spec.capacity,workerIds:[],delivered:{}});
+    if(!this.records.has(building.id)){this.records.set(building.id,{buildingId:building.id,capacity:spec.capacity,workerIds:[],delivered:{}});this.changed(building.id);}
     return this.records.get(building.id);
   }
   building(worker){return this.scene.buildings.find(b=>b.id===worker?.assignedWorkplaceId&&buildingIsComplete(b)&&buildingDefinition(b).workplace)??null;}
@@ -23,12 +25,12 @@ export class WorkplaceSystem {
     const spec=buildingDefinition(building).workplace,record=this.register(building);if(!spec||!record)return false;
     if(worker.assignedWorkplaceId===building.id)return true;if(record.workerIds.length>=spec.capacity)return false;
     this.detach(worker);this.scene.workerSystem.jobs.assign(worker,spec.profession);
-    worker.assignedWorkplaceId=building.id;worker.workplaceReached=false;worker.arriving=false;worker.workState='Going to Workplace';worker.aiCooldown=0;record.workerIds.push(worker.id);return true;
+    worker.assignedWorkplaceId=building.id;worker.workplaceReached=false;worker.arriving=false;worker.workState='Going to Workplace';worker.aiCooldown=0;record.workerIds.push(worker.id);this.changed(building.id);return true;
   }
   detach(worker){
     this.scene.workerSystem.ai.cancel(worker);
-    for(const record of this.records.values())record.workerIds=record.workerIds.filter(id=>id!==worker.id);
-    this.dropCargo(worker);worker.assignedWorkplaceId=null;worker.workplaceReached=false;
+    const changed=[];for(const record of this.records.values()){const before=record.workerIds.length;record.workerIds=record.workerIds.filter(id=>id!==worker.id);if(before!==record.workerIds.length)changed.push(record.buildingId);}
+    this.dropCargo(worker);worker.assignedWorkplaceId=null;worker.workplaceReached=false;for(const id of changed)this.changed(id);
   }
   remove(worker){this.detach(worker);if(worker.isAlive)this.scene.workerSystem.jobs.assign(worker,'idle');}
   dropCargo(worker){
@@ -57,8 +59,8 @@ export class WorkplaceSystem {
   }
   exportState(){return {records:structuredClone([...this.records.values()])};}
   importState(data){
-    if(data){this.records=new Map(data.records.map(record=>[record.buildingId,structuredClone(record)]));return;}
+    if(data){this.records=new Map(data.records.map(record=>[record.buildingId,structuredClone(record)]));this.changed();return;}
     for(const worker of this.scene.workerSystem.liveWorkers())if(worker.profession!=='idle'&&!this.building(worker))this.remove(worker);
   }
-  destroy(){this.unsubscribe();this.records.clear();}
+  destroy(){this.unsubscribe();this.listeners.clear();this.records.clear();}
 }

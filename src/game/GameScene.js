@@ -50,6 +50,7 @@ import { EconomyPanel } from '../ui/EconomyPanel.js';
 import { WorkplaceSystem } from '../systems/WorkplaceSystem.js';
 import { WorkplaceView } from './WorkplaceView.js';
 import { WorkplacePanel } from '../ui/WorkplacePanel.js';
+import { MissingWorkersIndicators } from '../ui/MissingWorkersIndicators.js';
 import { ConstructionSystem } from '../systems/ConstructionSystem.js';
 import { ConstructionView } from './ConstructionView.js';
 import { ConstructionUI } from '../ui/ConstructionUI.js';
@@ -193,7 +194,7 @@ export class GameScene extends Phaser.Scene {
     this.buildingBar.close();this.updateInventory();
     this.updateTimeDisplay();
     this.setStatus('Vyber surovinu, volné políčko, Buildings nebo Asset Library.');
-    this.worldCamera=new WorldCamera(this,this.player);
+    this.worldCamera=new WorldCamera(this,this.player);this.staffingIndicators=new MissingWorkersIndicators(this);
     const onBackground=()=>{this.visibilityPaused=true;this.tweens.pauseAll();this.setGalleryInput(false);};
     const onForeground=()=>{this.visibilityPaused=false;this.activeFramePending=true;if(!this.gameOver&&!this.gameTime.paused)this.tweens.resumeAll();this.setGalleryInput(true);};
     this.game.events.on(Phaser.Core.Events.PAUSE,onBackground);this.game.events.on(Phaser.Core.Events.RESUME,onForeground);
@@ -216,6 +217,7 @@ export class GameScene extends Phaser.Scene {
       this.kingLogistics.destroy();
       this.memoryRenderer.destroy();
       this.populationSidebar.destroy();
+      this.staffingIndicators.destroy();
       this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
       this.buildingUnlocks.destroy();
       this.animalSystem.destroy();this.dropSystem.destroy();document.querySelector('#object-tooltip').hidden=true;
@@ -577,6 +579,7 @@ export class GameScene extends Phaser.Scene {
     this.populationSidebar?.update();
     this.economyPanel?.update();
     this.workplacePanel?.refresh();
+    this.staffingIndicators?.update();
     this.constructionUI?.refresh();
     this.farmingPanel?.refresh();
     this.storagePanel?.refresh();

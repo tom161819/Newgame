@@ -14,6 +14,15 @@ header p { margin: 0 0 9px; color: #bdb99d; font-size: 12px; line-height: 1.5; }
 .inventory output { min-width: 2ch; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; color: #f0d78b; }
 #game { width: 100%; flex: 1; min-height: 0; overflow: hidden; outline: 1px solid #82774c; box-shadow: 0 0 22px #151b1344; }
 #game canvas { display: block; }
+.worker-indicators { position:fixed; z-index:8; overflow:hidden; pointer-events:none; }
+.missing-workers { position:absolute; left:0; top:0; display:grid; place-items:center; padding:2px; border:1px solid #f0d8a2; border-radius:50%; color:#fff3d6; background:#9c332a; box-shadow:0 1px 4px #10150ed9; pointer-events:auto; animation:staffing-pulse 1.5s ease-in-out infinite; will-change:transform,opacity; }
+.missing-workers[data-staffing-tone="partial"] { background:#a65c17; }
+.missing-workers svg { display:block; width:100%; height:100%; fill:currentColor; }
+.missing-workers:focus-visible { outline:2px solid #ffe99d; outline-offset:2px; }
+.staffing-tooltip { position:fixed; z-index:21; display:grid; gap:3px; max-width:220px; padding:8px 10px; border:1px solid #a28b56; border-radius:4px; color:#ece2c4; background:#252c1cf5; font-size:12px; pointer-events:none; box-shadow:0 3px 10px #0006; }
+.staffing-tooltip[hidden] { display:none; }
+@keyframes staffing-pulse { 0%,100% { opacity:1; } 50% { opacity:.58; } }
+@media (prefers-reduced-motion:reduce) { .missing-workers { animation:none; } }
 .camera-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 7px; font-size: 11px; color: #bdb99d; }
 .camera-controls button { padding: 5px 9px; font-size: 11px; }
 .camera-controls { flex-wrap: wrap; gap: 6px 12px; }
