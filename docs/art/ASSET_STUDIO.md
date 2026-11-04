@@ -99,6 +99,14 @@ ID, půdorysy a výbava vycházejí z Codexova zadání C06–C08 (`docs/request
 - **Směry:** `military-directions` ukazuje stejného šermíře natočeného do 8 směrů (`facing` 0–7, `rotateParts`). Recepty tedy umí vyrenderovat všechny směry pohybu.
 - **Animace** (chůze, boj, střelba, zranění, jízda) zatím nejsou. Postavy mají statický postoj a všechny tyto assety jsou Draft.
 
+## Stavebnice hradby (návrh ke schválení)
+
+Schválený segment `stone-wall-crenellated` je tenká samostatná zeď a herní hradbu (plný blok 1×1, napojení na sousedy, ochoz pro krále ve výšce 68 px) nahradit nemůže. Recept `wallkit` ji proto rozkládá na díly ve stejném stylu:
+- `wall-kit-block`: plný blok ve výšce herní hradby (68 px), se soklem, zdivem a světlým ochozem;
+- `wall-kit-parapet-n/e/s/w`: cimbuří jedné strany (N = mřížka y−, E = x+, S = y+, W = x−).
+
+Hra nakreslí blok a cimbuří jen na stranách bez sousední hradby; jižní a východní díl patří před jednotky na ochozu, stejně jako dnes. `wall-kit-preview` (roh a malé ohrazení) ukazuje, jak se díly spojí. Díly je potřeba schválit společně a do hry se převedou až potom.
+
 ## Výběr a schválení varianty
 
 1. V záložce **Compare variants** porovnej varianty vedle sebe: zoom 0,5–4×, pozadí, mřížka, půdorys, ohraničení s rozměry v pixelech, člověk 1,2 jednotky, přepínač *Game pixels* (přesně 1×) a denní doba.

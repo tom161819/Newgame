@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wall-kit-preview",
+  "variantId": "wall-kit-preview-corner",
+  "name": "Corner wall",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "500c5c85",
+  "generator": "wallkit",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 278,
+  "height": 211,
+  "anchor": {
+    "x": 129,
+    "y": 145
+  },
+  "origin": {
+    "x": 0.46403,
+    "y": 0.6872
+  },
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "base": {
+    "x": 129,
+    "y": 209
+  },
+  "baseOrigin": {
+    "x": 0.46403,
+    "y": 0.99052
+  },
+  "visualHeight": 209,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.075,
+  "lights": []
+}

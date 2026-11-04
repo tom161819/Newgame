@@ -43,3 +43,18 @@ test('building concepts tell their trade with props and stay concepts', () => {
   const smelter = workshops.find(a => a.id === 'smelter'), model = GENERATORS.workshop.build(smelter.variants[0].spec, { footprint: smelter.footprint, style });
   assert.deepEqual(model.lights.map(l => l.type), ['brazier']);
 });
+
+test('wall kit: a full-tile block at the game wall height and one parapet per side', async () => {
+  const { WALL_HEIGHT } = await import('../studio/src/generators/wallkit.js');
+  const wall = (await import('../src/data/objects/index.js')).objectDefinitions.find(d => d.id === 'wall');
+  assert.ok(Math.abs(WALL_HEIGHT * 39.191836 - wall.visual.wallHeight) < 1e-6, 'same 68 px wall walk as the game');
+  const kit = json('art/assets/buildings/wall-kit/asset.json');
+  assert.deepEqual(validateAssetSpec(kit, { generators: GENERATORS, style }), []);
+  assert.deepEqual(kit.variants.map(v => v.spec.side ?? v.spec.piece).sort(), ['E', 'N', 'S', 'W', 'block']);
+  const block = GENERATORS.wallkit.build({ piece: 'block' }, { footprint: kit.footprint, style });
+  const top = Math.max(...block.primitives.map(p => p.at[1] + p.size[1]));
+  assert.ok(Math.abs(top - WALL_HEIGHT) < 1e-9, 'the wall walk is the top of the block');
+  const preview = json('art/assets/buildings/wall-kit-preview/asset.json'), cells = preview.variants[0].spec.cells.length;
+  const model = GENERATORS.wallkit.build(preview.variants[0].spec, { footprint: preview.footprint, style });
+  assert.equal(model.primitives.filter(p => p.material === 'stone_dark').length, cells, 'one block per cell');
+});

@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| Approved assets into the game, part 7: quarry | Claude | `claude/approved-assets-quarry` | this PR | Verified | `src/data/objects/approvedArt.js`, deposit outline in `src/systems/SpriteViews.js`, `public/assets/buildings/quarry/`. The approved wall piece does not fit the connected wall and wall walk; a wall kit goes back to the studio for approval. |
+| Wall kit concept in the Studio (connected wall pieces for approval) | Claude | `claude/wall-kit-studio` | this PR | Verified | `studio/src/generators/wallkit.js`, `art/assets/buildings/wall-kit*/`, `art/sprites/wall-kit*/`, `art/approvals.json` (review marks), `tests/asset-studio-buildings.test.js`. The game is unchanged until the developer approves the pieces. |
 | Castle/king depth order and starter stockpile in front (Issue #32) | Claude | `claude/fix-castle-stockpile` | pending | In progress | `src/game/buildings.js` (groundDepthAbove), `src/game/PlayerController.js` (depth lines), `src/systems/WorldGenerationConfig.js` (createStartingStockpile), `tests/castle-depth-stockpile.test.js`. |
 | M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main2663942 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT403 | IN PROGRESS: preserve approved villager sprites for manual PR22 merge; relevant integration checks running. Earlier476models/Pages/scaffold native and full/Studio/archive proofs retained. Actual final gh merge22 at e574f75 still API Forbidden. Frozen02a has own459test archive; final verifier checks actual deployed Git blobs, allowing later live development. Public tag/main/deployment gates pending; new user order C01–C08 then master11–15, all unstarted. | Native smoke regressions; release-gate/deployed-archive verifier and tests; release notes,02a archive/catalog, progress/verification docs. Claude art unchanged; no schema rewrite. |
 
@@ -23,6 +23,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#41](https://github.com/tom161819/Newgame/pull/41) Approved assets part 7: quarry (Claude). The approved wall segment did not fit the connected wall; a wall kit followed in the Studio.
 - 2026-11-04 [#29](https://github.com/tom161819/Newgame/pull/29) Approved assets part 6: seasonal grass textures and a smoother season blend (Claude).
 - 2026-11-04 [#28](https://github.com/tom161819/Newgame/pull/28) Approved assets part 5: eight-direction profession/gender villager art and Studio facing export (Claude), main2663942, preserved unchanged.
 

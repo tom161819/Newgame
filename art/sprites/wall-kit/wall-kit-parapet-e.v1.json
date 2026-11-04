@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wall-kit",
+  "variantId": "wall-kit-parapet-e",
+  "name": "Parapet east (front right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "3b44dd16",
+  "generator": "wallkit",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 86,
+  "height": 101,
+  "anchor": {
+    "x": 33,
+    "y": 83
+  },
+  "origin": {
+    "x": 0.38372,
+    "y": 0.82178
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 99
+  },
+  "baseOrigin": {
+    "x": 0.38372,
+    "y": 0.9802
+  },
+  "visualHeight": 99,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.075,
+  "lights": []
+}
