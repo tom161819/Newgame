@@ -1,0 +1,209 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { gridToWorld } from '../src/game/isometric.js';
+import { objectDefinitions } from '../src/data/objects/index.js';
+import { projectPoint, footprintDiamond, heightInPixels, PIXELS_PER_UNIT, VERTICAL_PIXELS_PER_UNIT, cameraDirection } from '../studio/src/lib/projection.js';
+import { stableStringify, fnv1a, specHash } from '../studio/src/lib/hash.js';
+import { validateAssetSpec, buildCatalog, filterCatalog, studioCategoryForGameObject, checkModel, modelBounds, CATEGORY_IDS } from '../studio/src/lib/specs.js';
+import { STATUSES, emptyManifest, validateManifest, readLocal, writeLocal, reviewState, updateLocal, discardLocal, buildExportManifest, pendingChanges, LOCAL_KEY } from '../studio/src/lib/approvals.js';
+import { timePreset, flicker, lightStrength, resolveLight, hexToRgb, rgbToHex, TIMES } from '../studio/src/lib/lighting.js';
+import { GENERATORS } from '../studio/src/generators/index.js';
+
+const root = fileURLToPath(new URL('../', import.meta.url));
+const json = file => JSON.parse(readFileSync(path.join(root, file), 'utf8'));
+const style = json('art/style-guide.json');
+const approvals = json('art/approvals.json');
+const specs = readdirSync(path.join(root, 'art/assets')).flatMap(category => readdirSync(path.join(root, 'art/assets', category)).map(id => ({ ...json(`art/assets/${category}/${id}/asset.json`), dir: `${category}/${id}` })));
+const catalog = buildCatalog({ specs, generators: GENERATORS, style, gameDefinitions: objectDefinitions, gameSprites: {} });
+
+function pngSize(file) {
+  const data = readFileSync(path.join(root, file));
+  assert.equal(data.subarray(0, 8).toString('hex'), '89504e470d0a1a0a', `${file} is a PNG`);
+  return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
+}
+
+test('studio projection equals the game projection for ground points and the style guide numbers', () => {
+  const origin = gridToWorld(0, 0);
+  for (const [x, y] of [[1, 0], [0, 1], [3, 2], [-2, 5], [0.5, 0.5], [7.25, 1.5]]) {
+    const game = gridToWorld(x, y), studio = projectPoint([x, 0, y]);
+    assert.ok(Math.abs(studio.x - (game.x - origin.x)) < 1e-9 && Math.abs(studio.y - (game.y - origin.y)) < 1e-9, `${x},${y}`);
+  }
+  assert.ok(Math.abs(PIXELS_PER_UNIT - style.projection.pixelsPerUnit) < 1e-5);
+  assert.ok(Math.abs(VERTICAL_PIXELS_PER_UNIT - style.projection.verticalPixelsPerUnit) < 1e-5);
+  assert.ok(Math.abs(projectPoint([0, 1, 0]).y + VERTICAL_PIXELS_PER_UNIT) < 1e-9, 'height goes straight up');
+  const diamond = footprintDiamond(2, 2);
+  assert.deepEqual(diamond.map(p => [Math.round(p.x), Math.round(p.y)]), [[0, -32], [64, 0], [0, 32], [-64, 0]]);
+  assert.equal(Math.round(heightInPixels(style.scale.humanHeight)), 47);
+  const [cx, cy, cz] = cameraDirection();
+  assert.ok(Math.abs(Math.hypot(cx, cy, cz) - 1) < 1e-12 && Math.abs(Math.asin(cy) * 180 / Math.PI - style.projection.elevationDeg) < 1e-9);
+});
+
+test('style guide is complete: materials use palette colours and known textures, times and light sources are defined', () => {
+  const hex = /^#[0-9a-f]{6}$/;
+  for (const [name, value] of Object.entries(style.palette)) assert.match(value, hex, name);
+  for (const [id, m] of Object.entries(style.materials)) {
+    assert.ok(style.palette[m.color], `${id} colour`);
+    assert.ok(['bricks', 'planks', 'shingles', 'noise', 'none'].includes(m.texture), `${id} texture`);
+    assert.ok(m.repeat > 0 && m.variation >= 0 && m.description, id);
+  }
+  assert.deepEqual(Object.keys(style.timeOfDay), TIMES);
+  for (const time of TIMES) { assert.match(style.timeOfDay[time].ambient, hex); assert.ok(style.timeOfDay[time].lightScale >= 0); }
+  assert.ok(style.lightSources.torch && style.lightSources.brazier);
+  assert.equal(style.projection.tileWidth, 64); assert.equal(style.projection.tileHeight, 32);
+});
+
+test('every asset spec is valid, ids are unique and the watchtower has at least three variants', () => {
+  for (const spec of specs) {
+    assert.deepEqual(validateAssetSpec(spec, { generators: GENERATORS, style }), [], spec.id);
+    assert.equal(spec.dir, `${spec.category}/${spec.id}`, 'folder matches category and id');
+  }
+  const variantIds = catalog.studio.flatMap(a => a.variants.map(v => v.id));
+  assert.equal(new Set(variantIds).size, variantIds.length);
+  const tower = catalog.studio.find(a => a.id === 'watchtower');
+  assert.ok(tower.variants.length >= 3);
+  assert.equal(tower.gameObjectId, 'tower');
+  assert.ok(objectDefinitions.some(d => d.id === tower.gameObjectId), 'linked game object exists');
+});
+
+test('spec validation reports bad categories, ids, versions, materials and footprint overflow', () => {
+  const base = structuredClone(specs.find(s => s.id === 'watchtower'));
+  const bad = { ...base, category: 'castles', variants: [{ ...base.variants[0], id: 'other-a', version: 0 }] };
+  const errors = validateAssetSpec(bad, { generators: GENERATORS, style });
+  assert.ok(errors.some(e => /category/.test(e)) && errors.some(e => /must start with/.test(e)) && errors.some(e => /version/.test(e)));
+  const model = { primitives: [{ shape: 'box', size: [3, 1, 0.5], at: [0, 0, 0], material: 'marble' }], lights: [{ type: 'laser', at: [0, 1, 0] }] };
+  const problems = checkModel(model, { footprint: { width: 2, height: 2 }, style });
+  assert.ok(problems.some(p => /marble/.test(p)) && problems.some(p => /leaves the 2×2 footprint/.test(p)) && problems.some(p => /laser/.test(p)));
+});
+
+test('generators are deterministic, clamp oversized specs into the footprint and emit lights for torches', () => {
+  for (const asset of catalog.studio) for (const variant of asset.variants) {
+    const generator = GENERATORS[asset.generator];
+    const a = generator.build(variant.spec, { footprint: asset.footprint, style }), b = generator.build(variant.spec, { footprint: asset.footprint, style });
+    assert.equal(stableStringify(a), stableStringify(b), variant.id);
+    const { max } = modelBounds(a);
+    assert.ok(Math.abs(max[1] - a.height) < 0.05 || max[1] <= a.height + 0.05, `${variant.id} height`);
+  }
+  const huge = GENERATORS.watchtower.build({ body: 'square', width: 9, height: 20, top: 'hoarding', roof: 'pyramid', torches: [{ face: 'right', offset: 5, height: 50 }] }, { footprint: { width: 2, height: 2 }, style });
+  assert.deepEqual(checkModel(huge, { footprint: { width: 2, height: 2 }, style }), []);
+  assert.equal(huge.lights.length, 1);
+  const square = catalog.studio.find(a => a.id === 'watchtower').variants.find(v => v.id === 'watchtower-square');
+  const model = GENERATORS.watchtower.build(square.spec, { footprint: { width: 2, height: 2 }, style });
+  assert.equal(model.lights.length, square.spec.torches.length);
+  assert.ok(model.lights.every(l => l.type === 'torch' && l.at[1] > 1));
+});
+
+test('spec hashes are stable, order independent and change with spec, version or generator version', () => {
+  assert.equal(stableStringify({ b: 1, a: [2, { d: 1, c: 2 }] }), '{"a":[2,{"c":2,"d":1}],"b":1}');
+  assert.equal(fnv1a(''), '811c9dc5');
+  const variant = { version: 1, spec: { a: 1, b: 2 } }, base = { generator: 'watchtower', generatorVersion: 1, styleVersion: 1 };
+  const hash = specHash({ ...base, variant });
+  assert.equal(hash, specHash({ ...base, variant: { version: 1, spec: { b: 2, a: 1 } } }));
+  assert.notEqual(hash, specHash({ ...base, variant: { version: 2, spec: variant.spec } }));
+  assert.notEqual(hash, specHash({ ...base, variant: { version: 1, spec: { a: 1, b: 3 } } }));
+  assert.notEqual(hash, specHash({ ...base, generatorVersion: 2, variant }));
+});
+
+test('committed sprites exist for every variant, match the current spec hash and their PNG size', () => {
+  for (const asset of catalog.studio) for (const variant of asset.variants) {
+    assert.ok(existsSync(path.join(root, variant.paths.sprite)), `${variant.paths.sprite} exported`);
+    const meta = json(variant.paths.spriteMeta), size = pngSize(variant.paths.sprite);
+    assert.equal(meta.specHash, variant.hash, `${variant.id}: export is stale, run npm run studio:export`);
+    assert.deepEqual([meta.width, meta.height], [size.width, size.height]);
+    assert.equal(meta.assetId, asset.id); assert.equal(meta.variantId, variant.id); assert.equal(meta.version, variant.version);
+    assert.ok(meta.anchor.x > 0 && meta.anchor.x < meta.width && meta.anchor.y > 0 && meta.anchor.y <= meta.height);
+    assert.ok(Math.abs(meta.origin.x - meta.anchor.x / meta.width) < 1e-4 && Math.abs(meta.origin.y - meta.anchor.y / meta.height) < 1e-4);
+    assert.ok(meta.lights.every(l => l.x >= 0 && l.x <= meta.width && l.y >= 0 && l.y <= meta.height && /^#[0-9a-f]{6}$/.test(l.color)));
+    assert.equal(meta.styleGuide, `${style.id}@${style.version}`);
+  }
+});
+
+test('committed review manifest is valid and refers only to existing variants', () => {
+  assert.deepEqual(validateManifest(approvals), []);
+  for (const [assetId, asset] of Object.entries(approvals.assets)) {
+    const known = catalog.studio.find(a => a.id === assetId);
+    assert.ok(known, assetId);
+    for (const variantId of Object.keys(asset.variants ?? {})) assert.ok(known.variants.some(v => v.id === variantId), variantId);
+  }
+  assert.deepEqual(validateManifest({ schema: 1, assets: { a: { variants: { 'a-1': { status: 'final', version: 0, specHash: 'x' } } } } }).length, 3);
+});
+
+test('local review is separate from the repository, stamps approvals and exports a committable manifest', () => {
+  const asset = catalog.studio.find(a => a.id === 'watchtower'), [first, second] = asset.variants;
+  const repo = { schema: 1, updatedAt: null, assets: { watchtower: { preferred: first.id, variants: { [first.id]: { status: 'review', version: first.version, specHash: first.hash, note: 'Check roof', updatedAt: '2026-11-01T00:00:00.000Z' } } } } };
+  let local = emptyManifest();
+  assert.equal(reviewState({ repo, local, assetId: 'watchtower', variant: first }).effective.status, 'review');
+  assert.equal(reviewState({ repo, local, assetId: 'watchtower', variant: first }).preferred, true);
+  local = updateLocal(local, { assetId: 'watchtower', variant: second, status: 'approved' }, '2026-11-04T10:00:00.000Z');
+  local = updateLocal(local, { assetId: 'watchtower', variant: second, preferred: true }, '2026-11-04T10:00:01.000Z');
+  const state = reviewState({ repo, local, assetId: 'watchtower', variant: second });
+  assert.deepEqual(state.pending, { status: 'approved', version: second.version, specHash: second.hash, note: '', updatedAt: '2026-11-04T10:00:00.000Z', approvedAt: '2026-11-04T10:00:00.000Z' });
+  assert.equal(state.repoStatus, 'draft'); assert.equal(state.preferred, true); assert.equal(state.hasLocalChange, true);
+  assert.equal(reviewState({ repo, local, assetId: 'watchtower', variant: first }).preferred, false);
+  assert.equal(repo.assets.watchtower.variants[second.id], undefined, 'repository object is never mutated');
+  // A note edit keeps the original approval time.
+  const noted = updateLocal(local, { assetId: 'watchtower', variant: second, note: 'Lovely' }, '2026-11-05T00:00:00.000Z');
+  assert.equal(noted.assets.watchtower.variants[second.id].approvedAt, '2026-11-04T10:00:00.000Z');
+  const manifest = buildExportManifest({ repo: { ...repo, assets: { ...repo.assets, ghost: { preferred: 'ghost-a', variants: { 'ghost-a': repo.assets.watchtower.variants[first.id] } } } }, local, catalog: catalog.studio, now: '2026-11-04T12:00:00.000Z' });
+  assert.deepEqual(validateManifest(manifest), []);
+  assert.equal(manifest.assets.watchtower.preferred, second.id);
+  assert.equal(manifest.assets.watchtower.variants[first.id].status, 'review');
+  assert.equal(manifest.assets.watchtower.variants[second.id].status, 'approved');
+  assert.equal(manifest.assets.ghost, undefined, 'records of removed assets are dropped');
+  const changes = pendingChanges({ repo, local, catalog: catalog.studio });
+  assert.deepEqual(changes.map(c => c.preferred ? `pref:${c.variantId}` : `${c.variantId}:${c.from}->${c.to}`).sort(), [`${second.id}:draft->approved`, `pref:${second.id}`].sort());
+  assert.deepEqual(discardLocal(local), emptyManifest());
+  assert.equal(discardLocal(local, 'watchtower').assets.watchtower, undefined);
+  assert.throws(() => updateLocal(local, { assetId: 'watchtower', variant: first, status: 'final' }), RangeError);
+});
+
+test('approvals become outdated when the spec changes and local storage failures are tolerated', () => {
+  const asset = catalog.studio.find(a => a.id === 'watchtower'), variant = asset.variants[0];
+  const local = updateLocal(emptyManifest(), { assetId: 'watchtower', variant, status: 'approved' });
+  assert.equal(reviewState({ repo: emptyManifest(), local, assetId: 'watchtower', variant }).outdated, false);
+  assert.equal(reviewState({ repo: emptyManifest(), local, assetId: 'watchtower', variant: { ...variant, hash: 'deadbeef' } }).outdated, true);
+  assert.equal(reviewState({ repo: emptyManifest(), local, assetId: 'watchtower', variant: { ...variant, version: variant.version + 1 } }).outdated, true);
+  const memory = new Map(), storage = { getItem: k => memory.get(k) ?? null, setItem: (k, v) => memory.set(k, v) };
+  assert.equal(writeLocal(storage, local), true);
+  assert.deepEqual(readLocal(storage), local);
+  memory.set(LOCAL_KEY, '{broken');
+  assert.deepEqual(readLocal(storage), emptyManifest());
+  const blocked = { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } };
+  assert.deepEqual(readLocal(blocked), emptyManifest());
+  assert.equal(writeLocal(blocked, local), false);
+  assert.deepEqual(STATUSES, ['draft', 'review', 'approved']);
+});
+
+test('lighting presets, flicker and light resolution follow the style guide', () => {
+  assert.deepEqual(hexToRgb('#34406b'), { r: 52, g: 64, b: 107 });
+  assert.equal(rgbToHex({ r: 52, g: 64, b: 107 }), '#34406b');
+  assert.throws(() => timePreset(style, 'noon'), RangeError);
+  const torch = resolveLight(style, { type: 'torch' }, { x: 10, y: 20 }, 2);
+  assert.equal(torch.radius, style.lightSources.torch.radiusTiles * 32 * 2);
+  for (let t = 0; t < 20; t += 0.37) { const f = flicker(t, torch.flicker, 3); assert.ok(f >= 1 - torch.flicker.amplitude - 1e-9 && f <= 1 + torch.flicker.amplitude + 1e-9); }
+  const day = lightStrength(torch, timePreset(style, 'day'), 0, 0, false), night = lightStrength(torch, timePreset(style, 'night'), 0, 0, false);
+  assert.ok(night > day * 5, 'torches dominate at night and barely show by day');
+});
+
+test('game definitions map to studio categories and filters combine source, category and search', () => {
+  assert.equal(studioCategoryForGameObject({ id: 'castle', category: 'building' }), 'buildings');
+  assert.equal(studioCategoryForGameObject({ id: 'deer', category: 'animal' }), 'units');
+  assert.equal(studioCategoryForGameObject({ id: 'oak_tree', category: 'resource' }), 'trees');
+  assert.equal(studioCategoryForGameObject({ id: 'rock_outcrop', category: 'decoration' }), 'nature');
+  assert.ok(catalog.game.every(item => CATEGORY_IDS.includes(item.category) && item.id.startsWith('game:')));
+  assert.ok(catalog.game.some(item => item.gameObjectId === 'tower' && item.spritePath === 'public/assets/buildings/tower/tower.png'));
+  assert.deepEqual(filterCatalog(catalog.all, { category: 'buildings', source: 'studio' }).map(i => i.id), ['watchtower']);
+  assert.deepEqual(filterCatalog(catalog.all, { source: 'studio', query: 'TORCH' }).map(i => i.id), ['torch-post']);
+  assert.ok(filterCatalog(catalog.all, { source: 'game' }).length >= 10);
+});
+
+test('the game never imports Asset Studio code or art and keeps its own build entry', () => {
+  const files = [];
+  const walk = dir => { for (const entry of readdirSync(path.join(root, dir), { withFileTypes: true })) { const file = `${dir}/${entry.name}`; if (entry.isDirectory()) walk(file); else if (file.endsWith('.js')) files.push(file); } };
+  walk('src');
+  for (const file of files) assert.doesNotMatch(readFileSync(path.join(root, file), 'utf8'), /studio\/|art\/(sprites|assets)|\.\.\/art\//, file);
+  assert.doesNotMatch(readFileSync(path.join(root, 'index.html'), 'utf8'), /studio/);
+  assert.doesNotMatch(readFileSync(path.join(root, 'vite.config.js'), 'utf8'), /studio/);
+});

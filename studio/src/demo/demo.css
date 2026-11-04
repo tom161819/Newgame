@@ -1,0 +1,4 @@
+.demo-main { max-width: 1200px; margin-inline: auto; width: 100%; }
+.demo-game { height: 540px; }
+.demo-game canvas { display: block; }
+@media (max-width: 820px) { .demo-game { height: 420px; } }

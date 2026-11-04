@@ -2,3 +2,4 @@ node_modules/
 dist/
 *.local
 public/versions/.pending-*/
+dist-studio/
