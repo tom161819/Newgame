@@ -51,6 +51,12 @@ Draft military assets remain Studio-only; Codex did not implement C06–C08 earl
 PR22 contains the complete candidate and the final source does not need another
 version bump or archive regeneration.
 
+Actual external action result after the final push: both `gh pr edit22` (using
+M2-final-candidate-pr.md) and the authorized `gh pr merge22 --merge` fail with
+`Post "https://api.github.com/graphql": Forbidden`. The complete candidate is
+uploaded in PR22; this is an actual API access blocker, not a request to approve
+the release again. No public tag was pushed and no success/merge is fabricated.
+
 Next without another authorization: merge this complete candidate through PR,
 verify actual Pages for its real main SHA (commit/SHA/checks reliably locates the
 run), complete release:gate M2 on the matching deployed source, then push only
