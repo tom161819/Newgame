@@ -7,7 +7,8 @@ test('CI avoids opening historical games for unrelated changes but retains relev
   for(const file of ['src/game/KingView.js','src/game/TerrainRenderer.js','src/game/SeasonTransition.js','src/systems/SpriteViews.js','src/data/objects/approvedArt.js','public/assets/buildings/quarry/quarry.png'])assert.equal(smokeScope({...same,paths:[file]}),'visual');
   assert.equal(smokeScope({...same,paths:['src/game/KingView.js','src/systems/WorldGenerationConfig.js']}),'full');
   assert.equal(smokeScope({...same,paths:['src/game/TerrainRenderer.js','src/data/objects/buildings.js']}),'full');
-  assert.equal(smokeScope({...same,paths:['src/game/KingView.js','src/ui/VersionArchivePanel.js']}),'archive');
+  assert.equal(smokeScope({...same,paths:['src/game/KingView.js','src/ui/VersionArchivePanel.js']}),'visual-archive');
+  assert.equal(smokeScope({...same,paths:['src/game/TerrainRenderer.js','CHANGELOG.md']}),'visual-archive');
   assert.equal(smokeScope({...same,paths:['src/game/KingView.js'],manual:true}),'full');
   assert.equal(smokeScope({...same,paths:['public/assets/terrain/grass.png'],currentVersion:'0.2.0'}),'full');
   for(const file of ['src/ui/PopulationSidebar.js','src/ui/MissingWorkersIndicators.js','src/ui/WorkplacePanel.js','scripts/staffing-smoke.mjs','scripts/forestry-smoke.mjs','scripts/mineral-smoke.mjs','scripts/zoom-smoke.mjs','scripts/ledger-smoke.mjs','scripts/smelting-smoke.mjs','src/ui/InventoryBar.js','src/ui/ResourceEconomyTooltip.js','src/ui/resourceEconomy.js','src/ui/resourceLedger.css'])assert.equal(smokeScope({...same,paths:[file]}),'full');
