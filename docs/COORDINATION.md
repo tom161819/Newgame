@@ -13,7 +13,7 @@ None pending. Add entries here when one pull request must wait for another.
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | Asset Studio recipes: house, oak, pine, wall, quarry | Claude | `claude/studio-recipes` | — | In progress | `studio/**`, `art/**`, `docs/art/**`, `tests/asset-studio.test.js` |
-| Stage10 Quarry Placement & Iron Smelter | Codex | `codex/stage-10-smelter` from main97b3381 | Not yet created; API policy unchanged | PhaseA verify existing finite Quarry; PhaseB/C extend existing production/logistics for Smelter. Visual Polish is Claude-owned by user instruction. | New smelting definitions/assets/tests; data jobs/workplaces/recipes/economy; existing production/logistics/storage/skill/validation/panel; smokes and own progress/docs. Necessary shared edits: objects/index registry and experience reward table, preserving Claude graphics/brazier changes. Avoid Studio/art, SpriteViews/renderer, tower definition and GameScene graphics. |
+| Stage10 Quarry Placement & Iron Smelter | Codex | `codex/stage-10-smelter` from main97b3381 | Not yet created; API policy unchanged | PhaseA/B verified:434 tests/build/targeted native furnace and Save14. PhaseC full regression/M2 gate pending. Visual Polish is Claude-owned by user instruction. | New smelting definitions/assets/tests; data jobs/workplaces/recipes/economy; existing production/logistics/storage/skill/validation/panel; smokes and own progress/docs. Necessary shared edits: objects/index registry and experience reward table, preserving Claude graphics/brazier changes. Avoid Studio/art, SpriteViews/renderer, tower definition and GameScene graphics. |
 
 ## Kept backups (do not delete without the developer)
 

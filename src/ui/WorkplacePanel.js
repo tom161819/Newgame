@@ -32,7 +32,7 @@ export class WorkplacePanel {
     const recipePanel=document.querySelector('#food-production-details');recipePanel.hidden=!production;
     if(production){
       const format=items=>Object.entries(items).map(([id,n])=>`${n} ${s.objectRegistry.require(id).name}`).join(' + '),cycle=production.cycle;
-      document.querySelector('#food-production-recipe').textContent=`${format(spec.recipe.input)} → ${format(spec.recipe.output)} · 30 seconds of active work`;
+      document.querySelector('#food-production-recipe').textContent=`${format(spec.recipe.input)} → ${format(spec.recipe.output)} · ${spec.recipe.duration/1000} seconds of active work`;
       document.querySelector('#food-production-status').textContent=`${!production.auto?'Paused':cycle?'Producing':employees[0]?.workMessage||'Waiting for Worker'} · ${production.completed} batches completed`;
       document.querySelector('#food-production-progress').value=cycle?.progress??0;
       const input=s.foodStorage.locations.get(`input-${b.id}`),output=s.foodStorage.locations.get(`output-${b.id}`);

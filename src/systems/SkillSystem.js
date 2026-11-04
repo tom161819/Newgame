@@ -1,4 +1,5 @@
 import { SKILL_IDS,WORK_RULES } from '../data/jobs.js';
+import { PRODUCTION_RECIPES } from '../data/production.js';
 import { createProgress } from '../data/experience.js';
 import { recalculateStats } from './UnitStats.js';
 import { talentXPMultiplier } from './NaturalTalentSystem.js';
@@ -20,7 +21,7 @@ export class SkillSystem {
   }
   completed(event,reward){
     const skill=event.type==='resourceCollected'&&event.objectType==='stone'?'mining':event.type==='depositMined'?'mining':event.type==='treeChopped'?'woodcutting':event.type==='animalKilled'?'hunting':event.type==='buildingCompleted'?'construction':event.type==='cropHarvested'?'farming':null;
-    const productionSkill=event.type==='transportDelivered'?'logistics':event.type==='foodProduced'?{mill:'milling',bakery:'baking'}[event.objectType]:null;
+    const productionSkill=event.type==='transportDelivered'?'logistics':event.type==='foodProduced'?PRODUCTION_RECIPES[event.objectType]?.skill:null;
     if(skill??productionSkill)this.addXP(event.actor,skill??productionSkill,reward);
   }
   attachCombat(combat){

@@ -6,8 +6,9 @@ import { carryCapacity } from '../data/logistics.js';
 
 const first=object=>Object.entries(object)[0];
 export class FoodProductionSystem {
-  constructor(scene){this.scene=scene;this.records=new Map();this.nextTransfer=1;for(const b of scene.buildings)this.register(b);}
+  constructor(scene){this.scene=scene;this.records=new Map();this.nextTransfer=1;this.nextEmployment=0;for(const b of scene.buildings)this.register(b);}
   get storage(){return this.scene.foodStorage;}
+  inputShortage(building){const recipe=buildingDefinition(building).recipe;if(Object.keys(recipe.input).length<2)return null;const input=this.storage.locations.get(`input-${building.id}`);return Object.entries(recipe.input).find(([resource,amount])=>(input?.stock[resource]??0)+this.storage.incoming(input?.id,resource)+this.storage.available(resource)<amount)?.[0]??null;}
   building(id){return this.scene.buildings.find(b=>b.id===id&&buildingIsComplete(b)&&buildingDefinition(b).recipe)??null;}
   register(building){
     if(!buildingIsComplete(building)||!buildingDefinition(building).recipe)return;
@@ -25,7 +26,7 @@ export class FoodProductionSystem {
     const id=data.transferId??`food-transfer-${this.nextTransfer++}`,reservation=kind==='produce'?`production-slot:${tileKey(route.destination)}`:`food-task:${id}`;
     if(!this.scene.workerSystem.reservations.reserve(reservation,worker.id))return false;
     worker.workTask={...data,kind,goal:{...route.destination},progressMs:0,reservation,transferId:id};worker.path=route.path;
-    worker.workState=kind==='produce'?'Working':'Traveling to Target';worker.workMessage=kind==='produce'?'Producing food':'Transporting food';return true;
+    worker.workState=kind==='produce'?'Working':'Traveling to Target';worker.workMessage=kind==='produce'?'Producing resources':'Transporting resources';return true;
   }
   move(worker,sourceId,destinationId,resource,amount,{capacityReservation=null,outputBuildingId=null,hauling=false,siteId=null,allocationId=null}={}){
     const source=this.storage.locations.get(sourceId),destination=this.storage.locations.get(destinationId);if(!source||!destination)return false;
@@ -91,7 +92,7 @@ export class FoodProductionSystem {
     const atSource=task.sourceDropId&&task.kind==='foodPickup'?this.scene.workerSystem.ai.atGoal(worker,location):this.storage.atLocation(worker,id);
     if(!atSource&&!worker.nextTile&&!worker.path.length&&worker.aiCooldown<=0){
       worker.aiCooldown=FOOD_RULES.searchInterval;const route=this.storage.route(worker,[location]);if(route){task.goal={...route.destination};worker.path=route.path;}
-      else{worker.workState='Waiting';worker.workMessage='Food transport route is blocked';}
+      else{worker.workState='Waiting';worker.workMessage='Transport route is blocked';}
     }
     return true;
   }
@@ -113,16 +114,19 @@ export class FoodProductionSystem {
       if(destination&&!this.scene.logisticsTasks?.waitForHauler(building,'output')&&this.move(worker,outputId,destination.id,outputResource,Math.min(outputAvailable,FOOD_RULES.carryCapacity),{capacityReservation:cap?.id,outputBuildingId:building.id}))return;
     }
     if(!record.auto){worker.workState='Waiting';worker.workMessage='Auto Production OFF';return;}
-    const [resource,needed]=first(recipe.input),input=this.storage.locations.get(inputId),incoming=[...this.scene.workerSystem.liveWorkers()].reduce((n,w)=>n+(w.workTask?.destinationId===inputId?w.workTask.amount:0),0);
-    if(!record.cycle&&(input.stock[resource]??0)+incoming<needed){
+    const input=this.storage.locations.get(inputId),missing=Object.entries(recipe.input).find(([resource,needed])=>(input.stock[resource]??0)+this.storage.incoming(inputId,resource)<needed);
+    if(!record.cycle&&missing){
+      const shortage=this.inputShortage(building);if(shortage){worker.workState='Waiting';worker.workMessage=`Waiting for ${shortage}`;return;}
+      const [resource,needed]=missing,incoming=this.storage.incoming(inputId,resource);
       if(this.scene.logisticsTasks?.waitForHauler(building,'input')){worker.workState='Waiting';worker.workMessage=`Waiting for Hauler delivery of ${resource}`;return;}
       const source=this.storage.findSource(worker,resource),destinationRoute=this.storage.route(worker,[input]);
       if(source&&destinationRoute){const amount=Math.min(needed-(input.stock[resource]??0)-incoming,this.storage.free(source.location.id,resource),FOOD_RULES.carryCapacity);
         if(amount>0&&this.move(worker,source.location.id,inputId,resource,amount))return;}
       worker.workState='Waiting';worker.workMessage=`Waiting for ${resource}`;return;
     }
-    if(!record.cycle&&(input.stock[resource]??0)<needed){worker.workState='Waiting';worker.workMessage=`Waiting for delivered ${resource}`;return;}
-    if(!record.cycle&&!this.storage.findDestination(worker,outputResource,outputAmount)){worker.workState='Waiting';worker.workMessage='Food storage is full or unreachable';return;}
+    const undelivered=Object.entries(recipe.input).find(([resource,needed])=>(input.stock[resource]??0)<needed);
+    if(!record.cycle&&undelivered){worker.workState='Waiting';worker.workMessage=`Waiting for delivered ${undelivered[0]}`;return;}
+    if(!record.cycle&&!this.storage.findDestination(worker,outputResource,outputAmount)){worker.workState='Waiting';worker.workMessage='Storage is full or unreachable';return;}
     const route=this.storage.route(worker,[input]);
     if(route&&this.setTask(worker,'produce',route,{targetId:building.id})){worker.workState='Working';worker.workMessage=`Producing ${outputResource}`;}
   }
@@ -165,6 +169,8 @@ export class FoodProductionSystem {
   }
   update(delta){
     if(this.scene.gameOver||this.scene.gameTime.paused)return;
+    if(this.scene.gameTime.totalElapsed>=this.nextEmployment){this.nextEmployment=this.scene.gameTime.totalElapsed+FOOD_RULES.searchInterval;
+      for(const record of this.records.values()){const building=this.building(record.buildingId);if(record.auto&&building&&buildingDefinition(building).autoEmployment)this.scene.workplaceSystem.autoEmploy(building);}}
     for(const worker of this.scene.workerSystem.liveWorkers()){
       const task=worker.workTask;if(task?.hauling&&task.kind==='foodDeliver'&&task.loadedPosition){task.loadedDistance+=Math.hypot(worker.position.x-task.loadedPosition.x,worker.position.y-task.loadedPosition.y);task.loadedPosition={...worker.position};}
       this.transfer(worker);
@@ -175,12 +181,12 @@ export class FoodProductionSystem {
       const recipe=buildingDefinition(building).recipe,workers=this.scene.workplaceSystem.employees(building).filter(w=>w.workTask?.kind==='produce'&&this.scene.workplaceSystem.atWorkplace(w));
       if(!workers.length)continue;
       if(!record.cycle){
-        const [inputResource,inputAmount]=first(recipe.input),[outputResource,outputAmount]=first(recipe.output),inputId=`input-${building.id}`;
-        if(this.storage.free(inputId,inputResource)<inputAmount||this.storage.used(this.storage.locations.get(`output-${building.id}`)))continue;
+        const [outputResource,outputAmount]=first(recipe.output),inputId=`input-${building.id}`;
+        if(Object.entries(recipe.input).some(([resource,amount])=>this.storage.free(inputId,resource)<amount)||this.storage.used(this.storage.locations.get(`output-${building.id}`)))continue;
         const destination=this.storage.findDestination(workers[0],outputResource,outputAmount);if(!destination)continue;
-        const id=`food-cycle-${building.id}-${record.nextCycle++}`,capacity=this.storage.reserve('capacity',destination.location.id,outputResource,outputAmount,id);if(!capacity)continue;
-        if(!this.storage.withdraw(inputId,inputResource,inputAmount)){this.storage.release(capacity);continue;}
-        record.cycle={id,requiredWork:recipe.duration,workDone:0,progress:0,state:'building',contributions:{},inputs:{...recipe.input},outputReservation:capacity,startedAt:this.scene.gameTime.totalElapsed};
+        const id=`food-cycle-${building.id}-${record.nextCycle}`,capacity=this.storage.reserve('capacity',destination.location.id,outputResource,outputAmount,id);if(!capacity)continue;
+        if(!this.storage.withdrawBatch(inputId,recipe.input)){this.storage.release(capacity);continue;}
+        record.nextCycle++;record.cycle={id,requiredWork:recipe.duration,workDone:0,progress:0,state:'building',contributions:{},inputs:{...recipe.input},outputReservation:capacity,startedAt:this.scene.gameTime.totalElapsed};
       }
       const cycle=record.cycle,participants=workers.map(w=>({id:w.id,speed:this.scene.skillSystem.workEfficiency(w,recipe.skill),available:Math.min(delta,w.availableWorkMs??0,Math.max(0,this.scene.gameTime.totalElapsed-cycle.startedAt))}));
       if(advanceConstruction({construction:cycle},participants,delta))this.finish(record,building);
@@ -201,8 +207,8 @@ export class FoodProductionSystem {
     const recipe=buildingDefinition(building).recipe,[resource,amount]=first(recipe.output);
     if(!this.storage.deposit(`output-${building.id}`,resource,amount))return false;
     record.cycle=null;record.outputReservation=cycle.outputReservation;record.completed++;
-    for(const [input,quantity]of Object.entries(cycle.inputs))this.scene.resourceLedger?.expense(input,quantity,`${buildingDefinition(building).name} Processing`,{id:`processing:${cycle.id}:${input}`,entityId:building.id});
-    this.scene.resourceLedger?.income(resource,amount,`${buildingDefinition(building).name} Production`,{id:`production:${cycle.id}:${resource}`,entityId:building.id,type:'production'});
+    for(const [input,quantity]of Object.entries(cycle.inputs))this.scene.resourceLedger?.expense(input,quantity,recipe.inputSources?.[input]??`${buildingDefinition(building).name} Processing`,{id:`processing:${cycle.id}:${input}`,entityId:building.id});
+    this.scene.resourceLedger?.income(resource,amount,recipe.outputSource??`${buildingDefinition(building).name} Production`,{id:`production:${cycle.id}:${resource}`,entityId:building.id,type:'production'});
     this.scene.foodSystem?.recordProduction(resource,amount,cycle.id);
     const contributors=Object.entries(cycle.contributions),total=contributors.reduce((n,[,work])=>n+work,0);let allocated=0;
     for(let i=0;i<contributors.length;i++){const[id,work]=contributors[i],ratio=i===contributors.length-1?1-allocated:work/total;allocated+=ratio;const worker=this.scene.workerSystem.workers.get(id);

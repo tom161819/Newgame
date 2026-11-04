@@ -14,10 +14,10 @@ export class LogisticsTaskManager {
     this.catalog.push(...(this.scene.constructionSystem?.materials.candidates()??[]));
     for(const record of this.scene.foodProduction.records.values()){
       const building=this.scene.foodProduction.building(record.buildingId);if(!building)continue;
-      const recipe=buildingDefinition(building).recipe,[resource,needed]=Object.entries(recipe.input)[0],input=storage.locations.get(`input-${building.id}`);
-      if(record.auto&&!record.cycle&&input){
-        const missing=needed-(input.stock[resource]??0)-storage.incoming(input.id);
-        if(missing>0)for(const source of stores)if(storage.free(source.id,resource)>0)this.catalog.push({priority:20,sourceId:source.id,destinationId:input.id,resource,amount:missing});
+      const recipe=buildingDefinition(building).recipe,input=storage.locations.get(`input-${building.id}`);
+      if(record.auto&&!record.cycle&&input&&!this.scene.foodProduction.inputShortage(building)){
+        for(const [resource,needed]of Object.entries(recipe.input)){const missing=needed-(input.stock[resource]??0)-storage.incoming(input.id,resource);
+          if(missing>0)for(const source of stores)if(storage.free(source.id,resource)>0)this.catalog.push({priority:20,sourceId:source.id,destinationId:input.id,resource,amount:missing});}
       }
       const [outputResource]=Object.entries(recipe.output)[0],output=storage.locations.get(`output-${building.id}`),available=storage.free(output.id,outputResource);
       if(available>0){
@@ -46,7 +46,7 @@ export class LogisticsTaskManager {
     for(const {task}of candidates){
       const destination=storage.locations.get(task.destinationId),drop=task.sourceDropId&&this.scene.dropSystem.drops.get(task.sourceDropId),existingCap=storage.reservations.get(task.capacityReservation);
       const allocation=task.allocationId&&storage.reservations.get(task.allocationId),available=task.allocationId?(allocation?.owner===`site-${task.siteId}`?allocation.amount:0):drop?.amount??storage.free(task.sourceId,task.resource),room=existingCap?.amount??storage.room(task.destinationId);
-      let missing=task.amount;if(destination?.kind==='input'){const b=this.scene.buildings.find(b=>b.id===destination.buildingId),recipe=b&&buildingDefinition(b).recipe;missing=(recipe?.input[task.resource]??0)-(destination.stock[task.resource]??0)-storage.incoming(destination.id);}
+      let missing=task.amount;if(destination?.kind==='input'){const b=this.scene.buildings.find(b=>b.id===destination.buildingId),recipe=b&&buildingDefinition(b).recipe;if(!b||this.scene.foodProduction.inputShortage(b))continue;missing=(recipe?.input[task.resource]??0)-(destination.stock[task.resource]??0)-storage.incoming(destination.id,task.resource);}
       const amount=Math.min(cap,available,room,missing);if(amount<=0||!destination||drop&&!this.scene.workerSystem.reservations.available(`drop:${drop.id}`,worker.id))continue;
       const routeKey=`${worker.id}:${task.sourceDropId??task.sourceId}:${task.destinationId}`;
       if(this.failedRoutes.has(routeKey))continue;
