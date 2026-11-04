@@ -12,7 +12,6 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| V01 studio part: seasonal ground and trees, transition preview | Claude | `claude/season-studio-concepts` | this PR | Verified | `studio/**`, `art/**`, `docs/art/**`, `tests/asset-studio*.test.js` |
 | V01 runtime, V02, V03 (visual master tasks) | Claude | not started | — | Waiting for Codex C01 (V01), C06/C07 (V02), C08 (V03) | will hold `src/game/TerrainRenderer.js`, `src/game/TreeView.js`, `src/game/MapMemoryRenderer.js` for V01; see `docs/art/VISUAL_PROGRESS.md` |
 
 ## Kept backups (do not delete without the developer)
@@ -22,6 +21,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#16](https://github.com/tom161819/Newgame/pull/16) V01 studio part: seasonal ground, oak and pine, uneven transition preview (Claude). Draft only; the in-game transition waits for Codex C01.
 - 2026-11-04 [#12](https://github.com/tom161819/Newgame/pull/12) Visual polish: compact HUD, larger map, fonts, construction dust; Asset Studio concepts for terrain, villagers, scaffold and buildings (Claude). Studio concepts stay Draft/Review until the developer approves them.
 - 2026-11-04 [#11](https://github.com/tom161819/Newgame/pull/11) Stage 10 Quarry placement and Iron Smelter, Save schema 14 (Codex).
 - 2026-11-04 [#10](https://github.com/tom161819/Newgame/pull/10) Approved watchtower and Brazier in the game, runtime flames and light sources (Claude).
