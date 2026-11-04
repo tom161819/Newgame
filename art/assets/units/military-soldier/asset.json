@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "id": "military-soldier",
+  "name": "Soldier",
+  "category": "units",
+  "description": "C08 Soldier (Sword): basic infantry. Red tabard over a quilted coat, nasal helmet, sword and round shield. Static pose facing the viewer; walking, fighting and shooting animations are not made yet (Draft).",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "military-soldier-man",
+      "name": "Soldier (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_ochre",
+        "armor": "gambeson",
+        "tabard": "cloth_red",
+        "headgear": "helmet",
+        "hair": "hair_dark",
+        "beard": true,
+        "tool": "sword",
+        "shield": true
+      }
+    },
+    {
+      "id": "military-soldier-woman",
+      "name": "Soldier (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_ochre",
+        "armor": "gambeson",
+        "tabard": "cloth_red",
+        "headgear": "helmet",
+        "hair": "hair_blond",
+        "hairStyle": "braid",
+        "tool": "sword",
+        "shield": true
+      }
+    },
+    {
+      "id": "military-soldier-kettle",
+      "name": "Soldier with kettle hat",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_brown",
+        "armor": "gambeson",
+        "tabard": "cloth_red",
+        "headgear": "kettle",
+        "hair": "hair_brown",
+        "tool": "sword",
+        "shield": true,
+        "shieldMaterial": "wood"
+      }
+    }
+  ]
+}

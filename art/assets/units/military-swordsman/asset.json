@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "id": "military-swordsman",
+  "name": "Swordsman",
+  "category": "units",
+  "description": "C08 Swordsman (Sword): veteran infantry. Mail under a surcoat, closed helmet, kite shield or a great sword; heavier and taller silhouette than the Soldier. Static pose facing the viewer; walking, fighting and shooting animations are not made yet (Draft).",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "military-swordsman-kite",
+      "name": "Swordsman with kite shield",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_red",
+        "armor": "mail",
+        "tabard": "cloth_red",
+        "headgear": "greathelm",
+        "tool": "sword",
+        "shield": true,
+        "shieldShape": "kite",
+        "shieldMaterial": "banner",
+        "build": 1.12
+      }
+    },
+    {
+      "id": "military-swordsman-woman",
+      "name": "Swordswoman, bascinet",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_red",
+        "armor": "mail",
+        "tabard": "cloth_red",
+        "headgear": "bascinet",
+        "hair": "hair_dark",
+        "tool": "sword",
+        "shield": true,
+        "shieldShape": "kite",
+        "shieldMaterial": "banner_blue"
+      }
+    },
+    {
+      "id": "military-swordsman-greatsword",
+      "name": "Swordsman with great sword",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_grey",
+        "armor": "mail",
+        "tabard": "banner_blue",
+        "headgear": "mailcoif",
+        "hair": "hair_brown",
+        "beard": true,
+        "tool": "greatsword",
+        "build": 1.15
+      }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "military-knight",
+  "variantId": "military-knight-woman",
+  "name": "Knight (woman) on a chestnut",
+  "category": "units",
+  "version": 1,
+  "specHash": "7dc91c9f",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 84,
+  "height": 80,
+  "anchor": {
+    "x": 33,
+    "y": 62
+  },
+  "origin": {
+    "x": 0.39286,
+    "y": 0.775
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 78
+  },
+  "baseOrigin": {
+    "x": 0.39286,
+    "y": 0.975
+  },
+  "visualHeight": 78,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.563,
+  "lights": []
+}

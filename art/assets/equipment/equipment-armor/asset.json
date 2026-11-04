@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "id": "equipment-armor",
+  "name": "Armor",
+  "category": "equipment",
+  "description": "Armor as a physical item (C06 Equipment Registry: armor). Shown on a stand so it reads on the map and in the Armory; also the reference for its UI icon.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "workshop",
+  "variants": [
+    {
+      "id": "equipment-armor-steel",
+      "name": "Steel plate armour",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "armorStand",
+            "at": [
+              0,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "equipment-armor-blackened",
+      "name": "Blackened plate armour",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "armorStand",
+            "at": [
+              0,
+              0
+            ],
+            "material": "steel_dark"
+          }
+        ]
+      }
+    }
+  ]
+}

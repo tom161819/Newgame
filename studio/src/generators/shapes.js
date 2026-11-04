@@ -40,3 +40,49 @@ export function seeded(seed = 1) {
 
 export const lerp = (a, b, t) => a + (b - a) * t;
 export const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+// A cylinder leaning by `t` radians towards compass `angle` (0 = +x, π/2 = +z),
+// standing on `from`. Returns the part and its top point.
+export function lean({ length, radiusBottom, radiusTop = radiusBottom, segments = 6 }, angle, t, from, material) {
+  const z = -Math.asin(Math.sin(t) * Math.cos(angle));
+  const x = Math.asin(clamp(Math.sin(t) * Math.sin(angle) / Math.cos(z), -1, 1));
+  const part = cylinder({ radiusBottom, radiusTop, height: length, segments, tilt: [x, z] }, from, material);
+  const top = cylinderTop(part);
+  return { part, end: [from[0] + top[0], from[1] + top[1], from[2] + top[2]] };
+}
+
+// Horse standing with its body along compass `angle`; `coat` and `mane` are materials.
+export function horse(at, { angle = -Math.PI / 4, coat = 'horse_bay', mane = 'horse_dark', saddle = false, scale = 1, barding = null } = {}) {
+  const [x, y, z] = at, k = scale, fx = Math.cos(angle), fz = Math.sin(angle), sx = -fz, sz = fx;
+  const p = (f, up, s = 0) => [x + fx * f * k + sx * s * k, y + up * k, z + fz * f * k + sz * s * k];
+  const rot = -angle, parts = [];
+  for (const [f, s] of [[0.3, 0.09], [0.3, -0.09], [-0.28, 0.09], [-0.28, -0.09]]) parts.push(box([0.07 * k, 0.42 * k, 0.07 * k], p(f, 0, s), coat, { rotation: rot }));
+  for (const [f, s] of [[0.3, 0.09], [0.3, -0.09], [-0.28, 0.09], [-0.28, -0.09]]) parts.push(box([0.075 * k, 0.05 * k, 0.075 * k], p(f, 0, s), mane, { rotation: rot }));
+  parts.push(box([0.78 * k, 0.28 * k, 0.27 * k], p(0, 0.4), barding ?? coat, { rotation: rot }));
+  const neck = lean({ length: 0.42 * k, radiusBottom: 0.09 * k, radiusTop: 0.06 * k }, angle, 0.62, p(0.3, 0.55), coat);
+  parts.push(neck.part);
+  parts.push(box([0.28 * k, 0.12 * k, 0.11 * k], [neck.end[0] + fx * 0.08 * k, neck.end[1] - 0.06 * k, neck.end[2] + fz * 0.08 * k], coat, { rotation: rot }));
+  parts.push(box([0.05 * k, 0.1 * k, 0.04 * k], [neck.end[0] - fx * 0.02 * k, neck.end[1] - 0.02 * k, neck.end[2] - fz * 0.02 * k], mane, { rotation: rot }));
+  // Mane along the top of the neck; the tail hangs from the rump (built from its tip up).
+  parts.push(lean({ length: 0.36 * k, radiusBottom: 0.035 * k, radiusTop: 0.03 * k }, angle, 0.62, p(0.27, 0.62), mane).part);
+  parts.push(lean({ length: 0.34 * k, radiusBottom: 0.025 * k, radiusTop: 0.05 * k }, angle, 0.35, p(-0.5, 0.32), mane).part);
+  if (saddle) parts.push(box([0.24 * k, 0.05 * k, 0.3 * k], p(0.02, 0.68), 'leather', { rotation: rot }), box([0.04 * k, 0.16 * k, 0.32 * k], p(0.02, 0.52), saddle === true ? 'banner' : saddle, { rotation: rot }));
+  return { parts, back: p(0.02, 0.73) };
+}
+
+// Turn a whole model around the vertical axis by `angle` (Three's rotation.y sense):
+// positions and box/prism rotations turn, leaning cylinders keep their lean in the
+// new direction, ellipsoids swap radii on quarter turns.
+export function rotateParts(parts, angle) {
+  const c = Math.cos(angle), s = Math.sin(angle), quarter = Math.round(angle / (Math.PI / 2)) % 2 !== 0 && Math.abs(angle / (Math.PI / 2) - Math.round(angle / (Math.PI / 2))) < 1e-9;
+  return parts.map(p => {
+    const [x, y, z] = p.at, at = [x * c + z * s, y, -x * s + z * c], out = { ...p, at };
+    if (p.shape === 'box' || p.shape === 'prism') out.rotation = (p.rotation ?? 0) + angle;
+    if (p.shape === 'sphere' && quarter) out.radii = [p.radii[2], p.radii[1], p.radii[0]];
+    if (p.shape === 'cylinder' && p.tilt) {
+      const [tx, ty, tz] = cylinderTop(p), rx = tx * c + tz * s, rz = -tx * s + tz * c;
+      out.tilt = [Math.atan2(rz, ty), Math.asin(clamp(-rx / p.height, -1, 1))];
+    }
+    return out;
+  });
+}

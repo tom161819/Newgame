@@ -79,6 +79,26 @@ Koncepty (vždy dvě varianty, doporučená je ve stavu Review): statek, sýpka,
 
 **Nakloněné válce:** `cylinder({ …, tilt: [x, z] })` nakloní válec kolem jeho základny (holé větve, později zbraně, žebříky a podobně). Bounds i validace půdorysu náklon počítají.
 
+## Vojenské budovy, vybavení a vojáci (V02, V03, návrhy)
+
+ID, půdorysy a výbava vycházejí z Codexova zadání C06–C08 (`docs/requests/CODEX_MASTER.md`). Budovy zatím ve hře nejsou, proto mají `plannedGameObjectId` místo `gameObjectId`. Až je Codex zavede a ustálí, návrhy se podle nich upraví.
+
+- **Budovy** (recept `workshop`, vždy 3 varianty, doporučená je ve stavu Review):
+  - `bowyer` (2×2): ohýbací forma, sušené pruty, stojan s luky;
+  - `swordsmith` (2×2): výheň se žhavým uhlím a světlem, kovadlina, kád na kalení, stojan s meči;
+  - `armorer` (2×2): stojany s brněním, pláty, stůl, kovadlina;
+  - `armory` (3×3): železem pobitá vrata, stojany se zbraněmi, štíty, prapor;
+  - `stables` (5×5): stáj, ohrada se skutečnou mezerou na branku, 3–4 koně, seno, koryto, stojan na sedla.
+- **Vybavení** (kategorie Equipment): `equipment-bow`, `-sword`, `-armor`, `-horse`. Předměty stojí na stojanech, aby byly čitelné na mapě i ve zbrojnici. Slouží zároveň jako předloha pro ikony v rozhraní.
+- **Vojáci** (recept `figure`, vždy 3 varianty včetně ženy):
+  - `military-archer`: luk a toulec, bez štítu;
+  - `military-soldier`: prošívanice, nosová přilba, meč, kulatý štít;
+  - `military-swordsman`: kroužková zbroj, uzavřená přilba, štít ve tvaru kapky nebo obouruční meč;
+  - `military-knight`: plátová zbroj, kbelcová přilba, kůň s čabrakou.
+  Recept umí zbroj (`armor`), náprsní šat (`tabard`), přilby (`kettle`, `greathelm`, `bascinet`, `mailcoif`), meče, kopí, štíty a jízdu (`mount`). Kůň smí přesahovat dlaždici stejně jako koruny stromů.
+- **Směry:** `military-directions` ukazuje stejného šermíře natočeného do 8 směrů (`facing` 0–7, `rotateParts`). Recepty tedy umí vyrenderovat všechny směry pohybu.
+- **Animace** (chůze, boj, střelba, zranění, jízda) zatím nejsou. Postavy mají statický postoj a všechny tyto assety jsou Draft.
+
 ## Výběr a schválení varianty
 
 1. V záložce **Compare variants** porovnej varianty vedle sebe: zoom 0,5–4×, pozadí, mřížka, půdorys, ohraničení s rozměry v pixelech, člověk 1,2 jednotky, přepínač *Game pixels* (přesně 1×) a denní doba.

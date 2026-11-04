@@ -1,0 +1,195 @@
+{
+  "schema": 1,
+  "id": "bowyer",
+  "name": "Bowyer",
+  "category": "buildings",
+  "description": "Bow workshop (C07 Bowyer, 2 × 2): a bending form on the bench, staves drying, finished bows on a rack. Ids and footprint follow the Codex C07 proposal; adjust when C06/C07 fix them.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "bowyer",
+  "variants": [
+    {
+      "id": "bowyer-timber",
+      "name": "Timber bowyer",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "timber",
+          "roofMaterial": "thatch",
+          "width": 1.0,
+          "depth": 0.9,
+          "wallHeight": 0.9,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 1,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "bowForm",
+            "at": [
+              0.45,
+              0.55
+            ]
+          },
+          {
+            "type": "bowRack",
+            "at": [
+              0.68,
+              -0.3
+            ],
+            "r": 1.5707963267948966
+          },
+          {
+            "type": "staves",
+            "at": [
+              -0.65,
+              0.6
+            ]
+          },
+          {
+            "type": "logs",
+            "at": [
+              -0.25,
+              0.72
+            ],
+            "count": 3,
+            "length": 0.4
+          }
+        ]
+      },
+      "notes": "Recommended direction."
+    },
+    {
+      "id": "bowyer-drying-shed",
+      "name": "Log workshop with drying shed",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.0,
+          "depth": 0.9,
+          "wallHeight": 0.9,
+          "roofHeight": 0.7,
+          "ridge": "z",
+          "windows": 1,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "awning",
+            "at": [
+              0.5,
+              0.42
+            ],
+            "width": 0.6,
+            "depth": 0.45,
+            "height": 0.62
+          },
+          {
+            "type": "staves",
+            "at": [
+              0.45,
+              0.35
+            ]
+          },
+          {
+            "type": "staves",
+            "at": [
+              0.6,
+              0.5
+            ]
+          },
+          {
+            "type": "bowRack",
+            "at": [
+              -0.55,
+              0.68
+            ]
+          },
+          {
+            "type": "workbench",
+            "at": [
+              0.6,
+              -0.5
+            ],
+            "r": 1.5707963267948966
+          }
+        ]
+      }
+    },
+    {
+      "id": "bowyer-stone",
+      "name": "Stone bowyer with stave yard",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "stone",
+          "roofMaterial": "roof_tile",
+          "width": 1.0,
+          "depth": 0.9,
+          "wallHeight": 0.9,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 1,
+          "at": [
+            -0.3,
+            -0.35
+          ],
+          "chimney": true
+        },
+        "props": [
+          {
+            "type": "staves",
+            "at": [
+              0.4,
+              0.45
+            ]
+          },
+          {
+            "type": "staves",
+            "at": [
+              0.62,
+              0.62
+            ]
+          },
+          {
+            "type": "bowForm",
+            "at": [
+              -0.45,
+              0.68
+            ]
+          },
+          {
+            "type": "bowRack",
+            "at": [
+              0.72,
+              -0.3
+            ],
+            "r": 1.5707963267948966
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.75,
+              0.15
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

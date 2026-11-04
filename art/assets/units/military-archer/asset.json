@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "id": "military-archer",
+  "name": "Archer",
+  "category": "units",
+  "description": "C08 Archer (Bow): ranged infantry. Reads at a distance by the bow and quiver, light leather and a hood or kettle hat; no shield. Static pose facing the viewer; walking, fighting and shooting animations are not made yet (Draft).",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "military-archer-hood",
+      "name": "Archer (man), hooded",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_green",
+        "sleeves": "leather",
+        "legs": "cloth_brown",
+        "armor": "gambeson",
+        "headgear": "hood",
+        "headgearMaterial": "cloth_forest",
+        "hair": "hair_brown",
+        "tool": "bow",
+        "beard": true
+      }
+    },
+    {
+      "id": "military-archer-woman",
+      "name": "Archer (woman), hooded",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_green",
+        "sleeves": "leather",
+        "legs": "cloth_brown",
+        "headgear": "hood",
+        "headgearMaterial": "cloth_forest",
+        "hair": "hair_auburn",
+        "hairStyle": "braid",
+        "tool": "bow"
+      }
+    },
+    {
+      "id": "military-archer-royal",
+      "name": "Royal archer, kettle hat",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_ochre",
+        "armor": "gambeson",
+        "tabard": "cloth_red",
+        "headgear": "kettle",
+        "hair": "hair_dark",
+        "tool": "bow"
+      }
+    }
+  ]
+}

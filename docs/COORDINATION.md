@@ -12,8 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| M2 final candidate and stable native release checks | Codex | `codex/m2-smelting-smoke`, main630caf1 preserved | Ready for PR | Final source02a3a43,459models/full native/Studio verified;73source archives/2456HTTP files/UI/Save14 pass,72older builds unchanged.0.3.0 tag prepared privately, not pushed. Main merge/deployment/gates still required; master11 and C01–C08 unstarted. | Native smoke helpers, Smelting regression, verified V01 note in0.3.0 CHANGELOG, new actual source snapshot/catalog and release/progress docs. No Codex gameplay/graphics/schema rewrite. |
-| V02, V03 studio concepts (military buildings, equipment, soldiers) | Claude | `claude/military-concepts-studio` (next) | — | Draft concepts on assumed ids; final ids follow Codex C06–C08 | `studio/**`, `art/**`, `docs/art/**` |
+| M2 final candidate and stable native release checks | Codex | `codex/m2-smelting-smoke`, integrating mainf1d6526 Studio-only follow-up | [#22](https://github.com/tom161819/Newgame/pull/22) | Final game source02a3a43,459models/full native/Studio and73archives/2456HTTP/UI/Save14 verified. Preserve the latest Draft Studio concepts; rerun their model/Studio checks. Game/build source paths match02a, existing72archives unchanged. Public tag/main/deployment gates pending; master11/C01–C08 unstarted. | Native smoke helpers/regression,0.3.0 release notes, new source archive/catalog and release/progress docs. No Codex gameplay/graphics/schema rewrite. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -22,6 +21,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#20](https://github.com/tom161819/Newgame/pull/20) V02/V03 studio concepts: bowyer, swordsmith, armorer, armory, stables, equipment items and four soldier classes with an 8-direction sheet (Claude). Draft/Review on the C06–C08 ids; adjust when Codex fixes them.
 - 2026-11-04 [#19](https://github.com/tom161819/Newgame/pull/19) Gradual and uneven seasonal terrain/tree transitions (Claude), merged main630caf1. Started before C01 at the developer's request; preserved by Codex integration.
 - 2026-11-04 [#18](https://github.com/tom161819/Newgame/pull/18) Actual M2 source archive f053be1 (72 snapshots) and original follow-up CODEX_MASTER C01–C08 queue (Codex), merged mainb554b4e. Release verification/tag remains active above.
 - 2026-11-04 [#15](https://github.com/tom161819/Newgame/pull/15) M2 v0.3.0 release source, final neighbouring-Quarry validation and autonomous milestone publication (Codex), merged main7595b80. Final tag/archive verification remains active above.

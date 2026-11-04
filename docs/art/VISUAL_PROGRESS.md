@@ -5,9 +5,9 @@ Claude's visual master tasks (V01–V03) and what they wait for. Rules: [AGENTS.
 | Task | State | Depends on | Notes |
 |---|---|---|---|
 | V01 studio part: seasonal ground, oak and pine, transition preview | Done, [#16](https://github.com/tom161819/Newgame/pull/16) | none (studio only) | Draft variants in the studio; `seasonBlend` proposes the uneven per-tile change. |
-| V01 runtime: gradual season change in the game | Done in `claude/season-terrain-transition` (started before C01 at the developer's request) | — | `src/game/SeasonTransition.js`; terrain tint and live trees blend per tile over the first 20 % of a season. |
-| V02 military buildings and equipment concepts | Waiting | Codex C06 (ids, footprints) and C07 (final building definitions) | Bowyer, swordsmith, armorer, armory, stables, equipment icons; at least 3 variants per key building. |
-| V03 four soldier classes | Waiting | Codex C08 (unit registry, slots, directions) | Archer, soldier, swordsman, knight on a horse; builds on the `figure` recipe and tilted parts. |
+| V01 runtime: gradual season change in the game | Done, [#19](https://github.com/tom161819/Newgame/pull/19) (started before C01 at the developer's request) | — | `src/game/SeasonTransition.js`; terrain tint and live trees blend per tile over the first 20 % of a season. |
+| V02 military buildings and equipment concepts | Draft concepts done, [#20](https://github.com/tom161819/Newgame/pull/20) (started before C06/C07 at the developer's request) | Codex C06/C07 to confirm ids and footprints | Bowyer, swordsmith, armorer (2×2), armory (3×3), stables (5×5), 3 variants each; bow, sword, armour and horse items. `plannedGameObjectId` until the buildings exist. |
+| V03 four soldier classes | Draft concepts done, [#20](https://github.com/tom161819/Newgame/pull/20) | Codex C08 for the unit registry, slots and directions | Archer, soldier, swordsman, mounted knight, 3 variants each incl. women; 8-direction reference sheet. Animations not made yet. |
 
 The C01–C08 definitions are in Codex's own master prompt, which is not in the repository; Claude checks GitHub branches, pull requests and `docs/COORDINATION.md` before starting each waiting task.
 

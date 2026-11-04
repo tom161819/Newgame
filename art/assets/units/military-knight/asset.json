@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "id": "military-knight",
+  "name": "Knight",
+  "category": "units",
+  "description": "C08 Knight (Sword + Armor + tamed Horse): plate armour, great helm with gold, lord-coloured surcoat, riding a real horse with a caparison. Static pose facing the viewer; walking, fighting and shooting animations are not made yet (Draft).",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "military-knight-blue",
+      "name": "Knight on a bay, blue caparison",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "steel",
+        "armor": "plate",
+        "tabard": "banner_blue",
+        "headgear": "greathelm",
+        "tool": "sword",
+        "shield": true,
+        "shieldShape": "kite",
+        "shieldMaterial": "banner_blue",
+        "mount": {
+          "coat": "horse_bay",
+          "barding": "banner_blue"
+        }
+      }
+    },
+    {
+      "id": "military-knight-red",
+      "name": "Knight on a grey, red caparison, lance",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "steel",
+        "armor": "plate",
+        "tabard": "banner",
+        "headgear": "greathelm",
+        "tool": "lance",
+        "shield": true,
+        "shieldShape": "kite",
+        "mount": {
+          "coat": "horse_grey",
+          "barding": "banner"
+        }
+      }
+    },
+    {
+      "id": "military-knight-woman",
+      "name": "Knight (woman) on a chestnut",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "steel",
+        "armor": "plate",
+        "tabard": "banner_blue",
+        "headgear": "bascinet",
+        "hair": "hair_blond",
+        "tool": "sword",
+        "shield": true,
+        "shieldShape": "kite",
+        "shieldMaterial": "banner_blue",
+        "mount": {
+          "coat": "horse_chestnut"
+        }
+      }
+    }
+  ]
+}

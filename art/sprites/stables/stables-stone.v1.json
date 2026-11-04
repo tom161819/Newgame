@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "stables",
+  "variantId": "stables-stone",
+  "name": "Stone stable with tack yard",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "d8ada10f",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 323,
+  "height": 222,
+  "anchor": {
+    "x": 161,
+    "y": 140
+  },
+  "origin": {
+    "x": 0.49845,
+    "y": 0.63063
+  },
+  "footprint": {
+    "width": 5,
+    "height": 5
+  },
+  "base": {
+    "x": 161,
+    "y": 220
+  },
+  "baseOrigin": {
+    "x": 0.49845,
+    "y": 0.99099
+  },
+  "visualHeight": 220,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.04,
+  "lights": []
+}

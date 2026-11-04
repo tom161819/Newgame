@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "equipment-horse",
+  "variantId": "equipment-horse-grey",
+  "name": "Grey horse",
+  "category": "equipment",
+  "version": 1,
+  "specHash": "cd81ec7e",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 74,
+  "anchor": {
+    "x": 65,
+    "y": 40
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.54054
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 72
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97297
+  },
+  "visualHeight": 72,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.98,
+  "lights": []
+}

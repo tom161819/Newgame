@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "bowyer",
+  "variantId": "bowyer-drying-shed",
+  "name": "Log workshop with drying shed",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "583cbdc2",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 123,
+  "anchor": {
+    "x": 65,
+    "y": 89
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.72358
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 121
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98374
+  },
+  "visualHeight": 121,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.74,
+  "lights": []
+}

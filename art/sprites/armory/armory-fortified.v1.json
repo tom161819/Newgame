@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "armory",
+  "variantId": "armory-fortified",
+  "name": "Fortified armory with banners",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "e181a614",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 161,
+  "anchor": {
+    "x": 97,
+    "y": 111
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.68944
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 159
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98758
+  },
+  "visualHeight": 159,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.09,
+  "lights": []
+}
