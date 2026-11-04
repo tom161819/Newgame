@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "farmer",
+  "name": "Farmer",
+  "category": "units",
+  "description": "Field worker: linen, wide straw hat, pitchfork or harvest basket. Concept for worker looks by profession; the game still draws one worker figure.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "farmer-male",
+      "name": "Farmer (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_linen",
+        "sleeves": "cloth_linen",
+        "legs": "cloth_wool",
+        "headgear": "straw",
+        "hair": "hair_blond",
+        "tool": "pitchfork",
+        "skin": "skin_tan"
+      }
+    },
+    {
+      "id": "farmer-female",
+      "name": "Farmer (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_ochre",
+        "sleeves": "cloth_linen",
+        "headgear": "coif",
+        "headgearMaterial": "cloth_linen",
+        "hair": "hair_blond",
+        "apron": "cloth_linen",
+        "tool": "basket",
+        "skin": "skin_tan"
+      }
+    }
+  ]
+}

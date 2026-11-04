@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "scaffold",
+  "variantId": "scaffold-timber",
+  "name": "Timber frame, sawn poles",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "7d1a1e14",
+  "generator": "scaffold",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 147,
+  "height": 147,
+  "anchor": {
+    "x": 65,
+    "y": 113
+  },
+  "origin": {
+    "x": 0.44218,
+    "y": 0.76871
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 145
+  },
+  "baseOrigin": {
+    "x": 0.44218,
+    "y": 0.98639
+  },
+  "visualHeight": 145,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.1,
+  "lights": []
+}

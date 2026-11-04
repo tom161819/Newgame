@@ -144,18 +144,23 @@ export function drawFlames(ctx, { lights, zoom, seconds, animate, style }) {
 }
 
 // Test map: sprites placed on grid tiles, painter-sorted by their front corner.
-export function drawTestMap(ctx, { width, height, items, zoom, origin, background = 'grass', size = 12 }) {
+// `groundTile(gx, gy)` may return a 64 × 32 tile canvas (ground recipes) to
+// paint instead of the flat colours; `afterGround(tileCentre, ctx, zoom)` draws on top.
+export function drawTestMap(ctx, { width, height, items, zoom, origin, background = 'grass', size = 12, groundTile = null, afterGround = null }) {
   const colours = tileColours[background] ?? tileColours.grass;
   ctx.save();
   ctx.fillStyle = '#20251f'; ctx.fillRect(0, 0, width, height);
   for (let gx = 0; gx < size; gx++) for (let gy = 0; gy < size; gy++) {
     const x = origin.x + (gx - gy) * TILE_WIDTH / 2 * zoom, y = origin.y + (gx + gy + 1) * TILE_HEIGHT / 2 * zoom;
+    const tile = groundTile?.(gx, gy);
+    if (tile) { ctx.drawImage(tile, x - TILE_WIDTH / 2 * zoom, y - TILE_HEIGHT / 2 * zoom, TILE_WIDTH * zoom, TILE_HEIGHT * zoom); continue; }
     diamond(ctx, x, y, zoom);
     const path = gy === Math.floor(size / 2) + 1;
     ctx.fillStyle = path ? tileColours.dirt[(gx * 3) % 3] : colours[(gx * 7 + gy * 13) % 3];
     ctx.fill();
   }
   ctx.restore();
+  afterGround?.((gx, gy) => ({ x: origin.x + (gx - gy) * TILE_WIDTH / 2 * zoom, y: origin.y + (gx + gy + 1) * TILE_HEIGHT / 2 * zoom }), ctx, zoom);
   const placed = items.map(item => {
     const cx = item.gx + item.footprint.width / 2, cy = item.gy + item.footprint.height / 2;
     return { ...item, x: origin.x + (cx - cy) * TILE_WIDTH / 2 * zoom, y: origin.y + (cx + cy) * TILE_HEIGHT / 2 * zoom, depth: item.gx + item.gy + item.footprint.width + item.footprint.height };

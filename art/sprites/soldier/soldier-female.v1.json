@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "soldier",
+  "variantId": "soldier-female",
+  "name": "Soldier (woman)",
+  "category": "units",
+  "version": 1,
+  "specHash": "aaad75c6",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 71,
+  "anchor": {
+    "x": 33,
+    "y": 53
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.74648
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 69
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.97183
+  },
+  "visualHeight": 69,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.362,
+  "lights": []
+}

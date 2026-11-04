@@ -12,8 +12,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| Approved tower and brazier in the game | Claude | `claude/approved-tower-brazier` | — | In progress | `src/data/objects/buildings.js` (tower), `src/data/objects/lighting.js`, `src/data/objects/index.js`, `src/data/experience.js` (brazier XP), `src/systems/ObjectRegistry.js` (lights validation), `src/systems/SpriteViews.js` (pixel hit test), `src/systems/LightSourceSystem.js`, `src/game/LitBuildingView.js`, `src/game/GameScene.js` (3 lines), `public/assets/buildings/{tower,brazier}/`, related tests |
-| M2 release and standing automatic milestone publication | Codex | `codex/m2-release` (main7012635 + verified Stage10 follow-up98b91de) | Not created; GitHub API network prerequisite being prepared | User authorizes M2 now and automatic M1–M5 releases after gates, with no further prompt. Preserve all tests, archives and Claude graphics. | AGENTS and release/queue/progress docs, version/changelog/release archive metadata; verified final Quarry fix/test. Network draft adds only api.github.com and tom161819.github.io, activation pending. |
+| M2 release and standing automatic milestone publication | Codex | `codex/m2-release-candidate` (includes main c2c2862 and verified Stage10 follow-up) | Creation/merge blocked: GitHub API returns Forbidden | v0.3.0 prepared and uploaded; publication authorized without another prompt. Latest user asks to upload first and test afterwards. Preserve all archives, Save14 and Claude graphics. | AGENTS, release/queue/progress docs, version/changelog metadata, final Quarry fix/test. Supported API/Pages network draft saved but not active. |
+| V01 runtime, V02, V03 (visual master tasks) | Claude | not started | — | Waiting for Codex C01 (V01), C06/C07 (V02), C08 (V03) | will hold `src/game/TerrainRenderer.js`, `src/game/TreeView.js`, `src/game/MapMemoryRenderer.js` for V01; see `docs/art/VISUAL_PROGRESS.md` |
 
 ## Kept backups (do not delete without the developer)
 
@@ -22,7 +22,10 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
-- 2026-11-04 [#11](https://github.com/tom161819/Newgame/pull/11) Stage10 Smelter, physical Ore/fuel production and autonomous conflict rule (Codex), merged main7012635; final neighbouring-Quarry validation follow-up remains in the active row.
+- 2026-11-04 [#16](https://github.com/tom161819/Newgame/pull/16) V01 studio part: seasonal ground, oak and pine, uneven transition preview (Claude). Draft only; the in-game transition waits for Codex C01.
+- 2026-11-04 [#12](https://github.com/tom161819/Newgame/pull/12) Visual polish: compact HUD, larger map, fonts, construction dust; Asset Studio concepts for terrain, villagers, scaffold and buildings (Claude). Studio concepts stay Draft/Review until the developer approves them.
+- 2026-11-04 [#11](https://github.com/tom161819/Newgame/pull/11) Stage 10 Quarry placement and Iron Smelter, Save schema 14 (Codex).
+- 2026-11-04 [#10](https://github.com/tom161819/Newgame/pull/10) Approved watchtower and Brazier in the game, runtime flames and light sources (Claude).
 - 2026-11-04 [#9](https://github.com/tom161819/Newgame/pull/9) Stage 09 Daily Resource Statistics & Ledger, Save schema 13 (Codex).
 - 2026-11-04 [#8](https://github.com/tom161819/Newgame/pull/8) Asset Studio recipes: house, oak, pine, wall, quarry (Claude).
 - 2026-11-04 [#7](https://github.com/tom161819/Newgame/pull/7) Asset Studio published on GitHub Pages under `/studio/` (Claude).

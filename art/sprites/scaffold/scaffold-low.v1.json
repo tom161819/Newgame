@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "scaffold",
+  "variantId": "scaffold-low",
+  "name": "First lift (up to 33 %)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "9631f323",
+  "generator": "scaffold",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 138,
+  "height": 115,
+  "anchor": {
+    "x": 65,
+    "y": 81
+  },
+  "origin": {
+    "x": 0.47101,
+    "y": 0.70435
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 113
+  },
+  "baseOrigin": {
+    "x": 0.47101,
+    "y": 0.98261
+  },
+  "visualHeight": 113,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.3,
+  "lights": []
+}

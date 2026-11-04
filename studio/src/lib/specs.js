@@ -1,10 +1,12 @@
 // Asset specifications: categories, validation and the catalog that joins
 // studio assets (art/assets/**/asset.json) with existing in-game definitions.
 import { specHash } from './hash.js';
+import { cylinderTop } from '../generators/shapes.js';
 
 export const CATEGORIES = Object.freeze([
   { id: 'buildings', label: 'Buildings' },
   { id: 'units', label: 'Units' },
+  { id: 'terrain', label: 'Terrain' },
   { id: 'trees', label: 'Trees' },
   { id: 'nature', label: 'Nature' },
   { id: 'resources', label: 'Resources' },
@@ -20,7 +22,7 @@ export function studioCategoryForGameObject(definition) {
     case 'building': return 'buildings';
     case 'character': case 'animal': return 'units';
     case 'resource': return 'resources';
-    case 'terrain': return 'nature';
+    case 'terrain': return 'terrain';
     case 'decoration': return /rock|outcrop|deposit|bush/.test(definition.id) ? 'nature' : 'decorations';
     default: return 'decorations';
   }
@@ -51,6 +53,7 @@ export function validateAssetSpec(spec, { generators, style, path = spec?.id }) 
     if (!Number.isInteger(variant?.version) || variant.version < 1) fail(`${where}: version must be a positive integer.`);
     if (!variant?.spec || typeof variant.spec !== 'object') { fail(`${where}: spec object is required.`); continue; }
     if (!generator || !footprint) continue;
+    if (generator.kind === 'surface') { for (const problem of generator.validate(variant.spec, { style })) fail(`${where}: ${problem}`); continue; }
     try {
       const model = generator.build(variant.spec, { footprint, style });
       for (const problem of checkModel(model, { footprint, style })) fail(`${where}: ${problem}`);
@@ -81,6 +84,11 @@ export function primitiveBounds(part) {
   if (part.shape === 'cylinder') {
     // Four-sided cylinders are square-aligned, so their half-extent is r / √2.
     const r = Math.max(part.radiusTop, part.radiusBottom) * (part.segments === 4 ? Math.SQRT1_2 : 1);
+    if (part.tilt) {
+      // Conservative box around both end discs of a leaning cylinder.
+      const [tx, ty, tz] = cylinderTop(part);
+      return { min: [x + Math.min(0, tx) - r, y + Math.min(0, ty) - (ty < 0 ? r : 0), z + Math.min(0, tz) - r], max: [x + Math.max(0, tx) + r, y + Math.max(0, ty) + r * 0.5, z + Math.max(0, tz) + r] };
+    }
     return { min: [x - r, y, z - r], max: [x + r, y + part.height, z + r] };
   }
   if (part.shape === 'sphere') {
@@ -108,6 +116,7 @@ export function assetPaths(asset, variant) {
     spec: base,
     generator: `studio/src/generators/${asset.generator}.js`,
     sprite: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.png` : null,
+    spriteSheet: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.tiles.png` : null,
     spriteFront: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.front.png` : null,
     spriteMeta: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.json` : null,
   };

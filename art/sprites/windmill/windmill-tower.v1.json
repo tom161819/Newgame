@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "windmill",
+  "variantId": "windmill-tower",
+  "name": "Tower windmill",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "dfe4b764",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 129,
+  "anchor": {
+    "x": 65,
+    "y": 95
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.73643
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 127
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.9845
+  },
+  "visualHeight": 127,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.4,
+  "lights": []
+}

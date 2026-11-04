@@ -7,6 +7,7 @@ import { cameraDirection, projectBox, projectPoint, PIXELS_PER_UNIT } from '../l
 import { modelBounds } from '../lib/specs.js';
 import { resolveLight } from '../lib/lighting.js';
 import { TEXTURES } from './textures.js';
+import { gameWearFromSpec, TILE_W, TILE_H } from '../lib/surface.js';
 
 const PAD = 3;
 let renderer = null;
@@ -93,6 +94,7 @@ function meshFor(part, style) {
   mesh.userData.layer = part.layer ?? 'main';
   mesh.position.set(...part.at);
   if (part.rotation) mesh.rotation.y = part.rotation;
+  if (part.tilt) { mesh.rotation.x = part.tilt[0]; mesh.rotation.z = part.tilt[1]; }
   mesh.castShadow = mesh.receiveShadow = true;
   return mesh;
 }
@@ -228,5 +230,11 @@ export function spriteMetadata({ asset, variant, style, sprite, generator }) {
     gameLights: sprite.lights.map(l => ({ type: l.type, x: round(l.x - base.x), y: round(l.y - base.y), color: l.color, radius: round(l.radius), intensity: l.intensity, flicker: l.flicker, flameSize: l.flameSize })),
     modelHeight: +sprite.modelHeight.toFixed(3),
     lights: sprite.lights.map(l => ({ type: l.type, x: +l.x.toFixed(2), y: +l.y.toFixed(2), color: l.color, radius: +l.radius.toFixed(2), intensity: l.intensity, flicker: l.flicker, flameSize: l.flameSize })),
+    // Ground recipes: the .tiles.png sheet holds one 64 × 32 game tile per frame.
+    ...(sprite.surface ? { surface: {
+      mode: variant.spec.mode, tileWidth: TILE_W, tileHeight: TILE_H, frames: sprite.tiles.length,
+      frameMeaning: variant.spec.mode === 'path' ? 'wear levels 0–3 (0 = untouched grass)' : 'interchangeable grass tiles, pick by tile hash',
+      gameWear: gameWearFromSpec(variant.spec, style),
+    } } : {}),
   };
 }

@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "id": "miner",
+  "name": "Miner",
+  "category": "units",
+  "description": "Quarry and mine worker: grey wool, leather cap and apron, pickaxe. Concept for worker looks by profession; the game still draws one worker figure.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "miner-male",
+      "name": "Miner (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_grey",
+        "legs": "cloth_brown",
+        "headgear": "cap",
+        "headgearMaterial": "leather",
+        "hair": "hair_dark",
+        "beard": true,
+        "apron": "leather",
+        "tool": "pickaxe",
+        "skin": "skin_tan",
+        "build": 1.15
+      }
+    },
+    {
+      "id": "miner-female",
+      "name": "Miner (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_grey",
+        "headgear": "coif",
+        "headgearMaterial": "cloth_linen",
+        "hair": "hair_dark",
+        "apron": "leather",
+        "tool": "pickaxe",
+        "skin": "skin_tan"
+      }
+    }
+  ]
+}

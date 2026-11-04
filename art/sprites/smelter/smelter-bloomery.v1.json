@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "smelter",
+  "variantId": "smelter-bloomery",
+  "name": "Bloomery and forge",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "b3a0419e",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 126,
+  "anchor": {
+    "x": 97,
+    "y": 76
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.60317
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 124
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98413
+  },
+  "visualHeight": 124,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "brazier",
+      "x": 0,
+      "y": -31.68,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    }
+  ],
+  "modelHeight": 2.1,
+  "lights": [
+    {
+      "type": "brazier",
+      "x": 97,
+      "y": 92.32,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    }
+  ]
+}

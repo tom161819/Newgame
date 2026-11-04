@@ -22,7 +22,7 @@ Volba: předrenderované 3D místo ručního SVG. Projekce, světlo i měřítko
 
 ## Nový asset
 
-1. Vytvoř `art/assets/<kategorie>/<id>/asset.json`. Kategorie: `buildings`, `units`, `trees`, `nature`, `resources`, `decorations`. ID varianty musí začínat `<id>-`.
+1. Vytvoř `art/assets/<kategorie>/<id>/asset.json`. Kategorie: `buildings`, `units`, `terrain`, `trees`, `nature`, `resources`, `decorations`. ID varianty musí začínat `<id>-`.
 2. Pokud se tvar hodí k existujícímu generátoru (např. `watchtower`), jen změň parametry `spec`. Seznam parametrů ukazuje záložka **Spec & files**.
 3. Pro nový druh objektu přidej `studio/src/generators/<nový>.js` (export `{ id, version, label, params, build }`) a zaregistruj ho v `studio/src/generators/index.js`. Používej jen materiály ze Style Guide a nech objekt uvnitř půdorysu.
 4. Spusť `npm test`. Validace ohlásí neznámé materiály, přesah půdorysu nebo duplicitní ID.
@@ -30,6 +30,54 @@ Volba: předrenderované 3D místo ručního SVG. Projekce, světlo i měřítko
 6. Otevři studio a porovnej varianty.
 
 Při jakékoli změně `spec` zvyš `version` varianty. Při změně kódu generátoru zvyš jeho `version`. Dřívější schválení se pak zobrazí jako **Outdated** a test vynutí nový export.
+
+## Terén: tráva, cesty a zarůstání (2D recepty)
+
+Povrch hry je plochá textura dlaždic 64 × 32 px, proto ho nekreslí 3D renderer, ale 2D recept `ground` (`studio/src/generators/ground.js`, `kind: 'surface'`, čisté výpočty v `studio/src/lib/surface.js`).
+
+- **`grass-ground`**: sady zaměnitelných dlaždic trávy (úroveň opotřebení 0). Barevné pole je periodický šum sdílený všemi dlaždicemi sady, takže na sebe navazují bez švů v libovolné kombinaci; detaily dlaždice k okrajům slábnou. Parametry: odstíny, kontrast skvrn, hustota a výška stébel v trsech, kvítí.
+- **`worn-path`**: stupně 1–3 vyšlapané cesty (`src/data/pathWear.js`). Každý stupeň má barvu, okraj, plochu, podíl zbylé trávy, šířku spojovacího pásu a měkkost okraje. Náhled ukazuje pás, který se vyšlape až na hlínu a pak zase zarůstá; hra už opotřebení i zarůstání počítá, mění se jen vzhled.
+- Pravidla jsou ve Style Guide (`terrain`) a hlídá je validace: každý stupeň je tmavší než předchozí, barvy zůstávají tlumeně zelené až hnědé (chroma ≤ 0,24, žádný oranžový ani červený tón). Dnešní herní barvy cest (#a2a06c, #a78d5c, #a58353) tímto pravidlem neprojdou, proto je studio nabízí k nahrazení.
+- Export: kromě náhledu `<varianta>.v<verze>.png` vznikne `<varianta>.v<verze>.tiles.png`, jeden řádek herních dlaždic 64 × 32. U trávy jde o zaměnitelné dlaždice, u cesty o úrovně 0–3. Metadata (`surface`) obsahují počet snímků a pro cesty `gameWear` = `color`, `edge`, `width` pro `wearSurfaces` v `src/data/objects/terrain.js`.
+- Záložka **Scene & lighting** pokryje celou testovací mapu dlaždicemi variant (u trávy pruhy vedle sebe, u cest jeden pás na variantu).
+
+**Příprava ve hře** (bez změny vzhledu, dokud se nic neschválí):
+- terénní objekt smí mít `spriteVariants` (až 8 cest k obrázkům). `AssetManager` je načte jako vrstvy `variant-<i>` a `TerrainRenderer` vybere variantu podle hashe dlaždice;
+- `visual.pathSoftness` u `wearSurfaces` přidá spojovacímu pásu měkký okraj (stejně jako náhled ve studiu).
+
+Po schválení: rozřezat `.tiles.png` na jednotlivé dlaždice do `public/assets/terrain/…`, nastavit `spriteVariants` u `grass_normal` (a dlaždice úrovní u `grass_trampled_1..3`) a převzít `gameWear` do `wearSurfaces`.
+
+## Postavy podle profese
+
+Recept `figure` (`studio/src/generators/figure.js`) skládá postavu z nízkopolygonových tvarů: boty, nohavice nebo dlouhá sukně, tunika, opasek, ruce, hlava, vlasy, vousy, pokrývka hlavy, zástěra a nástroj či náklad. Všechny barvy jsou látky a kůže ze Style Guide (`cloth_*`, `leather`, `skin*`, `hair_*`).
+
+- `art/assets/units/<profese>/asset.json`: villager, woodcutter, miner, hunter, builder, farmer, miller, baker, hauler, soldier; každá má variantu muže a ženy.
+- Profese se pozná podle tří znaků zároveň: pokrývka hlavy, nástroj nebo náklad, hlavní barva oděvu (pravidlo `units` ve Style Guide). Test hlídá, že žádné dvě profese nejsou jen přebarvený klon a že postavy mají lidské měřítko 1,2 jednotky v jedné dlaždici.
+- Nové profese a barevné varianty vznikají jen úpravou `spec` (parametry ukazuje záložka **Spec & files**).
+- Hra zatím kreslí jednu postavu poddaného (`peasant`). Návrhy jsou ve stavu Draft. Až budou schválené, bude potřeba převzít sprity a vybírat je podle profese a pohlaví pracovníka; animace chůze a práce zatím recept nemá.
+
+## Stavba: lešení a prach
+
+- Hra kreslí lešení až po první odpracované práci (`scaffoldStage` v `src/game/ConstructionDust.js`, `workDone > 0`), tedy když na stavbu dorazí stavitel a začne pracovat. Do té doby je vidět jen průhledný plán. Lešení pak roste se třemi fázemi postupu.
+- Při aktivní práci (stavba v daném snímku postoupila) stoupá jemný prach (`DustEmitter`): nejvýš jeden obláček za 240–520 ms, nejvýš 6 na stavbu a 48 v celé hře. Obrázky se recyklují, skryté stavby žádné obláčky nemají a při `prefers-reduced-motion` je prach vypnutý.
+- Podobu lešení navrhuje recept `scaffold` (`art/assets/buildings/scaffold`): fáze low/mid/high podle postupu stavby, kulatá vázaná nebo hranolová břevna, rozestavěné kamenné nebo trámové jádro, žebřík a materiál vedle stavby. Hra dál kreslí lešení čarami, dokud se varianta neschválí.
+
+## Budovy s tematickými předměty
+
+Recept `workshop` (`studio/src/generators/workshop.js`) postaví hlavní stavbu a kolem ní dvorek s předměty, podle kterých se pozná řemeslo. Hlavní stavba je jeden z druhů: `house` (recept domu), `raised` (sýpka na kamenných patkách), `windmill` (věžový mlýn s lopatkami natočenými k divákovi), `furnace` (pec s měchy a světlem) a `barn` (velká stodola s vraty). Umístí se mimo střed (`body.at`), aby zbylo místo na dvůr.
+
+Předměty jsou katalog v `studio/src/generators/props.js`: pytle, sudy, bedny, seno, kmeny, palivové dříví, špalek se sekerou, mlýnský kámen, kolo, pracovní stůl, pec na chleba, skládaný kámen, ruda, uhlí, kovadlina, stojan s nářadím, rám s kůží, parohy, plot, vozík, koryto, přístřešek a plachta. Ve `spec` se zapisují jako seznam `{ type, at: [x, z], … }`, takže nová budova je hlavně data.
+
+Koncepty (vždy dvě varianty, doporučená je ve stavu Review): statek, sýpka, pekárna, mlýn, tavírna, sklad, lovecká chata a dřevorubecká chata. Hra je nepoužívá, dokud je vývojář neschválí a nepřevezme podle postupu níže. Pravidlo pro předměty je ve Style Guide (`props`).
+
+## Roční období (V01, návrhy)
+
+- `season-ground`: tráva na jaře, v létě (základ), na podzim (olivová tráva a spadané listí), na začátku zimy (jinovatka a závěje) a v hluboké zimě (souvislý sníh). Sníh i listí jsou periodické, takže dlaždice dál navazují bez švů (`ground`: `snow`, `leaves`).
+- `oak-seasons` a `pine-seasons`: stejný dospělý strom s parametrem `season`. Jarní dub má květy, podzimní okrové, zlaté a rezavé listí, zimní dub holé větve se sněhem. Zimní borovice má sněhové čepice. Léto je beze změny, takže dosavadní exporty si drží hash.
+- **Náhled přechodu**: záložka *Scene & lighting* u `season-ground` ukazuje navržený postup. Globální průběh jde zleva doprava přes `transition.order` a každá dlaždice se prolne ve vlastní chvíli podle `seasonBlend` (`studio/src/lib/surface.js`): stabilní hash dlaždice a pomalý šum, žádná šachovnice, na konci okna je přechod u všech dlaždic hotový. Stejnou funkci může použít hra.
+- Pravidla jsou ve Style Guide (`seasons`). Herní přechod (TerrainRenderer, stromy, Fog of War) přijde až po Codexově C01; viz `docs/art/VISUAL_PROGRESS.md`.
+
+**Nakloněné válce:** `cylinder({ …, tilt: [x, z] })` nakloní válec kolem jeho základny (holé větve, později zbraně, žebříky a podobně). Bounds i validace půdorysu náklon počítají.
 
 ## Výběr a schválení varianty
 
@@ -94,7 +142,7 @@ Takto se do hry dostala věž `watchtower-square` a pánev `torch-post-brazier`:
 
 ## Omezení MVP
 
-- Generátory: `watchtower`, `torch-post`, `house`, `tree` (dub, borovice), `wall` (kamenná hradba, palisáda), `quarry`. Jednotky a animace postav zatím nemají recept.
+- Generátory: `watchtower`, `torch-post`, `house`, `tree` (dub, borovice), `wall` (kamenná hradba, palisáda), `quarry`, 2D `ground` (tráva, cesty), `figure` (postavy), `scaffold` (lešení) a `workshop` (budovy s předměty); `tree` má roční období. Postavy jsou zatím statické, bez snímků animace.
 - Animovaný je jen plamen, a to procedurálně v kompozitoru. Snímky animací se zatím neexportují.
 - Export je deterministický v jednom prostředí. Jiný prohlížeč nebo GPU může dát drobně odlišné pixely, proto je autoritou commitnutý PNG.
 - Schválení do repozitáře vyžaduje ruční krok přes GitHub (vložit JSON a otevřít PR). Studio nemá token a na GitHub nezapisuje.

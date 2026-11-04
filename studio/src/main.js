@@ -5,6 +5,8 @@ import { STATUSES, STATUS_LABELS, readLocal, writeLocal, reviewState, updateLoca
 import { TIMES, timePreset } from './lib/lighting.js';
 import { heightInPixels, projectPoint } from './lib/projection.js';
 import { renderModel, spriteMetadata, rendererAvailable } from './render/spriteRenderer.js';
+import { drawConnection, previewFrame, resolveStages } from './generators/ground.js';
+import { seasonBlend } from './lib/surface.js';
 import { BACKGROUNDS, drawBackground, drawGrid, drawFootprint, drawHuman, drawBounds, drawSprite, applyTimeOfDay, drawFlames, drawTestMap } from './render/compositor.js';
 
 const REPOSITORY = 'https://github.com/tom161819/Newgame';
@@ -65,8 +67,8 @@ function spriteFor(asset, variant, scale = 1) {
   const key = `${variant.id}:${variant.hash}:${scale}`;
   if (!spriteCache.has(key)) {
     const generator = generators[asset.generator];
-    const model = generator.build(variant.spec, { footprint: asset.footprint, style });
-    spriteCache.set(key, renderModel(model, { style, footprint: asset.footprint, scale }));
+    if (generator.kind === 'surface') spriteCache.set(key, generator.paint(variant.spec, { footprint: asset.footprint, style, scale }));
+    else spriteCache.set(key, renderModel(generator.build(variant.spec, { footprint: asset.footprint, style }), { style, footprint: asset.footprint, scale }));
   }
   return spriteCache.get(key);
 }
@@ -246,8 +248,70 @@ function sceneView(asset) {
     h('span', {}, 'Sprites keep daylight shading; dusk and night come from one light map.')))];
 }
 
+// Ground recipes cover the whole test map: grass variants side by side in
+// bands, or one band per path variant with a path that wears in and grows over.
+// Proposed season change: global progress runs left to right through the
+// variants in `transition.order`; each tile blends in at its own moment
+// (seasonBlend), as the game would do over the first part of a season.
+const transitionCache = new Map();
+function transitionStep(asset, size, gx, gy) {
+  const steps = asset.transition.order.length - 1, P = gx / (size - 1) * steps, from = Math.min(steps - 1, Math.floor(P));
+  return { from, blend: seasonBlend(P - from, gx, gy, { seed: 7 }), nearest: Math.round(P) };
+}
+function transitionGround(asset, size) {
+  const order = asset.transition.order.map(id => asset.variants.find(v => v.id === id)), sprites = order.map(v => spriteFor(asset, v, 2));
+  const frame = (i, gx, gy) => sprites[i].tiles[previewFrame(order[i].spec, { width: size, height: size }, gx, gy).frame];
+  return { groundTile: (gx, gy) => {
+    const key = `${asset.id}:${order.map(v => v.hash).join(',')}:${gx},${gy}`;
+    if (!transitionCache.has(key)) {
+      const { from, blend } = transitionStep(asset, size, gx, gy), a = frame(from, gx, gy), canvas = document.createElement('canvas');
+      canvas.width = a.width; canvas.height = a.height;
+      const ctx = canvas.getContext('2d'); ctx.drawImage(a, 0, 0); ctx.globalAlpha = blend; ctx.drawImage(frame(from + 1, gx, gy), 0, 0);
+      transitionCache.set(key, canvas);
+    }
+    return transitionCache.get(key);
+  } };
+}
+function surfaceGround(asset, size) {
+  if (asset.transition) return transitionGround(asset, size);
+  const sprites = asset.variants.map(v => spriteFor(asset, v, 2)), band = Math.ceil(size / sprites.length);
+  const pick = n => Math.min(sprites.length - 1, Math.floor(n / band));
+  if (asset.variants[0].spec.mode === 'grass') {
+    return { groundTile: (gx, gy) => { const i = pick(gx); return sprites[i].tiles[previewFrame(asset.variants[i].spec, { width: size, height: size }, gx, gy).frame]; } };
+  }
+  const level = (gx, gy) => {
+    const i = pick(gy), ramp = [0, ...(asset.variants[i].spec.preview ?? [1, 2, 3, 3, 2, 1]), 0];
+    return gy === i * band + Math.floor(band / 2) ? ramp[gx % ramp.length] : 0;
+  };
+  return {
+    groundTile: (gx, gy) => sprites[pick(gy)].tiles[level(gx, gy)],
+    afterGround: (centre, ctx, zoom) => {
+      for (let gy = 0; gy < size; gy++) for (let gx = 0; gx < size; gx++) {
+        const here = level(gx, gy); if (!here) continue;
+        const stages = resolveStages(asset.variants[pick(gy)].spec, style);
+        for (const dx of [-1, 1]) {
+          const other = gx + dx >= 0 && gx + dx < size ? level(gx + dx, gy) : 0;
+          if (other) drawConnection(ctx, centre(gx, gy), [dx, 0], { ...stages[here - 1], width: Math.min(stages[here - 1].width, stages[other - 1].width) }, zoom);
+        }
+      }
+    },
+  };
+}
 function sceneItems(asset) {
   const items = [];
+  if (generators[asset.generator].kind === 'surface') {
+    const torch = catalog.studio.find(a => a.id === 'torch-post');
+    if (asset.transition) for (const [gx, gy] of [[1, 1], [3, 0], [5, 1], [7, 0], [9, 1], [11, 0], [2, 10], [6, 10], [10, 10]]) {
+      const ids = asset.transition.trees[transitionStep(asset, 12, gx, gy).nearest] ?? [];
+      for (const id of ids.filter((_, i) => i === (gx + gy) % 2)) {
+        const tree = catalog.studio.find(a => id.startsWith(`${a.id}-`)), variant = tree?.variants.find(v => v.id === id);
+        if (variant) items.push({ sprite: spriteFor(tree, variant, 2), footprint: tree.footprint, gx, gy });
+      }
+    }
+    if (torch) for (const [gx, gy] of [[2, 1], [8, 6], [4, 9]]) items.push({ sprite: spriteFor(torch, preferredVariant(torch), 2), footprint: torch.footprint, gx, gy });
+    for (let i = 0; i < 4; i++) items.push({ human: true, style, footprint: { width: 1, height: 1 }, gx: 1 + i * 3, gy: 4 + (i % 2) * 3 });
+    return { items, size: 12, ground: surfaceGround(asset, 12) };
+  }
   let gx = 1;
   const main = asset.variants.map(variant => ({ asset, variant }));
   const torch = catalog.studio.find(a => a.id === 'torch-post');
@@ -269,9 +333,9 @@ function paintScene(canvas, asset, seconds = performance.now() / 1000) {
   if (!width || !height || !glReady) return;
   if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
   const ctx = canvas.getContext('2d'), zoom = state.sceneZoom * dpr;
-  const { items, size } = sceneItems(asset);
+  const { items, size, ground } = sceneItems(asset);
   const origin = { x: width / 2, y: height / 2 - size * 16 * zoom + 60 * zoom };
-  const placed = drawTestMap(ctx, { width, height, items, zoom, origin, background: state.background === 'dirt' ? 'dirt' : 'grass', size });
+  const placed = drawTestMap(ctx, { width, height, items, zoom, origin, background: state.background === 'dirt' ? 'dirt' : 'grass', size, ...ground });
   const lights = placed.filter(p => p.sprite).flatMap((p, index) => p.sprite.lights.map((l, i) => {
     const display = zoom / p.sprite.scale;
     return { ...l, x: p.x + (l.x - p.sprite.anchor.x) * display, y: p.y + (l.y - p.sprite.anchor.y) * display, radius: l.radius * display, seed: index * 3 + i + 1 };
@@ -349,6 +413,10 @@ function styleGuideView() {
     h('section', { class: 'panel' }, h('h2', {}, 'Materials'), h('div', { class: 'materials' }, materials)),
     h('section', { class: 'panel' }, h('h2', {}, 'Light, shadow and detail'), h('ul', { class: 'rules' },
       h('li', {}, style.light.rule), h('li', {}, style.detail.silhouette), h('li', {}, style.detail.outline), h('li', {}, style.detail.textureScale), h('li', {}, style.detail.colour), h('li', {}, `Smallest readable feature: ${style.detail.minimumFeaturePx} px at 1×.`))),
+    style.units ? h('section', { class: 'panel' }, h('h2', {}, 'Figures'), h('ul', { class: 'rules' }, ['rule', 'readability', 'sexes'].map(key => h('li', {}, style.units[key])))) : null,
+    style.props ? h('section', { class: 'panel' }, h('h2', {}, 'Props'), h('ul', { class: 'rules' }, h('li', {}, style.props.rule))) : null,
+    style.seasons ? h('section', { class: 'panel' }, h('h2', {}, 'Seasons'), h('ul', { class: 'rules' }, ['rule', 'transition'].map(key => h('li', {}, style.seasons[key])))) : null,
+    style.terrain ? h('section', { class: 'panel' }, h('h2', {}, 'Terrain'), h('ul', { class: 'rules' }, ['rule', 'grass', 'paths', 'overgrowth'].map(key => h('li', {}, style.terrain[key])))) : null,
     h('section', { class: 'panel' }, h('h2', {}, 'Time of day'), h('p', { class: 'feedback' }, style.lightingModel), h('div', { class: 'times' },
       TIMES.map(t => h('div', { class: 'time' }, h('span', { style: `background:${style.timeOfDay[t].ambient}` }), h('p', {}, h('strong', {}, style.timeOfDay[t].label), ` · light ×${style.timeOfDay[t].lightScale}`, h('br'), style.timeOfDay[t].description))))),
     h('section', { class: 'panel' }, h('h2', {}, 'Light sources'), h('ul', { class: 'rules' }, Object.entries(style.lightSources).map(([id, l]) => h('li', {}, h('strong', { class: 'mono' }, id), ` ${l.color}, radius ${l.radiusTiles} tiles, intensity ${l.intensity}, flicker ±${l.flicker.amplitude * 100}% at ${l.flicker.speed} Hz-ish`)))),
@@ -425,7 +493,7 @@ function exportSprite(assetId, variantId) {
   if (!variant) throw new RangeError(`Unknown variant ${assetId}/${variantId}`);
   const sprite = spriteFor(asset, variant, 1);
   const meta = spriteMetadata({ asset, variant, style, sprite, generator: generators[asset.generator] });
-  return { png: sprite.canvas.toDataURL('image/png'), front: sprite.front?.toDataURL('image/png') ?? null, meta, paths: variant.paths };
+  return { png: sprite.canvas.toDataURL('image/png'), front: sprite.front?.toDataURL('image/png') ?? null, sheet: sprite.sheet?.toDataURL('image/png') ?? null, meta, paths: variant.paths };
 }
 function exportPng(asset, variant) {
   const { png, paths } = exportSprite(asset.id, variant.id);

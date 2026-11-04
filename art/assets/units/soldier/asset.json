@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "soldier",
+  "name": "Soldier",
+  "category": "units",
+  "description": "Royal guard: red tabard, iron helmet, spear and painted shield. Concept for worker looks by profession; the game still draws one worker figure.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "soldier-male",
+      "name": "Soldier (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_red",
+        "sleeves": "cloth_grey",
+        "legs": "cloth_grey",
+        "headgear": "helmet",
+        "hair": "hair_dark",
+        "beard": true,
+        "tool": "spear",
+        "shield": true,
+        "build": 1.1
+      }
+    },
+    {
+      "id": "soldier-female",
+      "name": "Soldier (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_red",
+        "sleeves": "cloth_grey",
+        "headgear": "helmet",
+        "hair": "hair_blond",
+        "hairStyle": "braid",
+        "tool": "spear",
+        "shield": true
+      }
+    }
+  ]
+}

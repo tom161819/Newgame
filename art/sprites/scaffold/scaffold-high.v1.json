@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "scaffold",
+  "variantId": "scaffold-high",
+  "name": "Third lift (67–99 %)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "fde65143",
+  "generator": "scaffold",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 156,
+  "height": 178,
+  "anchor": {
+    "x": 65,
+    "y": 144
+  },
+  "origin": {
+    "x": 0.41667,
+    "y": 0.80899
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 176
+  },
+  "baseOrigin": {
+    "x": 0.41667,
+    "y": 0.98876
+  },
+  "visualHeight": 176,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.9,
+  "lights": []
+}

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "farmstead",
+  "variantId": "farmstead-thatched",
+  "name": "Thatched farmstead",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "5e606ee1",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 130,
+  "anchor": {
+    "x": 65,
+    "y": 96
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.73846
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 128
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98462
+  },
+  "visualHeight": 128,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.14,
+  "lights": []
+}

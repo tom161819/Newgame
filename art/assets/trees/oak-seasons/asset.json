@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "oak-seasons",
+  "name": "Oak through the seasons",
+  "category": "trees",
+  "description": "Season looks of the mature tree for the seasonal transition; the game currently draws simpler seasonal trees.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "tree",
+  "gameObjectId": "oak_tree",
+  "variants": [
+    {
+      "id": "oak-seasons-spring",
+      "name": "Spring oak with blossom",
+      "version": 1,
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11,
+        "season": "spring"
+      }
+    },
+    {
+      "id": "oak-seasons-summer",
+      "name": "Summer oak (base)",
+      "version": 1,
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11,
+        "season": "summer"
+      }
+    },
+    {
+      "id": "oak-seasons-autumn",
+      "name": "Autumn oak",
+      "version": 1,
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11,
+        "season": "autumn"
+      }
+    },
+    {
+      "id": "oak-seasons-winter",
+      "name": "Bare winter oak",
+      "version": 1,
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11,
+        "season": "winter"
+      }
+    }
+  ]
+}

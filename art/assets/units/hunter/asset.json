@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "id": "hunter",
+  "name": "Hunter",
+  "category": "units",
+  "description": "Hunting lodge: green tunic, brimmed leather hat, bow and quiver. Concept for worker looks by profession; the game still draws one worker figure.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "hunter-male",
+      "name": "Hunter (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_green",
+        "legs": "cloth_brown",
+        "sleeves": "leather",
+        "headgear": "brimmed",
+        "headgearMaterial": "leather",
+        "hair": "hair_auburn",
+        "tool": "bow"
+      }
+    },
+    {
+      "id": "hunter-female",
+      "name": "Hunter (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_green",
+        "headgear": "hood",
+        "headgearMaterial": "cloth_forest",
+        "hair": "hair_blond",
+        "hairStyle": "braid",
+        "tool": "bow"
+      }
+    }
+  ]
+}

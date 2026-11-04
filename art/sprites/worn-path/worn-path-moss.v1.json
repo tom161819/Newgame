@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "assetId": "worn-path",
+  "variantId": "worn-path-moss",
+  "name": "Green to earth",
+  "category": "terrain",
+  "version": 1,
+  "specHash": "8030f0cf",
+  "generator": "ground",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 288,
+  "height": 144,
+  "anchor": {
+    "x": 144,
+    "y": 72
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.5
+  },
+  "footprint": {
+    "width": 6,
+    "height": 3
+  },
+  "base": {
+    "x": 192,
+    "y": 144
+  },
+  "baseOrigin": {
+    "x": 0.66667,
+    "y": 1
+  },
+  "visualHeight": 144,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0,
+  "lights": [],
+  "surface": {
+    "mode": "path",
+    "tileWidth": 64,
+    "tileHeight": 32,
+    "frames": 4,
+    "frameMeaning": "wear levels 0–3 (0 = untouched grass)",
+    "gameWear": [
+      {
+        "level": 1,
+        "color": "#56723a",
+        "edge": "#5f7d3e",
+        "width": 5
+      },
+      {
+        "level": 2,
+        "color": "#4d5e34",
+        "edge": "#55683a",
+        "width": 9
+      },
+      {
+        "level": 3,
+        "color": "#574a36",
+        "edge": "#5a5a3a",
+        "width": 13
+      }
+    ]
+  }
+}
