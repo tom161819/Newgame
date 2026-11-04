@@ -13,7 +13,7 @@ None pending. Add entries here when one pull request must wait for another.
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | Approved tower and brazier in the game | Claude | `claude/approved-tower-brazier` | — | In progress | `src/data/objects/buildings.js` (tower), `src/data/objects/lighting.js`, `src/data/objects/index.js`, `src/data/experience.js` (brazier XP), `src/systems/ObjectRegistry.js` (lights validation), `src/systems/SpriteViews.js` (pixel hit test), `src/systems/LightSourceSystem.js`, `src/game/LitBuildingView.js`, `src/game/GameScene.js` (3 lines), `public/assets/buildings/{tower,brazier}/`, related tests |
-| Stage10 Quarry Placement & Iron Smelter | Codex | `codex/stage-10-smelter` from main97b3381 | Not yet created; API policy unchanged | PhaseA/B verified:434 tests/build/targeted native furnace and Save14. Current main03a3de3/Claude PR10 integrated with both additions retained; 437/437 combined tests and Pages build pass; full native gate pending. User now authorizes resolving routine conflicts autonomously; no conflict confirmation required. Visual Polish is Claude-owned by user instruction. | New smelting definitions/assets/tests; data jobs/workplaces/recipes/economy; existing production/logistics/storage/skill/validation/panel; smokes and own progress/docs. Necessary shared edits: objects/index registry and experience reward table, preserving Claude graphics/brazier changes. Avoid Studio/art, SpriteViews/renderer, tower definition and GameScene graphics. |
+| Stage10 final Quarry save fix & M2 preflight | Codex | `codex/stage-10-smelter` (includes main7012635/PR11) | [PR11 merged](https://github.com/tom161819/Newgame/pull/11); [follow-up body](verification/master-10-pr.md), API still Forbidden | Verified438/438 tests, final build/current native, earlier full combined smoke and71-archive HTTP checks. Final eligible two-Quarry save correction ready; M2 formal Pages/release gate pending. Routine conflicts now autonomous per user/AGENTS. | Final serializer/mineral regression test, Unreleased and own verification/progress/queue/task row. Main graphics, Studio/art, renderer/tower/brazier remain unchanged. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -22,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#11](https://github.com/tom161819/Newgame/pull/11) Stage10 Smelter, physical Ore/fuel production and autonomous conflict rule (Codex), merged main7012635; final neighbouring-Quarry validation follow-up remains in the active row.
 - 2026-11-04 [#9](https://github.com/tom161819/Newgame/pull/9) Stage 09 Daily Resource Statistics & Ledger, Save schema 13 (Codex).
 - 2026-11-04 [#8](https://github.com/tom161819/Newgame/pull/8) Asset Studio recipes: house, oak, pine, wall, quarry (Claude).
 - 2026-11-04 [#7](https://github.com/tom161819/Newgame/pull/7) Asset Studio published on GitHub Pages under `/studio/` (Claude).
