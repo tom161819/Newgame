@@ -1,4 +1,4 @@
-# M2 Smelter smoke sequencing — implemented, native verification pending
+# M2 native fixture corrections — targeted checks passed, full verification pending
 
 Starting point: mainb554b4e, which merged archive PR18. Source PR15's actual
 Pages run41877748443 now reports Success for7595b80. The subsequent formal M2
@@ -38,10 +38,22 @@ probe document.elementFromPoint, selecting only an exposed canvas point within
 the same anchor diamond. Use ordinary mouse input and never click through or
 disable the real staffing controls. Replay the captured state for verification.
 
+The real captured failure state now replays successfully with the helper:
+ordinary input hits CANVAS, creates a planned2x2Tower, normal cancellation
+restores exactly10Stone, and the Granary staffing button remains interactive.
+The full native construction scenario also gets a permanent30px test-only DOM
+control covering the centre of the anchor; placement must use exposed canvas
+without activating or disabling that control. The fixture is removed before
+normal Tower inspection/cancellation and is never shipped in the game.
+
 Results so far: dedicated Smelting models and all456model tests pass,0fail/skip;
-changelog/catalog validation and diff checks pass. The revised native script
-still needs its actual browser result. No player Changelog entry is added for
-test-only work. No source asset, graphic, Save schema or existing archive changed.
+changelog/catalog validation and diff checks pass. The revised native
+`--smelting` suite exits0, including both carried inputs, partial cycle/Bar-cargo
+Save14,AutoOFF,10sharedXP,exact receipts,Fog,current movement,old-schema refusal
+and isolated historical saves. The actual captured blueprint failure replay
+also exits0. The complete revised `--full` run is next. No player Changelog entry
+is added for test-only work. No source asset, graphic, Save schema or existing
+archive changed.
 
 The v0.3.0 tag remains local at f053be1 and is absent remotely. Do not push that
 provisional tag while the final source includes this unmerged script correction.

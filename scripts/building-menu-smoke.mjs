@@ -93,7 +93,13 @@ export async function buildingUnlockGameplaySmoke(page){
   await supplyAndBuild(page,field);
   assert.equal(await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;return s.farmingSystem.records.has(id)&&s.inventory.count('stone')===7;},field.id),true);
   console.log('PASS actual Granary→Farmhouse physical supply/build, live menu unlocks, exact mid-blueprint Load, relocking and grandfathered field completion');
-  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('stone',3);s.updateInventory();});const tower=await placeBlueprint(page,'tower');
+  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('stone',3);s.updateInventory();
+    // Reproduce a real staffing button covering the camera-centred anchor.
+    const bounds=s.game.canvas.getBoundingClientRect(),control=document.createElement('button');control.id='native-blueprint-ui-obstruction';control.textContent='⚙';window.__blueprintUIHits=0;
+    Object.assign(control.style,{position:'fixed',left:`${bounds.left+bounds.width/2-15}px`,top:`${bounds.top+bounds.height/2-15}px`,width:'30px',height:'30px',minWidth:'0',minHeight:'0',padding:'0',margin:'0',border:'0',zIndex:'10000',pointerEvents:'auto'});control.addEventListener('pointerdown',()=>window.__blueprintUIHits++);document.body.append(control);
+  });
+  let tower;try{tower=await placeBlueprint(page,'tower');assert.equal(await page.evaluate(()=>window.__blueprintUIHits),0,'Blueprint placement uses exposed canvas instead of clicking a UI overlay.');}
+  finally{await page.evaluate(()=>{document.querySelector('#native-blueprint-ui-obstruction')?.remove();delete window.__blueprintUIHits;});}
   await clickBuilding(page,tower.id);await page.locator('#construction-dialog[open]').waitFor();await page.locator('#cancel-construction').click();assert.equal(await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;return !s.buildings.some(b=>b.id===id)&&s.inventory.count('stone')===10;},tower.id),true);
   console.log('PASS actual unstarted blueprint cancellation restores the reserved price without duplicating materials');
 }
