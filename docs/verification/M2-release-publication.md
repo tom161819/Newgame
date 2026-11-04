@@ -1,6 +1,24 @@
-# M2 publication — source merged, final archive prepared, deployment pending
+# M2 publication — source/archive merged; native gate sequencing fix in verification
 
-## Current checkpoint after the user's PR merge — 2026-11-04
+## Latest checkpoint — after PR18 merge
+
+Archive PR18 is merged into mainb554b4e. Pages41877748443 for source merge7595b80
+now genuinely reports Success. The formal M2 gate ran its first8commands
+successfully, then timed out in the Smelter test's sequential cargo/cycle waits.
+A real model reproduction shows why a finished Bar can be a Hauler's first
+cargo, after the partial cycle already ended; the standalone original native
+Smelter and the diagnostic full rerun's Smelter both pass. No exact state from
+the first timeout was captured, so do not claim otherwise.
+
+The fixture/observation fix and a current-save late-carrier regression are now
+in codex/m2-smelting-smoke from mainb554b4e.456models/validators pass; revised
+native verification is pending. Production code, graphics, Save14 and all72
+archives stay unchanged. See [the detailed checkpoint](M2-smelter-smoke.md).
+The v0.3.0 tag is still local/unpublished and the final release source must
+include the verified test correction. No public tag is moved, no source guard
+is weakened, and M2/master11 are not falsely marked complete.
+
+## Earlier checkpoint after PR15 merge — 2026-11-04
 
 PR15 is actually merged into main
 `7595b80b64f88fdd984505f79ce201098a54d280`. The release game source is
