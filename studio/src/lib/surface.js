@@ -129,14 +129,6 @@ export function gameWearFromSpec(spec, style) {
   return spec.stages.map((stage, i) => ({ level: i + 1, color: resolveColour(style, stage.colour), edge: resolveColour(style, stage.edge), width: stage.width }));
 }
 
-// Uneven season change. `progress` runs 0 → 1 over the transition window
-// (the first 10–25 % of a season). Each tile starts at its own moment, mixed
-// from a stable per-tile hash and slow large-scale noise, then blends in over
-// the rest of the window, so the map never flips at once and shows no
-// checkerboard. Every tile is fully blended at progress 1.
-export function seasonBlend(progress, x, y, { seed = 1, spread = 0.6 } = {}) {
-  if (progress <= 0) return 0;
-  if (progress >= 1) return 1;
-  const start = spread * (0.45 * hash2(seed, x, y) + 0.55 * periodicNoise(seed + 41, 8, x / 64, y / 64));
-  return smoothstep(0, 1, (progress - start) / (1 - spread));
-}
+// Uneven season change: the game's own function, so the studio preview and
+// the game agree tile for tile.
+export { seasonBlend } from '../../../src/game/SeasonTransition.js';
