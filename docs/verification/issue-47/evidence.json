@@ -1,0 +1,143 @@
+{
+  "head": "65b4bf8a439686253dd5e933a8d5555e83c01922",
+  "releaseSource": "02a3a43ace8adc993aea7a392424d7cdf4e7dec9",
+  "releaseTree": "49b1e79b6bf90152c2e69e9fbc01ad74221208d2",
+  "packageVersion": "0.3.0",
+  "saveSchema": 15,
+  "notesEqual": true,
+  "stages": [
+    {
+      "stage": "01",
+      "commit": "fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265"
+    },
+    {
+      "stage": "02",
+      "commit": "5074450fe57321ac71b7ded1cedcaf2281d2f216"
+    },
+    {
+      "stage": "03",
+      "commit": "1d9dd4610a5690db8348b2743ec376b668266fcf"
+    },
+    {
+      "stage": "04",
+      "commit": "0024c16c803a91b151cff08300665076f8b67b35"
+    },
+    {
+      "stage": "05",
+      "commit": "ead4d006a39685c53e3de79f7ad33e991e34acbe"
+    },
+    {
+      "stage": "06",
+      "commit": "7a5a6662c7d619c7e86960d6f71cf5c68b035483"
+    },
+    {
+      "stage": "07",
+      "commit": "0596b517e38919c672c0856f9fd7f3d927cc848b"
+    },
+    {
+      "stage": "08",
+      "commit": "c106cc4f4b0d1afb73a444500d0d1adabc92fb05"
+    },
+    {
+      "stage": "09",
+      "commit": "f3310a105223654a595f5bff205c56f5668c15cc"
+    },
+    {
+      "stage": "10",
+      "commit": "0f4ebce931d912c18ff33a6148697b9514bb9249"
+    }
+  ],
+  "ciSmokeScope": "full",
+  "archive": {
+    "deploymentCommit": "65b4bf8a439686253dd5e933a8d5555e83c01922",
+    "releaseCommit": "02a3a43ace8adc993aea7a392424d7cdf4e7dec9",
+    "archivePath": "public/versions/02a3a43ace8adc993aea7a392424d7cdf4e7dec9/",
+    "verifiedGitFiles": 71
+  },
+  "ciStatus": "Success",
+  "pages": {
+    "run": "41924183243",
+    "commit": "65b4bf8a439686253dd5e933a8d5555e83c01922",
+    "url": "https://tom161819.github.io/Newgame/",
+    "status": "Success"
+  },
+  "liveSchema": 15,
+  "frozenReleaseSchema": 14,
+  "checks": [
+    {
+      "command": "npm ci",
+      "status": "passed",
+      "execution": "existing successful GitHub Pages CI",
+      "run": "41924183243",
+      "commit": "65b4bf8a439686253dd5e933a8d5555e83c01922"
+    },
+    {
+      "command": "npm run changelog:validate",
+      "status": "passed",
+      "execution": "existing successful GitHub Pages CI",
+      "run": "41924183243",
+      "commit": "65b4bf8a439686253dd5e933a8d5555e83c01922"
+    },
+    {
+      "command": "npm run versions:validate",
+      "status": "passed",
+      "execution": "existing successful GitHub Pages CI",
+      "run": "41924183243",
+      "commit": "65b4bf8a439686253dd5e933a8d5555e83c01922"
+    },
+    {
+      "command": "npm test",
+      "status": "passed",
+      "execution": "existing successful GitHub Pages CI",
+      "run": "41924183243",
+      "commit": "65b4bf8a439686253dd5e933a8d5555e83c01922"
+    },
+    {
+      "command": "npm run archive:verify",
+      "status": "passed",
+      "execution": "existing successful GitHub Pages CI",
+      "run": "41924183243",
+      "commit": "65b4bf8a439686253dd5e933a8d5555e83c01922"
+    },
+    {
+      "command": "npm run build -- --base=\"${BASE_PATH}/\"",
+      "status": "passed",
+      "execution": "existing successful GitHub Pages CI",
+      "run": "41924183243",
+      "commit": "65b4bf8a439686253dd5e933a8d5555e83c01922"
+    },
+    {
+      "command": "npm run archive:stage",
+      "status": "passed",
+      "execution": "existing successful GitHub Pages CI",
+      "run": "41924183243",
+      "commit": "65b4bf8a439686253dd5e933a8d5555e83c01922"
+    },
+    {
+      "command": "node scripts/verify-site-archives.mjs",
+      "status": "passed",
+      "execution": "existing successful GitHub Pages CI",
+      "run": "41924183243",
+      "commit": "65b4bf8a439686253dd5e933a8d5555e83c01922"
+    },
+    {
+      "command": "node scripts/browser-smoke.mjs --base=/Newgame/ --full",
+      "status": "passed",
+      "execution": "existing successful GitHub Pages CI",
+      "run": "41924183243",
+      "commit": "65b4bf8a439686253dd5e933a8d5555e83c01922"
+    }
+  ],
+  "standaloneGateCLIReexecuted": false,
+  "reuseReason": "User explicitly requires reuse of existing checks for the same commit; all nine prerequisite commands ran in the mandatory Pages build/full browser chain.",
+  "publicVerification": "pending: public Pages HTTPS is blocked by the managed gateway; do not mark release done",
+  "tagBeforePublication": null,
+  "publicTag": {
+    "tag": "v0.3.0",
+    "source": "02a3a43ace8adc993aea7a392424d7cdf4e7dec9",
+    "remote": "b20628dec0f21068c23b713a3fe0bfeb5e30b115\trefs/tags/v0.3.0\n02a3a43ace8adc993aea7a392424d7cdf4e7dec9\trefs/tags/v0.3.0^{}",
+    "releaseSourceURL": "https://github.com/tom161819/Newgame/tree/v0.3.0",
+    "onlyExplicitTagPushed": true,
+    "publicArtifactVerification": "pending tag-aware Pages and actual public catalog/manifest"
+  }
+}

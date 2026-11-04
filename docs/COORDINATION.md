@@ -13,7 +13,8 @@ None pending. Add entries here when one pull request must wait for another.
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | N02 (#33): global Hauler logistics, Warehouse delivery fix, no Deliver Materials | Claude | `claude/global-hauler-warehouse` | this PR | Verified | `src/data/jobs.js`, `src/data/workplaces.js`, `src/data/objects/{logistics,foodProduction}.js`, `src/systems/{LogisticsTaskManager,BuilderAI,ConstructionSystem,KingLogisticsSystem,FoodProductionSystem,FoodStateValidation,GameStateSerializer}.js` (SAVE_VERSION 15), `src/ui/{ConstructionUI,StoragePanel}.js`, `src/game/GameScene.js`, `index.html`, logistics/smelting tests, building-menu and smelting smokes, README. |
-| M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main2663942 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT403 | IN PROGRESS: preserve approved villager sprites for manual PR22 merge; relevant integration checks running. Earlier476models/Pages/scaffold native and full/Studio/archive proofs retained. Actual final gh merge22 at e574f75 still API Forbidden. Frozen02a has own459test archive; final verifier checks actual deployed Git blobs, allowing later live development. Public tag/main/deployment gates pending; new user order C01–C08 then master11–15, all unstarted. | Native smoke regressions; release-gate/deployed-archive verifier and tests; release notes,02a archive/catalog, progress/verification docs. Claude art unchanged; no schema rewrite. |
+| Issue #47: finish actual M2 release | Codex | `codex/issue-47-m2-release` from main65b4bf8 | No duplicate PR22; metadata PR not yet created | IN PROGRESS: read live Issue47 agent:codex/status:ready; API claim/labels/STARTED blocked by the single observed GraphQL Forbidden request, so no successful claim is fabricated. Audit reuses exact-main Pages41924183243 Success/full smoke; frozen02a provenance verified. Actual public v0.3.0 now targets02a; final tag-aware Pages/live verify still pending. | Only release/merge-queue/progress evidence docs and the authorized existing tag; no mechanics, source archive or dependency changes. |
+| Parked C01 / Issue #48 WIP | Codex | `codex/fow-exploration-blueprints`, pushed dd728a0 | No ready PR | PRESERVED, not complete and not advanced through a blocked dependency: reproduced skipped-visibility repaint bug, fix and12focused tests; evaluate again only after Issue47 is done and48 ready. | Existing two-file fix retained in its own remote WIP branch; do not merge its old coordination/AGENTS overrides into current main. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -21,6 +22,8 @@ None pending. Add entries here when one pull request must wait for another.
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- PR22 actually merged at cfe51fafd0e3a509c7335d6564fa206193165e20; its mechanics/archive work is not an open PR. Final M2 publication is tracked only by live Issue47. No duplicate implementation or MERGE-HELP for merged PR22.
 
 - 2026-11-04 [#45](https://github.com/tom161819/Newgame/pull/45) Approved wall kit in the game; developer's Studio approvals recorded (Claude).
 - 2026-11-04 [#42](https://github.com/tom161819/Newgame/pull/42) N01: Castle no longer covers the king; starter stockpile in front (Claude, Issue #32).
