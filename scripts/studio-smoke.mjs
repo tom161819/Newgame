@@ -64,7 +64,8 @@ try {
   assert.ok(dark < grass - 20, `dark background (${dark.toFixed(1)}) is darker than grass (${grass.toFixed(1)})`);
   await page.locator('#compare-zoom').fill('3');
   assert.match(await page.locator('label[for="compare-zoom"] output').textContent(), /3×/);
-  assert.match(await page.locator('.variant-card').first().locator('.facts').textContent(), /156 × 219 px at 1×.*2 × 2 tiles \(128 px wide\)/s);
+  const square = await page.evaluate(() => window.assetStudio.exportSprite('watchtower', 'watchtower-square').meta);
+  assert.match(await page.locator('.variant-card[data-variant="watchtower-square"] .facts').textContent(), new RegExp(`${square.width} × ${square.height} px at 1×.*2 × 2 tiles \\(128 px wide\\)`, 's'));
   pass(`${cards} variants side by side with zoom, background, footprint and pixel size`);
 
   await page.getByRole('group', { name: 'Background' }).getByRole('button', { name: 'Grass' }).click();
@@ -85,6 +86,8 @@ try {
   await page.getByRole('tab', { name: 'Compare variants' }).click();
   const round = page.locator('.variant-card[data-variant="watchtower-round"]');
   await round.getByRole('button', { name: 'Approved' }).click();
+  // The repository may already prefer another variant, so choose this one explicitly.
+  if (!await page.locator('.variant-card[data-variant="watchtower-round"].preferred').count()) await page.locator('.variant-card[data-variant="watchtower-round"] .star').click();
   await page.waitForSelector('.variant-card[data-variant="watchtower-round"].preferred');
   const local = await page.evaluate(() => window.assetStudio.local());
   const record = local.assets.watchtower.variants['watchtower-round'];

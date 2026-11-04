@@ -425,7 +425,7 @@ function exportSprite(assetId, variantId) {
   if (!variant) throw new RangeError(`Unknown variant ${assetId}/${variantId}`);
   const sprite = spriteFor(asset, variant, 1);
   const meta = spriteMetadata({ asset, variant, style, sprite, generator: generators[asset.generator] });
-  return { png: sprite.canvas.toDataURL('image/png'), meta, paths: variant.paths };
+  return { png: sprite.canvas.toDataURL('image/png'), front: sprite.front?.toDataURL('image/png') ?? null, meta, paths: variant.paths };
 }
 function exportPng(asset, variant) {
   const { png, paths } = exportSprite(asset.id, variant.id);

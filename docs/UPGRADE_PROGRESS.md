@@ -71,3 +71,7 @@ síť. Připravený PR lze založit a sloučit přes web GitHubu; nic není slou
 ### Navázání masteru — 2026-11-04
 
 Etapa09 byla sloučena přes PR9 do main97b3381; předchozí síťová blokace předání již nebrání základu etapy10. Etapa10 začíná v nové codex/stage-10-smelter z tohoto main. Visual Polish & Art Pass převzal Claude a je z fronty Codexu vyřazen. Zachovat všechny jeho grafické větve. Po etapě10 připravit M2 gate ve větvi a zastavit pro výslovný pokyn k vydání podle nahraných pravidel spolupráce.
+
+### Trvalé pravidlo konfliktů — 2026-11-04
+
+Uživatel výslovně zrušil nutnost potvrzovat další běžné konflikty: Codex je řeší samostatně ve vlastní větvi, zachovává záměr obou autorů, ověřuje výsledek a zapisuje řešení. Toto nahrazuje větu o zastavení při konfliktu z dříve nahraného pokynu. Platí i pro Claude přes společný AGENTS.md; jeho vlastní grafické větve se nepřepisují.

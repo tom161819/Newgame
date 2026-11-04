@@ -1,6 +1,33 @@
 {
   "schema": 1,
-  "updatedAt": null,
+  "updatedAt": "2026-11-04T13:00:36.000Z",
   "note": "Committed review state for Asset Studio. Export it from the studio and commit it through a pull request; the studio never writes to GitHub.",
-  "assets": {}
+  "assets": {
+    "watchtower": {
+      "preferred": "watchtower-square",
+      "variants": {
+        "watchtower-square": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "91b92f67",
+          "note": "Approved by the developer on 2026-11-04 and integrated into the game.",
+          "updatedAt": "2026-11-04T13:00:36.000Z",
+          "approvedAt": "2026-11-04T13:00:36.000Z"
+        }
+      }
+    },
+    "torch-post": {
+      "preferred": "torch-post-brazier",
+      "variants": {
+        "torch-post-brazier": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "8fdb895d",
+          "note": "Approved by the developer on 2026-11-04 and integrated into the game.",
+          "updatedAt": "2026-11-04T13:00:36.000Z",
+          "approvedAt": "2026-11-04T13:00:36.000Z"
+        }
+      }
+    }
+  }
 }

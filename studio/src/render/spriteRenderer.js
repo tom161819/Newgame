@@ -90,6 +90,7 @@ function meshFor(part, style) {
     geometry.translate(0, ry, 0);
   } else throw new RangeError(`Unknown primitive ${part.shape}`);
   const mesh = new THREE.Mesh(geometry, mat);
+  mesh.userData.layer = part.layer ?? 'main';
   mesh.position.set(...part.at);
   if (part.rotation) mesh.rotation.y = part.rotation;
   mesh.castShadow = mesh.receiveShadow = true;
@@ -121,7 +122,11 @@ function dispose({ group, ground }) {
   ground.geometry.dispose(); ground.material.dispose();
 }
 
-// Returns { canvas, width, height, anchor, lights, scale, footprint, modelHeight }.
+const depthOnly = new THREE.MeshBasicMaterial({ colorWrite: false });
+
+// Returns { canvas, front, width, height, anchor, platform, lights, scale, footprint, modelHeight }.
+// `front` (or null) holds only parts tagged layer: 'front', occluded exactly as in
+// the full render and cropped identically, so it overlays the sprite pixel for pixel.
 // All pixel values are at the requested scale; scale 1 equals the game's 1× zoom.
 export function renderModel(model, { style, footprint, scale = 1 }) {
   const gl = getRenderer(), built = sceneFor(model, style);
@@ -129,8 +134,10 @@ export function renderModel(model, { style, footprint, scale = 1 }) {
     // Frame the model plus the longest shadow it can cast on the ground.
     const { min, max } = modelBounds(model), d = built.direction;
     const reach = max[1] / Math.max(0.2, d.y);
-    const frameMin = [Math.min(min[0], min[0] - d.x * reach) - 0.2, 0, Math.min(min[2], min[2] - d.z * reach) - 0.2];
-    const frameMax = [Math.max(max[0], max[0] - d.x * reach) + 0.2, max[1] + 0.2, Math.max(max[2], max[2] - d.z * reach) + 0.2];
+    // The frame also covers the whole footprint, so its corners (the game's anchor) are inside the sprite.
+    const fw = footprint.width / 2, fh = footprint.height / 2;
+    const frameMin = [Math.min(min[0], min[0] - d.x * reach, -fw) - 0.2, 0, Math.min(min[2], min[2] - d.z * reach, -fh) - 0.2];
+    const frameMax = [Math.max(max[0], max[0] - d.x * reach, fw) + 0.2, max[1] + 0.2, Math.max(max[2], max[2] - d.z * reach, fh) + 0.2];
     const box = projectBox(frameMin, frameMax, scale);
     const left = Math.floor(box.left) - PAD, top = Math.floor(box.top) - PAD;
     const width = Math.ceil(box.right) + PAD - left, height = Math.ceil(box.bottom) + PAD - top;
@@ -147,22 +154,39 @@ export function renderModel(model, { style, footprint, scale = 1 }) {
     full.width = width; full.height = height;
     const ctx = full.getContext('2d', { willReadFrequently: true });
     ctx.drawImage(gl.domElement, 0, 0);
-    const crop = alphaBounds(ctx.getImageData(0, 0, width, height));
+    const corners = [[-fw, 0, -fh], [fw, 0, -fh], [fw, 0, fh], [-fw, 0, fh]].map(p => projectPoint(p, scale)).map(p => ({ x: p.x - left, y: p.y - top }));
+    const crop = alphaBounds(ctx.getImageData(0, 0, width, height), corners);
     const out = document.createElement('canvas');
     out.width = crop.width; out.height = crop.height;
     out.getContext('2d').drawImage(full, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
     const anchor = { x: -left - crop.x, y: -top - crop.y };
+    let front = null;
+    if (model.primitives.some(part => part.layer === 'front')) {
+      const restore = [];
+      built.group.traverse(mesh => { if (mesh.isMesh && mesh.userData.layer !== 'front') { restore.push([mesh, mesh.material]); mesh.material = depthOnly; } });
+      built.ground.visible = false;
+      gl.render(built.scene, camera);
+      for (const [mesh, mat] of restore) mesh.material = mat;
+      built.ground.visible = true;
+      front = document.createElement('canvas');
+      front.width = crop.width; front.height = crop.height;
+      front.getContext('2d').drawImage(gl.domElement, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
+    }
+    const platformPoint = model.platform ? projectPoint(model.platform, scale) : null;
+    const platform = platformPoint ? { x: anchor.x + platformPoint.x, y: anchor.y + platformPoint.y } : null;
     const lights = (model.lights ?? []).map(light => {
       const p = projectPoint(light.at, scale);
       return resolveLight(style, light, { x: anchor.x + p.x, y: anchor.y + p.y }, scale);
     });
-    return { canvas: out, width: out.width, height: out.height, anchor, lights, scale, footprint, modelHeight: model.height };
+    return { canvas: out, front, width: out.width, height: out.height, anchor, platform, lights, scale, footprint, modelHeight: model.height };
   } finally { dispose(built); }
 }
 
-function alphaBounds(image) {
+// Tight box around visible pixels, widened to include the given points (footprint corners).
+function alphaBounds(image, include = []) {
   const { data, width, height } = image;
   let minX = width, minY = height, maxX = -1, maxY = -1;
+  for (const p of include) { minX = Math.min(minX, Math.floor(p.x)); minY = Math.min(minY, Math.floor(p.y)); maxX = Math.max(maxX, Math.ceil(p.x)); maxY = Math.max(maxY, Math.ceil(p.y)); }
   for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
     if (data[(y * width + x) * 4 + 3] > 6) { if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; }
   }
@@ -172,7 +196,13 @@ function alphaBounds(image) {
 }
 
 // Metadata stored next to an exported PNG; everything the game needs to place it.
+// `anchor`/`origin` use the studio convention (footprint centre). The game places
+// buildings at the footprint's front corner (towerBase), so `base`/`baseOrigin`,
+// `platform`, `visualHeight` and `gameLights` are given in that convention too.
 export function spriteMetadata({ asset, variant, style, sprite, generator }) {
+  const corner = projectPoint([asset.footprint.width / 2, 0, asset.footprint.height / 2], sprite.scale);
+  const base = { x: sprite.anchor.x + corner.x, y: sprite.anchor.y + corner.y };
+  const round = n => +n.toFixed(2);
   return {
     schema: 1,
     assetId: asset.id,
@@ -190,6 +220,12 @@ export function spriteMetadata({ asset, variant, style, sprite, generator }) {
     anchor: { x: sprite.anchor.x, y: sprite.anchor.y },
     origin: { x: +(sprite.anchor.x / sprite.width).toFixed(5), y: +(sprite.anchor.y / sprite.height).toFixed(5) },
     footprint: asset.footprint,
+    base: { x: round(base.x), y: round(base.y) },
+    baseOrigin: { x: +(base.x / sprite.width).toFixed(5), y: +(base.y / sprite.height).toFixed(5) },
+    visualHeight: round(base.y),
+    platform: sprite.platform ? { x: round(sprite.platform.x - base.x), y: round(sprite.platform.y - base.y) } : null,
+    frontLayer: !!sprite.front,
+    gameLights: sprite.lights.map(l => ({ type: l.type, x: round(l.x - base.x), y: round(l.y - base.y), color: l.color, radius: round(l.radius), intensity: l.intensity, flicker: l.flicker, flameSize: l.flameSize })),
     modelHeight: +sprite.modelHeight.toFixed(3),
     lights: sprite.lights.map(l => ({ type: l.type, x: +l.x.toFixed(2), y: +l.y.toFixed(2), color: l.color, radius: +l.radius.toFixed(2), intensity: l.intensity, flicker: l.flicker, flameSize: l.flameSize })),
   };

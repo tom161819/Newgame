@@ -114,3 +114,17 @@ Studio, renderer/tower implementation or push to main while waiting.
 Original PR API limitation also remains: no supported GitHub connector; GraphQL
 last returned Forbidden because api.github.com is outside the environment policy.
 No Stage10 PR, successful deployment, M2 release/tag or new archive is claimed.
+
+## Approved integration — in verification
+
+The user explicitly approved combining both changes, then made autonomous routine
+conflict resolution a standing instruction (no future conflict confirmation).
+AGENTS.md now records this override; CLAUDE.md imports those shared rules.
+Merged actual main03a3de3 into the Codex branch, preserving Claude's complete
+watchtower/brazier/Studio/art code. Five additive conflicts use the reviewed
+resolution: both registries and XP entries,49objects/17buildables/51queued assets
+(including the tower front), both category lists and the shared task register.
+No graphics implementation or other agent branch was overwritten. Full integrated
+verification follows; older branch-only results are not claimed for this merge.
+
+Combined main03a3de3 verification:437 passed,0failed,0skipped; build:pages passes. Package manifests are unchanged, so no dependency reinstall was required. The superseded old-base full smoke was terminated before rebuilding to avoid mixing artifacts; its partial results are historical only. Now commit this normal merge and run one full smoke on the combined artifact.

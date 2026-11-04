@@ -12,8 +12,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| Asset Studio recipes: house, oak, pine, wall, quarry | Claude | `claude/studio-recipes` | — | In progress | `studio/**`, `art/**`, `docs/art/**`, `tests/asset-studio.test.js` |
-| Stage10 Quarry Placement & Iron Smelter | Codex | `codex/stage-10-smelter` from main97b3381 | Not yet created; API policy unchanged | PhaseA/B verified:434 tests/build/targeted native furnace and Save14. PhaseC native/71-archive HTTP checks pass; repeated full gate running after updating10skill expectations. Main03a3de3/Claude PR10 needs additive resolution in5shared files; user approval requested per uploaded conflict rule. Visual Polish is Claude-owned by user instruction. | New smelting definitions/assets/tests; data jobs/workplaces/recipes/economy; existing production/logistics/storage/skill/validation/panel; smokes and own progress/docs. Necessary shared edits: objects/index registry and experience reward table, preserving Claude graphics/brazier changes. Avoid Studio/art, SpriteViews/renderer, tower definition and GameScene graphics. |
+| Approved tower and brazier in the game | Claude | `claude/approved-tower-brazier` | — | In progress | `src/data/objects/buildings.js` (tower), `src/data/objects/lighting.js`, `src/data/objects/index.js`, `src/data/experience.js` (brazier XP), `src/systems/ObjectRegistry.js` (lights validation), `src/systems/SpriteViews.js` (pixel hit test), `src/systems/LightSourceSystem.js`, `src/game/LitBuildingView.js`, `src/game/GameScene.js` (3 lines), `public/assets/buildings/{tower,brazier}/`, related tests |
+| Stage10 Quarry Placement & Iron Smelter | Codex | `codex/stage-10-smelter` from main97b3381 | Not yet created; API policy unchanged | PhaseA/B verified:434 tests/build/targeted native furnace and Save14. Current main03a3de3/Claude PR10 integrated with both additions retained; 437/437 combined tests and Pages build pass; full native gate pending. User now authorizes resolving routine conflicts autonomously; no conflict confirmation required. Visual Polish is Claude-owned by user instruction. | New smelting definitions/assets/tests; data jobs/workplaces/recipes/economy; existing production/logistics/storage/skill/validation/panel; smokes and own progress/docs. Necessary shared edits: objects/index registry and experience reward table, preserving Claude graphics/brazier changes. Avoid Studio/art, SpriteViews/renderer, tower definition and GameScene graphics. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -22,7 +22,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
-- 2026-11-04 [#9](https://github.com/tom161819/Newgame/pull/9) Stage09 Daily Resource Statistics & Ledger (Codex), merged main97b3381;419 tests/full browser/Pages build/71 archives verified.
+- 2026-11-04 [#9](https://github.com/tom161819/Newgame/pull/9) Stage 09 Daily Resource Statistics & Ledger, Save schema 13 (Codex).
+- 2026-11-04 [#8](https://github.com/tom161819/Newgame/pull/8) Asset Studio recipes: house, oak, pine, wall, quarry (Claude).
 - 2026-11-04 [#7](https://github.com/tom161819/Newgame/pull/7) Asset Studio published on GitHub Pages under `/studio/` (Claude).
 - 2026-11-04 [#1](https://github.com/tom161819/Newgame/pull/1) Stages 07 Forestry and 08 Extended Zoom Out (Codex).
 - 2026-11-04 [#2](https://github.com/tom161819/Newgame/pull/2) Collaboration rules, `CLAUDE.md` and this register (Claude).

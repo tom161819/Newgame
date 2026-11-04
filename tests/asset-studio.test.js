@@ -213,7 +213,7 @@ test('game definitions map to studio categories and filters combine source, cate
   assert.equal(studioCategoryForGameObject({ id: 'oak_tree', category: 'resource' }), 'trees');
   assert.equal(studioCategoryForGameObject({ id: 'rock_outcrop', category: 'decoration' }), 'nature');
   assert.ok(catalog.game.every(item => CATEGORY_IDS.includes(item.category) && item.id.startsWith('game:')));
-  assert.ok(catalog.game.some(item => item.gameObjectId === 'tower' && item.spritePath === 'public/assets/buildings/tower/tower.png'));
+  assert.ok(catalog.game.some(item => item.gameObjectId === 'tower' && item.spritePath === 'public/assets/buildings/tower/watchtower-square.v1.png'));
   assert.deepEqual(filterCatalog(catalog.all, { category: 'buildings', source: 'studio' }).map(i => i.id).sort(), ['house', 'quarry', 'stone-wall', 'watchtower']);
   assert.deepEqual(filterCatalog(catalog.all, { category: 'trees', source: 'studio' }).map(i => i.id).sort(), ['oak-tree', 'pine-tree']);
   assert.deepEqual(filterCatalog(catalog.all, { source: 'studio', query: 'TORCH' }).map(i => i.id), ['torch-post']);
@@ -224,7 +224,36 @@ test('the game never imports Asset Studio code or art and keeps its own build en
   const files = [];
   const walk = dir => { for (const entry of readdirSync(path.join(root, dir), { withFileTypes: true })) { const file = `${dir}/${entry.name}`; if (entry.isDirectory()) walk(file); else if (file.endsWith('.js')) files.push(file); } };
   walk('src');
-  for (const file of files) assert.doesNotMatch(readFileSync(path.join(root, file), 'utf8'), /studio\/|art\/(sprites|assets)|\.\.\/art\//, file);
+  // Game code may name an approved export (artSource) but never imports studio code or art files.
+  for (const file of files) assert.doesNotMatch(readFileSync(path.join(root, file), 'utf8'), /(?:from\s*|import\s*\()\s*['"][^'"]*(?:studio\/|\/art\/)/, file);
   assert.doesNotMatch(readFileSync(path.join(root, 'index.html'), 'utf8'), /studio/);
   assert.doesNotMatch(readFileSync(path.join(root, 'vite.config.js'), 'utf8'), /studio/);
+});
+
+test('the game uses the approved Asset Studio exports byte for byte with their anchors, platform and lights', () => {
+  const definitions = new Map(objectDefinitions.map(d => [d.id, d]));
+  for (const [gameId, assetId] of [['tower', 'watchtower'], ['brazier', 'torch-post']]) {
+    const definition = definitions.get(gameId), meta = json(definition.artSource);
+    const repo = approvals.assets[assetId];
+    assert.equal(repo.preferred, meta.variantId, `${assetId}: the game uses the preferred variant`);
+    assert.equal(repo.variants[meta.variantId].status, 'approved');
+    assert.equal(repo.variants[meta.variantId].specHash, meta.specHash, `${assetId}: approval matches the export`);
+    const variant = catalog.studio.find(a => a.id === assetId).variants.find(v => v.id === meta.variantId);
+    assert.equal(variant.hash, meta.specHash, `${assetId}: export matches the current spec`);
+    assert.ok(readFileSync(path.join(root, `public${definition.sprite}`)).equals(readFileSync(path.join(root, variant.paths.sprite))), `${gameId} sprite equals the approved export`);
+    assert.equal(definition.renderMode, 'sprite');
+    assert.deepEqual(definition.origin, meta.baseOrigin);
+    assert.equal(definition.visualHeight, meta.visualHeight);
+    assert.deepEqual(definition.lights, meta.gameLights);
+    assert.deepEqual([definition.width, definition.height], [meta.footprint.width, meta.footprint.height]);
+    if (meta.frontLayer) {
+      assert.ok(readFileSync(path.join(root, `public${definition.frontSprite}`)).equals(readFileSync(path.join(root, variant.paths.spriteFront))), `${gameId} front layer equals the export`);
+      assert.deepEqual(definition.frontOrigin, meta.baseOrigin);
+    }
+    if (meta.platform) assert.deepEqual(definition.platform, meta.platform);
+  }
+  const front = pngSize('public/assets/buildings/tower/watchtower-square.v1.front.png'), main = pngSize('public/assets/buildings/tower/watchtower-square.v1.png');
+  assert.deepEqual(front, main, 'front layer has the same frame as the tower sprite');
+  assert.equal(definitions.get('brazier').buildingCategory, 'infrastructure');
+  assert.ok(definitions.get('brazier').buildable && definitions.get('brazier').constructionTime > 0);
 });
