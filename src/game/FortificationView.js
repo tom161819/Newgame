@@ -2,6 +2,19 @@ import Phaser from 'phaser';
 import { gridToWorld,tilePolygon } from './isometric.js';
 import { towerBase,buildingDepth,buildingDefinition } from './buildings.js';
 import { isWall,wallIndex,connectionsFor } from './walls.js';
+import { APPROVED_WALL_ART } from '../data/objects/approvedArt.js';
+import { assetURL } from '../systems/AssetManager.js';
+
+// The approved wall kit loads on first use; open walls repaint when it arrives.
+const wallKey=piece=>`wall-art:${piece}`,liveWalls=new Set();
+const wallArtReady=scene=>Object.keys(APPROVED_WALL_ART).every(piece=>scene.textures?.exists(wallKey(piece)));
+function ensureWallArt(scene){
+  if(scene.__wallArtRequested||!scene.load)return;scene.__wallArtRequested=true;let queued=0;
+  for(const [piece,art]of Object.entries(APPROVED_WALL_ART))if(!scene.textures.exists(wallKey(piece))){scene.load.image(wallKey(piece),assetURL(art.sprite,scene.assets?.baseURL??import.meta.env?.BASE_URL??'/'));queued++;}
+  if(!queued)return;
+  scene.load.once('complete',()=>{for(const view of liveWalls)if(view.scene===scene&&view.building)view.paint(view.building,view.tint);});
+  if(!scene.load.isLoading())scene.load.start();
+}
 
 function polygon(g,color,points){g.fillStyle(color);g.fillPoints(points,true);}
 function lerp(a,b,t){return {x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t};}
@@ -27,11 +40,12 @@ function parapet(g,a,b,height,color){
 // Stejné rozhraní jako TowerView, rozměry a výška pocházejí z definice.
 export class FortificationView {
   constructor(scene,building,preview=false){
-    this.scene=scene;this.preview=preview;this.back=scene.add.graphics();this.front=scene.add.graphics();this.footprint=scene.add.graphics();
-    this.paint(building);if(preview){this.back.setAlpha(.5);this.front.setAlpha(.5);}
+    this.scene=scene;this.preview=preview;this.back=scene.add.graphics();this.front=scene.add.graphics();this.footprint=scene.add.graphics();this.art={};
+    if(isWall(building)){liveWalls.add(this);ensureWallArt(scene);}
+    this.paint(building);if(preview)this.setAlpha(1);
   }
   paint(building,tint=null){
-    this.definition=buildingDefinition(building);this.base=towerBase(building);
+    this.definition=buildingDefinition(building);this.base=towerBase(building);this.building=building;this.tint=tint;
     const d=this.definition,h=d.visual.wallHeight,{x,y}=building;
     const points=[[x,y],[x+d.width,y],[x+d.width,y+d.height],[x,y+d.height]].map(([gx,gy])=>{const p=gridToWorld(gx,gy);return {x:p.x-this.base.x,y:p.y-this.base.y};});
     const [a,b,c,e]=points,depth=buildingDepth(building),g=this.back.clear().setPosition(this.base.x,this.base.y).setDepth(this.preview?10001:depth);
@@ -39,8 +53,10 @@ export class FortificationView {
     const floor=this.footprint.clear().setDepth(this.preview?10000:-90);
     floor.fillStyle(tint??0x777450,this.preview?0.3:0.2);floor.lineStyle(1,tint??0xb3a477,.75);
     for(const tile of building.tiles){floor.fillPoints(tilePolygon(tile),true);floor.strokePoints(tilePolygon(tile),true);}
-    const shadow=d.shadow;if(shadow){g.fillStyle(shadow.color,shadow.alpha);g.fillEllipse(shadow.x,shadow.y,shadow.width,shadow.height);}
     const links=isWall(building)?building.connections??connectionsFor(wallIndex(this.scene.buildings),building):{};
+    this.hitArea=new Phaser.Geom.Polygon([{x:a.x,y:a.y-h-14},{x:b.x,y:b.y-h-14},b,c,e,{x:e.x,y:e.y-h-14}]);
+    if(this.paintArt(building,links,depth,tint))return;
+    const shadow=d.shadow;if(shadow){g.fillStyle(shadow.color,shadow.alpha);g.fillEllipse(shadow.x,shadow.y,shadow.width,shadow.height);}
     // Sousední tělesa tyto stěny překryjí. Ponechání obou ploch zamezí
     // otevřenému řezu, když se soused skryje za hranicí Fog of War.
     masonry(g,e,c,h,tint??0xada691);
@@ -55,11 +71,24 @@ export class FortificationView {
       polygon(g,0x3f3c2a,[p,q,{x:q.x,y:q.y-38},{x:p.x,y:p.y-38}]);
       g.lineStyle(2,0x8c7953);g.lineBetween((p.x+q.x)/2,(p.y+q.y)/2,(p.x+q.x)/2,(p.y+q.y)/2-38);
     }
-    this.hitArea=new Phaser.Geom.Polygon([{x:a.x,y:a.y-h-14},{x:b.x,y:b.y-h-14},b,c,e,{x:e.x,y:e.y-h-14}]);
   }
+  // Approved kit: the block plus the parapets of open sides; S and E stand in
+  // front of units on the wall walk, exactly like the procedural layers.
+  paintArt(building,links,depth,tint){
+    const use=isWall(building)&&wallArtReady(this.scene);
+    for(const [piece,art]of Object.entries(APPROVED_WALL_ART)){
+      const show=use&&(piece==='block'||!links[piece]);
+      if(!show){this.art[piece]?.setVisible(false);continue;}
+      const front=piece==='S'||piece==='E',image=this.art[piece]??=this.scene.add.image(0,0,wallKey(piece));
+      image.setOrigin(art.origin.x,art.origin.y).setPosition(this.base.x,this.base.y).setDepth(this.preview?(front?10002:10001):front?depth+.3:depth).setVisible(this.back.visible).setAlpha(this.back.alpha);
+      if(tint==null)image.clearTint();else image.setTint(tint);
+    }
+    return use;
+  }
+  get artImages(){return Object.values(this.art);}
   contains(x,y){return Phaser.Geom.Polygon.Contains(this.hitArea,x-this.base.x,y-this.base.y);}
-  setAlpha(value){this.footprint.setAlpha(value);this.back.setAlpha(value);this.front.setAlpha(value);return this;}
-  setVisible(value){this.back.setVisible(value);this.front.setVisible(value);this.footprint.setVisible(value);return this;}
+  setAlpha(value){const v=this.preview?value*.5:value;this.footprint.setAlpha(value);this.back.setAlpha(v);this.front.setAlpha(v);for(const image of this.artImages)image.setAlpha(v);return this;}
+  setVisible(value){this.back.setVisible(value);this.front.setVisible(value);this.footprint.setVisible(value);for(const image of this.artImages)image.setVisible(value&&image.visible!==false);return this;}
   inView(view){const width=(this.definition.width+this.definition.height)*32;return this.base.x+width>=view.x&&this.base.x-width<=view.right&&this.base.y+10>=view.y&&this.base.y-this.definition.visualHeight<=view.bottom;}
-  destroy(){this.back.destroy();this.front.destroy();this.footprint.destroy();}
+  destroy(){liveWalls.delete(this);this.back.destroy();this.front.destroy();this.footprint.destroy();for(const image of this.artImages)image.destroy();}
 }

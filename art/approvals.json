@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-04T22:00:00.000Z",
+  "updatedAt": "2026-11-04T21:55:58.391Z",
   "note": "Committed review state for Asset Studio. Export it from the studio and commit it through a pull request; the studio never writes to GitHub.",
   "assets": {
     "watchtower": {
@@ -260,6 +260,14 @@
           "specHash": "2a9e5b47",
           "note": "Proposed by Claude for review; the building is not in the game yet (Codex C07).",
           "updatedAt": "2026-11-04T21:00:00.000Z"
+        },
+        "bowyer-stone": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "92c39d13",
+          "note": "",
+          "updatedAt": "2026-11-04T21:39:28.443Z",
+          "approvedAt": "2026-11-04T21:39:28.443Z"
         }
       }
     },
@@ -267,11 +275,12 @@
       "preferred": "swordsmith-stone",
       "variants": {
         "swordsmith-stone": {
-          "status": "review",
+          "status": "approved",
           "version": 1,
           "specHash": "85e2ce33",
-          "note": "Proposed by Claude for review; the building is not in the game yet (Codex C07).",
-          "updatedAt": "2026-11-04T21:00:00.000Z"
+          "note": "",
+          "updatedAt": "2026-11-04T21:55:16.366Z",
+          "approvedAt": "2026-11-04T21:55:16.366Z"
         }
       }
     },
@@ -284,6 +293,14 @@
           "specHash": "b358728f",
           "note": "Proposed by Claude for review; the building is not in the game yet (Codex C07).",
           "updatedAt": "2026-11-04T21:00:00.000Z"
+        },
+        "armorer-forge": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "53e287eb",
+          "note": "",
+          "updatedAt": "2026-11-04T21:39:06.929Z",
+          "approvedAt": "2026-11-04T21:39:06.929Z"
         }
       }
     },
@@ -296,6 +313,14 @@
           "specHash": "3609b6ed",
           "note": "Proposed by Claude for review; the building is not in the game yet (Codex C07).",
           "updatedAt": "2026-11-04T21:00:00.000Z"
+        },
+        "armory-fortified": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "e181a614",
+          "note": "",
+          "updatedAt": "2026-11-04T21:39:15.015Z",
+          "approvedAt": "2026-11-04T21:39:15.015Z"
         }
       }
     },
@@ -308,6 +333,14 @@
           "specHash": "c12a6ce9",
           "note": "Proposed by Claude for review; the building is not in the game yet (Codex C07).",
           "updatedAt": "2026-11-04T21:00:00.000Z"
+        },
+        "stables-shelter": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "03d361a6",
+          "note": "",
+          "updatedAt": "2026-11-04T21:40:09.111Z",
+          "approvedAt": "2026-11-04T21:40:09.111Z"
         }
       }
     },
@@ -709,39 +742,294 @@
       "preferred": "wall-kit-block",
       "variants": {
         "wall-kit-block": {
-          "status": "review",
+          "status": "approved",
           "version": 1,
           "specHash": "1e0903db",
-          "note": "Proposed by Claude: the connected game wall as pieces; approve all five together.",
-          "updatedAt": "2026-11-04T22:00:00.000Z"
+          "note": "",
+          "updatedAt": "2026-11-04T21:55:26.347Z",
+          "approvedAt": "2026-11-04T21:55:26.347Z"
         },
         "wall-kit-parapet-n": {
-          "status": "review",
+          "status": "approved",
           "version": 1,
           "specHash": "6de05cf7",
-          "note": "Proposed by Claude: the connected game wall as pieces; approve all five together.",
-          "updatedAt": "2026-11-04T22:00:00.000Z"
+          "note": "",
+          "updatedAt": "2026-11-04T21:55:33.417Z",
+          "approvedAt": "2026-11-04T21:55:33.417Z"
         },
         "wall-kit-parapet-e": {
-          "status": "review",
+          "status": "approved",
           "version": 1,
           "specHash": "3b44dd16",
-          "note": "Proposed by Claude: the connected game wall as pieces; approve all five together.",
-          "updatedAt": "2026-11-04T22:00:00.000Z"
+          "note": "",
+          "updatedAt": "2026-11-04T21:55:34.500Z",
+          "approvedAt": "2026-11-04T21:55:34.500Z"
         },
         "wall-kit-parapet-s": {
-          "status": "review",
+          "status": "approved",
           "version": 1,
           "specHash": "404f44b0",
-          "note": "Proposed by Claude: the connected game wall as pieces; approve all five together.",
-          "updatedAt": "2026-11-04T22:00:00.000Z"
+          "note": "",
+          "updatedAt": "2026-11-04T21:55:35.071Z",
+          "approvedAt": "2026-11-04T21:55:35.071Z"
         },
         "wall-kit-parapet-w": {
-          "status": "review",
+          "status": "approved",
           "version": 1,
           "specHash": "3ee9f324",
-          "note": "Proposed by Claude: the connected game wall as pieces; approve all five together.",
-          "updatedAt": "2026-11-04T22:00:00.000Z"
+          "note": "",
+          "updatedAt": "2026-11-04T21:55:38.204Z",
+          "approvedAt": "2026-11-04T21:55:38.204Z"
+        }
+      }
+    },
+    "military-archer": {
+      "preferred": "military-archer-hood",
+      "variants": {
+        "military-archer-hood": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "c28347b4",
+          "note": "",
+          "updatedAt": "2026-11-04T21:38:34.713Z",
+          "approvedAt": "2026-11-04T21:38:34.713Z"
+        },
+        "military-archer-woman": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "af7c3ddc",
+          "note": "",
+          "updatedAt": "2026-11-04T21:38:39.537Z",
+          "approvedAt": "2026-11-04T21:38:39.537Z"
+        },
+        "military-archer-royal": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "b4820061",
+          "note": "",
+          "updatedAt": "2026-11-04T21:38:41.551Z",
+          "approvedAt": "2026-11-04T21:38:41.551Z"
+        }
+      }
+    },
+    "equipment-armor": {
+      "preferred": "equipment-armor-steel",
+      "variants": {
+        "equipment-armor-steel": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "37359497",
+          "note": "",
+          "updatedAt": "2026-11-04T21:38:49.870Z",
+          "approvedAt": "2026-11-04T21:38:49.870Z"
+        },
+        "equipment-armor-blackened": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "5463b5d2",
+          "note": "",
+          "updatedAt": "2026-11-04T21:38:50.593Z",
+          "approvedAt": "2026-11-04T21:38:50.593Z"
+        }
+      }
+    },
+    "equipment-bow": {
+      "preferred": "equipment-bow-quiver",
+      "variants": {
+        "equipment-bow-quiver": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "ea5320fb",
+          "note": "",
+          "updatedAt": "2026-11-04T21:39:22.361Z",
+          "approvedAt": "2026-11-04T21:39:22.361Z"
+        }
+      }
+    },
+    "equipment-horse": {
+      "preferred": "equipment-horse-bay",
+      "variants": {
+        "equipment-horse-bay": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "0b5bc244",
+          "note": "",
+          "updatedAt": "2026-11-04T21:39:34.556Z",
+          "approvedAt": "2026-11-04T21:39:34.556Z"
+        },
+        "equipment-horse-grey": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "cd81ec7e",
+          "note": "",
+          "updatedAt": "2026-11-04T21:39:35.553Z",
+          "approvedAt": "2026-11-04T21:39:35.553Z"
+        }
+      }
+    },
+    "military-knight": {
+      "preferred": "military-knight-blue",
+      "variants": {
+        "military-knight-blue": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "ff80cd9a",
+          "note": "",
+          "updatedAt": "2026-11-04T21:39:41.827Z",
+          "approvedAt": "2026-11-04T21:39:41.827Z"
+        },
+        "military-knight-red": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "00dd5720",
+          "note": "",
+          "updatedAt": "2026-11-04T21:39:42.495Z",
+          "approvedAt": "2026-11-04T21:39:42.495Z"
+        },
+        "military-knight-woman": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "7dc91c9f",
+          "note": "",
+          "updatedAt": "2026-11-04T21:39:43.719Z",
+          "approvedAt": "2026-11-04T21:39:43.719Z"
+        }
+      }
+    },
+    "military-soldier": {
+      "preferred": "military-soldier-man",
+      "variants": {
+        "military-soldier-man": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "1fb152b3",
+          "note": "",
+          "updatedAt": "2026-11-04T21:40:17.038Z",
+          "approvedAt": "2026-11-04T21:40:17.038Z"
+        },
+        "military-soldier-woman": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "0d53c9f0",
+          "note": "",
+          "updatedAt": "2026-11-04T21:40:18.099Z",
+          "approvedAt": "2026-11-04T21:40:18.099Z"
+        },
+        "military-soldier-kettle": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "9109bb61",
+          "note": "",
+          "updatedAt": "2026-11-04T21:40:19.078Z",
+          "approvedAt": "2026-11-04T21:40:19.078Z"
+        }
+      }
+    },
+    "military-directions": {
+      "preferred": "military-directions-4",
+      "variants": {
+        "military-directions-4": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "3d173c7e",
+          "note": "",
+          "updatedAt": "2026-11-04T21:39:54.751Z",
+          "approvedAt": "2026-11-04T21:39:54.751Z"
+        },
+        "military-directions-5": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "612bcee1",
+          "note": "",
+          "updatedAt": "2026-11-04T21:39:55.323Z",
+          "approvedAt": "2026-11-04T21:39:55.323Z"
+        },
+        "military-directions-6": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "ede1cac0",
+          "note": "",
+          "updatedAt": "2026-11-04T21:39:56.563Z",
+          "approvedAt": "2026-11-04T21:39:56.563Z"
+        },
+        "military-directions-7": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "4858e28b",
+          "note": "",
+          "updatedAt": "2026-11-04T21:39:57.819Z",
+          "approvedAt": "2026-11-04T21:39:57.819Z"
+        }
+      }
+    },
+    "equipment-sword": {
+      "preferred": "equipment-sword-steel",
+      "variants": {
+        "equipment-sword-steel": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "7e9ec236",
+          "note": "",
+          "updatedAt": "2026-11-04T21:40:24.547Z",
+          "approvedAt": "2026-11-04T21:40:24.547Z"
+        },
+        "equipment-sword-pair": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "7839bdf7",
+          "note": "",
+          "updatedAt": "2026-11-04T21:40:25.183Z",
+          "approvedAt": "2026-11-04T21:40:25.183Z"
+        }
+      }
+    },
+    "military-swordsman": {
+      "preferred": "military-swordsman-kite",
+      "variants": {
+        "military-swordsman-kite": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "0ab71638",
+          "note": "",
+          "updatedAt": "2026-11-04T21:40:30.077Z",
+          "approvedAt": "2026-11-04T21:40:30.077Z"
+        },
+        "military-swordsman-woman": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "ece25d93",
+          "note": "",
+          "updatedAt": "2026-11-04T21:40:31.081Z",
+          "approvedAt": "2026-11-04T21:40:31.081Z"
+        },
+        "military-swordsman-greatsword": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "77d3911d",
+          "note": "",
+          "updatedAt": "2026-11-04T21:40:32.636Z",
+          "approvedAt": "2026-11-04T21:40:32.636Z"
+        }
+      }
+    },
+    "wall-kit-preview": {
+      "preferred": "wall-kit-preview-corner",
+      "variants": {
+        "wall-kit-preview-corner": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "500c5c85",
+          "note": "",
+          "updatedAt": "2026-11-04T21:55:45.942Z",
+          "approvedAt": "2026-11-04T21:55:45.942Z"
+        },
+        "wall-kit-preview-enclosure": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "6378f78f",
+          "note": "",
+          "updatedAt": "2026-11-04T21:55:46.774Z",
+          "approvedAt": "2026-11-04T21:55:46.774Z"
         }
       }
     }
