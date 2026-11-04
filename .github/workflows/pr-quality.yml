@@ -1,0 +1,59 @@
+name: PR quality gate
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+# Pull request code is untrusted: use only read-only repository permissions.
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-quality-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Game and Studio checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out complete source history
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate changelog and version catalog
+        run: |
+          npm run changelog:validate
+          npm run versions:validate
+
+      - name: Test current game systems and Asset Studio data
+        run: npm test
+
+      - name: Build current game
+        run: npm run build -- --base=/Newgame/
+
+      - name: Browser smoke of current game (no historical archive staging)
+        run: npm run smoke -- --base=/Newgame/ --current-only
+
+      - name: Build Asset Studio
+        run: npm run studio:build
+
+      - name: Smoke test Asset Studio
+        run: npm run studio:smoke -- --no-build
+
+# Historical archives remain immutable. The existing deployment workflow
+# validates/stages them for the published site. This PR gate deliberately
+# tests the current game and Studio without copying all historical bundles.
