@@ -12,6 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| Asset Studio on GitHub Pages | Claude | `claude/studio-pages` | — | In progress | `.github/workflows/pages.yml` (studio steps after the game checks), `docs/art/ASSET_STUDIO.md` |
 | Stage 09 Daily Resource Statistics & Ledger | Codex | `codex/stage-09-ledger` (from `main`) | — | Ready to start. Any unpushed local work goes first to `codex/stage-09-ledger-wip`; no migrations of older saves (Alpha save policy) | — |
 
 ## Kept backups (do not delete without the developer)
