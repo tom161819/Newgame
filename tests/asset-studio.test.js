@@ -336,3 +336,13 @@ test('construction sites use the approved scaffold art by stage, byte for byte w
   const ids = new Set(objectDefinitions.map(d => d.id));
   assert.ok(TIMBER_SCAFFOLD_BUILDINGS.every(id => ids.has(id)));
 });
+
+test('untouched grass uses the approved season-ground tiles for spring, autumn and winter', () => {
+  const grass = objectDefinitions.find(d => d.id === 'grass_normal');
+  for (const [season, variant] of [['Spring', 'season-ground-spring'], ['Autumn', 'season-ground-autumn'], ['Winter', 'season-ground-snow']]) {
+    assert.equal(approvals.assets['season-ground'].variants[variant]?.status, 'approved', variant);
+    grass.seasonVariants[season].forEach((file, i) => assert.ok(readFileSync(path.join(root, `public${file}`)).equals(readFileSync(path.join(root, `art/sprites/season-ground/${variant}.v1.tile-${i}.png`))), `${season} ${i}`));
+  }
+  // Summer is the lush set already used for grass_normal.
+  assert.equal(json('art/sprites/season-ground/season-ground-summer.v1.json').specHash, json('art/sprites/grass-ground/grass-ground-lush.v1.json').specHash);
+});
