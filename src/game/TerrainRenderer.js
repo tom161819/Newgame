@@ -145,8 +145,7 @@ export class TerrainRenderer {
     }
   }
 
-  update(camera,fog=null,memory=this.memory) {
-    this.fog=fog;this.memory=memory;
+  updateFog(camera,fog) {
     const mode=`${fog?.enabled}:${fog?.explorationEnabled}`;
     if(mode!==this.fogMode){
       this.originalBackground??=camera.backgroundColor?.rgba??'#3a3c2b';
@@ -155,7 +154,21 @@ export class TerrainRenderer {
       camera.setBackgroundColor?.(fog?.enabled?'#000':this.originalBackground);
       this.fogMode=mode;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';
     }
-    if(fog&&this.fogRevision!==fog.revision){this.fogRevision=fog.revision;if(fog.enabled)this.invalidateArea([...fog.added,...fog.removed].map(index=>({x:index%fog.width,y:Math.floor(index/fog.width)})),false);}
+    if(fog&&this.fogRevision!==fog.revision){
+      const previous=this.paintedVisibility??new Set(),current=fog.visibleIndices;
+      // Consumers may skip revisions (Save, several source updates, a paused
+      // frame). Compare against what this renderer actually painted, rather
+      // than the last producer delta, which may already have been overwritten.
+      const changed=[...previous].filter(index=>!current.has(index));
+      for(const index of current)if(!previous.has(index))changed.push(index);
+      this.paintedVisibility=new Set(current);this.fogRevision=fog.revision;
+      if(fog.enabled)this.invalidateArea(changed.map(index=>({x:index%fog.width,y:Math.floor(index/fog.width)})),false);
+    }
+  }
+
+  update(camera,fog=null,memory=this.memory) {
+    this.fog=fog;this.memory=memory;
+    this.updateFog(camera,fog);
     const view = camera.worldView;
     const cacheKey = [Math.floor(view.x / 16), Math.floor(view.y / 16), Math.ceil(view.width), Math.ceil(view.height),fog?.signature??'',this.wear?.levelRevision??0,this.debugEnabled?this.wear?.revision:0,this.debugEnabled].join(',');
     if (cacheKey === this.lastView) return;
