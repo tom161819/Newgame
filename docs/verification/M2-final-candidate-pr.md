@@ -1,27 +1,35 @@
-Finalizes the existing M2 v0.3.0 candidate with reliable native release checks
-and a playable archive of actual source02a3a43. The Smelter smoke now waits for
-the carrier's physical arrival and observes both carried inputs alongside
-partial work; a late-carrier regression preserves the real producer fallback.
-Blueprint clicks settle the camera and target exposed canvas within the same
-grid tile, including a real DOM-obstruction regression. Gameplay and Save14
-remain unchanged by Codex; Claude's merged seasonal visuals/Studio are preserved
-and their verified note moves into0.3.0. No additional MINOR bump.
+Finalizes M2 v0.3.0 with a frozen playable archive of actual source
+02a3a43ace8adc993aea7a392424d7cdf4e7dec9. Preserves Claude’s merged seasonal,
+ground and production-building graphics through main14071b1, plus the military
+Studio concepts. The later ground/building work stays Unreleased; M2 source02a
+and its archive remain unchanged. No extra MINOR bump.
 
-Validation:459models,0fail/skip; full combined native suite including seasons,
-stock/XP/receipts/IndexedDB/Fog and both corrections; exact failure-state replay;
-Studio Canvas/WebGL/mobile; actual archived-source459tests/build/Chromium;
-archive SHA/catalog/changelog validation; final Pages artifact with73canonical
-URLs,2456HTTP files/121455383bytes/correct MIME+hashes; final archive/current UI,
-Save14, incompatible-slot preservation and historical storage isolation.
+Makes the native Smelter check observe physically carried inputs alongside
+partial work, and makes blueprint clicks settle the camera and use genuine
+exposed canvas points. Permanent regressions cover a late Hauler and an actual
+obstructing DOM control. No gameplay or Save14 model was rewritten by Codex.
 
-Latest mainf1d6526 Draft Studio follow-up is also preserved:462working-tree
-models and updated Studio smoke/Pages build/archive HTTP pass. Game/build paths
-are identical to source02a; its archived459test result and full native proof
-remain exact. No Draft military visual or mechanic was added to the game.
+Final release verification now reads all archived blobs from the actual
+successful deployment’s Git commit and compares exact files/SHA-256, including
+the manifest and version-index provenance. Newer live development is allowed;
+an old deployment plus an archive present only locally fails. The public tag,
+source tree, package version, released notes and playable catalog remain checked.
+The actual public catalog/manifest must also match, so a pre-tag build cannot
+pass using only a local catalog. Preflight still requires matching deployed live
+source and all nine checks.
 
-All72previous snapshots/URLs/save namespaces stay unchanged. Source tree and
-local prepared tag are recorded in M2-release-publication.md. No public tag was
-moved or pushed; publish v0.3.0 at02a only after the real main merge/gates, then
-verify tag-aware Pages and release:verify before marking M2 RELEASED. C01–C08 is
-already queued after the original master15; master11 has not started. No new
-release approval is needed.
+Validation:474/474 tests,0fail/skip; changelog/catalog/archive SHA validation;
+Pages production build;73canonical URLs/2456HTTP files/121455383bytes/MIME/SHA;
+Studio Canvas/WebGL/export/mobile smoke. Real Git fixtures cover corrupted,
+missing/extra/symlink archive files and stale deployment metadata. All71files
+of the actual02a archive pass the new Git-blob verifier locally. The frozen
+source independently passed459tests/build/Chromium. Full current-game native
+integration after approved-ground/building merges exits0, including production,
+Fog/zoom,Population200,seasons,physical construction/cancellation,Save14 and
+historical-game storage isolation. No current gameplay path changed afterward.
+
+All72previous snapshots/URLs/save namespaces are unchanged. No public tag was
+pushed or moved; local v0.3.0 remains prepared at02a. After actual main merge and
+Pages/gates, publish only that tag, run a tag-aware Pages build and release:verify,
+then mark M2 RELEASED and continue master11. Master11–15 and queued C01–C08 remain
+unstarted. Autonomous milestone publication is already authorized.

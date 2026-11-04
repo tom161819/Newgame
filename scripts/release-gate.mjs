@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { milestoneStages,completedStages,pagesEvidence,releaseNumber } from './release-gate-lib.mjs';
 import { parseChangelog,readRelease } from './changelog-lib.mjs';
 import { readVersionCatalog } from './version-catalog.mjs';
-import { verifyDeployedArchive } from './deployed-archive.mjs';
+import { verifyDeployedArchive,verifyPublishedRelease } from './deployed-archive.mjs';
+import { digest } from './archive-lib.mjs';
 import { nextVersion } from '../src/data/semver.js';
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2),mode=args[0];
@@ -41,7 +42,10 @@ if(mode==='check'){
   if(JSON.stringify(taggedRelease)!==JSON.stringify(data.releases.find(release=>release.version===data.version)))throw new Error('Published release notes differ from the tagged release.');
   report.deployedArchive=await verifyDeployedArchive({root,deploymentCommit:deployed,releaseCommit:commit,version:data.version});
   const catalog=await readVersionCatalog(root),entry=catalog.versions.find(v=>v.version===data.version);if(!entry?.available||entry.commit!==commit)throw new Error('The official release has no matching playable archive.');
-  report.tag=tag;report.releaseCommit=commit;report.archiveURL=entry.archiveURL;report.checks.push({command:'exact public tag / frozen release notes / immutable source archive / actual deployed archive blobs and index',status:'passed'});
+  const publishedFile=route=>{try{return execFileSync('curl',['--fail','--silent','--show-error','--location','--max-time','30',new URL(route,pages.url).href],{stdio:['ignore','pipe','pipe'],maxBuffer:8*1024*1024});}catch{throw new Error('Cannot verify the actual published release artifact through the configured HTTPS connection.');}};
+  const publishedCatalog=JSON.parse(publishedFile('versions/catalog.json').toString('utf8'));
+  report.publishedRelease=verifyPublishedRelease({catalog:publishedCatalog,manifest:publishedFile(`${entry.archiveURL}snapshot.json`),entry,manifestHash:digest(await readFile(new URL(`../public/versions/${commit}/snapshot.json`,import.meta.url)))});
+  report.tag=tag;report.releaseCommit=commit;report.archiveURL=entry.archiveURL;report.checks.push({command:'exact public tag / frozen release notes / actual deployed archive blobs and index / live playable catalog and manifest',status:'passed'});
 }
 if(option('report'))await writeFile(option('report'),JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify(report,null,2));

@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main14071b1 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT 403 | IN PROGRESS: source02a stays frozen; preserve newer approved ground and production-building art. Verify actual deployed archive blobs independently of newer live development, then run relevant integration checks. Public tag/deployment gates pending; master11/C01–C08 unstarted. | Native smoke regressions; `scripts/release-gate.mjs`, new deployed-archive verifier/tests; release notes, new source archive/catalog and progress docs. No Codex art/schema rewrite. |
+| M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main14071b1 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT403 | READY:474models/Studio/Pages/73archive URLs and full current native pass. Frozen02a has own459test archive; final verifier checks actual deployed Git blobs, allowing later live development. Public tag/main/deployment gates pending; master11/C01–C08 unstarted. | Native smoke regressions; release-gate/deployed-archive verifier and tests; release notes,02a archive/catalog, progress/verification docs. Claude art unchanged; no schema rewrite. |
 
 ## Kept backups (do not delete without the developer)
 

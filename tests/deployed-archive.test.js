@@ -5,7 +5,7 @@ import { mkdtemp,mkdir,writeFile,readFile,rm,symlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { digest } from '../scripts/archive-lib.mjs';
-import { verifyDeployedArchive } from '../scripts/deployed-archive.mjs';
+import { verifyDeployedArchive,verifyPublishedRelease } from '../scripts/deployed-archive.mjs';
 
 async function fixture(t){
   const root=await mkdtemp(path.join(tmpdir(),'newgame-deployed-archive-'));t.after(()=>rm(root,{recursive:true,force:true}));
@@ -65,4 +65,16 @@ test('a manifest cannot claim another tree even when all local asset hashes matc
   const f=await fixture(t),file=f.prefix+'snapshot.json',manifest=JSON.parse(await readFile(path.join(f.root,file),'utf8'));
   await f.write(file,JSON.stringify({...manifest,tree:'f'.repeat(40)}));
   await assert.rejects(f.verify(),/actual release source tree/);
+});
+
+test('final release proof checks the live playable official entry and exact served manifest',()=>{
+  const entry={version:'0.3.0',title:'M2: Resources, economy and iron',date:'2026-11-04',tag:'v0.3.0',commit:'a'.repeat(40),archiveURL:`/Newgame/versions/${'a'.repeat(40)}/`,available:true,releaseType:'milestone',reconstructed:false,changes:{added:['Actual iron production.']}};
+  const manifest=Buffer.from('{"commit":"'+entry.commit+'"}\n'),manifestHash=digest(manifest);
+  const catalog={schema:1,currentBuild:{commit:'b'.repeat(40)},versions:[structuredClone(entry)]};
+  assert.equal(verifyPublishedRelease({catalog,manifest,entry,manifestHash}).commit,entry.commit);
+  for(const change of [{available:false},{commit:'b'.repeat(40)},{tag:undefined},{archiveURL:'/wrong/'},{changes:{added:['Unverified replacement.']}}]){
+    assert.throws(()=>verifyPublishedRelease({catalog:{...catalog,versions:[{...entry,...change}]},manifest,entry,manifestHash}),/Published catalog/);
+  }
+  for(const versions of [[],[entry,entry]])assert.throws(()=>verifyPublishedRelease({catalog:{...catalog,versions},manifest,entry,manifestHash}),/Published catalog/);
+  assert.throws(()=>verifyPublishedRelease({catalog,manifest:Buffer.from('stale manifest'),entry,manifestHash}),/Published archive manifest/);
 });

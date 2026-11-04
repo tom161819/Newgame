@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { isDeepStrictEqual } from 'node:util';
 import { digest,verifySnapshot } from './archive-lib.mjs';
 
 // A local archive does not prove that a successful, possibly older Pages run
@@ -34,4 +35,14 @@ export async function verifyDeployedArchive({root,deploymentCommit,releaseCommit
   const matches=records.filter(record=>record.commit===releaseCommit);
   if(matches.length!==1||matches[0].tree!==snapshot.tree||matches[0].basePath!==snapshot.basePath) throw new Error('Deployed version index does not identify the exact release archive.');
   return {deploymentCommit,releaseCommit,archivePath,verifiedGitFiles:entries.length};
+}
+
+// A build made before the public tag existed may contain the archive but still
+// list the official release as unavailable. Verify what Pages actually serves.
+export function verifyPublishedRelease({catalog,manifest,entry,manifestHash}) {
+  const matches=catalog?.schema===1&&Array.isArray(catalog.versions)?catalog.versions.filter(item=>item.version===entry.version):[];
+  const fields=['version','title','date','tag','commit','archiveURL','available','releaseType','reconstructed','changes'];
+  if(matches.length!==1||matches[0].available!==true||fields.some(field=>!isDeepStrictEqual(matches[0][field],entry[field]))) throw new Error('Published catalog does not advertise the exact tagged playable release; run and verify a tag-aware Pages build.');
+  if(digest(manifest)!==manifestHash) throw new Error('Published archive manifest differs from the verified immutable release.');
+  return {version:entry.version,commit:entry.commit,archiveURL:entry.archiveURL,manifestSHA256:manifestHash};
 }

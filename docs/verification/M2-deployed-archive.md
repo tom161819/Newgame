@@ -24,7 +24,12 @@ Final `release:verify` now distinguishes that live build from the frozen release
   non-blob entries and any differing SHA-256, including the raw manifest bytes.
 - Require that deployed commit's version index to advertise the exact source
   tree and canonical archive URL. Keep the matching playable official catalog
-  entry check. A tag-aware Pages build remains required after tag publication.
+  entry check.
+- Read the actual public Pages catalog and archive manifest over HTTPS. Require
+  the official playable entry, exact released changes/tag/source/link and raw
+  manifest SHA-256 to match. This catches a build made before tag publication,
+  even if its Git tree already contains the archive and a local tag exists.
+  No inaccessible public artifact is silently treated as verified.
 
 A successful old deployment plus an archive present only in the local branch
 cannot pass. Newer approved live graphics need not be copied into an old release.
@@ -37,7 +42,10 @@ The real Git fixtures cover binary PNG bytes, newer live development, an old
 deployment missing the archive, a corrupted deployed image hidden by a restored
 local copy, missing/extra files, symlinks, incorrect published metadata, a false
 source tree and a mismatched package version. Together with existing gate tests:
-12/12 pass. The complete current suite passes473/473,0failed/0skipped.
+13/13 pass. The complete current suite passes474/474,0failed/0skipped.
+The live-catalog regression rejects unavailable/missing/duplicate releases,
+wrong source/tag/link/notes and a stale served manifest; newer live development
+is allowed. Actual public release verification remains pending, not simulated.
 
 Direct verification against integration commit
 `3d5ac80ebb389f3be810a440634a66950ae19506` hashes all71 actual Git files in the

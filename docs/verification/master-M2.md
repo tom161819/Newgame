@@ -1,21 +1,18 @@
 # M2 — Resources, economy and iron — local preflight verified
 
-Status: FINAL CANDIDATE VERIFIED LOCALLY; publication IN PROGRESS.
-Latest exact source02a3a43ace8adc993aea7a392424d7cdf4e7dec9 has459passing models,
-full native/Studio checks, corrected release fixtures, merged V01 and coherent
-0.3.0notes. Its actual archive brings the total to73, with all72older builds
-unchanged;73HTTP paths/2456files/UI/Save14 pass. Tag remains private, main/source
-deployment and release gates are pending. See the latest publication checkpoint;
-the earlier preflight details below do not supersede it.
-Game0.3.0, Save14, was merged through PR15 into main7595b80. The user authorized this release
-and automatic milestone releases without another prompt, then explicitly asked
-to upload first and test afterwards. The previous approval hold is superseded.
-Latest main c2c2862 is integrated normally at f053be1;455 tests, Pages build and
-current native Save14 smoke pass. A local-only v0.3.0 tag and final source f053be1
-archive are now prepared:72snapshots,1new,0skipped,455tests/build/Chromium on the
-actual archived source; all71old snapshots unchanged. The public tag and exact
-successful deployment remain pending (Pages41877748443 currentlyQueued).
-See [the current publication checkpoint](M2-release-publication.md).
+Status: FROZEN RELEASE CANDIDATE; public publication pending in
+[PR22](https://github.com/tom161819/Newgame/pull/22). Source02a has its own459-test
+archive (73total,72older unchanged),0.3.0/Save14 and coherent release notes.
+The current working branch preserves approved ground/building art through
+main14071b1:474models, validators, Pages build,73canonical archive URLs/2456HTTP
+files and Studio smoke pass. The complete current-game native suite also exits0, including physical
+production/construction, Fog/zoom, seasons, current Save14 and historical games.
+Final verification now hashes exact archive blobs from the actual deployed Git
+commit; preflight still requires the reviewed live source to match that deploy.
+See [the current publication checkpoint](M2-release-publication.md) for exact
+SHAs, results, the private tag and the actual network blocker. No tag/main/Pages
+success or formal final gate is claimed before it really occurs. Automatic M2–M5
+publication is already authorized; no new approval is needed.
 
 ## Verified implementation commits
 
