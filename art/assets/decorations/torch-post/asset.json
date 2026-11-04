@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "torch-post",
+  "name": "Torch post",
+  "category": "decorations",
+  "description": "A standalone torch on a wooden post. Light source for night scenes along paths and gates.",
+  "footprint": { "width": 1, "height": 1 },
+  "generator": "torch-post",
+  "variants": [
+    {
+      "id": "torch-post-iron",
+      "name": "Iron cage torch",
+      "version": 1,
+      "notes": "Wooden post, iron cage, flame and light added at runtime.",
+      "spec": { "postHeight": 1.45, "postWidth": 0.12, "basket": "cage", "light": "torch" }
+    },
+    {
+      "id": "torch-post-brazier",
+      "name": "Stone brazier",
+      "version": 1,
+      "notes": "Low stone pedestal with an iron bowl; larger and warmer light.",
+      "spec": { "postHeight": 0.75, "postWidth": 0.36, "basket": "bowl", "light": "brazier" }
+    }
+  ]
+}

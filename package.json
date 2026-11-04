@@ -21,13 +21,18 @@
     "release:verify": "node scripts/release-gate.mjs verify",
     "archive:stage": "node scripts/stage-archive.mjs",
     "build:pages": "npm run build -- --base=/Newgame/ && npm run archive:stage",
-    "archive:verify-site": "node scripts/verify-site-archives.mjs"
+    "archive:verify-site": "node scripts/verify-site-archives.mjs",
+    "studio": "vite --config studio/vite.config.js",
+    "studio:build": "vite build --config studio/vite.config.js",
+    "studio:smoke": "node scripts/studio-smoke.mjs",
+    "studio:export": "node scripts/studio-export.mjs"
   },
   "dependencies": {
     "phaser": "4.2.1"
   },
   "devDependencies": {
     "playwright-core": "1.57.0",
+    "three": "0.186.1",
     "vite": "8.3.5"
   }
 }

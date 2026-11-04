@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Medieval Kingdom Asset Studio</title>
+    <meta name="claude:viewport-fit-sides" content="cover" />
+    <link rel="icon" href="data:," />
+    <meta name="description" content="Review, compare and approve isometric sprites for Medieval Kingdom." />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div><strong>Asset Studio</strong><span class="brand-sub">Medieval Kingdom · 2:1 isometric</span></div>
+      </div>
+      <nav class="views" aria-label="Studio views">
+        <a id="nav-assets" href="#assets" aria-current="page">Assets</a>
+        <a id="nav-style" href="#style-guide">Style guide</a>
+        <a href="./phaser-demo.html">Phaser demo</a>
+      </nav>
+      <div class="review-status">
+        <span id="review-summary" class="review-summary" aria-live="polite"></span>
+        <button id="open-export" type="button" class="button primary">Export review</button>
+      </div>
+    </header>
+    <p id="studio-alert" class="studio-alert" role="alert" hidden></p>
+    <div class="shell">
+      <aside class="library" aria-label="Asset library">
+        <label class="search"><span class="visually-hidden">Search assets</span><input id="library-search" type="search" placeholder="Search name or id" autocomplete="off" /></label>
+        <div id="library-source" class="segmented compact" role="group" aria-label="Asset source"></div>
+        <div id="library-categories" class="chips" role="group" aria-label="Category"></div>
+        <ul id="library-list" class="library-list"></ul>
+      </aside>
+      <main id="main" class="workspace" tabindex="-1"></main>
+    </div>
+    <dialog id="export-dialog" aria-labelledby="export-title">
+      <form method="dialog" class="dialog-body" id="export-form">
+        <header class="dialog-head"><h2 id="export-title">Export review</h2><button type="submit" class="button ghost" aria-label="Close">Close</button></header>
+        <p class="dialog-lede">Local review decisions live only in this browser. To make them permanent, replace <code>art/approvals.json</code> in the repository with the file below and merge it through a pull request.</p>
+        <ul id="export-changes" class="change-list"></ul>
+        <label for="export-json" class="field-label">art/approvals.json</label>
+        <textarea id="export-json" rows="12" readonly spellcheck="false"></textarea>
+        <div class="dialog-actions">
+          <button type="button" id="export-copy" class="button primary">Copy JSON</button>
+          <button type="button" id="export-download" class="button">Download approvals.json</button>
+          <a id="export-github" class="button ghost" target="_blank" rel="noopener noreferrer">Open the file on GitHub</a>
+          <span id="export-feedback" class="feedback" aria-live="polite"></span>
+        </div>
+        <ol class="steps">
+          <li>Copy or download the JSON above.</li>
+          <li>On GitHub open <code>art/approvals.json</code>, choose <em>Edit</em>, paste the content.</li>
+          <li>Commit to a new branch and open a pull request. The approval becomes permanent after the merge.</li>
+        </ol>
+        <div class="danger-zone">
+          <button type="button" id="discard-local" class="button danger">Discard local review</button>
+          <span id="discard-hint" class="feedback"></span>
+        </div>
+      </form>
+    </dialog>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "assetId": "house",
+  "variantId": "house-stone",
+  "name": "Stone house with tile roof",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "2cf4b872",
+  "generator": "house",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 124,
+  "height": 127,
+  "anchor": {
+    "x": 55,
+    "y": 102
+  },
+  "origin": {
+    "x": 0.44355,
+    "y": 0.80315
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "modelHeight": 2.49,
+  "lights": []
+}

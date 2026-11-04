@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "quarry",
+  "name": "Quarry",
+  "category": "buildings",
+  "description": "A 3 × 3 quarry over a stone deposit. Candidate replacement for the current Quarry sprite.",
+  "footprint": { "width": 3, "height": 3 },
+  "generator": "quarry",
+  "gameObjectId": "quarry",
+  "variants": [
+    {
+      "id": "quarry-cliff",
+      "name": "Rock face with hoist",
+      "version": 1,
+      "notes": "Stepped worked face at the back, timber hoist, cut blocks and a tool shed.",
+      "spec": { "layout": "cliff", "rockHeight": 1.7, "blocks": 5, "hoist": true, "shed": true, "seed": 3 }
+    },
+    {
+      "id": "quarry-pit",
+      "name": "Stepped pit",
+      "version": 1,
+      "notes": "Lower terraced pit that keeps the view open behind it.",
+      "spec": { "layout": "pit", "rockHeight": 1.0, "blocks": 6, "hoist": true, "shed": true, "seed": 7 }
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "assetId": "house",
+  "variantId": "house-wood",
+  "name": "Plank cottage",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "1d7d3382",
+  "generator": "house",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 112,
+  "height": 121,
+  "anchor": {
+    "x": 50,
+    "y": 98
+  },
+  "origin": {
+    "x": 0.44643,
+    "y": 0.80992
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "modelHeight": 2.19,
+  "lights": []
+}
