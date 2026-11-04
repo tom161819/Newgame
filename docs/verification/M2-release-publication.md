@@ -1,5 +1,16 @@
 # M2 publication checkpoint — verified candidate, public release pending
 
+## Actual PR22 merge and next-task start — 2026-11-04
+
+PR22 is really merged as maincfe51fafd0e3a509c7335d6564fa206193165e20 (parents
+2663942 and8a2fed5). The final e2d9ce6 evidence-only follow-up had not reached
+that merge; its own documentation was preserved via3306a7a in the new C01 branch.
+Game/build source paths agree. The public v0.3.0 tag is still absent as last
+checked. An actual HTTPS request to the public Pages catalog still fails at
+CONNECT403, so final live-publication verification remains blocked. No public
+release completion is invented. The user explicitly requested starting further
+tasks; C01 begins from integrated main, with this metadata blocker retained.
+
 ## Manual-merge handoff after PR28 — 2026-11-04
 
 PR22 was confirmed OPEN on the ordinary public GitHub page. Main2663942/PR28

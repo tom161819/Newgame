@@ -26,6 +26,12 @@ Keep original IDs and M3–M5 release gates; this order overrides older requests
 that put C01–C08 after master15. Follow `docs/TASK_QUEUE.md` and
 `docs/CODEX_PROGRESS.md`, including the deferred Stables/Knight dependency.
 
+After PR22 was actually merged (maincfe51fa), the user explicitly requested
+starting the next tasks. C01 development may proceed from that integrated base
+while final M2 public-artifact verification is genuinely network-blocked. Keep
+M2 publication pending and all release gates; do not fabricate a completed tag
+or deployment. This supersedes waiting on release metadata to start C01.
+
 # Project workflow
 
 - Read `docs/TASK_QUEUE.md` and finish one queued step at a time. Follow the user's standing commit, deployment and checkpoint instructions.

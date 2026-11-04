@@ -7,9 +7,14 @@ active M2 publication after master01–10, then **C01–C08**, then original mas
 instruction to wait for all15 master stages; the original request stays intact.
 AGENTS.md, alpha save policy and Claude's ownership remain in force.
 
+Latest start instruction: after manually merging PR22 as maincfe51fa, the user
+asked to start the next tasks now. C01 development proceeds from this integrated
+baseline while the actual M2 live-catalog CONNECT403 blocker stays recorded as
+publication pending; no release checks are bypassed or completion fabricated.
+
 | Order | Task | Status | Dependencies / evidence |
 |---|---|---|---|
-|1|C01 Fog, unknown-ground movement and provisional blueprints|PENDING|M2 publication after master01–10 complete/deployed; audit current Fog first.|
+|1|C01 Fog, unknown-ground movement and provisional blueprints|IN PROGRESS|PR22/master01–10 integrated at maincfe51fa. User explicitly asked to start next tasks; public M2 metadata verification remains network-blocked. Audit current Fog first.|
 |2|C02 Staffing picker and Granary indicator|PENDING|C01 merged and deployed; inspect actual Granary workplaces.|
 |3|C03 Auto employment and Castle priorities|PENDING|C02 merged/deployed; extend existing staffing instead of a second scheduler.|
 |4|C04 Production diagnostics and notices|PENDING|C03 merged/deployed; reuse authoritative work states and activity events.|

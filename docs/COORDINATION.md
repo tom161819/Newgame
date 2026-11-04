@@ -12,7 +12,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main2663942 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT403 | READY for manual merge:477models, validators, Pages build, native Population200/Fog/current Save14/historical games and updated Studio pass. Screenshot conflict fixed and uploaded as8a2fed5; earlier full/archive proofs retained. API publication blocker remains. Actual final gh merge22 at e574f75 still API Forbidden. Frozen02a has own459test archive; final verifier checks actual deployed Git blobs, allowing later live development. Public tag/main/deployment gates pending; new user order C01–C08 then master11–15, all unstarted. | Native smoke regressions; release-gate/deployed-archive verifier and tests; release notes,02a archive/catalog, progress/verification docs. Claude art unchanged; no schema rewrite. |
+| C01 Fog, unknown-ground movement and provisional blueprints | Codex | `codex/fow-exploration-blueprints` from maincfe51fa | not yet opened | IN PROGRESS: user requested next tasks after actual PR22 merge. Audit sight/knowledge, implement unknown movement and survey-safe construction; no art pass. | Fog/exploration, GameScene input/preview, movement/pathfinding, construction/materials/logistics/validation/current Save schema and relevant UI/tests/smoke; CHANGELOG/progress. Claude art/Studio remain owned by Claude. |
+| M2 release metadata | Codex | source02a3a43, implementation merged PR22/maincfe51fa | PR22 MERGED | PUBLICATION PENDING: actual public Pages catalog HTTPS still fails CONNECT403. No public tag/final verification success claimed. This real network blocker is separate from C01 development explicitly requested now. | Release evidence/tag/catalog verification; do not alter immutable snapshots. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -20,6 +21,8 @@ None pending. Add entries here when one pull request must wait for another.
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-04 [#22](https://github.com/tom161819/Newgame/pull/22) M2 final source archive, reliable native/provenance checks, preserved approved graphics and reordered C01–C08 → master11–15; manually merged as cfe51fafd0e3a509c7335d6564fa206193165e20. Latest source477models and targeted/Studio checks passed. Final public release verification remains separately pending above.
 
 - 2026-11-04 [#28](https://github.com/tom161819/Newgame/pull/28) Approved assets part 5: eight-direction profession/gender villager art and Studio facing export (Claude), main2663942, preserved unchanged.
 

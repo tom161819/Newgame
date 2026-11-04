@@ -51,6 +51,13 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
    - Fáze D dokončena: rozpis šesti fyzických kategorií, sklady/nosiči/cíle/náklady, ruční vyzvednutí a odložení králem, legacy značky, bezpečná obnova neplatných pokynů a nejrychlejší cesty po pěšinách. 271/271 testů (12 nových), build, produkční browser/IndexedDB/mobilní UI a skutečný publikovaný schema5 save ověřeny. Zimní 100×100 scéna s 20 NPC, 6 nosiči, 3 sýpkami, 2 sklady, 4 staveništi, 4 výrobami a 22 pozemky: průměr 17,61 ms (~57 FPS), p95 33,3 ms, bez JS chyb; snapshot validní. Archiv62 skutečných verzí (7 nových,0 vynechaných) ověřen včetně SHA-256. Publikace `e721a68`, Pages `41694834348` **Success** (58 s), původní URL potvrzena nasazením. Podrobnosti: [ověření](verification/step-24.md).
    - Každou dokončenou a otestovanou fázi uložit samostatným commitem.
 
+## Aktuální navázání po sloučení PR22
+
+PR22 skutečně sloučen do maincfe51fa. Uživatel poté výslovně požádal začít další
+úkoly: C01 implementace začíná nad integrovanou hrou. Finální M2 tag/ověření
+veřejného katalogu zůstává skutečně síťově blokované (CONNECT403), samostatně
+PENDING; nic se neoznačuje za vydané. Nové funkce používají vlastní větve/PR.
+
 ## Následuje — nové pořadí podle uživatele2026-11-04
 
 1. **Dokončit rozpracované vydání M2 v0.3.0.** Master01–10 jsou implementované; zbývá skutečné sloučení kandidáta v PR22, Pages/gates/tag. M1v0.2.0 je RELEASED. [Stav a ověření](verification/M2-release-publication.md). Bez nové žádosti o svolení, zastavit jen při reálné technické blokaci.
