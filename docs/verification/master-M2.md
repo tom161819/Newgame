@@ -43,10 +43,10 @@ checked; no tag/version/archive was created. This is not a released milestone.
    Main7012635 already contains the main Stage10 feature through PR11.
 2. Verify successful GitHub Pages for the exact final mainSHA. This cloud environment
    still blocks GitHub API PR creation; do not replace it with a direct main push.
-3. The uploaded developer handoff explicitly says after Stage10 to prepare the M2
-   gate in a branch and stop for a release instruction. That rule was not changed
-   by the later conflict-only authorization. Request/use that actual instruction
-   before release preparation/publication.
+3. The user subsequently authorized M2 and standing automatic M1–M5 releases.
+   The previous Stage10 stop/release-confirmation requirement is superseded.
+   Complete the actual gates and publication without another approval prompt;
+   only genuine access/environment blockers can pause progress.
 4. Run the existing formal command with actual evidence, never fabricated IDs:
    npm run release:gate -- M2 --pages-run=ACTUAL_RUN --pages-commit=ACTUAL_FULL_SHA
    --report=/tmp/m2-gate.json. It verifies clean source/deployment and all checks.

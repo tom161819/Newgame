@@ -22,3 +22,17 @@ Save14 roundtrip pass. Earlier combined full native gate passed before the last
 narrow two-Quarry validator correction, covered by dedicated restored mining and
 forged-binding tests. Final release candidate requires new metadata/UI/build/
 archive checks. Formal gate still needs exact successful Pages evidence.
+
+Candidate preparation is separate: codex/m2-release preserves the0.2.0 preflight
+source and standing authorization; codex/m2-release-candidate prepares package/
+lock/Changelog0.3.0 with M2 metadata, preserving the game/Save14 model and all prior
+releases. No tag or publication is claimed. The API draft activation is a technical
+prerequisite, not another release approval. Continue with local candidate checks
+and an actual-source archive preview before reporting the external blocker.
+
+Prepared0.3.0 candidate: clean npm ci,438/438 model tests, changelog/catalog validation
+and build:pages pass. Source evidence retains all71archives. Actual existing main
+7012635 has successful Pages run41853854762, but that source lacks the final small
+Quarry correction and release metadata. It is not proof of the prepared release.
+No new release tag exists yet. The candidate source will be committed/pushed,
+then archived as a real-commit preview and exercised in the full browser suite.
