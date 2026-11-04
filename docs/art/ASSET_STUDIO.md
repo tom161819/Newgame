@@ -82,7 +82,7 @@ Nic z toho tento MVP nedělá.
 
 ## Omezení MVP
 
-- Generátory jsou dva (`watchtower`, `torch-post`). Jednotky, stromy a animace postav zatím nemají recept.
+- Generátory: `watchtower`, `torch-post`, `house`, `tree` (dub, borovice), `wall` (kamenná hradba, palisáda), `quarry`. Jednotky a animace postav zatím nemají recept.
 - Animovaný je jen plamen, a to procedurálně v kompozitoru. Snímky animací se zatím neexportují.
 - Export je deterministický v jednom prostředí. Jiný prohlížeč nebo GPU může dát drobně odlišné pixely, proto je autoritou commitnutý PNG.
 - Schválení do repozitáře vyžaduje ruční krok přes GitHub (vložit JSON a otevřít PR). Studio nemá token a na GitHub nezapisuje.

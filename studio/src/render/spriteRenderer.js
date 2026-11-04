@@ -74,6 +74,20 @@ function meshFor(part, style) {
     geometry = new THREE.CylinderGeometry(part.radiusTop, part.radiusBottom, part.height, part.segments, 1, false, part.segments === 4 ? Math.PI / 4 : 0);
     scaleCylinderUVs(geometry, part, repeat);
     geometry.translate(0, part.height / 2, 0);
+  } else if (part.shape === 'prism') {
+    const [w, h, d] = part.size, shape = new THREE.Shape();
+    shape.moveTo(-w / 2, 0); shape.lineTo(w / 2, 0); shape.lineTo(0, h); shape.closePath();
+    geometry = new THREE.ExtrudeGeometry(shape, { depth: d, bevelEnabled: false });
+    geometry.translate(0, 0, -d / 2);
+    const uv = geometry.attributes.uv;
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) / repeat, uv.getY(i) / repeat);
+  } else if (part.shape === 'sphere') {
+    const [rx, ry, rz] = part.radii;
+    geometry = new THREE.IcosahedronGeometry(1, part.detail ?? 1);
+    geometry.scale(rx, ry, rz);
+    const uv = geometry.attributes.uv, scale = 2 * Math.max(rx, rz) / repeat;
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * scale, uv.getY(i) * scale);
+    geometry.translate(0, ry, 0);
   } else throw new RangeError(`Unknown primitive ${part.shape}`);
   const mesh = new THREE.Mesh(geometry, mat);
   mesh.position.set(...part.at);

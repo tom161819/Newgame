@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "pine-tree",
+  "name": "Pine",
+  "category": "trees",
+  "description": "Conifer on one tile. Variants cover growth stages used by forestry.",
+  "footprint": { "width": 1, "height": 1 },
+  "generator": "tree",
+  "gameObjectId": "pine_tree",
+  "variants": [
+    {
+      "id": "pine-tree-mature",
+      "name": "Mature pine",
+      "version": 1,
+      "notes": "Tall, four tiers.",
+      "spec": { "kind": "pine", "height": 3.3, "crown": 0.56, "trunk": 0.08, "tiers": 4 }
+    },
+    {
+      "id": "pine-tree-young",
+      "name": "Young pine",
+      "version": 1,
+      "notes": "Growth stage before maturity.",
+      "spec": { "kind": "pine", "height": 1.8, "crown": 0.38, "trunk": 0.05, "tiers": 3 }
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "assetId": "pine-tree",
+  "variantId": "pine-tree-mature",
+  "name": "Mature pine",
+  "category": "trees",
+  "version": 1,
+  "specHash": "fa63223e",
+  "generator": "tree",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 68,
+  "height": 133,
+  "anchor": {
+    "x": 27,
+    "y": 130
+  },
+  "origin": {
+    "x": 0.39706,
+    "y": 0.97744
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "modelHeight": 3.307,
+  "lights": []
+}

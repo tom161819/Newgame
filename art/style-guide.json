@@ -20,13 +20,15 @@
     "doorHeight": 0.95,
     "storeyHeight": 1.0,
     "footprintMargin": 0.08,
+    "canopyOverhang": 0.3,
     "ranges": {
       "tower": [3.2, 4.8],
       "house": [1.6, 2.8],
       "wall": [1.4, 2.0],
       "tree": [1.6, 3.6],
       "resource": [0.15, 0.6],
-      "decoration": [0.3, 1.8]
+      "decoration": [0.3, 1.8],
+      "quarry": [1.0, 2.4]
     }
   },
   "palette": {
@@ -46,7 +48,14 @@
     "banner_red": "#9b2c26",
     "fire_core": "#fff1b8",
     "fire": "#ffb347",
-    "fire_edge": "#d9531e"
+    "fire_edge": "#d9531e",
+    "plaster": "#d6cbb2",
+    "bark": "#5e4632",
+    "leaf": "#5d7d38",
+    "leaf_light": "#7a9846",
+    "leaf_dark": "#435f2a",
+    "pine": "#3c5a38",
+    "rock": "#8b8374"
   },
   "materials": {
     "stone": { "color": "stone", "texture": "bricks", "repeat": 1.2, "variation": 0.1, "description": "Coursed field stone with dark mortar lines. Main walls of towers, keeps and walls." },
@@ -59,7 +68,14 @@
     "thatch": { "color": "thatch", "texture": "noise", "repeat": 1.0, "variation": 0.14, "description": "Straw roofs of farms and peasant houses." },
     "iron": { "color": "iron", "texture": "none", "repeat": 1, "variation": 0.04, "description": "Brackets, hinges, braziers and bands." },
     "opening": { "color": "mortar", "texture": "none", "repeat": 1, "variation": 0, "description": "Arrow slits and dark window openings." },
-    "banner": { "color": "banner_red", "texture": "none", "repeat": 1, "variation": 0.05, "description": "Cloth banners in the kingdom colour." }
+    "banner": { "color": "banner_red", "texture": "none", "repeat": 1, "variation": 0.05, "description": "Cloth banners in the kingdom colour." },
+    "plaster": { "color": "plaster", "texture": "noise", "repeat": 1.2, "variation": 0.06, "description": "Lime plaster between timber frames." },
+    "bark": { "color": "bark", "texture": "planks", "repeat": 0.6, "variation": 0.14, "description": "Tree trunks and rough logs." },
+    "foliage": { "color": "leaf", "texture": "noise", "repeat": 0.8, "variation": 0.18, "description": "Broadleaf canopy, main mass." },
+    "foliage_light": { "color": "leaf_light", "texture": "noise", "repeat": 0.8, "variation": 0.16, "description": "Sunlit canopy clusters." },
+    "foliage_dark": { "color": "leaf_dark", "texture": "noise", "repeat": 0.8, "variation": 0.16, "description": "Shaded canopy clusters and hedges." },
+    "pine_needles": { "color": "pine", "texture": "noise", "repeat": 0.7, "variation": 0.18, "description": "Conifer tiers." },
+    "rock": { "color": "rock", "texture": "noise", "repeat": 1.0, "variation": 0.2, "description": "Natural rock outcrops and quarry faces." }
   },
   "light": {
     "sun": { "direction": [0.55, 1.0, 0.9], "color": "#fff0d4", "intensity": 2.6 },

@@ -7,7 +7,7 @@ import { gridToWorld } from '../src/game/isometric.js';
 import { objectDefinitions } from '../src/data/objects/index.js';
 import { projectPoint, footprintDiamond, heightInPixels, PIXELS_PER_UNIT, VERTICAL_PIXELS_PER_UNIT, cameraDirection } from '../studio/src/lib/projection.js';
 import { stableStringify, fnv1a, specHash } from '../studio/src/lib/hash.js';
-import { validateAssetSpec, buildCatalog, filterCatalog, studioCategoryForGameObject, checkModel, modelBounds, CATEGORY_IDS } from '../studio/src/lib/specs.js';
+import { validateAssetSpec, buildCatalog, filterCatalog, studioCategoryForGameObject, checkModel, modelBounds, primitiveBounds, CATEGORY_IDS } from '../studio/src/lib/specs.js';
 import { STATUSES, emptyManifest, validateManifest, readLocal, writeLocal, reviewState, updateLocal, discardLocal, buildExportManifest, pendingChanges, LOCAL_KEY } from '../studio/src/lib/approvals.js';
 import { timePreset, flicker, lightStrength, resolveLight, hexToRgb, rgbToHex, TIMES } from '../studio/src/lib/lighting.js';
 import { GENERATORS } from '../studio/src/generators/index.js';
@@ -93,6 +93,26 @@ test('generators are deterministic, clamp oversized specs into the footprint and
   const model = GENERATORS.watchtower.build(square.spec, { footprint: { width: 2, height: 2 }, style });
   assert.equal(model.lights.length, square.spec.torches.length);
   assert.ok(model.lights.every(l => l.type === 'torch' && l.at[1] > 1));
+});
+
+test('prism and sphere bounds are exact and only canopy parts may overhang the footprint', () => {
+  const roof = { shape: 'prism', size: [1.2, 0.6, 2], at: [0, 1, 0], material: 'thatch' };
+  assert.deepEqual(primitiveBounds(roof), { min: [-0.6, 1, -1], max: [0.6, 1.6, 1] });
+  const turned = primitiveBounds({ ...roof, rotation: Math.PI / 2 });
+  assert.ok(Math.abs(turned.max[0] - 1) < 1e-9 && Math.abs(turned.max[2] - 0.6) < 1e-9);
+  assert.deepEqual(primitiveBounds({ shape: 'sphere', radii: [0.5, 0.3, 0.4], at: [1, 2, 3], material: 'foliage' }), { min: [0.5, 2, 2.6], max: [1.5, 2.6, 3.4] });
+  const crown = { shape: 'sphere', radii: [0.7, 0.4, 0.7], at: [0, 1, 0], material: 'foliage' }, footprint = { width: 1, height: 1 };
+  assert.ok(checkModel({ primitives: [crown] }, { footprint, style }).some(p => /leaves the 1×1 footprint/.test(p)), 'plain parts may not overhang');
+  assert.deepEqual(checkModel({ primitives: [{ ...crown, overhang: true }] }, { footprint, style }), [], 'canopy may overhang by the style allowance');
+  assert.ok(checkModel({ primitives: [{ ...crown, radii: [0.9, 0.4, 0.9], overhang: true }] }, { footprint, style }).some(p => /canopy overhang/.test(p)));
+  for (const asset of catalog.studio.filter(a => a.generator === 'tree')) for (const variant of asset.variants) {
+    const model = GENERATORS.tree.build(variant.spec, { footprint: asset.footprint, style });
+    assert.ok(model.primitives.filter(p => !p.overhang).every(p => primitiveBounds(p).max[0] <= 0.5 && primitiveBounds(p).max[2] <= 0.5), `${variant.id} trunk stays on its tile`);
+  }
+  for (const variant of catalog.studio.find(a => a.id === 'stone-wall').variants) {
+    const { min, max } = modelBounds(GENERATORS.wall.build(variant.spec, { footprint: { width: 1, height: 1 }, style }));
+    assert.ok(Math.abs(min[0] + 0.5) < 1e-9 && Math.abs(max[0] - 0.5) < 1e-9, `${variant.id} spans the whole tile so segments join`);
+  }
 });
 
 test('spec hashes are stable, order independent and change with spec, version or generator version', () => {
@@ -194,7 +214,8 @@ test('game definitions map to studio categories and filters combine source, cate
   assert.equal(studioCategoryForGameObject({ id: 'rock_outcrop', category: 'decoration' }), 'nature');
   assert.ok(catalog.game.every(item => CATEGORY_IDS.includes(item.category) && item.id.startsWith('game:')));
   assert.ok(catalog.game.some(item => item.gameObjectId === 'tower' && item.spritePath === 'public/assets/buildings/tower/tower.png'));
-  assert.deepEqual(filterCatalog(catalog.all, { category: 'buildings', source: 'studio' }).map(i => i.id), ['watchtower']);
+  assert.deepEqual(filterCatalog(catalog.all, { category: 'buildings', source: 'studio' }).map(i => i.id).sort(), ['house', 'quarry', 'stone-wall', 'watchtower']);
+  assert.deepEqual(filterCatalog(catalog.all, { category: 'trees', source: 'studio' }).map(i => i.id).sort(), ['oak-tree', 'pine-tree']);
   assert.deepEqual(filterCatalog(catalog.all, { source: 'studio', query: 'TORCH' }).map(i => i.id), ['torch-post']);
   assert.ok(filterCatalog(catalog.all, { source: 'game' }).length >= 10);
 });

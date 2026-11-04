@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "assetId": "stone-wall",
+  "variantId": "stone-wall-crenellated",
+  "name": "Crenellated stone wall",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "0bf964f4",
+  "generator": "wall",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 72,
+  "height": 96,
+  "anchor": {
+    "x": 27,
+    "y": 82
+  },
+  "origin": {
+    "x": 0.375,
+    "y": 0.85417
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "modelHeight": 1.98,
+  "lights": []
+}
