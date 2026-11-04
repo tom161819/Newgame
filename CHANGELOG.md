@@ -6,7 +6,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Fixed
+- Haulers now actually carry goods: a resident given the Hauler profession immediately serves every Warehouse, Granary and construction site in the kingdom instead of waiting for a workplace, so new Warehouses fill without the king.
 - The Castle no longer covers the king when he stands in front of it, and the starting stockpile now appears in front of the Castle instead of behind it.
+
+### Changed
+- Construction supplies are delivered automatically: Haulers carry them first, and a Builder fetches them himself when no Hauler is free. The Deliver Materials button is gone; Build with King on an unsupplied site makes the king carry the materials and then start building.
+- Warehouses and Granaries no longer have Hauler workplace slots. Saved games from earlier versions cannot be loaded and need a new game.
 
 ### Improved
 - Stone walls have a new painted look: solid masonry blocks with a pale wall walk that join seamlessly, with merlons only on the outer edges of a wall line, corner or enclosure.
