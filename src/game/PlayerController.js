@@ -50,6 +50,7 @@ export class PlayerController {
   }
 
   stopForBuilding() {
+    this.scene.naturalResources?.cancelKing();
     this.path = [];
     this.order = null;
     this.roofContinuation = null;
@@ -58,6 +59,7 @@ export class PlayerController {
   }
 
   command(order) {
+    this.scene.naturalResources?.cancelKing();
     if(!this.isAlive||this.state===PLAYER_STATE.DEAD)return false;
     if(order.kind==='enter'&&!buildingIsComplete(order.tower))return false;
     if (this.transitioning) {

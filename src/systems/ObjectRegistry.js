@@ -60,6 +60,7 @@ export function validateDefinition(definition) {
     if(d.category!=='building'||!plainObject(r)||!quantities(r.input)||!quantities(r.output)||!finite(r.duration)||r.duration<=0||!SKILL_IDS.includes(r.skill)||!d.workplace||!Number.isSafeInteger(d.bufferCapacity)||d.bufferCapacity<Math.max(...Object.values(r.input),...Object.values(r.output)))fail(id,'neplatný výrobní recept.');
   }
   if(d.edible!==undefined&&(d.category!=='resource'||typeof d.edible!=='boolean'))fail(id,'neplatné označení potraviny.');
+  if(d.tree!==undefined&&(!plainObject(d.tree)||d.category!=='resource'||d.collectible||!Number.isSafeInteger(d.tree.wood)||d.tree.wood<1||!finite(d.tree.xp)||d.tree.xp<=0||!finite(d.tree.chopDuration)||d.tree.chopDuration<=0||!Array.isArray(d.tree.stages)||d.tree.stages.length!==4))fail(id,'neplatný obnovitelný strom.');
   if(['character','animal'].includes(d.category)&&d.stats===undefined)fail(id,'živá jednotka vyžaduje bojové statistiky.');
   if (d.stats !== undefined && (!plainObject(d.stats) || !['maxHP','attackDPS','armor','attackRange'].every(key=>finite(d.stats[key]))
     || d.stats.maxHP<=0 || d.stats.attackDPS<0 || d.stats.armor<0 || d.stats.armor>90 || d.stats.attackRange<0)) fail(id, 'neplatné bojové statistiky.');

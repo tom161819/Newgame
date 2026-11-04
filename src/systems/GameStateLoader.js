@@ -33,7 +33,7 @@ export function loadGameState(scene,input){
     scene.buildings.push(building);scene.towerViews.set(building.id,scene.createBuildingView(definition,building));
   }
   scene.refreshWallConnections();
-  for(const r of state.resources)scene.addResource(scene.objectRegistry.require(r.type),r.tile);
+  for(const r of state.resources)scene.addResource(scene.objectRegistry.require(r.type),r.tile,r.natural??null);
   for(const a of state.animals){
     const animal=scene.animalSystem.create(scene.objectRegistry.require(a.type),a.tile,a.id);restoreActor(animal,a);
     const pos=gridToWorld(animal.position.x,animal.position.y);animal.view.setPosition(pos.x,pos.y).setDepth(pos.y+(animal.definition.depth?.offset??0));
@@ -94,6 +94,7 @@ export function loadGameState(scene,input){
   scene.treasureSystem.pending=state.commands.pendingChest;
   scene.animalSystem.nextId=state.counters.animal;scene.dropSystem.nextId=state.counters.drop;scene.treasureSystem.nextId=state.counters.chest;
   scene.gameTime.importState(state.time);scene.seasons?.importState(state.seasons);scene.foodSystem.importState(state.food);scene.production.importState(state.production);
+  scene.naturalResources?.importState(state.naturalResources);
   scene.experienceSystem?.importState(state.experienceSystem);
   scene.skillSystem?.importState(state.skillSystem);scene.workerSystem?.importState(state.population);
   if(scene.workerSystem&&state.workers===undefined)scene.workerSystem.spawnInitial();

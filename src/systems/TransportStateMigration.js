@@ -11,7 +11,7 @@ export function repairTransportInstructions(state,registry,check){
   if(!state.inventory||typeof state.inventory!=='object'||Array.isArray(state.inventory)||entries.some(l=>Object.values(l.stock).some(n=>!Number.isSafeInteger(n)||n<1))||reservations.some(r=>!Number.isSafeInteger(r.amount)||r.amount<1||!['stock','capacity'].includes(r.kind)||registry.get(r.resource)?.category!=='resource'))return;
   const locations=new Map(entries.map(l=>[l.id,l])),bookings=new Map(reservations.map(r=>[r.id,r])),released=new Set();
   for(const l of entries)for(const [id,quantity]of Object.entries(l.stock))if(reservations.filter(r=>r.kind==='stock'&&r.locationId===l.id&&r.resource===id).reduce((n,r)=>n+r.amount,0)>quantity)return;
-  const resources=registry.byCategory('resource').filter(d=>storage.physicalMaterials?d.id!=='gold':FOOD_RESOURCE_IDS.includes(d.id)).map(d=>d.id);
+  const resources=registry.byCategory('resource').filter(d=>d.collectible&&(storage.physicalMaterials?d.id!=='gold':FOOD_RESOURCE_IDS.includes(d.id))).map(d=>d.id);
   const summary=()=>Object.fromEntries(resources.map(id=>[id,entries.filter(l=>['fallback','storage'].includes(l.kind)).reduce((n,l)=>n+(l.stock[id]??0)-reservations.filter(r=>!released.has(r.id)&&r.kind==='stock'&&r.locationId===l.id&&r.resource===id).reduce((v,r)=>v+r.amount,0),0)]));
   const before=summary(),sites=new Set((state.buildings??[]).filter(b=>!buildingIsComplete(b)).map(b=>b.id));let changed=false;
   const adjacent=(l,t)=>l&&t&&Number.isInteger(t.x)&&Number.isInteger(t.y)&&((t.x>=l.x&&t.x<l.x+l.width&&(t.y===l.y-1||t.y===l.y+l.height))||(t.y>=l.y&&t.y<l.y+l.height&&(t.x===l.x-1||t.x===l.x+l.width))||(l.kind==='fallback'&&t.x===l.x&&t.y===l.y));

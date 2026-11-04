@@ -30,6 +30,8 @@ import { KingLogisticsSystem } from '../../src/systems/KingLogisticsSystem.js';
 import { LogisticsTaskManager } from '../../src/systems/LogisticsTaskManager.js';
 import { createStartingStockpile,createStartingCastle } from '../../src/systems/WorldGenerationConfig.js';
 import { WorkerSystem } from '../../src/systems/WorkerSystem.js';
+import { NaturalResourcesSystem } from '../../src/systems/NaturalResourcesSystem.js';
+import { treeBlocks } from '../../src/data/naturalResources.js';
 import { ResourceSpawner } from '../../src/game/stones.js';
 import { tileCenter } from '../../src/game/isometric.js';
 import { wallIndex,connectionsFor } from '../../src/game/walls.js';
@@ -51,12 +53,12 @@ export function ensureBuildingPrerequisites(scene,definition){
   }
 }
 
-export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,workplaces=false,construction=false,farming=false,foodProduction=false,seasons=false,logistics=false,starter=true,gameSettings}={}){
+export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,workplaces=false,construction=false,farming=false,foodProduction=false,seasons=false,logistics=false,naturalResources=false,starter=true,gameSettings}={}){
   const scene={objectRegistry,gameSettings,terrainGrid:terrain.map(r=>[...r]),map:terrain.map(r=>[...r]),inventory:new Inventory(),gameOver:false,
     resources:new Map(),resourceOccupancy:new Map(),buildings:[],towerViews:new Map(),animations:[],
     marker:{visible:false,setVisible(v){this.visible=v;}},showMarker(){this.marker.visible=true;},setStatus(){},updateBuildingUI(){},updateInventory(){},updateTimeDisplay(){},refreshVisibility(){},
     reservedTiles(){return [...this.character.reservedTiles(),...this.animalSystem.reservedTiles(),...(this.workerSystem?.reservedTiles()??[]),...(this.foodStorage?.reservedTiles()??[]),...this.buildings.flatMap(b=>b.tiles??[])];},
-    huntingSystem:{target:null,repath:0},mountSystem:{target:null,repath:0},combatFeedback:{hit(){},remove(){}},
+    huntingSystem:{target:null,repath:0,cancel(){this.target=null;}},mountSystem:{target:null,repath:0,cancel(){this.target=null;}},combatFeedback:{hit(){},remove(){}},
     settingsPanel:{settings:{fogOfWar:gameSettings?.fogOfWar??false,explorationMode:gameSettings?.explorationMode??true,pathWearDebug:false},applySettings(d){this.settings={...d};}},fog:{setEnabled(){}},worldCamera:{following:false},
     cameras:{main:{zoom:1,scrollX:2500,scrollY:1300,width:1000,height:640,setZoom(z){this.zoom=z;return this;},centerOn(x,y){this.scrollX=x-this.width/2;this.scrollY=y-this.height/2;return this;},preRender(){}}},
     refreshWallConnections(){this.wallMap=wallIndex(this.buildings);for(const b of this.wallMap.values())b.connections=connectionsFor(this.wallMap,b);},
@@ -82,7 +84,8 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   if(logistics&&starter){if(scene.gameSettings?.startingCastle)createStartingCastle(scene,scene.character.tile);createStartingStockpile(scene,scene.character.tile);}
   if(foodProduction||logistics){scene.foodStorage=new FoodStorageSystem(scene,{physicalMaterials:logistics});scene.foodProduction=new FoodProductionSystem(scene);if(logistics){scene.kingLogistics=new KingLogisticsSystem(scene);scene.logisticsTasks=new LogisticsTaskManager(scene);}}
   if(farming||foodProduction||logistics)scene.farmingSystem=new FarmingSystem(scene,{growthModifier:()=>scene.seasons?.growthMultiplier()??1,onHarvest:foodProduction||logistics?result=>scene.foodProduction.harvest(result):null});
-  scene.addResource=(d,tile)=>{const v=view(d.id,tileCenter(tile)),key=`${tile.x},${tile.y}`;v.setData('tile',{...tile}).setData('object',{type:d.id,definition:d,x:tile.x,y:tile.y,tiles:[{...tile}]});scene.resources.set(key,v);scene.resourceOccupancy.set(key,key);};
+  scene.addResource=(d,tile,natural=null)=>{const v=view(d.id,tileCenter(tile)),key=`${tile.x},${tile.y}`,object={type:d.id,definition:d,x:tile.x,y:tile.y,tiles:[{...tile}],...(natural?{natural:structuredClone(natural)}:{})};v.setData('tile',{...tile}).setData('object',object);if(natural)v.getMemoryState=()=>({stage:object.natural.stage,season:scene.seasons?.season??'Spring'});scene.resources.set(key,v);scene.resourceOccupancy.set(key,key);if(natural?treeBlocks(object):!d.walkable)scene.map[tile.y][tile.x]=1;scene.naturalResources?.register(object);};
+  if(naturalResources)scene.naturalResources=new NaturalResourcesSystem(scene);
   scene.collectResource=(key,tile,actor)=>{const v=scene.resources.get(key);if(!v||key!==`${tile.x},${tile.y}`||actor.state!=='ground')return false;
     const type=v.getData('objectId');if(actor===scene.character&&scene.foodStorage?.manages(type)&&scene.kingLogistics?.room(type)<1)return false;scene.resources.delete(key);v.destroy();scene.dropSystem.refreshOccupancy(tile);const event={type:'resourceCollected',objectType:type,quantity:1};if(actor===scene.character&&scene.kingLogistics&&scene.foodStorage.manages(type))scene.kingLogistics.receive({resource:type,amount:1,event});else if(!scene.workplaceSystem?.carryCollection(actor,{resource:type,amount:1,event})){scene.inventory.add(type);scene.activities.emit(event.type,{...event,actor});}return true;};
   scene.collectStone=tile=>scene.collectResource(`${tile.x},${tile.y}`,tile,scene.character);
@@ -96,7 +99,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
     const tile={x:Math.floor(target.position.x),y:Math.floor(target.position.y)};if(killer){const event={type:'animalKilled',objectType:target.type,quantity:1};if(!scene.workplaceSystem?.deferReward(killer,event))scene.activities.emit(event.type,{...event,actor:killer});}
     scene.animalSystem.remove(target);const amount=target.definition.gameplay.meatDrop,drop=amount>0?scene.dropSystem.create('meat',tile,amount):null;if(amount>0)scene.foodSystem.recordProduction('meat',amount,`meat-${target.id}`);scene.workerSystem.ai.animalDied(target,killer,drop);
   });
-  scene.tick=delta=>{if(scene.gameTime.paused||scene.gameOver)return;scene.gameTime.update(delta);if(scene.constructionSystem)scene.character.update(delta);scene.kingLogistics?.update(delta);scene.logisticsTasks?.update();scene.animalSystem.update(delta);scene.workerSystem.update(delta);const covered=scene.combat.update(delta);scene.constructionSystem?.update(delta);scene.farmingSystem?.update(delta);scene.foodProduction?.update(delta);scene.regeneration.update(delta,[scene.character,...scene.animalSystem.animals.values(),...scene.workerSystem.liveWorkers()],covered);};
+  scene.tick=delta=>{if(scene.gameTime.paused||scene.gameOver)return;scene.gameTime.update(delta);if(scene.constructionSystem||scene.naturalResources)scene.character.update(delta);scene.naturalResources?.updateKing(delta);scene.kingLogistics?.update(delta);scene.logisticsTasks?.update();scene.animalSystem.update(delta);scene.workerSystem.update(delta);const covered=scene.combat.update(delta);scene.constructionSystem?.update(delta);scene.farmingSystem?.update(delta);scene.foodProduction?.update(delta);scene.regeneration.update(delta,[scene.character,...scene.animalSystem.animals.values(),...scene.workerSystem.liveWorkers()],covered);};
   scene.simulate=(ms,step=50)=>{let elapsed=0;while(elapsed<ms){const delta=Math.min(step,ms-elapsed);scene.tick(delta);elapsed+=delta;}};
   captureMapKnowledge(scene);
   return scene;

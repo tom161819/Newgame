@@ -1,7 +1,9 @@
 import { FARMING_RULES } from './farming.js';
 import { FOOD_RECIPES } from './foodProduction.js';
+import { FORESTRY } from './naturalResources.js';
 export const EXPERIENCE_MAX_LEVEL=50;
 export const XP_REWARDS=Object.freeze({
+  treeChopped:Object.freeze(Object.fromEntries(Object.entries(FORESTRY.trees).map(([id,rule])=>[id,rule.xp]))),
   transportDelivered:Object.freeze({hauler:1}),
   resourceCollected:Object.freeze({stone:3}),dropCollected:Object.freeze({meat:2}),
   animalKilled:Object.freeze({rabbit:10,deer:20,wild_boar:35}),

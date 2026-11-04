@@ -51,6 +51,10 @@ import { WorkplaceSystem } from '../systems/WorkplaceSystem.js';
 import { WorkplaceView } from './WorkplaceView.js';
 import { WorkplacePanel } from '../ui/WorkplacePanel.js';
 import { MissingWorkersIndicators } from '../ui/MissingWorkersIndicators.js';
+import { NaturalResourcesSystem } from '../systems/NaturalResourcesSystem.js';
+import { TreeView } from './TreeView.js';
+import { treeBlocks } from '../data/naturalResources.js';
+import { NaturalResourcePanel } from '../ui/NaturalResourcePanel.js';
 import { ConstructionSystem } from '../systems/ConstructionSystem.js';
 import { ConstructionView } from './ConstructionView.js';
 import { ConstructionUI } from '../ui/ConstructionUI.js';
@@ -96,11 +100,13 @@ export class GameScene extends Phaser.Scene {
     this.foodStorage=null;this.foodProduction=null;this.logisticsTasks=null;this.legacyStockpiles=null;
     this.seasons=null;
     this.kingLogistics=null;
+    this.naturalResources=null;this.naturalResourcePanel=null;
     this.fog=null;this.mapMemory=null;this.memoryRenderer=null;this.populationSidebar=null;
     this.gameOver=false;this.input.enabled=true;this.input.keyboard.enabled=true;this.tweens.resumeAll();
     this.activeFramePending=true;this.visibilityPaused=document.hidden;
     this.assets.initialize();
     this.assets.registerRenderer('stone',(definition,context)=>drawStone(this,context.tile,definition));
+    this.assets.registerRenderer('tree',(definition,context)=>new TreeView(this,definition,context));
     this.assets.registerRenderer('king',(definition,context)=>new KingView(this,context.x,context.y,definition));
     this.assets.registerRenderer('tower',(_definition,context)=>new TowerView(this,context.building,context.preview));
     this.assets.registerRenderer('animal',(definition,context)=>new AnimalView(this,context.x,context.y,definition));
@@ -195,6 +201,7 @@ export class GameScene extends Phaser.Scene {
     this.updateTimeDisplay();
     this.setStatus('Vyber surovinu, volné políčko, Buildings nebo Asset Library.');
     this.worldCamera=new WorldCamera(this,this.player);this.staffingIndicators=new MissingWorkersIndicators(this);
+    this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState)this.naturalResources.generate();
     const onBackground=()=>{this.visibilityPaused=true;this.tweens.pauseAll();this.setGalleryInput(false);};
     const onForeground=()=>{this.visibilityPaused=false;this.activeFramePending=true;if(!this.gameOver&&!this.gameTime.paused)this.tweens.resumeAll();this.setGalleryInput(true);};
     this.game.events.on(Phaser.Core.Events.PAUSE,onBackground);this.game.events.on(Phaser.Core.Events.RESUME,onForeground);
@@ -218,6 +225,7 @@ export class GameScene extends Phaser.Scene {
       this.memoryRenderer.destroy();
       this.populationSidebar.destroy();
       this.staffingIndicators.destroy();
+      this.naturalResourcePanel.destroy();this.naturalResources.destroy();
       this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
       this.buildingUnlocks.destroy();
       this.animalSystem.destroy();this.dropSystem.destroy();document.querySelector('#object-tooltip').hidden=true;
@@ -281,13 +289,14 @@ export class GameScene extends Phaser.Scene {
     return c.currentTower?towerNeighbors(c.currentTower):[c.nextTile??c.tile];
   }
   resourceCount(id) { let count=0;for(const view of this.resources.values())if(view.getData('objectId')===id)count++;return count; }
-  addResource(definition,tile) {
+  addResource(definition,tile,natural=null) {
     const point=gridToWorld(tile.x+definition.width/2,tile.y+definition.height/2),key=tileKey(tile);
-    const view=this.assets.createView(definition.id,{...point,tile});
-    const object={x:tile.x,y:tile.y,type:definition.id,definition,tiles:resourceTiles(tile,definition)};
+    const object={x:tile.x,y:tile.y,type:definition.id,definition,tiles:resourceTiles(tile,definition),...(natural?{natural:structuredClone(natural)}:{})};
+    const view=this.assets.createView(definition.id,{...point,tile,object});
     view.setData('tile',{...tile});view.setData('object',object);
     this.resources.set(key,view);
-    for(const part of object.tiles){this.resourceOccupancy.set(tileKey(part),key);if(!definition.walkable)this.map[part.y][part.x]=1;}
+    for(const part of object.tiles){this.resourceOccupancy.set(tileKey(part),key);if(natural?treeBlocks(object):!definition.walkable)this.map[part.y][part.x]=1;}
+    this.naturalResources?.register(object);
     this.updateWorldCount();
   }
 
@@ -296,6 +305,7 @@ export class GameScene extends Phaser.Scene {
     if(this.gameOver||this.gameTime.paused||document.querySelector('dialog[open]'))return;
     if(pointer.rightButtonDown()){if(this.buildMode)this.cancelBuilding();return;}
     if(!pointer.leftButtonDown())return;
+    this.naturalResources?.cancelKing();
     this.populationSidebar?.clearSelection();
     this.treasureSystem.cancelRequest();
     let goal=this.pointerTile(pointer);
@@ -346,6 +356,7 @@ export class GameScene extends Phaser.Scene {
       const resource=hit?.kind==='resource'?hit.object:null;
       if(resource){
         const object=resource.getData('object'),definition=object.definition;
+        if(definition.tree){this.naturalResourcePanel.open(object);return;}
         if(!definition.collectible){this.setStatus(definition.description);return;}
         goal=resource.getData('tile');
         if(!definition.walkable)accepted=this.character.command({kind:'collect',resource:object,pickupKey:tileKey(goal)});
@@ -536,7 +547,7 @@ export class GameScene extends Phaser.Scene {
     if(!delta){this.refreshVisibility();return;}
     // Časové úseky uzavírají mzdy před novou prací, změnou skillu nebo úmrtím tohoto snímku.
     const activeDelta=this.gameTime.update(delta);this.updateTimeDisplay();
-    this.character.update(delta);this.player.animate(delta,this.character.walking&&[PLAYER_STATE.GROUND,PLAYER_STATE.ON_WALL].includes(this.character.state),this.character.direction);
+    this.character.update(delta);this.naturalResources.updateKing(delta);this.player.animate(delta,this.character.walking&&[PLAYER_STATE.GROUND,PLAYER_STATE.ON_WALL].includes(this.character.state),this.character.direction);
     this.kingLogistics.update(delta);
     this.logisticsTasks.update();
     this.animalSystem.update(delta);this.huntingSystem.update(delta);this.mountSystem.update(delta);this.workerSystem.update(delta);const covered=this.combat.update(delta);
@@ -580,6 +591,7 @@ export class GameScene extends Phaser.Scene {
     this.economyPanel?.update();
     this.workplacePanel?.refresh();
     this.staffingIndicators?.update();
+    this.naturalResources?.refreshSeason();this.naturalResourcePanel?.refresh();
     this.constructionUI?.refresh();
     this.farmingPanel?.refresh();
     this.storagePanel?.refresh();

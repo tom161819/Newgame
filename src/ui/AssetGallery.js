@@ -61,6 +61,7 @@ export class AssetGallery {
     if(definition.availableJobs)rows.push(['Profese',definition.availableJobs.join(', ')]);
     if(definition.constructionTime)rows.push(['Doba výstavby',`${definition.constructionTime/1000} s`]);
     if(definition.workplace)rows.push(['Pracovní místa',String(definition.workplace.capacity)],['Profese',definition.workplace.profession],['Pracovní skill',definition.workplace.skill]);
+    if(definition.tree)rows.push(['Growth stages',definition.tree.stages.join(' → ')],['Mature yield',`${definition.tree.wood} Wood`],['Chopping',`${definition.tree.chopDuration/1000}s · ${definition.tree.xp} Woodcutting XP`]);
     if(definition.equipment)rows.push(['Slot',definition.equipment.slot],['Bonus',formatModifiers(definition.equipment.modifiers)]);
     if(definition.production)rows.push(['Produkce',`${definition.production.amount} ${this.registry.require(definition.production.resource).name} / day`]);
     if(definition.treasure)rows.push(['Obsah',`${definition.treasure.goldMin}–${definition.treasure.goldMax} Gold + ${definition.treasure.equipment.map(id=>this.registry.require(id).name).join(', ')}`]);

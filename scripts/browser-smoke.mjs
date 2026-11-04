@@ -12,6 +12,8 @@ import { stageArchivedSnapshots } from './stage-archive.mjs';
 import { explorationMenuSmoke,staticMemoryRendererSmoke,hiddenInteractionSmoke } from './fog-smoke.mjs';
 import { populationSidebarSmoke,populationNavigationSmoke,populationIntegrationSmoke } from './population-smoke.mjs';
 import { staffingIndicatorsSmoke } from './staffing-smoke.mjs';
+import { emptyNaturalState } from '../src/data/naturalResources.js';
+import { forestrySmoke } from './forestry-smoke.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
 const base=projectBase(args.find(a=>a.startsWith('--base='))?.slice(7)??'/Newgame/'),dist=path.join(root,'dist');
@@ -72,6 +74,7 @@ try{
   if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full'))await page.locator('#setup-seasons').uncheck();}
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
+  if(args.includes('--full')||args.includes('--forestry'))await forestrySmoke(page);
   if(args.includes('--full')||args.includes('--population')){await populationSidebarSmoke(page);await populationNavigationSmoke(page);await populationIntegrationSmoke(page);}
   if(args.includes('--full')||args.includes('--staffing'))await staffingIndicatorsSmoke(page);
   if(args.includes('--full')||args.includes('--fog')){await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);await hiddenInteractionSmoke(page);}
@@ -82,10 +85,11 @@ try{
     for(const a of s.animalSystem.animals.values())a.wanderWait=1e8;for(const w of s.workerSystem.liveWorkers())w.aiCooldown=1e8;
     const occupied=new Set(s.reservedTiles().map(t=>`${t.x},${t.y}`)),start=s.character.tile;
     for(let y=40;y<70;y++)for(let x=40;x<70;x++){
-      const t={x,y},distance=Math.hypot(x-start.x,y-start.y);if(distance<8||distance>12||s.map[y]?.[x]!==0||occupied.has(`${x},${y}`))continue;
+      const t={x,y},distance=Math.hypot(x-start.x,y-start.y);if(distance<8||distance>12||s.map[y]?.[x]!==0||occupied.has(`${x},${y}`)||s.resourceOccupancy.has(`${x},${y}`))continue;
+      const point={x:s.map.length*32+(x-y)*32,y:128+(x+y+1)*16-4};if([...s.resources.values()].some(v=>v.getData('definition').tree&&v.containsPoint(point.x,point.y)))continue;
       if(!s.character.command({kind:'move',goal:t,silent:true}))continue;
       s.character.stopForBuilding();s.addResource(s.objectRegistry.require('stone'),t);
-      const point={x:s.map.length*32+(x-y)*32,y:128+(x+y+1)*16-4};s.worldCamera.following=false;s.cameras.main.setZoom(.9).centerOn(point.x,point.y);s.cameras.main.preRender();return point;
+      s.worldCamera.following=false;s.cameras.main.setZoom(.9).centerOn(point.x,point.y);s.cameras.main.preRender();return point;
     }throw Error('No reachable smoke-test stone site.');
   });
   const camera=await page.evaluate(()=>{const c=window.__game.registry.get('application').scene.cameras.main;return{x:c.scrollX+c.width/2,y:c.scrollY+c.height/2,w:c.width,h:c.height,z:c.zoom};}),bounds=await page.locator('canvas').boundingBox();
@@ -134,8 +138,14 @@ try{
     const legacyPage=await context.newPage();await instrument(legacyPage);await legacyPage.goto(origin+previous.archiveURL);await legacyPage.locator('#new-game').click();await legacyPage.locator('#start-game').click();await legacyPage.waitForFunction(()=>window.__game?.registry.get('application').scene?.mapMemory);
     const legacy=await legacyPage.evaluate(()=>{const app=window.__game.registry.get('application'),s=app.scene;s.pauseManager.set('test',true);const w=s.workerSystem.liveWorkers()[0];w.currentHP=0;w.isAlive=false;s.workerSystem.onDeath(w);return app.snapshot();});assert.equal(legacy.saveVersion,9);assert.ok(legacy.exploration.explored.length>0);await legacyPage.close();
     await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(state);},legacy);await page.waitForFunction(()=>window.__restored);
-    const restored=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.deepEqual(restored,{...legacy,saveVersion:restored.saveVersion,workers:legacy.workers.map(w=>({...w,isSubject:true,diedAt:w.isAlive?null:legacy.time.totalElapsed}))});
-    console.log('PASS actual 0024c16 schema-9 source save migrates to Save10 with exact map memory, stock, time and XP; undated old deaths gain one persisted retention window');
+    const restored=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.deepEqual(restored,{...legacy,saveVersion:restored.saveVersion,...(restored.saveVersion>=11?{naturalResources:emptyNaturalState()}:{}),workers:legacy.workers.map(w=>({...w,isSubject:true,diedAt:w.isAlive?null:legacy.time.totalElapsed}))});
+    console.log(`PASS actual 0024c16 schema-9 source save migrates to Save${restored.saveVersion} with exact map memory, stock, time and XP; undated old deaths gain one persisted retention window`);
+  }
+  if(migrated.saveVersion>=11){
+    const previous=catalog.builds.find(b=>b.commit==='fa56c96113fdad8097d641ad87c06e74d532efa8');assert.ok(previous?.available,'The real v0.2.0/Save10 source archive must remain available.');const legacyPage=await context.newPage();await instrument(legacyPage);await legacyPage.goto(origin+previous.archiveURL);await legacyPage.locator('#new-game').click();await legacyPage.locator('#start-game').click();await legacyPage.waitForFunction(()=>window.__game?.registry.get('application').scene?.workerSystem);
+    const legacy=await legacyPage.evaluate(()=>{const app=window.__game.registry.get('application'),s=app.scene;s.pauseManager.set('test',true);s.gameTime.setPaused(false);s.gameTime.update(4321);s.gameTime.setPaused(true);s.experienceSystem.addXP(s.workerSystem.liveSubjects()[0],42);return app.snapshot();});assert.equal(legacy.saveVersion,10);await legacyPage.close();
+    await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(state);},legacy);await page.waitForFunction(()=>window.__restored);const restored=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.deepEqual(restored,{...legacy,saveVersion:restored.saveVersion,naturalResources:emptyNaturalState()});assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.naturalResources.byId.size),0);
+    console.log(`PASS real v0.2.0 schema10 migrates to Save${restored.saveVersion} with the entire old world, villagers, talents, memory, pay, food, XP and stock unchanged; no forest is invented over an existing kingdom`);
   }
   const archivePage=await context.newPage();await instrument(archivePage);await archivePage.goto(origin+base+'versions/');assert.equal(await archivePage.locator('[data-version-label]').count(),catalog.versions.length+(catalog.versions.some(v=>v.current)?0:1));
   await archivePage.setViewportSize({width:390,height:844});assert.equal(await archivePage.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
