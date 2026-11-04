@@ -262,3 +262,24 @@ test('the game uses the approved Asset Studio exports byte for byte with their a
   assert.equal(definitions.get('brazier').buildingCategory, 'infrastructure');
   assert.ok(definitions.get('brazier').buildable && definitions.get('brazier').constructionTime > 0);
 });
+
+test('the game uses the approved grass and worn-path tiles byte for byte with their strip colours', () => {
+  const definitions = new Map(objectDefinitions.map(d => [d.id, d]));
+  const tile = (asset, variant, i) => readFileSync(path.join(root, `art/sprites/${asset}/${variant}.v1.tile-${i}.png`));
+  for (const [asset, variant] of [['grass-ground', 'grass-ground-lush'], ['worn-path', 'worn-path-moss']]) {
+    const repo = approvals.assets[asset];
+    assert.equal(repo.preferred, variant); assert.equal(repo.variants[variant].status, 'approved');
+    assert.equal(repo.variants[variant].specHash, json(`art/sprites/${asset}/${variant}.v1.json`).specHash);
+  }
+  const grass = definitions.get('grass_normal');
+  assert.equal(grass.artSource, 'art/sprites/grass-ground/grass-ground-lush.v1.json');
+  assert.equal(grass.spriteVariants.length, 4);
+  grass.spriteVariants.forEach((file, i) => assert.ok(readFileSync(path.join(root, `public${file}`)).equals(tile('grass-ground', 'grass-ground-lush', i)), file));
+  const wear = json('art/sprites/worn-path/worn-path-moss.v1.json').surface.gameWear;
+  for (const stage of wear) {
+    const d = definitions.get(`grass_trampled_${stage.level}`);
+    assert.ok(readFileSync(path.join(root, `public${d.sprite}`)).equals(tile('worn-path', 'worn-path-moss', stage.level)), d.id);
+    assert.deepEqual([d.visual.pathColor, d.visual.pathEdge, d.visual.pathWidth], [stage.color, stage.edge, stage.width]);
+    assert.equal(d.artSource, 'art/sprites/worn-path/worn-path-moss.v1.json');
+  }
+});

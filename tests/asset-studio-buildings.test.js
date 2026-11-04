@@ -5,13 +5,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GENERATORS } from '../studio/src/generators/index.js';
 import { PROPS, PROP_TYPES } from '../studio/src/generators/props.js';
-import { checkModel, validateAssetSpec } from '../studio/src/lib/specs.js';
+import { checkModel, validateAssetSpec, buildCatalog } from '../studio/src/lib/specs.js';
 import { objectDefinitions } from '../src/data/objects/index.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const json = file => JSON.parse(readFileSync(path.join(root, file), 'utf8'));
 const style = json('art/style-guide.json');
 const workshops = readdirSync(path.join(root, 'art/assets/buildings')).map(id => json(`art/assets/buildings/${id}/asset.json`)).filter(a => a.generator === 'workshop');
+const catalog = buildCatalog({ specs: workshops, generators: GENERATORS, style }).studio;
 
 test('every prop uses style materials and fits a 2 × 2 site when placed at its centre', () => {
   assert.ok(PROP_TYPES.length >= 20);
@@ -33,7 +34,8 @@ test('building concepts tell their trade with props and stay concepts', () => {
     for (const variant of asset.variants) {
       const types = new Set(variant.spec.props.map(p => p.type));
       assert.ok(types.size >= 3, `${variant.id}: at least three kinds of props`);
-      assert.notEqual(approvals.assets[asset.id]?.variants?.[variant.id]?.status, 'approved', 'concepts wait for the developer');
+      const review = approvals.assets[asset.id]?.variants?.[variant.id];
+      if (review?.status === 'approved') assert.equal(review.specHash, catalog.find(a => a.id === asset.id).variants.find(v => v.id === variant.id).hash, `${variant.id}: approval matches the current spec`);
     }
   }
   for (const id of ['farmhouse', 'granary', 'bakery', 'mill', 'warehouse', 'hunting_lodge', 'lumberjack_hut']) assert.ok(workshops.some(a => a.gameObjectId === id), id);

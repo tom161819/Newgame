@@ -108,15 +108,15 @@ test('asset URLs retain the Pages prefix; PNG/WebP/sheets load once per object t
     spritesheet:{frameWidth:32,frameHeight:48},renderMode:'sprite',stats:structuredClone(objectRegistry.require('king').stats)}));
   const calls=[], scene={load:{on(){},image(...args){calls.push(['image',...args]);},spritesheet(...args){calls.push(['sheet',...args]);}},textures:{exists:()=>false}};
   const manager = new AssetManager(scene,registry,{baseURL:'/Newgame/'});
-  // 49 registered objects + the animated test object, plus the tower's separately queued front layer.
-  assert.equal(manager.queue(),51);assert.equal(manager.queue(),0);
-  assert.equal(calls.length,51);
+  // 49 registered objects + the animated test object, plus the tower's front layer and the four approved grass tile variants.
+  assert.equal(manager.queue(),55);assert.equal(manager.queue(),0);
+  assert.equal(calls.length,55);
   assert.ok(calls.some(c=>c[2].endsWith('.webp')));
   assert.deepEqual(calls.find(c=>c[0]==='sheet'),['sheet','asset:animated:main','/Newgame/assets/resources/stone/stone.png',{frameWidth:32,frameHeight:48}]);
 });
 
-test('terrain tiles may list interchangeable sprite variants that load as extra layers; nothing in the game uses them yet', () => {
-  assert.ok(objectRegistry.all().every(d=>d.spriteVariants===undefined),'no unapproved ground art is wired in');
+test('terrain tiles may list interchangeable sprite variants that load as extra layers; only approved grass uses them', () => {
+  assert.deepEqual(objectRegistry.all().filter(d=>d.spriteVariants).map(d=>d.id),['grass_normal'],'only the approved grass set is wired in');
   const grass=objectRegistry.require('grass_normal'),registry=new ObjectRegistry(objectRegistry.all().filter(d=>d.id!=='grass_normal'));
   registry.register({...grass,spriteVariants:['/assets/terrain/path_wear/a.png','/assets/terrain/path_wear/b.png']});
   const calls=[],scene={load:{on(){},image(...args){calls.push(args);},spritesheet(){}},textures:{exists:()=>false}};
