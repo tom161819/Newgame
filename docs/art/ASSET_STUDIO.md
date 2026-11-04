@@ -56,13 +56,25 @@ this.add.image(centre.x, centre.y, 'watchtower-round@v1')
 // světla: centre + (light.x - meta.anchor.x, light.y - meta.anchor.y)
 ```
 
-Postup, jak schválený asset převzít do hry, je samostatná úloha s vlastním PR:
+### Převzetí schváleného assetu do hry
 
-1. Zkopírovat PNG do `public/assets/generated/<id>/`.
-2. Upravit definici objektu v `src/data/objects/` na `renderMode: 'sprite'` a nastavit `origin` z metadat.
-3. Ověřit kolize a výběr myší.
+Takto se do hry dostala věž `watchtower-square` a pánev `torch-post-brazier`:
 
-Nic z toho tento MVP nedělá.
+1. Zapsat schválení do `art/approvals.json` (stav `approved`, `preferred`, `specHash`).
+2. Zkopírovat `art/sprites/<asset>/<varianta>.v<verze>.png` a případnou `.front.png` beze změny do `public/assets/buildings/<objekt>/`.
+3. V definici objektu (`src/data/objects/`) nastavit hodnoty z metadat exportu:
+   - `sprite` a `frontSprite`, `renderMode: 'sprite'`;
+   - `origin` (a `frontOrigin`) = `baseOrigin`, protože hra kotví budovy v předním rohu půdorysu, ne ve středu;
+   - `visualHeight`, `platform` (u budov s plošinou) a `lights` = `gameLights`;
+   - `artSource` = cesta k JSON metadatům.
+4. Test `tests/asset-studio.test.js` hlídá, že soubory ve hře jsou bajtově shodné se schváleným exportem a hodnoty odpovídají metadatům. Změna ve studiu bez nového převzetí tak neprojde.
+
+**Přední vrstva** (`.front.png`): části označené v receptu `layer: 'front'` (např. přední cimbuří) se exportují zvlášť. Hra je kreslí nad jednotkou na plošině, takže král stojí uvnitř hradeb.
+
+**Světla:**
+- Budova s `lights` má za běhu plamen (`src/game/LitBuildingView.js`).
+- Všechna světla jsou dostupná přes `scene.lightSources.lights()` (`src/systems/LightSourceSystem.js`).
+- Až hra dostane noc, stačí je vykreslit do světelné mapy podle postupu níže.
 
 ### Den/noc ve hře
 

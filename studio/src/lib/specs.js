@@ -108,6 +108,7 @@ export function assetPaths(asset, variant) {
     spec: base,
     generator: `studio/src/generators/${asset.generator}.js`,
     sprite: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.png` : null,
+    spriteFront: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.front.png` : null,
     spriteMeta: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.json` : null,
   };
 }

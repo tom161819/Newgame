@@ -92,7 +92,13 @@ export class SpriteBuildingView {
     floor.fillStyle(tint??0x777450,this.preview?0.3:0.25);floor.lineStyle(1,tint??0xb3a477,0.8);
     for(const tile of building.tiles){floor.fillPoints(tilePolygon(tile),true);floor.strokePoints(tilePolygon(tile),true);}
   }
-  contains(x,y) { return this.back.getBounds().contains(x,y); }
+  // Opaque pixels only: transparent padding and the baked ground shadow (≈32 % alpha) are not part of the building.
+  contains(x,y) {
+    const bounds=this.back.getBounds();if(!bounds.contains(x,y))return false;
+    const sprite=this.back.sprite,frame=sprite?.frame;if(!frame||!bounds.width||!bounds.height)return true;
+    const alpha=this.manager.scene.textures.getPixelAlpha(Math.floor((x-bounds.x)/bounds.width*frame.width),Math.floor((y-bounds.y)/bounds.height*frame.height),sprite.texture.key,frame.name);
+    return alpha==null||alpha>=160;
+  }
   setAlpha(value) { this.back.setAlpha(value);this.front.setAlpha(value);this.footprint.setAlpha(value);return this; }
   setVisible(value) { this.back.setVisible(value);this.front.setVisible(value);this.footprint.setVisible(value); }
   inView(view) { const b=this.back.getBounds();return b.right>=view.x&&b.x<=view.right&&b.bottom>=view.y&&b.y<=view.bottom; }

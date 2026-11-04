@@ -70,7 +70,7 @@ export function build(spec, { footprint, style }) {
   }
 
   const topWidth = width * taper;
-  let topY = height;
+  let topY = height, platform = [0, height, 0]; // where a unit stands on top
   if (spec.top === 'hoarding') {
     const hoardWidth = Math.min(topWidth + 0.26, maxWidth - 0.06), hoardHeight = clamp(spec.hoardingHeight ?? 1, 0.6, 1.6);
     const wood = spec.hoardingMaterial ?? 'wood';
@@ -101,16 +101,20 @@ export function build(spec, { footprint, style }) {
       const count = 10, radius = ledge / 2 - 0.08;
       for (let i = 0; i < count; i++) {
         const angle = i / count * Math.PI * 2;
-        parts.push(box([0.2, merlonHeight, 0.14], [Math.cos(angle) * radius, merlonY, Math.sin(angle) * radius], material, { rotation: -angle + Math.PI / 2 }));
+        // Merlons facing the camera form the front layer drawn over a unit on the platform.
+        const front = Math.cos(angle) + Math.sin(angle) > 0.1 ? { layer: 'front' } : {};
+        parts.push(box([0.2, merlonHeight, 0.14], [Math.cos(angle) * radius, merlonY, Math.sin(angle) * radius], material, { rotation: -angle + Math.PI / 2, ...front }));
       }
     } else {
       const perSide = 3, inset = ledge / 2 - 0.07;
       for (let i = 0; i < perSide; i++) {
         const t = lerp(-inset + 0.07, inset - 0.07, i / (perSide - 1));
-        for (const [x, z, w, d] of [[t, inset, 0.22, 0.14], [t, -inset, 0.22, 0.14], [inset, t, 0.14, 0.22], [-inset, t, 0.14, 0.22]]) parts.push(box([w, merlonHeight, d], [x, merlonY, z], material));
+        // The +Z and +X rows face the camera: they are the front layer over the platform.
+        for (const [x, z, w, d, front] of [[t, inset, 0.22, 0.14, true], [t, -inset, 0.22, 0.14], [inset, t, 0.14, 0.22, true], [-inset, t, 0.14, 0.22]]) parts.push(box([w, merlonHeight, d], [x, merlonY, z], material, front ? { layer: 'front' } : {}));
       }
     }
     topY = merlonY + merlonHeight;
+    platform = [0, merlonY, 0];
     if (spec.roof === 'cone' || spec.roof === 'pyramid') {
       const base = ledge - 0.3, roofHeight = clamp(spec.roofHeight ?? 1.1, 0.5, 2);
       parts.push(spec.roof === 'cone'
@@ -136,7 +140,7 @@ export function build(spec, { footprint, style }) {
     lights.push({ type: 'torch', at: [tip[0], y + 0.32, tip[2]] });
   }
 
-  return { primitives: parts, lights, height: topY };
+  return { primitives: parts, lights, height: topY, platform };
 }
 
 export default { id: 'watchtower', version: 1, label: 'Watchtower', params, build };
