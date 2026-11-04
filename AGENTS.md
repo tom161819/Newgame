@@ -6,6 +6,7 @@ Claude (Claude Code, reads `CLAUDE.md`, which imports this file) and Codex (read
 2. One task, one branch from current `main`: Claude uses `claude/<task>`, Codex uses `codex/<task>`. Never commit to the other agent's branches or to `backup/*` branches unless the developer asks.
 3. Finish every task with a pull request into `main`. If it depends on another open pull request, branch from that work and state the dependency and merge order in the description.
    - The agent that opened a pull request merges it itself once rule 6 passes and GitHub reports no conflicts. If `main` moved meanwhile, merge `main` into the branch (never force push), rerun the checks, then merge.
+   - Resolve routine merge conflicts autonomously in your own task branch, preserving both agents' intended changes. The user explicitly removed the previous conflict-confirmation requirement on 2026-11-04. Inspect both sides, run relevant tests and record the resolution; never discard another agent's work or rewrite shared history. Ask only when intent is genuinely ambiguous or a real technical blocker cannot be resolved.
    - Merge the other agent's pull request only when the developer asks, or when it is the next item in an agreed merge order in `docs/COORDINATION.md` and its own description says it is verified.
    - Do not merge a pull request marked draft, WIP or "hold", or one the developer asked to wait.
    - After a merge, check that the GitHub Pages workflow run for it succeeded; if it failed, fix it at once in a new branch and pull request.

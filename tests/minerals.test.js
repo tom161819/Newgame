@@ -31,6 +31,13 @@ test('finite building placement distinguishes a missing rock from unreachable ex
   const s=fixture();deposit(s);for(let y=42;y<=47;y++)for(let x=46;x<=51;x++)if(x===46||x===51||y===42||y===47)s.map[y][x]=s.terrainGrid[y][x]=1;
   assert.match(error(s,'quarry',{x:47,y:43}),/reachable external/);
 });
+test('Quarry accepts one corner or the full rock footprint while other buildings cannot use the rock exception',()=>{
+  for(const anchor of [{x:47,y:42},{x:48,y:43}]){const s=fixture(),d=deposit(s);assert.equal(error(s,'quarry',anchor),null);assert.ok(error(s,'castle',anchor));const b=building(s,'quarry',anchor);assert.equal(b.depositId,d.natural.id);assert.ok(towerNeighbors(b).some(t=>s.map[t.y]?.[t.x]===0));validateGameState(serializeGameState(s));}
+});
+test('overlapping several rocks binds the stable primary only and never switches to the untouched secondary deposit',()=>{
+  const s=fixture(),primary=deposit(s,undefined,{x:49,y:44},1),secondary=deposit(s,undefined,{x:47,y:44},80),b=building(s,'quarry',{x:48,y:43});
+  assert.equal(b.depositId,primary.natural.id);assert.equal(secondary.natural.boundBuildingId,null);const saved=validateGameState(serializeGameState(s)),r=fixture(false);loadGameState(r,saved);assert.deepEqual(serializeGameState(r),saved);const restored=r.buildings.find(o=>o.id===b.id);worker(r,restored);until(r,()=>r.inventory.count('stone')===1);r.simulate(18000);assert.equal(r.naturalResources.byId.get(secondary.natural.id).natural.remaining,80);assert.equal(restored.depositId,primary.natural.id);assert.equal(r.inventory.count('stone'),1);validateGameState(serializeGameState(r));
+});
 test('Iron Mine costs12Stone8Wood, has three Miners and requires a visible unbound deposit within four footprint tiles without overlap',()=>{
   const s=fixture(),d=deposit(s,'iron_deposit',{x:51,y:44},60);assert.match(error(s,'iron_mine',{x:43,y:43}),/four tiles/);assert.equal(error(s,'iron_mine',{x:45,y:43}),null);assert.ok(error(s,'iron_mine',{x:50,y:43}));
   s.fog.setEnabled(true);assert.match(error(s,'iron_mine',{x:45,y:43}),/visible/);s.fog.setEnabled(false);const b=building(s,'iron_mine',{x:45,y:43});assert.deepEqual(b.definition.cost,{stone:12,wood:8});assert.equal(b.definition.workplace.capacity,3);assert.equal(d.natural.boundBuildingId,b.id);assert.equal(s.inventory.count('stone'),0);assert.equal(s.inventory.count('wood'),0);assert.equal(s.foodStorage.manages('iron_ore'),true);assert.notEqual(s.objectRegistry.require('iron_ore').id,'iron');

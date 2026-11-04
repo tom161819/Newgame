@@ -6,6 +6,7 @@ export const WORKPLACES=Object.freeze({
   hunting_lodge:Object.freeze({capacity:2,profession:'hunter',skill:'hunting'}),
   barracks:Object.freeze({capacity:5,profession:'soldier',skill:'combat'}),
   farmhouse:Object.freeze({capacity:3,profession:'farmer',skill:'farming'}),
+  smelter:Object.freeze({capacity:2,profession:'smelter_operator',skill:'smelting'}),
   mill:Object.freeze({capacity:2,profession:'miller',skill:'milling'}),
   bakery:Object.freeze({capacity:2,profession:'baker',skill:'baking'}),
   warehouse:Object.freeze({capacity:3,profession:'hauler',skill:'logistics'}),

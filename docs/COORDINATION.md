@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| Visual polish and Asset Studio concepts (phases A–E) | Claude | `claude/visual-polish-and-asset-studio` | — | In progress | `index.html` (game layout), `src/style.css`, `src/main.js`, `src/ui/CompactHud.js`, `package.json` (fonts), `studio/**`, `art/**`, `docs/art/**`; later phases: construction view, terrain support |
+| Visual polish and Asset Studio concepts (phases A–E) | Claude | `claude/visual-polish-and-asset-studio` | pending | In review: phases A–E verified | `index.html` (game layout), `src/style.css`, `src/main.js`, `src/ui/CompactHud.js`, `package.json` (fonts), `src/game/ConstructionView.js`, `src/game/ConstructionDust.js`, `src/game/TerrainRenderer.js`, `src/systems/AssetManager.js` and `src/systems/ObjectRegistry.js` (terrain `spriteVariants`), `studio/**`, `art/**`, `docs/art/**`. Necessary edit of Codex's `scripts/zoom-smoke.mjs`: it runs at 1440×900 so the 0.25× floor stays reachable with the taller map. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -21,6 +21,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#11](https://github.com/tom161819/Newgame/pull/11) Stage 10 Quarry placement and Iron Smelter, Save schema 14 (Codex).
 - 2026-11-04 [#10](https://github.com/tom161819/Newgame/pull/10) Approved watchtower and Brazier in the game, runtime flames and light sources (Claude).
 - 2026-11-04 [#9](https://github.com/tom161819/Newgame/pull/9) Stage 09 Daily Resource Statistics & Ledger, Save schema 13 (Codex).
 - 2026-11-04 [#8](https://github.com/tom161819/Newgame/pull/8) Asset Studio recipes: house, oak, pine, wall, quarry (Claude).

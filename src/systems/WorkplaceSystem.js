@@ -20,6 +20,12 @@ export class WorkplaceSystem {
   atWorkplace(worker){return !worker.nextTile&&!worker.path.length&&this.goals(worker).some(t=>tileKey(t)===tileKey(worker.tile));}
   employees(building){return (this.register(building)?.workerIds??[]).map(id=>this.scene.workerSystem.workers.get(id)).filter(w=>w?.isAlive&&w.isSubject!==false);}
   predictedWage(worker,profession){return this.scene.wageSystem.dailyWage({...worker,profession});}
+  autoEmploy(building){
+    const spec=buildingDefinition(building).workplace,record=this.register(building);if(!spec||!record)return;
+    const candidates=this.scene.workerSystem.liveSubjects().filter(w=>w.profession==='idle'&&w.assignedWorkplaceId==null&&!w.arriving&&!w.cargo&&!w.workTask)
+      .sort((a,b)=>(b.skills[spec.skill]?.level??1)-(a.skills[spec.skill]?.level??1)||a.id.localeCompare(b.id,undefined,{numeric:true}));
+    for(const worker of candidates){if(record.workerIds.length>=spec.capacity)break;if(this.scene.workerSystem.ai.route(worker,towerNeighbors(building)))this.assign(building,worker);}
+  }
   assign(building,worker){
     if(!worker?.isAlive||worker.isSubject===false||this.scene.gameOver||!this.scene.buildings.includes(building)||!this.scene.workerSystem.workers.has(worker.id))return false;
     const spec=buildingDefinition(building).workplace,record=this.register(building);if(!spec||!record)return false;
