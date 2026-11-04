@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main4857ba7 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT403 | IN PROGRESS:475models/Pages and tree native pass; approved-scaffold integration checks running; earlier full native/Studio/73URLs pass. Frozen02a has own459test archive; final verifier checks actual deployed Git blobs, allowing later live development. Public tag/main/deployment gates pending; new user order C01–C08 then master11–15, all unstarted. | Native smoke regressions; release-gate/deployed-archive verifier and tests; release notes,02a archive/catalog, progress/verification docs. Claude art unchanged; no schema rewrite. |
+| M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main4857ba7 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT403 | READY:476models/Pages and latest scaffold/Fog/current Save14/historical native pass; prior full/Studio/73URLs and tree/zoom/seasons proofs retained at their actual sources. Frozen02a has own459test archive; final verifier checks actual deployed Git blobs, allowing later live development. Public tag/main/deployment gates pending; new user order C01–C08 then master11–15, all unstarted. | Native smoke regressions; release-gate/deployed-archive verifier and tests; release notes,02a archive/catalog, progress/verification docs. Claude art unchanged; no schema rewrite. |
 
 ## Kept backups (do not delete without the developer)
 

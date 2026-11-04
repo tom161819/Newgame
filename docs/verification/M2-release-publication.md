@@ -1,6 +1,18 @@
 # M2 publication checkpoint — verified candidate, public release pending
 
-## Latest integration and queue update — 2026-11-04
+## Latest approved-scaffold integration — 2026-11-04
+
+Main4857ba7/PR26 scaffold art was normally merged as06ff55a. Only COORDINATION
+conflicted; preserved both authors and the user's new queue order. Current
+source476/476models, validators and Pages build pass. Native `--fog` also exits0:
+real scaffold/static memory, hidden blueprint handling, menu/camera/mobile,
+current IndexedDB roundtrip and historical games. Game/art paths match that main;
+no production AI/model changed, so earlier full and tree-specific proofs below
+remain applicable to their recorded scopes. New logs:
+Newgame-M2-scaffold-integration-{tests,pages,smoke}.log in workspace/scratch.
+Frozen02a and every archive directory remain unchanged.
+
+## Tree integration and queue update — 2026-11-04
 
 Main2ce3cd7/PR25 approved tree art was normally merged as46cd448; only the
 coordination register conflicted, both histories preserved. Actual game/art

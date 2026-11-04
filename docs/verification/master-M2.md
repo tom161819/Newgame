@@ -1,7 +1,8 @@
 # M2 — Resources, economy and iron — local preflight verified
 
-Latest update: main2ce3cd7 trees preserved;475/475models, production build and
-native zoom/Fog/season-transition/forestry/current Save14/historical games pass.
+Latest update: main4857ba7 trees/scaffold preserved;476/476models, production build and
+native tree zoom/Fog/season-transition/forestry plus the later scaffold/Fog/
+blueprint/current Save14/historical game checks pass.
 Prior full suite through main14071b1 remains recorded below. New user order:
 M2 publication → C01–C08 → master11–15 (IDs and later milestone gates unchanged).
 
