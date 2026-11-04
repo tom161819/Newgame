@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "id": "grass-ground",
+  "name": "Grass ground",
+  "category": "terrain",
+  "description": "Ground tile sets for untouched grass (wear level 0). Each variant is a set of interchangeable 64 × 32 tiles that join without seams; the game would pick one per tile by its hash.",
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "generator": "ground",
+  "gameObjectId": "grass_normal",
+  "variants": [
+    {
+      "id": "grass-ground-lush",
+      "name": "Lush meadow",
+      "version": 1,
+      "notes": "Recommended. Livelier greens, taller tufts, a few pale flowers.",
+      "spec": {
+        "mode": "grass",
+        "base": "meadow",
+        "shades": [
+          "meadow_deep",
+          "#527c33",
+          "meadow",
+          "#6a9440"
+        ],
+        "patchiness": 0.55,
+        "blades": {
+          "density": 72,
+          "height": [
+            3,
+            7
+          ],
+          "colours": [
+            "#4b762d",
+            "#6b9a3c",
+            "meadow_light",
+            "#3f6a2a"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 1.5,
+          "colours": [
+            "clover",
+            "buttercup"
+          ]
+        },
+        "tiles": 4,
+        "seed": 11
+      }
+    },
+    {
+      "id": "grass-ground-tall",
+      "name": "Tall summer grass",
+      "version": 1,
+      "notes": "Densest and tallest blades; strongest texture, check readability under units.",
+      "spec": {
+        "mode": "grass",
+        "base": "#668a3e",
+        "shades": [
+          "#4f7134",
+          "#628640",
+          "#759a48",
+          "#87a85a"
+        ],
+        "patchiness": 0.45,
+        "blades": {
+          "density": 96,
+          "height": [
+            4,
+            9
+          ],
+          "colours": [
+            "#58803a",
+            "#7a9e48",
+            "meadow_tip",
+            "#48702e"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 0.6,
+          "colours": [
+            "buttercup"
+          ]
+        },
+        "tiles": 4,
+        "seed": 23
+      }
+    },
+    {
+      "id": "grass-ground-clover",
+      "name": "Clover and wildflowers",
+      "version": 1,
+      "notes": "Patchier colour with clover, buttercups and heather.",
+      "spec": {
+        "mode": "grass",
+        "base": "#5c8640",
+        "shades": [
+          "#476e33",
+          "#58823c",
+          "#6a9446",
+          "#77a04e"
+        ],
+        "patchiness": 0.7,
+        "blades": {
+          "density": 56,
+          "height": [
+            2,
+            6
+          ],
+          "colours": [
+            "#4c7731",
+            "#68963f",
+            "#82a94f"
+          ],
+          "tufts": 2
+        },
+        "flowers": {
+          "density": 5,
+          "colours": [
+            "clover",
+            "buttercup",
+            "heather"
+          ]
+        },
+        "tiles": 4,
+        "seed": 37
+      }
+    },
+    {
+      "id": "grass-ground-pasture",
+      "name": "Muted pasture (close to today)",
+      "version": 1,
+      "notes": "Today's olive grass_normal colour with real blades, for comparison.",
+      "spec": {
+        "mode": "grass",
+        "base": "pasture",
+        "shades": [
+          "#66773f",
+          "#71834a",
+          "#7d8e54",
+          "#889860"
+        ],
+        "patchiness": 0.4,
+        "blades": {
+          "density": 46,
+          "height": [
+            2,
+            5
+          ],
+          "colours": [
+            "#5f743d",
+            "#7d8f52",
+            "#94a066"
+          ],
+          "tufts": 2
+        },
+        "flowers": {
+          "density": 0,
+          "colours": []
+        },
+        "tiles": 4,
+        "seed": 5
+      }
+    }
+  ]
+}

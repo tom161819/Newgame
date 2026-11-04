@@ -1,0 +1,249 @@
+{
+  "schema": 1,
+  "id": "worn-path",
+  "name": "Worn path",
+  "category": "terrain",
+  "description": "Trampled stages 1–3 of a footpath on grass (src/data/pathWear.js). The strip in the preview wears in from grass to bare soil and grows over again, as an unused path does.",
+  "footprint": {
+    "width": 6,
+    "height": 3
+  },
+  "generator": "ground",
+  "gameObjectId": "grass_trampled_3",
+  "variants": [
+    {
+      "id": "worn-path-moss",
+      "name": "Green to earth",
+      "version": 1,
+      "notes": "Recommended. Flattened green, then dark olive, then muted dark brown soil; soft edges.",
+      "spec": {
+        "mode": "path",
+        "ground": {
+          "mode": "grass",
+          "base": "meadow",
+          "shades": [
+            "meadow_deep",
+            "#527c33",
+            "meadow",
+            "#6a9440"
+          ],
+          "patchiness": 0.55,
+          "blades": {
+            "density": 72,
+            "height": [
+              3,
+              7
+            ],
+            "colours": [
+              "#4b762d",
+              "#6b9a3c",
+              "meadow_light",
+              "#3f6a2a"
+            ],
+            "tufts": 3
+          },
+          "flowers": {
+            "density": 1.5,
+            "colours": [
+              "clover",
+              "buttercup"
+            ]
+          },
+          "tiles": 4,
+          "seed": 11
+        },
+        "stages": [
+          {
+            "colour": "moss",
+            "edge": "#5f7d3e",
+            "coverage": 0.45,
+            "blades": 0.7,
+            "width": 5,
+            "softness": 2
+          },
+          {
+            "colour": "olive_dark",
+            "edge": "#55683a",
+            "coverage": 0.65,
+            "blades": 0.4,
+            "width": 9,
+            "softness": 2
+          },
+          {
+            "colour": "soil_dark",
+            "edge": "#5a5a3a",
+            "coverage": 0.85,
+            "blades": 0.15,
+            "width": 13,
+            "softness": 2
+          }
+        ],
+        "preview": [
+          1,
+          2,
+          3,
+          3,
+          2,
+          1
+        ],
+        "seed": 11
+      }
+    },
+    {
+      "id": "worn-path-earth",
+      "name": "Earth track",
+      "version": 1,
+      "notes": "Turns brown earlier; a clearer road for busy routes.",
+      "spec": {
+        "mode": "path",
+        "ground": {
+          "mode": "grass",
+          "base": "meadow",
+          "shades": [
+            "meadow_deep",
+            "#527c33",
+            "meadow",
+            "#6a9440"
+          ],
+          "patchiness": 0.55,
+          "blades": {
+            "density": 72,
+            "height": [
+              3,
+              7
+            ],
+            "colours": [
+              "#4b762d",
+              "#6b9a3c",
+              "meadow_light",
+              "#3f6a2a"
+            ],
+            "tufts": 3
+          },
+          "flowers": {
+            "density": 1.5,
+            "colours": [
+              "clover",
+              "buttercup"
+            ]
+          },
+          "tiles": 4,
+          "seed": 11
+        },
+        "stages": [
+          {
+            "colour": "#5b6f3a",
+            "edge": "#5f7840",
+            "coverage": 0.5,
+            "blades": 0.55,
+            "width": 6,
+            "softness": 1
+          },
+          {
+            "colour": "soil",
+            "edge": "#5c6a3c",
+            "coverage": 0.72,
+            "blades": 0.25,
+            "width": 10,
+            "softness": 1
+          },
+          {
+            "colour": "#4e4232",
+            "edge": "#55543a",
+            "coverage": 0.9,
+            "blades": 0.08,
+            "width": 14,
+            "softness": 1
+          }
+        ],
+        "preview": [
+          1,
+          2,
+          3,
+          3,
+          2,
+          1
+        ],
+        "seed": 11
+      }
+    },
+    {
+      "id": "worn-path-subtle",
+      "name": "Soft footpath",
+      "version": 1,
+      "notes": "Narrower and gentler; the grass keeps more blades at every stage.",
+      "spec": {
+        "mode": "path",
+        "ground": {
+          "mode": "grass",
+          "base": "#5c8640",
+          "shades": [
+            "#476e33",
+            "#58823c",
+            "#6a9446",
+            "#77a04e"
+          ],
+          "patchiness": 0.7,
+          "blades": {
+            "density": 56,
+            "height": [
+              2,
+              6
+            ],
+            "colours": [
+              "#4c7731",
+              "#68963f",
+              "#82a94f"
+            ],
+            "tufts": 2
+          },
+          "flowers": {
+            "density": 5,
+            "colours": [
+              "clover",
+              "buttercup",
+              "heather"
+            ]
+          },
+          "tiles": 4,
+          "seed": 37
+        },
+        "stages": [
+          {
+            "colour": "#5e7a3f",
+            "edge": "#628243",
+            "coverage": 0.35,
+            "blades": 0.8,
+            "width": 4,
+            "softness": 3
+          },
+          {
+            "colour": "#566a3b",
+            "edge": "#5d7840",
+            "coverage": 0.5,
+            "blades": 0.55,
+            "width": 7,
+            "softness": 3
+          },
+          {
+            "colour": "#5c5139",
+            "edge": "#5d6640",
+            "coverage": 0.7,
+            "blades": 0.3,
+            "width": 10,
+            "softness": 3
+          }
+        ],
+        "preview": [
+          1,
+          2,
+          3,
+          3,
+          2,
+          1
+        ],
+        "seed": 37
+      }
+    }
+  ]
+}

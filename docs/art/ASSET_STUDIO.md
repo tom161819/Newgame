@@ -22,7 +22,7 @@ Volba: předrenderované 3D místo ručního SVG. Projekce, světlo i měřítko
 
 ## Nový asset
 
-1. Vytvoř `art/assets/<kategorie>/<id>/asset.json`. Kategorie: `buildings`, `units`, `trees`, `nature`, `resources`, `decorations`. ID varianty musí začínat `<id>-`.
+1. Vytvoř `art/assets/<kategorie>/<id>/asset.json`. Kategorie: `buildings`, `units`, `terrain`, `trees`, `nature`, `resources`, `decorations`. ID varianty musí začínat `<id>-`.
 2. Pokud se tvar hodí k existujícímu generátoru (např. `watchtower`), jen změň parametry `spec`. Seznam parametrů ukazuje záložka **Spec & files**.
 3. Pro nový druh objektu přidej `studio/src/generators/<nový>.js` (export `{ id, version, label, params, build }`) a zaregistruj ho v `studio/src/generators/index.js`. Používej jen materiály ze Style Guide a nech objekt uvnitř půdorysu.
 4. Spusť `npm test`. Validace ohlásí neznámé materiály, přesah půdorysu nebo duplicitní ID.
@@ -30,6 +30,22 @@ Volba: předrenderované 3D místo ručního SVG. Projekce, světlo i měřítko
 6. Otevři studio a porovnej varianty.
 
 Při jakékoli změně `spec` zvyš `version` varianty. Při změně kódu generátoru zvyš jeho `version`. Dřívější schválení se pak zobrazí jako **Outdated** a test vynutí nový export.
+
+## Terén: tráva, cesty a zarůstání (2D recepty)
+
+Povrch hry je plochá textura dlaždic 64 × 32 px, proto ho nekreslí 3D renderer, ale 2D recept `ground` (`studio/src/generators/ground.js`, `kind: 'surface'`, čisté výpočty v `studio/src/lib/surface.js`).
+
+- **`grass-ground`**: sady zaměnitelných dlaždic trávy (úroveň opotřebení 0). Barevné pole je periodický šum sdílený všemi dlaždicemi sady, takže na sebe navazují bez švů v libovolné kombinaci; detaily dlaždice k okrajům slábnou. Parametry: odstíny, kontrast skvrn, hustota a výška stébel v trsech, kvítí.
+- **`worn-path`**: stupně 1–3 vyšlapané cesty (`src/data/pathWear.js`). Každý stupeň má barvu, okraj, plochu, podíl zbylé trávy, šířku spojovacího pásu a měkkost okraje. Náhled ukazuje pás, který se vyšlape až na hlínu a pak zase zarůstá; hra už opotřebení i zarůstání počítá, mění se jen vzhled.
+- Pravidla jsou ve Style Guide (`terrain`) a hlídá je validace: každý stupeň je tmavší než předchozí, barvy zůstávají tlumeně zelené až hnědé (chroma ≤ 0,24, žádný oranžový ani červený tón). Dnešní herní barvy cest (#a2a06c, #a78d5c, #a58353) tímto pravidlem neprojdou, proto je studio nabízí k nahrazení.
+- Export: kromě náhledu `<varianta>.v<verze>.png` vznikne `<varianta>.v<verze>.tiles.png`, jeden řádek herních dlaždic 64 × 32. U trávy jde o zaměnitelné dlaždice, u cesty o úrovně 0–3. Metadata (`surface`) obsahují počet snímků a pro cesty `gameWear` = `color`, `edge`, `width` pro `wearSurfaces` v `src/data/objects/terrain.js`.
+- Záložka **Scene & lighting** pokryje celou testovací mapu dlaždicemi variant (u trávy pruhy vedle sebe, u cest jeden pás na variantu).
+
+**Příprava ve hře** (bez změny vzhledu, dokud se nic neschválí):
+- terénní objekt smí mít `spriteVariants` (až 8 cest k obrázkům). `AssetManager` je načte jako vrstvy `variant-<i>` a `TerrainRenderer` vybere variantu podle hashe dlaždice;
+- `visual.pathSoftness` u `wearSurfaces` přidá spojovacímu pásu měkký okraj (stejně jako náhled ve studiu).
+
+Po schválení: rozřezat `.tiles.png` na jednotlivé dlaždice do `public/assets/terrain/…`, nastavit `spriteVariants` u `grass_normal` (a dlaždice úrovní u `grass_trampled_1..3`) a převzít `gameWear` do `wearSurfaces`.
 
 ## Výběr a schválení varianty
 
@@ -94,7 +110,7 @@ Takto se do hry dostala věž `watchtower-square` a pánev `torch-post-brazier`:
 
 ## Omezení MVP
 
-- Generátory: `watchtower`, `torch-post`, `house`, `tree` (dub, borovice), `wall` (kamenná hradba, palisáda), `quarry`. Jednotky a animace postav zatím nemají recept.
+- Generátory: `watchtower`, `torch-post`, `house`, `tree` (dub, borovice), `wall` (kamenná hradba, palisáda), `quarry` a 2D `ground` (tráva, cesty). Jednotky a animace postav zatím nemají recept.
 - Animovaný je jen plamen, a to procedurálně v kompozitoru. Snímky animací se zatím neexportují.
 - Export je deterministický v jednom prostředí. Jiný prohlížeč nebo GPU může dát drobně odlišné pixely, proto je autoritou commitnutý PNG.
 - Schválení do repozitáře vyžaduje ruční krok přes GitHub (vložit JSON a otevřít PR). Studio nemá token a na GitHub nezapisuje.

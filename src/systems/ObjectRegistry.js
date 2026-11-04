@@ -42,6 +42,7 @@ export function validateDefinition(definition) {
     || d.spawn.initial < 0 || d.spawn.max < d.spawn.initial || !finite(d.spawn.interval) || d.spawn.interval <= 0)) fail(id, 'neplatné generování suroviny.');
   if (d.spritesheet !== undefined && (!plainObject(d.spritesheet) || ![d.spritesheet.frameWidth,d.spritesheet.frameHeight].every(v => Number.isSafeInteger(v) && v > 0))) fail(id, 'neplatné rozměry spritesheetu.');
   if (d.frontSprite && !/^\/assets\/(?!.*\.\.)[^?#]+\.(png|webp|svg)$/i.test(d.frontSprite)) fail(id, 'neplatná přední vrstva.');
+  if (d.spriteVariants !== undefined && (d.category !== 'terrain' || !Array.isArray(d.spriteVariants) || d.spriteVariants.length > 8 || d.spriteVariants.some(p => typeof p !== 'string' || !/^\/assets\/(?!.*\.\.)[^?#]+\.(png|webp|svg)$/i.test(p)))) fail(id, 'neplatné varianty terénní dlaždice.');
   if (d.visual !== undefined && !plainObject(d.visual)) fail(id, 'neplatné vizuální parametry.');
   if (d.lights !== undefined && (!Array.isArray(d.lights) || d.lights.some(l => !plainObject(l) || typeof l.type !== 'string' || ![l.x, l.y, l.radius, l.intensity, l.flameSize].every(finite)
     || !/^#[0-9a-f]{6}$/i.test(l.color) || l.radius <= 0 || l.intensity < 0 || l.flameSize <= 0 || !plainObject(l.flicker) || ![l.flicker.amplitude, l.flicker.speed].every(finite)))) fail(id, 'neplatný zdroj světla.');

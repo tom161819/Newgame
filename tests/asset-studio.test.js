@@ -81,6 +81,7 @@ test('spec validation reports bad categories, ids, versions, materials and footp
 test('generators are deterministic, clamp oversized specs into the footprint and emit lights for torches', () => {
   for (const asset of catalog.studio) for (const variant of asset.variants) {
     const generator = GENERATORS[asset.generator];
+    if (generator.kind === 'surface') continue; // 2D recipes paint in the browser; tests/asset-studio-surface.test.js
     const a = generator.build(variant.spec, { footprint: asset.footprint, style }), b = generator.build(variant.spec, { footprint: asset.footprint, style });
     assert.equal(stableStringify(a), stableStringify(b), variant.id);
     const { max } = modelBounds(a);

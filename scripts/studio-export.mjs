@@ -25,6 +25,7 @@ try {
     await mkdir(path.join(root, path.dirname(result.paths.sprite)), { recursive: true });
     await writeFile(path.join(root, result.paths.sprite), png);
     await writeFile(path.join(root, result.paths.spriteMeta), `${JSON.stringify(result.meta, null, 2)}\n`);
+    if (result.sheet) await writeFile(path.join(root, result.paths.spriteSheet), Buffer.from(result.sheet.replace(/^data:image\/png;base64,/, ''), 'base64'));
     if (result.front) await writeFile(path.join(root, result.paths.spriteFront), Buffer.from(result.front.replace(/^data:image\/png;base64,/, ''), 'base64'));
     console.log(`Exported ${result.paths.sprite} (${result.meta.width}×${result.meta.height}, hash ${result.meta.specHash})`);
   }
