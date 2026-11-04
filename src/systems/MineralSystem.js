@@ -24,10 +24,9 @@ export class MineralSystem {
     const footprint={...anchor,definition},spec=definition.mining;if(!spec)return[];
     return this.deposits().filter(d=>d.type===spec.depositType&&(spec.overlap?rectanglesOverlap(footprint,d):footprintDistance(footprint,d)<=spec.range)).sort((a,b)=>footprintDistance(footprint,a)-footprintDistance(footprint,b)||a.natural.id.localeCompare(b.natural.id,undefined,{numeric:true}));
   }
-  select(definition,anchor){const candidates=this.candidates(definition,anchor);return definition.mining.overlap?candidates.length===1?candidates[0]:null:candidates.find(d=>d.natural.remaining>0&&d.natural.boundBuildingId==null&&this.scene.fog.isVisibleObject(d))??null;}
+  select(definition,anchor){const candidates=this.candidates(definition,anchor);return definition.mining.overlap?candidates[0]??null:candidates.find(d=>d.natural.remaining>0&&d.natural.boundBuildingId==null&&this.scene.fog.isVisibleObject(d))??null;}
   placementError(definition,anchor){
     if(!definition.mining)return null;const candidates=this.candidates(definition,anchor),deposit=this.select(definition,anchor);
-    if(definition.mining.overlap&&candidates.length>1)return 'Place Quarry over a single Stone Deposit.';
     if(!deposit)return definition.mining.overlap?'Quarry must overlap a finite Stone Deposit.':'Iron Mine requires an available visible Iron Deposit within four tiles.';
     if(deposit.natural.remaining===0)return 'Deposit Depleted';
     if(deposit.natural.boundBuildingId!=null)return 'This deposit is already assigned to another building.';

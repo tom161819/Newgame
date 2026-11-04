@@ -22,3 +22,20 @@ Final gates pending; no feature, tests, release or deployment is claimed complet
 ALPHA: bump SAVE_VERSION for the persistent production/skill/resource changes,
 no older-save migrations. After Stage10 prepare M2 gate in branch and STOP for
 the explicit developer release instruction required by the uploaded handoff.
+
+## PhaseA — DONE
+
+Existing rock placement, finite stock, unique binding, real reachable external
+work slots, strict collision exception and depleted/Fog rules were reused.
+Closed actual gaps: one-cell/full overlap is covered; a footprint across several
+rocks selects the stable primary by deposit ID and never mines the secondary;
+strict Save validation allows that secondary rock overlap while retaining unique
+primary ownership. A valid procedural Quarry preview outlines the selected rock.
+The menu description now states the actual finite-deposit/access requirement.
+
+421 model tests passed (0 failed/skipped), build:pages and the current native
+movement/pickup/physical delivery/IndexedDB/menu smoke passed. One new collision
+fixture initially used a2x2 Tower that did not reach the tested3x3 corner; corrected
+the fixture to the same-sized Castle. No existing tests were removed. Full mineral
+and new furnace native coverage remain pending in PhaseC. Logs:
+/workspace/scratch/Newgame-master10-phaseA-{tests,pages,smoke}.log.

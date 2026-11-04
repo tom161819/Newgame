@@ -9,6 +9,7 @@ export class WorkplaceView {
     const d=this.definition=buildingDefinition(building),base=this.base=towerBase(building),point=(x,y,z=0)=>{const p=gridToWorld(x,y);return{x:p.x-base.x,y:p.y-base.y-z};};
     const {x,y}=building,w=d.width,h=d.height,g=this.body.clear().setPosition(base.x,base.y).setDepth(this.preview?10001:buildingDepth(building));
     const floor=this.footprint.clear().setDepth(this.preview?10000:-90);floor.fillStyle(tint??0x857b50,.25);floor.lineStyle(1,tint??0xc2b489,.8);for(const tile of building.tiles){floor.fillPoints(tilePolygon(tile),true);floor.strokePoints(tilePolygon(tile),true);}
+    if(this.preview&&d.id==='quarry'&&tint===0x71dba6){const deposit=this.scene.naturalResources?.mining.select(d,building);if(deposit){floor.fillStyle(0xe6c36b,.35);floor.lineStyle(3,0xf6d786,1);for(const tile of deposit.tiles){floor.fillPoints(tilePolygon(tile),true);floor.strokePoints(tilePolygon(tile),true);}}}
     g.fillStyle(0x292d20,.3);g.fillEllipse(12,-15,w*59,h*21);
     const a=point(x+.1,y+.1),b=point(x+w-.1,y+.1),c=point(x+w-.1,y+h-.1),e=point(x+.1,y+h-.1);
     polygon(g,tint??0x8f8773,[a,b,c,e]);
