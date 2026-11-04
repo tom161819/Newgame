@@ -1,5 +1,25 @@
 # M2 publication checkpoint — verified candidate, public release pending
 
+## Manual-merge handoff after PR28 — 2026-11-04
+
+PR22 was confirmed OPEN on the ordinary public GitHub page. Main2663942/PR28
+adds approved villager facings and Studio export. Normally merged as8a2fed5;
+only COORDINATION conflicted. Both authors' history and the latest task order
+were preserved; all game/art files match main. The exact conflict shown in the
+user's browser screenshot is resolved and that merge is already pushed.
+
+477/477models,0failed/0skipped; changelog/catalog validation and Pages build pass.
+Native `--population --fog` exits0:200residents, actual portraits/selection,
+profession/XP tooltips, visibility, map memory, current Save14 and historical
+storage isolation. Updated Studio Canvas/WebGL/export/mobile exits0. Logs in
+workspace/scratch: Newgame-M2-villager-integration-{tests,pages,smoke,studio}.log.
+No production model/schema or archived bytes changed; frozen02a remains intact.
+
+The remaining manual action is on the PR overview after green GitHub Checks:
+choose Create a merge commit, then Merge pull request / Confirm merge. The user
+need not resolve the stale browser conflict editor. Actual remote merge/Pages,
+formal final gate and public tag are still pending; do not mark M2 RELEASED.
+
 ## Final upload and actual merge attempt — 2026-11-04
 
 Candidate e574f75 is pushed to PR22. The newer maina09de58/PR27 adds only the
