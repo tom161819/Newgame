@@ -1,12 +1,17 @@
+// Approved Asset Studio art (art/approvals.json): grass-ground-lush for untouched
+// grass (four interchangeable tiles picked per tile) and worn-path-moss for the
+// trampled stages, with its connection-strip colours (metadata gameWear).
+const GRASS_TILES=[0,1,2,3].map(i=>`/assets/terrain/grass/lush/grass-ground-lush.v1.tile-${i}.png`);
 const wearSurfaces=[
-  {id:'grass_normal',name:'Grass — Normal',description:'Původní vysoká tráva.',color:'#74854b',edge:'#86975c',width:0},
-  {id:'grass_trampled_1',name:'Grass — Trampled 1',description:'Lehce sešlapaná tráva od pěti průchodů. Rychlost +5 %.',color:'#a2a06c',edge:'#9b9f66',width:5},
-  {id:'grass_trampled_2',name:'Grass — Trampled 2',description:'Travnatohlinitá pěšina od patnácti průchodů. Rychlost +10 %.',color:'#a78d5c',edge:'#96935f',width:10},
-  {id:'grass_trampled_3',name:'Grass — Trampled 3',description:'Výrazná hlinitá cesta od třiceti průchodů. Rychlost +15 %.',color:'#a58353',edge:'#8d8957',width:15},
-].map((d,level)=>({id:d.id,name:d.name,description:d.description,category:'terrain',sprite:`/assets/terrain/path_wear/${d.id}.svg`,
+  {id:'grass_normal',name:'Grass — Normal',description:'Původní vysoká tráva.',color:'#74854b',edge:'#86975c',width:0,sprite:GRASS_TILES[0],variants:GRASS_TILES,artSource:'art/sprites/grass-ground/grass-ground-lush.v1.json'},
+  {id:'grass_trampled_1',name:'Grass — Trampled 1',description:'Lehce sešlapaná tráva od pěti průchodů. Rychlost +5 %.',color:'#56723a',edge:'#5f7d3e',width:5},
+  {id:'grass_trampled_2',name:'Grass — Trampled 2',description:'Travnatohlinitá pěšina od patnácti průchodů. Rychlost +10 %.',color:'#4d5e34',edge:'#55683a',width:9},
+  {id:'grass_trampled_3',name:'Grass — Trampled 3',description:'Výrazná hlinitá cesta od třiceti průchodů. Rychlost +15 %.',color:'#574a36',edge:'#5a5a3a',width:13},
+].map((d,level)=>({id:d.id,name:d.name,description:d.description,category:'terrain',sprite:d.sprite??`/assets/terrain/path_wear/moss/worn-path-moss.v1.tile-${level}.png`,
+  ...(d.variants?{spriteVariants:d.variants}:{}),artSource:d.artSource??'art/sprites/worn-path/worn-path-moss.v1.json',
   width:1,height:1,walkable:true,collectible:false,buildable:false,cost:{},interactions:[],
   renderMode:'sprite',origin:{x:.5,y:.5},visualHeight:0,depth:{offset:-100},
-  visual:{wearLevel:level,pathColor:d.color,pathEdge:d.edge,pathWidth:d.width},
+  visual:{wearLevel:level,pathColor:d.color,pathEdge:d.edge,pathWidth:d.width,...(level?{pathSoftness:2}:{})},
 }));
 export const terrain = [
   {

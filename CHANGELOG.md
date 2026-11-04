@@ -5,6 +5,10 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+### Improved
+- Farmhouse, Granary, Bakery, Mill, Warehouse, Hunting Lodge, Lumberjack Hut and Smelter have new painted looks with yards that show their trade: hay and a trough, a raised granary with sacks, a bread oven, a windmill, crates and barrels, drying hides, a log pile, and a furnace with a living flame.
+- Lusher grass in four interchangeable tile designs with tufts and small flowers, and footpaths that wear from flattened green through dark olive to muted dark earth with soft edges, instead of orange-tan strips.
+
 ## [0.3.0] - 2026-11-04
 <!-- version: {"title": "M2: Resources, economy and iron", "tag": "v0.3.0", "type": "milestone", "reconstructed": false, "evidence": ["src/systems/NaturalResourcesSystem.js", "src/systems/MineralSystem.js", "src/systems/ResourceTransactionLedger.js", "src/data/objects/smelting.js", "docs/verification/master-10.md"]} -->
 ### Added

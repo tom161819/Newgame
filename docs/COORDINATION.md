@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| M2 final candidate and stable native release checks | Codex | `codex/m2-smelting-smoke`, mainf1d6526 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), uploaded; actual edit/merge API Forbidden | READY:462working-tree models/Studio pass; game source02a has459models/full native,73archives/2456HTTP/UI/Save14 verified. Game/build source paths still match02a exactly;72older archives unchanged. Public tag/main/deployment gates pending; master11/C01–C08 unstarted. | Native smoke helpers/regression,0.3.0 notes, new source archive/catalog and release/progress docs. No Codex gameplay/graphics/schema rewrite; new military assets stay Draft Studio-only. |
+| M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main14071b1 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT 403 | IN PROGRESS: source02a stays frozen; preserve newer approved ground and production-building art. Verify actual deployed archive blobs independently of newer live development, then run relevant integration checks. Public tag/deployment gates pending; master11/C01–C08 unstarted. | Native smoke regressions; `scripts/release-gate.mjs`, new deployed-archive verifier/tests; release notes, new source archive/catalog and progress docs. No Codex art/schema rewrite. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -21,6 +21,9 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#24](https://github.com/tom161819/Newgame/pull/24) Approved assets part 2: production-building art and living Smelter flame (Claude), main14071b1. Preserved in the M2 candidate; later art stays Unreleased.
+
+- 2026-11-04 [#23](https://github.com/tom161819/Newgame/pull/23) Approved assets part 1: developer approvals (58 variants), lush grass and moss footpaths in the game (Claude).
 - 2026-11-04 [#20](https://github.com/tom161819/Newgame/pull/20) V02/V03 studio concepts: bowyer, swordsmith, armorer, armory, stables, equipment items and four soldier classes with an 8-direction sheet (Claude). Draft/Review on the C06–C08 ids; adjust when Codex fixes them.
 - 2026-11-04 [#19](https://github.com/tom161819/Newgame/pull/19) Gradual and uneven seasonal terrain/tree transitions (Claude), merged main630caf1. Started before C01 at the developer's request; preserved by Codex integration.
 - 2026-11-04 [#18](https://github.com/tom161819/Newgame/pull/18) Actual M2 source archive f053be1 (72 snapshots) and original follow-up CODEX_MASTER C01–C08 queue (Codex), merged mainb554b4e. Release verification/tag remains active above.

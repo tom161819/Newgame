@@ -47,7 +47,8 @@ test('ground variants are valid, exported with a tile sheet and stay drafts or r
       assert.ok(existsSync(path.join(root, variant.paths.spriteSheet)));
       assert.deepEqual(sheet, { width: meta.surface.frames * 64, height: 32 }, `${variant.id} sheet holds 64 × 32 frames`);
       assert.equal(meta.surface.frames, variant.spec.mode === 'path' ? WEAR_STAGES : variant.spec.tiles);
-      assert.notEqual(approvals.assets[asset.id]?.variants?.[variant.id]?.status, 'approved', 'ground art waits for the developer');
+      const review = approvals.assets[asset.id]?.variants?.[variant.id];
+      if (review?.status === 'approved') assert.equal(review.specHash, variant.hash, `${variant.id}: approval matches the current spec`);
     }
   }
 });
@@ -62,9 +63,10 @@ test('worn stages darken towards muted brown; today\'s orange-tan path colours f
     assert.ok(lightness(last) < 0.36 && chroma(last) <= 0.24, `${variant.id}: last stage is dark, muted soil`);
   }
   const moss = path.variants[0].spec;
-  const today = objectDefinitions.filter(d => /^grass_trampled_/.test(d.id)).map(d => d.visual);
-  const asToday = { ...moss, stages: today.map((v, i) => ({ ...moss.stages[i], colour: v.pathColor, edge: v.pathEdge })) };
-  assert.ok(validateSurfaceSpec(asToday, { style }).some(p => /orange|darker/.test(p)));
+  // The previous in-game path colours (before the approved moss path) fail the rule.
+  const before = [['#a2a06c', '#9b9f66'], ['#a78d5c', '#96935f'], ['#a58353', '#8d8957']];
+  const asBefore = { ...moss, stages: before.map(([colour, edge], i) => ({ ...moss.stages[i], colour, edge })) };
+  assert.ok(validateSurfaceSpec(asBefore, { style }).some(p => /orange|darker/.test(p)));
   assert.ok(validateSurfaceSpec({ ...moss, stages: [moss.stages[0], { ...moss.stages[1], colour: '#b04020' }, moss.stages[2]] }, { style }).length);
   assert.ok(validateSurfaceSpec({ mode: 'grass', base: 'nope', shades: ['meadow'], blades: { density: 500, height: [9, 2], colours: [] } }, { style }).length >= 4);
 });
