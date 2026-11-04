@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "windmill",
+  "variantId": "windmill-post",
+  "name": "Wooden post mill",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "6b4180a3",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 121,
+  "anchor": {
+    "x": 65,
+    "y": 87
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.71901
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 119
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98347
+  },
+  "visualHeight": 119,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.25,
+  "lights": []
+}

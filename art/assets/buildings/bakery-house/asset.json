@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "id": "bakery-house",
+  "name": "Bakery",
+  "category": "buildings",
+  "description": "Bakery with a domed bread oven in the yard, firewood, flour sacks and a kneading bench.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "workshop",
+  "gameObjectId": "bakery",
+  "variants": [
+    {
+      "id": "bakery-house-yard-oven",
+      "name": "Bakery with yard oven",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "timber",
+          "roofMaterial": "roof_tile",
+          "width": 1.0,
+          "depth": 1.0,
+          "wallHeight": 0.95,
+          "roofHeight": 0.7,
+          "ridge": "z",
+          "windows": 1,
+          "chimney": true,
+          "at": [
+            -0.3,
+            -0.3
+          ]
+        },
+        "props": [
+          {
+            "type": "oven",
+            "at": [
+              0.45,
+              0.3
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.55,
+              -0.6
+            ]
+          },
+          {
+            "type": "sacks",
+            "at": [
+              -0.6,
+              0.55
+            ],
+            "count": 3
+          },
+          {
+            "type": "workbench",
+            "at": [
+              0.0,
+              0.8
+            ]
+          }
+        ]
+      },
+      "notes": "Recommended concept for review."
+    },
+    {
+      "id": "bakery-house-stall",
+      "name": "Stone bakery with bread stall",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "stone",
+          "roofMaterial": "roof_shingle",
+          "width": 1.0,
+          "depth": 1.0,
+          "wallHeight": 0.95,
+          "roofHeight": 0.75,
+          "ridge": "x",
+          "windows": 1,
+          "chimney": true,
+          "lantern": true,
+          "at": [
+            -0.3,
+            -0.3
+          ]
+        },
+        "props": [
+          {
+            "type": "awning",
+            "at": [
+              0.5,
+              0.45
+            ],
+            "width": 0.6,
+            "depth": 0.4,
+            "height": 0.55
+          },
+          {
+            "type": "crates",
+            "at": [
+              0.38,
+              0.4
+            ],
+            "count": 2
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.55,
+              -0.6
+            ]
+          },
+          {
+            "type": "sacks",
+            "at": [
+              -0.62,
+              0.6
+            ],
+            "count": 2
+          },
+          {
+            "type": "barrel",
+            "at": [
+              -0.1,
+              0.8
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

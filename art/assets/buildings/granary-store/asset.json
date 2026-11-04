@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "id": "granary-store",
+  "name": "Granary",
+  "category": "buildings",
+  "description": "Grain store: sacks, barrels and a cart around a raised or stone granary.",
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "generator": "workshop",
+  "gameObjectId": "granary",
+  "variants": [
+    {
+      "id": "granary-store-raised",
+      "name": "Raised timber granary",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "raised",
+          "walls": "wood",
+          "roofMaterial": "thatch",
+          "width": 1.8,
+          "depth": 1.4,
+          "wallHeight": 1.0,
+          "roofHeight": 0.9,
+          "ridge": "x",
+          "windows": 0,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "sacks",
+            "at": [
+              0.55,
+              0.6
+            ],
+            "count": 5
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -1.05,
+              0.8
+            ],
+            "count": 4
+          },
+          {
+            "type": "cart",
+            "at": [
+              1.0,
+              -0.25
+            ]
+          },
+          {
+            "type": "sacks",
+            "at": [
+              0.98,
+              0.15
+            ],
+            "count": 2
+          }
+        ]
+      },
+      "notes": "Recommended concept for review."
+    },
+    {
+      "id": "granary-store-stone",
+      "name": "Stone granary",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "stone",
+          "roofMaterial": "roof_tile",
+          "width": 1.9,
+          "depth": 1.5,
+          "wallHeight": 1.1,
+          "roofHeight": 0.9,
+          "ridge": "x",
+          "windows": 1,
+          "at": [
+            -0.25,
+            -0.3
+          ]
+        },
+        "props": [
+          {
+            "type": "crates",
+            "at": [
+              0.55,
+              0.75
+            ],
+            "count": 4
+          },
+          {
+            "type": "sacks",
+            "at": [
+              -0.9,
+              0.8
+            ],
+            "count": 5
+          },
+          {
+            "type": "barrels",
+            "at": [
+              0.95,
+              -0.4
+            ],
+            "count": 3
+          },
+          {
+            "type": "millstone",
+            "at": [
+              0.05,
+              0.95
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

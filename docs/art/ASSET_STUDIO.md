@@ -62,6 +62,14 @@ Recept `figure` (`studio/src/generators/figure.js`) skládá postavu z nízkopol
 - Při aktivní práci (stavba v daném snímku postoupila) stoupá jemný prach (`DustEmitter`): nejvýš jeden obláček za 240–520 ms, nejvýš 6 na stavbu a 48 v celé hře. Obrázky se recyklují, skryté stavby žádné obláčky nemají a při `prefers-reduced-motion` je prach vypnutý.
 - Podobu lešení navrhuje recept `scaffold` (`art/assets/buildings/scaffold`): fáze low/mid/high podle postupu stavby, kulatá vázaná nebo hranolová břevna, rozestavěné kamenné nebo trámové jádro, žebřík a materiál vedle stavby. Hra dál kreslí lešení čarami, dokud se varianta neschválí.
 
+## Budovy s tematickými předměty
+
+Recept `workshop` (`studio/src/generators/workshop.js`) postaví hlavní stavbu a kolem ní dvorek s předměty, podle kterých se pozná řemeslo. Hlavní stavba je jeden z druhů: `house` (recept domu), `raised` (sýpka na kamenných patkách), `windmill` (věžový mlýn s lopatkami natočenými k divákovi), `furnace` (pec s měchy a světlem) a `barn` (velká stodola s vraty). Umístí se mimo střed (`body.at`), aby zbylo místo na dvůr.
+
+Předměty jsou katalog v `studio/src/generators/props.js`: pytle, sudy, bedny, seno, kmeny, palivové dříví, špalek se sekerou, mlýnský kámen, kolo, pracovní stůl, pec na chleba, skládaný kámen, ruda, uhlí, kovadlina, stojan s nářadím, rám s kůží, parohy, plot, vozík, koryto, přístřešek a plachta. Ve `spec` se zapisují jako seznam `{ type, at: [x, z], … }`, takže nová budova je hlavně data.
+
+Koncepty (vždy dvě varianty, doporučená je ve stavu Review): statek, sýpka, pekárna, mlýn, tavírna (budoucí budova), sklad, lovecká chata a dřevorubecká chata. Hra je nepoužívá, dokud je vývojář neschválí a nepřevezme podle postupu níže. Pravidlo pro předměty je ve Style Guide (`props`).
+
 ## Výběr a schválení varianty
 
 1. V záložce **Compare variants** porovnej varianty vedle sebe: zoom 0,5–4×, pozadí, mřížka, půdorys, ohraničení s rozměry v pixelech, člověk 1,2 jednotky, přepínač *Game pixels* (přesně 1×) a denní doba.
@@ -125,7 +133,7 @@ Takto se do hry dostala věž `watchtower-square` a pánev `torch-post-brazier`:
 
 ## Omezení MVP
 
-- Generátory: `watchtower`, `torch-post`, `house`, `tree` (dub, borovice), `wall` (kamenná hradba, palisáda), `quarry`, 2D `ground` (tráva, cesty) a `figure` (postavy). Postavy jsou zatím statické, bez snímků animace.
+- Generátory: `watchtower`, `torch-post`, `house`, `tree` (dub, borovice), `wall` (kamenná hradba, palisáda), `quarry`, 2D `ground` (tráva, cesty), `figure` (postavy), `scaffold` (lešení) a `workshop` (budovy s předměty). Postavy jsou zatím statické, bez snímků animace.
 - Animovaný je jen plamen, a to procedurálně v kompozitoru. Snímky animací se zatím neexportují.
 - Export je deterministický v jednom prostředí. Jiný prohlížeč nebo GPU může dát drobně odlišné pixely, proto je autoritou commitnutý PNG.
 - Schválení do repozitáře vyžaduje ruční krok přes GitHub (vložit JSON a otevřít PR). Studio nemá token a na GitHub nezapisuje.

@@ -9,6 +9,7 @@ import quarry from './quarry.js';
 import ground from './ground.js';
 import figure from './figure.js';
 import scaffold from './scaffold.js';
+import workshop from './workshop.js';
 
 export const GENERATORS = Object.freeze({
   [watchtower.id]: watchtower,
@@ -20,4 +21,5 @@ export const GENERATORS = Object.freeze({
   [ground.id]: ground,
   [figure.id]: figure,
   [scaffold.id]: scaffold,
+  [workshop.id]: workshop,
 });

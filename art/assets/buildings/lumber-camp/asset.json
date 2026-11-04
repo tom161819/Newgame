@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "id": "lumber-camp",
+  "name": "Lumberjack Hut",
+  "category": "buildings",
+  "description": "Woodcutters’ hut: a pile of trunks, a chopping stump with an axe and stacked firewood.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "workshop",
+  "gameObjectId": "lumberjack_hut",
+  "variants": [
+    {
+      "id": "lumber-camp-hut",
+      "name": "Lumberjack hut with log pile",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.0,
+          "depth": 0.9,
+          "wallHeight": 0.85,
+          "roofHeight": 0.65,
+          "ridge": "z",
+          "windows": 1,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "logs",
+            "at": [
+              0.25,
+              0.45
+            ],
+            "count": 6,
+            "length": 0.55
+          },
+          {
+            "type": "stump",
+            "at": [
+              -0.55,
+              0.62
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.6,
+              -0.55
+            ]
+          },
+          {
+            "type": "toolRack",
+            "at": [
+              0.85,
+              -0.05
+            ],
+            "r": 1.5708
+          }
+        ]
+      },
+      "notes": "Recommended concept for review."
+    },
+    {
+      "id": "lumber-camp-sawhorse",
+      "name": "Hut with sawing bench",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "timber",
+          "roofMaterial": "thatch",
+          "width": 1.0,
+          "depth": 0.9,
+          "wallHeight": 0.85,
+          "roofHeight": 0.75,
+          "ridge": "x",
+          "windows": 1,
+          "chimney": true,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "workbench",
+            "at": [
+              0.45,
+              0.55
+            ]
+          },
+          {
+            "type": "logs",
+            "at": [
+              -0.75,
+              0.5
+            ],
+            "count": 5,
+            "length": 0.45
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              -0.5
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.6,
+              0.0
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

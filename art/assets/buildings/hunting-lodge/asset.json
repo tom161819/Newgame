@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "id": "hunting-lodge",
+  "name": "Hunting Lodge",
+  "category": "buildings",
+  "description": "Hunters’ lodge: antlers over the door, hides drying on racks, firewood and a chopping stump.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "workshop",
+  "gameObjectId": "hunting_lodge",
+  "variants": [
+    {
+      "id": "hunting-lodge-log",
+      "name": "Log hunting lodge",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.1,
+          "depth": 0.95,
+          "wallHeight": 0.85,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 1,
+          "chimney": true,
+          "at": [
+            -0.25,
+            -0.3
+          ]
+        },
+        "props": [
+          {
+            "type": "antlers",
+            "at": [
+              -0.45,
+              0.21
+            ],
+            "y": 0.82
+          },
+          {
+            "type": "hideRack",
+            "at": [
+              0.55,
+              0.35
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.55,
+              -0.62
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.05,
+              0.72
+            ]
+          }
+        ]
+      },
+      "notes": "Recommended concept for review."
+    },
+    {
+      "id": "hunting-lodge-thatch",
+      "name": "Thatched lodge with drying racks",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "timber",
+          "roofMaterial": "thatch",
+          "width": 1.0,
+          "depth": 0.95,
+          "wallHeight": 0.85,
+          "roofHeight": 0.8,
+          "ridge": "z",
+          "windows": 1,
+          "at": [
+            -0.3,
+            -0.3
+          ]
+        },
+        "props": [
+          {
+            "type": "hideRack",
+            "at": [
+              0.55,
+              0.25
+            ]
+          },
+          {
+            "type": "hideRack",
+            "at": [
+              0.55,
+              0.7
+            ]
+          },
+          {
+            "type": "antlers",
+            "at": [
+              -0.48,
+              0.21
+            ],
+            "y": 0.82
+          },
+          {
+            "type": "logs",
+            "at": [
+              -0.75,
+              0.55
+            ],
+            "count": 3,
+            "length": 0.4
+          }
+        ]
+      }
+    }
+  ]
+}

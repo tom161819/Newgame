@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "id": "warehouse-store",
+  "name": "Warehouse",
+  "category": "buildings",
+  "description": "Storehouse: a big barn with double doors and a yard of crates, barrels and sacks.",
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "generator": "workshop",
+  "gameObjectId": "warehouse",
+  "variants": [
+    {
+      "id": "warehouse-store-timber",
+      "name": "Timber warehouse",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "barn",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.9,
+          "depth": 1.5,
+          "wallHeight": 1.2,
+          "roofHeight": 0.9,
+          "ridge": "x",
+          "at": [
+            -0.3,
+            -0.4
+          ]
+        },
+        "props": [
+          {
+            "type": "crates",
+            "at": [
+              0.55,
+              0.6
+            ],
+            "count": 4
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -1.0,
+              0.75
+            ],
+            "count": 4
+          },
+          {
+            "type": "sacks",
+            "at": [
+              -0.05,
+              0.95
+            ],
+            "count": 3
+          },
+          {
+            "type": "cart",
+            "at": [
+              1.0,
+              -0.45
+            ]
+          }
+        ]
+      },
+      "notes": "Recommended concept for review."
+    },
+    {
+      "id": "warehouse-store-stone",
+      "name": "Stone warehouse",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "barn",
+          "walls": "stone",
+          "roofMaterial": "roof_tile",
+          "width": 1.9,
+          "depth": 1.5,
+          "wallHeight": 1.2,
+          "roofHeight": 0.9,
+          "ridge": "x",
+          "at": [
+            -0.3,
+            -0.4
+          ]
+        },
+        "props": [
+          {
+            "type": "crates",
+            "at": [
+              0.6,
+              0.65
+            ],
+            "count": 3
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -1.05,
+              0.8
+            ],
+            "count": 3
+          },
+          {
+            "type": "tarp",
+            "at": [
+              1.0,
+              -0.35
+            ]
+          },
+          {
+            "type": "sacks",
+            "at": [
+              0.0,
+              0.95
+            ],
+            "count": 4
+          }
+        ]
+      }
+    }
+  ]
+}

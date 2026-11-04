@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "lumber-camp",
+  "variantId": "lumber-camp-hut",
+  "name": "Lumberjack hut with log pile",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "fb16ec6c",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 119,
+  "anchor": {
+    "x": 65,
+    "y": 85
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.71429
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 117
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98319
+  },
+  "visualHeight": 117,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.64,
+  "lights": []
+}

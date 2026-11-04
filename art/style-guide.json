@@ -105,7 +105,8 @@
     "cloth_red": "#8d3a2e",
     "cloth_ochre": "#b88a3e",
     "cloth_grey": "#7c7a72",
-    "leather": "#6e4a2c"
+    "leather": "#6e4a2c",
+    "ore": "#7d5a45"
   },
   "materials": {
     "stone": {
@@ -352,6 +353,13 @@
       "repeat": 1,
       "variation": 0.05,
       "description": "Belts, boots, aprons, quivers and straps."
+    },
+    "ore": {
+      "color": "ore",
+      "texture": "noise",
+      "repeat": 0.6,
+      "variation": 0.18,
+      "description": "Iron ore: rusty brown rock."
     }
   },
   "light": {
@@ -444,5 +452,8 @@
     "rule": "Figures are 1.2 units tall (1.12 for women), face the camera and keep every part inside one tile.",
     "readability": "A profession must read at 1× from three cues at once: headgear, the tool or load in hand, and the main garment colour. Avoid recoloured clones.",
     "sexes": "Men wear a tunic over hose and may have a beard; women wear a long dress or kirtle, a coif or kerchief, often an apron. Tools and colours follow the profession, not the sex."
+  },
+  "props": {
+    "rule": "Every production building tells its trade with two or three props in its yard: sacks, barrels, crates, hay, logs, an oven, ore, tools. Props stay inside the footprint and below the eaves, so the building keeps a clear silhouette."
   }
 }
