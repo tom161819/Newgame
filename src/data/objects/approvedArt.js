@@ -22,6 +22,17 @@ export const APPROVED_TREE_ART=Object.freeze({
   pine_tree:{mature:{sprite:'/assets/resources/pine_tree/art/pine-tree-mature.v1.png',artSource:'art/sprites/pine-tree/pine-tree-mature.v1.json',origin:{"x":0.44595,"y":0.87838}},young:{sprite:'/assets/resources/pine_tree/art/pine-tree-young.v1.png',artSource:'art/sprites/pine-tree/pine-tree-young.v1.json',origin:{"x":0.49254,"y":0.80645}},winter:{sprite:'/assets/resources/pine_tree/art/pine-seasons-winter.v1.png',artSource:'art/sprites/pine-seasons/pine-seasons-winter.v1.json',origin:{"x":0.44595,"y":0.87919}}},
 });
 
+// Approved scaffold art by construction stage (drawn for a 2 × 2 site, scaled to
+// the site's width, anchored at the front corner like buildings). Wooden
+// buildings show the timber-frame variant in the middle stage.
+export const APPROVED_SCAFFOLD_ART=Object.freeze({
+  low:{sprite:'/assets/buildings/scaffold/scaffold-low.v1.png',artSource:'art/sprites/scaffold/scaffold-low.v1.json',origin:{"x":0.47101,"y":0.98261},visualHeight:113},
+  mid:{sprite:'/assets/buildings/scaffold/scaffold-mid.v1.png',artSource:'art/sprites/scaffold/scaffold-mid.v1.json',origin:{"x":0.44218,"y":0.9863},visualHeight:144},
+  high:{sprite:'/assets/buildings/scaffold/scaffold-high.v1.png',artSource:'art/sprites/scaffold/scaffold-high.v1.json',origin:{"x":0.41667,"y":0.98876},visualHeight:176},
+  timber:{sprite:'/assets/buildings/scaffold/scaffold-timber.v1.png',artSource:'art/sprites/scaffold/scaffold-timber.v1.json',origin:{"x":0.44218,"y":0.98639},visualHeight:145},
+});
+export const TIMBER_SCAFFOLD_BUILDINGS=Object.freeze(['farmhouse','granary','hunting_lodge','lumberjack_hut']);
+
 export function withApprovedArt(definition){
   const building=APPROVED_BUILDING_ART[definition.id],tree=APPROVED_TREE_ART[definition.id];
   if(building)return{...definition,...structuredClone(building),renderMode:'sprite'};

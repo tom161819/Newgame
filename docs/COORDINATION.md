@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main2ce3cd7 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT403 | READY:475models/Pages pass; prior full native/Studio/73URLs pass; targeted approved-tree/Fog/zoom/seasons/Save14 native exit0. Frozen02a has own459test archive; final verifier checks actual deployed Git blobs, allowing later live development. Public tag/main/deployment gates pending; new user order C01–C08 then master11–15, all unstarted. | Native smoke regressions; release-gate/deployed-archive verifier and tests; release notes,02a archive/catalog, progress/verification docs. Claude art unchanged; no schema rewrite. |
+| M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main4857ba7 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT403 | IN PROGRESS:475models/Pages and tree native pass; approved-scaffold integration checks running; earlier full native/Studio/73URLs pass. Frozen02a has own459test archive; final verifier checks actual deployed Git blobs, allowing later live development. Public tag/main/deployment gates pending; new user order C01–C08 then master11–15, all unstarted. | Native smoke regressions; release-gate/deployed-archive verifier and tests; release notes,02a archive/catalog, progress/verification docs. Claude art unchanged; no schema rewrite. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -20,6 +20,8 @@ None pending. Add entries here when one pull request must wait for another.
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-04 [#26](https://github.com/tom161819/Newgame/pull/26) Approved assets part 4: scaffold stage art (Claude), main4857ba7, preserved unchanged.
 
 - 2026-11-04 [#25](https://github.com/tom161819/Newgame/pull/25) Approved assets part 3: young/mature/seasonal Oak and Pine studio art (Claude), main2ce3cd7, preserved unchanged.
 
