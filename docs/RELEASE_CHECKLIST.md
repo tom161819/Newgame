@@ -1,6 +1,6 @@
 # Milestone release gate
 
-Automatická vydání M1–M5 jsou uživatelem výslovně zadaná. Běžné pracovní commity jsou Unreleased. Skript `release:prepare` nadále pouze připravuje soubory; autorizovaný orchestrátor pak provede skutečný Git/publikaci samostatně.
+Automatická vydání M1–M5 jsou uživatelem výslovně zadaná; nový pokyn2026-11-04 ruší dřívější stop po10 a čekání na další release svolení. Po úspěšném gate vydat, ověřit skutečnou publikaci a automaticky pokračovat masterem. Běžné pracovní commity jsou Unreleased. Skript `release:prepare` nadále pouze připravuje soubory; autorizovaný orchestrátor pak provede skutečný Git/publikaci samostatně.
 
 1. Ověřit všechny etapy daného milníku v progress, reálné commity, čistotu rozsahu změn a aktuální verzi/tagy. Nevydávat historická či duplicitní čísla.
 2. Spustit plné automatické testy, relevantní integrační scénáře, dostupný browser smoke, New Game, Save/Load aktuálního schématu včetně odmítnutí savu jiného schématu (ALPHA: starší savy se nemigrují), logistiku, rušení staveb, více NPC, FoW a výkon. Zapsat skutečné výsledky a neověřené části.

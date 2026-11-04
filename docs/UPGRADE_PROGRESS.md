@@ -77,3 +77,7 @@ Etapa09 byla sloučena přes PR9 do main97b3381; předchozí síťová blokace p
 ### Trvalé pravidlo konfliktů — 2026-11-04
 
 Uživatel výslovně zrušil nutnost potvrzovat další běžné konflikty: Codex je řeší samostatně ve vlastní větvi, zachovává záměr obou autorů, ověřuje výsledek a zapisuje řešení. Toto nahrazuje větu o zastavení při konfliktu z dříve nahraného pokynu. Platí i pro Claude přes společný AGENTS.md; jeho vlastní grafické větve se nepřepisují.
+
+## Nové trvalé svolení k vydávání —2026-11-04
+
+Uživatel: „vydej to a nastav že není potřeba čekat na pokyn“. M2 vydání je IN PROGRESS ve větvi codex/m2-release. AGENTS.md zrušil dřívější stop po10 a čekání na další release pokyn. Po úspěšných kontrolách automaticky vydat milník a pokračovat11–15. Technický přístup k GitHub API/Pages se musí skutečně ověřit; nejde jej nahradit přímým pushem do main nebo tvrzením o neprovedeném vydání.
