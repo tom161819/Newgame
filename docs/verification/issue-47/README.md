@@ -81,6 +81,22 @@ publishing the tag. The tag/notes/archive checks passed; it failed exactly at
 public artifact HTTPS: `Cannot verify the actual published release artifact
 through the configured HTTPS connection.` No success report was produced.
 
+## Actual PR creation is blocked
+
+After pushing a1a0b3319ee262d44e3d002894412d704131e769, one standard `gh pr create`
+for this branch was attempted. It returned `Post https://api.github.com/graphql:
+Forbidden`; no PR was created. Do not turn this into a fictitious PR/MERGE-HELP
+number or claim that the new workflow has run. No Issue label/STARTED/comment
+write is claimed either. Current Codex-ready search still returns only47.
+
+An authorized helper can open the prepared branch directly:
+https://github.com/tom161819/Newgame/pull/new/codex/issue-47-m2-release
+
+Re-read the branch's actual head before acting; later commits may only update
+this evidence. Standard required CI and review still apply to the exact PR head.
+A successful main merge will enable the proposed read-only verification job.
+No existing public tag or immutable archive may be changed to work around this.
+
 ## Safe helper / manual handoff
 
 1. Re-read live Issue47, main, this branch's exact head and open PRs. Avoid duplicate

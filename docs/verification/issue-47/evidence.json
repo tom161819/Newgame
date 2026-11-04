@@ -166,5 +166,19 @@
       "Git error aborts instead of reporting absent tag"
     ],
     "liveWorkflowResult": "not executed; requires standard PR merge and actual deployment"
-  }
+  },
+  "prCreationAttempt": {
+    "headAtAttempt": "a1a0b3319ee262d44e3d002894412d704131e769",
+    "branch": "codex/issue-47-m2-release",
+    "attempts": 1,
+    "result": "Post https://api.github.com/graphql: Forbidden",
+    "prCreated": false,
+    "mergeHelpIssueCreated": false,
+    "issueClaimOrLabelsChanged": false,
+    "helperCreateURL": "https://github.com/tom161819/Newgame/pull/new/codex/issue-47-m2-release",
+    "newPRHeadRequiredCI": "not yet run; PR not created"
+  },
+  "eligibleCodexIssuesAtFinalRead": [
+    47
+  ]
 }

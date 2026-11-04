@@ -12,6 +12,22 @@ Required CI of a new PR head still needs to complete before a standard merge.
 The only public open PR observed was Claude PR31 (scheduler smoke test), explicitly
 HOLD. It is excluded from the merge queue and must not be merged as assistance.
 
+## Actual PR-creation attempt
+
+The prepared branch head a1a0b3319ee262d44e3d002894412d704131e769 was pushed.
+One normal `gh pr create` was attempted, with the exact-head body prepared in a
+file. It returned `Post https://api.github.com/graphql: Forbidden` before a PR
+was created. No PR number, current-head green CI, merge or MERGE-HELP Issue is
+invented. Do not retry the unchanged denied API in a loop.
+
+Create/review link for an authorized helper:
+https://github.com/tom161819/Newgame/pull/new/codex/issue-47-m2-release
+
+The source branch may receive evidence-only checkpoints; always re-read its
+actual live SHA and wait for that PR head's required checks. The observed
+current open PR31 is HOLD and is not an eligible substitute. A fresh public
+Codex-ready Issue search still returned only47;48–60 are dependency-blocked.
+
 ## Release/publication handoff — Issue47
 
 - Issue: https://github.com/tom161819/Newgame/issues/47
