@@ -363,3 +363,19 @@ test('villagers use the approved looks in eight directions, chosen by profession
   for (const [profession, bySex] of Object.entries(PROFESSION_LOOKS)) for (const look of Object.values(bySex)) assert.ok(APPROVED_VILLAGER_ART[look], `${profession}: ${look} is approved and exported`);
   assert.deepEqual(['Matěj', 'Anna', 'Jakub 2', 'Eliška', 'Marie', 'Jan', 'Klára 3'].map(villagerSex), ['male', 'female', 'male', 'female', 'female', 'male', 'female']);
 });
+
+test('the connected wall uses the approved wall kit: a block and one parapet per side, byte for byte with the export', async () => {
+  const { APPROVED_WALL_ART } = await import('../src/data/objects/approvedArt.js');
+  assert.deepEqual(Object.keys(APPROVED_WALL_ART).sort(), ['E', 'N', 'S', 'W', 'block']);
+  for (const [piece, art] of Object.entries(APPROVED_WALL_ART)) {
+    const meta = json(art.artSource);
+    assert.equal(meta.variantId, piece === 'block' ? 'wall-kit-block' : `wall-kit-parapet-${piece.toLowerCase()}`);
+    assert.equal(approvals.assets['wall-kit'].variants[meta.variantId]?.status, 'approved', piece);
+    assert.ok(readFileSync(path.join(root, `public${art.sprite}`)).equals(readFileSync(path.join(root, `art/sprites/wall-kit/${meta.variantId}.v1.png`))), piece);
+    assert.deepEqual(art.origin, meta.baseOrigin, `${piece}: anchored at the tile's front corner like the procedural wall`);
+    assert.deepEqual(meta.footprint, { width: 1, height: 1 });
+  }
+  const wall = objectDefinitions.find(d => d.id === 'wall');
+  assert.equal(wall.renderer, 'fortification', 'FortificationView keeps the procedural fallback and the castle');
+  assert.equal(wall.visual.wallHeight, 68);
+});

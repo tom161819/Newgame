@@ -32,6 +32,16 @@ export const APPROVED_SCAFFOLD_ART=Object.freeze({
   high:{sprite:'/assets/buildings/scaffold/scaffold-high.v1.png',artSource:'art/sprites/scaffold/scaffold-high.v1.json',origin:{"x":0.41667,"y":0.98876},visualHeight:176},
   timber:{sprite:'/assets/buildings/scaffold/scaffold-timber.v1.png',artSource:'art/sprites/scaffold/scaffold-timber.v1.json',origin:{"x":0.44218,"y":0.98639},visualHeight:145},
 });
+// Approved wall kit for the connected 1 × 1 wall: one block at the wall-walk
+// height and one parapet per open side (N = grid y−1, E = x+1, S = y+1, W = x−1),
+// all anchored at the tile's front corner like buildings.
+export const APPROVED_WALL_ART=Object.freeze({
+  block:{sprite:'/assets/buildings/wall/kit/wall-kit-block.v1.png',artSource:'art/sprites/wall-kit/wall-kit-block.v1.json',origin:{"x":0.38824,"y":0.98058}},
+  N:{sprite:'/assets/buildings/wall/kit/wall-kit-parapet-n.v1.png',artSource:'art/sprites/wall-kit/wall-kit-parapet-n.v1.json',origin:{"x":0.38372,"y":0.98261}},
+  E:{sprite:'/assets/buildings/wall/kit/wall-kit-parapet-e.v1.png',artSource:'art/sprites/wall-kit/wall-kit-parapet-e.v1.json',origin:{"x":0.38372,"y":0.9802}},
+  S:{sprite:'/assets/buildings/wall/kit/wall-kit-parapet-s.v1.png',artSource:'art/sprites/wall-kit/wall-kit-parapet-s.v1.json',origin:{"x":0.49254,"y":0.9802}},
+  W:{sprite:'/assets/buildings/wall/kit/wall-kit-parapet-w.v1.png',artSource:'art/sprites/wall-kit/wall-kit-parapet-w.v1.json',origin:{"x":0.49254,"y":0.98261}},
+});
 export const TIMBER_SCAFFOLD_BUILDINGS=Object.freeze(['farmhouse','granary','hunting_lodge','lumberjack_hut']);
 
 // Approved villager looks (art/sprites/<profession>/<variant>.v1.facing-<k>.png,

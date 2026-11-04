@@ -9,6 +9,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - The Castle no longer covers the king when he stands in front of it, and the starting stockpile now appears in front of the Castle instead of behind it.
 
 ### Improved
+- Stone walls have a new painted look: solid masonry blocks with a pale wall walk that join seamlessly, with merlons only on the outer edges of a wall line, corner or enclosure.
 - The grass itself now changes with the seasons: fresh green with flowers in spring, olive grass with fallen leaves in autumn and snow cover in winter. A new season spreads in broad patches during its first day, and no light seams show between tiles.
 - Quarries have a new painted look: a stepped stone pit with a timber hoist, stacked blocks and a tool shed. Placing one still outlines its deposit in gold.
 - Villagers dress for their job: woodcutters, miners, hunters, builders, farmers, millers, bakers, haulers and soldiers each have their own clothes, headgear and tools, as men and women, facing all eight walking directions with a light walking and working motion.
