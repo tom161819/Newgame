@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "military-directions",
+  "variantId": "military-directions-1",
+  "name": "Facing 1: south",
+  "category": "units",
+  "version": 1,
+  "specHash": "39a2923d",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 63,
+  "anchor": {
+    "x": 33,
+    "y": 45
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.71429
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 61
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.96825
+  },
+  "visualHeight": 61,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.095,
+  "lights": []
+}

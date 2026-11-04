@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "military-knight",
+  "variantId": "military-knight-blue",
+  "name": "Knight on a bay, blue caparison",
+  "category": "units",
+  "version": 1,
+  "specHash": "ff80cd9a",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 84,
+  "height": 81,
+  "anchor": {
+    "x": 33,
+    "y": 63
+  },
+  "origin": {
+    "x": 0.39286,
+    "y": 0.77778
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 79
+  },
+  "baseOrigin": {
+    "x": 0.39286,
+    "y": 0.97531
+  },
+  "visualHeight": 79,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.538,
+  "lights": []
+}

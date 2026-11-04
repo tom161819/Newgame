@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "swordsmith",
+  "variantId": "swordsmith-lean-to",
+  "name": "Timber smithy with lean-to forge",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "6f1dbbb9",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 124,
+  "anchor": {
+    "x": 65,
+    "y": 90
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.72581
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 122
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98387
+  },
+  "visualHeight": 122,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "brazier",
+      "x": 3.2,
+      "y": -34.09,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    }
+  ],
+  "modelHeight": 1.74,
+  "lights": [
+    {
+      "type": "brazier",
+      "x": 68.2,
+      "y": 87.91,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    }
+  ]
+}

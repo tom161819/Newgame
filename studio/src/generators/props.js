@@ -1,7 +1,7 @@
 // Thematic props shared by building recipes. Each helper returns primitives
 // standing on the ground at (x, z) in model units; `r` turns the prop around
 // the vertical axis where that matters. Only style-guide materials are used.
-import { box, cylinder, sphere, prism } from './shapes.js';
+import { box, cylinder, sphere, prism, lean, horse } from './shapes.js';
 
 const T = Math.PI / 4;
 
@@ -46,5 +46,35 @@ export const PROPS = {
   awning: (x, z, { width = 0.6, depth = 0.4, height = 0.6 } = {}) => [box([0.04, height, 0.04], [x - width / 2 + 0.03, 0, z + depth / 2 - 0.03], 'wood_dark'), box([0.04, height, 0.04], [x + width / 2 - 0.03, 0, z + depth / 2 - 0.03], 'wood_dark'), box([width, 0.03, depth], [x, height, z], 'roof_shingle')],
   tarp: (x, z) => [prism([0.5, 0.25, 0.36], [x, 0, z], 'cloth_ochre')],
 };
+
+// Military trades (V02). Racks hold identical weapons; the forge carries a runtime light.
+const along = (x, z, r, d) => [x + Math.cos(r) * d, z - Math.sin(r) * d], ground = ([px, pz]) => [px, 0, pz];
+Object.assign(PROPS, {
+  forge: (x, z) => Object.assign([box([0.5, 0.3, 0.4], [x, 0, z], 'stone'), box([0.38, 0.04, 0.28], [x, 0.3, z], 'coals'), cylinder({ radiusBottom: 0.3, radiusTop: 0.1, height: 0.22, segments: 4 }, [x, 0.62, z], 'stone_dark'), box([0.14, 0.4, 0.14], [x, 0.84, z], 'stone_dark'), box([0.03, 0.32, 0.03], [x - 0.2, 0.3, z + 0.15], 'wood_dark'), box([0.03, 0.32, 0.03], [x + 0.2, 0.3, z + 0.15], 'wood_dark')], { lights: [{ type: 'brazier', at: [x, 0.38, z] }] }),
+  quench: (x, z) => [cylinder({ radiusBottom: 0.11, height: 0.2, segments: 10 }, [x, 0, z], 'wood'), cylinder({ radiusBottom: 0.09, height: 0.005, segments: 10 }, [x, 0.2, z], 'opening'), cylinder({ radiusBottom: 0.113, height: 0.02, segments: 10 }, [x, 0.15, z], 'iron')],
+  swordRack: (x, z, { r = 0, count = 4 } = {}) => {
+    const out = [box([0.035, 0.5, 0.035], ground(along(x, z, r, -0.24)), 'wood_dark'), box([0.035, 0.5, 0.035], ground(along(x, z, r, 0.24)), 'wood_dark'), box([0.52, 0.035, 0.04], [x, 0.44, z], 'wood_dark', { rotation: r })];
+    for (let i = 0; i < count; i++) { const [px, pz] = along(x, z, r, -0.16 + i * 0.32 / Math.max(1, count - 1)); out.push(box([0.025, 0.34, 0.012], [px, 0.08, pz], 'steel', { rotation: r }), box([0.09, 0.02, 0.02], [px, 0.42, pz], 'gold_trim', { rotation: r }), box([0.018, 0.07, 0.018], [px, 0.44, pz], 'leather')); }
+    return out;
+  },
+  bowRack: (x, z, { r = 0, count = 3 } = {}) => {
+    const [ax, az] = along(x, z, r, -0.2), [bx, bz] = along(x, z, r, 0.2), out = [box([0.035, 0.5, 0.035], [ax, 0, az], 'wood_dark'), box([0.035, 0.5, 0.035], [bx, 0, bz], 'wood_dark'), box([0.46, 0.035, 0.04], [x, 0.46, z], 'wood_dark', { rotation: r })];
+    for (let i = 0; i < count; i++) { const [px, pz] = along(x, z, r, -0.12 + i * 0.12); out.push(lean({ length: 0.62, radiusBottom: 0.014, radiusTop: 0.01, segments: 5 }, -r + Math.PI / 2, 0.12, [px, 0, pz], 'wood').part); }
+    return out;
+  },
+  staves: (x, z) => [-0.06, -0.02, 0.02, 0.06].flatMap((o, i) => [lean({ length: 0.7, radiusBottom: 0.016, segments: 5 }, i * 1.7, 0.08 + i * 0.03, [x + o, 0, z + (i % 2) * 0.05], i % 2 ? 'wood' : 'bark').part]),
+  bowForm: (x, z, { r = 0 } = {}) => {
+    const out = PROPS.workbench(x, z, { r }), [ax, az] = along(x, z, r, -0.02);
+    out.push(lean({ length: 0.24, radiusBottom: 0.014, segments: 5 }, -r + Math.PI, 1.25, [ax, 0.29, az], 'wood').part, lean({ length: 0.24, radiusBottom: 0.014, segments: 5 }, -r, 1.25, [ax, 0.29, az], 'wood').part);
+    return out;
+  },
+  armorStand: (x, z, { material = 'steel' } = {}) => [box([0.18, 0.04, 0.18], [x, 0, z], 'wood_dark'), box([0.04, 0.42, 0.04], [x, 0.04, z], 'wood_dark'), cylinder({ radiusBottom: 0.09, radiusTop: 0.115, height: 0.22, segments: 8 }, [x, 0.3, z], material), box([0.3, 0.06, 0.12], [x, 0.5, z], material, { rotation: -Math.PI / 4 }), sphere([0.07, 0.07, 0.07], [x, 0.55, z], material, 1)],
+  plates: (x, z) => [0, 1, 2, 3].map(i => box([0.28 - i * 0.02, 0.025, 0.18 - i * 0.01], [x + i * 0.01, i * 0.026, z], i % 2 ? 'steel' : 'steel_dark', { rotation: i * 0.2 })),
+  shield: (x, z, { angle = Math.PI / 4, material = 'banner', y = 0 } = {}) => { const disc = lean({ length: 0.03, radiusBottom: 0.15, segments: 12 }, angle, Math.PI / 2, [x, y + 0.15, z], material); return [disc.part, sphere([0.035, 0.035, 0.035], [x + Math.cos(angle) * 0.03, y + 0.13, z + Math.sin(angle) * 0.03], 'iron', 0)]; },
+  banner: (x, z, { material = 'banner' } = {}) => [box([0.03, 0.9, 0.03], [x, 0, z], 'wood_dark'), box([0.02, 0.32, 0.22], [x + 0.02, 0.52, z + 0.11], material), sphere([0.03, 0.03, 0.03], [x, 0.9, z], 'gold_trim', 0)],
+  weaponCrate: (x, z) => [...PROPS.crate(x, z, { size: 0.26 }), ...[-0.06, 0, 0.06].map(o => box([0.02, 0.12, 0.02], [x + o, 0.26, z + o * 0.5], 'leather')), box([0.12, 0.02, 0.02], [x, 0.36, z], 'gold_trim')],
+  horse: (x, z, { angle = -Math.PI / 4, coat = 'horse_bay', saddle = false } = {}) => horse([x, 0, z], { angle, coat, saddle }).parts,
+  saddleRack: (x, z) => [box([0.04, 0.32, 0.04], [x - 0.12, 0, z], 'wood_dark'), box([0.04, 0.32, 0.04], [x + 0.12, 0, z], 'wood_dark'), box([0.3, 0.05, 0.08], [x, 0.3, z], 'wood_dark'), box([0.24, 0.06, 0.26], [x, 0.35, z], 'leather'), box([0.04, 0.14, 0.28], [x, 0.24, z], 'banner')],
+});
 
 export const PROP_TYPES = Object.keys(PROPS);

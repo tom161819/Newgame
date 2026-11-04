@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "id": "equipment-bow",
+  "name": "Bow",
+  "category": "equipment",
+  "description": "Bow as a physical item (C06 Equipment Registry: bow). Shown on a stand so it reads on the map and in the Armory; also the reference for its UI icon.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "workshop",
+  "variants": [
+    {
+      "id": "equipment-bow-plain",
+      "name": "Yew bow on a stand",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "bowRack",
+            "at": [
+              0,
+              0
+            ],
+            "count": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "equipment-bow-quiver",
+      "name": "Bow with quiver",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "bowRack",
+            "at": [
+              0,
+              -0.1
+            ],
+            "count": 2
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.25,
+              0.25
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

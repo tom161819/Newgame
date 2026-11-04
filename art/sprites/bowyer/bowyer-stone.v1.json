@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "bowyer",
+  "variantId": "bowyer-stone",
+  "name": "Stone bowyer with stave yard",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "92c39d13",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 131,
+  "anchor": {
+    "x": 65,
+    "y": 97
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.74046
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 129
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98473
+  },
+  "visualHeight": 129,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.09,
+  "lights": []
+}

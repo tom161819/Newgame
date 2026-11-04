@@ -1,0 +1,213 @@
+{
+  "schema": 1,
+  "id": "armory",
+  "name": "Armory",
+  "category": "buildings",
+  "description": "Equipment store (C07 Armory, 3 × 3, about 40 items): iron-banded doors, racks of swords and bows, shields and a banner; not a production building. Ids and footprint follow the Codex C07 proposal; adjust when C06/C07 fix them.",
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "armory",
+  "variants": [
+    {
+      "id": "armory-stone",
+      "name": "Stone armory with iron-banded doors",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "barn",
+          "walls": "stone",
+          "roofMaterial": "roof_tile",
+          "width": 1.9,
+          "depth": 1.4,
+          "wallHeight": 1.1,
+          "roofHeight": 0.85,
+          "ridge": "x",
+          "ironBands": true,
+          "at": [
+            -0.3,
+            -0.45
+          ]
+        },
+        "props": [
+          {
+            "type": "swordRack",
+            "at": [
+              0.75,
+              0.75
+            ]
+          },
+          {
+            "type": "bowRack",
+            "at": [
+              -0.65,
+              0.95
+            ]
+          },
+          {
+            "type": "shield",
+            "at": [
+              1.15,
+              0.1
+            ]
+          },
+          {
+            "type": "shield",
+            "at": [
+              1.15,
+              -0.35
+            ],
+            "material": "banner_blue"
+          },
+          {
+            "type": "banner",
+            "at": [
+              1.2,
+              0.95
+            ]
+          },
+          {
+            "type": "weaponCrate",
+            "at": [
+              0.1,
+              1.1
+            ]
+          }
+        ]
+      },
+      "notes": "Recommended direction."
+    },
+    {
+      "id": "armory-timber",
+      "name": "Timber armory with weapon yard",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "barn",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.9,
+          "depth": 1.4,
+          "wallHeight": 1.1,
+          "roofHeight": 0.9,
+          "ridge": "x",
+          "ironBands": true,
+          "at": [
+            -0.3,
+            -0.45
+          ]
+        },
+        "props": [
+          {
+            "type": "armorStand",
+            "at": [
+              0.75,
+              0.6
+            ]
+          },
+          {
+            "type": "armorStand",
+            "at": [
+              1.1,
+              0.95
+            ]
+          },
+          {
+            "type": "swordRack",
+            "at": [
+              -0.4,
+              0.95
+            ]
+          },
+          {
+            "type": "bowRack",
+            "at": [
+              1.15,
+              -0.3
+            ],
+            "r": 1.5707963267948966
+          },
+          {
+            "type": "crates",
+            "at": [
+              0.15,
+              0.85
+            ],
+            "count": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "armory-fortified",
+      "name": "Fortified armory with banners",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "barn",
+          "walls": "stone",
+          "roofMaterial": "roof_shingle",
+          "width": 2.0,
+          "depth": 1.5,
+          "wallHeight": 1.25,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "ironBands": true,
+          "at": [
+            -0.25,
+            -0.4
+          ]
+        },
+        "props": [
+          {
+            "type": "banner",
+            "at": [
+              0.45,
+              0.98
+            ]
+          },
+          {
+            "type": "banner",
+            "at": [
+              -0.65,
+              0.98
+            ],
+            "material": "banner_blue"
+          },
+          {
+            "type": "shield",
+            "at": [
+              1.15,
+              0.4
+            ]
+          },
+          {
+            "type": "shield",
+            "at": [
+              1.15,
+              0.0
+            ],
+            "material": "banner_blue"
+          },
+          {
+            "type": "weaponCrate",
+            "at": [
+              0.95,
+              1.05
+            ]
+          },
+          {
+            "type": "swordRack",
+            "at": [
+              -0.1,
+              1.15
+            ],
+            "count": 3
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -9,9 +9,10 @@ import { box, cylinder, prism, sphere, clamp } from './shapes.js';
 import { PROPS, PROP_TYPES } from './props.js';
 
 export const params = [
-  { key: 'body.kind', values: ['house', 'raised', 'windmill', 'furnace', 'barn'], description: 'Main structure: house, granary on staddle stones, tower windmill with sails, bloomery furnace, big barn.' },
+  { key: 'body.kind', values: ['house', 'raised', 'windmill', 'furnace', 'barn', 'none'], description: 'Main structure: house, granary on staddle stones, tower windmill with sails, bloomery furnace, big barn, or none (props only, e.g. equipment).' },
   { key: 'body', description: 'House parameters (walls, width, depth, wallHeight, ridge, roofHeight, roofMaterial, windows, chimney, lantern) or the kind-specific ones.' },
   { key: 'body.at', unit: 'units', description: '[x, z] centre of the body; the rest of the footprint is the yard.' },
+  { key: 'body.ironBands', description: 'Barn: iron bands across the double doors (armory).' },
   { key: 'props', description: `List of { type, at: [x, z], …options }. Types: ${PROP_TYPES.join(', ')}.` },
 ];
 
@@ -57,18 +58,21 @@ function body(spec, style) {
     // Wide double doors on the left face and a hayloft hatch.
     parts.push(box([0.7, 0.85, 0.04], [width * 0.1, 0.14, depth / 2 + 0.02], 'wood_dark'), box([0.02, 0.85, 0.05], [width * 0.1, 0.14, depth / 2 + 0.03], 'iron'));
     parts.push(box([0.3, 0.26, 0.04], [width * 0.1, 0.14 + wall - 0.3, depth / 2 + 0.02], 'opening'));
+    if (spec.ironBands) for (const y of [0.3, 0.6, 0.85]) parts.push(box([0.72, 0.04, 0.05], [width * 0.1, y, depth / 2 + 0.04], 'iron'));
     return { parts, lights: built.lights };
   }
   throw new RangeError(`Unknown workshop body ${kind}`);
 }
 
 export function build(spec, { footprint, style }) {
-  const made = body(spec.body ?? {}, style), [bx, bz] = spec.body?.at ?? [0, 0];
+  const made = spec.body?.kind === 'none' ? { parts: [], lights: [] } : body(spec.body ?? {}, style), [bx, bz] = spec.body?.at ?? [0, 0];
   const parts = shift(made.parts, bx, bz), lights = shiftLights(made.lights, bx, bz);
   for (const prop of spec.props ?? []) {
     const helper = PROPS[prop.type];
     if (!helper) throw new RangeError(`Unknown prop ${prop.type}`);
-    parts.push(...(prop.type === 'fence' ? helper(...prop.from, ...prop.to) : helper(prop.at[0], prop.at[1], prop)));
+    const made = prop.type === 'fence' ? helper(...prop.from, ...prop.to) : helper(prop.at[0], prop.at[1], prop);
+    parts.push(...made);
+    if (made.lights) lights.push(...made.lights);
   }
   if (spec.ground) parts.unshift(box([footprint.width - 0.18, 0.02, footprint.height - 0.18], [0, 0, 0], spec.ground));
   let height = 0;
