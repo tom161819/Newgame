@@ -55,3 +55,13 @@ codex/stage-09-ledger-wip feb19d2. Z této větve se nic neslučuje naslepo.
 Další etapa10 až po merge09 nebo na skutečném PR09; M2 release jen připravit ve
 větvi a pak čekat na výslovný pokyn vývojáře. Podrobnosti a aktuální síťová
 překážka vytvoření PR jsou v reportu09.
+
+### Aktualizace svolení ke sloučení — 2026-11-04
+
+Uživatel nově výslovně povolil sloučit dokončenou etapu09 do main přes PR; původní
+HOLD je pro tento úkol zrušen. Nejde o pokyn k nové číslované verzi/tagu ani ke
+sloučení rozpracované grafiky. Ověřený produktový kód od f3310a1 je beze změny,
+main stále69e5e57. Claudova větev `claude/approved-tower-brazier`2c95aec zůstává
+nedotčená; preview odhalilo jen konflikt sousedních řádků evidence, nikoli kódu.
+GitHub API znovu vrací Forbidden, takže PR/merge z tohoto prostředí stále blokuje
+síť. Připravený PR lze založit a sloučit přes web GitHubu; nic není sloučeno přímo.

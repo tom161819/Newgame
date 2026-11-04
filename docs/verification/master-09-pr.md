@@ -35,9 +35,15 @@ All original #1/#3 dependencies are merged. A normal merge of main69e5e57 retain
 the other agent's work and `npm ci` installed its updated lockfile. Original WIP
 remains separately backed up in `codex/stage-09-ledger-wip` feb19d2.
 
-**HOLD for developer review; no agent self-merge or release.** The explicit uploaded
-handoff overrides the later repository self-merge guidance. Stage10 waits for
-this merge or an actual PR to stack upon. Details: `docs/verification/master-09.md`.
+The user explicitly authorized merging Stage09 into main through a PR on
+2026-11-04; the previous HOLD is lifted for this task. No separate release/tag
+was requested. Stage10 still needs this merge or an actual PR to stack upon.
+
+Remote `claude/approved-tower-brazier` at2c95aec contains the other agent's
+unfinished graphics. Do not merge that branch as part of this PR. A merge-tree
+preview found no game-code conflicts; its only conflict is adjacent task rows
+in `docs/COORDINATION.md`. Preserve both task records when that work later lands.
+Details: `docs/verification/master-09.md`.
 
 This is a prepared PR body, not an existing PR. REST/GraphQL creation is denied
 because the managed network policy excludes api.github.com; Git transport works.

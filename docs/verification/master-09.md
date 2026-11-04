@@ -108,3 +108,26 @@ Next: developer/Claude opens the PR and reviews it. Stage10 remains unstarted
 until Stage09 is merged or an actual Stage09 PR exists to stack upon. Prepare
 the M2 gate only after Stage10; do not issue a release without the explicit
 developer instruction required by the uploaded handoff.
+
+## Merge authorization and graphics check — 2026-11-04
+
+The user now explicitly authorizes merging this completed task into main through
+its PR; the previous HOLD is lifted for Stage09. Do not infer a numbered release,
+tag or permission to merge the other agent's unfinished graphics. Main remains
+69e5e57 and the verified product source is unchanged since f3310a1.
+
+Fetched remote Claude branches. `claude/approved-tower-brazier` at2c95aec contains
+an approved watchtower/brazier integration not yet in main. That branch was only
+read, never checked out, modified or pushed. A `git merge-tree --write-tree
+--messages HEAD origin/claude/approved-tower-brazier` preview found no game-code
+conflicts; the only conflict is adjacent task rows in `docs/COORDINATION.md`.
+Resolve those later by retaining both agents' task information, without replacing
+one branch's code wholesale. The preview did not apply a merge to the worktree.
+
+The actual GitHub CLI request was retried and again failed with
+`Post https://api.github.com/graphql: Forbidden`. Runtime and local policy still
+exclude that API host, and tool discovery found no supported GitHub connector.
+Public github.com and Git transport work; do not bypass the API restriction or
+push directly to main instead of the required PR. No PR/merge or successful
+Pages deployment is claimed. The branch and prepared body remain the concrete
+handoff for manual web creation/merge or a supported API-enabled environment.
