@@ -1,3 +1,4 @@
+import { objectDefinitions } from '../src/data/objects/index.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -14,7 +15,7 @@ const assets = readdirSync(path.join(root, 'art/assets')).flatMap(c => readdirSy
 const byId = id => assets.find(a => a.id === id);
 const build = (asset, variant) => GENERATORS[asset.generator].build(variant.spec, { footprint: asset.footprint, style });
 
-test('V02 military buildings: Codex C07 footprints, at least three variants, trade props, never approved', () => {
+test('V02 military buildings: Codex C07 footprints, at least three variants, trade props, unused by the game until Codex adds them', () => {
   for (const [id, size] of [['bowyer', 2], ['swordsmith', 2], ['armorer', 2], ['armory', 3], ['stables', 5]]) {
     const asset = byId(id);
     assert.deepEqual(asset.footprint, { width: size, height: size }, id);
@@ -22,7 +23,9 @@ test('V02 military buildings: Codex C07 footprints, at least three variants, tra
     assert.equal(asset.gameObjectId, undefined);
     assert.ok(asset.variants.length >= 3, `${id}: three comparable variants`);
     assert.deepEqual(validateAssetSpec(asset, { generators: GENERATORS, style }), [], id);
-    for (const variant of asset.variants) assert.notEqual(approvals.assets[id]?.variants?.[variant.id]?.status, 'approved');
+    // The developer may approve a look before C07 lands; nothing in the game may use it yet.
+    for (const variant of asset.variants) assert.ok(['approved', 'review', undefined].includes(approvals.assets[id]?.variants?.[variant.id]?.status), variant.id);
+    assert.equal(JSON.stringify(objectDefinitions).includes(`art/sprites/${id}/`), false, `${id}: no game art before the building exists`);
   }
   for (const variant of byId('swordsmith').variants) assert.ok(build(byId('swordsmith'), variant).lights.some(l => l.type === 'brazier'), `${variant.id}: forge glows`);
   for (const variant of byId('stables').variants) {

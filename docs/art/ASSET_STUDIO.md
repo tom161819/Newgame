@@ -105,7 +105,7 @@ Schválený segment `stone-wall-crenellated` je tenká samostatná zeď a herní
 - `wall-kit-block`: plný blok ve výšce herní hradby (68 px), se soklem, zdivem a světlým ochozem;
 - `wall-kit-parapet-n/e/s/w`: cimbuří jedné strany (N = mřížka y−, E = x+, S = y+, W = x−).
 
-Hra nakreslí blok a cimbuří jen na stranách bez sousední hradby; jižní a východní díl patří před jednotky na ochozu, stejně jako dnes. `wall-kit-preview` (roh a malé ohrazení) ukazuje, jak se díly spojí. Díly je potřeba schválit společně a do hry se převedou až potom.
+Hra nakreslí blok a cimbuří jen na stranách bez sousední hradby; jižní a východní díl patří před jednotky na ochozu, stejně jako dnes. `wall-kit-preview` (roh a malé ohrazení) ukazuje, jak se díly spojí. Vývojář díly schválil 2026-11-04; hra je kreslí ve `FortificationView` podle `APPROVED_WALL_ART` (`src/data/objects/approvedArt.js`) a obrázky načte až při prvním použití, do té doby kreslí původní procedurální hradbu. Hrad (Castle) zůstává procedurální.
 
 ## Výběr a schválení varianty
 
