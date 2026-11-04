@@ -15,8 +15,11 @@ export function smokeScope({paths=[],previousVersion,currentVersion,manual=false
   ]);
   const isVisual=file=>visualOnly.has(file)||file.startsWith('public/assets/');
   if(manual||previousVersion!==currentVersion||paths.some(file=>(/^src\/(game|systems)\//.test(file)||file.startsWith('src/data/')&&!historyData.has(file))&&!isVisual(file)||/^src\/ui\/(PopulationSidebar|populationData|MissingWorkersIndicators|NaturalResourcePanel|WorkplacePanel|InventoryBar|ResourceEconomyTooltip|resourceEconomy)\.js$/.test(file)||(/^scripts\/(population|staffing|fog|forestry|mineral|zoom|ledger|smelting)-smoke\.mjs$/.test(file)||file==='src/ui/resourceLedger.css')))return 'full';
-  if(paths.some(file=>historyData.has(file)||/^public\/versions\//.test(file)||/^(CHANGELOG\.md|vite\.config\.js|index\.html|src\/style\.css)$/.test(file)||/^src\/ui\/(VersionArchivePanel|ChangelogPanel|GameApplication)\.js$/.test(file)||/^scripts\/(.*archive.*|version-catalog|git-source-facts|browser-smoke|ci-smoke).*\.mjs$/.test(file)))return 'archive';
-  if(paths.some(isVisual))return 'visual';
+  const historyChanged=paths.some(file=>historyData.has(file)||/^public\/versions\//.test(file)||/^(CHANGELOG\.md|vite\.config\.js|index\.html|src\/style\.css)$/.test(file)||/^src\/ui\/(VersionArchivePanel|ChangelogPanel|GameApplication)\.js$/.test(file)||/^scripts\/(.*archive.*|version-catalog|git-source-facts|browser-smoke|ci-smoke).*\.mjs$/.test(file));
+  const visualsChanged=paths.some(isVisual);
+  if(historyChanged&&visualsChanged)return 'visual-archive';
+  if(historyChanged)return 'archive';
+  if(visualsChanged)return 'visual';
   return 'current';
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
@@ -27,6 +30,6 @@ if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.ur
   const mode=smokeScope({paths,previousVersion,currentVersion,manual:!previous}),base=process.argv.slice(2).find(arg=>arg.startsWith('--base='))??'--base=/Newgame/';
   console.log(`Browser scope: ${mode}; ${paths.length} changed paths. Full archive checks remain mandatory at release gates.`);
   if(mode!=='current'){const check=spawnSync(process.execPath,['scripts/verify-site-archives.mjs'],{cwd:root,stdio:'inherit'});if(check.error)throw check.error;if(check.status!==0)throw new Error('The composed archive failed its original URL/byte checks.');}
-  const selection=mode==='full'?['--full']:mode==='visual'?['--current-only','--zoom','--season-transition']:mode==='current'?['--current-only']:[];
+  const selection=mode==='full'?['--full']:mode==='visual'?['--current-only','--zoom','--season-transition']:mode==='visual-archive'?['--zoom','--season-transition']:mode==='current'?['--current-only']:[];
   const args=['scripts/browser-smoke.mjs',base,...selection],result=spawnSync(process.execPath,args,{cwd:root,stdio:'inherit'});if(result.error)throw result.error;process.exitCode=result.status??1;
 }
