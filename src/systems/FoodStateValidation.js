@@ -84,7 +84,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     else check(adjacent(locations.get(t.kind==='foodPickup'?t.sourceId:t.destinationId),t.goal));
     if(t.hauling!==undefined){check(t.hauling===true&&w.profession==='hauler');if(t.kind==='foodDeliver'){number(t.loadedDistance);number(t.loadedPosition?.x,0,100);number(t.loadedPosition?.y,0,100);}}
     if(t.kind==='foodPickup'){
-      if(t.sourceDropId)check(!t.stockReservation&&(t.hauling||t.naturalHarvest===true||t.naturalMining===true));
+      if(t.sourceDropId)check(!t.stockReservation&&(t.hauling||t.naturalHarvest===true||t.naturalMining===true||t.siteId!=null&&w.profession==='builder'));
       else{const stock=reservations.get(t.stockReservation);check(stock?.kind==='stock'&&stock.locationId===t.sourceId&&stock.resource===t.resource&&stock.amount===t.amount&&stock.owner===t.transferId&&!stockRefs.has(stock.id));stockRefs.add(stock.id);}check(!w.cargo);
     }else check(w.cargo?.resource===t.resource&&w.cargo.amount>=t.amount);
     if(t.naturalHarvest!==undefined)check(t.naturalHarvest===true&&w.profession==='woodcutter'&&s.buildings.some(b=>b.id===w.assignedWorkplaceId&&b.type==='lumberjack_hut')&&t.resource==='wood');
@@ -100,7 +100,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     const cargo=s.player.cargo;if(cargo){check(resources.includes(cargo.resource));integer(cargo.amount,1,20);}
     if(cargo?.transportCancelled!==undefined)check(typeof cargo.transportCancelled==='boolean');
     array(s.player.pendingWorkRewards,100000);for(const event of s.player.pendingWorkRewards){check(cargo&&['resourceCollected','dropCollected'].includes(event.type)&&resources.includes(event.objectType));integer(event.quantity,1);if(event.contributionRatio!==undefined)number(event.contributionRatio);}
-    if(royal.workflowSiteId!=null)check(sites.has(royal.workflowSiteId));if(royal.nextRetry!==undefined)number(royal.nextRetry);
+    if(royal.workflowSiteId!=null)check(sites.has(royal.workflowSiteId));if(royal.buildAfter!==undefined)check(typeof royal.buildAfter==='boolean'&&(!royal.buildAfter||royal.workflowSiteId!=null));if(royal.nextRetry!==undefined)number(royal.nextRetry);
     const t=royal.task;if(t){check(['deposit','stockPickup','siteDeposit','withdraw'].includes(t.kind)&&resources.includes(t.resource)&&(t.kind==='withdraw'||locations.has(t.destinationId)));integer(t.amount,1,20);number(t.retryAt);
       if(t.kind==='withdraw'){
         const r=reservations.get(t.stockReservation),source=locations.get(t.sourceId);check(!cargo&&r?.kind==='stock'&&r.siteId==null&&r.owner===t.id&&r.locationId===t.sourceId&&r.resource===t.resource&&r.amount===t.amount&&!stockRefs.has(r.id)&&['storage','fallback'].includes(source?.kind)&&adjacent(source,t.goal)&&t.capacityReservation==null);stockRefs.add(r.id);

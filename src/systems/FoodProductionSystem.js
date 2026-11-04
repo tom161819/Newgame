@@ -53,7 +53,7 @@ export class FoodProductionSystem {
     const reservation=`drop:${drop.id}`;if(!this.scene.workerSystem.reservations.reserve(reservation,worker.id))return false;
     const transferId=`food-transfer-${this.nextTransfer++}`,capacityReservation=this.storage.reserve('capacity',destinationId,drop.resource,amount,transferId);
     if(capacityReservation&&siteId!=null)this.storage.reservations.get(capacityReservation).siteId=siteId;
-    if(!capacityReservation||!this.setTask(worker,'foodPickup',route,{transferId,sourceDropId:drop.id,destinationId,resource:drop.resource,amount,capacityReservation,hauling,...(siteId!=null?{siteId}:{})})){
+    if(!capacityReservation||!this.setTask(worker,'foodPickup',route,{transferId,sourceDropId:drop.id,destinationId,resource:drop.resource,amount,capacityReservation,...(hauling?{hauling:true}:{}),...(siteId!=null?{siteId}:{})})){
       this.storage.release(capacityReservation);this.scene.workerSystem.reservations.release(reservation,worker.id);return false;
     }
     return true;

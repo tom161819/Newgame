@@ -13,6 +13,6 @@ export const JOBS=Object.freeze({
   miller:Object.freeze({portraitColor:'#9d8058',name:'Miller',skill:'milling',workplace:'mill',requiresWorkplace:true}),
   baker:Object.freeze({portraitColor:'#ab6d43',name:'Baker',skill:'baking',workplace:'bakery',requiresWorkplace:true}),
   smelter_operator:Object.freeze({portraitColor:'#a25428',name:'Smelter Operator',skill:'smelting',workplace:'smelter',requiresWorkplace:true}),
-  hauler:Object.freeze({portraitColor:'#69517b',name:'Hauler',skill:'logistics',workplace:'warehouse',requiresWorkplace:true}),
+  hauler:Object.freeze({portraitColor:'#69517b',name:'Hauler',skill:'logistics',workplace:null,requiresWorkplace:false}),
   soldier:Object.freeze({portraitColor:'#863f3c',name:'Soldier',skill:'combat',workplace:'barracks',requiresWorkplace:false}),
 });

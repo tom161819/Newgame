@@ -11,14 +11,19 @@ globalThis.document={querySelector:()=>({textContent:''})};
 const scene=()=>workerScene(undefined,{construction:true,logistics:true,gameSettings:gameSettings()});
 const starter=s=>`stockpile-${s.buildings.find(b=>b.type==='starter_stockpile').id}`;
 function building(s,type,x=50,y=45,{blueprint=false,paid=false}={}){const d=s.objectRegistry.require(type);if(!blueprint||paid)s.inventory.add('stone',d.cost.stone??0);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d,reserveMaterials:blueprint&&!paid});assert.ifError(result.error);if(blueprint)s.constructionSystem.plan(result.building);s.towerViews.set(result.building.id,s.createBuildingView(d,result.building));return result.building;}
-function worker(s,b,tile={x:53,y:45}){const w=s.workerSystem.create(tile);assert.equal(s.workplaceSystem.assign(b,w),true);return w;}
+function worker(s,b,tile={x:53,y:45}){const w=s.workerSystem.create(tile);assert.equal((b.definition.workplace?s.workplaceSystem.assign(b,w):s.workerSystem.jobs.assign(w,'hauler')),true);return w;}
 function until(s,p,max=60000){let n=0;while(!p()&&n<max){s.tick(25);n+=25;}assert.ok(p(),`Condition not reached (${n}ms): ${JSON.stringify({royal:s.kingLogistics.exportState(),cargo:s.character.cargo,workers:s.workerSystem.liveWorkers().map(w=>({state:w.workState,task:w.workTask,cargo:w.cargo}))})}`);}
 const snapshot=s=>validateGameState(serializeGameState(s),s.objectRegistry);
 function restore(data,registry=objectRegistry){const s=workerScene(undefined,{construction:true,logistics:true,starter:false,gameSettings:gameSettings()});s.objectRegistry=registry;loadGameState(s,data);return s;}
 const quantity=(s,id)=>[...s.foodStorage.locations.values()].reduce((n,l)=>n+(l.stock[id]??0),0)+[s.character,...s.workerSystem.liveWorkers()].reduce((n,w)=>n+(w.cargo?.resource===id?w.cargo.amount:0),0)+[...s.dropSystem.drops.values()].filter(d=>d.resource===id).reduce((n,d)=>n+d.amount,0);
 
-test('placing a physical blueprint reserves its cost without debiting stock; neither king nor builders work before every supply arrives',()=>{
-  const s=scene();s.foodStorage.deposit(starter(s),'stone',30);const b=building(s,'tower',48,43,{blueprint:true}),w=s.workerSystem.create({x:46,y:43});s.workerSystem.jobs.assign(w,'builder');assert.equal(s.inventory.count('stone'),20);assert.equal(s.foodStorage.locations.get(starter(s)).stock.stone,30);assert.equal(quantity(s,'stone'),30);assert.equal(s.constructionSystem.commandKing(b),false);s.simulate(6000);assert.equal(b.construction.workDone,0);assert.equal(w.workTask,null);assert.equal(s.foodStorage.locations.get(`site-${b.id}`).stock.stone,undefined);assert.deepEqual(s.constructionSystem.materials.summary(b),[{resource:'stone',required:10,reserved:10,delivered:0,carried:0,ground:0,missing:10}]);snapshot(s);
+test('placing a physical blueprint reserves its cost without debiting stock; nobody works before every supply arrives',()=>{
+  const s=scene();s.foodStorage.deposit(starter(s),'stone',30);const b=building(s,'tower',48,43,{blueprint:true});assert.equal(s.inventory.count('stone'),20);assert.equal(s.foodStorage.locations.get(starter(s)).stock.stone,30);assert.equal(quantity(s,'stone'),30);assert.equal(s.constructionSystem.commandKing(b),false);s.simulate(6000);assert.equal(b.construction.workDone,0);assert.equal(s.foodStorage.locations.get(`site-${b.id}`).stock.stone,undefined);assert.deepEqual(s.constructionSystem.materials.summary(b),[{resource:'stone',required:10,reserved:10,delivered:0,carried:0,ground:0,missing:10}]);snapshot(s);
+});
+test('without a free Hauler a Builder fetches the reserved stone himself, never builds before full delivery and consumes it once',()=>{
+  const s=scene();s.foodStorage.deposit(starter(s),'stone',30);const b=building(s,'tower',48,43,{blueprint:true}),w=s.workerSystem.create({x:46,y:43});s.workerSystem.jobs.assign(w,'builder');
+  let carried=false,saved=false;until(s,()=>{if(w.cargo?.siteId===b.id){carried=true;assert.equal(w.workTask.hauling,undefined,'no Hauler XP flag');if(!saved){snapshot(s);saved=true;}}if(b.construction.workDone>0&&!buildingIsComplete(b))assert.equal(s.constructionSystem.materials.ready(b),true);return buildingIsComplete(b);});
+  assert.equal(carried,true);assert.equal(saved,true);assert.equal(quantity(s,'stone'),20);assert.equal(s.foodStorage.locations.get(starter(s)).stock.stone,20);assert.equal(s.inventory.count('stone'),20);snapshot(s);
 });
 test('a Hauler takes reserved stone once, physically supplies a site, then an existing Builder works and consumes delivered stock once',()=>{
   const s=scene(),warehouse=building(s,'warehouse'),h=worker(s,warehouse),w=s.workerSystem.create({x:58,y:47});s.foodStorage.deposit(`warehouse-${warehouse.id}`,'stone',30);const b=building(s,'tower',60,45,{blueprint:true});s.workerSystem.jobs.assign(w,'builder');until(s,()=>h.cargo?.siteId===b.id);assert.equal(s.foodStorage.locations.get(`warehouse-${warehouse.id}`).stock.stone,20);assert.equal(b.construction.workDone,0);assert.equal(s.inventory.count('stone'),20);snapshot(s);until(s,()=>b.construction.workDone>0);assert.equal(s.foodStorage.locations.get(`site-${b.id}`).stock.stone,10);assert.equal(h.cargo,null);until(s,()=>buildingIsComplete(b));assert.equal(s.foodStorage.locations.has(`site-${b.id}`),false);assert.equal(quantity(s,'stone'),20);assert.equal(w.skills.construction.totalXP,15);assert.ok(h.skills.logistics.totalXP>=10);s.simulate(1500);assert.equal(quantity(s,'stone'),20);snapshot(s);
@@ -66,4 +71,24 @@ test('royal stock pickup and recovery of committed ground cargo restore their ex
 });
 test('producers let reachable Haulers supply and empty their buffers, while a kingdom without Haulers retains physical self-haul production',()=>{
   for(const employ of [true,false]){const s=scene(),granary=building(s,'granary'),mill=building(s,'mill',58,45),warehouse=building(s,'warehouse',50,53),m=s.workerSystem.create({x:57,y:45});s.workplaceSystem.assign(mill,m);const h=employ?worker(s,warehouse,{x:53,y:53}):null;s.foodStorage.deposit(`granary-${granary.id}`,'wheat',4);let selfHaul=false,n=0;while(s.inventory.count('flour')!==3&&n<60000){s.tick(25);n+=25;if(['foodPickup','foodDeliver'].includes(m.workTask?.kind))selfHaul=true;}assert.equal(s.inventory.count('flour'),3);assert.equal(selfHaul,!employ);assert.equal(quantity(s,'wheat'),0);assert.equal(quantity(s,'flour'),3);assert.equal(m.skills.milling.totalXP,8);if(h)assert.ok(h.skills.logistics.totalXP>=7);snapshot(s);}
+});
+test('N02: a Hauler chosen only by profession fills a new Warehouse from the starter store and loose ground stone',()=>{
+  const s=scene(),warehouse=building(s,'warehouse');s.foodStorage.deposit(starter(s),'stone',15);s.dropSystem.create('stone',{x:46,y:50},8);
+  const h=s.workerSystem.create({x:48,y:52});assert.equal(s.workerSystem.jobs.assign(h,'hauler'),true);assert.equal(h.assignedWorkplaceId,null);
+  s.simulate(1000);assert.notEqual(h.workMessage,'Waiting for workplace');let saved=false;
+  until(s,()=>{if(h.cargo&&!saved){snapshot(s);saved=true;}return s.foodStorage.locations.get(`warehouse-${warehouse.id}`).stock.stone===23;});
+  assert.equal(saved,true);assert.equal(s.dropSystem.drops.size,0);assert.equal(s.foodStorage.locations.get(starter(s)).stock.stone??0,0);assert.equal(quantity(s,'stone'),23);assert.ok(h.skills.logistics.totalXP>0);snapshot(s);
+});
+test('N02: Build with King fetches the missing materials, survives Save/Load on the way and then builds; a map click alone does not',()=>{
+  const s=scene();s.foodStorage.deposit(starter(s),'stone',30);const b=building(s,'tower',48,43,{blueprint:true});
+  assert.equal(s.constructionSystem.commandKing(b),false);assert.equal(s.kingLogistics.workflowSiteId,null);
+  assert.equal(s.constructionSystem.commandKing(b,{fetch:true}),true);assert.equal(s.kingLogistics.workflowSiteId,b.id);
+  until(s,()=>s.character.cargo?.siteId===b.id);const data=snapshot(s);assert.equal(data.kingLogistics.buildAfter,true);
+  const r=restore(data);until(r,()=>buildingIsComplete(r.buildings.find(x=>x.id===b.id)));assert.equal(quantity(r,'stone'),20);snapshot(r);
+});
+test('N02: with a free Hauler the Builder leaves the carrying to him; two Haulers never share one site booking',()=>{
+  const s=scene(),warehouse=building(s,'warehouse');s.foodStorage.deposit(`warehouse-${warehouse.id}`,'stone',40);const sites=[building(s,'tower',60,45,{blueprint:true}),building(s,'tower',64,49,{blueprint:true})];
+  const a=worker(s,warehouse,{x:53,y:45}),c=worker(s,warehouse,{x:53,y:47}),builder=s.workerSystem.create({x:58,y:47});s.workerSystem.jobs.assign(builder,'builder');
+  let builderCarried=false;until(s,()=>{if(builder.cargo)builderCarried=true;const ids=[a,c].map(w=>w.workTask?.stockReservation).filter(Boolean);assert.equal(new Set(ids).size,ids.length);return sites.every(site=>buildingIsComplete(site));},120000);
+  assert.equal(builderCarried,false,'two free Haulers supply both sites');assert.equal(quantity(s,'stone'),20);snapshot(s);
 });

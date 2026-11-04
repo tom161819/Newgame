@@ -1,5 +1,5 @@
 import { element } from './objectLabels.js';
-import { cargoLabel,transportLabel,storageName } from './transportLabels.js';
+import { transportLabel,storageName } from './transportLabels.js';
 
 export class StoragePanel {
   constructor(scene){
@@ -36,11 +36,6 @@ export class StoragePanel {
       for(const resource of l.allowed){
         const row=element('p','',`${scene.objectRegistry.require(resource).name}: ${l.stock[resource]??0} · Reserved: ${storage.reserved(l.id,resource)} `),collect=element('button','','Collect with King');collect.type='button';collect.dataset.kingCollect=resource;collect.dataset.storageId=l.id;collect.disabled=!!scene.character.cargo||storage.free(l.id,resource)<1;
         collect.addEventListener('click',()=>scene.kingLogistics.startPickup(l.id,resource));row.append(collect);section.append(row);
-      }
-      if(building?.definition.workplace?.profession==='hauler'){
-        const workers=scene.workplaceSystem.employees(building),button=element('button','','Manage Haulers');button.type='button';button.addEventListener('click',()=>{this.close();scene.workplacePanel.open(building);});
-        section.append(element('p','',`Haulers: ${workers.length} / ${building.definition.workplace.capacity}`));
-        for(const worker of workers)section.append(element('p','',`${worker.name} · ${cargoLabel(scene,worker)} · ${transportLabel(scene,worker)}`));section.append(button);
       }
       const tasks=actors.filter(actor=>{const t=actor===scene.character?scene.kingLogistics.task:actor.workTask;return t&&(t.sourceId===l.id||t.destinationId===l.id);});
       section.append(element('h4','',`Active deliveries: ${tasks.length}`));for(const actor of tasks)section.append(element('p','',`${actor.name??actor.definition.name}: ${transportLabel(scene,actor)}`));return section;

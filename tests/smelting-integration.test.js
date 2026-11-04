@@ -9,7 +9,7 @@ globalThis.document={querySelector:()=>({textContent:''})};
 const scene=starter=>{const s=workerScene(undefined,{construction:true,logistics:true,naturalResources:true,ledger:true,starter});s.workerSystem.unsubscribe();return s;};
 function until(s,p,max=150000){let elapsed=0;while(!p()&&elapsed<max){s.tick(50);elapsed+=50;}assert.ok(p(),JSON.stringify(s.workerSystem.liveWorkers().map(w=>({id:w.id,cargo:w.cargo,task:w.workTask,message:w.workMessage}))));}
 function build(s,type,x,y){const d=s.objectRegistry.require(type),result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d,reserveMaterials:true});assert.ifError(result.error);const b=result.building;s.constructionSystem.plan(b);s.towerViews.set(b.id,s.createBuildingView(d,b));assert.ok(s.kingLogistics.startMaterials(b));until(s,()=>s.constructionSystem.materials.ready(b)&&s.kingLogistics.workflowSiteId==null);assert.ok(s.constructionSystem.commandKing(b));until(s,()=>buildingIsComplete(b));return b;}
-function employee(s,b,tile){const w=s.workerSystem.create(tile);assert.ok(s.workplaceSystem.assign(b,w));return w;}
+function employee(s,b,tile){const w=s.workerSystem.create(tile);assert.ok((b.definition.workplace?s.workplaceSystem.assign(b,w):s.workerSystem.jobs.assign(w,'hauler')));return w;}
 
 test('M2 actual forest → physical construction → finite mine → Ore/fuel logistics → Smelter → Warehouse survives active-cycle Save/Load',()=>{
  let s=scene(true);s.inventory.add('stone',18);const hut=build(s,'lumberjack_hut',44,43),warehouse=build(s,'warehouse',52,43);s.inventory.add('stone',24);

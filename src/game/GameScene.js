@@ -337,7 +337,7 @@ export class GameScene extends Phaser.Scene {
     if(!selected&&!this.fog.isVisibleTile(goal)){this.setStatus(OUTSIDE_SIGHT);return;}
     if(selected?.kind==='human'){this.unitPanel.open(selected.object);return;}
     if(selected?.kind==='stockpile'){this.storagePanel.open(null,selected.object.location.id);return;}
-    if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){this.kingLogistics.cancel();this.constructionSystem.commandKing(selected.object);this.constructionUI.open(selected.object);return;}
+    if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){if(this.kingLogistics.workflowSiteId!==selected.object.id){this.kingLogistics.cancel();this.constructionSystem.commandKing(selected.object);}this.constructionUI.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).crop){this.farmingPanel.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).storage){this.storagePanel.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).workplace){this.workplacePanel.open(selected.object);return;}

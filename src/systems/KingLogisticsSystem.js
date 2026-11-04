@@ -41,10 +41,10 @@ export class KingLogisticsSystem {
     const id=`king-transfer-${this.nextId++}`,stockReservation=this.storage.reserve('stock',locationId,resource,amount,id);if(!stockReservation)return false;
     return this.move({id,kind:'withdraw',sourceId:locationId,resource,amount,stockReservation,goal:{...route.destination},retryAt:0},route);
   }
-  startMaterials(building){
+  startMaterials(building,{build=false}={}){
     if(!this.materials?.enabled||!this.materials.site(building?.id)||this.actor.transitioning||this.scene.gameOver)return false;
     this.cancel();this.scene.constructionSystem.stopKing();this.actor.stopForBuilding();this.scene.huntingSystem.cancel?.();this.scene.mountSystem.cancel?.();this.scene.treasureSystem.cancelRequest?.();
-    this.workflowSiteId=building.id;this.nextRetry=0;this.continueMaterials();return true;
+    this.workflowSiteId=building.id;this.buildAfter=build;this.nextRetry=0;this.continueMaterials();return true;
   }
   continueMaterials(){
     const site=this.materials?.site(this.workflowSiteId);if(!site){this.workflowSiteId=null;return false;}
@@ -57,7 +57,10 @@ export class KingLogisticsSystem {
       // load can safely be set down on ground; no roof-to-ground teleport.
       const goal=this.storage.goals(this.storage.locations.get(`site-${site.id}`))[0];if(goal)actor.command({kind:'move',goal,silent:true});return false;
     }
-    if(this.materials.ready(site)){this.workflowSiteId=null;this.scene.setStatus('Materials delivered. Use Build with King to begin construction.');return true;}
+    if(this.materials.ready(site)){
+      this.workflowSiteId=null;if(this.buildAfter){this.buildAfter=false;return this.scene.constructionSystem.commandKing(site);}
+      this.scene.setStatus('Materials delivered. Use Build with King to begin construction.');return true;
+    }
     const choices=this.materials.candidates(site.id).sort((a,b)=>{
       const position=t=>t.sourceDropId?this.scene.dropSystem.drops.get(t.sourceDropId)?.tile:this.storage.locations.get(t.sourceId),distance=t=>{const p=position(t);return p?Math.hypot(actor.position.x-p.x,actor.position.y-p.y):Infinity;};return distance(a)-distance(b);
     });
@@ -115,7 +118,7 @@ export class KingLogisticsSystem {
     this.scene.updateInventory();if(this.workflowSiteId!=null){this.nextRetry=0;return;}
     if(actor.cargo)this.startDelivery();else this.scene.setStatus(location.kind==='site'?'Construction materials delivered.':'Cargo delivered to storage.');
   }
-  exportState(){return{nextId:this.nextId,task:structuredClone(this.task),workflowSiteId:this.workflowSiteId,nextRetry:this.nextRetry};}
-  importState(data){this.nextId=data?.nextId??1;this.task=structuredClone(data?.task??null);this.workflowSiteId=data?.workflowSiteId??null;this.nextRetry=data?.nextRetry??0;if(this.task?.kind==='stockPickup'&&this.task.sourceDropId)this.scene.workerSystem.reservations.reserve(`drop:${this.task.sourceDropId}`,'king');}
+  exportState(){return{nextId:this.nextId,task:structuredClone(this.task),workflowSiteId:this.workflowSiteId,buildAfter:this.workflowSiteId!=null&&!!this.buildAfter,nextRetry:this.nextRetry};}
+  importState(data){this.nextId=data?.nextId??1;this.task=structuredClone(data?.task??null);this.workflowSiteId=data?.workflowSiteId??null;this.buildAfter=data?.buildAfter===true;this.nextRetry=data?.nextRetry??0;if(this.task?.kind==='stockPickup'&&this.task.sourceDropId)this.scene.workerSystem.reservations.reserve(`drop:${this.task.sourceDropId}`,'king');}
   destroy(){this.cancel();}
 }

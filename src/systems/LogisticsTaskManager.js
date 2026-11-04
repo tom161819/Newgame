@@ -34,14 +34,17 @@ export class LogisticsTaskManager {
       for(const destination of stores)if(destination.allowed.includes(drop.resource)&&storage.room(destination.id)>0)this.catalog.push({priority:edible&&this.scene.foodSystem.shortage?10:35,sourceDropId:drop.id,destinationId:destination.id,resource:drop.resource,amount:drop.amount});
     }
   }
-  updateWorker(worker){
-    if(worker.workTask||worker.cargo||worker.aiCooldown>0)return;
+  // Haulers serve the whole kingdom without a workplace. A Builder calls this with
+  // constructionOnly when no Hauler is free, reusing the same bookings.
+  freeHauler(){return this.scene.workerSystem.liveWorkers().some(w=>w.profession==='hauler'&&!w.arriving&&!w.workTask&&!w.cargo&&!['Fleeing','Recovering'].includes(w.workState));}
+  updateWorker(worker,{constructionOnly=false}={}){
+    if(worker.workTask||worker.cargo||worker.aiCooldown>0)return false;
     worker.aiCooldown=LOGISTICS_RULES.planningInterval;worker.workState='Waiting';worker.workMessage='Waiting for transport';this.update();
     const storage=this.storage,cap=carryCapacity(worker),score=task=>{
       const source=task.sourceDropId?this.scene.dropSystem.drops.get(task.sourceDropId)?.tile:storage.locations.get(task.sourceId),target=storage.locations.get(task.destinationId);
       return source&&target?Math.hypot(worker.position.x-source.x,worker.position.y-source.y)+Math.hypot(source.x-target.x,source.y-target.y):Infinity;
     };
-    const candidates=this.catalog.map(task=>({task,score:score(task)})).filter(t=>Number.isFinite(t.score)).sort((a,b)=>a.task.priority-b.task.priority||a.score-b.score);
+    const candidates=this.catalog.filter(task=>!constructionOnly||task.siteId!=null).map(task=>({task,score:score(task)})).filter(t=>Number.isFinite(t.score)).sort((a,b)=>a.task.priority-b.task.priority||a.score-b.score);
     let attempts=0;
     for(const {task}of candidates){
       const destination=storage.locations.get(task.destinationId),drop=task.sourceDropId&&this.scene.dropSystem.drops.get(task.sourceDropId),existingCap=storage.reservations.get(task.capacityReservation);
@@ -52,9 +55,10 @@ export class LogisticsTaskManager {
       if(this.failedRoutes.has(routeKey))continue;
       if(++attempts>8)break;
       if(!storage.route(worker,[destination])){this.failedRoutes.set(routeKey,this.scene.gameTime.totalElapsed+2000);continue;}
-      const options={...task,hauling:true},success=drop?this.scene.foodProduction.moveGround(worker,drop,destination.id,amount,options):this.scene.foodProduction.move(worker,task.sourceId,destination.id,task.resource,amount,options);
-      if(success)return;this.failedRoutes.set(routeKey,this.scene.gameTime.totalElapsed+2000);
+      const options={...task,hauling:worker.profession==='hauler'},success=drop?this.scene.foodProduction.moveGround(worker,drop,destination.id,amount,options):this.scene.foodProduction.move(worker,task.sourceId,destination.id,task.resource,amount,options);
+      if(success)return true;this.failedRoutes.set(routeKey,this.scene.gameTime.totalElapsed+2000);
     }
+    return false;
   }
   waitForHauler(building,kind){
     const record=this.scene.foodProduction.records.get(building.id),now=this.scene.gameTime.totalElapsed,key=`${building.id}:${kind}`;
@@ -62,7 +66,7 @@ export class LogisticsTaskManager {
     if(now-wait.since>=3000)return false;
     if(now-wait.checkedAt>=500){
       wait.checkedAt=now;const location=this.storage.locations.get(`${kind}-${building.id}`);
-      wait.available=this.scene.workerSystem.liveWorkers().filter(w=>w.profession==='hauler'&&!w.arriving&&this.scene.workplaceSystem.building(w)).slice(0,6).some(w=>!!this.storage.route(w,[location]));
+      wait.available=this.scene.workerSystem.liveWorkers().filter(w=>w.profession==='hauler'&&!w.arriving).slice(0,6).some(w=>!!this.storage.route(w,[location]));
     }return wait.available;
   }
   destroy(){this.catalog=[];this.failedRoutes.clear();this.producerWaits.clear();}
