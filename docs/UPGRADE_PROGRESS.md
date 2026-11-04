@@ -17,6 +17,14 @@ herní zdroj beze změny). Kandidát e574f75 nahrán do PR22; skutečný posledn
 `gh pr merge22 --merge --match-head-commit` stále API Forbidden. Nová fronta je
 uložená a nahraná; žádné nevykonané sloučení/tag/Pages není označené za úspěšné.
 
+Ruční předání PR22: uživatelský snímek ukázal nový konflikt COORDINATION po
+PR28/Claudových poddaných. Main2663942 přinesen normálním mergem8a2fed5; konflikt
+opraven se zachováním obou autorů i nové fronty a nahrán.477/477testů, validace,
+Pages build, native Population200/Fog/aktuální Save14/historické hry a Studio
+Canvas/WebGL/export/mobil prošly. Po zelených GitHub Checks ruční Merge pull
+request / Confirm merge (Create a merge commit); API stále skutečně blokované.
+Vydání/tag/finální Pages gate nejsou označené za provedené.
+
 ## Změna pořadí — pokyn uživatele2026-11-04
 
 Po dokončení M2 nejprve C01–C08, potom11(dláždění),12(kolář/povozy/stáje/bydlení),
