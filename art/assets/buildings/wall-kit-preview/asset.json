@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "id": "wall-kit-preview",
+  "name": "Wall kit preview",
+  "category": "buildings",
+  "description": "How the wall kit joins in the game: blocks merge into one wall and parapets appear only on open sides. For review only; the game builds walls from the kit pieces.",
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "generator": "wallkit",
+  "variants": [
+    {
+      "id": "wall-kit-preview-corner",
+      "name": "Corner wall",
+      "version": 1,
+      "spec": {
+        "piece": "assembly",
+        "merlons": 3,
+        "cells": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            3,
+            3
+          ]
+        ]
+      }
+    },
+    {
+      "id": "wall-kit-preview-enclosure",
+      "name": "Small enclosure",
+      "version": 1,
+      "spec": {
+        "piece": "assembly",
+        "merlons": 3,
+        "cells": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            3,
+            3
+          ]
+        ]
+      }
+    }
+  ]
+}

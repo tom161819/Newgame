@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-04T19:08:28.176Z",
+  "updatedAt": "2026-11-04T22:00:00.000Z",
   "note": "Committed review state for Asset Studio. Export it from the studio and commit it through a pull request; the studio never writes to GitHub.",
   "assets": {
     "watchtower": {
@@ -702,6 +702,46 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:07:23.159Z",
           "approvedAt": "2026-11-04T19:07:23.159Z"
+        }
+      }
+    },
+    "wall-kit": {
+      "preferred": "wall-kit-block",
+      "variants": {
+        "wall-kit-block": {
+          "status": "review",
+          "version": 1,
+          "specHash": "1e0903db",
+          "note": "Proposed by Claude: the connected game wall as pieces; approve all five together.",
+          "updatedAt": "2026-11-04T22:00:00.000Z"
+        },
+        "wall-kit-parapet-n": {
+          "status": "review",
+          "version": 1,
+          "specHash": "6de05cf7",
+          "note": "Proposed by Claude: the connected game wall as pieces; approve all five together.",
+          "updatedAt": "2026-11-04T22:00:00.000Z"
+        },
+        "wall-kit-parapet-e": {
+          "status": "review",
+          "version": 1,
+          "specHash": "3b44dd16",
+          "note": "Proposed by Claude: the connected game wall as pieces; approve all five together.",
+          "updatedAt": "2026-11-04T22:00:00.000Z"
+        },
+        "wall-kit-parapet-s": {
+          "status": "review",
+          "version": 1,
+          "specHash": "404f44b0",
+          "note": "Proposed by Claude: the connected game wall as pieces; approve all five together.",
+          "updatedAt": "2026-11-04T22:00:00.000Z"
+        },
+        "wall-kit-parapet-w": {
+          "status": "review",
+          "version": 1,
+          "specHash": "3ee9f324",
+          "note": "Proposed by Claude: the connected game wall as pieces; approve all five together.",
+          "updatedAt": "2026-11-04T22:00:00.000Z"
         }
       }
     }

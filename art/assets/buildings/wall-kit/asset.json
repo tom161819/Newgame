@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "id": "wall-kit",
+  "name": "Wall kit",
+  "category": "buildings",
+  "description": "The connected Stone Wall as pieces in the style of the approved crenellated wall: a full-tile block at the game’s 68 px wall height (the king walks on its top) and one parapet per side. The game draws the block and only the parapets of open sides; south and east parapets sit in front of units on the wall walk. Approve all five pieces together.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "wallkit",
+  "gameObjectId": "wall",
+  "variants": [
+    {
+      "id": "wall-kit-block",
+      "name": "Block",
+      "version": 1,
+      "notes": "Full tile, plinth, masonry and light coping (the wall walk).",
+      "spec": {
+        "piece": "block"
+      }
+    },
+    {
+      "id": "wall-kit-parapet-n",
+      "name": "Parapet north (back left)",
+      "version": 1,
+      "spec": {
+        "piece": "parapet",
+        "side": "N",
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-kit-parapet-e",
+      "name": "Parapet east (front right)",
+      "version": 1,
+      "spec": {
+        "piece": "parapet",
+        "side": "E",
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-kit-parapet-s",
+      "name": "Parapet south (front left)",
+      "version": 1,
+      "spec": {
+        "piece": "parapet",
+        "side": "S",
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-kit-parapet-w",
+      "name": "Parapet west (back right)",
+      "version": 1,
+      "spec": {
+        "piece": "parapet",
+        "side": "W",
+        "merlons": 3
+      }
+    }
+  ]
+}
