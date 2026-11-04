@@ -10,6 +10,7 @@ import { buildingMenuSmoke,buildingUnlockGameplaySmoke } from './building-menu-s
 import { seasonsMenuSmoke } from './seasons-menu-smoke.mjs';
 import { stageArchivedSnapshots } from './stage-archive.mjs';
 import { explorationMenuSmoke,staticMemoryRendererSmoke,hiddenInteractionSmoke } from './fog-smoke.mjs';
+import { populationSidebarSmoke } from './population-smoke.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
 const base=projectBase(args.find(a=>a.startsWith('--base='))?.slice(7)??'/Newgame/'),dist=path.join(root,'dist');
@@ -69,6 +70,7 @@ try{
   if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full'))await page.locator('#setup-seasons').uncheck();}
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
+  if(args.includes('--full')||args.includes('--population'))await populationSidebarSmoke(page);
   if(args.includes('--full')||args.includes('--fog')){await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);await hiddenInteractionSmoke(page);}
   if(args.includes('--full'))await seasonsMenuSmoke(page);
   await buildingMenuSmoke(page);

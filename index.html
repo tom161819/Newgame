@@ -68,6 +68,12 @@
       </section>
     </main>
     <button id="settings-button" class="settings-button" type="button" aria-label="Settings" aria-controls="settings-panel" aria-expanded="false">⚙</button>
+    <button id="population-tab" class="population-tab" type="button" aria-controls="population-panel" aria-expanded="false"><span aria-hidden="true">♟</span> Population <span id="population-tab-count">0</span></button>
+    <aside id="population-panel" class="population-panel" aria-labelledby="population-title" aria-hidden="true" inert>
+      <div class="settings-heading"><h2 id="population-title">Population</h2><button id="close-population" type="button" aria-label="Close Population">×</button></div>
+      <p id="population-summary"></p>
+      <div id="population-viewport" class="population-viewport"><div id="population-list" class="population-list" role="list" aria-label="Permanent villagers"></div><p id="population-empty" hidden>No villagers found.</p></div>
+    </aside>
     <aside id="settings-panel" class="settings-panel" aria-labelledby="settings-title" aria-hidden="true" inert>
       <div class="settings-heading"><h2 id="settings-title">Settings</h2><button id="close-settings" type="button" aria-label="Zavřít nastavení">×</button></div>
       <label class="setting-row" for="fog-toggle"><span>Fog of War</span><input id="fog-toggle" type="checkbox" role="switch" /></label>

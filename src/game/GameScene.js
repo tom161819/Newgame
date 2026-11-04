@@ -73,6 +73,7 @@ import { BuildingUnlockManager } from '../systems/BuildingUnlockManager.js';
 import { MapMemory } from '../systems/MapMemory.js';
 import { captureMapKnowledge } from './mapMemoryObjects.js';
 import { MapMemoryRenderer } from './MapMemoryRenderer.js';
+import { PopulationSidebar } from '../ui/PopulationSidebar.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -94,7 +95,7 @@ export class GameScene extends Phaser.Scene {
     this.foodStorage=null;this.foodProduction=null;this.logisticsTasks=null;this.legacyStockpiles=null;
     this.seasons=null;
     this.kingLogistics=null;
-    this.fog=null;this.mapMemory=null;this.memoryRenderer=null;
+    this.fog=null;this.mapMemory=null;this.memoryRenderer=null;this.populationSidebar=null;
     this.gameOver=false;this.input.enabled=true;this.input.keyboard.enabled=true;this.tweens.resumeAll();
     this.activeFramePending=true;this.visibilityPaused=document.hidden;
     this.assets.initialize();
@@ -183,7 +184,7 @@ export class GameScene extends Phaser.Scene {
     this.constructionUI=new ConstructionUI(this);
     this.foodProduction=new FoodProductionSystem(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
     this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);
-    this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);
+    this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);this.populationSidebar=new PopulationSidebar(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
     this.treasurePanel=new TreasurePanel(this);if(!this.loadState)this.treasureSystem.spawn(PLAYER_START);
     this.wildlifeRespawn=new WildlifeRespawnSystem(this,this.animalSystem);
@@ -214,6 +215,7 @@ export class GameScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
       this.kingLogistics.destroy();
       this.memoryRenderer.destroy();
+      this.populationSidebar.destroy();
       this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
       this.buildingUnlocks.destroy();
       this.animalSystem.destroy();this.dropSystem.destroy();document.querySelector('#object-tooltip').hidden=true;
@@ -571,6 +573,7 @@ export class GameScene extends Phaser.Scene {
     this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
     this.combatFeedback?.refresh();
     this.experienceFeedback?.refreshVisibility();this.unitPanel?.refresh();
+    this.populationSidebar?.refresh();
     this.economyPanel?.update();
     this.workplacePanel?.refresh();
     this.constructionUI?.refresh();

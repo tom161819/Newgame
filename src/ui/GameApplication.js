@@ -26,6 +26,7 @@ export class GameApplication {
       event.preventDefault();
       if(this.scene.buildMode)this.scene.cancelBuilding();
       else if(this.scene.settingsPanel.open)this.scene.settingsPanel.setOpen(false);
+      else if(this.scene.populationSidebar?.open)this.scene.populationSidebar.setOpen(false);
       else this.showPause();
     });
   }

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { directionName,DIRECTION_POSES } from './directions.js';
 import { CargoBundleView } from './CargoBundleView.js';
+import { HUMAN_APPEARANCE as COLORS } from '../data/humanAppearance.js';
 
 // Pohled poddaného používá stejných osm logických směrů jako král.
 export class HumanView extends Phaser.GameObjects.Container {
@@ -8,16 +9,16 @@ export class HumanView extends Phaser.GameObjects.Container {
     super(scene,x,y);scene.add.existing(this);this.definition=definition;this.phase=0;this.facing='S';
     this.shadow=scene.add.ellipse(0,1,23,10,0x26301e,.25);
     this.leftLeg=scene.add.rectangle(-3,-5,4,11,0x454334);this.rightLeg=scene.add.rectangle(3,-5,4,11,0x454334);
-    this.body=scene.add.graphics();this.arms=[scene.add.rectangle(-7,-21,4,14,0xc6a37d),scene.add.rectangle(7,-21,4,14,0xc6a37d)];
+    this.body=scene.add.graphics();this.arms=[scene.add.rectangle(-7,-21,4,14,COLORS.armSkin),scene.add.rectangle(7,-21,4,14,COLORS.armSkin)];
     this.weapon=scene.add.graphics().setVisible(false);this.tool=scene.add.graphics().setVisible(false);this.add([this.shadow,this.leftLeg,this.rightLeg,this.body,...this.arms,this.weapon,this.tool]);this.cargoBundle=new CargoBundleView(scene,this);this.paint();
   }
   paint(){
     const pose=DIRECTION_POSES[this.facing],g=this.body.clear(),width=pose.profile?4:6,hx=pose.screenX;
-    g.fillStyle(0x8b8052);g.fillPoints([{x:-width,y:-30},{x:width,y:-30},{x:width+2,y:-11},{x:-width-2,y:-11}],true);
-    g.fillStyle(0x514333);g.fillRect(-width-1,-17,width*2+2,3);
-    g.fillStyle(pose.back?0x765b3d:0xd2ad83);g.fillEllipse(hx,-37,pose.profile?9:12,12);
-    g.fillStyle(0x604b33);g.fillEllipse(hx,-42,12,7);
-    if(!pose.back){g.fillStyle(0x3b3026);g.fillRect(hx+(pose.profile?hx*3:-3),-38,2,2);if(!pose.profile)g.fillRect(hx+2,-38,2,2);}
+    g.fillStyle(COLORS.tunic);g.fillPoints([{x:-width,y:-30},{x:width,y:-30},{x:width+2,y:-11},{x:-width-2,y:-11}],true);
+    g.fillStyle(COLORS.belt);g.fillRect(-width-1,-17,width*2+2,3);
+    g.fillStyle(pose.back?COLORS.back:COLORS.skin);g.fillEllipse(hx,-37,pose.profile?9:12,12);
+    g.fillStyle(COLORS.hair);g.fillEllipse(hx,-42,12,7);
+    if(!pose.back){g.fillStyle(COLORS.eyes);g.fillRect(hx+(pose.profile?hx*3:-3),-38,2,2);if(!pose.profile)g.fillRect(hx+2,-38,2,2);}
   }
   animate(delta,moving,direction){
     const facing=directionName(direction);if(facing&&facing!==this.facing){this.facing=facing;this.paint();}
