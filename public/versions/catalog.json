@@ -1,23 +1,81 @@
 {
   "schema": 1,
-  "gameVersion": "0.1.0",
+  "gameVersion": "0.2.0",
   "projectBase": "/Newgame/",
   "currentBuild": {
-    "version": "0.1.0+dev.0f24913231d0dfa4d08f87cc1043d960e83fbe1b",
-    "gameVersion": "0.1.0",
-    "title": "Current development build",
+    "version": "0.2.0",
+    "gameVersion": "0.2.0",
+    "title": "Current Version",
     "date": "2026-11-04",
-    "commit": "0f24913231d0dfa4d08f87cc1043d960e83fbe1b",
+    "commit": "fa56c96113fdad8097d641ad87c06e74d532efa8",
     "archiveURL": "/Newgame/",
     "available": true,
-    "description": "Current development build; released changes are listed separately.",
-    "releaseType": "development",
+    "description": "Current released game.",
+    "releaseType": "release",
     "historical": false,
     "reconstructed": false,
     "current": true,
-    "dirty": true
+    "dirty": false
   },
   "versions": [
+    {
+      "version": "0.2.0",
+      "title": "M1: Exploration and kingdom management",
+      "date": "2026-11-04",
+      "commit": "fa56c96113fdad8097d641ad87c06e74d532efa8",
+      "archiveURL": "/Newgame/versions/fa56c96113fdad8097d641ad87c06e74d532efa8/",
+      "available": true,
+      "description": "Spot missing staff above completed workplaces: red when empty, orange when partly staffed, with visible-only vacancy details and one-click access to Assign Worker.",
+      "releaseType": "milestone",
+      "historical": false,
+      "reconstructed": false,
+      "label": "Official release",
+      "changes": {
+        "added": [
+          "Spot missing staff above completed workplaces: red when empty, orange when partly staffed, with visible-only vacancy details and one-click access to Assign Worker.",
+          "Keep recently deceased residents in a separate read-only list for three complete game days, with saved death dates and safe migration of older kingdoms; their records remain available for unpaid wages without occupying jobs or counting as living residents.",
+          "Search and filter residents, rank them by overall progress or any real skill, and inspect or locate them without interrupting their work or revealing hidden positions.",
+          "Inspect actual villager XP, skills, natural talents, current work and hunger in a scrollable desktop tooltip, with touch-friendly character details on small screens.",
+          "Open a compact Population sidebar with profession-coloured portraits, live resident and employment totals, and a virtual list that stays bounded for large kingdoms.",
+          "Save discovered terrain and last-known static visuals independently of the real world, with safe migration of older kingdoms that reveals only the loaded king’s actual sight.",
+          "Keep muted last-seen copies of static objects, crop stages and construction outside sight; hidden changes appear only when rediscovered, while moving units remain hidden and the actual world continues normally.",
+          "Explore circular areas with black undiscovered ground and dark, desaturated remembered terrain; switch Fog of War and Exploration independently in New Game and Settings without revealing hidden objects or changing discovery history.",
+          "Choose permanent Summer in New Game or Settings while preserving the exact seasonal cycle, daily weather and crop progress for later resumption.",
+          "Browse verified historical milestones and original development snapshots from the main menu, with linked, collapsible release notes and isolated archived saves.",
+          "Inspect available, reserved, carried, on-site, buffered and ground resources, see carried bundles, and physically collect or set down the king's stored supplies.",
+          "Deliver reserved building materials to construction sites with Haulers or the king before builders can begin; the king can supply a site over multiple trips.",
+          "Assign Haulers to Warehouses or Granaries to reserve and carry supplies, earn Logistics experience and increase their load from 20 to 38 units.",
+          "Start with a reachable 40-unit stockpile and build 200-unit Warehouses for construction materials; the king carries collected resources to storage before they become available.",
+          "Experience five-day seasons and daily weather that affect crop growth, with autumn foliage and snow-covered winter landscapes.",
+          "Feed the king and villagers from stored apples, bread and meat; track food supply, hunger and its effects on work and settlement.",
+          "Build Mills, Bakeries and 200-unit Granaries; Millers and Bakers physically collect inputs, share production work and return finished flour and bread to storage.",
+          "Manage automatic production, storage contents and reservations, with 20-unit worker loads, a 30-unit camp fallback and persistent in-transit supplies.",
+          "Build Farmhouses, Wheat Fields and Orchards, and assign up to three Farmers to each Farmhouse.",
+          "Grow wheat through four stages over two game days and fruit over three game days; farmers physically harvest 8 Wheat or 6 Apple within their workplace radius.",
+          "Earn Farming experience for completed harvests, eat apples through the existing food cycle, and save growing crops and reserved work without duplicate harvests."
+        ],
+        "changed": [
+          "Group Buildings into themed categories and require a completed Granary for new Farmhouses, then a completed Farmhouse for new Wheat Fields and Orchards; existing structures and valid blueprints remain intact."
+        ],
+        "improved": [
+          "Repaint only changed terrain cells as circular sight moves, keeping exploration responsive with twenty residents and avoiding whole-chunk redraws.",
+          "Use circular logical sight with the existing mounted and fortification bonuses; stationary vision is cached and active vision sources can combine without revealing unrelated structures.",
+          "Open numbered version archives on demand, browse descriptive historical milestones and development commits, and keep frozen games out of ordinary source builds.",
+          "Choose faster walking routes over worn paths while keeping diagonal corners safe and avoiding excessive detours.",
+          "Prefer Haulers for production deliveries while letting producers carry their own supplies when no carrier can serve them.",
+          "Preserve existing materials, in-transit loads and collection rewards when loading older kingdoms, without duplicating stock or experience.",
+          "Share cached crop textures while preserving per-tile depth so villagers can walk through fields and among fruit trees smoothly."
+        ],
+        "fixed": [
+          "Prevent hidden map clicks, building previews, path-debug details and stone totals from revealing unseen changes; keep undiscovered tile seams completely black.",
+          "Recover outdated delivery instructions on load while preserving cargo, construction allocations and earned experience."
+        ]
+      },
+      "sequence": 86,
+      "commitDate": "2026-11-04T07:03:18Z",
+      "tag": "v0.2.0",
+      "current": true
+    },
     {
       "version": "0.1.0+archive.30",
       "title": "Faster archives and clearer version history",
@@ -716,6 +774,20 @@
     }
   ],
   "builds": [
+    {
+      "version": "0.2.0+git.fa56c96113fdad8097d641ad87c06e74d532efa8",
+      "gameVersion": "0.2.0",
+      "commit": "fa56c96113fdad8097d641ad87c06e74d532efa8",
+      "date": "2026-11-04T07:03:18Z",
+      "title": "Release v0.2.0: M1 exploration and kingdom management",
+      "description": "Release v0.2.0: M1 exploration and kingdom management",
+      "archiveURL": "/Newgame/versions/fa56c96113fdad8097d641ad87c06e74d532efa8/",
+      "available": true,
+      "sequence": 86,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
     {
       "version": "0.1.0+git.0024c16c803a91b151cff08300665076f8b67b35",
       "gameVersion": "0.1.0",

@@ -34,7 +34,7 @@ Nové [zadání](requests/archive-optimization.md) po03, před04. Zjištěno65 l
 
 ## Release gates
 
-M1 (01–06): release gate PASSED na `c58eda6dcf0ad6d92b9554b5d803903e50331f95`, skutečné Pages41788637831 Success, čisté npm ci/356 testů/build/plný browser/70 SHA archivů/2263 HTTP souborů. Připravena0.2.0; tag, skutečný archiv a finální publikace ještě čekají. M2 (07–10), M3 (11–12), M4 (13–14), M5 (15): PENDING. Žádné nové číslo ani tag zatím nevydáno. Release kandidát0.2.0 je připraven podle úspěšného gate; RELEASED lze zapsat až po tagu, archivu a potvrzeném finálním Pages deploy.
+M1 (01–06): release gate PASSED na `c58eda6dcf0ad6d92b9554b5d803903e50331f95`, skutečné Pages41788637831 Success, čisté npm ci/356 testů/build/plný browser/70 SHA archivů/2263 HTTP souborů. Ověřený release zdroj0.2.0 `fa56c96113fdad8097d641ad87c06e74d532efa8`, lokální tagv0.2.0,71 neměnných archivů/2314 HTTP souborů; finální publikace a skutečné Pages Success ještě čekají. M2 (07–10), M3 (11–12), M4 (13–14), M5 (15): PENDING. Žádné nové číslo ani tag zatím nevydáno. Release kandidát0.2.0 je připraven podle úspěšného gate; RELEASED lze zapsat až po tagu, archivu a potvrzeném finálním Pages deploy.
 
 ## Následující vizuální upgrade
 

@@ -1,6 +1,23 @@
 [
   {
     "schema": 1,
+    "commit": "fa56c96113fdad8097d641ad87c06e74d532efa8",
+    "tree": "3f83d8ba5a2fc9fbd6669d1f9a46a20fd4ff7ffb",
+    "date": "2026-11-04T07:03:18Z",
+    "sequence": 86,
+    "subject": "Release v0.2.0: M1 exploration and kingdom management",
+    "name": "Release v0.2.0: M1 exploration and kingdom management",
+    "description": "Release v0.2.0: M1 exploration and kingdom management",
+    "basePath": "/Newgame/versions/fa56c96113fdad8097d641ad87c06e74d532efa8/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    },
+    "originalVersion": "0.2.0"
+  },
+  {
+    "schema": 1,
     "commit": "0024c16c803a91b151cff08300665076f8b67b35",
     "tree": "ec76965538ff8c4dbbd93cc53b5edc1f67620c87",
     "date": "2026-11-03T23:44:29Z",
