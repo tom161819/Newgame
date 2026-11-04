@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Improved
+- The grass itself now changes with the seasons: fresh green with flowers in spring, olive grass with fallen leaves in autumn and snow cover in winter. A new season spreads in broad patches during its first day, and no light seams show between tiles.
 - Villagers dress for their job: woodcutters, miners, hunters, builders, farmers, millers, bakers, haulers and soldiers each have their own clothes, headgear and tools, as men and women, facing all eight walking directions with a light walking and working motion.
 - Construction sites show painted scaffolding that grows in three stages with the work: a first lift around low stone courses, a second lift (a timber frame for wooden buildings) and a tall third lift, sized to the building.
 - Oaks and pines have new painted looks for young and mature trees: oaks blossom in spring, turn ochre and gold in autumn and stand bare with snow on their branches in winter, pines carry snow in winter, and summer oaks come in two crown shapes. Stumps and saplings keep their simple look.

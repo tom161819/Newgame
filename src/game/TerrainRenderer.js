@@ -27,6 +27,9 @@ export class TerrainRenderer {
     this.createTextures();
     this.outcrop=registry.require('rock_outcrop');
     this.wallTexture=assets?.textureFor(this.outcrop.id,'terrain-wall')??'terrain-wall';
+    // Seasonal grass textures (wear level 0); summer uses the ordinary grass variants.
+    const grass=registry.get?.(PATH_WEAR.terrainIds[0]);
+    this.seasonGrass=Object.fromEntries(Object.entries(grass?.seasonVariants??{}).map(([season,list])=>[season,list.map((_,i)=>`season-${season}-${i}`).filter(layer=>assets?.hasTexture(grass.id,layer)).map(layer=>assets.key(grass.id,layer))]).filter(([,keys])=>keys.length));
     this.wearTextures=PATH_WEAR.terrainIds.map(id=>({key:assets?.hasTexture(id)?assets.textureKey(id):this.groundTextures[0].key,variants:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer))}));
   }
 
@@ -88,16 +91,21 @@ export class TerrainRenderer {
           const polygon=(e=0)=>{context.beginPath();context.moveTo(point.x-left-32-e,point.y-origin.y);context.lineTo(point.x-left,point.y-origin.y-16-e/2);context.lineTo(point.x-left+32+e,point.y-origin.y);context.lineTo(point.x-left,point.y-origin.y+16+e/2);context.closePath();};
           // The clip reaches a little past the diamond so antialiased edges of neighbours overlap
           // instead of leaving a light seam; ground tiles carry a pixel of bleed for this.
-          context.save();polygon(TILE_BLEED);context.clip();context.clearRect(point.x-left-33,point.y-origin.y-17,66,34);
+          // Clear only the tile's own diamond, then draw with the reach, so a repainted tile never erases its neighbour's edge.
+          context.save();polygon();context.clip();context.clearRect(point.x-left-33,point.y-origin.y-17,66,34);context.restore();
+          context.save();polygon(TILE_BLEED);context.clip();
           if(state===VISIBILITY.UNEXPLORED){context.fillStyle='#000';polygon(TILE_BLEED);context.fill();context.restore();continue;}
           const wear=this.wear?this.wearTextures[level]:null,entry=wear?(wear.variants.length?{key:wear.variants[terrainHash(x,y)%wear.variants.length]}:wear):this.groundTextures[terrainHash(x,y)%this.groundTextures.length];
-          const frame=this.scene.textures.get(entry.key).get(entry.frame);
           if(state===VISIBILITY.EXPLORED)context.filter=`grayscale(${(1-FOG_STYLE.saturation)*100}%) brightness(${(this.fog?.brightness(tile)??FOG_STYLE.brightness)*100}%)`;
-          context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,point.x-left-32,point.y-origin.y-16,64,32);
-          if(this.wear)this.drawConnections(context,x,y,left,origin.y);
+          const draw=key=>{const frame=this.scene.textures.get(key).get(key===entry.key?entry.frame:undefined);context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,point.x-left-32,point.y-origin.y-16,64,32);};
           const mix=state===VISIBILITY.VISIBLE?this.seasonMix?.(x,y,season):null;
+          // Untouched grass shows the season's own tiles; during a transition the new season fades in over the old one.
+          const seasonal=season=>season==='Summer'?entry.key:this.seasonGrass[season]?.[terrainHash(x,y)%this.seasonGrass[season].length],grassSeason=wear&&level===0&&seasonal(season)&&(!mix||seasonal(mix.from));
+          if(grassSeason&&mix){draw(seasonal(mix.from));context.globalAlpha=mix.amount;draw(seasonal(season));context.globalAlpha=1;}
+          else draw(grassSeason?seasonal(season):entry.key);
+          if(this.wear)this.drawConnections(context,x,y,left,origin.y);
           const tint=(mix&&mixTint(mix.from,season,mix.amount))??{Spring:'rgba(95,145,65,.08)',Summer:'rgba(185,159,70,.09)',Autumn:'rgba(158,105,45,.17)',Winter:'rgba(232,237,220,.83)'}[season];
-          if(tint){context.globalCompositeOperation='source-atop';context.fillStyle=tint;polygon(TILE_BLEED);context.fill();}
+          if(tint&&!grassSeason){context.globalCompositeOperation='source-atop';context.fillStyle=tint;polygon(TILE_BLEED);context.fill();}
           context.restore();
         }
       }
