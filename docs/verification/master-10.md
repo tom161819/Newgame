@@ -1,4 +1,4 @@
-# Stage10 — Quarry Placement & Iron Smelter — IN PROGRESS
+# Stage10 — Quarry Placement & Iron Smelter — implementation verified
 
 Owner Codex; branch codex/stage-10-smelter, base main97b3381 (Stage09 merged PR9).
 Visual Polish & Art Pass is removed from the Codex queue by the latest user
@@ -128,3 +128,59 @@ No graphics implementation or other agent branch was overwritten. Full integrate
 verification follows; older branch-only results are not claimed for this merge.
 
 Combined main03a3de3 verification:437 passed,0failed,0skipped; build:pages passes. Package manifests are unchanged, so no dependency reinstall was required. The superseded old-base full smoke was terminated before rebuilding to avoid mixing artifacts; its partial results are historical only. Now commit this normal merge and run one full smoke on the combined artifact.
+
+## PhaseC native gate and final validation correction
+
+The complete combined-build smoke finished successfully, including new furnace
+and all earlier gameplay, full construction chain, alternate-schema rejection
+without slot/world mutation and original historical games. Log:
+/workspace/scratch/Newgame-master10-merged-full.log.
+
+Final review then added a valid two-Quarry edge scenario: each building mines a
+different primary rock while a secondary edge lies beneath its neighbour. The
+validator incorrectly rejected that legitimate snapshot. It now permits that
+static rock overlap; subsequent unique reciprocal primary-binding checks remain
+mandatory and reject a forged association. Exact restored simulation extracts
+only one unit from each finite deposit, with total2Stone. No schema bump beyond14
+or migration is needed for this bug fix.438/438 model tests now pass,0failed/skipped.
+This small validator change follows the full smoke; run the final production
+build and current-game native roundtrip on it before finishing. Do not attribute
+the earlier full log to a build that did not yet contain this correction.
+
+## Final handoff
+
+PhaseC is verified:438 model tests passed,0failed/skipped; production Pages build,
+changelog/catalog/SHA checks and final current-game native/IndexedDB smoke pass.
+The full combined-game suite passed on0f76b96 before the last narrow Quarry
+validator correction. That correction has its own actual two-Quarry/depletion/
+roundtrip/corrupt-binding regression, the complete438model suite and final native
+current-game roundtrip. It does not alter graphics or the production pipeline.
+
+A fetch verified the developer/other workflow already merged our0f76b96 through
+PR11 as main701263575ff37ebc7e3aca2a208dd2026bc86a33. We made a clean normal merge
+of that main into this branch, preserving the final0f4ebce validation correction.
+Only that small fix/test and the completion records remain for a follow-up PR.
+No direct main push was used. The autonomous conflict policy is already in main.
+
+Final standalone performance measurement (no other browser test running):
+20residents,100x100map,Canvas,Fog,moving king,0.25zoom,1440x1000,360frames each:
+59.34FPS cold and60.00FPS after closing Archives. Both samples advanced simulation
+and recorded actual passages.0catalog requests at cold start,0historical game
+requests,0retained development rows,0per-frame staffing scans. Screenshot of the
+combined Smelter panel: /workspace/scratch/Newgame-master10-merged-smelter.png.
+Earlier equivalent panel layout was visually inspected.
+
+Final logs in /workspace/scratch/: Newgame-master10-final-{tests,pages,current,
+profile}.log, Newgame-master10-merged-full.log and Newgame-master10-merged-http.log.
+71canonical archive URLs/2314files/116659963bytes have correct SHA/MIME; all71
+historical snapshots, URLs, Git history and save namespaces remain unchanged.
+No tests were deleted and no old-save migrations were added; current schema14
+works, other schemas leave their slots stored and are rejected before mutation.
+
+GitHub CLI was rechecked at final handoff and still returned GraphQL Forbidden;
+api.github.com is outside this environment's network policy and no supported
+GitHub connector exists. Prepared [follow-up body](master-10-pr.md). No follow-up
+PR or deployment is claimed. M2 local preflight is [recorded](master-M2.md), but
+formal release:gate needs successful Pages of the exact final source, then the
+explicit release instruction from the uploaded collaboration rules. No number,
+tag or new snapshot was issued. Stage11 remains pending until that M2 handoff.
