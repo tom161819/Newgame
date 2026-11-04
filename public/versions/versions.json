@@ -1,6 +1,23 @@
 [
   {
     "schema": 1,
+    "commit": "02a3a43ace8adc993aea7a392424d7cdf4e7dec9",
+    "tree": "49b1e79b6bf90152c2e69e9fbc01ad74221208d2",
+    "date": "2026-11-04T19:14:22Z",
+    "sequence": 109,
+    "subject": "Finalize verified M2 v0.3.0 source and seasonal release notes",
+    "name": "Finalize verified M2 v0.3.0 source and seasonal release notes",
+    "description": "Finalize verified M2 v0.3.0 source and seasonal release notes",
+    "basePath": "/Newgame/versions/02a3a43ace8adc993aea7a392424d7cdf4e7dec9/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    },
+    "originalVersion": "0.3.0"
+  },
+  {
+    "schema": 1,
     "commit": "f053be1879beb2af3814972caecc8768b8f1ad90",
     "tree": "146d6f9ec0cd4f9456fb993b1159a23392717edb",
     "date": "2026-11-04T17:21:47Z",

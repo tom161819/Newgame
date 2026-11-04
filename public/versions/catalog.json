@@ -7,7 +7,7 @@
     "gameVersion": "0.3.0",
     "title": "Current Version",
     "date": "2026-11-04",
-    "commit": "c90e9d2cde6bc98b3109550adbf4e499e79b93d0",
+    "commit": "02a3a43ace8adc993aea7a392424d7cdf4e7dec9",
     "archiveURL": "/Newgame/",
     "available": true,
     "description": "Current released game.",
@@ -22,8 +22,8 @@
       "version": "0.3.0",
       "title": "M2: Resources, economy and iron",
       "date": "2026-11-04",
-      "commit": "f053be1879beb2af3814972caecc8768b8f1ad90",
-      "archiveURL": "/Newgame/versions/f053be1879beb2af3814972caecc8768b8f1ad90/",
+      "commit": "02a3a43ace8adc993aea7a392424d7cdf4e7dec9",
+      "archiveURL": "/Newgame/versions/02a3a43ace8adc993aea7a392424d7cdf4e7dec9/",
       "available": true,
       "description": "Build 3×3 Smelters for 12 Stone and 10 Wood. Two Smelter Operators physically process 3 Iron Ore and 2 Wood into 1 Iron Bar in 40 seconds of base work, with existing Haulers, storage, skills, wages and daily accounting.",
       "releaseType": "milestone",
@@ -51,6 +51,7 @@
           "Saved forestry jobs resume intact, and deposits never regenerate in a loaded kingdom. Cleared stumps can be built over, and trees cannot regrow beneath finished fields or buildings."
         ],
         "improved": [
+          "Seasons now change gradually: during the first day of a new season the grass tint and the trees turn patch by patch across the map instead of all at once. The change follows game time, so loading a save mid-change shows the same picture, and Seasons OFF stays plain summer.",
           "Place a Quarry across one or more rock formations with one stable primary deposit; a gold outline identifies that deposit in a valid preview, and depletion never switches mining to another rock.",
           "Smoothly zoom out to 0.25× with the mouse wheel while keeping accurate map clicks, building previews and Fog of War. Camera limits also adapt safely to tall windows, and saved views retain their actual zoom.",
           "Try the WebGL renderer by adding ?renderer=webgl to the game address, or ?renderer=auto to use WebGL only with hardware acceleration. Canvas remains the default, and Settings show the active renderer.",
@@ -59,8 +60,8 @@
           "Building sites puff small clouds of dust while builders are working on them; the clouds fade and stop as soon as work pauses, and are skipped when the system asks for reduced motion."
         ]
       },
-      "sequence": 102,
-      "commitDate": "2026-11-04T17:21:47Z",
+      "sequence": 109,
+      "commitDate": "2026-11-04T19:14:22Z",
       "tag": "v0.3.0",
       "current": true
     },
@@ -820,6 +821,20 @@
     }
   ],
   "builds": [
+    {
+      "version": "0.3.0+git.02a3a43ace8adc993aea7a392424d7cdf4e7dec9",
+      "gameVersion": "0.3.0",
+      "commit": "02a3a43ace8adc993aea7a392424d7cdf4e7dec9",
+      "date": "2026-11-04T19:14:22Z",
+      "title": "Finalize verified M2 v0.3.0 source and seasonal release notes",
+      "description": "Finalize verified M2 v0.3.0 source and seasonal release notes",
+      "archiveURL": "/Newgame/versions/02a3a43ace8adc993aea7a392424d7cdf4e7dec9/",
+      "available": true,
+      "sequence": 109,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
     {
       "version": "0.3.0+git.f053be1879beb2af3814972caecc8768b8f1ad90",
       "gameVersion": "0.3.0",

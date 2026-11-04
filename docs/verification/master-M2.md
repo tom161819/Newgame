@@ -1,6 +1,12 @@
 # M2 — Resources, economy and iron — local preflight verified
 
-Status: LOCAL PREFLIGHT VERIFIED; publication IN PROGRESS, external merge blocked.
+Status: FINAL CANDIDATE VERIFIED LOCALLY; publication IN PROGRESS.
+Latest exact source02a3a43ace8adc993aea7a392424d7cdf4e7dec9 has459passing models,
+full native/Studio checks, corrected release fixtures, merged V01 and coherent
+0.3.0notes. Its actual archive brings the total to73, with all72older builds
+unchanged;73HTTP paths/2456files/UI/Save14 pass. Tag remains private, main/source
+deployment and release gates are pending. See the latest publication checkpoint;
+the earlier preflight details below do not supersede it.
 Game0.3.0, Save14, was merged through PR15 into main7595b80. The user authorized this release
 and automatic milestone releases without another prompt, then explicitly asked
 to upload first and test afterwards. The previous approval hold is superseded.

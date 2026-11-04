@@ -1,6 +1,57 @@
-# M2 publication — source/archive merged; native gate sequencing fix in verification
+# M2 publication — final source/archive VERIFIED LOCALLY, PR/deployment pending
 
-## Latest checkpoint — after PR18 merge
+## Final prepared candidate — 2026-11-04
+
+- Exact source:02a3a43ace8adc993aea7a392424d7cdf4e7dec9;
+  tree49b1e79b6bf90152c2e69e9fbc01ad74221208d2, package0.3.0, Save14.
+  Branch codex/m2-smelting-smoke preserves main630caf1 and Claude's PR19
+  seasonal visuals/Studio byte-for-byte. Only COORDINATION conflicted and both
+  authors' task history/active work were retained. No Codex gameplay/art rewrite.
+- Native fixture corrections: physically ready Hauler and joint Ore/Wood/partial
+  cycle observation; settled camera and genuine exposed-canvas blueprint clicks,
+  with a permanent obstructing UI regression. The late-carrier model covers a
+  Bar as first cargo, exact receipts/XP and loaded-cargo Save14. Details in
+  M2-smelter-smoke.md. No player release note was invented for test-only work.
+- Combined source8b118e4:459/459models,0fail/skip; production build, validators,
+  complete native suite (including gradual seasons,mid-transition Load and both
+  corrected fixtures) and Studio Canvas/WebGL/mobile smoke all exit0. The only
+  subsequent source change moves the verified existing V01 entry into0.3.0;
+  game/scripts/assets are identical to the fully tested combined source.
+- Final source02a was exported by the actual archive builder:459tests, production
+  build and real Chromium startup pass;70hashed files, exact source tree;73total
+  snapshots,1new,0skipped. All72prior directories, URLs and save namespaces stay
+  byte-for-byte unchanged, including the earlier f053 candidate.
+- Final73-snapshot artifact: archive SHA and changelog/catalog checks,Pages build,
+  73canonical HTTP URLs/2456files/121455383bytes/MIME/SHA, and the ordinary native
+  archive/current-game/IndexedDB/old-schema/mobile suite all exit0. Catalog33
+  milestones correctly resolves0.3.0 to the new actual source and canonical path
+  /Newgame/versions/02a3a43ace8adc993aea7a392424d7cdf4e7dec9/.
+- Local tag v0.3.0 now has objectb20628dec0f21068c23b713a3fe0bfeb5e30b115
+  targeting02a. The old UNPUBLISHED candidate tag objecta0eebc1 was first preserved
+  at refs/tags/candidate/v0.3.0-f053be1, then its private v0.3.0 reference refined.
+  ls-remote confirmed no public v0.3.0 before this. No published tag, Git history
+  or prior archive was moved/overwritten. No tag was pushed.
+- Actual earlier deployments are Success:41877748443/main7595b80 (PR15), and
+  41883338166/mainb554b4e (PR18). The Actions index was stale; the latter run was
+  found through the ordinary public commit/SHA/checks page. Do not attribute
+  those deployed-source proofs to this still-unmerged final source.
+- Master11–15 and C01–C08 remain unstarted. The user's exact new master is already
+  preserved/queued after the original15; no additional release approval is needed.
+
+Next without another authorization: merge this complete candidate through PR,
+verify actual Pages for its real main SHA (commit/SHA/checks reliably locates the
+run), complete release:gate M2 on the matching deployed source, then push only
+refs/tags/v0.3.0 after confirming02a is an ancestor of main. Do not run another
+release:prepare minor:0.3.0 is the already prepared M2 candidate,0.4.0 belongs to
+the next milestone. The final archive is already part of this PR, so do not
+regenerate/delete the72older builds. Ensure a tag-aware Pages build refreshes
+the generated catalog after tag publication; verify actual deployment and
+release:verify before marking M2 RELEASED. Then begin master11 automatically.
+An API403 or unavailable tag-aware deploy is a technical blocker, not a request
+for new release permission. Preserve the exact checkpoint and never bypass the
+managed destination policy or replace PR merges with a direct main push.
+
+## Earlier checkpoint — after PR18 merge
 
 Archive PR18 is merged into mainb554b4e. Pages41877748443 for source merge7595b80
 now genuinely reports Success. The formal M2 gate ran its first8commands
