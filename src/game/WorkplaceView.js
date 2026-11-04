@@ -21,6 +21,12 @@ export class WorkplaceView {
         const p=point(x+dx,y+dy);polygon(g,tint??0x777b70,[{x:p.x-size/2,y:p.y},{x:p.x,y:p.y-size},{x:p.x+size/2,y:p.y-3},{x:p.x,y:p.y+7}]);polygon(g,tint??0xb8b7a4,[{x:p.x-size/2,y:p.y},{x:p.x,y:p.y-size},{x:p.x+size/2,y:p.y-3},{x:p.x,y:p.y-5}]);
       }
       const post=point(x+2.4,y+1.5);g.lineStyle(5,tint??0x725735);g.lineBetween(post.x,post.y,post.x,post.y-68);g.lineBetween(post.x-26,post.y-55,post.x+32,post.y-72);g.lineStyle(1,0xbab18d);g.lineBetween(post.x+30,post.y-71,post.x+30,post.y-24);g.strokeCircle(post.x+30,post.y-20,4);
+    }else if(d.id==='iron_mine'){
+      const shaft=[point(x+.55,y+.6),point(x+1.8,y+.6),point(x+1.8,y+1.9),point(x+.55,y+1.9)];polygon(g,tint??0x343c31,shaft);g.lineStyle(6,tint??0x817a61);g.strokePoints(shaft,true);
+      const left=point(x+.55,y+1.9),right=point(x+1.8,y+1.9),peak=point(x+1.2,y+1.9,94);
+      g.lineStyle(7,tint??0x725735);g.lineBetween(left.x,left.y,left.x,left.y-80);g.lineBetween(right.x,right.y,right.x,right.y-80);g.lineBetween(left.x,left.y-80,right.x,right.y-80);g.lineBetween(left.x,left.y-76,peak.x,peak.y);g.lineBetween(right.x,right.y-76,peak.x,peak.y);
+      g.lineStyle(2,tint??0xc4b187);g.lineBetween(peak.x,peak.y,peak.x,peak.y+58);g.fillStyle(tint??0x696c60);g.fillRect(peak.x-10,peak.y+54,20,16);
+      const cart=point(x+2.3,y+2.1);polygon(g,tint??0x806744,[{x:cart.x-23,y:cart.y-25},{x:cart.x+20,y:cart.y-25},{x:cart.x+16,y:cart.y-4},{x:cart.x-17,y:cart.y-4}]);g.fillStyle(tint??0x404e43);g.fillTriangle(cart.x-17,cart.y-25,cart.x-5,cart.y-44,cart.x+4,cart.y-25);g.fillTriangle(cart.x-2,cart.y-25,cart.x+11,cart.y-41,cart.x+19,cart.y-25);g.lineStyle(2,tint??0xa56442);g.lineBetween(cart.x-5,cart.y-39,cart.x-1,cart.y-29);g.fillStyle(tint??0x333b32);g.fillCircle(cart.x-12,cart.y-1,6);g.fillCircle(cart.x+12,cart.y-1,6);
     }else{
       const height=d.id==='mill'?77:['granary','warehouse'].includes(d.id)?65:d.id==='barracks'?57:43,roof=height+36,raise=p=>({...p,y:p.y-height});
       polygon(g,tint??0xa29676,[e,c,raise(c),raise(e)]);polygon(g,tint??0x746f5a,[c,b,raise(b),raise(c)]);

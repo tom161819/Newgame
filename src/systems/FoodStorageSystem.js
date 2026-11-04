@@ -15,7 +15,7 @@ export class FoodStorageSystem {
     this.migrateInventory(legacy);scene.inventory.useStorage(this);
     for(const building of scene.buildings)this.register(building);
   }
-  manages(resource){return this.physicalMaterials?resource!=='gold'&&this.scene.objectRegistry.get(resource)?.category==='resource':FOOD_RESOURCE_IDS.includes(resource);}
+  manages(resource){return this.physicalMaterials?resource!=='gold'&&this.scene.objectRegistry.get(resource)?.category==='resource'&&this.scene.objectRegistry.get(resource).collectible:FOOD_RESOURCE_IDS.includes(resource);}
   resourceIds(){return this.physicalMaterials?physicalResources(this.scene.objectRegistry):[...FOOD_RESOURCE_IDS];}
   reservedTiles(){return [...this.locations.values()].filter(l=>l.kind==='fallback'&&l.buildingId==null).map(l=>({x:l.x,y:l.y}));}
   changed(){for(const l of this.locations.values())l.legacyOverflow=Math.max(0,this.used(l)-l.capacity);this.revision++;for(const listener of this.listeners)listener();}

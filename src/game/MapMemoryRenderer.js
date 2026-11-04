@@ -48,7 +48,7 @@ export class MapMemoryRenderer {
     }else if(entry.kind==='stockpile'){
       view=s.legacyStockpiles.createMarker({id:entry.visual.id});frozenAppearance(s,view,()=>view.paint());view.setPosition(point.x,point.y).setDepth(point.y+.12);
     }else{
-      view=s.assets.createView(d.id,{...point,tile:{x:entry.x,y:entry.y}});
+      view=s.assets.createView(d.id,{...point,tile:{x:entry.x,y:entry.y},...(d.tree?{object:{natural:{stage:entry.visual.stage}},season:entry.visual.season}:d.deposit?{object:{natural:{depleted:entry.visual.depleted}}}:{})});
       frozenAppearance(s,view,()=>view.paint?.());
       if(entry.kind==='chest'){view.setOpened?.(entry.visual.opened);if(view.lid&&entry.visual.lid)Object.assign(view.lid,entry.visual.lid);}
     }

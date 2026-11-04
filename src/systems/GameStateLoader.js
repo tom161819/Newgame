@@ -33,7 +33,7 @@ export function loadGameState(scene,input){
     scene.buildings.push(building);scene.towerViews.set(building.id,scene.createBuildingView(definition,building));
   }
   scene.refreshWallConnections();
-  for(const r of state.resources)scene.addResource(scene.objectRegistry.require(r.type),r.tile);
+  for(const r of state.resources)scene.addResource(scene.objectRegistry.require(r.type),r.tile,r.natural??null);
   for(const a of state.animals){
     const animal=scene.animalSystem.create(scene.objectRegistry.require(a.type),a.tile,a.id);restoreActor(animal,a);
     const pos=gridToWorld(animal.position.x,animal.position.y);animal.view.setPosition(pos.x,pos.y).setDepth(pos.y+(animal.definition.depth?.offset??0));
@@ -47,6 +47,7 @@ export function loadGameState(scene,input){
     worker.workplaceReached=data.workplaceReached??false;worker.cargo=structuredClone(data.cargo??null);worker.pendingWorkRewards=structuredClone(data.pendingWorkRewards??[]);
     worker.workTask=structuredClone(data.workTask);worker.active=worker.isAlive;
     if(worker.workTask)scene.workerSystem.reservations.reserve(worker.workTask.reservation,worker.id);
+    if(['chopTree','mineDeposit'].includes(worker.workTask?.kind))scene.workerSystem.reservations.reserve(`natural-slot:${worker.workTask.goal.x},${worker.workTask.goal.y}`,worker.id);
     if(worker.workTask?.kind==='foodPickup'&&worker.workTask.sourceDropId)scene.workerSystem.reservations.reserve(`drop:${worker.workTask.sourceDropId}`,worker.id);
     if(!worker.isAlive)worker.view.destroy();else{const pos=gridToWorld(worker.position.x,worker.position.y);worker.view.setPosition(pos.x,pos.y).setDepth(pos.y+.1);worker.view.animate?.(0,worker.walking,worker.direction);}
   }
@@ -94,6 +95,7 @@ export function loadGameState(scene,input){
   scene.treasureSystem.pending=state.commands.pendingChest;
   scene.animalSystem.nextId=state.counters.animal;scene.dropSystem.nextId=state.counters.drop;scene.treasureSystem.nextId=state.counters.chest;
   scene.gameTime.importState(state.time);scene.seasons?.importState(state.seasons);scene.foodSystem.importState(state.food);scene.production.importState(state.production);
+  scene.naturalResources?.importState(state.naturalResources);
   scene.experienceSystem?.importState(state.experienceSystem);
   scene.skillSystem?.importState(state.skillSystem);scene.workerSystem?.importState(state.population);
   if(scene.workerSystem&&state.workers===undefined)scene.workerSystem.spawnInitial();
@@ -122,7 +124,7 @@ export function loadGameState(scene,input){
   scene.terrain?.setDebug(!!state.settings.pathWearDebug);
   scene.events?.emit('buildings:changed');
   scene.updateInventory();scene.worldCamera.syncSize?.();
-  const camera=scene.cameras.main;camera.setZoom(state.camera.zoom).centerOn(state.camera.x,state.camera.y);camera.preRender();
+  const camera=scene.cameras.main;camera.setZoom(state.camera.zoom);scene.worldCamera.syncZoom?.();camera.centerOn(state.camera.x,state.camera.y);camera.preRender();
   scene.worldCamera.following=state.camera.following;
   document.querySelector('#camera-mode').textContent=state.camera.following?'Kamera sleduje krále':'Ruční posun · mezerník vrátí krále';
   scene.updateInventory();scene.updateTimeDisplay();scene.refreshVisibility();scene.activeFramePending=true;

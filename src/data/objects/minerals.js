@@ -1,0 +1,9 @@
+import { MINERAL_DEPOSITS,MINING_WORK } from '../minerals.js';
+import { WORKPLACES } from '../workplaces.js';
+
+export const mineralDefinitions=[...Object.entries(MINERAL_DEPOSITS).map(([id,deposit])=>({
+  id,name:id==='stone_deposit'?'Stone Deposit':'Iron Deposit',category:'resource',sprite:`/assets/resources/${id}/${id}.svg`,width:2,height:2,walkable:false,collectible:false,buildable:false,cost:{},interactions:['inspect_deposit'],deposit:{...deposit},
+  description:`A finite ${deposit.min}–${deposit.max} ${deposit.resource==='stone'?'Stone':'Iron Ore'} deposit. Never regenerates; depletion leaves a rocky formation.`,renderMode:'procedural',renderer:'deposit',origin:{x:.5,y:.85},visualHeight:90,depth:{offset:.14},
+})),{id:'iron_ore',name:'Iron Ore',inventoryLabel:'Iron Ore',symbol:'◈',inventoryOrder:13,category:'resource',sprite:'/assets/resources/iron_ore/iron_ore.svg',width:1,height:1,walkable:true,collectible:true,buildable:false,cost:{},interactions:['collect'],description:'Raw iron-bearing ore. It is not finished Iron and cannot yet be smelted.',renderMode:'sprite',origin:{x:.5,y:.75},visualHeight:28,visual:{displayWidth:28,displayHeight:28},depth:{offset:.08}}];
+export const mineralBuildings=[{id:'iron_mine',name:'Iron Mine',category:'building',buildingCategory:'industry',sprite:'/assets/buildings/iron_mine/iron_mine.svg',width:3,height:3,walkable:false,collectible:false,buildable:true,cost:{stone:12,wood:8},constructionTime:30000,workplace:WORKPLACES.iron_mine,mining:MINING_WORK.iron_mine,
+  description:'Three Miners work a single assigned Iron Deposit within four tiles of the footprint, then physically deliver raw Iron Ore to storage.',interactions:['manage_workers'],renderMode:'procedural',renderer:'workplace',origin:{x:.5,y:.9},visualHeight:110,depth:{offset:0},shadow:{baked:true,x:12,y:-15,width:177,height:63,color:0x30291c,alpha:.3}}];

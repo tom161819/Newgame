@@ -1,7 +1,6 @@
 import { WORLD_BOUNDS, clampMapCenter } from './isometric.js';
-
-export const MIN_ZOOM = 0.45;
-export const MAX_ZOOM = 1.8;
+import { MIN_ZOOM,MAX_ZOOM,DEFAULT_ZOOM,ZOOM_RESPONSE_MS,clampZoom } from '../data/camera.js';
+export { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 
 export class WorldCamera {
   constructor(scene, target) {
@@ -14,7 +13,7 @@ export class WorldCamera {
       const center={x:this.camera.scrollX+this.camera.width/2,y:this.camera.scrollY+this.camera.height/2};
       if(scene.scale.getParentBounds())scene.scale.refresh();
       else scene.scale.updateBounds();
-      this.camera.centerOn(center.x,center.y);this.camera.preRender();
+      this.syncZoom();this.camera.centerOn(center.x,center.y);this.camera.preRender();
     };
     this.syncSize();
     this.resizeObserver=new ResizeObserver(this.syncSize);
@@ -22,7 +21,7 @@ export class WorldCamera {
     this.following = true;
     this.keys = scene.input.keyboard.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,SPACE');
     this.camera.setBounds(WORLD_BOUNDS.x, WORLD_BOUNDS.y, WORLD_BOUNDS.width, WORLD_BOUNDS.height);
-    this.camera.setZoom(1);
+    this.camera.setZoom(DEFAULT_ZOOM);this.zoomTarget=DEFAULT_ZOOM;this.lastZoom=DEFAULT_ZOOM;
     this.camera.centerOn(target.x, target.y - 25);
     this.camera.preRender();
     this.wheel = (pointer, objects, dx, dy) => this.zoom(dy);
@@ -47,11 +46,22 @@ export class WorldCamera {
   }
 
   zoom(delta) {
-    this.camera.setZoom(Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, this.camera.zoom * Math.exp(-delta * 0.001))));
-    this.camera.preRender();
+    if(!Number.isFinite(delta)||this.scene.gameTime?.paused||this.scene.gameOver)return;
+    this.syncZoom();this.zoomTarget=Math.max(this.minimumZoom(),clampZoom(this.zoomTarget*Math.exp(-delta*.001)));
+  }
+
+  minimumZoom(){return Math.min(MAX_ZOOM,Math.max(MIN_ZOOM,this.camera.width/WORLD_BOUNDS.width,this.camera.height/WORLD_BOUNDS.height));}
+  syncZoom(){
+    // Restored games and explicitly positioned test/editor cameras set Phaser's
+    // zoom directly. Adopt that value instead of pulling them back next frame.
+    const minimum=this.minimumZoom();if(this.camera.zoom<minimum)this.camera.setZoom(minimum);
+    if(this.lastZoom!==this.camera.zoom||!Number.isFinite(this.zoomTarget)){this.lastZoom=this.camera.zoom;this.zoomTarget=Math.max(minimum,clampZoom(this.camera.zoom));}
+    this.zoomTarget=Math.max(minimum,this.zoomTarget);
   }
 
   update(delta) {
+    this.syncZoom();const distance=this.zoomTarget-this.camera.zoom;
+    if(Math.abs(distance)>0){const next=this.camera.zoom+distance*(1-Math.exp(-Math.max(0,delta)/ZOOM_RESPONSE_MS));this.camera.setZoom(Math.abs(next-this.zoomTarget)<1e-4?this.zoomTarget:next);this.lastZoom=this.camera.zoom;}
     const k = this.keys, camera = this.camera;
     let dx = Number(k.D.isDown || k.RIGHT.isDown) - Number(k.A.isDown || k.LEFT.isDown);
     let dy = Number(k.S.isDown || k.DOWN.isDown) - Number(k.W.isDown || k.UP.isDown);

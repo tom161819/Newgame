@@ -16,7 +16,7 @@ export class ConstructionSystem {
   }
   plan(building){
     if(building.construction)return building;
-    building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;initializeConstructionSite(building);this.materials.registerLegacy(building);for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.revision++;this.scene.events?.emit('buildings:changed');return building;
+    building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;if(building.type==='quarry'&&!building.depositId)building.quarryMode='unbound';initializeConstructionSite(building);this.materials.registerLegacy(building);for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.revision++;this.scene.events?.emit('buildings:changed');return building;
   }
   actor(id){return id==='king'?this.scene.character:this.scene.workerSystem.workers.get(id);}
   slotKey(goal){return `construction-slot:${tileKey(goal)}`;}
@@ -92,6 +92,7 @@ export class ConstructionSystem {
     for(const id of [...c.assignedBuilders]){const actor=this.actor(id);if(!actor)continue;if(id==='king')this.stopKing();else this.scene.workerSystem.ai.cancel(actor);}
     this.sites.delete(site.id);this.scene.buildings.splice(this.scene.buildings.indexOf(site),1);
     for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=this.scene.terrainGrid[tile.y][tile.x];
+    this.scene.naturalResources?.mining.restoreTiles(site.tiles);
     if(!this.materials.cancel(site,refund))for(const [id,n]of Object.entries(refund))this.scene.inventory.add(id,n);this.revision++;this.scene.events?.emit('buildings:changed');this.onCancel(site,refund);return true;
   }
   estimatedSeconds(site){const rate=this.activeBuilders(site).reduce((sum,p)=>sum+this.scene.skillSystem.workEfficiency(p.actor,'construction'),0);return rate?(site.construction.requiredWork-site.construction.workDone)/rate/1000:null;}

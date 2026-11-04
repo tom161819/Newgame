@@ -9,5 +9,7 @@ import { treasures } from './treasures.js';
 import { farmingBuildings,farmingResources } from './farming.js';
 import { foodBuildings,processedFoodResources } from './foodProduction.js';
 import { logisticsBuildings,materialDefinitions } from './logistics.js';
+import { naturalDefinitions,forestryBuildings } from './naturalResources.js';
+import { mineralDefinitions,mineralBuildings } from './minerals.js';
 
-export const objectDefinitions = [...terrain, ...resources, ...farmingResources,...processedFoodResources,...materialDefinitions, ...buildings, ...farmingBuildings,...foodBuildings,...logisticsBuildings, ...characters, ...decorations, ...animals, ...equipment, ...treasures];
+export const objectDefinitions = [...terrain, ...resources,...naturalDefinitions, ...farmingResources,...processedFoodResources,...materialDefinitions,...mineralDefinitions, ...buildings, ...farmingBuildings,...foodBuildings,...logisticsBuildings,...forestryBuildings,...mineralBuildings, ...characters, ...decorations, ...animals, ...equipment, ...treasures];
