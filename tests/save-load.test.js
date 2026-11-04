@@ -3,7 +3,8 @@ import { FogOfWarSystem } from '../src/systems/FogOfWarSystem.js';
 import { MapMemory } from '../src/systems/MapMemory.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
+import { serializeGameState,validateGameState,saveSchemaStatus,IncompatibleSaveError,SAVE_VERSION } from '../src/systems/GameStateSerializer.js';
+import { saveRecordStatus,incompatibleSaveMessage } from '../src/ui/SaveLoadMenu.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
 import { PauseManager } from '../src/systems/PauseManager.js';
 import { objectRegistry } from '../src/systems/ObjectRegistry.js';
@@ -125,6 +126,35 @@ test('corrupt versions, coordinates, references, overlaps, HP, equipment and clo
     s=>s.commands.attacks=[['king','missing']],s=>s.player.order={kind:'openChest',chestId:'missing'}]){
     const data=structuredClone(original);corrupt(data);const target=scene();assert.throws(()=>loadGameState(target,data));assert.equal(target.buildings.length,0);assert.equal(target.inventory.count('gold'),0);
   }
+});
+
+test('alpha saves load only the current schema; older or newer versions are reported as incompatible without mutation',()=>{
+  const original=serializeGameState(fixture());assert.equal(original.saveVersion,SAVE_VERSION);
+  assert.deepEqual(saveSchemaStatus(original),{compatible:true,savedVersion:SAVE_VERSION,currentVersion:SAVE_VERSION});
+  for(const version of [1,SAVE_VERSION-1,SAVE_VERSION+1]){
+    const data=structuredClone(original);data.saveVersion=version;const before=structuredClone(data),target=scene(),empty=serializeGameState(target);
+    assert.deepEqual(saveSchemaStatus(data),{compatible:false,savedVersion:version,currentVersion:SAVE_VERSION});
+    assert.throws(()=>validateGameState(data),error=>error instanceof IncompatibleSaveError&&error.savedVersion===version&&error.currentVersion===SAVE_VERSION&&error.message.includes(`schema ${version}`));
+    assert.throws(()=>loadGameState(target,data),IncompatibleSaveError);
+    assert.deepEqual(data,before,'the stored save is never converted');assert.deepEqual(serializeGameState(target),empty,'the running world is unchanged');
+  }
+  for(const version of [undefined,null,'12',12.5]){
+    const data=structuredClone(original);data.saveVersion=version;
+    assert.throws(()=>validateGameState(data),error=>!(error instanceof IncompatibleSaveError)&&/poškozená/.test(error.message));
+  }
+  assert.throws(()=>validateGameState(null),error=>!(error instanceof IncompatibleSaveError));
+});
+
+test('save list status reads the stored schema and offers a new game without deleting the slot',()=>{
+  const state=serializeGameState(fixture());
+  assert.equal(saveRecordStatus({saveVersion:SAVE_VERSION,state}).compatible,true);
+  const old={id:'a',name:'Old kingdom',saveVersion:SAVE_VERSION-1,state:{...state,saveVersion:SAVE_VERSION-1}},status=saveRecordStatus(old);
+  assert.deepEqual(status,{compatible:false,savedVersion:SAVE_VERSION-1,currentVersion:SAVE_VERSION});
+  assert.equal(saveRecordStatus({saveVersion:SAVE_VERSION-1}).savedVersion,SAVE_VERSION-1,'record metadata is enough to flag a slot');
+  assert.equal(saveRecordStatus({}).savedVersion,null);
+  const message=incompatibleSaveMessage(old.name,status);
+  assert.match(message,new RegExp(`"Old kingdom" uses save schema ${SAVE_VERSION-1}`));assert.match(message,new RegExp(`loads only schema ${SAVE_VERSION}`));
+  assert.match(message,/stays stored until you delete it/);assert.match(message,/Start a new game instead\?/);
 });
 
 test('central pause retains independent menu/settings reasons and resumes only after both close',()=>{

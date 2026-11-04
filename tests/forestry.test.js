@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { workerScene } from './helpers/workerScene.js';
-import { treeState,FORESTRY,emptyNaturalState } from '../src/data/naturalResources.js';
+import { treeState,FORESTRY } from '../src/data/naturalResources.js';
 import { reachableTiles } from '../src/game/pathfinding.js';
 import { serializeGameState,validateGameState,SAVE_VERSION } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
@@ -33,9 +33,8 @@ test('the king physically approaches, chops once, leaves real Wood on the ground
 test('cancelling chopping releases its exclusive task, preserves partial work and awards only the final real completion',()=>{
   const s=fixture(),t=tree(s);assert.equal(s.naturalResources.beginKingChop(t),true);until(s,()=>t.natural.workDone>1000);const partial=t.natural.workDone;assert.equal(s.character.command({kind:'move',goal:{x:44,y:43}}),true);assert.equal(s.naturalResources.kingTask,null);assert.equal(s.workerSystem.reservations.owners.has(s.naturalResources.reservation(t)),false);s.simulate(2000);assert.equal(t.natural.workDone,partial);assert.equal(s.character.experience.totalXP,0);assert.equal(s.naturalResources.beginKingChop(t),true);until(s,()=>t.natural.stage===0);assert.equal(s.character.experience.totalXP,15);assert.equal([...s.dropSystem.drops.values()].reduce((n,d)=>n+d.amount,0),6);
 });
-test('Save11 restores partial chopping/growth/reservations without replay; real schema10 safely gains no invented forest',()=>{
+test('current-schema save restores partial chopping/growth/reservations without replay',()=>{
   const s=fixture({construction:true,logistics:true}),t=tree(s);s.naturalResources.beginKingChop(t);until(s,()=>t.natural.workDone>4000);const saved=validateGameState(serializeGameState(s)),r=fixture({construction:true,logistics:true,starter:false});loadGameState(r,saved);assert.equal(saved.saveVersion,SAVE_VERSION);assert.deepEqual(serializeGameState(r),saved);const restored=r.naturalResources.byId.get(t.natural.id);assert.equal(r.workerSystem.reservations.owners.get(r.naturalResources.reservation(restored)),'king');until(r,()=>restored.natural.stage===0);assert.equal(r.character.experience.totalXP,15);assert.equal([...r.dropSystem.drops.values()].reduce((n,d)=>n+d.amount,0),6);const again=fixture({construction:true,logistics:true,starter:false});loadGameState(again,serializeGameState(r));again.simulate(500);assert.equal(again.character.experience.totalXP,15);assert.equal(again.dropSystem.drops.size,1);
-  const old=serializeGameState(workerScene());old.saveVersion=10;delete old.naturalResources;const before=structuredClone(old),migrated=validateGameState(old);assert.deepEqual(old,before);assert.deepEqual(migrated.naturalResources,emptyNaturalState());const legacy=fixture();loadGameState(legacy,old);assert.equal(legacy.naturalResources.byId.size,0);assert.deepEqual(serializeGameState(legacy),migrated);
 });
 test('royal chopping dismounts the same living horse and never works through another actor’s reservation',()=>{
   const s=fixture(),t=tree(s),horse=s.animalSystem.create(s.objectRegistry.require('horse'),{x:41,y:40});s.mountSystem=new MountSystem(s);assert.equal(s.mountSystem.mount(horse),true);const oldSpeed=s.character.speed;

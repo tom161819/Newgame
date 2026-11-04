@@ -32,7 +32,7 @@ if(mode==='check'){
   const stages=completedStages(progress,prerequisiteStages);for(const stage of stages){stage.commit=git('rev-parse','--verify',`${stage.commit}^{commit}`);git('merge-base','--is-ancestor',stage.commit,head);}
   if(git('tag','--list',`v${nextVersion(data.version,'minor')}`))throw new Error('The proposed milestone version already has a tag; do not reuse a release number.');
   report.milestone=milestone;report.stages=stages;
-  // Includes legacy save migrations, logistics, construction/cancellation and no-duplication scenarios.
+  // Includes current-schema Save/Load, incompatible-save handling, logistics, construction/cancellation and no-duplication scenarios.
   for(const command of [['ci'],['run','changelog:validate'],['run','versions:validate'],['test'],['run','archive:verify'],['run','build','--','--base=/Newgame/'],['run','archive:stage'],['run','archive:verify-site'],['run','smoke','--','--base=/Newgame/','--full']]){run('npm',command);report.checks.push({command:`npm ${command.join(' ')}`,status:'passed'});}
 }else{
   releaseNumber(data.version);const tag=`v${data.version}`,commit=git('rev-parse','--verify',`${tag}^{commit}`);git('merge-base','--is-ancestor',commit,head);

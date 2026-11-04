@@ -29,15 +29,6 @@ test('Save9 restores exact exploration and stale static knowledge without recrea
   move(restored,40,40);assert.equal(restored.mapMemory.objects.has(`building:${building.id}`),false);assert.equal(restored.mapMemory.objects.has('resource:42,40'),false);
 });
 
-test('actual old-schema migration is idempotent, leaves input unchanged and reveals only the loaded king circle even with Fog OFF',()=>{
-  const {s}=fixture(),old=serializeGameState(s);old.saveVersion=8;delete old.exploration;delete old.settings.explorationMode;delete old.gameSettings.explorationMode;old.settings.fogOfWar=false;
-  const original=structuredClone(old),migrated=validateGameState(old);assert.deepEqual(validateGameState(migrated),migrated);assert.deepEqual(old,original);
-  assert.deepEqual(migrated.exploration,{version:1,explored:[],terrain:[],objects:[]});
-  const restored=create(false);loadGameState(restored,migrated);const saved=serializeGameState(restored);
-  assert.equal(saved.exploration.explored.length,317);assert.equal(restored.fog.state({x:40,y:40}),VISIBILITY.UNEXPLORED);assert.equal(restored.fog.state({x:80,y:80}),VISIBILITY.VISIBLE);
-  assert.equal(restored.fog.enabled,false);assert.equal(restored.fog.explorationEnabled,true);assert.deepEqual(saved.inventory,old.inventory);assert.deepEqual(saved.time,old.time);
-});
-
 test('corrupt knowledge is rejected before load, including fake dynamic snapshots and never-discovered objects',()=>{
   const {s}=fixture(),saved=serializeGameState(s),before=structuredClone(saved);
   const changes=[

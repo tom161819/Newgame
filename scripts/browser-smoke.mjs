@@ -12,13 +12,10 @@ import { stageArchivedSnapshots } from './stage-archive.mjs';
 import { explorationMenuSmoke,staticMemoryRendererSmoke,hiddenInteractionSmoke } from './fog-smoke.mjs';
 import { populationSidebarSmoke,populationNavigationSmoke,populationIntegrationSmoke } from './population-smoke.mjs';
 import { staffingIndicatorsSmoke } from './staffing-smoke.mjs';
-import { emptyNaturalState } from '../src/data/naturalResources.js';
 import { mineralSmoke } from './mineral-smoke.mjs';
-import { naturalMigrationSmoke } from './natural-migration-smoke.mjs';
 import { zoomSmoke } from './zoom-smoke.mjs';
 import { forestrySmoke,forestryHutSmoke } from './forestry-smoke.mjs';
 
-function mineralStorageMigration(state){const s=structuredClone(state);if(s.saveVersion>=12)return s;for(const l of s.foodStorage?.locations??[])if(l.allowed.includes('wood')&&!l.allowed.includes('iron_ore'))l.allowed.push('iron_ore');for(const b of s.buildings??[])if(b.type==='quarry')b.quarryMode=b.construction&&b.construction.state!=='complete'?'unbound':'legacy';return s;}
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
 const base=projectBase(args.find(a=>a.startsWith('--base='))?.slice(7)??'/Newgame/'),dist=path.join(root,'dist');
@@ -121,40 +118,26 @@ try{
   assert.equal(await page.evaluate(()=>localStorage.getItem('smoke.main')),'preserved');assert.deepEqual(await page.evaluate(id=>window.__game.registry.get('application').saves.get(id),record.id),record);
   assert.equal(await page.evaluate(()=>window.__game.registry.get('application').saves.list().then(rows=>rows.length)),1);
   await old.close();
-  await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(state);},isolated.state);
-  await page.waitForFunction(()=>window.__restored);const migrated=await page.evaluate(()=>window.__game.registry.get('application').snapshot());
-  assert.equal(migrated.saveVersion,record.saveVersion);assert.deepEqual(migrated.time,isolated.state.time);assert.deepEqual(migrated.player.tile,isolated.state.player.tile);assert.equal(migrated.inventory.stone??0,isolated.state.inventory.stone??0);assert.equal(migrated.player.experience.totalXP,isolated.state.player.experience.totalXP);
-  console.log(`PASS actual historical save schema ${isolated.schema} migrates to ${migrated.saveVersion} with preserved time, royal position, stock and experience`);
-  if(migrated.saveVersion>=8){
-    const previous=catalog.builds.find(b=>b.commit==='fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265');assert.ok(previous?.available,'The actual previous schema-7 source archive must remain available.');
-    const legacyPage=await context.newPage();await instrument(legacyPage);await legacyPage.goto(origin+previous.archiveURL);await legacyPage.locator('#new-game').click();await legacyPage.locator('#start-game').click();await legacyPage.waitForFunction(()=>window.__game?.registry.get('application').scene?.seasons);
-    const legacyState=await legacyPage.evaluate(()=>{const app=window.__game.registry.get('application'),s=app.scene;s.pauseManager.set('test',true);s.workerSystem.unsubscribe();s.seasons.random=()=>0;s.gameTime.setPaused(false);s.gameTime.update(15*s.gameTime.dayDuration+23456);s.gameTime.setPaused(true);return app.snapshot();});assert.equal(legacyState.saveVersion,7);assert.equal(legacyState.seasons.season,'Winter');
-    await legacyPage.close();await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(state);},legacyState);await page.waitForFunction(()=>window.__restored);
-    const restored=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.deepEqual(restored.time,legacyState.time);assert.equal(restored.seasons.enabled,true);assert.equal(restored.seasons.rememberedSeason,'Winter');assert.equal(restored.seasons.cycleDay,legacyState.time.day);assert.equal(restored.seasons.cycleElapsed,legacyState.time.elapsed);assert.deepEqual(restored.inventory,legacyState.inventory);
-    console.log(`PASS actual source fcdb80f schema-7 winter save migrates to ${restored.saveVersion} without resetting its partial day, stocks or weather`);
-  }
-  if(migrated.saveVersion>=9){
-    const previous=catalog.builds.find(b=>b.commit==='a4f51ecd936af7678c0822ead4e15c91c0b3e780');assert.ok(previous?.available);
-    const legacyPage=await context.newPage();await instrument(legacyPage);await legacyPage.goto(origin+previous.archiveURL);await legacyPage.locator('#new-game').click();await legacyPage.locator('.setup-advanced summary').click();await legacyPage.locator('#setup-seasons').uncheck();await legacyPage.locator('#start-game').click();await legacyPage.waitForFunction(()=>window.__game?.registry.get('application').scene?.seasons);
-    const legacy=await legacyPage.evaluate(()=>{const app=window.__game.registry.get('application'),s=app.scene;s.pauseManager.set('test',true);s.workerSystem.unsubscribe();s.gameTime.setPaused(false);s.gameTime.update(5*s.gameTime.dayDuration+12345);s.gameTime.setPaused(true);return app.snapshot();});assert.equal(legacy.saveVersion,8);assert.equal(legacy.seasons.enabled,false);await legacyPage.close();
-    await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(state);},legacy);await page.waitForFunction(()=>window.__restored);
-    const restored=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.deepEqual(restored.time,legacy.time);assert.deepEqual(restored.seasons,legacy.seasons);assert.deepEqual(restored.inventory,legacy.inventory);assert.deepEqual(restored.player.experience,legacy.player.experience);assert.equal(restored.exploration.explored.length,317);assert.equal(restored.settings.explorationMode,true);
-    console.log('PASS actual a4f51ec schema-8 permanent Summer save preserves time, frozen seasonal cycle, stock and XP; migration discovers only the loaded king circle');
-  }
-  if(migrated.saveVersion>=10){
-    const previous=catalog.builds.find(b=>b.commit==='0024c16c803a91b151cff08300665076f8b67b35');assert.ok(previous?.available,'The actual schema-9 source archive must remain available.');
-    const legacyPage=await context.newPage();await instrument(legacyPage);await legacyPage.goto(origin+previous.archiveURL);await legacyPage.locator('#new-game').click();await legacyPage.locator('#start-game').click();await legacyPage.waitForFunction(()=>window.__game?.registry.get('application').scene?.mapMemory);
-    const legacy=await legacyPage.evaluate(()=>{const app=window.__game.registry.get('application'),s=app.scene;s.pauseManager.set('test',true);const w=s.workerSystem.liveWorkers()[0];w.currentHP=0;w.isAlive=false;s.workerSystem.onDeath(w);return app.snapshot();});assert.equal(legacy.saveVersion,9);assert.ok(legacy.exploration.explored.length>0);await legacyPage.close();
-    await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(state);},legacy);await page.waitForFunction(()=>window.__restored);
-    const restored=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.deepEqual(restored,{...mineralStorageMigration(legacy),saveVersion:restored.saveVersion,...(restored.saveVersion>=11?{naturalResources:emptyNaturalState()}:{}),workers:legacy.workers.map(w=>({...w,isSubject:true,diedAt:w.isAlive?null:legacy.time.totalElapsed}))});
-    console.log(`PASS actual 0024c16 schema-9 source save migrates to Save${restored.saveVersion} with exact map memory, stock, time and XP; undated old deaths gain one persisted retention window`);
-  }
-  if(migrated.saveVersion>=11){
-    const previous=catalog.builds.find(b=>b.commit==='fa56c96113fdad8097d641ad87c06e74d532efa8');assert.ok(previous?.available,'The real v0.2.0/Save10 source archive must remain available.');const legacyPage=await context.newPage();await instrument(legacyPage);await legacyPage.goto(origin+previous.archiveURL);await legacyPage.locator('#new-game').click();await legacyPage.locator('#start-game').click();await legacyPage.waitForFunction(()=>window.__game?.registry.get('application').scene?.workerSystem);
-    const legacy=await legacyPage.evaluate(()=>{const app=window.__game.registry.get('application'),s=app.scene;s.pauseManager.set('test',true);s.gameTime.setPaused(false);s.gameTime.update(4321);s.gameTime.setPaused(true);s.experienceSystem.addXP(s.workerSystem.liveSubjects()[0],42);return app.snapshot();});assert.equal(legacy.saveVersion,10);await legacyPage.close();
-    await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(state);},legacy);await page.waitForFunction(()=>window.__restored);const restored=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.deepEqual(restored,{...mineralStorageMigration(legacy),saveVersion:restored.saveVersion,naturalResources:emptyNaturalState()});assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.naturalResources.byId.size),0);
-    console.log(`PASS real v0.2.0 schema10 migrates to Save${restored.saveVersion} with the entire old world, villagers, talents, memory, pay, food, XP and stock unchanged; no forest is invented over an existing kingdom`);
-  }
+  // ALPHA policy: an older schema is never converted. The Load menu flags it, offers a new game and keeps the slot.
+  const current=await page.evaluate(async state=>{const app=window.__game.registry.get('application');app.scene.pauseManager.set('test',true);const before=app.snapshot();let outcome;
+    try{await app.load(state);outcome={loaded:true};}catch(error){outcome={loaded:false,name:error.name,savedVersion:error.savedVersion,currentVersion:error.currentVersion};}
+    return {before,after:app.snapshot(),outcome};},isolated.state);
+  assert.deepEqual(current.outcome,{loaded:false,name:'IncompatibleSaveError',savedVersion:isolated.schema,currentVersion:record.saveVersion});assert.deepEqual(current.after,current.before);
+  const stored=await page.evaluate(state=>window.__game.registry.get('application').saves.save({name:'Archived 0.1.0 kingdom',state}),isolated.state);
+  await page.evaluate(()=>window.__game.registry.get('application').openSaves('load'));
+  const row=page.locator('#save-list .save-row',{hasText:'Archived 0.1.0 kingdom'});await row.locator('.save-warning').waitFor();
+  assert.match(await row.locator('.save-warning').textContent(),new RegExp(`schema ${isolated.schema}, current ${record.saveVersion}`));
+  await row.locator('[data-action="load"]').click();await page.locator('#save-confirm[open]').waitFor();
+  assert.match(await page.locator('#save-confirm-text').textContent(),/Start a new game instead\?/);assert.equal(await page.locator('#confirm-save-yes').textContent(),'Start New Game');
+  await page.locator('#confirm-save-no').click();assert.equal(await page.locator('#save-load-dialog').evaluate(d=>d.open),true);
+  assert.deepEqual(await page.evaluate(id=>window.__game.registry.get('application').saves.get(id).then(r=>r.state),stored.id),isolated.state,'the incompatible slot stays unchanged');
+  assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').snapshot()),current.before);
+  await row.locator('[data-action="load"]').click();await page.locator('#save-confirm[open]').waitFor();await page.locator('#confirm-save-yes').click();
+  await page.locator('#game-setup').waitFor({state:'visible',timeout:10000});assert.equal(await page.locator('#start-game').isVisible(),true);
+  assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene),null,'the running game was stopped without saving over any slot');
+  assert.equal(await page.evaluate(id=>window.__game.registry.get('application').saves.get(id).then(r=>!!r),stored.id),true,'starting a new game never deletes the old save');
+  await page.evaluate(id=>window.__game.registry.get('application').saves.delete(id),stored.id);
+  console.log(`PASS actual historical schema ${isolated.schema} save is reported as incompatible with schema ${record.saveVersion}; the world and the stored slot stay unchanged and New Game is offered`);
   const archivePage=await context.newPage();await instrument(archivePage);await archivePage.goto(origin+base+'versions/');assert.equal(await archivePage.locator('[data-version-label]').count(),catalog.versions.length+(catalog.versions.some(v=>v.current)?0:1));
   await archivePage.setViewportSize({width:390,height:844});assert.equal(await archivePage.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   const first=catalog.builds.at(-1);await archivePage.goto(origin+first.archiveURL);await archivePage.locator('canvas').waitFor();
@@ -165,4 +148,3 @@ try{
 }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 }
 await runSmoke();
-if(args.includes('--full'))await naturalMigrationSmoke();
