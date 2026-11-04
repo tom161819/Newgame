@@ -14,6 +14,8 @@ M2 PR15 i archivní PR18 jsou merged, jejich skutečné Pages41877748443/4188333
 
 ## Master: 15 etap, 5 milníků
 
+Aktualizace předání: celý kandidát je v [PR22](https://github.com/tom161819/Newgame/pull/22). Zachován i následný mainf1d6526/Draft Studio; pracovní větev462/462modelů a aktualizovaný Studio smoke/build/HTTP pass. Ověřený herní zdroj02a a jeho459testový archiv zůstávají přesně stejné, nové Studio koncepce nemění herní/build cesty. Není nutný další archiv ani opakování nezměněného herního suite. Zbývá skutečné sloučení/vydání/gates podle předání, nikoli další svolení.
+
 Etapy01–06 i dodatečný audit archivu jsou DONE; M1 RELEASED0.2.0,07–10 jsou DONE ve větvi, hlavní10 merged PR11 a finální malý follow-up čeká na PR; M2 release pending,11–15 PENDING. U dokončené etapy doplnit konkrétní chování, testy (passed/failed/skipped), commit, stav milníku a další etapu. DONE lze zapsat pouze po implementaci a skutečné kontrole.
 
 | Etapa | Krok | Milník | Stav | Commit / ověření |

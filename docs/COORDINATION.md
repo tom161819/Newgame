@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| M2 final candidate and stable native release checks | Codex | `codex/m2-smelting-smoke`, integrating mainf1d6526 Studio-only follow-up | [#22](https://github.com/tom161819/Newgame/pull/22) | Final game source02a3a43,459models/full native/Studio and73archives/2456HTTP/UI/Save14 verified. Preserve the latest Draft Studio concepts; rerun their model/Studio checks. Game/build source paths match02a, existing72archives unchanged. Public tag/main/deployment gates pending; master11/C01–C08 unstarted. | Native smoke helpers/regression,0.3.0 release notes, new source archive/catalog and release/progress docs. No Codex gameplay/graphics/schema rewrite. |
+| M2 final candidate and stable native release checks | Codex | `codex/m2-smelting-smoke`, mainf1d6526 preserved | [#22](https://github.com/tom161819/Newgame/pull/22) | READY:462working-tree models/Studio pass; game source02a has459models/full native,73archives/2456HTTP/UI/Save14 verified. Game/build source paths still match02a exactly;72older archives unchanged. Public tag/main/deployment gates pending; master11/C01–C08 unstarted. | Native smoke helpers/regression,0.3.0 notes, new source archive/catalog and release/progress docs. No Codex gameplay/graphics/schema rewrite; new military assets stay Draft Studio-only. |
 
 ## Kept backups (do not delete without the developer)
 

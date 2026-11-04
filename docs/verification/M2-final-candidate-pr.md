@@ -14,6 +14,11 @@ archive SHA/catalog/changelog validation; final Pages artifact with73canonical
 URLs,2456HTTP files/121455383bytes/correct MIME+hashes; final archive/current UI,
 Save14, incompatible-slot preservation and historical storage isolation.
 
+Latest mainf1d6526 Draft Studio follow-up is also preserved:462working-tree
+models and updated Studio smoke/Pages build/archive HTTP pass. Game/build paths
+are identical to source02a; its archived459test result and full native proof
+remain exact. No Draft military visual or mechanic was added to the game.
+
 All72previous snapshots/URLs/save namespaces stay unchanged. Source tree and
 local prepared tag are recorded in M2-release-publication.md. No public tag was
 moved or pushed; publish v0.3.0 at02a only after the real main merge/gates, then

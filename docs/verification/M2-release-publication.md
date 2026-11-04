@@ -38,6 +38,19 @@
 - Master11–15 and C01–C08 remain unstarted. The user's exact new master is already
   preserved/queued after the original15; no additional release approval is needed.
 
+Final integration follow-up: the user opened PR22 for codex/m2-smelting-smoke.
+Claude then merged Draft military Studio concepts through PR20/coordination21,
+mainf1d6526. They were normally merged as7d10a83; only the shared coordination
+register conflicted and both histories were retained. `git diff02a HEAD` for all
+release-gate game/build paths is empty, so the verified source/tag/archive02a
+remains exact; no extra Game full run or duplicate snapshot was needed.
+The working tree now passes462/462models,0fail/skip,updated Studio smoke
+(Canvas/WebGL/export/mobile),validators,Pages build and the same73URL/2456file
+HTTP/SHA checks. The actual frozen source02a correctly retains its own459tests.
+Draft military assets remain Studio-only; Codex did not implement C06–C08 early.
+PR22 contains the complete candidate and the final source does not need another
+version bump or archive regeneration.
+
 Next without another authorization: merge this complete candidate through PR,
 verify actual Pages for its real main SHA (commit/SHA/checks reliably locates the
 run), complete release:gate M2 on the matching deployed source, then push only
