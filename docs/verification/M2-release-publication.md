@@ -58,6 +58,15 @@ release:verify. Only then mark M2 RELEASED and begin master11. API remains outsi
 the runtime's allowed hosts, so PR creation/merge may still need the normal web
 route; this is technical access, not a new authorization requirement.
 
+Final external checkpoint: the actual draft PR creation command using
+`--head codex/m2-release-archive --body-file docs/verification/M2-archive-pr.md`
+also fails `Post "https://api.github.com/graphql": Forbidden`. No archive PR was
+created. Public PR list has no open rows, main remains7595b80, and ls-remote has
+no v0.3.0 tag. Branch465e319 and its actual72-archive artifact are pushed; this
+subsequent documentation-only checkpoint records the blockers. Do not claim work
+will run outside an active session. Resume at the successful Pages/gate/tag/PR
+steps above; master11 and the queued C01–C08 remain unstarted.
+
 ## Earlier checkpoint before the user's merge
 
 - Actual open PR: https://github.com/tom161819/Newgame/pull/15,

@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| M2 final tag/archive and queued follow-up request | Codex | `codex/m2-release-archive` from main7595b80 | PR15 merged; archive PR not opened yet | Verify actual Pages, finish the v0.3.0 source tag and immutable archive; preserve all existing builds. Append CODEX_MASTER C01–C08 after the existing master15, without starting their mechanics. | Release/archive metadata and new snapshot, queue/progress/coordination/verification docs, `docs/requests/CODEX_MASTER.md`, `docs/CODEX_PROGRESS.md`. API/Pages policy remains restricted. |
+| M2 final tag/archive and queued follow-up request | Codex | `codex/m2-release-archive` from main7595b80 | PR15 merged; actual archive draft PR creation fails: API Forbidden | Local artifact verified:455tests/full merged browser/Studio/72snapshots/2385HTTPfiles; formal gate refuses Pages41877748443 stillQueued. Tag only local, archive branch pushed. C01–C08 queued after master15, not started. | Release/archive metadata and new snapshot, queue/progress/coordination/verification docs, `docs/requests/CODEX_MASTER.md`, `docs/CODEX_PROGRESS.md`. No public tag or RELEASED claim until actual gates pass. |
 | V01 runtime, V02, V03 (visual master tasks) | Claude | not started | — | Waiting for Codex C01 (V01), C06/C07 (V02), C08 (V03) | will hold `src/game/TerrainRenderer.js`, `src/game/TreeView.js`, `src/game/MapMemoryRenderer.js` for V01; see `docs/art/VISUAL_PROGRESS.md` |
 
 ## Kept backups (do not delete without the developer)
