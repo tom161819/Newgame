@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| M2 release and standing automatic milestone publication | Codex | `codex/m2-release-candidate` (includes main c2c2862 and verified Stage10 follow-up) | [#15](https://github.com/tom161819/Newgame/pull/15), OPEN; merge command blocked by GitHub API Forbidden | v0.3.0 uploaded; 455 tests, Pages build and current native Save14 smoke pass after integration. Publication authorized without another prompt. PR15 supersedes the older preflight PR14. | AGENTS, release/queue/progress docs, version/changelog metadata, final Quarry fix/test. Supported API/Pages network draft saved but not active. |
+| M2 final tag/archive and queued follow-up request | Codex | `codex/m2-release-archive` from main7595b80 | PR15 merged; actual archive draft PR creation fails: API Forbidden | Local artifact verified:455tests/full merged browser/Studio/72snapshots/2385HTTPfiles; formal gate refuses Pages41877748443 stillQueued. Tag only local, archive branch pushed. C01–C08 queued after master15, not started. | Release/archive metadata and new snapshot, queue/progress/coordination/verification docs, `docs/requests/CODEX_MASTER.md`, `docs/CODEX_PROGRESS.md`. No public tag or RELEASED claim until actual gates pass. |
 | V01 runtime, V02, V03 (visual master tasks) | Claude | not started | — | Waiting for Codex C01 (V01), C06/C07 (V02), C08 (V03) | will hold `src/game/TerrainRenderer.js`, `src/game/TreeView.js`, `src/game/MapMemoryRenderer.js` for V01; see `docs/art/VISUAL_PROGRESS.md` |
 
 ## Kept backups (do not delete without the developer)
@@ -22,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#15](https://github.com/tom161819/Newgame/pull/15) M2 v0.3.0 release source, final neighbouring-Quarry validation and autonomous milestone publication (Codex), merged main7595b80. Final tag/archive verification remains active above.
 - 2026-11-04 [#16](https://github.com/tom161819/Newgame/pull/16) V01 studio part: seasonal ground, oak and pine, uneven transition preview (Claude). Draft only; the in-game transition waits for Codex C01.
 - 2026-11-04 [#12](https://github.com/tom161819/Newgame/pull/12) Visual polish: compact HUD, larger map, fonts, construction dust; Asset Studio concepts for terrain, villagers, scaffold and buildings (Claude). Studio concepts stay Draft/Review until the developer approves them.
 - 2026-11-04 [#11](https://github.com/tom161819/Newgame/pull/11) Stage 10 Quarry placement and Iron Smelter, Save schema 14 (Codex).

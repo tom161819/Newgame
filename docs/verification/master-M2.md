@@ -1,12 +1,15 @@
 # M2 — Resources, economy and iron — local preflight verified
 
 Status: LOCAL PREFLIGHT VERIFIED; publication IN PROGRESS, external merge blocked.
-Candidate game0.3.0, Save14, is uploaded in PR15. The user authorized this release
+Game0.3.0, Save14, was merged through PR15 into main7595b80. The user authorized this release
 and automatic milestone releases without another prompt, then explicitly asked
 to upload first and test afterwards. The previous approval hold is superseded.
 Latest main c2c2862 is integrated normally at f053be1;455 tests, Pages build and
-current native Save14 smoke pass. No v0.3.0 tag, final archive or successful
-deployment is claimed. See [the current publication checkpoint](M2-release-publication.md).
+current native Save14 smoke pass. A local-only v0.3.0 tag and final source f053be1
+archive are now prepared:72snapshots,1new,0skipped,455tests/build/Chromium on the
+actual archived source; all71old snapshots unchanged. The public tag and exact
+successful deployment remain pending (Pages41877748443 currentlyQueued).
+See [the current publication checkpoint](M2-release-publication.md).
 
 ## Verified implementation commits
 
