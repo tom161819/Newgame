@@ -1,5 +1,8 @@
 # Follow-up Codex master — C01–C08
 
+> **Jednotná provozní fronta (2026-11-04):** GitHub Issues jsou nyní zdroj pravdy pro přidělení práce a stavy ready/blocked/review/done. Původní podrobné zadání v tomto souboru a v `docs/requests/CODEX_MASTER.md` zůstává závazné pro věcný rozsah. Neoznačujte níže uvedené PENDING za DONE bez skutečného PR, úspěšného nasazení a relevantního milníku. M2: [#47](https://github.com/tom161819/Newgame/issues/47); C01–C08: [#48](https://github.com/tom161819/Newgame/issues/48), [#49](https://github.com/tom161819/Newgame/issues/49), [#50](https://github.com/tom161819/Newgame/issues/50), [#51](https://github.com/tom161819/Newgame/issues/51), [#52](https://github.com/tom161819/Newgame/issues/52), [#53](https://github.com/tom161819/Newgame/issues/53), [#54](https://github.com/tom161819/Newgame/issues/54), [#55](https://github.com/tom161819/Newgame/issues/55). Master11–15: [#56](https://github.com/tom161819/Newgame/issues/56) až [#60](https://github.com/tom161819/Newgame/issues/60). Aktuálně je ready jen M2; další se odblokují po splnění závislostí. Codex si může brát Issue v běžící relaci, ale Issues jej samy nespouštějí.
+
+
 Source: [original CODEX_MASTER.md](requests/CODEX_MASTER.md), supplied2026-11-04.
 The latest explicit user reorder (2026-11-04) is authoritative: finish the
 active M2 publication after master01–10, then **C01–C08**, then original master
