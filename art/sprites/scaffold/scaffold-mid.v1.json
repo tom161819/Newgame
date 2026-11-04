@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "scaffold",
+  "variantId": "scaffold-mid",
+  "name": "Second lift (34–66 %)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "50ccd563",
+  "generator": "scaffold",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 147,
+  "height": 146,
+  "anchor": {
+    "x": 65,
+    "y": 112
+  },
+  "origin": {
+    "x": 0.44218,
+    "y": 0.76712
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 144
+  },
+  "baseOrigin": {
+    "x": 0.44218,
+    "y": 0.9863
+  },
+  "visualHeight": 144,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.1,
+  "lights": []
+}

@@ -56,6 +56,12 @@ Recept `figure` (`studio/src/generators/figure.js`) skládá postavu z nízkopol
 - Nové profese a barevné varianty vznikají jen úpravou `spec` (parametry ukazuje záložka **Spec & files**).
 - Hra zatím kreslí jednu postavu poddaného (`peasant`). Návrhy jsou ve stavu Draft. Až budou schválené, bude potřeba převzít sprity a vybírat je podle profese a pohlaví pracovníka; animace chůze a práce zatím recept nemá.
 
+## Stavba: lešení a prach
+
+- Hra kreslí lešení až po první odpracované práci (`scaffoldStage` v `src/game/ConstructionDust.js`, `workDone > 0`), tedy když na stavbu dorazí stavitel a začne pracovat. Do té doby je vidět jen průhledný plán. Lešení pak roste se třemi fázemi postupu.
+- Při aktivní práci (stavba v daném snímku postoupila) stoupá jemný prach (`DustEmitter`): nejvýš jeden obláček za 240–520 ms, nejvýš 6 na stavbu a 48 v celé hře. Obrázky se recyklují, skryté stavby žádné obláčky nemají a při `prefers-reduced-motion` je prach vypnutý.
+- Podobu lešení navrhuje recept `scaffold` (`art/assets/buildings/scaffold`): fáze low/mid/high podle postupu stavby, kulatá vázaná nebo hranolová břevna, rozestavěné kamenné nebo trámové jádro, žebřík a materiál vedle stavby. Hra dál kreslí lešení čarami, dokud se varianta neschválí.
+
 ## Výběr a schválení varianty
 
 1. V záložce **Compare variants** porovnej varianty vedle sebe: zoom 0,5–4×, pozadí, mřížka, půdorys, ohraničení s rozměry v pixelech, člověk 1,2 jednotky, přepínač *Game pixels* (přesně 1×) a denní doba.

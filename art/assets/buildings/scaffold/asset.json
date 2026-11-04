@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "id": "scaffold",
+  "name": "Construction scaffold",
+  "category": "buildings",
+  "description": "How a 2 × 2 building site looks once builders are at work: poles, ledgers, plank decks, ladder and a half-built core. The game shows scaffolding only after the first work and adds dust while builders work; it still draws it as simple lines until a variant is approved.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "scaffold",
+  "variants": [
+    {
+      "id": "scaffold-low",
+      "name": "First lift (up to 33 %)",
+      "version": 1,
+      "notes": "Low stone courses, one lift, materials stacked beside it.",
+      "spec": {
+        "stage": "low",
+        "poles": "round",
+        "core": "stone",
+        "ladder": true,
+        "materials": true
+      }
+    },
+    {
+      "id": "scaffold-mid",
+      "name": "Second lift (34–66 %)",
+      "version": 1,
+      "notes": "Recommended look: lashed round poles and plank decks on the visible faces.",
+      "spec": {
+        "stage": "mid",
+        "poles": "round",
+        "core": "stone",
+        "ladder": true,
+        "materials": true
+      }
+    },
+    {
+      "id": "scaffold-high",
+      "name": "Third lift (67–99 %)",
+      "version": 1,
+      "notes": "Tallest stage before the finished building replaces it.",
+      "spec": {
+        "stage": "high",
+        "poles": "round",
+        "core": "stone",
+        "ladder": true
+      }
+    },
+    {
+      "id": "scaffold-timber",
+      "name": "Timber frame, sawn poles",
+      "version": 1,
+      "notes": "Alternative for wooden buildings: squared poles around a timber frame.",
+      "spec": {
+        "stage": "mid",
+        "poles": "squared",
+        "core": "timber",
+        "ladder": true,
+        "materials": true
+      }
+    }
+  ]
+}
