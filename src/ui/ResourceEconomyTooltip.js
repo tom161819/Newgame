@@ -8,7 +8,7 @@ export class ResourceEconomyTooltip {
     this.root.addEventListener('pointerenter',()=>clearTimeout(this.closeTimer),options);this.root.addEventListener('pointerleave',()=>this.scheduleHide(),options);this.root.addEventListener('focusout',()=>this.scheduleHide(),options);window.addEventListener('resize',()=>this.position(),options);window.addEventListener('blur',()=>this.hide(),options);
     this.root.addEventListener('focusin',()=>this.bar.resetCameraKeys(),options);
   }
-  show(resource,item){clearTimeout(this.closeTimer);this.resource=resource;this.item=item;this.root.hidden=false;this.refresh();}
+  show(resource,item){clearTimeout(this.closeTimer);const changed=this.resource!==resource;this.resource=resource;this.item=item;this.root.hidden=false;this.refresh();if(changed)this.root.scrollTop=0;}
   scheduleHide(){clearTimeout(this.closeTimer);this.closeTimer=setTimeout(()=>{if(!this.root.contains(document.activeElement)&&document.activeElement!==this.item)this.hide();},160);}
   hide(){clearTimeout(this.closeTimer);this.root.hidden=true;this.resource=null;this.item=null;}
   refresh(){
