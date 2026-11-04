@@ -91,6 +91,8 @@ export class SpriteBuildingView {
     const floor=this.footprint.clear().setDepth(this.preview?10000:-90);
     floor.fillStyle(tint??0x777450,this.preview?0.3:0.25);floor.lineStyle(1,tint??0xb3a477,0.8);
     for(const tile of building.tiles){floor.fillPoints(tilePolygon(tile),true);floor.strokePoints(tilePolygon(tile),true);}
+    // A valid Quarry preview outlines its primary deposit in gold (same as WorkplaceView).
+    if(this.preview&&this.definition.id==='quarry'&&tint===0x71dba6){const deposit=this.manager.scene.naturalResources?.mining.select(this.definition,building);if(deposit){floor.fillStyle(0xe6c36b,.35);floor.lineStyle(3,0xf6d786,1);for(const tile of deposit.tiles){floor.fillPoints(tilePolygon(tile),true);floor.strokePoints(tilePolygon(tile),true);}}}
   }
   // Opaque pixels only: transparent padding and the baked ground shadow (≈32 % alpha) are not part of the building.
   contains(x,y) {
