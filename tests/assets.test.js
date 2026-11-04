@@ -109,9 +109,9 @@ test('asset URLs retain the Pages prefix; PNG/WebP/sheets load once per object t
   const calls=[], scene={load:{on(){},image(...args){calls.push(['image',...args]);},spritesheet(...args){calls.push(['sheet',...args]);}},textures:{exists:()=>false}};
   const manager = new AssetManager(scene,registry,{baseURL:'/Newgame/'});
   // 49 registered objects + the animated test object, plus the tower's front layer, the four approved grass tiles
-  // and the nine approved tree looks (six oak, three pine).
-  assert.equal(manager.queue(),64);assert.equal(manager.queue(),0);
-  assert.equal(calls.length,64);
+  // the nine approved tree looks (six oak, three pine) and twelve seasonal grass tiles (spring, autumn, winter).
+  assert.equal(manager.queue(),76);assert.equal(manager.queue(),0);
+  assert.equal(calls.length,76);
   assert.ok(calls.some(c=>c[2].endsWith('.webp')));
   assert.deepEqual(calls.find(c=>c[0]==='sheet'),['sheet','asset:animated:main','/Newgame/assets/resources/stone/stone.png',{frameWidth:32,frameHeight:48}]);
 });
@@ -119,10 +119,12 @@ test('asset URLs retain the Pages prefix; PNG/WebP/sheets load once per object t
 test('terrain tiles may list interchangeable sprite variants that load as extra layers; only approved grass uses them', () => {
   assert.deepEqual(objectRegistry.all().filter(d=>d.spriteVariants).map(d=>d.id),['grass_normal'],'only the approved grass set is wired in');
   const grass=objectRegistry.require('grass_normal'),registry=new ObjectRegistry(objectRegistry.all().filter(d=>d.id!=='grass_normal'));
-  registry.register({...grass,spriteVariants:['/assets/terrain/path_wear/a.png','/assets/terrain/path_wear/b.png']});
+  registry.register({...grass,seasonVariants:undefined,spriteVariants:['/assets/terrain/path_wear/a.png','/assets/terrain/path_wear/b.png']});
   const calls=[],scene={load:{on(){},image(...args){calls.push(args);},spritesheet(){}},textures:{exists:()=>false}};
   new AssetManager(scene,registry,{baseURL:'/Newgame/'}).queue([registry.require('grass_normal')]);
   assert.deepEqual(calls.map(c=>c[0]),['asset:grass_normal:main','asset:grass_normal:variant-0','asset:grass_normal:variant-1']);
   assert.throws(()=>new ObjectRegistry([...objectRegistry.all().filter(d=>d.id!=='grass_normal'),{...grass,spriteVariants:['../x.png']}]),/varianty terénní/);
   assert.throws(()=>new ObjectRegistry([...objectRegistry.all().filter(d=>d.id!=='tower'),{...objectRegistry.require('tower'),spriteVariants:['/assets/a.png']}]),/varianty terénní/);
+  assert.deepEqual(Object.keys(grass.seasonVariants).sort(),['Autumn','Spring','Winter'],'approved seasonal grass (summer = the lush set)');
+  assert.throws(()=>new ObjectRegistry([...objectRegistry.all().filter(d=>d.id!=='grass_normal'),{...grass,seasonVariants:{Monsoon:['/assets/a.png']}}]),/sezónní varianty/);
 });

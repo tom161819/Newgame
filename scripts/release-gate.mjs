@@ -2,9 +2,10 @@ import { execFileSync,spawnSync } from 'node:child_process';
 import { readFile,writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { milestoneStages,completedStages,pagesEvidence,releaseNumber } from './release-gate-lib.mjs';
-import { readRelease } from './changelog-lib.mjs';
+import { parseChangelog,readRelease } from './changelog-lib.mjs';
 import { readVersionCatalog } from './version-catalog.mjs';
-import { verifySnapshot } from './archive-lib.mjs';
+import { verifyDeployedArchive,verifyPublishedRelease } from './deployed-archive.mjs';
+import { digest } from './archive-lib.mjs';
 import { nextVersion } from '../src/data/semver.js';
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2),mode=args[0];
@@ -23,9 +24,9 @@ let html;try{html=execFileSync('curl',['--fail','--silent','--show-error','--loc
 const pages=pagesEvidence(html,{run:pagesRun,commit:deployed});
 git('merge-base','--is-ancestor',deployed,head);
 const sourcePaths=['src','scripts','index.html','vite.config.js','package.json','package-lock.json','CHANGELOG.md','public/assets','.github/workflows'];
-if(git('diff','--name-only',deployed,head,'--',...sourcePaths))throw new Error('The source under review differs from the successfully deployed game.');
 const {data}=await readRelease(root),report={mode,head,version:data.version,pages,checks:[],recordedAt:new Date().toISOString()};
 if(mode==='check'){
+  if(git('diff','--name-only',deployed,head,'--',...sourcePaths))throw new Error('The source under review differs from the successfully deployed game.');
   const milestone=args[1],roadmap=await readFile(new URL('../docs/UPGRADE_ROADMAP_25_37.md',import.meta.url),'utf8'),progress=await readFile(new URL('../docs/UPGRADE_PROGRESS.md',import.meta.url),'utf8');
   milestoneStages(roadmap,milestone);
   const prerequisiteStages=Array.from({length:Number(milestone.slice(1))},(_,i)=>milestoneStages(roadmap,`M${i+1}`)).flat();
@@ -36,12 +37,15 @@ if(mode==='check'){
   for(const command of [['ci'],['run','changelog:validate'],['run','versions:validate'],['test'],['run','archive:verify'],['run','build','--','--base=/Newgame/'],['run','archive:stage'],['run','archive:verify-site'],['run','smoke','--','--base=/Newgame/','--full']]){run('npm',command);report.checks.push({command:`npm ${command.join(' ')}`,status:'passed'});}
 }else{
   releaseNumber(data.version);const tag=`v${data.version}`,commit=git('rev-parse','--verify',`${tag}^{commit}`);git('merge-base','--is-ancestor',commit,head);
-  if(git('diff','--name-only',commit,head,'--',...sourcePaths))throw new Error('Tagged source differs from the deployed release.');
   const remote=git('ls-remote','origin',`refs/tags/${tag}`,`refs/tags/${tag}^{}`);if(!remote.split('\n').some(line=>line.startsWith(`${commit}\t`)))throw new Error('The release tag is not actually published.');
-  const snapshot=await verifySnapshot(fileURLToPath(new URL(`../public/versions/${commit}/`,import.meta.url)),commit);
-  if(snapshot.tree!==git('rev-parse',`${commit}^{tree}`))throw new Error('Archive provenance does not match the actual tag tree.');
+  const taggedRelease=parseChangelog(git('show',`${commit}:CHANGELOG.md`),data.version).releases.find(release=>release.version===data.version);
+  if(JSON.stringify(taggedRelease)!==JSON.stringify(data.releases.find(release=>release.version===data.version)))throw new Error('Published release notes differ from the tagged release.');
+  report.deployedArchive=await verifyDeployedArchive({root,deploymentCommit:deployed,releaseCommit:commit,version:data.version});
   const catalog=await readVersionCatalog(root),entry=catalog.versions.find(v=>v.version===data.version);if(!entry?.available||entry.commit!==commit)throw new Error('The official release has no matching playable archive.');
-  report.tag=tag;report.releaseCommit=commit;report.archiveURL=entry.archiveURL;report.checks.push({command:'exact tag / remote tag / immutable source archive / deployed source',status:'passed'});
+  const publishedFile=route=>{try{return execFileSync('curl',['--fail','--silent','--show-error','--location','--max-time','30',new URL(route,pages.url).href],{stdio:['ignore','pipe','pipe'],maxBuffer:8*1024*1024});}catch{throw new Error('Cannot verify the actual published release artifact through the configured HTTPS connection.');}};
+  const publishedCatalog=JSON.parse(publishedFile('versions/catalog.json').toString('utf8'));
+  report.publishedRelease=verifyPublishedRelease({catalog:publishedCatalog,manifest:publishedFile(`${entry.archiveURL}snapshot.json`),entry,manifestHash:digest(await readFile(new URL(`../public/versions/${commit}/snapshot.json`,import.meta.url)))});
+  report.tag=tag;report.releaseCommit=commit;report.archiveURL=entry.archiveURL;report.checks.push({command:'exact public tag / frozen release notes / actual deployed archive blobs and index / live playable catalog and manifest',status:'passed'});
 }
 if(option('report'))await writeFile(option('report'),JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify(report,null,2));

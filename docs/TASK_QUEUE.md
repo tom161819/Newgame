@@ -51,12 +51,19 @@ Tento soubor a úplná zadání jsou uložené v repozitáři pro navázání pr
    - Fáze D dokončena: rozpis šesti fyzických kategorií, sklady/nosiči/cíle/náklady, ruční vyzvednutí a odložení králem, legacy značky, bezpečná obnova neplatných pokynů a nejrychlejší cesty po pěšinách. 271/271 testů (12 nových), build, produkční browser/IndexedDB/mobilní UI a skutečný publikovaný schema5 save ověřeny. Zimní 100×100 scéna s 20 NPC, 6 nosiči, 3 sýpkami, 2 sklady, 4 staveništi, 4 výrobami a 22 pozemky: průměr 17,61 ms (~57 FPS), p95 33,3 ms, bez JS chyb; snapshot validní. Archiv62 skutečných verzí (7 nových,0 vynechaných) ověřen včetně SHA-256. Publikace `e721a68`, Pages `41694834348` **Success** (58 s), původní URL potvrzena nasazením. Podrobnosti: [ověření](verification/step-24.md).
    - Každou dokončenou a otestovanou fázi uložit samostatným commitem.
 
-## Následuje
+## Následuje — nové pořadí podle uživatele2026-11-04
 
-1. **M1v0.2.0 RELEASED, etapy01–10 implementovány a ověřeny; M2 je nyní výslovně autorizované k vydání po finálním gate, pak automaticky11:** [Master prompt 25–37 — 15 etap / 5 milníků](requests/master-25-37.md). Přesné pořadí a samostatné specifikace jsou v [roadmapě](UPGRADE_ROADMAP_25_37.md); stav v [progress](UPGRADE_PROGRESS.md). Každá etapa testy/opravit/build/Unreleased/commit, automaticky další. M1–M5 po release gate automatický MINOR, skutečný Git tag a neměnný archiv; uživatel tato vydání výslovně autorizoval bez dalšího potvrzení.
-2. **DONE — po03, před04:** [Kontrola a optimalizace archivu](requests/archive-optimization.md), nové zadání uživatele. Zachovat všechny snapshoty/URL/historii/savy; audit, měření a bezpečná optimalizace, čísla a skutečné názvy/verzní Changelog. Publikace `0135b6e`, [Pages41733540087](https://github.com/tom161819/Newgame/actions/runs/41733540087) **Success**;317/317 testů,69 původních URL/2212 HTTP souborů, Save2/7→8 a neměnnost všech původních snapshotů ověřeny. Pokračovat masterem04–15.
-3. **VYŘAZENO Z FRONTY CODEXU — 2026-11-04:** [Visual Polish & Art Pass](requests/visual-polish-art-pass.md) převzal Claude podle výslovného pokynu uživatele. Codex tento upgrade neimplementuje; pokračuje pouze master etapami10–15. Zadání a dosavadní grafická práce zůstávají zachovány.
-4. **NOVÁ NAVAZUJÍCÍ FRONTA — po dokončení původního masteru01–15:** [CODEX_MASTER.md](requests/CODEX_MASTER.md), příloha uživatele2026-11-04. Osm úkolů C01→C08: Fog/neznámá území a blueprinty; výběr pracovníků/sýpka; zaměstnávání a priority hradu; výrobní upozornění; Move/Hold jednotek; audit stájí a kontrakt výbavy; výroba zbraní/zbrojnice; vojenské jednotky. Stav a závislosti: [CODEX_PROGRESS.md](CODEX_PROGRESS.md). Každý vlastní větev/PR/testy/ověřený deploy, bez duplicit již dokončených mechanik. Do té doby pouze uchovat zadání; nepředbíhat master etapy11–15. Nové vizuály a schvalování assetů zůstávají u Claude, Codex nepřebírá V01–V03.
+1. **Dokončit rozpracované vydání M2 v0.3.0.** Master01–10 jsou implementované; zbývá skutečné sloučení kandidáta v PR22, Pages/gates/tag. M1v0.2.0 je RELEASED. [Stav a ověření](verification/M2-release-publication.md). Bez nové žádosti o svolení, zastavit jen při reálné technické blokaci.
+2. **Potom C01 → C02 → C03 → C04 → C05 → C06 → C07 → C08:** Fog/neznámá území a blueprinty; výběr pracovníků/sýpka; zaměstnávání a priority hradu; výrobní upozornění; Move/Hold; audit stájí a kontrakt výbavy; výroba zbraní/zbrojnice; vojenské jednotky. [Původní zadání](requests/CODEX_MASTER.md), [aktuální návaznosti a stav](CODEX_PROGRESS.md). Uživatel tyto úkoly nově přesunul před zbylých pět etap původního masteru.
+3. **Až za C08 původní master11 → 12 → 13 → 14 → 15:** kamenné dláždění a nádvoří; kolář/povozy/stáje/bydlení; potřeby a spokojenost poddaných; obchodníci/karavany/obchod; simulace na pozadí a dopočítání času. [Specifikace a milníky](UPGRADE_ROADMAP_25_37.md), [stav](UPGRADE_PROGRESS.md). Původní čísla i M3(po12), M4(po14), M5(po15) zůstávají zachována. Stáje se kvůli pořadí neoznačují za hotové: C06 ověří skutečný stav; odemčení rytíře závislé na hotových stájích a integrační ověření naváže na12, bez duplicitní implementace.
+4. **VYŘAZENO Z FRONTY CODEXU:** [Visual Polish & Art Pass](requests/visual-polish-art-pass.md) převzal Claude. Zachovat jeho grafiku a schvalování assetů; Codex neprovádí souběžný art pass.
+5. **DONE — dodatečný audit/optimalizace archivu po03, před04:** publikace0135b6e, [Pages41733540087](https://github.com/tom161819/Newgame/actions/runs/41733540087) Success;317testů,69původních URL/2212HTTPsouborů a neměnnost archivů ověřeny. [Zadání](requests/archive-optimization.md), [report](verification/archive-optimization.md).
+
+Každý úkol: vlastní commit/PR, relevantní testy a ověřené nasazení před dalším.
+M1–M5 mají automatický MINOR/tag/neměnný archiv až po svém gate; nové pořadí
+nepřidává samovolné číslované vydání ke každému C úkolu. Tato změna pořadí má
+přednost před staršími pokyny „nejprve všech15, potom C01–C08“. Originály zadání
+ani dokončené etapy se nepřepisují a žádný stav PENDING se nemění na DONE.
 
 Předchozí fronta do kroku 19 včetně archivu 41 verzí byla dokončená a publikovaná (`e0c4f54`, Pages `41620923762`). Nové požadavky se dokončují v uvedeném pořadí, každý po ověření a nasazení před zahájením následujícího.
 
@@ -64,4 +71,4 @@ Předchozí fronta do kroku 19 včetně archivu 41 verzí byla dokončená a pub
 
 ## Trvalé vydávání — nový pokyn uživatele2026-11-04
 
-M2 vydat nyní; po dalších úspěšných milníkových kontrolách vydávat M1–M5 bez čekání na nový pokyn a pokračovat masterem. Dřívější stop po10/žádost o další svolení se ruší. Zachovat PR workflow, skutečné testy, tag, archiv a ověření Pages; nepřeskakovat reálnou technickou blokaci. Visual Polish zůstává mimo Codex, u Claude.
+M2 vydat nyní; po dalších úspěšných milníkových kontrolách vydávat M1–M5 bez čekání na nový pokyn a pokračovat aktuální frontou: C01–C08 a potom master11–15. Dřívější stop po10/žádost o další svolení se ruší. Zachovat PR workflow, skutečné testy, tag, archiv a ověření Pages; nepřeskakovat reálnou technickou blokaci. Visual Polish zůstává mimo Codex, u Claude.

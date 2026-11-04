@@ -10,9 +10,23 @@ Etapa09 Ledger je DONE a sloučená přes [PR9](https://github.com/tom161819/New
 
 Etapa10 je implementována a ověřena: fázeA `f93474f`, fázeB `069bf90df39e97f92394e167678a7be84505f29c`, integrace Claudovy grafiky `0f76b96bb4a3cf7f4fcb1aec717f0034347694bc` (437 testů/plný browser), finální oprava sousedních lomů `0f4ebce931d912c18ff33a6148697b9514bb9249` (438 testů/build/aktuální native Save14). Hlavní implementace už je merged přes [PR11](https://github.com/tom161819/Newgame/pull/11), main7012635; malý follow-up validace a závěrečné evidence je připraven ve stejné codex větvi. Konečný profil20NPC/Fog/pohyb/zoom0.25:59.34–60FPS. [Report10](verification/master-10.md), [předání](verification/master-10-pr.md), [M2 preflight](verification/master-M2.md).
 
-M2 zdroj0.3.0/Save14 je sloučen přes [PR15](https://github.com/tom161819/Newgame/pull/15) do main `7595b80b64f88fdd984505f79ce201098a54d280`. Skutečný zdroj `f053be1879beb2af3814972caecc8768b8f1ad90` zachovává Claudovo UI/grafiku/Studio;455/455 testů, npm ci, validace, Pages build, celý native browser/Save14 i Studio smoke prošly. V `codex/m2-release-archive` je místní tagv0.3.0 a skutečný finální archiv f053be1:72snapshotů,1nový/0vynechaných, vlastní455testů/build/Chromium a70SHA souborů. Původních71snapshotů/URL je beze změny; finální web72URL/2385HTTPsouborů/119054931B/MIME/SHA a browser72archivů prošel. Veřejný tag ještě není nahraný a Pages41877748443 zatímQueued; formální gate se skutečně zastavil na chybějícím Pages Success. M2 proto není RELEASED a11–15 PENDING. Nový CODEX_MASTER C01–C08 je uložený až za původní15etapovou frontou. Nečeká se na další svolení; platí skutečné release gates. [Aktuální předání](verification/M2-release-publication.md). Visual Polish zůstává u Claude.
+M2 PR15 i archivní PR18 jsou merged, jejich skutečné Pages41877748443/41883338166 Success. Formální nativní gate odhalil dva nestabilní testovací předpoklady (pořadí nákladu/výroby a kliknutí pod DOM ikonou); opraveny se skutečnými regresemi. V `codex/m2-smelting-smoke` je nyní ověřený finální zdroj `02a3a43ace8adc993aea7a392424d7cdf4e7dec9`,0.3.0/Save14, se zachovaným main630caf1/Claudovou V01 grafikou:459/459 modelů, celý native včetně sezónních přechodů a Studio smoke pass. Nový skutečný zdrojový archiv prošel vlastními459testy/buildem/Chromiem;73snapshotů,1nový/0vynechaných, původních72adresářů/URL/savů beze změny. Finální web73URL/2456HTTPsouborů/121455383B/MIME/SHA a UI/IndexedDB/mobil prošel. Připravený v0.3.0 tag je pouze místní na02a; předchozí nezveřejněný kandidátní odkaz f053 je uchovaný. Veřejné tagy ani historie se nepřepisují. Finální kandidát ještě vyžaduje vlastní PR/main/Pages/gates, M2 proto není RELEASED a11–15 PENDING. Nový pokyn uživatele přesouvá C01–C08 před master11–15, ihned za dokončení vydání M2. [Předání](verification/M2-release-publication.md). Visual Polish zůstává u Claude.
+
+Závěrečné předání: zachován i maina09de58/nové PR quality CI (pouze workflow,
+herní zdroj beze změny). Kandidát e574f75 nahrán do PR22; skutečný poslední
+`gh pr merge22 --merge --match-head-commit` stále API Forbidden. Nová fronta je
+uložená a nahraná; žádné nevykonané sloučení/tag/Pages není označené za úspěšné.
+
+## Změna pořadí — pokyn uživatele2026-11-04
+
+Po dokončení M2 nejprve C01–C08, potom11(dláždění),12(kolář/povozy/stáje/bydlení),
+13(potřeby/spokojenost),14(obchod),15(simulace na pozadí). Původní čísla a milníky
+zůstávají; všech pět etap stále PENDING. Stáje/rytíř mají explicitní návaznost
+v [CODEX_PROGRESS.md](CODEX_PROGRESS.md). Žádný odložený úkol není zrušený.
 
 ## Master: 15 etap, 5 milníků
+
+Aktualizace předání: celý kandidát je v [PR22](https://github.com/tom161819/Newgame/pull/22). Zachován main4857ba7 včetně schválené trávy, budov, stromů a lešení; žádná vlastní změna jejich grafiky. Pracovní větev476/476modelů, validace a Pages build pass; celý native přes main14071b1 a následný cílený test stromů/Fog/zoomu/sezón/kácení/aktuálního Save14/historických her exit0; po novém lešení i cílený native Fog/scaffold/blueprint/menu/aktuální IndexedDB/historické hry exit0. Studio/73URL/2456HTTPsouborů ověřeny, všechny archivní bajty beze změny. Zdroj vydání02a a jeho459testový archiv zůstávají zmrazené. Nový verifier prokazuje skutečné nasazené Git bloby i veřejný katalog/manifest; preflight zůstává striktní. Public tag/main/Pages gate pending, skutečný CONNECT403 blokuje API před GitHubem. Nové pořadí uživatele: po M2 C01–C08, potom master11–15. [Předání](verification/M2-release-publication.md).
 
 Etapy01–06 i dodatečný audit archivu jsou DONE; M1 RELEASED0.2.0,07–10 jsou DONE ve větvi, hlavní10 merged PR11 a finální malý follow-up čeká na PR; M2 release pending,11–15 PENDING. U dokončené etapy doplnit konkrétní chování, testy (passed/failed/skipped), commit, stav milníku a další etapu. DONE lze zapsat pouze po implementaci a skutečné kontrole.
 
@@ -80,4 +94,4 @@ Uživatel výslovně zrušil nutnost potvrzovat další běžné konflikty: Code
 
 ## Nové trvalé svolení k vydávání —2026-11-04
 
-Uživatel: „vydej to a nastav že není potřeba čekat na pokyn“. M2 vydání je IN PROGRESS ve větvi codex/m2-release. AGENTS.md zrušil dřívější stop po10 a čekání na další release pokyn. Po úspěšných kontrolách automaticky vydat milník a pokračovat11–15. Technický přístup k GitHub API/Pages se musí skutečně ověřit; nejde jej nahradit přímým pushem do main nebo tvrzením o neprovedeném vydání.
+Uživatel: „vydej to a nastav že není potřeba čekat na pokyn“. M2 vydání je IN PROGRESS ve větvi codex/m2-release. AGENTS.md zrušil dřívější stop po10 a čekání na další release pokyn. Po úspěšných kontrolách automaticky vydat milník a pokračovat aktuální frontou: C01–C08, potom11–15. Technický přístup k GitHub API/Pages se musí skutečně ověřit; nejde jej nahradit přímým pushem do main nebo tvrzením o neprovedeném vydání.

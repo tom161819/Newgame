@@ -6,7 +6,7 @@ import { COLUMNS, ROWS } from './config.js';
 // previous season into the current one. Everything is derived from game time,
 // so Save/Load, background catch-up and Seasons ON/OFF give the same picture
 // and nothing new is stored.
-export const SEASON_TRANSITION=Object.freeze({share:.2,steps:24,levels:8,spread:.6,seed:1,chunksPerFrame:10});
+export const SEASON_TRANSITION=Object.freeze({share:.2,steps:24,levels:12,spread:.7,seed:1,chunksPerFrame:10});
 
 function hash01(seed,x,y){
   let h=Math.imul(seed^0x9e3779b9,0x85ebca6b)^Math.imul(x,0xc2b2ae35)^Math.imul(y,0x27d4eb2f);
@@ -25,7 +25,8 @@ const smooth=t=>{const x=Math.min(1,Math.max(0,t));return x*x*(3-2*x);};
 // flips at once and shows no checkerboard; every tile is done at progress 1.
 export function seasonBlend(progress,x,y,{seed=SEASON_TRANSITION.seed,spread=SEASON_TRANSITION.spread}={}){
   if(progress<=0)return 0;if(progress>=1)return 1;
-  const start=spread*(.45*hash01(seed,x,y)+.55*lowNoise(seed,x,y));
+  // Mostly slow noise (patches several tiles wide), a little per-tile jitter: no checkerboard.
+  const start=spread*(.15*hash01(seed,x,y)+.85*lowNoise(seed,x,y));
   return smooth((progress-start)/(1-spread));
 }
 

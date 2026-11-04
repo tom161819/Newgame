@@ -12,8 +12,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| Approved assets into the game, part 5: villagers | Claude | `claude/approved-assets-villagers` | this PR | Verified | `src/game/HumanView.js`, `src/data/objects/approvedArt.js`, `public/assets/characters/villagers/`, studio facings export. Next: seasonal ground, quarry, wall. |
-| M2 final tag/archive and queued follow-up request | Codex | `codex/m2-release-archive` from main7595b80 | PR15 merged; actual archive draft PR creation fails: API Forbidden | Local artifact verified:455tests/full merged browser/Studio/72snapshots/2385HTTPfiles; formal gate refuses Pages41877748443 stillQueued. Tag only local, archive branch pushed. C01–C08 queued after master15, not started. | Release/archive metadata and new snapshot, queue/progress/coordination/verification docs, `docs/requests/CODEX_MASTER.md`, `docs/CODEX_PROGRESS.md`. No public tag or RELEASED claim until actual gates pass. |
+| Approved assets into the game, part 6: seasonal grass | Claude | `claude/approved-assets-seasons` | this PR | Verified | `src/game/TerrainRenderer.js`, `src/game/SeasonTransition.js` (smoother blend), `src/data/objects/terrain.js` (seasonVariants), `seasonVariants` validation in `ObjectRegistry.js`, one line in `AssetManager.js`, `public/assets/terrain/grass/seasons/`. Remaining: quarry, wall. |
+| M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main2663942 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT403 | IN PROGRESS: preserve approved villager sprites for manual PR22 merge; relevant integration checks running. Earlier476models/Pages/scaffold native and full/Studio/archive proofs retained. Actual final gh merge22 at e574f75 still API Forbidden. Frozen02a has own459test archive; final verifier checks actual deployed Git blobs, allowing later live development. Public tag/main/deployment gates pending; new user order C01–C08 then master11–15, all unstarted. | Native smoke regressions; release-gate/deployed-archive verifier and tests; release notes,02a archive/catalog, progress/verification docs. Claude art unchanged; no schema rewrite. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -22,12 +22,18 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
-- 2026-11-04 [#26](https://github.com/tom161819/Newgame/pull/26) Approved assets part 4: scaffolding by construction stage (Claude).
-- 2026-11-04 [#25](https://github.com/tom161819/Newgame/pull/25) Approved assets part 3: oaks and pines by growth stage and season (Claude).
-- 2026-11-04 [#24](https://github.com/tom161819/Newgame/pull/24) Approved assets part 2: eight production buildings with their studio art (Claude).
+- 2026-11-04 [#28](https://github.com/tom161819/Newgame/pull/28) Approved assets part 5: eight-direction profession/gender villager art and Studio facing export (Claude), main2663942, preserved unchanged.
+
+- 2026-11-04 [#26](https://github.com/tom161819/Newgame/pull/26) Approved assets part 4: scaffold stage art (Claude), main4857ba7, preserved unchanged.
+
+- 2026-11-04 [#25](https://github.com/tom161819/Newgame/pull/25) Approved assets part 3: young/mature/seasonal Oak and Pine studio art (Claude), main2ce3cd7, preserved unchanged.
+
+- 2026-11-04 [#24](https://github.com/tom161819/Newgame/pull/24) Approved assets part 2: eight production buildings’ art and living Smelter flame (Claude), main14071b1. Preserved in the M2 candidate; later art stays Unreleased.
+
 - 2026-11-04 [#23](https://github.com/tom161819/Newgame/pull/23) Approved assets part 1: developer approvals (58 variants), lush grass and moss footpaths in the game (Claude).
 - 2026-11-04 [#20](https://github.com/tom161819/Newgame/pull/20) V02/V03 studio concepts: bowyer, swordsmith, armorer, armory, stables, equipment items and four soldier classes with an 8-direction sheet (Claude). Draft/Review on the C06–C08 ids; adjust when Codex fixes them.
-- 2026-11-04 [#19](https://github.com/tom161819/Newgame/pull/19) V01: seasons change gradually and unevenly across the map (Claude).
+- 2026-11-04 [#19](https://github.com/tom161819/Newgame/pull/19) Gradual and uneven seasonal terrain/tree transitions (Claude), merged main630caf1. Started before C01 at the developer's request; preserved by Codex integration.
+- 2026-11-04 [#18](https://github.com/tom161819/Newgame/pull/18) Actual M2 source archive f053be1 (72 snapshots) and original follow-up CODEX_MASTER C01–C08 queue (Codex), merged mainb554b4e. Release verification/tag remains active above.
 - 2026-11-04 [#15](https://github.com/tom161819/Newgame/pull/15) M2 v0.3.0 release source, final neighbouring-Quarry validation and autonomous milestone publication (Codex), merged main7595b80. Final tag/archive verification remains active above.
 - 2026-11-04 [#16](https://github.com/tom161819/Newgame/pull/16) V01 studio part: seasonal ground, oak and pine, uneven transition preview (Claude). Draft only; the in-game transition waits for Codex C01.
 - 2026-11-04 [#12](https://github.com/tom161819/Newgame/pull/12) Visual polish: compact HUD, larger map, fonts, construction dust; Asset Studio concepts for terrain, villagers, scaffold and buildings (Claude). Studio concepts stay Draft/Review until the developer approves them.

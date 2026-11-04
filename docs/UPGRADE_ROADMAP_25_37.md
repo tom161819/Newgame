@@ -1,5 +1,10 @@
 # Upgrade roadmap 25–37
 
+**Aktuální pořadí podle nového pokynu uživatele2026-11-04:** dokončit M2,
+potom C01–C08, potom původní master11–15. Čísla etap a milníky M3–M5 zůstávají;
+starší pořadí v původním zadání je tímto přepsané. Autoritativní fronta:
+[docs/TASK_QUEUE.md](TASK_QUEUE.md), návaznosti [CODEX_PROGRESS.md](CODEX_PROGRESS.md).
+
 Nejprve dokončit aktuální krok 24 (A–D) podle [fronty](TASK_QUEUE.md). Potom automaticky provést následující etapy v přesném pořadí; po M1–M5 testy a autorizovaný MINOR release, tag a neměnný archiv. Visual Polish & Art Pass byl2026-11-04 výslovně vyřazen z fronty Codexu; grafiku řeší Claude. Codex dokončuje pouze master etapy do15.
 
 Úplný dodaný master: [originál](requests/master-25-37.md). Společná pravidla a závazná řešení konfliktů: [00_ORCHESTRATOR.md](upgrades/00_ORCHESTRATOR.md). Neimplementovat budoucí etapy před dokončením právě aktivní. Aktuální stav není plánem nahrazen: viz [UPGRADE_PROGRESS.md](UPGRADE_PROGRESS.md).
