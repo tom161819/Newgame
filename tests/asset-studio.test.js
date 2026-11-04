@@ -320,3 +320,19 @@ test('trees use the approved Asset Studio art for each look, byte for byte with 
   }
   assert.ok(APPROVED_TREE_ART.oak_tree.spring && APPROVED_TREE_ART.oak_tree.autumn && APPROVED_TREE_ART.oak_tree.winter && APPROVED_TREE_ART.pine_tree.winter);
 });
+
+test('construction sites use the approved scaffold art by stage, byte for byte with the export anchor', async () => {
+  const { APPROVED_SCAFFOLD_ART, TIMBER_SCAFFOLD_BUILDINGS } = await import('../src/data/objects/approvedArt.js');
+  assert.deepEqual(Object.keys(APPROVED_SCAFFOLD_ART).sort(), ['high', 'low', 'mid', 'timber']);
+  for (const [look, art] of Object.entries(APPROVED_SCAFFOLD_ART)) {
+    const meta = json(art.artSource);
+    assert.equal(approvals.assets.scaffold.variants[meta.variantId]?.status, 'approved', look);
+    assert.equal(meta.variantId, `scaffold-${look}`);
+    assert.ok(readFileSync(path.join(root, `public${art.sprite}`)).equals(readFileSync(path.join(root, `art/sprites/scaffold/${meta.variantId}.v1.png`))), look);
+    assert.deepEqual(art.origin, meta.baseOrigin);
+    assert.equal(art.visualHeight, meta.visualHeight);
+    assert.deepEqual(meta.footprint, { width: 2, height: 2 }, 'scaled by site width / 2 in ConstructionView');
+  }
+  const ids = new Set(objectDefinitions.map(d => d.id));
+  assert.ok(TIMBER_SCAFFOLD_BUILDINGS.every(id => ids.has(id)));
+});

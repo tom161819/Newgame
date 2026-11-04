@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| Approved assets into the game, part 3: trees | Claude | `claude/approved-assets-trees` | this PR | Verified | `src/game/TreeView.js`, `src/data/objects/approvedArt.js`, `artSprites` validation in `src/systems/ObjectRegistry.js`, one line in `src/systems/AssetManager.js`, `public/assets/resources/*/art/`. Next: scaffold, villagers, seasonal ground, quarry, wall. |
+| Approved assets into the game, part 4: scaffold | Claude | `claude/approved-assets-scaffold` | this PR | Verified | `src/game/ConstructionView.js`, `src/data/objects/approvedArt.js`, `public/assets/buildings/scaffold/`. Next: villagers, seasonal ground, quarry, wall. |
 | M2 final tag/archive and queued follow-up request | Codex | `codex/m2-release-archive` from main7595b80 | PR15 merged; actual archive draft PR creation fails: API Forbidden | Local artifact verified:455tests/full merged browser/Studio/72snapshots/2385HTTPfiles; formal gate refuses Pages41877748443 stillQueued. Tag only local, archive branch pushed. C01–C08 queued after master15, not started. | Release/archive metadata and new snapshot, queue/progress/coordination/verification docs, `docs/requests/CODEX_MASTER.md`, `docs/CODEX_PROGRESS.md`. No public tag or RELEASED claim until actual gates pass. |
 
 ## Kept backups (do not delete without the developer)
@@ -22,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#25](https://github.com/tom161819/Newgame/pull/25) Approved assets part 3: oaks and pines by growth stage and season (Claude).
 - 2026-11-04 [#24](https://github.com/tom161819/Newgame/pull/24) Approved assets part 2: eight production buildings with their studio art (Claude).
 - 2026-11-04 [#23](https://github.com/tom161819/Newgame/pull/23) Approved assets part 1: developer approvals (58 variants), lush grass and moss footpaths in the game (Claude).
 - 2026-11-04 [#20](https://github.com/tom161819/Newgame/pull/20) V02/V03 studio concepts: bowyer, swordsmith, armorer, armory, stables, equipment items and four soldier classes with an 8-direction sheet (Claude). Draft/Review on the C06–C08 ids; adjust when Codex fixes them.
