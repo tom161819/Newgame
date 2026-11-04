@@ -1,4 +1,4 @@
-# M2 native fixture corrections — targeted checks passed, full verification pending
+# M2 native fixture corrections — VERIFIED
 
 Starting point: mainb554b4e, which merged archive PR18. Source PR15's actual
 Pages run41877748443 now reports Success for7595b80. The subsequent formal M2
@@ -54,6 +54,23 @@ and isolated historical saves. The actual captured blueprint failure replay
 also exits0. The complete revised `--full` run is next. No player Changelog entry
 is added for test-only work. No source asset, graphic, Save schema or existing
 archive changed.
+
+Completed verification: source9d0a6d4 passed the full corrected native suite,
+including the permanent obstructing UI control. After Claude's PR19 landed,
+main630caf1 was merged normally as8b118e4; only COORDINATION conflicted, resolved
+by retaining both authors' active/done work. Game/Studio/art files are byte-for-byte
+the merged main versions. The combined source passes459/459models,0fail/skip,
+changelog/catalog checks, build:pages, all72canonical archive URLs/2385HTTP files/
+119054931bytes/SHA/MIME, the complete native suite including gradual seasons,
+exact mid-transition Load, both fixture corrections, and Studio smoke in
+Canvas/WebGL/mobile. Each actual command exits0. No failed run is relabelled.
+
+Finalization now moves Claude's already merged/verified V01 note from Unreleased
+to the existing0.3.0 candidate; there is no second MINOR bump and no player entry
+for test-only corrections. Cut an actual source commit after this metadata change,
+preserve the old unpublished f053 tag reference, prepare the final local tag and
+add its real immutable archive. Preserve all72prior snapshots and publish no tag
+before the final source is merged and actual release/deployment gates permit it.
 
 The v0.3.0 tag remains local at f053be1 and is absent remotely. Do not push that
 provisional tag while the final source includes this unmerged script correction.

@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| M2 release verification: deterministic native fixtures | Codex | `codex/m2-smelting-smoke`, now integrating main630caf1 | PR15/18 merged; follow-up in verification | Original base456models/full native/replay/72archive HTTP all pass. Preserve Claude's merged V01 and verify the combined source. Tag remains local; master11 and C01–C08 unstarted. | `scripts/smelting-smoke.mjs`, `scripts/building-menu-smoke.mjs`, `tests/smelting.test.js`, release/progress/coordination docs. No Codex gameplay, graphics, save schema or immutable archive edits. |
+| M2 final candidate and stable native release checks | Codex | `codex/m2-smelting-smoke`, main630caf1 preserved | PR15/18 merged; final candidate preparing | Combined459models/full native/Studio/72archive HTTP all pass. Finalize the existing0.3.0 notes with verified V01, preserve the unpublished f053 candidate tag, and archive the final actual source. Public tag waits for source merge/gates; master11 and C01–C08 unstarted. | Native smoke helpers, Smelting regression, CHANGELOG release notes, new source snapshot/catalog and release/progress/coordination docs. No Codex gameplay/graphics/schema edits; existing archives immutable. |
 | V02, V03 studio concepts (military buildings, equipment, soldiers) | Claude | `claude/military-concepts-studio` (next) | — | Draft concepts on assumed ids; final ids follow Codex C06–C08 | `studio/**`, `art/**`, `docs/art/**` |
 
 ## Kept backups (do not delete without the developer)
