@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "stone-wall",
+  "name": "Wall segment",
+  "category": "buildings",
+  "description": "One 1 × 1 wall segment running along grid x. Candidate replacement for the procedural Stone Wall.",
+  "footprint": { "width": 1, "height": 1 },
+  "generator": "wall",
+  "gameObjectId": "wall",
+  "variants": [
+    {
+      "id": "stone-wall-crenellated",
+      "name": "Crenellated stone wall",
+      "version": 1,
+      "notes": "Matches the square watchtower: stone body, light coping, two merlons.",
+      "spec": { "style": "stone", "height": 1.6, "thickness": 0.55, "merlons": 2 }
+    },
+    {
+      "id": "stone-wall-palisade",
+      "name": "Timber palisade",
+      "version": 1,
+      "notes": "Early or frontier defence from sharpened logs.",
+      "spec": { "style": "palisade", "height": 1.5, "thickness": 0.3 }
+    }
+  ]
+}

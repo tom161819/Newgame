@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "assetId": "quarry",
+  "variantId": "quarry-cliff",
+  "name": "Rock face with hoist",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "4e464b20",
+  "generator": "quarry",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 203,
+  "height": 169,
+  "anchor": {
+    "x": 92,
+    "y": 122
+  },
+  "origin": {
+    "x": 0.4532,
+    "y": 0.72189
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "modelHeight": 2.231,
+  "lights": []
+}

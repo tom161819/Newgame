@@ -33,7 +33,7 @@ Shodu studia s hrou kontroluje test `tests/asset-studio.test.js`.
 | Strom | 1,6–3,6 | 63–141 |
 | Surovina | 0,15–0,6 | 6–24 |
 
-Půdorys budovy nechává od okraje políček rezervu 0,08 jednotky. Nic kromě stínu nesmí přesahovat půdorys; generátory to hlídají a validace to testuje.
+Půdorys budovy nechává od okraje políček rezervu 0,08 jednotky. Kromě stínu nesmí půdorys nic přesahovat; výjimkou jsou koruny stromů, které smějí přesáhnout až o 0,3 jednotky (`scale.canopyOverhang`). Kmeny přesahovat nesmějí. Úseky hradeb vyplňují celé políčko ve směru zdi, aby na sebe navazovaly. Generátory to hlídají a validace to testuje.
 
 ## Paleta a materiály
 
@@ -42,6 +42,9 @@ Používej jen barvy z palety. Novou barvu nejdřív přidej do `palette`, teprv
 | Materiál | Použití | Textura |
 |---|---|---|
 | `stone`, `stone_light`, `stone_dark` | zdi, obklady, sokly | cihly ~0,3 × 0,15 jednotky |
+| `plaster` | výplň hrázdění | jemný šum |
+| `rock` | skály, stěny lomů | šum |
+| `bark`, `foliage`, `foliage_light`, `foliage_dark`, `pine_needles` | kmeny a koruny; světlejší listí na slunné straně | šum / prkna |
 | `wood`, `wood_dark` | ochozy, dveře, trámy, sloupy | prkna ~0,17 jednotky |
 | `roof_shingle`, `roof_tile`, `thatch` | střechy | šindele / došky |
 | `iron` | kování, koše, pánve | bez textury |

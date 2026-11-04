@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "id": "oak-tree",
+  "name": "Oak",
+  "category": "trees",
+  "description": "Broadleaf tree on one tile. Variants cover growth stages used by forestry.",
+  "footprint": { "width": 1, "height": 1 },
+  "generator": "tree",
+  "gameObjectId": "oak_tree",
+  "variants": [
+    {
+      "id": "oak-tree-mature",
+      "name": "Mature oak",
+      "version": 1,
+      "notes": "Full crown, ready to harvest.",
+      "spec": { "kind": "oak", "height": 2.9, "crown": 0.66, "trunk": 0.1, "clusters": 6, "seed": 11 }
+    },
+    {
+      "id": "oak-tree-broad",
+      "name": "Broad oak",
+      "version": 1,
+      "notes": "Lower and rounder, for variety in groves.",
+      "spec": { "kind": "oak", "height": 2.4, "crown": 0.72, "trunk": 0.12, "clusters": 5, "seed": 23 }
+    },
+    {
+      "id": "oak-tree-young",
+      "name": "Young oak",
+      "version": 1,
+      "notes": "Growth stage before maturity.",
+      "spec": { "kind": "oak", "height": 1.7, "crown": 0.42, "trunk": 0.06, "clusters": 4, "seed": 5 }
+    }
+  ]
+}

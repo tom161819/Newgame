@@ -61,11 +61,14 @@ export function validateAssetSpec(spec, { generators, style, path = spec?.id }) 
 
 // Every primitive must use a style-guide material and stay inside the footprint.
 export function checkModel(model, { footprint, style }) {
-  const problems = [], halfW = footprint.width / 2 + 1e-6, halfH = footprint.height / 2 + 1e-6;
+  const problems = [];
   for (const part of model.primitives) {
     if (!style.materials[part.material]) problems.push(`material "${part.material}" is not in the style guide.`);
+    // Only parts marked as canopy may overhang, by the style guide's allowance.
+    const extra = part.overhang ? style.scale.canopyOverhang ?? 0 : 0;
+    const halfW = footprint.width / 2 + extra + 1e-6, halfH = footprint.height / 2 + extra + 1e-6;
     const { min, max } = primitiveBounds(part);
-    if (min[0] < -halfW || max[0] > halfW || min[2] < -halfH || max[2] > halfH) problems.push(`${part.shape} (${part.material}) leaves the ${footprint.width}×${footprint.height} footprint.`);
+    if (min[0] < -halfW || max[0] > halfW || min[2] < -halfH || max[2] > halfH) problems.push(`${part.shape} (${part.material}) leaves the ${footprint.width}×${footprint.height} footprint${extra ? ` plus its ${extra}-unit canopy overhang` : ''}.`);
     if (min[1] < -1e-6) problems.push(`${part.shape} goes below ground.`);
   }
   for (const light of model.lights ?? []) if (!style.lightSources[light.type]) problems.push(`light type "${light.type}" is not in the style guide.`);
@@ -79,6 +82,10 @@ export function primitiveBounds(part) {
     // Four-sided cylinders are square-aligned, so their half-extent is r / √2.
     const r = Math.max(part.radiusTop, part.radiusBottom) * (part.segments === 4 ? Math.SQRT1_2 : 1);
     return { min: [x - r, y, z - r], max: [x + r, y + part.height, z + r] };
+  }
+  if (part.shape === 'sphere') {
+    const [rx, ry, rz] = part.radii;
+    return { min: [x - rx, y, z - rz], max: [x + rx, y + ry * 2, z + rz] };
   }
   const [w, h, d] = part.size, cos = Math.abs(Math.cos(part.rotation ?? 0)), sin = Math.abs(Math.sin(part.rotation ?? 0));
   const hx = (cos * w + sin * d) / 2, hz = (sin * w + cos * d) / 2;
