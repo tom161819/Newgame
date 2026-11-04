@@ -60,7 +60,7 @@ export function validateDefinition(definition) {
   if(d.storage!==undefined&&(!plainObject(d.storage)||d.category!=='building'||!Number.isSafeInteger(d.storage.capacity)||d.storage.capacity<=0||!Array.isArray(d.storage.resources)||!d.storage.resources.length||new Set(d.storage.resources).size!==d.storage.resources.length))fail(id,'neplatný sklad.');
   if(d.recipe!==undefined){
     const r=d.recipe,quantities=value=>plainObject(value)&&Object.keys(value).length>0&&Object.values(value).every(n=>Number.isSafeInteger(n)&&n>0);
-    if(d.category!=='building'||!plainObject(r)||!quantities(r.input)||!quantities(r.output)||!finite(r.duration)||r.duration<=0||!SKILL_IDS.includes(r.skill)||!d.workplace||!Number.isSafeInteger(d.bufferCapacity)||d.bufferCapacity<Math.max(...Object.values(r.input),...Object.values(r.output)))fail(id,'neplatný výrobní recept.');
+    if(d.category!=='building'||!plainObject(r)||!quantities(r.input)||!quantities(r.output)||!finite(r.duration)||r.duration<=0||!SKILL_IDS.includes(r.skill)||!d.workplace||!Number.isSafeInteger(d.bufferCapacity)||d.bufferCapacity<Math.max(Object.values(r.input).reduce((n,v)=>n+v,0),Object.values(r.output).reduce((n,v)=>n+v,0)))fail(id,'neplatný výrobní recept.');
   }
   if(d.edible!==undefined&&(d.category!=='resource'||typeof d.edible!=='boolean'))fail(id,'neplatné označení potraviny.');
   if(d.deposit!==undefined&&(!plainObject(d.deposit)||d.category!=='resource'||d.collectible||!Number.isSafeInteger(d.deposit.min)||!Number.isSafeInteger(d.deposit.max)||d.deposit.min<1||d.deposit.max<d.deposit.min))fail(id,'invalid finite deposit.');

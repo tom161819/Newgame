@@ -21,7 +21,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=13;
+export const SAVE_VERSION=14;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -155,7 +155,7 @@ export function validateGameState(input,registry=objectRegistry){
     else if(d.deposit){const n=r.natural;check(n&&n.kind==='deposit'&&Object.keys(n).every(key=>['id','kind','remaining','max','boundBuildingId'].includes(key)));const id=String(n.id).match(/^deposit-([1-9]\d*)$/);check(id&&Number(id[1])<natural.nextDepositId&&!depositIds.has(n.id));depositIds.set(n.id,r);integer(n.max,d.deposit.min,d.deposit.max);integer(n.remaining,0,n.max);check(n.boundBuildingId==null||bIds.has(n.boundBuildingId));}
     else check(r.natural===undefined);
     for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){
-    const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`,overlap=s.buildings.find(b=>x>=b.x&&x<b.x+definition(b.type).width&&y>=b.y&&y<b.y+definition(b.type).height),allowedOverlap=d.tree&&r.natural.stage===0||d.deposit&&overlap?.type==='quarry'&&overlap.quarryMode==='finite'&&overlap.depositId===r.natural.id&&r.natural.boundBuildingId===overlap.id;check(s.terrain[y]?.[x]===0&&(!occupied.has(key)||allowedOverlap)&&!resourceTiles.has(key));resourceTiles.add(key);if(d.deposit||d.tree&&r.natural.stage===3)solid.add(key);
+    const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`,overlap=s.buildings.find(b=>x>=b.x&&x<b.x+definition(b.type).width&&y>=b.y&&y<b.y+definition(b.type).height),allowedOverlap=d.tree&&r.natural.stage===0||r.type==='stone_deposit'&&overlap?.type==='quarry'&&overlap.quarryMode==='finite'&&(overlap.depositId===r.natural.id&&r.natural.boundBuildingId===overlap.id||r.natural.boundBuildingId==null);check(s.terrain[y]?.[x]===0&&(!occupied.has(key)||allowedOverlap)&&!resourceTiles.has(key));resourceTiles.add(key);if(d.deposit||d.tree&&r.natural.stage===3)solid.add(key);
   }}
   const boundDeposits=new Set();for(const b of s.buildings){
     if(b.type==='quarry'){check(['finite','legacy','unbound'].includes(b.quarryMode));if(b.quarryMode==='legacy')check(buildingIsComplete(b)&&b.depositId===undefined);if(b.quarryMode==='unbound')check(b.depositId===undefined);}

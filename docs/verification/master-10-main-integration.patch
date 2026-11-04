@@ -1,0 +1,94 @@
+--- a/docs/COORDINATION.md
++++ b/docs/COORDINATION.md
+@@ -13,6 +13,7 @@
+ | Task | Owner | Branch | PR | Status | Files held |
+ |---|---|---|---|---|---|
+ | Approved tower and brazier in the game | Claude | `claude/approved-tower-brazier` | — | In progress | `src/data/objects/buildings.js` (tower), `src/data/objects/lighting.js`, `src/data/objects/index.js`, `src/data/experience.js` (brazier XP), `src/systems/ObjectRegistry.js` (lights validation), `src/systems/SpriteViews.js` (pixel hit test), `src/systems/LightSourceSystem.js`, `src/game/LitBuildingView.js`, `src/game/GameScene.js` (3 lines), `public/assets/buildings/{tower,brazier}/`, related tests |
++| Stage10 Quarry Placement & Iron Smelter | Codex | `codex/stage-10-smelter` from main97b3381 | Not yet created; API policy unchanged | PhaseA/B verified:434 tests/build/targeted native furnace and Save14. PhaseC full regression/M2 gate pending. Visual Polish is Claude-owned by user instruction. | New smelting definitions/assets/tests; data jobs/workplaces/recipes/economy; existing production/logistics/storage/skill/validation/panel; smokes and own progress/docs. Necessary shared edits: objects/index registry and experience reward table, preserving Claude graphics/brazier changes. Avoid Studio/art, SpriteViews/renderer, tower definition and GameScene graphics. |
+ 
+ ## Kept backups (do not delete without the developer)
+ 
+--- a/src/data/experience.js
++++ b/src/data/experience.js
+@@ -1,5 +1,5 @@
+ import { FARMING_RULES } from './farming.js';
+-import { FOOD_RECIPES } from './foodProduction.js';
++import { PRODUCTION_RECIPES } from './production.js';
+ import { FORESTRY } from './naturalResources.js';
+ import { MINING_WORK } from './minerals.js';
+ export const EXPERIENCE_MAX_LEVEL=50;
+@@ -9,8 +9,8 @@
+   transportDelivered:Object.freeze({hauler:1}),
+   resourceCollected:Object.freeze({stone:3}),dropCollected:Object.freeze({meat:2}),
+   animalKilled:Object.freeze({rabbit:10,deer:20,wild_boar:35}),
+-  buildingCompleted:Object.freeze({wall:2,tower:15,castle:30,house:10,quarry:15,hunting_lodge:10,barracks:20,farmhouse:10,wheat_field:5,orchard:8,mill:12,bakery:10,granary:10,warehouse:10,lumberjack_hut:8,iron_mine:12,brazier:3}),
+-  foodProduced:Object.freeze(Object.fromEntries(Object.entries(FOOD_RECIPES).map(([id,recipe])=>[id,recipe.xp]))),
++  buildingCompleted:Object.freeze({wall:2,tower:15,castle:30,house:10,quarry:15,hunting_lodge:10,barracks:20,farmhouse:10,wheat_field:5,orchard:8,mill:12,bakery:10,granary:10,warehouse:10,lumberjack_hut:8,iron_mine:12,brazier:3,smelter:15}),
++  foodProduced:Object.freeze(Object.fromEntries(Object.entries(PRODUCTION_RECIPES).map(([id,recipe])=>[id,recipe.xp]))),
+   cropHarvested:Object.freeze(Object.fromEntries(Object.entries(FARMING_RULES.crops).map(([id,crop])=>[id,crop.xp]))),
+ });
+ export function getXPRequired(level){
+--- a/src/data/objects/index.js
++++ b/src/data/objects/index.js
+@@ -12,5 +12,6 @@
+ import { naturalDefinitions,forestryBuildings } from './naturalResources.js';
+ import { mineralDefinitions,mineralBuildings } from './minerals.js';
+ import { lightingBuildings } from './lighting.js';
++import { smeltingDefinitions } from './smelting.js';
+ 
+-export const objectDefinitions = [...terrain, ...resources,...naturalDefinitions, ...farmingResources,...processedFoodResources,...materialDefinitions,...mineralDefinitions, ...buildings, ...farmingBuildings,...foodBuildings,...logisticsBuildings,...forestryBuildings,...mineralBuildings,...lightingBuildings, ...characters, ...decorations, ...animals, ...equipment, ...treasures];
++export const objectDefinitions = [...terrain, ...resources,...naturalDefinitions, ...farmingResources,...processedFoodResources,...materialDefinitions,...mineralDefinitions, ...buildings, ...farmingBuildings,...foodBuildings,...logisticsBuildings,...forestryBuildings,...mineralBuildings,...lightingBuildings,...smeltingDefinitions, ...characters, ...decorations, ...animals, ...equipment, ...treasures];
+--- a/tests/assets.test.js
++++ b/tests/assets.test.js
+@@ -9,10 +9,10 @@
+ const definition = (id, changes = {}) => ({ ...structuredClone(objectRegistry.require('stone')), id, ...changes });
+ 
+ test('registry exposes the existing game objects, categories and buildable menu', () => {
+-  assert.equal(objectRegistry.all().length, 47);
+-  assert.deepEqual(objectRegistry.buildables().map(d => d.id), ['tower','castle','wall','quarry','hunting_lodge','barracks','farmhouse','wheat_field','orchard','mill','bakery','granary','warehouse','lumberjack_hut','iron_mine','brazier']);
++  assert.equal(objectRegistry.all().length, 49);
++  assert.deepEqual(objectRegistry.buildables().map(d => d.id), ['tower','castle','wall','quarry','hunting_lodge','barracks','farmhouse','wheat_field','orchard','mill','bakery','granary','warehouse','lumberjack_hut','iron_mine','brazier','smelter']);
+   assert.deepEqual(objectRegistry.byCategory('terrain').map(d => d.id), ['grass','dirt','grass_normal','grass_trampled_1','grass_trampled_2','grass_trampled_3']);
+-  assert.equal(objectRegistry.forGallery('all').length, 47);
++  assert.equal(objectRegistry.forGallery('all').length, 49);
+   assert.equal(objectRegistry.forGallery('resource')[0].id, 'stone');
+   assert.equal(objectRegistry.require('tower').cost.stone, 10);
+   assert.equal(objectRegistry.get('missing'), null);
+@@ -54,7 +54,7 @@
+   const extra = registry.register({ ...structuredClone(registry.require('tower')),
+     id:'test_lodge',width:3,height:1,cost:{stone:12},interactions:[],renderMode:'sprite',
+   });
+-  assert.deepEqual(registry.buildables().map(d => d.id), ['tower','castle','wall','quarry','hunting_lodge','barracks','farmhouse','wheat_field','orchard','mill','bakery','granary','warehouse','lumberjack_hut','iron_mine','brazier','test_lodge']);
++  assert.deepEqual(registry.buildables().map(d => d.id), ['tower','castle','wall','quarry','hunting_lodge','barracks','farmhouse','wheat_field','orchard','mill','bakery','granary','warehouse','lumberjack_hut','iron_mine','brazier','smelter','test_lodge']);
+   const map = Array.from({length:8},()=>Array(8).fill(0)), inventory = new Inventory(), buildings = [];
+   inventory.add('stone',11);
+   const options = {map,inventory,buildings,resources:new Map(),anchor:{x:2,y:3},definition:extra};
+@@ -108,9 +108,9 @@
+     spritesheet:{frameWidth:32,frameHeight:48},renderMode:'sprite',stats:structuredClone(objectRegistry.require('king').stats)}));
+   const calls=[], scene={load:{on(){},image(...args){calls.push(['image',...args]);},spritesheet(...args){calls.push(['sheet',...args]);}},textures:{exists:()=>false}};
+   const manager = new AssetManager(scene,registry,{baseURL:'/Newgame/'});
+-  // 47 registered objects + the animated test object, plus the tower's separately queued front layer.
+-  assert.equal(manager.queue(),49);assert.equal(manager.queue(),0);
+-  assert.equal(calls.length,49);
++  // 49 registered objects + the animated test object, plus the tower's separately queued front layer.
++  assert.equal(manager.queue(),51);assert.equal(manager.queue(),0);
++  assert.equal(calls.length,51);
+   assert.ok(calls.some(c=>c[2].endsWith('.webp')));
+   assert.deepEqual(calls.find(c=>c[0]==='sheet'),['sheet','asset:animated:main','/Newgame/assets/resources/stone/stone.png',{frameWidth:32,frameHeight:48}]);
+ });
+--- a/tests/building-categories.test.js
++++ b/tests/building-categories.test.js
+@@ -3,11 +3,11 @@
+ import { objectRegistry,ObjectRegistry } from '../src/systems/ObjectRegistry.js';
+ import { BUILDING_CATEGORIES,buildingsInCategory } from '../src/data/buildingCategories.js';
+ test('each implemented building has a central valid menu category; All contains only actual buildables',()=>{
+-  const all=buildingsInCategory(objectRegistry,'all');assert.deepEqual(all,objectRegistry.buildables());assert.equal(all.length,16);
++  const all=buildingsInCategory(objectRegistry,'all');assert.deepEqual(all,objectRegistry.buildables());assert.equal(all.length,17);
+   for(const d of objectRegistry.byCategory('building'))assert.ok(Object.hasOwn(BUILDING_CATEGORIES,d.buildingCategory));
+   assert.deepEqual(buildingsInCategory(objectRegistry,'defense').map(d=>d.id),['tower','castle','wall','barracks']);
+   assert.deepEqual(buildingsInCategory(objectRegistry,'food').map(d=>d.id),['hunting_lodge','farmhouse','wheat_field','orchard','mill','bakery','granary']);
+-  assert.deepEqual(buildingsInCategory(objectRegistry,'industry').map(d=>d.id),['quarry','lumberjack_hut','iron_mine']);assert.deepEqual(buildingsInCategory(objectRegistry,'logistics').map(d=>d.id),['warehouse']);
++  assert.deepEqual(buildingsInCategory(objectRegistry,'industry').map(d=>d.id),['quarry','lumberjack_hut','iron_mine','smelter']);assert.deepEqual(buildingsInCategory(objectRegistry,'logistics').map(d=>d.id),['warehouse']);
+   assert.deepEqual(buildingsInCategory(objectRegistry,'housing'),[]);assert.deepEqual(buildingsInCategory(objectRegistry,'infrastructure').map(d=>d.id),['brazier']);
+ });
+ test('data-only additions join their registered category automatically; uncategorized legacy extensions remain in All',()=>{

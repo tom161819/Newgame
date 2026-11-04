@@ -6,6 +6,8 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Build 3×3 Smelters for 12 Stone and 10 Wood. Two Smelter Operators physically process 3 Iron Ore and 2 Wood into 1 Iron Bar in 40 seconds of base work, with existing Haulers, storage, skills, wages and daily accounting.
+- Auto Production at a Smelter fills vacant seats with reachable unemployed residents ranked by Smelting skill; employed workers and visitors keep their assignments.
 - See each resource’s net change for the last completed game day, with income/expense tooltips and a 30-day economic journal. Mining, harvests, production, construction losses, actual wages and treasure are counted once; carrying and storage transfers are excluded.
 - Discover five finite Stone Deposits and four Iron Deposits in new kingdoms. Build Quarries over a single accessible rock and Iron Mines within four tiles for 12 Stone and 8 physically delivered Wood; Miners physically extract and deliver Stone or raw Iron Ore until that deposit is depleted.
 - Build Lumberjack Huts with three Woodcutter seats and an 18-tile working radius; reserve timber storage, chop and carry actual logs, inspect production and keep hidden tree counts tied to last-known map information.
@@ -15,13 +17,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Build Braziers in the Infrastructure category for 3 Stone: stone fire bowls with a living flame, ready to light the surroundings once nights arrive.
 
 ### Changed
-- Save schema 13 keeps the economic journal and receipt IDs alongside the kingdom. This alpha build accepts only its current save schema; other slots remain untouched.
+- Save schema 14 preserves Smelting skills, both physical recipe inputs, production progress, Iron Bars and the economic journal alongside the kingdom. This alpha build accepts only its current save schema; other slots remain untouched.
 - Saves from another save schema are no longer converted during alpha development. Load Game marks them as incompatible, explains why and offers a new game; the old save stays stored until you delete it.
 
 ### Fixed
 - Saved forestry jobs resume intact, and deposits never regenerate in a loaded kingdom. Cleared stumps can be built over, and trees cannot regrow beneath finished fields or buildings.
 
 ### Improved
+- Place a Quarry across one or more rock formations with one stable primary deposit; a gold outline identifies that deposit in a valid preview, and depletion never switches mining to another rock.
 - Smoothly zoom out to 0.25× with the mouse wheel while keeping accurate map clicks, building previews and Fog of War. Camera limits also adapt safely to tall windows, and saved views retain their actual zoom.
 - Try the WebGL renderer by adding ?renderer=webgl to the game address, or ?renderer=auto to use WebGL only with hardware acceleration. Canvas remains the default, and Settings show the active renderer.
 - Stone Towers have a new painted look with a burning wall torch. The king still climbs to the top and now stands inside the battlements.

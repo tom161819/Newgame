@@ -1,6 +1,6 @@
 # Upgrade roadmap 25–37
 
-Nejprve dokončit aktuální krok 24 (A–D) podle [fronty](TASK_QUEUE.md). Potom automaticky provést následující etapy v přesném pořadí; po M1–M5 testy a autorizovaný MINOR release, tag a neměnný archiv. Až po etapě 15 následuje [Visual Polish & Art Pass](requests/visual-polish-art-pass.md), fáze A–E.
+Nejprve dokončit aktuální krok 24 (A–D) podle [fronty](TASK_QUEUE.md). Potom automaticky provést následující etapy v přesném pořadí; po M1–M5 testy a autorizovaný MINOR release, tag a neměnný archiv. Visual Polish & Art Pass byl2026-11-04 výslovně vyřazen z fronty Codexu; grafiku řeší Claude. Codex dokončuje pouze master etapy do15.
 
 Úplný dodaný master: [originál](requests/master-25-37.md). Společná pravidla a závazná řešení konfliktů: [00_ORCHESTRATOR.md](upgrades/00_ORCHESTRATOR.md). Neimplementovat budoucí etapy před dokončením právě aktivní. Aktuální stav není plánem nahrazen: viz [UPGRADE_PROGRESS.md](UPGRADE_PROGRESS.md).
 

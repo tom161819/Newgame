@@ -33,7 +33,7 @@ export class FoodStorageSystem {
   isStock(location){return location.kind==='storage'||location.kind==='fallback';}
   used(location){return sum(location.stock);}
   reserved(locationId,resource){return [...this.reservations.values()].filter(r=>r.kind==='stock'&&r.locationId===locationId&&r.resource===resource).reduce((n,r)=>n+r.amount,0);}
-  incoming(locationId){return [...this.reservations.values()].filter(r=>r.kind==='capacity'&&r.locationId===locationId).reduce((n,r)=>n+r.amount,0);}
+  incoming(locationId,resource=null){return [...this.reservations.values()].filter(r=>r.kind==='capacity'&&r.locationId===locationId&&(resource==null||r.resource===resource)).reduce((n,r)=>n+r.amount,0);}
   free(locationId,resource){const l=this.locations.get(locationId);return l?Math.max(0,(l.stock[resource]??0)-this.reserved(locationId,resource)):0;}
   room(locationId){const l=this.locations.get(locationId);return l?Math.max(0,l.capacity-this.used(l)-this.incoming(locationId)):0;}
   available(resource){return [...this.locations.values()].filter(l=>this.isStock(l)).reduce((n,l)=>n+this.free(l.id,resource),0);}
@@ -107,6 +107,12 @@ export class FoodStorageSystem {
   withdraw(locationId,resource,amount){
     const l=this.locations.get(locationId);if(!l||!positive(amount)||this.free(locationId,resource)<amount)return false;
     this.consumeHaulExclusion(l,resource,amount);l.stock[resource]-=amount;if(!l.stock[resource])delete l.stock[resource];this.changed();return true;
+  }
+  withdrawBatch(locationId,inputs){
+    const location=this.locations.get(locationId),entries=Object.entries(inputs);
+    if(!location||!entries.length||entries.some(([resource,amount])=>!positive(amount)||this.free(locationId,resource)<amount))return false;
+    for(const [resource,amount]of entries){this.consumeHaulExclusion(location,resource,amount);location.stock[resource]-=amount;if(!location.stock[resource])delete location.stock[resource];}
+    this.changed();return true;
   }
   deposit(locationId,resource,amount){
     const l=this.locations.get(locationId);if(!l||!positive(amount)||!l.allowed.includes(resource)||this.room(locationId)<amount)return false;
