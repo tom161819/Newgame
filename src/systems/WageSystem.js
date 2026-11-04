@@ -29,7 +29,7 @@ export class WageSystem {
     this.arrears.sort((a,b)=>a.day-b.day||a.workerId.localeCompare(b.workerId,undefined,{numeric:true}));
     for(const debt of this.arrears){
       const paid=Math.min(debt.amount,this.scene.inventory.count('gold'));
-      if(paid>0&&this.scene.inventory.spend('gold',paid))debt.amount-=paid;
+      if(paid>0&&this.scene.inventory.spend('gold',paid,{source:'Worker Wages',id:`wage-payment:${day}:${debt.workerId}:${debt.day}`,entityId:debt.workerId}))debt.amount-=paid;
     }
     this.arrears=this.arrears.filter(debt=>debt.amount>0);this.onPayroll({day,unpaid:this.totalUnpaid()});return true;
   }

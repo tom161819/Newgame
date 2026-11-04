@@ -20,7 +20,10 @@ export class ProductionSystem {
     if(day<=this.lastProcessedDay)return {};
     this.lastProcessedDay=day;
     const totals=this.dailyIncome();
-    for(const [resource,amount]of Object.entries(totals))this.inventory.add(resource,amount);
+    for(const [index,building]of this.getBuildings().entries()){
+      const p=buildingDefinition(building).production;if(!buildingIsComplete(building)||p?.interval!=='day')continue;
+      this.inventory.add(p.resource,p.amount,{source:building.type==='castle'?'Castle Income':`${buildingDefinition(building).name} Income`,id:`daily-income:${building.id??index}:${day}:${p.resource}`,entityId:building.id??null,type:'production'});
+    }
     if(Object.keys(totals).length)this.onIncome(day,totals);
     return totals;
   }

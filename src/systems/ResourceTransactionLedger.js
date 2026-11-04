@@ -18,11 +18,12 @@ export class ResourceTransactionLedger {
     if(data.id&&this.processed.has(data.id))return false;
     if(!['income','expense'].includes(data.direction)||!TRANSACTION_TYPES.includes(data.type)||typeof data.source!=='string'||!data.source||data.source.length>160||['__proto__','constructor','prototype'].includes(data.source)||data.resource!=='gold'&&!Number.isSafeInteger(data.quantity))throw new TypeError('Invalid resource transaction');
     const id=data.id??`ledger-${this.nextId++}`;if(typeof id!=='string'||!id||id.length>256)throw new TypeError('Invalid transaction ID');
-    const tx=Object.freeze({id,time:this.scene.gameTime.totalElapsed,day:this.current.day,resource:data.resource,quantity:data.quantity,direction:data.direction,type:data.type,source:data.source,entityId:data.entityId??null});
+    const entityId=data.entityId??'kingdom';if(!(typeof entityId==='string'&&entityId.length>0&&entityId.length<=128||Number.isSafeInteger(entityId)&&entityId>0)||data.quantity>Number.MAX_SAFE_INTEGER)throw new TypeError('Invalid transaction entity or quantity');
+    const tx=Object.freeze({id,time:this.scene.gameTime.eventTime??this.scene.gameTime.totalElapsed,day:this.current.day,resource:data.resource,quantity:data.quantity,direction:data.direction,type:data.type,source:data.source,entityId});
     this.processed.add(id);this.current.transactions.push(tx);addTransaction(this.current.totals,tx);this.changed();return tx;
   }
   activity(event){
-    const d=this.scene.objectRegistry.get(event.objectType),id=`economic:${event.id}`,entityId=event.objectId??event.actor?.id??null;
+    const d=this.scene.objectRegistry.get(event.objectType),id=`economic:${event.id}`,entityId=event.objectId??event.objectIds?.[0]??event.actor?.id??null;
     if(event.type==='treeChopped'&&d?.tree)this.income('wood',d.tree.wood,'Woodcutting',{id,entityId,type:'production'});
     if(event.type==='depositMined'&&d?.deposit)this.income(d.deposit.resource,1,d.deposit.resource==='stone'?'Mining':'Iron Mining',{id,entityId,type:'production'});
     if(event.type==='cropHarvested'&&d?.crop)this.income(d.crop.resource,d.crop.yield,d.crop.resource==='apple'?'Orchard Harvest':'Farming',{id,entityId,type:'production'});

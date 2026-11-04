@@ -14,6 +14,7 @@ import { populationSidebarSmoke,populationNavigationSmoke,populationIntegrationS
 import { staffingIndicatorsSmoke } from './staffing-smoke.mjs';
 import { mineralSmoke } from './mineral-smoke.mjs';
 import { zoomSmoke } from './zoom-smoke.mjs';
+import { ledgerSmoke } from './ledger-smoke.mjs';
 import { forestrySmoke,forestryHutSmoke } from './forestry-smoke.mjs';
 
 
@@ -76,6 +77,7 @@ try{
   if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full'))await page.locator('#setup-seasons').uncheck();}
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
+  if(args.includes('--full')||args.includes('--ledger'))await ledgerSmoke(page);
   if(args.includes('--full')||args.includes('--zoom'))await zoomSmoke(page);
   if(args.includes('--full')||args.includes('--minerals'))await mineralSmoke(page);
   if(args.includes('--full')||args.includes('--forestry'))await forestrySmoke(page);

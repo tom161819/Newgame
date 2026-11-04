@@ -49,7 +49,7 @@ export class WorkplaceSystem {
     const record=this.records.get(worker.assignedWorkplaceId),cargo=worker.cargo,rewards=worker.pendingWorkRewards??[];
     // Náklad je odstraněn před událostmi: další snímek nebo save nemůže zásilku zopakovat.
     worker.cargo=null;worker.pendingWorkRewards=[];record.delivered[cargo.resource]=(record.delivered[cargo.resource]??0)+cargo.amount;
-    this.scene.inventory.add(cargo.resource,cargo.amount);for(const event of rewards){const {type,...data}=event;this.scene.activities.emit(type,{...data,actor:worker});}
+    this.scene.inventory.add(cargo.resource,cargo.amount,{track:false});for(const event of rewards){const {type,...data}=event;this.scene.activities.emit(type,{...data,actor:worker});}
     this.scene.updateInventory();return true;
   }
   summary(building){

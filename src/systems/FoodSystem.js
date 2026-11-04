@@ -20,15 +20,15 @@ export class FoodSystem {
   workMultiplier(actor){return actor.id!=='king'&&this.residents.get(actor.id)?.hungry?HUNGRY_WORK_MULTIPLIER:1;}
   bucket(){const day=this.time?.day??this.lastProcessedDay;let record=this.history.find(r=>r.day===day);if(!record){record={day,produced:0,consumed:0};this.history.push(record);}return record;}
   trimHistory(){const day=this.time?.day??this.lastProcessedDay;this.history=this.history.filter(r=>r.day>day-FOOD_ECONOMY_DAYS);}
-  eat(){for(const id of EDIBLE_RESOURCES)if(this.inventory.count(id)>0&&this.inventory.spend(id,1)){this.bucket().consumed++;return true;}return false;}
-  recover(){if(this.time?.paused||this.scene?.gameOver)return false;let changed=false;for(const u of this.units())if(u.isAlive){const record=this.residents.get(u.id);if(record?.hungry&&this.eat()){record.hungry=false;changed=true;}}if(changed)this.onChange();return changed;}
+  eat(actor=this.scene?.character??{id:'king'}){for(const id of EDIBLE_RESOURCES)if(this.inventory.count(id)>0&&this.inventory.spend(id,1,{source:actor.id==='king'?'King Consumption':'Villager Consumption',entityId:actor.id})){this.bucket().consumed++;return true;}return false;}
+  recover(){if(this.time?.paused||this.scene?.gameOver)return false;let changed=false;for(const u of this.units())if(u.isAlive){const record=this.residents.get(u.id);if(record?.hungry&&this.eat(u)){record.hungry=false;changed=true;}}if(changed)this.onChange();return changed;}
   advance(delta){
     if(!Number.isFinite(delta)||delta<=0||this.scene?.gameOver||this.time?.paused)return;
     this.syncResidents();let changed=this.recover();
     for(const u of this.units())if(u.isAlive){
       const record=this.residents.get(u.id),rate=(u.id==='king'?2:1)/this.dayDuration,corrected=delta*rate-record.compensation,total=record.progress+corrected;
       record.compensation=(total-record.progress)-corrected;record.progress=total;
-      while(record.progress>=1-1e-10){record.progress=Math.max(0,record.progress-1);record.hungry=!this.eat();changed=true;}
+      while(record.progress>=1-1e-10){record.progress=Math.max(0,record.progress-1);record.hungry=!this.eat(u);changed=true;}
     }
     if(changed)this.onChange();
   }
@@ -36,6 +36,7 @@ export class FoodSystem {
   recordProduction(resource,amount,eventId){
     if(!EDIBLE_RESOURCES.includes(resource)||!Number.isSafeInteger(amount)||amount<=0||!eventId||this.productionEvents.has(eventId))return;
     this.productionEvents.add(eventId);this.bucket().produced+=amount;this.trimHistory();
+    if(resource==='meat')this.scene?.resourceLedger?.income(resource,amount,'Hunting',{id:`hunting:${eventId}`,entityId:eventId,type:'production'});
   }
   overview(){const day=this.time?.day??this.lastProcessedDay;this.trimHistory();return{storage:this.availablePortions,daily:this.dailyConsumption,production:this.history.reduce((n,r)=>n+r.produced,0)/Math.min(day,FOOD_ECONOMY_DAYS),days:this.dailyConsumption?this.availablePortions/this.dailyConsumption:0,unfed:this.hungryCount};}
   exportState(){this.syncResidents();return{elapsed:this.elapsed,residents:structuredClone([...this.residents.values()]),history:structuredClone(this.history),productionEvents:[...this.productionEvents],lastProcessedDay:this.time?.day??this.lastProcessedDay};}

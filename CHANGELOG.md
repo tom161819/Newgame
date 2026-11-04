@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- See each resource’s net change for the last completed game day, with income/expense tooltips and a 30-day economic journal. Mining, harvests, production, construction losses, actual wages and treasure are counted once; carrying and storage transfers are excluded.
 - Discover five finite Stone Deposits and four Iron Deposits in new kingdoms. Build Quarries over a single accessible rock and Iron Mines within four tiles for 12 Stone and 8 physically delivered Wood; Miners physically extract and deliver Stone or raw Iron Ore until that deposit is depleted.
 - Build Lumberjack Huts with three Woodcutter seats and an 18-tile working radius; reserve timber storage, chop and carry actual logs, inspect production and keep hidden tree counts tied to last-known map information.
 - Find grouped Oak and Pine forests in new kingdoms, with mature trees ready to harvest and stumps, saplings and young trees that regrow through the game’s seasons.
@@ -13,6 +14,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Remembered trees keep their last-seen shape outside sight.
 
 ### Changed
+- Save schema 13 keeps the economic journal and receipt IDs alongside the kingdom. This alpha build accepts only its current save schema; other slots remain untouched.
 - Saves from another save schema are no longer converted during alpha development. Load Game marks them as incompatible, explains why and offers a new game; the old save stays stored until you delete it.
 
 ### Fixed

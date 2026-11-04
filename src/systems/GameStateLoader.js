@@ -22,6 +22,7 @@ export function restoreOrder(data,scene){
 }
 export function loadGameState(scene,input){
   const state=validateGameState(input,scene.objectRegistry),p=state.player,c=scene.character;
+  scene.resourceLedger?.suspend();
   scene.gameSettings=gameSettings(state.gameSettings);
   scene.gameTime.dayDuration=scene.gameSettings.dayLengthSeconds*1000;
   scene.wildlifeRespawn?.importState(state.wildlifeRespawn);
@@ -100,6 +101,7 @@ export function loadGameState(scene,input){
   scene.skillSystem?.importState(state.skillSystem);scene.workerSystem?.importState(state.population);
   if(scene.workerSystem&&state.workers===undefined)scene.workerSystem.spawnInitial();
   scene.wageSystem?.importState(state.wages);
+  scene.resourceLedger?.importState(state.resourceLedger);
   scene.workplaceSystem?.importState(state.workplaces);
   scene.constructionSystem?.importState(state.constructionSystem);
   if(scene.seasons&&!state.seasons&&state.farming)for(const record of state.farming.records){const b=scene.buildings.find(b=>b.id===record.buildingId);record.stage=seasonalCropStage(b.type,record.growthDays,b.definition.crop.growthDays,scene.seasons.season);}

@@ -20,7 +20,7 @@ Etapy01–06 i dodatečný audit archivu jsou DONE; M1 RELEASED0.2.0,07–08 jso
 | 06 | 32: Missing Workers Indicator | M1 | DONE | Dokončené pracovní budovy: červená/oranžová, skutečná místa/události, tooltip/Assign Worker, Fog/zoom/Save10;356/356/build/browser,200 budov~50FPS bez přepočtu míst za snímek. `7a5a6662c7d619c7e86960d6f71cf5c68b035483`;[report](verification/master-06.md) |
 | 07 | 25: Forestry & Natural Resources | M2 | DONE | FázeA DONE `0596b517e38919c672c0856f9fd7f3d927cc848b`:200 seskupených Oak/Pine/růst/král/kácení/fyzické dřevo/Save11/Fog;365/365/build/plný browser/2,7,8,9,10→11;20NPC+mlha~60FPS,71 archivů beze změny. FázeB DONE `328c3a63858f3cd92c910f101809c7c20fe13b6c`: chata8 Stone/2×2/3 místa/18 radius, fyzické dřevo, rezervace skladu, Save/Load a známé počty stromů;374/374/build/plný browser, finální nativní chata/cargo. FázeC DONE `e8ea0ce4970c67b1b6b0a89851b44a24f1275eae`: konečná ložiska5 Stone/4 Iron, striktní Quarry, Iron Mine12 Stone+8 Wood, fyzická těžba/transport/Save12/Fog;388/388/build/nativní obě stavby a skutečný Save11→12,20NPC~59–60FPS. FázeD DONE `d195a39f5090643c7785c9c9b56db746e57f9991`:389/389, plný browser a skutečné Save2/7/8/9/10/11→12; celý fyzický řetězec stromy→dřevo→vícesurovinová stavba dolu→ruda→Warehouse přes Save/Load. Následuje08;[report](verification/master-07.md). |
 | 08 | 31A: Extended Zoom Out | M2 | DONE | Plynulý zoom0.25–1.8/default1, bezpečné vysoké okno, přesné klikání/blueprint/Fog/Save12;395/395/build/nativní0.25 a vysoké okno,20NPC+mlha58.7–60FPS;[report](verification/master-08.md). |
-| 09 | 31B: Daily Resource Statistics & Ledger | M2 | PENDING | Nezahájeno |
+| 09 | 31B: Daily Resource Statistics & Ledger | M2 | PARTIAL | `codex/stage-09-ledger` nad PR3 ALPHA; živý journal/Save13/lišta/tooltipy,398 testů/build/cílený browser prošly; finální full/Pages/archive gate čeká. PR závisí na1/3, API pro jeho otevření blokuje síť;[report](verification/master-09.md). |
 | 10 | 35: Quarry Placement & Iron Smelter | M2 | PENDING | Nezahájeno |
 | 11 | 37: Stone Pavement & Courtyards | M3 | PENDING | Nezahájeno |
 | 12 | 34: Wheelwright, Wagons, Stables & Housing | M3 | PENDING | Nezahájeno |
@@ -39,3 +39,17 @@ M1 (01–06): **RELEASED0.2.0**, source `fa56c96113fdad8097d641ad87c06e74d532efa
 ## Následující vizuální upgrade
 
 Visual Polish & Art Pass, fáze A–E: PENDING až po celém masteru. Úplné zadání je v `docs/requests/visual-polish-art-pass.md`.
+
+
+## Nová pravidla spolupráce (pokyn vývojáře po etapě08)
+
+Do main nepřispívat přímo, žádné push/tag/release na main. Úkoly ve vlastních
+codex/* větvích, odevzdání PR, merge a publikace výhradně vývojářem. Tato pravidla
+mají přednost před starou frontou a původní automatickou release politikou.
+Etapa09 je nad výslovně povoleným PR3 alpha-save-policy cf4c542 (PR1/3 ještě OPEN).
+Nepřidávat migrace; aktuální schéma13 se načítá plně a jiné schéma se odmítne bez
+mazání nebo změny uloženého slotu. Původní nenahraný WIP byl zachráněn ve větvi
+codex/stage-09-ledger-wip feb19d2. Z této větve se nic neslučuje naslepo.
+Další etapa10 až po merge09 nebo na skutečném PR09; M2 release jen připravit ve
+větvi a pak čekat na výslovný pokyn vývojáře. Podrobnosti a aktuální síťová
+překážka vytvoření PR jsou v reportu09.

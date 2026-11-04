@@ -20,7 +20,7 @@ explicitly requires held files here/in the PR instead of inventing that register
 Held: ledger data/system/validator and its tests; `src/game/inventory.js`,
 `src/systems/GameTimeSystem.js`, `src/game/GameScene.js`,
 `src/systems/GameStateSerializer.js`, `src/systems/GameStateLoader.js`,
-`src/systems/{ProductionSystem,WageSystem,FoodSystem,FarmingSystem,FoodProductionSystem,TreasureSystem,ConstructionMaterialsSystem}.js`,
+`src/systems/{ProductionSystem,WageSystem,FoodSystem,FarmingSystem,FoodProductionSystem,FoodStorageSystem,TreasureSystem,ConstructionMaterialsSystem,ConstructionSystem,DropSystem,WorkplaceSystem}.js`, `src/game/buildings.js`,
 `src/ui/InventoryBar.js`, new resource-tooltip UI/CSS, relevant smoke/helpers,
 `CHANGELOG.md` Unreleased and `docs/UPGRADE_PROGRESS.md`.
 
@@ -39,3 +39,32 @@ exact PR description meanwhile, without claiming a PR exists or bypassing policy
 Remaining: finish live sources/sinks, journal consistency validation/Save13,
 last-completed-day resource bar and bounded accessible tooltip, full tests,
 build:pages/browser --full/archive verification and final review record.
+
+
+## Implementation checkpoint — PARTIAL, full gate pending
+
+Foundation commit: fdbdaa00b3f15b794f8d98c13f372e8b782ce482, backed up on this
+codex task branch. The live journal, explicit economic source/sink integration,
+Save13 DTO/strict validation and Resource Bar/tooltips are implemented. Inputs of
+an unfinished reversible recipe remain owned buffer material; their expense is
+recorded on successful processing. Cancelled batches return those inputs without
+fictional income/expense. Construction reservations/delivery are transfers;
+completed consumption or actual cancellation losses are recorded. Gold tracks
+actual castle payouts, paid arrears/wages and treasure; unpaid debts are not cash
+expenses. No new trade, building or background simulation was introduced.
+
+398 current-policy model tests passed; production build and targeted native ledger
+smoke passed. Economic tests cover real1/3 worker scenarios, finite mining, ground
+wood and loaded-cargo restoration, raw collection/deposit/withdraw/drop/collect,
+all food processing, reversible inputs, construction/cancellation, debt settlement,
+Gold/meals/day lengths, corrupted journals and incompatible schema rejection.
+Native controls verify prior-day-only coloured amounts, genuine castle/wage/meal
+and treasure events, unchanged imported journal/receipt IDs in IndexedDB, mobile
+all-resource bounds, scrolling with no camera zoom/pan/stuck keys, and continued
+Settings/Population/Buildings access. Screenshot Newgame-master09-ledger.png was
+visually inspected. Full stage gate is still pending and is not claimed complete.
+Logs: /workspace/scratch/Newgame-master09-{tests,ledger-tests,ledger-smoke,build}.log.
+No main/Claude/backup branch, renderer, Studio, save-menu/application, historical
+snapshot, release version or Git tag was changed. New tooltip CSS is isolated
+from Claude's held src/style.css and main entry. Later updates will record the
+full browser/Pages/archive gate and actual PR delivery status.
