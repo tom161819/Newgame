@@ -6,7 +6,7 @@ handoffs; it cannot bypass required checks, holds, ownership or dependencies.
 ## Verified but unmerged Codex PRs
 
 None at this audit. PR22 is actually merged. No new PR number is invented for
-`codex/issue-47-m2-release`; its evidence documents are prepared on that branch.
+`codex/issue-47-m2-release`; its evidence documents and read-only post-deployment verifier are prepared on that branch.
 Required CI of a new PR head still needs to complete before a standard merge.
 
 The only public open PR observed was Claude PR31 (scheduler smoke test), explicitly
@@ -18,8 +18,8 @@ HOLD. It is excluded from the merge queue and must not be merged as assistance.
 - Prepared branch: `codex/issue-47-m2-release` from main65b4bf8a439686253dd5e933a8d5555e83c01922.
 - Exact CI-tested game source:65b4bf8a439686253dd5e933a8d5555e83c01922;
   Pages41924183243 **Success**, all nine mandatory release prerequisite commands
-  and full browser scope verified from the actual workflow. The branch only
-  adds documentation, not a second version of M2 mechanics.
+  and full browser scope verified from the actual workflow. The branch adds documentation and read-only release verification CI, not
+  another version of M2 mechanics.
 - Public tag: v0.3.0 really targets02a3a43ace8adc993aea7a392424d7cdf4e7dec9.
 - Blocker: managed API connection returns Forbidden; actual public Pages HTTPS
   returns CONNECT403. This is not a branch-protection exemption or evidence
@@ -31,7 +31,7 @@ HOLD. It is excluded from the merge queue and must not be merged as assistance.
   exact live head, required CI, reviews, conflicts and holds; standard merge.
   Then verify the tag-aware Pages deployment and live catalog/manifest. Full
   instructions/evidence: [Issue47 audit](verification/issue-47/README.md).
-- Recommended manual order: this metadata handoff first; Issue48+ only after
+- Recommended manual order: this evidence/verification-CI handoff first; Issue48+ only after
   real M2 closure. Never tag unmerged code or merge multiple PRs blindly.
 
 No live MERGE-HELP Issue or PR comment is claimed. A request cannot name a

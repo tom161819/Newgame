@@ -139,5 +139,32 @@
     "releaseSourceURL": "https://github.com/tom161819/Newgame/tree/v0.3.0",
     "onlyExplicitTagPushed": true,
     "publicArtifactVerification": "pending tag-aware Pages and actual public catalog/manifest"
+  },
+  "finalVerificationAttempt": {
+    "command": "npm run release:verify -- --pages-run=41924183243 --pages-commit=65b4bf8a439686253dd5e933a8d5555e83c01922",
+    "exitCode": 1,
+    "result": "failed at actual public artifact HTTPS; no successful release report produced",
+    "message": "Cannot verify the actual published release artifact through the configured HTTPS connection."
+  },
+  "postDeploymentVerification": {
+    "workflow": ".github/workflows/verify-published-release.yml",
+    "state": "prepared; YAML/Bash/static trust-boundary checks passed; first real CI execution pending main merge",
+    "permissions": {
+      "contents": "read"
+    },
+    "repeatsBuildOrGameTests": false,
+    "writesGitHubMetadataOrTags": false,
+    "targetedTests": {
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0,
+      "command": "node --test tests/deployed-archive.test.js tests/release-gate.test.js"
+    },
+    "workflowTagStepCasesPassed": [
+      "actual published tag",
+      "missing tag explicitly not verified",
+      "Git error aborts instead of reporting absent tag"
+    ],
+    "liveWorkflowResult": "not executed; requires standard PR merge and actual deployment"
   }
 }

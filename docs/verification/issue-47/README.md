@@ -26,8 +26,9 @@ Branch: `codex/issue-47-m2-release`, based on main65b4bf8a439686253dd5e933a8d555
   full native browser/Save-Load and Studio. No duplicate local npm ci, full test,
   build or browser run was started. The standalone release:gate CLI was **not**
   rerun; evidence explicitly credits the actual existing CI execution.
-- The candidate's only repository changes are audit/coordination documents.
-  Game/build/test/dependency paths stay byte-identical to the CI-tested source.
+- The candidate adds audit/coordination documents and a read-only post-deployment
+  verification workflow. Existing runtime, build configuration, test and
+  dependency files stay byte-identical to the CI-tested source.
 
 Structured proof: [evidence.json](evidence.json).
 Existing successful run: https://github.com/tom161819/Newgame/actions/runs/41924183243
@@ -53,12 +54,39 @@ retry the same denied API or use private endpoints/proxies to bypass policy.
 The final public-catalog HTTPS request also fails at CONNECT403. Use the ordinary
 supported connection of an authorized helper for this read, not a false pass.
 
+## Read-only post-deployment verifier prepared
+
+`.github/workflows/verify-published-release.yml` is a normal post-deployment
+check after a successful Pages **main push**. It executes reviewed verifier code
+from the default branch, checks the event's actual deployed SHA/run, and calls
+the existing strict release:verify. It fetches the actual public catalog and
+manifest; its JSON success evidence is retained in the job summary.
+
+Permissions are contents:read only; there are no Issue/PR/tag/main writes. No
+install, build, game tests, Studio smoke or archive staging is repeated. No
+retry loop masks Forbidden or other failures. Missing current milestone tags
+are explicitly reported as **not verified**, never as a successful release.
+The report header is written only after verification exits0 and its report
+file exists. Older cancelled/superseded Pages runs do not trigger this check.
+
+YAML, trusted-main event guards, pinned checkout/setup-node actions, read-only
+permissions and all Bash blocks were checked locally. All13 existing verifier/gate
+regressions passed. The exact workflow tag step also passed against the real
+repository, an empty-tag Git fixture and an actual Git error (fail closed).
+No dependencies were installed. The workflow itself still requires a real main merge
+and a real first run. It is not claimed executed or successful in advance.
+
+Actual standalone release:verify against41924183243 was attempted once after
+publishing the tag. The tag/notes/archive checks passed; it failed exactly at
+public artifact HTTPS: `Cannot verify the actual published release artifact
+through the configured HTTPS connection.` No success report was produced.
+
 ## Safe helper / manual handoff
 
 1. Re-read live Issue47, main, this branch's exact head and open PRs. Avoid duplicate
    claims or requests. Record STARTED or blocked status on the existing Issue
    using an integration that can actually write; Codex could not apply it.
-2. Open a **documentation/evidence** PR from this existing branch if none exists.
+2. Open a **release evidence/read-only CI** PR from this existing branch if none exists.
    No duplicate functional M2 PR. Recheck its live head, required checks, reviews,
    branch protection and dependencies. Old green CI is not proof of green checks
    for a new PR head. Standard merge commit only after all required checks pass.
@@ -66,8 +94,10 @@ supported connection of an authorized helper for this read, not a false pass.
    authorized helper may run the existing Pages workflow on main. Verify the
    successful run contains the tested commit or a newer descendant; a cancelled
    superseded deployment is not a failure. Never push directly to main.
-4. Verify actual public catalog and manifest, then run release:verify with the
-   real successful run/full SHA. Record the real results and final release report.
+4. The new verifier should run after that actual successful main-push deployment;
+   inspect its real successful run and JSON summary. It must prove the actual
+   catalog/manifest/tag/source checks. Record the resulting final release report
+   (or perform the same strict release:verify using the real run/full SHA).
 5. Only after all release conditions pass: update progress/Issue47 to done and
    close it; re-evaluate and unlock **only Issue48**. Later tasks stay blocked.
 
