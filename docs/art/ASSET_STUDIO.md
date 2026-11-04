@@ -126,7 +126,7 @@ this.add.image(centre.x, centre.y, 'watchtower-round@v1')
 
 ### Převzetí schváleného assetu do hry
 
-Takto se do hry dostala věž `watchtower-square` a pánev `torch-post-brazier`:
+Takto se do hry dostala věž `watchtower-square` a pánev `torch-post-brazier`. Výrobní budovy (statek, sýpka, pekárna, mlýn, sklad, lovecká chata, dřevorubecká chata, tavírna) mají hodnoty z metadat v jednom souboru `src/data/objects/approvedArt.js`, který se v `src/data/objects/index.js` aplikuje na definice. Codexovy datové soubory tak zůstávají beze změny a procedurální renderer slouží jako záloha.
 
 1. Zapsat schválení do `art/approvals.json` (stav `approved`, `preferred`, `specHash`).
 2. Zkopírovat `art/sprites/<asset>/<varianta>.v<verze>.png` a případnou `.front.png` beze změny do `public/assets/buildings/<objekt>/`.

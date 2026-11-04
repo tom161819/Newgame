@@ -283,3 +283,22 @@ test('the game uses the approved grass and worn-path tiles byte for byte with th
     assert.equal(d.artSource, 'art/sprites/worn-path/worn-path-moss.v1.json');
   }
 });
+
+test('approved production buildings use their Asset Studio exports byte for byte with anchors and lights', async () => {
+  const { APPROVED_BUILDING_ART } = await import('../src/data/objects/approvedArt.js');
+  const definitions = new Map(objectDefinitions.map(d => [d.id, d]));
+  assert.ok(Object.keys(APPROVED_BUILDING_ART).length >= 8);
+  for (const [gameId, art] of Object.entries(APPROVED_BUILDING_ART)) {
+    const definition = definitions.get(gameId), meta = json(art.artSource), repo = approvals.assets[meta.assetId];
+    assert.equal(definition.renderMode, 'sprite', gameId);
+    assert.equal(repo.preferred, meta.variantId, `${gameId}: the game uses the preferred variant`);
+    assert.equal(repo.variants[meta.variantId].status, 'approved');
+    assert.equal(repo.variants[meta.variantId].specHash, meta.specHash);
+    assert.equal(catalog.studio.find(a => a.id === meta.assetId).variants.find(v => v.id === meta.variantId).hash, meta.specHash);
+    assert.deepEqual([definition.width, definition.height], [meta.footprint.width, meta.footprint.height], `${gameId}: footprint matches`);
+    assert.ok(readFileSync(path.join(root, `public${definition.sprite}`)).equals(readFileSync(path.join(root, `art/sprites/${meta.assetId}/${meta.variantId}.v${meta.version}.png`))), `${gameId}: sprite equals the export`);
+    assert.deepEqual(definition.origin, meta.baseOrigin);
+    assert.equal(definition.visualHeight, meta.visualHeight);
+    assert.deepEqual(definition.lights ?? [], meta.gameLights);
+  }
+});
