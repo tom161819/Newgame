@@ -12,8 +12,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| M2 release verification: deterministic native fixtures | Codex | `codex/m2-smelting-smoke` from mainb554b4e | PR15 and archive PR18 merged; follow-up in verification | Pages41877748443 nowSuccess. Fix Smelter observation ordering and real blueprint clicks covered by staffing DOM controls; retain stock/XP/Save14 checks.456model tests pass. Tag remains local; master11 and C01–C08 unstarted. | `scripts/smelting-smoke.mjs`, `scripts/building-menu-smoke.mjs`, `tests/smelting.test.js`, release/progress/coordination docs. No gameplay, graphics, save schema or immutable archive edits. |
-| V01 runtime, V02, V03 (visual master tasks) | Claude | not started | — | Waiting for Codex C01 (V01), C06/C07 (V02), C08 (V03) | will hold `src/game/TerrainRenderer.js`, `src/game/TreeView.js`, `src/game/MapMemoryRenderer.js` for V01; see `docs/art/VISUAL_PROGRESS.md` |
+| M2 release verification: deterministic native fixtures | Codex | `codex/m2-smelting-smoke`, now integrating main630caf1 | PR15/18 merged; follow-up in verification | Original base456models/full native/replay/72archive HTTP all pass. Preserve Claude's merged V01 and verify the combined source. Tag remains local; master11 and C01–C08 unstarted. | `scripts/smelting-smoke.mjs`, `scripts/building-menu-smoke.mjs`, `tests/smelting.test.js`, release/progress/coordination docs. No Codex gameplay, graphics, save schema or immutable archive edits. |
+| V02, V03 studio concepts (military buildings, equipment, soldiers) | Claude | `claude/military-concepts-studio` (next) | — | Draft concepts on assumed ids; final ids follow Codex C06–C08 | `studio/**`, `art/**`, `docs/art/**` |
 
 ## Kept backups (do not delete without the developer)
 
@@ -22,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#19](https://github.com/tom161819/Newgame/pull/19) Gradual and uneven seasonal terrain/tree transitions (Claude), merged main630caf1. Started before C01 at the developer's request; preserved by Codex integration.
 - 2026-11-04 [#18](https://github.com/tom161819/Newgame/pull/18) Actual M2 source archive f053be1 (72 snapshots) and original follow-up CODEX_MASTER C01–C08 queue (Codex), merged mainb554b4e. Release verification/tag remains active above.
 - 2026-11-04 [#15](https://github.com/tom161819/Newgame/pull/15) M2 v0.3.0 release source, final neighbouring-Quarry validation and autonomous milestone publication (Codex), merged main7595b80. Final tag/archive verification remains active above.
 - 2026-11-04 [#16](https://github.com/tom161819/Newgame/pull/16) V01 studio part: seasonal ground, oak and pine, uneven transition preview (Claude). Draft only; the in-game transition waits for Codex C01.
