@@ -345,4 +345,19 @@ test('untouched grass uses the approved season-ground tiles for spring, autumn a
   }
   // Summer is the lush set already used for grass_normal.
   assert.equal(json('art/sprites/season-ground/season-ground-summer.v1.json').specHash, json('art/sprites/grass-ground/grass-ground-lush.v1.json').specHash);
+test('villagers use the approved looks in eight directions, chosen by profession and name', async () => {
+  const { APPROVED_VILLAGER_ART, PROFESSION_LOOKS, FACING_INDEX, villagerSex } = await import('../src/data/objects/approvedArt.js');
+  assert.deepEqual(Object.values(FACING_INDEX).sort(), [0, 1, 2, 3, 4, 5, 6, 7]);
+  for (const [look, art] of Object.entries(APPROVED_VILLAGER_ART)) {
+    const meta = json(art.artSource);
+    assert.equal(approvals.assets[meta.assetId].variants[look]?.status, 'approved', look);
+    assert.equal(approvals.assets[meta.assetId].variants[look].specHash, meta.specHash);
+    assert.equal(meta.facings.length, 8);
+    for (let k = 0; k < 8; k++) {
+      assert.ok(readFileSync(path.join(root, `public${art.base}.facing-${k}.png`)).equals(readFileSync(path.join(root, `art/sprites/${meta.assetId}/${look}.v1.facing-${k}.png`))), `${look} ${k}`);
+      assert.deepEqual(art.origins[k], meta.facings[k].origin);
+    }
+  }
+  for (const [profession, bySex] of Object.entries(PROFESSION_LOOKS)) for (const look of Object.values(bySex)) assert.ok(APPROVED_VILLAGER_ART[look], `${profession}: ${look} is approved and exported`);
+  assert.deepEqual(['Matěj', 'Anna', 'Jakub 2', 'Eliška', 'Marie', 'Jan', 'Klára 3'].map(villagerSex), ['male', 'female', 'male', 'female', 'female', 'male', 'female']);
 });
