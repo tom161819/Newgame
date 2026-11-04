@@ -4,7 +4,7 @@ Claude's visual master tasks (V01–V03) and what they wait for. Rules: [AGENTS.
 
 | Task | State | Depends on | Notes |
 |---|---|---|---|
-| V01 studio part: seasonal ground, oak and pine, transition preview | Done in `claude/season-studio-concepts` | none (studio only) | Draft variants in the studio; `seasonBlend` proposes the uneven per-tile change. |
+| V01 studio part: seasonal ground, oak and pine, transition preview | Done, [#16](https://github.com/tom161819/Newgame/pull/16) | none (studio only) | Draft variants in the studio; `seasonBlend` proposes the uneven per-tile change. |
 | V01 runtime: gradual season change in the game | Waiting | Codex C01 merged | Must touch `TerrainRenderer`, `TreeView`, `MapMemoryRenderer`; starts only when no Codex task holds them. Plan below. |
 | V02 military buildings and equipment concepts | Waiting | Codex C06 (ids, footprints) and C07 (final building definitions) | Bowyer, swordsmith, armorer, armory, stables, equipment icons; at least 3 variants per key building. |
 | V03 four soldier classes | Waiting | Codex C08 (unit registry, slots, directions) | Archer, soldier, swordsman, knight on a horse; builds on the `figure` recipe and tilted parts. |
