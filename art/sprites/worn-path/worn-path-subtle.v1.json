@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "assetId": "worn-path",
+  "variantId": "worn-path-subtle",
+  "name": "Soft footpath",
+  "category": "terrain",
+  "version": 1,
+  "specHash": "afaf7fe8",
+  "generator": "ground",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 288,
+  "height": 144,
+  "anchor": {
+    "x": 144,
+    "y": 72
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.5
+  },
+  "footprint": {
+    "width": 6,
+    "height": 3
+  },
+  "base": {
+    "x": 192,
+    "y": 144
+  },
+  "baseOrigin": {
+    "x": 0.66667,
+    "y": 1
+  },
+  "visualHeight": 144,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0,
+  "lights": [],
+  "surface": {
+    "mode": "path",
+    "tileWidth": 64,
+    "tileHeight": 32,
+    "frames": 4,
+    "frameMeaning": "wear levels 0–3 (0 = untouched grass)",
+    "gameWear": [
+      {
+        "level": 1,
+        "color": "#5e7a3f",
+        "edge": "#628243",
+        "width": 4
+      },
+      {
+        "level": 2,
+        "color": "#566a3b",
+        "edge": "#5d7840",
+        "width": 7
+      },
+      {
+        "level": 3,
+        "color": "#5c5139",
+        "edge": "#5d6640",
+        "width": 10
+      }
+    ]
+  }
+}

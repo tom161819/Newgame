@@ -12,8 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| Approved tower and brazier in the game | Claude | `claude/approved-tower-brazier` | — | In progress | `src/data/objects/buildings.js` (tower), `src/data/objects/lighting.js`, `src/data/objects/index.js`, `src/data/experience.js` (brazier XP), `src/systems/ObjectRegistry.js` (lights validation), `src/systems/SpriteViews.js` (pixel hit test), `src/systems/LightSourceSystem.js`, `src/game/LitBuildingView.js`, `src/game/GameScene.js` (3 lines), `public/assets/buildings/{tower,brazier}/`, related tests |
-| Stage10 Quarry Placement & Iron Smelter | Codex | `codex/stage-10-smelter` from main97b3381 | Not yet created; API policy unchanged | PhaseA/B verified:434 tests/build/targeted native furnace and Save14. Current main03a3de3/Claude PR10 integrated with both additions retained; 437/437 combined tests and Pages build pass; full native gate pending. User now authorizes resolving routine conflicts autonomously; no conflict confirmation required. Visual Polish is Claude-owned by user instruction. | New smelting definitions/assets/tests; data jobs/workplaces/recipes/economy; existing production/logistics/storage/skill/validation/panel; smokes and own progress/docs. Necessary shared edits: objects/index registry and experience reward table, preserving Claude graphics/brazier changes. Avoid Studio/art, SpriteViews/renderer, tower definition and GameScene graphics. |
+| Visual polish and Asset Studio concepts (phases A–E) | Claude | `claude/visual-polish-and-asset-studio` | [#12](https://github.com/tom161819/Newgame/pull/12) | Verified, merging | `index.html` (game layout), `src/style.css`, `src/main.js`, `src/ui/CompactHud.js`, `package.json` (fonts), `src/game/ConstructionView.js`, `src/game/ConstructionDust.js`, `src/game/TerrainRenderer.js`, `src/systems/AssetManager.js` and `src/systems/ObjectRegistry.js` (terrain `spriteVariants`), `studio/**`, `art/**`, `docs/art/**`. Necessary edit of Codex's `scripts/zoom-smoke.mjs`: it runs at 1440×900 so the 0.25× floor stays reachable with the taller map. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -22,6 +21,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#11](https://github.com/tom161819/Newgame/pull/11) Stage 10 Quarry placement and Iron Smelter, Save schema 14 (Codex).
+- 2026-11-04 [#10](https://github.com/tom161819/Newgame/pull/10) Approved watchtower and Brazier in the game, runtime flames and light sources (Claude).
 - 2026-11-04 [#9](https://github.com/tom161819/Newgame/pull/9) Stage 09 Daily Resource Statistics & Ledger, Save schema 13 (Codex).
 - 2026-11-04 [#8](https://github.com/tom161819/Newgame/pull/8) Asset Studio recipes: house, oak, pine, wall, quarry (Claude).
 - 2026-11-04 [#7](https://github.com/tom161819/Newgame/pull/7) Asset Studio published on GitHub Pages under `/studio/` (Claude).

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-04T13:00:36.000Z",
+  "updatedAt": "2026-11-04T19:00:00.000Z",
   "note": "Committed review state for Asset Studio. Export it from the studio and commit it through a pull request; the studio never writes to GitHub.",
   "assets": {
     "watchtower": {
@@ -26,6 +26,138 @@
           "note": "Approved by the developer on 2026-11-04 and integrated into the game.",
           "updatedAt": "2026-11-04T13:00:36.000Z",
           "approvedAt": "2026-11-04T13:00:36.000Z"
+        }
+      }
+    },
+    "grass-ground": {
+      "preferred": "grass-ground-lush",
+      "variants": {
+        "grass-ground-lush": {
+          "status": "review",
+          "version": 1,
+          "specHash": "3800b976",
+          "note": "Proposed by Claude for review; not used by the game until approved.",
+          "updatedAt": "2026-11-04T18:00:00.000Z"
+        }
+      }
+    },
+    "worn-path": {
+      "preferred": "worn-path-moss",
+      "variants": {
+        "worn-path-moss": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8030f0cf",
+          "note": "Proposed by Claude for review; not used by the game until approved.",
+          "updatedAt": "2026-11-04T18:00:00.000Z"
+        }
+      }
+    },
+    "farmstead": {
+      "preferred": "farmstead-thatched",
+      "variants": {
+        "farmstead-thatched": {
+          "status": "review",
+          "version": 1,
+          "specHash": "5e606ee1",
+          "note": "Proposed by Claude for review; not used by the game until approved.",
+          "updatedAt": "2026-11-04T19:00:00.000Z"
+        }
+      }
+    },
+    "granary-store": {
+      "preferred": "granary-store-raised",
+      "variants": {
+        "granary-store-raised": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8b920f31",
+          "note": "Proposed by Claude for review; not used by the game until approved.",
+          "updatedAt": "2026-11-04T19:00:00.000Z"
+        }
+      }
+    },
+    "bakery-house": {
+      "preferred": "bakery-house-yard-oven",
+      "variants": {
+        "bakery-house-yard-oven": {
+          "status": "review",
+          "version": 1,
+          "specHash": "71125ed5",
+          "note": "Proposed by Claude for review; not used by the game until approved.",
+          "updatedAt": "2026-11-04T19:00:00.000Z"
+        }
+      }
+    },
+    "windmill": {
+      "preferred": "windmill-tower",
+      "variants": {
+        "windmill-tower": {
+          "status": "review",
+          "version": 1,
+          "specHash": "dfe4b764",
+          "note": "Proposed by Claude for review; not used by the game until approved.",
+          "updatedAt": "2026-11-04T19:00:00.000Z"
+        }
+      }
+    },
+    "smelter": {
+      "preferred": "smelter-bloomery",
+      "variants": {
+        "smelter-bloomery": {
+          "status": "review",
+          "version": 1,
+          "specHash": "b3a0419e",
+          "note": "Proposed by Claude for review; not used by the game until approved.",
+          "updatedAt": "2026-11-04T19:00:00.000Z"
+        }
+      }
+    },
+    "warehouse-store": {
+      "preferred": "warehouse-store-timber",
+      "variants": {
+        "warehouse-store-timber": {
+          "status": "review",
+          "version": 1,
+          "specHash": "3d08139f",
+          "note": "Proposed by Claude for review; not used by the game until approved.",
+          "updatedAt": "2026-11-04T19:00:00.000Z"
+        }
+      }
+    },
+    "hunting-lodge": {
+      "preferred": "hunting-lodge-log",
+      "variants": {
+        "hunting-lodge-log": {
+          "status": "review",
+          "version": 1,
+          "specHash": "29c42966",
+          "note": "Proposed by Claude for review; not used by the game until approved.",
+          "updatedAt": "2026-11-04T19:00:00.000Z"
+        }
+      }
+    },
+    "lumber-camp": {
+      "preferred": "lumber-camp-hut",
+      "variants": {
+        "lumber-camp-hut": {
+          "status": "review",
+          "version": 1,
+          "specHash": "fb16ec6c",
+          "note": "Proposed by Claude for review; not used by the game until approved.",
+          "updatedAt": "2026-11-04T19:00:00.000Z"
+        }
+      }
+    },
+    "scaffold": {
+      "preferred": "scaffold-mid",
+      "variants": {
+        "scaffold-mid": {
+          "status": "review",
+          "version": 1,
+          "specHash": "50ccd563",
+          "note": "Proposed by Claude for review; not used by the game until approved.",
+          "updatedAt": "2026-11-04T19:00:00.000Z"
         }
       }
     }

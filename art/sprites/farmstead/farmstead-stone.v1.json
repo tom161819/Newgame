@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "farmstead",
+  "variantId": "farmstead-stone",
+  "name": "Stone farmhouse with cart",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "af2a97c1",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 134,
+  "anchor": {
+    "x": 65,
+    "y": 100
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.74627
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 132
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98507
+  },
+  "visualHeight": 132,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.09,
+  "lights": []
+}

@@ -22,7 +22,7 @@ export class TerrainRenderer {
     this.createTextures();
     this.outcrop=registry.require('rock_outcrop');
     this.wallTexture=assets?.textureFor(this.outcrop.id,'terrain-wall')??'terrain-wall';
-    this.wearTextures=PATH_WEAR.terrainIds.map(id=>({key:assets?.hasTexture(id)?assets.textureKey(id):this.groundTextures[0].key}));
+    this.wearTextures=PATH_WEAR.terrainIds.map(id=>({key:assets?.hasTexture(id)?assets.textureKey(id):this.groundTextures[0].key,variants:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer))}));
   }
 
   setPathWear(system){this.wear=system;this.unsubscribeWear=system.subscribe(tile=>this.invalidateArea([tile]));}
@@ -52,6 +52,7 @@ export class TerrainRenderer {
       const neighborVisual=this.registry.require(PATH_WEAR.terrainIds[other]).visual,width=Math.min(visual.pathWidth,neighborVisual.pathWidth);
       const end={x:(dx-dy)*16,y:(dx+dy)*16},bend=((terrainHash(x+dx,y+dy)%5)-2)*.35;
       const line=()=>{context.beginPath();context.moveTo(0,0);context.quadraticCurveTo(end.x*.5+bend,end.y*.5-bend,end.x,end.y);context.stroke();};
+      for(let i=visual.pathSoftness??0;i>0;i--){context.strokeStyle=visual.pathEdge;context.lineWidth=width+3+i*3;context.globalAlpha=.16;line();}
       context.strokeStyle=visual.pathEdge;context.lineWidth=width+3;context.globalAlpha=.6;line();
       context.strokeStyle=visual.pathColor;context.lineWidth=width;context.globalAlpha=1;line();
     }
@@ -80,7 +81,7 @@ export class TerrainRenderer {
           const polygon=()=>{context.beginPath();context.moveTo(point.x-left-32,point.y-origin.y);context.lineTo(point.x-left,point.y-origin.y-16);context.lineTo(point.x-left+32,point.y-origin.y);context.lineTo(point.x-left,point.y-origin.y+16);context.closePath();};
           context.save();polygon();context.clip();context.clearRect(point.x-left-32,point.y-origin.y-16,64,32);
           if(state===VISIBILITY.UNEXPLORED){context.fillStyle='#000';polygon();context.fill();context.restore();continue;}
-          const entry=this.wear?this.wearTextures[level]:this.groundTextures[terrainHash(x,y)%this.groundTextures.length];
+          const wear=this.wear?this.wearTextures[level]:null,entry=wear?(wear.variants.length?{key:wear.variants[terrainHash(x,y)%wear.variants.length]}:wear):this.groundTextures[terrainHash(x,y)%this.groundTextures.length];
           const frame=this.scene.textures.get(entry.key).get(entry.frame);
           if(state===VISIBILITY.EXPLORED)context.filter=`grayscale(${(1-FOG_STYLE.saturation)*100}%) brightness(${(this.fog?.brightness(tile)??FOG_STYLE.brightness)*100}%)`;
           context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,point.x-left-32,point.y-origin.y-16,64,32);

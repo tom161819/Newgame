@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "bakery-house",
+  "variantId": "bakery-house-stall",
+  "name": "Stone bakery with bread stall",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "312c474f",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 135,
+  "anchor": {
+    "x": 65,
+    "y": 101
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.74815
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 133
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98519
+  },
+  "visualHeight": 133,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -14.72,
+      "y": -70.52,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 2.19,
+  "lights": [
+    {
+      "type": "torch",
+      "x": 50.28,
+      "y": 62.48,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

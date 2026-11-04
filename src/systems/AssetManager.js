@@ -23,7 +23,7 @@ export class AssetManager {
   queue(definitions=this.registry.all()) {
     let count=0;
     for(const definition of definitions){
-      for(const [layer,path]of [['main',definition.sprite],['front',definition.frontSprite]]){
+      for(const [layer,path]of [['main',definition.sprite],['front',definition.frontSprite],...(definition.spriteVariants??[]).map((p,i)=>[`variant-${i}`,p])]){
         if(!path)continue;
         const key=this.key(definition.id,layer);
         if(this.hasTexture(definition.id,layer)||this.queued.has(key))continue;

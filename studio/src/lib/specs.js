@@ -5,6 +5,7 @@ import { specHash } from './hash.js';
 export const CATEGORIES = Object.freeze([
   { id: 'buildings', label: 'Buildings' },
   { id: 'units', label: 'Units' },
+  { id: 'terrain', label: 'Terrain' },
   { id: 'trees', label: 'Trees' },
   { id: 'nature', label: 'Nature' },
   { id: 'resources', label: 'Resources' },
@@ -20,7 +21,7 @@ export function studioCategoryForGameObject(definition) {
     case 'building': return 'buildings';
     case 'character': case 'animal': return 'units';
     case 'resource': return 'resources';
-    case 'terrain': return 'nature';
+    case 'terrain': return 'terrain';
     case 'decoration': return /rock|outcrop|deposit|bush/.test(definition.id) ? 'nature' : 'decorations';
     default: return 'decorations';
   }
@@ -51,6 +52,7 @@ export function validateAssetSpec(spec, { generators, style, path = spec?.id }) 
     if (!Number.isInteger(variant?.version) || variant.version < 1) fail(`${where}: version must be a positive integer.`);
     if (!variant?.spec || typeof variant.spec !== 'object') { fail(`${where}: spec object is required.`); continue; }
     if (!generator || !footprint) continue;
+    if (generator.kind === 'surface') { for (const problem of generator.validate(variant.spec, { style })) fail(`${where}: ${problem}`); continue; }
     try {
       const model = generator.build(variant.spec, { footprint, style });
       for (const problem of checkModel(model, { footprint, style })) fail(`${where}: ${problem}`);
@@ -108,6 +110,7 @@ export function assetPaths(asset, variant) {
     spec: base,
     generator: `studio/src/generators/${asset.generator}.js`,
     sprite: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.png` : null,
+    spriteSheet: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.tiles.png` : null,
     spriteFront: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.front.png` : null,
     spriteMeta: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.json` : null,
   };

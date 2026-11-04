@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "id": "hauler",
+  "name": "Hauler",
+  "category": "units",
+  "description": "Porter: grey wool, carrying frame with a crate on the back. Concept for worker looks by profession; the game still draws one worker figure.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "hauler-male",
+      "name": "Hauler (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_grey",
+        "legs": "cloth_wool",
+        "headgear": "hood",
+        "headgearMaterial": "cloth_wool",
+        "hair": "hair_brown",
+        "tool": "carrier",
+        "build": 1.1
+      }
+    },
+    {
+      "id": "hauler-female",
+      "name": "Hauler (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_wool",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_ochre",
+        "hair": "hair_dark",
+        "apron": "cloth_linen",
+        "tool": "carrier"
+      }
+    }
+  ]
+}

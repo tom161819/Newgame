@@ -22,13 +22,34 @@
     "footprintMargin": 0.08,
     "canopyOverhang": 0.3,
     "ranges": {
-      "tower": [3.2, 4.8],
-      "house": [1.6, 2.8],
-      "wall": [1.4, 2.0],
-      "tree": [1.6, 3.6],
-      "resource": [0.15, 0.6],
-      "decoration": [0.3, 1.8],
-      "quarry": [1.0, 2.4]
+      "tower": [
+        3.2,
+        4.8
+      ],
+      "house": [
+        1.6,
+        2.8
+      ],
+      "wall": [
+        1.4,
+        2.0
+      ],
+      "tree": [
+        1.6,
+        3.6
+      ],
+      "resource": [
+        0.15,
+        0.6
+      ],
+      "decoration": [
+        0.3,
+        1.8
+      ],
+      "quarry": [
+        1.0,
+        2.4
+      ]
     }
   },
   "palette": {
@@ -55,32 +76,311 @@
     "leaf_light": "#7a9846",
     "leaf_dark": "#435f2a",
     "pine": "#3c5a38",
-    "rock": "#8b8374"
+    "rock": "#8b8374",
+    "meadow_deep": "#466c2e",
+    "meadow": "#5a8436",
+    "meadow_light": "#78a24a",
+    "meadow_tip": "#93b65c",
+    "pasture": "#74854b",
+    "moss": "#56723a",
+    "olive_dark": "#4d5e34",
+    "soil_dark": "#574a36",
+    "soil": "#62553b",
+    "clover": "#eeeadb",
+    "buttercup": "#e2c656",
+    "heather": "#b6a2d2",
+    "skin": "#d9a782",
+    "skin_tan": "#b07c5a",
+    "hair_dark": "#3b2a1e",
+    "hair_brown": "#6b4528",
+    "hair_auburn": "#8a4a2a",
+    "hair_blond": "#c9a560",
+    "hair_grey": "#9a958c",
+    "linen": "#e3dcc8",
+    "wool": "#8a6d4e",
+    "cloth_brown": "#6b5038",
+    "cloth_green": "#5b7640",
+    "cloth_forest": "#3f5a35",
+    "cloth_blue": "#4a5f80",
+    "cloth_red": "#8d3a2e",
+    "cloth_ochre": "#b88a3e",
+    "cloth_grey": "#7c7a72",
+    "leather": "#6e4a2c",
+    "ore": "#7d5a45"
   },
   "materials": {
-    "stone": { "color": "stone", "texture": "bricks", "repeat": 1.2, "variation": 0.1, "description": "Coursed field stone with dark mortar lines. Main walls of towers, keeps and walls." },
-    "stone_light": { "color": "stone_light", "texture": "bricks", "repeat": 1.4, "variation": 0.08, "description": "Dressed limestone for important buildings and trims." },
-    "stone_dark": { "color": "stone_dark", "texture": "bricks", "repeat": 1.0, "variation": 0.12, "description": "Foundations, plinths and wet lower courses." },
-    "wood": { "color": "wood", "texture": "planks", "repeat": 1.0, "variation": 0.12, "description": "Sawn timber: galleries, hoardings, walls of huts." },
-    "wood_dark": { "color": "wood_dark", "texture": "planks", "repeat": 0.8, "variation": 0.1, "description": "Doors, beams, posts and shutters." },
-    "roof_shingle": { "color": "roof_shingle", "texture": "shingles", "repeat": 1.0, "variation": 0.12, "description": "Wooden shingle roofs." },
-    "roof_tile": { "color": "roof_tile", "texture": "shingles", "repeat": 0.9, "variation": 0.1, "description": "Fired clay roofs for wealthy buildings." },
-    "thatch": { "color": "thatch", "texture": "noise", "repeat": 1.0, "variation": 0.14, "description": "Straw roofs of farms and peasant houses." },
-    "iron": { "color": "iron", "texture": "none", "repeat": 1, "variation": 0.04, "description": "Brackets, hinges, braziers and bands." },
-    "opening": { "color": "mortar", "texture": "none", "repeat": 1, "variation": 0, "description": "Arrow slits and dark window openings." },
-    "banner": { "color": "banner_red", "texture": "none", "repeat": 1, "variation": 0.05, "description": "Cloth banners in the kingdom colour." },
-    "plaster": { "color": "plaster", "texture": "noise", "repeat": 1.2, "variation": 0.06, "description": "Lime plaster between timber frames." },
-    "bark": { "color": "bark", "texture": "planks", "repeat": 0.6, "variation": 0.14, "description": "Tree trunks and rough logs." },
-    "foliage": { "color": "leaf", "texture": "noise", "repeat": 0.8, "variation": 0.18, "description": "Broadleaf canopy, main mass." },
-    "foliage_light": { "color": "leaf_light", "texture": "noise", "repeat": 0.8, "variation": 0.16, "description": "Sunlit canopy clusters." },
-    "foliage_dark": { "color": "leaf_dark", "texture": "noise", "repeat": 0.8, "variation": 0.16, "description": "Shaded canopy clusters and hedges." },
-    "pine_needles": { "color": "pine", "texture": "noise", "repeat": 0.7, "variation": 0.18, "description": "Conifer tiers." },
-    "rock": { "color": "rock", "texture": "noise", "repeat": 1.0, "variation": 0.2, "description": "Natural rock outcrops and quarry faces." }
+    "stone": {
+      "color": "stone",
+      "texture": "bricks",
+      "repeat": 1.2,
+      "variation": 0.1,
+      "description": "Coursed field stone with dark mortar lines. Main walls of towers, keeps and walls."
+    },
+    "stone_light": {
+      "color": "stone_light",
+      "texture": "bricks",
+      "repeat": 1.4,
+      "variation": 0.08,
+      "description": "Dressed limestone for important buildings and trims."
+    },
+    "stone_dark": {
+      "color": "stone_dark",
+      "texture": "bricks",
+      "repeat": 1.0,
+      "variation": 0.12,
+      "description": "Foundations, plinths and wet lower courses."
+    },
+    "wood": {
+      "color": "wood",
+      "texture": "planks",
+      "repeat": 1.0,
+      "variation": 0.12,
+      "description": "Sawn timber: galleries, hoardings, walls of huts."
+    },
+    "wood_dark": {
+      "color": "wood_dark",
+      "texture": "planks",
+      "repeat": 0.8,
+      "variation": 0.1,
+      "description": "Doors, beams, posts and shutters."
+    },
+    "roof_shingle": {
+      "color": "roof_shingle",
+      "texture": "shingles",
+      "repeat": 1.0,
+      "variation": 0.12,
+      "description": "Wooden shingle roofs."
+    },
+    "roof_tile": {
+      "color": "roof_tile",
+      "texture": "shingles",
+      "repeat": 0.9,
+      "variation": 0.1,
+      "description": "Fired clay roofs for wealthy buildings."
+    },
+    "thatch": {
+      "color": "thatch",
+      "texture": "noise",
+      "repeat": 1.0,
+      "variation": 0.14,
+      "description": "Straw roofs of farms and peasant houses."
+    },
+    "iron": {
+      "color": "iron",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Brackets, hinges, braziers and bands."
+    },
+    "opening": {
+      "color": "mortar",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0,
+      "description": "Arrow slits and dark window openings."
+    },
+    "banner": {
+      "color": "banner_red",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Cloth banners in the kingdom colour."
+    },
+    "plaster": {
+      "color": "plaster",
+      "texture": "noise",
+      "repeat": 1.2,
+      "variation": 0.06,
+      "description": "Lime plaster between timber frames."
+    },
+    "bark": {
+      "color": "bark",
+      "texture": "planks",
+      "repeat": 0.6,
+      "variation": 0.14,
+      "description": "Tree trunks and rough logs."
+    },
+    "foliage": {
+      "color": "leaf",
+      "texture": "noise",
+      "repeat": 0.8,
+      "variation": 0.18,
+      "description": "Broadleaf canopy, main mass."
+    },
+    "foliage_light": {
+      "color": "leaf_light",
+      "texture": "noise",
+      "repeat": 0.8,
+      "variation": 0.16,
+      "description": "Sunlit canopy clusters."
+    },
+    "foliage_dark": {
+      "color": "leaf_dark",
+      "texture": "noise",
+      "repeat": 0.8,
+      "variation": 0.16,
+      "description": "Shaded canopy clusters and hedges."
+    },
+    "pine_needles": {
+      "color": "pine",
+      "texture": "noise",
+      "repeat": 0.7,
+      "variation": 0.18,
+      "description": "Conifer tiers."
+    },
+    "rock": {
+      "color": "rock",
+      "texture": "noise",
+      "repeat": 1.0,
+      "variation": 0.2,
+      "description": "Natural rock outcrops and quarry faces."
+    },
+    "skin": {
+      "color": "skin",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.02,
+      "description": "Faces and hands."
+    },
+    "skin_tan": {
+      "color": "skin_tan",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.02,
+      "description": "Weathered, sun-tanned skin."
+    },
+    "hair_dark": {
+      "color": "hair_dark",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Dark hair and beards."
+    },
+    "hair_brown": {
+      "color": "hair_brown",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Brown hair."
+    },
+    "hair_auburn": {
+      "color": "hair_auburn",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Auburn hair."
+    },
+    "hair_blond": {
+      "color": "hair_blond",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Fair hair."
+    },
+    "hair_grey": {
+      "color": "hair_grey",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Grey hair of elders."
+    },
+    "cloth_linen": {
+      "color": "linen",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Undyed linen: shirts, aprons, coifs, millers and bakers."
+    },
+    "cloth_wool": {
+      "color": "wool",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Undyed brown wool, the common tunic."
+    },
+    "cloth_brown": {
+      "color": "cloth_brown",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Dark brown hose and cloaks."
+    },
+    "cloth_green": {
+      "color": "cloth_green",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Green dye: foresters and hunters."
+    },
+    "cloth_forest": {
+      "color": "cloth_forest",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Deep green: woodcutters."
+    },
+    "cloth_blue": {
+      "color": "cloth_blue",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Woad blue, worn by townsfolk."
+    },
+    "cloth_red": {
+      "color": "cloth_red",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Madder red: royal soldiers."
+    },
+    "cloth_ochre": {
+      "color": "cloth_ochre",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Ochre: builders and farm workers."
+    },
+    "cloth_grey": {
+      "color": "cloth_grey",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Grey wool: miners and haulers."
+    },
+    "leather": {
+      "color": "leather",
+      "texture": "none",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Belts, boots, aprons, quivers and straps."
+    },
+    "ore": {
+      "color": "ore",
+      "texture": "noise",
+      "repeat": 0.6,
+      "variation": 0.18,
+      "description": "Iron ore: rusty brown rock."
+    }
   },
   "light": {
-    "sun": { "direction": [0.55, 1.0, 0.9], "color": "#fff0d4", "intensity": 2.6 },
-    "hemisphere": { "sky": "#d9e2ee", "ground": "#6d5c40", "intensity": 1.15 },
-    "shadow": { "opacity": 0.32, "mapSize": 2048 },
+    "sun": {
+      "direction": [
+        0.55,
+        1.0,
+        0.9
+      ],
+      "color": "#fff0d4",
+      "intensity": 2.6
+    },
+    "hemisphere": {
+      "sky": "#d9e2ee",
+      "ground": "#6d5c40",
+      "intensity": 1.15
+    },
+    "shadow": {
+      "opacity": 0.32,
+      "mapSize": 2048
+    },
     "rule": "One sun for every asset, from the front left. The left-front face is brightest, the right-front face is mid-tone, roofs catch the most light. Shadows fall back-right and are baked into the sprite at 32 % opacity."
   },
   "detail": {
@@ -91,13 +391,46 @@
     "colour": "Use palette materials only. New colours need a palette entry first."
   },
   "timeOfDay": {
-    "day": { "label": "Day", "ambient": "#ffffff", "lightScale": 0.12, "description": "Neutral. Sprites are authored for this state." },
-    "dusk": { "label": "Dusk", "ambient": "#d79f7d", "lightScale": 0.65, "description": "Warm, slightly darker; torches start to read." },
-    "night": { "label": "Night", "ambient": "#34406b", "lightScale": 1.0, "description": "Cool blue darkness; torches and fires carry the scene." }
+    "day": {
+      "label": "Day",
+      "ambient": "#ffffff",
+      "lightScale": 0.12,
+      "description": "Neutral. Sprites are authored for this state."
+    },
+    "dusk": {
+      "label": "Dusk",
+      "ambient": "#d79f7d",
+      "lightScale": 0.65,
+      "description": "Warm, slightly darker; torches start to read."
+    },
+    "night": {
+      "label": "Night",
+      "ambient": "#34406b",
+      "lightScale": 1.0,
+      "description": "Cool blue darkness; torches and fires carry the scene."
+    }
   },
   "lightSources": {
-    "torch": { "color": "#ffb25a", "radiusTiles": 3.2, "intensity": 0.95, "flicker": { "amplitude": 0.12, "speed": 7.0 }, "flameSize": 1.0 },
-    "brazier": { "color": "#ff9d4a", "radiusTiles": 4.2, "intensity": 1.0, "flicker": { "amplitude": 0.16, "speed": 5.5 }, "flameSize": 1.6 }
+    "torch": {
+      "color": "#ffb25a",
+      "radiusTiles": 3.2,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7.0
+      },
+      "flameSize": 1.0
+    },
+    "brazier": {
+      "color": "#ff9d4a",
+      "radiusTiles": 4.2,
+      "intensity": 1.0,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    }
   },
   "lightingModel": "Sprites carry daylight only. Time of day is applied at runtime by multiplying the scene with a light map: the light map is filled with the ambient colour and each light source is added as a coloured radial gradient. Flames are drawn after the multiply so they stay bright. No per-time-of-day sprites.",
   "animation": {
@@ -108,5 +441,19 @@
       "Units use eight directions with the same projection and light as buildings.",
       "Loops must be seamless and last 4 to 12 frames."
     ]
+  },
+  "terrain": {
+    "rule": "Ground is a flat 64 × 32 tile texture. Tiles of one set share a periodic colour field, so any two of them join without a seam.",
+    "grass": "Lively mid-greens with darker patches; blades 2–9 px at 1×, drawn as small tufts; flowers sparse and pale. Avoid yellow-brown dry grass as the default.",
+    "paths": "Wear goes from green through flattened dark green and olive to muted dark brown soil. Each stage is darker than the one before; no orange, red or bright tan (chroma at most 0.24).",
+    "overgrowth": "An unused path recovers stage by stage back to grass (src/data/pathWear.js: recovery after 3 days, 5 points a day), so every stage must also read as a path growing over."
+  },
+  "units": {
+    "rule": "Figures are 1.2 units tall (1.12 for women), face the camera and keep every part inside one tile.",
+    "readability": "A profession must read at 1× from three cues at once: headgear, the tool or load in hand, and the main garment colour. Avoid recoloured clones.",
+    "sexes": "Men wear a tunic over hose and may have a beard; women wear a long dress or kirtle, a coif or kerchief, often an apron. Tools and colours follow the profession, not the sex."
+  },
+  "props": {
+    "rule": "Every production building tells its trade with two or three props in its yard: sacks, barrels, crates, hay, logs, an oven, ore, tools. Props stay inside the footprint and below the eaves, so the building keeps a clear silhouette."
   }
 }

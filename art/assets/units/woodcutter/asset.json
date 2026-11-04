@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "woodcutter",
+  "name": "Woodcutter",
+  "category": "units",
+  "description": "Forester: deep green, hood, felling axe. Concept for worker looks by profession; the game still draws one worker figure.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "woodcutter-male",
+      "name": "Woodcutter (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_forest",
+        "legs": "cloth_brown",
+        "headgear": "hood",
+        "headgearMaterial": "cloth_green",
+        "hair": "hair_dark",
+        "beard": true,
+        "tool": "axe",
+        "build": 1.1
+      }
+    },
+    {
+      "id": "woodcutter-female",
+      "name": "Woodcutter (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_forest",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_green",
+        "hair": "hair_brown",
+        "hairStyle": "braid",
+        "tool": "axe",
+        "apron": "leather"
+      }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "hunter",
+  "variantId": "hunter-male",
+  "name": "Hunter (man)",
+  "category": "units",
+  "version": 1,
+  "specHash": "d737c5d5",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 64,
+  "anchor": {
+    "x": 33,
+    "y": 46
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.71875
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 62
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.96875
+  },
+  "visualHeight": 62,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.11,
+  "lights": []
+}

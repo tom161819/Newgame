@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "hunting-lodge",
+  "variantId": "hunting-lodge-log",
+  "name": "Log hunting lodge",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "29c42966",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 127,
+  "anchor": {
+    "x": 65,
+    "y": 93
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.73228
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 125
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98425
+  },
+  "visualHeight": 125,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.04,
+  "lights": []
+}
