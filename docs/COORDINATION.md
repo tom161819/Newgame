@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| Approved assets into the game, part 1: approvals and ground | Claude | `claude/approved-assets-ground` | this PR | Verified | `art/approvals.json`, `src/data/objects/terrain.js` (wear surfaces), `src/game/TerrainRenderer.js` (clip reach), `public/assets/terrain/**`, studio export of tiles. Next parts: production buildings, trees, scaffold, villagers, seasonal ground, quarry, wall. |
+| Approved assets into the game, part 2: production buildings | Claude | `claude/approved-assets-buildings` | this PR | Verified | `src/data/objects/approvedArt.js` (new), one `.map(withApprovedArt)` in `src/data/objects/index.js`, `public/assets/buildings/<id>/*.v1.png`. Part 1 (ground) merged in #23. Next: trees, scaffold, villagers, seasonal ground, quarry, wall. |
 | M2 final tag/archive and queued follow-up request | Codex | `codex/m2-release-archive` from main7595b80 | PR15 merged; actual archive draft PR creation fails: API Forbidden | Local artifact verified:455tests/full merged browser/Studio/72snapshots/2385HTTPfiles; formal gate refuses Pages41877748443 stillQueued. Tag only local, archive branch pushed. C01–C08 queued after master15, not started. | Release/archive metadata and new snapshot, queue/progress/coordination/verification docs, `docs/requests/CODEX_MASTER.md`, `docs/CODEX_PROGRESS.md`. No public tag or RELEASED claim until actual gates pass. |
 
 ## Kept backups (do not delete without the developer)
@@ -22,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#23](https://github.com/tom161819/Newgame/pull/23) Approved assets part 1: developer approvals (58 variants), lush grass and moss footpaths in the game (Claude).
 - 2026-11-04 [#20](https://github.com/tom161819/Newgame/pull/20) V02/V03 studio concepts: bowyer, swordsmith, armorer, armory, stables, equipment items and four soldier classes with an 8-direction sheet (Claude). Draft/Review on the C06–C08 ids; adjust when Codex fixes them.
 - 2026-11-04 [#19](https://github.com/tom161819/Newgame/pull/19) V01: seasons change gradually and unevenly across the map (Claude).
 - 2026-11-04 [#15](https://github.com/tom161819/Newgame/pull/15) M2 v0.3.0 release source, final neighbouring-Quarry validation and autonomous milestone publication (Codex), merged main7595b80. Final tag/archive verification remains active above.

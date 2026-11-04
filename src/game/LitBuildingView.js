@@ -29,6 +29,12 @@ export class LitBuildingView {
     }
   }
   paint(building, tint = null) { this.inner.paint(building, tint); this.base = towerBase(building); this.drawFlames(this.system?.seconds ?? 0); }
+  // The wrapped view's parts stay reachable (visibility checks, map memory, tests).
+  get back() { return this.inner.back; }
+  get front() { return this.inner.front; }
+  get body() { return this.inner.body; }
+  get footprint() { return this.inner.footprint; }
+  setData(...args) { this.inner.setData?.(...args); return this; }
   contains(x, y) { return this.inner.contains(x, y); }
   inView(view) { return this.inner.inView(view); }
   setVisible(value) { this.visible = !!value; this.inner.setVisible(value); this.flames.setVisible(value); return this; }
