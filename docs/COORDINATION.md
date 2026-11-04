@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| Approved assets into the game, part 4: scaffold | Claude | `claude/approved-assets-scaffold` | this PR | Verified | `src/game/ConstructionView.js`, `src/data/objects/approvedArt.js`, `public/assets/buildings/scaffold/`. Next: villagers, seasonal ground, quarry, wall. |
+| Approved assets into the game, part 5: villagers | Claude | `claude/approved-assets-villagers` | this PR | Verified | `src/game/HumanView.js`, `src/data/objects/approvedArt.js`, `public/assets/characters/villagers/`, studio facings export. Next: seasonal ground, quarry, wall. |
 | M2 final tag/archive and queued follow-up request | Codex | `codex/m2-release-archive` from main7595b80 | PR15 merged; actual archive draft PR creation fails: API Forbidden | Local artifact verified:455tests/full merged browser/Studio/72snapshots/2385HTTPfiles; formal gate refuses Pages41877748443 stillQueued. Tag only local, archive branch pushed. C01–C08 queued after master15, not started. | Release/archive metadata and new snapshot, queue/progress/coordination/verification docs, `docs/requests/CODEX_MASTER.md`, `docs/CODEX_PROGRESS.md`. No public tag or RELEASED claim until actual gates pass. |
 
 ## Kept backups (do not delete without the developer)
@@ -22,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#26](https://github.com/tom161819/Newgame/pull/26) Approved assets part 4: scaffolding by construction stage (Claude).
 - 2026-11-04 [#25](https://github.com/tom161819/Newgame/pull/25) Approved assets part 3: oaks and pines by growth stage and season (Claude).
 - 2026-11-04 [#24](https://github.com/tom161819/Newgame/pull/24) Approved assets part 2: eight production buildings with their studio art (Claude).
 - 2026-11-04 [#23](https://github.com/tom161819/Newgame/pull/23) Approved assets part 1: developer approvals (58 variants), lush grass and moss footpaths in the game (Claude).

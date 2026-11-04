@@ -9,6 +9,9 @@ import { browserRuntime } from './browser-runtime.mjs';
 import { buildStudio, serveStudio, root } from './studio-server.mjs';
 
 const only = process.argv.slice(2).filter(arg => !arg.startsWith('--'));
+// Approved figures are also exported in eight directions for the game's walking villagers.
+const approvals = JSON.parse(await (await import('node:fs/promises')).readFile(new URL('../art/approvals.json', import.meta.url), 'utf8'));
+const approvedVariant = (assetId, variantId) => approvals.assets?.[assetId]?.variants?.[variantId]?.status === 'approved';
 buildStudio();
 const server = await serveStudio();
 const runtime = await browserRuntime();
@@ -20,7 +23,9 @@ try {
   const assets = (await page.evaluate(() => window.assetStudio.assets())).filter(asset => !only.length || only.includes(asset.id));
   if (!assets.length) throw new Error(`No studio asset matches ${only.join(', ')}.`);
   for (const asset of assets) for (const variant of asset.variants) {
-    const result = await page.evaluate(([a, v]) => window.assetStudio.exportSprite(a, v), [asset.id, variant.id]);
+    const facings = asset.category === 'units' && approvedVariant(asset.id, variant.id);
+    const result = await page.evaluate(([a, v, f]) => window.assetStudio.exportSprite(a, v, { facings: f }), [asset.id, variant.id, facings]);
+    for (const [k, png] of result.facingPngs.entries()) await writeFile(path.join(root, result.paths.sprite.replace(/\.png$/, `.facing-${k}.png`)), Buffer.from(png.replace(/^data:image\/png;base64,/, ''), 'base64'));
     const png = Buffer.from(result.png.replace(/^data:image\/png;base64,/, ''), 'base64');
     await mkdir(path.join(root, path.dirname(result.paths.sprite)), { recursive: true });
     await writeFile(path.join(root, result.paths.sprite), png);

@@ -33,6 +33,45 @@ export const APPROVED_SCAFFOLD_ART=Object.freeze({
 });
 export const TIMBER_SCAFFOLD_BUILDINGS=Object.freeze(['farmhouse','granary','hunting_lodge','lumberjack_hut']);
 
+// Approved villager looks (art/sprites/<profession>/<variant>.v1.facing-<k>.png,
+// eight walking directions, origin = the studio anchor at the figure's feet).
+// Studio facing k: 0 faces the viewer (game SE), then turns towards screen right.
+export const APPROVED_VILLAGER_ART=Object.freeze({
+  'villager-male':{base:'/assets/characters/villagers/villager-male.v1',artSource:'art/sprites/villager/villager-male.v1.json',origins:[{"x":0.49254,"y":0.71429},{"x":0.49254,"y":0.71429},{"x":0.49254,"y":0.71429},{"x":0.49254,"y":0.71429},{"x":0.49254,"y":0.70968},{"x":0.49254,"y":0.71429},{"x":0.49254,"y":0.71429},{"x":0.49254,"y":0.71429}]},
+  'villager-female':{base:'/assets/characters/villagers/villager-female.v1',artSource:'art/sprites/villager/villager-female.v1.json',origins:[{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492}]},
+  'woodcutter-male':{base:'/assets/characters/villagers/woodcutter-male.v1',artSource:'art/sprites/woodcutter/woodcutter-male.v1.json',origins:[{"x":0.49254,"y":0.72727},{"x":0.49254,"y":0.72308},{"x":0.49254,"y":0.72308},{"x":0.49254,"y":0.71429},{"x":0.49254,"y":0.71429},{"x":0.49254,"y":0.71429},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.72308}]},
+  'woodcutter-female':{base:'/assets/characters/villagers/woodcutter-female.v1',artSource:'art/sprites/woodcutter/woodcutter-female.v1.json',origins:[{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492}]},
+  'miner-male':{base:'/assets/characters/villagers/miner-male.v1',artSource:'art/sprites/miner/miner-male.v1.json',origins:[{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875}]},
+  'miner-female':{base:'/assets/characters/villagers/miner-female.v1',artSource:'art/sprites/miner/miner-female.v1.json',origins:[{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492}]},
+  'hunter-male':{base:'/assets/characters/villagers/hunter-male.v1',artSource:'art/sprites/hunter/hunter-male.v1.json',origins:[{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875}]},
+  'hunter-female':{base:'/assets/characters/villagers/hunter-female.v1',artSource:'art/sprites/hunter/hunter-female.v1.json',origins:[{"x":0.49254,"y":0.71429},{"x":0.49254,"y":0.71429},{"x":0.49254,"y":0.70968},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70968},{"x":0.49254,"y":0.70968},{"x":0.49254,"y":0.71429}]},
+  'builder-male':{base:'/assets/characters/villagers/builder-male.v1',artSource:'art/sprites/builder/builder-male.v1.json',origins:[{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875}]},
+  'builder-female':{base:'/assets/characters/villagers/builder-female.v1',artSource:'art/sprites/builder/builder-female.v1.json',origins:[{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492}]},
+  'farmer-male':{base:'/assets/characters/villagers/farmer-male.v1',artSource:'art/sprites/farmer/farmer-male.v1.json',origins:[{"x":0.49254,"y":0.74648},{"x":0.49254,"y":0.75676},{"x":0.49254,"y":0.76316},{"x":0.49254,"y":0.76316},{"x":0.49254,"y":0.75676},{"x":0.49254,"y":0.74286},{"x":0.49254,"y":0.72727},{"x":0.49254,"y":0.73529}]},
+  'farmer-female':{base:'/assets/characters/villagers/farmer-female.v1',artSource:'art/sprites/farmer/farmer-female.v1.json',origins:[{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492}]},
+  'miller-male':{base:'/assets/characters/villagers/miller-male.v1',artSource:'art/sprites/miller/miller-male.v1.json',origins:[{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.71875}]},
+  'miller-female':{base:'/assets/characters/villagers/miller-female.v1',artSource:'art/sprites/miller/miller-female.v1.json',origins:[{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492}]},
+  'baker-male':{base:'/assets/characters/villagers/baker-male.v1',artSource:'art/sprites/baker/baker-male.v1.json',origins:[{"x":0.49254,"y":0.73134},{"x":0.49254,"y":0.73913},{"x":0.49254,"y":0.74286},{"x":0.49254,"y":0.74648},{"x":0.49254,"y":0.73529},{"x":0.49254,"y":0.73134},{"x":0.49254,"y":0.73134},{"x":0.49254,"y":0.73134}]},
+  'baker-female':{base:'/assets/characters/villagers/baker-female.v1',artSource:'art/sprites/baker/baker-female.v1.json',origins:[{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492}]},
+  'hauler-male':{base:'/assets/characters/villagers/hauler-male.v1',artSource:'art/sprites/hauler/hauler-male.v1.json',origins:[{"x":0.49254,"y":0.72727},{"x":0.49254,"y":0.72308},{"x":0.49254,"y":0.72308},{"x":0.49254,"y":0.71429},{"x":0.49254,"y":0.71429},{"x":0.49254,"y":0.71429},{"x":0.49254,"y":0.71875},{"x":0.49254,"y":0.72308}]},
+  'hauler-female':{base:'/assets/characters/villagers/hauler-female.v1',artSource:'art/sprites/hauler/hauler-female.v1.json',origins:[{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.7},{"x":0.49254,"y":0.70492},{"x":0.49254,"y":0.70492}]},
+  'soldier-male':{base:'/assets/characters/villagers/soldier-male.v1',artSource:'art/sprites/soldier/soldier-male.v1.json',origins:[{"x":0.49254,"y":0.75676},{"x":0.49254,"y":0.77215},{"x":0.49254,"y":0.77778},{"x":0.49254,"y":0.775},{"x":0.49254,"y":0.76623},{"x":0.49254,"y":0.75342},{"x":0.49254,"y":0.74648},{"x":0.49254,"y":0.74648}]},
+});
+export const FACING_INDEX=Object.freeze({SE:0,E:1,NE:2,N:3,NW:4,W:5,SW:6,S:7});
+// Profession -> look per sex. Soldiers have one approved look; smelter operators
+// wear the miner's leather apron until they get their own design.
+export const PROFESSION_LOOKS=Object.freeze({
+  idle:{male:'villager-male',female:'villager-female'},woodcutter:{male:'woodcutter-male',female:'woodcutter-female'},
+  miner:{male:'miner-male',female:'miner-female'},hunter:{male:'hunter-male',female:'hunter-female'},
+  builder:{male:'builder-male',female:'builder-female'},farmer:{male:'farmer-male',female:'farmer-female'},
+  miller:{male:'miller-male',female:'miller-female'},baker:{male:'baker-male',female:'baker-female'},
+  hauler:{male:'hauler-male',female:'hauler-female'},soldier:{male:'soldier-male',female:'soldier-male'},
+  smelter_operator:{male:'miner-male',female:'miner-female'},
+});
+// Villagers carry Czech given names; the game stores no sex, so the look follows the name.
+const FEMALE_NAMES=new Set(['Anna','Eliška','Marie','Tereza','Klára']);
+export function villagerSex(name=''){const first=String(name).split(' ')[0];return FEMALE_NAMES.has(first)||/a$/i.test(first)?'female':'male';}
+
 export function withApprovedArt(definition){
   const building=APPROVED_BUILDING_ART[definition.id],tree=APPROVED_TREE_ART[definition.id];
   if(building)return{...definition,...structuredClone(building),renderMode:'sprite'};
