@@ -28,10 +28,18 @@ export async function buildingMenuSmoke(page){
   console.log('PASS registered building categories, All/empty tabs, preview cancellation, camera controls and mobile horizontal tabs');
 }
 
-export async function clickWorld(page,point){
-  await page.evaluate(async point=>{await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));const s=window.__game.registry.get('application').scene;s.worldCamera.syncSize();s.worldCamera.following=false;s.cameras.main.setZoom(.9).centerOn(point.x,point.y);s.cameras.main.preRender();},point);
+export async function clickWorld(page,point,{forBlueprint=false}={}){
+  await page.evaluate(async point=>{await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));const s=window.__game.registry.get('application').scene;s.worldCamera.syncSize();s.worldCamera.following=false;s.cameras.main.setZoom(.9).centerOn(point.x,point.y);s.cameras.main.preRender();await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));},point);
   const camera=await page.evaluate(()=>{const c=window.__game.registry.get('application').scene.cameras.main;return{x:c.scrollX+c.width/2,y:c.scrollY+c.height/2,w:c.width,h:c.height,z:c.zoom};}),bounds=await page.locator('canvas').boundingBox();
-  await page.mouse.click(bounds.x+((point.x-camera.x)*camera.z+camera.w/2)*bounds.width/camera.w,bounds.y+((point.y-camera.y)*camera.z+camera.h/2)*bounds.height/camera.h);
+  // Staffing controls are real DOM overlays. Use an exposed point inside the
+  // same 64x32 anchor diamond; never dispatch a synthetic click through them.
+  const offsets=forBlueprint?[[0,0],[16,0],[-16,0],[0,-8],[0,8],[12,4],[-12,4],[12,-4],[-12,-4],[24,0],[-24,0]]:[[0,0]];
+  for(const [dx,dy]of offsets){
+    const target={x:bounds.x+((point.x+dx-camera.x)*camera.z+camera.w/2)*bounds.width/camera.w,y:bounds.y+((point.y+dy-camera.y)*camera.z+camera.h/2)*bounds.height/camera.h};
+    if(forBlueprint&&!await page.evaluate(p=>document.elementFromPoint(p.x,p.y)?.tagName==='CANVAS',target))continue;
+    await page.mouse.click(target.x,target.y);return;
+  }
+  throw Error('The blueprint anchor has no exposed canvas point; a real UI control covers it.');
 }
 export async function clickBuilding(page,id){
   // A ground tile can be covered by a neighbouring isometric roof. Click an
@@ -51,7 +59,7 @@ export async function placeBlueprint(page,type){
       return {x:s.map.length*32+(x-y)*32,y:128+(x+y+1)*16};
     }throw Error(`No free ${type} blueprint site.`);
   },type);
-  await page.locator('#buildings-tab').click();await page.locator('[data-building-category="all"]').click();await page.locator(`#${type}-choice`).click();await clickWorld(page,point);
+  await page.locator('#buildings-tab').click();await page.locator('[data-building-category="all"]').click();await page.locator(`#${type}-choice`).click();await clickWorld(page,point,{forBlueprint:true});
   await page.waitForFunction(type=>window.__game.registry.get('application').scene.buildings.some(b=>b.type===type&&b.construction?.state==='planned'),type);
   const id=await page.evaluate(type=>window.__game.registry.get('application').scene.buildings.filter(b=>b.type===type&&b.construction?.state==='planned').at(-1).id,type);return {id,point};
 }

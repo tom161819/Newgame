@@ -28,6 +28,16 @@ single polling window. Assert both physical input types. Keep the former total
 45s+60s travel budget and all existing price,40s work,AutoOFF,IndexDB,XP,receipt,
 Hauler-output and Fog checks. No production logic or game state is changed.
 
+The diagnostic old full suite subsequently passed every scenario through the
+food/unlock construction chain, then failed creating the cancellation-test Tower.
+The captured actual snapshot has10Stone, no stuck cargo/reservations and a valid
+completed Granary/Field; its screenshot shows the Granary's staffing dialog open
+instead of a Tower blueprint. The helper clicked a real Missing Workers DOM
+overlay after centering the camera. Fix the helper to settle the new camera and
+probe document.elementFromPoint, selecting only an exposed canvas point within
+the same anchor diamond. Use ordinary mouse input and never click through or
+disable the real staffing controls. Replay the captured state for verification.
+
 Results so far: dedicated Smelting models and all456model tests pass,0fail/skip;
 changelog/catalog validation and diff checks pass. The revised native script
 still needs its actual browser result. No player Changelog entry is added for
