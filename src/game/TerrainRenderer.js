@@ -7,6 +7,7 @@ import { VISIBILITY, FOG_STYLE } from '../systems/FogOfWarSystem.js';
 import { MEMORY_DIRECTIONS } from '../systems/MapMemory.js';
 
 const CHUNK_SIZE = 10;
+const TILE_BLEED = .8;
 
 // Season tints as RGBA, for blending between seasons during a transition.
 const SEASON_TINT={Spring:[95,145,65,.08],Summer:[185,159,70,.09],Autumn:[158,105,45,.17],Winter:[232,237,220,.83]};
@@ -84,9 +85,11 @@ export class TerrainRenderer {
           this.paintStats.tiles++;
           const point = tileCenter({ x, y });
           const tile={x,y},state=this.fog?.displayState(tile)??VISIBILITY.VISIBLE,[,level,season]=this.tileData(tile);
-          const polygon=()=>{context.beginPath();context.moveTo(point.x-left-32,point.y-origin.y);context.lineTo(point.x-left,point.y-origin.y-16);context.lineTo(point.x-left+32,point.y-origin.y);context.lineTo(point.x-left,point.y-origin.y+16);context.closePath();};
-          context.save();polygon();context.clip();context.clearRect(point.x-left-32,point.y-origin.y-16,64,32);
-          if(state===VISIBILITY.UNEXPLORED){context.fillStyle='#000';polygon();context.fill();context.restore();continue;}
+          const polygon=(e=0)=>{context.beginPath();context.moveTo(point.x-left-32-e,point.y-origin.y);context.lineTo(point.x-left,point.y-origin.y-16-e/2);context.lineTo(point.x-left+32+e,point.y-origin.y);context.lineTo(point.x-left,point.y-origin.y+16+e/2);context.closePath();};
+          // The clip reaches a little past the diamond so antialiased edges of neighbours overlap
+          // instead of leaving a light seam; ground tiles carry a pixel of bleed for this.
+          context.save();polygon(TILE_BLEED);context.clip();context.clearRect(point.x-left-33,point.y-origin.y-17,66,34);
+          if(state===VISIBILITY.UNEXPLORED){context.fillStyle='#000';polygon(TILE_BLEED);context.fill();context.restore();continue;}
           const wear=this.wear?this.wearTextures[level]:null,entry=wear?(wear.variants.length?{key:wear.variants[terrainHash(x,y)%wear.variants.length]}:wear):this.groundTextures[terrainHash(x,y)%this.groundTextures.length];
           const frame=this.scene.textures.get(entry.key).get(entry.frame);
           if(state===VISIBILITY.EXPLORED)context.filter=`grayscale(${(1-FOG_STYLE.saturation)*100}%) brightness(${(this.fog?.brightness(tile)??FOG_STYLE.brightness)*100}%)`;
@@ -94,7 +97,7 @@ export class TerrainRenderer {
           if(this.wear)this.drawConnections(context,x,y,left,origin.y);
           const mix=state===VISIBILITY.VISIBLE?this.seasonMix?.(x,y,season):null;
           const tint=(mix&&mixTint(mix.from,season,mix.amount))??{Spring:'rgba(95,145,65,.08)',Summer:'rgba(185,159,70,.09)',Autumn:'rgba(158,105,45,.17)',Winter:'rgba(232,237,220,.83)'}[season];
-          if(tint){context.globalCompositeOperation='source-atop';context.fillStyle=tint;polygon();context.fill();}
+          if(tint){context.globalCompositeOperation='source-atop';context.fillStyle=tint;polygon(TILE_BLEED);context.fill();}
           context.restore();
         }
       }

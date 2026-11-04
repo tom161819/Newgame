@@ -45,7 +45,7 @@ Povrch hry je plochá textura dlaždic 64 × 32 px, proto ho nekreslí 3D render
 - terénní objekt smí mít `spriteVariants` (až 8 cest k obrázkům). `AssetManager` je načte jako vrstvy `variant-<i>` a `TerrainRenderer` vybere variantu podle hashe dlaždice;
 - `visual.pathSoftness` u `wearSurfaces` přidá spojovacímu pásu měkký okraj (stejně jako náhled ve studiu).
 
-Po schválení: rozřezat `.tiles.png` na jednotlivé dlaždice do `public/assets/terrain/…`, nastavit `spriteVariants` u `grass_normal` (a dlaždice úrovní u `grass_trampled_1..3`) a převzít `gameWear` do `wearSurfaces`.
+Export ukládá každou dlaždici i zvlášť (`<varianta>.v<verze>.tile-<i>.png`), aby hra dostala bajtově shodné kopie. **Ve hře** od 4. 11. 2026 (schválil vývojář): `grass_normal` = `grass-ground-lush` (4 dlaždice ve `spriteVariants`), `grass_trampled_1..3` = dlaždice 1–3 z `worn-path-moss` a jeho `gameWear` s `pathSoftness: 2`. Hlídá to test v `tests/asset-studio.test.js`. TerrainRenderer ořezává dlaždici o 0,8 px za kosočtverec, aby mezi dlaždicemi nebyly světlé švy.
 
 ## Postavy podle profese
 
