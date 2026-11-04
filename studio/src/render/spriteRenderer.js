@@ -94,6 +94,7 @@ function meshFor(part, style) {
   mesh.userData.layer = part.layer ?? 'main';
   mesh.position.set(...part.at);
   if (part.rotation) mesh.rotation.y = part.rotation;
+  if (part.tilt) { mesh.rotation.x = part.tilt[0]; mesh.rotation.z = part.tilt[1]; }
   mesh.castShadow = mesh.receiveShadow = true;
   return mesh;
 }

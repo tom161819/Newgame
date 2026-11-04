@@ -218,7 +218,9 @@ test('game definitions map to studio categories and filters combine source, cate
   const studioBuildings = filterCatalog(catalog.all, { category: 'buildings', source: 'studio' });
   assert.ok(studioBuildings.every(i => i.category === 'buildings' && i.source === 'studio'));
   for (const id of ['house', 'quarry', 'stone-wall', 'watchtower', 'scaffold']) assert.ok(studioBuildings.some(i => i.id === id), id);
-  assert.deepEqual(filterCatalog(catalog.all, { category: 'trees', source: 'studio' }).map(i => i.id).sort(), ['oak-tree', 'pine-tree']);
+  const studioTrees = filterCatalog(catalog.all, { category: 'trees', source: 'studio' }).map(i => i.id);
+  for (const id of ['oak-tree', 'pine-tree', 'oak-seasons', 'pine-seasons']) assert.ok(studioTrees.includes(id), id);
+  assert.ok(filterCatalog(catalog.all, { category: 'trees', source: 'studio' }).every(i => i.category === 'trees'));
   assert.deepEqual(filterCatalog(catalog.all, { source: 'studio', query: 'TORCH' }).map(i => i.id), ['torch-post']);
   assert.ok(filterCatalog(catalog.all, { source: 'game' }).length >= 10);
 });

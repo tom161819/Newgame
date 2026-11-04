@@ -106,7 +106,18 @@
     "cloth_ochre": "#b88a3e",
     "cloth_grey": "#7c7a72",
     "leather": "#6e4a2c",
-    "ore": "#7d5a45"
+    "ore": "#7d5a45",
+    "leaf_spring": "#86a94e",
+    "blossom": "#e8d3d6",
+    "leaf_autumn": "#a8742f",
+    "leaf_autumn_light": "#c4973f",
+    "leaf_autumn_dark": "#7f4a28",
+    "grass_autumn": "#8a8a48",
+    "grass_dry": "#9d9560",
+    "grass_frost": "#7f8c6c",
+    "snow": "#e6ebee",
+    "snow_shade": "#c6d0d8",
+    "twigs": "#6f6052"
   },
   "materials": {
     "stone": {
@@ -360,6 +371,55 @@
       "repeat": 0.6,
       "variation": 0.18,
       "description": "Iron ore: rusty brown rock."
+    },
+    "foliage_spring": {
+      "color": "leaf_spring",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.12,
+      "description": "Fresh spring leaves."
+    },
+    "blossom": {
+      "color": "blossom",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.1,
+      "description": "Spring blossom clusters."
+    },
+    "foliage_autumn": {
+      "color": "leaf_autumn",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.14,
+      "description": "Autumn leaves, ochre."
+    },
+    "foliage_autumn_light": {
+      "color": "leaf_autumn_light",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.12,
+      "description": "Sunlit autumn leaves, gold."
+    },
+    "foliage_autumn_dark": {
+      "color": "leaf_autumn_dark",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.14,
+      "description": "Shaded autumn leaves, russet."
+    },
+    "snow": {
+      "color": "snow",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.05,
+      "description": "Snow caps on trees and roofs."
+    },
+    "twigs": {
+      "color": "twigs",
+      "texture": "noise",
+      "repeat": 0.8,
+      "variation": 0.22,
+      "description": "Bare winter crown: a grey-brown haze of twigs."
     }
   },
   "light": {
@@ -455,5 +515,9 @@
   },
   "props": {
     "rule": "Every production building tells its trade with two or three props in its yard: sacks, barrels, crates, hay, logs, an oven, ore, tools. Props stay inside the footprint and below the eaves, so the building keeps a clear silhouette."
+  },
+  "seasons": {
+    "rule": "Seasons change the colour of grass, leaves and ground, never the silhouette of buildings. Spring is fresh light green with sparse blossom; summer is the lush base; autumn turns grass olive and leaves ochre, gold and russet (muted, never neon orange); winter dulls grass, bares broadleaf trees and adds snow in patches before full cover.",
+    "transition": "A new season spreads over the first 10–25 % of its length, unevenly: each tile starts a little earlier or later by a stable hash and a slow large-scale noise, so the map never flips in one frame and shows no checkerboard. Paths, buildings and Fog of War memory keep their own rules."
   }
 }

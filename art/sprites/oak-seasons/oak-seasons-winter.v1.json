@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "oak-seasons",
+  "variantId": "oak-seasons-winter",
+  "name": "Bare winter oak",
+  "category": "trees",
+  "version": 1,
+  "specHash": "8b9dda4d",
+  "generator": "tree",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 87,
+  "height": 116,
+  "anchor": {
+    "x": 34,
+    "y": 98
+  },
+  "origin": {
+    "x": 0.3908,
+    "y": 0.84483
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 34,
+    "y": 114
+  },
+  "baseOrigin": {
+    "x": 0.3908,
+    "y": 0.98276
+  },
+  "visualHeight": 114,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.208,
+  "lights": []
+}

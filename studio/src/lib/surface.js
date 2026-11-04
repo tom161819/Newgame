@@ -91,6 +91,15 @@ export function validateSurfaceSpec(spec, { style }) {
   else blades.colours.forEach((c, i) => colour(c, `blades.colours[${i}]`));
   for (const [i, c] of (grass.flowers?.colours ?? []).entries()) colour(c, `flowers.colours[${i}]`);
   if (!num(grass.flowers?.density ?? 0, 0, 12)) problems.push('flowers.density must be 0–12 per tile.');
+  if (grass.snow !== undefined) {
+    if (!num(grass.snow?.coverage, 0, 1)) problems.push('snow.coverage must be 0–1.');
+    for (const key of ['colour', 'shade']) if (grass.snow?.[key] !== undefined) colour(grass.snow[key], `snow.${key}`);
+  }
+  if (grass.leaves !== undefined) {
+    if (!num(grass.leaves?.density, 0, 40)) problems.push('leaves.density must be 0–40 per tile.');
+    if (!Array.isArray(grass.leaves?.colours) || !grass.leaves.colours.length) problems.push('leaves.colours needs at least one colour.');
+    else grass.leaves.colours.forEach((c, i) => colour(c, `leaves.colours[${i}]`));
+  }
   if (!Number.isInteger(grass.tiles ?? 4) || (grass.tiles ?? 4) < 1 || (grass.tiles ?? 4) > 8) problems.push('tiles must be 1–8.');
   if (spec.mode === 'path') {
     if (!Array.isArray(spec.stages) || spec.stages.length !== WEAR_STAGES - 1) { problems.push(`stages needs ${WEAR_STAGES - 1} entries (wear levels 1–3).`); return problems; }
@@ -118,4 +127,16 @@ export function validateSurfaceSpec(spec, { style }) {
 export function gameWearFromSpec(spec, style) {
   if (spec.mode !== 'path') return null;
   return spec.stages.map((stage, i) => ({ level: i + 1, color: resolveColour(style, stage.colour), edge: resolveColour(style, stage.edge), width: stage.width }));
+}
+
+// Uneven season change. `progress` runs 0 → 1 over the transition window
+// (the first 10–25 % of a season). Each tile starts at its own moment, mixed
+// from a stable per-tile hash and slow large-scale noise, then blends in over
+// the rest of the window, so the map never flips at once and shows no
+// checkerboard. Every tile is fully blended at progress 1.
+export function seasonBlend(progress, x, y, { seed = 1, spread = 0.6 } = {}) {
+  if (progress <= 0) return 0;
+  if (progress >= 1) return 1;
+  const start = spread * (0.45 * hash2(seed, x, y) + 0.55 * periodicNoise(seed + 41, 8, x / 64, y / 64));
+  return smoothstep(0, 1, (progress - start) / (1 - spread));
 }

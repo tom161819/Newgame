@@ -12,6 +12,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| V01 studio part: seasonal ground and trees, transition preview | Claude | `claude/season-studio-concepts` | this PR | Verified | `studio/**`, `art/**`, `docs/art/**`, `tests/asset-studio*.test.js` |
+| V01 runtime, V02, V03 (visual master tasks) | Claude | not started | — | Waiting for Codex C01 (V01), C06/C07 (V02), C08 (V03) | will hold `src/game/TerrainRenderer.js`, `src/game/TreeView.js`, `src/game/MapMemoryRenderer.js` for V01; see `docs/art/VISUAL_PROGRESS.md` |
 
 ## Kept backups (do not delete without the developer)
 
