@@ -1,6 +1,49 @@
-# M2 publication — uploaded in PR15, external merge BLOCKED
+# M2 publication — source merged, final archive prepared, deployment pending
 
-## Current checkpoint — 2026-11-04
+## Current checkpoint after the user's PR merge — 2026-11-04
+
+PR15 is actually merged into main
+`7595b80b64f88fdd984505f79ce201098a54d280`. The release game source is
+`f053be1879beb2af3814972caecc8768b8f1ad90`, an ancestor of that merge with no
+game/build/source-path differences. Work continues in `codex/m2-release-archive`
+from main7595b80; no direct main push or history rewrite.
+
+The real Pages run is41877748443. Its public page currently says **Queued** and
+now exposes the produced github-pages artifact. Success for this exact commit
+has not yet been confirmed. Do not replace that state with the older successful
+run41870462305 for mainc2c2862.
+
+A **local-only** annotated v0.3.0 tag points to f053be1, to prepare a faithful
+archive before publication. Its object is a0eebc1704e37b5ba7cab5572cbfab1dcff22f1e;
+source tree146d6f9ec0cd4f9456fb993b1159a23392717edb. It has not been pushed.
+The final archive builder exported the actual tagged source, passed455/455 tests,
+built it for its canonical subdirectory and started the real game in Chromium.
+Result:72 snapshots, exactly1new (f053be1),0skipped;70hashed files in the new
+snapshot. All71existing snapshot directories are unchanged. The generated catalog
+correctly labels0.3.0 `M2: Resources, economy and iron`, resolves the actual tag
+and links `/Newgame/versions/f053be1879beb2af3814972caecc8768b8f1ad90/`.
+Full archive integrity and changelog/catalog validation pass. The earlier5f6009c
+preview is not used or published.
+
+The merged game build passes all71old canonical URLs/2314HTTP files/SHA/MIME.
+Current Studio smoke exits0, including the seasonal concepts, real exports,
+relative URLs, Canvas/WebGL demo and390px layout. The full merged-game native
+suite is running; do not claim completion until its exit status is collected.
+
+The user also supplied CODEX_MASTER.md. Its exact30411bytes are preserved in
+docs/requests/CODEX_MASTER.md (SHA256
+e8e0b436ad9ca620680f55569376913229218b5602cac1aeb1890d7472340470).
+TASK_QUEUE and CODEX_PROGRESS schedule C01–C08 **after** the original master15;
+none of the new gameplay tasks has started. Claude keeps the visual tasks.
+
+Next: collect full smoke; confirm the exact successful Pages run and complete
+the formal M2 gate; push the actual tag only then. Submit this verified archive
+and queue documentation through a PR, verify its exact deployment and run
+release:verify. Only then mark M2 RELEASED and begin master11. API remains outside
+the runtime's allowed hosts, so PR creation/merge may still need the normal web
+route; this is technical access, not a new authorization requirement.
+
+## Earlier checkpoint before the user's merge
 
 - Actual open PR: https://github.com/tom161819/Newgame/pull/15,
   `codex/m2-release-candidate` -> `main`. The older preflight PR14 is superseded;

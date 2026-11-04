@@ -1,6 +1,23 @@
 [
   {
     "schema": 1,
+    "commit": "f053be1879beb2af3814972caecc8768b8f1ad90",
+    "tree": "146d6f9ec0cd4f9456fb993b1159a23392717edb",
+    "date": "2026-11-04T17:21:47Z",
+    "sequence": 102,
+    "subject": "Preserve current Claude graphics and Studio work in M2 release candidate",
+    "name": "Preserve current Claude graphics and Studio work in M2 release candidate",
+    "description": "Preserve current Claude graphics and Studio work in M2 release candidate",
+    "basePath": "/Newgame/versions/f053be1879beb2af3814972caecc8768b8f1ad90/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    },
+    "originalVersion": "0.3.0"
+  },
+  {
+    "schema": 1,
     "commit": "fa56c96113fdad8097d641ad87c06e74d532efa8",
     "tree": "3f83d8ba5a2fc9fbd6669d1f9a46a20fd4ff7ffb",
     "date": "2026-11-04T07:03:18Z",
