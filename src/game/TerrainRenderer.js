@@ -8,6 +8,10 @@ import { MEMORY_DIRECTIONS } from '../systems/MapMemory.js';
 
 const CHUNK_SIZE = 10;
 
+// Season tints as RGBA, for blending between seasons during a transition.
+const SEASON_TINT={Spring:[95,145,65,.08],Summer:[185,159,70,.09],Autumn:[158,105,45,.17],Winter:[232,237,220,.83]};
+function mixTint(from,to,t){const a=SEASON_TINT[from],b=SEASON_TINT[to];if(!a||!b)return null;const c=a.map((v,i)=>v+(b[i]-v)*t);return`rgba(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])},${c[3].toFixed(3)})`;}
+
 function terrainHash(x, y) { return ((Math.imul(x + 17, 374761393) ^ Math.imul(y + 29, 668265263)) >>> 0); }
 
 export class TerrainRenderer {
@@ -28,6 +32,8 @@ export class TerrainRenderer {
   setPathWear(system){this.wear=system;this.unsubscribeWear=system.subscribe(tile=>this.invalidateArea([tile]));}
   setDebug(value){this.debugEnabled=!!value;this.lastView='';if(!value)this.debugGraphics.clear();}
   setSeason(season){if(season===this.season)return;this.season=season;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
+  // Whole chunks, repainted in one pass, give the same pixels as a fresh draw (season transition).
+  invalidateChunksOf(tiles){for(const tile of tiles){const key=`${Math.floor(tile.x/CHUNK_SIZE)},${Math.floor(tile.y/CHUNK_SIZE)}`;this.dirtyTiles.delete(key);this.dirtyChunks.add(key);}if(tiles.length)this.lastView='';}
   invalidateArea(tiles,neighbors=true){
     if(!tiles.length)return;
     const range=neighbors?1:0;
@@ -86,7 +92,8 @@ export class TerrainRenderer {
           if(state===VISIBILITY.EXPLORED)context.filter=`grayscale(${(1-FOG_STYLE.saturation)*100}%) brightness(${(this.fog?.brightness(tile)??FOG_STYLE.brightness)*100}%)`;
           context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,point.x-left-32,point.y-origin.y-16,64,32);
           if(this.wear)this.drawConnections(context,x,y,left,origin.y);
-          const tint={Spring:'rgba(95,145,65,.08)',Summer:'rgba(185,159,70,.09)',Autumn:'rgba(158,105,45,.17)',Winter:'rgba(232,237,220,.83)'}[season];
+          const mix=state===VISIBILITY.VISIBLE?this.seasonMix?.(x,y,season):null;
+          const tint=(mix&&mixTint(mix.from,season,mix.amount))??{Spring:'rgba(95,145,65,.08)',Summer:'rgba(185,159,70,.09)',Autumn:'rgba(158,105,45,.17)',Winter:'rgba(232,237,220,.83)'}[season];
           if(tint){context.globalCompositeOperation='source-atop';context.fillStyle=tint;polygon();context.fill();}
           context.restore();
         }

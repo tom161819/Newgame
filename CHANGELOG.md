@@ -30,6 +30,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Stone Towers have a new painted look with a burning wall torch. The king still climbs to the top and now stands inside the battlements.
 - See more of the kingdom: a slim title bar, a compact floating resource bar with icons and counts (details on hover and under More), camera chips on the map and a one-line status bar. Interface text uses the Figtree and Source Serif 4 fonts with softer panels, buttons and dialogs.
 - Building sites puff small clouds of dust while builders are working on them; the clouds fade and stop as soon as work pauses, and are skipped when the system asks for reduced motion.
+- Seasons now change gradually: during the first day of a new season the grass tint and the trees turn patch by patch across the map instead of all at once. The change follows game time, so loading a save mid-change shows the same picture, and Seasons OFF stays plain summer.
 
 ## [0.2.0] - 2026-11-04
 <!-- version: {"title": "M1: Exploration and kingdom management", "tag": "v0.2.0", "type": "milestone", "reconstructed": false, "evidence": ["src/systems/MapMemory.js", "src/ui/PopulationSidebar.js", "src/ui/MissingWorkersIndicators.js", "docs/verification/master-M1.md"]} -->

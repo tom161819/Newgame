@@ -12,7 +12,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| V01 runtime, V02, V03 (visual master tasks) | Claude | not started | — | Waiting for Codex C01 (V01), C06/C07 (V02), C08 (V03) | will hold `src/game/TerrainRenderer.js`, `src/game/TreeView.js`, `src/game/MapMemoryRenderer.js` for V01; see `docs/art/VISUAL_PROGRESS.md` |
+| V01 runtime: gradual season change | Claude | `claude/season-terrain-transition` | this PR | Verified | `src/game/SeasonTransition.js`, `src/game/TerrainRenderer.js` (season tint), `src/game/TreeView.js` (`applySeason`), `scripts/season-transition-smoke.mjs`; minimal hooks in `src/game/GameScene.js` (2 lines) and `scripts/browser-smoke.mjs` (1 line). Started before C01 at the developer's request. |
+| V02, V03 studio concepts (military buildings, equipment, soldiers) | Claude | `claude/military-concepts-studio` (next) | — | Draft concepts on assumed ids; final ids follow Codex C06–C08 | `studio/**`, `art/**`, `docs/art/**` |
 
 ## Kept backups (do not delete without the developer)
 

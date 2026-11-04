@@ -60,6 +60,7 @@ import { DepositView } from './DepositView.js';
 import { NaturalResourcePanel } from '../ui/NaturalResourcePanel.js';
 import { ConstructionSystem } from '../systems/ConstructionSystem.js';
 import { ConstructionView } from './ConstructionView.js';
+import { SeasonTransition } from './SeasonTransition.js';
 import { ConstructionUI } from '../ui/ConstructionUI.js';
 import { gameSettings,resourceSpawnSettings } from '../systems/GameSettings.js';
 import { createStartingCastle,createStartingStockpile } from '../systems/WorldGenerationConfig.js';
@@ -129,6 +130,7 @@ export class GameScene extends Phaser.Scene {
     this.inventory=new Inventory();if(!this.loadState)this.inventory.add('gold',this.gameSettings.startingGold);
     this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);this.regeneration=new RegenerationSystem();
     this.seasons=new SeasonSystem(this.gameTime,{enabled:this.gameSettings.seasonsEnabled,initialWeather:this.loadState?(this.loadState.seasons?.weather??'Sunny'):undefined});this.terrain.setSeason(this.seasons.season);
+    this.seasonTransition=new SeasonTransition(this);this.terrain.seasonMix=(x,y,season)=>this.seasonTransition.mix(x,y,season);
     this.unsubscribeSeason=this.seasons.onChange(()=>{const changed=this.terrain.season!==this.seasons.season;this.terrain.setSeason(this.seasons.season);if(changed&&this.worldCamera){this.terrain.invalidateArea(this.mapMemory.observeTerrain(this.terrainGrid,this.pathWear,this.seasons.season,this.map));this.terrain.update(this.cameras.main,this.fog,this.mapMemory);}this.updateTimeDisplay();this.settingsPanel?.syncSeasons();});
     this.activities=new GameActivityBus();this.experienceSystem=new ExperienceSystem(this.activities);
     this.skillSystem=new SkillSystem(this);
@@ -244,7 +246,7 @@ export class GameScene extends Phaser.Scene {
       this.experienceFeedback.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
       this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
       this.storagePanel.destroy();this.legacyStockpiles.destroy();this.logisticsTasks.destroy();this.foodProduction.destroy();this.foodStorage.destroy();
-      this.foodEconomyPanel.destroy();this.foodSystem.destroy();this.unsubscribeSeason();this.seasons.destroy();
+      this.foodEconomyPanel.destroy();this.foodSystem.destroy();this.unsubscribeSeason();this.seasonTransition?.destroy();this.seasons.destroy();
       this.game.events.off(Phaser.Core.Events.PAUSE,onBackground);this.game.events.off(Phaser.Core.Events.RESUME,onForeground);
       this.game.canvas.style.cursor='';
     });
@@ -600,7 +602,7 @@ export class GameScene extends Phaser.Scene {
     this.economyPanel?.update();
     this.workplacePanel?.refresh();
     this.staffingIndicators?.update();
-    this.naturalResources?.refreshSeason();this.naturalResourcePanel?.refresh();
+    this.naturalResources?.refreshSeason();this.seasonTransition?.update();this.seasonTransition?.flush();this.naturalResourcePanel?.refresh();
     this.constructionUI?.refresh();
     this.farmingPanel?.refresh();
     this.storagePanel?.refresh();

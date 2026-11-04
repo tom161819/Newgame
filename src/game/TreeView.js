@@ -6,7 +6,9 @@ export class TreeView extends Phaser.GameObjects.Container {
     super(scene,context.x,context.y);scene.add.existing(this);this.definition=definition;this.object=context.object??{natural:treeState('preview')};this.body=scene.add.graphics();this.bar=scene.add.graphics();this.add([this.body,this.bar]);this.season=context.season??scene.seasons?.season??'Spring';this.setDepth(context.y+(definition.depth?.offset??0));this.paint();
   }
   setNaturalState(object){this.object=object;this.paint();return this;}
-  setSeason(value){if(value!==this.season){this.season=value;this.paint();}return this;}
+  // Live trees follow the gradual season change of their tile; remembered (map memory) trees keep what was seen.
+  setSeason(value){this.targetSeason=value;return this.applySeason();}
+  applySeason(){const target=this.targetSeason??this.season,o=this.object,value=Number.isFinite(o?.x)?this.scene.seasonTransition?.seasonAt(o,target)??target:target;if(value!==this.season){this.season=value;this.paint();}return this;}
   paint(){
     const stage=this.object.natural.stage,g=this.body.clear(),pine=this.definition.id==='pine_tree',winter=this.season==='Winter',autumn=this.season==='Autumn',scale=stage===1?.25:stage===2?.58:1,height=(pine?100:84)*scale;
     this.setDepth(this.y+(stage<3?-.15:this.definition.depth?.offset??0));

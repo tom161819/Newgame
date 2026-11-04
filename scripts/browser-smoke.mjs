@@ -8,6 +8,7 @@ import { browserRuntime } from './browser-runtime.mjs';
 import { projectBase } from './archive-lib.mjs';
 import { buildingMenuSmoke,buildingUnlockGameplaySmoke } from './building-menu-smoke.mjs';
 import { seasonsMenuSmoke } from './seasons-menu-smoke.mjs';
+import { seasonTransitionSmoke } from './season-transition-smoke.mjs';
 import { stageArchivedSnapshots } from './stage-archive.mjs';
 import { explorationMenuSmoke,staticMemoryRendererSmoke,hiddenInteractionSmoke } from './fog-smoke.mjs';
 import { populationSidebarSmoke,populationNavigationSmoke,populationIntegrationSmoke } from './population-smoke.mjs';
@@ -88,6 +89,7 @@ try{
   if(args.includes('--full')||args.includes('--staffing'))await staffingIndicatorsSmoke(page);
   if(args.includes('--full')||args.includes('--fog')){await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);await hiddenInteractionSmoke(page);}
   if(args.includes('--full'))await seasonsMenuSmoke(page);
+  if(args.includes('--full')||args.includes('--season-transition'))await seasonTransitionSmoke(page);
   await buildingMenuSmoke(page);
   const point=await page.evaluate(()=>{
     const s=window.__game.registry.get('application').scene;

@@ -5,16 +5,16 @@ Claude's visual master tasks (V01–V03) and what they wait for. Rules: [AGENTS.
 | Task | State | Depends on | Notes |
 |---|---|---|---|
 | V01 studio part: seasonal ground, oak and pine, transition preview | Done, [#16](https://github.com/tom161819/Newgame/pull/16) | none (studio only) | Draft variants in the studio; `seasonBlend` proposes the uneven per-tile change. |
-| V01 runtime: gradual season change in the game | Waiting | Codex C01 merged | Must touch `TerrainRenderer`, `TreeView`, `MapMemoryRenderer`; starts only when no Codex task holds them. Plan below. |
+| V01 runtime: gradual season change in the game | Done in `claude/season-terrain-transition` (started before C01 at the developer's request) | — | `src/game/SeasonTransition.js`; terrain tint and live trees blend per tile over the first 20 % of a season. |
 | V02 military buildings and equipment concepts | Waiting | Codex C06 (ids, footprints) and C07 (final building definitions) | Bowyer, swordsmith, armorer, armory, stables, equipment icons; at least 3 variants per key building. |
 | V03 four soldier classes | Waiting | Codex C08 (unit registry, slots, directions) | Archer, soldier, swordsman, knight on a horse; builds on the `figure` recipe and tilted parts. |
 
 The C01–C08 definitions are in Codex's own master prompt, which is not in the repository; Claude checks GitHub branches, pull requests and `docs/COORDINATION.md` before starting each waiting task.
 
-## V01 runtime plan (after C01)
+## V01 runtime (implemented)
 
-- Seasons keep their current rules (`SeasonSystem`); only the display blends. On a season change the renderer keeps the previous season as `from`, the new one as `to`, and a display progress from the season's elapsed time over its first 15 % (game time, so Save/Load and background catch-up give the same picture).
-- Per tile: `seasonBlend(progress, x, y)` (stable hash + slow noise). Chunks redraw at most a few times per second while a transition runs and only when visible; no per-tile timers, no full-map passes per frame.
-- Trees take the season of their tile's blend (above 0.5 → new look). Fog of War: unexplored stays black; remembered tiles keep the season they were seen in (Map Memory already stores it).
-- Seasons OFF: summer, no animation. Turning seasons on blends from summer over the same window.
+- Seasons keep their current rules (`SeasonSystem`); only the display blends. `transitionState` derives `from`, `to` and progress from game time over the first 20 % of a season (one game day), so Save/Load and background catch-up give the same picture and nothing new is saved. No transition in the first season of a game.
+- Per tile: `seasonBlend(progress, x, y)` (stable hash + slow noise), shared with the studio preview. Progress moves in 24 steps and each tile in 8 levels; a step queues the 10 × 10 chunks whose tiles changed level; up to 10 repaint per frame while playing (all at once while paused), each in one pass so the picture equals a fresh draw. Measured in headless Chromium at 0.25× (whole map): one unbudgeted step cost 80–100 ms, the per-frame budget keeps it to roughly a tenth. No per-tile timers, no per-frame full-map work.
+- Live trees take the season of their tile's blend (from half way). Fog of War: only visible tiles blend; unexplored stays black and remembered tiles and trees keep the season they were seen in.
+- Seasons OFF: summer, no animation. Turning seasons back on inside the window continues the blend from the previous season.
 - New art (seasonal grass, snow, seasonal trees) replaces the procedural tints only after the developer approves the studio variants.
