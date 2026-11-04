@@ -25,10 +25,18 @@ and links `/Newgame/versions/f053be1879beb2af3814972caecc8768b8f1ad90/`.
 Full archive integrity and changelog/catalog validation pass. The earlier5f6009c
 preview is not used or published.
 
-The merged game build passes all71old canonical URLs/2314HTTP files/SHA/MIME.
+The full merged-game native suite now exits0: ledger, real40s Smelter, both finite
+mines, forestry/physical timber,0.25zoom,Fog/static memory,Population200/mobile,
+staffing,seasons,real construction/unlocks/cancellation,exact IndexedDB Save14,
+incompatible schema refusal and isolated historical games. This complete suite
+used the unchanged71-archive artifact. After adding the new snapshot, the final
+72-archive Pages build and ordinary archive/browser smoke also exit0, including
+33milestones/72snapshots, menu/mobile/changelog, movement/pickup/physical delivery,
+Save14, incompatible-slot preservation and separate historical saves.
+Final production HTTP validation:72canonical URLs,2385files,119054931bytes,
+correct MIME and SHA256. The prior71-archive artifact had2314HTTP files.
 Current Studio smoke exits0, including the seasonal concepts, real exports,
-relative URLs, Canvas/WebGL demo and390px layout. The full merged-game native
-suite is running; do not claim completion until its exit status is collected.
+relative URLs, Canvas/WebGL demo and390px layout.
 
 The user also supplied CODEX_MASTER.md. Its exact30411bytes are preserved in
 docs/requests/CODEX_MASTER.md (SHA256
@@ -36,7 +44,14 @@ e8e0b436ad9ca620680f55569376913229218b5602cac1aeb1890d7472340470).
 TASK_QUEUE and CODEX_PROGRESS schedule C01–C08 **after** the original master15;
 none of the new gameplay tasks has started. Claude keeps the visual tasks.
 
-Next: collect full smoke; confirm the exact successful Pages run and complete
+The formal `release:gate M2` was actually attempted with run41877748443 and
+commit7595b80. It correctly exits1 at pagesEvidence: `Pages has not confirmed
+Success for the exact deployment on main.` No successful formal gate is claimed;
+it ran no additional checks after that guard. Public run HTML still has queued
+job icons, a Pages artifact and now a deploy job. Do not fabricate a Success or
+publish the local tag to bypass the guard.
+
+Next: confirm the exact successful Pages run and complete
 the formal M2 gate; push the actual tag only then. Submit this verified archive
 and queue documentation through a PR, verify its exact deployment and run
 release:verify. Only then mark M2 RELEASED and begin master11. API remains outside
