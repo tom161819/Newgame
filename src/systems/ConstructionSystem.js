@@ -35,11 +35,15 @@ export class ConstructionSystem {
   }
   atSite(actor,assignment){return actor.isAlive&&actor.state==='ground'&&!actor.nextTile&&!actor.path.length&&tileKey(actor.tile)===tileKey(assignment.goal);}
   activeBuilders(site){return site.construction.assignedBuilders.map(id=>({actor:this.actor(id),assignment:this.assignments.get(id)})).filter(p=>p.actor&&p.assignment&&this.atSite(p.actor,p.assignment));}
-  commandKing(site){
+  // fetch: the King first carries the missing materials himself, then builds.
+  commandKing(site,{fetch=false}={}){
     this.stopKing();const king=this.scene.character;
     this.scene.huntingSystem.cancel?.();this.scene.mountSystem.cancel?.();this.scene.treasureSystem.cancelRequest?.();
     if(!this.sites.has(site.id)||this.scene.gameOver||king.transitioning)return false;
-    if(!this.materials.ready(site)){this.scene.setStatus('Waiting for construction materials. Use Deliver Materials.');return false;}
+    if(!this.materials.ready(site)){
+      if(fetch&&this.scene.kingLogistics?.startMaterials(site,{build:true})){this.scene.setStatus('Král nosí materiál na staveniště a potom začne stavět.');return true;}
+      this.scene.setStatus('Waiting for construction materials. Haulers and Builders deliver them automatically.');return false;
+    }
     this.scene.kingLogistics?.cancel();
     if(site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders){this.scene.setStatus('Na staveništi není volné pracovní místo (3 / 3).');return false;}
     if(king.mountedHorse&&!this.scene.mountSystem.dismount())return false;

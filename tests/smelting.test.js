@@ -11,7 +11,7 @@ import { JOBS } from '../src/data/jobs.js';
 globalThis.document={querySelector:()=>({textContent:''})};
 const scene=(starter=true)=>{const s=workerScene(undefined,{construction:true,logistics:true,ledger:true,starter});s.workerSystem.unsubscribe();return s;};
 function build(s,type,x=52,y=44,blueprint=false){const d=s.objectRegistry.require(type);for(const [r,n]of Object.entries(d.cost))s.inventory.add(r,n,{track:false});const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d,reserveMaterials:blueprint});assert.ifError(result.error);const b=result.building;if(blueprint)s.constructionSystem.plan(b);s.towerViews.set(b.id,s.createBuildingView(d,b));return b;}
-function worker(s,b,tile={x:51,y:44}){const w=s.workerSystem.create(tile);if(b)assert.ok(s.workplaceSystem.assign(b,w));return w;}
+function worker(s,b,tile={x:51,y:44}){const w=s.workerSystem.create(tile);if(b)assert.ok(b.definition.workplace?s.workplaceSystem.assign(b,w):s.workerSystem.jobs.assign(w,'hauler'));return w;}
 function until(s,p,max=100000){let elapsed=0;while(!p()&&elapsed<max){s.tick(50);elapsed+=50;}assert.ok(p(),JSON.stringify(s.workerSystem.liveWorkers().map(w=>({id:w.id,task:w.workTask,cargo:w.cargo,message:w.workMessage}))));return elapsed;}
 const snapshot=s=>validateGameState(serializeGameState(s));
 function restore(saved){const s=scene(false);loadGameState(s,saved);return s;}
@@ -35,11 +35,11 @@ test('Haulers reserve Ore and fuel independently and physically return the finis
  const {s,b,warehouse,stock,record,ws:[w]}=fixture(),h=worker(s,warehouse,{x:49,y:44});s.foodStorage.deposit(stock,'iron_ore',3);s.foodStorage.deposit(stock,'wood',2);const transported=new Set();until(s,()=>{if(h.cargo)transported.add(h.cargo.resource);return s.inventory.count('iron_bar')===1;});assert.deepEqual(transported,new Set(['iron_ore','wood','iron_bar']));assert.equal(record.completed,1);assert.equal(w.skills.smelting.totalXP,10);assert.ok(h.skills.logistics.totalXP>0);assert.equal(w.cargo,null);assert.equal(s.foodStorage.reservations.size,0);assert.equal(s.workerSystem.reservations.owners.size,0);assert.equal(receipts(s,'Smelter Production').length,1);snapshot(s);
 });
 test('a distant Hauler can first carry the finished Bar after Operators supplied the batch, including loaded Save/Load',()=>{
- const {s,warehouse,stock,record,ws}=fixture(2),h=worker(s,warehouse,{x:70,y:65});
+ const {s,warehouse,stock,record,ws}=fixture(2);
  s.foodStorage.deposit(stock,'iron_ore',3);s.foodStorage.deposit(stock,'wood',2);
- let sawPartial=false;
- until(s,()=>{if(record.cycle?.workDone>1000)sawPartial=true;return !!h.cargo;});
- assert.equal(sawPartial,true);assert.equal(h.cargo.resource,'iron_bar');
+ // Kingdom-wide Haulers start at once, so the distant one is hired only after the Operators supplied the batch.
+ until(s,()=>record.cycle?.workDone>1000);const h=worker(s,warehouse,{x:70,y:65});
+ until(s,()=>!!h.cargo);assert.equal(h.cargo.resource,'iron_bar');
  assert.equal(record.completed,1);assert.equal(record.cycle,null);
  assert.ok(Math.abs(ws.reduce((n,w)=>n+w.experience.totalXP,0)-10)<1e-7);
  const saved=snapshot(s),r=restore(saved);assert.deepEqual(serializeGameState(r),saved);

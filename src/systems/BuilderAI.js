@@ -6,6 +6,14 @@ import { towerNeighbors } from '../game/buildings.js';
 export class BuilderAI {
   constructor(construction){this.construction=construction;this.blocked=new Map();}
   releaseWorker(worker){this.construction.release(worker);}
+  // With no site ready to build and no free Hauler, a Builder fetches site
+  // materials through the shared logistics bookings instead of waiting.
+  carryMaterials(worker){
+    const logistics=this.construction.scene.logisticsTasks;if(!logistics||!this.construction.materials.enabled||logistics.freeHauler())return false;
+    const cooldown=worker.aiCooldown;worker.aiCooldown=0;
+    if(logistics.updateWorker(worker,{constructionOnly:true}))return true;
+    worker.aiCooldown=cooldown;worker.workState='Waiting';worker.workMessage='Waiting for construction';return false;
+  }
   updateWorker(worker){
     const system=this.construction,scene=system.scene;
     if(worker.workTask){
@@ -36,7 +44,7 @@ export class BuilderAI {
     const route=findPathToAny(scene.workerSystem.navigationMap(worker),start,[...choices.values()].map(c=>c.goal),scene.pathWear?.routingOptions(worker));
     if(!route){
       for(const site of new Set([...choices.values()].map(c=>c.site)))if(!findPathToAny(scene.map,start,system.goals(site,worker))){this.blocked.set(`${worker.id}:${site.id}`,system.revision);site.unreachableReason='Staveniště je pro některé stavitele nedostupné.';}
-      return;
+      this.carryMaterials(worker);return;
     }
     const {site}=choices.get(tileKey(route.destination));if(system.reserve(site,worker,route.destination)){
       worker.path=route.path;worker.workState='Traveling to Target';worker.workMessage=`Travelling to ${site.definition.name}`;site.unreachableReason='';

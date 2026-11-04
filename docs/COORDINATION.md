@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| Approved wall kit into the game | Claude | `claude/wall-kit-game` | this PR | Verified | `src/game/FortificationView.js`, `APPROVED_WALL_ART` in `src/data/objects/approvedArt.js`, `public/assets/buildings/wall/kit/`, `art/approvals.json` (developer export 2026-11-04 21:55). Next: N02 (#33) on `claude/global-hauler-warehouse`. |
+| N02 (#33): global Hauler logistics, Warehouse delivery fix, no Deliver Materials | Claude | `claude/global-hauler-warehouse` | this PR | Verified | `src/data/jobs.js`, `src/data/workplaces.js`, `src/data/objects/{logistics,foodProduction}.js`, `src/systems/{LogisticsTaskManager,BuilderAI,ConstructionSystem,KingLogisticsSystem,FoodProductionSystem,FoodStateValidation,GameStateSerializer}.js` (SAVE_VERSION 15), `src/ui/{ConstructionUI,StoragePanel}.js`, `src/game/GameScene.js`, `index.html`, logistics/smelting tests, building-menu and smelting smokes, README. |
 | M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main2663942 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT403 | IN PROGRESS: preserve approved villager sprites for manual PR22 merge; relevant integration checks running. Earlier476models/Pages/scaffold native and full/Studio/archive proofs retained. Actual final gh merge22 at e574f75 still API Forbidden. Frozen02a has own459test archive; final verifier checks actual deployed Git blobs, allowing later live development. Public tag/main/deployment gates pending; new user order C01–C08 then master11–15, all unstarted. | Native smoke regressions; release-gate/deployed-archive verifier and tests; release notes,02a archive/catalog, progress/verification docs. Claude art unchanged; no schema rewrite. |
 
 ## Kept backups (do not delete without the developer)
@@ -22,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#45](https://github.com/tom161819/Newgame/pull/45) Approved wall kit in the game; developer's Studio approvals recorded (Claude).
 - 2026-11-04 [#42](https://github.com/tom161819/Newgame/pull/42) N01: Castle no longer covers the king; starter stockpile in front (Claude, Issue #32).
 - 2026-11-04 [#44](https://github.com/tom161819/Newgame/pull/44) Wall kit concept in the Studio (Claude).
 - 2026-11-04 [#41](https://github.com/tom161819/Newgame/pull/41) Approved assets part 7: quarry (Claude). The approved wall segment did not fit the connected wall; a wall kit followed in the Studio.
