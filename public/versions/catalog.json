@@ -1,13 +1,13 @@
 {
   "schema": 1,
-  "gameVersion": "0.2.0",
+  "gameVersion": "0.3.0",
   "projectBase": "/Newgame/",
   "currentBuild": {
-    "version": "0.2.0",
-    "gameVersion": "0.2.0",
+    "version": "0.3.0",
+    "gameVersion": "0.3.0",
     "title": "Current Version",
     "date": "2026-11-04",
-    "commit": "fa56c96113fdad8097d641ad87c06e74d532efa8",
+    "commit": "c90e9d2cde6bc98b3109550adbf4e499e79b93d0",
     "archiveURL": "/Newgame/",
     "available": true,
     "description": "Current released game.",
@@ -18,6 +18,52 @@
     "dirty": false
   },
   "versions": [
+    {
+      "version": "0.3.0",
+      "title": "M2: Resources, economy and iron",
+      "date": "2026-11-04",
+      "commit": "f053be1879beb2af3814972caecc8768b8f1ad90",
+      "archiveURL": "/Newgame/versions/f053be1879beb2af3814972caecc8768b8f1ad90/",
+      "available": true,
+      "description": "Build 3×3 Smelters for 12 Stone and 10 Wood. Two Smelter Operators physically process 3 Iron Ore and 2 Wood into 1 Iron Bar in 40 seconds of base work, with existing Haulers, storage, skills, wages and daily accounting.",
+      "releaseType": "milestone",
+      "historical": false,
+      "reconstructed": false,
+      "label": "Official release",
+      "changes": {
+        "added": [
+          "Build 3×3 Smelters for 12 Stone and 10 Wood. Two Smelter Operators physically process 3 Iron Ore and 2 Wood into 1 Iron Bar in 40 seconds of base work, with existing Haulers, storage, skills, wages and daily accounting.",
+          "Auto Production at a Smelter fills vacant seats with reachable unemployed residents ranked by Smelting skill; employed workers and visitors keep their assignments.",
+          "See each resource’s net change for the last completed game day, with income/expense tooltips and a 30-day economic journal. Mining, harvests, production, construction losses, actual wages and treasure are counted once; carrying and storage transfers are excluded.",
+          "Discover five finite Stone Deposits and four Iron Deposits in new kingdoms. Build Quarries over an accessible assigned rock and Iron Mines within four tiles for 12 Stone and 8 physically delivered Wood; Miners physically extract and deliver Stone or raw Iron Ore until that deposit is depleted.",
+          "Build Lumberjack Huts with three Woodcutter seats and an 18-tile working radius; reserve timber storage, chop and carry actual logs, inspect production and keep hidden tree counts tied to last-known map information.",
+          "Find grouped Oak and Pine forests in new kingdoms, with mature trees ready to harvest and stumps, saplings and young trees that regrow through the game’s seasons.",
+          "Send the king to chop a reserved tree, leave real timber on the ground and carry it into existing storage; interrupted work, growth and rewards survive Save/Load without duplication.",
+          "Remembered trees keep their last-seen shape outside sight.",
+          "Build Braziers in the Infrastructure category for 3 Stone: stone fire bowls with a living flame, ready to light the surroundings once nights arrive."
+        ],
+        "changed": [
+          "Save schema 14 preserves Smelting skills, both physical recipe inputs, production progress, Iron Bars and the economic journal alongside the kingdom. This alpha build accepts only its current save schema; other slots remain untouched.",
+          "Saves from another save schema are no longer converted during alpha development. Load Game marks them as incompatible, explains why and offers a new game; the old save stays stored until you delete it."
+        ],
+        "fixed": [
+          "Save and load neighbouring Quarries over separate deposits even when a secondary rock edge lies beneath the other building; primary deposit ownership stays unique.",
+          "Saved forestry jobs resume intact, and deposits never regenerate in a loaded kingdom. Cleared stumps can be built over, and trees cannot regrow beneath finished fields or buildings."
+        ],
+        "improved": [
+          "Place a Quarry across one or more rock formations with one stable primary deposit; a gold outline identifies that deposit in a valid preview, and depletion never switches mining to another rock.",
+          "Smoothly zoom out to 0.25× with the mouse wheel while keeping accurate map clicks, building previews and Fog of War. Camera limits also adapt safely to tall windows, and saved views retain their actual zoom.",
+          "Try the WebGL renderer by adding ?renderer=webgl to the game address, or ?renderer=auto to use WebGL only with hardware acceleration. Canvas remains the default, and Settings show the active renderer.",
+          "Stone Towers have a new painted look with a burning wall torch. The king still climbs to the top and now stands inside the battlements.",
+          "See more of the kingdom: a slim title bar, a compact floating resource bar with icons and counts (details on hover and under More), camera chips on the map and a one-line status bar. Interface text uses the Figtree and Source Serif 4 fonts with softer panels, buttons and dialogs.",
+          "Building sites puff small clouds of dust while builders are working on them; the clouds fade and stop as soon as work pauses, and are skipped when the system asks for reduced motion."
+        ]
+      },
+      "sequence": 102,
+      "commitDate": "2026-11-04T17:21:47Z",
+      "tag": "v0.3.0",
+      "current": true
+    },
     {
       "version": "0.2.0",
       "title": "M1: Exploration and kingdom management",
@@ -74,7 +120,7 @@
       "sequence": 86,
       "commitDate": "2026-11-04T07:03:18Z",
       "tag": "v0.2.0",
-      "current": true
+      "current": false
     },
     {
       "version": "0.1.0+archive.30",
@@ -774,6 +820,20 @@
     }
   ],
   "builds": [
+    {
+      "version": "0.3.0+git.f053be1879beb2af3814972caecc8768b8f1ad90",
+      "gameVersion": "0.3.0",
+      "commit": "f053be1879beb2af3814972caecc8768b8f1ad90",
+      "date": "2026-11-04T17:21:47Z",
+      "title": "Preserve current Claude graphics and Studio work in M2 release candidate",
+      "description": "Preserve current Claude graphics and Studio work in M2 release candidate",
+      "archiveURL": "/Newgame/versions/f053be1879beb2af3814972caecc8768b8f1ad90/",
+      "available": true,
+      "sequence": 102,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
     {
       "version": "0.2.0+git.fa56c96113fdad8097d641ad87c06e74d532efa8",
       "gameVersion": "0.2.0",
