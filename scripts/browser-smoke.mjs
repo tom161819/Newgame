@@ -15,6 +15,7 @@ import { staffingIndicatorsSmoke } from './staffing-smoke.mjs';
 import { emptyNaturalState } from '../src/data/naturalResources.js';
 import { mineralSmoke } from './mineral-smoke.mjs';
 import { naturalMigrationSmoke } from './natural-migration-smoke.mjs';
+import { zoomSmoke } from './zoom-smoke.mjs';
 import { forestrySmoke,forestryHutSmoke } from './forestry-smoke.mjs';
 
 function mineralStorageMigration(state){const s=structuredClone(state);if(s.saveVersion>=12)return s;for(const l of s.foodStorage?.locations??[])if(l.allowed.includes('wood')&&!l.allowed.includes('iron_ore'))l.allowed.push('iron_ore');for(const b of s.buildings??[])if(b.type==='quarry')b.quarryMode=b.construction&&b.construction.state!=='complete'?'unbound':'legacy';return s;}
@@ -78,6 +79,7 @@ try{
   if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full'))await page.locator('#setup-seasons').uncheck();}
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
+  if(args.includes('--full')||args.includes('--zoom'))await zoomSmoke(page);
   if(args.includes('--full')||args.includes('--minerals'))await mineralSmoke(page);
   if(args.includes('--full')||args.includes('--forestry'))await forestrySmoke(page);
   if(args.includes('--full')||args.includes('--forestry-workers'))await forestryHutSmoke(page);

@@ -15,6 +15,9 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ### Fixed
 - Keep completed legacy Quarries, old material stocks and saved forestry jobs intact when upgrading; new deposits never regenerate or appear over an existing saved kingdom. Cleared stumps can be built over, and trees cannot regrow beneath finished fields or buildings.
 
+### Improved
+- Smoothly zoom out to 0.25× with the mouse wheel while keeping accurate map clicks, building previews and Fog of War. Camera limits also adapt safely to tall windows, and saved views retain their actual zoom.
+
 ## [0.2.0] - 2026-11-04
 <!-- version: {"title": "M1: Exploration and kingdom management", "tag": "v0.2.0", "type": "milestone", "reconstructed": false, "evidence": ["src/systems/MapMemory.js", "src/ui/PopulationSidebar.js", "src/ui/MissingWorkersIndicators.js", "docs/verification/master-M1.md"]} -->
 ### Added

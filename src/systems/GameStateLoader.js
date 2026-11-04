@@ -124,7 +124,7 @@ export function loadGameState(scene,input){
   scene.terrain?.setDebug(!!state.settings.pathWearDebug);
   scene.events?.emit('buildings:changed');
   scene.updateInventory();scene.worldCamera.syncSize?.();
-  const camera=scene.cameras.main;camera.setZoom(state.camera.zoom).centerOn(state.camera.x,state.camera.y);camera.preRender();
+  const camera=scene.cameras.main;camera.setZoom(state.camera.zoom);scene.worldCamera.syncZoom?.();camera.centerOn(state.camera.x,state.camera.y);camera.preRender();
   scene.worldCamera.following=state.camera.following;
   document.querySelector('#camera-mode').textContent=state.camera.following?'Kamera sleduje krále':'Ruční posun · mezerník vrátí krále';
   scene.updateInventory();scene.updateTimeDisplay();scene.refreshVisibility();scene.activeFramePending=true;

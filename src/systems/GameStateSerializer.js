@@ -18,6 +18,7 @@ import { captureMapKnowledge } from '../game/mapMemoryObjects.js';
 import { validateMapMemory } from './MapMemoryValidation.js';
 import { FORESTRY,emptyNaturalState } from '../data/naturalResources.js';
 import { migrateNaturalState } from './NaturalStateMigration.js';
+import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 
 export const SAVE_VERSION=12;
 const copy=value=>value==null?null:structuredClone(value);
@@ -295,7 +296,7 @@ export function validateGameState(input,registry=objectRegistry){
     integer(w.lastDecayDay,1,s.time.day);
     for(let i=0;i<COLUMNS*ROWS;i++){integer(w.scores[i]);integer(w.levels[i],0,3);integer(w.lastPassDays[i],0,s.time.day);check(w.levels[i]===wearLevel(w.scores[i]));if(w.scores[i])check(w.lastPassDays[i]>0);}
   }
-  number(s.camera?.zoom,.45,1.8);number(s.camera.x,-1e6,1e6);number(s.camera.y,-1e6,1e6);check(typeof s.camera.following==='boolean');
+  number(s.camera?.zoom,MIN_ZOOM,MAX_ZOOM);number(s.camera.x,-1e6,1e6);number(s.camera.y,-1e6,1e6);check(typeof s.camera.following==='boolean');
   check(typeof s.settings?.fogOfWar==='boolean');if(s.settings.pathWearDebug!==undefined)check(typeof s.settings.pathWearDebug==='boolean');const c=s.commands;check(c);check(c.hunt==null||aIds.has(c.hunt));check(c.mount==null||aIds.has(c.mount));
   number(c.huntRepath,-1e9,1e9);number(c.mountRepath,-1e9,1e9);check(c.pendingChest==null||cIds.has(c.pendingChest));array(c.attacks,1000);
   for(const pair of c.attacks){array(pair,2);check(pair.length===2&&pair[0]!==pair[1]&&pair.every(id=>unitIds.has(id)));}
