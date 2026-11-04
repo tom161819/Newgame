@@ -3,10 +3,10 @@
   "id": "smelter",
   "name": "Smelter",
   "category": "buildings",
-  "description": "Future iron works: a bloomery furnace with bellows, ore and charcoal piles, an anvil under an awning.",
+  "description": "Iron works (game: Smelter, 3 × 3): a bloomery furnace with bellows and glowing mouth, ore and charcoal piles, an anvil under an awning.",
   "footprint": {
-    "width": 2,
-    "height": 2
+    "width": 3,
+    "height": 3
   },
   "generator": "workshop",
   "variants": [
@@ -17,57 +17,73 @@
       "spec": {
         "body": {
           "kind": "furnace",
+          "size": 1.5,
           "at": [
-            0.3,
-            0.3
+            0.35,
+            0.35
           ]
         },
         "props": [
           {
             "type": "awning",
             "at": [
-              -0.45,
-              -0.45
+              -0.7,
+              -0.7
             ],
-            "width": 0.8,
-            "depth": 0.6,
-            "height": 0.7
+            "width": 0.9,
+            "depth": 0.7,
+            "height": 0.75
           },
           {
             "type": "anvil",
             "at": [
-              -0.45,
-              -0.45
+              -0.7,
+              -0.7
             ]
           },
           {
             "type": "ore",
             "at": [
-              0.5,
-              -0.55
+              0.8,
+              -0.75
+            ]
+          },
+          {
+            "type": "ore",
+            "at": [
+              0.95,
+              -0.25
             ]
           },
           {
             "type": "charcoal",
             "at": [
-              -0.6,
-              0.55
-            ]
-          },
-          {
-            "type": "barrel",
-            "at": [
-              -0.05,
+              -0.85,
               0.8
             ]
           },
           {
+            "type": "barrels",
+            "at": [
+              -0.2,
+              1.05
+            ],
+            "count": 2
+          },
+          {
             "type": "toolRack",
             "at": [
-              -0.85,
+              -1.25,
               -0.05
             ],
             "r": 1.5708
+          },
+          {
+            "type": "stoneStack",
+            "at": [
+              1.0,
+              1.0
+            ]
           }
         ]
       },
@@ -80,49 +96,65 @@
       "spec": {
         "body": {
           "kind": "furnace",
+          "size": 1.4,
           "at": [
-            -0.35,
-            -0.35
+            -0.45,
+            -0.45
           ]
         },
         "props": [
           {
             "type": "cart",
             "at": [
-              0.4,
-              0.55
-            ]
-          },
-          {
-            "type": "ore",
-            "at": [
-              0.55,
-              -0.45
-            ]
-          },
-          {
-            "type": "ore",
-            "at": [
               0.6,
-              0.05
+              0.85
+            ]
+          },
+          {
+            "type": "ore",
+            "at": [
+              0.85,
+              -0.65
+            ]
+          },
+          {
+            "type": "ore",
+            "at": [
+              0.95,
+              -0.1
             ]
           },
           {
             "type": "charcoal",
             "at": [
-              -0.6,
-              0.5
+              -0.9,
+              0.75
+            ]
+          },
+          {
+            "type": "charcoal",
+            "at": [
+              -0.45,
+              1.0
             ]
           },
           {
             "type": "anvil",
             "at": [
-              0.0,
-              0.25
+              0.15,
+              0.3
+            ]
+          },
+          {
+            "type": "workbench",
+            "at": [
+              0.35,
+              -0.95
             ]
           }
         ]
       }
     }
-  ]
+  ],
+  "gameObjectId": "smelter"
 }

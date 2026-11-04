@@ -107,7 +107,7 @@
         "smelter-bloomery": {
           "status": "review",
           "version": 1,
-          "specHash": "414b156d",
+          "specHash": "b3a0419e",
           "note": "Proposed by Claude for review; not used by the game until approved.",
           "updatedAt": "2026-11-04T19:00:00.000Z"
         }

@@ -68,7 +68,7 @@ Recept `workshop` (`studio/src/generators/workshop.js`) postaví hlavní stavbu 
 
 Předměty jsou katalog v `studio/src/generators/props.js`: pytle, sudy, bedny, seno, kmeny, palivové dříví, špalek se sekerou, mlýnský kámen, kolo, pracovní stůl, pec na chleba, skládaný kámen, ruda, uhlí, kovadlina, stojan s nářadím, rám s kůží, parohy, plot, vozík, koryto, přístřešek a plachta. Ve `spec` se zapisují jako seznam `{ type, at: [x, z], … }`, takže nová budova je hlavně data.
 
-Koncepty (vždy dvě varianty, doporučená je ve stavu Review): statek, sýpka, pekárna, mlýn, tavírna (budoucí budova), sklad, lovecká chata a dřevorubecká chata. Hra je nepoužívá, dokud je vývojář neschválí a nepřevezme podle postupu níže. Pravidlo pro předměty je ve Style Guide (`props`).
+Koncepty (vždy dvě varianty, doporučená je ve stavu Review): statek, sýpka, pekárna, mlýn, tavírna, sklad, lovecká chata a dřevorubecká chata. Hra je nepoužívá, dokud je vývojář neschválí a nepřevezme podle postupu níže. Pravidlo pro předměty je ve Style Guide (`props`).
 
 ## Výběr a schválení varianty
 

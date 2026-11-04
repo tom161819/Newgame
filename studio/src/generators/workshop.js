@@ -43,11 +43,12 @@ function body(spec, style) {
     return { parts, lights: [] };
   }
   if (kind === 'furnace') {
-    const parts = [cylinder({ radiusBottom: 0.34, radiusTop: 0.2, height: 0.9, segments: 10 }, [0, 0, 0], 'stone'), cylinder({ radiusBottom: 0.12, radiusTop: 0.1, height: 0.5, segments: 8 }, [0, 0.9, 0], 'stone_dark'),
-      box([0.05, 0.2, 0.18], [0.21, 0.08, 0.21], 'opening', { rotation: Math.PI / 4 })];
-    // Leather bellows on the side.
-    parts.push(box([0.2, 0.08, 0.14], [-0.3, 0.12, 0.22], 'leather', { rotation: Math.PI / 4 }));
-    return { parts, lights: [{ type: 'brazier', at: [0.27, 0.2, 0.27] }] };
+    // Bloomery: tapered stone stack, chimney, glowing mouth and bellows; `size` scales it.
+    const k = clamp(spec.size ?? 1, 0.8, 1.6);
+    const parts = [cylinder({ radiusBottom: 0.34 * k, radiusTop: 0.2 * k, height: 0.9 * k, segments: 10 }, [0, 0, 0], 'stone'), cylinder({ radiusBottom: 0.12 * k, radiusTop: 0.1 * k, height: 0.5 * k, segments: 8 }, [0, 0.9 * k, 0], 'stone_dark'),
+      box([0.05, 0.2 * k, 0.18 * k], [0.21 * k, 0.08, 0.21 * k], 'opening', { rotation: Math.PI / 4 })];
+    parts.push(box([0.2 * k, 0.08 * k, 0.14 * k], [-0.3 * k, 0.12, 0.22 * k], 'leather', { rotation: Math.PI / 4 }));
+    return { parts, lights: [{ type: 'brazier', at: [0.27 * k, 0.2, 0.27 * k] }] };
   }
   if (kind === 'barn') {
     const width = spec.width ?? 2.2, depth = spec.depth ?? 1.6, wall = spec.wallHeight ?? 1.2;

@@ -5,41 +5,41 @@
   "name": "Bloomery and forge",
   "category": "buildings",
   "version": 1,
-  "specHash": "414b156d",
+  "specHash": "b3a0419e",
   "generator": "workshop",
   "generatorVersion": 1,
   "styleGuide": "medieval-kingdom-painted-isometric@1",
   "scale": 1,
-  "width": 131,
-  "height": 89,
+  "width": 195,
+  "height": 126,
   "anchor": {
-    "x": 65,
-    "y": 55
+    "x": 97,
+    "y": 76
   },
   "origin": {
-    "x": 0.49618,
-    "y": 0.61798
+    "x": 0.49744,
+    "y": 0.60317
   },
   "footprint": {
-    "width": 2,
-    "height": 2
+    "width": 3,
+    "height": 3
   },
   "base": {
-    "x": 65,
-    "y": 87
+    "x": 97,
+    "y": 124
   },
   "baseOrigin": {
-    "x": 0.49618,
-    "y": 0.97753
+    "x": 0.49744,
+    "y": 0.98413
   },
-  "visualHeight": 87,
+  "visualHeight": 124,
   "platform": null,
   "frontLayer": false,
   "gameLights": [
     {
       "type": "brazier",
       "x": 0,
-      "y": -21.6,
+      "y": -31.68,
       "color": "#ff9d4a",
       "radius": 134.4,
       "intensity": 1,
@@ -50,12 +50,12 @@
       "flameSize": 1.6
     }
   ],
-  "modelHeight": 1.4,
+  "modelHeight": 2.1,
   "lights": [
     {
       "type": "brazier",
-      "x": 65,
-      "y": 65.4,
+      "x": 97,
+      "y": 92.32,
       "color": "#ff9d4a",
       "radius": 134.4,
       "intensity": 1,

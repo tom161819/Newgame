@@ -5,41 +5,41 @@
   "name": "Furnace yard with ore cart",
   "category": "buildings",
   "version": 1,
-  "specHash": "843f0552",
+  "specHash": "7e2b5725",
   "generator": "workshop",
   "generatorVersion": 1,
   "styleGuide": "medieval-kingdom-painted-isometric@1",
   "scale": 1,
-  "width": 131,
-  "height": 104,
+  "width": 195,
+  "height": 146,
   "anchor": {
-    "x": 65,
-    "y": 70
+    "x": 97,
+    "y": 96
   },
   "origin": {
-    "x": 0.49618,
-    "y": 0.67308
+    "x": 0.49744,
+    "y": 0.65753
   },
   "footprint": {
-    "width": 2,
-    "height": 2
+    "width": 3,
+    "height": 3
   },
   "base": {
-    "x": 65,
-    "y": 102
+    "x": 97,
+    "y": 144
   },
   "baseOrigin": {
-    "x": 0.49618,
-    "y": 0.98077
+    "x": 0.49744,
+    "y": 0.9863
   },
-  "visualHeight": 102,
+  "visualHeight": 144,
   "platform": null,
   "frontLayer": false,
   "gameLights": [
     {
       "type": "brazier",
       "x": 0,
-      "y": -42.4,
+      "y": -58.14,
       "color": "#ff9d4a",
       "radius": 134.4,
       "intensity": 1,
@@ -50,12 +50,12 @@
       "flameSize": 1.6
     }
   ],
-  "modelHeight": 1.4,
+  "modelHeight": 1.96,
   "lights": [
     {
       "type": "brazier",
-      "x": 65,
-      "y": 59.6,
+      "x": 97,
+      "y": 85.86,
       "color": "#ff9d4a",
       "radius": 134.4,
       "intensity": 1,
