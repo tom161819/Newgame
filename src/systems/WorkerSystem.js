@@ -18,6 +18,7 @@ export class WorkerSystem {
   }
   liveWorkers(){return [...this.workers.values()].filter(w=>w.isAlive);}
   liveSubjects(){return this.liveWorkers().filter(w=>w.isSubject!==false);}
+  recentDeaths(){const now=this.scene.gameTime.totalElapsed,retention=POPULATION.recentDeathDays*this.scene.gameTime.dayDuration;return [...this.workers.values()].filter(w=>!w.isAlive&&w.isSubject!==false&&Number.isFinite(w.diedAt)&&now-w.diedAt>=0&&now-w.diedAt<retention-1e-7).sort((a,b)=>b.diedAt-a.diedAt||a.id.localeCompare(b.id,undefined,{numeric:true}));}
   subscribe(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   reservedTiles(){return this.liveWorkers().flatMap(w=>w.reservedTiles());}
   origin(worker=null){
@@ -43,10 +44,12 @@ export class WorkerSystem {
     const occupied=new Set([...this.scene.resourceOccupancy.keys(),...this.scene.reservedTiles().map(tileKey)]);
     return reachableTiles(this.scene.map,this.homeGoals()).filter(t=>!occupied.has(tileKey(t)));
   }
-  create(tile,{id=null,name=null,randomize=true}={}){
+  create(tile,{id=null,name=null,randomize=true,isSubject=true}={}){
+    if(typeof isSubject!=='boolean')throw new TypeError('Invalid resident ownership.');
     id??=`worker-${this.nextId++}`;const number=Number(id.split('-')[1]),definition=this.scene.objectRegistry.require('peasant');
     const view=this.scene.assets.createView(definition.id,{...tileCenter(tile),tile});
     const worker=new WorkerController(this.scene,definition,id,tile,view,name??`${names[(number-1)%names.length]}${number>names.length?` ${Math.ceil(number/names.length)}`:''}`);
+    worker.isSubject=isSubject;
     if(randomize)initializeNaturalTalent(worker);
     view.setData('worker',worker);this.workers.set(id,worker);this.updateUI();return worker;
   }
@@ -60,15 +63,15 @@ export class WorkerSystem {
   }
   onNewDay(day){
     if(day<=this.lastMigrationDay)return;this.lastMigrationDay=day;
-    for(let i=0;i<POPULATION.migrantsPerDay&&this.liveWorkers().length<POPULATION.maximum;i++){
+    for(let i=0;i<POPULATION.migrantsPerDay&&this.liveSubjects().length<POPULATION.maximum;i++){
       if(this.scene.attractiveness&&!this.scene.attractiveness.shouldSettle())continue;
       const map=this.scene.map,origin=this.origin(),candidates=this.candidates().filter(t=>(t.x<=1||t.y<=1||t.x>=map[0].length-2||t.y>=map.length-2)&&Math.hypot(t.x-origin.x,t.y-origin.y)>25);
       if(!candidates.length)break;const worker=this.create(candidates[Math.floor(Math.random()*candidates.length)]);worker.arriving=true;worker.workState='Arriving';worker.moveTo(this.homeGoals());
     }
     this.updateUI();
   }
-  update(delta){for(const worker of this.liveWorkers())this.ai.update(worker,delta);}
-  onDeath(worker){this.scene.workplaceSystem?.detach(worker);this.ai.cancel(worker);worker.active=false;worker.path=[];worker.nextTile=null;worker.walking=false;worker.workState='Dead';worker.arriving=false;worker.view.destroy();this.scene.combatFeedback.remove(worker.id);this.updateUI();}
+  update(delta){for(const worker of this.liveWorkers())if(worker.isSubject!==false)this.ai.update(worker,delta);else worker.update(delta);}
+  onDeath(worker){worker.diedAt??=this.scene.gameTime.totalElapsed;this.scene.workplaceSystem?.detach(worker);this.ai.cancel(worker);worker.active=false;worker.path=[];worker.nextTile=null;worker.walking=false;worker.workState='Dead';worker.workMessage='';worker.arriving=false;worker.view.destroy();this.scene.combatFeedback.remove(worker.id);this.updateUI();}
   updateUI(){const count=this.liveSubjects().length;this.onChange(count,POPULATION.maximum);for(const listener of this.listeners)listener(count,POPULATION.maximum);}
   exportState(){return {nextId:this.nextId,lastMigrationDay:this.lastMigrationDay};}
   importState(data){this.nextId=data?.nextId??1;this.lastMigrationDay=data?.lastMigrationDay??this.scene.gameTime.day;this.updateUI();}

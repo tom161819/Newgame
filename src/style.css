@@ -305,3 +305,9 @@ body:not(.in-game) > .population-tooltip { display:none; }
 .population-row { display:flex; gap:4px; }
 .population-select { min-width:0; flex:1; }
 .population-locate { flex-shrink:0; width:42px; padding:2px; font-size:9px; }
+.population-deaths-heading { position:absolute; left:0; right:0; height:60px; display:flex; align-items:end; margin:0; padding:0 3px 12px; font:14px Georgia,serif; color:#c5b59a; border-top:1px solid #726751; }
+.population-row.is-dead .population-portrait { filter:grayscale(1); opacity:.6; }
+.population-row.is-dead .population-portrait-frame::after { content:''; position:absolute; left:-3px; top:20px; width:50px; height:2px; background:#cba18d; transform:rotate(-45deg); }
+.population-row.is-dead .population-state-icon { color:#e0c7b6; }
+.population-row.is-dead .population-select { cursor:default; opacity:.85; }
+.population-row.is-dead .population-locate { opacity:.35; }

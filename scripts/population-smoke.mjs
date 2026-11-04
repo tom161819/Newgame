@@ -11,7 +11,7 @@ export async function populationSidebarSmoke(page){
     for(let y=2;y<98&&s.workerSystem.liveSubjects().length<200;y++)for(let x=2;x<98&&s.workerSystem.liveSubjects().length<200;x++){
       const key=`${x},${y}`;if(s.map[y][x]!==0||occupied.has(key)||s.resourceOccupancy.has(key))continue;s.workerSystem.create({x,y});occupied.add(key);
     }
-    const visitor=s.workerSystem.create({x:1,y:1});visitor.isSubject=false;
+    s.workerSystem.create({x:1,y:1},{isSubject:false});
     const dead=s.workerSystem.create({x:2,y:1});dead.currentHP=0;dead.isAlive=false;s.workerSystem.onDeath(dead);s.workerSystem.updateUI();
     const first=s.workerSystem.liveSubjects()[0];s.workerSystem.jobs.assign(first,'miner');s.experienceSystem.addXP(first,200);s.populationSidebar.refresh(true);
     return {first:first.id,name:first.name,last:s.populationSidebar.records.at(-1).id,count:s.workerSystem.liveSubjects().length};
@@ -40,6 +40,28 @@ export async function populationSidebarSmoke(page){
   await page.locator('.population-select').first().hover();await page.locator('#population-tooltip:not([hidden])').hover();const activeZoom=await page.evaluate(()=>window.__game.registry.get('application').scene.cameras.main.zoom);await page.mouse.wheel(0,250);await page.waitForFunction(()=>document.querySelector('#population-tooltip').scrollTop>0);assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.cameras.main.zoom),activeZoom);
   await page.locator('#population-tab').click();await page.evaluate(()=>window.__game.registry.get('application').scene.worldCamera.follow());
   console.log('PASS native Population sidebar, real portraits and profession colour, actual skill/talent/XP tooltip, permanent/dead/visitor filtering, 200-resident virtual rows, active scroll isolation, camera controls, bounded mobile details and exact world restoration');
+}
+
+export async function populationIntegrationSmoke(page){
+  const baseline=await page.evaluate(()=>{const app=window.__game.registry.get('application');app.scene.pauseManager.set('population-integration',true);return app.snapshot();});
+  const load=async state=>{await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__populationIntegrationReady=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('population-integration',true);window.__populationIntegrationReady=true;app.onGameReady=ready;};await app.load(state);},state);await page.waitForFunction(()=>window.__populationIntegrationReady);};
+  const fixture=await page.evaluate(()=>{
+    const s=window.__game.registry.get('application').scene;s.gameTime.setPaused(false);s.gameTime.update(3*s.gameTime.dayDuration+1234);s.gameTime.setPaused(true);
+    const occupied=new Set(s.reservedTiles().map(t=>`${t.x},${t.y}`));
+    for(let y=2;y<98&&s.workerSystem.liveSubjects().length<200;y++)for(let x=2;x<98&&s.workerSystem.liveSubjects().length<200;x++){const key=`${x},${y}`;if(s.map[y][x]!==0||occupied.has(key)||s.resourceOccupancy.has(key))continue;const w=s.workerSystem.create({x,y});w.aiCooldown=1e8;occupied.add(key);}
+    const recent=s.workerSystem.create({x:1,y:1},{name:'Recent death integration'}),old=s.workerSystem.create({x:2,y:1},{name:'Expired death integration'});for(const w of [recent,old]){w.isAlive=false;w.currentHP=0;s.workerSystem.onDeath(w);}old.diedAt=s.gameTime.totalElapsed-3*s.gameTime.dayDuration;
+    const visitor=s.workerSystem.create({x:3,y:1},{name:'Foreign visitor integration',isSubject:false});s.workerSystem.updateUI();return{recent:recent.id,old:old.id,visitor:visitor.id};
+  });
+  await page.locator('#population-tab').click();await page.locator('#population-sort').selectOption('skill:mining');await page.locator('#population-order').selectOption('asc');await page.locator('#population-profession').selectOption('idle');
+  const saved=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.equal(saved.workers.filter(w=>w.isAlive&&w.isSubject).length,200);assert.equal(saved.workers.filter(w=>w.id===fixture.recent).length,1);assert.equal(Object.hasOwn(saved.population,'recentDeaths'),false);
+  await load(saved);assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').snapshot()),saved);assert.equal(await page.locator('#population-tab').getAttribute('aria-expanded'),'false');assert.equal(await page.locator('.population-row').count(),0);
+  await page.locator('#population-tab').click();assert.equal(await page.locator('#population-sort').inputValue(),'skill:mining');assert.equal(await page.locator('#population-order').inputValue(),'asc');assert.equal(await page.locator('#population-profession').inputValue(),'idle');assert.equal(await page.locator('#population-tab-count').textContent(),'200');assert.ok(await page.locator('.population-row').count()<=14);
+  await page.locator('#population-search').fill('integration');assert.equal(await page.locator('.population-deaths-heading').textContent(),'Recent Deaths (1)');const dead=page.locator(`.population-row[data-worker-id="${fixture.recent}"]`);assert.equal(await dead.getAttribute('data-population-state'),'dead');assert.equal(await dead.locator('.population-select').isDisabled(),true);assert.equal(await dead.locator('.population-locate').isDisabled(),true);assert.equal(await page.locator(`[data-worker-id="${fixture.old}"]`).count(),0);assert.equal(await page.locator(`[data-worker-id="${fixture.visitor}"]`).count(),0);
+  await dead.focus();await page.locator('#population-tooltip:not([hidden])').waitFor();assert.match(await page.locator('#population-tooltip').textContent(),/Deceased/);
+  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.gameTime.setPaused(false);s.gameTime.update(3*s.gameTime.dayDuration-1);s.gameTime.setPaused(true);s.populationSidebar.refresh(true);});assert.equal(await dead.count(),1);
+  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.gameTime.setPaused(false);s.gameTime.update(1);s.gameTime.setPaused(true);s.populationSidebar.refresh(true);});assert.equal(await dead.count(),0);assert.equal(await page.locator('.population-deaths-heading').count(),0);assert.equal(await page.locator('#population-tooltip').evaluate(e=>e.hidden),true);assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.workerSystem.workers.has(id),fixture.recent),true);
+  await page.locator('#population-search').fill('');await page.locator('#population-sort').selectOption('level');await page.locator('#population-order').selectOption('desc');await page.locator('#population-profession').selectOption('all');await page.locator('#population-tab').click();await load(baseline);assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').snapshot()),baseline);await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('population-integration',false));
+  console.log('PASS native Save10 restores 200 authoritative residents, persistent UI-only preferences and separate read-only Recent Deaths; exact three-day expiry retains debt history and never revives expired residents or foreign visitors');
 }
 
 export async function populationNavigationSmoke(page){

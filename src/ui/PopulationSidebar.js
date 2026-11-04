@@ -43,10 +43,12 @@ export class PopulationSidebar {
   refresh(force=false){
     if(!this.open)return;const now=performance.now();if(!force&&now-this.lastRefresh<200)return;this.lastRefresh=now;
     const summary=populationSummary(this.scene.workerSystem.workers.values());this.records=sortedPopulation(summary.residents,this.preferences,this.search.value);
+    this.deaths=sortedPopulation(this.scene.workerSystem.recentDeaths(),this.preferences,this.search.value,{includeDead:true});
+    this.displayRecords=[...this.records.map(worker=>({worker})),...(this.deaths.length?[{heading:true},...this.deaths.map(worker=>({worker}))]:[])];
     const text=`Population: ${summary.total} · Employed: ${summary.employed} · Unemployed: ${summary.unemployed}`;
     const output=document.querySelector('#population-summary');if(output.textContent!==text)output.textContent=text;
-    document.querySelector('#population-empty').hidden=this.records.length>0;document.querySelector('#population-filter-count').textContent=`${this.records.length} / ${summary.total} shown`;
-    this.list.style.height=`${this.records.length*POPULATION_ROW_HEIGHT}px`;this.renderVisible();this.refreshDetails();
+    document.querySelector('#population-empty').hidden=this.records.length>0||this.deaths.length>0;document.querySelector('#population-filter-count').textContent=`${this.records.length} / ${summary.total} living shown${this.deaths.length?` · ${this.deaths.length} recent deaths`:''}`;
+    this.list.style.height=`${this.displayRecords.length*POPULATION_ROW_HEIGHT}px`;this.renderVisible();this.refreshDetails();
   }
   createRow(id){
     const controller=new AbortController();
@@ -56,20 +58,27 @@ export class PopulationSidebar {
     const text=element('span','population-row-text'),name=element('strong'),job=element('small'),progress=element('small','population-row-progress');text.append(name,job,progress);select.append(portraitFrame,text);
     const locate=element('button','population-locate','Locate');locate.type='button';locate.setAttribute('aria-label',`Locate villager ${id}`);row.append(select,locate);
     const options={signal:controller.signal};
-    select.addEventListener('pointerenter',()=>this.showDetails(id,row),options);select.addEventListener('pointerleave',()=>this.deferHideDetails(),options);
+    row.addEventListener('pointerenter',()=>this.showDetails(id,row),options);row.addEventListener('pointerleave',()=>this.deferHideDetails(),options);row.addEventListener('focus',()=>this.showDetails(id,row),options);
     select.addEventListener('focus',()=>this.showDetails(id,row),options);select.addEventListener('blur',event=>{if(!this.tooltip.contains(event.relatedTarget))this.deferHideDetails();},options);
     select.addEventListener('click',()=>{clearTimeout(this.inspectTimer);this.hideDetails();if(!this.selectResident(id))return;this.inspectTimer=setTimeout(()=>{const worker=this.resident(id);if(worker&&this.open)this.scene.unitPanel.open(worker,{management:true});},240);},options);
     select.addEventListener('dblclick',()=>this.locateResident(id),options);locate.addEventListener('click',()=>this.locateResident(id),options);
     return {row,portrait,name,job,progress,select,locate,status,controller};
   }
   renderVisible(){
-    const range=populationWindow(this.records.length,this.viewport.scrollTop,this.viewport.clientHeight||300),needed=new Set(),ordered=[];
+    const range=populationWindow(this.displayRecords.length,this.viewport.scrollTop,this.viewport.clientHeight||300),needed=new Set(),ordered=[];
     for(let index=range.start;index<range.end;index++){
-      const worker=this.records[index];needed.add(worker.id);let record=this.rows.get(worker.id);
+      const item=this.displayRecords[index];
+      if(item.heading){
+        const key='@recent-deaths';needed.add(key);let record=this.rows.get(key);
+        if(!record){const row=element('h3','population-deaths-heading');row.dataset.workerId=key;record={row,controller:new AbortController()};this.rows.set(key,record);}
+        record.row.style.top=`${index*POPULATION_ROW_HEIGHT}px`;record.row.textContent=`Recent Deaths (${this.deaths.length})`;ordered.push(record.row);continue;
+      }
+      const worker=item.worker;needed.add(worker.id);let record=this.rows.get(worker.id);
       if(!record){record=this.createRow(worker.id);this.rows.set(worker.id,record);this.list.append(record.row);}
       ordered.push(record.row);
       record.row.style.top=`${index*POPULATION_ROW_HEIGHT}px`;
-      const skill=this.preferences.sortBy.startsWith('skill:')?this.preferences.sortBy.slice(6):null,warnings=residentWarnings(this.scene,worker),signature=JSON.stringify([worker.name,worker.profession,worker.experience,worker.definition.id,worker.workState,warnings,skill,skill?worker.skills[skill]:null]);if(signature===record.signature)continue;record.signature=signature;
+      const skill=this.preferences.sortBy.startsWith('skill:')?this.preferences.sortBy.slice(6):null,warnings=residentWarnings(this.scene,worker),signature=JSON.stringify([worker.name,worker.profession,worker.experience,worker.definition.id,worker.workState,warnings,skill,skill?worker.skills[skill]:null,worker.isAlive]);if(signature===record.signature)continue;record.signature=signature;
+      record.row.classList.toggle('is-dead',!worker.isAlive);record.row.dataset.populationState=worker.isAlive?'living':'dead';record.row.tabIndex=worker.isAlive?-1:0;record.select.disabled=!worker.isAlive;record.locate.disabled=!worker.isAlive;
       record.name.textContent=worker.name;record.job.textContent=JOBS[worker.profession]?.name??worker.profession;
       const e=worker.experience;record.progress.textContent=`LVL ${e.level} · ${skill?`${SKILLS[skill]} ${worker.skills[skill]?.level??1}`:e.level===e.maxLevel?'XP MAX':`${Math.round(e.currentXP*100)/100} / ${e.xpToNextLevel} XP`}`;
       record.portrait.src=this.portrait(worker);record.portrait.alt=`Portrait of ${worker.name}`;record.portrait.style.backgroundColor=professionColor(worker.profession);record.select.setAttribute('aria-label',`Inspect ${worker.name}`);
@@ -81,6 +90,7 @@ export class PopulationSidebar {
     this.positionTooltip();
   }
   resident(id){const worker=this.scene.workerSystem.workers.get(id);return worker?.isAlive&&worker.isSubject!==false?worker:null;}
+  detailWorker(id){const worker=this.scene.workerSystem.workers.get(id);return worker&&worker.isSubject!==false&&(worker.isAlive||this.scene.workerSystem.recentDeaths().some(dead=>dead.id===id))?worker:null;}
   selectResident(id,duration=Infinity){const worker=this.resident(id);if(!worker)return false;this.selectedId=id;this.selectionExpires=this.scene.gameTime.totalElapsed+duration;this.refreshSelection();return true;}
   locateResident(id){
     clearTimeout(this.inspectTimer);this.hideDetails();const worker=this.resident(id);if(!worker)return false;
@@ -89,21 +99,21 @@ export class PopulationSidebar {
   }
   clearSelection(){this.selectedId=null;this.selection.setVisible(false);}
   refreshSelection(){
-    const worker=this.resident(this.selectedId),visible=worker&&this.scene.gameTime.totalElapsed<this.selectionExpires&&this.scene.fog.isVisibleObject(worker)&&worker.view.visible;
+    const worker=this.resident(this.selectedId);if(this.selectedId&&!worker){this.clearSelection();return;}const visible=worker&&this.scene.gameTime.totalElapsed<this.selectionExpires&&this.scene.fog.isVisibleObject(worker)&&worker.view.visible;
     this.selection.setVisible(!!visible);if(visible)this.selection.setPosition(worker.view.x,worker.view.y).setDepth(worker.view.depth+.2);
   }
   update(){this.refreshSelection();this.refresh();}
   showDetails(id,anchor){
     if(!this.open||innerWidth<600||matchMedia('(hover: none)').matches)return;
-    clearTimeout(this.hideTimer);this.rows.get(this.tooltipWorkerId)?.select.removeAttribute('aria-describedby');this.tooltipWorkerId=id;this.tooltipAnchor=anchor;this.rows.get(id)?.select.setAttribute('aria-describedby',this.tooltip.id);this.refreshDetails();
+    clearTimeout(this.hideTimer);this.rows.get(this.tooltipWorkerId)?.select.removeAttribute('aria-describedby');this.rows.get(this.tooltipWorkerId)?.row.removeAttribute('aria-describedby');this.tooltipWorkerId=id;this.tooltipAnchor=anchor;this.rows.get(id)?.select.setAttribute('aria-describedby',this.tooltip.id);this.rows.get(id)?.row.setAttribute('aria-describedby',this.tooltip.id);this.refreshDetails();
   }
   deferHideDetails(){clearTimeout(this.hideTimer);this.hideTimer=setTimeout(()=>this.hideDetails(),100);}
   hideDetails(){
-    clearTimeout(this.hideTimer);this.rows.get(this.tooltipWorkerId)?.select.removeAttribute('aria-describedby');this.tooltip.hidden=true;this.tooltipWorkerId=null;this.tooltipAnchor=null;this.tooltipSignature=null;this.tooltip.replaceChildren();
+    clearTimeout(this.hideTimer);this.rows.get(this.tooltipWorkerId)?.select.removeAttribute('aria-describedby');this.rows.get(this.tooltipWorkerId)?.row.removeAttribute('aria-describedby');this.tooltip.hidden=true;this.tooltipWorkerId=null;this.tooltipAnchor=null;this.tooltipSignature=null;this.tooltip.replaceChildren();
   }
   refreshDetails(){
-    if(!this.tooltipWorkerId||!this.open)return;const worker=this.scene.workerSystem.workers.get(this.tooltipWorkerId);
-    if(!worker?.isAlive||worker.isSubject===false){this.hideDetails();return;}
+    if(!this.tooltipWorkerId||!this.open)return;const worker=this.detailWorker(this.tooltipWorkerId);
+    if(!worker){this.hideDetails();return;}
     const data=populationDetails(this.scene,worker),signature=JSON.stringify(data);this.tooltip.hidden=false;
     if(signature!==this.tooltipSignature){
       const scroll=this.tooltip.scrollTop;this.tooltipSignature=signature;

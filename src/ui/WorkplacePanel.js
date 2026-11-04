@@ -21,7 +21,7 @@ export class WorkplacePanel {
   refresh(){
     if(!this.dialog.open||!this.building)return;
     const s=this.scene,b=this.building;if(!s.buildings.includes(b)||!s.fog.isVisibleObject(b)){this.close();return;}
-    const spec=buildingDefinition(b),summary=s.workplaceSystem.summary(b),employees=s.workplaceSystem.employees(b),candidates=s.workerSystem.liveWorkers().filter(w=>w.assignedWorkplaceId!==b.id);
+    const spec=buildingDefinition(b),summary=s.workplaceSystem.summary(b),employees=s.workplaceSystem.employees(b),candidates=s.workerSystem.liveSubjects().filter(w=>w.assignedWorkplaceId!==b.id);
     const production=spec.recipe?s.foodProduction.records.get(b.id):null;
     const signature=JSON.stringify([summary,production,production?s.foodStorage.revision:0,employees.map(w=>[w.id,w.workState,w.workMessage,w.skills[spec.workplace.skill].level]),candidates.map(w=>[w.id,w.profession,w.naturalTalent,w.skills[spec.workplace.skill].level])]);if(signature===this.signature)return;this.signature=signature;
     const recipePanel=document.querySelector('#food-production-details');recipePanel.hidden=!production;

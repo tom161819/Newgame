@@ -10,7 +10,7 @@ export class WageSystem {
     this.unsubscribeDay=scene.gameTime.onNewDay(day=>this.processDay(day));
   }
   dailyWage(worker){
-    const base=BASE_DAILY_WAGES[worker.profession]??0;if(!worker.isAlive||!base)return 0;
+    const base=BASE_DAILY_WAGES[worker.profession]??0;if(!worker.isAlive||worker.isSubject===false||!base)return 0;
     return base+Math.floor(((worker.skills[JOBS[worker.profession].skill]?.level??1)-1)/WAGE_LEVEL_INTERVAL);
   }
   accrue(delta){

@@ -3,11 +3,11 @@
   "gameVersion": "0.1.0",
   "projectBase": "/Newgame/",
   "currentBuild": {
-    "version": "0.1.0+dev.a4f51ecd936af7678c0822ead4e15c91c0b3e780",
+    "version": "0.1.0+dev.0f24913231d0dfa4d08f87cc1043d960e83fbe1b",
     "gameVersion": "0.1.0",
     "title": "Current development build",
-    "date": "2026-11-03",
-    "commit": "a4f51ecd936af7678c0822ead4e15c91c0b3e780",
+    "date": "2026-11-04",
+    "commit": "0f24913231d0dfa4d08f87cc1043d960e83fbe1b",
     "archiveURL": "/Newgame/",
     "available": true,
     "description": "Current development build; released changes are listed separately.",
@@ -716,6 +716,20 @@
     }
   ],
   "builds": [
+    {
+      "version": "0.1.0+git.0024c16c803a91b151cff08300665076f8b67b35",
+      "gameVersion": "0.1.0",
+      "commit": "0024c16c803a91b151cff08300665076f8b67b35",
+      "date": "2026-11-03T23:44:29Z",
+      "title": "Persist safe map knowledge and keep moving circular exploration fast without hidden information leaks",
+      "description": "Persist safe map knowledge and keep moving circular exploration fast without hidden information leaks",
+      "archiveURL": "/Newgame/versions/0024c16c803a91b151cff08300665076f8b67b35/",
+      "available": true,
+      "sequence": 77,
+      "releaseType": "snapshot",
+      "historical": true,
+      "reconstructed": true
+    },
     {
       "version": "0.1.0+git.a4f51ecd936af7678c0822ead4e15c91c0b3e780",
       "gameVersion": "0.1.0",

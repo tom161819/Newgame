@@ -33,6 +33,15 @@ async function clickWorld(page,point){
   const camera=await page.evaluate(()=>{const c=window.__game.registry.get('application').scene.cameras.main;return{x:c.scrollX+c.width/2,y:c.scrollY+c.height/2,w:c.width,h:c.height,z:c.zoom};}),bounds=await page.locator('canvas').boundingBox();
   await page.mouse.click(bounds.x+((point.x-camera.x)*camera.z+camera.w/2)*bounds.width/camera.w,bounds.y+((point.y-camera.y)*camera.z+camera.h/2)*bounds.height/camera.h);
 }
+async function clickBuilding(page,id){
+  // A ground tile can be covered by a neighbouring isometric roof. Click an
+  // actually exposed part of this building through the ordinary mouse path.
+  const point=await page.evaluate(id=>{
+    const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id),height=b.definition.visualHeight;
+    for(const tile of b.tiles)for(let lift=8;lift<=height;lift+=8){const x=s.map.length*32+(tile.x-tile.y)*32,y=128+(tile.x+tile.y+1)*16-lift,horizontal=(x-s.map.length*32)/32,vertical=(y-128)/16,hit=s.pickInteraction(x,y,{x:Math.floor((vertical+horizontal)/2),y:Math.floor((vertical-horizontal)/2)});if(hit?.kind==='building'&&hit.object.id===id)return{x,y};}
+    throw Error(`No exposed clickable surface for building ${id}.`);
+  },id);await clickWorld(page,point);
+}
 async function placeBlueprint(page,type){
   const point=await page.evaluate(type=>{
     const s=window.__game.registry.get('application').scene,d=s.objectRegistry.require(type),occupied=new Set(s.reservedTiles().map(t=>`${t.x},${t.y}`)),start=s.character.tile;
@@ -47,10 +56,10 @@ async function placeBlueprint(page,type){
   const id=await page.evaluate(type=>window.__game.registry.get('application').scene.buildings.filter(b=>b.type===type&&b.construction?.state==='planned').at(-1).id,type);return {id,point};
 }
 async function supplyAndBuild(page,{id,point}){
-  await clickWorld(page,point);await page.locator('#construction-dialog[open]').waitFor();assert.equal(await page.locator('#construction-king-work').isDisabled(),true);await page.locator('#construction-deliver').click();await page.locator('#close-construction').click();
+  await clickBuilding(page,id);await page.locator('#construction-dialog[open]').waitFor();assert.equal(await page.locator('#construction-king-work').isDisabled(),true);await page.locator('#construction-deliver').click();await page.locator('#close-construction').click();
   await page.waitForFunction(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id);return s.constructionSystem.materials.ready(b)&&s.kingLogistics.workflowSiteId==null;},id,{timeout:35000});
   // A normal second map click issues the existing royal Build order.
-  await clickWorld(page,point);await page.locator('#construction-dialog[open]').waitFor();assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.constructionSystem.assignments.get('king')?.siteId===id,id),true);await page.locator('#close-construction').click();
+  await clickBuilding(page,id);await page.locator('#construction-dialog[open]').waitFor();assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.constructionSystem.assignments.get('king')?.siteId===id,id),true);await page.locator('#close-construction').click();
   await page.waitForFunction(id=>window.__game.registry.get('application').scene.buildings.find(b=>b.id===id)?.construction?.state==='complete',id,{timeout:65000});
   console.log(`PASS physical construction and material delivery for site ${id}`);
 }
@@ -77,6 +86,6 @@ export async function buildingUnlockGameplaySmoke(page){
   assert.equal(await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;return s.farmingSystem.records.has(id)&&s.inventory.count('stone')===7;},field.id),true);
   console.log('PASS actual Granary→Farmhouse physical supply/build, live menu unlocks, exact mid-blueprint Load, relocking and grandfathered field completion');
   await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('stone',3);s.updateInventory();});const tower=await placeBlueprint(page,'tower');
-  await clickWorld(page,tower.point);await page.locator('#construction-dialog[open]').waitFor();await page.locator('#cancel-construction').click();assert.equal(await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;return !s.buildings.some(b=>b.id===id)&&s.inventory.count('stone')===10;},tower.id),true);
+  await clickBuilding(page,tower.id);await page.locator('#construction-dialog[open]').waitFor();await page.locator('#cancel-construction').click();assert.equal(await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;return !s.buildings.some(b=>b.id===id)&&s.inventory.count('stone')===10;},tower.id),true);
   console.log('PASS actual unstarted blueprint cancellation restores the reserved price without duplicating materials');
 }

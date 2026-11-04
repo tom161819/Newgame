@@ -1,6 +1,23 @@
 [
   {
     "schema": 1,
+    "commit": "0024c16c803a91b151cff08300665076f8b67b35",
+    "tree": "ec76965538ff8c4dbbd93cc53b5edc1f67620c87",
+    "date": "2026-11-03T23:44:29Z",
+    "sequence": 77,
+    "subject": "Persist safe map knowledge and keep moving circular exploration fast without hidden information leaks",
+    "name": "Persist safe map knowledge and keep moving circular exploration fast without hidden information leaks",
+    "description": "Persist safe map knowledge and keep moving circular exploration fast without hidden information leaks",
+    "basePath": "/Newgame/versions/0024c16c803a91b151cff08300665076f8b67b35/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    },
+    "originalVersion": "0.1.0"
+  },
+  {
+    "schema": 1,
     "commit": "a4f51ecd936af7678c0822ead4e15c91c0b3e780",
     "tree": "e087457df21b5bd25fef2ff9ec51d2fd50274c15",
     "date": "2026-11-03T22:38:40Z",

@@ -10,7 +10,7 @@ import { buildingMenuSmoke,buildingUnlockGameplaySmoke } from './building-menu-s
 import { seasonsMenuSmoke } from './seasons-menu-smoke.mjs';
 import { stageArchivedSnapshots } from './stage-archive.mjs';
 import { explorationMenuSmoke,staticMemoryRendererSmoke,hiddenInteractionSmoke } from './fog-smoke.mjs';
-import { populationSidebarSmoke,populationNavigationSmoke } from './population-smoke.mjs';
+import { populationSidebarSmoke,populationNavigationSmoke,populationIntegrationSmoke } from './population-smoke.mjs';
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
 const base=projectBase(args.find(a=>a.startsWith('--base='))?.slice(7)??'/Newgame/'),dist=path.join(root,'dist');
@@ -41,6 +41,7 @@ try{
     // Instrument the served copy only; no test globals are shipped in the game.
     await p.route('**/assets/index-*.js',async route=>{const response=await route.fetch();await route.fulfill({response,body:(await response.text()).replace(/new ([\w$]+)\.Game\(/,'window.__game = new $1.Game(')});});
   };
+  await page.addInitScript(()=>{let state=77123;Math.random=()=>((state=Math.imul(state,1664525)+1013904223>>>0)/2**32);});
   await instrument(page);await page.goto(origin+base);
   assert.ok((await page.title()).includes(`v${catalog.gameVersion}`));
   for(const label of await page.locator('[data-game-version]').allTextContents())assert.equal(label,`v${catalog.gameVersion}`);
@@ -70,7 +71,7 @@ try{
   if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full'))await page.locator('#setup-seasons').uncheck();}
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
-  if(args.includes('--full')||args.includes('--population')){await populationSidebarSmoke(page);await populationNavigationSmoke(page);}
+  if(args.includes('--full')||args.includes('--population')){await populationSidebarSmoke(page);await populationNavigationSmoke(page);await populationIntegrationSmoke(page);}
   if(args.includes('--full')||args.includes('--fog')){await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);await hiddenInteractionSmoke(page);}
   if(args.includes('--full'))await seasonsMenuSmoke(page);
   await buildingMenuSmoke(page);
@@ -125,6 +126,14 @@ try{
     await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(state);},legacy);await page.waitForFunction(()=>window.__restored);
     const restored=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.deepEqual(restored.time,legacy.time);assert.deepEqual(restored.seasons,legacy.seasons);assert.deepEqual(restored.inventory,legacy.inventory);assert.deepEqual(restored.player.experience,legacy.player.experience);assert.equal(restored.exploration.explored.length,317);assert.equal(restored.settings.explorationMode,true);
     console.log('PASS actual a4f51ec schema-8 permanent Summer save preserves time, frozen seasonal cycle, stock and XP; migration discovers only the loaded king circle');
+  }
+  if(migrated.saveVersion>=10){
+    const previous=catalog.builds.find(b=>b.commit==='0024c16c803a91b151cff08300665076f8b67b35');assert.ok(previous?.available,'The actual schema-9 source archive must remain available.');
+    const legacyPage=await context.newPage();await instrument(legacyPage);await legacyPage.goto(origin+previous.archiveURL);await legacyPage.locator('#new-game').click();await legacyPage.locator('#start-game').click();await legacyPage.waitForFunction(()=>window.__game?.registry.get('application').scene?.mapMemory);
+    const legacy=await legacyPage.evaluate(()=>{const app=window.__game.registry.get('application'),s=app.scene;s.pauseManager.set('test',true);const w=s.workerSystem.liveWorkers()[0];w.currentHP=0;w.isAlive=false;s.workerSystem.onDeath(w);return app.snapshot();});assert.equal(legacy.saveVersion,9);assert.ok(legacy.exploration.explored.length>0);await legacyPage.close();
+    await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(state);},legacy);await page.waitForFunction(()=>window.__restored);
+    const restored=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.deepEqual(restored,{...legacy,saveVersion:restored.saveVersion,workers:legacy.workers.map(w=>({...w,isSubject:true,diedAt:w.isAlive?null:legacy.time.totalElapsed}))});
+    console.log('PASS actual 0024c16 schema-9 source save migrates to Save10 with exact map memory, stock, time and XP; undated old deaths gain one persisted retention window');
   }
   const archivePage=await context.newPage();await instrument(archivePage);await archivePage.goto(origin+base+'versions/');assert.equal(await archivePage.locator('[data-version-label]').count(),catalog.versions.length+(catalog.versions.some(v=>v.current)?0:1));
   await archivePage.setViewportSize({width:390,height:844});assert.equal(await archivePage.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);

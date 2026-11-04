@@ -40,7 +40,7 @@ export function loadGameState(scene,input){
     animal.view.animate?.(0,animal.walking,animal.direction);
   }
   for(const data of state.workers??[]){
-    const worker=scene.workerSystem.create(data.tile,{id:data.id,name:data.name,randomize:false});restoreActor(worker,data);
+    const worker=scene.workerSystem.create(data.tile,{id:data.id,name:data.name,randomize:false,isSubject:data.isSubject});restoreActor(worker,data);worker.diedAt=data.diedAt;
     if(data.naturalTalent){worker.naturalTalent=data.naturalTalent;worker.initialSkills=structuredClone(data.initialSkills);}
     else initializeNaturalTalent(worker,{legacy:true});
     for(const key of ['profession','workState','workMessage','assignedWorkplaceId','arriving','aiCooldown'])worker[key]=data[key];

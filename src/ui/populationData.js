@@ -9,9 +9,9 @@ export function populationPreferences(input){return {sortBy:POPULATION_SORTS.inc
 export function readPopulationPreferences(storage){try{return populationPreferences(JSON.parse(storage.getItem('newgame.population')??'null'));}catch{return populationPreferences();}}
 export function writePopulationPreferences(storage,value){try{storage.setItem('newgame.population',JSON.stringify(populationPreferences(value)));}catch{/* Preferences are optional when browser storage is unavailable. */}}
 const fold=value=>String(value??'').normalize('NFD').replace(/\p{Diacritic}/gu,'').toLocaleLowerCase('cs');
-export function sortedPopulation(workers,preferences,query=''){
+export function sortedPopulation(workers,preferences,query='',{includeDead=false}={}){
   const p=populationPreferences(preferences),direction=p.direction==='desc'?-1:1,search=fold(query.trim()),skill=p.sortBy.startsWith('skill:')?p.sortBy.slice(6):null;
-  return [...workers].filter(w=>w.isAlive&&w.isSubject!==false&&(p.profession==='all'||w.profession===p.profession)&&fold(w.name).includes(search)).sort((a,b)=>{
+  return [...workers].filter(w=>(includeDead||w.isAlive)&&w.isSubject!==false&&(p.profession==='all'||w.profession===p.profession)&&fold(w.name).includes(search)).sort((a,b)=>{
     let primary=0;
     if(skill)primary=(a.skills[skill]?.level??1)-(b.skills[skill]?.level??1)||(a.skills[skill]?.currentXP??0)-(b.skills[skill]?.currentXP??0)||a.experience.level-b.experience.level;
     else if(p.sortBy==='level')primary=a.experience.level-b.experience.level||a.experience.totalXP-b.experience.totalXP;
@@ -32,6 +32,7 @@ export function populationWindow(total,scroll,height,overscan=3){
 }
 export const professionColor=profession=>JOBS[profession]?.portraitColor??JOBS.idle.portraitColor;
 export function residentWarnings(scene,worker){
+  if(!worker.isAlive)return [{icon:'☠',text:'Deceased'}];
   const warnings=[];
   if(scene.foodSystem?.residents.get(worker.id)?.hungry)warnings.push({icon:'⚠',text:'Hungry: work efficiency is reduced by 20%.'});
   if(worker.currentHP<worker.maxHP*.3)warnings.push({icon:'!',text:'Low health'});
