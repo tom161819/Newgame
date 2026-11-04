@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| Approved tower and brazier in the game | Claude | `claude/approved-tower-brazier` | — | In progress | `src/data/objects/buildings.js` (tower), `src/data/objects/lighting.js`, `src/data/objects/index.js`, `src/data/experience.js` (brazier XP), `src/systems/ObjectRegistry.js` (lights validation), `src/systems/SpriteViews.js` (pixel hit test), `src/systems/LightSourceSystem.js`, `src/game/LitBuildingView.js`, `src/game/GameScene.js` (3 lines), `public/assets/buildings/{tower,brazier}/`, related tests |
+| Visual polish and Asset Studio concepts (phases A–E) | Claude | `claude/visual-polish-and-asset-studio` | — | In progress | `index.html` (game layout), `src/style.css`, `src/main.js`, `src/ui/CompactHud.js`, `package.json` (fonts), `studio/**`, `art/**`, `docs/art/**`; later phases: construction view, terrain support |
 
 ## Kept backups (do not delete without the developer)
 
@@ -21,6 +21,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#10](https://github.com/tom161819/Newgame/pull/10) Approved watchtower and Brazier in the game, runtime flames and light sources (Claude).
 - 2026-11-04 [#9](https://github.com/tom161819/Newgame/pull/9) Stage 09 Daily Resource Statistics & Ledger, Save schema 13 (Codex).
 - 2026-11-04 [#8](https://github.com/tom161819/Newgame/pull/8) Asset Studio recipes: house, oak, pine, wall, quarry (Claude).
 - 2026-11-04 [#7](https://github.com/tom161819/Newgame/pull/7) Asset Studio published on GitHub Pages under `/studio/` (Claude).
