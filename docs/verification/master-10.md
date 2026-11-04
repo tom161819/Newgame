@@ -72,3 +72,45 @@ IndexedDB restoration and frozen Fog building checks pass. The first native fixt
 incorrectly tried the hidden workplace control inside the Warehouse storage
 panel; corrected it to the real Manage Haulers flow. Full gate follows in PhaseC.
 Logs: /workspace/scratch/Newgame-master10-{phaseB-final-tests,phaseB-pages,smelting-smoke,chain-regression}.log.
+
+## PhaseC checkpoint — current branch verified; integration with newer main pending
+
+Targeted native furnace passes: real Warehouse and Smelter blueprints and royal
+supply/build, existing Manage Haulers flow, two auto-hired Operators, actual input
+and output journeys, partial40s cycle/loaded Bar IndexedDB roundtrips,10shared XP,
+exact3Ore/2Wood/1Bar receipts, resource tooltip and frozen Fog building. Screenshot
+/workspace/scratch/Newgame-master10-smelter.png was visually inspected.
+
+The first full smoke passed the furnace, original mineral extraction/forestry,
+zoom and Fog, then correctly failed on Population's old hardcoded9skill assertion.
+It now checks all registered10skills and actual Smelting sorting, without removing
+coverage. Targeted Population200/mobile/staffing/Fog/current pickup smoke passes.
+A fresh complete --full is running; do not claim it passed until its final result.
+
+Archive/catalog checks pass: all71 immutable builds remain unchanged; local
+production HTTP verifies71 canonical URLs/2314files/116659963bytes with matching
+MIME/SHA. Performance at0.25zoom/20NPC/Fog/moving king:57.30FPS cold and59.34FPS after
+closing Archives (360frames each); active simulation and real passages confirmed,
+no historical game requests, retained archive rows or per-frame staffing scans.
+This is local evidence, not a guarantee for every device. One full smoke process
+was also running during this timing sample.
+
+Meanwhile main advanced to03a3de337e8299b0cf24f7e82286f498c55fb99d, containing
+Claude's approved watchtower/brazier PR10. A non-applying merge-tree preview found
+five shared-file conflicts: docs/COORDINATION.md, src/data/experience.js,
+src/data/objects/index.js, tests/assets.test.js and tests/building-categories.test.js.
+They are additive registry/XP/test-count/task-register changes, not an alternative
+graphics implementation. Prepared review patch: master-10-main-integration.patch;
+git apply --check against actual main03a3de3 passes. It preserves all Claude
+entries and adds Smelter/Bar; registry49, buildables17 and queued textures51.
+The patch has NOT been applied to the branch and is not a completed integration.
+
+The uploaded user handoff explicitly says to stop the affected part on a conflict
+with Claude's work. An asynchronous question asks approval to combine these five
+files in this Codex branch and retest. Await an actual answer; elapsed time is not
+approval. Independent branch tests continue. Do not modify Claude branches, art,
+Studio, renderer/tower implementation or push to main while waiting.
+
+Original PR API limitation also remains: no supported GitHub connector; GraphQL
+last returned Forbidden because api.github.com is outside the environment policy.
+No Stage10 PR, successful deployment, M2 release/tag or new archive is claimed.

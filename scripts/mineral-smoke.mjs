@@ -12,7 +12,7 @@ export async function mineralSmoke(page){
       const s=window.__game.registry.get('application').scene,d=s.objectRegistry.require(type),deposits=s.naturalResources.mining.deposits().filter(o=>o.type===d.mining.depositType).sort((a,b)=>Math.hypot(a.x-s.character.tile.x,a.y-s.character.tile.y)-Math.hypot(b.x-s.character.tile.x,b.y-s.character.tile.y));
       for(const rock of deposits)for(let y=Math.max(1,rock.y-6);y<=Math.min(96,rock.y+3);y++)for(let x=Math.max(1,rock.x-6);x<=Math.min(96,rock.x+3);x++){
         s.previewAnchor={x,y};s.previewKey=null;s.updateBuildingPreview();if(s.previewKey!==`${x},${y}:null`)continue;
-        const actual=s.naturalResources.mining.select(d,{x,y});actual.natural.remaining=1;return{point:{x:3200+(x-y)*32,y:128+(x+y+1)*16},depositId:actual.natural.id,resource:d.mining.resource,xp:d.mining.xp};
+        const actual=s.naturalResources.mining.select(d,{x,y});actual.natural.remaining=1;if(type==='quarry'&&!s.preview.footprint.commandBuffer.includes(0xf6d786))throw Error('Valid Quarry preview must outline its selected rock');return{point:{x:3200+(x-y)*32,y:128+(x+y+1)*16},depositId:actual.natural.id,resource:d.mining.resource,xp:d.mining.xp};
       }throw Error(`No legal actual ${type} site`);
     },type);
     await clickWorld(page,fixture.point);await page.waitForFunction(type=>window.__game.registry.get('application').scene.buildings.some(b=>b.type===type&&b.construction?.state==='planned'),type);

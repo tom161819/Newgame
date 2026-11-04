@@ -1,7 +1,7 @@
 # Stage 09 — Daily Resource Statistics and Ledger
 
-Status: implementation and integrated verification complete; PR creation blocked
-by the managed environment's GitHub API policy. Owner: Codex.
+Status: implementation and integrated verification complete; merged through
+[PR9](https://github.com/tom161819/Newgame/pull/9) into main97b3381 externally. Owner: Codex.
 Branch: `codex/stage-09-ledger`. No merge into main, deployment, release or tag was made.
 
 ## Recovery and integration
@@ -131,3 +131,10 @@ Public github.com and Git transport work; do not bypass the API restriction or
 push directly to main instead of the required PR. No PR/merge or successful
 Pages deployment is claimed. The branch and prepared body remain the concrete
 handoff for manual web creation/merge or a supported API-enabled environment.
+
+## Delivery completed externally
+
+A subsequent fetch verified main97b3381 is the merge of PR9, containing the exact
+2064129 branch tip. Stage10 now starts from that merged main. Earlier API/HOLD
+notes describe the previous handoff; no direct main push or agent API merge was
+used to work around the network restriction.
