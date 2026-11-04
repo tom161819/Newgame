@@ -13,7 +13,7 @@ None pending. Add entries here when one pull request must wait for another.
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | Asset Studio recipes: house, oak, pine, wall, quarry | Claude | `claude/studio-recipes` | — | In progress | `studio/**`, `art/**`, `docs/art/**`, `tests/asset-studio.test.js` |
-| Stage 09 Daily Resource Statistics & Ledger | Codex | `codex/stage-09-ledger` (from `main`) | — | Ready to start. Any unpushed local work goes first to `codex/stage-09-ledger-wip`; no migrations of older saves (Alpha save policy) | — |
+| Stage 09 Daily Resource Statistics & Ledger | Codex | `codex/stage-09-ledger` (ALPHA base, normal merge of current main69e5e57) | Prepared body: [report](verification/master-09-pr.md); creation blocked by network API policy | Implementation verified:419/419 tests, full browser, Pages build, archive/catalog/71-URL HTTP checks passed on integrated main. Save13, no migrations. User authorized merging Stage09 through a PR on2026-11-04; previous HOLD lifted. No release/tag authorization added. WIP preserved in codex/stage-09-ledger-wip feb19d2. Stage10 waits for merge or actual PR09. | Ledger data/system/validator/tests; GameScene/buildings/inventory; GameTime/serializer/loader; existing production/food/storage/treasure/wages/construction/drop/workplace source owners; InventoryBar/new tooltip/CSS; browser/CI/forestry/mineral/ledger smokes and helper; Unreleased/progress/verification and this task row. No Studio/art/renderer/main-entry/save-menu changes. Remote claude/approved-tower-brazier2c95aec is preserved; dry-run integration conflicts only in this register, not game code. |
 
 ## Kept backups (do not delete without the developer)
 

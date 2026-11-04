@@ -94,7 +94,7 @@ export class FarmingSystem {
     record.cycle++;record.growthDays=0;record.stage=0;record.lastClock=this.clocks[building.type];record.reservedBy=null;
     this.scene.workerSystem.ai.cancel(worker);worker.workState='Searching for Work';
     const result={worker,building,resource:spec.resource,amount:spec.yield,cycle};
-    if(this.onHarvest)this.onHarvest(result);else this.scene.inventory.add(spec.resource,spec.yield);
+    if(this.onHarvest)this.onHarvest(result);else this.scene.inventory.add(spec.resource,spec.yield,{track:false});
     this.scene.foodSystem?.recordProduction(spec.resource,spec.yield,`harvest-${building.id}-${cycle}`);
     this.scene.activities.emit('cropHarvested',{actor:worker,objectType:building.type,quantity:1,objectId:building.id,cycle},`harvest-${building.id}-${cycle}`);
     this.paint(building,record);this.scene.updateInventory();return true;

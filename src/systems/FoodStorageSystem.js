@@ -47,6 +47,9 @@ export class FoodStorageSystem {
     }
     for(const actor of [this.scene.character,...(this.scene.workerSystem?.liveWorkers()??[])])if(actor.cargo&&rows.has(actor.cargo.resource))rows.get(actor.cargo.resource).carried+=actor.cargo.amount;
     for(const drop of this.scene.dropSystem.drops.values())if(rows.has(drop.resource))rows.get(drop.resource).ground+=drop.amount;
+    // Inputs of a reversible active recipe still belong to the kingdom. They
+    // leave ownership only when that cycle succeeds, not on buffer withdrawal.
+    for(const record of this.scene.foodProduction?.records.values()??[])for(const [resource,amount]of Object.entries(record.cycle?.inputs??{}))if(rows.has(resource))rows.get(resource).buffers+=amount;
     for(const view of this.scene.resources.values()){const row=rows.get(view.getData('objectId'));if(row)row.ground+=view.getData('object')?.amount??1;}
     return [...rows.values()].map(row=>({...row,total:row.freeStored+row.reservedStored+row.carried+row.sites+row.buffers+row.ground}));
   }
