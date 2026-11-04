@@ -128,3 +128,21 @@ No graphics implementation or other agent branch was overwritten. Full integrate
 verification follows; older branch-only results are not claimed for this merge.
 
 Combined main03a3de3 verification:437 passed,0failed,0skipped; build:pages passes. Package manifests are unchanged, so no dependency reinstall was required. The superseded old-base full smoke was terminated before rebuilding to avoid mixing artifacts; its partial results are historical only. Now commit this normal merge and run one full smoke on the combined artifact.
+
+## PhaseC native gate and final validation correction
+
+The complete combined-build smoke finished successfully, including new furnace
+and all earlier gameplay, full construction chain, alternate-schema rejection
+without slot/world mutation and original historical games. Log:
+/workspace/scratch/Newgame-master10-merged-full.log.
+
+Final review then added a valid two-Quarry edge scenario: each building mines a
+different primary rock while a secondary edge lies beneath its neighbour. The
+validator incorrectly rejected that legitimate snapshot. It now permits that
+static rock overlap; subsequent unique reciprocal primary-binding checks remain
+mandatory and reject a forged association. Exact restored simulation extracts
+only one unit from each finite deposit, with total2Stone. No schema bump beyond14
+or migration is needed for this bug fix.438/438 model tests now pass,0failed/skipped.
+This small validator change follows the full smoke; run the final production
+build and current-game native roundtrip on it before finishing. Do not attribute
+the earlier full log to a build that did not yet contain this correction.
