@@ -4,8 +4,16 @@
 
 export const box = (size, at, material, extra = {}) => ({ shape: 'box', size, at, material, ...extra });
 
-export const cylinder = ({ radiusBottom, radiusTop = radiusBottom, height, segments = 18 }, at, material) =>
-  ({ shape: 'cylinder', radiusBottom, radiusTop, height, segments, at, material });
+// `tilt: [x, z]` leans the cylinder about its base (radians around the X and Z axes).
+export const cylinder = ({ radiusBottom, radiusTop = radiusBottom, height, segments = 18, tilt }, at, material) =>
+  ({ shape: 'cylinder', radiusBottom, radiusTop, height, segments, at, material, ...(tilt ? { tilt } : {}) });
+
+// Top centre of a (possibly tilted) cylinder relative to its base, matching Three's XYZ Euler order.
+export function cylinderTop({ height, tilt }) {
+  if (!tilt) return [0, height, 0];
+  const [x, z] = tilt;
+  return [-height * Math.sin(z), height * Math.cos(z) * Math.cos(x), height * Math.cos(z) * Math.sin(x)];
+}
 
 // Square frustum whose sides are `width` (bottom) and `width * taper` (top).
 export const squareFrustum = (width, height, taper, at, material) =>

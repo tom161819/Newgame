@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "pine-seasons",
+  "variantId": "pine-seasons-winter",
+  "name": "Snowy pine",
+  "category": "trees",
+  "version": 1,
+  "specHash": "827c1bde",
+  "generator": "tree",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 74,
+  "height": 149,
+  "anchor": {
+    "x": 33,
+    "y": 131
+  },
+  "origin": {
+    "x": 0.44595,
+    "y": 0.87919
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 147
+  },
+  "baseOrigin": {
+    "x": 0.44595,
+    "y": 0.98658
+  },
+  "visualHeight": 147,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 3.307,
+  "lights": []
+}

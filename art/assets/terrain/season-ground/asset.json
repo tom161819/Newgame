@@ -1,0 +1,247 @@
+{
+  "schema": 1,
+  "id": "season-ground",
+  "name": "Seasonal ground",
+  "category": "terrain",
+  "description": "Grass in every season, as tile sets that join without seams. The Scene tab previews the proposed uneven transition: seasons spread tile by tile from left to right instead of flipping the whole map at once.",
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "generator": "ground",
+  "gameObjectId": "grass_normal",
+  "transition": {
+    "order": [
+      "season-ground-spring",
+      "season-ground-summer",
+      "season-ground-autumn",
+      "season-ground-frost",
+      "season-ground-snow"
+    ],
+    "trees": [
+      [
+        "oak-seasons-spring",
+        "pine-seasons-summer"
+      ],
+      [
+        "oak-seasons-summer",
+        "pine-seasons-summer"
+      ],
+      [
+        "oak-seasons-autumn",
+        "pine-seasons-summer"
+      ],
+      [
+        "oak-seasons-winter",
+        "pine-seasons-winter"
+      ],
+      [
+        "oak-seasons-winter",
+        "pine-seasons-winter"
+      ]
+    ]
+  },
+  "variants": [
+    {
+      "id": "season-ground-spring",
+      "name": "Spring: fresh green",
+      "version": 1,
+      "notes": "Light fresh green, short new blades, early flowers.",
+      "spec": {
+        "mode": "grass",
+        "base": "#6a9a40",
+        "shades": [
+          "#507c34",
+          "#62903b",
+          "#78a64a",
+          "#8cb45a"
+        ],
+        "patchiness": 0.5,
+        "blades": {
+          "density": 64,
+          "height": [
+            2,
+            6
+          ],
+          "colours": [
+            "#5a8a34",
+            "leaf_spring",
+            "#9cc062"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 3,
+          "colours": [
+            "clover",
+            "buttercup",
+            "blossom"
+          ]
+        },
+        "tiles": 4,
+        "seed": 11
+      }
+    },
+    {
+      "id": "season-ground-summer",
+      "name": "Summer: lush meadow (base)",
+      "version": 1,
+      "notes": "Same as grass-ground-lush; the season reference.",
+      "spec": {
+        "mode": "grass",
+        "base": "meadow",
+        "shades": [
+          "meadow_deep",
+          "#527c33",
+          "meadow",
+          "#6a9440"
+        ],
+        "patchiness": 0.55,
+        "blades": {
+          "density": 72,
+          "height": [
+            3,
+            7
+          ],
+          "colours": [
+            "#4b762d",
+            "#6b9a3c",
+            "meadow_light",
+            "#3f6a2a"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 1.5,
+          "colours": [
+            "clover",
+            "buttercup"
+          ]
+        },
+        "tiles": 4,
+        "seed": 11
+      }
+    },
+    {
+      "id": "season-ground-autumn",
+      "name": "Autumn: olive grass and fallen leaves",
+      "version": 1,
+      "notes": "Muted olive and straw; ochre, gold and russet leaves, not orange.",
+      "spec": {
+        "mode": "grass",
+        "base": "grass_autumn",
+        "shades": [
+          "#6f7438",
+          "#80833f",
+          "grass_autumn",
+          "grass_dry"
+        ],
+        "patchiness": 0.6,
+        "blades": {
+          "density": 60,
+          "height": [
+            3,
+            7
+          ],
+          "colours": [
+            "#7a7c3c",
+            "#968f4e",
+            "#5f6a32"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 0,
+          "colours": []
+        },
+        "tiles": 4,
+        "seed": 11,
+        "leaves": {
+          "density": 14,
+          "colours": [
+            "leaf_autumn",
+            "leaf_autumn_light",
+            "leaf_autumn_dark"
+          ]
+        }
+      }
+    },
+    {
+      "id": "season-ground-frost",
+      "name": "Early winter: frost and first snow",
+      "version": 1,
+      "notes": "Dull frosted grass with snow lying in drifts.",
+      "spec": {
+        "mode": "grass",
+        "base": "grass_frost",
+        "shades": [
+          "#6c7a5e",
+          "#7c8a6a",
+          "grass_frost",
+          "#9aa48a"
+        ],
+        "patchiness": 0.5,
+        "blades": {
+          "density": 40,
+          "height": [
+            2,
+            5
+          ],
+          "colours": [
+            "#738064",
+            "#8e9a7e",
+            "#a7b097"
+          ],
+          "tufts": 2
+        },
+        "flowers": {
+          "density": 0,
+          "colours": []
+        },
+        "tiles": 4,
+        "seed": 11,
+        "snow": {
+          "coverage": 0.35
+        }
+      }
+    },
+    {
+      "id": "season-ground-snow",
+      "name": "Deep winter: snow cover",
+      "version": 1,
+      "notes": "Almost full snow; a few grass tips and soft blue shade.",
+      "spec": {
+        "mode": "grass",
+        "base": "grass_frost",
+        "shades": [
+          "#6c7a5e",
+          "#7c8a6a",
+          "grass_frost",
+          "#9aa48a"
+        ],
+        "patchiness": 0.5,
+        "blades": {
+          "density": 40,
+          "height": [
+            2,
+            5
+          ],
+          "colours": [
+            "#738064",
+            "#8e9a7e"
+          ],
+          "tufts": 2
+        },
+        "flowers": {
+          "density": 0,
+          "colours": []
+        },
+        "tiles": 4,
+        "seed": 11,
+        "snow": {
+          "coverage": 0.92
+        }
+      }
+    }
+  ]
+}

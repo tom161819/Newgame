@@ -70,6 +70,15 @@ Předměty jsou katalog v `studio/src/generators/props.js`: pytle, sudy, bedny, 
 
 Koncepty (vždy dvě varianty, doporučená je ve stavu Review): statek, sýpka, pekárna, mlýn, tavírna, sklad, lovecká chata a dřevorubecká chata. Hra je nepoužívá, dokud je vývojář neschválí a nepřevezme podle postupu níže. Pravidlo pro předměty je ve Style Guide (`props`).
 
+## Roční období (V01, návrhy)
+
+- `season-ground`: tráva na jaře, v létě (základ), na podzim (olivová tráva a spadané listí), na začátku zimy (jinovatka a závěje) a v hluboké zimě (souvislý sníh). Sníh i listí jsou periodické, takže dlaždice dál navazují bez švů (`ground`: `snow`, `leaves`).
+- `oak-seasons` a `pine-seasons`: stejný dospělý strom s parametrem `season`. Jarní dub má květy, podzimní okrové, zlaté a rezavé listí, zimní dub holé větve se sněhem. Zimní borovice má sněhové čepice. Léto je beze změny, takže dosavadní exporty si drží hash.
+- **Náhled přechodu**: záložka *Scene & lighting* u `season-ground` ukazuje navržený postup. Globální průběh jde zleva doprava přes `transition.order` a každá dlaždice se prolne ve vlastní chvíli podle `seasonBlend` (`studio/src/lib/surface.js`): stabilní hash dlaždice a pomalý šum, žádná šachovnice, na konci okna je přechod u všech dlaždic hotový. Stejnou funkci může použít hra.
+- Pravidla jsou ve Style Guide (`seasons`). Herní přechod (TerrainRenderer, stromy, Fog of War) přijde až po Codexově C01; viz `docs/art/VISUAL_PROGRESS.md`.
+
+**Nakloněné válce:** `cylinder({ …, tilt: [x, z] })` nakloní válec kolem jeho základny (holé větve, později zbraně, žebříky a podobně). Bounds i validace půdorysu náklon počítají.
+
 ## Výběr a schválení varianty
 
 1. V záložce **Compare variants** porovnej varianty vedle sebe: zoom 0,5–4×, pozadí, mřížka, půdorys, ohraničení s rozměry v pixelech, člověk 1,2 jednotky, přepínač *Game pixels* (přesně 1×) a denní doba.
@@ -133,7 +142,7 @@ Takto se do hry dostala věž `watchtower-square` a pánev `torch-post-brazier`:
 
 ## Omezení MVP
 
-- Generátory: `watchtower`, `torch-post`, `house`, `tree` (dub, borovice), `wall` (kamenná hradba, palisáda), `quarry`, 2D `ground` (tráva, cesty), `figure` (postavy), `scaffold` (lešení) a `workshop` (budovy s předměty). Postavy jsou zatím statické, bez snímků animace.
+- Generátory: `watchtower`, `torch-post`, `house`, `tree` (dub, borovice), `wall` (kamenná hradba, palisáda), `quarry`, 2D `ground` (tráva, cesty), `figure` (postavy), `scaffold` (lešení) a `workshop` (budovy s předměty); `tree` má roční období. Postavy jsou zatím statické, bez snímků animace.
 - Animovaný je jen plamen, a to procedurálně v kompozitoru. Snímky animací se zatím neexportují.
 - Export je deterministický v jednom prostředí. Jiný prohlížeč nebo GPU může dát drobně odlišné pixely, proto je autoritou commitnutý PNG.
 - Schválení do repozitáře vyžaduje ruční krok přes GitHub (vložit JSON a otevřít PR). Studio nemá token a na GitHub nezapisuje.

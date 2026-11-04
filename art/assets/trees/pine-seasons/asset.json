@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "id": "pine-seasons",
+  "name": "Pine through the seasons",
+  "category": "trees",
+  "description": "Season looks of the mature tree for the seasonal transition; the game currently draws simpler seasonal trees.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "tree",
+  "gameObjectId": "pine_tree",
+  "variants": [
+    {
+      "id": "pine-seasons-summer",
+      "name": "Pine (base)",
+      "version": 1,
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4,
+        "season": "summer"
+      }
+    },
+    {
+      "id": "pine-seasons-winter",
+      "name": "Snowy pine",
+      "version": 1,
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4,
+        "season": "winter"
+      }
+    }
+  ]
+}

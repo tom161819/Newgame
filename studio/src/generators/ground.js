@@ -25,6 +25,8 @@ export const params = [
   { key: 'ground', description: 'Path mode: the grass spec the path is trampled into.' },
   { key: 'stages', description: 'Path mode: wear levels 1–3 { colour, edge, coverage, blades, width, softness }.' },
   { key: 'preview', description: 'Path mode: wear levels along the preview strip (0–3), e.g. a path that fades back into grass.' },
+  { key: 'snow', description: '{ coverage 0–1, colour, shade }: snow drifts that tile seamlessly; blades mostly hidden.' },
+  { key: 'leaves', description: '{ density, colours }: fallen leaves per tile (autumn).' },
   { key: 'seed', description: 'Integer seed; change it for a different but equivalent layout.' },
 ];
 
@@ -42,7 +44,8 @@ function paintField(ctx, s, grass, style, index, seed, stage) {
   const width = TILE_W * s, height = TILE_H * s, image = ctx.createImageData(width, height), data = image.data;
   const shades = grass.shades.map(c => rgb(style, c)), base = rgb(style, grass.base), contrast = 0.6 + (grass.patchiness ?? 0.5) * 1.4;
   const soil = stage ? rgb(style, stage.colour) : null, edge = stage ? rgb(style, stage.edge) : null;
-  const mask = new Float32Array(width * height);
+  const mask = new Float32Array(width * height), snowMask = new Float32Array(width * height);
+  const snow = grass.snow ? { coverage: grass.snow.coverage, light: rgb(style, grass.snow.colour ?? 'snow'), shade: rgb(style, grass.snow.shade ?? 'snow_shade') } : null;
   for (let py = 0; py < height; py++) for (let px = 0; px < width; px++) {
     const { u, v } = pixelToTile((px + 0.5) / s, (py + 0.5) / s), i = py * width + px;
     if (u < -0.04 || u > 1.04 || v < -0.04 || v > 1.04) continue; // 1 px bleed: no seams where tiles meet; the game clips to the diamond
@@ -59,14 +62,20 @@ function paintField(ctx, s, grass, style, index, seed, stage) {
       colour = mixRgb(mixRgb(colour, edge, Math.min(1, m * 1.4) * 0.7), soil, m * m);
       colour = mixRgb(colour, edge, ring * 0.25);
     }
+    if (snow) {
+      // Snow lies in drifts first and covers everything at coverage 1; periodic, so it tiles.
+      const m = smoothstep(1 - snow.coverage - 0.08, 1 - snow.coverage + 0.06, periodicFbm(seed + 501, u, v, 3, 2) * 0.8 + 0.2 * snow.coverage + 0.1);
+      snowMask[i] = m;
+      colour = mixRgb(colour, mixRgb(snow.shade, snow.light, periodicFbm(seed + 503, u, v, 2, 4)), m);
+    }
     const grain = (periodicNoise(seed + 977, 16, u, v) - 0.5) * 14 + (((px * 73856093) ^ (py * 19349663)) % 7 - 3);
     data[i * 4] = colour[0] + grain; data[i * 4 + 1] = colour[1] + grain; data[i * 4 + 2] = colour[2] + grain * 0.7; data[i * 4 + 3] = 255;
   }
   ctx.putImageData(image, 0, 0);
-  return mask;
+  return { mask, snowMask };
 }
 
-function paintBlades(ctx, s, grass, style, index, seed, stage, mask) {
+function paintBlades(ctx, s, grass, style, index, seed, stage, { mask, snowMask }) {
   const blades = grass.blades ?? {}, rand = tileRandom(seed * 31 + index * 7919 + (stage ? 101 : 0));
   const colours = blades.colours.map(c => rgb(style, c)), [h0, h1] = blades.height, tufts = Math.max(1, Math.min(4, blades.tufts ?? 2));
   const width = TILE_W * s, list = [];
@@ -76,7 +85,9 @@ function paintBlades(ctx, s, grass, style, index, seed, stage, mask) {
     if (edgeDistance(u, v) < 0.04) continue;
     const worn = stage ? mask[Math.min(mask.length - 1, Math.floor(root.y * s) * width + Math.floor(root.x * s))] : 0;
     if (stage && rand() < worn * (1 - stage.blades)) continue;
-    const shorter = stage ? 1 - worn * 0.6 : 1;
+    const snowy = grass.snow ? snowMask[Math.min(snowMask.length - 1, Math.floor(root.y * s) * width + Math.floor(root.x * s))] : 0;
+    if (snowy > 0.5 && rand() < 0.85) continue; // only a few tips poke through the snow
+    const shorter = (stage ? 1 - worn * 0.6 : 1) * (1 - snowy * 0.6);
     for (let b = 0; b < tufts; b++) list.push({ x: root.x + (rand() - 0.5) * 2.2, y: root.y + (rand() - 0.5) * 1.2, h: (h0 + rand() * (h1 - h0)) * shorter, lean: (rand() - 0.5) * 3.2, colour: colours[Math.floor(rand() * colours.length)], shade: rand() });
   }
   list.sort((a, b) => a.y - b.y);
@@ -96,6 +107,14 @@ function paintBlades(ctx, s, grass, style, index, seed, stage, mask) {
     ctx.fillStyle = css(rgb(style, flowers.colours[Math.floor(frand() * flowers.colours.length)]));
     ctx.beginPath(); ctx.arc(p.x * s, (p.y - 1.5) * s, Math.max(0.7, 0.95 * s), 0, Math.PI * 2); ctx.fill();
   }
+  // Fallen leaves: small flat ellipses scattered over the grass.
+  const leaves = grass.leaves, lrand = tileRandom(seed * 23 + index * 389);
+  for (let f = 0; f < Math.round(leaves?.density ?? 0); f++) {
+    const u = 0.06 + lrand() * 0.88, v = 0.06 + lrand() * 0.88, p = tileToPixel(u, v);
+    if (stage && mask[Math.floor(p.y * s) * width + Math.floor(p.x * s)] > 0.6 && lrand() < 0.7) continue;
+    ctx.fillStyle = css(rgb(style, leaves.colours[Math.floor(lrand() * leaves.colours.length)]));
+    ctx.beginPath(); ctx.ellipse(p.x * s, p.y * s, 1.4 * s, 0.7 * s, lrand() * Math.PI, 0, Math.PI * 2); ctx.fill();
+  }
   ctx.restore();
 }
 
@@ -106,8 +125,8 @@ function tileCanvas(s) {
 }
 function paintTile(s, grass, style, index, seed, stage = null) {
   const canvas = tileCanvas(s), ctx = canvas.getContext('2d', { willReadFrequently: true });
-  const mask = paintField(ctx, s, grass, style, index, seed, stage);
-  paintBlades(ctx, s, grass, style, index, seed, stage, mask);
+  const masks = paintField(ctx, s, grass, style, index, seed, stage);
+  paintBlades(ctx, s, grass, style, index, seed, stage, masks);
   return canvas;
 }
 

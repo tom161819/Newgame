@@ -1,6 +1,7 @@
 // Asset specifications: categories, validation and the catalog that joins
 // studio assets (art/assets/**/asset.json) with existing in-game definitions.
 import { specHash } from './hash.js';
+import { cylinderTop } from '../generators/shapes.js';
 
 export const CATEGORIES = Object.freeze([
   { id: 'buildings', label: 'Buildings' },
@@ -83,6 +84,11 @@ export function primitiveBounds(part) {
   if (part.shape === 'cylinder') {
     // Four-sided cylinders are square-aligned, so their half-extent is r / √2.
     const r = Math.max(part.radiusTop, part.radiusBottom) * (part.segments === 4 ? Math.SQRT1_2 : 1);
+    if (part.tilt) {
+      // Conservative box around both end discs of a leaning cylinder.
+      const [tx, ty, tz] = cylinderTop(part);
+      return { min: [x + Math.min(0, tx) - r, y + Math.min(0, ty) - (ty < 0 ? r : 0), z + Math.min(0, tz) - r], max: [x + Math.max(0, tx) + r, y + Math.max(0, ty) + r * 0.5, z + Math.max(0, tz) + r] };
+    }
     return { min: [x - r, y, z - r], max: [x + r, y + part.height, z + r] };
   }
   if (part.shape === 'sphere') {
