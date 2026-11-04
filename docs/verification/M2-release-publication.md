@@ -1,5 +1,21 @@
 # M2 publication checkpoint — verified candidate, public release pending
 
+## Final upload and actual merge attempt — 2026-11-04
+
+Candidate e574f75 is pushed to PR22. The newer maina09de58/PR27 adds only the
+pull-request quality workflow and was merged normally; game/assets/scripts and
+archives are unchanged from the476-test/scaffold-verified source. No repeated
+full game suite is warranted for this CI-only integration.
+
+The actual authorized `gh pr merge22 --merge --match-head-commit e574f75…` still
+returns `Post "https://api.github.com/graphql": Forbidden`. A fresh supported
+`gh pr view22` query fails identically. No merge, public tag or final Pages/gate
+success is claimed. The reordered queue is safely pushed: M2 → C01–C08 →
+master11–15. Resume by fetching main and preserving any intervening work, then
+finish the actual publication steps below when the API limitation is resolved.
+Do not chase unrelated art changes by retagging/rebuilding frozen02a, bypass
+managed networking or push directly to main.
+
 ## Latest approved-scaffold integration — 2026-11-04
 
 Main4857ba7/PR26 scaffold art was normally merged as06ff55a. Only COORDINATION

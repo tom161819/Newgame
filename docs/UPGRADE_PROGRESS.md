@@ -12,6 +12,11 @@ Etapa10 je implementována a ověřena: fázeA `f93474f`, fázeB `069bf90df39e97
 
 M2 PR15 i archivní PR18 jsou merged, jejich skutečné Pages41877748443/41883338166 Success. Formální nativní gate odhalil dva nestabilní testovací předpoklady (pořadí nákladu/výroby a kliknutí pod DOM ikonou); opraveny se skutečnými regresemi. V `codex/m2-smelting-smoke` je nyní ověřený finální zdroj `02a3a43ace8adc993aea7a392424d7cdf4e7dec9`,0.3.0/Save14, se zachovaným main630caf1/Claudovou V01 grafikou:459/459 modelů, celý native včetně sezónních přechodů a Studio smoke pass. Nový skutečný zdrojový archiv prošel vlastními459testy/buildem/Chromiem;73snapshotů,1nový/0vynechaných, původních72adresářů/URL/savů beze změny. Finální web73URL/2456HTTPsouborů/121455383B/MIME/SHA a UI/IndexedDB/mobil prošel. Připravený v0.3.0 tag je pouze místní na02a; předchozí nezveřejněný kandidátní odkaz f053 je uchovaný. Veřejné tagy ani historie se nepřepisují. Finální kandidát ještě vyžaduje vlastní PR/main/Pages/gates, M2 proto není RELEASED a11–15 PENDING. Nový pokyn uživatele přesouvá C01–C08 před master11–15, ihned za dokončení vydání M2. [Předání](verification/M2-release-publication.md). Visual Polish zůstává u Claude.
 
+Závěrečné předání: zachován i maina09de58/nové PR quality CI (pouze workflow,
+herní zdroj beze změny). Kandidát e574f75 nahrán do PR22; skutečný poslední
+`gh pr merge22 --merge --match-head-commit` stále API Forbidden. Nová fronta je
+uložená a nahraná; žádné nevykonané sloučení/tag/Pages není označené za úspěšné.
+
 ## Změna pořadí — pokyn uživatele2026-11-04
 
 Po dokončení M2 nejprve C01–C08, potom11(dláždění),12(kolář/povozy/stáje/bydlení),
