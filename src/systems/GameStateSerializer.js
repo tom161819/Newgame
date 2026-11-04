@@ -17,7 +17,6 @@ import { repairTransportInstructions } from './TransportStateMigration.js';
 import { captureMapKnowledge } from '../game/mapMemoryObjects.js';
 import { validateMapMemory } from './MapMemoryValidation.js';
 import { FORESTRY,emptyNaturalState } from '../data/naturalResources.js';
-import { migrateNaturalState } from './NaturalStateMigration.js';
 import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 
 export const SAVE_VERSION=12;
@@ -84,6 +83,19 @@ export function serializeGameState(scene){
   };
 }
 
+// ALPHA policy: only the current SAVE_VERSION loads. Older or newer schemas are
+// reported as incompatible (never migrated, never deleted automatically).
+export class IncompatibleSaveError extends Error {
+  constructor(savedVersion){
+    super(`This save uses save schema ${savedVersion ?? 'unknown'}, but this alpha build loads only schema ${SAVE_VERSION}. Older saves are not converted during alpha development.`);
+    this.name='IncompatibleSaveError';this.savedVersion=savedVersion??null;this.currentVersion=SAVE_VERSION;
+  }
+}
+export function saveSchemaStatus(input){
+  const savedVersion=Number.isInteger(input?.saveVersion)?input.saveVersion:null;
+  return {compatible:savedVersion===SAVE_VERSION,savedVersion,currentVersion:SAVE_VERSION};
+}
+
 // Validace proběhne ještě před zastavením právě běžící scény. Poškozený save
 // proto nemění současný svět ani záznam v IndexedDB.
 export function validateGameState(input,registry=objectRegistry){
@@ -96,21 +108,15 @@ export function validateGameState(input,registry=objectRegistry){
   const array=(a,max=20000)=>check(Array.isArray(a)&&a.length<=max);
   const definition=(id,category)=>{const d=registry.get(id);check(d&&(!category||d.category===category));return d;};
   const unique=(array)=>{const ids=new Set();for(const a of array){check(a.id!=null&&!ids.has(a.id));ids.add(a.id);}return ids;};
-  check(input&&[1,2,3,4,5,6,7,8,9,10,11,SAVE_VERSION].includes(input.saveVersion));
+  check(input&&typeof input==='object');
+  const schema=saveSchemaStatus(input);if(!schema.compatible){if(schema.savedVersion!==null)throw new IncompatibleSaveError(schema.savedVersion);fail();}
   let s;try{s=JSON.parse(JSON.stringify(input));}catch{fail();}
-  if(input.saveVersion<9&&s.settings)s.settings.explorationMode??=true;
-  if(input.saveVersion<9&&s.exploration===undefined)s.exploration={version:1,explored:[],terrain:[],objects:[]};
-  if(input.saveVersion<10)for(const worker of s.workers??[]){worker.isSubject??=true;worker.diedAt??=worker.isAlive?null:s.time?.totalElapsed;}
-  if(input.saveVersion<11)s.naturalResources??=emptyNaturalState();
-  if(input.saveVersion<12)migrateNaturalState(s,registry);
-  if(input.saveVersion<4)for(const actor of [s.player,...(s.workers??[])])for(const key of ['skills','initialSkills'])if(actor?.[key])for(const id of ['milling','baking'])actor[key][id]??=createProgress();
   if(!s.logistics){
     for(const actor of [s.player,...(s.workers??[])])for(const key of ['skills','initialSkills'])if(actor?.[key])actor[key].logistics??=createProgress();
     if(s.workplaces?.records)for(const b of s.buildings??[])if(['granary','warehouse'].includes(b.type)&&buildingIsComplete(b)&&!s.workplaces.records.some(r=>r.buildingId===b.id))s.workplaces.records.push({buildingId:b.id,capacity:registry.require(b.type).workplace.capacity,workerIds:[],delivered:{}});
   }else check(s.logistics.version===1);
   for(const d of s.drops??[]){d.haulEligible??=true;check(typeof d.haulEligible==='boolean');}
   try{const settings=gameSettings(s.gameSettings);s.gameSettings={...settings,fogOfWar:s.gameSettings?.fogOfWar??s.settings?.fogOfWar??settings.fogOfWar};}catch{fail();}
-  if(input.saveVersion<8&&s.seasons&&s.seasons.enabled===undefined){const data=s.seasons;data.enabled=true;data.cycleDay=data.lastProcessedDay;data.cycleElapsed=s.time?.elapsed;data.cycleCompensation=0;data.rememberedSeason=data.season;}
   s.saveVersion=SAVE_VERSION;
   const dayDuration=s.gameSettings.dayLengthSeconds*1000;
   s.wildlifeRespawn??={elapsed:0};number(s.wildlifeRespawn.elapsed,0,(WILDLIFE_INTERVALS[s.gameSettings.wildlifeRespawn]||1)-1e-7);

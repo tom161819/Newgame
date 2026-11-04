@@ -87,6 +87,3 @@ test('completed walkable crop plots remain free of stone spawns and accept real 
 test('Apple is eaten before Meat by the single daily food scheduler, while Wheat stays inedible',()=>{
   const s=scene();s.inventory.add('wheat',12);s.inventory.add('apple',3);s.inventory.add('meat',1);assert.equal(objectRegistry.require('apple').edible,true);assert.equal(objectRegistry.require('wheat').edible,false);s.foodSystem.update(60000);assert.equal(s.inventory.count('meat'),1);assert.equal(s.inventory.count('apple'),1);s.foodSystem.update(120000);assert.equal(s.inventory.count('apple'),0);assert.equal(s.inventory.count('wheat'),12);assert.equal(s.foodSystem.availablePortions,0);assert.equal(s.foodSystem.elapsed,0);
 });
-test('older schema2 worlds load with no invented farms, crops, harvest rewards or changed inventory',()=>{
-  const s=scene();s.inventory.add('stone',17);const data=serializeGameState(s);data.saveVersion=2;delete data.farming;const r=scene();loadGameState(r,data);assert.equal(r.farmingSystem.records.size,0);assert.deepEqual(r.inventory.exportState(),s.inventory.exportState());assert.equal(r.buildings.length,0);assert.equal(r.character.experience.totalXP,0);assert.equal(serializeGameState(r).saveVersion,SAVE_VERSION);
-});

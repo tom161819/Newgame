@@ -26,11 +26,6 @@ test('Save10 keeps one worker authority, exact death age, visitor identity and o
   assert.ok(r.wageSystem.totalUnpaid()>0);r.inventory.add('gold',10);const remaining=3*r.gameTime.dayDuration-(r.gameTime.totalElapsed-worker.diedAt);r.gameTime.update(remaining-1);assert.equal(r.workerSystem.recentDeaths().length,1);r.gameTime.update(1);assert.equal(r.workerSystem.recentDeaths().length,0);
   assert.equal(r.wageSystem.totalUnpaid(),0);assert.ok(r.inventory.count('gold')>8&&r.inventory.count('gold')<=9);assert.equal(r.workerSystem.workers.has(worker.id),true);assert.equal(r.workerSystem.workers.size,2);
 });
-test('schema9 migration is idempotent, preserves explored memory and grants undated old deaths one persisted retention window',()=>{
-  const {s,visitor}=fixture();visitor.isSubject=true;const old=serializeGameState(s);old.saveVersion=9;for(const worker of old.workers){delete worker.isSubject;delete worker.diedAt;}
-  const before=structuredClone(old),migrated=validateGameState(old);assert.deepEqual(old,before);assert.deepEqual(validateGameState(migrated),migrated);assert.deepEqual(migrated.exploration,old.exploration);
-  const dead=migrated.workers.find(w=>!w.isAlive);assert.equal(dead.diedAt,old.time.totalElapsed);assert.equal(dead.isSubject,true);const r=restore(migrated);assert.deepEqual(serializeGameState(r),migrated);r.gameTime.update(1000);const again=restore(serializeGameState(r));assert.equal(again.workerSystem.workers.get(dead.id).diedAt,dead.diedAt);
-});
 test('visitors keep physical movement but cannot take kingdom jobs, wages, workplace seats or food',()=>{
   const s=workerScene(undefined,{workplaces:true,seasons:true});s.workerSystem.unsubscribe();const visitor=s.workerSystem.create({x:41,y:40},{isSubject:false}),d=s.objectRegistry.require('quarry');for(const [id,n]of Object.entries(d.cost))s.inventory.add(id,n);
   const {building,error}=placeBuilding({map:s.map,anchor:{x:46,y:45},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(error);s.towerViews.set(building.id,s.createBuildingView(d,building));

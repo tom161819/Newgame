@@ -170,6 +170,8 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 .save-description h3 { margin:0 0 7px; overflow-wrap:anywhere; }
 .save-description p { margin:5px 0; }
 .save-description small { color:#b3b99f; }
+.save-description .save-warning { color:#f0b46a; font-weight:600; }
+.save-row.incompatible h3 { color:#d8d2b8; }
 .save-actions { display:flex; flex-wrap:wrap; gap:8px; }
 #save-error { color:#ffb3a2; }
 #save-load-dialog[aria-busy="true"] .save-actions button, #save-load-dialog[aria-busy="true"] #new-save-form button { opacity:.6; pointer-events:none; }

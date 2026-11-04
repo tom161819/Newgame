@@ -1,5 +1,11 @@
 import { element } from './objectLabels.js';
+import { IncompatibleSaveError,saveSchemaStatus } from '../systems/GameStateSerializer.js';
 
+// Saves record their schema twice (record and state); either identifies an incompatible slot without loading it.
+export function saveRecordStatus(record){return saveSchemaStatus({saveVersion:record?.state?.saveVersion??record?.saveVersion});}
+export function incompatibleSaveMessage(name,status){
+  return `"${name||'Saved game'}" uses save schema ${status.savedVersion??'unknown'}. This alpha build loads only schema ${status.currentVersion}, so older saves cannot be continued. The save stays stored until you delete it. Start a new game instead?`;
+}
 export function formatPlayTime(ms){const seconds=Math.floor(ms/1000);return `${Math.floor(seconds/3600)}:${String(Math.floor(seconds/60)%60).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;}
 export class SaveLoadMenu {
   constructor(app){
@@ -31,6 +37,8 @@ export class SaveLoadMenu {
       const validDate=value=>{const date=new Date(value);return Number.isFinite(date.getTime())?date.toLocaleString('cs-CZ'):'Neznámé datum';};
       info.append(element('h3','',save.name||'Uložená hra'),element('p','',`Day ${save.day??'?'} · Hráno ${formatPlayTime(save.playTime??0)}`),
         element('small','',`Uloženo: ${validDate(save.updatedAt)} · Vytvořeno: ${validDate(save.createdAt)}`));
+      const status=saveRecordStatus(save);
+      if(!status.compatible){row.classList.add('incompatible');info.append(element('p','save-warning',`Incompatible save · schema ${status.savedVersion??'unknown'}, current ${status.currentVersion}`));}
       const actions=element('div','save-actions');
       for(const [action,label]of [['load','Load'],...(this.mode==='save'?[['overwrite','Přepsat']]:[]),['delete','Delete']]){
         const button=element('button','',label);button.type='button';button.dataset.action=action;button.dataset.id=save.id;actions.append(button);
@@ -39,7 +47,16 @@ export class SaveLoadMenu {
     });
     this.list.replaceChildren(...(rows.length?rows:[element('p','empty-saves','No saved games')]));
   }
-  confirm(message){document.querySelector('#save-confirm-text').textContent=message;this.confirmation.showModal();return new Promise(resolve=>{this.confirmResolve=resolve;});}
+  confirm(message,{yes='Potvrdit',no='Zrušit'}={}){
+    document.querySelector('#save-confirm-text').textContent=message;document.querySelector('#confirm-save-yes').textContent=yes;document.querySelector('#confirm-save-no').textContent=no;
+    this.confirmation.showModal();return new Promise(resolve=>{this.confirmResolve=resolve;});
+  }
+  // Never deletes or converts the slot. The player chooses a new game or returns to the list.
+  async incompatible(record,status){
+    this.error(`Incompatible save: schema ${status.savedVersion??'unknown'} cannot be loaded by schema ${status.currentVersion}.`);
+    if(!await this.confirm(incompatibleSaveMessage(record?.name,status),{yes:'Start New Game',no:'Back'}))return;
+    this.dialog.close();this.app.openNewGameSetup();
+  }
   answer(value){this.confirmation.close();this.confirmResolve?.(value);this.confirmResolve=null;}
   async action(action,id){
     this.error();
@@ -50,7 +67,11 @@ export class SaveLoadMenu {
       if(!await this.confirm('Přepsat tuto uloženou hru současným stavem?'))return;
       const old=await this.app.saves.get(id);await this.save(id,old.name);
     }else if(action==='load'){
-      const record=await this.app.saves.get(id);await this.app.load(record?.state);this.dialog.close();
+      const record=await this.app.saves.get(id),status=saveRecordStatus(record);
+      if(!status.compatible&&status.savedVersion!==null){await this.incompatible(record,status);return;}
+      try{await this.app.load(record?.state);}
+      catch(error){if(error instanceof IncompatibleSaveError){await this.incompatible(record,saveSchemaStatus(record?.state));return;}throw error;}
+      this.dialog.close();
     }
   }
   async save(id=null,name=null){

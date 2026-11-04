@@ -64,6 +64,8 @@ Settings nebo Game Menu → **Save Game** otevře seznam místních pozic. Lze v
 
 Save/Load zachovává logickou mapu, překážky, budovy a spojení hradeb, kameny, množství dropů, zvířata a jejich HP, obsah a vybrání truhly, inventář a vybavení. Obnovuje i probíhající krok, natočení, cíl, souboj, stejný osedlaný kůň, pobyt na plošině či rozpracované lezení, kameru, zoom, Fog of War, herní čas a zbytky časovačů. Načtení znovu negeneruje objekty ani příjem zlata za dokončený den. Doba se zavřenou hrou se nezapočítává.
 
+**ALPHA:** hra načítá pouze savy aktuálního schématu (`SAVE_VERSION`, nezávislé na verzi hry). Save jiného schématu zobrazí v Load Game upozornění „Incompatible save“ a nabídne novou hru; nic se nepřevádí ani automaticky nemaže a odstranění vyžaduje potvrzení. Zmínky o převodu starších savů v dalších sekcích popisují dřívější vývoj a v ALPHA neplatí. Pravidla jsou v [AGENTS.md](AGENTS.md).
+
 Data mají `saveVersion` a před nahrazením světa procházejí kontrolou. Poškozený save zobrazí chybu a ponechá současnou hru. Zápis do IndexedDB je atomický: při chybě zůstane předchozí save. Samotné ukládání a načítání již otevřené hry funguje i bez internetu; stažení hry při prvním otevření vyžaduje připojení.
 
 ## Zkušenosti a levely

@@ -30,7 +30,14 @@ export class GameApplication {
       else this.showPause();
     });
   }
-  showMainMenu(){this.scene=null;this.main.hidden=false;document.body.classList.remove('in-game');document.querySelector('main').inert=true;document.querySelector('#new-game').disabled=false;document.querySelector('#main-load-game').disabled=false;document.querySelector('#new-game').focus();}
+  showMainMenu(){this.scene=null;this.main.hidden=false;document.body.classList.remove('in-game');document.querySelector('main').inert=true;document.querySelector('#new-game').disabled=false;document.querySelector('#main-load-game').disabled=false;document.querySelector('#new-game').focus();
+    if(this.pendingSetup){this.pendingSetup=false;this.main.hidden=true;this.setup.open();}}
+  // Opens Game Setup from anywhere. A running game is stopped first; nothing is saved or deleted.
+  openNewGameSetup(){
+    this.pauseDialog.close();
+    if(this.scene){this.pendingSetup=true;this.returnToMain();return;}
+    this.main.hidden=true;this.setup.open();
+  }
   start(state=null,settings){
     this.archive.close(false);
     this.changelog.close(false);
