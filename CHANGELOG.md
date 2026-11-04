@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Build Braziers in the Infrastructure category for 3 Stone: stone fire bowls with a living flame, ready to light the surroundings once nights arrive.
 - Discover five finite Stone Deposits and four Iron Deposits in new kingdoms. Build Quarries over a single accessible rock and Iron Mines within four tiles for 12 Stone and 8 physically delivered Wood; Miners physically extract and deliver Stone or raw Iron Ore until that deposit is depleted.
 - Build Lumberjack Huts with three Woodcutter seats and an 18-tile working radius; reserve timber storage, chop and carry actual logs, inspect production and keep hidden tree counts tied to last-known map information.
 - Find grouped Oak and Pine forests in new kingdoms, with mature trees ready to harvest and stumps, saplings and young trees that regrow through the game’s seasons.
@@ -13,6 +14,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Remembered trees keep their last-seen shape outside sight.
 
 ### Changed
+- Stone Towers have a new painted look with a burning wall torch. The king still climbs to the top and now stands inside the battlements.
 - Saves from another save schema are no longer converted during alpha development. Load Game marks them as incompatible, explains why and offers a new game; the old save stays stored until you delete it.
 
 ### Fixed

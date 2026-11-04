@@ -2,13 +2,16 @@ import { WORKPLACES } from '../workplaces.js';
 import { MINING_WORK } from '../minerals.js';
 export const buildings = [
   {
-    id: 'tower', name: 'Stone Tower', category: 'building', buildingCategory:'defense', sprite: '/assets/buildings/tower/tower.png',
+    // Approved Asset Studio sprite (art/sprites/watchtower/watchtower-square.v1.json); TowerView stays the fallback.
+    id: 'tower', name: 'Stone Tower', category: 'building', buildingCategory:'defense', sprite: '/assets/buildings/tower/watchtower-square.v1.png',
+    frontSprite: '/assets/buildings/tower/watchtower-square.v1.front.png', artSource: 'art/sprites/watchtower/watchtower-square.v1.json',
     visibility: { multiplier: 2 },
     width: 2, height: 2, walkable: false, collectible: false, buildable: true,
     cost: { stone: 10 }, interactions: ['enter', 'exit'], description: 'Kamenná strážní věž s horní plošinou a cimbuřím.',
     constructionTime:20000,
-    renderMode: 'procedural', renderer: 'tower', origin: { x: 0.5, y: 0.91 }, visualHeight: 166,
-    platform: { x: 0, y: -118 }, depth: { offset: 0 },
+    renderMode: 'sprite', renderer: 'tower', origin: { x: 0.39634, y: 0.99107 }, frontOrigin: { x: 0.39634, y: 0.99107 }, visualHeight: 222,
+    platform: { x: 0, y: -183.28 }, depth: { offset: 0 },
+    lights: [{ type: 'torch', x: -15.88, y: -72.15, color: '#ffb25a', radius: 102.4, intensity: 0.95, flicker: { amplitude: 0.12, speed: 7 }, flameSize: 1 }],
     shadow: { baked: true, x: 8, y: -20, width: 114, height: 43, color: 0x30291c, alpha: 0.3 },
   },
   {

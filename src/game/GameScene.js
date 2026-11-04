@@ -80,6 +80,7 @@ import { MapMemory } from '../systems/MapMemory.js';
 import { captureMapKnowledge } from './mapMemoryObjects.js';
 import { MapMemoryRenderer } from './MapMemoryRenderer.js';
 import { PopulationSidebar } from '../ui/PopulationSidebar.js';
+import { LightSourceSystem } from '../systems/LightSourceSystem.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -106,6 +107,7 @@ export class GameScene extends Phaser.Scene {
     this.gameOver=false;this.input.enabled=true;this.input.keyboard.enabled=true;this.tweens.resumeAll();
     this.activeFramePending=true;this.visibilityPaused=document.hidden;
     this.assets.initialize();
+    this.lightSources=new LightSourceSystem(this);
     this.assets.registerRenderer('stone',(definition,context)=>drawStone(this,context.tile,definition));
     this.assets.registerRenderer('tree',(definition,context)=>new TreeView(this,definition,context));
     this.assets.registerRenderer('deposit',(definition,context)=>new DepositView(this,definition,context));
@@ -223,7 +225,7 @@ export class GameScene extends Phaser.Scene {
     this.input.on('pointermove',pointer=>{this.updateHover(pointer);if(this.buildMode&&!this.assetGallery.isOpen){if(!this.dragAnchor)this.wallLastLine=null;this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
     this.input.on('gameout',()=>{this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;this.clearWallPreviews();document.querySelector('#object-tooltip').hidden=true;});
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
-      this.kingLogistics.destroy();
+      this.kingLogistics.destroy();this.lightSources.destroy();
       this.memoryRenderer.destroy();
       this.populationSidebar.destroy();
       this.staffingIndicators.destroy();
@@ -389,7 +391,8 @@ export class GameScene extends Phaser.Scene {
   createBuildingView(definition,building,preview=false) {
     const object={...building,type:definition.id,definition,tiles:building.tiles??buildingTiles(building,definition)};
     if(!preview){this.naturalResources?.mining.registerBuilding(building);this.terrain.invalidateArea(object.tiles);this.workplaceSystem?.register(building);this.farmingSystem?.register(building);this.foodStorage?.register(building);this.foodProduction?.register(building);}
-    const view=this.assets.createView(definition.id,{building:object,preview});
+    let view=this.assets.createView(definition.id,{building:object,preview});
+    if(!preview&&definition.lights?.length&&buildingIsComplete(building)&&this.lightSources)view=this.lightSources.attach(view,object);
     if(!preview&&definition.crop&&buildingIsComplete(building))view.setGrowth?.(this.farmingSystem?.records.get(building.id)?.stage??0);
     return !preview&&!buildingIsComplete(building)?new ConstructionView(this,building,view):view;
   }
@@ -563,7 +566,7 @@ export class GameScene extends Phaser.Scene {
     for(const spawner of this.resourceSpawners)spawner.update(activeDelta);
     this.wildlifeRespawn.update(activeDelta);
     this.noticeRemaining=Math.max(0,this.noticeRemaining-activeDelta);if(!this.noticeRemaining)document.querySelector('#day-notice').hidden=true;
-    this.worldCamera.update(delta);this.refreshVisibility();
+    this.worldCamera.update(delta);this.refreshVisibility();this.lightSources.update(delta);
     if(this.buildMode&&!document.querySelector('dialog[open]')){if(this.previewTracking)this.previewAnchor=this.pointerTile(this.input.activePointer);this.updateBuildingPreview();}
   }
   refreshVisibility(){

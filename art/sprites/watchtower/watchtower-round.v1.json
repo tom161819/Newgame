@@ -10,25 +10,67 @@
   "generatorVersion": 1,
   "styleGuide": "medieval-kingdom-painted-isometric@1",
   "scale": 1,
-  "width": 121,
-  "height": 214,
+  "width": 145,
+  "height": 227,
   "anchor": {
-    "x": 41,
+    "x": 65,
     "y": 193
   },
   "origin": {
-    "x": 0.33884,
-    "y": 0.90187
+    "x": 0.44828,
+    "y": 0.85022
   },
   "footprint": {
     "width": 2,
     "height": 2
   },
+  "base": {
+    "x": 65,
+    "y": 225
+  },
+  "baseOrigin": {
+    "x": 0.44828,
+    "y": 0.99119
+  },
+  "visualHeight": 225,
+  "platform": {
+    "x": 0,
+    "y": -175.44
+  },
+  "frontLayer": true,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -37.83,
+      "y": -88.9,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    },
+    {
+      "type": "torch",
+      "x": 37.83,
+      "y": -88.9,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
   "modelHeight": 4.91,
   "lights": [
     {
       "type": "torch",
-      "x": 3.17,
+      "x": 27.17,
       "y": 136.1,
       "color": "#ffb25a",
       "radius": 102.4,
@@ -41,7 +83,7 @@
     },
     {
       "type": "torch",
-      "x": 78.83,
+      "x": 102.83,
       "y": 136.1,
       "color": "#ffb25a",
       "radius": 102.4,
