@@ -13,7 +13,6 @@ None pending. Add entries here when one pull request must wait for another.
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | Approved tower and brazier in the game | Claude | `claude/approved-tower-brazier` | — | In progress | `src/data/objects/buildings.js` (tower), `src/data/objects/lighting.js`, `src/data/objects/index.js`, `src/data/experience.js` (brazier XP), `src/systems/ObjectRegistry.js` (lights validation), `src/systems/SpriteViews.js` (pixel hit test), `src/systems/LightSourceSystem.js`, `src/game/LitBuildingView.js`, `src/game/GameScene.js` (3 lines), `public/assets/buildings/{tower,brazier}/`, related tests |
-| Stage 09 Daily Resource Statistics & Ledger | Codex | `codex/stage-09-ledger` (from `main`) | — | Ready to start. Any unpushed local work goes first to `codex/stage-09-ledger-wip`; no migrations of older saves (Alpha save policy) | — |
 
 ## Kept backups (do not delete without the developer)
 
@@ -22,6 +21,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-04 [#9](https://github.com/tom161819/Newgame/pull/9) Stage 09 Daily Resource Statistics & Ledger, Save schema 13 (Codex).
 - 2026-11-04 [#8](https://github.com/tom161819/Newgame/pull/8) Asset Studio recipes: house, oak, pine, wall, quarry (Claude).
 - 2026-11-04 [#7](https://github.com/tom161819/Newgame/pull/7) Asset Studio published on GitHub Pages under `/studio/` (Claude).
 - 2026-11-04 [#1](https://github.com/tom161819/Newgame/pull/1) Stages 07 Forestry and 08 Extended Zoom Out (Codex).

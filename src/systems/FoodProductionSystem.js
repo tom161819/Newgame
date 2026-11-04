@@ -201,6 +201,8 @@ export class FoodProductionSystem {
     const recipe=buildingDefinition(building).recipe,[resource,amount]=first(recipe.output);
     if(!this.storage.deposit(`output-${building.id}`,resource,amount))return false;
     record.cycle=null;record.outputReservation=cycle.outputReservation;record.completed++;
+    for(const [input,quantity]of Object.entries(cycle.inputs))this.scene.resourceLedger?.expense(input,quantity,`${buildingDefinition(building).name} Processing`,{id:`processing:${cycle.id}:${input}`,entityId:building.id});
+    this.scene.resourceLedger?.income(resource,amount,`${buildingDefinition(building).name} Production`,{id:`production:${cycle.id}:${resource}`,entityId:building.id,type:'production'});
     this.scene.foodSystem?.recordProduction(resource,amount,cycle.id);
     const contributors=Object.entries(cycle.contributions),total=contributors.reduce((n,[,work])=>n+work,0);let allocated=0;
     for(let i=0;i<contributors.length;i++){const[id,work]=contributors[i],ratio=i===contributors.length-1?1-allocated:work/total;allocated+=ratio;const worker=this.scene.workerSystem.workers.get(id);

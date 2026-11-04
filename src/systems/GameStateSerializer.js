@@ -18,8 +18,10 @@ import { captureMapKnowledge } from '../game/mapMemoryObjects.js';
 import { validateMapMemory } from './MapMemoryValidation.js';
 import { FORESTRY,emptyNaturalState } from '../data/naturalResources.js';
 import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
+import { emptyLedgerState } from '../data/resourceLedger.js';
+import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=12;
+export const SAVE_VERSION=13;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -45,6 +47,7 @@ export function serializeGameState(scene){
     saveVersion:SAVE_VERSION,gameSettings:{...gameSettings(scene.gameSettings),...(scene.seasons?{seasonsEnabled:scene.seasons.enabled}:{})},terrain:scene.terrainGrid.map(row=>[...row]),
     exploration:scene.mapMemory.exportState(),
     naturalResources:scene.naturalResources?.exportState()??emptyNaturalState(),
+    resourceLedger:scene.resourceLedger?.exportState()??emptyLedgerState(scene.gameTime),
     ...(scene.experienceSystem?{experienceSystem:scene.experienceSystem.exportState()}:{}),
     ...(scene.skillSystem?{skillSystem:scene.skillSystem.exportState()}:{}),
     ...(scene.wageSystem?{wages:scene.wageSystem.exportState()}:{}),
@@ -286,6 +289,7 @@ export function validateGameState(input,registry=objectRegistry){
   check(s.equipment&&Object.keys(s.equipment).length===2);for(const slot of ['weapon','armor'])if(s.equipment[slot]!=null){const id=s.equipment[slot];check(definition(id,'equipment').equipment.slot===slot&&(s.inventory[id]??0)>0);}
   integer(s.time?.day,1);number(s.time.elapsed,0,dayDuration-1e-7);number(s.time.totalElapsed);check(Math.abs(s.time.totalElapsed-((s.time.day-1)*dayDuration+s.time.elapsed))<.01);
   s.time.compensation??=0;number(s.time.compensation,-1e-6,1e-6);
+  validateResourceLedger(s.resourceLedger,registry,s.time,dayDuration,{check,number,integer,array});
   number(s.food?.elapsed,0,(s.food?.residents?dayDuration/2:registry.require('meat').consumption.interval)-1e-7);
   const spawnIds=new Set();for(const t of s.spawners){const d=definition(t.id,'resource');check(d.spawn&&!spawnIds.has(t.id));spawnIds.add(t.id);number(t.elapsed,0,d.spawn.interval-1e-7);}
   check(registry.byCategory('resource').filter(d=>d.spawn).every(d=>spawnIds.has(d.id)));

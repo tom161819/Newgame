@@ -33,6 +33,7 @@ import { WorkerSystem } from '../../src/systems/WorkerSystem.js';
 import { NaturalResourcesSystem } from '../../src/systems/NaturalResourcesSystem.js';
 import { resourceBlocks } from '../../src/data/minerals.js';
 import { buildingTiles } from '../../src/game/buildings.js';
+import { ResourceTransactionLedger } from '../../src/systems/ResourceTransactionLedger.js';
 import { ResourceSpawner } from '../../src/game/stones.js';
 import { tileCenter } from '../../src/game/isometric.js';
 import { wallIndex,connectionsFor } from '../../src/game/walls.js';
@@ -54,7 +55,7 @@ export function ensureBuildingPrerequisites(scene,definition){
   }
 }
 
-export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,workplaces=false,construction=false,farming=false,foodProduction=false,seasons=false,logistics=false,naturalResources=false,starter=true,gameSettings}={}){
+export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,workplaces=false,construction=false,farming=false,foodProduction=false,seasons=false,logistics=false,naturalResources=false,ledger=false,starter=true,gameSettings}={}){
   const scene={objectRegistry,gameSettings,terrainGrid:terrain.map(r=>[...r]),map:terrain.map(r=>[...r]),inventory:new Inventory(),gameOver:false,
     resources:new Map(),resourceOccupancy:new Map(),buildings:[],towerViews:new Map(),animations:[],
     marker:{visible:false,setVisible(v){this.visible=v;}},showMarker(){this.marker.visible=true;},setStatus(){},updateBuildingUI(){},updateInventory(){},updateTimeDisplay(){},refreshVisibility(){},
@@ -88,7 +89,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   scene.addResource=(d,tile,natural=null)=>{const v=view(d.id,tileCenter(tile)),key=`${tile.x},${tile.y}`,object={type:d.id,definition:d,x:tile.x,y:tile.y,tiles:buildingTiles(tile,d),...(natural?{natural:structuredClone(natural)}:{})};v.setData('tile',{...tile}).setData('object',object);if(natural)v.getMemoryState=()=>d.tree?{stage:object.natural.stage,season:scene.seasons?.season??'Spring'}:{depleted:object.natural.remaining===0};scene.resources.set(key,v);for(const t of object.tiles){scene.resourceOccupancy.set(`${t.x},${t.y}`,key);if(resourceBlocks(object))scene.map[t.y][t.x]=1;}scene.naturalResources?.register(object);};
   if(naturalResources)scene.naturalResources=new NaturalResourcesSystem(scene);
   scene.collectResource=(key,tile,actor)=>{const v=scene.resources.get(key);if(!v||key!==`${tile.x},${tile.y}`||actor.state!=='ground')return false;
-    const type=v.getData('objectId');if(actor===scene.character&&scene.foodStorage?.manages(type)&&scene.kingLogistics?.room(type)<1)return false;scene.resources.delete(key);v.destroy();scene.dropSystem.refreshOccupancy(tile);const event={type:'resourceCollected',objectType:type,quantity:1};if(actor===scene.character&&scene.kingLogistics&&scene.foodStorage.manages(type))scene.kingLogistics.receive({resource:type,amount:1,event});else if(!scene.workplaceSystem?.carryCollection(actor,{resource:type,amount:1,event})){scene.inventory.add(type);scene.activities.emit(event.type,{...event,actor});}return true;};
+    const type=v.getData('objectId');if(actor===scene.character&&scene.foodStorage?.manages(type)&&scene.kingLogistics?.room(type)<1)return false;scene.resources.delete(key);v.destroy();scene.dropSystem.refreshOccupancy(tile);const event={type:'resourceCollected',objectType:type,quantity:1};if(actor===scene.character&&scene.kingLogistics&&scene.foodStorage.manages(type))scene.kingLogistics.receive({resource:type,amount:1,event});else if(!scene.workplaceSystem?.carryCollection(actor,{resource:type,amount:1,event})){scene.inventory.add(type,1,{track:false});scene.activities.emit(event.type,{...event,actor});}scene.resourceLedger?.income(type,1,type==='stone'?'Stone Collection':'Resource Collection',{entityId:key});return true;};
   scene.collectStone=tile=>scene.collectResource(`${tile.x},${tile.y}`,tile,scene.character);
   scene.resourceSpawners=[new ResourceSpawner({map:scene.map,resources:scene.resourceOccupancy,getCount:()=>scene.resources.size,getOrigins:()=>[scene.character.tile],getReserved:()=>scene.reservedTiles(),spawn:t=>scene.addResource(objectRegistry.require('stone'),t)})];
   scene.combat.on('attack',(a,t)=>{if(scene.animalSystem.animals.has(t.id))scene.animalSystem.onAttacked(t,a);});
@@ -102,6 +103,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   });
   scene.tick=delta=>{if(scene.gameTime.paused||scene.gameOver)return;scene.gameTime.update(delta);if(scene.constructionSystem||scene.naturalResources)scene.character.update(delta);scene.naturalResources?.updateKing(delta);scene.kingLogistics?.update(delta);scene.logisticsTasks?.update();scene.animalSystem.update(delta);scene.workerSystem.update(delta);const covered=scene.combat.update(delta);scene.constructionSystem?.update(delta);scene.farmingSystem?.update(delta);scene.foodProduction?.update(delta);scene.regeneration.update(delta,[scene.character,...scene.animalSystem.animals.values(),...scene.workerSystem.liveWorkers()],covered);};
   scene.simulate=(ms,step=50)=>{let elapsed=0;while(elapsed<ms){const delta=Math.min(step,ms-elapsed);scene.tick(delta);elapsed+=delta;}};
+  if(ledger)scene.resourceLedger=new ResourceTransactionLedger(scene);
   captureMapKnowledge(scene);
   return scene;
 }

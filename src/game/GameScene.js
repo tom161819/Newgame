@@ -3,6 +3,8 @@ import { COLUMNS, ROWS, PLAYER_START, createMap, isWalkable, tileCenter } from '
 import { tilePolygon, worldToTile, gridToWorld } from './isometric.js';
 import { TerrainRenderer } from './TerrainRenderer.js';
 import { WorldCamera } from './WorldCamera.js';
+import { ResourceTransactionLedger } from '../systems/ResourceTransactionLedger.js';
+import '../ui/resourceLedger.css';
 import { Inventory } from './inventory.js';
 import { drawStone, generateResourcePositions, resourceTiles, tileKey, ResourceSpawner } from './stones.js';
 import { placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors, buildingDefinition,buildingDepth,buildingIsComplete } from './buildings.js';
@@ -95,7 +97,7 @@ export class GameScene extends Phaser.Scene {
   create() {
     this.worldCamera=null;
     this.workerSystem=null;
-    this.wageSystem=null;this.economyPanel=null;
+    this.wageSystem=null;this.economyPanel=null;this.resourceLedger=null;
     this.workplaceSystem=null;
     this.constructionSystem=null;
     this.farmingSystem=null;
@@ -206,6 +208,7 @@ export class GameScene extends Phaser.Scene {
     this.setStatus('Vyber surovinu, volné políčko, Buildings nebo Asset Library.');
     this.worldCamera=new WorldCamera(this,this.player);this.staffingIndicators=new MissingWorkersIndicators(this);
     this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState){this.naturalResources.generate();this.naturalResources.mining.generate();}
+    this.resourceLedger=new ResourceTransactionLedger(this);if(this.loadState)this.resourceLedger.suspend();this.inventoryBar.setLedger(this.resourceLedger);
     const onBackground=()=>{this.visibilityPaused=true;this.tweens.pauseAll();this.setGalleryInput(false);};
     const onForeground=()=>{this.visibilityPaused=false;this.activeFramePending=true;if(!this.gameOver&&!this.gameTime.paused)this.tweens.resumeAll();this.setGalleryInput(true);};
     this.game.events.on(Phaser.Core.Events.PAUSE,onBackground);this.game.events.on(Phaser.Core.Events.RESUME,onForeground);
@@ -229,7 +232,7 @@ export class GameScene extends Phaser.Scene {
       this.memoryRenderer.destroy();
       this.populationSidebar.destroy();
       this.staffingIndicators.destroy();
-      this.naturalResourcePanel.destroy();this.naturalResources.destroy();
+      this.naturalResourcePanel.destroy();this.naturalResources.destroy();this.resourceLedger.destroy();
       this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
       this.buildingUnlocks.destroy();
       this.animalSystem.destroy();this.dropSystem.destroy();document.querySelector('#object-tooltip').hidden=true;
@@ -488,7 +491,8 @@ export class GameScene extends Phaser.Scene {
     for(const tile of object.tiles){this.dropSystem.refreshOccupancy(tile);if(!definition.walkable)this.map[tile.y][tile.x]=0;}
     const event={type:'resourceCollected',objectType:definition.id,quantity:1};
     if(actor===this.character&&this.kingLogistics&&this.foodStorage.manages(definition.id))this.kingLogistics.receive({resource:definition.id,amount:1,event});
-    else if(!this.workplaceSystem?.carryCollection(actor,{resource:definition.id,amount:1,event})){this.inventory.add(definition.id);this.activities.emit(event.type,{...event,actor});}
+    else if(!this.workplaceSystem?.carryCollection(actor,{resource:definition.id,amount:1,event})){this.inventory.add(definition.id,1,{track:false});this.activities.emit(event.type,{...event,actor});}
+    this.resourceLedger?.income(definition.id,1,definition.id==='stone'?'Stone Collection':'Resource Collection',{entityId:key});
     this.updateInventory();return true;
   }
   collectStone(tile) { return this.collectResource(tileKey(tile),this.character.tile); }

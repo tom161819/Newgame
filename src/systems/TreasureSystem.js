@@ -42,7 +42,7 @@ export class TreasureSystem {
     const chest=this.chests.get(id);
     if(!chest||!chest.opened||chest.looted||!this.adjacent(chest)||!this.scene.character.isAlive)return false;
     chest.looted=true;
-    this.scene.inventory.add('gold',chest.contents.gold);
+    this.scene.inventory.add('gold',chest.contents.gold,{source:'Treasure',id:`treasure:${chest.id}:gold`,entityId:chest.id});
     for(const item of chest.contents.equipment){this.scene.inventory.add(item);this.scene.equipment.equip(item);}
     this.onChange();return true;
   }

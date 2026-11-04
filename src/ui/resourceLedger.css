@@ -1,0 +1,14 @@
+.inventory-item[data-resource-economy] { gap:6px; border-radius:3px; }
+.inventory-item[data-resource-economy]:focus-visible { outline:2px solid #d8bc72; outline-offset:3px; }
+.resource-delta { font-size:11px; min-width:2ch; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.resource-delta[data-tone="positive"] { color:#a4ce82; }
+.resource-delta[data-tone="negative"] { color:#e69d89; }
+.resource-delta[data-tone="neutral"] { color:#b0ae9d; }
+.resource-economy-tooltip { position:fixed; z-index:40; width:min(330px,calc(100vw - 16px)); max-height:min(440px,calc(100dvh - 32px)); overflow:auto; overscroll-behavior:contain; padding:13px; box-sizing:border-box; border:1px solid #a38f58; border-radius:5px; background:#292f24fa; color:#eee3c2; box-shadow:0 6px 20px #0008; font-size:12px; line-height:1.5; }
+.resource-economy-tooltip[hidden] { display:none; }
+.resource-economy-tooltip h3 { margin:0 0 7px; font-size:15px; }
+.resource-economy-tooltip h4 { margin:11px 0 5px; color:#dcc480; font-size:11px; text-transform:uppercase; }
+.resource-economy-tooltip p { margin:5px 0; }
+.resource-economy-summary { white-space:pre-line; }
+.resource-economy-tooltip ul { margin:0; padding-left:18px; }
+@media(max-width:600px) { .inventory-item[data-resource-economy] { font-size:11px; gap:4px; } .resource-delta { font-size:10px; } }

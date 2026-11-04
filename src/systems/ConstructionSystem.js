@@ -93,7 +93,7 @@ export class ConstructionSystem {
     this.sites.delete(site.id);this.scene.buildings.splice(this.scene.buildings.indexOf(site),1);
     for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=this.scene.terrainGrid[tile.y][tile.x];
     this.scene.naturalResources?.mining.restoreTiles(site.tiles);
-    if(!this.materials.cancel(site,refund))for(const [id,n]of Object.entries(refund))this.scene.inventory.add(id,n);this.revision++;this.scene.events?.emit('buildings:changed');this.onCancel(site,refund);return true;
+    if(!this.materials.cancel(site,refund))for(const [id,n]of Object.entries(refund))this.scene.inventory.add(id,n,{source:'Construction Refund',type:'refund',id:`construction-refund:${site.id}:${id}`,entityId:site.id});this.revision++;this.scene.events?.emit('buildings:changed');this.onCancel(site,refund);return true;
   }
   estimatedSeconds(site){const rate=this.activeBuilders(site).reduce((sum,p)=>sum+this.scene.skillSystem.workEfficiency(p.actor,'construction'),0);return rate?(site.construction.requiredWork-site.construction.workDone)/rate/1000:null;}
   exportState(){const king=this.assignments.get('king');return {nextId:Math.max(this.nextId,Math.max(0,...this.scene.buildings.map(b=>b.id))+1),kingSiteId:king?.siteId??null,kingGoal:king?.goal?{...king.goal}:null};}

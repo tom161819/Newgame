@@ -40,7 +40,7 @@ export class DropSystem {
     if(!drop.amount){this.drops.delete(id);drop.view.destroy();this.refreshOccupancy(drop.tile);}
     if(royal)royal.receive({resource:drop.resource,amount,event,siteId:drop.siteId});
     else if(!this.scene.workplaceSystem?.carryCollection(actor,{resource:drop.resource,amount,event})){
-      this.scene.inventory.add(drop.resource,amount);this.scene.activities?.emit(event.type,{...event,actor});
+      this.scene.inventory.add(drop.resource,amount,{track:false});this.scene.activities?.emit(event.type,{...event,actor});
     }
     if(actor.cargo&&cancelledTransport)actor.cargo.transportCancelled=true;
     this.scene.updateInventory();
