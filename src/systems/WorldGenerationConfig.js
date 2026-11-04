@@ -1,5 +1,5 @@
 import { PLAYER_START } from '../game/config.js';
-import { placementError,buildingTiles,towerNeighbors } from '../game/buildings.js';
+import { placementError,buildingTiles,towerNeighbors,buildingDefinition } from '../game/buildings.js';
 import { findPathToAny,reachableTiles } from '../game/pathfinding.js';
 
 // Volá se pouze při New Game, před rozmístěním surovin a jednotek.
@@ -19,10 +19,12 @@ export function createStartingCastle(scene,start=PLAYER_START){
 }
 
 export function createStartingStockpile(scene,start=PLAYER_START){
-  const definition=scene.objectRegistry.require('starter_stockpile'),castle=scene.buildings.find(b=>b.type==='castle'),origin=castle?{x:castle.x+1,y:castle.y+1}:start,candidates=[];
+  const definition=scene.objectRegistry.require('starter_stockpile'),castle=scene.buildings.find(b=>b.type==='castle'),cd=castle?buildingDefinition(castle):null,origin=castle?{x:castle.x+(cd.width-1)/2+1.5,y:castle.y+cd.height+1}:start,candidates=[];
   const reachable=reachableTiles(scene.map,[start]).length;
   for(let dy=-12;dy<=12;dy++)for(let dx=-12;dx<=12;dx++)candidates.push({x:start.x+dx,y:start.y+dy});
-  candidates.sort((a,b)=>Math.hypot(a.x+1-origin.x,a.y+1-origin.y)-Math.hypot(b.x+1-origin.x,b.y+1-origin.y));
+  // Před hradem ve směru kamery (větší x+y); zbytek jen jako deterministická záloha.
+  const frontSum=castle?castle.x+castle.y+cd.width+cd.height-1:-Infinity,isFront=a=>a.x+a.y>=frontSum;
+  candidates.sort((a,b)=>(isFront(b)-isFront(a))||Math.hypot(a.x+1-origin.x,a.y+1-origin.y)-Math.hypot(b.x+1-origin.x,b.y+1-origin.y)||a.y-b.y||a.x-b.x);
   for(const anchor of candidates){
     if(placementError(scene.map,anchor,scene.resourceOccupancy,[start],{...definition,buildable:true},scene.buildings))continue;
     const building={id:Math.max(0,...scene.buildings.map(b=>b.id))+1,type:definition.id,definition,...anchor,tiles:buildingTiles(anchor,definition)};
