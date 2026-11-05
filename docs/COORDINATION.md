@@ -6,7 +6,7 @@ Files held lists the files a task changes. Another task avoids them unless neces
 
 ## Agreed merge order
 
-None pending. Add entries here when one pull request must wait for another.
+Issue47 release verification must actually complete before Issue48 may merge or deploy. Issue48 is explicitly stacked preparation only; API writes are unavailable and no PR number is invented.
 
 ## Active
 
@@ -15,6 +15,8 @@ None pending. Add entries here when one pull request must wait for another.
 | N08 (#39) archive version labels | Claude | — | — | Blocked | Waits for Codex #47 (M2 release/archive) to close or to state that archive labels are out of its scope; N10 (#63) follows N08; N09 (#40) is HOLD. No files held. |
 | Issue #47: finish actual M2 release | Codex | `codex/issue-47-m2-release` integrated main1b73c2c | No duplicate PR22; metadata PR not yet created | BLOCKED on API bootstrap/final verification: public v0.3.0 now targets02a; actual full Pages41924183243 and71archive blobs verified. Read-only post-deploy verifier candidate a1a0b33 validated; the owner-requested retry also returned Forbidden; CONNECT403 confirmed before GitHub API, no PR exists. Issue claim/label changes and MERGE-HELP not fabricated. Final tag-aware Pages/live verification pending; only47 currently ready. | Read-only `.github/workflows/verify-published-release.yml`, release/merge-queue/progress evidence docs and the authorized existing tag; no mechanics, archive or dependency changes. Archive relabeling is outside this task; no archive-label files held. |
 | Parked C01 / Issue #48 WIP | Codex | `codex/fow-exploration-blueprints`, pushed dd728a0 | No ready PR | PRESERVED, not complete and not advanced through a blocked dependency: reproduced skipped-visibility repaint bug, fix and12focused tests; evaluate again only after Issue47 is done and48 ready. | Existing two-file fix retained in its own remote WIP branch; do not merge its old coordination/AGENTS overrides into current main. |
+
+| Issue #48 / C01 | Codex | `codex/issue-48-fow-blueprints` from `95cea7883d81395460dce478ab994167ab9bd14a` | No PR: API CONNECT403 | STARTED (API read-only), STACKED WIP; requires actual Issue47 release completion before merge/deploy. #48 remains publicly blocked, not claimed ready. | Fog/MapMemory/navigation, king/worker view integration, provisional construction/serialization, focused tests/smokes/i18n and C01 evidence; no new art or archive-label changes. |
 
 ## Kept backups (do not delete without the developer)
 
