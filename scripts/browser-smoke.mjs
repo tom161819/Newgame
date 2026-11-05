@@ -1,3 +1,4 @@
+import { wildlifeClearanceSmoke } from './wildlife-clearance-smoke.mjs';
 import { unitCommandSmoke } from './unit-command-smoke.mjs';
 import { i18nSmoke,i18nGameSmoke } from './i18n-smoke.mjs';
 import { autosaveSmoke } from './autosave-smoke.mjs';
@@ -97,6 +98,7 @@ try{
   if(args.includes('--full')||args.includes('--forestry-workers'))await forestryHutSmoke(page);
   if(args.includes('--full')||args.includes('--population')){await populationSidebarSmoke(page);await populationNavigationSmoke(page);await populationIntegrationSmoke(page);}
   if(args.includes('--full')||args.includes('--staffing'))await staffingIndicatorsSmoke(page);
+  if(args.includes('--full')||args.includes('--wildlife-clearance'))await wildlifeClearanceSmoke(page);
   if(args.includes('--full')||args.includes('--unit-commands'))await unitCommandSmoke(page);
   if(args.includes('--full')||args.includes('--employment'))await employmentSmoke(page);
   if(args.includes('--full')||args.includes('--notices'))await noticesSmoke(page);

@@ -18,7 +18,7 @@ AGENTS.md, alpha save policy and Claude's ownership remain in force.
 |2|C02 Staffing picker and Granary indicator|PENDING|C01 merged and deployed; inspect actual Granary workplaces.|
 |3|C03 Auto employment and Castle priorities|PENDING|C02 merged/deployed; extend existing staffing instead of a second scheduler.|
 |4|C04 Production diagnostics and notices|PENDING|C03 merged/deployed; reuse authoritative work states and activity events.|
-|5|C05 Unit selection, Move and Hold|PENDING|C04 merged/deployed; preserve jobs, cargo and reservations.|
+|5|C05 Unit selection, Move and Hold|DONE|Issue52 / PR107; merge 0b6b163; 561 tests + 43 full browser smokes; Pages42019289576 succeeded. Schema21; C04 preserved. C06 remains Claude-owned.|
 |6|C06 Stables audit and equipment contract|PENDING|C05 merged/deployed; audit current horses/equipment and record planned Stage12 Stables/vehicles as not implemented; do not duplicate them.|
 |7|C07 Weapon production and Armory|PENDING|C06 merged/deployed; real Wood/Iron Bar/logistics/ownership contract; visuals may use clear temporary fallbacks.|
 |8|C08 Military recruitment and combat|PENDING|C07 merged/deployed and stable equipment contract. Knight availability still requires actual completed Stables/reservable horse; dependent unlock/integration follows deferred Stage12.|
@@ -40,3 +40,7 @@ approval prompt or promises of work outside a running session.
 Claude retains V01–V03 and art/Studio ownership. C01 unblocks V01; C06/C07 provide
 the V02 contract; C08 provides the V03 unit contract. Those dependencies do not
 authorize Codex to replace or approve Claude's graphics.
+
+## C05 verified completion — 2026-11-05
+
+Issue52 is closed/done after [PR107](https://github.com/tom161819/Newgame/pull/107) merged as 0b6b1631adf90ba09965b63bac720a5aa60d35b8. Local 561/561 tests, changelog, build:pages and 43 full browser scenarios passed. [Current-head CI42019031980](https://github.com/tom161819/Newgame/actions/runs/42019031980) and [Pages42019289576](https://github.com/tom161819/Newgame/actions/runs/42019289576) build/deploy succeeded. Current-schema21 round trips preserve movement, Hold and cargo. C04 #106 was integrated without losing notices; intentionally held workers are excluded from active production/transport diagnostics. Only immediate successor #53 was moved to ready, retaining its approved agent:claude owner.
