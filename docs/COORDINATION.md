@@ -13,7 +13,7 @@ None pending. Add entries here when one pull request must wait for another.
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | C04 (#51) Production diagnostics notices | Claude (taken over from Codex) | `claude/c04-production-diagnostics` | — | In progress | src/data/diagnostics.js, src/systems/ProductionDiagnostics.js, src/ui/NoticesPanel.js, index.html (notices panel), GameScene.js (create/update/destroy only), i18n notice keys, style.css (appended block), scripts/{browser,notices}-smoke.mjs, tests/production-diagnostics.test.js. |
-| AUD66 (#95) Wildlife building clearance audit | Codex | `codex/wildlife-building-clearance` | — | STARTED from 0b6b163; separate worktree while C05 Pages is monitored | AnimalSystem.js, WildlifeRespawnSystem.js, new wildlife clearance helper/data, isolated tests and browser smoke, changelog/verification/progress. No GameScene, AnimalController, worker/player/UI/Studio changes. |
+| AUD66 (#95) Wildlife building clearance audit | Codex | `codex/wildlife-building-clearance` | [#109](https://github.com/tom161819/Newgame/pull/109) | Review; 569 tests, changelog, build and relevant browser smoke PASS; before/after screenshots; awaiting CI | AnimalSystem.js, WildlifeRespawnSystem.js, new wildlife clearance helper/data, isolated tests and browser smoke, changelog/verification/progress. No GameScene, AnimalController, worker/player/UI/Studio changes. |
 
 ## Kept backups (do not delete without the developer)
 
