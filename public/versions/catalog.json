@@ -831,6 +831,8 @@
       "archiveURL": "/Newgame/versions/02a3a43ace8adc993aea7a392424d7cdf4e7dec9/",
       "available": true,
       "sequence": 109,
+      "buildNumber": 109,
+      "buildLabel": "Archive build 109 · v0.3.0 · 02a3a43",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -845,6 +847,8 @@
       "archiveURL": "/Newgame/versions/f053be1879beb2af3814972caecc8768b8f1ad90/",
       "available": true,
       "sequence": 102,
+      "buildNumber": 102,
+      "buildLabel": "Archive build 102 · v0.3.0 · f053be1",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -859,6 +863,8 @@
       "archiveURL": "/Newgame/versions/fa56c96113fdad8097d641ad87c06e74d532efa8/",
       "available": true,
       "sequence": 86,
+      "buildNumber": 86,
+      "buildLabel": "Archive build 86 · v0.2.0 · fa56c96",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -873,6 +879,8 @@
       "archiveURL": "/Newgame/versions/0024c16c803a91b151cff08300665076f8b67b35/",
       "available": true,
       "sequence": 77,
+      "buildNumber": 77,
+      "buildLabel": "Archive build 77 · v0.1.0 · 0024c16",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -887,6 +895,8 @@
       "archiveURL": "/Newgame/versions/a4f51ecd936af7678c0822ead4e15c91c0b3e780/",
       "available": true,
       "sequence": 71,
+      "buildNumber": 71,
+      "buildLabel": "Archive build 71 · v0.1.0 · a4f51ec",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -901,6 +911,8 @@
       "archiveURL": "/Newgame/versions/8b796271fd452f60cd1f66725d6ce68b8ef67746/",
       "available": true,
       "sequence": 70,
+      "buildNumber": 70,
+      "buildLabel": "Archive build 70 · v0.1.0 · 8b79627",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -915,6 +927,8 @@
       "archiveURL": "/Newgame/versions/1d9dd4610a5690db8348b2743ec376b668266fcf/",
       "available": true,
       "sequence": 69,
+      "buildNumber": 69,
+      "buildLabel": "Archive build 69 · v0.1.0 · 1d9dd46",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -929,6 +943,8 @@
       "archiveURL": "/Newgame/versions/5074450fe57321ac71b7ded1cedcaf2281d2f216/",
       "available": true,
       "sequence": 67,
+      "buildNumber": 67,
+      "buildLabel": "Archive build 67 · v0.1.0 · 5074450",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -943,6 +959,8 @@
       "archiveURL": "/Newgame/versions/fcdb80f2ab1ded774a76f3928fd6fdfe9c3bf265/",
       "available": true,
       "sequence": 65,
+      "buildNumber": 65,
+      "buildLabel": "Archive build 65 · v0.1.0 · fcdb80f",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -957,6 +975,8 @@
       "archiveURL": "/Newgame/versions/8ba14e17f85cb97275c3a47996bb44a6d5ba1864/",
       "available": true,
       "sequence": 64,
+      "buildNumber": 64,
+      "buildLabel": "Archive build 64 · v0.1.0 · 8ba14e1",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -971,6 +991,8 @@
       "archiveURL": "/Newgame/versions/e721a68f45ecd91f0eed1d321f40a6d8b59100ea/",
       "available": true,
       "sequence": 63,
+      "buildNumber": 63,
+      "buildLabel": "Archive build 63 · v0.1.0 · e721a68",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -985,6 +1007,8 @@
       "archiveURL": "/Newgame/versions/9e93982740685b0bd18543e1ce7f707b2102b7f1/",
       "available": true,
       "sequence": 62,
+      "buildNumber": 62,
+      "buildLabel": "Archive build 62 · v0.1.0 · 9e93982",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -999,6 +1023,8 @@
       "archiveURL": "/Newgame/versions/a454fe9d3cbe9df36871d95d835a228e723fa870/",
       "available": true,
       "sequence": 61,
+      "buildNumber": 61,
+      "buildLabel": "Archive build 61 · v0.1.0 · a454fe9",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1013,6 +1039,8 @@
       "archiveURL": "/Newgame/versions/f4e621b816c4177103157b711d22fbdb3dcf9ea1/",
       "available": true,
       "sequence": 60,
+      "buildNumber": 60,
+      "buildLabel": "Archive build 60 · v0.1.0 · f4e621b",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1027,6 +1055,8 @@
       "archiveURL": "/Newgame/versions/fb5aaf24c7fb77793f43b4725df438ae359abde2/",
       "available": true,
       "sequence": 59,
+      "buildNumber": 59,
+      "buildLabel": "Archive build 59 · v0.1.0 · fb5aaf2",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1041,6 +1071,8 @@
       "archiveURL": "/Newgame/versions/e864b0b05852548dc990f317a3bca1f6badf80f6/",
       "available": true,
       "sequence": 58,
+      "buildNumber": 58,
+      "buildLabel": "Archive build 58 · v0.1.0 · e864b0b",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1055,6 +1087,8 @@
       "archiveURL": "/Newgame/versions/e2fe98cafab5d03ce203c7437ccaea5c90ed8f48/",
       "available": true,
       "sequence": 57,
+      "buildNumber": 57,
+      "buildLabel": "Archive build 57 · v0.1.0 · e2fe98c",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1069,6 +1103,8 @@
       "archiveURL": "/Newgame/versions/74628eb60c7c0ee921f1274a9e418cead73985fa/",
       "available": true,
       "sequence": 56,
+      "buildNumber": 56,
+      "buildLabel": "Archive build 56 · v0.1.0 · 74628eb",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1083,6 +1119,8 @@
       "archiveURL": "/Newgame/versions/ddc9168972667cd3c969fd256e1ec7035f78072a/",
       "available": true,
       "sequence": 55,
+      "buildNumber": 55,
+      "buildLabel": "Archive build 55 · v0.1.0 · ddc9168",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1097,6 +1135,8 @@
       "archiveURL": "/Newgame/versions/1545aea42ece4f7ad448789650e61fb3c43d8116/",
       "available": true,
       "sequence": 54,
+      "buildNumber": 54,
+      "buildLabel": "Archive build 54 · v0.1.0 · 1545aea",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1111,6 +1151,8 @@
       "archiveURL": "/Newgame/versions/5e9b134ac2734550ed8ac19fe4f50a94a9cd58e7/",
       "available": true,
       "sequence": 53,
+      "buildNumber": 53,
+      "buildLabel": "Archive build 53 · v0.1.0 · 5e9b134",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1125,6 +1167,8 @@
       "archiveURL": "/Newgame/versions/66311391900df17e0755bdac7e51db40a5516d13/",
       "available": true,
       "sequence": 52,
+      "buildNumber": 52,
+      "buildLabel": "Archive build 52 · v0.1.0 · 6631139",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1139,6 +1183,8 @@
       "archiveURL": "/Newgame/versions/4ecbf0939353cf4ab3226423bdb0ee1b6d564039/",
       "available": true,
       "sequence": 51,
+      "buildNumber": 51,
+      "buildLabel": "Archive build 51 · v0.1.0 · 4ecbf09",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1153,6 +1199,8 @@
       "archiveURL": "/Newgame/versions/339904f717e767cc1af4459e541cbb4b6edb867a/",
       "available": true,
       "sequence": 50,
+      "buildNumber": 50,
+      "buildLabel": "Archive build 50 · v0.1.0 · 339904f",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1167,6 +1215,8 @@
       "archiveURL": "/Newgame/versions/d859f3cdea7056de79dcd97b16be322f38733f64/",
       "available": true,
       "sequence": 49,
+      "buildNumber": 49,
+      "buildLabel": "Archive build 49 · v0.1.0 · d859f3c",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1181,6 +1231,8 @@
       "archiveURL": "/Newgame/versions/4dd41fb2bfb9b1f58fb237d64a01f1049abb444e/",
       "available": true,
       "sequence": 48,
+      "buildNumber": 48,
+      "buildLabel": "Archive build 48 · v0.1.0 · 4dd41fb",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1195,6 +1247,8 @@
       "archiveURL": "/Newgame/versions/fbba1d91bfff2dba946586fd74fd9d48ae0ece9b/",
       "available": true,
       "sequence": 47,
+      "buildNumber": 47,
+      "buildLabel": "Archive build 47 · v0.1.0 · fbba1d9",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1209,6 +1263,8 @@
       "archiveURL": "/Newgame/versions/e8d41eb8ec75f12d7cb72b6f139becd023b8715d/",
       "available": true,
       "sequence": 46,
+      "buildNumber": 46,
+      "buildLabel": "Archive build 46 · v0.1.0 · e8d41eb",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1223,6 +1279,8 @@
       "archiveURL": "/Newgame/versions/2d72b21609b4148421d24563b77bec76e4a0f2be/",
       "available": true,
       "sequence": 45,
+      "buildNumber": 45,
+      "buildLabel": "Archive build 45 · v0.1.0 · 2d72b21",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1237,6 +1295,8 @@
       "archiveURL": "/Newgame/versions/e0c4f5462905dea15bd8ca0ff7553cdee9ad7d41/",
       "available": true,
       "sequence": 44,
+      "buildNumber": 44,
+      "buildLabel": "Archive build 44 · v0.1.0 · e0c4f54",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1251,6 +1311,8 @@
       "archiveURL": "/Newgame/versions/0b2377a442ef338d8d8b09da4f4b5c62c38870b6/",
       "available": true,
       "sequence": 43,
+      "buildNumber": 43,
+      "buildLabel": "Archive build 43 · v0.1.0 · 0b2377a",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1265,6 +1327,8 @@
       "archiveURL": "/Newgame/versions/6570b7e4f4cbdd7e44942b7d953db2286a5199f6/",
       "available": true,
       "sequence": 42,
+      "buildNumber": 42,
+      "buildLabel": "Archive build 42 · v0.1.0 · 6570b7e",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1279,6 +1343,8 @@
       "archiveURL": "/Newgame/versions/f22ded073c30f1e0fd60dceff2a244bb8f6cb087/",
       "available": true,
       "sequence": 41,
+      "buildNumber": 41,
+      "buildLabel": "Archive build 41 · v0.1.0 · f22ded0",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1293,6 +1359,8 @@
       "archiveURL": "/Newgame/versions/e571ab705acd594edabb177c84fff6a5e1899cde/",
       "available": true,
       "sequence": 40,
+      "buildNumber": 40,
+      "buildLabel": "Archive build 40 · v0.1.0 · e571ab7",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1307,6 +1375,8 @@
       "archiveURL": "/Newgame/versions/ed58610b326ce27743957e9aee83ed2fb683ae72/",
       "available": true,
       "sequence": 39,
+      "buildNumber": 39,
+      "buildLabel": "Archive build 39 · v0.1.0 · ed58610",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1321,6 +1391,8 @@
       "archiveURL": "/Newgame/versions/09ad285cdbec95edaf468fd115a81432c60b6354/",
       "available": true,
       "sequence": 38,
+      "buildNumber": 38,
+      "buildLabel": "Archive build 38 · v0.1.0 · 09ad285",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1335,6 +1407,8 @@
       "archiveURL": "/Newgame/versions/e4f092fcc20e93f8a276515fd779732c65bca596/",
       "available": true,
       "sequence": 37,
+      "buildNumber": 37,
+      "buildLabel": "Archive build 37 · v0.1.0 · e4f092f",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1349,6 +1423,8 @@
       "archiveURL": "/Newgame/versions/e104791dda5b4db6b79f4b5c757d4ff91256ff55/",
       "available": true,
       "sequence": 36,
+      "buildNumber": 36,
+      "buildLabel": "Archive build 36 · v0.1.0 · e104791",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1363,6 +1439,8 @@
       "archiveURL": "/Newgame/versions/43766dcac74b8c528b6219878a8ee217c796d84b/",
       "available": true,
       "sequence": 35,
+      "buildNumber": 35,
+      "buildLabel": "Archive build 35 · v0.1.0 · 43766dc",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1377,6 +1455,8 @@
       "archiveURL": "/Newgame/versions/b09d5681cfb0a837ac2db6e6e27b001102789120/",
       "available": true,
       "sequence": 34,
+      "buildNumber": 34,
+      "buildLabel": "Archive build 34 · v0.1.0 · b09d568",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1391,6 +1471,8 @@
       "archiveURL": "/Newgame/versions/5636967ecddcc998e4e6cf48ea9e52bd90993ef6/",
       "available": true,
       "sequence": 33,
+      "buildNumber": 33,
+      "buildLabel": "Archive build 33 · v0.1.0 · 5636967",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1405,6 +1487,8 @@
       "archiveURL": "/Newgame/versions/0af9b89608654944b5fadbdde3d0907fd4a59dd8/",
       "available": true,
       "sequence": 32,
+      "buildNumber": 32,
+      "buildLabel": "Archive build 32 · v0.1.0 · 0af9b89",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1419,6 +1503,8 @@
       "archiveURL": "/Newgame/versions/dbdaeb9e2768efac36dfc625a22d5e379d6f739c/",
       "available": true,
       "sequence": 31,
+      "buildNumber": 31,
+      "buildLabel": "Archive build 31 · v0.1.0 · dbdaeb9",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1433,6 +1519,8 @@
       "archiveURL": "/Newgame/versions/124414727907ac0e082cb225fd2190c9f55882bd/",
       "available": true,
       "sequence": 30,
+      "buildNumber": 30,
+      "buildLabel": "Archive build 30 · v0.1.0 · 1244147",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1447,6 +1535,8 @@
       "archiveURL": "/Newgame/versions/eb69116629b4f95de83da76c95f6dd233e4961a9/",
       "available": true,
       "sequence": 29,
+      "buildNumber": 29,
+      "buildLabel": "Archive build 29 · v0.1.0 · eb69116",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1461,6 +1551,8 @@
       "archiveURL": "/Newgame/versions/fc979b15a2663298d3a05f65e573579e8bab9d7c/",
       "available": true,
       "sequence": 28,
+      "buildNumber": 28,
+      "buildLabel": "Archive build 28 · v0.1.0 · fc979b1",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1475,6 +1567,8 @@
       "archiveURL": "/Newgame/versions/1899d3a5059b70881c7d2e9c4b5a2dbba9b90111/",
       "available": true,
       "sequence": 27,
+      "buildNumber": 27,
+      "buildLabel": "Archive build 27 · v0.1.0 · 1899d3a",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1489,6 +1583,8 @@
       "archiveURL": "/Newgame/versions/c8a87c72733494f5f312dca09a3c5af99254ed44/",
       "available": true,
       "sequence": 26,
+      "buildNumber": 26,
+      "buildLabel": "Archive build 26 · v0.1.0 · c8a87c7",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1503,6 +1599,8 @@
       "archiveURL": "/Newgame/versions/b8daafb9791990ac10a23badeb9ecbdcec19c1d7/",
       "available": true,
       "sequence": 25,
+      "buildNumber": 25,
+      "buildLabel": "Archive build 25 · v0.1.0 · b8daafb",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1517,6 +1615,8 @@
       "archiveURL": "/Newgame/versions/29a9cec61de6dd5b3de4f52c154e8ebbabad3907/",
       "available": true,
       "sequence": 24,
+      "buildNumber": 24,
+      "buildLabel": "Archive build 24 · v0.1.0 · 29a9cec",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1531,6 +1631,8 @@
       "archiveURL": "/Newgame/versions/af5077ace77bdfd4c89e93615f09af64369b612a/",
       "available": true,
       "sequence": 23,
+      "buildNumber": 23,
+      "buildLabel": "Archive build 23 · v0.1.0 · af5077a",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1545,6 +1647,8 @@
       "archiveURL": "/Newgame/versions/574ef6be24993b0ab8b5efc27320fe562be455c2/",
       "available": true,
       "sequence": 22,
+      "buildNumber": 22,
+      "buildLabel": "Archive build 22 · v0.1.0 · 574ef6b",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1559,6 +1663,8 @@
       "archiveURL": "/Newgame/versions/72bdb4177e7e3391aed529e2324cb015457d5d8b/",
       "available": true,
       "sequence": 21,
+      "buildNumber": 21,
+      "buildLabel": "Archive build 21 · v0.1.0 · 72bdb41",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1573,6 +1679,8 @@
       "archiveURL": "/Newgame/versions/cd77265f9fb7ea44df8da58e72bae88872b8c7b4/",
       "available": true,
       "sequence": 20,
+      "buildNumber": 20,
+      "buildLabel": "Archive build 20 · v0.1.0 · cd77265",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1587,6 +1695,8 @@
       "archiveURL": "/Newgame/versions/f379c5110a494be6121439cc42cad943e14100c3/",
       "available": true,
       "sequence": 19,
+      "buildNumber": 19,
+      "buildLabel": "Archive build 19 · v0.1.0 · f379c51",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1601,6 +1711,8 @@
       "archiveURL": "/Newgame/versions/a6c29fac54447bcf9147c3ddf961d6d6326debb5/",
       "available": true,
       "sequence": 18,
+      "buildNumber": 18,
+      "buildLabel": "Archive build 18 · v0.1.0 · a6c29fa",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1615,6 +1727,8 @@
       "archiveURL": "/Newgame/versions/c967ce8487c73ed6916746f008194fdcd6aa09a4/",
       "available": true,
       "sequence": 17,
+      "buildNumber": 17,
+      "buildLabel": "Archive build 17 · v0.1.0 · c967ce8",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1629,6 +1743,8 @@
       "archiveURL": "/Newgame/versions/6d189b0ab7f0f13cacbc989ee91ecd8080e9a981/",
       "available": true,
       "sequence": 16,
+      "buildNumber": 16,
+      "buildLabel": "Archive build 16 · v0.1.0 · 6d189b0",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1643,6 +1759,8 @@
       "archiveURL": "/Newgame/versions/b0018a326f97a6f5a6774c96a36a2c0992cf1144/",
       "available": true,
       "sequence": 15,
+      "buildNumber": 15,
+      "buildLabel": "Archive build 15 · v0.1.0 · b0018a3",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1657,6 +1775,8 @@
       "archiveURL": "/Newgame/versions/c3614997c019fee254ce02f5efe255dc054d669d/",
       "available": true,
       "sequence": 14,
+      "buildNumber": 14,
+      "buildLabel": "Archive build 14 · v0.1.0 · c361499",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1671,6 +1791,8 @@
       "archiveURL": "/Newgame/versions/9c814838783e73b5979bbab8ebfd9b2523b63491/",
       "available": true,
       "sequence": 13,
+      "buildNumber": 13,
+      "buildLabel": "Archive build 13 · v0.1.0 · 9c81483",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1685,6 +1807,8 @@
       "archiveURL": "/Newgame/versions/81ab03ed4c007d30eda7b7ffc793d7c0483ff474/",
       "available": true,
       "sequence": 12,
+      "buildNumber": 12,
+      "buildLabel": "Archive build 12 · v0.1.0 · 81ab03e",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1699,6 +1823,8 @@
       "archiveURL": "/Newgame/versions/e1f70f7b3cbcacfb333e667116c9998176efe0ee/",
       "available": true,
       "sequence": 11,
+      "buildNumber": 11,
+      "buildLabel": "Archive build 11 · v0.1.0 · e1f70f7",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1713,6 +1839,8 @@
       "archiveURL": "/Newgame/versions/3d1c2f2488166c60e83e06a2e207fb4745657ed1/",
       "available": true,
       "sequence": 10,
+      "buildNumber": 10,
+      "buildLabel": "Archive build 10 · v0.1.0 · 3d1c2f2",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1727,6 +1855,8 @@
       "archiveURL": "/Newgame/versions/6ae12dc3e0c07a5b64ef04f14565cae3acdc94cb/",
       "available": true,
       "sequence": 9,
+      "buildNumber": 9,
+      "buildLabel": "Archive build 9 · v0.1.0 · 6ae12dc",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1741,6 +1871,8 @@
       "archiveURL": "/Newgame/versions/4d3d63fa7432736dc2e7248ff81e9bc20bbef559/",
       "available": true,
       "sequence": 8,
+      "buildNumber": 8,
+      "buildLabel": "Archive build 8 · v0.1.0 · 4d3d63f",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1755,6 +1887,8 @@
       "archiveURL": "/Newgame/versions/2e0974c8dd812c0d77b3bdb2ad1963d1a457419f/",
       "available": true,
       "sequence": 7,
+      "buildNumber": 7,
+      "buildLabel": "Archive build 7 · v0.1.0 · 2e0974c",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1769,6 +1903,8 @@
       "archiveURL": "/Newgame/versions/6714fc5338f101e4bddf6c21033d2754527dbd90/",
       "available": true,
       "sequence": 6,
+      "buildNumber": 6,
+      "buildLabel": "Archive build 6 · v0.1.0 · 6714fc5",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1783,6 +1919,8 @@
       "archiveURL": "/Newgame/versions/bf049d5ecacbc9301dc4e04dd6d05534a94fd5e5/",
       "available": true,
       "sequence": 5,
+      "buildNumber": 5,
+      "buildLabel": "Archive build 5 · v0.1.0 · bf049d5",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1797,6 +1935,8 @@
       "archiveURL": "/Newgame/versions/162efeb202028e9235e0711e1937a766b7e5a8de/",
       "available": true,
       "sequence": 4,
+      "buildNumber": 4,
+      "buildLabel": "Archive build 4 · v0.1.0 · 162efeb",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1811,6 +1951,8 @@
       "archiveURL": "/Newgame/versions/f94d77a74ca921d47f50a3f7b86fa5b83eed01d7/",
       "available": true,
       "sequence": 3,
+      "buildNumber": 3,
+      "buildLabel": "Archive build 3 · v0.1.0 · f94d77a",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1825,6 +1967,8 @@
       "archiveURL": "/Newgame/versions/1c078de6c892990164867548ee55cafd21f03eb2/",
       "available": true,
       "sequence": 2,
+      "buildNumber": 2,
+      "buildLabel": "Archive build 2 · v0.1.0 · 1c078de",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true
@@ -1839,6 +1983,8 @@
       "archiveURL": "/Newgame/versions/7291dc37059af80a0f3c5c801c0c4918206205f2/",
       "available": true,
       "sequence": 1,
+      "buildNumber": 1,
+      "buildLabel": "Archive build 1 · v0.1.0 · 7291dc3",
       "releaseType": "snapshot",
       "historical": true,
       "reconstructed": true

@@ -64,6 +64,7 @@ try{
   assert.equal(await page.locator('#archive-snapshot-list > article').count(),0);await page.locator('#archive-snapshot-count').click();
   await page.waitForFunction(expected=>document.querySelector('#archive-snapshot-list').childElementCount===expected,catalog.builds.length);
   assert.equal(await page.locator('#archive-snapshot-list > article').count(),catalog.builds.length);
+  const buildNumbers=await page.locator('#archive-snapshot-list > article').evaluateAll(rows=>rows.map(row=>[row.dataset.buildNumber,row.querySelector('h3').textContent]));assert.equal(new Set(buildNumbers.map(([n])=>n)).size,catalog.builds.length);assert.deepEqual(buildNumbers.map(([n])=>Number(n)),catalog.builds.map(v=>v.buildNumber));assert.ok(buildNumbers.every(([n,heading])=>heading.startsWith(`Archive build ${n} — `)));assert.ok(await page.locator('#archive-build-note').isVisible());
   const historical=catalog.versions.find(v=>v.reconstructed&&v.available);assert.ok(historical,'A real historical milestone is required.');
   const row=page.locator('#archive-version-list > article').filter({has:page.locator(`[data-view-changes="${historical.version}"]`)});
   assert.equal(await row.locator('.archive-play').getAttribute('href'),historical.archiveURL);

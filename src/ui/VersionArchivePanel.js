@@ -11,9 +11,9 @@ export class VersionArchivePanel {
     this.snapshots.addEventListener('toggle',()=>{if(this.snapshots.open&&this.catalog)document.querySelector('#archive-snapshot-list').replaceChildren(...this.catalog.builds.map(entry=>this.entry(entry,true)));});
   }
   entry(entry,snapshot=false){
-    const row=element('article','archive-version'),heading=element('h3','',`v${displayBuildVersion(entry.version)} — ${entry.title}`);heading.title=entry.version;row.dataset.catalogVersion=entry.version;
+    const row=element('article','archive-version'),heading=element('h3','',snapshot?t('archive.buildHeading',{number:entry.buildNumber,title:entry.title}):`v${displayBuildVersion(entry.version)} — ${entry.title}`);heading.title=entry.version;row.dataset.catalogVersion=entry.version;if(snapshot)row.dataset.buildNumber=entry.buildNumber;
     const label=entry.current?t('archive.current'):snapshot?t('archive.snapshotLabel',{version:entry.gameVersion}):entry.reconstructed?t('archive.reconstructed'):t('archive.archived');
-    row.append(heading,element('p','archive-version-label',label),element('p','',entry.description));
+    row.append(heading,element('p','archive-version-label',label));if(entry.description&&!(snapshot&&entry.description===entry.title))row.append(element('p','',entry.description));
     const date=element('time','',entry.date?.slice(0,10)??t('archive.noDate'));if(entry.date)date.dateTime=entry.date;
     const metadata=element('p','archive-version-meta');metadata.append(date);if(entry.commit){const commit=element('code','',` · ${entry.commit.slice(0,7)}`);commit.title=entry.commit;metadata.append(commit);}row.append(metadata);
     const actions=element('div','archive-version-actions');

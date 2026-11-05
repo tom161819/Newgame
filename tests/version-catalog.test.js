@@ -28,6 +28,7 @@ test('central catalog preserves original numbers and URLs; snapshots are not inv
   assert.equal(catalog.versions.length,2);assert.equal(catalog.builds.length,2);assert.equal(catalog.versions[1].version,'0.1.0+archive.1');assert.equal(catalog.versions[1].archiveURL,record.basePath);
   assert.equal(catalog.versions[0].version,'0.1.0');assert.equal(catalog.versions[0].reconstructed,false);assert.equal(catalog.currentBuild.version,`0.1.0+dev.${c}`);
   assert.deepEqual(catalog.builds.map(v=>v.gameVersion),['0.1.0','0.1.0']);assert.equal(new Set([...catalog.versions,...catalog.builds,catalog.currentBuild].map(v=>v.version)).size,5);
+  assert.deepEqual(catalog.builds.map(v=>[v.buildNumber,v.buildLabel]),[[2,`Archive build 2 · v0.1.0 · ${b.slice(0,7)}`],[1,`Archive build 1 · v0.1.0 · ${a.slice(0,7)}`]]);assert.equal(catalog.builds.every(v=>v.releaseType==='snapshot'&&!catalog.versions.some(r=>r.version===v.version)),true);
   assert.equal(JSON.stringify(catalog).includes('Private unfinished release notes'),false);assert.ok(catalogHTML(catalog).includes(`href="${record.basePath}"`));
 });
 test('missing verified build is unavailable everywhere, without a fake Play link',()=>{
@@ -39,7 +40,7 @@ test('unavailable milestones still sort by their actual commit time, rather than
   const catalog=assemble({data});assert.deepEqual(catalog.versions.filter(v=>v.reconstructed).map(v=>v.commit),[b,a]);assert.equal(catalog.versions.find(v=>v.commit===b).available,false);
 });
 test('catalog refuses duplicate commits, unsafe or mismatching URLs, duplicate anchors and inaccurate dates',()=>{
-  assert.throws(()=>assemble({records:[record,record]}),/unique/);
+  assert.throws(()=>assemble({records:[record,record]}),/unique/);assert.throws(()=>assemble({records:[record,{...record,commit:b,basePath:`/Newgame/versions/${b}/`}]}),/build numbers/);assert.throws(()=>assemble({records:[{...record,sequence:0}]}),/build numbers/);
   for(const basePath of [`https://example.com/versions/${a}/`,`/Newgame/versions/${b}/`,'/../versions/'])assert.throws(()=>assemble({records:[{...record,basePath}]}));
   assert.throws(()=>assemble({records:[{...record,date:'2026-11-02T00:00:00Z'}]}),/date/);
   const data=parseChangelog(markdown,'0.1.0');data.releases[0].resolvedCommit=a;assert.throws(()=>assemble({data}),/two distinct/);
@@ -54,7 +55,7 @@ test('static archive escapes authored text, preserves every canonical URL and li
   const catalog=assemble();catalog.versions[0].title='<img src=x onerror=alert(1)>';const html=catalogHTML(catalog);
   assert.ok(html.includes('&lt;img'));assert.ok(!html.includes('<img'));assert.ok(html.includes('?changelog=0.1.0%2Barchive.1'));assert.ok(html.includes(`href="${record.basePath}"`));
   assert.ok(html.includes('Reconstructed archive labels'));assert.ok(html.includes('original v0.1.0'));
-  assert.ok(html.includes('v0.1.0+git.aaaaaaa'));
+  assert.ok(html.includes('Archive build 1 — Original source'));assert.ok(html.includes('data-build-number="1"'));assert.ok(html.includes(`title="0.1.0+git.${a}"`));assert.ok(html.includes('not a release version'));
 });
 test('git-archive builds use exact exported provenance and original metadata without nested archives',async()=>{
   const root=await mkdtemp(path.join(tmpdir(),'newgame-catalog-'));
