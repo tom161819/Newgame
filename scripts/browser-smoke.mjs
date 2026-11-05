@@ -1,3 +1,4 @@
+import { employmentExclusionsSmoke } from './employment-exclusions-smoke.mjs';
 import { chainNoticesSmoke } from './chain-notices-smoke.mjs';
 import { idleStoneSmoke } from './idle-stone-smoke.mjs';
 import { wildlifeClearanceSmoke } from './wildlife-clearance-smoke.mjs';
@@ -109,6 +110,7 @@ try{
   if(args.includes('--full')||args.includes('--idle-stone'))await idleStoneSmoke(page);
   if(args.includes('--full')||args.includes('--wildlife-clearance'))await wildlifeClearanceSmoke(page);
   if(args.includes('--full')||args.includes('--unit-commands'))await unitCommandSmoke(page);
+  if(args.includes('--full')||args.includes('--employment-exclusions'))await employmentExclusionsSmoke(page);
   if(args.includes('--full')||args.includes('--employment'))await employmentSmoke(page);
   if(args.includes('--full')||args.includes('--chain-notices'))await chainNoticesSmoke(page);
   if(args.includes('--full')||args.includes('--notices'))await noticesSmoke(page);

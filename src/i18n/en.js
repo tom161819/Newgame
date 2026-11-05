@@ -2,6 +2,13 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  // Employment exclusions (#131).
+  'employment.exclude.local':'Disable employment here',
+  'employment.exclude.type':'Disable employment for this building type ({name})',
+  'employment.exclude.localStatus':'New assignments are disabled for this building.',
+  'employment.exclude.typeStatus':'New assignments are disabled for every building of this type.',
+  'employment.exclude.allowedStatus':'New assignments are allowed.',
+  'employment.exclude.help':'Current workers keep their jobs. Both automatic and manual new assignments follow these rules; a type-wide ban takes priority.',
   // Food-chain completion advice (#125).
   'notice.missingChainSource':'{name}: no {producer} for long-term production. Existing supplies can still be used.',
   'hud.deliverCargo':'Deliver to storage','status.cargoAwaitDelivery':'Stone collected. Use Deliver to storage when you are ready.',
