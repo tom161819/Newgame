@@ -12,8 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| N03 (#34): idle Hauler loose-stone collection | Claude | `claude/hauler-idle-stone` | pending | In review | `src/systems/{LogisticsTaskManager,WorkerAI,JobSystem,GameStateSerializer,GameStateLoader}.js` (SAVE_VERSION 16), `src/data/logistics.js`, `src/ui/UnitPanel.js`, `src/game/GameScene.js`, `index.html`, `tests/logistics-haulers.test.js`. |
-| N02 (#33): global Hauler logistics, Warehouse delivery fix, no Deliver Materials | Claude | `claude/global-hauler-warehouse` | this PR | Verified | `src/data/jobs.js`, `src/data/workplaces.js`, `src/data/objects/{logistics,foodProduction}.js`, `src/systems/{LogisticsTaskManager,BuilderAI,ConstructionSystem,KingLogisticsSystem,FoodProductionSystem,FoodStateValidation,GameStateSerializer}.js` (SAVE_VERSION 15), `src/ui/{ConstructionUI,StoragePanel}.js`, `src/game/GameScene.js`, `index.html`, logistics/smelting tests, building-menu and smelting smokes, README. |
+| N03 follow-up: idle-stone tests and one pickup path for game and tests | Claude | `claude/n03-tests` | this PR | Verified | `tests/hauler-idle-stone.test.js`, `src/systems/WorkplaceSystem.js` (carryCollection), `src/game/GameScene.js`. |
 | M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main2663942 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT403 | IN PROGRESS: preserve approved villager sprites for manual PR22 merge; relevant integration checks running. Earlier476models/Pages/scaffold native and full/Studio/archive proofs retained. Actual final gh merge22 at e574f75 still API Forbidden. Frozen02a has own459test archive; final verifier checks actual deployed Git blobs, allowing later live development. Public tag/main/deployment gates pending; new user order C01–C08 then master11–15, all unstarted. | Native smoke regressions; release-gate/deployed-archive verifier and tests; release notes,02a archive/catalog, progress/verification docs. Claude art unchanged; no schema rewrite. |
 
 ## Kept backups (do not delete without the developer)
@@ -23,6 +22,9 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-05 [#67](https://github.com/tom161819/Newgame/pull/67) Fix the Pages deploy after N03: smokes expect save version 16 and switch idle stone off in the smelting smoke (Claude).
+- 2026-11-05 [#66](https://github.com/tom161819/Newgame/pull/66) N03: idle Haulers collect loose stone near the Castle, per-unit ON/OFF and radius, SAVE_VERSION 16 (Claude, Issue #34). Its own Pages run failed in the smokes; fixed by #67.
+- 2026-11-04 [#62](https://github.com/tom161819/Newgame/pull/62) N02: Haulers work kingdom-wide, Builders fetch site materials, no Deliver Materials (Claude, Issue #33).
 - 2026-11-04 [#45](https://github.com/tom161819/Newgame/pull/45) Approved wall kit in the game; developer's Studio approvals recorded (Claude).
 - 2026-11-04 [#42](https://github.com/tom161819/Newgame/pull/42) N01: Castle no longer covers the king; starter stockpile in front (Claude, Issue #32).
 - 2026-11-04 [#44](https://github.com/tom161819/Newgame/pull/44) Wall kit concept in the Studio (Claude).

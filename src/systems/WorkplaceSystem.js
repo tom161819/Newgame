@@ -45,6 +45,8 @@ export class WorkplaceSystem {
     worker.cargo=null;worker.pendingWorkRewards=[];
   }
   carryCollection(worker,{resource,amount,event}){
+    // A Hauler has no workplace: a picked-up loose stone becomes physical cargo for storage.
+    if(worker?.profession==='hauler'&&worker.assignedWorkplaceId==null&&this.scene.foodStorage?.manages(resource)&&!worker.cargo){worker.cargo={resource,amount};return true;}
     if(!this.building(worker))return false;
     worker.cargo={resource,amount};worker.pendingWorkRewards??=[];worker.pendingWorkRewards.push(event);return true;
   }
