@@ -393,3 +393,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .setup-resources { margin-top:20px; }
 .setup-resources .setup-help { margin:0; }
 .save-transfer { display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 4px; }
+.autosave-status { color:#cfd6c0; }
+.autosave-status.failed { color:#f0a58f; }
+.setting-row select { padding:4px 6px; font:inherit; background:#26321f; color:#ece2c4; border:1px solid #91835b; }
+.save-badge { display:inline-block; margin-bottom:4px; padding:1px 8px; border-radius:10px; background:#5a6b3c; color:#f1e8c8; font-size:12px; letter-spacing:.04em; text-transform:uppercase; }

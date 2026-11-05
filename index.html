@@ -102,6 +102,10 @@
       <p>OFF keeps permanent summer and remembers the seasonal cycle. Weather and game days continue.</p>
       <label class="setting-row" for="path-wear-toggle"><span>Show Path Wear Debug</span><input id="path-wear-toggle" type="checkbox" role="switch" /></label>
       <p>Barvy vyšlapání a počet průchodů pod ukazatelem myši.</p>
+      <label class="setting-row" for="autosave-toggle"><span>Autosave</span><input id="autosave-toggle" type="checkbox" role="switch" checked/></label>
+      <label class="setting-row" for="autosave-interval"><span>Autosave every</span><select id="autosave-interval"><option value="60000">1 minute</option><option value="120000">2 minutes</option><option value="300000" selected>5 minutes</option><option value="600000">10 minutes</option></select></label>
+      <p id="autosave-status" class="autosave-status" role="status">No autosave yet in this session.</p>
+      <p>Counts active play only; nothing is saved while paused or in a hidden tab. Load the Autosave slot from Load Game. Closing the browser does not guarantee a save.</p>
       <nav class="settings-actions" aria-label="Herní menu"><button type="button" data-game-menu="save">Save Game</button><button type="button" data-game-menu="load">Load Game</button><button type="button" data-game-menu="main">Main Menu</button></nav>
       <p class="settings-version">Medieval Kingdom · <span data-game-version></span></p>
       <p class="settings-renderer" title="Choose the renderer with ?renderer=canvas, ?renderer=webgl or ?renderer=auto in the page address.">Renderer: <span id="renderer-status">Canvas</span></p>
