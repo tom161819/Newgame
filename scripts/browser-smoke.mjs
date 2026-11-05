@@ -10,6 +10,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { browserRuntime } from './browser-runtime.mjs';
 import { projectBase } from './archive-lib.mjs';
+import { noticesSmoke } from './notices-smoke.mjs';
 import { employmentSmoke } from './employment-smoke.mjs';
 import { buildingMenuSmoke,buildingUnlockGameplaySmoke } from './building-menu-smoke.mjs';
 import { seasonsMenuSmoke } from './seasons-menu-smoke.mjs';
@@ -98,6 +99,7 @@ try{
   if(args.includes('--full')||args.includes('--staffing'))await staffingIndicatorsSmoke(page);
   if(args.includes('--full')||args.includes('--unit-commands'))await unitCommandSmoke(page);
   if(args.includes('--full')||args.includes('--employment'))await employmentSmoke(page);
+  if(args.includes('--full')||args.includes('--notices'))await noticesSmoke(page);
   if(args.includes('--full')||args.includes('--fog')){await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);await hiddenInteractionSmoke(page);}
   if(args.includes('--full')||args.includes('--i18n'))await i18nGameSmoke(page);
   if(args.includes('--full')||args.includes('--save-transfer'))await saveTransferSmoke(page);

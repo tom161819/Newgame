@@ -51,3 +51,11 @@ and Resume. It restores the original world before the other smokes run.
 
 Final gate/PR/deployment evidence is recorded in Issue52 and the PR. A local
 build or green test alone does not mean this work is merged or deployed.
+
+## C04 integration
+
+Main advanced to df4cac5 (PR106) during the final gate. Its GameScene wiring,
+notices UI, browser scenario, translations and styles are preserved. The three
+additive conflicts (changelog, active coordination and appended CSS) retain both
+features. C04 diagnostics now exclude commanded Builders/Haulers/Farmers from
+working sources, with an integration regression. SAVE_VERSION remains 21.
