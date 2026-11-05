@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| C02 (#49) Assign Worker groups, Granary staffing audit | Claude (taken over from Codex; Codex not running) | `claude/c02-staffing-granary` | — | In progress | src/ui/WorkplacePanel.js, src/ui/workplaceCandidates.js, i18n workplace keys, src/style.css (candidate block), scripts/staffing-smoke.mjs, tests/workplace-candidates.test.js. |
+| C03 (#50) Auto Employment and Castle priorities | Claude (taken over from Codex; Codex not running) | `claude/c03-auto-employment` | — | In progress | src/data/employment.js, src/systems/EmploymentSystem.js, src/ui/EmploymentPanel.js, GameScene.js (wiring, Castle click, Settings toggle), WorkplacePanel/UnitPanel (manual holds), WorkerSystem.create, FoodProductionSystem (Smelter delegates), GameSettings, NewGameSetup, GameStateSerializer/Loader (SAVE_VERSION 20), index.html (panel, toggles), i18n employment keys, style.css, smokes (browser, employment, smelting, ledger). |
 
 ## Kept backups (do not delete without the developer)
 
@@ -21,6 +21,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-05 [#89](https://github.com/tom161819/Newgame/pull/89) C02: Assign Worker in three sorted groups with move confirmation; the Granary reports no false Missing Workers. Issue #49 done and closed (Claude).
 - 2026-11-05 [#85](https://github.com/tom161819/Newgame/pull/85), [#86](https://github.com/tom161819/Newgame/pull/86), [#88](https://github.com/tom161819/Newgame/pull/88) C01: no stuck visibility, subjects see 15 tiles, the king explores unknown land, provisional blueprints outside sight (SAVE_VERSION 19). Taken over from Codex; Issue #48 done and closed (Claude).
 - 2026-11-05 [#84](https://github.com/tom161819/Newgame/pull/84) N11: trampled paths drawn as the approved narrow Earth track over seasonal grass; Pages 41985687360 and Verify published release passed. Issue #64 done and closed (Claude).
 - 2026-11-05 [#82](https://github.com/tom161819/Newgame/pull/82) N10: the Buildings menu is a wide horizontal strip of cards (buttons, wheel, keyboard, phone scrolling); Pages 41981107835 and Verify published release passed. Issue #63 done and closed (Claude).

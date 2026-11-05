@@ -19,8 +19,8 @@ export class WorkplacePanel {
       const assign=button.dataset.assignWorker,remove=button.dataset.removeWorker;
       // Moving someone who already has another job takes a second, confirming click.
       if(assign&&button.dataset.confirmMove&&this.pendingMove!==assign){this.pendingMove=assign;this.signature=null;this.refresh();return;}
-      if(assign){this.pendingMove=null;scene.workplaceSystem.assign(this.building,scene.workerSystem.workers.get(assign));}
-      if(remove)scene.workplaceSystem.remove(scene.workerSystem.workers.get(remove));this.refresh();
+      if(assign){this.pendingMove=null;const worker=scene.workerSystem.workers.get(assign);scene.employment?.release(worker);scene.workplaceSystem.assign(this.building,worker);}
+      if(remove){const worker=scene.workerSystem.workers.get(remove);scene.employment?.hold(worker);scene.workplaceSystem.remove(worker);}this.refresh();
     },options);
     this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.close();},options);this.dialog.addEventListener('close',()=>this.restoreInput(),options);
   }

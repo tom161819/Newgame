@@ -49,7 +49,7 @@ export class WorkerSystem {
     id??=`worker-${this.nextId++}`;const number=Number(id.split('-')[1]),definition=this.scene.objectRegistry.require('peasant');
     const view=this.scene.assets.createView(definition.id,{...tileCenter(tile),tile});
     const worker=new WorkerController(this.scene,definition,id,tile,view,name??`${names[(number-1)%names.length]}${number>names.length?` ${Math.ceil(number/names.length)}`:''}`);
-    worker.isSubject=isSubject;
+    worker.isSubject=isSubject;this.scene.employment?.request();
     if(randomize)initializeNaturalTalent(worker);
     view.setData('worker',worker);this.workers.set(id,worker);this.updateUI();return worker;
   }
