@@ -5,6 +5,8 @@ import { tileKey } from './stones.js';
 import { groundDepthAbove,planGroundOrder, planTowerExit, towerNeighbors, buildingDepth, towerTop, buildingDefinition,buildingIsComplete } from './buildings.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { advanceMovement } from './movement.js';
+import { canStep } from './pathfinding.js';
+import { knownMap } from './knownMap.js';
 import { isWall,wallIndex,findRoofPath,planRoofExit } from './walls.js';
 import { createCombatStats } from '../systems/CombatSystem.js';
 import { createExperience } from '../data/experience.js';
@@ -74,7 +76,7 @@ export class PlayerController {
         this.scene.setStatus(t('status.onTower'));
         return false;
       }
-      const route = planTowerExit(this.scene.map, this.currentTower, order,this.scene.pathWear?.routingOptions(this));
+      const route = planTowerExit(order.explore?knownMap(this.scene):this.scene.map, this.currentTower, order,this.scene.pathWear?.routingOptions(this));
       if (!route) {
         this.scene.setStatus(t('status.noTowerPath'));
         return false;
@@ -86,7 +88,7 @@ export class PlayerController {
       return true;
     }
 
-    const route = planGroundOrder(this.scene.map, this.nextTile ?? this.tile, order,this.scene.pathWear?.routingOptions(this));
+    const route = planGroundOrder(order.explore?knownMap(this.scene):this.scene.map, this.nextTile ?? this.tile, order,this.scene.pathWear?.routingOptions(this));
     if (!route) {
       this.scene.setStatus(t('status.noPath'));
       return false;
@@ -94,12 +96,20 @@ export class PlayerController {
     this.order = order;
     this.path = route.path;
     this.scene.showMarker(route.destination);
-    if(!order.silent)this.scene.setStatus(order.kind === 'enter' ? t('status.toTowerEntrance')
+    if(!order.silent)this.scene.setStatus(order.explore ? t('status.toUnknown') : order.kind === 'enter' ? t('status.toTowerEntrance')
       : order.pickupKey ? t('status.toStone') : t('status.toTarget'));
     if (!this.nextTile && this.path.length === 0) this.arrive();
     return true;
   }
 
+  // Into the unknown the route was planned on the known map; a real obstacle met on the way is only seen when reached.
+  canEnterTile(tile){return !this.order?.explore||canStep(this.scene.map,this.tile,tile);}
+  replanExplore(){
+    const route=planGroundOrder(knownMap(this.scene),this.tile,this.order,this.scene.pathWear?.routingOptions(this));
+    if(!route){this.path=[];this.order=null;this.scene.marker.setVisible(false);this.scene.setStatus(t('status.exploreBlocked'));return;}
+    this.path=route.path;this.scene.showMarker(route.destination);
+    if(!this.path.length)this.arrive();
+  }
   wallAt(tile){return (this.scene.wallMap??wallIndex(this.scene.buildings)).get(tileKey(tile));}
   commandOnWall(order){
     const start=this.nextTile?this.wallAt(this.nextTile):this.currentTower;
@@ -107,7 +117,7 @@ export class PlayerController {
       const route=findRoofPath(this.scene.buildings,start,order.tower);
       if(route!==null){this.startRoofRoute(route,null);return true;}
     }
-    const route=planRoofExit(this.scene.map,this.scene.buildings,start,order,this.scene.pathWear?.routingOptions(this));
+    const route=planRoofExit(order.explore?knownMap(this.scene):this.scene.map,this.scene.buildings,start,order,this.scene.pathWear?.routingOptions(this));
     if(!route){
       this.path=[];this.roofContinuation=null;this.scene.marker.setVisible(false);
       this.scene.setStatus(t('status.noWallPath'));return false;
@@ -215,6 +225,7 @@ export class PlayerController {
     }
     if (this.state !== PLAYER_STATE.GROUND) return;
     this.availableWorkMs=advanceMovement(this,delta);
+    if(this.order?.explore&&!this.nextTile&&this.path.length&&!this.canEnterTile(this.path[0]))this.replanExplore();
     const projected = gridToWorld(this.position.x, this.position.y);
     this.sprite.setPosition(projected.x, projected.y);
     this.sprite.setDepth(groundDepthAbove(this.scene.buildings,{x:Math.floor(this.position.x),y:Math.floor(this.position.y)},this.sprite.y + this.depthOffset));

@@ -17,7 +17,7 @@ export function restoreActor(unit,data){
 }
 export function restoreOrder(data,scene){
   if(!data)return null;
-  return {kind:data.kind,goal:data.goal?{...data.goal}:null,pickupKey:data.pickupKey,dropId:data.dropId,silent:data.silent,
+  return {kind:data.kind,goal:data.goal?{...data.goal}:null,pickupKey:data.pickupKey,dropId:data.dropId,silent:data.silent,explore:data.explore,
     tower:scene.buildings.find(b=>b.id===data.buildingId),animal:scene.animalSystem.animals.get(data.animalId),
     chest:scene.treasureSystem.chests.get(data.chestId),resource:scene.resources.get(data.resourceKey)?.getData('object')};
 }

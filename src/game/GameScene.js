@@ -339,7 +339,9 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     const selected=this.pickInteraction(pointer.worldX,pointer.worldY,goal);
-    if(!selected&&!this.fog.isVisibleTile(goal)){this.setStatus(OUTSIDE_SIGHT);return;}
+    // Unseen ground can be a destination; nothing hidden there is checked or revealed.
+    const unknown=!selected&&!this.fog.isVisibleTile(goal);
+    if(unknown&&!this.fog.isInMap(goal)){this.setStatus(OUTSIDE_SIGHT);return;}
     if(selected?.kind==='human'){this.unitPanel.open(selected.object);return;}
     if(selected?.kind==='stockpile'){this.storagePanel.open(null,selected.object.location.id);return;}
     if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){if(this.kingLogistics.workflowSiteId!==selected.object.id){this.kingLogistics.cancel();this.constructionSystem.commandKing(selected.object);}this.constructionUI.open(selected.object);return;}
@@ -375,7 +377,8 @@ export class GameScene extends Phaser.Scene {
         goal=resource.getData('tile');
         if(!definition.walkable)accepted=this.character.command({kind:'collect',resource:object,pickupKey:tileKey(goal)});
         else accepted=this.character.command({kind:'move',goal,pickupKey:tileKey(goal)});
-      }else if(!isWalkable(this.map,goal.x,goal.y))this.setStatus(t('status.obstacle'));
+      }else if(unknown)accepted=this.character.command({kind:'move',goal,pickupKey:null,explore:true});
+      else if(!isWalkable(this.map,goal.x,goal.y))this.setStatus(t('status.obstacle'));
       else accepted=this.character.command({kind:'move',goal,pickupKey:null});
     }
     if(accepted)this.worldCamera.follow();
