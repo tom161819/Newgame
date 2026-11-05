@@ -19,7 +19,7 @@ export const characters = [
     description:'Obyvatel s vlastním talentem (+20 % příslušných XP), šesti skilly a jednou placenou profesí.',
     renderMode:'procedural',renderer:'human',origin:{x:.5,y:.92},visualHeight:48,
     visual:{hitArea:{x:-13,y:-44,width:26,height:39},healthBarOffset:48},depth:{offset:.1},
-    gameplay:{movementSpeed:3,initialCount:POPULATION.initial,behavior:'worker'},
+    gameplay:{movementSpeed:3,initialCount:POPULATION.initial,behavior:'worker',baseSight:15},
     stats:{maxHP:60,attackDPS:6,armor:0,attackRange:1,hpRegenPerSecond:.2},
     experience:{initialLevel:1,maxLevel:50,enabled:true,gainMultiplier:1},
     skills:SKILL_IDS,availableJobs:Object.keys(JOBS),workEfficiencyPerLevel:WORK_RULES.efficiencyPerLevel,

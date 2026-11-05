@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Every subject now has its own sight: with Fog of War on, each living subject lights a circle 15 tiles across (75 % of the king's 20) wherever they walk, and newly seen ground is added to the map memory. A subject who leaves, dies or emigrates takes that sight away, so only the remembered, darker map stays.
 - Choose Czech or English in the main menu or in Settings; the game remembers the choice. The main menu, New Game Setup, Save/Load with import and autosave, the pause menu, Settings, the changelog, the version archive, the game HUD (day, season, weather, food, sight, health, level, economy, camera and building bar) and the names and descriptions of all buildings, resources, animals, items, professions and skills are translated, including Czech plural forms. In-game panels are translated too: storage, construction, workplaces and production, crops, trees and deposits, the character sheet, equipment, treasure, food economy, the building menu, missing-worker markers, the resource income/expense tooltip, the Population sidebar and the Asset Library. Gameplay messages in the status bar, residents' work messages, construction and placement messages and notifications follow the chosen language too; saved games stay language-neutral. Switching the language during play updates the HUD at once.
 - Autosave: the game saves itself into a separate Autosave slot every 5 minutes of active play (1, 2 or 10 minutes, or off, in Settings). Paused games and hidden tabs do not count, a failed autosave keeps the previous one, Settings shows the time of the last autosave, and the Autosave slot loads from Load Game.
 - Move saved games between devices without any server: Download Save in the Save/Load menu stores a save as a JSON file, and Import Save File checks it and adds it as a new save (or replaces the same save after you confirm). Damaged files and saves from other alpha versions are refused without changing anything.
@@ -13,6 +14,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Idle Haulers now collect loose stone lying within a set radius of the Castle (default 80 tiles) and carry it to storage. Each Hauler has a Collect loose stone ON/OFF switch and a radius field in the unit panel; real transport jobs always come first. Saved games from earlier versions cannot be loaded and need a new game.
 
 ### Fixed
+- Ground the king has walked away from no longer stays fully lit when several sight changes happen between two redraws (for example while saving or after a pause); it fades back to the remembered map.
 - Haulers now actually carry goods: a resident given the Hauler profession immediately serves every Warehouse, Granary and construction site in the kingdom instead of waiting for a workplace, so new Warehouses fill without the king.
 - The Castle no longer covers the king when he stands in front of it, and the starting stockpile now appears in front of the Castle instead of behind it.
 

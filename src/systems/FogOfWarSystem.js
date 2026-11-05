@@ -12,35 +12,46 @@ export const visibilityPlacementError=(fog,tiles)=>fog?.enabled&&tiles.some(tile
 export class FogOfWarSystem {
   constructor(character,enabled=false,{width=COLUMNS,height=ROWS,explorationEnabled=true}={}){
     Object.assign(this,{character,enabled,width,height,explorationEnabled});
-    this.explored=new Uint8Array(width*height);
-    this.providers=new Map();this.visibleIndices=new Set();this.revision=0;this.update();
+    this.explored=new Uint8Array(width*height);this.coverage=new Uint16Array(width*height);this.painted=new Map();
+    this.providers=new Map();this.visibleIndices=new Set();this.added=[];this.removed=[];this.revision=0;this.update();
   }
+  // A provider returns one logical source or a list of them ({id, center, radius}); a list lets many units share one registration.
   registerSource(id,provider){
     if(typeof provider!=='function')throw new TypeError('A vision source requires a profile provider.');
     this.providers.set(id,provider);this.update();
     return ()=>{this.providers.delete(id);this.update();};
   }
+  circle(source){
+    const tiles=[],minX=Math.max(0,Math.ceil(source.center.x-source.radius-.5)),maxX=Math.min(this.width-1,Math.floor(source.center.x+source.radius-.5));
+    const minY=Math.max(0,Math.ceil(source.center.y-source.radius-.5)),maxY=Math.min(this.height-1,Math.floor(source.center.y+source.radius-.5));
+    for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++)if(contains(source,{x:x+.5,y:y+.5}))tiles.push(y*this.width+x);
+    return tiles;
+  }
   update(){
     const profile=visibilityProfile(this.character);
     this.size=profile.size;this.radius=profile.radius;
-    const sources=[profile,...[...this.providers.values()].map(provider=>provider()).filter(Boolean)];
+    const sources=[{id:'character',center:profile.center,radius:profile.radius}];
+    for(const [id,provider]of this.providers){const value=provider();if(!value)continue;const list=Array.isArray(value)?value:[value];list.forEach((source,i)=>{if(source)sources.push({id:Array.isArray(value)?`${id}:${source.id??i}`:id,center:source.center,radius:source.radius});});}
     for(const source of sources)if(!Number.isFinite(source.radius)||source.radius<0||!Number.isFinite(source.center?.x)||!Number.isFinite(source.center?.y))throw new TypeError('Invalid logical vision source.');
-    const key=sources.map(s=>`${s.center.x},${s.center.y},${s.radius}`).join(';');
-    if(key!==this.sourceKey){
-      this.sourceKey=key;this.sources=sources.map(s=>({center:{...s.center},radius:s.radius}));
+    // Incremental coverage: only a source that moved, appeared or left touches the map; the others keep their counted circles.
+    const next=new Map(),before=new Map(),touch=(tiles,step)=>{for(const index of tiles){if(!before.has(index))before.set(index,this.coverage[index]>0);this.coverage[index]+=step;}};
+    let changed=sources.length!==this.painted.size;
+    for(const source of sources){
+      const key=`${source.center.x},${source.center.y},${source.radius}`,old=this.painted.get(source.id);
+      if(old?.key===key){next.set(source.id,old);continue;}
+      changed=true;if(old)touch(old.tiles,-1);const tiles=this.circle(source);touch(tiles,1);next.set(source.id,{key,tiles});
+    }
+    for(const [id,old]of this.painted)if(!next.has(id)){changed=true;touch(old.tiles,-1);}
+    this.painted=next;
+    if(changed){
+      this.sources=sources.map(s=>({center:{...s.center},radius:s.radius}));
       this.left=Math.ceil(Math.min(...sources.map(s=>s.center.x-s.radius))-.5);
       this.top=Math.ceil(Math.min(...sources.map(s=>s.center.y-s.radius))-.5);
       this.right=Math.floor(Math.max(...sources.map(s=>s.center.x+s.radius))-.5)+1;
       this.bottom=Math.floor(Math.max(...sources.map(s=>s.center.y+s.radius))-.5)+1;
-      const next=new Set();
-      for(const source of this.sources){
-        const minX=Math.max(0,Math.ceil(source.center.x-source.radius-.5)),maxX=Math.min(this.width-1,Math.floor(source.center.x+source.radius-.5));
-        const minY=Math.max(0,Math.ceil(source.center.y-source.radius-.5)),maxY=Math.min(this.height-1,Math.floor(source.center.y+source.radius-.5));
-        for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++)if(contains(source,{x:x+.5,y:y+.5}))next.add(y*this.width+x);
-      }
-      this.added=[...next].filter(index=>!this.visibleIndices.has(index));
-      this.removed=[...this.visibleIndices].filter(index=>!next.has(index));
-      this.visibleIndices=next;this.revision++;
+      this.added=[];this.removed=[];
+      for(const [index,was]of before){const now=this.coverage[index]>0;if(now&&!was){this.visibleIndices.add(index);this.added.push(index);}else if(!now&&was){this.visibleIndices.delete(index);this.removed.push(index);}}
+      this.revision++;
     }
     this.signature=`${this.enabled?'on':'off'}:${this.explorationEnabled}:${this.revision}`;
   }
