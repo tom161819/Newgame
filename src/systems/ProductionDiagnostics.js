@@ -1,12 +1,29 @@
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
-import { DIAGNOSTICS,INPUT_SOURCES } from '../data/diagnostics.js';
+import { DIAGNOSTICS,INPUT_SOURCES,COMPLETION_SOURCES } from '../data/diagnostics.js';
 
 // Lasting problems that block work or production, each identified by (entity, reason). A problem is reported once
 // it has lasted DIAGNOSTICS.persistence, repeated at most every DIAGNOSTICS.reminder while it lasts, and dropped as
 // soon as it is gone. Checked a few times per game second from the actual construction, production and storage
 // state, never per unit or per frame. Nothing is saved: after Load a problem must last again before it is shown.
 export class ProductionDiagnostics {
-  constructor(scene){this.scene=scene;this.issues=new Map();this.listeners=new Set();this.nextCheck=0;this.revision=0;}
+  constructor(scene){this.scene=scene;this.issues=new Map();this.listeners=new Set();this.nextCheck=0;this.revision=0;this.completionNotices=new Map();this.unsubscribe=scene.activities?.on(event=>{if(event.type==='buildingCompleted')this.completed(event.objectIds??[]);});}
+  completed(ids){
+    for(const id of ids){
+      const building=this.scene.buildings.find(b=>b.id===id),producer=building&&COMPLETION_SOURCES[building.type];
+      if(!producer||!buildingIsComplete(building)||this.hasBuilding(producer))continue;
+      // One piece of advice per missing link, even when several workers or
+      // several new buildings complete the same chain.
+      const key=`chain:${building.type}:${producer}`;if(this.completionNotices.has(key))continue;
+      const issue={key,entityId:id,reason:'missingChainSource',category:'production',params:{producer},lastNotified:this.scene.gameTime.totalElapsed,dismissed:false,informational:true};
+      this.completionNotices.set(key,issue);this.scene.activities?.emit('productionIssue',{reason:issue.reason,category:issue.category,objectIds:[id],params:{producer},informational:true});this.changed();
+    }
+    this.resolveCompletionNotices();
+  }
+  resolveCompletionNotices(){
+    let changed=false;for(const [key,issue]of this.completionNotices){
+      if(this.hasBuilding(issue.params.producer)||!this.scene.buildings.some(b=>b.id===issue.entityId&&buildingIsComplete(b))){this.completionNotices.delete(key);changed=true;}
+    }if(changed)this.changed();
+  }
   onChange(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   changed(){this.revision++;for(const listener of this.listeners)listener();}
   residents(profession){return this.scene.workerSystem.liveSubjects().filter(w=>w.profession===profession&&(!w.commandState||w.commandState.state==='Working'));}
@@ -42,7 +59,7 @@ export class ProductionDiagnostics {
   }
   update(){
     const time=this.scene.gameTime;if(!time||time.paused||this.scene.gameOver)return;const now=time.totalElapsed;if(now<this.nextCheck)return;this.nextCheck=now+DIAGNOSTICS.checkInterval;
-    const seen=new Set();let changed=false;
+    this.resolveCompletionNotices();const seen=new Set();let changed=false;
     for(const found of this.detect()){
       // One current reason per entity: a new reason replaces the old one.
       const key=`${found.entityId}:${found.reason}`;seen.add(key);let issue=this.issues.get(key);
@@ -55,7 +72,7 @@ export class ProductionDiagnostics {
     if(changed)this.changed();
   }
   // Reported and not dismissed since its last reminder.
-  active(){return [...this.issues.values()].filter(issue=>issue.lastNotified!=null&&!issue.dismissed).sort((a,b)=>a.lastNotified-b.lastNotified||a.key.localeCompare(b.key));}
-  dismiss(key){const issue=this.issues.get(key);if(issue&&!issue.dismissed){issue.dismissed=true;this.changed();}}
-  destroy(){this.listeners.clear();this.issues.clear();}
+  active(){const blocking=[...this.issues.values()].filter(issue=>issue.lastNotified!=null&&!issue.dismissed),entities=new Set(blocking.map(i=>i.entityId));return [...blocking,...[...this.completionNotices.values()].filter(i=>!i.dismissed&&!entities.has(i.entityId))].sort((a,b)=>a.lastNotified-b.lastNotified||a.key.localeCompare(b.key));}
+  dismiss(key){const issue=this.issues.get(key)??this.completionNotices.get(key);if(issue&&!issue.dismissed){issue.dismissed=true;this.changed();}}
+  destroy(){this.unsubscribe?.();this.listeners.clear();this.issues.clear();this.completionNotices.clear();}
 }

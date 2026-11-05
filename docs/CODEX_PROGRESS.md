@@ -56,3 +56,13 @@ Issue93 extends the existing N03 implementation, not a second logistics engine. 
 Validation: 584/584 tests (12 focused idle-stone cases), changelog:validate and build:pages PASS. `npm run smoke -- --base=/Newgame/ --current-only --idle-stone` PASS: actual panel ON/radius, a new game with no Castle, physical pickup, current-schema cargo Save/Load and exactly one deposit; standard movement/IndexedDB/cold-start/browser checks also passed.
 
 Verified completion: [PR112](https://github.com/tom161819/Newgame/pull/112) merged as afd5f88fe7eb316b2d1e1f72238eaceee002c304 after [current-head CI42028197212](https://github.com/tom161819/Newgame/actions/runs/42028197212) success for f2fcc7e. [Pages42028606962](https://github.com/tom161819/Newgame/actions/runs/42028606962) build and deploy succeeded for the exact merge, with 584 tests, unchanged archives, full browser/save compatibility (explicit AUD63 and C05 passes) and Studio checks. Issue93 is closed/done. Live queue check found no other open agent:codex + status:ready; C07 #54 remains agent:claude. Completion-record-only checks: 584/584 tests, changelog:validate, build:pages and current-only browser smoke PASS.
+
+## AUD78 verified completion — 2026-11-05
+
+[PR134](https://github.com/tom161819/Newgame/pull/134) merged as2d9a357 after current-head CI42057853531. 592 tests, changelog, build and real browser HUD/standing/cargo Save/Load plus Hauler regression passed. [Pages42058257302](https://github.com/tom161819/Newgame/actions/runs/42058257302) full browser/save/archive/Studio build and deploy succeeded for that exact merge. Issue102 closed/done; current schema22 unchanged, C07 and House preserved.
+
+## NEW08-B implementation — 2026-11-05
+
+Issue125 uses the existing completion ActivityBus event, ProductionDiagnostics and NoticesPanel. A completed Mill without a completed Wheat Field, or Bakery without a completed Mill, creates one informational production notice per missing structural link regardless of stock/staff. Multiple contributor events and new consumers do not repeat it. Dismissal lasts for that missing-link episode; completion of its predecessor clears it. Existing C04 blocking reasons retain panel priority and their 30-second logic. Advice is transient, never saved or replayed when loading existing buildings; no new schema/model fields. EN/CS text explicitly allows existing supplies. C08 systems and storage/production registries are untouched. Browser completion-event fixtures exercise the live bus/panel, dismiss, dedup, resolution and a real current-schema reload alongside the old C04 smoke.
+
+Validation: 595/595 tests (8 diagnostics cases), changelog:validate, build:pages and browser --current-only --chain-notices --notices PASS.

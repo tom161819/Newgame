@@ -9,3 +9,6 @@ export const INPUT_SOURCES=Object.freeze({
   iron_ore:Object.freeze({building:'iron_mine',profession:'miner'}),
   wood:Object.freeze({building:'lumberjack_hut',profession:'woodcutter'}),
 });
+
+// Structural advice on completion, independent of current input stock or staffing.
+export const COMPLETION_SOURCES=Object.freeze({mill:'wheat_field',bakery:'mill'});
