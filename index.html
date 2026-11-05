@@ -69,9 +69,9 @@
       <div class="status-row"><p id="status" role="status">Vyber kámen nebo volné políčko.</p><footer><span data-i18n="hud.controls">WASD / šipky: kamera · kolečko: zoom</span></footer></div>
       <section class="buildings-bar" aria-label="Stavění budov" data-i18n-attr="aria-label:hud.buildingsBar">
         <div id="buildings-panel" class="buildings-panel" hidden>
-          <h2 data-i18n="hud.buildings">Buildings</h2>
+          <div class="buildings-panel-header"><h2 data-i18n="hud.buildings">Buildings</h2><span class="building-scroll-controls"><button id="building-scroll-prev" type="button" aria-controls="building-options" aria-label="Scroll buildings left" data-i18n-attr="aria-label:hud.buildingsScrollPrev;title:hud.buildingsScrollPrev" title="Scroll buildings left">‹</button><button id="building-scroll-next" type="button" aria-controls="building-options" aria-label="Scroll buildings right" data-i18n-attr="aria-label:hud.buildingsScrollNext;title:hud.buildingsScrollNext" title="Scroll buildings right">›</button></span></div>
           <nav id="building-categories" aria-label="Building categories" data-i18n-attr="aria-label:hud.buildingCategories"></nav>
-          <div id="building-options"></div>
+          <div id="building-options" role="group" aria-label="Buildings" data-i18n-attr="aria-label:hud.buildings"></div>
         </div>
         <button id="buildings-tab" type="button" aria-expanded="false" aria-controls="buildings-panel" data-i18n="hud.buildings">Buildings</button>
         <button id="asset-library-button" type="button" data-i18n="hud.assetLibrary">Asset Library</button><a class="version-archive-link" data-version-archive href="./versions/" target="_blank" rel="noopener noreferrer" data-i18n="hud.olderVersions">Starší verze ↗</a>
