@@ -62,3 +62,12 @@ schema save round-trips exactly; the derived mask rebuilds after Load.
 
 The before image is from the existing C05 build; the after image is from this
 branch. No historical archive or production graphic was modified.
+
+## Published verification
+
+PR [#109](https://github.com/tom161819/Newgame/pull/109) merged as
+`6181d50f5ee032de6a13b5a1cdb1f060912128a7`. Required current-head CI
+[42021551021](https://github.com/tom161819/Newgame/actions/runs/42021551021)
+succeeded on `cf13c90402e241e7bdf668dba98fcb8ece1924a7`. Local 570 tests,
+changelog validation, build:pages and the relevant real browser smoke passed.
+The first Pages run [42021840338](https://github.com/tom161819/Newgame/actions/runs/42021840338) failed before deploy: the old fog smoke sampled a fixed corner that was actually visible to a subject. A focused replay confirmed logical state2 and a green terrain pixel there. The follow-up fixture chooses an on-screen corner whose four neighbours are all logically unexplored, retains exact `[0,0,0,255]` assertions and adds a regression with subject sight. No game rendering or sight rules change. Final deployment verification remains pending until the corrected Pages run succeeds.

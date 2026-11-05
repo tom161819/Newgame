@@ -1,15 +1,18 @@
+import { unknownFogSeam } from './fog-sampling.mjs';
 import assert from 'node:assert/strict';
 
 export async function explorationMenuSmoke(page){
   await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.pauseManager.set('fog-smoke',true);window.__fogSmoke={position:{...s.character.position},tile:{...s.character.tile},fog:s.fog.enabled,exploration:s.fog.explorationEnabled};});
   await page.locator('#settings-button').click();await page.locator('#fog-toggle').check();await page.locator('#exploration-toggle').check();
-  const sample=()=>page.evaluate(async()=>{await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  const seam=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,c=s.cameras.main;return {king:{...s.character.tile},camera:{scrollX:c.scrollX,scrollY:c.scrollY,width:c.width,height:c.height,zoom:c.zoom},width:s.fog.width,height:s.fog.height,states:Array.from({length:s.fog.width*s.fog.height},(_,i)=>s.fog.state({x:i%s.fog.width,y:Math.floor(i/s.fog.width)}))};});
+  const seamPoint=unknownFogSeam({...seam,state:tile=>seam.states[tile.y*seam.width+tile.x]},seam.camera,seam.king);
+  const sample=()=>page.evaluate(async seamPoint=>{await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     const s=window.__game.registry.get('application').scene,tile={x:95,y:95},cx=Math.floor(tile.x/10),cy=Math.floor(tile.y/10),texture=s.terrain.chunkTexture(cx,cy),point={x:3200+(tile.x-tile.y)*32,y:128+(tile.x+tile.y+1)*16};
     const pixel=Array.from(s.textures.get(texture.key).getContext().getImageData(point.x-texture.x,point.y-texture.y,1,1).data);
-    const c=s.cameras.main,k=s.character.tile,edge={x:3200+(k.x+9-k.y+8)*32,y:128+(k.x+9+k.y-8)*16},screen={x:Math.round((edge.x-(c.scrollX+c.width/2))*c.zoom+c.width/2),y:Math.round((edge.y-(c.scrollY+c.height/2))*c.zoom+c.height/2)},seam=Array.from(s.game.canvas.getContext('2d').getImageData(screen.x,screen.y,1,1).data);
-    return {pixel,seam,backgroundAlpha:c.backgroundColor.alpha,seen:s.fog.explored.reduce((a,b)=>a+b,0),state:s.fog.state(tile),display:s.fog.displayState(tile),memory:s.mapMemory.terrain.has(9595)};
-  });
-  const black=await sample();assert.deepEqual(black.pixel,[0,0,0,255]);assert.deepEqual(black.seam,[0,0,0,255]);assert.equal(black.backgroundAlpha,255);assert.equal(black.state,0);assert.equal(black.memory,false);
+    const c=s.cameras.main,screen=seamPoint.screen,seam=Array.from(s.game.canvas.getContext('2d').getImageData(screen.x,screen.y,1,1).data);
+    return {pixel,seam,seamStates:seamPoint.neighbors.map(tile=>s.fog.state(tile)),backgroundAlpha:c.backgroundColor.alpha,seen:s.fog.explored.reduce((a,b)=>a+b,0),state:s.fog.state(tile),display:s.fog.displayState(tile),memory:s.mapMemory.terrain.has(9595)};
+  },seamPoint);
+  const black=await sample();assert.deepEqual(black.seamStates,[0,0,0,0]);assert.deepEqual(black.pixel,[0,0,0,255]);assert.deepEqual(black.seam,[0,0,0,255],JSON.stringify(black));assert.equal(black.backgroundAlpha,255);assert.equal(black.state,0);assert.equal(black.memory,false);
   await page.locator('#exploration-toggle').uncheck();const grey=await sample();assert.equal(grey.display,1);assert.ok(grey.pixel.slice(0,3).some(v=>v>0));assert.equal(grey.seen,black.seen);
   await page.locator('#fog-toggle').uncheck();const clear=await sample();assert.equal(clear.display,2);assert.ok(clear.pixel.slice(0,3).reduce((a,b)=>a+b,0)>grey.pixel.slice(0,3).reduce((a,b)=>a+b,0)*1.5);assert.equal(clear.seen,black.seen);
   await page.locator('#exploration-toggle').check();await page.locator('#fog-toggle').check();const restored=await sample();assert.deepEqual(restored,black);
