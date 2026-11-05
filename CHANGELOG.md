@@ -11,6 +11,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
   - The Hauler's panel has a Transport setting: Auto, By hand or Wheelbarrow. By hand parks the Wheelbarrow where he stands.
   - Death or a new job leaves the Wheelbarrow on the ground for another Hauler, and one Wheelbarrow never has two drivers.
   - Saves keep every Wheelbarrow.
+- Finishing a Mill without a Wheat Field or a Bakery without a Mill shows one informational notice about the missing long-term supply. Existing supplies still work; dismiss the advice or finish the missing link to clear it. Actual production blockers retain priority.
 - Stone Pavement (Buildings → Infrastructure), a permanent cobbled surface. Units on it move 25 % faster; this replaces the trodden-path bonus and never adds to it. Routes now prefer a faster paved way.
   - Build tools: Single, Line (default, also diagonal) and Area for courtyards, with a green/red/grey preview, the count of new tiles and the cost. An order costs 1 Stone for every 2 new tiles; already paved or ordered tiles are free.
   - Haulers bring the Stone and Builders (or the King) lay it tile by tile. Blueprints never block the way.
