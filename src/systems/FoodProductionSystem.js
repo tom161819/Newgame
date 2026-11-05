@@ -127,7 +127,7 @@ export class FoodProductionSystem {
     }
     const undelivered=Object.entries(recipe.input).find(([resource,needed])=>(input.stock[resource]??0)<needed);
     if(!record.cycle&&undelivered){worker.workState='Waiting';worker.workMessage=`Waiting for delivered ${undelivered[0]}`;return;}
-    if(!record.cycle&&!this.storage.findDestination(worker,outputResource,outputAmount)){worker.workState='Waiting';worker.workMessage='Storage is full or unreachable';return;}
+    if(!record.cycle&&!recipe.vehicle&&!this.storage.findDestination(worker,outputResource,outputAmount)){worker.workState='Waiting';worker.workMessage='Storage is full or unreachable';return;}
     const route=this.storage.route(worker,[input]);
     if(route&&this.setTask(worker,'produce',route,{targetId:building.id})){worker.workState='Working';worker.workMessage=`Producing ${outputResource}`;}
   }
@@ -184,9 +184,10 @@ export class FoodProductionSystem {
       if(!record.cycle){
         const [outputResource,outputAmount]=first(recipe.output),inputId=`input-${building.id}`;
         if(Object.entries(recipe.input).some(([resource,amount])=>this.storage.free(inputId,resource)<amount)||this.storage.used(this.storage.locations.get(`output-${building.id}`)))continue;
-        const destination=this.storage.findDestination(workers[0],outputResource,outputAmount);if(!destination)continue;
-        const id=`food-cycle-${building.id}-${record.nextCycle}`,capacity=this.storage.reserve('capacity',destination.location.id,outputResource,outputAmount,id);if(!capacity)continue;
-        if(!this.storage.withdrawBatch(inputId,recipe.input)){this.storage.release(capacity);continue;}
+        // S12: a vehicle (Wheelbarrow) is not stored; VehicleSystem rolls it out of the output buffer onto the map.
+        const destination=recipe.vehicle?null:this.storage.findDestination(workers[0],outputResource,outputAmount);if(!recipe.vehicle&&!destination)continue;
+        const id=`food-cycle-${building.id}-${record.nextCycle}`,capacity=recipe.vehicle?null:this.storage.reserve('capacity',destination.location.id,outputResource,outputAmount,id);if(!recipe.vehicle&&!capacity)continue;
+        if(!this.storage.withdrawBatch(inputId,recipe.input)){if(capacity)this.storage.release(capacity);continue;}
         record.nextCycle++;record.cycle={id,requiredWork:recipe.duration,workDone:0,progress:0,state:'building',contributions:{},inputs:{...recipe.input},outputReservation:capacity,startedAt:this.scene.gameTime.totalElapsed};
       }
       const cycle=record.cycle,participants=workers.map(w=>({id:w.id,speed:this.scene.skillSystem.workEfficiency(w,recipe.skill),available:Math.min(delta,w.availableWorkMs??0,Math.max(0,this.scene.gameTime.totalElapsed-cycle.startedAt))}));

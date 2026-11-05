@@ -10,6 +10,7 @@ export const WORKPLACES=Object.freeze({
   mill:Object.freeze({capacity:2,profession:'miller',skill:'milling'}),
   bakery:Object.freeze({capacity:2,profession:'baker',skill:'baking'}),
   bowyer:Object.freeze({capacity:2,profession:'bowyer',skill:'crafting'}),
+  wheelwright_workshop:Object.freeze({capacity:2,profession:'wheelwright',skill:'crafting'}),
   swordsmith:Object.freeze({capacity:2,profession:'swordsmith',skill:'crafting'}),
   armorer:Object.freeze({capacity:2,profession:'armorer',skill:'crafting'}),
 });

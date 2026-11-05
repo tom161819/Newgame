@@ -6,6 +6,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Wheelwright's Workshop (Industry, 3×3, 12 Stone + 15 Wood) with two Wheelwrights, who use the Crafting skill. From 10 Wood and 2 Iron Bars brought in by Haulers they build a Wheelbarrow in 30 seconds of work. The Wheelbarrow is a real object left beside the workshop.
+  - An idle Hauler in Auto or Wheelbarrow mode walks to a free Wheelbarrow and takes it, then carries five times as much (200 load units, so 20 Stone per trip).
+  - The Hauler's panel has a Transport setting: Auto, By hand or Wheelbarrow. By hand parks the Wheelbarrow where he stands.
+  - Death or a new job leaves the Wheelbarrow on the ground for another Hauler, and one Wheelbarrow never has two drivers.
+  - Saves keep every Wheelbarrow.
 - Workplace panels can disable new employment for one building or for its entire type, including future buildings. Both automatic and manual assignments respect the bans. Existing staff keep their jobs; type bans take priority and local choices remain when a type is re-enabled. These rules are saved with the game.
 - Finishing a Mill without a Wheat Field or a Bakery without a Mill shows one informational notice about the missing long-term supply. Existing supplies still work; dismiss the advice or finish the missing link to clear it. Actual production blockers retain priority.
 - Stone Pavement (Buildings → Infrastructure), a permanent cobbled surface. Units on it move 25 % faster; this replaces the trodden-path bonus and never adds to it. Routes now prefer a faster paved way.

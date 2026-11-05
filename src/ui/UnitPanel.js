@@ -3,7 +3,7 @@ import { t,language } from '../i18n/index.js';
 import { SKILLS,JOBS,WORK_RULES } from '../data/jobs.js';
 import { element } from './objectLabels.js';
 import { TALENTS,TALENT_XP_BONUS } from '../data/economy.js';
-import { carryCapacity,IDLE_STONE,defaultStoneCollection } from '../data/logistics.js';
+import { carryCapacity,IDLE_STONE,defaultStoneCollection,TRANSPORT_MODES } from '../data/logistics.js';
 import { cargoLabel,transportLabel } from './transportLabels.js';
 
 export class UnitPanel {
@@ -14,6 +14,11 @@ export class UnitPanel {
     this.jobSelect=document.querySelector('#assign-job');this.jobSelect.replaceChildren(...Object.entries(JOBS).map(([id,job])=>{const option=element('option','',job.name);option.value=id;return option;}));
     this.jobSelect.addEventListener('change',()=>{if(this.unit){if(this.jobSelect.value==='idle')scene.employment?.hold(this.unit);else scene.employment?.release(this.unit);scene.workerSystem.jobs.assign(this.unit,this.jobSelect.value);}this.refresh();},options);
     this.stoneToggle=document.querySelector('#stone-collect');this.stoneRadius=document.querySelector('#stone-radius');
+    // S12: a Hauler's transport mode (Auto takes a free Wheelbarrow when one exists).
+    this.transportRow=document.createElement('label');this.transportRow.className='transport-mode';this.transportRow.append(document.createTextNode(t('transport.mode')+' '));
+    this.transportMode=document.createElement('select');this.transportMode.id='transport-mode';for(const mode of TRANSPORT_MODES){const o=document.createElement('option');o.value=mode;o.textContent=t(`transport.mode.${mode}`);this.transportMode.append(o);}
+    this.transportRow.append(this.transportMode);document.querySelector('#unit-stone-controls').append(this.transportRow);
+    this.transportMode.addEventListener('change',()=>{if(this.unit?.profession==='hauler'){scene.vehicles?.setMode(this.unit,this.transportMode.value);this.refresh();}},options);
     this.stoneToggle.addEventListener('change',()=>{if(this.unit?.profession==='hauler'){(this.unit.stoneCollection??=defaultStoneCollection()).enabled=this.stoneToggle.checked;this.refresh();}},options);
     this.stoneRadius.addEventListener('change',()=>{if(this.unit?.profession==='hauler'){const v=Math.min(IDLE_STONE.maxRadius,Math.max(0,Math.round(Number(this.stoneRadius.value))));(this.unit.stoneCollection??=defaultStoneCollection()).radius=Number.isFinite(v)?v:IDLE_STONE.defaultRadius;this.refresh();}},options);
     this.commandControls=element('div','unit-command-controls');
@@ -37,7 +42,7 @@ export class UnitPanel {
     for(const [key,value]of Object.entries(values))document.querySelector(`[data-unit-stat="${key}"]`).textContent=value;
     const worker=s.workerSystem?.workers.has(u.id)&&u.isSubject!==false;document.querySelector('#unit-job-controls').hidden=!worker;
     if(worker){this.commandControls.hidden=!s.workerSystem.commands.owns(u);for(const button of this.commandControls.children){button.textContent=t(`command.${button.dataset.unitCommand}`);button.disabled=!!s.gameTime.paused;}for(const option of this.jobSelect.options)option.textContent=JOBS[option.value].name;this.jobSelect.value=u.profession;document.querySelector('#unit-profession').textContent=JOBS[u.profession].name;document.querySelector('#unit-work-state').textContent=`${(['Holding','MovingToHold'].includes(u.commandState?.state)?t(`command.${u.commandState.state}`):localized(`work.state.${u.workState}`,u.workState))}${u.workMessage?` · ${workMessageLabel(u.workMessage)}`:''}${s.foodSystem.workMultiplier(u)<1?` · ${t('unit.hungry')}`:''}`;
-      const hauler=u.profession==='hauler'&&u.stoneCollection;document.querySelector('#unit-stone-controls').hidden=!hauler;if(hauler){this.stoneToggle.checked=u.stoneCollection.enabled;if(document.activeElement!==this.stoneRadius)this.stoneRadius.value=u.stoneCollection.radius;}
+      const hauler=u.profession==='hauler'&&u.stoneCollection;document.querySelector('#unit-stone-controls').hidden=!hauler;if(hauler){this.transportMode.value=s.vehicles?.mode(u)??'auto';this.stoneToggle.checked=u.stoneCollection.enabled;if(document.activeElement!==this.stoneRadius)this.stoneRadius.value=u.stoneCollection.radius;}
       document.querySelector('#unit-wage').textContent=t('unit.wage',{amount:s.wageSystem.dailyWage(u).toFixed(2)});
       document.querySelector('#unit-talent').textContent=t('unit.talent',{talent:localized(`talent.${u.naturalTalent}`,TALENTS[u.naturalTalent]),bonus:TALENT_XP_BONUS*100,skill:SKILLS[u.naturalTalent]});
       document.querySelector('#unit-unpaid').textContent=t('unit.unpaid',{amount:s.wageSystem.unpaid(u).toFixed(2)});
@@ -51,5 +56,5 @@ export class UnitPanel {
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){this.dialog.close();this.restoreInput();}
-  destroy(){this.close();this.controller.abort();this.commandControls.remove();}
+  destroy(){this.close();this.controller.abort();this.commandControls.remove();this.transportRow.remove();}
 }

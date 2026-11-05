@@ -13,7 +13,7 @@ import { TALENTS } from '../data/economy.js';
 import { validateFoodState } from './FoodStateValidation.js';
 import { validateSeasonFoodState } from './SeasonFoodStateValidation.js';
 import { seasonalCropStage } from '../data/seasons.js';
-import { carryCapacity,IDLE_STONE } from '../data/logistics.js';
+import { carryCapacity,IDLE_STONE,VEHICLES,TRANSPORT_MODES } from '../data/logistics.js';
 import { repairTransportInstructions } from './TransportStateMigration.js';
 import { captureMapKnowledge } from '../game/mapMemoryObjects.js';
 import { validateMapMemory } from './MapMemoryValidation.js';
@@ -24,7 +24,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=26;
+export const SAVE_VERSION=27;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -60,6 +60,7 @@ export function serializeGameState(scene){
     ...(scene.seasons?{seasons:scene.seasons.exportState()}:{}),
     ...(scene.employment?{employment:scene.employment.exportState()}:{}),
     ...(scene.military?{military:scene.military.exportState()}:{}),
+    ...(scene.vehicles?{vehicles:scene.vehicles.exportState()}:{}),
     ...(scene.kingLogistics?{kingLogistics:scene.kingLogistics.exportState()}:{}),
     ...(scene.logisticsTasks?{logistics:{version:1,...(scene.constructionSystem?.materials.enabled?{materialsVersion:1}:{})}}:{}),
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
@@ -262,7 +263,7 @@ export function validateGameState(input,registry=objectRegistry){
         }
       }
       if(w.workplaceReached!==undefined)check(typeof w.workplaceReached==='boolean');
-      if(w.cargo){check(w.isAlive&&(w.assignedWorkplaceId!=null||['hauler','builder'].includes(w.profession))&&definition(w.cargo.resource).category==='resource'&&w.cargo.resource!=='gold');integer(w.cargo.amount,1,s.foodStorage?.physicalMaterials||s.foodStorage&&FOOD_RESOURCE_IDS.includes(w.cargo.resource)?carryCapacity(w,w.cargo.resource):Number.MAX_SAFE_INTEGER);if(w.cargo.transportCancelled!==undefined)check(typeof w.cargo.transportCancelled==='boolean');}
+      if(w.cargo){check(w.isAlive&&(w.assignedWorkplaceId!=null||['hauler','builder'].includes(w.profession))&&definition(w.cargo.resource).category==='resource'&&w.cargo.resource!=='gold');integer(w.cargo.amount,1,s.foodStorage?.physicalMaterials||s.foodStorage&&FOOD_RESOURCE_IDS.includes(w.cargo.resource)?carryCapacity({...w,vehicleType:s.vehicles?.vehicles.find(v=>v.operatorId===w.id&&v.state==='inUse')?.type??null},w.cargo.resource):Number.MAX_SAFE_INTEGER);if(w.cargo.transportCancelled!==undefined)check(typeof w.cargo.transportCancelled==='boolean');}
       if(w.pendingWorkRewards!==undefined){array(w.pendingWorkRewards,10000);for(const event of w.pendingWorkRewards){
         check(w.isAlive&&w.assignedWorkplaceId!=null);check((event.type==='resourceCollected'&&event.objectType==='stone')||(event.type==='dropCollected'&&event.objectType==='meat')||(event.type==='animalKilled'&&['rabbit','deer','wild_boar'].includes(event.objectType)));integer(event.quantity??1,1);if(event.contributionRatio!==undefined)number(event.contributionRatio);
       }}
@@ -352,6 +353,11 @@ export function validateGameState(input,registry=objectRegistry){
     array(e.held);check(new Set(e.held).size===e.held.length&&e.held.every(id=>wIds.has(id)));
     array(e.blockedBuildings);check(new Set(e.blockedBuildings).size===e.blockedBuildings.length);for(const id of e.blockedBuildings){integer(id,1);const b=s.buildings.find(b=>b.id===id);check(b&&buildingIsComplete(b)&&!b.unverified&&!!definition(b.type).workplace);}
     array(e.blockedTypes);check(new Set(e.blockedTypes).size===e.blockedTypes.length);for(const type of e.blockedTypes)check(typeof type==='string'&&!!definition(type,'building').workplace);}
+  // S12 vehicles: unique ids on open ground; an operator is one living Hauler at most once; modes are known.
+  if(s.vehicles!==undefined){const v=s.vehicles;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='modes,nextId,vehicles');integer(v.nextId,1);array(v.vehicles);const ids=new Set(),operators=new Set(),workers=new Map(s.workers.map(w=>[w.id,w]));
+    for(const x of v.vehicles){check(x&&Object.keys(x).sort().join()==='id,operatorId,state,type,x,y'&&Object.hasOwn(VEHICLES,x.type)&&['parked','reserved','inUse'].includes(x.state));const m=String(x.id).match(/^vehicle-(\d+)$/);check(m&&Number(m[1])<v.nextId&&!ids.has(x.id));ids.add(x.id);
+      integer(x.x,0,COLUMNS-1);integer(x.y,0,ROWS-1);check(s.terrain[x.y][x.x]===0);check((x.state==='parked')===(x.operatorId==null));if(x.operatorId!=null){const w=workers.get(x.operatorId);check(w?.isAlive&&w.profession==='hauler'&&!operators.has(x.operatorId));operators.add(x.operatorId);}}
+    check(v.modes&&typeof v.modes==='object');for(const [id,mode]of Object.entries(v.modes))check(workers.has(id)&&TRANSPORT_MODES.includes(mode)&&mode!=='auto');}
   // C08 units and training orders: one per living Soldier, a known type, its exact kit.
   if(s.military!==undefined){const m=s.military;check(m&&typeof m==='object'&&Object.keys(m).sort().join()==='nextOrder,orders,units');integer(m.nextOrder,1);array(m.units);array(m.orders);
     const workers=new Map(s.workers.map(w=>[w.id,w])),seen=new Set(),kit=type=>Object.values(UNIT_TYPES[type].equipment);
