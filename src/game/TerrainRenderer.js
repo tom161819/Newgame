@@ -39,7 +39,7 @@ export class TerrainRenderer {
   // A wear change can turn neighbours into (or out of) a trodden area, which reaches their own neighbours: repaint 5×5.
   setPathWear(system){this.wear=system;this.unsubscribeWear=system.subscribe(tile=>this.invalidateArea([tile],true,2));}
   setDebug(value){this.debugEnabled=!!value;this.lastView='';if(!value)this.debugGraphics.clear();}
-  setSeason(season){if(season===this.season)return;this.season=season;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
+  setSeason(season){if(season===this.season)return;this.season=season;this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
   // Whole chunks, repainted in one pass, give the same pixels as a fresh draw (season transition).
   invalidateChunksOf(tiles){for(const tile of tiles){const key=`${Math.floor(tile.x/CHUNK_SIZE)},${Math.floor(tile.y/CHUNK_SIZE)}`;this.dirtyTiles.delete(key);this.dirtyChunks.add(key);}if(tiles.length)this.lastView='';}
   invalidateArea(tiles,neighbors=true,reach=1){
@@ -234,7 +234,7 @@ export class TerrainRenderer {
       // Diamond edges are antialiased. Their transparent seams must reveal
       // black, never the normal olive scene background in undiscovered areas.
       camera.setBackgroundColor?.(fog?.enabled?'#000':this.originalBackground);
-      this.fogMode=mode;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';
+      this.fogMode=mode;this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';
     }
     if(fog&&this.fogRevision!==fog.revision){
       const previous=this.paintedVisibility??new Set(),current=fog.visibleIndices;
@@ -251,7 +251,7 @@ export class TerrainRenderer {
   // Performance: a newly visible chunk is painted at once (never a hole); already shown chunks that became dirty
   // (fog, path wear, pavement, season) repaint at most two per frame, so a wave of changes never freezes a frame.
   repaintDirty(){
-    let budget=2;
+    let budget=this.repaintAll?Infinity:2;this.repaintAll=false;
     for (const key of this.neededChunks??[]) {
       const shown=this.chunks.has(key);if(shown&&!this.dirtyChunks.has(key))continue;if(shown&&budget--<=0)continue;
       const [cx,cy] = key.split(',').map(Number), texture = this.chunkTexture(cx,cy);
