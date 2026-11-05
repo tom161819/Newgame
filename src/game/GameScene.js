@@ -24,8 +24,9 @@ import { AnimalSystem } from '../systems/AnimalSystem.js';
 import { HuntingSystem } from '../systems/HuntingSystem.js';
 import { DropSystem } from '../systems/DropSystem.js';
 import { FoodSystem } from '../systems/FoodSystem.js';
-import { FogOfWarSystem,OUTSIDE_SIGHT,visibilityPlacementError } from '../systems/FogOfWarSystem.js';
+import { FogOfWarSystem,OUTSIDE_SIGHT } from '../systems/FogOfWarSystem.js';
 import { subjectSight } from '../systems/VisibilityModifiers.js';
+import { isProvisional,knownPlacementError,knownContext } from './provisionalSites.js';
 import { MountSystem } from '../systems/MountSystem.js';
 import { SettingsPanel } from '../ui/SettingsPanel.js';
 import { FortificationView } from './FortificationView.js';
@@ -200,7 +201,7 @@ export class GameScene extends Phaser.Scene {
     this.workplaceSystem=new WorkplaceSystem(this);this.workplacePanel=new WorkplacePanel(this);
     this.constructionSystem=new ConstructionSystem(this,{onProgress:site=>this.towerViews.get(site.id)?.updateProgress?.(site),
       onComplete:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.built',{name:buildingDefinition(site).name}));},
-      onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.siteCancelled'));}});
+      onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);if(this.mapMemory?.objects.delete(`building:${site.id}`))this.mapMemory.revision++;this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.siteCancelled'));}});
     this.constructionUI=new ConstructionUI(this);
     this.foodProduction=new FoodProductionSystem(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
     this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);
@@ -328,13 +329,15 @@ export class GameScene extends Phaser.Scene {
       if(this.selectedBuilding.construction?.mode==='line'){
         this.dragAnchor={...goal};this.wallLastLine=null;this.previewTracking=true;this.previewKey=null;this.updateBuildingPreview();return;
       }
-      const hidden=visibilityPlacementError(this.fog,buildingTiles(goal,this.selectedBuilding));if(hidden){this.setStatus(hidden);return;}
-      const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding,reserveMaterials:true});
+      // Outside sight a blueprint is provisional: checked against known ground now, against the real site once seen.
+      const provisional=isProvisional(this.fog,buildingTiles(goal,this.selectedBuilding)),known=provisional?knownPlacementError(this,goal,this.selectedBuilding):null;
+      if(known){this.previewKey=null;this.updateBuildingPreview();this.setStatus(known);return;}
+      const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding,reserveMaterials:true,provisional});
       if(result.error){this.previewKey=null;this.updateBuildingPreview();this.setStatus(result.error);}
       else{
         this.constructionSystem.plan(result.building);
-        this.towerViews.set(result.building.id,this.createBuildingView(this.selectedBuilding,result.building));
-        this.updateInventory();this.cancelBuilding(t('status.blueprintReady',{name:this.selectedBuilding.name,cost:formatCost(this.selectedBuilding.cost,this.objectRegistry)}));
+        this.towerViews.set(result.building.id,this.createBuildingView(this.selectedBuilding,result.building));if(provisional)this.rememberBlueprint(result.building);
+        this.updateInventory();this.cancelBuilding(t(provisional?'status.blueprintProvisional':'status.blueprintReady',{name:this.selectedBuilding.name,cost:formatCost(this.selectedBuilding.cost,this.objectRegistry)}));
       }
       return;
     }
@@ -433,29 +436,37 @@ export class GameScene extends Phaser.Scene {
     this.buildMode=false;this.selectedBuilding=null;this.previewAnchor=null;this.previewTracking=false;this.previewKey=null;
     this.preview.setVisible(false);this.game.canvas.style.cursor='';this.updateBuildingUI();this.setStatus(message);
   }
+  // The player sees the provisional blueprint they placed, as a remembered site, until someone sees the real ground.
+  rememberBlueprint(building){
+    if(!this.fog.enabled||!this.mapMemory)return;const d=buildingDefinition(building),key=`building:${building.id}`;
+    this.mapMemory.objects.set(key,{key,kind:'building',type:building.type,x:building.x,y:building.y,width:d.width,height:d.height,visual:{construction:{state:'planned',progress:0,workDone:0}}});this.mapMemory.revision++;
+  }
   updateBuildingPreview() {
     const anchor=this.previewAnchor,definition=this.selectedBuilding;
     if(this.buildMode&&anchor&&definition.construction?.mode==='line'){this.updateWallPreview(anchor);return;}
     if(!this.buildMode||!anchor||anchor.x<0||anchor.y<0||anchor.x>=COLUMNS||anchor.y>=ROWS){this.preview.setVisible(false);return;}
-    const error=visibilityPlacementError(this.fog,buildingTiles(anchor,definition))??placementError(this.map,anchor,this.resourceOccupancy,this.reservedTiles(),definition,this.buildings,this.buildingUnlocks)
+    // Outside sight the preview is amber (provisional): only known ground decides, never a hidden obstacle.
+    const provisional=isProvisional(this.fog,buildingTiles(anchor,definition));
+    const error=(provisional?knownPlacementError(this,anchor,definition):placementError(this.map,anchor,this.resourceOccupancy,this.reservedTiles(),definition,this.buildings,this.buildingUnlocks))
       ??(!this.inventory.canAfford(definition.cost)?t('status.noFunds'):null);
-    const key=`${tileKey(anchor)}:${error}`;
+    const key=`${tileKey(anchor)}:${provisional}:${error}`;
     if(key!==this.previewKey){
-      this.preview.paint({x:anchor.x,y:anchor.y,type:definition.id,definition,tiles:buildingTiles(anchor,definition)},error?0xf27777:0x71dba6);
-      this.previewKey=key;this.setStatus(error??t('status.validPlace',{name:definition.name,cost:formatCost(definition.cost,this.objectRegistry)}));
+      this.preview.paint({x:anchor.x,y:anchor.y,type:definition.id,definition,tiles:buildingTiles(anchor,definition)},error?0xf27777:provisional?0xe3c46b:0x71dba6);
+      this.previewKey=key;this.setStatus(error??t(provisional?'status.provisionalPlace':'status.validPlace',{name:definition.name,cost:formatCost(definition.cost,this.objectRegistry)}));
     }
     this.preview.setVisible(true);
   }
   clearWallPreviews(){
     for(const view of this.wallPreviews.values())view.destroy();this.wallPreviews.clear();this.dragAnchor=null;this.wallLastLine=null;
   }
-  wallOptions(tiles){return {map:this.map,tiles,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),buildings:this.buildings,definition:this.selectedBuilding,inventory:this.inventory,reserveMaterials:true};}
+  // A wall line reaching outside sight is planned against known ground and every segment becomes provisional.
+  wallOptions(tiles){const provisional=isProvisional(this.fog,tiles);return {map:this.map,tiles,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),buildings:this.buildings,definition:this.selectedBuilding,inventory:this.inventory,reserveMaterials:true,...(provisional?{...knownContext(this),provisional}:{})};}
   updateWallPreview(anchor){
     this.preview.setVisible(false);
-    const tiles=this.dragAnchor?wallLine(this.dragAnchor,anchor):this.wallLastLine??[anchor],hidden=visibilityPlacementError(this.fog,tiles),plan=hidden?{error:hidden,tiles:[],cost:{}}:wallLinePlan(this.wallOptions(tiles));
-    const key=`walls:${tiles.map(tileKey).join(';')}:${plan.error}`;
+    const tiles=this.dragAnchor?wallLine(this.dragAnchor,anchor):this.wallLastLine??[anchor],options=this.wallOptions(tiles),plan=wallLinePlan(options);
+    const key=`walls:${tiles.map(tileKey).join(';')}:${!!options.provisional}:${plan.error}`;
     if(key===this.previewKey){for(const view of this.wallPreviews.values())view.setVisible(true);return;}
-    const definition=this.selectedBuilding,existing=hidden?new Map():wallIndex(this.buildings,true),index=new Map(existing);
+    const definition=this.selectedBuilding,existing=wallIndex(this.buildings,true),index=new Map(existing);
     for(const tile of tiles)index.set(tileKey(tile),{...tile,type:definition.id,definition});
     const needed=new Set();
     for(const tile of tiles){
@@ -463,20 +474,19 @@ export class GameScene extends Phaser.Scene {
       const object={...tile,type:definition.id,definition,tiles:buildingTiles(tile,definition),connections:connectionsFor(index,tile)};
       let view=this.wallPreviews.get(tileId);
       if(!view){view=this.createBuildingView(definition,object,true);this.wallPreviews.set(tileId,view);}
-      view.paint(object,plan.error?0xf27777:0x71dba6);view.setVisible(true);
+      view.paint(object,plan.error?0xf27777:options.provisional?0xe3c46b:0x71dba6);view.setVisible(true);
     }
     for(const [id,view]of this.wallPreviews)if(!needed.has(id)){view.destroy();this.wallPreviews.delete(id);}
     this.previewKey=key;
-    this.setStatus(plan.error??t('status.wallPlan',{count:plan.tiles.length,cost:formatCost(plan.cost,this.objectRegistry)}));
+    this.setStatus(plan.error??t(options.provisional?'status.wallPlanProvisional':'status.wallPlan',{count:plan.tiles.length,cost:formatCost(plan.cost,this.objectRegistry)}));
   }
   confirmWallLine(pointer){
     if(!this.buildMode||this.selectedBuilding.construction?.mode!=='line'||!this.dragAnchor)return;
-    const tiles=wallLine(this.dragAnchor,this.pointerTile(pointer)),hidden=visibilityPlacementError(this.fog,tiles);
-    if(hidden){this.clearWallPreviews();this.setStatus(hidden);return;}
-    const result=placeWallLine(this.wallOptions(tiles));
+    const tiles=wallLine(this.dragAnchor,this.pointerTile(pointer)),options=this.wallOptions(tiles);
+    const result=placeWallLine(options);
     this.dragAnchor=null;
     if(result.error){this.wallLastLine=tiles;this.previewTracking=false;this.previewKey=null;this.updateBuildingPreview();return;}
-    for(const building of result.buildings){this.constructionSystem.plan(building);this.towerViews.set(building.id,this.createBuildingView(this.selectedBuilding,building));}
+    for(const building of result.buildings){this.constructionSystem.plan(building);this.towerViews.set(building.id,this.createBuildingView(this.selectedBuilding,building));if(building.unverified)this.rememberBlueprint(building);}
     this.refreshWallConnections();this.updateInventory();
     this.cancelBuilding(t('status.wallBlueprints',{count:result.buildings.length,cost:formatCost(result.cost,this.objectRegistry)}));
   }

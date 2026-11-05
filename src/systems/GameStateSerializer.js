@@ -22,7 +22,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=18;
+export const SAVE_VERSION=19;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -71,7 +71,7 @@ export function serializeGameState(scene){
       render:{x:scene.player.x,y:scene.player.y,depth:scene.player.depth},
       transition:c.transitioning?{remaining:Math.max(1,(c.transitionTween?.duration??900)-(c.transitionTween?.elapsed??0))}:null},
     inventory:scene.inventory.exportState(),equipment:scene.equipment.exportState(),
-    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
+    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.unverified?{unverified:true}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
     resources:[...scene.resources.values()].map(v=>({type:v.getData('objectId'),tile:point(v.getData('tile')),...(v.getData('object').natural?{natural:copy(v.getData('object').natural)}:{})})),
     drops:[...scene.dropSystem.drops.values()].map(d=>({id:d.id,resource:d.resource,tile:point(d.tile),amount:d.amount,rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0),haulEligible:d.haulEligible!==false,...(d.siteId!=null?{siteId:d.siteId}:{})})),
     animals:[...scene.animalSystem.animals.values()].map(a=>({...serializeActor(a),retaliationId:a.retaliationTarget?.id??null})),
@@ -133,8 +133,13 @@ export function validateGameState(input,registry=objectRegistry){
     const x=p.x+dx,y=p.y+dy,key=`${x},${y}`;check(s.terrain[y]?.[x]===0&&!occupied.has(key));occupied.add(key);
   }};
   const siteAssignments=new Set();
-  for(const b of s.buildings){integer(b.id,1);const d=definition(b.type,'building');check(d.buildable||d.starter);if(d.starter)check(buildingIsComplete(b));occupy(b,d.width,d.height);
-    if(!d.walkable||!buildingIsComplete(b))for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++)solid.add(`${b.x+dx},${b.y+dy}`);
+  // A provisional site (placed outside sight) claims no tiles until verified: it may lie over hidden terrain or resources.
+  const provisional=new Set();
+  for(const b of s.buildings){integer(b.id,1);const d=definition(b.type,'building');check(d.buildable||d.starter);if(d.starter)check(buildingIsComplete(b));
+    check(b.unverified===undefined||b.unverified===true&&b.construction?.state==='planned'&&!b.depositId);
+    if(b.unverified){tile(b);for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){const x=b.x+dx,y=b.y+dy,key=`${x},${y}`;check(s.terrain[y]?.[x]!==undefined&&!provisional.has(key));provisional.add(key);}}
+    else occupy(b,d.width,d.height);
+    if(!b.unverified&&(!d.walkable||!buildingIsComplete(b)))for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++)solid.add(`${b.x+dx},${b.y+dy}`);
     if(b.construction){
       const c=b.construction;check(['planned','building','complete'].includes(c.state));number(c.requiredWork,1,86400000);check(c.requiredWork===(d.constructionTime??CONSTRUCTION_RULES.defaultTime));
       number(c.workDone,0,c.requiredWork);number(c.progress,0,100);check(Math.abs(c.progress-100*c.workDone/c.requiredWork)<1e-6);
@@ -147,6 +152,7 @@ export function validateGameState(input,registry=objectRegistry){
       for(const id of c.assignedBuilders){check((id==='king'||wIds.has(id))&&!siteAssignments.has(id));siteAssignments.add(id);}
     }
   }
+  for(const key of provisional)check(!occupied.has(key));
   repairTransportInstructions(s,registry,check);
   const natural=s.naturalResources;check(natural&&Object.keys(natural).every(key=>['nextId','nextDepositId','growthClock','ageClock','refreshElapsed','kingTask'].includes(key)));integer(natural.nextId,1);integer(natural.nextDepositId,1);number(natural.ageClock,0,s.time.totalElapsed/dayDuration+1e-6);number(natural.growthClock,0,natural.ageClock*1.25+1e-6);number(natural.refreshElapsed,0,FORESTRY.refreshInterval);check(natural.refreshElapsed<FORESTRY.refreshInterval);
   const resourceTiles=new Set(),treeIds=new Map(),depositIds=new Map();
@@ -156,7 +162,7 @@ export function validateGameState(input,registry=objectRegistry){
     else check(r.natural===undefined);
     for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){
     // Rock edges may sit under a neighbouring Quarry; unique reciprocal primary bindings are checked below.
-    const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`,overlap=s.buildings.find(b=>x>=b.x&&x<b.x+definition(b.type).width&&y>=b.y&&y<b.y+definition(b.type).height),allowedOverlap=d.tree&&r.natural.stage===0||r.type==='stone_deposit'&&overlap?.type==='quarry'&&overlap.quarryMode==='finite';check(s.terrain[y]?.[x]===0&&(!occupied.has(key)||allowedOverlap)&&!resourceTiles.has(key));resourceTiles.add(key);if(d.deposit||d.tree&&r.natural.stage===3)solid.add(key);
+    const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`,overlap=s.buildings.find(b=>!b.unverified&&x>=b.x&&x<b.x+definition(b.type).width&&y>=b.y&&y<b.y+definition(b.type).height),allowedOverlap=d.tree&&r.natural.stage===0||r.type==='stone_deposit'&&overlap?.type==='quarry'&&overlap.quarryMode==='finite';check(s.terrain[y]?.[x]===0&&(!occupied.has(key)||allowedOverlap)&&!resourceTiles.has(key));resourceTiles.add(key);if(d.deposit||d.tree&&r.natural.stage===3)solid.add(key);
   }}
   const boundDeposits=new Set();for(const b of s.buildings){
     if(b.type==='quarry'){check(['finite','legacy','unbound'].includes(b.quarryMode));if(b.quarryMode==='legacy')check(buildingIsComplete(b)&&b.depositId===undefined);if(b.quarryMode==='unbound')check(b.depositId===undefined);}

@@ -31,7 +31,7 @@ export function loadGameState(scene,input){
   scene.inventory.importState(state.inventory);
   for(const data of state.buildings){
     const definition=scene.objectRegistry.require(data.type),building={...data,definition,tiles:buildingTiles(data,definition)};
-    for(const t of building.tiles)scene.map[t.y][t.x]=definition.walkable&&(!building.construction||building.construction.state==='complete')?0:1;
+    if(!building.unverified)for(const t of building.tiles)scene.map[t.y][t.x]=definition.walkable&&(!building.construction||building.construction.state==='complete')?0:1;
     scene.buildings.push(building);scene.towerViews.set(building.id,scene.createBuildingView(definition,building));
   }
   scene.refreshWallConnections();

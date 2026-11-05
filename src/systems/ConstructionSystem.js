@@ -1,6 +1,6 @@
 import { t } from '../i18n/index.js';
 import { dataName } from '../i18n/names.js';
-import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
+import { buildingDefinition,buildingIsComplete,towerNeighbors,placementError } from '../game/buildings.js';
 import { findPathToAny,octileDistance } from '../game/pathfinding.js';
 import { tileKey } from '../game/stones.js';
 import { CONSTRUCTION_RULES } from '../data/construction.js';
@@ -18,7 +18,7 @@ export class ConstructionSystem {
   }
   plan(building){
     if(building.construction)return building;
-    building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;if(building.type==='quarry'&&!building.depositId)building.quarryMode='unbound';initializeConstructionSite(building);this.materials.registerLegacy(building);for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.revision++;this.scene.events?.emit('buildings:changed');return building;
+    building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;if(building.type==='quarry'&&!building.depositId)building.quarryMode='unbound';initializeConstructionSite(building);this.materials.registerLegacy(building);if(!building.unverified)for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.revision++;this.scene.events?.emit('buildings:changed');return building;
   }
   actor(id){return id==='king'?this.scene.character:this.scene.workerSystem.workers.get(id);}
   slotKey(goal){return `construction-slot:${tileKey(goal)}`;}
@@ -61,9 +61,23 @@ export class ConstructionSystem {
   stopKing(){
     const king=this.scene.character;if(!this.assignments.has('king'))return false;this.release(king);this.kingWorking=false;king.stopForBuilding();this.scene.setStatus(t('status.kingStopped'));return true;
   }
+  // A provisional blueprint (placed outside sight) is checked once its whole site is seen. A hidden obstacle cancels the
+  // whole order at once; otherwise the site claims its tiles and building may start. Units standing on it are waited for.
+  verifyProvisional(site){
+    const fog=this.scene.fog;if(fog?.enabled&&!site.tiles.every(tile=>fog.isInSightTile(tile)))return false;
+    const d=buildingDefinition(site),others=this.scene.buildings.filter(b=>b!==site);
+    if(placementError(this.scene.map,site,this.scene.resourceOccupancy,[],d,others,{status:()=>({unlocked:true})})){this.cancel(site,{obstacle:true});return false;}
+    // reservedTiles() also lists building footprints (this site included); only units standing on the site make it wait.
+    const footprints=new Set(this.scene.buildings.flatMap(b=>b.tiles).map(tileKey)),occupied=new Set((this.scene.reservedTiles?.()??[]).map(tileKey).filter(key=>!footprints.has(key)));
+    if(site.tiles.some(tile=>occupied.has(tileKey(tile))))return false;
+    delete site.unverified;for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=1;
+    const natural=this.scene.resourceOccupancy?.naturalContext;if(natural){natural.mining.bind(site);natural.topologyRevision++;}
+    this.scene.terrain?.invalidateArea(site.tiles);this.revision++;this.scene.events?.emit('buildings:changed');return true;
+  }
   update(delta){
+    for(const site of [...this.sites.values()])if(site.unverified)this.verifyProvisional(site);
     for(const site of [...this.sites.values()]){
-      if(!this.materials.ready(site))continue;
+      if(site.unverified||!this.materials.ready(site))continue;
       const participants=[];
       for(const id of [...site.construction.assignedBuilders]){
         const actor=this.actor(id),assignment=this.assignments.get(id);
@@ -92,14 +106,17 @@ export class ConstructionSystem {
     }
     this.scene.events?.emit('buildings:changed');this.onComplete(site);return true;
   }
-  cancel(site){
+  // obstacle: a provisional site found blocked; reported once as constructionCancelled (reason obstacle).
+  cancel(site,{obstacle=false}={}){
     if(!this.sites.has(site.id))return false;
     const c=site.construction,refund=Object.fromEntries(Object.entries(c.investedMaterials).map(([id,n])=>[id,c.workDone>0?Math.floor(n*.5):n]));
     for(const id of [...c.assignedBuilders]){const actor=this.actor(id);if(!actor)continue;if(id==='king')this.stopKing();else this.scene.workerSystem.ai.cancel(actor);}
     this.sites.delete(site.id);this.scene.buildings.splice(this.scene.buildings.indexOf(site),1);
-    for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=this.scene.terrainGrid[tile.y][tile.x];
-    this.scene.naturalResources?.mining.restoreTiles(site.tiles);
-    if(!this.materials.cancel(site,refund))for(const [id,n]of Object.entries(refund))this.scene.inventory.add(id,n,{source:'Construction Refund',type:'refund',id:`construction-refund:${site.id}:${id}`,entityId:site.id});this.revision++;this.scene.events?.emit('buildings:changed');this.onCancel(site,refund);return true;
+    // A provisional site never claimed its tiles, so the map under it is left exactly as it is.
+    if(!site.unverified){for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=this.scene.terrainGrid[tile.y][tile.x];this.scene.naturalResources?.mining.restoreTiles(site.tiles);}
+    if(!this.materials.cancel(site,refund))for(const [id,n]of Object.entries(refund))this.scene.inventory.add(id,n,{source:'Construction Refund',type:'refund',id:`construction-refund:${site.id}:${id}`,entityId:site.id});this.revision++;this.scene.events?.emit('buildings:changed');this.onCancel(site,refund);
+    if(obstacle){this.scene.activities?.emit('constructionCancelled',{reason:'obstacle',objectType:site.type,objectIds:[site.id],tile:{x:site.x,y:site.y}});this.scene.setStatus?.(t('status.obstacleFound',{name:buildingDefinition(site).name}));}
+    return true;
   }
   estimatedSeconds(site){const rate=this.activeBuilders(site).reduce((sum,p)=>sum+this.scene.skillSystem.workEfficiency(p.actor,'construction'),0);return rate?(site.construction.requiredWork-site.construction.workDone)/rate/1000:null;}
   exportState(){const king=this.assignments.get('king');return {nextId:Math.max(this.nextId,Math.max(0,...this.scene.buildings.map(b=>b.id))+1),kingSiteId:king?.siteId??null,kingGoal:king?.goal?{...king.goal}:null};}
