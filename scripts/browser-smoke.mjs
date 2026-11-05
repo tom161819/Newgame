@@ -126,6 +126,11 @@ try{
   const camera=await page.evaluate(()=>{const c=window.__game.registry.get('application').scene.cameras.main;return{x:c.scrollX+c.width/2,y:c.scrollY+c.height/2,w:c.width,h:c.height,z:c.zoom};}),bounds=await page.locator('canvas').boundingBox();
   await page.mouse.click(bounds.x+((point.x-camera.x)*camera.z+camera.w/2)*bounds.width/camera.w,bounds.y+((point.y-camera.y)*camera.z+camera.h/2)*bounds.height/camera.h);
   await page.waitForFunction(()=>window.__game.registry.get('application').scene.character.cargo?.amount===1,null,{timeout:20000});
+  const waiting=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;return {tile:s.character.tile,task:s.kingLogistics.task,stock:s.inventory.count('stone')};});
+  assert.equal(waiting.task,null);assert.equal(waiting.stock,0);await page.waitForTimeout(1200);
+  assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').scene.character.tile),waiting.tile);
+  assert.equal(await page.locator('#king-cargo-deliver').isVisible(),true);
+  await page.locator('#king-cargo-deliver').click();
   const record=await page.evaluate(async()=>{const app=window.__game.registry.get('application');app.scene.pauseManager.set('test',true);localStorage.setItem('smoke.main','preserved');return app.saves.save({name:'Browser smoke: cargo in transit',state:app.snapshot()});});
   assert.equal(record.state.player.cargo.amount,1);assert.equal(record.state.inventory.stone??0,0);
   await page.evaluate(async id=>{const app=window.__game.registry.get('application'),record=await app.saves.get(id),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(record.state);},record.id);

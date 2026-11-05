@@ -13,6 +13,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| AUD78 (#102) Manual king stone delivery | Codex | `codex/king-manual-stone-delivery` | — | STARTED from e630597; live ready override from Claude6658384869 | KingLogisticsSystem.js, isolated HUD controller if useful, small GameScene HUD integration, index.html/style.css, EN/CS keys, focused logistics/browser tests, docs/changelog. No C07 storage acceptance, equipment, jobs/production or Studio changes. |
 
 ## Kept backups (do not delete without the developer)
 
