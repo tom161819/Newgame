@@ -18,3 +18,20 @@ export async function i18nSmoke(page){
   await page.locator('#main-language').selectOption('en');assert.equal(await text('#new-game'),'New Game');assert.equal(await page.evaluate(()=>document.documentElement.lang),'en');
   console.log('PASS Czech/English switch in the main menu, translated setup with Czech plurals, remembered after reload, phone width, back to English');
 }
+
+// In-game switch from Settings: HUD texts and data names change at once, without a restart.
+export async function i18nGameSmoke(page){
+  const text=selector=>page.locator(selector).first().textContent();
+  await page.locator('#settings-button').click();await page.locator('#settings-panel.open').waitFor();
+  assert.equal(await page.locator('#settings-language').inputValue(),'en');await page.locator('#settings-language').selectOption('cs');
+  assert.equal(await text('#settings-title'),'Nastavení');assert.equal(await page.locator('#main-language').inputValue(),'cs','both pickers stay in sync');
+  await page.locator('#close-settings').click();
+  assert.match(await text('#game-time'),/^Den \d+ \| /);assert.match(await text('#season-weather'),/^(Jaro|Léto|Podzim|Zima)/);assert.equal(await text('#buildings-tab'),'Budovy');
+  assert.match(await text('#vision-status'),/^(Mlha války: VYP|Dohled: )/);assert.match(await text('#king-health'),/^Životy: /);assert.match(await text('#king-level'),/^Král \| úroveň \d+$/);
+  assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.objectRegistry.require('warehouse').name),'Sklad');
+  const body=await page.evaluate(()=>document.querySelector('main').innerText);assert.doesNotMatch(body,/undefined|\{\w+\}/);
+  await page.locator('#settings-button').click();await page.locator('#settings-language').selectOption('en');await page.locator('#close-settings').click();
+  assert.match(await text('#game-time'),/^Day \d+ \| /);assert.equal(await text('#buildings-tab'),'Buildings');assert.match(await text('#king-level'),/^King \| LVL \d+$/);
+  assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.objectRegistry.require('warehouse').name),'Warehouse');
+  console.log('PASS in-game language switch from Settings: day, season, sight, HP, level, Buildings tab and object names follow at once; pickers in sync; back to English');
+}

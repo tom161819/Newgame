@@ -24,7 +24,7 @@ test('every key used in the markup and in code exists, including the dynamic fam
   const html=readFileSync(path.join(root,'index.html'),'utf8'),used=new Set([...html.matchAll(/data-i18n="([^"]+)"/g)].map(m=>m[1]));
   for(const m of html.matchAll(/data-i18n-attr="([^"]+)"/g))for(const pair of m[1].split(';'))used.add(pair.split(':')[1]);
   for(const file of sources(path.join(root,'src')))for(const m of readFileSync(file,'utf8').matchAll(/\bt\('([\w.]+)'/g))used.add(m[1]);
-  for(const family of [['difficulty',['easy','normal','hard']],['setup.respawn',['off','slow','normal','fast']],['setup.wildlife',['rare','normal','abundant']],['resource',['stone','wood','iron_ore','bread']],['changelog.category',['added','changed','improved','fixed','balance','removed']],['setup.day',['60','120','240']]])for(const v of family[1])used.add(`${family[0]}.${v}`);
+  for(const family of [['difficulty',['easy','normal','hard']],['setup.respawn',['off','slow','normal','fast']],['setup.wildlife',['rare','normal','abundant']],['resource',['stone','wood','iron_ore','bread']],['changelog.category',['added','changed','improved','fixed','balance','removed']],['setup.day',['60','120','240']],['season',['Spring','Summer','Autumn','Winter']],['weather',['Sunny','Rainy','Drought','Frost']]])for(const v of family[1])used.add(`${family[0]}.${v}`);
   const missing=[...used].filter(key=>!Object.hasOwn(en,key));assert.deepEqual(missing,[]);assert.ok(used.size>140,`${used.size} keys in use`);
 });
 test('parameters, plurals and fallbacks never produce undefined',()=>{
@@ -43,5 +43,14 @@ test('the choice is remembered per browser; the browser language is the first de
   setLanguage('cs',{storage});assert.equal(data.get('newgame.language'),'cs');assert.equal(readLanguage(storage,'en-US'),'cs');assert.equal(language(),'cs');
   assert.equal(setLanguage('xx',{storage}),false);assert.equal(language(),'cs');
   assert.equal(readLanguage({getItem(){throw new Error('blocked');}},'cs'),'cs');
+  setLanguage(DEFAULT_LANGUAGE,{persist:false});
+});
+test('every object, profession and skill has a name in both languages, and data names follow the language',async()=>{
+  const {objectRegistry}=await import('../src/systems/ObjectRegistry.js'),{JOBS,SKILLS}=await import('../src/data/jobs.js');
+  for(const d of objectRegistry.all()){assert.ok(Object.hasOwn(en,`object.${d.id}.name`),d.id);if(d.description!==undefined)assert.ok(Object.hasOwn(en,`object.${d.id}.description`),d.id);}
+  for(const id of Object.keys(JOBS))assert.ok(Object.hasOwn(en,`job.${id}`),id);for(const id of Object.keys(SKILLS))assert.ok(Object.hasOwn(en,`skill.${id}`),id);
+  setLanguage('cs',{persist:false});assert.equal(objectRegistry.require('warehouse').name,'Sklad');assert.equal(JOBS.hauler.name,'Nosič');assert.equal(SKILLS.mining,'Těžba');assert.equal(objectRegistry.require('stone').name,'Kámen');
+  setLanguage('en',{persist:false});assert.equal(objectRegistry.require('warehouse').name,'Warehouse');assert.equal(JOBS.hauler.name,'Hauler');assert.equal(SKILLS.mining,'Mining');assert.equal(objectRegistry.require('stone').name,'Stone');
+  assert.equal(Object.isFrozen(objectRegistry.require('warehouse')),true,'definitions stay frozen');
   setLanguage(DEFAULT_LANGUAGE,{persist:false});
 });

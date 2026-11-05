@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { inAttackRange } from '../systems/CombatSystem.js';
 
 export class CombatFeedback {
@@ -17,7 +18,7 @@ export class CombatFeedback {
   refresh(){
     const s=this.scene,king=s.character,output=document.querySelector('#king-health');
     const hp=king.currentHP>0?Math.max(.01,Math.round(king.currentHP*100)/100):0;
-    const text=`HP: ${hp} / ${king.maxHP}`;if(output.textContent!==text)output.textContent=text;
+    const text=t('hud.hp',{hp,max:king.maxHP});if(output.textContent!==text)output.textContent=text;
     const progress=document.querySelector('#king-health-bar');progress.max=king.maxHP;progress.value=king.currentHP;
     for(const animal of [...s.animalSystem.animals.values(),...(s.workerSystem?.liveWorkers()??[])]){
       const fighting=s.combat.attacks.has(animal)||[...s.combat.attacks.values()].includes(animal);
