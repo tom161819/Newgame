@@ -1,3 +1,5 @@
+import { t } from '../i18n/index.js';
+import { localized } from '../i18n/names.js';
 import Phaser from 'phaser';
 import { COLUMNS, ROWS, PLAYER_START, createMap, isWalkable, tileCenter } from './map.js';
 import { tilePolygon, worldToTile, gridToWorld } from './isometric.js';
@@ -191,7 +193,7 @@ export class GameScene extends Phaser.Scene {
     this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,unlocks:this.buildingUnlocks,onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
     this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
     this.equipmentPanel=new EquipmentPanel(this);
-    this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=`Poddaní ${count} / ${maximum}`;}});if(!this.loadState)this.workerSystem.spawnInitial();
+    this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=t('hud.population',{count,maximum});}});if(!this.loadState)this.workerSystem.spawnInitial();
     this.workplaceSystem=new WorkplaceSystem(this);this.workplacePanel=new WorkplacePanel(this);
     this.constructionSystem=new ConstructionSystem(this,{onProgress:site=>this.towerViews.get(site.id)?.updateProgress?.(site),
       onComplete:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(`${buildingDefinition(site).name}: stavba dokončena.`);},
@@ -499,23 +501,28 @@ export class GameScene extends Phaser.Scene {
   }
   collectStone(tile) { return this.collectResource(tileKey(tile),this.character.tile); }
   updateInventory() { this.inventoryBar.update();this.updateBuildingUI();this.updateWorldCount();this.updateFoodDisplay();this.equipmentPanel?.refresh();this.economyPanel?.update(); }
+  // Language switch during play: refresh every HUD text that is built in code.
+  relabelUI(){
+    this.updateTimeDisplay();this.updateFoodDisplay();this.updateWorldCount();this.updateMountUI?.();this.combatFeedback?.refresh();this.experienceFeedback?.refresh();this.workerSystem?.updateUI();this.inventoryBar?.update();this.updateBuildingUI();
+    if(this.worldCamera?.following)document.querySelector('#camera-mode').textContent=t('hud.cameraKing');
+  }
   updateTimeDisplay(){const output=document.querySelector('#game-time');if(output.textContent!==this.gameTime.label)output.textContent=this.gameTime.label;const seasons=document.querySelector('#season-weather');if(seasons.textContent!==this.seasons.label)seasons.textContent=this.seasons.label;}
   onDailyIncome(day,totals){
-    const labels=new Set(this.buildings.map(b=>buildingDefinition(b).production).filter(p=>p?.interval==='day'&&totals[p.resource]).map(p=>p.label).filter(Boolean));
+    const labels=new Set(this.buildings.map(b=>buildingDefinition(b).production).filter(p=>p?.interval==='day'&&totals[p.resource]).map(p=>localized(`production.${p.resource}`,p.label)).filter(Boolean));
     const details=Object.entries(totals).map(([id,amount])=>`+${amount} ${this.objectRegistry.require(id).name}`).join(' · ');
-    const notice=document.querySelector('#day-notice');notice.textContent=`Day ${day} – ${[...labels].join(', ')||'Income'}: ${details}`;
+    const notice=document.querySelector('#day-notice');notice.textContent=t('hud.dayNotice',{day,labels:[...labels].join(', ')||t('hud.income'),details});
     notice.hidden=false;this.noticeRemaining=4000;this.updateInventory();
   }
   updateFoodDisplay(){
-    const text=`Food: ${this.foodSystem.dailyConsumption} portions/day`;
+    const text=t('hud.food',{count:this.foodSystem.dailyConsumption});
     const output=document.querySelector('#food-countdown');if(output.textContent!==text)output.textContent=text;
-    const warning=document.querySelector('#food-warning');warning.hidden=!this.foodSystem.shortage;warning.textContent=`Food shortage · ${this.foodSystem.hungryCount} unfed`;
+    const warning=document.querySelector('#food-warning');warning.hidden=!this.foodSystem.shortage;warning.textContent=t('hud.foodShortage',{count:this.foodSystem.hungryCount});
   }
   updateBuildingUI() { this.buildingBar.update(this.inventory,this.buildMode?this.selectedBuilding:null); }
   updateWorldCount() {
     const capacity=resourceSpawnSettings(this.objectRegistry.require('stone'),this.gameSettings).max;
     const count=this.fog?.enabled?[...this.mapMemory.objects.values()].filter(entry=>entry.kind==='resource'&&entry.type==='stone').length:this.resourceCount('stone');
-    const text=`Mapa ${COLUMNS} × ${ROWS} · ${this.fog?.enabled?'známé kameny':'kameny'} ${count}${this.fog?.enabled?'':` / ${capacity}`}`;
+    const text=this.fog?.enabled?t('hud.worldKnownStones',{columns:COLUMNS,rows:ROWS,count}):t('hud.worldStones',{columns:COLUMNS,rows:ROWS,count,capacity});
     const output=document.querySelector('#world-stones');if(output.textContent!==text)output.textContent=text;
   }
   setStatus(message) { document.querySelector('#status').textContent=message; }
@@ -543,7 +550,7 @@ export class GameScene extends Phaser.Scene {
   }
   updateMountUI(){
     document.querySelector('#dismount').hidden=!this.character.mountedHorse;
-    const text=this.fog.enabled?`Dohled: ${this.fog.radius} polí · kruh`:'Fog of War: OFF';
+    const text=this.fog.enabled?t('hud.sight',{count:this.fog.radius}):t('hud.fogOff');
     const output=document.querySelector('#vision-status');if(output.textContent!==text)output.textContent=text;
   }
   update(_time,delta) {

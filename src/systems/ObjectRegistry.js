@@ -2,6 +2,7 @@ import { objectDefinitions } from '../data/objects/index.js';
 import { JOBS,SKILL_IDS } from '../data/jobs.js';
 import { BUILDING_CATEGORIES } from '../data/buildingCategories.js';
 
+import { localizeDefinition } from '../i18n/names.js';
 export const OBJECT_CATEGORIES = Object.freeze(['terrain', 'resource', 'building', 'character', 'decoration', 'animal', 'equipment', 'treasure']);
 const DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 const plainObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -116,7 +117,7 @@ export class ObjectRegistry {
     for (const definition of definitions) {
       validateDefinition(definition);
       if (this.definitions.has(definition.id) || pending.has(definition.id)) throw new Error(`Duplicitní ID objektu: ${definition.id}`);
-      pending.set(definition.id, freezeDeep(structuredClone(definition)));
+      pending.set(definition.id, freezeDeep(localizeDefinition(structuredClone(definition))));
     }
     const known=new Map([...this.definitions,...pending]);
     for(const definition of pending.values()){

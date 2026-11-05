@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { validateGameState } from './GameStateSerializer.js';
 import { recalculateStats } from './UnitStats.js';
 import { buildingTiles,buildingDepth,towerTop } from '../game/buildings.js';
@@ -129,7 +130,7 @@ export function loadGameState(scene,input){
   scene.updateInventory();scene.worldCamera.syncSize?.();
   const camera=scene.cameras.main;camera.setZoom(state.camera.zoom);scene.worldCamera.syncZoom?.();camera.centerOn(state.camera.x,state.camera.y);camera.preRender();
   scene.worldCamera.following=state.camera.following;
-  document.querySelector('#camera-mode').textContent=state.camera.following?'Kamera sleduje krále':'Ruční posun · mezerník vrátí krále';
+  document.querySelector('#camera-mode').textContent=t(state.camera.following?'hud.cameraKing':'hud.cameraManual');
   scene.updateInventory();scene.updateTimeDisplay();scene.refreshVisibility();scene.activeFramePending=true;
   scene.experienceFeedback?.refresh();
   scene.setStatus('Uložená hra načtena.');

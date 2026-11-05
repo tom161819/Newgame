@@ -1,6 +1,8 @@
+import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  ...objects,
   'common.back':'Back','common.close':'Close ×','common.cancel':'Cancel','common.confirm':'Confirm','common.unknownDate':'Unknown date',
   'language.label':'Language',
   'menu.eyebrow':'ROYAL WATCH','menu.tagline':'Build your kingdom.','menu.newGame':'New Game','menu.loadGame':'Load Game','menu.saveGame':'Save Game','menu.mainMenu':'Main Menu',
@@ -23,6 +25,17 @@ export default {
   'setup.summary.chests':{one:'{count} chest',other:'{count} chests'},'setup.summary.stones':{one:'{count} stone on the map',other:'{count} stones on the map'},
   'setup.summary.castle':'Castle {state}','setup.summary.day':'Day {seconds} s','setup.summary.respawn':'Respawn {mode}','setup.summary.gold':'{count} Gold','setup.summary.stockpile':'Stockpile: {list}',
   'resource.stone':'stone','resource.wood':'wood','resource.iron_ore':'iron ore','resource.bread':'bread','state.on':'ON','state.off':'OFF',
+  'hud.subtitle':'Royal Watch · First Journey','hud.inventory':'Inventory','hud.kingHealth':'King\'s health','hud.kingOverview':'King overview','hud.kingXp':'King\'s experience','hud.more':'More','hud.moreTitle':'Show details',
+  'hud.equipment':'Equipment','hud.storage':'Resources & Storage','hud.foodEconomy':'Food Economy','hud.economy':'Economy','hud.gold':'Gold:','hud.castleIncome':'Castle Income:','hud.perDay':'Gold/day','hud.wages':'Worker Wages:','hud.balance':'Balance:','hud.unpaid':'Unpaid wages:','hud.wageWarning':'Insufficient Gold to pay wages.',
+  'hud.map':'Isometric game map of 100 × 100 tiles','hud.dismount':'Dismount · H','hud.followKing':'To the king · Space','hud.controls':'WASD / arrows: camera · wheel: zoom','hud.buildingsBar':'Building construction','hud.buildings':'Buildings','hud.buildingCategories':'Building categories','hud.assetLibrary':'Asset Library','hud.olderVersions':'Older versions ↗','hud.cancelBuilding':'Cancel (Esc)','hud.population.tab':'Population',
+  'hud.day':'Day {day} | {remaining} / {total}','hud.season':'{season} · Day {day} / 5 · Year {year} · {weather}','hud.seasonsOff':'Summer (Seasons OFF) · {weather}',
+  'season.Spring':'Spring','season.Summer':'Summer','season.Autumn':'Autumn','season.Winter':'Winter','weather.Sunny':'Sunny','weather.Rainy':'Rainy','weather.Drought':'Drought','weather.Frost':'Frost',
+  'hud.dayNotice':'Day {day} – {labels}: {details}','hud.income':'Income','production.gold':'Castle income',
+  'hud.food':{one:'Food: {count} portion/day',other:'Food: {count} portions/day'},'hud.foodShortage':'Food shortage · {count} unfed',
+  'hud.worldStones':'Map {columns} × {rows} · stones {count} / {capacity}','hud.worldKnownStones':'Map {columns} × {rows} · known stones {count}',
+  'hud.sight':{one:'Sight: {count} tile · circle',other:'Sight: {count} tiles · circle'},'hud.fogOff':'Fog of War: OFF','hud.population':'Residents {count} / {maximum}',
+  'hud.hp':'HP: {hp} / {max}','hud.kingLevel':'King | LVL {level}','hud.kingTitle':'King — Level {level}',
+  'hud.cameraKing':'Camera follows the king','hud.cameraUnit':'Selected resident: {name}','hud.cameraManual':'Manual pan · Space returns to the king',
   'pause.title':'Game Menu','pause.paused':'The game is paused.','pause.resume':'Resume Game','confirm.title':'Confirmation',
   'saves.intro':'Saved games are available on this device and in this browser. Download Save stores a save as a file; Import Save File moves it to another device.',
   'saves.import':'Import Save File','saves.newName':'New save name','saves.create':'Create new save','saves.defaultName':'Kingdom — Day {day}',

@@ -1,5 +1,7 @@
+import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  ...objects,
   'common.back':'Zpět','common.close':'Zavřít ×','common.cancel':'Zrušit','common.confirm':'Potvrdit','common.unknownDate':'Neznámé datum',
   'language.label':'Jazyk',
   'menu.eyebrow':'KRÁLOVSKÁ HLÍDKA','menu.tagline':'Vybuduj své království.','menu.newGame':'Nová hra','menu.loadGame':'Načíst hru','menu.saveGame':'Uložit hru','menu.mainMenu':'Hlavní menu',
@@ -22,6 +24,17 @@ export default {
   'setup.summary.chests':{one:'{count} truhla',few:'{count} truhly',many:'{count} truhly',other:'{count} truhel'},'setup.summary.stones':{one:'{count} kámen na mapě',few:'{count} kameny na mapě',many:'{count} kamene na mapě',other:'{count} kamenů na mapě'},
   'setup.summary.castle':'Hrad {state}','setup.summary.day':'Den {seconds} s','setup.summary.respawn':'Obnova {mode}','setup.summary.gold':'{count} zlata','setup.summary.stockpile':'Skladiště: {list}',
   'resource.stone':'kámen','resource.wood':'dřevo','resource.iron_ore':'železná ruda','resource.bread':'chléb','state.on':'ZAP','state.off':'VYP',
+  'hud.subtitle':'Královská hlídka · První cesta','hud.inventory':'Inventář','hud.kingHealth':'Životy krále','hud.kingOverview':'Přehled krále','hud.kingXp':'Zkušenosti krále','hud.more':'Více','hud.moreTitle':'Zobrazit podrobnosti',
+  'hud.equipment':'Vybavení','hud.storage':'Suroviny a sklady','hud.foodEconomy':'Potravinová ekonomika','hud.economy':'Ekonomika','hud.gold':'Zlato:','hud.castleIncome':'Příjem hradu:','hud.perDay':'zlata/den','hud.wages':'Mzdy pracovníků:','hud.balance':'Bilance:','hud.unpaid':'Nevyplacené mzdy:','hud.wageWarning':'Na výplatu mezd nestačí zlato.',
+  'hud.map':'Izometrická herní mapa 100 × 100 políček','hud.dismount':'Sesednout · H','hud.followKing':'Na krále · mezerník','hud.controls':'WASD / šipky: kamera · kolečko: zoom','hud.buildingsBar':'Stavění budov','hud.buildings':'Budovy','hud.buildingCategories':'Kategorie budov','hud.assetLibrary':'Knihovna objektů','hud.olderVersions':'Starší verze ↗','hud.cancelBuilding':'Zrušit (Esc)','hud.population.tab':'Obyvatelé',
+  'hud.day':'Den {day} | {remaining} / {total}','hud.season':'{season} · den {day} / 5 · rok {year} · {weather}','hud.seasonsOff':'Léto (roční období VYP) · {weather}',
+  'season.Spring':'Jaro','season.Summer':'Léto','season.Autumn':'Podzim','season.Winter':'Zima','weather.Sunny':'Slunečno','weather.Rainy':'Deštivo','weather.Drought':'Sucho','weather.Frost':'Mráz',
+  'hud.dayNotice':'Den {day} – {labels}: {details}','hud.income':'Příjem','production.gold':'Příjem hradu',
+  'hud.food':{one:'Jídlo: {count} porce/den',few:'Jídlo: {count} porce/den',many:'Jídlo: {count} porce/den',other:'Jídlo: {count} porcí/den'},'hud.foodShortage':'Nedostatek jídla · nenasycených: {count}',
+  'hud.worldStones':'Mapa {columns} × {rows} · kameny {count} / {capacity}','hud.worldKnownStones':'Mapa {columns} × {rows} · známé kameny {count}',
+  'hud.sight':{one:'Dohled: {count} pole · kruh',few:'Dohled: {count} pole · kruh',many:'Dohled: {count} pole · kruh',other:'Dohled: {count} polí · kruh'},'hud.fogOff':'Mlha války: VYP','hud.population':'Poddaní {count} / {maximum}',
+  'hud.hp':'Životy: {hp} / {max}','hud.kingLevel':'Král | úroveň {level}','hud.kingTitle':'Král — úroveň {level}',
+  'hud.cameraKing':'Kamera sleduje krále','hud.cameraUnit':'Vybraný poddaný: {name}','hud.cameraManual':'Ruční posun · mezerník vrátí krále',
   'pause.title':'Herní menu','pause.paused':'Hra je pozastavená.','pause.resume':'Pokračovat ve hře','confirm.title':'Potvrzení',
   'saves.intro':'Uložené pozice jsou dostupné na tomto zařízení a v tomto prohlížeči. Tlačítko Stáhnout uloží pozici do souboru, Importovat soubor ji přenese na jiné zařízení.',
   'saves.import':'Importovat soubor','saves.newName':'Název nové hry','saves.create':'Vytvořit nový save','saves.defaultName':'Království — den {day}',

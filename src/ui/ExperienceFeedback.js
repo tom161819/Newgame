@@ -1,10 +1,11 @@
+import { t } from '../i18n/index.js';
 const format=value=>String(Math.round(value*100)/100);
 export class ExperienceFeedback {
   constructor(scene){this.scene=scene;this.effects=[];this.unsubscribe=scene.experienceSystem.on('xp',(actor,amount,detail)=>this.onGain(actor,amount,detail));this.refresh();}
   refresh(){
     const e=this.scene.experienceSystem.getLevelProgress(this.scene.character);if(!e)return;
-    document.querySelector('#king-level').textContent=`King | LVL ${e.level}`;
-    document.querySelector('#king-profile').title=`Král — Level ${e.level}`;
+    document.querySelector('#king-level').textContent=t('hud.kingLevel',{level:e.level});
+    document.querySelector('#king-profile').title=t('hud.kingTitle',{level:e.level});
     document.querySelector('#king-xp').textContent=e.level===e.maxLevel?'XP MAX':`XP ${format(e.currentXP)} / ${e.xpToNextLevel}`;
     const bar=document.querySelector('#king-xp-bar');bar.max=e.xpToNextLevel||1;bar.value=e.level===e.maxLevel?1:e.currentXP;
   }

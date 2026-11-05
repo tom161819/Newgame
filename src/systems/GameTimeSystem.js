@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { DEFAULT_GAME_SETTINGS } from './GameSettings.js';
 export const DAY_DURATION=DEFAULT_GAME_SETTINGS.dayLengthSeconds*1000;
 
@@ -39,7 +40,7 @@ export class GameTimeSystem {
   get eventTime(){return this.advanceEndTime??this.totalElapsed;}
   get label(){
     const format=n=>`${String(Math.floor(n/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;
-    return `Day ${this.day} | ${format(this.remainingSeconds)} / ${format(this.dayDuration/1000)}`;
+    return t('hud.day',{day:this.day,remaining:format(this.remainingSeconds),total:format(this.dayDuration/1000)});
   }
   destroy(){this.listeners.clear();this.dayClosedListeners?.clear();this.advanceListeners.clear();this.afterAdvanceListeners.clear();this.boundaries.clear();}
 }
