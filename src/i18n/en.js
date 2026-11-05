@@ -2,6 +2,8 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  // Food-chain completion advice (#125).
+  'notice.missingChainSource':'{name}: no {producer} for long-term production. Existing supplies can still be used.',
   'hud.deliverCargo':'Deliver to storage','status.cargoAwaitDelivery':'Stone collected. Use Deliver to storage when you are ready.',
   'work.message.No reachable collection area':'No reachable Castle, material storage or construction site',
   'work.state.Holding':'Holding position','work.state.MovingToHold':'Moving to hold position',
