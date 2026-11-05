@@ -12,7 +12,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| C03 (#50) Auto Employment and Castle priorities | Claude (taken over from Codex; Codex not running) | `claude/c03-auto-employment` | — | In progress | src/data/employment.js, src/systems/EmploymentSystem.js, src/ui/EmploymentPanel.js, GameScene.js (wiring, Castle click, Settings toggle), WorkplacePanel/UnitPanel (manual holds), WorkerSystem.create, FoodProductionSystem (Smelter delegates), GameSettings, NewGameSetup, GameStateSerializer/Loader (SAVE_VERSION 20), index.html (panel, toggles), i18n employment keys, style.css, smokes (browser, employment, smelting, ledger). |
+| C04 (#51) Production diagnostics notices | Claude (taken over from Codex) | `claude/c04-production-diagnostics` | — | In progress | src/data/diagnostics.js, src/systems/ProductionDiagnostics.js, src/ui/NoticesPanel.js, index.html (notices panel), GameScene.js (create/update/destroy only), i18n notice keys, style.css (appended block), scripts/{browser,notices}-smoke.mjs, tests/production-diagnostics.test.js. |
+| C05 (#52) Unit selection, Move/Hold Position | Codex | `codex/…` | — | Ready (developer's request) | Codex registers its files; avoid the C04 files above. Claude opens/merges the PR when Codex reports DONE-READY in #52. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -21,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-05 [#90](https://github.com/tom161819/Newgame/pull/90) C03: Auto Employment with Castle Employment Priorities (SAVE_VERSION 20). Issue #50 done and closed (Claude).
 - 2026-11-05 [#89](https://github.com/tom161819/Newgame/pull/89) C02: Assign Worker in three sorted groups with move confirmation; the Granary reports no false Missing Workers. Issue #49 done and closed (Claude).
 - 2026-11-05 [#85](https://github.com/tom161819/Newgame/pull/85), [#86](https://github.com/tom161819/Newgame/pull/86), [#88](https://github.com/tom161819/Newgame/pull/88) C01: no stuck visibility, subjects see 15 tiles, the king explores unknown land, provisional blueprints outside sight (SAVE_VERSION 19). Taken over from Codex; Issue #48 done and closed (Claude).
 - 2026-11-05 [#84](https://github.com/tom161819/Newgame/pull/84) N11: trampled paths drawn as the approved narrow Earth track over seasonal grass; Pages 41985687360 and Verify published release passed. Issue #64 done and closed (Claude).
