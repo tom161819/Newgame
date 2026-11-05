@@ -7,6 +7,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ### Added
 - Finishing a Mill without a Wheat Field or a Bakery without a Mill shows one informational notice about the missing long-term supply. Existing supplies still work; dismiss the advice or finish the missing link to clear it. Actual production blockers retain priority.
+- Military training in the Barracks panel. Each Soldier working there can be trained as one of four unit types:
+  - Soldier: Sword, 5 Gold, 20 s.
+  - Swordsman: Sword, 12 Gold, 45 s, Combat 3+. Tougher and better armoured.
+  - Archer: Bow, 8 Gold, 30 s. Shoots from 6 tiles, but only with a clear line past trees, walls and rock, and never at unseen game.
+  - Knight: Sword and Armor. Locked until Stables with a tamed Horse exist.
+
+  Haulers carry the exact items from an Armory into the Barracks; training starts only when they have arrived. The panel shows the kits in stock and why a type is blocked. Cancelling refunds the Gold. Discharge or death drops the gear for Haulers to return. Trained units earn a higher wage and defend residents and the king near their Barracks.
 - House (Housing menu, 2×2, 10 Wood and 4 Stone): each completed House raises the resident limit by 5 above the base 20, so migrants keep arriving. Blueprints give no room until they are built; the Residents counter shows the new limit at once.
 - Weapon and armour workshops and the Armory, all under Castle & Defense:
   - Bowyer: 8 Wood make a Bow.

@@ -26,6 +26,7 @@ import { mineralSmoke } from './mineral-smoke.mjs';
 import { zoomSmoke } from './zoom-smoke.mjs';
 import { ledgerSmoke } from './ledger-smoke.mjs';
 import { smeltingSmoke } from './smelting-smoke.mjs';
+import { militarySmoke } from './military-smoke.mjs';
 import { housingSmoke } from './housing-smoke.mjs';
 import { forestrySmoke,forestryHutSmoke } from './forestry-smoke.mjs';
 
@@ -95,6 +96,7 @@ try{
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
   if(args.includes('--full')||args.includes('--ledger'))await ledgerSmoke(page);
   if(args.includes('--full')||args.includes('--smelting'))await smeltingSmoke(page);
+  if(args.includes('--full')||args.includes('--military'))await militarySmoke(page);
   if(args.includes('--full')||args.includes('--housing'))await housingSmoke(page);
   if(args.includes('--full')||args.includes('--zoom'))await zoomSmoke(page);
   if(args.includes('--full')||args.includes('--minerals'))await mineralSmoke(page);

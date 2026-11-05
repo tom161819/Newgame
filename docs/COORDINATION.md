@@ -14,6 +14,7 @@ None pending. Add entries here when one pull request must wait for another.
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | NEW08-B (#125) Food chain completion notices | Codex | `codex/food-chain-completion-notices` | — | Implemented after verified #102 Pages; 595 tests, changelog, build:pages and chain-notices + C04 browser smoke PASS; PR/CI pending | ProductionDiagnostics.js, data/diagnostics.js, own EN/CS block, focused tests/browser smoke, docs/changelog. No C08 held systems or persistent schema edits. |
+| C08 (#55) Military units, training, equipment, combat | Claude | `claude/c08-military-units` | — | PR open; 599 tests, 50 full smokes PASS | data/military.js (new), systems/MilitarySystem.js (new), game/lineOfSight.js (new), ui/militaryPanel.js (new), FoodStorageSystem.js + FoodStateValidation.js (Barracks kit store), LogisticsTaskManager.js, CombatSystem.js, UnitStats.js, WorkerAI.js, WorkerSystem.js, WageSystem.js, WorkplacePanel.js, GameScene.js, GameStateSerializer/Loader (SAVE_VERSION 23), militaryEquipment.js + contract, objects/buildings.js (barracks kit), i18n en/cs, style.css, tests, smokes. |
 | House (#57, House part only; developer priority) | Claude | `claude/house-population-capacity` | — | PR open; 589 tests, 47 full smokes PASS | data/objects/housing.js (new), objects/index.js, approvedArt.js (house), jobs.js (houseCapacity), WorkerSystem.js (capacity), i18n objects, public/assets/buildings/house, tests. |
 
 ## Kept backups (do not delete without the developer)

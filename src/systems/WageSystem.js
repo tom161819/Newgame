@@ -11,7 +11,7 @@ export class WageSystem {
   }
   dailyWage(worker){
     const base=BASE_DAILY_WAGES[worker.profession]??0;if(!worker.isAlive||worker.isSubject===false||!base)return 0;
-    return base+Math.floor(((worker.skills[JOBS[worker.profession].skill]?.level??1)-1)/WAGE_LEVEL_INTERVAL);
+    return base+Math.floor(((worker.skills[JOBS[worker.profession].skill]?.level??1)-1)/WAGE_LEVEL_INTERVAL)+(this.scene.military?.wageBonus(worker)??0);
   }
   accrue(delta){
     for(const worker of this.scene.workerSystem.liveWorkers()){
