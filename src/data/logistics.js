@@ -14,7 +14,10 @@ export function storageResources(definition,registry){return definition.storage.
 // 2 more for every 5 Logistics levels. Gold is never carried.
 export const RESOURCE_WEIGHTS=Object.freeze({stone:10,iron:10,iron_ore:10,wood:5,iron_bar:5,armor:8,sword:4,bow:3,meat:1,wheat:1,apple:1,flour:1,bread:1});
 export const loadWeight=resource=>RESOURCE_WEIGHTS[resource]??1;
-export function loadCapacity(actor){return LOGISTICS_RULES.loadUnits+(actor.profession==='hauler'?Math.floor(((actor.skills?.logistics?.level??1)-1)/5)*2:0);}
+// S12: a vehicle multiplies the load; one transport mode at a time, never combined.
+export const VEHICLES=Object.freeze({wheelbarrow:Object.freeze({multiplier:5,speed:.9}),horse_wagon:Object.freeze({multiplier:10,speed:1.1,requiresHorse:true})});
+export const TRANSPORT_MODES=Object.freeze(['auto','hands','wheelbarrow']);
+export function loadCapacity(actor){return (LOGISTICS_RULES.loadUnits+(actor.profession==='hauler'?Math.floor(((actor.skills?.logistics?.level??1)-1)/5)*2:0))*(VEHICLES[actor.vehicleType]?.multiplier??1);}
 // How many pieces of one resource fit in one trip (at least one, so heavy goods still move); without a resource, load units.
 export function carryCapacity(actor,resource=null){const units=loadCapacity(actor);return resource?Math.max(1,Math.floor(units/loadWeight(resource))):units;}
 export const stockLocationId=building=>`${building.type==='starter_stockpile'?'stockpile':building.type==='warehouse'?'warehouse':building.type==='armory'?'armory':'granary'}-${building.id}`;

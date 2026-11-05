@@ -18,7 +18,7 @@ export async function militarySmoke(page){
   const row=page.locator(`.military-soldier[data-soldier="${fixture.soldier}"]`);assert.equal(await row.locator('[data-train="knight"]').isDisabled(),true);assert.equal(await row.locator('[data-train="swordsman"]').isDisabled(),true,'Combat 1 is too low for a Swordsman');
   await row.locator('[data-train="soldier"]').click();await page.locator('#close-workplace').click();
   await page.waitForFunction(id=>window.__game.registry.get('application').scene.military.order({id})?.state==='training',fixture.soldier,{timeout:60000});
-  const mid=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.equal(mid.saveVersion,25);assert.equal(mid.military.orders[0].state,'training');assert.deepEqual(mid.military.orders[0].items,{sword:1});
+  const mid=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.equal(mid.saveVersion,26);assert.equal(mid.military.orders[0].state,'training');assert.deepEqual(mid.military.orders[0].items,{sword:1});
   await load(mid);
   await page.waitForFunction(id=>window.__game.registry.get('application').scene.military.units.get(id)?.type==='soldier',fixture.soldier,{timeout:60000});
   const unit=await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,w=s.workerSystem.workers.get(id);return [w.maxHP,w.attackDPS,s.foodStorage.available('sword')];},fixture.soldier);assert.deepEqual(unit,[80,12,0]);

@@ -79,7 +79,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     if(t.kind==='chopTree'){const tree=s.resources.find(r=>r.natural?.id===t.targetId),yieldAmount=registry.require(tree?.type).tree.wood;check(t.amount===yieldAmount&&locations.has(t.destinationId)&&['fallback','storage'].includes(locations.get(t.destinationId).kind));capacity(t.capacityReservation,t.transferId,'wood',yieldAmount);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);continue;}
     if(t.kind==='mineDeposit'){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),resource=registry.require(home.type).mining.resource;check(t.amount===1&&locations.has(t.destinationId)&&['fallback','storage'].includes(locations.get(t.destinationId).kind));capacity(t.capacityReservation,t.transferId,resource,1);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);continue;}
     if(!['foodPickup','foodDeliver'].includes(t.kind))continue;
-    check(resources.includes(t.resource)&&locations.has(t.destinationId));integer(t.amount,1,carryCapacity(w,t.resource));
+    check(resources.includes(t.resource)&&locations.has(t.destinationId));integer(t.amount,1,carryCapacity({...w,vehicleType:s.vehicles?.vehicles.find(v=>v.operatorId===w.id&&v.state==='inUse')?.type??null},t.resource));
     const sourceDrop=t.sourceDropId&&s.drops.find(d=>d.id===t.sourceDropId);
     if(t.kind==='foodPickup'&&t.sourceDropId){check(sourceDrop&&sourceDrop.resource===t.resource&&sourceDrop.amount>=t.amount&&t.goal.x===sourceDrop.tile.x&&t.goal.y===sourceDrop.tile.y&&!groundRefs.has(t.sourceDropId));groundRefs.add(t.sourceDropId);}
     else check(adjacent(locations.get(t.kind==='foodPickup'?t.sourceId:t.destinationId),t.goal));
