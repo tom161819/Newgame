@@ -248,12 +248,34 @@ export class TerrainRenderer {
     }
   }
 
+  // Performance: a newly visible chunk is painted at once (never a hole); already shown chunks that became dirty
+  // (fog, path wear, pavement, season) repaint at most two per frame, so a wave of changes never freezes a frame.
+  repaintDirty(){
+    let budget=2;
+    for (const key of this.neededChunks??[]) {
+      const shown=this.chunks.has(key);if(shown&&!this.dirtyChunks.has(key))continue;if(shown&&budget--<=0)continue;
+      const [cx,cy] = key.split(',').map(Number), texture = this.chunkTexture(cx,cy);
+      const image = this.chunks.get(key)??this.chunkPool.pop() ?? this.scene.add.image(0,0,texture.key).setOrigin(0,0).setDepth(-100);
+      image.setTexture(texture.key).setPosition(texture.x,texture.y).setVisible(true);
+      this.chunks.set(key,image);
+    }
+  }
   update(camera,fog=null,memory=this.memory) {
     this.fog=fog;this.memory=memory;
     this.updateFog(camera,fog);
     const view = camera.worldView;
-    const cacheKey = [Math.floor(view.x / 16), Math.floor(view.y / 16), Math.ceil(view.width), Math.ceil(view.height),fog?.signature??'',this.wear?.levelRevision??0,this.debugEnabled?this.wear?.revision:0,this.debugEnabled].join(',');
-    if (cacheKey === this.lastView) return;
+    const cacheKey = [Math.floor(view.x / 16), Math.floor(view.y / 16), Math.ceil(view.width), Math.ceil(view.height),fog?`${fog.enabled}:${fog.explorationEnabled}`:'',this.debugEnabled?this.wear?.levelRevision??0:0,this.debugEnabled?this.wear?.revision:0,this.debugEnabled].join(',');
+    // Performance: path wear repaints only its own tiles (invalidateArea), so it no longer re-walks every visible tile.
+    // Sight moving by a step only re-tints the rock outcrops whose visibility changed; the full walk over every visible
+    // tile runs when the camera moves, the Fog mode changes, or a newly seen rock has no sprite yet.
+    if (cacheKey === this.lastView && fog && this.outcropFogRevision!==fog.revision) {
+      const fresh=this.outcropFogRevision===fog.revision-1;this.outcropFogRevision=fog.revision;
+      if(fresh)for(const index of [...fog.added,...fog.removed]){const x=index%fog.width,y=Math.floor(index/fog.width),key=`${x},${y}`;if(!this.tileData({x,y})[0])continue;
+        const tile=this.tiles.get(key);if(!tile){if(fog.added.includes(index)){this.lastView='';break;}continue;}tile.setTint(fog.displayState({x,y})===VISIBILITY.EXPLORED?0x4d504d:0xffffff);}
+      else this.lastView='';
+    }
+    if (cacheKey === this.lastView) {this.repaintDirty();return;}
+    this.outcropFogRevision=fog?.revision;
     this.lastView = cacheKey;
     this.debugGraphics.clear();
     const padding = 100;
@@ -263,7 +285,7 @@ export class TerrainRenderer {
     const maxX=Math.min(COLUMNS-1,Math.ceil(Math.max(...corners.map(p=>p.x)))+1);
     const minY=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.y)))-1);
     const maxY=Math.min(ROWS-1,Math.ceil(Math.max(...corners.map(p=>p.y)))+1);
-    const visible = new Set(), neededChunks = new Set();
+    const visible = new Set(), neededChunks = new Set(), chunkIds = new Set();
     let visibleCount = 0;
     for(let y=minY;y<=maxY;y++) for(let x=minX;x<=maxX;x++) {
       const p=tileCenter({x,y});
@@ -273,7 +295,9 @@ export class TerrainRenderer {
         const colors=[0x87a18a,0xc6cf75,0xdfac67,0xe38b57],level=this.wear.level({x,y});
         this.debugGraphics.fillStyle(colors[level],level ? .36 : .08);this.debugGraphics.fillPoints([{x:p.x-31,y:p.y},{x:p.x,y:p.y-15},{x:p.x+31,y:p.y},{x:p.x,y:p.y+15}],true);
       }
-      neededChunks.add(`${Math.floor(x/CHUNK_SIZE)},${Math.floor(y/CHUNK_SIZE)}`);
+      const chunk=Math.floor(y/CHUNK_SIZE)*64+Math.floor(x/CHUNK_SIZE);if(!chunkIds.has(chunk)){chunkIds.add(chunk);neededChunks.add(`${Math.floor(x/CHUNK_SIZE)},${Math.floor(y/CHUNK_SIZE)}`);}
+      // Only rock outcrops need sprites: ordinary ground stops here without any fog or memory lookups.
+      if(!this.map[y]?.[x])continue;
       const state=fog?.displayState({x,y})??VISIBILITY.VISIBLE;
       if(!this.tileData({x,y})[0]||state===VISIBILITY.UNEXPLORED)continue;
       if(fog?.enabled&&!fog.isInSightTile({x,y})&&!fog.explored[y*fog.width+x])continue;
@@ -290,12 +314,7 @@ export class TerrainRenderer {
     for (const [key, chunk] of this.chunks) if (!neededChunks.has(key)) {
       chunk.setVisible(false); this.chunkPool.push(chunk); this.chunks.delete(key);
     }
-    for (const key of neededChunks) if (!this.chunks.has(key)||this.dirtyChunks.has(key)) {
-      const [cx,cy] = key.split(',').map(Number), texture = this.chunkTexture(cx,cy);
-      const image = this.chunks.get(key)??this.chunkPool.pop() ?? this.scene.add.image(0,0,texture.key).setOrigin(0,0).setDepth(-100);
-      image.setTexture(texture.key).setPosition(texture.x,texture.y).setVisible(true);
-      this.chunks.set(key,image);
-    }
+    this.neededChunks=neededChunks;this.repaintDirty();
     this.visibleCount=visibleCount;
   }
   destroy(){this.unsubscribeWear?.();this.debugGraphics.destroy();}
