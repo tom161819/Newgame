@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| C01 (#48) Fog of War, exploration, blueprints, subject sight | Claude (taken over from Codex, developer's instruction 2026-11-05: Codex is not running) | `claude/c01-fow-sight` → `claude/c01-explore` → `claude/c01-blueprints` (merge in this order) | — | In progress | src/systems/FogOfWarSystem.js, VisibilityModifiers.js, MapMemory (read only), src/game/TerrainRenderer.js (updateFog), PlayerController.js, knownMap.js, provisionalSites.js, buildings.js, walls.js, GameScene.js (click, placement, preview), ConstructionSystem.js, GameStateSerializer/Loader, characters.js (peasant sight), i18n status keys, fog/population/smelting/forestry/mineral/ledger smokes. |
+| C01 (#48) Fog of War, exploration, blueprints, subject sight | Claude (taken over from Codex, developer's instruction 2026-11-05: Codex is not running) | `claude/c01-fow-sight` → `claude/c01-explore` → `claude/c01-blueprints` (merge in this order) | A+D [#85](https://github.com/tom161819/Newgame/pull/85) merged; B open | In progress | src/systems/FogOfWarSystem.js, VisibilityModifiers.js, MapMemory (read only), src/game/TerrainRenderer.js (updateFog), PlayerController.js, knownMap.js, provisionalSites.js, buildings.js, walls.js, GameScene.js (click, placement, preview), ConstructionSystem.js, GameStateSerializer/Loader, characters.js (peasant sight), i18n status keys, fog/population/smelting/forestry/mineral/ledger smokes. |
 
 ## Kept backups (do not delete without the developer)
 
