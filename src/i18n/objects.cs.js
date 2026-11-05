@@ -32,6 +32,7 @@ export default {
   'object.mill.name':'Mlýn','object.mill.description':'Dva mlynáři semelou 4 pšenice na 3 mouky za 30 sekund aktivní práce. Vstupy i výstupy se fyzicky nosí.',
   'object.bakery.name':'Pekárna','object.bakery.description':'Dva pekaři upečou ze 2 mouky 4 chleby za 30 sekund aktivní práce s fyzickým doručováním.',
   'object.granary.name':'Sýpka','object.granary.description':'Fyzický sklad pro 200 jednotek jídla. Nosiči obsluhují všechny sklady v království.',
+  'object.house.name':'Dům','object.house.description':'Rodinný dům. Každý dokončený Dům dá místo dalším 5 obyvatelům.',
   'object.warehouse.name':'Sklad','object.warehouse.description':'Fyzický sklad pro 200 jednotek stavebního materiálu. Nosiči obsluhují všechny sklady v království.',
   'object.starter_stockpile.name':'Počáteční skladiště','object.starter_stockpile.description':'Malé počáteční skladiště pro celkem 40 jednotek materiálu a jídla.',
   'object.lumberjack_hut.name':'Dřevorubecká chata','object.lumberjack_hut.description':'Tři dřevorubci si rezervují vzrostlé stromy do 18 políček, fyzicky je pokácí a odnesou dřevo do skladu.',

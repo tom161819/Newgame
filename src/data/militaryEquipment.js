@@ -1,5 +1,5 @@
-// C06 integration contract for military equipment (C07 production, C08 units, Stage 12 Stables). Data only: nothing
-// here is used by the running game yet. See docs/contracts/military-equipment.md.
+// C06 integration contract for military equipment (C07 production, C08 units, Stage 12 Stables). C08 implements the
+// units in data/military.js and MilitarySystem. See docs/contracts/military-equipment.md.
 
 // Equipment slots a unit can fill. weapon/armor already exist on the king (EquipmentSystem); mount holds an animal id,
 // never an inventory item.
@@ -17,16 +17,17 @@ export const MILITARY_ITEMS=Object.freeze({
 // Unit roles C08 recruits from Soldiers. One weapon per role; armor optional unless required; Knights need a mount
 // from real Stables, so they stay locked until Stage 12 builds them.
 export const UNIT_ROLES=Object.freeze({
+  soldier:Object.freeze({profession:'soldier',weapon:'sword',armor:'optional',mount:null}),
   swordsman:Object.freeze({profession:'soldier',weapon:'sword',armor:'optional',mount:null}),
   archer:Object.freeze({profession:'soldier',weapon:'bow',armor:'optional',mount:null}),
   knight:Object.freeze({profession:'soldier',weapon:'sword',armor:'required',mount:'horse',lockedUntil:'stables'}),
 });
 
-// How a physical item moves. Items are stored goods in an Armory until a unit is equipped:
-// a reservation `equipment:<workerId>:<slot>` holds one item in a store, the unit (or a Hauler) carries it, and only
-// then does it leave the stock and fill the slot. Unequip or death puts it back: dropped where the unit stands as a
-// collectible drop, which Haulers return to storage. Saves keep each unit's slots by item id.
-export const EQUIPMENT_FLOW=Object.freeze({reservationKey:'equipment:<workerId>:<slot>',onUnequip:'drop',onDeath:'drop',returnedBy:'hauler',saved:'worker.equipment'});
+// How a physical item moves (implemented by C08, MilitarySystem): a training order makes Haulers carry the unit's
+// items from an Armory into the Barracks kit store (`kit-<barracksId>`); training takes them from there. Discharge or
+// death drops them where the unit stands as collectible drops, which Haulers return to an Armory. Saves keep each
+// unit's slots by item id in `military.units`.
+export const EQUIPMENT_FLOW=Object.freeze({reservationKey:'kit-<barracksId>',onUnequip:'drop',onDeath:'drop',returnedBy:'hauler',saved:'military.units'});
 
 // Horses: only tamed horses kept by Stables can be reserved for a Knight (`horse.reservedBy = workerId`); wild horses
 // stay free for the king to ride and are never assigned.
@@ -35,6 +36,6 @@ export const HORSE_CONTRACT=Object.freeze({animal:'horse',source:'stables',reser
 // Audit (2026-11-05, main 185f9e5): what exists now. Stables, Wheelwright and the Horse Wagon belong to Stage 12.
 export const MILITARY_AUDIT=Object.freeze({
   stables:'not implemented yet (Stage 12)',wheelwright:'not implemented yet (Stage 12)',horse_wagon:'not implemented yet (Stage 12)',
-  iron_bar:'implemented (Smelter)',barracks:'implemented (Soldiers patrol, no equipment)',horse:'implemented (wild; king mount only)',
+  iron_bar:'implemented (Smelter)',barracks:'implemented (C08: trains Soldier, Swordsman and Archer from Armory equipment; Knight locked until Stables)',horse:'implemented (wild; king mount only)',
   equipment:'implemented for the king (weapon and armor slots)',
 });

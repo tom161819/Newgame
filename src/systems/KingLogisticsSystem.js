@@ -10,13 +10,21 @@ export class KingLogisticsSystem {
   receive({resource,amount,event,siteId=null}){
     if(!Number.isSafeInteger(amount)||amount<=0||this.room(resource,siteId)<amount)return false;
     this.cancel();const actor=this.actor;if(actor.cargo)actor.cargo.amount+=amount;else actor.cargo={resource,amount,...(siteId!=null?{siteId}:{})};
-    if(event)actor.pendingWorkRewards.push(event);this.startDelivery();return true;
+    if(event)actor.pendingWorkRewards.push(event);
+    // Free stone belongs to the king until the player explicitly orders delivery.
+    // Site-bound material keeps the existing construction workflow.
+    if(resource==='stone'&&siteId==null){actor.stopForBuilding();this.scene.updateInventory();this.scene.setStatus(t('status.cargoAwaitDelivery'));}else this.startDelivery();return true;
   }
   cancel(){
     const task=this.task;if(task){if(task.stockReservation)this.materials?.returnAllocation(task.stockReservation);this.storage.release(task.capacityReservation);if(task.sourceDropId)this.scene.workerSystem.reservations.release(`drop:${task.sourceDropId}`,'king');this.actor.stopForBuilding();}
     this.task=null;this.workflowSiteId=null;this.nextRetry=0;
   }
   move(task,route){this.task=task;if(!this.actor.command({kind:'move',goal:route.destination,silent:true})){this.cancel();return false;}this.scene.worldCamera?.follow?.();return true;}
+  commandDelivery(){
+    const actor=this.actor;if(!actor.cargo||actor.transitioning||!actor.isAlive||this.scene.gameOver||this.scene.gameTime.paused)return false;
+    this.scene.constructionSystem?.stopKing();actor.stopForBuilding();this.scene.huntingSystem.cancel?.();this.scene.mountSystem.cancel?.();this.scene.treasureSystem.cancelRequest?.();
+    return this.startDelivery();
+  }
   startDelivery(buildingId=null,{resumeSiteId=null}={}){
     const actor=this.actor,cargo=actor.cargo;if(!cargo)return false;this.cancel();this.workflowSiteId=resumeSiteId;
     if(cargo.siteId!=null&&!this.materials?.site(cargo.siteId))delete cargo.siteId;

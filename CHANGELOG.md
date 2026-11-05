@@ -6,6 +6,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Military training in the Barracks panel. Each Soldier working there can be trained as one of four unit types:
+  - Soldier: Sword, 5 Gold, 20 s.
+  - Swordsman: Sword, 12 Gold, 45 s, Combat 3+. Tougher and better armoured.
+  - Archer: Bow, 8 Gold, 30 s. Shoots from 6 tiles, but only with a clear line past trees, walls and rock, and never at unseen game.
+  - Knight: Sword and Armor. Locked until Stables with a tamed Horse exist.
+
+  Haulers carry the exact items from an Armory into the Barracks; training starts only when they have arrived. The panel shows the kits in stock and why a type is blocked. Cancelling refunds the Gold. Discharge or death drops the gear for Haulers to return. Trained units earn a higher wage and defend residents and the king near their Barracks.
+- House (Housing menu, 2×2, 10 Wood and 4 Stone): each completed House raises the resident limit by 5 above the base 20, so migrants keep arriving. Blueprints give no room until they are built; the Residents counter shows the new limit at once.
 - Weapon and armour workshops and the Armory, all under Castle & Defense:
   - Bowyer: 8 Wood make a Bow.
   - Swordsmith: 3 Iron Bars and 2 Wood make a Sword.
@@ -27,6 +35,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Idle Haulers now collect loose stone lying within a set radius of the Castle (default 80 tiles) and carry it to storage. Each Hauler has a Collect loose stone ON/OFF switch and a radius field in the unit panel; real transport jobs always come first. Saved games from earlier versions cannot be loaded and need a new game.
 
 ### Fixed
+- The king waits after collecting loose stone and keeps it in his personal cargo. Use Deliver to storage in the top-left HUD to carry it to a reachable store; changing orders keeps the cargo safe, and full stores never consume it.
 - Idle Haulers also collect loose stone within their chosen radius of reachable Warehouses, Starter Stockpiles and physical construction sites. They work without a Castle, keep real deliveries first, and carry each stone to storage using the existing reservations.
 - Wandering rabbits, deer and wild boars keep one tile away from solid buildings and physical construction sites, including narrow gaps and diagonal corners. Wildlife spawns respect the same margin; animals retreat when a new structure surrounds them. Hunting and the king’s horse keep their existing movement.
 - Ground the king has walked away from no longer stays fully lit when several sight changes happen between two redraws (for example while saving or after a pause); it fades back to the remembered map.

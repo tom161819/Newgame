@@ -1,6 +1,6 @@
 # Military equipment contract (C06)
 
-Status: audited on main `185f9e5`. This contract is what C07 (weapon and armor production) and C08 (units,
+Status: audited on main `185f9e5`; units implemented by C08. This contract is what C07 (weapon and armor production) and C08 (units,
 recruitment, combat) build on, and what Stage 12 (Stables) completes. The machine-readable form is
 `src/data/militaryEquipment.js`; `tests/military-equipment-contract.test.js` keeps both honest.
 
@@ -35,7 +35,8 @@ and Armor (`basic_sword`, `basic_armor`) remain separate equipment; C08 gives un
 
 | Role | From | Weapon | Armor | Mount |
 |---|---|---|---|---|
-| Swordsman | Soldier | `sword` | optional | — |
+| Soldier | Soldier | `sword` | — | — |
+| Swordsman | Soldier | `sword` | — (trained armor bonus) | — |
 | Archer | Soldier | `bow` | optional | — |
 | Knight | Soldier | `sword` | required | Horse from Stables (**locked until Stage 12**) |
 
@@ -44,11 +45,13 @@ One weapon per role. Stat modifiers come from the item definition (`equipment.mo
 
 ## Moving items
 
+Implemented by C08 (`src/data/military.js`, `src/systems/MilitarySystem.js`):
+
 1. C07 workshops put finished items into their output buffer; Haulers carry them to an Armory (physical goods, no teleporting).
-2. Equipping a unit reserves one item in a store: reservation key `equipment:<workerId>:<slot>`.
-3. The unit or a Hauler carries it; only then does it leave the stock and fill the slot.
-4. Unequipping or death drops the item where the unit stands as a collectible drop; Haulers return it to storage.
-5. Saves keep every unit's slots by item id (`worker.equipment`).
+2. A training order in the Barracks panel (paid in Gold) asks for the unit's kit. Haulers carry exactly those items from an Armory to the Barracks kit store `kit-<barracksId>` (10 slots); leftovers go back.
+3. Training takes the kit from that store and runs for the unit's training time while the Soldier is at the Barracks. Cancelling refunds the Gold and puts taken items back.
+4. Discharge or death drops the items where the unit stands as collectible drops; Haulers return them to an Armory.
+5. Saves keep units (`military.units`: type and slots by item id) and orders (`military.orders`); the stat bonuses are worker stat modifiers.
 
 ## Horses (Stage 12)
 
