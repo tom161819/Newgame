@@ -445,3 +445,17 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .employment-row { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:13px; }
 .employment-row select { padding:4px 8px; font:inherit; background:#26321f; color:#ece2c4; border:1px solid #91835b; border-radius:4px; }
 @media(max-width:600px) { .employment-panel { right:16px; left:16px; width:auto; top:72px; } }
+
+/* Right-bottom notices: lasting production and work problems; small, dismissable, filterable by category. */
+.notices-panel { position:fixed; right:16px; bottom:64px; z-index:25; width:min(340px,calc(100vw - 32px)); max-height:40dvh; overflow:auto; padding:10px 12px; border:1px solid #8a7a4f; border-radius:10px; background:rgb(38 43 31 / .94); box-shadow:0 10px 28px rgb(6 9 5 / .5); }
+.notices-heading { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; }
+.notices-heading h2 { margin:0; font-size:13px; }
+.notices-filters { display:flex; gap:4px; }
+.notice-filter { font-size:11px; padding:3px 7px; }
+.notice-filter[aria-pressed="false"] { opacity:.55; text-decoration:line-through; }
+.notices-list { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+.notice { display:flex; gap:6px; align-items:flex-start; border-left:3px solid #d8a54f; background:#2f3626; border-radius:4px; }
+.notice-production { border-left-color:#e08a5a; }
+.notice-text { flex:1; text-align:left; font-size:12px; line-height:1.35; padding:6px 8px; border:0; background:transparent; }
+.notice-dismiss { border:0; background:transparent; padding:6px 8px; font-size:14px; line-height:1; }
+@media(max-width:600px) { .notices-panel { left:16px; right:16px; width:auto; bottom:58px; } }
