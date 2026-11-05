@@ -33,7 +33,8 @@ export function placeWallLine(options){
     const building={...tile,id:id++,type:definition.id,definition,tiles:buildingTiles(tile,definition)};
     if(materials&&!materials.prepare(building)){for(const prepared of created)materials.discardPrepared(prepared);return {...plan,error:t('status.wallNoFunds')};}created.push(building);
   }
-  for(const building of created){map[building.y][building.x]=definition.walkable?0:1;buildings.push(building);}
+  // provisional: segments outside sight claim no tiles until each one is seen (ConstructionSystem.verifyProvisional).
+  for(const building of created){if(options.provisional)building.unverified=true;else map[building.y][building.x]=definition.walkable?0:1;buildings.push(building);}
   return {...plan,buildings:created};
 }
 

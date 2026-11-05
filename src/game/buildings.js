@@ -60,12 +60,14 @@ export function placementError(map,anchor,resources,reservedTiles=[],definition=
   return natural?.mining.accessError(map,definition,anchor)??null;
 }
 
-export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,inventory,buildings,definition=towerDefinition(),reserveMaterials=false}) {
-  const error=placementError(map,anchor,resources,reservedTiles,definition,buildings);
+// provisional: a blueprint outside sight, already validated by knownPlacementError; it claims no map tiles until verified.
+export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,inventory,buildings,definition=towerDefinition(),reserveMaterials=false,provisional=false}) {
+  const error=provisional?null:placementError(map,anchor,resources,reservedTiles,definition,buildings);
   if(error)return {error};
   const construction=inventory.storage?.scene.constructionSystem,materials=reserveMaterials&&construction?.materials.enabled?construction.materials:null;
   const building={id:Math.max(buildings.reduce((n,b)=>Math.max(n,b.id),0)+1,materials?construction.nextId:1),type:definition.id,definition,x:anchor.x,y:anchor.y,tiles:buildingTiles(anchor,definition)};
   if(!(materials?materials.prepare(building):inventory.pay(definition.cost,{source:`${dataName(definition)} Construction`,entityId:building.id})))return {error:t('status.noFunds')};
+  if(provisional){building.unverified=true;buildings.push(building);if(definition.id==='quarry')building.quarryMode='unbound';return {building};}
   for(const tile of building.tiles)map[tile.y][tile.x]=definition.walkable?0:1;
   buildings.push(building);
   if(resources.naturalContext){resources.naturalContext.mining.bind(building);resources.naturalContext.topologyRevision++;}else if(definition.id==='quarry')building.quarryMode=reserveMaterials?'unbound':'legacy';
