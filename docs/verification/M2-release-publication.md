@@ -1,4 +1,14 @@
-# M2 publication checkpoint — verified candidate, public release pending
+# M2 publication checkpoint — RELEASED
+
+## Final result — 2026-11-05
+
+M2 v0.3.0 is **RELEASED** (2026-11-05). Issue47 was finished by Claude at the owner's
+request: PR79 (Codex head 5b094ea + main) merged as d9e91258a15e79b64c774ffe45ff413f47066d72;
+the first tag-aware Pages run 41975989872 succeeded; Verify published release 41976289989
+passed the exact tag v0.3.0 → 02a3a43, frozen notes, 71 deployed archive blobs and the live
+catalog/manifest (SHA-256 4bce4d36cb4ed15aeb0fb956bc5432300d1c2634813d18690cf1d2b4c596f2ac).
+Issue47 is closed as done; only Issue48 (C01) was moved to ready.
+
 
 ## Current Issue47 audit — 2026-11-04
 

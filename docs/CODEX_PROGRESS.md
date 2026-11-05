@@ -1,10 +1,6 @@
 # Follow-up Codex master — C01–C08
 
-Current audit2026-11-04: Issue47 has the actual public v0.3.0 tag and exact-source
-full CI/archive evidence; final tag-aware Pages/public artifact verification is
-still blocked. Do not close47 or unblock48 yet. Earlier partial C01 is preserved
-as WIPdd728a0 on codex/fow-exploration-blueprints, not a complete/ready task.
-[Audit and fallback handoff](verification/issue-47/README.md).
+Current state 2026-11-05: M2 v0.3.0 is **RELEASED** (2026-11-05). Issue47 was finished by Claude at the owner's request: PR79 (Codex head 5b094ea + main) merged as d9e91258a15e79b64c774ffe45ff413f47066d72; the first tag-aware Pages run 41975989872 succeeded; Verify published release 41976289989 passed the exact tag v0.3.0 → 02a3a43, frozen notes, 71 deployed archive blobs and the live catalog/manifest (SHA-256 4bce4d36cb4ed15aeb0fb956bc5432300d1c2634813d18690cf1d2b4c596f2ac). Issue47 is closed as done; only Issue48 (C01) was moved to ready. The parked C01 WIP dd728a0 on codex/fow-exploration-blueprints is preserved for Issue48. [Audit and fallback handoff](verification/issue-47/README.md).
 
 > **Jednotná provozní fronta (2026-11-04):** GitHub Issues jsou nyní zdroj pravdy pro přidělení práce a stavy ready/blocked/review/done. Původní podrobné zadání v tomto souboru a v `docs/requests/CODEX_MASTER.md` zůstává závazné pro věcný rozsah. Neoznačujte níže uvedené PENDING za DONE bez skutečného PR, úspěšného nasazení a relevantního milníku. M2: [#47](https://github.com/tom161819/Newgame/issues/47); C01–C08: [#48](https://github.com/tom161819/Newgame/issues/48), [#49](https://github.com/tom161819/Newgame/issues/49), [#50](https://github.com/tom161819/Newgame/issues/50), [#51](https://github.com/tom161819/Newgame/issues/51), [#52](https://github.com/tom161819/Newgame/issues/52), [#53](https://github.com/tom161819/Newgame/issues/53), [#54](https://github.com/tom161819/Newgame/issues/54), [#55](https://github.com/tom161819/Newgame/issues/55). Master11–15: [#56](https://github.com/tom161819/Newgame/issues/56) až [#60](https://github.com/tom161819/Newgame/issues/60). Aktuálně je ready jen M2; další se odblokují po splnění závislostí. Codex si může brát Issue v běžící relaci, ale Issues jej samy nespouštějí.
 
