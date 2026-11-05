@@ -88,6 +88,7 @@ export class SeasonTransition{
   flush(limit=SEASON_TRANSITION.chunksPerFrame){
     if(!this.pending.size)return 0;
     const tiles=[];for(const [key,tile]of this.pending){if(tiles.length>=limit)break;tiles.push(tile);this.pending.delete(key);}
-    this.terrain?.invalidateChunksOf(tiles);this.redraw?.();return tiles.length;
+    // A paused scene has no later simulation frames to drain the renderer budget.
+    this.terrain?.invalidateChunksOf(tiles,{immediate:limit===Infinity});this.redraw?.();return tiles.length;
   }
 }

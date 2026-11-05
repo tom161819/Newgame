@@ -41,7 +41,7 @@ export class TerrainRenderer {
   setDebug(value){this.debugEnabled=!!value;this.lastView='';if(!value)this.debugGraphics.clear();}
   setSeason(season){if(season===this.season)return;this.season=season;this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
   // Whole chunks, repainted in one pass, give the same pixels as a fresh draw (season transition).
-  invalidateChunksOf(tiles){for(const tile of tiles){const key=`${Math.floor(tile.x/CHUNK_SIZE)},${Math.floor(tile.y/CHUNK_SIZE)}`;this.dirtyTiles.delete(key);this.dirtyChunks.add(key);}if(tiles.length)this.lastView='';}
+  invalidateChunksOf(tiles,{immediate=false}={}){for(const tile of tiles){const key=`${Math.floor(tile.x/CHUNK_SIZE)},${Math.floor(tile.y/CHUNK_SIZE)}`;this.dirtyTiles.delete(key);this.dirtyChunks.add(key);}if(tiles.length){this.lastView='';if(immediate)this.repaintAll=true;}}
   invalidateArea(tiles,neighbors=true,reach=1){
     if(!tiles.length)return;
     const range=neighbors?reach:0;
