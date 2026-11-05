@@ -1,3 +1,5 @@
+import { t } from '../i18n/index.js';
+import { localized } from '../i18n/names.js';
 import Phaser from 'phaser';
 import { COLUMNS, ROWS, PLAYER_START, createMap, isWalkable, tileCenter } from './map.js';
 import { tilePolygon, worldToTile, gridToWorld } from './isometric.js';
@@ -63,7 +65,7 @@ import { ConstructionView } from './ConstructionView.js';
 import { SeasonTransition } from './SeasonTransition.js';
 import { ConstructionUI } from '../ui/ConstructionUI.js';
 import { gameSettings,resourceSpawnSettings } from '../systems/GameSettings.js';
-import { createStartingCastle,createStartingStockpile } from '../systems/WorldGenerationConfig.js';
+import { createStartingCastle,createStartingStockpile,depositStartingResources } from '../systems/WorldGenerationConfig.js';
 import { WildlifeRespawnSystem } from '../systems/WildlifeRespawnSystem.js';
 import { FarmingSystem } from '../systems/FarmingSystem.js';
 import { CropPlotView } from './CropPlotView.js';
@@ -169,7 +171,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.spawner=this.resourceSpawners.find(s=>s.definition.id==='stone');
     this.dropSystem=new DropSystem(this);
-    this.foodStorage=new FoodStorageSystem(this,{physicalMaterials:true});this.kingLogistics=new KingLogisticsSystem(this);
+    this.foodStorage=new FoodStorageSystem(this,{physicalMaterials:true});this.kingLogistics=new KingLogisticsSystem(this);if(!this.loadState)depositStartingResources(this);
     this.animalSystem=new AnimalSystem(this);if(!this.loadState)this.animalSystem.spawn(PLAYER_START);
     this.huntingSystem=new HuntingSystem(this);
     this.combatFeedback=new CombatFeedback(this);
@@ -191,11 +193,11 @@ export class GameScene extends Phaser.Scene {
     this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,unlocks:this.buildingUnlocks,onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
     this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
     this.equipmentPanel=new EquipmentPanel(this);
-    this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=`Poddaní ${count} / ${maximum}`;}});if(!this.loadState)this.workerSystem.spawnInitial();
+    this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=t('hud.population',{count,maximum});}});if(!this.loadState)this.workerSystem.spawnInitial();
     this.workplaceSystem=new WorkplaceSystem(this);this.workplacePanel=new WorkplacePanel(this);
     this.constructionSystem=new ConstructionSystem(this,{onProgress:site=>this.towerViews.get(site.id)?.updateProgress?.(site),
-      onComplete:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(`${buildingDefinition(site).name}: stavba dokončena.`);},
-      onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus('Stavba zrušena. Materiál je vrácen podle její rozpracovanosti.');}});
+      onComplete:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.built',{name:buildingDefinition(site).name}));},
+      onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.siteCancelled'));}});
     this.constructionUI=new ConstructionUI(this);
     this.foodProduction=new FoodProductionSystem(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
     this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);
@@ -207,7 +209,7 @@ export class GameScene extends Phaser.Scene {
     this.wageSystem=new WageSystem(this,{onPayroll:()=>this.updateInventory()});this.economyPanel=new EconomyPanel(this);
     this.buildingBar.close();this.updateInventory();
     this.updateTimeDisplay();
-    this.setStatus('Vyber surovinu, volné políčko, Buildings nebo Asset Library.');
+    this.setStatus(t('status.idle'));
     this.worldCamera=new WorldCamera(this,this.player);this.staffingIndicators=new MissingWorkersIndicators(this);
     this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState){this.naturalResources.generate();this.naturalResources.mining.generate();}
     this.resourceLedger=new ResourceTransactionLedger(this);if(this.loadState)this.resourceLedger.suspend();this.inventoryBar.setLedger(this.resourceLedger);
@@ -272,7 +274,7 @@ export class GameScene extends Phaser.Scene {
     const tooltip=document.querySelector('#object-tooltip');
     const wearInfo=document.querySelector('#path-wear-info');wearInfo.hidden=!this.settingsPanel.settings.pathWearDebug;
     if(!wearInfo.hidden){const tile=this.pointerTile(pointer);if(!this.fog.isVisibleTile(tile)){wearInfo.textContent='Path Wear: outside current sight.';}else{const grass=this.pathWear.isGrass(tile),score=grass?this.pathWear.scores[this.pathWear.index(tile)]:0;
-      const text=grass?`Path Wear (${tile.x}, ${tile.y}): ${score} · Level ${this.pathWear.level(tile)}`:'Path Wear: mimo travnatý povrch';if(wearInfo.textContent!==text)wearInfo.textContent=text;
+      const text=grass?t('status.pathWear',{x:tile.x,y:tile.y,score,level:this.pathWear.level(tile)}):t('status.pathWearNone');if(wearInfo.textContent!==text)wearInfo.textContent=text;
     }}
     if(this.buildMode||document.querySelector('dialog[open]')){tooltip.hidden=true;return;}
     pointer.updateWorldPoint(this.cameras.main);
@@ -329,7 +331,7 @@ export class GameScene extends Phaser.Scene {
       else{
         this.constructionSystem.plan(result.building);
         this.towerViews.set(result.building.id,this.createBuildingView(this.selectedBuilding,result.building));
-        this.updateInventory();this.cancelBuilding(`${this.selectedBuilding.name}: blueprint připraven. Materiál: ${formatCost(this.selectedBuilding.cost,this.objectRegistry)}. Klikni na něj a král může stavět.`);
+        this.updateInventory();this.cancelBuilding(t('status.blueprintReady',{name:this.selectedBuilding.name,cost:formatCost(this.selectedBuilding.cost,this.objectRegistry)}));
       }
       return;
     }
@@ -341,7 +343,7 @@ export class GameScene extends Phaser.Scene {
     if(selected?.kind==='building'&&buildingDefinition(selected.object).crop){this.farmingPanel.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).storage){this.storagePanel.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).workplace){this.workplacePanel.open(selected.object);return;}
-    if(this.character.transitioning){this.setStatus('Počkej, až král dokončí výstup nebo sestup.');return;}
+    if(this.character.transitioning){this.setStatus(t('status.waitClimb'));return;}
     this.constructionSystem.stopKing();
     this.kingLogistics.cancel();
     this.character.order=null;
@@ -370,7 +372,7 @@ export class GameScene extends Phaser.Scene {
         goal=resource.getData('tile');
         if(!definition.walkable)accepted=this.character.command({kind:'collect',resource:object,pickupKey:tileKey(goal)});
         else accepted=this.character.command({kind:'move',goal,pickupKey:tileKey(goal)});
-      }else if(!isWalkable(this.map,goal.x,goal.y))this.setStatus('Tady je překážka nebo okraj mapy. Vyber volné políčko.');
+      }else if(!isWalkable(this.map,goal.x,goal.y))this.setStatus(t('status.obstacle'));
       else accepted=this.character.command({kind:'move',goal,pickupKey:null});
     }
     if(accepted)this.worldCamera.follow();
@@ -407,7 +409,7 @@ export class GameScene extends Phaser.Scene {
   }
   startBuilding(definition=this.objectRegistry.require('tower')) {
     if(this.gameOver||this.gameTime.paused)return false;
-    if(this.character.transitioning){this.setStatus('Nejdřív dokonči výstup nebo sestup z věže.');return false;}
+    if(this.character.transitioning){this.setStatus(t('status.finishClimb'));return false;}
     definition=this.objectRegistry.get(definition.id);if(!definition?.buildable)return false;
     const status=this.buildingUnlocks.status(definition,{live:true});if(!status.unlocked){this.setStatus(status.description);return false;}
     this.kingLogistics?.cancel();
@@ -417,7 +419,7 @@ export class GameScene extends Phaser.Scene {
     this.constructionSystem.stopKing();this.character.stopForBuilding();this.selectedBuilding=definition;
     this.preview.destroy();this.preview=this.createBuildingView(definition,{x:0,y:0},true);this.preview.setVisible(false);
     this.buildMode=true;this.previewKey=null;this.previewAnchor=null;this.previewTracking=false;this.game.canvas.style.cursor='crosshair';
-    this.updateBuildingUI();this.setStatus(`${definition.name}: ${definition.width} × ${definition.height} políčka. Cena: ${formatCost(definition.cost,this.objectRegistry)}. Esc nebo pravý klik stavbu zruší.`);
+    this.updateBuildingUI();this.setStatus(t('status.placing',{name:definition.name,size:t('building.size',{width:definition.width,height:definition.height}),cost:formatCost(definition.cost,this.objectRegistry)}));
     return true;
   }
   cancelBuilding(message='Režim stavění zrušen. Můžeš se znovu pohybovat a sbírat suroviny.') {
@@ -430,11 +432,11 @@ export class GameScene extends Phaser.Scene {
     if(this.buildMode&&anchor&&definition.construction?.mode==='line'){this.updateWallPreview(anchor);return;}
     if(!this.buildMode||!anchor||anchor.x<0||anchor.y<0||anchor.x>=COLUMNS||anchor.y>=ROWS){this.preview.setVisible(false);return;}
     const error=visibilityPlacementError(this.fog,buildingTiles(anchor,definition))??placementError(this.map,anchor,this.resourceOccupancy,this.reservedTiles(),definition,this.buildings,this.buildingUnlocks)
-      ??(!this.inventory.canAfford(definition.cost)?'Na tuto budovu nemáš dostatek surovin.':null);
+      ??(!this.inventory.canAfford(definition.cost)?t('status.noFunds'):null);
     const key=`${tileKey(anchor)}:${error}`;
     if(key!==this.previewKey){
       this.preview.paint({x:anchor.x,y:anchor.y,type:definition.id,definition,tiles:buildingTiles(anchor,definition)},error?0xf27777:0x71dba6);
-      this.previewKey=key;this.setStatus(error??`Platné místo: levým kliknutím postavíš ${definition.name}. Cena: ${formatCost(definition.cost,this.objectRegistry)}.`);
+      this.previewKey=key;this.setStatus(error??t('status.validPlace',{name:definition.name,cost:formatCost(definition.cost,this.objectRegistry)}));
     }
     this.preview.setVisible(true);
   }
@@ -459,7 +461,7 @@ export class GameScene extends Phaser.Scene {
     }
     for(const [id,view]of this.wallPreviews)if(!needed.has(id)){view.destroy();this.wallPreviews.delete(id);}
     this.previewKey=key;
-    this.setStatus(plan.error??`Hradba: ${plan.tiles.length} nových segmentů · ${formatCost(plan.cost,this.objectRegistry)}. Uvolni levé tlačítko pro stavbu.`);
+    this.setStatus(plan.error??t('status.wallPlan',{count:plan.tiles.length,cost:formatCost(plan.cost,this.objectRegistry)}));
   }
   confirmWallLine(pointer){
     if(!this.buildMode||this.selectedBuilding.construction?.mode!=='line'||!this.dragAnchor)return;
@@ -470,7 +472,7 @@ export class GameScene extends Phaser.Scene {
     if(result.error){this.wallLastLine=tiles;this.previewTracking=false;this.previewKey=null;this.updateBuildingPreview();return;}
     for(const building of result.buildings){this.constructionSystem.plan(building);this.towerViews.set(building.id,this.createBuildingView(this.selectedBuilding,building));}
     this.refreshWallConnections();this.updateInventory();
-    this.cancelBuilding(`Blueprinty hradeb: ${result.buildings.length} segmentů. Materiál: ${formatCost(result.cost,this.objectRegistry)}.`);
+    this.cancelBuilding(t('status.wallBlueprints',{count:result.buildings.length,cost:formatCost(result.cost,this.objectRegistry)}));
   }
   refreshWallConnections(){
     this.wallMap=wallIndex(this.buildings);
@@ -488,7 +490,7 @@ export class GameScene extends Phaser.Scene {
     if(!definition.collectible)return false;
     const reachable=definition.walkable?key===tileKey(standingTile):towerNeighbors(object).some(p=>tileKey(p)===tileKey(standingTile));
     if(!reachable)return false;
-    if(actor===this.character&&this.foodStorage.manages(definition.id)&&this.kingLogistics?.room(definition.id)<1){this.setStatus('Cargo is full. Deliver it to storage first.');return false;}
+    if(actor===this.character&&this.foodStorage.manages(definition.id)&&this.kingLogistics?.room(definition.id)<1){this.setStatus(t('status.cargoFull'));return false;}
     view.destroy();this.resources.delete(key);
     for(const tile of object.tiles){this.dropSystem.refreshOccupancy(tile);if(!definition.walkable)this.map[tile.y][tile.x]=0;}
     const event={type:'resourceCollected',objectType:definition.id,quantity:1};
@@ -499,26 +501,32 @@ export class GameScene extends Phaser.Scene {
   }
   collectStone(tile) { return this.collectResource(tileKey(tile),this.character.tile); }
   updateInventory() { this.inventoryBar.update();this.updateBuildingUI();this.updateWorldCount();this.updateFoodDisplay();this.equipmentPanel?.refresh();this.economyPanel?.update(); }
+  // Language switch during play: refresh every HUD text that is built in code.
+  relabelUI(){
+    this.updateTimeDisplay();this.updateFoodDisplay();this.updateWorldCount();this.updateMountUI?.();this.combatFeedback?.refresh();this.experienceFeedback?.refresh();this.workerSystem?.updateUI();this.inventoryBar?.update();this.buildingBar?.selectCategory?.(this.buildingBar.category);if(this.populationSidebar){this.populationSidebar.renderOptions();this.populationSidebar.lastRefresh=-Infinity;}this.updateBuildingUI();
+    if(this.worldCamera?.following)document.querySelector('#camera-mode').textContent=t('hud.cameraKing');
+  }
   updateTimeDisplay(){const output=document.querySelector('#game-time');if(output.textContent!==this.gameTime.label)output.textContent=this.gameTime.label;const seasons=document.querySelector('#season-weather');if(seasons.textContent!==this.seasons.label)seasons.textContent=this.seasons.label;}
   onDailyIncome(day,totals){
-    const labels=new Set(this.buildings.map(b=>buildingDefinition(b).production).filter(p=>p?.interval==='day'&&totals[p.resource]).map(p=>p.label).filter(Boolean));
+    const labels=new Set(this.buildings.map(b=>buildingDefinition(b).production).filter(p=>p?.interval==='day'&&totals[p.resource]).map(p=>localized(`production.${p.resource}`,p.label)).filter(Boolean));
     const details=Object.entries(totals).map(([id,amount])=>`+${amount} ${this.objectRegistry.require(id).name}`).join(' · ');
-    const notice=document.querySelector('#day-notice');notice.textContent=`Day ${day} – ${[...labels].join(', ')||'Income'}: ${details}`;
+    const notice=document.querySelector('#day-notice');notice.textContent=t('hud.dayNotice',{day,labels:[...labels].join(', ')||t('hud.income'),details});
     notice.hidden=false;this.noticeRemaining=4000;this.updateInventory();
   }
   updateFoodDisplay(){
-    const text=`Food: ${this.foodSystem.dailyConsumption} portions/day`;
+    const text=t('hud.food',{count:this.foodSystem.dailyConsumption});
     const output=document.querySelector('#food-countdown');if(output.textContent!==text)output.textContent=text;
-    const warning=document.querySelector('#food-warning');warning.hidden=!this.foodSystem.shortage;warning.textContent=`Food shortage · ${this.foodSystem.hungryCount} unfed`;
+    const warning=document.querySelector('#food-warning');warning.hidden=!this.foodSystem.shortage;warning.textContent=t('hud.foodShortage',{count:this.foodSystem.hungryCount});
   }
   updateBuildingUI() { this.buildingBar.update(this.inventory,this.buildMode?this.selectedBuilding:null); }
   updateWorldCount() {
     const capacity=resourceSpawnSettings(this.objectRegistry.require('stone'),this.gameSettings).max;
     const count=this.fog?.enabled?[...this.mapMemory.objects.values()].filter(entry=>entry.kind==='resource'&&entry.type==='stone').length:this.resourceCount('stone');
-    const text=`Mapa ${COLUMNS} × ${ROWS} · ${this.fog?.enabled?'známé kameny':'kameny'} ${count}${this.fog?.enabled?'':` / ${capacity}`}`;
+    const text=this.fog?.enabled?t('hud.worldKnownStones',{columns:COLUMNS,rows:ROWS,count}):t('hud.worldStones',{columns:COLUMNS,rows:ROWS,count,capacity});
     const output=document.querySelector('#world-stones');if(output.textContent!==text)output.textContent=text;
   }
-  setStatus(message) { document.querySelector('#status').textContent=message; }
+  // The fog module's shared English sight message is translated here, at display.
+  setStatus(message) { document.querySelector('#status').textContent=message===OUTSIDE_SIGHT?t('status.outsideSight'):message; }
   onUnitDeath(unit,killer=null){
     if(unit===this.character){this.finishGame();return;}
     if(this.workerSystem.workers.has(unit.id)){this.workerSystem.onDeath(unit);return;}
@@ -528,11 +536,11 @@ export class GameScene extends Phaser.Scene {
     const drop=amount>0?this.dropSystem.create('meat',tile,amount):null;this.workerSystem.ai.animalDied(unit,killer,drop);
     if(amount>0)this.foodSystem.recordProduction('meat',amount,`meat-${unit.id}`);
     if(this.huntingSystem.target===unit)this.huntingSystem.cancel();
-    if(amount>0)this.setStatus(`${unit.definition.name} uloveno. Na zemi je Meat ×${amount}; seber ho kliknutím.`);
+    if(amount>0)this.setStatus(t('status.hunted',{name:unit.definition.name,meat:this.objectRegistry.require('meat').name,count:amount}));
   }
   finishGame(){
     if(this.gameOver)return;
-    this.gameOver=true;this.gameTime.setPaused(true);this.huntingSystem.cancel();this.mountSystem.cancel();this.treasureSystem.cancelRequest();this.cancelBuilding('Král padl.');
+    this.gameOver=true;this.gameTime.setPaused(true);this.huntingSystem.cancel();this.mountSystem.cancel();this.treasureSystem.cancelRequest();this.cancelBuilding(t('status.kingFell'));
     this.character.stopForBuilding();this.character.nextTile=null;this.character.walking=false;this.character.state=PLAYER_STATE.DEAD;
     for(const attacker of [...this.combat.attacks.keys()])this.combat.stopAttack(attacker);
     this.assetGallery.close();this.equipmentPanel.close();this.treasurePanel.close();this.settingsPanel.setOpen(false);this.input.enabled=false;this.input.keyboard.enabled=false;
@@ -543,7 +551,7 @@ export class GameScene extends Phaser.Scene {
   }
   updateMountUI(){
     document.querySelector('#dismount').hidden=!this.character.mountedHorse;
-    const text=this.fog.enabled?`Dohled: ${this.fog.radius} polí · kruh`:'Fog of War: OFF';
+    const text=this.fog.enabled?t('hud.sight',{count:this.fog.radius}):t('hud.fogOff');
     const output=document.querySelector('#vision-status');if(output.textContent!==text)output.textContent=text;
   }
   update(_time,delta) {
@@ -553,6 +561,8 @@ export class GameScene extends Phaser.Scene {
     const raw=this.game.loop.rawDelta;
     delta=this.activeFramePending?0:Number.isFinite(raw)?Math.max(0,raw):Math.max(0,delta);
     this.activeFramePending=false;
+    // Autosave counts only these active, visible, unpaused milliseconds.
+    this.registry.get('application')?.autosave?.update(delta);
     // První snímek po Load/Resume pouze obnoví obraz. Nulový čas nesmí
     // změnit uloženou animaci, rozpracovanou AI ani příkazy jednotek.
     if(!delta){this.refreshVisibility();return;}

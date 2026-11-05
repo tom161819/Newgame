@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { TREE_STAGES } from '../data/naturalResources.js';
 export class NaturalResourcePanel {
   constructor(scene){
@@ -9,7 +10,7 @@ export class NaturalResourcePanel {
   refresh(){
     if(!this.dialog.open)return;const object=this.object;if(!object||!this.scene.fog.isVisibleObject(object)){this.close();return;}
     const state=object.natural,button=document.querySelector('#chop-tree');document.querySelector('#natural-resource-title').textContent=object.definition.name;button.hidden=!object.definition.tree;
-    document.querySelector('#natural-resource-info').textContent=object.definition.tree?`${TREE_STAGES[state.stage]} · ${object.definition.tree.wood} Wood · ${object.definition.tree.chopDuration/1000} seconds of active work · Woodcutting XP ${object.definition.tree.xp}`:`${state.remaining} / ${state.max} ${this.scene.objectRegistry.require(object.definition.deposit.resource).name} · ${state.remaining===0?'Deposit Depleted':state.boundBuildingId!=null?'Assigned to a mining building':'Available for a mining building'} · No respawn`;
+    document.querySelector('#natural-resource-info').textContent=object.definition.tree?t('tree.info',{stage:t(`tree.stage.${state.stage}`),wood:object.definition.tree.wood,seconds:object.definition.tree.chopDuration/1000,xp:object.definition.tree.xp}):t('deposit.info',{remaining:state.remaining,max:state.max,resource:this.scene.objectRegistry.require(object.definition.deposit.resource).name,state:t(state.remaining===0?'deposit.depleted':state.boundBuildingId!=null?'deposit.assigned':'deposit.available')});
     button.disabled=state.stage!==3;
   }
   restore(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}

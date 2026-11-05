@@ -1,3 +1,6 @@
+import { i18nSmoke,i18nGameSmoke } from './i18n-smoke.mjs';
+import { autosaveSmoke } from './autosave-smoke.mjs';
+import { saveTransferSmoke } from './save-transfer-smoke.mjs';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { createReadStream } from 'node:fs';
@@ -75,6 +78,7 @@ try{
   console.log(`PASS main-menu archive, ${catalog.versions.length} milestones / ${catalog.builds.length} actual snapshots, linked collapsible changelog, mobile`);
   }
 
+  if(args.includes('--full')||args.includes('--i18n'))await i18nSmoke(page);
   await page.locator('#new-game').click();await page.locator('.setup-advanced summary').click();await page.locator('#setup-fog').uncheck();await page.locator('#setup-respawn').selectOption('off');
   if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full'))await page.locator('#setup-seasons').uncheck();}
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
@@ -88,6 +92,9 @@ try{
   if(args.includes('--full')||args.includes('--population')){await populationSidebarSmoke(page);await populationNavigationSmoke(page);await populationIntegrationSmoke(page);}
   if(args.includes('--full')||args.includes('--staffing'))await staffingIndicatorsSmoke(page);
   if(args.includes('--full')||args.includes('--fog')){await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);await hiddenInteractionSmoke(page);}
+  if(args.includes('--full')||args.includes('--i18n'))await i18nGameSmoke(page);
+  if(args.includes('--full')||args.includes('--save-transfer'))await saveTransferSmoke(page);
+  if(args.includes('--full')||args.includes('--autosave'))await autosaveSmoke(page);
   if(args.includes('--full'))await seasonsMenuSmoke(page);
   if(args.includes('--full')||args.includes('--season-transition'))await seasonTransitionSmoke(page);
   await buildingMenuSmoke(page);
@@ -144,6 +151,16 @@ try{
   assert.equal(await page.evaluate(id=>window.__game.registry.get('application').saves.get(id).then(r=>!!r),stored.id),true,'starting a new game never deletes the old save');
   await page.evaluate(id=>window.__game.registry.get('application').saves.delete(id),stored.id);
   console.log(`PASS actual historical schema ${isolated.schema} save is reported as incompatible with schema ${record.saveVersion}; the world and the stored slot stay unchanged and New Game is offered`);
+  // N04: starting resources on the restarted New Game screen go into the Starter Stockpile once, capped at its 40 units.
+  {const set=(name,value)=>page.locator(`#game-setup-form [name="${name}"]`).evaluate((e,v)=>{e.value=String(v);e.dispatchEvent(new Event('input',{bubbles:true}));},value);
+  await page.locator('.setup-advanced summary').click();assert.equal(await page.locator('#setup-resources-total').textContent(),'0 / 40');
+  await set('startingStone',25);await set('startingWood',25);assert.equal(await page.locator('#setup-start-wood').inputValue(),'15','the slider stops at the remaining room');assert.equal(await page.locator('#setup-resources-total').textContent(),'40 / 40');
+  assert.match(await page.locator('#setup-summary').textContent(),/Stockpile: 25 stone, 15 wood/);
+  await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'setup fits a phone');await page.setViewportSize({width:1440,height:1000});
+  await page.locator('#start-game').click();await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
+  const start=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,starter=s.buildings.find(b=>b.type==='starter_stockpile');return {stock:s.foodStorage.locations.get(`stockpile-${starter.id}`).stock,loose:s.resourceCount('stone'),initial:s.gameSettings.initialStoneCount,stone:s.inventory.count('stone'),settings:window.__game.registry.get('application').snapshot().gameSettings};});
+  assert.deepEqual(start.stock,{stone:25,wood:15});assert.equal(start.stone,25);assert.equal(start.loose,start.initial,'loose map stones follow Initial Stones only');assert.equal(start.settings.startingWood,15);
+  console.log(`PASS New Game starting resources: capped 40-unit Starter Stockpile, 25 Stone + 15 Wood deposited once, ${start.loose} loose map stones kept separate, phone-width setup`);}
   const archivePage=await context.newPage();await instrument(archivePage);await archivePage.goto(origin+base+'versions/');assert.equal(await archivePage.locator('[data-version-label]').count(),catalog.versions.length+(catalog.versions.some(v=>v.current)?0:1));
   await archivePage.setViewportSize({width:390,height:844});assert.equal(await archivePage.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   const first=catalog.builds.at(-1);await archivePage.goto(origin+first.archiveURL);await archivePage.locator('canvas').waitFor();

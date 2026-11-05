@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { carryCapacity } from '../data/logistics.js';
 
 export class KingLogisticsSystem {
@@ -21,10 +22,10 @@ export class KingLogisticsSystem {
     if(cargo.siteId!=null&&!this.materials?.site(cargo.siteId))delete cargo.siteId;
     if(cargo.siteId!=null&&buildingId==null)return this.startSiteDeposit(cargo.siteId);
     const route=buildingId==null?this.storage.findDestination(actor,cargo.resource,cargo.amount,{partial:true}):this.storage.route(actor,[...this.storage.locations.values()].filter(l=>l.buildingId===buildingId&&this.storage.isStock(l)&&l.allowed.includes(cargo.resource)&&this.storage.room(l.id)>0));
-    if(!route){this.scene.setStatus('Cargo is preserved. No reachable storage has free capacity.');return false;}
+    if(!route){this.scene.setStatus(t('status.cargoNoStorage'));return false;}
     const amount=Math.min(cargo.amount,this.storage.room(route.location.id)),id=`king-transfer-${this.nextId++}`,capacityReservation=this.storage.reserve('capacity',route.location.id,cargo.resource,amount,id);if(!capacityReservation)return false;
     const task={id,kind:'deposit',destinationId:route.location.id,resource:cargo.resource,amount,capacityReservation,goal:{...route.destination},retryAt:0,...(cargo.siteId!=null?{siteId:cargo.siteId}:{})};
-    if(!this.move(task,route))return false;this.scene.setStatus(`King carrying ${cargo.amount} ${cargo.resource} to storage.`);return true;
+    if(!this.move(task,route))return false;this.scene.setStatus(t('status.kingCarrying',{count:cargo.amount,resource:this.scene.objectRegistry.require(cargo.resource).name}));return true;
   }
   startSiteDeposit(siteId){
     const cargo=this.actor.cargo,location=this.storage.locations.get(`site-${siteId}`);if(!cargo||cargo.siteId!==siteId||!location)return false;
@@ -59,7 +60,7 @@ export class KingLogisticsSystem {
     }
     if(this.materials.ready(site)){
       this.workflowSiteId=null;if(this.buildAfter){this.buildAfter=false;return this.scene.constructionSystem.commandKing(site);}
-      this.scene.setStatus('Materials delivered. Use Build with King to begin construction.');return true;
+      this.scene.setStatus(t('status.materialsDelivered'));return true;
     }
     const choices=this.materials.candidates(site.id).sort((a,b)=>{
       const position=t=>t.sourceDropId?this.scene.dropSystem.drops.get(t.sourceDropId)?.tile:this.storage.locations.get(t.sourceId),distance=t=>{const p=position(t);return p?Math.hypot(actor.position.x-p.x,actor.position.y-p.y):Infinity;};return distance(a)-distance(b);
@@ -76,7 +77,7 @@ export class KingLogisticsSystem {
       if(!drop&&!stockReservation){this.storage.release(capacityReservation);continue;}
       return this.move({id,kind:'stockPickup',siteId:site.id,sourceId:choice.sourceId??null,sourceDropId:drop?.id??null,destinationId:destination.id,resource:choice.resource,amount,stockReservation,capacityReservation,goal:{...route.destination},retryAt:0},route);
     }
-    this.scene.setStatus('Waiting for reachable construction supplies. Reserved and carried materials are preserved.');return false;
+    this.scene.setStatus(t('status.waitSupplies'));return false;
   }
   dropCargo({keepWorkflow=false}={}){
     const actor=this.actor,cargo=actor.cargo;if(!cargo||actor.state!=='ground'||actor.nextTile||this.scene.map[actor.tile.y]?.[actor.tile.x]!==0)return false;
@@ -101,7 +102,7 @@ export class KingLogisticsSystem {
     }
     if(task.kind==='withdraw'){
       const cargo=this.storage.take(task.stockReservation);if(!cargo){this.cancel();return;}
-      actor.cargo={...cargo,transportCancelled:true};actor.pendingWorkRewards=[];this.task=null;this.scene.updateInventory();this.scene.setStatus('Cargo collected. Deliver it elsewhere or set it down on free ground.');return;
+      actor.cargo={...cargo,transportCancelled:true};actor.pendingWorkRewards=[];this.task=null;this.scene.updateInventory();this.scene.setStatus(t('status.cargoCollected'));return;
     }
     if(task.kind==='stockPickup'){
       const destination=this.storage.locations.get(task.destinationId),route=destination&&this.storage.route(actor,[destination]);if(!route)return;
@@ -116,7 +117,7 @@ export class KingLogisticsSystem {
     actor.cargo.amount-=task.amount;this.task=null;
     if(!actor.cargo.amount){actor.cargo=null;const events=actor.pendingWorkRewards;actor.pendingWorkRewards=[];for(const event of events){const{type,...data}=event;this.scene.activities.emit(type,{...data,actor});}}
     this.scene.updateInventory();if(this.workflowSiteId!=null){this.nextRetry=0;return;}
-    if(actor.cargo)this.startDelivery();else this.scene.setStatus(location.kind==='site'?'Construction materials delivered.':'Cargo delivered to storage.');
+    if(actor.cargo)this.startDelivery();else this.scene.setStatus(location.kind==='site'?t('status.constructionDelivered'):t('status.cargoDelivered'));
   }
   exportState(){return{nextId:this.nextId,task:structuredClone(this.task),workflowSiteId:this.workflowSiteId,buildAfter:this.workflowSiteId!=null&&!!this.buildAfter,nextRetry:this.nextRetry};}
   importState(data){this.nextId=data?.nextId??1;this.task=structuredClone(data?.task??null);this.workflowSiteId=data?.workflowSiteId??null;this.buildAfter=data?.buildAfter===true;this.nextRetry=data?.nextRetry??0;if(this.task?.kind==='stockPickup'&&this.task.sourceDropId)this.scene.workerSystem.reservations.reserve(`drop:${this.task.sourceDropId}`,'king');}

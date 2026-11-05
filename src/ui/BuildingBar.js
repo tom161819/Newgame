@@ -1,3 +1,5 @@
+import { localized } from '../i18n/names.js';
+import { t } from '../i18n/index.js';
 import { element,formatCost,missingCost } from './objectLabels.js';
 import { BUILDING_CATEGORIES,buildingsInCategory } from '../data/buildingCategories.js';
 
@@ -18,7 +20,7 @@ export class BuildingBar {
     this.render();
   }
   render() {
-    const categories={all:{name:'All',icon:'☷'},...BUILDING_CATEGORIES};
+    const categories={all:{name:t('buildingCategory.all'),icon:'☷'},...Object.fromEntries(Object.entries(BUILDING_CATEGORIES).map(([id,c])=>[id,{...c,name:localized(`buildingCategory.${id}`,c.name)}]))};
     this.categories.replaceChildren(...Object.entries(categories).map(([id,{name,icon}])=>{const button=element('button','building-category',`${icon} ${name}`);button.type='button';button.dataset.buildingCategory=id;button.setAttribute('aria-pressed',String(this.category===id));return button;}));
     this.choices=new Map();
     const cards=buildingsInCategory(this.registry,this.category).map(definition=>{
@@ -26,14 +28,14 @@ export class BuildingBar {
       button.type='button';button.id=`${definition.id}-choice`;button.dataset.buildingId=definition.id;
       button.setAttribute('aria-pressed','false');button.setAttribute('aria-describedby',`${definition.id}-description ${definition.id}-availability`);
       const image=element('img','tower-icon');image.src=this.assets.previewURL(definition);image.alt='';
-      const names=element('span','building-name');names.append(element('strong','',definition.name),element('small','',`${definition.width} × ${definition.height} políčka`));
+      const names=element('span','building-name');names.append(element('strong','',definition.name),element('small','',t('building.size',{width:definition.width,height:definition.height})));
       button.append(image,names,element('span','building-price',formatCost(definition.cost,this.registry)));
       const description=element('p','',definition.description);description.id=`${definition.id}-description`;
       const availability=element('p','building-availability');availability.id=`${definition.id}-availability`;availability.setAttribute('role','status');
       const lock=element('span','building-lock');button.append(lock);
       card.append(button,description,availability);this.choices.set(definition.id,{button,availability,definition,card,lock});return card;
     });
-    this.list.replaceChildren(...(cards.length?cards:[element('p','building-empty','No registered buildings in this category yet.')]));this.choice=this.choices.get('tower')?.button;
+    this.list.replaceChildren(...(cards.length?cards:[element('p','building-empty',t('building.empty'))]));this.choice=this.choices.get('tower')?.button;
     if(this.inventory)this.update(this.inventory,this.selected);
   }
   selectCategory(category){
@@ -48,7 +50,7 @@ export class BuildingBar {
     this.inventory=inventory;this.selected=selected;
     for(const {button,availability,definition,card,lock}of this.choices.values()){
       const status=this.unlocks?.status(definition)??{unlocked:true};
-      button.disabled=!status.unlocked;card.classList.toggle('building-locked',!status.unlocked);lock.textContent=status.unlocked?'':'🔒 Locked';
+      button.disabled=!status.unlocked;card.classList.toggle('building-locked',!status.unlocked);lock.textContent=status.unlocked?'':`🔒 ${t('building.locked')}`;
       card.title=status.unlocked?definition.description:status.description;
       availability.textContent=status.unlocked?missingCost(definition.cost,inventory,this.registry):status.description;
       availability.classList.toggle('shortage',!status.unlocked||!inventory.canAfford(definition.cost));

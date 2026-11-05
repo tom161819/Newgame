@@ -1,3 +1,5 @@
+import { localized,workMessageLabel } from '../i18n/names.js';
+import { t } from '../i18n/index.js';
 import { buildingDefinition } from '../game/buildings.js';
 import { JOBS,SKILLS } from '../data/jobs.js';
 import { TALENTS } from '../data/economy.js';
@@ -28,28 +30,28 @@ export class WorkplacePanel {
     const forestry=spec.id==='lumberjack_hut'?s.naturalResources.forestry.summary(b):null;this.forestryDetails.hidden=!forestry;
     const mining=spec.mining?s.naturalResources?.mining.summary(b):null;this.miningDetails.hidden=!mining;this.miningDetails.textContent=mining??'';
     const signature=JSON.stringify([summary,production,forestry,mining,production?s.foodStorage.revision:0,employees.map(w=>[w.id,w.workState,w.workMessage,w.skills[spec.workplace.skill].level]),candidates.map(w=>[w.id,w.profession,w.naturalTalent,w.skills[spec.workplace.skill].level])]);if(signature===this.signature)return;this.signature=signature;
-    if(forestry){this.forestryTrees.textContent=`${forestry.known?'Known mature':'Mature'} trees in working radius: ${forestry.trees}`;this.forestryTotal.textContent=`Timber cut: ${forestry.harvested} Wood`;this.forestryToday.textContent=`Wood production today: ${forestry.today}`;}
+    if(forestry){this.forestryTrees.textContent=t(forestry.known?'workplace.knownTrees':'workplace.trees',{count:forestry.trees});this.forestryTotal.textContent=t('workplace.timber',{count:forestry.harvested});this.forestryToday.textContent=t('workplace.woodToday',{count:forestry.today});}
     const recipePanel=document.querySelector('#food-production-details');recipePanel.hidden=!production;
     if(production){
       const format=items=>Object.entries(items).map(([id,n])=>`${n} ${s.objectRegistry.require(id).name}`).join(' + '),cycle=production.cycle;
-      document.querySelector('#food-production-recipe').textContent=`${format(spec.recipe.input)} → ${format(spec.recipe.output)} · ${spec.recipe.duration/1000} seconds of active work`;
-      document.querySelector('#food-production-status').textContent=`${!production.auto?'Paused':cycle?'Producing':employees[0]?.workMessage||'Waiting for Worker'} · ${production.completed} batches completed`;
+      document.querySelector('#food-production-recipe').textContent=t('workplace.recipe',{input:format(spec.recipe.input),output:format(spec.recipe.output),seconds:spec.recipe.duration/1000});
+      document.querySelector('#food-production-status').textContent=t('workplace.status',{state:!production.auto?t('workplace.paused'):cycle?t('workplace.producing'):employees[0]?.workMessage?workMessageLabel(employees[0].workMessage):t('workplace.waitingWorker'),count:production.completed});
       document.querySelector('#food-production-progress').value=cycle?.progress??0;
       const input=s.foodStorage.locations.get(`input-${b.id}`),output=s.foodStorage.locations.get(`output-${b.id}`);
-      document.querySelector('#food-production-buffers').textContent=`Input: ${format(input.stock)||'empty'} · Output: ${format(output.stock)||'empty'}`;
-      document.querySelector('#food-production-missing').textContent=cycle?`Current batch: ${format(cycle.inputs)}`:`Missing: ${format(Object.fromEntries(Object.entries(spec.recipe.input).map(([id,n])=>[id,Math.max(0,n-(input.stock[id]??0))])))}`;
-      const toggle=document.querySelector('#toggle-food-production');toggle.textContent=`Auto Production: ${production.auto?'ON':'OFF'}`;toggle.setAttribute('aria-pressed',String(production.auto));
+      document.querySelector('#food-production-buffers').textContent=t('workplace.buffers',{input:format(input.stock)||t('transport.empty'),output:format(output.stock)||t('transport.empty')});
+      document.querySelector('#food-production-missing').textContent=cycle?t('workplace.batch',{list:format(cycle.inputs)}):t('workplace.missing',{list:format(Object.fromEntries(Object.entries(spec.recipe.input).map(([id,n])=>[id,Math.max(0,n-(input.stock[id]??0))])))});
+      const toggle=document.querySelector('#toggle-food-production');toggle.textContent=t('workplace.auto',{state:t(production.auto?'state.on':'state.off')});toggle.setAttribute('aria-pressed',String(production.auto));
     }
     document.querySelector('#workplace-name').textContent=spec.name;const image=document.querySelector('#workplace-image');image.src=s.assets.previewURL(spec);image.alt=spec.name;
-    document.querySelector('#workplace-count').textContent=`Workers: ${summary.count} / ${summary.capacity}`;
-    document.querySelector('#workplace-wages').textContent=`Worker Wages: ${summary.wages.toFixed(2)} Gold/day`;
-    document.querySelector('#workplace-average').textContent=`Average ${SKILLS[spec.workplace.skill]}: ${summary.averageSkill.toFixed(2)}`;
-    document.querySelector('#workplace-production').textContent=`Delivered: ${Object.entries(summary.delivered).map(([id,n])=>`${s.objectRegistry.require(id).name} ${n}`).join(' · ')||'0'}`;
-    const rows=employees.map(w=>{const row=element('li','workplace-worker'),text=element('span','',`${w.name} · ${SKILLS[spec.workplace.skill]} Lv. ${w.skills[spec.workplace.skill].level} · ${w.workState}${w.workMessage?` — ${w.workMessage}`:''}`),remove=element('button','','Remove Worker');remove.type='button';remove.dataset.removeWorker=w.id;row.append(text,remove);return row;});
-    for(let i=summary.count;i<summary.capacity;i++)rows.push(element('li','empty-slot','Empty Slot'));document.querySelector('#workplace-workers').replaceChildren(...rows);
+    document.querySelector('#workplace-count').textContent=t('workplace.workers',{count:summary.count,capacity:summary.capacity});
+    document.querySelector('#workplace-wages').textContent=t('workplace.wages',{amount:summary.wages.toFixed(2)});
+    document.querySelector('#workplace-average').textContent=t('workplace.average',{skill:SKILLS[spec.workplace.skill],value:summary.averageSkill.toFixed(2)});
+    document.querySelector('#workplace-production').textContent=t('workplace.delivered',{list:Object.entries(summary.delivered).map(([id,n])=>`${s.objectRegistry.require(id).name} ${n}`).join(' · ')||'0'});
+    const rows=employees.map(w=>{const row=element('li','workplace-worker'),text=element('span','',`${w.name} · ${t('workplace.skillLevel',{skill:SKILLS[spec.workplace.skill],level:w.skills[spec.workplace.skill].level})} · ${localized(`work.state.${w.workState}`,w.workState)}${w.workMessage?` — ${workMessageLabel(w.workMessage)}`:''}`),remove=element('button','',t('workplace.remove'));remove.type='button';remove.dataset.removeWorker=w.id;row.append(text,remove);return row;});
+    for(let i=summary.count;i<summary.capacity;i++)rows.push(element('li','empty-slot',t('workplace.emptySlot')));document.querySelector('#workplace-workers').replaceChildren(...rows);
     document.querySelector('#assign-workplace-worker').disabled=summary.count>=summary.capacity;
-    document.querySelector('#workplace-candidates').replaceChildren(...candidates.map(w=>{const row=element('li','workplace-worker'),button=element('button','','Assign');button.type='button';button.dataset.assignWorker=w.id;button.disabled=summary.count>=summary.capacity;
-      row.append(element('span','',`${w.name} · ${JOBS[w.profession].name} · ${SKILLS[spec.workplace.skill]} Lv. ${w.skills[spec.workplace.skill].level} · ${TALENTS[w.naturalTalent]} · ${s.workplaceSystem.predictedWage(w,spec.workplace.profession).toFixed(2)} Gold/day`),button);return row;}));
+    document.querySelector('#workplace-candidates').replaceChildren(...candidates.map(w=>{const row=element('li','workplace-worker'),button=element('button','',t('workplace.assignOne'));button.type='button';button.dataset.assignWorker=w.id;button.disabled=summary.count>=summary.capacity;
+      row.append(element('span','',`${w.name} · ${JOBS[w.profession].name} · ${t('workplace.skillLevel',{skill:SKILLS[spec.workplace.skill],level:w.skills[spec.workplace.skill].level})} · ${localized(`talent.${w.naturalTalent}`,TALENTS[w.naturalTalent])} · ${t('unit.wage',{amount:s.workplaceSystem.predictedWage(w,spec.workplace.profession).toFixed(2)})}`),button);return row;}));
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){this.dialog.close();this.restoreInput();}

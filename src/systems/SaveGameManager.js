@@ -23,9 +23,10 @@ export class SaveGameManager {
   async list(){return (await this.transaction('readonly',store=>store.getAll())).sort((a,b)=>String(b.updatedAt??'').localeCompare(String(a.updatedAt??'')));}
   get(id){return this.transaction('readonly',store=>store.get(id));}
   delete(id){return this.transaction('readwrite',store=>store.delete(id));}
-  async save({id=null,name,state}){
+  // create: an imported file keeps its own slot id, so importing it again asks before replacing.
+  async save({id=null,name,state,create=false}){
     const now=new Date().toISOString(),previous=id?await this.get(id):null;
-    if(id&&!previous)throw new Error('Uložená pozice již neexistuje.');
+    if(id&&!previous&&!create)throw new Error('Uložená pozice již neexistuje.');
     const record={id:id??globalThis.crypto.randomUUID(),name:String(name).trim().slice(0,80)||'Království',
       createdAt:previous?.createdAt??now,updatedAt:now,day:state.time.day,playTime:state.time.totalElapsed,saveVersion:state.saveVersion,state};
     // Jediný atomický put. Při selhání transakce zůstane předchozí záznam platný.

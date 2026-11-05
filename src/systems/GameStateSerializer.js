@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { objectRegistry } from './ObjectRegistry.js';
 import { COLUMNS,ROWS } from '../game/config.js';
 import { wearLevel } from '../data/pathWear.js';
@@ -12,7 +13,7 @@ import { TALENTS } from '../data/economy.js';
 import { validateFoodState } from './FoodStateValidation.js';
 import { validateSeasonFoodState } from './SeasonFoodStateValidation.js';
 import { seasonalCropStage } from '../data/seasons.js';
-import { carryCapacity } from '../data/logistics.js';
+import { carryCapacity,IDLE_STONE } from '../data/logistics.js';
 import { repairTransportInstructions } from './TransportStateMigration.js';
 import { captureMapKnowledge } from '../game/mapMemoryObjects.js';
 import { validateMapMemory } from './MapMemoryValidation.js';
@@ -21,7 +22,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=15;
+export const SAVE_VERSION=17;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -60,7 +61,7 @@ export function serializeGameState(scene){
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
     ...(scene.workerSystem?{population:scene.workerSystem.exportState(),workers:[...scene.workerSystem.workers.values()].map(w=>({...serializeActor(w),name:w.name,profession:w.profession,isSubject:w.isSubject!==false,diedAt:w.diedAt??null,
       ...(w.naturalTalent?{naturalTalent:w.naturalTalent,initialSkills:copy(w.initialSkills)}:{}),
-      workplaceReached:w.workplaceReached,cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
+      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),workplaceReached:w.workplaceReached,cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
       workState:w.workState,workMessage:w.workMessage??'',workTask:copy(w.workTask),assignedWorkplaceId:w.assignedWorkplaceId,arriving:w.arriving,aiCooldown:w.aiCooldown}))}:{}),
     ...(scene.pathWear?{pathWear:scene.pathWear.exportState()}:{}),
     player:{...serializeActor(c),state:c.state,currentTowerId:c.currentTower?.id??null,horseId:c.mountedHorse?.id??null,
@@ -102,7 +103,7 @@ export function saveSchemaStatus(input){
 // Validace proběhne ještě před zastavením právě běžící scény. Poškozený save
 // proto nemění současný svět ani záznam v IndexedDB.
 export function validateGameState(input,registry=objectRegistry){
-  const fail=()=>{throw new Error('Uložená hra je poškozená nebo má nepodporovanou verzi.');};
+  const fail=()=>{throw new Error(t('saves.corrupt'));};
   const check=value=>{if(!value)fail();};
   const number=(n,min=0,max=Number.MAX_SAFE_INTEGER)=>check(Number.isFinite(n)&&n>=min&&n<=max);
   const integer=(n,min=0,max=Number.MAX_SAFE_INTEGER)=>{number(n,min,max);check(Number.isInteger(n));};
@@ -217,13 +218,14 @@ export function validateGameState(input,registry=objectRegistry){
       const match=String(w.id).match(/^worker-(\d+)$/);check(match&&Number(match[1])>0&&Number(match[1])<s.population.nextId);
       check(typeof w.arriving==='boolean');number(w.aiCooldown,-1e9,1e9);number(w.wanderWait,-1e9,1e9);check(w.assignedWorkplaceId==null||bIds.has(w.assignedWorkplaceId));
       check(['Idle','Searching for Work','Moving to Target','Working','Returning','Waiting','Fleeing','Recovering','Arriving','Dead','Going to Workplace','Searching for Target','Traveling to Target','Returning to Workplace','Patrolling'].includes(w.workState));
-      check(typeof w.workMessage==='string'&&w.workMessage.length<200);if(!w.isAlive)check(w.workState==='Dead'&&!w.workTask&&!w.arriving);
+      check(typeof w.workMessage==='string'&&w.workMessage.length<200);
+      if(w.stoneCollection!==undefined){check(w.stoneCollection&&typeof w.stoneCollection.enabled==='boolean'&&Object.keys(w.stoneCollection).length===2);integer(w.stoneCollection.radius,0,IDLE_STONE.maxRadius);}if(w.profession==='hauler')check(w.stoneCollection);if(!w.isAlive)check(w.workState==='Dead'&&!w.workTask&&!w.arriving);
       const t=w.workTask;if(t){
         check(w.isAlive&&['mine','mineDrop','hunt','collectMeat','build','harvest','chopTree','mineDeposit','foodPickup','foodDeliver','produce'].includes(t.kind));tile(t.goal);number(t.progressMs,0,t.kind==='mineDeposit'?(definition(s.buildings.find(b=>b.id===w.assignedWorkplaceId)?.type).mining?.duration??0):t.kind==='harvest'?(definition(s.buildings.find(b=>b.id===t.targetId)?.type).crop?.workDuration??0):WORK_RULES.miningDuration);
         const prefix=t.kind==='mine'?'resource':t.kind==='hunt'?'animal':'drop',expected=t.kind==='mineDeposit'?`mineral:${t.targetId}:${w.id}`:t.kind==='chopTree'?`natural:${t.targetId}`:t.kind==='produce'?`production-slot:${t.goal.x},${t.goal.y}`:['foodPickup','foodDeliver'].includes(t.kind)?`food-task:${t.transferId}`:t.kind==='build'?`construction-slot:${t.goal.x},${t.goal.y}`:t.kind==='harvest'?`crop:${t.targetId}`:`${prefix}:${t.targetId}`;check(t.reservation===expected&&!reservations.has(t.reservation));reservations.add(t.reservation);
         if(t.kind==='foodPickup'&&t.sourceDropId){check(!reservations.has(`drop:${t.sourceDropId}`));reservations.add(`drop:${t.sourceDropId}`);}
         if(['mine','mineDrop'].includes(t.kind)){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);check(home?.type!=='iron_mine'&&!['finite','unbound'].includes(home?.quarryMode));}
-        if(t.kind==='mine')check(w.profession==='miner'&&s.resources.some(r=>r.type==='stone'&&`${r.tile.x},${r.tile.y}`===t.targetId));
+        if(t.kind==='mine')check((w.profession==='miner'&&t.idleStone===undefined||w.profession==='hauler'&&t.idleStone===true&&w.stoneCollection?.enabled)&&s.resources.some(r=>r.type==='stone'&&`${r.tile.x},${r.tile.y}`===t.targetId));
         if(t.kind==='hunt')check(w.profession==='hunter'&&aIds.has(t.targetId));if(t.kind==='collectMeat')check(w.profession==='hunter'&&dIds.has(t.targetId));
         if(t.kind==='mineDrop')check(w.profession==='miner'&&s.drops.some(d=>d.id===t.targetId&&d.resource==='stone'));
         if(t.kind==='chopTree'){const target=treeIds.get(t.targetId),home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),slot=`natural-slot:${t.goal.x},${t.goal.y}`;check(w.profession==='woodcutter'&&home?.type==='lumberjack_hut'&&buildingIsComplete(home)&&target?.natural.stage===3&&Math.abs(target.tile.x-t.goal.x)+Math.abs(target.tile.y-t.goal.y)===1&&!reservations.has(slot));reservations.add(slot);}

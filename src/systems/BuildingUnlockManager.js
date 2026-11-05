@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { buildingIsComplete } from '../game/buildingState.js';
 
 const unlocked=Object.freeze({unlocked:true,missing:[],description:''});
@@ -8,7 +9,7 @@ function worldIndex(buildings){
 }
 function evaluate(definition,index,registry){
   const missing=(definition.requiresCompletedBuildings??[]).filter(id=>!index.complete.has(id));if(!missing.length)return unlocked;
-  const description=missing.map(id=>{const name=registry?.get(id)?.name??id;return index.pending.has(id)?`Requires a completed ${name}`:`Requires: Build a ${name}`;}).join(' · ');
+  const description=missing.map(id=>{const name=registry?.get(id)?.name??id;return t(index.pending.has(id)?'unlock.pending':'unlock.build',{name});}).join(' · ');
   return {unlocked:false,missing,description};
 }
 // The placement transaction reads the current world; the UI uses an event-updated index.

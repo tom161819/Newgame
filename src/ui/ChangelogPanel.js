@@ -1,5 +1,6 @@
 import { compareVersions, versionParts } from '../data/semver.js';
 import { CHANGELOG_CATEGORIES } from '../data/changelogCategories.js';
+import { t } from '../i18n/index.js';
 
 const STORAGE_KEY = 'newgame.changelog.lastSeen';
 export function seenVersionState(version, stored) {
@@ -22,13 +23,16 @@ export class ChangelogPanel {
     this.badge.hidden = !initial.isNew;
     for (const label of document.querySelectorAll('[data-game-version]')) label.textContent = `v${version}`;
     document.title = `Medieval Kingdom · v${version}`;
-    this.render(catalog?.versions??releases);
+    this.releases=catalog?.versions??releases;this.render(this.releases);
     this.button.addEventListener('click', () => this.open());
     document.querySelector('#changelog-back').addEventListener('click', () => this.close());
     this.dialog.addEventListener('cancel', event => { event.preventDefault(); this.close(); });
   }
 
   persistSeen() { try { this.storage?.setItem(STORAGE_KEY, this.seen); } catch { /* Never affect game saving. */ } }
+
+  // Release notes stay as authored (English history); only the panel chrome is translated.
+  relabel() { this.render(this.releases); }
 
   render(releases) {
     const element = (tag, text, className) => {
@@ -42,15 +46,15 @@ export class ChangelogPanel {
       entry.dataset.release = release.version;
       const summary=element('summary'),heading = element('h3', `v${release.version}${release.title?` — ${release.title}`:''} `), date = element('time', release.date);
       date.dateTime = release.date; heading.append(date);summary.append(heading);entry.append(summary);
-      if(release.historical)entry.append(element('p','Reconstructed archive label; the original build version and commit are preserved.','archive-version-label'));
-      if(release.available&&release.archiveURL){const play=element('a','Play this archived build ↗','archive-play');play.href=release.archiveURL;play.target='_blank';play.rel='noopener noreferrer';entry.append(play);}
-      for (const [key, label] of Object.entries(CHANGELOG_CATEGORIES)) {
+      if(release.historical)entry.append(element('p',t('changelog.reconstructed'),'archive-version-label'));
+      if(release.available&&release.archiveURL){const play=element('a',t('changelog.playArchived'),'archive-play');play.href=release.archiveURL;play.target='_blank';play.rel='noopener noreferrer';entry.append(play);}
+      for (const key of Object.keys(CHANGELOG_CATEGORIES)) {
         const changes = release.changes[key];
         if (!changes?.length) continue;
         const section = element('section'), list = element('ul');
         section.dataset.category = key;
         list.append(...changes.map(change => element('li', change)));
-        section.append(element('h4', label), list); entry.append(section);
+        section.append(element('h4', t(`changelog.category.${key}`)), list); entry.append(section);
       }
       return entry;
     });

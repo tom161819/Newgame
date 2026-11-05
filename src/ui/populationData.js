@@ -1,3 +1,5 @@
+import { localized,workMessageLabel } from '../i18n/names.js';
+import { t } from '../i18n/index.js';
 import { JOBS,SKILLS,SKILL_IDS } from '../data/jobs.js';
 import { HUMAN_APPEARANCE } from '../data/humanAppearance.js';
 import { TALENTS } from '../data/economy.js';
@@ -32,18 +34,18 @@ export function populationWindow(total,scroll,height,overscan=3){
 }
 export const professionColor=profession=>JOBS[profession]?.portraitColor??JOBS.idle.portraitColor;
 export function residentWarnings(scene,worker){
-  if(!worker.isAlive)return [{icon:'☠',text:'Deceased'}];
+  if(!worker.isAlive)return [{icon:'☠',text:t('population.deceased')}];
   const warnings=[];
-  if(scene.foodSystem?.residents.get(worker.id)?.hungry)warnings.push({icon:'⚠',text:'Hungry: work efficiency is reduced by 20%.'});
-  if(worker.currentHP<worker.maxHP*.3)warnings.push({icon:'!',text:'Low health'});
-  if(worker.profession==='idle')warnings.push({icon:'◇',text:'Unemployed'});
+  if(scene.foodSystem?.residents.get(worker.id)?.hungry)warnings.push({icon:'⚠',text:t('population.hungry')});
+  if(worker.currentHP<worker.maxHP*.3)warnings.push({icon:'!',text:t('population.lowHealth')});
+  if(worker.profession==='idle')warnings.push({icon:'◇',text:JOBS.idle.name});
   return warnings;
 }
 export function populationDetails(scene,worker){
   const experience=worker.experience,workplace=scene.workplaceSystem?.building(worker);
   return {name:worker.name,profession:JOBS[worker.profession]?.name??worker.profession,level:experience.level,currentXP:experience.currentXP,totalXP:experience.totalXP,xpToNextLevel:experience.xpToNextLevel,maxLevel:experience.maxLevel,
-    job:worker.workState,task:worker.workMessage||'No active task',workplace:workplace?.definition.name??'Not assigned',
-    talent:TALENTS[worker.naturalTalent]??'None',warnings:residentWarnings(scene,worker),
+    job:localized(`work.state.${worker.workState}`,worker.workState),task:worker.workMessage?workMessageLabel(worker.workMessage):t('population.noTask'),workplace:worker.profession==='hauler'?t('unit.wholeKingdom'):workplace?.definition.name??t('unit.notAssigned'),
+    talent:TALENTS[worker.naturalTalent]?localized(`talent.${worker.naturalTalent}`,TALENTS[worker.naturalTalent]):t('population.none'),hasTalent:!!TALENTS[worker.naturalTalent],warnings:residentWarnings(scene,worker),
     skills:Object.entries(SKILLS).filter(([id])=>worker.skills[id]).map(([id,name])=>{const skill=worker.skills[id];return {id,name,level:skill.level,currentXP:skill.currentXP,xpToNextLevel:skill.xpToNextLevel,maxLevel:skill.maxLevel,talented:id===worker.naturalTalent};})};
 }
 export function humanPortrait(){

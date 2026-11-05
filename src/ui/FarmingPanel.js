@@ -1,3 +1,5 @@
+import { localized } from '../i18n/names.js';
+import { t } from '../i18n/index.js';
 import { buildingDefinition } from '../game/buildings.js';
 
 export class FarmingPanel {
@@ -13,11 +15,11 @@ export class FarmingPanel {
     const scene=this.scene,building=this.building;if(!scene.buildings.includes(building)||!scene.fog.isVisibleObject(building)){this.close();return;}
     const record=scene.farmingSystem.sync(building),spec=buildingDefinition(building).crop,worker=scene.workerSystem.workers.get(record.reservedBy);
     document.querySelector('#farming-title').textContent=buildingDefinition(building).name;
-    document.querySelector('#farming-stage').textContent=`Stage ${record.stage}: ${spec.stages[record.stage]}`;
+    document.querySelector('#farming-stage').textContent=t('farming.stage',{stage:record.stage,name:localized(`crop.${building.type}.stage.${record.stage}`,spec.stages[record.stage])});
     document.querySelector('#farming-growth').value=record.growthDays/spec.growthDays*100;
-    document.querySelector('#farming-time').textContent=scene.seasons?.season==='Winter'?`Winter dormancy · ${record.growthDays.toFixed(2)} / ${spec.growthDays} growth days preserved`:building.type==='orchard'&&scene.seasons?.season==='Spring'?'Spring blossom · Fruit develops in Summer':scene.farmingSystem.ripe(building)?'Ready for harvest':`${record.growthDays.toFixed(2)} / ${spec.growthDays} growth days`;
-    document.querySelector('#farming-yield').textContent=`Harvest: ${spec.yield} ${scene.objectRegistry.require(spec.resource).name}`;
-    document.querySelector('#farming-worker').textContent=worker?`${worker.name}: ${worker.workState}${worker.workTask?` · ${(Math.min(1,worker.workTask.progressMs/spec.workDuration)*100).toFixed(0)}%`:''}`:'Waiting for a Farmer from a Farmhouse within 15 tiles.';
+    document.querySelector('#farming-time').textContent=scene.seasons?.season==='Winter'?t('farming.dormancy',{done:record.growthDays.toFixed(2),total:spec.growthDays}):building.type==='orchard'&&scene.seasons?.season==='Spring'?t('farming.blossom'):scene.farmingSystem.ripe(building)?t('farming.ready'):t('farming.growth',{done:record.growthDays.toFixed(2),total:spec.growthDays});
+    document.querySelector('#farming-yield').textContent=t('farming.harvest',{count:spec.yield,resource:scene.objectRegistry.require(spec.resource).name});
+    document.querySelector('#farming-worker').textContent=worker?`${worker.name}: ${worker.workState}${worker.workTask?` · ${(Math.min(1,worker.workTask.progressMs/spec.workDuration)*100).toFixed(0)}%`:''}`:t('farming.waiting');
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){this.dialog.close();this.restoreInput();}

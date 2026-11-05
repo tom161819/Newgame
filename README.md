@@ -68,6 +68,12 @@ Save/Load zachovává logickou mapu, překážky, budovy a spojení hradeb, kame
 
 Data mají `saveVersion` a před nahrazením světa procházejí kontrolou. Poškozený save zobrazí chybu a ponechá současnou hru. Zápis do IndexedDB je atomický: při chybě zůstane předchozí save. Samotné ukládání a načítání již otevřené hry funguje i bez internetu; stažení hry při prvním otevření vyžaduje připojení.
 
+**Přenos pozic mezi zařízeními:** v menu Save/Load stáhne **Download Save** vybranou pozici jako soubor JSON (formát `medieval-kingdom-save`, schéma, verze hry, datum a celý snapshot). **Import Save File** soubor načte jen pomocí `JSON.parse`, ověří velikost (max. 16 MB), formát, schéma a stejnou validaci jako Load a uloží ho do nového slotu. Pokud na zařízení existuje slot se stejným ID, nabídne **Replace** nebo **Keep both**. Poškozený soubor nebo jiné schéma se odmítne beze změny hry i ostatních slotů. Žádný server ani placená služba se nepoužívá.
+
+**Autosave:** hra se sama ukládá do samostatného slotu **Autosave** (ruční pozice nepřepisuje). Výchozí interval je 5 minut skutečné aktivní hry; v Settings lze autosave vypnout nebo zvolit 1, 2, 5 či 10 minut (nastavení si pamatuje prohlížeč). Pozastavená hra ani skrytá karta se nepočítají, dvě ukládání nikdy neběží současně a neúspěšný zápis ponechá předchozí autosave. Settings ukazuje čas posledního úspěšného autosave; chybu oznámí jednou. Zavření prohlížeče uložení nezaručuje. Autosave se načte z Load Game jako každá jiná pozice.
+
+**Jazyk:** čeština a angličtina se přepínají v hlavním menu nebo v Settings; volbu si pamatuje prohlížeč (výchozí podle jazyka prohlížeče). Všechny texty jdou přes jeden překladový systém `src/i18n/` (`t(klíč, parametry)`, množná čísla přes `Intl.PluralRules`, chybějící klíč spadne na angličtinu a pak na samotný klíč). Další jazyk = další slovník se stejnými klíči; test hlídá, že oba slovníky mají totožné klíče a parametry a že každý použitý klíč existuje.
+
 ## Zkušenosti a levely
 
 Král začíná na **levelu 1 s 0 XP**. Odměnu získá až po dokončení činnosti: kámen **3 XP**, sebraný balíček masa **2 XP** bez ohledu na jeho množství, zajíc **10 XP**, srna **20 XP**, divočák **35 XP**, nový segment hradby **2 XP**, věž **15 XP**, hrad **30 XP**, kamenolom **15 XP**, lovecká chata **10 XP** a kasárna **20 XP**. Řada hradeb odmění jen skutečně nové segmenty. Neúspěšná nebo zrušená akce nic nepřidá; chůze, čekání, regenerace ani produkce zlata XP nevytvářejí.
@@ -311,7 +317,7 @@ New Game otevře Game Setup: obtížnost Easy/Normal/Hard, 3/9/24 lovitelných z
 
 ### Pokročilé nastavení světa
 
-Advanced Settings jsou standardně sbalené. Nová hra používá Fog of War ON (přednost před starou preferencí prohlížeče), volitelný hotový hrad 3 × 3 zdarma, den 60/120/240 sekund, obnovu zvěře Off/120/60/30 sekund a počáteční zlato 0–500 po 25. Reset to Defaults obnoví jen formulář; přehled pod ním ukazuje všech devět voleb. Hra ani uložené pozice se při nastavování nemění.
+Advanced Settings jsou standardně sbalené. Nová hra používá Fog of War ON (přednost před starou preferencí prohlížeče), volitelný hotový hrad 3 × 3 zdarma, den 60/120/240 sekund, obnovu zvěře Off/120/60/30 sekund a počáteční zlato 0–500 po 25. Pod zlatem lze nastavit počáteční Stone, Wood, Iron Ore a Bread po 5 kusech; dohromady nejvýš 40, tedy kapacitu počátečního skladiště, kam se při startu fyzicky uloží. Initial Stones dál určuje jen volně ležící kameny na mapě. Reset to Defaults obnoví jen formulář; přehled pod ním ukazuje všech devět voleb. Hra ani uložené pozice se při nastavování nemění.
 
 Denní příjem, poměrné mzdy, zarůstání cest i migrace používají zvolenou délku dne. Spotřeba masa po minutě a kameny po 20 sekundách zůstávají stejné. WildlifeRespawnSystem doplňuje jeden nejvíce chybějící druh na interval do cíle 3/9/24; hledá dosažitelné volné místo a přednostně místo mimo králův dohled. Pauza a Game Over jej zastaví. Koně nedoplňuje.
 

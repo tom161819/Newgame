@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { initCompactHud, HUD_DETAILS_KEY } from '../src/ui/CompactHud.js';
+import { setLanguage } from '../src/i18n/index.js';
 
 function element() {
   const attributes = new Map(), listeners = new Map(), classes = new Set();
@@ -22,9 +23,10 @@ function fixture(saved = null, wageHidden = true) {
 test('HUD details start collapsed, toggle accessibly and remember the choice', () => {
   const { doc, nodes, memory, storage } = fixture();
   const hud = initCompactHud(doc, storage), toggle = nodes['#hud-details-toggle'], panel = nodes['#hud-details'];
-  assert.equal(panel.hidden, true); assert.equal(toggle.getAttribute('aria-expanded'), 'false'); assert.equal(toggle.textContent, 'Více');
+  assert.equal(panel.hidden, true); assert.equal(toggle.getAttribute('aria-expanded'), 'false'); assert.equal(toggle.textContent, 'More');
   toggle.click();
-  assert.equal(panel.hidden, false); assert.equal(toggle.getAttribute('aria-expanded'), 'true'); assert.equal(toggle.textContent, 'Méně');
+  assert.equal(panel.hidden, false); assert.equal(toggle.getAttribute('aria-expanded'), 'true'); assert.equal(toggle.textContent, 'Less');
+  setLanguage('cs', { persist: false }); assert.equal(toggle.textContent, 'Méně'); assert.equal(toggle.title, 'Skrýt podrobnosti'); setLanguage('en', { persist: false }); assert.equal(toggle.textContent, 'Less');
   assert.equal(memory.get(HUD_DETAILS_KEY), '1'); assert.equal(hud.isOpen(), true);
   const reopened = fixture('1');
   initCompactHud(reopened.doc, reopened.storage);

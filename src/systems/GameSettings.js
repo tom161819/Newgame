@@ -1,5 +1,11 @@
+import { LOGISTICS_RULES } from '../data/logistics.js';
 export const DEFAULT_GAME_SETTINGS=Object.freeze({difficulty:'normal',wildlifePopulation:'normal',treasureCount:1,initialStoneCount:30,
-  fogOfWar:true,explorationMode:true,seasonsEnabled:true,startingCastle:false,dayLengthSeconds:120,wildlifeRespawn:'normal',startingGold:0});
+  fogOfWar:true,explorationMode:true,seasonsEnabled:true,startingCastle:false,dayLengthSeconds:120,wildlifeRespawn:'normal',startingGold:0,
+  startingStone:0,startingWood:0,startingIronOre:0,startingBread:0});
+// Physical goods placed once in the Starter Stockpile; their total fits its capacity.
+export const STARTING_RESOURCES=Object.freeze({startingStone:'stone',startingWood:'wood',startingIronOre:'iron_ore',startingBread:'bread'});
+export const STARTING_RESOURCE_STEP=5,STARTING_RESOURCE_CAPACITY=LOGISTICS_RULES.starterCapacity;
+export const startingResourceTotal=s=>Object.keys(STARTING_RESOURCES).reduce((n,k)=>n+(s?.[k]??0),0);
 export const DIFFICULTIES=Object.freeze({
   easy:{kingHP:1.5,kingDPS:1.25,animalHP:.75,animalDPS:.75},
   normal:{kingHP:1,kingDPS:1,animalHP:1,animalDPS:1},
@@ -14,7 +20,8 @@ export function gameSettings(input=DEFAULT_GAME_SETTINGS){
     ||!Number.isInteger(s.treasureCount)||s.treasureCount<0||s.treasureCount>10
     ||!Number.isInteger(s.initialStoneCount)||s.initialStoneCount<0||s.initialStoneCount>100||s.initialStoneCount%5!==0
     ||typeof s.fogOfWar!=='boolean'||typeof s.explorationMode!=='boolean'||typeof s.seasonsEnabled!=='boolean'||typeof s.startingCastle!=='boolean'||![60,120,240].includes(s.dayLengthSeconds)
-    ||!Object.hasOwn(WILDLIFE_INTERVALS,s.wildlifeRespawn)||!Number.isInteger(s.startingGold)||s.startingGold<0||s.startingGold>500||s.startingGold%25!==0)throw new Error('Neplatné nastavení nové hry.');
+    ||!Object.hasOwn(WILDLIFE_INTERVALS,s.wildlifeRespawn)||!Number.isInteger(s.startingGold)||s.startingGold<0||s.startingGold>500||s.startingGold%25!==0
+    ||Object.keys(STARTING_RESOURCES).some(k=>!Number.isInteger(s[k])||s[k]<0||s[k]>STARTING_RESOURCE_CAPACITY||s[k]%STARTING_RESOURCE_STEP!==0)||startingResourceTotal(s)>STARTING_RESOURCE_CAPACITY)throw new Error('Neplatné nastavení nové hry.');
   return Object.freeze(Object.fromEntries(Object.keys(DEFAULT_GAME_SETTINGS).map(k=>[k,s[k]])));
 }
 export function configuredStats(definition,settings){

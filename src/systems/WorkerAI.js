@@ -1,3 +1,4 @@
+import { dataName } from '../i18n/names.js';
 import { findPathToAny } from '../game/pathfinding.js';
 import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
 import { tileKey } from '../game/stones.js';
@@ -48,7 +49,7 @@ export class WorkerAI {
     else if(worker.profession==='hunter')this.hunter(worker,delta);
     else if(worker.profession==='farmer'&&this.scene.farmingSystem)this.scene.farmingSystem.updateWorker(worker,delta);
     else if(job.workplace&&this.scene.workplaceSystem?.building(worker)?.definition.recipe&&this.scene.foodProduction)this.scene.foodProduction.updateWorker(worker);
-    else if(worker.profession==='hauler'&&this.scene.logisticsTasks)this.scene.logisticsTasks.updateWorker(worker);
+    else if(worker.profession==='hauler'&&this.scene.logisticsTasks)this.scene.logisticsTasks.updateHauler(worker,delta);
     else if(worker.profession==='builder'){
       // Budovy jsou dosud okamžité. Staveniště dodá až skutečný construction provider.
       worker.workState='Waiting';worker.workMessage='Waiting for construction';
@@ -153,7 +154,7 @@ export class WorkerAI {
     const animal=this.scene.animalSystem.animals.get(task.targetId);
     if(!animal?.isAlive||this.scene.huntingSystem.target===animal){this.cancel(worker);return;}
     if(!worker.nextTile&&canInteractAdjacent(this.scene.map,worker,animal)){
-      worker.path=[];worker.workState='Working';worker.workMessage=`Hunting ${animal.definition.name}`;
+      worker.path=[];worker.workState='Working';worker.workMessage=`Hunting ${dataName(animal.definition)}`;
       const dx=animal.position.x-worker.position.x,dy=animal.position.y-worker.position.y,n=Math.hypot(dx,dy);if(n)worker.direction={x:dx/n,y:dy/n};
       this.scene.combat.startAttack(worker,animal);
     }else{
