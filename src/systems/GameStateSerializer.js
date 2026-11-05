@@ -19,11 +19,12 @@ import { captureMapKnowledge } from '../game/mapMemoryObjects.js';
 import { validateMapMemory } from './MapMemoryValidation.js';
 import { FORESTRY,emptyNaturalState } from '../data/naturalResources.js';
 import { EMPLOYMENT_PROFESSIONS,PRIORITY_RANGE } from '../data/employment.js';
+import { UNIT_TYPES } from '../data/military.js';
 import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=22;
+export const SAVE_VERSION=23;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -58,6 +59,7 @@ export function serializeGameState(scene){
     ...(scene.farmingSystem?{farming:scene.farmingSystem.exportState()}:{}),
     ...(scene.seasons?{seasons:scene.seasons.exportState()}:{}),
     ...(scene.employment?{employment:scene.employment.exportState()}:{}),
+    ...(scene.military?{military:scene.military.exportState()}:{}),
     ...(scene.kingLogistics?{kingLogistics:scene.kingLogistics.exportState()}:{}),
     ...(scene.logisticsTasks?{logistics:{version:1,...(scene.constructionSystem?.materials.enabled?{materialsVersion:1}:{})}}:{}),
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
@@ -191,7 +193,7 @@ export function validateGameState(input,registry=objectRegistry){
     number(a.maxHP,1,1e9);number(a.currentHP,0,a.maxHP);check(a.isAlive?a.currentHP>0:a.currentHP===0);
     const b=a.baseStats;check(b);number(b.maxHP,1,1e9);number(b.attackDPS,0,1e9);number(b.armor,0,90);number(b.attackRange,0,100);number(b.hpRegenPerSecond,0,1e6);
     check(a.statModifiers&&typeof a.statModifiers==='object'&&!Array.isArray(a.statModifiers));
-    for(const [name,m]of Object.entries(a.statModifiers)){check(!['__proto__','prototype','constructor'].includes(name)&&m&&typeof m==='object');for(const [key,v]of Object.entries(m)){check(['maxHP','attackBonus','attackMultiplier','armor','hpRegenPerSecond'].includes(key));number(v,key==='attackMultiplier'?0:-1e6,1e6);}}
+    for(const [name,m]of Object.entries(a.statModifiers)){check(!['__proto__','prototype','constructor'].includes(name)&&m&&typeof m==='object');for(const [key,v]of Object.entries(m)){check(['maxHP','attackBonus','attackMultiplier','armor','hpRegenPerSecond','attackRange'].includes(key));number(v,key==='attackMultiplier'?0:-1e6,1e6);}}
     if(a.experience!==undefined){
       const e=a.experience;check(definition(a.type).category==='character'&&e&&typeof e.enabled==='boolean');
       integer(e.maxLevel,1,50);integer(e.level,1,e.maxLevel);number(e.gainMultiplier,0,1e6);number(e.currentXP);number(e.totalXP,0,totalXPForLevel(e.maxLevel));
@@ -346,5 +348,12 @@ export function validateGameState(input,registry=objectRegistry){
   if(s.employment!==undefined){const e=s.employment;check(e&&typeof e==='object'&&Object.keys(e).sort().join()==='enabled,held,priorities'&&typeof e.enabled==='boolean');
     check(e.priorities&&typeof e.priorities==='object'&&Object.keys(e.priorities).sort().join()===[...EMPLOYMENT_PROFESSIONS].sort().join());for(const value of Object.values(e.priorities))integer(value,PRIORITY_RANGE.min,PRIORITY_RANGE.max);
     array(e.held);check(new Set(e.held).size===e.held.length&&e.held.every(id=>wIds.has(id)));}
+  // C08 units and training orders: one per living Soldier, a known type, its exact kit.
+  if(s.military!==undefined){const m=s.military;check(m&&typeof m==='object'&&Object.keys(m).sort().join()==='nextOrder,orders,units');integer(m.nextOrder,1);array(m.units);array(m.orders);
+    const workers=new Map(s.workers.map(w=>[w.id,w])),seen=new Set(),kit=type=>Object.values(UNIT_TYPES[type].equipment);
+    for(const u of m.units){check(u&&Object.keys(u).sort().join()==='equipment,type,workerId'&&Object.hasOwn(UNIT_TYPES,u.type)&&!UNIT_TYPES[u.type].lockedUntil&&workers.get(u.workerId)?.isAlive&&!seen.has(u.workerId));seen.add(u.workerId);check(JSON.stringify(u.equipment)===JSON.stringify(UNIT_TYPES[u.type].equipment));}
+    const ids=new Set();for(const o of m.orders){check(o&&Object.keys(o).sort().join()==='barracksId,id,items,required,state,type,workDone,workerId'&&Object.hasOwn(UNIT_TYPES,o.type)&&!UNIT_TYPES[o.type].lockedUntil);integer(o.id,1,m.nextOrder-1);check(!ids.has(o.id)&&!seen.has(o.workerId));ids.add(o.id);seen.add(o.workerId);
+      const w=workers.get(o.workerId);check(w?.isAlive&&w.profession==='soldier'&&w.assignedWorkplaceId===o.barracksId&&s.buildings.some(b=>b.id===o.barracksId&&b.type==='barracks'));check(o.required===UNIT_TYPES[o.type].trainingTime);number(o.workDone,0,o.required);
+      check(['supplying','training'].includes(o.state));const items={};if(o.state==='training')for(const id of kit(o.type))items[id]=(items[id]??0)+1;check(o.items&&JSON.stringify(Object.entries(o.items).sort())===JSON.stringify(Object.entries(items).sort()));if(o.state==='supplying')check(o.workDone===0);}}
   return s;
 }

@@ -13,7 +13,7 @@ export class LogisticsTaskManager {
     for(const [key,expires]of this.failedRoutes)if(expires<=now)this.failedRoutes.delete(key);
     for(const key of this.producerWaits.keys())if(!this.scene.foodProduction.records.has(Number(key.split(':')[0])))this.producerWaits.delete(key);
     const storage=this.storage,stores=[...storage.locations.values()].filter(l=>storage.isStock(l));
-    this.catalog.push(...(this.scene.constructionSystem?.materials.candidates()??[]));
+    this.catalog.push(...(this.scene.constructionSystem?.materials.candidates()??[]),...(this.scene.military?.candidates()??[]));
     for(const record of this.scene.foodProduction.records.values()){
       const building=this.scene.foodProduction.building(record.buildingId);if(!building)continue;
       const recipe=buildingDefinition(building).recipe,input=storage.locations.get(`input-${building.id}`);
@@ -52,6 +52,7 @@ export class LogisticsTaskManager {
       const destination=storage.locations.get(task.destinationId),drop=task.sourceDropId&&this.scene.dropSystem.drops.get(task.sourceDropId),existingCap=storage.reservations.get(task.capacityReservation);
       const allocation=task.allocationId&&storage.reservations.get(task.allocationId),available=task.allocationId?(allocation?.owner===`site-${task.siteId}`?allocation.amount:0):drop?.amount??storage.free(task.sourceId,task.resource),room=existingCap?.amount??storage.room(task.destinationId);
       let missing=task.amount;if(destination?.kind==='input'){const b=this.scene.buildings.find(b=>b.id===destination.buildingId),recipe=b&&buildingDefinition(b).recipe;if(!b||this.scene.foodProduction.inputShortage(b))continue;missing=(recipe?.input[task.resource]??0)-(destination.stock[task.resource]??0)-storage.incoming(destination.id,task.resource);}
+      if(destination?.kind==='kit')missing=this.scene.military?.missing(destination.buildingId,task.resource)??0;
       const amount=Math.min(cap,available,room,missing);if(amount<=0||!destination||drop&&!this.scene.workerSystem.reservations.available(`drop:${drop.id}`,worker.id))continue;
       const routeKey=`${worker.id}:${task.sourceDropId??task.sourceId}:${task.destinationId}`;
       if(this.failedRoutes.has(routeKey))continue;

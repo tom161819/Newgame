@@ -72,7 +72,7 @@ export class WorkerSystem {
     this.updateUI();
   }
   update(delta){for(const worker of this.liveWorkers())if(worker.isSubject!==false)this.ai.update(worker,delta);else worker.update(delta);}
-  onDeath(worker){worker.commandState={state:'Working',goal:null};worker.diedAt??=this.scene.gameTime.totalElapsed;this.scene.workplaceSystem?.detach(worker);this.ai.cancel(worker);worker.active=false;worker.path=[];worker.nextTile=null;worker.walking=false;worker.workState='Dead';worker.workMessage='';worker.arriving=false;worker.view.destroy();this.scene.combatFeedback.remove(worker.id);this.updateUI();}
+  onDeath(worker){this.scene.military?.release(worker,{dead:true});worker.commandState={state:'Working',goal:null};worker.diedAt??=this.scene.gameTime.totalElapsed;this.scene.workplaceSystem?.detach(worker);this.ai.cancel(worker);worker.active=false;worker.path=[];worker.nextTile=null;worker.walking=false;worker.workState='Dead';worker.workMessage='';worker.arriving=false;worker.view.destroy();this.scene.combatFeedback.remove(worker.id);this.updateUI();}
   updateUI(){const count=this.liveSubjects().length;this.onChange(count,POPULATION.maximum);for(const listener of this.listeners)listener(count,POPULATION.maximum);}
   exportState(){return {nextId:this.nextId,lastMigrationDay:this.lastMigrationDay};}
   importState(data){this.nextId=data?.nextId??1;this.lastMigrationDay=data?.lastMigrationDay??this.scene.gameTime.day;this.updateUI();}

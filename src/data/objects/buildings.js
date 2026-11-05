@@ -38,7 +38,7 @@ export const buildings = [
   ...[
     {id:'quarry',name:'Quarry',buildingCategory:'industry',width:3,height:3,cost:{stone:15},constructionTime:30000,visualHeight:95,description:'Kamenolom se třemi místy pro horníky. Musí překrývat skutečné kamenné ložisko a mít dostupný přístup. Těží pouze svou přiřazenou konečnou zásobu.'},
     {id:'hunting_lodge',name:'Hunting Lodge',buildingCategory:'food',width:2,height:2,cost:{stone:10},constructionTime:25000,visualHeight:110,description:'Lovecká chata pro dva lovce. Lovci přinášejí maso ze skutečných úlovků.'},
-    {id:'barracks',name:'Barracks',buildingCategory:'defense',width:3,height:3,cost:{stone:20},constructionTime:40000,visualHeight:125,description:'Kasárna s pěti místy pro stávající poddané. Vojáci hlídkují v okolí.'},
+    {id:'barracks',name:'Barracks',buildingCategory:'defense',width:3,height:3,cost:{stone:20},constructionTime:40000,visualHeight:125,kit:{capacity:10},description:'Kasárna s pěti místy pro stávající poddané. Vojáci hlídkují v okolí.'},
   ].map(d=>({...d,category:'building',sprite:`/assets/buildings/${d.id}/${d.id}.svg`,walkable:false,collectible:false,buildable:true,
     interactions:['manage_workers'],renderMode:'procedural',renderer:'workplace',origin:{x:.5,y:.9},depth:{offset:0},
     workplace:WORKPLACES[d.id],...(d.id==='quarry'?{mining:MINING_WORK.quarry}:{}),shadow:{baked:true,x:12,y:-15,width:d.width*59,height:d.height*21,color:0x30291c,alpha:.3}})),

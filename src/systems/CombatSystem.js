@@ -1,5 +1,6 @@
 import { isWalkable } from '../game/map.js';
 import { clampArmor } from './UnitStats.js';
+import { hasLineOfSight } from '../game/lineOfSight.js';
 export { clampArmor,createCombatStats } from './UnitStats.js';
 
 export function inAttackRange(attacker,target,map=null) {
@@ -9,14 +10,15 @@ export function inAttackRange(attacker,target,map=null) {
   if(map&&attacker.attackRange<=1&&a.x!==b.x&&a.y!==b.y){
     return isWalkable(map,a.x,b.y)&&isWalkable(map,b.x,a.y);
   }
-  return true;
+  // Ranged attacks need a clear line between the two tiles.
+  return attacker.attackRange<=1||!map||hasLineOfSight(map,a,b);
 }
 
 // Integruje DPS po časových úsecích až k nejbližší smrti. Odvetný útok tak
 // nekončí o celý snímek dříve nebo později podle FPS či pořadí jednotek.
 export class CombatSystem {
-  constructor({map=null,canFight=()=>true,regenerationRate=()=>0}={}) {
-    this.map=map;this.canFight=canFight;this.regenerationRate=regenerationRate;this.attacks=new Map();this.listeners=new Map();this.dead=new WeakSet();
+  constructor({map=null,canFight=()=>true,regenerationRate=()=>0,canTarget=()=>true}={}) {
+    this.map=map;this.canFight=canFight;this.canTarget=canTarget;this.regenerationRate=regenerationRate;this.attacks=new Map();this.listeners=new Map();this.dead=new WeakSet();
   }
   on(event,listener){if(!this.listeners.has(event))this.listeners.set(event,new Set());this.listeners.get(event).add(listener);return()=>this.listeners.get(event)?.delete(listener);}
   emit(event,...args){for(const listener of this.listeners.get(event)??[])listener(...args);}
@@ -47,7 +49,7 @@ export class CombatSystem {
       const rates=new Map(),contributors=new Map();
       for(const [attacker,target]of this.attacks){
         if(!attacker.isAlive||!target.isAlive){this.stopAttack(attacker);continue;}
-        if(!this.canFight(attacker)||!this.canFight(target)||!inAttackRange(attacker,target,this.map))continue;
+        if(!this.canFight(attacker)||!this.canFight(target)||!inAttackRange(attacker,target,this.map)||!this.canTarget(attacker,target))continue;
         const rate=Math.max(0,attacker.attackDPS)*(1-clampArmor(target.armor)/100);
         if(rate>0){rates.set(target,(rates.get(target)??0)+rate);if(!contributors.has(target))contributors.set(target,[]);contributors.get(target).push({attacker,rate});}
       }

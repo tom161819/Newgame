@@ -464,3 +464,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .notice-text { flex:1; text-align:left; font-size:12px; line-height:1.35; padding:6px 8px; border:0; background:transparent; }
 .notice-dismiss { border:0; background:transparent; padding:6px 8px; font-size:14px; line-height:1; }
 @media(max-width:600px) { .notices-panel { left:16px; right:16px; width:auto; bottom:58px; } }
+/* C08 Barracks training */
+.military-details h3{margin:.6rem 0 .3rem}
+.unit-type-cards{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.4rem}
+.unit-type-card{display:flex;flex-direction:column;gap:.15rem;padding:.4rem;border:1px solid rgba(120,90,50,.45);border-radius:6px;font-size:.85rem}
+.military-soldiers{list-style:none;padding:0;margin:.5rem 0 0;display:flex;flex-direction:column;gap:.3rem}
+.military-soldier{display:flex;flex-wrap:wrap;align-items:center;gap:.3rem}
+.military-soldier>span{flex:1 1 100%}
