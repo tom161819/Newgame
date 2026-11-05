@@ -13,7 +13,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| C08 (#55) Military units, training, equipment, combat | Claude | `claude/c08-military-units` | — | PR open; 599 tests, 50 full smokes PASS | data/military.js (new), systems/MilitarySystem.js (new), game/lineOfSight.js (new), ui/militaryPanel.js (new), FoodStorageSystem.js + FoodStateValidation.js (Barracks kit store), LogisticsTaskManager.js, CombatSystem.js, UnitStats.js, WorkerAI.js, WorkerSystem.js, WageSystem.js, WorkplacePanel.js, GameScene.js, GameStateSerializer/Loader (SAVE_VERSION 23), militaryEquipment.js + contract, objects/buildings.js (barracks kit), i18n en/cs, style.css, tests, smokes. |
+| S11 (#56) Stone Pavement | Claude | `claude/s11-stone-pavement` | — | In progress | data/pavement.js, data/objects/pavement.js, game/pavement.js, game/PavementTool.js, game/PavementView.js, game/cobbles.js (new); PathWearSystem (paved layer), MapMemory + validation, TerrainRenderer, ConstructionSystem (pavement sites), ObjectRegistry (mode), GameScene, GameStateSerializer (SAVE_VERSION 24), i18n, style.css, public/assets/buildings/stone_pavement, tests, smokes, UPGRADE_PROGRESS. |
 | AUD78 (#102) Manual king stone delivery | Codex | `codex/king-manual-stone-delivery` | — | STARTED from e630597; live ready override from Claude6658384869 | KingLogisticsSystem.js, isolated HUD controller if useful, small GameScene HUD integration, index.html/style.css, EN/CS keys, focused logistics/browser tests, docs/changelog. No C07 storage acceptance, equipment, jobs/production or Studio changes. |
 | House (#57, House part only; developer priority) | Claude | `claude/house-population-capacity` | — | PR open; 589 tests, 47 full smokes PASS | data/objects/housing.js (new), objects/index.js, approvedArt.js (house), jobs.js (houseCapacity), WorkerSystem.js (capacity), i18n objects, public/assets/buildings/house, tests. |
 
@@ -24,6 +24,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-05 [#135](https://github.com/tom161819/Newgame/pull/135) C08 #55 (Claude): Barracks training (Soldier, Swordsman, Archer; Knight locked), Armory kit logistics, line of sight, defence, schema 23. Merge 5737395; 599 tests, 50 full smokes, CI and [Pages 42061820180](https://github.com/tom161819/Newgame/actions/runs/42061820180) succeeded. Issue 55 closed; S11 #56 in progress.
 - 2026-11-05 [#117](https://github.com/tom161819/Newgame/pull/117) C07 #54 (Claude): Bowyer, Swordsmith, Armorer and Armory with physical equipment logistics, schema 22. Merge 6284504; 586 tests, 45 full smokes, CI and [Pages 42053330151](https://github.com/tom161819/Newgame/actions/runs/42053330151) succeeded. Issue 54 closed; C08 #55 in progress (Claude).
 Completion record: Codex `codex/completion-aud63` updated only docs/COORDINATION.md and docs/CODEX_PROGRESS.md records the successful post-merge deployment; 584 tests, changelog, build:pages and current-only browser smoke PASS. No gameplay or environment configuration changes.
 

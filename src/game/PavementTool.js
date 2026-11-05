@@ -27,7 +27,10 @@ export class PavementTool {
   removable(tiles){const s=this.scene,sites=new Map(s.buildings.filter(isPavementSite).map(b=>[tileKey(b),b]));return tiles.filter(tile=>this.inSight(tile)&&(s.pathWear?.isPaved(tile)||sites.has(tileKey(tile))));}
   begin(tile){this.anchor={...tile};this.key=null;this.preview(tile);}
   preview(end){
-    const s=this.scene;s.preview.setVisible(false);const tiles=this.tiles(end),key=`${this.mode}:${tiles.map(tileKey).join(';')}:${s.inventory.count('stone')}`;
+    const s=this.scene;s.preview.setVisible(false);
+    // The confirmation stays in the status bar until the pointer moves to another tile.
+    if(!this.anchor&&this.held===tileKey(end))return;this.held=null;
+    const tiles=this.tiles(end),key=`${this.mode}:${tiles.map(tileKey).join(';')}:${s.inventory.count('stone')}`;
     if(key===this.key){for(const v of this.views.values())v.setVisible(true);return;}this.key=key;
     const paint=new Map();let status;
     if(this.mode==='remove'){const remove=this.removable(tiles);for(const tile of remove)paint.set(tileKey(tile),[tile,0xf27777]);status=t('pavement.removePlan',{count:remove.length});}
@@ -40,12 +43,12 @@ export class PavementTool {
   }
   confirm(end){
     const s=this.scene,tiles=this.tiles(end);this.anchor=null;this.key=null;
-    if(this.mode==='remove'){const count=this.remove(this.removable(tiles));s.setStatus(t('pavement.removed',{count}));this.preview(end);return count;}
+    if(this.mode==='remove'){const count=this.remove(this.removable(tiles));this.clearViews();this.held=tileKey(end);s.setStatus(t('pavement.removed',{count}));return count;}
     const plan=this.plan(tiles);if(plan.error){s.setStatus(plan.error);this.preview(end);return 0;}
     const result=placePavement({map:s.map,tiles:plan.fresh,resources:s.resourceOccupancy,buildings:s.buildings,pathWear:s.pathWear,inventory:s.inventory,registry:s.objectRegistry});
     if(result.error){s.setStatus(result.error);this.preview(end);return 0;}
     for(const building of result.buildings){s.constructionSystem.plan(building);s.towerViews.set(building.id,s.createBuildingView(building.definition,building));}
-    s.events?.emit('buildings:changed');s.updateInventory();this.clearViews();
+    s.events?.emit('buildings:changed');s.updateInventory();this.clearViews();this.held=tileKey(end);
     s.setStatus(t('pavement.ordered',{count:result.buildings.length,cost:result.cost.stone}));return result.buildings.length;
   }
   // Finished pavement is removed without a refund; an unfinished blueprint is cancelled by the ordinary refund rules.

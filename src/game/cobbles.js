@@ -11,7 +11,8 @@ export function drawCobbles(context,cx,cy,{seed=0,tileX=0,tileY=0,edges={},tint=
   for(let row=0;row<4;row++)for(let col=0;col<4;col++){
     const gx=tileX*4+col,gy=tileY*4+row,r=hash(gx,gy,seed),g=hash(gy,gx,seed+3);
     const u=(col+.5+(r-.5)*.25)/4,v=(row+.5+(g-.5)*.25)/4,p=toScreen(u,v),w=6.2+r*1.6,h=3.1+g*.9;
-    const shade=winter?[200,198,188]:[150+Math.round(r*40),146+Math.round(g*34),130+Math.round(r*28)];
+    // Muted grey stone with a slight warm or cool cast per stone, never a colour of its own.
+    const tone=Math.round(128+r*42),warm=Math.round((g-.5)*10),shade=winter?[200,198,190]:[tone+warm,tone+Math.round(warm/3),tone-8-Math.round(warm/2)];
     context.fillStyle=tint!=null?`rgba(255,255,255,.35)`:`rgb(${shade.join(',')})`;
     context.beginPath();context.ellipse(p.x,p.y,w,h,0,0,Math.PI*2);context.fill();
     context.strokeStyle='rgba(60,56,46,.55)';context.lineWidth=.8;context.stroke();
