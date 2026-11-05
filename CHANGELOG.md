@@ -7,6 +7,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ### Added
 - Finishing a Mill without a Wheat Field or a Bakery without a Mill shows one informational notice about the missing long-term supply. Existing supplies still work; dismiss the advice or finish the missing link to clear it. Actual production blockers retain priority.
+- Stone Pavement (Buildings → Infrastructure), a permanent cobbled surface. Units on it move 25 % faster; this replaces the trodden-path bonus and never adds to it. Routes now prefer a faster paved way.
+  - Build tools: Single, Line (default, also diagonal) and Area for courtyards, with a green/red/grey preview, the count of new tiles and the cost. An order costs 1 Stone for every 2 new tiles; already paved or ordered tiles are free.
+  - Haulers bring the Stone and Builders (or the King) lay it tile by tile. Blueprints never block the way.
+  - Remove clears finished pavement without a refund; cancelling a blueprint follows the usual refund rules.
+  - Fog of War shows the last known pavement. Saves keep finished and unfinished pavement.
 - Military training in the Barracks panel. Each Soldier working there can be trained as one of four unit types:
   - Soldier: Sword, 5 Gold, 20 s.
   - Swordsman: Sword, 12 Gold, 45 s, Combat 3+. Tougher and better armoured.

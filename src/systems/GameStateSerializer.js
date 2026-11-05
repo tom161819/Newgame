@@ -24,7 +24,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=23;
+export const SAVE_VERSION=24;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -139,7 +139,7 @@ export function validateGameState(input,registry=objectRegistry){
   const siteAssignments=new Set();
   // A provisional site (placed outside sight) claims no tiles until verified: it may lie over hidden terrain or resources.
   const provisional=new Set();
-  for(const b of s.buildings){integer(b.id,1);const d=definition(b.type,'building');check(d.buildable||d.starter);if(d.starter)check(buildingIsComplete(b));
+  for(const b of s.buildings){integer(b.id,1);const d=definition(b.type,'building');check(d.buildable||d.starter||d.pavement);if(d.starter)check(buildingIsComplete(b));if(d.pavement)check(!buildingIsComplete(b));
     check(b.unverified===undefined||b.unverified===true&&b.construction?.state==='planned'&&!b.depositId);
     if(b.unverified){tile(b);for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){const x=b.x+dx,y=b.y+dy,key=`${x},${y}`;check(s.terrain[y]?.[x]!==undefined&&!provisional.has(key));provisional.add(key);}}
     else occupy(b,d.width,d.height);
@@ -321,6 +321,8 @@ export function validateGameState(input,registry=objectRegistry){
   if(s.pathWear){
     const w=s.pathWear;for(const key of ['scores','levels','lastPassDays']){array(w[key],COLUMNS*ROWS);check(w[key].length===COLUMNS*ROWS);}
     integer(w.lastDecayDay,1,s.time.day);
+    // S11 pavement: sorted unique tile indices on open, non-rock ground.
+    array(w.paved,COLUMNS*ROWS);for(let i=0;i<w.paved.length;i++){integer(w.paved[i],0,COLUMNS*ROWS-1);if(i)check(w.paved[i]>w.paved[i-1]);check(s.terrain[Math.floor(w.paved[i]/COLUMNS)]?.[w.paved[i]%COLUMNS]===0);}
     for(let i=0;i<COLUMNS*ROWS;i++){integer(w.scores[i]);integer(w.levels[i],0,3);integer(w.lastPassDays[i],0,s.time.day);check(w.levels[i]===wearLevel(w.scores[i]));if(w.scores[i])check(w.lastPassDays[i]>0);}
   }
   number(s.camera?.zoom,MIN_ZOOM,MAX_ZOOM);number(s.camera.x,-1e6,1e6);number(s.camera.y,-1e6,1e6);check(typeof s.camera.following==='boolean');

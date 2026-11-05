@@ -37,10 +37,10 @@ test('terrain memory freezes discovered terrain, paths and seasons until ordinar
   const {king,fog,memory,grid}=world(),tile={x:22,y:20},index=2022;let level=0;
   const wear={level:()=>level};grid[20][22]=1;
   const changed=memory.observeTerrain(grid,wear,'Spring');assert.ok(changed.some(t=>t.x===22&&t.y===20));
-  assert.deepEqual(memory.terrainAt(tile,grid,wear,'Spring'),[1,0,'Spring',0]);
+  assert.deepEqual(memory.terrainAt(tile,grid,wear,'Spring'),[1,0,'Spring',0,0]);
   king.position={x:80.5,y:80.5};fog.update();grid[20][22]=0;level=3;
-  memory.observeTerrain(grid,wear,'Winter');assert.deepEqual(memory.terrain.get(index),[1,0,'Spring',0]);
-  assert.deepEqual(memory.terrainAt(tile,grid,wear,'Winter'),[1,0,'Spring',0]);
+  memory.observeTerrain(grid,wear,'Winter');assert.deepEqual(memory.terrain.get(index),[1,0,'Spring',0,0]);
+  assert.deepEqual(memory.terrainAt(tile,grid,wear,'Winter'),[1,0,'Spring',0,0]);
   fog.setEnabled(false);memory.observeTerrain(grid,wear,'Winter');assert.equal(memory.terrain.get(index)[0],1);
   assert.equal(memory.terrainAt(tile,grid,wear,'Winter')[0],0);
   fog.setEnabled(true);assert.equal(memory.terrainAt(tile,grid,wear,'Winter')[0],1);

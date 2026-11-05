@@ -57,7 +57,7 @@ Etapy01–06 i dodatečný audit archivu jsou DONE; M1 RELEASED0.2.0,07–10 jso
 | 08 | 31A: Extended Zoom Out | M2 | DONE | `c106cc4f4b0d1afb73a444500d0d1adabc92fb05`; plynulý zoom0.25–1.8/default1, bezpečné vysoké okno, přesné klikání/blueprint/Fog/Save12;395/395/build/nativní0.25 a vysoké okno,20NPC+mlha58.7–60FPS;[report](verification/master-08.md). |
 | 09 | 31B: Daily Resource Statistics & Ledger | M2 | DONE | `f3310a105223654a595f5bff205c56f5668c15cc`; merged [PR9](https://github.com/tom161819/Newgame/pull/9), main97b3381; journal/Save13/lišta/tooltipy,419/419 testů/Pages build/plný browser/71 SHA archivů/2314 HTTP souborů;[report](verification/master-09.md). |
 | 10 | 35: Quarry Placement & Iron Smelter | M2 | DONE | `0f4ebce931d912c18ff33a6148697b9514bb9249`; Quarry/Smelter/3Ore+2Wood→1Bar/Smelting/Save14,438 testů/build/current native; plný browser společné verze0f76b96 prošel před poslední drobnou validací. PR11 core merged, finální follow-up připraven;71 archivů/2314 HTTP souborů;[report](verification/master-10.md). |
-| 11 | 37: Stone Pavement & Courtyards | M3 | PENDING | Nezahájeno |
+| 11 | 37: Stone Pavement & Courtyards | M3 | REVIEW | Claude `claude/s11-stone-pavement` (#56): vrstva dlažby v PathWear, Single/Line/Area/Remove, fyzické blueprinty (1 Stone/2 políčka, Builder 2 s/políčko), +25 % bez sčítání s pěšinou, časové A*, Fog/Map Memory, Save24; 606 testů, browser `--pavement` PASS. Mosty/ostatní povrchy a povozy podle etapy 12. |
 | 12 | 34: Wheelwright, Wagons, Stables & Housing | M3 | PENDING | Nezahájeno |
 | 13 | 26: Villager Needs & Happiness | M4 | PENDING | Nezahájeno |
 | 14 | 27: Merchants, Caravans & Trade | M4 | PENDING | Nezahájeno |

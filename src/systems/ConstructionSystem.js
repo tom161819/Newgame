@@ -18,7 +18,8 @@ export class ConstructionSystem {
   }
   plan(building){
     if(building.construction)return building;
-    building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;if(building.type==='quarry'&&!building.depositId)building.quarryMode='unbound';initializeConstructionSite(building);this.materials.registerLegacy(building);if(!building.unverified)for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.revision++;this.scene.events?.emit('buildings:changed');return building;
+    building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;if(building.type==='quarry'&&!building.depositId)building.quarryMode='unbound';initializeConstructionSite(building);this.materials.registerLegacy(building);// S11: a pavement blueprint never blocks the way; people keep walking over it while it is laid.
+    if(!building.unverified&&!buildingDefinition(building).pavement)for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.revision++;this.scene.events?.emit('buildings:changed');return building;
   }
   actor(id){return id==='king'?this.scene.character:this.scene.workerSystem.workers.get(id);}
   slotKey(goal){return `construction-slot:${tileKey(goal)}`;}
@@ -104,6 +105,8 @@ export class ConstructionSystem {
       const [id,work]=contributors[i],ratio=i===contributors.length-1?1-allocated:work/total;allocated+=ratio;const actor=this.actor(id);
       if(actor?.isAlive)this.scene.activities.emit('buildingCompleted',{actor,objectType:site.type,quantity:1,contributionRatio:ratio,objectIds:[site.id]});
     }
+    // S11: a finished pavement tile becomes the terrain surface layer; its site record goes away.
+    if(buildingDefinition(site).pavement){const i=this.scene.buildings.indexOf(site);if(i>=0)this.scene.buildings.splice(i,1);this.scene.pathWear?.setPaved(site,true);}
     this.scene.events?.emit('buildings:changed');this.onComplete(site);return true;
   }
   // obstacle: a provisional site found blocked; reported once as constructionCancelled (reason obstacle).
