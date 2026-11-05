@@ -1,6 +1,10 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  // Seasonal field tending (#122).
+  'work.message.Tending crops':'Péče o plodiny',
+  'work.message.Walking to tend crops':'Cesta za péčí o plodiny',
+  'work.message.Waiting at farmhouse':'Čekání u statku',
   // Food-chain completion advice (#125).
   'notice.missingChainSource':'{name}: pro dlouhodobou výrobu chybí {producer}. Současné zásoby lze dál využít.',
   'hud.deliverCargo':'Odnést do skladu','status.cargoAwaitDelivery':'Kámen sebrán. Až budeš chtít, zvol Odnést do skladu.',

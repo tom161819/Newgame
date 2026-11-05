@@ -2,6 +2,10 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  // Seasonal field tending (#122).
+  'work.message.Tending crops':'Tending crops',
+  'work.message.Walking to tend crops':'Walking to tend crops',
+  'work.message.Waiting at farmhouse':'Waiting at farmhouse',
   // Food-chain completion advice (#125).
   'notice.missingChainSource':'{name}: no {producer} for long-term production. Existing supplies can still be used.',
   'hud.deliverCargo':'Deliver to storage','status.cargoAwaitDelivery':'Stone collected. Use Deliver to storage when you are ready.',

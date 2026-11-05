@@ -1,5 +1,6 @@
 export const FARMING_RULES = Object.freeze({
   workRadius: 15,
+  tending: Object.freeze({harvestCheck:250,poseDuration:2500,travelTimeout:15000,maxPlots:12}),
   refreshInterval: 1000,
   crops: Object.freeze({
     wheat_field: Object.freeze({ resource: 'wheat', growthDays: 2, yield: 8, workDuration: 4000, xp: 8,
