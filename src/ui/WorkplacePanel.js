@@ -4,6 +4,7 @@ import { buildingDefinition } from '../game/buildings.js';
 import { JOBS,SKILLS } from '../data/jobs.js';
 import { TALENTS } from '../data/economy.js';
 import { element } from './objectLabels.js';
+import { CANDIDATE_GROUPS,candidateGroups } from './workplaceCandidates.js';
 
 export class WorkplacePanel {
   constructor(scene){
@@ -16,20 +17,22 @@ export class WorkplacePanel {
     this.dialog.addEventListener('click',e=>{
       const button=e.target.closest('button');if(!button)return;
       const assign=button.dataset.assignWorker,remove=button.dataset.removeWorker;
-      if(assign)scene.workplaceSystem.assign(this.building,scene.workerSystem.workers.get(assign));
+      // Moving someone who already has another job takes a second, confirming click.
+      if(assign&&button.dataset.confirmMove&&this.pendingMove!==assign){this.pendingMove=assign;this.signature=null;this.refresh();return;}
+      if(assign){this.pendingMove=null;scene.workplaceSystem.assign(this.building,scene.workerSystem.workers.get(assign));}
       if(remove)scene.workplaceSystem.remove(scene.workerSystem.workers.get(remove));this.refresh();
     },options);
     this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.close();},options);this.dialog.addEventListener('close',()=>this.restoreInput(),options);
   }
-  open(building){this.building=building;this.signature=null;this.restored=false;this.scene.setGalleryInput(false);document.querySelector('#workplace-candidates').hidden=true;this.dialog.showModal();this.refresh();}
+  open(building){this.building=building;this.signature=null;this.pendingMove=null;this.restored=false;this.scene.setGalleryInput(false);document.querySelector('#workplace-candidates').hidden=true;this.dialog.showModal();this.refresh();}
   refresh(){
     if(!this.dialog.open||!this.building)return;
     const s=this.scene,b=this.building;if(!s.buildings.includes(b)||!s.fog.isVisibleObject(b)){this.close();return;}
-    const spec=buildingDefinition(b),summary=s.workplaceSystem.summary(b),employees=s.workplaceSystem.employees(b),candidates=s.workerSystem.liveSubjects().filter(w=>w.assignedWorkplaceId!==b.id);
+    const spec=buildingDefinition(b),summary=s.workplaceSystem.summary(b),employees=s.workplaceSystem.employees(b),candidates=s.workerSystem.liveSubjects();
     const production=spec.recipe?s.foodProduction.records.get(b.id):null;
     const forestry=spec.id==='lumberjack_hut'?s.naturalResources.forestry.summary(b):null;this.forestryDetails.hidden=!forestry;
     const mining=spec.mining?s.naturalResources?.mining.summary(b):null;this.miningDetails.hidden=!mining;this.miningDetails.textContent=mining??'';
-    const signature=JSON.stringify([summary,production,forestry,mining,production?s.foodStorage.revision:0,employees.map(w=>[w.id,w.workState,w.workMessage,w.skills[spec.workplace.skill].level]),candidates.map(w=>[w.id,w.profession,w.naturalTalent,w.skills[spec.workplace.skill].level])]);if(signature===this.signature)return;this.signature=signature;
+    const signature=JSON.stringify([summary,production,forestry,mining,production?s.foodStorage.revision:0,employees.map(w=>[w.id,w.workState,w.workMessage,w.skills[spec.workplace.skill].level]),candidates.map(w=>[w.id,w.profession,w.assignedWorkplaceId,w.naturalTalent,w.skills[spec.workplace.skill].level,w.skills[spec.workplace.skill].totalXP]),this.pendingMove]);if(signature===this.signature)return;this.signature=signature;
     if(forestry){this.forestryTrees.textContent=t(forestry.known?'workplace.knownTrees':'workplace.trees',{count:forestry.trees});this.forestryTotal.textContent=t('workplace.timber',{count:forestry.harvested});this.forestryToday.textContent=t('workplace.woodToday',{count:forestry.today});}
     const recipePanel=document.querySelector('#food-production-details');recipePanel.hidden=!production;
     if(production){
@@ -50,8 +53,21 @@ export class WorkplacePanel {
     const rows=employees.map(w=>{const row=element('li','workplace-worker'),text=element('span','',`${w.name} · ${t('workplace.skillLevel',{skill:SKILLS[spec.workplace.skill],level:w.skills[spec.workplace.skill].level})} · ${localized(`work.state.${w.workState}`,w.workState)}${w.workMessage?` — ${workMessageLabel(w.workMessage)}`:''}`),remove=element('button','',t('workplace.remove'));remove.type='button';remove.dataset.removeWorker=w.id;row.append(text,remove);return row;});
     for(let i=summary.count;i<summary.capacity;i++)rows.push(element('li','empty-slot',t('workplace.emptySlot')));document.querySelector('#workplace-workers').replaceChildren(...rows);
     document.querySelector('#assign-workplace-worker').disabled=summary.count>=summary.capacity;
-    document.querySelector('#workplace-candidates').replaceChildren(...candidates.map(w=>{const row=element('li','workplace-worker'),button=element('button','',t('workplace.assignOne'));button.type='button';button.dataset.assignWorker=w.id;button.disabled=summary.count>=summary.capacity;
-      row.append(element('span','',`${w.name} · ${JOBS[w.profession].name} · ${t('workplace.skillLevel',{skill:SKILLS[spec.workplace.skill],level:w.skills[spec.workplace.skill].level})} · ${localized(`talent.${w.naturalTalent}`,TALENTS[w.naturalTalent])} · ${t('unit.wage',{amount:s.workplaceSystem.predictedWage(w,spec.workplace.profession).toFixed(2)})}`),button);return row;}));
+    // Three groups in a fixed order (Unemployed, other profession, this profession), each sorted by the skill this building needs.
+    const skill=spec.workplace.skill,groups=candidateGroups(candidates,spec.workplace),full=summary.count>=summary.capacity;
+    const workplaceName=w=>{const home=s.buildings.find(x=>x.id===w.assignedWorkplaceId);return home?buildingDefinition(home).name:JOBS[w.profession].name;};
+    const row=(w,group)=>{
+      const item=element('li',`workplace-worker workplace-candidate candidate-${group}`),here=w.assignedWorkplaceId===b.id,portrait=element('img','candidate-portrait');portrait.alt='';portrait.src=s.populationSidebar?.portrait(w)??'';
+      const details=element('span','candidate-details');details.append(element('strong','',w.name),element('span','',`${t('workplace.skillXP',{skill:SKILLS[skill],level:w.skills[skill].level,xp:Math.floor(w.skills[skill].totalXP??0)})} · ${localized(`talent.${w.naturalTalent}`,TALENTS[w.naturalTalent])}`),element('span','',`${t('workplace.currentJob',{job:w.profession==='idle'?JOBS.idle.name:workplaceName(w)})} · ${t('unit.wage',{amount:s.workplaceSystem.predictedWage(w,spec.workplace.profession).toFixed(2)})}`));
+      const button=element('button','',here?t('workplace.assignedHere'):this.pendingMove===w.id?t('workplace.confirmMove',{job:workplaceName(w)}):t('workplace.assignOne'));button.type='button';
+      if(here)button.disabled=true;else{button.dataset.assignWorker=w.id;button.disabled=full;if(w.profession!=='idle')button.dataset.confirmMove='true';}
+      item.append(portrait,details,button);return item;
+    };
+    document.querySelector('#workplace-candidates').replaceChildren(...CANDIDATE_GROUPS.map(group=>{
+      const section=element('li','candidate-group'),list=element('ul','candidate-list');section.dataset.candidateGroup=group;
+      list.append(...(groups[group].length?groups[group].map(w=>row(w,group)):[element('li','empty-slot',t('workplace.groupEmpty'))]));
+      section.append(element('h3','',t(`workplace.group.${group}`,{count:groups[group].length})),list);return section;
+    }));
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){this.dialog.close();this.restoreInput();}

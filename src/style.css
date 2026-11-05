@@ -423,3 +423,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 #building-options .building-option > p:not(.building-availability) { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
 #building-options .building-empty { flex:1 0 100%; }
 @media(max-width:600px) { .buildings-panel { padding:10px; } #building-options .building-option { flex-basis:min(200px, 72vw); } }
+
+/* Assign Worker: three groups; Unemployed are told apart by a subtle tint and edge, not a loud colour. */
+.candidate-group { list-style:none; display:grid; gap:6px; }
+.candidate-group h3 { margin:10px 0 2px; font-size:13px; color:#e6d7a8; }
+.candidate-list { list-style:none; padding:0; margin:0; display:grid; gap:6px; }
+.workplace-candidate { align-items:center; }
+.workplace-candidate.candidate-unemployed { background:#2b3424; border-color:#7b8a5a; box-shadow:inset 3px 0 0 #8fa266; }
+.candidate-portrait { width:28px; height:34px; object-fit:contain; flex-shrink:0; }
+.candidate-details { display:grid; gap:2px; flex:1; min-width:0; }
+.candidate-details span { color:#c9c3a3; font-size:11px; }

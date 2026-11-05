@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| C01 (#48) Fog of War, exploration, blueprints, subject sight | Claude (taken over from Codex, developer's instruction 2026-11-05: Codex is not running) | `claude/c01-fow-sight` → `claude/c01-explore` → `claude/c01-blueprints` (merge in this order) | A+D [#85](https://github.com/tom161819/Newgame/pull/85) and B [#86](https://github.com/tom161819/Newgame/pull/86) merged; C open | In progress | src/systems/FogOfWarSystem.js, VisibilityModifiers.js, MapMemory (read only), src/game/TerrainRenderer.js (updateFog), PlayerController.js, knownMap.js, provisionalSites.js, buildings.js, walls.js, GameScene.js (click, placement, preview), ConstructionSystem.js, GameStateSerializer/Loader, characters.js (peasant sight), i18n status keys, fog/population/smelting/forestry/mineral/ledger smokes. |
+| C02 (#49) Assign Worker groups, Granary staffing audit | Claude (taken over from Codex; Codex not running) | `claude/c02-staffing-granary` | — | In progress | src/ui/WorkplacePanel.js, src/ui/workplaceCandidates.js, i18n workplace keys, src/style.css (candidate block), scripts/staffing-smoke.mjs, tests/workplace-candidates.test.js. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -21,6 +21,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-05 [#85](https://github.com/tom161819/Newgame/pull/85), [#86](https://github.com/tom161819/Newgame/pull/86), [#88](https://github.com/tom161819/Newgame/pull/88) C01: no stuck visibility, subjects see 15 tiles, the king explores unknown land, provisional blueprints outside sight (SAVE_VERSION 19). Taken over from Codex; Issue #48 done and closed (Claude).
 - 2026-11-05 [#84](https://github.com/tom161819/Newgame/pull/84) N11: trampled paths drawn as the approved narrow Earth track over seasonal grass; Pages 41985687360 and Verify published release passed. Issue #64 done and closed (Claude).
 - 2026-11-05 [#82](https://github.com/tom161819/Newgame/pull/82) N10: the Buildings menu is a wide horizontal strip of cards (buttons, wheel, keyboard, phone scrolling); Pages 41981107835 and Verify published release passed. Issue #63 done and closed (Claude).
 - 2026-11-05 [#81](https://github.com/tom161819/Newgame/pull/81) N08: unique Archive build numbers for the 73 historical snapshots, explained in the archive UI; Pages 41978659289 and Verify published release passed. Issue #39 done and closed; N10 (#63) unblocked (Claude).
