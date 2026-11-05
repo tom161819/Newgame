@@ -28,10 +28,10 @@ test('three units receive distinct destinations, no physical overlap, and select
 test('Hold releases a pending pickup, preserves loaded cargo once, and Resume physically returns it',()=>{
  const s=world(),w=s.workerSystem.create({x:60,y:60});s.workerSystem.jobs.assign(w,'hauler');const store=[...s.foodStorage.locations.values()].find(l=>l.kind==='fallback');s.foodStorage.deposit(store.id,'stone',10);
  assert.equal(s.foodProduction.move(w,store.id,store.id,'stone',10),false);
- const drop=s.dropSystem.create('wood',{x:62,y:60},9);assert.ok(s.foodProduction.moveGround(w,drop,store.id,9));assert.ok(s.foodStorage.reservations.size>0);
- s.workerSystem.commands.hold(w);assert.equal(s.foodStorage.reservations.size,0);assert.equal(s.workerSystem.reservations.byKey?.size??0,0);assert.equal(total(s,'wood'),9);
- s.workerSystem.commands.resume(w);assert.ok(s.foodProduction.moveGround(w,drop,store.id,9));until(s,()=>w.cargo?.amount===9);s.workerSystem.commands.hold(w);const before=structuredClone(w.cargo);assert.equal(s.foodStorage.reservations.size,0);s.simulate(1500);assert.deepEqual(w.cargo,before);assert.equal(total(s,'wood'),9);
- validateGameState(serializeGameState(s));s.workerSystem.commands.resume(w);until(s,()=>!w.cargo);assert.equal(total(s,'wood'),9);s.simulate(2000);assert.equal(total(s,'wood'),9);
+ const drop=s.dropSystem.create('wood',{x:62,y:60},8);assert.ok(s.foodProduction.moveGround(w,drop,store.id,8));assert.ok(s.foodStorage.reservations.size>0);
+ s.workerSystem.commands.hold(w);assert.equal(s.foodStorage.reservations.size,0);assert.equal(s.workerSystem.reservations.byKey?.size??0,0);assert.equal(total(s,'wood'),8);
+ s.workerSystem.commands.resume(w);assert.ok(s.foodProduction.moveGround(w,drop,store.id,8));until(s,()=>w.cargo?.amount===8);s.workerSystem.commands.hold(w);const before=structuredClone(w.cargo);assert.equal(s.foodStorage.reservations.size,0);s.simulate(1500);assert.deepEqual(w.cargo,before);assert.equal(total(s,'wood'),8);
+ validateGameState(serializeGameState(s));s.workerSystem.commands.resume(w);until(s,()=>!w.cargo);assert.equal(total(s,'wood'),8);s.simulate(2000);assert.equal(total(s,'wood'),8);
 });
 
 test('job changes and automatic employment cannot override Hold; death drops cargo and clears the command',()=>{

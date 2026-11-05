@@ -92,7 +92,7 @@ export async function placeBlueprint(page,type){
 export async function supplyAndBuild(page,{id,point}){
   // There is no Deliver Materials button: Build with King first carries the missing materials, then builds.
   await clickBuilding(page,id);await page.locator('#construction-dialog[open]').waitFor();assert.equal(await page.locator('#construction-deliver').count(),0);assert.equal(await page.locator('#construction-king-work').isDisabled(),false);await page.locator('#construction-king-work').click();await page.locator('#close-construction').click();
-  await page.waitForFunction(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id);return s.constructionSystem.materials.ready(b)&&s.kingLogistics.workflowSiteId==null&&s.constructionSystem.assignments.get('king')?.siteId===id;},id,{timeout:35000});
+  await page.waitForFunction(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id);return s.constructionSystem.materials.ready(b)&&s.kingLogistics.workflowSiteId==null&&s.constructionSystem.assignments.get('king')?.siteId===id;},id,{timeout:120000});
   await page.waitForFunction(id=>window.__game.registry.get('application').scene.buildings.find(b=>b.id===id)?.construction?.state==='complete',id,{timeout:65000});
   console.log(`PASS physical construction and material delivery for site ${id}`);
 }

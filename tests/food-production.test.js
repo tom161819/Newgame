@@ -74,9 +74,9 @@ test('profession changes, worker death and destroyed machines preserve consumed 
   }
   const {s,stock,mill,record}=millFixture();s.foodStorage.deposit(stock,'wheat',4);until(s,()=>record.cycle?.workDone>=1000);s.buildings=s.buildings.filter(b=>b!==mill);s.tick(25);assert.equal(quantities(s).wheat,4);assert.equal(s.foodProduction.records.has(mill.id),false);assert.equal(s.foodStorage.reservations.size,0);
 });
-test('large ground meat piles are carried in trips of at most 20 with one proportional collection reward and no phantom food',()=>{
+test('large ground meat piles are carried in trips of at most 40 (40 load units of Meat) with one proportional collection reward and no phantom food',()=>{
   const s=scene(),home=building(s,'hunting_lodge',44,45),granary=building(s,'granary',48,45),w=worker(s,home,{x:43,y:45});s.dropSystem.create('meat',{x:43,y:46},47);
-  let max=0;until(s,()=>{max=Math.max(max,w.cargo?.amount??0);return s.inventory.count('meat')===47;},60000);assert.equal(w.experience.totalXP,2);assert.equal(s.dropSystem.drops.size,0);assert.equal(max,20);assert.equal(s.foodStorage.locations.get(`granary-${granary.id}`).stock.meat,47);
+  let max=0;until(s,()=>{max=Math.max(max,w.cargo?.amount??0);return s.inventory.count('meat')===47;},60000);assert.equal(w.experience.totalXP,2);assert.equal(s.dropSystem.drops.size,0);assert.equal(max,40);assert.equal(s.foodStorage.locations.get(`granary-${granary.id}`).stock.meat,47);
 });
 test('Save validation rejects duplicate quantity/reservations, incompatible storage and forged cycles before mutating a world',()=>{
   const {s,stock,record}=millFixture();s.foodStorage.deposit(stock,'wheat',4);until(s,()=>record.cycle?.workDone>=1000);const data=validateGameState(serializeGameState(s));
