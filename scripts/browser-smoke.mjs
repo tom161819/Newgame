@@ -94,7 +94,7 @@ try{
   await page.locator('#new-game').click();await page.locator('.setup-advanced summary').click();await page.locator('#setup-fog').uncheck();await page.locator('#setup-respawn').selectOption('off');
   // Residents stay where the smokes put them; Auto Employment has its own smoke.
   assert.equal(await page.locator('#setup-auto-employment').isChecked(),true);await page.locator('#setup-auto-employment').uncheck();
-  if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full'))await page.locator('#setup-seasons').uncheck();}
+  if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full')||args.includes('--seasons-menu'))await page.locator('#setup-seasons').uncheck();}
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
   if(args.includes('--full')||args.includes('--ledger'))await ledgerSmoke(page);
@@ -120,7 +120,7 @@ try{
   if(args.includes('--full')||args.includes('--i18n'))await i18nGameSmoke(page);
   if(args.includes('--full')||args.includes('--save-transfer'))await saveTransferSmoke(page);
   if(args.includes('--full')||args.includes('--autosave'))await autosaveSmoke(page);
-  if(args.includes('--full'))await seasonsMenuSmoke(page);
+  if(args.includes('--full')||args.includes('--seasons-menu'))await seasonsMenuSmoke(page);
   if(args.includes('--full')||args.includes('--season-transition'))await seasonTransitionSmoke(page);
   await buildingMenuSmoke(page);
   const point=await page.evaluate(()=>{

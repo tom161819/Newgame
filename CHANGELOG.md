@@ -43,6 +43,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Idle Haulers now collect loose stone lying within a set radius of the Castle (default 80 tiles) and carry it to storage. Each Hauler has a Collect loose stone ON/OFF switch and a radius field in the unit panel; real transport jobs always come first. Saved games from earlier versions cannot be loaded and need a new game.
 
 ### Fixed
+- Seasonal ground changes finish repainting while the game is paused, so resuming a saved season keeps the same terrain picture. Normal gameplay retains its bounded redraw budget.
 - The king waits after collecting loose stone and keeps it in his personal cargo. Use Deliver to storage in the top-left HUD to carry it to a reachable store; changing orders keeps the cargo safe, and full stores never consume it.
 - Idle Haulers also collect loose stone within their chosen radius of reachable Warehouses, Starter Stockpiles and physical construction sites. They work without a Castle, keep real deliveries first, and carry each stone to storage using the existing reservations.
 - Wandering rabbits, deer and wild boars keep one tile away from solid buildings and physical construction sites, including narrow gaps and diagonal corners. Wildlife spawns respect the same margin; animals retreat when a new structure surrounds them. Hunting and the king’s horse keep their existing movement.
