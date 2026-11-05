@@ -22,7 +22,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=17;
+export const SAVE_VERSION=18;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -35,7 +35,7 @@ export function serializeActor(unit){
 }
 export function serializeOrder(order){
   if(!order)return null;
-  return {kind:order.kind,goal:point(order.goal),pickupKey:order.pickupKey??null,dropId:order.dropId??null,silent:!!order.silent,
+  return {kind:order.kind,goal:point(order.goal),pickupKey:order.pickupKey??null,dropId:order.dropId??null,silent:!!order.silent,explore:!!order.explore,
     buildingId:order.tower?.id??null,animalId:order.animal?.id??null,chestId:order.chest?.id??null,
     resourceKey:order.resource?`${order.resource.x},${order.resource.y}`:null};
 }
@@ -283,7 +283,7 @@ export function validateGameState(input,registry=objectRegistry){
     }
   }else check(!plots.length);
   if(p.horseId)check(s.animals.some(a=>a.id===p.horseId&&a.type==='horse'&&a.mounted&&a.isAlive));
-  const order=o=>{if(!o)return;check(['move','enter','collect','drop','openChest','approachAnimal'].includes(o.kind));if(o.kind==='move'||o.kind==='drop')tile(o.goal);
+  const order=o=>{if(!o)return;check(['move','enter','collect','drop','openChest','approachAnimal'].includes(o.kind));check(typeof o.explore==='boolean'&&(!o.explore||o.kind==='move'));if(o.kind==='move'||o.kind==='drop')tile(o.goal);
     if(o.kind==='enter')check(bIds.has(o.buildingId)&&buildingIsComplete(s.buildings.find(b=>b.id===o.buildingId)));if(o.kind==='approachAnimal')check(aIds.has(o.animalId));if(o.kind==='drop')check(dIds.has(o.dropId));
     if(o.kind==='openChest')check(cIds.has(o.chestId));if(o.kind==='collect')check(s.resources.some(r=>`${r.tile.x},${r.tile.y}`===o.resourceKey));};
   order(p.order);if(p.roofContinuation){order(p.roofContinuation.order);tile(p.roofContinuation.exit);tile(p.roofContinuation.destination);array(p.roofContinuation.path);p.roofContinuation.path.forEach(tile);}
