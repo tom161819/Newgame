@@ -6,7 +6,7 @@ export class KingLogisticsSystem {
   get actor(){return this.scene.character;}
   get storage(){return this.scene.foodStorage;}
   get materials(){return this.scene.constructionSystem?.materials;}
-  room(resource,siteId=null){const cargo=this.actor.cargo;return !this.storage.manages(resource)||cargo&&(cargo.resource!==resource||(cargo.siteId??null)!==(siteId??null))?0:Math.max(0,carryCapacity(this.actor)-(cargo?.amount??0));}
+  room(resource,siteId=null){const cargo=this.actor.cargo;return !this.storage.manages(resource)||cargo&&(cargo.resource!==resource||(cargo.siteId??null)!==(siteId??null))?0:Math.max(0,carryCapacity(this.actor,resource)-(cargo?.amount??0));}
   receive({resource,amount,event,siteId=null}){
     if(!Number.isSafeInteger(amount)||amount<=0||this.room(resource,siteId)<amount)return false;
     this.cancel();const actor=this.actor;if(actor.cargo)actor.cargo.amount+=amount;else actor.cargo={resource,amount,...(siteId!=null?{siteId}:{})};

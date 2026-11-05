@@ -262,7 +262,7 @@ export function validateGameState(input,registry=objectRegistry){
         }
       }
       if(w.workplaceReached!==undefined)check(typeof w.workplaceReached==='boolean');
-      if(w.cargo){check(w.isAlive&&(w.assignedWorkplaceId!=null||['hauler','builder'].includes(w.profession))&&definition(w.cargo.resource).category==='resource'&&w.cargo.resource!=='gold');integer(w.cargo.amount,1,s.foodStorage?.physicalMaterials||s.foodStorage&&FOOD_RESOURCE_IDS.includes(w.cargo.resource)?carryCapacity(w):Number.MAX_SAFE_INTEGER);if(w.cargo.transportCancelled!==undefined)check(typeof w.cargo.transportCancelled==='boolean');}
+      if(w.cargo){check(w.isAlive&&(w.assignedWorkplaceId!=null||['hauler','builder'].includes(w.profession))&&definition(w.cargo.resource).category==='resource'&&w.cargo.resource!=='gold');integer(w.cargo.amount,1,s.foodStorage?.physicalMaterials||s.foodStorage&&FOOD_RESOURCE_IDS.includes(w.cargo.resource)?carryCapacity(w,w.cargo.resource):Number.MAX_SAFE_INTEGER);if(w.cargo.transportCancelled!==undefined)check(typeof w.cargo.transportCancelled==='boolean');}
       if(w.pendingWorkRewards!==undefined){array(w.pendingWorkRewards,10000);for(const event of w.pendingWorkRewards){
         check(w.isAlive&&w.assignedWorkplaceId!=null);check((event.type==='resourceCollected'&&event.objectType==='stone')||(event.type==='dropCollected'&&event.objectType==='meat')||(event.type==='animalKilled'&&['rabbit','deer','wild_boar'].includes(event.objectType)));integer(event.quantity??1,1);if(event.contributionRatio!==undefined)number(event.contributionRatio);
       }}

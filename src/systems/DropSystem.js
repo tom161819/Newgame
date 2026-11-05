@@ -33,7 +33,7 @@ export class DropSystem {
   collect(id,standingTile,actor=this.scene.character){
     const drop=this.drops.get(id);
     if(!drop||actor.state!=='ground'||tileKey(standingTile)!==tileKey(drop.tile))return false;
-    const cancelledTransport=drop.haulEligible===false,royal=actor===this.scene.character&&this.scene.foodStorage?.manages(drop.resource)&&this.scene.kingLogistics,capacity=royal?royal.room(drop.resource,drop.siteId):carryCapacity(actor);
+    const cancelledTransport=drop.haulEligible===false,royal=actor===this.scene.character&&this.scene.foodStorage?.manages(drop.resource)&&this.scene.kingLogistics,capacity=royal?royal.room(drop.resource,drop.siteId):carryCapacity(actor,drop.resource);
     if(royal&&!capacity){this.scene.setStatus(t('status.cargoFull'));return false;}
     const limited=royal||this.scene.foodStorage?.manages(drop.resource)&&this.scene.workerSystem?.workers.has(actor.id),amount=limited?Math.min(capacity,drop.amount):drop.amount;
     const packageRatio=amount/drop.amount*(drop.rewardRemaining??1),units=amount/drop.amount*(drop.rewardUnits??(drop.resource==='stone'?drop.amount:0)),contributionRatio=drop.resource==='stone'?units/amount:packageRatio,event={type:drop.resource==='stone'?'resourceCollected':'dropCollected',objectType:drop.resource,quantity:amount,objectId:drop.id,contributionRatio};
