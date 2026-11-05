@@ -6,8 +6,9 @@ import { JOBS } from '../src/data/jobs.js';
 import { WORKPLACES } from '../src/data/workplaces.js';
 import { readFileSync } from 'node:fs';
 
-test('the audit matches the registry: Stables, Wheelwright and Horse Wagon are not implemented yet, the rest exists',()=>{
-  for(const id of ['stables','wheelwright','horse_wagon']){assert.equal(objectRegistry.get(id)??null,null,`${id} is a Stage 12 feature, not a regression`);assert.match(MILITARY_AUDIT[id],/not implemented yet/);}
+test('the audit matches the registry: Stables and the Wheelwright exist (S12), the Horse Wagon is still to come',()=>{
+  for(const id of ['stables','wheelwright_workshop']){assert.ok(objectRegistry.get(id),id);assert.match(MILITARY_AUDIT[id],/^implemented/);}
+  assert.equal(objectRegistry.get('horse_wagon')??null,null);assert.match(MILITARY_AUDIT.horse_wagon,/not implemented yet/);
   assert.equal(objectRegistry.require('iron_bar').category,'resource');assert.equal(objectRegistry.require('barracks').buildable,true);
   assert.equal(objectRegistry.require('horse').category,'animal');assert.equal(WORKPLACES.barracks.profession,'soldier');
 });
