@@ -28,7 +28,7 @@ import { SeasonSystem } from '../../src/systems/SeasonSystem.js';
 import { KingdomAttractivenessSystem } from '../../src/systems/KingdomAttractivenessSystem.js';
 import { KingLogisticsSystem } from '../../src/systems/KingLogisticsSystem.js';
 import { LogisticsTaskManager } from '../../src/systems/LogisticsTaskManager.js';
-import { createStartingStockpile,createStartingCastle } from '../../src/systems/WorldGenerationConfig.js';
+import { createStartingStockpile,createStartingCastle,depositStartingResources } from '../../src/systems/WorldGenerationConfig.js';
 import { WorkerSystem } from '../../src/systems/WorkerSystem.js';
 import { NaturalResourcesSystem } from '../../src/systems/NaturalResourcesSystem.js';
 import { resourceBlocks } from '../../src/data/minerals.js';
@@ -84,7 +84,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   if(workplaces||construction||farming||foodProduction||logistics)scene.workplaceSystem=new WorkplaceSystem(scene);
   if(construction)scene.constructionSystem=new ConstructionSystem(scene,{onComplete:b=>{scene.towerViews.set(b.id,scene.createBuildingView(b.definition,b));scene.refreshWallConnections();},onCancel:b=>{scene.towerViews.delete(b.id);scene.refreshWallConnections();}});
   if(logistics&&starter){if(scene.gameSettings?.startingCastle)createStartingCastle(scene,scene.character.tile);createStartingStockpile(scene,scene.character.tile);}
-  if(foodProduction||logistics){scene.foodStorage=new FoodStorageSystem(scene,{physicalMaterials:logistics});scene.foodProduction=new FoodProductionSystem(scene);if(logistics){scene.kingLogistics=new KingLogisticsSystem(scene);scene.logisticsTasks=new LogisticsTaskManager(scene);}}
+  if(foodProduction||logistics){scene.foodStorage=new FoodStorageSystem(scene,{physicalMaterials:logistics});scene.foodProduction=new FoodProductionSystem(scene);if(logistics){scene.kingLogistics=new KingLogisticsSystem(scene);scene.logisticsTasks=new LogisticsTaskManager(scene);if(starter)depositStartingResources(scene);}}
   if(farming||foodProduction||logistics)scene.farmingSystem=new FarmingSystem(scene,{growthModifier:()=>scene.seasons?.growthMultiplier()??1,onHarvest:foodProduction||logistics?result=>scene.foodProduction.harvest(result):null});
   scene.addResource=(d,tile,natural=null)=>{const v=view(d.id,tileCenter(tile)),key=`${tile.x},${tile.y}`,object={type:d.id,definition:d,x:tile.x,y:tile.y,tiles:buildingTiles(tile,d),...(natural?{natural:structuredClone(natural)}:{})};v.setData('tile',{...tile}).setData('object',object);if(natural)v.getMemoryState=()=>d.tree?{stage:object.natural.stage,season:scene.seasons?.season??'Spring'}:{depleted:object.natural.remaining===0};scene.resources.set(key,v);for(const t of object.tiles){scene.resourceOccupancy.set(`${t.x},${t.y}`,key);if(resourceBlocks(object))scene.map[t.y][t.x]=1;}scene.naturalResources?.register(object);};
   if(naturalResources)scene.naturalResources=new NaturalResourcesSystem(scene);

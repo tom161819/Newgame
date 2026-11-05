@@ -390,3 +390,5 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   #king-health-bar { width: 64px; }
   .camera-controls { font-size: 10px; }
 }
+.setup-resources { margin-top:20px; }
+.setup-resources .setup-help { margin:0; }

@@ -63,7 +63,7 @@ import { ConstructionView } from './ConstructionView.js';
 import { SeasonTransition } from './SeasonTransition.js';
 import { ConstructionUI } from '../ui/ConstructionUI.js';
 import { gameSettings,resourceSpawnSettings } from '../systems/GameSettings.js';
-import { createStartingCastle,createStartingStockpile } from '../systems/WorldGenerationConfig.js';
+import { createStartingCastle,createStartingStockpile,depositStartingResources } from '../systems/WorldGenerationConfig.js';
 import { WildlifeRespawnSystem } from '../systems/WildlifeRespawnSystem.js';
 import { FarmingSystem } from '../systems/FarmingSystem.js';
 import { CropPlotView } from './CropPlotView.js';
@@ -169,7 +169,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.spawner=this.resourceSpawners.find(s=>s.definition.id==='stone');
     this.dropSystem=new DropSystem(this);
-    this.foodStorage=new FoodStorageSystem(this,{physicalMaterials:true});this.kingLogistics=new KingLogisticsSystem(this);
+    this.foodStorage=new FoodStorageSystem(this,{physicalMaterials:true});this.kingLogistics=new KingLogisticsSystem(this);if(!this.loadState)depositStartingResources(this);
     this.animalSystem=new AnimalSystem(this);if(!this.loadState)this.animalSystem.spawn(PLAYER_START);
     this.huntingSystem=new HuntingSystem(this);
     this.combatFeedback=new CombatFeedback(this);

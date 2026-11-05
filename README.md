@@ -311,7 +311,7 @@ New Game otevře Game Setup: obtížnost Easy/Normal/Hard, 3/9/24 lovitelných z
 
 ### Pokročilé nastavení světa
 
-Advanced Settings jsou standardně sbalené. Nová hra používá Fog of War ON (přednost před starou preferencí prohlížeče), volitelný hotový hrad 3 × 3 zdarma, den 60/120/240 sekund, obnovu zvěře Off/120/60/30 sekund a počáteční zlato 0–500 po 25. Reset to Defaults obnoví jen formulář; přehled pod ním ukazuje všech devět voleb. Hra ani uložené pozice se při nastavování nemění.
+Advanced Settings jsou standardně sbalené. Nová hra používá Fog of War ON (přednost před starou preferencí prohlížeče), volitelný hotový hrad 3 × 3 zdarma, den 60/120/240 sekund, obnovu zvěře Off/120/60/30 sekund a počáteční zlato 0–500 po 25. Pod zlatem lze nastavit počáteční Stone, Wood, Iron Ore a Bread po 5 kusech; dohromady nejvýš 40, tedy kapacitu počátečního skladiště, kam se při startu fyzicky uloží. Initial Stones dál určuje jen volně ležící kameny na mapě. Reset to Defaults obnoví jen formulář; přehled pod ním ukazuje všech devět voleb. Hra ani uložené pozice se při nastavování nemění.
 
 Denní příjem, poměrné mzdy, zarůstání cest i migrace používají zvolenou délku dne. Spotřeba masa po minutě a kameny po 20 sekundách zůstávají stejné. WildlifeRespawnSystem doplňuje jeden nejvíce chybějící druh na interval do cíle 3/9/24; hledá dosažitelné volné místo a přednostně místo mimo králův dohled. Pauza a Game Over jej zastaví. Koně nedoplňuje.
 

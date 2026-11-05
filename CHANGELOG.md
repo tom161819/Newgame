@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- New Game Setup can stock the Starter Stockpile: under Starting Gold choose Starting Stone, Wood, Iron Ore and Bread in steps of 5, up to its 40-unit capacity in total. The goods are placed in the stockpile at the start; Initial Stones still sets only the loose stones on the map. Saved games from earlier versions cannot be loaded and need a new game.
 - Idle Haulers now collect loose stone lying within a set radius of the Castle (default 80 tiles) and carry it to storage. Each Hauler has a Collect loose stone ON/OFF switch and a radius field in the unit panel; real transport jobs always come first. Saved games from earlier versions cannot be loaded and need a new game.
 
 ### Fixed

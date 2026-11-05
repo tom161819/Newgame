@@ -1,6 +1,7 @@
 import { PLAYER_START } from '../game/config.js';
 import { placementError,buildingTiles,towerNeighbors,buildingDefinition } from '../game/buildings.js';
 import { findPathToAny,reachableTiles } from '../game/pathfinding.js';
+import { STARTING_RESOURCES } from './GameSettings.js';
 
 // Volá se pouze při New Game, před rozmístěním surovin a jednotek.
 export function createStartingCastle(scene,start=PLAYER_START){
@@ -33,4 +34,14 @@ export function createStartingStockpile(scene,start=PLAYER_START){
     scene.buildings.push(building);scene.towerViews.set(building.id,scene.createBuildingView(definition,building));return building;
   }
   throw new Error('Poblíž krále není dostupné místo pro počáteční skladiště.');
+}
+
+// New Game only, once: the chosen starting goods go physically into the Starter
+// Stockpile through the ordinary storage deposit (settings already cap the total).
+export function depositStartingResources(scene){
+  const starter=scene.buildings.find(b=>b.type==='starter_stockpile'),id=starter&&`stockpile-${starter.id}`;
+  for(const [key,resource]of Object.entries(STARTING_RESOURCES)){
+    const amount=scene.gameSettings?.[key]??0;if(!amount)continue;
+    if(!id||!scene.foodStorage?.deposit(id,resource,amount))throw new Error(`Starting ${resource} does not fit the Starter Stockpile.`);
+  }
 }
