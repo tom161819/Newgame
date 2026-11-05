@@ -13,6 +13,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| House (#57, House part only; developer priority) | Claude | `claude/house-population-capacity` | — | In progress; depends on C07 PR #117 | data/objects/housing.js (new), objects/index.js, approvedArt.js (house), jobs.js (houseCapacity), WorkerSystem.js (capacity), i18n objects, public/assets/buildings/house, tests. |
 | C07 (#54) Weapon workshops and Armory | Claude | `claude/c07-weapon-production-armory` | — | PR open; 586 tests, 45 full smokes PASS | data/objects/military.js (new), production.js, jobs.js, workplaces.js, economy.js, employment.js, logistics.js, objects/index.js, approvedArt.js, militaryEquipment.js + contract, i18n objects, public/assets (approved art), GameStateSerializer (SAVE_VERSION 22), tests. |
 
 ## Kept backups (do not delete without the developer)

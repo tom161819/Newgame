@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- House (Housing menu, 2×2, 10 Wood and 4 Stone): each completed House raises the resident limit by 5 above the base 20, so migrants keep arriving. Blueprints give no room until they are built; the Residents counter shows the new limit at once.
 - Weapon and armour workshops and the Armory, all under Castle & Defense:
   - Bowyer: 8 Wood make a Bow.
   - Swordsmith: 3 Iron Bars and 2 Wood make a Sword.
