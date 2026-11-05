@@ -6,6 +6,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- House (Housing menu, 2×2, 10 Wood and 4 Stone): each completed House raises the resident limit by 5 above the base 20, so migrants keep arriving. Blueprints give no room until they are built; the Residents counter shows the new limit at once.
+- Weapon and armour workshops and the Armory, all under Castle & Defense:
+  - Bowyer: 8 Wood make a Bow.
+  - Swordsmith: 3 Iron Bars and 2 Wood make a Sword.
+  - Armorer: 5 Iron Bars and 2 Wood make metal Armor.
+  Each workshop has two workers, physically delivered inputs, Auto Production and the new Crafting skill. Haulers carry finished Bows, Swords and Armor to an Armory, which stores up to 40 pieces and nothing else; Warehouses never take them. The buildings use the approved Asset Studio art.
 - Select your subjects with a click or drag a box around a group, then right-click to move them to separate nearby positions and hold there. Hold Here and Resume Previous Job preserve professions and physical cargo while releasing work reservations safely. Escape deselects without resuming work. Manual orders are saved with the game. The king keeps his existing controls.
 - Notices in the bottom-right corner warn about lasting problems:
   - a supplied construction site with no Builder;

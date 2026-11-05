@@ -1,9 +1,9 @@
 import { localizeJobs,localizeSkills } from '../i18n/names.js';
-export const SKILLS=Object.freeze(localizeSkills({woodcutting:'Woodcutting',mining:'Mining',hunting:'Hunting',construction:'Construction',farming:'Farming',combat:'Combat',milling:'Milling',baking:'Baking',logistics:'Logistics',smelting:'Smelting'}));
+export const SKILLS=Object.freeze(localizeSkills({woodcutting:'Woodcutting',mining:'Mining',hunting:'Hunting',construction:'Construction',farming:'Farming',combat:'Combat',milling:'Milling',baking:'Baking',logistics:'Logistics',smelting:'Smelting',crafting:'Crafting'}));
 export const SKILL_IDS=Object.freeze(Object.keys(SKILLS));
 export const WORK_RULES=Object.freeze({efficiencyPerLevel:.01,miningDuration:1500,searchInterval:500,workRadius:24,
   fleeRatio:.3,recoverRatio:.8,combatXPPerDamage:1,combatXPPerTarget:40});
-export const POPULATION=Object.freeze({initial:3,maximum:20,migrantsPerDay:1,wanderRadius:5,recentDeathDays:3});
+export const POPULATION=Object.freeze({initial:3,maximum:20,houseCapacity:5,migrantsPerDay:1,wanderRadius:5,recentDeathDays:3});
 export const JOBS=Object.freeze(localizeJobs({
   idle:Object.freeze({portraitColor:'#62655d',name:'Unemployed',skill:null}),
   woodcutter:Object.freeze({portraitColor:'#365e42',name:'Woodcutter',skill:'woodcutting',workplace:'lumberjack_hut',requiresWorkplace:true}),
@@ -16,4 +16,7 @@ export const JOBS=Object.freeze(localizeJobs({
   smelter_operator:Object.freeze({portraitColor:'#a25428',name:'Smelter Operator',skill:'smelting',workplace:'smelter',requiresWorkplace:true}),
   hauler:Object.freeze({portraitColor:'#69517b',name:'Hauler',skill:'logistics',workplace:null,requiresWorkplace:false}),
   soldier:Object.freeze({portraitColor:'#863f3c',name:'Soldier',skill:'combat',workplace:'barracks',requiresWorkplace:false}),
+  bowyer:Object.freeze({portraitColor:'#6d5a32',name:'Bowyer',skill:'crafting',workplace:'bowyer',requiresWorkplace:true}),
+  swordsmith:Object.freeze({portraitColor:'#5d6470',name:'Swordsmith',skill:'crafting',workplace:'swordsmith',requiresWorkplace:true}),
+  armorer:Object.freeze({portraitColor:'#58606b',name:'Armorer',skill:'crafting',workplace:'armorer',requiresWorkplace:true}),
 }));

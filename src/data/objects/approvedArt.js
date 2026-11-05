@@ -4,6 +4,8 @@
 // tests/asset-studio.test.js checks that files and numbers match the export.
 // The procedural renderer stays as the fallback if an image cannot load.
 export const APPROVED_BUILDING_ART=Object.freeze({
+  house:{"sprite":"/assets/buildings/house/house-timber.v1.png","artSource":"art/sprites/house/house-timber.v1.json","origin":{"x":0.48872,"y":0.98473},"visualHeight":129,"lights":[{"type":"torch","x":-22.4,"y":-59.96,"color":"#ffb25a","radius":102.4,"intensity":0.95,"flicker":{"amplitude":0.12,"speed":7},"flameSize":1}]},
+  swordsmith:{"sprite":"/assets/buildings/swordsmith/swordsmith-stone.v1.png","artSource":"art/sprites/swordsmith/swordsmith-stone.v1.json","origin":{"x":0.49618,"y":0.98473},"visualHeight":129,"lights":[{"type":"brazier","x":6.4,"y":-34.09,"color":"#ff9d4a","radius":134.4,"intensity":1,"flicker":{"amplitude":0.16,"speed":5.5},"flameSize":1.6}]},
   farmhouse:{"sprite":"/assets/buildings/farmhouse/farmstead-thatched.v1.png","artSource":"art/sprites/farmstead/farmstead-thatched.v1.json","origin":{"x":0.49618,"y":0.98462},"visualHeight":128},
   granary:{"sprite":"/assets/buildings/granary/granary-store-raised.v1.png","artSource":"art/sprites/granary-store/granary-store-raised.v1.json","origin":{"x":0.49744,"y":0.98817},"visualHeight":167},
   bakery:{"sprite":"/assets/buildings/bakery/bakery-house-yard-oven.v1.png","artSource":"art/sprites/bakery-house/bakery-house-yard-oven.v1.json","origin":{"x":0.49618,"y":0.98551},"visualHeight":136},

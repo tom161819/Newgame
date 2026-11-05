@@ -18,31 +18,33 @@ recruitment, combat) build on, and what Stage 12 (Stables) completes. The machin
 Nothing is missing from the Buildings menu: Stables cannot appear because they do not exist yet. They are not
 added early here (the order override in #53 keeps Stage 12 after C08).
 
-## Items
+## Items (implemented by C07)
 
-| Contract key | Item id | Slot | Recipe | Workshop | State |
-|---|---|---|---|---|---|
-| sword | `basic_sword` | weapon | 1 Iron Bar | Swordsmith | exists (the king's Sword) |
-| armor | `basic_armor` | armor | 2 Iron Bars | Armorer | exists (the king's Armor) |
-| bow | `bow` | weapon | 2 Wood | Bowyer | added by C07 |
+| Item id | Slot | Recipe | Workshop |
+|---|---|---|---|
+| `bow` | weapon | 8 Wood, 30 s | Bowyer |
+| `sword` | weapon | 3 Iron Bars + 2 Wood, 45 s | Swordsmith |
+| `armor` | armor | 5 Iron Bars + 2 Wood, 60 s | Armorer |
 
-A produced Sword or Armor *is* the item the king already equips; there are no duplicate items, and treasure chests
-keep giving them. Items are stored goods, counted in storage like any resource.
+They are stored goods (`category: resource`, `resourceCategory: equipment`) so the existing physical logistics carries
+them; only an Armory (capacity 40) stores them, never a Warehouse or the Starter Stockpile. The king's treasure Sword
+and Armor (`basic_sword`, `basic_armor`) remain separate equipment; C08 gives units the same modifiers as those items
+(`modifiersFrom`). This replaces the C06 proposal to reuse the king items, which could not travel through storage.
 
 ## Unit roles (C08)
 
 | Role | From | Weapon | Armor | Mount |
 |---|---|---|---|---|
-| Swordsman | Soldier | Sword | optional | — |
-| Archer | Soldier | Bow | optional | — |
-| Knight | Soldier | Sword | required | Horse from Stables (**locked until Stage 12**) |
+| Swordsman | Soldier | `sword` | optional | — |
+| Archer | Soldier | `bow` | optional | — |
+| Knight | Soldier | `sword` | required | Horse from Stables (**locked until Stage 12**) |
 
 One weapon per role. Stat modifiers come from the item definition (`equipment.modifiers`), exactly as for the king
 (`UnitStats.recalculateStats`); a unit's stats are its base stats plus its items.
 
 ## Moving items
 
-1. C07 workshops put finished items into storage (physical goods, no teleporting).
+1. C07 workshops put finished items into their output buffer; Haulers carry them to an Armory (physical goods, no teleporting).
 2. Equipping a unit reserves one item in a store: reservation key `equipment:<workerId>:<slot>`.
 3. The unit or a Hauler carries it; only then does it leave the stock and fill the slot.
 4. Unequipping or death drops the item where the unit stands as a collectible drop; Haulers return it to storage.
