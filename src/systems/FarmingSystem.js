@@ -1,3 +1,4 @@
+import { dataName } from '../i18n/names.js';
 import { FARMING_RULES } from '../data/farming.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
@@ -71,8 +72,8 @@ export class FarmingSystem {
     }
     const building=this.building(task.targetId),record=this.records.get(task.targetId);
     if(!building||!this.inRange(worker,building)||!this.ripe(building)||record.reservedBy!==worker.id||record.cycle!==task.cycle){ai.cancel(worker);return;}
-    if(ai.atGoal(worker,task.goal)){worker.workState='Working';worker.workMessage=`Harvesting ${buildingDefinition(building).name}`;}
-    else{worker.workState='Traveling to Target';worker.workMessage=`Walking to ${buildingDefinition(building).name}`;ai.ensureRoute(worker,task.goal);}
+    if(ai.atGoal(worker,task.goal)){worker.workState='Working';worker.workMessage=`Harvesting ${dataName(buildingDefinition(building))}`;}
+    else{worker.workState='Traveling to Target';worker.workMessage=`Walking to ${dataName(buildingDefinition(building))}`;ai.ensureRoute(worker,task.goal);}
   }
   update(delta) {
     if(this.scene.gameOver||this.scene.gameTime.paused)return;
@@ -82,7 +83,7 @@ export class FarmingSystem {
       if(!building||record?.reservedBy!==worker.id||record.cycle!==task.cycle||!this.inRange(worker,building)||!this.scene.workerSystem.ai.atGoal(worker,task.goal))continue;
       const available=Math.min(delta,worker.availableWorkMs??0,Math.max(0,this.scene.gameTime.totalElapsed-task.startedAt));
       task.progressMs+=available*this.scene.skillSystem.workEfficiency(worker,'farming');
-      worker.workState='Working';worker.workMessage=`Harvesting ${buildingDefinition(building).name}`;
+      worker.workState='Working';worker.workMessage=`Harvesting ${dataName(buildingDefinition(building))}`;
       if(task.progressMs>=buildingDefinition(building).crop.workDuration)this.harvest(worker,building,record);
     }
   }

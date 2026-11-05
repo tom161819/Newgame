@@ -1,3 +1,4 @@
+import { dataName } from '../i18n/names.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 
 // Site stock is part of the same physical storage ledger as warehouses. The
@@ -27,7 +28,7 @@ export class ConstructionMaterialsSystem {
       if(remaining){this.discardPrepared(building);return false;}
     }
     const currency=Object.fromEntries(Object.entries(cost).filter(([id])=>!this.storage.manages(id)));
-    if(!this.scene.inventory.pay(currency,{source:`${buildingDefinition(building).name} Construction`,entityId:building.id})){this.discardPrepared(building);return false;}return true;
+    if(!this.scene.inventory.pay(currency,{source:`${dataName(buildingDefinition(building))} Construction`,entityId:building.id})){this.discardPrepared(building);return false;}return true;
   }
   discardPrepared(building){
     for(const r of [...this.storage.reservations.values()])if(r.siteId===building.id)this.storage.release(r.id);
@@ -66,7 +67,7 @@ export class ConstructionMaterialsSystem {
   complete(building){
     if(!this.enabled)return true;if(!this.ready(building))return false;
     const consumed={...this.storage.locations.get(this.owner(building.id)).stock};this.storage.locations.delete(this.owner(building.id));delete building.materialSupply;this.storage.changed();
-    for(const [resource,amount]of Object.entries(consumed))this.scene.resourceLedger?.expense(resource,amount,`${buildingDefinition(building).name} Construction`,{id:`construction:${building.id}:${resource}`,entityId:building.id});return true;
+    for(const [resource,amount]of Object.entries(consumed))this.scene.resourceLedger?.expense(resource,amount,`${dataName(buildingDefinition(building))} Construction`,{id:`construction:${building.id}:${resource}`,entityId:building.id});return true;
   }
   cancel(building,refund){
     if(!this.enabled||!building.materialSupply)return false;
@@ -85,7 +86,7 @@ export class ConstructionMaterialsSystem {
     if(location)for(const [resource,amount]of Object.entries(location.stock))this.storage.spill(resource,Math.min(amount,refund[resource]??0),{x:building.x,y:building.y});
     this.storage.locations.delete(this.owner(building.id));delete building.materialSupply;
     for(const [resource,amount]of Object.entries(refund))if(!this.storage.manages(resource))this.scene.inventory.add(resource,amount,{source:'Construction Refund',type:'refund',id:`construction-refund:${building.id}:${resource}`,entityId:building.id});
-    for(const [resource,amount]of lost)this.scene.resourceLedger?.expense(resource,amount,`${buildingDefinition(building).name} Cancellation Loss`,{id:`construction-loss:${building.id}:${resource}`,entityId:building.id});
+    for(const [resource,amount]of lost)this.scene.resourceLedger?.expense(resource,amount,`${dataName(buildingDefinition(building))} Cancellation Loss`,{id:`construction-loss:${building.id}:${resource}`,entityId:building.id});
     this.storage.changed();return true;
   }
   summary(building){

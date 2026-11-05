@@ -12,8 +12,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| N02 (#33): global Hauler logistics, Warehouse delivery fix, no Deliver Materials | Claude | `claude/global-hauler-warehouse` | this PR | Verified | `src/data/jobs.js`, `src/data/workplaces.js`, `src/data/objects/{logistics,foodProduction}.js`, `src/systems/{LogisticsTaskManager,BuilderAI,ConstructionSystem,KingLogisticsSystem,FoodProductionSystem,FoodStateValidation,GameStateSerializer}.js` (SAVE_VERSION 15), `src/ui/{ConstructionUI,StoragePanel}.js`, `src/game/GameScene.js`, `index.html`, logistics/smelting tests, building-menu and smelting smokes, README. |
-| Issue #47: finish actual M2 release | Codex | `codex/issue-47-m2-release` from main65b4bf8 | No duplicate PR22; metadata PR not yet created | BLOCKED on API bootstrap/final verification: public v0.3.0 now targets02a; actual full Pages41924183243 and71archive blobs verified. Read-only post-deploy verifier candidate a1a0b33 validated; one gh PR-create attempt returned Forbidden, no PR exists. Issue claim/label changes and MERGE-HELP not fabricated. Final tag-aware Pages/live verification pending; only47 currently ready. | Read-only `.github/workflows/verify-published-release.yml`, release/merge-queue/progress evidence docs and the authorized existing tag; no mechanics, archive or dependency changes. |
+| N08 (#39) archive version labels | Claude | — | — | Blocked | Waits for Codex #47 (M2 release/archive) to close or to state that archive labels are out of its scope; N10 (#63) follows N08; N09 (#40) is HOLD. No files held. |
+| Issue #47: finish actual M2 release | Codex | `codex/issue-47-m2-release` integrated main1b73c2c | No duplicate PR22; metadata PR not yet created | BLOCKED on API bootstrap/final verification: public v0.3.0 now targets02a; actual full Pages41924183243 and71archive blobs verified. Read-only post-deploy verifier candidate a1a0b33 validated; the owner-requested retry also returned Forbidden; CONNECT403 confirmed before GitHub API, no PR exists. Issue claim/label changes and MERGE-HELP not fabricated. Final tag-aware Pages/live verification pending; only47 currently ready. | Read-only `.github/workflows/verify-published-release.yml`, release/merge-queue/progress evidence docs and the authorized existing tag; no mechanics, archive or dependency changes. Archive relabeling is outside this task; no archive-label files held. |
 | Parked C01 / Issue #48 WIP | Codex | `codex/fow-exploration-blueprints`, pushed dd728a0 | No ready PR | PRESERVED, not complete and not advanced through a blocked dependency: reproduced skipped-visibility repaint bug, fix and12focused tests; evaluate again only after Issue47 is done and48 ready. | Existing two-file fix retained in its own remote WIP branch; do not merge its old coordination/AGENTS overrides into current main. |
 
 ## Kept backups (do not delete without the developer)
@@ -23,8 +23,20 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
-- PR22 actually merged at cfe51fafd0e3a509c7335d6564fa206193165e20; its mechanics/archive work is not an open PR. Final M2 publication is tracked only by live Issue47. No duplicate implementation or MERGE-HELP for merged PR22.
+- PR22 actually merged at cfe51fafd0e3a509c7335d6564fa206193165e20; no duplicate implementation or MERGE-HELP for merged PR22. Final M2 publication is tracked by Issue47.
 
+- 2026-11-05 [#76](https://github.com/tom161819/Newgame/pull/76) N07 part 4: status, placement and work messages. Issue #38 (Czech/English localization) done and closed (Claude).
+- 2026-11-05 [#75](https://github.com/tom161819/Newgame/pull/75) N07 part 3b: Population sidebar and Asset Library (Claude, Issue #38).
+- 2026-11-05 [#74](https://github.com/tom161819/Newgame/pull/74) N07 part 3a: in-game panels (Claude, Issue #38).
+- 2026-11-05 [#73](https://github.com/tom161819/Newgame/pull/73) N07 part 2: names, seasons, weather and the game HUD (Claude, Issue #38).
+- 2026-11-05 [#72](https://github.com/tom161819/Newgame/pull/72) N07 part 1: translation system, language switch, menus and save screens (Claude, Issue #38).
+- 2026-11-05 [#71](https://github.com/tom161819/Newgame/pull/71) N06: Autosave (Claude, Issue #37).
+- 2026-11-05 [#70](https://github.com/tom161819/Newgame/pull/70) N05: Download Save and Import Save File (Claude, Issue #36).
+- 2026-11-05 [#69](https://github.com/tom161819/Newgame/pull/69) N04: starting resources in New Game Setup, SAVE_VERSION 17 (Claude, Issue #35).
+- 2026-11-05 [#68](https://github.com/tom161819/Newgame/pull/68) N03 follow-up: idle-stone tests and one physical pickup path (Claude).
+- 2026-11-05 [#67](https://github.com/tom161819/Newgame/pull/67) Fix the Pages deploy after N03: smokes expect save version 16 and switch idle stone off in the smelting smoke (Claude).
+- 2026-11-05 [#66](https://github.com/tom161819/Newgame/pull/66) N03: idle Haulers collect loose stone near the Castle, per-unit ON/OFF and radius, SAVE_VERSION 16 (Claude, Issue #34). Its own Pages run failed in the smokes; fixed by #67.
+- 2026-11-04 [#62](https://github.com/tom161819/Newgame/pull/62) N02: Haulers work kingdom-wide, Builders fetch site materials, no Deliver Materials (Claude, Issue #33).
 - 2026-11-04 [#45](https://github.com/tom161819/Newgame/pull/45) Approved wall kit in the game; developer's Studio approvals recorded (Claude).
 - 2026-11-04 [#42](https://github.com/tom161819/Newgame/pull/42) N01: Castle no longer covers the king; starter stockpile in front (Claude, Issue #32).
 - 2026-11-04 [#44](https://github.com/tom161819/Newgame/pull/44) Wall kit concept in the Studio (Claude).

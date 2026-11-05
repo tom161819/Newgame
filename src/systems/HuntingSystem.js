@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { canInteractAdjacent } from '../game/interaction.js';
 
 export class HuntingSystem {
@@ -7,7 +8,7 @@ export class HuntingSystem {
     if(!this.scene.character.isAlive||!animal.active||!animal.isAlive||!animal.definition.gameplay.huntable)return false;
     this.target=animal;this.repath=0;
     if(!this.plan()){this.cancel();return false;}
-    this.scene.setStatus(`Král pronásleduje ${animal.definition.name}. Kliknutím jinam lov zrušíš.`);return true;
+    this.scene.setStatus(t('status.chasing',{name:animal.definition.name}));return true;
   }
   cancel(){
     if(this.target){this.scene.character.stopForBuilding();this.scene.animalSystem.stopRetaliation(this.target);}
@@ -24,7 +25,7 @@ export class HuntingSystem {
     this.repath-=delta;
     if(this.repath<=0){
       this.repath=350;
-      if(!this.plan()){this.cancel();king.stopForBuilding();this.scene.setStatus('Zvíře není dostupné. Lov byl zrušen.');}
+      if(!this.plan()){this.cancel();king.stopForBuilding();this.scene.setStatus(t('status.animalUnreachable'));}
     }
   }
   attack(animal){
@@ -33,6 +34,6 @@ export class HuntingSystem {
     const dx=animal.position.x-king.position.x,dy=animal.position.y-king.position.y,length=Math.hypot(dx,dy);
     if(length)king.direction={x:dx/length,y:dy/length};
     king.stopForBuilding();this.scene.combat.startAttack(king,animal);
-    this.scene.setStatus(`Král bojuje s ${animal.definition.name}. Kliknutím jinam souboj zrušíš.`);return true;
+    this.scene.setStatus(t('status.fighting',{name:animal.definition.name}));return true;
   }
 }

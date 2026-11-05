@@ -1,3 +1,5 @@
+import { t } from '../i18n/index.js';
+import { dataName } from '../i18n/names.js';
 import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { findPathToAny,octileDistance } from '../game/pathfinding.js';
 import { tileKey } from '../game/stones.js';
@@ -41,23 +43,23 @@ export class ConstructionSystem {
     this.scene.huntingSystem.cancel?.();this.scene.mountSystem.cancel?.();this.scene.treasureSystem.cancelRequest?.();
     if(!this.sites.has(site.id)||this.scene.gameOver||king.transitioning)return false;
     if(!this.materials.ready(site)){
-      if(fetch&&this.scene.kingLogistics?.startMaterials(site,{build:true})){this.scene.setStatus('Král nosí materiál na staveniště a potom začne stavět.');return true;}
-      this.scene.setStatus('Waiting for construction materials. Haulers and Builders deliver them automatically.');return false;
+      if(fetch&&this.scene.kingLogistics?.startMaterials(site,{build:true})){this.scene.setStatus(t('status.kingFetches'));return true;}
+      this.scene.setStatus(t('status.waitMaterials'));return false;
     }
     this.scene.kingLogistics?.cancel();
-    if(site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders){this.scene.setStatus('Na staveništi není volné pracovní místo (3 / 3).');return false;}
+    if(site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders){this.scene.setStatus(t('status.siteFull'));return false;}
     if(king.mountedHorse&&!this.scene.mountSystem.dismount())return false;
     const goals=this.goals(site,king).sort((a,b)=>octileDistance(king.tile,a)-octileDistance(king.tile,b));
     const groundRoute=king.state==='ground'?findPathToAny(this.scene.map,king.nextTile??king.tile,goals,this.scene.pathWear?.routingOptions(king)):null;
     const candidates=groundRoute?[groundRoute.destination]:king.state==='ground'?[]:goals;
     for(const goal of candidates)if(this.reserve(site,king,goal)){
-      if(king.command({kind:'move',goal,silent:true})){this.scene.worldCamera?.follow?.();site.unreachableReason='';this.scene.setStatus('Král jde na staveniště. Stavět začne až po příchodu.');return true;}
+      if(king.command({kind:'move',goal,silent:true})){this.scene.worldCamera?.follow?.();site.unreachableReason='';this.scene.setStatus(t('status.kingToSite'));return true;}
       this.release(king);
     }
-    site.unreachableReason='K tomuto staveništi nevede dostupná cesta.';this.scene.setStatus(site.unreachableReason);return false;
+    site.unreachableReason=t('status.noSitePath');this.scene.setStatus(site.unreachableReason);return false;
   }
   stopKing(){
-    const king=this.scene.character;if(!this.assignments.has('king'))return false;this.release(king);this.kingWorking=false;king.stopForBuilding();this.scene.setStatus('Král přerušil stavbu. Postup zůstává zachovaný.');return true;
+    const king=this.scene.character;if(!this.assignments.has('king'))return false;this.release(king);this.kingWorking=false;king.stopForBuilding();this.scene.setStatus(t('status.kingStopped'));return true;
   }
   update(delta){
     for(const site of [...this.sites.values()]){
@@ -68,8 +70,8 @@ export class ConstructionSystem {
         if(!actor?.isAlive||(id!=='king'&&actor.profession!=='builder')){if(actor)this.release(actor);continue;}
         if(assignment&&this.atSite(actor,assignment)){
           participants.push({id,speed:this.scene.skillSystem.workEfficiency(actor,'construction'),available:Math.min(delta,actor.availableWorkMs??0)});
-          if(id==='king'&&!this.kingWorking){this.kingWorking=true;this.scene.setStatus(`Král staví ${buildingDefinition(site).name}. Jiným příkazem práci přerušíš.`);}
-          if(id!=='king'){actor.workState='Working';actor.workMessage=`Building ${buildingDefinition(site).name}`;}
+          if(id==='king'&&!this.kingWorking){this.kingWorking=true;this.scene.setStatus(t('status.kingBuilds',{name:buildingDefinition(site).name}));}
+          if(id!=='king'){actor.workState='Working';actor.workMessage=`Building ${dataName(buildingDefinition(site))}`;}
         }
       }
       const before=site.construction.workDone,complete=advanceConstruction(site,participants,delta);

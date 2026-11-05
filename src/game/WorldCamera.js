@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { WORLD_BOUNDS, clampMapCenter } from './isometric.js';
 import { MIN_ZOOM,MAX_ZOOM,DEFAULT_ZOOM,ZOOM_RESPONSE_MS,clampZoom } from '../data/camera.js';
 export { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
@@ -33,7 +34,7 @@ export class WorldCamera {
 
   follow() {
     this.following = true;this.panTarget=null;
-    document.querySelector('#camera-mode').textContent = 'Kamera sleduje krále';
+    document.querySelector('#camera-mode').textContent = t('hud.cameraKing');
   }
 
   locate(unit){
@@ -41,7 +42,7 @@ export class WorldCamera {
     if(!unit.isAlive||!view||!this.scene.fog.isVisibleObject(unit))return false;
     // Capture an allowed, currently seen point. Never track a hidden actor.
     this.panTarget=clampMapCenter(view.x,view.y-25);this.following=false;
-    document.querySelector('#camera-mode').textContent=`Vybraný poddaný: ${unit.name??unit.definition.name}`;
+    document.querySelector('#camera-mode').textContent=t('hud.cameraUnit',{name:unit.name??unit.definition.name});
     return true;
   }
 
@@ -67,7 +68,7 @@ export class WorldCamera {
     let dy = Number(k.S.isDown || k.DOWN.isDown) - Number(k.W.isDown || k.UP.isDown);
     let x = camera.scrollX + camera.width / 2, y = camera.scrollY + camera.height / 2;
     if (dx || dy) {
-      if (this.following) document.querySelector('#camera-mode').textContent = 'Ruční posun · mezerník vrátí krále';
+      if (this.following) document.querySelector('#camera-mode').textContent = t('hud.cameraManual');
       this.following = false;
       this.panTarget=null;
       const amount = 650 * delta / 1000 / camera.zoom / Math.hypot(dx, dy);

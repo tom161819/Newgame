@@ -1,3 +1,5 @@
+import { ledgerLabel } from '../i18n/names.js';
+import { t } from '../i18n/index.js';
 import { element } from './objectLabels.js';
 import { economyAmount } from './resourceEconomy.js';
 
@@ -12,11 +14,11 @@ export class ResourceEconomyTooltip {
   scheduleHide(){clearTimeout(this.closeTimer);this.closeTimer=setTimeout(()=>{if(!this.root.contains(document.activeElement)&&document.activeElement!==this.item)this.hide();},160);}
   hide(){clearTimeout(this.closeTimer);this.root.hidden=true;this.resource=null;this.item=null;}
   refresh(){
-    if(this.root.hidden||!this.resource)return;const id=this.resource,d=this.bar.registry.require(id),summary=this.bar.ledger?.summary(id),count=this.bar.format(id),signature=JSON.stringify([id,d.name,count,summary]);if(signature===this.signature){this.position();return;}this.signature=signature;const title=element('h3','',d.name),stored=element('p','',`Current Storage: ${count}`),nodes=[title,stored];
-    if(!summary)nodes.push(element('p','', 'No completed game day yet.'));
+    if(this.root.hidden||!this.resource)return;const id=this.resource,d=this.bar.registry.require(id),summary=this.bar.ledger?.summary(id),count=this.bar.format(id),signature=JSON.stringify([id,d.name,count,summary,t('economy.storage',{count:''})]);if(signature===this.signature){this.position();return;}this.signature=signature;const title=element('h3','',d.name),stored=element('p','',t('economy.storage',{count})),nodes=[title,stored];
+    if(!summary)nodes.push(element('p','',t('economy.noDay')));
     else{
-      nodes.push(element('h4','',`Last Game Day ${summary.day}${summary.partial?' · tracked since loading':''}`),element('p','resource-economy-summary',`Production / Income: ${summary.income?'+':''}${economyAmount(id,summary.income)}\nConsumption / Expenses: ${summary.expenses?'−':''}${economyAmount(id,summary.expenses)}\nNet Change: ${economyAmount(id,summary.net,{signed:true})}`));
-      for(const [title,entries,sign]of [['Income',summary.incomeBySource,'+'],['Expenses',summary.expensesBySource,'−']]){nodes.push(element('h4','',title));const list=element('ul');for(const [source,amount]of Object.entries(entries).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])))list.append(element('li','',`${sign}${economyAmount(id,amount)} ${source}`));if(!list.childElementCount)list.append(element('li','', '0'));nodes.push(list);}
+      nodes.push(element('h4','',`${t('economy.lastDay',{day:summary.day})}${summary.partial?` · ${t('economy.partial')}`:''}`),element('p','resource-economy-summary',t('economy.summary',{income:`${summary.income?'+':''}${economyAmount(id,summary.income)}`,expenses:`${summary.expenses?'−':''}${economyAmount(id,summary.expenses)}`,net:economyAmount(id,summary.net,{signed:true})})));
+      for(const [title,entries,sign]of [[t('economy.income'),summary.incomeBySource,'+'],[t('economy.expenses'),summary.expensesBySource,'−']]){nodes.push(element('h4','',title));const list=element('ul');for(const [source,amount]of Object.entries(entries).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])))list.append(element('li','',`${sign}${economyAmount(id,amount)} ${ledgerLabel(source)}`));if(!list.childElementCount)list.append(element('li','', '0'));nodes.push(list);}
     }
     this.root.replaceChildren(...nodes);this.position();
   }

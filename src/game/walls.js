@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { buildingDefinition,buildingIsComplete,placementError,buildingTiles,planTowerExit } from './buildings.js';
 import { tileKey } from './stones.js';
 
@@ -16,21 +17,21 @@ export function connectionsFor(index,building){
 }
 export function wallLinePlan({map,tiles,resources,reservedTiles=[],buildings,definition,inventory}){
   const existing=wallIndex(buildings,true),fresh=tiles.filter(tile=>!existing.has(tileKey(tile)));
-  if(!fresh.length)return {error:'Na celé této řadě už hradby stojí.',tiles:[],cost:{}};
+  if(!fresh.length)return {error:t('status.wallExists'),tiles:[],cost:{}};
   for(const tile of fresh){const error=placementError(map,tile,resources,reservedTiles,definition,buildings);if(error)return {error,tiles:fresh,cost:{}};}
   const cost=Object.fromEntries(Object.entries(definition.cost).map(([id,amount])=>[id,amount*fresh.length]));
-  if(!inventory.canAfford(cost))return {error:'Na celou řadu hradeb nemáš dostatek surovin.',tiles:fresh,cost};
+  if(!inventory.canAfford(cost))return {error:t('status.wallNoFunds'),tiles:fresh,cost};
   return {tiles:fresh,cost,error:null};
 }
 export function placeWallLine(options){
   const plan=wallLinePlan(options);if(plan.error)return plan;
   const construction=options.inventory.storage?.scene.constructionSystem,materials=options.reserveMaterials&&construction?.materials.enabled?construction.materials:null;
-  if(!materials&&!options.inventory.pay(plan.cost))return {...plan,error:'Na celou řadu hradeb nemáš dostatek surovin.'};
+  if(!materials&&!options.inventory.pay(plan.cost))return {...plan,error:t('status.wallNoFunds')};
   const {buildings,map,definition}=options,created=[];
   let id=Math.max(buildings.reduce((n,b)=>Math.max(n,b.id),0)+1,materials?construction.nextId:1);
   for(const tile of plan.tiles){
     const building={...tile,id:id++,type:definition.id,definition,tiles:buildingTiles(tile,definition)};
-    if(materials&&!materials.prepare(building)){for(const prepared of created)materials.discardPrepared(prepared);return {...plan,error:'Na celou řadu hradeb nemáš dostatek surovin.'};}created.push(building);
+    if(materials&&!materials.prepare(building)){for(const prepared of created)materials.discardPrepared(prepared);return {...plan,error:t('status.wallNoFunds')};}created.push(building);
   }
   for(const building of created){map[building.y][building.x]=definition.walkable?0:1;buildings.push(building);}
   return {...plan,buildings:created};

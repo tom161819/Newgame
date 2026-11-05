@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { tileKey } from '../game/stones.js';
 import { tileCenter } from '../game/map.js';
 import { carryCapacity } from '../data/logistics.js';
@@ -33,7 +34,7 @@ export class DropSystem {
     const drop=this.drops.get(id);
     if(!drop||actor.state!=='ground'||tileKey(standingTile)!==tileKey(drop.tile))return false;
     const cancelledTransport=drop.haulEligible===false,royal=actor===this.scene.character&&this.scene.foodStorage?.manages(drop.resource)&&this.scene.kingLogistics,capacity=royal?royal.room(drop.resource,drop.siteId):carryCapacity(actor);
-    if(royal&&!capacity){this.scene.setStatus('Cargo is full. Deliver it to storage first.');return false;}
+    if(royal&&!capacity){this.scene.setStatus(t('status.cargoFull'));return false;}
     const limited=royal||this.scene.foodStorage?.manages(drop.resource)&&this.scene.workerSystem?.workers.has(actor.id),amount=limited?Math.min(capacity,drop.amount):drop.amount;
     const packageRatio=amount/drop.amount*(drop.rewardRemaining??1),units=amount/drop.amount*(drop.rewardUnits??(drop.resource==='stone'?drop.amount:0)),contributionRatio=drop.resource==='stone'?units/amount:packageRatio,event={type:drop.resource==='stone'?'resourceCollected':'dropCollected',objectType:drop.resource,quantity:amount,objectId:drop.id,contributionRatio};
     drop.rewardRemaining=(drop.rewardRemaining??1)-packageRatio;drop.rewardUnits=Math.max(0,(drop.rewardUnits??0)-units);drop.amount-=amount;
@@ -44,7 +45,7 @@ export class DropSystem {
     }
     if(actor.cargo&&cancelledTransport)actor.cargo.transportCancelled=true;
     this.scene.updateInventory();
-    this.scene.setStatus(`${this.scene.objectRegistry.require(drop.resource).name} ×${amount} sebráno.`);return true;
+    this.scene.setStatus(t('status.picked',{name:this.scene.objectRegistry.require(drop.resource).name,count:amount}));return true;
   }
   atPoint(x,y){return [...this.drops.values()].sort((a,b)=>b.view.depth-a.view.depth).find(d=>(!this.scene.fog||this.scene.fog.isVisibleTile(d.tile))&&this.scene.assets.hitTest(d.view,x,y))??null;}
   atTile(tile){return [...this.drops.values()].find(d=>tileKey(d.tile)===tileKey(tile)&&d.view.visible&&(!this.scene.fog||this.scene.fog.isVisibleTile(d.tile)))??null;}
