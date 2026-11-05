@@ -1,17 +1,18 @@
 // Approved Asset Studio art (art/approvals.json): grass-ground-lush for untouched
-// grass (four interchangeable tiles picked per tile) and worn-path-moss for the
-// trampled stages, with its connection-strip colours (metadata gameWear).
+// grass (four interchangeable tiles picked per tile) and worn-path-earth (Earth track) for the
+// trampled stages, with its connection-strip colours (metadata gameWear). The game draws the
+// track as a narrow strip over the tile's own seasonal grass (TerrainRenderer.drawPaths).
 const GRASS_TILES=[0,1,2,3].map(i=>`/assets/terrain/grass/lush/grass-ground-lush.v1.tile-${i}.png`);
 // Approved season-ground tiles replace the seasonal tint on untouched grass (summer = the lush set).
 const seasonTiles=name=>[0,1,2,3].map(i=>`/assets/terrain/grass/seasons/season-ground-${name}.v1.tile-${i}.png`);
 const GRASS_SEASONS={Spring:seasonTiles('spring'),Autumn:seasonTiles('autumn'),Winter:seasonTiles('snow')};
 const wearSurfaces=[
   {id:'grass_normal',name:'Grass — Normal',description:'Původní vysoká tráva.',color:'#74854b',edge:'#86975c',width:0,sprite:GRASS_TILES[0],variants:GRASS_TILES,artSource:'art/sprites/grass-ground/grass-ground-lush.v1.json'},
-  {id:'grass_trampled_1',name:'Grass — Trampled 1',description:'Lehce sešlapaná tráva od pěti průchodů. Rychlost +5 %.',color:'#56723a',edge:'#5f7d3e',width:5},
-  {id:'grass_trampled_2',name:'Grass — Trampled 2',description:'Travnatohlinitá pěšina od patnácti průchodů. Rychlost +10 %.',color:'#4d5e34',edge:'#55683a',width:9},
-  {id:'grass_trampled_3',name:'Grass — Trampled 3',description:'Výrazná hlinitá cesta od třiceti průchodů. Rychlost +15 %.',color:'#574a36',edge:'#5a5a3a',width:13},
-].map((d,level)=>({id:d.id,name:d.name,description:d.description,category:'terrain',sprite:d.sprite??`/assets/terrain/path_wear/moss/worn-path-moss.v1.tile-${level}.png`,
-  ...(d.variants?{spriteVariants:d.variants,seasonVariants:GRASS_SEASONS}:{}),artSource:d.artSource??'art/sprites/worn-path/worn-path-moss.v1.json',
+  {id:'grass_trampled_1',name:'Grass — Trampled 1',description:'Lehce sešlapaná tráva od pěti průchodů. Rychlost +5 %.',color:'#5b6f3a',edge:'#5f7840',width:6},
+  {id:'grass_trampled_2',name:'Grass — Trampled 2',description:'Travnatohlinitá pěšina od patnácti průchodů. Rychlost +10 %.',color:'#62553b',edge:'#5c6a3c',width:10},
+  {id:'grass_trampled_3',name:'Grass — Trampled 3',description:'Výrazná hlinitá cesta od třiceti průchodů. Rychlost +15 %.',color:'#4e4232',edge:'#55543a',width:14},
+].map((d,level)=>({id:d.id,name:d.name,description:d.description,category:'terrain',sprite:d.sprite??`/assets/terrain/path_wear/earth/worn-path-earth.v1.tile-${level}.png`,
+  ...(d.variants?{spriteVariants:d.variants,seasonVariants:GRASS_SEASONS}:{}),artSource:d.artSource??'art/sprites/worn-path/worn-path-earth.v1.json',
   width:1,height:1,walkable:true,collectible:false,buildable:false,cost:{},interactions:[],
   renderMode:'sprite',origin:{x:.5,y:.5},visualHeight:0,depth:{offset:-100},
   visual:{wearLevel:level,pathColor:d.color,pathEdge:d.edge,pathWidth:d.width,...(level?{pathSoftness:2}:{})},
