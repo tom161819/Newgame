@@ -12,8 +12,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| AUD66 (#95) Wildlife building clearance audit | Codex | `codex/wildlife-building-clearance` | [#109](https://github.com/tom161819/Newgame/pull/109) | Merged as 6181d50; 570 tests, changelog, build, browser smoke and current-head CI PASS; Pages42021840338 failed on an invalid fixed fog-smoke sample; follow-up [#110](https://github.com/tom161819/Newgame/pull/110); merged N12 main preserving renderer and king-only fixture; integrated 576 tests + 14 browser scenarios PASS | AnimalSystem.js, WildlifeRespawnSystem.js, new wildlife clearance helper/data, isolated tests and browser smoke, changelog/verification/progress. Follow-up: scripts/fog-smoke.mjs + fog-sampling.mjs and its tests; exact black assertion preserved. No GameScene, AnimalController, worker/player/UI/Studio changes. |
 | C06 (#53) Stables/horses audit, military equipment contract | Claude | `claude/c06-stables-equipment-audit` | — | In progress | src/data/militaryEquipment.js (new, data only), docs/contracts/military-equipment.md (new), tests/military-equipment-contract.test.js (new). No gameplay or save change. |
-| AUD66 (#95) Wildlife building clearance audit | Codex | `codex/wildlife-building-clearance` | [#109](https://github.com/tom161819/Newgame/pull/109) | Review; 570 tests, changelog, build and relevant browser smoke PASS; before/after screenshots; awaiting CI | AnimalSystem.js, WildlifeRespawnSystem.js, new wildlife clearance helper/data, isolated tests and browser smoke, changelog/verification/progress. No GameScene, AnimalController, worker/player/UI/Studio changes. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -22,9 +22,10 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-05 [#106](https://github.com/tom161819/Newgame/pull/106) C04 #51: production diagnostics and notices (Claude). Issue51 is done/closed; [Pages42016024471](https://github.com/tom161819/Newgame/actions/runs/42016024471) succeeded for df4cac5.
+
 - 2026-11-05 [#108](https://github.com/tom161819/Newgame/pull/108) N12: organic Earth track paths, connected trodden areas, two-pass chunk paint without tile-grid seams. Issue #87 (Claude).
 - 2026-11-05 [#107](https://github.com/tom161819/Newgame/pull/107) C05 #52: visible own subject selection, Move/Hold/Resume, schema21 and C04 availability integration. Merge 0b6b163; 561 tests, 43 full smokes and current-head CI passed; [Pages 42019289576](https://github.com/tom161819/Newgame/actions/runs/42019289576) build+deploy succeeded for that exact commit. Issue52 done/closed; only C06 #53 unblocked, keeping agent:claude.
-- 2026-11-05 [#106](https://github.com/tom161819/Newgame/pull/106) C04: right-bottom notices for lasting production and work blockers. Issue #51 (Claude).
 
 - 2026-11-05 [#90](https://github.com/tom161819/Newgame/pull/90) C03: Auto Employment with Castle Employment Priorities (SAVE_VERSION 20). Issue #50 done and closed (Claude).
 - 2026-11-05 [#89](https://github.com/tom161819/Newgame/pull/89) C02: Assign Worker in three sorted groups with move confirmation; the Granary reports no false Missing Workers. Issue #49 done and closed (Claude).

@@ -62,3 +62,30 @@ schema save round-trips exactly; the derived mask rebuilds after Load.
 
 The before image is from the existing C05 build; the after image is from this
 branch. No historical archive or production graphic was modified.
+
+## Published verification
+
+PR [#109](https://github.com/tom161819/Newgame/pull/109) merged as
+`6181d50f5ee032de6a13b5a1cdb1f060912128a7`. Required current-head CI
+[42021551021](https://github.com/tom161819/Newgame/actions/runs/42021551021)
+succeeded on `cf13c90402e241e7bdf668dba98fcb8ece1924a7`. Local 570 tests,
+changelog validation, build:pages and the relevant real browser smoke passed.
+The first Pages run [42021840338](https://github.com/tom161819/Newgame/actions/runs/42021840338) failed before deploy: the old fog smoke sampled a fixed corner that was actually visible to a subject. A focused replay confirmed logical state2 and a green terrain pixel there. The follow-up fixture chooses an on-screen corner whose four neighbours are all logically unexplored, retains exact `[0,0,0,255]` assertions and adds a regression with subject sight. No game rendering or sight rules change. Final deployment verification remains pending until the corrected Pages run succeeds.
+
+The later N12 main (185f9e5 / PR108) also isolates the king’s sight in this
+fixture. That isolation is preserved. Focused replay still found a grey fixed
+seam after subject removal because already explored memory remains; the
+unknown-neighbour precondition covers that case too, with a regression test.
+
+Follow-up [PR110](https://github.com/tom161819/Newgame/pull/110) integrates
+main185f9e5 without changing its renderer or its subject-provider isolation.
+The integrated local gate passed 576 tests, changelog validation, build:pages
+and the composed 14-scenario browser replay (including the formerly failing
+fog assertion). Four sampling regressions cover active subject sight, remembered
+land, lack of a valid unknown corner and off-screen pixels.
+
+The subsequently merged C06 data-only audit (main868a2d3 / PR111) is also
+preserved. All 579 tests, changelog validation, build:pages and the focused
+Fog/cold-game browser run passed on the combined tree. The earlier composed
+14-scenario replay passed with the same runtime code; C06 adds only its future
+equipment data contract and tests.
