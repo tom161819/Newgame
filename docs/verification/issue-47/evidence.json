@@ -180,5 +180,36 @@
   },
   "eligibleCodexIssuesAtFinalRead": [
     47
-  ]
+  ],
+  "apiRetry20261105": {
+    "requestedByOwner": true,
+    "headAtAttempt": "a758ae583b3985c916b807877cd70cd4cd08e9af",
+    "fetchedMain": "1b73c2c62d9f5c0dd7cbcc43cfc4398efa8b996e",
+    "attemptsThisRetry": 1,
+    "result": "Post https://api.github.com/graphql: Forbidden",
+    "prCreated": false,
+    "transport": {
+      "curlExitCode": 56,
+      "proxyConnectStatus": 403,
+      "githubHTTPStatus": 0,
+      "message": "CONNECT tunnel failed, response 403"
+    },
+    "localPolicy": "restricted; github.com included; api.github.com and tom161819.github.io excluded",
+    "runtimeSpecRevision": "3",
+    "runtimeObservationsCurrent": true,
+    "runtimeNetworkState": "unknown",
+    "savedDraftRevision": 8,
+    "savedDraftRequiredHosts": [
+      "api.github.com",
+      "tom161819.github.io"
+    ],
+    "retainedDiagnostics": "not_found; no history records",
+    "causeBoundary": "proxy denied HTTPS tunnel before GitHub API; GitHub API authorization remains untested",
+    "historicalAccessChangeCause": "not established; historical diagnostics unavailable",
+    "report": "network-access-2026-11-05.md",
+    "requiredRecovery": "apply intended network configuration through supported environment runtime flow; recheck after access changes",
+    "configurationRewriteNeeded": false,
+    "issueOrLabelWritesClaimed": false,
+    "mergeHelpIssueCreated": false
+  }
 }

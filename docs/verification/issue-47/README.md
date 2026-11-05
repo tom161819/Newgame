@@ -97,7 +97,16 @@ this evidence. Standard required CI and review still apply to the exact PR head.
 A successful main merge will enable the proposed read-only verification job.
 No existing public tag or immutable archive may be changed to work around this.
 
-## Safe helper / manual handoff
+## API retry and confirmed network blocker (2026-11-05)
+
+The owner requested a new attempt rather than creating a PR manually. The
+standard retry failed again before reaching GitHub API. The HTTPS proxy returns
+CONNECT403; the saved draft permits the required hosts but the running instance
+does not. Full sanitized evidence and the supported recovery boundary are in
+[the network-access diagnosis](network-access-2026-11-05.md). No PR was created,
+and no GitHub permission change is justified by this transport failure.
+
+## Safe authorized-agent handoff
 
 1. Re-read live Issue47, main, this branch's exact head and open PRs. Avoid duplicate
    claims or requests. Record STARTED or blocked status on the existing Issue
@@ -127,6 +136,6 @@ Remote branch `codex/fow-exploration-blueprints` retains WIPdd728a0. It contains
 only the reproduced lost-visibility-delta terrain fix and its regressions;12
 focused checks passed on its older base. C01 unknown movement/provisional sites
 are not implemented. Do not merge that branch's obsolete AGENTS/queue overrides
-into current main. Once Issue48 is actually ready, audit the new renderer and
-Save15 baseline and recover only the relevant tested code. This WIP is not a
+into current main. Once Issue48 is actually ready, audit the latest main renderer
+and current save schema and recover only the relevant tested code. This WIP is not a
 ready PR and is not included in the release branch.

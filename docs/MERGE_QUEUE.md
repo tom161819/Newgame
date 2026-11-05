@@ -1,4 +1,4 @@
-# Merge queue — actual remote state, 2026-11-04
+# Merge queue — latest access diagnosis, 2026-11-05
 
 GitHub Issues and live PR state are authoritative. This file records fallback
 handoffs; it cannot bypass required checks, holds, ownership or dependencies.
@@ -13,6 +13,17 @@ The only public open PR observed was Claude PR31 (scheduler smoke test), explici
 HOLD. It is excluded from the merge queue and must not be merged as assistance.
 
 ## Actual PR-creation attempt
+
+At the owner's request, one further standard PR-creation attempt was made on
+2026-11-05 at exact head `a758ae583b3985c916b807877cd70cd4cd08e9af`. It again
+returned `Post https://api.github.com/graphql: Forbidden`; no PR was created.
+A direct transport diagnostic proved HTTPS proxy CONNECT403 before GitHub API.
+The saved draft includes the API/Pages hosts but the running policy excludes
+them. See [sanitized evidence and supported recovery](verification/issue-47/network-access-2026-11-05.md).
+Do not ask the owner to create a PR as a substitute for restoring agent access.
+Actual fetched main is now `1b73c2c62d9f5c0dd7cbcc43cfc4398efa8b996e` (PR77);
+the CI evidence below remains attributed to its historical exact source SHA.
+Only HOLD PR31 remains publicly open at this check.
 
 The prepared branch head a1a0b3319ee262d44e3d002894412d704131e769 was pushed.
 One normal `gh pr create` was attempted, with the exact-head body prepared in a
