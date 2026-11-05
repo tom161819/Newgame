@@ -61,3 +61,12 @@ test('saved ledger sources stay English and are translated only for display',asy
   setLanguage('en',{persist:false});assert.equal(ledgerLabel('Warehouse Construction'),'Warehouse Construction');assert.equal(ledgerLabel('Worker Wages'),'Worker Wages');
   setLanguage(DEFAULT_LANGUAGE,{persist:false});
 });
+test('work messages stay English in saves and are translated for display, including names and resources',async()=>{
+  const {workMessageLabel}=await import('../src/i18n/names.js');
+  setLanguage('cs',{persist:false});
+  assert.equal(workMessageLabel('Waiting for transport'),'Čeká na přepravu');assert.equal(workMessageLabel('Building Warehouse'),'Staví: Sklad');
+  assert.equal(workMessageLabel('Carrying 12 stone'),'Nese 12 × Kámen');assert.equal(workMessageLabel('Waiting for Hauler delivery of wheat'),'Čeká, až nosič doručí: Pšenice');
+  assert.equal(workMessageLabel('Chopping Oak 40%'),'Kácí Dub 40 %');assert.equal(workMessageLabel('Something new'),'Something new');assert.equal(workMessageLabel(''),'');
+  setLanguage('en',{persist:false});assert.equal(workMessageLabel('Building Warehouse'),'Building Warehouse');assert.equal(workMessageLabel('Carrying 12 stone'),'Carrying 12 Stone');
+  setLanguage(DEFAULT_LANGUAGE,{persist:false});
+});

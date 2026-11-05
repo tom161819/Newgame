@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { FORESTRY,treeBlocks,treeState } from '../data/naturalResources.js';
 import { reachableTiles,findPathToAny } from '../game/pathfinding.js';
 import { tileKey } from '../game/stones.js';
@@ -69,11 +70,11 @@ export class NaturalResourcesSystem {
     const s=this.scene,actor=s.character;if(!object?.definition.tree||object.natural?.stage!==3||!actor.isAlive||actor.transitioning||!s.fog.isVisibleObject(object))return false;
     if(actor.mountedHorse&&!s.mountSystem.dismount())return false;
     const route=findPathToAny(s.map,actor.nextTile??actor.tile,this.goals(object),s.pathWear?.routingOptions(actor));
-    if(!route){s.setStatus('No reachable place to chop this tree.');return false;}
-    const key=this.reservation(object);if(!s.workerSystem.reservations.available(key,'king')){s.setStatus('This tree is already reserved.');return false;}
+    if(!route){s.setStatus(t('status.noChopPlace'));return false;}
+    const key=this.reservation(object);if(!s.workerSystem.reservations.available(key,'king')){s.setStatus(t('status.treeReserved'));return false;}
     this.cancelKing();s.constructionSystem?.stopKing();s.kingLogistics?.cancel();s.huntingSystem.cancel();s.mountSystem.cancel();s.treasureSystem.cancelRequest();
     if(!actor.command({kind:'move',goal:route.destination,silent:true}))return false;
-    if(!s.workerSystem.reservations.reserve(key,'king'))return false;this.kingTask={treeId:object.natural.id,goal:{...route.destination},arrived:false};s.worldCamera?.follow?.();s.setStatus('King travelling to chop the tree.');return true;
+    if(!s.workerSystem.reservations.reserve(key,'king'))return false;this.kingTask={treeId:object.natural.id,goal:{...route.destination},arrived:false};s.worldCamera?.follow?.();s.setStatus(t('status.kingToTree'));return true;
   }
   updateKing(delta){
     const task=this.kingTask;if(!task)return;const s=this.scene,actor=s.character,object=this.byId.get(task.treeId);
@@ -91,7 +92,7 @@ export class NaturalResourcesSystem {
     // Commit the stump before drops/XP: another actor, frame or load cannot repeat a harvest.
     n.stage=0;n.growthDays=0;n.growthCheckpoint=this.growthClock;n.workDone=0;n.cycle++;this.refreshMap(object);this.view(object)?.setNaturalState?.(object);this.scene.workerSystem.reservations.release(this.reservation(object),actor.id);if(actor.id==='king')this.kingTask=null;
     this.scene.dropSystem.create('wood',{x:object.x,y:object.y},rule.wood,null,{rewardRemaining:0,rewardUnits:0});
-    this.scene.activities.emit('treeChopped',{actor,objectType:object.type,quantity:1,objectIds:[n.id]},`tree:${n.id}:${n.cycle}`);this.scene.setStatus(`${rule.wood} Wood lies beside the stump. Carry it to storage.`);return true;
+    this.scene.activities.emit('treeChopped',{actor,objectType:object.type,quantity:1,objectIds:[n.id]},`tree:${n.id}:${n.cycle}`);this.scene.setStatus(t('status.woodBesideStump',{count:rule.wood}));return true;
   }
   exportState(){this.flushGrowth();return{nextId:this.nextId,nextDepositId:this.nextDepositId,growthClock:this.growthClock,ageClock:this.ageClock,refreshElapsed:this.refreshElapsed,kingTask:structuredClone(this.kingTask)};}
   importState(data){this.cancelKing();Object.assign(this,structuredClone(data));if(this.kingTask){const object=this.byId.get(this.kingTask.treeId);this.scene.workerSystem.reservations.reserve(this.reservation(object),'king');}this.refreshSeason();}

@@ -1,3 +1,4 @@
+import { dataName } from '../i18n/names.js';
 import { findPathToAny } from '../game/pathfinding.js';
 import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
 import { tileKey } from '../game/stones.js';
@@ -153,7 +154,7 @@ export class WorkerAI {
     const animal=this.scene.animalSystem.animals.get(task.targetId);
     if(!animal?.isAlive||this.scene.huntingSystem.target===animal){this.cancel(worker);return;}
     if(!worker.nextTile&&canInteractAdjacent(this.scene.map,worker,animal)){
-      worker.path=[];worker.workState='Working';worker.workMessage=`Hunting ${animal.definition.name}`;
+      worker.path=[];worker.workState='Working';worker.workMessage=`Hunting ${dataName(animal.definition)}`;
       const dx=animal.position.x-worker.position.x,dy=animal.position.y-worker.position.y,n=Math.hypot(dx,dy);if(n)worker.direction={x:dx/n,y:dy/n};
       this.scene.combat.startAttack(worker,animal);
     }else{

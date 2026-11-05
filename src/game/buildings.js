@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { dataName } from '../i18n/names.js';
 import { isWalkable } from './map.js';
 import { gridToWorld } from './isometric.js';
@@ -47,15 +48,15 @@ export function towerTop(building) {
 }
 
 export function placementError(map,anchor,resources,reservedTiles=[],definition=towerDefinition(),buildings=[],unlocks=null) {
-  if(!definition.buildable||definition.category!=='building')return 'Tento objekt není určený ke stavbě.';
+  if(!definition.buildable||definition.category!=='building')return t('status.notBuildable');
   const status=unlocks?.status(definition)??buildingUnlockStatus(definition,buildings,objectRegistry);if(!status.unlocked)return status.description;
   const tiles=buildingTiles(anchor,definition);
-  if(tiles.some(tile=>tile.x<0||tile.y<0||tile.y>=map.length||tile.x>=map[0].length))return 'Budova musí zůstat uvnitř mapy.';
+  if(tiles.some(tile=>tile.x<0||tile.y<0||tile.y>=map.length||tile.x>=map[0].length))return t('status.insideMap');
   const natural=resources.naturalContext,special=natural?.mining.placementError(definition,anchor);if(special)return special;
-  if(tiles.some(tile=>!isWalkable(map,tile.x,tile.y)&&!natural?.mining.canBuildOver(definition,tile)))return `Budova potřebuje ${definition.width} × ${definition.height} volných políček uvnitř mapy.`;
-  if(tiles.some(tile=>resources.has(tileKey(tile))&&!natural?.mining.canBuildOver(definition,tile)))return 'Na tomto místě leží surovina.';
-  if(tiles.some(tile=>reservedTiles.some(p=>tileKey(p)===tileKey(tile))))return 'Tady stojí král nebo zvíře, případně právě dokončuje krok.';
-  if(tiles.some(tile=>buildings.some(building=>building.tiles.some(p=>tileKey(p)===tileKey(tile)))))return 'Tady už stojí budova.';
+  if(tiles.some(tile=>!isWalkable(map,tile.x,tile.y)&&!natural?.mining.canBuildOver(definition,tile)))return t('status.needsTiles',{width:definition.width,height:definition.height});
+  if(tiles.some(tile=>resources.has(tileKey(tile))&&!natural?.mining.canBuildOver(definition,tile)))return t('status.resourceHere');
+  if(tiles.some(tile=>reservedTiles.some(p=>tileKey(p)===tileKey(tile))))return t('status.unitHere');
+  if(tiles.some(tile=>buildings.some(building=>building.tiles.some(p=>tileKey(p)===tileKey(tile)))))return t('status.buildingHere');
   return natural?.mining.accessError(map,definition,anchor)??null;
 }
 
@@ -64,7 +65,7 @@ export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,
   if(error)return {error};
   const construction=inventory.storage?.scene.constructionSystem,materials=reserveMaterials&&construction?.materials.enabled?construction.materials:null;
   const building={id:Math.max(buildings.reduce((n,b)=>Math.max(n,b.id),0)+1,materials?construction.nextId:1),type:definition.id,definition,x:anchor.x,y:anchor.y,tiles:buildingTiles(anchor,definition)};
-  if(!(materials?materials.prepare(building):inventory.pay(definition.cost,{source:`${dataName(definition)} Construction`,entityId:building.id})))return {error:'Na tuto budovu nemáš dostatek surovin.'};
+  if(!(materials?materials.prepare(building):inventory.pay(definition.cost,{source:`${dataName(definition)} Construction`,entityId:building.id})))return {error:t('status.noFunds')};
   for(const tile of building.tiles)map[tile.y][tile.x]=definition.walkable?0:1;
   buildings.push(building);
   if(resources.naturalContext){resources.naturalContext.mining.bind(building);resources.naturalContext.topologyRevision++;}else if(definition.id==='quarry')building.quarryMode=reserveMaterials?'unbound':'legacy';

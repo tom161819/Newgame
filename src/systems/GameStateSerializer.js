@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { objectRegistry } from './ObjectRegistry.js';
 import { COLUMNS,ROWS } from '../game/config.js';
 import { wearLevel } from '../data/pathWear.js';
@@ -102,7 +103,7 @@ export function saveSchemaStatus(input){
 // Validace proběhne ještě před zastavením právě běžící scény. Poškozený save
 // proto nemění současný svět ani záznam v IndexedDB.
 export function validateGameState(input,registry=objectRegistry){
-  const fail=()=>{throw new Error('Uložená hra je poškozená nebo má nepodporovanou verzi.');};
+  const fail=()=>{throw new Error(t('saves.corrupt'));};
   const check=value=>{if(!value)fail();};
   const number=(n,min=0,max=Number.MAX_SAFE_INTEGER)=>check(Number.isFinite(n)&&n>=min&&n<=max);
   const integer=(n,min=0,max=Number.MAX_SAFE_INTEGER)=>{number(n,min,max);check(Number.isInteger(n));};

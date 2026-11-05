@@ -133,5 +133,5 @@ export function loadGameState(scene,input){
   document.querySelector('#camera-mode').textContent=t(state.camera.following?'hud.cameraKing':'hud.cameraManual');
   scene.updateInventory();scene.updateTimeDisplay();scene.refreshVisibility();scene.activeFramePending=true;
   scene.experienceFeedback?.refresh();
-  scene.setStatus('Uložená hra načtena.');
+  scene.setStatus(t('status.gameLoaded'));
 }

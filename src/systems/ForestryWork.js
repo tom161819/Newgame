@@ -1,3 +1,4 @@
+import { dataName } from '../i18n/names.js';
 import { WORK_RULES } from '../data/jobs.js';
 import { tileKey } from '../game/stones.js';
 
@@ -25,13 +26,13 @@ export class ForestryWork {
       const transferId=`food-transfer-${s.foodProduction.nextTransfer++}`,capacityReservation=s.foodStorage.reserve('capacity',output.location.id,'wood',object.definition.tree.wood,transferId);if(!capacityReservation)return;
       const reservation=this.natural.reservation(object),slot=this.slot(route.destination);
       if(!system.reservations.reserve(reservation,worker.id)||!system.reservations.reserve(slot,worker.id)){system.reservations.release(reservation,worker.id);s.foodStorage.release(capacityReservation);return;}
-      worker.workTask=task={kind:'chopTree',targetId:object.natural.id,reservation,goal:{...route.destination},progressMs:0,transferId,capacityReservation,destinationId:output.location.id,amount:object.definition.tree.wood};worker.path=route.path;worker.workState='Traveling to Target';worker.workMessage=`Travelling to ${object.definition.name}`;
+      worker.workTask=task={kind:'chopTree',targetId:object.natural.id,reservation,goal:{...route.destination},progressMs:0,transferId,capacityReservation,destinationId:output.location.id,amount:object.definition.tree.wood};worker.path=route.path;worker.workState='Traveling to Target';worker.workMessage=`Travelling to ${dataName(object.definition)}`;
     }
     if(task.kind!=='chopTree')return;const object=this.natural.byId.get(task.targetId);
     if(!object||object.natural.stage!==3||s.map[task.goal.y]?.[task.goal.x]!==0||system.reservations.owners.get(task.reservation)!==worker.id||!s.foodStorage.reservations.has(task.capacityReservation)){system.ai.cancel(worker);this.wait(worker,'Waiting for a valid tree and storage reservation');return;}
     if(worker.nextTile||worker.path.length)return;
     if(!system.ai.atGoal(worker,task.goal)){system.ai.cancel(worker);this.wait(worker,'Waiting for a reachable work position');return;}
-    worker.workState='Working';worker.workMessage=`Chopping ${object.definition.name} ${Math.floor(object.natural.workDone/object.definition.tree.chopDuration*100)}%`;
+    worker.workState='Working';worker.workMessage=`Chopping ${dataName(object.definition)} ${Math.floor(object.natural.workDone/object.definition.tree.chopDuration*100)}%`;
     if(!this.natural.work(object,worker,delta))return;
     const record=s.workplaceSystem.records.get(building.id),day=s.gameTime.day,stats=record.forestry??{harvested:0,day,producedToday:0};if(stats.day!==day){stats.day=day;stats.producedToday=0;}stats.harvested+=object.definition.tree.wood;stats.producedToday+=object.definition.tree.wood;record.forestry=stats;
     system.reservations.release(this.slot(task.goal),worker.id);worker.workTask=null;const drop=[...s.dropSystem.drops.values()].find(d=>d.resource==='wood'&&d.tile.x===object.x&&d.tile.y===object.y),pickup=drop&&system.ai.route(worker,[drop.tile]);

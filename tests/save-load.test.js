@@ -140,7 +140,7 @@ test('alpha saves load only the current schema; older or newer versions are repo
   }
   for(const version of [undefined,null,'12',12.5]){
     const data=structuredClone(original);data.saveVersion=version;
-    assert.throws(()=>validateGameState(data),error=>!(error instanceof IncompatibleSaveError)&&/poškozená/.test(error.message));
+    assert.throws(()=>validateGameState(data),error=>!(error instanceof IncompatibleSaveError)&&/damaged|poškozená/.test(error.message));
   }
   assert.throws(()=>validateGameState(null),error=>!(error instanceof IncompatibleSaveError));
 });
