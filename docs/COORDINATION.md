@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| N12 (#87) Organic path wear, trodden areas | Claude | `claude/path-wear-natural-areas` | [#108](https://github.com/tom161819/Newgame/pull/108) | Review | src/game/TerrainRenderer.js (path geometry, two-pass chunk paint, wear invalidation reach), tests/path-wear-render.test.js. |
+| C06 (#53) Stables/horses audit, military equipment contract | Claude | `claude/c06-stables-equipment-audit` | — | In progress | src/data/militaryEquipment.js (new, data only), docs/contracts/military-equipment.md (new), tests/military-equipment-contract.test.js (new). No gameplay or save change. |
 | AUD66 (#95) Wildlife building clearance audit | Codex | `codex/wildlife-building-clearance` | [#109](https://github.com/tom161819/Newgame/pull/109) | Review; 570 tests, changelog, build and relevant browser smoke PASS; before/after screenshots; awaiting CI | AnimalSystem.js, WildlifeRespawnSystem.js, new wildlife clearance helper/data, isolated tests and browser smoke, changelog/verification/progress. No GameScene, AnimalController, worker/player/UI/Studio changes. |
 
 ## Kept backups (do not delete without the developer)
@@ -22,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-05 [#108](https://github.com/tom161819/Newgame/pull/108) N12: organic Earth track paths, connected trodden areas, two-pass chunk paint without tile-grid seams. Issue #87 (Claude).
 - 2026-11-05 [#107](https://github.com/tom161819/Newgame/pull/107) C05 #52: visible own subject selection, Move/Hold/Resume, schema21 and C04 availability integration. Merge 0b6b163; 561 tests, 43 full smokes and current-head CI passed; [Pages 42019289576](https://github.com/tom161819/Newgame/actions/runs/42019289576) build+deploy succeeded for that exact commit. Issue52 done/closed; only C06 #53 unblocked, keeping agent:claude.
 - 2026-11-05 [#106](https://github.com/tom161819/Newgame/pull/106) C04: right-bottom notices for lasting production and work blockers. Issue #51 (Claude).
 
