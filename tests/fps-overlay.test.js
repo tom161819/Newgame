@@ -11,7 +11,8 @@ test('FrameStats: FPS over the last second, the slowest frame and stutters over 
   const s=new FrameStats();let now=0;s.frame(now);
   for(let i=0;i<60;i++){now+=16;s.frame(now);}now+=120;s.frame(now);now+=70;s.frame(now);for(let i=0;i<30;i++){now+=16;s.frame(now);}
   const r=s.summary(now);assert.equal(r.worstMs,120);assert.equal(r.stutters,2);
-  let last=0;for(let k=0;k<s.size;k++){if(s.at[(s.head+k)%s.at.length]>=now-1000)last++;}assert.equal(r.fps,last);
+  assert.equal(r.fps,53,'52 frames in the last 990 ms, including both stutters');
+  const fresh=new FrameStats();for(let i=0;i<=15;i++)fresh.frame(i*16);assert.equal(fresh.summary(240).fps,63,'a fresh overlay reports the rate, not the frame count');
   now+=FRAME_RULES.windowMs+1;s.frame(now);const later=s.summary(now);assert.equal(later.stutters,1,'old stutters leave the 5 s window; the long gap itself counts');
   const small=new FrameStats(4);for(let i=0;i<=10;i++)small.frame(i*10);assert.equal(small.size,4,'fixed ring buffer');
 });

@@ -13,9 +13,10 @@ export class FrameStats {
   frame(now){if(this.last!==null){const i=(this.head+this.size)%this.at.length;this.at[i]=now;this.ms[i]=now-this.last;if(this.size<this.at.length)this.size++;else this.head=(this.head+1)%this.at.length;}this.last=now;}
   summary(now,{windowMs=FRAME_RULES.windowMs,stutterMs=FRAME_RULES.stutterMs}={}){
     while(this.size&&this.at[this.head]<now-windowMs){this.head=(this.head+1)%this.at.length;this.size--;}
-    let second=0,worst=0,stutters=0;
-    for(let k=0;k<this.size;k++){const i=(this.head+k)%this.at.length,ms=this.ms[i];if(this.at[i]>=now-1000)second++;if(ms>worst)worst=ms;if(ms>stutterMs)stutters++;}
-    return {fps:second,worstMs:Math.round(worst),stutters};
+    let second=0,span=0,worst=0,stutters=0;
+    for(let k=0;k<this.size;k++){const i=(this.head+k)%this.at.length,ms=this.ms[i];if(this.at[i]>=now-1000){second++;span+=ms;}if(ms>worst)worst=ms;if(ms>stutterMs)stutters++;}
+    // Frames per second over the measured part of the last second (a fresh overlay has less history).
+    return {fps:span>0?Math.round(second*1000/Math.max(span,Math.min(1000,span))):0,worstMs:Math.round(worst),stutters};
   }
 }
 
@@ -38,7 +39,7 @@ export class FpsOverlay {
     if(this.element){this.element.hidden=!on;if(!on){this.element.textContent='';this.text='';}}
   }
   frame(){
-    const now=this.now();this.stats.frame(now);if(now<this.nextRefresh||!this.element)return;this.nextRefresh=now+FRAME_RULES.refreshMs;
+    const now=this.now();this.stats.frame(now);if(!this.nextRefresh){this.nextRefresh=now+FRAME_RULES.refreshMs;return;}if(now<this.nextRefresh||!this.element)return;this.nextRefresh=now+FRAME_RULES.refreshMs;
     const s=this.stats.summary(now),renderer=this.game.renderer?.type===2?'WebGL':'Canvas',zoom=this.camera()?.zoom;
     const text=t('dev.fpsOverlay',{fps:s.fps,worst:s.worstMs,stutters:s.stutters,renderer,zoom:Number.isFinite(zoom)?zoom.toFixed(2):'—'});
     if(text!==this.text){this.text=text;this.element.textContent=text;}
