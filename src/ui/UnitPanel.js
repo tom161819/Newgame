@@ -56,5 +56,5 @@ export class UnitPanel {
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){this.dialog.close();this.restoreInput();}
-  destroy(){this.close();this.controller.abort();this.commandControls.remove();}
+  destroy(){this.close();this.controller.abort();this.commandControls.remove();this.transportRow.remove();}
 }
