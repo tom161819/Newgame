@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| N07 (#38) part 4: status, work and placement messages; notifications | Claude | `claude/cz-en-localization-messages` | this PR | Verified | status texts in `src/game/{GameScene,PlayerController,buildings,walls}.js`, `src/systems/{Construction,KingLogistics,Mount,NaturalResources,Hunting,Drop}System.js`, `src/systems/{BuilderAI,GameStateLoader,GameStateSerializer}.js`; work messages kept English (dataName) in `src/systems/{ForestryWork,FarmingSystem,WorkerAI,ConstructionSystem,BuilderAI}.js`; `src/ui/{CompactHud,UnitPanel,WorkplacePanel,populationData}.js`; `src/i18n/*`; tests. FogOfWarSystem untouched (Codex C01 area). |
+| N08 (#39) archive version labels | Claude | — | — | Blocked | Waits for Codex #47 (M2 release/archive) to close or to state that archive labels are out of its scope; N10 (#63) follows N08; N09 (#40) is HOLD. No files held. |
 | M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main2663942 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT403 | IN PROGRESS: preserve approved villager sprites for manual PR22 merge; relevant integration checks running. Earlier476models/Pages/scaffold native and full/Studio/archive proofs retained. Actual final gh merge22 at e574f75 still API Forbidden. Frozen02a has own459test archive; final verifier checks actual deployed Git blobs, allowing later live development. Public tag/main/deployment gates pending; new user order C01–C08 then master11–15, all unstarted. | Native smoke regressions; release-gate/deployed-archive verifier and tests; release notes,02a archive/catalog, progress/verification docs. Claude art unchanged; no schema rewrite. |
 
 ## Kept backups (do not delete without the developer)
@@ -22,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-05 [#76](https://github.com/tom161819/Newgame/pull/76) N07 part 4: status, placement and work messages. Issue #38 (Czech/English localization) done and closed (Claude).
 - 2026-11-05 [#75](https://github.com/tom161819/Newgame/pull/75) N07 part 3b: Population sidebar and Asset Library (Claude, Issue #38).
 - 2026-11-05 [#74](https://github.com/tom161819/Newgame/pull/74) N07 part 3a: in-game panels (Claude, Issue #38).
 - 2026-11-05 [#73](https://github.com/tom161819/Newgame/pull/73) N07 part 2: names, seasons, weather and the game HUD (Claude, Issue #38).
