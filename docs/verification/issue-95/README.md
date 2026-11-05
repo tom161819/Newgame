@@ -76,3 +76,10 @@ The later N12 main (185f9e5 / PR108) also isolates the king’s sight in this
 fixture. That isolation is preserved. Focused replay still found a grey fixed
 seam after subject removal because already explored memory remains; the
 unknown-neighbour precondition covers that case too, with a regression test.
+
+Follow-up [PR110](https://github.com/tom161819/Newgame/pull/110) integrates
+main185f9e5 without changing its renderer or its subject-provider isolation.
+The integrated local gate passed 576 tests, changelog validation, build:pages
+and the composed 14-scenario browser replay (including the formerly failing
+fog assertion). Four sampling regressions cover active subject sight, remembered
+land, lack of a valid unknown corner and off-screen pixels.
