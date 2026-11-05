@@ -1,7 +1,7 @@
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
 import { PLAYER_START } from '../game/config.js';
 import { buildingIsComplete } from '../game/buildings.js';
-import { physicalResources,materialResources,storageResources,stockLocationId,carryCapacity } from '../data/logistics.js';
+import { physicalResources,materialResources,storageResources,stockLocationId,carryCapacity,equipmentResources } from '../data/logistics.js';
 
 export function validateFoodState(s,registry,{check,number,integer,array}){
   const storage=s.foodStorage,production=s.foodProduction;
@@ -21,6 +21,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     const d=registry.require(b.type),base={buildingId:b.id,x:b.x,y:b.y,width:d.width,height:d.height};
     if(d.storage&&(physical||!d.storage.accepts))expected.set(stockLocationId(b),{...base,kind:d.starter?'fallback':'storage',capacity:d.storage.capacity,allowed:storageResources(d,registry)});
     if(d.recipe)for(const kind of ['input','output'])expected.set(`${kind}-${b.id}`,{...base,kind,capacity:d.bufferCapacity,allowed:Object.keys(d.recipe[kind])});
+    if(d.kit)expected.set(`kit-${b.id}`,{...base,kind:'kit',capacity:d.kit.capacity,allowed:equipmentResources(registry)});
   }
   const sites=new Map();
   if(physical)for(const b of s.buildings){

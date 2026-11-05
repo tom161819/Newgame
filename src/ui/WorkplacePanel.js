@@ -5,17 +5,20 @@ import { JOBS,SKILLS } from '../data/jobs.js';
 import { TALENTS } from '../data/economy.js';
 import { element } from './objectLabels.js';
 import { CANDIDATE_GROUPS,candidateGroups } from './workplaceCandidates.js';
+import { renderMilitary,militarySignature,handleMilitaryClick } from './militaryPanel.js';
 
 export class WorkplacePanel {
   constructor(scene){
     this.scene=scene;this.dialog=document.querySelector('#workplace-dialog');this.controller=new AbortController();const options={signal:this.controller.signal};this.restored=true;
     this.forestryDetails=element('section');this.forestryDetails.id='forestry-details';this.forestryDetails.hidden=true;this.forestryTrees=element('p');this.forestryTrees.id='forestry-tree-count';this.forestryTotal=element('p');this.forestryTotal.id='forestry-output-total';this.forestryToday=element('p');this.forestryToday.id='forestry-output-today';this.forestryDetails.append(this.forestryTrees,this.forestryTotal,this.forestryToday);this.dialog.insertBefore(this.forestryDetails,document.querySelector('#food-production-details'));
+    this.militaryDetails=element('section','military-details');this.militaryDetails.id='military-details';this.militaryDetails.hidden=true;this.dialog.insertBefore(this.militaryDetails,document.querySelector('#food-production-details'));
     this.miningDetails=element('p');this.miningDetails.id='mining-details';this.miningDetails.hidden=true;this.dialog.insertBefore(this.miningDetails,this.forestryDetails);
     document.querySelector('#close-workplace').addEventListener('click',()=>this.close(),options);
     document.querySelector('#assign-workplace-worker').addEventListener('click',()=>{document.querySelector('#workplace-candidates').hidden=!document.querySelector('#workplace-candidates').hidden;},options);
     document.querySelector('#toggle-food-production').addEventListener('click',()=>{const record=scene.foodProduction.records.get(this.building?.id);if(record)scene.foodProduction.toggle(this.building.id,!record.auto);this.refresh();},options);
     this.dialog.addEventListener('click',e=>{
       const button=e.target.closest('button');if(!button)return;
+      if(handleMilitaryClick(scene,button)){this.signature=null;this.refresh();return;}
       const assign=button.dataset.assignWorker,remove=button.dataset.removeWorker;
       // Moving someone who already has another job takes a second, confirming click.
       if(assign&&button.dataset.confirmMove&&this.pendingMove!==assign){this.pendingMove=assign;this.signature=null;this.refresh();return;}
@@ -32,7 +35,7 @@ export class WorkplacePanel {
     const production=spec.recipe?s.foodProduction.records.get(b.id):null;
     const forestry=spec.id==='lumberjack_hut'?s.naturalResources.forestry.summary(b):null;this.forestryDetails.hidden=!forestry;
     const mining=spec.mining?s.naturalResources?.mining.summary(b):null;this.miningDetails.hidden=!mining;this.miningDetails.textContent=mining??'';
-    const signature=JSON.stringify([summary,production,forestry,mining,production?s.foodStorage.revision:0,employees.map(w=>[w.id,w.workState,w.workMessage,w.skills[spec.workplace.skill].level]),candidates.map(w=>[w.id,w.profession,w.assignedWorkplaceId,w.naturalTalent,w.skills[spec.workplace.skill].level,w.skills[spec.workplace.skill].totalXP]),this.pendingMove]);if(signature===this.signature)return;this.signature=signature;
+    const signature=JSON.stringify([summary,production,forestry,mining,production?s.foodStorage.revision:0,employees.map(w=>[w.id,w.workState,w.workMessage,w.skills[spec.workplace.skill].level]),militarySignature(s,b),candidates.map(w=>[w.id,w.profession,w.assignedWorkplaceId,w.naturalTalent,w.skills[spec.workplace.skill].level,w.skills[spec.workplace.skill].totalXP]),this.pendingMove]);if(signature===this.signature)return;this.signature=signature;
     if(forestry){this.forestryTrees.textContent=t(forestry.known?'workplace.knownTrees':'workplace.trees',{count:forestry.trees});this.forestryTotal.textContent=t('workplace.timber',{count:forestry.harvested});this.forestryToday.textContent=t('workplace.woodToday',{count:forestry.today});}
     const recipePanel=document.querySelector('#food-production-details');recipePanel.hidden=!production;
     if(production){
@@ -51,7 +54,7 @@ export class WorkplacePanel {
     document.querySelector('#workplace-average').textContent=t('workplace.average',{skill:SKILLS[spec.workplace.skill],value:summary.averageSkill.toFixed(2)});
     document.querySelector('#workplace-production').textContent=t('workplace.delivered',{list:Object.entries(summary.delivered).map(([id,n])=>`${s.objectRegistry.require(id).name} ${n}`).join(' · ')||'0'});
     const rows=employees.map(w=>{const row=element('li','workplace-worker'),text=element('span','',`${w.name} · ${t('workplace.skillLevel',{skill:SKILLS[spec.workplace.skill],level:w.skills[spec.workplace.skill].level})} · ${localized(`work.state.${w.workState}`,w.workState)}${w.workMessage?` — ${workMessageLabel(w.workMessage)}`:''}`),remove=element('button','',t('workplace.remove'));remove.type='button';remove.dataset.removeWorker=w.id;row.append(text,remove);return row;});
-    for(let i=summary.count;i<summary.capacity;i++)rows.push(element('li','empty-slot',t('workplace.emptySlot')));document.querySelector('#workplace-workers').replaceChildren(...rows);
+    for(let i=summary.count;i<summary.capacity;i++)rows.push(element('li','empty-slot',t('workplace.emptySlot')));document.querySelector('#workplace-workers').replaceChildren(...rows);renderMilitary(s,b,this.militaryDetails,employees);
     document.querySelector('#assign-workplace-worker').disabled=summary.count>=summary.capacity;
     // Three groups in a fixed order (Unemployed, other profession, this profession), each sorted by the skill this building needs.
     const skill=spec.workplace.skill,groups=candidateGroups(candidates,spec.workplace),full=summary.count>=summary.capacity;
@@ -71,5 +74,5 @@ export class WorkplacePanel {
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){this.dialog.close();this.restoreInput();}
-  destroy(){this.close();this.controller.abort();this.forestryDetails.remove();this.miningDetails.remove();}
+  destroy(){this.close();this.controller.abort();this.forestryDetails.remove();this.miningDetails.remove();this.militaryDetails.remove();}
 }

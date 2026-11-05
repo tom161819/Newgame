@@ -40,7 +40,7 @@ export class WorkerAI {
       if(!workplace.building(worker)){workplace.remove(worker);worker.update(delta);return;}
       if(!worker.workplaceReached){this.goToWorkplace(worker);worker.update(delta);return;}
       if(worker.cargo){this.returnToWorkplace(worker);worker.update(delta);return;}
-      if(worker.profession==='soldier'){this.patrol(worker);worker.update(delta);return;}
+      if(worker.profession==='soldier'){if(!this.scene.military?.updateSoldier(worker,delta))this.patrol(worker);worker.update(delta);return;}
     }
     if(worker.profession==='woodcutter'&&this.scene.naturalResources)this.scene.naturalResources.updateWorker(worker,delta);
     else if(worker.profession==='miner'){

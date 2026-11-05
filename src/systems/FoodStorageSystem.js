@@ -3,7 +3,7 @@ import { PLAYER_START } from '../game/config.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { findPathToAny } from '../game/pathfinding.js';
 import { tileKey } from '../game/stones.js';
-import { physicalResources,materialResources,storageResources,stockLocationId } from '../data/logistics.js';
+import { physicalResources,materialResources,storageResources,stockLocationId,equipmentResources } from '../data/logistics.js';
 
 const sum=values=>Object.values(values).reduce((a,b)=>a+b,0);
 const positive=n=>Number.isSafeInteger(n)&&n>0;
@@ -29,6 +29,8 @@ export class FoodStorageSystem {
       if(d.starter){const camp=this.locations.get('food-camp');if(camp&&!this.used(camp)&&!this.incoming(camp.id)){this.locations.delete(camp.id);this.changed();}}
     }
     if(d.recipe){add(`input-${building.id}`,'input',d.bufferCapacity,Object.keys(d.recipe.input));add(`output-${building.id}`,'output',d.bufferCapacity,Object.keys(d.recipe.output));}
+    // C08: a Barracks keeps the Bows, Swords and Armor Haulers bring for the units it trains.
+    if(d.kit)add(`kit-${building.id}`,'kit',d.kit.capacity,equipmentResources(this.scene.objectRegistry));
   }
   isStock(location){return location.kind==='storage'||location.kind==='fallback';}
   used(location){return sum(location.stock);}
