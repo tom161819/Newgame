@@ -46,3 +46,9 @@ test('stepped updates repaint only changed tiles, trees follow their tile, the e
   assert.ok(transition.levels.every(level => level === SEASON_TRANSITION.levels));
   assert.equal(transition.seasonAt({}, 'Autumn'), 'Autumn', 'trees without a tile (map memory) keep their season');
 });
+
+test('an explicit complete transition flush relays immediate painting, while a normal batch keeps its frame budget',()=>{
+ const calls=[],transition=new SeasonTransition({}, {seasons:seasons(SEASON_DAYS*2+1),terrain:{invalidateChunksOf(tiles,options){calls.push({tiles:tiles.length,...options});}}});
+ transition.update();transition.flush();assert.equal(calls.at(-1).immediate,false);assert.equal(calls.at(-1).tiles,SEASON_TRANSITION.chunksPerFrame);
+ transition.flush(Infinity);assert.equal(calls.at(-1).immediate,true);assert.ok(calls.at(-1).tiles>SEASON_TRANSITION.chunksPerFrame);
+});
