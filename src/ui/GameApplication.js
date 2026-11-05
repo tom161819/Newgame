@@ -5,10 +5,19 @@ import { NewGameSetup } from './NewGameSetup.js';
 import { ChangelogPanel } from './ChangelogPanel.js';
 import { VersionArchivePanel } from './VersionArchivePanel.js';
 import { gameVersion,releases } from 'virtual:game-release';
+import { AutosaveService,readAutosaveSettings,saveAutosaveSettings } from '../systems/AutosaveService.js';
 
 export class GameApplication {
   constructor(game){
     this.game=game;this.scene=null;this.gameVersion=gameVersion;this.saves=new SaveGameManager();this.saveMenu=new SaveLoadMenu(this);
+    let storage;try{storage=window.localStorage;}catch{}
+    this.autosave=new AutosaveService({saves:this.saves,snapshot:()=>this.snapshot(),settings:readAutosaveSettings(storage),onStatus:status=>this.autosaveStatus(status)});
+    const autosaveToggle=document.querySelector('#autosave-toggle'),autosaveInterval=document.querySelector('#autosave-interval');
+    if(autosaveToggle&&autosaveInterval){
+      autosaveToggle.checked=this.autosave.enabled;autosaveInterval.value=String(this.autosave.intervalMs);autosaveInterval.disabled=!this.autosave.enabled;
+      const apply=()=>{this.autosave.configure({enabled:autosaveToggle.checked,intervalMs:Number(autosaveInterval.value)});autosaveInterval.disabled=!this.autosave.enabled;saveAutosaveSettings(storage,this.autosave);this.autosaveStatus();};
+      autosaveToggle.addEventListener('change',apply);autosaveInterval.addEventListener('change',apply);this.autosaveStatus();
+    }
     this.main=document.querySelector('#main-menu');this.pauseDialog=document.querySelector('#pause-menu');
     this.changelog=new ChangelogPanel({version:gameVersion,releases});
     this.archive=new VersionArchivePanel({catalogURL:`${import.meta.env.BASE_URL}versions/catalog.json`,onChanges:version=>{if(version&&!releases.some(r=>r.version===version))window.open(`${import.meta.env.BASE_URL}?changelog=${encodeURIComponent(version)}`,'_blank','noopener,noreferrer');else this.changelog.open(version);}});
@@ -45,7 +54,15 @@ export class GameApplication {
     this.pauseDialog.close();this.main.hidden=true;document.body.classList.add('in-game');document.querySelector('main').inert=false;
     this.game.scene.stop('MainMenu');this.game.scene.stop('Game');this.scene=null;this.game.scene.start('Game',{state,settings});
   }
-  onGameReady(scene){this.scene=scene;}
+  onGameReady(scene){this.scene=scene;this.autosave.reset();}
+  // The last successful Autosave stays visible; a failure is announced once per streak.
+  autosaveStatus(status=null){
+    const output=document.querySelector('#autosave-status');if(!output)return;
+    const time=at=>{const date=new Date(at);return Number.isFinite(date.getTime())?date.toLocaleTimeString('cs-CZ'):'—';};
+    const last=this.autosave.lastSuccess,base=!this.autosave.enabled?'Autosave is off.':last?`Last autosave: ${time(last.at)} · Day ${last.day}`:'No autosave yet in this session.';
+    if(status?.type==='failed'){output.textContent=`Autosave failed: ${status.message}. ${last?`The previous autosave (${time(last.at)}) is kept.`:''}`.trim();output.classList.add('failed');if(status.first)this.notify('Autosave failed. Your previous saves are kept.');return;}
+    output.classList.remove('failed');output.textContent=base;if(status?.recovered)this.notify('Autosave works again.');
+  }
   async load(input){const state=validateGameState(input);this.start(state);}
   snapshot(){if(!this.scene||this.scene.gameOver)throw new Error('Nejprve spusť hru.');return validateGameState(serializeGameState(this.scene));}
   showPause(){

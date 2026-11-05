@@ -553,6 +553,8 @@ export class GameScene extends Phaser.Scene {
     const raw=this.game.loop.rawDelta;
     delta=this.activeFramePending?0:Number.isFinite(raw)?Math.max(0,raw):Math.max(0,delta);
     this.activeFramePending=false;
+    // Autosave counts only these active, visible, unpaused milliseconds.
+    this.registry.get('application')?.autosave?.update(delta);
     // První snímek po Load/Resume pouze obnoví obraz. Nulový čas nesmí
     // změnit uloženou animaci, rozpracovanou AI ani příkazy jednotek.
     if(!delta){this.refreshVisibility();return;}

@@ -1,6 +1,7 @@
 import { element } from './objectLabels.js';
 import { IncompatibleSaveError,saveSchemaStatus } from '../systems/GameStateSerializer.js';
 import { exportSaveFile,parseSaveFile,saveFileName,SAVE_FILE_MAX_BYTES } from '../systems/SaveTransfer.js';
+import { AUTOSAVE_ID } from '../systems/AutosaveService.js';
 
 // Saves record their schema twice (record and state); either identifies an incompatible slot without loading it.
 export function saveRecordStatus(record){return saveSchemaStatus({saveVersion:record?.state?.saveVersion??record?.saveVersion});}
@@ -60,10 +61,10 @@ export class SaveLoadMenu {
       const validDate=value=>{const date=new Date(value);return Number.isFinite(date.getTime())?date.toLocaleString('cs-CZ'):'Neznámé datum';};
       info.append(element('h3','',save.name||'Uložená hra'),element('p','',`Day ${save.day??'?'} · Hráno ${formatPlayTime(save.playTime??0)}`),
         element('small','',`Uloženo: ${validDate(save.updatedAt)} · Vytvořeno: ${validDate(save.createdAt)}`));
-      const status=saveRecordStatus(save);
+      const status=saveRecordStatus(save),auto=save.id===AUTOSAVE_ID;if(auto){row.classList.add('autosave');info.prepend(element('span','save-badge','Autosave'));}
       if(!status.compatible){row.classList.add('incompatible');info.append(element('p','save-warning',`Incompatible save · schema ${status.savedVersion??'unknown'}, current ${status.currentVersion}`));}
       const actions=element('div','save-actions');
-      for(const [action,label]of [['load','Load'],...(this.mode==='save'?[['overwrite','Přepsat']]:[]),...(status.compatible?[['download','Download Save']]:[]),['delete','Delete']]){
+      for(const [action,label]of [['load','Load'],...(this.mode==='save'&&!auto?[['overwrite','Přepsat']]:[]),...(status.compatible?[['download','Download Save']]:[]),['delete','Delete']]){
         const button=element('button','',label);button.type='button';button.dataset.action=action;button.dataset.id=save.id;actions.append(button);
       }
       row.append(info,actions);return row;
