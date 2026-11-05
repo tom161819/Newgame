@@ -19,7 +19,8 @@ export function staticMemoryEntries(scene){
   return entries;
 }
 
-export function captureMapKnowledge(scene){
+// force: a Save takes a fresh object snapshot, so a save and its reload always hold identical memory.
+export function captureMapKnowledge(scene,{force=false}={}){
   if(!scene.mapMemory)return;
   scene.fog.update();
   const worldRevision=`${scene.constructionSystem?.revision??0}:${scene.buildings.length}`;
@@ -27,5 +28,5 @@ export function captureMapKnowledge(scene){
   if(scene.fog.enabled)scene.terrain?.invalidateArea(changed,false);
   // Objects in sight are snapshotted when sight changes and at most every 250 ms otherwise (growth, construction).
   const now=performance.now(),memory=scene.mapMemory,key=`${scene.fog.revision}|${scene.fog.enabled}|${worldRevision}|${scene.resources?.size??0}|${scene.dropSystem?.drops.size??0}|${scene.treasureSystem?.chests.size??0}`;
-  if(memory.objectsKey!==key||!(now<(memory.nextObjectScan??0))){memory.objectsKey=key;memory.nextObjectScan=now+250;memory.observeObjects(staticMemoryEntries(scene));}
+  if(force||memory.objectsKey!==key||!(now<(memory.nextObjectScan??0))){memory.objectsKey=key;memory.nextObjectScan=now+250;memory.observeObjects(staticMemoryEntries(scene));}
 }
