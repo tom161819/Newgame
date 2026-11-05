@@ -42,7 +42,7 @@ export class LogisticsTaskManager {
   updateWorker(worker,{constructionOnly=false}={}){
     if(worker.workTask||worker.cargo||worker.aiCooldown>0)return false;
     worker.aiCooldown=LOGISTICS_RULES.planningInterval;worker.workState='Waiting';worker.workMessage='Waiting for transport';this.update();
-    const storage=this.storage,cap=carryCapacity(worker),score=task=>{
+    const storage=this.storage,cap=resource=>carryCapacity(worker,resource),score=task=>{
       const source=task.sourceDropId?this.scene.dropSystem.drops.get(task.sourceDropId)?.tile:storage.locations.get(task.sourceId),target=storage.locations.get(task.destinationId);
       return source&&target?Math.hypot(worker.position.x-source.x,worker.position.y-source.y)+Math.hypot(source.x-target.x,source.y-target.y):Infinity;
     };
@@ -53,7 +53,7 @@ export class LogisticsTaskManager {
       const allocation=task.allocationId&&storage.reservations.get(task.allocationId),available=task.allocationId?(allocation?.owner===`site-${task.siteId}`?allocation.amount:0):drop?.amount??storage.free(task.sourceId,task.resource),room=existingCap?.amount??storage.room(task.destinationId);
       let missing=task.amount;if(destination?.kind==='input'){const b=this.scene.buildings.find(b=>b.id===destination.buildingId),recipe=b&&buildingDefinition(b).recipe;if(!b||this.scene.foodProduction.inputShortage(b))continue;missing=(recipe?.input[task.resource]??0)-(destination.stock[task.resource]??0)-storage.incoming(destination.id,task.resource);}
       if(destination?.kind==='kit')missing=this.scene.military?.missing(destination.buildingId,task.resource)??0;
-      const amount=Math.min(cap,available,room,missing);if(amount<=0||!destination||drop&&!this.scene.workerSystem.reservations.available(`drop:${drop.id}`,worker.id))continue;
+      const amount=Math.min(cap(task.resource),available,room,missing);if(amount<=0||!destination||drop&&!this.scene.workerSystem.reservations.available(`drop:${drop.id}`,worker.id))continue;
       const routeKey=`${worker.id}:${task.sourceDropId??task.sourceId}:${task.destinationId}`;
       if(this.failedRoutes.has(routeKey))continue;
       if(++attempts>8)break;

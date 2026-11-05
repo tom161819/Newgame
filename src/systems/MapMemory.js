@@ -19,9 +19,23 @@ export class MapMemory {
     if(changed)this.revision++;
     return changed;
   }
-  observeTerrain(grid,wear,season,map=grid){
+  // Performance: visiting every visible tile each frame cost milliseconds. When only sight moved by one step
+  // (fog.added/removed) and nothing else changed, only the newly seen tiles and their neighbours (whose path links
+  // depend on sight) are refreshed; a change of wear, pavement, season, map or Fog mode refreshes everything in sight.
+  observeTerrain(grid,wear,season,map=grid,worldRevision=null){
+    const world=worldRevision==null?null:`${this.fog.enabled}|${wear?.levelRevision??0}|${season}|${worldRevision}`,fog=this.fog;
+    let indices=fog.visibleIndices;
+    if(world!==null&&world===this.terrainWorld){
+      if(fog.revision===this.terrainFogRevision)return [];
+      if(fog.revision===this.terrainFogRevision+1){
+        const set=new Set(),w=fog.width;
+        for(const index of [...fog.added,...fog.removed]){const x=index%w,y=Math.floor(index/w);for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const n=(y+dy)*w+x+dx;if(x+dx>=0&&x+dx<w&&fog.visibleIndices.has(n))set.add(n);}}
+        indices=set;
+      }
+    }
+    this.terrainWorld=world;this.terrainFogRevision=fog.revision;
     const changed=[];
-    for(const index of this.fog.visibleIndices){
+    for(const index of indices){
       const tile={x:index%this.fog.width,y:Math.floor(index/this.fog.width)},value=grid[tile.y]?.[tile.x];
       if(value===undefined)continue;
       this.fog.explored[index]=1;
@@ -31,8 +45,8 @@ export class MapMemory {
         const cornersVisible=!dx||!dy||this.fog.isInSightTile({x:tile.x+dx,y:tile.y})&&this.fog.isInSightTile({x:tile.x,y:tile.y+dy});
         if(this.fog.isInSightTile(next)?cornersVisible&&wear.level(next)>0&&canStep(map,tile,next):(previous?.[3]??0)&(1<<bit))connections|=1<<bit;
       }
-      const data=[value,wear?.level(tile)??0,season,connections,wear?.isPaved?.(tile)?1:0];
-      if(!previous||data.some((value,i)=>value!==previous[i])){this.terrain.set(index,data);changed.push(tile);}
+      const level=wear?.level(tile)??0,paved=wear?.isPaved?.(tile)?1:0;
+      if(!previous||previous[0]!==value||previous[1]!==level||previous[2]!==season||previous[3]!==connections||previous[4]!==paved){this.terrain.set(index,[value,level,season,connections,paved]);changed.push(tile);}
     }
     if(changed.length)this.revision++;
     return changed;
