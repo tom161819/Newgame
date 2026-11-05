@@ -68,6 +68,8 @@ Save/Load zachovává logickou mapu, překážky, budovy a spojení hradeb, kame
 
 Data mají `saveVersion` a před nahrazením světa procházejí kontrolou. Poškozený save zobrazí chybu a ponechá současnou hru. Zápis do IndexedDB je atomický: při chybě zůstane předchozí save. Samotné ukládání a načítání již otevřené hry funguje i bez internetu; stažení hry při prvním otevření vyžaduje připojení.
 
+**Přenos pozic mezi zařízeními:** v menu Save/Load stáhne **Download Save** vybranou pozici jako soubor JSON (formát `medieval-kingdom-save`, schéma, verze hry, datum a celý snapshot). **Import Save File** soubor načte jen pomocí `JSON.parse`, ověří velikost (max. 16 MB), formát, schéma a stejnou validaci jako Load a uloží ho do nového slotu. Pokud na zařízení existuje slot se stejným ID, nabídne **Replace** nebo **Keep both**. Poškozený soubor nebo jiné schéma se odmítne beze změny hry i ostatních slotů. Žádný server ani placená služba se nepoužívá.
+
 ## Zkušenosti a levely
 
 Král začíná na **levelu 1 s 0 XP**. Odměnu získá až po dokončení činnosti: kámen **3 XP**, sebraný balíček masa **2 XP** bez ohledu na jeho množství, zajíc **10 XP**, srna **20 XP**, divočák **35 XP**, nový segment hradby **2 XP**, věž **15 XP**, hrad **30 XP**, kamenolom **15 XP**, lovecká chata **10 XP** a kasárna **20 XP**. Řada hradeb odmění jen skutečně nové segmenty. Neúspěšná nebo zrušená akce nic nepřidá; chůze, čekání, regenerace ani produkce zlata XP nevytvářejí.
