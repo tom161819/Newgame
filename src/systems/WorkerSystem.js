@@ -15,7 +15,7 @@ export class WorkerSystem {
   constructor(scene,{onChange=()=>{}}={}){
     this.scene=scene;this.onChange=onChange;this.workers=new Map();this.nextId=1;this.lastMigrationDay=scene.gameTime.day;this.listeners=new Set();
     this.reservations=new TaskReservationSystem();this.ai=new WorkerAI(this);this.commands=new UnitCommands(this);this.jobs=new JobSystem(this);
-    this.unsubscribe=scene.gameTime.onNewDay(day=>this.onNewDay(day));
+    this.unsubscribe=scene.gameTime.onNewDay(day=>this.onNewDay(day));this.buildingsChanged=()=>this.updateUI();scene.events?.on?.('buildings:changed',this.buildingsChanged);
   }
   liveWorkers(){return [...this.workers.values()].filter(w=>w.isAlive);}
   liveSubjects(){return this.liveWorkers().filter(w=>w.isSubject!==false);}
@@ -64,7 +64,7 @@ export class WorkerSystem {
   }
   onNewDay(day){
     if(day<=this.lastMigrationDay)return;this.lastMigrationDay=day;
-    for(let i=0;i<POPULATION.migrantsPerDay&&this.liveSubjects().length<POPULATION.maximum;i++){
+    for(let i=0;i<POPULATION.migrantsPerDay&&this.liveSubjects().length<this.capacity();i++){
       if(this.scene.attractiveness&&!this.scene.attractiveness.shouldSettle())continue;
       const map=this.scene.map,origin=this.origin(),candidates=this.candidates().filter(t=>(t.x<=1||t.y<=1||t.x>=map[0].length-2||t.y>=map.length-2)&&Math.hypot(t.x-origin.x,t.y-origin.y)>25);
       if(!candidates.length)break;const worker=this.create(candidates[Math.floor(Math.random()*candidates.length)]);worker.arriving=true;worker.workState='Arriving';worker.moveTo(this.homeGoals());
@@ -73,8 +73,10 @@ export class WorkerSystem {
   }
   update(delta){for(const worker of this.liveWorkers())if(worker.isSubject!==false)this.ai.update(worker,delta);else worker.update(delta);}
   onDeath(worker){worker.commandState={state:'Working',goal:null};worker.diedAt??=this.scene.gameTime.totalElapsed;this.scene.workplaceSystem?.detach(worker);this.ai.cancel(worker);worker.active=false;worker.path=[];worker.nextTile=null;worker.walking=false;worker.workState='Dead';worker.workMessage='';worker.arriving=false;worker.view.destroy();this.scene.combatFeedback.remove(worker.id);this.updateUI();}
-  updateUI(){const count=this.liveSubjects().length;this.onChange(count,POPULATION.maximum);for(const listener of this.listeners)listener(count,POPULATION.maximum);}
+  // Resident capacity: the base settlement plus every completed House.
+  capacity(){return POPULATION.maximum+(this.scene.buildings??[]).reduce((n,b)=>n+(buildingIsComplete(b)?this.scene.objectRegistry?.get(b.type)?.housing?.capacity??0:0),0);}
+  updateUI(){const count=this.liveSubjects().length,maximum=this.capacity();this.onChange(count,maximum);for(const listener of this.listeners)listener(count,maximum);}
   exportState(){return {nextId:this.nextId,lastMigrationDay:this.lastMigrationDay};}
   importState(data){this.nextId=data?.nextId??1;this.lastMigrationDay=data?.lastMigrationDay??this.scene.gameTime.day;this.updateUI();}
-  destroy(){this.unsubscribe();this.jobs.destroy();this.listeners.clear();this.reservations.clear();for(const worker of this.workers.values())worker.view.destroy();this.workers.clear();}
+  destroy(){this.unsubscribe();this.scene.events?.off?.('buildings:changed',this.buildingsChanged);this.jobs.destroy();this.listeners.clear();this.reservations.clear();for(const worker of this.workers.values())worker.view.destroy();this.workers.clear();}
 }
