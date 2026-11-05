@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { SAVE_VERSION } from '../src/systems/GameStateSerializer.js';
 import { placeBlueprint,supplyAndBuild,clickBuilding } from './building-menu-smoke.mjs';
 
 // S12 phase C: real Stables; a Stablehand tames a visible wild horse on his own and leads it into the paddock; the panel
@@ -14,7 +15,7 @@ export async function stablesSmoke(page){
   assert.equal(fixture.profession,'stablehand');
   await page.waitForFunction(id=>window.__game.registry.get('application').scene.stables.horses.has(id),fixture.horse,{timeout:150000});
   await clickBuilding(page,site.id);await page.locator('#workplace-dialog[open]').waitFor();assert.match(await page.locator("#mining-details").textContent(),/[1-4] \/ 4/);await page.locator('#close-workplace').click();
-  const saved=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.equal(saved.saveVersion,27);await load(saved);
+  const saved=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.equal(saved.saveVersion,SAVE_VERSION);await load(saved);
   const inside=await page.evaluate(({horse,site})=>{const s=window.__game.registry.get('application').scene,a=s.animalSystem.animals.get(horse),b=s.buildings.find(b=>b.id===site);return s.stables.tamed(a)&&a.tile.x>=b.x&&a.tile.x<b.x+5&&a.tile.y>=b.y&&a.tile.y<b.y+5;},{horse:fixture.horse,site:site.id});assert.equal(inside,true);
   await load(baseline);
   console.log('PASS S12 Stables: real Stables, Stablehand tamed a visible wild horse and led it into the paddock, panel counts it, kept inside after Load');
