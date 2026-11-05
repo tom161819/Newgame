@@ -1,0 +1,76 @@
+name: Verify published release
+
+on:
+  workflow_run:
+    workflows: [Publish game to GitHub Pages]
+    types: [completed]
+    branches: [main]
+
+# This job only verifies public artifacts. It does not publish tags, edit Issues,
+# merge PRs or receive write permissions.
+permissions:
+  contents: read
+
+concurrency:
+  group: published-release-verification
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out reviewed verification code and complete tag history
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          # workflow_run uses the default branch's trusted workflow commit.
+          # The deployment SHA is checked separately by release:verify.
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+
+      # The verifier uses only Node built-ins, Git and curl. No install, build,
+      # game/Studio smoke or archive composition is repeated here.
+      - name: Check whether the current milestone tag is published
+        id: release
+        shell: bash
+        run: |
+          tag="$(node --input-type=module -e "import {readFileSync} from 'node:fs'; import {releaseNumber} from './scripts/release-gate-lib.mjs'; process.stdout.write('v'+releaseNumber(JSON.parse(readFileSync('package.json','utf8')).version));")"
+          if git show-ref --verify --quiet "refs/tags/${tag}"; then
+            echo 'published=true' >> "$GITHUB_OUTPUT"
+          else
+            tag_lookup_status=$?
+            if [ "$tag_lookup_status" -ne 1 ]; then exit "$tag_lookup_status"; fi
+            echo 'published=false' >> "$GITHUB_OUTPUT"
+            printf '### No public milestone tag\n\nNo matching tag exists for the current package version. This run makes no release-verification claim.\n' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Verify actual public catalog, manifest and deployed source
+        if: steps.release.outputs.published == 'true'
+        env:
+          PAGES_RUN_ID: ${{ github.event.workflow_run.id }}
+          PAGES_COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
+        shell: bash
+        run: |
+          node scripts/release-gate.mjs verify \
+            --pages-run="$PAGES_RUN_ID" \
+            --pages-commit="$PAGES_COMMIT_SHA" \
+            --report="$RUNNER_TEMP/published-release-verification.json"
+          test -s "$RUNNER_TEMP/published-release-verification.json"
+          {
+            printf '### Verified public release\n\n'
+            printf '```json\n'
+            cat "$RUNNER_TEMP/published-release-verification.json"
+            printf '\n```\n'
+          } >> "$GITHUB_STEP_SUMMARY"

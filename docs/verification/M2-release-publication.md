@@ -1,5 +1,23 @@
 # M2 publication checkpoint — verified candidate, public release pending
 
+## Current Issue47 audit — 2026-11-04
+
+The old checkpoints below are historical, not the live task queue. PR22 is
+actually merged; main65b4bf8 also includes Claude N02/Save15 through PR62.
+Pages41924183243 for that exact main is Success and its full CI supplied all9
+prerequisite checks, so identical checks were reused rather than rerun.
+
+Public tag v0.3.0 is now actually pushed and verified by ls-remote, targeting the
+unchanged frozen source02a3a43ace8adc993aea7a392424d7cdf4e7dec9. Its71archive
+blobs match the actual deployed Git tree; no new archive/version/schema change.
+Final M2 completion remains pending: fresh tag-aware Pages and actual public
+catalog/manifest verification are still required. API writes and public Pages
+HTTPS are genuinely blocked by this runtime; Issue47 status is not fabricated.
+
+See [current structured evidence and safe handoff](issue-47/README.md) and
+[MERGE_QUEUE](../MERGE_QUEUE.md). C01 WIPdd728a0 is safely pushed and parked;
+Issue48 and later tasks remain blocked until47 actually completes.
+
 ## Final upload and actual merge attempt — 2026-11-04
 
 Candidate e574f75 is pushed to PR22. The newer maina09de58/PR27 adds only the

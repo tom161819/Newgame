@@ -1,6 +1,21 @@
 # Upgrade progress
 
-## Aktuální práce
+## Aktuální audit Issue47 — 2026-11-04
+
+GitHub Issues jsou hlavní fronta. PR22 je skutečně merged; hlavní větev65b4bf8
+obsahuje i Claudův N02/PR62 a Save15. Její Pages41924183243 má Success a plný
+scope dodal všech9povinných předpokladových kontrol; bez duplicitní lokální
+instalace/full testů/buildu. Tagv0.3.0 byl nyní skutečně zveřejněn na původním
+02a3a43 (archivní Save14, strom49b1e79,71přesných Git souborů), bez úpravy archivů.
+
+M2 dosud není RELEASED: přímý release:verify opravdu selhal až na veřejném HTTPS
+katalogu. Nový read-only post-Pages workflow je připravený ke standardnímu PR;
+13regresí ověřovače, YAML/Bash a skutečný tag/no-tag/Git-error krok prošly.
+Samotný nový workflow ještě neběžel a Issue/PR API claim/publikace jsou blokované.
+Neodblokovat48 ani pozdější závislé úkoly. C01 WIPdd728a0 je bezpečně uložený.
+[Aktuální důkazy](verification/issue-47/README.md), [předání](MERGE_QUEUE.md).
+
+## Historické záznamy před aktuálním auditem
 
 Krok24 je dokončen a publikován: `e721a68`, Pages `41694834348` **Success** (58 s), původní adresa hry zachována. A `fb5aaf2`, B `f4e621b`, C `a454fe9`, D `9e93982`;271/271 testů, build, skutečné UI/IndexedDB, starší savy5/6, fyzický potravinový řetězec, ruční přeprava, zimní20NPC kolem57 FPS a62 neměnných archivů ověřeny. Podrobnosti: [step24 verification](verification/step-24.md).
 
