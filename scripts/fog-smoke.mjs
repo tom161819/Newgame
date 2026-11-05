@@ -58,7 +58,8 @@ export async function hiddenInteractionSmoke(page){
   await clickTile({x:95,y:95});const first=await page.locator('#status').textContent();assert.equal(first,'The king sets out into unexplored land.');assert.equal(await page.locator('#path-wear-info').textContent(),'Path Wear: outside current sight.');
   assert.deepEqual(await page.evaluate(()=>{const o=window.__game.registry.get('application').scene.character.order;return {explore:o?.explore,goal:o?.goal};}),{explore:true,goal:{x:95,y:95}});
   await clickTile({x:96,y:95});assert.equal(await page.locator('#status').textContent(),first);assert.equal(await page.locator('#object-tooltip').evaluate(e=>e.hidden),true);
-  await page.evaluate(()=>window.__game.registry.get('application').scene.character.stopForBuilding());
+  // Stop the king and the camera that followed him, so the next clicks land on the same hidden tiles.
+  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,c=s.cameras.main;s.character.stopForBuilding();s.worldCamera.following=false;s.worldCamera.panTarget=null;c.centerOn(3200,3150);c.preRender();});
   await page.locator('#buildings-tab').click();await page.locator('[data-building-category="defense"]').click();await page.locator('#tower-choice').click();await clickTile({x:95,y:95});
   // A blueprint outside sight is provisional: placed without revealing anything, claiming no hidden ground until seen.
   assert.match(await page.locator('#status').textContent(),/blueprint placed in unexplored land/);
