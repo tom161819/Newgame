@@ -44,7 +44,7 @@ export function serializeOrder(order){
 export function serializeGameState(scene){
   scene.naturalResources?.flushGrowth();
   scene.naturalResources?.refreshSeason();
-  captureMapKnowledge(scene);
+  captureMapKnowledge(scene,{force:true});
   const c=scene.character,camera=scene.cameras.main;
   return {
     saveVersion:SAVE_VERSION,gameSettings:{...gameSettings(scene.gameSettings),...(scene.seasons?{seasonsEnabled:scene.seasons.enabled}:{})},terrain:scene.terrainGrid.map(row=>[...row]),
