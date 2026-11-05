@@ -9,6 +9,7 @@ export class MountSystem {
   cancel(){if(this.target)this.scene.character.stopForBuilding();this.target=null;}
   command(horse){
     this.cancel();
+    if(this.scene.stables?.tamed(horse)){this.scene.setStatus(t('stables.inStable'));return false;}
     if(this.scene.character.mountedHorse||!horse.active||!horse.isAlive||horse.mounted||!horse.definition.interactions.includes('mount'))return false;
     this.target=horse;this.repath=0;
     if(!this.plan()){this.cancel();return false;}
@@ -38,7 +39,7 @@ export class MountSystem {
     const point=tileCenter(tile);horse.view.setPosition(point.x,point.y).setDepth(point.y+(horse.definition.depth?.offset??0)).setVisible(true);
     king.mountedHorse=null;king.speed=king.definition.gameplay.movementSpeed;
     this.scene.player.setMounted?.(null);this.scene.fog?.update();this.scene.updateMountUI?.();
-    this.scene.setStatus(t('status.kingDismounted'));return true;
+    if(this.scene.stables?.onDismount(horse))this.scene.setStatus(t('stables.kingStabled'));else this.scene.setStatus(t('status.kingDismounted'));return true;
   }
   update(delta){
     const king=this.scene.character,horse=king.mountedHorse;

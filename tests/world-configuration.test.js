@@ -52,7 +52,7 @@ test('respawn Off/Slow/Normal/Fast uses active milliseconds, fills one missing s
     const s=configured({wildlifePopulation:'normal',wildlifeRespawn,difficulty:'hard'});s.animalSystem.spawn(s.character.tile);remove(s,'rabbit',2);remove(s,'deer');const interval=WILDLIFE_INTERVALS[wildlifeRespawn];
     if(!interval){s.wildlifeRespawn.update(1000000);assert.deepEqual(counts(s),{rabbit:1,deer:2,wild_boar:3});continue;}
     s.wildlifeRespawn.update(interval-1);assert.deepEqual(counts(s),{rabbit:1,deer:2,wild_boar:3});s.wildlifeRespawn.update(1);assert.deepEqual(counts(s),{rabbit:2,deer:2,wild_boar:3});
-    s.wildlifeRespawn.update(interval*10);assert.deepEqual(counts(s),{rabbit:3,deer:3,wild_boar:3});assert.equal(s.animalSystem.animals.size,10);
+    s.wildlifeRespawn.update(interval*10);assert.deepEqual(counts(s),{rabbit:3,deer:3,wild_boar:3});assert.equal(s.animalSystem.animals.size,15);
     const rabbit=[...s.animalSystem.animals.values()].filter(a=>a.type==='rabbit').at(-1);assert.equal(rabbit.maxHP,19.5);assert.equal(rabbit.attackDPS,1.3);assert.equal(rabbit.active,true);
   }
 });
@@ -68,6 +68,6 @@ test('respawn pauses with game pause/death and falls back to a safe visible cell
 test('current-schema roundtrip restores advanced settings, partial long day and respawn, castle/gold/wages without repeating creation or bonuses',()=>{
   const s=configured({difficulty:'easy',startingCastle:true,startingGold:500,dayLengthSeconds:240,wildlifeRespawn:'fast',fogOfWar:false});s.inventory.add('gold',500);createStartingCastle(s,s.character.tile);s.constructionSystem=new ConstructionSystem(s);s.animalSystem.spawn(s.character.tile);remove(s,'deer');s.gameTime.update(180000);s.wildlifeRespawn.update(29876);s.character.currentHP=87.5;
   const data=validateGameState(serializeGameState(s));assert.equal(data.saveVersion,SAVE_VERSION);
-  for(let i=0;i<3;i++){const r=configured({});r.constructionSystem=new ConstructionSystem(r);loadGameState(r,data);assert.deepEqual(serializeGameState(r),data);assert.equal(r.gameTime.dayDuration,240000);assert.equal(r.wildlifeRespawn.elapsed,29876);assert.equal(r.buildings.length,1);assert.equal(r.inventory.count('gold'),500);assert.equal(r.character.maxHP,150);assert.equal(r.character.currentHP,87.5);r.wildlifeRespawn.update(124);assert.equal(r.animalSystem.animals.size,10);}
+  for(let i=0;i<3;i++){const r=configured({});r.constructionSystem=new ConstructionSystem(r);loadGameState(r,data);assert.deepEqual(serializeGameState(r),data);assert.equal(r.gameTime.dayDuration,240000);assert.equal(r.wildlifeRespawn.elapsed,29876);assert.equal(r.buildings.length,1);assert.equal(r.inventory.count('gold'),500);assert.equal(r.character.maxHP,150);assert.equal(r.character.currentHP,87.5);r.wildlifeRespawn.update(124);assert.equal(r.animalSystem.animals.size,15);}
   for(const mutate of [x=>x.wildlifeRespawn.elapsed=30000,x=>x.gameSettings.dayLengthSeconds=90,x=>x.time.elapsed=240000]){const bad=structuredClone(data);mutate(bad);assert.throws(()=>validateGameState(bad));}
 });

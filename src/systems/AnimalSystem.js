@@ -40,7 +40,7 @@ export class AnimalSystem {
     this.clearance.refresh();
     for(const animal of this.animals.values()){
       if(!animal.active||!animal.isAlive)continue;
-      if(animal.mounted)continue;
+      if(animal.mounted||this.scene.stables?.holds(animal))continue;
       const target=animal.retaliationTarget;
       if(target){
         if(!target.isAlive){this.stopRetaliation(animal);}

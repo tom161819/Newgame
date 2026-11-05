@@ -50,6 +50,7 @@ export class WorkerAI {
     else if(worker.profession==='hunter')this.hunter(worker,delta);
     else if(worker.profession==='farmer'&&this.scene.farmingSystem)this.scene.farmingSystem.updateWorker(worker,delta);
     else if(job.workplace&&this.scene.workplaceSystem?.building(worker)?.definition.recipe&&this.scene.foodProduction)this.scene.foodProduction.updateWorker(worker);
+    else if(worker.profession==='stablehand'&&this.scene.stables){this.scene.stables.updateWorker(worker,delta);}
     else if(worker.profession==='hauler'&&this.scene.logisticsTasks){if(!this.scene.vehicles?.updateHauler(worker))this.scene.logisticsTasks.updateHauler(worker,delta);}
     else if(worker.profession==='builder'){
       // Budovy jsou dosud okamžité. Staveniště dodá až skutečný construction provider.
