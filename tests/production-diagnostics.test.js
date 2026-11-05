@@ -61,3 +61,22 @@ test('C05 commanded Builders, Haulers and Farmers are not counted as working sou
  s.foodStorage.locations.get(`granary-${granary.id}`).stock.wheat=0;const farm=building(s,'farmhouse',40,45);building(s,'wheat_field',40,52);const farmer=employ(s,farm,'farmer',42);s.workerSystem.commands.hold(farmer);advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(reasons(s).includes('noProducerWorkers'));s.workerSystem.commands.resume(farmer);advance(s,DIAGNOSTICS.checkInterval);assert.ok(!reasons(s).includes('noProducerWorkers'));
  const miller=s.workplaceSystem.employees(mill)[0];s.workerSystem.commands.hold(farmer);s.workerSystem.commands.hold(miller);advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(!s.diagnostics.active().some(i=>i.entityId===mill.id),'a deliberately held production crew raises no production alarm');
 });
+
+test('completion advice is immediate despite stock and no staff, deduplicated across workers/buildings and never reminded',()=>{
+ const s=scene(),mill=building(s,'mill',54,45);s.foodStorage.locations.get(`input-${mill.id}`).stock.wheat=20;
+ s.activities.emit('buildingCompleted',{objectIds:[mill.id]});assert.deepEqual(reasons(s),['missingChainSource']);assert.equal(s.log.length,1);assert.equal(s.log[0].informational,true);
+ s.activities.emit('buildingCompleted',{objectIds:[mill.id]});const other=building(s,'mill',60,45);s.activities.emit('buildingCompleted',{objectIds:[other.id]});advance(s,DIAGNOSTICS.reminder*3);assert.equal(s.log.length,1);assert.equal(s.diagnostics.active().length,1);
+ s.diagnostics.dismiss(s.diagnostics.active()[0].key);advance(s,DIAGNOSTICS.reminder*3);assert.deepEqual(reasons(s),[]);assert.equal(s.log.length,1);
+ building(s,'wheat_field',40,52);advance(s,DIAGNOSTICS.checkInterval);assert.equal(s.diagnostics.completionNotices.size,0);
+});
+test('Bakery requires a completed Mill; existing predecessors and reloaded buildings do not replay completion advice',()=>{
+ const s=scene(),bakery=building(s,'bakery',54,45);s.activities.emit('buildingCompleted',{objectIds:[bakery.id]});assert.deepEqual(s.diagnostics.active()[0].params,{producer:'mill'});
+ const mill=building(s,'mill',60,45,{blueprint:true});advance(s,DIAGNOSTICS.checkInterval);assert.equal(reasons(s).length,1);
+ mill.construction.state='complete';s.constructionSystem.sites.delete(mill.id);s.activities.emit('buildingCompleted',{objectIds:[mill.id]});assert.equal(s.diagnostics.active().some(i=>i.params.producer==='mill'),false);
+ const next=building(s,'bakery',54,52);s.activities.emit('buildingCompleted',{objectIds:[next.id]});assert.equal(s.log.filter(i=>i.params.producer==='mill').length,1);
+ s.diagnostics.destroy();s.diagnostics=new ProductionDiagnostics(s);advance(s,DIAGNOSTICS.reminder*2);assert.deepEqual(reasons(s),[],'loading existing complete buildings emits no completion event');
+});
+test('C04 actual blockers take precedence over structural advice without duplicating the panel row',()=>{
+ const s=scene(),mill=building(s,'mill',54,45);s.activities.emit('buildingCompleted',{objectIds:[mill.id]});employ(s,mill,'miller');advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);
+ assert.equal(s.diagnostics.active().length,1);assert.equal(s.diagnostics.active()[0].reason,'noProducer');s.foodProduction.records.get(mill.id).auto=false;advance(s,DIAGNOSTICS.checkInterval);assert.deepEqual(reasons(s),['missingChainSource']);
+});

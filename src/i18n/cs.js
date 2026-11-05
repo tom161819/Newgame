@@ -1,6 +1,8 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  // Food-chain completion advice (#125).
+  'notice.missingChainSource':'{name}: pro dlouhodobou výrobu chybí {producer}. Současné zásoby lze dál využít.',
   'hud.deliverCargo':'Odnést do skladu','status.cargoAwaitDelivery':'Kámen sebrán. Až budeš chtít, zvol Odnést do skladu.',
   'work.message.No reachable collection area':'Není dostupný hrad, sklad materiálu ani staveniště',
   'work.state.Holding':'Drží pozici','work.state.MovingToHold':'Přesun na určenou pozici',

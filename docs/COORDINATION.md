@@ -13,10 +13,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| S12 phase A (#57) Carry weights | Claude | `claude/s12-carry-weights` | — | In progress | data/logistics.js (weights, 40 load units), KingLogisticsSystem, FoodProductionSystem, LogisticsTaskManager, DropSystem, FoodStateValidation, GameStateSerializer (SAVE_VERSION 25), transportLabels, UnitPanel, i18n, logistics tests. |
-| S11 (#56) Stone Pavement | Claude | `claude/s11-stone-pavement` | — | Merged #136; Pages pending | data/pavement.js, data/objects/pavement.js, game/pavement.js, game/PavementTool.js, game/PavementView.js, game/cobbles.js (new); PathWearSystem (paved layer), MapMemory + validation, TerrainRenderer, ConstructionSystem (pavement sites), ObjectRegistry (mode), GameScene, GameStateSerializer (SAVE_VERSION 24), i18n, style.css, public/assets/buildings/stone_pavement, tests, smokes, UPGRADE_PROGRESS. |
-| AUD78 (#102) Manual king stone delivery | Codex | `codex/king-manual-stone-delivery` | — | STARTED from e630597; live ready override from Claude6658384869 | KingLogisticsSystem.js, isolated HUD controller if useful, small GameScene HUD integration, index.html/style.css, EN/CS keys, focused logistics/browser tests, docs/changelog. No C07 storage acceptance, equipment, jobs/production or Studio changes. |
-| House (#57, House part only; developer priority) | Claude | `claude/house-population-capacity` | — | PR open; 589 tests, 47 full smokes PASS | data/objects/housing.js (new), objects/index.js, approvedArt.js (house), jobs.js (houseCapacity), WorkerSystem.js (capacity), i18n objects, public/assets/buildings/house, tests. |
+| S12 phase A (#57) Carry weights | Claude | `claude/s12-carry-weights` | PR open; 611 tests, 52 full smokes PASS | data/logistics.js (weights, 40 load units), KingLogisticsSystem, FoodProductionSystem, LogisticsTaskManager, DropSystem, FoodStateValidation, GameStateSerializer (SAVE_VERSION 25), transportLabels, UnitPanel, i18n, logistics tests. |
+| NEW08-B (#125) Food chain completion notices | Codex | `codex/food-chain-completion-notices` | [#137](https://github.com/tom161819/Newgame/pull/137) | Implemented after verified #102 Pages; 602 tests after C08/schema23 integration, changelog, build:pages and chain-notices + C04 browser smoke PASS; GitHub push restored; PR/CI pending | ProductionDiagnostics.js, data/diagnostics.js, own EN/CS block, focused tests/browser smoke, docs/changelog. No C08 held systems or persistent schema edits. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -24,6 +22,10 @@ None pending. Add entries here when one pull request must wait for another.
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-05 [#133](https://github.com/tom161819/Newgame/pull/133) House (#57 part, Claude): +5 residents per completed House. Merge 8e604c0; Pages 42058257302 succeeded.
+- 2026-11-05 [#136](https://github.com/tom161819/Newgame/pull/136) S11 #56 (Claude): Stone Pavement, schema 24. Merge 3c08916; 606 tests, 51 full smokes, CI and [Pages 42073363443](https://github.com/tom161819/Newgame/actions/runs/42073363443) (descendant 8871f60) succeeded. Issue 56 closed.
+- 2026-11-05 [#134](https://github.com/tom161819/Newgame/pull/134) AUD78 #102: manual king stone delivery, merge2d9a357. 592 tests, changelog, build:pages, real HUD click/standing/cargo Save/Load and Hauler smoke PASS. CI42057853531 success for09eabd0; [Pages42058257302](https://github.com/tom161819/Newgame/actions/runs/42058257302) build+deploy succeeded for exact merge with full browser/save/archive/Studio gates. Issue102 closed/done. C07/schema22 and House preserved.
 
 - 2026-11-05 [#135](https://github.com/tom161819/Newgame/pull/135) C08 #55 (Claude): Barracks training (Soldier, Swordsman, Archer; Knight locked), Armory kit logistics, line of sight, defence, schema 23. Merge 5737395; 599 tests, 50 full smokes, CI and [Pages 42061820180](https://github.com/tom161819/Newgame/actions/runs/42061820180) succeeded. Issue 55 closed; S11 #56 in progress.
 - 2026-11-05 [#117](https://github.com/tom161819/Newgame/pull/117) C07 #54 (Claude): Bowyer, Swordsmith, Armorer and Armory with physical equipment logistics, schema 22. Merge 6284504; 586 tests, 45 full smokes, CI and [Pages 42053330151](https://github.com/tom161819/Newgame/actions/runs/42053330151) succeeded. Issue 54 closed; C08 #55 in progress (Claude).

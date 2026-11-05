@@ -1,3 +1,4 @@
+import { chainNoticesSmoke } from './chain-notices-smoke.mjs';
 import { idleStoneSmoke } from './idle-stone-smoke.mjs';
 import { wildlifeClearanceSmoke } from './wildlife-clearance-smoke.mjs';
 import { unitCommandSmoke } from './unit-command-smoke.mjs';
@@ -109,6 +110,7 @@ try{
   if(args.includes('--full')||args.includes('--wildlife-clearance'))await wildlifeClearanceSmoke(page);
   if(args.includes('--full')||args.includes('--unit-commands'))await unitCommandSmoke(page);
   if(args.includes('--full')||args.includes('--employment'))await employmentSmoke(page);
+  if(args.includes('--full')||args.includes('--chain-notices'))await chainNoticesSmoke(page);
   if(args.includes('--full')||args.includes('--notices'))await noticesSmoke(page);
   if(args.includes('--full')||args.includes('--fog')){await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);await hiddenInteractionSmoke(page);}
   if(args.includes('--full')||args.includes('--i18n'))await i18nGameSmoke(page);
