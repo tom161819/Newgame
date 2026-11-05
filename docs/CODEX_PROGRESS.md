@@ -68,3 +68,9 @@ Issue125 uses the existing completion ActivityBus event, ProductionDiagnostics a
 Validation: 595/595 tests (8 diagnostics cases), changelog:validate, build:pages and browser --current-only --chain-notices --notices PASS.
 
 Resumed after GitHub commit_refs_rules recovery: normal push succeeded. Integrated C08 main5737395/schema23 without changing its model; preserved both sides of changelog/coordination conflicts. Integrated 602/602 tests, changelog:validate, build:pages and --current-only --chain-notices --notices browser smoke PASS.
+
+## NEW04 implementation — 2026-11-05
+
+Issue122 adds low-priority seasonal tending directly inside the existing FarmingSystem. Farmers first check for harvest, then choose reachable perimeter positions near completed crops within their Farmhouse range. They use the existing farmer work pose, change position after a short interval and claim distinct idle destinations. Harvest preempts within 250ms; existing WorkerAI gives cargo delivery and manual Hold priority. Winter/missing/inaccessible crops return to Farmhouse waiting. Tending never changes resources, XP, growth or crop ownership. Temporary target claims are released on cancellation, job change, Hold, death or invalidation and rebuilt after Load; existing paths remain physical. No new workTask kind, persistent field or schema change. No WorkerAI, logistics/storage, renderer or asset edits.
+
+Validation after S12 weights and FoW/save fixes maina6442d5: 618/618 tests including seven focused cases covering active seasons, harvest preemption, winter/removal/access, multiple farmers/Hold, in-flight exact current-schema roundtrip, real cargo priority and bounded path searches. Changelog:validate, build:pages and --current-only --farmer-tending browser PASS: actual movement, existing work animation, reposition, no idle XP/goods, reload and native harvest/physical delivery.
