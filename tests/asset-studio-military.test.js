@@ -15,7 +15,7 @@ const assets = readdirSync(path.join(root, 'art/assets')).flatMap(c => readdirSy
 const byId = id => assets.find(a => a.id === id);
 const build = (asset, variant) => GENERATORS[asset.generator].build(variant.spec, { footprint: asset.footprint, style });
 
-test('V02 military buildings: Codex C07 footprints, at least three variants, trade props, unused by the game until Codex adds them', () => {
+test('V02 military buildings: C07 footprints, at least three variants, trade props; C07 buildings use only approved art, Stables stay unused', () => {
   for (const [id, size] of [['bowyer', 2], ['swordsmith', 2], ['armorer', 2], ['armory', 3], ['stables', 5]]) {
     const asset = byId(id);
     assert.deepEqual(asset.footprint, { width: size, height: size }, id);
@@ -23,9 +23,14 @@ test('V02 military buildings: Codex C07 footprints, at least three variants, tra
     assert.equal(asset.gameObjectId, undefined);
     assert.ok(asset.variants.length >= 3, `${id}: three comparable variants`);
     assert.deepEqual(validateAssetSpec(asset, { generators: GENERATORS, style }), [], id);
-    // The developer may approve a look before C07 lands; nothing in the game may use it yet.
     for (const variant of asset.variants) assert.ok(['approved', 'review', undefined].includes(approvals.assets[id]?.variants?.[variant.id]?.status), variant.id);
-    assert.equal(JSON.stringify(objectDefinitions).includes(`art/sprites/${id}/`), false, `${id}: no game art before the building exists`);
+    const game = objectDefinitions.find(d => d.id === id);
+    if (id === 'stables') { assert.equal(game, undefined, 'Stables come with Stage 12'); continue; }
+    // C07 built it: the game shows an approved export of it, byte for byte, never a look still in review.
+    const used = asset.variants.find(v => game.sprite.endsWith(`/${v.id}.v1.png`));
+    assert.ok(used, `${id}: the game sprite is a Studio export`);
+    assert.equal(approvals.assets[id].variants[used.id].status, 'approved', `${id}: ${used.id} is approved`);
+    assert.ok(readFileSync(path.join(root, `public${game.sprite}`)).equals(readFileSync(path.join(root, `art/sprites/${id}/${used.id}.v1.png`))), `${id}: same bytes as the export`);
   }
   for (const variant of byId('swordsmith').variants) assert.ok(build(byId('swordsmith'), variant).lights.some(l => l.type === 'brazier'), `${variant.id}: forge glows`);
   for (const variant of byId('stables').variants) {
