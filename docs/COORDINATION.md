@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| N11 (#64) Path Wear Earth track | Claude | — | — | Blocked | Needs src/game/TerrainRenderer.js (grass base + transparent Earth track overlay), which Codex #48 holds (WIP dd728a0 in `codex/fow-exploration-blueprints`). Starts after that change is merged into main, or when the developer reorders the queue. N09 (#40) is HOLD. |
+| N11 (#64) Path Wear Earth track | Claude | `claude/path-wear-earth-track` | — | In progress | src/game/TerrainRenderer.js (path drawing and grass base), src/data/objects/terrain.js (wear stages), art/approvals.json (worn-path preferred → Earth track), public/assets/terrain/path_wear/earth/ (approved tiles), tests/asset-studio.test.js, tests/path-wear-render.test.js. The developer authorised it on 2026-11-05 while Codex is not running; Codex's parked #48 fix (dd728a0, `TerrainRenderer.updateFog`) touches a different part of the file. |
 | Issue #48: C01 Fog, unknown-ground movement, blueprints | Codex | `codex/fow-exploration-blueprints` (parked WIP dd728a0) | — | Ready (unblocked 2026-11-05 after M2 release) | Recover only the relevant tested terrain fix onto current main; no old AGENTS/coordination overrides. |
 
 ## Kept backups (do not delete without the developer)
