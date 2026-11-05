@@ -1,5 +1,6 @@
-import { LOGISTICS_RULES,carryCapacity } from '../data/logistics.js';
-import { buildingDefinition } from '../game/buildings.js';
+import { LOGISTICS_RULES,IDLE_STONE,carryCapacity } from '../data/logistics.js';
+import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
+import { tileKey } from '../game/stones.js';
 
 // Derived catalog only: physical ownership stays in storage, drops and cargo.
 export class LogisticsTaskManager {
@@ -59,6 +60,49 @@ export class LogisticsTaskManager {
       if(success)return true;this.failedRoutes.set(routeKey,this.scene.gameTime.totalElapsed+2000);
     }
     return false;
+  }
+  // Hauler loop: real transport first; when idle, loose stones near the Castle.
+  updateHauler(worker,delta){
+    if(worker.workTask?.kind==='mine'){this.collectStone(worker,delta);return;}
+    if(worker.workTask||worker.cargo||worker.aiCooldown>0)return;
+    if(!this.updateWorker(worker))this.startStone(worker);
+  }
+  castleCentre(){
+    const castle=this.scene.buildings.find(b=>b.type==='castle'&&buildingIsComplete(b));if(!castle)return null;
+    const d=buildingDefinition(castle);return {x:castle.x+(d.width-1)/2,y:castle.y+(d.height-1)/2};
+  }
+  looseStones(worker){
+    const settings=worker.stoneCollection,centre=this.castleCentre();if(!settings?.enabled||!centre)return [];
+    const reservations=this.scene.workerSystem.reservations,king=this.scene.character.order?.pickupKey;
+    return [...this.scene.resources.entries()].filter(([key,view])=>{
+      const tile=view.getData('tile');
+      return view.getData('objectId')==='stone'&&key!==king&&reservations.available(`resource:${key}`,worker.id)&&Math.hypot(tile.x-centre.x,tile.y-centre.y)<=settings.radius;
+    });
+  }
+  startStone(worker){
+    const settings=worker.stoneCollection;if(!settings?.enabled)return false;
+    if(!this.castleCentre()){worker.workMessage='No Castle: loose stone collection paused';return false;}
+    if(!this.storage.findDestination(worker,'stone',1)){worker.workMessage='No storage room for loose stone';return false;}
+    const near=this.looseStones(worker).map(([key,view])=>({key,tile:view.getData('tile')})).sort((a,b)=>Math.hypot(a.tile.x-worker.position.x,a.tile.y-worker.position.y)-Math.hypot(b.tile.x-worker.position.x,b.tile.y-worker.position.y)).slice(0,IDLE_STONE.candidates);
+    if(!near.length)return false;
+    const ai=this.scene.workerSystem.ai,route=ai.route(worker,near.map(s=>s.tile));if(!route)return false;
+    const target=near.find(s=>tileKey(s.tile)===tileKey(route.destination));if(!target)return false;
+    if(!ai.reserve(worker,`resource:${target.key}`,{kind:'mine',targetId:target.key,idleStone:true},route))return false;
+    worker.workMessage='Collecting loose stone';return true;
+  }
+  collectStone(worker,delta){
+    const task=worker.workTask,ai=this.scene.workerSystem.ai,view=this.scene.resources.get(task.targetId),centre=this.castleCentre(),settings=worker.stoneCollection;
+    const tile=view?.getData('tile');
+    if(!view||!settings?.enabled||!centre||Math.hypot(tile.x-centre.x,tile.y-centre.y)>settings.radius||this.scene.character.order?.pickupKey===task.targetId){ai.cancel(worker);worker.workState='Searching for Work';return;}
+    // A real transport task takes over before the stone is picked up.
+    if(worker.aiCooldown<=0&&!ai.atGoal(worker,task.goal)){
+      const saved={task,path:worker.path,state:worker.workState,message:worker.workMessage};worker.workTask=null;
+      if(this.updateWorker(worker)){this.scene.workerSystem.reservations.release(task.reservation,worker.id);return;}
+      Object.assign(worker,{workTask:saved.task,path:saved.path,workState:saved.state,workMessage:saved.message});
+    }
+    if(!ai.ensureRoute(worker,task.goal))return;
+    worker.workState='Working';worker.workMessage='Picking up loose stone';task.progressMs+=delta;
+    if(task.progressMs>=IDLE_STONE.pickupDuration){this.scene.collectResource(task.targetId,worker.tile,worker);ai.cancel(worker);worker.workState='Searching for Work';}
   }
   waitForHauler(building,kind){
     const record=this.scene.foodProduction.records.get(building.id),now=this.scene.gameTime.totalElapsed,key=`${building.id}:${kind}`;
