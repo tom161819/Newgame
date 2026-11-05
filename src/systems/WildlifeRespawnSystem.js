@@ -11,7 +11,8 @@ export class WildlifeRespawnSystem {
     if([...counts.values()].reduce((a,b)=>a+b,0)>=target*definitions.length)return false;
     const missing=Math.max(...definitions.map(d=>target-counts.get(d.id))),choices=definitions.filter(d=>target-counts.get(d.id)===missing),definition=choices[Math.floor(this.random()*choices.length)];
     const origins=this.scene.resourceOrigins?.()??[this.scene.character.tile];
-    const candidates=resourceCandidates(this.scene.map,origins,this.scene.reservedTiles(),this.scene.resourceOccupancy,definition);if(!candidates.length)return false;
+    this.animals.clearance.refresh();
+    const candidates=resourceCandidates(this.scene.map,origins,this.scene.reservedTiles(),this.scene.resourceOccupancy,definition).filter(tile=>this.animals.clearance.isClear(tile));if(!candidates.length)return false;
     const sight=new FogOfWarSystem(this.scene.character,true),hidden=candidates.filter(t=>!sight.isVisibleTile(t)),safe=hidden.length?hidden:candidates;
     const tile=safe[Math.floor(this.random()*safe.length)];this.animals.create(definition,tile);return true;
   }

@@ -1,3 +1,4 @@
+import { UnitSelection } from '../ui/UnitSelection.js';
 import { t } from '../i18n/index.js';
 import { localized } from '../i18n/names.js';
 import Phaser from 'phaser';
@@ -237,13 +238,14 @@ export class GameScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-H',onDismount);this.updateMountUI();
     this.combatFeedback.refresh();
     this.input.mouse.disableContextMenu();
-    this.input.on('pointerdown',pointer=>this.handleClick(pointer));
-    this.input.on('pointerup',pointer=>{if(this.dragAnchor&&pointer.leftButtonReleased())this.confirmWallLine(pointer);});
-    this.input.on('pointerupoutside',()=>this.clearWallPreviews());
-    this.input.on('pointermove',pointer=>{this.updateHover(pointer);if(this.buildMode&&!this.assetGallery.isOpen){if(!this.dragAnchor)this.wallLastLine=null;this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
-    this.input.on('gameout',()=>{this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;this.clearWallPreviews();document.querySelector('#object-tooltip').hidden=true;});
+    this.unitSelection=new UnitSelection(this);
+    this.input.on('pointerdown',pointer=>{if(!this.unitSelection.down(pointer))this.handleClick(pointer);});
+    this.input.on('pointerup',pointer=>{if(this.unitSelection.up(pointer))return;if(this.dragAnchor&&pointer.leftButtonReleased())this.confirmWallLine(pointer);});
+    this.input.on('pointerupoutside',()=>{this.unitSelection.cancelDrag();this.clearWallPreviews();});
+    this.input.on('pointermove',pointer=>{this.unitSelection.move(pointer);this.updateHover(pointer);if(this.buildMode&&!this.assetGallery.isOpen){if(!this.dragAnchor)this.wallLastLine=null;this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
+    this.input.on('gameout',()=>{this.unitSelection.cancelDrag();this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;this.clearWallPreviews();document.querySelector('#object-tooltip').hidden=true;});
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
-      this.kingLogistics.destroy();this.lightSources.destroy();
+      this.unitSelection.destroy();this.kingLogistics.destroy();this.lightSources.destroy();
       this.memoryRenderer.destroy();
       this.populationSidebar.destroy();
       this.staffingIndicators.destroy();
@@ -323,10 +325,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   pointerTile(pointer) { pointer.updateWorldPoint(this.cameras.main);return worldToTile(pointer.worldX,pointer.worldY); }
-  handleClick(pointer) {
+  handleClick(pointer,released=false) {
     if(this.gameOver||this.gameTime.paused||document.querySelector('dialog[open]'))return;
     if(pointer.rightButtonDown()){if(this.buildMode)this.cancelBuilding();return;}
-    if(!pointer.leftButtonDown())return;
+    if(!released&&!pointer.leftButtonDown())return;
     this.naturalResources?.cancelKing();
     this.populationSidebar?.clearSelection();
     this.treasureSystem.cancelRequest();
@@ -433,7 +435,7 @@ export class GameScene extends Phaser.Scene {
     this.huntingSystem.cancel();this.mountSystem.cancel();
     this.treasureSystem.cancelRequest();
     this.clearWallPreviews();
-    this.constructionSystem.stopKing();this.character.stopForBuilding();this.selectedBuilding=definition;
+    this.unitSelection?.clear();this.constructionSystem.stopKing();this.character.stopForBuilding();this.selectedBuilding=definition;
     this.preview.destroy();this.preview=this.createBuildingView(definition,{x:0,y:0},true);this.preview.setVisible(false);
     this.buildMode=true;this.previewKey=null;this.previewAnchor=null;this.previewTracking=false;this.game.canvas.style.cursor='crosshair';
     this.updateBuildingUI();this.setStatus(t('status.placing',{name:definition.name,size:t('building.size',{width:definition.width,height:definition.height}),cost:formatCost(definition.cost,this.objectRegistry)}));
@@ -632,7 +634,7 @@ export class GameScene extends Phaser.Scene {
     this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
     this.combatFeedback?.refresh();
     this.experienceFeedback?.refreshVisibility();this.unitPanel?.refresh();
-    this.populationSidebar?.update();
+    this.populationSidebar?.update();this.unitSelection?.draw();
     this.economyPanel?.update();
     this.workplacePanel?.refresh();
     this.staffingIndicators?.update();

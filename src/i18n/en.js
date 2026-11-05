@@ -2,6 +2,19 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  'work.state.Holding':'Holding position','work.state.MovingToHold':'Moving to hold position',
+  "command.title": "Unit orders",
+  "command.selected": "Selected: {count} · Right-click to move and hold",
+  "command.hold": "Hold Here",
+  "command.resume": "Resume Previous Job",
+  "command.inspect": "Unit Details",
+  "command.clear": "Deselect",
+  "command.MovingToHold": "Moving to hold position",
+  "command.Holding": "Holding position",
+  "command.moving": "Moving {count} units to hold position.",
+  "command.noRoute": "No reachable destination for the selected units.",
+  "command.blocked": "Unit stopped and is holding: the route is blocked.",
+
   ...objects,
   'common.back':'Back','common.close':'Close ×','common.cancel':'Cancel','common.confirm':'Confirm','common.unknownDate':'Unknown date',
   'language.label':'Language',

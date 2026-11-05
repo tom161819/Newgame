@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Select your subjects with a click or drag a box around a group, then right-click to move them to separate nearby positions and hold there. Hold Here and Resume Previous Job preserve professions and physical cargo while releasing work reservations safely. Escape deselects without resuming work. Manual orders are saved with the game. The king keeps his existing controls.
 - Notices in the bottom-right corner warn about lasting problems:
   - a supplied construction site with no Builder;
   - a Mill, Bakery or Smelter that is switched on and staffed but lacks an input.
@@ -21,6 +22,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Idle Haulers now collect loose stone lying within a set radius of the Castle (default 80 tiles) and carry it to storage. Each Hauler has a Collect loose stone ON/OFF switch and a radius field in the unit panel; real transport jobs always come first. Saved games from earlier versions cannot be loaded and need a new game.
 
 ### Fixed
+- Wandering rabbits, deer and wild boars keep one tile away from solid buildings and physical construction sites, including narrow gaps and diagonal corners. Wildlife spawns respect the same margin; animals retreat when a new structure surrounds them. Hunting and the king’s horse keep their existing movement.
 - Ground the king has walked away from no longer stays fully lit when several sight changes happen between two redraws (for example while saving or after a pause); it fades back to the remembered map.
 - Haulers now actually carry goods: a resident given the Hauler profession immediately serves every Warehouse, Granary and construction site in the kingdom instead of waiting for a workplace, so new Warehouses fill without the king.
 - The Castle no longer covers the king when he stands in front of it, and the starting stockpile now appears in front of the Castle instead of behind it.

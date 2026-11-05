@@ -29,7 +29,7 @@ export class EmploymentSystem {
   // Manual orders win: a resident removed or made Unemployed by hand is left alone; a manual assignment clears that.
   hold(worker){if(worker)this.held.add(worker.id);}
   release(worker){if(worker)this.held.delete(worker.id);}
-  available(worker){return worker.isAlive&&worker.isSubject!==false&&worker.profession==='idle'&&worker.assignedWorkplaceId==null&&!worker.arriving&&!worker.cargo&&!worker.workTask&&!worker.leaving&&!this.held.has(worker.id);}
+  available(worker){return (!worker.commandState||worker.commandState.state==='Working')&&worker.isAlive&&worker.isSubject!==false&&worker.profession==='idle'&&worker.assignedWorkplaceId==null&&!worker.arriving&&!worker.cargo&&!worker.workTask&&!worker.leaving&&!this.held.has(worker.id);}
   seats(){
     const s=this.scene,seats=[];
     for(const building of [...s.buildings].sort((a,b)=>a.id-b.id)){

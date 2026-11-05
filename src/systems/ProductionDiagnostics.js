@@ -9,7 +9,7 @@ export class ProductionDiagnostics {
   constructor(scene){this.scene=scene;this.issues=new Map();this.listeners=new Set();this.nextCheck=0;this.revision=0;}
   onChange(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   changed(){this.revision++;for(const listener of this.listeners)listener();}
-  residents(profession){return this.scene.workerSystem.liveSubjects().filter(w=>w.profession===profession);}
+  residents(profession){return this.scene.workerSystem.liveSubjects().filter(w=>w.profession===profession&&(!w.commandState||w.commandState.state==='Working'));}
   hasBuilding(type){return this.scene.buildings.some(b=>b.type===type&&buildingIsComplete(b));}
   // Construction: a supplied site nobody can build, because the kingdom has no Builder.
   constructionIssues(){
@@ -22,7 +22,7 @@ export class ProductionDiagnostics {
   // Intentionally paused production, unstaffed buildings and inputs on their way or still growing are not problems.
   productionIssue(record){
     const s=this.scene,building=s.buildings.find(b=>b.id===record.buildingId);if(!building||!record.auto||record.cycle||!buildingIsComplete(building))return null;
-    const recipe=buildingDefinition(building).recipe;if(!recipe||!s.workplaceSystem.employees(building).length)return null;
+    const recipe=buildingDefinition(building).recipe;if(!recipe||!s.workplaceSystem.employees(building).some(w=>!w.commandState||w.commandState.state==='Working'))return null;
     const input=s.foodStorage.locations.get(`input-${building.id}`);if(!input)return null;
     for(const [resource,need]of Object.entries(recipe.input)){
       const missing=need-(input.stock[resource]??0)-s.foodStorage.incoming(input.id,resource);if(missing<=0)continue;
@@ -30,7 +30,7 @@ export class ProductionDiagnostics {
       const source=INPUT_SOURCES[resource];if(!source)return {reason:'noInput',params:{resource}};
       if(!this.hasBuilding(source.building))return {reason:'noProducer',params:{resource,producer:source.building}};
       if(source.field&&!this.hasBuilding(source.field))return {reason:'noField',params:{resource,producer:source.field}};
-      if(!s.buildings.some(b=>b.type===source.building&&s.workplaceSystem.employees(b).length))return {reason:'noProducerWorkers',params:{resource,profession:source.profession}};
+      if(!s.buildings.some(b=>b.type===source.building&&s.workplaceSystem.employees(b).some(w=>!w.commandState||w.commandState.state==='Working')))return {reason:'noProducerWorkers',params:{resource,profession:source.profession}};
       // Producers exist and work: the input is on its way (crops growing, a season, a long trip). Not a problem.
     }
     return null;

@@ -48,7 +48,7 @@ export function loadGameState(scene,input){
     for(const key of ['profession','workState','workMessage','assignedWorkplaceId','arriving','aiCooldown'])worker[key]=data[key];
     if(data.stoneCollection)worker.stoneCollection=structuredClone(data.stoneCollection);
     worker.workplaceReached=data.workplaceReached??false;worker.cargo=structuredClone(data.cargo??null);worker.pendingWorkRewards=structuredClone(data.pendingWorkRewards??[]);
-    worker.workTask=structuredClone(data.workTask);worker.active=worker.isAlive;
+    worker.commandState=structuredClone(data.commandState);worker.workTask=structuredClone(data.workTask);worker.active=worker.isAlive;
     if(worker.workTask)scene.workerSystem.reservations.reserve(worker.workTask.reservation,worker.id);
     if(['chopTree','mineDeposit'].includes(worker.workTask?.kind))scene.workerSystem.reservations.reserve(`natural-slot:${worker.workTask.goal.x},${worker.workTask.goal.y}`,worker.id);
     if(worker.workTask?.kind==='foodPickup'&&worker.workTask.sourceDropId)scene.workerSystem.reservations.reserve(`drop:${worker.workTask.sourceDropId}`,worker.id);

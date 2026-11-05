@@ -37,7 +37,7 @@ export class LogisticsTaskManager {
   }
   // Haulers serve the whole kingdom without a workplace. A Builder calls this with
   // constructionOnly when no Hauler is free, reusing the same bookings.
-  freeHauler(){return this.scene.workerSystem.liveWorkers().some(w=>w.profession==='hauler'&&!w.arriving&&!w.workTask&&!w.cargo&&!['Fleeing','Recovering'].includes(w.workState));}
+  freeHauler(){return this.scene.workerSystem.liveWorkers().some(w=>(!w.commandState||w.commandState.state==='Working')&&w.profession==='hauler'&&!w.arriving&&!w.workTask&&!w.cargo&&!['Fleeing','Recovering'].includes(w.workState));}
   updateWorker(worker,{constructionOnly=false}={}){
     if(worker.workTask||worker.cargo||worker.aiCooldown>0)return false;
     worker.aiCooldown=LOGISTICS_RULES.planningInterval;worker.workState='Waiting';worker.workMessage='Waiting for transport';this.update();
@@ -110,7 +110,7 @@ export class LogisticsTaskManager {
     if(now-wait.since>=3000)return false;
     if(now-wait.checkedAt>=500){
       wait.checkedAt=now;const location=this.storage.locations.get(`${kind}-${building.id}`);
-      wait.available=this.scene.workerSystem.liveWorkers().filter(w=>w.profession==='hauler'&&!w.arriving).slice(0,6).some(w=>!!this.storage.route(w,[location]));
+      wait.available=this.scene.workerSystem.liveWorkers().filter(w=>(!w.commandState||w.commandState.state==='Working')&&w.profession==='hauler'&&!w.arriving).slice(0,6).some(w=>!!this.storage.route(w,[location]));
     }return wait.available;
   }
   destroy(){this.catalog=[];this.failedRoutes.clear();this.producerWaits.clear();}
