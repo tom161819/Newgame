@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { SAVE_VERSION,IncompatibleSaveError,saveSchemaStatus,validateGameState } from './GameStateSerializer.js';
 
 // Moving a save between devices without a backend: a stored slot becomes one JSON
@@ -15,7 +16,7 @@ export function saveFileName(record){
 
 // Only a current-schema, fully valid slot is exported; a broken slot is never spread further.
 export function exportSaveFile(record,{gameVersion=null,now=new Date()}={}){
-  if(!record?.state)throw new SaveFileError('This save has no game state to export.');
+  if(!record?.state)throw new SaveFileError(t('transfer.noState'));
   const status=saveSchemaStatus(record.state);if(!status.compatible)throw new IncompatibleSaveError(status.savedVersion);
   const state=validateGameState(record.state);
   return JSON.stringify({format:SAVE_FILE_FORMAT,saveVersion:SAVE_VERSION,gameVersion,exportedAt:now.toISOString(),
@@ -25,13 +26,13 @@ export function exportSaveFile(record,{gameVersion=null,now=new Date()}={}){
 // Returns {id,name,state} or throws SaveFileError / IncompatibleSaveError; never touches a running game.
 export function parseSaveFile(text,{size=null}={}){
   const bytes=size??(typeof text==='string'?new TextEncoder().encode(text).length:Infinity);
-  if(typeof text!=='string'||bytes>SAVE_FILE_MAX_BYTES)throw new SaveFileError(`The file is not a save or is larger than ${SAVE_FILE_MAX_BYTES/1024/1024} MB.`);
-  let data;try{data=JSON.parse(text);}catch{throw new SaveFileError('The file is not valid JSON, so it cannot be a Medieval Kingdom save.');}
-  if(!data||typeof data!=='object'||Array.isArray(data)||data.format!==SAVE_FILE_FORMAT||!data.state||typeof data.state!=='object')throw new SaveFileError('This file is not a Medieval Kingdom save export.');
+  if(typeof text!=='string'||bytes>SAVE_FILE_MAX_BYTES)throw new SaveFileError(t('transfer.notSave',{size:SAVE_FILE_MAX_BYTES/1024/1024}));
+  let data;try{data=JSON.parse(text);}catch{throw new SaveFileError(t('transfer.notJson'));}
+  if(!data||typeof data!=='object'||Array.isArray(data)||data.format!==SAVE_FILE_FORMAT||!data.state||typeof data.state!=='object')throw new SaveFileError(t('transfer.notExport'));
   const status=saveSchemaStatus(data.state);
   if(!status.compatible||data.saveVersion!==data.state.saveVersion)throw new IncompatibleSaveError(status.savedVersion??(Number.isInteger(data.saveVersion)?data.saveVersion:null));
-  let state;try{state=validateGameState(data.state);}catch(error){if(error instanceof IncompatibleSaveError)throw error;throw new SaveFileError('The save file is damaged or inconsistent and was not imported.');}
+  let state;try{state=validateGameState(data.state);}catch(error){if(error instanceof IncompatibleSaveError)throw error;throw new SaveFileError(t('transfer.damaged'));}
   const save=data.save&&typeof data.save==='object'?data.save:{};
   const id=typeof save.id==='string'&&/^[\w-]{1,80}$/.test(save.id)?save.id:null;
-  return {id,name:(typeof save.name==='string'&&save.name.trim()?save.name.trim():'Imported kingdom').slice(0,80),state};
+  return {id,name:(typeof save.name==='string'&&save.name.trim()?save.name.trim():t('transfer.importedName')).slice(0,80),state};
 }

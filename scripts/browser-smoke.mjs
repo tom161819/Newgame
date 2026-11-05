@@ -1,3 +1,4 @@
+import { i18nSmoke } from './i18n-smoke.mjs';
 import { autosaveSmoke } from './autosave-smoke.mjs';
 import { saveTransferSmoke } from './save-transfer-smoke.mjs';
 import assert from 'node:assert/strict';
@@ -77,6 +78,7 @@ try{
   console.log(`PASS main-menu archive, ${catalog.versions.length} milestones / ${catalog.builds.length} actual snapshots, linked collapsible changelog, mobile`);
   }
 
+  if(args.includes('--full')||args.includes('--i18n'))await i18nSmoke(page);
   await page.locator('#new-game').click();await page.locator('.setup-advanced summary').click();await page.locator('#setup-fog').uncheck();await page.locator('#setup-respawn').selectOption('off');
   if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full'))await page.locator('#setup-seasons').uncheck();}
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();

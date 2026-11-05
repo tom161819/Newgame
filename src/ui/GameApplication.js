@@ -5,12 +5,16 @@ import { NewGameSetup } from './NewGameSetup.js';
 import { ChangelogPanel } from './ChangelogPanel.js';
 import { VersionArchivePanel } from './VersionArchivePanel.js';
 import { gameVersion,releases } from 'virtual:game-release';
-import { AutosaveService,readAutosaveSettings,saveAutosaveSettings } from '../systems/AutosaveService.js';
+import { AutosaveService,readAutosaveSettings,saveAutosaveSettings,AUTOSAVE_INTERVALS } from '../systems/AutosaveService.js';
+import { t,language,LANGUAGES,initLanguage,setLanguage,onLanguageChange } from '../i18n/index.js';
 
 export class GameApplication {
   constructor(game){
-    this.game=game;this.scene=null;this.gameVersion=gameVersion;this.saves=new SaveGameManager();this.saveMenu=new SaveLoadMenu(this);
     let storage;try{storage=window.localStorage;}catch{}
+    // The language is chosen before any screen renders; both pickers stay in sync.
+    initLanguage(storage);this.languageSelects=[...document.querySelectorAll('[data-language-select]')];
+    for(const select of this.languageSelects){select.replaceChildren(...Object.entries(LANGUAGES).map(([id,{label}])=>{const option=document.createElement('option');option.value=id;option.textContent=label;return option;}));select.value=language();select.addEventListener('change',()=>setLanguage(select.value,{storage}));}
+    this.game=game;this.scene=null;this.gameVersion=gameVersion;this.saves=new SaveGameManager();this.saveMenu=new SaveLoadMenu(this);
     this.autosave=new AutosaveService({saves:this.saves,snapshot:()=>this.snapshot(),settings:readAutosaveSettings(storage),onStatus:status=>this.autosaveStatus(status)});
     const autosaveToggle=document.querySelector('#autosave-toggle'),autosaveInterval=document.querySelector('#autosave-interval');
     if(autosaveToggle&&autosaveInterval){
@@ -18,6 +22,7 @@ export class GameApplication {
       const apply=()=>{this.autosave.configure({enabled:autosaveToggle.checked,intervalMs:Number(autosaveInterval.value)});autosaveInterval.disabled=!this.autosave.enabled;saveAutosaveSettings(storage,this.autosave);this.autosaveStatus();};
       autosaveToggle.addEventListener('change',apply);autosaveInterval.addEventListener('change',apply);this.autosaveStatus();
     }
+    this.labelAutosaveIntervals();onLanguageChange(()=>this.relabel());
     this.main=document.querySelector('#main-menu');this.pauseDialog=document.querySelector('#pause-menu');
     this.changelog=new ChangelogPanel({version:gameVersion,releases});
     this.archive=new VersionArchivePanel({catalogURL:`${import.meta.env.BASE_URL}versions/catalog.json`,onChanges:version=>{if(version&&!releases.some(r=>r.version===version))window.open(`${import.meta.env.BASE_URL}?changelog=${encodeURIComponent(version)}`,'_blank','noopener,noreferrer');else this.changelog.open(version);}});
@@ -55,16 +60,19 @@ export class GameApplication {
     this.game.scene.stop('MainMenu');this.game.scene.stop('Game');this.scene=null;this.game.scene.start('Game',{state,settings});
   }
   onGameReady(scene){this.scene=scene;this.autosave.reset();}
+  labelAutosaveIntervals(){for(const option of document.querySelectorAll('#autosave-interval option'))option.textContent=t('autosave.interval',{count:Number(option.value)/60000});}
+  // A language switch re-renders the texts built in code; static markup is handled by applyTranslations.
+  relabel(){for(const select of this.languageSelects)select.value=language();this.labelAutosaveIntervals();this.autosaveStatus(this.autosaveFailure);this.setup?.refresh();this.saveMenu.relabel();this.changelog?.relabel?.();this.archive?.relabel?.();this.scene?.relabelUI?.();}
   // The last successful Autosave stays visible; a failure is announced once per streak.
   autosaveStatus(status=null){
     const output=document.querySelector('#autosave-status');if(!output)return;
-    const time=at=>{const date=new Date(at);return Number.isFinite(date.getTime())?date.toLocaleTimeString('cs-CZ'):'—';};
-    const last=this.autosave.lastSuccess,base=!this.autosave.enabled?'Autosave is off.':last?`Last autosave: ${time(last.at)} · Day ${last.day}`:'No autosave yet in this session.';
-    if(status?.type==='failed'){output.textContent=`Autosave failed: ${status.message}. ${last?`The previous autosave (${time(last.at)}) is kept.`:''}`.trim();output.classList.add('failed');if(status.first)this.notify('Autosave failed. Your previous saves are kept.');return;}
-    output.classList.remove('failed');output.textContent=base;if(status?.recovered)this.notify('Autosave works again.');
+    const time=at=>{const date=new Date(at);return Number.isFinite(date.getTime())?date.toLocaleTimeString(language()==='cs'?'cs-CZ':'en-GB'):'—';};
+    const last=this.autosave.lastSuccess,base=!this.autosave.enabled?t('autosave.off'):last?t('autosave.last',{time:time(last.at),day:last.day}):t('autosave.none');
+    if(status?.type==='failed'&&this.autosave.enabled){this.autosaveFailure={...status,first:false};output.textContent=`${t('autosave.failed',{message:status.message})} ${last?t('autosave.kept',{time:time(last.at)}):''}`.trim();output.classList.add('failed');if(status.first)this.notify(t('autosave.failedNotice'));return;}
+    if(status?.type==='saved')this.autosaveFailure=null;output.classList.remove('failed');output.textContent=base;if(status?.recovered)this.notify(t('autosave.recovered'));
   }
   async load(input){const state=validateGameState(input);this.start(state);}
-  snapshot(){if(!this.scene||this.scene.gameOver)throw new Error('Nejprve spusť hru.');return validateGameState(serializeGameState(this.scene));}
+  snapshot(){if(!this.scene||this.scene.gameOver)throw new Error(t('app.startFirst'));return validateGameState(serializeGameState(this.scene));}
   showPause(){
     if(!this.scene||this.scene.gameOver)return;
     this.scene.pauseManager.set('menu',true);this.scene.settingsPanel.setOpen(false);
