@@ -42,8 +42,12 @@ test('walking within one tile changes nothing; 200 moving subjects stay fast',()
   const people=Array.from({length:200},(_,i)=>subject(`worker-${i}`,5.5+(i%20)*4.5,5.5+Math.floor(i/20)*9)),fog=world(people);
   const revision=fog.revision;for(const p of people)p.position={x:p.position.x+.3,y:p.position.y-.3};fog.update();
   assert.equal(fog.revision,revision,'no recalculation while every subject stays on its tile');
-  const started=performance.now();
-  for(let frame=0;frame<60;frame++){for(const [i,p]of people.entries())if(i%3===frame%3)p.position={x:Math.min(99.5,p.position.x+1),y:p.position.y};fog.update();}
-  const elapsed=performance.now()-started;assert.deepEqual(fog.visibleIndices,expected(fog));
-  assert.ok(elapsed<400,`60 frames with a third of 200 subjects changing tile took ${elapsed.toFixed(0)} ms`);
+  // Subjects walk about three tiles a second, so at 60 frames each changes tile roughly every 20 frames; 200 subjects
+  // then move 10 circles per frame. The previous algorithm recounted every circle and diffed the whole set each frame.
+  const move=frame=>{for(const [i,p]of people.entries())if(i%20===frame%20)p.position={x:p.position.x+(frame%40<20?1:-1),y:p.position.y};};
+  const previous=()=>{let last=new Set();return ()=>{const next=expected(fog);[...next].filter(i=>!last.has(i));[...last].filter(i=>!next.has(i));last=next;};};
+  const time=step=>{const started=performance.now();for(let frame=0;frame<120;frame++){move(frame);step();}return performance.now()-started;};
+  const elapsed=time(()=>fog.update());assert.deepEqual(fog.visibleIndices,expected(fog));
+  const recount=previous(),baseline=time(()=>{fog.update();recount();})-elapsed;
+  assert.ok(elapsed<baseline,`incremental ${elapsed.toFixed(0)} ms vs previous full recount ${baseline.toFixed(0)} ms for 120 frames of 200 walking subjects`);
 });

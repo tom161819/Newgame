@@ -12,7 +12,7 @@ export const visibilityPlacementError=(fog,tiles)=>fog?.enabled&&tiles.some(tile
 export class FogOfWarSystem {
   constructor(character,enabled=false,{width=COLUMNS,height=ROWS,explorationEnabled=true}={}){
     Object.assign(this,{character,enabled,width,height,explorationEnabled});
-    this.explored=new Uint8Array(width*height);this.coverage=new Uint16Array(width*height);this.painted=new Map();
+    this.explored=new Uint8Array(width*height);this.coverage=new Uint16Array(width*height);this.stamps=new Uint32Array(width*height);this.stamp=0;this.painted=new Map();
     this.providers=new Map();this.visibleIndices=new Set();this.added=[];this.removed=[];this.revision=0;this.update();
   }
   // A provider returns one logical source or a list of them ({id, center, radius}); a list lets many units share one registration.
@@ -22,6 +22,14 @@ export class FogOfWarSystem {
     return ()=>{this.providers.delete(id);this.update();};
   }
   circle(source){
+    // Sources standing on a tile centre (subjects) reuse one precomputed disc shape per radius.
+    if((source.center.x-.5)%1===0&&(source.center.y-.5)%1===0){
+      this.discs??=new Map();let disc=this.discs.get(source.radius);
+      if(!disc){disc=[];const r=Math.ceil(source.radius);for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++)if(dx*dx+dy*dy<=source.radius**2)disc.push(dx,dy);this.discs.set(source.radius,disc);}
+      const tiles=[],cx=source.center.x-.5,cy=source.center.y-.5;
+      for(let i=0;i<disc.length;i+=2){const x=cx+disc[i],y=cy+disc[i+1];if(x>=0&&x<this.width&&y>=0&&y<this.height)tiles.push(y*this.width+x);}
+      return tiles;
+    }
     const tiles=[],minX=Math.max(0,Math.ceil(source.center.x-source.radius-.5)),maxX=Math.min(this.width-1,Math.floor(source.center.x+source.radius-.5));
     const minY=Math.max(0,Math.ceil(source.center.y-source.radius-.5)),maxY=Math.min(this.height-1,Math.floor(source.center.y+source.radius-.5));
     for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++)if(contains(source,{x:x+.5,y:y+.5}))tiles.push(y*this.width+x);
@@ -34,7 +42,8 @@ export class FogOfWarSystem {
     for(const [id,provider]of this.providers){const value=provider();if(!value)continue;const list=Array.isArray(value)?value:[value];list.forEach((source,i)=>{if(source)sources.push({id:Array.isArray(value)?`${id}:${source.id??i}`:id,center:source.center,radius:source.radius});});}
     for(const source of sources)if(!Number.isFinite(source.radius)||source.radius<0||!Number.isFinite(source.center?.x)||!Number.isFinite(source.center?.y))throw new TypeError('Invalid logical vision source.');
     // Incremental coverage: only a source that moved, appeared or left touches the map; the others keep their counted circles.
-    const next=new Map(),before=new Map(),touch=(tiles,step)=>{for(const index of tiles){if(!before.has(index))before.set(index,this.coverage[index]>0);this.coverage[index]+=step;}};
+    const next=new Map(),touched=[],was=[],stamp=++this.stamp,coverage=this.coverage,stamps=this.stamps;
+    const touch=(tiles,step)=>{for(let i=0;i<tiles.length;i++){const index=tiles[i];if(stamps[index]!==stamp){stamps[index]=stamp;touched.push(index);was.push(coverage[index]>0);}coverage[index]+=step;}};
     let changed=sources.length!==this.painted.size;
     for(const source of sources){
       const key=`${source.center.x},${source.center.y},${source.radius}`,old=this.painted.get(source.id);
@@ -50,7 +59,7 @@ export class FogOfWarSystem {
       this.right=Math.floor(Math.max(...sources.map(s=>s.center.x+s.radius))-.5)+1;
       this.bottom=Math.floor(Math.max(...sources.map(s=>s.center.y+s.radius))-.5)+1;
       this.added=[];this.removed=[];
-      for(const [index,was]of before){const now=this.coverage[index]>0;if(now&&!was){this.visibleIndices.add(index);this.added.push(index);}else if(!now&&was){this.visibleIndices.delete(index);this.removed.push(index);}}
+      for(let i=0;i<touched.length;i++){const index=touched[i],now=coverage[index]>0;if(now&&!was[i]){this.visibleIndices.add(index);this.added.push(index);}else if(!now&&was[i]){this.visibleIndices.delete(index);this.removed.push(index);}}
       this.revision++;
     }
     this.signature=`${this.enabled?'on':'off'}:${this.explorationEnabled}:${this.revision}`;
@@ -68,6 +77,7 @@ export class FogOfWarSystem {
     return FOG_STYLE.brightness+FOG_STYLE.edgeBrightness*Math.max(0,1-distance/FOG_STYLE.edgeWidth);
   }
   isInSightPosition(position){return this.sources.some(source=>contains(source,position));}
+  isInMap(tile){return Number.isInteger(tile.x)&&Number.isInteger(tile.y)&&tile.x>=0&&tile.x<this.width&&tile.y>=0&&tile.y<this.height;}
   isInSightTile(tile){return tile.x>=0&&tile.x<this.width&&tile.y>=0&&tile.y<this.height&&this.visibleIndices.has(tile.y*this.width+tile.x);}
   isVisiblePosition(position){return !this.enabled||this.isInSightPosition(position);}
   isVisibleTile(tile){return !this.enabled||this.isInSightTile(tile);}
