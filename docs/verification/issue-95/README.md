@@ -83,3 +83,9 @@ The integrated local gate passed 576 tests, changelog validation, build:pages
 and the composed 14-scenario browser replay (including the formerly failing
 fog assertion). Four sampling regressions cover active subject sight, remembered
 land, lack of a valid unknown corner and off-screen pixels.
+
+The subsequently merged C06 data-only audit (main868a2d3 / PR111) is also
+preserved. All 579 tests, changelog validation, build:pages and the focused
+Fog/cold-game browser run passed on the combined tree. The earlier composed
+14-scenario replay passed with the same runtime code; C06 adds only its future
+equipment data contract and tests.
