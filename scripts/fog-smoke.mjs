@@ -15,9 +15,11 @@ export async function explorationMenuSmoke(page){
   await page.locator('#exploration-toggle').check();await page.locator('#fog-toggle').check();const restored=await sample();assert.deepEqual(restored,black);
   const history=await page.evaluate(()=>{
     const s=window.__game.registry.get('application').scene,old={...s.character.tile},index=old.y*100+old.x;
+    // Subjects standing near the king still see his old tile; leave only the king as a source for this check.
+    const subjects=s.fog.providers.get('subjects');s.fog.providers.delete('subjects');
     const before=s.mapMemory.terrain.get(index)?.slice();s.character.position={x:80.5,y:80.5};s.refreshVisibility();
     const result={state:s.fog.state(old),old:before,remembered:s.mapMemory.terrain.get(index)?.slice(),unknown:s.fog.state({x:95,y:95}),count:s.fog.explored.reduce((a,b)=>a+b,0)};
-    s.character.position={...window.__fogSmoke.position};s.refreshVisibility();return result;
+    s.character.position={...window.__fogSmoke.position};if(subjects)s.fog.providers.set('subjects',subjects);s.refreshVisibility();return result;
   });
   assert.equal(history.state,1);assert.deepEqual(history.remembered,history.old);assert.equal(history.unknown,0);assert.ok(history.count>black.seen);
   const original=await page.evaluate(()=>window.__fogSmoke);await page.locator('#fog-toggle').setChecked(original.fog);await page.locator('#exploration-toggle').setChecked(original.exploration);await page.locator('#close-settings').click();
@@ -31,10 +33,12 @@ export async function staticMemoryRendererSmoke(page){
     const position={...s.character.position},enabled=s.fog.enabled,before=app.snapshot(),memory=new s.mapMemory.constructor(s.fog),renderer=new s.memoryRenderer.constructor(s,memory);
     const types=['tower','castle','wall','granary','wheat_field','orchard','stone','treasure_chest'];
     const entries=types.map((type,index)=>{const d=s.objectRegistry.require(type),kind=d.category==='building'?'building':type==='treasure_chest'?'chest':'resource';return {key:`fixture:${type}`,kind,type,x:s.character.tile.x+2,y:s.character.tile.y+2,width:d.width,height:d.height,visual:{...(d.crop?{stage:3,season:'Summer'}:{}),...(type==='tower'?{construction:{state:'building',progress:50,workDone:10}}:{}),...(type==='treasure_chest'?{opened:true,lid:{y:-38,rotation:-.65}}:{})}};});
+    // Only the king's sight here: subjects standing near his old tile would still see the fixtures.
+    const subjects=s.fog.providers.get('subjects');s.fog.providers.delete('subjects');
     s.fog.setEnabled(true);memory.observeObjects(entries);s.character.position={x:80.5,y:80.5};s.fog.update();renderer.update(s.cameras.main.worldView);
     const rendered=[...renderer.views.keys()],chest=renderer.views.get('fixture:treasure_chest')?.view,field=renderer.views.get('fixture:wheat_field')?.view;
     const visual={chestOpened:chest?.opened,chestLid:chest?.lid?.rotation,fieldStage:field?.stage,fieldSeason:field?.season,fieldTexture:field?.plants[0].texture.key};
-    renderer.destroy();s.character.position=position;s.fog.setEnabled(enabled);s.refreshVisibility();const after=app.snapshot();
+    renderer.destroy();s.character.position=position;if(subjects)s.fog.providers.set('subjects',subjects);s.fog.setEnabled(enabled);s.refreshVisibility();const after=app.snapshot();
     const keys=['inventory','buildings','workers','resources','drops','foodStorage','foodProduction','farming','production','constructionSystem'];
     const unchanged=keys.every(key=>JSON.stringify(before[key])===JSON.stringify(after[key]));s.pauseManager.set('memory-smoke',false);
     return {rendered,visual,unchanged};
@@ -45,6 +49,9 @@ export async function staticMemoryRendererSmoke(page){
 
 export async function hiddenInteractionSmoke(page){
   await page.locator('#settings-button').click();await page.locator('#fog-toggle').check();await page.locator('#exploration-toggle').check();await page.locator('#path-wear-toggle').check();await page.locator('#close-settings').click();
+  // Every living subject is its own sight source (radius 7.5) next to the king's.
+  const sight=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,f=s.fog;f.update();const subjects=s.workerSystem.liveSubjects();return {sources:f.sources.length,subjects:subjects.length,radii:[...new Set(f.sources.slice(1).map(x=>x.radius))],own:subjects.every(w=>f.isInSightTile({x:Math.floor(w.position.x),y:Math.floor(w.position.y)}))};});
+  assert.ok(sight.subjects>0);assert.equal(sight.sources,sight.subjects+1);assert.deepEqual(sight.radii,[7.5]);assert.equal(sight.own,true);
   const original=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,c=s.cameras.main;const state={x:c.scrollX+c.width/2,y:c.scrollY+c.height/2,zoom:c.zoom,following:s.worldCamera.following,count:s.buildings.length};s.worldCamera.following=false;c.centerOn(3200,3150).setZoom(.9);c.preRender();return state;});
   const clickTile=async tile=>{const point=await page.evaluate(tile=>{const s=window.__game.registry.get('application').scene,c=s.cameras.main,p={x:3200+(tile.x-tile.y)*32,y:128+(tile.x+tile.y+1)*16};return{x:(p.x-(c.scrollX+c.width/2))*c.zoom+c.width/2,y:(p.y-(c.scrollY+c.height/2))*c.zoom+c.height/2,w:c.width,h:c.height};},tile),bounds=await page.locator('canvas').boundingBox();await page.mouse.move(bounds.x+point.x*bounds.width/point.w,bounds.y+point.y*bounds.height/point.h);await page.mouse.click(bounds.x+point.x*bounds.width/point.w,bounds.y+point.y*bounds.height/point.h);};
   await clickTile({x:95,y:95});const first=await page.locator('#status').textContent();assert.equal(first,'Outside current sight. Explore this area first.');assert.equal(await page.locator('#path-wear-info').textContent(),'Path Wear: outside current sight.');

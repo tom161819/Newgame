@@ -25,6 +25,7 @@ import { HuntingSystem } from '../systems/HuntingSystem.js';
 import { DropSystem } from '../systems/DropSystem.js';
 import { FoodSystem } from '../systems/FoodSystem.js';
 import { FogOfWarSystem,OUTSIDE_SIGHT,visibilityPlacementError } from '../systems/FogOfWarSystem.js';
+import { subjectSight } from '../systems/VisibilityModifiers.js';
 import { MountSystem } from '../systems/MountSystem.js';
 import { SettingsPanel } from '../ui/SettingsPanel.js';
 import { FortificationView } from './FortificationView.js';
@@ -194,6 +195,8 @@ export class GameScene extends Phaser.Scene {
     this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
     this.equipmentPanel=new EquipmentPanel(this);
     this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=t('hud.population',{count,maximum});}});if(!this.loadState)this.workerSystem.spawnInitial();
+    // Every living subject is a moving sight source (diameter 15); leaving, dying or emigrating removes it.
+    this.fog.registerSource('subjects',()=>this.workerSystem.liveSubjects().map(subjectSight));
     this.workplaceSystem=new WorkplaceSystem(this);this.workplacePanel=new WorkplacePanel(this);
     this.constructionSystem=new ConstructionSystem(this,{onProgress:site=>this.towerViews.get(site.id)?.updateProgress?.(site),
       onComplete:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.built',{name:buildingDefinition(site).name}));},
