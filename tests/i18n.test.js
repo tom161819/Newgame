@@ -24,7 +24,7 @@ test('every key used in the markup and in code exists, including the dynamic fam
   const html=readFileSync(path.join(root,'index.html'),'utf8'),used=new Set([...html.matchAll(/data-i18n="([^"]+)"/g)].map(m=>m[1]));
   for(const m of html.matchAll(/data-i18n-attr="([^"]+)"/g))for(const pair of m[1].split(';'))used.add(pair.split(':')[1]);
   for(const file of sources(path.join(root,'src')))for(const m of readFileSync(file,'utf8').matchAll(/\bt\('([\w.]+)'/g))used.add(m[1]);
-  for(const family of [['difficulty',['easy','normal','hard']],['setup.respawn',['off','slow','normal','fast']],['setup.wildlife',['rare','normal','abundant']],['resource',['stone','wood','iron_ore','bread']],['changelog.category',['added','changed','improved','fixed','balance','removed']],['setup.day',['60','120','240']],['season',['Spring','Summer','Autumn','Winter']],['weather',['Sunny','Rainy','Drought','Frost']]])for(const v of family[1])used.add(`${family[0]}.${v}`);
+  for(const family of [['difficulty',['easy','normal','hard']],['setup.respawn',['off','slow','normal','fast']],['setup.wildlife',['rare','normal','abundant']],['resource',['stone','wood','iron_ore','bread']],['changelog.category',['added','changed','improved','fixed','balance','removed']],['setup.day',['60','120','240']],['season',['Spring','Summer','Autumn','Winter']],['weather',['Sunny','Rainy','Drought','Frost']],['tree.stage',['0','1','2','3']],['crop.wheat_field.stage',['0','1','2','3']],['crop.orchard.stage',['0','1','2','3']],['construction.phase',['Completed','Blueprint','Foundations','Structure','Nearly complete']],['buildingCategory',['all','defense','housing','food','industry','logistics','infrastructure']],['talent',['woodcutting','mining','hunting','construction','farming','combat']],['category',['terrain','resource','building','character','decoration','animal','equipment','treasure']]])for(const v of family[1])used.add(`${family[0]}.${v}`);
   const missing=[...used].filter(key=>!Object.hasOwn(en,key));assert.deepEqual(missing,[]);assert.ok(used.size>140,`${used.size} keys in use`);
 });
 test('parameters, plurals and fallbacks never produce undefined',()=>{
@@ -52,5 +52,12 @@ test('every object, profession and skill has a name in both languages, and data 
   setLanguage('cs',{persist:false});assert.equal(objectRegistry.require('warehouse').name,'Sklad');assert.equal(JOBS.hauler.name,'Nosič');assert.equal(SKILLS.mining,'Těžba');assert.equal(objectRegistry.require('stone').name,'Kámen');
   setLanguage('en',{persist:false});assert.equal(objectRegistry.require('warehouse').name,'Warehouse');assert.equal(JOBS.hauler.name,'Hauler');assert.equal(SKILLS.mining,'Mining');assert.equal(objectRegistry.require('stone').name,'Stone');
   assert.equal(Object.isFrozen(objectRegistry.require('warehouse')),true,'definitions stay frozen');
+  setLanguage(DEFAULT_LANGUAGE,{persist:false});
+});
+test('saved ledger sources stay English and are translated only for display',async()=>{
+  const {dataName,ledgerLabel}=await import('../src/i18n/names.js'),{objectRegistry}=await import('../src/systems/ObjectRegistry.js');
+  setLanguage('cs',{persist:false});assert.equal(dataName(objectRegistry.require('warehouse')),'Warehouse');
+  assert.equal(ledgerLabel('Warehouse Construction'),'Stavba: Sklad');assert.equal(ledgerLabel('Worker Wages'),'Mzdy pracovníků');assert.equal(ledgerLabel('Unknown Thing'),'Unknown Thing');
+  setLanguage('en',{persist:false});assert.equal(ledgerLabel('Warehouse Construction'),'Warehouse Construction');assert.equal(ledgerLabel('Worker Wages'),'Worker Wages');
   setLanguage(DEFAULT_LANGUAGE,{persist:false});
 });

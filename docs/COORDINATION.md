@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| N07 (#38) part 2: object/profession/skill names, seasons, weather and the game HUD | Claude | `claude/cz-en-localization-names` | this PR | Verified | `src/i18n/{names,objects.en,objects.cs}.js` (new), `src/i18n/{en,cs}.js`, `src/systems/ObjectRegistry.js` (one line), `src/data/jobs.js` (wrappers), `src/systems/{SeasonSystem,GameTimeSystem,GameStateLoader}.js`, `src/game/{GameScene,WorldCamera}.js`, `src/ui/{CombatFeedback,ExperienceFeedback}.js`, `index.html`, tests and i18n smoke. Parts 3–4 (panels, status messages) follow. |
+| N07 (#38) part 3a: in-game panels | Claude | `claude/cz-en-localization-panels` | this PR | Verified | `index.html` (panel dialogs), `src/ui/{UnitPanel,StoragePanel,ConstructionUI,WorkplacePanel,FarmingPanel,TreasurePanel,NaturalResourcePanel,EquipmentPanel,BuildingBar,MissingWorkersIndicators,ResourceEconomyTooltip,transportLabels,objectLabels}.js`, `src/data/buildingCategories.js`, `src/i18n/*`, ledger/transaction sources kept English via `dataName()` in `src/systems/{Production,ConstructionMaterials,FoodProduction}System.js`, `src/game/buildings.js`. Next: 3b (population sidebar, Asset Library), 4 (status messages). |
 | M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main2663942 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT403 | IN PROGRESS: preserve approved villager sprites for manual PR22 merge; relevant integration checks running. Earlier476models/Pages/scaffold native and full/Studio/archive proofs retained. Actual final gh merge22 at e574f75 still API Forbidden. Frozen02a has own459test archive; final verifier checks actual deployed Git blobs, allowing later live development. Public tag/main/deployment gates pending; new user order C01–C08 then master11–15, all unstarted. | Native smoke regressions; release-gate/deployed-archive verifier and tests; release notes,02a archive/catalog, progress/verification docs. Claude art unchanged; no schema rewrite. |
 
 ## Kept backups (do not delete without the developer)
@@ -22,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-05 [#73](https://github.com/tom161819/Newgame/pull/73) N07 part 2: names, seasons, weather and the game HUD (Claude, Issue #38).
 - 2026-11-05 [#72](https://github.com/tom161819/Newgame/pull/72) N07 part 1: translation system, language switch, menus and save screens (Claude, Issue #38).
 - 2026-11-05 [#71](https://github.com/tom161819/Newgame/pull/71) N06: Autosave (Claude, Issue #37).
 - 2026-11-05 [#70](https://github.com/tom161819/Newgame/pull/70) N05: Download Save and Import Save File (Claude, Issue #36).

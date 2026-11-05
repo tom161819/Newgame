@@ -1,3 +1,4 @@
+import { dataName } from '../i18n/names.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 
 export class ProductionSystem {
@@ -22,7 +23,7 @@ export class ProductionSystem {
     const totals=this.dailyIncome();
     for(const [index,building]of this.getBuildings().entries()){
       const p=buildingDefinition(building).production;if(!buildingIsComplete(building)||p?.interval!=='day')continue;
-      this.inventory.add(p.resource,p.amount,{source:building.type==='castle'?'Castle Income':`${buildingDefinition(building).name} Income`,id:`daily-income:${building.id??index}:${day}:${p.resource}`,entityId:building.id??null,type:'production'});
+      this.inventory.add(p.resource,p.amount,{source:building.type==='castle'?'Castle Income':`${dataName(buildingDefinition(building))} Income`,id:`daily-income:${building.id??index}:${day}:${p.resource}`,entityId:building.id??null,type:'production'});
     }
     if(Object.keys(totals).length)this.onIncome(day,totals);
     return totals;
