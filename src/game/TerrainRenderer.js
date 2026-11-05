@@ -35,14 +35,15 @@ export class TerrainRenderer {
     this.wearTextures=PATH_WEAR.terrainIds.map(id=>({key:assets?.hasTexture(id)?assets.textureKey(id):this.groundTextures[0].key,variants:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer))}));
   }
 
-  setPathWear(system){this.wear=system;this.unsubscribeWear=system.subscribe(tile=>this.invalidateArea([tile]));}
+  // A wear change can turn neighbours into (or out of) a trodden area, which reaches their own neighbours: repaint 5×5.
+  setPathWear(system){this.wear=system;this.unsubscribeWear=system.subscribe(tile=>this.invalidateArea([tile],true,2));}
   setDebug(value){this.debugEnabled=!!value;this.lastView='';if(!value)this.debugGraphics.clear();}
   setSeason(season){if(season===this.season)return;this.season=season;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
   // Whole chunks, repainted in one pass, give the same pixels as a fresh draw (season transition).
   invalidateChunksOf(tiles){for(const tile of tiles){const key=`${Math.floor(tile.x/CHUNK_SIZE)},${Math.floor(tile.y/CHUNK_SIZE)}`;this.dirtyTiles.delete(key);this.dirtyChunks.add(key);}if(tiles.length)this.lastView='';}
-  invalidateArea(tiles,neighbors=true){
+  invalidateArea(tiles,neighbors=true,reach=1){
     if(!tiles.length)return;
-    const range=neighbors?1:0;
+    const range=neighbors?reach:0;
     for(const tile of tiles)for(let dy=-range;dy<=range;dy++)for(let dx=-range;dx<=range;dx++){
       const x=tile.x+dx,y=tile.y+dy;if(x<0||x>=COLUMNS||y<0||y>=ROWS)continue;
       const key=`${Math.floor(x/CHUNK_SIZE)},${Math.floor(y/CHUNK_SIZE)}`;
@@ -60,48 +61,78 @@ export class TerrainRenderer {
     if(tile.x<0||tile.y<0||tile.x>=COLUMNS||tile.y>=ROWS)return 0;
     return this.fog?.enabled&&this.memory?this.memory.terrain.get(tile.y*this.fog.width+tile.x)?.[1]??0:this.wear?.level(tile)??0;
   }
-  pathSegments(tile){
-    const level=this.pathLevel(tile);if(!level)return [];
-    const remembered=this.fog?.enabled&&this.memory,visual=this.registry.require(PATH_WEAR.terrainIds[level]).visual,center=tileCenter(tile),start={x:center.x,y:center.y*2};
-    // The track widens a little, unevenly, where feet cross each tile, like the approved Earth track.
-    const hash=terrainHash(tile.x,tile.y),bits=remembered?this.memory.terrain.get(tile.y*this.fog.width+tile.x)?.[3]??0:0,segments=[{level,visual,width:Math.round(visual.pathWidth*(1.05+(hash%5)*.06)),start}];
-    for(const [bit,[dx,dy]]of MEMORY_DIRECTIONS.entries()){
-      const neighbor={x:tile.x+dx,y:tile.y+dy},other=this.pathLevel(neighbor);
-      if(!other||(remembered?!(bits&(1<<bit)):!canStep(this.scene.map,tile,neighbor)))continue;
-      const width=Math.min(visual.pathWidth,this.registry.require(PATH_WEAR.terrainIds[other]).visual.pathWidth),bend=((terrainHash(neighbor.x,neighbor.y)%5)-2)*.35;
-      const end={x:start.x+(dx-dy)*16,y:start.y+(dx+dy)*16};segments.push({level,visual,width,start,end,control:{x:(start.x+end.x)/2+bend,y:(start.y+end.y)/2-bend}});
-    }
-    return segments;
+  // Organic Earth track: a corridor is one gentle curve per pair of linked worn tiles, through slightly offset tile
+  // nodes and shared by both tiles, so it runs on across tile edges without a kink. A diagonal joins only where no
+  // corner tile is worn, so there are no stars or cross-hatching. Tiles inside any 2×2 block of worn tiles form one
+  // trodden area of overlapping soft blobs with no internal links. Under Fog of War only remembered data is read.
+  pathVisual(level){return this.registry.require(PATH_WEAR.terrainIds[level]).visual;}
+  pathNode(tile){const center=tileCenter(tile),h=terrainHash(tile.x,tile.y);return {x:center.x+((h%7)-3)*1.1,y:(center.y+(((h>>>3)%5)-2)*.7)*2};}
+  pathLinked(tile,neighbor,bit){
+    if(this.fog?.enabled&&this.memory)return !!((this.memory.terrain.get(tile.y*this.fog.width+tile.x)?.[3]??0)&(1<<bit));
+    return canStep(this.scene.map,tile,neighbor);
   }
-  pathPattern(context,level){
-    this.pathPatterns??=new Map();if(this.pathPatterns.has(level))return this.pathPatterns.get(level);
-    const key=this.wearTextures?.[level]?.key,id=PATH_WEAR.terrainIds[level];let pattern=null;
-    if(key&&key!==this.groundTextures?.[0]?.key&&this.scene.textures.exists?.(key)&&typeof document!=='undefined'){
-      // The soil at the centre of the approved Earth track tile, repeated in world space.
-      const image=this.scene.textures.get(key).getSourceImage(),scale=image.width/64,crop=document.createElement('canvas');crop.width=24;crop.height=10;
-      crop.getContext('2d').drawImage(image,20*scale,11*scale,24*scale,10*scale,0,0,24,10);
-      pattern=context.createPattern(crop,'repeat');pattern?.setTransform?.(new DOMMatrix().scale(1,2));
+  pathArea(tile){
+    if(!this.pathLevel(tile))return false;
+    return [[0,0],[-1,0],[0,-1],[-1,-1]].some(([ox,oy])=>[[0,0],[1,0],[0,1],[1,1]].every(([dx,dy])=>this.pathLevel({x:tile.x+ox+dx,y:tile.y+oy+dy})>0));
+  }
+  // Everything that can reach the diamond of tile (x, y): drawn from the worn tiles around it.
+  pathElements(x,y){
+    const nodes=[],areas=[],links=new Map();
+    for(let oy=-1;oy<=1;oy++)for(let ox=-1;ox<=1;ox++){
+      const tile={x:x+ox,y:y+oy},level=this.pathLevel(tile);if(!level)continue;
+      const visual=this.pathVisual(level),h=terrainHash(tile.x,tile.y),area=this.pathArea(tile);
+      if(area)areas.push({level,visual,center:this.pathNode(tile),radius:42+(h%5)*1.5});
+      else nodes.push({level,visual,tile,width:visual.pathWidth,start:this.pathNode(tile)});
+      for(const [bit,[dx,dy]]of MEMORY_DIRECTIONS.entries()){
+        const neighbor={x:tile.x+dx,y:tile.y+dy},other=this.pathLevel(neighbor);if(!other)continue;
+        if(dx&&dy&&(this.pathLevel({x:tile.x+dx,y:tile.y})||this.pathLevel({x:tile.x,y:tile.y+dy})))continue;
+        if(area&&this.pathArea(neighbor))continue;
+        const first=tile.y*COLUMNS+tile.x<neighbor.y*COLUMNS+neighbor.x,a=first?tile:neighbor,b=first?neighbor:tile,key=`${a.x},${a.y}|${b.x},${b.y}`;
+        if(links.has(key)||!this.pathLinked(tile,neighbor,bit))continue;
+        const low=Math.min(level,other),start=this.pathNode(a),end=this.pathNode(b),length=Math.hypot(end.x-start.x,end.y-start.y)||1,bend=((terrainHash(a.x*3+b.x,a.y*3+b.y)%7)-3)*1.4;
+        links.set(key,{level:low,visual:this.pathVisual(low),width:Math.min(visual.pathWidth,this.pathVisual(other).pathWidth),start,end,
+          control:{x:(start.x+end.x)/2-(end.y-start.y)/length*bend,y:(start.y+end.y)/2+(end.x-start.x)/length*bend}});
+      }
     }
-    this.pathPatterns.set(level,pattern);return pattern;
+    const linked=new Set([...links.keys()].flatMap(key=>key.split('|')));
+    for(const node of nodes)if(!linked.has(`${node.tile.x},${node.tile.y}`))node.width=Math.round(node.width*(1.05+(terrainHash(node.tile.x,node.tile.y)%5)*.06));
+    return {nodes,areas,links:[...links.values()]};
+  }
+  // The soil core: the path colour with the centre of the approved Earth track tile laid over it, composed into one
+  // opaque pattern repeated in world space. Being opaque, it is drawn with the tile overlap and never shows a seam.
+  pathPattern(context,level,colour,alpha){
+    this.pathPatterns??=new Map();const key=`${level}|${colour}|${alpha.toFixed(2)}`;if(this.pathPatterns.has(key))return this.pathPatterns.get(key);
+    const texture=this.wearTextures?.[level]?.key;let style=colour;
+    if(texture&&texture!==this.groundTextures?.[0]?.key&&this.scene.textures.exists?.(texture)&&typeof document!=='undefined'){
+      const image=this.scene.textures.get(texture).getSourceImage(),scale=image.width/64,crop=document.createElement('canvas');crop.width=24;crop.height=10;
+      const c=crop.getContext('2d');c.fillStyle=colour;c.fillRect(0,0,24,10);c.globalAlpha=alpha;c.drawImage(image,20*scale,11*scale,24*scale,10*scale,0,0,24,10);
+      const pattern=context.createPattern(crop,'repeat');if(pattern){pattern.setTransform?.(new DOMMatrix().scale(1,2));style=pattern;}
+    }
+    this.pathPatterns.set(key,style);return style;
   }
   drawPaths(context,x,y,left,top,veil=0,clip=null){
-    const segments=[];for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)segments.push(...this.pathSegments({x:x+dx,y:y+dy}));
-    if(!segments.length)return;
-    const groups=key=>{const map=new Map();for(const segment of segments){const k=key(segment);if(!map.has(k))map.set(k,[]);map.get(k).push(segment);}return [...map.values()];};
-    // One stroke per group, so overlapping strips never double their transparency.
-    const stroke=(list,style,alpha,width)=>{context.beginPath();for(const s of list){context.moveTo(s.start.x,s.start.y);if(s.end)context.quadraticCurveTo(s.control.x,s.control.y,s.end.x,s.end.y);else context.lineTo(s.start.x+.01,s.start.y);}context.strokeStyle=style;context.globalAlpha=alpha;context.lineWidth=width;context.stroke();};
+    const {nodes,areas,links}=this.pathElements(x,y);if(!nodes.length&&!areas.length&&!links.length)return;
+    const levels=[...new Set([...nodes,...areas,...links].map(e=>e.level))].sort((a,b)=>a-b);
+    // One stroke or fill per group, so overlapping shapes never double their transparency; areas fill as one union.
+    const lines=(list,style,alpha,extra)=>{const groups=new Map();for(const s of list){const w=s.width+extra;if(!groups.has(w))groups.set(w,[]);groups.get(w).push(s);}
+      for(const [width,group]of groups){context.beginPath();for(const s of group){context.moveTo(s.start.x,s.start.y);if(s.end)context.quadraticCurveTo(s.control.x,s.control.y,s.end.x,s.end.y);else context.lineTo(s.start.x+.01,s.start.y);}context.strokeStyle=style;context.globalAlpha=alpha;context.lineWidth=width;context.stroke();}};
+    const blobs=(list,style,alpha,extra)=>{if(!list.length)return;context.beginPath();for(const a of list){context.moveTo(a.center.x+a.radius+extra,a.center.y);context.arc(a.center.x,a.center.y,a.radius+extra,0,Math.PI*2);}context.fillStyle=style;context.globalAlpha=alpha;context.fill();};
+    const at=(list,level)=>list.filter(e=>e.level===level);
     // Snow settles on the track: its colours fade towards snow (light tracks most), so it stays a trodden line.
     const snow=level=>Math.min(.85,veil*WINTER_VEIL[level]),tone=(colour,level)=>veil>0?mixColour(colour,'#e8eddc',snow(level)):colour;
     const begin=()=>{context.save();context.translate(-left,-top);context.scale(1,.5);context.lineCap='round';context.lineJoin='round';};
     // Translucent halo and edge: clipped to the exact diamond, as the 1 px overlap used for opaque ground would double them into seams.
     context.save();clip?.();begin();
-    for(const list of groups(s=>`${s.level}|${s.width}`)){const {level,visual,width}=list[0],edge=tone(visual.pathEdge,level);for(let i=visual.pathSoftness??0;i>0;i--)stroke(list,edge,.16,width+3+i*3);stroke(list,edge,.6,width+3);}
+    for(const level of levels){const visual=this.pathVisual(level),edge=tone(visual.pathEdge,level),strips=[...at(links,level),...at(nodes,level)],plots=at(areas,level);
+      for(let i=visual.pathSoftness??0;i>0;i--){lines(strips,edge,.16,3+i*3);blobs(plots,edge,.16,2+i*3);}lines(strips,edge,.6,3);blobs(plots,edge,.6,2);}
     context.restore();context.restore();
     // Opaque soil core with the approved texture: drawn with the overlap, so tile edges never show a seam.
     begin();
-    for(const list of groups(s=>`${s.level}|${s.width}`)){const {level,visual,width}=list[0];stroke(list,tone(visual.pathColor,level),1,width);const pattern=this.pathPattern(context,level);if(pattern)stroke(list,pattern,.85*(1-(veil>0?snow(level):0)),width);}
+    for(const level of levels){const core=tone(this.pathVisual(level).pathColor,level),grain=Math.round(.85*(1-(veil>0?snow(level):0))*20)/20;
+      lines([...at(links,level),...at(nodes,level)],this.pathPattern(context,level,core,grain),1,0);blobs(at(areas,level),this.pathPattern(context,level,core,grain/2),1,0);}
     context.restore();
   }
+
 
   tileData(tile){return this.memory?.terrainAt(tile,this.map,this.wear,this.season)??[this.map[tile.y]?.[tile.x]??0,this.wear?.level(tile)??0,this.season];}
 
@@ -116,6 +147,8 @@ export class TerrainRenderer {
       const context = texture.getContext();
       const dirty=this.dirtyTiles.get(`${cx},${cy}`);
       if(!dirty)context.clearRect(0,0,texture.width,texture.height);
+      // Ground first for every tile, tracks second: a neighbour's ground overlap can then never cover a track's edge.
+      const paths=[];
       for (let y = cy * CHUNK_SIZE; y < (cy + 1) * CHUNK_SIZE; y++) {
         for (let x = cx * CHUNK_SIZE; x < (cx + 1) * CHUNK_SIZE; x++) {
           if(dirty&&!dirty.has(y*COLUMNS+x))continue;
@@ -126,7 +159,9 @@ export class TerrainRenderer {
           // The clip reaches a little past the diamond so antialiased edges of neighbours overlap
           // instead of leaving a light seam; ground tiles carry a pixel of bleed for this.
           // Clear only the tile's own diamond, then draw with the reach, so a repainted tile never erases its neighbour's edge.
-          context.save();polygon();context.clip();context.clearRect(point.x-left-33,point.y-origin.y-17,66,34);context.restore();
+          // A whole-chunk paint starts from a cleared canvas; clearing each diamond again would leave its antialiased rim
+          // half transparent where the previous neighbour had already painted, which shows as a light grid.
+          if(dirty){context.save();polygon();context.clip();context.clearRect(point.x-left-33,point.y-origin.y-17,66,34);context.restore();}
           context.save();polygon(TILE_BLEED);context.clip();
           if(state===VISIBILITY.UNEXPLORED){context.fillStyle='#000';polygon(TILE_BLEED);context.fill();context.restore();continue;}
           const wear=this.wear?this.wearTextures[0]:null,entry=wear?(wear.variants.length?{key:wear.variants[terrainHash(x,y)%wear.variants.length]}:wear):this.groundTextures[terrainHash(x,y)%this.groundTextures.length];
@@ -137,12 +172,13 @@ export class TerrainRenderer {
           const seasonal=season=>season==='Summer'?entry.key:this.seasonGrass[season]?.[terrainHash(x,y)%this.seasonGrass[season].length],grassSeason=wear&&seasonal(season)&&(!mix||seasonal(mix.from));
           if(grassSeason&&mix){draw(seasonal(mix.from));context.globalAlpha=mix.amount;draw(seasonal(season));context.globalAlpha=1;}
           else draw(grassSeason?seasonal(season):entry.key);
-          if(this.wear)this.drawPaths(context,x,y,left,origin.y,mix?(mix.from==='Winter'?1-mix.amount:0)*.45+(season==='Winter'?mix.amount:0)*.45:season==='Winter'?.45:0,()=>{polygon();context.clip();});
+          if(this.wear)paths.push({x,y,polygon,filter:context.filter,veil:mix?(mix.from==='Winter'?1-mix.amount:0)*.45+(season==='Winter'?mix.amount:0)*.45:season==='Winter'?.45:0});
           const tint=(mix&&mixTint(mix.from,season,mix.amount))??{Spring:'rgba(95,145,65,.08)',Summer:'rgba(185,159,70,.09)',Autumn:'rgba(158,105,45,.17)',Winter:'rgba(232,237,220,.83)'}[season];
           if(tint&&!grassSeason){context.globalCompositeOperation='source-atop';context.fillStyle=tint;polygon(TILE_BLEED);context.fill();}
           context.restore();
         }
       }
+      for(const p of paths){context.save();p.polygon(TILE_BLEED);context.clip();context.filter=p.filter;this.drawPaths(context,p.x,p.y,left,origin.y,p.veil,()=>{p.polygon();context.clip();});context.restore();}
       texture.refresh();
       this.paintStats.chunks++;
       this.dirtyChunks.delete(`${cx},${cy}`);

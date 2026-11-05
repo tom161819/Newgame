@@ -15,3 +15,8 @@ test('remembered ground is not treated as unexplored, and lack of a valid sample
 test('unknown ground outside the viewport is not sampled as a canvas pixel',()=>{
  const f=fog();assert.throws(()=>unknownFogSeam(f,{...camera,scrollX:0,scrollY:0},king),/on-screen/);
 });
+
+test('removing subject sight still leaves explored memory; a remembered fixed corner is not a black sample',()=>{
+ const f=fog();f.registerSource('subjects',()=>[{id:'worker',center:{x:55.5,y:47.5},radius:7.5}]);for(const index of f.visibleIndices)f.explored[index]=1;f.providers.delete('subjects');f.update();assert.equal(f.state({x:59,y:42}),1);
+ const chosen=unknownFogSeam(f,camera,king);assert.notDeepEqual(chosen.tile,{x:59,y:42});assert.ok(chosen.neighbors.every(t=>f.state(t)===0));
+});

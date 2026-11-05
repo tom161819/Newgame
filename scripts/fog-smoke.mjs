@@ -2,7 +2,9 @@ import { unknownFogSeam } from './fog-sampling.mjs';
 import assert from 'node:assert/strict';
 
 export async function explorationMenuSmoke(page){
-  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.pauseManager.set('fog-smoke',true);window.__fogSmoke={position:{...s.character.position},tile:{...s.character.tile},fog:s.fog.enabled,exploration:s.fog.explorationEnabled};});
+  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.pauseManager.set('fog-smoke',true);window.__fogSmoke={position:{...s.character.position},tile:{...s.character.tile},fog:s.fog.enabled,exploration:s.fog.explorationEnabled,subjects:s.fog.providers.get('subjects')};
+    // These pixels are measured around the king's own sight circle; wandering subjects would light parts of it.
+    s.fog.providers.delete('subjects');s.fog.update();});
   await page.locator('#settings-button').click();await page.locator('#fog-toggle').check();await page.locator('#exploration-toggle').check();
   const seam=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,c=s.cameras.main;return {king:{...s.character.tile},camera:{scrollX:c.scrollX,scrollY:c.scrollY,width:c.width,height:c.height,zoom:c.zoom},width:s.fog.width,height:s.fog.height,states:Array.from({length:s.fog.width*s.fog.height},(_,i)=>s.fog.state({x:i%s.fog.width,y:Math.floor(i/s.fog.width)}))};});
   const seamPoint=unknownFogSeam({...seam,state:tile=>seam.states[tile.y*seam.width+tile.x]},seam.camera,seam.king);
@@ -26,7 +28,7 @@ export async function explorationMenuSmoke(page){
   });
   assert.equal(history.state,1);assert.deepEqual(history.remembered,history.old);assert.equal(history.unknown,0);assert.ok(history.count>black.seen);
   const original=await page.evaluate(()=>window.__fogSmoke);await page.locator('#fog-toggle').setChecked(original.fog);await page.locator('#exploration-toggle').setChecked(original.exploration);await page.locator('#close-settings').click();
-  await page.evaluate(()=>{window.__game.registry.get('application').scene.pauseManager.set('fog-smoke',false);delete window.__fogSmoke;});
+  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;if(window.__fogSmoke.subjects)s.fog.providers.set('subjects',window.__fogSmoke.subjects);s.fog.update();s.pauseManager.set('fog-smoke',false);delete window.__fogSmoke;});
   console.log('PASS native circular exploration, black/grey/normal terrain pixels, independent runtime switches, unchanged discovery on test reveal and frozen known terrain');
 }
 

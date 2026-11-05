@@ -71,3 +71,8 @@ PR [#109](https://github.com/tom161819/Newgame/pull/109) merged as
 succeeded on `cf13c90402e241e7bdf668dba98fcb8ece1924a7`. Local 570 tests,
 changelog validation, build:pages and the relevant real browser smoke passed.
 The first Pages run [42021840338](https://github.com/tom161819/Newgame/actions/runs/42021840338) failed before deploy: the old fog smoke sampled a fixed corner that was actually visible to a subject. A focused replay confirmed logical state2 and a green terrain pixel there. The follow-up fixture chooses an on-screen corner whose four neighbours are all logically unexplored, retains exact `[0,0,0,255]` assertions and adds a regression with subject sight. No game rendering or sight rules change. Final deployment verification remains pending until the corrected Pages run succeeds.
+
+The later N12 main (185f9e5 / PR108) also isolates the king’s sight in this
+fixture. That isolation is preserved. Focused replay still found a grey fixed
+seam after subject removal because already explored memory remains; the
+unknown-neighbour precondition covers that case too, with a regression test.

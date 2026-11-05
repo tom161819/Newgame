@@ -28,6 +28,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - The Castle no longer covers the king when he stands in front of it, and the starting stockpile now appears in front of the Castle instead of behind it.
 
 ### Changed
+- Trampled paths look natural:
+  - a single track gently meanders and runs on across tile edges without breaks;
+  - turns and junctions are rounded, instead of a star of straight spokes and cross-hatching;
+  - wherever trampled ground spreads in two directions (2×2 tiles or more), it becomes one connected earthen patch with a soft, irregular grassy edge.
+  Narrow tracks join these patches smoothly. Each wear stage keeps its own colour. Snow, Fog of War and map memory work as before, and faint tile-grid lines no longer show on ground or tracks.
 - Assign Worker now lists every resident in three groups: Unemployed (gently highlighted), those employed in another profession, and those already in this profession. Each group shows its count and is sorted by the skill the building needs (level, XP, natural talent). Every row shows the resident's portrait, talent, current job and expected wage. Moving someone away from another job asks for a confirming second click, and people already working here are marked Assigned here.
 - Trampled paths now look like the approved Earth track: a narrow, soft-edged earthen trail runs through the grass instead of recolouring whole tiles. The grass around it keeps its seasonal look, and in winter the trail shows as a muddy, snow-covered line. Each of the three wear stages is wider and darker than the last, and the trail continues smoothly through bends, junctions and diagonals.
 - The Buildings menu now opens as a wide, low strip: building cards sit side by side, and arrow buttons, the mouse wheel or trackpad, and the Left/Right/Home/End keys scroll through them. On phones the strip scrolls sideways, so the last building can still be selected. Every card keeps its preview, size, cost, missing resources and lock state.
