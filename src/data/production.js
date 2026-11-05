@@ -5,4 +5,8 @@ export const PRODUCTION_RECIPES=Object.freeze({
   ...FOOD_RECIPES,
   smelter:Object.freeze({input:Object.freeze({iron_ore:3,wood:2}),output:Object.freeze({iron_bar:1}),duration:40000,skill:'smelting',xp:10,
     inputSources:Object.freeze({iron_ore:'Smelting',wood:'Smelting Fuel'}),outputSource:'Smelter Production'}),
+  // Military workshops (C07): balance lives here and may change.
+  bowyer:Object.freeze({input:Object.freeze({wood:8}),output:Object.freeze({bow:1}),duration:30000,skill:'crafting',xp:10,inputSources:Object.freeze({wood:'Bowmaking'}),outputSource:'Bowyer Production'}),
+  swordsmith:Object.freeze({input:Object.freeze({iron_bar:3,wood:2}),output:Object.freeze({sword:1}),duration:45000,skill:'crafting',xp:12,inputSources:Object.freeze({iron_bar:'Swordsmithing',wood:'Forge Fuel'}),outputSource:'Swordsmith Production'}),
+  armorer:Object.freeze({input:Object.freeze({iron_bar:5,wood:2}),output:Object.freeze({armor:1}),duration:60000,skill:'crafting',xp:14,inputSources:Object.freeze({iron_bar:'Armorsmithing',wood:'Forge Fuel'}),outputSource:'Armorer Production'}),
 });

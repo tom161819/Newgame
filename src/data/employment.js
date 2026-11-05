@@ -2,7 +2,7 @@ import { WORKPLACES } from './workplaces.js';
 // Employment priorities (Castle): 1–5, 5 = filled first. Every profession with workplaces belongs to a sector; the
 // presets are built from the sectors, so a new profession only needs its sector here.
 export const PRIORITY_RANGE=Object.freeze({min:1,max:5,default:3});
-export const EMPLOYMENT_SECTORS=Object.freeze({farmer:'food',hunter:'food',miller:'food',baker:'food',woodcutter:'production',miner:'production',smelter_operator:'production',soldier:'defense'});
+export const EMPLOYMENT_SECTORS=Object.freeze({farmer:'food',hunter:'food',miller:'food',baker:'food',woodcutter:'production',miner:'production',smelter_operator:'production',soldier:'defense',bowyer:'defense',swordsmith:'defense',armorer:'defense'});
 // Professions the automatic employment can fill: those with workplace seats, in registry order.
 export const EMPLOYMENT_PROFESSIONS=Object.freeze([...new Set(Object.values(WORKPLACES).map(w=>w.profession))]);
 const preset=values=>Object.freeze(Object.fromEntries(EMPLOYMENT_PROFESSIONS.map(p=>[p,values[EMPLOYMENT_SECTORS[p]]??PRIORITY_RANGE.default])));

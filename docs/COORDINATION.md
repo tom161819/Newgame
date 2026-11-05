@@ -13,6 +13,7 @@ None pending. Add entries here when one pull request must wait for another.
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | AUD63 (#93) Idle Hauler collection at storage and sites | Codex | `codex/idle-hauler-storage-stone` | — | Implemented from c25fc7d; 584 tests, changelog, build:pages and actual browser panel/cargo Save/Load PASS; PR/CI pending. AUD66 Pages verified | LogisticsTaskManager.js, data/logistics.js comment, focused tests/browser smoke, i18n radius label + work message, docs/changelog. No GameScene, worker/player controller, UnitPanel, renderer or Studio edits. |
+| C07 (#54) Weapon workshops and Armory | Claude | `claude/c07-weapon-production-armory` | — | In progress | data/objects/military.js (new), production.js, jobs.js, workplaces.js, economy.js, employment.js, logistics.js, objects/index.js, approvedArt.js, militaryEquipment.js + contract, i18n objects, public/assets (approved art), GameStateSerializer (SAVE_VERSION 22), tests. |
 
 ## Kept backups (do not delete without the developer)
 
