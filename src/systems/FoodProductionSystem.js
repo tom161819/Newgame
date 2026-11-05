@@ -111,8 +111,8 @@ export class FoodProductionSystem {
     const [outputResource,outputAmount]=first(recipe.output),outputAvailable=this.storage.free(outputId,outputResource);
     if(outputAvailable){
       let cap=this.storage.reservations.get(record.outputReservation),destination=cap&&this.storage.locations.get(cap.locationId);
-      if(!destination){const route=this.storage.findDestination(worker,outputResource,Math.min(outputAvailable,FOOD_RULES.carryCapacity));if(route)destination=route.location;}
-      if(destination&&!this.scene.logisticsTasks?.waitForHauler(building,'output')&&this.move(worker,outputId,destination.id,outputResource,Math.min(outputAvailable,FOOD_RULES.carryCapacity),{capacityReservation:cap?.id,outputBuildingId:building.id}))return;
+      if(!destination){const route=this.storage.findDestination(worker,outputResource,Math.min(outputAvailable,carryCapacity(worker,outputResource)));if(route)destination=route.location;}
+      if(destination&&!this.scene.logisticsTasks?.waitForHauler(building,'output')&&this.move(worker,outputId,destination.id,outputResource,Math.min(outputAvailable,carryCapacity(worker,outputResource)),{capacityReservation:cap?.id,outputBuildingId:building.id}))return;
     }
     if(!record.auto){worker.workState='Waiting';worker.workMessage='Auto Production OFF';return;}
     const input=this.storage.locations.get(inputId),missing=Object.entries(recipe.input).find(([resource,needed])=>(input.stock[resource]??0)+this.storage.incoming(inputId,resource)<needed);
@@ -121,7 +121,7 @@ export class FoodProductionSystem {
       const [resource,needed]=missing,incoming=this.storage.incoming(inputId,resource);
       if(this.scene.logisticsTasks?.waitForHauler(building,'input')){worker.workState='Waiting';worker.workMessage=`Waiting for Hauler delivery of ${resource}`;return;}
       const source=this.storage.findSource(worker,resource),destinationRoute=this.storage.route(worker,[input]);
-      if(source&&destinationRoute){const amount=Math.min(needed-(input.stock[resource]??0)-incoming,this.storage.free(source.location.id,resource),FOOD_RULES.carryCapacity);
+      if(source&&destinationRoute){const amount=Math.min(needed-(input.stock[resource]??0)-incoming,this.storage.free(source.location.id,resource),carryCapacity(worker,resource));
         if(amount>0&&this.move(worker,source.location.id,inputId,resource,amount))return;}
       worker.workState='Waiting';worker.workMessage=`Waiting for ${resource}`;return;
     }
