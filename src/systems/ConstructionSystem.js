@@ -104,6 +104,8 @@ export class ConstructionSystem {
       const [id,work]=contributors[i],ratio=i===contributors.length-1?1-allocated:work/total;allocated+=ratio;const actor=this.actor(id);
       if(actor?.isAlive)this.scene.activities.emit('buildingCompleted',{actor,objectType:site.type,quantity:1,contributionRatio:ratio,objectIds:[site.id]});
     }
+    // S11: a finished pavement tile becomes the terrain surface layer; its site record goes away.
+    if(buildingDefinition(site).pavement){const i=this.scene.buildings.indexOf(site);if(i>=0)this.scene.buildings.splice(i,1);this.scene.pathWear?.setPaved(site,true);}
     this.scene.events?.emit('buildings:changed');this.onComplete(site);return true;
   }
   // obstacle: a provisional site found blocked; reported once as constructionCancelled (reason obstacle).

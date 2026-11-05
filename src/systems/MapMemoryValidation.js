@@ -8,7 +8,7 @@ export function validateMapMemory(data,registry,{check,number,integer,array}){
   array(data.terrain,size);check(data.terrain.length===explored.size);const tiles=new Set();
   for(const pair of data.terrain){
     array(pair,2);check(pair.length===2);const [index,value]=pair;integer(index,0,size-1);check(explored.has(index)&&!tiles.has(index));tiles.add(index);
-    array(value,4);check(value.length===4);integer(value[0],0,1);integer(value[1],0,3);check(['Spring','Summer','Autumn','Winter'].includes(value[2]));integer(value[3],0,255);
+    array(value,5);check(value.length===5);integer(value[0],0,1);integer(value[1],0,3);check(['Spring','Summer','Autumn','Winter'].includes(value[2]));integer(value[3],0,255);integer(value[4],0,1);
   }
   array(data.objects,30000);const keys=new Set();
   for(const entry of data.objects){
