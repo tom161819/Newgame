@@ -248,10 +248,9 @@ export class TerrainRenderer {
     }
   }
 
-  // Performance: a newly visible chunk is painted at once (never a hole); already shown chunks that became dirty
-  // (fog, path wear, pavement, season) repaint at most two per frame, so a wave of changes never freezes a frame.
+  // Dirty chunks in view repaint at once (a per-frame budget made partial and full repaints differ in pixels).
   repaintDirty(){
-    let budget=this.repaintAll?Infinity:2;this.repaintAll=false;
+    let budget=Infinity;this.repaintAll=false;
     for (const key of this.neededChunks??[]) {
       const shown=this.chunks.has(key);if(shown&&!this.dirtyChunks.has(key))continue;if(shown&&budget--<=0)continue;
       const [cx,cy] = key.split(',').map(Number), texture = this.chunkTexture(cx,cy);
