@@ -1,4 +1,5 @@
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
+import { recipeResources } from '../data/production.js';
 import { PLAYER_START } from '../game/config.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { findPathToAny } from '../game/pathfinding.js';
@@ -28,7 +29,7 @@ export class FoodStorageSystem {
       add(stockLocationId(building),d.starter?'fallback':'storage',d.storage.capacity,storageResources(d,this.scene.objectRegistry));
       if(d.starter){const camp=this.locations.get('food-camp');if(camp&&!this.used(camp)&&!this.incoming(camp.id)){this.locations.delete(camp.id);this.changed();}}
     }
-    if(d.recipe){add(`input-${building.id}`,'input',d.bufferCapacity,Object.keys(d.recipe.input));add(`output-${building.id}`,'output',d.bufferCapacity,Object.keys(d.recipe.output));}
+    if(d.recipe){add(`input-${building.id}`,'input',d.bufferCapacity,recipeResources(d,'input'));add(`output-${building.id}`,'output',d.bufferCapacity,recipeResources(d,'output'));}
     // C08: a Barracks keeps the Bows, Swords and Armor Haulers bring for the units it trains.
     if(d.kit)add(`kit-${building.id}`,'kit',d.kit.capacity,equipmentResources(this.scene.objectRegistry));
   }

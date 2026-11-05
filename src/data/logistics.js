@@ -16,7 +16,9 @@ export const RESOURCE_WEIGHTS=Object.freeze({stone:10,iron:10,iron_ore:10,wood:5
 export const loadWeight=resource=>RESOURCE_WEIGHTS[resource]??1;
 // S12: a vehicle multiplies the load; one transport mode at a time, never combined.
 export const VEHICLES=Object.freeze({wheelbarrow:Object.freeze({multiplier:5,speed:.9}),horse_wagon:Object.freeze({multiplier:10,speed:1.1,requiresHorse:true})});
-export const TRANSPORT_MODES=Object.freeze(['auto','hands','wheelbarrow']);
+export const TRANSPORT_MODES=Object.freeze(['auto','hands','wheelbarrow','horse_wagon']);
+// The largest load one trip can ever hold (best Hauler on a Horse Wagon), for Save validation.
+export const MAX_TRIP_UNITS=(LOGISTICS_RULES.loadUnits+20)*Math.max(...Object.values(VEHICLES).map(v=>v.multiplier));
 export function loadCapacity(actor){return (LOGISTICS_RULES.loadUnits+(actor.profession==='hauler'?Math.floor(((actor.skills?.logistics?.level??1)-1)/5)*2:0))*(VEHICLES[actor.vehicleType]?.multiplier??1);}
 // How many pieces of one resource fit in one trip (at least one, so heavy goods still move); without a resource, load units.
 export function carryCapacity(actor,resource=null){const units=loadCapacity(actor);return resource?Math.max(1,Math.floor(units/loadWeight(resource))):units;}

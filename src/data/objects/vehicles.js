@@ -1,5 +1,5 @@
 import { WORKPLACES } from '../workplaces.js';
-import { PRODUCTION_RECIPES } from '../production.js';
+import { PRODUCTION_RECIPES,WHEELWRIGHT_RECIPES } from '../production.js';
 import { FOOD_RULES } from '../foodProduction.js';
 
 // S12 phase B: the Wheelwright's Workshop makes Wheelbarrows on the shared physical recipe pipeline. A finished
@@ -14,11 +14,15 @@ export const vehicleDefinitions=[
     description:'A stable with a fenced paddock for 4 tamed horses. Two Stablehands tame wild horses and lead them in.'},
   {id:'wheelwright_workshop',name:"Wheelwright's Workshop",category:'building',buildingCategory:'industry',sprite:'/assets/buildings/wheelwright_workshop/wheelwright_workshop.svg',
     width:3,height:3,walkable:false,collectible:false,buildable:true,cost:{stone:12,wood:15},constructionTime:40000,
-    workplace:WORKPLACES.wheelwright_workshop,recipe:PRODUCTION_RECIPES.wheelwright_workshop,autoEmployment:true,bufferCapacity:FOOD_RULES.bufferCapacity,
+    workplace:WORKPLACES.wheelwright_workshop,recipe:PRODUCTION_RECIPES.wheelwright_workshop,recipes:WHEELWRIGHT_RECIPES,autoEmployment:true,bufferCapacity:40,
     interactions:['manage_workers'],renderMode:'procedural',renderer:'workplace',origin:{x:.5,y:.9},visualHeight:110,depth:{offset:0},
-    description:"Two Wheelwrights build a Wheelbarrow from 10 Wood and 2 Iron Bars in 30 seconds of work. It is left beside the workshop for a Hauler to take."},
+    description:"Two Wheelwrights build a Wheelbarrow (10 Wood, 2 Iron Bars, 30 s) or a Horse Wagon (30 Wood, 6 Iron Bars and a tamed horse from the Stables, 90 s). It is left beside the workshop for a Hauler to take."},
   {id:'wheelbarrow',name:'Wheelbarrow',inventoryLabel:'Wheelbarrows',quantityNames:['Wheelbarrow','Wheelbarrows','Wheelbarrows'],inventoryOrder:19,category:'resource',resourceCategory:'vehicle',
     sprite:'/assets/resources/wheelbarrow/wheelbarrow.svg',width:1,height:1,walkable:true,collectible:true,buildable:false,cost:{},interactions:[],
     renderMode:'procedural',origin:{x:.5,y:.6},visualHeight:30,depth:{offset:.08},
     description:'A wooden Wheelbarrow with an iron-shod wheel. A Hauler pushing it carries five times as much.'},
+  {id:'horse_wagon',name:'Horse Wagon',inventoryLabel:'Horse Wagons',quantityNames:['Horse Wagon','Horse Wagons','Horse Wagons'],inventoryOrder:20,category:'resource',resourceCategory:'vehicle',
+    sprite:'/assets/resources/horse_wagon/horse_wagon.svg',width:1,height:1,walkable:true,collectible:true,buildable:false,cost:{},interactions:[],
+    renderMode:'procedural',origin:{x:.5,y:.7},visualHeight:40,depth:{offset:.08},
+    description:'A four-wheeled wagon drawn by a tamed horse. A Hauler driving it carries ten times as much.'},
 ];
