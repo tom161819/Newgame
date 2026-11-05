@@ -24,6 +24,8 @@ Codex PR138 (#131) first; PR142 (#122) then integrates that actual merge/schema2
 
 ## Done
 
+- 2026-11-05 [#155](https://github.com/tom161819/Newgame/pull/155) NEW20 #148 (Claude): walls keep their kit pieces after culling. Merge d50c7a8; 626 tests, walls smoke fails without the fix, CI succeeded.
+- 2026-11-05 [#154](https://github.com/tom161819/Newgame/pull/154) S12 phase C (#57, Claude): Stables, Stablehands tame horses, Knight on horseback, schema 28. Merge 3126010; 626 tests, 57 full smokes, CI succeeded.
 - 2026-11-05 [#153](https://github.com/tom161819/Newgame/pull/153) S12 phase B (#57, Claude): Wheelwright's Workshop and Wheelbarrow, schema 27. Merge 72b751b; 621 tests, 55 full smokes, CI succeeded.
 - 2026-11-05 [#139](https://github.com/tom161819/Newgame/pull/139) S12 phase A (#57, Claude): carry by weight, 40 load units per person, schema 25. Merge 3b26275; 611 tests, 52 full smokes, CI succeeded; Pages pending.
 - 2026-11-05 [#137](https://github.com/tom161819/Newgame/pull/137) NEW08-B #125: food-chain completion advice via existing diagnostics/bus/panel, merge8871f60. Integrated C08/S11 schema24; 609 tests, changelog/build and chain-notices/C04/pavement browser checks passed. CI42072991047 success for e5d0996; [Pages42073363443](https://github.com/tom161819/Newgame/actions/runs/42073363443) build+deploy succeeded for exact merge, including full browser/save/archive/Studio. Issue125 closed/done. Original commit_refs_rules blockage resolved with ordinary push.

@@ -40,7 +40,7 @@ function parapet(g,a,b,height,color){
 // Stejné rozhraní jako TowerView, rozměry a výška pocházejí z definice.
 export class FortificationView {
   constructor(scene,building,preview=false){
-    this.scene=scene;this.preview=preview;this.back=scene.add.graphics();this.front=scene.add.graphics();this.footprint=scene.add.graphics();this.art={};
+    this.scene=scene;this.preview=preview;this.back=scene.add.graphics();this.front=scene.add.graphics();this.footprint=scene.add.graphics();this.art={};this.artShown={};
     if(isWall(building)){liveWalls.add(this);ensureWallArt(scene);}
     this.paint(building);if(preview)this.setAlpha(1);
   }
@@ -78,6 +78,8 @@ export class FortificationView {
     const use=isWall(building)&&wallArtReady(this.scene);
     for(const [piece,art]of Object.entries(APPROVED_WALL_ART)){
       const show=use&&(piece==='block'||!links[piece]);
+      // Remember which pieces belong to the wall: culling hides and shows the whole view later.
+      this.artShown[piece]=show;
       if(!show){this.art[piece]?.setVisible(false);continue;}
       const front=piece==='S'||piece==='E',image=this.art[piece]??=this.scene.add.image(0,0,wallKey(piece));
       image.setOrigin(art.origin.x,art.origin.y).setPosition(this.base.x,this.base.y).setDepth(this.preview?(front?10002:10001):front?depth+.3:depth).setVisible(this.back.visible).setAlpha(this.back.alpha);
@@ -88,7 +90,7 @@ export class FortificationView {
   get artImages(){return Object.values(this.art);}
   contains(x,y){return Phaser.Geom.Polygon.Contains(this.hitArea,x-this.base.x,y-this.base.y);}
   setAlpha(value){const v=this.preview?value*.5:value;this.footprint.setAlpha(value);this.back.setAlpha(v);this.front.setAlpha(v);for(const image of this.artImages)image.setAlpha(v);return this;}
-  setVisible(value){this.back.setVisible(value);this.front.setVisible(value);this.footprint.setVisible(value);for(const image of this.artImages)image.setVisible(value&&image.visible!==false);return this;}
+  setVisible(value){this.back.setVisible(value);this.front.setVisible(value);this.footprint.setVisible(value);for(const [piece,image]of Object.entries(this.art))image.setVisible(value&&this.artShown[piece]===true);return this;}
   inView(view){const width=(this.definition.width+this.definition.height)*32;return this.base.x+width>=view.x&&this.base.x-width<=view.right&&this.base.y+10>=view.y&&this.base.y-this.definition.visualHeight<=view.bottom;}
   destroy(){liveWalls.delete(this);this.back.destroy();this.front.destroy();this.footprint.destroy();for(const image of this.artImages)image.destroy();}
 }
