@@ -23,10 +23,10 @@ test('difficulty changes king and huntable base HP/DPS once, then equipment appl
   }
   assert.equal(objectRegistry.require('king').stats.maxHP,100);
 });
-test('rare/normal/abundant spawn exactly 3/9/24 reachable non-overlapping animals plus one unchanged horse',()=>{
+test('rare/normal/abundant spawn exactly 3/9/24 reachable non-overlapping animals plus six wild horses',()=>{
   for(const [wildlifePopulation,count]of [['rare',3],['normal',9],['abundant',24]]){
     const s=workerScene(undefined,{gameSettings:gameSettings({wildlifePopulation})}),start=s.character.tile;s.addResource(objectRegistry.require('stone'),{x:2,y:2});s.map[1][1]=1;
-    s.animalSystem.spawn(start);const all=[...s.animalSystem.animals.values()];assert.equal(all.filter(a=>a.definition.gameplay.huntable).length,count);assert.equal(all.filter(a=>a.type==='horse').length,1);
+    s.animalSystem.spawn(start);const all=[...s.animalSystem.animals.values()];assert.equal(all.filter(a=>a.definition.gameplay.huntable).length,count);assert.equal(all.filter(a=>a.type==='horse').length,6,'six wild horses (S12)');
     assert.equal(new Set(all.map(a=>tileKey(a.tile))).size,all.length);for(const a of all){assert.notEqual(tileKey(a.tile),tileKey(start));assert.notEqual(tileKey(a.tile),'2,2');assert.equal(s.map[a.tile.y][a.tile.x],0);}
   }
 });

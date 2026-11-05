@@ -24,7 +24,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=26;
+export const SAVE_VERSION=27;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -61,6 +61,7 @@ export function serializeGameState(scene){
     ...(scene.employment?{employment:scene.employment.exportState()}:{}),
     ...(scene.military?{military:scene.military.exportState()}:{}),
     ...(scene.vehicles?{vehicles:scene.vehicles.exportState()}:{}),
+    ...(scene.stables?{stables:scene.stables.exportState()}:{}),
     ...(scene.kingLogistics?{kingLogistics:scene.kingLogistics.exportState()}:{}),
     ...(scene.logisticsTasks?{logistics:{version:1,...(scene.constructionSystem?.materials.enabled?{materialsVersion:1}:{})}}:{}),
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
@@ -351,6 +352,12 @@ export function validateGameState(input,registry=objectRegistry){
   if(s.employment!==undefined){const e=s.employment;check(e&&typeof e==='object'&&Object.keys(e).sort().join()==='enabled,held,priorities'&&typeof e.enabled==='boolean');
     check(e.priorities&&typeof e.priorities==='object'&&Object.keys(e.priorities).sort().join()===[...EMPLOYMENT_PROFESSIONS].sort().join());for(const value of Object.values(e.priorities))integer(value,PRIORITY_RANGE.min,PRIORITY_RANGE.max);
     array(e.held);check(new Set(e.held).size===e.held.length&&e.held.every(id=>wIds.has(id)));}
+  // S12 Stables: each tamed horse once, a living horse in an existing Stables within capacity; jobs by living Stablehands.
+  if(s.stables!==undefined){const st=s.stables;check(st&&typeof st==='object'&&Object.keys(st).sort().join()==='horses,jobs,ridden');array(st.horses);array(st.jobs);
+    const animals=new Map(s.animals.map(a=>[a.id,a])),stables=new Map(s.buildings.filter(b=>b.type==='stables'&&buildingIsComplete(b)).map(b=>[b.id,b])),seen=new Set(),count=new Map();
+    for(const h of st.horses){check(h&&Object.keys(h).sort().join()==='id,stableId,state'&&h.state==='stabled'&&animals.get(h.id)?.type==='horse'&&animals.get(h.id).isAlive&&!animals.get(h.id).mounted&&stables.has(h.stableId)&&!seen.has(h.id));seen.add(h.id);count.set(h.stableId,(count.get(h.stableId)??0)+1);}
+    const workers=new Map(s.workers.map(w=>[w.id,w]));for(const j of st.jobs){check(j&&Object.keys(j).sort().join()==='horseId,phase,progress,stableId,workerId'&&['approach','taming','leading'].includes(j.phase)&&workers.get(j.workerId)?.isAlive&&workers.get(j.workerId).profession==='stablehand'&&animals.get(j.horseId)?.type==='horse'&&!seen.has(j.horseId)&&stables.has(j.stableId));number(j.progress,0,1e9);seen.add(j.horseId);count.set(j.stableId,(count.get(j.stableId)??0)+1);}
+    for(const [id,n]of count)check(n<=registry.require('stables').horseCapacity);check(st.ridden==null||animals.get(st.ridden)?.mounted===true);}
   // S12 vehicles: unique ids on open ground; an operator is one living Hauler at most once; modes are known.
   if(s.vehicles!==undefined){const v=s.vehicles;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='modes,nextId,vehicles');integer(v.nextId,1);array(v.vehicles);const ids=new Set(),operators=new Set(),workers=new Map(s.workers.map(w=>[w.id,w]));
     for(const x of v.vehicles){check(x&&Object.keys(x).sort().join()==='id,operatorId,state,type,x,y'&&Object.hasOwn(VEHICLES,x.type)&&['parked','reserved','inUse'].includes(x.state));const m=String(x.id).match(/^vehicle-(\d+)$/);check(m&&Number(m[1])<v.nextId&&!ids.has(x.id));ids.add(x.id);
