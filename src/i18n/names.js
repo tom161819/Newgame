@@ -29,3 +29,29 @@ export function ledgerLabel(source){
   const name=source.slice(0,-suffix.length-1),entry=Object.entries(LANGUAGES.en.dictionary).find(([key,value])=>value===name&&/^object\.[\w]+\.name$/.test(key));
   return entry?t(`ledger.suffix.${suffix}`,{name:t(entry[0])}):source;
 }
+// A stored English object name or id back to the current language ("Warehouse" or "stone").
+function storedName(value){
+  const entry=Object.entries(LANGUAGES.en.dictionary).find(([key,text])=>text===value&&/^object\.\w+\.name$/.test(key));
+  if(entry)return t(entry[0]);return hasKey(`object.${value}.name`,'en')?t(`object.${value}.name`):value;
+}
+// Work messages are saved in English; they are translated only for display.
+const WORK_PATTERNS=[
+  [/^Collecting (\d+) (\w+)$/,'work.collecting',m=>({count:m[1],resource:storedName(m[2])})],
+  [/^Carrying (\d+) (\w+)$/,'work.carrying',m=>({count:m[1],resource:storedName(m[2])})],
+  [/^Chopping (.+) (\d+)%$/,'work.chopping',m=>({name:storedName(m[1]),percent:m[2]})],
+  [/^Mining (\d+)%$/,'work.mining',m=>({percent:m[1]})],
+  [/^Building (.+)$/,'work.building',m=>({name:storedName(m[1])})],
+  [/^Harvesting (.+)$/,'work.harvesting',m=>({name:storedName(m[1])})],
+  [/^Hunting (.+)$/,'work.hunting',m=>({name:storedName(m[1])})],
+  [/^Producing (.+)$/,'work.producing',m=>({resource:storedName(m[1])})],
+  [/^Travelling to (.+)$/,'work.travelling',m=>({name:storedName(m[1])})],
+  [/^Walking to (.+)$/,'work.walking',m=>({name:storedName(m[1])})],
+  [/^Waiting for Hauler delivery of (.+)$/,'work.waitingHauler',m=>({resource:storedName(m[1])})],
+  [/^Waiting for delivered (.+)$/,'work.waitingDelivered',m=>({resource:storedName(m[1])})],
+  [/^Waiting for (.+)$/,'work.waitingFor',m=>({resource:storedName(m[1])})],
+];
+export function workMessageLabel(message){
+  if(!message)return '';if(hasKey(`work.message.${message}`,language()))return t(`work.message.${message}`);
+  for(const [pattern,key,params]of WORK_PATTERNS){const m=message.match(pattern);if(m)return t(key,params(m));}
+  return message;
+}

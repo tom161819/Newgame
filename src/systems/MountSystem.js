@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
 import { canStep } from '../game/pathfinding.js';
 import { tileKey } from '../game/stones.js';
@@ -11,7 +12,7 @@ export class MountSystem {
     if(this.scene.character.mountedHorse||!horse.active||!horse.isAlive||horse.mounted||!horse.definition.interactions.includes('mount'))return false;
     this.target=horse;this.repath=0;
     if(!this.plan()){this.cancel();return false;}
-    this.scene.setStatus('Král jde ke koni. Kliknutím jinam příkaz zrušíš.');return true;
+    this.scene.setStatus(t('status.kingToHorse'));return true;
   }
   plan(){return this.scene.character.command({kind:'approachAnimal',animal:this.target,silent:true});}
   mount(horse){
@@ -21,7 +22,7 @@ export class MountSystem {
     horse.mounted=true;horse.path=[];horse.nextTile=null;horse.walking=false;horse.view.setVisible(false);
     king.mountedHorse=horse;king.speed=king.definition.gameplay.movementSpeed*horse.definition.gameplay.mountedSpeedMultiplier;
     this.scene.player.setMounted?.(horse.definition);this.scene.fog?.update();this.scene.updateMountUI?.();
-    this.scene.setStatus('Král jede na koni. Sesedni tlačítkem Dismount nebo klávesou H.');return true;
+    this.scene.setStatus(t('status.kingRiding'));return true;
   }
   dismount(){
     const king=this.scene.character,horse=king.mountedHorse;if(!horse)return false;
@@ -31,13 +32,13 @@ export class MountSystem {
     const exits=adjacentTiles({tile:origin}).filter(tile=>canStep(this.scene.map,origin,tile)
       &&!reserved.has(tileKey(tile))&&!this.scene.resourceOccupancy.has(tileKey(tile)));
     exits.sort((a,b)=>Math.hypot(a.x+.5-king.position.x,a.y+.5-king.position.y)-Math.hypot(b.x+.5-king.position.x,b.y+.5-king.position.y)||a.y-b.y||a.x-b.x);
-    if(!exits.length){this.scene.setStatus('Pro sesednutí není vedle krále volné políčko.');return false;}
+    if(!exits.length){this.scene.setStatus(t('status.noDismountTile'));return false;}
     const tile=exits[0];horse.mounted=false;horse.tile={...tile};horse.position={x:tile.x+.5,y:tile.y+.5};
     horse.path=[];horse.nextTile=null;horse.wanderWait=2000;
     const point=tileCenter(tile);horse.view.setPosition(point.x,point.y).setDepth(point.y+(horse.definition.depth?.offset??0)).setVisible(true);
     king.mountedHorse=null;king.speed=king.definition.gameplay.movementSpeed;
     this.scene.player.setMounted?.(null);this.scene.fog?.update();this.scene.updateMountUI?.();
-    this.scene.setStatus('Král sesedl. Kůň zůstává poblíž a lze na něj znovu nasednout.');return true;
+    this.scene.setStatus(t('status.kingDismounted'));return true;
   }
   update(delta){
     const king=this.scene.character,horse=king.mountedHorse;
@@ -47,7 +48,7 @@ export class MountSystem {
     if(king.state!=='ground')return;
     if(!king.nextTile&&canInteractAdjacent(this.scene.map,king,target)){this.mount(target);return;}
     this.repath-=delta;
-    if(this.repath<=0){this.repath=350;if(!this.plan()){this.cancel();this.scene.setStatus('Ke koni nevede dostupná cesta.');}}
+    if(this.repath<=0){this.repath=350;if(!this.plan()){this.cancel();this.scene.setStatus(t('status.noPathHorse'));}}
   }
   onDeath(horse){
     if(this.target===horse)this.cancel();

@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { tileCenter, isWalkable } from './map.js';
 import { gridToWorld } from './isometric.js';
 import { tileKey } from './stones.js';
@@ -63,19 +64,19 @@ export class PlayerController {
     if(!this.isAlive||this.state===PLAYER_STATE.DEAD)return false;
     if(order.kind==='enter'&&!buildingIsComplete(order.tower))return false;
     if (this.transitioning) {
-      this.scene.setStatus('Počkej, až král dokončí výstup nebo sestup.');
+      this.scene.setStatus(t('status.waitClimb'));
       return false;
     }
     this.order = null;
     if(this.state===PLAYER_STATE.ON_WALL)return this.commandOnWall(order);
     if (this.state === PLAYER_STATE.ON_TOWER) {
       if (order.kind === 'enter' && order.tower === this.currentTower) {
-        this.scene.setStatus('Jsi na této věži. Pro sestup klikni na volné políčko.');
+        this.scene.setStatus(t('status.onTower'));
         return false;
       }
       const route = planTowerExit(this.scene.map, this.currentTower, order,this.scene.pathWear?.routingOptions(this));
       if (!route) {
-        this.scene.setStatus('Z věže nevede dostupná cesta k tomuto cíli. Král zůstává nahoře.');
+        this.scene.setStatus(t('status.noTowerPath'));
         return false;
       }
       this.order = order;
@@ -87,14 +88,14 @@ export class PlayerController {
 
     const route = planGroundOrder(this.scene.map, this.nextTile ?? this.tile, order,this.scene.pathWear?.routingOptions(this));
     if (!route) {
-      this.scene.setStatus('K tomuto cíli nevede cesta.');
+      this.scene.setStatus(t('status.noPath'));
       return false;
     }
     this.order = order;
     this.path = route.path;
     this.scene.showMarker(route.destination);
-    if(!order.silent)this.scene.setStatus(order.kind === 'enter' ? 'Jdu k dostupnému vstupu do věže.'
-      : order.pickupKey ? 'Jdu sebrat kámen. Dalším kliknutím změníš cíl.' : 'Mířím do cíle.');
+    if(!order.silent)this.scene.setStatus(order.kind === 'enter' ? t('status.toTowerEntrance')
+      : order.pickupKey ? t('status.toStone') : t('status.toTarget'));
     if (!this.nextTile && this.path.length === 0) this.arrive();
     return true;
   }
@@ -109,13 +110,13 @@ export class PlayerController {
     const route=planRoofExit(this.scene.map,this.scene.buildings,start,order,this.scene.pathWear?.routingOptions(this));
     if(!route){
       this.path=[];this.roofContinuation=null;this.scene.marker.setVisible(false);
-      this.scene.setStatus('Z propojených hradeb nevede dostupná cesta k cíli.');return false;
+      this.scene.setStatus(t('status.noWallPath'));return false;
     }
     this.startRoofRoute(route.roofPath,{order,path:route.path,destination:route.destination,exit:route.exit});return true;
   }
   startRoofRoute(buildings,continuation){
     this.path=buildings.map(b=>({x:b.x,y:b.y}));this.roofContinuation=continuation;
-    this.scene.marker.setVisible(false);this.scene.setStatus('Král jde po propojené hradbě.');
+    this.scene.marker.setVisible(false);this.scene.setStatus(t('status.kingOnWallPath'));
     if(!this.nextTile&&!this.path.length)this.finishRoofRoute();
   }
   finishRoofRoute(){
@@ -123,7 +124,7 @@ export class PlayerController {
     const continuation=this.roofContinuation;this.roofContinuation=null;
     if(continuation){
       this.order=continuation.order;this.path=continuation.path;this.scene.showMarker(continuation.destination);this.descend(continuation.exit);
-    }else this.scene.setStatus('Král stojí na hradbě. Klikni na spojený segment nebo na zem pro sestup.');
+    }else this.scene.setStatus(t('status.kingOnWall'));
   }
 
   arrive() {
@@ -140,11 +141,11 @@ export class PlayerController {
     } else if (order?.kind === 'enter') {
       this.climb(order.tower);
     } else if (order?.kind === 'collect' && this.scene.collectResource(order.pickupKey,this.tile)) {
-      this.scene.setStatus('Surovina sebrána.');
+      this.scene.setStatus(t('status.resourceCollected'));
     } else if (order?.pickupKey === tileKey(this.tile) && this.scene.collectStone(this.tile)) {
-      this.scene.setStatus('Kámen sebrán! Vyber další kámen nebo volné políčko.');
+      this.scene.setStatus(t('status.stoneCollected'));
     } else {
-      this.scene.setStatus('Jsem v cíli. Vyber další políčko, kámen nebo věž.');
+      this.scene.setStatus(t('status.arrived'));
     }
   }
 
@@ -160,7 +161,7 @@ export class PlayerController {
     this.currentTower = tower;
     this.setState(PLAYER_STATE.ENTERING);
     this.sprite.setDepth(buildingDepth(tower) + 0.2);
-    this.scene.setStatus('Král šplhá na plošinu věže…');
+    this.scene.setStatus(t('status.kingClimbingUp'));
     this.transitionTween=this.scene.tweens.add({
       targets: this.sprite, ...towerTop(tower), duration: 900, ease: 'Sine.InOut',
       onComplete: () => {this.completeClimb(tower);},
@@ -172,17 +173,17 @@ export class PlayerController {
     if(isWall(tower)){
       this.tile={x:tower.x,y:tower.y};this.position={x:tower.x+.5,y:tower.y+.5};this.path=[];this.nextTile=null;
       this.setState(PLAYER_STATE.ON_WALL);
-      this.scene.setStatus('Jsi na hradbě. Klikni na spojený segment nebo na zem pro sestup.');
+      this.scene.setStatus(t('status.onWall'));
     }else{
       this.setState(PLAYER_STATE.ON_TOWER);
-      this.scene.setStatus('Jsi na horní plošině. Kliknutím na průchozí políčko král nejprve sleze dolů.');
+      this.scene.setStatus(t('status.onPlatform'));
     }
   }
 
   descend(exit) {
     this.exitTile = exit;
     this.setState(PLAYER_STATE.EXITING);
-    this.scene.setStatus('Král slézá z věže…');
+    this.scene.setStatus(t('status.kingClimbingDown'));
     this.transitionTween=this.scene.tweens.add({
       targets: this.sprite, ...tileCenter(exit), duration: 900, ease: 'Sine.InOut',
       onComplete: () => {this.completeDescent(exit);},
@@ -198,7 +199,7 @@ export class PlayerController {
     this.sprite.setDepth(groundDepthAbove(this.scene.buildings,{x:Math.floor(this.position.x),y:Math.floor(this.position.y)},this.sprite.y + this.depthOffset));
     this.setState(PLAYER_STATE.GROUND);
     if (this.path.length === 0) this.arrive();
-    else this.scene.setStatus('Král je dole a pokračuje k cíli.');
+    else this.scene.setStatus(t('status.kingDown'));
   }
 
   update(delta) {
