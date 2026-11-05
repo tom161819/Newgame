@@ -30,8 +30,15 @@ export async function i18nGameSmoke(page){
   assert.match(await text('#vision-status'),/^(Mlha války: VYP|Dohled: )/);assert.match(await text('#king-health'),/^Životy: /);assert.match(await text('#king-level'),/^Král \| úroveň \d+$/);
   assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.objectRegistry.require('warehouse').name),'Sklad');
   const body=await page.evaluate(()=>document.querySelector('main').innerText);assert.doesNotMatch(body,/undefined|\{\w+\}/);
+  // Panels in Czech: storage and the king's character sheet.
+  await page.evaluate(()=>window.__game.registry.get('application').scene.storagePanel.open());await page.locator('#storage-dialog[open]').waitFor();
+  assert.equal(await text('#storage-title'),'Suroviny a sklady');assert.match(await page.locator('#storage-details').innerText(),/Uloženo: \d+ \/ \d+/);assert.doesNotMatch(await page.locator('#storage-dialog').innerText(),/undefined|\{\w+\}/);
+  await page.locator('#close-storage').click();
+  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.unitPanel.open(s.character);});await page.locator('#unit-dialog[open]').waitFor();
+  assert.match(await text('#unit-level'),/^Úroveň \d+ \/ \d+$/);assert.equal(await text('#unit-dialog h3[data-i18n="unit.skills"]'),'Dovednosti');assert.doesNotMatch(await page.locator('#unit-dialog').innerText(),/undefined|\{\w+\}/);
+  await page.locator('#close-unit').click();
   await page.locator('#settings-button').click();await page.locator('#settings-language').selectOption('en');await page.locator('#close-settings').click();
   assert.match(await text('#game-time'),/^Day \d+ \| /);assert.equal(await text('#buildings-tab'),'Buildings');assert.match(await text('#king-level'),/^King \| LVL \d+$/);
   assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.objectRegistry.require('warehouse').name),'Warehouse');
-  console.log('PASS in-game language switch from Settings: day, season, sight, HP, level, Buildings tab and object names follow at once; pickers in sync; back to English');
+  console.log('PASS in-game language switch from Settings: day, season, sight, HP, level, Buildings tab, object names, storage and character panels follow at once; pickers in sync; back to English');
 }

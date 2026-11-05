@@ -1,3 +1,5 @@
+import { localized } from '../i18n/names.js';
+import { t,language } from '../i18n/index.js';
 import { SKILLS,JOBS,WORK_RULES } from '../data/jobs.js';
 import { element } from './objectLabels.js';
 import { TALENTS,TALENT_XP_BONUS } from '../data/economy.js';
@@ -24,23 +26,23 @@ export class UnitPanel {
     if((!view?.scene||!s.fog.isVisibleObject(u))&&!managed){this.close();return;}
     const e=s.experienceSystem.getLevelProgress(u),format=n=>String(Math.round(n*100)/100);
     document.querySelector('#unit-name').textContent=u.name??u.definition.name;
-    document.querySelector('#unit-level').textContent=`Level ${e.level} / ${e.maxLevel}`;
-    document.querySelector('#unit-xp').textContent=e.level===e.maxLevel?'XP MAX':`XP ${format(e.currentXP)} / ${e.xpToNextLevel}`;
+    document.querySelector('#unit-level').textContent=t('unit.level',{level:e.level,max:e.maxLevel});
+    document.querySelector('#unit-xp').textContent=e.level===e.maxLevel?t('unit.xpMax'):t('unit.xpProgress',{current:format(e.currentXP),next:e.xpToNextLevel});
     document.querySelector('#unit-cargo').textContent=cargoLabel(s,u);document.querySelector('#unit-transport').textContent=transportLabel(s,u);
     const bar=document.querySelector('#unit-xp-bar');bar.max=e.xpToNextLevel||1;bar.value=e.level===e.maxLevel?1:e.currentXP;
     const values={hp:`${format(u.currentHP)} / ${u.maxHP}`,dps:format(u.attackDPS),armor:`${format(u.armor)} %`,totalXP:format(e.totalXP)};
     for(const [key,value]of Object.entries(values))document.querySelector(`[data-unit-stat="${key}"]`).textContent=value;
     const worker=s.workerSystem?.workers.has(u.id)&&u.isSubject!==false;document.querySelector('#unit-job-controls').hidden=!worker;
-    if(worker){this.jobSelect.value=u.profession;document.querySelector('#unit-profession').textContent=JOBS[u.profession].name;document.querySelector('#unit-work-state').textContent=`${u.workState}${u.workMessage?` · ${u.workMessage}`:''}${s.foodSystem.workMultiplier(u)<1?' · Hungry (−20% work efficiency)':''}`;
+    if(worker){for(const option of this.jobSelect.options)option.textContent=JOBS[option.value].name;this.jobSelect.value=u.profession;document.querySelector('#unit-profession').textContent=JOBS[u.profession].name;document.querySelector('#unit-work-state').textContent=`${localized(`work.state.${u.workState}`,u.workState)}${u.workMessage?` · ${localized(`work.message.${u.workMessage}`,u.workMessage)}`:''}${s.foodSystem.workMultiplier(u)<1?` · ${t('unit.hungry')}`:''}`;
       const hauler=u.profession==='hauler'&&u.stoneCollection;document.querySelector('#unit-stone-controls').hidden=!hauler;if(hauler){this.stoneToggle.checked=u.stoneCollection.enabled;if(document.activeElement!==this.stoneRadius)this.stoneRadius.value=u.stoneCollection.radius;}
-      document.querySelector('#unit-wage').textContent=`${s.wageSystem.dailyWage(u).toFixed(2)} Gold/day`;
-      document.querySelector('#unit-talent').textContent=`${TALENTS[u.naturalTalent]} · +${TALENT_XP_BONUS*100} % ${SKILLS[u.naturalTalent]} XP`;
-      document.querySelector('#unit-unpaid').textContent=`Unpaid wages: ${s.wageSystem.unpaid(u).toFixed(2)} Gold`;
-      document.querySelector('#unit-workplace').textContent=`Workplace: ${s.workplaceSystem?.building(u)?.definition.name??'Not assigned'}`;
+      document.querySelector('#unit-wage').textContent=t('unit.wage',{amount:s.wageSystem.dailyWage(u).toFixed(2)});
+      document.querySelector('#unit-talent').textContent=t('unit.talent',{talent:localized(`talent.${u.naturalTalent}`,TALENTS[u.naturalTalent]),bonus:TALENT_XP_BONUS*100,skill:SKILLS[u.naturalTalent]});
+      document.querySelector('#unit-unpaid').textContent=t('unit.unpaid',{amount:s.wageSystem.unpaid(u).toFixed(2)});
+      document.querySelector('#unit-workplace').textContent=t('unit.workplace',{place:u.profession==='hauler'?t('unit.wholeKingdom'):s.workplaceSystem?.building(u)?.definition.name??t('unit.notAssigned')});
     }
-    const signature=JSON.stringify([u.skills,u.naturalTalent]);
+    const signature=JSON.stringify([u.skills,u.naturalTalent,language()]);
     if(this.skillSignature!==`${u.id}:${signature}`){
-      const rows=Object.entries(SKILLS).map(([id,name])=>{const skill=u.skills[id],talented=id===u.naturalTalent,row=element('div',`skill-row${talented?' talented-skill':''}`);row.dataset.skill=id;row.append(element('strong','',`${name}${talented?' ★':''}`),element('span','',`LVL ${skill.level}`),element('span','',skill.level===skill.maxLevel?'XP MAX':`${format(skill.currentXP)} / ${skill.xpToNextLevel} XP`),element('small','',id==='logistics'?`Hauler capacity: ${carryCapacity({...u,profession:'hauler'})}`:`${Math.round((1+(skill.level-1)*WORK_RULES.efficiencyPerLevel)*100)} %${talented?' · +20 % XP':''}`));return row;});
+      const rows=Object.entries(SKILLS).map(([id,name])=>{const skill=u.skills[id],talented=id===u.naturalTalent,row=element('div',`skill-row${talented?' talented-skill':''}`);row.dataset.skill=id;row.append(element('strong','',`${name}${talented?' ★':''}`),element('span','',t('unit.skillLevel',{level:skill.level})),element('span','',skill.level===skill.maxLevel?t('unit.xpMax'):t('unit.skillXp',{current:format(skill.currentXP),next:skill.xpToNextLevel})),element('small','',id==='logistics'?t('unit.haulerCapacity',{count:carryCapacity({...u,profession:'hauler'})}):`${Math.round((1+(skill.level-1)*WORK_RULES.efficiencyPerLevel)*100)} %${talented?' · +20 % XP':''}`));return row;});
       document.querySelector('#unit-skills').replaceChildren(...rows);this.skillSignature=`${u.id}:${signature}`;
     }
   }

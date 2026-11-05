@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { buildingDefinition } from '../game/buildings.js';
 import { constructionPhase,CONSTRUCTION_RULES } from '../data/construction.js';
 import { element } from './objectLabels.js';
@@ -16,14 +17,14 @@ export class ConstructionUI {
     if(!this.dialog.open)return;const s=this.scene,site=this.site;if(!site||!s.constructionSystem.sites.has(site.id)||!s.fog.isVisibleObject(site)){this.close();return;}
     const c=site.construction,system=s.constructionSystem,active=system.activeBuilders(site),estimate=system.estimatedSeconds(site),king=system.assignments.get('king'),kingHere=king?.siteId===site.id;
     document.querySelector('#construction-name').textContent=buildingDefinition(site).name;
-    document.querySelector('#construction-percentage').textContent=`${c.progress.toFixed(1)} % · ${constructionPhase(site)}`;document.querySelector('#construction-progress').value=c.progress;
-    document.querySelector('#construction-builders').textContent=`Builders: ${active.length} working / ${CONSTRUCTION_RULES.maximumBuilders} slots · ${c.assignedBuilders.length} reserved`;
-    document.querySelector('#construction-eta').textContent=!system.materials.ready(site)?'Waiting for delivered materials':estimate==null?'Waiting for builders':`Remaining: ${Math.ceil(estimate)} s`;
-    document.querySelector('#construction-king-task').textContent=s.kingLogistics.workflowSiteId===site.id?'King: Delivering materials':kingHere?(system.atSite(s.character,king)?'King: Building':'King: Travelling to construction site'):'King: Not assigned';
+    document.querySelector('#construction-percentage').textContent=`${c.progress.toFixed(1)} % · ${t(`construction.phase.${constructionPhase(site)}`)}`;document.querySelector('#construction-progress').value=c.progress;
+    document.querySelector('#construction-builders').textContent=t('construction.builders',{working:active.length,slots:CONSTRUCTION_RULES.maximumBuilders,reserved:c.assignedBuilders.length});
+    document.querySelector('#construction-eta').textContent=!system.materials.ready(site)?t('construction.waitMaterials'):estimate==null?t('construction.waitBuilders'):t('construction.remaining',{seconds:Math.ceil(estimate)});
+    document.querySelector('#construction-king-task').textContent=t(s.kingLogistics.workflowSiteId===site.id?'construction.kingDelivering':kingHere?(system.atSite(s.character,king)?'construction.kingBuilding':'construction.kingTravelling'):'construction.kingNone');
     const ready=system.materials.ready(site),summary=system.materials.summary(site);
-    document.querySelector('#construction-materials').replaceChildren(...summary.map(row=>element('p','',`${s.objectRegistry.require(row.resource).name}: Required ${row.required} · Reserved ${row.reserved} · Carried ${row.carried} · On ground ${row.ground} · Delivered ${row.delivered} · Missing ${row.missing}`)));
+    document.querySelector('#construction-materials').replaceChildren(...summary.map(row=>element('p','',t('construction.material',{resource:s.objectRegistry.require(row.resource).name,...row}))));
     const button=document.querySelector('#construction-king-work');button.disabled=s.kingLogistics.workflowSiteId===site.id||kingHere||ready&&c.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders;document.querySelector('#construction-king-stop').hidden=!kingHere;
-    document.querySelector('#construction-refund').textContent=`Cancel refund: ${c.workDone>0?'50 % (rounded down)':'100 %'}`;document.querySelector('#construction-unreachable').textContent=site.unreachableReason??'';
+    document.querySelector('#construction-refund').textContent=t(c.workDone>0?'construction.refundHalf':'construction.refundFull');document.querySelector('#construction-unreachable').textContent=site.unreachableReason??'';
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){this.dialog.close();this.restoreInput();}

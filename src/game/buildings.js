@@ -1,3 +1,4 @@
+import { dataName } from '../i18n/names.js';
 import { isWalkable } from './map.js';
 import { gridToWorld } from './isometric.js';
 import { findPathToAny } from './pathfinding.js';
@@ -63,7 +64,7 @@ export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,
   if(error)return {error};
   const construction=inventory.storage?.scene.constructionSystem,materials=reserveMaterials&&construction?.materials.enabled?construction.materials:null;
   const building={id:Math.max(buildings.reduce((n,b)=>Math.max(n,b.id),0)+1,materials?construction.nextId:1),type:definition.id,definition,x:anchor.x,y:anchor.y,tiles:buildingTiles(anchor,definition)};
-  if(!(materials?materials.prepare(building):inventory.pay(definition.cost,{source:`${definition.name} Construction`,entityId:building.id})))return {error:'Na tuto budovu nemáš dostatek surovin.'};
+  if(!(materials?materials.prepare(building):inventory.pay(definition.cost,{source:`${dataName(definition)} Construction`,entityId:building.id})))return {error:'Na tuto budovu nemáš dostatek surovin.'};
   for(const tile of building.tiles)map[tile.y][tile.x]=definition.walkable?0:1;
   buildings.push(building);
   if(resources.naturalContext){resources.naturalContext.mining.bind(building);resources.naturalContext.topologyRevision++;}else if(definition.id==='quarry')building.quarryMode=reserveMaterials?'unbound':'legacy';

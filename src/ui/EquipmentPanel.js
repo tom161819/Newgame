@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { element,formatModifiers } from './objectLabels.js';
 
 export class EquipmentPanel {
@@ -20,7 +21,7 @@ export class EquipmentPanel {
   refresh(){if(this.lastSignature!==this.signature())this.render();else if(this.dialog.open)this.updateStats();}
   render(){
     const s=this.scene,summary=[],cards=[];
-    for(const [slot,label]of [['weapon','Weapon'],['armor','Armor']]){
+    for(const [slot,label]of [['weapon',t('equipment.weapon')],['armor',t('unit.armor')]]){
       const id=s.equipment.slots[slot],d=id?s.objectRegistry.require(id):null;
       const button=element('button','equipment-summary-button');button.type='button';
       if(d){const icon=element('img','');icon.src=s.assets.previewURL(d);icon.alt='';button.append(icon);}
@@ -28,11 +29,11 @@ export class EquipmentPanel {
       const card=element('section','equipment-slot');card.append(element('h3','',label));
       if(d){
         const image=element('img','equipment-icon');image.src=s.assets.previewURL(d);image.alt=d.name;
-        const remove=element('button','','Odložit');remove.type='button';remove.dataset.unequip=slot;
+        const remove=element('button','',t('equipment.unequip'));remove.type='button';remove.dataset.unequip=slot;
         card.append(image,element('strong','',d.name),element('p','',formatModifiers(d.equipment.modifiers)),element('p','',d.description),remove);
-      }else card.append(element('p','','Prázdný slot'));
+      }else card.append(element('p','',t('equipment.empty')));
       for(const item of s.equipment.owned(slot))if(item.id!==id){
-        const equip=element('button','',`Vybavit ${item.name}`);equip.type='button';equip.dataset.equip=item.id;card.append(equip);
+        const equip=element('button','',t('equipment.equip',{name:item.name}));equip.type='button';equip.dataset.equip=item.id;card.append(equip);
       }
       cards.push(card);
     }

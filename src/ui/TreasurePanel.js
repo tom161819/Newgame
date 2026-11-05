@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { element } from './objectLabels.js';
 
 export class TreasurePanel {
@@ -11,8 +12,8 @@ export class TreasurePanel {
   open(chest){
     this.chest=chest;this.restored=false;this.scene.setGalleryInput(false);
     const list=document.querySelector('#treasure-contents');
-    const entries=chest.looted?[element('li','','Truhla je prázdná.')]:[
-      element('li','',`🪙 ${chest.contents.gold} Gold`),...chest.contents.equipment.map(id=>element('li','',`1 × ${this.scene.objectRegistry.require(id).name}`)),
+    const entries=chest.looted?[element('li','',t('treasure.empty'))]:[
+      element('li','',`🪙 ${t('treasure.gold',{count:chest.contents.gold})}`),...chest.contents.equipment.map(id=>element('li','',`1 × ${this.scene.objectRegistry.require(id).name}`)),
     ];
     list.replaceChildren(...entries);document.querySelector('#take-all').hidden=chest.looted;this.dialog.showModal();
   }

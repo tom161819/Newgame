@@ -1,9 +1,10 @@
+import { t } from '../i18n/index.js';
 import { carryCapacity } from '../data/logistics.js';
-export function storageName(scene,id){const location=scene.foodStorage.locations.get(id);if(!location)return 'Unavailable destination';const building=scene.buildings.find(b=>b.id===location.buildingId);return building?`${building.definition.name} #${building.id}${location.kind==='site'?' (construction)':location.kind==='input'?' input':location.kind==='output'?' output':''}`:id==='legacy-materials'?'Legacy Stockpile':'Camp Storage';}
-export function cargoLabel(scene,actor){const cargo=actor.cargo;return `Cargo: ${cargo?`${cargo.amount} ${scene.objectRegistry.require(cargo.resource).name}`:'empty'} / ${carryCapacity(actor)}${cargo?.siteId!=null?` · ${storageName(scene,`site-${cargo.siteId}`)}`:''}`;}
+export function storageName(scene,id){const location=scene.foodStorage.locations.get(id);if(!location)return t('transport.unavailable');const building=scene.buildings.find(b=>b.id===location.buildingId);return building?`${building.definition.name} #${building.id}${location.kind==='site'?` ${t('transport.site')}`:location.kind==='input'?` ${t('transport.input')}`:location.kind==='output'?` ${t('transport.output')}`:''}`:id==='legacy-materials'?t('transport.legacy'):t('transport.camp');}
+export function cargoLabel(scene,actor){const cargo=actor.cargo;return `${t('transport.cargo',{load:cargo?`${cargo.amount} ${scene.objectRegistry.require(cargo.resource).name}`:t('transport.empty'),capacity:carryCapacity(actor)})}${cargo?.siteId!=null?` · ${storageName(scene,`site-${cargo.siteId}`)}`:''}`;}
 export function transportLabel(scene,actor){
   const task=actor===scene.character?scene.kingLogistics.task:actor.workTask;
-  if(!['foodPickup','foodDeliver','deposit','stockPickup','siteDeposit','withdraw'].includes(task?.kind))return actor.cargo?'Waiting for delivery':'No active delivery';
-  const pickup=['foodPickup','stockPickup','withdraw'].includes(task.kind),drop=task.sourceDropId&&scene.dropSystem.drops.get(task.sourceDropId),source=drop?`Ground (${drop.tile.x}, ${drop.tile.y})`:storageName(scene,task.sourceId),destination=task.kind==='withdraw'?'King cargo':storageName(scene,task.destinationId);
-  return `${pickup?'Collecting':'Delivering'} ${task.amount} ${scene.objectRegistry.require(task.resource).name} · ${pickup?`${source} → `:''}${destination}`;
+  if(!['foodPickup','foodDeliver','deposit','stockPickup','siteDeposit','withdraw'].includes(task?.kind))return t(actor.cargo?'transport.waiting':'transport.none');
+  const pickup=['foodPickup','stockPickup','withdraw'].includes(task.kind),drop=task.sourceDropId&&scene.dropSystem.drops.get(task.sourceDropId),source=drop?t('transport.ground',{x:drop.tile.x,y:drop.tile.y}):storageName(scene,task.sourceId),destination=task.kind==='withdraw'?t('transport.kingCargo'):storageName(scene,task.destinationId);
+  return `${t(pickup?'transport.collecting':'transport.delivering',{count:task.amount,resource:scene.objectRegistry.require(task.resource).name})} · ${pickup?`${source} → `:''}${destination}`;
 }
