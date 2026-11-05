@@ -5,6 +5,13 @@ export default {
   'work.message.Tending crops':'Péče o plodiny',
   'work.message.Walking to tend crops':'Cesta za péčí o plodiny',
   'work.message.Waiting at farmhouse':'Čekání u statku',
+  // Employment exclusions (#131).
+  'employment.exclude.local':'Zakázat zaměstnávání v této budově',
+  'employment.exclude.type':'Zakázat zaměstnávání pro celý typ ({name})',
+  'employment.exclude.localStatus':'Nové přiřazování je v této budově zakázáno.',
+  'employment.exclude.typeStatus':'Nové přiřazování je zakázáno ve všech budovách tohoto typu.',
+  'employment.exclude.allowedStatus':'Nové přiřazování je povoleno.',
+  'employment.exclude.help':'Současní pracovníci zůstávají. Pravidla platí pro nové automatické i ruční přiřazení; zákaz typu má přednost.',
   // Food-chain completion advice (#125).
   'notice.missingChainSource':'{name}: pro dlouhodobou výrobu chybí {producer}. Současné zásoby lze dál využít.',
   'hud.deliverCargo':'Odnést do skladu','status.cargoAwaitDelivery':'Kámen sebrán. Až budeš chtít, zvol Odnést do skladu.',

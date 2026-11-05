@@ -6,7 +6,7 @@ Files held lists the files a task changes. Another task avoids them unless neces
 
 ## Agreed merge order
 
-None pending. Add entries here when one pull request must wait for another.
+Codex PR138 (#131) first; PR142 (#122) then integrates that actual merge/schema26 and repeats relevant checks. Verify predecessor Pages success before merging the next PR.
 
 ## Active
 
@@ -14,8 +14,10 @@ None pending. Add entries here when one pull request must wait for another.
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | NEW04 (#122) Seasonal field tending | Codex | `codex/farmer-field-tending` | — | Implemented independently while #131 waits; current S12/FoW main integrated, 618 tests + build and real farmer browser PASS; PR/CI pending | FarmingSystem.js, data/farming.js, own EN/CS block, isolated farming tests/browser smoke, docs/changelog. No WorkerAI, serializer, cargo/storage or S12 edits; derived low-priority behavior only. |
+| NEW14 (#131) Employment exclusions | Codex | `codex/employment-exclusions` | [#138](https://github.com/tom161819/Newgame/pull/138) | Draft PR; S12 phase A and FoW fixes integrated from maina6442d5, schema26 preserved; 616 tests, changelog/build and UI/staffing/priority Save26 browser PASS after integration; ready for current-head CI | EmploymentSystem/data employment, WorkplaceSystem assignment guard, WorkplacePanel, own EN/CS block, schema+employment validation only in GameStateSerializer, tests/browser smoke (ledger/smelting/military schema assertions use authored SAVE_VERSION), docs/changelog. Other S12 held logistics untouched. |
+| S11 (#56) Stone Pavement | Claude | `claude/s11-stone-pavement` | — | PR open; 606 tests, 51 full smokes PASS | data/pavement.js, data/objects/pavement.js, game/pavement.js, game/PavementTool.js, game/PavementView.js, game/cobbles.js (new); PathWearSystem (paved layer), MapMemory + validation, TerrainRenderer, ConstructionSystem (pavement sites), ObjectRegistry (mode), GameScene, GameStateSerializer (SAVE_VERSION 24), i18n, style.css, public/assets/buildings/stone_pavement, tests, smokes, UPGRADE_PROGRESS. |
+| House (#57, House part only; developer priority) | Claude | `claude/house-population-capacity` | — | PR open; 589 tests, 47 full smokes PASS | data/objects/housing.js (new), objects/index.js, approvedArt.js (house), jobs.js (houseCapacity), WorkerSystem.js (capacity), i18n objects, public/assets/buildings/house, tests. |
 | S12 phase A (#57) Carry weights | Claude | `claude/s12-carry-weights` | — | PR open; 611 tests, 52 full smokes PASS | data/logistics.js (weights, 40 load units), KingLogisticsSystem, FoodProductionSystem, LogisticsTaskManager, DropSystem, FoodStateValidation, GameStateSerializer (SAVE_VERSION 25), transportLabels, UnitPanel, i18n, logistics tests. |
-| NEW08-B (#125) Food chain completion notices | Codex | `codex/food-chain-completion-notices` | [#137](https://github.com/tom161819/Newgame/pull/137) | Implemented after verified #102 Pages; 602 tests after C08/schema23 integration, changelog, build:pages and chain-notices + C04 browser smoke PASS; GitHub push restored; PR/CI pending | ProductionDiagnostics.js, data/diagnostics.js, own EN/CS block, focused tests/browser smoke, docs/changelog. No C08 held systems or persistent schema edits. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -23,6 +25,8 @@ None pending. Add entries here when one pull request must wait for another.
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-05 [#137](https://github.com/tom161819/Newgame/pull/137) NEW08-B #125: food-chain completion advice via existing diagnostics/bus/panel, merge8871f60. Integrated C08/S11 schema24; 609 tests, changelog/build and chain-notices/C04/pavement browser checks passed. CI42072991047 success for e5d0996; [Pages42073363443](https://github.com/tom161819/Newgame/actions/runs/42073363443) build+deploy succeeded for exact merge, including full browser/save/archive/Studio. Issue125 closed/done. Original commit_refs_rules blockage resolved with ordinary push.
 
 - 2026-11-05 [#133](https://github.com/tom161819/Newgame/pull/133) House (#57 part, Claude): +5 residents per completed House. Merge 8e604c0; Pages 42058257302 succeeded.
 - 2026-11-05 [#136](https://github.com/tom161819/Newgame/pull/136) S11 #56 (Claude): Stone Pavement, schema 24. Merge 3c08916; 606 tests, 51 full smokes, CI and [Pages 42073363443](https://github.com/tom161819/Newgame/actions/runs/42073363443) (descendant 8871f60) succeeded. Issue 56 closed.

@@ -7,6 +7,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ### Added
 - Farmers tend and move around reachable fields and orchards during Spring, Summer and Autumn while waiting for harvest. This produces no goods or XP; harvest and cargo delivery take priority. In Winter or without an accessible plot they wait safely at the Farmhouse.
+- Workplace panels can disable new employment for one building or for its entire type, including future buildings. Both automatic and manual assignments respect the bans. Existing staff keep their jobs; type bans take priority and local choices remain when a type is re-enabled. These rules are saved with the game.
 - Finishing a Mill without a Wheat Field or a Bakery without a Mill shows one informational notice about the missing long-term supply. Existing supplies still work; dismiss the advice or finish the missing link to clear it. Actual production blockers retain priority.
 - Stone Pavement (Buildings → Infrastructure), a permanent cobbled surface. Units on it move 25 % faster; this replaces the trodden-path bonus and never adds to it. Routes now prefer a faster paved way.
   - Build tools: Single, Line (default, also diagonal) and Area for courtyards, with a green/red/grey preview, the count of new tiles and the cost. An order costs 1 Stone for every 2 new tiles; already paved or ordered tiles are free.

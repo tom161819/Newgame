@@ -58,7 +58,33 @@ test('OFF hires nobody; blueprints, held and busy residents are skipped; a manua
 
 test('settings, priorities and held residents survive Save/Load in the current schema',()=>{
   const s=fixture(),w=resident(s,50);s.employment.applyPreset('production');s.employment.setPriority('farmer',4);s.employment.hold(w);s.employment.setEnabled(false);
-  const state=validateGameState(serializeGameState(s));assert.deepEqual(state.employment,{enabled:false,priorities:{...EMPLOYMENT_PRESETS.production,farmer:4},held:[w.id]});
+  const state=validateGameState(serializeGameState(s));assert.deepEqual(state.employment,{blockedBuildings:[],blockedTypes:[],enabled:false,priorities:{...EMPLOYMENT_PRESETS.production,farmer:4},held:[w.id]});
   for(const bad of [{...state.employment,priorities:{...state.employment.priorities,farmer:6}},{...state.employment,held:['worker-999']},{...state.employment,extra:1}])assert.throws(()=>validateGameState({...structuredClone(state),employment:bad}));
   const r=fixture({starter:false});loadGameState(r,structuredClone(state));assert.deepEqual(r.employment.exportState(),state.employment);assert.equal(r.employment.preset,'custom');
+});
+
+test('local employment exclusion blocks automatic and manual new assignments without firing or moving existing staff',()=>{
+ const s=fixture(),a=build(s,'quarry',55,50),b=build(s,'quarry',62,50),old=resident(s,48),fresh=resident(s,49);
+ assert.equal(s.workplaceSystem.assign(a,old),true);assert.equal(s.employment.setBuildingDisabled(a,true),true);s.employment.hold(fresh);
+ assert.equal(s.workplaceSystem.assign(a,fresh),false);assert.equal(fresh.profession,'idle');assert.equal(old.assignedWorkplaceId,a.id);assert.equal(s.workplaceSystem.assign(a,old),true,'existing employee is unchanged');
+ s.employment.release(fresh);s.employment.update();assert.equal(fresh.assignedWorkplaceId,b.id);assert.equal(old.assignedWorkplaceId,a.id);assert.equal(s.employment.blockReason(a),'local');assert.equal(s.employment.blockReason(b),null);
+});
+test('type ban covers future instances and local allow cannot bypass it; removing type ban preserves local rules',()=>{
+ const s=fixture(),a=build(s,'quarry',55,50),b=build(s,'quarry',62,50);s.employment.setTypeDisabled(a,true);s.employment.setBuildingDisabled(b,true);s.employment.setBuildingDisabled(a,false);
+ const c=build(s,'quarry',69,50),w=resident(s,49);s.employment.update();assert.equal(w.profession,'idle');for(const home of [a,b,c]){assert.equal(s.employment.blockReason(home),'type');assert.equal(s.workplaceSystem.assign(home,w),false);}
+ s.employment.setTypeDisabled(c,false);assert.equal(s.employment.blockReason(b),'local');s.employment.update();assert.equal(w.assignedWorkplaceId,a.id);assert.equal(s.workplaceSystem.records.get(a.id).workerIds.filter(id=>id===w.id).length,1);assert.equal(s.employment.run(),0);
+});
+test('removing one building prunes its local rule only, preserves type rule and rejects foreign or non-workplace control targets',()=>{
+ const s=fixture(),a=build(s,'quarry',55,50),b=build(s,'quarry',62,50);s.employment.setBuildingDisabled(a,true);s.employment.setBuildingDisabled(b,true);s.employment.setTypeDisabled(a,true);
+ assert.equal(s.employment.setTypeDisabled({...a,type:'lumberjack_hut'},true),false);assert.equal(s.employment.setBuildingDisabled(a,'yes'),false);
+ s.buildings.splice(s.buildings.indexOf(a),1);s.events.emit('buildings:changed');assert.deepEqual(s.employment.exportState().blockedBuildings,[b.id]);assert.deepEqual(s.employment.exportState().blockedTypes,['quarry']);
+});
+test('unblocking re-evaluates safely while held residents and full capacities remain authoritative',()=>{
+ const s=fixture(),a=build(s,'quarry',55,50),held=resident(s,46),workers=[47,48,49,50].map(x=>resident(s,x));s.employment.hold(held);s.employment.setBuildingDisabled(a,true);s.employment.update();assert.ok(workers.every(w=>w.profession==='idle'));
+ s.employment.setBuildingDisabled(a,false);s.employment.update();assert.equal(s.workplaceSystem.employees(a).length,3);assert.equal(held.profession,'idle');assert.equal(workers.filter(w=>w.profession==='idle').length,1);s.employment.request();s.employment.update();assert.equal(s.workplaceSystem.employees(a).length,3);
+});
+test('current-schema exclusions roundtrip exactly and reject corrupted rules without changing the running world',()=>{
+ const s=fixture(),a=build(s,'quarry',55,50);s.employment.setBuildingDisabled(a,true);s.employment.setTypeDisabled(a,true);const state=validateGameState(serializeGameState(s));
+ const r=fixture({starter:false});loadGameState(r,structuredClone(state));assert.deepEqual(r.employment.exportState(),state.employment);assert.equal(r.employment.blockReason(r.buildings.find(b=>b.id===a.id)),'type');
+ for(const change of [e=>e.blockedBuildings.push(a.id),e=>e.blockedBuildings=[9999],e=>e.blockedBuildings=[-1],e=>e.blockedTypes=['castle'],e=>e.blockedTypes.push('quarry'),e=>delete e.blockedTypes]){const bad=structuredClone(state);change(bad.employment);assert.throws(()=>validateGameState(bad));assert.deepEqual(serializeGameState(s),state);}
 });
