@@ -12,9 +12,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| N08 (#39) archive version labels | Claude | — | — | Blocked | Waits for Codex #47 (M2 release/archive) to close or to state that archive labels are out of its scope; N10 (#63) follows N08; N09 (#40) is HOLD. No files held. |
-| Issue #47: finish actual M2 release | Codex | `codex/issue-47-m2-release` from main65b4bf8 | Helper PR opened by Claude from this exact head (owner request, Codex API blocked) | BLOCKED on API bootstrap/final verification: public v0.3.0 now targets02a; actual full Pages41924183243 and71archive blobs verified. Read-only post-deploy verifier candidate a1a0b33 validated; one gh PR-create attempt returned Forbidden, no PR exists. Issue claim/label changes and MERGE-HELP not fabricated. Final tag-aware Pages/live verification pending; only47 currently ready. | Read-only `.github/workflows/verify-published-release.yml`, release/merge-queue/progress evidence docs and the authorized existing tag; no mechanics, archive or dependency changes. |
-| Parked C01 / Issue #48 WIP | Codex | `codex/fow-exploration-blueprints`, pushed dd728a0 | No ready PR | PRESERVED, not complete and not advanced through a blocked dependency: reproduced skipped-visibility repaint bug, fix and12focused tests; evaluate again only after Issue47 is done and48 ready. | Existing two-file fix retained in its own remote WIP branch; do not merge its old coordination/AGENTS overrides into current main. |
+| N08 (#39) archive version labels | Claude | — | — | Next | Codex #47 is done (M2 released), so its archive work no longer blocks N08; N10 (#63) follows N08; N09 (#40) is HOLD. |
+| Issue #48: C01 Fog, unknown-ground movement, blueprints | Codex | `codex/fow-exploration-blueprints` (parked WIP dd728a0) | — | Ready (unblocked 2026-11-05 after M2 release) | Recover only the relevant tested terrain fix onto current main; no old AGENTS/coordination overrides. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -23,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-05 [#79](https://github.com/tom161819/Newgame/pull/79) Issue #47: M2 v0.3.0 RELEASED — Codex release evidence and read-only post-Pages verifier, merged by Claude; Pages 41975989872 and Verify published release 41976289989 succeeded.
 - 2026-11-05 [#76](https://github.com/tom161819/Newgame/pull/76) N07 part 4: status, placement and work messages. Issue #38 (Czech/English localization) done and closed (Claude).
 - 2026-11-05 [#75](https://github.com/tom161819/Newgame/pull/75) N07 part 3b: Population sidebar and Asset Library (Claude, Issue #38).
 - 2026-11-05 [#74](https://github.com/tom161819/Newgame/pull/74) N07 part 3a: in-game panels (Claude, Issue #38).
