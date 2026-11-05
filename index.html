@@ -82,17 +82,17 @@
     <button id="settings-button" class="settings-button" type="button" aria-label="Settings" data-i18n-attr="aria-label:settings.title" aria-controls="settings-panel" aria-expanded="false">⚙</button>
     <button id="population-tab" class="population-tab" type="button" aria-controls="population-panel" aria-expanded="false"><span aria-hidden="true">♟</span> <span data-i18n="hud.population.tab">Population</span> <span id="population-tab-count">0</span></button>
     <aside id="population-panel" class="population-panel" aria-labelledby="population-title" aria-hidden="true" inert>
-      <div class="settings-heading"><h2 id="population-title">Population</h2><button id="close-population" type="button" aria-label="Close Population">×</button></div>
+      <div class="settings-heading"><h2 id="population-title" data-i18n="hud.population.tab">Population</h2><button id="close-population" type="button" aria-label="Close Population" data-i18n-attr="aria-label:population.close">×</button></div>
       <p id="population-summary"></p>
       <div class="population-controls">
-        <label for="population-search">Search villagers<input id="population-search" type="search" placeholder="Search villagers..." autocomplete="off"/></label>
-        <label for="population-profession">Profession<select id="population-profession"></select></label>
-        <div class="population-sort-controls"><label for="population-sort">Sort By<select id="population-sort"></select></label><label for="population-order">Order<select id="population-order"><option value="desc">Descending</option><option value="asc">Ascending</option></select></label></div>
+        <label for="population-search"><span data-i18n="population.search">Search villagers</span><input id="population-search" type="search" placeholder="Search villagers..." autocomplete="off" data-i18n-attr="placeholder:population.searchPlaceholder"/></label>
+        <label for="population-profession"><span data-i18n="population.profession">Profession</span><select id="population-profession"></select></label>
+        <div class="population-sort-controls"><label for="population-sort"><span data-i18n="population.sortBy">Sort By</span><select id="population-sort"></select></label><label for="population-order"><span data-i18n="population.order">Order</span><select id="population-order"><option value="desc" data-i18n="population.desc">Descending</option><option value="asc" data-i18n="population.asc">Ascending</option></select></label></div>
       </div>
       <small id="population-filter-count"></small>
-      <div id="population-viewport" class="population-viewport"><div id="population-list" class="population-list" role="list" aria-label="Permanent villagers"></div><p id="population-empty" hidden>No villagers found.</p></div>
+      <div id="population-viewport" class="population-viewport"><div id="population-list" class="population-list" role="list" aria-label="Permanent villagers" data-i18n-attr="aria-label:population.list"></div><p id="population-empty" hidden data-i18n="population.empty">No villagers found.</p></div>
     </aside>
-    <aside id="population-tooltip" class="population-tooltip" role="tooltip" aria-label="Villager details" tabindex="0" hidden></aside>
+    <aside id="population-tooltip" class="population-tooltip" role="tooltip" aria-label="Villager details" data-i18n-attr="aria-label:population.details" tabindex="0" hidden></aside>
     <aside id="settings-panel" class="settings-panel" aria-labelledby="settings-title" aria-hidden="true" inert>
       <div class="settings-heading"><h2 id="settings-title" data-i18n="settings.title">Settings</h2><button id="close-settings" type="button" aria-label="Zavřít nastavení" data-i18n-attr="aria-label:settings.close">×</button></div>
       <label class="setting-row" for="settings-language"><span data-i18n="language.label">Language</span><select id="settings-language" data-language-select></select></label>
