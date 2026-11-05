@@ -9,11 +9,16 @@ export class BuildingBar {
     this.controller=new AbortController();
     this.tab=document.querySelector('#buildings-tab');this.panel=document.querySelector('#buildings-panel');
     this.list=document.querySelector('#building-options');this.cancel=document.querySelector('#cancel-building');
-    this.categories=document.querySelector('#building-categories');
+    this.categories=document.querySelector('#building-categories');this.prev=document.querySelector('#building-scroll-prev');this.next=document.querySelector('#building-scroll-next');
     const options={signal:this.controller.signal};
     this.tab.addEventListener('click',()=>this.toggle(),options);
     this.list.addEventListener('click',event=>{const button=event.target.closest('[data-building-id]');if(button&&!button.disabled&&onSelect(registry.require(button.dataset.buildingId)))this.close();},options);
     this.cancel.addEventListener('click',onCancel,options);
+    this.prev?.addEventListener('click',()=>this.scrollBy(-1),options);this.next?.addEventListener('click',()=>this.scrollBy(1),options);
+    this.list.addEventListener('scroll',()=>this.updateScroll(),{...options,passive:true});window.addEventListener('resize',()=>this.updateScroll(),options);
+    // A vertical wheel or trackpad gesture over the strip moves it sideways; the map never receives it.
+    this.list.addEventListener('wheel',event=>{if(this.list.scrollWidth<=this.list.clientWidth+1||Math.abs(event.deltaX)>=Math.abs(event.deltaY))return;event.preventDefault();this.list.scrollLeft+=event.deltaY;},{...options,passive:false});
+    this.list.addEventListener('keydown',event=>{const step={ArrowRight:1,ArrowLeft:-1,Home:-Infinity,End:Infinity}[event.key];const current=event.target.closest?.('[data-building-id]');if(!step||!current)return;const buttons=[...this.list.querySelectorAll('[data-building-id]')],index=buttons.indexOf(current),target=buttons[Math.max(0,Math.min(buttons.length-1,Number.isFinite(step)?index+step:step<0?0:buttons.length-1))];if(target&&target!==current){event.preventDefault();target.focus();target.closest('.building-option')?.scrollIntoView({block:'nearest',inline:'nearest'});}},options);
     this.categories.addEventListener('click',event=>{const button=event.target.closest('[data-building-category]');if(button)this.selectCategory(button.dataset.buildingCategory);},options);
     this.unsubscribe=registry.subscribe(()=>this.render());this.unsubscribeAssets=assets.subscribe(()=>this.render());
     this.unsubscribeUnlocks=unlocks?.subscribe(()=>{if(this.selected&&!unlocks.status(this.selected).unlocked)this.onCancel();if(this.inventory)this.update(this.inventory,this.selected);});
@@ -36,15 +41,17 @@ export class BuildingBar {
       card.append(button,description,availability);this.choices.set(definition.id,{button,availability,definition,card,lock});return card;
     });
     this.list.replaceChildren(...(cards.length?cards:[element('p','building-empty',t('building.empty'))]));this.choice=this.choices.get('tower')?.button;
-    if(this.inventory)this.update(this.inventory,this.selected);
+    this.list.scrollLeft=0;if(this.inventory)this.update(this.inventory,this.selected);this.updateScroll();
   }
+  scrollBy(direction){this.list.scrollBy({left:direction*Math.max(160,this.list.clientWidth*.8),behavior:'smooth'});}
+  updateScroll(){if(!this.prev||!this.next)return;const max=this.list.scrollWidth-this.list.clientWidth,overflow=max>1;this.prev.hidden=this.next.hidden=!overflow;this.prev.disabled=this.list.scrollLeft<=1;this.next.disabled=this.list.scrollLeft>=max-1;}
   selectCategory(category){
     if(category!=='all'&&!Object.hasOwn(BUILDING_CATEGORIES,category))return;
     this.category=category;
     if(this.selected&&!buildingsInCategory(this.registry,category).some(d=>d.id===this.selected.id))this.onCancel();
     this.render();
   }
-  toggle(){this.panel.hidden=!this.panel.hidden;this.tab.setAttribute('aria-expanded',String(!this.panel.hidden));}
+  toggle(){this.panel.hidden=!this.panel.hidden;this.tab.setAttribute('aria-expanded',String(!this.panel.hidden));this.updateScroll();}
   close(){this.panel.hidden=true;this.tab.setAttribute('aria-expanded','false');}
   update(inventory,selected){
     this.inventory=inventory;this.selected=selected;

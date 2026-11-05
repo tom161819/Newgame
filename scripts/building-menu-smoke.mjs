@@ -1,8 +1,33 @@
 import assert from 'node:assert/strict';
+const frames=page=>page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+async function horizontalStripSmoke(page){
+  // Desktop: the open menu is a low horizontal strip with several cards side by side, reachable by buttons, wheel and keyboard.
+  await frames(page);const layout=await page.evaluate(()=>{const panel=document.querySelector('#buildings-panel').getBoundingClientRect(),list=document.querySelector('#building-options'),box=list.getBoundingClientRect();const cards=[...list.querySelectorAll('.building-option')].map(c=>c.getBoundingClientRect());return {height:panel.height,width:panel.width,side:cards.filter(c=>Math.abs(c.top-cards[0].top)<1&&c.left>=box.left-1&&c.right<=box.right+1).length,overflow:list.scrollWidth>list.clientWidth,page:document.documentElement.scrollWidth>innerWidth};});
+  assert.ok(layout.side>=3,`at least three building cards side by side (${layout.side})`);assert.ok(layout.height<=420,`Buildings menu stays low (${layout.height}px)`);assert.ok(layout.width>layout.height);assert.equal(layout.page,false);assert.equal(layout.overflow,true);
+  const scrollLeft=()=>page.locator('#building-options').evaluate(e=>e.scrollLeft);
+  assert.equal(await page.locator('#building-scroll-prev').isDisabled(),true);assert.equal(await page.locator('#building-scroll-next').isDisabled(),false);
+  await page.locator('#building-scroll-next').click();await page.waitForFunction(()=>document.querySelector('#building-options').scrollLeft>100);await page.waitForFunction(()=>!document.querySelector('#building-scroll-prev').disabled);
+  await page.locator('#building-options').evaluate(e=>{e.scrollLeft=0;});const zoom=await page.evaluate(()=>window.__game.registry.get('application').scene.cameras.main.zoom);
+  await page.locator('#building-options').hover();await page.mouse.wheel(0,300);await page.waitForFunction(()=>document.querySelector('#building-options').scrollLeft>0);
+  assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.cameras.main.zoom),zoom,'the wheel over the strip does not zoom the map');
+  await page.locator('#building-options [data-building-id]').first().focus();await page.keyboard.press('End');await frames(page);
+  const last=await page.evaluate(()=>{const list=document.querySelector('#building-options'),buttons=[...list.querySelectorAll('[data-building-id]')],box=list.getBoundingClientRect(),rect=document.activeElement.getBoundingClientRect();return {focused:document.activeElement===buttons.at(-1),visible:rect.left>=box.left-1&&rect.right<=box.right+1};});
+  assert.deepEqual(last,{focused:true,visible:true});await page.keyboard.press('ArrowLeft');assert.equal(await page.evaluate(()=>{const b=[...document.querySelectorAll('#building-options [data-building-id]')];return document.activeElement===b.at(-2);}),true);
+  await page.keyboard.press('Home');assert.equal(await page.evaluate(()=>document.activeElement===document.querySelector('#building-options [data-building-id]')),true);
+  await page.locator('#building-options').evaluate(e=>{e.scrollLeft=0;});assert.equal(await scrollLeft(),0);
+}
+async function mobileLastBuildingSmoke(page){
+  // Narrow screens: the last building in All can be scrolled into view and selected without page overflow.
+  await page.locator('#building-options').evaluate(e=>{e.scrollLeft=e.scrollWidth;});await frames(page);
+  const id=await page.locator('#building-options [data-building-id]:not([disabled])').last().getAttribute('data-building-id'),choice=page.locator(`#${id}-choice`);
+  const box=await choice.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=390,'the last available building is fully on screen');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  await choice.click();assert.equal(await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;return s.buildMode&&s.selectedBuilding?.id===id;},id),true);
+  await page.locator('#cancel-building').click();assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.buildMode),false);await page.locator('#buildings-tab').click();
+}
 export async function buildingMenuSmoke(page){
   if(!await page.locator('#building-categories').count())return;
   const definitions=await page.evaluate(()=>window.__game.registry.get('application').scene.objectRegistry.buildables().map(d=>({id:d.id,category:d.buildingCategory})));
-  await page.locator('#buildings-tab').click();
+  await page.locator('#buildings-tab').click();await horizontalStripSmoke(page);
   const categories=await page.locator('[data-building-category]').evaluateAll(tabs=>tabs.map(t=>t.dataset.buildingCategory));
   assert.deepEqual(categories,['all','defense','housing','food','industry','logistics','infrastructure']);
   for(const category of categories){
@@ -20,12 +45,12 @@ export async function buildingMenuSmoke(page){
   const before=await page.evaluate(()=>window.__game.registry.get('application').scene.cameras.main.scrollY);await page.keyboard.down('w');await page.waitForTimeout(140);await page.keyboard.up('w');
   assert.ok(await page.evaluate(before=>window.__game.registry.get('application').scene.cameras.main.scrollY<before,before),'Camera remains operable with Buildings open.');
   await page.setViewportSize({width:390,height:844});const overflow=await page.locator('#building-categories').evaluate(e=>e.scrollWidth>e.clientWidth);assert.equal(overflow,true);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
-  await page.locator('[data-building-category="all"]').click();await page.locator('#buildings-tab').click();await page.setViewportSize({width:1440,height:1000});
+  await page.locator('[data-building-category="all"]').click();await mobileLastBuildingSmoke(page);await page.locator('#buildings-tab').click();await page.setViewportSize({width:1440,height:1000});
   await page.evaluate(async()=>{await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));window.__game.registry.get('application').scene.worldCamera.syncSize();});
   await page.locator('#asset-library-button').click();await page.locator('#asset-categories [data-category="building"]').click();await page.locator('#asset-grid [data-object-id="farmhouse"]').click();assert.match(await page.locator('#asset-detail').textContent(),/Food & Farming/);
   if(hasUnlocks)assert.match(await page.locator('#asset-detail').textContent(),/Requires a completed Granary/);
   await page.locator('#close-asset-gallery').click();
-  console.log('PASS registered building categories, All/empty tabs, preview cancellation, camera controls and mobile horizontal tabs');
+  console.log('PASS registered building categories, All/empty tabs, horizontal building strip (buttons, wheel, keyboard), preview cancellation, camera controls and mobile last-building selection');
 }
 
 export async function clickWorld(page,point,{forBlueprint=false}={}){

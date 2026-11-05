@@ -400,3 +400,26 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .save-badge { display:inline-block; margin-bottom:4px; padding:1px 8px; border-radius:10px; background:#5a6b3c; color:#f1e8c8; font-size:12px; letter-spacing:.04em; text-transform:uppercase; }
 .language-picker { display:flex; align-items:center; justify-content:center; gap:10px; margin-top:14px; color:#d8cfae; font-size:14px; }
 .language-picker select, .setting-row select#settings-language { padding:4px 8px; font:inherit; background:#26321f; color:#ece2c4; border:1px solid #91835b; border-radius:4px; }
+
+/* Buildings menu: a horizontal strip of cards that grows in width, not height. */
+.buildings-panel { width:min(100%, 1180px); padding:12px 14px; overflow-x:hidden; overflow-y:auto; }
+.buildings-panel-header { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.buildings-panel-header h2 { margin:0; }
+.building-scroll-controls { display:flex; gap:6px; margin-left:auto; }
+.building-scroll-controls button { min-width:34px; padding:4px 10px; font-size:16px; line-height:1; }
+.building-scroll-controls button:disabled { opacity:.4; cursor:default; }
+.buildings-panel #building-categories { margin-bottom:8px; }
+#building-options { display:flex; gap:10px; overflow-x:auto; overflow-y:hidden; padding:2px 2px 8px; scroll-snap-type:x proximity; overscroll-behavior-x:contain; scroll-padding-inline:2px; }
+#building-options .building-option { flex:0 0 228px; display:flex; flex-direction:column; min-width:0; margin:0; padding:10px; border:1px solid #6b6947; border-radius:8px; background:#2c3123; scroll-snap-align:start; }
+#building-options .building-option + .building-option { border-top:1px solid #6b6947; margin-top:0; padding-top:10px; }
+#building-options .building-choice { display:grid; grid-template-columns:42px minmax(0,1fr); grid-template-areas:"icon name" "icon price" "lock lock"; align-items:center; column-gap:10px; row-gap:4px; padding:8px; }
+#building-options .tower-icon { grid-area:icon; }
+#building-options .building-name { grid-area:name; min-width:0; }
+#building-options .building-name strong { overflow-wrap:anywhere; }
+#building-options .building-price { grid-area:price; margin-left:0; white-space:normal; font-size:13px; }
+#building-options .building-lock { grid-area:lock; }
+#building-options .building-lock:empty { display:none; }
+#building-options .building-option p { margin:8px 0 0; font-size:11px; line-height:1.4; }
+#building-options .building-option > p:not(.building-availability) { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+#building-options .building-empty { flex:1 0 100%; }
+@media(max-width:600px) { .buildings-panel { padding:10px; } #building-options .building-option { flex-basis:min(200px, 72vw); } }

@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| N08 (#39) archive version labels | Claude | `claude/archive-unique-version-labels` | — | In progress | scripts/version-catalog.mjs, src/ui/VersionArchivePanel.js, src/i18n/en.js + cs.js (archive keys), index.html (archive dialog), tests/version-catalog.test.js, scripts/browser-smoke.mjs (archive assertions), public/versions/catalog.json + index.html (catalog only, no snapshots). N10 (#63) follows N08; N09 (#40) is HOLD. |
+| N10 (#63) horizontal Buildings menu | Claude | `claude/buildings-menu-horizontal` | — | In progress | src/style.css (Buildings menu block at the end), src/ui/BuildingBar.js (scrolling/keyboard), index.html (Buildings panel header), src/i18n/en.js + cs.js (two hud keys), scripts/building-menu-smoke.mjs. No mechanics or Save/Load changes. N11 (#64) follows N10; N09 (#40) is HOLD. |
 | Issue #48: C01 Fog, unknown-ground movement, blueprints | Codex | `codex/fow-exploration-blueprints` (parked WIP dd728a0) | — | Ready (unblocked 2026-11-05 after M2 release) | Recover only the relevant tested terrain fix onto current main; no old AGENTS/coordination overrides. |
 
 ## Kept backups (do not delete without the developer)
@@ -22,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-05 [#81](https://github.com/tom161819/Newgame/pull/81) N08: unique Archive build numbers for the 73 historical snapshots, explained in the archive UI; Pages 41978659289 and Verify published release passed. Issue #39 done and closed; N10 (#63) unblocked (Claude).
 - 2026-11-05 [#79](https://github.com/tom161819/Newgame/pull/79) Issue #47: M2 v0.3.0 RELEASED — Codex release evidence and read-only post-Pages verifier, merged by Claude; Pages 41975989872 and Verify published release 41976289989 succeeded.
 - 2026-11-05 [#76](https://github.com/tom161819/Newgame/pull/76) N07 part 4: status, placement and work messages. Issue #38 (Czech/English localization) done and closed (Claude).
 - 2026-11-05 [#75](https://github.com/tom161819/Newgame/pull/75) N07 part 3b: Population sidebar and Asset Library (Claude, Issue #38).
