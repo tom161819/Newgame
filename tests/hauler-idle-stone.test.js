@@ -8,7 +8,7 @@ import { loadGameState } from '../src/systems/GameStateLoader.js';
 import { IDLE_STONE } from '../src/data/logistics.js';
 globalThis.document={querySelector:()=>({textContent:''})};
 
-// N03 (#34): an idle Hauler picks up loose stones within a per-unit radius of the Castle.
+// N03 (#34) and AUD63 (#93): physical loose-stone collection around reachable hubs.
 const settings=()=>gameSettings({startingCastle:true});
 const scene=()=>workerScene(undefined,{construction:true,logistics:true,gameSettings:settings()});
 const castle=s=>s.buildings.find(b=>b.type==='castle');
@@ -39,9 +39,34 @@ test('switched OFF, a Hauler leaves loose stone alone and drops an unstarted pic
   const s=scene(),tile=stone(s,8,0),h=hauler(s);h.stoneCollection.enabled=false;s.simulate(10000);assert.ok(s.resources.has(`${tile.x},${tile.y}`));assert.equal(h.workTask,null);
   h.stoneCollection.enabled=true;until(s,()=>h.workTask?.kind==='mine');h.stoneCollection.enabled=false;s.tick(25);assert.equal(h.workTask,null);assert.equal(s.workerSystem.reservations.available(`resource:${tile.x},${tile.y}`,'nobody'),true);snapshot(s);
 });
-test('without a Castle the search is paused instead of running from an arbitrary point',()=>{
+test('without a Castle an accessible Starter Stockpile is a collection centre',()=>{
   const s=workerScene(undefined,{construction:true,logistics:true,gameSettings:gameSettings({startingCastle:false})});s.addResource(s.objectRegistry.require('stone'),{x:50,y:50});
-  const h=hauler(s);s.simulate(6000);assert.equal(h.workTask,null);assert.match(h.workMessage,/No Castle/);snapshot(s);
+  const h=hauler(s);until(s,()=>stored(s)===1&&!h.cargo);assert.equal(castle(s),undefined);snapshot(s);
+});
+test('a distant Warehouse expands the per-unit radius and shares connectivity between Haulers',()=>{
+  const s=scene(),b=building(s,'warehouse',75,75),a=hauler(s,{x:73,y:74}),h=hauler(s,{x:72,y:74});a.stoneCollection.radius=0;h.stoneCollection.radius=5;
+  s.addResource(s.objectRegistry.require('stone'),{x:73,y:75});
+  const areas=s.logisticsTasks.stoneAreas(a),cache=s.logisticsTasks.stoneAreaCache;s.logisticsTasks.stoneAreas(h);
+  assert.equal(s.logisticsTasks.stoneAreaCache,cache);assert.equal(cache.regions.get('73,74'),cache.regions.get('72,74'));
+  assert.ok(areas.some(x=>x.id===`warehouse-${b.id}`));until(s,()=>stored(s)===1&&!h.cargo);assert.equal(a.workTask,null);snapshot(s);
+});
+test('an inaccessible Warehouse cannot expand the collection area; connectivity expires after terrain changes',()=>{
+  const s=scene(),b=building(s,'warehouse',75,75),h=hauler(s,{x:70,y:74});h.stoneCollection.radius=5;
+  const location=s.foodStorage.locations.get(`warehouse-${b.id}`);assert.ok(s.logisticsTasks.stoneAreas(h).some(a=>a.id===location.id));
+  for(const t of s.foodStorage.goals(location))s.map[t.y][t.x]=1;
+  s.gameTime.totalElapsed+=501;assert.equal(s.logisticsTasks.stoneAreas(h).some(a=>a.id===location.id),false);
+  s.addResource(s.objectRegistry.require('stone'),{x:71,y:75});assert.equal(s.logisticsTasks.startStone(h),false);assert.equal(h.workTask,null);
+});
+test('a physical construction site extends collection without granting unbooked materials',()=>{
+  const s=scene();s.inventory.add('stone',30);const site=building(s,'tower',75,75,true),h=hauler(s,{x:73,y:74});h.stoneCollection.radius=4;
+  const location=s.foodStorage.locations.get(`site-${site.id}`),before=structuredClone(location.stock),tile={x:73,y:75};
+  s.addResource(s.objectRegistry.require('stone'),tile);assert.ok(s.logisticsTasks.stoneAreas(h).some(a=>a.id===location.id));
+  assert.equal(s.logisticsTasks.startStone(h),true);assert.equal(h.workTask.targetId,'73,75');assert.deepEqual(location.stock,before);
+  h.stoneCollection.radius=0;s.tick(25);assert.equal(h.workTask,null);assert.equal(s.workerSystem.reservations.available('resource:73,75','other'),true);assert.deepEqual(location.stock,before);h.stoneCollection.radius=4;const total=stored(s);until(s,()=>!s.resources.has('73,75')&&!h.cargo&&stored(s)===total+1,120000);assert.equal(s.constructionSystem.materials.ready(site),true);snapshot(s);
+});
+test('without any reachable material hub idle collection pauses',()=>{
+  const s=workerScene(undefined,{construction:true,logistics:true,starter:false,gameSettings:gameSettings({startingCastle:false})}),h=hauler(s);
+  s.addResource(s.objectRegistry.require('stone'),{x:50,y:50});s.simulate(1000);assert.equal(h.workTask,null);assert.match(h.workMessage,/No reachable collection area/);
 });
 test('two Haulers never reserve the same stone; a full store stops new pickups while carried stone is kept',()=>{
   const s=scene();for(let i=0;i<4;i++)stone(s,5+i,6);const a=hauler(s,{x:46,y:52}),b=hauler(s,{x:46,y:54});
@@ -55,6 +80,12 @@ test('real construction transport takes priority over loose stone, even on the w
   until(s,()=>h.workTask?.kind==='mine');const site=building(s,'tower',62,48,true);
   until(s,()=>h.workTask?.siteId===site.id||h.cargo?.siteId===site.id);assert.equal(s.workerSystem.reservations.owners.has(`resource:${h.workTask?.targetId}`),false);
   until(s,()=>s.constructionSystem.materials.ready(site));snapshot(s);
+});
+test('a new real delivery preempts an at-goal stone pickup before any material is collected',()=>{
+  const s=scene(),warehouse=building(s,'warehouse',58,52);s.foodStorage.deposit(`warehouse-${warehouse.id}`,'stone',30);const tile=stone(s,6,4),key=`${tile.x},${tile.y}`,h=hauler(s,{x:56,y:56});
+  until(s,()=>h.workTask?.kind==='mine'&&s.workerSystem.ai.atGoal(h,h.workTask.goal));
+  const site=building(s,'tower',62,48,true);until(s,()=>h.workTask?.siteId===site.id||!s.resources.has(key),1000);
+  assert.equal(h.workTask?.siteId,site.id);assert.equal(s.resources.has(key),true);assert.equal(s.workerSystem.reservations.available(`resource:${key}`,'other'),true);snapshot(s);
 });
 test('map edges and invalid settings: radius beyond the map is fine, saves reject out-of-range radii',()=>{
   const s=scene(),edge={x:98,y:97};s.addResource(s.objectRegistry.require('stone'),edge);const h=hauler(s);assert.ok(Math.hypot(edge.x-centre(s).x,edge.y-centre(s).y)>80,'beyond the default radius');

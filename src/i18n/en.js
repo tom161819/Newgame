@@ -2,6 +2,7 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  'work.message.No reachable collection area':'No reachable Castle, material storage or construction site',
   'work.state.Holding':'Holding position','work.state.MovingToHold':'Moving to hold position',
   "command.title": "Unit orders",
   "command.selected": "Selected: {count} · Right-click to move and hold",
@@ -53,7 +54,7 @@ export default {
   'panel.baseDps':'Base DPS','panel.finalDps':'Final DPS','panel.baseArmor':'Base Armor (%)','panel.finalArmor':'Final Armor (%)','panel.hp':'HP','panel.hpRegen':'HP Regeneration','panel.takeAll':'Take All',
   'food.storage':'Food Storage','food.daily':'Daily Consumption','food.production':'Recent Production / day','food.days':'Estimated Food Supply (days)','food.unfed':'Unfed residents','food.season':'Season & Weather','food.attractiveness':'Kingdom Attractiveness','food.note':'Food supply uses available stored Apple, Bread and Meat. Incoming harvests are not included.',
   'storage.deposit':'Deposit King Cargo','storage.drop':'Set Down King Cargo','construction.progress':'Construction progress','construction.kingWork':'Build with King','construction.kingStop':'Stop King\'s work','construction.cancel':'Cancel Construction',
-  'workplace.progress':'Food production progress','workplace.assign':'Assign Worker','unit.xp':'Character experience','unit.totalXp':'Total XP','unit.dps':'DPS','unit.armor':'Armor','unit.assignJob':'Assign Job','unit.stoneCollect':'Collect loose stone','unit.stoneRadius':'Radius from Castle (tiles)','unit.skills':'Skills',
+  'workplace.progress':'Food production progress','workplace.assign':'Assign Worker','unit.xp':'Character experience','unit.totalXp':'Total XP','unit.dps':'DPS','unit.armor':'Armor','unit.assignJob':'Assign Job','unit.stoneCollect':'Collect loose stone','unit.stoneRadius':'Collection radius (tiles)','unit.skills':'Skills',
   'tree.chop':'Chop Tree','assets.intro':'Browse registered objects · no editing or placing on the map','assets.close':'Close library','assets.categories':'Object categories','assets.objects':'Objects','assets.detail':'Object detail',
   'farming.growthBar':'Crop growth','farming.stage':'Stage {stage}: {name}','farming.dormancy':'Winter dormancy · {done} / {total} growth days preserved','farming.blossom':'Spring blossom · Fruit develops in Summer','farming.ready':'Ready for harvest','farming.growth':'{done} / {total} growth days','farming.harvest':'Harvest: {count} {resource}','farming.waiting':'Waiting for a Farmer from a Farmhouse within 15 tiles.',
   'crop.wheat_field.stage.0':'Prepared soil','crop.wheat_field.stage.1':'Young wheat','crop.wheat_field.stage.2':'Growing wheat','crop.wheat_field.stage.3':'Ripe wheat','crop.orchard.stage.0':'Resting trees','crop.orchard.stage.1':'Blossoming trees','crop.orchard.stage.2':'Small fruit','crop.orchard.stage.3':'Ripe apples',

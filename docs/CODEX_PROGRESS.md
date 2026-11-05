@@ -19,7 +19,7 @@ AGENTS.md, alpha save policy and Claude's ownership remain in force.
 |3|C03 Auto employment and Castle priorities|PENDING|C02 merged/deployed; extend existing staffing instead of a second scheduler.|
 |4|C04 Production diagnostics and notices|PENDING|C03 merged/deployed; reuse authoritative work states and activity events.|
 |5|C05 Unit selection, Move and Hold|DONE|Issue52 / PR107; merge 0b6b163; 561 tests + 43 full browser smokes; Pages42019289576 succeeded. Schema21; C04 preserved. C06 remains Claude-owned.|
-|6|C06 Stables audit and equipment contract|PENDING|C05 merged/deployed; audit current horses/equipment and record planned Stage12 Stables/vehicles as not implemented; do not duplicate them.|
+|6|C06 Stables audit and equipment contract|DONE|Issue53 / Claude PR111, merge868a2d3; descendant Pages42025802576 success; Issue closed/done by owner. C05 merged/deployed; audit current horses/equipment and record planned Stage12 Stables/vehicles as not implemented; do not duplicate them.|
 |7|C07 Weapon production and Armory|PENDING|C06 merged/deployed; real Wood/Iron Bar/logistics/ownership contract; visuals may use clear temporary fallbacks.|
 |8|C08 Military recruitment and combat|PENDING|C07 merged/deployed and stable equipment contract. Knight availability still requires actual completed Stables/reservable horse; dependent unlock/integration follows deferred Stage12.|
 
@@ -44,3 +44,13 @@ authorize Codex to replace or approve Claude's graphics.
 ## C05 verified completion — 2026-11-05
 
 Issue52 is closed/done after [PR107](https://github.com/tom161819/Newgame/pull/107) merged as 0b6b1631adf90ba09965b63bac720a5aa60d35b8. Local 561/561 tests, changelog, build:pages and 43 full browser scenarios passed. [Current-head CI42019031980](https://github.com/tom161819/Newgame/actions/runs/42019031980) and [Pages42019289576](https://github.com/tom161819/Newgame/actions/runs/42019289576) build/deploy succeeded. Current-schema21 round trips preserve movement, Hold and cargo. C04 #106 was integrated without losing notices; intentionally held workers are excluded from active production/transport diagnostics. Only immediate successor #53 was moved to ready, retaining its approved agent:claude owner.
+
+## AUD66 verified completion — 2026-11-05
+
+Issue95 closed/done: [PR109](https://github.com/tom161819/Newgame/pull/109), merge6181d50. Rabbits/deer/boars keep a one-tile physical building/site clearance while wandering and spawning; retreat, diagonal gaps, hunting, horse, fog, performance and current-schema21 round trips are covered. Initial 570 tests and focused browser smoke passed. Failed Pages42021840338 exposed an invalid fixed fog sample, not a wildlife regression: [PR110](https://github.com/tom161819/Newgame/pull/110), mergec25fc7d, chooses a genuinely unknown corner while preserving exact black pixels and Claude's N12 renderer/king-only fixture. Integrated 579 tests and composed/focused browser checks passed. [Pages42025802576](https://github.com/tom161819/Newgame/actions/runs/42025802576) build and deploy actually succeeded for c25fc7d, including full smoke, save compatibility, archives and Studio.
+
+## AUD63 implementation — 2026-11-05
+
+Issue93 extends the existing N03 implementation, not a second logistics engine. A Hauler's existing Euclidean radius is the union around reachable complete Castles, stone-accepting stock locations and verified physical sites requiring stone. Physical connectivity is shared per connected component for the 500ms planning interval; structural revision changes invalidate it. The actual worker navigation still decides routes. Dedicated storage remains the normal destination with existing fallback/capacity rules; loose stone is never injected into site allocations. Real material/production deliveries preempt pickup, including a Hauler already at a stone. OFF, reduced radius or lost hub access release unstarted reservations. Cargo keeps the existing safe return behavior. No persistent fields or schema change (21). EN/CS radius labels describe collection generally.
+
+Validation: 584/584 tests (12 focused idle-stone cases), changelog:validate and build:pages PASS. `npm run smoke -- --base=/Newgame/ --current-only --idle-stone` PASS: actual panel ON/radius, a new game with no Castle, physical pickup, current-schema cargo Save/Load and exactly one deposit; standard movement/IndexedDB/cold-start/browser checks also passed.
