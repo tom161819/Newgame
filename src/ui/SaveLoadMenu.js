@@ -1,5 +1,6 @@
 import { element } from './objectLabels.js';
 import { IncompatibleSaveError,saveSchemaStatus } from '../systems/GameStateSerializer.js';
+import { exportSaveFile,parseSaveFile,saveFileName,SAVE_FILE_MAX_BYTES } from '../systems/SaveTransfer.js';
 
 // Saves record their schema twice (record and state); either identifies an incompatible slot without loading it.
 export function saveRecordStatus(record){return saveSchemaStatus({saveVersion:record?.state?.saveVersion??record?.saveVersion});}
@@ -17,6 +18,28 @@ export class SaveLoadMenu {
     document.querySelector('#confirm-save-yes').addEventListener('click',()=>this.answer(true));
     document.querySelector('#confirm-save-no').addEventListener('click',()=>this.answer(false));
     this.confirmation.addEventListener('cancel',event=>{event.preventDefault();this.answer(false);});
+    this.fileInput=document.querySelector('#import-save-file');
+    document.querySelector('#import-save').addEventListener('click',()=>{if(!this.busy)this.fileInput.click();});
+    this.fileInput.addEventListener('change',()=>{const file=this.fileInput.files?.[0];this.fileInput.value='';if(file)this.run(()=>this.importFile(file));});
+  }
+  notice(message){document.querySelector('#save-notice').textContent=message;}
+  // Download: the stored slot as one JSON file; nothing is uploaded anywhere.
+  async download(id){
+    const record=await this.app.saves.get(id);if(!record)throw new Error('Uložená pozice již neexistuje.');
+    const blob=new Blob([exportSaveFile(record,{gameVersion:this.app.gameVersion??null})],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+    link.href=url;link.download=saveFileName(record);document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),0);
+    this.notice(`Save file "${link.download}" downloaded.`);
+  }
+  // Import: validated completely before storing; a new slot, or the same slot only after confirmation.
+  async importFile(file){
+    this.error();
+    if(file.size>SAVE_FILE_MAX_BYTES)throw new Error(`The file is larger than ${SAVE_FILE_MAX_BYTES/1024/1024} MB and was not imported.`);
+    let imported;try{imported=parseSaveFile(await file.text(),{size:file.size});}
+    catch(error){if(error instanceof IncompatibleSaveError)throw new Error(`Incompatible save file: schema ${error.savedVersion??'unknown'} cannot be imported by schema ${error.currentVersion}. Nothing was changed.`);throw error;}
+    const existing=imported.id?await this.app.saves.get(imported.id):null;
+    const replace=existing?await this.confirm(`"${existing.name}" already exists on this device. Replace it with the imported file? Choose "Keep both" to import it as a new save.`,{yes:'Replace',no:'Keep both'}):false;
+    const record=await this.app.saves.save(replace?{id:imported.id,name:imported.name,state:imported.state}:{id:existing?null:imported.id,name:imported.name,state:imported.state,create:!existing});
+    this.notice(`Imported "${record.name}" (Day ${record.day}). Load it from the list.`);await this.refresh();
   }
   error(message=''){document.querySelector('#save-error').textContent=message;document.querySelector('#save-notice').textContent='';}
   async open(mode){
@@ -40,7 +63,7 @@ export class SaveLoadMenu {
       const status=saveRecordStatus(save);
       if(!status.compatible){row.classList.add('incompatible');info.append(element('p','save-warning',`Incompatible save · schema ${status.savedVersion??'unknown'}, current ${status.currentVersion}`));}
       const actions=element('div','save-actions');
-      for(const [action,label]of [['load','Load'],...(this.mode==='save'?[['overwrite','Přepsat']]:[]),['delete','Delete']]){
+      for(const [action,label]of [['load','Load'],...(this.mode==='save'?[['overwrite','Přepsat']]:[]),...(status.compatible?[['download','Download Save']]:[]),['delete','Delete']]){
         const button=element('button','',label);button.type='button';button.dataset.action=action;button.dataset.id=save.id;actions.append(button);
       }
       row.append(info,actions);return row;
@@ -66,6 +89,7 @@ export class SaveLoadMenu {
     }else if(action==='overwrite'){
       if(!await this.confirm('Přepsat tuto uloženou hru současným stavem?'))return;
       const old=await this.app.saves.get(id);await this.save(id,old.name);
+    }else if(action==='download'){await this.download(id);
     }else if(action==='load'){
       const record=await this.app.saves.get(id),status=saveRecordStatus(record);
       if(!status.compatible&&status.savedVersion!==null){await this.incompatible(record,status);return;}

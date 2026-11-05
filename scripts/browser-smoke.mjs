@@ -1,3 +1,4 @@
+import { saveTransferSmoke } from './save-transfer-smoke.mjs';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
 import { createReadStream } from 'node:fs';
@@ -88,6 +89,7 @@ try{
   if(args.includes('--full')||args.includes('--population')){await populationSidebarSmoke(page);await populationNavigationSmoke(page);await populationIntegrationSmoke(page);}
   if(args.includes('--full')||args.includes('--staffing'))await staffingIndicatorsSmoke(page);
   if(args.includes('--full')||args.includes('--fog')){await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);await hiddenInteractionSmoke(page);}
+  if(args.includes('--full')||args.includes('--save-transfer'))await saveTransferSmoke(page);
   if(args.includes('--full'))await seasonsMenuSmoke(page);
   if(args.includes('--full')||args.includes('--season-transition'))await seasonTransitionSmoke(page);
   await buildingMenuSmoke(page);

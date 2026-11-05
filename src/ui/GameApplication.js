@@ -8,7 +8,7 @@ import { gameVersion,releases } from 'virtual:game-release';
 
 export class GameApplication {
   constructor(game){
-    this.game=game;this.scene=null;this.saves=new SaveGameManager();this.saveMenu=new SaveLoadMenu(this);
+    this.game=game;this.scene=null;this.gameVersion=gameVersion;this.saves=new SaveGameManager();this.saveMenu=new SaveLoadMenu(this);
     this.main=document.querySelector('#main-menu');this.pauseDialog=document.querySelector('#pause-menu');
     this.changelog=new ChangelogPanel({version:gameVersion,releases});
     this.archive=new VersionArchivePanel({catalogURL:`${import.meta.env.BASE_URL}versions/catalog.json`,onChanges:version=>{if(version&&!releases.some(r=>r.version===version))window.open(`${import.meta.env.BASE_URL}?changelog=${encodeURIComponent(version)}`,'_blank','noopener,noreferrer');else this.changelog.open(version);}});
