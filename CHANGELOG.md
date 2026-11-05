@@ -17,6 +17,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - The Castle no longer covers the king when he stands in front of it, and the starting stockpile now appears in front of the Castle instead of behind it.
 
 ### Changed
+- The Version Archive gives every development snapshot its own Archive build number (for example Archive build 109 · v0.3.0 · 02a3a43), counted along the main history and tied to its commit, and explains that these builds are not release versions. Snapshot headings show the real commit summary once instead of a repeated SemVer label; links, release versions and archived saves are unchanged.
 - Construction supplies are delivered automatically: Haulers carry them first, and a Builder fetches them himself when no Hauler is free. The Deliver Materials button is gone; Build with King on an unsupplied site makes the king carry the materials and then start building.
 - Warehouses and Granaries no longer have Hauler workplace slots. Saved games from earlier versions cannot be loaded and need a new game.
 

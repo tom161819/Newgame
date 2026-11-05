@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| N08 (#39) archive version labels | Claude | — | — | Next | Codex #47 is done (M2 released), so its archive work no longer blocks N08; N10 (#63) follows N08; N09 (#40) is HOLD. |
+| N08 (#39) archive version labels | Claude | `claude/archive-unique-version-labels` | — | In progress | scripts/version-catalog.mjs, src/ui/VersionArchivePanel.js, src/i18n/en.js + cs.js (archive keys), index.html (archive dialog), tests/version-catalog.test.js, scripts/browser-smoke.mjs (archive assertions), public/versions/catalog.json + index.html (catalog only, no snapshots). N10 (#63) follows N08; N09 (#40) is HOLD. |
 | Issue #48: C01 Fog, unknown-ground movement, blueprints | Codex | `codex/fow-exploration-blueprints` (parked WIP dd728a0) | — | Ready (unblocked 2026-11-05 after M2 release) | Recover only the relevant tested terrain fix onto current main; no old AGENTS/coordination overrides. |
 
 ## Kept backups (do not delete without the developer)
