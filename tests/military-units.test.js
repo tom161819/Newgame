@@ -75,6 +75,9 @@ test('two Barracks train at the same time without taking each other’s items; D
   until(s,()=>s.military.units.size===2);assert.equal(armoryStock(s,armory).sword??0,0);
   assert.equal(s.military.release(a),true);assert.equal(s.workerSystem.workers.get(a.id).attackDPS,6,'back to a plain resident');
   until(s,()=>(armoryStock(s,armory).sword??0)===1);
+  // A unit moved to another job also hands its gear back.
+  s.military.train(b,'soldier');until(s,()=>s.military.units.has(b.id));s.workplaceSystem.remove(b);s.tick(50);
+  assert.equal(s.military.units.has(b.id),false);assert.equal(b.attackDPS,6);until(s,()=>(armoryStock(s,armory).sword??0)===2);
 });
 
 test('archers need a clear line: trees, walls and rock block the shot; they never shoot unseen game',()=>{

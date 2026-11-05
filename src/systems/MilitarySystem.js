@@ -99,6 +99,8 @@ export class MilitarySystem {
   }
   update(delta){
     if(this.scene.gameOver||this.scene.gameTime?.paused||!this.storage)return;
+    // A unit moved out of its Barracks (new job, Unemployed) hands its gear back: it drops where the resident stands.
+    for(const workerId of [...this.units.keys()]){const w=this.scene.workerSystem.workers.get(workerId);if(!w?.isAlive)this.units.delete(workerId);else if(w.profession!=='soldier'||!this.barracks(w.assignedWorkplaceId))this.release(w);}
     for(const order of [...this.orders.values()].sort((a,b)=>a.id-b.id)){
       const worker=this.scene.workerSystem.workers.get(order.workerId);
       if(!worker?.isAlive||worker.assignedWorkplaceId!==order.barracksId||!this.barracks(order.barracksId)){this.cancel(order.id);continue;}
