@@ -10,9 +10,9 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Active
 
+
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| AUD63 (#93) Idle Hauler collection at storage and sites | Codex | `codex/idle-hauler-storage-stone` | — | Implemented from c25fc7d; 584 tests, changelog, build:pages and actual browser panel/cargo Save/Load PASS; PR/CI pending. AUD66 Pages verified | LogisticsTaskManager.js, data/logistics.js comment, focused tests/browser smoke, i18n radius label + work message, docs/changelog. No GameScene, worker/player controller, UnitPanel, renderer or Studio edits. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -20,6 +20,10 @@ None pending. Add entries here when one pull request must wait for another.
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+Completion record: Codex `codex/completion-aud63` updated only docs/COORDINATION.md and docs/CODEX_PROGRESS.md records the successful post-merge deployment; 584 tests, changelog, build:pages and current-only browser smoke PASS. No gameplay or environment configuration changes.
+
+- 2026-11-05 [#112](https://github.com/tom161819/Newgame/pull/112) AUD63 #93: existing idle Hauler collection extended to reachable storage/sites, merge afd5f88fe7eb316b2d1e1f72238eaceee002c304. 584 tests (12 focused), changelog, build:pages and actual browser panel/cargo Save/Load passed; [CI42028197212](https://github.com/tom161819/Newgame/actions/runs/42028197212) success for exact head f2fcc7e. [Pages42028606962](https://github.com/tom161819/Newgame/actions/runs/42028606962) build AND deploy succeeded for afd5f88, including full browser/save/archive/Studio checks. Issue93 closed/done; no other ready Codex Issue found. C07 #54 remains Claude-owned. Schema21 unchanged.
 
 - 2026-11-05 [#111](https://github.com/tom161819/Newgame/pull/111) C06 #53 (Claude): audit and data-only military equipment contract, merged868a2d3 and closed/done by owner. Descendant Pages42025802576 succeeded; C07 #54 is ready and remains agent:claude.
 
