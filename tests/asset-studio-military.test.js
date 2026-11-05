@@ -25,7 +25,6 @@ test('V02 military buildings: C07 footprints, at least three variants, trade pro
     assert.deepEqual(validateAssetSpec(asset, { generators: GENERATORS, style }), [], id);
     for (const variant of asset.variants) assert.ok(['approved', 'review', undefined].includes(approvals.assets[id]?.variants?.[variant.id]?.status), variant.id);
     const game = objectDefinitions.find(d => d.id === id);
-    if (id === 'stables') { assert.equal(game, undefined, 'Stables come with Stage 12'); continue; }
     // C07 built it: the game shows an approved export of it, byte for byte, never a look still in review.
     const used = asset.variants.find(v => game.sprite.endsWith(`/${v.id}.v1.png`));
     assert.ok(used, `${id}: the game sprite is a Studio export`);

@@ -30,6 +30,8 @@ import { smeltingSmoke } from './smelting-smoke.mjs';
 import { militarySmoke } from './military-smoke.mjs';
 import { pavementSmoke } from './pavement-smoke.mjs';
 import { devFpsSmoke } from './dev-fps-smoke.mjs';
+import { wheelwrightSmoke } from './wheelwright-smoke.mjs';
+import { stablesSmoke } from './stables-smoke.mjs';
 import { housingSmoke } from './housing-smoke.mjs';
 import { forestrySmoke,forestryHutSmoke } from './forestry-smoke.mjs';
 
@@ -100,6 +102,8 @@ try{
   if(args.includes('--full')||args.includes('--ledger'))await ledgerSmoke(page);
   if(args.includes('--full')||args.includes('--smelting'))await smeltingSmoke(page);
   if(args.includes('--full')||args.includes('--military'))await militarySmoke(page);
+  if(args.includes('--full')||args.includes('--wheelwright'))await wheelwrightSmoke(page);
+  if(args.includes('--full')||args.includes('--stables'))await stablesSmoke(page);
   if(args.includes('--full')||args.includes('--pavement'))await pavementSmoke(page,{screenshot:process.env.PAVEMENT_SHOT??null});
   if(args.includes('--full')||args.includes('--dev-fps'))await devFpsSmoke(page);
   if(args.includes('--full')||args.includes('--housing'))await housingSmoke(page);
