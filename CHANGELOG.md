@@ -68,6 +68,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Warehouses and Granaries no longer have Hauler workplace slots. Saved games from earlier versions cannot be loaded and need a new game.
 
 ### Improved
+- Smoother play with many residents and Fog of War. Map memory now refreshes only the tiles whose visibility just changed, instead of every tile in sight each frame. Moving the camera no longer re-walks all visible ground, and repaints of changed terrain are spread over several frames. In a test kingdom of 40 residents while panning, this halved the time spent on visibility each frame and cut stutters to a third.
 - Stone walls have a new painted look: solid masonry blocks with a pale wall walk that join seamlessly, with merlons only on the outer edges of a wall line, corner or enclosure.
 - The grass itself now changes with the seasons: fresh green with flowers in spring, olive grass with fallen leaves in autumn and snow cover in winter. A new season spreads in broad patches during its first day, and no light seams show between tiles.
 - Quarries have a new painted look: a stepped stone pit with a timber hoist, stacked blocks and a tool shed. Placing one still outlines its deposit in gold.
