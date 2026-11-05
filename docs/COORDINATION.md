@@ -13,6 +13,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| AUD78 (#102) Manual king stone delivery | Codex | `codex/king-manual-stone-delivery` | — | STARTED from e630597; live ready override from Claude6658384869 | KingLogisticsSystem.js, isolated HUD controller if useful, small GameScene HUD integration, index.html/style.css, EN/CS keys, focused logistics/browser tests, docs/changelog. No C07 storage acceptance, equipment, jobs/production or Studio changes. |
 | House (#57, House part only; developer priority) | Claude | `claude/house-population-capacity` | — | PR open; 589 tests, 47 full smokes PASS | data/objects/housing.js (new), objects/index.js, approvedArt.js (house), jobs.js (houseCapacity), WorkerSystem.js (capacity), i18n objects, public/assets/buildings/house, tests. |
 
 ## Kept backups (do not delete without the developer)
