@@ -6,7 +6,7 @@ export class KingLogisticsSystem {
   get actor(){return this.scene.character;}
   get storage(){return this.scene.foodStorage;}
   get materials(){return this.scene.constructionSystem?.materials;}
-  room(resource,siteId=null){const cargo=this.actor.cargo;return !this.storage.manages(resource)||cargo&&(cargo.resource!==resource||(cargo.siteId??null)!==(siteId??null))?0:Math.max(0,carryCapacity(this.actor)-(cargo?.amount??0));}
+  room(resource,siteId=null){const cargo=this.actor.cargo;return !this.storage.manages(resource)||cargo&&(cargo.resource!==resource||(cargo.siteId??null)!==(siteId??null))?0:Math.max(0,carryCapacity(this.actor,resource)-(cargo?.amount??0));}
   receive({resource,amount,event,siteId=null}){
     if(!Number.isSafeInteger(amount)||amount<=0||this.room(resource,siteId)<amount)return false;
     this.cancel();const actor=this.actor;if(actor.cargo)actor.cargo.amount+=amount;else actor.cargo={resource,amount,...(siteId!=null?{siteId}:{})};
@@ -42,9 +42,9 @@ export class KingLogisticsSystem {
     this.storage.reservations.get(capacityReservation).siteId=siteId;
     return this.move({id,kind:'siteDeposit',siteId,destinationId:location.id,resource:cargo.resource,amount,capacityReservation,goal:{...route.destination},retryAt:0},route);
   }
-  startPickup(locationId,resource,amount=20){
+  startPickup(locationId,resource,amount=Infinity){
     const source=this.storage.locations.get(locationId);if(this.actor.cargo||!source||!this.storage.isStock(source)||!this.storage.manages(resource)||this.actor.transitioning||this.scene.gameOver)return false;
-    amount=Math.min(20,amount,this.storage.free(locationId,resource));if(!Number.isSafeInteger(amount)||amount<1)return false;
+    amount=Math.min(carryCapacity(this.actor,resource),amount,this.storage.free(locationId,resource));if(!Number.isSafeInteger(amount)||amount<1)return false;
     this.cancel();this.scene.constructionSystem.stopKing();this.actor.stopForBuilding();this.scene.huntingSystem.cancel?.();this.scene.mountSystem.cancel?.();this.scene.treasureSystem.cancelRequest?.();
     const route=this.storage.route(this.actor,[source]);if(!route)return false;
     const id=`king-transfer-${this.nextId++}`,stockReservation=this.storage.reserve('stock',locationId,resource,amount,id);if(!stockReservation)return false;
@@ -77,7 +77,7 @@ export class KingLogisticsSystem {
       const drop=choice.sourceDropId&&this.scene.dropSystem.drops.get(choice.sourceDropId),source=drop?{...drop.tile,kind:'ground',width:1,height:1}:this.storage.locations.get(choice.sourceId),destination=this.storage.locations.get(choice.destinationId);
       if(!source||!destination||drop&&!this.scene.workerSystem.reservations.available(`drop:${drop.id}`,'king'))continue;
       const route=this.storage.route(actor,[source]);if(!route||!this.storage.route(actor,[destination]))continue;
-      const amount=Math.min(20,choice.amount,this.storage.room(destination.id));if(amount<1)continue;
+      const amount=Math.min(carryCapacity(actor,choice.resource),choice.amount,this.storage.room(destination.id));if(amount<1)continue;
       const id=`king-transfer-${this.nextId++}`,capacityReservation=this.storage.reserve('capacity',destination.id,choice.resource,amount,id);if(!capacityReservation)continue;
       this.storage.reservations.get(capacityReservation).siteId=site.id;
       const stockReservation=drop?null:this.storage.splitStock(choice.allocationId,amount,id);

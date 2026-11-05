@@ -49,6 +49,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - The Castle no longer covers the king when he stands in front of it, and the starting stockpile now appears in front of the Castle instead of behind it.
 
 ### Changed
+- Carrying now goes by weight: every resource has a load weight (Stone 10, Iron Ore 10, Wood 5, Iron Bar 5, Armor 8, Sword 4, Bow 3, food 1) and a person carries 40 load units. That is 4 Stone, 8 Wood or 40 food per trip; Haulers gain 2 more units every 5 Logistics levels. This applies to the King, Haulers, Builders and workshop carriers alike, and the unit panel shows the capacity in load units.
 - Trampled paths look natural:
   - a single track gently meanders and runs on across tile edges without breaks;
   - turns and junctions are rounded, instead of a star of straight spokes and cross-hatching;
