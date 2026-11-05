@@ -37,8 +37,14 @@ export async function i18nGameSmoke(page){
   await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.unitPanel.open(s.character);});await page.locator('#unit-dialog[open]').waitFor();
   assert.match(await text('#unit-level'),/^Úroveň \d+ \/ \d+$/);assert.equal(await text('#unit-dialog h3[data-i18n="unit.skills"]'),'Dovednosti');assert.doesNotMatch(await page.locator('#unit-dialog').innerText(),/undefined|\{\w+\}/);
   await page.locator('#close-unit').click();
+  // Population sidebar and Asset Library in Czech.
+  await page.locator('#population-tab').click();await page.locator('#population-panel.open').waitFor();
+  assert.match(await text('#population-summary'),/^Obyvatelé: \d+ · zaměstnaní: \d+ · nezaměstnaní: \d+$/);assert.equal(await page.locator('#population-order option[value="desc"]').textContent(),'Sestupně');
+  assert.doesNotMatch(await page.locator('#population-panel').innerText(),/undefined|\{\w+\}/);await page.locator('#close-population').click();
+  await page.locator('#asset-library-button').click();await page.locator('#asset-gallery[open]').waitFor();
+  assert.match(await text('#asset-count'),/^\d+ \/ \d+ objektů$/);assert.doesNotMatch(await page.locator('#asset-gallery').innerText(),/undefined|\{\w+\}/);await page.locator('#close-asset-gallery').click();
   await page.locator('#settings-button').click();await page.locator('#settings-language').selectOption('en');await page.locator('#close-settings').click();
   assert.match(await text('#game-time'),/^Day \d+ \| /);assert.equal(await text('#buildings-tab'),'Buildings');assert.match(await text('#king-level'),/^King \| LVL \d+$/);
   assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.objectRegistry.require('warehouse').name),'Warehouse');
-  console.log('PASS in-game language switch from Settings: day, season, sight, HP, level, Buildings tab, object names, storage and character panels follow at once; pickers in sync; back to English');
+  console.log('PASS in-game language switch from Settings: day, season, sight, HP, level, Buildings tab, object names, storage, character, population and Asset Library panels follow at once; pickers in sync; back to English');
 }
