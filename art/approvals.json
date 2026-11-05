@@ -67,7 +67,7 @@
       }
     },
     "worn-path": {
-      "preferred": "worn-path-moss",
+      "preferred": "worn-path-earth",
       "variants": {
         "worn-path-moss": {
           "status": "approved",
