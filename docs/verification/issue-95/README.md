@@ -52,11 +52,12 @@ schema save round-trips exactly; the derived mask rebuilds after Load.
 - `tests/wildlife-clearance.test.js`: immediate/diagonal clearance, entire route
   through a narrow-gap scenario, new structure during movement, escape, hunting
   retaliation, mounting/dismounting, initial counts and respawn, unchanged fog,
-  exact current Save/Load and 200 animals reusing the mask.
+  exact current Save/Load and 200 animals reusing the mask, plus a cramped map with no safe wildlife
+  positions that must still spawn its interactive horse.
 - `scripts/wildlife-clearance-smoke.mjs`: real game placement and native wander,
   open ordinary terrain, unchanged exploration and world restoration. Included
   in `--full`, or run with `--current-only --wildlife-clearance`.
-- Local gate: 569 tests passed; changelog validation, build:pages and the relevant
+- Local gate: 570 tests passed; changelog validation, build:pages and the relevant
   browser smoke passed. PR/CI/merge/deployment evidence is recorded in Issue95.
 
 The before image is from the existing C05 build; the after image is from this

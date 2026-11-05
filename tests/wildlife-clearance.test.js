@@ -55,3 +55,8 @@ test('200 idle animals reuse the same mask; building removal invalidates it once
  const s=scene(),b=building(s);for(let i=0;i<200;i++){const a=animal(s,5+i%20,5+Math.floor(i/20));a.wanderWait=1e8;}const c=s.animalSystem.clearance,revision=c.revision,started=performance.now();for(let i=0;i<100;i++)s.animalSystem.update(16);const elapsed=performance.now()-started;assert.equal(c.revision,revision);assert.ok(elapsed<1500,`200 animals / 100 frames: ${elapsed.toFixed(1)} ms`);
  assert.equal(c.isClear({x:49,y:50}),false);s.buildings.splice(s.buildings.indexOf(b),1);s.animalSystem.update(16);assert.equal(c.revision,revision+1);assert.equal(c.isClear({x:49,y:50}),true);
 });
+
+
+test('a cramped world with no safe wildlife ring still spawns its interactive horse on ordinary free terrain',()=>{
+ const s=scene();s.map=Array.from({length:3},()=>Array(3).fill(0));building(s,1,1);s.animalSystem.spawn({x:0,y:0});assert.equal([...s.animalSystem.animals.values()].filter(a=>a.definition.gameplay.huntable).length,0);assert.equal([...s.animalSystem.animals.values()].filter(a=>a.type==='horse').length,1);
+});

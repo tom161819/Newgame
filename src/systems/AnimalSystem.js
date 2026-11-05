@@ -11,11 +11,13 @@ export class AnimalSystem {
   spawn(start){
     const definitions=this.scene.objectRegistry.byCategory('animal');this.clearance.refresh();
     const positions=generateResourcePositions(this.scene.map,start,this.scene.map.length*this.scene.map[0].length,this.random,this.scene.resourceOccupancy);
+    const safe=positions.filter(tile=>this.clearance.isClear(tile)),used=new Set();
     for(const definition of definitions)for(let i=0;i<animalInitialCount(definition,this.scene.gameSettings);i++){
-      let tile=positions.pop();if(definition.gameplay.huntable)while(tile&&!this.clearance.isClear(tile))tile=positions.pop();if(!tile)break;
-      this.create(definition,tile);
+      const pool=definition.gameplay.huntable?safe:positions;let tile=pool.pop();while(tile&&used.has(`${tile.x},${tile.y}`))tile=pool.pop();if(!tile)break;
+      used.add(`${tile.x},${tile.y}`);this.create(definition,tile);
     }
   }
+
   create(definition,tile,id=`animal-${this.nextId++}`){
     const view=this.scene.assets.createView(definition.id,{...tileCenter(tile),tile});
     const animal=new AnimalController(this.scene,definition,id,tile,view);
