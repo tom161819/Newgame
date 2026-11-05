@@ -60,12 +60,13 @@ export async function hiddenInteractionSmoke(page){
   await clickTile({x:96,y:95});assert.equal(await page.locator('#status').textContent(),first);assert.equal(await page.locator('#object-tooltip').evaluate(e=>e.hidden),true);
   // Stop the king and the camera that followed him, so the next clicks land on the same hidden tiles.
   await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,c=s.cameras.main;s.character.stopForBuilding();s.worldCamera.following=false;s.worldCamera.panTarget=null;c.centerOn(3200,3150);c.preRender();});
+  const stone=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,cost=s.objectRegistry.require('tower').cost.stone;s.inventory.add('stone',cost);s.updateInventory();return cost;});
   await page.locator('#buildings-tab').click();await page.locator('[data-building-category="defense"]').click();await page.locator('#tower-choice').click();await clickTile({x:95,y:95});
   // A blueprint outside sight is provisional: placed without revealing anything, claiming no hidden ground until seen.
   assert.match(await page.locator('#status').textContent(),/blueprint placed in unexplored land/);
   const provisional=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,b=s.buildings.at(-1);return {count:s.buildings.length,unverified:b.unverified,map:b.tiles.map(t=>s.map[t.y][t.x]),terrain:b.tiles.map(t=>s.terrainGrid[t.y][t.x]),remembered:s.mapMemory.objects.has(`building:${b.id}`)};});
   assert.equal(provisional.count,original.count+1);assert.equal(provisional.unverified,true);assert.deepEqual(provisional.map,provisional.terrain);assert.equal(provisional.remembered,true);
-  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.constructionSystem.cancel(s.buildings.at(-1));});assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.buildings.length),original.count);
+  await page.evaluate(stone=>{const s=window.__game.registry.get('application').scene;s.constructionSystem.cancel(s.buildings.at(-1));s.inventory.spend('stone',stone);s.updateInventory();},stone);assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.buildings.length),original.count);
   await page.locator('#settings-button').click();await page.locator('#fog-toggle').uncheck();await page.locator('#path-wear-toggle').uncheck();await page.locator('#close-settings').click();
   await page.evaluate(original=>{const s=window.__game.registry.get('application').scene,c=s.cameras.main;c.setZoom(original.zoom).centerOn(original.x,original.y);c.preRender();s.worldCamera.following=original.following;s.refreshVisibility();},original);
   console.log('PASS real hidden map clicks send the king into the unknown with one generic message, no tooltip or live path-wear data; a hidden tower blueprint is provisional and claims no hidden ground');
