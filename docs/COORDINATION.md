@@ -6,14 +6,14 @@ Files held lists the files a task changes. Another task avoids them unless neces
 
 ## Agreed merge order
 
-None pending. Add entries here when one pull request must wait for another.
+Codex PR138 (#131) first; PR142 (#122) then integrates that actual merge/schema26 and repeats relevant checks. Verify predecessor Pages success before merging the next PR.
 
 ## Active
 
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| NEW14 (#131) Employment exclusions | Codex | `codex/employment-exclusions` | [#138](https://github.com/tom161819/Newgame/pull/138) | Draft PR; S12 phase A and FoW fixes integrated from maina6442d5, schema26 preserved; fresh integrated checks running | EmploymentSystem/data employment, WorkplaceSystem assignment guard, WorkplacePanel, own EN/CS block, schema+employment validation only in GameStateSerializer, tests/browser smoke (ledger/smelting/military schema assertions use authored SAVE_VERSION), docs/changelog. Other S12 held logistics untouched. |
+| NEW14 (#131) Employment exclusions | Codex | `codex/employment-exclusions` | [#138](https://github.com/tom161819/Newgame/pull/138) | Draft PR; S12 phase A and FoW fixes integrated from maina6442d5, schema26 preserved; 616 tests, changelog/build and UI/staffing/priority Save26 browser PASS after integration; ready for current-head CI | EmploymentSystem/data employment, WorkplaceSystem assignment guard, WorkplacePanel, own EN/CS block, schema+employment validation only in GameStateSerializer, tests/browser smoke (ledger/smelting/military schema assertions use authored SAVE_VERSION), docs/changelog. Other S12 held logistics untouched. |
 | S11 (#56) Stone Pavement | Claude | `claude/s11-stone-pavement` | — | PR open; 606 tests, 51 full smokes PASS | data/pavement.js, data/objects/pavement.js, game/pavement.js, game/PavementTool.js, game/PavementView.js, game/cobbles.js (new); PathWearSystem (paved layer), MapMemory + validation, TerrainRenderer, ConstructionSystem (pavement sites), ObjectRegistry (mode), GameScene, GameStateSerializer (SAVE_VERSION 24), i18n, style.css, public/assets/buildings/stone_pavement, tests, smokes, UPGRADE_PROGRESS. |
 | House (#57, House part only; developer priority) | Claude | `claude/house-population-capacity` | — | PR open; 589 tests, 47 full smokes PASS | data/objects/housing.js (new), objects/index.js, approvedArt.js (house), jobs.js (houseCapacity), WorkerSystem.js (capacity), i18n objects, public/assets/buildings/house, tests. |
 | S12 phase A (#57) Carry weights | Claude | `claude/s12-carry-weights` | — | PR open; 611 tests, 52 full smokes PASS | data/logistics.js (weights, 40 load units), KingLogisticsSystem, FoodProductionSystem, LogisticsTaskManager, DropSystem, FoodStateValidation, GameStateSerializer (SAVE_VERSION 25), transportLabels, UnitPanel, i18n, logistics tests. |
