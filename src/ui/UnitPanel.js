@@ -12,7 +12,7 @@ export class UnitPanel {
     document.querySelector('#close-unit').addEventListener('click',()=>this.close(),options);
     document.querySelector('#king-profile').addEventListener('click',()=>this.open(scene.character),options);
     this.jobSelect=document.querySelector('#assign-job');this.jobSelect.replaceChildren(...Object.entries(JOBS).map(([id,job])=>{const option=element('option','',job.name);option.value=id;return option;}));
-    this.jobSelect.addEventListener('change',()=>{if(this.unit)scene.workerSystem.jobs.assign(this.unit,this.jobSelect.value);this.refresh();},options);
+    this.jobSelect.addEventListener('change',()=>{if(this.unit){if(this.jobSelect.value==='idle')scene.employment?.hold(this.unit);else scene.employment?.release(this.unit);scene.workerSystem.jobs.assign(this.unit,this.jobSelect.value);}this.refresh();},options);
     this.stoneToggle=document.querySelector('#stone-collect');this.stoneRadius=document.querySelector('#stone-radius');
     this.stoneToggle.addEventListener('change',()=>{if(this.unit?.profession==='hauler'){(this.unit.stoneCollection??=defaultStoneCollection()).enabled=this.stoneToggle.checked;this.refresh();}},options);
     this.stoneRadius.addEventListener('change',()=>{if(this.unit?.profession==='hauler'){const v=Math.min(IDLE_STONE.maxRadius,Math.max(0,Math.round(Number(this.stoneRadius.value))));(this.unit.stoneCollection??=defaultStoneCollection()).radius=Number.isFinite(v)?v:IDLE_STONE.defaultRadius;this.refresh();}},options);

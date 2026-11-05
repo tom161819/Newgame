@@ -171,7 +171,7 @@ export class FoodProductionSystem {
   update(delta){
     if(this.scene.gameOver||this.scene.gameTime.paused)return;
     if(this.scene.gameTime.totalElapsed>=this.nextEmployment){this.nextEmployment=this.scene.gameTime.totalElapsed+FOOD_RULES.searchInterval;
-      for(const record of this.records.values()){const building=this.building(record.buildingId);if(record.auto&&building&&buildingDefinition(building).autoEmployment)this.scene.workplaceSystem.autoEmploy(building);}}
+      for(const record of this.records.values()){const building=this.building(record.buildingId);if(record.auto&&building&&buildingDefinition(building).autoEmployment){if(this.scene.employment)this.scene.employment.request();else this.scene.workplaceSystem.autoEmploy(building);}}}
     for(const worker of this.scene.workerSystem.liveWorkers()){
       const task=worker.workTask;if(task?.hauling&&task.kind==='foodDeliver'&&task.loadedPosition){task.loadedDistance+=Math.hypot(worker.position.x-task.loadedPosition.x,worker.position.y-task.loadedPosition.y);task.loadedPosition={...worker.position};}
       this.transfer(worker);

@@ -9,6 +9,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { browserRuntime } from './browser-runtime.mjs';
 import { projectBase } from './archive-lib.mjs';
+import { employmentSmoke } from './employment-smoke.mjs';
 import { buildingMenuSmoke,buildingUnlockGameplaySmoke } from './building-menu-smoke.mjs';
 import { seasonsMenuSmoke } from './seasons-menu-smoke.mjs';
 import { seasonTransitionSmoke } from './season-transition-smoke.mjs';
@@ -81,6 +82,8 @@ try{
 
   if(args.includes('--full')||args.includes('--i18n'))await i18nSmoke(page);
   await page.locator('#new-game').click();await page.locator('.setup-advanced summary').click();await page.locator('#setup-fog').uncheck();await page.locator('#setup-respawn').selectOption('off');
+  // Residents stay where the smokes put them; Auto Employment has its own smoke.
+  assert.equal(await page.locator('#setup-auto-employment').isChecked(),true);await page.locator('#setup-auto-employment').uncheck();
   if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full'))await page.locator('#setup-seasons').uncheck();}
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
@@ -92,6 +95,7 @@ try{
   if(args.includes('--full')||args.includes('--forestry-workers'))await forestryHutSmoke(page);
   if(args.includes('--full')||args.includes('--population')){await populationSidebarSmoke(page);await populationNavigationSmoke(page);await populationIntegrationSmoke(page);}
   if(args.includes('--full')||args.includes('--staffing'))await staffingIndicatorsSmoke(page);
+  if(args.includes('--full')||args.includes('--employment'))await employmentSmoke(page);
   if(args.includes('--full')||args.includes('--fog')){await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);await hiddenInteractionSmoke(page);}
   if(args.includes('--full')||args.includes('--i18n'))await i18nGameSmoke(page);
   if(args.includes('--full')||args.includes('--save-transfer'))await saveTransferSmoke(page);

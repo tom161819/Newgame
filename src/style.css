@@ -433,3 +433,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .candidate-portrait { width:28px; height:34px; object-fit:contain; flex-shrink:0; }
 .candidate-details { display:grid; gap:2px; flex:1; min-width:0; }
 .candidate-details span { color:#c9c3a3; font-size:11px; }
+
+/* Castle employment priorities: a side panel beside the map, not a modal dialog. */
+.employment-panel { position:fixed; right:58px; top:96px; z-index:30; width:min(320px,calc(100vw - 32px)); max-height:calc(100dvh - 140px); overflow:auto; padding:14px; border:1px solid var(--line,#978657); border-radius:12px; background:linear-gradient(180deg,#343a2a,#2b3023); box-shadow:0 18px 48px rgb(6 9 5 / .55); }
+.employment-panel h2 { font-size:15px; margin:0; }
+.employment-help, .employment-state { font-size:12px; color:#c9c3a3; margin:8px 0; }
+.employment-presets { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0; }
+.employment-presets button { font-size:12px; padding:6px 9px; }
+.employment-presets button[aria-checked="true"] { border-color:#e2c673; background:#555b3c; }
+.employment-priorities { list-style:none; padding:0; margin:0; display:grid; gap:6px; }
+.employment-row { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:13px; }
+.employment-row select { padding:4px 8px; font:inherit; background:#26321f; color:#ece2c4; border:1px solid #91835b; border-radius:4px; }
+@media(max-width:600px) { .employment-panel { right:16px; left:16px; width:auto; top:72px; } }

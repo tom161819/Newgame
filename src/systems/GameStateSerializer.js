@@ -18,11 +18,12 @@ import { repairTransportInstructions } from './TransportStateMigration.js';
 import { captureMapKnowledge } from '../game/mapMemoryObjects.js';
 import { validateMapMemory } from './MapMemoryValidation.js';
 import { FORESTRY,emptyNaturalState } from '../data/naturalResources.js';
+import { EMPLOYMENT_PROFESSIONS,PRIORITY_RANGE } from '../data/employment.js';
 import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=19;
+export const SAVE_VERSION=20;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -56,6 +57,7 @@ export function serializeGameState(scene){
     ...(scene.constructionSystem?{constructionSystem:scene.constructionSystem.exportState()}:{}),
     ...(scene.farmingSystem?{farming:scene.farmingSystem.exportState()}:{}),
     ...(scene.seasons?{seasons:scene.seasons.exportState()}:{}),
+    ...(scene.employment?{employment:scene.employment.exportState()}:{}),
     ...(scene.kingLogistics?{kingLogistics:scene.kingLogistics.exportState()}:{}),
     ...(scene.logisticsTasks?{logistics:{version:1,...(scene.constructionSystem?.materials.enabled?{materialsVersion:1}:{})}}:{}),
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
@@ -335,5 +337,9 @@ export function validateGameState(input,registry=objectRegistry){
   validateSeasonFoodState(s,{check,number,integer,array});
   check(typeof s.settings.explorationMode==='boolean');
   validateMapMemory(s.exploration,registry,{check,number,integer,array});
+  // Automatic employment: ON/OFF, a 1–5 priority for every workplace profession, residents held Unemployed by hand.
+  if(s.employment!==undefined){const e=s.employment;check(e&&typeof e==='object'&&Object.keys(e).sort().join()==='enabled,held,priorities'&&typeof e.enabled==='boolean');
+    check(e.priorities&&typeof e.priorities==='object'&&Object.keys(e.priorities).sort().join()===[...EMPLOYMENT_PROFESSIONS].sort().join());for(const value of Object.values(e.priorities))integer(value,PRIORITY_RANGE.min,PRIORITY_RANGE.max);
+    array(e.held);check(new Set(e.held).size===e.held.length&&e.held.every(id=>wIds.has(id)));}
   return s;
 }
