@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| C04 (#51) Production diagnostics notices | Claude (taken over from Codex) | `claude/c04-production-diagnostics` | — | In progress | src/data/diagnostics.js, src/systems/ProductionDiagnostics.js, src/ui/NoticesPanel.js, index.html (notices panel), GameScene.js (create/update/destroy only), i18n notice keys, style.css (appended block), scripts/{browser,notices}-smoke.mjs, tests/production-diagnostics.test.js. |
+| N12 (#87) Organic path wear, trodden areas | Claude | `claude/path-wear-natural-areas` | — | In progress | src/game/TerrainRenderer.js (path geometry, two-pass chunk paint, wear invalidation reach), tests/path-wear-render.test.js. |
 | C05 (#52) Unit selection, Move/Hold Position | Codex | `codex/…` | — | Ready (developer's request) | Codex registers its files; avoid the C04 files above. Claude opens/merges the PR when Codex reports DONE-READY in #52. |
 
 ## Kept backups (do not delete without the developer)
@@ -22,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-05 [#106](https://github.com/tom161819/Newgame/pull/106) C04: right-bottom notices for lasting production and work blockers. Issue #51 (Claude).
 - 2026-11-05 [#90](https://github.com/tom161819/Newgame/pull/90) C03: Auto Employment with Castle Employment Priorities (SAVE_VERSION 20). Issue #50 done and closed (Claude).
 - 2026-11-05 [#89](https://github.com/tom161819/Newgame/pull/89) C02: Assign Worker in three sorted groups with move confirmation; the Granary reports no false Missing Workers. Issue #49 done and closed (Claude).
 - 2026-11-05 [#85](https://github.com/tom161819/Newgame/pull/85), [#86](https://github.com/tom161819/Newgame/pull/86), [#88](https://github.com/tom161819/Newgame/pull/88) C01: no stuck visibility, subjects see 15 tiles, the king explores unknown land, provisional blueprints outside sight (SAVE_VERSION 19). Taken over from Codex; Issue #48 done and closed (Claude).
