@@ -13,7 +13,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| NEW08-B (#125) Food chain completion notices | Codex | `codex/food-chain-completion-notices` | [#137](https://github.com/tom161819/Newgame/pull/137) | Implemented after verified #102 Pages; 602 tests after C08/schema23 integration, changelog, build:pages and chain-notices + C04 browser smoke PASS; GitHub push restored; PR/CI pending | ProductionDiagnostics.js, data/diagnostics.js, own EN/CS block, focused tests/browser smoke, docs/changelog. No C08 held systems or persistent schema edits. |
+| NEW14 (#131) Employment exclusions | Codex | `codex/employment-exclusions` | — | Implemented from8871f60; 614 tests/build/browser controls PASS before S12 integration; schema26 reserved, integrate actual merged S12 phase A/schema25 before ready/merge | EmploymentSystem/data employment, WorkplaceSystem assignment guard, WorkplacePanel, own EN/CS block, schema+employment validation only in GameStateSerializer, tests/browser smoke (ledger/smelting/military schema assertions use authored SAVE_VERSION), docs/changelog. Other S12 held logistics untouched. |
 | S11 (#56) Stone Pavement | Claude | `claude/s11-stone-pavement` | — | PR open; 606 tests, 51 full smokes PASS | data/pavement.js, data/objects/pavement.js, game/pavement.js, game/PavementTool.js, game/PavementView.js, game/cobbles.js (new); PathWearSystem (paved layer), MapMemory + validation, TerrainRenderer, ConstructionSystem (pavement sites), ObjectRegistry (mode), GameScene, GameStateSerializer (SAVE_VERSION 24), i18n, style.css, public/assets/buildings/stone_pavement, tests, smokes, UPGRADE_PROGRESS. |
 | House (#57, House part only; developer priority) | Claude | `claude/house-population-capacity` | — | PR open; 589 tests, 47 full smokes PASS | data/objects/housing.js (new), objects/index.js, approvedArt.js (house), jobs.js (houseCapacity), WorkerSystem.js (capacity), i18n objects, public/assets/buildings/house, tests. |
 
@@ -23,6 +23,8 @@ None pending. Add entries here when one pull request must wait for another.
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-05 [#137](https://github.com/tom161819/Newgame/pull/137) NEW08-B #125: food-chain completion advice via existing diagnostics/bus/panel, merge8871f60. Integrated C08/S11 schema24; 609 tests, changelog/build and chain-notices/C04/pavement browser checks passed. CI42072991047 success for e5d0996; [Pages42073363443](https://github.com/tom161819/Newgame/actions/runs/42073363443) build+deploy succeeded for exact merge, including full browser/save/archive/Studio. Issue125 closed/done. Original commit_refs_rules blockage resolved with ordinary push.
 
 - 2026-11-05 [#134](https://github.com/tom161819/Newgame/pull/134) AUD78 #102: manual king stone delivery, merge2d9a357. 592 tests, changelog, build:pages, real HUD click/standing/cargo Save/Load and Hauler smoke PASS. CI42057853531 success for09eabd0; [Pages42058257302](https://github.com/tom161819/Newgame/actions/runs/42058257302) build+deploy succeeded for exact merge with full browser/save/archive/Studio gates. Issue102 closed/done. C07/schema22 and House preserved.
 

@@ -68,3 +68,11 @@ Issue125 uses the existing completion ActivityBus event, ProductionDiagnostics a
 Validation: 595/595 tests (8 diagnostics cases), changelog:validate, build:pages and browser --current-only --chain-notices --notices PASS.
 
 Resumed after GitHub commit_refs_rules recovery: normal push succeeded. Integrated C08 main5737395/schema23 without changing its model; preserved both sides of changelog/coordination conflicts. Integrated 602/602 tests, changelog:validate, build:pages and --current-only --chain-notices --notices browser smoke PASS.
+
+NEW08-B verified completion: [PR137](https://github.com/tom161819/Newgame/pull/137), merge8871f6086e7aae9c2c8a9675baf3e7a776873a62. Integrated C08/S11 schema24, 609 tests plus changelog/build and browser notices/C04/pavement PASS; current-head CI42072991047 succeeded. [Pages42073363443](https://github.com/tom161819/Newgame/actions/runs/42073363443) completed full browser/Save/Load, unchanged archive, Studio build and actual deploy successfully for the exact merge. Issue125 closed/done.
+
+## NEW14 implementation — 2026-11-05
+
+Issue131 extends the existing EmploymentSystem with blocked building IDs and blocked type IDs. Type exclusion wins; a local allow never bypasses it. WorkplaceSystem rejects all new automatic/manual assignments centrally before detaching anyone, while existing employees stay. Unblocking requests a normal scheduler pass, respecting capacities and held residents. WorkplacePanel shows both independent controls and the reason; a successful manual assignment alone clears the resident hold. Removed instances are pruned from the local set; type exclusions remain for future buildings. Both sets are included in the exact validated employment state. Schema26 is reserved after Claude's S12 phase A/schema25; integrate that actual merged source before marking the PR ready. No cargo/production/storage logic changes. Browser schema assertions read the authored SAVE_VERSION instead of stale literals.
+
+Validation before S12 integration: 614 tests, changelog:validate and build:pages PASS. Browser --current-only --employment-exclusions --employment --staffing PASS, including real local/type controls in two same-type buildings, disabled manual Assign, retained employees, safe auto resume, exact rule Save/Load and original staffing/priority regressions.
