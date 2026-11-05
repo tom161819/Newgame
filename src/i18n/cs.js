@@ -148,6 +148,7 @@ export default {
   'transfer.notExport':'Tento soubor není export uložené hry Medieval Kingdom.','transfer.damaged':'Soubor s uloženou hrou je poškozený nebo nekonzistentní a nebyl importován.','transfer.noState':'Tato uložená hra nemá žádný stav k exportu.','transfer.importedName':'Importované království',
   'settings.title':'Nastavení','settings.close':'Zavřít nastavení','settings.fog':'Mlha války','settings.exploration':'Průzkum','settings.fogHint':'Omezí viditelnost objektů podle dohledu krále. Terén zůstává viditelný.',
   'settings.seasons':'Roční období','settings.seasonsHint':'VYP ponechá trvalé léto a zapamatuje si cyklus ročních období. Počasí a herní dny pokračují.',
+  'dev.title':'Vývojář','dev.showFps':'Zobrazit FPS · F3','dev.showFpsHint':'Snímky za sekundu, nejpomalejší snímek a zadrhnutí nad 50 ms za posledních 5 sekund. Uloženo jen v tomto prohlížeči, nikdy v uložené hře.','dev.fpsOverlay':'{fps} FPS · nejpomalejší {worst} ms · zadrhnutí {stutters} (5 s) · {renderer} · přiblížení {zoom}',
   'settings.pathWear':'Ladění vyšlapaných cest','settings.pathWearHint':'Barvy vyšlapání a počet průchodů pod ukazatelem myši.','settings.gameMenu':'Herní menu',
   'settings.renderer':'Vykreslování:','settings.rendererHint':'Vykreslování zvolíš parametrem ?renderer=canvas, ?renderer=webgl nebo ?renderer=auto v adrese stránky.',
   'autosave.toggle':'Automatické ukládání','autosave.every':'Ukládat každých','autosave.interval':{one:'{count} minutu',few:'{count} minuty',many:'{count} minuty',other:'{count} minut'},

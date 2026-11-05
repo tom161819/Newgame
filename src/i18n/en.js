@@ -148,6 +148,7 @@ export default {
   'transfer.notExport':'This file is not a Medieval Kingdom save export.','transfer.damaged':'The save file is damaged or inconsistent and was not imported.','transfer.noState':'This save has no game state to export.','transfer.importedName':'Imported kingdom',
   'settings.title':'Settings','settings.close':'Close settings','settings.fog':'Fog of War','settings.exploration':'Exploration','settings.fogHint':'Limits object visibility to the king\'s sight. Terrain stays visible.',
   'settings.seasons':'Seasons','settings.seasonsHint':'OFF keeps permanent summer and remembers the seasonal cycle. Weather and game days continue.',
+  'dev.title':'Developer','dev.showFps':'Show FPS · F3','dev.showFpsHint':'Frames per second, the slowest frame and stutters over 50 ms in the last 5 seconds. Stored in this browser only, never in a save.','dev.fpsOverlay':'{fps} FPS · slowest {worst} ms · stutters {stutters} (5 s) · {renderer} · zoom {zoom}',
   'settings.pathWear':'Show Path Wear Debug','settings.pathWearHint':'Wear colours and pass counts under the mouse pointer.','settings.gameMenu':'Game menu',
   'settings.renderer':'Renderer:','settings.rendererHint':'Choose the renderer with ?renderer=canvas, ?renderer=webgl or ?renderer=auto in the page address.',
   'autosave.toggle':'Autosave','autosave.every':'Autosave every','autosave.interval':{one:'{count} minute',other:'{count} minutes'},
