@@ -13,6 +13,8 @@ const TILE_BLEED = .8;
 const SEASON_TINT={Spring:[95,145,65,.08],Summer:[185,159,70,.09],Autumn:[158,105,45,.17],Winter:[232,237,220,.83]};
 function mixTint(from,to,t){const a=SEASON_TINT[from],b=SEASON_TINT[to];if(!a||!b)return null;const c=a.map((v,i)=>v+(b[i]-v)*t);return`rgba(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])},${c[3].toFixed(3)})`;}
 
+const WINTER_VEIL=[0,1.9,1.3,1]; // light tracks fade most under snow
+function mixColour(a,b,t){const p=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)),x=p(a),y=p(b);return`rgb(${x.map((v,i)=>Math.round(v+(y[i]-v)*t)).join(',')})`;}
 function terrainHash(x, y) { return ((Math.imul(x + 17, 374761393) ^ Math.imul(y + 29, 668265263)) >>> 0); }
 
 export class TerrainRenderer {
@@ -50,22 +52,54 @@ export class TerrainRenderer {
     }
     this.lastView='';
   }
-  drawConnections(context,x,y,left,top){
-    const tile={x,y},remembered=this.fog?.enabled&&this.memory,level=remembered?this.tileData(tile)[1]:this.wear?.level(tile)??0;if(!level)return;
-    const visual=this.registry.require(PATH_WEAR.terrainIds[level]).visual,center=tileCenter(tile);
-    context.save();context.translate(center.x-left,center.y-top);
-    context.beginPath();context.moveTo(-32,0);context.lineTo(0,-16);context.lineTo(32,0);context.lineTo(0,16);context.closePath();context.clip();context.scale(1,.5);context.lineCap='round';
-    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
-      if(!dx&&!dy)continue;const neighbor={x:x+dx,y:y+dy},other=remembered?(this.memory.terrain.get(neighbor.y*this.fog.width+neighbor.x)?.[1]??0):this.wear.level(neighbor);
-      const bit=MEMORY_DIRECTIONS.findIndex(([nx,ny])=>nx===dx&&ny===dy);
-      if(!other||(remembered?!((this.tileData(tile)[3]??0)&(1<<bit)):!canStep(this.scene.map,tile,neighbor)))continue;
-      const neighborVisual=this.registry.require(PATH_WEAR.terrainIds[other]).visual,width=Math.min(visual.pathWidth,neighborVisual.pathWidth);
-      const end={x:(dx-dy)*16,y:(dx+dy)*16},bend=((terrainHash(x+dx,y+dy)%5)-2)*.35;
-      const line=()=>{context.beginPath();context.moveTo(0,0);context.quadraticCurveTo(end.x*.5+bend,end.y*.5-bend,end.x,end.y);context.stroke();};
-      for(let i=visual.pathSoftness??0;i>0;i--){context.strokeStyle=visual.pathEdge;context.lineWidth=width+3+i*3;context.globalAlpha=.16;line();}
-      context.strokeStyle=visual.pathEdge;context.lineWidth=width+3;context.globalAlpha=.6;line();
-      context.strokeStyle=visual.pathColor;context.lineWidth=width;context.globalAlpha=1;line();
+  // Worn grass keeps the tile's own seasonal grass; the approved Earth track is drawn over it as a narrow
+  // strip (soft halo, edge, soil texture from the approved tiles). Every tile draws the strips of all worn
+  // tiles around it, clipped to its own diamond, so a single repainted tile matches a full repaint and the
+  // track runs on across edges, corners and diagonals. Fog mode reads only remembered levels and links.
+  pathLevel(tile){
+    if(tile.x<0||tile.y<0||tile.x>=COLUMNS||tile.y>=ROWS)return 0;
+    return this.fog?.enabled&&this.memory?this.memory.terrain.get(tile.y*this.fog.width+tile.x)?.[1]??0:this.wear?.level(tile)??0;
+  }
+  pathSegments(tile){
+    const level=this.pathLevel(tile);if(!level)return [];
+    const remembered=this.fog?.enabled&&this.memory,visual=this.registry.require(PATH_WEAR.terrainIds[level]).visual,center=tileCenter(tile),start={x:center.x,y:center.y*2};
+    // The track widens a little, unevenly, where feet cross each tile, like the approved Earth track.
+    const hash=terrainHash(tile.x,tile.y),bits=remembered?this.memory.terrain.get(tile.y*this.fog.width+tile.x)?.[3]??0:0,segments=[{level,visual,width:Math.round(visual.pathWidth*(1.05+(hash%5)*.06)),start}];
+    for(const [bit,[dx,dy]]of MEMORY_DIRECTIONS.entries()){
+      const neighbor={x:tile.x+dx,y:tile.y+dy},other=this.pathLevel(neighbor);
+      if(!other||(remembered?!(bits&(1<<bit)):!canStep(this.scene.map,tile,neighbor)))continue;
+      const width=Math.min(visual.pathWidth,this.registry.require(PATH_WEAR.terrainIds[other]).visual.pathWidth),bend=((terrainHash(neighbor.x,neighbor.y)%5)-2)*.35;
+      const end={x:start.x+(dx-dy)*16,y:start.y+(dx+dy)*16};segments.push({level,visual,width,start,end,control:{x:(start.x+end.x)/2+bend,y:(start.y+end.y)/2-bend}});
     }
+    return segments;
+  }
+  pathPattern(context,level){
+    this.pathPatterns??=new Map();if(this.pathPatterns.has(level))return this.pathPatterns.get(level);
+    const key=this.wearTextures?.[level]?.key,id=PATH_WEAR.terrainIds[level];let pattern=null;
+    if(key&&key!==this.groundTextures?.[0]?.key&&this.scene.textures.exists?.(key)&&typeof document!=='undefined'){
+      // The soil at the centre of the approved Earth track tile, repeated in world space.
+      const image=this.scene.textures.get(key).getSourceImage(),scale=image.width/64,crop=document.createElement('canvas');crop.width=24;crop.height=10;
+      crop.getContext('2d').drawImage(image,20*scale,11*scale,24*scale,10*scale,0,0,24,10);
+      pattern=context.createPattern(crop,'repeat');pattern?.setTransform?.(new DOMMatrix().scale(1,2));
+    }
+    this.pathPatterns.set(level,pattern);return pattern;
+  }
+  drawPaths(context,x,y,left,top,veil=0,clip=null){
+    const segments=[];for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)segments.push(...this.pathSegments({x:x+dx,y:y+dy}));
+    if(!segments.length)return;
+    const groups=key=>{const map=new Map();for(const segment of segments){const k=key(segment);if(!map.has(k))map.set(k,[]);map.get(k).push(segment);}return [...map.values()];};
+    // One stroke per group, so overlapping strips never double their transparency.
+    const stroke=(list,style,alpha,width)=>{context.beginPath();for(const s of list){context.moveTo(s.start.x,s.start.y);if(s.end)context.quadraticCurveTo(s.control.x,s.control.y,s.end.x,s.end.y);else context.lineTo(s.start.x+.01,s.start.y);}context.strokeStyle=style;context.globalAlpha=alpha;context.lineWidth=width;context.stroke();};
+    // Snow settles on the track: its colours fade towards snow (light tracks most), so it stays a trodden line.
+    const snow=level=>Math.min(.85,veil*WINTER_VEIL[level]),tone=(colour,level)=>veil>0?mixColour(colour,'#e8eddc',snow(level)):colour;
+    const begin=()=>{context.save();context.translate(-left,-top);context.scale(1,.5);context.lineCap='round';context.lineJoin='round';};
+    // Translucent halo and edge: clipped to the exact diamond, as the 1 px overlap used for opaque ground would double them into seams.
+    context.save();clip?.();begin();
+    for(const list of groups(s=>`${s.level}|${s.width}`)){const {level,visual,width}=list[0],edge=tone(visual.pathEdge,level);for(let i=visual.pathSoftness??0;i>0;i--)stroke(list,edge,.16,width+3+i*3);stroke(list,edge,.6,width+3);}
+    context.restore();context.restore();
+    // Opaque soil core with the approved texture: drawn with the overlap, so tile edges never show a seam.
+    begin();
+    for(const list of groups(s=>`${s.level}|${s.width}`)){const {level,visual,width}=list[0];stroke(list,tone(visual.pathColor,level),1,width);const pattern=this.pathPattern(context,level);if(pattern)stroke(list,pattern,.85*(1-(veil>0?snow(level):0)),width);}
     context.restore();
   }
 
@@ -95,15 +129,15 @@ export class TerrainRenderer {
           context.save();polygon();context.clip();context.clearRect(point.x-left-33,point.y-origin.y-17,66,34);context.restore();
           context.save();polygon(TILE_BLEED);context.clip();
           if(state===VISIBILITY.UNEXPLORED){context.fillStyle='#000';polygon(TILE_BLEED);context.fill();context.restore();continue;}
-          const wear=this.wear?this.wearTextures[level]:null,entry=wear?(wear.variants.length?{key:wear.variants[terrainHash(x,y)%wear.variants.length]}:wear):this.groundTextures[terrainHash(x,y)%this.groundTextures.length];
+          const wear=this.wear?this.wearTextures[0]:null,entry=wear?(wear.variants.length?{key:wear.variants[terrainHash(x,y)%wear.variants.length]}:wear):this.groundTextures[terrainHash(x,y)%this.groundTextures.length];
           if(state===VISIBILITY.EXPLORED)context.filter=`grayscale(${(1-FOG_STYLE.saturation)*100}%) brightness(${(this.fog?.brightness(tile)??FOG_STYLE.brightness)*100}%)`;
           const draw=key=>{const frame=this.scene.textures.get(key).get(key===entry.key?entry.frame:undefined);context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,point.x-left-32,point.y-origin.y-16,64,32);};
           const mix=state===VISIBILITY.VISIBLE?this.seasonMix?.(x,y,season):null;
           // Untouched grass shows the season's own tiles; during a transition the new season fades in over the old one.
-          const seasonal=season=>season==='Summer'?entry.key:this.seasonGrass[season]?.[terrainHash(x,y)%this.seasonGrass[season].length],grassSeason=wear&&level===0&&seasonal(season)&&(!mix||seasonal(mix.from));
+          const seasonal=season=>season==='Summer'?entry.key:this.seasonGrass[season]?.[terrainHash(x,y)%this.seasonGrass[season].length],grassSeason=wear&&seasonal(season)&&(!mix||seasonal(mix.from));
           if(grassSeason&&mix){draw(seasonal(mix.from));context.globalAlpha=mix.amount;draw(seasonal(season));context.globalAlpha=1;}
           else draw(grassSeason?seasonal(season):entry.key);
-          if(this.wear)this.drawConnections(context,x,y,left,origin.y);
+          if(this.wear)this.drawPaths(context,x,y,left,origin.y,mix?(mix.from==='Winter'?1-mix.amount:0)*.45+(season==='Winter'?mix.amount:0)*.45:season==='Winter'?.45:0,()=>{polygon();context.clip();});
           const tint=(mix&&mixTint(mix.from,season,mix.amount))??{Spring:'rgba(95,145,65,.08)',Summer:'rgba(185,159,70,.09)',Autumn:'rgba(158,105,45,.17)',Winter:'rgba(232,237,220,.83)'}[season];
           if(tint&&!grassSeason){context.globalCompositeOperation='source-atop';context.fillStyle=tint;polygon(TILE_BLEED);context.fill();}
           context.restore();

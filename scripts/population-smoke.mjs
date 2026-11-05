@@ -70,6 +70,8 @@ export async function populationNavigationSmoke(page){
   await page.locator('#settings-button').click();await page.locator('#fog-toggle').check();await page.locator('#close-settings').click();
   const fixture=await page.evaluate(()=>{
     const s=window.__game.registry.get('application').scene,occupied=new Set(s.reservedTiles().map(t=>`${t.x},${t.y}`));let hidden,visible;
+    // Every subject now sees around itself; to test a unit outside sight, only the king's sight stays for this fixture.
+    window.__subjectSight=s.fog.providers.get('subjects');s.fog.providers.delete('subjects');s.fog.update();
     for(let y=2;y<98&&(!hidden||!visible);y++)for(let x=2;x<98&&(!hidden||!visible);x++){
       const tile={x,y},key=`${x},${y}`;if(s.map[y][x]!==0||occupied.has(key)||s.resourceOccupancy.has(key))continue;const distance=Math.hypot(x-s.character.tile.x,y-s.character.tile.y);
       if(!hidden&&distance>35){hidden=s.workerSystem.create(tile,{name:'Hidden navigation resident'});occupied.add(key);}
@@ -89,6 +91,7 @@ export async function populationNavigationSmoke(page){
   assert.deepEqual(selected.path,fixture.path);assert.deepEqual(selected.task,fixture.task);assert.equal(selected.profession,fixture.profession);assert.ok(selected.target);assert.equal(selected.highlight,true);
   await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('navigation-smoke',false));await page.waitForFunction(y=>Math.abs(window.__game.registry.get('application').scene.cameras.main.scrollY-y)>1,fixture.camera.y);await page.waitForFunction(target=>{const s=window.__game.registry.get('application').scene,c=s.cameras.main;return Math.hypot(c.scrollX+c.width/2-target.x,c.scrollY+c.height/2-target.y)<3;},selected.target);
   assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').scene.mapMemory.exportState().explored),fixture.explored);
+  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.fog.providers.set('subjects',window.__subjectSight);delete window.__subjectSight;s.fog.update();});
   await page.locator('#population-tab').click();
   await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__navigationReady=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('navigation-smoke',true);window.__navigationReady=true;app.onGameReady=ready;};await app.load(state);},baseline);await page.waitForFunction(()=>window.__navigationReady);assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').snapshot()),baseline);await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('navigation-smoke',false));
   console.log('PASS native hidden Locate refusal and paper-only own-unit inspection, visible single/double click and smooth camera selection without changing route, profession, task or exploration');

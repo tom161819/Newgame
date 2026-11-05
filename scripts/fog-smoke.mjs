@@ -15,9 +15,11 @@ export async function explorationMenuSmoke(page){
   await page.locator('#exploration-toggle').check();await page.locator('#fog-toggle').check();const restored=await sample();assert.deepEqual(restored,black);
   const history=await page.evaluate(()=>{
     const s=window.__game.registry.get('application').scene,old={...s.character.tile},index=old.y*100+old.x;
+    // Subjects standing near the king still see his old tile; leave only the king as a source for this check.
+    const subjects=s.fog.providers.get('subjects');s.fog.providers.delete('subjects');
     const before=s.mapMemory.terrain.get(index)?.slice();s.character.position={x:80.5,y:80.5};s.refreshVisibility();
     const result={state:s.fog.state(old),old:before,remembered:s.mapMemory.terrain.get(index)?.slice(),unknown:s.fog.state({x:95,y:95}),count:s.fog.explored.reduce((a,b)=>a+b,0)};
-    s.character.position={...window.__fogSmoke.position};s.refreshVisibility();return result;
+    s.character.position={...window.__fogSmoke.position};if(subjects)s.fog.providers.set('subjects',subjects);s.refreshVisibility();return result;
   });
   assert.equal(history.state,1);assert.deepEqual(history.remembered,history.old);assert.equal(history.unknown,0);assert.ok(history.count>black.seen);
   const original=await page.evaluate(()=>window.__fogSmoke);await page.locator('#fog-toggle').setChecked(original.fog);await page.locator('#exploration-toggle').setChecked(original.exploration);await page.locator('#close-settings').click();
@@ -31,10 +33,12 @@ export async function staticMemoryRendererSmoke(page){
     const position={...s.character.position},enabled=s.fog.enabled,before=app.snapshot(),memory=new s.mapMemory.constructor(s.fog),renderer=new s.memoryRenderer.constructor(s,memory);
     const types=['tower','castle','wall','granary','wheat_field','orchard','stone','treasure_chest'];
     const entries=types.map((type,index)=>{const d=s.objectRegistry.require(type),kind=d.category==='building'?'building':type==='treasure_chest'?'chest':'resource';return {key:`fixture:${type}`,kind,type,x:s.character.tile.x+2,y:s.character.tile.y+2,width:d.width,height:d.height,visual:{...(d.crop?{stage:3,season:'Summer'}:{}),...(type==='tower'?{construction:{state:'building',progress:50,workDone:10}}:{}),...(type==='treasure_chest'?{opened:true,lid:{y:-38,rotation:-.65}}:{})}};});
+    // Only the king's sight here: subjects standing near his old tile would still see the fixtures.
+    const subjects=s.fog.providers.get('subjects');s.fog.providers.delete('subjects');
     s.fog.setEnabled(true);memory.observeObjects(entries);s.character.position={x:80.5,y:80.5};s.fog.update();renderer.update(s.cameras.main.worldView);
     const rendered=[...renderer.views.keys()],chest=renderer.views.get('fixture:treasure_chest')?.view,field=renderer.views.get('fixture:wheat_field')?.view;
     const visual={chestOpened:chest?.opened,chestLid:chest?.lid?.rotation,fieldStage:field?.stage,fieldSeason:field?.season,fieldTexture:field?.plants[0].texture.key};
-    renderer.destroy();s.character.position=position;s.fog.setEnabled(enabled);s.refreshVisibility();const after=app.snapshot();
+    renderer.destroy();s.character.position=position;if(subjects)s.fog.providers.set('subjects',subjects);s.fog.setEnabled(enabled);s.refreshVisibility();const after=app.snapshot();
     const keys=['inventory','buildings','workers','resources','drops','foodStorage','foodProduction','farming','production','constructionSystem'];
     const unchanged=keys.every(key=>JSON.stringify(before[key])===JSON.stringify(after[key]));s.pauseManager.set('memory-smoke',false);
     return {rendered,visual,unchanged};
