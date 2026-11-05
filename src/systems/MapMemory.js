@@ -31,7 +31,7 @@ export class MapMemory {
         const cornersVisible=!dx||!dy||this.fog.isInSightTile({x:tile.x+dx,y:tile.y})&&this.fog.isInSightTile({x:tile.x,y:tile.y+dy});
         if(this.fog.isInSightTile(next)?cornersVisible&&wear.level(next)>0&&canStep(map,tile,next):(previous?.[3]??0)&(1<<bit))connections|=1<<bit;
       }
-      const data=[value,wear?.level(tile)??0,season,connections];
+      const data=[value,wear?.level(tile)??0,season,connections,wear?.isPaved?.(tile)?1:0];
       if(!previous||data.some((value,i)=>value!==previous[i])){this.terrain.set(index,data);changed.push(tile);}
     }
     if(changed.length)this.revision++;
@@ -42,7 +42,7 @@ export class MapMemory {
     if(fog.enabled){
       const remembered=this.terrain.get(tile.y*fog.width+tile.x);if(remembered)return remembered;
     }
-    return [grid[tile.y]?.[tile.x]??0,wear?.level(tile)??0,season];
+    return [grid[tile.y]?.[tile.x]??0,wear?.level(tile)??0,season,0,wear?.isPaved?.(tile)?1:0];
   }
   exportState(){
     return {version:1,explored:Array.from(this.fog.explored.entries()).filter(([,value])=>value).map(([index])=>index),

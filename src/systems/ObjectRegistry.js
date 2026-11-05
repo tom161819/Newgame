@@ -53,8 +53,8 @@ export function validateDefinition(definition) {
   if (d.visibility !== undefined && (!plainObject(d.visibility) || !finite(d.visibility.multiplier) || d.visibility.multiplier<=0)) fail(id, 'neplatný bonus dohledu.');
   if (d.navigation !== undefined && (!plainObject(d.navigation) || typeof d.navigation.walkableTop!=='boolean'
     || (d.navigation.walkableTop&&(d.category!=='building'||d.width!==1||d.height!==1||!d.interactions.includes('walk_top'))))) fail(id, 'neplatná navigace po vrcholu.');
-  if (d.construction !== undefined && (!plainObject(d.construction) || !['single','line'].includes(d.construction.mode)
-    || (d.construction.mode==='line'&&(d.category!=='building'||d.width!==1||d.height!==1)))) fail(id, 'neplatný režim stavění.');
+  if (d.construction !== undefined && (!plainObject(d.construction) || !['single','line','pavement'].includes(d.construction.mode)
+    || (['line','pavement'].includes(d.construction.mode)&&(d.category!=='building'||d.width!==1||d.height!==1)))) fail(id, 'neplatný režim stavění.');
   if (d.renderer==='fortification'&&(!finite(d.visual?.wallHeight)||d.visual.wallHeight<=0)) fail(id, 'opevnění vyžaduje kladnou výšku stěn.');
   if(d.workplace!==undefined&&(!plainObject(d.workplace)||d.category!=='building'||!Number.isSafeInteger(d.workplace.capacity)||d.workplace.capacity<1
     ||!Object.hasOwn(JOBS,d.workplace.profession)||!SKILL_IDS.includes(d.workplace.skill)||JOBS[d.workplace.profession].skill!==d.workplace.skill))fail(id,'neplatné pracoviště.');

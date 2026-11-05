@@ -81,6 +81,8 @@ import { FarmingPanel } from '../ui/FarmingPanel.js';
 import { FoodStorageSystem } from '../systems/FoodStorageSystem.js';
 import { FoodProductionSystem } from '../systems/FoodProductionSystem.js';
 import { MilitarySystem } from '../systems/MilitarySystem.js';
+import { PavementView } from './PavementView.js';
+import { PavementTool } from './PavementTool.js';
 import { LogisticsTaskManager } from '../systems/LogisticsTaskManager.js';
 import { LegacyStockpileMarkers } from './LegacyStockpileMarkers.js';
 import { cargoLabel,transportLabel } from '../ui/transportLabels.js';
@@ -134,6 +136,7 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('workplace',(_definition,context)=>new WorkplaceView(this,context.building,context.preview));
     this.assets.registerRenderer('food_building',(_definition,context)=>new WorkplaceView(this,context.building,context.preview));
     this.assets.registerRenderer('crop',(_definition,context)=>new CropPlotView(this,context.building,context.preview));
+    this.assets.registerRenderer('pavement',(_definition,context)=>new PavementView(this,context.building,context.preview));
     const base=this.objectRegistry.require('grass'),obstacle=this.objectRegistry.require('rock_outcrop');
     this.terrainGrid=this.loadState?this.loadState.terrain.map(row=>[...row]):createMap(Math.random);
     this.map=this.terrainGrid.map(row=>row.map(value=>(value?obstacle:base).walkable?0:1));
@@ -153,7 +156,7 @@ export class GameScene extends Phaser.Scene {
     this.buildings=[];this.towerViews=new Map();
     this.wallMap=new Map();this.wallPreviews=new Map();this.dragAnchor=null;this.wallLastLine=null;
     this.buildMode=false;this.selectedBuilding=null;this.previewAnchor=null;this.previewTracking=false;this.previewKey=null;
-    this.preview=this.createBuildingView(this.objectRegistry.require('tower'),{x:0,y:0},true);this.preview.setVisible(false);
+    this.preview=this.createBuildingView(this.objectRegistry.require('tower'),{x:0,y:0},true);this.preview.setVisible(false);this.pavementTool=new PavementTool(this);
     this.marker=this.add.graphics().setDepth(9998).setVisible(false);
     const position=tileCenter(PLAYER_START);
     this.player=this.assets.createView('king',position);
@@ -207,7 +210,7 @@ export class GameScene extends Phaser.Scene {
     this.fog.registerSource('subjects',()=>this.workerSystem.liveSubjects().map(subjectSight));
     this.workplaceSystem=new WorkplaceSystem(this);this.workplacePanel=new WorkplacePanel(this);
     this.constructionSystem=new ConstructionSystem(this,{onProgress:site=>this.towerViews.get(site.id)?.updateProgress?.(site),
-      onComplete:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.built',{name:buildingDefinition(site).name}));},
+      onComplete:site=>{this.towerViews.get(site.id)?.destroy();if(buildingDefinition(site).pavement){this.towerViews.delete(site.id);this.terrain.invalidateArea([site]);this.updateInventory();this.constructionUI?.refresh();return;}this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.built',{name:buildingDefinition(site).name}));},
       onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);if(this.mapMemory?.objects.delete(`building:${site.id}`))this.mapMemory.revision++;this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.siteCancelled'));}});
     this.constructionUI=new ConstructionUI(this);
     this.foodProduction=new FoodProductionSystem(this);this.military=new MilitarySystem(this);this.employment=new EmploymentSystem(this,{enabled:this.gameSettings.autoEmployment});this.diagnostics=new ProductionDiagnostics(this);this.employmentPanel=new EmploymentPanel(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.kingCargoControl=new KingCargoControl(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
@@ -242,7 +245,7 @@ export class GameScene extends Phaser.Scene {
     this.input.mouse.disableContextMenu();
     this.unitSelection=new UnitSelection(this);
     this.input.on('pointerdown',pointer=>{if(!this.unitSelection.down(pointer))this.handleClick(pointer);});
-    this.input.on('pointerup',pointer=>{if(this.unitSelection.up(pointer))return;if(this.dragAnchor&&pointer.leftButtonReleased())this.confirmWallLine(pointer);});
+    this.input.on('pointerup',pointer=>{if(this.unitSelection.up(pointer))return;if(this.pavementTool?.anchor&&this.pavementTool.active()&&pointer.leftButtonReleased()){this.pavementTool.confirm(this.pointerTile(pointer));return;}if(this.dragAnchor&&pointer.leftButtonReleased())this.confirmWallLine(pointer);});
     this.input.on('pointerupoutside',()=>{this.unitSelection.cancelDrag();this.clearWallPreviews();});
     this.input.on('pointermove',pointer=>{this.unitSelection.move(pointer);this.updateHover(pointer);if(this.buildMode&&!this.assetGallery.isOpen){if(!this.dragAnchor)this.wallLastLine=null;this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
     this.input.on('gameout',()=>{this.unitSelection.cancelDrag();this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;this.clearWallPreviews();document.querySelector('#object-tooltip').hidden=true;});
@@ -260,7 +263,7 @@ export class GameScene extends Phaser.Scene {
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
       this.equipmentPanel.destroy();this.treasurePanel.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
-      this.experienceFeedback.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
+      this.experienceFeedback.destroy();this.pavementTool.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
       this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
       this.storagePanel.destroy();this.legacyStockpiles.destroy();this.logisticsTasks.destroy();this.foodProduction.destroy();this.foodStorage.destroy();
       this.foodEconomyPanel.destroy();this.foodSystem.destroy();this.unsubscribeSeason();this.seasonTransition?.destroy();this.seasons.destroy();
@@ -337,6 +340,7 @@ export class GameScene extends Phaser.Scene {
     let goal=this.pointerTile(pointer);
     if(this.buildMode){
       this.previewAnchor=goal;
+      if(this.selectedBuilding.construction?.mode==='pavement'){this.pavementTool.begin(goal);return;}
       if(this.selectedBuilding.construction?.mode==='line'){
         this.dragAnchor={...goal};this.wallLastLine=null;this.previewTracking=true;this.previewKey=null;this.updateBuildingPreview();return;
       }
@@ -439,13 +443,13 @@ export class GameScene extends Phaser.Scene {
     this.clearWallPreviews();
     this.unitSelection?.clear();this.constructionSystem.stopKing();this.character.stopForBuilding();this.selectedBuilding=definition;
     this.preview.destroy();this.preview=this.createBuildingView(definition,{x:0,y:0},true);this.preview.setVisible(false);
-    this.buildMode=true;this.previewKey=null;this.previewAnchor=null;this.previewTracking=false;this.game.canvas.style.cursor='crosshair';
+    this.buildMode=true;this.previewKey=null;this.previewAnchor=null;this.previewTracking=false;this.game.canvas.style.cursor='crosshair';this.pavementTool.clear();
     this.updateBuildingUI();this.setStatus(t('status.placing',{name:definition.name,size:t('building.size',{width:definition.width,height:definition.height}),cost:formatCost(definition.cost,this.objectRegistry)}));
     return true;
   }
   cancelBuilding(message='Režim stavění zrušen. Můžeš se znovu pohybovat a sbírat suroviny.') {
     this.clearWallPreviews();
-    this.buildMode=false;this.selectedBuilding=null;this.previewAnchor=null;this.previewTracking=false;this.previewKey=null;
+    this.buildMode=false;this.pavementTool?.clear();this.selectedBuilding=null;this.previewAnchor=null;this.previewTracking=false;this.previewKey=null;
     this.preview.setVisible(false);this.game.canvas.style.cursor='';this.updateBuildingUI();this.setStatus(message);
   }
   // The player sees the provisional blueprint they placed, as a remembered site, until someone sees the real ground.
@@ -456,6 +460,7 @@ export class GameScene extends Phaser.Scene {
   updateBuildingPreview() {
     const anchor=this.previewAnchor,definition=this.selectedBuilding;
     if(this.buildMode&&anchor&&definition.construction?.mode==='line'){this.updateWallPreview(anchor);return;}
+    if(this.buildMode&&anchor&&definition.construction?.mode==='pavement'){this.pavementTool.preview(anchor);return;}
     if(!this.buildMode||!anchor||anchor.x<0||anchor.y<0||anchor.x>=COLUMNS||anchor.y>=ROWS){this.preview.setVisible(false);return;}
     // Outside sight the preview is amber (provisional): only known ground decides, never a hidden obstacle.
     const provisional=isProvisional(this.fog,buildingTiles(anchor,definition));

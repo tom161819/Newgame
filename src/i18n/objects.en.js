@@ -33,6 +33,7 @@ export default {
   'object.bakery.name':'Bakery','object.bakery.description':'Two Bakers turn 2 Flour into 4 Bread with 30 seconds of active work and physical deliveries.',
   'object.granary.name':'Granary','object.granary.description':'A physical store with room for 200 food units. Haulers serve every store in the kingdom.',
   'object.house.name':'House','object.house.description':'A family home. Each completed House gives room for 5 more residents.',
+  'object.stone_pavement.name':'Stone Pavement','object.stone_pavement.description':'A permanent cobbled surface: +25 % movement speed. 1 Stone for every 2 new tiles. Build single tiles, lines or whole courtyards.','object.stone_pavement_joint.name':'Stone Pavement','object.stone_pavement_joint.description':'The free second tile of a Stone Pavement pair.',
   'object.warehouse.name':'Warehouse','object.warehouse.description':'A physical store for 200 building materials. Haulers serve every store in the kingdom.',
   'object.starter_stockpile.name':'Starter Stockpile','object.starter_stockpile.description':'A small starting store with space for 40 materials and food units combined.',
   'object.lumberjack_hut.name':'Lumberjack Hut','object.lumberjack_hut.description':'Three Woodcutters reserve mature trees within 18 tiles, physically chop and carry timber to existing storage.',

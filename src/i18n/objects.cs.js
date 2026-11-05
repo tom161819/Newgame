@@ -33,6 +33,7 @@ export default {
   'object.bakery.name':'Pekárna','object.bakery.description':'Dva pekaři upečou ze 2 mouky 4 chleby za 30 sekund aktivní práce s fyzickým doručováním.',
   'object.granary.name':'Sýpka','object.granary.description':'Fyzický sklad pro 200 jednotek jídla. Nosiči obsluhují všechny sklady v království.',
   'object.house.name':'Dům','object.house.description':'Rodinný dům. Každý dokončený Dům dá místo dalším 5 obyvatelům.',
+  'object.stone_pavement.name':'Dlážděná cesta','object.stone_pavement.description':'Trvalý dlážděný povrch: +25 % rychlost pohybu. 1 kámen na každá 2 nová políčka. Stav jednotlivá políčka, cesty i celá nádvoří.','object.stone_pavement_joint.name':'Dlážděná cesta','object.stone_pavement_joint.description':'Druhé, bezplatné políčko dvojice dlažby.',
   'object.warehouse.name':'Sklad','object.warehouse.description':'Fyzický sklad pro 200 jednotek stavebního materiálu. Nosiči obsluhují všechny sklady v království.',
   'object.starter_stockpile.name':'Počáteční skladiště','object.starter_stockpile.description':'Malé počáteční skladiště pro celkem 40 jednotek materiálu a jídla.',
   'object.lumberjack_hut.name':'Dřevorubecká chata','object.lumberjack_hut.description':'Tři dřevorubci si rezervují vzrostlé stromy do 18 políček, fyzicky je pokácí a odnesou dřevo do skladu.',

@@ -1,3 +1,4 @@
+import { drawCobbles } from './cobbles.js';
 import { COLUMNS, ROWS } from './config.js';
 import { tileCenter, worldToGrid, gridToWorld } from './isometric.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
@@ -134,7 +135,7 @@ export class TerrainRenderer {
   }
 
 
-  tileData(tile){return this.memory?.terrainAt(tile,this.map,this.wear,this.season)??[this.map[tile.y]?.[tile.x]??0,this.wear?.level(tile)??0,this.season];}
+  tileData(tile){return this.memory?.terrainAt(tile,this.map,this.wear,this.season)??[this.map[tile.y]?.[tile.x]??0,this.wear?.level(tile)??0,this.season,0,this.wear?.isPaved?.(tile)?1:0];}
 
   chunkTexture(cx, cy) {
     const key = `terrain-chunk-${cx}-${cy}`;
@@ -179,6 +180,9 @@ export class TerrainRenderer {
         }
       }
       for(const p of paths){context.save();p.polygon(TILE_BLEED);context.clip();context.filter=p.filter;this.drawPaths(context,p.x,p.y,left,origin.y,p.veil,()=>{p.polygon();context.clip();});context.restore();}
+      // S11 Stone Pavement on top of ground and tracks; under Fog of War only the remembered surface is drawn.
+      for(const p of paths){const paved=tile=>this.tileData(tile)[4]===1;if(!paved(p))continue;const c=tileCenter(p);context.save();context.filter=p.filter;
+        drawCobbles(context,c.x-left,c.y-origin.y,{tileX:p.x,tileY:p.y,winter:p.veil>.3,edges:{N:!paved({x:p.x-1,y:p.y}),E:!paved({x:p.x,y:p.y-1}),S:!paved({x:p.x+1,y:p.y}),W:!paved({x:p.x,y:p.y+1})}});context.restore();}
       texture.refresh();
       this.paintStats.chunks++;
       this.dirtyChunks.delete(`${cx},${cy}`);
