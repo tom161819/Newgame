@@ -16,16 +16,29 @@ export class StableSystem {
   horse(id){return this.scene.animalSystem.animals.get(id)??null;}
   tamed(animal){return this.horses.has(animal?.id);}
   stabledIn(stableId){return [...this.horses.entries()].filter(([,h])=>h.stableId===stableId);}
+  inPaddock(stableId){return this.stabledIn(stableId).filter(([,h])=>h.state!=='ridden');}
   used(stableId){return this.stabledIn(stableId).length+[...this.jobs.values()].filter(j=>j.stableId===stableId).length;}
   room(stableId){const b=this.stable(stableId);return b?Math.max(0,b.definition.horseCapacity-this.used(stableId)):0;}
   freeStable(near){return this.stables().filter(b=>this.room(b.id)>0).sort((a,b)=>Math.hypot(a.x-near.x,a.y-near.y)-Math.hypot(b.x-near.x,b.y-near.y))[0]??null;}
   wild(animal){return animal?.type==='horse'&&animal.isAlive&&animal.active&&!animal.mounted&&!this.tamed(animal)&&![...this.jobs.values()].some(j=>j.horseId===animal.id);}
   summary(stableId){return {horses:this.stabledIn(stableId).map(([id,h])=>({id,state:h.state,hp:this.horse(id)?.currentHP??0})),capacity:this.stable(stableId)?.definition.horseCapacity??0,taming:[...this.jobs.values()].filter(j=>j.stableId===stableId).length};}
+  // Knights: a stabled horse is reserved for a training order, then ridden by the Knight (hidden under him, still a real
+  // animal that keeps its place in its Stables). Cancel, death or discharge brings it back, or frees it if no room.
+  freeHorse(){return [...this.horses].find(([,h])=>h.state==='stabled')?.[0]??null;}
+  riderHorse(workerId){return [...this.horses].find(([,h])=>h.riderId===workerId)?.[0]??null;}
+  reserveHorse(workerId){const id=this.freeHorse();if(!id)return null;const h=this.horses.get(id);h.state='reserved';h.riderId=workerId;return id;}
+  mountRider(workerId){const id=this.riderHorse(workerId);if(!id)return false;const h=this.horses.get(id),a=this.horse(id);h.state='ridden';if(a){a.path=[];a.view?.setVisible?.(false);}return true;}
+  returnHorse(workerId,tile=null){
+    const id=this.riderHorse(workerId);if(!id)return false;const h=this.horses.get(id),a=this.horse(id);
+    if(a)a.view?.setVisible?.(true);
+    if(this.stable(h.stableId)){h.state='stabled';delete h.riderId;this.place(id);return true;}
+    this.horses.delete(id);if(a&&tile){a.tile={...tile};a.position={x:tile.x+.5,y:tile.y+.5};a.path=[];a.wanderWait=0;}return true;
+  }
   // A paddock spot inside the Stables footprint for each stabled horse.
   paddock(b,index){const spots=[[3,1],[3,3],[1,3],[4,2]],[dx,dy]=spots[index%spots.length];return {x:b.x+dx+.5,y:b.y+dy+.5};}
   place(id){
     const h=this.horses.get(id),b=h&&this.stable(h.stableId),a=this.horse(id);if(!b||!a)return;
-    const index=this.stabledIn(b.id).findIndex(([hid])=>hid===id),p=this.paddock(b,index);
+    if(h.state==='ridden')return;const index=this.inPaddock(b.id).findIndex(([hid])=>hid===id),p=this.paddock(b,index);
     const tile={x:Math.floor(p.x),y:Math.floor(p.y)},point=tileCenter(tile);a.path=[];a.nextTile=null;a.walking=false;a.position={x:p.x,y:p.y};a.tile=tile;
     a.view?.setPosition?.(point.x,point.y)?.setDepth?.(point.y+(a.definition.depth?.offset??0));
   }
@@ -76,7 +89,7 @@ export class StableSystem {
   }
   update(delta){
     if(this.scene.gameTime?.paused)return;this.updateKing(delta);
-    for(const [id,h]of [...this.horses]){const a=this.horse(id);if(!a?.isAlive||!this.stable(h.stableId)){this.horses.delete(id);if(a){a.path=[];a.wanderWait=0;}}}
+    for(const [id,h]of [...this.horses]){const a=this.horse(id);if(!a?.isAlive||!this.stable(h.stableId)&&h.state==='stabled'){this.horses.delete(id);if(a){a.path=[];a.wanderWait=0;}}}
     for(const j of this.jobs.values())if(j.phase==='leading'){const h=this.horse(j.horseId);if(h?.isAlive)h.update?.(delta);}
     for(const [workerId]of [...this.jobs]){const w=this.scene.workerSystem.workers.get(workerId);if(!w?.isAlive||w.profession!=='stablehand')this.cancel({id:workerId});}
   }
@@ -84,7 +97,8 @@ export class StableSystem {
   holds(animal){return this.tamed(animal)||[...this.jobs.values()].some(j=>j.horseId===animal.id&&j.phase!=='approach');}
   exportState(){return {horses:[...this.horses].map(([id,h])=>({id,...h})),jobs:[...this.jobs].map(([workerId,j])=>({workerId,...j})),ridden:this.scene.character?.mountedHorse?.kingTamed?this.scene.character.mountedHorse.id:null};}
   importState(data){
-    this.horses=new Map((data?.horses??[]).map(({id,...h})=>[id,h]));this.jobs=new Map((data?.jobs??[]).map(({workerId,...j})=>[workerId,j]));
+    this.horses=new Map((data?.horses??[]).map(({id,...h})=>[id,h]));
+    for(const [id,h]of this.horses)if(h.state==='ridden')this.horse(id)?.view?.setVisible?.(false);this.jobs=new Map((data?.jobs??[]).map(({workerId,...j})=>[workerId,j]));
     if(data?.ridden){const a=this.horse(data.ridden);if(a){a.kingTamed=true;a.rideMs=STABLE_RULES.kingTameMs;}}
     for(const id of this.horses.keys())this.place(id);
   }

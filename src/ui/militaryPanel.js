@@ -11,7 +11,7 @@ export function renderMilitary(scene,building,root,employees){
   const cards=UNIT_TYPE_IDS.map(type=>{
     const spec=UNIT_TYPES[type],kit=unitKit(type),kits=Math.min(...Object.entries(kit).map(([id,n])=>Math.floor(m.available(id)/n))),card=element('li','unit-type-card');card.dataset.unitType=type;
     card.append(element('strong','',t(`unit.type.${type}`)),element('span','',t('military.kit',{list:itemList(scene,kit)})),element('span','',t('military.cost',{gold:spec.goldCost,seconds:spec.trainingTime/1000,level:spec.requiredCombatLevel})),
-      element('span','',spec.lockedUntil?t('military.locked'):t('military.kits',{count:kits})));
+      element('span','',t('military.kits',{count:kits})),...(spec.mount?[element('span','',t('military.horses',{count:scene.stables?[...scene.stables.horses.values()].filter(h=>h.state==='stabled').length:0}))]:[]));
     return card;
   });
   const rows=employees.map(w=>{

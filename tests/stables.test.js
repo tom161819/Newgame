@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { workerScene,ensureBuildingPrerequisites } from './helpers/workerScene.js';
 import { placeBuilding } from '../src/game/buildings.js';
+import { totalXPForLevel,getXPRequired } from '../src/data/experience.js';
 import { STABLE_RULES } from '../src/data/stables.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
@@ -44,4 +45,18 @@ test('the King tames a wild horse by riding it 25 s and leaves it in Stables wit
   s.character.tile={x:49,y:55};h.mounted=false;s.character.mountedHorse=null;assert.equal(s.stables.onDismount(h),true);assert.equal(s.stables.tamed(h),true);
   assert.equal(s.mountSystem?.command?.(h)??false,false);
   const far=horse(s,{x:80,y:80});far.kingTamed=true;s.character.tile={x:80,y:79};assert.equal(s.stables.onDismount(far),false,'too far from Stables: it stays outside');
+});
+
+test('a Knight needs a free stabled horse: reserved for training, ridden afterwards (faster), returned on discharge; Save/Load',()=>{
+  let s=scene();const st=building(s,'stables',50,50),barracks=building(s,'barracks',34,46),armory=building(s,'armory',62,40);
+  s.foodStorage.register(armory);s.foodStorage.register(barracks);s.foodStorage.deposit(`armory-${armory.id}`,'sword',1);s.foodStorage.deposit(`armory-${armory.id}`,'armor',1);s.inventory.add('gold',100);
+  for(const t of [{x:56,y:44},{x:57,y:44}]){const h=s.workerSystem.create(t);s.workerSystem.jobs.assign(h,'hauler');}
+  const knight=s.workerSystem.create({x:35,y:50});assert.equal(s.workplaceSystem.assign(barracks,knight),true);Object.assign(knight.skills.combat,{level:4,currentXP:0,totalXP:totalXPForLevel(4),xpToNextLevel:getXPRequired(4)});
+  assert.equal(s.military.blocker(knight,'knight'),'horse','no tamed horse yet');
+  const horseAnimal=horse(s,{x:30,y:30});s.stables.horses.set(horseAnimal.id,{state:'stabled',stableId:st.id});s.stables.place(horseAnimal.id);
+  assert.equal(s.military.blocker(knight,'knight'),null);
+  assert.equal(s.military.train(knight,'knight'),null);assert.equal(s.stables.horses.get(horseAnimal.id).state,'reserved');assert.equal(s.stables.freeHorse(),null,'no second Knight on the same horse');
+  until(s,()=>s.military.units.has(knight.id));assert.equal(s.stables.horses.get(horseAnimal.id).state,'ridden');assert.ok(knight.speed>knight.definition.gameplay.movementSpeed,'a mounted Knight is faster');
+  const saved=validateGameState(serializeGameState(s)),r=scene(false);loadGameState(r,structuredClone(saved));assert.deepEqual(validateGameState(serializeGameState(r)),saved);s=r;
+  const k=s.workerSystem.workers.get(knight.id);assert.equal(s.military.release(k),true);assert.equal(s.stables.horses.get(horseAnimal.id).state,'stabled','back in the paddock');assert.equal(k.speed,k.definition.gameplay.movementSpeed);
 });
