@@ -139,7 +139,7 @@ export function validateGameState(input,registry=objectRegistry){
   const siteAssignments=new Set();
   // A provisional site (placed outside sight) claims no tiles until verified: it may lie over hidden terrain or resources.
   const provisional=new Set();
-  for(const b of s.buildings){integer(b.id,1);const d=definition(b.type,'building');check(d.buildable||d.starter);if(d.starter)check(buildingIsComplete(b));
+  for(const b of s.buildings){integer(b.id,1);const d=definition(b.type,'building');check(d.buildable||d.starter||d.pavement);if(d.starter)check(buildingIsComplete(b));if(d.pavement)check(!buildingIsComplete(b));
     check(b.unverified===undefined||b.unverified===true&&b.construction?.state==='planned'&&!b.depositId);
     if(b.unverified){tile(b);for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){const x=b.x+dx,y=b.y+dy,key=`${x},${y}`;check(s.terrain[y]?.[x]!==undefined&&!provisional.has(key));provisional.add(key);}}
     else occupy(b,d.width,d.height);

@@ -18,7 +18,8 @@ export class ConstructionSystem {
   }
   plan(building){
     if(building.construction)return building;
-    building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;if(building.type==='quarry'&&!building.depositId)building.quarryMode='unbound';initializeConstructionSite(building);this.materials.registerLegacy(building);if(!building.unverified)for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.revision++;this.scene.events?.emit('buildings:changed');return building;
+    building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;if(building.type==='quarry'&&!building.depositId)building.quarryMode='unbound';initializeConstructionSite(building);this.materials.registerLegacy(building);// S11: a pavement blueprint never blocks the way; people keep walking over it while it is laid.
+    if(!building.unverified&&!buildingDefinition(building).pavement)for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.revision++;this.scene.events?.emit('buildings:changed');return building;
   }
   actor(id){return id==='king'?this.scene.character:this.scene.workerSystem.workers.get(id);}
   slotKey(goal){return `construction-slot:${tileKey(goal)}`;}
