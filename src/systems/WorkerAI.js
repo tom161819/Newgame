@@ -25,6 +25,7 @@ export class WorkerAI {
   }
   update(worker,delta){
     if(!worker.isAlive)return;
+    if(this.system.commands.update(worker,delta))return;
     worker.aiCooldown-=delta;
     if(worker.arriving){this.arrival(worker);worker.update(delta);return;}
     if((worker.profession==='hunter'&&worker.currentHP<worker.maxHP*WORK_RULES.fleeRatio)||['Fleeing','Recovering'].includes(worker.workState)){

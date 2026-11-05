@@ -14,6 +14,8 @@ None pending. Add entries here when one pull request must wait for another.
 |---|---|---|---|---|---|
 | C03 (#50) Auto Employment and Castle priorities | Claude (taken over from Codex; Codex not running) | `claude/c03-auto-employment` | — | In progress | src/data/employment.js, src/systems/EmploymentSystem.js, src/ui/EmploymentPanel.js, GameScene.js (wiring, Castle click, Settings toggle), WorkplacePanel/UnitPanel (manual holds), WorkerSystem.create, FoodProductionSystem (Smelter delegates), GameSettings, NewGameSetup, GameStateSerializer/Loader (SAVE_VERSION 20), index.html (panel, toggles), i18n employment keys, style.css, smokes (browser, employment, smelting, ledger). |
 
+| C05 (#52) Unit selection, Move/Hold/Resume | Codex | `codex/unit-selection-move-hold` | — | STARTED from 57b62d6; explicitly ready in Issue52 alongside C04 | UnitCommands/UnitSelection new systems, WorkerAI/WorkerController/JobSystem, GameScene input/selection hunks, UnitPanel command actions, GameApplication Escape priority, save serializer/loader + schema smokes, command.* i18n, appended selection CSS, focused tests/smoke, changelog/progress. Preserve Claude C04 diagnostics/notices and its GameScene wiring; shared files integrated by separate hunks. |
+
 ## Kept backups (do not delete without the developer)
 
 - `claude/serene-wright-97oy7k` at `0a48e67`: WIP checkpoint of the alpha policy and renderer switch; fully merged through #3 and #4. Delete it when the developer agrees.

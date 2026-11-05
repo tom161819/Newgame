@@ -39,6 +39,7 @@ export class GameApplication {
       if(event.code!=='Escape'||event.repeat||document.querySelector('dialog[open]')||!this.scene||this.scene.gameOver)return;
       event.preventDefault();
       if(this.scene.buildMode)this.scene.cancelBuilding();
+      else if(this.scene.unitSelection?.ids.size)this.scene.unitSelection.clear();
       else if(this.scene.settingsPanel.open)this.scene.settingsPanel.setOpen(false);
       else if(this.scene.populationSidebar?.open)this.scene.populationSidebar.setOpen(false);
       else this.showPause();
