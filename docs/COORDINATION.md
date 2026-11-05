@@ -12,8 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| AUD66 (#95) Wildlife building clearance audit | Codex | `codex/wildlife-building-clearance` | [#109](https://github.com/tom161819/Newgame/pull/109) | Merged as 6181d50; 570 tests, changelog, build, browser smoke and current-head CI PASS; Pages42021840338 failed on an invalid fixed fog-smoke sample; follow-up [#110](https://github.com/tom161819/Newgame/pull/110); merged N12 main preserving renderer and king-only fixture; integrated 576 tests + 14 browser scenarios PASS | AnimalSystem.js, WildlifeRespawnSystem.js, new wildlife clearance helper/data, isolated tests and browser smoke, changelog/verification/progress. Follow-up: scripts/fog-smoke.mjs + fog-sampling.mjs and its tests; exact black assertion preserved. No GameScene, AnimalController, worker/player/UI/Studio changes. |
-| C06 (#53) Stables/horses audit, military equipment contract | Claude | `claude/c06-stables-equipment-audit` | — | In progress | src/data/militaryEquipment.js (new, data only), docs/contracts/military-equipment.md (new), tests/military-equipment-contract.test.js (new). No gameplay or save change. |
+| AUD63 (#93) Idle Hauler collection at storage and sites | Codex | `codex/idle-hauler-storage-stone` | — | Implemented from c25fc7d; 584 tests, changelog, build:pages and actual browser panel/cargo Save/Load PASS; PR/CI pending. AUD66 Pages verified | LogisticsTaskManager.js, data/logistics.js comment, focused tests/browser smoke, i18n radius label + work message, docs/changelog. No GameScene, worker/player controller, UnitPanel, renderer or Studio edits. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -21,6 +20,10 @@ None pending. Add entries here when one pull request must wait for another.
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-05 [#111](https://github.com/tom161819/Newgame/pull/111) C06 #53 (Claude): audit and data-only military equipment contract, merged868a2d3 and closed/done by owner. Descendant Pages42025802576 succeeded; C07 #54 is ready and remains agent:claude.
+
+- 2026-11-05 [#109](https://github.com/tom161819/Newgame/pull/109) AUD66 #95: wildlife clearance, merge6181d50; follow-up [#110](https://github.com/tom161819/Newgame/pull/110) c25fc7d repaired the logically invalid fixed fog-smoke sample without changing gameplay. 579 tests and exact-black fog checks passed. [Pages42025802576](https://github.com/tom161819/Newgame/actions/runs/42025802576) completed build, full browser/save/archive/Studio checks and deploy successfully for c25fc7d containing both PRs. Issue95 closed/done.
 
 - 2026-11-05 [#106](https://github.com/tom161819/Newgame/pull/106) C04 #51: production diagnostics and notices (Claude). Issue51 is done/closed; [Pages42016024471](https://github.com/tom161819/Newgame/actions/runs/42016024471) succeeded for df4cac5.
 

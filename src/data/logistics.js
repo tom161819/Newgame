@@ -1,6 +1,6 @@
 import { FOOD_RESOURCE_IDS } from './foodProduction.js';
 export const LOGISTICS_RULES=Object.freeze({starterCapacity:40,warehouseCapacity:200,baseCarry:20,planningInterval:500});
-// Idle Haulers pick up loose stones within a radius (tiles) of the Castle.
+// Idle Haulers pick up loose stones within a radius (tiles) of reachable Castles, material storage or active sites.
 export const IDLE_STONE=Object.freeze({defaultRadius:80,maxRadius:150,pickupDuration:1000,candidates:40});
 export const defaultStoneCollection=()=>({enabled:true,radius:IDLE_STONE.defaultRadius});
 export const materialResources=registry=>registry.byCategory('resource').filter(d=>d.collectible&&d.id!=='gold'&&!FOOD_RESOURCE_IDS.includes(d.id)).map(d=>d.id);

@@ -1,10 +1,11 @@
+import { reachableTiles } from '../game/pathfinding.js';
 import { LOGISTICS_RULES,IDLE_STONE,carryCapacity } from '../data/logistics.js';
-import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
+import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
 
 // Derived catalog only: physical ownership stays in storage, drops and cargo.
 export class LogisticsTaskManager {
-  constructor(scene){this.scene=scene;this.catalog=[];this.nextRefresh=0;this.failedRoutes=new Map();this.producerWaits=new Map();}
+  constructor(scene){this.scene=scene;this.catalog=[];this.nextRefresh=0;this.failedRoutes=new Map();this.producerWaits=new Map();this.stoneAreaCache=null;}
   get storage(){return this.scene.foodStorage;}
   update(){
     const now=this.scene.gameTime.totalElapsed;if(now<this.nextRefresh)return;
@@ -61,7 +62,7 @@ export class LogisticsTaskManager {
     }
     return false;
   }
-  // Hauler loop: real transport first; when idle, loose stones near the Castle.
+  // Hauler loop: real transport first; idle collection uses reachable kingdom hubs.
   updateHauler(worker,delta){
     if(worker.workTask?.kind==='mine'){this.collectStone(worker,delta);return;}
     if(worker.workTask||worker.cargo||worker.aiCooldown>0)return;
@@ -71,17 +72,37 @@ export class LogisticsTaskManager {
     const castle=this.scene.buildings.find(b=>b.type==='castle'&&buildingIsComplete(b));if(!castle)return null;
     const d=buildingDefinition(castle);return {x:castle.x+(d.width-1)/2,y:castle.y+(d.height-1)/2};
   }
+  stoneAreas(worker){
+    const now=this.scene.gameTime.totalElapsed,revision=`${this.scene.constructionSystem?.revision??0}:${this.storage.locations.size}`;
+    let cache=this.stoneAreaCache;
+    if(!cache||now>=cache.expires||cache.revision!==revision){
+      const areas=[],centre=b=>{const d=buildingDefinition(b);return {x:b.x+(d.width-1)/2,y:b.y+(d.height-1)/2};};
+      for(const b of this.scene.buildings)if(b.type==='castle'&&buildingIsComplete(b))areas.push({id:`castle-${b.id}`,kind:'castle',...centre(b),goals:towerNeighbors(b).filter(t=>this.scene.map[t.y]?.[t.x]===0)});
+      for(const location of this.storage.locations.values())if(this.storage.isStock(location)&&location.allowed.includes('stone'))areas.push({id:location.id,kind:'storage',x:location.x+(location.width-1)/2,y:location.y+(location.height-1)/2,goals:this.storage.goals(location)});
+      // Sites extend the collection area, not the material ownership rules:
+      // fresh loose stone still goes to normal storage before any site booking.
+      for(const site of this.scene.constructionSystem?.sites.values()??[])if(!site.unverified&&(buildingDefinition(site).cost.stone??0)>0){const location=this.storage.locations.get(`site-${site.id}`);if(location)areas.push({id:location.id,kind:'site',...centre(site),goals:this.storage.goals(location)});}
+      cache=this.stoneAreaCache={expires:now+LOGISTICS_RULES.planningInterval,revision,areas,regions:new Map()};
+    }
+    const start=worker.nextTile??worker.tile,key=tileKey(start);let region=cache.regions.get(key);
+    if(!region){
+      // Share physical connectivity among Haulers in the same component for
+      // this planning interval, rather than pathfinding to every centre/unit.
+      const tiles=reachableTiles(this.scene.map,[start]);region=new Set(tiles.map(tileKey));for(const tile of tiles)cache.regions.set(tileKey(tile),region);
+    }
+    return cache.areas.filter(area=>area.goals.some(t=>region.has(tileKey(t))));
+  }
+  stoneInRange(worker,tile,areas=this.stoneAreas(worker)){
+    const settings=worker.stoneCollection;return !!settings?.enabled&&areas.some(area=>Math.hypot(tile.x-area.x,tile.y-area.y)<=settings.radius);
+  }
   looseStones(worker){
-    const settings=worker.stoneCollection,centre=this.castleCentre();if(!settings?.enabled||!centre)return [];
+    const settings=worker.stoneCollection;if(!settings?.enabled)return [];const areas=this.stoneAreas(worker);if(!areas.length)return [];
     const reservations=this.scene.workerSystem.reservations,king=this.scene.character.order?.pickupKey;
-    return [...this.scene.resources.entries()].filter(([key,view])=>{
-      const tile=view.getData('tile');
-      return view.getData('objectId')==='stone'&&key!==king&&reservations.available(`resource:${key}`,worker.id)&&Math.hypot(tile.x-centre.x,tile.y-centre.y)<=settings.radius;
-    });
+    return [...this.scene.resources.entries()].filter(([key,view])=>view.getData('objectId')==='stone'&&key!==king&&reservations.available(`resource:${key}`,worker.id)&&this.stoneInRange(worker,view.getData('tile'),areas));
   }
   startStone(worker){
     const settings=worker.stoneCollection;if(!settings?.enabled)return false;
-    if(!this.castleCentre()){worker.workMessage='No Castle: loose stone collection paused';return false;}
+    if(!this.stoneAreas(worker).length){worker.workMessage='No reachable collection area';return false;}
     if(!this.storage.findDestination(worker,'stone',1)){worker.workMessage='No storage room for loose stone';return false;}
     const near=this.looseStones(worker).map(([key,view])=>({key,tile:view.getData('tile')})).sort((a,b)=>Math.hypot(a.tile.x-worker.position.x,a.tile.y-worker.position.y)-Math.hypot(b.tile.x-worker.position.x,b.tile.y-worker.position.y)).slice(0,IDLE_STONE.candidates);
     if(!near.length)return false;
@@ -91,11 +112,11 @@ export class LogisticsTaskManager {
     worker.workMessage='Collecting loose stone';return true;
   }
   collectStone(worker,delta){
-    const task=worker.workTask,ai=this.scene.workerSystem.ai,view=this.scene.resources.get(task.targetId),centre=this.castleCentre(),settings=worker.stoneCollection;
+    const task=worker.workTask,ai=this.scene.workerSystem.ai,view=this.scene.resources.get(task.targetId),settings=worker.stoneCollection;
     const tile=view?.getData('tile');
-    if(!view||!settings?.enabled||!centre||Math.hypot(tile.x-centre.x,tile.y-centre.y)>settings.radius||this.scene.character.order?.pickupKey===task.targetId){ai.cancel(worker);worker.workState='Searching for Work';return;}
+    if(!view||!settings?.enabled||!this.stoneInRange(worker,tile)||this.scene.character.order?.pickupKey===task.targetId){ai.cancel(worker);worker.workState='Searching for Work';return;}
     // A real transport task takes over before the stone is picked up.
-    if(worker.aiCooldown<=0&&!ai.atGoal(worker,task.goal)){
+    if(worker.aiCooldown<=0){
       const saved={task,path:worker.path,state:worker.workState,message:worker.workMessage};worker.workTask=null;
       if(this.updateWorker(worker)){this.scene.workerSystem.reservations.release(task.reservation,worker.id);return;}
       Object.assign(worker,{workTask:saved.task,path:saved.path,workState:saved.state,workMessage:saved.message});
@@ -113,5 +134,5 @@ export class LogisticsTaskManager {
       wait.available=this.scene.workerSystem.liveWorkers().filter(w=>(!w.commandState||w.commandState.state==='Working')&&w.profession==='hauler'&&!w.arriving).slice(0,6).some(w=>!!this.storage.route(w,[location]));
     }return wait.available;
   }
-  destroy(){this.catalog=[];this.failedRoutes.clear();this.producerWaits.clear();}
+  destroy(){this.stoneAreaCache=null;this.catalog=[];this.failedRoutes.clear();this.producerWaits.clear();}
 }

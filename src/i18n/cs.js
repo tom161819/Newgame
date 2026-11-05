@@ -1,6 +1,7 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  'work.message.No reachable collection area':'Není dostupný hrad, sklad materiálu ani staveniště',
   'work.state.Holding':'Drží pozici','work.state.MovingToHold':'Přesun na určenou pozici',
   "command.title": "Příkazy jednotek",
   "command.selected": "Vybráno: {count} · Pravým tlačítkem přesunout a držet pozici",
@@ -53,7 +54,7 @@ export default {
   'panel.baseDps':'Základní DPS','panel.finalDps':'Výsledné DPS','panel.baseArmor':'Základní brnění (%)','panel.finalArmor':'Výsledné brnění (%)','panel.hp':'Životy','panel.hpRegen':'Obnova životů','panel.takeAll':'Vzít vše',
   'food.storage':'Zásoby jídla','food.daily':'Denní spotřeba','food.production':'Nedávná produkce / den','food.days':'Odhad zásob (dny)','food.unfed':'Nenasycení obyvatelé','food.season':'Roční období a počasí','food.attractiveness':'Atraktivita království','food.note':'Zásoby počítají s uloženými jablky, chlebem a masem. Budoucí sklizně se nezapočítávají.',
   'storage.deposit':'Uložit náklad krále','storage.drop':'Položit náklad krále','construction.progress':'Postup výstavby','construction.kingWork':'Stavět s králem','construction.kingStop':'Ukončit práci krále','construction.cancel':'Zrušit stavbu',
-  'workplace.progress':'Postup výroby','workplace.assign':'Přidělit pracovníka','unit.xp':'Zkušenosti postavy','unit.totalXp':'Celkem XP','unit.dps':'DPS','unit.armor':'Brnění','unit.assignJob':'Přidělit profesi','unit.stoneCollect':'Sbírat volné kameny','unit.stoneRadius':'Okruh od hradu (políčka)','unit.skills':'Dovednosti',
+  'workplace.progress':'Postup výroby','workplace.assign':'Přidělit pracovníka','unit.xp':'Zkušenosti postavy','unit.totalXp':'Celkem XP','unit.dps':'DPS','unit.armor':'Brnění','unit.assignJob':'Přidělit profesi','unit.stoneCollect':'Sbírat volné kameny','unit.stoneRadius':'Okruh sběru (políčka)','unit.skills':'Dovednosti',
   'tree.chop':'Pokácet strom','assets.intro':'Prohlížení registrovaných objektů · bez úprav a vkládání do mapy','assets.close':'Zavřít knihovnu','assets.categories':'Kategorie objektů','assets.objects':'Objekty','assets.detail':'Detail objektu',
   'farming.growthBar':'Růst plodin','farming.stage':'Fáze {stage}: {name}','farming.dormancy':'Zimní klid · zachováno {done} / {total} dnů růstu','farming.blossom':'Jarní květ · plody dozrají v létě','farming.ready':'Připraveno ke sklizni','farming.growth':'{done} / {total} dnů růstu','farming.harvest':'Sklizeň: {count} {resource}','farming.waiting':'Čeká se na farmáře ze statku do 15 políček.',
   'crop.wheat_field.stage.0':'Připravená půda','crop.wheat_field.stage.1':'Mladá pšenice','crop.wheat_field.stage.2':'Rostoucí pšenice','crop.wheat_field.stage.3':'Zralá pšenice','crop.orchard.stage.0':'Odpočívající stromy','crop.orchard.stage.1':'Kvetoucí stromy','crop.orchard.stage.2':'Malé plody','crop.orchard.stage.3':'Zralá jablka',
