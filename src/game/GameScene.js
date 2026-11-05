@@ -493,7 +493,6 @@ export class GameScene extends Phaser.Scene {
     for(const tile of object.tiles){this.dropSystem.refreshOccupancy(tile);if(!definition.walkable)this.map[tile.y][tile.x]=0;}
     const event={type:'resourceCollected',objectType:definition.id,quantity:1};
     if(actor===this.character&&this.kingLogistics&&this.foodStorage.manages(definition.id))this.kingLogistics.receive({resource:definition.id,amount:1,event});
-    else if(actor.profession==='hauler'&&this.foodStorage?.manages(definition.id))actor.cargo={resource:definition.id,amount:1};
     else if(!this.workplaceSystem?.carryCollection(actor,{resource:definition.id,amount:1,event})){this.inventory.add(definition.id,1,{track:false});this.activities.emit(event.type,{...event,actor});}
     this.resourceLedger?.income(definition.id,1,definition.id==='stone'?'Stone Collection':'Resource Collection',{entityId:key});
     this.updateInventory();return true;
