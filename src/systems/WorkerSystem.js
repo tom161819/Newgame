@@ -1,3 +1,4 @@
+import { UnitCommands } from './UnitCommands.js';
 import { WorkerController } from '../game/WorkerController.js';
 import { tileCenter,PLAYER_START } from '../game/map.js';
 import { reachableTiles } from '../game/pathfinding.js';
@@ -13,7 +14,7 @@ const names=['Matěj','Anna','Jakub','Eliška','Pavel','Marie','Jan','Tereza','O
 export class WorkerSystem {
   constructor(scene,{onChange=()=>{}}={}){
     this.scene=scene;this.onChange=onChange;this.workers=new Map();this.nextId=1;this.lastMigrationDay=scene.gameTime.day;this.listeners=new Set();
-    this.reservations=new TaskReservationSystem();this.ai=new WorkerAI(this);this.jobs=new JobSystem(this);
+    this.reservations=new TaskReservationSystem();this.ai=new WorkerAI(this);this.commands=new UnitCommands(this);this.jobs=new JobSystem(this);
     this.unsubscribe=scene.gameTime.onNewDay(day=>this.onNewDay(day));
   }
   liveWorkers(){return [...this.workers.values()].filter(w=>w.isAlive);}
@@ -71,7 +72,7 @@ export class WorkerSystem {
     this.updateUI();
   }
   update(delta){for(const worker of this.liveWorkers())if(worker.isSubject!==false)this.ai.update(worker,delta);else worker.update(delta);}
-  onDeath(worker){worker.diedAt??=this.scene.gameTime.totalElapsed;this.scene.workplaceSystem?.detach(worker);this.ai.cancel(worker);worker.active=false;worker.path=[];worker.nextTile=null;worker.walking=false;worker.workState='Dead';worker.workMessage='';worker.arriving=false;worker.view.destroy();this.scene.combatFeedback.remove(worker.id);this.updateUI();}
+  onDeath(worker){worker.commandState={state:'Working',goal:null};worker.diedAt??=this.scene.gameTime.totalElapsed;this.scene.workplaceSystem?.detach(worker);this.ai.cancel(worker);worker.active=false;worker.path=[];worker.nextTile=null;worker.walking=false;worker.workState='Dead';worker.workMessage='';worker.arriving=false;worker.view.destroy();this.scene.combatFeedback.remove(worker.id);this.updateUI();}
   updateUI(){const count=this.liveSubjects().length;this.onChange(count,POPULATION.maximum);for(const listener of this.listeners)listener(count,POPULATION.maximum);}
   exportState(){return {nextId:this.nextId,lastMigrationDay:this.lastMigrationDay};}
   importState(data){this.nextId=data?.nextId??1;this.lastMigrationDay=data?.lastMigrationDay??this.scene.gameTime.day;this.updateUI();}

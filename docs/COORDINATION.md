@@ -12,8 +12,8 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| C05 (#52) Unit selection, Move/Hold/Resume | Codex | `codex/unit-selection-move-hold` | [#107](https://github.com/tom161819/Newgame/pull/107) | Draft; full local browser gate and PR CI in progress; explicitly ready alongside C04 | UnitCommands/UnitSelection new systems, WorkerAI/WorkerController/JobSystem, GameScene input/selection hunks, UnitPanel command actions, GameApplication Escape priority, save serializer/loader + schema smokes, command.* i18n, appended selection CSS, focused tests/smoke, changelog/progress. Merged C04 #106 preserving its diagnostics/notices and GameScene wiring; ProductionDiagnostics also excludes commanded residents from available workers. |
 | C04 (#51) Production diagnostics notices | Claude (taken over from Codex) | `claude/c04-production-diagnostics` | — | In progress | src/data/diagnostics.js, src/systems/ProductionDiagnostics.js, src/ui/NoticesPanel.js, index.html (notices panel), GameScene.js (create/update/destroy only), i18n notice keys, style.css (appended block), scripts/{browser,notices}-smoke.mjs, tests/production-diagnostics.test.js. |
-| C05 (#52) Unit selection, Move/Hold Position | Codex | `codex/…` | — | Ready (developer's request) | Codex registers its files; avoid the C04 files above. Claude opens/merges the PR when Codex reports DONE-READY in #52. |
 
 ## Kept backups (do not delete without the developer)
 

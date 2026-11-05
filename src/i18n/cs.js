@@ -1,6 +1,20 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  'work.state.Holding':'Drží pozici','work.state.MovingToHold':'Přesun na určenou pozici',
+  "command.title": "Příkazy jednotek",
+  "command.selected": "Vybráno: {count} · Pravým tlačítkem přesunout a držet pozici",
+  "command.hold": "Držet pozici zde",
+  "command.resume": "Pokračovat v původní práci",
+  "command.inspect": "Podrobnosti jednotky",
+  "command.clear": "Zrušit výběr",
+  "command.MovingToHold": "Přesun na určenou pozici",
+  "command.Holding": "Drží pozici",
+  "command.moving": "Přesouvá se {count} jednotek, poté zůstanou stát.",
+  "command.noRoute": "Pro vybrané jednotky není dostupný cíl.",
+  "command.blocked": "Jednotka se zastavila a drží pozici: cesta je zablokovaná.",
+
+
   ...objects,
   'common.back':'Zpět','common.close':'Zavřít ×','common.cancel':'Zrušit','common.confirm':'Potvrdit','common.unknownDate':'Neznámé datum',
   'language.label':'Jazyk',

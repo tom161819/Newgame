@@ -51,3 +51,13 @@ test('two identical buildings keep separate issues; 120 buildings are checked ch
   const started=performance.now();advance(s,DIAGNOSTICS.checkInterval*50);const perCheck=(performance.now()-started)/50;
   assert.ok(perCheck<20,`one check of 120 sites took ${perCheck.toFixed(2)} ms`);
 });
+
+
+test('C05 commanded Builders, Haulers and Farmers are not counted as working sources until Resume',()=>{
+ const s=scene(),site=building(s,'tower',60,50,{blueprint:true}),builder=employ(s,null,'builder');s.workerSystem.commands.hold(builder);advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(reasons(s).includes('noBuilder'));
+ s.workerSystem.commands.resume(builder);advance(s,DIAGNOSTICS.checkInterval);assert.ok(!reasons(s).includes('noBuilder'));
+ const mill=building(s,'mill',54,45);employ(s,mill,'miller');const granary=building(s,'granary',48,52);s.foodStorage.locations.get(`granary-${granary.id}`).stock.wheat=8;const hauler=employ(s,null,'hauler',44);s.workerSystem.commands.hold(hauler);
+ advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(reasons(s).includes('noHauler'));s.workerSystem.commands.resume(hauler);advance(s,DIAGNOSTICS.checkInterval);assert.ok(!reasons(s).includes('noHauler'));
+ s.foodStorage.locations.get(`granary-${granary.id}`).stock.wheat=0;const farm=building(s,'farmhouse',40,45);building(s,'wheat_field',40,52);const farmer=employ(s,farm,'farmer',42);s.workerSystem.commands.hold(farmer);advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(reasons(s).includes('noProducerWorkers'));s.workerSystem.commands.resume(farmer);advance(s,DIAGNOSTICS.checkInterval);assert.ok(!reasons(s).includes('noProducerWorkers'));
+ const miller=s.workplaceSystem.employees(mill)[0];s.workerSystem.commands.hold(farmer);s.workerSystem.commands.hold(miller);advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(!s.diagnostics.active().some(i=>i.entityId===mill.id),'a deliberately held production crew raises no production alarm');
+});
