@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Choose Czech or English in the main menu or in Settings; the game remembers the choice. The main menu, New Game Setup, Save/Load with import and autosave, the pause menu, Settings, the changelog and the version archive are translated, including Czech plural forms.
 - Autosave: the game saves itself into a separate Autosave slot every 5 minutes of active play (1, 2 or 10 minutes, or off, in Settings). Paused games and hidden tabs do not count, a failed autosave keeps the previous one, Settings shows the time of the last autosave, and the Autosave slot loads from Load Game.
 - Move saved games between devices without any server: Download Save in the Save/Load menu stores a save as a JSON file, and Import Save File checks it and adds it as a new save (or replaces the same save after you confirm). Damaged files and saves from other alpha versions are refused without changing anything.
 - New Game Setup can stock the Starter Stockpile: under Starting Gold choose Starting Stone, Wood, Iron Ore and Bread in steps of 5, up to its 40-unit capacity in total. The goods are placed in the stockpile at the start; Initial Stones still sets only the loose stones on the map. Saved games from earlier versions cannot be loaded and need a new game.

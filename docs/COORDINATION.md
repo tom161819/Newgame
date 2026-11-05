@@ -12,7 +12,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| N06 (#37): Autosave | Claude | `claude/autosave` | this PR | Verified | `src/systems/AutosaveService.js` (new), `src/ui/GameApplication.js`, `src/game/GameScene.js` (one update call), `src/ui/SaveLoadMenu.js`, `index.html`, `src/style.css`, `tests/autosave.test.js`, `scripts/autosave-smoke.mjs`, `scripts/browser-smoke.mjs`, README. |
+| N07 (#38) part 1: i18n core, language switch, menus, setup, Save/Load, Settings | Claude | `claude/cz-en-localization` | this PR | Verified | `src/i18n/` (new), `index.html` (data-i18n), `src/ui/{GameApplication,NewGameSetup,SaveLoadMenu,ChangelogPanel,VersionArchivePanel}.js`, `src/systems/SaveTransfer.js`, `src/style.css`, `tests/i18n.test.js`, `scripts/i18n-smoke.mjs`, `scripts/browser-smoke.mjs`. Parts 2–4 (HUD/names, panels, status messages) follow on `claude/cz-en-localization-*`. |
 | M2 final candidate and deployed-archive verification | Codex | `codex/m2-smelting-smoke`, main2663942 preserved | [#22](https://github.com/tom161819/Newgame/pull/22), actual API merge blocked by CONNECT403 | IN PROGRESS: preserve approved villager sprites for manual PR22 merge; relevant integration checks running. Earlier476models/Pages/scaffold native and full/Studio/archive proofs retained. Actual final gh merge22 at e574f75 still API Forbidden. Frozen02a has own459test archive; final verifier checks actual deployed Git blobs, allowing later live development. Public tag/main/deployment gates pending; new user order C01–C08 then master11–15, all unstarted. | Native smoke regressions; release-gate/deployed-archive verifier and tests; release notes,02a archive/catalog, progress/verification docs. Claude art unchanged; no schema rewrite. |
 
 ## Kept backups (do not delete without the developer)
@@ -22,6 +22,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Done
 
+- 2026-11-05 [#71](https://github.com/tom161819/Newgame/pull/71) N06: Autosave (Claude, Issue #37).
 - 2026-11-05 [#70](https://github.com/tom161819/Newgame/pull/70) N05: Download Save and Import Save File (Claude, Issue #36).
 - 2026-11-05 [#69](https://github.com/tom161819/Newgame/pull/69) N04: starting resources in New Game Setup, SAVE_VERSION 17 (Claude, Issue #35).
 - 2026-11-05 [#68](https://github.com/tom161819/Newgame/pull/68) N03 follow-up: idle-stone tests and one physical pickup path (Claude).

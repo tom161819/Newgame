@@ -72,6 +72,8 @@ Data mají `saveVersion` a před nahrazením světa procházejí kontrolou. Poš
 
 **Autosave:** hra se sama ukládá do samostatného slotu **Autosave** (ruční pozice nepřepisuje). Výchozí interval je 5 minut skutečné aktivní hry; v Settings lze autosave vypnout nebo zvolit 1, 2, 5 či 10 minut (nastavení si pamatuje prohlížeč). Pozastavená hra ani skrytá karta se nepočítají, dvě ukládání nikdy neběží současně a neúspěšný zápis ponechá předchozí autosave. Settings ukazuje čas posledního úspěšného autosave; chybu oznámí jednou. Zavření prohlížeče uložení nezaručuje. Autosave se načte z Load Game jako každá jiná pozice.
 
+**Jazyk:** čeština a angličtina se přepínají v hlavním menu nebo v Settings; volbu si pamatuje prohlížeč (výchozí podle jazyka prohlížeče). Všechny texty jdou přes jeden překladový systém `src/i18n/` (`t(klíč, parametry)`, množná čísla přes `Intl.PluralRules`, chybějící klíč spadne na angličtinu a pak na samotný klíč). Další jazyk = další slovník se stejnými klíči; test hlídá, že oba slovníky mají totožné klíče a parametry a že každý použitý klíč existuje.
+
 ## Zkušenosti a levely
 
 Král začíná na **levelu 1 s 0 XP**. Odměnu získá až po dokončení činnosti: kámen **3 XP**, sebraný balíček masa **2 XP** bez ohledu na jeho množství, zajíc **10 XP**, srna **20 XP**, divočák **35 XP**, nový segment hradby **2 XP**, věž **15 XP**, hrad **30 XP**, kamenolom **15 XP**, lovecká chata **10 XP** a kasárna **20 XP**. Řada hradeb odmění jen skutečně nové segmenty. Neúspěšná nebo zrušená akce nic nepřidá; chůze, čekání, regenerace ani produkce zlata XP nevytvářejí.
