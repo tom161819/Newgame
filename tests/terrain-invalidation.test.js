@@ -39,3 +39,12 @@ test('a legitimate second sight source keeps its tiles lit until that source lea
   r.dirtyChunks.clear();r.dirtyTiles.clear();remove();king.position={x:70.5,y:70.5};fog.update();r.updateFog({},fog);
   assert.equal(fog.isVisibleTile({x:10,y:10}),false);assert.ok(r.dirtyTiles.get('1,1')?.has(1010));
 });
+
+test('an explicit complete transition redraw drains visible chunks while normal live redraw stays bounded',()=>{
+ const r=Object.create(TerrainRenderer.prototype),keys=['0,0','1,0','2,0','3,0','4,0','5,0'];let painted=[];
+ const image=()=>({setTexture(){return this;},setPosition(){return this;},setVisible(){return this;}});
+ Object.assign(r,{scene:{},dirtyTiles:new Map(),neededChunks:keys,chunks:new Map(keys.map(k=>[k,image()])),dirtyChunks:new Set(keys),chunkTexture(x,y){const key=`${x},${y}`;painted.push(key);this.dirtyChunks.delete(key);return {key,x,y};}});
+ r.repaintDirty();assert.equal(painted.length,2);assert.equal(r.dirtyChunks.size,4);
+ r.invalidateChunksOf(keys.map(k=>{const [x,y]=k.split(',').map(Number);return {x:x*10,y:y*10};}),{immediate:true});r.repaintDirty();assert.equal(r.dirtyChunks.size,0,'paused scenes have no future simulation frames to finish the seasonal redraw');assert.equal(painted.length,8);
+ r.dirtyChunks=new Set(keys);painted=[];r.repaintDirty();assert.equal(painted.length,2,'normal live redraw remains bounded');
+});

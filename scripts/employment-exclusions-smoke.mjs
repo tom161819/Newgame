@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+
+export async function employmentExclusionsSmoke(page){
+ const saved=await page.evaluate(()=>window.__game.registry.get('application').snapshot());
+ const fixture=await page.evaluate(()=>{
+  const s=window.__game.registry.get('application').scene;s.pauseManager.set('exclusions-smoke',true);s.fog.setEnabled(false);s.employment.setEnabled(false);s.workerSystem.unsubscribe();for(const w of s.workerSystem.liveSubjects())s.workerSystem.commands.hold(w);
+  const add=type=>{const d=s.objectRegistry.require(type),occupied=new Set(s.reservedTiles().map(t=>`${t.x},${t.y}`));let anchor,tiles;
+   for(let y=25;y<65&&!anchor;y++)for(let x=25;x<75&&!anchor;x++){const ts=[];for(let dy=-1;dy<=d.height;dy++)for(let dx=-1;dx<=d.width;dx++)ts.push({x:x+dx,y:y+dy});if(ts.every(t=>s.map[t.y]?.[t.x]===0&&!s.resourceOccupancy.has(`${t.x},${t.y}`)&&!occupied.has(`${t.x},${t.y}`))){anchor={x,y};tiles=ts.filter(t=>t.x>=x&&t.x<x+d.width&&t.y>=y&&t.y<y+d.height);}}
+   if(!anchor)throw Error('No workplace exclusion fixture space');const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,...anchor,tiles};s.buildings.push(b);for(const t of tiles)s.map[t.y][t.x]=1;s.towerViews.set(b.id,s.createBuildingView(d,b));s.events.emit('buildings:changed');return b;};
+  const a=add('quarry'),b=add('quarry'),old=s.workerSystem.create({x:a.x-1,y:a.y}),fresh=s.workerSystem.create({x:b.x-1,y:b.y});s.workplaceSystem.assign(a,old);s.workplacePanel.open(a);return {a:a.id,b:b.id,old:old.id,fresh:fresh.id};
+ });
+ const local=page.locator('[data-employment-exclusion="local"]'),type=page.locator('[data-employment-exclusion="type"]');
+ await local.check();assert.equal(await page.locator('#assign-workplace-worker').isDisabled(),true);assert.match(await page.locator('#employment-exclusion-reason').textContent(),/this building/);await type.check();await local.uncheck();assert.equal(await page.locator('#assign-workplace-worker').isDisabled(),true);assert.match(await page.locator('#employment-exclusion-reason').textContent(),/every building/);
+ await page.locator('#close-workplace').click();await page.evaluate(f=>{const s=window.__game.registry.get('application').scene;s.workplacePanel.open(s.buildings.find(b=>b.id===f.b));},fixture);
+ assert.equal(await type.isChecked(),true);assert.equal(await local.isChecked(),false);await local.check();await type.uncheck();assert.equal(await page.locator('#assign-workplace-worker').isDisabled(),true,'local rule remains after removing type ban');await page.locator('#close-workplace').click();
+ const state=await page.evaluate(f=>{const app=window.__game.registry.get('application'),s=app.scene;s.employment.setEnabled(true);s.employment.run();return {old:s.workerSystem.workers.get(f.old).assignedWorkplaceId,fresh:s.workerSystem.workers.get(f.fresh).assignedWorkplaceId,save:app.snapshot()};},fixture);assert.equal(state.old,fixture.a);assert.equal(state.fresh,fixture.a);assert.deepEqual(state.save.employment.blockedBuildings,[fixture.b]);assert.deepEqual(state.save.employment.blockedTypes,[]);
+ const load=async state=>{await page.evaluate(state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__exclusionsReady=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('exclusions-smoke',true);window.__exclusionsReady=true;app.onGameReady=ready;};app.load(state);},state);await page.waitForFunction(()=>window.__exclusionsReady);};
+ await load(state.save);assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').snapshot().employment),state.save.employment);
+ await page.evaluate(f=>{const s=window.__game.registry.get('application').scene;s.fog.setEnabled(false);s.workplacePanel.open(s.buildings.find(b=>b.id===f.b));},fixture);assert.equal(await local.isChecked(),true);assert.equal(await type.isChecked(),false);assert.equal(await page.locator('#assign-workplace-worker').isDisabled(),true);await page.locator('#close-workplace').click();
+ await load(saved);await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('exclusions-smoke',false));
+ console.log('PASS employment exclusions: real local/type controls, shared type state, manual Assign disabled, existing workers retained, safe auto resume and exact rules Save/Load');
+}

@@ -11,6 +11,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
   - The Hauler's panel has a Transport setting: Auto, By hand or Wheelbarrow. By hand parks the Wheelbarrow where he stands.
   - Death or a new job leaves the Wheelbarrow on the ground for another Hauler, and one Wheelbarrow never has two drivers.
   - Saves keep every Wheelbarrow.
+- Workplace panels can disable new employment for one building or for its entire type, including future buildings. Both automatic and manual assignments respect the bans. Existing staff keep their jobs; type bans take priority and local choices remain when a type is re-enabled. These rules are saved with the game.
 - Finishing a Mill without a Wheat Field or a Bakery without a Mill shows one informational notice about the missing long-term supply. Existing supplies still work; dismiss the advice or finish the missing link to clear it. Actual production blockers retain priority.
 - Stone Pavement (Buildings → Infrastructure), a permanent cobbled surface. Units on it move 25 % faster; this replaces the trodden-path bonus and never adds to it. Routes now prefer a faster paved way.
   - Build tools: Single, Line (default, also diagonal) and Area for courtyards, with a green/red/grey preview, the count of new tiles and the cost. An order costs 1 Stone for every 2 new tiles; already paved or ordered tiles are free.
@@ -46,6 +47,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Idle Haulers now collect loose stone lying within a set radius of the Castle (default 80 tiles) and carry it to storage. Each Hauler has a Collect loose stone ON/OFF switch and a radius field in the unit panel; real transport jobs always come first. Saved games from earlier versions cannot be loaded and need a new game.
 
 ### Fixed
+- Seasonal ground changes finish repainting while the game is paused, so resuming a saved season keeps the same terrain picture. Normal gameplay retains its bounded redraw budget.
 - The king waits after collecting loose stone and keeps it in his personal cargo. Use Deliver to storage in the top-left HUD to carry it to a reachable store; changing orders keeps the cargo safe, and full stores never consume it.
 - Idle Haulers also collect loose stone within their chosen radius of reachable Warehouses, Starter Stockpiles and physical construction sites. They work without a Castle, keep real deliveries first, and carry each stone to storage using the existing reservations.
 - Wandering rabbits, deer and wild boars keep one tile away from solid buildings and physical construction sites, including narrow gaps and diagonal corners. Wildlife spawns respect the same margin; animals retreat when a new structure surrounds them. Hunting and the king’s horse keep their existing movement.

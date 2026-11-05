@@ -11,7 +11,7 @@ export const compareForSkill=skill=>(a,b)=>Number(b.naturalTalent===skill)-Numbe
 
 export class EmploymentSystem {
   constructor(scene,{enabled=true,state=null}={}){
-    this.scene=scene;this.enabled=state?.enabled??enabled;this.priorities={...EMPLOYMENT_PRESETS.balanced,...(state?.priorities??{})};this.held=new Set(state?.held??[]);
+    this.scene=scene;this.enabled=state?.enabled??enabled;this.priorities={...EMPLOYMENT_PRESETS.balanced,...(state?.priorities??{})};this.held=new Set(state?.held??[]);this.blockedBuildings=new Set(state?.blockedBuildings??[]);this.blockedTypes=new Set(state?.blockedTypes??[]);
     this.listeners=new Set();this.dirty=true;this.running=false;
     this.unsubscribe=scene.workplaceSystem.onChange(()=>this.request());this.worldChanged=()=>this.request();scene.events?.on('buildings:changed',this.worldChanged);
   }
@@ -19,7 +19,20 @@ export class EmploymentSystem {
   onChange(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   changed(){for(const listener of this.listeners)listener();}
   // Events only mark the plan as due; it runs once in the next update, never inside the event that asked for it.
-  request(){this.dirty=true;}
+  request(){this.pruneExclusions();this.dirty=true;}
+  workplace(building){return !!building&&this.scene.buildings.includes(building)&&buildingIsComplete(building)&&!building.unverified&&!!buildingDefinition(building).workplace;}
+  blockReason(building){return this.blockedTypes.has(building?.type)?'type':this.blockedBuildings.has(building?.id)?'local':null;}
+  setBuildingDisabled(building,disabled){
+    if(!this.workplace(building)||typeof disabled!=='boolean')return false;
+    if(disabled)this.blockedBuildings.add(building.id);else this.blockedBuildings.delete(building.id);this.request();this.changed();return true;
+  }
+  setTypeDisabled(building,disabled){
+    if(!this.workplace(building)||typeof disabled!=='boolean')return false;
+    if(disabled)this.blockedTypes.add(building.type);else this.blockedTypes.delete(building.type);this.request();this.changed();return true;
+  }
+  pruneExclusions(){
+    if(!this.blockedBuildings.size)return;const valid=new Set(this.scene.buildings.filter(b=>buildingIsComplete(b)&&!b.unverified&&buildingDefinition(b).workplace).map(b=>b.id));for(const id of this.blockedBuildings)if(!valid.has(id))this.blockedBuildings.delete(id);
+  }
   setEnabled(value){this.enabled=!!value;this.request();this.changed();}
   setPriority(profession,value){
     if(!EMPLOYMENT_PROFESSIONS.includes(profession)||!Number.isInteger(value)||value<PRIORITY_RANGE.min||value>PRIORITY_RANGE.max)return false;
@@ -33,7 +46,7 @@ export class EmploymentSystem {
   seats(){
     const s=this.scene,seats=[];
     for(const building of [...s.buildings].sort((a,b)=>a.id-b.id)){
-      const spec=buildingDefinition(building).workplace;if(!spec||!buildingIsComplete(building)||building.unverified)continue;
+      const spec=buildingDefinition(building).workplace;if(!spec||!buildingIsComplete(building)||building.unverified||this.blockReason(building))continue;
       const production=s.foodProduction?.records.get(building.id);if(production&&!production.auto)continue;
       const record=s.workplaceSystem.register(building);if(!record)continue;
       for(let i=record.workerIds.length;i<spec.capacity;i++)seats.push({building,spec,priority:this.priorities[spec.profession]??PRIORITY_RANGE.default});
@@ -68,7 +81,7 @@ export class EmploymentSystem {
     return hired;
   }
   update(){if(this.dirty&&this.enabled&&!this.scene.gameTime?.paused){this.dirty=false;this.run();}}
-  importState(data){this.enabled=data?.enabled??this.enabled;this.priorities={...EMPLOYMENT_PRESETS.balanced,...(data?.priorities??{})};this.held=new Set(data?.held??[]);this.request();this.changed();}
-  exportState(){return {enabled:this.enabled,priorities:{...this.priorities},held:[...this.held].sort()};}
+  importState(data){this.enabled=data?.enabled??this.enabled;this.priorities={...EMPLOYMENT_PRESETS.balanced,...(data?.priorities??{})};this.held=new Set(data?.held??[]);this.blockedBuildings=new Set(data?.blockedBuildings??[]);this.blockedTypes=new Set(data?.blockedTypes??[]);this.request();this.changed();}
+  exportState(){this.pruneExclusions();return {blockedBuildings:[...this.blockedBuildings].sort((a,b)=>a-b),blockedTypes:[...this.blockedTypes].sort(),enabled:this.enabled,priorities:{...this.priorities},held:[...this.held].sort()};}
   destroy(){this.unsubscribe();this.scene.events?.off('buildings:changed',this.worldChanged);this.listeners.clear();}
 }
