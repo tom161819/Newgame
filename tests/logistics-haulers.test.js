@@ -65,3 +65,12 @@ test('bounded route searches eventually skip nearby unreachable piles instead of
 test('a legitimate delivery between adjacent stores sharing an access tile earns base quantity XP once without invented travel distance',()=>{
   const s=scene(),a=building(s,'warehouse'),b=building(s,'warehouse',54,45),w=worker(s,a,{x:53,y:45});s.foodStorage.deposit(`warehouse-${a.id}`,'iron',20);assert.equal(s.foodProduction.move(w,`warehouse-${a.id}`,`warehouse-${b.id}`,'iron',20,{hauling:true}),true);s.tick(25);assert.equal(w.workTask.loadedDistance,0);s.tick(25);assert.equal(w.skills.logistics.totalXP,20);assert.equal(w.experience.totalXP,20);assert.equal(s.foodStorage.locations.get(`warehouse-${b.id}`).stock.iron,20);s.simulate(1500);assert.equal(w.experience.totalXP,20);validateGameState(serializeGameState(s));
 });
+test('N03: idle Hauler collects loose stone near the Castle into storage, respects OFF and radius, and Save/Load keeps the setting',()=>{
+  const s=scene(),b=building(s,'warehouse'),w=worker(s,b);assert.deepEqual(w.stoneCollection,{enabled:true,radius:80});
+  const c=building(s,'castle',60,60);assert.ok(c);
+  const tile={x:c.x+6,y:c.y+6};s.map[tile.y][tile.x]=0;s.addResource(s.objectRegistry.require('stone'),tile);const key=`${tile.x},${tile.y}`;
+  w.stoneCollection.enabled=false;for(let i=0;i<200;i++)s.tick(25);assert.ok(s.resources.has(key),'OFF leaves stone');
+  w.stoneCollection.enabled=true;w.stoneCollection.radius=1;for(let i=0;i<200;i++)s.tick(25);assert.ok(s.resources.has(key),'outside radius');
+  w.stoneCollection.radius=80;const before=quantity(s,'stone');until(s,()=>!s.resources.has(key),80000);until(s,()=>quantity(s,'stone')>=before+1&&!w.cargo,80000);
+  const data=serializeGameState(s);assert.equal(data.workers.find(x=>x.id===w.id).stoneCollection.radius,80);validateGameState(data);
+});
