@@ -10,7 +10,6 @@ None pending. Add entries here when one pull request must wait for another.
 
 ## Active
 
-Completion record: Codex `codex/completion-aud63` holds only docs/COORDINATION.md and docs/CODEX_PROGRESS.md records the successful post-merge deployment; 584 tests, changelog, build:pages and current-only browser smoke PASS. No gameplay or environment configuration changes.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
@@ -21,6 +20,8 @@ Completion record: Codex `codex/completion-aud63` holds only docs/COORDINATION.m
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+Completion record: Codex `codex/completion-aud63` updated only docs/COORDINATION.md and docs/CODEX_PROGRESS.md records the successful post-merge deployment; 584 tests, changelog, build:pages and current-only browser smoke PASS. No gameplay or environment configuration changes.
 
 - 2026-11-05 [#112](https://github.com/tom161819/Newgame/pull/112) AUD63 #93: existing idle Hauler collection extended to reachable storage/sites, merge afd5f88fe7eb316b2d1e1f72238eaceee002c304. 584 tests (12 focused), changelog, build:pages and actual browser panel/cargo Save/Load passed; [CI42028197212](https://github.com/tom161819/Newgame/actions/runs/42028197212) success for exact head f2fcc7e. [Pages42028606962](https://github.com/tom161819/Newgame/actions/runs/42028606962) build AND deploy succeeded for afd5f88, including full browser/save/archive/Studio checks. Issue93 closed/done; no other ready Codex Issue found. C07 #54 remains Claude-owned. Schema21 unchanged.
 
