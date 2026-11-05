@@ -13,7 +13,7 @@ None pending. Add entries here when one pull request must wait for another.
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| S12 phase A (#57) Carry weights | Claude | `claude/s12-carry-weights` | PR open; 611 tests, 52 full smokes PASS | data/logistics.js (weights, 40 load units), KingLogisticsSystem, FoodProductionSystem, LogisticsTaskManager, DropSystem, FoodStateValidation, GameStateSerializer (SAVE_VERSION 25), transportLabels, UnitPanel, i18n, logistics tests. |
+| S12 phase A (#57) Carry weights | Claude | `claude/s12-carry-weights` | — | PR open; 611 tests, 52 full smokes PASS | data/logistics.js (weights, 40 load units), KingLogisticsSystem, FoodProductionSystem, LogisticsTaskManager, DropSystem, FoodStateValidation, GameStateSerializer (SAVE_VERSION 25), transportLabels, UnitPanel, i18n, logistics tests. |
 | NEW08-B (#125) Food chain completion notices | Codex | `codex/food-chain-completion-notices` | [#137](https://github.com/tom161819/Newgame/pull/137) | Implemented after verified #102 Pages; 602 tests after C08/schema23 integration, changelog, build:pages and chain-notices + C04 browser smoke PASS; GitHub push restored; PR/CI pending | ProductionDiagnostics.js, data/diagnostics.js, own EN/CS block, focused tests/browser smoke, docs/changelog. No C08 held systems or persistent schema edits. |
 
 ## Kept backups (do not delete without the developer)
