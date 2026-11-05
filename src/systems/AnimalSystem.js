@@ -1,3 +1,4 @@
+import { WildlifeClearance,keepsWildlifeClearance } from './WildlifeClearance.js';
 import { AnimalController } from '../game/AnimalController.js';
 import { generateResourcePositions } from '../game/stones.js';
 import { tileCenter,isWalkable } from '../game/map.js';
@@ -6,12 +7,12 @@ import { inAttackRange } from './CombatSystem.js';
 import { animalInitialCount } from './GameSettings.js';
 
 export class AnimalSystem {
-  constructor(scene,random=Math.random){this.scene=scene;this.random=random;this.animals=new Map();this.nextId=1;}
+  constructor(scene,random=Math.random){this.scene=scene;this.random=random;this.animals=new Map();this.nextId=1;this.clearance=new WildlifeClearance(scene);}
   spawn(start){
-    const definitions=this.scene.objectRegistry.byCategory('animal'),total=definitions.reduce((n,d)=>n+animalInitialCount(d,this.scene.gameSettings),0);
-    const positions=generateResourcePositions(this.scene.map,start,total,this.random,this.scene.resourceOccupancy);
+    const definitions=this.scene.objectRegistry.byCategory('animal');this.clearance.refresh();
+    const positions=generateResourcePositions(this.scene.map,start,this.scene.map.length*this.scene.map[0].length,this.random,this.scene.resourceOccupancy);
     for(const definition of definitions)for(let i=0;i<animalInitialCount(definition,this.scene.gameSettings);i++){
-      const tile=positions.pop();if(!tile)break;
+      let tile=positions.pop();if(definition.gameplay.huntable)while(tile&&!this.clearance.isClear(tile))tile=positions.pop();if(!tile)break;
       this.create(definition,tile);
     }
   }
@@ -34,6 +35,7 @@ export class AnimalSystem {
   }
   atPoint(x,y){return [...this.animals.values()].sort((a,b)=>b.view.depth-a.view.depth).find(a=>!a.mounted&&(!this.scene.fog||this.scene.fog.isVisibleObject(a))&&this.scene.assets.hitTest(a.view,x,y))??null;}
   update(delta){
+    this.clearance.refresh();
     for(const animal of this.animals.values()){
       if(!animal.active||!animal.isAlive)continue;
       if(animal.mounted)continue;
@@ -53,12 +55,15 @@ export class AnimalSystem {
           animal.update(delta);continue;
         }
       }
+      const wild=keepsWildlifeClearance(animal);
+      if(wild&&(animal.nextTile&&!this.clearance.isClear(animal.nextTile)||animal.path.some(tile=>!this.clearance.isClear(tile)))){animal.path=[];animal.wanderWait=0;}
       if(!animal.nextTile&&!animal.path.length){
         animal.wanderWait-=delta;
         if(animal.wanderWait<=0){
           const radius=animal.definition.gameplay.wanderRadius;
           const goal={x:animal.tile.x+Math.floor(this.random()*(radius*2+1))-radius,y:animal.tile.y+Math.floor(this.random()*(radius*2+1))-radius};
-          if(isWalkable(this.scene.map,goal.x,goal.y))animal.moveTo([goal]);
+          if(wild){const route=this.clearance.isClear(animal.tile)?this.clearance.route(animal,goal):this.clearance.escape(animal);animal.path=route?.path??[];}
+          else if(isWalkable(this.scene.map,goal.x,goal.y))animal.moveTo([goal]);
           animal.wanderWait=1800+this.random()*4000;
         }
       }
