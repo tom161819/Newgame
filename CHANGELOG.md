@@ -5,6 +5,16 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-06
+<!-- version: {"title":"Villager needs and Happiness (S13 phase A)","type":"feature","reconstructed":false,"saveVersion":33} -->
+### Added
+- Villager needs: every permanent resident now has Food, Rest, Housing and Safety (0–100 %), a Happiness score, a mood (Happy, Neutral, Unhappy or Critical) and a main problem. Food follows the existing daily meal, so no food is used twice. Rest falls during active work and recovers while waiting. Housing comes from the settlement's places and completed Houses. Safety rises near a finished Castle, tower, Barracks or soldiers and drops for a day after an attack. Unpaid wages lower Happiness.
+- The villager panel shows these needs as bars with the mood, the main problem and the home. The top bar shows Kingdom Happiness; clicking it opens Population, which now summarises hungry, tired and homeless residents and can sort by Happiness.
+- Needs are measured and shown only for now: they do not yet change work speed, cause strikes or make villagers leave.
+
+### Changed
+- Saved games use a new format (33) for the needs. Games saved by earlier versions cannot be loaded; start a new game.
+
 ## [0.4.0] - 2026-11-06
 <!-- version: {"title":"M3: Stone pavement, wheelwright, wagons, stables and housing","type":"milestone","reconstructed":false,"saveVersion":32} -->
 ### Added
