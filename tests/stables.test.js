@@ -60,3 +60,16 @@ test('a Knight needs a free stabled horse: reserved for training, ridden afterwa
   const saved=validateGameState(serializeGameState(s)),r=scene(false);loadGameState(r,structuredClone(saved));assert.deepEqual(validateGameState(serializeGameState(r)),saved);s=r;
   const k=s.workerSystem.workers.get(knight.id);assert.equal(s.military.release(k),true);assert.equal(s.stables.horses.get(horseAnimal.id).state,'stabled','back in the paddock');assert.equal(k.speed,k.definition.gameplay.movementSpeed);
 });
+
+test('#163: a blocked way home never loses a tamed horse, and the led horse does not block its Stablehand',()=>{
+  const s=scene(),st=building(s,'stables',50,50),w=stablehand(s,st,{x:49,y:56}),h=horse(s,{x:56,y:58});
+  until(s,()=>s.stables.jobs.get(w.id)?.phase==='leading');
+  const job=s.stables.jobs.get(w.id);
+  // The horse one step behind is not an obstacle on the Stablehand's own navigation map.
+  const nav=s.workerSystem.navigationMap(w);for(const t of h.reservedTiles())assert.equal(nav[t.y][t.x],s.map[t.y][t.x],'led horse tile stays open for routing');
+  // A route that cannot be found keeps the job (and the taming done) and simply retries.
+  const moveTo=w.moveTo.bind(w);let refused=0;w.moveTo=goals=>{if(refused<3){refused++;w.path=[];return false;}return moveTo(goals);};w.path=[];w.nextTile=null;w.aiCooldown=0;
+  for(let i=0;i<60&&refused<3;i++)s.tick(50);
+  assert.equal(refused,3);assert.equal(s.stables.jobs.get(w.id),job,'still the same leading job');assert.equal(job.phase,'leading');
+  w.moveTo=moveTo;until(s,()=>s.stables.horses.has(h.id));
+});
