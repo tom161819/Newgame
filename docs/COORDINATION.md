@@ -13,6 +13,7 @@ PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da2
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| NEW10 (#127) Studio Needs review filter | Claude | `claude/studio-review-filter` | — | PR open | studio/src/main.js, studio/src/lib/{approvals,specs}.js, studio/index.html, studio/src/styles.css, scripts/studio-smoke.mjs |
 | NEW18 (#146) Farm plot ownership | Codex | `codex/farm-plot-ownership` | [#166](https://github.com/tom161819/Newgame/pull/166) | Implemented: 670 tests + changelog/build and native ownership/tending browser PASS; schema31; foundation before145; actual165 merge90eb356 integrated; fresh670 tests/changelog/build/browser PASS; clear map/desktop+phone visibility and Escape verified; predecessor Pages42163373128 SUCCESS, await final exact-head CI | data/farmPlots.js, buildings placement, FarmingSystem, GameStateSerializer/Loader schema31, FarmConnections overlay/focus, farm-only responsive CSS, WorkplacePanel/FarmingPanel, own i18n/tests/browser/docs. Prices and farmer construction stay in145. |
 | NEW21 (#149) Studio ruins designs | Claude | `claude/studio-ruins` | [#161](https://github.com/tom161819/Newgame/pull/161) | PR open; review only | studio/src/generators/ruins.js (new), art/assets/decorations/ruin*, art/sprites/ruin*, art/approvals.json, art/style-guide.json (soot, charcoal) |
 
