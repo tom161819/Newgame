@@ -1,5 +1,7 @@
 // České názvy a popisy herních objektů, profesí a dovedností.
 export default {
+  'object.builder_workshop.name':'Stavitelská dílna',
+  'object.builder_workshop.description':'Volitelná společná základna Builderů. Dostupná dokončená dílna umožní normální rychlost stavby; bez ní Builder staví rychlostí 50 %. Pohyb, nošení, Farmáři, král a demolice se nemění. Dočasný provizorní vzhled.',
   'object.grass.name':'Tráva','object.grass.description':'Suchá tráva na průchozím izometrickém políčku.',
   'object.dirt.name':'Hlína','object.dirt.description':'Udusaná zem a písčité odstíny krajiny.',
   'object.grass_normal.name':'Tráva — neporušená','object.grass_normal.description':'Původní vysoká tráva.',

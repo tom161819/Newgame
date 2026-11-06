@@ -1,6 +1,13 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  'workshop.rule':'Builder bez dostupné dokončené dílny staví rychlostí 50 %. Pohyb, nošení, král a Farmáři se nemění.',
+  'workshop.someSlow':'{count} pracujících Builderů nemá dostupnou dílnu: rychlost stavby −50 %.',
+  'workshop.slow':'Rychlost stavby: 50 % — nemá dostupnou dokončenou stavitelskou dílnu. Pohyb a nošení se nemění.',
+  'workshop.normal':'Rychlost stavby: 100 % — má dostupnou dokončenou stavitelskou dílnu.',
+  'workshop.noBase':'Bez dostupné dílny (rychlost stavby 50 %)',
+  'workshop.users':'Builderů využívajících společnou základnu: {count}. Nezabírá pracovní ani Hauler místa.',
+
   'rock.danger':'Čeká, až bude místo těžby bezpečné',
   'rock.mark':'Označit skály',
   'rock.unmark':'Zrušit označení skal',

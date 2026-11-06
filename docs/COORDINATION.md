@@ -21,8 +21,8 @@ Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke pau
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| NEW01-A #118 Builder workshop mechanics | Codex | `codex/builder-workshop-base` (stacked on94) | [#196](https://github.com/tom161819/Newgame/pull/196) | Main9337395 integrated; coordination conflict resolved; prior786 tests + exact-head226c8ea CI PASS; final CI pending;94 actual Pages verified; placeholder allowed, final art119 stays Claude | own workshop definition/derived base policy, ConstructionSystem.workSpeed, central idleHomes/BuilderAI, Unit/Construction/detail status, completion XP, schema/release/i18n, own tests/native/docs; no final art |
 | #210 AR-6 #216 end-to-end pilot (Builders' Workshop through Submit → intake → revise → approve → integrate) | Claude | — | — | Waiting for Codex #196 and the owner's first Submit review | — |
-| AUD65 #94 Manual rock mining | Codex | `codex/manual-rock-mining` (stacked on124) | [#194](https://github.com/tom161819/Newgame/pull/194) | Implemented; schema36/release0.8.0 after185 actual Pages;750 tests/version/changelog/build + native real-mouse10Stones/ledger/Load/phone/commands/Needs/eventfeed PASS | own rock marking tool/UI, GameScene/GameApplication narrow input/Escape hooks, MiningWork/WorkerAI/WorkplaceSystem/free Miner selection, current schema serializer/loader/terrain validation, XP/SkillSystem, physical Drop/FoodProduction reuse and cargo provenance, i18n, own tests/browser/docs |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
@@ -45,8 +45,12 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 
 ## Done
 
+- Codex94/PR194 verified done: merge2dc39c4, exacttagv0.8.0; Pages42242745923 build128000668031/deploy128000666084 SUCCESS.754 tests and native physical mining/ledger/Load/commands PASS.
+
 - 2026-11-06 Claude: #210 asset review workflow AR-1…AR-5: manifest statuses/comments/history ([#217](https://github.com/tom161819/Newgame/pull/217)), Studio review UI ([#218](https://github.com/tom161819/Newgame/pull/218)), Submit review ([#219](https://github.com/tom161819/Newgame/pull/219)), intake workflow + approval guard ([#220](https://github.com/tom161819/Newgame/pull/220)), `art:revise`/`art:integrate` + AGENTS.md procedure ([#221](https://github.com/tom161819/Newgame/pull/221)).
+
 - 2026-11-06 Claude: #99 mill sails ([#207](https://github.com/tom161819/Newgame/pull/207), 0.8.1); #92 visual fallbacks audit + six profession concepts ([#208](https://github.com/tom161819/Newgame/pull/208)) and Barracks/Wheelwright/Iron Mine concepts ([#209](https://github.com/tom161819/Newgame/pull/209)), awaiting the owner's choice.
+
 - 2026-11-06 Claude: #116 Path renderer V2 in the Path Lab ([#205](https://github.com/tom161819/Newgame/pull/205)), awaiting the owner's preset choice; Pages deploy retries ([#206](https://github.com/tom161819/Newgame/pull/206)).
 - 2026-11-06 Claude: #115 Path Lab in the Asset Studio ([#204](https://github.com/tom161819/Newgame/pull/204)).
 - 2026-11-06 Claude: #119 Builders' Workshop concepts ([#199](https://github.com/tom161819/Newgame/pull/199)) and #114 porch concepts ([#201](https://github.com/tom161819/Newgame/pull/201)) in the Studio, awaiting the owner's choice; Pages deploy timeout ([#203](https://github.com/tom161819/Newgame/pull/203), ineffective: replaced by deploy retries).
