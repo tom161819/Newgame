@@ -121,6 +121,8 @@ export function assetPaths(asset, variant) {
     // Ground recipes also export each game tile on its own: <spriteTileBase><index>.png
     spriteTileBase: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.tile-` : null,
     spriteFront: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.front.png` : null,
+    spriteStill: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.still.png` : null,
+    spriteRotor: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.rotor.png` : null,
     spriteMeta: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.json` : null,
   };
 }

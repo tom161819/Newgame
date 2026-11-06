@@ -110,8 +110,8 @@ test('asset URLs retain the Pages prefix; PNG/WebP/sheets load once per object t
   const manager = new AssetManager(scene,registry,{baseURL:'/Newgame/'});
   // 64 registered objects + the animated test object, plus the tower's front layer, the four approved grass tiles
   // the nine approved tree looks (six oak, three pine) and twelve seasonal grass tiles (spring, autumn, winter).
-  assert.equal(manager.queue(),91);assert.equal(manager.queue(),0);
-  assert.equal(calls.length,91);
+  assert.equal(manager.queue(),93);assert.equal(manager.queue(),0);
+  assert.equal(calls.length,93); // includes workshop and both Mill layers
   assert.ok(calls.some(c=>c[2].endsWith('.webp')));
   assert.deepEqual(calls.find(c=>c[0]==='sheet'),['sheet','asset:animated:main','/Newgame/assets/resources/stone/stone.png',{frameWidth:32,frameHeight:48}]);
 });

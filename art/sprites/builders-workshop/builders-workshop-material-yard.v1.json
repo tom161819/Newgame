@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "builders-workshop",
+  "variantId": "builders-workshop-material-yard",
+  "name": "Shed with material yard",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "95f3a15b",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 87,
+  "anchor": {
+    "x": 65,
+    "y": 53
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.6092
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 85
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97701
+  },
+  "visualHeight": 85,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.828,
+  "lights": []
+}

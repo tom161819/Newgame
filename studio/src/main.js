@@ -508,7 +508,7 @@ function exportSprite(assetId, variantId, { facings = false } = {}) {
   // Figures can also be rendered in the eight walking directions (facing 0–7, 0 = towards the viewer).
   const turned = facings && asset.generator === 'figure' ? Array.from({ length: 8 }, (_, k) => renderModel(generators.figure.build({ ...variant.spec, facing: k }, { footprint: asset.footprint, style }), { style, footprint: asset.footprint, scale: 1 })) : [];
   if (turned.length) meta.facings = turned.map((s, k) => ({ facing: k, width: s.width, height: s.height, anchor: s.anchor, origin: { x: +(s.anchor.x / s.width).toFixed(5), y: +(s.anchor.y / s.height).toFixed(5) } }));
-  return { facingPngs: turned.map(s => s.canvas.toDataURL('image/png')), png: sprite.canvas.toDataURL('image/png'), front: sprite.front?.toDataURL('image/png') ?? null, sheet: sprite.sheet?.toDataURL('image/png') ?? null, tiles: sprite.tiles?.map(tile => tile.toDataURL('image/png')) ?? [], meta, paths: { ...variant.paths, spriteTiles: (sprite.tiles ?? []).map((_, i) => `${variant.paths.spriteTileBase}${i}.png`) } };
+  return { facingPngs: turned.map(s => s.canvas.toDataURL('image/png')), png: sprite.canvas.toDataURL('image/png'), front: sprite.front?.toDataURL('image/png') ?? null, still: sprite.still?.toDataURL('image/png') ?? null, rotor: sprite.rotor?.toDataURL('image/png') ?? null, sheet: sprite.sheet?.toDataURL('image/png') ?? null, tiles: sprite.tiles?.map(tile => tile.toDataURL('image/png')) ?? [], meta, paths: { ...variant.paths, spriteTiles: (sprite.tiles ?? []).map((_, i) => `${variant.paths.spriteTileBase}${i}.png`) } };
 }
 function exportPng(asset, variant) {
   const { png, paths } = exportSprite(asset.id, variant.id);

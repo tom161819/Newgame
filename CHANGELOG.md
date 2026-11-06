@@ -11,6 +11,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 - Builders can share an optional Builders’ Workshop as a reachable base and wait nearby between jobs. Without a completed reachable workshop, actual construction runs at 50% speed; movement, carrying, Farmers, the King and demolition are unchanged. The workshop uses a clearly described procedural placeholder while its final art awaits approval.
 
+## [0.8.1] - 2026-11-06
+<!-- version: {"title":"Turning mill sails","type":"feature","reconstructed":false,"saveVersion":36} -->
+### Added
+- The Mill's sails now turn while a Miller is grinding and slow to a stop when no one is. They stop while the game is paused and follow the game speed. The Mill keeps its approved look; only the sails move.
+
 ## [0.8.0] - 2026-11-06
 <!-- version: {"title":"Manual rock mining with physical stone delivery","type":"feature","reconstructed":false,"saveVersion":36} -->
 ### Added

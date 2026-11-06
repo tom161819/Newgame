@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "trade-porch",
+  "variantId": "trade-porch-bakery",
+  "name": "Bakery: table with bread baskets, 2 seats",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "d724449a",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 99,
+  "height": 71,
+  "anchor": {
+    "x": 49,
+    "y": 45
+  },
+  "origin": {
+    "x": 0.49495,
+    "y": 0.6338
+  },
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "base": {
+    "x": 65,
+    "y": 69
+  },
+  "baseOrigin": {
+    "x": 0.65657,
+    "y": 0.97183
+  },
+  "visualHeight": 69,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.69,
+  "lights": []
+}

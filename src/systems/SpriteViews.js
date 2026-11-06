@@ -74,19 +74,23 @@ export class SpriteBuildingView {
   constructor(manager,definition,building,preview=false) {
     this.manager=manager;this.definition=definition;this.preview=preview;
     const base=towerBase(building);
-    this.back=new SpriteObjectView(manager,definition,base.x,base.y);
+    // #99: a building with a rotor (the Mill) shows its still body and turns the sails alone (see game/MillSails.js).
+    const rotor=definition.rotor&&manager.hasTexture(definition.id,'still')&&manager.hasTexture(definition.id,'rotor');
+    this.back=new SpriteObjectView(manager,definition,base.x,base.y,rotor?{key:manager.textureKey(definition.id,'still')}:{});
+    this.rotor=rotor?manager.scene.add.image(base.x+definition.rotor.pivot.x,base.y+definition.rotor.pivot.y,manager.textureKey(definition.id,'rotor')).setOrigin(definition.rotor.origin.x,definition.rotor.origin.y):null;
     this.front=manager.hasTexture(definition.id,'front')
       ? new SpriteObjectView(manager,definition,base.x,base.y,{key:manager.textureKey(definition.id,'front'),origin:definition.frontOrigin??definition.origin,front:true})
       : manager.scene.add.graphics();
     this.footprint=manager.scene.add.graphics();
     this.paint(building);
-    if(preview){this.back.setAlpha(0.5);this.front.setAlpha(0.5);}
+    if(preview){this.back.setAlpha(0.5);this.front.setAlpha(0.5);this.rotor?.setAlpha(0.5);}
   }
   paint(building,tint=null) {
     this.base=towerBase(building);
     const depth=buildingDepth(building);
     this.back.setPosition(this.base.x,this.base.y).setDepth(this.preview?10001:depth).setTint(tint);
     this.front.setPosition(this.base.x,this.base.y).setDepth(this.preview?10002:depth+0.3);
+    this.rotor?.setPosition(this.base.x+this.definition.rotor.pivot.x,this.base.y+this.definition.rotor.pivot.y).setDepth(this.preview?10001.5:depth+0.2);if(this.rotor){if(tint)this.rotor.setTint(tint);else this.rotor.clearTint();}
     if(this.front.setTint)this.front.setTint(tint);
     const floor=this.footprint.clear().setDepth(this.preview?10000:-90);
     floor.fillStyle(tint??0x777450,this.preview?0.3:0.25);floor.lineStyle(1,tint??0xb3a477,0.8);
@@ -101,8 +105,8 @@ export class SpriteBuildingView {
     const alpha=this.manager.scene.textures.getPixelAlpha(Math.floor((x-bounds.x)/bounds.width*frame.width),Math.floor((y-bounds.y)/bounds.height*frame.height),sprite.texture.key,frame.name);
     return alpha==null||alpha>=160;
   }
-  setAlpha(value) { this.back.setAlpha(value);this.front.setAlpha(value);this.footprint.setAlpha(value);return this; }
-  setVisible(value) { this.back.setVisible(value);this.front.setVisible(value);this.footprint.setVisible(value); }
+  setAlpha(value) { this.back.setAlpha(value);this.front.setAlpha(value);this.rotor?.setAlpha(value);this.footprint.setAlpha(value);return this; }
+  setVisible(value) { this.back.setVisible(value);this.front.setVisible(value);this.rotor?.setVisible(value);this.footprint.setVisible(value); }
   inView(view) { const b=this.back.getBounds();return b.right>=view.x&&b.x<=view.right&&b.bottom>=view.y&&b.y<=view.bottom; }
-  destroy() { this.back.destroy();this.front.destroy();this.footprint.destroy(); }
+  destroy() { this.back.destroy();this.front.destroy();this.rotor?.destroy();this.footprint.destroy(); }
 }

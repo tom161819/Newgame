@@ -180,8 +180,40 @@ try {
   }
   pass('Phaser demo places exported sprites with their anchors and lights the night in Canvas and WebGL');
 
+  // #115 Path Lab: the production N12 path renderer on an editable map, scenarios, painting, undo, honest V2 state, JSON round trip.
+  {
+    const { page: lab, errors: labErrors } = await open(context, 'path-lab.html#scenario=straight&season=Winter');
+    await lab.waitForFunction(() => window.pathLab?.ready);
+    const start = await lab.evaluate(() => ({ worn: window.pathLab.painted(), season: window.pathLab.state.season, size: window.pathLab.sceneSize() }));
+    assert.equal(start.worn, 12, 'deep link loads the straight scenario');assert.equal(start.season, 'Winter');assert.ok(start.size[0] > 1000);
+    // #116 Experimental V2: enabled, different from N12 on the same map, sliders repaint it, a change makes the preset Custom.
+    const probe = () => lab.evaluate(() => { const c = document.querySelector('#lab-view'), d = c.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, c.width, c.height).data; let h = 0; for (let i = 0; i < d.length; i += 64) h = (h * 31 + d[i] + d[i + 1] * 7) >>> 0; return h; });
+    await lab.locator('#lab-scenarios [data-scenario="path-to-area"]').click();const n12 = await probe();
+    await lab.locator('#lab-preset').selectOption('organic');await lab.waitForTimeout(400);const organic = await probe();assert.notEqual(organic, n12, 'V2 Organic differs from N12');
+    assert.equal(await lab.evaluate(() => window.pathLab.state.renderer), 'v2');assert.equal(await lab.locator('#lab-p-meanderStrength').isDisabled(), false);
+    await lab.locator('#lab-p-areaExpansion').fill('1');await lab.locator('#lab-p-areaExpansion').dispatchEvent('input');await lab.waitForTimeout(400);
+    assert.notEqual(await probe(), organic, 'a slider repaints V2');assert.equal(await lab.evaluate(() => window.pathLab.state.preset), 'custom');
+    await lab.locator('#lab-renderer button[data-value="current"]').click();await lab.waitForTimeout(300);assert.equal(await probe(), n12, 'Current is unchanged and comes back exactly');
+    // Real pointer painting on the canvas, then undo.
+    const box = await lab.locator('#lab-view').boundingBox();await lab.locator('#lab-scenarios [data-scenario="corner"]').click();
+    const before = await lab.evaluate(() => window.pathLab.painted());
+    await lab.mouse.move(box.x + box.width * 0.3, box.y + box.height * 0.75);await lab.mouse.down();await lab.mouse.move(box.x + box.width * 0.45, box.y + box.height * 0.8, { steps: 8 });await lab.mouse.up();
+    const after = await lab.evaluate(() => window.pathLab.painted());assert.ok(after > before, `painting adds worn tiles (${before} → ${after})`);
+    await lab.locator('#lab-undo').click();assert.equal(await lab.evaluate(() => window.pathLab.painted()), before, 'undo restores the map');
+    await lab.locator('#lab-redo').click();assert.equal(await lab.evaluate(() => window.pathLab.painted()), after, 'redo');
+    // The track is drawn: a worn tile differs from the grass beside it in the rendered scene.
+    await lab.locator('#lab-scenarios [data-scenario="path-to-area"]').click();
+    const json = await lab.evaluate(() => window.pathLab.exportJson());assert.equal(json.kind, 'path-lab');assert.equal(json.wear.length, 24 * 24);
+    await lab.evaluate(() => window.pathLab.importJson({ ...window.pathLab.exportJson(), season: 'Autumn' }));assert.equal(await lab.evaluate(() => window.pathLab.state.season), 'Autumn', 'JSON import round trip');
+    await lab.locator('#lab-json').fill('{"kind":"path-lab","schema":99}');await lab.locator('#lab-import').click();assert.match(await lab.locator('#lab-json-feedback').textContent(), /Not imported/);
+    await lab.locator('#lab-variant-name').fill('smoke');await lab.locator('#lab-save').click();assert.equal(await lab.locator('#lab-variants li').count(), 1);
+    if (process.env.PATH_LAB_SHOT) { await lab.locator('#lab-centerline').check(); await lab.screenshot({ path: process.env.PATH_LAB_SHOT }); }
+    assert.deepEqual(labErrors, []);await lab.close();
+  }
+  pass('Path Lab: N12 reference renders the editable map, deep-linked scenario and season, Experimental V2 differs and repaints from its sliders (preset → Custom), real painting with undo/redo, JSON export/import validation, saved variant');
+
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 } });
-  for (const path of ['index.html#watchtower', 'index.html#style-guide', 'phaser-demo.html']) {
+  for (const path of ['index.html#watchtower', 'index.html#style-guide', 'phaser-demo.html', 'path-lab.html']) {
     const { page: small, errors: smallErrors } = await open(phone, path);
     await small.waitForTimeout(800);
     assert.equal(await small.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${path} fits a phone`);

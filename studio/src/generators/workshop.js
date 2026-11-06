@@ -9,7 +9,7 @@ import { box, cylinder, prism, sphere, clamp } from './shapes.js';
 import { PROPS, PROP_TYPES } from './props.js';
 
 export const params = [
-  { key: 'body.kind', values: ['house', 'raised', 'windmill', 'furnace', 'barn', 'none'], description: 'Main structure: house, granary on staddle stones, tower windmill with sails, bloomery furnace, big barn, or none (props only, e.g. equipment).' },
+  { key: 'body.kind', values: ['house', 'raised', 'windmill', 'furnace', 'barn', 'shed', 'none'], description: 'Main structure: house, granary on staddle stones, tower windmill with sails, bloomery furnace, big barn, open lean-to shed (posts, sloping roof, low back wall; work stays visible underneath), or none (props only, e.g. equipment).' },
   { key: 'body', description: 'House parameters (walls, width, depth, wallHeight, ridge, roofHeight, roofMaterial, windows, chimney, lantern) or the kind-specific ones.' },
   { key: 'body.at', unit: 'units', description: '[x, z] centre of the body; the rest of the footprint is the yard.' },
   { key: 'body.ironBands', description: 'Barn: iron bands across the double doors (armory).' },
@@ -37,11 +37,14 @@ function body(spec, style) {
       box([0.16, 0.16, 0.03], [r * 0.56 + 0.03, h * 0.62, r * 0.56 + 0.03], 'opening', { rotation: Math.PI / 4 })];
     // Sails in the plane facing the camera: a "+" of lattice blades on a hub.
     const hub = [r * 0.72 + 0.06, h - 0.05, r * 0.72 + 0.06];
-    parts.push(sphere([0.06, 0.06, 0.06], [hub[0], hub[1] - 0.06, hub[2]], 'wood_dark', 0));
-    parts.push(box([0.17, sail * 2, 0.025], [hub[0] + 0.02, hub[1] - sail, hub[2] + 0.02], 'wood', { rotation: Math.PI / 4 }));
-    parts.push(box([sail * 2, 0.17, 0.025], [hub[0] + 0.02, hub[1] - 0.085, hub[2] + 0.02], 'wood', { rotation: Math.PI / 4 }));
-    parts.push(box([0.03, sail * 2, 0.03], [hub[0] + 0.035, hub[1] - sail, hub[2] + 0.035], 'cloth_linen', { rotation: Math.PI / 4 }));
-    return { parts, lights: [] };
+    // The hub and sails are tagged as the `rotor` layer (#99): the export adds a still sprite without them and a
+    // sails-only sprite with the hub as pivot, so the game can turn the sails alone. Pixels of the full sprite are unchanged.
+    const rotor = [sphere([0.06, 0.06, 0.06], [hub[0], hub[1] - 0.06, hub[2]], 'wood_dark', 0),
+      box([0.17, sail * 2, 0.025], [hub[0] + 0.02, hub[1] - sail, hub[2] + 0.02], 'wood', { rotation: Math.PI / 4 }),
+      box([sail * 2, 0.17, 0.025], [hub[0] + 0.02, hub[1] - 0.085, hub[2] + 0.02], 'wood', { rotation: Math.PI / 4 }),
+      box([0.03, sail * 2, 0.03], [hub[0] + 0.035, hub[1] - sail, hub[2] + 0.035], 'cloth_linen', { rotation: Math.PI / 4 })];
+    parts.push(...rotor.map(part => ({ ...part, layer: 'rotor' })));
+    return { parts, lights: [], pivot: [hub[0] + 0.02, hub[1] - 0.06, hub[2] + 0.02] };
   }
   if (kind === 'furnace') {
     // Bloomery: tapered stone stack, chimney, glowing mouth and bellows; `size` scales it.
@@ -61,6 +64,20 @@ function body(spec, style) {
     if (spec.ironBands) for (const y of [0.3, 0.6, 0.85]) parts.push(box([0.72, 0.04, 0.05], [width * 0.1, y, depth / 2 + 0.04], 'iron'));
     return { parts, lights: built.lights };
   }
+  if (kind === 'shed') {
+    // Open lean-to work shed (#119): posts carry a roof that slopes down to a low plank back wall, so the
+    // benches, beams and tools underneath stay visible from the isometric camera (front faces +x and +z).
+    const width = clamp(spec.width ?? 1.5, 0.8, 1.9), depth = clamp(spec.depth ?? 1.0, 0.6, 1.5), front = clamp(spec.frontHeight ?? 0.85, 0.6, 1.2), back = clamp(spec.backHeight ?? 0.55, 0.35, front), roof = spec.roofMaterial ?? 'roof_shingle';
+    const parts = [];
+    for (const x of [-width / 2 + 0.04, 0, width / 2 - 0.04]) parts.push(box([0.06, front, 0.06], [x, 0, depth / 2 - 0.04], 'wood_dark'), box([0.06, back, 0.06], [x, 0, -depth / 2 + 0.04], 'wood_dark'));
+    // Back wall of planks up to the low eave, a beam under each eave, the sloping roof as thin overlapping steps.
+    if (spec.backWall !== false) parts.push(box([width - 0.04, back * 0.8, 0.04], [0, 0, -depth / 2 + 0.03], 'wood'));
+    parts.push(box([width + 0.04, 0.05, 0.06], [0, front - 0.05, depth / 2 - 0.04], 'wood_dark'), box([width + 0.04, 0.05, 0.06], [0, back - 0.05, -depth / 2 + 0.04], 'wood_dark'));
+    const steps = 6;
+    for (let i = 0; i < steps; i++) { const t = (i + 0.5) / steps, z = -depth / 2 - 0.08 + t * (depth + 0.22), y = back + (front - back) * t; parts.push(box([width + 0.1, 0.035, (depth + 0.22) / steps + 0.03], [0, y, z], roof)); }
+    if (spec.sideWall) parts.push(box([0.04, back * 0.8, depth - 0.1], [-width / 2 + 0.03, 0, 0], 'wood'));
+    return { parts, lights: spec.lantern ? [{ type: 'torch', at: [width / 2 - 0.1, front - 0.12, depth / 2 - 0.02] }] : [] };
+  }
   throw new RangeError(`Unknown workshop body ${kind}`);
 }
 
@@ -77,7 +94,7 @@ export function build(spec, { footprint, style }) {
   if (spec.ground) parts.unshift(box([footprint.width - 0.18, 0.02, footprint.height - 0.18], [0, 0, 0], spec.ground));
   let height = 0;
   for (const p of parts) height = Math.max(height, p.at[1] + (p.size?.[1] ?? p.height ?? (p.radii ? p.radii[1] * 2 : 0)));
-  return { primitives: parts, lights, height };
+  return { primitives: parts, lights, height, ...(made.pivot ? { rotor: { at: [made.pivot[0] + bx, made.pivot[1], made.pivot[2] + bz] } } : {}) };
 }
 
 export default { id: 'workshop', version: 1, label: 'Workshop with props', params, build };

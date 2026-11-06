@@ -21,8 +21,8 @@ Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke pau
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| NEW01-A #118 Builder workshop mechanics | Codex | `codex/builder-workshop-base` (stacked on94) | — | Implemented schema37;757 tests/30 focused/version/changelog/build PASS; final0.9.0 native base/rate/Load/phone/demolition+rock/Needs/morale/feed/commands PASS;183→185→194→118 actual Pages; placeholder allowed, final art119 stays Claude | own workshop definition/derived base policy, ConstructionSystem.workSpeed, central idleHomes/BuilderAI, Unit/Construction/detail status, completion XP, schema/release/i18n, own tests/native/docs; no final art |
-| AUD65 #94 Manual rock mining | Codex | `codex/manual-rock-mining` (stacked on124) | [#194](https://github.com/tom161819/Newgame/pull/194) | Implemented; schema36/release0.8.0 after185 actual Pages;750 tests/version/changelog/build + native real-mouse10Stones/ledger/Load/phone/commands/Needs/eventfeed PASS | own rock marking tool/UI, GameScene/GameApplication narrow input/Escape hooks, MiningWork/WorkerAI/WorkplaceSystem/free Miner selection, current schema serializer/loader/terrain validation, XP/SkillSystem, physical Drop/FoodProduction reuse and cargo provenance, i18n, own tests/browser/docs |
+| NEW01-A #118 Builder workshop mechanics | Codex | `codex/builder-workshop-base` (stacked on94) | [#196](https://github.com/tom161819/Newgame/pull/196) | Main ea34fac integrated;772 tests/version/changelog/build PASS; renewed workshop/Mill/Needs/C05 native PASS;94 actual Pages verified; placeholder allowed, final art119 stays Claude | own workshop definition/derived base policy, ConstructionSystem.workSpeed, central idleHomes/BuilderAI, Unit/Construction/detail status, completion XP, schema/release/i18n, own tests/native/docs; no final art |
+| #99 Mill sails turn while grinding (still body + rotor layer from the approved export) | Claude | `claude/mill-sails` | — | In review | studio generator/renderer/export rotor layer, art/sprites/windmill, public/assets/buildings/mill, approvedArt, AssetManager, SpriteViews, MapMemoryRenderer, new game/MillSails.js, GameScene hook, tests, smoke |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
@@ -34,6 +34,8 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 4. [#98](https://github.com/tom161819/Newgame/issues/98) AUD71-A idle residents sit on a placeholder porch at their workplace (follows #124's central idle rule; porch art stays with Claude in #114)
 5. [#132](https://github.com/tom161819/Newgame/issues/132) NEW08-A food building menu order and hut unlocking (moved from Claude's backlog)
 6. [#97](https://github.com/tom161819/Newgame/issues/97) AUD69-70 working castle gate; walls reached only through a tower or the gate (mechanics; new gate art via Claude's Asset Studio)
+7. [#100](https://github.com/tom161819/Newgame/issues/100) AUD75 world generation: rivers, beaches, desert, bushes (new terrain art via Claude's Asset Studio)
+8. [#91](https://github.com/tom161819/Newgame/issues/91) AUD41 Asset Library developer edit mode and balance tools
 
 ## Kept backups (do not delete without the developer)
 
@@ -42,6 +44,11 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 
 ## Done
 
+- Codex94/PR194 verified done: merge2dc39c4, exacttagv0.8.0; Pages42242745923 build128000668031/deploy128000666084 SUCCESS.754 tests and native physical mining/ledger/Load/commands PASS.
+
+- 2026-11-06 Claude: #116 Path renderer V2 in the Path Lab ([#205](https://github.com/tom161819/Newgame/pull/205)), awaiting the owner's preset choice; Pages deploy retries ([#206](https://github.com/tom161819/Newgame/pull/206)).
+- 2026-11-06 Claude: #115 Path Lab in the Asset Studio ([#204](https://github.com/tom161819/Newgame/pull/204)).
+- 2026-11-06 Claude: #119 Builders' Workshop concepts ([#199](https://github.com/tom161819/Newgame/pull/199)) and #114 porch concepts ([#201](https://github.com/tom161819/Newgame/pull/201)) in the Studio, awaiting the owner's choice; Pages deploy timeout ([#203](https://github.com/tom161819/Newgame/pull/203), ineffective: replaced by deploy retries).
 - 2026-11-06 Claude PR197 Needs tooltips and100-resident performance coverage mergedb53b8da731f5e5ad75574fc0e73edfd43e472f07, release0.7.2/schema35. Integrated tooltip assertions while retaining exact snapshot/Load pause guard.
 
 - 2026-11-06 PR185 / Issue124: release0.7.0/schema35 merged03062705c47199386af24d55dfce8ec38a1e4755;743 tests/version/changelog/build and native gathering/Needs/morale/feed/commands/current Load PASS, CI42233028928 SUCCESS. Tag v0.7.0 resolves to exact merge. Actual Pages42233665135 build127965062613 and deploy127965013083 SUCCESS after one backend-only failed-deploy retry; issue124 closed/done. PR194 is the existing next task.

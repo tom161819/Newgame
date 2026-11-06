@@ -1,0 +1,28 @@
+/* Path Lab (#115) layout on top of the studio's styles. */
+.lab-main { display: flex; flex-direction: column; gap: 12px; padding: 12px 16px; min-width: 0; }
+.lab-toolbar { flex-wrap: wrap; row-gap: 8px; }
+.lab-actions { display: flex; flex-wrap: wrap; gap: 4px; }
+.lab-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 12px; min-width: 0; }
+.lab-stage-wrap { position: relative; min-width: 0; }
+.lab-view { display: block; width: 100%; height: min(70vh, 640px); background: #2a3020; border-radius: 8px; touch-action: none; cursor: crosshair; }
+.lab-overlays { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; font-size: 13px; }
+.lab-side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.lab-side .panel h2 { margin-top: 0; }
+.lab-scenarios { display: flex; flex-direction: column; gap: 4px; }
+.lab-scenarios .button { text-align: left; }
+.lab-scenarios .button[data-priority]::after { content: " ★"; color: #e7b94f; }
+.lab-params { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+.lab-param { display: grid; grid-template-columns: 1fr 64px 28px; gap: 4px 6px; align-items: center; font-size: 12.5px; }
+.lab-param label { grid-column: 1 / -1; display: flex; justify-content: space-between; }
+.lab-param input[type=number] { width: 64px; }
+.lab-param.v2-only { opacity: .55; }
+.lab-badge { font-size: 11px; padding: 1px 6px; border-radius: 9px; background: #4a4430; color: #f0d999; }
+.lab-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.lab-row input[type=text] { flex: 1; min-width: 0; }
+.lab-variants { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.lab-variants li { display: flex; gap: 4px; align-items: center; font-size: 13px; }
+.lab-variants li span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#lab-json { width: 100%; box-sizing: border-box; font-family: ui-monospace, monospace; font-size: 11px; }
+.muted { color: #b9b29a; font-size: 12.5px; margin: 4px 0; }
+.segmented button[disabled] { opacity: .45; cursor: not-allowed; }
+@media (max-width: 900px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } .lab-view { height: 56vh; } }

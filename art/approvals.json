@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-06T03:00:00.000Z",
+  "updatedAt": "2026-11-06T16:00:00.000Z",
   "note": "Committed review state for Asset Studio. Export it from the studio and commit it through a pull request; the studio never writes to GitHub.",
   "assets": {
     "watchtower": {
@@ -1174,6 +1174,91 @@
           "specHash": "6f0ac52e",
           "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
           "updatedAt": "2026-11-06T03:00:00.000Z"
+        }
+      }
+    },
+    "builders-workshop": {
+      "preferred": "builders-workshop-open-shed",
+      "variants": {
+        "builders-workshop-open-shed": {
+          "status": "review",
+          "version": 1,
+          "specHash": "fbc62623",
+          "note": "Proposed by Claude for review (#119); the game keeps the #118 placeholder until one variant is approved.",
+          "updatedAt": "2026-11-06T15:30:00.000Z"
+        },
+        "builders-workshop-house-awning": {
+          "status": "review",
+          "version": 1,
+          "specHash": "49557077",
+          "note": "Proposed by Claude for review (#119); the game keeps the #118 placeholder until one variant is approved.",
+          "updatedAt": "2026-11-06T15:30:00.000Z"
+        },
+        "builders-workshop-material-yard": {
+          "status": "review",
+          "version": 1,
+          "specHash": "95f3a15b",
+          "note": "Proposed by Claude for review (#119); the game keeps the #118 placeholder until one variant is approved.",
+          "updatedAt": "2026-11-06T15:30:00.000Z"
+        }
+      }
+    },
+    "workplace-porch": {
+      "preferred": "workplace-porch-veranda",
+      "variants": {
+        "workplace-porch-veranda": {
+          "status": "review",
+          "version": 1,
+          "specHash": "f63c375b",
+          "note": "Proposed by Claude for review (#114); seating concept for #98, not used by the game until approved.",
+          "updatedAt": "2026-11-06T16:00:00.000Z"
+        },
+        "workplace-porch-awning": {
+          "status": "review",
+          "version": 1,
+          "specHash": "a936c96c",
+          "note": "Proposed by Claude for review (#114); seating concept for #98, not used by the game until approved.",
+          "updatedAt": "2026-11-06T16:00:00.000Z"
+        },
+        "workplace-porch-bench": {
+          "status": "review",
+          "version": 1,
+          "specHash": "f519ca47",
+          "note": "Proposed by Claude for review (#114); seating concept for #98, not used by the game until approved.",
+          "updatedAt": "2026-11-06T16:00:00.000Z"
+        }
+      }
+    },
+    "trade-porch": {
+      "preferred": "trade-porch-mill",
+      "variants": {
+        "trade-porch-mill": {
+          "status": "review",
+          "version": 1,
+          "specHash": "a8ac9f28",
+          "note": "Proposed by Claude for review (#114); seating concept for #98, not used by the game until approved.",
+          "updatedAt": "2026-11-06T16:00:00.000Z"
+        },
+        "trade-porch-bakery": {
+          "status": "review",
+          "version": 1,
+          "specHash": "d724449a",
+          "note": "Proposed by Claude for review (#114); seating concept for #98, not used by the game until approved.",
+          "updatedAt": "2026-11-06T16:00:00.000Z"
+        },
+        "trade-porch-quarry": {
+          "status": "review",
+          "version": 1,
+          "specHash": "5551e60b",
+          "note": "Proposed by Claude for review (#114); seating concept for #98, not used by the game until approved.",
+          "updatedAt": "2026-11-06T16:00:00.000Z"
+        },
+        "trade-porch-smelter": {
+          "status": "review",
+          "version": 1,
+          "specHash": "a8c43185",
+          "note": "Proposed by Claude for review (#114); seating concept for #98, not used by the game until approved.",
+          "updatedAt": "2026-11-06T16:00:00.000Z"
         }
       }
     }

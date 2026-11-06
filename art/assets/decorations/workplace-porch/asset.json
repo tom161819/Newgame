@@ -1,0 +1,164 @@
+{
+  "schema": 1,
+  "id": "workplace-porch",
+  "name": "Workplace porch (shared)",
+  "category": "decorations",
+  "description": "Seating in front of a workplace where idle workers wait (#114 art for the #98 mechanics). Three alternatives of the shared construction: a strip of 2 \u00d7 1 tiles placed along the building's front, never on its door. Each variant lists its seats as `seats` ([x, z] in tile units, figure facing the camera), so #98 can place seated workers on them. Concepts for review; nothing enters the game until approved.",
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "generator": "workshop",
+  "variants": [
+    {
+      "id": "workplace-porch-veranda",
+      "name": "Open veranda, 2 seats",
+      "version": 1,
+      "notes": "Light lean-to roof on posts over a bench for two; a barrel at the side.",
+      "spec": {
+        "body": {
+          "kind": "shed",
+          "width": 1.3,
+          "depth": 0.6,
+          "frontHeight": 0.75,
+          "backHeight": 0.5,
+          "backWall": false,
+          "at": [
+            -0.15,
+            -0.02
+          ]
+        },
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              -0.15,
+              0.0
+            ],
+            "length": 0.6
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.72,
+              0.1
+            ]
+          }
+        ],
+        "seats": [
+          [
+            -0.3,
+            0.02
+          ],
+          [
+            0.0,
+            0.02
+          ]
+        ]
+      }
+    },
+    {
+      "id": "workplace-porch-awning",
+      "name": "Awning with table, 3 seats",
+      "version": 1,
+      "notes": "Shingled awning over a table with three stools; for workplaces with three or more workers.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "awning",
+            "at": [
+              -0.1,
+              -0.05
+            ],
+            "width": 1.2,
+            "depth": 0.55,
+            "height": 0.66
+          },
+          {
+            "type": "table",
+            "at": [
+              -0.1,
+              -0.05
+            ]
+          },
+          {
+            "type": "stool",
+            "at": [
+              -0.38,
+              0.2
+            ]
+          },
+          {
+            "type": "stool",
+            "at": [
+              -0.1,
+              0.24
+            ]
+          },
+          {
+            "type": "stool",
+            "at": [
+              0.18,
+              0.2
+            ]
+          }
+        ],
+        "seats": [
+          [
+            -0.38,
+            0.2
+          ],
+          [
+            -0.1,
+            0.24
+          ],
+          [
+            0.18,
+            0.2
+          ]
+        ]
+      }
+    },
+    {
+      "id": "workplace-porch-bench",
+      "name": "Plain bench, 1\u20132 seats",
+      "version": 1,
+      "notes": "No roof: a bench against the wall and a crate; the smallest footprint for one or two workers.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              -0.2,
+              -0.05
+            ],
+            "length": 0.55
+          },
+          {
+            "type": "crate",
+            "at": [
+              0.45,
+              -0.1
+            ]
+          }
+        ],
+        "seats": [
+          [
+            -0.33,
+            -0.04
+          ],
+          [
+            -0.07,
+            -0.04
+          ]
+        ]
+      }
+    }
+  ]
+}
