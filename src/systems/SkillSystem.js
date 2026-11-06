@@ -15,7 +15,7 @@ export class SkillSystem {
   initialize(actor){if(actor.definition.category!=='character')return null;actor.skills??={};for(const id of SKILL_IDS)actor.skills[id]??=createProgress();actor.activitySkill??=null;actor.statModifiers.activitySkill??={};return actor.skills;}
   importCharacter(actor,data){if(actor.definition.category!=='character')return;actor.skills=data?structuredClone(data):null;this.initialize(actor);}
   efficiency(actor,skill){const skills=this.initialize(actor);return 1+((skills?.[skill]?.level??1)-1)*WORK_RULES.efficiencyPerLevel;}
-  workEfficiency(actor,skill){return this.efficiency(actor,skill)*(this.scene.foodSystem?.workMultiplier(actor)??1);}
+  workEfficiency(actor,skill){return this.efficiency(actor,skill)*(this.scene.foodSystem?.workMultiplier(actor)??1)*(this.scene.needs?.workModifier?.(actor)??1);}
   addXP(actor,skill,amount){
     const skills=this.initialize(actor);if(!skills?.[skill]||actor.isAlive===false||actor.experience?.enabled===false)return 0;
     return this.scene.experienceSystem.addTrackXP(skills[skill],amount*talentXPMultiplier(actor,skill),()=>{if(actor.activitySkill===skill)this.refreshModifier(actor);});

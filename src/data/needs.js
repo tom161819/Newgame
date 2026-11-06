@@ -7,12 +7,15 @@ export const NEEDS=Object.freeze({
   rest:Object.freeze({drainPerDay:30,recoverPerDay:60,low:20}),
   safety:Object.freeze({base:45,castle:{bonus:25,range:12},tower:{bonus:15,range:10},guard:{bonus:10,range:10},attack:{penalty:30,days:1}}),
   unpaid:Object.freeze({perGold:5,max:30}),
-  // Phase C applies the work modifiers; phase A only measures and shows them.
+  // Work speed of every task (phase C): FinalWorkSpeed = base × skill × hunger × mood.work. Walking and combat are not affected.
   moods:Object.freeze([{id:'happy',min:70,work:1.1},{id:'neutral',min:40,work:1},{id:'unhappy',min:25,work:.8},{id:'critical',min:0,work:.8}]),
   activeStates:Object.freeze(['Working','Traveling to Target','Searching for Target','Going to Workplace','Returning to Workplace','Patrolling','Fleeing','MovingToHold']),
   updateMs:1000,
 });
 export const clampNeed=value=>Math.max(0,Math.min(100,value));
+// Kingdom Happiness (average of residents) as a modifier of the existing Kingdom Attractiveness (#58 phase C).
+export const HAPPINESS_ATTRACTIVENESS=Object.freeze([{min:80,value:15},{min:50,value:0},{min:30,value:-20},{min:0,value:-45}]);
+export const attractivenessFor=happiness=>happiness==null?0:HAPPINESS_ATTRACTIVENESS.find(r=>happiness>=r.min).value;
 export const moodFor=happiness=>NEEDS.moods.find(m=>happiness>=m.min)??NEEDS.moods.at(-1);
 // Weighted Happiness minus the separate unpaid-wage penalty (counted once), rounded to 0–100.
 export function happinessOf({food,rest,housing,safety},unpaidPenalty=0){

@@ -85,3 +85,24 @@ test('S13 performance: 200 residents update in one step without per-frame work',
   const start=performance.now();s.needs.step(1000);const sum=s.needs.summary();const ms=performance.now()-start;
   assert.equal(sum.population,200);assert.ok(ms<200,`${ms} ms for a step and a summary of 200 residents`);
 });
+
+test('S13 phase C: the mood scales work speed (Happy ×1.10, Unhappy and Critical ×0.80) on top of skill and hunger; walking and combat unchanged',()=>{
+  const s=workerScene(undefined,{starter:true,morale:true});s.workerSystem.unsubscribe?.();const w=person(s,{x:40,y:40}),speed=w.moveSpeed??w.speed,attack=w.attack;
+  const base=s.skillSystem.efficiency(w,'mining')*s.foodSystem.workMultiplier(w);
+  assert.equal(s.skillSystem.workEfficiency(w,'mining'),base,'no update yet: neutral');
+  s.needs.step(1000);assert.equal(s.needs.status(w).mood,'happy');assert.ok(Math.abs(s.skillSystem.workEfficiency(w,'mining')-base*1.1)<1e-9,'happy works 10 % faster');
+  const r=s.needs.records.get(w.id);r.food=0;r.rest=0;s.needs.refresh();assert.ok(['unhappy','critical'].includes(s.needs.status(w).mood));
+  assert.ok(Math.abs(s.skillSystem.workEfficiency(w,'mining')-base*.8)<1e-9,'unhappy works 20 % slower');
+  assert.equal(w.moveSpeed??w.speed,speed);assert.equal(w.attack,attack);assert.equal(s.needs.workModifier(s.character),1,'the King has no mood factor');
+});
+
+test('S13 phase C: Kingdom Happiness is part of the existing Kingdom Attractiveness, with no effect while there are no residents',()=>{
+  const s=workerScene(undefined,{starter:true,seasons:true,morale:true});s.workerSystem.unsubscribe?.();
+  s.needs.refresh();assert.equal(s.attractiveness.modifiers.get('happiness'),0,'no residents: no bonus or penalty');
+  const w=person(s,{x:40,y:40});s.needs.step(1000);assert.ok(s.needs.kingdomHappiness>=80);assert.equal(s.attractiveness.modifiers.get('happiness'),15);
+  const r=s.needs.records.get(w.id);r.food=0;r.rest=0;s.needs.refresh();const h=s.needs.kingdomHappiness;assert.ok(h<50,`${h}`);
+  assert.equal(s.attractiveness.modifiers.get('happiness'),h>=30?-20:-45);assert.ok(s.attractiveness.value<=100+s.attractiveness.modifiers.get('happiness'));
+  // Derived, not saved: the factor is rebuilt from the saved needs on Load.
+  const saved=s.needs.exportState();assert.equal('work' in saved,false);s.needs.work.clear();s.needs.importState(saved);assert.ok(s.needs.workModifier(w)<1);
+  s.needs.destroy();assert.equal(s.attractiveness.modifiers.has('happiness'),false);
+});
