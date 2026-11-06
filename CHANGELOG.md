@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-06
+<!-- version: {"title":"Castle gathering and arrival uniforms","type":"feature","reconstructed":false,"saveVersion":35} -->
+### Added
+
+- Unemployed residents and idle Haulers gather at reachable Castle meeting points without crowding entrances or standing on paved roads. Haulers keep accepting global deliveries while walking there, and use safe nearby waiting when no Castle is reachable.
+- New workers keep an unemployed appearance until physically reaching their workplace. Global Haulers change at their Castle meeting point or first real task, and Builders at their work site. Reassignment, manual commands and Save/Load keep the appearance consistent.
+
 ## [0.6.1] - 2026-11-06
 <!-- version: {"title":"Mood affects work speed and attractiveness","type":"feature","reconstructed":false,"saveVersion":34} -->
 ### Changed

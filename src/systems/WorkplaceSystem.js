@@ -55,7 +55,7 @@ export class WorkplaceSystem {
     if(!worker?.isAlive||worker.isSubject===false||this.scene.gameOver||!this.scene.buildings.includes(building)||!this.scene.workerSystem.workers.has(worker.id))return false;
     const spec=buildingDefinition(building).workplace,record=this.register(building);if(!spec||!record)return false;
     if(worker.assignedWorkplaceId===building.id)return true;if(this.scene.employment?.blockReason(building)||record.workerIds.length>=spec.capacity)return false;
-    this.detach(worker);this.scene.workerSystem.jobs.assign(worker,spec.profession);
+    this.detach(worker);worker.displayProfession='idle';this.scene.workerSystem.jobs.assign(worker,spec.profession);
     worker.assignedWorkplaceId=building.id;worker.workplaceReached=false;worker.arriving=false;worker.workState='Going to Workplace';worker.aiCooldown=0;record.workerIds.push(worker.id);this.changed(building.id);return true;
   }
   detach(worker){

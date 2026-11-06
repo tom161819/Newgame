@@ -19,8 +19,8 @@ Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeat
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| NEW07 #124 Castle gathering + arrival uniforms | Codex | `codex/castle-idle-gathering` (stacked on183) | [#185](https://github.com/tom161819/Newgame/pull/185) | Integrated Needs/event-feed main; release0.7.0/schema35;741 tests/version/changelog/build PASS, combined native PASS;183 actual0.6.0 Pages verified;193 morale main integrated, renewed exact-head checks pending | derived idle policy, WorkerAI/WorkerSystem/BuilderAI/ConstructionSystem/JobSystem/WorkplaceSystem/UnitCommands, HumanView approved outfit selection, alpha serializer/loader if needed, own tests/native/i18n/docs |
 | S13 #58 phase C part 1: mood work speed, Kingdom Happiness in attractiveness | Claude | `claude/needs-work-morale` | — | In review | NeedsSystem (refresh/workModifier), data/needs.js, SkillSystem.workEfficiency, NeedsDisplay, i18n `needs.workLine`, tests/helpers/workerScene.js (`morale` option), needs smoke; release 0.6.1 |
-| NEW13 #130 Builder demolition | Codex | `codex/builder-demolition` (stacked on180) | [#183](https://github.com/tom161819/Newgame/pull/183) | Integrating main c7fad22 Needs33/event-feed; schema34 + next MINOR0.6.0; earlier721 tests/native PASS, renewed checks pending | DemolitionSystem/UI, shared ConstructionSystem/BuilderAI/WorkerAI, GameScene, schema33 Serializer/Loader/current fixtures, lifecycle cleanup, i18n/HTML/style, own tests/browser/docs |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
@@ -39,6 +39,8 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-06 PR183 / Issue130: release0.6.0/schema34, mergedabc12a11534967e7d0e393c0356c52a668758716 after CI42227943052 SUCCESS.733 tests/version/changelog/build and integrated native demolition/Needs/feed/stockpile/rightclick PASS. Actual Pages42228504161 build127928224031/deploy127941021369 SUCCESS; annotated tagv0.6.0 resolves to exactabc12a1. Issue130 closed/done;124 already in review185.
 
 - 2026-11-06 Claude: #105 event feed and bottom-right corner column ([#192](https://github.com/tom161819/Newgame/pull/192), release 0.5.1).
 - 2026-11-06 PR180 / Issue128: merged6ddc7f18484e5b669655b10135b6e10bc0b52996 after exact-head CI42199613796 SUCCESS.701 tests/changelog/build and native stockpile hauling/removal/confirmation/SaveLoad/wear/repeat PASS. Actual Pages42200431522 build127834071595 and deploy127844758887 SUCCESS. Issue128 closed/done;130 already in review183, preserve its claim.

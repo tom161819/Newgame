@@ -12,10 +12,14 @@ export class BuilderAI {
   // materials through the shared logistics bookings instead of waiting.
   carryMaterials(worker){
     if(worker.profession!=='builder')return false;
-    const logistics=this.construction.scene.logisticsTasks;if(!logistics||!this.construction.materials.enabled||logistics.freeHauler())return false;
-    const cooldown=worker.aiCooldown;worker.aiCooldown=0;
-    if(logistics.updateWorker(worker,{constructionOnly:true}))return true;
-    worker.aiCooldown=cooldown;worker.workState='Waiting';worker.workMessage='Waiting for construction';return false;
+    const logistics=this.construction.scene.logisticsTasks;
+    if(logistics&&this.construction.materials.enabled&&!logistics.freeHauler()){
+      const cooldown=worker.aiCooldown;worker.aiCooldown=0;
+      if(logistics.updateWorker(worker,{constructionOnly:true})){this.construction.scene.workerSystem.gather?.release(worker);return true;}
+      worker.aiCooldown=cooldown;
+    }
+    if(this.construction.scene.workerSystem.gather?.update(worker,{workplaceOnly:true}))return true;
+    worker.workState='Waiting';worker.workMessage='Waiting for construction';return false;
   }
   updateWorker(worker){
     const system=this.construction,scene=system.scene;

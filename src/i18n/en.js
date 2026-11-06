@@ -226,4 +226,8 @@ export default {
   'demolition.unavailable':'This building is not available for dismantling.',
   'work.dismantling':'Dismantling {name}',
   'ledger.Demolition Refund':'Demolition Refund',
+  'work.message.Waiting near Castle':'Waiting near Castle',
+  'work.message.Waiting near workplace':'Waiting near workplace',
+  'work.message.Walking to workplace':'Walking to workplace',
+  'work.message.Walking nearby':'Walking nearby',
 };

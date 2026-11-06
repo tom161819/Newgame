@@ -28,7 +28,7 @@ export class HumanView extends Phaser.GameObjects.Container {
   // Profession and name decide the approved look; the procedural figure stays until it loads.
   updateLook(){
     const worker=this.getData?.('worker');if(!worker)return;
-    const look=PROFESSION_LOOKS[worker.profession]?.[villagerSex(worker.name)]??null;
+    const look=PROFESSION_LOOKS[worker.isSubject===false?worker.profession:(worker.displayProfession??'idle')]?.[villagerSex(worker.name)]??null;
     if(look===this.look)return;this.look=look;this.lookReady=false;
     if(look&&APPROVED_VILLAGER_ART[look])this.lookReady=ensureLook(this.scene,look,()=>{if(this.look===look&&this.scene){this.lookReady=true;this.applyArt();}});
     this.applyArt();
