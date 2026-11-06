@@ -20,6 +20,11 @@ for (const need of needs) {
   if (need.review) {
     const r = await fetch(`https://api.github.com/repos/${repo}/issues/${need.review.issue}`, { headers: { Accept: 'application/vnd.github+json', ...(token ? { Authorization: `Bearer ${token}` } : {}) } }).catch(e => ({ ok: false, status: 0, error: e }));
     if (r.ok) issue = await r.json(); else if (r.status !== 404) { problems.push(`${need.variantId}: could not read review issue #${need.review.issue} (${r.status || r.error?.message}).`); continue; }
+    if (issue) { // REST has no edit time; GraphQL lastEditedAt says whether the review block changed after it was opened.
+      const [owner, name] = repo.split('/'), q = await fetch('https://api.github.com/graphql', { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify({ query: 'query($o:String!,$n:String!,$i:Int!){repository(owner:$o,name:$n){issue(number:$i){lastEditedAt}}}', variables: { o: owner, n: name, i: need.review.issue } }) }).then(x => x.ok ? x.json() : null).catch(() => null);
+      const edit = q?.data?.repository?.issue; if (!edit) { problems.push(`${need.variantId}: could not check whether review issue #${need.review.issue} was edited.`); continue; }
+      issue.lastEditedAt = edit.lastEditedAt;
+    }
   }
   const problem = proofProblem(need, issue); if (problem) problems.push(problem);
 }

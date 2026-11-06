@@ -39,13 +39,23 @@ export function checkItems(payload, variants) {
   });
 }
 
+// Only an issue the owner opened in the browser (the Studio's pre-filled Submit) can carry decisions. Claude's GitHub
+// tools act under the owner's login too, but GitHub marks those issues with performed_via_github_app; an edited review
+// block could also have been changed by an agent, so it has to be submitted again.
+export function authorProblem(issue, { edited = false } = {}) {
+  if (issue?.user?.login !== OWNER) return `opened by ${issue?.user?.login ?? 'unknown'}, not the owner`;
+  if (issue.performed_via_github_app) return `opened through the ${issue.performed_via_github_app.slug ?? 'unknown'} GitHub app (an agent), not by the owner in the browser`;
+  if (edited) return 'its review block was edited after it was opened; submit the review again from the Studio';
+  return null;
+}
+
 const LABEL = { approved: 'Approved', 'revision-requested': 'Revision requested', rejected: 'Rejected', review: 'Back to review', draft: 'Draft', blocked: 'Blocked' };
-export function summaryComment({ payload, items, author, superseded = [] }) {
+export function summaryComment({ payload, items, author, problem = author === OWNER ? null : `opened by ${author}, not the owner`, superseded = [] }) {
   const ok = items.filter(i => i.check === 'ok'), bad = items.filter(i => i.check !== 'ok'), count = d => ok.filter(i => i.decision === d).length;
   const row = i => `| \`${i.variantId}\` | v${i.version} | ${i.decision ? LABEL[i.decision] : '—'}${i.preferred ? ' ★' : ''} | ${(i.comment ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ')} |`;
   return [
     `### Asset review received: \`${payload.submissionId}\``,
-    author === OWNER ? `Submitted by the owner (@${OWNER}), so Claude acts on it.` : `⚠️ Submitted by ${author}, not the owner: **ignored** for approvals.`,
+    problem ? `⚠️ This review was ${problem}: **ignored** for approvals.` : `Submitted by the owner (@${OWNER}), so Claude acts on it.`,
     '', `**Approved ${count('approved')} · Revision requested ${count('revision-requested')} · Rejected ${count('rejected')}**`, '',
     ...(ok.length ? ['| Variant | Version | Decision | Comment |', '|---|---|---|---|', ...ok.map(row), ''] : []),
     ...(bad.length ? ['**Not applicable on main** (decide again in the Studio):', ...bad.map(i => `- \`${i.variantId}\` v${i.version}: ${i.note}`), ''] : []),
@@ -75,7 +85,7 @@ export function approvalsNeedingProof(base, head) {
 export function proofProblem(need, issue) {
   if (!need.review) return `${need.variantId} v${need.version}: approved without "review": {issue, submissionId}. Only the owner's Submit review can approve.`;
   if (!issue) return `${need.variantId}: review issue #${need.review.issue} not found.`;
-  if (issue.user?.login !== OWNER) return `${need.variantId}: review issue #${need.review.issue} was opened by ${issue.user?.login}, not the owner.`;
+  const who = authorProblem(issue, { edited: !!issue.lastEditedAt }); if (who) return `${need.variantId}: review issue #${need.review.issue} was ${who}.`;
   const { payload, error } = parsePayload(issue.body);
   if (error) return `${need.variantId}: review issue #${need.review.issue}: ${error}`;
   if (payload.submissionId !== need.review.submissionId) return `${need.variantId}: issue #${need.review.issue} holds submission ${payload.submissionId}, not ${need.review.submissionId}.`;
