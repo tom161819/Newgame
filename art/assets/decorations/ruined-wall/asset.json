@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "id": "ruined-wall",
+  "name": "Broken wall",
+  "category": "decorations",
+  "description": "Collapsed segments of the stone wall, same thickness and line as the wall kit, with breaches and fallen blocks. Concept for review (#149): map decoration, random starting ruins, or what demolition (#130) or a battle leaves behind. No game mechanics yet.",
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "generator": "ruins",
+  "variants": [
+    {
+      "id": "ruined-wall-breach",
+      "name": "Breach",
+      "version": 1,
+      "notes": "Full-height wall broken through in the middle.",
+      "spec": {
+        "kind": "wall",
+        "seed": 5,
+        "collapse": 0.55
+      }
+    },
+    {
+      "id": "ruined-wall-low",
+      "name": "Low remains",
+      "version": 1,
+      "notes": "Only the lower courses remain.",
+      "spec": {
+        "kind": "wall",
+        "seed": 8,
+        "height": 0.8,
+        "collapse": 0.7
+      }
+    },
+    {
+      "id": "ruined-wall-crumbling",
+      "name": "Crumbling wall",
+      "version": 1,
+      "notes": "Uneven top, a little damage, a few loose blocks.",
+      "spec": {
+        "kind": "wall",
+        "seed": 14,
+        "collapse": 0.25
+      }
+    },
+    {
+      "id": "ruined-wall-overgrown",
+      "name": "Overgrown wall",
+      "version": 1,
+      "notes": "Low broken wall with grass and moss.",
+      "spec": {
+        "kind": "wall",
+        "seed": 19,
+        "height": 1.1,
+        "collapse": 0.6,
+        "overgrown": true
+      }
+    }
+  ]
+}

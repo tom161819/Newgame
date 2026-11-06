@@ -1,4 +1,4 @@
-import { UNIT_TYPES,unitKit } from '../data/military.js';
+import { UNIT_TYPES,unitKit,KNIGHT_SPEED } from '../data/military.js';
 import { MILITARY_ITEMS } from '../data/militaryEquipment.js';
 import { buildingIsComplete } from '../game/buildings.js';
 import { recalculateStats } from './UnitStats.js';
@@ -19,7 +19,7 @@ export class MilitarySystem {
   // Why a unit type cannot be trained for this Soldier right now, or null.
   blocker(worker,type){
     const spec=UNIT_TYPES[type];if(!spec)return 'unknown';
-    if(spec.lockedUntil)return 'locked';
+    if(spec.mount==='horse'&&!this.scene.stables?.freeHorse())return 'horse';
     if(!worker?.isAlive||worker.profession!=='soldier'||!this.barracks(worker.assignedWorkplaceId))return 'notSoldier';
     if(this.unit(worker))return 'trained';if(this.order(worker))return 'training';
     if((worker.skills.combat?.level??1)<spec.requiredCombatLevel)return 'skill';
@@ -35,23 +35,26 @@ export class MilitarySystem {
     const reason=this.blocker(worker,type);if(reason)return reason;const spec=UNIT_TYPES[type],id=this.nextOrder++;
     if(!this.scene.inventory.spend('gold',spec.goldCost,{source:'Military Training',id:`military-training:${id}`,entityId:worker.id}))return 'gold';
     this.orders.set(id,{id,workerId:worker.id,barracksId:worker.assignedWorkplaceId,type,state:'supplying',workDone:0,required:spec.trainingTime,items:{}});
+    if(spec.mount==='horse')this.scene.stables.reserveHorse(worker.id);
     this.scene.updateInventory?.();return null;
   }
   cancel(orderId){
-    const order=this.orders.get(orderId);if(!order)return false;this.orders.delete(orderId);
+    const order=this.orders.get(orderId);if(!order)return false;this.orders.delete(orderId);if(UNIT_TYPES[order.type].mount)this.scene.stables?.returnHorse(order.workerId);
     const kit=`kit-${order.barracksId}`;for(const[id,n]of Object.entries(order.items))if(!this.storage.deposit(kit,id,n))this.storage.spill(id,n,this.tileOf(order.barracksId));
     this.scene.inventory.add('gold',UNIT_TYPES[order.type].goldCost,{source:'Military Training Refund',type:'refund',id:`military-refund:${order.id}`,entityId:order.workerId});
     this.scene.updateInventory?.();return true;
   }
   tileOf(barracksId){const b=this.barracks(barracksId)??this.scene.buildings.find(b=>b.id===barracksId);return b?{x:b.x-1,y:b.y}:this.scene.character.tile;}
   apply(worker){
-    const unit=this.unit(worker);if(!unit){delete worker.statModifiers.military;delete worker.statModifiers.militaryEquipment;recalculateStats(worker);return;}
+    const unit=this.unit(worker);if(!unit){delete worker.statModifiers.military;delete worker.statModifiers.militaryEquipment;recalculateStats(worker);if(worker.definition?.gameplay?.movementSpeed)worker.speed=worker.definition.gameplay.movementSpeed;return;}
     const items={};for(const id of Object.values(unit.equipment)){const item=MILITARY_ITEMS[id],mods=item.modifiers??this.scene.objectRegistry.require(item.modifiersFrom).equipment.modifiers;for(const[k,v]of Object.entries(mods))items[k]=(items[k]??0)+v;}
     worker.statModifiers.militaryEquipment=items;worker.statModifiers.military={...UNIT_TYPES[unit.type].modifiers};recalculateStats(worker);
+    worker.speed=(worker.definition?.gameplay?.movementSpeed??worker.speed)*(UNIT_TYPES[unit.type].mount?KNIGHT_SPEED:1);
   }
   // Discharge or death: the unit's items fall where it stands; Haulers carry them back to an Armory.
   release(worker,{dead=false}={}){
     const unit=this.unit(worker);const order=this.order(worker);if(order)this.cancel(order.id);if(!unit)return false;
+    if(UNIT_TYPES[unit.type].mount)this.scene.stables?.returnHorse(worker.id,worker.tile);
     this.units.delete(worker.id);const at=this.scene.gameTime?.totalElapsed??0;
     for(const[slot,id]of Object.entries(unit.equipment)){this.storage.spill(id,1,worker.tile);this.scene.resourceLedger?.income(id,1,'Recovered Equipment',{id:`military-return:${worker.id}:${slot}:${at}`,entityId:worker.id});}
     if(!dead)this.apply(worker);else{delete worker.statModifiers.military;delete worker.statModifiers.militaryEquipment;}
@@ -111,7 +114,7 @@ export class MilitarySystem {
     }
   }
   finish(order,worker){
-    this.orders.delete(order.id);const equipment={...UNIT_TYPES[order.type].equipment};this.units.set(worker.id,{type:order.type,equipment});
+    this.orders.delete(order.id);const equipment={...UNIT_TYPES[order.type].equipment};if(UNIT_TYPES[order.type].mount)this.scene.stables?.mountRider(worker.id);this.units.set(worker.id,{type:order.type,equipment});
     for(const[id,n]of Object.entries(order.items))this.scene.resourceLedger?.expense(id,n,'Military Equipment',{id:`military-equip:${order.id}:${id}`,entityId:worker.id});
     this.apply(worker);worker.currentHP=worker.maxHP;this.scene.activities?.emit('unitTrained',{actor:worker,objectType:order.type,quantity:1});this.scene.updateInventory?.();
   }

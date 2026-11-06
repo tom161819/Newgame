@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "burnt-building",
+  "variantId": "burnt-building-timber",
+  "name": "Burnt timber house",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "9c7c3339",
+  "generator": "ruins",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 134,
+  "height": 103,
+  "anchor": {
+    "x": 65,
+    "y": 69
+  },
+  "origin": {
+    "x": 0.48507,
+    "y": 0.6699
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 101
+  },
+  "baseOrigin": {
+    "x": 0.48507,
+    "y": 0.98058
+  },
+  "visualHeight": 101,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.344,
+  "lights": []
+}

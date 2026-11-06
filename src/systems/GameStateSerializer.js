@@ -6,6 +6,7 @@ import { getXPRequired,totalXPForLevel,createProgress } from '../data/experience
 import { JOBS,SKILL_IDS,WORK_RULES } from '../data/jobs.js';
 import { CONSTRUCTION_RULES } from '../data/construction.js';
 import { buildingIsComplete,towerNeighbors } from '../game/buildings.js';
+import { pavementHost } from '../game/pavement.js';
 import { gameSettings,WILDLIFE_INTERVALS } from './GameSettings.js';
 import { FARMING_RULES } from '../data/farming.js';
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
@@ -13,7 +14,7 @@ import { TALENTS } from '../data/economy.js';
 import { validateFoodState } from './FoodStateValidation.js';
 import { validateSeasonFoodState } from './SeasonFoodStateValidation.js';
 import { seasonalCropStage } from '../data/seasons.js';
-import { carryCapacity,IDLE_STONE } from '../data/logistics.js';
+import { carryCapacity,IDLE_STONE,VEHICLES,TRANSPORT_MODES } from '../data/logistics.js';
 import { repairTransportInstructions } from './TransportStateMigration.js';
 import { captureMapKnowledge } from '../game/mapMemoryObjects.js';
 import { validateMapMemory } from './MapMemoryValidation.js';
@@ -24,7 +25,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=26;
+export const SAVE_VERSION=29;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -60,6 +61,8 @@ export function serializeGameState(scene){
     ...(scene.seasons?{seasons:scene.seasons.exportState()}:{}),
     ...(scene.employment?{employment:scene.employment.exportState()}:{}),
     ...(scene.military?{military:scene.military.exportState()}:{}),
+    ...(scene.vehicles?{vehicles:scene.vehicles.exportState()}:{}),
+    ...(scene.stables?{stables:scene.stables.exportState()}:{}),
     ...(scene.kingLogistics?{kingLogistics:scene.kingLogistics.exportState()}:{}),
     ...(scene.logisticsTasks?{logistics:{version:1,...(scene.constructionSystem?.materials.enabled?{materialsVersion:1}:{})}}:{}),
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
@@ -142,6 +145,8 @@ export function validateGameState(input,registry=objectRegistry){
   for(const b of s.buildings){integer(b.id,1);const d=definition(b.type,'building');check(d.buildable||d.starter||d.pavement);if(d.starter)check(buildingIsComplete(b));if(d.pavement)check(!buildingIsComplete(b));
     check(b.unverified===undefined||b.unverified===true&&b.construction?.state==='planned'&&!b.depositId);
     if(b.unverified){tile(b);for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){const x=b.x+dx,y=b.y+dy,key=`${x},${y}`;check(s.terrain[y]?.[x]!==undefined&&!provisional.has(key));provisional.add(key);}}
+    // #150: a pavement site may lie on the floor of a finished building (not farmland); it claims no tile of its own.
+    else if(d.pavement&&pavementHost(s.buildings,b,registry))tile(b);
     else occupy(b,d.width,d.height);
     if(!b.unverified&&(!d.walkable||!buildingIsComplete(b)))for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++)solid.add(`${b.x+dx},${b.y+dy}`);
     if(b.construction){
@@ -252,7 +257,7 @@ export function validateGameState(input,registry=objectRegistry){
         }
         if(t.kind==='build'){
           const site=s.buildings.find(b=>b.id===t.targetId);check(w.profession==='builder'&&site&&!buildingIsComplete(site)&&site.construction.assignedBuilders.includes(w.id));
-          check(towerNeighbors(site).some(p=>p.x===t.goal.x&&p.y===t.goal.y));
+          check(towerNeighbors(pavementHost(s.buildings,site,registry)??site).some(p=>p.x===t.goal.x&&p.y===t.goal.y));
         }
         if(t.kind==='harvest'){
           const plot=s.buildings.find(b=>b.id===t.targetId),record=s.farming?.records?.find(r=>r.buildingId===t.targetId),home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);
@@ -262,7 +267,7 @@ export function validateGameState(input,registry=objectRegistry){
         }
       }
       if(w.workplaceReached!==undefined)check(typeof w.workplaceReached==='boolean');
-      if(w.cargo){check(w.isAlive&&(w.assignedWorkplaceId!=null||['hauler','builder'].includes(w.profession))&&definition(w.cargo.resource).category==='resource'&&w.cargo.resource!=='gold');integer(w.cargo.amount,1,s.foodStorage?.physicalMaterials||s.foodStorage&&FOOD_RESOURCE_IDS.includes(w.cargo.resource)?carryCapacity(w,w.cargo.resource):Number.MAX_SAFE_INTEGER);if(w.cargo.transportCancelled!==undefined)check(typeof w.cargo.transportCancelled==='boolean');}
+      if(w.cargo){check(w.isAlive&&(w.assignedWorkplaceId!=null||['hauler','builder'].includes(w.profession))&&definition(w.cargo.resource).category==='resource'&&w.cargo.resource!=='gold');integer(w.cargo.amount,1,s.foodStorage?.physicalMaterials||s.foodStorage&&FOOD_RESOURCE_IDS.includes(w.cargo.resource)?carryCapacity({...w,vehicleType:s.vehicles?.vehicles.find(v=>v.operatorId===w.id&&v.state==='inUse')?.type??null},w.cargo.resource):Number.MAX_SAFE_INTEGER);if(w.cargo.transportCancelled!==undefined)check(typeof w.cargo.transportCancelled==='boolean');}
       if(w.pendingWorkRewards!==undefined){array(w.pendingWorkRewards,10000);for(const event of w.pendingWorkRewards){
         check(w.isAlive&&w.assignedWorkplaceId!=null);check((event.type==='resourceCollected'&&event.objectType==='stone')||(event.type==='dropCollected'&&event.objectType==='meat')||(event.type==='animalKilled'&&['rabbit','deer','wild_boar'].includes(event.objectType)));integer(event.quantity??1,1);if(event.contributionRatio!==undefined)number(event.contributionRatio);
       }}
@@ -284,7 +289,7 @@ export function validateGameState(input,registry=objectRegistry){
   if(s.constructionSystem!==undefined){
     const c=s.constructionSystem;check(c);integer(c.nextId,Math.max(0,...s.buildings.map(b=>b.id))+1);
     check(c.kingSiteId==null||bIds.has(c.kingSiteId));
-    if(c.kingSiteId!=null){const site=s.buildings.find(b=>b.id===c.kingSiteId);check(!buildingIsComplete(site)&&site.construction.assignedBuilders.includes('king'));tile(c.kingGoal);check(towerNeighbors(site).some(p=>p.x===c.kingGoal.x&&p.y===c.kingGoal.y));check(!reservations.has(`construction-slot:${c.kingGoal.x},${c.kingGoal.y}`));}
+    if(c.kingSiteId!=null){const site=s.buildings.find(b=>b.id===c.kingSiteId);check(!buildingIsComplete(site)&&site.construction.assignedBuilders.includes('king'));tile(c.kingGoal);check(towerNeighbors(pavementHost(s.buildings,site,registry)??site).some(p=>p.x===c.kingGoal.x&&p.y===c.kingGoal.y));check(!reservations.has(`construction-slot:${c.kingGoal.x},${c.kingGoal.y}`));}
     else check(c.kingGoal==null&&!siteAssignments.has('king'));
     for(const id of siteAssignments)if(id!=='king'){const w=s.workers?.find(w=>w.id===id);check(w?.isAlive&&w.profession==='builder'&&w.workTask?.kind==='build');}
   }else check(!s.buildings.some(b=>!buildingIsComplete(b)));
@@ -352,11 +357,28 @@ export function validateGameState(input,registry=objectRegistry){
     array(e.held);check(new Set(e.held).size===e.held.length&&e.held.every(id=>wIds.has(id)));
     array(e.blockedBuildings);check(new Set(e.blockedBuildings).size===e.blockedBuildings.length);for(const id of e.blockedBuildings){integer(id,1);const b=s.buildings.find(b=>b.id===id);check(b&&buildingIsComplete(b)&&!b.unverified&&!!definition(b.type).workplace);}
     array(e.blockedTypes);check(new Set(e.blockedTypes).size===e.blockedTypes.length);for(const type of e.blockedTypes)check(typeof type==='string'&&!!definition(type,'building').workplace);}
-  // C08 units and training orders: one per living Soldier, a known type, its exact kit.
+  // S12 Stables: each tamed horse once, a living horse in an existing Stables within capacity; jobs by living Stablehands.
+  if(s.stables!==undefined){const st=s.stables;check(st&&typeof st==='object'&&Object.keys(st).sort().join()==='horses,jobs,ridden');array(st.horses);array(st.jobs);
+    const animals=new Map(s.animals.map(a=>[a.id,a])),stables=new Map(s.buildings.filter(b=>b.type==='stables'&&buildingIsComplete(b)).map(b=>[b.id,b])),seen=new Set(),count=new Map();
+    const riders=new Set();for(const h of st.horses){const keys=Object.keys(h).sort().join(),a=animals.get(h.id);check(a?.type==='horse'&&a.isAlive&&!seen.has(h.id));
+      if(h.state==='stabled')check(keys==='id,stableId,state'&&!a.mounted&&stables.has(h.stableId));
+      // Horse Wagon: reserved for a Wheelwright's batch (still in its paddock), or harnessed to its wagon (out of the Stables).
+      else if(h.workshopId!=null){check(h.state==='reserved'&&keys==='id,stableId,state,workshopId'&&!a.mounted&&s.foodProduction?.records.some(r=>r.buildingId===h.workshopId&&(r.cycle?.horseId===h.id||(s.foodStorage.locations.find(l=>l.id===`output-${h.workshopId}`)?.stock.horse_wagon??0)>0)));}
+      else if(h.state==='harnessed'){check(keys==='id,state,vehicleId'&&!a.mounted&&(s.vehicles?.vehicles??[]).some(v=>v.id===h.vehicleId&&v.type==='horse_wagon'&&v.horseId===h.id));seen.add(h.id);continue;}
+      else{check(['reserved','ridden'].includes(h.state)&&keys==='id,riderId,stableId,state'&&!riders.has(h.riderId)&&s.workers.some(w=>w.id===h.riderId&&w.isAlive));riders.add(h.riderId);check(!a.mounted);}seen.add(h.id);count.set(h.stableId,(count.get(h.stableId)??0)+1);}
+    const workers=new Map(s.workers.map(w=>[w.id,w]));for(const j of st.jobs){check(j&&Object.keys(j).sort().join()==='horseId,phase,progress,stableId,workerId'&&['approach','taming','leading'].includes(j.phase)&&workers.get(j.workerId)?.isAlive&&workers.get(j.workerId).profession==='stablehand'&&animals.get(j.horseId)?.type==='horse'&&!seen.has(j.horseId)&&stables.has(j.stableId));number(j.progress,0,1e9);seen.add(j.horseId);count.set(j.stableId,(count.get(j.stableId)??0)+1);}
+    for(const [id,n]of count)check(n<=registry.require('stables').horseCapacity);check(st.ridden==null||animals.get(st.ridden)?.mounted===true);}
+  // S12 vehicles: unique ids on open ground; an operator is one living Hauler at most once; modes are known.
+  if(s.vehicles!==undefined){const v=s.vehicles;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='modes,nextId,vehicles');integer(v.nextId,1);array(v.vehicles);const ids=new Set(),operators=new Set(),workers=new Map(s.workers.map(w=>[w.id,w]));
+    for(const x of v.vehicles){check(x&&Object.keys(x).sort().join()==='horseId,id,operatorId,state,type,x,y'&&(x.horseId===null||x.type==='horse_wagon'&&(s.stables?.horses??[]).some(h=>h.id===x.horseId&&h.state==='harnessed'&&h.vehicleId===x.id))&&Object.hasOwn(VEHICLES,x.type)&&['parked','reserved','inUse'].includes(x.state));const m=String(x.id).match(/^vehicle-(\d+)$/);check(m&&Number(m[1])<v.nextId&&!ids.has(x.id));ids.add(x.id);
+      integer(x.x,0,COLUMNS-1);integer(x.y,0,ROWS-1);check(s.terrain[x.y][x.x]===0);check((x.state==='parked')===(x.operatorId==null));if(x.operatorId!=null){const w=workers.get(x.operatorId);check(w?.isAlive&&w.profession==='hauler'&&!operators.has(x.operatorId));operators.add(x.operatorId);}}
+    check(v.modes&&typeof v.modes==='object');for(const [id,mode]of Object.entries(v.modes))check(workers.has(id)&&TRANSPORT_MODES.includes(mode)&&mode!=='auto');}
+  // C08 units and training orders: one per living Soldier, a known type, its exact kit; a Knight has his horse (S12).
+  const st0=new Set((s.stables?.horses??[]).filter(h=>h.riderId).map(h=>h.riderId));
   if(s.military!==undefined){const m=s.military;check(m&&typeof m==='object'&&Object.keys(m).sort().join()==='nextOrder,orders,units');integer(m.nextOrder,1);array(m.units);array(m.orders);
     const workers=new Map(s.workers.map(w=>[w.id,w])),seen=new Set(),kit=type=>Object.values(UNIT_TYPES[type].equipment);
-    for(const u of m.units){check(u&&Object.keys(u).sort().join()==='equipment,type,workerId'&&Object.hasOwn(UNIT_TYPES,u.type)&&!UNIT_TYPES[u.type].lockedUntil&&workers.get(u.workerId)?.isAlive&&!seen.has(u.workerId));seen.add(u.workerId);check(JSON.stringify(u.equipment)===JSON.stringify(UNIT_TYPES[u.type].equipment));}
-    const ids=new Set();for(const o of m.orders){check(o&&Object.keys(o).sort().join()==='barracksId,id,items,required,state,type,workDone,workerId'&&Object.hasOwn(UNIT_TYPES,o.type)&&!UNIT_TYPES[o.type].lockedUntil);integer(o.id,1,m.nextOrder-1);check(!ids.has(o.id)&&!seen.has(o.workerId));ids.add(o.id);seen.add(o.workerId);
+    for(const u of m.units){check(u&&Object.keys(u).sort().join()==='equipment,type,workerId'&&Object.hasOwn(UNIT_TYPES,u.type)&&(!UNIT_TYPES[u.type].mount||st0.has(u.workerId))&&workers.get(u.workerId)?.isAlive&&!seen.has(u.workerId));seen.add(u.workerId);check(JSON.stringify(u.equipment)===JSON.stringify(UNIT_TYPES[u.type].equipment));}
+    const ids=new Set();for(const o of m.orders){check(o&&Object.keys(o).sort().join()==='barracksId,id,items,required,state,type,workDone,workerId'&&Object.hasOwn(UNIT_TYPES,o.type)&&(!UNIT_TYPES[o.type].mount||st0.has(o.workerId)));integer(o.id,1,m.nextOrder-1);check(!ids.has(o.id)&&!seen.has(o.workerId));ids.add(o.id);seen.add(o.workerId);
       const w=workers.get(o.workerId);check(w?.isAlive&&w.profession==='soldier'&&w.assignedWorkplaceId===o.barracksId&&s.buildings.some(b=>b.id===o.barracksId&&b.type==='barracks'));check(o.required===UNIT_TYPES[o.type].trainingTime);number(o.workDone,0,o.required);
       check(['supplying','training'].includes(o.state));const items={};if(o.state==='training')for(const id of kit(o.type))items[id]=(items[id]??0)+1;check(o.items&&JSON.stringify(Object.entries(o.items).sort())===JSON.stringify(Object.entries(items).sort()));if(o.state==='supplying')check(o.workDone===0);}}
   return s;

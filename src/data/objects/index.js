@@ -15,7 +15,8 @@ import { lightingBuildings } from './lighting.js';
 import { militaryDefinitions } from './military.js';
 import { housingBuildings } from './housing.js';
 import { pavementDefinitions } from './pavement.js';
+import { vehicleDefinitions } from './vehicles.js';
 import { smeltingDefinitions } from './smelting.js';
 import { withApprovedArt } from './approvedArt.js';
 
-export const objectDefinitions = [...terrain, ...resources,...naturalDefinitions, ...farmingResources,...processedFoodResources,...materialDefinitions,...mineralDefinitions, ...buildings, ...farmingBuildings,...foodBuildings,...logisticsBuildings,...housingBuildings,...pavementDefinitions,...forestryBuildings,...mineralBuildings,...lightingBuildings,...smeltingDefinitions,...militaryDefinitions, ...characters, ...decorations, ...animals, ...equipment, ...treasures].map(withApprovedArt);
+export const objectDefinitions = [...terrain, ...resources,...naturalDefinitions, ...farmingResources,...processedFoodResources,...materialDefinitions,...mineralDefinitions, ...buildings, ...farmingBuildings,...foodBuildings,...logisticsBuildings,...housingBuildings,...pavementDefinitions,...vehicleDefinitions,...forestryBuildings,...mineralBuildings,...lightingBuildings,...smeltingDefinitions,...militaryDefinitions, ...characters, ...decorations, ...animals, ...equipment, ...treasures].map(withApprovedArt);

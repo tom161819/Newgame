@@ -35,7 +35,7 @@ export const HORSE_CONTRACT=Object.freeze({animal:'horse',source:'stables',reser
 
 // Audit (2026-11-05, main 185f9e5): what exists now. Stables, Wheelwright and the Horse Wagon belong to Stage 12.
 export const MILITARY_AUDIT=Object.freeze({
-  stables:'not implemented yet (Stage 12)',wheelwright:'not implemented yet (Stage 12)',horse_wagon:'not implemented yet (Stage 12)',
+  stables:'implemented (S12 phase C: Stablehands and the King tame wild horses)',wheelwright_workshop:'implemented (S12 phase B: Wheelbarrow; phase D: Horse Wagon)',horse_wagon:'implemented (S12 phase D: Wheelwright recipe with a harnessed tamed horse)',
   iron_bar:'implemented (Smelter)',barracks:'implemented (C08: trains Soldier, Swordsman and Archer from Armory equipment; Knight locked until Stables)',horse:'implemented (wild; king mount only)',
   equipment:'implemented for the king (weapon and armor slots)',
 });

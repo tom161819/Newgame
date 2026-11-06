@@ -39,7 +39,7 @@ export class ProductionDiagnostics {
   // Intentionally paused production, unstaffed buildings and inputs on their way or still growing are not problems.
   productionIssue(record){
     const s=this.scene,building=s.buildings.find(b=>b.id===record.buildingId);if(!building||!record.auto||record.cycle||!buildingIsComplete(building))return null;
-    const recipe=buildingDefinition(building).recipe;if(!recipe||!s.workplaceSystem.employees(building).some(w=>!w.commandState||w.commandState.state==='Working'))return null;
+    const recipe=buildingDefinition(building).recipe&&s.foodProduction?.recipe(building);if(!recipe||!s.workplaceSystem.employees(building).some(w=>!w.commandState||w.commandState.state==='Working'))return null;
     const input=s.foodStorage.locations.get(`input-${building.id}`);if(!input)return null;
     for(const [resource,need]of Object.entries(recipe.input)){
       const missing=need-(input.stock[resource]??0)-s.foodStorage.incoming(input.id,resource);if(missing<=0)continue;

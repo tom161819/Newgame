@@ -7,6 +7,20 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ### Added
 - Farmers tend and move around reachable fields and orchards during Spring, Summer and Autumn while waiting for harvest. This produces no goods or XP; harvest and cargo delivery take priority. In Winter or without an accessible plot they wait safely at the Farmhouse.
+- Stone Pavement can now be laid under a finished building (Single, Line or Area). Builders work from the building's edge and the cost stays 1 Stone for every 2 tiles. The building covers the paved floor, and the floor remains after the building is gone. Fields and orchards cannot be paved.
+- Horse Wagon: the Wheelwright's Workshop panel has a Make choice between Wheelbarrow and Horse Wagon (30 Wood, 6 Iron Bars and one tamed horse from the Stables, 90 seconds of work).
+  - The Wheelwrights wait until a tamed horse is free, then reserve it before any material is used. A running batch keeps its recipe when the choice changes.
+  - The finished wagon stands beside the workshop with the horse harnessed. The horse leaves its paddock place, travels with the wagon and is never used up.
+  - A Hauler in Auto mode takes a free Horse Wagon before a Wheelbarrow and carries ten times as much (400 load units, so 40 Stone or 80 Wood per trip). The Transport setting also offers Horse Wagon.
+  - If the horse dies, its wagon stays parked and cannot be driven. A demolished workshop gives a reserved horse back to its Stables.
+- Settings → Developer → Show FPS (or F3) shows a small overlay with frames per second, the slowest frame and the number of stutters over 50 ms in the last 5 seconds, plus the renderer and zoom. The choice is kept in this browser only, never in a save, and the overlay costs nothing while it is off.
+- Stables (Logistics & Trade, 5×5, 15 Wood + 10 Stone) with a paddock for 4 tamed horses and two Stablehands, who use the Hunting skill. While the Stables have room, a Stablehand finds a wild horse in sight on his own. He reserves it so no one else takes it, tames it in 20 seconds (faster with skill) and leads it into the paddock. The King can tame a wild horse by riding it for 25 seconds; dismounting beside Stables with room leaves it there. Horses in the Stables can no longer be ridden off. A new kingdom has six wild horses. Saves keep tamed horses and taming in progress.
+- The Knight can now be trained. He needs Sword, Armor and a free tamed horse in the Stables, which is reserved for the training and becomes his mount; a mounted Knight moves 50 % faster. Cancelling, discharge or death returns the horse to the Stables, or sets it free if they are gone.
+- Wheelwright's Workshop (Industry, 3×3, 12 Stone + 15 Wood) with two Wheelwrights, who use the Crafting skill. From 10 Wood and 2 Iron Bars brought in by Haulers they build a Wheelbarrow in 30 seconds of work. The Wheelbarrow is a real object left beside the workshop.
+  - An idle Hauler in Auto or Wheelbarrow mode walks to a free Wheelbarrow and takes it, then carries five times as much (200 load units, so 20 Stone per trip).
+  - The Hauler's panel has a Transport setting: Auto, By hand or Wheelbarrow. By hand parks the Wheelbarrow where he stands.
+  - Death or a new job leaves the Wheelbarrow on the ground for another Hauler, and one Wheelbarrow never has two drivers.
+  - Saves keep every Wheelbarrow.
 - Workplace panels can disable new employment for one building or for its entire type, including future buildings. Both automatic and manual assignments respect the bans. Existing staff keep their jobs; type bans take priority and local choices remain when a type is re-enabled. These rules are saved with the game.
 - Finishing a Mill without a Wheat Field or a Bakery without a Mill shows one informational notice about the missing long-term supply. Existing supplies still work; dismiss the advice or finish the missing link to clear it. Actual production blockers retain priority.
 - Stone Pavement (Buildings → Infrastructure), a permanent cobbled surface. Units on it move 25 % faster; this replaces the trodden-path bonus and never adds to it. Routes now prefer a faster paved way.
@@ -43,6 +57,9 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Idle Haulers now collect loose stone lying within a set radius of the Castle (default 80 tiles) and carry it to storage. Each Hauler has a Collect loose stone ON/OFF switch and a radius field in the unit panel; real transport jobs always come first. Saved games from earlier versions cannot be loaded and need a new game.
 
 ### Fixed
+- Saves no longer reject large single deliveries made with a Wheelbarrow or Horse Wagon.
+- Finished walls no longer vanish after the camera pans away and back: the wall blocks and their parapets reappear exactly as before.
+- Joined wall segments form one continuous wall: their shadows fall on the ground only and no longer paint dark bands across the neighbouring wall tops and the wall walk (straight lines, corners, T junctions and crossings, Canvas and WebGL).
 - Seasonal ground changes finish repainting while the game is paused, so resuming a saved season keeps the same terrain picture. Normal gameplay retains its bounded redraw budget.
 - The king waits after collecting loose stone and keeps it in his personal cargo. Use Deliver to storage in the top-left HUD to carry it to a reachable store; changing orders keeps the cargo safe, and full stores never consume it.
 - Idle Haulers also collect loose stone within their chosen radius of reachable Warehouses, Starter Stockpiles and physical construction sites. They work without a Castle, keep real deliveries first, and carry each stone to storage using the existing reservations.

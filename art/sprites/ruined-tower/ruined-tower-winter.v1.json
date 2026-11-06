@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "ruined-tower",
+  "variantId": "ruined-tower-winter",
+  "name": "Tower in snow",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "1595d210",
+  "generator": "ruins",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 134,
+  "height": 172,
+  "anchor": {
+    "x": 65,
+    "y": 138
+  },
+  "origin": {
+    "x": 0.48507,
+    "y": 0.80233
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 170
+  },
+  "baseOrigin": {
+    "x": 0.48507,
+    "y": 0.98837
+  },
+  "visualHeight": 170,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 3.035,
+  "lights": []
+}

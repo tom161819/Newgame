@@ -6,19 +6,15 @@ Files held lists the files a task changes. Another task avoids them unless neces
 
 ## Agreed merge order
 
-Codex PR138 (#131) first; PR142 (#122) then integrates that actual merge/schema26 and repeats relevant checks. Verify predecessor Pages success before merging the next PR.
+PR138 and repair PR151 are merged and verified by Pages42109315944. PR142 (#122) integrates current main/schema29 and must pass fresh checks/CI and actual Pages.
 
 ## Active
 
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| NEW04 (#122) Seasonal field tending | Codex | `codex/farmer-field-tending` | — | Implemented independently while #131 waits; current S12/FoW main integrated, 618 tests + build and real farmer browser PASS; PR/CI pending | FarmingSystem.js, data/farming.js, own EN/CS block, isolated farming tests/browser smoke, docs/changelog. No WorkerAI, serializer, cargo/storage or S12 edits; derived low-priority behavior only. |
-| Pages season-pixel regression after FoW optimization | Codex | `codex/pages-season-pixels` | — | Reproduced exact pixel failure; 618 tests, changelog/build, strict seasons/FoW/transition browser PASS; PR/CI pending | SeasonTransition + TerrainRenderer explicit complete-redraw contract, focused renderer/transition tests, seasons-menu smoke selection and docs. Coordinates with Claude fow-performance-pixels test-wait guards; fog-smoke/seasons-menu assertions untouched. No game data/schema or memory semantics changes. |
-| NEW14 (#131) Employment exclusions | Codex | `codex/employment-exclusions` | [#138](https://github.com/tom161819/Newgame/pull/138) | Draft PR; S12 phase A and FoW fixes integrated from maina6442d5, schema26 preserved; 616 tests, changelog/build and UI/staffing/priority Save26 browser PASS after integration; ready for current-head CI | EmploymentSystem/data employment, WorkplaceSystem assignment guard, WorkplacePanel, own EN/CS block, schema+employment validation only in GameStateSerializer, tests/browser smoke (ledger/smelting/military schema assertions use authored SAVE_VERSION), docs/changelog. Other S12 held logistics untouched. |
-| S11 (#56) Stone Pavement | Claude | `claude/s11-stone-pavement` | — | PR open; 606 tests, 51 full smokes PASS | data/pavement.js, data/objects/pavement.js, game/pavement.js, game/PavementTool.js, game/PavementView.js, game/cobbles.js (new); PathWearSystem (paved layer), MapMemory + validation, TerrainRenderer, ConstructionSystem (pavement sites), ObjectRegistry (mode), GameScene, GameStateSerializer (SAVE_VERSION 24), i18n, style.css, public/assets/buildings/stone_pavement, tests, smokes, UPGRADE_PROGRESS. |
-| House (#57, House part only; developer priority) | Claude | `claude/house-population-capacity` | — | PR open; 589 tests, 47 full smokes PASS | data/objects/housing.js (new), objects/index.js, approvedArt.js (house), jobs.js (houseCapacity), WorkerSystem.js (capacity), i18n objects, public/assets/buildings/house, tests. |
-| S12 phase A (#57) Carry weights | Claude | `claude/s12-carry-weights` | — | PR open; 611 tests, 52 full smokes PASS | data/logistics.js (weights, 40 load units), KingLogisticsSystem, FoodProductionSystem, LogisticsTaskManager, DropSystem, FoodStateValidation, GameStateSerializer (SAVE_VERSION 25), transportLabels, UnitPanel, i18n, logistics tests. |
+| NEW04 (#122) Seasonal field tending | Codex | `codex/farmer-field-tending` | [#142](https://github.com/tom161819/Newgame/pull/142) | Implemented independently while #131 waits; current S12/FoW main integrated, 618 tests + build and real farmer browser PASS; PR/CI pending | FarmingSystem.js, data/farming.js, own EN/CS block, isolated farming tests/browser smoke, docs/changelog. No WorkerAI, serializer, cargo/storage or S12 edits; derived low-priority behavior only. |
+| NEW21 (#149) Studio ruins designs | Claude | `claude/studio-ruins` | [#161](https://github.com/tom161819/Newgame/pull/161) | PR open; review only | studio/src/generators/ruins.js (new), art/assets/decorations/ruin*, art/sprites/ruin*, art/approvals.json, art/style-guide.json (soot, charcoal) |
 
 ## Kept backups (do not delete without the developer)
 
@@ -27,8 +23,19 @@ Codex PR138 (#131) first; PR142 (#122) then integrates that actual merge/schema2
 
 ## Done
 
-- 2026-11-05 [#137](https://github.com/tom161819/Newgame/pull/137) NEW08-B #125: food-chain completion advice via existing diagnostics/bus/panel, merge8871f60. Integrated C08/S11 schema24; 609 tests, changelog/build and chain-notices/C04/pavement browser checks passed. CI42072991047 success for e5d0996; [Pages42073363443](https://github.com/tom161819/Newgame/actions/runs/42073363443) build+deploy succeeded for exact merge, including full browser/save/archive/Studio. Issue125 closed/done. Original commit_refs_rules blockage resolved with ordinary push.
+- 2026-11-06 PR138 / Issue131: employment exclusions merged99ee504, repaired descendant PR151/09df170. Pages42109315944 build and deploy succeeded for09df170 containing both, including the full browser/save/archive/Studio gate. Issue131 closed/done. The exact seasonal pixel failure was reproduced and fixed while keeping the live redraw budget.
 
+- 2026-11-06 [#162](https://github.com/tom161819/Newgame/pull/162) Pages fix (Claude): the fog seam sample searches further out. Merge 65d5202; Pages 42152292448 succeeded.
+- 2026-11-06 [#159](https://github.com/tom161819/Newgame/pull/159) NEW22 #150 (Claude): Stone Pavement under finished buildings. Merge faff426; 638 tests, 63 full smokes; deployed by the #162 Pages run.
+- 2026-11-06 [#160](https://github.com/tom161819/Newgame/pull/160) Pages fix (Claude): the Stables smoke tames its own wild horse only (Pages for #158 had timed out). Merge a16863b.
+- 2026-11-06 [#158](https://github.com/tom161819/Newgame/pull/158) S12 phase D (#57, Claude): Horse Wagon, schema 29. Merge a9aa16f; 635 tests, 62 full smokes, CI succeeded.
+- 2026-11-06 [#157](https://github.com/tom161819/Newgame/pull/157) NEW19 #147 (Claude): wall kit shadows on the ground layer. Merge 824c99e; 631 tests, walls/fog smokes, CI succeeded.
+- 2026-11-06 [#156](https://github.com/tom161819/Newgame/pull/156) NEW16 #144 (Claude): Developer settings with an FPS overlay (F3). Merge 2e9bbb5; 629 tests, dev-fps smoke, CI succeeded.
+- 2026-11-05 [#155](https://github.com/tom161819/Newgame/pull/155) NEW20 #148 (Claude): walls keep their kit pieces after culling. Merge d50c7a8; 626 tests, walls smoke fails without the fix, CI succeeded.
+- 2026-11-05 [#154](https://github.com/tom161819/Newgame/pull/154) S12 phase C (#57, Claude): Stables, Stablehands tame horses, Knight on horseback, schema 28. Merge 3126010; 626 tests, 57 full smokes, CI succeeded.
+- 2026-11-05 [#153](https://github.com/tom161819/Newgame/pull/153) S12 phase B (#57, Claude): Wheelwright's Workshop and Wheelbarrow, schema 27. Merge 72b751b; 621 tests, 55 full smokes, CI succeeded.
+- 2026-11-05 [#139](https://github.com/tom161819/Newgame/pull/139) S12 phase A (#57, Claude): carry by weight, 40 load units per person, schema 25. Merge 3b26275; 611 tests, 52 full smokes, CI succeeded; Pages pending.
+- 2026-11-05 [#137](https://github.com/tom161819/Newgame/pull/137) NEW08-B #125: food-chain completion advice via existing diagnostics/bus/panel, merge8871f60. Integrated C08/S11 schema24; 609 tests, changelog/build and chain-notices/C04/pavement browser checks passed. CI42072991047 success for e5d0996; [Pages42073363443](https://github.com/tom161819/Newgame/actions/runs/42073363443) build+deploy succeeded for exact merge, including full browser/save/archive/Studio. Issue125 closed/done. Original commit_refs_rules blockage resolved with ordinary push.
 - 2026-11-05 [#133](https://github.com/tom161819/Newgame/pull/133) House (#57 part, Claude): +5 residents per completed House. Merge 8e604c0; Pages 42058257302 succeeded.
 - 2026-11-05 [#136](https://github.com/tom161819/Newgame/pull/136) S11 #56 (Claude): Stone Pavement, schema 24. Merge 3c08916; 606 tests, 51 full smokes, CI and [Pages 42073363443](https://github.com/tom161819/Newgame/actions/runs/42073363443) (descendant 8871f60) succeeded. Issue 56 closed.
 - 2026-11-05 [#134](https://github.com/tom161819/Newgame/pull/134) AUD78 #102: manual king stone delivery, merge2d9a357. 592 tests, changelog, build:pages, real HUD click/standing/cargo Save/Load and Hauler smoke PASS. CI42057853531 success for09eabd0; [Pages42058257302](https://github.com/tom161819/Newgame/actions/runs/42058257302) build+deploy succeeded for exact merge with full browser/save/archive/Studio gates. Issue102 closed/done. C07/schema22 and House preserved.
