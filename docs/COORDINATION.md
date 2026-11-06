@@ -6,6 +6,8 @@ Files held lists the files a task changes. Another task avoids them unless neces
 
 ## Agreed merge order
 
+**#174 version gate is enforced from release 0.4.0 (M3, Claude PR from `claude/m3-release`).** From then on, every PR into `main` that changes the game (`src/`, `index.html`, `public/` except `public/versions/`, `vite.config.js`) must run `npm run release:prepare -- patch` (or `-- minor` when SAVE_VERSION changes) so it carries the next version and an empty Unreleased. Every PR touching anything outside `docs/` adds `docs/changes/<issue>-<slug>.md` from `docs/changes/TEMPLATE.md`. Check with `npm run version:check`. If two PRs take the same number, the later one merges `main` and prepares the next number. Rules: AGENTS.md *Versions, releases and change records*.
+
 Urgent current Pages repair: Codex right-click smoke isolation first (main9703b37 Pages42190334050 failed in pave-under after real Move fixture leaked), 179/#96 is merged and deployed;180/#128 is next. Restore the smoke snapshot, preserve game commands and all assertions.
 
 PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da21f0c and its Pages42159725044 retry completed build/deploy SUCCESS. PR165 (#143) merged90eb356 after exact-head CI42160766881 and Pages42163373128 build/deploy SUCCESS. PR166 and167 have merged and actual successful Pages; see verified Done entries.
