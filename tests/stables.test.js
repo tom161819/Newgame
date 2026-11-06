@@ -73,3 +73,11 @@ test('#163: a blocked way home never loses a tamed horse, and the led horse does
   assert.equal(refused,3);assert.equal(s.stables.jobs.get(w.id),job,'still the same leading job');assert.equal(job.phase,'leading');
   w.moveTo=moveTo;until(s,()=>s.stables.horses.has(h.id));
 });
+
+test('#163: a worker sharing his tile with the King can still find a way (he is never trapped on his own tile)',()=>{
+  const s=scene(),w=s.workerSystem.create({x:49,y:56});
+  s.character.tile={x:49,y:56};s.character.position={x:49.5,y:56.5};s.character.nextTile=null;
+  const nav=s.workerSystem.navigationMap(w);assert.equal(nav[56][49],0,'own tile stays open');
+  assert.equal(w.moveTo([{x:55,y:56}]),true,'a route out exists');
+  const other=s.workerSystem.create({x:60,y:60});assert.equal(s.workerSystem.navigationMap(other)[56][49],1,'for everyone else the King still blocks that tile');
+});

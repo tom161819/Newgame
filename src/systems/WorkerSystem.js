@@ -35,6 +35,8 @@ export class WorkerSystem {
       if(!map[tile.y]||map[tile.y][tile.x]===undefined)continue;
       if(!rows.has(tile.y)){rows.add(tile.y);map[tile.y]=[...map[tile.y]];}map[tile.y][tile.x]=1;
     }
+    // #163: a unit sharing the worker's own tile (e.g. the King at a doorway) must not trap him: he can always leave it.
+    for(const tile of [worker?.tile,worker?.nextTile])if(tile&&map[tile.y]?.[tile.x]===1&&this.scene.map[tile.y]?.[tile.x]===0){if(!rows.has(tile.y)){rows.add(tile.y);map[tile.y]=[...map[tile.y]];}map[tile.y][tile.x]=0;}
     return map;
   }
   homeGoals(worker=null){
