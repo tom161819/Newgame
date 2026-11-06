@@ -12,7 +12,7 @@ export default {
   'staffing.editor.sessionOnly':'Applied for this session; export to keep authored data.',
   'staffing.editor.export':'Export workplace data',
   'staffing.editor.import':'Import workplace data',
-  'staffing.editor.help':'Changes apply to all buildings of this type. Excess employees become Unemployed. Export these authoring data for use in another browser; game saves do not contain them.',
+  'staffing.editor.help':'Changes apply to all buildings of this type. Excess employees become Unemployed. Export these authoring data for use in another browser; game saves do not contain them. Import the same data before loading affected saves.',
 
   // Independent Granary capacities (#123).
   'storage.granary.raw':'Raw Materials {used}/{capacity} · Incoming {incoming} · Free {free}',

@@ -60,3 +60,13 @@ test('recipe batches apply the total curve once, with exact skill-weighted work 
     near(totals[0]/totals[1],.25);
   }finally{objectRegistry.configureWorkplaces({version:1,workplaces:{}});}
 });
+
+test('capacity edits cancel excess military/taming jobs immediately, including while paused before Save',()=>{
+  try{
+    const s=workerScene(undefined,{construction:true,foodProduction:true,logistics:true,starter:true});s.workerSystem.unsubscribe();const b=build(s,'barracks',47,43),workers=[];for(let i=0;i<2;i++){const w=s.workerSystem.create({x:47+i,y:42});s.workplaceSystem.assign(b,w);workers.push(w);}s.inventory.add('gold',50);assert.equal(s.military.train(workers[1],'soldier'),null);assert.ok(s.military.order(workers[1]));
+    s.gameTime.setPaused(true);objectRegistry.configureWorkplaces({version:1,workplaces:{barracks:{capacity:1}}});s.workplaceSystem.reconcileDefinitions();assert.equal(s.military.order(workers[1]),null);assert.equal(s.inventory.count('gold'),50);validateGameState(serializeGameState(s));
+    objectRegistry.configureWorkplaces({version:1,workplaces:{}});
+    const t=workerScene(undefined,{construction:true,foodProduction:true,logistics:true,starter:true});t.workerSystem.unsubscribe();const stable=build(t,'stables',47,43),hands=[];for(let i=0;i<2;i++){const w=t.workerSystem.create({x:47+i,y:42});t.workplaceSystem.assign(stable,w);hands.push(w);}const horse=t.animalSystem.create(t.objectRegistry.require('horse'),{x:54,y:43});horse.wanderWait=1e8;t.stables.updateWorker(hands[1],25);assert.ok(t.stables.jobs.has(hands[1].id));
+    t.gameTime.setPaused(true);objectRegistry.configureWorkplaces({version:1,workplaces:{stables:{capacity:1}}});t.workplaceSystem.reconcileDefinitions();assert.equal(t.stables.jobs.has(hands[1].id),false);assert.equal(hands[1].profession,'idle');assert.ok(horse.isAlive);validateGameState(serializeGameState(t));
+  }finally{objectRegistry.configureWorkplaces({version:1,workplaces:{}});}
+});

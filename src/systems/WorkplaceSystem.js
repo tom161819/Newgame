@@ -37,7 +37,7 @@ export class WorkplaceSystem {
       const definition=this.scene.objectRegistry.get(building.type);if(!definition?.workplace)continue;
       building.definition=definition;const record=this.records.get(building.id);if(!record)continue;
       const excess=this.employees(building).slice(definition.workplace.capacity);record.capacity=definition.workplace.capacity;
-      for(const worker of excess){this.scene.employment?.hold(worker);this.remove(worker);}
+      for(const worker of excess){this.scene.employment?.hold(worker);this.scene.stables?.cancel(worker);this.scene.military?.release(worker);this.remove(worker);}
       this.changed(building.id);
     }
     this.scene.employment?.request();

@@ -11,7 +11,7 @@ export default {
   'staffing.editor.sessionOnly':'Použito pro tuto relaci; pro zachování exportujte data.',
   'staffing.editor.export':'Exportovat data pracovišť',
   'staffing.editor.import':'Importovat data pracovišť',
-  'staffing.editor.help':'Změny platí pro všechny budovy tohoto typu. Nadbyteční zaměstnanci se stanou nezaměstnanými. Pro jiný prohlížeč exportujte tato autorská data; herní uložené pozice je neobsahují.',
+  'staffing.editor.help':'Změny platí pro všechny budovy tohoto typu. Nadbyteční zaměstnanci se stanou nezaměstnanými. Pro jiný prohlížeč exportujte tato autorská data; herní uložené pozice je neobsahují. Před načtením dotčených pozic importujte stejná data.',
 
   // Independent Granary capacities (#123).
   'storage.granary.raw':'Suroviny {used}/{capacity} · Na cestě {incoming} · Volno {free}',
