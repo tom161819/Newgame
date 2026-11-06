@@ -33,7 +33,7 @@ export class PopulationSidebar {
   // Sort and profession lists are rebuilt in the current language, keeping the selection.
   renderOptions(){
     const option=(value,name)=>{const node=element('option','',name);node.value=value;return node;},skills=element('optgroup'),sort=this.sort.value,profession=this.profession.value;skills.label=t('population.skills');skills.append(...Object.entries(SKILLS).map(([id,name])=>option(`skill:${id}`,name)));
-    this.sort.replaceChildren(...['level','xp','name','profession'].map(value=>option(value,t(`population.sort.${value}`))),skills);
+    this.sort.replaceChildren(...['level','xp','name','profession','happiness'].map(value=>option(value,t(`population.sort.${value}`))),skills);
     this.profession.replaceChildren(option('all',t('buildingCategory.all')),...Object.entries(JOBS).map(([id,job])=>option(id,job.name)));
     if(sort)this.sort.value=sort;if(profession)this.profession.value=profession;
   }
@@ -49,7 +49,9 @@ export class PopulationSidebar {
   }
   refresh(force=false){
     if(!this.open)return;const now=performance.now();if(!force&&now-this.lastRefresh<200)return;this.lastRefresh=now;
-    const summary=populationSummary(this.scene.workerSystem.workers.values());this.records=sortedPopulation(summary.residents,this.preferences,this.search.value);
+    const summary=populationSummary(this.scene.workerSystem.workers.values()),needs=this.scene.needs,homes=needs?.homes(),happiness=needs?worker=>needs.status(worker,homes)?.happiness??0:null;this.records=sortedPopulation(summary.residents,this.preferences,this.search.value,{happiness});
+    // S13: the needs summary of the whole kingdom, above the list.
+    const kingdom=needs?.summary(),needsLine=document.querySelector('#population-needs');if(needsLine&&kingdom){const text=kingdom.population?t('population.needs',{...kingdom,happiness:kingdom.happiness}):'';if(needsLine.textContent!==text)needsLine.textContent=text;needsLine.hidden=!text;}
     this.deaths=sortedPopulation(this.scene.workerSystem.recentDeaths(),this.preferences,this.search.value,{includeDead:true});
     this.displayRecords=[...this.records.map(worker=>({worker})),...(this.deaths.length?[{heading:true},...this.deaths.map(worker=>({worker}))]:[])];
     const text=t('population.summary',{total:summary.total,employed:summary.employed,unemployed:summary.unemployed});

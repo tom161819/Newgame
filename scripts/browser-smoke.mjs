@@ -42,6 +42,7 @@ import { paveUnderSmoke } from './pave-under-smoke.mjs';
 import { devFpsSmoke } from './dev-fps-smoke.mjs';
 import { memoryBrightnessSmoke } from './memory-brightness-smoke.mjs';
 import { minimapSmoke } from './minimap-smoke.mjs';
+import { needsSmoke } from './needs-smoke.mjs';
 import { wallVisibilitySmoke } from './wall-visibility-smoke.mjs';
 import { wheelwrightSmoke } from './wheelwright-smoke.mjs';
 import { stablesSmoke } from './stables-smoke.mjs';
@@ -126,6 +127,7 @@ try{
   if(args.includes('--full')||args.includes('--pave-under'))await paveUnderSmoke(page);
   if(args.includes('--full')||args.includes('--dev-fps'))await devFpsSmoke(page);
   if(args.includes('--full')||args.includes('--fog-brightness'))await memoryBrightnessSmoke(page,{screenshot:process.env.BRIGHTNESS_SHOT??null});
+  if(args.includes('--full')||args.includes('--needs'))await needsSmoke(page,{screenshot:process.env.NEEDS_SHOT??null});
   if(args.includes('--full')||args.includes('--minimap'))await minimapSmoke(page,{screenshot:process.env.MINIMAP_SHOT??null});
   if(args.includes('--full')||args.includes('--walls'))await wallVisibilitySmoke(page);
   if(args.includes('--full')||args.includes('--housing'))await housingSmoke(page);

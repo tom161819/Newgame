@@ -46,7 +46,7 @@
             <div id="inventory-items"></div>
             <button id="king-cargo-deliver" type="button" hidden><b aria-hidden="true">⇥</b> <span data-i18n="hud.deliverCargo">Deliver to storage</span></button>
             <span id="king-cargo-status" hidden></span>
-            <span class="food-status"><output id="food-countdown">Food: 01:00</output><small id="food-warning">Out of food</small></span>
+            <span class="food-status"><output id="food-countdown">Food: 01:00</output><small id="food-warning">Out of food</small><button id="kingdom-happiness" class="kingdom-happiness" type="button">☺ —</button></span>
             <div class="hud-status">
               <span id="game-time" class="game-time">Day 1</span>
               <span id="season-weather" class="game-time">Spring · Day 1 / 5 · Year 1</span>
@@ -85,7 +85,7 @@
     <button id="population-tab" class="population-tab" type="button" aria-controls="population-panel" aria-expanded="false"><span aria-hidden="true">♟</span> <span data-i18n="hud.population.tab">Population</span> <span id="population-tab-count">0</span></button>
     <aside id="population-panel" class="population-panel" aria-labelledby="population-title" aria-hidden="true" inert>
       <div class="settings-heading"><h2 id="population-title" data-i18n="hud.population.tab">Population</h2><button id="close-population" type="button" aria-label="Close Population" data-i18n-attr="aria-label:population.close">×</button></div>
-      <p id="population-summary"></p>
+      <p id="population-summary"></p><p id="population-needs" class="population-needs" hidden></p>
       <div class="population-controls">
         <label for="population-search"><span data-i18n="population.search">Search villagers</span><input id="population-search" type="search" placeholder="Search villagers..." autocomplete="off" data-i18n-attr="placeholder:population.searchPlaceholder"/></label>
         <label for="population-profession"><span data-i18n="population.profession">Profession</span><select id="population-profession"></select></label>
