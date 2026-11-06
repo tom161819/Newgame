@@ -13,10 +13,9 @@ PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da2
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| NEW10 (#127) Studio Needs review filter | Claude | `claude/studio-review-filter` | [#168](https://github.com/tom161819/Newgame/pull/168) | PR open | studio/src/main.js, studio/src/lib/{approvals,specs}.js, studio/index.html, studio/src/styles.css, scripts/studio-smoke.mjs |
+| NEW03 (#121) Right click closes panels | Claude | `claude/right-click-close-panels` | [#169](https://github.com/tom161819/Newgame/pull/169) | PR open; right-click smoke PASS | ui/PanelDismiss.js (new), GameScene (pointerdown, 3 lines), scripts/right-click-smoke.mjs (new), browser-smoke |
 | NEW17 (#145) Farmer plot establishment | Codex | `codex/farmer-plot-establishment` | [#167](https://github.com/tom161819/Newgame/pull/167) | Implemented: 677 tests/changelog/build and native establishment/ownership/tending browser PASS; schema32; complete --full browser PASS on885; actual166 merge4e29 integrated; fresh678 tests/changelog/build and native UI/planting/tending-presence/employment browsers PASS; final CI/166 Pages pending; merge only after actual166 Pages | crop costs, shared ConstructionSystem/BuilderAI/ConstructionUI + ConstructionMaterials contracts, FarmingSystem, Workplaces presence hook, XP rules, diagnostics, schema32 validation, own i18n/tests/browser/docs. Reuse sites/progress/tasks; preserve166 ownership. |
 | NEW18 (#146) Farm plot ownership | Codex | `codex/farm-plot-ownership` | [#166](https://github.com/tom161819/Newgame/pull/166) | Implemented: 670 tests + changelog/build and native ownership/tending browser PASS; schema31; foundation before145; actual165 merge90eb356 integrated; fresh670 tests/changelog/build/browser PASS; clear map/desktop+phone visibility and Escape verified; merged4e29fe3 after final-head CI42165693609 SUCCESS; await actual Pages42166266800 | data/farmPlots.js, buildings placement, FarmingSystem, GameStateSerializer/Loader schema31, FarmConnections overlay/focus, farm-only responsive CSS, WorkplacePanel/FarmingPanel, own i18n/tests/browser/docs. Prices and farmer construction stay in145. |
-| NEW21 (#149) Studio ruins designs | Claude | `claude/studio-ruins` | [#161](https://github.com/tom161819/Newgame/pull/161) | PR open; review only | studio/src/generators/ruins.js (new), art/assets/decorations/ruin*, art/sprites/ruin*, art/approvals.json, art/style-guide.json (soot, charcoal) |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
@@ -35,6 +34,10 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-06 [#161](https://github.com/tom161819/Newgame/pull/161) #149 (Claude): Studio ruins designs (soot/charred wood palette) for review.
+
+- 2026-11-06 [#168](https://github.com/tom161819/Newgame/pull/168) #127 (Claude): Asset Studio "Needs review" filter. Merged df27e00.
 
 - 2026-11-06 PR173: Builder gives up a goal tile occupied by a standing unit; fixes the pavement smoke timeout on main's Pages (merge aaa11ab, whose failed-job retry then deployed SUCCESS). 10/10 local pavement smokes PASS (main failed 1 in 3). Merged 733af7d.
 
