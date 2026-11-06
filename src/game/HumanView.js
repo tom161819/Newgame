@@ -60,14 +60,14 @@ export class HumanView extends Phaser.GameObjects.Container {
   }
   // Derived placeholder pose for #98; approved textures are never edited or replaced.
   setSeated(value){
-    value=!!value;if(this.seated===value)return;this.seated=value;
+    value=!!value;if(this.seated===value)return;this.seated=value;if(!this.scene||!this.body||!this.art)return;
     if(value){this.applySeatPose();return;}
     this.art.setScale(1,1);this.art.y=0;this.art.rotation=0;this.body.setScale(1,1).setPosition(0,0);
     this.leftLeg.rotation=0;this.rightLeg.rotation=0;this.leftLeg.setPosition(-3,-5);this.rightLeg.setPosition(3,-5);for(const arm of this.arms){arm.y=-21;arm.rotation=0;}
   }
   applySeatPose(){
-    if(!this.seated)return;this.art.setScale(1,.72);this.art.y=-9;this.art.rotation=0;this.body.setScale(1,.8).setPosition(0,-6);
-    this.leftLeg.setPosition(-5,-8);this.rightLeg.setPosition(5,-8);this.leftLeg.rotation=-.8;this.rightLeg.rotation=.8;for(const arm of this.arms){arm.y=-18;arm.rotation=0;}this.weapon.setVisible(false);this.tool.setVisible(false);
+    if(!this.seated||!this.scene)return;this.art.setScale(1,.72);this.art.y=0;this.art.rotation=0;this.body.setScale(1,.8).setPosition(0,2);
+    this.leftLeg.setPosition(-5,-4);this.rightLeg.setPosition(5,-4);this.leftLeg.rotation=-.8;this.rightLeg.rotation=.8;for(const arm of this.arms){arm.y=-18;arm.rotation=0;}this.weapon.setVisible(false);this.tool.setVisible(false);
   }
   setAttackPose(delta,active,direction){
     if(this.art.visible){this.weapon.setVisible(false);if(active){this.attackPhase=(this.attackPhase??0)+delta*.011;this.art.rotation=Math.sin(this.attackPhase)*.12;}return;}

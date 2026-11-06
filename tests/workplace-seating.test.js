@@ -41,3 +41,6 @@ test('fifty workplaces and one hundred employees share bounded planning and neve
  assert.equal(homes.length,50);assert.equal(people.length,100);until(s,()=>people.every(w=>claim(s,w)?.seated));assert.equal(new Set(people.map(w=>key(w.tile))).size,100);assert.equal(s.workerSystem.seating.claims.size,100);
  let searches=0;const navigation=s.workerSystem.navigationMap.bind(s.workerSystem);s.workerSystem.navigationMap=w=>{searches++;return navigation(w);};s.simulate(2000);assert.ok(searches<1000,'resting workers retain seats rather than replanning each frame');assert.equal(s.workerSystem.seating.anchorCache.size,50);validateGameState(serializeGameState(s));
 });
+test('scene shutdown releases logical leases without touching an already destroyed view',()=>{
+ const s=scene(),home=add(s,'mill'),w=employ(s,home);until(s,()=>claim(s,w)?.seated);w.view.scene=null;w.view.setSeated=()=>{throw Error('Destroyed view must not be reset');};assert.doesNotThrow(()=>s.workerSystem.seating.destroy());assert.equal(s.workerSystem.seating.claims.size,0);assert.equal([...s.workerSystem.reservations.owners.values()].includes(w.id),false);
+});

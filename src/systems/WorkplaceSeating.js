@@ -22,7 +22,7 @@ export class WorkplaceSeating {
     if([...s.combat.attacks].some(([a,b])=>a===worker||b===worker))return null;return home;
   }
   release(worker,{stop=false}={}){
-    const claim=this.claims.get(worker.id);worker.view?.setSeated?.(false);this.retry.delete(worker.id);if(!claim)return;
+    const claim=this.claims.get(worker.id);if(worker.view?.scene)worker.view.setSeated?.(false);this.retry.delete(worker.id);if(!claim)return;
     this.system.reservations.release(`seat:${claim.homeId}:${tileKey(claim.goal)}`,worker.id);this.system.reservations.release(`idle-anchor:${tileKey(claim.goal)}`,worker.id);this.claims.delete(worker.id);if(stop&&same(worker.path.at(-1),claim.goal))worker.path=[];
   }
   update(worker){
