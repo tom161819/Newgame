@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-06
+<!-- version: {"title":"Builder demolition and physical material recovery","type":"feature","reconstructed":false,"saveVersion":34} -->
+### Added
+
+- Finished buildings can be dismantled by Builders after confirmation, with physical work, cancellation and current Save/Load. Completion leaves half their construction materials on the ground, rounded down, and preserves stored goods, production inputs and transport ownership. The Castle is protected; empty Starter Stockpiles keep their separate action.
+
 ## [0.5.1] - 2026-11-06
 <!-- version: {"title":"Event feed above the minimap","type":"feature","reconstructed":false,"saveVersion":33} -->
 ### Added

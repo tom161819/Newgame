@@ -32,7 +32,20 @@ export class StableSystem {
   reserveForWorkshop(id,workshopId){const h=this.horses.get(id);if(h?.state!=='stabled')return false;h.state='reserved';h.workshopId=workshopId;return true;}
   workshopHorse(workshopId){return [...this.horses].find(([,h])=>h.state==='reserved'&&h.workshopId===workshopId)?.[0]??null;}
   harness(workshopId,vehicleId){const id=this.workshopHorse(workshopId);if(!id)return null;this.horses.set(id,{state:'harnessed',vehicleId});const a=this.horse(id);if(a){a.path=[];a.nextTile=null;a.view?.setVisible?.(false);}return id;}
-  unreserveWorkshop(workshopId){const id=this.workshopHorse(workshopId);if(!id)return;const h=this.horses.get(id);delete h.workshopId;h.state='stabled';this.place(id);}
+  unreserveWorkshop(workshopId){const id=this.workshopHorse(workshopId);if(!id)return;const h=this.horses.get(id);
+    if(!this.stable(h.stableId)){this.horses.delete(id);const a=this.horse(id);if(a){a.path=[];a.wanderWait=0;a.view?.setVisible?.(true);}return;}
+    delete h.workshopId;h.state='stabled';this.place(id);
+  }
+  removeBuilding(building){
+    if(building.type!=='stables')return;
+    for(const [workerId,job]of [...this.jobs])if(job.stableId===building.id)this.cancel({id:workerId});
+    for(const [id,h]of [...this.horses])if(h.stableId===building.id){
+      // A ridden/reserved horse still belongs to its existing rider or batch. Its absent home
+      // frees no new horse; cancellation/discharge will release it on the ground normally.
+      if(h.state!=='stabled'){h.stableId=null;continue;}
+      this.horses.delete(id);const a=this.horse(id);if(a){a.path=[];a.wanderWait=0;a.view?.setVisible?.(true);}
+    }
+  }
   mountRider(workerId){const id=this.riderHorse(workerId);if(!id)return false;const h=this.horses.get(id),a=this.horse(id);h.state='ridden';if(a){a.path=[];a.view?.setVisible?.(false);}return true;}
   returnHorse(workerId,tile=null){
     const id=this.riderHorse(workerId);if(!id)return false;const h=this.horses.get(id),a=this.horse(id);

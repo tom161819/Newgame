@@ -1,3 +1,6 @@
+import { DemolitionSystem } from '../systems/DemolitionSystem.js';
+import { finishDemolition } from './buildingRemoval.js';
+import { DemolitionUI } from '../ui/DemolitionUI.js';
 import { KingdomHappinessIndicator } from '../ui/NeedsDisplay.js';
 import { NeedsSystem } from '../systems/NeedsSystem.js';
 import { blockingDialog } from '../ui/dockedPanels.js';
@@ -225,10 +228,11 @@ export class GameScene extends Phaser.Scene {
     this.constructionSystem=new ConstructionSystem(this,{onProgress:site=>this.towerViews.get(site.id)?.updateProgress?.(site),
       onComplete:site=>{this.towerViews.get(site.id)?.destroy();if(buildingDefinition(site).pavement){this.towerViews.delete(site.id);this.terrain.invalidateArea([site]);this.updateInventory();this.constructionUI?.refresh();return;}this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.built',{name:buildingDefinition(site).name}));},
       onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);if(this.mapMemory?.objects.delete(`building:${site.id}`))this.mapMemory.revision++;this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.siteCancelled'));}});
+    this.demolition=new DemolitionSystem(this,{complete:(building,refund)=>finishDemolition(this,building,refund)});
     this.constructionUI=new ConstructionUI(this);
     this.foodProduction=new FoodProductionSystem(this);this.military=new MilitarySystem(this);this.vehicles=new VehicleSystem(this);this.stables=new StableSystem(this);this.needs=new NeedsSystem(this);this.kingdomHappiness=new KingdomHappinessIndicator(this);this.vehicleViews=new VehicleViews(this);this.employment=new EmploymentSystem(this,{enabled:this.gameSettings.autoEmployment});this.diagnostics=new ProductionDiagnostics(this);this.employmentPanel=new EmploymentPanel(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.kingCargoControl=new KingCargoControl(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
     this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);this.farmConnections=new FarmConnections(this);
-    this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);this.populationSidebar=new PopulationSidebar(this);this.noticesPanel=new NoticesPanel(this);
+    this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);this.demolitionUI=new DemolitionUI(this);this.populationSidebar=new PopulationSidebar(this);this.noticesPanel=new NoticesPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
     this.treasurePanel=new TreasurePanel(this);if(!this.loadState)this.treasureSystem.spawn(PLAYER_START);
     this.wildlifeRespawn=new WildlifeRespawnSystem(this,this.animalSystem);
@@ -280,7 +284,7 @@ export class GameScene extends Phaser.Scene {
       this.equipmentPanel.destroy();this.treasurePanel.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.pavementTool.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
-      this.farmConnections.destroy();this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
+      this.demolitionUI.destroy();this.demolition.destroy();this.farmConnections.destroy();this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
       this.storagePanel.destroy();this.legacyStockpiles.destroy();this.logisticsTasks.destroy();this.foodProduction.destroy();this.foodStorage.destroy();
       this.foodEconomyPanel.destroy();this.foodSystem.destroy();this.needs?.destroy();this.unsubscribeSeason();this.seasonTransition?.destroy();this.seasons.destroy();
       this.game.events.off(Phaser.Core.Events.PAUSE,onBackground);this.game.events.off(Phaser.Core.Events.RESUME,onForeground);
@@ -382,6 +386,7 @@ export class GameScene extends Phaser.Scene {
     // Unseen ground can be a destination; nothing hidden there is checked or revealed.
     const unknown=!selected&&!this.fog.isVisibleTile(goal);
     if(unknown&&!this.fog.isInMap(goal)){this.setStatus(OUTSIDE_SIGHT);return;}
+    this.demolitionUI.select(selected?.kind==='building'?selected.object:null);
     if(selected?.kind==='human'){this.unitPanel.open(selected.object);return;}
     if(selected?.kind==='stockpile'){this.storagePanel.open(null,selected.object.location.id);return;}
     if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){if(this.kingLogistics.workflowSiteId!==selected.object.id){this.kingLogistics.cancel();this.constructionSystem.commandKing(selected.object);}this.constructionUI.open(selected.object);return;}
@@ -627,7 +632,7 @@ export class GameScene extends Phaser.Scene {
     this.logisticsTasks.update();
     this.animalSystem.update(delta);this.huntingSystem.update(delta);this.mountSystem.update(delta);this.workerSystem.update(delta);const covered=this.combat.update(delta);
     if(this.gameOver)return;
-    this.constructionSystem.update(delta);
+    this.constructionSystem.update(delta);this.demolition.update(delta);
     this.farmingSystem.update(delta);
     this.foodProduction.update(delta);this.military.update(delta);this.vehicles.update();this.stables.update(delta);this.vehicleViews.update();this.employment.update();this.diagnostics.update();
     this.regeneration.update(delta,[this.character,...this.animalSystem.animals.values(),...this.workerSystem.liveWorkers()],covered);
@@ -669,7 +674,7 @@ export class GameScene extends Phaser.Scene {
     this.naturalResources?.refreshSeason();this.seasonTransition?.update();this.seasonTransition?.flush();this.naturalResourcePanel?.refresh();
     this.constructionUI?.refresh();
     this.farmingPanel?.refresh();
-    this.storagePanel?.refresh();
+    this.storagePanel?.refresh();this.demolitionUI?.refresh();
     this.foodEconomyPanel?.refresh();
     this.treasureSystem?.update(view,this.fog);if(this.equipmentPanel?.dialog.open)this.equipmentPanel.updateStats();
   }

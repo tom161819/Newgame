@@ -37,7 +37,7 @@ export class WorkplacePanel {
     window.addEventListener('resize',()=>{if(this.dialog.open&&this.building?.type==='farmhouse')requestAnimationFrame(()=>{if(this.dialog.open&&this.building?.type==='farmhouse')this.scene.farmConnections?.focus(this.building,this.dialog);});},options);
     this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.close();},options);this.dialog.addEventListener('close',()=>{if(!this.dialog.open)this.restoreInput();},options);
   }
-  open(building){if(this.dialog.open)this.close();this.building=building;this.signature=null;this.pendingMove=null;this.restored=false;this.scene.setGalleryInput(false);document.querySelector('#workplace-candidates').hidden=true;this.dialog.classList.toggle('farm-workplace-dialog',building.type==='farmhouse');if(building.type==='farmhouse')this.dialog.show();else this.dialog.showModal();this.refresh();this.scene.farmConnections?.refresh();if(building.type==='farmhouse')this.scene.farmConnections?.focus(building,this.dialog);}
+  open(building){if(this.dialog.open)this.close();this.building=building;this.signature=null;this.pendingMove=null;this.restored=false;this.scene.setGalleryInput(false);document.querySelector('#workplace-candidates').hidden=true;this.dialog.classList.toggle('farm-workplace-dialog',building.type==='farmhouse');if(building.type==='farmhouse')this.dialog.show();else this.dialog.showModal();this.scene.demolitionUI?.attach(this.dialog,building);this.refresh();this.scene.farmConnections?.refresh();if(building.type==='farmhouse')this.scene.farmConnections?.focus(building,this.dialog);}
   refresh(){
     if(!this.dialog.open||!this.building)return;
     const s=this.scene,b=this.building;if(!s.buildings.includes(b)||!s.fog.isVisibleObject(b)){this.close();return;}
