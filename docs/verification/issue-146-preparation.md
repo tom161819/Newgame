@@ -15,3 +15,5 @@ PR165 final head0e9159b has exact-head CI42160766881 success; predecessor Granar
 Actual165 merge90eb356 is integrated without source conflict. Predecessor164 Pages42159725044 succeeded in normal failed-job retry;123 closed/done. Await165 Pages before166 merge; fresh integrated checks/CI follow.
 
 Fresh checks after actual90eb356 integration:670/670 tests, changelog:validate, build:pages and --current-only --farm-plots --farmer-tending browser PASS. PR166 remains draft pending actual165 Pages42163373128 and exact-head CI.
+
+Final visual check found the old generic modal obscured/blurred the map. Farmhouse alone now uses a nonmodal responsive side/bottom inspector, with camera focus respecting existing zoom/fog limits. Native browser verifies visible farm/plot centers outside the panel at desktop1440px and phone390px, Escape/continued input, plus existing employment/staffing UI regressions.670 tests and changelog/build PASS; final layout smoke and manual screenshot inspection PASS. Added farm-only CSS to held files. Predecessor165 Pages42163373128 is now build+deploy SUCCESS and143 closed/done; final166 exact-head CI remains required before merge.
