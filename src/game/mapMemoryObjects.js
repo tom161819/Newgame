@@ -30,3 +30,11 @@ export function captureMapKnowledge(scene,{force=false}={}){
   const now=performance.now(),memory=scene.mapMemory,key=`${scene.fog.revision}|${scene.fog.enabled}|${worldRevision}|${scene.resources?.size??0}|${scene.dropSystem?.drops.size??0}|${scene.treasureSystem?.chests.size??0}`;
   if(force||memory.objectsKey!==key||!(now<(memory.nextObjectScan??0))){memory.objectsKey=key;memory.nextObjectScan=now+250;memory.observeObjects(staticMemoryEntries(scene));}
 }
+
+// Player-authored provisional orders are derived markers, not observations of hidden ground.
+// Keep them visible in memory at runtime and recreate them from saved construction orders on Load.
+export function rememberBlueprint(scene,building){
+  if(!scene.fog.enabled||!scene.mapMemory)return;
+  const d=scene.objectRegistry.require(building.type),key=`building:${building.id}`;
+  scene.mapMemory.objects.set(key,{key,kind:'building',type:building.type,x:building.x,y:building.y,width:d.width,height:d.height,visual:{construction:{state:'planned',progress:0,workDone:0},...(d.crop?{stage:0,season:scene.seasons?.season??'Spring'}:{})}});scene.mapMemory.revision++;
+}

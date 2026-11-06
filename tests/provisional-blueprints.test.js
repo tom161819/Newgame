@@ -1,3 +1,4 @@
+import { rememberBlueprint } from '../src/game/mapMemoryObjects.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { workerScene } from './helpers/workerScene.js';
@@ -71,4 +72,17 @@ test('a wall line reaching outside sight: every segment is provisional and check
   s.fog.registerSource('scout',()=>({center:{x:79.5,y:50.5},radius:4}));s.tick(50);
   assert.deepEqual(r.buildings.map(b=>s.buildings.includes(b)),[true,true,false,true]);assert.ok(r.buildings.filter(b=>s.buildings.includes(b)).every(b=>!b.unverified));
   assert.deepEqual(tiles.map(t=>s.map[t.y][t.x]),[1,1,1,1]);assert.equal(s.log.filter(e=>e.type==='constructionCancelled').length,1);
+});
+
+
+test('native provisional markers survive current Save/Load without claiming observations on unknown ground',()=>{
+  const s=scene(),site=place(s,'wall',{x:80,y:50}).building;s.settingsPanel.settings.fogOfWar=true;rememberBlueprint(s,site);
+  const key=`building:${site.id}`;assert.ok(s.mapMemory.objects.has(key));
+  const state=serializeGameState(s);assert.equal(state.exploration.objects.some(e=>e.key===key),false);
+  assert.equal(s.mapMemory.objects.has(key),true,'saving does not hide the runtime marker');validateGameState(state);
+  const loaded=scene(state.terrain,{starter:false});loadGameState(loaded,structuredClone(state));
+  assert.ok(loaded.mapMemory.objects.has(key),'Load derives marker from the actual unverified order');
+  assert.equal(loaded.mapMemory.explored?.[50*100+80]??loaded.fog.explored[50*100+80],0);
+  const forged=structuredClone(state);forged.exploration.objects.push(structuredClone(s.mapMemory.objects.get(key)));
+  assert.throws(()=>validateGameState(forged),'unobserved objects are still rejected in persisted map knowledge');
 });

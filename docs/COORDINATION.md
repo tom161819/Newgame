@@ -8,21 +8,22 @@ Files held lists the files a task changes. Another task avoids them unless neces
 
 Urgent current Pages repair: Codex right-click smoke isolation first (main9703b37 Pages42190334050 failed in pave-under after real Move fixture leaked), then179/#96, then180/#128. Restore the smoke snapshot, preserve game commands and all assertions.
 
-PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da21f0c and its Pages42159725044 retry completed build/deploy SUCCESS. PR165 (#143) merged90eb356 after exact-head CI42160766881 and Pages42163373128 build/deploy SUCCESS. PR166 merged4e29fe3 after exact-head CI42165693609 SUCCESS; await its Pages42166266800 before167/145 merges.
+PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da21f0c and its Pages42159725044 retry completed build/deploy SUCCESS. PR165 (#143) merged90eb356 after exact-head CI42160766881 and Pages42163373128 build/deploy SUCCESS. PR166 and167 have merged and actual successful Pages; see verified Done entries.
+
+Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeated placement. Necessary overlap: GameScene placement and the shared one-blueprint smoke helper; preserve all Claude panel/minimap/input changes and fresh-site retries.
 
 ## Active
 
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| AUD68 #96 Repeated farm and orchard placement | Codex | `codex/repeat-farm-placement` (stacked on178) | [#179](https://github.com/tom161819/Newgame/pull/179) | Implemented;697 tests PASS; native repeat/fog/SaveLoad/rightclick/walls PASS; 178 merged9703b37;697 tests PASS; full browser exposed inherited pave-under fixture leak; repair181 integrated; rerun gates | GameScene placement, mapMemoryObjects derived marker, Serializer/Loader (schema unchanged), provisional-blueprints regression, building-menu smoke helper, own native repeat smoke/browser runner, changelog/progress/coordination |
 | Pages42190334050 right-click smoke isolation repair | Codex | `codex/right-click-smoke-isolation` | — | Implemented:696 tests/changelog/build PASS; native right-click followed by actual4-tile under-building paving+Load PASS; normal merge repair before179/180 | scripts/right-click-smoke.mjs, own regression assertion/docs/changelog |
 | #129 Brightness of explored areas outside sight | Claude | `claude/fog-dim-slider` | [#171](https://github.com/tom161819/Newgame/pull/171) | PR open; fog/walls/brightness/i18n smokes PASS | systems/FogOfWarSystem.js (memory brightness), TerrainRenderer.js (memory tint), MapMemoryRenderer.js, ui/SettingsPanel.js, GameStateSerializer.js (settings field excluded), index.html + style.css settings row, i18n, tests/memory-brightness.test.js, scripts/memory-brightness-smoke.mjs |
 | #126 Remembered rocks stay lit outside sight | Claude | `claude/fog-rock-memory` (from `claude/fog-dim-slider`) | [#172](https://github.com/tom161819/Newgame/pull/172) | PR open; merge after #171 | game/memoryTexture.js (new), TerrainRenderer.js (paintWall), MapMemoryRenderer.js, tests/memory-brightness.test.js, scripts/memory-brightness-smoke.mjs |
 | NEW02 (#120) One click opens a compact unit detail | Claude | `claude/unit-click-detail` | — | In progress | ui/UnitPanel.js, ui/UnitSelection.js, ui/dockedPanels.js (new), GameScene.js (open-dialog checks only), index.html (unit dialog class), style.css, scripts/unit-command-smoke.mjs |
 | AUD82 (#104) Minimap | Claude | `claude/minimap` | — | PR open | ui/Minimap.js (new), GameScene.js (create/update/destroy only), style.css, i18n, tests/minimap.test.js, scripts/minimap-smoke.mjs; game-canvas selectors in smokes (`canvas:not(.minimap-canvas)`) |
 | NEW03 (#121) Right click closes panels | Claude | `claude/right-click-close-panels` | [#169](https://github.com/tom161819/Newgame/pull/169) | PR open; right-click smoke PASS | ui/PanelDismiss.js (new), GameScene (pointerdown, 3 lines), scripts/right-click-smoke.mjs (new), browser-smoke |
-| NEW17 (#145) Farmer plot establishment | Codex | `codex/farmer-plot-establishment` | [#167](https://github.com/tom161819/Newgame/pull/167) | Implemented: 677 tests/changelog/build and native establishment/ownership/tending browser PASS; schema32; complete --full browser PASS on885; actual166 merge4e29 integrated; fresh678 tests/changelog/build and native UI/planting/tending-presence/employment browsers PASS; final CI/166 Pages pending; merge only after actual166 Pages | crop costs, shared ConstructionSystem/BuilderAI/ConstructionUI + ConstructionMaterials contracts, FarmingSystem, Workplaces presence hook, XP rules, diagnostics, schema32 validation, own i18n/tests/browser/docs. Reuse sites/progress/tasks; preserve166 ownership. |
-| NEW18 (#146) Farm plot ownership | Codex | `codex/farm-plot-ownership` | [#166](https://github.com/tom161819/Newgame/pull/166) | Implemented: 670 tests + changelog/build and native ownership/tending browser PASS; schema31; foundation before145; actual165 merge90eb356 integrated; fresh670 tests/changelog/build/browser PASS; clear map/desktop+phone visibility and Escape verified; merged4e29fe3 after final-head CI42165693609 SUCCESS; await actual Pages42166266800 | data/farmPlots.js, buildings placement, FarmingSystem, GameStateSerializer/Loader schema31, FarmConnections overlay/focus, farm-only responsive CSS, WorkplacePanel/FarmingPanel, own i18n/tests/browser/docs. Prices and farmer construction stay in145. |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
@@ -41,6 +42,10 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-06 PR167 / Issue145: merged0f0b9fa after exact-head CI42168372971 SUCCESS;678 tests/changelog/build and native Farmer establishment/ownership/tending/staffing PASS. Successful descendant df27e0083893ac225716ea4f6f38298398a2bed0 contains the merge; actual Pages42180539823 build+deploy SUCCESS. Original42168689667 Stables failure was repaired by Claude170/173. Issue145 closed/done. Later main35a816d Pages42181480904 failed separately in horse-wagon placement; repair remains Claude176/178.
+- 2026-11-06 PR166 / Issue146: merged4e29fe3 after exact-head CI42165693609;670 tests/changelog/build and native ownership/tending desktop+phone+Escape PASS. Actual Pages42166266800 build+deploy SUCCESS, including full browser/save/archive/Studio. Issue146 closed/done. These records also preserve the verified completion work from codex/farming-completion-records; that checkpoint branch stays intact.
+
 
 - 2026-11-06 Smoke fixture: `placeBlueprint` retries with a fresh free site when a unit steps onto the chosen footprint before the click (Pages run 42181480904 for PR169 timed out in horse-wagon after stables; game refused the occupied site correctly).
 

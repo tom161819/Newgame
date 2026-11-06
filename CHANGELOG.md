@@ -6,6 +6,9 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+
+- Saving and loading keeps provisional construction orders on unexplored land without revealing it.
+- Farmhouses and orchards stay selected after placing a blueprint, so more can be ordered with successive clicks. Escape, right click or selecting another building ends the tool. Invalid or repeated clicks never spend materials.
 - Minimap in the bottom-right corner of the map, drawn in the same diamond shape. It shows only what the king knows: unexplored land is grey, remembered land and objects are muted from memory, and the area in sight is in full colour. Fog of War OFF shows the whole map as before. A gold dot marks the king and an outline shows the camera view. Clicking the minimap moves the camera there without revealing anything or ordering anyone.
 - A right click on the map closes open panels (unit and building details, storage, construction, Settings, Population and similar). That click does nothing else, so it never sends selected units away; with no panel open, right click orders Move as before. Confirmations, the pause menu and Save/Load are not closed this way.
 - Settings → Brightness of explored areas outside sight: a slider from 15 % to 90 % (default 30 %, as before) with a Default button. It immediately brightens or darkens remembered ground, rocks, buildings and objects outside current sight. Unexplored ground stays black and the area in sight is never darkened. The choice is kept in this browser only, never in a save.
