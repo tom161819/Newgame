@@ -11,6 +11,8 @@ export async function stablesSmoke(page){
   const site=await placeBlueprint(page,'stables');await supplyAndBuild(page,site);
   const fixture=await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id),[w]=s.workerSystem.liveSubjects().filter(x=>!x.arriving);s.employment?.setEnabled(false);s.workplaceSystem.assign(b,w);
     let tile=null;for(let r=7;r<14&&!tile;r++)for(let dx=-r;dx<=r&&!tile;dx++){const t={x:b.x+2+dx,y:b.y+6+r};if(s.map[t.y]?.[t.x]===0&&!s.resourceOccupancy.has(`${t.x},${t.y}`))tile=t;}
+    // Only this wild horse: the Stablehand tames the nearest one in sight, so other wild horses would make the wait depend on luck.
+    for(const a of [...s.animalSystem.animals.values()])if(a.type==='horse'&&!s.stables.tamed(a))s.animalSystem.remove(a);
     const horse=s.animalSystem.create(s.objectRegistry.require('horse'),tile);return{horse:horse.id,worker:w.id,profession:w.profession};},site.id);
   assert.equal(fixture.profession,'stablehand');
   await page.waitForFunction(id=>window.__game.registry.get('application').scene.stables.horses.has(id),fixture.horse,{timeout:150000});
