@@ -6,6 +6,8 @@ Files held lists the files a task changes. Another task avoids them unless neces
 
 ## Agreed merge order
 
+Urgent current Pages repair: Codex right-click smoke isolation first (main9703b37 Pages42190334050 failed in pave-under after real Move fixture leaked), then179/#96, then180/#128. Restore the smoke snapshot, preserve game commands and all assertions.
+
 PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da21f0c and its Pages42159725044 retry completed build/deploy SUCCESS. PR165 (#143) merged90eb356 after exact-head CI42160766881 and Pages42163373128 build/deploy SUCCESS. PR166 merged4e29fe3 after exact-head CI42165693609 SUCCESS; await its Pages42166266800 before167/145 merges.
 
 ## Active
@@ -13,6 +15,7 @@ PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da2
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| Pages42190334050 right-click smoke isolation repair | Codex | `codex/right-click-smoke-isolation` | — | Implemented:696 tests/changelog/build PASS; native right-click followed by actual4-tile under-building paving+Load PASS; normal merge repair before179/180 | scripts/right-click-smoke.mjs, own regression assertion/docs/changelog |
 | #129 Brightness of explored areas outside sight | Claude | `claude/fog-dim-slider` | [#171](https://github.com/tom161819/Newgame/pull/171) | PR open; fog/walls/brightness/i18n smokes PASS | systems/FogOfWarSystem.js (memory brightness), TerrainRenderer.js (memory tint), MapMemoryRenderer.js, ui/SettingsPanel.js, GameStateSerializer.js (settings field excluded), index.html + style.css settings row, i18n, tests/memory-brightness.test.js, scripts/memory-brightness-smoke.mjs |
 | #126 Remembered rocks stay lit outside sight | Claude | `claude/fog-rock-memory` (from `claude/fog-dim-slider`) | [#172](https://github.com/tom161819/Newgame/pull/172) | PR open; merge after #171 | game/memoryTexture.js (new), TerrainRenderer.js (paintWall), MapMemoryRenderer.js, tests/memory-brightness.test.js, scripts/memory-brightness-smoke.mjs |
 | NEW02 (#120) One click opens a compact unit detail | Claude | `claude/unit-click-detail` | — | In progress | ui/UnitPanel.js, ui/UnitSelection.js, ui/dockedPanels.js (new), GameScene.js (open-dialog checks only), index.html (unit dialog class), style.css, scripts/unit-command-smoke.mjs |
