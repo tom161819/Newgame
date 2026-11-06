@@ -1,0 +1,155 @@
+{
+  "schema": 1,
+  "id": "barracks-hall",
+  "name": "Barracks",
+  "category": "buildings",
+  "description": "Soldiers' quarters with a small training yard: a long hall, weapon racks, a straw target and the kingdom banner. Concept for review (#92); the game keeps its current drawing until one is approved.",
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "barracks",
+  "variants": [
+    {
+      "id": "barracks-hall-timber",
+      "name": "Timber hall with training yard",
+      "version": 1,
+      "notes": "A long timber hall on a stone plinth; weapon racks and a fenced yard in front.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 2.3,
+          "depth": 1.2,
+          "wallHeight": 0.95,
+          "roofHeight": 0.75,
+          "ridge": "x",
+          "windows": 3,
+          "chimney": true,
+          "at": [
+            -0.2,
+            -0.75
+          ]
+        },
+        "props": [
+          {
+            "type": "swordRack",
+            "at": [
+              -0.9,
+              0.55
+            ]
+          },
+          {
+            "type": "bowRack",
+            "at": [
+              -0.35,
+              0.75
+            ]
+          },
+          {
+            "type": "armorStand",
+            "at": [
+              0.4,
+              0.6
+            ]
+          },
+          {
+            "type": "banner",
+            "at": [
+              1.15,
+              -0.2
+            ]
+          },
+          {
+            "type": "hayStack",
+            "at": [
+              1.0,
+              0.95
+            ]
+          },
+          {
+            "type": "fence",
+            "from": [
+              -1.35,
+              1.35
+            ],
+            "to": [
+              1.35,
+              1.35
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "barracks-hall-stone",
+      "name": "Stone barracks",
+      "version": 1,
+      "notes": "Stone walls and a tiled roof like the approved Armory; shields on the wall, a weapon crate and a banner.",
+      "spec": {
+        "body": {
+          "kind": "barn",
+          "walls": "stone",
+          "roofMaterial": "roof_tile",
+          "width": 2.4,
+          "depth": 1.3,
+          "wallHeight": 1.05,
+          "roofHeight": 0.8,
+          "ridge": "x",
+          "ironBands": true,
+          "at": [
+            -0.15,
+            -0.7
+          ]
+        },
+        "props": [
+          {
+            "type": "shield",
+            "at": [
+              1.3,
+              -0.2
+            ]
+          },
+          {
+            "type": "shield",
+            "at": [
+              1.3,
+              -0.65
+            ],
+            "material": "banner_blue"
+          },
+          {
+            "type": "swordRack",
+            "at": [
+              -0.8,
+              0.6
+            ]
+          },
+          {
+            "type": "weaponCrate",
+            "at": [
+              0.1,
+              0.75
+            ]
+          },
+          {
+            "type": "banner",
+            "at": [
+              1.2,
+              0.9
+            ]
+          },
+          {
+            "type": "armorStand",
+            "at": [
+              -0.2,
+              1.1
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
