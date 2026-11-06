@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Asset Studio Path Lab</title>
+    <meta name="claude:viewport-fit-sides" content="cover" />
+    <link rel="icon" href="data:," />
+    <meta name="description" content="Tune trodden paths on a small editable map and compare renderers before anything reaches the game." />
+  </head>
+  <body class="path-lab">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><strong>Path Lab</strong><span class="brand-sub">Trodden paths · 2:1 isometric · nothing here changes the game</span></div></div>
+      <nav class="views" aria-label="Studio views"><a href="./index.html#assets">Assets</a><a href="./index.html#style-guide">Style guide</a><a href="./phaser-demo.html">Phaser demo</a><a href="./path-lab.html" aria-current="page">Path Lab</a></nav>
+    </header>
+    <main class="workspace lab-main">
+      <div class="toolbar lab-toolbar" role="toolbar" aria-label="Path Lab tools">
+        <div class="tool"><span>Brush</span><div class="segmented" role="group" aria-label="Brush" id="lab-brush"></div></div>
+        <div class="tool"><span>Size</span><div class="segmented" role="group" aria-label="Brush size" id="lab-size"></div></div>
+        <div class="tool"><span>Season</span><div class="segmented" role="group" aria-label="Season" id="lab-season"></div></div>
+        <div class="tool"><span>Renderer</span><div class="segmented" role="group" aria-label="Renderer" id="lab-renderer"></div></div>
+        <div class="tool lab-actions">
+          <button type="button" class="button" id="lab-undo">Undo</button><button type="button" class="button" id="lab-redo">Redo</button>
+          <button type="button" class="button" id="lab-clear">Reset map</button>
+          <button type="button" class="button" id="lab-zoom-out" aria-label="Zoom out">−</button><button type="button" class="button" id="lab-fit">Fit</button><button type="button" class="button" id="lab-zoom-in" aria-label="Zoom in">+</button>
+        </div>
+        <span class="feedback" id="lab-status" aria-live="polite"></span>
+      </div>
+      <div class="lab-layout">
+        <section class="lab-stage-wrap" aria-label="Lab map">
+          <canvas id="lab-view" class="lab-view" tabindex="0" aria-label="Editable 24 × 24 isometric test map. Drag to paint, right-drag or Shift-drag to pan, wheel to zoom."></canvas>
+          <div class="lab-overlays" role="group" aria-label="Diagnostics">
+            <label><input type="checkbox" id="lab-grid" /> Grid</label>
+            <label><input type="checkbox" id="lab-levels" /> Wear levels</label>
+            <label><input type="checkbox" id="lab-centerline" /> Centerline / areas</label>
+          </div>
+        </section>
+        <aside class="lab-side">
+          <section class="panel"><h2>Scenarios</h2><div id="lab-scenarios" class="lab-scenarios"></div></section>
+          <section class="panel"><h2>Preset</h2><select id="lab-preset" aria-label="Preset"></select><p id="lab-preset-note" class="muted"></p></section>
+          <section class="panel"><h2>Parameters</h2><p id="lab-params-note" class="muted"></p><div id="lab-params" class="lab-params"></div><button type="button" class="button" id="lab-reset-params">Reset parameters</button></section>
+          <section class="panel">
+            <h2>Variants</h2>
+            <p class="muted">Saved only in this browser. Exporting gives a JSON file; nothing is committed to the repository or the game from here.</p>
+            <div class="lab-row"><input id="lab-variant-name" type="text" placeholder="Variant name" aria-label="Variant name" /><button type="button" class="button primary" id="lab-save">Save</button></div>
+            <ul id="lab-variants" class="lab-variants"></ul>
+            <div class="lab-row"><button type="button" class="button" id="lab-export">Export JSON</button><button type="button" class="button" id="lab-import">Import JSON</button><button type="button" class="button ghost" id="lab-link">Copy link</button></div>
+            <textarea id="lab-json" rows="5" spellcheck="false" aria-label="Path Lab JSON"></textarea>
+            <p id="lab-json-feedback" class="feedback" aria-live="polite"></p>
+          </section>
+        </aside>
+      </div>
+    </main>
+    <script type="module" src="./src/path-lab/main.js"></script>
+  </body>
+</html>

@@ -22,8 +22,7 @@ Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke pau
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | AUD65 #94 Manual rock mining | Codex | `codex/manual-rock-mining` (stacked on124) | [#194](https://github.com/tom161819/Newgame/pull/194) | Implemented; schema36/release0.8.0 after185 actual Pages;750 tests/version/changelog/build + native real-mouse10Stones/ledger/Load/phone/commands/Needs/eventfeed PASS | own rock marking tool/UI, GameScene/GameApplication narrow input/Escape hooks, MiningWork/WorkerAI/WorkplaceSystem/free Miner selection, current schema serializer/loader/terrain validation, XP/SkillSystem, physical Drop/FoodProduction reuse and cargo provenance, i18n, own tests/browser/docs |
-| #119 Builders' Workshop concepts for approval (art for Codex #118) | Claude | `claude/builder-workshop-art` | — | In review | studio/src/generators/workshop.js (`shed` body), art/assets/buildings/builders-workshop, art/sprites/builders-workshop, art/approvals.json |
-| #114 workplace porch / seating concepts (art for Codex #98) | Claude | `claude/idle-verandas-art-studio` (on #199) | — | In review | studio/src/generators/props.js (bench/stool/table/basket), art/assets/decorations/{workplace,trade}-porch, art/sprites, art/approvals.json |
+| #115 Path Lab in the Asset Studio (part 1 of path renderer V2, #116 next) | Claude | `claude/path-lab` | — | In review | studio/path-lab.html, studio/src/path-lab/*, studio/vite.config.js, studio nav links, scripts/studio-smoke.mjs, pages.yml check, tests/path-lab.test.js |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
@@ -35,6 +34,8 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 4. [#98](https://github.com/tom161819/Newgame/issues/98) AUD71-A idle residents sit on a placeholder porch at their workplace (follows #124's central idle rule; porch art stays with Claude in #114)
 5. [#132](https://github.com/tom161819/Newgame/issues/132) NEW08-A food building menu order and hut unlocking (moved from Claude's backlog)
 6. [#97](https://github.com/tom161819/Newgame/issues/97) AUD69-70 working castle gate; walls reached only through a tower or the gate (mechanics; new gate art via Claude's Asset Studio)
+7. [#100](https://github.com/tom161819/Newgame/issues/100) AUD75 world generation: rivers, beaches, desert, bushes (new terrain art via Claude's Asset Studio)
+8. [#91](https://github.com/tom161819/Newgame/issues/91) AUD41 Asset Library developer edit mode and balance tools
 
 ## Kept backups (do not delete without the developer)
 
@@ -43,6 +44,7 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 
 ## Done
 
+- 2026-11-06 Claude: #119 Builders' Workshop concepts ([#199](https://github.com/tom161819/Newgame/pull/199)) and #114 porch concepts ([#201](https://github.com/tom161819/Newgame/pull/201)) in the Studio, awaiting the owner's choice; Pages deploy timeout 30 min ([#203](https://github.com/tom161819/Newgame/pull/203)).
 - 2026-11-06 Claude PR197 Needs tooltips and100-resident performance coverage mergedb53b8da731f5e5ad75574fc0e73edfd43e472f07, release0.7.2/schema35. Integrated tooltip assertions while retaining exact snapshot/Load pause guard.
 
 - 2026-11-06 PR185 / Issue124: release0.7.0/schema35 merged03062705c47199386af24d55dfce8ec38a1e4755;743 tests/version/changelog/build and native gathering/Needs/morale/feed/commands/current Load PASS, CI42233028928 SUCCESS. Tag v0.7.0 resolves to exact merge. Actual Pages42233665135 build127965062613 and deploy127965013083 SUCCESS after one backend-only failed-deploy retry; issue124 closed/done. PR194 is the existing next task.
