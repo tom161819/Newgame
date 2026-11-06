@@ -59,7 +59,7 @@ export function ensureBuildingPrerequisites(scene,definition){
   }
 }
 
-export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,workplaces=false,construction=false,farming=false,foodProduction=false,seasons=false,logistics=false,naturalResources=false,ledger=false,starter=true,gameSettings}={}){
+export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,morale=false,workplaces=false,construction=false,farming=false,foodProduction=false,seasons=false,logistics=false,naturalResources=false,ledger=false,starter=true,gameSettings}={}){
   const scene={objectRegistry,gameSettings,terrainGrid:terrain.map(r=>[...r]),map:terrain.map(r=>[...r]),inventory:new Inventory(),gameOver:false,
     resources:new Map(),resourceOccupancy:new Map(),buildings:[],towerViews:new Map(),animations:[],
     marker:{visible:false,setVisible(v){this.visible=v;}},showMarker(){this.marker.visible=true;},setStatus(){},updateBuildingUI(){},updateInventory(){},updateTimeDisplay(){},refreshVisibility(){},
@@ -85,7 +85,9 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   if(!randomizeTalents){const create=scene.workerSystem.create.bind(scene.workerSystem);scene.workerSystem.create=(tile,options={})=>{const w=create(tile,{...options,randomize:false});w.naturalTalent='woodcutting';w.initialSkills=structuredClone(w.skills);return w;};}
   scene.foodSystem=new FoodSystem(scene.inventory,objectRegistry.require('meat'),()=>{},{time:scene.gameTime,scene,subscribe:seasons});scene.production=new ProductionSystem(scene.gameTime,scene.inventory,()=>scene.buildings);scene.wageSystem=new WageSystem(scene);
   if(seasons)scene.attractiveness=new KingdomAttractivenessSystem(scene);
-  scene.needs=new NeedsSystem(scene);
+  // Needs are measured in every test scene. Their effects (mood work speed, attractiveness, #58 phase C) only with morale:true,
+  // so the many exact base-timing tests keep checking skills, hunger and buildings alone.
+  scene.needs=new NeedsSystem(scene);if(!morale)scene.needs.refresh=()=>{};
   if(workplaces||construction||farming||foodProduction||logistics)scene.workplaceSystem=new WorkplaceSystem(scene);
   if(construction)scene.constructionSystem=new ConstructionSystem(scene,{onComplete:b=>{scene.towerViews.set(b.id,scene.createBuildingView(b.definition,b));scene.refreshWallConnections();},onCancel:b=>{scene.towerViews.delete(b.id);scene.refreshWallConnections();}});
   if(logistics&&starter){if(scene.gameSettings?.startingCastle)createStartingCastle(scene,scene.character.tile);createStartingStockpile(scene,scene.character.tile);}
