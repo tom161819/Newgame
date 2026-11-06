@@ -1,4 +1,5 @@
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
+import { pavementWorkArea } from '../game/pavement.js';
 import { PLAYER_START } from '../game/config.js';
 import { buildingIsComplete } from '../game/buildings.js';
 import { physicalResources,materialResources,storageResources,stockLocationId,carryCapacity,equipmentResources } from '../data/logistics.js';
@@ -29,7 +30,8 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     if(!b.materialSupply)continue;check(!buildingIsComplete(b));
     const d=registry.require(b.type),supply=b.materialSupply,required=Object.fromEntries(Object.entries(d.cost).filter(([id])=>resources.includes(id)));
     check(supply.version===1&&typeof supply.legacyPaid==='boolean'&&JSON.stringify(supply.required)===JSON.stringify(required));sites.set(b.id,b);
-    expected.set(`site-${b.id}`,{kind:'site',buildingId:b.id,x:b.x,y:b.y,width:d.width,height:d.height,capacity:Object.values(required).reduce((n,v)=>n+v,0),allowed:Object.keys(required)});
+    const area=d.pavement?pavementWorkArea(s.buildings,b,registry):{x:b.x,y:b.y,width:d.width,height:d.height};
+    expected.set(`site-${b.id}`,{kind:'site',buildingId:b.id,x:area.x,y:area.y,width:area.width,height:area.height,capacity:Object.values(required).reduce((n,v)=>n+v,0),allowed:Object.keys(required)});
   }
   const locations=new Map(),reservations=new Map(),used=l=>Object.values(l.stock).reduce((n,v)=>n+v,0);
   check(storage.locations.length===expected.size);
