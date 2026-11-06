@@ -23,6 +23,8 @@ export async function rightClickSmoke(page){
   // 4. The pause menu is a menu, not a panel: a right click leaves it open.
   await page.evaluate(()=>window.__game.registry.get('application').showPause());await page.locator('#pause-menu[open]').waitFor();
   await page.mouse.click(at.x,at.y,{button:'right'});assert.ok((await state()).open.includes('pause-menu'),'pause menu stays');
-  await page.evaluate(()=>{const app=window.__game.registry.get('application');app.resume();app.scene.unitSelection.clear();});
+  // Leave no manual order behind: later smokes give this villager a job, and a Moving/Holding villager does not work.
+  await page.evaluate(id=>{const app=window.__game.registry.get('application');app.resume();app.scene.unitSelection.clear();app.scene.workerSystem.commands.resume(app.scene.workerSystem.workers.get(id));},ids.worker);
+  assert.equal((await state()).cmd,'Working','the villager is back to his own work');
   console.log('PASS #121 right click: closes the unit panel and Settings without ordering Move, still orders Move with nothing open, leaves the pause menu open');
 }
