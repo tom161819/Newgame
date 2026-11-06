@@ -17,8 +17,19 @@ export async function unitCommandSmoke(page){
   return {ids:ws.map(w=>w.id),visitor:visitor.id,target:{x:room.x+6,y:room.y+4}};
  });
  const screen=async(id,feet=false)=>page.evaluate(({id,feet})=>{const s=window.__game.registry.get('application').scene,w=s.workerSystem.workers.get(id),c=s.cameras.main,r=s.game.canvas.getBoundingClientRect(),p={x:w.view.x,y:w.view.y-(feet?0:12)};return{x:r.x+((p.x-c.scrollX-c.width/2)*c.zoom+c.width/2)*r.width/c.width,y:r.y+((p.y-c.scrollY-c.height/2)*c.zoom+c.height/2)*r.height/c.height};},{id,feet});
- let p=await screen(fixture.ids[0]);await page.mouse.click(p.x,p.y);await page.locator('#unit-command-bar:not([hidden])').waitFor();assert.deepEqual(await page.evaluate(()=>[...window.__game.registry.get('application').scene.unitSelection.ids]),[fixture.ids[0]]);
- await page.locator('#unit-command-bar [data-unit-command="inspect"]').click();await page.locator('#unit-dialog[open]').waitFor();await page.locator('#unit-dialog [data-unit-command="hold"]').click();await page.locator('#close-unit').click();
+ // #120: one click opens the villager's compact detail at once (docked, not modal); its icon commands use UnitCommands.
+ const name=id=>page.evaluate(id=>window.__game.registry.get('application').scene.workerSystem.workers.get(id).name,id);
+ let p=await screen(fixture.ids[0]);await page.mouse.click(p.x,p.y);await page.locator('#unit-dialog[open]').waitFor();
+ assert.deepEqual(await page.evaluate(()=>[...window.__game.registry.get('application').scene.unitSelection.ids]),[fixture.ids[0]]);assert.equal(await page.locator('#unit-name').textContent(),await name(fixture.ids[0]));
+ assert.equal(await page.locator('#unit-dialog').evaluate(d=>d.matches(':modal')),false,'no modal backdrop over the map');assert.equal(await page.locator('#unit-command-bar').isHidden(),true,'no extra selection step');
+ const box=await page.locator('#unit-dialog').boundingBox();assert.ok(box.width<=360,`compact panel ${box.width}px`);
+ const hold=page.locator('#unit-dialog [data-unit-command="hold"]'),resume=page.locator('#unit-dialog [data-unit-command="resume"]');
+ assert.deepEqual([await hold.getAttribute('aria-pressed'),await hold.isDisabled(),await resume.isDisabled(),await hold.getAttribute('aria-label')],['true',true,false,'Hold Here'],'the held villager: Hold active, Resume available');
+ await resume.hover();await page.waitForTimeout(250);if(process.env.UNIT_SHOT)await page.screenshot({path:process.env.UNIT_SHOT});assert.equal(await resume.evaluate(b=>getComputedStyle(b,'::after').opacity),'1','tooltip on hover');assert.equal(await resume.evaluate(b=>getComputedStyle(b,'::after').content),'"Resume Previous Job"');
+ await resume.click();assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.workerSystem.workers.get(id).commandState.state,fixture.ids[0]),'Working');assert.deepEqual([await hold.getAttribute('aria-pressed'),await resume.isDisabled()],['false',true]);
+ await hold.focus();await page.keyboard.press('Enter');assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.workerSystem.workers.get(id).commandState.state,fixture.ids[0]),'Holding');
+ p=await screen(fixture.ids[1]);await page.mouse.click(p.x,p.y);await page.waitForFunction(id=>window.__game.registry.get('application').scene.unitPanel.unit?.id===id,fixture.ids[1]);assert.equal(await page.locator('#unit-name').textContent(),await name(fixture.ids[1]),'a click on another villager switches the detail');
+ await page.keyboard.press('Escape');await page.locator('#unit-dialog:not([open])').waitFor({state:'attached'});
  for(const zoom of [.65,1.3]){
   await page.evaluate(zoom=>{const s=window.__game.registry.get('application').scene;s.unitSelection.clear();s.cameras.main.setZoom(zoom);s.cameras.main.preRender();},zoom);
   const points=await Promise.all(fixture.ids.map(id=>screen(id,true))),a={x:Math.min(...points.map(p=>p.x))-24*zoom,y:Math.min(...points.map(p=>p.y))-32*zoom},b={x:Math.max(...points.map(p=>p.x))+24*zoom,y:Math.max(...points.map(p=>p.y))+8*zoom};
@@ -34,5 +45,5 @@ export async function unitCommandSmoke(page){
  await page.keyboard.press('Escape');assert.equal(await page.locator('#unit-command-bar').isHidden(),true);await page.waitForTimeout(1200);assert.deepEqual(await page.evaluate(ids=>ids.map(id=>window.__game.registry.get('application').scene.workerSystem.workers.get(id).tile),fixture.ids),held.map(w=>w.tile));
  await page.evaluate(ids=>{const s=window.__game.registry.get('application').scene;s.unitSelection.set(ids.map(id=>s.workerSystem.workers.get(id)));},fixture.ids);await page.locator('#unit-command-bar [data-unit-command="resume"]').click();assert.ok(await page.evaluate(ids=>ids.every(id=>window.__game.registry.get('application').scene.workerSystem.workers.get(id).commandState.state==='Working'),fixture.ids));
  await page.evaluate(async state=>{const app=window.__game.registry.get('application');window.__commandReady=false;const original=app.onGameReady.bind(app);app.onGameReady=s=>{original(s);window.__commandReady=true;app.onGameReady=original;};await app.load(state);},saved);await page.waitForFunction(()=>window.__commandReady);
- console.log('PASS C05: real mouse selection and drag at two zooms, distinct group targets, right-click Move/Hold, Escape deselect, details controls and Resume; king unchanged');
+ console.log('PASS C05: real mouse selection and drag at two zooms, distinct group targets, right-click Move/Hold, Escape deselect, one-click docked detail with icon Hold/Resume, tooltips and switching, Resume; king unchanged');
 }

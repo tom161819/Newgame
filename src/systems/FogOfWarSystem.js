@@ -4,6 +4,9 @@ import { COLUMNS, ROWS } from '../game/config.js';
 const contains = (source, position) => (position.x-source.center.x)**2+(position.y-source.center.y)**2<=source.radius**2;
 export const VISIBILITY=Object.freeze({UNEXPLORED:0,EXPLORED:1,VISIBLE:2});
 export const FOG_STYLE=Object.freeze({brightness:.3,saturation:.15,edgeWidth:1,edgeBrightness:.08});
+// #129 player preference: brightness of explored ground outside current sight (never of unexplored ground).
+export const MEMORY_BRIGHTNESS=Object.freeze({min:.15,max:.9,step:.05,default:FOG_STYLE.brightness});
+export const clampMemoryBrightness=value=>{const n=Number(value);if(!Number.isFinite(n))return MEMORY_BRIGHTNESS.default;return Math.round(Math.min(MEMORY_BRIGHTNESS.max,Math.max(MEMORY_BRIGHTNESS.min,n))*100)/100;};
 export const OUTSIDE_SIGHT='Outside current sight. Explore this area first.';
 export const visibilityPlacementError=(fog,tiles)=>fog?.enabled&&tiles.some(tile=>!fog.isInSightTile(tile))?OUTSIDE_SIGHT:null;
 
@@ -11,7 +14,7 @@ export const visibilityPlacementError=(fog,tiles)=>fog?.enabled&&tiles.some(tile
 // this ordinary sight calculation; exploration can safely consume it separately.
 export class FogOfWarSystem {
   constructor(character,enabled=false,{width=COLUMNS,height=ROWS,explorationEnabled=true}={}){
-    Object.assign(this,{character,enabled,width,height,explorationEnabled});
+    Object.assign(this,{character,enabled,width,height,explorationEnabled});this.memoryBrightness=MEMORY_BRIGHTNESS.default;
     this.explored=new Uint8Array(width*height);this.coverage=new Uint16Array(width*height);this.stamps=new Uint32Array(width*height);this.stamp=0;this.painted=new Map();
     this.providers=new Map();this.visibleIndices=new Set();this.added=[];this.removed=[];this.revision=0;this.update();
   }
@@ -62,10 +65,11 @@ export class FogOfWarSystem {
       for(let i=0;i<touched.length;i++){const index=touched[i],now=coverage[index]>0;if(now&&!was[i]){this.visibleIndices.add(index);this.added.push(index);}else if(!now&&was[i]){this.visibleIndices.delete(index);this.removed.push(index);}}
       this.revision++;
     }
-    this.signature=`${this.enabled?'on':'off'}:${this.explorationEnabled}:${this.revision}`;
+    this.signature=`${this.enabled?'on':'off'}:${this.explorationEnabled}:${this.revision}:${this.memoryBrightness}`;
   }
   setEnabled(value){this.enabled=!!value;this.update();}
   setExplorationEnabled(value){this.explorationEnabled=!!value;this.update();}
+  setMemoryBrightness(value){const b=clampMemoryBrightness(value);if(b===this.memoryBrightness)return false;this.memoryBrightness=b;this.update();return true;}
   state(tile){
     if(tile.x<0||tile.x>=this.width||tile.y<0||tile.y>=this.height)return VISIBILITY.UNEXPLORED;
     return this.isInSightTile(tile)?VISIBILITY.VISIBLE:this.explored[tile.y*this.width+tile.x]?VISIBILITY.EXPLORED:VISIBILITY.UNEXPLORED;
@@ -74,7 +78,7 @@ export class FogOfWarSystem {
   brightness(tile){
     if(this.displayState(tile)===VISIBILITY.VISIBLE)return 1;
     const distance=Math.min(...this.sources.map(s=>Math.hypot(tile.x+.5-s.center.x,tile.y+.5-s.center.y)-s.radius));
-    return FOG_STYLE.brightness+FOG_STYLE.edgeBrightness*Math.max(0,1-distance/FOG_STYLE.edgeWidth);
+    return Math.min(1,this.memoryBrightness+FOG_STYLE.edgeBrightness*Math.max(0,1-distance/FOG_STYLE.edgeWidth));
   }
   isInSightPosition(position){return this.sources.some(source=>contains(source,position));}
   isInMap(tile){return Number.isInteger(tile.x)&&Number.isInteger(tile.y)&&tile.x>=0&&tile.x<this.width&&tile.y>=0&&tile.y<this.height;}

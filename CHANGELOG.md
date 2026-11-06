@@ -6,7 +6,9 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Minimap in the bottom-right corner of the map, drawn in the same diamond shape. It shows only what the king knows: unexplored land is grey, remembered land and objects are muted from memory, and the area in sight is in full colour. Fog of War OFF shows the whole map as before. A gold dot marks the king and an outline shows the camera view. Clicking the minimap moves the camera there without revealing anything or ordering anyone.
 - A right click on the map closes open panels (unit and building details, storage, construction, Settings, Population and similar). That click does nothing else, so it never sends selected units away; with no panel open, right click orders Move as before. Confirmations, the pause menu and Save/Load are not closed this way.
+- Settings → Brightness of explored areas outside sight: a slider from 15 % to 90 % (default 30 %, as before) with a Default button. It immediately brightens or darkens remembered ground, rocks, buildings and objects outside current sight. Unexplored ground stays black and the area in sight is never darkened. The choice is kept in this browser only, never in a save.
 - Fields and orchards cost no materials and must be physically established by Farmers of their own Farmhouse. Builders and the King cannot build them. Establishment takes game time and grants Farming XP; growth starts only when the plot is ready, with safe cancellation and in-progress Save/Load. Harvest and cargo keep priority over planting. Farmers physically tending their own plots count as present staff.
 - Each Farmhouse serves up to four fields or orchards, including planned plots. New plots connect to the nearest farm with room; farmers only tend and harvest their own plots. Selecting a Farmhouse shows its plot count and visible connection lines beside a clear map, with a bottom inspector on phones. Unconnected plots are marked and can connect when a farm gains room.
 - Workplace output follows the number of physically present workers. Quarries produce 20/50/100% with one/two/three workers; other workplaces use linear output unless authored otherwise. The Asset Library developer editor can set places and output curves, import/export authoring data, and safely release excess employees. Workplace panels show current output and missing workers.
@@ -62,6 +64,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Idle Haulers now collect loose stone lying within a set radius of the Castle (default 80 tiles) and carry it to storage. Each Hauler has a Collect loose stone ON/OFF switch and a radius field in the unit panel; real transport jobs always come first. Saved games from earlier versions cannot be loaded and need a new game.
 
 ### Fixed
+- Fog of War: remembered rock outcrops outside current sight are now muted like the trees, buildings and ground around them in every renderer, instead of staying fully lit. They follow the brightness setting; rocks in sight keep their full colours.
 - A Builder whose chosen side of a construction site is taken by a villager standing still now walks to another free side instead of waiting there forever.
 - Villagers are never trapped on their own tile when someone else (for example the King standing in a doorway) shares it; they can always walk away.
 - Stablehands no longer lose a horse they have just tamed. If the way to the Stables is briefly blocked, they wait and try again instead of letting the horse go wild and starting over, and the horse they lead no longer blocks their own path.
@@ -77,6 +80,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - The Castle no longer covers the king when he stands in front of it, and the starting stockpile now appears in front of the Castle instead of behind it.
 
 ### Changed
+- One click on your villager opens his details at once in a smaller panel docked beside the map, without darkening the scene. Clicking another villager switches the panel, and Escape or Close closes it. Hold Here and Resume Previous Job are compact icon buttons with their names shown on hover or keyboard focus; Hold stays highlighted while the villager holds. Drag selection and group commands are unchanged.
 - Carrying now goes by weight: every resource has a load weight (Stone 10, Iron Ore 10, Wood 5, Iron Bar 5, Armor 8, Sword 4, Bow 3, food 1) and a person carries 40 load units. That is 4 Stone, 8 Wood or 40 food per trip; Haulers gain 2 more units every 5 Logistics levels. This applies to the King, Haulers, Builders and workshop carriers alike, and the unit panel shows the capacity in load units.
 - Trampled paths look natural:
   - a single track gently meanders and runs on across tile edges without breaks;

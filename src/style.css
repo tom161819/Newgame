@@ -56,6 +56,12 @@ header p { margin: 0 0 9px; color: #bdb99d; font-size: 12px; line-height: 1.5; }
 .setting-row input:checked { background: #827143; }
 .setting-row input:checked::before { transform: translateX(18px); background: #f0d78b; }
 .setting-row input:focus-visible { outline: 2px solid #e2c673; outline-offset: 3px; }
+.setting-range { flex-wrap: wrap; cursor: default; }
+.setting-range label { flex: 1 1 0; cursor: pointer; }
+.setting-range output { font-variant-numeric: tabular-nums; color: #f0d78b; }
+.setting-range input[type=range] { appearance: auto; flex: 1 1 100%; width: auto; height: 18px; border: 0; border-radius: 0; background: none; accent-color: #c9a85a; margin: 0; }
+.setting-range input[type=range]::before { content: none; }
+.setting-range button { margin-left: auto; padding: 2px 10px; font: inherit; font-size: 12px; background: #26321f; color: #ece2c4; border: 1px solid #91835b; border-radius: 4px; cursor: pointer; }
 .settings-panel p { font-size: 11px; line-height: 1.5; color: #bdb99d; }
 .status-row { display: flex; align-items: center; gap: 4px 16px; min-height: 30px; padding: 4px 2px 2px; }
 footer { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-left: auto; font-size: 11px; color: #9f9c82; white-space: nowrap; }
@@ -484,3 +490,17 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .pavement-modes[hidden]{display:none}
 .pavement-modes button{padding:.2rem .55rem;border-radius:5px;border:1px solid rgba(120,90,50,.55);background:rgba(40,32,20,.55);color:inherit;cursor:pointer}
 .pavement-modes button[aria-checked="true"]{background:#c9a75b;color:#241a0b;font-weight:600}
+/* #120: compact unit detail docked beside the map, without a modal backdrop. */
+#unit-dialog.docked-panel { position:fixed; inset:144px 16px auto auto; margin:0; width:min(340px,calc(100vw - 24px)); max-height:calc(100dvh - 300px); z-index:30; padding:12px 14px; font-size:13px; box-shadow:0 6px 20px #0009; }
+#unit-dialog.docked-panel h2 { font-size:1.05rem; margin:0; }
+#unit-dialog.docked-panel h3 { font-size:.95rem; margin:.6rem 0 .3rem; }
+#unit-dialog.docked-panel p { margin:.2rem 0; }
+@media(max-width:760px){ #unit-dialog.docked-panel { inset:auto 12px 12px; width:auto; max-height:45dvh; } }
+.unit-command-controls .icon-command { position:relative; width:34px; height:30px; padding:0; font-size:15px; line-height:1; }
+.unit-command-controls .icon-command[aria-pressed="true"] { background:#827143; border-color:#f0d78b; color:#fff3c8; opacity:1; }
+.unit-command-controls .icon-command::after { content:attr(data-tooltip); position:absolute; left:50%; bottom:calc(100% + 6px); transform:translateX(-50%); white-space:nowrap; padding:3px 8px; border-radius:4px; background:#141b12; border:1px solid #978657; color:#ece2c4; font-size:12px; opacity:0; pointer-events:none; transition:opacity .12s; z-index:2; }
+.unit-command-controls .icon-command:hover::after, .unit-command-controls .icon-command:focus-visible::after { opacity:1; }
+/* #104: minimap in the bottom-right corner, the square grid turned into the isometric diamond. */
+.minimap { position:absolute; right:12px; bottom:10px; z-index:9; width:212px; height:106px; cursor:pointer; filter:drop-shadow(0 2px 6px #000a); touch-action:none; }
+.minimap canvas { position:absolute; left:50%; top:50%; width:150px; height:150px; margin:-75px 0 0 -75px; transform:scaleY(.5) rotate(45deg); image-rendering:pixelated; border:1px solid #b99a53; }
+@media(max-width:760px){ .minimap { transform:scale(.7); transform-origin:100% 100%; } }
