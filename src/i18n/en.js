@@ -2,6 +2,14 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  'construction.farmers':'Farmers: {working} working · {reserved}/{slots} places reserved',
+  'construction.waitFarmers':'Waiting for Farmers of this plot’s Farmhouse',
+  'construction.farmerOnly':'Only Farmers of this plot’s Farmhouse can establish it.',
+  'construction.refundNone':'This plot costs no materials; cancellation returns none.',
+  'notice.noFarmer':'{name}: the plot is waiting for a Farmer from its Farmhouse.',
+  'notice.noFarm':'{name}: no Farmhouse has room for this plot. Build another Farmhouse.',
+  'work.establishing':'Establishing {name}',
+
   'farmPlots.count':'Plots {count} / {capacity}',
   'farmPlots.owner':'Connected to {name} #{id}',
   'farmPlots.orphan':'No Farmhouse has room for this plot. Build another Farmhouse (four plots each). Unconnected plots are not worked.',

@@ -12,6 +12,8 @@ export async function farmerTendingSmoke(page){
  await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('tending-smoke',false));
  await page.waitForFunction(f=>{const s=window.__game.registry.get('application').scene,w=s.workerSystem.workers.get(f.worker);return w.workMessage==='Tending crops'&&w.view.workPhase>0;},f,{timeout:30000});
  const first=await page.evaluate(f=>{const s=window.__game.registry.get('application').scene,w=s.workerSystem.workers.get(f.worker);return {tile:w.tile,xp:w.experience.totalXP,farmingXP:w.skills.farming.totalXP,stock:s.inventory.count('wheat'),task:w.workTask,phase:w.view.workPhase};},f);
+ await page.evaluate(f=>{const s=window.__game.registry.get('application').scene;s.pauseManager.set('tending-staffing-ui',true);s.workplacePanel.open(s.buildings.find(b=>b.id===f.home));},f);
+ assert.match(await page.locator('#workplace-staffing-output').textContent(),/33%.*1 present/);await page.click('#close-workplace');await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('tending-staffing-ui',false));
  assert.equal(first.task,null);assert.equal(first.xp,f.xp);assert.equal(first.farmingXP,f.farmingXP);assert.equal(first.stock,f.stock);assert.ok(first.phase>0);
  await page.waitForFunction(({f,tile})=>{const w=window.__game.registry.get('application').scene.workerSystem.workers.get(f.worker);return w.workMessage==='Tending crops'&&(w.tile.x!==tile.x||w.tile.y!==tile.y);},{f,tile:first.tile},{timeout:15000});
  const mid=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.equal(Object.hasOwn(mid.farming,'tending'),false);
