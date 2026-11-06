@@ -88,9 +88,12 @@ export async function placeBlueprint(page,type){
     try{await page.waitForFunction(({type,before})=>window.__game.registry.get('application').scene.buildings.filter(b=>b.type===type&&b.construction?.state==='planned').length>before,{type,before},{timeout:8000});break;}
     catch(error){if(attempt===3)throw new Error(`${type} blueprint not placed after 4 sites; status: ${await page.locator('#status').textContent()}`);}
   }
-  const id=await page.evaluate(type=>window.__game.registry.get('application').scene.buildings.filter(b=>b.type===type&&b.construction?.state==='planned').at(-1).id,type);return {id,point};
+  const id=await page.evaluate(type=>window.__game.registry.get('application').scene.buildings.filter(b=>b.type===type&&b.construction?.state==='planned').at(-1).id,type);
+  // This helper promises one blueprint; repeat-placement tools must be dismissed before inspecting it.
+  if(await page.evaluate(()=>window.__game.registry.get('application').scene.buildMode))await page.keyboard.press('Escape');
+  return {id,point};
 }
-async function chooseBlueprintSite(page,type){
+export async function chooseBlueprintSite(page,type){
   return page.evaluate(type=>{
     const s=window.__game.registry.get('application').scene,d=s.objectRegistry.require(type),occupied=new Set(s.reservedTiles().map(t=>`${t.x},${t.y}`)),start=s.character.tile;
     for(let y=35;y<70;y++)for(let x=35;x<70;x++){

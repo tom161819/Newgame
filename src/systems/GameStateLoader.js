@@ -1,3 +1,4 @@
+import { rememberBlueprint } from '../game/mapMemoryObjects.js';
 import { t } from '../i18n/index.js';
 import { validateGameState } from './GameStateSerializer.js';
 import { recalculateStats } from './UnitStats.js';
@@ -126,6 +127,7 @@ export function loadGameState(scene,input){
   scene.settingsPanel.applySettings(state.settings);scene.fog.setEnabled(state.settings.fogOfWar);
   scene.fog.setExplorationEnabled?.(state.settings.explorationMode??true);
   scene.fog.update?.();scene.mapMemory?.importState(state.exploration);
+  for(const building of scene.buildings)if(building.unverified)rememberBlueprint(scene,building);
   scene.terrain?.setDebug(!!state.settings.pathWearDebug);
   scene.events?.emit('buildings:changed');
   scene.updateInventory();scene.worldCamera.syncSize?.();

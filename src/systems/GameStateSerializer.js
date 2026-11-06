@@ -47,10 +47,14 @@ export function serializeGameState(scene){
   scene.naturalResources?.flushGrowth();
   scene.naturalResources?.refreshSeason();
   captureMapKnowledge(scene,{force:true});
-  const c=scene.character,camera=scene.cameras.main;
+  const c=scene.character,camera=scene.cameras.main,exploration=scene.mapMemory.exportState();
+  // A provisional order is already persisted in buildings. Its marker must not masquerade as
+  // an observed object on unexplored ground (and must not weaken memory validation).
+  const provisionalKeys=new Set(scene.buildings.filter(b=>b.unverified).map(b=>`building:${b.id}`));
+  exploration.objects=exploration.objects.filter(entry=>!provisionalKeys.has(entry.key));
   return {
     saveVersion:SAVE_VERSION,gameSettings:{...gameSettings(scene.gameSettings),...(scene.seasons?{seasonsEnabled:scene.seasons.enabled}:{})},terrain:scene.terrainGrid.map(row=>[...row]),
-    exploration:scene.mapMemory.exportState(),
+    exploration,
     naturalResources:scene.naturalResources?.exportState()??emptyNaturalState(),
     resourceLedger:scene.resourceLedger?.exportState()??emptyLedgerState(scene.gameTime),
     ...(scene.experienceSystem?{experienceSystem:scene.experienceSystem.exportState()}:{}),

@@ -101,7 +101,7 @@ import { FoodEconomyPanel } from '../ui/FoodEconomyPanel.js';
 import { KingLogisticsSystem } from '../systems/KingLogisticsSystem.js';
 import { BuildingUnlockManager } from '../systems/BuildingUnlockManager.js';
 import { MapMemory } from '../systems/MapMemory.js';
-import { captureMapKnowledge } from './mapMemoryObjects.js';
+import { captureMapKnowledge,rememberBlueprint } from './mapMemoryObjects.js';
 import { MapMemoryRenderer } from './MapMemoryRenderer.js';
 import { PopulationSidebar } from '../ui/PopulationSidebar.js';
 import { LightSourceSystem } from '../systems/LightSourceSystem.js';
@@ -365,7 +365,13 @@ export class GameScene extends Phaser.Scene {
       else{
         this.constructionSystem.plan(result.building);
         this.towerViews.set(result.building.id,this.createBuildingView(this.selectedBuilding,result.building));if(provisional)this.rememberBlueprint(result.building);
-        this.updateInventory();this.cancelBuilding(this.selectedBuilding.crop&&result.building.farmId==null?t('farmPlots.orphan'):t(provisional?'status.blueprintProvisional':'status.blueprintReady',{name:this.selectedBuilding.name,cost:formatCost(this.selectedBuilding.cost,this.objectRegistry)}));
+        const message=this.selectedBuilding.crop&&result.building.farmId==null?t('farmPlots.orphan'):t(provisional?'status.blueprintProvisional':'status.blueprintReady',{name:this.selectedBuilding.name,cost:formatCost(this.selectedBuilding.cost,this.objectRegistry)});
+        this.updateInventory();
+        // Keep the same tool after each accepted farm/orchard order. Revalidate the occupied
+        // footprint immediately so a second click cannot create or pay for another order there.
+        if(['farmhouse','orchard'].includes(this.selectedBuilding.id)){
+          this.previewKey=null;this.updateBuildingPreview();this.updateBuildingUI();this.setStatus(message);
+        }else this.cancelBuilding(message);
       }
       return;
     }
@@ -467,8 +473,7 @@ export class GameScene extends Phaser.Scene {
   }
   // The player sees the provisional blueprint they placed, as a remembered site, until someone sees the real ground.
   rememberBlueprint(building){
-    if(!this.fog.enabled||!this.mapMemory)return;const d=buildingDefinition(building),key=`building:${building.id}`;
-    this.mapMemory.objects.set(key,{key,kind:'building',type:building.type,x:building.x,y:building.y,width:d.width,height:d.height,visual:{construction:{state:'planned',progress:0,workDone:0}}});this.mapMemory.revision++;
+    rememberBlueprint(this,building);
   }
   updateBuildingPreview() {
     const anchor=this.previewAnchor,definition=this.selectedBuilding;
