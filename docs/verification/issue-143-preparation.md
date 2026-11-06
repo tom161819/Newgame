@@ -11,4 +11,12 @@ Started 2026-11-06 by Codex on `codex/workplace-staffing-output`, stacked from P
 - Asset Library currently has no authoring controls. Add narrowly scoped workplace authoring rather than implement unrelated blocked general editor Issue91. Authored definitions stay outside game saves; export/import validates the complete override set and applies definitions atomically. A save with incompatible authored workplace data must fail before mutating the world.
 - Pending Claude Issue163 owns the intermittent Stables smoke; do not edit that fixture as part of143.
 
-No implementation or validation is claimed by this preparation checkpoint.
+## Implementation checkpoint
+
+Central curves use total full-workplace output. Each active participant receives `capacity * curve[present] / present` alongside its existing skill multiplier; absent curves retain the original per-worker speed. Quarry defaults to 0/20/50/100 percent. Presence excludes travel, cargo and Hold, and uses actual physical remote work goals for outdoor jobs (including adjacent taming). Existing production/crop/mining/forestry/hunting collection, training and taming providers retain their task and resource ownership.
+
+Asset Library has an explicitly opened Developer authoring section with capacity/curve preview, apply and JSON import/export. Registry validates all overrides before changing any definition; roles and all non-workplace data cannot be overridden. Per-browser authoring is loaded before save validation and is not part of saves. Existing records are reconciled and excess residents safely become held Unemployed. Persistent game model remains schema30; saves continue to require the matching authored capacity and reject inconsistent records before world replacement.
+
+661/661 full tests passed. Six added cases cover exact real Quarry game-time ratios/skills, travel/cargo/Hold exclusion, atomic authoring, safe capacity reduction with wages/current-schema roundtrip, and actual recipe work contributions. The existing hunger timing test now measures native work rate and accounts for the 25ms completion frame instead of assuming the old Quarry speed; it retains exact 25% hunger slowdown, physical quantity and movement assertions. Changelog validation and production build passed; final combined browser check is running. Native Stables and Barracks changes are timer multipliers only; Claude163's flaky Stables smoke is untouched.
+
+Actual predecessor PR164 merged da21f0c; its Pages42159725044 is still required before this feature merges. No143 PR/merge/deployment is claimed yet.

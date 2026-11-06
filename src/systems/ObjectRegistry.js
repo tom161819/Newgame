@@ -1,3 +1,5 @@
+import { validateWorkplaceOverrides,readWorkplaceAuthoring } from '../data/workplaceAuthoring.js';
+import { validStaffing } from '../data/workplaces.js';
 import { objectDefinitions } from '../data/objects/index.js';
 import { JOBS,SKILL_IDS } from '../data/jobs.js';
 import { BUILDING_CATEGORIES } from '../data/buildingCategories.js';
@@ -56,7 +58,7 @@ export function validateDefinition(definition) {
   if (d.construction !== undefined && (!plainObject(d.construction) || !['single','line','pavement'].includes(d.construction.mode)
     || (['line','pavement'].includes(d.construction.mode)&&(d.category!=='building'||d.width!==1||d.height!==1)))) fail(id, 'neplatný režim stavění.');
   if (d.renderer==='fortification'&&(!finite(d.visual?.wallHeight)||d.visual.wallHeight<=0)) fail(id, 'opevnění vyžaduje kladnou výšku stěn.');
-  if(d.workplace!==undefined&&(!plainObject(d.workplace)||d.category!=='building'||!Number.isSafeInteger(d.workplace.capacity)||d.workplace.capacity<1
+  if(d.workplace!==undefined&&(!plainObject(d.workplace)||d.category!=='building'||!validStaffing(d.workplace)
     ||!Object.hasOwn(JOBS,d.workplace.profession)||!SKILL_IDS.includes(d.workplace.skill)||JOBS[d.workplace.profession].skill!==d.workplace.skill))fail(id,'neplatné pracoviště.');
   if(d.crop!==undefined&&(!plainObject(d.crop)||d.category!=='building'||!d.walkable||typeof d.crop.resource!=='string'||!finite(d.crop.growthDays)||d.crop.growthDays<=0
     ||!Number.isSafeInteger(d.crop.yield)||d.crop.yield<=0||!finite(d.crop.workDuration)||d.crop.workDuration<=0||!Array.isArray(d.crop.stages)||d.crop.stages.length!==4))fail(id,'neplatné pěstování plodin.');
@@ -112,7 +114,7 @@ export function validateDefinition(definition) {
 }
 
 export class ObjectRegistry {
-  constructor(definitions = []) { this.definitions = new Map(); this.listeners = new Set(); this.registerAll(definitions); }
+  constructor(definitions = []) { this.definitions = new Map(); this.listeners = new Set(); this.registerAll(definitions);this.workplaceDefaults=new Map(this.all().filter(d=>d.workplace).map(d=>[d.id,d.workplace]));this.workplaceOverrides={}; }
 
   registerAll(definitions) {
     const pending = new Map();
@@ -137,6 +139,15 @@ export class ObjectRegistry {
     return this;
   }
 
+  configureWorkplaces(input){
+    const overrides=validateWorkplaceOverrides(input,this.workplaceDefaults),pending=new Map();
+    for(const [id,base]of this.workplaceDefaults){
+      const spec=overrides[id]?{profession:base.profession,skill:base.skill,...overrides[id]}:base;
+      const definition={...this.require(id),workplace:spec};validateDefinition(definition);pending.set(id,freezeDeep(definition));
+    }
+    for(const [id,definition]of pending)this.definitions.set(id,definition);
+    this.workplaceOverrides=structuredClone(overrides);for(const listener of this.listeners)listener();return overrides;
+  }
   register(definition) { this.registerAll([definition]); return this.require(definition.id); }
   get(id) { return this.definitions.get(id) ?? null; }
   require(id) { const d = this.get(id); if (!d) throw new Error(`Neznámý objekt: ${id}`); return d; }
@@ -148,3 +159,6 @@ export class ObjectRegistry {
 }
 
 export const objectRegistry = new ObjectRegistry(objectDefinitions);
+
+// Per-browser authored data is loaded before any game/save validation, never from a save.
+try{const authored=readWorkplaceAuthoring(globalThis.localStorage);if(authored)objectRegistry.configureWorkplaces(authored);}catch{/* Invalid authoring cannot prevent a new game with defaults. */}

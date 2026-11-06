@@ -109,7 +109,7 @@ export class MilitarySystem {
       if(!worker?.isAlive||worker.assignedWorkplaceId!==order.barracksId||!this.barracks(order.barracksId)){this.cancel(order.id);continue;}
       if(order.state==='supplying'){const kit=unitKit(order.type);if(this.storage.withdrawBatch(`kit-${order.barracksId}`,kit)){order.items=kit;order.state='training';}else continue;}
       if(!this.scene.workplaceSystem.atWorkplace(worker))continue;
-      order.workDone=Math.min(order.required,order.workDone+Math.max(0,delta));
+      order.workDone=Math.min(order.required,order.workDone+Math.max(0,delta)*(this.scene.workplaceSystem.workFactor?.(worker)??1));
       if(order.workDone>=order.required)this.finish(order,worker);
     }
   }

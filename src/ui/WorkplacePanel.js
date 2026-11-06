@@ -10,6 +10,7 @@ import { renderMilitary,militarySignature,handleMilitaryClick } from './military
 export class WorkplacePanel {
   constructor(scene){
     this.scene=scene;this.dialog=document.querySelector('#workplace-dialog');this.controller=new AbortController();const options={signal:this.controller.signal};this.restored=true;
+    this.staffingStatus=element('p');this.staffingStatus.id='workplace-staffing-output';this.dialog.insertBefore(this.staffingStatus,document.querySelector('#food-production-details'));
     this.exclusions=element('section');this.exclusions.id='employment-exclusions';this.exclusionInputs={};this.exclusionLabels={};
     for(const kind of ['local','type']){const label=element('label'),input=element('input'),text=element('span');input.type='checkbox';input.dataset.employmentExclusion=kind;this.exclusionInputs[kind]=input;this.exclusionLabels[kind]=text;label.append(input,text);this.exclusions.append(label);
       input.addEventListener('change',()=>{const e=scene.employment;if(e&&this.building){if(kind==='local')e.setBuildingDisabled(this.building,input.checked);else e.setTypeDisabled(this.building,input.checked);}this.pendingMove=null;this.signature=null;this.refresh();},options);}
@@ -60,6 +61,7 @@ export class WorkplacePanel {
       const toggle=document.querySelector('#toggle-food-production');toggle.textContent=t('workplace.auto',{state:t(production.auto?'state.on':'state.off')});toggle.setAttribute('aria-pressed',String(production.auto));
     }
     document.querySelector('#workplace-name').textContent=spec.name;const image=document.querySelector('#workplace-image');image.src=s.assets.previewURL(spec);image.alt=spec.name;
+    this.staffingStatus.textContent=t('staffing.status',{count:summary.missing,percent:Math.round(summary.output*100),missing:summary.missing,present:summary.present});
     document.querySelector('#workplace-count').textContent=t('workplace.workers',{count:summary.count,capacity:summary.capacity});
     document.querySelector('#workplace-wages').textContent=t('workplace.wages',{amount:summary.wages.toFixed(2)});
     document.querySelector('#workplace-average').textContent=t('workplace.average',{skill:SKILLS[spec.workplace.skill],value:summary.averageSkill.toFixed(2)});
@@ -85,5 +87,5 @@ export class WorkplacePanel {
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){this.dialog.close();this.restoreInput();}
-  destroy(){this.close();this.controller.abort();this.exclusions.remove();this.forestryDetails.remove();this.miningDetails.remove();this.militaryDetails.remove();}
+  destroy(){this.close();this.controller.abort();this.staffingStatus.remove();this.exclusions.remove();this.forestryDetails.remove();this.miningDetails.remove();this.militaryDetails.remove();}
 }
