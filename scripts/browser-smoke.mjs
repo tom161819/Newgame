@@ -37,6 +37,7 @@ import { pavementSmoke } from './pavement-smoke.mjs';
 import { rightClickSmoke } from './right-click-smoke.mjs';
 import { paveUnderSmoke } from './pave-under-smoke.mjs';
 import { devFpsSmoke } from './dev-fps-smoke.mjs';
+import { memoryBrightnessSmoke } from './memory-brightness-smoke.mjs';
 import { wallVisibilitySmoke } from './wall-visibility-smoke.mjs';
 import { wheelwrightSmoke } from './wheelwright-smoke.mjs';
 import { stablesSmoke } from './stables-smoke.mjs';
@@ -118,6 +119,7 @@ try{
   if(args.includes('--full')||args.includes('--right-click'))await rightClickSmoke(page);
   if(args.includes('--full')||args.includes('--pave-under'))await paveUnderSmoke(page);
   if(args.includes('--full')||args.includes('--dev-fps'))await devFpsSmoke(page);
+  if(args.includes('--full')||args.includes('--fog-brightness'))await memoryBrightnessSmoke(page,{screenshot:process.env.BRIGHTNESS_SHOT??null});
   if(args.includes('--full')||args.includes('--walls'))await wallVisibilitySmoke(page);
   if(args.includes('--full')||args.includes('--housing'))await housingSmoke(page);
   if(args.includes('--full')||args.includes('--zoom'))await zoomSmoke(page);
