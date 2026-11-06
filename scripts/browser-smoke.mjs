@@ -29,6 +29,8 @@ import { ledgerSmoke } from './ledger-smoke.mjs';
 import { smeltingSmoke } from './smelting-smoke.mjs';
 import { militarySmoke } from './military-smoke.mjs';
 import { pavementSmoke } from './pavement-smoke.mjs';
+import { devFpsSmoke } from './dev-fps-smoke.mjs';
+import { wallVisibilitySmoke } from './wall-visibility-smoke.mjs';
 import { wheelwrightSmoke } from './wheelwright-smoke.mjs';
 import { stablesSmoke } from './stables-smoke.mjs';
 import { horseWagonSmoke } from './horse-wagon-smoke.mjs';
@@ -106,6 +108,8 @@ try{
   if(args.includes('--full')||args.includes('--stables'))await stablesSmoke(page);
   if(args.includes('--full')||args.includes('--horse-wagon'))await horseWagonSmoke(page);
   if(args.includes('--full')||args.includes('--pavement'))await pavementSmoke(page,{screenshot:process.env.PAVEMENT_SHOT??null});
+  if(args.includes('--full')||args.includes('--dev-fps'))await devFpsSmoke(page);
+  if(args.includes('--full')||args.includes('--walls'))await wallVisibilitySmoke(page);
   if(args.includes('--full')||args.includes('--housing'))await housingSmoke(page);
   if(args.includes('--full')||args.includes('--zoom'))await zoomSmoke(page);
   if(args.includes('--full')||args.includes('--minerals'))await mineralSmoke(page);

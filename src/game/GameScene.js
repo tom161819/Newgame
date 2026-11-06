@@ -35,6 +35,7 @@ import { NoticesPanel } from '../ui/NoticesPanel.js';
 import { isProvisional,knownPlacementError,knownContext } from './provisionalSites.js';
 import { MountSystem } from '../systems/MountSystem.js';
 import { SettingsPanel } from '../ui/SettingsPanel.js';
+import { FpsOverlay } from '../ui/FpsOverlay.js';
 import { FortificationView } from './FortificationView.js';
 import { wallLine,wallLinePlan,placeWallLine,wallIndex,connectionsFor,connectedWalls,isWall } from './walls.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
@@ -201,6 +202,7 @@ export class GameScene extends Phaser.Scene {
     if(!this.loadState){this.settingsPanel.applySettings({...this.settingsPanel.settings,fogOfWar:this.gameSettings.fogOfWar,explorationMode:this.gameSettings.explorationMode});this.fog.setEnabled(this.gameSettings.fogOfWar);}
     this.fog.setExplorationEnabled(this.settingsPanel.settings.explorationMode);
     this.terrain.setDebug(this.settingsPanel.settings.pathWearDebug);
+    let devStorage;try{devStorage=window.localStorage;}catch{}this.fpsOverlay=new FpsOverlay(this.game,{storage:devStorage,camera:()=>this.cameras?.main});
     this.foodSystem=new FoodSystem(this.inventory,this.objectRegistry.require('meat'),()=>this.updateInventory(),{time:this.gameTime,scene:this,subscribe:true});
     this.attractiveness=new KingdomAttractivenessSystem(this);this.foodEconomyPanel=new FoodEconomyPanel(this);
     this.inventoryBar=new InventoryBar(this.objectRegistry,this.assets,this.inventory);
@@ -261,7 +263,7 @@ export class GameScene extends Phaser.Scene {
       this.noticesPanel.destroy();this.diagnostics.destroy();this.employmentPanel.destroy();this.unsubscribeEmployment?.();this.employment.destroy();this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
       this.buildingUnlocks.destroy();
       this.animalSystem.destroy();this.dropSystem.destroy();document.querySelector('#object-tooltip').hidden=true;
-      this.settingsPanel.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
+      this.settingsPanel.destroy();this.fpsOverlay.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
       this.clearWallPreviews();
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
       this.equipmentPanel.destroy();this.treasurePanel.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
