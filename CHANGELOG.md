@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-11-06
+<!-- version: {"title":"Event feed above the minimap","type":"feature","reconstructed":false,"saveVersion":33} -->
+### Added
+- Event feed above the minimap: short messages about a finished building, a new resident, a death, a resident leaving, an attack on a resident, a new season and a food shortage. At most five are shown, newest on top; each fades after about 8 seconds (12 for important ones) and stays while the game is paused.
+
+### Fixed
+- The Notices panel no longer covers the minimap: notices, the event feed and the minimap now stack in one column in the bottom-right corner of the map.
+- On phones the minimap is drawn smaller instead of being scaled, so clicking it centres the camera on the right spot.
+
 ## [0.5.0] - 2026-11-06
 <!-- version: {"title":"Villager needs and Happiness (S13 phase A)","type":"feature","reconstructed":false,"saveVersion":33} -->
 ### Added

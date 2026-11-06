@@ -19,7 +19,7 @@ Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeat
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| S13 #58 Villager Needs & Happiness (M4), phase A: individual needs, Happiness, mood, panels | Claude | `claude/s13-needs` | — | Starting | new systems/NeedsSystem.js + data/needs.js, GameStateSerializer/Loader (schema 33 → release 0.5.0), UnitPanel + PopulationSidebar summary, HUD Kingdom Happiness, i18n, tests. Phase B (daily routine/home rest) waits for Codex #124 (WorkerAI idle) to merge, to avoid parallel edits of WorkerAI. |
+| #105 event feed above the minimap; bottom-right column notices → feed → minimap (no overlap) | Claude | `claude/event-feed` | — | In review | new ui/EventFeed.js, Minimap mount/size, index.html corner stack + notices, style.css, GameScene wiring, i18n `feed.*`, scripts/event-feed-smoke.mjs; release 0.5.1 |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
@@ -39,6 +39,7 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 
 ## Done
 
+- 2026-11-06 Claude: S13 #58 phase A needs and Happiness ([#191](https://github.com/tom161819/Newgame/pull/191), release 0.5.0, SAVE_VERSION 33). Phases B–D remain; B waits for Codex #124.
 - 2026-11-06 Claude: #121 ([#169](https://github.com/tom161819/Newgame/pull/169)), batch [#178](https://github.com/tom161819/Newgame/pull/178) = #129/#126/#120/#104 + smoke fix #176, #174 versions ([#184](https://github.com/tom161819/Newgame/pull/184), [#186](https://github.com/tom161819/Newgame/pull/186), [#188](https://github.com/tom161819/Newgame/pull/188)), **M3 RELEASED 0.4.0** ([#187](https://github.com/tom161819/Newgame/pull/187), archive [#189](https://github.com/tom161819/Newgame/pull/189); tag `v0.4.0` → `375f1aa`; Pages 42214708789 + Verify 42215177100 Success). Codex #128 ([#180](https://github.com/tom161819/Newgame/pull/180)) merged.
 
 - 2026-11-06 PR179 / Issue96: merged1ede1ed210f80dfbe8e50154af62cbc2dc118a22 after exact final CI42195939745 SUCCESS;697 tests/changelog/build and relevant native repeated farm/orchard/Fog/Load/rightclick/pave-under/walls/ownership PASS. Actual Pages42196320133 build127820327813 AND deploy127830563932 SUCCESS for the exact merge, including full simulation/save/archive/Studio gates. Issue96 closed/done.128 already claimed/review in180, never relabel an active task ready.
