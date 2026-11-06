@@ -12,7 +12,11 @@ export async function horseWagonSmoke(page){
   await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('stone',12);s.inventory.add('wood',15);s.updateInventory();});
   const shop=await placeBlueprint(page,'wheelwright_workshop');await supplyAndBuild(page,shop);
   const ids=await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id),[a,c,h]=s.workerSystem.liveSubjects().filter(w=>!w.arriving);s.employment?.setEnabled(false);
-    s.workplaceSystem.assign(b,a);s.workplaceSystem.assign(b,c);s.workerSystem.jobs.assign(h,'hauler');h.stoneCollection={enabled:false,radius:80};s.workplacePanel.open(b);return{hauler:h.id,wheelwright:a.id};},shop.id);
+    // These three subjects are autonomous fixture staff. A prior scenario's manual Move/Hold
+    // must not prevent a correctly assigned worker from ever reaching the recipe's blocker.
+    for(const w of [a,c,h])s.workerSystem.commands.resume(w);
+    if(!s.workplaceSystem.assign(b,a)||!s.workplaceSystem.assign(b,c)||!s.workerSystem.jobs.assign(h,'hauler'))throw Error('Horse wagon fixture could not assign its staff');
+    h.stoneCollection={enabled:false,radius:80};s.workplacePanel.open(b);return{hauler:h.id,wheelwright:a.id};},shop.id);
   await page.locator('#workplace-dialog[open] #recipe-choice').waitFor();
   assert.deepEqual(await page.locator('#recipe-choice option').evaluateAll(o=>o.map(x=>x.value)),['wheelbarrow','horse_wagon']);
   await page.locator('#recipe-choice').selectOption('horse_wagon');
@@ -20,7 +24,8 @@ export async function horseWagonSmoke(page){
   assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.foodProduction.records.get(id).recipe,shop.id),'horse_wagon');
   await page.locator('#close-workplace').click();
   await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('wood',30);s.inventory.add('iron_bar',6);s.updateInventory();});
-  await page.waitForFunction(id=>window.__game.registry.get('application').scene.workerSystem.workers.get(id).workMessage==='Waiting for a tamed horse in the Stables',ids.wheelwright,{timeout:120000});
+  try{await page.waitForFunction(id=>window.__game.registry.get('application').scene.workerSystem.workers.get(id).workMessage==='Waiting for a tamed horse in the Stables',ids.wheelwright,{timeout:120000});}
+  catch(error){const diagnostic=await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id);return {time:s.gameTime.totalElapsed,workers:s.workerSystem.liveSubjects().map(w=>({id:w.id,job:w.profession,cmd:w.commandState,tile:w.tile,next:w.nextTile,path:w.path.length,state:w.workState,message:w.workMessage,home:w.assignedWorkplaceId,reached:w.workplaceReached,cargo:w.cargo,task:w.workTask})),stock:[...s.foodStorage.locations.values()].map(l=>({id:l.id,stock:l.stock,incoming:s.foodStorage.incoming(l.id)})),record:s.foodProduction.records.get(id),shortage:s.foodProduction.inputShortage(b),drops:[...s.dropSystem.drops.values()].map(d=>({id:d.id,resource:d.resource,amount:d.amount})),king:{tile:s.character.tile,cargo:s.character.cargo}};},shop.id);throw new Error(`Horse wagon supply did not reach horse wait: ${JSON.stringify(diagnostic)}`,{cause:error});}
   const horse=await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id),a=s.animalSystem.create(s.objectRegistry.require('horse'),{x:b.x+2,y:b.y+2});s.stables.horses.set(a.id,{state:'stabled',stableId:b.id});s.stables.place(a.id);return a.id;},stables.id);
   await page.waitForFunction(()=>window.__game.registry.get('application').scene.vehicles.vehicles.size===1,null,{timeout:240000});
   await page.waitForFunction(id=>{const s=window.__game.registry.get('application').scene;return s.vehicles.held(s.workerSystem.workers.get(id))?.type==='horse_wagon';},ids.hauler,{timeout:90000});
