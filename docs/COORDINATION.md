@@ -6,16 +6,15 @@ Files held lists the files a task changes. Another task avoids them unless neces
 
 ## Agreed merge order
 
-PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da21f0c and awaits its own Pages. NEW15 (#143) must integrate that actual merge and wait for its deployment before merging.
+PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da21f0c and its Pages42159725044 retry completed build/deploy SUCCESS. PR165 (#143) merged90eb356 after exact-head CI42160766881; await its own Pages before166 merges. Then166 precedes145.
 
 ## Active
 
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| NEW18 (#146) Farm plot ownership | Codex | `codex/farm-plot-ownership` | — | Implemented: 670 tests + changelog/build and native ownership/tending browser PASS; schema31; foundation before145, stacked from165; merge only after165 Pages | data/farmPlots.js, buildings placement, FarmingSystem, GameStateSerializer/Loader schema31, FarmConnections overlay, WorkplacePanel/FarmingPanel, own i18n/tests/browser/docs. Prices and farmer construction stay in145. |
-| NEW15 (#143) Workplace staffing output | Codex | `codex/workplace-staffing-output` | [#165](https://github.com/tom161819/Newgame/pull/165) | Implemented: 662 tests + build/changelog and combined native browser PASS; final focused editor also PASS; await current-head CI, merge only after164 Pages | data/workplaces.js, ObjectRegistry validation, WorkplaceSystem, existing work providers, dev AssetGallery editor, WorkplacePanel, authored data/registry, StableSystem and MilitarySystem speed hooks only, own i18n/tests/browser/docs. Preserve Claude163 Stables smoke. |
-| NEW06 (#123) Granary independent capacities | Codex | `codex/granary-capacity-groups` | [#164](https://github.com/tom161819/Newgame/pull/164) | Merged da21f0c after exact-head CI42158316333 success and predecessor Pages; await actual own Pages | data/granaryCapacity.js, FoodStorageSystem + FoodStateValidation, resource-aware room call sites in logistics/production/king/construction, StoragePanel, GameStateSerializer schema30 only, own i18n keys, focused storage/logistics tests/browser and docs. S12 is closed/done; preserve its weights/vehicles. |
+| NEW18 (#146) Farm plot ownership | Codex | `codex/farm-plot-ownership` | [#166](https://github.com/tom161819/Newgame/pull/166) | Implemented: 670 tests + changelog/build and native ownership/tending browser PASS; schema31; foundation before145; actual165 merge90eb356 integrated; fresh670 tests/changelog/build/browser PASS; await exact-head CI and predecessor Pages42163373128 | data/farmPlots.js, buildings placement, FarmingSystem, GameStateSerializer/Loader schema31, FarmConnections overlay, WorkplacePanel/FarmingPanel, own i18n/tests/browser/docs. Prices and farmer construction stay in145. |
+| NEW15 (#143) Workplace staffing output | Codex | `codex/workplace-staffing-output` | [#165](https://github.com/tom161819/Newgame/pull/165) | Merged90eb356 after final-head CI42160766881 and verified predecessor deployment; 662 tests + build/changelog/combined native browser PASS; await own Pages | data/workplaces.js, ObjectRegistry validation, WorkplaceSystem, existing work providers, dev AssetGallery editor, WorkplacePanel, authored data/registry, StableSystem and MilitarySystem speed hooks only, own i18n/tests/browser/docs. Preserve Claude163 Stables smoke. |
 | NEW21 (#149) Studio ruins designs | Claude | `claude/studio-ruins` | [#161](https://github.com/tom161819/Newgame/pull/161) | PR open; review only | studio/src/generators/ruins.js (new), art/assets/decorations/ruin*, art/sprites/ruin*, art/approvals.json, art/style-guide.json (soot, charcoal) |
 
 ## Kept backups (do not delete without the developer)
@@ -24,6 +23,8 @@ PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da2
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-06 PR164 / Issue123: merged da21f0c after exact-head CI42158316333;655 tests, changelog/build and Granary/tending browser PASS. Pages42159725044 build+deploy completed SUCCESS in normal failed-job retry (original deployment timed out in GitHub syncing_files, no source failure). Issue123 closed/done. Direct public URL read is blocked by session proxy CONNECT403; no network rule changes or bypass.
 
 - 2026-11-06 PR142 / Issue122: merged232908750f063b17cfabe6ed9121d4278c0bdb22 after exact-head CI42157067169. 646 tests + changelog/build and combined farmer/employment/staffing/seasons browser PASS. Pages42157299626 build AND deploy succeeded for the exact merge, including full browser/save/archive/Studio. Issue122 closed/done.
 

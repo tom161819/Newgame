@@ -11,3 +11,7 @@ Schema31 persists farmId for every crop and validates type/range/cardinality plu
 670/670 full tests PASS, including eight new ownership cases (nearest/ties/mixed slots, provisional claims, actual farmer isolation, farm removal, later-farm Load ordering, corrupt/range/fifth rejection before mutation, fog-safe links, cancellation freeing a slot). Changelog:validate and build:pages PASS. Browser --current-only --farm-plots --farmer-tending PASS, including actual mouse placement of the fifth blueprint, warning, live count/links, new-farm reconnection and current-schema Load; prior real tending/harvest regressions retained. Historical archives and dependencies untouched.
 
 PR165 final head0e9159b has exact-head CI42160766881 success; predecessor Granary Pages42159725044 is still running its final checks. No146 merge/deployment claimed. Integrate actual165 merge and verify its Pages before146 can merge.
+
+Actual165 merge90eb356 is integrated without source conflict. Predecessor164 Pages42159725044 succeeded in normal failed-job retry;123 closed/done. Await165 Pages before166 merge; fresh integrated checks/CI follow.
+
+Fresh checks after actual90eb356 integration:670/670 tests, changelog:validate, build:pages and --current-only --farm-plots --farmer-tending browser PASS. PR166 remains draft pending actual165 Pages42163373128 and exact-head CI.
