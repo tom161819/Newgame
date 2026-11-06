@@ -1,7 +1,8 @@
 import './styles.css';
 import { loadStudioData } from './data.js';
 import { buildCatalog, filterCatalog, CATEGORIES } from './lib/specs.js';
-import { BASIC_STATUSES, STATUS_LABELS, readLocal, writeLocal, reviewState, reviewSummary, updateLocal, discardLocal, buildExportManifest, pendingChanges } from './lib/approvals.js';
+import { STATUS_LABELS, readLocal, writeLocal, reviewState, reviewSummary, updateLocal, discardLocal, buildExportManifest, pendingChanges, gameArtSources, inGame } from './lib/approvals.js';
+import { withApprovedArt, APPROVED_VILLAGER_ART } from '../../src/data/objects/approvedArt.js';
 import { TIMES, timePreset } from './lib/lighting.js';
 import { heightInPixels, projectPoint } from './lib/projection.js';
 import { renderModel, spriteMetadata, rendererAvailable } from './render/spriteRenderer.js';
@@ -80,7 +81,18 @@ function preferredVariant(asset) {
 // #127 Needs review: the variants of a studio asset that still wait for approval (local edits included).
 const review = asset => reviewSummary({ repo: data.approvals, local: state.local, asset });
 const pendingMode = () => state.review === 'pending';
-const libraryFilter = extra => ({ source: state.source, pendingOnly: pendingMode(), isPending: item => review(item).pending.length > 0, ...extra });
+// #212 review filters over the same catalog: Waiting for My Review (pending), Revision Requested, Approved, In Game.
+let artSources = null;
+const sourcesInGame = () => artSources ??= gameArtSources({ definitions: data.gameDefinitions.map(withApprovedArt), villagerArt: APPROVED_VILLAGER_ART });
+const variantStates = asset => asset.variants.map(variant => ({ variant, state: reviewState({ repo: data.approvals, local: state.local, assetId: asset.id, variant }) }));
+const REVIEW_FILTERS = {
+  pending: item => review(item).pending.length > 0,
+  revision: item => variantStates(item).some(({ state: s }) => s.revisionRequested),
+  approved: item => variantStates(item).some(({ state: s }) => s.effective.status === 'approved' && !s.outdated),
+  ingame: item => item.variants.some(variant => inGame(variant.paths, sourcesInGame())),
+};
+const reviewFilterOn = () => state.review !== 'all' && !!REVIEW_FILTERS[state.review];
+const libraryFilter = extra => ({ source: state.source, pendingOnly: reviewFilterOn(), isPending: item => (REVIEW_FILTERS[state.review] ?? REVIEW_FILTERS.pending)(item), ...extra });
 function assetStatus(asset) {
   const states = asset.variants.map(variant => reviewState({ repo: data.approvals, local: state.local, assetId: asset.id, variant }));
   const status = states.some(s => s.effective.status === 'approved' && !s.outdated) ? 'approved' : states.some(s => s.effective.status === 'review') ? 'review' : 'draft';
@@ -91,15 +103,16 @@ function assetStatus(asset) {
 function renderLibrary() {
   const sources = [['all', 'All'], ['studio', 'Studio'], ['game', 'In game']];
   $('#library-source').replaceChildren(...sources.map(([id, label]) => h('button', { type: 'button', 'aria-pressed': String(state.source === id), onclick: () => { state.source = id; saveUi(); renderLibrary(); } }, label)));
-  const waiting = filterCatalog(catalog.all, { pendingOnly: true, isPending: item => review(item).pending.length > 0 }).length;
-  $('#library-review').replaceChildren(...[['all', 'All', null], ['pending', 'Needs review', waiting]].map(([id, label, count]) => h('button', { type: 'button', 'data-review': id, 'aria-pressed': String(state.review === id), title: id === 'pending' ? 'Only designs that still wait for approval; approved designs and current game sprites are hidden.' : 'Every asset', onclick: () => { state.review = id; saveUi(); renderAll(); } }, label, count === null ? null : h('span', { class: 'count' }, ` ${count}`))));
+  const count = id => filterCatalog(catalog.all, { pendingOnly: true, isPending: REVIEW_FILTERS[id] }).length;
+  const reviewFilters = [['all', 'All', null, ''], ['pending', 'Waiting for my review', count('pending'), 'Designs with a variant you have not decided on for its current version'], ['revision', 'Revision requested', count('revision'), 'Waiting for Claude to deliver a new version'], ['approved', 'Approved', count('approved'), 'An approved variant for the current version'], ['ingame', 'In game', count('ingame'), 'The game uses exactly this exported version']];
+  $('#library-review').replaceChildren(...reviewFilters.map(([id, label, n, title]) => h('button', { type: 'button', 'data-review': id, 'aria-pressed': String(state.review === id), title, onclick: () => { state.review = id; saveUi(); renderAll(); } }, label, n === null ? null : h('span', { class: 'count' }, String(n)))));
   const counts = Object.fromEntries(CATEGORIES.map(c => [c.id, filterCatalog(catalog.all, libraryFilter({ category: c.id })).length]));
   const chips = [{ id: 'all', label: 'All' }, ...CATEGORIES].map(c => h('button', { type: 'button', class: 'chip', 'aria-pressed': String(state.category === c.id), onclick: () => { state.category = c.id; saveUi(); renderLibrary(); } },
     c.label, c.id === 'all' ? null : h('span', { class: 'count' }, counts[c.id])));
   $('#library-categories').replaceChildren(...chips);
   const items = filterCatalog(catalog.all, libraryFilter({ category: state.category, query: state.query }));
   const list = $('#library-list');
-  if (!items.length) { list.replaceChildren(h('li', { class: 'empty' }, pendingMode() ? 'Nothing here waits for approval: every studio design in this filter is approved, and current game sprites are hidden in Needs review.' : 'No assets match this filter.')); return; }
+  if (!items.length) { list.replaceChildren(h('li', { class: 'empty' }, state.review === 'pending' ? 'Nothing here waits for your review: every studio design in this filter is decided for its current version, and current game sprites are hidden.' : reviewFilterOn() ? 'No designs in this review state.' : 'No assets match this filter.')); return; }
   const groups = [['studio', 'Studio assets'], ['game', 'Current game sprites']];
   list.replaceChildren(...groups.flatMap(([source, label]) => {
     const group = items.filter(item => item.source === source);
@@ -195,13 +208,25 @@ function variantCard(asset, variant) {
   const base = spriteFor(asset, variant, 1), height = heightInPixels(base.modelHeight);
   const canvas = h('canvas', { class: 'variant-canvas', 'data-variant': variant.id, role: 'img', 'aria-label': `${variant.name} rendered at ${state.zoom}× on ${state.background}` });
   canvas._paint = () => paintVariant(canvas, asset, variant);
-  const statusButtons = h('div', { class: 'segmented status', role: 'group', 'aria-label': `Status of ${variant.name}` },
-    BASIC_STATUSES.map(status => h('button', { type: 'button', 'data-status': status, 'aria-pressed': String(review.effective.status === status), onclick: () => changeReview(asset, variant, { status }) }, STATUS_LABELS[status])));
-  const note = h('textarea', { id: `note-${variant.id}`, placeholder: 'Review note (optional)', 'aria-label': `Note for ${variant.name}`, onchange: event => changeReview(asset, variant, { note: event.target.value }) });
-  note.value = review.effective.note ?? '';
+  // #212 decisions on this exact version: Approve, Request revision (needs a comment), Reject; Back to review undoes.
+  const comment = h('textarea', { id: `note-${variant.id}`, placeholder: 'Comment for this version (required for Request revision)', 'aria-label': `Comment on ${variant.name} v${variant.version}` });
+  const error = h('p', { class: 'review-error', role: 'alert', hidden: true });
+  const decide = status => {
+    const text = comment.value.trim();
+    if (status === 'revision-requested' && !text) { error.textContent = 'Write what should change before requesting a revision.'; error.hidden = false; comment.focus(); return; }
+    changeReview(asset, variant, { status, ...(text ? { comment: text } : {}) });
+  };
+  const DECISIONS = [['approved', 'Approve'], ['revision-requested', 'Request revision'], ['rejected', 'Reject'], ['review', 'Back to review']];
+  const statusButtons = h('div', { class: 'segmented status decisions', role: 'group', 'aria-label': `Decision on ${variant.name}` },
+    DECISIONS.map(([status, label]) => h('button', { type: 'button', 'data-status': status, 'aria-pressed': String(review.effective.status === status && !review.outdated), onclick: () => decide(status) }, label)));
+  const note = h('div', { class: 'review-comment' }, comment, error);
+  const record = review.effective, entries = [...(record.history ?? []).map(h2 => ({ kind: 'version', ...h2 })), ...(record.comments ?? []).map(c => ({ kind: 'comment', ...c }))].sort((a, b) => a.version - b.version || String(a.at).localeCompare(String(b.at)));
+  const history = entries.length ? h('details', { class: 'review-history' }, h('summary', {}, `History (${entries.length})`), h('ol', {}, entries.map(e => h('li', {}, e.kind === 'version' ? `v${e.version} · ${STATUS_LABELS[e.status] ?? e.status} · #${e.specHash}` : `v${e.version} comment: “${e.text}”`, e.at ? h('time', { datetime: e.at }, ` ${e.at.slice(0, 10)}`) : null)))) : null;
+  const issue = record.review?.issue ? h('a', { class: 'review-issue', href: `${REPOSITORY}/issues/${record.review.issue}`, target: '_blank', rel: 'noopener noreferrer' }, `Review #${record.review.issue}`) : null;
+  const live = inGame(variant.paths, sourcesInGame());
   const repoLabel = review.committed ? `Repository: ${STATUS_LABELS[review.repoStatus]} v${review.committed.version}` : 'Repository: not reviewed';
   return h('article', { class: `variant-card${review.preferred ? ' preferred' : ''}`, 'data-variant': variant.id },
-    h('header', {}, h('div', {}, h('h3', {}, variant.name), h('span', { class: 'sub' }, `${variant.id} · v${variant.version} · #${variant.hash}`)), pill(review.effective.status)),
+    h('header', {}, h('div', {}, h('h3', {}, variant.name), h('span', { class: 'sub' }, `${variant.id} · v${variant.version} · #${variant.hash}`)), h('span', { class: 'pills' }, pill(review.outdated ? 'outdated' : review.effective.status, review.outdated ? 'Outdated' : undefined), live ? h('span', { class: 'pill ingame', title: 'The game uses exactly this exported version' }, 'In game') : null)),
     canvas,
     h('dl', { class: 'facts' },
       h('dt', {}, 'Sprite'), h('dd', {}, `${base.width} × ${base.height} px at 1×`),
@@ -213,7 +238,7 @@ function variantCard(asset, variant) {
     h('div', { class: 'review' },
       h('div', { class: 'review-line' }, h('span', {}, repoLabel), review.pending ? h('span', { class: 'pill local', title: 'Stored in this browser only' }, `Local: ${STATUS_LABELS[review.pending.status]}`) : null, review.outdated ? h('span', { class: 'pill outdated', title: 'The spec changed after this review' }, 'Outdated') : null),
       h('div', { class: 'review-row' }, statusButtons, h('button', { type: 'button', class: 'star', 'aria-pressed': String(review.preferred), onclick: () => changeReview(asset, variant, { preferred: !review.preferred }) }, review.preferred ? '★ Preferred' : '☆ Prefer')),
-      note,
+      note, history, issue,
       h('div', { class: 'card-actions' },
         h('button', { type: 'button', class: 'button', onclick: () => exportPng(asset, variant) }, 'Download PNG'),
         h('button', { type: 'button', class: 'button ghost', onclick: () => exportMeta(asset, variant) }, 'Download metadata'))));
