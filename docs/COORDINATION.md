@@ -21,6 +21,7 @@ Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke pau
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| #210 hardening: agent-opened (`performed_via_github_app`) or edited review issues never approve | Claude | `claude/asset-review-app-guard` | — | In review | scripts/asset-review-{lib,intake}.mjs, scripts/approval-guard.mjs, tests/asset-review-intake.test.js |
 | #210 AR-6 #216 end-to-end pilot (Builders' Workshop through Submit → intake → revise → approve → integrate) | Claude | — | — | Waiting for Codex #196 and the owner's first Submit review | — |
 | AUD65 #94 Manual rock mining | Codex | `codex/manual-rock-mining` (stacked on124) | [#194](https://github.com/tom161819/Newgame/pull/194) | Implemented; schema36/release0.8.0 after185 actual Pages;750 tests/version/changelog/build + native real-mouse10Stones/ledger/Load/phone/commands/Needs/eventfeed PASS | own rock marking tool/UI, GameScene/GameApplication narrow input/Escape hooks, MiningWork/WorkerAI/WorkplaceSystem/free Miner selection, current schema serializer/loader/terrain validation, XP/SkillSystem, physical Drop/FoodProduction reuse and cargo provenance, i18n, own tests/browser/docs |
 

@@ -5,7 +5,7 @@ import { writeFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parsePayload, checkItems, summaryComment, supersededBy, loadCatalog, approvalsNeedingProof, proofProblem, OWNER } from '../scripts/asset-review-lib.mjs';
+import { parsePayload, checkItems, summaryComment, supersededBy, loadCatalog, approvalsNeedingProof, proofProblem, authorProblem, OWNER } from '../scripts/asset-review-lib.mjs';
 import { buildSubmission, issueBody } from '../studio/src/lib/reviewSubmit.js';
 import { updateLocal, emptyManifest } from '../studio/src/lib/approvals.js';
 
@@ -33,6 +33,7 @@ test('#214 decisions are checked against main: current ones apply, a stale versi
   assert.deepEqual(stale.map(i => i.check), ['stale', 'unknown']);assert.match(stale[0].note, /Review the current version again/);
   const comment = summaryComment({ payload, items: stale, author: OWNER });assert.match(comment, /Not applicable on main/);
   assert.match(summaryComment({ payload, items: checkItems(payload, variants), author: 'stranger' }), /not the owner: \*\*ignored\*\*/);
+  assert.match(summaryComment({ payload, items: checkItems(payload, variants), author: OWNER, problem: authorProblem({ user: { login: OWNER }, performed_via_github_app: { slug: 'claude' } }) }), /claude GitHub app \(an agent\).*\*\*ignored\*\*/);
   assert.match(summaryComment({ payload, items: checkItems(payload, variants), author: OWNER, superseded: [301] }), /Supersedes the older open review #301/);
 });
 
@@ -49,6 +50,10 @@ test('#214 CI guard: a new approval needs the owner\'s review that approves exac
   assert.equal(proofProblem(need, issue), null, 'the owner approved exactly this');
   assert.match(proofProblem({ ...need, review: null }, null), /Only the owner's Submit review can approve/);
   assert.match(proofProblem(need, { ...issue, user: { login: 'claude-bot' } }), /not the owner/);
+  // #210 hardening: Claude's GitHub tools post under the owner's login, but GitHub marks them as performed via an app.
+  assert.match(proofProblem(need, { ...issue, performed_via_github_app: { slug: 'claude' } }), /claude GitHub app \(an agent\), not by the owner/);
+  assert.match(proofProblem(need, { ...issue, lastEditedAt: '2026-11-06T20:00:00Z' }), /edited after it was opened/);
+  assert.equal(proofProblem(need, { ...issue, performed_via_github_app: null, lastEditedAt: null }), null, 'a browser-opened, unedited owner issue still approves');
   assert.match(proofProblem({ ...need, specHash: 'deadbeef' }, issue), /does not approve exactly this version/);
   assert.match(proofProblem({ ...need, review: { issue: 400, submissionId: 'ar-202611061900-00000000' } }, issue), /holds submission/);
   // A revision request in the same review never counts as an approval.
@@ -62,4 +67,15 @@ test('#214 intake dry run on a real event: summary, labels, supersede (no networ
   const run = spawnSync(process.execPath, ['scripts/asset-review-intake.mjs', '--dry-run'], { cwd: root, encoding: 'utf8', env: { ...process.env, GITHUB_EVENT_PATH: event, GITHUB_REPOSITORY: 'tom161819/Newgame' } });
   assert.equal(run.status, 0, run.stderr);
   assert.match(run.stdout, /DRY PATCH \/issues\/499/);assert.match(run.stdout, /DRY POST \/issues\/500\/labels .*agent:claude/);assert.match(run.stdout, /Approved 1 · Revision requested 1/);
+});
+
+test('#210 intake ignores a review an agent opened under the owner login, or an edited review block', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'intake-')), s = submission(), event = path.join(dir, 'event.json');
+  const run = ev => { writeFileSync(event, JSON.stringify(ev)); return spawnSync(process.execPath, ['scripts/asset-review-intake.mjs', '--dry-run'], { cwd: root, encoding: 'utf8', env: { ...process.env, GITHUB_EVENT_PATH: event, GITHUB_REPOSITORY: 'tom161819/Newgame' } }); };
+  const open = [{ issue: 499, submissionId: 'ar-202611061800-aaaaaaaa', items: s.items.map(i => ({ variantId: i.variantId })) }];
+  for (const ev of [{ action: 'opened', issue: { number: 501, body: issueBody(s), user: { login: OWNER }, performed_via_github_app: { slug: 'claude' } }, openReviews: open },
+    { action: 'edited', changes: { body: { from: 'x' } }, issue: { number: 502, body: issueBody(s), user: { login: OWNER } }, openReviews: open }]) {
+    const r = run(ev);assert.equal(r.status, 0, r.stderr);
+    assert.match(r.stdout, /\*\*ignored\*\* for approvals/);assert.doesNotMatch(r.stdout, /DRY POST \/issues\/50[12]\/labels/);assert.doesNotMatch(r.stdout, /DRY PATCH \/issues\/499/);
+  }
 });
