@@ -73,12 +73,21 @@ jobs:
       id-token: write
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.first.outputs.page_url || steps.second.outputs.page_url || steps.third.outputs.page_url }}
     steps:
+      # GitHub's Pages backend sometimes keeps a deployment queued or syncing past the action's hard 10-minute limit
+      # (a larger `timeout` is ignored): 0306270, 2dc39c4 and d7ea2cb were cancelled although their builds passed.
+      # The same uploaded artifact is therefore deployed up to three times before the job fails.
       - name: Publish website
-        id: deployment
+        id: first
+        continue-on-error: true
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
-        with:
-          # The site with its playable archive is ~140 MB in ~3000 files; GitHub's file sync regularly needs more than
-          # the action's default 10 minutes, which cancelled finished deployments (0306270, 2dc39c4).
-          timeout: 1800000
+      - name: Publish website (retry 1)
+        id: second
+        if: steps.first.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+      - name: Publish website (retry 2)
+        id: third
+        if: steps.first.outcome == 'failure' && steps.second.outcome == 'failure'
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
