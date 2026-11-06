@@ -1,7 +1,7 @@
 import { execFileSync,spawnSync } from 'node:child_process';
 import { readFile,writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { milestoneStages,completedStages,pagesEvidence,releaseNumber } from './release-gate-lib.mjs';
+import { milestoneStages,completedStages,pagesRunEvidence,releaseNumber } from './release-gate-lib.mjs';
 import { parseChangelog,readRelease } from './changelog-lib.mjs';
 import { readVersionCatalog } from './version-catalog.mjs';
 import { verifyDeployedArchive,verifyPublishedRelease } from './deployed-archive.mjs';
@@ -17,11 +17,10 @@ const head=git('rev-parse','HEAD'),deployed=option('pages-commit'),pagesRun=opti
 if(!deployed||!pagesRun)throw new Error('An actual successful Pages deployment is required; no release was prepared.');
 if(!/^\d+$/.test(pagesRun))throw new Error('Expected a numeric actual Pages run ID.');
 if(git('status','--porcelain'))throw new Error('Commit verified work before running a release gate.');
-const url=`https://github.com/tom161819/Newgame/actions/runs/${encodeURIComponent(pagesRun)}`;
-// curl honors the managed runtime's HTTPS proxy and CA settings on supported
-// Node versions; raw Node fetch does not necessarily use that proxy.
-let html;try{html=execFileSync('curl',['--fail','--silent','--show-error','--location','--max-time','30',url],{encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:8*1024*1024});}catch{throw new Error('Cannot read actual Pages evidence through the configured HTTPS connection.');}
-const pages=pagesEvidence(html,{run:pagesRun,commit:deployed});
+const url=`https://api.github.com/repos/tom161819/Newgame/actions/runs/${encodeURIComponent(pagesRun)}`;
+// curl honors the managed runtime's HTTPS proxy and CA settings; the REST API answers where the HTML run page is blocked.
+let runJSON;try{runJSON=JSON.parse(execFileSync('curl',['--fail','--silent','--show-error','--location','--max-time','30','-H','Accept: application/vnd.github+json',url],{encoding:'utf8',stdio:['ignore','pipe','pipe'],maxBuffer:8*1024*1024}));}catch{throw new Error('Cannot read actual Pages evidence from the GitHub API; no release was prepared.');}
+const pages=pagesRunEvidence(runJSON,{run:pagesRun,commit:deployed});
 git('merge-base','--is-ancestor',deployed,head);
 const sourcePaths=['src','scripts','index.html','vite.config.js','package.json','package-lock.json','CHANGELOG.md','public/assets','.github/workflows'];
 const {data}=await readRelease(root),report={mode,head,version:data.version,pages,checks:[],recordedAt:new Date().toISOString()};
