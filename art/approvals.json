@@ -1262,6 +1262,120 @@
         }
       }
     },
+    "smelter-operator": {
+      "preferred": "smelter-operator-male",
+      "variants": {
+        "smelter-operator-male": {
+          "status": "review",
+          "version": 1,
+          "specHash": "2668b864",
+          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
+          "updatedAt": "2026-11-06T18:30:00.000Z"
+        },
+        "smelter-operator-female": {
+          "status": "review",
+          "version": 1,
+          "specHash": "b4c2d3d5",
+          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
+          "updatedAt": "2026-11-06T18:30:00.000Z"
+        }
+      }
+    },
+    "swordsmith-worker": {
+      "preferred": "swordsmith-worker-male",
+      "variants": {
+        "swordsmith-worker-male": {
+          "status": "review",
+          "version": 1,
+          "specHash": "d4831829",
+          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
+          "updatedAt": "2026-11-06T18:30:00.000Z"
+        },
+        "swordsmith-worker-female": {
+          "status": "review",
+          "version": 1,
+          "specHash": "0c1013a9",
+          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
+          "updatedAt": "2026-11-06T18:30:00.000Z"
+        }
+      }
+    },
+    "armorer-worker": {
+      "preferred": "armorer-worker-male",
+      "variants": {
+        "armorer-worker-male": {
+          "status": "review",
+          "version": 1,
+          "specHash": "2522a561",
+          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
+          "updatedAt": "2026-11-06T18:30:00.000Z"
+        },
+        "armorer-worker-female": {
+          "status": "review",
+          "version": 1,
+          "specHash": "c758bc28",
+          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
+          "updatedAt": "2026-11-06T18:30:00.000Z"
+        }
+      }
+    },
+    "bowyer-worker": {
+      "preferred": "bowyer-worker-male",
+      "variants": {
+        "bowyer-worker-male": {
+          "status": "review",
+          "version": 1,
+          "specHash": "1618bc2b",
+          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
+          "updatedAt": "2026-11-06T18:30:00.000Z"
+        },
+        "bowyer-worker-female": {
+          "status": "review",
+          "version": 1,
+          "specHash": "d5a494e4",
+          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
+          "updatedAt": "2026-11-06T18:30:00.000Z"
+        }
+      }
+    },
+    "wheelwright": {
+      "preferred": "wheelwright-male",
+      "variants": {
+        "wheelwright-male": {
+          "status": "review",
+          "version": 1,
+          "specHash": "71d4f3ab",
+          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
+          "updatedAt": "2026-11-06T18:30:00.000Z"
+        },
+        "wheelwright-female": {
+          "status": "review",
+          "version": 1,
+          "specHash": "a5170561",
+          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
+          "updatedAt": "2026-11-06T18:30:00.000Z"
+        }
+      }
+    },
+    "stablehand": {
+      "preferred": "stablehand-male",
+      "variants": {
+        "stablehand-male": {
+          "status": "review",
+          "version": 1,
+          "specHash": "b61eb2c4",
+          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
+          "updatedAt": "2026-11-06T18:30:00.000Z"
+        },
+        "stablehand-female": {
+          "status": "review",
+          "version": 1,
+          "specHash": "e6ce13ec",
+          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
+          "updatedAt": "2026-11-06T18:30:00.000Z"
+        }
+      }
+    },
     "barracks-hall": {
       "preferred": "barracks-hall-stone",
       "variants": {
