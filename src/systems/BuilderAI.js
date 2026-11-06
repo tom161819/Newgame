@@ -38,7 +38,7 @@ export class BuilderAI {
       if(!system.materials.ready(site))continue;
       if(site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders||this.blocked.get(`${worker.id}:${site.id}`)===system.revision)continue;
       const goals=system.goals(site,worker);if(!goals.length){
-        if(!towerNeighbors(site).some(t=>scene.map[t.y]?.[t.x]===0)){this.blocked.set(`${worker.id}:${site.id}`,system.revision);site.unreachableReason=t('status.siteNoAccess');}
+        if(!towerNeighbors(system.materials.area?.(site).host??site).some(t=>scene.map[t.y]?.[t.x]===0)){this.blocked.set(`${worker.id}:${site.id}`,system.revision);site.unreachableReason=t('status.siteNoAccess');}
         continue;
       }
       for(const goal of goals)choices.set(tileKey(goal),{goal,site});

@@ -13,9 +13,7 @@ Codex PR138 (#131) first; PR142 (#122) then integrates that actual merge/schema2
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| NEW21 (#149) Studio ruins designs | Claude | `claude/studio-ruins` | — | PR open; review only | studio/src/generators/ruins.js (new), art/assets/decorations/ruin*, art/sprites/ruin*, art/approvals.json, art/style-guide.json (soot, charcoal) |
-| Pages fix: deterministic Stables smoke (after #158) | Claude | `claude/fix-stables-smoke` | — | PR open | scripts/stables-smoke.mjs |
-| S12 phase D (#57) Horse Wagon | Claude | `claude/s12-horse-wagon` | — | PR open; schema 29; 633 tests, 62 full smokes PASS | data/production.js, objects/vehicles.js, FoodProduction/Storage/StateValidation, LogisticsTaskManager, ProductionDiagnostics, StableSystem, VehicleSystem, WorkerSystem (navigation), VehicleViews, WorkplacePanel, serializer |
+| NEW21 (#149) Studio ruins designs | Claude | `claude/studio-ruins` | [#161](https://github.com/tom161819/Newgame/pull/161) | PR open; review only | studio/src/generators/ruins.js (new), art/assets/decorations/ruin*, art/sprites/ruin*, art/approvals.json, art/style-guide.json (soot, charcoal) |
 | Pages season-pixel regression after FoW optimization | Codex | `codex/pages-season-pixels` | — | Reproduced exact pixel failure; 618 tests, changelog/build, strict seasons/FoW/transition browser PASS; PR/CI pending | SeasonTransition + TerrainRenderer explicit complete-redraw contract, focused renderer/transition tests, seasons-menu smoke selection and docs. Coordinates with Claude fow-performance-pixels test-wait guards; fog-smoke/seasons-menu assertions untouched. No game data/schema or memory semantics changes. |
 | NEW14 (#131) Employment exclusions | Codex | `codex/employment-exclusions` | [#138](https://github.com/tom161819/Newgame/pull/138) | Draft PR; S12 phase A and FoW fixes integrated from maina6442d5, schema26 preserved; 616 tests, changelog/build and UI/staffing/priority Save26 browser PASS after integration; ready for current-head CI | EmploymentSystem/data employment, WorkplaceSystem assignment guard, WorkplacePanel, own EN/CS block, schema+employment validation only in GameStateSerializer, tests/browser smoke (ledger/smelting/military schema assertions use authored SAVE_VERSION), docs/changelog. Other S12 held logistics untouched. |
 
@@ -26,6 +24,10 @@ Codex PR138 (#131) first; PR142 (#122) then integrates that actual merge/schema2
 
 ## Done
 
+- 2026-11-06 [#162](https://github.com/tom161819/Newgame/pull/162) Pages fix (Claude): the fog seam sample searches further out. Merge 65d5202; Pages 42152292448 succeeded.
+- 2026-11-06 [#159](https://github.com/tom161819/Newgame/pull/159) NEW22 #150 (Claude): Stone Pavement under finished buildings. Merge faff426; 638 tests, 63 full smokes; deployed by the #162 Pages run.
+- 2026-11-06 [#160](https://github.com/tom161819/Newgame/pull/160) Pages fix (Claude): the Stables smoke tames its own wild horse only (Pages for #158 had timed out). Merge a16863b.
+- 2026-11-06 [#158](https://github.com/tom161819/Newgame/pull/158) S12 phase D (#57, Claude): Horse Wagon, schema 29. Merge a9aa16f; 635 tests, 62 full smokes, CI succeeded.
 - 2026-11-06 [#157](https://github.com/tom161819/Newgame/pull/157) NEW19 #147 (Claude): wall kit shadows on the ground layer. Merge 824c99e; 631 tests, walls/fog smokes, CI succeeded.
 - 2026-11-06 [#156](https://github.com/tom161819/Newgame/pull/156) NEW16 #144 (Claude): Developer settings with an FPS overlay (F3). Merge 2e9bbb5; 629 tests, dev-fps smoke, CI succeeded.
 - 2026-11-05 [#155](https://github.com/tom161819/Newgame/pull/155) NEW20 #148 (Claude): walls keep their kit pieces after culling. Merge d50c7a8; 626 tests, walls smoke fails without the fix, CI succeeded.

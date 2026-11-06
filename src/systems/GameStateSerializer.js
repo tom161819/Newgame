@@ -6,6 +6,7 @@ import { getXPRequired,totalXPForLevel,createProgress } from '../data/experience
 import { JOBS,SKILL_IDS,WORK_RULES } from '../data/jobs.js';
 import { CONSTRUCTION_RULES } from '../data/construction.js';
 import { buildingIsComplete,towerNeighbors } from '../game/buildings.js';
+import { pavementHost } from '../game/pavement.js';
 import { gameSettings,WILDLIFE_INTERVALS } from './GameSettings.js';
 import { FARMING_RULES } from '../data/farming.js';
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
@@ -144,6 +145,8 @@ export function validateGameState(input,registry=objectRegistry){
   for(const b of s.buildings){integer(b.id,1);const d=definition(b.type,'building');check(d.buildable||d.starter||d.pavement);if(d.starter)check(buildingIsComplete(b));if(d.pavement)check(!buildingIsComplete(b));
     check(b.unverified===undefined||b.unverified===true&&b.construction?.state==='planned'&&!b.depositId);
     if(b.unverified){tile(b);for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){const x=b.x+dx,y=b.y+dy,key=`${x},${y}`;check(s.terrain[y]?.[x]!==undefined&&!provisional.has(key));provisional.add(key);}}
+    // #150: a pavement site may lie on the floor of a finished building (not farmland); it claims no tile of its own.
+    else if(d.pavement&&pavementHost(s.buildings,b,registry))tile(b);
     else occupy(b,d.width,d.height);
     if(!b.unverified&&(!d.walkable||!buildingIsComplete(b)))for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++)solid.add(`${b.x+dx},${b.y+dy}`);
     if(b.construction){
@@ -254,7 +257,7 @@ export function validateGameState(input,registry=objectRegistry){
         }
         if(t.kind==='build'){
           const site=s.buildings.find(b=>b.id===t.targetId);check(w.profession==='builder'&&site&&!buildingIsComplete(site)&&site.construction.assignedBuilders.includes(w.id));
-          check(towerNeighbors(site).some(p=>p.x===t.goal.x&&p.y===t.goal.y));
+          check(towerNeighbors(pavementHost(s.buildings,site,registry)??site).some(p=>p.x===t.goal.x&&p.y===t.goal.y));
         }
         if(t.kind==='harvest'){
           const plot=s.buildings.find(b=>b.id===t.targetId),record=s.farming?.records?.find(r=>r.buildingId===t.targetId),home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);
@@ -286,7 +289,7 @@ export function validateGameState(input,registry=objectRegistry){
   if(s.constructionSystem!==undefined){
     const c=s.constructionSystem;check(c);integer(c.nextId,Math.max(0,...s.buildings.map(b=>b.id))+1);
     check(c.kingSiteId==null||bIds.has(c.kingSiteId));
-    if(c.kingSiteId!=null){const site=s.buildings.find(b=>b.id===c.kingSiteId);check(!buildingIsComplete(site)&&site.construction.assignedBuilders.includes('king'));tile(c.kingGoal);check(towerNeighbors(site).some(p=>p.x===c.kingGoal.x&&p.y===c.kingGoal.y));check(!reservations.has(`construction-slot:${c.kingGoal.x},${c.kingGoal.y}`));}
+    if(c.kingSiteId!=null){const site=s.buildings.find(b=>b.id===c.kingSiteId);check(!buildingIsComplete(site)&&site.construction.assignedBuilders.includes('king'));tile(c.kingGoal);check(towerNeighbors(pavementHost(s.buildings,site,registry)??site).some(p=>p.x===c.kingGoal.x&&p.y===c.kingGoal.y));check(!reservations.has(`construction-slot:${c.kingGoal.x},${c.kingGoal.y}`));}
     else check(c.kingGoal==null&&!siteAssignments.has('king'));
     for(const id of siteAssignments)if(id!=='king'){const w=s.workers?.find(w=>w.id===id);check(w?.isAlive&&w.profession==='builder'&&w.workTask?.kind==='build');}
   }else check(!s.buildings.some(b=>!buildingIsComplete(b)));

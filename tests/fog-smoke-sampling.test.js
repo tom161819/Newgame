@@ -20,3 +20,10 @@ test('removing subject sight still leaves explored memory; a remembered fixed co
  const f=fog();f.registerSource('subjects',()=>[{id:'worker',center:{x:55.5,y:47.5},radius:7.5}]);for(const index of f.visibleIndices)f.explored[index]=1;f.providers.delete('subjects');f.update();assert.equal(f.state({x:59,y:42}),1);
  const chosen=unknownFogSeam(f,camera,king);assert.notDeepEqual(chosen.tile,{x:59,y:42});assert.ok(chosen.neighbors.every(t=>f.state(t)===0));
 });
+
+test('when every nearby fixed corner is already explored, the fixture searches further out and still finds unknown ground on screen',()=>{
+ const f=fog();for(let y=0;y<f.height;y++)for(let x=0;x<f.width;x++)if(Math.hypot(x-king.x,y-king.y)<=13)f.explored[y*f.width+x]=1;f.update();
+ for(const [dx,dy]of [[9,-8],[8,9],[-9,8],[-8,-9]])assert.notEqual(f.state({x:king.x+dx,y:king.y+dy}),0);
+ const chosen=unknownFogSeam(f,camera,king);assert.ok(Math.hypot(chosen.tile.x-king.x,chosen.tile.y-king.y)>12);assert.ok(chosen.neighbors.every(t=>f.state(t)===0));
+ assert.ok(chosen.screen.x>=2&&chosen.screen.x<camera.width-2&&chosen.screen.y>=2&&chosen.screen.y<camera.height-2);
+});

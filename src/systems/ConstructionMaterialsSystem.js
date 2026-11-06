@@ -1,5 +1,6 @@
 import { dataName } from '../i18n/names.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
+import { pavementWorkArea } from '../game/pavement.js';
 
 // Site stock is part of the same physical storage ledger as warehouses. The
 // requirement is a recipe, not another copy of the invested resources.
@@ -12,8 +13,13 @@ export class ConstructionMaterialsSystem {
   required(building){return Object.fromEntries(Object.entries(buildingDefinition(building).cost).filter(([id])=>this.storage.manages(id)));}
   location(building){
     const id=this.owner(building.id),d=buildingDefinition(building);let location=this.storage.locations.get(id);
-    if(!location){location={id,kind:'site',buildingId:building.id,x:building.x,y:building.y,width:d.width,height:d.height,capacity:Object.values(building.materialSupply.required).reduce((n,v)=>n+v,0),allowed:Object.keys(building.materialSupply.required),stock:{},legacyOverflow:0};this.storage.locations.set(id,location);this.storage.changed();}return location;
+    const area=this.area(building);
+    if(!location){location={id,kind:'site',buildingId:building.id,x:area.x,y:area.y,width:area.width,height:area.height,capacity:Object.values(building.materialSupply.required).reduce((n,v)=>n+v,0),allowed:Object.keys(building.materialSupply.required),stock:{},legacyOverflow:0};this.storage.locations.set(id,location);this.storage.changed();}return location;
   }
+  // #150: pavement under a finished building is supplied and built from the building's edge.
+  area(building){if(!buildingDefinition(building).pavement){const d=buildingDefinition(building);return {x:building.x,y:building.y,width:d.width,height:d.height};}return pavementWorkArea(this.scene.buildings,building,this.scene.objectRegistry);}
+  // The work area follows the host: if it is demolished, the site is reached from its own tile again.
+  syncAreas(){for(const site of this.scene.buildings){if(!buildingDefinition(site).pavement)continue;const l=this.storage?.locations.get(this.owner(site.id));if(!l)continue;const a=this.area(site);if(l.x!==a.x||l.y!==a.y||l.width!==a.width||l.height!==a.height){Object.assign(l,{x:a.x,y:a.y,width:a.width,height:a.height});this.storage.changed();}}}
   prepare(building){
     if(!this.enabled)return false;
     const cost=buildingDefinition(building).cost;if(!this.scene.inventory.canAfford(cost))return false;
