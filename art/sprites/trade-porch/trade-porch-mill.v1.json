@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "trade-porch",
+  "variantId": "trade-porch-mill",
+  "name": "Mill: veranda with grain sacks, 2 seats",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "a8ac9f28",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 99,
+  "height": 70,
+  "anchor": {
+    "x": 49,
+    "y": 44
+  },
+  "origin": {
+    "x": 0.49495,
+    "y": 0.62857
+  },
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "base": {
+    "x": 65,
+    "y": 68
+  },
+  "baseOrigin": {
+    "x": 0.65657,
+    "y": 0.97143
+  },
+  "visualHeight": 68,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.764,
+  "lights": []
+}
