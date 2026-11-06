@@ -1,3 +1,4 @@
+import { workplaceSeatingSmoke } from './workplace-seating-smoke.mjs';
 import { builderWorkshopSmoke } from './builder-workshop-smoke.mjs';
 import { rockMiningSmoke } from './rock-mining-smoke.mjs';
 import { castleGatheringSmoke } from './castle-gathering-smoke.mjs';
@@ -145,6 +146,7 @@ try{
   if(args.includes('--full')||args.includes('--workplace-output'))await workplaceOutputSmoke(page);
   if(args.includes('--full')||args.includes('--granary-capacity'))await granaryCapacitySmoke(page);
   if(args.includes('--full')||args.includes('--farmer-establishment'))await farmerEstablishmentSmoke(page);
+  if(args.includes('--full')||args.includes('--workplace-seating'))await workplaceSeatingSmoke(page,{screenshot:args.includes('--seating-shot')?'/tmp/newgame-workplace-seating.png':null});
   if(args.includes('--full')||args.includes('--builder-workshop'))await builderWorkshopSmoke(page,{screenshot:args.includes('--workshop-shot')?'/tmp/newgame-builder-workshop.png':null});
   if(args.includes('--full')||args.includes('--rock-mining'))await rockMiningSmoke(page,{screenshot:args.includes('--rock-shot')?'/tmp/newgame-rock-mining.png':null});
   if(args.includes('--full')||args.includes('--castle-gathering'))await castleGatheringSmoke(page,{screenshot:args.includes('--gather-shot')?'/tmp/newgame-castle-gathering.png':null});

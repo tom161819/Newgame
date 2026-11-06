@@ -2,6 +2,8 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  'seating.resting':'Resting on the workplace porch',
+  'seating.walking':'Walking to a workplace seat',
   'workshop.rule':'Builders without a reachable completed workshop build at 50% speed. Movement, carrying, King and Farmers are unchanged.',
   'workshop.someSlow':'{count} working Builders have no reachable workshop: construction speed −50%.',
   'workshop.slow':'Construction speed: 50% — no reachable completed Builders’ Workshop. Movement and carrying are unchanged.',

@@ -23,6 +23,7 @@ export class UnitPanel {
     this.transportMode.addEventListener('change',()=>{if(this.unit?.profession==='hauler'){scene.vehicles?.setMode(this.unit,this.transportMode.value);this.refresh();}},options);
     this.stoneToggle.addEventListener('change',()=>{if(this.unit?.profession==='hauler'){(this.unit.stoneCollection??=defaultStoneCollection()).enabled=this.stoneToggle.checked;this.refresh();}},options);
     this.stoneRadius.addEventListener('change',()=>{if(this.unit?.profession==='hauler'){const v=Math.min(IDLE_STONE.maxRadius,Math.max(0,Math.round(Number(this.stoneRadius.value))));(this.unit.stoneCollection??=defaultStoneCollection()).radius=Number.isFinite(v)?v:IDLE_STONE.defaultRadius;this.refresh();}},options);
+    this.restStatus=element('p');this.restStatus.id='unit-rest-state';document.querySelector('#unit-job-controls').append(this.restStatus);
     this.builderRate=element('p');this.builderRate.id='unit-builder-rate';document.querySelector('#unit-job-controls').append(this.builderRate);
     this.commandControls=element('div','unit-command-controls');
     // #120: compact icon commands through the existing UnitCommands; the name shows as a tooltip on hover or focus.
@@ -49,6 +50,7 @@ export class UnitPanel {
     const values={hp:`${format(u.currentHP)} / ${u.maxHP}`,dps:format(u.attackDPS),armor:`${format(u.armor)} %`,totalXP:format(e.totalXP)};
     for(const [key,value]of Object.entries(values))document.querySelector(`[data-unit-stat="${key}"]`).textContent=value;
     const worker=s.workerSystem?.workers.has(u.id)&&u.isSubject!==false;document.querySelector('#unit-job-controls').hidden=!worker;
+    const seat=worker&&s.workerSystem.seating?.claims.get(u.id);this.restStatus.hidden=!seat;if(seat)this.restStatus.textContent=t(seat.seated?'seating.resting':'seating.walking');
     this.builderRate.hidden=!worker||u.profession!=='builder';if(!this.builderRate.hidden)this.builderRate.textContent=t(s.constructionSystem.workshops.factor(u)<1?'workshop.slow':'workshop.normal');
     if(worker){this.commandControls.hidden=!s.workerSystem.commands.owns(u);const state=u.commandState?.state,holding=state==='Holding'||state==='MovingToHold';for(const button of this.commandControls.children){const action=button.dataset.unitCommand,label=t(`command.${action}`);button.setAttribute('aria-label',label);button.dataset.tooltip=label;button.disabled=!!s.gameTime.paused||(action==='hold'?state==='Holding':!holding);if(action==='hold')button.setAttribute('aria-pressed',String(holding));}for(const option of this.jobSelect.options)option.textContent=JOBS[option.value].name;this.jobSelect.value=u.profession;document.querySelector('#unit-profession').textContent=JOBS[u.profession].name;document.querySelector('#unit-work-state').textContent=`${(['Holding','MovingToHold'].includes(u.commandState?.state)?t(`command.${u.commandState.state}`):localized(`work.state.${u.workState}`,u.workState))}${u.workMessage?` · ${workMessageLabel(u.workMessage)}`:''}${s.foodSystem.workMultiplier(u)<1?` · ${t('unit.hungry')}`:''}`;
       const hauler=u.profession==='hauler'&&u.stoneCollection;document.querySelector('#unit-stone-controls').hidden=!hauler;if(hauler){this.transportMode.value=s.vehicles?.mode(u)??'auto';this.stoneToggle.checked=u.stoneCollection.enabled;if(document.activeElement!==this.stoneRadius)this.stoneRadius.value=u.stoneCollection.radius;}
@@ -66,5 +68,5 @@ export class UnitPanel {
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){this.dialog.close();this.restoreInput();if(!this.destroyed)this.scene.unitSelection?.draw();}
-  destroy(){this.destroyed=true;this.close();this.needs?.remove();this.controller.abort();this.commandControls.remove();this.transportRow.remove();this.builderRate.remove();}
+  destroy(){this.destroyed=true;this.close();this.needs?.remove();this.controller.abort();this.commandControls.remove();this.transportRow.remove();this.builderRate.remove();this.restStatus.remove();}
 }

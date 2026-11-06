@@ -1,6 +1,8 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  'seating.resting':'Odpočívá vsedě u pracoviště',
+  'seating.walking':'Jde k sedadlu u pracoviště',
   'workshop.rule':'Builder bez dostupné dokončené dílny staví rychlostí 50 %. Pohyb, nošení, král a Farmáři se nemění.',
   'workshop.someSlow':'{count} pracujících Builderů nemá dostupnou dílnu: rychlost stavby −50 %.',
   'workshop.slow':'Rychlost stavby: 50 % — nemá dostupnou dokončenou stavitelskou dílnu. Pohyb a nošení se nemění.',

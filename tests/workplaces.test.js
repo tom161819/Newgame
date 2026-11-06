@@ -48,7 +48,8 @@ test('two quarry miners reserve different real stones, do not overlap while trav
     assert.ok(Math.floor(a.position.x)!==Math.floor(b.position.x)||Math.floor(a.position.y)!==Math.floor(b.position.y));
     if(s.inventory.count('stone')===2)break;
   }
-  assert.ok(reserved);assert.equal(s.inventory.count('stone'),2);assert.equal(a.experience.totalXP+b.experience.totalXP,6);assert.equal(s.workplaceSystem.summary(q).delivered.stone,2);assert.equal(s.workerSystem.reservations.owners.size,0);
+  // Idle seats may retain leases; every production/resource task lease must be released.
+  assert.ok(reserved);assert.equal(s.inventory.count('stone'),2);assert.equal(a.experience.totalXP+b.experience.totalXP,6);assert.equal(s.workplaceSystem.summary(q).delivered.stone,2);assert.equal([...s.workerSystem.reservations.owners.keys()].filter(k=>!k.startsWith('seat:')&&!k.startsWith('idle-anchor:')).length,0);
   s.simulate(5000);assert.equal(s.inventory.count('stone'),2);
 });
 

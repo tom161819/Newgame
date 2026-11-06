@@ -5,6 +5,10 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+### Added
+
+- Idle employees walk to separate seats on a basic porch outside their own workplace and sit until work arrives. Cargo, new jobs, farming tending, combat and manual commands keep priority; blocked porches fall back safely. The temporary porch and seated pose use existing graphics, respect sight and rebuild safely after Load.
+
 ## [0.9.0] - 2026-11-06
 <!-- version: {"title":"Optional Builders Workshop and construction efficiency","type":"feature","reconstructed":false,"saveVersion":37} -->
 ### Added
