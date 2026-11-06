@@ -1,6 +1,10 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  'farmPlots.count':'Pole {count} / {capacity}',
+  'farmPlots.owner':'Připojeno k {name} č. {id}',
+  'farmPlots.orphan':'Žádná farma nemá pro toto pole místo. Postav další farmu (každá obsluhuje čtyři pole). Nepřipojená pole farmáři neobsluhují.',
+
   'staffing.status':{one:'Výkon {percent} % – chybí {missing} pracovník ({present} přítomných)',few:'Výkon {percent} % – chybí {missing} pracovníci ({present} přítomných)',other:'Výkon {percent} % – chybí {missing} pracovníků ({present} přítomných)'},
   'staffing.editor.title':'Vývojář: nastavení pracoviště',
   'staffing.editor.capacity':'Počet pracovních míst',

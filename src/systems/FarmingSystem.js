@@ -1,3 +1,4 @@
+import { reconcileFarmPlots,farmPlots,FARM_PLOT_CAPACITY } from '../data/farmPlots.js';
 import { dataName } from '../i18n/names.js';
 import { FARMING_RULES } from '../data/farming.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
@@ -9,15 +10,36 @@ export class FarmingSystem {
   constructor(scene,{growthModifier=()=>1,onHarvest=null}={}) {
     Object.assign(this,{scene,growthModifier,onHarvest});
     this.clocks=Object.fromEntries(Object.keys(FARMING_RULES.crops).map(id=>[id,0]));
-    this.records=new Map();this.refreshElapsed=0;this.tending=new Map();
+    this.records=new Map();this.refreshElapsed=0;this.tending=new Map();this.knownFarmIds=new Set();
+    this.worldChanged=()=>this.reconcilePlots();scene.events?.on('buildings:changed',this.worldChanged);this.reconcilePlots();
     this.unsubscribe=scene.gameTime.onAdvance(delta=>this.advanceGrowth(delta));
     if(scene.seasons){this.unsubscribeBefore=scene.seasons.onBeforeChange(()=>this.refreshSeason());this.unsubscribeSeason=scene.seasons.onChange(()=>this.refreshSeason());}
     for(const building of scene.buildings)this.register(building);
   }
   register(building) {
+    if(!this.scene.restoringFarmPlots&&(building.type==='farmhouse'||buildingDefinition(building).crop&&building.farmId===undefined))this.reconcilePlots();
     if(!buildingDefinition(building).crop||!buildingIsComplete(building))return null;
     if(!this.records.has(building.id))this.records.set(building.id,{buildingId:building.id,growthDays:0,lastClock:this.clocks[building.type],stage:0,cycle:0,reservedBy:null});
     return this.records.get(building.id);
+  }
+  plots(farm){return farmPlots(farm,this.scene.buildings,buildingDefinition);}
+  plotSummary(farm){return {count:this.plots(farm).length,capacity:FARM_PLOT_CAPACITY};}
+  reconcilePlots(){
+    if(this.scene.restoringFarmPlots)return;
+    const farms=new Set(this.scene.buildings.filter(b=>b.type==='farmhouse').map(b=>b.id));
+    for(const id of this.knownFarmIds)if(!farms.has(id)){
+      const workplaces=this.scene.workplaceSystem,record=workplaces?.records.get(id);
+      for(const workerId of [...(record?.workerIds??[])]){const worker=this.scene.workerSystem.workers.get(workerId);if(worker){this.scene.employment?.hold(worker);workplaces.remove(worker);}}
+      workplaces?.records.delete(id);workplaces?.changed(id);
+    }
+    this.knownFarmIds=farms;
+    reconcileFarmPlots(this.scene.buildings,buildingDefinition);
+    for(const worker of this.scene.workerSystem?.liveWorkers()??[]){
+      const task=worker.workTask;if(task?.kind==='harvest'&&!this.inRange(worker,this.building(task.targetId)))this.scene.workerSystem.ai.cancel(worker);
+      const tending=this.tending.get(worker.id);if(tending&&!this.inRange(worker,this.building(tending.targetId)))this.stopTending(worker,{stop:true});
+    }
+    for(const id of this.records.keys())if(!this.building(id))this.records.delete(id);
+    this.scene.farmConnections?.refresh();
   }
   building(id){return this.scene.buildings.find(b=>b.id===id&&buildingIsComplete(b)&&buildingDefinition(b).crop)??null;}
   sync(building) {
@@ -43,7 +65,7 @@ export class FarmingSystem {
   }
   ripe(building){const record=this.sync(building);return record&&record.growthDays>=buildingDefinition(building).crop.growthDays&&(this.scene.seasons?.canHarvest(building.type)??true);}
   inRange(worker,building) {
-    const home=this.scene.workplaceSystem?.building(worker);if(home?.type!=='farmhouse')return false;
+    const home=this.scene.workplaceSystem?.building(worker);if(home?.type!=='farmhouse'||!building||building.farmId!==home.id)return false;
     const origin={x:home.x+buildingDefinition(home).width/2,y:home.y+buildingDefinition(home).height/2};
     return Math.max(Math.abs(building.x+buildingDefinition(building).width/2-origin.x),Math.abs(building.y+buildingDefinition(building).height/2-origin.y))<=buildingDefinition(home).workRadius;
   }
@@ -129,7 +151,7 @@ export class FarmingSystem {
   harvest(worker,building,record) {
     const task=worker.workTask;
     if(this.scene.gameOver||this.scene.gameTime.paused||this.building(building?.id)!==building||worker.profession!=='farmer'||!worker.isAlive||task?.kind!=='harvest'||task.cycle!==record.cycle||record.reservedBy!==worker.id
-      ||!this.scene.workerSystem.ai.atGoal(worker,task.goal)||task.progressMs<buildingDefinition(building).crop.workDuration||!this.ripe(building))return false;
+      ||!this.inRange(worker,building)||!this.scene.workerSystem.ai.atGoal(worker,task.goal)||task.progressMs<buildingDefinition(building).crop.workDuration||!this.ripe(building))return false;
     const spec=buildingDefinition(building).crop,cycle=record.cycle;
     record.cycle++;record.growthDays=0;record.stage=0;record.lastClock=this.clocks[building.type];record.reservedBy=null;
     this.scene.workerSystem.ai.cancel(worker);worker.workState='Searching for Work';
@@ -141,10 +163,11 @@ export class FarmingSystem {
   }
   exportState(){for(const record of this.records.values()){const building=this.building(record.buildingId);if(building)this.sync(building);}return {clocks:{...this.clocks},refreshElapsed:this.refreshElapsed,records:structuredClone([...this.records.values()])};}
   importState(data){
+    this.knownFarmIds=new Set(this.scene.buildings.filter(b=>b.type==='farmhouse').map(b=>b.id));
     for(const worker of this.scene.workerSystem.liveWorkers())this.stopTending(worker);
     if(data){this.clocks={...data.clocks};this.refreshElapsed=data.refreshElapsed;this.records=new Map(data.records.map(r=>[r.buildingId,structuredClone(r)]));}
     else for(const building of this.scene.buildings)this.register(building);
     for(const record of this.records.values()){const building=this.building(record.buildingId);if(building)this.paint(building,record);}
   }
-  destroy(){this.unsubscribe();this.unsubscribeBefore?.();this.unsubscribeSeason?.();this.records.clear();for(const worker of this.scene.workerSystem.liveWorkers())this.stopTending(worker);this.tending.clear();}
+  destroy(){this.scene.events?.off('buildings:changed',this.worldChanged);this.unsubscribe();this.unsubscribeBefore?.();this.unsubscribeSeason?.();this.records.clear();for(const worker of this.scene.workerSystem.liveWorkers())this.stopTending(worker);this.tending.clear();}
 }

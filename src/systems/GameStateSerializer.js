@@ -5,9 +5,10 @@ import { wearLevel } from '../data/pathWear.js';
 import { getXPRequired,totalXPForLevel,createProgress } from '../data/experience.js';
 import { JOBS,SKILL_IDS,WORK_RULES } from '../data/jobs.js';
 import { CONSTRUCTION_RULES } from '../data/construction.js';
-import { buildingIsComplete,towerNeighbors } from '../game/buildings.js';
+import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { pavementHost } from '../game/pavement.js';
 import { gameSettings,WILDLIFE_INTERVALS } from './GameSettings.js';
+import { farmInRange,FARM_PLOT_CAPACITY } from '../data/farmPlots.js';
 import { FARMING_RULES } from '../data/farming.js';
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
 import { TALENTS } from '../data/economy.js';
@@ -25,7 +26,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=30;
+export const SAVE_VERSION=31;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -78,7 +79,7 @@ export function serializeGameState(scene){
       render:{x:scene.player.x,y:scene.player.y,depth:scene.player.depth},
       transition:c.transitioning?{remaining:Math.max(1,(c.transitionTween?.duration??900)-(c.transitionTween?.elapsed??0))}:null},
     inventory:scene.inventory.exportState(),equipment:scene.equipment.exportState(),
-    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.unverified?{unverified:true}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
+    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(buildingDefinition(b).crop?{farmId:b.farmId??null}:{}),...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.unverified?{unverified:true}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
     resources:[...scene.resources.values()].map(v=>({type:v.getData('objectId'),tile:point(v.getData('tile')),...(v.getData('object').natural?{natural:copy(v.getData('object').natural)}:{})})),
     drops:[...scene.dropSystem.drops.values()].map(d=>({id:d.id,resource:d.resource,tile:point(d.tile),amount:d.amount,rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0),haulEligible:d.haulEligible!==false,...(d.siteId!=null?{siteId:d.siteId}:{})})),
     animals:[...scene.animalSystem.animals.values()].map(a=>({...serializeActor(a),retaliationId:a.retaliationTarget?.id??null})),
@@ -160,6 +161,12 @@ export function validateGameState(input,registry=objectRegistry){
       array(c.assignedBuilders,CONSTRUCTION_RULES.maximumBuilders);check(new Set(c.assignedBuilders).size===c.assignedBuilders.length);if(c.state==='complete')check(!c.assignedBuilders.length);
       for(const id of c.assignedBuilders){check((id==='king'||wIds.has(id))&&!siteAssignments.has(id));siteAssignments.add(id);}
     }
+  }
+  const plotCounts=new Map();
+  for(const b of s.buildings){
+    const d=definition(b.type);if(!d.crop){check(b.farmId===undefined);continue;}
+    check(b.farmId===null||Number.isSafeInteger(b.farmId)&&b.farmId>0);
+    if(b.farmId!==null){const farm=s.buildings.find(f=>f.id===b.farmId);check(farmInRange(farm,b,x=>definition(x.type)));const count=(plotCounts.get(farm.id)??0)+1;check(count<=FARM_PLOT_CAPACITY);plotCounts.set(farm.id,count);}
   }
   for(const key of provisional)check(!occupied.has(key));
   repairTransportInstructions(s,registry,check);
@@ -261,7 +268,7 @@ export function validateGameState(input,registry=objectRegistry){
         }
         if(t.kind==='harvest'){
           const plot=s.buildings.find(b=>b.id===t.targetId),record=s.farming?.records?.find(r=>r.buildingId===t.targetId),home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);
-          check(w.profession==='farmer'&&plot&&home?.type==='farmhouse'&&buildingIsComplete(plot)&&buildingIsComplete(home)&&definition(plot.type).crop&&record?.reservedBy===w.id);
+          check(w.profession==='farmer'&&plot&&home?.type==='farmhouse'&&buildingIsComplete(plot)&&buildingIsComplete(home)&&definition(plot.type).crop&&plot.farmId===home.id&&record?.reservedBy===w.id);
           check(t.goal.x>=plot.x&&t.goal.x<plot.x+definition(plot.type).width&&t.goal.y>=plot.y&&t.goal.y<plot.y+definition(plot.type).height);
           integer(t.cycle);check(t.cycle===record.cycle&&record.growthDays===definition(plot.type).crop.growthDays);number(t.startedAt,0,s.time?.totalElapsed??0);
         }

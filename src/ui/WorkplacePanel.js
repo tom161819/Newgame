@@ -10,6 +10,7 @@ import { renderMilitary,militarySignature,handleMilitaryClick } from './military
 export class WorkplacePanel {
   constructor(scene){
     this.scene=scene;this.dialog=document.querySelector('#workplace-dialog');this.controller=new AbortController();const options={signal:this.controller.signal};this.restored=true;
+    this.farmCount=element('p');this.farmCount.id='farm-plot-count';this.farmCount.hidden=true;this.dialog.insertBefore(this.farmCount,document.querySelector('#food-production-details'));
     this.staffingStatus=element('p');this.staffingStatus.id='workplace-staffing-output';this.dialog.insertBefore(this.staffingStatus,document.querySelector('#food-production-details'));
     this.exclusions=element('section');this.exclusions.id='employment-exclusions';this.exclusionInputs={};this.exclusionLabels={};
     for(const kind of ['local','type']){const label=element('label'),input=element('input'),text=element('span');input.type='checkbox';input.dataset.employmentExclusion=kind;this.exclusionInputs[kind]=input;this.exclusionLabels[kind]=text;label.append(input,text);this.exclusions.append(label);
@@ -32,13 +33,16 @@ export class WorkplacePanel {
       if(assign){this.pendingMove=null;const worker=scene.workerSystem.workers.get(assign);if(scene.workplaceSystem.assign(this.building,worker))scene.employment?.release(worker);}
       if(remove){const worker=scene.workerSystem.workers.get(remove);scene.employment?.hold(worker);scene.workplaceSystem.remove(worker);}this.refresh();
     },options);
-    this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.close();},options);this.dialog.addEventListener('close',()=>this.restoreInput(),options);
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&this.dialog.open&&this.dialog.classList.contains('farm-workplace-dialog')&&!document.querySelector('dialog:modal')){e.preventDefault();e.stopPropagation();this.close();}},options);
+    window.addEventListener('resize',()=>{if(this.dialog.open&&this.building?.type==='farmhouse')requestAnimationFrame(()=>{if(this.dialog.open&&this.building?.type==='farmhouse')this.scene.farmConnections?.focus(this.building,this.dialog);});},options);
+    this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.close();},options);this.dialog.addEventListener('close',()=>{if(!this.dialog.open)this.restoreInput();},options);
   }
-  open(building){this.building=building;this.signature=null;this.pendingMove=null;this.restored=false;this.scene.setGalleryInput(false);document.querySelector('#workplace-candidates').hidden=true;this.dialog.showModal();this.refresh();}
+  open(building){if(this.dialog.open)this.close();this.building=building;this.signature=null;this.pendingMove=null;this.restored=false;this.scene.setGalleryInput(false);document.querySelector('#workplace-candidates').hidden=true;this.dialog.classList.toggle('farm-workplace-dialog',building.type==='farmhouse');if(building.type==='farmhouse')this.dialog.show();else this.dialog.showModal();this.refresh();this.scene.farmConnections?.refresh();if(building.type==='farmhouse')this.scene.farmConnections?.focus(building,this.dialog);}
   refresh(){
     if(!this.dialog.open||!this.building)return;
     const s=this.scene,b=this.building;if(!s.buildings.includes(b)||!s.fog.isVisibleObject(b)){this.close();return;}
     const spec=buildingDefinition(b),summary=s.workplaceSystem.summary(b),employees=s.workplaceSystem.employees(b),candidates=s.workerSystem.liveSubjects();
+    const plots=b.type==='farmhouse'?s.farmingSystem?.plotSummary(b):null;this.farmCount.hidden=!plots;if(plots)this.farmCount.textContent=t('farmPlots.count',plots);
     const employment=s.employment,blocked=employment?.blockReason(b)??null;
     this.exclusions.hidden=!employment;this.exclusionInputs.local.checked=employment?.blockedBuildings.has(b.id)??false;this.exclusionInputs.type.checked=employment?.blockedTypes.has(b.type)??false;
     for(const kind of ['local','type'])this.exclusionLabels[kind].textContent=t(`employment.exclude.${kind}`,{name:spec.name});this.exclusionReason.textContent=t(`employment.exclude.${blocked??'allowed'}`+'Status');this.exclusionHelp.textContent=t('employment.exclude.help');
@@ -86,6 +90,6 @@ export class WorkplacePanel {
     }));
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
-  close(){this.dialog.close();this.restoreInput();}
-  destroy(){this.close();this.controller.abort();this.staffingStatus.remove();this.exclusions.remove();this.forestryDetails.remove();this.miningDetails.remove();this.militaryDetails.remove();}
+  close(){this.dialog.close();this.restoreInput();this.scene.farmConnections?.refresh();}
+  destroy(){this.close();this.controller.abort();this.farmCount.remove();this.staffingStatus.remove();this.exclusions.remove();this.forestryDetails.remove();this.miningDetails.remove();this.militaryDetails.remove();}
 }

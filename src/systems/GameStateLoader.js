@@ -29,11 +29,12 @@ export function loadGameState(scene,input){
   scene.wildlifeRespawn?.importState(state.wildlifeRespawn);
   for(const spawner of scene.resourceSpawners)spawner.spawnSettings=resourceSpawnSettings(spawner.definition,scene.gameSettings);
   scene.inventory.importState(state.inventory);
-  for(const data of state.buildings){
+  scene.restoringFarmPlots=true;
+  try{for(const data of state.buildings){
     const definition=scene.objectRegistry.require(data.type),building={...data,definition,tiles:buildingTiles(data,definition)};
     if(!building.unverified)for(const t of building.tiles)scene.map[t.y][t.x]=definition.walkable&&(!building.construction||building.construction.state==='complete')?0:1;
     scene.buildings.push(building);scene.towerViews.set(building.id,scene.createBuildingView(definition,building));
-  }
+  }}finally{scene.restoringFarmPlots=false;}
   scene.refreshWallConnections();
   for(const r of state.resources)scene.addResource(scene.objectRegistry.require(r.type),r.tile,r.natural??null);
   for(const a of state.animals){
