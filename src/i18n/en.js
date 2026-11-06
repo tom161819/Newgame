@@ -2,6 +2,13 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  'workshop.rule':'Builders without a reachable completed workshop build at 50% speed. Movement, carrying, King and Farmers are unchanged.',
+  'workshop.someSlow':'{count} working Builders have no reachable workshop: construction speed −50%.',
+  'workshop.slow':'Construction speed: 50% — no reachable completed Builders’ Workshop. Movement and carrying are unchanged.',
+  'workshop.normal':'Construction speed: 100% — a completed Builders’ Workshop is reachable.',
+  'workshop.noBase':'No reachable workshop (construction speed 50%)',
+  'workshop.users':'Builders using this shared base: {count}. No employee or Hauler slots are consumed.',
+
   'rock.danger':'Waiting until the mining site is safe',
   'rock.mark':'Mark rocks',
   'rock.unmark':'Unmark rocks',

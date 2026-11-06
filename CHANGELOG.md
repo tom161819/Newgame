@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-06
+<!-- version: {"title":"Optional Builders Workshop and construction efficiency","type":"feature","reconstructed":false,"saveVersion":37} -->
+### Added
+
+- Builders can share an optional Builders’ Workshop as a reachable base and wait nearby between jobs. Without a completed reachable workshop, actual construction runs at 50% speed; movement, carrying, Farmers, the King and demolition are unchanged. The workshop uses a clearly described procedural placeholder while its final art awaits approval.
+
 ## [0.8.0] - 2026-11-06
 <!-- version: {"title":"Manual rock mining with physical stone delivery","type":"feature","reconstructed":false,"saveVersion":36} -->
 ### Added

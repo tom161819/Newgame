@@ -1,3 +1,4 @@
+import { builderWorkshopDefinitions } from './builderWorkshop.js';
 import { terrain } from './terrain.js';
 import { resources } from './resources.js';
 import { buildings } from './buildings.js';
@@ -19,4 +20,4 @@ import { vehicleDefinitions } from './vehicles.js';
 import { smeltingDefinitions } from './smelting.js';
 import { withApprovedArt } from './approvedArt.js';
 
-export const objectDefinitions = [...terrain, ...resources,...naturalDefinitions, ...farmingResources,...processedFoodResources,...materialDefinitions,...mineralDefinitions, ...buildings, ...farmingBuildings,...foodBuildings,...logisticsBuildings,...housingBuildings,...pavementDefinitions,...vehicleDefinitions,...forestryBuildings,...mineralBuildings,...lightingBuildings,...smeltingDefinitions,...militaryDefinitions, ...characters, ...decorations, ...animals, ...equipment, ...treasures].map(withApprovedArt);
+export const objectDefinitions = [...terrain, ...resources,...naturalDefinitions, ...farmingResources,...processedFoodResources,...materialDefinitions,...mineralDefinitions, ...buildings, ...farmingBuildings,...foodBuildings,...logisticsBuildings,...housingBuildings,...pavementDefinitions,...vehicleDefinitions,...forestryBuildings,...mineralBuildings,...lightingBuildings,...smeltingDefinitions,...militaryDefinitions,...builderWorkshopDefinitions, ...characters, ...decorations, ...animals, ...equipment, ...treasures].map(withApprovedArt);
