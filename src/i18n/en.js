@@ -195,4 +195,13 @@ export default {
   'autosave.off':'Autosave is off.','autosave.none':'No autosave yet in this session.','autosave.last':'Last autosave: {time} · Day {day}',
   'autosave.failed':'Autosave failed: {message}.','autosave.kept':'The previous autosave ({time}) is kept.','autosave.failedNotice':'Autosave failed. Your previous saves are kept.','autosave.recovered':'Autosave works again.',
   'app.startFirst':'Start a game first.',
+  'stockpile.remove':'Dismantle Empty Stockpile',
+  'stockpile.confirmText':'Remove this empty temporary stockpile? Existing transport must finish first. No materials are returned.',
+  'stockpile.confirm':'Confirm Dismantle',
+  'stockpile.warehouse':'Build a Warehouse before removing the temporary stockpile.',
+  'stockpile.stock':'Haulers move available goods to compatible stores. Empty this stockpile first; keep food until a Granary has room.',
+  'stockpile.busy':'Waiting for all reservations and transport to finish.',
+  'stockpile.unavailable':'This stockpile is not available for dismantling.',
+  'stockpile.empty':'The stockpile is empty and has no active reservations or transport.',
+  'stockpile.removed':'Temporary stockpile removed. The worn ground will recover naturally.',
 };

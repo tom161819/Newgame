@@ -24,6 +24,13 @@ export class PathWearSystem {
     const i=this.index(tile);this.scores[i]=Math.min(Number.MAX_SAFE_INTEGER,this.scores[i]+(actor.mountedHorse?2:1));
     this.lastPassDays[i]=this.time.day;this.active.add(i);this.revision++;this.refreshLevel(i);
   }
+  // A removed temporary structure leaves ordinary wear, with the same recovery clock as footsteps.
+  markMaximum(tiles){
+    for(const tile of tiles){if(!this.isGrass(tile))continue;const i=this.index(tile);
+      this.scores[i]=Math.max(this.scores[i],PATH_WEAR.thresholds.at(-1));this.lastPassDays[i]=this.time.day;
+      this.active.add(i);this.revision++;this.refreshLevel(i);
+    }
+  }
   subscribe(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   refreshLevel(i){
     const level=wearLevel(this.scores[i]);if(this.levels[i]===level)return;

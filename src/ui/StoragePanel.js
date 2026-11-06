@@ -9,10 +9,17 @@ export class StoragePanel {
     document.querySelector('#close-storage').addEventListener('click',()=>this.close(),options);
     document.querySelector('#storage-king-deposit').addEventListener('click',()=>scene.kingLogistics?.startDelivery(this.building?.id??null),options);
     document.querySelector('#storage-king-drop').addEventListener('click',()=>scene.kingLogistics?.dropCargo(),options);
+    document.querySelector('#stockpile-dismantle-start').addEventListener('click',()=>{this.confirmingStockpile=true;this.signature=null;this.refresh();},options);
+    document.querySelector('#stockpile-dismantle-cancel').addEventListener('click',()=>{this.confirmingStockpile=false;this.signature=null;this.refresh();},options);
+    document.querySelector('#stockpile-dismantle-confirm').addEventListener('click',()=>{
+      if(!this.confirmingStockpile)return;
+      const result=scene.foodStorage.dismantleStarter(this.building);this.confirmingStockpile=false;
+      if(result.removed){this.close();scene.setStatus(t('stockpile.removed'));}else{this.signature=null;this.refresh();}
+    },options);
     this.dialog.addEventListener('cancel',event=>{event.preventDefault();this.close();},options);
     this.dialog.addEventListener('close',()=>{if(!document.querySelector('dialog[open]'))scene.setGalleryInput(true);},options);
   }
-  open(building=null,locationId=null){this.building=building;this.locationId=locationId;this.signature=null;this.breakdownOpen=false;this.scene.setGalleryInput(false);this.dialog.showModal();this.refresh();}
+  open(building=null,locationId=null){this.building=building;this.locationId=locationId;this.signature=null;this.breakdownOpen=false;this.confirmingStockpile=false;this.scene.setGalleryInput(false);this.dialog.showModal();this.refresh();}
   breakdown(rows){
     const details=element('details','resource-breakdown'),summary=element('summary','',t('storage.breakdown'));details.open=this.breakdownOpen;details.append(summary);details.addEventListener('toggle',()=>{this.breakdownOpen=details.open;});
     details.append(element('p','',t('storage.breakdownNote')));
@@ -24,7 +31,13 @@ export class StoragePanel {
   refresh(){
     if(!this.dialog.open)return;
     const scene=this.scene,storage=scene.foodStorage,actors=[scene.character,...scene.workerSystem.liveWorkers()],breakdown=!this.building&&!this.locationId?storage.resourceBreakdown():null;
-    const signature=JSON.stringify([storage.revision,breakdown,actors.map(w=>[w.id,w.assignedWorkplaceId,w.workState,w.workMessage,w.cargo,w.workTask?.kind,w.skills?.logistics.level]),scene.kingLogistics.task,scene.character.state]);if(this.signature===signature)return;this.signature=signature;
+    const starter=this.building?.type==='starter_stockpile',removalReason=starter?storage.starterRemovalStatus(this.building):'unavailable';
+    const signature=JSON.stringify([storage.revision,breakdown,removalReason,this.confirmingStockpile,actors.map(w=>[w.id,w.assignedWorkplaceId,w.workState,w.workMessage,w.cargo,w.workTask?.kind,w.skills?.logistics.level]),scene.kingLogistics.task,scene.character.state]);if(this.signature===signature)return;this.signature=signature;
+    document.querySelector('#stockpile-dismantle').hidden=!starter;
+    document.querySelector('#stockpile-dismantle-reason').textContent=starter?t(removalReason?`stockpile.${removalReason}`:'stockpile.empty'):'';
+    if(removalReason)this.confirmingStockpile=false;
+    const remove=document.querySelector('#stockpile-dismantle-start');remove.disabled=!!removalReason;remove.hidden=!!this.confirmingStockpile;
+    document.querySelector('#stockpile-dismantle-confirmation').hidden=!this.confirmingStockpile;
     document.querySelector('#storage-title').textContent=this.building?.definition.name??(this.locationId?storageName(scene,this.locationId):t('hud.storage'));
     document.querySelector('#storage-king-deposit').hidden=!scene.kingLogistics||!scene.character.cargo;
     const dropButton=document.querySelector('#storage-king-drop');dropButton.hidden=!scene.character.cargo;dropButton.disabled=scene.character.state!=='ground'||!!scene.character.nextTile;
@@ -45,6 +58,6 @@ export class StoragePanel {
     });
     document.querySelector('#storage-details').replaceChildren(...(breakdown?[this.breakdown(breakdown),...sections]:sections));
   }
-  close(){this.dialog.close();this.scene.setGalleryInput(true);}
+  close(){this.confirmingStockpile=false;this.dialog.close();this.scene.setGalleryInput(true);}
   destroy(){this.close();this.controller.abort();}
 }
