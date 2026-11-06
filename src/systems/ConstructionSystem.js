@@ -1,3 +1,4 @@
+import { BuilderWorkshopBases } from './BuilderWorkshopBases.js';
 import { t } from '../i18n/index.js';
 import { dataName } from '../i18n/names.js';
 import { buildingDefinition,buildingIsComplete,towerNeighbors,placementError } from '../game/buildings.js';
@@ -12,7 +13,7 @@ import { ConstructionMaterialsSystem } from './ConstructionMaterialsSystem.js';
 export class ConstructionSystem {
   constructor(scene,{onProgress=()=>{},onComplete=()=>{},onCancel=()=>{}}={}){
     Object.assign(this,{scene,onProgress,onComplete,onCancel});this.sites=new Map();this.assignments=new Map();this.nextId=Math.max(0,...scene.buildings.map(b=>b.id))+1;this.revision=0;
-    this.builderAI=new BuilderAI(this);scene.workerSystem.jobs.setConstructionProvider(this.builderAI);
+    this.workshops=new BuilderWorkshopBases(this);this.builderAI=new BuilderAI(this);scene.workerSystem.jobs.setConstructionProvider(this.builderAI);
     this.kingWorking=false;
     this.materials=new ConstructionMaterialsSystem(this);
   }
@@ -33,7 +34,7 @@ export class ConstructionSystem {
     return buildingDefinition(site).crop?actor.id!=='king'&&actor.profession==='farmer'&&!!this.scene.farmingSystem?.inRange(actor,site):actor.id==='king'||actor.profession==='builder';
   }
   workSkill(site){return !site.demolition&&buildingDefinition(site).crop?'farming':'construction';}
-  workSpeed(site,actor){return this.scene.skillSystem.workEfficiency(actor,this.workSkill(site))*(!site.demolition&&buildingDefinition(site).crop?(this.scene.workplaceSystem?.workFactor?.(actor)??1):1);}
+  workSpeed(site,actor){const workshopFactor=!site.demolition&&actor.profession==='builder'&&!buildingDefinition(site).crop?this.workshops.factor(actor):1;return workshopFactor*this.scene.skillSystem.workEfficiency(actor,this.workSkill(site))*(!site.demolition&&buildingDefinition(site).crop?(this.scene.workplaceSystem?.workFactor?.(actor)??1):1);}
   reserve(site,actor,goal){
     if(!this.getSite(site.id)||!this.canWork(site,actor)||!this.ready(site)||!actor.isAlive||this.assignments.has(actor.id)||site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders)return false;
     if(!this.scene.workerSystem.reservations.reserve(this.slotKey(goal),actor.id))return false;
@@ -138,9 +139,10 @@ export class ConstructionSystem {
   estimatedSeconds(site){const rate=this.activeBuilders(site).reduce((sum,p)=>sum+this.workSpeed(site,p.actor),0);return rate?(site.construction.requiredWork-site.construction.workDone)/rate/1000:null;}
   exportState(){const king=this.assignments.get('king');return {nextId:Math.max(this.nextId,Math.max(0,...this.scene.buildings.map(b=>b.id))+1),kingSiteId:king?.siteId??null,kingGoal:king?.goal?{...king.goal}:null};}
   importState(data){
+    this.workshops.cache.clear();
     this.sites=new Map(this.scene.buildings.filter(b=>!buildingIsComplete(b)).map(b=>[b.id,b]));this.assignments.clear();this.nextId=data?.nextId??Math.max(0,...this.scene.buildings.map(b=>b.id))+1;
     for(const worker of this.scene.workerSystem.workers.values())if(['build','dismantle'].includes(worker.workTask?.kind))this.assignments.set(worker.id,{siteId:worker.workTask.targetId,goal:{...worker.workTask.goal}});
     if(data?.kingSiteId){const goal={...data.kingGoal};this.assignments.set('king',{siteId:data.kingSiteId,goal});this.scene.workerSystem.reservations.reserve(this.slotKey(goal),'king');}this.revision++;
   }
-  destroy(){this.scene.workerSystem.jobs.setConstructionProvider(null);this.assignments.clear();this.sites.clear();}
+  destroy(){this.workshops.cache.clear();this.scene.workerSystem.jobs.setConstructionProvider(null);this.assignments.clear();this.sites.clear();}
 }

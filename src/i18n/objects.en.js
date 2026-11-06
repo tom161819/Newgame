@@ -1,5 +1,7 @@
 // English names and descriptions of game objects, professions and skills.
 export default {
+  'object.builder_workshop.name':'Builders’ Workshop',
+  'object.builder_workshop.description':'Optional shared base for Builders. A reachable completed workshop restores normal construction speed; without one Builders work at 50%. Movement, carrying, Farmers, the King and demolition are unchanged. Temporary placeholder appearance.',
   'object.grass.name':'Grass','object.grass.description':'Dry grass on a walkable isometric tile.',
   'object.dirt.name':'Dirt','object.dirt.description':'Packed earth and sandy shades of the land.',
   'object.grass_normal.name':'Grass — Normal','object.grass_normal.description':'Original tall grass.',

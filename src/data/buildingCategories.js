@@ -7,4 +7,9 @@ export const BUILDING_CATEGORIES=Object.freeze({
   logistics:{name:'Logistics & Trade',icon:'▣'},infrastructure:{name:'Infrastructure',icon:'▦'},
 });
 export const buildingCategoryLabel=definition=>BUILDING_CATEGORIES[definition.buildingCategory]?localized(`buildingCategory.${definition.buildingCategory}`,BUILDING_CATEGORIES[definition.buildingCategory].name):t('buildingCategory.all');
-export const buildingsInCategory=(registry,category)=>registry.buildables().filter(d=>category==='all'||d.buildingCategory===category);
+// Food starts with its prerequisite chain; all other entries keep registry order.
+const foodPriority=id=>id==='granary'?0:id==='farmhouse'?1:2;
+export function buildingsInCategory(registry,category){
+  const buildings=registry.buildables().filter(d=>category==='all'||d.buildingCategory===category);
+  return category==='food'?buildings.sort((a,b)=>foodPriority(a.id)-foodPriority(b.id)):buildings;
+}

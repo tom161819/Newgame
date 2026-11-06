@@ -10,8 +10,11 @@ const scene=()=>workerScene(undefined,{workplaces:true});
 const worker=(s,x=50,y=50)=>s.workerSystem.create({x,y});
 const stone=(s,x,y)=>s.addResource(s.objectRegistry.require('stone'),{x,y});
 function build(s,type,x=55,y=50){
-  s.inventory.add('stone',s.objectRegistry.require(type).cost.stone);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:s.objectRegistry.require(type)});
-  assert.ok(result.building,result.error);const b=result.building;s.towerViews.set(b.id,s.createBuildingView(b.definition,b));return b;
+  // Existing Lodges remain valid without a Granary. These worker-only fixtures model that world;
+  // real new-placement prerequisites are exercised with physical construction in building-unlocks.test.js.
+  const registered=s.objectRegistry.require(type),definition=type==='hunting_lodge'?{...registered,requiresCompletedBuildings:[]}:registered;
+  s.inventory.add('stone',registered.cost.stone);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition});
+  assert.ok(result.building,result.error);const b=result.building;b.definition=registered;s.towerViews.set(b.id,s.createBuildingView(b.definition,b));return b;
 }
 function until(s,condition,max=30000){let elapsed=0;while(!condition()&&elapsed<max){s.tick(50);elapsed+=50;}assert.ok(condition(),`Condition not reached after ${elapsed}ms`);return elapsed;}
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} !== ${b}`);
@@ -48,7 +51,8 @@ test('two quarry miners reserve different real stones, do not overlap while trav
     assert.ok(Math.floor(a.position.x)!==Math.floor(b.position.x)||Math.floor(a.position.y)!==Math.floor(b.position.y));
     if(s.inventory.count('stone')===2)break;
   }
-  assert.ok(reserved);assert.equal(s.inventory.count('stone'),2);assert.equal(a.experience.totalXP+b.experience.totalXP,6);assert.equal(s.workplaceSystem.summary(q).delivered.stone,2);assert.equal(s.workerSystem.reservations.owners.size,0);
+  // Idle seats may retain leases; every production/resource task lease must be released.
+  assert.ok(reserved);assert.equal(s.inventory.count('stone'),2);assert.equal(a.experience.totalXP+b.experience.totalXP,6);assert.equal(s.workplaceSystem.summary(q).delivered.stone,2);assert.equal([...s.workerSystem.reservations.owners.keys()].filter(k=>!k.startsWith('seat:')&&!k.startsWith('idle-anchor:')).length,0);
   s.simulate(5000);assert.equal(s.inventory.count('stone'),2);
 });
 

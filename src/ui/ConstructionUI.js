@@ -19,6 +19,7 @@ export class ConstructionUI {
     document.querySelector('#construction-name').textContent=buildingDefinition(site).name;
     document.querySelector('#construction-percentage').textContent=`${c.progress.toFixed(1)} % · ${t(`construction.phase.${constructionPhase(site)}`)}`;document.querySelector('#construction-progress').value=c.progress;
     document.querySelector('#construction-builders').textContent=t(crop?'construction.farmers':'construction.builders',{working:active.length,slots:CONSTRUCTION_RULES.maximumBuilders,reserved:c.assignedBuilders.length});
+    const slow=crop?0:active.filter(p=>p.actor.profession==='builder'&&system.workshops.factor(p.actor)<1).length;document.querySelector('#construction-workshop').textContent=crop?'':t(slow?'workshop.someSlow':'workshop.rule',{count:slow});
     document.querySelector('#construction-eta').textContent=!system.materials.ready(site)?t('construction.waitMaterials'):estimate==null?t(crop?'construction.waitFarmers':'construction.waitBuilders'):t('construction.remaining',{seconds:Math.ceil(estimate)});
     document.querySelector('#construction-king-task').textContent=crop?t('construction.farmerOnly'):t(s.kingLogistics.workflowSiteId===site.id?'construction.kingDelivering':kingHere?(system.atSite(s.character,king)?'construction.kingBuilding':'construction.kingTravelling'):'construction.kingNone');
     const ready=system.materials.ready(site),summary=system.materials.summary(site);

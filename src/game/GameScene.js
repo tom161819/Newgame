@@ -669,7 +669,7 @@ export class GameScene extends Phaser.Scene {
     this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
     this.combatFeedback?.refresh();
     this.experienceFeedback?.refreshVisibility();this.unitPanel?.refresh();
-    this.rockMiningTool?.refresh();this.populationSidebar?.update();this.unitSelection?.draw();this.minimap?.update();this.eventFeed?.update();this.kingdomHappiness?.update();
+    this.workerSystem?.seating?.render();this.rockMiningTool?.refresh();this.populationSidebar?.update();this.unitSelection?.draw();this.minimap?.update();this.eventFeed?.update();this.kingdomHappiness?.update();
     this.economyPanel?.update();
     this.workplacePanel?.refresh();this.farmConnections?.refresh();
     this.staffingIndicators?.update();
