@@ -2,6 +2,10 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  // Seasonal field tending (#122).
+  'work.message.Tending crops':'Tending crops',
+  'work.message.Walking to tend crops':'Walking to tend crops',
+  'work.message.Waiting at farmhouse':'Waiting at farmhouse',
   // Employment exclusions (#131).
   'employment.exclude.local':'Disable employment here',
   'employment.exclude.type':'Disable employment for this building type ({name})',

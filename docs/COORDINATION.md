@@ -6,16 +6,15 @@ Files held lists the files a task changes. Another task avoids them unless neces
 
 ## Agreed merge order
 
-Codex PR138 (#131) first; PR142 (#122) then integrates that actual merge/schema26 and repeats relevant checks. Verify predecessor Pages success before merging the next PR.
+PR138 and repair PR151 are merged and verified by Pages42109315944. PR142 (#122) integrates current main/schema29 and must pass fresh checks/CI and actual Pages.
 
 ## Active
 
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| NEW04 (#122) Seasonal field tending | Codex | `codex/farmer-field-tending` | [#142](https://github.com/tom161819/Newgame/pull/142) | Restored after restart and approval limit; main9478976/schema29 integrated, 646 tests + changelog/build and combined farmer/employment/staffing/seasons browser PASS; exact-head CI pending | FarmingSystem.js, data/farming.js, own EN/CS block, isolated farming tests/browser smoke, docs/changelog. No WorkerAI, serializer, cargo/storage or S12 edits; derived low-priority behavior only. |
 | NEW21 (#149) Studio ruins designs | Claude | `claude/studio-ruins` | [#161](https://github.com/tom161819/Newgame/pull/161) | PR open; review only | studio/src/generators/ruins.js (new), art/assets/decorations/ruin*, art/sprites/ruin*, art/approvals.json, art/style-guide.json (soot, charcoal) |
-| Pages season-pixel regression after FoW optimization | Codex | `codex/pages-season-pixels` | — | Reproduced exact pixel failure; 618 tests, changelog/build, strict seasons/FoW/transition browser PASS; PR/CI pending | SeasonTransition + TerrainRenderer explicit complete-redraw contract, focused renderer/transition tests, seasons-menu smoke selection and docs. Coordinates with Claude fow-performance-pixels test-wait guards; fog-smoke/seasons-menu assertions untouched. No game data/schema or memory semantics changes. |
-| NEW14 (#131) Employment exclusions | Codex | `codex/employment-exclusions` | [#138](https://github.com/tom161819/Newgame/pull/138) | Draft PR; S12 phase A and FoW fixes integrated from maina6442d5, schema26 preserved; 616 tests, changelog/build and UI/staffing/priority Save26 browser PASS after integration; ready for current-head CI | EmploymentSystem/data employment, WorkplaceSystem assignment guard, WorkplacePanel, own EN/CS block, schema+employment validation only in GameStateSerializer, tests/browser smoke (ledger/smelting/military schema assertions use authored SAVE_VERSION), docs/changelog. Other S12 held logistics untouched. |
 
 ## Kept backups (do not delete without the developer)
 
@@ -23,6 +22,8 @@ Codex PR138 (#131) first; PR142 (#122) then integrates that actual merge/schema2
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-06 PR138 / Issue131: employment exclusions merged99ee504, repaired descendant PR151/09df170. Pages42109315944 build and deploy succeeded for09df170 containing both, including the full browser/save/archive/Studio gate. Issue131 closed/done. The exact seasonal pixel failure was reproduced and fixed while keeping the live redraw budget.
 
 - 2026-11-06 [#162](https://github.com/tom161819/Newgame/pull/162) Pages fix (Claude): the fog seam sample searches further out. Merge 65d5202; Pages 42152292448 succeeded.
 - 2026-11-06 [#159](https://github.com/tom161819/Newgame/pull/159) NEW22 #150 (Claude): Stone Pavement under finished buildings. Merge faff426; 638 tests, 63 full smokes; deployed by the #162 Pages run.

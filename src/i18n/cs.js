@@ -1,6 +1,10 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  // Seasonal field tending (#122).
+  'work.message.Tending crops':'Péče o plodiny',
+  'work.message.Walking to tend crops':'Cesta za péčí o plodiny',
+  'work.message.Waiting at farmhouse':'Čekání u statku',
   // Employment exclusions (#131).
   'employment.exclude.local':'Zakázat zaměstnávání v této budově',
   'employment.exclude.type':'Zakázat zaměstnávání pro celý typ ({name})',
