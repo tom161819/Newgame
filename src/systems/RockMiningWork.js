@@ -52,11 +52,12 @@ export class RockMiningWork {
     if(!record.marked||s.terrainGrid[record.tile.y]?.[record.tile.x]!==1||!this.goals(record,worker).some(p=>tileKey(p)===tileKey(task.goal))){system.ai.cancel(worker);this.wait(worker,'rock.noAccess');return true;}
     if(worker.nextTile||worker.path.length){worker.workState='Traveling to Target';worker.workMessage=t('rock.travelling');return true;}
     if(!system.ai.atGoal(worker,task.goal)){system.ai.cancel(worker);this.wait(worker,'rock.noAccess');return true;}
+    if(record.outputTile&&s.map[record.outputTile.y]?.[record.outputTile.x]!==0&&drop){system.ai.cancel(worker);this.wait(worker,'rock.noAccess');return true;}
     worker.workState='Working';worker.workMessage=t('rock.progress',{count:record.produced,total:RULES.yield});worker.displayProfession='miner';
     record.workDone=Math.min(RULES.duration,record.workDone+Math.min(delta,worker.availableWorkMs??delta)*s.skillSystem.workEfficiency(worker,'mining'));
     if(record.workDone+1e-7<RULES.duration)return true;
     record.workDone=0;record.produced++;
-    record.outputTile??={...task.goal};const output=s.dropSystem.create('stone',record.outputTile,1,null,{rewardRemaining:0,rewardUnits:0});record.dropId=output.id;
+    if(!record.outputTile||s.map[record.outputTile.y]?.[record.outputTile.x]!==0)record.outputTile={...task.goal};const output=s.dropSystem.create('stone',record.outputTile,1,null,{rewardRemaining:0,rewardUnits:0});record.dropId=output.id;
     s.resourceLedger?.income('stone',1,'Manual Rock Mining',{id:`rock:${record.id}:${record.produced}`,entityId:record.id,type:'production'});
     s.activities.emit('manualRockMined',{actor:worker,objectType:'rock_outcrop',quantity:1,objectId:record.id},`rock:${record.id}:${record.produced}`);
     if(record.produced===RULES.yield){s.terrainGrid[record.tile.y][record.tile.x]=0;s.naturalResources.mining.restoreTiles([record.tile]);s.terrain?.invalidateArea([record.tile]);system.ai.cancel(worker);worker.manualRockId=record.id;worker.aiCooldown=0;}
