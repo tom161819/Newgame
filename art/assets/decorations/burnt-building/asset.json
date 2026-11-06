@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "id": "burnt-building",
+  "name": "Burnt building",
+  "category": "decorations",
+  "description": "A house after a fire: blackened walls, charred beams fallen inside, a collapsed roof and ash on the floor. Concept for review (#149): map decoration, random starting ruins, or what demolition (#130) or a battle leaves behind. No game mechanics yet.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "ruins",
+  "variants": [
+    {
+      "id": "burnt-building-timber",
+      "name": "Burnt timber house",
+      "version": 1,
+      "notes": "Charred timber walls and posts.",
+      "spec": {
+        "kind": "burnt",
+        "seed": 4,
+        "material": "wood",
+        "height": 1.1,
+        "collapse": 0.6
+      }
+    },
+    {
+      "id": "burnt-building-stone",
+      "name": "Burnt stone house",
+      "version": 1,
+      "notes": "Soot-blackened stone walls, part of the roof still hanging.",
+      "spec": {
+        "kind": "burnt",
+        "seed": 12,
+        "material": "stone",
+        "height": 1.3,
+        "collapse": 0.45
+      }
+    },
+    {
+      "id": "burnt-building-collapsed",
+      "name": "Collapsed after fire",
+      "version": 1,
+      "notes": "Hardly anything stands: beams and ash.",
+      "spec": {
+        "kind": "burnt",
+        "seed": 21,
+        "material": "wood",
+        "height": 0.8,
+        "collapse": 0.9
+      }
+    }
+  ]
+}

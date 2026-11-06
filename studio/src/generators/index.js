@@ -11,6 +11,7 @@ import figure from './figure.js';
 import scaffold from './scaffold.js';
 import workshop from './workshop.js';
 import wallkit from './wallkit.js';
+import ruins from './ruins.js';
 
 export const GENERATORS = Object.freeze({
   [watchtower.id]: watchtower,
@@ -24,4 +25,5 @@ export const GENERATORS = Object.freeze({
   [scaffold.id]: scaffold,
   [workshop.id]: workshop,
   [wallkit.id]: wallkit,
+  [ruins.id]: ruins,
 });

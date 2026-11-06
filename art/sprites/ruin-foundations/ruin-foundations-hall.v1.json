@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "ruin-foundations",
+  "variantId": "ruin-foundations-hall",
+  "name": "Hall walls",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "8c393f73",
+  "generator": "ruins",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 196,
+  "height": 151,
+  "anchor": {
+    "x": 97,
+    "y": 101
+  },
+  "origin": {
+    "x": 0.4949,
+    "y": 0.66887
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 149
+  },
+  "baseOrigin": {
+    "x": 0.4949,
+    "y": 0.98675
+  },
+  "visualHeight": 149,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.524,
+  "lights": []
+}

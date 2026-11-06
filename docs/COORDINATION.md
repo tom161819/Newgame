@@ -13,6 +13,7 @@ Codex PR138 (#131) first; PR142 (#122) then integrates that actual merge/schema2
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| NEW21 (#149) Studio ruins designs | Claude | `claude/studio-ruins` | — | PR open; review only | studio/src/generators/ruins.js (new), art/assets/decorations/ruin*, art/sprites/ruin*, art/approvals.json, art/style-guide.json (soot, charcoal) |
 | Pages fix: deterministic Stables smoke (after #158) | Claude | `claude/fix-stables-smoke` | — | PR open | scripts/stables-smoke.mjs |
 | S12 phase D (#57) Horse Wagon | Claude | `claude/s12-horse-wagon` | — | PR open; schema 29; 633 tests, 62 full smokes PASS | data/production.js, objects/vehicles.js, FoodProduction/Storage/StateValidation, LogisticsTaskManager, ProductionDiagnostics, StableSystem, VehicleSystem, WorkerSystem (navigation), VehicleViews, WorkplacePanel, serializer |
 | Pages season-pixel regression after FoW optimization | Codex | `codex/pages-season-pixels` | — | Reproduced exact pixel failure; 618 tests, changelog/build, strict seasons/FoW/transition browser PASS; PR/CI pending | SeasonTransition + TerrainRenderer explicit complete-redraw contract, focused renderer/transition tests, seasons-menu smoke selection and docs. Coordinates with Claude fow-performance-pixels test-wait guards; fog-smoke/seasons-menu assertions untouched. No game data/schema or memory semantics changes. |
