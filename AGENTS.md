@@ -76,13 +76,27 @@ that put C01–C08 after master15. Follow `docs/TASK_QUEUE.md` and
 
 - Read the active **GitHub Issue** first, then `docs/TASK_QUEUE.md` and the linked original specifications for requirements; complete and release one dependency-safe queued step at a time. Follow the user's standing commit, deployment and checkpoint instructions.
 - `package.json` is the only authored source of the game version. Do not copy version numbers into UI or HTML. Game versions and `SAVE_VERSION` are separate; increase `SAVE_VERSION` whenever the persistent data model changes (see Alpha save policy).
-- After completing and verifying a feature or fix, add a concise, player-facing English entry to `CHANGELOG.md` under `Unreleased`, in Added/Changed/Improved/Fixed/Balance/Removed as appropriate. Describe actual behaviour, not plans, commit counts or unverified work.
-- Do not turn every commit into a release. Numbered M1–M5 milestone releases use the standing authorization above; no new prompt is needed. Unrelated standalone releases still follow the developer's scope. `npm run release:prepare -- minor|patch|major` prepares local files; complete the authorized Git/tag/archive/Pages workflow after validation.
-- `CHANGELOG.md` is the only authored history. Vite generates the player data from released entries; never maintain a second manual list. Keep Unreleased hidden from players.
+- After completing and verifying a feature or fix, add a concise, player-facing English entry to `CHANGELOG.md` under `Unreleased`, in Added/Changed/Improved/Fixed/Balance/Removed as appropriate. Describe actual behaviour, not plans, commit counts or unverified work. Release it in the same pull request when the change ships to players.
+- Every change that ships to players is a release (see *Versions, releases and change records* below). Milestone releases M1–M5 still follow rule 9 and the release gate. `npm run release:prepare -- major|minor|patch [--title "…"] [--milestone]` prepares the version, lockfile and changelog locally; then commit, open the PR, merge, and push the tag `v<version>` for the merge commit.
+- `CHANGELOG.md` is the only authored history. Vite generates the player data from released entries; never maintain a second manual list. Keep Unreleased hidden from players. A deployed game change must never stay hidden there: when a release merges, Unreleased is empty.
 - Run `npm run changelog:validate`, relevant tests and the production build before completing work. Verify current-schema Save/Load whenever changing persistent models.
 - Existing `public/versions/<commit>/` snapshots are immutable. Add historical builds only from their actual Git commits and run `npm run archive:verify`.
 - Historical bundles are generated data, not current source. Keep them out of broad searches/context; use the catalog, manifests and actual Git source for archive work. `.rgignore` excludes them from ordinary ripgrep discovery. Do not read minified snapshots to learn the current architecture.
 - `.gitattributes` suppresses generated archive text diffs; inspect SHA manifests, derived metadata and original source commits instead. This does not change tracked bytes or weaken `archive:verify`.
+
+# Versions, releases and change records (#174, 2026-11-06)
+
+These rules supersede the earlier "do not turn every commit into a release" and four-part versioning instructions; the M1–M5 milestone gates (rule 9) stay.
+
+1. **Exactly three numbers, MAJOR.MINOR.PATCH.** `package.json`, `package-lock.json`, Git tags and catalog data use canonical SemVer (`0.3.1`, tag `v0.3.1`). Players see MINOR and PATCH padded to at least two digits (`v0.03.01`, `v0.03.100`) through `displayVersion()` in `src/data/semver.js`. Never write a padded number into `package.json`, and never add a fourth part.
+2. **MAJOR** for a new generation of the game (`0.3.4 → 1.0.0`).
+3. **MINOR** for every change of `SAVE_VERSION` or the persistent data model (`0.3.4 → 0.4.0`, PATCH resets to 0). `release:prepare -- patch` refuses a changed `SAVE_VERSION`. Do not raise `SAVE_VERSION` just to release.
+4. **PATCH** for every other change that ships to players: feature, improvement or fix without a schema change (`0.4.0 → 0.4.1`). "Ships to players" means `src/`, `index.html`, `public/` (not `public/versions/`) or `vite.config.js`. Studio, scripts, tests, workflows and docs alone are not a game release.
+5. **Every release has its own `CHANGELOG.md` section** with date, player-facing summary and the SAVE_VERSION it ships with (`"saveVersion"` in the version comment, written by `release:prepare`). The game's changelog shows each release with its Save/Load impact. Unreleased is empty after a release.
+6. **Versions advance one step from `main`**: no skipped, repeated or lower numbers. If `main` released the same number meanwhile, merge `main` into your branch and prepare the next number.
+7. **Change record in every pull request** that touches anything outside `docs/`: `docs/changes/<issue>-<slug>.md` from `docs/changes/TEMPLATE.md`, about 5–20 sentences. Sections: What and why; Files and systems; Implementation decisions; Save/Load impact; Testing; Notes for the next agent. Do not write records retroactively for old work.
+8. **Gate:** `npm run version:check` (CI step "Version and change-record policy" in `pr-quality.yml`) enforces rules 3–7 against `main`. It only reports until `main` contains the first release written under these rules; from then on it blocks.
+9. **Tags and archives:** after merging a release, push the tag `v<version>` for the merge commit and confirm the Pages deployment. Only milestone releases (`--milestone`, M1–M5) also get an immutable playable archive snapshot via the release gate. Historical tags, releases and archives are never renamed or rewritten.
 
 # Alpha save policy
 
