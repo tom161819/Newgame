@@ -194,7 +194,7 @@ test('approvals become outdated when the spec changes and local storage failures
   const blocked = { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } };
   assert.deepEqual(readLocal(blocked), emptyManifest());
   assert.equal(writeLocal(blocked, local), false);
-  assert.deepEqual(STATUSES, ['draft', 'review', 'approved']);
+  assert.deepEqual(STATUSES, ['draft', 'review', 'revision-requested', 'approved', 'rejected', 'blocked']);
 });
 
 test('lighting presets, flicker and light resolution follow the style guide', () => {

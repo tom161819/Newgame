@@ -1,0 +1,157 @@
+{
+  "schema": 1,
+  "id": "wheelwright-yard",
+  "name": "Wheelwright Workshop",
+  "category": "buildings",
+  "description": "Wheel and wagon workshop: an open work shed, wheels leaning against the wall, a half-built cart, spokes and timber. Concept for review (#92); the game keeps its current drawing until one is approved.",
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "wheelwright_workshop",
+  "variants": [
+    {
+      "id": "wheelwright-yard-shed",
+      "name": "Workshop with open shed",
+      "version": 1,
+      "notes": "A low timber workshop and an open shed where a cart is being built; wheels and logs around.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.4,
+          "depth": 1.1,
+          "wallHeight": 0.85,
+          "roofHeight": 0.6,
+          "ridge": "z",
+          "windows": 1,
+          "at": [
+            -0.6,
+            -0.6
+          ]
+        },
+        "props": [
+          {
+            "type": "awning",
+            "at": [
+              0.55,
+              -0.6
+            ],
+            "width": 1.1,
+            "depth": 0.7,
+            "height": 0.75
+          },
+          {
+            "type": "cart",
+            "at": [
+              0.55,
+              -0.55
+            ]
+          },
+          {
+            "type": "wheel",
+            "at": [
+              -0.1,
+              0.45
+            ]
+          },
+          {
+            "type": "wheel",
+            "at": [
+              0.3,
+              0.55
+            ]
+          },
+          {
+            "type": "logs",
+            "at": [
+              0.9,
+              0.85
+            ],
+            "count": 6,
+            "length": 0.7
+          },
+          {
+            "type": "workbench",
+            "at": [
+              -0.8,
+              0.6
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "wheelwright-yard-stone",
+      "name": "Stone workshop and wheel rack",
+      "version": 1,
+      "notes": "A stone workshop with a shingled roof; finished wheels stacked by the door, a cart and a workbench in the yard.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "stone",
+          "roofMaterial": "roof_shingle",
+          "width": 1.8,
+          "depth": 1.2,
+          "wallHeight": 0.95,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 2,
+          "chimney": true,
+          "at": [
+            -0.3,
+            -0.6
+          ]
+        },
+        "props": [
+          {
+            "type": "wheel",
+            "at": [
+              0.9,
+              -0.1
+            ]
+          },
+          {
+            "type": "wheel",
+            "at": [
+              0.95,
+              0.25
+            ]
+          },
+          {
+            "type": "wheel",
+            "at": [
+              1.0,
+              0.6
+            ]
+          },
+          {
+            "type": "cart",
+            "at": [
+              -0.3,
+              0.65
+            ]
+          },
+          {
+            "type": "workbench",
+            "at": [
+              0.4,
+              0.75
+            ]
+          },
+          {
+            "type": "logs",
+            "at": [
+              -1.0,
+              1.0
+            ],
+            "count": 5,
+            "length": 0.6
+          }
+        ]
+      }
+    }
+  ]
+}
