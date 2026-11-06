@@ -9,6 +9,8 @@ on:
 # Pull request code is untrusted: use only read-only repository permissions.
 permissions:
   contents: read
+  # #214: the approval guard reads the owner's review issues.
+  issues: read
 
 concurrency:
   group: pr-quality-${{ github.event.pull_request.number || github.ref }}
@@ -44,6 +46,11 @@ jobs:
       - name: Version and change-record policy
         if: github.event_name == 'pull_request'
         run: node scripts/version-policy.mjs --base=HEAD^1
+
+      - name: Approvals need the owner's review (#214)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/approval-guard.mjs --base=HEAD^1
 
       - name: Test current game systems and Asset Studio data
         run: npm test

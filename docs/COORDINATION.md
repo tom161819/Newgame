@@ -21,10 +21,11 @@ Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke pau
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| NEW01-A #118 Builder workshop mechanics | Codex | `codex/builder-workshop-base` (stacked on94) | [#196](https://github.com/tom161819/Newgame/pull/196) | Main8ac90ee integrated; only coordination conflict;777 tests/build/native/Studio + exact-head02dfe9b CI PASS before independent AR-3; final CI pending;94 actual Pages verified; placeholder allowed, final art119 stays Claude | own workshop definition/derived base policy, ConstructionSystem.workSpeed, central idleHomes/BuilderAI, Unit/Construction/detail status, completion XP, schema/release/i18n, own tests/native/docs; no final art |
+| NEW01-A #118 Builder workshop mechanics | Codex | `codex/builder-workshop-base` (stacked on94) | [#196](https://github.com/tom161819/Newgame/pull/196) | Main42a2974 integrated; only coordination conflict; prior781 tests/version/build/native/Studio PASS; final CI including AR-4 approval guard pending;94 actual Pages verified; placeholder allowed, final art119 stays Claude | own workshop definition/derived base policy, ConstructionSystem.workSpeed, central idleHomes/BuilderAI, Unit/Construction/detail status, completion XP, schema/release/i18n, own tests/native/docs; no final art |
 | #210 asset review workflow, AR-1 #211 manifest statuses/comments/history | Claude | `claude/asset-review-manifest` | — | In review | studio/src/lib/approvals.js, studio/src/main.js (one constant), tests/asset-review-manifest.test.js, tests/asset-studio.test.js |
 | #210 AR-2 #212 Studio review UI (stacked on AR-1) | Claude | `claude/asset-review-ui` | — | In review | studio/src/main.js, studio/src/styles.css, scripts/studio-smoke.mjs |
 | #210 AR-3 #213 Submit review (stacked on AR-2) | Claude | `claude/asset-review-submit` | — | In review | studio/src/lib/reviewSubmit.js, studio/index.html, studio/src/main.js, styles.css, scripts/studio-smoke.mjs, tests/review-submit.test.js |
+| #210 AR-4 #214 asset-review intake workflow + approval guard (stacked on AR-3) | Claude | `claude/asset-review-intake` | — | In review | scripts/asset-review-{lib,intake}.mjs, scripts/approval-guard.mjs, .github/workflows/asset-review.yml, .github/workflows/pr-quality.yml, tests/asset-review-intake.test.js |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
