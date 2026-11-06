@@ -19,7 +19,7 @@ Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeat
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| #105 event feed above the minimap; bottom-right column notices → feed → minimap (no overlap) | Claude | `claude/event-feed` | — | In review | new ui/EventFeed.js, Minimap mount/size, index.html corner stack + notices, style.css, GameScene wiring, i18n `feed.*`, scripts/event-feed-smoke.mjs; release 0.5.1 |
+| S13 #58 phase C part 1: mood work speed, Kingdom Happiness in attractiveness | Claude | `claude/needs-work-morale` | — | In review | NeedsSystem (refresh/workModifier), data/needs.js, SkillSystem.workEfficiency, NeedsDisplay, i18n `needs.workLine`, tests/helpers/workerScene.js (`morale` option), needs smoke; release 0.5.2 |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
@@ -39,6 +39,7 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 
 ## Done
 
+- 2026-11-06 Claude: #105 event feed and bottom-right corner column ([#192](https://github.com/tom161819/Newgame/pull/192), release 0.5.1).
 - 2026-11-06 Claude: S13 #58 phase A needs and Happiness ([#191](https://github.com/tom161819/Newgame/pull/191), release 0.5.0, SAVE_VERSION 33). Phases B–D remain; B waits for Codex #124.
 - 2026-11-06 Claude: #121 ([#169](https://github.com/tom161819/Newgame/pull/169)), batch [#178](https://github.com/tom161819/Newgame/pull/178) = #129/#126/#120/#104 + smoke fix #176, #174 versions ([#184](https://github.com/tom161819/Newgame/pull/184), [#186](https://github.com/tom161819/Newgame/pull/186), [#188](https://github.com/tom161819/Newgame/pull/188)), **M3 RELEASED 0.4.0** ([#187](https://github.com/tom161819/Newgame/pull/187), archive [#189](https://github.com/tom161819/Newgame/pull/189); tag `v0.4.0` → `375f1aa`; Pages 42214708789 + Verify 42215177100 Success). Codex #128 ([#180](https://github.com/tom161819/Newgame/pull/180)) merged.
 
