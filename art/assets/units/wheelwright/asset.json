@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "wheelwright",
+  "name": "Wheelwright",
+  "category": "units",
+  "description": "Builds wheels and wagons: brown tunic, linen kerchief, leather apron and a wooden mallet. Concept for review (#92); the game keeps its current look until one is approved.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "plannedProfession": "wheelwright",
+  "variants": [
+    {
+      "id": "wheelwright-male",
+      "name": "Wheelwright (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_brown",
+        "legs": "cloth_wool",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_linen",
+        "hair": "hair_brown",
+        "beard": true,
+        "apron": "leather",
+        "tool": "mallet"
+      }
+    },
+    {
+      "id": "wheelwright-female",
+      "name": "Wheelwright (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_brown",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_linen",
+        "hair": "hair_brown",
+        "apron": "leather",
+        "tool": "mallet"
+      }
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "armorer-worker",
+  "name": "Armorer",
+  "category": "units",
+  "description": "Makes armour: grey wool under a mail coif-like hood of leather, heavy apron and a smith's hammer. Concept for review (#92); the game keeps its current look until one is approved.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "plannedProfession": "armorer",
+  "variants": [
+    {
+      "id": "armorer-worker-male",
+      "name": "Armorer (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_grey",
+        "legs": "cloth_brown",
+        "headgear": "hood",
+        "headgearMaterial": "leather",
+        "hair": "hair_grey",
+        "beard": true,
+        "apron": "leather",
+        "tool": "hammer",
+        "build": 1.15
+      }
+    },
+    {
+      "id": "armorer-worker-female",
+      "name": "Armorer (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_grey",
+        "headgear": "hood",
+        "headgearMaterial": "leather",
+        "hair": "hair_dark",
+        "apron": "leather",
+        "tool": "hammer"
+      }
+    }
+  ]
+}
