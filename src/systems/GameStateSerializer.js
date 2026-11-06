@@ -1,3 +1,4 @@
+import { demolitionRefund } from '../data/demolition.js';
 import { t } from '../i18n/index.js';
 import { objectRegistry } from './ObjectRegistry.js';
 import { COLUMNS,ROWS } from '../game/config.js';
@@ -26,7 +27,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=32;
+export const SAVE_VERSION=33;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -83,7 +84,7 @@ export function serializeGameState(scene){
       render:{x:scene.player.x,y:scene.player.y,depth:scene.player.depth},
       transition:c.transitioning?{remaining:Math.max(1,(c.transitionTween?.duration??900)-(c.transitionTween?.elapsed??0))}:null},
     inventory:scene.inventory.exportState(),equipment:scene.equipment.exportState(),
-    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(buildingDefinition(b).crop?{farmId:b.farmId??null}:{}),...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.unverified?{unverified:true}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
+    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(buildingDefinition(b).crop?{farmId:b.farmId??null}:{}),...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.unverified?{unverified:true}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.demolition?{demolition:copy(b.demolition)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
     resources:[...scene.resources.values()].map(v=>({type:v.getData('objectId'),tile:point(v.getData('tile')),...(v.getData('object').natural?{natural:copy(v.getData('object').natural)}:{})})),
     drops:[...scene.dropSystem.drops.values()].map(d=>({id:d.id,resource:d.resource,tile:point(d.tile),amount:d.amount,rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0),haulEligible:d.haulEligible!==false,...(d.siteId!=null?{siteId:d.siteId}:{})})),
     animals:[...scene.animalSystem.animals.values()].map(a=>({...serializeActor(a),retaliationId:a.retaliationTarget?.id??null})),
@@ -165,6 +166,18 @@ export function validateGameState(input,registry=objectRegistry){
       array(c.assignedBuilders,CONSTRUCTION_RULES.maximumBuilders);check(new Set(c.assignedBuilders).size===c.assignedBuilders.length);if(c.state==='complete')check(!c.assignedBuilders.length);
       for(const id of c.assignedBuilders){check((id==='king'||wIds.has(id))&&!siteAssignments.has(id));siteAssignments.add(id);}
     }
+  }
+  for(const b of s.buildings)if(b.demolition!==undefined){
+    const d=definition(b.type),c=b.demolition;
+    check(buildingIsComplete(b)&&d.buildable&&!d.starter&&!d.pavement&&b.type!=='castle'&&!b.unverified);
+    check(c&&typeof c==='object'&&!Array.isArray(c)&&Object.keys(c).every(k=>['state','requiredWork','workDone','progress','contributions','assignedBuilders','refund'].includes(k)));
+    check(['planned','building'].includes(c.state));number(c.requiredWork,1,86400000);check(c.requiredWork===(d.constructionTime??CONSTRUCTION_RULES.defaultTime));
+    number(c.workDone,0,c.requiredWork);number(c.progress,0,100);check(Math.abs(c.progress-100*c.workDone/c.requiredWork)<1e-6);check(c.state==='planned'?c.workDone===0:c.workDone>0);
+    check(c.refund&&typeof c.refund==='object'&&JSON.stringify(Object.entries(c.refund).sort())===JSON.stringify(Object.entries(demolitionRefund(d)).sort()));
+    check(c.contributions&&typeof c.contributions==='object'&&!Array.isArray(c.contributions));let work=0;
+    for(const [id,amount]of Object.entries(c.contributions)){check(wIds.has(id));number(amount,Number.MIN_VALUE,c.requiredWork);work+=amount;}check(Math.abs(work-c.workDone)<1e-6);
+    array(c.assignedBuilders,CONSTRUCTION_RULES.maximumBuilders);check(new Set(c.assignedBuilders).size===c.assignedBuilders.length);
+    for(const id of c.assignedBuilders){const w=s.workers?.find(w=>w.id===id);check(w?.isAlive&&w.profession==='builder'&&w.workTask?.kind==='dismantle'&&w.workTask.targetId===b.id&&!siteAssignments.has(id));siteAssignments.add(id);}
   }
   const plotCounts=new Map();
   for(const b of s.buildings){
@@ -252,8 +265,8 @@ export function validateGameState(input,registry=objectRegistry){
       check(typeof w.workMessage==='string'&&w.workMessage.length<200);
       if(w.stoneCollection!==undefined){check(w.stoneCollection&&typeof w.stoneCollection.enabled==='boolean'&&Object.keys(w.stoneCollection).length===2);integer(w.stoneCollection.radius,0,IDLE_STONE.maxRadius);}if(w.profession==='hauler')check(w.stoneCollection);if(!w.isAlive)check(w.workState==='Dead'&&!w.workTask&&!w.arriving);
       const t=w.workTask;if(t){
-        check(w.isAlive&&['mine','mineDrop','hunt','collectMeat','build','harvest','chopTree','mineDeposit','foodPickup','foodDeliver','produce'].includes(t.kind));tile(t.goal);number(t.progressMs,0,t.kind==='mineDeposit'?(definition(s.buildings.find(b=>b.id===w.assignedWorkplaceId)?.type).mining?.duration??0):t.kind==='harvest'?(definition(s.buildings.find(b=>b.id===t.targetId)?.type).crop?.workDuration??0):WORK_RULES.miningDuration);
-        const prefix=t.kind==='mine'?'resource':t.kind==='hunt'?'animal':'drop',expected=t.kind==='mineDeposit'?`mineral:${t.targetId}:${w.id}`:t.kind==='chopTree'?`natural:${t.targetId}`:t.kind==='produce'?`production-slot:${t.goal.x},${t.goal.y}`:['foodPickup','foodDeliver'].includes(t.kind)?`food-task:${t.transferId}`:t.kind==='build'?`construction-slot:${t.goal.x},${t.goal.y}`:t.kind==='harvest'?`crop:${t.targetId}`:`${prefix}:${t.targetId}`;check(t.reservation===expected&&!reservations.has(t.reservation));reservations.add(t.reservation);
+        check(w.isAlive&&['mine','mineDrop','hunt','collectMeat','build','dismantle','harvest','chopTree','mineDeposit','foodPickup','foodDeliver','produce'].includes(t.kind));tile(t.goal);number(t.progressMs,0,t.kind==='mineDeposit'?(definition(s.buildings.find(b=>b.id===w.assignedWorkplaceId)?.type).mining?.duration??0):t.kind==='harvest'?(definition(s.buildings.find(b=>b.id===t.targetId)?.type).crop?.workDuration??0):WORK_RULES.miningDuration);
+        const prefix=t.kind==='mine'?'resource':t.kind==='hunt'?'animal':'drop',expected=t.kind==='mineDeposit'?`mineral:${t.targetId}:${w.id}`:t.kind==='chopTree'?`natural:${t.targetId}`:t.kind==='produce'?`production-slot:${t.goal.x},${t.goal.y}`:['foodPickup','foodDeliver'].includes(t.kind)?`food-task:${t.transferId}`:['build','dismantle'].includes(t.kind)?`construction-slot:${t.goal.x},${t.goal.y}`:t.kind==='harvest'?`crop:${t.targetId}`:`${prefix}:${t.targetId}`;check(t.reservation===expected&&!reservations.has(t.reservation));reservations.add(t.reservation);
         if(t.kind==='foodPickup'&&t.sourceDropId){check(!reservations.has(`drop:${t.sourceDropId}`));reservations.add(`drop:${t.sourceDropId}`);}
         if(['mine','mineDrop'].includes(t.kind)){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);check(home?.type!=='iron_mine'&&!['finite','unbound'].includes(home?.quarryMode));}
         if(t.kind==='mine')check((w.profession==='miner'&&t.idleStone===undefined||w.profession==='hauler'&&t.idleStone===true&&w.stoneCollection?.enabled)&&s.resources.some(r=>r.type==='stone'&&`${r.tile.x},${r.tile.y}`===t.targetId));
@@ -265,6 +278,10 @@ export function validateGameState(input,registry=objectRegistry){
           check(w.profession==='miner'&&home&&buildingIsComplete(home)&&spec&&home.depositId===t.targetId&&target?.natural.remaining>0&&!reservations.has(slot)&&!solid.has(`${t.goal.x},${t.goal.y}`));reservations.add(slot);
           const workObject=spec.overlap?{...home,definition:definition(home.type)}:{...target.tile,definition:definition(target.type)};check(towerNeighbors(workObject).some(p=>p.x===t.goal.x&&p.y===t.goal.y));
           const count=(depositClaims.get(t.targetId)??0)+1;depositClaims.set(t.targetId,count);check(count<=target.natural.remaining);
+        }
+        if(t.kind==='dismantle'){
+          const target=s.buildings.find(b=>b.id===t.targetId);check(target&&buildingIsComplete(target)&&target.demolition?.assignedBuilders.includes(w.id)&&w.profession==='builder');
+          check(towerNeighbors({...target,definition:definition(target.type)}).some(p=>p.x===t.goal.x&&p.y===t.goal.y));
         }
         if(t.kind==='build'){
           const site=s.buildings.find(b=>b.id===t.targetId);check(site&&!buildingIsComplete(site)&&site.construction.assignedBuilders.includes(w.id));if(definition(site.type).crop){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);check(w.profession==='farmer'&&home?.type==='farmhouse'&&buildingIsComplete(home)&&site.farmId===home.id);}else check(w.profession==='builder');
@@ -302,7 +319,7 @@ export function validateGameState(input,registry=objectRegistry){
     check(c.kingSiteId==null||bIds.has(c.kingSiteId));
     if(c.kingSiteId!=null){const site=s.buildings.find(b=>b.id===c.kingSiteId);check(!buildingIsComplete(site)&&!definition(site.type).crop&&site.construction.assignedBuilders.includes('king'));tile(c.kingGoal);check(towerNeighbors(pavementHost(s.buildings,site,registry)??site).some(p=>p.x===c.kingGoal.x&&p.y===c.kingGoal.y));check(!reservations.has(`construction-slot:${c.kingGoal.x},${c.kingGoal.y}`));}
     else check(c.kingGoal==null&&!siteAssignments.has('king'));
-    for(const id of siteAssignments)if(id!=='king'){const w=s.workers?.find(w=>w.id===id);check(w?.isAlive&&w.workTask?.kind==='build'&&['builder','farmer'].includes(w.profession));}
+    for(const id of siteAssignments)if(id!=='king'){const w=s.workers?.find(w=>w.id===id);check(w?.isAlive&&['build','dismantle'].includes(w.workTask?.kind)&&['builder','farmer'].includes(w.profession));}
   }else check(!s.buildings.some(b=>!buildingIsComplete(b)));
   const plots=s.buildings.filter(b=>buildingIsComplete(b)&&definition(b.type).crop);
   if(s.farming!==undefined){

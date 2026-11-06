@@ -20,9 +20,9 @@ export class BuilderAI {
   updateWorker(worker){
     const system=this.construction,scene=system.scene;
     if(worker.workTask){
-      const site=system.sites.get(worker.workTask.targetId),assignment=system.assignments.get(worker.id);
+      const site=system.getSite(worker.workTask.targetId),assignment=system.assignments.get(worker.id);
       if(!site||!assignment||!system.canWork(site,worker)){scene.workerSystem.ai.cancel(worker);return;}
-      if(system.atSite(worker,assignment)){worker.workState='Working';worker.workMessage=`${buildingDefinition(site).crop?'Establishing':'Building'} ${dataName(site.definition)}`;return;}
+      if(system.atSite(worker,assignment)){worker.workState='Working';worker.workMessage=`${site.demolition?'Dismantling':buildingDefinition(site).crop?'Establishing':'Building'} ${dataName(site.definition)}`;return;}
       worker.workState='Traveling to Target';worker.workMessage=`Travelling to ${dataName(site.definition)}`;
       if(!worker.nextTile&&!worker.path.length&&worker.aiCooldown<=0){
         worker.aiCooldown=CONSTRUCTION_RULES.retryInterval;
@@ -36,8 +36,8 @@ export class BuilderAI {
     }
     worker.workState='Waiting';worker.workMessage='Waiting for construction';if(worker.aiCooldown>0)return;worker.aiCooldown=CONSTRUCTION_RULES.retryInterval;
     const choices=new Map(),start=worker.nextTile??worker.tile;
-    for(const site of system.sites.values()){
-      if(!system.canWork(site,worker)||!system.materials.ready(site))continue;
+    for(const site of system.workSites()){
+      if(!system.canWork(site,worker)||!system.ready(site))continue;
       if(site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders||this.blocked.get(`${worker.id}:${site.id}`)===system.revision)continue;
       const goals=system.goals(site,worker);if(!goals.length){
         if(!towerNeighbors(system.materials.area?.(site).host??site).some(t=>scene.map[t.y]?.[t.x]===0)){this.blocked.set(`${worker.id}:${site.id}`,system.revision);site.unreachableReason=t('status.siteNoAccess');}
