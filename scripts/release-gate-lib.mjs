@@ -19,4 +19,13 @@ export function pagesEvidence(html,{run,commit}){
   if(!html.includes(`/tom161819/Newgame/commit/${commit}`))throw new Error('Pages evidence does not identify the full deployed source SHA.');
   return {run:String(run),commit,url:'https://tom161819.github.io/Newgame/',status:'Success'};
 }
+// #174: Pages evidence from the GitHub REST API run object (api.github.com is reachable where the HTML run page is not,
+// and a successful re-run of failed jobs is still the same push run). Required: the Pages workflow, a push to main,
+// the exact deployed SHA, a completed successful run of this repository.
+export function pagesRunEvidence(run,{run:id,commit,repository='tom161819/Newgame'}){
+  if(!/^\d+$/.test(String(id))||!/^[a-f0-9]{40}$/.test(commit))throw new Error('A real Pages run and full deployed commit are required.');
+  const problems=[[String(run?.id)===String(id),'a different run'],[run?.repository?.full_name===repository,'another repository'],[run?.path==='.github/workflows/pages.yml','not the Pages workflow'],[run?.event==='push'&&run?.head_branch==='main','not a push to main'],[run?.head_sha===commit,'a different deployed commit'],[run?.status==='completed'&&run?.conclusion==='success','not a completed successful run']].filter(([ok])=>!ok).map(([,why])=>why);
+  if(problems.length)throw new Error(`Pages has not confirmed Success for the exact deployment on main (${problems.join(', ')}).`);
+  return {run:String(id),commit,url:`https://${repository.split('/')[0]}.github.io/${repository.split('/')[1]}/`,status:'Success',attempt:run.run_attempt??1};
+}
 export function releaseNumber(version){const parts=versionParts(version);if(parts[0]!==0||parts[2]!==0)throw new Error('Master milestones use pre-1.0 MINOR releases (0.MINOR.0).');return version;}

@@ -32,7 +32,7 @@ test('Castle, starter, noncanonical/unfinished targets and occupied roofs are pr
 
 test('schema33 keeps partial demolition and shared Builder reservations; rejects corrupted refunds and old saves',async()=>{
  const {serializeGameState,validateGameState,SAVE_VERSION}=await import('../src/systems/GameStateSerializer.js'),{loadGameState}=await import('../src/systems/GameStateLoader.js');
- const {s,b,worker}=fixture();s.demolition.request(b);const w=worker();until(s,()=>b.demolition.workDone>500);const state=validateGameState(serializeGameState(s));assert.equal(state.saveVersion,SAVE_VERSION);assert.equal(SAVE_VERSION,33);
+ const {s,b,worker}=fixture();s.demolition.request(b);const w=worker();until(s,()=>b.demolition.workDone>500);const state=validateGameState(serializeGameState(s));assert.equal(state.saveVersion,SAVE_VERSION);assert.equal(SAVE_VERSION,34);
  const r=workerScene(state.terrain,{construction:true,foodProduction:true,logistics:true,starter:false});r.demolition=new DemolitionSystem(r,{complete:()=>false});loadGameState(r,structuredClone(state));assert.equal(r.demolition.jobs.get(b.id).workDone,b.demolition.workDone);assert.deepEqual(r.constructionSystem.assignments.get(w.id),s.constructionSystem.assignments.get(w.id));assert.deepEqual(validateGameState(serializeGameState(r)),state);
  for(const mutate of [s=>s.buildings.find(x=>x.id===b.id).demolition.refund.stone++,s=>s.buildings.find(x=>x.id===b.id).demolition.assignedBuilders.push('king'),s=>s.buildings.find(x=>x.id===b.id).demolition.workDone++,s=>s.workers.find(x=>x.id===w.id).workTask.targetId=9999,s=>s.saveVersion=32]){const bad=structuredClone(state);mutate(bad);assert.throws(()=>validateGameState(bad));}
 });
