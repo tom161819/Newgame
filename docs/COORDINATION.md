@@ -18,6 +18,17 @@ PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da2
 | NEW18 (#146) Farm plot ownership | Codex | `codex/farm-plot-ownership` | [#166](https://github.com/tom161819/Newgame/pull/166) | Implemented: 670 tests + changelog/build and native ownership/tending browser PASS; schema31; foundation before145; actual165 merge90eb356 integrated; fresh670 tests/changelog/build/browser PASS; clear map/desktop+phone visibility and Escape verified; merged4e29fe3 after final-head CI42165693609 SUCCESS; await actual Pages42166266800 | data/farmPlots.js, buildings placement, FarmingSystem, GameStateSerializer/Loader schema31, FarmConnections overlay/focus, farm-only responsive CSS, WorkplacePanel/FarmingPanel, own i18n/tests/browser/docs. Prices and farmer construction stay in145. |
 | NEW21 (#149) Studio ruins designs | Claude | `claude/studio-ruins` | [#161](https://github.com/tom161819/Newgame/pull/161) | PR open; review only | studio/src/generators/ruins.js (new), art/assets/decorations/ruin*, art/sprites/ruin*, art/approvals.json, art/style-guide.json (soot, charcoal) |
 
+## Codex queue (developer: Codex always has several issues queued)
+
+In this order; one `status:ready` at a time. When an issue is merged, verified on Pages and closed, the next one becomes `status:ready`. Whoever sees fewer than three queued Codex issues adds more from the backlog. Claude does this at every check.
+
+1. [#96](https://github.com/tom161819/Newgame/issues/96) AUD68 repeated placement of farms and orchards (`status:ready`)
+2. [#128](https://github.com/tom161819/Newgame/issues/128) NEW11 temporary stockpile: haul to Warehouse, dismantle (provides the dismantle interface)
+3. [#130](https://github.com/tom161819/Newgame/issues/130) NEW13 demolition with 50 % refund (reuses #128)
+4. [#124](https://github.com/tom161819/Newgame/issues/124) NEW07 idle residents gather at the Castle
+5. [#94](https://github.com/tom161819/Newgame/issues/94) AUD65 manual marking of rocks for Miners
+6. [#118](https://github.com/tom161819/Newgame/issues/118) NEW01-A Builders' workshop (mechanics; the art stays with Claude in #119)
+
 ## Kept backups (do not delete without the developer)
 
 - `claude/serene-wright-97oy7k` at `0a48e67`: WIP checkpoint of the alpha policy and renderer switch; fully merged through #3 and #4. Delete it when the developer agrees.
