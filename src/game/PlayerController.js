@@ -118,7 +118,7 @@ export class PlayerController {
     this.path=route.path;this.scene.showMarker(route.destination);
     if(!this.path.length)this.arrive();
   }
-  wallAt(tile){const key=`${this.scene.constructionSystem?.revision??0}:${this.scene.buildings.length}`;if(this.roofMapKey!==key){this.roofMapKey=key;this.roofMap=roofIndex(this.scene.buildings);}return (this.scene.roofMap??this.roofMap).get(tileKey(tile));}
+  wallAt(tile){const key=`${this.scene.constructionSystem?.revision??0}:${this.scene.buildings.length}`;if(this.roofMapKey!==key){this.roofMapKey=key;this.roofMap=roofIndex(this.scene.buildings);}return this.roofMap.get(tileKey(tile));}
   commandOnWall(order){
     const start=this.nextTile?this.wallAt(this.nextTile):this.currentTower;
     if(order.kind==='enter'&&(isWall(order.tower)||isRoofAccess(order.tower))){
@@ -143,7 +143,9 @@ export class PlayerController {
     this.walking=false;
     const continuation=this.roofContinuation;this.roofContinuation=null;
     if(continuation){
-      this.currentTower=this.scene.buildings.find(b=>b.id===continuation.accessId)??this.currentTower;this.order=continuation.order;this.path=continuation.path;this.scene.showMarker(continuation.destination);this.descend(continuation.exit);
+      const access=this.scene.buildings.find(b=>b.id===continuation.accessId),route=access&&planTowerExit(this.scene.map,access,continuation.order,this.scene.pathWear?.routingOptions(this));
+      if(!route){this.path=[];this.scene.marker.setVisible(false);this.scene.setStatus(t('status.noTowerPath'));return;}
+      this.currentTower=access;this.order=continuation.order;this.path=route.path;this.scene.showMarker(route.destination);this.descend(route.exit);
     }else{const owner=this.scene.buildings.find(b=>b.id===this.currentTower?.id);if(owner&&!isWall(owner)&&tileKey(owner)===tileKey(this.tile)){this.currentTower=owner;this.setState(PLAYER_STATE.ON_TOWER);}this.scene.setStatus(t('status.kingOnWall'));}
   }
 

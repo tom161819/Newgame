@@ -1,3 +1,4 @@
+import { validateRoofState } from './RoofStateValidation.js';
 import { buildingGroundOpen } from '../game/buildingGround.js';
 import { validateRockMining } from './RockMiningState.js';
 import { ROCK_MINING } from '../data/rockMining.js';
@@ -341,6 +342,7 @@ export function validateGameState(input,registry=objectRegistry){
   const order=o=>{if(!o)return;check(['move','enter','collect','drop','openChest','approachAnimal'].includes(o.kind));check(typeof o.explore==='boolean'&&(!o.explore||o.kind==='move'));if(o.kind==='move'||o.kind==='drop')tile(o.goal);
     if(o.kind==='enter')check(bIds.has(o.buildingId)&&buildingIsComplete(s.buildings.find(b=>b.id===o.buildingId)));if(o.kind==='approachAnimal')check(aIds.has(o.animalId));if(o.kind==='drop')check(dIds.has(o.dropId));
     if(o.kind==='openChest')check(cIds.has(o.chestId));if(o.kind==='collect')check(s.resources.some(r=>`${r.tile.x},${r.tile.y}`===o.resourceKey));};
+  validateRoofState(s,registry,check);
   order(p.order);order(p.roofOrder);if(p.roofOrder)check(p.roofOrder.kind==='enter');if(p.roofContinuation){order(p.roofContinuation.order);tile(p.roofContinuation.exit);tile(p.roofContinuation.destination);check(bIds.has(p.roofContinuation.accessId));array(p.roofContinuation.path);p.roofContinuation.path.forEach(tile);}
   check(s.inventory&&typeof s.inventory==='object');for(const [id,count]of Object.entries(s.inventory)){const d=definition(id);check(['resource','equipment'].includes(d.category));if(id==='gold')number(count);else integer(count);}
   check(s.equipment&&Object.keys(s.equipment).length===2);for(const slot of ['weapon','armor'])if(s.equipment[slot]!=null){const id=s.equipment[slot];check(definition(id,'equipment').equipment.slot===slot&&(s.inventory[id]??0)>0);}

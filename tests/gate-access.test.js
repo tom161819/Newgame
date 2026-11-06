@@ -50,3 +50,21 @@ test('registry rejects invalid gate geometry instead of introducing an unrestric
  const base=structuredClone(objectRegistry.require('gate_y'));
  for(const patch of [{width:2},{height:3},{navigation:{walkableTop:true,roofAccess:true,gateAxis:'z'}},{navigation:{walkableTop:true,gateAxis:'y'}}])assert.throws(()=>new ObjectRegistry([{...base,...patch,id:'bad_gate'}]));
 });
+
+test('a newly completed tower refreshes roof ownership and blends roof height continuously into its far wall',()=>{
+ const s=scene(),left=completed(s,'wall',52,50),tower=completed(s,'tower',53,49),right=completed(s,'wall',55,50);
+ // An earlier scene snapshot must not override a newly changed world graph.
+ s.roofMap=new Map();assert.ok(s.character.command({kind:'enter',tower:left}));until(s,()=>s.character.state==='enteringTower');
+ const climb=s.animations.at(-1);s.player.setPosition(climb.x,climb.y);climb.onComplete();until(s,()=>s.character.state==='onWall'&&key(s.character.tile)===key(left)&&!s.character.path.length&&!s.character.nextTile);
+ assert.ok(s.character.command({kind:'enter',tower:right}));let previous={x:s.player.x,y:s.player.y},maximum=0,visited=false;
+ until(s,()=>{maximum=Math.max(maximum,Math.hypot(s.player.x-previous.x,s.player.y-previous.y));previous={x:s.player.x,y:s.player.y};visited||=s.character.currentTower.id===tower.id;return key(s.character.tile)===key(right)&&!s.character.path.length&&!s.character.nextTile;});
+ assert.ok(visited);assert.ok(maximum<20,`no roof-height jump: maximum25ms movement ${maximum}`);assert.equal(s.character.currentTower.id,right.id);validateGameState(serializeGameState(s));
+});
+
+test('forged access and disconnected roof paths reject before mutating the running current-schema world',()=>{
+ const s=scene(),gate=completed(s,'gate_y',49,50),wall=completed(s,'wall',52,50);assert.ok(s.character.command({kind:'enter',tower:wall}));until(s,()=>s.character.state==='enteringTower');
+ const pending=validateGameState(serializeGameState(s));
+ for(const mutate of [v=>v.player.currentTowerId=wall.id,v=>v.player.roofOrder.buildingId=9999,v=>delete v.player.roofOrder]){const bad=structuredClone(pending);mutate(bad);assert.throws(()=>loadGameState(s,bad));assert.deepEqual(serializeGameState(s),pending);}
+ const climb=s.animations.at(-1);s.player.setPosition(climb.x,climb.y);climb.onComplete();until(s,()=>key(s.character.tile)===key(wall)&&!s.character.path.length&&!s.character.nextTile);const roof=validateGameState(serializeGameState(s));
+ for(const mutate of [v=>v.player.path=[{x:70,y:70}],v=>v.player.path=[{x:49,y:50}],v=>{v.player.roofContinuation={order:{kind:'move',goal:{x:45,y:45}},accessId:wall.id,exit:{x:52,y:51},destination:{x:45,y:45},path:[]};}]){const bad=structuredClone(roof);mutate(bad);assert.throws(()=>loadGameState(s,bad));assert.deepEqual(serializeGameState(s),roof);}
+});

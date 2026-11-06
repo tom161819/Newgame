@@ -5,6 +5,8 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-06
+<!-- version: {"title":"Stone Gates and access to wall walks","type":"feature","reconstructed":false,"saveVersion":38} -->
 ### Added
 
 - Stone Gates provide a two-way passage between solid pillars in either map axis, with stairs to connected wall walks.

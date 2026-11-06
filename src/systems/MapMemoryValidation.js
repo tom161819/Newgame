@@ -26,9 +26,10 @@ export function validateMapMemory(data,registry,{check,number,integer,array}){
     integer(entry.x,0,COLUMNS-entry.width);integer(entry.y,0,ROWS-entry.height);
     let discovered=false;for(let y=0;y<entry.height;y++)for(let x=0;x<entry.width;x++)if(explored.has((entry.y+y)*COLUMNS+entry.x+x))discovered=true;check(discovered);
     const v=entry.visual;check(v&&typeof v==='object'&&!Array.isArray(v));
-    const allowed=entry.kind==='building'?['construction','connections','stage','season']:entry.kind==='chest'?['opened','lid']:entry.kind==='stockpile'?['id']:d.tree?['stage','season']:d.deposit?['depleted']:[];
+    const allowed=entry.kind==='building'?['construction','connections','roofConnections','stage','season']:entry.kind==='chest'?['opened','lid']:entry.kind==='stockpile'?['id']:d.tree?['stage','season']:d.deposit?['depleted']:[];
     check(Object.keys(v).every(key=>allowed.includes(key)));
     if(v.construction){const c=v.construction;check(entry.kind==='building'&&['planned','building','complete'].includes(c.state));number(c.progress,0,100);number(c.workDone);check(Object.keys(c).every(key=>['state','progress','workDone'].includes(key)));}
+    if(v.roofConnections){check(d.navigation?.gateAxis&&Array.isArray(v.roofConnections)&&v.roofConnections.length===3);for(const c of v.roofConnections){check(c&&typeof c==='object'&&!Array.isArray(c));check(Object.keys(c).length===4);for(const [key,value]of Object.entries(c))check(['N','E','S','W'].includes(key)&&typeof value==='boolean');}}
     if(v.connections){check(d.id==='wall'&&typeof v.connections==='object'&&!Array.isArray(v.connections));for(const [key,value]of Object.entries(v.connections))check(['N','E','S','W'].includes(key)&&typeof value==='boolean');}
     if(d.crop||d.tree){integer(v.stage,0,3);check(['Spring','Summer','Autumn','Winter'].includes(v.season));}else check(v.stage===undefined&&v.season===undefined);
     if(d.deposit)check(typeof v.depleted==='boolean');

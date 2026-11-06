@@ -1,6 +1,6 @@
 import { FortificationView } from './FortificationView.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
-import { tileCenter,tilePolygon } from './isometric.js';
+import { tileCenter } from './isometric.js';
 import { roofCells,wallIndex,connectionsFor } from './walls.js';
 
 // Reuses the approved wall kit. The middle span crops its block to the lintel;
@@ -19,20 +19,21 @@ class LintelView extends FortificationView {
   }
 }
 export class GateView {
-  constructor(scene,building,preview=false){this.scene=scene;this.preview=preview;this.list=[];this.paint(building);}
+  constructor(scene,building,preview=false,memory=false){this.scene=scene;this.preview=preview;this.memory=memory;this.parts=[];this.paint(building);}
+  get list(){return [...this.parts,...this.parts.flatMap(view=>view.artImages)];}
   paint(building,tint=null){
-    this.building=building;const index=wallIndex(this.scene.buildings),wall=objectRegistry.require('wall');
+    this.building=building;const index=this.memory?new Map():wallIndex(this.scene.buildings),wall=objectRegistry.require('wall');
     const cells=roofCells(building);
     for(let i=0;i<cells.length;i++){
-      const node={...cells[i],type:'wall',definition:wall,connections:connectionsFor(index,cells[i])};
-      if(!this.list[i])this.list[i]=i===1?new LintelView(this.scene,node,this.preview):new FortificationView(this.scene,node,this.preview);
-      this.list[i].paint(node,tint);
+      const node={...cells[i],type:'wall',definition:wall,connections:building.roofConnections?.[i]??connectionsFor(index,cells[i])};
+      if(!this.parts[i])this.parts[i]=i===1?new LintelView(this.scene,node,this.preview):new FortificationView(this.scene,node,this.preview);
+      this.parts[i].paint(node,tint);
     }
     return this;
   }
-  contains(x,y){return this.list.some(view=>view.contains(x,y));}
-  setVisible(value){for(const view of this.list)view.setVisible(value);return this;}
-  setAlpha(value){for(const view of this.list)view.setAlpha(value);return this;}
-  inView(view){return this.list.some(part=>part.inView(view));}
-  destroy(){for(const view of this.list)view.destroy();this.list=[];}
+  contains(x,y){return this.parts.some(view=>view.contains(x,y));}
+  setVisible(value){for(const view of this.parts)view.setVisible(value);return this;}
+  setAlpha(value){for(const view of this.parts)view.setAlpha(value);return this;}
+  inView(view){return this.parts.some(part=>part.inView(view));}
+  destroy(){for(const view of this.parts)view.destroy();this.parts=[];}
 }

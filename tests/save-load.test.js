@@ -101,12 +101,14 @@ test('rooftop route and a partially completed climb retain building references a
   const s=fixture(),wall=s.buildings.find(b=>b.type==='wall');
   s.character.state='onWall';s.character.currentTower=wall;s.character.tile={x:wall.x,y:wall.y};s.character.position={x:wall.x+.8,y:wall.y+.5};
   s.character.nextTile={x:41,y:40};s.character.path=[];s.character.order=null;
-  s.character.roofContinuation={order:{kind:'move',goal:{x:45,y:45}},path:[{x:42,y:41}],destination:{x:45,y:45},exit:{x:41,y:41}};
+  s.inventory.add('stone',6);const gate=placeBuilding({map:s.map,anchor:{x:37,y:40},resources:s.resourceOccupancy,reservedTiles:[],inventory:s.inventory,buildings:s.buildings,definition:s.objectRegistry.require('gate_y')}).building;assert.ok(gate);s.refreshWallConnections();
+  s.character.path=[{x:40,y:40},{x:39,y:40},{x:38,y:40},{x:37,y:40}];
+  s.character.roofContinuation={order:{kind:'move',goal:{x:45,y:45}},path:[{x:42,y:41}],destination:{x:45,y:45},exit:{x:37,y:41},accessId:gate.id};
   const r=restore(serializeGameState(s));assert.equal(r.character.currentTower,r.buildings.find(b=>b.id===wall.id));assert.deepEqual(r.character.roofContinuation.order.goal,{x:45,y:45});
-  s.character.state='enteringTower';s.character.transitionTween={duration:900,elapsed:425};s.character.roofContinuation=null;
+  s.character.state='enteringTower';s.character.currentTower=s.buildings.find(b=>b.type==='tower');s.character.tile={x:30,y:32};s.character.position={x:30.5,y:32.5};s.character.nextTile=null;s.character.path=[];s.character.transitionTween={duration:900,elapsed:425};s.character.roofContinuation=null;
   const data=serializeGameState(s),climb=restore(data);assert.equal(climb.character.state,'enteringTower');assert.equal(climb.animations[0].duration,475);
   assert.deepEqual({x:climb.player.x,y:climb.player.y},{x:data.player.render.x,y:data.player.render.y});
-  climb.animations[0].onComplete();assert.equal(climb.character.state,'onWall');assert.equal(climb.character.currentTower.id,wall.id);
+  climb.animations[0].onComplete();assert.equal(climb.character.state,'onTower');assert.equal(climb.character.currentTower.id,s.character.currentTower.id);
 });
 
 test('combat targets and fixed unopened treasure contents survive restoration without random regeneration',()=>{

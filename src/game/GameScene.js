@@ -147,7 +147,7 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('tower',(_definition,context)=>new TowerView(this,context.building,context.preview));
     this.assets.registerRenderer('animal',(definition,context)=>new AnimalView(this,context.x,context.y,definition));
     this.assets.registerRenderer('fortification',(_definition,context)=>new FortificationView(this,context.building,context.preview));
-    this.assets.registerRenderer('gate',(_definition,context)=>new GateView(this,context.building,context.preview));
+    this.assets.registerRenderer('gate',(_definition,context)=>new GateView(this,context.building,context.preview,context.memory));
     this.assets.registerRenderer('chest',(_definition,context)=>new ChestView(this,context.x,context.y));
     this.assets.registerRenderer('human',(definition,context)=>new HumanView(this,context.x,context.y,definition));
     this.assets.registerRenderer('workplace',(_definition,context)=>new WorkplaceView(this,context.building,context.preview));
@@ -539,9 +539,9 @@ export class GameScene extends Phaser.Scene {
   }
   refreshWallConnections(){
     this.wallMap=wallIndex(this.buildings);this.roofMap=roofIndex(this.buildings);
-    for(const building of this.wallMap.values()){
-      const connections=connectionsFor(this.wallMap,building),key=JSON.stringify(connections);
-      if(key!==building.connectionKey){building.connections=connections;building.connectionKey=key;this.towerViews.get(building.id)?.paint(building);}
+    for(const building of this.buildings.filter(b=>isWall(b)&&buildingIsComplete(b))){
+      const links=building.tiles.map(tile=>connectionsFor(this.roofMap,tile)),key=JSON.stringify(links);
+      if(key!==building.connectionKey){if(building.definition.navigation?.gateAxis)building.roofConnections=links;else building.connections=links[0];building.connectionKey=key;this.towerViews.get(building.id)?.paint(building);}
     }
   }
   showMarker(tile) { this.marker.clear().lineStyle(2,0xe3c879,1).strokePoints(tilePolygon(tile),true).setVisible(true); }
