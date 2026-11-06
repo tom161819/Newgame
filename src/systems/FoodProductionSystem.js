@@ -77,7 +77,7 @@ export class FoodProductionSystem {
     const site=cargo.siteId!=null&&this.scene.constructionSystem?.materials.site(cargo.siteId),siteLocation=site&&this.storage.locations.get(`site-${site.id}`);
     if(cargo.siteId!=null&&!site)delete cargo.siteId;
     const route=siteLocation?this.storage.route(worker,[siteLocation]):this.storage.findDestination(worker,cargo.resource,cargo.amount,{partial:true});if(!route){worker.workState='Waiting';worker.workMessage='Waiting for reachable storage capacity';worker.aiCooldown=FOOD_RULES.searchInterval;return false;}
-    const amount=Math.min(cargo.amount,this.storage.room(route.location.id),carryCapacity(worker,cargo.resource)),transferId=`food-transfer-${this.nextTransfer++}`;
+    const amount=Math.min(cargo.amount,this.storage.room(route.location.id,cargo.resource),carryCapacity(worker,cargo.resource)),transferId=`food-transfer-${this.nextTransfer++}`;
     const capacityReservation=this.storage.reserve('capacity',route.location.id,cargo.resource,amount,transferId);if(!capacityReservation)return false;
     if(site)this.storage.reservations.get(capacityReservation).siteId=site.id;
     if(!this.setTask(worker,'foodDeliver',route,{transferId,destinationId:route.location.id,resource:cargo.resource,amount,capacityReservation,...(site?{siteId:site.id}:{})})){this.storage.release(capacityReservation);return false;}

@@ -95,7 +95,7 @@ export class MilitarySystem {
       for(const resource of kit.allowed){const missing=this.missing(kit.buildingId,resource);
         if(missing>0)for(const source of stores)if(storage.free(source.id,resource)>0)tasks.push({priority:20,sourceId:source.id,destinationId:kit.id,resource,amount:missing});
         const surplus=storage.free(kit.id,resource)-(need[resource]??0);
-        if(surplus>0)for(const destination of stores)if(destination.allowed.includes(resource)&&storage.room(destination.id)>0)tasks.push({priority:40,sourceId:kit.id,destinationId:destination.id,resource,amount:surplus});
+        if(surplus>0)for(const destination of stores)if(destination.allowed.includes(resource)&&storage.room(destination.id,resource)>0)tasks.push({priority:40,sourceId:kit.id,destinationId:destination.id,resource,amount:surplus});
       }
     }
     return tasks;

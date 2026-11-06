@@ -1,3 +1,4 @@
+import { GRANARY_GROUP_CAPACITY,granaryUsage } from '../data/granaryCapacity.js';
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
 import { pavementWorkArea } from '../game/pavement.js';
 import { recipeFor,recipeResources } from '../data/production.js';
@@ -34,6 +35,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     const area=d.pavement?pavementWorkArea(s.buildings,b,registry):{x:b.x,y:b.y,width:d.width,height:d.height};
     expected.set(`site-${b.id}`,{kind:'site',buildingId:b.id,x:area.x,y:area.y,width:area.width,height:area.height,capacity:Object.values(required).reduce((n,v)=>n+v,0),allowed:Object.keys(required)});
   }
+  const granaries=new Set(s.buildings.filter(b=>b.type==='granary'&&buildingIsComplete(b)).map(stockLocationId));
   const locations=new Map(),reservations=new Map(),used=l=>Object.values(l.stock).reduce((n,v)=>n+v,0);
   check(storage.locations.length===expected.size);
   for(const l of storage.locations){
@@ -41,7 +43,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     for(const [key,value]of Object.entries(e))check(JSON.stringify(l[key])===JSON.stringify(value));
     check(l.stock&&typeof l.stock==='object'&&!Array.isArray(l.stock));for(const [id,n]of Object.entries(l.stock)){check(l.allowed.includes(id));integer(n,1);}
     if(l.haulExcluded!==undefined){check(l.haulExcluded&&typeof l.haulExcluded==='object'&&!Array.isArray(l.haulExcluded));for(const [id,n]of Object.entries(l.haulExcluded)){check(l.allowed.includes(id));integer(n,1,l.stock[id]??0);}}
-    integer(l.legacyOverflow);check(l.legacyOverflow===Math.max(0,used(l)-l.capacity));check(l.kind==='fallback'&&l.buildingId==null||l.legacyOverflow===0);
+    integer(l.legacyOverflow);check(l.legacyOverflow===(granaries.has(l.id)?Object.entries(granaryUsage(l.stock,registry)).reduce((n,[group,amount])=>n+Math.max(0,amount-GRANARY_GROUP_CAPACITY[group]),0):Math.max(0,used(l)-l.capacity)));check(l.kind==='fallback'&&l.buildingId==null||l.legacyOverflow===0);
   }
   for(const r of storage.reservations){
     const l=locations.get(r.locationId);check(l&&!reservations.has(r.id)&&['stock','capacity'].includes(r.kind)&&l.allowed.includes(r.resource));reservations.set(r.id,r);
@@ -49,7 +51,9 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     if(r.siteId!=null)check(sites.has(r.siteId)&&(sites.get(r.siteId).materialSupply.required[r.resource]??0)>0);
   }
   for(const l of locations.values()){
-    const incoming=[...reservations.values()].filter(r=>r.locationId===l.id&&r.kind==='capacity').reduce((n,r)=>n+r.amount,0);check(used(l)+incoming<=l.capacity+l.legacyOverflow);
+    const pending=[...reservations.values()].filter(r=>r.locationId===l.id&&r.kind==='capacity');
+    if(granaries.has(l.id)){const committed={...l.stock};for(const r of pending)committed[r.resource]=(committed[r.resource]??0)+r.amount;for(const [group,amount]of Object.entries(granaryUsage(committed,registry)))check(amount<=GRANARY_GROUP_CAPACITY[group]);}
+    else check(used(l)+pending.reduce((n,r)=>n+r.amount,0)<=l.capacity+l.legacyOverflow);
     for(const resource of l.allowed)check([...reservations.values()].filter(r=>r.kind==='stock'&&r.locationId===l.id&&r.resource===resource).reduce((n,r)=>n+r.amount,0)<=(l.stock[resource]??0));
     if(l.kind==='fallback'||l.kind==='storage')for(const resource of l.allowed){
       const count=[...locations.values()].filter(p=>['fallback','storage'].includes(p.kind)).reduce((n,p)=>n+(p.stock[resource]??0)-[...reservations.values()].filter(r=>r.kind==='stock'&&r.locationId===p.id&&r.resource===resource).reduce((a,r)=>a+r.amount,0),0);

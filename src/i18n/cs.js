@@ -1,6 +1,9 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  // Independent Granary capacities (#123).
+  'storage.granary.raw':'Suroviny {used}/{capacity} · Na cestě {incoming} · Volno {free}',
+  'storage.granary.food':'Jídlo {used}/{capacity} · Na cestě {incoming} · Volno {free}',
   // Seasonal field tending (#122).
   'work.message.Tending crops':'Péče o plodiny',
   'work.message.Walking to tend crops':'Cesta za péčí o plodiny',
