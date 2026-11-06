@@ -1,3 +1,4 @@
+import { blockingDialog } from '../ui/dockedPanels.js';
 import { KingCargoControl } from '../ui/KingCargoControl.js';
 import { UnitSelection } from '../ui/UnitSelection.js';
 import { t } from '../i18n/index.js';
@@ -285,7 +286,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   setGalleryInput(enabled) {
-    enabled=enabled&&!this.gameOver&&!this.gameTime.paused&&!this.visibilityPaused&&!document.querySelector('dialog[open]');
+    enabled=enabled&&!this.gameOver&&!this.gameTime.paused&&!this.visibilityPaused&&!blockingDialog(document);
     this.input.enabled=enabled;this.input.keyboard.enabled=enabled;
     for(const key of Object.values(this.worldCamera?.keys??{}))key.reset();
     this.previewTracking=false;this.preview.setVisible(false);
@@ -304,7 +305,7 @@ export class GameScene extends Phaser.Scene {
     if(!wearInfo.hidden){const tile=this.pointerTile(pointer);if(!this.fog.isVisibleTile(tile)){wearInfo.textContent='Path Wear: outside current sight.';}else{const grass=this.pathWear.isGrass(tile),score=grass?this.pathWear.scores[this.pathWear.index(tile)]:0;
       const text=grass?t('status.pathWear',{x:tile.x,y:tile.y,score,level:this.pathWear.level(tile)}):t('status.pathWearNone');if(wearInfo.textContent!==text)wearInfo.textContent=text;
     }}
-    if(this.buildMode||document.querySelector('dialog[open]')){tooltip.hidden=true;return;}
+    if(this.buildMode||blockingDialog(document)){tooltip.hidden=true;return;}
     pointer.updateWorldPoint(this.cameras.main);
     const hoverHit=this.pickInteraction(pointer.worldX,pointer.worldY,this.pointerTile(pointer));
     if(hoverHit?.kind==='human'){
@@ -341,7 +342,7 @@ export class GameScene extends Phaser.Scene {
 
   pointerTile(pointer) { pointer.updateWorldPoint(this.cameras.main);return worldToTile(pointer.worldX,pointer.worldY); }
   handleClick(pointer,released=false) {
-    if(this.gameOver||this.gameTime.paused||document.querySelector('dialog[open]'))return;
+    if(this.gameOver||this.gameTime.paused||blockingDialog(document))return;
     if(pointer.rightButtonDown()){if(this.buildMode)this.cancelBuilding();return;}
     if(!released&&!pointer.leftButtonDown())return;
     this.naturalResources?.cancelKing();

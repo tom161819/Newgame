@@ -484,3 +484,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .pavement-modes[hidden]{display:none}
 .pavement-modes button{padding:.2rem .55rem;border-radius:5px;border:1px solid rgba(120,90,50,.55);background:rgba(40,32,20,.55);color:inherit;cursor:pointer}
 .pavement-modes button[aria-checked="true"]{background:#c9a75b;color:#241a0b;font-weight:600}
+/* #120: compact unit detail docked beside the map, without a modal backdrop. */
+#unit-dialog.docked-panel { position:fixed; inset:144px 16px auto auto; margin:0; width:min(340px,calc(100vw - 24px)); max-height:calc(100dvh - 300px); z-index:30; padding:12px 14px; font-size:13px; box-shadow:0 6px 20px #0009; }
+#unit-dialog.docked-panel h2 { font-size:1.05rem; margin:0; }
+#unit-dialog.docked-panel h3 { font-size:.95rem; margin:.6rem 0 .3rem; }
+#unit-dialog.docked-panel p { margin:.2rem 0; }
+@media(max-width:760px){ #unit-dialog.docked-panel { inset:auto 12px 12px; width:auto; max-height:45dvh; } }
+.unit-command-controls .icon-command { position:relative; width:34px; height:30px; padding:0; font-size:15px; line-height:1; }
+.unit-command-controls .icon-command[aria-pressed="true"] { background:#827143; border-color:#f0d78b; color:#fff3c8; opacity:1; }
+.unit-command-controls .icon-command::after { content:attr(data-tooltip); position:absolute; left:50%; bottom:calc(100% + 6px); transform:translateX(-50%); white-space:nowrap; padding:3px 8px; border-radius:4px; background:#141b12; border:1px solid #978657; color:#ece2c4; font-size:12px; opacity:0; pointer-events:none; transition:opacity .12s; z-index:2; }
+.unit-command-controls .icon-command:hover::after, .unit-command-controls .icon-command:focus-visible::after { opacity:1; }
