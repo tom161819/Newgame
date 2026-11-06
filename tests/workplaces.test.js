@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { workerScene } from './helpers/workerScene.js';
+import { workerScene,ensureBuildingPrerequisites } from './helpers/workerScene.js';
 import { placeBuilding,buildingTiles } from '../src/game/buildings.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
@@ -10,6 +10,7 @@ const scene=()=>workerScene(undefined,{workplaces:true});
 const worker=(s,x=50,y=50)=>s.workerSystem.create({x,y});
 const stone=(s,x,y)=>s.addResource(s.objectRegistry.require('stone'),{x,y});
 function build(s,type,x=55,y=50){
+  ensureBuildingPrerequisites(s,s.objectRegistry.require(type)); // #132: a Hunting Lodge needs a completed Granary first.
   s.inventory.add('stone',s.objectRegistry.require(type).cost.stone);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:s.objectRegistry.require(type)});
   assert.ok(result.building,result.error);const b=result.building;s.towerViews.set(b.id,s.createBuildingView(b.definition,b));return b;
 }
@@ -27,7 +28,7 @@ test('workplace definitions use exact prices/footprints, reject occupied cells a
   }
   assert.equal(s.workerSystem.workers.size,11);const displaced=workers[0];s.workplaceSystem.remove(workers[3]);assert.equal(s.workplaceSystem.assign(l,displaced),true);assert.equal(s.workplaceSystem.summary(q).count,2);assert.equal(s.workplaceSystem.summary(l).count,2);assert.equal(displaced.profession,'hunter');
   s.workplaceSystem.remove(displaced);assert.equal(displaced.profession,'idle');assert.equal(displaced.assignedWorkplaceId,null);
-  const fail=placeBuilding({map:s.map,anchor:{x:55,y:50},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:q.definition});assert.ok(fail.error);assert.equal(s.buildings.length,3);
+  const fail=placeBuilding({map:s.map,anchor:{x:55,y:50},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:q.definition});assert.ok(fail.error);assert.equal(s.buildings.length,4,'quarry, Granary (#132 prerequisite), lodge and barracks');
   for(const type of ['quarry','hunting_lodge','barracks'])s.activities.emit('buildingCompleted',{actor:s.character,objectType:type},`built-${type}`);
   assert.equal(s.character.experience.totalXP,45);assert.equal(s.character.skills.construction.totalXP,45);
   s.activities.emit('buildingCompleted',{actor:s.character,objectType:'quarry'},'built-quarry');assert.equal(s.character.experience.totalXP,45);
@@ -99,9 +100,10 @@ test('older unassigned workers migrate to Idle without losing skills, talent, ea
 
 test('a hunter saved between the real kill and meat pickup restores pending kill rewards without replaying them',()=>{
   globalThis.document??={querySelector:()=>({textContent:''})};
-  const s=scene(),l=build(s,'hunting_lodge'),w=worker(s,53,50),rabbit=s.animalSystem.create(s.objectRegistry.require('rabbit'),{x:60,y:50});rabbit.wanderWait=1e8;s.workplaceSystem.assign(l,w);until(s,()=>!rabbit.isAlive);
+  // #132: the lodge needs a completed Granary, and a save with a Granary carries the food storage state.
+  const s=workerScene(undefined,{workplaces:true,foodProduction:true}),l=build(s,'hunting_lodge'),w=worker(s,53,50),rabbit=s.animalSystem.create(s.objectRegistry.require('rabbit'),{x:60,y:50});rabbit.wanderWait=1e8;s.workplaceSystem.assign(l,w);until(s,()=>!rabbit.isAlive);
   assert.equal(w.cargo,null);assert.equal(w.pendingWorkRewards.length,1);assert.equal(w.pendingWorkRewards[0].type,'animalKilled');
-  const saved=validateGameState(serializeGameState(s)),r=workerScene(saved.terrain,{workplaces:true});loadGameState(r,saved);assert.deepEqual(serializeGameState(r),saved);until(r,()=>r.inventory.count('meat')===5);
+  const saved=validateGameState(serializeGameState(s)),r=workerScene(saved.terrain,{workplaces:true,foodProduction:true});loadGameState(r,saved);assert.deepEqual(serializeGameState(r),saved);until(r,()=>r.inventory.count('meat')===5);
   const loaded=r.workerSystem.workers.get(w.id);assert.equal(loaded.experience.totalXP,12);assert.equal(loaded.skills.hunting.totalXP,10);near(loaded.skills.combat.totalXP,15);assert.equal(loaded.pendingWorkRewards.length,0);r.simulate(4000);assert.equal(loaded.experience.totalXP,12);assert.equal(r.inventory.count('meat'),5);
 });
 

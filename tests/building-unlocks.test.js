@@ -14,11 +14,22 @@ function place(s,type,x=44,y=44){return placeBuilding({map:s.map,anchor:{x,y},re
 function until(s,predicate,max=80000){let elapsed=0;while(!predicate()&&elapsed<max){s.tick(25);elapsed+=25;}assert.ok(predicate(),`Condition not reached (${elapsed}ms).`);}
 function build(s,type,x,y){const result=place(s,type,x,y);assert.ifError(result.error);const b=result.building;s.constructionSystem.plan(b);assert.equal(s.kingLogistics.startMaterials(b),true);until(s,()=>s.constructionSystem.materials.ready(b));assert.equal(s.constructionSystem.commandKing(b),true);until(s,()=>buildingIsComplete(b));return b;}
 
-test('new games and starting castles do not unlock farming; other food buildings keep their existing availability',()=>{
+test('new games and starting castles do not unlock farming or hunting; other food buildings keep their existing availability',()=>{
   const s=scene();s.buildings.push({id:90,type:'castle'});s.events.emit('buildings:changed');
-  for(const id of ['granary','mill','bakery','hunting_lodge','tower','warehouse'])assert.equal(s.buildingUnlocks.status(definition(id)).unlocked,true);
-  for(const id of ['farmhouse','wheat_field','orchard'])assert.equal(s.buildingUnlocks.status(definition(id)).unlocked,false);
+  for(const id of ['granary','mill','bakery','tower','warehouse'])assert.equal(s.buildingUnlocks.status(definition(id)).unlocked,true);
+  for(const id of ['farmhouse','wheat_field','orchard','hunting_lodge'])assert.equal(s.buildingUnlocks.status(definition(id)).unlocked,false);
   assert.match(s.buildingUnlocks.status(definition('farmhouse')).description,/Build a Granary/);
+  assert.match(s.buildingUnlocks.status(definition('hunting_lodge')).description,/Build a Granary/);
+});
+test('#132 a completed Granary unlocks the Hunting Lodge; an unfinished one does not, and existing lodges stay',()=>{
+  const s=scene();s.inventory.add('stone',40);
+  assert.ok(place(s,'hunting_lodge').error,'no lodge before a Granary');
+  const granary=place(s,'granary').building;s.constructionSystem.plan(granary);s.events.emit('buildings:changed');
+  assert.match(s.buildingUnlocks.status(definition('hunting_lodge')).description,/completed Granary/);
+  assert.equal(s.kingLogistics.startMaterials(granary),true);until(s,()=>s.constructionSystem.materials.ready(granary));
+  assert.equal(s.constructionSystem.commandKing(granary),true);until(s,()=>buildingIsComplete(granary));
+  assert.equal(s.buildingUnlocks.status(definition('hunting_lodge')).unlocked,true);
+  assert.ifError(place(s,'hunting_lodge',50,44).error);
 });
 test('the placement transaction rejects locked objects before payment, reservations, occupancy or world mutation',()=>{
   const s=scene();s.inventory.add('stone',30);const before=serializeGameState(s);

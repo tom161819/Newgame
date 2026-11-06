@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-11-07
+<!-- version: {"title":"Granary first in the Food menu","type":"feature","reconstructed":false,"saveVersion":36} -->
+### Changed
+- The Food & Farming menu now starts with the Granary, followed by the Farmhouse, Wheat Field, Orchard, Hunting Lodge, Mill and Bakery.
+- A new Hunting Lodge needs a completed Granary first, like the Farmhouse, so meat always has somewhere to go. Hunting Lodges you have already built or placed are not affected.
+
 ## [0.8.1] - 2026-11-06
 <!-- version: {"title":"Turning mill sails","type":"feature","reconstructed":false,"saveVersion":36} -->
 ### Added

@@ -7,4 +7,12 @@ export const BUILDING_CATEGORIES=Object.freeze({
   logistics:{name:'Logistics & Trade',icon:'▣'},infrastructure:{name:'Infrastructure',icon:'▦'},
 });
 export const buildingCategoryLabel=definition=>BUILDING_CATEGORIES[definition.buildingCategory]?localized(`buildingCategory.${definition.buildingCategory}`,BUILDING_CATEGORIES[definition.buildingCategory].name):t('buildingCategory.all');
-export const buildingsInCategory=(registry,category)=>registry.buildables().filter(d=>category==='all'||d.buildingCategory===category);
+// #132: optional menuOrder sorts buildings within their own category (lower first, unordered ones keep registry order
+// after the ordered ones). In All, each category keeps its slots, so only the order inside a category changes.
+const byMenuOrder=(a,b)=>(a.menuOrder??Number.MAX_SAFE_INTEGER)-(b.menuOrder??Number.MAX_SAFE_INTEGER);
+export function buildingsInCategory(registry,category){
+  const list=registry.buildables().filter(d=>category==='all'||d.buildingCategory===category),slots=new Map(),out=list.slice();
+  list.forEach((d,i)=>{const key=d.buildingCategory??'';if(!slots.has(key))slots.set(key,[]);slots.get(key).push(i);});
+  for(const indices of slots.values()){const sorted=indices.map(i=>list[i]).sort(byMenuOrder);indices.forEach((i,j)=>{out[i]=sorted[j];});}
+  return out;
+}

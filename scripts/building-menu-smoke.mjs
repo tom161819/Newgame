@@ -27,13 +27,15 @@ async function mobileLastBuildingSmoke(page){
 }
 export async function buildingMenuSmoke(page){
   if(!await page.locator('#building-categories').count())return;
-  const definitions=await page.evaluate(()=>window.__game.registry.get('application').scene.objectRegistry.buildables().map(d=>({id:d.id,category:d.buildingCategory})));
+  const definitions=await page.evaluate(()=>window.__game.registry.get('application').scene.objectRegistry.buildables().map(d=>({id:d.id,category:d.buildingCategory,menuOrder:d.menuOrder})));
+  // #132: menuOrder sorts buildings inside their category; in All each category keeps its slots.
+  const menuOrder=list=>{const out=list.slice(),slots=new Map();list.forEach((d,i)=>{if(!slots.has(d.category))slots.set(d.category,[]);slots.get(d.category).push(i);});for(const idx of slots.values()){const sorted=idx.map(i=>list[i]).sort((a,b)=>(a.menuOrder??Number.MAX_SAFE_INTEGER)-(b.menuOrder??Number.MAX_SAFE_INTEGER));idx.forEach((i,j)=>{out[i]=sorted[j];});}return out;};
   await page.locator('#buildings-tab').click();await horizontalStripSmoke(page);
   const categories=await page.locator('[data-building-category]').evaluateAll(tabs=>tabs.map(t=>t.dataset.buildingCategory));
   assert.deepEqual(categories,['all','defense','housing','food','industry','logistics','infrastructure']);
   for(const category of categories){
     const tab=page.locator(`[data-building-category="${category}"]`);await tab.click();assert.equal(await tab.getAttribute('aria-pressed'),'true');
-    assert.deepEqual(await page.locator('#building-options [data-building-id]').evaluateAll(buttons=>buttons.map(b=>b.dataset.buildingId)),definitions.filter(d=>category==='all'||d.category===category).map(d=>d.id));
+    assert.deepEqual(await page.locator('#building-options [data-building-id]').evaluateAll(buttons=>buttons.map(b=>b.dataset.buildingId)),menuOrder(definitions.filter(d=>category==='all'||d.category===category)).map(d=>d.id));
   }
   await page.locator('[data-building-category="defense"]').click();await page.locator('#tower-choice').click();assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.buildMode),true);
   await page.locator('#buildings-tab').click();await page.locator('[data-building-category="food"]').click();assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.buildMode),false);
@@ -41,6 +43,8 @@ export async function buildingMenuSmoke(page){
   if(hasUnlocks){
     assert.equal(await page.locator('#farmhouse-choice').isDisabled(),true);assert.equal(await page.locator('#wheat_field-choice').isDisabled(),true);assert.equal(await page.locator('#orchard-choice').isDisabled(),true);assert.equal(await page.locator('#granary-choice').isDisabled(),false);
     assert.match(await page.locator('#farmhouse-availability').textContent(),/Build a Granary/);
+    assert.equal(await page.locator('#hunting_lodge-choice').isDisabled(),true);assert.match(await page.locator('#hunting_lodge-availability').textContent(),/Build a Granary/);
+    assert.equal(await page.locator('#building-options [data-building-id]').first().getAttribute('data-building-id'),'granary','the Granary leads the Food menu');
     assert.equal(await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;return s.startBuilding(s.objectRegistry.require('farmhouse'));}),false);
   }
   const before=await page.evaluate(()=>window.__game.registry.get('application').scene.cameras.main.scrollY);await page.keyboard.down('w');await page.waitForTimeout(140);await page.keyboard.up('w');
@@ -116,7 +120,7 @@ export async function buildingUnlockGameplaySmoke(page){
   const granary=await placeBlueprint(page,'granary');
   await page.locator('#buildings-tab').click();await page.locator('[data-building-category="food"]').click();assert.equal(await page.locator('#farmhouse-choice').isDisabled(),true);assert.match(await page.locator('#farmhouse-availability').textContent(),/completed Granary/);await page.locator('#buildings-tab').click();
   await supplyAndBuild(page,granary);
-  await page.locator('#buildings-tab').click();assert.equal(await page.locator('#farmhouse-choice').isDisabled(),false);assert.equal(await page.locator('#wheat_field-choice').isDisabled(),true);await page.locator('#buildings-tab').click();
+  await page.locator('#buildings-tab').click();assert.equal(await page.locator('#farmhouse-choice').isDisabled(),false);assert.equal(await page.locator('#hunting_lodge-choice').isDisabled(),false,'#132 a completed Granary unlocks the Hunting Lodge');assert.equal(await page.locator('#wheat_field-choice').isDisabled(),true);await page.locator('#buildings-tab').click();
   const farm=await placeBlueprint(page,'farmhouse');
   const saved=await page.evaluate(()=>{const app=window.__game.registry.get('application');app.scene.pauseManager.set('test',true);return app.snapshot();});
   await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(state);},saved);

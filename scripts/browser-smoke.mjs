@@ -197,7 +197,7 @@ try{
   await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('test',false));await page.waitForFunction(()=>window.__game.registry.get('application').scene.inventory.count('stone')===1,null,{timeout:20000});
   assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.character.experience.totalXP),3);
   console.log('PASS New Game, real mouse movement/pickup, physical delivery, exact IndexedDB Save/Load in transit, no duplicated stock or XP');
-  if(args.includes('--full'))await buildingUnlockGameplaySmoke(page);
+  if(args.includes('--full')||args.includes('--building-unlocks'))await buildingUnlockGameplaySmoke(page);
   if(currentOnly){assert.equal(requests.some(url=>/\/versions\/[a-f0-9]{40}\//.test(url)),false);assert.equal(requests.some(url=>url.includes('/versions/catalog.json')),false);assert.deepEqual(errors,[]);await context.close();console.log('PASS cold current game starts and plays without requesting an archive catalog, historical script or historical graphic');return;}
 
   const original=catalog.versions.find(v=>v.version==='0.1.0'&&v.available);assert.ok(original,'Original official archive is required.');
