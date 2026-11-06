@@ -3,7 +3,10 @@ import { gridToWorld } from '../src/game/isometric.js';
 // A screen-space seam assertion must sample genuinely unknown ground. Subject
 // sight is part of the union, so a fixed offset from the king is not sufficient.
 export function unknownFogSeam(fog,camera,king){
+  // Nearest candidates first; earlier smokes (subjects walking about) may already have explored those, so the
+  // search continues in rings further out, still on screen.
   const offsets=[[9,-8],[8,9],[-9,8],[-8,-9],[9,8],[-9,-8],[8,-9],[-8,9]];
+  for(let r=10;r<=40;r++)for(let d=-r;d<=r;d++)offsets.push([r,d],[-r,d],[d,r],[d,-r]);
   for(const [dx,dy]of offsets){
     const tile={x:king.x+dx,y:king.y+dy},neighbors=[{x:tile.x-1,y:tile.y-1},{x:tile.x,y:tile.y-1},{x:tile.x-1,y:tile.y},tile];
     if(neighbors.some(t=>t.x<0||t.y<0||t.x>=fog.width||t.y>=fog.height||fog.state(t)!==0))continue;
