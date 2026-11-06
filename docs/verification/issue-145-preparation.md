@@ -12,4 +12,6 @@ Changelog:validate and build:pages PASS. Complete --full browser/save/archive re
 
 Integrated verified166 head1b689a4, including actual165 merge90eb356 and verified123 deployment. Only coordination conflicted: retained current predecessor records and own145 row. Runtime source unchanged by integration.
 
-Actual166 merge4e29fe3 integrated, including its final a9fcf1a map-visible inspector and desktop/phone tests. Conflicts were only changelog/progress/coordination; preserved both features and all verified deployment records. Runtime source merged without conflict. Fresh integrated tests/build/native browser and exact-head CI next; actual166 Pages42166266800 must succeed before145 merges.
+Actual166 merge4e29fe3 integrated, including its final a9fcf1a map-visible inspector and desktop/phone tests. Conflicts were only changelog/progress/coordination; preserved both features and all verified deployment records. Runtime source merged without conflict. Fresh integrated677 tests/changelog/build and native establishment/ownership/tending/employment/staffing browser PASS; exact-head CI next; actual166 Pages42166266800 must succeed before145 merges.
+
+Integrated checks completed successfully on89a75a4:677/677 tests, changelog:validate, build:pages and native establishment, responsive farm connections/phone geometry, tending, staffing and employment controls. No package/archive changes. Full --full browser/save/archive completed on885388a. Final published head CI and166 actual deployment remain required before merge.
