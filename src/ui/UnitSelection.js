@@ -1,5 +1,6 @@
 import { t,language } from '../i18n/index.js';
 import { tileCenter } from '../game/isometric.js';
+import { blockingDialog } from './dockedPanels.js';
 
 // Screen-space drag rectangle; selected rings and order markers are projected
 // from world positions each frame, so pan/zoom never change who was selected.
@@ -22,7 +23,7 @@ export class UnitSelection {
     for(const worker of workers)s.workerSystem.commands[action](worker);this.draw();
   }
   down(pointer){
-    const s=this.scene;if(s.gameOver||s.gameTime.paused||s.buildMode||document.querySelector('dialog[open]'))return false;
+    const s=this.scene;if(s.gameOver||s.gameTime.paused||s.buildMode||blockingDialog(document))return false;
     if(pointer.rightButtonDown()){
       if(this.ids.size){const count=s.workerSystem.commands.move(this.workers(),s.pointerTile(pointer));s.setStatus(t(count?'command.moving':'command.noRoute',{count}));return true;}
       return false;
@@ -39,17 +40,20 @@ export class UnitSelection {
       this.set(this.scene.workerSystem.liveSubjects().filter(w=>{const v=w.view;return v.x>=Math.min(a.x,b.x)&&v.x<=Math.max(a.x,b.x)&&v.y>=Math.min(a.y,b.y)&&v.y<=Math.max(a.y,b.y);}));
     }else{
       const s=this.scene;pointer.updateWorldPoint(s.cameras.main);const hit=s.pickInteraction(pointer.worldX,pointer.worldY,s.pointerTile(pointer));
-      if(hit?.kind==='human'&&s.workerSystem.commands.selectable(hit.object))this.set([hit.object]);
-      else{this.clear();s.handleClick(pointer,true);}
+      // #120: one click on an own villager opens his detail at once; a click on another villager switches it.
+      if(hit?.kind==='human'&&s.workerSystem.commands.selectable(hit.object)){this.set([hit.object]);s.unitPanel?.open(hit.object);}
+      else{this.clear();if(s.unitPanel?.dialog.open&&s.unitPanel.unit?.id!=null&&s.workerSystem.workers.get(s.unitPanel.unit.id)===s.unitPanel.unit)s.unitPanel.close();s.handleClick(pointer,true);}
     }
     this.dragging=false;this.draw();return true;
   }
   cancelDrag(){this.anchor=null;this.dragging=false;this.overlay.clear();}
   draw(){
     const s=this.scene,workers=this.workers();this.ids=new Set(workers.map(w=>w.id));this.graphics.clear();this.overlay.clear();
-    const signature=JSON.stringify([workers.length,s.gameOver,s.gameTime.paused,language()]);
+    // The open detail of the one selected villager already carries his commands.
+    const detail=workers.length===1&&!!s.unitPanel?.dialog.open&&s.unitPanel.unit===workers[0];
+    const signature=JSON.stringify([workers.length,s.gameOver,s.gameTime.paused,language(),detail]);
     if(signature!==this.signature){
-      this.signature=signature;this.panel.hidden=!workers.length||!!s.gameOver;this.panel.setAttribute('aria-label',t('command.title'));this.label.textContent=t('command.selected',{count:workers.length});
+      this.signature=signature;this.panel.hidden=!workers.length||!!s.gameOver||detail;this.panel.setAttribute('aria-label',t('command.title'));this.label.textContent=t('command.selected',{count:workers.length});
       for(const [action,button]of Object.entries(this.buttons))button.textContent=t(`command.${action}`);
       this.buttons.inspect.disabled=workers.length!==1;this.buttons.hold.disabled=this.buttons.resume.disabled=!!s.gameTime.paused;
     }
