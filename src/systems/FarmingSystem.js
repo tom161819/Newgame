@@ -121,7 +121,7 @@ export class FarmingSystem {
       const building=this.building(task.targetId),record=this.records.get(task.targetId);
       if(!building||record?.reservedBy!==worker.id||record.cycle!==task.cycle||!this.inRange(worker,building)||!this.scene.workerSystem.ai.atGoal(worker,task.goal))continue;
       const available=Math.min(delta,worker.availableWorkMs??0,Math.max(0,this.scene.gameTime.totalElapsed-task.startedAt));
-      task.progressMs+=available*this.scene.skillSystem.workEfficiency(worker,'farming');
+      task.progressMs+=available*this.scene.skillSystem.workEfficiency(worker,'farming')*(this.scene.workplaceSystem.workFactor?.(worker)??1);
       worker.workState='Working';worker.workMessage=`Harvesting ${dataName(buildingDefinition(building))}`;
       if(task.progressMs>=buildingDefinition(building).crop.workDuration)this.harvest(worker,building,record);
     }

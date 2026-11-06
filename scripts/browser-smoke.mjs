@@ -1,3 +1,4 @@
+import { workplaceOutputSmoke } from './workplace-output-smoke.mjs';
 import { granaryCapacitySmoke } from './granary-capacity-smoke.mjs';
 import { farmerTendingSmoke } from './farmer-tending-smoke.mjs';
 import { employmentExclusionsSmoke } from './employment-exclusions-smoke.mjs';
@@ -120,6 +121,7 @@ try{
   if(args.includes('--full')||args.includes('--forestry'))await forestrySmoke(page);
   if(args.includes('--full')||args.includes('--forestry-workers'))await forestryHutSmoke(page);
   if(args.includes('--full')||args.includes('--population')){await populationSidebarSmoke(page);await populationNavigationSmoke(page);await populationIntegrationSmoke(page);}
+  if(args.includes('--full')||args.includes('--workplace-output'))await workplaceOutputSmoke(page);
   if(args.includes('--full')||args.includes('--granary-capacity'))await granaryCapacitySmoke(page);
   if(args.includes('--full')||args.includes('--farmer-tending'))await farmerTendingSmoke(page);
   if(args.includes('--full')||args.includes('--staffing'))await staffingIndicatorsSmoke(page);

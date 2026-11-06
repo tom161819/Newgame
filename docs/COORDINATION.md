@@ -6,15 +6,15 @@ Files held lists the files a task changes. Another task avoids them unless neces
 
 ## Agreed merge order
 
-PR138 and repair PR151 are merged and verified by Pages42109315944. PR142 (#122) integrates current main/schema29 and must pass fresh checks/CI and actual Pages.
+PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da21f0c and awaits its own Pages. NEW15 (#143) must integrate that actual merge and wait for its deployment before merging.
 
 ## Active
 
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| NEW06 (#123) Granary independent capacities | Codex | `codex/granary-capacity-groups` | — | Implemented on actual farmer merge2329087; schema30; 655 tests, changelog/build and Granary+farmer browser PASS; wait predecessor Pages before merge | data/granaryCapacity.js, FoodStorageSystem + FoodStateValidation, resource-aware room call sites in logistics/production/king/construction, StoragePanel, GameStateSerializer schema30 only, own i18n keys, focused storage/logistics tests/browser and docs. S12 is closed/done; preserve its weights/vehicles. |
-| NEW04 (#122) Seasonal field tending | Codex | `codex/farmer-field-tending` | [#142](https://github.com/tom161819/Newgame/pull/142) | Restored after restart and approval limit; main9478976/schema29 integrated, 646 tests + changelog/build and combined farmer/employment/staffing/seasons browser PASS; exact-head CI pending | FarmingSystem.js, data/farming.js, own EN/CS block, isolated farming tests/browser smoke, docs/changelog. No WorkerAI, serializer, cargo/storage or S12 edits; derived low-priority behavior only. |
+| NEW15 (#143) Workplace staffing output | Codex | `codex/workplace-staffing-output` | [#165](https://github.com/tom161819/Newgame/pull/165) | Implemented: 662 tests + build/changelog and combined native browser PASS; final focused editor also PASS; await current-head CI, merge only after164 Pages | data/workplaces.js, ObjectRegistry validation, WorkplaceSystem, existing work providers, dev AssetGallery editor, WorkplacePanel, authored data/registry, StableSystem and MilitarySystem speed hooks only, own i18n/tests/browser/docs. Preserve Claude163 Stables smoke. |
+| NEW06 (#123) Granary independent capacities | Codex | `codex/granary-capacity-groups` | [#164](https://github.com/tom161819/Newgame/pull/164) | Merged da21f0c after exact-head CI42158316333 success and predecessor Pages; await actual own Pages | data/granaryCapacity.js, FoodStorageSystem + FoodStateValidation, resource-aware room call sites in logistics/production/king/construction, StoragePanel, GameStateSerializer schema30 only, own i18n keys, focused storage/logistics tests/browser and docs. S12 is closed/done; preserve its weights/vehicles. |
 | NEW21 (#149) Studio ruins designs | Claude | `claude/studio-ruins` | [#161](https://github.com/tom161819/Newgame/pull/161) | PR open; review only | studio/src/generators/ruins.js (new), art/assets/decorations/ruin*, art/sprites/ruin*, art/approvals.json, art/style-guide.json (soot, charcoal) |
 
 ## Kept backups (do not delete without the developer)
@@ -23,6 +23,8 @@ PR138 and repair PR151 are merged and verified by Pages42109315944. PR142 (#122)
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-06 PR142 / Issue122: merged232908750f063b17cfabe6ed9121d4278c0bdb22 after exact-head CI42157067169. 646 tests + changelog/build and combined farmer/employment/staffing/seasons browser PASS. Pages42157299626 build AND deploy succeeded for the exact merge, including full browser/save/archive/Studio. Issue122 closed/done.
 
 - 2026-11-06 PR138 / Issue131: employment exclusions merged99ee504, repaired descendant PR151/09df170. Pages42109315944 build and deploy succeeded for09df170 containing both, including the full browser/save/archive/Studio gate. Issue131 closed/done. The exact seasonal pixel failure was reproduced and fixed while keeping the live redraw budget.
 

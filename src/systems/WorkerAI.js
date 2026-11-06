@@ -125,7 +125,7 @@ export class WorkerAI {
     const view=task.kind==='mineDrop'?this.scene.dropSystem.drops.get(task.targetId):this.scene.resources.get(task.targetId);
     if(!view||this.scene.character.order?.pickupKey===task.targetId||this.scene.character.order?.dropId===task.targetId){this.cancel(worker);return;}
     if(!this.ensureRoute(worker,task.goal))return;
-    worker.workState='Working';worker.workMessage='Mining stone';task.progressMs+=delta*this.scene.skillSystem.workEfficiency(worker,'mining');
+    worker.workState='Working';worker.workMessage='Mining stone';task.progressMs+=delta*this.scene.skillSystem.workEfficiency(worker,'mining')*(this.scene.workplaceSystem?.workFactor?.(worker)??1);
     if(task.progressMs>=WORK_RULES.miningDuration){if(task.kind==='mineDrop')this.scene.dropSystem.collect(task.targetId,worker.tile,worker);else this.scene.collectResource(task.targetId,worker.tile,worker);this.cancel(worker);worker.workState='Searching for Work';}
   }
   hunter(worker,delta){
@@ -150,7 +150,7 @@ export class WorkerAI {
       const drop=this.scene.dropSystem.drops.get(task.targetId);
       if(!drop||this.scene.character.order?.dropId===task.targetId){this.cancel(worker);return;}
       if(this.ensureRoute(worker,drop.tile)){
-        if(this.scene.workplaceSystem){worker.workState='Working';worker.workMessage='Gathering meat';task.progressMs+=delta*this.scene.skillSystem.workEfficiency(worker,'hunting');if(task.progressMs<WORKPLACE_RULES.collectMeatDuration)return;}
+        if(this.scene.workplaceSystem){worker.workState='Working';worker.workMessage='Gathering meat';task.progressMs+=delta*this.scene.skillSystem.workEfficiency(worker,'hunting')*(this.scene.workplaceSystem?.workFactor?.(worker)??1);if(task.progressMs<WORKPLACE_RULES.collectMeatDuration)return;}
         this.scene.dropSystem.collect(drop.id,worker.tile,worker);this.cancel(worker);worker.workState='Searching for Work';}return;
     }
     const animal=this.scene.animalSystem.animals.get(task.targetId);

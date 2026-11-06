@@ -2,6 +2,18 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  'staffing.status':{one:'Output {percent}% – {missing} worker missing ({present} present)',other:'Output {percent}% – {missing} workers missing ({present} present)'},
+  'staffing.editor.title':'Developer: workplace authoring',
+  'staffing.editor.capacity':'Workplaces',
+  'staffing.editor.curve':'Output percentages from 0 workers (comma separated; empty = linear)',
+  'staffing.editor.invalid':'Invalid data: 1–50 places and a 0–100 percentage for each headcount, starting at 0%.',
+  'staffing.editor.apply':'Apply authored data',
+  'staffing.editor.saved':'Authored data saved in this browser.',
+  'staffing.editor.sessionOnly':'Applied for this session; export to keep authored data.',
+  'staffing.editor.export':'Export workplace data',
+  'staffing.editor.import':'Import workplace data',
+  'staffing.editor.help':'Changes apply to all buildings of this type. Excess employees become Unemployed. Export these authoring data for use in another browser; game saves do not contain them. Import the same data before loading affected saves.',
+
   // Independent Granary capacities (#123).
   'storage.granary.raw':'Raw Materials {used}/{capacity} · Incoming {incoming} · Free {free}',
   'storage.granary.food':'Food {used}/{capacity} · Incoming {incoming} · Free {free}',

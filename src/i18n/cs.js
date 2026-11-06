@@ -1,6 +1,18 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  'staffing.status':{one:'Výkon {percent} % – chybí {missing} pracovník ({present} přítomných)',few:'Výkon {percent} % – chybí {missing} pracovníci ({present} přítomných)',other:'Výkon {percent} % – chybí {missing} pracovníků ({present} přítomných)'},
+  'staffing.editor.title':'Vývojář: nastavení pracoviště',
+  'staffing.editor.capacity':'Počet pracovních míst',
+  'staffing.editor.curve':'Procenta výkonu od 0 pracovníků (oddělit čárkou; prázdné = lineární)',
+  'staffing.editor.invalid':'Neplatná data: 1–50 míst a procento 0–100 pro každý počet, počínaje 0 %.',
+  'staffing.editor.apply':'Použít autorská data',
+  'staffing.editor.saved':'Autorská data uložena v tomto prohlížeči.',
+  'staffing.editor.sessionOnly':'Použito pro tuto relaci; pro zachování exportujte data.',
+  'staffing.editor.export':'Exportovat data pracovišť',
+  'staffing.editor.import':'Importovat data pracovišť',
+  'staffing.editor.help':'Změny platí pro všechny budovy tohoto typu. Nadbyteční zaměstnanci se stanou nezaměstnanými. Pro jiný prohlížeč exportujte tato autorská data; herní uložené pozice je neobsahují. Před načtením dotčených pozic importujte stejná data.',
+
   // Independent Granary capacities (#123).
   'storage.granary.raw':'Suroviny {used}/{capacity} · Na cestě {incoming} · Volno {free}',
   'storage.granary.food':'Jídlo {used}/{capacity} · Na cestě {incoming} · Volno {free}',

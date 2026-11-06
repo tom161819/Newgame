@@ -208,7 +208,7 @@ export class GameScene extends Phaser.Scene {
     this.inventoryBar=new InventoryBar(this.objectRegistry,this.assets,this.inventory);
     this.buildingUnlocks=new BuildingUnlockManager(this);
     this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,unlocks:this.buildingUnlocks,onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
-    this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
+    this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onWorkplaceApply:()=>{this.workplaceSystem.reconcileDefinitions();if(this.selectedBuilding)this.selectedBuilding=this.objectRegistry.require(this.selectedBuilding.id);},onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
     this.equipmentPanel=new EquipmentPanel(this);
     this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=t('hud.population',{count,maximum});}});if(!this.loadState)this.workerSystem.spawnInitial();
     // Every living subject is a moving sight source (diameter 15); leaving, dying or emigrating removes it.

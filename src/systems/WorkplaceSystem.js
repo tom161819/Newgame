@@ -1,5 +1,6 @@
 import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
-import { WORKPLACES } from '../data/workplaces.js';
+import { WORKPLACES,staffingOutput,staffingWorkFactor } from '../data/workplaces.js';
+import { canInteractAdjacent } from '../game/interaction.js';
 import { tileKey } from '../game/stones.js';
 
 export class WorkplaceSystem {
@@ -19,6 +20,28 @@ export class WorkplaceSystem {
   goals(worker){const building=this.building(worker);return building?towerNeighbors(building).filter(t=>this.scene.map[t.y]?.[t.x]===0):[];}
   atWorkplace(worker){return !worker.nextTile&&!worker.path.length&&this.goals(worker).some(t=>tileKey(t)===tileKey(worker.tile));}
   employees(building){return (this.register(building)?.workerIds??[]).map(id=>this.scene.workerSystem.workers.get(id)).filter(w=>w?.isAlive&&w.isSubject!==false);}
+  present(building){
+    return this.employees(building).filter(worker=>{
+      if(worker.nextTile||worker.path.length||worker.cargo||worker.leaving||worker.commandState&&worker.commandState.state!=='Working')return false;
+      if(this.atWorkplace(worker))return true;
+      const stableJob=this.scene.stables?.jobs.get(worker.id),horse=stableJob&&this.scene.stables.horse(stableJob.horseId);
+      if(stableJob?.phase==='taming'&&horse?.isAlive&&canInteractAdjacent(this.scene.map,worker,horse))return true;
+      const task=worker.workTask;
+      return ['mineDeposit','chopTree','harvest','mine','mineDrop','collectMeat'].includes(task?.kind)&&this.scene.workerSystem.ai.atGoal(worker,task.goal);
+    });
+  }
+  staffing(building){const spec=buildingDefinition(building).workplace,present=this.present(building).length;return {present,output:staffingOutput(spec,present),missing:Math.max(0,spec.capacity-present),factor:staffingWorkFactor(spec,present)};}
+  workFactor(worker){const home=this.building(worker);return home?this.staffing(home).factor:1;}
+  reconcileDefinitions(){
+    for(const building of this.scene.buildings){
+      const definition=this.scene.objectRegistry.get(building.type);if(!definition?.workplace)continue;
+      building.definition=definition;const record=this.records.get(building.id);if(!record)continue;
+      const excess=this.employees(building).slice(definition.workplace.capacity);record.capacity=definition.workplace.capacity;
+      for(const worker of excess){this.scene.employment?.hold(worker);this.scene.stables?.cancel(worker);this.scene.military?.release(worker);this.remove(worker);}
+      this.changed(building.id);
+    }
+    this.scene.employment?.request();
+  }
   predictedWage(worker,profession){return this.scene.wageSystem.dailyWage({...worker,profession});}
   autoEmploy(building){
     const spec=buildingDefinition(building).workplace,record=this.register(building);if(!spec||!record)return;
@@ -62,7 +85,7 @@ export class WorkplaceSystem {
   }
   summary(building){
     const workers=this.employees(building),record=this.register(building),spec=buildingDefinition(building).workplace;
-    return {count:workers.length,capacity:spec.capacity,wages:workers.reduce((sum,w)=>sum+this.scene.wageSystem.dailyWage(w),0),
+    return {...this.staffing(building),count:workers.length,capacity:spec.capacity,wages:workers.reduce((sum,w)=>sum+this.scene.wageSystem.dailyWage(w),0),
       averageSkill:workers.length?workers.reduce((sum,w)=>sum+w.skills[spec.skill].level,0)/workers.length:0,delivered:record.delivered};
   }
   exportState(){return {records:structuredClone([...this.records.values()])};}

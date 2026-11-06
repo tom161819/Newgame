@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { workerScene,ensureBuildingPrerequisites } from './helpers/workerScene.js';
+import { WORK_RULES } from '../src/data/jobs.js';
 import { calendar,SEASONS,SEASON_GROWTH,WEATHER_GROWTH,WEATHER_PROBABILITIES } from '../src/data/seasons.js';
 import { SeasonSystem } from '../src/systems/SeasonSystem.js';
 import { GameTimeSystem } from '../src/systems/GameTimeSystem.js';
@@ -58,7 +59,7 @@ test('missing meals slow only hungry subjects by twenty percent, lower attractiv
   stock(s,{apple:12});s.foodSystem.update(0);assert.equal(s.foodSystem.hungryCount,0);assert.equal(s.inventory.count('apple'),10);near(s.skillSystem.workEfficiency(w,'mining'),1.01);assert.equal(s.attractiveness.value,100);assert.equal(s.attractiveness.shouldSettle(()=>.99),true);assert.equal(w.isAlive,true);assert.equal(w.profession,'idle');
 });
 test('hungry miners physically take twenty-five percent longer for the same work without changing movement speed or production quantity',()=>{
-  const durations=[];for(const hungry of [false,true]){const s=scene(),quarry=building(s,'quarry',44,45),w=s.workerSystem.create({x:43,y:45});s.workplaceSystem.assign(quarry,w);if(hungry)s.gameTime.update(120000);else stock(s,{apple:20});s.addResource(s.objectRegistry.require('stone'),{x:43,y:46});until(s,()=>w.workTask?.kind==='mine'&&w.workTask.progressMs>0);const start=s.gameTime.totalElapsed,progress=w.workTask.progressMs;until(s,()=>w.cargo?.resource==='stone');durations.push(s.gameTime.totalElapsed-start+progress/(hungry?.8:1));assert.equal(w.cargo.amount,1);assert.equal(w.speed,s.objectRegistry.require('peasant').gameplay.movementSpeed);}
+  const durations=[];for(const hungry of [false,true]){const s=scene(),quarry=building(s,'quarry',44,45),w=s.workerSystem.create({x:43,y:45});s.workplaceSystem.assign(quarry,w);if(hungry)s.gameTime.update(120000);else stock(s,{apple:20});s.addResource(s.objectRegistry.require('stone'),{x:43,y:46});until(s,()=>w.workTask?.kind==='mine'&&w.workTask.progressMs>0);const before=w.workTask.progressMs;s.tick(1000);const rate=(w.workTask.progressMs-before)/1000;near(rate,(hungry?.8:1)*s.workplaceSystem.workFactor(w));const remaining=WORK_RULES.miningDuration-w.workTask.progressMs,start=s.gameTime.totalElapsed;until(s,()=>w.cargo?.resource==='stone');assert.ok(Math.abs(s.gameTime.totalElapsed-start-remaining/rate)<=25);durations.push(WORK_RULES.miningDuration/rate);assert.equal(w.cargo.amount,1);assert.equal(w.speed,s.objectRegistry.require('peasant').gameplay.movementSpeed);}
   near(durations[1]/durations[0],1.25);
 });
 test('food shortage modifies the existing daily settlement decision without another migration loop',()=>{
