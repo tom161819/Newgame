@@ -103,6 +103,16 @@ a { color: var(--accent); }
 .pill.local { color: var(--accent); border-style: dashed; }
 .pill.outdated { color: var(--danger); }
 .pill.game { color: var(--muted); }
+.pill.revision-requested { color: var(--accent); }
+.pill.rejected, .pill.blocked { color: var(--danger); }
+.pill.ingame { color: var(--status-approved); border-style: double; }
+.pills { display: inline-flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.segmented.decisions { flex-wrap: wrap; }
+.review-comment textarea { width: 100%; box-sizing: border-box; }
+.review-error { color: var(--danger); font-size: 12.5px; margin: 4px 0 0; }
+.review-history { font-size: 12.5px; margin: 6px 0; }
+.review-history ol { margin: 4px 0 0; padding-left: 18px; }
+.review-issue { font-size: 12.5px; }
 
 .asset-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 20px; justify-content: space-between; }
 .asset-head h1 { font-size: 28px; }

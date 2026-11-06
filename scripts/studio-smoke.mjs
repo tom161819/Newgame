@@ -64,7 +64,33 @@ try {
   assert.equal(await page.locator('#library-review [data-review="pending"]').getAttribute('aria-pressed'), 'true', 'remembered after reload');
   await page.locator('#library-review [data-review="all"]').click();
   assert.ok(await page.locator('.library-item .pill.game').count() > 0, 'All shows game sprites again');
-  pass(`Needs review lists ${waitingCount} designs waiting for approval, hides approved and In game, remembered after reload`);
+  pass(`Waiting for my review lists ${waitingCount} designs waiting for approval, hides approved and In game, remembered after reload`);
+
+  // #212 review filters: In game lists exactly the designs whose exported version the game uses.
+  await page.locator('#library-review [data-review="ingame"]').click();
+  const live = await page.locator('.library-item .name').allTextContents();
+  assert.ok(live.includes('Mill') && !live.includes('Ruined tower'), `In game lists approved art in use only ${JSON.stringify(live.slice(0, 8))}`);
+  await page.locator('.library-item', { hasText: /^Mill/ }).first().click();
+  assert.ok(await page.locator('.variant-card[data-variant="windmill-tower"] .pill.ingame').count() === 1, 'the Mill variant in use shows In game');
+  assert.equal(await page.locator('.variant-card[data-variant="windmill-post"] .pill.ingame').count(), 0, 'its sibling does not');
+  await page.locator('#library-review [data-review="all"]').click();
+  // Request revision needs a comment; it is stored with the exact version and the design moves to Revision requested.
+  await page.locator('.library-item', { hasText: 'Ruined tower' }).first().click();
+  const ruin = page.locator('.variant-card').first(), ruinId = await ruin.getAttribute('data-variant');
+  await ruin.getByRole('button', { name: 'Request revision' }).click();
+  assert.match(await ruin.locator('.review-error').textContent(), /Write what should change/);
+  await ruin.locator('textarea').fill('Too regular: more missing stones, a broken top edge and rubble at the foot.');
+  await ruin.getByRole('button', { name: 'Request revision' }).click();
+  const ruinRecord = await page.evaluate(id => Object.values(window.assetStudio.local().assets).map(a => a.variants?.[id]).find(Boolean), ruinId);
+  assert.equal(ruinRecord.status, 'revision-requested');assert.deepEqual(ruinRecord.comments.map(c => [c.version, c.text]), [[1, 'Too regular: more missing stones, a broken top edge and rubble at the foot.']]);
+  await page.locator('#library-review [data-review="revision"]').click();
+  assert.ok((await page.locator('.library-item .name').allTextContents()).includes('Ruined tower'), 'Revision requested lists it');
+  await page.locator('.variant-card').first().locator('details.review-history summary').click();
+  assert.match(await page.locator('.variant-card').first().locator('.review-history').textContent(), /v1 comment: “Too regular/);
+  await page.locator('.variant-card').first().getByRole('button', { name: 'Reject' }).click();
+  assert.equal(await page.evaluate(id => Object.values(window.assetStudio.local().assets).map(a => a.variants?.[id]).find(Boolean).status, ruinId), 'rejected');
+  await page.locator('#library-review [data-review="all"]').click();
+  pass('review decisions: In game badge only on art the game uses, Request revision needs a comment stored with the version, history shows it, Reject, filters Revision requested / In game');
 
   await page.locator('.library-item', { hasText: 'Watchtower' }).click();
   await page.waitForFunction(() => document.querySelectorAll('.variant-card canvas').length >= 3);
@@ -102,7 +128,7 @@ try {
 
   await page.getByRole('tab', { name: 'Compare variants' }).click();
   const round = page.locator('.variant-card[data-variant="watchtower-round"]');
-  await round.getByRole('button', { name: 'Approved' }).click();
+  await round.getByRole('button', { name: 'Approve', exact: true }).click();
   // The repository may already prefer another variant, so choose this one explicitly.
   if (!await page.locator('.variant-card[data-variant="watchtower-round"].preferred').count()) await page.locator('.variant-card[data-variant="watchtower-round"] .star').click();
   await page.waitForSelector('.variant-card[data-variant="watchtower-round"].preferred');
@@ -113,7 +139,7 @@ try {
   assert.match(await page.locator('#review-summary').textContent(), /local changes? not in the repository/);
   assert.match(await round.locator('.review-line').first().textContent(), /Repository: not reviewed.*Local: Approved/s);
   await page.reload(); await page.waitForFunction(() => window.assetStudio?.ready);
-  assert.equal(await page.locator('.variant-card[data-variant="watchtower-round"] .segmented.status [aria-pressed="true"]').textContent(), 'Approved');
+  assert.equal(await page.locator('.variant-card[data-variant="watchtower-round"] .segmented.status [aria-pressed="true"]').textContent(), 'Approve');
   pass('approving stores version, spec hash and time locally, survives reload and stays marked as not committed');
 
   await page.getByRole('button', { name: 'Export review' }).click();
