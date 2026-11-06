@@ -6,6 +6,8 @@ import { WearMap, LAB_SIZE, SEASONS, SCENARIOS, History, strokeLine, scenarioMap
 import { PARAMS, PRESETS, RENDERERS, defaultConfig, clampParam } from './params.js';
 import { renderScene, drawOverlay, sceneBounds } from './scene.js';
 import { currentPathRenderer } from './current.js';
+import { createV2Renderer } from './v2.js';
+import { objectRegistry } from '../../../src/systems/ObjectRegistry.js';
 import { tileCenter } from '../../../src/game/isometric.js';
 
 const urls = import.meta.glob('../../../public/assets/terrain/{grass/lush,grass/seasons,path_wear/earth}/*.png', { eager: true, query: '?url', import: 'default' });
@@ -21,7 +23,7 @@ const loadImage = src => new Promise(resolve => { if (!src) return resolve(null)
 const state = { map: scenarioMap('path-to-area'), season: 'Summer', renderer: 'current', preset: 'current', seed: 1, config: defaultConfig(), brush: 2, size: 1, view: { x: 0, y: 0, scale: 1 }, overlays: { grid: false, levels: false, centerline: false }, name: 'Untitled' };
 let history = new History(state.map), images = null, scene = null;
 const offscreen = document.createElement('canvas'), view = $('#lab-view'), ctx = view.getContext('2d');
-const renderers = { current: currentPathRenderer };
+const renderers = { current: currentPathRenderer, v2: (map, { earth }) => createV2Renderer(map, { earth, config: state.config, seed: state.seed, registry: objectRegistry }) };
 const setStatus = text => { $('#lab-status').textContent = text; };
 
 function readLink() {
@@ -32,6 +34,8 @@ function readLink() {
 }
 function link(scenario = null) { const params = new URLSearchParams({ season: state.season, preset: state.preset }); if (scenario) params.set('scenario', scenario); return `${location.href.split('#')[0]}#${params}`; }
 
+let pending = 0;
+function schedule() { if (pending) return; pending = requestAnimationFrame(() => { pending = 0; repaint(); }); }
 function repaint() {
   scene = renderScene(offscreen, { map: state.map, season: state.season, images, renderer: RENDERERS[state.renderer] ? state.renderer : 'current', renderers });
   draw();
@@ -91,21 +95,22 @@ function applyPreset(id, render = true) {
   $('#lab-preset').value = id; $('#lab-preset-note').textContent = preset.renderer !== 'current' && !RENDERERS[preset.renderer] ? `${preset.note} Proposal: its renderer arrives with #116; the map shows Current until then.` : preset.note;
   renderParams(); syncRenderer(); if (render) repaint();
 }
+function markCustom() { state.preset = 'custom'; $('#lab-preset').value = 'custom'; $('#lab-preset-note').textContent = 'Your own V2 settings: save them as a variant or export JSON.'; }
 function syncRenderer() { for (const b of $('#lab-renderer').children) b.setAttribute('aria-pressed', String(b.dataset.value === state.renderer)); }
 function renderParams() {
-  const live = RENDERERS.v2; $('#lab-params-note').textContent = live ? 'Changes repaint the Experimental V2 renderer immediately.' : 'Available with V2 (#116). The controls are ready but disabled: the current renderer has no tunable geometry, and nothing is faked.';
+  const live = RENDERERS.v2; $('#lab-params-note').textContent = live ? (state.renderer === 'v2' ? 'Changes repaint the Experimental V2 renderer immediately; the preset becomes "Custom".' : 'These drive Experimental V2. Switch the renderer to V2 (or pick a V2 preset) to see them; Current (N12) has no tunable geometry.') : 'Available with V2 (#116). The controls are ready but disabled: the current renderer has no tunable geometry, and nothing is faked.';
   const rows = PARAMS.map(p => {
     const row = document.createElement('div'); row.className = `lab-param${live ? '' : ' v2-only'}`; row.title = p.tip;
     const label = document.createElement('label'); label.htmlFor = `lab-p-${p.key}`; label.textContent = p.label; const range = document.createElement('span'); range.className = 'muted'; range.textContent = `${p.min}–${p.max}${p.unit ? ` ${p.unit}` : ''}`; label.append(range);
     const slider = document.createElement('input'); slider.type = 'range'; slider.id = `lab-p-${p.key}`; Object.assign(slider, { min: p.min, max: p.max, step: p.step, value: state.config[p.key], disabled: !live });
     const number = document.createElement('input'); number.type = 'number'; Object.assign(number, { min: p.min, max: p.max, step: p.step, value: state.config[p.key], disabled: !live }); number.setAttribute('aria-label', `${p.label} value`);
     const reset = document.createElement('button'); reset.type = 'button'; reset.className = 'button ghost'; reset.textContent = '↺'; reset.title = `Reset to ${p.default}`; reset.disabled = !live;
-    const set = value => { state.config[p.key] = clampParam(p.key, value); slider.value = number.value = state.config[p.key]; if (live) repaint(); };
+    const set = value => { state.config[p.key] = clampParam(p.key, value); slider.value = number.value = state.config[p.key]; if (state.preset !== 'custom' && state.renderer === 'v2') markCustom(); if (live && state.renderer === 'v2') schedule(); };
     slider.addEventListener('input', () => set(slider.value)); number.addEventListener('change', () => set(number.value)); reset.addEventListener('click', () => set(p.default));
     row.append(label, slider, number, reset); return row;
   });
   const seed = document.createElement('div'); seed.className = `lab-param${live ? '' : ' v2-only'}`; seed.innerHTML = '<label for="lab-seed">Seed <span class="muted">integer</span></label>';
-  const seedInput = document.createElement('input'); seedInput.type = 'number'; seedInput.id = 'lab-seed'; seedInput.step = 1; seedInput.value = state.seed; seedInput.disabled = !live; seedInput.addEventListener('change', () => { state.seed = Math.trunc(Number(seedInput.value)) || 1; if (live) repaint(); });
+  const seedInput = document.createElement('input'); seedInput.type = 'number'; seedInput.id = 'lab-seed'; seedInput.step = 1; seedInput.value = state.seed; seedInput.disabled = !live; seedInput.addEventListener('change', () => { state.seed = Math.trunc(Number(seedInput.value)) || 1; if (live && state.renderer === 'v2') repaint(); });
   seed.append(seedInput); $('#lab-params').replaceChildren(...rows, seed); $('#lab-reset-params').disabled = !live;
 }
 
@@ -131,7 +136,7 @@ function segmentedAll() {
   segmented($('#lab-brush'), BRUSHES, () => state.brush, id => { state.brush = id; });
   segmented($('#lab-size'), SIZES.map(s => ({ id: s, label: `${s}×${s}` })), () => state.size, id => { state.size = id; });
   segmented($('#lab-season'), SEASONS.map(s => ({ id: s, label: s })), () => state.season, id => { state.season = id; repaint(); });
-  segmented($('#lab-renderer'), [{ id: 'current', label: 'Current (N12)' }, { id: 'v2', label: 'Experimental V2', disabled: !RENDERERS.v2, title: 'Available with V2 (#116)' }], () => state.renderer, id => { state.renderer = id; repaint(); });
+  segmented($('#lab-renderer'), [{ id: 'current', label: 'Current (N12)' }, { id: 'v2', label: 'Experimental V2', disabled: !RENDERERS.v2, title: 'Available with V2 (#116)' }], () => state.renderer, id => { state.renderer = id; renderParams(); repaint(); });
 }
 
 function bindPanels() {

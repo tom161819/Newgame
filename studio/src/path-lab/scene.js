@@ -29,7 +29,9 @@ export function renderScene(canvas, { map, season = 'Summer', images, renderer =
     context.restore(); cells.push({ x, y, point });
   }
   // Tracks second, so a neighbour's ground overlap never covers a track's edge (as in the game).
-  if (paths) for (const { x, y, point } of cells) { context.save(); diamond(point, TILE_BLEED); context.clip(); paths.drawPaths(context, x, y, bounds.left, bounds.top, veil, () => { diamond(point); context.clip(); }); context.restore(); }
+  // A renderer may paint the whole scene in one pass (V2) instead of tile by tile (N12).
+  if (paths?.drawScene) paths.drawScene(context, bounds, veil);
+  else if (paths) for (const { x, y, point } of cells) { context.save(); diamond(point, TILE_BLEED); context.clip(); paths.drawPaths(context, x, y, bounds.left, bounds.top, veil, () => { diamond(point); context.clip(); }); context.restore(); }
   return { bounds, paths };
 }
 
@@ -38,7 +40,12 @@ export function drawOverlay(context, { map, bounds, paths, grid = false, levels 
   context.save(); context.lineWidth = 1 / scale;
   if (grid) { context.strokeStyle = 'rgba(255,255,255,.22)'; for (let y = 0; y < map.size; y++) for (let x = 0; x < map.size; x++) { const p = tileCenter({ x, y }); context.beginPath(); context.moveTo(p.x - bounds.left - 32, p.y - bounds.top); context.lineTo(p.x - bounds.left, p.y - bounds.top - 16); context.lineTo(p.x - bounds.left + 32, p.y - bounds.top); context.lineTo(p.x - bounds.left, p.y - bounds.top + 16); context.closePath(); context.stroke(); } }
   if (levels) { context.font = `${10 / scale}px system-ui`; context.textAlign = 'center'; context.textBaseline = 'middle'; for (let y = 0; y < map.size; y++) for (let x = 0; x < map.size; x++) { const level = map.get(x, y); if (!level) continue; const p = tileCenter({ x, y }); context.fillStyle = ['', '#fff6', '#ffd54acc', '#ff7a45'][level]; context.fillText(String(level), p.x - bounds.left, p.y - bounds.top); } }
-  if (centerline && paths?.pathElements) {
+  if (centerline && paths?.debugGeometry) {
+    const { lines, discs, tiles = [] } = paths.debugGeometry();
+    context.strokeStyle = '#38d6ff'; for (const line of lines) { context.beginPath(); line.forEach((p, i) => i ? context.lineTo(p.x - bounds.left, p.y / 2 - bounds.top) : context.moveTo(p.x - bounds.left, p.y / 2 - bounds.top)); context.stroke(); }
+    context.strokeStyle = '#ff5ad1'; for (const t of tiles) { context.beginPath(); context.moveTo(t.x - t.half - bounds.left, t.y / 2 - bounds.top); context.lineTo(t.x - bounds.left, (t.y - t.half) / 2 - bounds.top); context.lineTo(t.x + t.half - bounds.left, t.y / 2 - bounds.top); context.lineTo(t.x - bounds.left, (t.y + t.half) / 2 - bounds.top); context.closePath(); context.stroke(); }
+    for (const d of discs) { context.beginPath(); context.ellipse(d.x - bounds.left, d.y / 2 - bounds.top, d.r, d.r / 2, 0, 0, Math.PI * 2); context.stroke(); }
+  } else if (centerline && paths?.pathElements) {
     const seen = new Set();
     for (let y = 0; y < map.size; y++) for (let x = 0; x < map.size; x++) {
       if (!map.get(x, y)) continue; const { links, areas, nodes } = paths.pathElements(x, y);

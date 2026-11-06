@@ -186,8 +186,14 @@ try {
     await lab.waitForFunction(() => window.pathLab?.ready);
     const start = await lab.evaluate(() => ({ worn: window.pathLab.painted(), season: window.pathLab.state.season, size: window.pathLab.sceneSize() }));
     assert.equal(start.worn, 12, 'deep link loads the straight scenario');assert.equal(start.season, 'Winter');assert.ok(start.size[0] > 1000);
-    assert.equal(await lab.locator('#lab-renderer button[data-value="v2"]').isDisabled(), true, 'V2 is shown as not yet available');
-    assert.equal(await lab.locator('#lab-p-meanderStrength').isDisabled(), true);assert.match(await lab.locator('#lab-params-note').textContent(), /Available with V2/);
+    // #116 Experimental V2: enabled, different from N12 on the same map, sliders repaint it, a change makes the preset Custom.
+    const probe = () => lab.evaluate(() => { const c = document.querySelector('#lab-view'), d = c.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, c.width, c.height).data; let h = 0; for (let i = 0; i < d.length; i += 64) h = (h * 31 + d[i] + d[i + 1] * 7) >>> 0; return h; });
+    await lab.locator('#lab-scenarios [data-scenario="path-to-area"]').click();const n12 = await probe();
+    await lab.locator('#lab-preset').selectOption('organic');await lab.waitForTimeout(400);const organic = await probe();assert.notEqual(organic, n12, 'V2 Organic differs from N12');
+    assert.equal(await lab.evaluate(() => window.pathLab.state.renderer), 'v2');assert.equal(await lab.locator('#lab-p-meanderStrength').isDisabled(), false);
+    await lab.locator('#lab-p-areaExpansion').fill('1');await lab.locator('#lab-p-areaExpansion').dispatchEvent('input');await lab.waitForTimeout(400);
+    assert.notEqual(await probe(), organic, 'a slider repaints V2');assert.equal(await lab.evaluate(() => window.pathLab.state.preset), 'custom');
+    await lab.locator('#lab-renderer button[data-value="current"]').click();await lab.waitForTimeout(300);assert.equal(await probe(), n12, 'Current is unchanged and comes back exactly');
     // Real pointer painting on the canvas, then undo.
     const box = await lab.locator('#lab-view').boundingBox();await lab.locator('#lab-scenarios [data-scenario="corner"]').click();
     const before = await lab.evaluate(() => window.pathLab.painted());
@@ -204,7 +210,7 @@ try {
     if (process.env.PATH_LAB_SHOT) { await lab.locator('#lab-centerline').check(); await lab.screenshot({ path: process.env.PATH_LAB_SHOT }); }
     assert.deepEqual(labErrors, []);await lab.close();
   }
-  pass('Path Lab: N12 reference renders the editable map, deep-linked scenario and season, real painting with undo/redo, V2 honestly disabled, JSON export/import validation, saved variant');
+  pass('Path Lab: N12 reference renders the editable map, deep-linked scenario and season, Experimental V2 differs and repaints from its sliders (preset → Custom), real painting with undo/redo, JSON export/import validation, saved variant');
 
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 } });
   for (const path of ['index.html#watchtower', 'index.html#style-guide', 'phaser-demo.html', 'path-lab.html']) {
