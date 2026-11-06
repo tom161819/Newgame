@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "id": "smelter-operator",
+  "name": "Smelter Operator",
+  "category": "units",
+  "description": "Runs the bloomery: soot-brown wool, a red kerchief against the heat, a long leather apron and tongs holding a bloom. Today the game dresses Smelter Operators as Miners. Concept for review (#92); the game keeps its current look until one is approved.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "plannedProfession": "smelter_operator",
+  "variants": [
+    {
+      "id": "smelter-operator-male",
+      "name": "Smelter Operator (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_brown",
+        "legs": "cloth_grey",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_red",
+        "hair": "hair_dark",
+        "beard": true,
+        "apron": "leather",
+        "tool": "tongs",
+        "skin": "skin_tan",
+        "build": 1.1
+      }
+    },
+    {
+      "id": "smelter-operator-female",
+      "name": "Smelter Operator (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_brown",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_red",
+        "hair": "hair_auburn",
+        "apron": "leather",
+        "tool": "tongs",
+        "skin": "skin_tan"
+      }
+    }
+  ]
+}

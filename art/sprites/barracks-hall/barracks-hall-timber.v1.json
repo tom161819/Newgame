@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "barracks-hall",
+  "variantId": "barracks-hall-timber",
+  "name": "Timber hall with training yard",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "cbb65133",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 159,
+  "anchor": {
+    "x": 97,
+    "y": 109
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.68553
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 157
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98742
+  },
+  "visualHeight": 157,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.19,
+  "lights": []
+}
