@@ -1,7 +1,7 @@
 import './styles.css';
 import { loadStudioData } from './data.js';
 import { buildCatalog, filterCatalog, CATEGORIES } from './lib/specs.js';
-import { STATUSES, STATUS_LABELS, readLocal, writeLocal, reviewState, reviewSummary, updateLocal, discardLocal, buildExportManifest, pendingChanges } from './lib/approvals.js';
+import { BASIC_STATUSES, STATUS_LABELS, readLocal, writeLocal, reviewState, reviewSummary, updateLocal, discardLocal, buildExportManifest, pendingChanges } from './lib/approvals.js';
 import { TIMES, timePreset } from './lib/lighting.js';
 import { heightInPixels, projectPoint } from './lib/projection.js';
 import { renderModel, spriteMetadata, rendererAvailable } from './render/spriteRenderer.js';
@@ -196,7 +196,7 @@ function variantCard(asset, variant) {
   const canvas = h('canvas', { class: 'variant-canvas', 'data-variant': variant.id, role: 'img', 'aria-label': `${variant.name} rendered at ${state.zoom}× on ${state.background}` });
   canvas._paint = () => paintVariant(canvas, asset, variant);
   const statusButtons = h('div', { class: 'segmented status', role: 'group', 'aria-label': `Status of ${variant.name}` },
-    STATUSES.map(status => h('button', { type: 'button', 'data-status': status, 'aria-pressed': String(review.effective.status === status), onclick: () => changeReview(asset, variant, { status }) }, STATUS_LABELS[status])));
+    BASIC_STATUSES.map(status => h('button', { type: 'button', 'data-status': status, 'aria-pressed': String(review.effective.status === status), onclick: () => changeReview(asset, variant, { status }) }, STATUS_LABELS[status])));
   const note = h('textarea', { id: `note-${variant.id}`, placeholder: 'Review note (optional)', 'aria-label': `Note for ${variant.name}`, onchange: event => changeReview(asset, variant, { note: event.target.value }) });
   note.value = review.effective.note ?? '';
   const repoLabel = review.committed ? `Repository: ${STATUS_LABELS[review.repoStatus]} v${review.committed.version}` : 'Repository: not reviewed';
