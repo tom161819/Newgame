@@ -1,3 +1,4 @@
+import { demolitionSmoke } from './demolition-smoke.mjs';
 import { stockpileCleanupSmoke } from './stockpile-cleanup-smoke.mjs';
 import { repeatPlacementSmoke } from './repeat-placement-smoke.mjs';
 import { farmerEstablishmentSmoke } from './farmer-establishment-smoke.mjs';
@@ -134,6 +135,7 @@ try{
   if(args.includes('--full')||args.includes('--workplace-output'))await workplaceOutputSmoke(page);
   if(args.includes('--full')||args.includes('--granary-capacity'))await granaryCapacitySmoke(page);
   if(args.includes('--full')||args.includes('--farmer-establishment'))await farmerEstablishmentSmoke(page);
+  if(args.includes('--full')||args.includes('--demolition'))await demolitionSmoke(page,{screenshot:args.includes('--demolition-shot')?'/tmp/newgame-demolition-confirm.png':null});
   if(args.includes('--full')||args.includes('--stockpile-cleanup'))await stockpileCleanupSmoke(page);
   if(args.includes('--full')||args.includes('--repeat-placement'))await repeatPlacementSmoke(page);
   if(args.includes('--full')||args.includes('--farm-plots'))await farmPlotsSmoke(page);

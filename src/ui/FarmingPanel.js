@@ -10,7 +10,7 @@ export class FarmingPanel {
     this.dialog.addEventListener('cancel',event=>{event.preventDefault();this.close();},options);
     this.dialog.addEventListener('close',()=>this.restoreInput(),options);
   }
-  open(building){this.building=building;this.restored=false;this.scene.setGalleryInput(false);this.dialog.showModal();this.refresh();}
+  open(building){this.building=building;this.restored=false;this.scene.setGalleryInput(false);this.dialog.showModal();this.scene.demolitionUI?.attach(this.dialog,building);this.refresh();}
   refresh(){
     if(!this.dialog.open||!this.building)return;
     const scene=this.scene,building=this.building;if(!scene.buildings.includes(building)||!scene.fog.isVisibleObject(building)){this.close();return;}

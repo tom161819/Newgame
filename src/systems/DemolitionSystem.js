@@ -1,3 +1,4 @@
+import { dataName } from '../i18n/names.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { CONSTRUCTION_RULES } from '../data/construction.js';
 import { advanceConstruction } from './ConstructionProgress.js';
@@ -42,7 +43,7 @@ export class DemolitionSystem {
       for(const workerId of [...record.assignedBuilders]){
         const actor=system.actor(workerId),assignment=system.assignments.get(workerId);
         if(!this.canWork(site,actor)){if(actor)this.scene.workerSystem.ai.cancel(actor);continue;}
-        if(assignment&&system.atSite(actor,assignment)){actor.workState='Working';actor.workMessage=`Dismantling ${buildingDefinition(building).name}`;participants.push({id:workerId,speed:system.workSpeed(site,actor),available:Math.min(delta,actor.availableWorkMs??0)});}
+        if(assignment&&system.atSite(actor,assignment)){actor.workState='Working';actor.workMessage=`Dismantling ${dataName(buildingDefinition(building))}`;participants.push({id:workerId,speed:system.workSpeed(site,actor),available:Math.min(delta,actor.availableWorkMs??0)});}
       }
       if(record.workDone>=record.requiredWork||advanceConstruction(site,participants,delta)){
         this.releaseWorkers(id);

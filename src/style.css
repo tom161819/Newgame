@@ -504,3 +504,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .minimap { position:absolute; right:12px; bottom:10px; z-index:9; width:212px; height:106px; cursor:pointer; filter:drop-shadow(0 2px 6px #000a); touch-action:none; }
 .minimap canvas { position:absolute; left:50%; top:50%; width:150px; height:150px; margin:-75px 0 0 -75px; transform:scaleY(.5) rotate(45deg); image-rendering:pixelated; border:1px solid #b99a53; }
 @media(max-width:760px){ .minimap { transform:scale(.7); transform-origin:100% 100%; } }
+
+.building-inspect-button{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.demolition-actions{margin-top:1rem;padding-top:1rem;border-top:1px solid #a9987255}
+.demolition-actions progress{display:block;width:100%;margin:.5rem 0}
+.demolition-actions progress[hidden]{display:none}

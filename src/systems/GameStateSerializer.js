@@ -366,7 +366,7 @@ export function validateGameState(input,registry=objectRegistry){
     integer(s.counters?.[key],1);
     for(const object of objects){const match=String(object.id).match(new RegExp(`^${prefix}-(\\d+)$`));check(match&&Number(match[1])>0&&Number(match[1])<s.counters[key]);}
   }
-  const dropKeys=s.drops.map(d=>`${d.resource}:${d.tile.x},${d.tile.y}`);check(new Set(dropKeys).size===dropKeys.length);
+  const dropKeys=s.drops.map(d=>`${d.resource}:${d.siteId??'free'}:${d.tile.x},${d.tile.y}`);check(new Set(dropKeys).size===dropKeys.length);
   if(s.experienceSystem!==undefined){
     const e=s.experienceSystem;check(e);integer(e.nextEventId,1);array(e.processedEventIds,1000000);check(new Set(e.processedEventIds).size===e.processedEventIds.length);
     for(const id of e.processedEventIds){check(typeof id==='string'&&id.length>0&&id.length<=128);const match=id.match(/^activity-(\d+)$/);if(match)integer(Number(match[1]),1,e.nextEventId-1);}
@@ -391,9 +391,9 @@ export function validateGameState(input,registry=objectRegistry){
     const riders=new Set();for(const h of st.horses){const keys=Object.keys(h).sort().join(),a=animals.get(h.id);check(a?.type==='horse'&&a.isAlive&&!seen.has(h.id));
       if(h.state==='stabled')check(keys==='id,stableId,state'&&!a.mounted&&stables.has(h.stableId));
       // Horse Wagon: reserved for a Wheelwright's batch (still in its paddock), or harnessed to its wagon (out of the Stables).
-      else if(h.workshopId!=null){check(h.state==='reserved'&&keys==='id,stableId,state,workshopId'&&!a.mounted&&s.foodProduction?.records.some(r=>r.buildingId===h.workshopId&&(r.cycle?.horseId===h.id||(s.foodStorage.locations.find(l=>l.id===`output-${h.workshopId}`)?.stock.horse_wagon??0)>0)));}
+      else if(h.workshopId!=null){check(h.state==='reserved'&&keys==='id,stableId,state,workshopId'&&!a.mounted&&(h.stableId===null||stables.has(h.stableId))&&s.foodProduction?.records.some(r=>r.buildingId===h.workshopId&&(r.cycle?.horseId===h.id||(s.foodStorage.locations.find(l=>l.id===`output-${h.workshopId}`)?.stock.horse_wagon??0)>0)));}
       else if(h.state==='harnessed'){check(keys==='id,state,vehicleId'&&!a.mounted&&(s.vehicles?.vehicles??[]).some(v=>v.id===h.vehicleId&&v.type==='horse_wagon'&&v.horseId===h.id));seen.add(h.id);continue;}
-      else{check(['reserved','ridden'].includes(h.state)&&keys==='id,riderId,stableId,state'&&!riders.has(h.riderId)&&s.workers.some(w=>w.id===h.riderId&&w.isAlive));riders.add(h.riderId);check(!a.mounted);}seen.add(h.id);count.set(h.stableId,(count.get(h.stableId)??0)+1);}
+      else{check(['reserved','ridden'].includes(h.state)&&keys==='id,riderId,stableId,state'&&!riders.has(h.riderId)&&s.workers.some(w=>w.id===h.riderId&&w.isAlive));riders.add(h.riderId);check(!a.mounted&&(h.stableId===null||stables.has(h.stableId)));}seen.add(h.id);if(h.stableId!==null)count.set(h.stableId,(count.get(h.stableId)??0)+1);}
     const workers=new Map(s.workers.map(w=>[w.id,w]));for(const j of st.jobs){check(j&&Object.keys(j).sort().join()==='horseId,phase,progress,stableId,workerId'&&['approach','taming','leading'].includes(j.phase)&&workers.get(j.workerId)?.isAlive&&workers.get(j.workerId).profession==='stablehand'&&animals.get(j.horseId)?.type==='horse'&&!seen.has(j.horseId)&&stables.has(j.stableId));number(j.progress,0,1e9);seen.add(j.horseId);count.set(j.stableId,(count.get(j.stableId)??0)+1);}
     for(const [id,n]of count)check(n<=registry.require('stables').horseCapacity);check(st.ridden==null||animals.get(st.ridden)?.mounted===true);}
   // S12 vehicles: unique ids on open ground; an operator is one living Hauler at most once; modes are known.

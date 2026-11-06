@@ -19,7 +19,7 @@ export class StoragePanel {
     this.dialog.addEventListener('cancel',event=>{event.preventDefault();this.close();},options);
     this.dialog.addEventListener('close',()=>{if(!document.querySelector('dialog[open]'))scene.setGalleryInput(true);},options);
   }
-  open(building=null,locationId=null){this.building=building;this.locationId=locationId;this.signature=null;this.breakdownOpen=false;this.confirmingStockpile=false;this.scene.setGalleryInput(false);this.dialog.showModal();this.refresh();}
+  open(building=null,locationId=null){this.building=building;this.locationId=locationId;this.signature=null;this.breakdownOpen=false;this.confirmingStockpile=false;this.scene.setGalleryInput(false);this.dialog.showModal();this.scene.demolitionUI?.attach(this.dialog,building);this.refresh();}
   breakdown(rows){
     const details=element('details','resource-breakdown'),summary=element('summary','',t('storage.breakdown'));details.open=this.breakdownOpen;details.append(summary);details.addEventListener('toggle',()=>{this.breakdownOpen=details.open;});
     details.append(element('p','',t('storage.breakdownNote')));

@@ -7,6 +7,8 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ### Added
 
+- Finished buildings can be dismantled by Builders after confirmation, with physical work, cancellation and current Save/Load. Completion leaves half their construction materials on the ground, rounded down, and preserves stored goods, production inputs and transport ownership. The Castle is protected; empty Starter Stockpiles keep their separate action.
+
 - After a Warehouse is built, the empty Starter Stockpile can be dismantled with confirmation once every reservation and transport has finished. Haulers use their existing routes to clear available goods; food waits safely for a Granary. The cleared footprint leaves worn ground that recovers naturally.
 
 - Saving and loading keeps provisional construction orders on unexplored land without revealing it.
