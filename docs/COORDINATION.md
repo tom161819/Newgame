@@ -35,6 +35,8 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 
 ## Done
 
+- 2026-11-06 Smoke fixture: `placeBlueprint` retries with a fresh free site when a unit steps onto the chosen footprint before the click (Pages run 42181480904 for PR169 timed out in horse-wagon after stables; game refused the occupied site correctly).
+
 - 2026-11-06 [#161](https://github.com/tom161819/Newgame/pull/161) #149 (Claude): Studio ruins designs (soot/charred wood palette) for review.
 
 - 2026-11-06 [#168](https://github.com/tom161819/Newgame/pull/168) #127 (Claude): Asset Studio "Needs review" filter. Merged df27e00.

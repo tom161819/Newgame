@@ -76,8 +76,22 @@ export async function clickBuilding(page,id){
     throw Error(`No exposed clickable surface for building ${id}.`);
   },id);await clickWorld(page,point);
 }
+// A villager or animal can step onto the chosen free footprint between choosing it and the real click; then the game
+// rightly refuses the blueprint. Choose a fresh site and click again instead of waiting for a placement that never comes.
 export async function placeBlueprint(page,type){
-  const point=await page.evaluate(type=>{
+  const placed=()=>page.evaluate(type=>window.__game.registry.get('application').scene.buildings.filter(b=>b.type===type&&b.construction?.state==='planned').length,type);
+  const before=await placed();let point;
+  for(let attempt=0;attempt<4;attempt++){
+    point=await chooseBlueprintSite(page,type);
+    if(attempt===0||!await page.evaluate(type=>{const s=window.__game.registry.get('application').scene;return !!s.buildMode&&s.selectedBuilding?.id===type;},type)){await page.locator('#buildings-tab').click();await page.locator('[data-building-category="all"]').click();await page.locator(`#${type}-choice`).click();}
+    await clickWorld(page,point,{forBlueprint:true});
+    try{await page.waitForFunction(({type,before})=>window.__game.registry.get('application').scene.buildings.filter(b=>b.type===type&&b.construction?.state==='planned').length>before,{type,before},{timeout:8000});break;}
+    catch(error){if(attempt===3)throw new Error(`${type} blueprint not placed after 4 sites; status: ${await page.locator('#status').textContent()}`);}
+  }
+  const id=await page.evaluate(type=>window.__game.registry.get('application').scene.buildings.filter(b=>b.type===type&&b.construction?.state==='planned').at(-1).id,type);return {id,point};
+}
+async function chooseBlueprintSite(page,type){
+  return page.evaluate(type=>{
     const s=window.__game.registry.get('application').scene,d=s.objectRegistry.require(type),occupied=new Set(s.reservedTiles().map(t=>`${t.x},${t.y}`)),start=s.character.tile;
     for(let y=35;y<70;y++)for(let x=35;x<70;x++){
       const distance=Math.hypot(x-start.x,y-start.y);if(distance<5||distance>10)continue;const tiles=[];for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++)tiles.push({x:x+dx,y:y+dy});
@@ -85,9 +99,6 @@ export async function placeBlueprint(page,type){
       return {x:s.map.length*32+(x-y)*32,y:128+(x+y+1)*16};
     }throw Error(`No free ${type} blueprint site.`);
   },type);
-  await page.locator('#buildings-tab').click();await page.locator('[data-building-category="all"]').click();await page.locator(`#${type}-choice`).click();await clickWorld(page,point,{forBlueprint:true});
-  await page.waitForFunction(type=>window.__game.registry.get('application').scene.buildings.some(b=>b.type===type&&b.construction?.state==='planned'),type);
-  const id=await page.evaluate(type=>window.__game.registry.get('application').scene.buildings.filter(b=>b.type===type&&b.construction?.state==='planned').at(-1).id,type);return {id,point};
 }
 export async function supplyAndBuild(page,{id,point}){
   // There is no Deliver Materials button: Build with King first carries the missing materials, then builds.
