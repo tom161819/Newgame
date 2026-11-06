@@ -4,7 +4,8 @@ import { tileCenter, worldToGrid, gridToWorld } from './isometric.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { PATH_WEAR } from '../data/pathWear.js';
 import { canStep } from './pathfinding.js';
-import { VISIBILITY, FOG_STYLE, memoryTint } from '../systems/FogOfWarSystem.js';
+import { VISIBILITY, FOG_STYLE } from '../systems/FogOfWarSystem.js';
+import { memoryTexture } from './memoryTexture.js';
 import { MEMORY_DIRECTIONS } from '../systems/MapMemory.js';
 
 const CHUNK_SIZE = 10;
@@ -227,6 +228,12 @@ export class TerrainRenderer {
     }
   }
 
+  // Remembered rocks use the same muted memory copy as other remembered objects; visible rocks the original art.
+  paintWall(wall,state,fog){
+    let key=this.wallTexture;
+    if(state===VISIBILITY.EXPLORED){const texture=this.scene.textures.get(this.wallTexture);key=memoryTexture(this.scene,texture,texture.get(),fog.memoryBrightness)??key;}
+    if(wall.texture.key!==key)wall.setTexture(key);
+  }
   updateFog(camera,fog) {
     const mode=`${fog?.enabled}:${fog?.explorationEnabled}`;
     if(mode!==this.fogMode){
@@ -275,7 +282,7 @@ export class TerrainRenderer {
     if (cacheKey === this.lastView && fog && this.outcropFogRevision!==fog.revision) {
       const fresh=this.outcropFogRevision===fog.revision-1;this.outcropFogRevision=fog.revision;
       if(fresh)for(const index of [...fog.added,...fog.removed]){const x=index%fog.width,y=Math.floor(index/fog.width),key=`${x},${y}`;if(!this.tileData({x,y})[0])continue;
-        const tile=this.tiles.get(key);if(!tile){if(fog.added.includes(index)){this.lastView='';break;}continue;}tile.setTint(fog.displayState({x,y})===VISIBILITY.EXPLORED?memoryTint(fog.memoryBrightness):0xffffff);}
+        const tile=this.tiles.get(key);if(!tile){if(fog.added.includes(index)){this.lastView='';break;}continue;}this.paintWall(tile,fog.displayState({x,y}),fog);}
       else this.lastView='';
     }
     if (cacheKey === this.lastView) {this.repaintDirty();return;}
@@ -306,9 +313,9 @@ export class TerrainRenderer {
       if(!this.tileData({x,y})[0]||state===VISIBILITY.UNEXPLORED)continue;
       if(fog?.enabled&&!fog.isInSightTile({x,y})&&!fog.explored[y*fog.width+x])continue;
       const key=`${x},${y}`; visible.add(key);
-      if(this.tiles.has(key)){this.tiles.get(key).setTint(state===VISIBILITY.EXPLORED?memoryTint(fog.memoryBrightness):0xffffff);continue;}
+      if(this.tiles.has(key)){this.paintWall(this.tiles.get(key),state,fog);continue;}
       const wall=this.wallPool.pop()??this.scene.add.image(0,0,this.wallTexture).setOrigin(this.outcrop.origin?.x??0.5,this.outcrop.origin?.y??1);
-      wall.setPosition(p.x,p.y).setDepth(p.y+(this.outcrop.depth?.offset??0)).setTint(state===VISIBILITY.EXPLORED?memoryTint(fog.memoryBrightness):0xffffff).setVisible(true);
+      wall.setPosition(p.x,p.y).setDepth(p.y+(this.outcrop.depth?.offset??0)).setVisible(true);this.paintWall(wall,state,fog);
       this.tiles.set(key,wall);
     }
     for(const [key,tile] of this.tiles) if(!visible.has(key)) {

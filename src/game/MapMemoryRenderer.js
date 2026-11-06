@@ -2,6 +2,7 @@ import { gridToWorld } from './isometric.js';
 import { buildingTiles } from './buildings.js';
 import { ConstructionView } from './ConstructionView.js';
 import { FOG_STYLE } from '../systems/FogOfWarSystem.js';
+import { memoryTexture } from './memoryTexture.js';
 
 export function memoryColor(color,brightness=FOG_STYLE.brightness){
   const r=(color>>>16)&255,g=(color>>>8)&255,b=color&255,luminance=.2126*r+.7152*g+.0722*b;
@@ -24,13 +25,8 @@ function frozenAppearance(scene,view,repaint,brightness=FOG_STYLE.brightness){
   repaint?.();
   parts(view,part=>{
     if(!['Image','Sprite'].includes(part.type))return;
-    part.anims?.stop();const frame=part.frame,key=`memory-texture:${brightness}:${part.texture.key}:${frame.name}`;
-    if(!scene.textures.exists(key)){
-      const texture=scene.textures.createCanvas(key,frame.cutWidth,frame.cutHeight),context=texture.getContext();
-      context.filter=`grayscale(${(1-FOG_STYLE.saturation)*100}%) brightness(${brightness*100}%)`;
-      context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,0,0,frame.cutWidth,frame.cutHeight);texture.refresh();
-    }
-    part.setTexture(key);
+    part.anims?.stop();const key=memoryTexture(scene,part.texture,part.frame,brightness);
+    if(key)part.setTexture(key);
   });
 }
 
