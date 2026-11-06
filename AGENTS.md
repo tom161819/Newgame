@@ -96,7 +96,7 @@ These rules supersede the earlier "do not turn every commit into a release" and 
 6. **Versions advance one step from `main`**: no skipped, repeated or lower numbers. If `main` released the same number meanwhile, merge `main` into your branch and prepare the next number.
 7. **Change record in every pull request** that touches anything outside `docs/`: `docs/changes/<issue>-<slug>.md` from `docs/changes/TEMPLATE.md`, about 5–20 sentences. Sections: What and why; Files and systems; Implementation decisions; Save/Load impact; Testing; Notes for the next agent. Do not write records retroactively for old work.
 8. **Gate:** `npm run version:check` (CI step "Version and change-record policy" in `pr-quality.yml`) enforces rules 3–7 against `main`. It only reports until `main` contains the first release written under these rules; from then on it blocks.
-9. **Tags and archives:** after merging a release, push the tag `v<version>` for the merge commit and confirm the Pages deployment. Only milestone releases (`--milestone`, M1–M5) also get an immutable playable archive snapshot via the release gate. Historical tags, releases and archives are never renamed or rewritten.
+9. **Tags and archives:** the *Tag released version* workflow (`.github/workflows/tag-release.yml`) tags `v<version>` on the first `main` commit that carries the version (the release PR's merge) after every push to `main`; agents' sessions cannot push tags. Confirm the tag and the Pages deployment. Only milestone releases (`--milestone`, M1–M5) also get an immutable playable archive snapshot via the release gate. Historical tags, releases and archives are never renamed or rewritten.
 
 # Alpha save policy
 
