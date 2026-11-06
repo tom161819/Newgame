@@ -4,6 +4,9 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+
+## [0.8.1] - 2026-11-06
+<!-- version: {"title":"Turning mill sails","type":"feature","reconstructed":false,"saveVersion":36} -->
 ### Added
 - The Mill's sails now turn while a Miller is grinding and slow to a stop when no one is. They stop while the game is paused and follow the game speed. The Mill keeps its approved look; only the sails move.
 
