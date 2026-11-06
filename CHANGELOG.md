@@ -7,6 +7,9 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ### Added
 
+- Unemployed residents and idle Haulers gather at reachable Castle meeting points without crowding entrances or standing on paved roads. Haulers keep accepting global deliveries while walking there, and use safe nearby waiting when no Castle is reachable.
+- New workers keep an unemployed appearance until physically reaching their workplace. Global Haulers change at their Castle meeting point or first real task, and Builders at their work site. Reassignment, manual commands and Save/Load keep the appearance consistent.
+
 - Finished buildings can be dismantled by Builders after confirmation, with physical work, cancellation and current Save/Load. Completion leaves half their construction materials on the ground, rounded down, and preserves stored goods, production inputs and transport ownership. The Castle is protected; empty Starter Stockpiles keep their separate action.
 
 - After a Warehouse is built, the empty Starter Stockpile can be dismantled with confirmation once every reservation and transport has finished. Haulers use their existing routes to clear available goods; food waits safely for a Granary. The cleared footprint leaves worn ground that recovers naturally.

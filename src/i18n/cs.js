@@ -224,4 +224,8 @@ export default {
   'demolition.unavailable':'Tuto budovu nelze nyní rozebrat.',
   'work.dismantling':'Rozebírá {name}',
   'ledger.Demolition Refund':'Vráceno při rozebrání',
+  'work.message.Waiting near Castle':'Čeká u hradu',
+  'work.message.Waiting near workplace':'Čeká u pracoviště',
+  'work.message.Walking to workplace':'Jde k pracovišti',
+  'work.message.Walking nearby':'Prochází se poblíž',
 };

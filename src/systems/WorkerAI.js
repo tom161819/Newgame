@@ -8,6 +8,7 @@ import { WORKPLACE_RULES } from '../data/workplaces.js';
 export class WorkerAI {
   constructor(system){this.system=system;this.scene=system.scene;}
   cancel(worker){
+    this.system.gather?.release(worker);
     this.scene.naturalResources?.releaseWorker(worker);
     this.scene.foodProduction?.cancelWorker(worker);
     this.scene.farmingSystem?.release(worker);
@@ -51,7 +52,11 @@ export class WorkerAI {
     else if(worker.profession==='farmer'&&this.scene.farmingSystem)this.scene.farmingSystem.updateWorker(worker,delta);
     else if(job.workplace&&this.scene.workplaceSystem?.building(worker)?.definition.recipe&&this.scene.foodProduction)this.scene.foodProduction.updateWorker(worker);
     else if(worker.profession==='stablehand'&&this.scene.stables){this.scene.stables.updateWorker(worker,delta);}
-    else if(worker.profession==='hauler'&&this.scene.logisticsTasks){if(!this.scene.vehicles?.updateHauler(worker))this.scene.logisticsTasks.updateHauler(worker,delta);}
+    else if(worker.profession==='hauler'&&this.scene.logisticsTasks){
+      const fetching=this.scene.vehicles?.updateHauler(worker);
+      if(!fetching)this.scene.logisticsTasks.updateHauler(worker,delta);
+      if(fetching||worker.workTask||worker.cargo)this.system.gather?.release(worker,{stop:!!fetching});else this.system.gather?.update(worker);
+    }
     else if(worker.profession==='builder'){
       // Budovy jsou dosud okamžité. Staveniště dodá až skutečný construction provider.
       worker.workState='Waiting';worker.workMessage='Waiting for construction';
@@ -82,8 +87,9 @@ export class WorkerAI {
     if(worker.aiCooldown<=0){worker.aiCooldown=WORK_RULES.searchInterval;worker.moveTo(this.system.homeGoals());}
   }
   idle(worker){
-    worker.workState='Idle';worker.workMessage='Unemployed';if(worker.nextTile||worker.path.length||worker.aiCooldown>0)return;
-    worker.aiCooldown=2500+Math.random()*3000;const origin=this.origin(worker),r=POPULATION.wanderRadius;
+    worker.workState='Idle';worker.workMessage='Unemployed';
+    if(this.system.gather){this.system.gather.update(worker);return;}if(worker.nextTile||worker.path.length||worker.aiCooldown>0)return;
+    worker.aiCooldown=2500+Math.random()*3000;const origin=worker.tile,r=2;
     const tile={x:Math.round(origin.x)+Math.floor(Math.random()*(r*2+1))-r,y:Math.round(origin.y)+Math.floor(Math.random()*(r*2+1))-r};
     if(this.scene.map[tile.y]?.[tile.x]===0)worker.moveTo([tile]);
   }

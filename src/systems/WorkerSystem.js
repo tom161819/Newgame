@@ -1,3 +1,5 @@
+import { IdleGathering } from './IdleGathering.js';
+import { syncWorkerUniform } from '../data/idleGathering.js';
 import { UnitCommands } from './UnitCommands.js';
 import { WorkerController } from '../game/WorkerController.js';
 import { tileCenter,PLAYER_START } from '../game/map.js';
@@ -14,8 +16,8 @@ const names=['Matěj','Anna','Jakub','Eliška','Pavel','Marie','Jan','Tereza','O
 export class WorkerSystem {
   constructor(scene,{onChange=()=>{}}={}){
     this.scene=scene;this.onChange=onChange;this.workers=new Map();this.nextId=1;this.lastMigrationDay=scene.gameTime.day;this.listeners=new Set();
-    this.reservations=new TaskReservationSystem();this.ai=new WorkerAI(this);this.commands=new UnitCommands(this);this.jobs=new JobSystem(this);
-    this.unsubscribe=scene.gameTime.onNewDay(day=>this.onNewDay(day));this.buildingsChanged=()=>this.updateUI();scene.events?.on?.('buildings:changed',this.buildingsChanged);
+    this.reservations=new TaskReservationSystem();this.ai=new WorkerAI(this);this.commands=new UnitCommands(this);this.jobs=new JobSystem(this);this.gather=new IdleGathering(this);
+    this.unsubscribe=scene.gameTime.onNewDay(day=>this.onNewDay(day));this.buildingsChanged=()=>{this.gather.doorsKey=null;this.updateUI();};scene.events?.on?.('buildings:changed',this.buildingsChanged);
   }
   liveWorkers(){return [...this.workers.values()].filter(w=>w.isAlive);}
   liveSubjects(){return this.liveWorkers().filter(w=>w.isSubject!==false);}
@@ -74,12 +76,12 @@ export class WorkerSystem {
     }
     this.updateUI();
   }
-  update(delta){for(const worker of this.liveWorkers())if(worker.isSubject!==false)this.ai.update(worker,delta);else worker.update(delta);}
+  update(delta){for(const worker of this.liveWorkers())if(worker.isSubject!==false){this.ai.update(worker,delta);syncWorkerUniform(this.scene,worker);}else worker.update(delta);}
   onDeath(worker){this.scene.military?.release(worker,{dead:true});this.scene.vehicles?.release(worker);worker.commandState={state:'Working',goal:null};worker.diedAt??=this.scene.gameTime.totalElapsed;this.scene.workplaceSystem?.detach(worker);this.ai.cancel(worker);worker.active=false;worker.path=[];worker.nextTile=null;worker.walking=false;worker.workState='Dead';worker.workMessage='';worker.arriving=false;worker.view.destroy();this.scene.combatFeedback.remove(worker.id);this.updateUI();}
   // Resident capacity: the base settlement plus every completed House.
   capacity(){return POPULATION.maximum+(this.scene.buildings??[]).reduce((n,b)=>n+(buildingIsComplete(b)?this.scene.objectRegistry?.get(b.type)?.housing?.capacity??0:0),0);}
   updateUI(){const count=this.liveSubjects().length,maximum=this.capacity();this.onChange(count,maximum);for(const listener of this.listeners)listener(count,maximum);}
   exportState(){return {nextId:this.nextId,lastMigrationDay:this.lastMigrationDay};}
   importState(data){this.nextId=data?.nextId??1;this.lastMigrationDay=data?.lastMigrationDay??this.scene.gameTime.day;this.updateUI();}
-  destroy(){this.unsubscribe();this.scene.events?.off?.('buildings:changed',this.buildingsChanged);this.jobs.destroy();this.listeners.clear();this.reservations.clear();for(const worker of this.workers.values())worker.view.destroy();this.workers.clear();}
+  destroy(){this.unsubscribe();this.scene.events?.off?.('buildings:changed',this.buildingsChanged);this.gather.clear();this.jobs.destroy();this.listeners.clear();this.reservations.clear();for(const worker of this.workers.values())worker.view.destroy();this.workers.clear();}
 }
