@@ -19,7 +19,7 @@ Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeat
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| #101 stone pickup "flicker" = top bar reflow when the King's cargo controls appear | Claude | `claude/stone-pickup-flicker` | — | In review | style.css (#king-cargo-* desktop slot), GameScene cargo status title, scripts/hud-cargo-smoke.mjs + browser-smoke flag |
+| S13 #58 phase D part 1: need tooltips (Safety factors), 100-resident performance test | Claude | `claude/needs-panel-detail` | — | In review | NeedsSystem.safetyDetail, NeedsDisplay tooltips, i18n `needs.tip.*`/`needs.safety.*`, tests/needs.test.js, needs smoke |
 | NEW07 #124 Castle gathering + arrival uniforms | Codex | `codex/castle-idle-gathering` (stacked on183) | [#185](https://github.com/tom161819/Newgame/pull/185) | Integrated Needs/event-feed main; release0.7.0/schema35;741 tests/version/changelog/build PASS, combined native PASS;183 actual0.6.0 Pages verified;193 morale main integrated, renewed exact-head checks pending | derived idle policy, WorkerAI/WorkerSystem/BuilderAI/ConstructionSystem/JobSystem/WorkplaceSystem/UnitCommands, HumanView approved outfit selection, alpha serializer/loader if needed, own tests/native/i18n/docs |
 
 ## Codex queue (developer: Codex always has several issues queued)
@@ -40,6 +40,7 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 
 ## Done
 
+- 2026-11-06 Claude: #101 steady top bar on stone pickup ([#195](https://github.com/tom161819/Newgame/pull/195), release 0.7.1).
 - 2026-11-06 Claude: S13 #58 phase C part 1, mood work speed and Happiness in attractiveness ([#193](https://github.com/tom161819/Newgame/pull/193), release 0.6.1).
 - 2026-11-06 PR183 / Issue130: release0.6.0/schema34, mergedabc12a11534967e7d0e393c0356c52a668758716 after CI42227943052 SUCCESS.733 tests/version/changelog/build and integrated native demolition/Needs/feed/stockpile/rightclick PASS. Actual Pages42228504161 build127928224031/deploy127941021369 SUCCESS; annotated tagv0.6.0 resolves to exactabc12a1. Issue130 closed/done;124 already in review185.
 - 2026-11-06 Claude: #105 event feed and bottom-right corner column ([#192](https://github.com/tom161819/Newgame/pull/192), release 0.5.1).
