@@ -5,6 +5,8 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-06
+<!-- version: {"title":"M3: Stone pavement, wheelwright, wagons, stables and housing","type":"milestone","reconstructed":false,"saveVersion":32} -->
 ### Added
 
 - After a Warehouse is built, the empty Starter Stockpile can be dismantled with confirmation once every reservation and transport has finished. Haulers use their existing routes to clear available goods; food waits safely for a Granary. The cleared footprint leaves worn ground that recovers naturally.
