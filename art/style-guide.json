@@ -126,7 +126,9 @@
     "steel_dark": "#5f666b",
     "gold_trim": "#c4a24a",
     "banner_blue": "#2f4d7a",
-    "coals": "#c4472a"
+    "coals": "#c4472a",
+    "soot": "#2e2925",
+    "charcoal": "#3d3129"
   },
   "materials": {
     "stone": {
@@ -492,7 +494,9 @@
       "repeat": 1,
       "variation": 0.2,
       "description": "Glowing forge coals (lit by a runtime light)."
-    }
+    },
+    "soot": { "color": "soot", "texture": "noise", "repeat": 1, "variation": 0.18, "description": "Soot on burnt walls and ash on the floor (matte, never glowing)." },
+    "charred_wood": { "color": "charcoal", "texture": "planks", "repeat": 0.8, "variation": 0.16, "description": "Charred beams and posts after a fire." }
   },
   "light": {
     "sun": {

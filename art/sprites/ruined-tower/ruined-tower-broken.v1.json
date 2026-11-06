@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "ruined-tower",
+  "variantId": "ruined-tower-broken",
+  "name": "Broken tower",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "fd4f1983",
+  "generator": "ruins",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 134,
+  "height": 171,
+  "anchor": {
+    "x": 65,
+    "y": 137
+  },
+  "origin": {
+    "x": 0.48507,
+    "y": 0.80117
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 169
+  },
+  "baseOrigin": {
+    "x": 0.48507,
+    "y": 0.9883
+  },
+  "visualHeight": 169,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 3,
+  "lights": []
+}

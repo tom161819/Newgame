@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-04T21:55:58.391Z",
+  "updatedAt": "2026-11-06T03:00:00.000Z",
   "note": "Committed review state for Asset Studio. Export it from the studio and commit it through a pull request; the studio never writes to GitHub.",
   "assets": {
     "watchtower": {
@@ -1030,6 +1030,150 @@
           "note": "",
           "updatedAt": "2026-11-04T21:55:46.774Z",
           "approvedAt": "2026-11-04T21:55:46.774Z"
+        }
+      }
+    },
+    "ruined-tower": {
+      "preferred": "ruined-tower-stump",
+      "variants": {
+        "ruined-tower-stump": {
+          "status": "review",
+          "version": 1,
+          "specHash": "1c180699",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        },
+        "ruined-tower-broken": {
+          "status": "review",
+          "version": 1,
+          "specHash": "fd4f1983",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        },
+        "ruined-tower-overgrown": {
+          "status": "review",
+          "version": 1,
+          "specHash": "23fd6aff",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        },
+        "ruined-tower-winter": {
+          "status": "review",
+          "version": 1,
+          "specHash": "1595d210",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        }
+      }
+    },
+    "ruined-wall": {
+      "preferred": "ruined-wall-breach",
+      "variants": {
+        "ruined-wall-breach": {
+          "status": "review",
+          "version": 1,
+          "specHash": "5243090c",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        },
+        "ruined-wall-low": {
+          "status": "review",
+          "version": 1,
+          "specHash": "5572cd99",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        },
+        "ruined-wall-crumbling": {
+          "status": "review",
+          "version": 1,
+          "specHash": "89b4afa7",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        },
+        "ruined-wall-overgrown": {
+          "status": "review",
+          "version": 1,
+          "specHash": "56eaff49",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        }
+      }
+    },
+    "ruin-foundations": {
+      "preferred": "ruin-foundations-house",
+      "variants": {
+        "ruin-foundations-house": {
+          "status": "review",
+          "version": 1,
+          "specHash": "4e3a7c84",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        },
+        "ruin-foundations-hall": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8c393f73",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        },
+        "ruin-foundations-traces": {
+          "status": "review",
+          "version": 1,
+          "specHash": "64745f56",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        }
+      }
+    },
+    "burnt-building": {
+      "preferred": "burnt-building-timber",
+      "variants": {
+        "burnt-building-timber": {
+          "status": "review",
+          "version": 1,
+          "specHash": "9c7c3339",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        },
+        "burnt-building-stone": {
+          "status": "review",
+          "version": 1,
+          "specHash": "0aa0b3ad",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        },
+        "burnt-building-collapsed": {
+          "status": "review",
+          "version": 1,
+          "specHash": "45ac407d",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        }
+      }
+    },
+    "scattered-stones": {
+      "preferred": "scattered-stones-heap",
+      "variants": {
+        "scattered-stones-heap": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8edb4c3c",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        },
+        "scattered-stones-spread": {
+          "status": "review",
+          "version": 1,
+          "specHash": "7cd3f5d8",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
+        },
+        "scattered-stones-grass": {
+          "status": "review",
+          "version": 1,
+          "specHash": "6f0ac52e",
+          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
+          "updatedAt": "2026-11-06T03:00:00.000Z"
         }
       }
     }

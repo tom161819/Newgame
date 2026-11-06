@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "id": "ruin-foundations",
+  "name": "Ruin foundations",
+  "category": "decorations",
+  "description": "Foundations and outer walls of a lost building, no roof, overgrown with grass. Concept for review (#149): map decoration, random starting ruins, or what demolition (#130) or a battle leaves behind. No game mechanics yet.",
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "generator": "ruins",
+  "variants": [
+    {
+      "id": "ruin-foundations-house",
+      "name": "House outline",
+      "version": 1,
+      "notes": "Knee-high walls of a small house and its inner wall.",
+      "spec": {
+        "kind": "foundation",
+        "seed": 3,
+        "height": 0.7,
+        "collapse": 0.55,
+        "overgrown": true
+      }
+    },
+    {
+      "id": "ruin-foundations-hall",
+      "name": "Hall walls",
+      "version": 1,
+      "notes": "Taller walls of a larger hall, partly standing.",
+      "spec": {
+        "kind": "foundation",
+        "seed": 9,
+        "height": 1.2,
+        "collapse": 0.45,
+        "overgrown": true
+      }
+    },
+    {
+      "id": "ruin-foundations-traces",
+      "name": "Faint traces",
+      "version": 1,
+      "notes": "Almost gone: low stones in the grass.",
+      "spec": {
+        "kind": "foundation",
+        "seed": 17,
+        "height": 0.35,
+        "collapse": 0.8,
+        "overgrown": true
+      }
+    }
+  ]
+}
