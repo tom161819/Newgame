@@ -484,3 +484,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .pavement-modes[hidden]{display:none}
 .pavement-modes button{padding:.2rem .55rem;border-radius:5px;border:1px solid rgba(120,90,50,.55);background:rgba(40,32,20,.55);color:inherit;cursor:pointer}
 .pavement-modes button[aria-checked="true"]{background:#c9a75b;color:#241a0b;font-weight:600}
+/* #104: minimap in the bottom-right corner, the square grid turned into the isometric diamond. */
+.minimap { position:absolute; right:12px; bottom:10px; z-index:9; width:212px; height:106px; cursor:pointer; filter:drop-shadow(0 2px 6px #000a); touch-action:none; }
+.minimap canvas { position:absolute; left:50%; top:50%; width:150px; height:150px; margin:-75px 0 0 -75px; transform:scaleY(.5) rotate(45deg); image-rendering:pixelated; border:1px solid #b99a53; }
+@media(max-width:760px){ .minimap { transform:scale(.7); transform-origin:100% 100%; } }

@@ -46,6 +46,8 @@ export default {
   'work.state.Holding':'Drží pozici','work.state.MovingToHold':'Přesun na určenou pozici',
   "command.title": "Příkazy jednotek",
   "command.selected": "Vybráno: {count} · Pravým tlačítkem přesunout a držet pozici",
+  "minimap.label": "Minimapa prozkoumané krajiny",
+  "minimap.hint": "Minimapa: šedá je neprozkoumané území, tlumené barvy jsou zapamatované. Kliknutím tam přesunete kameru.",
   "command.hold": "Držet pozici zde",
   "command.resume": "Pokračovat v původní práci",
   "command.inspect": "Podrobnosti jednotky",
