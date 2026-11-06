@@ -16,6 +16,7 @@
     "changelog:validate": "node scripts/validate-changelog.mjs",
     "release:prepare": "node scripts/prepare-release.mjs",
     "versions:validate": "node scripts/validate-version-catalog.mjs",
+    "version:check": "node scripts/version-policy.mjs",
     "smoke": "node scripts/browser-smoke.mjs",
     "release:gate": "node scripts/release-gate.mjs check",
     "release:verify": "node scripts/release-gate.mjs verify",

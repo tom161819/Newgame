@@ -1,4 +1,4 @@
-import { compareVersions, versionParts } from '../data/semver.js';
+import { compareVersions, versionParts, displayVersion } from '../data/semver.js';
 import { CHANGELOG_CATEGORIES } from '../data/changelogCategories.js';
 import { t } from '../i18n/index.js';
 
@@ -21,8 +21,9 @@ export class ChangelogPanel {
     this.seen = initial.seen;
     if (stored !== this.seen) this.persistSeen();
     this.badge.hidden = !initial.isNew;
-    for (const label of document.querySelectorAll('[data-game-version]')) label.textContent = `v${version}`;
-    document.title = `Medieval Kingdom · v${version}`;
+    // #174: shown as MAJOR.MINOR.PATCH with two-digit MINOR and PATCH; the canonical value stays in data attributes.
+    for (const label of document.querySelectorAll('[data-game-version]')) { label.textContent = `v${displayVersion(version)}`; label.dataset.canonicalVersion = version; }
+    document.title = `Medieval Kingdom · v${displayVersion(version)}`;
     this.releases=catalog?.versions??releases;this.render(this.releases);
     this.button.addEventListener('click', () => this.open());
     document.querySelector('#changelog-back').addEventListener('click', () => this.close());
@@ -44,9 +45,10 @@ export class ChangelogPanel {
     const entries = releases.map(release => {
       const entry = element('details', '', 'changelog-release');
       entry.dataset.release = release.version;
-      const summary=element('summary'),heading = element('h3', `v${release.version}${release.title?` — ${release.title}`:''} `), date = element('time', release.date);
+      const summary=element('summary'),heading = element('h3', `v${displayVersion(release.version)}${release.title?` — ${release.title}`:''} `), date = element('time', release.date);
       date.dateTime = release.date; heading.append(date);summary.append(heading);entry.append(summary);
       if(release.historical)entry.append(element('p',t('changelog.reconstructed'),'archive-version-label'));
+      if(release.saveImpact)entry.append(element('p',t(`changelog.save.${release.saveImpact}`,{schema:release.saveVersion}),'changelog-save-impact'));
       if(release.available&&release.archiveURL){const play=element('a',t('changelog.playArchived'),'archive-play');play.href=release.archiveURL;play.target='_blank';play.rel='noopener noreferrer';entry.append(play);}
       for (const key of Object.keys(CHANGELOG_CATEGORIES)) {
         const changes = release.changes[key];

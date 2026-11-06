@@ -39,6 +39,12 @@ jobs:
           npm run changelog:validate
           npm run versions:validate
 
+      # #174: SAVE_VERSION change -> MINOR/MAJOR; game change -> next version with a dated release; change record in docs/changes.
+      # The checkout is the pull request merge commit, so HEAD^1 is the current main.
+      - name: Version and change-record policy
+        if: github.event_name == 'pull_request'
+        run: node scripts/version-policy.mjs --base=HEAD^1
+
       - name: Test current game systems and Asset Studio data
         run: npm test
 

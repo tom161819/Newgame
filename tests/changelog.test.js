@@ -41,14 +41,22 @@ test('NEW tracks only upgrades; first launch, invalid local data, same version a
 test('release CLI prepares only local files and failure leaves all authoritative files unchanged',async()=>{
   const root=await mkdtemp(path.join(tmpdir(),'newgame-release-test-')),project=fileURLToPath(new URL('../',import.meta.url));
   try{
-    for(const dir of ['scripts','src/data'])await mkdir(path.join(root,dir),{recursive:true});
+    for(const dir of ['scripts','src/data','src/systems'])await mkdir(path.join(root,dir),{recursive:true});
+    await writeFile(path.join(root,'src/systems/GameStateSerializer.js'),'export const SAVE_VERSION=7;\n');
     for(const file of ['scripts/changelog-lib.mjs','scripts/prepare-release.mjs','src/data/semver.js','src/data/changelogCategories.js'])await cp(path.join(project,file),path.join(root,file));
     const pkg={type:'module',version:'0.2.0'},lock={version:'0.2.0',packages:{'':{version:'0.2.0'}}};
     await writeFile(path.join(root,'package.json'),JSON.stringify(pkg));await writeFile(path.join(root,'package-lock.json'),JSON.stringify(lock));await writeFile(path.join(root,'CHANGELOG.md'),history);
     const output=execFileSync(process.execPath,['scripts/prepare-release.mjs','minor','--date','2026-11-03'],{cwd:root,encoding:'utf8'});assert.match(output,/Prepared v0.3.0 locally/);const {data}=await readRelease(root);assert.equal(data.version,'0.3.0');assert.equal(data.releases.length,3);
+    assert.deepEqual(data.releases[0].metadata,{title:'A completed development change hidden from players.',type:'feature',reconstructed:false,saveVersion:7},'#174: every release records its title, kind and save schema');
     const before=await Promise.all(['package.json','package-lock.json','CHANGELOG.md'].map(f=>readFile(path.join(root,f),'utf8')));
     assert.throws(()=>execFileSync(process.execPath,['scripts/prepare-release.mjs','patch','--date','2026-11-03'],{cwd:root,stdio:'pipe'}));
     assert.deepEqual(await Promise.all(['package.json','package-lock.json','CHANGELOG.md'].map(f=>readFile(path.join(root,f),'utf8'))),before);
+    // #174: once a release recorded its schema, a changed SAVE_VERSION cannot ship as a patch.
+    await writeFile(path.join(root,'CHANGELOG.md'),before[2].replace('## [Unreleased]\n','## [Unreleased]\n\n### Fixed\n- A later fix.\n'));await writeFile(path.join(root,'src/systems/GameStateSerializer.js'),'export const SAVE_VERSION=8;\n');
+    assert.throws(()=>execFileSync(process.execPath,['scripts/prepare-release.mjs','patch','--date','2026-11-03'],{cwd:root,stdio:'pipe'}),/minor or major/);
+    assert.match(execFileSync(process.execPath,['scripts/prepare-release.mjs','minor','--date','2026-11-03','--title','Schema 8'],{cwd:root,encoding:'utf8'}),/Prepared v0.4.0/);
+    const schema=(await readRelease(root)).data.releases[0];assert.deepEqual([schema.version,schema.metadata.saveVersion,schema.metadata.title,schema.metadata.type],['0.4.0',8,'Schema 8','fix']);
+    await writeFile(path.join(root,'package.json'),before[0]);await writeFile(path.join(root,'package-lock.json'),before[1]);await writeFile(path.join(root,'CHANGELOG.md'),before[2]);
     const broken=JSON.parse(before[1]);broken.packages[''].version='0.1.0';await writeFile(path.join(root,'package-lock.json'),JSON.stringify(broken));await assert.rejects(()=>readRelease(root),/do not match/);
   }finally{await rm(root,{recursive:true,force:true});}
 });
