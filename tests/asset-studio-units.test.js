@@ -10,7 +10,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const json = file => JSON.parse(readFileSync(path.join(root, file), 'utf8'));
 const style = json('art/style-guide.json');
 const units = readdirSync(path.join(root, 'art/assets/units')).map(id => json(`art/assets/units/${id}/asset.json`)).filter(a => a.generator === 'figure' && !a.id.startsWith('military-'));
-const PROFESSIONS = ['villager', 'woodcutter', 'miner', 'hunter', 'builder', 'farmer', 'miller', 'baker', 'hauler', 'soldier'];
+const PROFESSIONS = ['villager', 'woodcutter', 'miner', 'hunter', 'builder', 'farmer', 'miller', 'baker', 'hauler', 'soldier', 'smelter-operator', 'swordsmith-worker', 'armorer-worker', 'bowyer-worker', 'wheelwright', 'stablehand']; // the last six: #92 concepts
 
 test('every profession has a man and a woman, at human scale inside one tile', () => {
   assert.deepEqual(units.map(u => u.id).sort(), [...PROFESSIONS].sort());
