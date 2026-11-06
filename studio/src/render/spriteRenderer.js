@@ -174,13 +174,29 @@ export function renderModel(model, { style, footprint, scale = 1 }) {
       front.width = crop.width; front.height = crop.height;
       front.getContext('2d').drawImage(gl.domElement, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
     }
+    // #99 rotor: the same frame rendered without the rotor parts (still) and with only them (rotor, occluded by the
+    // rest exactly as in the full sprite), plus the pivot in sprite pixels, so the game can turn the sails alone.
+    let still = null, rotor = null, rotorPivot = null;
+    if (model.primitives.some(part => part.layer === 'rotor')) {
+      const capture = () => { const c = document.createElement('canvas'); c.width = crop.width; c.height = crop.height; c.getContext('2d').drawImage(gl.domElement, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height); return c; };
+      const rotorMeshes = [];built.group.traverse(mesh => { if (mesh.isMesh && mesh.userData.layer === 'rotor') rotorMeshes.push(mesh); });
+      for (const mesh of rotorMeshes) mesh.visible = false;
+      gl.render(built.scene, camera);still = capture();
+      for (const mesh of rotorMeshes) mesh.visible = true;
+      const restore = [];
+      built.group.traverse(mesh => { if (mesh.isMesh && mesh.userData.layer !== 'rotor') { restore.push([mesh, mesh.material]); mesh.material = depthOnly; } });
+      built.ground.visible = false;gl.render(built.scene, camera);rotor = capture();
+      for (const [mesh, mat] of restore) mesh.material = mat;
+      built.ground.visible = true;
+      if (model.rotor?.at) { const p = projectPoint(model.rotor.at, scale); rotorPivot = { x: +(anchor.x + p.x).toFixed(2), y: +(anchor.y + p.y).toFixed(2) }; }
+    }
     const platformPoint = model.platform ? projectPoint(model.platform, scale) : null;
     const platform = platformPoint ? { x: anchor.x + platformPoint.x, y: anchor.y + platformPoint.y } : null;
     const lights = (model.lights ?? []).map(light => {
       const p = projectPoint(light.at, scale);
       return resolveLight(style, light, { x: anchor.x + p.x, y: anchor.y + p.y }, scale);
     });
-    return { canvas: out, front, width: out.width, height: out.height, anchor, platform, lights, scale, footprint, modelHeight: model.height };
+    return { canvas: out, front, still, rotor, rotorPivot, width: out.width, height: out.height, anchor, platform, lights, scale, footprint, modelHeight: model.height };
   } finally { dispose(built); }
 }
 
@@ -227,6 +243,8 @@ export function spriteMetadata({ asset, variant, style, sprite, generator }) {
     visualHeight: round(base.y),
     platform: sprite.platform ? { x: round(sprite.platform.x - base.x), y: round(sprite.platform.y - base.y) } : null,
     frontLayer: !!sprite.front,
+    // #99: still body + turning rotor; pivot in sprite pixels (same image size and anchor as the full sprite).
+    ...(sprite.rotor ? { rotor: { pivot: sprite.rotorPivot, gamePivot: sprite.rotorPivot ? { x: round(sprite.rotorPivot.x - base.x), y: round(sprite.rotorPivot.y - base.y) } : null } } : {}),
     gameLights: sprite.lights.map(l => ({ type: l.type, x: round(l.x - base.x), y: round(l.y - base.y), color: l.color, radius: round(l.radius), intensity: l.intensity, flicker: l.flicker, flameSize: l.flameSize })),
     modelHeight: +sprite.modelHeight.toFixed(3),
     lights: sprite.lights.map(l => ({ type: l.type, x: +l.x.toFixed(2), y: +l.y.toFixed(2), color: l.color, radius: +l.radius.toFixed(2), intensity: l.intensity, flicker: l.flicker, flameSize: l.flameSize })),

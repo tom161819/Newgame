@@ -7,6 +7,7 @@ import { NeedsSystem } from '../systems/NeedsSystem.js';
 import { blockingDialog } from '../ui/dockedPanels.js';
 import { Minimap } from '../ui/Minimap.js';
 import { EventFeed } from '../ui/EventFeed.js';
+import { MillSails } from './MillSails.js';
 import { KingCargoControl } from '../ui/KingCargoControl.js';
 import { UnitSelection } from '../ui/UnitSelection.js';
 import { t } from '../i18n/index.js';
@@ -261,7 +262,7 @@ export class GameScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-H',onDismount);this.updateMountUI();
     this.combatFeedback.refresh();
     this.input.mouse.disableContextMenu();
-    this.unitSelection=new UnitSelection(this);this.rockMiningTool=new RockMiningTool(this);this.minimap=new Minimap(this);this.eventFeed=new EventFeed(this);
+    this.unitSelection=new UnitSelection(this);this.rockMiningTool=new RockMiningTool(this);this.minimap=new Minimap(this);this.eventFeed=new EventFeed(this);this.millSails=new MillSails(this);
     // #121: a right click on the map first closes open panels (and does nothing else); otherwise it commands as before.
     const sidePanels=()=>[this.settingsPanel,this.populationSidebar];
     installPanelDismiss(document,{panels:sidePanels,signal:this.controls.signal});
@@ -271,7 +272,7 @@ export class GameScene extends Phaser.Scene {
     this.input.on('pointermove',pointer=>{this.rockMiningTool.move(pointer);this.unitSelection.move(pointer);this.updateHover(pointer);if(this.buildMode&&!this.assetGallery.isOpen){if(!this.dragAnchor)this.wallLastLine=null;this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
     this.input.on('gameout',()=>{this.rockMiningTool.cancelDrag();this.unitSelection.cancelDrag();this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;this.clearWallPreviews();document.querySelector('#object-tooltip').hidden=true;});
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
-      this.rockMiningTool.destroy();this.unitSelection.destroy();this.minimap?.destroy();this.eventFeed?.destroy();this.kingCargoControl.destroy();this.kingLogistics.destroy();this.lightSources.destroy();
+      this.rockMiningTool.destroy();this.unitSelection.destroy();this.minimap?.destroy();this.eventFeed?.destroy();this.millSails?.destroy();this.kingCargoControl.destroy();this.kingLogistics.destroy();this.lightSources.destroy();
       this.memoryRenderer.destroy();
       this.populationSidebar.destroy();
       this.staffingIndicators.destroy();
@@ -628,7 +629,7 @@ export class GameScene extends Phaser.Scene {
     // změnit uloženou animaci, rozpracovanou AI ani příkazy jednotek.
     if(!delta){this.refreshVisibility();return;}
     // Časové úseky uzavírají mzdy před novou prací, změnou skillu nebo úmrtím tohoto snímku.
-    const activeDelta=this.gameTime.update(delta);this.updateTimeDisplay();
+    const activeDelta=this.gameTime.update(delta);this.updateTimeDisplay();this.millSails?.update(activeDelta);
     this.character.update(delta);this.naturalResources.updateKing(delta);this.player.animate(delta,this.character.walking&&[PLAYER_STATE.GROUND,PLAYER_STATE.ON_WALL].includes(this.character.state),this.character.direction);
     this.kingLogistics.update(delta);
     this.logisticsTasks.update();

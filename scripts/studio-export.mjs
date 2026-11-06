@@ -33,6 +33,7 @@ try {
     for (const [i, tile] of result.tiles.entries()) await writeFile(path.join(root, result.paths.spriteTiles[i]), Buffer.from(tile.replace(/^data:image\/png;base64,/, ''), 'base64'));
     if (result.sheet) await writeFile(path.join(root, result.paths.spriteSheet), Buffer.from(result.sheet.replace(/^data:image\/png;base64,/, ''), 'base64'));
     if (result.front) await writeFile(path.join(root, result.paths.spriteFront), Buffer.from(result.front.replace(/^data:image\/png;base64,/, ''), 'base64'));
+    for (const layer of ['still', 'rotor']) if (result[layer]) await writeFile(path.join(root, result.paths[`sprite${layer[0].toUpperCase()}${layer.slice(1)}`]), Buffer.from(result[layer].replace(/^data:image\/png;base64,/, ''), 'base64'));
     console.log(`Exported ${result.paths.sprite} (${result.meta.width}×${result.meta.height}, hash ${result.meta.specHash})`);
   }
 } finally {
