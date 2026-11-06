@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "ruined-wall",
+  "variantId": "ruined-wall-low",
+  "name": "Low remains",
+  "category": "decorations",
+  "version": 2,
+  "specHash": "1ec78c97",
+  "generator": "ruins",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 99,
+  "height": 61,
+  "anchor": {
+    "x": 49,
+    "y": 35
+  },
+  "origin": {
+    "x": 0.49495,
+    "y": 0.57377
+  },
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "base": {
+    "x": 65,
+    "y": 59
+  },
+  "baseOrigin": {
+    "x": 0.65657,
+    "y": 0.96721
+  },
+  "visualHeight": 59,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.525,
+  "lights": []
+}

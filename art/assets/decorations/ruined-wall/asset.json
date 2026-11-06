@@ -3,7 +3,7 @@
   "id": "ruined-wall",
   "name": "Broken wall",
   "category": "decorations",
-  "description": "Collapsed segments of the stone wall, same thickness and line as the wall kit, with breaches and fallen blocks. Concept for review (#149): map decoration, random starting ruins, or what demolition (#130) or a battle leaves behind. No game mechanics yet.",
+  "description": "Collapsed run of the stone wall in rough rubble masonry: irregular stones, a ragged broken top, breaches, fallen heaps and overgrowth. Concept for review (#149): map decoration, random starting ruins, or what demolition (#130) or a battle leaves behind. No game mechanics yet.",
   "footprint": {
     "width": 2,
     "height": 1
@@ -13,48 +13,274 @@
     {
       "id": "ruined-wall-breach",
       "name": "Breach",
-      "version": 1,
-      "notes": "Full-height wall broken through in the middle.",
+      "version": 2,
+      "notes": "Two stubs of a full-height wall with a V-shaped breach full of rubble; the left side stands higher.",
       "spec": {
-        "kind": "wall",
+        "kind": "stonewall",
         "seed": 5,
-        "collapse": 0.55
+        "profile": [
+          [
+            0,
+            0.7
+          ],
+          [
+            0.1,
+            0.82
+          ],
+          [
+            0.22,
+            0.74
+          ],
+          [
+            0.33,
+            0.5
+          ],
+          [
+            0.43,
+            0.12
+          ],
+          [
+            0.52,
+            0.02
+          ],
+          [
+            0.6,
+            0.2
+          ],
+          [
+            0.7,
+            0.52
+          ],
+          [
+            0.84,
+            0.62
+          ],
+          [
+            1,
+            0.48
+          ]
+        ],
+        "ragged": 0.55,
+        "holes": 0.05,
+        "heaps": [
+          [
+            0.51,
+            1,
+            "through"
+          ],
+          [
+            0.33,
+            0.45
+          ],
+          [
+            0.84,
+            0.35
+          ]
+        ],
+        "green": 0.3
       }
     },
     {
       "id": "ruined-wall-low",
       "name": "Low remains",
-      "version": 1,
-      "notes": "Only the lower courses remain.",
+      "version": 2,
+      "notes": "Foundations rather than a wall: one to three broken courses, gaps to the ground and a lot of scattered rubble.",
       "spec": {
-        "kind": "wall",
+        "kind": "stonewall",
         "seed": 8,
-        "height": 0.8,
-        "collapse": 0.7
+        "height": 0.9,
+        "profile": [
+          [
+            0,
+            0.5
+          ],
+          [
+            0.12,
+            0.38
+          ],
+          [
+            0.24,
+            0.06
+          ],
+          [
+            0.33,
+            0.42
+          ],
+          [
+            0.5,
+            0.3
+          ],
+          [
+            0.62,
+            0.36
+          ],
+          [
+            0.72,
+            0.0
+          ],
+          [
+            0.8,
+            0.18
+          ],
+          [
+            1,
+            0.46
+          ]
+        ],
+        "ragged": 0.7,
+        "holes": 0.08,
+        "heaps": [
+          [
+            0.26,
+            0.7,
+            "through"
+          ],
+          [
+            0.72,
+            0.8,
+            "through"
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.95,
+            0.35
+          ]
+        ],
+        "green": 0.55,
+        "bushes": 1
       }
     },
     {
       "id": "ruined-wall-crumbling",
       "name": "Crumbling wall",
-      "version": 1,
-      "notes": "Uneven top, a little damage, a few loose blocks.",
+      "version": 2,
+      "notes": "Tallest piece: the left end stands almost to full height with a window, the rest crumbles down to the right and leans out.",
       "spec": {
-        "kind": "wall",
+        "kind": "stonewall",
         "seed": 14,
-        "collapse": 0.25
+        "height": 1.85,
+        "profile": [
+          [
+            0,
+            0.97
+          ],
+          [
+            0.16,
+            1.0
+          ],
+          [
+            0.3,
+            0.9
+          ],
+          [
+            0.4,
+            0.7
+          ],
+          [
+            0.52,
+            0.55
+          ],
+          [
+            0.64,
+            0.42
+          ],
+          [
+            0.78,
+            0.26
+          ],
+          [
+            0.9,
+            0.14
+          ],
+          [
+            1,
+            0.08
+          ]
+        ],
+        "ragged": 0.6,
+        "holes": 0.06,
+        "lean": {
+          "from": 0.4,
+          "to": 1,
+          "amount": 0.04
+        },
+        "window": {
+          "at": 0.18,
+          "y": 0.48,
+          "width": 0.24,
+          "height": 0.34
+        },
+        "heaps": [
+          [
+            0.88,
+            0.9
+          ],
+          [
+            0.62,
+            0.55
+          ]
+        ],
+        "green": 0.25
       }
     },
     {
       "id": "ruined-wall-overgrown",
       "name": "Overgrown wall",
-      "version": 1,
-      "notes": "Low broken wall with grass and moss.",
+      "version": 2,
+      "notes": "Low broken wall taken back by nature: moss on the tops, ivy over the face, grass and bushes in the rubble.",
       "spec": {
-        "kind": "wall",
+        "kind": "stonewall",
         "seed": 19,
-        "height": 1.1,
-        "collapse": 0.6,
-        "overgrown": true
+        "height": 1.2,
+        "profile": [
+          [
+            0,
+            0.55
+          ],
+          [
+            0.18,
+            0.85
+          ],
+          [
+            0.32,
+            0.72
+          ],
+          [
+            0.46,
+            0.28
+          ],
+          [
+            0.58,
+            0.4
+          ],
+          [
+            0.78,
+            0.78
+          ],
+          [
+            1,
+            0.42
+          ]
+        ],
+        "ragged": 0.5,
+        "holes": 0.05,
+        "heaps": [
+          [
+            0.47,
+            0.6,
+            "through"
+          ],
+          [
+            0.08,
+            0.4
+          ]
+        ],
+        "green": 1,
+        "ivy": 3,
+        "bushes": 4
       }
     }
   ]

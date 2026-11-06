@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "ruined-wall",
+  "variantId": "ruined-wall-overgrown",
+  "name": "Overgrown wall",
+  "category": "decorations",
+  "version": 2,
+  "specHash": "c919ca2c",
+  "generator": "ruins",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 99,
+  "height": 81,
+  "anchor": {
+    "x": 49,
+    "y": 55
+  },
+  "origin": {
+    "x": 0.49495,
+    "y": 0.67901
+  },
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "base": {
+    "x": 65,
+    "y": 79
+  },
+  "baseOrigin": {
+    "x": 0.65657,
+    "y": 0.97531
+  },
+  "visualHeight": 79,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.137,
+  "lights": []
+}

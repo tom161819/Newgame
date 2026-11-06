@@ -496,7 +496,13 @@
       "description": "Glowing forge coals (lit by a runtime light)."
     },
     "soot": { "color": "soot", "texture": "noise", "repeat": 1, "variation": 0.18, "description": "Soot on burnt walls and ash on the floor (matte, never glowing)." },
-    "charred_wood": { "color": "charcoal", "texture": "planks", "repeat": 0.8, "variation": 0.16, "description": "Charred beams and posts after a fire." }
+    "charred_wood": { "color": "charcoal", "texture": "planks", "repeat": 0.8, "variation": 0.16, "description": "Charred beams and posts after a fire." },
+    "fieldstone": { "color": "stone", "texture": "noise", "repeat": 0.5, "variation": 0.18, "description": "One rough, uncoursed stone (no mortar lines): rubble walls and ruins, where each stone is its own shape." },
+    "fieldstone_light": { "color": "stone_light", "texture": "noise", "repeat": 0.5, "variation": 0.16, "description": "Paler weathered stone: lintels, sun-bleached tops of ruins." },
+    "fieldstone_dark": { "color": "stone_dark", "texture": "noise", "repeat": 0.5, "variation": 0.2, "description": "Damp or dirty stone: lower courses and fallen stones of ruins." },
+    "rubble_fill": { "color": "mortar", "texture": "noise", "repeat": 0.6, "variation": 0.14, "description": "Dark mortar and rubble core inside a broken wall; shows where stones are missing." },
+    "moss": { "color": "moss", "texture": "noise", "repeat": 0.5, "variation": 0.2, "description": "Moss on old stone tops and in shaded joints." },
+    "soil": { "color": "soil", "texture": "noise", "repeat": 0.8, "variation": 0.18, "description": "Bare trodden earth and dust around the foot of ruins and props." }
   },
   "light": {
     "sun": {

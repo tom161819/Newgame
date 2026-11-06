@@ -77,10 +77,14 @@ try {
   // Request revision needs a comment; it is stored with the exact version and the design moves to Revision requested.
   await page.locator('.library-item', { hasText: 'Ruined tower' }).first().click();
   const ruin = page.locator('.variant-card').first(), ruinId = await ruin.getAttribute('data-variant');
+  assert.ok(await ruin.getByRole('button', { name: 'Send for rework' }).isDisabled(), 'Send for rework waits for a comment');
   await ruin.getByRole('button', { name: 'Request revision' }).click();
   assert.match(await ruin.locator('.review-error').textContent(), /Write what should change/);
   await ruin.locator('textarea').fill('Too regular: more missing stones, a broken top edge and rubble at the foot.');
-  await ruin.getByRole('button', { name: 'Request revision' }).click();
+  assert.ok(await ruin.locator('.review-error').isHidden(), 'the hint disappears once the comment has text');
+  await ruin.getByRole('button', { name: 'Send for rework' }).click();
+  assert.match(await page.locator(`.variant-card[data-variant="${ruinId}"] .review-saved`).textContent(), /sent for rework/);
+  assert.equal(await page.locator(`.variant-card[data-variant="${ruinId}"] textarea`).inputValue(), '', 'the comment box is empty after sending');
   const ruinRecord = await page.evaluate(id => Object.values(window.assetStudio.local().assets).map(a => a.variants?.[id]).find(Boolean), ruinId);
   assert.equal(ruinRecord.status, 'revision-requested');assert.deepEqual(ruinRecord.comments.map(c => [c.version, c.text]), [[1, 'Too regular: more missing stones, a broken top edge and rubble at the foot.']]);
   await page.locator('#library-review [data-review="revision"]').click();
@@ -90,7 +94,7 @@ try {
   await page.locator('.variant-card').first().getByRole('button', { name: 'Reject' }).click();
   assert.equal(await page.evaluate(id => Object.values(window.assetStudio.local().assets).map(a => a.variants?.[id]).find(Boolean).status, ruinId), 'rejected');
   await page.locator('#library-review [data-review="all"]').click();
-  pass('review decisions: In game badge only on art the game uses, Request revision needs a comment stored with the version, history shows it, Reject, filters Revision requested / In game');
+  pass('review decisions: In game badge only on art the game uses, Request revision needs a comment (Send for rework, hint clears, confirmation) stored with the version, history shows it, Reject, filters Revision requested / In game');
 
   await page.locator('.library-item', { hasText: 'Watchtower' }).click();
   await page.waitForFunction(() => document.querySelectorAll('.variant-card canvas').length >= 3);
@@ -266,7 +270,8 @@ try {
   assert.deepEqual(stored.record.comments.map(c => [c.text, c.by]), [['Darker roof please', 'u-owner']]);
   await sharedPage.waitForSelector('.variant-card[data-variant="watchtower-timber"] .pill.shared');
   assert.match(await timber.locator('.pill.shared').textContent(), /Shared: Revision requested · Tomáš \(you\)/);
-  assert.match(await sharedPage.locator('#review-summary').textContent(), /1 decision waiting for Claude/);
+  assert.match(await sharedPage.locator('#review-summary').textContent(), /1 decision waiting for Claude — write „spustit revizi“/);
+  assert.match(await timber.locator('.review-saved').textContent(), /Write „spustit revizi“ in the MK chat/);
   // Another reviewer approves the round tower: it appears without a reload, signed with her name.
   await sharedPage.evaluate(() => window.__fakeClaude.put('reviews/watchtower__watchtower-round', { assetId: 'watchtower', variantId: 'watchtower-round', by: 'u-art', at: '2026-11-06T22:00:00.000Z', record: { status: 'approved', version: 1, specHash: window.assetStudio.assets().find(a => a.id === 'watchtower').variants.find(v => v.id === 'watchtower-round').hash, note: '', updatedAt: '2026-11-06T22:00:00.000Z', approvedAt: '2026-11-06T22:00:00.000Z', decidedBy: 'u-art' } }));
   await sharedPage.waitForFunction(() => /Jana/.test(document.querySelector('.variant-card[data-variant="watchtower-round"] .pill.shared')?.textContent ?? ''));

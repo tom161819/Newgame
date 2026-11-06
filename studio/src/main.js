@@ -214,6 +214,8 @@ function compareView(asset) {
   return [controls, ...(note ? [note] : []), h('section', { class: 'variants', 'aria-label': 'Variants' }, shown.map(variant => variantCard(asset, variant)))];
 }
 
+// Confirmation under a card after a decision (cards are rebuilt on every render, so it lives outside them).
+const savedFlash = new Map();
 function variantCard(asset, variant) {
   const review = reviewState({ repo: data.approvals, local: state.local, assetId: asset.id, variant });
   const base = spriteFor(asset, variant, 1), height = heightInPixels(base.modelHeight);
@@ -222,9 +224,14 @@ function variantCard(asset, variant) {
   // #212 decisions on this exact version: Approve, Request revision (needs a comment), Reject; Back to review undoes.
   const comment = h('textarea', { id: `note-${variant.id}`, placeholder: 'Comment for this version (required for Request revision)', 'aria-label': `Comment on ${variant.name} v${variant.version}` });
   const error = h('p', { class: 'review-error', role: 'alert', hidden: true });
+  const key = `${asset.id}/${variant.id}`;
+  // Request revision with an empty comment only points at the comment box; the hint disappears as soon as there is text.
+  const send = h('button', { type: 'button', class: 'button send-rework', disabled: true, onclick: () => decide('revision-requested') }, 'Send for rework');
+  comment.addEventListener('input', () => { const empty = !comment.value.trim(); send.disabled = empty || readOnly; if (!empty) error.hidden = true; });
   const decide = status => {
     const text = comment.value.trim();
-    if (status === 'revision-requested' && !text) { error.textContent = 'Write what should change before requesting a revision.'; error.hidden = false; comment.focus(); return; }
+    if (status === 'revision-requested' && !text) { error.textContent = 'Write what should change, then press Send for rework.'; error.hidden = false; comment.focus(); return; }
+    savedFlash.set(key, { status, at: Date.now() });
     changeReview(asset, variant, { status, ...(text ? { comment: text } : {}) });
   };
   const DECISIONS = [['approved', 'Approve'], ['revision-requested', 'Request revision'], ['rejected', 'Reject'], ['review', 'Back to review']];
@@ -232,7 +239,11 @@ function variantCard(asset, variant) {
   const statusButtons = h('div', { class: 'segmented status decisions', role: 'group', 'aria-label': `Decision on ${variant.name}` },
     DECISIONS.map(([status, label]) => h('button', { type: 'button', 'data-status': status, 'aria-pressed': String(review.effective.status === status && !review.outdated), disabled: readOnly, onclick: () => decide(status) }, label)));
   if (readOnly) comment.disabled = true;
-  const note = h('div', { class: 'review-comment' }, comment, error);
+  const flash = savedFlash.get(key), fresh = flash && Date.now() - flash.at < 120000;
+  const saved = fresh ? h('p', { class: 'review-saved', role: 'status' }, flash.status === 'revision-requested'
+    ? (sharedMode() ? 'Saved: sent for rework. Write „spustit revizi“ in the MK chat and Claude starts on it.' : 'Saved in this browser: sent for rework. Hand the review over to Claude to start on it.')
+    : `Saved: ${STATUS_LABELS[flash.status] ?? flash.status}.`) : null;
+  const note = h('div', { class: 'review-comment' }, comment, h('div', { class: 'review-send' }, send, h('span', { class: 'sub' }, 'Writes the comment and asks for a new version.')), error, saved);
   const record = review.effective, entries = [...(record.history ?? []).map(h2 => ({ kind: 'version', ...h2 })), ...(record.comments ?? []).map(c => ({ kind: 'comment', ...c }))].sort((a, b) => a.version - b.version || String(a.at).localeCompare(String(b.at)));
   const history = entries.length ? h('details', { class: 'review-history' }, h('summary', {}, `History (${entries.length})`), h('ol', {}, entries.map(e => h('li', {}, e.kind === 'version' ? `v${e.version} · ${STATUS_LABELS[e.status] ?? e.status} · #${e.specHash}` : `v${e.version} comment${e.by ? ` by ${reviewerName(e.by)}` : ''}: “${e.text}”`, e.at ? h('time', { datetime: e.at }, ` ${e.at.slice(0, 10)}`) : null)))) : null;
   const live = inGame(variant.paths, sourcesInGame());
@@ -535,7 +546,7 @@ function saveShared(writes) {
 function renderSummary() {
   const changes = pendingChanges({ repo: data.approvals, local: state.local, catalog: catalog.studio }), n = changes.length;
   const text = sharedMode()
-    ? (n ? h('span', {}, h('strong', {}, `${n} decision${n === 1 ? '' : 's'}`), ' waiting for Claude') : 'Every decision is in the repository')
+    ? (n ? h('span', {}, h('strong', {}, `${n} decision${n === 1 ? '' : 's'}`), ' waiting for Claude — write „spustit revizi“ in the MK chat to start') : 'Every decision is in the repository')
     : (n ? h('span', {}, h('strong', {}, `${n} local change${n === 1 ? '' : 's'}`), ' not in the repository') : 'Review matches the repository');
   $('#review-summary').replaceChildren(text);
   $('#open-export').textContent = sharedMode() ? 'Review hand-over' : 'Export review';
