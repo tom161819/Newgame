@@ -69,6 +69,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Idle Haulers now collect loose stone lying within a set radius of the Castle (default 80 tiles) and carry it to storage. Each Hauler has a Collect loose stone ON/OFF switch and a radius field in the unit panel; real transport jobs always come first. Saved games from earlier versions cannot be loaded and need a new game.
 
 ### Fixed
+- Automated panel controls and construction checks restore their own game state between scenarios.
 - Fog of War: remembered rock outcrops outside current sight are now muted like the trees, buildings and ground around them in every renderer, instead of staying fully lit. They follow the brightness setting; rocks in sight keep their full colours.
 - A Builder whose chosen side of a construction site is taken by a villager standing still now walks to another free side instead of waiting there forever.
 - Villagers are never trapped on their own tile when someone else (for example the King standing in a doorway) shares it; they can always walk away.
