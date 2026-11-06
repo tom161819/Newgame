@@ -5,6 +5,8 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-11-06
+<!-- version: {"title":"Workplace idle seating","type":"feature","reconstructed":false,"saveVersion":37} -->
 ### Added
 
 - Idle employees walk to separate seats on a basic porch outside their own workplace and sit until work arrives. Cargo, new jobs, farming tending, combat and manual commands keep priority; blocked porches fall back safely. The temporary porch and seated pose use existing graphics, respect sight and rebuild safely after Load.
@@ -21,12 +23,23 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 - Mark visible rocks by click or drag for free Miners, or cancel their orders. Each rock slowly yields ten physical Stones, then disappears; the Miner carries the output to storage before choosing another rock. Partial work, ground goods and active deliveries survive current Save/Load. Employed Quarry and Iron Mine workers keep their jobs.
 
+## [0.7.1] - 2026-11-06
+<!-- version: {"title":"Steady top bar on stone pickup","type":"fix","reconstructed":false,"saveVersion":35} -->
+### Fixed
+- Picking up a stone no longer makes the top bar jump. On desktop the King's "Deliver to storage" button and cargo status keep a fixed place in the bar, so Food, the clock and the other items stay where they are when the button appears or disappears. This was most noticeable when zoomed out, where the map itself does not move. The full cargo text is shown as a tooltip when it is too long.
+
 ## [0.7.0] - 2026-11-06
 <!-- version: {"title":"Castle gathering and arrival uniforms","type":"feature","reconstructed":false,"saveVersion":35} -->
 ### Added
 
 - Unemployed residents and idle Haulers gather at reachable Castle meeting points without crowding entrances or standing on paved roads. Haulers keep accepting global deliveries while walking there, and use safe nearby waiting when no Castle is reachable.
 - New workers keep an unemployed appearance until physically reaching their workplace. Global Haulers change at their Castle meeting point or first real task, and Builders at their work site. Reassignment, manual commands and Save/Load keep the appearance consistent.
+
+## [0.6.1] - 2026-11-06
+<!-- version: {"title":"Mood affects work speed and attractiveness","type":"feature","reconstructed":false,"saveVersion":34} -->
+### Changed
+- A villager's mood now changes how fast they work: Happy residents work 10 % faster, Unhappy and Critical ones 20 % slower. This stacks with skill level and the hunger slowdown. Walking speed and combat are not affected. The villager panel shows the current work speed.
+- Kingdom Happiness now affects how attractive the kingdom is to travellers: at least 80 % adds a bonus (it offsets part of the food-shortage penalty), 30–49 % lowers attractiveness and below 30 % lowers it sharply. With no residents there is no effect.
 
 ## [0.6.0] - 2026-11-06
 <!-- version: {"title":"Builder demolition and physical material recovery","type":"feature","reconstructed":false,"saveVersion":34} -->
