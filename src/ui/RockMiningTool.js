@@ -31,5 +31,5 @@ export class RockMiningTool {
     for(const r of s.naturalResources.miningWork.rocks.records.values())if(r.marked&&r.produced<10&&s.fog.isVisibleTile(r.tile))diamond(r.tile,0xffd768);
     if(this.enabled&&this.anchor&&this.end)for(let y=Math.max(0,Math.min(this.anchor.y,this.end.y));y<=Math.min(99,Math.max(this.anchor.y,this.end.y));y++)for(let x=Math.max(0,Math.min(this.anchor.x,this.end.x));x<=Math.min(99,Math.max(this.anchor.x,this.end.x));x++)if(s.fog.isVisibleTile({x,y})&&s.terrainGrid[y][x]===1)diamond({x,y},this.remove?0xf27777:0xffd768,.65);
   }
-  destroy(){this.close();this.controller.abort();this.graphics.destroy();}
+  destroy(){this.enabled=false;this.anchor=null;this.scene.game.canvas.style.cursor='';this.controller.abort();this.graphics.destroy();}
 }
