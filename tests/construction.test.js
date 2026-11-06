@@ -100,3 +100,12 @@ test('older completed buildings keep all functions without rebuilding, repaying 
   globalThis.document??={querySelector:()=>({textContent:''})};
   const old=workerScene(),d=old.objectRegistry.require('castle');old.inventory.add('stone',10);placeBuilding({map:old.map,anchor:{x:50,y:50},resources:old.resourceOccupancy,reservedTiles:old.reservedTiles(),inventory:old.inventory,buildings:old.buildings,definition:d});const saved=serializeGameState(old),r=scene();loadGameState(r,saved);assert.equal(buildingIsComplete(r.buildings[0]),true);assert.equal(r.constructionSystem.sites.size,0);assert.equal(r.production.dailyIncome().gold,5);assert.equal(r.character.experience.totalXP,0);assert.equal(r.inventory.count('stone'),0);validateGameState(serializeGameState(r));
 });
+
+test('a Builder whose reserved goal tile becomes occupied by a standing unit picks another free side instead of waiting forever',()=>{
+  const s=scene(),b=site(s),w=builder(s);s.tick(0);const goal={...s.constructionSystem.assignments.get(w.id).goal};
+  // A villager standing still on that exact tile (in the pavement smoke an idle Hauler waited there).
+  const blocker=s.workerSystem.create(goal);blocker.commandState={state:'Holding',goal:null};blocker.workState='Holding';
+  until(s,()=>s.constructionSystem.atSite(w,s.constructionSystem.assignments.get(w.id)??{goal:{x:-1,y:-1}}),20000);
+  assert.notDeepEqual(s.constructionSystem.assignments.get(w.id).goal,goal,'another side of the site');assert.deepEqual(blocker.tile,goal,'the blocker was not moved');
+  until(s,()=>b.construction.workDone>0,2000);
+});

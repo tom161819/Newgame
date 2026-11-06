@@ -30,7 +30,8 @@ export class BuilderAI {
           assignment.checkedRevision=system.revision;
           if(!findPathToAny(scene.map,worker.tile,[assignment.goal])){scene.workerSystem.ai.cancel(worker);worker.aiCooldown=0;return;}
         }
-        worker.moveTo([assignment.goal]);
+        // A unit standing on the reserved side blocks only this goal: give it up so the next search picks a free side.
+        if(!worker.moveTo([assignment.goal])){scene.workerSystem.ai.cancel(worker);worker.aiCooldown=0;}
       }return;
     }
     worker.workState='Waiting';worker.workMessage='Waiting for construction';if(worker.aiCooldown>0)return;worker.aiCooldown=CONSTRUCTION_RULES.retryInterval;
