@@ -77,7 +77,8 @@ export class StableSystem {
     const b=this.stable(job.stableId);if(!b){this.cancel(worker);return true;}
     const goals=towerNeighbors(b).filter(t=>this.scene.map[t.y]?.[t.x]===0),here=goals.some(t=>tileKey(t)===tileKey(worker.tile))&&!worker.nextTile&&!worker.path.length;
     if(here){this.jobs.delete(worker.id);this.horses.set(horse.id,{state:'stabled',stableId:b.id});this.place(horse.id);worker.workState='Searching for Work';worker.aiCooldown=0;return true;}
-    if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=700;if(!worker.moveTo(goals))this.cancel(worker);}
+    // #163: a blocked route never throws the tamed horse away; the Stablehand waits a moment and tries again.
+    if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=700;if(!worker.moveTo(goals))worker.workMessage='Waiting for a free way to the Stables';}
     if(!horse.nextTile&&!horse.path.length&&Math.hypot(horse.position.x-worker.position.x,horse.position.y-worker.position.y)>1.6)horse.moveTo?.(adjacentTiles(worker,this.scene.map));
     return true;
   }
@@ -103,6 +104,8 @@ export class StableSystem {
     for(const [workerId]of [...this.jobs]){const w=this.scene.workerSystem.workers.get(workerId);if(!w?.isAlive||w.profession!=='stablehand')this.cancel({id:workerId});}
   }
   // AnimalSystem skips its own wandering for tamed horses (they stand in the paddock) and for one being led.
+  // The horse being led walks a step behind its Stablehand and never blocks his way (#163).
+  led(animal){return [...this.jobs.values()].some(j=>j.horseId===animal.id&&j.phase==='leading');}
   holds(animal){return this.tamed(animal)||[...this.jobs.values()].some(j=>j.horseId===animal.id&&j.phase!=='approach');}
   exportState(){return {horses:[...this.horses].map(([id,h])=>({id,...h})),jobs:[...this.jobs].map(([workerId,j])=>({workerId,...j})),ridden:this.scene.character?.mountedHorse?.kingTamed?this.scene.character.mountedHorse.id:null};}
   importState(data){
