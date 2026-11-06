@@ -68,9 +68,9 @@ export class Minimap {
     this.context=this.canvas.getContext('2d');this.baseContext=this.base.getContext('2d');this.image=this.baseContext?.createImageData(fog.width,fog.height);
     this.controller=new AbortController();const options={signal:this.controller.signal};
     // Navigation: a click centres the camera on that known or unknown spot; it reveals nothing.
-    this.root.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();this.panTo(minimapPointToGrid(this.root.getBoundingClientRect(),{x:e.clientX,y:e.clientY},{size:fog.width}));},options);
+    this.root.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();this.panTo(minimapPointToGrid(this.root.getBoundingClientRect(),{x:e.clientX,y:e.clientY},{size:fog.width,cssSize:this.canvas.offsetWidth||MINIMAP.cssSize}));},options);
     for(const type of ['click','mousedown','mouseup','wheel','contextmenu'])this.root.addEventListener(type,e=>e.stopPropagation(),options);
-    (doc.querySelector('#game')??scene.game?.canvas?.parentElement)?.append(this.root);this.label();this.offLanguage=onLanguageChange(()=>this.label());
+    (doc.querySelector('#corner-stack')??doc.querySelector('#game')??scene.game?.canvas?.parentElement)?.append(this.root);this.label();this.offLanguage=onLanguageChange(()=>this.label());
   }
   label(){this.root.setAttribute('aria-label',t('minimap.label'));this.root.title=t('minimap.hint');}
   panTo(point){

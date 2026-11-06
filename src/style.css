@@ -463,7 +463,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .unit-command-bar span { flex-basis: 100%; text-align: center; font-size: .85rem; }
 .unit-command-controls { display: flex; gap: 8px; margin-top: 8px; }
 /* Right-bottom notices: lasting production and work problems; small, dismissable, filterable by category. */
-.notices-panel { position:fixed; right:16px; bottom:64px; z-index:25; width:min(340px,calc(100vw - 32px)); max-height:40dvh; overflow:auto; padding:10px 12px; border:1px solid #8a7a4f; border-radius:10px; background:rgb(38 43 31 / .94); box-shadow:0 10px 28px rgb(6 9 5 / .5); }
+.notices-panel { width:min(340px,calc(100vw - 32px)); max-height:40dvh; overflow:auto; padding:10px 12px; border:1px solid #8a7a4f; border-radius:10px; background:rgb(38 43 31 / .94); box-shadow:0 10px 28px rgb(6 9 5 / .5); }
 .notices-heading { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; }
 .notices-heading h2 { margin:0; font-size:13px; }
 .notices-filters { display:flex; gap:4px; }
@@ -474,7 +474,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .notice-production { border-left-color:#e08a5a; }
 .notice-text { flex:1; text-align:left; font-size:12px; line-height:1.35; padding:6px 8px; border:0; background:transparent; }
 .notice-dismiss { border:0; background:transparent; padding:6px 8px; font-size:14px; line-height:1; }
-@media(max-width:600px) { .notices-panel { left:16px; right:16px; width:auto; bottom:58px; } }
+@media(max-width:600px) { .notices-panel { width:calc(100vw - 32px); } }
 
 #king-cargo-deliver { display: inline-flex; align-items: center; gap: .3rem; flex-shrink: 0; min-height: 2.5rem; padding: .35rem .6rem; border-color: #b69c56; color: #f2dfab; }
 #king-cargo-deliver[hidden] { display: none; }
@@ -501,10 +501,27 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .unit-command-controls .icon-command::after { content:attr(data-tooltip); position:absolute; left:50%; bottom:calc(100% + 6px); transform:translateX(-50%); white-space:nowrap; padding:3px 8px; border-radius:4px; background:#141b12; border:1px solid #978657; color:#ece2c4; font-size:12px; opacity:0; pointer-events:none; transition:opacity .12s; z-index:2; }
 .unit-command-controls .icon-command:hover::after, .unit-command-controls .icon-command:focus-visible::after { opacity:1; }
 /* #104: minimap in the bottom-right corner, the square grid turned into the isometric diamond. */
-.minimap { position:absolute; right:12px; bottom:10px; z-index:9; width:212px; height:106px; cursor:pointer; filter:drop-shadow(0 2px 6px #000a); touch-action:none; }
-.minimap canvas { position:absolute; left:50%; top:50%; width:150px; height:150px; margin:-75px 0 0 -75px; transform:scaleY(.5) rotate(45deg); image-rendering:pixelated; border:1px solid #b99a53; }
-@media(max-width:760px){ .minimap { transform:scale(.7); transform-origin:100% 100%; } }
-
+.minimap { position:relative; flex:none; --minimap-size:150px; width:calc(var(--minimap-size) * 1.4142); height:calc(var(--minimap-size) * .7071); height:106px; cursor:pointer; filter:drop-shadow(0 2px 6px #000a); touch-action:none; }
+.minimap canvas { position:absolute; left:50%; top:50%; width:var(--minimap-size); height:var(--minimap-size); margin:calc(var(--minimap-size) / -2) 0 0 calc(var(--minimap-size) / -2); transform:scaleY(.5) rotate(45deg); image-rendering:pixelated; border:1px solid #b99a53; }
+@media(max-width:760px){ .minimap { --minimap-size:105px; } }
+/* #105: the bottom-right column of the map, top to bottom notices → event feed → minimap, so none covers another. */
+.corner-stack { position:absolute; right:12px; bottom:10px; z-index:9; display:flex; flex-direction:column; align-items:flex-end; gap:8px; max-height:calc(100% - 20px); pointer-events:none; }
+.corner-stack > * { pointer-events:auto; }
+.event-feed { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; align-items:flex-end; gap:4px; width:min(300px,calc(100vw - 32px)); pointer-events:none !important; }
+.event-feed:empty { display:none; }
+.feed-entry { max-width:100%; padding:4px 9px; border-radius:6px; background:rgb(30 34 24 / .82); border-left:3px solid #b99a53; color:#ece2c4; font-size:12px; line-height:1.35; text-shadow:0 1px 1px #000; animation:feed-in .25s ease-out; }
+.feed-entry.important { border-left-color:#e0794f; }
+@keyframes feed-in { from { opacity:0; transform:translateX(12px); } }
+@media(prefers-reduced-motion:reduce){ .feed-entry { animation:none; } }
+/* S13 (#58): needs in the unit panel and Kingdom Happiness in the HUD. */
+.unit-needs h3 { margin:.6rem 0 .3rem; }
+.need-row { display:grid; grid-template-columns:6.5rem 1fr 3rem; align-items:center; gap:6px; font-size:12px; }
+.need-row meter { width:100%; height:9px; }
+.need-row b { text-align:right; font-weight:600; font-variant-numeric:tabular-nums; }
+.need-mood[data-mood="happy"] { color:#b9e08a; } .need-mood[data-mood="unhappy"] { color:#e6b062; } .need-mood[data-mood="critical"] { color:#f08a6c; }
+.kingdom-happiness { justify-self:start; padding:0 6px; font:inherit; font-size:11px; color:#d5c78d; background:none; border:1px solid #6c6440; border-radius:3px; cursor:pointer; }
+.kingdom-happiness[data-mood="unhappy"] { color:#e6b062; } .kingdom-happiness[data-mood="critical"] { color:#f08a6c; border-color:#a5553c; }
+.population-needs { margin:.2rem 0; font-size:12px; color:#d9cfa8; }
 .building-inspect-button{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .demolition-actions{margin-top:1rem;padding-top:1rem;border-top:1px solid #a9987255}
 .demolition-actions progress{display:block;width:100%;margin:.5rem 0}
