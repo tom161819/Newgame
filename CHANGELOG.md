@@ -61,6 +61,8 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Idle Haulers now collect loose stone lying within a set radius of the Castle (default 80 tiles) and carry it to storage. Each Hauler has a Collect loose stone ON/OFF switch and a radius field in the unit panel; real transport jobs always come first. Saved games from earlier versions cannot be loaded and need a new game.
 
 ### Fixed
+- Villagers are never trapped on their own tile when someone else (for example the King standing in a doorway) shares it; they can always walk away.
+- Stablehands no longer lose a horse they have just tamed. If the way to the Stables is briefly blocked, they wait and try again instead of letting the horse go wild and starting over, and the horse they lead no longer blocks their own path.
 - Saves no longer reject large single deliveries made with a Wheelbarrow or Horse Wagon.
 - Finished walls no longer vanish after the camera pans away and back: the wall blocks and their parapets reappear exactly as before.
 - Joined wall segments form one continuous wall: their shadows fall on the ground only and no longer paint dark bands across the neighbouring wall tops and the wall walk (straight lines, corners, T junctions and crossings, Canvas and WebGL).
