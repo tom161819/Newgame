@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "barracks-hall",
+  "variantId": "barracks-hall-stone",
+  "name": "Stone barracks",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "0b7359ac",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 164,
+  "anchor": {
+    "x": 97,
+    "y": 114
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.69512
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 162
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.9878
+  },
+  "visualHeight": 162,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.99,
+  "lights": []
+}

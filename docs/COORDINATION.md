@@ -21,6 +21,7 @@ Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke pau
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
+| #92 building concepts: Barracks, Wheelwright Workshop, Iron Mine | Claude | `claude/building-concepts-92` | — | In review | art/assets/buildings/{barracks-hall,wheelwright-yard,iron-mine}, art/sprites, art/approvals.json |
 | AUD65 #94 Manual rock mining | Codex | `codex/manual-rock-mining` (stacked on124) | [#194](https://github.com/tom161819/Newgame/pull/194) | Implemented; schema36/release0.8.0 after185 actual Pages;750 tests/version/changelog/build + native real-mouse10Stones/ledger/Load/phone/commands/Needs/eventfeed PASS | own rock marking tool/UI, GameScene/GameApplication narrow input/Escape hooks, MiningWork/WorkerAI/WorkplaceSystem/free Miner selection, current schema serializer/loader/terrain validation, XP/SkillSystem, physical Drop/FoodProduction reuse and cargo provenance, i18n, own tests/browser/docs |
 | #99 Mill sails turn while grinding (still body + rotor layer from the approved export) | Claude | `claude/mill-sails` | — | In review | studio generator/renderer/export rotor layer, art/sprites/windmill, public/assets/buildings/mill, approvedArt, AssetManager, SpriteViews, MapMemoryRenderer, new game/MillSails.js, GameScene hook, tests, smoke |
 
