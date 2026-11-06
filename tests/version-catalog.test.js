@@ -18,7 +18,7 @@ const assemble=(options={})=>assembleVersionCatalog({data:parseChangelog(markdow
 test('archival identifiers follow full SemVer while official release comparisons remain strict',()=>{
   for(const value of ['0.1.0+archive.1',`0.1.0+git.${a}`,'0.1.0-alpha.1+build.42'])assert.deepEqual(semanticVersion(value).parts,[0,1,0]);
   for(const bad of ['0.1.0+','0.1.0+archive..1','0.1.0-01','01.1.0+archive.1'])assert.throws(()=>semanticVersion(bad));
-  assert.throws(()=>versionParts('0.1.0+archive.1'));assert.equal(displayBuildVersion(`0.1.0+git.${a}`),'0.1.0+git.aaaaaaa');assert.equal(displayBuildVersion('0.1.0+archive.12'),'0.1.0+archive.12');
+  assert.throws(()=>versionParts('0.1.0+archive.1'));assert.equal(displayBuildVersion(`0.1.0+git.${a}`),'0.01.00+git.aaaaaaa');assert.equal(displayBuildVersion('0.1.0+archive.12'),'0.01.00+archive.12');
 });
 test('reconstructed notes require explicit labels and actual full SHA; duplicate metadata is rejected',()=>{
   for(const value of [markdown.replace(a,'abc'),markdown.replace('+archive.1','+git.a'),markdown.replace('"reconstructed":true','"reconstructed":false'),markdown.replace('<!-- version:',`<!-- version: ${JSON.stringify(metadata)} -->\n<!-- version:`),markdown.replace('## [Unreleased]',`## [Unreleased]\n<!-- version: ${JSON.stringify(metadata)} -->`)])assert.throws(()=>parseChangelog(value,'0.1.0'));
@@ -28,7 +28,7 @@ test('central catalog preserves original numbers and URLs; snapshots are not inv
   assert.equal(catalog.versions.length,2);assert.equal(catalog.builds.length,2);assert.equal(catalog.versions[1].version,'0.1.0+archive.1');assert.equal(catalog.versions[1].archiveURL,record.basePath);
   assert.equal(catalog.versions[0].version,'0.1.0');assert.equal(catalog.versions[0].reconstructed,false);assert.equal(catalog.currentBuild.version,`0.1.0+dev.${c}`);
   assert.deepEqual(catalog.builds.map(v=>v.gameVersion),['0.1.0','0.1.0']);assert.equal(new Set([...catalog.versions,...catalog.builds,catalog.currentBuild].map(v=>v.version)).size,5);
-  assert.deepEqual(catalog.builds.map(v=>[v.buildNumber,v.buildLabel]),[[2,`Archive build 2 · v0.1.0 · ${b.slice(0,7)}`],[1,`Archive build 1 · v0.1.0 · ${a.slice(0,7)}`]]);assert.equal(catalog.builds.every(v=>v.releaseType==='snapshot'&&!catalog.versions.some(r=>r.version===v.version)),true);
+  assert.deepEqual(catalog.builds.map(v=>[v.buildNumber,v.buildLabel]),[[2,`Archive build 2 · v0.01.00 · ${b.slice(0,7)}`],[1,`Archive build 1 · v0.01.00 · ${a.slice(0,7)}`]]);assert.equal(catalog.builds.every(v=>v.releaseType==='snapshot'&&!catalog.versions.some(r=>r.version===v.version)),true);
   assert.equal(JSON.stringify(catalog).includes('Private unfinished release notes'),false);assert.ok(catalogHTML(catalog).includes(`href="${record.basePath}"`));
 });
 test('missing verified build is unavailable everywhere, without a fake Play link',()=>{
@@ -54,7 +54,7 @@ test('release preparation preserves all historical entries, advances only the of
 test('static archive escapes authored text, preserves every canonical URL and links to actual release changes',()=>{
   const catalog=assemble();catalog.versions[0].title='<img src=x onerror=alert(1)>';const html=catalogHTML(catalog);
   assert.ok(html.includes('&lt;img'));assert.ok(!html.includes('<img'));assert.ok(html.includes('?changelog=0.1.0%2Barchive.1'));assert.ok(html.includes(`href="${record.basePath}"`));
-  assert.ok(html.includes('Reconstructed archive labels'));assert.ok(html.includes('original v0.1.0'));
+  assert.ok(html.includes('Reconstructed archive labels'));assert.ok(html.includes('original v0.01.00'),'#174: two-digit MINOR/PATCH for players');
   assert.ok(html.includes('Archive build 1 — Original source'));assert.ok(html.includes('data-build-number="1"'));assert.ok(html.includes(`title="0.1.0+git.${a}"`));assert.ok(html.includes('not a release version'));
 });
 test('git-archive builds use exact exported provenance and original metadata without nested archives',async()=>{

@@ -41,6 +41,7 @@ export function parseChangelog(markdown, currentVersion) {
         if(!metadata||typeof metadata.title!=='string'||!metadata.title.trim()||metadata.title.length>160||typeof metadata.reconstructed!=='boolean'||!['initial','feature','fix','milestone'].includes(metadata.type))fail(i,'Invalid version title, type or reconstructed label.');
         if(metadata.commit!==undefined&&!/^[a-f0-9]{40}$/.test(metadata.commit))fail(i,'Expected a full actual Git commit SHA.');
         if(metadata.tag!==undefined&&metadata.tag!==`v${section.version}`)fail(i,'The release tag must match its version.');
+        if(metadata.saveVersion!==undefined&&(!Number.isSafeInteger(metadata.saveVersion)||metadata.saveVersion<1))fail(i,'saveVersion must be the positive SAVE_VERSION the release shipped with.');
         section.metadata=metadata;
       }else if (line.startsWith('### ')) {
         const label = line.slice(4).trim();
@@ -84,13 +85,23 @@ export async function readRelease(root) {
   return { data, pkg, lock, markdown, packageText, lockText };
 }
 
-export function prepareRelease({ markdown, pkg, lock }, type, date) {
+// The SAVE_VERSION a release ships with, read from the serializer (the only authored source of the schema number).
+export function saveVersionFrom(serializerSource){const match=String(serializerSource).match(/export const SAVE_VERSION\s*=\s*(\d+)\s*;/);if(!match)throw new Error('SAVE_VERSION not found in GameStateSerializer.js.');return Number(match[1]);}
+// #174: the latest official release that recorded its save schema (releases before the new scheme did not).
+export const lastRecordedSave=data=>data.releases.find(r=>!r.metadata?.reconstructed&&Number.isSafeInteger(r.metadata?.saveVersion))?.metadata.saveVersion??null;
+const releaseKind=changes=>Object.keys(changes).filter(key=>changes[key].length).every(key=>key==='fixed')?'fix':'feature';
+export function prepareRelease({ markdown, pkg, lock }, type, date, {saveVersion=null,title=null,baselineSave=null,milestone=false}={}) {
   const current = parseChangelog(markdown, pkg.version);
   if (!Object.values(current.unreleased.changes).some(changes => changes.length)) throw new Error('Unreleased has no completed changes to release.');
   const version = nextVersion(pkg.version, type);
   validateDate(date);
   if (date < current.releases.find(r=>!r.metadata?.reconstructed).date) throw new Error('The new release date precedes the latest release.');
-  const nextMarkdown = markdown.replace(/^## \[Unreleased\]\s*$/m, `## [Unreleased]\n\n## [${version}] - ${date}`);
+  // #174: a new save schema is a MINOR (or MAJOR) release; a PATCH never changes SAVE_VERSION.
+  const previousSave=baselineSave??lastRecordedSave(current);
+  if(saveVersion!==null&&type==='patch'&&previousSave!==null&&saveVersion!==previousSave)throw new Error(`SAVE_VERSION changed from ${previousSave} to ${saveVersion}: release it as minor or major, not patch.`);
+  const first=Object.values(current.unreleased.changes).flat()[0]??'',metadata={title:(title??first.replace(/\s+/g,' ').split(/(?<=[.!?])\s/)[0]).slice(0,160).trim()||`Release ${version}`,type:milestone?'milestone':releaseKind(current.unreleased.changes),reconstructed:false};
+  if(saveVersion!==null)metadata.saveVersion=saveVersion;
+  const nextMarkdown = markdown.replace(/^## \[Unreleased\]\s*$/m, `## [Unreleased]\n\n## [${version}] - ${date}\n<!-- version: ${JSON.stringify(metadata)} -->`);
   const nextPackage = { ...pkg, version }, nextLock = structuredClone(lock);
   nextLock.version = version; nextLock.packages[''].version = version;
   parseChangelog(nextMarkdown, version);
