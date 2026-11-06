@@ -36,16 +36,21 @@ if(mode==='check'){
   // Includes current-schema Save/Load, incompatible-save handling, logistics, construction/cancellation and no-duplication scenarios.
   for(const command of [['ci'],['run','changelog:validate'],['run','versions:validate'],['test'],['run','archive:verify'],['run','build','--','--base=/Newgame/'],['run','archive:stage'],['run','archive:verify-site'],['run','smoke','--','--base=/Newgame/','--full']]){run('npm',command);report.checks.push({command:`npm ${command.join(' ')}`,status:'passed'});}
 }else{
-  releaseNumber(data.version);const tag=`v${data.version}`,commit=git('rev-parse','--verify',`${tag}^{commit}`);git('merge-base','--is-ancestor',commit,head);
+  // #174: every release is tagged; only milestone releases (M1–M5, 0.MINOR.0) also carry an immutable playable archive.
+  const current=data.releases.find(release=>release.version===data.version),milestone=current?.metadata?.type==='milestone';if(milestone)releaseNumber(data.version);
+  const tag=`v${data.version}`,commit=git('rev-parse','--verify',`${tag}^{commit}`);git('merge-base','--is-ancestor',commit,head);
   const remote=git('ls-remote','origin',`refs/tags/${tag}`,`refs/tags/${tag}^{}`);if(!remote.split('\n').some(line=>line.startsWith(`${commit}\t`)))throw new Error('The release tag is not actually published.');
   const taggedRelease=parseChangelog(git('show',`${commit}:CHANGELOG.md`),data.version).releases.find(release=>release.version===data.version);
   if(JSON.stringify(taggedRelease)!==JSON.stringify(data.releases.find(release=>release.version===data.version)))throw new Error('Published release notes differ from the tagged release.');
+  if(!milestone){report.tag=tag;report.releaseCommit=commit;report.checks.push({command:'exact public tag / frozen release notes / successful Pages deployment (not a milestone: no archive required)',status:'passed'});}
+  else{
   report.deployedArchive=await verifyDeployedArchive({root,deploymentCommit:deployed,releaseCommit:commit,version:data.version});
   const catalog=await readVersionCatalog(root),entry=catalog.versions.find(v=>v.version===data.version);if(!entry?.available||entry.commit!==commit)throw new Error('The official release has no matching playable archive.');
   const publishedFile=route=>{try{return execFileSync('curl',['--fail','--silent','--show-error','--location','--max-time','30',new URL(route,pages.url).href],{stdio:['ignore','pipe','pipe'],maxBuffer:8*1024*1024});}catch{throw new Error('Cannot verify the actual published release artifact through the configured HTTPS connection.');}};
   const publishedCatalog=JSON.parse(publishedFile('versions/catalog.json').toString('utf8'));
   report.publishedRelease=verifyPublishedRelease({catalog:publishedCatalog,manifest:publishedFile(`${entry.archiveURL}snapshot.json`),entry,manifestHash:digest(await readFile(new URL(`../public/versions/${commit}/snapshot.json`,import.meta.url)))});
   report.tag=tag;report.releaseCommit=commit;report.archiveURL=entry.archiveURL;report.checks.push({command:'exact public tag / frozen release notes / actual deployed archive blobs and index / live playable catalog and manifest',status:'passed'});
+  }
 }
 if(option('report'))await writeFile(option('report'),JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify(report,null,2));

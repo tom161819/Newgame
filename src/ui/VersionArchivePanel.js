@@ -1,6 +1,6 @@
 import { element } from './objectLabels.js';
 import { t } from '../i18n/index.js';
-import { displayBuildVersion } from '../data/semver.js';
+import { displayBuildVersion,displayVersion } from '../data/semver.js';
 export { displayBuildVersion } from '../data/semver.js';
 export class VersionArchivePanel {
   constructor({catalog=null,catalogURL,onChanges}){
@@ -12,7 +12,7 @@ export class VersionArchivePanel {
   }
   entry(entry,snapshot=false){
     const row=element('article','archive-version'),heading=element('h3','',snapshot?t('archive.buildHeading',{number:entry.buildNumber,title:entry.title}):`v${displayBuildVersion(entry.version)} — ${entry.title}`);heading.title=entry.version;row.dataset.catalogVersion=entry.version;if(snapshot)row.dataset.buildNumber=entry.buildNumber;
-    const label=entry.current?t('archive.current'):snapshot?t('archive.snapshotLabel',{version:entry.gameVersion}):entry.reconstructed?t('archive.reconstructed'):t('archive.archived');
+    const label=entry.current?t('archive.current'):snapshot?t('archive.snapshotLabel',{version:displayVersion(entry.gameVersion)}):entry.reconstructed?t('archive.reconstructed'):t('archive.archived');
     row.append(heading,element('p','archive-version-label',label));if(entry.description&&!(snapshot&&entry.description===entry.title))row.append(element('p','',entry.description));
     const date=element('time','',entry.date?.slice(0,10)??t('archive.noDate'));if(entry.date)date.dateTime=entry.date;
     const metadata=element('p','archive-version-meta');metadata.append(date);if(entry.commit){const commit=element('code','',` · ${entry.commit.slice(0,7)}`);commit.title=entry.commit;metadata.append(commit);}row.append(metadata);
