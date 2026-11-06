@@ -10,7 +10,7 @@ export class FarmingSystem {
   constructor(scene,{growthModifier=()=>1,onHarvest=null}={}) {
     Object.assign(this,{scene,growthModifier,onHarvest});
     this.clocks=Object.fromEntries(Object.keys(FARMING_RULES.crops).map(id=>[id,0]));
-    this.records=new Map();this.refreshElapsed=0;this.tending=new Map();this.knownFarmIds=new Set();
+    this.records=new Map();this.refreshElapsed=0;this.tending=new Map();this.establishChecks=new Map();this.knownFarmIds=new Set();
     this.worldChanged=()=>this.reconcilePlots();scene.events?.on('buildings:changed',this.worldChanged);this.reconcilePlots();
     this.unsubscribe=scene.gameTime.onAdvance(delta=>this.advanceGrowth(delta));
     if(scene.seasons){this.unsubscribeBefore=scene.seasons.onBeforeChange(()=>this.refreshSeason());this.unsubscribeSeason=scene.seasons.onChange(()=>this.refreshSeason());}
@@ -35,7 +35,7 @@ export class FarmingSystem {
     this.knownFarmIds=farms;
     reconcileFarmPlots(this.scene.buildings,buildingDefinition);
     for(const worker of this.scene.workerSystem?.liveWorkers()??[]){
-      const task=worker.workTask;if(task?.kind==='harvest'&&!this.inRange(worker,this.building(task.targetId)))this.scene.workerSystem.ai.cancel(worker);
+      const task=worker.workTask;if(task?.kind==='build'&&!this.scene.constructionSystem?.canWork(this.scene.buildings.find(b=>b.id===task.targetId),worker))this.scene.workerSystem.ai.cancel(worker);if(task?.kind==='harvest'&&!this.inRange(worker,this.building(task.targetId)))this.scene.workerSystem.ai.cancel(worker);
       const tending=this.tending.get(worker.id);if(tending&&!this.inRange(worker,this.building(tending.targetId)))this.stopTending(worker,{stop:true});
     }
     for(const id of this.records.keys())if(!this.building(id))this.records.delete(id);
@@ -70,6 +70,7 @@ export class FarmingSystem {
     return Math.max(Math.abs(building.x+buildingDefinition(building).width/2-origin.x),Math.abs(building.y+buildingDefinition(building).height/2-origin.y))<=buildingDefinition(home).workRadius;
   }
   release(worker) {
+    this.establishChecks.delete(worker.id);
     this.stopTending(worker);
     if(worker.workTask?.kind!=='harvest')return;
     const record=this.records.get(worker.workTask.targetId);if(record?.reservedBy===worker.id)record.reservedBy=null;
@@ -107,24 +108,41 @@ export class FarmingSystem {
     if(!this.scene.workerSystem.reservations.reserve(reservation,worker.id)){this.waitAtHome(worker);return;}
     this.tending.set(worker.id,{targetId:chosen.plot.id,goal:{...route.destination},reservation,nextHarvestCheck:now+rules.harvestCheck,travelDeadline:now+rules.travelTimeout});worker.path=route.path;worker.workState='Traveling to Target';worker.workMessage='Walking to tend crops';
   }
+  harvestPlan(worker){
+    const goals=new Map();
+    for(const building of this.scene.buildings)if(buildingDefinition(building).crop&&buildingIsComplete(building)&&this.inRange(worker,building)&&this.ripe(building)){
+      const record=this.records.get(building.id);if(record.reservedBy&&record.reservedBy!==worker.id)continue;
+      for(const tile of building.tiles)if(this.scene.map[tile.y]?.[tile.x]===0)goals.set(tileKey(tile),{tile,building});
+    }
+    const route=goals.size?this.scene.workerSystem.ai.route(worker,[...goals.values()].map(g=>g.tile)):null;
+    return route?{route,building:goals.get(tileKey(route.destination)).building}:null;
+  }
+  tryEstablish(worker){
+    const system=this.scene.constructionSystem;
+    if(!system||![...system.sites.values()].some(site=>!site.unverified&&system.canWork(site,worker)&&system.materials.ready(site)))return false;
+    this.stopTending(worker,{stop:true});worker.aiCooldown=0;system.builderAI.updateWorker(worker);return worker.workTask?.kind==='build';
+  }
   updateWorker(worker) {
     const ai=this.scene.workerSystem.ai;
-    let task=worker.workTask;
+    let task=worker.workTask,plan=null;
+    if(task?.kind==='build'){
+      const now=this.scene.gameTime.totalElapsed;
+      if(now>=(this.establishChecks.get(worker.id)??0)){
+        this.establishChecks.set(worker.id,now+FARMING_RULES.tending.harvestCheck);plan=this.harvestPlan(worker);
+        const crop=plan&&buildingDefinition(plan.building).crop,room=plan&&(!this.scene.foodProduction||this.scene.foodStorage.findDestination(worker,crop.resource,crop.yield));
+        if(room){ai.cancel(worker);task=null;worker.aiCooldown=0;}else plan=null;
+      }
+      if(task){this.scene.constructionSystem.builderAI.updateWorker(worker);return;}
+    }
     if(!task){
       const tending=this.tending.get(worker.id),now=this.scene.gameTime.totalElapsed;
       if(tending){if(now<tending.nextHarvestCheck){this.tend(worker);return;}tending.nextHarvestCheck=now+FARMING_RULES.tending.harvestCheck;worker.aiCooldown=0;}
       if(worker.aiCooldown>0)return;
       worker.aiCooldown=WORK_RULES.searchInterval;
-      const goals=new Map();
-      for(const building of this.scene.buildings)if(buildingDefinition(building).crop&&buildingIsComplete(building)&&this.inRange(worker,building)&&this.ripe(building)){
-        const record=this.records.get(building.id);
-        if(record.reservedBy&&record.reservedBy!==worker.id)continue;
-        for(const tile of building.tiles)if(this.scene.map[tile.y]?.[tile.x]===0)goals.set(tileKey(tile),{tile,building});
-      }
-      const route=goals.size?ai.route(worker,[...goals.values()].map(g=>g.tile)):null;
-      if(!route){this.tend(worker);return;}
+      plan??=this.harvestPlan(worker);
+      if(!plan){if(!this.tryEstablish(worker))this.tend(worker);return;}
       this.stopTending(worker,{stop:true});
-      const building=goals.get(tileKey(route.destination)).building,record=this.records.get(building.id);
+      const {route,building}=plan,record=this.records.get(building.id);
       if(!ai.reserve(worker,`crop:${building.id}`,{kind:'harvest',targetId:building.id,cycle:record.cycle,startedAt:this.scene.gameTime.totalElapsed},route))return;
       if(this.scene.foodProduction&&!this.scene.foodProduction.prepareHarvest(worker,building,worker.workTask)){ai.cancel(worker);worker.workState='Waiting';worker.workMessage='Food storage is full or unreachable';worker.aiCooldown=WORK_RULES.searchInterval;return;}
       record.reservedBy=worker.id;task=worker.workTask;
@@ -169,5 +187,5 @@ export class FarmingSystem {
     else for(const building of this.scene.buildings)this.register(building);
     for(const record of this.records.values()){const building=this.building(record.buildingId);if(building)this.paint(building,record);}
   }
-  destroy(){this.scene.events?.off('buildings:changed',this.worldChanged);this.unsubscribe();this.unsubscribeBefore?.();this.unsubscribeSeason?.();this.records.clear();for(const worker of this.scene.workerSystem.liveWorkers())this.stopTending(worker);this.tending.clear();}
+  destroy(){this.scene.events?.off('buildings:changed',this.worldChanged);this.unsubscribe();this.unsubscribeBefore?.();this.unsubscribeSeason?.();this.records.clear();for(const worker of this.scene.workerSystem.liveWorkers())this.stopTending(worker);this.tending.clear();this.establishChecks.clear();}
 }

@@ -31,9 +31,15 @@ export class ProductionDiagnostics {
   // Construction: a supplied site nobody can build, because the kingdom has no Builder.
   constructionIssues(){
     const c=this.scene.constructionSystem;if(!c)return [];
-    if(this.residents('builder').length)return [];
-    return [...c.sites.values()].filter(site=>!site.unverified&&c.materials.ready(site)&&!site.construction.assignedBuilders.length)
-      .map(site=>({entityId:site.id,reason:'noBuilder',category:'construction',params:{}}));
+    const found=[],builders=this.residents('builder').length;
+    for(const site of c.sites.values()){
+      if(site.unverified||!c.materials.ready(site)||site.construction.assignedBuilders.length)continue;
+      if(buildingDefinition(site).crop){
+        const home=this.scene.buildings.find(b=>b.id===site.farmId),farmers=home&&this.residents('farmer').some(w=>w.assignedWorkplaceId===home.id);
+        if(!home||!farmers)found.push({entityId:site.id,reason:home?'noFarmer':'noFarm',category:'construction',params:{}});
+      }else if(!builders)found.push({entityId:site.id,reason:'noBuilder',category:'construction',params:{}});
+    }
+    return found;
   }
   // Production: a staffed building switched on that lacks an input, with the nearest cause that can be checked.
   // Intentionally paused production, unstaffed buildings and inputs on their way or still growing are not problems.
