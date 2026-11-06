@@ -2,6 +2,7 @@ import { KingdomHappinessIndicator } from '../ui/NeedsDisplay.js';
 import { NeedsSystem } from '../systems/NeedsSystem.js';
 import { blockingDialog } from '../ui/dockedPanels.js';
 import { Minimap } from '../ui/Minimap.js';
+import { EventFeed } from '../ui/EventFeed.js';
 import { KingCargoControl } from '../ui/KingCargoControl.js';
 import { UnitSelection } from '../ui/UnitSelection.js';
 import { t } from '../i18n/index.js';
@@ -255,7 +256,7 @@ export class GameScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-H',onDismount);this.updateMountUI();
     this.combatFeedback.refresh();
     this.input.mouse.disableContextMenu();
-    this.unitSelection=new UnitSelection(this);this.minimap=new Minimap(this);
+    this.unitSelection=new UnitSelection(this);this.minimap=new Minimap(this);this.eventFeed=new EventFeed(this);
     // #121: a right click on the map first closes open panels (and does nothing else); otherwise it commands as before.
     const sidePanels=()=>[this.settingsPanel,this.populationSidebar];
     installPanelDismiss(document,{panels:sidePanels,signal:this.controls.signal});
@@ -265,7 +266,7 @@ export class GameScene extends Phaser.Scene {
     this.input.on('pointermove',pointer=>{this.unitSelection.move(pointer);this.updateHover(pointer);if(this.buildMode&&!this.assetGallery.isOpen){if(!this.dragAnchor)this.wallLastLine=null;this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
     this.input.on('gameout',()=>{this.unitSelection.cancelDrag();this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;this.clearWallPreviews();document.querySelector('#object-tooltip').hidden=true;});
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
-      this.unitSelection.destroy();this.minimap?.destroy();this.kingCargoControl.destroy();this.kingLogistics.destroy();this.lightSources.destroy();
+      this.unitSelection.destroy();this.minimap?.destroy();this.eventFeed?.destroy();this.kingCargoControl.destroy();this.kingLogistics.destroy();this.lightSources.destroy();
       this.memoryRenderer.destroy();
       this.populationSidebar.destroy();
       this.staffingIndicators.destroy();
@@ -661,7 +662,7 @@ export class GameScene extends Phaser.Scene {
     this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
     this.combatFeedback?.refresh();
     this.experienceFeedback?.refreshVisibility();this.unitPanel?.refresh();
-    this.populationSidebar?.update();this.unitSelection?.draw();this.minimap?.update();this.kingdomHappiness?.update();
+    this.populationSidebar?.update();this.unitSelection?.draw();this.minimap?.update();this.eventFeed?.update();this.kingdomHappiness?.update();
     this.economyPanel?.update();
     this.workplacePanel?.refresh();this.farmConnections?.refresh();
     this.staffingIndicators?.update();
