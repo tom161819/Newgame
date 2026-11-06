@@ -500,3 +500,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .unit-command-controls .icon-command[aria-pressed="true"] { background:#827143; border-color:#f0d78b; color:#fff3c8; opacity:1; }
 .unit-command-controls .icon-command::after { content:attr(data-tooltip); position:absolute; left:50%; bottom:calc(100% + 6px); transform:translateX(-50%); white-space:nowrap; padding:3px 8px; border-radius:4px; background:#141b12; border:1px solid #978657; color:#ece2c4; font-size:12px; opacity:0; pointer-events:none; transition:opacity .12s; z-index:2; }
 .unit-command-controls .icon-command:hover::after, .unit-command-controls .icon-command:focus-visible::after { opacity:1; }
+/* #104: minimap in the bottom-right corner, the square grid turned into the isometric diamond. */
+.minimap { position:absolute; right:12px; bottom:10px; z-index:9; width:212px; height:106px; cursor:pointer; filter:drop-shadow(0 2px 6px #000a); touch-action:none; }
+.minimap canvas { position:absolute; left:50%; top:50%; width:150px; height:150px; margin:-75px 0 0 -75px; transform:scaleY(.5) rotate(45deg); image-rendering:pixelated; border:1px solid #b99a53; }
+@media(max-width:760px){ .minimap { transform:scale(.7); transform-origin:100% 100%; } }

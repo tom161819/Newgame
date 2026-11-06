@@ -56,7 +56,7 @@ export async function buildingMenuSmoke(page){
 
 export async function clickWorld(page,point,{forBlueprint=false}={}){
   await page.evaluate(async point=>{await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));const s=window.__game.registry.get('application').scene;s.worldCamera.syncSize();s.worldCamera.following=false;s.cameras.main.setZoom(.9).centerOn(point.x,point.y);s.cameras.main.preRender();await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));},point);
-  const camera=await page.evaluate(()=>{const c=window.__game.registry.get('application').scene.cameras.main;return{x:c.scrollX+c.width/2,y:c.scrollY+c.height/2,w:c.width,h:c.height,z:c.zoom};}),bounds=await page.locator('canvas').boundingBox();
+  const camera=await page.evaluate(()=>{const c=window.__game.registry.get('application').scene.cameras.main;return{x:c.scrollX+c.width/2,y:c.scrollY+c.height/2,w:c.width,h:c.height,z:c.zoom};}),bounds=await page.locator('canvas:not(.minimap-canvas)').boundingBox();
   // Staffing controls are real DOM overlays. Use an exposed point inside the
   // same 64x32 anchor diamond; never dispatch a synthetic click through them.
   const offsets=forBlueprint?[[0,0],[16,0],[-16,0],[0,-8],[0,8],[12,4],[-12,4],[12,-4],[-12,-4],[24,0],[-24,0]]:[[0,0]];
