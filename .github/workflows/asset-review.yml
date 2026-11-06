@@ -1,0 +1,32 @@
+name: Asset review intake
+
+# #214 (AR-4 of #210): an Asset Studio "Submit review" issue is validated against main, summarised, older reviews it
+# supersedes are closed and it is labelled for Claude. It only comments and labels; it never writes to the repository.
+on:
+  issues:
+    types: [opened, edited, labeled]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: asset-review-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  intake:
+    if: contains(github.event.issue.body, '```asset-review')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Validate and summarise the review
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/asset-review-intake.mjs
