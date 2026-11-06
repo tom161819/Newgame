@@ -13,7 +13,7 @@ PR138 and repair PR151 are merged and verified by Pages42109315944. PR142 (#122)
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| NEW04 (#122) Seasonal field tending | Codex | `codex/farmer-field-tending` | [#142](https://github.com/tom161819/Newgame/pull/142) | Implemented independently while #131 waits; current S12/FoW main integrated, 618 tests + build and real farmer browser PASS; PR/CI pending | FarmingSystem.js, data/farming.js, own EN/CS block, isolated farming tests/browser smoke, docs/changelog. No WorkerAI, serializer, cargo/storage or S12 edits; derived low-priority behavior only. |
+| NEW04 (#122) Seasonal field tending | Codex | `codex/farmer-field-tending` | [#142](https://github.com/tom161819/Newgame/pull/142) | Restored after restart and approval limit; main9478976/schema29 integrated, 646 tests + changelog/build and combined farmer/employment/staffing/seasons browser PASS; exact-head CI pending | FarmingSystem.js, data/farming.js, own EN/CS block, isolated farming tests/browser smoke, docs/changelog. No WorkerAI, serializer, cargo/storage or S12 edits; derived low-priority behavior only. |
 | NEW21 (#149) Studio ruins designs | Claude | `claude/studio-ruins` | [#161](https://github.com/tom161819/Newgame/pull/161) | PR open; review only | studio/src/generators/ruins.js (new), art/assets/decorations/ruin*, art/sprites/ruin*, art/approvals.json, art/style-guide.json (soot, charcoal) |
 
 ## Kept backups (do not delete without the developer)
