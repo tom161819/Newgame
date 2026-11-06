@@ -15,7 +15,6 @@ PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da2
 |---|---|---|---|---|---|
 | Verified farming deployment records | Codex | `codex/farming-completion-records` | — | Prepared during167 deployment wait; merge only after actual167 Pages | docs/COORDINATION.md, docs/CODEX_PROGRESS.md, completed verification records only. |
 | NEW17 (#145) Farmer plot establishment | Codex | `codex/farmer-plot-establishment` | [#167](https://github.com/tom161819/Newgame/pull/167) | Implemented: 677 tests/changelog/build and native establishment/ownership/tending browser PASS; schema32; complete --full browser PASS on885; actual166 merge4e29 integrated; fresh678 tests/changelog/build and native UI/planting/tending-presence/employment browsers PASS; merged0f0b9fa after final CI42168372971 and verified166 deployment; await own Pages42168689667; merge only after actual166 Pages | crop costs, shared ConstructionSystem/BuilderAI/ConstructionUI + ConstructionMaterials contracts, FarmingSystem, Workplaces presence hook, XP rules, diagnostics, schema32 validation, own i18n/tests/browser/docs. Reuse sites/progress/tasks; preserve166 ownership. |
-| NEW21 (#149) Studio ruins designs | Claude | `claude/studio-ruins` | [#161](https://github.com/tom161819/Newgame/pull/161) | PR open; review only | studio/src/generators/ruins.js (new), art/assets/decorations/ruin*, art/sprites/ruin*, art/approvals.json, art/style-guide.json (soot, charcoal) |
 
 ## Kept backups (do not delete without the developer)
 
@@ -23,6 +22,8 @@ PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da2
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-06 PR161 / Issue149 (Claude): Studio ruin designs completed as review candidates; actual merge947897601720893ff7bb58117afc202ecd531db3 is an ancestor of current main. Issue149 is closed/status:done; verified descendant Pages42157299626 and42166266800 contain it. Removed its stale active-row reservation; asset approvals remain unchanged.
 
 - 2026-11-06 PR166 / Issue146: merged4e29fe3f9b7a2f0021c21b46c00cfb652edf5c4c after exact-head CI42165693609;670 tests/changelog/build and native ownership/tending/employment/staffing PASS, including desktop/phone map visibility and Escape. Pages42166266800 build AND deploy SUCCESS for the exact merge;146 closed/done. Schema31, no migrations; farm-only responsive inspector keeps connections readable.
 
