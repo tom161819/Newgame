@@ -1,3 +1,4 @@
+import { GateView } from './GateView.js';
 import { RockMiningTool } from '../ui/RockMiningTool.js';
 import { DemolitionSystem } from '../systems/DemolitionSystem.js';
 import { finishDemolition } from './buildingRemoval.js';
@@ -48,7 +49,7 @@ import { SettingsPanel } from '../ui/SettingsPanel.js';
 import { FpsOverlay } from '../ui/FpsOverlay.js';
 import { installPanelDismiss,closeOpenPanels } from '../ui/PanelDismiss.js';
 import { FortificationView } from './FortificationView.js';
-import { wallLine,wallLinePlan,placeWallLine,wallIndex,connectionsFor,connectedWalls,isWall } from './walls.js';
+import { wallLine,wallLinePlan,placeWallLine,wallIndex,connectionsFor,connectedWalls,isWall,roofAccessOrigins,roofIndex } from './walls.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
 import { CombatFeedback } from '../ui/CombatFeedback.js';
 import { GameTimeSystem } from '../systems/GameTimeSystem.js';
@@ -146,6 +147,7 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('tower',(_definition,context)=>new TowerView(this,context.building,context.preview));
     this.assets.registerRenderer('animal',(definition,context)=>new AnimalView(this,context.x,context.y,definition));
     this.assets.registerRenderer('fortification',(_definition,context)=>new FortificationView(this,context.building,context.preview));
+    this.assets.registerRenderer('gate',(_definition,context)=>new GateView(this,context.building,context.preview));
     this.assets.registerRenderer('chest',(_definition,context)=>new ChestView(this,context.x,context.y));
     this.assets.registerRenderer('human',(definition,context)=>new HumanView(this,context.x,context.y,definition));
     this.assets.registerRenderer('workplace',(_definition,context)=>new WorkplaceView(this,context.building,context.preview));
@@ -335,7 +337,7 @@ export class GameScene extends Phaser.Scene {
   resourceOrigins() {
     const c=this.character;
     if(c.exitTile)return [c.exitTile];
-    if(c.currentTower&&isWall(c.currentTower))return connectedWalls(this.buildings,c.currentTower).flatMap(towerNeighbors);
+    if(c.currentTower&&isWall(c.currentTower))return roofAccessOrigins(this.buildings,c.currentTower);
     return c.currentTower?towerNeighbors(c.currentTower):[c.nextTile??c.tile];
   }
   resourceCount(id) { let count=0;for(const view of this.resources.values())if(view.getData('objectId')===id)count++;return count; }
@@ -536,7 +538,7 @@ export class GameScene extends Phaser.Scene {
     this.cancelBuilding(t('status.wallBlueprints',{count:result.buildings.length,cost:formatCost(result.cost,this.objectRegistry)}));
   }
   refreshWallConnections(){
-    this.wallMap=wallIndex(this.buildings);
+    this.wallMap=wallIndex(this.buildings);this.roofMap=roofIndex(this.buildings);
     for(const building of this.wallMap.values()){
       const connections=connectionsFor(this.wallMap,building),key=JSON.stringify(connections);
       if(key!==building.connectionKey){building.connections=connections;building.connectionKey=key;this.towerViews.get(building.id)?.paint(building);}

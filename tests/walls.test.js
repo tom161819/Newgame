@@ -66,18 +66,21 @@ test('roof navigation only joins shared edges and finds an exit beyond a surroun
   const bridge=makeWall(3,2,3);assert.deepEqual(findRoofPath([a,bridge,diagonal],a,diagonal).map(b=>b.id),[3,2]);
   const world=map(),buildings=[];
   for(let y=4;y<=6;y++)for(let x=4;x<=6;x++){buildings.push(makeWall(x,y,buildings.length+1));world[y][x]=1;}
-  const center=buildings.find(b=>b.x===5&&b.y===5),route=planRoofExit(world,buildings,center,{kind:'move',goal:{x:0,y:0}});
+  const center=buildings.find(b=>b.x===5&&b.y===5);assert.equal(planRoofExit(world,buildings,center,{kind:'move',goal:{x:0,y:0}}),null,'plain walls provide no ground exit');
+  const definition=objectRegistry.require('tower'),tower={id:99,type:'tower',x:7,y:4,definition,tiles:buildingTiles({x:7,y:4},definition)};buildings.push(tower);for(const t of tower.tiles)world[t.y][t.x]=1;
+  const route=planRoofExit(world,buildings,center,{kind:'move',goal:{x:0,y:0}});assert.equal(route.accessId,tower.id);
   assert.ok(route);assert.ok(route.roofPath.length>0);assert.equal(world[route.exit.y][route.exit.x],0);
 });
 
 test('king climbs, walks continuously on joined walls, retargets without jumping and descends before ground movement',()=>{
   const buildings=Array.from({length:5},(_,i)=>makeWall(4+i,4,i+1)),world=map();for(const b of buildings)world[b.y][b.x]=1;
+  const definition=objectRegistry.require('tower'),access={id:99,type:'tower',x:2,y:4,definition,tiles:buildingTiles({x:2,y:4},definition)};buildings.push(access);for(const t of access.tiles)world[t.y][t.x]=1;
   const sprite={...tileCenter({x:0,y:0}),setPosition(x,y){this.x=x;this.y=y;return this;},setDepth(n){this.depth=n;return this;}},animations=[];
   const scene={map:world,buildings,wallMap:wallIndex(buildings),marker:{visible:false,setVisible(v){this.visible=v;}},
     setStatus(){},showMarker(){this.marker.visible=true;},updateBuildingUI(){},tweens:{add(tween){animations.push(tween);}}};
   const c=new PlayerController(scene,sprite,{x:0,y:0});
   const complete=()=>{const a=animations.shift();assert.ok(a);sprite.setPosition(a.x,a.y);a.onComplete();};
-  c.command({kind:'enter',tower:buildings[0]});c.update(20000);assert.equal(c.state,'enteringTower');complete();assert.equal(c.state,'onWall');
+  c.command({kind:'enter',tower:buildings[0]});c.update(20000);assert.equal(c.state,'enteringTower');assert.equal(c.currentTower.id,access.id);complete();assert.equal(c.state,'onWall');c.update(20000);
   assert.deepEqual({x:sprite.x,y:sprite.y},towerTop(buildings[0]));
   c.command({kind:'enter',tower:buildings[4]});c.update(100);assert.equal(c.state,'onWall');assert.equal(c.walking,true);
   const before={...c.position},next={...c.nextTile};c.command({kind:'enter',tower:buildings[0]});

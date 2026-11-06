@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+### Added
+
+- Stone Gates provide a two-way passage between solid pillars in either map axis, with stairs to connected wall walks.
+
+### Changed
+
+- Wall walks are reached and left through completed reachable towers or gates. The King travels continuously over joined walls and tower roofs instead of climbing any wall from the ground.
+
 ## [0.9.2] - 2026-11-06
 <!-- version: {"title":"Food menu and Hunting Lodge unlock","type":"feature","reconstructed":false,"saveVersion":37} -->
 ### Changed

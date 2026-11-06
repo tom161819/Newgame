@@ -1,3 +1,4 @@
+import { buildingGroundOpen } from '../game/buildingGround.js';
 import { BuilderWorkshopBases } from './BuilderWorkshopBases.js';
 import { t } from '../i18n/index.js';
 import { dataName } from '../i18n/names.js';
@@ -112,7 +113,7 @@ export class ConstructionSystem {
     if(!this.materials.complete(site))return false;
     c.state='complete';c.progress=100;c.rewardsGranted=true;
     // #150: pavement laid under a finished building leaves that building's tiles blocked.
-    if(buildingDefinition(site).walkable&&!(buildingDefinition(site).pavement&&this.materials.area(site).host))for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=0;
+    if(!(buildingDefinition(site).pavement&&this.materials.area(site).host))for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=buildingGroundOpen(site,buildingDefinition(site),tile)?0:1;
     for(const id of [...c.assignedBuilders]){const actor=this.actor(id);if(!actor)continue;if(id==='king')this.stopKing();else{this.scene.workerSystem.ai.cancel(actor);actor.workState='Searching for Work';actor.aiCooldown=0;}}
     c.assignedBuilders=[];this.sites.delete(site.id);this.revision++;
     const contributors=Object.entries(c.contributions).filter(([,work])=>work>0),total=contributors.reduce((sum,[,work])=>sum+work,0);let allocated=0;

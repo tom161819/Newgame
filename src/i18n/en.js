@@ -2,6 +2,10 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  'object.gate_x.name':'Stone Gate (X passage)','object.gate_y.name':'Stone Gate (Y passage)',
+  'object.gate_x.description':'Two-way X passage between solid pillars; stairs lead to the joined wall walk. Existing wall kit.',
+  'object.gate_y.description':'Two-way Y passage between solid pillars; stairs lead to the joined wall walk. Existing wall kit.',
+  'status.noRoofAccess':'No reachable completed tower or gate leads to that wall.',
   'seating.resting':'Resting on the workplace porch',
   'seating.walking':'Walking to a workplace seat',
   'workshop.rule':'Builders without a reachable completed workshop build at 50% speed. Movement, carrying, King and Farmers are unchanged.',

@@ -1,10 +1,19 @@
+import { findPathToAny } from './pathfinding.js';
+import { tileCenter } from './isometric.js';
 import { t } from '../i18n/index.js';
-import { buildingDefinition,buildingIsComplete,placementError,buildingTiles,planTowerExit } from './buildings.js';
+import { buildingDefinition,buildingIsComplete,placementError,buildingTiles,planTowerExit,towerNeighbors,roofAccessNeighbors,towerTop } from './buildings.js';
 import { tileKey } from './stones.js';
 
 export const WALL_DIRECTIONS=Object.freeze([{name:'N',x:0,y:-1},{name:'E',x:1,y:0},{name:'S',x:0,y:1},{name:'W',x:-1,y:0}]);
 export const isWall=building=>buildingDefinition(building).navigation?.walkableTop===true;
-export const wallIndex=(buildings,includeUnfinished=false)=>new Map(buildings.filter(b=>isWall(b)&&(includeUnfinished||buildingIsComplete(b))).map(b=>[tileKey(b),b]));
+export const isRoofAccess=b=>buildingDefinition(b).navigation?.roofAccess===true||!isWall(b)&&buildingDefinition(b).interactions?.includes('enter');
+export function roofCells(building){
+  const d=buildingDefinition(building);if(d.width===1&&d.height===1)return [building];
+  const top=towerTop(building),center=tileCenter(building),definition={...d,width:1,height:1,navigation:{...d.navigation,walkableTop:true},platform:{x:top.x-center.x,y:top.y-center.y}};
+  return building.tiles.map(tile=>({...building,...tile,tiles:[tile],definition,roofOwnerId:building.id}));
+}
+export const wallIndex=(buildings,includeUnfinished=false)=>new Map(buildings.filter(b=>isWall(b)&&(includeUnfinished||buildingIsComplete(b))).flatMap(roofCells).map(b=>[tileKey(b),b]));
+export const roofIndex=buildings=>new Map(buildings.filter(b=>(isWall(b)||isRoofAccess(b))&&buildingIsComplete(b)).flatMap(roofCells).map(b=>[tileKey(b),b]));
 
 export function wallLine(start,end){
   const dx=end.x-start.x,dy=end.y-start.y,horizontal=Math.abs(dx)>=Math.abs(dy);
@@ -39,7 +48,7 @@ export function placeWallLine(options){
 }
 
 function roofTree(buildings,start){
-  const index=wallIndex(buildings),first=tileKey(start),parents=new Map(),distances=new Map(),queue=[];
+  const index=roofIndex(buildings),first=tileKey(start),parents=new Map(),distances=new Map(),queue=[];
   if(index.has(first)){parents.set(first,null);distances.set(first,0);queue.push(first);}
   for(let i=0;i<queue.length;i++){
     const key=queue[i],building=index.get(key);if(!building)continue;
@@ -55,15 +64,30 @@ function reconstruct(tree,end){
 }
 export function connectedWalls(buildings,start){const tree=roofTree(buildings,start);return [...tree.parents.keys()].map(key=>tree.index.get(key)).filter(Boolean);}
 export function findRoofPath(buildings,start,end){
-  if(!isWall(start)||!isWall(end))return null;
+  if(!start||!end)return null;
   const tree=roofTree(buildings,start);return tree.parents.has(tileKey(end))?reconstruct(tree,end):null;
+}
+export function planGroundRoofEntry(map,buildings,start,target,options){
+  let best=null;
+  for(const access of buildings.filter(b=>isRoofAccess(b)&&buildingIsComplete(b))){
+    const roofPath=findRoofPath(buildings,access,target);if(roofPath===null)continue;
+    const route=findPathToAny(map,start,roofAccessNeighbors(access),options);if(!route)continue;
+    const totalCost=route.cost+roofPath.length;
+    if(!best||totalCost<best.totalCost)best={...route,totalCost,access};
+  }
+  return best;
 }
 export function planRoofExit(map,buildings,start,order,options){
   const tree=roofTree(buildings,start);let best=null;
-  for(const [key,roofCost]of tree.distances){
-    const wall=tree.index.get(key),route=planTowerExit(map,wall,order,options);if(!route)continue;
+  for(const access of buildings.filter(b=>isRoofAccess(b)&&buildingIsComplete(b))){
+    const key=tileKey(access),roofCost=tree.distances.get(key);if(roofCost==null)continue;
+    const route=planTowerExit(map,access,order,options);if(!route)continue;
     const totalCost=roofCost+route.cost;
-    if(!best||totalCost<best.totalCost)best={...route,totalCost,wall,roofPath:reconstruct(tree,wall)};
+    if(!best||totalCost<best.totalCost)best={...route,totalCost,accessId:access.id,wall:tree.index.get(key),roofPath:reconstruct(tree,access)};
   }
   return best;
+}
+export function roofAccessOrigins(buildings,start){
+  const tree=roofTree(buildings,start);
+  return buildings.filter(b=>isRoofAccess(b)&&buildingIsComplete(b)&&tree.parents.has(tileKey(b))).flatMap(roofAccessNeighbors);
 }

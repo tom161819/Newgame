@@ -1,3 +1,4 @@
+import { buildingGroundOpen,gateStairNeighbors } from './buildingGround.js';
 import { availableFarm } from '../data/farmPlots.js';
 import { t } from '../i18n/index.js';
 import { dataName } from '../i18n/names.js';
@@ -70,7 +71,7 @@ export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,
   if(definition.crop)building.farmId=availableFarm(building,buildings,buildingDefinition)?.id??null;
   if(!(materials?materials.prepare(building):inventory.pay(definition.cost,{source:`${dataName(definition)} Construction`,entityId:building.id})))return {error:t('status.noFunds')};
   if(provisional){building.unverified=true;buildings.push(building);if(definition.id==='quarry')building.quarryMode='unbound';return {building};}
-  for(const tile of building.tiles)map[tile.y][tile.x]=definition.walkable?0:1;
+  for(const tile of building.tiles)map[tile.y][tile.x]=buildingGroundOpen(building,definition,tile)?0:1;
   buildings.push(building);
   if(resources.naturalContext){resources.naturalContext.mining.bind(building);resources.naturalContext.topologyRevision++;}else if(definition.id==='quarry')building.quarryMode=reserveMaterials?'unbound':'legacy';
   return {building};
@@ -80,7 +81,8 @@ export function placeTower(options) {
   return result.error?result:{tower:result.building};
 }
 
-export function approachTower(map,start,building,options) { return findPathToAny(map,start,towerNeighbors(building),options); }
+export function roofAccessNeighbors(building){return gateStairNeighbors(building,buildingDefinition(building))??towerNeighbors(building);}
+export function approachTower(map,start,building,options) { return findPathToAny(map,start,roofAccessNeighbors(building),options); }
 export function planGroundOrder(map,start,order,options) {
   if(order.kind==='approachAnimal')return findPathToAny(map,start,adjacentTiles(order.animal,map),options);
   if(order.kind==='enter')return approachTower(map,start,order.tower,options);
@@ -90,7 +92,7 @@ export function planGroundOrder(map,start,order,options) {
 }
 export function planTowerExit(map,building,order,options) {
   let best=null;
-  for(const exit of towerNeighbors(building)){
+  for(const exit of roofAccessNeighbors(building)){
     if(!isWalkable(map,exit.x,exit.y))continue;
     const route=planGroundOrder(map,exit,order,options);
     if(route&&(!best||route.cost<best.cost))best={...route,exit};
