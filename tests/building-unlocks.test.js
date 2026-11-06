@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { setLanguage } from '../src/i18n/index.js';
 import { EventEmitter } from 'node:events';
 import { workerScene } from './helpers/workerScene.js';
 import { objectRegistry,ObjectRegistry } from '../src/systems/ObjectRegistry.js';
@@ -16,19 +17,19 @@ function build(s,type,x,y){const result=place(s,type,x,y);assert.ifError(result.
 
 test('new games and starting castles do not unlock farming; other food buildings keep their existing availability',()=>{
   const s=scene();s.buildings.push({id:90,type:'castle'});s.events.emit('buildings:changed');
-  for(const id of ['granary','mill','bakery','hunting_lodge','tower','warehouse'])assert.equal(s.buildingUnlocks.status(definition(id)).unlocked,true);
-  for(const id of ['farmhouse','wheat_field','orchard'])assert.equal(s.buildingUnlocks.status(definition(id)).unlocked,false);
+  for(const id of ['granary','mill','bakery','tower','warehouse'])assert.equal(s.buildingUnlocks.status(definition(id)).unlocked,true);
+  for(const id of ['farmhouse','hunting_lodge','wheat_field','orchard'])assert.equal(s.buildingUnlocks.status(definition(id)).unlocked,false);
   assert.match(s.buildingUnlocks.status(definition('farmhouse')).description,/Build a Granary/);
 });
 test('the placement transaction rejects locked objects before payment, reservations, occupancy or world mutation',()=>{
   const s=scene();s.inventory.add('stone',30);const before=serializeGameState(s);
-  for(const id of ['farmhouse','wheat_field','orchard']){assert.ok(place(s,id).error);assert.deepEqual(serializeGameState(s),before);}
+  for(const id of ['farmhouse','hunting_lodge','wheat_field','orchard']){assert.ok(place(s,id).error);assert.deepEqual(serializeGameState(s),before);}
 });
 test('only physical Granary completion unlocks Farmhouse, then completed Farmhouse unlocks both crops',()=>{
   const s=scene();s.inventory.add('stone',30);const result=place(s,'granary');assert.ifError(result.error);const granary=result.building;s.constructionSystem.plan(granary);
   assert.equal(s.inventory.count('stone'),20);assert.match(s.buildingUnlocks.status(definition('farmhouse')).description,/completed Granary/);assert.ok(place(s,'farmhouse',50,44).error);
-  assert.equal(s.kingLogistics.startMaterials(granary),true);until(s,()=>s.constructionSystem.materials.ready(granary));assert.equal(s.buildingUnlocks.status(definition('farmhouse')).unlocked,false);
-  assert.equal(s.constructionSystem.commandKing(granary),true);until(s,()=>buildingIsComplete(granary));assert.equal(s.buildingUnlocks.status(definition('farmhouse')).unlocked,true);
+  assert.equal(s.kingLogistics.startMaterials(granary),true);until(s,()=>s.constructionSystem.materials.ready(granary));assert.equal(s.buildingUnlocks.status(definition('farmhouse')).unlocked,false);assert.equal(s.buildingUnlocks.status(definition('hunting_lodge')).unlocked,false);
+  assert.equal(s.constructionSystem.commandKing(granary),true);until(s,()=>buildingIsComplete(granary));assert.equal(s.buildingUnlocks.status(definition('farmhouse')).unlocked,true);assert.equal(s.buildingUnlocks.status(definition('hunting_lodge')).unlocked,true);
   const farm=build(s,'farmhouse',50,44);assert.equal(s.buildingUnlocks.status(definition('wheat_field')).unlocked,true);assert.equal(s.buildingUnlocks.status(definition('orchard')).unlocked,true);
   assert.equal(s.inventory.count('stone'),10);assert.equal(s.buildings.filter(b=>b.type==='granary').length,1);assert.equal(s.buildings.find(b=>b.id===farm.id),farm);validateGameState(serializeGameState(s));
 });
@@ -73,4 +74,13 @@ test('Save/Load derives prerequisites from actual buildings and preserves legacy
 test('canceling an unfinished prerequisite releases its payment and updates the pending tooltip without unlocking',()=>{
   const s=scene();s.inventory.add('stone',10);const {building}=place(s,'granary');s.constructionSystem.plan(building);assert.match(s.buildingUnlocks.status(definition('farmhouse')).description,/completed Granary/);
   assert.equal(s.constructionSystem.cancel(building),true);assert.match(s.buildingUnlocks.status(definition('farmhouse')).description,/Build a Granary/);assert.equal(s.inventory.count('stone'),10);assert.equal(s.character.experience.totalXP,0);validateGameState(serializeGameState(s));
+});
+
+
+test('Lodge unlock follows completed Granaries after current Load and relocks without removing existing Lodges; requirement is localized',()=>{
+  const s=scene();s.inventory.add('stone',20);const granary=build(s,'granary',44,44),lodge=build(s,'hunting_lodge',50,44);
+  const saved=validateGameState(serializeGameState(s)),r=scene({starter:false});loadGameState(r,structuredClone(saved));assert.equal(r.buildingUnlocks.status(definition('hunting_lodge')).unlocked,true);
+  r.buildings=r.buildings.filter(b=>b.id!==granary.id);r.events.emit('buildings:changed');assert.equal(r.buildingUnlocks.status(definition('hunting_lodge')).unlocked,false);assert.ok(r.buildings.some(b=>b.id===lodge.id));assert.ok(place(r,'hunting_lodge',60,44).error);
+  try{setLanguage('cs',{persist:false});assert.match(r.buildingUnlocks.status(definition('hunting_lodge')).description,/Vyžaduje.*Sýpka/);setLanguage('en',{persist:false});assert.match(r.buildingUnlocks.status(definition('hunting_lodge')).description,/Build a Granary/);}finally{setLanguage('en',{persist:false});}
+  r.buildings.push({...granary,id:1000});r.events.emit('buildings:changed');assert.equal(r.buildingUnlocks.status(definition('hunting_lodge')).unlocked,true);
 });

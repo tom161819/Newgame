@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-11-06
+<!-- version: {"title":"Food menu and Hunting Lodge unlock","type":"feature","reconstructed":false,"saveVersion":37} -->
+### Changed
+
+- Food & Farming starts with Granary, then Farmhouse. Hunting Lodge stays visibly locked until a Granary is finished; losing the last Granary relocks new Lodges while existing ones remain.
+
 ## [0.9.1] - 2026-11-06
 <!-- version: {"title":"Workplace idle seating","type":"feature","reconstructed":false,"saveVersion":37} -->
 ### Added

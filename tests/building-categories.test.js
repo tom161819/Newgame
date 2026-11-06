@@ -6,7 +6,7 @@ test('each implemented building has a central valid menu category; All contains 
   const all=buildingsInCategory(objectRegistry,'all');assert.deepEqual(all,objectRegistry.buildables());assert.equal(all.length,26);
   for(const d of objectRegistry.byCategory('building'))assert.ok(Object.hasOwn(BUILDING_CATEGORIES,d.buildingCategory));
   assert.deepEqual(buildingsInCategory(objectRegistry,'defense').map(d=>d.id),['tower','castle','wall','barracks','bowyer','swordsmith','armorer','armory']);
-  assert.deepEqual(buildingsInCategory(objectRegistry,'food').map(d=>d.id),['hunting_lodge','farmhouse','wheat_field','orchard','mill','bakery','granary']);
+  assert.deepEqual(buildingsInCategory(objectRegistry,'food').map(d=>d.id),['granary','farmhouse','hunting_lodge','wheat_field','orchard','mill','bakery']);
   assert.deepEqual(buildingsInCategory(objectRegistry,'industry').map(d=>d.id),['quarry','wheelwright_workshop','lumberjack_hut','iron_mine','smelter','builder_workshop']);assert.deepEqual(buildingsInCategory(objectRegistry,'logistics').map(d=>d.id),['warehouse','stables']);
   assert.deepEqual(buildingsInCategory(objectRegistry,'housing').map(d=>d.id),['house']);assert.deepEqual(buildingsInCategory(objectRegistry,'infrastructure').map(d=>d.id),['stone_pavement','brazier']);
 });
