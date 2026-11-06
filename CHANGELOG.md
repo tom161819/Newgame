@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Each Granary stores 200 raw inputs and 200 finished food independently. Wheat and Flour share the raw limit; Bread, Meat and Apple share the food limit. Incoming reservations use their own group, and the storage panel shows both counts and reserved arrivals. Warehouses, the Starter Stockpile and production buffers keep their existing limits.
 - Stone Pavement can now be laid under a finished building (Single, Line or Area). Builders work from the building's edge and the cost stays 1 Stone for every 2 tiles. The building covers the paved floor, and the floor remains after the building is gone. Fields and orchards cannot be paved.
 - Horse Wagon: the Wheelwright's Workshop panel has a Make choice between Wheelbarrow and Horse Wagon (30 Wood, 6 Iron Bars and one tamed horse from the Stables, 90 seconds of work).
   - The Wheelwrights wait until a tamed horse is free, then reserve it before any material is used. A running batch keeps its recipe when the choice changes.

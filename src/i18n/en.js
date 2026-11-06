@@ -2,6 +2,9 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  // Independent Granary capacities (#123).
+  'storage.granary.raw':'Raw Materials {used}/{capacity} · Incoming {incoming} · Free {free}',
+  'storage.granary.food':'Food {used}/{capacity} · Incoming {incoming} · Free {free}',
   // Employment exclusions (#131).
   'employment.exclude.local':'Disable employment here',
   'employment.exclude.type':'Disable employment for this building type ({name})',

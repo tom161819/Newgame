@@ -1,3 +1,4 @@
+import { GRANARY_GROUP_CAPACITY,granaryGroup,granaryUsage } from '../data/granaryCapacity.js';
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
 import { recipeResources } from '../data/production.js';
 import { PLAYER_START } from '../game/config.js';
@@ -19,7 +20,7 @@ export class FoodStorageSystem {
   manages(resource){return this.physicalMaterials?resource!=='gold'&&this.scene.objectRegistry.get(resource)?.category==='resource'&&this.scene.objectRegistry.get(resource).collectible:FOOD_RESOURCE_IDS.includes(resource);}
   resourceIds(){return this.physicalMaterials?physicalResources(this.scene.objectRegistry):[...FOOD_RESOURCE_IDS];}
   reservedTiles(){return [...this.locations.values()].filter(l=>l.kind==='fallback'&&l.buildingId==null).map(l=>({x:l.x,y:l.y}));}
-  changed(){for(const l of this.locations.values())l.legacyOverflow=Math.max(0,this.used(l)-l.capacity);this.revision++;for(const listener of this.listeners)listener();}
+  changed(){for(const l of this.locations.values())l.legacyOverflow=this.groups(l.id)?Object.values(this.groups(l.id)).reduce((n,g)=>n+Math.max(0,g.used-g.capacity),0):Math.max(0,this.used(l)-l.capacity);this.revision++;for(const listener of this.listeners)listener();}
   subscribe(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   register(building){
     if(!buildingIsComplete(building))return;
@@ -38,7 +39,19 @@ export class FoodStorageSystem {
   reserved(locationId,resource){return [...this.reservations.values()].filter(r=>r.kind==='stock'&&r.locationId===locationId&&r.resource===resource).reduce((n,r)=>n+r.amount,0);}
   incoming(locationId,resource=null){return [...this.reservations.values()].filter(r=>r.kind==='capacity'&&r.locationId===locationId&&(resource==null||r.resource===resource)).reduce((n,r)=>n+r.amount,0);}
   free(locationId,resource){const l=this.locations.get(locationId);return l?Math.max(0,(l.stock[resource]??0)-this.reserved(locationId,resource)):0;}
-  room(locationId){const l=this.locations.get(locationId);return l?Math.max(0,l.capacity-this.used(l)-this.incoming(locationId)):0;}
+  groups(locationId){
+    const l=this.locations.get(locationId);if(!l||l.kind!=='storage'||!this.scene.buildings.some(b=>b.id===l.buildingId&&b.type==='granary'))return null;
+    const used=granaryUsage(l.stock,this.scene.objectRegistry),incoming={raw:0,food:0};
+    for(const r of this.reservations.values())if(r.kind==='capacity'&&r.locationId===locationId){const group=granaryGroup(r.resource,this.scene.objectRegistry);if(group)incoming[group]+=r.amount;}
+    return Object.fromEntries(Object.entries(GRANARY_GROUP_CAPACITY).map(([group,capacity])=>[group,{capacity,used:used[group],incoming:incoming[group],free:Math.max(0,capacity-used[group]-incoming[group])}]));
+  }
+  storedRoom(location,resource){const groups=this.groups(location.id);if(!groups)return Math.max(0,location.capacity-this.used(location));const group=granaryGroup(resource,this.scene.objectRegistry);return group?Math.max(0,groups[group].capacity-groups[group].used):0;}
+  room(locationId,resource=null){
+    const l=this.locations.get(locationId);if(!l)return 0;const groups=this.groups(locationId);
+    if(!groups)return Math.max(0,l.capacity-this.used(l)-this.incoming(locationId));
+    if(resource==null)return Object.values(groups).reduce((n,g)=>n+g.free,0);
+    const group=granaryGroup(resource,this.scene.objectRegistry);return group?groups[group].free:0;
+  }
   available(resource){return [...this.locations.values()].filter(l=>this.isStock(l)).reduce((n,l)=>n+this.free(l.id,resource),0);}
   inventorySummary(){const result={};for(const id of this.resourceIds())if([...this.locations.values()].some(l=>this.isStock(l)&&(l.stock[id]??0)>0))result[id]=this.available(id);return result;}
   resourceBreakdown(){
@@ -71,17 +84,17 @@ export class FoodStorageSystem {
   }
   findDestination(actor,resource,amount,{partial=false}={}){
     const granaries=[...this.locations.values()].filter(l=>l.kind==='storage'&&l.allowed.includes(resource));
-    const withRoom=granaries.filter(l=>this.room(l.id)>=(partial?1:amount)),route=this.route(actor,withRoom);
+    const withRoom=granaries.filter(l=>this.room(l.id,resource)>=(partial?1:amount)),route=this.route(actor,withRoom);
     if(route)return route;
     // A reachable full granary stops production rather than creating extra camp capacity.
     if(!this.physicalMaterials&&granaries.length&&this.route(actor,granaries))return null;
-    return this.route(actor,[...this.locations.values()].filter(l=>l.kind==='fallback'&&l.allowed.includes(resource)&&this.room(l.id)>=(partial?1:amount)));
+    return this.route(actor,[...this.locations.values()].filter(l=>l.kind==='fallback'&&l.allowed.includes(resource)&&this.room(l.id,resource)>=(partial?1:amount)));
   }
   findSource(actor,resource){return this.route(actor,[...this.locations.values()].filter(l=>this.isStock(l)&&this.free(l.id,resource)>0));}
   atLocation(actor,id){const l=this.locations.get(id);return !!l&&!actor.nextTile&&!actor.path.length&&this.goals(l).some(t=>tileKey(t)===tileKey(actor.tile));}
   reserve(kind,locationId,resource,amount,owner){
     const l=this.locations.get(locationId);if(!['stock','capacity'].includes(kind)||!l||!positive(amount)||!l.allowed.includes(resource)||!owner)return null;
-    if((kind==='stock'?this.free(locationId,resource):this.room(locationId))<amount)return null;
+    if((kind==='stock'?this.free(locationId,resource):this.room(locationId,resource))<amount)return null;
     const id=`food-reservation-${this.nextReservation++}`;this.reservations.set(id,{id,kind,locationId,resource,amount,owner});this.changed();return id;
   }
   release(id){if(this.reservations.delete(id))this.changed();}
@@ -103,7 +116,7 @@ export class FoodStorageSystem {
   }
   put(id,amount,{transportCancelled=false}={}){
     const r=this.reservations.get(id),l=r&&this.locations.get(r.locationId);
-    if(!l||r.kind!=='capacity'||!positive(amount)||amount>r.amount||this.used(l)+amount>l.capacity)return false;
+    if(!l||r.kind!=='capacity'||!positive(amount)||amount>r.amount||this.storedRoom(l,r.resource)<amount)return false;
     l.stock[r.resource]=(l.stock[r.resource]??0)+amount;if(transportCancelled){l.haulExcluded??={};l.haulExcluded[r.resource]=(l.haulExcluded[r.resource]??0)+amount;}
     r.amount-=amount;if(!r.amount)this.reservations.delete(id);this.changed();return true;
   }
@@ -118,7 +131,7 @@ export class FoodStorageSystem {
     this.changed();return true;
   }
   deposit(locationId,resource,amount){
-    const l=this.locations.get(locationId);if(!l||!positive(amount)||!l.allowed.includes(resource)||this.room(locationId)<amount)return false;
+    const l=this.locations.get(locationId);if(!l||!positive(amount)||!l.allowed.includes(resource)||this.room(locationId,resource)<amount)return false;
     l.stock[resource]=(l.stock[resource]??0)+amount;this.changed();return true;
   }
   spend(resource,amount){
@@ -129,7 +142,7 @@ export class FoodStorageSystem {
   addToInventory(resource,amount){
     if(!Number.isSafeInteger(amount)||amount<0)throw new RangeError('Invalid food amount.');
     const actor=this.scene.character;let remaining=amount;
-    while(remaining){const route=this.findDestination(actor,resource,remaining,{partial:true});if(!route)break;const n=Math.min(remaining,this.room(route.location.id));if(!this.deposit(route.location.id,resource,n))break;remaining-=n;}
+    while(remaining){const route=this.findDestination(actor,resource,remaining,{partial:true});if(!route)break;const n=Math.min(remaining,this.room(route.location.id,resource));if(!this.deposit(route.location.id,resource,n))break;remaining-=n;}
     if(remaining)this.spill(resource,remaining,actor.tile);
     return amount-remaining;
   }

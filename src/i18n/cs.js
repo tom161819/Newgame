@@ -1,6 +1,9 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  // Independent Granary capacities (#123).
+  'storage.granary.raw':'Suroviny {used}/{capacity} · Na cestě {incoming} · Volno {free}',
+  'storage.granary.food':'Jídlo {used}/{capacity} · Na cestě {incoming} · Volno {free}',
   // Employment exclusions (#131).
   'employment.exclude.local':'Zakázat zaměstnávání v této budově',
   'employment.exclude.type':'Zakázat zaměstnávání pro celý typ ({name})',
