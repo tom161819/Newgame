@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "iron-mine",
+  "variantId": "iron-mine-headframe",
+  "name": "Mine with ore yard",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "7af560d5",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 145,
+  "anchor": {
+    "x": 97,
+    "y": 95
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.65517
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 143
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98621
+  },
+  "visualHeight": 143,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.54,
+  "lights": []
+}
