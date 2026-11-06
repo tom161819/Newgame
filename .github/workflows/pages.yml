@@ -78,3 +78,7 @@ jobs:
       - name: Publish website
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+        with:
+          # The site with its playable archive is ~140 MB in ~3000 files; GitHub's file sync regularly needs more than
+          # the action's default 10 minutes, which cancelled finished deployments (0306270, 2dc39c4).
+          timeout: 1800000
