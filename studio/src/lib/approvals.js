@@ -34,6 +34,7 @@ export function validateManifest(manifest) {
         if (!Array.isArray(record.history)) errors.push(`${assetId}/${variantId}: history must be a list.`);
         else record.history.forEach((h, i) => { if (!h || !Number.isInteger(h.version) || h.version < 1 || !HASH.test(h.specHash ?? '') || !STATUSES.includes(h.status) || !iso(h.at)) errors.push(`${assetId}/${variantId}: history entry ${i + 1} needs version, specHash, status and at.`); else if (h.version >= record.version) errors.push(`${assetId}/${variantId}: history entry ${i + 1} must be older than version ${record.version}.`); });
       }
+      if (record.decidedBy !== undefined && (typeof record.decidedBy !== 'string' || !record.decidedBy)) errors.push(`${assetId}/${variantId}: decidedBy must be a reviewer id.`);
       if (record.review !== undefined && (!record.review || !Number.isInteger(record.review.issue) || record.review.issue < 1 || typeof record.review.submissionId !== 'string' || !record.review.submissionId)) errors.push(`${assetId}/${variantId}: review needs the issue number and submissionId.`);
       if (record.status === 'revision-requested' && !(record.comments ?? []).some(c => c.version === record.version)) errors.push(`${assetId}/${variantId}: a revision request needs a comment for version ${record.version}.`);
     }
@@ -81,7 +82,8 @@ export function reviewSummary({ repo, local, asset }) {
 }
 
 // Immutable update of the local layer. Approving stamps the exact version and spec hash.
-export function updateLocal(local, { assetId, variant, status, note, comment, preferred }, now = new Date().toISOString()) {
+// `by` is the reviewer's opaque id in the shared Studio page (never a name); it is omitted in a local-only review.
+export function updateLocal(local, { assetId, variant, status, note, comment, preferred, by }, now = new Date().toISOString()) {
   const next = structuredClone(local);
   const asset = next.assets[assetId] ??= { variants: {} };
   asset.variants ??= {};
@@ -90,7 +92,7 @@ export function updateLocal(local, { assetId, variant, status, note, comment, pr
     const previous = asset.variants[variant.id] ?? {};
     const nextStatus = status ?? previous.status ?? 'draft';
     const comments = [...(previous.comments ?? [])];
-    if (comment !== undefined && String(comment).trim()) comments.push({ version: variant.version, text: String(comment).trim(), at: now });
+    if (comment !== undefined && String(comment).trim()) comments.push({ version: variant.version, text: String(comment).trim(), at: now, ...(by ? { by } : {}) });
     if (nextStatus === 'revision-requested' && !comments.some(c => c.version === variant.version)) throw new RangeError('A revision request needs a comment that says what to change.');
     asset.variants[variant.id] = {
       status: nextStatus,
@@ -98,6 +100,7 @@ export function updateLocal(local, { assetId, variant, status, note, comment, pr
       specHash: variant.hash,
       note: note ?? previous.note ?? '',
       updatedAt: now,
+      ...(by ? { decidedBy: by } : previous.decidedBy ? { decidedBy: previous.decidedBy } : {}),
       ...(nextStatus === 'approved' ? { approvedAt: status === 'approved' || !previous.approvedAt ? now : previous.approvedAt } : {}),
       ...(comments.length ? { comments } : {}),
       ...(previous.history ? { history: previous.history } : {}),

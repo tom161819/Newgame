@@ -1,5 +1,5 @@
-// Browser smoke test of the built Asset Studio, served from a GitHub-Pages-like
-// sub-path with every non-local request blocked (no backend, no CDN).
+// Browser smoke test of the built Asset Studio, served from a sub-path (as when published as a page)
+// with every non-local request blocked (no backend, no CDN).
 //   npm run studio:smoke            build, then test
 //   npm run studio:smoke -- --no-build
 import assert from 'node:assert/strict';
@@ -150,9 +150,10 @@ try {
   const [manifestDownload] = await Promise.all([page.waitForEvent('download'), page.locator('#export-download').click()]);
   assert.equal(manifestDownload.suggestedFilename(), 'approvals.json');
   assert.deepEqual(JSON.parse(await readFile(await manifestDownload.path(), 'utf8')), exported);
-  assert.match(await page.locator('#export-github').getAttribute('href'), /github\.com\/tom161819\/Newgame\/edit\/main\/art\/approvals\.json$/);
+  assert.equal(await page.locator('#export-dialog a[href*="github"]').count(), 0, 'no repository host links');
+  assert.match(await page.locator('#export-lede').textContent(), /give the file below to Claude/);
   await page.locator('#export-form button[type="submit"]').click();
-  pass('export produces a valid approvals.json for a pull request; nothing is sent to GitHub');
+  pass('local export produces a valid approvals.json to hand to Claude; nothing is sent anywhere');
 
   const expected = await page.evaluate(() => window.assetStudio.exportSprite('watchtower', 'watchtower-round').meta);
   const [png] = await Promise.all([page.waitForEvent('download'), round.getByRole('button', { name: 'Download PNG' }).click()]);
@@ -237,6 +238,54 @@ try {
     assert.deepEqual(labErrors, []);await lab.close();
   }
   pass('Path Lab: N12 reference renders the editable map, deep-linked scenario and season, Experimental V2 differs and repaints from its sliders (preset → Custom), real painting with undo/redo, JSON export/import validation, saved variant');
+
+  // Shared review: the Studio published as a page in Claude, with a stand-in for the page runtime (db, user,
+  // downloads). Decisions go to the shared database, other reviewers' decisions appear live, names resolve from ids.
+  const sharedContext = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+  await sharedContext.addInitScript(() => {
+    const docs = new Map(), listeners = new Map(), saves = [];
+    const snapshotOf = collection => { const list = [...docs].filter(([p]) => p.startsWith(`${collection}/`)).map(([p, d]) => ({ id: p.split('/')[1], exists: true, data: () => structuredClone(d), metadata: { fromCache: false, hasPendingWrites: false } })); return { docs: list, size: list.length, empty: !list.length, docChanges: () => [], metadata: { fromCache: false, hasPendingWrites: false } }; };
+    const notify = collection => setTimeout(() => (listeners.get(collection) ?? []).forEach(fn => fn(snapshotOf(collection))), 0);
+    const doc = path => ({ path, id: path.split('/')[1], set: async data => { docs.set(path, structuredClone(data)); notify(path.split('/')[0]); }, delete: async () => { docs.delete(path); notify(path.split('/')[0]); } });
+    const db = { doc, collection: name => ({ path: name, doc: id => doc(`${name}/${id}`), onSnapshot(next) { listeners.set(name, [...(listeners.get(name) ?? []), next]); setTimeout(() => next(snapshotOf(name)), 20); return () => {}; } }) };
+    const user = { id: async () => 'u-owner', can: async () => true, profiles: async ids => Object.fromEntries(ids.map(id => [id, { name: { 'u-owner': 'Tomáš', 'u-art': 'Jana' }[id] ?? '' }])) };
+    const downloads = { save: async request => { saves.push(request.filename); return { status: 'saved' }; } };
+    window.__fakeClaude = { docs, saves, put(path, data) { docs.set(path, data); notify(path.split('/')[0]); } };
+    window.claude = { use: async name => ({ db, user, downloads })[name] ?? null };
+  });
+  const { page: sharedPage, errors: sharedErrors } = await open(sharedContext, 'index.html#watchtower');
+  await sharedPage.waitForFunction(() => window.assetStudio?.reviewMode() === 'shared');
+  assert.match(await sharedPage.locator('#review-summary').textContent(), /Every decision is in the repository/);
+  assert.equal(await sharedPage.locator('#open-export').textContent(), 'Review hand-over');
+  const timber = sharedPage.locator('.variant-card[data-variant="watchtower-timber"]');
+  await timber.locator('textarea').fill('Darker roof please');
+  await timber.getByRole('button', { name: 'Request revision' }).click();
+  await sharedPage.waitForFunction(() => window.__fakeClaude.docs.has('reviews/watchtower__watchtower-timber'));
+  const stored = await sharedPage.evaluate(() => window.__fakeClaude.docs.get('reviews/watchtower__watchtower-timber'));
+  assert.equal(stored.record.status, 'revision-requested'); assert.equal(stored.record.decidedBy, 'u-owner'); assert.equal(stored.by, 'u-owner');
+  assert.deepEqual(stored.record.comments.map(c => [c.text, c.by]), [['Darker roof please', 'u-owner']]);
+  await sharedPage.waitForSelector('.variant-card[data-variant="watchtower-timber"] .pill.shared');
+  assert.match(await timber.locator('.pill.shared').textContent(), /Shared: Revision requested · Tomáš \(you\)/);
+  assert.match(await sharedPage.locator('#review-summary').textContent(), /1 decision waiting for Claude/);
+  // Another reviewer approves the round tower: it appears without a reload, signed with her name.
+  await sharedPage.evaluate(() => window.__fakeClaude.put('reviews/watchtower__watchtower-round', { assetId: 'watchtower', variantId: 'watchtower-round', by: 'u-art', at: '2026-11-06T22:00:00.000Z', record: { status: 'approved', version: 1, specHash: window.assetStudio.assets().find(a => a.id === 'watchtower').variants.find(v => v.id === 'watchtower-round').hash, note: '', updatedAt: '2026-11-06T22:00:00.000Z', approvedAt: '2026-11-06T22:00:00.000Z', decidedBy: 'u-art' } }));
+  await sharedPage.waitForFunction(() => /Jana/.test(document.querySelector('.variant-card[data-variant="watchtower-round"] .pill.shared')?.textContent ?? ''));
+  assert.match(await sharedPage.locator('#review-summary').textContent(), /2 decisions waiting for Claude/);
+  // A forged document is ignored instead of breaking the Studio.
+  await sharedPage.evaluate(() => window.__fakeClaude.put('reviews/bogus', { assetId: 'watchtower', variantId: 'watchtower-square', record: { status: 'approved', version: 'x' } }));
+  await sharedPage.waitForTimeout(100);
+  assert.match(await sharedPage.locator('#review-summary').textContent(), /2 decisions waiting for Claude/);
+  await sharedPage.getByRole('button', { name: 'Review hand-over' }).click();
+  assert.match(await sharedPage.locator('#export-lede').textContent(), /Claude reads them/);
+  assert.ok(await sharedPage.locator('.danger-zone').isHidden(), 'shared decisions cannot be discarded from one browser');
+  await sharedPage.locator('#export-download').click();
+  await sharedPage.waitForFunction(() => window.__fakeClaude.saves.includes('approvals.json'));
+  await sharedPage.locator('#export-form button[type="submit"]').click();
+  await timber.getByRole('button', { name: 'Download PNG' }).click();
+  await sharedPage.waitForFunction(() => window.__fakeClaude.saves.includes('watchtower-timber.v1.png'));
+  assert.deepEqual(sharedErrors, []);
+  await sharedContext.close();
+  pass('shared review: decisions are saved to the page database with the reviewer id, other reviewers appear live with names, forged rows are ignored, files are offered through the page');
 
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 } });
   for (const path of ['index.html#watchtower', 'index.html#style-guide', 'phaser-demo.html', 'path-lab.html']) {

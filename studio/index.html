@@ -39,20 +39,19 @@
     <dialog id="export-dialog" aria-labelledby="export-title">
       <form method="dialog" class="dialog-body" id="export-form">
         <header class="dialog-head"><h2 id="export-title">Export review</h2><button type="submit" class="button ghost" aria-label="Close">Close</button></header>
-        <p class="dialog-lede">Local review decisions live only in this browser. To make them permanent, replace <code>art/approvals.json</code> in the repository with the file below and merge it through a pull request.</p>
+        <p class="dialog-lede" id="export-lede">Local review decisions live only in this browser.</p>
         <ul id="export-changes" class="change-list"></ul>
         <label for="export-json" class="field-label">art/approvals.json</label>
         <textarea id="export-json" rows="12" readonly spellcheck="false"></textarea>
         <div class="dialog-actions">
           <button type="button" id="export-copy" class="button primary">Copy JSON</button>
           <button type="button" id="export-download" class="button">Download approvals.json</button>
-          <a id="export-github" class="button ghost" target="_blank" rel="noopener noreferrer">Open the file on GitHub</a>
           <span id="export-feedback" class="feedback" aria-live="polite"></span>
         </div>
-        <ol class="steps">
+        <ol class="steps" id="export-steps">
           <li>Copy or download the JSON above.</li>
-          <li>On GitHub open <code>art/approvals.json</code>, choose <em>Edit</em>, paste the content.</li>
-          <li>Commit to a new branch and open a pull request. The approval becomes permanent after the merge.</li>
+          <li>Paste it into a chat with Claude or attach the file.</li>
+          <li>Claude replaces <code>art/approvals.json</code> in the game repository; the decisions become permanent with that commit.</li>
         </ol>
         <div class="danger-zone">
           <button type="button" id="discard-local" class="button danger">Discard local review</button>

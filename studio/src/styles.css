@@ -205,6 +205,8 @@ dialog::backdrop { background: rgba(10, 14, 12, 0.45); }
 .feedback { color: var(--muted); font-size: 12.5px; }
 .change-list { margin: 0; padding-left: 18px; font-size: 13px; }
 .steps { margin: 0; padding-left: 20px; color: var(--muted); font-size: 13px; }
+/* Elements the Studio hides with the hidden attribute stay hidden whatever their display rule. */
+.dialog-body [hidden] { display: none; }
 .danger-zone { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 12px; }
 
 @media (max-width: 820px) {
@@ -221,3 +223,6 @@ dialog::backdrop { background: rgba(10, 14, 12, 0.45); }
 .segmented.review-filter button[data-review="pending"][aria-pressed="true"] { box-shadow: inset 0 -2px 0 var(--status-review); }
 .review-note { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
 button.link { border: 0; background: none; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; }
+
+/* Shared review: a decision saved for every reviewer, waiting for Claude to take it over. */
+.pill.local.shared { white-space: normal; }

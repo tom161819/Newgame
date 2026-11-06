@@ -2,6 +2,7 @@ import './styles.css';
 import { loadStudioData } from './data.js';
 import { buildCatalog, filterCatalog, CATEGORIES } from './lib/specs.js';
 import { STATUS_LABELS, readLocal, writeLocal, reviewState, reviewSummary, updateLocal, discardLocal, buildExportManifest, pendingChanges, gameArtSources, inGame } from './lib/approvals.js';
+import { REVIEWS, PREFERRED, layerFromDocs, docWrites, reviewerIds } from './lib/sharedReview.js';
 import { withApprovedArt, APPROVED_VILLAGER_ART } from '../../src/data/objects/approvedArt.js';
 import { TIMES, timePreset } from './lib/lighting.js';
 import { heightInPixels, projectPoint } from './lib/projection.js';
@@ -10,7 +11,6 @@ import { drawConnection, previewFrame, resolveStages } from './generators/ground
 import { seasonBlend } from './lib/surface.js';
 import { BACKGROUNDS, drawBackground, drawGrid, drawFootprint, drawHuman, drawBounds, drawSprite, applyTimeOfDay, drawFlames, drawTestMap } from './render/compositor.js';
 
-const REPOSITORY = 'https://github.com/tom161819/Newgame';
 const UI_KEY = 'asset-studio.ui.v1';
 const data = loadStudioData();
 const { style, generators } = data;
@@ -25,6 +25,10 @@ const state = {
   zoom: 1.5, background: 'grass', grid: true, footprint: true, bounds: true, human: true, gamePixels: false, time: 'day', sceneZoom: 1.25,
   local: readLocal(storage),
 };
+// Shared review: in the Studio page published in Claude, decisions live in the page's database for every reviewer.
+// Elsewhere (npm run studio, tests) the Studio keeps the local-only review in this browser, as before.
+const shared = { mode: 'local', db: null, user: null, uid: null, canWrite: null, names: new Map(), downloads: null, writes: Promise.resolve() };
+const sharedMode = () => shared.mode === 'shared';
 try { Object.assign(state, pickUi(JSON.parse(storage?.getItem(UI_KEY) ?? '{}'))); } catch { /* keep defaults */ }
 function pickUi(saved) {
   const out = {};
@@ -52,12 +56,19 @@ function h(tag, attrs = {}, ...children) {
   return node;
 }
 const $ = selector => document.querySelector(selector);
-const repoLink = (path, label = path) => h('a', { href: `${REPOSITORY}/blob/main/${path}`, target: '_blank', rel: 'noopener noreferrer', class: 'mono' }, label);
+// Repository paths are shown as text: the Studio has no repository host to link to.
+const repoLink = (path, label = path) => h('code', { class: 'mono', title: 'Path in the game repository' }, label);
+const reviewerName = id => (id && shared.names.get(id)) || (id && id === shared.uid ? 'you' : id ? 'a reviewer' : '');
 const assetHash = id => id.replace(':', '-');
 const findAsset = id => catalog.all.find(item => item.id === id);
 const pill = (status, label = STATUS_LABELS[status] ?? status) => h('span', { class: `pill ${status}` }, label);
 
 function download(name, blob) {
+  // A page in Claude cannot start downloads itself: it offers the file and the viewer confirms the save.
+  if (shared.downloads) {
+    shared.downloads.save({ filename: name, data: blob }).catch(error => { if (error?.code !== 'declined') showAlert(`${name} could not be saved here (${error?.code ?? 'unavailable'}).`); });
+    return;
+  }
   const url = URL.createObjectURL(blob), link = h('a', { href: url, download: name });
   document.body.append(link); link.click(); link.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
@@ -217,12 +228,13 @@ function variantCard(asset, variant) {
     changeReview(asset, variant, { status, ...(text ? { comment: text } : {}) });
   };
   const DECISIONS = [['approved', 'Approve'], ['revision-requested', 'Request revision'], ['rejected', 'Reject'], ['review', 'Back to review']];
+  const readOnly = sharedMode() && shared.canWrite === false;
   const statusButtons = h('div', { class: 'segmented status decisions', role: 'group', 'aria-label': `Decision on ${variant.name}` },
-    DECISIONS.map(([status, label]) => h('button', { type: 'button', 'data-status': status, 'aria-pressed': String(review.effective.status === status && !review.outdated), onclick: () => decide(status) }, label)));
+    DECISIONS.map(([status, label]) => h('button', { type: 'button', 'data-status': status, 'aria-pressed': String(review.effective.status === status && !review.outdated), disabled: readOnly, onclick: () => decide(status) }, label)));
+  if (readOnly) comment.disabled = true;
   const note = h('div', { class: 'review-comment' }, comment, error);
   const record = review.effective, entries = [...(record.history ?? []).map(h2 => ({ kind: 'version', ...h2 })), ...(record.comments ?? []).map(c => ({ kind: 'comment', ...c }))].sort((a, b) => a.version - b.version || String(a.at).localeCompare(String(b.at)));
-  const history = entries.length ? h('details', { class: 'review-history' }, h('summary', {}, `History (${entries.length})`), h('ol', {}, entries.map(e => h('li', {}, e.kind === 'version' ? `v${e.version} · ${STATUS_LABELS[e.status] ?? e.status} · #${e.specHash}` : `v${e.version} comment: “${e.text}”`, e.at ? h('time', { datetime: e.at }, ` ${e.at.slice(0, 10)}`) : null)))) : null;
-  const issue = record.review?.issue ? h('a', { class: 'review-issue', href: `${REPOSITORY}/issues/${record.review.issue}`, target: '_blank', rel: 'noopener noreferrer' }, `Review #${record.review.issue}`) : null;
+  const history = entries.length ? h('details', { class: 'review-history' }, h('summary', {}, `History (${entries.length})`), h('ol', {}, entries.map(e => h('li', {}, e.kind === 'version' ? `v${e.version} · ${STATUS_LABELS[e.status] ?? e.status} · #${e.specHash}` : `v${e.version} comment${e.by ? ` by ${reviewerName(e.by)}` : ''}: “${e.text}”`, e.at ? h('time', { datetime: e.at }, ` ${e.at.slice(0, 10)}`) : null)))) : null;
   const live = inGame(variant.paths, sourcesInGame());
   const repoLabel = review.committed ? `Repository: ${STATUS_LABELS[review.repoStatus]} v${review.committed.version}` : 'Repository: not reviewed';
   return h('article', { class: `variant-card${review.preferred ? ' preferred' : ''}`, 'data-variant': variant.id },
@@ -236,12 +248,21 @@ function variantCard(asset, variant) {
       h('dt', {}, 'Lights'), h('dd', {}, base.lights.length ? base.lights.map(l => l.type).join(', ') : 'none')),
     variant.notes ? h('p', { class: 'variant-notes' }, variant.notes) : null,
     h('div', { class: 'review' },
-      h('div', { class: 'review-line' }, h('span', {}, repoLabel), review.pending ? h('span', { class: 'pill local', title: 'Stored in this browser only' }, `Local: ${STATUS_LABELS[review.pending.status]}`) : null, review.outdated ? h('span', { class: 'pill outdated', title: 'The spec changed after this review' }, 'Outdated') : null),
-      h('div', { class: 'review-row' }, statusButtons, h('button', { type: 'button', class: 'star', 'aria-pressed': String(review.preferred), onclick: () => changeReview(asset, variant, { preferred: !review.preferred }) }, review.preferred ? '★ Preferred' : '☆ Prefer')),
-      note, history, issue,
+      h('div', { class: 'review-line' }, h('span', {}, repoLabel), review.pending ? pendingPill(review.pending) : null, review.outdated ? h('span', { class: 'pill outdated', title: 'The spec changed after this review' }, 'Outdated') : null),
+      h('div', { class: 'review-row' }, statusButtons, h('button', { type: 'button', class: 'star', 'aria-pressed': String(review.preferred), disabled: readOnly, onclick: () => changeReview(asset, variant, { preferred: !review.preferred }) }, review.preferred ? '★ Preferred' : '☆ Prefer')),
+      readOnly ? h('p', { class: 'feedback' }, 'You can view this review. Deciding needs Contributor access to the Studio page.') : null,
+      note, history,
       h('div', { class: 'card-actions' },
         h('button', { type: 'button', class: 'button', onclick: () => exportPng(asset, variant) }, 'Download PNG'),
         h('button', { type: 'button', class: 'button ghost', onclick: () => exportMeta(asset, variant) }, 'Download metadata'))));
+}
+
+// A decision not in the repository yet: shared (waiting for Claude) or local to this browser.
+function pendingPill(record) {
+  const status = STATUS_LABELS[record.status] ?? record.status;
+  if (!sharedMode()) return h('span', { class: 'pill local', title: 'Stored in this browser only' }, `Local: ${status}`);
+  const by = record.decidedBy ? ` · ${reviewerName(record.decidedBy)}` : '';
+  return h('span', { class: 'pill local shared', title: 'Saved in the shared Studio; Claude takes it over into the repository at the start of the next chat' }, `Shared: ${status}${by}`);
 }
 
 function paintVariant(canvas, asset, variant, seconds = performance.now() / 1000) {
@@ -394,7 +415,7 @@ function detailsView(asset) {
       : h('p', { class: 'empty' }, `Not exported to the repository yet. Expected at ${variant.paths.sprite}.`);
     return h('section', { class: 'panel' }, h('h2', {}, variant.name), rows([
       ['ID', h('span', { class: 'mono' }, variant.id)], ['Version', `v${variant.version}`], ['Spec hash', h('span', { class: 'mono' }, variant.hash)],
-      ['Status', h('span', { class: 'review-line' }, pill(review.effective.status), review.pending ? h('span', { class: 'pill local' }, 'local, not committed') : h('span', {}, 'from repository'), review.outdated ? h('span', { class: 'pill outdated' }, 'Outdated') : null)],
+      ['Status', h('span', { class: 'review-line' }, pill(review.effective.status), review.pending ? h('span', { class: 'pill local' }, sharedMode() ? 'shared, waiting for Claude' : 'local, not committed') : h('span', {}, 'from repository'), review.outdated ? h('span', { class: 'pill outdated' }, 'Outdated') : null)],
       ['Approved at', review.effective.approvedAt ?? '—'], ['Sprite file', spriteInfo],
     ]), h('pre', { class: 'json' }, JSON.stringify(variant.spec, null, 2)));
   });
@@ -488,24 +509,51 @@ function paintRuler(canvas) {
 
 // ---------- review ----------
 function changeReview(asset, variant, change) {
-  state.local = updateLocal(state.local, { assetId: asset.id, variant, ...change });
-  if (change.status === 'approved' && !reviewState({ repo: data.approvals, local: state.local, assetId: asset.id, variant }).preferred && !asset.variants.some(v => v.id !== variant.id && reviewState({ repo: data.approvals, local: state.local, assetId: asset.id, variant: v }).preferred)) {
-    state.local = updateLocal(state.local, { assetId: asset.id, variant, preferred: true });
+  const before = state.local, by = sharedMode() ? shared.uid ?? undefined : undefined;
+  let next = updateLocal(state.local, { assetId: asset.id, variant, ...change, by });
+  if (change.status === 'approved' && !reviewState({ repo: data.approvals, local: next, assetId: asset.id, variant }).preferred && !asset.variants.some(v => v.id !== variant.id && reviewState({ repo: data.approvals, local: next, assetId: asset.id, variant: v }).preferred)) {
+    next = updateLocal(next, { assetId: asset.id, variant, preferred: true });
   }
-  if (!writeLocal(storage, state.local)) showAlert('This browser blocks local storage, so review changes last only until the page is closed. Export them before leaving.');
+  state.local = next;
+  if (sharedMode()) saveShared(docWrites(before, next, { by: shared.uid }));
+  else if (!writeLocal(storage, state.local)) showAlert('This browser blocks local storage, so review changes last only until the page is closed. Export them before leaving.');
   renderAll();
 }
+// Writes go one at a time, in order; the database snapshot then confirms them (or restores the stored state).
+function saveShared(writes) {
+  shared.writes = shared.writes.then(async () => {
+    for (const write of writes) {
+      const ref = shared.db.doc(write.path);
+      try { if (write.data) await ref.set(write.data); else await ref.delete(); }
+      catch (error) {
+        if (error?.code === 'invalid_argument' && shared.canWrite !== true) { shared.canWrite = false; showAlert('Your decisions cannot be saved: deciding needs Contributor access to the Studio page.'); renderAll(); return; }
+        showAlert(`A review decision could not be saved (${error?.code ?? 'unavailable'}). The Studio shows what is stored.`);
+      }
+    }
+  });
+}
 function renderSummary() {
-  const changes = pendingChanges({ repo: data.approvals, local: state.local, catalog: catalog.studio });
-  $('#review-summary').replaceChildren(changes.length ? h('span', {}, h('strong', {}, `${changes.length} local change${changes.length === 1 ? '' : 's'}`), ' not in the repository') : 'Review matches the repository');
+  const changes = pendingChanges({ repo: data.approvals, local: state.local, catalog: catalog.studio }), n = changes.length;
+  const text = sharedMode()
+    ? (n ? h('span', {}, h('strong', {}, `${n} decision${n === 1 ? '' : 's'}`), ' waiting for Claude') : 'Every decision is in the repository')
+    : (n ? h('span', {}, h('strong', {}, `${n} local change${n === 1 ? '' : 's'}`), ' not in the repository') : 'Review matches the repository');
+  $('#review-summary').replaceChildren(text);
+  $('#open-export').textContent = sharedMode() ? 'Review hand-over' : 'Export review';
 }
 function exportManifest() { return buildExportManifest({ repo: data.approvals, local: state.local, catalog: catalog.studio }); }
 function openExport() {
   const changes = pendingChanges({ repo: data.approvals, local: state.local, catalog: catalog.studio });
-  $('#export-changes').replaceChildren(...(changes.length ? changes.map(c => h('li', {}, c.preferred ? `${c.variantId}: preferred variant of ${c.assetId}` : `${c.variantId}: ${STATUS_LABELS[c.from]} → ${STATUS_LABELS[c.to]}`)) : [h('li', {}, 'No local changes. The file below equals the committed manifest.')]));
+  const none = sharedMode() ? 'Nothing is waiting: every shared decision is already in the repository.' : 'No local changes. The file below equals the committed manifest.';
+  $('#export-changes').replaceChildren(...(changes.length ? changes.map(c => h('li', {}, c.preferred ? `${c.variantId}: preferred variant of ${c.assetId}` : `${c.variantId}: ${STATUS_LABELS[c.from]} → ${STATUS_LABELS[c.to]}`)) : [h('li', {}, none)]));
   $('#export-json').value = `${JSON.stringify(exportManifest(), null, 2)}\n`;
   $('#export-feedback').textContent = ''; $('#discard-hint').textContent = ''; discardArmed = false;
-  $('#export-github').href = `${REPOSITORY}/edit/main/art/approvals.json`;
+  $('#export-title').textContent = sharedMode() ? 'Review hand-over' : 'Export review';
+  $('#export-lede').textContent = sharedMode()
+    ? 'Decisions are saved for every reviewer as soon as you click. At the start of the next chat Claude reads them, writes them into art/approvals.json in the game repository, exports approved sprites and turns revision requests into tasks. Nothing else is needed from you.'
+    : 'Local review decisions live only in this browser. To make them permanent, give the file below to Claude (paste it into a chat or attach it), who replaces art/approvals.json in the game repository.';
+  $('#export-steps').hidden = sharedMode();
+  $('#export-download').hidden = !shared.downloads && sharedMode();
+  $('.danger-zone').hidden = sharedMode();
   $('#export-dialog').showModal();
 }
 let discardArmed = false;
@@ -516,12 +564,52 @@ function bindExport() {
     try { await navigator.clipboard.writeText(text); $('#export-feedback').textContent = 'Copied to the clipboard.'; }
     catch { $('#export-json').select(); $('#export-feedback').textContent = 'Copy is blocked here. The text is selected; press Ctrl+C or ⌘C.'; }
   });
-  $('#export-download').addEventListener('click', () => { download('approvals.json', new Blob([$('#export-json').value], { type: 'application/json' })); $('#export-feedback').textContent = 'Download started. If nothing happens, use Copy JSON.'; });
+  $('#export-download').addEventListener('click', () => { download('approvals.json', new Blob([$('#export-json').value], { type: 'application/json' })); $('#export-feedback').textContent = shared.downloads ? 'Confirm the save to download approvals.json.' : 'Download started. If nothing happens, use Copy JSON.'; });
   $('#discard-local').addEventListener('click', () => {
+    if (sharedMode()) return;
     if (!discardArmed) { discardArmed = true; $('#discard-hint').textContent = 'Click again to discard every local review decision. The repository is not affected.'; return; }
     state.local = discardLocal(state.local); writeLocal(storage, state.local); discardArmed = false;
     $('#export-dialog').close(); renderAll();
   });
+}
+
+// ---------- shared review (Studio page in Claude) ----------
+// Lights up only when the page runs in Claude with its database; the local review stays the fallback.
+async function connectShared() {
+  const claude = window.claude;
+  if (typeof claude?.use !== 'function') return;
+  claude.use('downloads').then(downloads => { shared.downloads = downloads ?? null; }).catch(() => {});
+  const [db, user] = await Promise.all([claude.use('db').catch(() => null), claude.use('user').catch(() => null)]);
+  if (!db) return;
+  shared.db = db; shared.user = user;
+  shared.uid = user ? await user.id().catch(() => null) : null;
+  shared.canWrite = user ? await Promise.resolve(user.can?.('data.write')).catch(() => null) ?? null : null;
+  let reviews = null, preferred = null, first = true;
+  const waiting = setTimeout(() => showAlert('The shared review cannot be reached yet; the Studio shows the repository state until it answers.'), 10000);
+  const apply = () => {
+    if (!reviews || !preferred) return;
+    clearTimeout(waiting);
+    if (first) { first = false; if ($('#studio-alert').textContent.startsWith('The shared review cannot')) showAlert(''); }
+    shared.mode = 'shared';
+    state.local = layerFromDocs(reviews, preferred);
+    resolveNames();
+    renderAll();
+  };
+  const failed = error => { clearTimeout(waiting); if (error?.code !== 'revoked') showAlert(`The shared review stopped updating (${error?.code ?? 'unavailable'}). Reload the page to reconnect.`); };
+  db.collection(REVIEWS).onSnapshot(snap => { reviews = snap.docs.filter(d => d.exists).map(d => d.data()); apply(); }, failed);
+  db.collection(PREFERRED).onSnapshot(snap => { preferred = snap.docs.filter(d => d.exists).map(d => d.data()); apply(); }, failed);
+}
+// Names are resolved from reviewer ids each time; only ids are ever stored.
+async function resolveNames() {
+  if (!shared.user?.profiles) return;
+  const ids = reviewerIds(state.local).filter(id => !shared.names.has(id));
+  if (!ids.length) return;
+  try {
+    const profiles = await shared.user.profiles(ids);
+    let changed = false;
+    for (const id of ids) { const name = profiles?.[id]?.name || ''; if (name) { shared.names.set(id, id === shared.uid ? `${name} (you)` : name); changed = true; } }
+    if (changed) renderAll();
+  } catch { /* names are optional */ }
 }
 
 // ---------- export of sprites ----------
@@ -579,6 +667,7 @@ window.addEventListener('hashchange', route);
 let resizeTimer;
 window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => paintVisible(), 120); });
 bindExport();
+connectShared().catch(() => {});
 if (!glReady) showAlert('WebGL is not available, so studio recipes cannot be rendered. Current game sprites are still listed.');
 route();
 
@@ -590,5 +679,6 @@ window.assetStudio = Object.freeze({
   exportSprite,
   exportManifest,
   local: () => structuredClone(state.local),
+  reviewMode: () => shared.mode,
   sceneLights: () => structuredClone(lastSceneLights),
 });
