@@ -1,6 +1,14 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  'construction.farmers':'Farmáři: pracují {working} · rezervováno {reserved}/{slots} míst',
+  'construction.waitFarmers':'Pole čeká na farmáře své farmy',
+  'construction.farmerOnly':'Toto pole mohou založit pouze farmáři přiřazené farmy.',
+  'construction.refundNone':'Pole nestojí žádný materiál; zrušení nic nevrací.',
+  'notice.noFarmer':'{name}: pole čeká na farmáře své farmy.',
+  'notice.noFarm':'{name}: žádná farma nemá pro toto pole místo. Postav další farmu.',
+  'work.establishing':'Zakládá: {name}',
+
   'farmPlots.count':'Pole {count} / {capacity}',
   'farmPlots.owner':'Připojeno k {name} č. {id}',
   'farmPlots.orphan':'Žádná farma nemá pro toto pole místo. Postav další farmu (každá obsluhuje čtyři pole). Nepřipojená pole farmáři neobsluhují.',

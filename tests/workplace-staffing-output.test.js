@@ -70,3 +70,7 @@ test('capacity edits cancel excess military/taming jobs immediately, including w
     t.gameTime.setPaused(true);objectRegistry.configureWorkplaces({version:1,workplaces:{stables:{capacity:1}}});t.workplaceSystem.reconcileDefinitions();assert.equal(t.stables.jobs.has(hands[1].id),false);assert.equal(hands[1].profession,'idle');assert.ok(horse.isAlive);validateGameState(serializeGameState(t));
   }finally{objectRegistry.configureWorkplaces({version:1,workplaces:{}});}
 });
+
+test('a Farmer physically tending an owned field counts as onsite staff; Hold still excludes that resident',()=>{
+  const s=workerScene(undefined,{construction:true,farming:true,foodProduction:true});s.workerSystem.unsubscribe();const home=build(s,'farmhouse',45,40),plot=build(s,'wheat_field',49,40),w=s.workerSystem.create({x:44,y:40});assert.ok(s.workplaceSystem.assign(home,w));until(s,()=>w.workMessage==='Tending crops'&&!w.nextTile&&!w.path.length);assert.equal(s.workplaceSystem.atWorkplace(w),false);assert.equal(plot.farmId,home.id);assert.equal(s.workplaceSystem.staffing(home).present,1);near(s.workplaceSystem.staffing(home).output,1/3);assert.equal(w.skills.farming.totalXP,0);assert.equal(s.inventory.count('wheat'),0);s.workerSystem.commands.hold(w);assert.equal(s.workplaceSystem.staffing(home).present,0);
+});

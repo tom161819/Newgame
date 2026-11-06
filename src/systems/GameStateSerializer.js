@@ -26,7 +26,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=31;
+export const SAVE_VERSION=32;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -263,7 +263,7 @@ export function validateGameState(input,registry=objectRegistry){
           const count=(depositClaims.get(t.targetId)??0)+1;depositClaims.set(t.targetId,count);check(count<=target.natural.remaining);
         }
         if(t.kind==='build'){
-          const site=s.buildings.find(b=>b.id===t.targetId);check(w.profession==='builder'&&site&&!buildingIsComplete(site)&&site.construction.assignedBuilders.includes(w.id));
+          const site=s.buildings.find(b=>b.id===t.targetId);check(site&&!buildingIsComplete(site)&&site.construction.assignedBuilders.includes(w.id));if(definition(site.type).crop){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);check(w.profession==='farmer'&&home?.type==='farmhouse'&&buildingIsComplete(home)&&site.farmId===home.id);}else check(w.profession==='builder');
           check(towerNeighbors(pavementHost(s.buildings,site,registry)??site).some(p=>p.x===t.goal.x&&p.y===t.goal.y));
         }
         if(t.kind==='harvest'){
@@ -296,9 +296,9 @@ export function validateGameState(input,registry=objectRegistry){
   if(s.constructionSystem!==undefined){
     const c=s.constructionSystem;check(c);integer(c.nextId,Math.max(0,...s.buildings.map(b=>b.id))+1);
     check(c.kingSiteId==null||bIds.has(c.kingSiteId));
-    if(c.kingSiteId!=null){const site=s.buildings.find(b=>b.id===c.kingSiteId);check(!buildingIsComplete(site)&&site.construction.assignedBuilders.includes('king'));tile(c.kingGoal);check(towerNeighbors(pavementHost(s.buildings,site,registry)??site).some(p=>p.x===c.kingGoal.x&&p.y===c.kingGoal.y));check(!reservations.has(`construction-slot:${c.kingGoal.x},${c.kingGoal.y}`));}
+    if(c.kingSiteId!=null){const site=s.buildings.find(b=>b.id===c.kingSiteId);check(!buildingIsComplete(site)&&!definition(site.type).crop&&site.construction.assignedBuilders.includes('king'));tile(c.kingGoal);check(towerNeighbors(pavementHost(s.buildings,site,registry)??site).some(p=>p.x===c.kingGoal.x&&p.y===c.kingGoal.y));check(!reservations.has(`construction-slot:${c.kingGoal.x},${c.kingGoal.y}`));}
     else check(c.kingGoal==null&&!siteAssignments.has('king'));
-    for(const id of siteAssignments)if(id!=='king'){const w=s.workers?.find(w=>w.id===id);check(w?.isAlive&&w.profession==='builder'&&w.workTask?.kind==='build');}
+    for(const id of siteAssignments)if(id!=='king'){const w=s.workers?.find(w=>w.id===id);check(w?.isAlive&&w.workTask?.kind==='build'&&['builder','farmer'].includes(w.profession));}
   }else check(!s.buildings.some(b=>!buildingIsComplete(b)));
   const plots=s.buildings.filter(b=>buildingIsComplete(b)&&definition(b.type).crop);
   if(s.farming!==undefined){
