@@ -5,10 +5,19 @@ import { element } from './objectLabels.js';
 const NEED_IDS=['food','rest','housing','safety'];
 export const homeLabel=home=>!home?t('needs.home.none'):home.kind==='house'?t('needs.home.house',{id:home.buildingId}):t('needs.home.settlement');
 export const problemLabel=problem=>problem?t(`needs.problem.${problem}`):t('needs.problem.none');
+// #58 phase D: each bar's tooltip says what moves the value, so the reason for dissatisfaction is visible.
+const signed=v=>v>0?`+${v}`:String(v).replace('-','−');
+export function needTooltip(id,status){
+  if(id==='food')return t(status.hungry?'needs.tip.foodLow':'needs.tip.food');
+  if(id==='rest')return t('needs.tip.rest');
+  if(id==='housing')return t('needs.tip.housing',{home:homeLabel(status.home)});
+  if(id==='safety')return (status.safetyFactors??[]).map(([k,v],i)=>`${t(`needs.safety.${k}`)} ${i?signed(v):v}`).join(' · ');
+  return t('needs.tip.happiness')+(status.unpaidPenalty>0?` · ${t('needs.unpaidLine',{penalty:status.unpaidPenalty})}`:'');
+}
 export function renderNeeds(root,status){
   if(!status){root.hidden=true;return;}
   root.hidden=false;
-  const bar=(id,value)=>{const row=element('div',`need-row need-${id}`);row.dataset.need=id;const meter=element('meter');meter.min=0;meter.max=100;meter.low=40;meter.high=70;meter.optimum=100;meter.value=value;meter.setAttribute('aria-label',t(`needs.${id}`));row.append(element('span','',t(`needs.${id}`)),meter,element('b','',`${value} %`));return row;};
+  const bar=(id,value)=>{const row=element('div',`need-row need-${id}`);row.dataset.need=id;row.title=needTooltip(id,status);const meter=element('meter');meter.min=0;meter.max=100;meter.low=40;meter.high=70;meter.optimum=100;meter.value=value;meter.setAttribute('aria-label',t(`needs.${id}`));row.append(element('span','',t(`needs.${id}`)),meter,element('b','',`${value} %`));return row;};
   const mood=element('p','need-mood',t('needs.moodLine',{mood:t(`needs.mood.${status.mood}`),happiness:status.happiness}));mood.dataset.mood=status.mood;
   // Phase C: the mood's effect on work speed, so the player sees why work is faster or slower.
   const work=element('p','need-work',t('needs.workLine',{factor:status.workModifier.toFixed(2)}));work.dataset.work=String(status.workModifier);

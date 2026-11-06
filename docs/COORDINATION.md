@@ -42,6 +42,8 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 
 ## Done
 
+- 2026-11-06 Claude PR197 Needs tooltips and100-resident performance coverage mergedb53b8da731f5e5ad75574fc0e73edfd43e472f07, release0.7.2/schema35. Integrated tooltip assertions while retaining exact snapshot/Load pause guard.
+
 - 2026-11-06 PR185 / Issue124: release0.7.0/schema35 merged03062705c47199386af24d55dfce8ec38a1e4755;743 tests/version/changelog/build and native gathering/Needs/morale/feed/commands/current Load PASS, CI42233028928 SUCCESS. Tag v0.7.0 resolves to exact merge. Actual Pages42233665135 build127965062613 and deploy127965013083 SUCCESS after one backend-only failed-deploy retry; issue124 closed/done. PR194 is the existing next task.
 - 2026-11-06 Claude PR195 / Issue101: HUD cargo layout fix mergedc697fd442a4d44a4097cc16561561b65e213fdda, release0.7.1/schema35; source integrated into194, actual Pages remains separately verified live.
 

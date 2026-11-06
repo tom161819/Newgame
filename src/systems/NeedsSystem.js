@@ -36,23 +36,25 @@ export class NeedsSystem {
     for(const house of houses)for(let seat=0;seat<(this.scene.objectRegistry.get(house.type).housing.capacity??POPULATION.houseCapacity)&&i<residents.length;seat++,i++)homes.set(residents[i].id,{kind:'house',buildingId:house.id});
     return homes;
   }
-  safety(worker,record){
+  // Safety and the reasons behind it (shown as the tooltip of the Safety bar).
+  safetyDetail(worker,record){
     const s=NEEDS.safety,p=worker.position??{x:worker.tile?.x??0,y:worker.tile?.y??0},near=(b,range)=>{const d=b.definition??this.scene.objectRegistry?.get?.(b.type)??{width:1,height:1};return Math.hypot(b.x+d.width/2-p.x,b.y+d.height/2-p.y)<=range;};
-    const done=(this.scene.buildings??[]).filter(b=>buildingIsComplete(b));let value=s.base;
-    if(done.some(b=>b.type==='castle'&&near(b,s.castle.range)))value+=s.castle.bonus;
-    if(done.some(b=>b.type==='tower'&&near(b,s.tower.range)))value+=s.tower.bonus;
-    if(done.some(b=>b.type==='barracks'&&near(b,s.guard.range))||this.residents().some(o=>o!==worker&&o.profession==='soldier'&&Math.hypot(o.position.x-p.x,o.position.y-p.y)<=s.guard.range))value+=s.guard.bonus;
-    if(record?.attackedAt!=null){const day=this.scene.gameTime?.dayDuration??120000,age=(this.scene.gameTime?.totalElapsed??0)-record.attackedAt,left=1-age/(s.attack.days*day);if(left>0)value-=s.attack.penalty*left;}
-    return Math.round(clampNeed(value));
+    const done=(this.scene.buildings??[]).filter(b=>buildingIsComplete(b)),factors=[['base',s.base]];
+    if(done.some(b=>b.type==='castle'&&near(b,s.castle.range)))factors.push(['castle',s.castle.bonus]);
+    if(done.some(b=>b.type==='tower'&&near(b,s.tower.range)))factors.push(['tower',s.tower.bonus]);
+    if(done.some(b=>b.type==='barracks'&&near(b,s.guard.range))||this.residents().some(o=>o!==worker&&o.profession==='soldier'&&Math.hypot(o.position.x-p.x,o.position.y-p.y)<=s.guard.range))factors.push(['guard',s.guard.bonus]);
+    if(record?.attackedAt!=null){const day=this.scene.gameTime?.dayDuration??120000,age=(this.scene.gameTime?.totalElapsed??0)-record.attackedAt,left=1-age/(s.attack.days*day);if(left>0)factors.push(['attack',-Math.round(s.attack.penalty*left)]);}
+    return {value:Math.round(clampNeed(factors.reduce((n,[,v])=>n+v,0))),factors};
   }
+  safety(worker,record){return this.safetyDetail(worker,record).value;}
   unpaidPenalty(worker){const gold=this.scene.wageSystem?.unpaid?.(worker)??0;return Math.min(NEEDS.unpaid.max,Math.round(gold*NEEDS.unpaid.perGold));}
   // Everything shown for one resident, derived from the stored state (never from the frame rate).
   status(worker,homes=this.homes()){
     // Only permanent residents: the King keeps his own HP and meals, visitors have no needs.
     if(!worker?.isAlive||worker.isSubject===false||this.scene.workerSystem?.workers.get(worker.id)!==worker)return null;
-    const r=this.records.get(worker.id)??{food:100,rest:100,attackedAt:null},home=homes.get(worker.id)??null,needs={food:Math.round(r.food),rest:Math.round(r.rest),housing:home?100:0,safety:this.safety(worker,r)};
+    const r=this.records.get(worker.id)??{food:100,rest:100,attackedAt:null},home=homes.get(worker.id)??null,safety=this.safetyDetail(worker,r),needs={food:Math.round(r.food),rest:Math.round(r.rest),housing:home?100:0,safety:safety.value};
     const penalty=this.unpaidPenalty(worker),happiness=happinessOf(needs,penalty),mood=moodFor(happiness);
-    return {...needs,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,mainProblem:mainProblem(needs,penalty),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
+    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,mainProblem:mainProblem(needs,penalty),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
   }
   summary(){
     const homes=this.homes(),list=this.residents().map(w=>this.status(w,homes));
