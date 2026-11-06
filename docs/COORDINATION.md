@@ -22,10 +22,7 @@ Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke pau
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | #210 asset review workflow, AR-1 #211 manifest statuses/comments/history | Claude | `claude/asset-review-manifest` | — | In review | studio/src/lib/approvals.js, studio/src/main.js (one constant), tests/asset-review-manifest.test.js, tests/asset-studio.test.js |
-| #92 building concepts: Barracks, Wheelwright Workshop, Iron Mine | Claude | `claude/building-concepts-92` | — | In review | art/assets/buildings/{barracks-hall,wheelwright-yard,iron-mine}, art/sprites, art/approvals.json |
-| #92 visual fallbacks audit + six profession look concepts | Claude | `claude/visual-polish-audit` | — | In review | docs/audits/92-visual-fallbacks.md, studio figure tools, art/assets/units/* (6 new), art/sprites, art/approvals.json, tests/asset-studio-units.test.js |
 | AUD65 #94 Manual rock mining | Codex | `codex/manual-rock-mining` (stacked on124) | [#194](https://github.com/tom161819/Newgame/pull/194) | Implemented; schema36/release0.8.0 after185 actual Pages;750 tests/version/changelog/build + native real-mouse10Stones/ledger/Load/phone/commands/Needs/eventfeed PASS | own rock marking tool/UI, GameScene/GameApplication narrow input/Escape hooks, MiningWork/WorkerAI/WorkplaceSystem/free Miner selection, current schema serializer/loader/terrain validation, XP/SkillSystem, physical Drop/FoodProduction reuse and cargo provenance, i18n, own tests/browser/docs |
-| #99 Mill sails turn while grinding (still body + rotor layer from the approved export) | Claude | `claude/mill-sails` | — | In review | studio generator/renderer/export rotor layer, art/sprites/windmill, public/assets/buildings/mill, approvedArt, AssetManager, SpriteViews, MapMemoryRenderer, new game/MillSails.js, GameScene hook, tests, smoke |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
@@ -39,6 +36,7 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 6. [#97](https://github.com/tom161819/Newgame/issues/97) AUD69-70 working castle gate; walls reached only through a tower or the gate (mechanics; new gate art via Claude's Asset Studio)
 7. [#100](https://github.com/tom161819/Newgame/issues/100) AUD75 world generation: rivers, beaches, desert, bushes (new terrain art via Claude's Asset Studio)
 8. [#91](https://github.com/tom161819/Newgame/issues/91) AUD41 Asset Library developer edit mode and balance tools
+9. [#103](https://github.com/tom161819/Newgame/issues/103) AUD80-81 Kingdom policy: tax rate and food rations in the Castle panel, feeding #58's NeedsSystem (handed over from Claude; after the schema chain #196–#202; Claude's #58 phase C2 follows it)
 
 ## Kept backups (do not delete without the developer)
 
@@ -47,6 +45,7 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 
 ## Done
 
+- 2026-11-06 Claude: #99 mill sails ([#207](https://github.com/tom161819/Newgame/pull/207), 0.8.1); #92 visual fallbacks audit + six profession concepts ([#208](https://github.com/tom161819/Newgame/pull/208)) and Barracks/Wheelwright/Iron Mine concepts ([#209](https://github.com/tom161819/Newgame/pull/209)), awaiting the owner's choice.
 - 2026-11-06 Claude: #116 Path renderer V2 in the Path Lab ([#205](https://github.com/tom161819/Newgame/pull/205)), awaiting the owner's preset choice; Pages deploy retries ([#206](https://github.com/tom161819/Newgame/pull/206)).
 - 2026-11-06 Claude: #115 Path Lab in the Asset Studio ([#204](https://github.com/tom161819/Newgame/pull/204)).
 - 2026-11-06 Claude: #119 Builders' Workshop concepts ([#199](https://github.com/tom161819/Newgame/pull/199)) and #114 porch concepts ([#201](https://github.com/tom161819/Newgame/pull/201)) in the Studio, awaiting the owner's choice; Pages deploy timeout ([#203](https://github.com/tom161819/Newgame/pull/203), ineffective: replaced by deploy retries).
