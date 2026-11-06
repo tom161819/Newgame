@@ -25,7 +25,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=28;
+export const SAVE_VERSION=29;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -361,12 +361,16 @@ export function validateGameState(input,registry=objectRegistry){
   if(s.stables!==undefined){const st=s.stables;check(st&&typeof st==='object'&&Object.keys(st).sort().join()==='horses,jobs,ridden');array(st.horses);array(st.jobs);
     const animals=new Map(s.animals.map(a=>[a.id,a])),stables=new Map(s.buildings.filter(b=>b.type==='stables'&&buildingIsComplete(b)).map(b=>[b.id,b])),seen=new Set(),count=new Map();
     const riders=new Set();for(const h of st.horses){const keys=Object.keys(h).sort().join(),a=animals.get(h.id);check(a?.type==='horse'&&a.isAlive&&!seen.has(h.id));
-      if(h.state==='stabled')check(keys==='id,stableId,state'&&!a.mounted&&stables.has(h.stableId));else{check(['reserved','ridden'].includes(h.state)&&keys==='id,riderId,stableId,state'&&!riders.has(h.riderId)&&s.workers.some(w=>w.id===h.riderId&&w.isAlive));riders.add(h.riderId);check(!a.mounted);}seen.add(h.id);count.set(h.stableId,(count.get(h.stableId)??0)+1);}
+      if(h.state==='stabled')check(keys==='id,stableId,state'&&!a.mounted&&stables.has(h.stableId));
+      // Horse Wagon: reserved for a Wheelwright's batch (still in its paddock), or harnessed to its wagon (out of the Stables).
+      else if(h.workshopId!=null){check(h.state==='reserved'&&keys==='id,stableId,state,workshopId'&&!a.mounted&&s.foodProduction?.records.some(r=>r.buildingId===h.workshopId&&(r.cycle?.horseId===h.id||(s.foodStorage.locations.find(l=>l.id===`output-${h.workshopId}`)?.stock.horse_wagon??0)>0)));}
+      else if(h.state==='harnessed'){check(keys==='id,state,vehicleId'&&!a.mounted&&(s.vehicles?.vehicles??[]).some(v=>v.id===h.vehicleId&&v.type==='horse_wagon'&&v.horseId===h.id));seen.add(h.id);continue;}
+      else{check(['reserved','ridden'].includes(h.state)&&keys==='id,riderId,stableId,state'&&!riders.has(h.riderId)&&s.workers.some(w=>w.id===h.riderId&&w.isAlive));riders.add(h.riderId);check(!a.mounted);}seen.add(h.id);count.set(h.stableId,(count.get(h.stableId)??0)+1);}
     const workers=new Map(s.workers.map(w=>[w.id,w]));for(const j of st.jobs){check(j&&Object.keys(j).sort().join()==='horseId,phase,progress,stableId,workerId'&&['approach','taming','leading'].includes(j.phase)&&workers.get(j.workerId)?.isAlive&&workers.get(j.workerId).profession==='stablehand'&&animals.get(j.horseId)?.type==='horse'&&!seen.has(j.horseId)&&stables.has(j.stableId));number(j.progress,0,1e9);seen.add(j.horseId);count.set(j.stableId,(count.get(j.stableId)??0)+1);}
     for(const [id,n]of count)check(n<=registry.require('stables').horseCapacity);check(st.ridden==null||animals.get(st.ridden)?.mounted===true);}
   // S12 vehicles: unique ids on open ground; an operator is one living Hauler at most once; modes are known.
   if(s.vehicles!==undefined){const v=s.vehicles;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='modes,nextId,vehicles');integer(v.nextId,1);array(v.vehicles);const ids=new Set(),operators=new Set(),workers=new Map(s.workers.map(w=>[w.id,w]));
-    for(const x of v.vehicles){check(x&&Object.keys(x).sort().join()==='id,operatorId,state,type,x,y'&&Object.hasOwn(VEHICLES,x.type)&&['parked','reserved','inUse'].includes(x.state));const m=String(x.id).match(/^vehicle-(\d+)$/);check(m&&Number(m[1])<v.nextId&&!ids.has(x.id));ids.add(x.id);
+    for(const x of v.vehicles){check(x&&Object.keys(x).sort().join()==='horseId,id,operatorId,state,type,x,y'&&(x.horseId===null||x.type==='horse_wagon'&&(s.stables?.horses??[]).some(h=>h.id===x.horseId&&h.state==='harnessed'&&h.vehicleId===x.id))&&Object.hasOwn(VEHICLES,x.type)&&['parked','reserved','inUse'].includes(x.state));const m=String(x.id).match(/^vehicle-(\d+)$/);check(m&&Number(m[1])<v.nextId&&!ids.has(x.id));ids.add(x.id);
       integer(x.x,0,COLUMNS-1);integer(x.y,0,ROWS-1);check(s.terrain[x.y][x.x]===0);check((x.state==='parked')===(x.operatorId==null));if(x.operatorId!=null){const w=workers.get(x.operatorId);check(w?.isAlive&&w.profession==='hauler'&&!operators.has(x.operatorId));operators.add(x.operatorId);}}
     check(v.modes&&typeof v.modes==='object');for(const [id,mode]of Object.entries(v.modes))check(workers.has(id)&&TRANSPORT_MODES.includes(mode)&&mode!=='auto');}
   // C08 units and training orders: one per living Soldier, a known type, its exact kit; a Knight has his horse (S12).

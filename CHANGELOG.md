@@ -7,6 +7,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ### Added
 - Stone Pavement can now be laid under a finished building (Single, Line or Area). Builders work from the building's edge and the cost stays 1 Stone for every 2 tiles. The building covers the paved floor, and the floor remains after the building is gone. Fields and orchards cannot be paved.
+- Horse Wagon: the Wheelwright's Workshop panel has a Make choice between Wheelbarrow and Horse Wagon (30 Wood, 6 Iron Bars and one tamed horse from the Stables, 90 seconds of work).
+  - The Wheelwrights wait until a tamed horse is free, then reserve it before any material is used. A running batch keeps its recipe when the choice changes.
+  - The finished wagon stands beside the workshop with the horse harnessed. The horse leaves its paddock place, travels with the wagon and is never used up.
+  - A Hauler in Auto mode takes a free Horse Wagon before a Wheelbarrow and carries ten times as much (400 load units, so 40 Stone or 80 Wood per trip). The Transport setting also offers Horse Wagon.
+  - If the horse dies, its wagon stays parked and cannot be driven. A demolished workshop gives a reserved horse back to its Stables.
 - Settings → Developer → Show FPS (or F3) shows a small overlay with frames per second, the slowest frame and the number of stutters over 50 ms in the last 5 seconds, plus the renderer and zoom. The choice is kept in this browser only, never in a save, and the overlay costs nothing while it is off.
 - Stables (Logistics & Trade, 5×5, 15 Wood + 10 Stone) with a paddock for 4 tamed horses and two Stablehands, who use the Hunting skill. While the Stables have room, a Stablehand finds a wild horse in sight on his own. He reserves it so no one else takes it, tames it in 20 seconds (faster with skill) and leads it into the paddock. The King can tame a wild horse by riding it for 25 seconds; dismounting beside Stables with room leaves it there. Horses in the Stables can no longer be ridden off. A new kingdom has six wild horses. Saves keep tamed horses and taming in progress.
 - The Knight can now be trained. He needs Sword, Armor and a free tamed horse in the Stables, which is reserved for the training and becomes his mount; a mounted Knight moves 50 % faster. Cancelling, discharge or death returns the horse to the Stables, or sets it free if they are gone.
@@ -51,6 +56,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Idle Haulers now collect loose stone lying within a set radius of the Castle (default 80 tiles) and carry it to storage. Each Hauler has a Collect loose stone ON/OFF switch and a radius field in the unit panel; real transport jobs always come first. Saved games from earlier versions cannot be loaded and need a new game.
 
 ### Fixed
+- Saves no longer reject large single deliveries made with a Wheelbarrow or Horse Wagon.
 - Finished walls no longer vanish after the camera pans away and back: the wall blocks and their parapets reappear exactly as before.
 - Joined wall segments form one continuous wall: their shadows fall on the ground only and no longer paint dark bands across the neighbouring wall tops and the wall walk (straight lines, corners, T junctions and crossings, Canvas and WebGL).
 - Seasonal ground changes finish repainting while the game is paused, so resuming a saved season keeps the same terrain picture. Normal gameplay retains its bounded redraw budget.

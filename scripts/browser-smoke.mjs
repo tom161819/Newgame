@@ -33,6 +33,7 @@ import { devFpsSmoke } from './dev-fps-smoke.mjs';
 import { wallVisibilitySmoke } from './wall-visibility-smoke.mjs';
 import { wheelwrightSmoke } from './wheelwright-smoke.mjs';
 import { stablesSmoke } from './stables-smoke.mjs';
+import { horseWagonSmoke } from './horse-wagon-smoke.mjs';
 import { housingSmoke } from './housing-smoke.mjs';
 import { forestrySmoke,forestryHutSmoke } from './forestry-smoke.mjs';
 
@@ -105,6 +106,7 @@ try{
   if(args.includes('--full')||args.includes('--military'))await militarySmoke(page);
   if(args.includes('--full')||args.includes('--wheelwright'))await wheelwrightSmoke(page);
   if(args.includes('--full')||args.includes('--stables'))await stablesSmoke(page);
+  if(args.includes('--full')||args.includes('--horse-wagon'))await horseWagonSmoke(page);
   if(args.includes('--full')||args.includes('--pavement'))await pavementSmoke(page,{screenshot:process.env.PAVEMENT_SHOT??null});
   if(args.includes('--full')||args.includes('--dev-fps'))await devFpsSmoke(page);
   if(args.includes('--full')||args.includes('--walls'))await wallVisibilitySmoke(page);

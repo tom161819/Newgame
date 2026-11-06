@@ -27,6 +27,12 @@ export class StableSystem {
   freeHorse(){return [...this.horses].find(([,h])=>h.state==='stabled')?.[0]??null;}
   riderHorse(workerId){return [...this.horses].find(([,h])=>h.riderId===workerId)?.[0]??null;}
   reserveHorse(workerId){const id=this.freeHorse();if(!id)return null;const h=this.horses.get(id);h.state='reserved';h.riderId=workerId;return id;}
+  // Horse Wagon (S12): a stabled horse is reserved for a Wheelwright's batch, stays in the paddock while the wagon is
+  // built and is then harnessed to that wagon: it leaves the Stables (freeing the place) and travels hidden with it.
+  reserveForWorkshop(id,workshopId){const h=this.horses.get(id);if(h?.state!=='stabled')return false;h.state='reserved';h.workshopId=workshopId;return true;}
+  workshopHorse(workshopId){return [...this.horses].find(([,h])=>h.state==='reserved'&&h.workshopId===workshopId)?.[0]??null;}
+  harness(workshopId,vehicleId){const id=this.workshopHorse(workshopId);if(!id)return null;this.horses.set(id,{state:'harnessed',vehicleId});const a=this.horse(id);if(a){a.path=[];a.nextTile=null;a.view?.setVisible?.(false);}return id;}
+  unreserveWorkshop(workshopId){const id=this.workshopHorse(workshopId);if(!id)return;const h=this.horses.get(id);delete h.workshopId;h.state='stabled';this.place(id);}
   mountRider(workerId){const id=this.riderHorse(workerId);if(!id)return false;const h=this.horses.get(id),a=this.horse(id);h.state='ridden';if(a){a.path=[];a.view?.setVisible?.(false);}return true;}
   returnHorse(workerId,tile=null){
     const id=this.riderHorse(workerId);if(!id)return false;const h=this.horses.get(id),a=this.horse(id);
@@ -90,6 +96,9 @@ export class StableSystem {
   update(delta){
     if(this.scene.gameTime?.paused)return;this.updateKing(delta);
     for(const [id,h]of [...this.horses]){const a=this.horse(id);if(!a?.isAlive||!this.stable(h.stableId)&&h.state==='stabled'){this.horses.delete(id);if(a){a.path=[];a.wanderWait=0;}}}
+    // A wagon batch cancelled (workshop gone or no batch left for this horse) gives the horse back to its paddock.
+    for(const [id,h]of [...this.horses])if(h.state==='reserved'&&h.workshopId!=null){const record=this.scene.foodProduction?.records.get(h.workshopId),output=this.scene.foodStorage?.locations.get(`output-${h.workshopId}`);
+      if(record?.cycle?.horseId!==id&&!(output?.stock.horse_wagon>0)){if(this.stable(h.stableId))this.unreserveWorkshop(h.workshopId);else this.horses.delete(id);}}
     for(const j of this.jobs.values())if(j.phase==='leading'){const h=this.horse(j.horseId);if(h?.isAlive)h.update?.(delta);}
     for(const [workerId]of [...this.jobs]){const w=this.scene.workerSystem.workers.get(workerId);if(!w?.isAlive||w.profession!=='stablehand')this.cancel({id:workerId});}
   }
@@ -98,7 +107,7 @@ export class StableSystem {
   exportState(){return {horses:[...this.horses].map(([id,h])=>({id,...h})),jobs:[...this.jobs].map(([workerId,j])=>({workerId,...j})),ridden:this.scene.character?.mountedHorse?.kingTamed?this.scene.character.mountedHorse.id:null};}
   importState(data){
     this.horses=new Map((data?.horses??[]).map(({id,...h})=>[id,h]));
-    for(const [id,h]of this.horses)if(h.state==='ridden')this.horse(id)?.view?.setVisible?.(false);this.jobs=new Map((data?.jobs??[]).map(({workerId,...j})=>[workerId,j]));
+    for(const [id,h]of this.horses)if(['ridden','harnessed'].includes(h.state))this.horse(id)?.view?.setVisible?.(false);this.jobs=new Map((data?.jobs??[]).map(({workerId,...j})=>[workerId,j]));
     if(data?.ridden){const a=this.horse(data.ridden);if(a){a.kingTamed=true;a.rideMs=STABLE_RULES.kingTameMs;}}
     for(const id of this.horses.keys())this.place(id);
   }

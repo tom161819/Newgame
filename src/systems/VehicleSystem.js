@@ -13,7 +13,7 @@ export class VehicleSystem {
   mode(worker){return TRANSPORT_MODES.includes(worker.transportMode)?worker.transportMode:'auto';}
   setMode(worker,mode){if(!TRANSPORT_MODES.includes(mode))return false;worker.transportMode=mode;if(mode==='hands'){this.unreserve(worker);if(!worker.cargo)this.park(worker);}return true;}
   free(tile){return this.scene.map[tile.y]?.[tile.x]===0&&![...this.vehicles.values()].some(v=>v.state!=='inUse'&&v.x===tile.x&&v.y===tile.y);}
-  create(type,tile){const vehicle={id:`vehicle-${this.nextId++}`,type,x:tile.x,y:tile.y,operatorId:null,state:'parked'};this.vehicles.set(vehicle.id,vehicle);this.changed();return vehicle;}
+  create(type,tile,horseId=null){const vehicle={id:`vehicle-${this.nextId++}`,type,x:tile.x,y:tile.y,operatorId:null,state:'parked',horseId};this.vehicles.set(vehicle.id,vehicle);this.changed();return vehicle;}
   changed(){for(const listener of this.listeners)listener();}
   // A finished vehicle leaves the output buffer and stands on a free tile next to the workshop.
   rollOut(){
@@ -22,7 +22,9 @@ export class VehicleSystem {
       const output=storage.locations.get(`output-${b.id}`);if(!output)continue;
       for(const [type,amount]of Object.entries(output.stock))for(let i=0;i<amount;i++){
         const tile=towerNeighbors(b).find(t=>this.free(t));if(!tile)return;
-        if(!storage.withdraw(output.id,type,1))break;this.create(type,tile);this.scene.updateInventory?.();
+        if(!storage.withdraw(output.id,type,1))break;const v=this.create(type,tile);
+        // Horse Wagon: the horse reserved for this batch is harnessed to the new wagon.
+        if(VEHICLES[type]?.requiresHorse){v.horseId=this.scene.stables?.harness(b.id,v.id)??null;this.changed();}this.scene.updateInventory?.();
       }}
   }
   unreserve(worker){const v=this.reservedBy(worker);if(v){v.operatorId=null;v.state='parked';this.changed();}}
@@ -35,22 +37,29 @@ export class VehicleSystem {
     if(this.held(worker)||worker.cargo||worker.workTask)return false;
     let target=this.reservedBy(worker);
     if(!target){
-      const wanted=mode==='auto'?['wheelbarrow']:[mode],options=[...this.vehicles.values()].filter(v=>v.state==='parked'&&wanted.includes(v.type)&&!VEHICLES[v.type]?.requiresHorse);
+      // Auto takes the best free vehicle: a Horse Wagon (with its horse) before a Wheelbarrow, then the nearest.
+      const wanted=mode==='auto'?['horse_wagon','wheelbarrow']:[mode],options=[...this.vehicles.values()].filter(v=>v.state==='parked'&&wanted.includes(v.type)&&this.usable(v));
       if(!options.length)return false;
-      target=options.sort((a,b)=>Math.hypot(a.x-worker.tile.x,a.y-worker.tile.y)-Math.hypot(b.x-worker.tile.x,b.y-worker.tile.y))[0];
+      target=options.sort((a,b)=>wanted.indexOf(a.type)-wanted.indexOf(b.type)||Math.hypot(a.x-worker.tile.x,a.y-worker.tile.y)-Math.hypot(b.x-worker.tile.x,b.y-worker.tile.y))[0];
       target.operatorId=worker.id;target.state='reserved';this.changed();
     }
     // Taken from its tile or a neighbouring one (someone may be standing on it).
-    if(Math.max(Math.abs(worker.tile.x-target.x),Math.abs(worker.tile.y-target.y))<=1&&!worker.nextTile&&!worker.path.length){target.state='inUse';worker.vehicleType=target.type;worker.workState='Waiting';worker.workMessage='Taking a Wheelbarrow';this.changed();return false;}
-    worker.workState='Traveling to Target';worker.workMessage='Fetching a Wheelbarrow';
+    if(Math.max(Math.abs(worker.tile.x-target.x),Math.abs(worker.tile.y-target.y))<=1&&!worker.nextTile&&!worker.path.length){target.state='inUse';worker.vehicleType=target.type;worker.workState='Waiting';worker.workMessage=target.type==='horse_wagon'?'Taking a Horse Wagon':'Taking a Wheelbarrow';this.changed();return false;}
+    worker.workState='Traveling to Target';worker.workMessage=target.type==='horse_wagon'?'Fetching a Horse Wagon':'Fetching a Wheelbarrow';
     if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=800;const goals=[{x:target.x,y:target.y},...[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]].map(([dx,dy])=>({x:target.x+dx,y:target.y+dy}))].filter(t=>this.scene.map[t.y]?.[t.x]===0);if(!worker.moveTo(goals)){target.operatorId=null;target.state='parked';this.changed();return false;}}
     return true;
   }
+  // A Horse Wagon needs its living, harnessed horse; without it the wagon stays where it is.
+  usable(v){return !VEHICLES[v.type]?.requiresHorse||this.scene.stables?.horses.get(v.horseId)?.state==='harnessed';}
   // Death or another job: the vehicle stays where the worker stands; another Hauler can take it.
   release(worker){this.unreserve(worker);this.park(worker);}
   update(){
     this.rollOut();
-    for(const v of this.vehicles.values()){if(!v.operatorId)continue;const w=this.scene.workerSystem.workers.get(v.operatorId);
+    for(const v of this.vehicles.values()){
+      if(v.horseId!=null&&!this.usable(v)){v.horseId=null;this.changed();}
+      if(v.horseId!=null){const a=this.scene.animalSystem?.animals.get(v.horseId),p=this.position(v);if(a){a.position={x:p.x,y:p.y};a.tile={x:Math.floor(p.x),y:Math.floor(p.y)};}}
+      if(!v.operatorId)continue;const w=this.scene.workerSystem.workers.get(v.operatorId);
+      if(v.state==='inUse'&&!this.usable(v)&&!w?.cargo&&w){this.park(w);continue;}
       if(!w?.isAlive){v.operatorId=null;v.state='parked';this.changed();continue;}
       if(v.state==='inUse'){v.x=w.tile.x;v.y=w.tile.y;if(w.profession!=='hauler'&&!w.cargo)this.park(w);}}
   }
