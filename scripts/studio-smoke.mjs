@@ -92,6 +92,30 @@ try {
   await page.locator('#library-review [data-review="all"]').click();
   pass('review decisions: In game badge only on art the game uses, Request revision needs a comment stored with the version, history shows it, Reject, filters Revision requested / In game');
 
+  // #213 Submit review: the decisions above (revision request + reject) open one pre-filled GitHub issue; only GitHub's
+  // confirmation marks them sent. The GitHub API is mocked: offline first, then not yet visible, then confirmed.
+  let apiMode = 'offline', submissionId = null;
+  await page.route('https://api.github.com/**', route => apiMode === 'offline' ? route.abort() : route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: apiMode === 'found' ? [{ number: 999, html_url: 'https://github.com/tom161819/Newgame/issues/999', body: `x ${submissionId}`, user: { login: 'tom161819' } }] : [] }) }));
+  await page.getByRole('button', { name: 'Submit review' }).click();
+  assert.match(await page.locator('#submit-summary').textContent(), /Rejected \(1\)/);
+  await page.evaluate(() => { window.__opened = []; window.open = url => { window.__opened.push(url); return null; }; });
+  await page.locator('#submit-send').click();
+  const issueLink = new URL(await page.evaluate(() => window.__opened[0]));
+  assert.equal(issueLink.pathname, '/tom161819/Newgame/issues/new');assert.equal(issueLink.searchParams.get('labels'), 'asset-review');assert.match(issueLink.searchParams.get('body'), /```asset-review/);
+  submissionId = (await page.evaluate(() => window.assetStudio.submission())).submissionId;
+  await page.locator('#submit-check').click();await page.waitForFunction(() => /could not be reached/.test(document.querySelector('#submit-status').textContent));
+  assert.ok(Object.keys((await page.evaluate(() => window.assetStudio.local())).assets).length > 0, 'offline: local decisions kept');
+  for (let i = errors.length - 1; i >= 0; i--) if (/ERR_FAILED/.test(errors[i])) errors.splice(i, 1); // the simulated outage above, not a page error
+  apiMode = 'missing';await page.locator('#submit-check').click();await page.waitForFunction(() => /has not shown the issue yet/.test(document.querySelector('#submit-status').textContent));
+  apiMode = 'found';await page.locator('#submit-check').click();await page.waitForFunction(() => /confirmed your review as issue #999/.test(document.querySelector('#submit-status').textContent));
+  assert.equal(await page.locator('#submit-link').getAttribute('href'), 'https://github.com/tom161819/Newgame/issues/999');
+  await page.locator('#submit-form button[type="submit"]').click();
+  // Submitting the same decisions again reuses the confirmed submission instead of opening a second issue.
+  await page.getByRole('button', { name: 'Submit review' }).click();
+  assert.equal((await page.evaluate(() => window.assetStudio.submission())).submissionId, submissionId);assert.match(await page.locator('#submit-status').textContent(), /issue #999/);
+  await page.locator('#submit-form button[type="submit"]').click();await page.unroute('https://api.github.com/**');
+  pass('Submit review: pre-filled asset-review issue, offline and not-yet-visible keep decisions waiting, GitHub confirmation marks it sent, re-submit reuses it');
+
   await page.locator('.library-item', { hasText: 'Watchtower' }).click();
   await page.waitForFunction(() => document.querySelectorAll('.variant-card canvas').length >= 3);
   const cards = await page.locator('.variant-card').count();
