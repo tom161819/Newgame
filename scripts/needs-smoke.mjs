@@ -25,11 +25,12 @@ export async function needsSmoke(page,{screenshot=null}={}){
   await page.waitForFunction(id=>document.querySelector('#population-list [data-worker-id]')?.dataset.workerId===id,id);
   await page.locator('#population-sort').selectOption(sortBefore);await page.locator('#population-order').selectOption(orderBefore);
   await page.locator('#close-population').click();
-  await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('needs-smoke',false));
+  // Keep the fixture paused through snapshot and restored-world assertion; a real frame may feed or decay Food.
   // Save/Load in the real application keeps the needs exactly.
   const saved=await page.evaluate(()=>window.__game.registry.get('application').snapshot());assert.equal(saved.needs.records.find(r=>r.id===id).food,15);
-  await page.evaluate(async state=>{const a=window.__game.registry.get('application');window.__needsReady=false;const ready=a.onGameReady.bind(a);a.onGameReady=s=>{ready(s);window.__needsReady=true;a.onGameReady=ready;};await a.load(state);},saved);
+  await page.evaluate(async state=>{const a=window.__game.registry.get('application');window.__needsReady=false;const ready=a.onGameReady.bind(a);a.onGameReady=s=>{ready(s);s.pauseManager.set('needs-smoke',true);window.__needsReady=true;a.onGameReady=ready;};await a.load(state);},saved);
   await page.waitForFunction(()=>window.__needsReady);
   assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.needs.records.get(id)?.food,id),15);
+  await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('needs-smoke',false));
   console.log(`PASS S13 needs: unit panel bars (Food 15 → Hungry, home), HUD ${hud.trim()} opens Population with the needs summary and Happiness sort, work speed factor shown and applied, Save/Load keeps needs`);
 }

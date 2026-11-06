@@ -16,24 +16,24 @@ Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeat
 
 ## Active
 
+Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke paused across snapshot/Load and releases pause only after exact Food assertion. A real resumed frame changed15 to15.90275 before the assertion; no Needs gameplay or tooltip logic changes. Preserve197 tooltip checks when integrating.
+
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | NEW01-A #118 Builder workshop mechanics | Codex | `codex/builder-workshop-base` (stacked on94) | — | Implemented schema37;757 tests/30 focused/version/changelog/build PASS; final0.9.0 native base/rate/Load/phone/demolition+rock/Needs/morale/feed/commands PASS;183→185→194→118 actual Pages; placeholder allowed, final art119 stays Claude | own workshop definition/derived base policy, ConstructionSystem.workSpeed, central idleHomes/BuilderAI, Unit/Construction/detail status, completion XP, schema/release/i18n, own tests/native/docs; no final art |
 | AUD65 #94 Manual rock mining | Codex | `codex/manual-rock-mining` (stacked on124) | [#194](https://github.com/tom161819/Newgame/pull/194) | Implemented; schema36/release0.8.0 after185 actual Pages;750 tests/version/changelog/build + native real-mouse10Stones/ledger/Load/phone/commands/Needs/eventfeed PASS | own rock marking tool/UI, GameScene/GameApplication narrow input/Escape hooks, MiningWork/WorkerAI/WorkplaceSystem/free Miner selection, current schema serializer/loader/terrain validation, XP/SkillSystem, physical Drop/FoodProduction reuse and cargo provenance, i18n, own tests/browser/docs |
-| NEW07 #124 Castle gathering + arrival uniforms | Codex | `codex/castle-idle-gathering` (stacked on183) | [#185](https://github.com/tom161819/Newgame/pull/185) | Integrated Needs/event-feed main; release0.7.0/schema35;743 tests/version/changelog/build + native morale integration PASS;merged0306270, actual0.7.0 Pages pending | derived idle policy, WorkerAI/WorkerSystem/BuilderAI/ConstructionSystem/JobSystem/WorkplaceSystem/UnitCommands, HumanView approved outfit selection, alpha serializer/loader if needed, own tests/native/i18n/docs |
-| S13 #58 phase C part 1: mood work speed, Kingdom Happiness in attractiveness | Claude | `claude/needs-work-morale` | — | In review | NeedsSystem (refresh/workModifier), data/needs.js, SkillSystem.workEfficiency, NeedsDisplay, i18n `needs.workLine`, tests/helpers/workerScene.js (`morale` option), needs smoke; release 0.6.1 |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
 In this order; one `status:ready` at a time. When an issue is merged, verified on Pages and closed, the next one becomes `status:ready`. Whoever sees fewer than three queued Codex issues adds more from the backlog. Claude does this at every check.
 
-1. [#96](https://github.com/tom161819/Newgame/issues/96) done; [#128](https://github.com/tom161819/Newgame/issues/128) done
-2. [#130](https://github.com/tom161819/Newgame/issues/130) NEW13 demolition with 50 % refund (reuses #128)
-3. [#124](https://github.com/tom161819/Newgame/issues/124) NEW07 idle residents gather at the Castle
-4. [#94](https://github.com/tom161819/Newgame/issues/94) AUD65 manual marking of rocks for Miners
-5. [#118](https://github.com/tom161819/Newgame/issues/118) NEW01-A Builders' workshop (mechanics; the art stays with Claude in #119)
-6. [#98](https://github.com/tom161819/Newgame/issues/98) AUD71-A idle residents sit on a placeholder porch at their workplace (follows #124's central idle rule; porch art stays with Claude in #114)
+1. Done: [#96](https://github.com/tom161819/Newgame/issues/96), [#128](https://github.com/tom161819/Newgame/issues/128), [#130](https://github.com/tom161819/Newgame/issues/130) (0.6.0), [#124](https://github.com/tom161819/Newgame/issues/124) (0.7.0)
+2. [#94](https://github.com/tom161819/Newgame/issues/94) AUD65 manual marking of rocks for Miners
+3. [#118](https://github.com/tom161819/Newgame/issues/118) NEW01-A Builders' workshop (mechanics; the art stays with Claude in #119)
+4. [#98](https://github.com/tom161819/Newgame/issues/98) AUD71-A idle residents sit on a placeholder porch at their workplace (follows #124's central idle rule; porch art stays with Claude in #114)
+5. [#132](https://github.com/tom161819/Newgame/issues/132) NEW08-A food building menu order and hut unlocking (moved from Claude's backlog)
+6. [#97](https://github.com/tom161819/Newgame/issues/97) AUD69-70 working castle gate; walls reached only through a tower or the gate (mechanics; new gate art via Claude's Asset Studio)
 
 ## Kept backups (do not delete without the developer)
 
@@ -42,8 +42,11 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 
 ## Done
 
-- 2026-11-06 PR183 / Issue130: release0.6.0/schema34, mergedabc12a11534967e7d0e393c0356c52a668758716 after CI42227943052 SUCCESS.733 tests/version/changelog/build and integrated native demolition/Needs/feed/stockpile/rightclick PASS. Actual Pages42228504161 build127928224031/deploy127941021369 SUCCESS; annotated tagv0.6.0 resolves to exactabc12a1. Issue130 closed/done;124 already in review185.
+- 2026-11-06 PR185 / Issue124: release0.7.0/schema35 merged03062705c47199386af24d55dfce8ec38a1e4755;743 tests/version/changelog/build and native gathering/Needs/morale/feed/commands/current Load PASS, CI42233028928 SUCCESS. Tag v0.7.0 resolves to exact merge. Actual Pages42233665135 build127965062613 and deploy127965013083 SUCCESS after one backend-only failed-deploy retry; issue124 closed/done. PR194 is the existing next task.
+- 2026-11-06 Claude PR195 / Issue101: HUD cargo layout fix mergedc697fd442a4d44a4097cc16561561b65e213fdda, release0.7.1/schema35; source integrated into194, actual Pages remains separately verified live.
 
+- 2026-11-06 Claude: S13 #58 phase C part 1, mood work speed and Happiness in attractiveness ([#193](https://github.com/tom161819/Newgame/pull/193), release 0.6.1).
+- 2026-11-06 PR183 / Issue130: release0.6.0/schema34, mergedabc12a11534967e7d0e393c0356c52a668758716 after CI42227943052 SUCCESS.733 tests/version/changelog/build and integrated native demolition/Needs/feed/stockpile/rightclick PASS. Actual Pages42228504161 build127928224031/deploy127941021369 SUCCESS; annotated tagv0.6.0 resolves to exactabc12a1. Issue130 closed/done;124 already in review185.
 - 2026-11-06 Claude: #105 event feed and bottom-right corner column ([#192](https://github.com/tom161819/Newgame/pull/192), release 0.5.1).
 - 2026-11-06 PR180 / Issue128: merged6ddc7f18484e5b669655b10135b6e10bc0b52996 after exact-head CI42199613796 SUCCESS.701 tests/changelog/build and native stockpile hauling/removal/confirmation/SaveLoad/wear/repeat PASS. Actual Pages42200431522 build127834071595 and deploy127844758887 SUCCESS. Issue128 closed/done;130 already in review183, preserve its claim.
 - 2026-11-06 Claude: S13 #58 phase A needs and Happiness ([#191](https://github.com/tom161819/Newgame/pull/191), release 0.5.0, SAVE_VERSION 33). Phases B–D remain; B waits for Codex #124.

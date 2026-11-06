@@ -17,6 +17,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 - Mark visible rocks by click or drag for free Miners, or cancel their orders. Each rock slowly yields ten physical Stones, then disappears; the Miner carries the output to storage before choosing another rock. Partial work, ground goods and active deliveries survive current Save/Load. Employed Quarry and Iron Mine workers keep their jobs.
 
+## [0.7.1] - 2026-11-06
+<!-- version: {"title":"Steady top bar on stone pickup","type":"fix","reconstructed":false,"saveVersion":35} -->
+### Fixed
+- Picking up a stone no longer makes the top bar jump. On desktop the King's "Deliver to storage" button and cargo status keep a fixed place in the bar, so Food, the clock and the other items stay where they are when the button appears or disappears. This was most noticeable when zoomed out, where the map itself does not move. The full cargo text is shown as a tooltip when it is too long.
+
 ## [0.7.0] - 2026-11-06
 <!-- version: {"title":"Castle gathering and arrival uniforms","type":"feature","reconstructed":false,"saveVersion":35} -->
 ### Added
