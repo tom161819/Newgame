@@ -11,7 +11,7 @@ export function memoryColor(color,brightness=FOG_STYLE.brightness){
 }
 function parts(view,callback,seen=new Set()){
   if(!view||seen.has(view))return;seen.add(view);callback(view);
-  for(const name of ['inner','container','body','back','front','footprint','floor','sprite','overlay','bar','lid'])parts(view[name],callback,seen);
+  for(const name of ['inner','container','body','back','front','rotor','footprint','floor','sprite','overlay','bar','lid'])parts(view[name],callback,seen);
   for(const child of [...(view.list??[]),...(view.plants??[])])parts(child,callback,seen);
 }
 function frozenAppearance(scene,view,repaint,brightness=FOG_STYLE.brightness){

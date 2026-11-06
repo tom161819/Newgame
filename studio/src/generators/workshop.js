@@ -37,11 +37,14 @@ function body(spec, style) {
       box([0.16, 0.16, 0.03], [r * 0.56 + 0.03, h * 0.62, r * 0.56 + 0.03], 'opening', { rotation: Math.PI / 4 })];
     // Sails in the plane facing the camera: a "+" of lattice blades on a hub.
     const hub = [r * 0.72 + 0.06, h - 0.05, r * 0.72 + 0.06];
-    parts.push(sphere([0.06, 0.06, 0.06], [hub[0], hub[1] - 0.06, hub[2]], 'wood_dark', 0));
-    parts.push(box([0.17, sail * 2, 0.025], [hub[0] + 0.02, hub[1] - sail, hub[2] + 0.02], 'wood', { rotation: Math.PI / 4 }));
-    parts.push(box([sail * 2, 0.17, 0.025], [hub[0] + 0.02, hub[1] - 0.085, hub[2] + 0.02], 'wood', { rotation: Math.PI / 4 }));
-    parts.push(box([0.03, sail * 2, 0.03], [hub[0] + 0.035, hub[1] - sail, hub[2] + 0.035], 'cloth_linen', { rotation: Math.PI / 4 }));
-    return { parts, lights: [] };
+    // The hub and sails are tagged as the `rotor` layer (#99): the export adds a still sprite without them and a
+    // sails-only sprite with the hub as pivot, so the game can turn the sails alone. Pixels of the full sprite are unchanged.
+    const rotor = [sphere([0.06, 0.06, 0.06], [hub[0], hub[1] - 0.06, hub[2]], 'wood_dark', 0),
+      box([0.17, sail * 2, 0.025], [hub[0] + 0.02, hub[1] - sail, hub[2] + 0.02], 'wood', { rotation: Math.PI / 4 }),
+      box([sail * 2, 0.17, 0.025], [hub[0] + 0.02, hub[1] - 0.085, hub[2] + 0.02], 'wood', { rotation: Math.PI / 4 }),
+      box([0.03, sail * 2, 0.03], [hub[0] + 0.035, hub[1] - sail, hub[2] + 0.035], 'cloth_linen', { rotation: Math.PI / 4 })];
+    parts.push(...rotor.map(part => ({ ...part, layer: 'rotor' })));
+    return { parts, lights: [], pivot: [hub[0] + 0.02, hub[1] - 0.06, hub[2] + 0.02] };
   }
   if (kind === 'furnace') {
     // Bloomery: tapered stone stack, chimney, glowing mouth and bellows; `size` scales it.
@@ -91,7 +94,7 @@ export function build(spec, { footprint, style }) {
   if (spec.ground) parts.unshift(box([footprint.width - 0.18, 0.02, footprint.height - 0.18], [0, 0, 0], spec.ground));
   let height = 0;
   for (const p of parts) height = Math.max(height, p.at[1] + (p.size?.[1] ?? p.height ?? (p.radii ? p.radii[1] * 2 : 0)));
-  return { primitives: parts, lights, height };
+  return { primitives: parts, lights, height, ...(made.pivot ? { rotor: { at: [made.pivot[0] + bx, made.pivot[1], made.pivot[2] + bz] } } : {}) };
 }
 
 export default { id: 'workshop', version: 1, label: 'Workshop with props', params, build };

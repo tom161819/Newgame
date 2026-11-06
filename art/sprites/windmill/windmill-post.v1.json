@@ -35,6 +35,16 @@
   "visualHeight": 119,
   "platform": null,
   "frontLayer": false,
+  "rotor": {
+    "pivot": {
+      "x": 65,
+      "y": 39.69
+    },
+    "gamePivot": {
+      "x": 0,
+      "y": -79.31
+    }
+  },
   "gameLights": [],
   "modelHeight": 2.25,
   "lights": []

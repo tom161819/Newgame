@@ -22,7 +22,7 @@ Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke pau
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | AUD65 #94 Manual rock mining | Codex | `codex/manual-rock-mining` (stacked on124) | [#194](https://github.com/tom161819/Newgame/pull/194) | Implemented; schema36/release0.8.0 after185 actual Pages;750 tests/version/changelog/build + native real-mouse10Stones/ledger/Load/phone/commands/Needs/eventfeed PASS | own rock marking tool/UI, GameScene/GameApplication narrow input/Escape hooks, MiningWork/WorkerAI/WorkplaceSystem/free Miner selection, current schema serializer/loader/terrain validation, XP/SkillSystem, physical Drop/FoodProduction reuse and cargo provenance, i18n, own tests/browser/docs |
-| #116 Natural Path Renderer V2 in the Path Lab (studio only; game unchanged until approval) | Claude | `claude/path-render-v2-lab` | — | In review | studio/src/path-lab/{v2,main,scene,params}.js, tests/path-lab.test.js, scripts/studio-smoke.mjs |
+| #99 Mill sails turn while grinding (still body + rotor layer from the approved export) | Claude | `claude/mill-sails` | — | In review | studio generator/renderer/export rotor layer, art/sprites/windmill, public/assets/buildings/mill, approvedArt, AssetManager, SpriteViews, MapMemoryRenderer, new game/MillSails.js, GameScene hook, tests, smoke |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
@@ -44,6 +44,7 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 
 ## Done
 
+- 2026-11-06 Claude: #116 Path renderer V2 in the Path Lab ([#205](https://github.com/tom161819/Newgame/pull/205)), awaiting the owner's preset choice; Pages deploy retries ([#206](https://github.com/tom161819/Newgame/pull/206)).
 - 2026-11-06 Claude: #115 Path Lab in the Asset Studio ([#204](https://github.com/tom161819/Newgame/pull/204)).
 - 2026-11-06 Claude: #119 Builders' Workshop concepts ([#199](https://github.com/tom161819/Newgame/pull/199)) and #114 porch concepts ([#201](https://github.com/tom161819/Newgame/pull/201)) in the Studio, awaiting the owner's choice; Pages deploy timeout ([#203](https://github.com/tom161819/Newgame/pull/203), ineffective: replaced by deploy retries).
 - 2026-11-06 Claude PR197 Needs tooltips and100-resident performance coverage mergedb53b8da731f5e5ad75574fc0e73edfd43e472f07, release0.7.2/schema35. Integrated tooltip assertions while retaining exact snapshot/Load pause guard.
