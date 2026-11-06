@@ -5,7 +5,7 @@ Phase A of [#58](https://github.com/tom161819/Newgame/issues/58) (0.5.0) measure
 - the mood's work factor: Happy ×1.10, Neutral ×1.00, Unhappy and Critical ×0.80;
 - Kingdom Happiness as a modifier of the existing Kingdom Attractiveness.
 
-Strikes and emigration (part 2) need saved day counters and a new SAVE_VERSION. They follow separately so this part stays a PATCH release (0.5.2).
+Strikes and emigration (part 2) need saved day counters and a new SAVE_VERSION. They follow separately so this part stays a PATCH release (0.6.1).
 
 ## Files and systems
 - `src/data/needs.js`: `HAPPINESS_ATTRACTIVENESS` (≥80 +15, 50–79 0, 30–49 −20, <30 −45) and `attractivenessFor()`.
@@ -24,7 +24,7 @@ Strikes and emigration (part 2) need saved day counters and a new SAVE_VERSION. 
 - Attractiveness has base 100 capped at 100, so the +15 bonus only offsets penalties such as the food shortage −40. A larger rework of attractiveness is outside this issue.
 
 ## Save/Load impact
-None. SAVE_VERSION stays 33; the factor is derived.
+None. SAVE_VERSION stays 34 (from #130); the factor is derived.
 
 ## Testing
 - `npm test` passes, including 2 new tests in `tests/needs.test.js`:
@@ -33,5 +33,5 @@ None. SAVE_VERSION stays 33; the factor is derived.
 - Smoke `--needs` now also checks that the panel's work-speed line equals the applied factor, and that the attractiveness modifier exists. `--event-feed` passes. A full smoke run was made (see the PR).
 
 ## Notes for the next agent
-- Part 2 (strikes after 2 days below 25, end at 45; emigration after 3 days below 15) needs per-record day counters, i.e. SAVE_VERSION +1 and a MINOR release. Coordinate the number with Codex #183 and #185, which also raise SAVE_VERSION.
+- Part 2 (strikes after 2 days below 25, end at 45; emigration after 3 days below 15) needs per-record day counters, i.e. SAVE_VERSION +1 and a MINOR release. Coordinate the number with Codex #185, which also raises SAVE_VERSION.
 - Use `scene.needs.workModifier(worker)`, never `status()`, in per-frame code.

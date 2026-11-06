@@ -19,7 +19,7 @@ Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeat
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| S13 #58 phase C part 1: mood work speed, Kingdom Happiness in attractiveness | Claude | `claude/needs-work-morale` | — | In review | NeedsSystem (refresh/workModifier), data/needs.js, SkillSystem.workEfficiency, NeedsDisplay, i18n `needs.workLine`, tests/helpers/workerScene.js (`morale` option), needs smoke; release 0.5.2 |
+| S13 #58 phase C part 1: mood work speed, Kingdom Happiness in attractiveness | Claude | `claude/needs-work-morale` | — | In review | NeedsSystem (refresh/workModifier), data/needs.js, SkillSystem.workEfficiency, NeedsDisplay, i18n `needs.workLine`, tests/helpers/workerScene.js (`morale` option), needs smoke; release 0.6.1 |
 | NEW13 #130 Builder demolition | Codex | `codex/builder-demolition` (stacked on180) | [#183](https://github.com/tom161819/Newgame/pull/183) | Integrating main c7fad22 Needs33/event-feed; schema34 + next MINOR0.6.0; earlier721 tests/native PASS, renewed checks pending | DemolitionSystem/UI, shared ConstructionSystem/BuilderAI/WorkerAI, GameScene, schema33 Serializer/Loader/current fixtures, lifecycle cleanup, i18n/HTML/style, own tests/browser/docs |
 
 ## Codex queue (developer: Codex always has several issues queued)
