@@ -33,3 +33,10 @@ test('a right click on a modal panel backdrop closes it and suppresses the brows
   d.listeners.contextmenu({target:unit,preventDefault(){prevented++;}});
   assert.equal(unit.open,false);assert.equal(prevented,1);
 });
+
+test('a right click on the game canvas while the game is paused by Settings still closes Settings',()=>{
+  const settings={open:true,setOpen(v){this.open=v;}},d=doc();installPanelDismiss(d,{panels:()=>[settings]});let prevented=0;
+  d.listeners.contextmenu({target:{tagName:'CANVAS',closest:()=>null},preventDefault(){prevented++;}});
+  assert.equal(settings.open,false);assert.equal(prevented,1);
+  d.listeners.contextmenu({target:{tagName:'CANVAS',closest:()=>null},preventDefault(){prevented++;}});assert.equal(prevented,1,'nothing open: untouched');
+});

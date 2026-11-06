@@ -22,5 +22,7 @@ export function installPanelDismiss(doc,{panels=()=>[],signal}={}){
   doc.addEventListener('contextmenu',event=>{
     const dialog=event.target?.closest?.('dialog');
     if(dialog&&event.target===dialog&&dismissible(dialog)){event.preventDefault();closeOpenPanels(doc,{panels:panels()});}
+    // The game canvas: Phaser ignores pointers while Settings pauses the game, but the context menu event still arrives.
+    else if(event.target?.tagName==='CANVAS'&&closeOpenPanels(doc,{panels:panels()}))event.preventDefault();
   },{capture:true,signal});
 }
