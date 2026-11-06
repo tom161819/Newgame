@@ -6,7 +6,7 @@ Files held lists the files a task changes. Another task avoids them unless neces
 
 ## Agreed merge order
 
-Urgent current Pages repair: Codex right-click smoke isolation first (main9703b37 Pages42190334050 failed in pave-under after real Move fixture leaked), 179/#96 is merged and deployed;180/#128 is next. Restore the smoke snapshot, preserve game commands and all assertions.
+Urgent current Pages repair: Codex right-click smoke isolation first (main9703b37 Pages42190334050 failed in pave-under after real Move fixture leaked), 179/#96 and180/#128 are merged and deployed;183/#130 is next, then124. Restore the smoke snapshot, preserve game commands and all assertions.
 
 PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da21f0c and its Pages42159725044 retry completed build/deploy SUCCESS. PR165 (#143) merged90eb356 after exact-head CI42160766881 and Pages42163373128 build/deploy SUCCESS. PR166 and167 have merged and actual successful Pages; see verified Done entries.
 
@@ -17,8 +17,7 @@ Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeat
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| NEW13 #130 Builder demolition | Codex | `codex/builder-demolition` (stacked on180) | — | Implemented schema33;714 tests/changelog/build and native demolition+stockpile+farm-plots+rightclick PASS;181→179→180→130, await actual predecessor Pages | DemolitionSystem/UI, shared ConstructionSystem/BuilderAI/WorkerAI, GameScene, schema33 Serializer/Loader/current fixtures, lifecycle cleanup, i18n/HTML/style, own tests/browser/docs |
-| NEW11 #128 Temporary stockpile cleanup | Codex | `codex/temporary-stockpile-cleanup` (stacked on179) | [#180](https://github.com/tom161819/Newgame/pull/180) | Implemented;701 tests + integrated native hauling/confirmation/SaveLoad/wear/repeat/i18n PASS; repair181 integrated; merge after179/#96 verified | FoodStorageSystem removal safety, StoragePanel/HTML/i18n, PathWearSystem, own tests/browser/docs |
+| NEW13 #130 Builder demolition | Codex | `codex/builder-demolition` (stacked on180) | [#183](https://github.com/tom161819/Newgame/pull/183) | Implemented schema33;714 tests/changelog/build and native demolition+stockpile+farm-plots+rightclick PASS;181→179→180 deployed; final head checks before merge130 | DemolitionSystem/UI, shared ConstructionSystem/BuilderAI/WorkerAI, GameScene, schema33 Serializer/Loader/current fixtures, lifecycle cleanup, i18n/HTML/style, own tests/browser/docs |
 | #129 Brightness of explored areas outside sight | Claude | `claude/fog-dim-slider` | [#171](https://github.com/tom161819/Newgame/pull/171) | PR open; fog/walls/brightness/i18n smokes PASS | systems/FogOfWarSystem.js (memory brightness), TerrainRenderer.js (memory tint), MapMemoryRenderer.js, ui/SettingsPanel.js, GameStateSerializer.js (settings field excluded), index.html + style.css settings row, i18n, tests/memory-brightness.test.js, scripts/memory-brightness-smoke.mjs |
 | #126 Remembered rocks stay lit outside sight | Claude | `claude/fog-rock-memory` (from `claude/fog-dim-slider`) | [#172](https://github.com/tom161819/Newgame/pull/172) | PR open; merge after #171 | game/memoryTexture.js (new), TerrainRenderer.js (paintWall), MapMemoryRenderer.js, tests/memory-brightness.test.js, scripts/memory-brightness-smoke.mjs |
 | NEW02 (#120) One click opens a compact unit detail | Claude | `claude/unit-click-detail` | — | In progress | ui/UnitPanel.js, ui/UnitSelection.js, ui/dockedPanels.js (new), GameScene.js (open-dialog checks only), index.html (unit dialog class), style.css, scripts/unit-command-smoke.mjs |
@@ -42,6 +41,8 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-06 PR180 / Issue128: merged6ddc7f18484e5b669655b10135b6e10bc0b52996 after exact-head CI42199613796 SUCCESS.701 tests/changelog/build and native stockpile hauling/removal/confirmation/SaveLoad/wear/repeat PASS. Actual Pages42200431522 build127834071595 and deploy127844758887 SUCCESS. Issue128 closed/done;130 already in review183, preserve its claim.
 
 - 2026-11-06 PR179 / Issue96: merged1ede1ed210f80dfbe8e50154af62cbc2dc118a22 after exact final CI42195939745 SUCCESS;697 tests/changelog/build and relevant native repeated farm/orchard/Fog/Load/rightclick/pave-under/walls/ownership PASS. Actual Pages42196320133 build127820327813 AND deploy127830563932 SUCCESS for the exact merge, including full simulation/save/archive/Studio gates. Issue96 closed/done.128 already claimed/review in180, never relabel an active task ready.
 - 2026-11-06 PR181 Pages repair: merged84f23d5 after final CI42192615092;696 tests/changelog/build and reproduced rightclick→pave-under+current Load PASS. Actual Pages42193129545 build127809725953/deploy127810899847 SUCCESS. Restored fixture world instead of leaking a real Move command; no production command changes or skipped assertions.

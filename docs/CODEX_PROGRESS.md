@@ -149,3 +149,5 @@ AUD68 validation follow-up:181 merged84f23d5 with actual Pages42193129545 build+
 
 
 AUD68 DONE VERIFIED: actual Pages42196320133 build127820327813 AND deploy127830563932 SUCCESS for exact PR179 merge1ede1ed (full simulation/save/archive/Studio gates). Issue96 closed/done. PR180/#128 already in review, no redundant ready label. PR181 smoke isolation repair has verified Pages42193129545 success. No full-browser failure remains unresolved in the deployment gate.
+
+NEW11 #128 DONE VERIFIED: PR180 merged6ddc7f18484e5b669655b10135b6e10bc0b52996, CI42199613796 SUCCESS;701 tests/changelog/build + integrated native stockpile checks PASS. Actual Pages42200431522 build127834071595/deploy127844758887 SUCCESS. Issue128 closed/done. Immediate successor130 already in PR183 review.
