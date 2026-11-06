@@ -13,7 +13,7 @@ Only an unassigned Miner can accept marked work, and a completed rock's output i
 The new current-only schema stores rock orders, produced units, partial work and mined cargo provenance; other schemas reject before mutation without migrations. SAVE_VERSION36 follows Needs33, demolition34 and gathering35; the required next MINOR is0.8.0.
 
 ## Testing
-Eight focused tests passed, covering exact ten-unit ground/storage/ledger conservation, free/employed/multiple/dead Miners, cancellation, combat/pause, partial capacity, partial Load and Hold/Load/Resume with cargo. A broader736-test run passed before the final cargo test and predecessor integrations; final full checks and real browser Load are still pending.
+Final749 unit tests, version policy against185, changelog validation and production build passed. Eight focused tests cover exact ten-unit ground/storage/ledger conservation, free/employed/multiple/dead Miners, cancellation, combat/pause, partial capacity, partial Load and Hold/Load/Resume with cargo. Native real-mouse mark/drag/unmark/Escape, actual role UI, ten progressive drops, rock removal, real delivery, exact ledger, partial/completed Load, phone layout, unit commands, Needs and event feed passed; the screenshot was visually inspected.
 
 ## Notes for the next agent
-Explicit stack183/#130 →185/#124 →94, with actual Pages and next MINOR for each before merging a successor. Native mouse tests exposed and fixed camera-coordinate, Escape integration and shutdown drawing after the camera was destroyed; final native verification remains required, without skipping checks or increasing timeouts.
+Explicit stack183/#130 →185/#124 →94, with actual Pages and next MINOR for each before merging a successor. Native mouse tests exposed and fixed camera-coordinate, Escape integration and shutdown drawing after the camera was destroyed; the final native cycle now passes with all Load checks and original timeouts retained.
