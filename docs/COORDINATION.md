@@ -6,7 +6,7 @@ Files held lists the files a task changes. Another task avoids them unless neces
 
 ## Agreed merge order
 
-Urgent current Pages repair: Codex right-click smoke isolation first (main9703b37 Pages42190334050 failed in pave-under after real Move fixture leaked), then179/#96, then180/#128. Restore the smoke snapshot, preserve game commands and all assertions.
+Urgent current Pages repair: Codex right-click smoke isolation first (main9703b37 Pages42190334050 failed in pave-under after real Move fixture leaked), 179/#96 is merged and deployed;180/#128 is next. Restore the smoke snapshot, preserve game commands and all assertions.
 
 PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da21f0c and its Pages42159725044 retry completed build/deploy SUCCESS. PR165 (#143) merged90eb356 after exact-head CI42160766881 and Pages42163373128 build/deploy SUCCESS. PR166 and167 have merged and actual successful Pages; see verified Done entries.
 
@@ -19,8 +19,6 @@ Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeat
 |---|---|---|---|---|---|
 | NEW13 #130 Builder demolition | Codex | `codex/builder-demolition` (stacked on180) | — | Implemented schema33;714 tests/changelog/build and native demolition+stockpile+farm-plots+rightclick PASS;181→179→180→130, await actual predecessor Pages | DemolitionSystem/UI, shared ConstructionSystem/BuilderAI/WorkerAI, GameScene, schema33 Serializer/Loader/current fixtures, lifecycle cleanup, i18n/HTML/style, own tests/browser/docs |
 | NEW11 #128 Temporary stockpile cleanup | Codex | `codex/temporary-stockpile-cleanup` (stacked on179) | [#180](https://github.com/tom161819/Newgame/pull/180) | Implemented;701 tests + integrated native hauling/confirmation/SaveLoad/wear/repeat/i18n PASS; repair181 integrated; merge after179/#96 verified | FoodStorageSystem removal safety, StoragePanel/HTML/i18n, PathWearSystem, own tests/browser/docs |
-| AUD68 #96 Repeated farm and orchard placement | Codex | `codex/repeat-farm-placement` (stacked on178) | [#179](https://github.com/tom161819/Newgame/pull/179) | Implemented;697 tests PASS; native repeat/fog/SaveLoad/rightclick/walls PASS; 178 merged9703b37;697 tests PASS; full browser exposed inherited pave-under fixture leak; merged1ede1ed after CI42195939745 SUCCESS; actual Pages pending before180 | GameScene placement, mapMemoryObjects derived marker, Serializer/Loader (schema unchanged), provisional-blueprints regression, building-menu smoke helper, own native repeat smoke/browser runner, changelog/progress/coordination |
-| Pages42190334050 right-click smoke isolation repair | Codex | `codex/right-click-smoke-isolation` | [#181](https://github.com/tom161819/Newgame/pull/181) | Implemented:696 tests/changelog/build PASS; native right-click followed by actual4-tile under-building paving+Load PASS; merged84f23d5; Pages42193129545 build+deploy SUCCESS | scripts/right-click-smoke.mjs, own regression assertion/docs/changelog |
 | #129 Brightness of explored areas outside sight | Claude | `claude/fog-dim-slider` | [#171](https://github.com/tom161819/Newgame/pull/171) | PR open; fog/walls/brightness/i18n smokes PASS | systems/FogOfWarSystem.js (memory brightness), TerrainRenderer.js (memory tint), MapMemoryRenderer.js, ui/SettingsPanel.js, GameStateSerializer.js (settings field excluded), index.html + style.css settings row, i18n, tests/memory-brightness.test.js, scripts/memory-brightness-smoke.mjs |
 | #126 Remembered rocks stay lit outside sight | Claude | `claude/fog-rock-memory` (from `claude/fog-dim-slider`) | [#172](https://github.com/tom161819/Newgame/pull/172) | PR open; merge after #171 | game/memoryTexture.js (new), TerrainRenderer.js (paintWall), MapMemoryRenderer.js, tests/memory-brightness.test.js, scripts/memory-brightness-smoke.mjs |
 | NEW02 (#120) One click opens a compact unit detail | Claude | `claude/unit-click-detail` | — | In progress | ui/UnitPanel.js, ui/UnitSelection.js, ui/dockedPanels.js (new), GameScene.js (open-dialog checks only), index.html (unit dialog class), style.css, scripts/unit-command-smoke.mjs |
@@ -31,7 +29,7 @@ Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeat
 
 In this order; one `status:ready` at a time. When an issue is merged, verified on Pages and closed, the next one becomes `status:ready`. Whoever sees fewer than three queued Codex issues adds more from the backlog. Claude does this at every check.
 
-1. [#96](https://github.com/tom161819/Newgame/issues/96) AUD68 repeated placement of farms and orchards (`status:ready`)
+1. [#96](https://github.com/tom161819/Newgame/issues/96) AUD68 repeated placement of farms and orchards (done/deployed)
 2. [#128](https://github.com/tom161819/Newgame/issues/128) NEW11 temporary stockpile: haul to Warehouse, dismantle (provides the dismantle interface)
 3. [#130](https://github.com/tom161819/Newgame/issues/130) NEW13 demolition with 50 % refund (reuses #128)
 4. [#124](https://github.com/tom161819/Newgame/issues/124) NEW07 idle residents gather at the Castle
@@ -44,6 +42,10 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-06 PR179 / Issue96: merged1ede1ed210f80dfbe8e50154af62cbc2dc118a22 after exact final CI42195939745 SUCCESS;697 tests/changelog/build and relevant native repeated farm/orchard/Fog/Load/rightclick/pave-under/walls/ownership PASS. Actual Pages42196320133 build127820327813 AND deploy127830563932 SUCCESS for the exact merge, including full simulation/save/archive/Studio gates. Issue96 closed/done.128 already claimed/review in180, never relabel an active task ready.
+- 2026-11-06 PR181 Pages repair: merged84f23d5 after final CI42192615092;696 tests/changelog/build and reproduced rightclick→pave-under+current Load PASS. Actual Pages42193129545 build127809725953/deploy127810899847 SUCCESS. Restored fixture world instead of leaking a real Move command; no production command changes or skipped assertions.
+
 
 - 2026-11-06 PR167 / Issue145: merged0f0b9fa after exact-head CI42168372971 SUCCESS;678 tests/changelog/build and native Farmer establishment/ownership/tending/staffing PASS. Successful descendant df27e0083893ac225716ea4f6f38298398a2bed0 contains the merge; actual Pages42180539823 build+deploy SUCCESS. Original42168689667 Stables failure was repaired by Claude170/173. Issue145 closed/done. Later main35a816d Pages42181480904 failed separately in horse-wagon placement; repair remains Claude176/178.
 - 2026-11-06 PR166 / Issue146: merged4e29fe3 after exact-head CI42165693609;670 tests/changelog/build and native ownership/tending desktop+phone+Escape PASS. Actual Pages42166266800 build+deploy SUCCESS, including full browser/save/archive/Studio. Issue146 closed/done. These records also preserve the verified completion work from codex/farming-completion-records; that checkpoint branch stays intact.
