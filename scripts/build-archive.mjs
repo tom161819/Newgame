@@ -58,9 +58,9 @@ async function browserCheck(directory,url){
     await page.goto(`http://127.0.0.1:${port}${url}`,{waitUntil:'networkidle',timeout:30000});
     if(await page.locator('#new-game').count())await page.locator('#new-game').click();
     if(await page.locator('#start-game').isVisible())await page.locator('#start-game').click();
-    await page.locator('canvas').waitFor({state:'visible',timeout:30000});await page.waitForTimeout(450);
+    await page.locator('canvas:not(.minimap-canvas)').first().waitFor({state:'visible',timeout:30000});await page.waitForTimeout(450);
     await page.waitForFunction(()=>[...document.images].filter(image=>image.getAttribute('src')).every(image=>image.complete&&image.naturalWidth>0));
-    const rendered=await page.locator('canvas').evaluate(canvas=>{
+    const rendered=await page.locator('canvas:not(.minimap-canvas)').first().evaluate(canvas=>{
       const context=canvas.getContext('2d');if(!context)return canvas.width>0&&canvas.height>0;
       const pixels=context.getImageData(0,0,canvas.width,canvas.height).data;let first=null;
       for(let i=0;i<pixels.length;i+=4)if(pixels[i+3]){const color=pixels[i]*65536+pixels[i+1]*256+pixels[i+2];if(first===null)first=color;else if(first!==color)return true;}return false;
