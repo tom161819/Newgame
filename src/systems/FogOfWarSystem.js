@@ -7,8 +7,6 @@ export const FOG_STYLE=Object.freeze({brightness:.3,saturation:.15,edgeWidth:1,e
 // #129 player preference: brightness of explored ground outside current sight (never of unexplored ground).
 export const MEMORY_BRIGHTNESS=Object.freeze({min:.15,max:.9,step:.05,default:FOG_STYLE.brightness});
 export const clampMemoryBrightness=value=>{const n=Number(value);if(!Number.isFinite(n))return MEMORY_BRIGHTNESS.default;return Math.round(Math.min(MEMORY_BRIGHTNESS.max,Math.max(MEMORY_BRIGHTNESS.min,n))*100)/100;};
-// Tint of remembered rock sprites; the default .3 gives the former 0x4d504d.
-export const memoryTint=(brightness=MEMORY_BRIGHTNESS.default)=>{const v=Math.round(255*brightness);return (v<<16)|(Math.min(255,v+3)<<8)|v;};
 export const OUTSIDE_SIGHT='Outside current sight. Explore this area first.';
 export const visibilityPlacementError=(fog,tiles)=>fog?.enabled&&tiles.some(tile=>!fog.isInSightTile(tile))?OUTSIDE_SIGHT:null;
 
