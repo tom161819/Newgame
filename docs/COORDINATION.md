@@ -6,16 +6,15 @@ Files held lists the files a task changes. Another task avoids them unless neces
 
 ## Agreed merge order
 
-PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da21f0c and its Pages42159725044 retry completed build/deploy SUCCESS. PR165 (#143) merged90eb356 after exact-head CI42160766881; await its own Pages before166 merges. Then166 precedes145.
+PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da21f0c and its Pages42159725044 retry completed build/deploy SUCCESS. PR165 (#143) merged90eb356 after exact-head CI42160766881 and Pages42163373128 build/deploy SUCCESS. PR166 merged4e29fe3 after exact-head CI42165693609 SUCCESS; await its Pages42166266800 before167/145 merges.
 
 ## Active
 
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| NEW17 (#145) Farmer plot establishment | Codex | `codex/farmer-plot-establishment` | — | Implemented: 677 tests/changelog/build and native establishment/ownership/tending browser PASS; schema32; full browser gate next; merge only after actual166 Pages | crop costs, shared ConstructionSystem/BuilderAI/ConstructionUI + ConstructionMaterials contracts, FarmingSystem, Workplaces presence hook, XP rules, diagnostics, schema32 validation, own i18n/tests/browser/docs. Reuse sites/progress/tasks; preserve166 ownership. |
-| NEW18 (#146) Farm plot ownership | Codex | `codex/farm-plot-ownership` | [#166](https://github.com/tom161819/Newgame/pull/166) | Implemented: 670 tests + changelog/build and native ownership/tending browser PASS; schema31; foundation before145; actual165 merge90eb356 integrated; fresh670 tests/changelog/build/browser PASS; await exact-head CI and predecessor Pages42163373128 | data/farmPlots.js, buildings placement, FarmingSystem, GameStateSerializer/Loader schema31, FarmConnections overlay, WorkplacePanel/FarmingPanel, own i18n/tests/browser/docs. Prices and farmer construction stay in145. |
-| NEW15 (#143) Workplace staffing output | Codex | `codex/workplace-staffing-output` | [#165](https://github.com/tom161819/Newgame/pull/165) | Merged90eb356 after final-head CI42160766881 and verified predecessor deployment; 662 tests + build/changelog/combined native browser PASS; await own Pages | data/workplaces.js, ObjectRegistry validation, WorkplaceSystem, existing work providers, dev AssetGallery editor, WorkplacePanel, authored data/registry, StableSystem and MilitarySystem speed hooks only, own i18n/tests/browser/docs. Preserve Claude163 Stables smoke. |
+| NEW17 (#145) Farmer plot establishment | Codex | `codex/farmer-plot-establishment` | [#167](https://github.com/tom161819/Newgame/pull/167) | Implemented: 677 tests/changelog/build and native establishment/ownership/tending browser PASS; schema32; complete --full browser PASS on885; actual166 merge integrated, fresh checks next; merge only after actual166 Pages | crop costs, shared ConstructionSystem/BuilderAI/ConstructionUI + ConstructionMaterials contracts, FarmingSystem, Workplaces presence hook, XP rules, diagnostics, schema32 validation, own i18n/tests/browser/docs. Reuse sites/progress/tasks; preserve166 ownership. |
+| NEW18 (#146) Farm plot ownership | Codex | `codex/farm-plot-ownership` | [#166](https://github.com/tom161819/Newgame/pull/166) | Implemented: 670 tests + changelog/build and native ownership/tending browser PASS; schema31; foundation before145; actual165 merge90eb356 integrated; fresh670 tests/changelog/build/browser PASS; clear map/desktop+phone visibility and Escape verified; merged4e29fe3 after final-head CI42165693609 SUCCESS; await actual Pages42166266800 | data/farmPlots.js, buildings placement, FarmingSystem, GameStateSerializer/Loader schema31, FarmConnections overlay/focus, farm-only responsive CSS, WorkplacePanel/FarmingPanel, own i18n/tests/browser/docs. Prices and farmer construction stay in145. |
 | NEW21 (#149) Studio ruins designs | Claude | `claude/studio-ruins` | [#161](https://github.com/tom161819/Newgame/pull/161) | PR open; review only | studio/src/generators/ruins.js (new), art/assets/decorations/ruin*, art/sprites/ruin*, art/approvals.json, art/style-guide.json (soot, charcoal) |
 
 ## Kept backups (do not delete without the developer)
@@ -24,6 +23,8 @@ PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da2
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-06 PR165 / Issue143: merged90eb356 after exact-head CI42160766881;662 tests + changelog/build, native staffing/editor/employment/military/wheelwright/stables and final editor browser PASS. Pages42163373128 build AND deploy SUCCESS for the exact merge, full browser/save/archive/Studio included. Issue143 closed/done.
 
 - 2026-11-06 PR164 / Issue123: merged da21f0c after exact-head CI42158316333;655 tests, changelog/build and Granary/tending browser PASS. Pages42159725044 build+deploy completed SUCCESS in normal failed-job retry (original deployment timed out in GitHub syncing_files, no source failure). Issue123 closed/done. Direct public URL read is blocked by session proxy CONNECT403; no network rule changes or bypass.
 
