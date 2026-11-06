@@ -7,6 +7,8 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ### Added
 
+- After a Warehouse is built, the empty Starter Stockpile can be dismantled with confirmation once every reservation and transport has finished. Haulers use their existing routes to clear available goods; food waits safely for a Granary. The cleared footprint leaves worn ground that recovers naturally.
+
 - Saving and loading keeps provisional construction orders on unexplored land without revealing it.
 - Farmhouses and orchards stay selected after placing a blueprint, so more can be ordered with successive clicks. Escape, right click or selecting another building ends the tool. Invalid or repeated clicks never spend materials.
 - Minimap in the bottom-right corner of the map, drawn in the same diamond shape. It shows only what the king knows: unexplored land is grey, remembered land and objects are muted from memory, and the area in sight is in full colour. Fog of War OFF shows the whole map as before. A gold dot marks the king and an outline shows the camera view. Clicking the minimap moves the camera there without revealing anything or ordering anyone.

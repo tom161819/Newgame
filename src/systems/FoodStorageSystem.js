@@ -153,6 +153,32 @@ export class FoodStorageSystem {
     }
     throw new Error('No safe ground tile for preserved food.');
   }
+  // The starter store has its own removal rules; this never demolishes an ordinary building.
+  starterRemovalStatus(building){
+    const s=this.scene;
+    if(!building||building.type!=='starter_stockpile'||!s.buildings.includes(building)||!buildingIsComplete(building))return 'unavailable';
+    if(!s.buildings.some(b=>b.type==='warehouse'&&buildingIsComplete(b)))return 'warehouse';
+    const locations=[...this.locations.values()].filter(l=>l.buildingId===building.id),ids=new Set(locations.map(l=>l.id));
+    if(!locations.length||locations.some(l=>this.used(l)>0))return 'stock';
+    if([...this.reservations.values()].some(r=>ids.has(r.locationId)))return 'busy';
+    const tasks=[s.kingLogistics?.task,...(s.workerSystem?.liveWorkers()??[]).map(w=>w.workTask)];
+    if(tasks.some(t=>t&&(ids.has(t.sourceId)||ids.has(t.destinationId))))return 'busy';
+    if(s.gameOver||s.fog&&!s.fog.isVisibleObject(building))return 'unavailable';
+    return null;
+  }
+  dismantleStarter(building){
+    const reason=this.starterRemovalStatus(building);if(reason)return {removed:false,reason};
+    const s=this.scene,tiles=building.tiles.map(t=>({...t}));
+    // Recheck and remove synchronously: there is no async gap for new stock or an in-flight booking.
+    this.removeBuilding(building);s.buildings.splice(s.buildings.indexOf(building),1);
+    for(const tile of tiles)s.map[tile.y][tile.x]=s.terrainGrid[tile.y][tile.x];
+    s.naturalResources?.mining.restoreTiles(tiles);
+    s.towerViews?.get(building.id)?.destroy();s.towerViews?.delete(building.id);
+    if(s.mapMemory?.objects.delete(`building:${building.id}`))s.mapMemory.revision++;
+    s.pathWear?.markMaximum(tiles);s.terrain?.invalidateArea(tiles);
+    s.events?.emit('buildings:changed');s.updateInventory?.();
+    return {removed:true,tiles};
+  }
   removeBuilding(building){
     for(const l of [...this.locations.values()])if(l.buildingId===building.id){for(const [resource,amount]of Object.entries(l.stock))this.spill(resource,amount,{x:building.x-1,y:building.y});
       for(const r of [...this.reservations.values()])if(r.locationId===l.id)this.release(r.id);this.locations.delete(l.id);this.changed();}

@@ -195,4 +195,13 @@ export default {
   'autosave.off':'Automatické ukládání je vypnuté.','autosave.none':'V této relaci zatím nic automaticky uloženo.','autosave.last':'Naposledy uloženo: {time} · den {day}',
   'autosave.failed':'Automatické uložení selhalo: {message}.','autosave.kept':'Předchozí automatické uložení ({time}) zůstává.','autosave.failedNotice':'Automatické uložení selhalo. Předchozí pozice zůstávají.','autosave.recovered':'Automatické ukládání znovu funguje.',
   'app.startFirst':'Nejprve spusť hru.',
+  'stockpile.remove':'Rozebrat prázdnou skládku',
+  'stockpile.confirmText':'Odstranit tuto prázdnou dočasnou skládku? Probíhající přeprava musí nejprve skončit. Stavební suroviny se nevracejí.',
+  'stockpile.confirm':'Potvrdit rozebrání',
+  'stockpile.warehouse':'Před odstraněním dočasné skládky postav skladiště.',
+  'stockpile.stock':'Nosiči převážejí dostupné zásoby do vhodných skladů. Nejprve vyprázdni skládku; potraviny ponech, dokud není místo v sýpce.',
+  'stockpile.busy':'Čeká se na dokončení všech rezervací a přepravy.',
+  'stockpile.unavailable':'Tuto skládku nelze nyní rozebrat.',
+  'stockpile.empty':'Skládka je prázdná a nemá aktivní rezervace ani přepravu.',
+  'stockpile.removed':'Dočasná skládka odstraněna. Prošlapaná zem postupně zaroste.',
 };
