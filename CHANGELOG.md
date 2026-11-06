@@ -4,6 +4,15 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+### Changed
+- A villager's mood now changes how fast they work: Happy residents work 10 % faster, Unhappy and Critical ones 20 % slower. This stacks with skill level and the hunger slowdown. Walking speed and combat are not affected. The villager panel shows the current work speed.
+- Kingdom Happiness now affects how attractive the kingdom is to travellers: at least 80 % adds a bonus (it offsets part of the food-shortage penalty), 30–49 % lowers attractiveness and below 30 % lowers it sharply. With no residents there is no effect.
+
+## [0.6.0] - 2026-11-06
+<!-- version: {"title":"Builder demolition and physical material recovery","type":"feature","reconstructed":false,"saveVersion":34} -->
+### Added
+
+- Finished buildings can be dismantled by Builders after confirmation, with physical work, cancellation and current Save/Load. Completion leaves half their construction materials on the ground, rounded down, and preserves stored goods, production inputs and transport ownership. The Castle is protected; empty Starter Stockpiles keep their separate action.
 
 ## [0.5.1] - 2026-11-06
 <!-- version: {"title":"Event feed above the minimap","type":"feature","reconstructed":false,"saveVersion":33} -->

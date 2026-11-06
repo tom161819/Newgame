@@ -21,25 +21,29 @@ export class ConstructionSystem {
     building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;if(building.type==='quarry'&&!building.depositId)building.quarryMode='unbound';initializeConstructionSite(building);this.materials.registerLegacy(building);// S11: a pavement blueprint never blocks the way; people keep walking over it while it is laid.
     if(!building.unverified&&!buildingDefinition(building).pavement)for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.revision++;this.scene.events?.emit('buildings:changed');return building;
   }
+  getSite(id){return this.sites.get(id)??this.scene.demolition?.site(id)??null;}
+  workSites(){return [...this.sites.values(),...(this.scene.demolition?.sites()??[])];}
+  ready(site){return site.demolition===true||this.materials.ready(site);}
   actor(id){return id==='king'?this.scene.character:this.scene.workerSystem.workers.get(id);}
   slotKey(goal){return `construction-slot:${tileKey(goal)}`;}
   goals(site,actor){const area=buildingDefinition(site).pavement?this.materials.area(site):null;return towerNeighbors(area?.host??site).filter(t=>this.scene.map[t.y]?.[t.x]===0&&this.scene.workerSystem.reservations.available(this.slotKey(t),actor.id));}
   canWork(site,actor){
+    if(site?.demolition===true)return this.scene.demolition?.canWork(site,actor)??false;
     if(!site||!actor||actor.commandState&&actor.commandState.state!=='Working')return false;
     return buildingDefinition(site).crop?actor.id!=='king'&&actor.profession==='farmer'&&!!this.scene.farmingSystem?.inRange(actor,site):actor.id==='king'||actor.profession==='builder';
   }
-  workSkill(site){return buildingDefinition(site).crop?'farming':'construction';}
-  workSpeed(site,actor){return this.scene.skillSystem.workEfficiency(actor,this.workSkill(site))*(buildingDefinition(site).crop?(this.scene.workplaceSystem?.workFactor?.(actor)??1):1);}
+  workSkill(site){return !site.demolition&&buildingDefinition(site).crop?'farming':'construction';}
+  workSpeed(site,actor){return this.scene.skillSystem.workEfficiency(actor,this.workSkill(site))*(!site.demolition&&buildingDefinition(site).crop?(this.scene.workplaceSystem?.workFactor?.(actor)??1):1);}
   reserve(site,actor,goal){
-    if(!this.sites.has(site.id)||!this.canWork(site,actor)||!this.materials.ready(site)||!actor.isAlive||this.assignments.has(actor.id)||site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders)return false;
+    if(!this.getSite(site.id)||!this.canWork(site,actor)||!this.ready(site)||!actor.isAlive||this.assignments.has(actor.id)||site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders)return false;
     if(!this.scene.workerSystem.reservations.reserve(this.slotKey(goal),actor.id))return false;
     this.assignments.set(actor.id,{siteId:site.id,goal:{...goal}});site.construction.assignedBuilders.push(actor.id);
-    if(actor.id!=='king')actor.workTask={kind:'build',targetId:site.id,reservation:this.slotKey(goal),goal:{...goal},progressMs:0};
+    if(actor.id!=='king')actor.workTask={kind:site.demolition?'dismantle':'build',targetId:site.id,reservation:this.slotKey(goal),goal:{...goal},progressMs:0};
     return true;
   }
   release(actor){
     const assigned=this.assignments.get(actor.id);if(!assigned)return;
-    const site=this.sites.get(assigned.siteId);if(site)site.construction.assignedBuilders=site.construction.assignedBuilders.filter(id=>id!==actor.id);
+    const site=this.getSite(assigned.siteId);if(site)site.construction.assignedBuilders=site.construction.assignedBuilders.filter(id=>id!==actor.id);
     this.scene.workerSystem.reservations.release(this.slotKey(assigned.goal),actor.id);this.assignments.delete(actor.id);
   }
   atSite(actor,assignment){return actor.isAlive&&actor.state==='ground'&&!actor.nextTile&&!actor.path.length&&tileKey(actor.tile)===tileKey(assignment.goal);}
@@ -134,7 +138,7 @@ export class ConstructionSystem {
   exportState(){const king=this.assignments.get('king');return {nextId:Math.max(this.nextId,Math.max(0,...this.scene.buildings.map(b=>b.id))+1),kingSiteId:king?.siteId??null,kingGoal:king?.goal?{...king.goal}:null};}
   importState(data){
     this.sites=new Map(this.scene.buildings.filter(b=>!buildingIsComplete(b)).map(b=>[b.id,b]));this.assignments.clear();this.nextId=data?.nextId??Math.max(0,...this.scene.buildings.map(b=>b.id))+1;
-    for(const worker of this.scene.workerSystem.workers.values())if(worker.workTask?.kind==='build')this.assignments.set(worker.id,{siteId:worker.workTask.targetId,goal:{...worker.workTask.goal}});
+    for(const worker of this.scene.workerSystem.workers.values())if(['build','dismantle'].includes(worker.workTask?.kind))this.assignments.set(worker.id,{siteId:worker.workTask.targetId,goal:{...worker.workTask.goal}});
     if(data?.kingSiteId){const goal={...data.kingGoal};this.assignments.set('king',{siteId:data.kingSiteId,goal});this.scene.workerSystem.reservations.reserve(this.slotKey(goal),'king');}this.revision++;
   }
   destroy(){this.scene.workerSystem.jobs.setConstructionProvider(null);this.assignments.clear();this.sites.clear();}

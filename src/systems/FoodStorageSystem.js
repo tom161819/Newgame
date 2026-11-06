@@ -1,3 +1,4 @@
+import { removeBuildingShell } from '../game/buildingRemoval.js';
 import { GRANARY_GROUP_CAPACITY,granaryGroup,granaryUsage } from '../data/granaryCapacity.js';
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
 import { recipeResources } from '../data/production.js';
@@ -168,14 +169,9 @@ export class FoodStorageSystem {
   }
   dismantleStarter(building){
     const reason=this.starterRemovalStatus(building);if(reason)return {removed:false,reason};
-    const s=this.scene,tiles=building.tiles.map(t=>({...t}));
+    const s=this.scene;
     // Recheck and remove synchronously: there is no async gap for new stock or an in-flight booking.
-    this.removeBuilding(building);s.buildings.splice(s.buildings.indexOf(building),1);
-    for(const tile of tiles)s.map[tile.y][tile.x]=s.terrainGrid[tile.y][tile.x];
-    s.naturalResources?.mining.restoreTiles(tiles);
-    s.towerViews?.get(building.id)?.destroy();s.towerViews?.delete(building.id);
-    if(s.mapMemory?.objects.delete(`building:${building.id}`))s.mapMemory.revision++;
-    s.pathWear?.markMaximum(tiles);s.terrain?.invalidateArea(tiles);
+    this.removeBuilding(building);const tiles=removeBuildingShell(s,building,{maximumWear:true});
     s.events?.emit('buildings:changed');s.updateInventory?.();
     return {removed:true,tiles};
   }

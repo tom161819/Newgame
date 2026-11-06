@@ -41,6 +41,7 @@ const WORK_PATTERNS=[
   [/^Chopping (.+) (\d+)%$/,'work.chopping',m=>({name:storedName(m[1]),percent:m[2]})],
   [/^Mining (\d+)%$/,'work.mining',m=>({percent:m[1]})],
   [/^Establishing (.+)$/,'work.establishing',m=>({name:storedName(m[1])})],
+  [/^Dismantling (.+)$/,'work.dismantling',m=>({name:storedName(m[1])})],
   [/^Building (.+)$/,'work.building',m=>({name:storedName(m[1])})],
   [/^Harvesting (.+)$/,'work.harvesting',m=>({name:storedName(m[1])})],
   [/^Hunting (.+)$/,'work.hunting',m=>({name:storedName(m[1])})],

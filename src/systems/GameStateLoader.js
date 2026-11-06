@@ -107,6 +107,7 @@ export function loadGameState(scene,input){
   scene.wageSystem?.importState(state.wages);
   scene.resourceLedger?.importState(state.resourceLedger);
   scene.workplaceSystem?.importState(state.workplaces);
+  scene.demolition?.rebuild();
   scene.constructionSystem?.importState(state.constructionSystem);
   if(scene.seasons&&!state.seasons&&state.farming)for(const record of state.farming.records){const b=scene.buildings.find(b=>b.id===record.buildingId);record.stage=seasonalCropStage(b.type,record.growthDays,b.definition.crop.growthDays,scene.seasons.season);}
   scene.farmingSystem?.importState(state.farming);

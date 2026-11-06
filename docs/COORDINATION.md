@@ -8,7 +8,7 @@ Files held lists the files a task changes. Another task avoids them unless neces
 
 **#174 version gate is enforced from release 0.4.0 (M3, Claude PR from `claude/m3-release`).** From then on, every PR into `main` that changes the game (`src/`, `index.html`, `public/` except `public/versions/`, `vite.config.js`) must run `npm run release:prepare -- patch` (or `-- minor` when SAVE_VERSION changes) so it carries the next version and an empty Unreleased. Every PR touching anything outside `docs/` adds `docs/changes/<issue>-<slug>.md` from `docs/changes/TEMPLATE.md`. Check with `npm run version:check`. If two PRs take the same number, the later one merges `main` and prepares the next number. Rules: AGENTS.md *Versions, releases and change records*.
 
-Urgent current Pages repair: Codex right-click smoke isolation first (main9703b37 Pages42190334050 failed in pave-under after real Move fixture leaked), 179/#96 is merged and deployed;180/#128 is next. Restore the smoke snapshot, preserve game commands and all assertions.
+Urgent current Pages repair: Codex right-click smoke isolation first (main9703b37 Pages42190334050 failed in pave-under after real Move fixture leaked), 179/#96 and180/#128 are merged and deployed;183/#130 is next, then124. Restore the smoke snapshot, preserve game commands and all assertions.
 
 PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da21f0c and its Pages42159725044 retry completed build/deploy SUCCESS. PR165 (#143) merged90eb356 after exact-head CI42160766881 and Pages42163373128 build/deploy SUCCESS. PR166 and167 have merged and actual successful Pages; see verified Done entries.
 
@@ -20,6 +20,7 @@ Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeat
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | S13 #58 phase C part 1: mood work speed, Kingdom Happiness in attractiveness | Claude | `claude/needs-work-morale` | — | In review | NeedsSystem (refresh/workModifier), data/needs.js, SkillSystem.workEfficiency, NeedsDisplay, i18n `needs.workLine`, tests/helpers/workerScene.js (`morale` option), needs smoke; release 0.5.2 |
+| NEW13 #130 Builder demolition | Codex | `codex/builder-demolition` (stacked on180) | [#183](https://github.com/tom161819/Newgame/pull/183) | Integrating main c7fad22 Needs33/event-feed; schema34 + next MINOR0.6.0; earlier721 tests/native PASS, renewed checks pending | DemolitionSystem/UI, shared ConstructionSystem/BuilderAI/WorkerAI, GameScene, schema33 Serializer/Loader/current fixtures, lifecycle cleanup, i18n/HTML/style, own tests/browser/docs |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
@@ -40,6 +41,7 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 ## Done
 
 - 2026-11-06 Claude: #105 event feed and bottom-right corner column ([#192](https://github.com/tom161819/Newgame/pull/192), release 0.5.1).
+- 2026-11-06 PR180 / Issue128: merged6ddc7f18484e5b669655b10135b6e10bc0b52996 after exact-head CI42199613796 SUCCESS.701 tests/changelog/build and native stockpile hauling/removal/confirmation/SaveLoad/wear/repeat PASS. Actual Pages42200431522 build127834071595 and deploy127844758887 SUCCESS. Issue128 closed/done;130 already in review183, preserve its claim.
 - 2026-11-06 Claude: S13 #58 phase A needs and Happiness ([#191](https://github.com/tom161819/Newgame/pull/191), release 0.5.0, SAVE_VERSION 33). Phases B–D remain; B waits for Codex #124.
 - 2026-11-06 Claude: #121 ([#169](https://github.com/tom161819/Newgame/pull/169)), batch [#178](https://github.com/tom161819/Newgame/pull/178) = #129/#126/#120/#104 + smoke fix #176, #174 versions ([#184](https://github.com/tom161819/Newgame/pull/184), [#186](https://github.com/tom161819/Newgame/pull/186), [#188](https://github.com/tom161819/Newgame/pull/188)), **M3 RELEASED 0.4.0** ([#187](https://github.com/tom161819/Newgame/pull/187), archive [#189](https://github.com/tom161819/Newgame/pull/189); tag `v0.4.0` → `375f1aa`; Pages 42214708789 + Verify 42215177100 Success). Codex #128 ([#180](https://github.com/tom161819/Newgame/pull/180)) merged.
 
