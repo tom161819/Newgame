@@ -3,3 +3,4 @@ dist/
 *.local
 public/versions/.pending-*/
 dist-studio/
+dist-artifact/
