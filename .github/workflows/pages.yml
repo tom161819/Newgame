@@ -59,7 +59,7 @@ jobs:
         run: |
           test ! -e dist/studio
           cp -r dist-studio dist/studio
-          test -f dist/studio/index.html && test -f dist/studio/phaser-demo.html
+          test -f dist/studio/index.html && test -f dist/studio/phaser-demo.html && test -f dist/studio/path-lab.html
       - name: Upload website
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
