@@ -3,11 +3,25 @@ import { gridToWorld,tilePolygon } from './isometric.js';
 import { towerBase,buildingDepth,buildingDefinition } from './buildings.js';
 import { isWall,wallIndex,connectionsFor } from './walls.js';
 import { APPROVED_WALL_ART } from '../data/objects/approvedArt.js';
+import { splitPixels } from './wallShadows.js';
 import { assetURL } from '../systems/AssetManager.js';
 
 // The approved wall kit loads on first use; open walls repaint when it arrives.
 const wallKey=piece=>`wall-art:${piece}`,liveWalls=new Set();
-const wallArtReady=scene=>Object.keys(APPROVED_WALL_ART).every(piece=>scene.textures?.exists(wallKey(piece)));
+// Ground layer for wall shadows: above the terrain and footprints (-90), below every wall, unit and building.
+export const WALL_SHADOW_DEPTH=-80;
+const bodyKey=piece=>`${wallKey(piece)}:body`,shadowKey=piece=>`${wallKey(piece)}:shadow`;
+// #147: every kit piece bakes its shadow in (near-black, semi-transparent pixels). Split once into a body and a
+// shadow texture; shadows go to one ground layer under all walls, so a wall never darkens its neighbour.
+function splitWallArt(scene){
+  for(const piece of Object.keys(APPROVED_WALL_ART)){
+    if(scene.textures.exists(bodyKey(piece))||!scene.textures.exists(wallKey(piece)))continue;
+    const source=scene.textures.get(wallKey(piece)).getSourceImage(),w=source.width,h=source.height,body=scene.textures.createCanvas(bodyKey(piece),w,h),shadow=scene.textures.createCanvas(shadowKey(piece),w,h);
+    const context=body.getContext();context.drawImage(source,0,0);const data=context.getImageData(0,0,w,h),shade=shadow.getContext().createImageData(w,h);
+    shade.data.set(splitPixels(data.data));context.putImageData(data,0,0);shadow.getContext().putImageData(shade,0,0);body.refresh();shadow.refresh();
+  }
+}
+const wallArtReady=scene=>{const pieces=Object.keys(APPROVED_WALL_ART);if(!pieces.every(piece=>scene.textures?.exists(wallKey(piece))))return false;splitWallArt(scene);return pieces.every(piece=>scene.textures.exists(bodyKey(piece)));};
 function ensureWallArt(scene){
   if(scene.__wallArtRequested||!scene.load)return;scene.__wallArtRequested=true;let queued=0;
   for(const [piece,art]of Object.entries(APPROVED_WALL_ART))if(!scene.textures.exists(wallKey(piece))){scene.load.image(wallKey(piece),assetURL(art.sprite,scene.assets?.baseURL??import.meta.env?.BASE_URL??'/'));queued++;}
@@ -40,7 +54,7 @@ function parapet(g,a,b,height,color){
 // Stejné rozhraní jako TowerView, rozměry a výška pocházejí z definice.
 export class FortificationView {
   constructor(scene,building,preview=false){
-    this.scene=scene;this.preview=preview;this.back=scene.add.graphics();this.front=scene.add.graphics();this.footprint=scene.add.graphics();this.art={};this.artShown={};
+    this.scene=scene;this.preview=preview;this.back=scene.add.graphics();this.front=scene.add.graphics();this.footprint=scene.add.graphics();this.art={};this.shadows={};this.artShown={};
     if(isWall(building)){liveWalls.add(this);ensureWallArt(scene);}
     this.paint(building);if(preview)this.setAlpha(1);
   }
@@ -80,17 +94,18 @@ export class FortificationView {
       const show=use&&(piece==='block'||!links[piece]);
       // Remember which pieces belong to the wall: culling hides and shows the whole view later.
       this.artShown[piece]=show;
-      if(!show){this.art[piece]?.setVisible(false);continue;}
-      const front=piece==='S'||piece==='E',image=this.art[piece]??=this.scene.add.image(0,0,wallKey(piece));
+      if(!show){this.art[piece]?.setVisible(false);this.shadows[piece]?.setVisible(false);continue;}
+      const front=piece==='S'||piece==='E',image=this.art[piece]??=this.scene.add.image(0,0,bodyKey(piece)),shadow=this.shadows[piece]??=this.scene.add.image(0,0,shadowKey(piece));
       image.setOrigin(art.origin.x,art.origin.y).setPosition(this.base.x,this.base.y).setDepth(this.preview?(front?10002:10001):front?depth+.3:depth).setVisible(this.back.visible).setAlpha(this.back.alpha);
+      shadow.setOrigin(art.origin.x,art.origin.y).setPosition(this.base.x,this.base.y).setDepth(this.preview?10000:WALL_SHADOW_DEPTH).setVisible(this.back.visible).setAlpha(this.back.alpha);
       if(tint==null)image.clearTint();else image.setTint(tint);
     }
     return use;
   }
-  get artImages(){return Object.values(this.art);}
+  get artImages(){return [...Object.values(this.art),...Object.values(this.shadows)];}
   contains(x,y){return Phaser.Geom.Polygon.Contains(this.hitArea,x-this.base.x,y-this.base.y);}
   setAlpha(value){const v=this.preview?value*.5:value;this.footprint.setAlpha(value);this.back.setAlpha(v);this.front.setAlpha(v);for(const image of this.artImages)image.setAlpha(v);return this;}
-  setVisible(value){this.back.setVisible(value);this.front.setVisible(value);this.footprint.setVisible(value);for(const [piece,image]of Object.entries(this.art))image.setVisible(value&&this.artShown[piece]===true);return this;}
+  setVisible(value){this.back.setVisible(value);this.front.setVisible(value);this.footprint.setVisible(value);for(const layer of [this.art,this.shadows])for(const [piece,image]of Object.entries(layer))image.setVisible(value&&this.artShown[piece]===true);return this;}
   inView(view){const width=(this.definition.width+this.definition.height)*32;return this.base.x+width>=view.x&&this.base.x-width<=view.right&&this.base.y+10>=view.y&&this.base.y-this.definition.visualHeight<=view.bottom;}
   destroy(){liveWalls.delete(this);this.back.destroy();this.front.destroy();this.footprint.destroy();for(const image of this.artImages)image.destroy();}
 }
