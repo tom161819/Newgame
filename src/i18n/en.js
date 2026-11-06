@@ -2,6 +2,10 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  'farmPlots.count':'Plots {count} / {capacity}',
+  'farmPlots.owner':'Connected to {name} #{id}',
+  'farmPlots.orphan':'No Farmhouse has room for this plot. Build another Farmhouse (four plots each). Unconnected plots are not worked.',
+
   'staffing.status':{one:'Output {percent}% – {missing} worker missing ({present} present)',other:'Output {percent}% – {missing} workers missing ({present} present)'},
   'staffing.editor.title':'Developer: workplace authoring',
   'staffing.editor.capacity':'Workplaces',
