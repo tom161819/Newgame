@@ -38,7 +38,8 @@ export class GameApplication {
     document.addEventListener('keydown',event=>{
       if(event.code!=='Escape'||event.repeat||document.querySelector('dialog[open]')||!this.scene||this.scene.gameOver)return;
       event.preventDefault();
-      if(this.scene.buildMode)this.scene.cancelBuilding();
+      if(this.scene.rockMiningTool?.enabled)this.scene.rockMiningTool.close();
+      else if(this.scene.buildMode)this.scene.cancelBuilding();
       else if(this.scene.unitSelection?.ids.size)this.scene.unitSelection.clear();
       else if(this.scene.settingsPanel.open)this.scene.settingsPanel.setOpen(false);
       else if(this.scene.populationSidebar?.open)this.scene.populationSidebar.setOpen(false);

@@ -34,6 +34,7 @@ export class WorkerAI {
     }
     if(this.scene.foodProduction?.handleTransport(worker)){worker.update(delta);return;}
     if(worker.profession==='idle'){this.idle(worker);worker.update(delta);return;}
+    if(this.scene.naturalResources?.miningWork.rocks.eligible(worker)){this.scene.naturalResources.miningWork.rocks.update(worker,delta);worker.update(delta);return;}
     const job=JOBS[worker.profession];
     const workplace=this.scene.workplaceSystem;
     if((job.requiresWorkplace||workplace?.requiresWorkplace(worker.profession))&&!worker.assignedWorkplaceId){worker.workState='Waiting';worker.workMessage='Waiting for workplace';worker.update(delta);return;}

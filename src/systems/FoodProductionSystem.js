@@ -80,7 +80,7 @@ export class FoodProductionSystem {
     const amount=Math.min(cargo.amount,this.storage.room(route.location.id,cargo.resource),carryCapacity(worker,cargo.resource)),transferId=`food-transfer-${this.nextTransfer++}`;
     const capacityReservation=this.storage.reserve('capacity',route.location.id,cargo.resource,amount,transferId);if(!capacityReservation)return false;
     if(site)this.storage.reservations.get(capacityReservation).siteId=site.id;
-    if(!this.setTask(worker,'foodDeliver',route,{transferId,destinationId:route.location.id,resource:cargo.resource,amount,capacityReservation,...(site?{siteId:site.id}:{})})){this.storage.release(capacityReservation);return false;}
+    if(!this.setTask(worker,'foodDeliver',route,{transferId,destinationId:route.location.id,resource:cargo.resource,amount,capacityReservation,...(site?{siteId:site.id}:{}),...(cargo.rockId!=null&&worker.profession==='miner'&&worker.assignedWorkplaceId==null?{manualMining:true,rockId:cargo.rockId}:{})})){this.storage.release(capacityReservation);return false;}
     return true;
   }
   handles(worker){return ['foodPickup','foodDeliver'].includes(worker.workTask?.kind)||!!worker.cargo&&this.storage.manages(worker.cargo.resource);}
@@ -151,7 +151,7 @@ export class FoodProductionSystem {
       if(task.sourceDropId&&(!this.scene.workerSystem.reservations.available(`drop:${task.sourceDropId}`,worker.id)||this.scene.character.order?.dropId===task.sourceDropId)){this.scene.workerSystem.ai.cancel(worker);return;}
       const cargo=drop?this.scene.dropSystem.takeForTransport(drop.id,task.amount):this.storage.take(task.stockReservation);if(!cargo){this.scene.workerSystem.ai.cancel(worker);return;}
       if(task.sourceDropId)this.scene.workerSystem.reservations.release(`drop:${task.sourceDropId}`,worker.id);
-      worker.cargo=cargo;const capacity=this.storage.reservations.get(task.capacityReservation);if(capacity)capacity.owner=task.transferId;
+      worker.cargo=cargo;if(task.manualMining)cargo.rockId=task.rockId;const capacity=this.storage.reservations.get(task.capacityReservation);if(capacity)capacity.owner=task.transferId;
       if(task.outputBuildingId){const record=this.records.get(task.outputBuildingId);if(record?.outputReservation===task.capacityReservation)record.outputReservation=null;}
       task.kind='foodDeliver';task.goal={...route.destination};worker.path=route.path;
       if(task.hauling){task.loadedDistance=0;task.loadedPosition={...worker.position};}return;

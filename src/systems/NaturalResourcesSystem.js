@@ -94,7 +94,7 @@ export class NaturalResourcesSystem {
     this.scene.dropSystem.create('wood',{x:object.x,y:object.y},rule.wood,null,{rewardRemaining:0,rewardUnits:0});
     this.scene.activities.emit('treeChopped',{actor,objectType:object.type,quantity:1,objectIds:[n.id]},`tree:${n.id}:${n.cycle}`);this.scene.setStatus(t('status.woodBesideStump',{count:rule.wood}));return true;
   }
-  exportState(){this.flushGrowth();return{nextId:this.nextId,nextDepositId:this.nextDepositId,growthClock:this.growthClock,ageClock:this.ageClock,refreshElapsed:this.refreshElapsed,kingTask:structuredClone(this.kingTask)};}
-  importState(data){this.cancelKing();Object.assign(this,structuredClone(data));if(this.kingTask){const object=this.byId.get(this.kingTask.treeId);this.scene.workerSystem.reservations.reserve(this.reservation(object),'king');}this.refreshSeason();}
+  exportState(){this.flushGrowth();return{nextId:this.nextId,nextDepositId:this.nextDepositId,growthClock:this.growthClock,ageClock:this.ageClock,refreshElapsed:this.refreshElapsed,kingTask:structuredClone(this.kingTask),rockMining:this.miningWork.rocks.exportState()};}
+  importState(data){this.cancelKing();const {rockMining,...rest}=structuredClone(data);Object.assign(this,rest);this.miningWork.rocks.importState(rockMining);if(this.kingTask){const object=this.byId.get(this.kingTask.treeId);this.scene.workerSystem.reservations.reserve(this.reservation(object),'king');}this.refreshSeason();}
   destroy(){this.cancelKing();this.unsubscribe();this.scene.events?.off('buildings:changed',this.worldChanged);if(this.scene.resourceOccupancy.naturalContext===this)delete this.scene.resourceOccupancy.naturalContext;this.byId.clear();}
 }

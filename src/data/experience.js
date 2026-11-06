@@ -4,6 +4,7 @@ import { FORESTRY } from './naturalResources.js';
 import { MINING_WORK } from './minerals.js';
 export const EXPERIENCE_MAX_LEVEL=50;
 export const XP_REWARDS=Object.freeze({
+  manualRockMined:Object.freeze({rock_outcrop:3}),
   depositMined:Object.freeze(Object.fromEntries(Object.values(MINING_WORK).map(rule=>[rule.depositType,rule.xp]))),
   treeChopped:Object.freeze(Object.fromEntries(Object.entries(FORESTRY.trees).map(([id,rule])=>[id,rule.xp]))),
   transportDelivered:Object.freeze({hauler:1}),

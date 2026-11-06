@@ -1,6 +1,20 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  'rock.danger':'Čeká, až bude místo těžby bezpečné',
+  'rock.mark':'Označit skály',
+  'rock.unmark':'Zrušit označení skal',
+  'rock.cancel':'Ukončit označování (Esc)',
+  'rock.markHint':'Kliknutím nebo tažením označ viditelné skály pro volného Minera. Každá poskytne 10 kamenů; těžba je pomalejší než v Quarry. Pravé tlačítko nebo Esc ukončí označování.',
+  'rock.removeHint':'Kliknutím nebo tažením zruš těžbu skal. Vytěžené kameny a odpracovaný čas zůstanou. Pravé tlačítko nebo Esc ukončí označování.',
+  'rock.marked':'Označeno {count} skal k těžbě.',
+  'rock.unmarked':'Zrušeno {count} příkazů k těžbě.',
+  'rock.noWork':'Čeká na označené skály',
+  'rock.noAccess':'Žádné dosažitelné místo pro těžbu skály',
+  'rock.noStorage':'Čeká na odvoz kamenů do dosažitelného skladu',
+  'rock.travelling':'Jde k označené skále',
+  'rock.progress':'Těží označenou skálu: {count} / {total} kamenů',
+
   'construction.farmers':'Farmáři: pracují {working} · rezervováno {reserved}/{slots} míst',
   'construction.waitFarmers':'Pole čeká na farmáře své farmy',
   'construction.farmerOnly':'Toto pole mohou založit pouze farmáři přiřazené farmy.',
