@@ -21,7 +21,7 @@ Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke pau
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| AUD71-A #98 Workplace idle seating | Codex | `codex/workplace-idle-seating` (stacked on118) | — | STARTED;183→185→194→118→98 with actual Pages; derived seats/pose, final porch art114 stays Claude | own seating policy/porch renderer/tests/native, WorkerSystem/WorkerAI and UnitCommands lifecycle hooks, HumanView derived pose, UnitPanel rest row preserving job diagnostics, existing lease-release regression expectations, i18n/docs/release; no Needs values or final art |
+| AUD71-A #98 Workplace idle seating | Codex | `codex/workplace-idle-seating` (stacked on118) | [#198](https://github.com/tom161819/Newgame/pull/198) | In review; release0.9.1/schema37 unchanged;769 tests/version/changelog/build and actual seating/production/commands/Load/phone/Fog/demolition PASS;194→196→198 with actual Pages; derived seats/pose, final porch art114 stays Claude | own seating policy/porch renderer/tests/native, WorkerSystem/WorkerAI and UnitCommands lifecycle hooks, HumanView derived pose, UnitPanel rest row preserving job diagnostics, existing lease-release regression expectations, i18n/docs/release; no Needs values or final art |
 | NEW01-A #118 Builder workshop mechanics | Codex | `codex/builder-workshop-base` (stacked on94) | — | Implemented schema37;757 tests/30 focused/version/changelog/build PASS; final0.9.0 native base/rate/Load/phone/demolition+rock/Needs/morale/feed/commands PASS;183→185→194→118 actual Pages; placeholder allowed, final art119 stays Claude | own workshop definition/derived base policy, ConstructionSystem.workSpeed, central idleHomes/BuilderAI, Unit/Construction/detail status, completion XP, schema/release/i18n, own tests/native/docs; no final art |
 | AUD65 #94 Manual rock mining | Codex | `codex/manual-rock-mining` (stacked on124) | [#194](https://github.com/tom161819/Newgame/pull/194) | Implemented; schema36/release0.8.0 after185 actual Pages;750 tests/version/changelog/build + native real-mouse10Stones/ledger/Load/phone/commands/Needs/eventfeed PASS | own rock marking tool/UI, GameScene/GameApplication narrow input/Escape hooks, MiningWork/WorkerAI/WorkplaceSystem/free Miner selection, current schema serializer/loader/terrain validation, XP/SkillSystem, physical Drop/FoodProduction reuse and cargo provenance, i18n, own tests/browser/docs |
 
@@ -42,6 +42,8 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-06 Claude PR197 Needs tooltips and100-resident performance coverage mergedb53b8da731f5e5ad75574fc0e73edfd43e472f07, release0.7.2/schema35. Integrated tooltip assertions while retaining exact snapshot/Load pause guard.
 
 - 2026-11-06 PR185 / Issue124: release0.7.0/schema35 merged03062705c47199386af24d55dfce8ec38a1e4755;743 tests/version/changelog/build and native gathering/Needs/morale/feed/commands/current Load PASS, CI42233028928 SUCCESS. Tag v0.7.0 resolves to exact merge. Actual Pages42233665135 build127965062613 and deploy127965013083 SUCCESS after one backend-only failed-deploy retry; issue124 closed/done. PR194 is the existing next task.
 - 2026-11-06 Claude PR195 / Issue101: HUD cargo layout fix mergedc697fd442a4d44a4097cc16561561b65e213fdda, release0.7.1/schema35; source integrated into194, actual Pages remains separately verified live.

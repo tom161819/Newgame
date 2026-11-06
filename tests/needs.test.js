@@ -106,3 +106,23 @@ test('S13 phase C: Kingdom Happiness is part of the existing Kingdom Attractiven
   const saved=s.needs.exportState();assert.equal('work' in saved,false);s.needs.work.clear();s.needs.importState(saved);assert.ok(s.needs.workModifier(w)<1);
   s.needs.destroy();assert.equal(s.attractiveness.modifiers.has('happiness'),false);
 });
+
+test('S13 phase D: need tooltips explain the values; Safety lists its factors and they add up',async()=>{
+  const { needTooltip }=await import('../src/ui/NeedsDisplay.js');
+  const s=scene(),w=person(s,{x:40,y:40});add(s,'castle',38,38);s.buildings.at(-1).completed=true;s.buildings.at(-1).construction=null;
+  s.needs.step(1000);const r=s.needs.records.get(w.id);r.attackedAt=s.gameTime.totalElapsed;const st=s.needs.status(w);
+  const sum=st.safetyFactors.reduce((n,[,v])=>n+v,0);assert.equal(st.safety,Math.max(0,Math.min(100,sum)));
+  assert.equal(st.safetyFactors[0][0],'base');assert.ok(st.safetyFactors.some(([k,v])=>k==='attack'&&v<0),'a recent attack is listed');
+  const tip=needTooltip('safety',st);assert.match(tip,/^Base 45/);assert.match(tip,/Recent attack −\d+/);
+  assert.match(needTooltip('housing',st),/Home: /);assert.match(needTooltip('happiness',{...st,unpaidPenalty:10}),/Food 35 %.*Unpaid/);
+  assert.equal(needTooltip('food',{...st,hungry:true}),'Missed meals: Food falls until the Granary or storage supplies food again.');
+});
+
+test('S13 phase D: 100 residents update needs and derived effects quickly',()=>{
+  const s=workerScene(undefined,{starter:true,morale:true});s.workerSystem.unsubscribe?.();
+  for(let i=0;i<100;i++){const w=s.workerSystem.create({x:20+i%40,y:20+Math.floor(i/40)*2});w.arriving=false;}
+  const n=s.needs.residents().length;assert.ok(n>=100,`${n} residents`);
+  const t0=performance.now();for(let i=0;i<10;i++)s.needs.step(1000);const per=(performance.now()-t0)/10;
+  assert.ok(per<50,`one needs update for ${n} residents takes ${per.toFixed(1)} ms (runs at most once per game second)`);
+  assert.equal(s.needs.work.size,n);assert.equal(s.needs.summary().population,n);console.log(`# 100-resident needs update: ${per.toFixed(2)} ms`);
+});
