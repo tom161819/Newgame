@@ -22,6 +22,7 @@ Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke pau
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | NEW01-A #118 Builder workshop mechanics | Codex | `codex/builder-workshop-base` (stacked on94) | [#196](https://github.com/tom161819/Newgame/pull/196) | Main ea34fac integrated;772 tests/version/changelog/build PASS; renewed workshop/Mill/Needs/C05 native PASS;94 actual Pages verified; placeholder allowed, final art119 stays Claude | own workshop definition/derived base policy, ConstructionSystem.workSpeed, central idleHomes/BuilderAI, Unit/Construction/detail status, completion XP, schema/release/i18n, own tests/native/docs; no final art |
+| #92 visual fallbacks audit + six profession look concepts | Claude | `claude/visual-polish-audit` | — | In review | docs/audits/92-visual-fallbacks.md, studio figure tools, art/assets/units/* (6 new), art/sprites, art/approvals.json, tests/asset-studio-units.test.js |
 | #99 Mill sails turn while grinding (still body + rotor layer from the approved export) | Claude | `claude/mill-sails` | — | In review | studio generator/renderer/export rotor layer, art/sprites/windmill, public/assets/buildings/mill, approvedArt, AssetManager, SpriteViews, MapMemoryRenderer, new game/MillSails.js, GameScene hook, tests, smoke |
 
 ## Codex queue (developer: Codex always has several issues queued)

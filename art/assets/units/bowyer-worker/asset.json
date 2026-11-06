@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "bowyer-worker",
+  "name": "Bowyer",
+  "category": "units",
+  "description": "Shapes bows: ochre tunic, green hood, linen apron and an unstrung yew stave. Concept for review (#92); the game keeps its current look until one is approved.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "plannedProfession": "bowyer",
+  "variants": [
+    {
+      "id": "bowyer-worker-male",
+      "name": "Bowyer (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_ochre",
+        "legs": "cloth_green",
+        "headgear": "hood",
+        "headgearMaterial": "cloth_forest",
+        "hair": "hair_blond",
+        "apron": "cloth_linen",
+        "tool": "stave"
+      }
+    },
+    {
+      "id": "bowyer-worker-female",
+      "name": "Bowyer (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_ochre",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_forest",
+        "hair": "hair_blond",
+        "apron": "cloth_linen",
+        "tool": "stave"
+      }
+    }
+  ]
+}
