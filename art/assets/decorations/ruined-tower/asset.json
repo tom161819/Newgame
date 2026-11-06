@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "id": "ruined-tower",
+  "name": "Ruined tower",
+  "category": "decorations",
+  "description": "Stone tower stump: the upper part has fallen, hollow inside, rubble around its foot. Concept for review (#149): map decoration, random starting ruins, or what demolition (#130) or a battle leaves behind. No game mechanics yet.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "ruins",
+  "variants": [
+    {
+      "id": "ruined-tower-stump",
+      "name": "Low stump",
+      "version": 1,
+      "notes": "Most of the tower is gone; knee-to-shoulder high walls and a ring of fallen stone.",
+      "spec": {
+        "kind": "tower",
+        "seed": 11,
+        "height": 1.6,
+        "size": 1.4,
+        "collapse": 0.85
+      }
+    },
+    {
+      "id": "ruined-tower-broken",
+      "name": "Broken tower",
+      "version": 1,
+      "notes": "The back walls still stand high with a window slit; the front has fallen.",
+      "spec": {
+        "kind": "tower",
+        "seed": 23,
+        "height": 2.8,
+        "size": 1.4,
+        "collapse": 0.5
+      }
+    },
+    {
+      "id": "ruined-tower-overgrown",
+      "name": "Overgrown tower",
+      "version": 1,
+      "notes": "An old ruin: moss and grass in the rubble.",
+      "spec": {
+        "kind": "tower",
+        "seed": 37,
+        "height": 2.2,
+        "size": 1.3,
+        "collapse": 0.6,
+        "overgrown": true
+      }
+    },
+    {
+      "id": "ruined-tower-winter",
+      "name": "Tower in snow",
+      "version": 1,
+      "notes": "The broken tower with snow on every top.",
+      "spec": {
+        "kind": "tower",
+        "seed": 23,
+        "height": 2.8,
+        "size": 1.4,
+        "collapse": 0.5,
+        "snow": true
+      }
+    }
+  ]
+}

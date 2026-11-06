@@ -35,6 +35,7 @@ import { NoticesPanel } from '../ui/NoticesPanel.js';
 import { isProvisional,knownPlacementError,knownContext } from './provisionalSites.js';
 import { MountSystem } from '../systems/MountSystem.js';
 import { SettingsPanel } from '../ui/SettingsPanel.js';
+import { FpsOverlay } from '../ui/FpsOverlay.js';
 import { FortificationView } from './FortificationView.js';
 import { wallLine,wallLinePlan,placeWallLine,wallIndex,connectionsFor,connectedWalls,isWall } from './walls.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
@@ -81,6 +82,9 @@ import { FarmingPanel } from '../ui/FarmingPanel.js';
 import { FoodStorageSystem } from '../systems/FoodStorageSystem.js';
 import { FoodProductionSystem } from '../systems/FoodProductionSystem.js';
 import { MilitarySystem } from '../systems/MilitarySystem.js';
+import { VehicleSystem } from '../systems/VehicleSystem.js';
+import { StableSystem } from '../systems/StableSystem.js';
+import { VehicleViews } from './VehicleViews.js';
 import { PavementView } from './PavementView.js';
 import { PavementTool } from './PavementTool.js';
 import { LogisticsTaskManager } from '../systems/LogisticsTaskManager.js';
@@ -198,6 +202,7 @@ export class GameScene extends Phaser.Scene {
     if(!this.loadState){this.settingsPanel.applySettings({...this.settingsPanel.settings,fogOfWar:this.gameSettings.fogOfWar,explorationMode:this.gameSettings.explorationMode});this.fog.setEnabled(this.gameSettings.fogOfWar);}
     this.fog.setExplorationEnabled(this.settingsPanel.settings.explorationMode);
     this.terrain.setDebug(this.settingsPanel.settings.pathWearDebug);
+    let devStorage;try{devStorage=window.localStorage;}catch{}this.fpsOverlay=new FpsOverlay(this.game,{storage:devStorage,camera:()=>this.cameras?.main});
     this.foodSystem=new FoodSystem(this.inventory,this.objectRegistry.require('meat'),()=>this.updateInventory(),{time:this.gameTime,scene:this,subscribe:true});
     this.attractiveness=new KingdomAttractivenessSystem(this);this.foodEconomyPanel=new FoodEconomyPanel(this);
     this.inventoryBar=new InventoryBar(this.objectRegistry,this.assets,this.inventory);
@@ -213,7 +218,7 @@ export class GameScene extends Phaser.Scene {
       onComplete:site=>{this.towerViews.get(site.id)?.destroy();if(buildingDefinition(site).pavement){this.towerViews.delete(site.id);this.terrain.invalidateArea([site]);this.updateInventory();this.constructionUI?.refresh();return;}this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.built',{name:buildingDefinition(site).name}));},
       onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);if(this.mapMemory?.objects.delete(`building:${site.id}`))this.mapMemory.revision++;this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.siteCancelled'));}});
     this.constructionUI=new ConstructionUI(this);
-    this.foodProduction=new FoodProductionSystem(this);this.military=new MilitarySystem(this);this.employment=new EmploymentSystem(this,{enabled:this.gameSettings.autoEmployment});this.diagnostics=new ProductionDiagnostics(this);this.employmentPanel=new EmploymentPanel(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.kingCargoControl=new KingCargoControl(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
+    this.foodProduction=new FoodProductionSystem(this);this.military=new MilitarySystem(this);this.vehicles=new VehicleSystem(this);this.stables=new StableSystem(this);this.vehicleViews=new VehicleViews(this);this.employment=new EmploymentSystem(this,{enabled:this.gameSettings.autoEmployment});this.diagnostics=new ProductionDiagnostics(this);this.employmentPanel=new EmploymentPanel(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.kingCargoControl=new KingCargoControl(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
     this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);
     this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);this.populationSidebar=new PopulationSidebar(this);this.noticesPanel=new NoticesPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
@@ -258,7 +263,7 @@ export class GameScene extends Phaser.Scene {
       this.noticesPanel.destroy();this.diagnostics.destroy();this.employmentPanel.destroy();this.unsubscribeEmployment?.();this.employment.destroy();this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
       this.buildingUnlocks.destroy();
       this.animalSystem.destroy();this.dropSystem.destroy();document.querySelector('#object-tooltip').hidden=true;
-      this.settingsPanel.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
+      this.settingsPanel.destroy();this.fpsOverlay.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
       this.clearWallPreviews();
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
       this.equipmentPanel.destroy();this.treasurePanel.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
@@ -608,7 +613,7 @@ export class GameScene extends Phaser.Scene {
     if(this.gameOver)return;
     this.constructionSystem.update(delta);
     this.farmingSystem.update(delta);
-    this.foodProduction.update(delta);this.military.update(delta);this.employment.update();this.diagnostics.update();
+    this.foodProduction.update(delta);this.military.update(delta);this.vehicles.update();this.stables.update(delta);this.vehicleViews.update();this.employment.update();this.diagnostics.update();
     this.regeneration.update(delta,[this.character,...this.animalSystem.animals.values(),...this.workerSystem.liveWorkers()],covered);
     this.combatFeedback.update(activeDelta);this.foodSystem.update(activeDelta);this.updateFoodDisplay();
     this.experienceFeedback.update(activeDelta);
@@ -631,7 +636,7 @@ export class GameScene extends Phaser.Scene {
     const cargoText=`${cargoLabel(this,this.character)} · ${transportLabel(this,this.character)}`;if(cargoStatus.textContent!==cargoText)cargoStatus.textContent=cargoText;
     this.dropSystem.update(view,this.fog);
     if(this.input.manager.isOver)this.updateHover(this.input.activePointer);
-    for(const animal of this.animalSystem.animals.values())animal.view.setVisible(!animal.mounted&&this.fog.isVisibleObject(animal)&&animal.view.x>view.x-60&&animal.view.x<view.right+60&&animal.view.y>view.y-40&&animal.view.y<view.bottom+70);
+    for(const animal of this.animalSystem.animals.values())animal.view.setVisible(!animal.mounted&&!['ridden','harnessed'].includes(this.stables?.horses.get(animal.id)?.state)&&this.fog.isVisibleObject(animal)&&animal.view.x>view.x-60&&animal.view.x<view.right+60&&animal.view.y>view.y-40&&animal.view.y<view.bottom+70);
     for(const worker of this.workerSystem?.liveWorkers()??[])worker.view.setVisible(this.fog.isVisibleObject(worker)&&worker.view.x>view.x-40&&worker.view.x<view.right+40&&worker.view.y>view.y-20&&worker.view.y<view.bottom+60);
     for(const resource of this.resources.values()){
       const definition=this.objectRegistry.require(resource.getData('objectId'));

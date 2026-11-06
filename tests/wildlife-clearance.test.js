@@ -58,5 +58,5 @@ test('200 idle animals reuse the same mask; building removal invalidates it once
 
 
 test('a cramped world with no safe wildlife ring still spawns its interactive horse on ordinary free terrain',()=>{
- const s=scene();s.map=Array.from({length:3},()=>Array(3).fill(0));building(s,1,1);s.animalSystem.spawn({x:0,y:0});assert.equal([...s.animalSystem.animals.values()].filter(a=>a.definition.gameplay.huntable).length,0);assert.equal([...s.animalSystem.animals.values()].filter(a=>a.type==='horse').length,1);
+ const s=scene();s.map=Array.from({length:3},()=>Array(3).fill(0));building(s,1,1);s.animalSystem.spawn({x:0,y:0});assert.equal([...s.animalSystem.animals.values()].filter(a=>a.definition.gameplay.huntable).length,0);assert.equal([...s.animalSystem.animals.values()].filter(a=>a.type==='horse').length>=1,true,'at least one interactive horse even when cramped');
 });

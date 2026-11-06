@@ -19,7 +19,7 @@ animals.push({
   description:'Volně žijící kůň. Po nasednutí zdvojnásobí rychlost a rozšíří dohled. Nelze ho lovit.',
   renderMode:'procedural',renderer:'animal',origin:{x:.5,y:.85},visualHeight:65,
   visual:{bodyColor:0xa7855a,bodyScale:1.2,hitArea:{x:-28,y:-50,width:56,height:55}},depth:{offset:.1},
-  gameplay:{movementSpeed:1.2,initialCount:1,behavior:'wander',huntable:false,meatDrop:0,wanderRadius:4,
+  gameplay:{movementSpeed:1.2,initialCount:6,behavior:'wander',huntable:false,meatDrop:0,wanderRadius:4,
     mountedSpeedMultiplier:2,visionMultiplier:1.5},
   stats:{maxHP:90,attackDPS:0,armor:0,attackRange:1},
   animations:{mode:'procedural',states:['idle','walk'],directions:['N','NE','E','SE','S','SW','W','NW']},

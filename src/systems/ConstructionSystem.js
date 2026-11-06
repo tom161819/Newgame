@@ -23,7 +23,7 @@ export class ConstructionSystem {
   }
   actor(id){return id==='king'?this.scene.character:this.scene.workerSystem.workers.get(id);}
   slotKey(goal){return `construction-slot:${tileKey(goal)}`;}
-  goals(site,actor){return towerNeighbors(site).filter(t=>this.scene.map[t.y]?.[t.x]===0&&this.scene.workerSystem.reservations.available(this.slotKey(t),actor.id));}
+  goals(site,actor){const area=buildingDefinition(site).pavement?this.materials.area(site):null;return towerNeighbors(area?.host??site).filter(t=>this.scene.map[t.y]?.[t.x]===0&&this.scene.workerSystem.reservations.available(this.slotKey(t),actor.id));}
   reserve(site,actor,goal){
     if(!this.sites.has(site.id)||!this.materials.ready(site)||!actor.isAlive||this.assignments.has(actor.id)||site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders)return false;
     if(!this.scene.workerSystem.reservations.reserve(this.slotKey(goal),actor.id))return false;
@@ -76,6 +76,7 @@ export class ConstructionSystem {
     this.scene.terrain?.invalidateArea(site.tiles);this.revision++;this.scene.events?.emit('buildings:changed');return true;
   }
   update(delta){
+    this.materials.syncAreas();
     for(const site of [...this.sites.values()])if(site.unverified)this.verifyProvisional(site);
     for(const site of [...this.sites.values()]){
       if(site.unverified||!this.materials.ready(site))continue;
@@ -97,7 +98,8 @@ export class ConstructionSystem {
     const c=site.construction;if(!this.sites.has(site.id)||c.rewardsGranted||c.workDone<c.requiredWork)return false;
     if(!this.materials.complete(site))return false;
     c.state='complete';c.progress=100;c.rewardsGranted=true;
-    if(buildingDefinition(site).walkable)for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=0;
+    // #150: pavement laid under a finished building leaves that building's tiles blocked.
+    if(buildingDefinition(site).walkable&&!(buildingDefinition(site).pavement&&this.materials.area(site).host))for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=0;
     for(const id of [...c.assignedBuilders]){const actor=this.actor(id);if(!actor)continue;if(id==='king')this.stopKing();else{this.scene.workerSystem.ai.cancel(actor);actor.workState='Searching for Work';actor.aiCooldown=0;}}
     c.assignedBuilders=[];this.sites.delete(site.id);this.revision++;
     const contributors=Object.entries(c.contributions).filter(([,work])=>work>0),total=contributors.reduce((sum,[,work])=>sum+work,0);let allocated=0;

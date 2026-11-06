@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "burnt-building",
+  "variantId": "burnt-building-stone",
+  "name": "Burnt stone house",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "0aa0b3ad",
+  "generator": "ruins",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 132,
+  "height": 118,
+  "anchor": {
+    "x": 65,
+    "y": 84
+  },
+  "origin": {
+    "x": 0.49242,
+    "y": 0.71186
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 116
+  },
+  "baseOrigin": {
+    "x": 0.49242,
+    "y": 0.98305
+  },
+  "visualHeight": 116,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.564,
+  "lights": []
+}
