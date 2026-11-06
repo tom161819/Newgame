@@ -51,6 +51,14 @@ export function reviewState({ repo, local, assetId, variant }) {
   };
 }
 
+// #127: a variant still waits for approval unless it is approved for its current version and spec
+// (draft, in review, or an approval made outdated by a newer recipe). Uses the effective state, local edits included.
+export const awaitsApproval = state => !(state.effective.status === 'approved' && !state.outdated);
+export function reviewSummary({ repo, local, asset }) {
+  const pending = asset.variants.filter(variant => awaitsApproval(reviewState({ repo, local, assetId: asset.id, variant }))).map(variant => variant.id);
+  return { pending, approved: asset.variants.length - pending.length, total: asset.variants.length };
+}
+
 // Immutable update of the local layer. Approving stamps the exact version and spec hash.
 export function updateLocal(local, { assetId, variant, status, note, preferred }, now = new Date().toISOString()) {
   const next = structuredClone(local);
