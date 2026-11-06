@@ -49,6 +49,23 @@ try {
   assert.deepEqual(await page.locator('.library-item .name').allTextContents(), ['Watchtower']);
   pass('category filters and search narrow the library');
 
+  // #127 Needs review: only designs still waiting for approval; game sprites and approved designs hidden; remembered.
+  await page.locator('#library-search').fill('');await page.locator('#library-categories button', { hasText: /^All/ }).click();
+  await page.locator('#library-review [data-review="pending"]').click();
+  const waitingCount = Number((await page.locator('#library-review [data-review="pending"] .count').textContent()).trim());
+  const waiting = await page.locator('.library-item .name').allTextContents();
+  assert.equal(waiting.length, waitingCount, 'the button counts what is listed');
+  for (const name of ['Ruined tower', 'Broken wall', 'Burnt building', 'Scattered bricks and stones']) assert.ok(waiting.includes(name), `${name} waits for approval`);
+  assert.equal(await page.locator('.library-item .pill.game').count(), 0, 'no In game sprite');
+  assert.equal(await page.locator('.library-item .pill.approved').count(), 0, 'no fully approved design');
+  await page.locator('.library-item', { hasText: 'Ruined tower' }).click();
+  assert.equal(await page.locator('.variant-card, .variants > *').count() > 0, true);
+  await page.reload();await page.waitForFunction(() => window.assetStudio?.ready);
+  assert.equal(await page.locator('#library-review [data-review="pending"]').getAttribute('aria-pressed'), 'true', 'remembered after reload');
+  await page.locator('#library-review [data-review="all"]').click();
+  assert.ok(await page.locator('.library-item .pill.game').count() > 0, 'All shows game sprites again');
+  pass(`Needs review lists ${waitingCount} designs waiting for approval, hides approved and In game, remembered after reload`);
+
   await page.locator('.library-item', { hasText: 'Watchtower' }).click();
   await page.waitForFunction(() => document.querySelectorAll('.variant-card canvas').length >= 3);
   const cards = await page.locator('.variant-card').count();

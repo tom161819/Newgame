@@ -37,6 +37,7 @@ import { isProvisional,knownPlacementError,knownContext } from './provisionalSit
 import { MountSystem } from '../systems/MountSystem.js';
 import { SettingsPanel } from '../ui/SettingsPanel.js';
 import { FpsOverlay } from '../ui/FpsOverlay.js';
+import { installPanelDismiss,closeOpenPanels } from '../ui/PanelDismiss.js';
 import { FortificationView } from './FortificationView.js';
 import { wallLine,wallLinePlan,placeWallLine,wallIndex,connectionsFor,connectedWalls,isWall } from './walls.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
@@ -251,7 +252,10 @@ export class GameScene extends Phaser.Scene {
     this.combatFeedback.refresh();
     this.input.mouse.disableContextMenu();
     this.unitSelection=new UnitSelection(this);
-    this.input.on('pointerdown',pointer=>{if(!this.unitSelection.down(pointer))this.handleClick(pointer);});
+    // #121: a right click on the map first closes open panels (and does nothing else); otherwise it commands as before.
+    const sidePanels=()=>[this.settingsPanel,this.populationSidebar];
+    installPanelDismiss(document,{panels:sidePanels,signal:this.controls.signal});
+    this.input.on('pointerdown',pointer=>{if(pointer.rightButtonDown()&&closeOpenPanels(document,{panels:sidePanels()}))return;if(!this.unitSelection.down(pointer))this.handleClick(pointer);});
     this.input.on('pointerup',pointer=>{if(this.unitSelection.up(pointer))return;if(this.pavementTool?.anchor&&this.pavementTool.active()&&pointer.leftButtonReleased()){this.pavementTool.confirm(this.pointerTile(pointer));return;}if(this.dragAnchor&&pointer.leftButtonReleased())this.confirmWallLine(pointer);});
     this.input.on('pointerupoutside',()=>{this.unitSelection.cancelDrag();this.clearWallPreviews();});
     this.input.on('pointermove',pointer=>{this.unitSelection.move(pointer);this.updateHover(pointer);if(this.buildMode&&!this.assetGallery.isOpen){if(!this.dragAnchor)this.wallLastLine=null;this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
