@@ -1,0 +1,244 @@
+{
+  "schema": 1,
+  "id": "builders-workshop",
+  "name": "Builders' Workshop",
+  "category": "buildings",
+  "description": "Builders' base (#119 art for the #118 mechanics): a small low building with an open work shelter where trestles, logs, beams and tools are visible from the isometric camera. Concepts for review; the game keeps its placeholder until one is approved.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "builder_workshop",
+  "variants": [
+    {
+      "id": "builders-workshop-open-shed",
+      "name": "Open lean-to shed",
+      "version": 1,
+      "notes": "Only a roof on posts with a low back wall: the whole work area stays visible. Two benches, a tool rack and squared beams under the roof; a log pile and stacked stone beside it.",
+      "spec": {
+        "body": {
+          "kind": "shed",
+          "width": 1.5,
+          "depth": 1.05,
+          "frontHeight": 0.88,
+          "backHeight": 0.5,
+          "lantern": true,
+          "at": [
+            -0.15,
+            -0.3
+          ]
+        },
+        "props": [
+          {
+            "type": "workbench",
+            "at": [
+              -0.45,
+              -0.25
+            ]
+          },
+          {
+            "type": "workbench",
+            "at": [
+              0.15,
+              -0.2
+            ],
+            "r": 0.3
+          },
+          {
+            "type": "toolRack",
+            "at": [
+              -0.6,
+              -0.68
+            ]
+          },
+          {
+            "type": "logs",
+            "at": [
+              0.55,
+              0.55
+            ],
+            "count": 6,
+            "length": 0.6
+          },
+          {
+            "type": "stoneStack",
+            "at": [
+              -0.45,
+              0.6
+            ]
+          },
+          {
+            "type": "crates",
+            "at": [
+              0.6,
+              -0.55
+            ],
+            "count": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "builders-workshop-house-awning",
+      "name": "Low workshop with awning",
+      "version": 1,
+      "notes": "A low timber workshop at the back and a shingled awning at its front; the bench and tools sit under the awning, logs and a cart in the yard.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.15,
+          "depth": 0.8,
+          "wallHeight": 0.7,
+          "roofHeight": 0.5,
+          "ridge": "x",
+          "windows": 1,
+          "at": [
+            -0.25,
+            -0.38
+          ]
+        },
+        "props": [
+          {
+            "type": "awning",
+            "at": [
+              -0.25,
+              0.1
+            ],
+            "width": 1.0,
+            "depth": 0.45,
+            "height": 0.62
+          },
+          {
+            "type": "workbench",
+            "at": [
+              -0.35,
+              0.12
+            ]
+          },
+          {
+            "type": "toolRack",
+            "at": [
+              0.12,
+              0.2
+            ]
+          },
+          {
+            "type": "logs",
+            "at": [
+              0.55,
+              0.45
+            ],
+            "count": 5,
+            "length": 0.55
+          },
+          {
+            "type": "cart",
+            "at": [
+              0.5,
+              -0.45
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              -0.65,
+              0.62
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "builders-workshop-material-yard",
+      "name": "Shed with material yard",
+      "version": 1,
+      "notes": "Shed with a plank side wall on one half of the plot, a fenced yard of building material on the other: logs, beams, stone blocks and crates.",
+      "spec": {
+        "body": {
+          "kind": "shed",
+          "width": 1.0,
+          "depth": 0.95,
+          "frontHeight": 0.82,
+          "backHeight": 0.5,
+          "sideWall": true,
+          "at": [
+            -0.4,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "workbench",
+            "at": [
+              -0.45,
+              -0.3
+            ]
+          },
+          {
+            "type": "toolRack",
+            "at": [
+              -0.75,
+              -0.62
+            ]
+          },
+          {
+            "type": "logs",
+            "at": [
+              0.48,
+              -0.42
+            ],
+            "count": 6,
+            "length": 0.6
+          },
+          {
+            "type": "stoneStack",
+            "at": [
+              0.45,
+              0.2
+            ]
+          },
+          {
+            "type": "stoneStack",
+            "at": [
+              0.12,
+              0.58
+            ]
+          },
+          {
+            "type": "crates",
+            "at": [
+              -0.55,
+              0.5
+            ],
+            "count": 3
+          },
+          {
+            "type": "fence",
+            "from": [
+              0.05,
+              0.85
+            ],
+            "to": [
+              0.85,
+              0.85
+            ]
+          },
+          {
+            "type": "fence",
+            "from": [
+              0.85,
+              -0.85
+            ],
+            "to": [
+              0.85,
+              0.85
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

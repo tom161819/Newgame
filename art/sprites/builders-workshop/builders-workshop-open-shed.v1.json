@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "builders-workshop",
+  "variantId": "builders-workshop-open-shed",
+  "name": "Open lean-to shed",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "fbc62623",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 87,
+  "anchor": {
+    "x": 65,
+    "y": 53
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.6092
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 85
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97701
+  },
+  "visualHeight": 85,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": 9.44,
+      "y": -50.51,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 0.883,
+  "lights": [
+    {
+      "type": "torch",
+      "x": 74.44,
+      "y": 34.49,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}
