@@ -6,6 +6,7 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 ## [Unreleased]
 
 ### Added
+- Stone Pavement can now be laid under a finished building (Single, Line or Area). Builders work from the building's edge and the cost stays 1 Stone for every 2 tiles. The building covers the paved floor, and the floor remains after the building is gone. Fields and orchards cannot be paved.
 - Horse Wagon: the Wheelwright's Workshop panel has a Make choice between Wheelbarrow and Horse Wagon (30 Wood, 6 Iron Bars and one tamed horse from the Stables, 90 seconds of work).
   - The Wheelwrights wait until a tamed horse is free, then reserve it before any material is used. A running batch keeps its recipe when the choice changes.
   - The finished wagon stands beside the workshop with the horse harnessed. The horse leaves its paddock place, travels with the wagon and is never used up.
