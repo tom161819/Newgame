@@ -11,6 +11,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 - Mark visible rocks by click or drag for free Miners, or cancel their orders. Each rock slowly yields ten physical Stones, then disappears; the Miner carries the output to storage before choosing another rock. Partial work, ground goods and active deliveries survive current Save/Load. Employed Quarry and Iron Mine workers keep their jobs.
 
+## [0.7.2] - 2026-11-06
+<!-- version: {"title":"Need tooltips","type":"feature","reconstructed":false,"saveVersion":35} -->
+### Improved
+- Every need bar in the villager panel now explains its value in a tooltip: Food (fed or missed meals), Rest (falls while working, recovers while waiting), Housing (the home) and Happiness (the weights and any unpaid-wage penalty). Safety lists what adds up to it, for example "Base 45 · Castle +25 · Recent attack −20".
+
 ## [0.7.1] - 2026-11-06
 <!-- version: {"title":"Steady top bar on stone pickup","type":"fix","reconstructed":false,"saveVersion":35} -->
 ### Fixed
