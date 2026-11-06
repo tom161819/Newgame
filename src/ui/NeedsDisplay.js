@@ -10,7 +10,9 @@ export function renderNeeds(root,status){
   root.hidden=false;
   const bar=(id,value)=>{const row=element('div',`need-row need-${id}`);row.dataset.need=id;const meter=element('meter');meter.min=0;meter.max=100;meter.low=40;meter.high=70;meter.optimum=100;meter.value=value;meter.setAttribute('aria-label',t(`needs.${id}`));row.append(element('span','',t(`needs.${id}`)),meter,element('b','',`${value} %`));return row;};
   const mood=element('p','need-mood',t('needs.moodLine',{mood:t(`needs.mood.${status.mood}`),happiness:status.happiness}));mood.dataset.mood=status.mood;
-  const lines=[element('h3','',t('needs.title')),...NEED_IDS.map(id=>bar(id,status[id])),bar('happiness',status.happiness),mood,element('p','need-problem',t('needs.problemLine',{problem:problemLabel(status.mainProblem)})),element('p','need-home',t('needs.homeLine',{home:homeLabel(status.home)}))];
+  // Phase C: the mood's effect on work speed, so the player sees why work is faster or slower.
+  const work=element('p','need-work',t('needs.workLine',{factor:status.workModifier.toFixed(2)}));work.dataset.work=String(status.workModifier);
+  const lines=[element('h3','',t('needs.title')),...NEED_IDS.map(id=>bar(id,status[id])),bar('happiness',status.happiness),mood,work,element('p','need-problem',t('needs.problemLine',{problem:problemLabel(status.mainProblem)})),element('p','need-home',t('needs.homeLine',{home:homeLabel(status.home)}))];
   if(status.unpaidPenalty>0)lines.push(element('p','need-unpaid',t('needs.unpaidLine',{penalty:status.unpaidPenalty})));
   root.replaceChildren(...lines);
 }
