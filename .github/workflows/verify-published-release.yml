@@ -42,18 +42,19 @@ jobs:
 
       # The verifier uses only Node built-ins, Git and curl. No install, build,
       # game/Studio smoke or archive composition is repeated here.
-      - name: Check whether the current milestone tag is published
+      - name: Check whether the current release tag is published
         id: release
         shell: bash
         run: |
-          tag="$(node --input-type=module -e "import {readFileSync} from 'node:fs'; import {releaseNumber} from './scripts/release-gate-lib.mjs'; process.stdout.write('v'+releaseNumber(JSON.parse(readFileSync('package.json','utf8')).version));")"
+          # #174: every release (MAJOR/MINOR/PATCH) is tagged v<canonical version>; milestones additionally need an archive.
+          tag="$(node --input-type=module -e "import {readFileSync} from 'node:fs'; import {versionParts} from './src/data/semver.js'; const v=JSON.parse(readFileSync('package.json','utf8')).version; versionParts(v); process.stdout.write('v'+v);")"
           if git show-ref --verify --quiet "refs/tags/${tag}"; then
             echo 'published=true' >> "$GITHUB_OUTPUT"
           else
             tag_lookup_status=$?
             if [ "$tag_lookup_status" -ne 1 ]; then exit "$tag_lookup_status"; fi
             echo 'published=false' >> "$GITHUB_OUTPUT"
-            printf '### No public milestone tag\n\nNo matching tag exists for the current package version. This run makes no release-verification claim.\n' >> "$GITHUB_STEP_SUMMARY"
+            printf '### No public release tag\n\nNo matching tag exists for the current package version. This run makes no release-verification claim.\n' >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Verify actual public catalog, manifest and deployed source

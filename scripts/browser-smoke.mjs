@@ -1,4 +1,5 @@
 import { demolitionSmoke } from './demolition-smoke.mjs';
+import { displayVersion } from '../src/data/semver.js';
 import { stockpileCleanupSmoke } from './stockpile-cleanup-smoke.mjs';
 import { repeatPlacementSmoke } from './repeat-placement-smoke.mjs';
 import { farmerEstablishmentSmoke } from './farmer-establishment-smoke.mjs';
@@ -81,8 +82,10 @@ try{
   };
   await page.addInitScript(()=>{let state=77123;Math.random=()=>((state=Math.imul(state,1664525)+1013904223>>>0)/2**32);});
   await instrument(page);await page.goto(origin+base);
-  assert.ok((await page.title()).includes(`v${catalog.gameVersion}`));
-  for(const label of await page.locator('[data-game-version]').allTextContents())assert.equal(label,`v${catalog.gameVersion}`);
+  // #174: players see two-digit MINOR/PATCH (0.3.0 → v0.03.00); the canonical version stays in a data attribute.
+  const shown=`v${displayVersion(catalog.gameVersion)}`;assert.match(shown,/^v\d+\.\d{2,}\.\d{2,}$/);assert.ok((await page.title()).includes(shown));
+  for(const label of await page.locator('[data-game-version]').allTextContents())assert.equal(label,shown);
+  for(const value of await page.locator('[data-game-version]').evaluateAll(labels=>labels.map(l=>l.dataset.canonicalVersion)))assert.equal(value,catalog.gameVersion);
   assert.equal(await page.locator('#archive-version-list > article').count(),0);assert.equal(await page.locator('#archive-snapshot-list > article').count(),0);
   assert.equal(requests.some(url=>url.includes('/versions/catalog.json')),false);
   if(!currentOnly){
@@ -96,7 +99,7 @@ try{
   const row=page.locator('#archive-version-list > article').filter({has:page.locator(`[data-view-changes="${historical.version}"]`)});
   assert.equal(await row.locator('.archive-play').getAttribute('href'),historical.archiveURL);
   await row.getByRole('button',{name:'View Changes',exact:true}).click();
-  const changes=page.locator('.changelog-release').filter({has:page.locator('summary').filter({hasText:`v${historical.version} `})});
+  const changes=page.locator('.changelog-release').filter({has:page.locator('summary').filter({hasText:`v${displayVersion(historical.version)} `})});
   assert.equal(await changes.evaluate(e=>e.open),true);assert.equal(await changes.locator('.archive-play').getAttribute('href'),historical.archiveURL);
   await changes.locator('summary').click();assert.equal(await changes.evaluate(e=>e.open),false);
   assert.equal(await page.locator('#changelog-releases').getByText('Unreleased',{exact:true}).count(),0);

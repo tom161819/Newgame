@@ -9,3 +9,4 @@
 - Use the GitHub MCP tools for pull requests. Pull requests target `main`; merge your own verified pull request with a merge commit (rule 3 in AGENTS.md) and confirm the GitHub Pages run succeeded.
 - Historical builds in `public/versions/` are generated and immutable. Do not read minified snapshots to learn the architecture; use the source, catalog and manifests.
 - The source is dense (many statements per line). Never reformat existing code; keep diffs minimal to avoid merge conflicts with Codex.
+- Versions and releases follow *Versions, releases and change records* in AGENTS.md (#174): a game change ships as the next PATCH (MINOR for a new `SAVE_VERSION`) through `npm run release:prepare`, every pull request outside `docs/` adds `docs/changes/<issue>-<slug>.md`, run `npm run version:check` before opening the PR, and push the `v<version>` tag after the merge.
