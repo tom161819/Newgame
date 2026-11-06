@@ -37,6 +37,7 @@ export class ConstructionSystem {
   reserve(site,actor,goal){
     if(!this.getSite(site.id)||!this.canWork(site,actor)||!this.ready(site)||!actor.isAlive||this.assignments.has(actor.id)||site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders)return false;
     if(!this.scene.workerSystem.reservations.reserve(this.slotKey(goal),actor.id))return false;
+    this.scene.workerSystem.gather?.release(actor);
     this.assignments.set(actor.id,{siteId:site.id,goal:{...goal}});site.construction.assignedBuilders.push(actor.id);
     if(actor.id!=='king')actor.workTask={kind:site.demolition?'dismantle':'build',targetId:site.id,reservation:this.slotKey(goal),goal:{...goal},progressMs:0};
     return true;

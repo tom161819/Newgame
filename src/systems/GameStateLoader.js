@@ -47,7 +47,7 @@ export function loadGameState(scene,input){
     const worker=scene.workerSystem.create(data.tile,{id:data.id,name:data.name,randomize:false,isSubject:data.isSubject});restoreActor(worker,data);worker.diedAt=data.diedAt;
     if(data.naturalTalent){worker.naturalTalent=data.naturalTalent;worker.initialSkills=structuredClone(data.initialSkills);}
     else initializeNaturalTalent(worker,{legacy:true});
-    for(const key of ['profession','workState','workMessage','assignedWorkplaceId','arriving','aiCooldown'])worker[key]=data[key];
+    for(const key of ['profession','displayProfession','workState','workMessage','assignedWorkplaceId','arriving','aiCooldown'])worker[key]=data[key];
     if(data.stoneCollection)worker.stoneCollection=structuredClone(data.stoneCollection);
     worker.workplaceReached=data.workplaceReached??false;worker.cargo=structuredClone(data.cargo??null);worker.pendingWorkRewards=structuredClone(data.pendingWorkRewards??[]);
     worker.commandState=structuredClone(data.commandState);worker.workTask=structuredClone(data.workTask);worker.active=worker.isAlive;

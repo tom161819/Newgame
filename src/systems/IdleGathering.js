@@ -1,0 +1,68 @@
+import { idleHomes,IDLE_GATHERING as RULES } from '../data/idleGathering.js';
+import { buildingDefinition,towerNeighbors } from '../game/buildings.js';
+import { findPathToAny } from '../game/pathfinding.js';
+import { tileKey } from '../game/stones.js';
+const same=(a,b)=>a&&b&&a.x===b.x&&a.y===b.y;
+const IDLE_MESSAGES=new Set(['Waiting for transport','Waiting near Castle','Waiting near workplace','Walking to Castle','Walking to workplace','Walking nearby']);
+const salt=id=>[...String(id)].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,0);
+// Derived idle path ownership, using the existing worker reservations and normal movement. Not a job scheduler.
+export class IdleGathering {
+  constructor(system){this.system=system;this.scene=system.scene;this.claims=new Map();this.nextPlans=new Map();this.budgetAt=null;this.budget=0;}
+  key(tile){return `idle-anchor:${tileKey(tile)}`;}
+  atHome(worker){const claim=this.claims.get(worker.id);return !!claim&&claim.kind!=='local'&&this.scene.buildings.some(b=>b.id===claim.homeId)&&!worker.nextTile&&!worker.path.length&&same(worker.tile,claim.goal);}
+  release(worker,{stop=false}={}){
+    const claim=this.claims.get(worker.id);this.nextPlans.delete(worker.id);if(!claim)return;
+    this.system.reservations.release(this.key(claim.goal),worker.id);this.claims.delete(worker.id);
+    if(stop&&same(worker.path.at(-1),claim.goal))worker.path=[];
+  }
+  clear(){for(const [id,claim]of this.claims)this.system.reservations.release(this.key(claim.goal),id);this.claims.clear();this.nextPlans.clear();}
+  doors(){const key=`${this.scene.constructionSystem?.revision??0}:${this.scene.buildings.length}`;if(key!==this.doorsKey){this.doorsKey=key;this.doorCache=new Set(this.scene.buildings.flatMap(b=>[...b.tiles,...towerNeighbors(b)]).map(tileKey));}return this.doorCache;}
+  valid(tile,worker,doors,occupied=null){
+    const s=this.scene,key=tileKey(tile);
+    if(s.map[tile.y]?.[tile.x]!==0||s.resourceOccupancy.has(key)||s.pathWear?.isPaved(tile)||doors.has(key)||!this.system.reservations.available(this.key(tile),worker.id))return false;
+    if([...this.scene.vehicles?.vehicles.values()??[]].some(v=>v.operatorId!==worker.id&&v.x===tile.x&&v.y===tile.y))return false;
+    return !occupied?.has(key);
+  }
+  candidates(home){
+    const b=home.building,d=buildingDefinition(b),tiles=[];
+    for(let y=b.y-RULES.maximumMargin;y<b.y+d.height+RULES.maximumMargin;y++)for(let x=b.x-RULES.maximumMargin;x<b.x+d.width+RULES.maximumMargin;x++){
+      const margin=Math.max(b.x-x,x-(b.x+d.width-1),b.y-y,y-(b.y+d.height-1));if(margin>=RULES.minimumMargin&&margin<=RULES.maximumMargin)tiles.push({x,y});
+    }return tiles;
+  }
+  update(worker,options={}){
+    if(!worker.isAlive||worker.isSubject===false||worker.arriving||worker.workTask||worker.cargo||worker.commandState?.state!=='Working'){this.release(worker);return false;}
+    const diagnostic=worker.profession==='hauler'&&worker.workMessage&&!IDLE_MESSAGES.has(worker.workMessage)?worker.workMessage:null;
+    const message=value=>{worker.workMessage=diagnostic??value;};
+    const now=this.scene.gameTime.totalElapsed,homes=idleHomes(this.scene,worker,options),doors=this.doors();let claim=this.claims.get(worker.id);
+    if(options.workplaceOnly&&!homes.length){this.release(worker,{stop:true});return false;}
+    if(claim&&(!this.valid(claim.goal,worker,doors)||claim.kind!=='local'&&!homes.some(h=>h.building.id===claim.homeId))){this.release(worker,{stop:true});claim=null;}
+    worker.workState=worker.profession==='idle'?'Idle':'Waiting';message(claim?.kind==='workplace'?'Waiting near workplace':claim?.kind==='castle'?'Waiting near Castle':worker.profession==='idle'?'Unemployed':'Waiting for transport');
+    if(claim){
+      if(worker.nextTile||worker.path.length){worker.workState='Traveling to Target';message(claim.kind==='castle'?'Walking to Castle':claim.kind==='workplace'?'Walking to workplace':'Walking nearby');return true;}
+      if(same(worker.tile,claim.goal)){
+        claim.until??=now+RULES.dwellMs+salt(worker.id)%2500;
+        if(now<claim.until&&(claim.kind!=='local'||!homes.length||now<(this.nextPlans.get(worker.id)??0)))return true;
+      }
+    }
+    if(now<(this.nextPlans.get(worker.id)??0))return !!claim;
+    if(this.budgetAt!==now){this.budgetAt=now;this.budget=6;}if(!this.budget)return !!claim;this.budget--;
+    const occupied=new Set([this.scene.character,...(this.scene.animalSystem?.animals.values()??[]),...this.system.liveWorkers()].filter(a=>a!==worker&&a.isAlive&&!a.mounted&&this.scene.stables?.horses.get(a.id)?.state!=='harnessed').flatMap(a=>a.reservedTiles()).map(tileKey));
+    this.nextPlans.set(worker.id,now+RULES.retryMs);const goals=new Map(),expired=claim?.until!=null&&now>=claim.until;
+    for(const home of homes)for(const tile of this.candidates(home))if(this.valid(tile,worker,doors,occupied)&&(!expired||!same(tile,claim.goal)))goals.set(tileKey(tile),{goal:tile,homeId:home.building.id,kind:home.kind});
+    const nav=this.system.navigationMap(worker),start=worker.nextTile??worker.tile,routeFor=goals=>goals.size?findPathToAny(nav,start,[...goals.values()].map(g=>g.goal),this.scene.pathWear?.routingOptions(worker)):null;
+    let route=routeFor(goals),chosen=route&&goals.get(tileKey(route.destination));
+    if(!route){
+      if(claim&&!expired&&same(worker.tile,claim.goal))return true;
+      const origin=claim?.localOrigin??{...worker.tile},local=new Map();
+      for(let dy=-RULES.localRadius;dy<=RULES.localRadius;dy++)for(let dx=-RULES.localRadius;dx<=RULES.localRadius;dx++){
+        const tile={x:origin.x+dx,y:origin.y+dy};if(this.valid(tile,worker,doors,occupied)&&(!expired||!same(tile,claim.goal)))local.set(tileKey(tile),{goal:tile,homeId:null,kind:'local',localOrigin:origin});
+      }
+      route=routeFor(local);chosen=route&&local.get(tileKey(route.destination));
+    }
+    if(!chosen)return !!claim;
+    if(!this.system.reservations.reserve(this.key(chosen.goal),worker.id))return !!claim;
+    if(claim&&!same(claim.goal,chosen.goal))this.system.reservations.release(this.key(claim.goal),worker.id);
+    this.claims.set(worker.id,{...chosen,until:null});worker.path=route.path;
+    message(chosen.kind==='castle'?'Waiting near Castle':chosen.kind==='workplace'?'Waiting near workplace':worker.profession==='idle'?'Unemployed':'Waiting for transport');return true;
+  }
+}
