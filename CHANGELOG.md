@@ -5,6 +5,8 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-06
+<!-- version: {"title":"Castle gathering and arrival uniforms","type":"feature","reconstructed":false,"saveVersion":35} -->
 ### Added
 
 - Unemployed residents and idle Haulers gather at reachable Castle meeting points without crowding entrances or standing on paved roads. Haulers keep accepting global deliveries while walking there, and use safe nearby waiting when no Castle is reachable.
