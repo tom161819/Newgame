@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "swordsmith-worker",
+  "name": "Swordsmith",
+  "category": "units",
+  "description": "Forges blades: dark blue tunic, leather cap and apron, a finished sword in hand. Concept for review (#92); the game keeps its current look until one is approved.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "plannedProfession": "swordsmith",
+  "variants": [
+    {
+      "id": "swordsmith-worker-male",
+      "name": "Swordsmith (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_blue",
+        "legs": "cloth_brown",
+        "headgear": "cap",
+        "headgearMaterial": "leather",
+        "hair": "hair_brown",
+        "beard": true,
+        "apron": "leather",
+        "tool": "sword",
+        "build": 1.1
+      }
+    },
+    {
+      "id": "swordsmith-worker-female",
+      "name": "Swordsmith (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_blue",
+        "headgear": "coif",
+        "headgearMaterial": "cloth_linen",
+        "hair": "hair_brown",
+        "apron": "leather",
+        "tool": "sword"
+      }
+    }
+  ]
+}

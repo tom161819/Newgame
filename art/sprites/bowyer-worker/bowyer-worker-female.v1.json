@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "bowyer-worker",
+  "variantId": "bowyer-worker-female",
+  "name": "Bowyer (woman)",
+  "category": "units",
+  "version": 1,
+  "specHash": "d5a494e4",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 65,
+  "anchor": {
+    "x": 33,
+    "y": 47
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.72308
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 63
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.96923
+  },
+  "visualHeight": 63,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.207,
+  "lights": []
+}
