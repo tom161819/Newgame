@@ -17,3 +17,5 @@ Actual165 merge90eb356 is integrated without source conflict. Predecessor164 Pag
 Fresh checks after actual90eb356 integration:670/670 tests, changelog:validate, build:pages and --current-only --farm-plots --farmer-tending browser PASS. PR166 remains draft pending actual165 Pages42163373128 and exact-head CI.
 
 Final visual check found the old generic modal obscured/blurred the map. Farmhouse alone now uses a nonmodal responsive side/bottom inspector, with camera focus respecting existing zoom/fog limits. Native browser verifies visible farm/plot centers outside the panel at desktop1440px and phone390px, Escape/continued input, plus existing employment/staffing UI regressions.670 tests and changelog/build PASS; final layout smoke and manual screenshot inspection PASS. Added farm-only CSS to held files. Predecessor165 Pages42163373128 is now build+deploy SUCCESS and143 closed/done; final166 exact-head CI remains required before merge.
+
+VERIFIED DONE: PR166 merge4e29fe3f9b7a2f0021c21b46c00cfb652edf5c4c, exact-head CI42165693609 and actual Pages42166266800 build+deploy SUCCESS. Issue146 closed/done after that evidence.
