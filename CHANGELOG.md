@@ -5,6 +5,18 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-11-06
+<!-- version: {"title":"Workplace idle seating","type":"feature","reconstructed":false,"saveVersion":37} -->
+### Added
+
+- Idle employees walk to separate seats on a basic porch outside their own workplace and sit until work arrives. Cargo, new jobs, farming tending, combat and manual commands keep priority; blocked porches fall back safely. The temporary porch and seated pose use existing graphics, respect sight and rebuild safely after Load.
+
+## [0.9.0] - 2026-11-06
+<!-- version: {"title":"Optional Builders Workshop and construction efficiency","type":"feature","reconstructed":false,"saveVersion":37} -->
+### Added
+
+- Builders can share an optional Builders’ Workshop as a reachable base and wait nearby between jobs. Without a completed reachable workshop, actual construction runs at 50% speed; movement, carrying, Farmers, the King and demolition are unchanged. The workshop uses a clearly described procedural placeholder while its final art awaits approval.
+
 ## [0.8.0] - 2026-11-06
 <!-- version: {"title":"Manual rock mining with physical stone delivery","type":"feature","reconstructed":false,"saveVersion":36} -->
 ### Added

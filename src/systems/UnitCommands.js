@@ -22,7 +22,7 @@ export class UnitCommands {
     worker.commandState={state:'Holding',goal:null};worker.workState='Holding';worker.workMessage='';return true;
   }
   resume(worker){
-    if(!this.owns(worker))return false;this.system.gather?.release(worker);worker.path=[];worker.commandState=workingCommand();worker.commandRetry=0;worker.commandWait=0;
+    if(!this.owns(worker))return false;this.system.seating?.release(worker);this.system.gather?.release(worker);worker.path=[];worker.commandState=workingCommand();worker.commandRetry=0;worker.commandWait=0;
     worker.workplaceReached=false;worker.aiCooldown=0;worker.workState=worker.profession==='idle'?'Idle':'Searching for Work';worker.workMessage='';this.scene.employment?.request();return true;
   }
   navigation(worker,base=knownMap(this.scene),departing=new Set()){

@@ -38,7 +38,7 @@ export class BuilderAI {
         if(!worker.moveTo([assignment.goal])){scene.workerSystem.ai.cancel(worker);worker.aiCooldown=0;}
       }return;
     }
-    worker.workState='Waiting';worker.workMessage='Waiting for construction';if(worker.aiCooldown>0)return;worker.aiCooldown=CONSTRUCTION_RULES.retryInterval;
+    worker.workState='Waiting';worker.workMessage='Waiting for construction';if(worker.aiCooldown>0){if(scene.workerSystem.gather?.claims.has(worker.id))scene.workerSystem.gather.update(worker,{workplaceOnly:true});return;}worker.aiCooldown=CONSTRUCTION_RULES.retryInterval;
     const choices=new Map(),start=worker.nextTile??worker.tile;
     for(const site of system.workSites()){
       if(!system.canWork(site,worker)||!system.ready(site))continue;

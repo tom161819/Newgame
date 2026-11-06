@@ -45,6 +45,7 @@ export class DemolitionUI {
     if(selected){const label=t('demolition.inspect',{name:buildingDefinition(selected).name});text(this.inspect,label);this.inspect.title=label;}
     const b=this.building(this.buildingId);if(!b){this.section.hidden=true;if(this.host?.open)this.host.close();return;}
     this.section.hidden=!this.host?.open;if(this.section.hidden)return;
+    if(this.dialog.open&&buildingDefinition(b).builderBase)text(document.querySelector('#building-detail-description'),buildingDefinition(b).description+' '+t('workshop.users',{count:this.scene.constructionSystem.workshops.users(b).length}));
     const reason=this.reason(b),record=b.demolition;
     this.progress.setAttribute('aria-label',t('demolition.title'));
     text(this.heading,t('demolition.title'));text(this.refund,t('demolition.refund',{refund:this.refundLabel(b)}));text(this.start,t('demolition.start'));text(this.cancel,t('demolition.cancel'));

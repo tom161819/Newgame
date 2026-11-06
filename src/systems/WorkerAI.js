@@ -8,7 +8,7 @@ import { WORKPLACE_RULES } from '../data/workplaces.js';
 export class WorkerAI {
   constructor(system){this.system=system;this.scene=system.scene;}
   cancel(worker){
-    this.system.gather?.release(worker);
+    this.system.seating?.release(worker);this.system.gather?.release(worker);
     this.scene.naturalResources?.releaseWorker(worker);
     this.scene.foodProduction?.cancelWorker(worker);
     this.scene.farmingSystem?.release(worker);

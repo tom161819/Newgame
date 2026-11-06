@@ -12,8 +12,8 @@ import { MountSystem } from '../src/systems/MountSystem.js';
 
 const scene=()=>workerScene(undefined,{construction:true});
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-6,`${a} !== ${b}`);
-function site(s,type='tower',x=50,y=50){
-  const d=s.objectRegistry.require(type);s.inventory.add('stone',d.cost.stone);const r=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ok(r.building,r.error);s.constructionSystem.plan(r.building);s.towerViews.set(r.building.id,s.createBuildingView(d,r.building));return r.building;
+function site(s,type='tower',x=50,y=50,{complete=false}={}){
+  const d=s.objectRegistry.require(type);for(const [id,n]of Object.entries(d.cost))s.inventory.add(id,n);const r=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ok(r.building,r.error);if(!complete)s.constructionSystem.plan(r.building);s.towerViews.set(r.building.id,s.createBuildingView(d,r.building));return r.building;
 }
 function builder(s,x=47,y=50){const w=s.workerSystem.create({x,y});s.workerSystem.jobs.assign(w,'builder');return w;}
 function until(s,condition,max=65000){let ms=0;while(!condition()&&ms<max){s.tick(50);ms+=50;}assert.ok(condition(),`No condition after ${ms} ms`);return ms;}
@@ -25,9 +25,9 @@ test('registry times, paid blueprint footprints and activation gates preserve on
   const worker=builder(s);assert.equal(s.workplaceSystem.assign(quarry,worker),false);assert.equal(s.character.command({kind:'enter',tower:castle}),false);assert.equal(s.character.experience.totalXP,0);s.constructionSystem.plan(castle);assert.equal(s.buildings.length,3);assert.equal(s.inventory.count('stone'),0);
 });
 
-test('one builder physically approaches, then takes exactly the base work time and earns one completion reward',()=>{
+test('one builder physically approaches, then takes exactly double base work time without a workshop and earns one completion reward',()=>{
   const s=scene(),b=site(s),w=builder(s);s.tick(0);assert.equal(w.workTask.kind,'build');assert.equal(b.construction.workDone,0);const position={...w.position};s.tick(100);assert.ok(Math.hypot(w.position.x-position.x,w.position.y-position.y)<.4);assert.equal(b.construction.workDone,0);
-  until(s,()=>s.constructionSystem.atSite(w,s.constructionSystem.assignments.get(w.id)));const work=b.construction.workDone;assert.ok(work<51);s.simulate(20000-work-1,50);assert.equal(buildingIsComplete(b),false);s.tick(1.01);assert.equal(buildingIsComplete(b),true);assert.equal(w.experience.totalXP,15);assert.equal(w.skills.construction.totalXP,15);assert.equal(w.workTask,null);assert.equal(s.workerSystem.reservations.owners.size,0);s.simulate(2000);assert.equal(w.experience.totalXP,15);
+  until(s,()=>s.constructionSystem.atSite(w,s.constructionSystem.assignments.get(w.id)));const work=b.construction.workDone;assert.ok(work<51);s.simulate((20000-work)*2-1,50);assert.equal(buildingIsComplete(b),false);s.tick(1.01);assert.equal(buildingIsComplete(b),true);assert.equal(w.experience.totalXP,15);assert.equal(w.skills.construction.totalXP,15);assert.equal(w.workTask,null);assert.equal(s.workerSystem.reservations.owners.size,0);s.simulate(2000);assert.equal(w.experience.totalXP,15);
 });
 
 test('construction sums skill speeds and integrates staggered arrivals and completion exactly at different frame rates',()=>{
@@ -86,7 +86,7 @@ test('unreachable sites are cached until map changes, while job changes release 
 });
 
 test('a completed castle activates daily income only afterwards; paused time and cancelled partial work produce no rewards',()=>{
-  const s=scene(),b=site(s,'castle'),w=builder(s);s.gameTime.update(120000);assert.equal(s.inventory.count('gold'),0);s.gameTime.setPaused(true);s.simulate(5000);assert.equal(b.construction.workDone,0);s.gameTime.setPaused(false);until(s,()=>buildingIsComplete(b));assert.equal(s.production.dailyIncome().gold,5);assert.equal(w.experience.totalXP,30);const gold=s.inventory.count('gold');s.gameTime.update(120000);assert.ok(s.inventory.count('gold')>gold);
+  const s=scene();site(s,'builder_workshop',60,60,{complete:true});const b=site(s,'castle'),w=builder(s);s.gameTime.update(120000);assert.equal(s.inventory.count('gold'),0);s.gameTime.setPaused(true);s.simulate(5000);assert.equal(b.construction.workDone,0);s.gameTime.setPaused(false);until(s,()=>buildingIsComplete(b));assert.equal(s.production.dailyIncome().gold,5);assert.equal(w.experience.totalXP,30);const gold=s.inventory.count('gold');s.gameTime.update(120000);assert.ok(s.inventory.count('gold')>gold);
 });
 
 test('precise Save/Load restores partial work, contributions, paid material, builder slots and king command without repeat payment or XP',()=>{

@@ -5,6 +5,7 @@ export const IDLE_GATHERING=Object.freeze({minimumMargin:2,maximumMargin:4,local
 export function idleHomes(scene,worker,{workplaceOnly=false}={}){
   const workplace=scene.workplaceSystem?.building(worker);
   if(worker.profession==='builder'&&workplace&&buildingDefinition(workplace).workplace?.profession==='builder')return [{building:workplace,kind:'workplace'}];
+  if(worker.profession==='builder')return scene.constructionSystem?.workshops?.homes(worker)??[];
   if(workplaceOnly||workplace||!['idle','hauler'].includes(worker.profession))return [];
   return scene.buildings.filter(b=>b.type==='castle'&&buildingIsComplete(b)).map(building=>({building,kind:'castle'}));
 }
@@ -16,5 +17,5 @@ export function syncWorkerUniform(scene,worker){
   if(home){if(worker.workplaceReached)worker.displayProfession=worker.profession;return;}
   // Global jobs change at their first real task goal, or the Hauler's Castle gathering point.
   const task=worker.workTask,atGoal=task?.goal&&!worker.nextTile&&!worker.path.length&&worker.tile.x===task.goal.x&&worker.tile.y===task.goal.y;
-  if(atGoal&&['hauler','builder'].includes(worker.profession)||worker.profession==='hauler'&&(scene.workerSystem.gather?.atHome(worker)||scene.vehicles?.held(worker)))worker.displayProfession=worker.profession;
+  if(worker.profession==='builder'&&scene.constructionSystem?.workshops?.home(worker)&&scene.workerSystem.gather?.atHome(worker)||atGoal&&['hauler','builder'].includes(worker.profession)||worker.profession==='hauler'&&(scene.workerSystem.gather?.atHome(worker)||scene.vehicles?.held(worker)))worker.displayProfession=worker.profession;
 }
