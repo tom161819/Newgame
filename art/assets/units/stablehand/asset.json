@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "id": "stablehand",
+  "name": "Stablehand",
+  "category": "units",
+  "description": "Tends the horses: green wool, a brimmed felt hat and a water bucket. Concept for review (#92); the game keeps its current look until one is approved.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "plannedProfession": "stablehand",
+  "variants": [
+    {
+      "id": "stablehand-male",
+      "name": "Stablehand (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_green",
+        "legs": "cloth_brown",
+        "headgear": "brimmed",
+        "headgearMaterial": "cloth_wool",
+        "hair": "hair_auburn",
+        "tool": "bucket"
+      }
+    },
+    {
+      "id": "stablehand-female",
+      "name": "Stablehand (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_green",
+        "headgear": "brimmed",
+        "headgearMaterial": "cloth_wool",
+        "hair": "hair_auburn",
+        "hairStyle": "braid",
+        "tool": "bucket"
+      }
+    }
+  ]
+}
