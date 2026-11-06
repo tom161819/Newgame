@@ -616,6 +616,13 @@
               "at": "2026-11-06T22:53:05.510Z"
             }
           ]
+        },
+        "ruined-wall-blender": {
+          "status": "review",
+          "version": 1,
+          "specHash": "65c7d893",
+          "note": "Blender pilot (#149): the Breach layout rendered by Blender for comparison; decoration only.",
+          "updatedAt": "2026-11-06T23:55:00.000Z"
         }
       }
     },

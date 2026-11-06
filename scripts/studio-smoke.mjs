@@ -95,6 +95,15 @@ try {
   assert.equal(await page.evaluate(id => Object.values(window.assetStudio.local().assets).map(a => a.variants?.[id]).find(Boolean).status, ruinId), 'rejected');
   await page.locator('#library-review [data-review="all"]').click();
   pass('review decisions: In game badge only on art the game uses, Request revision needs a comment (Send for rework, hint clears, confirmation) stored with the version, history shows it, Reject, filters Revision requested / In game');
+  // Blender pilot: the baked variant shows the committed render, sized and anchored by its sidecar.
+  await page.locator('.library-item', { hasText: 'Broken wall' }).first().click();
+  const bakedCard = page.locator('.variant-card[data-variant="ruined-wall-blender"]');
+  assert.match(await bakedCard.locator('.baked-note').textContent(), /Pre-rendered in Blender 5\.\d.*CYCLES/);
+  assert.doesNotMatch(await bakedCard.locator('.baked-note').textContent(), /bake again|Not baked/);
+  assert.match(await bakedCard.locator('.facts').textContent(), /102 × 99 px at 1×/);
+  const bakedExport = await page.evaluate(() => window.assetStudio.exportSprite('ruined-wall', 'ruined-wall-blender'));
+  assert.ok(bakedExport.baked && bakedExport.meta.generator === 'blender', 'export hands over the baked sprite unchanged');
+  pass('Blender-baked variant: committed render shown with its anchor and render facts, export keeps it');
 
   await page.locator('.library-item', { hasText: 'Watchtower' }).click();
   await page.waitForFunction(() => document.querySelectorAll('.variant-card canvas').length >= 3);

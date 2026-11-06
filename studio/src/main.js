@@ -76,11 +76,35 @@ function download(name, blob) {
 
 // ---------- sprite rendering ----------
 const spriteCache = new Map();
+// Blender pilot (#149): variants with `baked` are pre-rendered (scripts/blender-bake.mjs). The Studio shows the
+// committed PNG (2× file for scales ≥ 2) with its sidecar anchor, so cards, scenes and the time-of-day preview work
+// exactly as for live recipes; only the lighting is baked into the image like every exported sprite.
+const bakedImages = new Map();
+const bakedSources = variant => {
+  const one = variant.paths.sprite, two = one.replace(/\.png$/, '.x2.png');
+  return { one: data.exportedSprites[one], two: data.exportedSprites[two], meta: data.exportedMeta[variant.paths.spriteMeta] };
+};
+function preloadBaked() {
+  const urls = catalog.studio.flatMap(asset => asset.variants.filter(v => v.baked)).flatMap(v => { const s = bakedSources(v); return [s.one, s.two].filter(Boolean); });
+  return Promise.all(urls.map(url => new Promise(resolve => { const img = new Image(); img.onload = () => { bakedImages.set(url, img); resolve(); }; img.onerror = () => resolve(); img.src = url; })));
+}
+function bakedSprite(asset, variant, scale) {
+  const { one, two, meta } = bakedSources(variant), useTwo = scale >= 2 && two && meta?.x2 && bakedImages.has(two);
+  const img = bakedImages.get(useTwo ? two : one), from = useTwo ? 2 : 1, k = scale / from;
+  const anchor0 = useTwo ? meta.x2.anchor : meta?.anchor ?? { x: 0, y: 0 };
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round((img?.naturalWidth ?? 1) * k)); canvas.height = Math.max(1, Math.round((img?.naturalHeight ?? 1) * k));
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  if (img) ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  return { canvas, front: null, still: null, rotor: null, width: canvas.width, height: canvas.height, anchor: { x: Math.round(anchor0.x * k), y: Math.round(anchor0.y * k) }, platform: null, lights: [], scale, footprint: asset.footprint, modelHeight: meta?.modelHeight ?? 1, baked: { renderer: variant.baked.renderer, missing: !img, outdated: meta?.specHash !== variant.hash, render: meta?.render ?? null } };
+}
 function spriteFor(asset, variant, scale = 1) {
   const key = `${variant.id}:${variant.hash}:${scale}`;
   if (!spriteCache.has(key)) {
     const generator = generators[asset.generator];
-    if (generator.kind === 'surface') spriteCache.set(key, generator.paint(variant.spec, { footprint: asset.footprint, style, scale }));
+    if (variant.baked) spriteCache.set(key, bakedSprite(asset, variant, scale));
+    else if (generator.kind === 'surface') spriteCache.set(key, generator.paint(variant.spec, { footprint: asset.footprint, style, scale }));
     else spriteCache.set(key, renderModel(generator.build(variant.spec, { footprint: asset.footprint, style }), { style, footprint: asset.footprint, scale }));
   }
   return spriteCache.get(key);
@@ -258,6 +282,7 @@ function variantCard(asset, variant) {
       h('dt', {}, 'Anchor'), h('dd', {}, `${base.anchor.x}, ${base.anchor.y} px (origin ${(base.anchor.x / base.width).toFixed(3)}, ${(base.anchor.y / base.height).toFixed(3)})`),
       h('dt', {}, 'Lights'), h('dd', {}, base.lights.length ? base.lights.map(l => l.type).join(', ') : 'none')),
     variant.notes ? h('p', { class: 'variant-notes' }, variant.notes) : null,
+    base.baked ? h('p', { class: 'variant-notes baked-note' }, base.baked.missing ? `Not baked yet: run npm run blender:bake -- ${asset.id}.` : `Pre-rendered in Blender ${base.baked.render?.blender ?? ''} (${base.baked.render?.engine ?? 'Cycles'}, ${base.baked.render?.samples ?? '?'} samples, ${base.baked.render?.seconds ?? '?'} s). Day, dusk and night are applied on top like for every sprite.${base.baked.outdated ? ' The spec changed since this render: bake again.' : ''}`) : null,
     h('div', { class: 'review' },
       h('div', { class: 'review-line' }, h('span', {}, repoLabel), review.pending ? pendingPill(review.pending) : null, review.outdated ? h('span', { class: 'pill outdated', title: 'The spec changed after this review' }, 'Outdated') : null),
       h('div', { class: 'review-row' }, statusButtons, h('button', { type: 'button', class: 'star', 'aria-pressed': String(review.preferred), disabled: readOnly, onclick: () => changeReview(asset, variant, { preferred: !review.preferred }) }, review.preferred ? '★ Preferred' : '☆ Prefer')),
@@ -628,6 +653,8 @@ function exportSprite(assetId, variantId, { facings = false } = {}) {
   const asset = findAsset(assetId), variant = asset?.variants?.find(v => v.id === variantId);
   if (!variant) throw new RangeError(`Unknown variant ${assetId}/${variantId}`);
   const sprite = spriteFor(asset, variant, 1);
+  // A baked sprite is already in the repository with its own metadata; exporting hands those over unchanged.
+  if (variant.baked) return { baked: true, facingPngs: [], png: sprite.canvas.toDataURL('image/png'), front: null, still: null, rotor: null, sheet: null, tiles: [], meta: structuredClone(data.exportedMeta[variant.paths.spriteMeta] ?? null), paths: { ...variant.paths, spriteTiles: [] } };
   const meta = spriteMetadata({ asset, variant, style, sprite, generator: generators[asset.generator] });
   // Figures can also be rendered in the eight walking directions (facing 0–7, 0 = towards the viewer).
   const turned = facings && asset.generator === 'figure' ? Array.from({ length: 8 }, (_, k) => renderModel(generators.figure.build({ ...variant.spec, facing: k }, { footprint: asset.footprint, style }), { style, footprint: asset.footprint, scale: 1 })) : [];
@@ -680,6 +707,8 @@ window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer
 bindExport();
 connectShared().catch(() => {});
 if (!glReady) showAlert('WebGL is not available, so studio recipes cannot be rendered. Current game sprites are still listed.');
+// Baked (Blender) sprites load as images first, so every view can draw them synchronously.
+preloadBaked().then(() => {
 route();
 
 // Automation hook used by scripts/studio-smoke.mjs and scripts/studio-export.mjs.
@@ -692,4 +721,5 @@ window.assetStudio = Object.freeze({
   local: () => structuredClone(state.local),
   reviewMode: () => shared.mode,
   sceneLights: () => structuredClone(lastSceneLights),
+});
 });

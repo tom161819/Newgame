@@ -116,7 +116,7 @@
           ],
           [
             0.72,
-            0.0
+            0
           ],
           [
             0.8,
@@ -169,7 +169,7 @@
           ],
           [
             0.16,
-            1.0
+            1
           ],
           [
             0.3,
@@ -281,6 +281,82 @@
         "green": 1,
         "ivy": 3,
         "bushes": 4
+      }
+    },
+    {
+      "id": "ruined-wall-blender",
+      "name": "Breach (Blender)",
+      "version": 1,
+      "notes": "Blender pilot: the same Breach layout rendered by Blender (Cycles) instead of the Studio's Three.js renderer — chipped rounded stones, soft sky light and shadows in the joints. Pre-rendered, so the Studio shows the baked sprite.",
+      "spec": {
+        "kind": "stonewall",
+        "seed": 5,
+        "profile": [
+          [
+            0,
+            0.7
+          ],
+          [
+            0.1,
+            0.82
+          ],
+          [
+            0.22,
+            0.74
+          ],
+          [
+            0.33,
+            0.5
+          ],
+          [
+            0.43,
+            0.12
+          ],
+          [
+            0.52,
+            0.02
+          ],
+          [
+            0.6,
+            0.2
+          ],
+          [
+            0.7,
+            0.52
+          ],
+          [
+            0.84,
+            0.62
+          ],
+          [
+            1,
+            0.48
+          ]
+        ],
+        "ragged": 0.55,
+        "holes": 0.05,
+        "heaps": [
+          [
+            0.51,
+            1,
+            "through"
+          ],
+          [
+            0.33,
+            0.45
+          ],
+          [
+            0.84,
+            0.35
+          ]
+        ],
+        "green": 0.3
+      },
+      "baked": {
+        "renderer": "blender",
+        "twin": "ruined-wall-breach",
+        "renderHash": "83166932",
+        "samples": 96
       }
     }
   ]

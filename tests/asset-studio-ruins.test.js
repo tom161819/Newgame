@@ -14,8 +14,10 @@ const asset = json('art/assets/decorations/ruined-wall/asset.json');
 const build = spec => GENERATORS.ruins.build(spec, { footprint: asset.footprint, style });
 const wallStones = model => model.primitives.filter(p => p.shape === 'box' && p.material.startsWith('fieldstone'));
 
+const live = asset.variants.filter(v => !v.baked);
+
 test('every broken wall variant is a v2 rough stone wall that fits its footprint and repeats exactly', () => {
-  for (const variant of asset.variants) {
+  for (const variant of live) {
     assert.equal(variant.version, 2, variant.id);
     assert.equal(variant.spec.kind, 'stonewall', variant.id);
     const model = build(variant.spec);
@@ -27,7 +29,7 @@ test('every broken wall variant is a v2 rough stone wall that fits its footprint
 });
 
 test('stones are irregular: lengths, heights and twists differ and the broken top is uneven', () => {
-  for (const variant of asset.variants) {
+  for (const variant of live) {
     const stones = wallStones(build(variant.spec));
     const distinct = values => new Set(values.map(v => v.toFixed(3))).size;
     assert.ok(distinct(stones.map(s => s.size[0])) > stones.length * 0.6, `${variant.id}: stone lengths vary`);
@@ -71,4 +73,27 @@ test('the older ruin recipes are unchanged (no generator version bump)', () => {
     assert.equal(meta.generatorVersion, 1, variant.id);
     if (approvals.assets['ruined-tower']?.variants?.[variant.id]) assert.equal(approvals.assets['ruined-tower'].variants[variant.id].specHash, meta.specHash, `${variant.id} keeps its reviewed hash`);
   }
+});
+
+// Blender pilot: the baked twin of Breach is committed with metadata that matches the Studio's spec hash and anchor convention.
+test('the Blender-baked Breach is committed at 1× and 2× with metadata matching its spec', async () => {
+  const { buildCatalog } = await import('../studio/src/lib/specs.js');
+  const { projectPoint } = await import('../studio/src/lib/projection.js');
+  const baked = asset.variants.filter(v => v.baked);
+  assert.deepEqual(baked.map(v => v.id), ['ruined-wall-blender']);
+  const entry = buildCatalog({ specs: [asset], generators: GENERATORS, style }).studio[0].variants.find(v => v.id === 'ruined-wall-blender');
+  const meta = json('art/sprites/ruined-wall/ruined-wall-blender.v1.json'), twin = json('art/sprites/ruined-wall/ruined-wall-breach.v2.json');
+  assert.equal(meta.specHash, entry.hash, 'bake again after changing the spec');
+  assert.equal(meta.generator, 'blender'); assert.equal(meta.render.renderHash, baked[0].baked.renderHash);
+  assert.deepEqual(baked[0].spec, asset.variants.find(v => v.id === baked[0].baked.twin).spec, 'same layout as its Studio twin');
+  // Same projection and framing as the Studio render of the same layout: identical anchor, size within a few pixels.
+  assert.deepEqual(meta.anchor, twin.anchor);
+  assert.ok(Math.abs(meta.width - twin.width) <= 3 && Math.abs(meta.height - twin.height) <= 3, `${meta.width}×${meta.height} vs ${twin.width}×${twin.height}`);
+  const corner = projectPoint([1, 0, 0.5]);
+  assert.deepEqual(meta.base, { x: +(meta.anchor.x + corner.x).toFixed(2), y: +(meta.anchor.y + corner.y).toFixed(2) });
+  for (const axis of ['x', 'y']) assert.ok(Math.abs(meta.x2.anchor[axis] - meta.anchor[axis] * 2) <= 2, `2× anchor ${axis} is about twice the 1× anchor`);
+  const png = readFileSync(path.join(root, 'art/sprites/ruined-wall/ruined-wall-blender.v1.png'));
+  assert.equal(png.readUInt32BE(16), meta.width); assert.equal(png.readUInt32BE(20), meta.height);
+  const png2 = readFileSync(path.join(root, 'art/sprites/ruined-wall/ruined-wall-blender.v1.x2.png'));
+  assert.equal(png2.readUInt32BE(16), meta.x2.width); assert.equal(png2.readUInt32BE(20), meta.x2.height);
 });

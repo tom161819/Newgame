@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "assetId": "ruined-wall",
+  "variantId": "ruined-wall-blender",
+  "name": "Breach (Blender)",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "65c7d893",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 102,
+  "height": 99,
+  "anchor": {
+    "x": 49,
+    "y": 73
+  },
+  "origin": {
+    "x": 0.48039,
+    "y": 0.73737
+  },
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "base": {
+    "x": 65,
+    "y": 97
+  },
+  "baseOrigin": {
+    "x": 0.63725,
+    "y": 0.9798
+  },
+  "visualHeight": 97,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.469,
+  "lights": [],
+  "x2": {
+    "width": 203,
+    "height": 195,
+    "anchor": {
+      "x": 97,
+      "y": 145
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 96,
+    "supersampling": 4,
+    "seconds": 94.3,
+    "renderHash": "83166932",
+    "script": "scripts/blender/render.py"
+  }
+}
