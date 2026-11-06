@@ -1,6 +1,19 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  'object.gate_x.name':'Kamenná brána (průchod X)','object.gate_y.name':'Kamenná brána (průchod Y)',
+  'object.gate_x.description':'Obousměrný průchod v ose X mezi pevnými pilíři; schody vedou na navazující hradby. Stávající sada hradeb.',
+  'object.gate_y.description':'Obousměrný průchod v ose Y mezi pevnými pilíři; schody vedou na navazující hradby. Stávající sada hradeb.',
+  'status.noRoofAccess':'Na tuto hradbu nevede dostupná dokončená věž ani brána.',
+  'seating.resting':'Odpočívá vsedě u pracoviště',
+  'seating.walking':'Jde k sedadlu u pracoviště',
+  'workshop.rule':'Builder bez dostupné dokončené dílny staví rychlostí 50 %. Pohyb, nošení, král a Farmáři se nemění.',
+  'workshop.someSlow':'{count} pracujících Builderů nemá dostupnou dílnu: rychlost stavby −50 %.',
+  'workshop.slow':'Rychlost stavby: 50 % — nemá dostupnou dokončenou stavitelskou dílnu. Pohyb a nošení se nemění.',
+  'workshop.normal':'Rychlost stavby: 100 % — má dostupnou dokončenou stavitelskou dílnu.',
+  'workshop.noBase':'Bez dostupné dílny (rychlost stavby 50 %)',
+  'workshop.users':'Builderů využívajících společnou základnu: {count}. Nezabírá pracovní ani Hauler místa.',
+
   'rock.danger':'Čeká, až bude místo těžby bezpečné',
   'rock.mark':'Označit skály',
   'rock.unmark':'Zrušit označení skal',

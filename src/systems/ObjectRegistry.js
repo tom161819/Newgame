@@ -53,11 +53,14 @@ export function validateDefinition(definition) {
     || !/^#[0-9a-f]{6}$/i.test(l.color) || l.radius <= 0 || l.intensity < 0 || l.flameSize <= 0 || !plainObject(l.flicker) || ![l.flicker.amplitude, l.flicker.speed].every(finite)))) fail(id, 'neplatný zdroj světla.');
   if (d.artSource !== undefined && (typeof d.artSource !== 'string' || !/^art\/sprites\/[a-z0-9-]+\/[a-z0-9.-]+\.json$/.test(d.artSource))) fail(id, 'neplatný odkaz na zdroj grafiky.');
   if (d.visibility !== undefined && (!plainObject(d.visibility) || !finite(d.visibility.multiplier) || d.visibility.multiplier<=0)) fail(id, 'neplatný bonus dohledu.');
-  if (d.navigation !== undefined && (!plainObject(d.navigation) || typeof d.navigation.walkableTop!=='boolean'
-    || (d.navigation.walkableTop&&(d.category!=='building'||d.width!==1||d.height!==1||!d.interactions.includes('walk_top'))))) fail(id, 'neplatná navigace po vrcholu.');
+  if(d.navigation!==undefined){
+    const n=d.navigation,gate=plainObject(n)&&n.roofAccess===true&&(n.gateAxis==='y'&&d.width===3&&d.height===1||n.gateAxis==='x'&&d.width===1&&d.height===3);
+    if(!plainObject(n)||typeof n.walkableTop!=='boolean'||n.roofAccess!==undefined&&typeof n.roofAccess!=='boolean'||n.gateAxis!==undefined&&!gate
+      ||n.walkableTop&&(d.category!=='building'||!gate&&(d.width!==1||d.height!==1)||!d.interactions.includes('walk_top')))fail(id,'neplatná navigace po vrcholu.');
+  }
   if (d.construction !== undefined && (!plainObject(d.construction) || !['single','line','pavement'].includes(d.construction.mode)
     || (['line','pavement'].includes(d.construction.mode)&&(d.category!=='building'||d.width!==1||d.height!==1)))) fail(id, 'neplatný režim stavění.');
-  if (d.renderer==='fortification'&&(!finite(d.visual?.wallHeight)||d.visual.wallHeight<=0)) fail(id, 'opevnění vyžaduje kladnou výšku stěn.');
+  if (['fortification','gate'].includes(d.renderer)&&(!finite(d.visual?.wallHeight)||d.visual.wallHeight<=0)) fail(id, 'opevnění vyžaduje kladnou výšku stěn.');
   if(d.workplace!==undefined&&(!plainObject(d.workplace)||d.category!=='building'||!validStaffing(d.workplace)
     ||!Object.hasOwn(JOBS,d.workplace.profession)||!SKILL_IDS.includes(d.workplace.skill)||JOBS[d.workplace.profession].skill!==d.workplace.skill))fail(id,'neplatné pracoviště.');
   if(d.crop!==undefined&&(!plainObject(d.crop)||d.category!=='building'||!d.walkable||typeof d.crop.resource!=='string'||!finite(d.crop.growthDays)||d.crop.growthDays<=0

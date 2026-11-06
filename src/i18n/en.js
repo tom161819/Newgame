@@ -2,6 +2,19 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  'object.gate_x.name':'Stone Gate (X passage)','object.gate_y.name':'Stone Gate (Y passage)',
+  'object.gate_x.description':'Two-way X passage between solid pillars; stairs lead to the joined wall walk. Existing wall kit.',
+  'object.gate_y.description':'Two-way Y passage between solid pillars; stairs lead to the joined wall walk. Existing wall kit.',
+  'status.noRoofAccess':'No reachable completed tower or gate leads to that wall.',
+  'seating.resting':'Resting on the workplace porch',
+  'seating.walking':'Walking to a workplace seat',
+  'workshop.rule':'Builders without a reachable completed workshop build at 50% speed. Movement, carrying, King and Farmers are unchanged.',
+  'workshop.someSlow':'{count} working Builders have no reachable workshop: construction speed −50%.',
+  'workshop.slow':'Construction speed: 50% — no reachable completed Builders’ Workshop. Movement and carrying are unchanged.',
+  'workshop.normal':'Construction speed: 100% — a completed Builders’ Workshop is reachable.',
+  'workshop.noBase':'No reachable workshop (construction speed 50%)',
+  'workshop.users':'Builders using this shared base: {count}. No employee or Hauler slots are consumed.',
+
   'rock.danger':'Waiting until the mining site is safe',
   'rock.mark':'Mark rocks',
   'rock.unmark':'Unmark rocks',

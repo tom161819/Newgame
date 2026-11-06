@@ -37,7 +37,7 @@ export class MapMemoryRenderer {
     const s=this.scene,b=this.memory.fog?.memoryBrightness??FOG_STYLE.brightness,d=s.objectRegistry.require(entry.type),point=gridToWorld(entry.x+entry.width/2,entry.y+entry.height/2);let view;
     if(entry.kind==='building'){
       const building={id:entry.key,type:entry.type,x:entry.x,y:entry.y,definition:d,tiles:buildingTiles(entry,d),...structuredClone(entry.visual)};
-      view=s.assets.createView(d.id,{building,preview:false});
+      view=s.assets.createView(d.id,{building,preview:false,memory:true});
       view.setGrowth?.(entry.visual.stage??0);view.setSeason?.(entry.visual.season??'Spring');
       if(building.construction?.state!=='complete'&&building.construction)view=new ConstructionView(s,building,view);
       frozenAppearance(s,view,()=>view.paint(building),b);

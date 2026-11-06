@@ -1,3 +1,5 @@
+import { validateRoofState } from './RoofStateValidation.js';
+import { buildingGroundOpen } from '../game/buildingGround.js';
 import { validateRockMining } from './RockMiningState.js';
 import { ROCK_MINING } from '../data/rockMining.js';
 import { demolitionRefund } from '../data/demolition.js';
@@ -29,7 +31,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=36;
+export const SAVE_VERSION=38;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -83,6 +85,7 @@ export function serializeGameState(scene){
     player:{...serializeActor(c),state:c.state,currentTowerId:c.currentTower?.id??null,horseId:c.mountedHorse?.id??null,
       ...(scene.kingLogistics?{cargo:copy(c.cargo),pendingWorkRewards:copy(c.pendingWorkRewards)}:{}),
       exitTile:point(c.exitTile),order:serializeOrder(c.order),
+      roofOrder:serializeOrder(c.roofOrder),
       roofContinuation:c.roofContinuation?{...copy({...c.roofContinuation,order:null}),order:serializeOrder(c.roofContinuation.order)}:null,
       render:{x:scene.player.x,y:scene.player.y,depth:scene.player.depth},
       transition:c.transitioning?{remaining:Math.max(1,(c.transitionTween?.duration??900)-(c.transitionTween?.elapsed??0))}:null},
@@ -157,7 +160,7 @@ export function validateGameState(input,registry=objectRegistry){
     // #150: a pavement site may lie on the floor of a finished building (not farmland); it claims no tile of its own.
     else if(d.pavement&&pavementHost(s.buildings,b,registry))tile(b);
     else occupy(b,d.width,d.height);
-    if(!b.unverified&&(!d.walkable||!buildingIsComplete(b)))for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++)solid.add(`${b.x+dx},${b.y+dy}`);
+    if(!b.unverified)for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){const tile={x:b.x+dx,y:b.y+dy};if(!buildingGroundOpen(b,d,tile))solid.add(`${tile.x},${tile.y}`);}
     if(b.construction){
       const c=b.construction;check(['planned','building','complete'].includes(c.state));number(c.requiredWork,1,86400000);check(c.requiredWork===(d.constructionTime??CONSTRUCTION_RULES.defaultTime));
       number(c.workDone,0,c.requiredWork);number(c.progress,0,100);check(Math.abs(c.progress-100*c.workDone/c.requiredWork)<1e-6);
@@ -339,7 +342,8 @@ export function validateGameState(input,registry=objectRegistry){
   const order=o=>{if(!o)return;check(['move','enter','collect','drop','openChest','approachAnimal'].includes(o.kind));check(typeof o.explore==='boolean'&&(!o.explore||o.kind==='move'));if(o.kind==='move'||o.kind==='drop')tile(o.goal);
     if(o.kind==='enter')check(bIds.has(o.buildingId)&&buildingIsComplete(s.buildings.find(b=>b.id===o.buildingId)));if(o.kind==='approachAnimal')check(aIds.has(o.animalId));if(o.kind==='drop')check(dIds.has(o.dropId));
     if(o.kind==='openChest')check(cIds.has(o.chestId));if(o.kind==='collect')check(s.resources.some(r=>`${r.tile.x},${r.tile.y}`===o.resourceKey));};
-  order(p.order);if(p.roofContinuation){order(p.roofContinuation.order);tile(p.roofContinuation.exit);tile(p.roofContinuation.destination);array(p.roofContinuation.path);p.roofContinuation.path.forEach(tile);}
+  validateRoofState(s,registry,check);
+  order(p.order);order(p.roofOrder);if(p.roofOrder)check(p.roofOrder.kind==='enter');if(p.roofContinuation){order(p.roofContinuation.order);tile(p.roofContinuation.exit);tile(p.roofContinuation.destination);check(bIds.has(p.roofContinuation.accessId));array(p.roofContinuation.path);p.roofContinuation.path.forEach(tile);}
   check(s.inventory&&typeof s.inventory==='object');for(const [id,count]of Object.entries(s.inventory)){const d=definition(id);check(['resource','equipment'].includes(d.category));if(id==='gold')number(count);else integer(count);}
   check(s.equipment&&Object.keys(s.equipment).length===2);for(const slot of ['weapon','armor'])if(s.equipment[slot]!=null){const id=s.equipment[slot];check(definition(id,'equipment').equipment.slot===slot&&(s.inventory[id]??0)>0);}
   integer(s.time?.day,1);number(s.time.elapsed,0,dayDuration-1e-7);number(s.time.totalElapsed);check(Math.abs(s.time.totalElapsed-((s.time.day-1)*dayDuration+s.time.elapsed))<.01);

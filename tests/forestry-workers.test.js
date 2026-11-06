@@ -44,5 +44,6 @@ test('regrowth waits for real ground timber rather than embedding undelivered ma
   const s=fixture(),t=tree(s);t.natural.stage=2;t.natural.growthDays=4;s.naturalResources.refreshMap(t);const drop=s.dropSystem.create('wood',{x:t.x,y:t.y},6);s.gameTime.update(1000);assert.equal(t.natural.stage,2);assert.equal(s.map[t.y][t.x],0);const cargo=s.dropSystem.takeForTransport(drop.id,6);assert.equal(cargo.amount,6);s.gameTime.update(1000);assert.equal(t.natural.stage,3);assert.equal(s.map[t.y][t.x],1);
 });
 test('a newly blocked work position releases tree/output reservations instead of stranding a Woodcutter',()=>{
-  const s=fixture(),b=hut(s),t=tree(s,{x:60,y:48}),w=worker(s,b);until(s,()=>w.workTask?.kind==='chopTree');const goal={...w.workTask.goal};s.map[goal.y][goal.x]=1;s.tick(50);assert.equal(w.workTask,null);assert.equal(s.foodStorage.reservations.size,0);assert.equal(s.workerSystem.reservations.owners.size,0);assert.equal(t.natural.workDone,0);assert.equal(totalWood(s),0);
+  // Idle seats may retain leases; every production/resource task lease must be released.
+  const s=fixture(),b=hut(s),t=tree(s,{x:60,y:48}),w=worker(s,b);until(s,()=>w.workTask?.kind==='chopTree');const goal={...w.workTask.goal};s.map[goal.y][goal.x]=1;s.tick(50);assert.equal(w.workTask,null);assert.equal(s.foodStorage.reservations.size,0);assert.equal([...s.workerSystem.reservations.owners.keys()].filter(k=>!k.startsWith('seat:')&&!k.startsWith('idle-anchor:')).length,0);assert.equal(t.natural.workDone,0);assert.equal(totalWood(s),0);
 });

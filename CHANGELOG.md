@@ -5,6 +5,34 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-06
+<!-- version: {"title":"Stone Gates and access to wall walks","type":"feature","reconstructed":false,"saveVersion":38} -->
+### Added
+
+- Stone Gates provide a two-way passage between solid pillars in either map axis, with stairs to connected wall walks.
+
+### Changed
+
+- Wall walks are reached and left through completed reachable towers or gates. The King travels continuously over joined walls and tower roofs instead of climbing any wall from the ground.
+
+## [0.9.2] - 2026-11-06
+<!-- version: {"title":"Food menu and Hunting Lodge unlock","type":"feature","reconstructed":false,"saveVersion":37} -->
+### Changed
+
+- Food & Farming starts with Granary, then Farmhouse. Hunting Lodge stays visibly locked until a Granary is finished; losing the last Granary relocks new Lodges while existing ones remain.
+
+## [0.9.1] - 2026-11-06
+<!-- version: {"title":"Workplace idle seating","type":"feature","reconstructed":false,"saveVersion":37} -->
+### Added
+
+- Idle employees walk to separate seats on a basic porch outside their own workplace and sit until work arrives. Cargo, new jobs, farming tending, combat and manual commands keep priority; blocked porches fall back safely. The temporary porch and seated pose use existing graphics, respect sight and rebuild safely after Load.
+
+## [0.9.0] - 2026-11-06
+<!-- version: {"title":"Optional Builders Workshop and construction efficiency","type":"feature","reconstructed":false,"saveVersion":37} -->
+### Added
+
+- Builders can share an optional Builders’ Workshop as a reachable base and wait nearby between jobs. Without a completed reachable workshop, actual construction runs at 50% speed; movement, carrying, Farmers, the King and demolition are unchanged. The workshop uses a clearly described procedural placeholder while its final art awaits approval.
+
 ## [0.8.0] - 2026-11-06
 <!-- version: {"title":"Manual rock mining with physical stone delivery","type":"feature","reconstructed":false,"saveVersion":36} -->
 ### Added

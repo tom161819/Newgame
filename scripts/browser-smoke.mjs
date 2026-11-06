@@ -1,3 +1,6 @@
+import { gateAccessSmoke } from './gate-access-smoke.mjs';
+import { workplaceSeatingSmoke } from './workplace-seating-smoke.mjs';
+import { builderWorkshopSmoke } from './builder-workshop-smoke.mjs';
 import { rockMiningSmoke } from './rock-mining-smoke.mjs';
 import { castleGatheringSmoke } from './castle-gathering-smoke.mjs';
 import { demolitionSmoke } from './demolition-smoke.mjs';
@@ -146,6 +149,9 @@ try{
   if(args.includes('--full')||args.includes('--workplace-output'))await workplaceOutputSmoke(page);
   if(args.includes('--full')||args.includes('--granary-capacity'))await granaryCapacitySmoke(page);
   if(args.includes('--full')||args.includes('--farmer-establishment'))await farmerEstablishmentSmoke(page);
+  if(args.includes('--full')||args.includes('--gate-access'))await gateAccessSmoke(page,{screenshot:args.includes('--gate-shot')?'/tmp/newgame-gate.png':null});
+  if(args.includes('--full')||args.includes('--workplace-seating'))await workplaceSeatingSmoke(page,{screenshot:args.includes('--seating-shot')?'/tmp/newgame-workplace-seating.png':null});
+  if(args.includes('--full')||args.includes('--builder-workshop'))await builderWorkshopSmoke(page,{screenshot:args.includes('--workshop-shot')?'/tmp/newgame-builder-workshop.png':null});
   if(args.includes('--full')||args.includes('--rock-mining'))await rockMiningSmoke(page,{screenshot:args.includes('--rock-shot')?'/tmp/newgame-rock-mining.png':null});
   if(args.includes('--full')||args.includes('--castle-gathering'))await castleGatheringSmoke(page,{screenshot:args.includes('--gather-shot')?'/tmp/newgame-castle-gathering.png':null});
   if(args.includes('--full')||args.includes('--demolition'))await demolitionSmoke(page,{screenshot:args.includes('--demolition-shot')?'/tmp/newgame-demolition-confirm.png':null});
@@ -195,7 +201,7 @@ try{
   await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('test',false));await page.waitForFunction(()=>window.__game.registry.get('application').scene.inventory.count('stone')===1,null,{timeout:20000});
   assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.character.experience.totalXP),3);
   console.log('PASS New Game, real mouse movement/pickup, physical delivery, exact IndexedDB Save/Load in transit, no duplicated stock or XP');
-  if(args.includes('--full'))await buildingUnlockGameplaySmoke(page);
+  if(args.includes('--full')||args.includes('--building-unlocks'))await buildingUnlockGameplaySmoke(page);
   if(currentOnly){assert.equal(requests.some(url=>/\/versions\/[a-f0-9]{40}\//.test(url)),false);assert.equal(requests.some(url=>url.includes('/versions/catalog.json')),false);assert.deepEqual(errors,[]);await context.close();console.log('PASS cold current game starts and plays without requesting an archive catalog, historical script or historical graphic');return;}
 
   const original=catalog.versions.find(v=>v.version==='0.1.0'&&v.available);assert.ok(original,'Original official archive is required.');

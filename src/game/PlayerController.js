@@ -2,12 +2,12 @@ import { t } from '../i18n/index.js';
 import { tileCenter, isWalkable } from './map.js';
 import { gridToWorld } from './isometric.js';
 import { tileKey } from './stones.js';
-import { groundDepthAbove,planGroundOrder, planTowerExit, towerNeighbors, buildingDepth, towerTop, buildingDefinition,buildingIsComplete } from './buildings.js';
+import { groundDepthAbove,planGroundOrder, planTowerExit, towerNeighbors, buildingDepth, towerTop, buildingDefinition,buildingIsComplete,roofAccessNeighbors } from './buildings.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { advanceMovement } from './movement.js';
 import { canStep } from './pathfinding.js';
 import { knownMap } from './knownMap.js';
-import { isWall,wallIndex,findRoofPath,planRoofExit } from './walls.js';
+import { isWall,isRoofAccess,roofIndex,findRoofPath,planRoofExit,planGroundRoofEntry } from './walls.js';
 import { createCombatStats } from '../systems/CombatSystem.js';
 import { createExperience } from '../data/experience.js';
 
@@ -43,7 +43,7 @@ export class PlayerController {
 
   reservedTiles() {
     // Chráníme oba konce právě procházeného úseku, nejen zaokrouhlenou polohu.
-    if (this.state === PLAYER_STATE.ON_TOWER) return [];
+    if ([PLAYER_STATE.ON_TOWER,PLAYER_STATE.ON_WALL].includes(this.state)) return [];
     const tiles = [this.tile, this.nextTile, this.exitTile].filter(Boolean);
     if (this.nextTile && this.nextTile.x !== this.tile.x && this.nextTile.y !== this.tile.y) {
       // Stavba nesmí zavřít ani jeden roh právě procházené diagonály.
@@ -57,6 +57,7 @@ export class PlayerController {
     this.path = [];
     this.order = null;
     this.roofContinuation = null;
+    this.roofOrder = null;
     this.scene.marker.setVisible(false);
     // Probíhající krok doběhne do středu; král se při otevření lišty neposune skokem.
   }
@@ -70,8 +71,10 @@ export class PlayerController {
       return false;
     }
     this.order = null;
+    this.roofOrder = null;
     if(this.state===PLAYER_STATE.ON_WALL)return this.commandOnWall(order);
     if (this.state === PLAYER_STATE.ON_TOWER) {
+      if(order.kind==='enter'&&order.tower!==this.currentTower){const roofPath=findRoofPath(this.scene.buildings,this.currentTower,order.tower);if(roofPath!==null){this.startRoofRoute(roofPath,null);return true;}if(isWall(order.tower)){this.scene.setStatus(t('status.noWallPath'));return false;}}
       if (order.kind === 'enter' && order.tower === this.currentTower) {
         this.scene.setStatus(t('status.onTower'));
         return false;
@@ -88,6 +91,11 @@ export class PlayerController {
       return true;
     }
 
+    if(order.kind==='enter'&&isWall(order.tower)&&!isRoofAccess(order.tower)){
+      const entry=planGroundRoofEntry(order.explore?knownMap(this.scene):this.scene.map,this.scene.buildings,this.nextTile??this.tile,order.tower,this.scene.pathWear?.routingOptions(this));
+      if(!entry){this.scene.setStatus(t('status.noRoofAccess'));return false;}
+      this.roofOrder={...order};order={kind:'enter',tower:entry.access};
+    }
     const route = planGroundOrder(order.explore?knownMap(this.scene):this.scene.map, this.nextTile ?? this.tile, order,this.scene.pathWear?.routingOptions(this));
     if (!route) {
       this.scene.setStatus(t('status.noPath'));
@@ -110,21 +118,23 @@ export class PlayerController {
     this.path=route.path;this.scene.showMarker(route.destination);
     if(!this.path.length)this.arrive();
   }
-  wallAt(tile){return (this.scene.wallMap??wallIndex(this.scene.buildings)).get(tileKey(tile));}
+  wallAt(tile){const key=`${this.scene.constructionSystem?.revision??0}:${this.scene.buildings.length}`;if(this.roofMapKey!==key){this.roofMapKey=key;this.roofMap=roofIndex(this.scene.buildings);}return this.roofMap.get(tileKey(tile));}
   commandOnWall(order){
     const start=this.nextTile?this.wallAt(this.nextTile):this.currentTower;
-    if(order.kind==='enter'&&isWall(order.tower)){
+    if(order.kind==='enter'&&(isWall(order.tower)||isRoofAccess(order.tower))){
       const route=findRoofPath(this.scene.buildings,start,order.tower);
       if(route!==null){this.startRoofRoute(route,null);return true;}
+      this.scene.setStatus(t('status.noWallPath'));return false;
     }
     const route=planRoofExit(order.explore?knownMap(this.scene):this.scene.map,this.scene.buildings,start,order,this.scene.pathWear?.routingOptions(this));
     if(!route){
       this.path=[];this.roofContinuation=null;this.scene.marker.setVisible(false);
       this.scene.setStatus(t('status.noWallPath'));return false;
     }
-    this.startRoofRoute(route.roofPath,{order,path:route.path,destination:route.destination,exit:route.exit});return true;
+    this.startRoofRoute(route.roofPath,{order,path:route.path,destination:route.destination,exit:route.exit,accessId:route.accessId});return true;
   }
   startRoofRoute(buildings,continuation){
+    this.setState(PLAYER_STATE.ON_WALL);
     this.path=buildings.map(b=>({x:b.x,y:b.y}));this.roofContinuation=continuation;
     this.scene.marker.setVisible(false);this.scene.setStatus(t('status.kingOnWallPath'));
     if(!this.nextTile&&!this.path.length)this.finishRoofRoute();
@@ -133,8 +143,10 @@ export class PlayerController {
     this.walking=false;
     const continuation=this.roofContinuation;this.roofContinuation=null;
     if(continuation){
-      this.order=continuation.order;this.path=continuation.path;this.scene.showMarker(continuation.destination);this.descend(continuation.exit);
-    }else this.scene.setStatus(t('status.kingOnWall'));
+      const access=this.scene.buildings.find(b=>b.id===continuation.accessId),route=access&&planTowerExit(this.scene.map,access,continuation.order,this.scene.pathWear?.routingOptions(this));
+      if(!route){this.path=[];this.scene.marker.setVisible(false);this.scene.setStatus(t('status.noTowerPath'));return;}
+      this.currentTower=access;this.order=continuation.order;this.path=route.path;this.scene.showMarker(route.destination);this.descend(route.exit);
+    }else{const owner=this.scene.buildings.find(b=>b.id===this.currentTower?.id);if(owner&&!isWall(owner)&&tileKey(owner)===tileKey(this.tile)){this.currentTower=owner;this.setState(PLAYER_STATE.ON_TOWER);}this.scene.setStatus(t('status.kingOnWall'));}
   }
 
   arrive() {
@@ -166,8 +178,8 @@ export class PlayerController {
 
   climb(tower) {
     // Animaci nelze spustit z dálky, z obsazeného políčka ani během kroku.
-    if (!buildingIsComplete(tower)||!buildingDefinition(tower).interactions.includes('enter') || this.nextTile || !isWalkable(this.scene.map, this.tile.x, this.tile.y)
-      || !towerNeighbors(tower).some(tile => tileKey(tile) === tileKey(this.tile))) return;
+    if (!buildingIsComplete(tower)||!isRoofAccess(tower) || this.nextTile || !isWalkable(this.scene.map, this.tile.x, this.tile.y)
+      || !roofAccessNeighbors(tower).some(tile => tileKey(tile) === tileKey(this.tile))) return;
     this.currentTower = tower;
     this.setState(PLAYER_STATE.ENTERING);
     this.sprite.setDepth(buildingDepth(tower) + 0.2);
@@ -180,6 +192,7 @@ export class PlayerController {
 
   completeClimb(tower){
     this.transitionTween=null;
+    this.tile={x:tower.x,y:tower.y};this.position={x:tower.x+.5,y:tower.y+.5};this.path=[];this.nextTile=null;
     if(isWall(tower)){
       this.tile={x:tower.x,y:tower.y};this.position={x:tower.x+.5,y:tower.y+.5};this.path=[];this.nextTile=null;
       this.setState(PLAYER_STATE.ON_WALL);
@@ -188,6 +201,7 @@ export class PlayerController {
       this.setState(PLAYER_STATE.ON_TOWER);
       this.scene.setStatus(t('status.onPlatform'));
     }
+    const pending=this.roofOrder;this.roofOrder=null;if(pending)this.command(pending);
   }
 
   descend(exit) {
@@ -218,8 +232,10 @@ export class PlayerController {
     if(this.state===PLAYER_STATE.ON_WALL){
       advanceMovement(this,delta);
       this.currentTower=this.wallAt(this.tile)??this.currentTower;
-      const point=gridToWorld(this.position.x,this.position.y),center=tileCenter(this.currentTower),top=towerTop(this.currentTower);
-      this.sprite.setPosition(point.x+top.x-center.x,point.y+top.y-center.y).setDepth(buildingDepth(this.currentTower)+point.y-center.y+.2);
+      const point=gridToWorld(this.position.x,this.position.y),center=tileCenter(this.currentTower),top=towerTop(this.currentTower),next=this.nextTile&&this.wallAt(this.nextTile);
+      let offset={x:top.x-center.x,y:top.y-center.y};
+      if(next){const nCenter=tileCenter(next),nTop=towerTop(next),distance=Math.hypot(this.nextTile.x-this.tile.x,this.nextTile.y-this.tile.y),fraction=Math.min(1,Math.hypot(this.position.x-this.tile.x-.5,this.position.y-this.tile.y-.5)/distance);offset={x:offset.x+(nTop.x-nCenter.x-offset.x)*fraction,y:offset.y+(nTop.y-nCenter.y-offset.y)*fraction};}
+      this.sprite.setPosition(point.x+offset.x,point.y+offset.y).setDepth(buildingDepth(this.currentTower)+point.y-center.y+.2);
       if(!this.nextTile&&!this.path.length){this.walking=false;if(this.roofContinuation)this.finishRoofRoute();}
       return;
     }

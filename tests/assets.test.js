@@ -9,10 +9,10 @@ import { ResourceSpawner, resourceCandidates, generateResourcePositions, tileKey
 const definition = (id, changes = {}) => ({ ...structuredClone(objectRegistry.require('stone')), id, ...changes });
 
 test('registry exposes the existing game objects, categories and buildable menu', () => {
-  assert.equal(objectRegistry.all().length, 63);
-  assert.deepEqual(objectRegistry.buildables().map(d => d.id), ['tower','castle','wall','quarry','hunting_lodge','barracks','farmhouse','wheat_field','orchard','mill','bakery','granary','warehouse','house','stone_pavement','stables','wheelwright_workshop','lumberjack_hut','iron_mine','brazier','smelter','bowyer','swordsmith','armorer','armory']);
+  assert.equal(objectRegistry.all().length, 66);
+  assert.deepEqual(objectRegistry.buildables().map(d => d.id), ['tower','castle','wall','quarry','hunting_lodge','barracks','gate_y','gate_x','farmhouse','wheat_field','orchard','mill','bakery','granary','warehouse','house','stone_pavement','stables','wheelwright_workshop','lumberjack_hut','iron_mine','brazier','smelter','bowyer','swordsmith','armorer','armory','builder_workshop']);
   assert.deepEqual(objectRegistry.byCategory('terrain').map(d => d.id), ['grass','dirt','grass_normal','grass_trampled_1','grass_trampled_2','grass_trampled_3']);
-  assert.equal(objectRegistry.forGallery('all').length, 63);
+  assert.equal(objectRegistry.forGallery('all').length, 66);
   assert.equal(objectRegistry.forGallery('resource')[0].id, 'stone');
   assert.equal(objectRegistry.require('tower').cost.stone, 10);
   assert.equal(objectRegistry.get('missing'), null);
@@ -54,7 +54,7 @@ test('a building added only as data uses its footprint, cost and navigation sett
   const extra = registry.register({ ...structuredClone(registry.require('tower')),
     id:'test_lodge',width:3,height:1,cost:{stone:12},interactions:[],renderMode:'sprite',
   });
-  assert.deepEqual(registry.buildables().map(d => d.id), ['tower','castle','wall','quarry','hunting_lodge','barracks','farmhouse','wheat_field','orchard','mill','bakery','granary','warehouse','house','stone_pavement','stables','wheelwright_workshop','lumberjack_hut','iron_mine','brazier','smelter','bowyer','swordsmith','armorer','armory','test_lodge']);
+  assert.deepEqual(registry.buildables().map(d => d.id), ['tower','castle','wall','quarry','hunting_lodge','barracks','gate_y','gate_x','farmhouse','wheat_field','orchard','mill','bakery','granary','warehouse','house','stone_pavement','stables','wheelwright_workshop','lumberjack_hut','iron_mine','brazier','smelter','bowyer','swordsmith','armorer','armory','builder_workshop','test_lodge']);
   const map = Array.from({length:8},()=>Array(8).fill(0)), inventory = new Inventory(), buildings = [];
   inventory.add('stone',11);
   const options = {map,inventory,buildings,resources:new Map(),anchor:{x:2,y:3},definition:extra};
@@ -108,10 +108,10 @@ test('asset URLs retain the Pages prefix; PNG/WebP/sheets load once per object t
     spritesheet:{frameWidth:32,frameHeight:48},renderMode:'sprite',stats:structuredClone(objectRegistry.require('king').stats)}));
   const calls=[], scene={load:{on(){},image(...args){calls.push(['image',...args]);},spritesheet(...args){calls.push(['sheet',...args]);}},textures:{exists:()=>false}};
   const manager = new AssetManager(scene,registry,{baseURL:'/Newgame/'});
-  // 63 registered objects + the animated test object, plus the tower's front layer, the four approved grass tiles
+  // 66 registered objects + the animated test object, plus the tower's front layer, the four approved grass tiles
   // the nine approved tree looks (six oak, three pine) and twelve seasonal grass tiles (spring, autumn, winter).
-  assert.equal(manager.queue(),90);assert.equal(manager.queue(),0);
-  assert.equal(calls.length,90);
+  assert.equal(manager.queue(),93);assert.equal(manager.queue(),0);
+  assert.equal(calls.length,93);
   assert.ok(calls.some(c=>c[2].endsWith('.webp')));
   assert.deepEqual(calls.find(c=>c[0]==='sheet'),['sheet','asset:animated:main','/Newgame/assets/resources/stone/stone.png',{frameWidth:32,frameHeight:48}]);
 });

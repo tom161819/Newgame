@@ -1,3 +1,4 @@
+import { buildingGroundOpen } from '../game/buildingGround.js';
 import { rememberBlueprint } from '../game/mapMemoryObjects.js';
 import { t } from '../i18n/index.js';
 import { validateGameState } from './GameStateSerializer.js';
@@ -33,7 +34,7 @@ export function loadGameState(scene,input){
   scene.restoringFarmPlots=true;
   try{for(const data of state.buildings){
     const definition=scene.objectRegistry.require(data.type),building={...data,definition,tiles:buildingTiles(data,definition)};
-    if(!building.unverified)for(const t of building.tiles)scene.map[t.y][t.x]=definition.walkable&&(!building.construction||building.construction.state==='complete')?0:1;
+    if(!building.unverified)for(const t of building.tiles)scene.map[t.y][t.x]=buildingGroundOpen(building,definition,t)?0:1;
     scene.buildings.push(building);scene.towerViews.set(building.id,scene.createBuildingView(definition,building));
   }}finally{scene.restoringFarmPlots=false;}
   scene.refreshWallConnections();
@@ -78,6 +79,7 @@ export function loadGameState(scene,input){
   restoreActor(c,p);c.state=p.state;c.currentTower=scene.buildings.find(b=>b.id===p.currentTowerId)??null;
   if(scene.kingLogistics){c.cargo=structuredClone(p.cargo??null);c.pendingWorkRewards=structuredClone(p.pendingWorkRewards??[]);}
   c.exitTile=p.exitTile?{...p.exitTile}:null;c.order=restoreOrder(p.order,scene);
+  c.roofOrder=restoreOrder(p.roofOrder,scene);
   c.roofContinuation=p.roofContinuation?{...structuredClone({...p.roofContinuation,order:null}),order:restoreOrder(p.roofContinuation.order,scene)}:null;
   c.mountedHorse=scene.animalSystem.animals.get(p.horseId)??null;
   scene.equipment.importState(state.equipment);scene.player.setMounted?.(c.mountedHorse?.definition??null);

@@ -11,6 +11,7 @@ export function staticMemoryEntries(scene){
   for(const building of scene.buildings)add('building',building.id,building.type,building,()=>({
     ...(building.construction?{construction:{state:building.construction.state,progress:building.construction.progress,workDone:building.construction.workDone}}:{}),
     ...(building.connections?{connections:{...building.connections}}:{}),
+    ...(building.roofConnections?{roofConnections:building.roofConnections.map(c=>({...c}))}:{}),
     ...(building.definition.crop?{stage:scene.farmingSystem?.records.get(building.id)?.stage??0,season:scene.seasons?.season??'Spring'}:{}),
   }));
   for(const chest of scene.treasureSystem?.chests.values()??[])add('chest',chest.id,chest.type,chest,()=>({opened:chest.opened,lid:chest.view.lid?{y:chest.view.lid.y,rotation:chest.view.lid.rotation}:null}));
