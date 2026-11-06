@@ -6,7 +6,7 @@ import { findPathToAny,canStep } from './pathfinding.js';
 export class WorkerController extends AnimalController {
   constructor(scene,definition,id,tile,view,name){
     super(scene,definition,id,tile,view);
-    Object.assign(this,{name,isSubject:true,diedAt:null,state:'ground',profession:'idle',displayProfession:'idle',workState:'Idle',workTask:null,assignedWorkplaceId:null,
+    Object.assign(this,{name,isSubject:true,diedAt:null,state:'ground',profession:'idle',displayProfession:'idle',manualRockId:null,workState:'Idle',workTask:null,assignedWorkplaceId:null,
       commandState:workingCommand(),experience:createExperience(definition),arriving:false,aiCooldown:0,workplaceReached:false,cargo:null,pendingWorkRewards:[]});
     scene.skillSystem.initialize(this);
   }

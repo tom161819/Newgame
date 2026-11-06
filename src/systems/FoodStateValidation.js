@@ -95,10 +95,11 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     else check(adjacent(locations.get(t.kind==='foodPickup'?t.sourceId:t.destinationId),t.goal));
     if(t.hauling!==undefined){check(t.hauling===true&&w.profession==='hauler');if(t.kind==='foodDeliver'){number(t.loadedDistance);number(t.loadedPosition?.x,0,100);number(t.loadedPosition?.y,0,100);}}
     if(t.kind==='foodPickup'){
-      if(t.sourceDropId)check(!t.stockReservation&&(t.hauling||t.naturalHarvest===true||t.naturalMining===true||t.siteId!=null&&w.profession==='builder'));
+      if(t.sourceDropId)check(!t.stockReservation&&(t.hauling||t.naturalHarvest===true||t.naturalMining===true||t.manualMining===true||t.siteId!=null&&w.profession==='builder'));
       else{const stock=reservations.get(t.stockReservation);check(stock?.kind==='stock'&&stock.locationId===t.sourceId&&stock.resource===t.resource&&stock.amount===t.amount&&stock.owner===t.transferId&&!stockRefs.has(stock.id));stockRefs.add(stock.id);}check(!w.cargo);
     }else check(w.cargo?.resource===t.resource&&w.cargo.amount>=t.amount);
     if(t.naturalHarvest!==undefined)check(t.naturalHarvest===true&&w.profession==='woodcutter'&&s.buildings.some(b=>b.id===w.assignedWorkplaceId&&b.type==='lumberjack_hut')&&t.resource==='wood');
+    if(t.manualMining!==undefined)check(t.manualMining===true&&w.profession==='miner'&&w.assignedWorkplaceId==null&&t.resource==='stone'&&(t.kind!=='foodDeliver'||w.cargo?.rockId===t.rockId)&&s.naturalResources?.rockMining.records.some(r=>r.id===t.rockId&&r.produced===10)&&!t.naturalMining&&!t.naturalHarvest&&!t.hauling);
     if(t.naturalMining!==undefined)check(t.naturalMining===true&&w.profession==='miner'&&s.buildings.some(b=>b.id===w.assignedWorkplaceId&&registry.require(b.type).mining?.resource===t.resource)&&!t.naturalHarvest);
     const cap=reservations.get(t.capacityReservation);
     if(t.siteId!=null){check(sites.has(t.siteId)&&t.destinationId===`site-${t.siteId}`&&cap?.siteId===t.siteId);if(t.kind==='foodPickup')check(t.sourceDropId?sourceDrop?.siteId===t.siteId:reservations.get(t.stockReservation)?.siteId===t.siteId);else check(w.cargo?.siteId===t.siteId);}

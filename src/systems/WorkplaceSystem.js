@@ -59,6 +59,7 @@ export class WorkplaceSystem {
     worker.assignedWorkplaceId=building.id;worker.workplaceReached=false;worker.arriving=false;worker.workState='Going to Workplace';worker.aiCooldown=0;record.workerIds.push(worker.id);this.changed(building.id);return true;
   }
   detach(worker){
+    worker.manualRockId=null;
     this.scene.workerSystem.ai.cancel(worker);
     const changed=[];for(const record of this.records.values()){const before=record.workerIds.length;record.workerIds=record.workerIds.filter(id=>id!==worker.id);if(before!==record.workerIds.length)changed.push(record.buildingId);}
     this.dropCargo(worker);worker.assignedWorkplaceId=null;worker.workplaceReached=false;for(const id of changed)this.changed(id);
