@@ -19,24 +19,18 @@ Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeat
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| #174 Versions MAJOR.MINOR.PATCH (two-digit display), release per change, change records, PR gate | Claude | `claude/version-scheme` | — | PR A (tooling, gate report-only until the first release under the scheme); PR B next: M3 milestone 0.4.0 | src/data/semver.js, ui/ChangelogPanel.js, ui/VersionArchivePanel.js, scripts/{changelog-lib,prepare-release,version-catalog,release-gate,version-policy,version-policy-lib}.mjs, workflows pr-quality + verify-published-release, AGENTS.md (new section), CLAUDE.md, docs/changes/, i18n, browser-smoke version labels |
-| NEW11 #128 Temporary stockpile cleanup | Codex | `codex/temporary-stockpile-cleanup` (stacked on179) | [#180](https://github.com/tom161819/Newgame/pull/180) | Implemented;701 tests + integrated native hauling/confirmation/SaveLoad/wear/repeat/i18n PASS; repair181 integrated; merge after179/#96 verified | FoodStorageSystem removal safety, StoragePanel/HTML/i18n, PathWearSystem, own tests/browser/docs |
-| #129 Brightness of explored areas outside sight | Claude | `claude/fog-dim-slider` | [#171](https://github.com/tom161819/Newgame/pull/171) | PR open; fog/walls/brightness/i18n smokes PASS | systems/FogOfWarSystem.js (memory brightness), TerrainRenderer.js (memory tint), MapMemoryRenderer.js, ui/SettingsPanel.js, GameStateSerializer.js (settings field excluded), index.html + style.css settings row, i18n, tests/memory-brightness.test.js, scripts/memory-brightness-smoke.mjs |
-| #126 Remembered rocks stay lit outside sight | Claude | `claude/fog-rock-memory` (from `claude/fog-dim-slider`) | [#172](https://github.com/tom161819/Newgame/pull/172) | PR open; merge after #171 | game/memoryTexture.js (new), TerrainRenderer.js (paintWall), MapMemoryRenderer.js, tests/memory-brightness.test.js, scripts/memory-brightness-smoke.mjs |
-| NEW02 (#120) One click opens a compact unit detail | Claude | `claude/unit-click-detail` | — | In progress | ui/UnitPanel.js, ui/UnitSelection.js, ui/dockedPanels.js (new), GameScene.js (open-dialog checks only), index.html (unit dialog class), style.css, scripts/unit-command-smoke.mjs |
-| AUD82 (#104) Minimap | Claude | `claude/minimap` | — | PR open | ui/Minimap.js (new), GameScene.js (create/update/destroy only), style.css, i18n, tests/minimap.test.js, scripts/minimap-smoke.mjs; game-canvas selectors in smokes (`canvas:not(.minimap-canvas)`) |
-| NEW03 (#121) Right click closes panels | Claude | `claude/right-click-close-panels` | [#169](https://github.com/tom161819/Newgame/pull/169) | PR open; right-click smoke PASS | ui/PanelDismiss.js (new), GameScene (pointerdown, 3 lines), scripts/right-click-smoke.mjs (new), browser-smoke |
+| S13 #58 Villager Needs & Happiness (M4), phase A: individual needs, Happiness, mood, panels | Claude | `claude/s13-needs` | — | Starting | new systems/NeedsSystem.js + data/needs.js, GameStateSerializer/Loader (schema 33 → release 0.5.0), UnitPanel + PopulationSidebar summary, HUD Kingdom Happiness, i18n, tests. Phase B (daily routine/home rest) waits for Codex #124 (WorkerAI idle) to merge, to avoid parallel edits of WorkerAI. |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
 In this order; one `status:ready` at a time. When an issue is merged, verified on Pages and closed, the next one becomes `status:ready`. Whoever sees fewer than three queued Codex issues adds more from the backlog. Claude does this at every check.
 
-1. [#96](https://github.com/tom161819/Newgame/issues/96) AUD68 repeated placement of farms and orchards (done/deployed)
-2. [#128](https://github.com/tom161819/Newgame/issues/128) NEW11 temporary stockpile: haul to Warehouse, dismantle (provides the dismantle interface)
-3. [#130](https://github.com/tom161819/Newgame/issues/130) NEW13 demolition with 50 % refund (reuses #128)
-4. [#124](https://github.com/tom161819/Newgame/issues/124) NEW07 idle residents gather at the Castle
-5. [#94](https://github.com/tom161819/Newgame/issues/94) AUD65 manual marking of rocks for Miners
-6. [#118](https://github.com/tom161819/Newgame/issues/118) NEW01-A Builders' workshop (mechanics; the art stays with Claude in #119)
+1. [#96](https://github.com/tom161819/Newgame/issues/96) done; [#128](https://github.com/tom161819/Newgame/issues/128) done
+2. [#130](https://github.com/tom161819/Newgame/issues/130) NEW13 demolition with 50 % refund (reuses #128)
+3. [#124](https://github.com/tom161819/Newgame/issues/124) NEW07 idle residents gather at the Castle
+4. [#94](https://github.com/tom161819/Newgame/issues/94) AUD65 manual marking of rocks for Miners
+5. [#118](https://github.com/tom161819/Newgame/issues/118) NEW01-A Builders' workshop (mechanics; the art stays with Claude in #119)
+6. [#98](https://github.com/tom161819/Newgame/issues/98) AUD71-A idle residents sit on a placeholder porch at their workplace (follows #124's central idle rule; porch art stays with Claude in #114)
 
 ## Kept backups (do not delete without the developer)
 
@@ -44,6 +38,8 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
 ## Done
+
+- 2026-11-06 Claude: #121 ([#169](https://github.com/tom161819/Newgame/pull/169)), batch [#178](https://github.com/tom161819/Newgame/pull/178) = #129/#126/#120/#104 + smoke fix #176, #174 versions ([#184](https://github.com/tom161819/Newgame/pull/184), [#186](https://github.com/tom161819/Newgame/pull/186), [#188](https://github.com/tom161819/Newgame/pull/188)), **M3 RELEASED 0.4.0** ([#187](https://github.com/tom161819/Newgame/pull/187), archive [#189](https://github.com/tom161819/Newgame/pull/189); tag `v0.4.0` → `375f1aa`; Pages 42214708789 + Verify 42215177100 Success). Codex #128 ([#180](https://github.com/tom161819/Newgame/pull/180)) merged.
 
 - 2026-11-06 PR179 / Issue96: merged1ede1ed210f80dfbe8e50154af62cbc2dc118a22 after exact final CI42195939745 SUCCESS;697 tests/changelog/build and relevant native repeated farm/orchard/Fog/Load/rightclick/pave-under/walls/ownership PASS. Actual Pages42196320133 build127820327813 AND deploy127830563932 SUCCESS for the exact merge, including full simulation/save/archive/Studio gates. Issue96 closed/done.128 already claimed/review in180, never relabel an active task ready.
 - 2026-11-06 PR181 Pages repair: merged84f23d5 after final CI42192615092;696 tests/changelog/build and reproduced rightclick→pave-under+current Load PASS. Actual Pages42193129545 build127809725953/deploy127810899847 SUCCESS. Restored fixture world instead of leaking a real Move command; no production command changes or skipped assertions.
