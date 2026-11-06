@@ -1,0 +1,87 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { workerScene } from './helpers/workerScene.js';
+import { NEEDS,happinessOf,moodFor,mainProblem } from '../src/data/needs.js';
+import { POPULATION } from '../src/data/jobs.js';
+import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
+import { loadGameState } from '../src/systems/GameStateLoader.js';
+import { sortedPopulation } from '../src/ui/populationData.js';
+globalThis.document??={querySelector:()=>({textContent:''})};
+
+const scene=()=>{const s=workerScene(undefined,{starter:true});s.workerSystem.unsubscribe?.();return s;};
+const day=s=>s.gameTime.dayDuration;
+const add=(s,type,x,y)=>{const d=s.objectRegistry.require(type),b={id:s.buildings.length+100,type,x,y,definition:d,tiles:[]};s.buildings.push(b);return b;};
+const person=(s,tile)=>{const w=s.workerSystem.create(tile);return w;};
+
+test('S13 formula: weighted Happiness minus the unpaid penalty; moods and the main problem',()=>{
+  assert.equal(happinessOf({food:100,rest:100,housing:100,safety:100}),100);assert.equal(happinessOf({food:0,rest:0,housing:0,safety:0}),0);
+  assert.equal(happinessOf({food:80,rest:25,housing:100,safety:70}),Math.round(80*.35+25*.25+100*.25+70*.15),'the issue example: 65 %');
+  assert.equal(happinessOf({food:100,rest:100,housing:100,safety:100},30),70,'unpaid wages counted once as a separate penalty');
+  assert.deepEqual([moodFor(70).id,moodFor(69).id,moodFor(40).id,moodFor(39).id,moodFor(25).id,moodFor(24).id],['happy','neutral','neutral','unhappy','unhappy','critical']);
+  assert.equal(mainProblem({food:80,rest:25,housing:100,safety:70}),'rest','Main problem: Low Rest');assert.equal(mainProblem({food:100,rest:100,housing:100,safety:100}),null);
+  assert.equal(mainProblem({food:100,rest:100,housing:100,safety:100},10),'wages');
+});
+
+test('S13 every resident has own needs; Food follows only the existing daily meal (no second consumption); Rest follows work',()=>{
+  const s=scene(),a=person(s,{x:40,y:40}),b=person(s,{x:41,y:40});s.inventory.add('bread',3);const bread=s.inventory.count('bread');
+  s.foodSystem.syncResidents();s.foodSystem.residents.get(a.id).hungry=true;a.workState='Working';b.workState='Waiting';
+  s.needs.step(day(s)/2);
+  const ra=s.needs.records.get(a.id),rb=s.needs.records.get(b.id);
+  assert.equal(ra.food,100-NEEDS.food.declinePerDay/2,'a missed meal lowers Food gradually');assert.equal(rb.food,100);
+  assert.equal(ra.rest,100-NEEDS.rest.drainPerDay/2,'work tires');assert.equal(rb.rest,100,'waiting does not');
+  assert.equal(s.inventory.count('bread'),bread,'needs never consume food themselves');
+  s.foodSystem.residents.get(a.id).hungry=false;s.needs.step(day(s)/4);assert.equal(ra.food,100,'after a real meal Food recovers');
+  a.workState='Waiting';s.needs.step(day(s)/4);assert.equal(ra.rest,100-NEEDS.rest.drainPerDay/2-NEEDS.rest.drainPerDay/4+NEEDS.rest.recoverPerDay/4,'half a day of work, a quarter more, then a quarter of rest');
+  const st=s.needs.status(a);assert.equal(st.housing,100);assert.equal(st.home.kind,'settlement');assert.ok(st.happiness>0&&st.happiness<=100);
+});
+
+test('S13 updates follow the central game clock at most once a second and stop while paused',()=>{
+  const s=scene(),w=person(s,{x:40,y:40});w.workState='Working';s.foodSystem.syncResidents();
+  const before=s.needs.revision;s.gameTime.update(400);s.gameTime.update(400);assert.equal(s.needs.revision,before,'no update before a full second');
+  s.gameTime.update(400);assert.equal(s.needs.revision,before+1);assert.ok(s.needs.records.get(w.id).rest<100);
+  const rest=s.needs.records.get(w.id).rest;s.gameTime.paused=true;s.gameTime.update?.(5000);assert.equal(s.needs.records.get(w.id).rest,rest,'pause freezes needs');
+});
+
+test('S13 Housing: base settlement places, then 5 per completed House; residents beyond capacity are homeless',()=>{
+  const s=scene();const people=Array.from({length:POPULATION.maximum+6},(_,i)=>person(s,{x:10+(i%30),y:10+Math.floor(i/30)}));
+  let homes=s.needs.homes();assert.equal(people.filter(p=>!homes.has(p.id)).length,6,'six above the base capacity have no home');
+  const house=add(s,'house',70,70);homes=s.needs.homes();
+  const housed=people.filter(p=>homes.get(p.id)?.kind==='house');assert.equal(housed.length,POPULATION.houseCapacity);assert.ok(housed.every(p=>homes.get(p.id).buildingId===house.id));
+  const homeless=people.find(p=>!homes.has(p.id));assert.equal(s.needs.status(homeless).housing,0);assert.equal(s.needs.status(homeless).homeless,true);
+  assert.equal(new Set([...homes.keys()]).size,homes.size,'one home per resident');
+});
+
+test('S13 Safety: base 45, finished Castle +25, tower +15, Barracks or a soldier +10, a recent attack lowers it for a day',()=>{
+  const s=scene(),w=person(s,{x:50,y:50});w.position={x:50.5,y:50.5};assert.equal(s.needs.status(w).safety,45);
+  const castle=add(s,'castle',48,48);assert.equal(s.needs.status(w).safety,70);
+  castle.construction={state:'planned'};assert.equal(s.needs.status(w).safety,45,'blueprints give no safety');castle.construction={state:'complete'};
+  add(s,'tower',52,52);assert.equal(s.needs.status(w).safety,85);add(s,'barracks',45,52);assert.equal(s.needs.status(w).safety,95);
+  s.needs.step(1000);w.currentHP-=5;s.needs.step(1000);assert.equal(s.needs.status(w).safety,95-NEEDS.safety.attack.penalty,'attacked just now');
+  s.gameTime.totalElapsed+=day(s)/2;assert.equal(s.needs.status(w).safety,95-NEEDS.safety.attack.penalty/2,'fades over a day');
+  s.gameTime.totalElapsed+=day(s);assert.equal(s.needs.status(w).safety,95);
+  const far=person(s,{x:5,y:5});far.position={x:5.5,y:5.5};assert.equal(s.needs.status(far).safety,45);
+});
+
+test('S13 kingdom summary and Happiness sort; the king and visitors have no needs',()=>{
+  const s=scene();assert.equal(s.needs.summary().happiness,null,'no residents: no bonus or penalty');
+  const a=person(s,{x:40,y:40}),b=person(s,{x:41,y:40});s.needs.records.set(b.id,{id:b.id,food:10,rest:10,hp:b.currentHP,attackedAt:null});
+  const sum=s.needs.summary();assert.equal(sum.population,2);assert.equal(sum.hungry,1);assert.equal(sum.tired,1);assert.equal(sum.happiness,Math.round((s.needs.status(a).happiness+s.needs.status(b).happiness)/2));
+  const order=sortedPopulation([a,b],{sortBy:'happiness',direction:'asc',profession:'all'},'',{happiness:w=>s.needs.status(w).happiness});assert.deepEqual(order.map(w=>w.id),[b.id,a.id],'lowest first');
+  const visitor=s.workerSystem.create({x:42,y:40},{isSubject:false});assert.equal(s.needs.status(visitor),null);assert.equal(s.needs.status(s.character),null);
+});
+
+test('S13 Save/Load keeps every resident\'s needs exactly; damaged records are rejected; the dead are not saved',()=>{
+  const s=scene(),a=person(s,{x:40,y:40}),b=person(s,{x:41,y:40});a.workState='Working';s.needs.step(day(s)/3);s.needs.records.get(b.id).food=33.5;s.needs.records.get(a.id).attackedAt=s.gameTime.totalElapsed;
+  const saved=validateGameState(serializeGameState(s));assert.equal(saved.needs.records.length,2);
+  const r=scene();loadGameState(r,structuredClone(saved));assert.deepEqual(validateGameState(serializeGameState(r)).needs,saved.needs);
+  assert.deepEqual(r.needs.status(r.workerSystem.workers.get(a.id)),s.needs.status(a),'the same needs, mood and problem after Load');
+  for(const bad of [x=>x.needs.records[0].food=101,x=>x.needs.records[0].id='ghost',x=>x.needs.records.push({...x.needs.records[0]}),x=>x.needs.records[0].attackedAt=x.time.totalElapsed+1,x=>delete x.needs.records[0].rest])
+    {const copy=structuredClone(saved);bad(copy);assert.throws(()=>validateGameState(copy));}
+  b.currentHP=0;b.isAlive=false;s.workerSystem.onDeath?.(b);assert.equal(validateGameState(serializeGameState(s)).needs.records.length,1);
+});
+
+test('S13 performance: 200 residents update in one step without per-frame work',()=>{
+  const s=scene();for(let i=0;i<200;i++){const w=person(s,{x:5+(i%80),y:5+Math.floor(i/80)});w.workState=i%2?'Working':'Waiting';}
+  const start=performance.now();s.needs.step(1000);const sum=s.needs.summary();const ms=performance.now()-start;
+  assert.equal(sum.population,200);assert.ok(ms<200,`${ms} ms for a step and a summary of 200 residents`);
+});

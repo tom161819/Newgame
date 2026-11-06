@@ -10,7 +10,34 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Unemployed residents and idle Haulers gather at reachable Castle meeting points without crowding entrances or standing on paved roads. Haulers keep accepting global deliveries while walking there, and use safe nearby waiting when no Castle is reachable.
 - New workers keep an unemployed appearance until physically reaching their workplace. Global Haulers change at their Castle meeting point or first real task, and Builders at their work site. Reassignment, manual commands and Save/Load keep the appearance consistent.
 
+## [0.6.0] - 2026-11-06
+<!-- version: {"title":"Builder demolition and physical material recovery","type":"feature","reconstructed":false,"saveVersion":34} -->
+### Added
+
 - Finished buildings can be dismantled by Builders after confirmation, with physical work, cancellation and current Save/Load. Completion leaves half their construction materials on the ground, rounded down, and preserves stored goods, production inputs and transport ownership. The Castle is protected; empty Starter Stockpiles keep their separate action.
+
+## [0.5.1] - 2026-11-06
+<!-- version: {"title":"Event feed above the minimap","type":"feature","reconstructed":false,"saveVersion":33} -->
+### Added
+- Event feed above the minimap: short messages about a finished building, a new resident, a death, a resident leaving, an attack on a resident, a new season and a food shortage. At most five are shown, newest on top; each fades after about 8 seconds (12 for important ones) and stays while the game is paused.
+
+### Fixed
+- The Notices panel no longer covers the minimap: notices, the event feed and the minimap now stack in one column in the bottom-right corner of the map.
+- On phones the minimap is drawn smaller instead of being scaled, so clicking it centres the camera on the right spot.
+
+## [0.5.0] - 2026-11-06
+<!-- version: {"title":"Villager needs and Happiness (S13 phase A)","type":"feature","reconstructed":false,"saveVersion":33} -->
+### Added
+- Villager needs: every permanent resident now has Food, Rest, Housing and Safety (0–100 %), a Happiness score, a mood (Happy, Neutral, Unhappy or Critical) and a main problem. Food follows the existing daily meal, so no food is used twice. Rest falls during active work and recovers while waiting. Housing comes from the settlement's places and completed Houses. Safety rises near a finished Castle, tower, Barracks or soldiers and drops for a day after an attack. Unpaid wages lower Happiness.
+- The villager panel shows these needs as bars with the mood, the main problem and the home. The top bar shows Kingdom Happiness; clicking it opens Population, which now summarises hungry, tired and homeless residents and can sort by Happiness.
+- Needs are measured and shown only for now: they do not yet change work speed, cause strikes or make villagers leave.
+
+### Changed
+- Saved games use a new format (33) for the needs. Games saved by earlier versions cannot be loaded; start a new game.
+
+## [0.4.0] - 2026-11-06
+<!-- version: {"title":"M3: Stone pavement, wheelwright, wagons, stables and housing","type":"milestone","reconstructed":false,"saveVersion":32} -->
+### Added
 
 - After a Warehouse is built, the empty Starter Stockpile can be dismantled with confirmation once every reservation and transport has finished. Haulers use their existing routes to clear available goods; food waits safely for a Granary. The cleared footprint leaves worn ground that recovers naturally.
 

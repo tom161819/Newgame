@@ -6,6 +6,7 @@ import { TALENTS,TALENT_XP_BONUS } from '../data/economy.js';
 import { carryCapacity,IDLE_STONE,defaultStoneCollection,TRANSPORT_MODES } from '../data/logistics.js';
 import { cargoLabel,transportLabel } from './transportLabels.js';
 import { blockingDialog } from './dockedPanels.js';
+import { renderNeeds } from './NeedsDisplay.js';
 
 export class UnitPanel {
   constructor(scene){
@@ -26,6 +27,8 @@ export class UnitPanel {
     // #120: compact icon commands through the existing UnitCommands; the name shows as a tooltip on hover or focus.
     for(const [action,icon]of [['hold','⏸'],['resume','▶']]){const button=element('button','icon-command',icon);button.type='button';button.dataset.unitCommand=action;button.addEventListener('click',()=>{scene.workerSystem.commands[action](this.unit);this.refresh();scene.unitSelection?.draw();},options);this.commandControls.append(button);}
     document.querySelector('#unit-job-controls').append(this.commandControls);
+    // S13: the resident's needs, Happiness, mood, main problem and home.
+    this.needs=element('section','unit-needs');this.needs.id='unit-needs';this.needs.hidden=true;document.querySelector('#unit-job-controls').after(this.needs);
     this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.close();},options);
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!e.repeat&&this.dialog.open&&!blockingDialog(document)){e.preventDefault();this.close();}},options);this.dialog.addEventListener('close',()=>this.restoreInput(),options);
   }
@@ -52,6 +55,7 @@ export class UnitPanel {
       document.querySelector('#unit-unpaid').textContent=t('unit.unpaid',{amount:s.wageSystem.unpaid(u).toFixed(2)});
       document.querySelector('#unit-workplace').textContent=t('unit.workplace',{place:u.profession==='hauler'?t('unit.wholeKingdom'):s.workplaceSystem?.building(u)?.definition.name??t('unit.notAssigned')});
     }
+    renderNeeds(this.needs,worker&&s.needs?s.needs.status(u):null);
     const signature=JSON.stringify([u.skills,u.naturalTalent,language()]);
     if(this.skillSignature!==`${u.id}:${signature}`){
       const rows=Object.entries(SKILLS).map(([id,name])=>{const skill=u.skills[id],talented=id===u.naturalTalent,row=element('div',`skill-row${talented?' talented-skill':''}`);row.dataset.skill=id;row.append(element('strong','',`${name}${talented?' ★':''}`),element('span','',t('unit.skillLevel',{level:skill.level})),element('span','',skill.level===skill.maxLevel?t('unit.xpMax'):t('unit.skillXp',{current:format(skill.currentXP),next:skill.xpToNextLevel})),element('small','',id==='logistics'?t('unit.haulerCapacity',{count:carryCapacity({...u,profession:'hauler'})}):`${Math.round((1+(skill.level-1)*WORK_RULES.efficiencyPerLevel)*100)} %${talented?' · +20 % XP':''}`));return row;});
@@ -60,5 +64,5 @@ export class UnitPanel {
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){this.dialog.close();this.restoreInput();if(!this.destroyed)this.scene.unitSelection?.draw();}
-  destroy(){this.destroyed=true;this.close();this.controller.abort();this.commandControls.remove();this.transportRow.remove();}
+  destroy(){this.destroyed=true;this.close();this.needs?.remove();this.controller.abort();this.commandControls.remove();this.transportRow.remove();}
 }

@@ -1,4 +1,5 @@
 import { StableSystem } from '../../src/systems/StableSystem.js';
+import { NeedsSystem } from '../../src/systems/NeedsSystem.js';
 import { VehicleSystem } from '../../src/systems/VehicleSystem.js';
 import { MilitarySystem } from '../../src/systems/MilitarySystem.js';
 import { captureMapKnowledge } from '../../src/game/mapMemoryObjects.js';
@@ -84,6 +85,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
   if(!randomizeTalents){const create=scene.workerSystem.create.bind(scene.workerSystem);scene.workerSystem.create=(tile,options={})=>{const w=create(tile,{...options,randomize:false});w.naturalTalent='woodcutting';w.initialSkills=structuredClone(w.skills);return w;};}
   scene.foodSystem=new FoodSystem(scene.inventory,objectRegistry.require('meat'),()=>{},{time:scene.gameTime,scene,subscribe:seasons});scene.production=new ProductionSystem(scene.gameTime,scene.inventory,()=>scene.buildings);scene.wageSystem=new WageSystem(scene);
   if(seasons)scene.attractiveness=new KingdomAttractivenessSystem(scene);
+  scene.needs=new NeedsSystem(scene);
   if(workplaces||construction||farming||foodProduction||logistics)scene.workplaceSystem=new WorkplaceSystem(scene);
   if(construction)scene.constructionSystem=new ConstructionSystem(scene,{onComplete:b=>{scene.towerViews.set(b.id,scene.createBuildingView(b.definition,b));scene.refreshWallConnections();},onCancel:b=>{scene.towerViews.delete(b.id);scene.refreshWallConnections();}});
   if(logistics&&starter){if(scene.gameSettings?.startingCastle)createStartingCastle(scene,scene.character.tile);createStartingStockpile(scene,scene.character.tile);}

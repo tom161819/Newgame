@@ -1,6 +1,23 @@
 [
   {
     "schema": 1,
+    "commit": "375f1aa83b97e6ab8661a14b1a4c7fa1fa365011",
+    "tree": "8e218a2411ccd0ce33fd603d9c14d2a242a6ea2b",
+    "date": "2026-11-06T12:20:07+01:00",
+    "sequence": 192,
+    "subject": "Merge pull request #187 from tom161819/claude/m3-release",
+    "name": "Merge pull request #187 from tom161819/claude/m3-release",
+    "description": "Merge pull request #187 from tom161819/claude/m3-release",
+    "basePath": "/Newgame/versions/375f1aa83b97e6ab8661a14b1a4c7fa1fa365011/",
+    "verification": {
+      "tests": true,
+      "build": true,
+      "browser": true
+    },
+    "originalVersion": "0.4.0"
+  },
+  {
+    "schema": 1,
     "commit": "02a3a43ace8adc993aea7a392424d7cdf4e7dec9",
     "tree": "49b1e79b6bf90152c2e69e9fbc01ad74221208d2",
     "date": "2026-11-04T19:14:22Z",
