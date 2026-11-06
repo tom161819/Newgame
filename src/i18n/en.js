@@ -5,6 +5,10 @@ export default {
   // Independent Granary capacities (#123).
   'storage.granary.raw':'Raw Materials {used}/{capacity} · Incoming {incoming} · Free {free}',
   'storage.granary.food':'Food {used}/{capacity} · Incoming {incoming} · Free {free}',
+  // Seasonal field tending (#122).
+  'work.message.Tending crops':'Tending crops',
+  'work.message.Walking to tend crops':'Walking to tend crops',
+  'work.message.Waiting at farmhouse':'Waiting at farmhouse',
   // Employment exclusions (#131).
   'employment.exclude.local':'Disable employment here',
   'employment.exclude.type':'Disable employment for this building type ({name})',
