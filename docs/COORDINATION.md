@@ -36,6 +36,7 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 
 ## Done
 
+- 2026-11-06 [#170](https://github.com/tom161819/Newgame/pull/170) #163 (Claude): Stablehands keep a tamed horse; villagers are never trapped on a shared tile. Merge aaa11ab; stables smoke 15/15.
 - 2026-11-06 PR165 / Issue143: merged90eb356 after exact-head CI42160766881;662 tests + changelog/build, native staffing/editor/employment/military/wheelwright/stables and final editor browser PASS. Pages42163373128 build AND deploy SUCCESS for the exact merge, full browser/save/archive/Studio included. Issue143 closed/done.
 
 - 2026-11-06 PR164 / Issue123: merged da21f0c after exact-head CI42158316333;655 tests, changelog/build and Granary/tending browser PASS. Pages42159725044 build+deploy completed SUCCESS in normal failed-job retry (original deployment timed out in GitHub syncing_files, no source failure). Issue123 closed/done. Direct public URL read is blocked by session proxy CONNECT403; no network rule changes or bypass.
