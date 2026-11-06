@@ -34,6 +34,7 @@ import { ledgerSmoke } from './ledger-smoke.mjs';
 import { smeltingSmoke } from './smelting-smoke.mjs';
 import { militarySmoke } from './military-smoke.mjs';
 import { pavementSmoke } from './pavement-smoke.mjs';
+import { rightClickSmoke } from './right-click-smoke.mjs';
 import { paveUnderSmoke } from './pave-under-smoke.mjs';
 import { devFpsSmoke } from './dev-fps-smoke.mjs';
 import { memoryBrightnessSmoke } from './memory-brightness-smoke.mjs';
@@ -115,6 +116,7 @@ try{
   if(args.includes('--full')||args.includes('--stables'))await stablesSmoke(page);
   if(args.includes('--full')||args.includes('--horse-wagon'))await horseWagonSmoke(page);
   if(args.includes('--full')||args.includes('--pavement'))await pavementSmoke(page,{screenshot:process.env.PAVEMENT_SHOT??null});
+  if(args.includes('--full')||args.includes('--right-click'))await rightClickSmoke(page);
   if(args.includes('--full')||args.includes('--pave-under'))await paveUnderSmoke(page);
   if(args.includes('--full')||args.includes('--dev-fps'))await devFpsSmoke(page);
   if(args.includes('--full')||args.includes('--fog-brightness'))await memoryBrightnessSmoke(page,{screenshot:process.env.BRIGHTNESS_SHOT??null});

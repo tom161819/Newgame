@@ -1,7 +1,7 @@
 import './styles.css';
 import { loadStudioData } from './data.js';
 import { buildCatalog, filterCatalog, CATEGORIES } from './lib/specs.js';
-import { STATUSES, STATUS_LABELS, readLocal, writeLocal, reviewState, updateLocal, discardLocal, buildExportManifest, pendingChanges } from './lib/approvals.js';
+import { STATUSES, STATUS_LABELS, readLocal, writeLocal, reviewState, reviewSummary, updateLocal, discardLocal, buildExportManifest, pendingChanges } from './lib/approvals.js';
 import { TIMES, timePreset } from './lib/lighting.js';
 import { heightInPixels, projectPoint } from './lib/projection.js';
 import { renderModel, spriteMetadata, rendererAvailable } from './render/spriteRenderer.js';
@@ -19,7 +19,7 @@ const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').ma
 const glReady = rendererAvailable();
 
 const state = {
-  view: 'assets', source: 'all', category: 'all', query: '',
+  view: 'assets', source: 'all', category: 'all', query: '', review: 'all',
   selected: catalog.studio[0]?.id ?? catalog.game[0]?.id, tab: 'compare',
   zoom: 1.5, background: 'grass', grid: true, footprint: true, bounds: true, human: true, gamePixels: false, time: 'day', sceneZoom: 1.25,
   local: readLocal(storage),
@@ -28,12 +28,13 @@ try { Object.assign(state, pickUi(JSON.parse(storage?.getItem(UI_KEY) ?? '{}')))
 function pickUi(saved) {
   const out = {};
   for (const key of ['source', 'category', 'tab', 'background', 'time']) if (typeof saved[key] === 'string') out[key] = saved[key];
+  if (['all', 'pending'].includes(saved.review)) out.review = saved.review;
   for (const key of ['zoom', 'sceneZoom']) if (Number.isFinite(saved[key])) out[key] = saved[key];
   for (const key of ['grid', 'footprint', 'bounds', 'human', 'gamePixels']) if (typeof saved[key] === 'boolean') out[key] = saved[key];
   return out;
 }
 function saveUi() {
-  try { storage?.setItem(UI_KEY, JSON.stringify(Object.fromEntries(['source', 'category', 'tab', 'background', 'time', 'zoom', 'sceneZoom', 'grid', 'footprint', 'bounds', 'human', 'gamePixels'].map(k => [k, state[k]])))); } catch { /* optional */ }
+  try { storage?.setItem(UI_KEY, JSON.stringify(Object.fromEntries(['source', 'review', 'category', 'tab', 'background', 'time', 'zoom', 'sceneZoom', 'grid', 'footprint', 'bounds', 'human', 'gamePixels'].map(k => [k, state[k]])))); } catch { /* optional */ }
 }
 
 // ---------- helpers ----------
@@ -76,6 +77,10 @@ function preferredVariant(asset) {
   const chosen = asset.variants.find(variant => reviewState({ repo: data.approvals, local: state.local, assetId: asset.id, variant }).preferred);
   return chosen ?? asset.variants[0];
 }
+// #127 Needs review: the variants of a studio asset that still wait for approval (local edits included).
+const review = asset => reviewSummary({ repo: data.approvals, local: state.local, asset });
+const pendingMode = () => state.review === 'pending';
+const libraryFilter = extra => ({ source: state.source, pendingOnly: pendingMode(), isPending: item => review(item).pending.length > 0, ...extra });
 function assetStatus(asset) {
   const states = asset.variants.map(variant => reviewState({ repo: data.approvals, local: state.local, assetId: asset.id, variant }));
   const status = states.some(s => s.effective.status === 'approved' && !s.outdated) ? 'approved' : states.some(s => s.effective.status === 'review') ? 'review' : 'draft';
@@ -86,13 +91,15 @@ function assetStatus(asset) {
 function renderLibrary() {
   const sources = [['all', 'All'], ['studio', 'Studio'], ['game', 'In game']];
   $('#library-source').replaceChildren(...sources.map(([id, label]) => h('button', { type: 'button', 'aria-pressed': String(state.source === id), onclick: () => { state.source = id; saveUi(); renderLibrary(); } }, label)));
-  const counts = Object.fromEntries(CATEGORIES.map(c => [c.id, filterCatalog(catalog.all, { category: c.id, source: state.source }).length]));
+  const waiting = filterCatalog(catalog.all, { pendingOnly: true, isPending: item => review(item).pending.length > 0 }).length;
+  $('#library-review').replaceChildren(...[['all', 'All', null], ['pending', 'Needs review', waiting]].map(([id, label, count]) => h('button', { type: 'button', 'data-review': id, 'aria-pressed': String(state.review === id), title: id === 'pending' ? 'Only designs that still wait for approval; approved designs and current game sprites are hidden.' : 'Every asset', onclick: () => { state.review = id; saveUi(); renderAll(); } }, label, count === null ? null : h('span', { class: 'count' }, ` ${count}`))));
+  const counts = Object.fromEntries(CATEGORIES.map(c => [c.id, filterCatalog(catalog.all, libraryFilter({ category: c.id })).length]));
   const chips = [{ id: 'all', label: 'All' }, ...CATEGORIES].map(c => h('button', { type: 'button', class: 'chip', 'aria-pressed': String(state.category === c.id), onclick: () => { state.category = c.id; saveUi(); renderLibrary(); } },
     c.label, c.id === 'all' ? null : h('span', { class: 'count' }, counts[c.id])));
   $('#library-categories').replaceChildren(...chips);
-  const items = filterCatalog(catalog.all, { category: state.category, source: state.source, query: state.query });
+  const items = filterCatalog(catalog.all, libraryFilter({ category: state.category, query: state.query }));
   const list = $('#library-list');
-  if (!items.length) { list.replaceChildren(h('li', { class: 'empty' }, 'No assets match this filter.')); return; }
+  if (!items.length) { list.replaceChildren(h('li', { class: 'empty' }, pendingMode() ? 'Nothing here waits for approval: every studio design in this filter is approved, and current game sprites are hidden in Needs review.' : 'No assets match this filter.')); return; }
   const groups = [['studio', 'Studio assets'], ['game', 'Current game sprites']];
   list.replaceChildren(...groups.flatMap(([source, label]) => {
     const group = items.filter(item => item.source === source);
@@ -112,7 +119,8 @@ function libraryItem(item) {
     } catch { /* thumbnail is optional */ }
   }
   const status = item.source === 'game' ? h('span', { class: 'pill game' }, 'In game') : (() => {
-    const s = assetStatus(item); return h('span', { class: 'review-line' }, pill(s.status), s.local ? h('span', { class: 'pill local', title: 'Changed in this browser, not committed' }, 'local') : null);
+    const s = assetStatus(item), r = review(item), mixed = r.pending.length && r.approved;
+    return h('span', { class: 'review-line' }, mixed ? h('span', { class: 'pill review', title: `${r.approved} approved, ${r.pending.length} still waiting` }, `${r.pending.length} of ${r.total} to review`) : pill(s.status), s.local ? h('span', { class: 'pill local', title: 'Changed in this browser, not committed' }, 'local') : null);
   })();
   return h('button', { type: 'button', class: 'library-item', 'aria-current': String(state.selected === item.id && state.view === 'assets'), onclick: () => select(item.id) },
     thumb, h('span', { class: 'label' }, h('span', { class: 'name' }, item.name), h('span', { class: 'meta' }, `${item.id} · ${item.footprint.width}×${item.footprint.height}`)), status);
@@ -176,7 +184,10 @@ function compareView(asset) {
     h('div', { class: 'tool' }, checkbox('Tile grid', 'grid', 'show-grid'), checkbox('Footprint', 'footprint', 'show-footprint'), checkbox('Bounds', 'bounds', 'show-bounds'), checkbox('Human', 'human', 'show-human'), checkbox('Game pixels', 'gamePixels', 'show-pixels')),
   ]);
   if (!glReady) return [controls, h('p', { class: 'empty' }, 'WebGL is unavailable in this browser, so 3D recipes cannot be rendered.')];
-  return [controls, h('section', { class: 'variants', 'aria-label': 'Variants' }, asset.variants.map(variant => variantCard(asset, variant)))];
+  // Needs review: only the variants that still wait; the approved ones are a click away.
+  const pending = pendingMode() ? review(asset).pending : null, shown = pending?.length ? asset.variants.filter(v => pending.includes(v.id)) : asset.variants;
+  const hidden = asset.variants.length - shown.length, note = hidden ? h('p', { class: 'review-note' }, `${hidden} approved variant${hidden === 1 ? '' : 's'} hidden by Needs review. `, h('button', { type: 'button', class: 'link', id: 'show-all-variants', onclick: () => { state.review = 'all'; saveUi(); renderAll(); } }, 'Show all variants')) : null;
+  return [controls, ...(note ? [note] : []), h('section', { class: 'variants', 'aria-label': 'Variants' }, shown.map(variant => variantCard(asset, variant)))];
 }
 
 function variantCard(asset, variant) {

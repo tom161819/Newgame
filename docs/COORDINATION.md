@@ -14,10 +14,19 @@ PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da2
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
 | #129 Brightness of explored areas outside sight | Claude | `claude/fog-dim-slider` | [#171](https://github.com/tom161819/Newgame/pull/171) | PR open; fog/walls/brightness/i18n smokes PASS | systems/FogOfWarSystem.js (memory brightness), TerrainRenderer.js (memory tint), MapMemoryRenderer.js, ui/SettingsPanel.js, GameStateSerializer.js (settings field excluded), index.html + style.css settings row, i18n, tests/memory-brightness.test.js, scripts/memory-brightness-smoke.mjs |
-| #163 Stablehand loses tamed horse while leading | Claude | `claude/fix-stablehand-leading` | — | PR open; stables smoke 15/15 PASS (was ~1/10 failing) | systems/StableSystem.js, WorkerSystem.js (navigation), i18n, tests/stables.test.js |
 | NEW17 (#145) Farmer plot establishment | Codex | `codex/farmer-plot-establishment` | [#167](https://github.com/tom161819/Newgame/pull/167) | Implemented: 677 tests/changelog/build and native establishment/ownership/tending browser PASS; schema32; complete --full browser PASS on885; actual166 merge4e29 integrated; fresh678 tests/changelog/build and native UI/planting/tending-presence/employment browsers PASS; final CI/166 Pages pending; merge only after actual166 Pages | crop costs, shared ConstructionSystem/BuilderAI/ConstructionUI + ConstructionMaterials contracts, FarmingSystem, Workplaces presence hook, XP rules, diagnostics, schema32 validation, own i18n/tests/browser/docs. Reuse sites/progress/tasks; preserve166 ownership. |
 | NEW18 (#146) Farm plot ownership | Codex | `codex/farm-plot-ownership` | [#166](https://github.com/tom161819/Newgame/pull/166) | Implemented: 670 tests + changelog/build and native ownership/tending browser PASS; schema31; foundation before145; actual165 merge90eb356 integrated; fresh670 tests/changelog/build/browser PASS; clear map/desktop+phone visibility and Escape verified; merged4e29fe3 after final-head CI42165693609 SUCCESS; await actual Pages42166266800 | data/farmPlots.js, buildings placement, FarmingSystem, GameStateSerializer/Loader schema31, FarmConnections overlay/focus, farm-only responsive CSS, WorkplacePanel/FarmingPanel, own i18n/tests/browser/docs. Prices and farmer construction stay in145. |
-| NEW21 (#149) Studio ruins designs | Claude | `claude/studio-ruins` | [#161](https://github.com/tom161819/Newgame/pull/161) | PR open; review only | studio/src/generators/ruins.js (new), art/assets/decorations/ruin*, art/sprites/ruin*, art/approvals.json, art/style-guide.json (soot, charcoal) |
+
+## Codex queue (developer: Codex always has several issues queued)
+
+In this order; one `status:ready` at a time. When an issue is merged, verified on Pages and closed, the next one becomes `status:ready`. Whoever sees fewer than three queued Codex issues adds more from the backlog. Claude does this at every check.
+
+1. [#96](https://github.com/tom161819/Newgame/issues/96) AUD68 repeated placement of farms and orchards (`status:ready`)
+2. [#128](https://github.com/tom161819/Newgame/issues/128) NEW11 temporary stockpile: haul to Warehouse, dismantle (provides the dismantle interface)
+3. [#130](https://github.com/tom161819/Newgame/issues/130) NEW13 demolition with 50 % refund (reuses #128)
+4. [#124](https://github.com/tom161819/Newgame/issues/124) NEW07 idle residents gather at the Castle
+5. [#94](https://github.com/tom161819/Newgame/issues/94) AUD65 manual marking of rocks for Miners
+6. [#118](https://github.com/tom161819/Newgame/issues/118) NEW01-A Builders' workshop (mechanics; the art stays with Claude in #119)
 
 ## Kept backups (do not delete without the developer)
 
@@ -26,6 +35,13 @@ PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da2
 
 ## Done
 
+- 2026-11-06 [#161](https://github.com/tom161819/Newgame/pull/161) #149 (Claude): Studio ruins designs (soot/charred wood palette) for review.
+
+- 2026-11-06 [#168](https://github.com/tom161819/Newgame/pull/168) #127 (Claude): Asset Studio "Needs review" filter. Merged df27e00.
+
+- 2026-11-06 PR173: Builder gives up a goal tile occupied by a standing unit; fixes the pavement smoke timeout on main's Pages (merge aaa11ab, whose failed-job retry then deployed SUCCESS). 10/10 local pavement smokes PASS (main failed 1 in 3). Merged 733af7d.
+
+- 2026-11-06 [#170](https://github.com/tom161819/Newgame/pull/170) #163 (Claude): Stablehands keep a tamed horse; villagers are never trapped on a shared tile. Merge aaa11ab; stables smoke 15/15.
 - 2026-11-06 PR165 / Issue143: merged90eb356 after exact-head CI42160766881;662 tests + changelog/build, native staffing/editor/employment/military/wheelwright/stables and final editor browser PASS. Pages42163373128 build AND deploy SUCCESS for the exact merge, full browser/save/archive/Studio included. Issue143 closed/done.
 
 - 2026-11-06 PR164 / Issue123: merged da21f0c after exact-head CI42158316333;655 tests, changelog/build and Granary/tending browser PASS. Pages42159725044 build+deploy completed SUCCESS in normal failed-job retry (original deployment timed out in GitHub syncing_files, no source failure). Issue123 closed/done. Direct public URL read is blocked by session proxy CONNECT403; no network rule changes or bypass.

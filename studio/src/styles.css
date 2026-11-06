@@ -206,3 +206,8 @@ dialog::backdrop { background: rgba(10, 14, 12, 0.45); }
   .scene-canvas { height: 380px; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+/* #127 Needs review filter */
+.segmented.review-filter button[data-review="pending"][aria-pressed="true"] { box-shadow: inset 0 -2px 0 var(--status-review); }
+.review-note { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
+button.link { border: 0; background: none; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; }

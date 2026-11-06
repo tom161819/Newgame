@@ -153,9 +153,12 @@ export function buildCatalog({ specs, generators, style, gameDefinitions = [], g
   return { studio, game, all: [...studio, ...game] };
 }
 
-export function filterCatalog(items, { category = 'all', source = 'all', query = '' } = {}) {
+// `pendingOnly` keeps studio designs that still wait for approval (`isPending` decides from the real review state);
+// sprites already in the game are never pending.
+export function filterCatalog(items, { category = 'all', source = 'all', query = '', pendingOnly = false, isPending = () => true } = {}) {
   const needle = query.trim().toLowerCase();
   return items.filter(item => (category === 'all' || item.category === category)
     && (source === 'all' || item.source === source)
+    && (!pendingOnly || (item.source !== 'game' && isPending(item)))
     && (!needle || `${item.name} ${item.id}`.toLowerCase().includes(needle)));
 }
