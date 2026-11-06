@@ -4,7 +4,7 @@ import { tileCenter, worldToGrid, gridToWorld } from './isometric.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { PATH_WEAR } from '../data/pathWear.js';
 import { canStep } from './pathfinding.js';
-import { VISIBILITY, FOG_STYLE } from '../systems/FogOfWarSystem.js';
+import { VISIBILITY, FOG_STYLE, memoryTint } from '../systems/FogOfWarSystem.js';
 import { MEMORY_DIRECTIONS } from '../systems/MapMemory.js';
 
 const CHUNK_SIZE = 10;
@@ -235,7 +235,11 @@ export class TerrainRenderer {
       // black, never the normal olive scene background in undiscovered areas.
       camera.setBackgroundColor?.(fog?.enabled?'#000':this.originalBackground);
       this.fogMode=mode;this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';
+    }else if(fog&&this.fogBrightness!==undefined&&this.fogBrightness!==fog.memoryBrightness){
+      // The slider lives in Settings, which pause the game loop: repaint the shown chunks now, the rest when they scroll in.
+      this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';
     }
+    this.fogBrightness=fog?.memoryBrightness;
     if(fog&&this.fogRevision!==fog.revision){
       const previous=this.paintedVisibility??new Set(),current=fog.visibleIndices;
       // Consumers may skip revisions (Save, several source updates, a paused
@@ -271,7 +275,7 @@ export class TerrainRenderer {
     if (cacheKey === this.lastView && fog && this.outcropFogRevision!==fog.revision) {
       const fresh=this.outcropFogRevision===fog.revision-1;this.outcropFogRevision=fog.revision;
       if(fresh)for(const index of [...fog.added,...fog.removed]){const x=index%fog.width,y=Math.floor(index/fog.width),key=`${x},${y}`;if(!this.tileData({x,y})[0])continue;
-        const tile=this.tiles.get(key);if(!tile){if(fog.added.includes(index)){this.lastView='';break;}continue;}tile.setTint(fog.displayState({x,y})===VISIBILITY.EXPLORED?0x4d504d:0xffffff);}
+        const tile=this.tiles.get(key);if(!tile){if(fog.added.includes(index)){this.lastView='';break;}continue;}tile.setTint(fog.displayState({x,y})===VISIBILITY.EXPLORED?memoryTint(fog.memoryBrightness):0xffffff);}
       else this.lastView='';
     }
     if (cacheKey === this.lastView) {this.repaintDirty();return;}
@@ -302,9 +306,9 @@ export class TerrainRenderer {
       if(!this.tileData({x,y})[0]||state===VISIBILITY.UNEXPLORED)continue;
       if(fog?.enabled&&!fog.isInSightTile({x,y})&&!fog.explored[y*fog.width+x])continue;
       const key=`${x},${y}`; visible.add(key);
-      if(this.tiles.has(key)){this.tiles.get(key).setTint(state===VISIBILITY.EXPLORED?0x4d504d:0xffffff);continue;}
+      if(this.tiles.has(key)){this.tiles.get(key).setTint(state===VISIBILITY.EXPLORED?memoryTint(fog.memoryBrightness):0xffffff);continue;}
       const wall=this.wallPool.pop()??this.scene.add.image(0,0,this.wallTexture).setOrigin(this.outcrop.origin?.x??0.5,this.outcrop.origin?.y??1);
-      wall.setPosition(p.x,p.y).setDepth(p.y+(this.outcrop.depth?.offset??0)).setTint(state===VISIBILITY.EXPLORED?0x4d504d:0xffffff).setVisible(true);
+      wall.setPosition(p.x,p.y).setDepth(p.y+(this.outcrop.depth?.offset??0)).setTint(state===VISIBILITY.EXPLORED?memoryTint(fog.memoryBrightness):0xffffff).setVisible(true);
       this.tiles.set(key,wall);
     }
     for(const [key,tile] of this.tiles) if(!visible.has(key)) {
