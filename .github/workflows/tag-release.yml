@@ -1,0 +1,43 @@
+name: Tag released version
+
+# #174: every release (MAJOR/MINOR/PATCH) gets the tag v<package.json version> on the first main commit that
+# carries it (the merge of its release pull request). Agents' sessions cannot push tags, so GitHub does it here.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tag-release
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out main history and tags
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+
+      - name: Tag the release if it is not tagged yet
+        shell: bash
+        run: |
+          target="$(node scripts/release-tag.mjs)"
+          if [ -z "$target" ]; then echo 'The current release is already tagged.'; exit 0; fi
+          read -r tag commit <<< "$target"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git tag -a "$tag" "$commit" -m "$tag"
+          git push origin "refs/tags/$tag"
+          printf '### Tagged %s\n\n%s\n' "$tag" "$commit" >> "$GITHUB_STEP_SUMMARY"
