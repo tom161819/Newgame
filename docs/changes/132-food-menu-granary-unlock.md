@@ -13,7 +13,7 @@ Blueprints and delivered materials do not unlock the Lodge. Completion, world ch
 SAVE_VERSION stays37; no persistent field or validation migration changes. Current saves derive availability from their actual completed buildings, while existing Lodges remain valid without the new prerequisite.
 
 ## Testing
-25 focused category/unlock/workplace tests passed, including physical Granary construction, rejected placement before payment, current Load, loss/restoration of prerequisite and Czech/English requirement text. Full tests, production/version/changelog checks and actual browser completion/Load/demolition coverage are pending.
+25 focused category/unlock/workplace tests passed, including physical Granary construction, rejected placement before payment, current Load, loss/restoration of prerequisite and Czech/English requirement text. 770 full tests after latest parent integration, version policy0.9.1→0.9.2 and changelog validation passed. Native menu ordering, actual Granary/Farmhouse construction and exact current Load passed; the new demolition fixture used the wrong API owner, now corrected to scene.demolition; renewed final build and complete browser cycle are running.
 
 ## Notes for the next agent
 Explicit stack194→196→198→this task, with successful actual Pages before each successor merge; expected patch0.9.2. Final porch art114 and workshop art119 remain outside this task.
