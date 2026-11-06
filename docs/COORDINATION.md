@@ -23,6 +23,7 @@ Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke pau
 |---|---|---|---|---|---|
 | AUD65 #94 Manual rock mining | Codex | `codex/manual-rock-mining` (stacked on124) | [#194](https://github.com/tom161819/Newgame/pull/194) | Implemented; schema36/release0.8.0 after185 actual Pages;750 tests/version/changelog/build + native real-mouse10Stones/ledger/Load/phone/commands/Needs/eventfeed PASS | own rock marking tool/UI, GameScene/GameApplication narrow input/Escape hooks, MiningWork/WorkerAI/WorkplaceSystem/free Miner selection, current schema serializer/loader/terrain validation, XP/SkillSystem, physical Drop/FoodProduction reuse and cargo provenance, i18n, own tests/browser/docs |
 | #119 Builders' Workshop concepts for approval (art for Codex #118) | Claude | `claude/builder-workshop-art` | — | In review | studio/src/generators/workshop.js (`shed` body), art/assets/buildings/builders-workshop, art/sprites/builders-workshop, art/approvals.json |
+| #114 workplace porch / seating concepts (art for Codex #98) | Claude | `claude/idle-verandas-art-studio` (on #199) | — | In review | studio/src/generators/props.js (bench/stool/table/basket), art/assets/decorations/{workplace,trade}-porch, art/sprites, art/approvals.json |
 
 ## Codex queue (developer: Codex always has several issues queued)
 

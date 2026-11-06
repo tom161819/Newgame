@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "workplace-porch",
+  "variantId": "workplace-porch-veranda",
+  "name": "Open veranda, 2 seats",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "f63c375b",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 99,
+  "height": 69,
+  "anchor": {
+    "x": 49,
+    "y": 43
+  },
+  "origin": {
+    "x": 0.49495,
+    "y": 0.62319
+  },
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "base": {
+    "x": 65,
+    "y": 67
+  },
+  "baseOrigin": {
+    "x": 0.65657,
+    "y": 0.97101
+  },
+  "visualHeight": 67,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.764,
+  "lights": []
+}

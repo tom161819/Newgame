@@ -74,6 +74,11 @@ Object.assign(PROPS, {
   banner: (x, z, { material = 'banner' } = {}) => [box([0.03, 0.9, 0.03], [x, 0, z], 'wood_dark'), box([0.02, 0.32, 0.22], [x + 0.02, 0.52, z + 0.11], material), sphere([0.03, 0.03, 0.03], [x, 0.9, z], 'gold_trim', 0)],
   weaponCrate: (x, z) => [...PROPS.crate(x, z, { size: 0.26 }), ...[-0.06, 0, 0.06].map(o => box([0.02, 0.12, 0.02], [x + o, 0.26, z + o * 0.5], 'leather')), box([0.12, 0.02, 0.02], [x, 0.36, z], 'gold_trim')],
   horse: (x, z, { angle = -Math.PI / 4, coat = 'horse_bay', saddle = false } = {}) => horse([x, 0, z], { angle, coat, saddle }).parts,
+  // #114 seating for idle workers (#98): seat tops at about 0.17, the height a seated figure needs.
+  bench: (x, z, { length = 0.5, r = 0 } = {}) => [box([length, 0.04, 0.12], [x, 0.15, z], 'wood', { rotation: r }), ...[-1, 1].map(s => box([0.04, 0.15, 0.1], [x + s * (length / 2 - 0.05) * Math.cos(r), 0, z - s * (length / 2 - 0.05) * Math.sin(r)], 'wood_dark', { rotation: r }))],
+  stool: (x, z) => [cylinder({ radiusBottom: 0.07, radiusTop: 0.07, height: 0.03, segments: 10 }, [x, 0.14, z], 'wood'), ...[[-0.04, -0.03], [0.04, -0.03], [0, 0.045]].map(([dx, dz]) => box([0.025, 0.14, 0.025], [x + dx, 0, z + dz], 'wood_dark'))],
+  table: (x, z, { r = 0 } = {}) => [box([0.4, 0.04, 0.26], [x, 0.24, z], 'wood', { rotation: r }), ...[[-0.16, -0.09], [0.16, -0.09], [-0.16, 0.09], [0.16, 0.09]].map(([dx, dz]) => box([0.04, 0.24, 0.04], [x + dx * Math.cos(r) + dz * Math.sin(r), 0, z - dx * Math.sin(r) + dz * Math.cos(r)], 'wood_dark'))],
+  basket: (x, z, { y = 0 } = {}) => [cylinder({ radiusBottom: 0.07, radiusTop: 0.09, height: 0.09, segments: 10 }, [x, y, z], 'twigs'), sphere([0.045, 0.03, 0.035], [x - 0.02, y + 0.09, z], 'cloth_ochre', 1), sphere([0.04, 0.028, 0.032], [x + 0.03, y + 0.09, z + 0.02], 'cloth_ochre', 1)],
   saddleRack: (x, z) => [box([0.04, 0.32, 0.04], [x - 0.12, 0, z], 'wood_dark'), box([0.04, 0.32, 0.04], [x + 0.12, 0, z], 'wood_dark'), box([0.3, 0.05, 0.08], [x, 0.3, z], 'wood_dark'), box([0.24, 0.06, 0.26], [x, 0.35, z], 'leather'), box([0.04, 0.14, 0.28], [x, 0.24, z], 'banner')],
 });
 
