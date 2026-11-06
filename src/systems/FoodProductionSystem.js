@@ -4,17 +4,22 @@ import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { advanceConstruction } from './ConstructionProgress.js';
 import { tileKey } from '../game/stones.js';
 import { carryCapacity } from '../data/logistics.js';
+import { recipeFor,defaultRecipeKey } from '../data/production.js';
 
 const first=object=>Object.entries(object)[0];
 export class FoodProductionSystem {
   constructor(scene){this.scene=scene;this.records=new Map();this.nextTransfer=1;this.nextEmployment=0;for(const b of scene.buildings)this.register(b);}
   get storage(){return this.scene.foodStorage;}
-  inputShortage(building){const recipe=buildingDefinition(building).recipe;if(Object.keys(recipe.input).length<2)return null;const input=this.storage.locations.get(`input-${building.id}`);return Object.entries(recipe.input).find(([resource,amount])=>(input?.stock[resource]??0)+this.storage.incoming(input?.id,resource)+this.storage.available(resource)<amount)?.[0]??null;}
+  // S12: the recipe the next batch uses (a workshop with choices keeps the player's choice in its record).
+  recipe(building){return recipeFor(buildingDefinition(building),this.records.get(building.id)?.recipe);}
+  cycleRecipe(record,building){return recipeFor(buildingDefinition(building),record.cycle?.recipe??record.recipe);}
+  setRecipe(buildingId,key){const record=this.records.get(buildingId),b=record&&this.building(buildingId),d=b&&buildingDefinition(b);if(!d?.recipes||!Object.hasOwn(d.recipes,key))return false;record.recipe=key;this.scene.logisticsTasks?.invalidate?.();return true;}
+  inputShortage(building){const recipe=this.recipe(building);if(Object.keys(recipe.input).length<2)return null;const input=this.storage.locations.get(`input-${building.id}`);return Object.entries(recipe.input).find(([resource,amount])=>(input?.stock[resource]??0)+this.storage.incoming(input?.id,resource)+this.storage.available(resource)<amount)?.[0]??null;}
   building(id){return this.scene.buildings.find(b=>b.id===id&&buildingIsComplete(b)&&buildingDefinition(b).recipe)??null;}
   register(building){
     if(!buildingIsComplete(building)||!buildingDefinition(building).recipe)return;
     this.storage.register(building);
-    if(!this.records.has(building.id))this.records.set(building.id,{buildingId:building.id,auto:true,nextCycle:1,cycle:null,outputReservation:null,completed:0});
+    if(!this.records.has(building.id)){const key=defaultRecipeKey(buildingDefinition(building));this.records.set(building.id,{buildingId:building.id,auto:true,nextCycle:1,cycle:null,outputReservation:null,completed:0,...(key?{recipe:key}:{})});}
   }
   cancelWorker(worker){
     const task=worker.workTask;if(!['foodPickup','foodDeliver','produce','harvest'].includes(task?.kind))return;
@@ -100,7 +105,7 @@ export class FoodProductionSystem {
   updateWorker(worker){
     const building=this.scene.workplaceSystem.building(worker),record=building&&this.records.get(building.id);
     if(!record){worker.workState='Waiting';worker.workMessage='Waiting for production workplace';return;}
-    const recipe=buildingDefinition(building).recipe,outputId=`output-${building.id}`,inputId=`input-${building.id}`;
+    const recipe=record.cycle?this.cycleRecipe(record,building):this.recipe(building),outputId=`output-${building.id}`,inputId=`input-${building.id}`;
     if(worker.workTask?.kind==='produce'){
       if(!record.auto){this.scene.workerSystem.ai.cancel(worker);worker.workState='Waiting';worker.workMessage='Auto Production OFF';return;}
       if(!this.scene.workplaceSystem.atWorkplace(worker)&&!worker.nextTile&&!worker.path.length)worker.moveTo(this.scene.workplaceSystem.goals(worker));
@@ -127,6 +132,7 @@ export class FoodProductionSystem {
     }
     const undelivered=Object.entries(recipe.input).find(([resource,needed])=>(input.stock[resource]??0)<needed);
     if(!record.cycle&&undelivered){worker.workState='Waiting';worker.workMessage=`Waiting for delivered ${undelivered[0]}`;return;}
+    if(!record.cycle&&recipe.horse&&!this.scene.stables?.freeHorse()){worker.workState='Waiting';worker.workMessage='Waiting for a tamed horse in the Stables';return;}
     if(!record.cycle&&!recipe.vehicle&&!this.storage.findDestination(worker,outputResource,outputAmount)){worker.workState='Waiting';worker.workMessage='Storage is full or unreachable';return;}
     const route=this.storage.route(worker,[input]);
     if(route&&this.setTask(worker,'produce',route,{targetId:building.id})){worker.workState='Working';worker.workMessage=`Producing ${outputResource}`;}
@@ -179,7 +185,7 @@ export class FoodProductionSystem {
     for(const record of [...this.records.values()]){
       const building=this.building(record.buildingId);if(!building){this.remove(record);continue;}
       if(!record.auto)continue;
-      const recipe=buildingDefinition(building).recipe,workers=this.scene.workplaceSystem.employees(building).filter(w=>w.workTask?.kind==='produce'&&this.scene.workplaceSystem.atWorkplace(w));
+      const recipe=record.cycle?this.cycleRecipe(record,building):this.recipe(building),workers=this.scene.workplaceSystem.employees(building).filter(w=>w.workTask?.kind==='produce'&&this.scene.workplaceSystem.atWorkplace(w));
       if(!workers.length)continue;
       if(!record.cycle){
         const [outputResource,outputAmount]=first(recipe.output),inputId=`input-${building.id}`;
@@ -187,8 +193,11 @@ export class FoodProductionSystem {
         // S12: a vehicle (Wheelbarrow) is not stored; VehicleSystem rolls it out of the output buffer onto the map.
         const destination=recipe.vehicle?null:this.storage.findDestination(workers[0],outputResource,outputAmount);if(!recipe.vehicle&&!destination)continue;
         const id=`food-cycle-${building.id}-${record.nextCycle}`,capacity=recipe.vehicle?null:this.storage.reserve('capacity',destination.location.id,outputResource,outputAmount,id);if(!recipe.vehicle&&!capacity)continue;
+        // S12 Horse Wagon: a tamed horse is reserved for this batch before anything is consumed.
+        const horseId=recipe.horse?this.scene.stables?.freeHorse()??null:undefined;if(recipe.horse&&!horseId)continue;
         if(!this.storage.withdrawBatch(inputId,recipe.input)){if(capacity)this.storage.release(capacity);continue;}
-        record.nextCycle++;record.cycle={id,requiredWork:recipe.duration,workDone:0,progress:0,state:'building',contributions:{},inputs:{...recipe.input},outputReservation:capacity,startedAt:this.scene.gameTime.totalElapsed};
+        if(recipe.horse)this.scene.stables.reserveForWorkshop(horseId,building.id);
+        record.nextCycle++;record.cycle={id,requiredWork:recipe.duration,workDone:0,progress:0,state:'building',contributions:{},inputs:{...recipe.input},outputReservation:capacity,startedAt:this.scene.gameTime.totalElapsed,...(record.recipe?{recipe:record.recipe}:{}),...(recipe.horse?{horseId}:{})};
       }
       const cycle=record.cycle,participants=workers.map(w=>({id:w.id,speed:this.scene.skillSystem.workEfficiency(w,recipe.skill),available:Math.min(delta,w.availableWorkMs??0,Math.max(0,this.scene.gameTime.totalElapsed-cycle.startedAt))}));
       if(advanceConstruction({construction:cycle},participants,delta))this.finish(record,building);
@@ -206,7 +215,7 @@ export class FoodProductionSystem {
   }
   finish(record,building){
     const cycle=record.cycle;if(!cycle||cycle.workDone<cycle.requiredWork)return false;
-    const recipe=buildingDefinition(building).recipe,[resource,amount]=first(recipe.output);
+    const recipe=this.cycleRecipe(record,building),[resource,amount]=first(recipe.output);
     if(!this.storage.deposit(`output-${building.id}`,resource,amount))return false;
     record.cycle=null;record.outputReservation=cycle.outputReservation;record.completed++;
     for(const [input,quantity]of Object.entries(cycle.inputs))this.scene.resourceLedger?.expense(input,quantity,recipe.inputSources?.[input]??`${dataName(buildingDefinition(building))} Processing`,{id:`processing:${cycle.id}:${input}`,entityId:building.id});

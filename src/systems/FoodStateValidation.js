@@ -1,7 +1,8 @@
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
+import { recipeFor,recipeResources } from '../data/production.js';
 import { PLAYER_START } from '../game/config.js';
 import { buildingIsComplete } from '../game/buildings.js';
-import { physicalResources,materialResources,storageResources,stockLocationId,carryCapacity,equipmentResources } from '../data/logistics.js';
+import { physicalResources,materialResources,storageResources,stockLocationId,carryCapacity,equipmentResources,MAX_TRIP_UNITS } from '../data/logistics.js';
 
 export function validateFoodState(s,registry,{check,number,integer,array}){
   const storage=s.foodStorage,production=s.foodProduction;
@@ -20,7 +21,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   for(const b of s.buildings)if(buildingIsComplete(b)){
     const d=registry.require(b.type),base={buildingId:b.id,x:b.x,y:b.y,width:d.width,height:d.height};
     if(d.storage&&(physical||!d.storage.accepts))expected.set(stockLocationId(b),{...base,kind:d.starter?'fallback':'storage',capacity:d.storage.capacity,allowed:storageResources(d,registry)});
-    if(d.recipe)for(const kind of ['input','output'])expected.set(`${kind}-${b.id}`,{...base,kind,capacity:d.bufferCapacity,allowed:Object.keys(d.recipe[kind])});
+    if(d.recipe)for(const kind of ['input','output'])expected.set(`${kind}-${b.id}`,{...base,kind,capacity:d.bufferCapacity,allowed:recipeResources(d,kind)});
     if(d.kit)expected.set(`kit-${b.id}`,{...base,kind:'kit',capacity:d.kit.capacity,allowed:equipmentResources(registry)});
   }
   const sites=new Map();
@@ -42,7 +43,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   }
   for(const r of storage.reservations){
     const l=locations.get(r.locationId);check(l&&!reservations.has(r.id)&&['stock','capacity'].includes(r.kind)&&l.allowed.includes(r.resource));reservations.set(r.id,r);
-    const id=String(r.id).match(/^food-reservation-(\d+)$/);check(id);integer(Number(id[1]),1,storage.nextReservation-1);integer(r.amount,1,r.siteId!=null&&r.owner===`site-${r.siteId}`?Number.MAX_SAFE_INTEGER:38);check(typeof r.owner==='string');
+    const id=String(r.id).match(/^food-reservation-(\d+)$/);check(id);integer(Number(id[1]),1,storage.nextReservation-1);integer(r.amount,1,r.siteId!=null&&r.owner===`site-${r.siteId}`?Number.MAX_SAFE_INTEGER:MAX_TRIP_UNITS);check(typeof r.owner==='string');
     if(r.siteId!=null)check(sites.has(r.siteId)&&(sites.get(r.siteId).materialSupply.required[r.resource]??0)>0);
   }
   for(const l of locations.values()){
@@ -61,7 +62,10 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   for(const r of production.records){
     const b=producers.find(b=>b.id===r.buildingId);check(b&&!records.has(b.id));records.set(b.id,r);check(typeof r.auto==='boolean');integer(r.nextCycle,1);integer(r.completed,0,r.nextCycle-1);
     check(r.nextCycle===1+r.completed+(r.cycle?1:0));
-    const recipe=registry.require(b.type).recipe,[outId,outAmount]=Object.entries(recipe.output)[0];
+    // S12: a workshop with recipe choices keeps the chosen one; a running batch keeps the recipe it started with.
+    const d=registry.require(b.type);if(d.recipes){check(Object.hasOwn(d.recipes,r.recipe));if(r.cycle)check(Object.hasOwn(d.recipes,r.cycle.recipe));}else check(r.recipe===undefined&&r.cycle?.recipe===undefined);
+    const recipe=recipeFor(d,r.cycle?.recipe??r.recipe),[outId,outAmount]=Object.entries(recipe.output)[0];
+    if(recipe.horse&&r.cycle)check(r.cycle.horseId!=null);else if(r.cycle)check(r.cycle.horseId===undefined);
     if(r.cycle){
       const c=r.cycle,match=String(c.id).match(new RegExp(`^food-cycle-${b.id}-(\\d+)$`));check(match);integer(Number(match[1]),1,r.nextCycle-1);
       check(!r.outputReservation&&c.state==='building'&&c.requiredWork===recipe.duration&&JSON.stringify(c.inputs)===JSON.stringify(recipe.input));number(c.workDone,0,c.requiredWork);number(c.progress,0,100);check(Math.abs(c.progress-100*c.workDone/c.requiredWork)<1e-7);number(c.startedAt,0,s.time.totalElapsed);

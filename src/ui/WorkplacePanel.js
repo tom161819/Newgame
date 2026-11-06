@@ -19,6 +19,8 @@ export class WorkplacePanel {
     this.miningDetails=element('p');this.miningDetails.id='mining-details';this.miningDetails.hidden=true;this.dialog.insertBefore(this.miningDetails,this.forestryDetails);
     document.querySelector('#close-workplace').addEventListener('click',()=>this.close(),options);
     document.querySelector('#assign-workplace-worker').addEventListener('click',()=>{document.querySelector('#workplace-candidates').hidden=!document.querySelector('#workplace-candidates').hidden;},options);
+    // S12: a workshop with several recipes (Wheelwright: Wheelbarrow or Horse Wagon); a running batch keeps its recipe.
+    document.querySelector('#recipe-choice').addEventListener('change',e=>{if(this.building)scene.foodProduction.setRecipe(this.building.id,e.target.value);this.refresh();},options);
     document.querySelector('#toggle-food-production').addEventListener('click',()=>{const record=scene.foodProduction.records.get(this.building?.id);if(record)scene.foodProduction.toggle(this.building.id,!record.auto);this.refresh();},options);
     this.dialog.addEventListener('click',e=>{
       const button=e.target.closest('button');if(!button)return;
@@ -47,12 +49,14 @@ export class WorkplacePanel {
     const recipePanel=document.querySelector('#food-production-details');recipePanel.hidden=!production;
     if(production){
       const format=items=>Object.entries(items).map(([id,n])=>`${n} ${s.objectRegistry.require(id).name}`).join(' + '),cycle=production.cycle;
-      document.querySelector('#food-production-recipe').textContent=t('workplace.recipe',{input:format(spec.recipe.input),output:format(spec.recipe.output),seconds:spec.recipe.duration/1000});
+      const recipe=s.foodProduction.recipe(b),choice=document.querySelector('#recipe-choice'),choiceRow=document.querySelector('#recipe-choice-row');choiceRow.hidden=!spec.recipes;
+      if(spec.recipes){if(choice.dataset.building!==String(b.id)||choice.options.length!==Object.keys(spec.recipes).length){choice.replaceChildren(...Object.entries(spec.recipes).map(([key,r])=>{const o=document.createElement('option');o.value=key;o.textContent=s.objectRegistry.require(Object.keys(r.output)[0]).name;return o;}));choice.dataset.building=String(b.id);}choice.value=production.recipe;}
+      document.querySelector('#food-production-recipe').textContent=t('workplace.recipe',{input:format(recipe.input),output:format(recipe.output),seconds:recipe.duration/1000})+(recipe.horse?` ${t('workplace.recipeHorse')}`:'');
       document.querySelector('#food-production-status').textContent=t('workplace.status',{state:!production.auto?t('workplace.paused'):cycle?t('workplace.producing'):employees[0]?.workMessage?workMessageLabel(employees[0].workMessage):t('workplace.waitingWorker'),count:production.completed});
       document.querySelector('#food-production-progress').value=cycle?.progress??0;
       const input=s.foodStorage.locations.get(`input-${b.id}`),output=s.foodStorage.locations.get(`output-${b.id}`);
       document.querySelector('#food-production-buffers').textContent=t('workplace.buffers',{input:format(input.stock)||t('transport.empty'),output:format(output.stock)||t('transport.empty')});
-      document.querySelector('#food-production-missing').textContent=cycle?t('workplace.batch',{list:format(cycle.inputs)}):t('workplace.missing',{list:format(Object.fromEntries(Object.entries(spec.recipe.input).map(([id,n])=>[id,Math.max(0,n-(input.stock[id]??0))])))});
+      document.querySelector('#food-production-missing').textContent=cycle?t('workplace.batch',{list:format(cycle.inputs)}):t('workplace.missing',{list:format(Object.fromEntries(Object.entries(recipe.input).map(([id,n])=>[id,Math.max(0,n-(input.stock[id]??0))])))});
       const toggle=document.querySelector('#toggle-food-production');toggle.textContent=t('workplace.auto',{state:t(production.auto?'state.on':'state.off')});toggle.setAttribute('aria-pressed',String(production.auto));
     }
     document.querySelector('#workplace-name').textContent=spec.name;const image=document.querySelector('#workplace-image');image.src=s.assets.previewURL(spec);image.alt=spec.name;

@@ -13,7 +13,7 @@ Codex PR138 (#131) first; PR142 (#122) then integrates that actual merge/schema2
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| NEW19 (#147) Joined walls overlap | Claude | `claude/wall-overlap` | — | PR open; #155 merged; 628 tests, walls/fog smokes PASS | game/FortificationView.js, game/wallShadows.js (new), wall-visibility smoke |
+| S12 phase D (#57) Horse Wagon | Claude | `claude/s12-horse-wagon` | — | PR open; schema 29; 633 tests, 62 full smokes PASS | data/production.js, objects/vehicles.js, FoodProduction/Storage/StateValidation, LogisticsTaskManager, ProductionDiagnostics, StableSystem, VehicleSystem, WorkerSystem (navigation), VehicleViews, WorkplacePanel, serializer |
 | Pages season-pixel regression after FoW optimization | Codex | `codex/pages-season-pixels` | — | Reproduced exact pixel failure; 618 tests, changelog/build, strict seasons/FoW/transition browser PASS; PR/CI pending | SeasonTransition + TerrainRenderer explicit complete-redraw contract, focused renderer/transition tests, seasons-menu smoke selection and docs. Coordinates with Claude fow-performance-pixels test-wait guards; fog-smoke/seasons-menu assertions untouched. No game data/schema or memory semantics changes. |
 | NEW14 (#131) Employment exclusions | Codex | `codex/employment-exclusions` | [#138](https://github.com/tom161819/Newgame/pull/138) | Draft PR; S12 phase A and FoW fixes integrated from maina6442d5, schema26 preserved; 616 tests, changelog/build and UI/staffing/priority Save26 browser PASS after integration; ready for current-head CI | EmploymentSystem/data employment, WorkplaceSystem assignment guard, WorkplacePanel, own EN/CS block, schema+employment validation only in GameStateSerializer, tests/browser smoke (ledger/smelting/military schema assertions use authored SAVE_VERSION), docs/changelog. Other S12 held logistics untouched. |
 
@@ -24,6 +24,7 @@ Codex PR138 (#131) first; PR142 (#122) then integrates that actual merge/schema2
 
 ## Done
 
+- 2026-11-06 [#157](https://github.com/tom161819/Newgame/pull/157) NEW19 #147 (Claude): wall kit shadows on the ground layer. Merge 824c99e; 631 tests, walls/fog smokes, CI succeeded.
 - 2026-11-06 [#156](https://github.com/tom161819/Newgame/pull/156) NEW16 #144 (Claude): Developer settings with an FPS overlay (F3). Merge 2e9bbb5; 629 tests, dev-fps smoke, CI succeeded.
 - 2026-11-05 [#155](https://github.com/tom161819/Newgame/pull/155) NEW20 #148 (Claude): walls keep their kit pieces after culling. Merge d50c7a8; 626 tests, walls smoke fails without the fix, CI succeeded.
 - 2026-11-05 [#154](https://github.com/tom161819/Newgame/pull/154) S12 phase C (#57, Claude): Stables, Stablehands tame horses, Knight on horseback, schema 28. Merge 3126010; 626 tests, 57 full smokes, CI succeeded.
