@@ -29,16 +29,16 @@ export class KingLogisticsSystem {
     const actor=this.actor,cargo=actor.cargo;if(!cargo)return false;this.cancel();this.workflowSiteId=resumeSiteId;
     if(cargo.siteId!=null&&!this.materials?.site(cargo.siteId))delete cargo.siteId;
     if(cargo.siteId!=null&&buildingId==null)return this.startSiteDeposit(cargo.siteId);
-    const route=buildingId==null?this.storage.findDestination(actor,cargo.resource,cargo.amount,{partial:true}):this.storage.route(actor,[...this.storage.locations.values()].filter(l=>l.buildingId===buildingId&&this.storage.isStock(l)&&l.allowed.includes(cargo.resource)&&this.storage.room(l.id)>0));
+    const route=buildingId==null?this.storage.findDestination(actor,cargo.resource,cargo.amount,{partial:true}):this.storage.route(actor,[...this.storage.locations.values()].filter(l=>l.buildingId===buildingId&&this.storage.isStock(l)&&l.allowed.includes(cargo.resource)&&this.storage.room(l.id,cargo.resource)>0));
     if(!route){this.scene.setStatus(t('status.cargoNoStorage'));return false;}
-    const amount=Math.min(cargo.amount,this.storage.room(route.location.id)),id=`king-transfer-${this.nextId++}`,capacityReservation=this.storage.reserve('capacity',route.location.id,cargo.resource,amount,id);if(!capacityReservation)return false;
+    const amount=Math.min(cargo.amount,this.storage.room(route.location.id,cargo.resource)),id=`king-transfer-${this.nextId++}`,capacityReservation=this.storage.reserve('capacity',route.location.id,cargo.resource,amount,id);if(!capacityReservation)return false;
     const task={id,kind:'deposit',destinationId:route.location.id,resource:cargo.resource,amount,capacityReservation,goal:{...route.destination},retryAt:0,...(cargo.siteId!=null?{siteId:cargo.siteId}:{})};
     if(!this.move(task,route))return false;this.scene.setStatus(t('status.kingCarrying',{count:cargo.amount,resource:this.scene.objectRegistry.require(cargo.resource).name}));return true;
   }
   startSiteDeposit(siteId){
     const cargo=this.actor.cargo,location=this.storage.locations.get(`site-${siteId}`);if(!cargo||cargo.siteId!==siteId||!location)return false;
     const route=this.storage.route(this.actor,[location]);if(!route)return false;
-    const id=`king-transfer-${this.nextId++}`,amount=Math.min(cargo.amount,this.storage.room(location.id)),capacityReservation=this.storage.reserve('capacity',location.id,cargo.resource,amount,id);if(!capacityReservation)return false;
+    const id=`king-transfer-${this.nextId++}`,amount=Math.min(cargo.amount,this.storage.room(location.id,cargo.resource)),capacityReservation=this.storage.reserve('capacity',location.id,cargo.resource,amount,id);if(!capacityReservation)return false;
     this.storage.reservations.get(capacityReservation).siteId=siteId;
     return this.move({id,kind:'siteDeposit',siteId,destinationId:location.id,resource:cargo.resource,amount,capacityReservation,goal:{...route.destination},retryAt:0},route);
   }
@@ -77,7 +77,7 @@ export class KingLogisticsSystem {
       const drop=choice.sourceDropId&&this.scene.dropSystem.drops.get(choice.sourceDropId),source=drop?{...drop.tile,kind:'ground',width:1,height:1}:this.storage.locations.get(choice.sourceId),destination=this.storage.locations.get(choice.destinationId);
       if(!source||!destination||drop&&!this.scene.workerSystem.reservations.available(`drop:${drop.id}`,'king'))continue;
       const route=this.storage.route(actor,[source]);if(!route||!this.storage.route(actor,[destination]))continue;
-      const amount=Math.min(carryCapacity(actor,choice.resource),choice.amount,this.storage.room(destination.id));if(amount<1)continue;
+      const amount=Math.min(carryCapacity(actor,choice.resource),choice.amount,this.storage.room(destination.id,choice.resource));if(amount<1)continue;
       const id=`king-transfer-${this.nextId++}`,capacityReservation=this.storage.reserve('capacity',destination.id,choice.resource,amount,id);if(!capacityReservation)continue;
       this.storage.reservations.get(capacityReservation).siteId=site.id;
       const stockReservation=drop?null:this.storage.splitStock(choice.allocationId,amount,id);

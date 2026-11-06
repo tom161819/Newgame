@@ -1,3 +1,4 @@
+import { GRANARY_GROUP_CAPACITY } from '../granaryCapacity.js';
 import { WORKPLACES } from '../workplaces.js';
 import { FOOD_RECIPES,FOOD_RULES,FOOD_RESOURCE_IDS } from '../foodProduction.js';
 
@@ -7,7 +8,7 @@ export const foodBuildings=[
   {id:'bakery',name:'Bakery',width:2,height:2,cost:{stone:10},constructionTime:25000,visualHeight:110,
     workplace:WORKPLACES.bakery,recipe:FOOD_RECIPES.bakery,description:'Two Bakers turn 2 Flour into 4 Bread with 30 seconds of active work and physical deliveries.'},
   {id:'granary',name:'Granary',width:3,height:3,cost:{stone:10},constructionTime:30000,visualHeight:125,
-    storage:{capacity:200,resources:FOOD_RESOURCE_IDS},description:'A physical store with room for 200 food units. Haulers serve every store in the kingdom.'},
+    storage:{capacity:GRANARY_GROUP_CAPACITY.raw,resources:FOOD_RESOURCE_IDS},description:'A physical store with separate room for 200 raw inputs and 200 finished food units. Haulers serve every store in the kingdom.'},
 ].map(d=>({...d,category:'building',buildingCategory:'food',sprite:`/assets/buildings/${d.id}/${d.id}.svg`,walkable:false,collectible:false,buildable:true,
   interactions:d.storage?['inspect_storage']:['manage_workers'],renderMode:'procedural',renderer:'food_building',origin:{x:.5,y:.9},depth:{offset:0},
   bufferCapacity:d.recipe?FOOD_RULES.bufferCapacity:undefined,

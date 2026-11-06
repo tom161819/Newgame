@@ -95,7 +95,7 @@ export class MilitarySystem {
       for(const resource of kit.allowed){const missing=this.missing(kit.buildingId,resource);
         if(missing>0)for(const source of stores)if(storage.free(source.id,resource)>0)tasks.push({priority:20,sourceId:source.id,destinationId:kit.id,resource,amount:missing});
         const surplus=storage.free(kit.id,resource)-(need[resource]??0);
-        if(surplus>0)for(const destination of stores)if(destination.allowed.includes(resource)&&storage.room(destination.id)>0)tasks.push({priority:40,sourceId:kit.id,destinationId:destination.id,resource,amount:surplus});
+        if(surplus>0)for(const destination of stores)if(destination.allowed.includes(resource)&&storage.room(destination.id,resource)>0)tasks.push({priority:40,sourceId:kit.id,destinationId:destination.id,resource,amount:surplus});
       }
     }
     return tasks;
@@ -109,7 +109,7 @@ export class MilitarySystem {
       if(!worker?.isAlive||worker.assignedWorkplaceId!==order.barracksId||!this.barracks(order.barracksId)){this.cancel(order.id);continue;}
       if(order.state==='supplying'){const kit=unitKit(order.type);if(this.storage.withdrawBatch(`kit-${order.barracksId}`,kit)){order.items=kit;order.state='training';}else continue;}
       if(!this.scene.workplaceSystem.atWorkplace(worker))continue;
-      order.workDone=Math.min(order.required,order.workDone+Math.max(0,delta));
+      order.workDone=Math.min(order.required,order.workDone+Math.max(0,delta)*(this.scene.workplaceSystem.workFactor?.(worker)??1));
       if(order.workDone>=order.required)this.finish(order,worker);
     }
   }

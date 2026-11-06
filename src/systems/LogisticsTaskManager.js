@@ -24,16 +24,16 @@ export class LogisticsTaskManager {
       const [outputResource]=Object.entries(recipe.output)[0],output=storage.locations.get(`output-${building.id}`),available=storage.free(output.id,outputResource);
       if(available>0){
         const cap=storage.reservations.get(record.outputReservation);
-        for(const destination of stores)if(destination.allowed.includes(outputResource)&&(cap?destination.id===cap.locationId:storage.room(destination.id)>0))this.catalog.push({priority:30,sourceId:output.id,destinationId:destination.id,resource:outputResource,amount:available,capacityReservation:cap?.id,outputBuildingId:building.id});
+        for(const destination of stores)if(destination.allowed.includes(outputResource)&&(cap?destination.id===cap.locationId:storage.room(destination.id,outputResource)>0))this.catalog.push({priority:30,sourceId:output.id,destinationId:destination.id,resource:outputResource,amount:available,capacityReservation:cap?.id,outputBuildingId:building.id});
       }
     }
     // One-way consolidation only: never shuttle goods between dedicated stores.
     for(const source of stores.filter(l=>l.kind==='fallback'))for(const [resource]of Object.entries(source.stock))if(storage.free(source.id,resource)>0)
-      for(const destination of stores.filter(l=>l.kind==='storage'&&l.allowed.includes(resource)&&storage.room(l.id)>0))this.catalog.push({priority:40,sourceId:source.id,destinationId:destination.id,resource,amount:storage.free(source.id,resource)});
+      for(const destination of stores.filter(l=>l.kind==='storage'&&l.allowed.includes(resource)&&storage.room(l.id,resource)>0))this.catalog.push({priority:40,sourceId:source.id,destinationId:destination.id,resource,amount:storage.free(source.id,resource)});
     for(const drop of this.scene.dropSystem.drops.values())if(storage.manages(drop.resource)&&this.scene.character.order?.dropId!==drop.id){
       if(drop.siteId!=null&&this.scene.constructionSystem?.materials.site(drop.siteId))continue;
       const edible=this.scene.objectRegistry.require(drop.resource).edible||drop.resource==='meat';
-      for(const destination of stores)if(destination.allowed.includes(drop.resource)&&storage.room(destination.id)>0)this.catalog.push({priority:edible&&this.scene.foodSystem.shortage?10:35,sourceDropId:drop.id,destinationId:destination.id,resource:drop.resource,amount:drop.amount});
+      for(const destination of stores)if(destination.allowed.includes(drop.resource)&&storage.room(destination.id,drop.resource)>0)this.catalog.push({priority:edible&&this.scene.foodSystem.shortage?10:35,sourceDropId:drop.id,destinationId:destination.id,resource:drop.resource,amount:drop.amount});
     }
   }
   // Haulers serve the whole kingdom without a workplace. A Builder calls this with
@@ -50,7 +50,7 @@ export class LogisticsTaskManager {
     let attempts=0;
     for(const {task}of candidates){
       const destination=storage.locations.get(task.destinationId),drop=task.sourceDropId&&this.scene.dropSystem.drops.get(task.sourceDropId),existingCap=storage.reservations.get(task.capacityReservation);
-      const allocation=task.allocationId&&storage.reservations.get(task.allocationId),available=task.allocationId?(allocation?.owner===`site-${task.siteId}`?allocation.amount:0):drop?.amount??storage.free(task.sourceId,task.resource),room=existingCap?.amount??storage.room(task.destinationId);
+      const allocation=task.allocationId&&storage.reservations.get(task.allocationId),available=task.allocationId?(allocation?.owner===`site-${task.siteId}`?allocation.amount:0):drop?.amount??storage.free(task.sourceId,task.resource),room=existingCap?.amount??storage.room(task.destinationId,task.resource);
       let missing=task.amount;if(destination?.kind==='input'){const b=this.scene.buildings.find(b=>b.id===destination.buildingId),recipe=b&&this.scene.foodProduction.recipe(b);if(!b||this.scene.foodProduction.inputShortage(b))continue;missing=(recipe?.input[task.resource]??0)-(destination.stock[task.resource]??0)-storage.incoming(destination.id,task.resource);}
       if(destination?.kind==='kit')missing=this.scene.military?.missing(destination.buildingId,task.resource)??0;
       const amount=Math.min(cap(task.resource),available,room,missing);if(amount<=0||!destination||drop&&!this.scene.workerSystem.reservations.available(`drop:${drop.id}`,worker.id))continue;

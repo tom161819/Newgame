@@ -68,7 +68,7 @@ export class StableSystem {
     }
     if(job.phase==='taming'){
       worker.workState='Working';worker.workMessage='Taming a horse';horse.path=[];horse.wanderWait=Math.max(horse.wanderWait??0,1000);
-      job.progress+=delta*(this.scene.skillSystem?.workEfficiency(worker,'hunting')??1);
+      job.progress+=delta*(this.scene.skillSystem?.workEfficiency(worker,'hunting')??1)*(this.scene.workplaceSystem.workFactor?.(worker)??1);
       if(job.progress>=STABLE_RULES.stablehandTameMs){job.phase='leading';this.scene.activities?.emit('horseTamed',{actor:worker,objectType:'horse',quantity:1});}
       return true;
     }

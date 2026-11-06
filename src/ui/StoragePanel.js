@@ -32,7 +32,9 @@ export class StoragePanel {
     const sections=locations.map(l=>{
       const building=scene.buildings.find(b=>b.id===l.buildingId),section=element('section','storage-location'),title=element('h3','',storageName(scene,l.id));
       const used=storage.used(l),incoming=storage.incoming(l.id);
-      section.append(title,element('p','',t('storage.stored',{used,capacity:l.capacity,free:storage.room(l.id),incoming})));
+      section.append(title);const groups=storage.groups(l.id);
+      if(groups)for(const [group,values]of Object.entries(groups)){const row=element('p','',t(`storage.granary.${group}`,values));row.dataset.granaryGroup=group;section.append(row);}
+      else section.append(element('p','',t('storage.stored',{used,capacity:l.capacity,free:storage.room(l.id),incoming})));
       if(l.legacyOverflow)section.append(element('p','',t('storage.legacy',{count:l.legacyOverflow})));
       for(const resource of l.allowed){
         const row=element('p','',t('storage.row',{resource:scene.objectRegistry.require(resource).name,count:l.stock[resource]??0,reserved:storage.reserved(l.id,resource)})+' '),collect=element('button','',t('storage.collect'));collect.type='button';collect.dataset.kingCollect=resource;collect.dataset.storageId=l.id;collect.disabled=!!scene.character.cargo||storage.free(l.id,resource)<1;

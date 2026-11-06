@@ -77,7 +77,7 @@ export class FoodProductionSystem {
     const site=cargo.siteId!=null&&this.scene.constructionSystem?.materials.site(cargo.siteId),siteLocation=site&&this.storage.locations.get(`site-${site.id}`);
     if(cargo.siteId!=null&&!site)delete cargo.siteId;
     const route=siteLocation?this.storage.route(worker,[siteLocation]):this.storage.findDestination(worker,cargo.resource,cargo.amount,{partial:true});if(!route){worker.workState='Waiting';worker.workMessage='Waiting for reachable storage capacity';worker.aiCooldown=FOOD_RULES.searchInterval;return false;}
-    const amount=Math.min(cargo.amount,this.storage.room(route.location.id),carryCapacity(worker,cargo.resource)),transferId=`food-transfer-${this.nextTransfer++}`;
+    const amount=Math.min(cargo.amount,this.storage.room(route.location.id,cargo.resource),carryCapacity(worker,cargo.resource)),transferId=`food-transfer-${this.nextTransfer++}`;
     const capacityReservation=this.storage.reserve('capacity',route.location.id,cargo.resource,amount,transferId);if(!capacityReservation)return false;
     if(site)this.storage.reservations.get(capacityReservation).siteId=site.id;
     if(!this.setTask(worker,'foodDeliver',route,{transferId,destinationId:route.location.id,resource:cargo.resource,amount,capacityReservation,...(site?{siteId:site.id}:{})})){this.storage.release(capacityReservation);return false;}
@@ -199,7 +199,7 @@ export class FoodProductionSystem {
         if(recipe.horse)this.scene.stables.reserveForWorkshop(horseId,building.id);
         record.nextCycle++;record.cycle={id,requiredWork:recipe.duration,workDone:0,progress:0,state:'building',contributions:{},inputs:{...recipe.input},outputReservation:capacity,startedAt:this.scene.gameTime.totalElapsed,...(record.recipe?{recipe:record.recipe}:{}),...(recipe.horse?{horseId}:{})};
       }
-      const cycle=record.cycle,participants=workers.map(w=>({id:w.id,speed:this.scene.skillSystem.workEfficiency(w,recipe.skill),available:Math.min(delta,w.availableWorkMs??0,Math.max(0,this.scene.gameTime.totalElapsed-cycle.startedAt))}));
+      const cycle=record.cycle,participants=workers.map(w=>({id:w.id,speed:this.scene.skillSystem.workEfficiency(w,recipe.skill)*(this.scene.workplaceSystem.workFactor?.(w)??1),available:Math.min(delta,w.availableWorkMs??0,Math.max(0,this.scene.gameTime.totalElapsed-cycle.startedAt))}));
       if(advanceConstruction({construction:cycle},participants,delta))this.finish(record,building);
     }
     for(const location of [...this.storage.locations.values()])if(location.buildingId!=null&&!this.scene.buildings.some(b=>b.id===location.buildingId)){

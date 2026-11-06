@@ -213,6 +213,9 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 .talented-skill strong { color:#f0d78b; }
 
 .workplace-dialog { width:min(760px,calc(100vw - 24px)); }
+/* Farm connections remain visible beside the nonmodal inspector. */
+.farm-workplace-dialog { position:fixed; inset:144px 16px auto auto; margin:0; width:min(420px,calc(100vw - 24px)); max-height:calc(100dvh - 160px); z-index:30; }
+@media(max-width:760px){.farm-workplace-dialog { inset:auto 12px 12px; width:auto; max-height:42dvh; }}
 .buildings-panel { max-height:min(70dvh,600px); overflow:auto; }
 #workplace-image { width:105px; height:100px; object-fit:contain; float:right; }
 #workplace-workers, #workplace-candidates { list-style:none; padding:0; display:grid; gap:8px; }

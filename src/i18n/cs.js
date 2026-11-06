@@ -1,6 +1,37 @@
 import objects from './objects.cs.js';
 // České texty UI; stejné klíče jako en.js (ověřuje test).
 export default {
+  'construction.farmers':'Farmáři: pracují {working} · rezervováno {reserved}/{slots} míst',
+  'construction.waitFarmers':'Pole čeká na farmáře své farmy',
+  'construction.farmerOnly':'Toto pole mohou založit pouze farmáři přiřazené farmy.',
+  'construction.refundNone':'Pole nestojí žádný materiál; zrušení nic nevrací.',
+  'notice.noFarmer':'{name}: pole čeká na farmáře své farmy.',
+  'notice.noFarm':'{name}: žádná farma nemá pro toto pole místo. Postav další farmu.',
+  'work.establishing':'Zakládá: {name}',
+
+  'farmPlots.count':'Pole {count} / {capacity}',
+  'farmPlots.owner':'Připojeno k {name} č. {id}',
+  'farmPlots.orphan':'Žádná farma nemá pro toto pole místo. Postav další farmu (každá obsluhuje čtyři pole). Nepřipojená pole farmáři neobsluhují.',
+
+  'staffing.status':{one:'Výkon {percent} % – chybí {missing} pracovník ({present} přítomných)',few:'Výkon {percent} % – chybí {missing} pracovníci ({present} přítomných)',other:'Výkon {percent} % – chybí {missing} pracovníků ({present} přítomných)'},
+  'staffing.editor.title':'Vývojář: nastavení pracoviště',
+  'staffing.editor.capacity':'Počet pracovních míst',
+  'staffing.editor.curve':'Procenta výkonu od 0 pracovníků (oddělit čárkou; prázdné = lineární)',
+  'staffing.editor.invalid':'Neplatná data: 1–50 míst a procento 0–100 pro každý počet, počínaje 0 %.',
+  'staffing.editor.apply':'Použít autorská data',
+  'staffing.editor.saved':'Autorská data uložena v tomto prohlížeči.',
+  'staffing.editor.sessionOnly':'Použito pro tuto relaci; pro zachování exportujte data.',
+  'staffing.editor.export':'Exportovat data pracovišť',
+  'staffing.editor.import':'Importovat data pracovišť',
+  'staffing.editor.help':'Změny platí pro všechny budovy tohoto typu. Nadbyteční zaměstnanci se stanou nezaměstnanými. Pro jiný prohlížeč exportujte tato autorská data; herní uložené pozice je neobsahují. Před načtením dotčených pozic importujte stejná data.',
+
+  // Independent Granary capacities (#123).
+  'storage.granary.raw':'Suroviny {used}/{capacity} · Na cestě {incoming} · Volno {free}',
+  'storage.granary.food':'Jídlo {used}/{capacity} · Na cestě {incoming} · Volno {free}',
+  // Seasonal field tending (#122).
+  'work.message.Tending crops':'Péče o plodiny',
+  'work.message.Walking to tend crops':'Cesta za péčí o plodiny',
+  'work.message.Waiting at farmhouse':'Čekání u statku',
   // Employment exclusions (#131).
   'employment.exclude.local':'Zakázat zaměstnávání v této budově',
   'employment.exclude.type':'Zakázat zaměstnávání pro celý typ ({name})',

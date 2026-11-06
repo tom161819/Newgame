@@ -2,6 +2,37 @@ import objects from './objects.en.js';
 // English UI texts. Keys are grouped by screen; values with {name} take parameters,
 // objects are plural forms chosen by Intl.PluralRules.
 export default {
+  'construction.farmers':'Farmers: {working} working · {reserved}/{slots} places reserved',
+  'construction.waitFarmers':'Waiting for Farmers of this plot’s Farmhouse',
+  'construction.farmerOnly':'Only Farmers of this plot’s Farmhouse can establish it.',
+  'construction.refundNone':'This plot costs no materials; cancellation returns none.',
+  'notice.noFarmer':'{name}: the plot is waiting for a Farmer from its Farmhouse.',
+  'notice.noFarm':'{name}: no Farmhouse has room for this plot. Build another Farmhouse.',
+  'work.establishing':'Establishing {name}',
+
+  'farmPlots.count':'Plots {count} / {capacity}',
+  'farmPlots.owner':'Connected to {name} #{id}',
+  'farmPlots.orphan':'No Farmhouse has room for this plot. Build another Farmhouse (four plots each). Unconnected plots are not worked.',
+
+  'staffing.status':{one:'Output {percent}% – {missing} worker missing ({present} present)',other:'Output {percent}% – {missing} workers missing ({present} present)'},
+  'staffing.editor.title':'Developer: workplace authoring',
+  'staffing.editor.capacity':'Workplaces',
+  'staffing.editor.curve':'Output percentages from 0 workers (comma separated; empty = linear)',
+  'staffing.editor.invalid':'Invalid data: 1–50 places and a 0–100 percentage for each headcount, starting at 0%.',
+  'staffing.editor.apply':'Apply authored data',
+  'staffing.editor.saved':'Authored data saved in this browser.',
+  'staffing.editor.sessionOnly':'Applied for this session; export to keep authored data.',
+  'staffing.editor.export':'Export workplace data',
+  'staffing.editor.import':'Import workplace data',
+  'staffing.editor.help':'Changes apply to all buildings of this type. Excess employees become Unemployed. Export these authoring data for use in another browser; game saves do not contain them. Import the same data before loading affected saves.',
+
+  // Independent Granary capacities (#123).
+  'storage.granary.raw':'Raw Materials {used}/{capacity} · Incoming {incoming} · Free {free}',
+  'storage.granary.food':'Food {used}/{capacity} · Incoming {incoming} · Free {free}',
+  // Seasonal field tending (#122).
+  'work.message.Tending crops':'Tending crops',
+  'work.message.Walking to tend crops':'Walking to tend crops',
+  'work.message.Waiting at farmhouse':'Waiting at farmhouse',
   // Employment exclusions (#131).
   'employment.exclude.local':'Disable employment here',
   'employment.exclude.type':'Disable employment for this building type ({name})',
