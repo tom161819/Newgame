@@ -1,14 +1,14 @@
-import { NEEDS,clampNeed,moodFor,happinessOf,mainProblem } from '../data/needs.js';
+import { NEEDS,clampNeed,moodFor,happinessOf,mainProblem,attractivenessFor } from '../data/needs.js';
 import { POPULATION } from '../data/jobs.js';
 import { buildingIsComplete } from '../game/buildings.js';
 
 // S13 (#58) phase A: every permanent resident has Food, Rest, Housing and Safety, a weighted Happiness, a mood and a
 // main problem. Updated from the central Game Time at most once per second (also off camera and under Fog of War);
-// phase A measures and shows, work efficiency, strikes and emigration follow in phase C.
+// the mood scales work speed and Kingdom Happiness feeds Kingdom Attractiveness (phase C); strikes and emigration follow.
 const order=id=>Number(String(id).replace(/\D+/g,''))||0;
 export class NeedsSystem {
   constructor(scene,{subscribe=true}={}){
-    this.scene=scene;this.records=new Map();this.pending=0;this.revision=0;
+    this.scene=scene;this.records=new Map();this.pending=0;this.revision=0;this.work=new Map();
     if(subscribe&&scene.gameTime?.onAdvance)this.unsubscribe=scene.gameTime.onAdvance(delta=>this.advance(delta));
   }
   residents(){return (this.scene.workerSystem?.liveWorkers()??[]).filter(w=>w.isAlive&&w.isSubject!==false);}
@@ -23,8 +23,12 @@ export class NeedsSystem {
       if(Number.isFinite(worker.currentHP)&&worker.currentHP<r.hp)r.attackedAt=now;r.hp=worker.currentHP;
     }
     for(const id of [...this.records.keys()])if(!live.has(id))this.records.delete(id);
-    this.revision++;
+    this.revision++;this.refresh();
   }
+  // Phase C: derived once per update, never saved: the mood's work factor per resident and Kingdom Happiness in attractiveness.
+  refresh(){const homes=this.homes(),list=[];this.work=new Map();for(const w of this.residents()){const s=this.status(w,homes);if(!s)continue;this.work.set(w.id,s.workModifier);list.push(s.happiness);}
+    const happiness=list.length?Math.round(list.reduce((n,v)=>n+v,0)/list.length):null;this.scene.attractiveness?.modifiers?.set('happiness',attractivenessFor(happiness));}
+  workModifier(worker){return this.work.get(worker?.id)??1;}
   // Residents fill the settlement's base places first, then completed Houses (5 each), in arrival order. Phase B stores homes.
   homes(){
     const residents=this.residents().sort((a,b)=>order(a.id)-order(b.id)),houses=(this.scene.buildings??[]).filter(b=>buildingIsComplete(b)&&this.scene.objectRegistry?.get?.(b.type)?.housing).sort((a,b)=>a.id-b.id),homes=new Map();
@@ -58,6 +62,6 @@ export class NeedsSystem {
   get kingdomHappiness(){return this.summary().happiness;}
   // Only living residents are saved: a record of someone who died or left since the last update is dropped here.
   exportState(){const live=new Set(this.residents().map(w=>w.id));return {pending:this.pending,records:[...this.records.values()].filter(r=>live.has(r.id)).sort((a,b)=>order(a.id)-order(b.id)).map(r=>({id:r.id,food:r.food,rest:r.rest,hp:r.hp,attackedAt:r.attackedAt}))};}
-  importState(data){this.pending=data?.pending??0;this.records=new Map((data?.records??[]).map(r=>[r.id,{...r}]));this.revision++;}
-  destroy(){this.unsubscribe?.();this.records.clear();}
+  importState(data){this.pending=data?.pending??0;this.records=new Map((data?.records??[]).map(r=>[r.id,{...r}]));this.revision++;this.refresh();}
+  destroy(){this.unsubscribe?.();this.records.clear();this.work.clear();this.scene.attractiveness?.modifiers?.delete('happiness');}
 }
