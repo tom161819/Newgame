@@ -98,6 +98,21 @@ These rules supersede the earlier "do not turn every commit into a release" and 
 8. **Gate:** `npm run version:check` (CI step "Version and change-record policy" in `pr-quality.yml`) enforces rules 3–7 against `main`. It only reports until `main` contains the first release written under these rules; from then on it blocks.
 9. **Tags and archives:** the *Tag released version* workflow (`.github/workflows/tag-release.yml`) tags `v<version>` on the first `main` commit that carries the version (the release PR's merge) after every push to `main`; agents' sessions cannot push tags. Confirm the tag and the Pages deployment. Only milestone releases (`--milestone`, M1–M5) also get an immutable playable archive snapshot via the release gate. Historical tags, releases and archives are never renamed or rewritten.
 
+# Graphics: designs, owner review and integration (#210, 2026-11-06)
+
+New or replaced graphics follow one loop. The owner only looks, comments and clicks; agents never edit approvals by hand.
+
+1. **Mechanics first.** A new building or object ships through a normal PR with a clearly marked placeholder (procedural or temporary sprite). The mechanics must not depend on final art.
+2. **Three designs.** Claude adds at least three distinct variants in the Asset Studio (`art/assets/<category>/<id>/asset.json` with `gameObjectId` or `plannedGameObjectId`), exports them (`npm run studio:export -- <id>`) and records each as `review` in `art/approvals.json`. Every part stays inside the game object's footprint.
+3. **Owner review.** In the Studio the owner chooses Approve, Request revision (with a comment), Reject or Preferred, then **Submit review**. A pre-filled GitHub issue labelled `asset-review` is created, and the `asset-review.yml` workflow summarises and validates it, then labels it `agent:claude` and `status:ready`.
+4. **Apply the review** (Claude, one PR per review issue):
+   - copy the decisions into `art/approvals.json`, with `review: {issue, submissionId}` on every decided record and comments as `comments[]`;
+   - CI fails any approval not backed by the owner's issue for exactly that variant, version and hash.
+5. **Revise.** For each revision request: change the spec as the comment asks, then run `npm run art:revise -- <variantId>`. The version goes up, the sprites are exported, the record returns to `review` with the old version in `history`, and the old sprites stay. Any number of rounds is fine; an approval never carries over to a new version.
+6. **Integrate.** For an approved variant, run `npm run art:integrate -- <variantId>` (buildings). It refuses unless the variant is approved by the owner for this version and hash, the export is current, and the footprint matches. It copies the PNG and its layers to `public/assets/` and writes `APPROVED_BUILDING_ART`. Then follow the normal release rules (CHANGELOG, `release:prepare`, change record) and run the smoke tests.
+   - If the art does not fit the object's footprint or anchor, open a technical issue to fix the art. **Never change the mechanics to fit the art.**
+7. Unapproved variants never enter the game. Agents never approve their own designs.
+
 # Alpha save policy
 
 Medieval Kingdom is in ALPHA and only its author tests it. Backward compatibility of saved games between versions is not required. These rules override any stage specification, request or older document that asks for save migrations or compatibility with older saves, until the developer explicitly asks for compatibility again.

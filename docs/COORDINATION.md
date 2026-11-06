@@ -21,11 +21,8 @@ Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke pau
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| NEW01-A #118 Builder workshop mechanics | Codex | `codex/builder-workshop-base` (stacked on94) | [#196](https://github.com/tom161819/Newgame/pull/196) | Main42a2974 integrated; only coordination conflict; prior781 tests/version/build/native/Studio PASS; final CI including AR-4 approval guard pending;94 actual Pages verified; placeholder allowed, final art119 stays Claude | own workshop definition/derived base policy, ConstructionSystem.workSpeed, central idleHomes/BuilderAI, Unit/Construction/detail status, completion XP, schema/release/i18n, own tests/native/docs; no final art |
-| #210 asset review workflow, AR-1 #211 manifest statuses/comments/history | Claude | `claude/asset-review-manifest` | — | In review | studio/src/lib/approvals.js, studio/src/main.js (one constant), tests/asset-review-manifest.test.js, tests/asset-studio.test.js |
-| #210 AR-2 #212 Studio review UI (stacked on AR-1) | Claude | `claude/asset-review-ui` | — | In review | studio/src/main.js, studio/src/styles.css, scripts/studio-smoke.mjs |
-| #210 AR-3 #213 Submit review (stacked on AR-2) | Claude | `claude/asset-review-submit` | — | In review | studio/src/lib/reviewSubmit.js, studio/index.html, studio/src/main.js, styles.css, scripts/studio-smoke.mjs, tests/review-submit.test.js |
-| #210 AR-4 #214 asset-review intake workflow + approval guard (stacked on AR-3) | Claude | `claude/asset-review-intake` | — | In review | scripts/asset-review-{lib,intake}.mjs, scripts/approval-guard.mjs, .github/workflows/asset-review.yml, .github/workflows/pr-quality.yml, tests/asset-review-intake.test.js |
+| NEW01-A #118 Builder workshop mechanics | Codex | `codex/builder-workshop-base` (stacked on94) | [#196](https://github.com/tom161819/Newgame/pull/196) | Main9337395 integrated; coordination conflict resolved; prior786 tests + exact-head226c8ea CI PASS; final CI pending;94 actual Pages verified; placeholder allowed, final art119 stays Claude | own workshop definition/derived base policy, ConstructionSystem.workSpeed, central idleHomes/BuilderAI, Unit/Construction/detail status, completion XP, schema/release/i18n, own tests/native/docs; no final art |
+| #210 AR-6 #216 end-to-end pilot (Builders' Workshop through Submit → intake → revise → approve → integrate) | Claude | — | — | Waiting for Codex #196 and the owner's first Submit review | — |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
@@ -49,6 +46,8 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 ## Done
 
 - Codex94/PR194 verified done: merge2dc39c4, exacttagv0.8.0; Pages42242745923 build128000668031/deploy128000666084 SUCCESS.754 tests and native physical mining/ledger/Load/commands PASS.
+
+- 2026-11-06 Claude: #210 asset review workflow AR-1…AR-5: manifest statuses/comments/history ([#217](https://github.com/tom161819/Newgame/pull/217)), Studio review UI ([#218](https://github.com/tom161819/Newgame/pull/218)), Submit review ([#219](https://github.com/tom161819/Newgame/pull/219)), intake workflow + approval guard ([#220](https://github.com/tom161819/Newgame/pull/220)), `art:revise`/`art:integrate` + AGENTS.md procedure ([#221](https://github.com/tom161819/Newgame/pull/221)).
 
 - 2026-11-06 Claude: #99 mill sails ([#207](https://github.com/tom161819/Newgame/pull/207), 0.8.1); #92 visual fallbacks audit + six profession concepts ([#208](https://github.com/tom161819/Newgame/pull/208)) and Barracks/Wheelwright/Iron Mine concepts ([#209](https://github.com/tom161819/Newgame/pull/209)), awaiting the owner's choice.
 
