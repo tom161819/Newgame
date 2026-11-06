@@ -26,12 +26,12 @@ Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeat
 
 In this order; one `status:ready` at a time. When an issue is merged, verified on Pages and closed, the next one becomes `status:ready`. Whoever sees fewer than three queued Codex issues adds more from the backlog. Claude does this at every check.
 
-1. [#96](https://github.com/tom161819/Newgame/issues/96) done; [#128](https://github.com/tom161819/Newgame/issues/128) done
-2. [#130](https://github.com/tom161819/Newgame/issues/130) NEW13 demolition with 50 % refund (reuses #128)
-3. [#124](https://github.com/tom161819/Newgame/issues/124) NEW07 idle residents gather at the Castle
-4. [#94](https://github.com/tom161819/Newgame/issues/94) AUD65 manual marking of rocks for Miners
-5. [#118](https://github.com/tom161819/Newgame/issues/118) NEW01-A Builders' workshop (mechanics; the art stays with Claude in #119)
-6. [#98](https://github.com/tom161819/Newgame/issues/98) AUD71-A idle residents sit on a placeholder porch at their workplace (follows #124's central idle rule; porch art stays with Claude in #114)
+1. Done: [#96](https://github.com/tom161819/Newgame/issues/96), [#128](https://github.com/tom161819/Newgame/issues/128), [#130](https://github.com/tom161819/Newgame/issues/130) (0.6.0), [#124](https://github.com/tom161819/Newgame/issues/124) (0.7.0)
+2. [#94](https://github.com/tom161819/Newgame/issues/94) AUD65 manual marking of rocks for Miners
+3. [#118](https://github.com/tom161819/Newgame/issues/118) NEW01-A Builders' workshop (mechanics; the art stays with Claude in #119)
+4. [#98](https://github.com/tom161819/Newgame/issues/98) AUD71-A idle residents sit on a placeholder porch at their workplace (follows #124's central idle rule; porch art stays with Claude in #114)
+5. [#132](https://github.com/tom161819/Newgame/issues/132) NEW08-A food building menu order and hut unlocking (moved from Claude's backlog)
+6. [#97](https://github.com/tom161819/Newgame/issues/97) AUD69-70 working castle gate; walls reached only through a tower or the gate (mechanics; new gate art via Claude's Asset Studio)
 
 ## Kept backups (do not delete without the developer)
 
