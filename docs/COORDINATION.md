@@ -16,11 +16,12 @@ Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeat
 
 ## Active
 
+Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke paused across snapshot/Load and releases pause only after exact Food assertion. A real resumed frame changed15 to15.90275 before the assertion; no Needs gameplay or tooltip logic changes. Preserve197 tooltip checks when integrating.
+
 
 | Task | Owner | Branch | PR | Status | Files held |
 |---|---|---|---|---|---|
-| S13 #58 phase D part 1: need tooltips (Safety factors), 100-resident performance test | Claude | `claude/needs-panel-detail` | — | In review | NeedsSystem.safetyDetail, NeedsDisplay tooltips, i18n `needs.tip.*`/`needs.safety.*`, tests/needs.test.js, needs smoke |
-| NEW07 #124 Castle gathering + arrival uniforms | Codex | `codex/castle-idle-gathering` (stacked on183) | [#185](https://github.com/tom161819/Newgame/pull/185) | Integrated Needs/event-feed main; release0.7.0/schema35;741 tests/version/changelog/build PASS, combined native PASS;183 actual0.6.0 Pages verified;193 morale main integrated, renewed exact-head checks pending | derived idle policy, WorkerAI/WorkerSystem/BuilderAI/ConstructionSystem/JobSystem/WorkplaceSystem/UnitCommands, HumanView approved outfit selection, alpha serializer/loader if needed, own tests/native/i18n/docs |
+| AUD65 #94 Manual rock mining | Codex | `codex/manual-rock-mining` (stacked on124) | [#194](https://github.com/tom161819/Newgame/pull/194) | Implemented; schema36/release0.8.0 after185 actual Pages;750 tests/version/changelog/build + native real-mouse10Stones/ledger/Load/phone/commands/Needs/eventfeed PASS | own rock marking tool/UI, GameScene/GameApplication narrow input/Escape hooks, MiningWork/WorkerAI/WorkplaceSystem/free Miner selection, current schema serializer/loader/terrain validation, XP/SkillSystem, physical Drop/FoodProduction reuse and cargo provenance, i18n, own tests/browser/docs |
 
 ## Codex queue (developer: Codex always has several issues queued)
 
@@ -40,7 +41,11 @@ In this order; one `status:ready` at a time. When an issue is merged, verified o
 
 ## Done
 
-- 2026-11-06 Claude: #101 steady top bar on stone pickup ([#195](https://github.com/tom161819/Newgame/pull/195), release 0.7.1).
+- 2026-11-06 Claude PR197 Needs tooltips and100-resident performance coverage mergedb53b8da731f5e5ad75574fc0e73edfd43e472f07, release0.7.2/schema35. Integrated tooltip assertions while retaining exact snapshot/Load pause guard.
+
+- 2026-11-06 PR185 / Issue124: release0.7.0/schema35 merged03062705c47199386af24d55dfce8ec38a1e4755;743 tests/version/changelog/build and native gathering/Needs/morale/feed/commands/current Load PASS, CI42233028928 SUCCESS. Tag v0.7.0 resolves to exact merge. Actual Pages42233665135 build127965062613 and deploy127965013083 SUCCESS after one backend-only failed-deploy retry; issue124 closed/done. PR194 is the existing next task.
+- 2026-11-06 Claude PR195 / Issue101: HUD cargo layout fix mergedc697fd442a4d44a4097cc16561561b65e213fdda, release0.7.1/schema35; source integrated into194, actual Pages remains separately verified live.
+
 - 2026-11-06 Claude: S13 #58 phase C part 1, mood work speed and Happiness in attractiveness ([#193](https://github.com/tom161819/Newgame/pull/193), release 0.6.1).
 - 2026-11-06 PR183 / Issue130: release0.6.0/schema34, mergedabc12a11534967e7d0e393c0356c52a668758716 after CI42227943052 SUCCESS.733 tests/version/changelog/build and integrated native demolition/Needs/feed/stockpile/rightclick PASS. Actual Pages42228504161 build127928224031/deploy127941021369 SUCCESS; annotated tagv0.6.0 resolves to exactabc12a1. Issue130 closed/done;124 already in review185.
 - 2026-11-06 Claude: #105 event feed and bottom-right corner column ([#192](https://github.com/tom161819/Newgame/pull/192), release 0.5.1).

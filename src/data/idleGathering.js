@@ -11,7 +11,7 @@ export function idleHomes(scene,worker,{workplaceOnly=false}={}){
 export function syncWorkerUniform(scene,worker){
   if(worker.profession==='idle'){worker.displayProfession='idle';return;}
   const home=scene.workplaceSystem?.building(worker),requiresHome=scene.workplaceSystem?.requiresWorkplace(worker.profession);
-  if(requiresHome&&!home){worker.displayProfession='idle';return;}
+  if(requiresHome&&!home&&!(worker.profession==='miner'&&(worker.manualRockId!=null||worker.cargo?.rockId!=null||worker.displayProfession==='miner'&&worker.commandState?.state!=='Working'))){worker.displayProfession='idle';return;}
   if(worker.displayProfession===worker.profession||!worker.isAlive||worker.commandState?.state!=='Working')return;
   if(home){if(worker.workplaceReached)worker.displayProfession=worker.profession;return;}
   // Global jobs change at their first real task goal, or the Hauler's Castle gathering point.

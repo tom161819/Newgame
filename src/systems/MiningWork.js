@@ -1,12 +1,13 @@
+import { RockMiningWork } from './RockMiningWork.js';
 import { WORK_RULES } from '../data/jobs.js';
 import { towerNeighbors } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
 
 // A provider of existing WorkerAI tasks, sharing transport and capacity leases.
 export class MiningWork {
-  constructor(scene,natural){Object.assign(this,{scene,natural});}
+  constructor(scene,natural){Object.assign(this,{scene,natural});this.rocks=new RockMiningWork(scene);}
   slot(goal){return `natural-slot:${tileKey(goal)}`;}
-  release(worker){const t=worker.workTask;if(t?.kind!=='mineDeposit')return;this.scene.workerSystem.reservations.release(this.slot(t.goal),worker.id);this.scene.foodStorage.release(t.capacityReservation);}
+  release(worker){this.rocks.release(worker);const t=worker.workTask;if(t?.kind!=='mineDeposit')return;this.scene.workerSystem.reservations.release(this.slot(t.goal),worker.id);this.scene.foodStorage.release(t.capacityReservation);}
   wait(worker,message){worker.workState='Waiting';worker.workMessage=message;worker.aiCooldown=WORK_RULES.searchInterval;}
   claims(id){return this.scene.workerSystem.liveWorkers().filter(w=>w.workTask?.kind==='mineDeposit'&&w.workTask.targetId===id).length;}
   update(worker,delta){
