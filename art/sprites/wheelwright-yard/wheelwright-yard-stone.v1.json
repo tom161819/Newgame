@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wheelwright-yard",
+  "variantId": "wheelwright-yard-stone",
+  "name": "Stone workshop and wheel rack",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "814c0922",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 152,
+  "anchor": {
+    "x": 97,
+    "y": 102
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.67105
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 150
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98684
+  },
+  "visualHeight": 150,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.14,
+  "lights": []
+}
