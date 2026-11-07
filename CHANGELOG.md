@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.47.0] - 2026-11-07
+<!-- version: {"title":"Kingdom overview in the top bar","type":"feature","reconstructed":false,"saveVersion":57} -->
+### Added
+- The empty start of the top bar's second row shows the kingdom at a glance: residents against housing room, the unemployed and the average mood.
+  - Hovering, focusing or tapping it opens a panel with the average Happiness, Food, Rest, Housing and Safety, the average mood and the Kingdom Attractiveness with what moves it.
+  - While the King carries cargo, the same space shows his cargo controls as before, so the bar never jumps.
+- At the start of a game, a slow, softly glowing arrow under the "?" button points to the help. It disappears for good once the help has been opened, or after the first 10 minutes. With reduced motion it stays still.
+
 ## [0.46.0] - 2026-11-07
 <!-- version: {"title":"Fires and firefighting","type":"feature","reconstructed":false,"saveVersion":57} -->
 ### Added

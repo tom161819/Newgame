@@ -56,8 +56,11 @@
           <div class="hud-row">
             <span class="inventory-label" data-i18n="hud.inventory">Inventář</span>
             <div id="inventory-items"></div>
+            <div class="hud-left-slot">
+            <div id="kingdom-overview" class="kingdom-overview" tabindex="0" role="button" aria-describedby="kingdom-overview-panel"><span id="overview-population" class="overview-chip"></span><span id="overview-unemployed" class="overview-chip"></span><span id="overview-mood" class="overview-chip"></span><div id="kingdom-overview-panel" class="kingdom-overview-panel" role="tooltip" hidden></div></div>
             <button id="king-cargo-deliver" type="button" hidden><b aria-hidden="true">⇥</b> <span data-i18n="hud.deliverCargo">Deliver to storage</span></button>
             <span id="king-cargo-status" hidden></span>
+            </div>
             <span class="food-status"><output id="food-countdown">Food: 01:00</output><small id="food-warning">Out of food</small><button id="kingdom-happiness" class="kingdom-happiness" type="button">☺ —</button></span>
             <div class="hud-status">
               <span id="game-time" class="game-time">Day 1</span>
@@ -67,6 +70,7 @@
               <button id="king-profile" type="button" class="experience-status" aria-label="Přehled krále" data-i18n-attr="aria-label:hud.kingOverview"><output id="king-level">King | LVL 1</output><progress id="king-xp-bar" max="100" value="0" aria-label="Zkušenosti krále" data-i18n-attr="aria-label:hud.kingXp"></progress><output id="king-xp">XP 0 / 100</output></button>
             </div>
             <button id="hud-details-toggle" class="hud-toggle" type="button" aria-expanded="false" aria-controls="hud-details" title="Zobrazit podrobnosti">Více</button>
+            <span id="help-arrow" class="help-arrow" aria-hidden="true" hidden>▲</span>
             <button id="help-toggle" class="hud-toggle help-toggle" type="button" aria-haspopup="dialog" aria-controls="help-dialog" aria-label="Help" title="Help" data-i18n-attr="aria-label:help.button" hidden>?</button>
           </div>
           <div id="hud-details" class="hud-details" hidden>
