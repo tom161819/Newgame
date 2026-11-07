@@ -681,3 +681,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .storage-amount { text-align:right; font-variant-numeric:tabular-nums; width:4.5em; }
 .storage-reserved { text-align:right; font-size:11px; color:#9a9680; white-space:nowrap; }
 .storage-hidden, .storage-empty { font-size:12px; color:#9a9680; margin:4px 0 0; }
+
+/* Kingdom Policy sliders (owner, 7 Nov): icon by level, slider, level name. */
+.policy-slider { display:grid; grid-template-columns:44px 1fr auto; grid-template-areas:"icon label level" "icon range range"; align-items:center; gap:2px 10px; margin:6px 0; }
+.policy-slider label { grid-area:label; font-weight:600; }
+.policy-slider .policy-icon { grid-area:icon; }
+.policy-slider .policy-icon svg { display:block; width:40px; height:40px; }
+.policy-slider input[type=range] { grid-area:range; width:100%; min-width:120px; accent-color:#e3c57a; }
+.policy-slider .policy-level { grid-area:level; text-align:right; font-variant:small-caps; color:#e3c57a; }

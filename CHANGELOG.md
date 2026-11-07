@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.36.0] - 2026-11-07
+<!-- version: {"title":"Kingdom Policy sliders","type":"feature","reconstructed":false,"saveVersion":54} -->
+### Changed
+- Kingdom Policy uses sliders.
+  - Taxes have five levels (None to Very high), and the icon beside the slider grows from an empty purse to a chest overflowing with gold.
+  - Food rations have three levels (Small, Normal, Generous), with an icon from a half-empty bowl to a full basket.
+  - Moving a slider sets the policy from tomorrow, as before. You can drag it, use the mouse wheel or the arrow keys.
+  - The Granary window has the same rations slider, and both always show the same setting.
+
 ## [0.35.0] - 2026-11-07
 <!-- version: {"title":"Tidier storage window","type":"feature","reconstructed":false,"saveVersion":54} -->
 ### Improved

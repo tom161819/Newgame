@@ -3,6 +3,7 @@ import { element } from './objectLabels.js';
 import { transportLabel,storageName } from './transportLabels.js';
 import { FOOD_RESOURCE_IDS } from '../data/foodProduction.js';
 import { equipmentResources } from '../data/logistics.js';
+import { createPolicySlider } from './PolicySliders.js';
 
 // Owner request (7 Nov): one tidy table per store – icon, name, amount (right aligned, same-width digits) and reserved
 // in small grey – grouped by kind (materials, food, equipment) with a small heading; empty goods are hidden. A bar on
@@ -55,6 +56,8 @@ export class StoragePanel {
       const building=scene.buildings.find(b=>b.id===l.buildingId),section=element('section','storage-location'),title=element('h3','',storageName(scene,l.id));
       const used=storage.used(l),incoming=storage.incoming(l.id);
       section.append(title);const groups=storage.groups(l.id);
+      // Owner request (7 Nov): the Granary has the same food-rations slider as the Castle panel (one kingdom policy).
+      if(groups&&scene.policy){this.rationSlider??=createPolicySlider(scene,'rations',{id:'granary-rations'});this.rationSlider.render();section.append(this.rationSlider.root);}
       if(groups){const total=Object.values(groups).reduce((n,g)=>n+g.capacity,0),fill=element('div','storage-fill'),meter=element('meter');meter.min=0;meter.max=total;meter.high=total*.85;meter.optimum=0;meter.value=used;meter.setAttribute('aria-label',t('storage.fill'));
         fill.append(element('strong','storage-fill-count',`${used} / ${total}`),meter);section.append(fill);
         for(const [group,values]of Object.entries(groups)){const row=element('p','storage-fill-text',t(`storage.granary.${group}`,values));row.dataset.granaryGroup=group;section.append(row);}}
@@ -90,5 +93,5 @@ export class StoragePanel {
     return wrap;
   }
   close(){this.confirmingStockpile=false;this.dialog.close();this.scene.setGalleryInput(true);}
-  destroy(){this.close();this.controller.abort();}
+  destroy(){this.close();this.controller.abort();this.rationSlider?.destroy();}
 }
