@@ -37,7 +37,7 @@ export class WageSystem {
   totalUnpaid(){return this.arrears.reduce((sum,d)=>sum+d.amount,0);}
   accrued(worker){return (this.accruals.get(worker.id)?.rateMilliseconds??0)/this.scene.gameTime.dayDuration;}
   overview(){
-    const income=this.scene.production.dailyIncome().gold??0,wages=this.scene.workerSystem.liveWorkers().reduce((sum,w)=>sum+this.dailyWage(w),0);
+    const income=(this.scene.production.dailyIncome().gold??0)+(this.scene.policy?.dailyTaxes?.()??0),wages=this.scene.workerSystem.liveWorkers().reduce((sum,w)=>sum+this.dailyWage(w),0);
     return {gold:this.scene.inventory.count('gold'),income,wages,balance:income-wages,unpaid:this.totalUnpaid()};
   }
   exportState(){return {lastProcessedDay:this.lastProcessedDay,accruals:structuredClone(Object.fromEntries(this.accruals)),arrears:structuredClone(this.arrears)};}

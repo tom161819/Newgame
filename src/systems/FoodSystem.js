@@ -26,7 +26,7 @@ export class FoodSystem {
     if(!Number.isFinite(delta)||delta<=0||this.scene?.gameOver||this.time?.paused)return;
     this.syncResidents();let changed=this.recover();
     for(const u of this.units())if(u.isAlive){
-      const record=this.residents.get(u.id),rate=(u.id==='king'?2:1)/this.dayDuration,corrected=delta*rate-record.compensation,total=record.progress+corrected;
+      const record=this.residents.get(u.id),rate=(u.id==='king'?2:(this.scene?.policy?.portions?.()??1))/this.dayDuration,corrected=delta*rate-record.compensation,total=record.progress+corrected;
       record.compensation=(total-record.progress)-corrected;record.progress=total;
       while(record.progress>=1-1e-10){record.progress=Math.max(0,record.progress-1);record.hungry=!this.eat(u);changed=true;}
     }

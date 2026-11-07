@@ -59,6 +59,7 @@ import { gettingStartedSmoke } from './getting-started-smoke.mjs';
 import { buildingCostsSmoke } from './building-costs-smoke.mjs';
 import { marketplaceSmoke } from './marketplace-smoke.mjs';
 import { gateSmoke } from './gate-smoke.mjs';
+import { policySmoke } from './policy-smoke.mjs';
 
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
@@ -138,6 +139,7 @@ try{
   if(args.includes('--full')||args.includes('--building-costs'))await buildingCostsSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--marketplace'))await marketplaceSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--gate'))await gateSmoke(context,origin+base,instrument);
+  if(args.includes('--full')||args.includes('--policy'))await policySmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--ledger'))await ledgerSmoke(page);
   if(args.includes('--full')||args.includes('--smelting'))await smeltingSmoke(page);
   if(args.includes('--full')||args.includes('--military'))await militarySmoke(page);

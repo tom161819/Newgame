@@ -288,4 +288,9 @@ export default {
   'market.status.Pending':'Pending','market.status.Transporting':'Transporting','market.status.PartiallyCompleted':'Partly completed','market.status.Completed':'Completed','market.status.Cancelled':'Cancelled','market.status.Failed':'Failed',
   'ledger.Trade Purchase':'Trade Purchase','ledger.Trade Sale':'Trade Sale',
   'status.noWallAccess':'This wall has no Gate or Tower to climb up from.',
+  'policy.title':'Kingdom policy','policy.tax':'Tax rate','policy.rations':'Food rations',
+  'policy.tax.none':'No taxes','policy.tax.low':'Low','policy.tax.normal':'Normal','policy.tax.high':'High','policy.tax.very_high':'Very high',
+  'policy.rations.small':'Small (½ portion a day)','policy.rations.normal':'Normal (1 portion a day)','policy.rations.generous':'Generous (1½ portions a day)',
+  'policy.taxEffect':'{each} Gold per resident each morning: {total} Gold/day from {count} residents. Happiness {happiness}.',
+  'policy.rationsEffect':'Each resident eats {portions} portions a day. Happiness {happiness}.','ledger.Taxes':'Taxes',
 };

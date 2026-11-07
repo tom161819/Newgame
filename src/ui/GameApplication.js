@@ -27,7 +27,7 @@ export class GameApplication {
     this.changelog=new ChangelogPanel({version:gameVersion,releases});
     this.archive=new VersionArchivePanel({catalogURL:`${import.meta.env.BASE_URL}versions/catalog.json`,onChanges:version=>{if(version&&!releases.some(r=>r.version===version))window.open(`${import.meta.env.BASE_URL}?changelog=${encodeURIComponent(version)}`,'_blank','noopener,noreferrer');else this.changelog.open(version);}});
     const requestedChanges=new URLSearchParams(window.location.search).get('changelog');if(releases.some(v=>v.version===requestedChanges))this.changelog.open(requestedChanges);
-    this.setup=new NewGameSetup({onStart:settings=>this.start(null,settings),onBack:()=>{this.setup.close();this.showMainMenu();}});
+    this.setup=new NewGameSetup({onStart:settings=>{this.pendingGettingStarted=true;this.start(null,settings);},onBack:()=>{this.setup.close();this.showMainMenu();}});
     document.querySelector('#new-game').addEventListener('click',()=>{this.main.hidden=true;this.setup.open();});
     document.querySelector('#main-load-game').addEventListener('click',()=>this.openSaves('load'));
     document.querySelector('#resume-game').addEventListener('click',()=>this.resume());
@@ -54,9 +54,8 @@ export class GameApplication {
     if(this.scene){this.pendingSetup=true;this.returnToMain();return;}
     this.main.hidden=true;this.setup.open();
   }
+  // Getting started opens once for a New Game started from the setup (onStart); loads and scripted restarts never open it.
   start(state=null,settings){
-    // A new game from the setup opens Getting started once; a loaded game never does.
-    this.pendingGettingStarted=!state;
     this.archive.close(false);
     this.changelog.close(false);
     this.setup.close();

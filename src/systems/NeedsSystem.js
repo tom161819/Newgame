@@ -67,8 +67,9 @@ export class NeedsSystem {
     // Only permanent residents: the King keeps his own HP and meals, visitors have no needs.
     if(!worker?.isAlive||worker.isSubject===false||this.scene.workerSystem?.workers.get(worker.id)!==worker)return null;
     const r=this.records.get(worker.id)??{food:100,rest:100,attackedAt:null},home=homes.get(worker.id)??null,safety=this.safetyDetail(worker,r),needs={food:Math.round(r.food),rest:Math.round(r.rest),housing:home?100:0,safety:safety.value};
-    const penalty=this.unpaidPenalty(worker),happiness=happinessOf(needs,penalty),mood=moodFor(happiness);
-    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,mainProblem:mainProblem(needs,penalty),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
+    // #103: taxes and rations move Happiness (bonus or penalty), kept apart from the unpaid-wage penalty.
+    const penalty=this.unpaidPenalty(worker),policy=this.scene.policy?.happiness?.()??0,happiness=happinessOf(needs,penalty-policy),mood=moodFor(happiness);
+    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,mainProblem:mainProblem(needs,penalty),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
   }
   summary(){
     const homes=this.homes(),list=this.residents().map(w=>this.status(w,homes));

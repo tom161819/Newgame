@@ -1,6 +1,7 @@
 import { validateRockMining } from './RockMiningState.js';
 import { CARAVAN_RULES,MERCHANT_TYPES } from '../data/trade.js';
 import { ORDER_STATUSES } from './TradeSystem.js';
+import { TAX_RATES,RATIONS } from '../data/policy.js';
 import { ROCK_MINING } from '../data/rockMining.js';
 import { buildingDemolitionRefund } from '../data/demolition.js';
 import { t } from '../i18n/index.js';
@@ -31,7 +32,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=39;
+export const SAVE_VERSION=40;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -76,6 +77,7 @@ export function serializeGameState(scene){
     ...(scene.needs?{needs:scene.needs.exportState()}:{}),
     ...(scene.caravans?{caravans:scene.caravans.exportState()}:{}),
     ...(scene.trade?{trade:scene.trade.exportState()}:{}),
+    ...(scene.policy?{policy:scene.policy.exportState()}:{}),
     ...(scene.kingLogistics?{kingLogistics:scene.kingLogistics.exportState()}:{}),
     ...(scene.logisticsTasks?{logistics:{version:1,...(scene.constructionSystem?.materials.enabled?{materialsVersion:1}:{})}}:{}),
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
@@ -451,6 +453,8 @@ export function validateGameState(input,registry=objectRegistry){
       if(c.phase!=='leaving'){const m=s.buildings.find(b=>b.id===c.marketplaceId);check(m&&m.type==='marketplace');}else integer(c.marketplaceId,0);
     }
   }
+  // #103: kingdom policy (schema 40).
+  if(s.policy!==undefined){const p=s.policy;check(p&&typeof p==='object'&&Object.keys(p).sort().join()==='lastTaxDay,rations,tax');check(Object.hasOwn(TAX_RATES,p.tax)&&Object.hasOwn(RATIONS,p.rations));integer(p.lastTaxDay,1,s.time?.day??Number.MAX_SAFE_INTEGER);}
   // Trade F1.3: orders (schema 39). Open orders belong to the active caravan and an existing Marketplace.
   if(s.trade!==undefined){
     const v=s.trade;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='orders,seq');integer(v.seq,0);array(v.orders,200);const ids=new Set();

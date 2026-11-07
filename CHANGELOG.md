@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-11-07
+<!-- version: {"title":"Kingdom policy: taxes and rations","type":"feature","reconstructed":false,"saveVersion":40} -->
+### Added
+- Kingdom policy in the Castle panel. Tax rate (none, low, normal, high, very high): every permanent resident pays 0 to 1.5 Gold each morning while the Castle stands, shown in the daily income and as Taxes in the resource statistics. Food rations (small ½, normal 1, generous 1½ portions a day) set how much each resident eats. Low taxes and generous rations make residents happier (up to +20 Happiness), high taxes and small rations unhappier (down to −35).
+
+### Fixed
+- Getting started opens by itself only for a new game started from the New Game setup, not when a game restarts in other ways.
+
+### Changed
+- Saved games use a new format (40) for the kingdom policy. Games saved by earlier versions cannot be loaded; start a new game.
+
 ## [0.11.1] - 2026-11-07
 <!-- version: {"title":"Gate in the wall","type":"feature","reconstructed":false,"saveVersion":39} -->
 ### Added

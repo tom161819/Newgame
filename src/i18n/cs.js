@@ -289,4 +289,9 @@ export default {
   'market.status.Pending':'Čeká','market.status.Transporting':'Přenáší se','market.status.PartiallyCompleted':'Částečně hotovo','market.status.Completed':'Hotovo','market.status.Cancelled':'Zrušeno','market.status.Failed':'Nepovedlo se',
   'ledger.Trade Purchase':'Nákup od karavany','ledger.Trade Sale':'Prodej karavaně',
   'status.noWallAccess':'Na tuhle hradbu nevede žádná brána ani věž.',
+  'policy.title':'Politika království','policy.tax':'Daně','policy.rations':'Příděly jídla',
+  'policy.tax.none':'Bez daní','policy.tax.low':'Nízké','policy.tax.normal':'Běžné','policy.tax.high':'Vysoké','policy.tax.very_high':'Velmi vysoké',
+  'policy.rations.small':'Malé (½ porce denně)','policy.rations.normal':'Běžné (1 porce denně)','policy.rations.generous':'Štědré (1½ porce denně)',
+  'policy.taxEffect':'{each} zlata za obyvatele každé ráno: {total} zlata/den od {count} obyvatel. Spokojenost {happiness}.',
+  'policy.rationsEffect':'Každý obyvatel sní {portions} porce denně. Spokojenost {happiness}.','ledger.Taxes':'Daně',
 };
