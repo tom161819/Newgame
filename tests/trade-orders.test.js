@@ -32,8 +32,8 @@ test('the Marketplace has its own goods space that is never a store for other go
 });
 
 test('selling: Haulers carry the goods; Gold arrives only when the caravan takes them, unit by unit and once', () => {
-  const {s,c,market,run}=world();const total=quantity(s,'wood'),before=s.inventory.count('gold'),unit=price('wood','sell');
-  const result=s.trade.place('sell','wood',20);assert.equal(result.ok,true,JSON.stringify(result.errors));const o=result.order;
+  const {s,c,market,run}=world();const total=quantity(s,'wood'),before=s.inventory.count('gold');
+  const result=s.trade.place('sell','wood',20);assert.equal(result.ok,true,JSON.stringify(result.errors));const o=result.order,unit=o.price;assert.equal(unit,s.trade.unitPrice('wood','sell'),'the live price is agreed and kept');
   assert.equal(s.inventory.count('gold'),before,'no Gold before delivery');
   run(()=>s.foodStorage.locations.get(`market-${market.id}`).stock.wood>0||o.delivered>0);
   run(()=>o.status==='Completed');

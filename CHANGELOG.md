@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-11-07
+<!-- version: {"title":"Live market prices","type":"feature","reconstructed":false,"saveVersion":48} -->
+### Added
+- Live market prices: goods the kingdom lacks, or that the caravan carries little of, cost more; plentiful goods cost less. Prices show ▲ or ▼, and hovering explains why.
+- Trade statistics in the Marketplace: Gold earned and spent, balance, top goods, recent trades and a price history chart for each good.
+
 ## [0.19.1] - 2026-11-07
 <!-- version: {"title":"Faster paths","type":"feature","reconstructed":false,"saveVersion":47} -->
 ### Improved

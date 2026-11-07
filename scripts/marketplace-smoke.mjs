@@ -28,7 +28,10 @@ export async function marketplaceSmoke(context,url,instrument){
     await page.locator('#marketplace-dialog[open]').waitFor();
     if(process.env.SMOKE_SHOTS){await page.screenshot({path:`${process.env.SMOKE_SHOTS}/marketplace-panel.png`});await page.keyboard.press('Escape');await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id);s.cameras.main.centerOn(...Object.values(s.towerViews.get(id)?.container?{x:s.towerViews.get(id).container.x,y:s.towerViews.get(id).container.y}:{x:0,y:0}));},id);await page.waitForTimeout(600);await page.screenshot({path:`${process.env.SMOKE_SHOTS}/marketplace-map.png`});await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;s.marketplacePanel.open(s.buildings.find(b=>b.id===id));},id);}
     const text=await page.locator('#marketplace-status').textContent();assert.match(text,/Next caravan expected in about/);assert.match(text,/Goods space: 0 \/ 80/);assert.match(text,/Loading spots: 2/);
-    assert.equal(await page.locator('[data-market-resource="bread"] td').allTextContents().then(v=>v.join('/')),'8/6');
+    // F2: live prices. The kingdom has no Bread, so it is at least its list price (8/6) and marked ▲ with a reason.
+    const bread=await page.locator('[data-market-resource="bread"] td').allTextContents();assert.match(bread.join('/'),/^\d+ ▲\/\d+ ▲$/);assert.ok(parseInt(bread[0])>=8&&parseInt(bread[1])>=6,bread.join('/'));assert.ok(Number(await page.locator('[data-market-resource="bread"] td').first().getAttribute('data-price-factor'))>100);
+    assert.match(await page.locator('[data-market-resource="bread"] td').first().getAttribute('title'),/little of it/);
+    assert.match(await page.locator('#marketplace-stats').textContent(),/Trade statistics.*No trade yet/);
     assert.ok(await page.locator('#marketplace-prices tbody tr').count()>=12);
     await page.keyboard.press('Escape');assert.equal(await page.locator('#marketplace-dialog').evaluate(d=>d.open),false);
     // F1.2: the developer console brings a caravan now; it drives in from the edge, trades, then leaves.
@@ -47,10 +50,17 @@ export async function marketplaceSmoke(context,url,instrument){
     await page.locator('[data-trade-order]').first().waitFor();assert.match(await page.locator('[data-trade-order]').first().textContent(),/Sell 20 Wood/);if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/trade-window.png`});
     await page.keyboard.press('Escape');
     await page.waitForFunction(()=>window.__game.registry.get('application').scene.trade.orders[0]?.status==='Completed',null,{timeout:150000});
-    assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.inventory.count('gold')),gold1+20*3,'paid on hand-over, 3 Gold per Wood');
+    const unit=await page.evaluate(()=>window.__game.registry.get('application').scene.trade.orders[0].price);assert.ok(unit>=2&&unit<=5,`live Wood price ${unit}`);
+    assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.inventory.count('gold')),gold1+20*unit,'paid on hand-over at the agreed price');
+    // F2 statistics: the sale shows in the totals, the recent trades and the price history chart.
+    await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;s.marketplacePanel.open(s.buildings.find(b=>b.id===id));},market);
+    const stats=await page.locator('#marketplace-stats').textContent();assert.match(stats,new RegExp(`Sold for ${20*unit} Gold`));assert.match(stats,new RegExp(`sold \\d+ Wood at ${unit} Gold`));assert.match(stats,/Top goods: Wood/);
+    await page.locator('#marketplace-chart-good').selectOption('wood');assert.ok(await page.locator('.market-chart circle.sell').count()>=1);
+    if(process.env.SMOKE_SHOTS)await page.locator('#marketplace-stats').screenshot({path:`${process.env.SMOKE_SHOTS}/trade-stats.png`});
+    await page.keyboard.press('Escape');
     assert.ok(gold0>=gold1);
     const gone=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.caravans.leave();for(let i=0;i<20000&&s.caravans.active;i++){s.caravans.update(100);s.caravanViews.update();}return {active:s.caravans.active,view:s.caravanViews.view,next:s.caravans.nextVisitAt};});
     assert.equal(gone.active,null);assert.equal(gone.view,null);assert.ok(gone.next>0);
-    console.log('PASS Marketplace: locked until a Warehouse is finished, placed from the Logistics menu, panel with goods space, loading spots and prices; a summoned caravan drives in from the edge, trades, leaves and the next one is scheduled');
+    console.log('PASS Marketplace: locked until a Warehouse is finished, placed from the Logistics menu, panel with goods space, loading spots and live prices with reasons; trade statistics and price history after a sale; a summoned caravan drives in from the edge, trades, leaves and the next one is scheduled');
   }finally{await page.close();}
 }

@@ -94,7 +94,7 @@ export class CaravanSystem {
     if(!this.active)return;
     advanceMovement(c,delta);
     if(c.nextTile||c.path.length)return;
-    if(c.phase==='arriving'){c.phase='trading';c.departAt=this.now+CARAVAN_RULES.stay*this.day;this.feed(null,'arrived',{type:t(`caravan.type.${c.type}`)},true);this.changed();}
+    if(c.phase==='arriving'){c.phase='trading';c.departAt=this.now+CARAVAN_RULES.stay*this.day;this.feed(null,'arrived',{type:t(`caravan.type.${c.type}`)},true);this.scene.trade?.recordOffers?.(c);this.changed();}
     else if(c.phase==='leaving')this.finish();
   }
   status(){const c=this.active;return {active:c?{id:c.id,type:c.type,phase:c.phase,marketplaceId:c.marketplaceId,stock:{...c.stock},gold:c.gold,leavesIn:c.departAt===null?null:Math.max(0,c.departAt+(c.waiting?CARAVAN_RULES.maxWait*this.day:0)-this.now),waiting:c.waiting}:null,nextIn:this.nextVisitAt===null?null:Math.max(0,this.nextVisitAt-this.now)};}

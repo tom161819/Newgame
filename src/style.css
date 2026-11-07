@@ -593,6 +593,25 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .market-order.status-Completed { color: #9fc172; }
 .market-order.status-Cancelled, .market-order.status-Failed { color: #b49a8a; }
 .marketplace-dialog.trading .market-prices, .marketplace-dialog.trading .market-prices-head { display: none; }
+.market-price.up { color: #e0a06b; }
+.market-price.down { color: #9fd08a; }
+.market-stats { margin-top: 10px; border-top: 1px solid #4a4a33; padding-top: 6px; font-size: 12px; }
+.market-stats h3 { margin: 0 0 4px; font-size: 14px; }
+.market-stats p { margin: 2px 0; }
+.market-stats-sub { color: #c8bd9c; margin-top: 6px !important; }
+.market-recent { margin: 2px 0 4px; padding-left: 18px; }
+.market-chart-good { font-size: 12px; margin: 2px 0; }
+.market-chart { display: block; width: 100%; max-width: 320px; height: auto; background: #2a2a1d; border-radius: 4px; margin-top: 4px; }
+.market-chart .axis { stroke: #6a6a4a; stroke-width: 1; }
+.market-chart .label { fill: #c8bd9c; font-size: 9px; }
+.market-chart .line { fill: none; stroke-width: 1.6; }
+.market-chart .line.buy, .market-chart .dot.buy { stroke: #e0a06b; fill: #e0a06b; }
+.market-chart .line.sell, .market-chart .dot.sell { stroke: #9fd08a; }
+.market-chart .line.buy { fill: none; }
+.market-chart .dot.sell { fill: #9fd08a; }
+.market-chart .legend { font-size: 9px; }
+.market-chart .legend.buy { fill: #e0a06b; }
+.market-chart .legend.sell { fill: #9fd08a; }
 
 /* #103 Kingdom policy in the Castle panel. */
 .kingdom-policy { margin-top: 10px; padding-top: 8px; border-top: 1px solid #4a4a33; }
