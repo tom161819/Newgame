@@ -1,8 +1,52 @@
 {
   "schema": 1,
   "name": "Olive (current)",
-  "style": "olive",
-  "tokens": { "page": "#25291e", "panel": "#2c3124", "panelRaised": "#363c2c", "glass": "rgb(30 35 25 / .86)", "line": "#79704b", "lineSoft": "#5b5a40", "ink": "#ede5c9", "muted": "#b9b598", "accent": "#e3c57a", "button": "#4d503a", "buttonInk": "#ece2c4", "field": "#26321f", "good": "#9fc172", "bad": "#e0806b", "fontUi": "figtree", "fontDisplay": "source-serif", "fontScale": 1, "radius": 12, "borderWidth": 1, "texture": "none", "frame": "plain", "shadow": "soft", "headings": "normal", "light": false },
+  "style": "olive-custom",
+  "tokens": { "page": "#25291e", "panel": "#2c3124", "panelRaised": "#363c2c", "glass": "rgb(30 35 25 / .86)", "line": "#79704b", "lineSoft": "#5b5a40", "ink": "#ede5c9", "muted": "#b9b598", "accent": "#e3c57a", "button": "#4d503a", "buttonInk": "#ece2c4", "field": "#26321f", "good": "#9fc172", "bad": "#e0806b", "fontUi": "figtree", "fontDisplay": "cinzel", "fontScale": 1, "radius": 19, "borderWidth": 4, "texture": "none", "frame": "rivets", "shadow": "soft", "headings": "smallcaps", "light": false },
   "layout": { "hud": "top", "buildingsBar": "bottom", "settings": "left", "population": "right", "cornerStack": "bottom-right", "dialogs": "center", "unitPanel": "right", "camera": "bottom-left", "header": "shown", "density": "comfortable" },
-  "panels": {}
+  "panels": {
+    "hud-details": {
+      "order": [
+        "#economy-overview",
+        "div.hud-details-row"
+      ]
+    },
+    "settings-panel": {
+      "order": [
+        "div.settings-heading",
+        "nav.settings-actions",
+        "label.setting-row",
+        "label.setting-row~5",
+        "label.setting-row~2",
+        "label.setting-row~3",
+        "p",
+        "div.setting-row",
+        "p~2",
+        "label.setting-row~4",
+        "p~3",
+        "label.setting-row~6",
+        "p~4",
+        "h3.settings-subheading",
+        "label.setting-row~7",
+        "p~5",
+        "label.setting-row~8",
+        "label.setting-row~9",
+        "#autosave-status",
+        "p~6",
+        "p.settings-version",
+        "p.settings-renderer"
+      ]
+    },
+    "employment-panel": {
+      "order": [
+        "section.kingdom-policy",
+        "div.dialog-heading",
+        "p.employment-help~2",
+        "p.employment-help",
+        "#employment-state",
+        "#employment-presets",
+        "#employment-priorities"
+      ]
+    }
+  }
 }

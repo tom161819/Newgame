@@ -23,10 +23,11 @@ test('the four UI styles are complete, valid configs with their own look and lay
   assert.equal(UI_PRESETS.find(p => p.style === 'parchment').tokens.light, true);
 });
 
-test('the game config is valid and starts as the current olive look', () => {
+test('the game config is valid and already normalised; the olive preset is the original look', () => {
   const current = json('art/ui/ui-config.json'), { config, problems } = normalizeUiConfig(current);
   assert.deepEqual(problems, []);
-  assert.deepEqual(config, normalizeUiConfig(BASE_CONFIG).config);
+  assert.deepEqual(config, current);
+  assert.deepEqual(normalizeUiConfig(json('art/ui/presets/olive.json')).config.tokens, normalizeUiConfig(BASE_CONFIG).config.tokens);
 });
 
 test('untrusted configs are cleaned: bad colours, positions, fonts and windows fall back or drop', () => {
