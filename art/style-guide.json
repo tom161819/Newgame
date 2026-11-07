@@ -595,6 +595,16 @@
         "speed": 5.5
       },
       "flameSize": 1.6
+    },
+    "window": {
+      "color": "#ffcf7a",
+      "radiusTiles": 0.9,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
     }
   },
   "lightingModel": "Sprites carry daylight only. Time of day is applied at runtime by multiplying the scene with a light map: the light map is filled with the ambient colour and each light source is added as a coloured radial gradient. Flames are drawn after the multiply so they stay bright. No per-time-of-day sprites.",

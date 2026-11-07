@@ -13,6 +13,7 @@ import workshop from './workshop.js';
 import wallkit from './wallkit.js';
 import ruins from './ruins.js';
 import icon from './icon.js';
+import castle from './castle.js';
 
 export const GENERATORS = Object.freeze({
   [watchtower.id]: watchtower,
@@ -28,4 +29,5 @@ export const GENERATORS = Object.freeze({
   [wallkit.id]: wallkit,
   [ruins.id]: ruins,
   [icon.id]: icon,
+  [castle.id]: castle,
 });

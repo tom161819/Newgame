@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "assetId": "castle",
+  "variantId": "castle-motte",
+  "name": "Early stronghold on a mound",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "490c5464",
+  "generator": "castle",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 233,
+  "anchor": {
+    "x": 97,
+    "y": 183
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.78541
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 231
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.99142
+  },
+  "visualHeight": 231,
+  "platform": {
+    "x": -8.64,
+    "y": -151.7
+  },
+  "frontLayer": true,
+  "gameLights": [
+    {
+      "type": "window",
+      "x": -4.8,
+      "y": -98.21,
+      "color": "#ffcf7a",
+      "radius": 28.8,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
+    },
+    {
+      "type": "window",
+      "x": 11.2,
+      "y": -90.21,
+      "color": "#ffcf7a",
+      "radius": 28.8,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
+    },
+    {
+      "type": "window",
+      "x": 37.44,
+      "y": -90.53,
+      "color": "#ffcf7a",
+      "radius": 28.8,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
+    },
+    {
+      "type": "torch",
+      "x": -42.56,
+      "y": -92.12,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    },
+    {
+      "type": "torch",
+      "x": -25.28,
+      "y": -83.48,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 4.232,
+  "lights": [
+    {
+      "type": "window",
+      "x": 92.2,
+      "y": 132.79,
+      "color": "#ffcf7a",
+      "radius": 28.8,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
+    },
+    {
+      "type": "window",
+      "x": 108.2,
+      "y": 140.79,
+      "color": "#ffcf7a",
+      "radius": 28.8,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
+    },
+    {
+      "type": "window",
+      "x": 134.44,
+      "y": 140.47,
+      "color": "#ffcf7a",
+      "radius": 28.8,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
+    },
+    {
+      "type": "torch",
+      "x": 54.44,
+      "y": 138.88,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    },
+    {
+      "type": "torch",
+      "x": 71.72,
+      "y": 147.52,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

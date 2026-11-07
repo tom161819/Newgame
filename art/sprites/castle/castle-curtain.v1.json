@@ -1,0 +1,202 @@
+{
+  "schema": 1,
+  "assetId": "castle",
+  "variantId": "castle-curtain",
+  "name": "Stone castle with corner towers",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "d41232ab",
+  "generator": "castle",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 212,
+  "height": 222,
+  "anchor": {
+    "x": 97,
+    "y": 172
+  },
+  "origin": {
+    "x": 0.45755,
+    "y": 0.77477
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 220
+  },
+  "baseOrigin": {
+    "x": 0.45755,
+    "y": 0.99099
+  },
+  "visualHeight": 220,
+  "platform": {
+    "x": 0,
+    "y": -105.11
+  },
+  "frontLayer": true,
+  "gameLights": [
+    {
+      "type": "window",
+      "x": -23.68,
+      "y": -122.02,
+      "color": "#ffcf7a",
+      "radius": 28.8,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
+    },
+    {
+      "type": "window",
+      "x": -8.64,
+      "y": -114.5,
+      "color": "#ffcf7a",
+      "radius": 28.8,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
+    },
+    {
+      "type": "window",
+      "x": 6.4,
+      "y": -106.98,
+      "color": "#ffcf7a",
+      "radius": 28.8,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
+    },
+    {
+      "type": "window",
+      "x": 32.32,
+      "y": -109.06,
+      "color": "#ffcf7a",
+      "radius": 28.8,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
+    },
+    {
+      "type": "torch",
+      "x": -55.68,
+      "y": -72.58,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    },
+    {
+      "type": "torch",
+      "x": -33.92,
+      "y": -61.7,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 4.055,
+  "lights": [
+    {
+      "type": "window",
+      "x": 73.32,
+      "y": 97.98,
+      "color": "#ffcf7a",
+      "radius": 28.8,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
+    },
+    {
+      "type": "window",
+      "x": 88.36,
+      "y": 105.5,
+      "color": "#ffcf7a",
+      "radius": 28.8,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
+    },
+    {
+      "type": "window",
+      "x": 103.4,
+      "y": 113.02,
+      "color": "#ffcf7a",
+      "radius": 28.8,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
+    },
+    {
+      "type": "window",
+      "x": 129.32,
+      "y": 110.94,
+      "color": "#ffcf7a",
+      "radius": 28.8,
+      "intensity": 0.75,
+      "flicker": {
+        "amplitude": 0.03,
+        "speed": 1.5
+      },
+      "flameSize": 0
+    },
+    {
+      "type": "torch",
+      "x": 41.32,
+      "y": 147.42,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    },
+    {
+      "type": "torch",
+      "x": 63.08,
+      "y": 158.3,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

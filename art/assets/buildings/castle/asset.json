@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "id": "castle",
+  "name": "Castle",
+  "category": "buildings",
+  "description": "New look for the king's castle (plan g-hrad-nova-grafika): three approaches on the game's 3 × 3 footprint, the gate on the gathering side, a platform for the king, the kingdom banner, gate torches and lit windows at night. The game keeps its current drawing until one is approved.",
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "generator": "castle",
+  "gameObjectId": "castle",
+  "variants": [
+    {
+      "id": "castle-curtain",
+      "name": "Stone castle with corner towers",
+      "version": 1,
+      "notes": "Curtain walls with battlements, four round corner towers (the front one crenellated: the king's platform), a gatehouse with a portcullis and a palace with a tiled roof.",
+      "spec": {
+        "layout": "curtain",
+        "roof": "roof_tile",
+        "banner": "banner"
+      }
+    },
+    {
+      "id": "castle-keep",
+      "name": "Castle with a bergfried",
+      "version": 1,
+      "notes": "A tall square keep with a high timber stair (the king's platform on top), low walls with a gate between two towers, a timber hall and a stable in the bailey.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      }
+    },
+    {
+      "id": "castle-motte",
+      "name": "Early stronghold on a mound",
+      "version": 1,
+      "notes": "An earth mound with a palisade, a stone hall and a timber tower (the king's platform), a gate with a ramp. Closer to the start of the game.",
+      "spec": {
+        "layout": "motte",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      }
+    }
+  ]
+}
