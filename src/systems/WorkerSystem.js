@@ -61,11 +61,12 @@ export class WorkerSystem {
     if(randomize)initializeNaturalTalent(worker);
     view.setData('worker',worker);this.workers.set(id,worker);this.updateUI();return worker;
   }
-  spawnInitial(){
+  // World v2: the first villagers stand where the world's 'villagers' stream puts them (seeded worlds).
+  spawnInitial(random=Math.random){
     const origin=this.origin();
     for(let i=0;i<POPULATION.initial;i++){
       const candidates=this.candidates().filter(t=>Math.max(Math.abs(t.x-origin.x),Math.abs(t.y-origin.y))<=5);
-      if(!candidates.length)break;this.create(candidates[Math.floor(Math.random()*candidates.length)]);
+      if(!candidates.length)break;this.create(candidates[Math.floor(random()*candidates.length)]);
     }
     this.updateUI();
   }

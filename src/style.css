@@ -255,6 +255,12 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 .setup-card { flex-shrink:0; }
 .setup-card fieldset { margin:24px 0; padding:0; border:0; min-width:0; }
 .setup-card legend, .setup-advanced summary { font:20px Georgia,serif; color:#d9c48d; }
+.world-code-row { display:flex; gap:6px; margin-top:10px; }
+.world-code-row input { padding:10px; color:#e5dcbf; background:#172622; border:1px solid #6b7253; border-radius:4px; }
+.world-code-row input[aria-invalid=true] { border-color:#e0806b; }
+.world-code-row input { flex:1; min-width:0; font:14px ui-monospace,monospace; letter-spacing:.04em; }
+.world-code-row button { padding:6px 10px; }
+.world-error { color:#e0806b; }
 .setup-advanced { border-top:1px solid #666c4f; border-bottom:1px solid #666c4f; padding:18px 0; }
 .setup-advanced summary { cursor:pointer; }
 .advanced-fields { padding-bottom:12px; }
@@ -642,3 +648,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .away-summary li.important { font-weight: 600; }
 .away-skipped { color: #e0a06b; }
 .away-events-title { margin: 6px 0 0; color: #c8bd9c; }
+
+/* World v2: world code in the game menu */
+.pause-world { font-size:13px; color:#c8bd9c; }
+.pause-world code { font:13px ui-monospace,monospace; color:#f0e3bb; user-select:all; }
+.pause-world button { margin-left:6px; padding:4px 8px; font-size:12px; }

@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-11-07
+<!-- version: {"title":"World codes","type":"feature","reconstructed":false,"saveVersion":50} -->
+### Added
+- World codes: each new world comes from a code such as MKW1-155515555555-7KQ9X2, and the same code always makes the same map, including trees, stones, ore, animals and chests. New Game Setup has a World section to paste or copy a code, roll a new seed, and choose Water (Low / Normal / High), Desert (Off / On) and Forest (Sparse / Normal / Dense). The game menu shows the current world's code with a Copy button.
+
 ## [0.22.1] - 2026-11-07
 <!-- version: {"title":"Archive numbers in time order","type":"feature","reconstructed":false,"saveVersion":49} -->
 ### Changed

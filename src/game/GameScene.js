@@ -1,3 +1,6 @@
+import { decodeWorldCode,randomWorldCode,defaultWorldLevels,settingsFromLevels } from '../data/worldCode.js';
+import { worldStreams } from './seededRandom.js';
+import { FORESTRY as WORLD_FORESTRY } from '../data/naturalResources.js';
 import { createBackgroundSimulation } from '../ui/BackgroundSimulationUI.js';
 import { RockMiningTool } from '../ui/RockMiningTool.js';
 import { DemolitionSystem } from '../systems/DemolitionSystem.js';
@@ -167,7 +170,12 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('crop',(_definition,context)=>new CropPlotView(this,context.building,context.preview));
     this.assets.registerRenderer('pavement',(_definition,context)=>new PavementView(this,context.building,context.preview));
     // #100: rock layer (terrainGrid), ground layer (grass, sand, water) and bushes; water cells block but stay see-through.
-    const world=this.loadState?{terrain:this.loadState.terrain.map(row=>[...row]),ground:this.loadState.ground?importGround(this.loadState.ground):emptyGround(),bushes:importBushes(this.loadState.bushes??[])}:generateWorld(Math.random);
+    // World v2 step 1: a new game draws its whole starting world from the world code (seed + settings), one random
+    // stream per part; a loaded game keeps its saved world and its code.
+    if(!this.loadState&&!this.gameSettings.worldCode)this.gameSettings=gameSettings({...this.gameSettings,worldCode:randomWorldCode()});
+    const worldCode=this.gameSettings.worldCode?decodeWorldCode(this.gameSettings.worldCode):null;
+    this.worldLevels=worldCode?.levels??defaultWorldLevels();this.worldRandom=worldCode?worldStreams(worldCode.seed):()=>Math.random;
+    const world=this.loadState?{terrain:this.loadState.terrain.map(row=>[...row]),ground:this.loadState.ground?importGround(this.loadState.ground):emptyGround(),bushes:importBushes(this.loadState.bushes??[])}:generateWorld(Math.random,{levels:this.worldLevels,streams:this.worldRandom});
     this.terrainGrid=world.terrain;this.groundGrid=world.ground;this.bushes=world.bushes;
     this.map=mapFromWorld(this.terrainGrid,this.groundGrid);
     this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
@@ -206,15 +214,15 @@ export class GameScene extends Phaser.Scene {
       });
       this.resourceSpawners.push(spawner);
       if(!this.loadState&&definition.walkable){
-        const candidates=generateResourcePositions(this.map,PLAYER_START,spawnSettings.initial,Math.random,this.resourceOccupancy,definition);
+        const candidates=generateResourcePositions(this.map,PLAYER_START,spawnSettings.initial,this.worldRandom(`resource:${definition.id}`),this.resourceOccupancy,definition);
         for(const tile of candidates)if(resourceTiles(tile,definition).every(p=>!this.resourceOccupancy.has(tileKey(p))))this.addResource(definition,tile);
       }
-      if(!this.loadState)while(this.resourceCount(definition.id)<spawnSettings.initial&&spawner.spawnOne()){}
+      if(!this.loadState){const random=spawner.random;spawner.random=this.worldRandom(`resource-fill:${definition.id}`);while(this.resourceCount(definition.id)<spawnSettings.initial&&spawner.spawnOne()){}spawner.random=random;}
     }
     this.spawner=this.resourceSpawners.find(s=>s.definition.id==='stone');
     this.dropSystem=new DropSystem(this);
     this.foodStorage=new FoodStorageSystem(this,{physicalMaterials:true});this.kingLogistics=new KingLogisticsSystem(this);if(!this.loadState)depositStartingResources(this);
-    this.animalSystem=new AnimalSystem(this);if(!this.loadState)this.animalSystem.spawn(PLAYER_START);
+    this.animalSystem=new AnimalSystem(this);if(!this.loadState){this.animalSystem.random=this.worldRandom('animals');this.animalSystem.spawn(PLAYER_START);this.animalSystem.random=Math.random;}
     this.huntingSystem=new HuntingSystem(this);
     this.combatFeedback=new CombatFeedback(this);
     this.combat.on('attack',(attacker,target)=>{if(this.animalSystem.animals.has(target.id))this.animalSystem.onAttacked(target,attacker);});
@@ -237,7 +245,7 @@ export class GameScene extends Phaser.Scene {
     this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,unlocks:this.buildingUnlocks,onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
     this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onWorkplaceApply:()=>{this.workplaceSystem.reconcileDefinitions();if(this.selectedBuilding)this.selectedBuilding=this.objectRegistry.require(this.selectedBuilding.id);},onCostApply:()=>{if(this.selectedBuilding)this.selectedBuilding=this.objectRegistry.require(this.selectedBuilding.id);this.updateInventory();},onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
     this.equipmentPanel=new EquipmentPanel(this);
-    this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=t('hud.population',{count,maximum});}});if(!this.loadState)this.workerSystem.spawnInitial();this.builderWorkshops=new BuilderWorkshopSystem(this);this.fishing=new FishingSystem(this);
+    this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=t('hud.population',{count,maximum});}});if(!this.loadState)this.workerSystem.spawnInitial(this.worldRandom('villagers'));this.builderWorkshops=new BuilderWorkshopSystem(this);this.fishing=new FishingSystem(this);
     // Every living subject is a moving sight source (diameter 15); leaving, dying or emigrating removes it.
     this.fog.registerSource('subjects',()=>this.workerSystem.liveSubjects().map(subjectSight));
     this.workplaceSystem=new WorkplaceSystem(this);this.workplacePanel=new WorkplacePanel(this);
@@ -250,7 +258,7 @@ export class GameScene extends Phaser.Scene {
     this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);this.farmConnections=new FarmConnections(this);
     this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);this.demolitionUI=new DemolitionUI(this);this.populationSidebar=new PopulationSidebar(this);this.noticesPanel=new NoticesPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
-    this.treasurePanel=new TreasurePanel(this);if(!this.loadState)this.treasureSystem.spawn(PLAYER_START);
+    this.treasurePanel=new TreasurePanel(this);if(!this.loadState){this.treasureSystem.random=this.worldRandom('treasures');this.treasureSystem.spawn(PLAYER_START);this.treasureSystem.random=Math.random;}
     this.wildlifeRespawn=new WildlifeRespawnSystem(this,this.animalSystem);
     this.policy=new PolicySystem(this);
     this.production=new ProductionSystem(this.gameTime,this.inventory,()=>this.buildings,(day,totals)=>this.onDailyIncome(day,totals));
@@ -261,7 +269,10 @@ export class GameScene extends Phaser.Scene {
     this.updateTimeDisplay();
     this.setStatus(t('status.idle'));
     this.worldCamera=new WorldCamera(this,this.player);this.staffingIndicators=new MissingWorkersIndicators(this);
-    this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState){this.naturalResources.generate();this.naturalResources.mining.generate();}
+    this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState){this.naturalResources.generate(this.worldRandom('trees'),Math.round(WORLD_FORESTRY.initialTrees*settingsFromLevels(this.worldLevels).forest));this.naturalResources.mining.generate(this.worldRandom('minerals'));}
+    // World v2: a fingerprint of the starting world as generated (terrain, water, bushes, every placed resource, animals,
+    // chests), so tests and the Studio can check that a world code always gives the same world.
+    this.startWorldFingerprint=this.loadState?null:this.worldFingerprint();
     this.resourceLedger=new ResourceTransactionLedger(this);if(this.loadState)this.resourceLedger.suspend();this.inventoryBar.setLedger(this.resourceLedger);
     const onBackground=()=>{this.background?.hide();this.visibilityPaused=true;this.tweens.pauseAll();this.setGalleryInput(false);};
     const onForeground=()=>{this.visibilityPaused=false;this.activeFramePending=true;if(!this.gameOver&&!this.gameTime.paused)this.tweens.resumeAll();this.setGalleryInput(true);this.background?.show();};
@@ -660,6 +671,14 @@ export class GameScene extends Phaser.Scene {
   }
   // #60: one step of the authoritative simulation, shared by normal frames and the background catch-up. Drawing and
   // the HUD are refreshed by the caller. Returns the active game time, or null when the King fell during the step.
+  worldFingerprint(){
+    const parts=[this.terrainGrid.map(r=>r.join('')).join('|'),this.groundGrid.map(r=>r.join('')).join('|'),[...this.bushes].sort().join(';'),
+      [...this.resources.values()].map(v=>{const o=v.getData('object');return `${v.getData('objectId')}@${o?.tile?.x??o?.x},${o?.tile?.y??o?.y}`;}).sort().join(';'),
+      [...this.animalSystem.animals.values()].map(a=>`${a.type??a.definition?.id}@${a.tile.x},${a.tile.y}`).sort().join(';'),
+      [...(this.treasureSystem?.chests.values()??[])].map(c=>`${c.tile?.x??c.x},${c.tile?.y??c.y}:${c.contents?.gold??''}`).sort().join(';')];
+    const fnv=text=>{let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0).toString(16).padStart(8,'0');};
+    return {hash:fnv(parts.join('#')),parts:Object.fromEntries(['terrain','ground','bushes','resources','animals','chests'].map((k,i)=>[k,fnv(parts[i])])),counts:{resources:this.resources.size,animals:this.animalSystem.animals.size,chests:this.treasureSystem?.chests.size??0,bushes:this.bushes.size}};
+  }
   // Sight and the explored-map memory between catch-up steps (normal frames do this in refreshVisibility).
   observeWorld(){captureMapKnowledge(this);}
   simulationStep(delta){

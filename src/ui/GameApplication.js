@@ -35,6 +35,7 @@ export class GameApplication {
       const action=button.dataset.gameMenu;if(action==='main')this.returnToMain();else this.openSaves(action);
     });
     this.pauseDialog.addEventListener('cancel',event=>{event.preventDefault();this.resume();});
+    document.querySelector('#copy-world-code')?.addEventListener('click',event=>{const code=this.scene?.gameSettings?.worldCode;if(!code)return;navigator.clipboard?.writeText(code).then(()=>{event.target.textContent=t('pause.copied');},()=>{}).catch(()=>{});const range=document.createRange();range.selectNodeContents(document.querySelector('#pause-world-code'));getSelection()?.removeAllRanges();getSelection()?.addRange(range);});
     document.addEventListener('keydown',event=>{
       if(event.code!=='Escape'||event.repeat||document.querySelector('dialog[open]')||!this.scene||this.scene.gameOver)return;
       event.preventDefault();
@@ -82,6 +83,8 @@ export class GameApplication {
   showPause(){
     if(!this.scene||this.scene.gameOver)return;
     this.scene.pauseManager.set('menu',true);this.scene.settingsPanel.setOpen(false);
+    // World v2: the code of this world, to share or replay it.
+    const code=this.scene.gameSettings?.worldCode??'';document.querySelector('#pause-world-code').textContent=code||'—';const copy=document.querySelector('#copy-world-code');copy.hidden=!code;copy.textContent=t('pause.copyWorldCode');
     if(!this.pauseDialog.open)this.pauseDialog.showModal();document.querySelector('#resume-game').focus();
   }
   resume(){this.pauseDialog.close();this.scene?.pauseManager.set('menu',false);}
