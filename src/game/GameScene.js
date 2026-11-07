@@ -748,7 +748,7 @@ export class GameScene extends Phaser.Scene {
     this.childrenSystem?.update(activeDelta);
     this.porches?.update(activeDelta);
     this.lightFuel?.update();
-    this.nightThreats?.update();
+    this.nightThreats?.update(activeDelta);
     this.noticeRemaining=Math.max(0,this.noticeRemaining-activeDelta);if(!this.noticeRemaining)document.querySelector('#day-notice').hidden=true;
     return activeDelta;
   }

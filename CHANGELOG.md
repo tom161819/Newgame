@@ -5,6 +5,16 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.45.0] - 2026-11-07
+<!-- version: {"title":"Thieves at night","type":"feature","reconstructed":false,"saveVersion":57} -->
+### Added
+- **Thieves:** on a night when a store or the castle has no burning light within 6 tiles, a thief may come.
+  - The chance grows with unhappiness, up to 30 % a night below 25 Happiness; with Happiness at 60 or more it is small.
+  - He comes from the map edge, takes 10–20 goods from the dark store (or 10–30 Gold from the castle) and runs.
+  - A soldier who sees him (in light or with a torch) chases him. A caught thief drops the goods for the Haulers, and Gold returns to the treasury.
+  - A thief who gets away is reported in the morning.
+- Thieves can be switched off (Night thieves).
+
 ## [0.44.0] - 2026-11-07
 <!-- version: {"title":"Wolves at night","type":"feature","reconstructed":false,"saveVersion":57} -->
 ### Added

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { workerScene } from './helpers/workerScene.js';
-import { placementError } from '../src/game/buildings.js';
+import { placementError,towerNeighbors } from '../src/game/buildings.js';
 import { NightThreatSystem,validNightThreatState,hasLocalWood } from '../src/systems/NightThreatSystem.js';
 import { DayNightSystem } from '../src/systems/DayNightSystem.js';
 import { LightFuelSystem } from '../src/systems/LightFuelSystem.js';
@@ -88,4 +88,35 @@ test('wolves near the houses: one notice and the night speed-up stops; the wolf 
 test('a 0.43.0 save (schema 57 without wolfDay) still loads', () => {
   assert.equal(validNightThreatState({enabled:{wolves:true,thieves:true,fires:true},campfires:[]},new Set()),true);
   assert.equal(validNightThreatState({enabled:{wolves:true,thieves:true,fires:true},campfires:[],wolfDay:'x'},new Set()),false);
+});
+
+test('thieves: no chance with lit stores; with a dark store and an unhappy kingdom a thief comes, steals and runs; a soldier who sees him gets the loot back', () => {
+  const {s,n}=world();n.random=()=>0;const store=[...s.foodStorage.locations.values()].find(l=>s.foodStorage.isStock(l));store.stock.wood=30;
+  night(s);s.dayNight.flameLights=()=>[{x:store.x+.5,y:store.y+.5,radius:6}];assert.equal(n.thiefTargets().length,0,'lit store');assert.equal(n.thiefChance(),0);
+  s.dayNight.flameLights=()=>[];s.needs.summary=()=>({happiness:20});const targets=n.thiefTargets();assert.ok(targets.length>=1);assert.ok(Math.abs(n.thiefChance(targets)-.3)<1e-9,'unhappy and dark: 30 %');
+  s.needs.summary=()=>({happiness:80});assert.ok(n.thiefChance(targets)<.1,'happy: small');
+  s.needs.summary=()=>({happiness:20});n.thiefDay=null;const thief=n.spawnThief(s.gameTime.day);assert.ok(thief);assert.equal(thief.isSubject,false,'not a resident');
+  // Put him next to the store: he steals and runs.
+  const b=s.buildings.find(x=>x.id===store.buildingId),spot=towerNeighbors(b).find(t=>s.map[t.y]?.[t.x]===0);
+  thief.tile={...spot};thief.position={x:spot.x+.5,y:spot.y+.5};thief.path=[];thief.nextTile=null;n.thieves.get(thief.id).repath=0;
+  n.updateThieves(50);const st=n.thieves.get(thief.id);assert.equal(st.state,'escaping');assert.equal(st.loot.resource,'wood');assert.ok(st.loot.amount>=10&&st.loot.amount<=20);assert.equal(store.stock.wood,30-st.loot.amount);
+  // A soldier with a torch right beside him: seen, chased, caught; the goods lie on the ground for the Haulers.
+  const soldier=s.workerSystem.create({x:thief.tile.x+1,y:thief.tile.y});soldier.profession='soldier';s.lightFuel.hands.add(soldier.id);
+  for(let i=0;i<40&&n.thieves.has(thief.id);i++){n.updateThieves(100);n.pursue(soldier);soldier.update(100);thief.update(100);}
+  assert.equal(n.thieves.has(thief.id),false,'caught');assert.ok([...s.dropSystem.drops.values()].some(d=>d.resource==='wood'&&d.amount===st.loot.amount),'loot dropped');
+});
+
+test('a thief who gets away is reported in the morning; switched-off thieves never come', () => {
+  const {s,n}=world();n.random=()=>0;const store=[...s.foodStorage.locations.values()].find(l=>s.foodStorage.isStock(l));store.stock.wood=30;s.needs.summary=()=>({happiness:20});s.dayNight.flameLights=()=>[];
+  night(s);const thief=n.spawnThief(s.gameTime.day);n.thieves.get(thief.id).loot={resource:'wood',amount:12,from:'Granary'};n.thieves.get(thief.id).state='escaping';n.thieves.get(thief.id).since=-1e9;
+  n.updateThieves(50);assert.equal(n.thieves.size,0,'gone');s.eventFeed={pushed:[],push(key,text){this.pushed.push({key,text});return true;}};
+  const g=s.gameTime;g.update(g.dayDuration-g.elapsed+g.dayDuration*.3);n.update(0);assert.match(s.eventFeed.pushed.map(p=>p.text).join('|'),/12 Wood/);
+  const off=world();off.n.setEnabled('thieves',false);off.n.random=()=>0;off.s.needs.summary=()=>({happiness:10});off.s.dayNight.flameLights=()=>[];night(off.s);assert.equal(off.n.spawnThief(off.s.gameTime.day),null);
+});
+
+test('save in the middle of a theft: the thief, his loot and the night are kept', () => {
+  const {s,n}=world();n.random=()=>0;const store=[...s.foodStorage.locations.values()].find(l=>s.foodStorage.isStock(l));store.stock.wood=30;s.needs.summary=()=>({happiness:20});s.dayNight.flameLights=()=>[];
+  night(s);const thief=n.spawnThief(s.gameTime.day);n.thieves.get(thief.id).loot={resource:'wood',amount:11,from:'Granary'};n.thieves.get(thief.id).state='escaping';
+  const state=validateGameState(serializeGameState(s));assert.deepEqual(state.nightThreats.thieves.map(t=>[t.id,t.state,t.loot.amount]),[[thief.id,'escaping',11]]);
+  assert.ok(state.workers.some(w=>w.id===thief.id&&w.isSubject===false),'the thief is a visitor, not a resident');
 });

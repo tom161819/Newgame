@@ -1,5 +1,5 @@
 import { NIGHT_THREATS } from '../data/nightThreats.js';
-import { buildingDefinition,buildingIsComplete,buildingTiles,placementError,campfireWood } from '../game/buildings.js';
+import { buildingDefinition,buildingIsComplete,buildingTiles,placementError,campfireWood,towerNeighbors } from '../game/buildings.js';
 import { removeBuildingShell } from '../game/buildingRemoval.js';
 import { adjacentTiles } from '../game/interaction.js';
 import { inAttackRange } from './CombatSystem.js';
@@ -14,6 +14,7 @@ export class NightThreatSystem {
   constructor(scene,settings=scene.gameSettings){
     this.scene=scene;this.enabled={wolves:settings?.nightWolves!==false,thieves:settings?.nightThieves!==false,fires:settings?.nightFires!==false};
     this.campfires=new Map();this.listeners=new Set();this.wolfDay=null;this.wolvesNear=false;this.random=Math.random;
+    this.thieves=new Map();this.thiefDay=null;this.reports=[];
   }
   onChange(l){this.listeners.add(l);return()=>this.listeners.delete(l);}
   changed(){for(const l of this.listeners)l();}
@@ -114,25 +115,107 @@ export class NightThreatSystem {
       if(wolf.path.some(t=>this.lit(t,lights))){wolf.path=[];(state.avoid??=new Set()).add(target.id);state.target=null;}}
     return true;
   }
+  // --- thieves -----------------------------------------------------------------------------------------------------
+  // Kingdom happiness: the average of the residents (100 when nobody lives here yet).
+  happiness(){return this.scene.needs?.summary?.()?.happiness??100;}
+  // Unlit targets: stores (and the castle for its Gold) without a burning light within 6 tiles.
+  thiefTargets(){
+    const s=this.scene,storage=s.foodStorage,out=[];
+    for(const l of storage?.locations?.values?.()??[]){if(!storage.isStock(l)||l.buildingId==null||!Object.values(l.stock).some(v=>v>0))continue;const c={x:l.x+l.width/2,y:l.y+l.height/2};if(s.dayNight?.darkAt?.(c))out.push({kind:'store',id:l.id,buildingId:l.buildingId,center:c});}
+    const castle=(s.buildings??[]).find(b=>b.type==='castle'&&buildingIsComplete(b));if(castle&&(s.inventory?.count?.('gold')??0)>0){const d=buildingDefinition(castle),c={x:castle.x+d.width/2,y:castle.y+d.height/2};if(s.dayNight?.darkAt?.(c))out.push({kind:'castle',id:'castle',buildingId:castle.id,center:c});}
+    return out;
+  }
+  thiefChance(targets=this.thiefTargets()){
+    const T=NIGHT_THREATS.thieves;if(!targets.length)return 0;const h=this.happiness(),unhappy=Math.max(0,Math.min(1,(T.happyAt-h)/(T.happyAt-T.unhappyAt)));
+    return T.maxChance*(.25+.75*unhappy)*(h>=T.happyAt?.5:1);
+  }
+  edgeTile(far,T){
+    const s=this.scene,rows=s.map.length,cols=s.map[0].length;
+    for(let i=0;i<300;i++){const side=Math.floor(this.random()*4),a=Math.floor(this.random()*(side%2?rows:cols)),d=Math.floor(this.random()*T.edge);
+      const tile=side===0?{x:a,y:d}:side===1?{x:cols-1-d,y:a}:side===2?{x:a,y:rows-1-d}:{x:d,y:a};if(isWalkable(s.map,tile.x,tile.y)&&far(tile))return tile;}
+    return null;
+  }
+  spawnThief(day){
+    const T=NIGHT_THREATS.thieves,s=this.scene;this.thiefDay=day;if(!this.enabled.thieves||!s.workerSystem)return null;
+    const targets=this.thiefTargets();if(!targets.length||this.random()>=this.thiefChance(targets))return null;
+    const target=targets[Math.floor(this.random()*targets.length)],start=this.edgeTile(t=>Math.hypot(t.x-target.center.x,t.y-target.center.y)>=T.spawnDistance,T);if(!start)return null;
+    const thief=s.workerSystem.create(start,{isSubject:false,name:t('threats.thiefName')});thief.workState='Moving to Target';thief.workMessage='Sneaking';
+    this.thieves.set(thief.id,{id:thief.id,state:'sneaking',target:{kind:target.kind,id:target.id,buildingId:target.buildingId},loot:null,pursuer:null,since:s.gameTime?.totalElapsed??0,repath:0});return thief;
+  }
+  thiefOf(worker){return this.thieves.get(worker?.id)??null;}
+  removeThief(id){const w=this.scene.workerSystem?.workers.get(id);if(w){w.view?.destroy?.();this.scene.workerSystem.workers.delete(id);}this.thieves.delete(id);}
+  steal(thief,state){
+    const T=NIGHT_THREATS.thieves,s=this.scene,[lo,hi]=state.target.kind==='castle'?T.gold:T.goods,want=lo+Math.floor(this.random()*(hi-lo+1));
+    if(state.target.kind==='castle'){const amount=Math.min(want,Math.floor(s.inventory.count('gold')));if(amount>0&&s.inventory.spend('gold',amount,{source:'Theft',id:`theft:${thief.id}`}))state.loot={resource:'gold',amount,from:'Castle'};}
+    else{const l=s.foodStorage.locations.get(state.target.id);if(l){const [resource]=Object.entries(l.stock).filter(([r])=>s.foodStorage.free(l.id,r)>0).sort((a,b)=>b[1]-a[1])[0]??[];
+      const amount=resource?Math.min(want,s.foodStorage.free(l.id,resource)):0;const b=s.buildings.find(x=>x.id===l.buildingId);
+      if(amount>0&&s.foodStorage.withdraw(l.id,resource,amount)){s.resourceLedger?.expense(resource,amount,'Theft',{id:`theft:${thief.id}`,entityId:l.buildingId});state.loot={resource,amount,from:b?s.objectRegistry.require(b.type).name:'store'};}}}
+    state.state='escaping';state.repath=0;
+  }
+  // A soldier sees the thief within his sight (a third at night outside light, full with a torch or in light).
+  spotter(thief){
+    const dn=this.scene.dayNight,lights=dn?.lights?.()??[];
+    return (this.scene.workerSystem?.liveWorkers?.()??[]).find(w=>w.profession==='soldier'&&w.isAlive&&w.isSubject!==false&&Math.hypot(w.position.x-thief.position.x,w.position.y-thief.position.y)<=(w.definition.gameplay.baseSight/2)*(dn?dn.sightFactor(w.position,lights):1))??null;
+  }
+  caught(thief,state){
+    const s=this.scene,loot=state.loot;
+    if(loot?.resource==='gold')s.inventory.add('gold',loot.amount,{source:'Recovered from Thief',id:`recovered:${thief.id}`});
+    else if(loot)s.dropSystem?.create(loot.resource,{x:thief.tile.x,y:thief.tile.y},loot.amount);
+    this.reports.push({caught:true});this.removeThief(thief.id);s.eventFeed?.push?.(`thief-caught:${thief.id}`,t('threats.thiefCaught'),{important:true});
+  }
+  updateThieves(delta){
+    const T=NIGHT_THREATS.thieves,s=this.scene,now=s.gameTime?.totalElapsed??0;
+    for(const state of [...this.thieves.values()]){
+      const thief=s.workerSystem?.workers.get(state.id);if(!thief){this.thieves.delete(state.id);continue;}
+      const exit=()=>this.edgeGoal(thief).slice(0,2).map(p=>({x:Math.max(0,Math.min(s.map[0].length-1,p.x)),y:Math.max(0,Math.min(s.map.length-1,p.y))}));
+      const atEdge=this.edgeGoal(thief).some(p=>p.x===thief.tile.x&&p.y===thief.tile.y);
+      if(state.state!=='sneaking'&&(atEdge||now-state.since>T.escapeMs)){if(state.loot)this.reports.push({...state.loot});this.removeThief(state.id);continue;}
+      // Seen by a soldier: he runs, the soldier chases him.
+      if(state.state!=='fleeing'){const soldier=this.spotter(thief);if(soldier){state.state='fleeing';state.pursuer=soldier.id;state.repath=0;}}
+      if(state.state==='fleeing'){const p=s.workerSystem.workers.get(state.pursuer);if(p?.isAlive&&Math.hypot(p.position.x-thief.position.x,p.position.y-thief.position.y)<=T.catchRange){this.caught(thief,state);continue;}}
+      state.repath-=delta;if(state.repath>0&&(thief.nextTile||thief.path.length))continue;state.repath=T.repathMs;
+      if(state.state==='sneaking'){
+        const b=s.buildings.find(x=>x.id===state.target.buildingId);if(!b){state.state='escaping';continue;}
+        const goals=towerNeighbors(b).filter(g=>isWalkable(s.map,g.x,g.y));if(goals.some(g=>g.x===thief.tile.x&&g.y===thief.tile.y)&&!thief.nextTile&&!thief.path.length){this.steal(thief,state);continue;}
+        thief.moveTo(goals);
+      }else thief.moveTo(exit());
+    }
+  }
+  // A soldier chasing a thief runs after him (called after his own AI step).
+  pursue(worker){
+    if(worker?.profession!=='soldier')return;const state=[...this.thieves.values()].find(st=>st.state==='fleeing'&&st.pursuer===worker.id);if(!state)return;
+    const thief=this.scene.workerSystem.workers.get(state.id);if(!thief)return;const now=this.scene.gameTime?.totalElapsed??0;
+    if((worker.pursueAt??0)>now)return;worker.pursueAt=now+NIGHT_THREATS.thieves.repathMs;worker.moveTo(adjacentTiles(thief,this.scene.map));worker.workMessage='Chasing a thief';
+  }
+  reportMorning(day){
+    if(!this.reports.length)return;const stolen=this.reports.filter(r=>!r.caught);
+    for(const r of stolen)this.scene.eventFeed?.push?.(`theft:${day}:${r.from}:${r.resource}`,t('threats.stolen',{amount:r.amount,resource:this.scene.objectRegistry?.get?.(r.resource)?.name??r.resource,from:r.from}),{important:true});
+    this.reports=[];
+  }
   checkWolvesNear(day){
     const W=NIGHT_THREATS.wolves,houses=this.houses();
     const near=this.wolves().some(w=>houses.some(h=>{const d=buildingDefinition(h);return Math.hypot(h.x+d.width/2-w.position.x,h.y+d.height/2-w.position.y)<=W.nearHouses;}));
     if(near&&!this.wolvesNear){this.scene.eventFeed?.push?.(`wolves-near:${day}`,t('threats.wolvesNear'),{important:true});}
     this.wolvesNear=near;
   }
-  update(){
-    this.updateCampfires();
+  update(delta=0){
+    this.updateCampfires();this.updateThieves(delta);
     const day=this.scene.gameTime?.day??1;
     if(this.scene.dayNight?.isNight()&&this.wolfDay!==day)this.spawnWolves(day);
+    if(this.scene.dayNight?.isNight()&&this.thiefDay!==day)this.spawnThief(day);
+    if(this.scene.dayNight?.part()==='day')this.reportMorning(day);
     this.checkWolvesNear(day);
   }
-  exportState(){return {enabled:{...this.enabled},wolfDay:this.wolfDay,campfires:[...this.campfires].map(([id,c])=>({id,litDay:c.litDay,ashesDay:c.ashesDay})).sort((a,b)=>a.id-b.id)};}
-  importState(data){if(!data)return;this.enabled={...this.enabled,...data.enabled};this.wolfDay=data.wolfDay??null;this.campfires=new Map((data.campfires??[]).map(c=>[c.id,{litDay:c.litDay,ashesDay:c.ashesDay}]));}
+  exportState(){return {enabled:{...this.enabled},wolfDay:this.wolfDay,thiefDay:this.thiefDay,thieves:[...this.thieves.values()].map(t=>({id:t.id,state:t.state,target:{...t.target},loot:t.loot?{...t.loot}:null,pursuer:t.pursuer})),reports:this.reports.map(r=>({...r})),campfires:[...this.campfires].map(([id,c])=>({id,litDay:c.litDay,ashesDay:c.ashesDay})).sort((a,b)=>a.id-b.id)};}
+  importState(data){if(!data)return;this.enabled={...this.enabled,...data.enabled};this.wolfDay=data.wolfDay??null;this.thiefDay=data.thiefDay??null;this.reports=(data.reports??[]).map(r=>({...r}));
+    this.thieves=new Map((data.thieves??[]).map(t=>[t.id,{...t,target:{...t.target},loot:t.loot?{...t.loot}:null,since:this.scene?.gameTime?.totalElapsed??0,repath:0}]));this.campfires=new Map((data.campfires??[]).map(c=>[c.id,{litDay:c.litDay,ashesDay:c.ashesDay}]));}
   destroy(){this.listeners.clear();}
 }
 export function validNightThreatState(data,buildingIds){
   const n=v=>v===null||Number.isSafeInteger(v)&&v>=1;
   // `wolfDay` came in 0.44.0; saves of 0.43.0 (same schema 57) have none.
-  return !!data&&typeof data==='object'&&!!data.enabled&&(data.wolfDay===undefined||n(data.wolfDay))&&NIGHT_THREATS.ids.every(id=>typeof data.enabled[id]==='boolean')&&Object.keys(data.enabled).length===NIGHT_THREATS.ids.length&&Object.keys(data).every(k=>['enabled','campfires','wolfDay'].includes(k))
+  return !!data&&typeof data==='object'&&!!data.enabled&&(data.wolfDay===undefined||n(data.wolfDay))&&NIGHT_THREATS.ids.every(id=>typeof data.enabled[id]==='boolean')&&Object.keys(data.enabled).length===NIGHT_THREATS.ids.length&&Object.keys(data).every(k=>['enabled','campfires','wolfDay','thiefDay','thieves','reports'].includes(k))&&(data.thiefDay===undefined||n(data.thiefDay))
+    &&(data.thieves===undefined||Array.isArray(data.thieves)&&data.thieves.every(t=>t&&typeof t.id==='string'&&['sneaking','escaping','fleeing'].includes(t.state)&&t.target&&typeof t.target.id==='string'&&(t.loot===null||Number.isFinite(t.loot.amount)&&t.loot.amount>0&&typeof t.loot.resource==='string')))
+    &&(data.reports===undefined||Array.isArray(data.reports))
     &&Array.isArray(data.campfires)&&data.campfires.every(c=>c&&buildingIds.has(c.id)&&n(c.litDay)&&n(c.ashesDay));
 }
