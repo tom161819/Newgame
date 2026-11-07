@@ -30,10 +30,12 @@ export function happinessOf({food,rest,housing,safety},unpaidPenalty=0){
   const w=NEEDS.weights;return Math.round(clampNeed(food*w.food+rest*w.rest+housing*w.housing+safety*w.safety-unpaidPenalty));
 }
 // The biggest single loss of Happiness, or null when nothing is notably wrong.
-export function mainProblem(needs,unpaidPenalty=0){
+export function mainProblem(needs,unpaidPenalty=0,policyLoss=0){
   const losses=Object.entries(NEEDS.weights).map(([id,weight])=>({id,loss:weight*(100-needs[id]),value:needs[id]}));
   if(unpaidPenalty>0)losses.push({id:'wages',loss:unpaidPenalty,value:0});
-  const worst=losses.filter(l=>l.id==='wages'||l.value<70).sort((a,b)=>b.loss-a.loss)[0];return worst?worst.id:null;
+  // Policy v2 P2: the kingdom policy (taxes and its situation penalties) can be the biggest loss.
+  if(policyLoss>0)losses.push({id:'policy',loss:policyLoss,value:0});
+  const worst=losses.filter(l=>['wages','policy'].includes(l.id)||l.value<70).sort((a,b)=>b.loss-a.loss)[0];return worst?worst.id:null;
 }
 
 // #58 phase C2 (S13 §8–9): strikes and emigration.

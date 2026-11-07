@@ -8,7 +8,7 @@ export const problemLabel=problem=>problem?t(`needs.problem.${problem}`):t('need
 // #58 phase D: each bar's tooltip says what moves the value, so the reason for dissatisfaction is visible.
 const signed=v=>v>0?`+${v}`:String(v).replace('-','−');
 export function needTooltip(id,status){
-  if(id==='food')return t(status.hungry?'needs.tip.foodLow':'needs.tip.food');
+  if(id==='food')return t(status.hungry?'needs.tip.foodLow':'needs.tip.food')+(status.foodCap<100?` · ${t('needs.tip.foodCap',{cap:status.foodCap})}`:'');
   if(id==='rest')return t('needs.tip.rest');
   if(id==='housing')return t('needs.tip.housing',{home:homeLabel(status.home)});
   if(id==='safety')return (status.safetyFactors??[]).map(([k,v],i)=>`${t(`needs.safety.${k}`)} ${i?signed(v):v}`).join(' · ');
@@ -27,6 +27,7 @@ export function renderNeeds(root,status){
   // Policy v2 P1: the effect moves towards its target; the line shows both while it is on its way.
   const signed=n=>`${n>0?'+':n<0?'−':''}${Math.abs(n)}`,policyNow=Math.round(status.policy??0),policyTarget=status.policyTarget??policyNow;
   if(policyNow||policyTarget)lines.push(element('p','need-policy',Math.round(status.policy??0)===policyTarget&&Math.abs((status.policy??0)-policyTarget)<.01?t('needs.policyLine',{value:signed(policyNow)}):t('needs.policyLineMoving',{value:signed(policyNow),target:signed(policyTarget)})));
+  for(const c of status.policyContext??[])lines.push(element('p','need-policy-context',t(`needs.context.${c.id}`,{value:`−${c.value}`})));
   if(status.leaving)lines.push(element('p','need-strike',t('needs.leavingLine')));
   else if(status.strike)lines.push(element('p','need-strike',t('needs.strikeLine')));
   else if(status.lowDays>0)lines.push(element('p','need-risk',t('needs.riskLine',{days:status.lowDays})));

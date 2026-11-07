@@ -23,7 +23,7 @@ test('policy has five tax rates and three rations; Normal is the default and inv
   assert.equal(s.policy.set('tax','very_high'),true);assert.equal(s.policy.set('rations','generous'),true);
   // Policy v2 P1: the choice waits for the morning; the effect then moves towards the new target.
   assert.deepEqual([s.policy.tax,s.policy.rations,s.policy.happiness()],['normal','normal',0]);assert.deepEqual(s.policy.pending,{tax:'very_high',rations:'generous'});
-  assert.equal(s.policy.apply(),true);assert.deepEqual([s.policy.tax,s.policy.rations,s.policy.target(),s.policy.pending],['very_high','generous',-10,null]);
+  assert.equal(s.policy.apply(),true);assert.deepEqual([s.policy.tax,s.policy.rations,s.policy.target(),s.policy.pending],['very_high','generous',-15,null]);
 });
 
 test('taxes are collected once each morning from every permanent resident while the Castle stands', () => {
@@ -43,7 +43,7 @@ test('rations change how often residents eat and their Happiness; taxes move Hap
   const s=world({residents:1}),w=s.workerSystem.liveWorkers()[0],base=s.needs.status(w).happiness;
   const now=(tax,rations='normal')=>{s.policy.set('tax',tax);s.policy.set('rations',rations);s.policy.apply();s.policy.effect=s.policy.target();};
   now('very_high');assert.equal(s.needs.status(w).happiness,Math.max(0,base-20));
-  now('none','generous');assert.equal(s.needs.status(w).happiness,Math.min(100,base+20));
+  now('none','generous');assert.equal(s.needs.status(w).happiness,Math.min(100,base+15));
 });
 
 test('policy is saved and loaded; an unknown rate is rejected', () => {
@@ -76,4 +76,24 @@ test('Policy v2 P1: the balance adds Castle income, taxes and trade, minus wages
   s.resourceLedger={history:[{totals:{gold:{incomeBySource:{'Trade Sale':30},expensesBySource:{'Trade Purchase':6}}}},{totals:{}},{totals:{gold:{incomeBySource:{'Trade Sale':6}}}}]};
   assert.equal(s.policy.balance().trade,10,'average of the last three days');
   const f=s.policy.food();assert.deepEqual(Object.keys(f),['production','consumption','net','days']);assert.equal(f.net,f.production-f.consumption);
+});
+
+test('Policy v2 P2: rations cap the Food need; Generous adds a small bonus; situation penalties act at once with reasons', () => {
+  const s=world({residents:1}),w=s.workerSystem.liveWorkers()[0],p=s.policy,now=(tax,rations)=>{p.set('tax',tax);p.set('rations',rations);p.apply();p.effect=p.target();};
+  s.inventory.add('bread',100);now('normal','small');for(let i=0;i<20;i++)s.needs.step(s.gameTime.dayDuration/10);
+  assert.equal(s.needs.status(w).food,60,'Small rations hold Food at 60');assert.equal(s.needs.status(w).foodCap,60);
+  now('normal','normal');for(let i=0;i<20;i++)s.needs.step(s.gameTime.dayDuration/10);assert.equal(s.needs.status(w).food,100);
+  // Small with High taxes: about the old −15 through the Food weight (0.35 × 40 = 14).
+  now('normal','small');for(let i=0;i<20;i++)s.needs.step(s.gameTime.dayDuration/10);const small=s.needs.status(w).happiness;now('normal','normal');for(let i=0;i<20;i++)s.needs.step(s.gameTime.dayDuration/10);
+  assert.equal(s.needs.status(w).happiness-small,14);
+  now('normal','generous');assert.equal(p.target(),5);
+  // 1. Taxed but unpaid.
+  s.wageSystem.unpaid=()=>2;assert.deepEqual(p.contextPenalties(w).map(c=>[c.id,c.value]),[['taxedUnpaid',10]]);now('none','normal');assert.deepEqual(p.contextPenalties(w),[]);s.wageSystem.unpaid=()=>0;
+  // 2. Promised generous food that never came: −10 and no well-fed bonus.
+  now('normal','generous');const fed=s.foodSystem.residents;s.foodSystem.residents=new Map([[w.id,{hungry:true}]]);assert.deepEqual(p.contextPenalties(w).map(c=>[c.id,c.value]),[['promisedFood',15]]);
+  const st=s.needs.status(w);assert.ok(st.policyContext.length===1);s.foodSystem.residents=fed;assert.equal(s.needs.status(w).happiness-st.happiness,15);
+  // 3. High taxes while hungry.
+  now('high','normal');assert.deepEqual(p.contextPenalties(w,{hungry:true}).map(c=>[c.id,c.value]),[['hungryTaxes',5]]);assert.deepEqual(p.contextPenalties(w,{hungry:false}),[]);
+  now('very_high','normal');assert.equal(s.needs.status(w).mainProblem,'policy','the policy is the biggest loss');
+  for(const status of [s.needs.status(w)])assert.ok(status.happiness>=0&&status.happiness<=100);
 });

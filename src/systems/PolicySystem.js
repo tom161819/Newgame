@@ -30,6 +30,16 @@ export class PolicySystem {
   daysToTarget(){return Math.abs(this.target()-this.effect)/POLICY_RULES.effectPerDay;}
   residents(){return (this.scene.workerSystem?.liveWorkers?.()??[]).filter(w=>w.isAlive&&w.isSubject!==false);}
   portions(){return RATIONS[this.rations].portions;}
+  foodCap(){return RATIONS[this.rations].foodCap;}
+  // Policy v2 P2: situation penalties of one resident, each with its reason (shown in the Happiness tooltip).
+  contextPenalties(worker,{hungry=false}={}){
+    const s=this.scene,c=POLICY_RULES.context,out=[];
+    if(this.tax!=='none'&&(s.wageSystem?.unpaid?.(worker)??0)>0)out.push({id:'taxedUnpaid',value:c.taxedUnpaid});
+    // Generous rations promised, but no meal for this resident: the penalty, and the well-fed bonus does not count.
+    if(this.rations==='generous'&&s.foodSystem?.residents?.get(worker.id)?.hungry)out.push({id:'promisedFood',value:c.promisedFood+Math.max(0,Math.min(RATIONS.generous.happiness,this.effect-TAX_RATES[this.tax].happiness))});
+    if(hungry&&c.hungryTaxRates.includes(this.tax))out.push({id:'hungryTaxes',value:c.hungryTaxes});
+    return out;
+  }
   // The Happiness effect in force now (whole points shown, the exact value used).
   happiness(){return this.effect;}
   dailyTaxes(tax=this.tax){return Math.round(this.residents().length*TAX_RATES[tax].perResident*100)/100;}

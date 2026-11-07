@@ -19,7 +19,9 @@ export class NeedsSystem {
     const day=this.scene.gameTime?.dayDuration??120000,fraction=ms/day,now=this.scene.gameTime?.totalElapsed??0,live=new Set(),homes=this.homes();
     for(const worker of this.residents()){
       live.add(worker.id);const r=this.record(worker),hungry=!!this.scene.foodSystem?.residents?.get(worker.id)?.hungry;
-      r.food=clampNeed(r.food+(hungry?-NEEDS.food.declinePerDay:NEEDS.food.recoverPerDay)*fraction);
+      // Policy v2 P2: rations cap the Food need; above the cap it falls back to it like a hungry resident's.
+      const cap=this.scene.policy?.foodCap?.()??100;
+      r.food=hungry?clampNeed(r.food-NEEDS.food.declinePerDay*fraction):r.food>cap?Math.max(cap,r.food-NEEDS.food.declinePerDay*fraction):Math.min(cap,r.food+NEEDS.food.recoverPerDay*fraction);
       // Phase B: resting at home recovers fastest, in the settlement's base places a little slower, without a home slowly.
       const rate=worker.workState==='Resting'?DAILY_REST.recoverPerDay[homes.get(worker.id)?.kind??'homeless']:NEEDS.activeStates.includes(worker.workState)?-NEEDS.rest.drainPerDay:NEEDS.rest.recoverPerDay;
       r.rest=clampNeed(r.rest+rate*fraction);
@@ -82,8 +84,10 @@ export class NeedsSystem {
     if(!worker?.isAlive||worker.isSubject===false||this.scene.workerSystem?.workers.get(worker.id)!==worker)return null;
     const r=this.records.get(worker.id)??{food:100,rest:100,attackedAt:null},home=homes.get(worker.id)??null,safety=this.safetyDetail(worker,r),needs={food:Math.round(r.food),rest:Math.round(r.rest),housing:home?100:0,safety:safety.value};
     // #103: taxes and rations move Happiness (bonus or penalty), kept apart from the unpaid-wage penalty.
-    const penalty=this.unpaidPenalty(worker),policy=this.scene.policy?.happiness?.()??0,happiness=happinessOf(needs,penalty-policy),mood=moodFor(happiness);
-    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,policyTarget:this.scene.policy?.target?.()??0,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
+    // Policy v2 P2: situation penalties (unpaid but taxed, promised food missing, taxed while hungry) act at once.
+    const penalty=this.unpaidPenalty(worker),policy=this.scene.policy?.happiness?.()??0,context=this.scene.policy?.contextPenalties?.(worker,{hungry:needs.food<NEEDS.food.low})??[],contextTotal=context.reduce((n,c)=>n+c.value,0);
+    const happiness=happinessOf(needs,penalty-policy+contextTotal),mood=moodFor(happiness),foodCap=this.scene.policy?.foodCap?.()??100;
+    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,policyTarget:this.scene.policy?.target?.()??0,policyContext:context,foodCap,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty,Math.max(0,-policy)+contextTotal),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
   }
   summary(){
     const homes=this.homes(),list=this.residents().map(w=>this.status(w,homes));

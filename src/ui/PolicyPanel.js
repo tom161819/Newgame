@@ -21,7 +21,7 @@ export class PolicyPanel {
     this.rations.replaceChildren(...Object.keys(RATIONS).map(id=>{const o=element('option','',t(`policy.rations.${id}`));o.value=id;return o;}));this.rations.value=p.pending?.rations??p.rations;
     const residents=p.residents().length,rate=TAX_RATES[p.tax],ration=RATIONS[p.rations];
     document.querySelector('#policy-tax-effect').textContent=t('policy.taxEffect',{each:rate.perResident.toFixed(2),total:p.dailyTaxes().toFixed(2),count:residents,happiness:this.signed(rate.happiness)});
-    document.querySelector('#policy-rations-effect').textContent=t('policy.rationsEffect',{portions:ration.portions,happiness:this.signed(ration.happiness)});
+    document.querySelector('#policy-rations-effect').textContent=t('policy.rationsEffect',{portions:ration.portions,cap:ration.foodCap,happiness:this.signed(ration.happiness)});
     // Policy v2 P1: what changes tomorrow, the daily balance, the Happiness forecast and the strike risk.
     const pending=document.querySelector('#policy-pending');if(!pending)return;pending.hidden=!p.pending;
     if(p.pending){const changes=[];if(p.pending.tax!==p.tax)changes.push(t('policy.pendingTax',{tax:t(`policy.tax.${p.pending.tax}`)}));if(p.pending.rations!==p.rations)changes.push(t('policy.pendingRations',{rations:t(`policy.rations.${p.pending.rations}`)}));document.querySelector('#policy-pending-text').textContent=t('policy.fromTomorrow',{changes:changes.join(', ')});}

@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-11-07
+<!-- version: {"title":"Rations and fair taxes","type":"feature","reconstructed":false,"saveVersion":46} -->
+### Changed
+- Food rations now work through hunger. Small rations keep residents' Food need at 60 at most, which lowers their Happiness by about as much as before. Generous rations give a small "well fed" bonus of +5.
+- Unhappy situations now cost Happiness at once, and the reason is shown in the resident's panel:
+  - taxes on top of unpaid wages (−10);
+  - generous rations promised but not delivered (−10);
+  - high taxes while hungry (−5).
+- The kingdom policy can now be shown as a resident's main problem.
+- Saved games use a new format (46). Games saved by earlier versions cannot be loaded; start a new game.
+
 ## [0.17.0] - 2026-11-07
 <!-- version: {"title":"Policy from the morning","type":"feature","reconstructed":false,"saveVersion":45} -->
 ### Added
