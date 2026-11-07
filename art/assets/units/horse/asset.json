@@ -309,7 +309,7 @@
     {
       "id": "horse-dun-sculpt",
       "name": "Dun – A · Sculpted (approved style)",
-      "version": 1,
+      "version": 4,
       "notes": "The approved realistic horse (Blender, sculpted look) in this coat.",
       "spec": {
         "species": "horse",
@@ -320,14 +320,14 @@
       "baked": {
         "renderer": "blender",
         "look": "sculpt",
-        "renderHash": "842d5e5e",
+        "renderHash": "29a70875",
         "samples": 96
       }
     },
     {
       "id": "horse-piebald-sculpt",
       "name": "Piebald – A · Sculpted (approved style)",
-      "version": 1,
+      "version": 3,
       "notes": "The approved realistic horse (Blender, sculpted look) in this coat.",
       "spec": {
         "species": "horse",
@@ -338,14 +338,14 @@
       "baked": {
         "renderer": "blender",
         "look": "sculpt",
-        "renderHash": "87f3e92c",
+        "renderHash": "22882327",
         "samples": 96
       }
     },
     {
       "id": "horse-dapple-sculpt",
       "name": "Dapple grey – A · Sculpted (approved style)",
-      "version": 1,
+      "version": 4,
       "notes": "The approved realistic horse (Blender, sculpted look) in this coat.",
       "spec": {
         "species": "horse",
@@ -356,7 +356,7 @@
       "baked": {
         "renderer": "blender",
         "look": "sculpt",
-        "renderHash": "c3110f5e",
+        "renderHash": "5fbe3ed9",
         "samples": 96
       }
     },

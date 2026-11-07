@@ -4,8 +4,8 @@
   "variantId": "horse-piebald-sculpt",
   "name": "Piebald – A · Sculpted (approved style)",
   "category": "units",
-  "version": 1,
-  "specHash": "5e56a262",
+  "version": 3,
+  "specHash": "5a5b1944",
   "generator": "blender",
   "generatorVersion": 1,
   "styleGuide": "medieval-kingdom-painted-isometric@1",
@@ -51,8 +51,8 @@
     "blender": "5.2.3 LTS",
     "samples": 96,
     "supersampling": 4,
-    "seconds": 68.7,
-    "renderHash": "87f3e92c",
+    "seconds": 63.5,
+    "renderHash": "22882327",
     "script": "scripts/blender/render.py"
   }
 }

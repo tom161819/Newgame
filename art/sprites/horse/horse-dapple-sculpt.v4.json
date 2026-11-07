@@ -4,8 +4,8 @@
   "variantId": "horse-dapple-sculpt",
   "name": "Dapple grey – A · Sculpted (approved style)",
   "category": "units",
-  "version": 1,
-  "specHash": "754ee18d",
+  "version": 4,
+  "specHash": "71468c7c",
   "generator": "blender",
   "generatorVersion": 1,
   "styleGuide": "medieval-kingdom-painted-isometric@1",
@@ -51,8 +51,8 @@
     "blender": "5.2.3 LTS",
     "samples": 96,
     "supersampling": 4,
-    "seconds": 65,
-    "renderHash": "c3110f5e",
+    "seconds": 64.2,
+    "renderHash": "5fbe3ed9",
     "script": "scripts/blender/render.py"
   }
 }

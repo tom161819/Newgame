@@ -269,6 +269,12 @@ function horseSkin(spec, plan, { breed, coat, mark, sock, P, rot }) {
     parts.push(ell(0.82 * L, 1.03 * H, sd * 0.03 * H, [0.01 * H, 0.012 * H, 0.008 * H], 'soot'));
   }
   if (breed === 'chestnut') parts.push(ell(0.74 * L, 1.2 * H, 0, [0.06 * H, 0.03 * H, 0.03 * H], 'cloth_linen'));
+  // Coat markings: regions of the skinned body painted in another material (Blender assigns the faces inside each
+  // sphere), so patches follow the body instead of sitting on it.
+  const patches = [], patch = (f, y, sd, r, material) => patches.push([...P(f, y, sd), r, material]);
+  if (breed === 'piebald') { patch(0.05 * L, 0.72 * H, 0.2 * H, 0.2 * H, 'cloth_linen'); patch(-0.34 * L, 0.78 * H, 0.15 * H, 0.15 * H, 'cloth_linen'); patch(0.1 * L, 0.66 * H, -0.2 * H, 0.17 * H, 'cloth_linen'); patch(0.5 * L, 1.1 * H, 0.05 * H, 0.08 * H, 'cloth_linen'); }
+  if (breed === 'dapple') for (let i = 0; i < 26; i++) { const f = -0.45 + (i % 9) * 0.1, sd = (i % 2 ? 1 : -1) * 0.22, y = 0.66 + ((i * 37) % 7) * 0.035; patch(f * L, y * H, sd * H, 0.075 * H, i % 3 ? 'cloth_linen' : 'stone_dark'); }
+  if (breed === 'dun') for (const f of [-0.5, -0.38, -0.26, -0.14, -0.02, 0.1, 0.22, 0.34]) patch(f * L, 1.04 * H + (f > 0.2 ? 0.04 * H : 0), 0, 0.08 * H, 'soot');
   const strand = (a, c, r0, r1, m) => { const A = P(...a), B = P(...c), dx = B[0] - A[0], dy = B[1] - A[1], dz = B[2] - A[2], len = Math.hypot(dx, dy, dz); return lean({ length: len, radiusBottom: r0, radiusTop: r1, segments: 6 }, Math.atan2(dz, dx), Math.acos(Math.max(-1, Math.min(1, dy / len))), A, m).part; };
   const maneMat = breed === 'palomino' || breed === 'chestnut' ? 'cloth_linen' : mark;
   for (let i = 0; i < 12; i++) { const t = i / 11, f = (0.4 + 0.2 * t) * L, y = (0.98 + 0.34 * t) * H + 0.06 * H, sd = (i % 2 ? 1 : -1) * 0.06 * H; parts.push(strand([f - 0.03 * L, y - 0.16 * H, sd * 1.6], [f, y, sd * 0.3], 0.008 * H, 0.03 * H, maneMat)); }
@@ -276,7 +282,7 @@ function horseSkin(spec, plan, { breed, coat, mark, sock, P, rot }) {
   for (const [sd, dl] of [[-1, 0.95], [0, 1.05], [1, 0.9]]) parts.push(strand([-0.66 * L, 0.84 * H - 0.6 * H * dl, sd * 0.03 * H], [-0.6 * L, 0.86 * H, 0], 0.03 * H, 0.03 * H, maneMat)); // tail
   if (spec.saddle) parts.push(ell(0.12 * L, 1.0 * H, 0, [0.14 * L, 0.04 * H, 0.2 * H], 'leather'));
   if (spec.harness) parts.push(ell(0.42 * L, 1.05 * H, 0, [0.06 * L, 0.16 * H, 0.17 * H], 'leather'));
-  return { parts, skeleton: { verts: verts.map(([f, y, sd, r]) => [...P(f, y, sd), r]), edges, material: coat, sock, sockFrom: 0.2 * H } };
+  return { parts, skeleton: { verts: verts.map(([f, y, sd, r]) => [...P(f, y, sd), r]), edges, material: coat, sock, sockFrom: 0.2 * H, patches } };
 }
 
 // ---------- realistic brown bear for the Blender looks (owner, 7 Nov 2026: massive, heavy, dangerous) ----------

@@ -339,6 +339,20 @@ def build_skin(model, mats, sk=None):
     for poly in obj.data.polygons:
         if sk['sock'] != sk['material'] and poly.center.z < limit:
             poly.material_index = 1
+    patches = sk.get('patches') or []
+    slots = {}
+    for p in patches:
+        if p[4] not in slots:
+            obj.data.materials.append(mats[p[4]]); slots[p[4]] = len(obj.data.materials) - 1
+    if patches:
+        centres = [(tb(p[:3]), p[3], slots[p[4]]) for p in patches]
+        for poly in obj.data.polygons:
+            if poly.center.z < limit:
+                continue
+            for c, r, idx in centres:
+                if (poly.center - c).length < r * (1 + 0.25 * mnoise.noise(poly.center * 40)):
+                    poly.material_index = idx
+                    break
     return obj
 
 
