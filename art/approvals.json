@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-07T16:35:08.685Z",
+  "updatedAt": "2026-11-07T18:09:34.918Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -378,14 +378,32 @@
       }
     },
     "fisherman-hut": {
-      "preferred": null,
+      "preferred": "fisherman-hut-stilt-net-loft",
       "variants": {
-        "fisherman-hut-stilt-net-loft": {
-          "status": "review",
-          "version": 2,
-          "specHash": "69d826b5",
+        "fisherman-hut-reed-cottage": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T17:40:00Z",
+          "specHash": "2920cefa",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1
+        },
+        "fisherman-hut-plank-smokehouse": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4759d185",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1
+        },
+        "fisherman-hut-stilt-net-loft": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "69d826b5",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T18:06:00Z",
           "comments": [
             {
               "at": "2026-11-07T16:25:24.015Z",
@@ -402,6 +420,27 @@
               "at": "2026-11-07T16:25:24.015Z"
             }
           ]
+        }
+      }
+    },
+    "fisherman-hut-large": {
+      "preferred": null,
+      "variants": {
+        "fisherman-hut-large-net-house": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "eb17d300",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1
+        },
+        "fisherman-hut-large-stage-hut": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f05c7811",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1
         }
       }
     },
@@ -609,14 +648,24 @@
       }
     },
     "pitch-kiln": {
-      "preferred": null,
+      "preferred": "pitch-kiln-stone-oven",
       "variants": {
-        "pitch-kiln-stone-oven": {
-          "status": "review",
-          "version": 2,
-          "specHash": "2d9bd415",
+        "pitch-kiln-turf-kiln": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T17:40:00Z",
+          "specHash": "dd84b900",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 2
+        },
+        "pitch-kiln-stone-oven": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2d9bd415",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T18:06:00Z",
           "comments": [
             {
               "at": "2026-11-07T16:26:23.158Z",
@@ -1981,6 +2030,28 @@
         }
       }
     },
+    "pet-icons": {
+      "preferred": "pet-icons-seated",
+      "variants": {
+        "pet-icons-seated": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "daebe5ca",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "pet-icons-heads": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "94132f51",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1
+        }
+      }
+    },
     "ration-icons": {
       "preferred": "ration-icons-bowls",
       "variants": {
@@ -2114,6 +2185,275 @@
         }
       }
     },
+    "cat": {
+      "preferred": "cat-black",
+      "variants": {
+        "cat-tabby": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9131d0f1",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T18:06:00Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "chci přidat další typ kočky, celá bíla, černá špička ocasu a černa skvrna na hlavě",
+              "version": 1
+            }
+          ]
+        },
+        "cat-black": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5b81e662",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "cat-ginger": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "52490389",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "cat-kitten": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "99d4aa88",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "cat-tabby-sit": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a3285c6e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "cat-ginger-pounce": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6b5d3166",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        }
+      }
+    },
+    "child": {
+      "preferred": "child-boy-tunic",
+      "variants": {
+        "child-boy-tunic": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "56e048a7",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "child-boy-cap": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "66937dc8",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "child-boy-ball": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0270e83b",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "child-girl-braid": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "256a9ffe",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "child-girl-kerchief": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f12e252e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "child-girl-basket": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8440c7c3",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        }
+      }
+    },
+    "dog": {
+      "preferred": null,
+      "variants": {
+        "dog-hound": {
+          "status": "review",
+          "version": 2,
+          "specHash": "3c6b0765",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T18:06:00Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "zlepšit tvary at je to vic realisticky pes",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "493a0a27",
+              "status": "revision-requested",
+              "at": "2026-11-07T18:06:00Z"
+            }
+          ]
+        },
+        "dog-sheepdog": {
+          "status": "review",
+          "version": 2,
+          "specHash": "39920583",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T18:06:00Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "zlepšit tvary at je to vic realisticky pes",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "08dbbcbf",
+              "status": "revision-requested",
+              "at": "2026-11-07T18:06:00Z"
+            }
+          ]
+        },
+        "dog-mastiff": {
+          "status": "review",
+          "version": 2,
+          "specHash": "5b789480",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T18:06:00Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "zlepšit tvary at je to vic realisticky pes",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "0da4664c",
+              "status": "revision-requested",
+              "at": "2026-11-07T18:06:00Z"
+            }
+          ]
+        },
+        "dog-hound-sit": {
+          "status": "review",
+          "version": 2,
+          "specHash": "aa199160",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T18:06:00Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "zlepšit tvary at je to vic realisticky pes",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "4b683eb0",
+              "status": "revision-requested",
+              "at": "2026-11-07T18:06:00Z"
+            }
+          ]
+        },
+        "dog-hound-run": {
+          "status": "review",
+          "version": 2,
+          "specHash": "d5150bc4",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T18:06:00Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "zlepšit tvary at je to vic realisticky pes",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "74e5b724",
+              "status": "revision-requested",
+              "at": "2026-11-07T18:06:00Z"
+            }
+          ]
+        },
+        "dog-mastiff-wounded": {
+          "status": "review",
+          "version": 2,
+          "specHash": "f9dd8745",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T18:06:00Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "zlepšit tvary at je to vic realisticky pes",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "94d83d93",
+              "status": "revision-requested",
+              "at": "2026-11-07T18:06:00Z"
+            }
+          ]
+        }
+      }
+    },
     "farmer": {
       "preferred": "farmer-male",
       "variants": {
@@ -2132,6 +2472,52 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:03:52.172Z",
           "approvedAt": "2026-11-04T19:03:52.172Z"
+        }
+      }
+    },
+    "firefighter": {
+      "preferred": "firefighter-male",
+      "variants": {
+        "firefighter-male": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "be59f6a9",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "firefighter-female": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e976aeb8",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        }
+      }
+    },
+    "fisher": {
+      "preferred": "fisher-male",
+      "variants": {
+        "fisher-male": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "118eab96",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "fisher-female": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6750a5bc",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
         }
       }
     },
@@ -2459,6 +2845,52 @@
         }
       }
     },
+    "pitch-maker": {
+      "preferred": "pitch-maker-male",
+      "variants": {
+        "pitch-maker-male": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4fd153bb",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "pitch-maker-female": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d3a25992",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        }
+      }
+    },
+    "rat": {
+      "preferred": "rat-grey",
+      "variants": {
+        "rat-grey": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a7a87b60",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "rat-brown": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3aef9e56",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        }
+      }
+    },
     "smelter-operator": {
       "preferred": "smelter-operator-male",
       "variants": {
@@ -2549,6 +2981,80 @@
         }
       }
     },
+    "thief": {
+      "preferred": null,
+      "variants": {
+        "thief-hooded": {
+          "status": "review",
+          "version": 2,
+          "specHash": "1a654f7d",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T18:06:00Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "at je celý v černym",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "f6ef09d5",
+              "status": "revision-requested",
+              "at": "2026-11-07T18:06:00Z"
+            }
+          ]
+        },
+        "thief-cutpurse": {
+          "status": "review",
+          "version": 2,
+          "specHash": "c406df0d",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T18:06:00Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "at je celý v černym",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "b80af97d",
+              "status": "revision-requested",
+              "at": "2026-11-07T18:06:00Z"
+            }
+          ]
+        }
+      }
+    },
+    "torchbearer": {
+      "preferred": "torchbearer-spearman",
+      "variants": {
+        "torchbearer-spearman": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c85e49be",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "torchbearer-watchwoman": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "15e6b3fa",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:06:00Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T18:06:00Z"
+        }
+      }
+    },
     "villager": {
       "preferred": "villager-male",
       "variants": {
@@ -2590,6 +3096,103 @@
           "status": "approved",
           "updatedAt": "2026-11-07T06:08:52.174Z",
           "version": 1
+        }
+      }
+    },
+    "wolf": {
+      "preferred": null,
+      "variants": {
+        "wolf-grey": {
+          "status": "review",
+          "version": 2,
+          "specHash": "822810ea",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T18:06:00Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "zlepšit tvary at je vic realisticky",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "9d2a2e96",
+              "status": "revision-requested",
+              "at": "2026-11-07T18:06:00Z"
+            }
+          ]
+        },
+        "wolf-dark": {
+          "status": "review",
+          "version": 2,
+          "specHash": "b8ae8ce9",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T18:06:00Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "zlepšit tvary at je vic realisticky",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "fbd61b75",
+              "status": "revision-requested",
+              "at": "2026-11-07T18:06:00Z"
+            }
+          ]
+        },
+        "wolf-grey-attack": {
+          "status": "review",
+          "version": 2,
+          "specHash": "74dbe301",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T18:06:00Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "zlepšit tvary at je vic realisticky",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "694419d1",
+              "status": "revision-requested",
+              "at": "2026-11-07T18:06:00Z"
+            }
+          ]
+        },
+        "wolf-dark-run": {
+          "status": "review",
+          "version": 2,
+          "specHash": "043697ba",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T18:06:00Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "zlepšit tvary at je vic realisticky",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "a6d47e34",
+              "status": "revision-requested",
+              "at": "2026-11-07T18:06:00Z"
+            }
+          ]
         }
       }
     },

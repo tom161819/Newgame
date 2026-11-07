@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "dog",
+  "variantId": "dog-mastiff-wounded",
+  "name": "Mastiff lying wounded",
+  "category": "units",
+  "version": 2,
+  "specHash": "f9dd8745",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 35,
+  "anchor": {
+    "x": 33,
+    "y": 17
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.48571
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 33
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.94286
+  },
+  "visualHeight": 33,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.323,
+  "lights": []
+}

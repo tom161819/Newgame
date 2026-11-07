@@ -3,7 +3,7 @@
   "id": "thief",
   "name": "Thief",
   "category": "units",
-  "description": "Night thief (plan g-noc-grafika): dark hood and cloak, sneaking with a bulging stolen sack over the shoulder.",
+  "description": "Night thief (plan g-noc-grafika). Revision 2 (owner: all in black): black hood, cloak, tunic and hose, soft dark boots, a stolen sack over the shoulder.",
   "footprint": {
     "width": 1,
     "height": 1
@@ -14,12 +14,12 @@
     {
       "id": "thief-hooded",
       "name": "Hooded thief",
-      "version": 1,
+      "version": 2,
       "spec": {
         "sex": "male",
-        "garment": "cloth_forest",
-        "legs": "cloth_grey",
-        "sleeves": "cloth_grey",
+        "garment": "soot",
+        "legs": "soot",
+        "sleeves": "soot",
         "headgear": "hood",
         "headgearMaterial": "soot",
         "hair": "hair_dark",
@@ -30,12 +30,14 @@
     {
       "id": "thief-cutpurse",
       "name": "Cutpurse",
-      "version": 1,
+      "version": 2,
       "spec": {
         "sex": "female",
-        "garment": "cloth_brown",
+        "garment": "soot",
+        "legs": "soot",
+        "sleeves": "soot",
         "headgear": "hood",
-        "headgearMaterial": "cloth_grey",
+        "headgearMaterial": "soot",
         "hair": "hair_dark",
         "build": 0.88,
         "tool": "loot"

@@ -14,9 +14,10 @@
     {
       "id": "wolf-grey",
       "name": "Grey wolf",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "wolf",
+        "anatomy": 2,
         "breed": "grey",
         "facing": 1
       }
@@ -24,9 +25,10 @@
     {
       "id": "wolf-dark",
       "name": "Dark wolf",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "wolf",
+        "anatomy": 2,
         "breed": "dark",
         "facing": 1
       }
@@ -34,9 +36,10 @@
     {
       "id": "wolf-grey-attack",
       "name": "Grey wolf attacking",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "wolf",
+        "anatomy": 2,
         "breed": "grey",
         "pose": "attack",
         "facing": 1
@@ -45,9 +48,10 @@
     {
       "id": "wolf-dark-run",
       "name": "Dark wolf running",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "wolf",
+        "anatomy": 2,
         "breed": "dark",
         "pose": "run",
         "facing": 2

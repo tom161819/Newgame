@@ -13,6 +13,8 @@ export const params = [
   { key: 'collar', description: 'Collar material (dogs).' },
   { key: 'facing', description: 'Turn in eighths of a full circle (0–7); 0 faces the viewer.' },
   { key: 'stride', description: 'Walk pose −1…1 for animation frames.' },
+  { key: 'anatomy', description: 'Dogs and wolves: 2 = the anatomical skeleton of revision 2 (the only one drawn now).' },
+  { key: 'markings', description: 'Cats: "patches" = white cat with a black tail tip and a black patch on the head.' },
 ];
 
 // Body plans in units: length, height of the back, body depth and width, leg length, head size, tail.
@@ -26,12 +28,112 @@ const PLANS = {
   wolf: { len: 0.56, back: 0.4, depth: 0.17, width: 0.15, leg: 0.24, head: 0.085, snout: 0.11, ears: 'point', tail: { length: 0.3, radius: 0.04, up: -0.45, bushy: 1.5 }, ruff: true },
 };
 const COATS = {
-  cat: { tabby: ['hair_brown', 'hair_dark'], black: ['soot', 'cloth_linen'], ginger: ['hair_auburn', 'cloth_linen'], kitten: ['hair_grey', 'cloth_linen'] },
+  cat: { tabby: ['hair_brown', 'hair_dark'], white: ['cloth_linen', 'soot'], black: ['soot', 'cloth_linen'], ginger: ['hair_auburn', 'cloth_linen'], kitten: ['hair_grey', 'cloth_linen'] },
   dog: { hound: ['horse_chestnut', 'cloth_linen'], sheepdog: ['soot', 'cloth_linen'], mastiff: ['hair_brown', 'horse_dark'] },
   rat: { rat: ['stone_dark', 'hair_grey'] },
   wolf: { grey: ['horse_grey', 'stone_light'], dark: ['stone_dark', 'horse_grey'] },
 };
 const FRONT = Math.PI / 4; // facing 0: the animal walks towards the viewer (+x +z), like the figure recipe
+
+// ---------- dogs and wolves (revision 2: anatomical skeleton) ----------
+// Owner, 7 Nov 2026: "better shapes, more like a real dog / wolf". The body is a deep chest, a tucked waist and a
+// rump; the neck rises forward to a skull with a tapered muzzle; legs have elbows, wrists, stifles and hocks (the
+// hind legs bend backwards). Joints are points (front, up) on the animal's side; limbs are tapered cylinders between.
+function canine(spec, plan, { species, breed, coat, mark, pose, stride, P, rot }) {
+  const parts = [], L = plan.len, H = plan.back, D = plan.depth, W = plan.width, hd = plan.head, legR = Math.max(0.016, W * 0.16);
+  const ell = (f, y, s, [a, b, c], material, pitch = 0) => sphere([a, b, c], P(f + b * Math.sin(pitch), y - b * Math.cos(pitch), s), material, 1, { rotation: rot, ...(pitch ? { tilt: [0, pitch] } : {}) });
+  const limb = (from, to, r0, r1, material) => { // from = lower point [f, y, s], to = upper point
+    const a = P(...from), b = P(...to), dx = b[0] - a[0], dy = b[1] - a[1], dz = b[2] - a[2], len = Math.hypot(dx, dy, dz);
+    return lean({ length: len, radiusBottom: r0, radiusTop: r1, segments: 7 }, Math.atan2(dz, dx), Math.acos(Math.max(-1, Math.min(1, dy / len))), a, material).part;
+  };
+  const lie = pose === 'lie', sit = pose === 'sit', attack = pose === 'attack', run = pose === 'run';
+  const wolf = species === 'wolf', shaggy = !!plan.shaggy;
+  // Pose: heights of the withers (shoulder top) and the hips, head lift.
+  const withers = lie ? D * 1.05 : sit ? H * 1.05 : attack ? H * 0.82 : H;
+  const hips = lie ? D * 0.95 : sit ? D * 0.75 : attack ? H * 1.02 : H * 0.96;
+  const swing = (run ? 1.6 : 1) * stride;
+  // Torso: chest, waist (belly tucked up) and rump, following the line from withers to hips.
+  const chestF = L * 0.24, rumpF = -L * 0.27;
+  if (sit) {
+    parts.push(ell(rumpF + L * 0.12, D * 0.5, 0, [L * 0.24, D * 0.5, W * 0.5], coat), ell(L * 0.02, H * 0.5, 0, [L * 0.3, D * 0.5, W * 0.46], coat, 0.85));
+  } else {
+    parts.push(ell(chestF, withers - D * 0.5, 0, [L * 0.27, D * 0.54, W * 0.5], coat));
+    parts.push(ell(0, (withers + hips) / 2 - D * 0.38, 0, [L * 0.26, D * 0.36, W * 0.42], coat, (hips - withers) / L));
+    parts.push(ell(rumpF, hips - D * 0.45, 0, [L * 0.24, D * 0.44, W * 0.46], coat));
+  }
+  const chestTop = sit ? H * 0.95 : withers, chestFront = sit ? L * 0.22 : chestF + L * 0.18;
+  // Chest / belly marking.
+  parts.push(ell(chestFront - L * 0.04, chestTop - D * 0.75, 0, [L * 0.12, D * 0.3, W * 0.36], mark));
+  // Legs. Front: shoulder → elbow → wrist → paw. Hind: hip → stifle → hock → paw.
+  const legs = [];
+  if (lie) {
+    for (const s of [-1, 1]) {
+      legs.push(limb([chestF + L * 0.42, legR, s * W * 0.25], [chestF + L * 0.05, legR * 1.2, s * W * 0.3], legR * 0.8, legR, coat));
+      legs.push(limb([rumpF + L * 0.2, legR, s * W * 0.55], [rumpF - L * 0.05, D * 0.5, s * W * 0.4], legR * 0.9, legR * 1.6, coat));
+    }
+  } else {
+    for (const [s, phase] of [[1, 1], [-1, -1]]) {
+      const sw = swing * phase * L * 0.22, f0 = sit ? L * 0.2 : chestF + L * 0.06, sy = chestTop - D * 0.55;
+      const elbow = [f0 - L * 0.02 + sw * 0.3, H * 0.5 + (sit ? H * 0.05 : 0) - (attack ? H * 0.12 : 0), s * W * 0.32], wrist = [f0 + sw * 0.85 + (attack ? L * 0.12 : 0), H * 0.14, s * W * 0.3], paw = [f0 + sw + L * 0.03 + (attack ? L * 0.12 : 0), 0, s * W * 0.3];
+      legs.push(limb(elbow, [f0, sy, s * W * 0.34], legR * 1.3, legR * 1.8, coat), limb(wrist, elbow, legR * 0.85, legR * 1.1, coat), limb(paw, wrist, legR * 0.8, legR * 0.85, coat));
+      legs.push(ell(paw[0] + legR * 0.4, legR * 0.8, paw[2], [legR * 1.4, legR * 0.8, legR * 1.1], wolf ? coat : breed === 'sheepdog' ? mark : coat));
+    }
+    for (const [s, phase] of [[1, -1], [-1, 1]]) {
+      const sw = swing * phase * L * 0.22;
+      if (sit) {
+        legs.push(ell(rumpF + L * 0.1, D * 0.36, s * W * 0.42, [L * 0.22, D * 0.32, W * 0.18], coat, 0.25), limb([rumpF + L * 0.38, legR, s * W * 0.4], [rumpF + L * 0.05, legR * 1.4, s * W * 0.42], legR * 0.8, legR * 1.1, coat));
+        continue;
+      }
+      const hip = [rumpF + L * 0.02, hips - D * 0.45, s * W * 0.36], stifle = [rumpF + L * 0.12 + sw * 0.4, H * 0.5 + (attack ? H * 0.05 : 0), s * W * 0.36];
+      const hock = [rumpF - L * 0.1 + sw * 0.7 - (attack ? L * 0.1 : 0), H * 0.25, s * W * 0.33], paw = [rumpF - L * 0.04 + sw, 0, s * W * 0.33];
+      legs.push(ell(rumpF + L * 0.04, hips - D * 0.95, s * W * 0.3, [L * 0.17, D * 0.42, W * 0.16], coat, -0.35));
+      legs.push(limb(stifle, hip, legR * 1.4, legR * 1.9, coat), limb(hock, stifle, legR * 0.9, legR * 1.3, coat), limb(paw, hock, legR * 0.75, legR * 0.85, coat));
+      legs.push(ell(paw[0] + legR * 0.4, legR * 0.8, paw[2], [legR * 1.4, legR * 0.8, legR * 1.1], coat));
+    }
+  }
+  parts.push(...legs);
+  // Neck and head. The neck rises forward from the chest; the attack pose lowers and stretches it.
+  const neckBase = [chestFront - L * 0.04, chestTop - D * 0.25], headUp = lie ? D * 0.75 : attack ? withers - hd * 0.2 : chestTop + (sit ? H * 0.38 : H * 0.3);
+  const skull = [chestFront + (lie ? L * 0.22 : attack ? L * 0.3 : L * 0.12), headUp];
+  const nx = skull[0] - neckBase[0], ny = skull[1] - neckBase[1], neckPitch = Math.atan2(ny, nx);
+  parts.push(ell((neckBase[0] + skull[0]) / 2, (neckBase[1] + skull[1]) / 2 + hd * 0.1, 0, [Math.hypot(nx, ny) / 2 + hd * 0.25, hd * 0.85 * (wolf ? 1.15 : 1), W * 0.36], coat, neckPitch));
+  if (wolf) parts.push(ell(neckBase[0] + nx * 0.35, neckBase[1] + ny * 0.35 + hd * 0.2, 0, [hd * 1.25, hd * 1.35, W * 0.52], coat === 'horse_grey' ? 'stone_light' : 'horse_grey', neckPitch));
+  if (shaggy) parts.push(ell(neckBase[0] + nx * 0.2, neckBase[1] + ny * 0.2, 0, [hd * 1.2, hd * 1.4, W * 0.55], mark, neckPitch));
+  parts.push(ell(skull[0], skull[1] + hd * 0.15, 0, [hd * 1.0, hd * 0.85, hd * 0.82], coat));
+  if (wolf) for (const s of [-1, 1]) parts.push(ell(skull[0] - hd * 0.1, skull[1] - hd * 0.1, s * hd * 0.55, [hd * 0.55, hd * 0.55, hd * 0.35], 'stone_light'));
+  // Muzzle: a tapered cylinder from the tip (lower) back up into the skull; nose; lower jaw.
+  const snout = plan.snout ?? hd, tipF = skull[0] + hd * 0.7 + snout, tipY = skull[1] - hd * (attack ? 0.15 : 0.3), muzzleMat = species === 'dog' && breed === 'sheepdog' ? 'cloth_linen' : species === 'dog' && breed === 'mastiff' ? 'horse_dark' : coat;
+  parts.push(limb([tipF, tipY, 0], [skull[0] + hd * 0.35, skull[1] + hd * 0.1, 0], hd * (breed === 'mastiff' ? 0.45 : 0.3), hd * 0.62, muzzleMat));
+  parts.push(ell(tipF + hd * 0.05, tipY + hd * 0.05, 0, [hd * 0.2, hd * 0.17, hd * 0.2], 'soot'));
+  if (attack) parts.push(limb([tipF - hd * 0.1, tipY - hd * 0.55, 0], [skull[0] + hd * 0.4, skull[1] - hd * 0.35, 0], hd * 0.2, hd * 0.4, coat), ell(tipF - snout * 0.45, tipY - hd * 0.3, 0, [snout * 0.4, hd * 0.12, hd * 0.25], 'cloth_red'),
+    ...[-1, 1].map(s => ell(tipF - hd * 0.15, tipY - hd * 0.32, s * hd * 0.12, [hd * 0.05, hd * 0.1, hd * 0.05], 'cloth_linen')));
+  // Eyes (amber for wolves), then ears.
+  for (const s of [-1, 1]) {
+    parts.push(ell(skull[0] + hd * 0.62, skull[1] + hd * 0.25, s * hd * 0.42, [hd * 0.14, hd * 0.12, hd * 0.12], wolf ? 'cloth_ochre' : 'soot'));
+    if (wolf || breed === 'sheepdog') {
+      const e = P(skull[0] - hd * 0.15, skull[1] + hd * 0.8, s * hd * 0.48);
+      parts.push(cylinder({ radiusBottom: hd * (wolf ? 0.32 : 0.28), radiusTop: hd * 0.02, height: hd * (wolf ? 1.0 : 0.6), segments: 4, tilt: [s * 0.25, wolf ? 0.1 : -0.5] }, e, coat));
+    } else {
+      parts.push(ell(skull[0] - hd * 0.25, skull[1] - hd * (breed === 'hound' ? 0.7 : 0.25), s * hd * 0.9, [hd * 0.35, hd * (breed === 'hound' ? 0.85 : 0.45), hd * 0.12], breed === 'hound' ? 'horse_dark' : coat, -0.2));
+    }
+  }
+  if (spec.collar) parts.push(ell(neckBase[0] + nx * 0.3, neckBase[1] + ny * 0.3 - hd * 0.65, 0, [hd * 0.62, hd * 0.2, W * 0.42], spec.collar, neckPitch));
+  // Back markings: a wolf's dark saddle, a hound's saddle, the sheepdog's shaggy coat.
+  if (!sit && !lie) {
+    if (wolf) parts.push(ell(-L * 0.05, (withers + hips) / 2 - D * 0.02, 0, [L * 0.36, D * 0.16, W * 0.42], coat === 'horse_grey' ? 'stone_dark' : 'soot'));
+    if (breed === 'hound') parts.push(ell(-L * 0.08, (withers + hips) / 2 - D * 0.04, 0, [L * 0.3, D * 0.14, W * 0.44], 'horse_dark'));
+    if (shaggy) for (const f of [-0.25, 0, 0.22]) parts.push(ell(L * f, (withers + hips) / 2 - D * 0.62, 0, [L * 0.18, D * 0.6, W * 0.56], coat));
+  }
+  // Tail from the rump: wolves carry it low and bushy, hounds up, sheepdogs a long plume.
+  const tail = plan.tail, rump = [rumpF - L * 0.2, (sit ? D * 0.4 : hips) - D * 0.2], up = sit ? -0.6 : attack ? 0.1 : tail.up + stride * 0.08;
+  const tipT = [rump[0] - Math.cos(up) * tail.length, Math.max(0.03, rump[1] + Math.sin(up) * tail.length)];
+  const rT = tail.radius * tail.bushy;
+  if (up >= 0) parts.push(limb([rump[0], rump[1], 0], [tipT[0], tipT[1], 0], rT * 0.7, rT, coat)); // lean upwards: from the rump
+  else parts.push(limb([tipT[0], tipT[1], 0], [rump[0], rump[1], 0], rT, rT * 0.7, coat));
+  if (wolf) parts.push(ell(tipT[0], tipT[1] + rT * 0.6, 0, [rT * 1.1, rT, rT], 'soot'));
+  if (lie && species === 'dog') parts.push(cylinder({ radiusBottom: D * 0.5, radiusTop: D * 0.5, height: L * 0.14, segments: 10, tilt: [0, -Math.PI / 2] }, P(-L * 0.08, D * 0.55), 'cloth_linen'), sphere([0.012, 0.012, 0.012], P(-L * 0.02, D * 1.05), 'cloth_red', 0));
+  return parts;
+}
 
 export function build(spec, { footprint }) {
   const species = spec.species ?? 'cat', breed = spec.breed ?? { cat: 'tabby', dog: 'hound', rat: 'rat', wolf: 'grey' }[species];
@@ -40,6 +142,11 @@ export function build(spec, { footprint }) {
   const coat = spec.coat ?? coatDefault, mark = spec.marking ?? markDefault, pose = spec.pose ?? 'stand', stride = Math.max(-1, Math.min(1, spec.stride ?? (pose === 'run' ? 1 : 0)));
   const fx = Math.cos(FRONT), fz = Math.sin(FRONT), sx = -fz, sz = fx, rot = -FRONT;
   const P = (f, up, s = 0) => [fx * f + sx * s, up, fz * f + sz * s];
+  if (species === 'dog' || species === 'wolf') {
+    const canineParts = canine(spec, plan, { species, breed, coat, mark, pose, stride, P, rot });
+    const turned = spec.facing ? turnParts(canineParts, spec.facing * Math.PI / 4) : canineParts, out = turned.map(p => ({ ...p, overhang: true }));
+    return { primitives: out, lights: [], height: Math.max(...out.map(p => p.at[1] + (p.size?.[1] ?? p.height ?? (p.radii ? p.radii[1] * 2 : 0)))) };
+  }
   const parts = [];
   const { len, depth, width, leg, head } = plan;
   // Pose shapes the body: sitting lowers the rump, pouncing and attacking lower the front, lying puts it on the ground.
@@ -72,6 +179,7 @@ export function build(spec, { footprint }) {
     parts.push(box([head * 0.25, head * 0.25, head * 0.3], P(headF + head * 0.62 + plan.snout * 0.85, headY - head * 0.62), 'soot', { rotation: rot }));
     if (pose === 'attack') parts.push(box([plan.snout * 0.9, head * 0.18, head * 0.5], P(headF + head * 0.5 + plan.snout * 0.4, headY - head * 1.35), 'cloth_red', { rotation: rot }), box([plan.snout * 0.85, head * 0.2, head * 0.55], P(headF + head * 0.5 + plan.snout * 0.45, headY - head * 1.6), coat, { rotation: rot }));
   } else parts.push(sphere([head * 0.45, head * 0.35, head * 0.45], P(headF + head * 0.75, headY - head * 0.9), mark, 0, { rotation: rot }));
+  if (species === 'cat' && breed === 'white') parts.push(sphere([head * 0.55, head * 0.32, head * 0.5], P(headF - head * 0.1, headY - head * 0.2, head * 0.25), 'soot', 1, { rotation: rot })); // owner: a black patch on the head
   for (const s of [-1, 1]) {
     parts.push(sphere([head * 0.16, head * 0.16, head * 0.16], P(headF + head * 0.82, headY - head * 0.45, s * head * 0.4), species === 'cat' ? 'foliage_spring' : 'soot', 0));
     if (plan.ears === 'point') parts.push(cylinder({ radiusBottom: head * 0.32, radiusTop: 0, height: head * (species === 'wolf' ? 0.95 : 0.85), segments: 4 }, P(headF - head * 0.15, headY - head * 0.05, s * head * 0.5), coat));

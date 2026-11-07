@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wolf",
+  "variantId": "wolf-dark-run",
+  "name": "Dark wolf running",
+  "category": "units",
+  "version": 2,
+  "specHash": "043697ba",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 47,
+  "anchor": {
+    "x": 33,
+    "y": 29
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.61702
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 45
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.95745
+  },
+  "visualHeight": 45,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.673,
+  "lights": []
+}

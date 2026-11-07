@@ -65,5 +65,136 @@
       },
       "flameSize": 1
     }
-  ]
+  ],
+  "facings": [
+    {
+      "facing": 0,
+      "width": 67,
+      "height": 61,
+      "anchor": {
+        "x": 33,
+        "y": 43
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.70492
+      }
+    },
+    {
+      "facing": 1,
+      "width": 67,
+      "height": 61,
+      "anchor": {
+        "x": 33,
+        "y": 43
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.70492
+      }
+    },
+    {
+      "facing": 2,
+      "width": 67,
+      "height": 61,
+      "anchor": {
+        "x": 33,
+        "y": 43
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.70492
+      }
+    },
+    {
+      "facing": 3,
+      "width": 67,
+      "height": 60,
+      "anchor": {
+        "x": 33,
+        "y": 42
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.7
+      }
+    },
+    {
+      "facing": 4,
+      "width": 67,
+      "height": 60,
+      "anchor": {
+        "x": 33,
+        "y": 42
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.7
+      }
+    },
+    {
+      "facing": 5,
+      "width": 67,
+      "height": 60,
+      "anchor": {
+        "x": 33,
+        "y": 42
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.7
+      }
+    },
+    {
+      "facing": 6,
+      "width": 67,
+      "height": 61,
+      "anchor": {
+        "x": 33,
+        "y": 43
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.70492
+      }
+    },
+    {
+      "facing": 7,
+      "width": 67,
+      "height": 61,
+      "anchor": {
+        "x": 33,
+        "y": 43
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.70492
+      }
+    }
+  ],
+  "walk": {
+    "frameWidth": 67,
+    "frameHeight": 61,
+    "anchor": {
+      "x": 33,
+      "y": 43
+    },
+    "origin": {
+      "x": 0.49254,
+      "y": 0.70492
+    },
+    "columns": [
+      "idle",
+      "stride-a",
+      "stride-b"
+    ],
+    "rows": "facing 0–7 (0 faces the viewer, then turning to screen right)",
+    "cycle": [
+      "idle",
+      "stride-a",
+      "idle",
+      "stride-b"
+    ],
+    "fps": 6
+  }
 }

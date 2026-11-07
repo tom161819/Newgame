@@ -14,9 +14,10 @@
     {
       "id": "dog-hound",
       "name": "Hound",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "dog",
+        "anatomy": 2,
         "breed": "hound",
         "collar": "leather",
         "facing": 1
@@ -25,9 +26,10 @@
     {
       "id": "dog-sheepdog",
       "name": "Shaggy sheepdog",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "dog",
+        "anatomy": 2,
         "breed": "sheepdog",
         "collar": "cloth_red",
         "facing": 1
@@ -36,9 +38,10 @@
     {
       "id": "dog-mastiff",
       "name": "Mastiff",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "dog",
+        "anatomy": 2,
         "breed": "mastiff",
         "collar": "iron",
         "facing": 1
@@ -47,9 +50,10 @@
     {
       "id": "dog-hound-sit",
       "name": "Hound sitting",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "dog",
+        "anatomy": 2,
         "breed": "hound",
         "collar": "leather",
         "pose": "sit",
@@ -59,9 +63,10 @@
     {
       "id": "dog-hound-run",
       "name": "Hound running",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "dog",
+        "anatomy": 2,
         "breed": "hound",
         "collar": "leather",
         "pose": "run",
@@ -71,9 +76,10 @@
     {
       "id": "dog-mastiff-wounded",
       "name": "Mastiff lying wounded",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "dog",
+        "anatomy": 2,
         "breed": "mastiff",
         "collar": "iron",
         "pose": "lie",

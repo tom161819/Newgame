@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wolf",
+  "variantId": "wolf-grey-attack",
+  "name": "Grey wolf attacking",
+  "category": "units",
+  "version": 2,
+  "specHash": "74dbe301",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 48,
+  "anchor": {
+    "x": 33,
+    "y": 30
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.625
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 46
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.95833
+  },
+  "visualHeight": 46,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.674,
+  "lights": []
+}
