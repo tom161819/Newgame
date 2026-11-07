@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "id": "cat",
+  "name": "Cat",
+  "category": "units",
+  "description": "House cats (plan g-domaci-zvirata-grafika): three coats and a kitten; walk in 8 directions, sitting and pouncing on a rat.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "animal",
+  "plannedGameObjectId": "cat",
+  "variants": [
+    {
+      "id": "cat-tabby",
+      "name": "Tabby cat",
+      "version": 1,
+      "spec": {
+        "species": "cat",
+        "breed": "tabby",
+        "facing": 1
+      }
+    },
+    {
+      "id": "cat-black",
+      "name": "Black cat with white socks",
+      "version": 1,
+      "spec": {
+        "species": "cat",
+        "breed": "black",
+        "facing": 1
+      }
+    },
+    {
+      "id": "cat-ginger",
+      "name": "Ginger cat",
+      "version": 1,
+      "spec": {
+        "species": "cat",
+        "breed": "ginger",
+        "facing": 1
+      }
+    },
+    {
+      "id": "cat-kitten",
+      "name": "Kitten",
+      "version": 1,
+      "spec": {
+        "species": "cat",
+        "breed": "kitten",
+        "facing": 1
+      }
+    },
+    {
+      "id": "cat-tabby-sit",
+      "name": "Tabby cat sitting",
+      "version": 1,
+      "spec": {
+        "species": "cat",
+        "breed": "tabby",
+        "pose": "sit",
+        "facing": 1
+      }
+    },
+    {
+      "id": "cat-ginger-pounce",
+      "name": "Ginger cat pouncing on a rat",
+      "version": 1,
+      "spec": {
+        "species": "cat",
+        "breed": "ginger",
+        "pose": "pounce",
+        "facing": 1
+      }
+    }
+  ]
+}

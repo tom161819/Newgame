@@ -78,7 +78,8 @@ export function rotateParts(parts, angle) {
   return parts.map(p => {
     const [x, y, z] = p.at, at = [x * c + z * s, y, -x * s + z * c], out = { ...p, at };
     if (p.shape === 'box' || p.shape === 'prism') out.rotation = (p.rotation ?? 0) + angle;
-    if (p.shape === 'sphere' && quarter) out.radii = [p.radii[2], p.radii[1], p.radii[0]];
+    if (p.shape === 'sphere' && p.rotation !== undefined) out.rotation = p.rotation + angle; // oriented ellipsoids (animal bodies) turn
+    else if (p.shape === 'sphere' && quarter) out.radii = [p.radii[2], p.radii[1], p.radii[0]];
     if (p.shape === 'cylinder' && p.tilt) {
       const [tx, ty, tz] = cylinderTop(p), rx = tx * c + tz * s, rz = -tx * s + tz * c;
       out.tilt = [Math.atan2(rz, ty), Math.asin(clamp(-rx / p.height, -1, 1))];

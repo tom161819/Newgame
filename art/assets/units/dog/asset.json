@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "id": "dog",
+  "name": "Hunting Dog",
+  "category": "units",
+  "description": "Hunting dogs (plan g-domaci-zvirata-grafika): hound, sheepdog and mastiff with leather collars; walk and run in 8 directions, sitting and lying wounded.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "animal",
+  "plannedGameObjectId": "dog",
+  "variants": [
+    {
+      "id": "dog-hound",
+      "name": "Hound",
+      "version": 1,
+      "spec": {
+        "species": "dog",
+        "breed": "hound",
+        "collar": "leather",
+        "facing": 1
+      }
+    },
+    {
+      "id": "dog-sheepdog",
+      "name": "Shaggy sheepdog",
+      "version": 1,
+      "spec": {
+        "species": "dog",
+        "breed": "sheepdog",
+        "collar": "cloth_red",
+        "facing": 1
+      }
+    },
+    {
+      "id": "dog-mastiff",
+      "name": "Mastiff",
+      "version": 1,
+      "spec": {
+        "species": "dog",
+        "breed": "mastiff",
+        "collar": "iron",
+        "facing": 1
+      }
+    },
+    {
+      "id": "dog-hound-sit",
+      "name": "Hound sitting",
+      "version": 1,
+      "spec": {
+        "species": "dog",
+        "breed": "hound",
+        "collar": "leather",
+        "pose": "sit",
+        "facing": 1
+      }
+    },
+    {
+      "id": "dog-hound-run",
+      "name": "Hound running",
+      "version": 1,
+      "spec": {
+        "species": "dog",
+        "breed": "hound",
+        "collar": "leather",
+        "pose": "run",
+        "facing": 2
+      }
+    },
+    {
+      "id": "dog-mastiff-wounded",
+      "name": "Mastiff lying wounded",
+      "version": 1,
+      "spec": {
+        "species": "dog",
+        "breed": "mastiff",
+        "collar": "iron",
+        "pose": "lie",
+        "facing": 1
+      }
+    }
+  ]
+}

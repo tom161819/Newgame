@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "cat",
+  "variantId": "cat-tabby",
+  "name": "Tabby cat",
+  "category": "units",
+  "version": 1,
+  "specHash": "9131d0f1",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 36,
+  "anchor": {
+    "x": 33,
+    "y": 18
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.5
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 34
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.94444
+  },
+  "visualHeight": 34,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.345,
+  "lights": []
+}

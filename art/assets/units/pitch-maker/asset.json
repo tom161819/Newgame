@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "pitch-maker",
+  "name": "Pitch Maker",
+  "category": "units",
+  "description": "Pitch kiln worker (Smolař, plan g-noc-grafika): soot-stained tunic, leather apron and cap, a bucket of pitch and a torch.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "plannedGameObjectId": "pitch_maker",
+  "variants": [
+    {
+      "id": "pitch-maker-male",
+      "name": "Pitch maker (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_grey",
+        "legs": "cloth_brown",
+        "sleeves": "soot",
+        "headgear": "cap",
+        "headgearMaterial": "leather",
+        "hair": "hair_dark",
+        "beard": true,
+        "apron": "charred_wood",
+        "tool": "bucket"
+      }
+    },
+    {
+      "id": "pitch-maker-female",
+      "name": "Pitch maker (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_grey",
+        "headgear": "coif",
+        "headgearMaterial": "cloth_brown",
+        "hair": "hair_auburn",
+        "apron": "charred_wood",
+        "tool": "torch"
+      }
+    }
+  ]
+}

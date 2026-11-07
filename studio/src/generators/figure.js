@@ -19,7 +19,7 @@ export const params = [
   { key: 'headgear', values: ['none', 'hood', 'cap', 'brimmed', 'straw', 'coif', 'kerchief', 'helmet', 'baker'], description: 'Hat or head covering.' },
   { key: 'headgearMaterial', description: 'Material of the headgear.' },
   { key: 'apron', description: 'Material of an apron, or omitted.' },
-  { key: 'tool', values: ['none', 'axe', 'pickaxe', 'hammer', 'bow', 'spear', 'pitchfork', 'peel', 'sack', 'basket', 'carrier', 'sword', 'tongs', 'mallet', 'stave', 'bucket'], description: 'What the figure holds or carries.' },
+  { key: 'tool', values: ['none', 'axe', 'pickaxe', 'hammer', 'bow', 'spear', 'pitchfork', 'peel', 'sack', 'basket', 'carrier', 'sword', 'tongs', 'mallet', 'stave', 'bucket', 'rod', 'torch', 'loot', 'firebucket'], description: 'What the figure holds or carries (rod = fishing rod and a creel; torch = a lit pitch torch with its light; loot = a bulging sack over the shoulder; firebucket = a leather fire bucket held in front).' },
   { key: 'shield', description: 'Shield on the left arm.' },
   { key: 'shieldShape', values: ['round', 'kite'], description: 'Round buckler-sized shield or tall kite shield.' },
   { key: 'shieldMaterial', description: 'Shield face material (banner, banner_blue, wood …).' },
@@ -39,8 +39,8 @@ const turned = (size, side, y, front, material) => box(size, at(side, y, front),
 const SIDE_AXIS = [S, 0, -S];
 const swung = (size, side, y, front, theta, material) => box(size, at(side, y, front), material, orientation(matMul(axisMatrix(SIDE_AXIS, theta), [[Math.cos(TURN), 0, Math.sin(TURN)], [0, 1, 0], [-Math.sin(TURN), 0, Math.cos(TURN)]])));
 // Which hands are busy: the right one holds a tool, the left one a bow, basket, bucket or shield.
-const RIGHT_TOOLS = new Set(['axe', 'pickaxe', 'hammer', 'sword', 'greatsword', 'lance', 'spear', 'pitchfork', 'peel', 'tongs', 'mallet', 'stave']);
-const LEFT_TOOLS = new Set(['bow', 'basket', 'bucket']);
+const RIGHT_TOOLS = new Set(['axe', 'pickaxe', 'hammer', 'sword', 'greatsword', 'lance', 'spear', 'pitchfork', 'peel', 'tongs', 'mallet', 'stave', 'rod', 'torch']);
+const LEFT_TOOLS = new Set(['bow', 'basket', 'bucket', 'rod']);
 
 export function build(spec, { style }) {
   const female = spec.sex === 'female';
@@ -112,7 +112,9 @@ export function build(spec, { style }) {
   }
   if (spec.facing) { const turnedParts = turnParts(parts, spec.facing * Math.PI / 4); parts.length = 0; parts.push(...turnedParts); }
   const top = Math.max(headTop, ...parts.map(p => p.at[1] + (p.size?.[1] ?? p.height ?? (p.radii ? p.radii[1] * 2 : 0))));
-  return { primitives: parts, lights: [], height: top };
+  // A held torch lights the ground around its carrier (the flame is drawn by the light, like the torch posts).
+  const torchHead = parts.find(p => p.torchHead), lights = torchHead ? [{ type: 'torch', at: [torchHead.at[0], torchHead.at[1] + 0.09, torchHead.at[2]] }] : [];
+  return { primitives: parts.map(({ torchHead: _, ...p }) => p), lights, height: top };
 }
 
 function headgear(kind, material, head, top) {
@@ -155,6 +157,12 @@ function tool(kind, { shoulder, hand, y, female }) {
     case 'mallet': return [turned([0.035, 0.42, 0.035], r, hand - 0.12, 0.06, 'wood_dark'), turned([0.13, 0.13, 0.22], r, hand + 0.28, 0.07, 'wood_dark')];
     case 'stave': return [turned([0.04, y(1.25), 0.03], r + 0.02, 0.04, 0.1, 'wood_dark'), turned([0.05, 0.1, 0.045], r + 0.02, 0.04 + y(0.6), 0.1, 'leather')];
     case 'bucket': return [cylinder({ radiusBottom: 0.085, radiusTop: 0.105, height: 0.17, segments: 10 }, at(l - 0.03, hand - 0.16, 0.08), 'wood_dark'), cylinder({ radiusBottom: 0.108, height: 0.018, segments: 10 }, at(l - 0.03, hand - 0.03, 0.08), 'iron'), turned([0.008, 0.1, 0.008], l - 0.03, hand, 0.08, 'iron')];
+    case 'rod': return [turned([0.018, y(1.0), 0.018], r, hand - 0.22, 0.1, 'wood'), turned([0.006, 0.45, 0.006], r, hand + y(0.35), 0.28, 'cloth_linen'),
+      cylinder({ radiusBottom: 0.06, radiusTop: 0.075, height: 0.13, segments: 8 }, at(l - 0.02, y(0.38), -0.02), 'twigs'), cylinder({ radiusBottom: 0.077, height: 0.015, segments: 8 }, at(l - 0.02, y(0.51), -0.02), 'wood_dark'),
+      turned([0.01, y(0.34), 0.01], 0, y(0.52), -0.06, 'leather')];
+    case 'torch': return [turned([0.03, 0.34, 0.03], r, hand - 0.08, 0.09, 'wood'), { ...cylinder({ radiusBottom: 0.035, radiusTop: 0.04, height: 0.07, segments: 6 }, at(r, hand + 0.26, 0.09), 'soot'), torchHead: true }];
+    case 'loot': return [sphere([0.15, 0.13, 0.13], at(0.05, y(0.82), -0.1), 'cloth_brown', 1), sphere([0.05, 0.04, 0.05], at(0.12, y(1.02), -0.04), 'cloth_brown', 0), sphere([0.025, 0.02, 0.025], at(-0.02, y(0.98), -0.06), 'gold_trim', 0)];
+    case 'firebucket': return [cylinder({ radiusBottom: 0.075, radiusTop: 0.09, height: 0.15, segments: 10 }, at(0, hand - 0.02, 0.2), 'leather'), cylinder({ radiusBottom: 0.075, height: 0.006, segments: 10 }, at(0, hand + 0.125, 0.2), 'steel'), turned([0.008, 0.08, 0.13], 0, hand + 0.13, 0.2, 'iron')];
     default: return [];
   }
 }

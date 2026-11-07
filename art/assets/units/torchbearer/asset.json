@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "torchbearer",
+  "name": "Soldier with a torch",
+  "category": "units",
+  "description": "Soldier or patrol carrying a lit torch at night (plan g-noc-grafika): the torch lights the ground around the walker.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "torchbearer-spearman",
+      "name": "Spearman with a torch",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "banner",
+        "legs": "cloth_brown",
+        "armor": "gambeson",
+        "headgear": "helmet",
+        "hair": "hair_brown",
+        "tool": "torch",
+        "shield": true,
+        "shieldShape": "round",
+        "shieldMaterial": "banner"
+      }
+    },
+    {
+      "id": "torchbearer-watchwoman",
+      "name": "Watchwoman with a torch",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "banner",
+        "armor": "gambeson",
+        "headgear": "hood",
+        "headgearMaterial": "cloth_red",
+        "hair": "hair_blond",
+        "tool": "torch"
+      }
+    }
+  ]
+}

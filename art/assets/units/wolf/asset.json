@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "id": "wolf",
+  "name": "Wolf",
+  "category": "units",
+  "description": "Night wolves (plan g-noc-grafika): bigger and greyer than the dogs, ruff and bushy low tail; walk and run in 8 directions, lunging attack.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "animal",
+  "gameObjectId": "wolf",
+  "variants": [
+    {
+      "id": "wolf-grey",
+      "name": "Grey wolf",
+      "version": 1,
+      "spec": {
+        "species": "wolf",
+        "breed": "grey",
+        "facing": 1
+      }
+    },
+    {
+      "id": "wolf-dark",
+      "name": "Dark wolf",
+      "version": 1,
+      "spec": {
+        "species": "wolf",
+        "breed": "dark",
+        "facing": 1
+      }
+    },
+    {
+      "id": "wolf-grey-attack",
+      "name": "Grey wolf attacking",
+      "version": 1,
+      "spec": {
+        "species": "wolf",
+        "breed": "grey",
+        "pose": "attack",
+        "facing": 1
+      }
+    },
+    {
+      "id": "wolf-dark-run",
+      "name": "Dark wolf running",
+      "version": 1,
+      "spec": {
+        "species": "wolf",
+        "breed": "dark",
+        "pose": "run",
+        "facing": 2
+      }
+    }
+  ]
+}

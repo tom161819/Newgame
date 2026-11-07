@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "id": "child",
+  "name": "Children",
+  "category": "units",
+  "description": "Village children (plan g-deti-naves-grafika): smaller than adults, simple medieval clothes in many colours, readable as kids at 1×.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "plannedGameObjectId": "child",
+  "variants": [
+    {
+      "id": "child-boy-tunic",
+      "name": "Boy in a red tunic",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "height": 0.78,
+        "build": 0.88,
+        "garment": "cloth_red",
+        "legs": "cloth_brown",
+        "headgear": "none",
+        "hair": "hair_blond",
+        "hairStyle": "short"
+      }
+    },
+    {
+      "id": "child-boy-cap",
+      "name": "Boy with a cap",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "height": 0.74,
+        "build": 0.86,
+        "garment": "cloth_green",
+        "legs": "cloth_grey",
+        "headgear": "cap",
+        "headgearMaterial": "cloth_wool",
+        "hair": "hair_brown"
+      }
+    },
+    {
+      "id": "child-boy-ball",
+      "name": "Boy with a ball",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "height": 0.7,
+        "build": 0.85,
+        "garment": "cloth_ochre",
+        "legs": "cloth_brown",
+        "headgear": "none",
+        "hair": "hair_auburn",
+        "tool": "sack"
+      }
+    },
+    {
+      "id": "child-girl-braid",
+      "name": "Girl with a braid",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "height": 0.76,
+        "build": 0.86,
+        "garment": "cloth_blue",
+        "headgear": "none",
+        "hair": "hair_blond",
+        "hairStyle": "braid",
+        "apron": "cloth_linen"
+      }
+    },
+    {
+      "id": "child-girl-kerchief",
+      "name": "Girl in a kerchief",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "height": 0.72,
+        "build": 0.85,
+        "garment": "cloth_red",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_ochre",
+        "hair": "hair_brown"
+      }
+    },
+    {
+      "id": "child-girl-basket",
+      "name": "Girl with a basket",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "height": 0.7,
+        "build": 0.85,
+        "garment": "cloth_green",
+        "headgear": "none",
+        "hair": "hair_auburn",
+        "hairStyle": "long",
+        "tool": "basket"
+      }
+    }
+  ]
+}

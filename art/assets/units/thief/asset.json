@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "thief",
+  "name": "Thief",
+  "category": "units",
+  "description": "Night thief (plan g-noc-grafika): dark hood and cloak, sneaking with a bulging stolen sack over the shoulder.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "plannedGameObjectId": "thief",
+  "variants": [
+    {
+      "id": "thief-hooded",
+      "name": "Hooded thief",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_forest",
+        "legs": "cloth_grey",
+        "sleeves": "cloth_grey",
+        "headgear": "hood",
+        "headgearMaterial": "soot",
+        "hair": "hair_dark",
+        "build": 0.9,
+        "tool": "loot"
+      }
+    },
+    {
+      "id": "thief-cutpurse",
+      "name": "Cutpurse",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_brown",
+        "headgear": "hood",
+        "headgearMaterial": "cloth_grey",
+        "hair": "hair_dark",
+        "build": 0.88,
+        "tool": "loot"
+      }
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "torchbearer",
+  "variantId": "torchbearer-spearman",
+  "name": "Spearman with a torch",
+  "category": "units",
+  "version": 1,
+  "specHash": "c85e49be",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 63,
+  "anchor": {
+    "x": 33,
+    "y": 45
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.71429
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 61
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.96825
+  },
+  "visualHeight": 61,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": 9.73,
+      "y": -46.1,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 1.095,
+  "lights": [
+    {
+      "type": "torch",
+      "x": 42.73,
+      "y": 14.9,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

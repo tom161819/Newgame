@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "id": "rat",
+  "name": "Rat",
+  "category": "units",
+  "description": "Rats in stores (plan g-domaci-zvirata-grafika): small, grey, long tail; walk in 8 directions.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "animal",
+  "plannedGameObjectId": "rat",
+  "variants": [
+    {
+      "id": "rat-grey",
+      "name": "Grey rat",
+      "version": 1,
+      "spec": {
+        "species": "rat",
+        "facing": 1
+      }
+    },
+    {
+      "id": "rat-brown",
+      "name": "Brown rat",
+      "version": 1,
+      "spec": {
+        "species": "rat",
+        "coat": "hair_brown",
+        "marking": "cloth_linen",
+        "facing": 1
+      }
+    }
+  ]
+}

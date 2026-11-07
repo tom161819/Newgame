@@ -395,11 +395,13 @@ function paintVariant(canvas, asset, variant, seconds = performance.now() / 1000
 // played standing → right → standing → left. Mounted figures and fixed-direction sheets do not walk.
 const WALK_FRAMES = [['idle', 0], ['stride-a', 1], ['stride-b', -1]], WALK_CYCLE = ['idle', 'stride-a', 'idle', 'stride-b'], WALK_FPS = 6;
 const walkCache = new Map();
-const walksVariant = variant => !variant.spec.mount && variant.spec.facing === undefined;
-const walks = asset => asset.generator === 'figure' && asset.variants.some(walksVariant);
+// Figures walk when shown in their default direction; animals keep a three-quarter still (`facing`) for the card but
+// walk when they stand (the walk frames set their own facing).
+const walksVariant = variant => !variant.spec.mount && (variant.spec.facing === undefined || (variant.spec.species !== undefined && (variant.spec.pose ?? 'stand') === 'stand'));
+const walks = asset => (asset.generator === 'figure' || asset.generator === 'animal') && asset.variants.some(walksVariant);
 function walkFrame(asset, variant, facing, stride, scale = 1) {
   const key = `${variant.id}:${variant.hash}:${facing}:${stride}:${scale}`;
-  if (!walkCache.has(key)) walkCache.set(key, renderModel(generators.figure.build({ ...variant.spec, facing, stride }, { footprint: asset.footprint, style }), { style, footprint: asset.footprint, scale }));
+  if (!walkCache.has(key)) walkCache.set(key, renderModel(generators[asset.generator].build({ ...variant.spec, facing, stride }, { footprint: asset.footprint, style }), { style, footprint: asset.footprint, scale }));
   return walkCache.get(key);
 }
 // One sheet per variant: rows = facings 0–7, columns = idle, stride-a, stride-b. Every cell shares one anchor (the
@@ -788,7 +790,7 @@ function exportSprite(assetId, variantId, { facings = false } = {}) {
   if (variant.baked) return { baked: true, facingPngs: [], png: sprite.canvas.toDataURL('image/png'), front: null, still: null, rotor: null, sheet: null, tiles: [], meta: structuredClone(data.exportedMeta[variant.paths.spriteMeta] ?? null), paths: { ...variant.paths, spriteTiles: [] } };
   const meta = spriteMetadata({ asset, variant, style, sprite, generator: generators[asset.generator] });
   // Figures can also be rendered in the eight walking directions (facing 0–7, 0 = towards the viewer).
-  const turned = facings && asset.generator === 'figure' && variant.spec.facing === undefined ? Array.from({ length: 8 }, (_, k) => renderModel(generators.figure.build({ ...variant.spec, facing: k }, { footprint: asset.footprint, style }), { style, footprint: asset.footprint, scale: 1 })) : [];
+  const turned = facings && (asset.generator === 'figure' || asset.generator === 'animal') && walksVariant(variant) ? Array.from({ length: 8 }, (_, k) => renderModel(generators[asset.generator].build({ ...variant.spec, facing: k }, { footprint: asset.footprint, style }), { style, footprint: asset.footprint, scale: 1 })) : [];
   if (turned.length) meta.facings = turned.map((s, k) => ({ facing: k, width: s.width, height: s.height, anchor: s.anchor, origin: { x: +(s.anchor.x / s.width).toFixed(5), y: +(s.anchor.y / s.height).toFixed(5) } }));
   const walk = turned.length && walksVariant(variant) ? walkSheet(asset, variant, 1) : null;
   if (walk) meta.walk = walkMeta(walk);

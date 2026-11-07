@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "id": "firefighter",
+  "name": "Firefighter with a bucket",
+  "category": "units",
+  "description": "Villager running with a leather fire bucket to put out a burning roof (plan g-noc-grafika).",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "firefighter-male",
+      "name": "Villager with fire bucket (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_linen",
+        "legs": "cloth_brown",
+        "headgear": "none",
+        "hair": "hair_auburn",
+        "tool": "firebucket"
+      }
+    },
+    {
+      "id": "firefighter-female",
+      "name": "Villager with fire bucket (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_ochre",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_red",
+        "hair": "hair_brown",
+        "apron": "cloth_linen",
+        "tool": "firebucket"
+      }
+    }
+  ]
+}

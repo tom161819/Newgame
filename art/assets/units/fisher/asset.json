@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "fisher",
+  "name": "Fisher",
+  "category": "units",
+  "description": "Fisherman's hut worker (plan g-rybarstvi-grafika): oilcloth-blue smock, wide straw or wool hat, fishing rod over the shoulder and a wicker creel at the hip.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "fisher-male",
+      "name": "Fisher (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_blue",
+        "legs": "cloth_brown",
+        "sleeves": "cloth_wool",
+        "headgear": "brimmed",
+        "headgearMaterial": "cloth_wool",
+        "hair": "hair_grey",
+        "beard": true,
+        "apron": "leather",
+        "tool": "rod"
+      }
+    },
+    {
+      "id": "fisher-female",
+      "name": "Fisher (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_blue",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_linen",
+        "hair": "hair_brown",
+        "hairStyle": "braid",
+        "apron": "leather",
+        "tool": "rod"
+      }
+    }
+  ]
+}
