@@ -19,3 +19,14 @@ export function price(resource,side,context={}){
   throw new TypeError(`Unknown trade side: ${side}`);
 }
 export function priceTable(registry){return tradeableResources(registry).map(d=>({resource:d.id,name:d.name,base:BASE_PRICES[d.id]??null,buy:price(d.id,'buy'),sell:price(d.id,'sell')}));}
+// Trade F1.2: merchant caravans. Times are in game days (the day length follows the game settings).
+export const CARAVAN_RULES=Object.freeze({minInterval:2,maxInterval:4,stay:.75,maxWait:.25,leavingWarning:.1,speed:1.6,goldMin:100,goldMax:300,
+  spawnAttempts:8,retryAfter:1,maxRoute:2000});
+// Each type carries some of its goods (at least one), each amount random within its range.
+export const MERCHANT_TYPES=Object.freeze({
+  general:{stock:{wheat:[10,30],apple:[10,25],bread:[5,20],wood:[10,30],stone:[10,30],iron_ore:[5,15]}},
+  food:{stock:{wheat:[20,60],apple:[15,40],flour:[10,30],bread:[10,30],meat:[5,20]}},
+  building_materials:{stock:{stone:[30,80],wood:[30,80]}},
+  ore_iron:{stock:{iron_ore:[20,60],iron_bar:[3,10]}},
+  arms:{stock:{bow:[1,4],sword:[1,3],armor:[1,2],iron_bar:[2,6]}},
+});

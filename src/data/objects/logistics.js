@@ -10,9 +10,11 @@ export const logisticsBuildings=[
   {id:'marketplace',name:'Marketplace',width:3,height:3,cost:{stone:12,wood:8},constructionTime:30000,visualHeight:90,buildable:true,
     requiresCompletedBuildings:['warehouse'],unlockDescription:'Requires a completed Warehouse before placing a Marketplace.',
     trade:{capacity:TRADE_RULES.marketplaceCapacity,loadingSpots:TRADE_RULES.loadingSpots},
+    // Provisional sprite (stalls on a paved square) scaled to the 3×3 footprint; the plate's front corner is the anchor.
+    renderMode:'sprite',origin:{x:.5,y:.964},visual:{displayWidth:209,displayHeight:183},
     description:`A market square with stalls where merchant caravans will trade. Goods space for ${TRADE_RULES.marketplaceCapacity} units and ${TRADE_RULES.loadingSpots} loading spots.`},
 ].map(d=>({...d,category:'building',buildingCategory:'logistics',sprite:`/assets/buildings/${d.id}/${d.id}.svg`,walkable:false,collectible:false,
-  interactions:[d.trade?'open_market':'inspect_storage'],renderMode:'procedural',renderer:'food_building',origin:{x:.5,y:.9},depth:{offset:0},
+  interactions:[d.trade?'open_market':'inspect_storage'],renderMode:d.renderMode??'procedural',renderer:'food_building',origin:d.origin??{x:.5,y:.9},depth:{offset:0},
   shadow:{baked:true,x:10,y:-10,width:d.width*59,height:d.height*21,color:0x30291c,alpha:.3}}));
 export const materialDefinitions=[
   {id:'wood',name:'Wood',symbol:'🪵',inventoryOrder:12,description:'Timber stored in a Warehouse or Starter Stockpile.'},

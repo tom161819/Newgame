@@ -5,6 +5,16 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-07
+<!-- version: {"title":"Merchant caravans","type":"feature","reconstructed":false,"saveVersion":38} -->
+### Added
+- Merchant caravans. While a finished Marketplace stands, a caravan comes every 2–4 game days: a merchant with his own horse wagon (red cover) drives in from the edge of the map along the roads, stays at the Marketplace for three quarters of a day and drives away again. Each caravan carries goods of one kind (general goods, food, building materials, ore and iron, or arms) and has its own Gold. Trading with it comes in the next update.
+- The Marketplace panel shows the caravan on its way, at the Marketplace with the time until it leaves and what it carries, or when the next one is expected. The event feed reports its arrival, that it will leave soon and its departure, or that a caravan could not reach the Marketplace.
+- The Marketplace is drawn with market stalls on a paved square (a temporary picture until the final art).
+
+### Changed
+- Saved games use a new format (38) for caravans. Games saved by earlier versions cannot be loaded; start a new game.
+
 ## [0.9.5] - 2026-11-07
 <!-- version: {"title":"Marketplace and trade prices","type":"feature","reconstructed":false,"saveVersion":37} -->
 ### Added

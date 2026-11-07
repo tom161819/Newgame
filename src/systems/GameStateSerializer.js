@@ -1,4 +1,5 @@
 import { validateRockMining } from './RockMiningState.js';
+import { CARAVAN_RULES,MERCHANT_TYPES } from '../data/trade.js';
 import { ROCK_MINING } from '../data/rockMining.js';
 import { buildingDemolitionRefund } from '../data/demolition.js';
 import { t } from '../i18n/index.js';
@@ -29,7 +30,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=37;
+export const SAVE_VERSION=38;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -72,6 +73,7 @@ export function serializeGameState(scene){
     ...(scene.vehicles?{vehicles:scene.vehicles.exportState()}:{}),
     ...(scene.stables?{stables:scene.stables.exportState()}:{}),
     ...(scene.needs?{needs:scene.needs.exportState()}:{}),
+    ...(scene.caravans?{caravans:scene.caravans.exportState()}:{}),
     ...(scene.kingLogistics?{kingLogistics:scene.kingLogistics.exportState()}:{}),
     ...(scene.logisticsTasks?{logistics:{version:1,...(scene.constructionSystem?.materials.enabled?{materialsVersion:1}:{})}}:{}),
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
@@ -433,6 +435,20 @@ export function validateGameState(input,registry=objectRegistry){
     const ids=new Set();for(const o of m.orders){check(o&&Object.keys(o).sort().join()==='barracksId,id,items,required,state,type,workDone,workerId'&&Object.hasOwn(UNIT_TYPES,o.type)&&(!UNIT_TYPES[o.type].mount||st0.has(o.workerId)));integer(o.id,1,m.nextOrder-1);check(!ids.has(o.id)&&!seen.has(o.workerId));ids.add(o.id);seen.add(o.workerId);
       const w=workers.get(o.workerId);check(w?.isAlive&&w.profession==='soldier'&&w.assignedWorkplaceId===o.barracksId&&s.buildings.some(b=>b.id===o.barracksId&&b.type==='barracks'));check(o.required===UNIT_TYPES[o.type].trainingTime);number(o.workDone,0,o.required);
       check(['supplying','training'].includes(o.state));const items={};if(o.state==='training')for(const id of kit(o.type))items[id]=(items[id]??0)+1;check(o.items&&JSON.stringify(Object.entries(o.items).sort())===JSON.stringify(Object.entries(items).sort()));if(o.state==='supplying')check(o.workDone===0);}}
+  // Trade F1.2: the merchant caravan (schema 38). Its stock and Gold are the merchant's own, never the kingdom's.
+  if(s.caravans!==undefined){
+    const v=s.caravans,now=s.time?.totalElapsed??Number.MAX_SAFE_INTEGER;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='active,nextVisitAt,seq');integer(v.seq,0);
+    check(v.nextVisitAt===null||(Number.isFinite(v.nextVisitAt)&&v.nextVisitAt>=0));
+    if(v.active!==null){
+      const c=v.active;check(c&&typeof c==='object'&&Object.keys(c).sort().join()==='departAt,entry,gold,id,marketplaceId,nextTile,path,phase,position,stock,tile,type,waiting,warned');
+      check(typeof c.id==='string'&&/^caravan-\d+$/.test(c.id)&&Number(c.id.slice(8))<=v.seq&&v.nextVisitAt===null);check(Object.hasOwn(MERCHANT_TYPES,c.type));check(['arriving','trading','leaving'].includes(c.phase));
+      check(c.stock&&typeof c.stock==='object'&&!Array.isArray(c.stock));for(const [id,n]of Object.entries(c.stock)){definition(id,'resource');integer(n,0,100000);}integer(c.gold,0,1000000);
+      tile(c.entry);tile(c.tile);position(c.position);array(c.path,10000);for(const p of c.path)tile(p);if(c.nextTile!==null)tile(c.nextTile);
+      check(typeof c.warned==='boolean'&&typeof c.waiting==='boolean');
+      if(c.phase==='trading'){number(c.departAt,0);check(c.departAt<=now+CARAVAN_RULES.stay*s.gameSettings.dayLengthSeconds*1000+1e-6);}else check(c.departAt===null&&!c.waiting);
+      if(c.phase!=='leaving'){const m=s.buildings.find(b=>b.id===c.marketplaceId);check(m&&m.type==='marketplace');}else integer(c.marketplaceId,0);
+    }
+  }
   validateRockMining(s,registry,{check,integer,number,array});
   return s;
 }
