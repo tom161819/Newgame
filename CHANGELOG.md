@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.51.0] - 2026-11-07
+<!-- version: {"title":"Employment 2","type":"feature","reconstructed":false,"saveVersion":57} -->
+### Changed
+- A job picked in the resident's window sticks on the first click.
+- Remove worker works while the worker is busy. Switching employment off for a building or a building type sends its workers away at once.
+- Staffing signs over buildings: nobody working is a yellow warning, some workers missing is grey, and a building with employment switched off shows a dark red stop sign.
+
+
 ## [0.50.1] - 2026-11-07
 <!-- version: {"title":"Tutorial look follows the UI style","type":"feature","reconstructed":false,"saveVersion":57} -->
 ### Changed

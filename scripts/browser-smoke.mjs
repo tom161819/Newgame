@@ -12,6 +12,7 @@ import { populationJobMenuSmoke } from './population-job-menu-smoke.mjs';
 import { e1Smoke } from './e1-smoke.mjs';
 import { e2Smoke,quickStartSmoke } from './e2-smoke.mjs';
 import { e4Smoke } from './e4-smoke.mjs';
+import { employment2Smoke } from './employment-2-smoke.mjs';
 import { animalLooksSmoke } from './animal-looks-smoke.mjs';
 import { tutorialSmoke } from './tutorial-smoke.mjs';
 import { workplaceOutputSmoke } from './workplace-output-smoke.mjs';
@@ -262,6 +263,7 @@ try{
   await step('unit-commands',()=>unitCommandSmoke(page));
   await step('employment-exclusions',()=>employmentExclusionsSmoke(page));
   await step('employment',()=>employmentSmoke(page));
+  await step('employment-2',()=>employment2Smoke(page));
   await step('chain-notices',()=>chainNoticesSmoke(page));
   await step('notices',()=>noticesSmoke(page));
   await step('fog',async()=>{await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);await hiddenInteractionSmoke(page);});

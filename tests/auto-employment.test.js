@@ -63,11 +63,12 @@ test('settings, priorities and held residents survive Save/Load in the current s
   const r=fixture({starter:false});loadGameState(r,structuredClone(state));assert.deepEqual(r.employment.exportState(),state.employment);assert.equal(r.employment.preset,'custom');
 });
 
-test('local employment exclusion blocks automatic and manual new assignments without firing or moving existing staff',()=>{
+test('local employment exclusion blocks new assignments and dismisses the staff at once (m-zamestnani-2)',()=>{
  const s=fixture(),a=build(s,'quarry',55,50),b=build(s,'quarry',62,50),old=resident(s,48),fresh=resident(s,49);
- assert.equal(s.workplaceSystem.assign(a,old),true);assert.equal(s.employment.setBuildingDisabled(a,true),true);s.employment.hold(fresh);
- assert.equal(s.workplaceSystem.assign(a,fresh),false);assert.equal(fresh.profession,'idle');assert.equal(old.assignedWorkplaceId,a.id);assert.equal(s.workplaceSystem.assign(a,old),true,'existing employee is unchanged');
- s.employment.release(fresh);s.employment.update();assert.equal(fresh.assignedWorkplaceId,b.id);assert.equal(old.assignedWorkplaceId,a.id);assert.equal(s.employment.blockReason(a),'local');assert.equal(s.employment.blockReason(b),null);
+ assert.equal(s.workplaceSystem.assign(a,old),true);old.workTask={kind:'mine'};assert.equal(s.employment.setBuildingDisabled(a,true),true);s.employment.hold(fresh);s.employment.hold(old);
+ assert.equal(old.assignedWorkplaceId,null,'dismissed while working');assert.equal(old.profession,'idle');assert.equal(old.workTask??null,null);
+ assert.equal(s.workplaceSystem.assign(a,fresh),false);assert.equal(fresh.profession,'idle');assert.equal(s.workplaceSystem.assign(a,old),false,'nobody can be placed there by hand either');
+ s.employment.release(fresh);s.employment.update();assert.equal(fresh.assignedWorkplaceId,b.id);assert.equal(old.assignedWorkplaceId,null);assert.equal(s.employment.blockReason(a),'local');assert.equal(s.employment.blockReason(b),null);
 });
 test('type ban covers future instances and local allow cannot bypass it; removing type ban preserves local rules',()=>{
  const s=fixture(),a=build(s,'quarry',55,50),b=build(s,'quarry',62,50);s.employment.setTypeDisabled(a,true);s.employment.setBuildingDisabled(b,true);s.employment.setBuildingDisabled(a,false);

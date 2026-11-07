@@ -29,7 +29,11 @@ header p { margin: 0 0 9px; color: #bdb99d; font-size: 12px; line-height: 1.5; }
 #game canvas { display: block; }
 .worker-indicators { position:fixed; z-index:8; overflow:hidden; pointer-events:none; }
 .missing-workers { position:absolute; left:0; top:0; display:grid; place-items:center; padding:2px; border:1px solid #f0d8a2; border-radius:50%; color:#fff3d6; background:#9c332a; box-shadow:0 1px 4px #10150ed9; pointer-events:auto; animation:staffing-pulse 1.5s ease-in-out infinite; will-change:transform,opacity; }
-.missing-workers[data-staffing-tone="partial"] { background:#d2a619; color:#2a2108; }
+/* m-zamestnani-2 (50, 58; changes 0.30.0): nobody = yellow warning, some missing = quiet grey, employment switched
+   off = dark red crossed stop sign (no pulse). */
+.missing-workers[data-staffing-tone="empty"] { background:#d2a619; color:#2a2108; border-color:#fff0b8; }
+.missing-workers[data-staffing-tone="partial"] { background:#6d6f66; color:#eceee6; border-color:#b9bbb0; animation:none; opacity:.85; }
+.missing-workers[data-staffing-tone="disabled"] { background:#6e1c18; color:#f3d6d0; border-color:#c4766c; animation:none; padding:1px; }
 .workplace-issue { color:#f0c75e; font-weight:600; }
 .missing-workers svg { display:block; width:100%; height:100%; fill:currentColor; }
 .missing-workers:focus-visible { outline:2px solid #ffe99d; outline-offset:2px; }

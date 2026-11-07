@@ -4,6 +4,7 @@ import { towerBase,buildingDefinition } from '../game/buildings.js';
 import { element } from './objectLabels.js';
 
 const workersIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="8" r="2.5"/><path d="M3 21v-5a6 6 0 0 1 12 0v5H3Zm13 0v-6a7 7 0 0 0-1-3 5 5 0 0 1 7 5v4h-6Z"/></svg>';
+const disabledIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2h8l6 6v8l-6 6H8l-6-6V8Z" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M6 18 18 6" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
 export class MissingWorkersIndicators {
   constructor(scene){
     this.scene=scene;this.model=new StaffingStatus(scene);this.buttons=new Map();this.controller=new AbortController();this.layer=element('div','worker-indicators');this.layer.setAttribute('aria-label',t('staffing.layer'));this.tooltip=element('div','staffing-tooltip');this.tooltip.id='staffing-tooltip';this.tooltip.setAttribute('role','tooltip');this.tooltip.hidden=true;document.body.append(this.layer,this.tooltip);
@@ -28,8 +29,8 @@ export class MissingWorkersIndicators {
       if(x<size/2||x>rect.width-size/2||y<size/2||y>rect.height-size/2)continue;
       let left=x-size/2,top=y-size/2;
       for(let attempt=0;attempt<8&&occupied.some(p=>Math.abs(p.left-left)<size+3&&Math.abs(p.top-top)<size+3);attempt++){left=Math.max(0,Math.min(rect.width-size,x-size/2+(attempt%2?-1:1)*Math.ceil((attempt+1)/2)*(size+3)));top=Math.max(0,y-size/2-Math.floor(attempt/4)*(size+3));}
-      occupied.push({left,top});keep.add(id);const item=this.buttons.get(id)??this.create(id),{button}=item,label=[definition.name,status.count,status.capacity].join('|');
-      if(label!==item.label){item.label=label;button.dataset.staffingTone=status.tone;button.dataset.workers=status.count;button.dataset.capacity=status.capacity;button.setAttribute('aria-label',`${t('staffing.title')} · ${definition.name} · ${t('workplace.workers',{count:status.count,capacity:status.capacity})} · ${t('staffing.missing',{count:status.missing})}`);}
+      occupied.push({left,top});keep.add(id);const item=this.buttons.get(id)??this.create(id),{button}=item,label=[definition.name,status.count,status.capacity,status.tone].join('|');
+      if(label!==item.label){item.label=label;if(button.dataset.staffingTone!==status.tone)button.innerHTML=status.tone==='disabled'?disabledIcon:workersIcon;button.dataset.staffingTone=status.tone;button.dataset.workers=status.count;button.dataset.capacity=status.capacity;button.setAttribute('aria-label',status.tone==='disabled'?`${t('staffing.disabled')} · ${definition.name}`:`${t('staffing.title')} · ${definition.name} · ${t('workplace.workers',{count:status.count,capacity:status.capacity})} · ${t('staffing.missing',{count:status.missing})}`);}
       if(size!==item.size){item.size=size;button.style.width=`${size}px`;button.style.height=`${size}px`;}button.style.transform=`translate3d(${left}px,${top}px,0)`;
     }
     for(const [id,item]of this.buttons)if(!keep.has(id)){if(this.hoveredId===id)this.hideTooltip();item.controller.abort();item.button.remove();this.buttons.delete(id);}
@@ -37,7 +38,7 @@ export class MissingWorkersIndicators {
   }
   refreshTooltip(){
     const status=this.model.records.get(this.hoveredId),button=this.buttons.get(this.hoveredId)?.button;if(!status||!button||!this.scene.fog.isVisibleObject(status.building)){this.hideTooltip();return;}
-    const name=buildingDefinition(status.building).name;this.tooltip.replaceChildren(element('strong','',t('staffing.title')),element('span','',name),element('span','',t('workplace.workers',{count:status.count,capacity:status.capacity})),element('span','',t('staffing.missing',{count:status.missing})));this.tooltip.hidden=false;button.setAttribute('aria-describedby',this.tooltip.id);
+    const name=buildingDefinition(status.building).name;if(status.tone==='disabled')this.tooltip.replaceChildren(element('strong','',t('staffing.disabled')),element('span','',name),element('span','',t('staffing.disabledHint')));else this.tooltip.replaceChildren(element('strong','',t('staffing.title')),element('span','',name),element('span','',t('workplace.workers',{count:status.count,capacity:status.capacity})),element('span','',t('staffing.missing',{count:status.missing})));this.tooltip.hidden=false;button.setAttribute('aria-describedby',this.tooltip.id);
     const rect=button.getBoundingClientRect();this.tooltip.style.left=`${Math.max(6,Math.min(innerWidth-this.tooltip.offsetWidth-6,rect.x+rect.width/2-this.tooltip.offsetWidth/2))}px`;this.tooltip.style.top=`${Math.max(6,rect.top-this.tooltip.offsetHeight-8)}px`;
   }
   hideTooltip(){this.buttons.get(this.hoveredId)?.button.removeAttribute('aria-describedby');this.hoveredId=null;this.tooltip.hidden=true;this.tooltip.replaceChildren();}

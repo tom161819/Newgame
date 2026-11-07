@@ -27,8 +27,13 @@ export class WorkplacePanel {
     // S12: a workshop with several recipes (Wheelwright: Wheelbarrow or Horse Wagon); a running batch keeps its recipe.
     document.querySelector('#recipe-choice').addEventListener('change',e=>{if(this.building)scene.foodProduction.setRecipe(this.building.id,e.target.value);this.refresh();},options);
     document.querySelector('#toggle-food-production').addEventListener('click',()=>{const record=scene.foodProduction.records.get(this.building?.id);if(record)scene.foodProduction.toggle(this.building.id,!record.auto);this.refresh();},options);
+    // m-zamestnani-2 (35): while someone works the panel redraws its rows (progress text), which replaced the button
+    // between press and release, so "Remove worker" was lost. Rows are kept still while a button is held down.
+    this.dialog.addEventListener('pointerdown',e=>{if(e.target.closest('button'))this.pressing=true;},options);
+    document.addEventListener('pointerup',()=>{if(this.pressing)setTimeout(()=>{this.pressing=false;},0);},{...options,capture:true});
+    document.addEventListener('pointercancel',()=>{this.pressing=false;},options);
     this.dialog.addEventListener('click',e=>{
-      const button=e.target.closest('button');if(!button)return;
+      this.pressing=false;const button=e.target.closest('button');if(!button)return;
       if(handleMilitaryClick(scene,button)){this.signature=null;this.refresh();return;}
       const assign=button.dataset.assignWorker,remove=button.dataset.removeWorker;
       // Moving someone who already has another job takes a second, confirming click.
@@ -42,6 +47,7 @@ export class WorkplacePanel {
   }
   open(building){if(this.dialog.open)this.close();this.building=building;this.signature=null;this.pendingMove=null;this.restored=false;this.scene.setGalleryInput(false);document.querySelector('#workplace-candidates').hidden=true;this.dialog.classList.toggle('farm-workplace-dialog',building.type==='farmhouse');if(building.type==='farmhouse')this.dialog.show();else this.dialog.showModal();this.scene.demolitionUI?.attach(this.dialog,building);this.refresh();this.scene.farmConnections?.refresh();if(building.type==='farmhouse')this.scene.farmConnections?.focus(building,this.dialog);}
   refresh(){
+    if(this.pressing)return;
     if(!this.dialog.open||!this.building)return;
     const s=this.scene,b=this.building;if(!s.buildings.includes(b)||!s.fog.isVisibleObject(b)){this.close();return;}
     const spec=buildingDefinition(b),summary=s.workplaceSystem.summary(b),employees=s.workplaceSystem.employees(b),candidates=s.workerSystem.liveSubjects();

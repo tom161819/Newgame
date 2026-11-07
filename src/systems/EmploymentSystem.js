@@ -22,13 +22,17 @@ export class EmploymentSystem {
   request(){this.pruneExclusions();this.dirty=true;}
   workplace(building){return !!building&&this.scene.buildings.includes(building)&&buildingIsComplete(building)&&!building.unverified&&!!buildingDefinition(building).workplace;}
   blockReason(building){return this.blockedTypes.has(building?.type)?'type':this.blockedBuildings.has(building?.id)?'local':null;}
+  // m-zamestnani-2 (35, owner 7 Nov 2026): switching employment off empties the building at once, also while its
+  // workers are in the middle of a task (the task is cancelled, cargo is dropped, a production cycle stays with the
+  // building). They become Unemployed and automatic employment may place them elsewhere.
+  dismiss(buildings){for(const building of buildings)for(const worker of [...(this.scene.workplaceSystem?.employees(building)??[])])this.scene.workplaceSystem.remove(worker);}
   setBuildingDisabled(building,disabled){
     if(!this.workplace(building)||typeof disabled!=='boolean')return false;
-    if(disabled)this.blockedBuildings.add(building.id);else this.blockedBuildings.delete(building.id);this.request();this.changed();return true;
+    if(disabled){this.blockedBuildings.add(building.id);this.dismiss([building]);}else this.blockedBuildings.delete(building.id);this.request();this.changed();return true;
   }
   setTypeDisabled(building,disabled){
     if(!this.workplace(building)||typeof disabled!=='boolean')return false;
-    if(disabled)this.blockedTypes.add(building.type);else this.blockedTypes.delete(building.type);this.request();this.changed();return true;
+    if(disabled){this.blockedTypes.add(building.type);this.dismiss(this.scene.buildings.filter(x=>x.type===building.type));}else this.blockedTypes.delete(building.type);this.request();this.changed();return true;
   }
   pruneExclusions(){
     if(!this.blockedBuildings.size)return;const valid=new Set(this.scene.buildings.filter(b=>buildingIsComplete(b)&&!b.unverified&&buildingDefinition(b).workplace).map(b=>b.id));for(const id of this.blockedBuildings)if(!valid.has(id))this.blockedBuildings.delete(id);
