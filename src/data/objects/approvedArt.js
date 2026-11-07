@@ -14,6 +14,7 @@ export const APPROVED_BUILDING_ART=Object.freeze({
   hunting_lodge:{"sprite":"/assets/buildings/hunting_lodge/hunting-lodge-log.v1.png","artSource":"art/sprites/hunting-lodge/hunting-lodge-log.v1.json","origin":{"x":0.49618,"y":0.98425},"visualHeight":125},
   lumberjack_hut:{"sprite":"/assets/buildings/lumberjack_hut/lumber-camp-hut.v1.png","artSource":"art/sprites/lumber-camp/lumber-camp-hut.v1.json","origin":{"x":0.49618,"y":0.98319},"visualHeight":117},
   quarry:{"sprite":"/assets/buildings/quarry/quarry-pit.v1.png","artSource":"art/sprites/quarry/quarry-pit.v1.json","origin":{"x":0.49744,"y":0.98551},"visualHeight":136},
+  builder_workshop:{"sprite":"/assets/buildings/builder_workshop/builders-workshop-material-yard.v2.png","artSource":"art/sprites/builders-workshop/builders-workshop-material-yard.v2.json","origin":{"x":0.49744,"y":0.98319},"visualHeight":117},
   smelter:{"sprite":"/assets/buildings/smelter/smelter-bloomery.v1.png","artSource":"art/sprites/smelter/smelter-bloomery.v1.json","origin":{"x":0.49744,"y":0.98413},"visualHeight":124,"lights":[{"type":"brazier","x":0,"y":-31.68,"color":"#ff9d4a","radius":134.4,"intensity":1,"flicker":{"amplitude":0.16,"speed":5.5},"flameSize":1.6}]},
 });
 

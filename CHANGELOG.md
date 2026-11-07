@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.14.1] - 2026-11-07
+<!-- version: {"title":"Builder's Workshop","type":"feature","reconstructed":false,"saveVersion":42} -->
+### Added
+- Builder's Workshop (Industry, 3 × 3, 20 Wood + 10 Stone): each workshop gives a place to 4 Builders. Builders with a place work at full speed and wait at the workshop when there is nothing to build. Its panel shows how many places are taken.
+- The Getting started help now suggests building a Builder's Workshop right after the Warehouse.
+
+### Changed
+- Builders without a place in a Builder's Workshop build and dismantle 50 % slower. Their resident panel says so, and the event feed explains it once.
+
 ## [0.14.0] - 2026-11-07
 <!-- version: {"title":"Rivers, beaches, desert and bushes","type":"feature","reconstructed":false,"saveVersion":42} -->
 ### Added

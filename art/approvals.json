@@ -105,7 +105,7 @@
       }
     },
     "builders-workshop": {
-      "preferred": "builders-workshop-open-shed",
+      "preferred": "builders-workshop-material-yard",
       "variants": {
         "builders-workshop-open-shed": {
           "status": "review",

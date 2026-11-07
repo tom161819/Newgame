@@ -44,6 +44,17 @@ export const buildings = [
     visibility:{multiplier:1.75},navigation:{walkableTop:true,access:true},
     renderMode:'sprite',origin:{x:.38372,y:.84348},visualHeight:113,platform:{x:0,y:-84},depth:{offset:0},
   },
+  // #118: Builders who have a place in a finished workshop (4 per workshop) work at full speed, others at half speed;
+  // idle Builders wait at their workshop. Approved art: builders-workshop material yard (APPROVED_BUILDING_ART).
+  {
+    id:'builder_workshop',name:"Builder's Workshop",category:'building',buildingCategory:'industry',
+    sprite:'/assets/buildings/builder_workshop/builders-workshop-material-yard.v2.png',
+    width:3,height:3,walkable:false,collectible:false,buildable:true,cost:{wood:20,stone:10},constructionTime:30000,
+    interactions:[],builderWorkshop:{capacity:4},
+    description:'An open workshop and material yard for Builders. Each workshop serves 4 Builders; Builders without one work 50 % slower.',
+    renderMode:'sprite',origin:{x:0.49744,y:0.98319},visualHeight:117,depth:{offset:0},
+    shadow:{baked:true,x:12,y:-15,width:3*59,height:3*21,color:0x30291c,alpha:.3},
+  },
   ...[
     {id:'quarry',name:'Quarry',buildingCategory:'industry',width:3,height:3,cost:{stone:15},constructionTime:30000,visualHeight:95,description:'Kamenolom se třemi místy pro horníky. Musí překrývat skutečné kamenné ložisko a mít dostupný přístup. Těží pouze svou přiřazenou konečnou zásobu.'},
     {id:'hunting_lodge',name:'Hunting Lodge',buildingCategory:'food',menuOrder:50,requiresCompletedBuildings:['granary'],unlockDescription:'Requires a completed Granary before placing new Hunting Lodges.',width:2,height:2,cost:{stone:10},constructionTime:25000,visualHeight:110,description:'Lovecká chata pro dva lovce. Lovci přinášejí maso ze skutečných úlovků.'},

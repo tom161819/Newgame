@@ -250,6 +250,8 @@ export default {
   'help.button':'Nápověda','help.buttonPending':'Nápověda · Začínáme: hotovo {done} z {total}','help.title':'Začínáme',
   'help.progress':'Hotovo {done} z {total}. Klikni na krok a najdeš budovu v menu staveb.','help.allSet':'Máš hotovo: osada má své první budovy.',
   'help.done':'Hotovo','help.todo':'Zbývá',
+  'help.step.builder_workshop':'Postav dílnu stavitelů','help.step.builder_workshop.why':'Stavitelé s místem v dílně stavějí dvakrát rychleji a mezi stavbami čekají u ní.',
+  'builderWorkshop.count':'{count} / {capacity} stavitelů','builderWorkshop.none':'Zatím tu nemá místo žádný stavitel.','builderWorkshop.without':'Stavitelů bez místa v dílně: {count}, pracují o {percent} % pomaleji.','builderWorkshop.allServed':'Všichni stavitelé v království mají místo v dílně.','builderWorkshop.help':'Stavitelé s místem v této dílně pracují plnou rychlostí a čekají tu, když není co stavět.','builderWorkshop.notice':'Stavitelé bez dílny stavitelů pracují o {percent} % pomaleji.','unit.noBuilderWorkshop':'Bez dílny stavitelů: rychlost práce −{percent} %',
   'help.step.warehouse':'Postav sklad','help.step.warehouse.why':'Nosiči sem nosí kámen, dřevo a rudu; pojme 200 stavebních materiálů.',
   'help.step.granary':'Postav sýpku','help.step.granary.why':'Skladuje jídlo a úrodu a odemyká statek a loveckou chatu.',
   'help.step.farmhouse':'Postav statek','help.step.farmhouse.why':'První zdroj jídla: farmáři se starají o úrodu kolem a statek odemyká pole.',

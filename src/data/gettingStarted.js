@@ -4,6 +4,7 @@
 // the game; the order must be achievable (a step never needs a building that a later step builds).
 export const GETTING_STARTED_STEPS=Object.freeze([
   {id:'warehouse',buildingId:'warehouse'},
+  {id:'builder_workshop',buildingId:'builder_workshop'},
   {id:'granary',buildingId:'granary'},
   {id:'farmhouse',buildingId:'farmhouse'},
   {id:'hunting_lodge',buildingId:'hunting_lodge'},

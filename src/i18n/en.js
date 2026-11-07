@@ -249,6 +249,8 @@ export default {
   'help.button':'Help','help.buttonPending':'Help · Getting started: {done} of {total} done','help.title':'Getting started',
   'help.progress':'{done} of {total} done. Click a step to find the building in the Buildings menu.','help.allSet':'You’re all set: your settlement has its first buildings.',
   'help.done':'Done','help.todo':'To do',
+  'help.step.builder_workshop':'Build a Builder\'s Workshop','help.step.builder_workshop.why':'Builders with a place in a workshop build twice as fast and wait there between jobs.',
+  'builderWorkshop.count':'{count} / {capacity} builders','builderWorkshop.none':'No Builders have a place here yet.','builderWorkshop.without':'{count} Builder(s) in the kingdom work {percent} % slower without a workshop place.','builderWorkshop.allServed':'Every Builder in the kingdom has a workshop place.','builderWorkshop.help':'Builders with a place here work at full speed and wait here when there is nothing to build.','builderWorkshop.notice':'Builders work {percent} % slower without a Builder\'s Workshop.','unit.noBuilderWorkshop':'No Builder\'s Workshop: −{percent} % work speed',
   'help.step.warehouse':'Build a Warehouse','help.step.warehouse.why':'Haulers bring stone, wood and ore here; it holds 200 building materials.',
   'help.step.granary':'Build a Granary','help.step.granary.why':'Stores food and farm produce, and unlocks the Farmhouse and the Hunting Lodge.',
   'help.step.farmhouse':'Build a Farmhouse','help.step.farmhouse.why':'Your first source of food: Farmers tend crops around it and it unlocks fields.',

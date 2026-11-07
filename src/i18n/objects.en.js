@@ -24,6 +24,7 @@ export default {
   'object.castle.name':'Castle','object.castle.description':'A stone fortress with a platform and battlements. Its platform gives 75 % more sight.',
   'object.wall.name':'Stone Wall','object.wall.description':'A connectable stone wall. Drag to build a straight line; you can walk along the top between connected segments.',
   'object.quarry.name':'Quarry','object.quarry.description':'A quarry with three Miner workplaces. It must cover a real stone deposit and be reachable. It mines only its assigned finite deposit.',
+  'object.builder_workshop.name':'Builder\'s Workshop','object.builder_workshop.description':'An open workshop and material yard for Builders. Each workshop serves 4 Builders; Builders without one work 50 % slower.',
   'object.hunting_lodge.name':'Hunting Lodge','object.hunting_lodge.description':'A hunting lodge for two Hunters. Hunters bring meat from real kills.',
   'object.barracks.name':'Barracks','object.barracks.description':'Barracks with five places for existing residents. Soldiers patrol the surroundings.',
   'object.farmhouse.name':'Farmhouse','object.farmhouse.description':'A farmhouse with three Farmer workplaces. Farmers tend crops within 15 tiles.',

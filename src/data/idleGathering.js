@@ -4,6 +4,8 @@ export const IDLE_GATHERING=Object.freeze({minimumMargin:2,maximumMargin:4,local
 // A Builder's assigned workshop wins over the Castle; Haulers never acquire a workplace slot.
 export function idleHomes(scene,worker,{workplaceOnly=false}={}){
   const workplace=scene.workplaceSystem?.building(worker);
+  // #118: a Builder with a place in a Builder's Workshop waits there.
+  const workshop=worker.profession==='builder'?scene.builderWorkshops?.workshopFor(worker):null;if(workshop)return [{building:workshop,kind:'workplace'}];
   if(worker.profession==='builder'&&workplace&&buildingDefinition(workplace).workplace?.profession==='builder')return [{building:workplace,kind:'workplace'}];
   if(workplaceOnly||workplace||!['idle','hauler'].includes(worker.profession))return [];
   return scene.buildings.filter(b=>b.type==='castle'&&buildingIsComplete(b)).map(building=>({building,kind:'castle'}));

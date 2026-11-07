@@ -53,7 +53,8 @@ export class UnitPanel {
       document.querySelector('#unit-wage').textContent=t('unit.wage',{amount:s.wageSystem.dailyWage(u).toFixed(2)});
       document.querySelector('#unit-talent').textContent=t('unit.talent',{talent:localized(`talent.${u.naturalTalent}`,TALENTS[u.naturalTalent]),bonus:TALENT_XP_BONUS*100,skill:SKILLS[u.naturalTalent]});
       document.querySelector('#unit-unpaid').textContent=t('unit.unpaid',{amount:s.wageSystem.unpaid(u).toFixed(2)});
-      document.querySelector('#unit-workplace').textContent=t('unit.workplace',{place:u.profession==='hauler'?t('unit.wholeKingdom'):s.workplaceSystem?.building(u)?.definition.name??t('unit.notAssigned')});
+      const workshop=u.profession==='builder'?s.builderWorkshops?.workshopFor(u):null;
+      document.querySelector('#unit-workplace').textContent=u.profession==='builder'&&s.builderWorkshops&&!workshop?t('unit.noBuilderWorkshop',{percent:50}):t('unit.workplace',{place:u.profession==='hauler'?t('unit.wholeKingdom'):(workshop??s.workplaceSystem?.building(u))?.definition.name??t('unit.notAssigned')});
     }
     renderNeeds(this.needs,worker&&s.needs?s.needs.status(u):null);
     const signature=JSON.stringify([u.skills,u.naturalTalent,language()]);

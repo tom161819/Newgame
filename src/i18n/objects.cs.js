@@ -24,6 +24,7 @@ export default {
   'object.castle.name':'Hrad','object.castle.description':'Kamenná pevnost s horní plošinou a cimbuřím. Z plošiny poskytuje o 75 % větší dohled.',
   'object.wall.name':'Kamenná hradba','object.wall.description':'Spojitelná kamenná hradba. Tažením postavíš rovnou řadu a po vrcholu lze chodit mezi spojenými segmenty.',
   'object.quarry.name':'Kamenolom','object.quarry.description':'Kamenolom se třemi místy pro horníky. Musí překrývat skutečné kamenné ložisko a mít dostupný přístup. Těží pouze svou přiřazenou konečnou zásobu.',
+  'object.builder_workshop.name':'Dílna stavitelů','object.builder_workshop.description':'Otevřená dílna a sklad stavebního materiálu. Každá dílna obslouží 4 stavitele; stavitelé bez dílny pracují o 50 % pomaleji.',
   'object.hunting_lodge.name':'Lovecká chata','object.hunting_lodge.description':'Lovecká chata pro dva lovce. Lovci přinášejí maso ze skutečných úlovků.',
   'object.barracks.name':'Kasárna','object.barracks.description':'Kasárna s pěti místy pro stávající poddané. Vojáci hlídkují v okolí.',
   'object.farmhouse.name':'Statek','object.farmhouse.description':'Statek se třemi místy pro farmáře. Farmáři obdělávají pole do 15 políček.',
