@@ -395,6 +395,42 @@
         "renderHash": "06a2398b",
         "samples": 96
       }
+    },
+    {
+      "id": "horse-bay-saddled-sculpt",
+      "name": "Bay horse saddled (knight's mount) – A · Sculpted (approved style)",
+      "version": 2,
+      "spec": {
+        "species": "horse",
+        "breed": "bay",
+        "saddle": true,
+        "facing": 2,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "0dce3d37",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-grey-harness-sculpt",
+      "name": "Grey horse in harness – A · Sculpted (approved style)",
+      "version": 1,
+      "spec": {
+        "species": "horse",
+        "breed": "grey",
+        "harness": true,
+        "facing": 2,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "0af722b2",
+        "samples": 96
+      }
     }
   ]
 }
