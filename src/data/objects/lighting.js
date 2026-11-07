@@ -34,4 +34,11 @@ export const lightingBuildings = [
     campfire: { woodRange: 6, radius: 5 },
     lights: [{ type: 'campfire', x: 0, y: -10, color: '#ff9a3c', radius: 160, intensity: 1, flicker: { amplitude: 0.2, speed: 6 }, flameSize: 1.3 }],
   },
+  {
+    // Day and night N3: what a burnt-down building leaves (approved Studio art burnt-building-timber, 2×2). Not built by
+    // the player; it can be demolished like any building.
+    id: 'burnt_ruins', name: 'Burnt Ruins', category: 'building', buildingCategory: 'infrastructure', sprite: '/assets/buildings/burnt_ruins/burnt-building-timber.v1.png',
+    artSource: 'art/sprites/burnt-building/burnt-building-timber.v1.json', width: 2, height: 2, walkable: false, collectible: false, buildable: false, cost: {}, constructionTime: 1000,
+    interactions: [], description: 'The charred remains of a building that burnt down.', renderMode: 'sprite', origin: { x: 0.48507, y: 0.98058 }, visualHeight: 101, depth: { offset: 0 },
+  },
 ];

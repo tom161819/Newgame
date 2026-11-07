@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { workerScene } from './helpers/workerScene.js';
 import { placementError,towerNeighbors } from '../src/game/buildings.js';
+import { gridToWorld } from '../src/game/isometric.js';
 import { NightThreatSystem,validNightThreatState,hasLocalWood } from '../src/systems/NightThreatSystem.js';
 import { DayNightSystem } from '../src/systems/DayNightSystem.js';
 import { LightFuelSystem } from '../src/systems/LightFuelSystem.js';
@@ -119,4 +120,19 @@ test('save in the middle of a theft: the thief, his loot and the night are kept'
   night(s);const thief=n.spawnThief(s.gameTime.day);n.thieves.get(thief.id).loot={resource:'wood',amount:11,from:'Granary'};n.thieves.get(thief.id).state='escaping';
   const state=validateGameState(serializeGameState(s));assert.deepEqual(state.nightThreats.thieves.map(t=>[t.id,t.state,t.loot.amount]),[[thief.id,'escaping',11]]);
   assert.ok(state.workers.some(w=>w.id===thief.id&&w.isSubject===false),'the thief is a visitor, not a resident');
+});
+
+test('fires: a burning flame near a wooden building may set it alight at night; residents with buckets put it out, faster with a Well; unchecked it burns down to ruins', () => {
+  const {s,n}=world();const place=(type,x,y)=>{const d=s.objectRegistry.require(type);const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,x,y,tiles:[]};for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){b.tiles.push({x:x+dx,y:y+dy});s.map[y+dy][x+dx]=1;}s.buildings.push(b);return b;};
+  const house=place('house',60,60),castle=s.buildings.find(b=>b.type==='castle');assert.equal(n.flammable(house),true);if(castle)assert.equal(n.flammable(castle),false);
+  const seasons=s.seasons;s.seasons={season:'Summer',weather:'Drought',enabled:true};assert.ok(Math.abs(n.fireRisk()-.04)<1e-9,'Drought doubles the risk');s.seasons.weather='Rainy';assert.ok(n.fireRisk()<.01);s.seasons=seasons;
+  s.lightSources={lights:()=>[{type:'torch',...gridToWorld(62.5,61),radius:100}]};n.random=()=>0;night(s);n.igniteFires(s.gameTime.day);assert.equal(n.burning(house),true,'set alight by the torch post');
+  // Two residents with a Well right next to the house put it out.
+  place('well',63,63);const helpers=[0,1].map(i=>s.workerSystem.create({x:64+i,y:64}));
+  for(let i=0;i<1200&&n.burning(house);i++){for(const w of helpers){if(!n.firefight(w,50))void 0;w.update(50);}n.updateFires(50);}
+  assert.equal(n.burning(house),false,'put out');assert.ok(s.buildings.includes(house),'still standing');
+  // Nobody helps: it burns down to ruins and its goods burn.
+  n.ignite(house);for(let i=0;i<2000&&n.burning(house);i++)n.updateFires(100);
+  assert.equal(s.buildings.includes(house),false,'burnt down');assert.ok(s.buildings.some(b=>b.type==='burnt_ruins'&&b.x===60&&b.y===60),'ruins left');
+  const off=world();off.n.setEnabled('fires',false);off.s.lightSources={lights:()=>[{type:'torch',...gridToWorld(62.5,61),radius:100}]};off.n.random=()=>0;assert.deepEqual(off.n.igniteFires(1),[],'switched off');
 });

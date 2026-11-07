@@ -28,7 +28,7 @@ export class NightOverlay {
     for(const rt of [this.dark,this.glow])rt.setPosition(view.x,view.y).setScale(1/zoom).setVisible(true);
     this.dark.clear().fill(DAY_NIGHT.ambient.color,alpha);this.glow.clear();
     const hands=(this.scene.lightFuel?.handLights?.()??[]).map(h=>{const p=gridToWorld(h.x,h.y);return {x:p.x,y:p.y-30,radius:h.radius*DAY_NIGHT.pxPerTile,type:'torch'};});
-    const lights=[...(this.scene.lightSources?.lights?.()??[]),...this.dayNight.houseWindows(),...hands],margin=200;
+    const lights=[...(this.scene.lightSources?.lights?.()??[]),...this.dayNight.houseWindows(),...hands,...(this.scene.fireViews?.lights?.()??[])],margin=200;
     for(const l of lights){
       if(l.x<view.x-margin||l.x>view.right+margin||l.y<view.y-margin||l.y>view.bottom+margin)continue;
       const sx=(l.x-view.x)*zoom,sy=(l.y-view.y)*zoom,size=Math.max(24,l.radius*2.2*zoom)*(l.strength??1);

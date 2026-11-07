@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.46.0] - 2026-11-07
+<!-- version: {"title":"Fires and firefighting","type":"feature","reconstructed":false,"saveVersion":57} -->
+### Added
+- **Fires:** at night a burning torch post, tower holder, brazier or campfire within 2 tiles of a wooden or thatched building may set it alight.
+  - The base chance is 2 % a night: doubled in a drought, much lower in the rain, halved in winter.
+  - A fire burns on the roof, grows, and can jump to a wooden neighbour within 2 tiles.
+  - Unchecked, it burns the building down in about a quarter of a day. Burnt Ruins remain (approved Studio art) and stored goods are lost.
+- **Firefighting:** up to 6 residents within 15 tiles carry buckets from the nearest Well or the shore and put the fire out. A Well close by makes it much quicker, which gives the Well its first use.
+- "Fire! … is burning" is reported and stops the night speed-up while it burns.
+- Fires can be switched off (Night fires).
+
 ## [0.45.0] - 2026-11-07
 <!-- version: {"title":"Thieves at night","type":"feature","reconstructed":false,"saveVersion":57} -->
 ### Added

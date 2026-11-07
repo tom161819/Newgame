@@ -14,6 +14,12 @@ export const NIGHT_THREATS=Object.freeze({
   // without a burning light within 6 tiles is a target. A thief takes 10–30 Gold (castle) or 10–20 goods and runs to
   // the map edge; a soldier who sees him (within his sight, so mostly in light) chases him and gets the loot back.
   thieves:Object.freeze({maxChance:.3,happyAt:60,unhappyAt:25,gold:Object.freeze([10,30]),goods:Object.freeze([10,20]),spawnDistance:24,edge:3,catchRange:1.5,repathMs:500,escapeMs:90000}),
+  // Fires: a burning flame (post, holder, brazier, campfire) within 2 tiles of a wooden or thatched building may set it
+  // alight at night (2 % a night; Drought ×2, Rainy ×0.3, Winter ×0.5). A fire grows, burns the building down in about
+  // a quarter of a day and can jump to a wooden neighbour within 2 tiles. Residents within 15 tiles fight it with
+  // buckets from the nearest Well or shore; a Well close by makes the trips short.
+  fires:Object.freeze({chance:.02,range:2,weather:Object.freeze({Drought:2,Rainy:.3}),winter:.5,burnDays:.25,regrowPerSecond:2,bucket:15,
+    spreadEverySeconds:5,spreadChance:.15,helpers:6,helperRange:15,fillMs:1000,throwMs:800,startIntensity:60}),
   campfire:Object.freeze({
     // Built from local wood: a tree or a bush within 6 tiles. Burns one night, then ashes for a day.
     woodRange:6,radius:5,ashesDays:1,

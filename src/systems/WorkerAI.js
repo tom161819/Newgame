@@ -25,7 +25,7 @@ export class WorkerAI {
     worker.workTask={...task,reservation:key,goal:{...route.destination},progressMs:0};worker.path=route.path;worker.workState=this.scene.workplaceSystem?'Traveling to Target':'Moving to Target';worker.workMessage=['mine','mineDrop'].includes(task.kind)?'Travelling to stone':task.kind==='hunt'?'Following game':'Collecting meat';return true;
   }
   // #98: after the job step an idle worker sits on his workplace's porch (or gets up when there is work again).
-  update(worker,delta){this.step(worker,delta);this.scene.lightFuel?.help(worker);this.scene.nightThreats?.pursue(worker);this.scene.porches?.check(worker);}
+  update(worker,delta){if(this.scene.nightThreats?.firefight(worker,delta)){worker.update(delta);return;}this.step(worker,delta);this.scene.lightFuel?.help(worker);this.scene.nightThreats?.pursue(worker);this.scene.porches?.check(worker);}
   step(worker,delta){
     if(!worker.isAlive)return;
     if(this.system.commands.update(worker,delta)){if(worker.restPhase)this.system.rest?.stop(worker);return;}

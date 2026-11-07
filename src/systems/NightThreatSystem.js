@@ -4,6 +4,8 @@ import { removeBuildingShell } from '../game/buildingRemoval.js';
 import { adjacentTiles } from '../game/interaction.js';
 import { inAttackRange } from './CombatSystem.js';
 import { isWalkable } from '../game/map.js';
+import { isWaterGround } from '../data/worldTerrain.js';
+import { worldToGrid } from '../game/isometric.js';
 import { t } from '../i18n/index.js';
 
 // Day and night N3: the switches of the night threats (wolves, thieves, fires; from the New Game setup, changeable in
@@ -15,6 +17,7 @@ export class NightThreatSystem {
     this.scene=scene;this.enabled={wolves:settings?.nightWolves!==false,thieves:settings?.nightThieves!==false,fires:settings?.nightFires!==false};
     this.campfires=new Map();this.listeners=new Set();this.wolfDay=null;this.wolvesNear=false;this.random=Math.random;
     this.thieves=new Map();this.thiefDay=null;this.reports=[];
+    this.fires=new Map();this.fireDay=null;this.spreadIn=0;
   }
   onChange(l){this.listeners.add(l);return()=>this.listeners.delete(l);}
   changed(){for(const l of this.listeners)l();}
@@ -192,6 +195,75 @@ export class NightThreatSystem {
     for(const r of stolen)this.scene.eventFeed?.push?.(`theft:${day}:${r.from}:${r.resource}`,t('threats.stolen',{amount:r.amount,resource:this.scene.objectRegistry?.get?.(r.resource)?.name??r.resource,from:r.from}),{important:true});
     this.reports=[];
   }
+  // --- fires -------------------------------------------------------------------------------------------------------
+  // Wooden or thatched: more Wood than Stone in its cost (Houses, farms, huts…), never the castle, towers or walls.
+  flammable(b){const d=buildingDefinition(b);if(!buildingIsComplete(b)||d.campfire||d.fuel||['castle','tower','wall','wall_gate','burnt_ruins'].includes(d.id)||d.category!=='building')return false;if(d.flammable!=null)return !!d.flammable;const wood=d.cost?.wood??0;return wood>0&&wood>=(d.cost?.stone??0);}
+  center(b){const d=buildingDefinition(b);return {x:b.x+d.width/2,y:b.y+d.height/2};}
+  // Distance from a point to the nearest tile of a building.
+  gap(b,p){const d=buildingDefinition(b),dx=Math.max(b.x-p.x,0,p.x-(b.x+d.width)),dy=Math.max(b.y-p.y,0,p.y-(b.y+d.height));return Math.hypot(dx,dy);}
+  fireRisk(){const F=NIGHT_THREATS.fires,s=this.scene;return F.chance*(F.weather[s.seasons?.weather]??1)*(s.seasons?.season==='Winter'?F.winter:1);}
+  // At nightfall every burning flame may set a wooden building within 2 tiles alight (one roll per building a night).
+  igniteFires(day){
+    this.fireDay=day;if(!this.enabled.fires)return [];const F=NIGHT_THREATS.fires,s=this.scene,flames=[];
+    for(const l of s.lightSources?.lights?.()??[]){if(!['torch','brazier','campfire'].includes(l.type))continue;const p=worldToGrid(l.x,l.y);flames.push({x:p.x,y:p.y,buildingId:l.buildingId});}
+    const out=[],risk=this.fireRisk();
+    for(const b of s.buildings??[]){if(!this.flammable(b)||this.fires.has(b.id))continue;
+      if(!flames.some(f=>f.buildingId!==b.id&&this.gap(b,f)<=F.range))continue;if(this.random()<risk)out.push(this.ignite(b));}
+    return out;
+  }
+  ignite(b){
+    const F=NIGHT_THREATS.fires,fire={id:b.id,intensity:F.startIntensity,health:100};this.fires.set(b.id,fire);
+    this.scene.eventFeed?.push?.(`fire:${b.id}:${this.scene.gameTime?.day??1}`,t('threats.fire',{name:this.scene.objectRegistry.require(b.type).name}),{important:true});this.changed();return fire;
+  }
+  burning(b){return this.fires.has(b?.id);}
+  // The fire grows, eats the building and may jump to a wooden neighbour; at 0 health it burns down.
+  updateFires(delta){
+    const F=NIGHT_THREATS.fires,s=this.scene,seconds=delta/1000,day=s.gameTime?.dayDuration??120000;if(!this.fires.size)return;
+    this.spreadIn-=seconds;const spread=this.spreadIn<=0;if(spread)this.spreadIn=F.spreadEverySeconds;
+    for(const fire of [...this.fires.values()]){
+      const b=s.buildings.find(x=>x.id===fire.id);if(!b){this.fires.delete(fire.id);continue;}
+      fire.intensity=Math.min(100,fire.intensity+F.regrowPerSecond*seconds);
+      fire.health-=100*(delta/(day*F.burnDays))*(fire.intensity/100);
+      if(fire.health<=0){this.burnDown(b);continue;}
+      if(spread&&this.enabled.fires)for(const other of s.buildings){if(other===b||!this.flammable(other)||this.fires.has(other.id))continue;if(this.gap(other,this.center(b))<=F.range+buildingDefinition(b).width/2&&this.random()<F.spreadChance)this.ignite(other);}
+    }
+  }
+  burnDown(b){
+    const s=this.scene,name=s.objectRegistry.require(b.type).name,storage=s.foodStorage;this.fires.delete(b.id);
+    // Stored goods burn with it (nothing spills), then the building and its functions go.
+    for(const l of [...(storage?.locations?.values?.()??[])])if(l.buildingId===b.id)l.stock={};
+    for(const w of s.workerSystem?.liveWorkers?.()??[])if(w.assignedWorkplaceId===b.id)s.workplaceSystem?.remove?.(w);
+    storage?.removeBuilding?.(b);s.foodProduction?.records?.delete?.(b.id);const d=buildingDefinition(b),anchor={x:b.x,y:b.y};removeBuildingShell(s,b);
+    if(d.width>=2&&d.height>=2){const rd=s.objectRegistry.require('burnt_ruins'),ruin={id:Math.max(0,...s.buildings.map(x=>x.id),b.id)+1,type:rd.id,definition:rd,...anchor,tiles:buildingTiles(anchor,rd)};
+      for(const tl of ruin.tiles)s.map[tl.y][tl.x]=1;s.buildings.push(ruin);s.towerViews?.set(ruin.id,s.createBuildingView(rd,ruin));}
+    s.events?.emit?.('buildings:changed');s.eventFeed?.push?.(`burnt:${b.id}`,t('threats.burntDown',{name}),{important:true});this.changed();
+  }
+  // Water: the nearest completed Well's neighbours, otherwise walkable tiles beside water near the fire.
+  waterGoals(fire){
+    const s=this.scene,b=s.buildings.find(x=>x.id===fire.id),c=this.center(b),wells=(s.buildings??[]).filter(x=>x.type==='well'&&buildingIsComplete(x)).sort((a,z)=>Math.hypot(a.x-c.x,a.y-c.y)-Math.hypot(z.x-c.x,z.y-c.y));
+    if(wells.length&&Math.hypot(wells[0].x-c.x,wells[0].y-c.y)<=25)return {kind:'well',goals:towerNeighbors(wells[0]).filter(g=>isWalkable(s.map,g.x,g.y))};
+    const shore=[];for(let r=1;r<=25&&shore.length<8;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=Math.floor(c.x)+dx,y=Math.floor(c.y)+dy;
+      if(isWalkable(s.map,x,y)&&[[1,0],[-1,0],[0,1],[0,-1]].some(([ax,ay])=>isWaterGround(s.groundGrid?.[y+ay]?.[x+ax])))shore.push({x,y});}
+    return {kind:'shore',goals:shore};
+  }
+  // A resident within 15 tiles drops what he is doing (if his hands are free) and carries buckets; true = handled.
+  firefight(worker,delta){
+    const F=NIGHT_THREATS.fires,s=this.scene;if(!this.fires.size||worker.isSubject===false||!worker.isAlive||worker.workTask||worker.cargo){if(worker.firefight&&!this.fires.has(worker.firefight.fireId))worker.firefight=null;return false;}
+    let job=worker.firefight;
+    if(job&&!this.fires.has(job.fireId)){worker.firefight=null;worker.path=[];worker.workState='Idle';worker.workMessage='';return false;}
+    if(!job){
+      const fire=[...this.fires.values()].map(f=>({f,b:s.buildings.find(x=>x.id===f.id)})).filter(x=>x.b&&this.gap(x.b,worker.position)<=F.helperRange).sort((a,z)=>this.gap(a.b,worker.position)-this.gap(z.b,worker.position))[0];
+      if(!fire||s.workerSystem.liveSubjects().filter(w=>w.firefight?.fireId===fire.f.id).length>=F.helpers)return false;
+      if(worker.restPhase)s.workerSystem.rest?.stop?.(worker);job=worker.firefight={fireId:fire.f.id,phase:'toWater',t:0};worker.path=[];
+    }
+    const b=s.buildings.find(x=>x.id===job.fireId),fire=this.fires.get(job.fireId);worker.workState='Working';worker.workMessage='Fighting the fire';
+    const at=goals=>goals.some(g=>g.x===worker.tile.x&&g.y===worker.tile.y)&&!worker.nextTile&&!worker.path.length;
+    if(job.phase==='toWater'){const water=this.waterGoals(fire);if(!water.goals.length){worker.firefight=null;return false;}if(at(water.goals)){job.phase='fill';job.t=F.fillMs;}else if(!worker.nextTile&&!worker.path.length&&!worker.moveTo(water.goals)){worker.firefight=null;return false;}}
+    else if(job.phase==='fill'){job.t-=delta;if(job.t<=0)job.phase='toFire';}
+    else if(job.phase==='toFire'){const goals=towerNeighbors(b).filter(g=>isWalkable(s.map,g.x,g.y));if(at(goals)){job.phase='throw';job.t=F.throwMs;}else if(!worker.nextTile&&!worker.path.length&&!worker.moveTo(goals)){worker.firefight=null;return false;}}
+    else if(job.phase==='throw'){job.t-=delta;if(job.t<=0){fire.intensity-=F.bucket;job.phase='toWater';if(fire.intensity<=0){this.fires.delete(fire.id);s.eventFeed?.push?.(`fire-out:${fire.id}:${s.gameTime?.totalElapsed??0}`,t('threats.fireOut',{name:s.objectRegistry.require(b.type).name}));this.changed();}}}
+    return true;
+  }
   checkWolvesNear(day){
     const W=NIGHT_THREATS.wolves,houses=this.houses();
     const near=this.wolves().some(w=>houses.some(h=>{const d=buildingDefinition(h);return Math.hypot(h.x+d.width/2-w.position.x,h.y+d.height/2-w.position.y)<=W.nearHouses;}));
@@ -199,22 +271,24 @@ export class NightThreatSystem {
     this.wolvesNear=near;
   }
   update(delta=0){
-    this.updateCampfires();this.updateThieves(delta);
+    this.updateCampfires();this.updateThieves(delta);this.updateFires(delta);
     const day=this.scene.gameTime?.day??1;
     if(this.scene.dayNight?.isNight()&&this.wolfDay!==day)this.spawnWolves(day);
     if(this.scene.dayNight?.isNight()&&this.thiefDay!==day)this.spawnThief(day);
+    if(this.scene.dayNight?.isNight()&&this.fireDay!==day)this.igniteFires(day);
     if(this.scene.dayNight?.part()==='day')this.reportMorning(day);
     this.checkWolvesNear(day);
   }
-  exportState(){return {enabled:{...this.enabled},wolfDay:this.wolfDay,thiefDay:this.thiefDay,thieves:[...this.thieves.values()].map(t=>({id:t.id,state:t.state,target:{...t.target},loot:t.loot?{...t.loot}:null,pursuer:t.pursuer})),reports:this.reports.map(r=>({...r})),campfires:[...this.campfires].map(([id,c])=>({id,litDay:c.litDay,ashesDay:c.ashesDay})).sort((a,b)=>a.id-b.id)};}
-  importState(data){if(!data)return;this.enabled={...this.enabled,...data.enabled};this.wolfDay=data.wolfDay??null;this.thiefDay=data.thiefDay??null;this.reports=(data.reports??[]).map(r=>({...r}));
+  exportState(){return {enabled:{...this.enabled},wolfDay:this.wolfDay,thiefDay:this.thiefDay,thieves:[...this.thieves.values()].map(t=>({id:t.id,state:t.state,target:{...t.target},loot:t.loot?{...t.loot}:null,pursuer:t.pursuer})),reports:this.reports.map(r=>({...r})),fireDay:this.fireDay,fires:[...this.fires.values()].map(f=>({id:f.id,intensity:Math.round(f.intensity*100)/100,health:Math.round(f.health*100)/100})),campfires:[...this.campfires].map(([id,c])=>({id,litDay:c.litDay,ashesDay:c.ashesDay})).sort((a,b)=>a.id-b.id)};}
+  importState(data){if(!data)return;this.enabled={...this.enabled,...data.enabled};this.wolfDay=data.wolfDay??null;this.thiefDay=data.thiefDay??null;this.fireDay=data.fireDay??null;this.fires=new Map((data.fires??[]).map(f=>[f.id,{...f}]));this.reports=(data.reports??[]).map(r=>({...r}));
     this.thieves=new Map((data.thieves??[]).map(t=>[t.id,{...t,target:{...t.target},loot:t.loot?{...t.loot}:null,since:this.scene?.gameTime?.totalElapsed??0,repath:0}]));this.campfires=new Map((data.campfires??[]).map(c=>[c.id,{litDay:c.litDay,ashesDay:c.ashesDay}]));}
   destroy(){this.listeners.clear();}
 }
 export function validNightThreatState(data,buildingIds){
   const n=v=>v===null||Number.isSafeInteger(v)&&v>=1;
   // `wolfDay` came in 0.44.0; saves of 0.43.0 (same schema 57) have none.
-  return !!data&&typeof data==='object'&&!!data.enabled&&(data.wolfDay===undefined||n(data.wolfDay))&&NIGHT_THREATS.ids.every(id=>typeof data.enabled[id]==='boolean')&&Object.keys(data.enabled).length===NIGHT_THREATS.ids.length&&Object.keys(data).every(k=>['enabled','campfires','wolfDay','thiefDay','thieves','reports'].includes(k))&&(data.thiefDay===undefined||n(data.thiefDay))
+  return !!data&&typeof data==='object'&&!!data.enabled&&(data.wolfDay===undefined||n(data.wolfDay))&&NIGHT_THREATS.ids.every(id=>typeof data.enabled[id]==='boolean')&&Object.keys(data.enabled).length===NIGHT_THREATS.ids.length&&Object.keys(data).every(k=>['enabled','campfires','wolfDay','thiefDay','thieves','reports','fireDay','fires'].includes(k))&&(data.fireDay===undefined||n(data.fireDay))
+    &&(data.fires===undefined||Array.isArray(data.fires)&&data.fires.every(f=>f&&buildingIds.has(f.id)&&Number.isFinite(f.intensity)&&f.intensity>0&&f.intensity<=100&&Number.isFinite(f.health)&&f.health>0&&f.health<=100))&&(data.thiefDay===undefined||n(data.thiefDay))
     &&(data.thieves===undefined||Array.isArray(data.thieves)&&data.thieves.every(t=>t&&typeof t.id==='string'&&['sneaking','escaping','fleeing'].includes(t.state)&&t.target&&typeof t.target.id==='string'&&(t.loot===null||Number.isFinite(t.loot.amount)&&t.loot.amount>0&&typeof t.loot.resource==='string')))
     &&(data.reports===undefined||Array.isArray(data.reports))
     &&Array.isArray(data.campfires)&&data.campfires.every(c=>c&&buildingIds.has(c.id)&&n(c.litDay)&&n(c.ashesDay));
