@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.54.0] - 2026-11-08
+<!-- version: {"title":"Resource overview","type":"feature","reconstructed":false,"saveVersion":58} -->
+### Added
+- The top bar groups resources into lightly tinted groups: gold, materials, food ingredients, food and equipment.
+- Resting the pointer on a store, on the map or on the store gauge in the top bar, shows what it holds: used and total space, then each good with its icon and amount.
+- The Marketplace shows an icon for each good, with the same group tints.
+- The New Game settings have a switch for the starting garrison.
+
+
 ## [0.53.0] - 2026-11-08
 <!-- version: {"title":"Start 2: bread, room for 10, garrison","type":"feature","reconstructed":false,"saveVersion":58} -->
 ### Changed

@@ -24,6 +24,8 @@ export async function marketplaceSmoke(context,url,instrument){
     assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.buildings.find(b=>b.id===id).type,id),'marketplace');
     // The placed site waits for builders; a finished Marketplace next to it opens the panel.
     const market=await finished('marketplace');
+    // m-start-v2: a new game has 200 Bread; this check wants a kingdom without Bread, so the fixture takes it out.
+    await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;for(const l of s.foodStorage.locations.values())if(l.stock?.bread)delete l.stock.bread;s.foodStorage.changed?.();s.trade?.invalidate?.();});
     await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;s.marketplacePanel.open(s.buildings.find(b=>b.id===id));},market);
     await page.locator('#marketplace-dialog[open]').waitFor();
     if(process.env.SMOKE_SHOTS){await page.screenshot({path:`${process.env.SMOKE_SHOTS}/marketplace-panel.png`});await page.keyboard.press('Escape');await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id);s.cameras.main.centerOn(...Object.values(s.towerViews.get(id)?.container?{x:s.towerViews.get(id).container.x,y:s.towerViews.get(id).container.y}:{x:0,y:0}));},id);await page.waitForTimeout(600);await page.screenshot({path:`${process.env.SMOKE_SHOTS}/marketplace-map.png`});await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;s.marketplacePanel.open(s.buildings.find(b=>b.id===id));},id);}
@@ -33,6 +35,8 @@ export async function marketplaceSmoke(context,url,instrument){
     assert.match(await page.locator('[data-market-resource="bread"] td').first().getAttribute('title'),/little of it/);
     assert.match(await page.locator('#marketplace-stats').textContent(),/Trade statistics.*No trade yet/);
     assert.ok(await page.locator('#marketplace-prices tbody tr').count()>=12);
+    // m-ui-prehled-surovin (26): goods with icons and group tints.
+    assert.equal(await page.locator('[data-market-resource="bread"]').getAttribute('data-resource-group'),'food');assert.ok(await page.locator('[data-market-resource="bread"] .market-good-icon').count()===1);
     await page.keyboard.press('Escape');assert.equal(await page.locator('#marketplace-dialog').evaluate(d=>d.open),false);
     // F1.2: the developer console brings a caravan now; it drives in from the edge, trades, then leaves.
     assert.equal(await page.evaluate(()=>window.mkDev.summonCaravan()),true);

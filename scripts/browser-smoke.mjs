@@ -13,6 +13,7 @@ import { e1Smoke } from './e1-smoke.mjs';
 import { e2Smoke,quickStartSmoke } from './e2-smoke.mjs';
 import { e4Smoke } from './e4-smoke.mjs';
 import { startV2Smoke } from './start-v2-smoke.mjs';
+import { resourceGroupsSmoke } from './resource-groups-smoke.mjs';
 import { employment2Smoke } from './employment-2-smoke.mjs';
 import { animalLooksSmoke } from './animal-looks-smoke.mjs';
 import { tutorialSmoke } from './tutorial-smoke.mjs';
@@ -180,7 +181,7 @@ try{
   assert.equal(await page.locator('#setup-castle').isChecked(),true);assert.equal(await page.locator('#setup-gold').inputValue(),'500');
   // E1 (owner 7 Nov 2026): basic buildings are wooden, so the start has more wood and no Iron Ore.
   for(const [id,value] of [['stone','40'],['wood','60'],['iron-ore','0'],['bread','200']])assert.equal(await page.locator(`#setup-start-${id}`).inputValue(),value);
-  await page.locator('#setup-castle').uncheck();
+  await page.locator('#setup-castle').uncheck();await page.locator('#setup-garrison').uncheck();
   for(const selector of ['#setup-gold','#setup-start-stone','#setup-start-wood','#setup-start-iron-ore','#setup-start-bread'])await page.locator(selector).evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
@@ -191,6 +192,7 @@ try{
   await step('e2',()=>quickStartSmoke(context,origin+base,instrument));
   await step('animal-looks',()=>animalLooksSmoke(context,origin+base,instrument));
   await step('start-v2',()=>startV2Smoke(context,origin+base,instrument));
+  await step('resource-groups',()=>resourceGroupsSmoke(context,origin+base,instrument));
   await step('tutorial',()=>tutorialSmoke(context,origin+base,instrument));
   await step('marketplace',()=>marketplaceSmoke(context,origin+base,instrument));
   await step('gate',()=>gateSmoke(context,origin+base,instrument));

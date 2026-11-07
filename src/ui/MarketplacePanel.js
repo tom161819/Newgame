@@ -3,6 +3,7 @@ import { element } from './objectLabels.js';
 import { priceTable,price,TRADE_RULES,PRICE_MODEL,AUTO_TRADE } from '../data/trade.js';
 import { CATS,DOGS } from '../data/domesticAnimals.js';
 import { buildingDefinition } from '../game/buildings.js';
+import { resourceGroup,RESOURCE_GROUPS } from '../data/resourceGroups.js';
 
 // Trade F1.1 (#59): the Marketplace panel. Caravans (F1.2) and orders (F1.3) are not in the game yet, so the panel shows
 // the goods space, the loading spots and the price list caravans will use.
@@ -26,12 +27,20 @@ export class MarketplacePanel {
       ...this.orderLines(b));
     this.renderTrade(b);
     const rows=this.prices().map(row=>{const tr=element('tr');tr.dataset.marketResource=row.resource;tr.append(element('th','',row.name),this.priceCell(row,'buy'),this.priceCell(row,'sell'));return tr;});
-    document.querySelector('#marketplace-prices tbody').replaceChildren(...rows);
+    document.querySelector('#marketplace-prices tbody').replaceChildren(...rows);this.decorate(document.querySelector('#marketplace-prices'));
     this.renderAuto();
     this.renderStats();
   }
   // Trade F2: live prices from the kingdom's and the caravan's stock.
-  prices(){const trade=this.scene.trade;return priceTable(this.scene.objectRegistry,r=>trade?.marketContext(r)??{});}
+  // m-ui-prehled-surovin (26): goods sorted by resource group, each row with the good's icon and the group's tint.
+  prices(){const trade=this.scene.trade,reg=this.scene.objectRegistry,rank=r=>RESOURCE_GROUPS.indexOf(resourceGroup(reg.get(r.resource),reg));return priceTable(reg,r=>trade?.marketContext(r)??{}).map((r,i)=>({r,i})).sort((a,b)=>rank(a.r)-rank(b.r)||a.i-b.i).map(x=>x.r);}
+  decorate(root){
+    const reg=this.scene.objectRegistry;
+    for(const tr of root?.querySelectorAll?.('tr[data-market-resource],tr[data-auto-resource],tr[data-trade-resource]')??[]){
+      const id=tr.dataset.marketResource??tr.dataset.autoResource??tr.dataset.tradeResource,d=reg.get(id);if(!d)continue;tr.dataset.resourceGroup=resourceGroup(d,reg);
+      const cell=tr.firstElementChild;if(cell&&!cell.querySelector('.market-good-icon')){const img=element('img','market-good-icon');img.alt='';img.src=this.scene.assets?.previewURL?.(d)??'';cell.prepend(img);}
+    }
+  }
   // A price with a ▲ (dearer) / ▼ (cheaper) marker; the tooltip names the reasons.
   priceCell(row,side){
     const mark=row.factor>1.005?'▲':row.factor<0.995?'▼':'',cell=element('td',`market-price${mark?mark==='▲'?' up':' down':''}`,`${row[side]}${mark?' '+mark:''}`);
@@ -68,7 +77,7 @@ export class MarketplacePanel {
       const td=element('td');td.append(mode);tr.append(element('th','',row.name),td,settings);body.append(tr);
     }
     table.append(thead,body);
-    root.replaceChildren(element('p','market-help',t('market.auto.help')),enabled,' ',budgetLabel,table);
+    root.replaceChildren(element('p','market-help',t('market.auto.help')),enabled,' ',budgetLabel,table);this.decorate(root);
     for(const id of Object.keys(a.rules))this.renderAutoNote(id);
   }
   number(id,value,min,max){const el=element('input','market-qty');el.type='number';el.id=id;el.min=String(min);el.max=String(max);el.step='1';el.value=String(value);return el;}
@@ -173,7 +182,7 @@ export class MarketplacePanel {
     if(cats){const buy=element('button','market-buy-cat',t('pets.buyButton',{price:CATS.price,count:cats}));buy.type='button';buy.id='market-buy-cat';buy.addEventListener('click',()=>this.scene.catPanel?.open(null,'buy'));extra.push(buy);}
     const dog=this.scene.domestic?.dogForSale?.();
     if(dog){const buy=element('button','market-buy-dog',t('pets.dog.buyButton',{price:DOGS.price,name:dog.name}));buy.type='button';buy.id='market-buy-dog';buy.addEventListener('click',()=>this.scene.catPanel?.openDog(dog,'buyDog'));extra.push(buy);}
-    root.replaceChildren(element('h3','',t('market.trade',{gold:c.gold})),table,quote,...extra);this.renderQuote();
+    root.replaceChildren(element('h3','',t('market.trade',{gold:c.gold})),table,quote,...extra);this.decorate(root);this.renderQuote();
   }
   maximum(side,resource){
     const trade=this.scene.trade,c=this.scene.caravans.active,unit=trade.unitPrice(resource,side);if(!c||!unit)return 1;

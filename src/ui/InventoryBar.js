@@ -2,6 +2,7 @@ import { element } from './objectLabels.js';
 import { ResourceEconomyTooltip } from './ResourceEconomyTooltip.js';
 import { dailyResourceLabel,dailyResourceTone } from './resourceEconomy.js';
 import { t } from '../i18n/index.js';
+import { resourceGroup,groupedResources,RESOURCE_GROUPS } from '../data/resourceGroups.js';
 
 // Vykresluje původní Inventory; nevytváří druhý inventář ani nové suroviny.
 const ALWAYS_SHOWN=new Set(['gold','stone','wood']);
@@ -17,7 +18,9 @@ export class InventoryBar {
   }
   render() {
     this.tooltip.hide();this.outputs=new Map();this.deltas=new Map();
-    const items=this.registry.byCategory('resource').filter(d=>d.collectible).sort((a,b)=>(a.inventoryOrder??100)-(b.inventoryOrder??100)).map(definition=>{
+    // m-ui-prehled-surovin (22): resources in groups (gold, materials, food raw materials, food, equipment), each group a
+    // tinted capsule; the order inside a group is the inventory order.
+    const items=groupedResources(this.registry.byCategory('resource').filter(d=>d.collectible),this.registry).map(definition=>{
       const item=element('div','inventory-item'),image=element('img','stone-icon');
       item.dataset.resourceEconomy=definition.id;item.tabIndex=0;item.setAttribute('aria-describedby',this.tooltip.root.id);
       image.src=this.assets.previewURL(definition);image.alt='';
@@ -31,20 +34,26 @@ export class InventoryBar {
       // N2: `inventoryHideZero` resources (Pitch, Torches) show only while the kingdom has some. E2 (report 0.48.0): every
       // other resource but Gold, Stone and Wood appears once the kingdom has had some (kept for the session).
       item.dataset.reveal=definition.inventoryHideZero?'zero':ALWAYS_SHOWN.has(definition.id)?'always':'seen';item.hidden=this.hideItem(definition.id,this.format(definition.id),item.dataset.reveal);
+      item.dataset.resourceGroup=resourceGroup(definition,this.registry);
       item.append(image,element('span','',definition.inventoryLabel??definition.name),output,delta);return item;
     });
+    const groups=RESOURCE_GROUPS.map(group=>{const box=element('div','inventory-group');box.dataset.resourceGroup=group;box.append(...items.filter(i=>i.dataset.resourceGroup===group));return box;}).filter(box=>box.childElementCount);
     // Owner request 7 Nov 2026: how full the stores are (Starter Stockpile and Warehouses), as used / capacity.
     const store=element('div','inventory-item storage-capacity');store.title=t('hud.storeCapacityHint');store.tabIndex=0;
     this.storeOutput=element('output','',this.storeText());this.storeOutput.id='storage-capacity';this.storeOutput.setAttribute('aria-label',t('hud.storeCapacity'));
     store.append(element('span','',t('hud.storeCapacity')),this.storeOutput);store.hidden=!this.storeUsage();
-    this.storeItem=store;this.root.replaceChildren(...items,store);
+    // (24) Resting on the gauge shows what the stores hold (StorePreview, shared with the map).
+    const stores=()=>[...(this.inventory.storage?.locations?.values()??[])].filter(l=>(l.kind==='fallback'&&l.buildingId!=null)||String(l.id).startsWith('warehouse-'));
+    store.addEventListener('pointerenter',e=>this.ledger?.scene?.storePreview?.hover({key:'hud-store',locations:stores,x:e.clientX,y:e.clientY,below:true}),{signal:this.controller.signal});
+    store.addEventListener('pointerleave',()=>this.ledger?.scene?.storePreview?.hover(null),{signal:this.controller.signal});
+    this.storeItem=store;this.root.replaceChildren(...groups,store);
   }
   storeUsage(){
     const locations=[...(this.inventory.storage?.locations?.values()??[])].filter(l=>(l.kind==='fallback'&&l.buildingId!=null)||String(l.id).startsWith('warehouse-'));
     if(!locations.length)return null;return {used:locations.reduce((n,l)=>n+Object.values(l.stock).reduce((a,v)=>a+v,0),0),capacity:locations.reduce((n,l)=>n+l.capacity,0)};
   }
   storeText(){const u=this.storeUsage();return u?`${u.used} / ${u.capacity}`:'';}
-  // Gold shows its limit: 500.00 / 500.
+  // Gold has no limit since 0.52 (a limit would show as amount / limit).
   format(id){const limit=this.inventory.limit?.(id);return id==='gold'?`${this.inventory.count(id).toFixed(2)}${limit!=null?` / ${limit}`:''}`:String(this.inventory.count(id));}
   resetCameraKeys(){for(const key of Object.values(this.ledger?.scene.worldCamera?.keys??{}))key.reset?.();}
   setLedger(ledger){this.unsubscribeLedger?.();this.ledger=ledger;this.unsubscribeLedger=ledger.onChange(()=>this.update());this.update();}

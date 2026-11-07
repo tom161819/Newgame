@@ -832,3 +832,30 @@ html[data-ui-pointer="hand"] .tutorial-arrow { clip-path:none; -webkit-mask:url(
 .royal-goal progress { accent-color:var(--gold); }
 .royal-goal-count { color:var(--ink); }
 .royal-goal small { color:var(--muted); }
+/* m-ui-prehled-surovin: resource groups (top bar, store preview, Marketplace). Quiet tints that read on every UI style. */
+:root { --group-gold:rgb(227 197 122 / .16); --group-materials:rgb(176 160 132 / .14); --group-foodRaw:rgb(214 180 90 / .15); --group-food:rgb(140 190 110 / .15); --group-equipment:rgb(130 160 200 / .16); }
+.inventory-group { display:contents; }
+@supports selector(:has(*)) {
+  .inventory-group { display:flex; align-items:center; gap:2px 12px; padding:1px 8px; border-radius:999px; }
+  .inventory-group:not(:has(> .inventory-item:not([hidden]))) { display:none; }
+}
+.inventory-group[data-resource-group="gold"] { background:var(--group-gold); }
+.inventory-group[data-resource-group="materials"] { background:var(--group-materials); }
+.inventory-group[data-resource-group="foodRaw"] { background:var(--group-foodRaw); }
+.inventory-group[data-resource-group="food"] { background:var(--group-food); }
+.inventory-group[data-resource-group="equipment"] { background:var(--group-equipment); }
+.store-preview { position:fixed; z-index:60; min-width:120px; max-width:260px; padding:7px 9px; border:1px solid var(--line); border-radius:var(--ui-radius,6px); background:var(--panel); color:var(--ink); box-shadow:0 4px 14px #0008; pointer-events:none; font-size:12px; }
+.store-preview[hidden] { display:none; }
+.store-preview-usage { display:block; margin-bottom:5px; color:var(--gold); font-variant-numeric:tabular-nums; }
+.store-preview-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(54px,1fr)); gap:3px; }
+.store-preview-item { display:flex; align-items:center; gap:4px; padding:2px 4px; border-radius:4px; font-variant-numeric:tabular-nums; }
+.store-preview-item img { width:18px; height:18px; object-fit:contain; }
+.store-preview-item[data-resource-group="gold"] { background:var(--group-gold); }
+.store-preview-item[data-resource-group="materials"] { background:var(--group-materials); }
+.store-preview-item[data-resource-group="foodRaw"] { background:var(--group-foodRaw); }
+.store-preview-item[data-resource-group="food"] { background:var(--group-food); }
+.store-preview-item[data-resource-group="equipment"] { background:var(--group-equipment); }
+tr[data-resource-group="gold"] { background:var(--group-gold); } tr[data-resource-group="materials"] { background:var(--group-materials); }
+tr[data-resource-group="foodRaw"] { background:var(--group-foodRaw); } tr[data-resource-group="food"] { background:var(--group-food); }
+tr[data-resource-group="equipment"] { background:var(--group-equipment); }
+.market-good-icon { width:16px; height:16px; margin-right:5px; vertical-align:-3px; object-fit:contain; }
