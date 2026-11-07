@@ -15,12 +15,12 @@ const pick = pattern => Object.entries(urls).filter(([path]) => pattern.test(pat
 const SOURCES = { Summer: pick(/grass-ground-lush\.v1\.tile-\d\.png$/), Spring: pick(/season-ground-spring/), Autumn: pick(/season-ground-autumn/), Winter: pick(/season-ground-snow/) };
 const EARTH = [null, ...[1, 2, 3].map(level => pick(new RegExp(`worn-path-earth\\.v1\\.tile-${level}\\.png$`))[0])];
 const STORAGE = 'asset-studio.path-lab.v1';
-const BRUSHES = [{ id: 0, label: 'Grass / Erase' }, { id: 1, label: 'Wear 1' }, { id: 2, label: 'Wear 2' }, { id: 3, label: 'Wear 3' }];
+const BRUSHES = [{ id: 0, label: 'Grass / Erase' }, { id: 1, label: 'Wear 1 · grass' }, { id: 2, label: 'Wear 2' }, { id: 3, label: 'Wear 3' }, { id: 4, label: 'Wear 4' }];
 const SIZES = [1, 2, 3, 5];
 const $ = selector => document.querySelector(selector);
 const loadImage = src => new Promise(resolve => { if (!src) return resolve(null); const image = new Image(); image.onload = () => resolve(image); image.onerror = () => resolve(null); image.src = src; });
 
-const state = { map: scenarioMap('path-to-area'), season: 'Summer', renderer: 'current', preset: 'current', seed: 1, config: defaultConfig(), brush: 2, size: 1, view: { x: 0, y: 0, scale: 1 }, overlays: { grid: false, levels: false, centerline: false }, name: 'Untitled' };
+const state = { map: scenarioMap('path-to-area'), season: 'Summer', renderer: 'current', preset: 'current', seed: 1, config: defaultConfig(), brush: 3, size: 1, view: { x: 0, y: 0, scale: 1 }, overlays: { grid: false, levels: false, centerline: false }, name: 'Untitled' };
 let history = new History(state.map), images = null, scene = null;
 const offscreen = document.createElement('canvas'), view = $('#lab-view'), ctx = view.getContext('2d');
 const renderers = { current: currentPathRenderer, v2: (map, { earth }) => createV2Renderer(map, { earth, config: state.config, seed: state.seed, registry: objectRegistry }) };

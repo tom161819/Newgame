@@ -7,12 +7,15 @@
 //  3. one surface: every point of the ground gets a signed distance to the union of all path capsules (variable width
 //     by wear level, widening towards an area over the blend distance) and area discs, joined with a smooth minimum, so
 //     a path flows into an area instead of ending in a circle; world-space noise roughens the edge.
+//  4. wear level: a smooth field over the worn tiles (Gaussian weights, slightly warped by noise), independent of the
+//     shapes, so one level fades into the next instead of switching at a tile edge. Level 1 is trampled grass (a dark
+//     green track over the grass, no soil); 2–4 are the soil levels with the approved Earth texture.
 // Ground space is (x, 2y) of the game's 64 × 32 projection, like N12's paths, so shapes lie flat on the ground.
 // Pure geometry here; `createV2Renderer` paints it on a canvas. Deterministic for seed + tile coordinates.
 import { tileCenter } from '../../../src/game/isometric.js';
 import { defaultConfig } from './params.js';
 
-export const V2_VERSION = 1;
+export const V2_VERSION = 2;
 const STEP = Math.hypot(32, 32); // ground distance between orthogonal tile centres
 const NEIGHBOURS = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 
@@ -92,7 +95,11 @@ function resample(points, spacing) {
   }
   return out;
 }
-const widthFor = (level, c) => level <= 1 ? c.width1 * level : level <= 2 ? c.width1 + (c.width2 - c.width1) * (level - 1) : c.width2 + (c.width3 - c.width2) * Math.min(1, level - 2);
+// Width by wear level, linear between the levels: 1 = trampled grass, 2–4 = soil (width1–width3).
+const widthFor = (level, c) => {
+  const table = [0, c.widthGrass, c.width1, c.width2, c.width3], l = Math.max(0, Math.min(4, level)), i = Math.min(3, Math.floor(l));
+  return table[i] + (table[i + 1] - table[i]) * (l - i);
+};
 
 // Smooth centerline of one chain in ground space: [{x, y, level, width}].
 export function centerline(chain, config = defaultConfig(), seed = 1) {
@@ -133,7 +140,21 @@ export function geometry(map, config = defaultConfig(), seed = 1) {
   const segments = [];
   lines.forEach((line, group) => { for (let i = 0; i < line.length - 1; i++) segments.push({ a: line[i], b: line[i + 1], group }); });
   const discs = topo.isolated.map((n, i) => ({ ...ground(n), level: n.level, r: widthFor(n.level, c) * 0.9, group: `disc${i}` }));
-  return { topo, lines, segments, discs, tiles: areaCentres, config: c, seed };
+  const worn = [...topo.nodes.values()].map(n => ({ ...ground(n), level: n.level }));
+  return { topo, lines, segments, discs, tiles: areaCentres, worn, sigma: levelSigma(c), config: c, seed };
+}
+
+// Spread of the level field in ground px: 0 → about a quarter tile (changes near the tile edge), 1 → a full tile.
+const levelSigma = c => STEP * (0.22 + c.levelBlend * 0.78);
+// Wear level at a ground point: Gaussian-weighted mean of the worn tiles around it (grass tiles do not count, so a
+// narrow path keeps its level to its edge), sampled at a point nudged by noise so the boundary between two levels
+// wanders instead of following the tile diamonds. null when no worn tile is near.
+export function levelAt(geo, x, y, worn = null) {
+  const c = geo.config, warp = 5 + c.edgeIrregularity * 12, f = 1 / (STEP * 0.8);
+  const wx = x + noise(x * f, y * f, geo.seed + 41, 0.4) * warp, wy = y + noise(x * f + 9.7, y * f - 4.3, geo.seed + 43, 0.4) * warp;
+  const k = 1 / (2 * geo.sigma * geo.sigma); let sum = 0, weight = 0;
+  for (const t of worn ?? geo.worn) { const d2 = (t.x - wx) ** 2 + (t.y - wy) ** 2, w = Math.exp(-d2 * k); sum += w * t.level; weight += w; }
+  return weight > 1e-4 ? sum / weight : null;
 }
 
 // Signed distance (ground px) and blended wear level at a ground point; negative inside the surface.
@@ -159,15 +180,17 @@ export function fieldAt(geo, x, y, candidates = null) {
   const area = groups.get('area'); if (area) area.d += noise(x / (STEP * 1.7), y / (STEP * 1.7), geo.seed + 29, 0.3) * (6 + c.edgeIrregularity * 16) * (1.2 - c.areaSmoothness * 0.5);
   for (const g of [...groups.values()].sort((a, b) => a.d - b.d)) { distance = distance === Infinity ? g.d : smin(distance, g.d, k); const w = Math.exp(-Math.max(0, g.d) / 8); levelSum += g.level * w; weightSum += w; }
   const edge = noise(x / (c.noiseScale * STEP * 2.2), y / (c.noiseScale * STEP * 2.2), geo.seed + 7, 0) * c.edgeIrregularity * 9 + noise(x / (c.noiseScale * STEP * 0.45), y / (c.noiseScale * STEP * 0.45), geo.seed + 13, 0.5) * c.edgeIrregularity * 3;
-  return { distance: distance + edge, level: levelSum / weightSum };
+  const smooth = geo.worn ? levelAt(geo, x, y, candidates?.worn) : null;
+  return { distance: distance + edge, level: smooth ?? levelSum / weightSum };
 }
 
 // Spatial buckets so a pixel only looks at nearby shapes.
 export function buckets(geo, cell = 96) {
-  const grid = new Map(), add = (gx, gy, list, item) => { const k2 = `${gx},${gy}`; if (!grid.has(k2)) grid.set(k2, { segments: [], discs: [], tiles: [] }); grid.get(k2)[list].push(item); };
+  const grid = new Map(), add = (gx, gy, list, item) => { const k2 = `${gx},${gy}`; if (!grid.has(k2)) grid.set(k2, { segments: [], discs: [], tiles: [], worn: [] }); grid.get(k2)[list].push(item); };
   const reach = 40 + geo.config.areaSmoothness * 30;
   for (const s of geo.segments) { const r = Math.max(s.a.width, s.b.width) / 2 + reach; for (let gx = Math.floor((Math.min(s.a.x, s.b.x) - r) / cell); gx <= Math.floor((Math.max(s.a.x, s.b.x) + r) / cell); gx++) for (let gy = Math.floor((Math.min(s.a.y, s.b.y) - r) / cell); gy <= Math.floor((Math.max(s.a.y, s.b.y) + r) / cell); gy++) add(gx, gy, 'segments', s); }
   for (const t of geo.tiles) { const r = t.half + reach; for (let gx = Math.floor((t.x - r) / cell); gx <= Math.floor((t.x + r) / cell); gx++) for (let gy = Math.floor((t.y - r) / cell); gy <= Math.floor((t.y + r) / cell); gy++) add(gx, gy, 'tiles', t); }
+  for (const t of geo.worn ?? []) { const r = geo.sigma * 3 + 20; for (let gx = Math.floor((t.x - r) / cell); gx <= Math.floor((t.x + r) / cell); gx++) for (let gy = Math.floor((t.y - r) / cell); gy <= Math.floor((t.y + r) / cell); gy++) add(gx, gy, 'worn', t); }
   for (const d of geo.discs) { const r = d.r + reach; for (let gx = Math.floor((d.x - r) / cell); gx <= Math.floor((d.x + r) / cell); gx++) for (let gy = Math.floor((d.y - r) / cell); gy <= Math.floor((d.y + r) / cell); gy++) add(gx, gy, 'discs', d); }
   return { cell, at: (x, y) => grid.get(`${Math.floor(x / cell)},${Math.floor(y / cell)}`) ?? null };
 }
@@ -175,42 +198,58 @@ export function buckets(geo, cell = 96) {
 // --- painting (browser) --------------------------------------------------------------------------------------------
 const hex = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
 const smoothstep = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-const WINTER = [0, 1.9, 1.3, 1];
+const WINTER = [0, 2.2, 1.9, 1.3, 1];
+// Level 1, trampled grass: a darker, flattened green laid thinly over the grass tile, so its blades still show.
+const GRASS_TRACK = { core: '#33561c', edge: '#466b28', density: 0.62 };
+// Coverage of the core by level: the grass track is thin, worn soil grows solid.
+const DENSITY = [0, GRASS_TRACK.density, 0.8, 0.9, 1];
 
 export function createV2Renderer(map, { earth = [], config = defaultConfig(), seed = 1, registry } = {}) {
   const visuals = [1, 2, 3].map(l => registry.require(['grass_normal', 'grass_trampled_1', 'grass_trampled_2', 'grass_trampled_3'][l]).visual);
+  const looks = [{ pathColor: GRASS_TRACK.core, pathEdge: GRASS_TRACK.edge }, ...visuals]; // lab levels 1–4
   const geo = geometry(map, config, seed), index = buckets(geo);
   return {
     geometry: geo,
     debugGeometry: () => ({ lines: geo.lines, discs: geo.discs, tiles: geo.tiles }),
     // One pass over the whole scene (the lab draws V2 once, not per tile). resolution: ground px per sample.
     drawScene(context, bounds, veil = 0, resolution = 2) {
-      const w = Math.ceil(bounds.width / resolution), h = Math.ceil(bounds.height / resolution), core = new ImageData(w, h), halo = new ImageData(w, h);
+      const w = Math.ceil(bounds.width / resolution), h = Math.ceil(bounds.height / resolution), core = new ImageData(w, h), halo = new ImageData(w, h), soil = new ImageData(w, h);
       const c = geo.config, soft = 0.6 + c.edgeSoftness * 4, haloWidth = 2 + c.edgeSoftness * 4;
-      const colours = visuals.map(v => hex(v.pathColor)), edges = visuals.map(v => hex(v.pathEdge)), snow = [232, 237, 220];
+      const colours = looks.map(v => hex(v.pathColor)), edges = looks.map(v => hex(v.pathEdge)), snow = [232, 237, 220];
       for (let py = 0; py < h; py++) for (let px = 0; px < w; px++) {
         const sx = bounds.left + (px + 0.5) * resolution, sy = bounds.top + (py + 0.5) * resolution, gx = sx, gy = sy * 2;
         const near = index.at(gx, gy); if (!near) continue;
         const { distance, level } = fieldAt(geo, gx, gy, near); if (distance > haloWidth + soft) continue;
-        const l = Math.max(1, Math.min(3, level)), i = Math.floor(l) - 1, f = l - Math.floor(l), j = Math.min(2, i + 1);
-        const mix = (list, ch) => list[i][ch] + (list[j][ch] - list[i][ch]) * f, snowAmount = Math.min(0.85, veil * WINTER[Math.round(l)]);
+        // Colours, coverage and snow all follow the smooth level, so no level boundary is visible as a line.
+        const l = Math.max(1, Math.min(4, level)), i = Math.floor(l) - 1, f = l - Math.floor(l), j = Math.min(3, i + 1);
+        const mix = (list, ch) => list[i][ch] + (list[j][ch] - list[i][ch]) * f, between = list => list[i + 1] + (list[Math.min(4, i + 2)] - list[i + 1]) * f;
+        const snowAmount = Math.min(0.85, veil * between(WINTER));
         const tone = (list, ch) => mix(list, ch) + (snow[ch] - mix(list, ch)) * snowAmount;
-        // Lightly worn ground keeps more grass showing through; a well-worn track is solid.
-        const density = 0.8 + (l - 1) * 0.1, o = (py * w + px) * 4;
+        const density = between(DENSITY), o = (py * w + px) * 4;
         const a = (1 - smoothstep(-soft, soft, distance)) * density;
-        if (a > 0) { core.data[o] = tone(colours, 0); core.data[o + 1] = tone(colours, 1); core.data[o + 2] = tone(colours, 2); core.data[o + 3] = Math.round(a * 255); }
+        if (a > 0) {
+          core.data[o] = tone(colours, 0); core.data[o + 1] = tone(colours, 1); core.data[o + 2] = tone(colours, 2); core.data[o + 3] = Math.round(a * 255);
+          soil.data[o + 3] = Math.round(a * smoothstep(1, 2, l) * 255); // the soil texture only where there is soil
+        }
         const e = (1 - smoothstep(0, haloWidth, distance)) * 0.35 * density;
         if (e > 0) { halo.data[o] = tone(edges, 0); halo.data[o + 1] = tone(edges, 1); halo.data[o + 2] = tone(edges, 2); halo.data[o + 3] = Math.round(e * 255); }
       }
-      const layer = (image, texture) => {
-        const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h; const ctx = canvas.getContext('2d'); ctx.putImageData(image, 0, 0);
+      const toCanvas = image => { const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h; canvas.getContext('2d').putImageData(image, 0, 0); return canvas; };
+      const layer = (image, texture, mask) => {
+        const canvas = toCanvas(image), ctx = canvas.getContext('2d');
         // The approved Earth track texture over the core, clipped to it, so the soil keeps the approved grain.
         // Only the soil centre of the approved tile (as N12 crops it), never its grass rim, or the tiles show as a grid.
+        // The mask fades the texture out towards trampled grass, which has no soil.
         if (texture) { const scale = texture.width / 64, crop = document.createElement('canvas'); crop.width = 24; crop.height = 10; crop.getContext('2d').drawImage(texture, 20 * scale, 11 * scale, 24 * scale, 10 * scale, 0, 0, 24, 10); texture = crop; }
-        if (texture) { const pattern = ctx.createPattern(texture, 'repeat'); pattern?.setTransform?.(new DOMMatrix().scale(1 / resolution)); ctx.globalCompositeOperation = 'source-atop'; ctx.globalAlpha = 0.5 * (1 - veil); ctx.fillStyle = pattern; ctx.fillRect(0, 0, w, h); }
+        if (texture) {
+          const grain = document.createElement('canvas'); grain.width = w; grain.height = h; const g = grain.getContext('2d'), pattern = g.createPattern(texture, 'repeat');
+          pattern?.setTransform?.(new DOMMatrix().scale(1 / resolution)); g.fillStyle = pattern; g.fillRect(0, 0, w, h);
+          if (mask) { g.globalCompositeOperation = 'destination-in'; g.drawImage(toCanvas(mask), 0, 0); }
+          ctx.globalCompositeOperation = 'source-atop'; ctx.globalAlpha = 0.5 * (1 - veil); ctx.drawImage(grain, 0, 0);
+        }
         context.save(); context.imageSmoothingEnabled = true; context.drawImage(canvas, 0, 0, w * resolution, h * resolution); context.restore();
       };
-      layer(halo, null); layer(core, earth[2] ?? earth[3] ?? null);
+      layer(halo, null); layer(core, earth[2] ?? earth[3] ?? null, soil);
     },
   };
 }
