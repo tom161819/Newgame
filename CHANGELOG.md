@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.38.1] - 2026-11-07
+<!-- version: {"title":"Approved Kingdom Policy icons","type":"feature","reconstructed":false,"saveVersion":55} -->
+### Changed
+- The Kingdom Policy sliders use the icons chosen in the Asset Studio: coin stacks for taxes (an empty purse up to a full chest) and bowls for food rations.
+
 ## [0.38.0] - 2026-11-07
 <!-- version: {"title":"Studio art chosen for the game","type":"feature","reconstructed":false,"saveVersion":55} -->
 ### Changed
