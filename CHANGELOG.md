@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.27.0] - 2026-11-07
+<!-- version: {"title":"Hunting dogs","type":"feature","reconstructed":false,"saveVersion":53} -->
+### Added
+- Hunting dogs. Every few days a stray dog appears near the castle; click it and send a Hunter to tame it (the chance grows with his hunting skill), and one in three merchant caravans brings a dog you can buy for 120 Gold. A dog follows its Hunter, sniffs out game up to 8 tiles away even under the fog, and while it is close the Hunter moves 30 % faster and deals 50 % more damage. When an animal attacks, the dog takes the blow; an injured dog lies down and heals in a day. If its Hunter changes profession the dog waits for a new master.
+
 ## [0.26.0] - 2026-11-07
 <!-- version: {"title":"Rats and cats","type":"feature","reconstructed":false,"saveVersion":52} -->
 ### Added

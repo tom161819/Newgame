@@ -55,6 +55,8 @@ export class UnitPanel {
       document.querySelector('#unit-unpaid').textContent=t('unit.unpaid',{amount:s.wageSystem.unpaid(u).toFixed(2)});
       const workshop=u.profession==='builder'?s.builderWorkshops?.workshopFor(u):null;
       document.querySelector('#unit-workplace').textContent=u.profession==='builder'&&s.builderWorkshops&&!workshop?t('unit.noBuilderWorkshop',{percent:50}):t('unit.workplace',{place:u.profession==='hauler'?t('unit.wholeKingdom'):(workshop??s.workplaceSystem?.building(u))?.definition.name??t('unit.notAssigned')});
+      // Z2: a Hunter's dog.
+      {const dog=u.profession==='hunter'?s.domestic?.dogOf?.(u):null,el=document.querySelector('#unit-workplace');if(dog)el.textContent+=` · ${t('pets.dog.unitLine',{name:dog.name,state:dog.injuredUntil!=null?t('pets.dog.injuredShort'):''}).trim()}`;}
     }
     renderNeeds(this.needs,worker&&s.needs?s.needs.status(u):null);
     const signature=JSON.stringify([u.skills,u.naturalTalent,language()]);

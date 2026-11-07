@@ -1,4 +1,4 @@
-import { RATS,CATS,ratLevel } from '../data/domesticAnimals.js';
+import { RATS,CATS,DOGS,ratLevel,tameChance } from '../data/domesticAnimals.js';
 import { FOOD_RESOURCE_IDS } from '../data/foodProduction.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { PLAYER_START,COLUMNS,ROWS } from '../game/config.js';
@@ -9,7 +9,7 @@ import { t } from '../i18n/index.js';
 // subject: no needs, eats nothing from the stores, never dies. Cats come as strays (Take in), from caravans
 // (30 Gold) or as kittens. Positions are tile coordinates (floats); cats walk straight lines around their home.
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-export const emptyDomesticState=()=>({seq:0,rats:{},loss:{},notified:{},cats:[],nextStrayAt:null,caravanCats:null});
+export const emptyDomesticState=()=>({seq:0,rats:{},loss:{},notified:{},cats:[],nextStrayAt:null,caravanCats:null,dogs:[],nextDogAt:null,caravanDog:null});
 export class DomesticAnimalSystem {
   constructor(scene,{random=Math.random}={}){
     this.scene=scene;this.random=random;this.listeners=new Set();this.importState(emptyDomesticState());
@@ -65,7 +65,7 @@ export class DomesticAnimalSystem {
       else if(level==='none'||level==='few')this.notified.set(l.id,'none');
     }
     for(const id of [...this.rats.keys()])if(!this.storage.locations.has(id)){this.rats.delete(id);this.loss.delete(id);this.notified.delete(id);}
-    this.updateCats(delta);this.updateStray();this.updateKittens();this.updateCaravan();
+    this.updateCats(delta);this.updateStray();this.updateKittens();this.updateCaravan();this.updateDogs(delta);
     if(dirty)this.scene.updateInventory?.();
   }
   buildingName(id){const b=this.scene.buildings?.find(b=>b.id===id);return b?(this.scene.objectRegistry?.get?.(b.type)?.name??b.type):t('pets.stockpile');}
@@ -108,7 +108,7 @@ export class DomesticAnimalSystem {
     return null;
   }
   leave(cat){
-    const dx=cat.x-PLAYER_START.x,dy=cat.y-PLAYER_START.y,d=Math.hypot(dx,dy)||1;cat.leaving=true;cat.target={x:cat.x+dx/d*60,y:cat.y+dy/d*60};this.feed(`cat:left:${cat.id}`,t('pets.feed.left',{name:cat.name}));this.changed();
+    const dx=cat.x-PLAYER_START.x,dy=cat.y-PLAYER_START.y,d=Math.hypot(dx,dy)||1;cat.leaving=true;cat.target={x:cat.x+dx/d*60,y:cat.y+dy/d*60};const dog=cat.id.startsWith('dog-');this.feed(`${dog?'dog':'cat'}:left:${cat.id}`,t(dog?'pets.dog.feed.left':'pets.feed.left',{name:cat.name}));this.changed();
   }
   // "Take in" / "Reassign": always works; the cat walks to its new home.
   assign(catId,buildingId){
@@ -145,23 +145,102 @@ export class DomesticAnimalSystem {
     const d=market?buildingDefinition(market):null,cat=this.newCat({x:market?market.x+d.width/2:c.tile?.x??PLAYER_START.x,y:market?market.y+d.height+.5:c.tile?.y??PLAYER_START.y,state:'home'});
     this.assign(cat.id,buildingId);this.scene.updateInventory?.();return {ok:true,cat};
   }
-  atPoint(x,y){let best=null;for(const cat of this.cats.values()){const v=cat.view;if(!v||!v.visible)continue;const d=Math.hypot(v.x-x,v.y-6-y);if(d<16&&(!best||v.depth>best.view.depth))best=cat;}return best;}
+  // ---- Z2: hunting dogs ----
+  hunters(){return (this.scene.workerSystem?.liveWorkers?.()??[]).filter(w=>w.profession==='hunter'&&w.isAlive);}
+  dogOf(worker){return [...this.dogs.values()].find(d=>d.hunterId===worker?.id)??null;}
+  freeHunters(){return this.hunters().filter(h=>!this.dogOf(h));}
+  huntingLevel(worker){return worker?.skills?.hunting?.level??1;}
+  // A dog helps its Hunter only while healthy and close.
+  activeDog(worker){const d=this.dogOf(worker);if(!d||d.injuredUntil!=null||!worker?.position)return null;return Math.hypot(d.x-worker.position.x,d.y-worker.position.y)<=DOGS.closeEnough?d:null;}
+  tracks(worker,tile){const d=this.dogOf(worker);return !!d&&d.injuredUntil==null&&Math.hypot(d.x-tile.x,d.y-tile.y)<=DOGS.trackRadius;}
+  // Any healthy owned dog within tracking range: the animal shows as a faint outline under Fog of War.
+  tracked(animal){for(const d of this.dogs.values())if(d.hunterId!=null&&d.injuredUntil==null&&Math.hypot(d.x-animal.position.x,d.y-animal.position.y)<=DOGS.trackRadius)return true;return false;}
+  // Combat: an animal attacking a Hunter with his dog close bites the dog first.
+  shield(target,attacker){if(!attacker||!this.scene.animalSystem?.animals?.has?.(attacker.id))return null;const d=this.activeDog(target);if(!d)return null;return {absorb:amount=>{d.hp=Math.max(0,d.hp-amount);if(d.hp<=0)this.injure(d);}};}
+  injure(dog){dog.injuredUntil=this.now()+DOGS.healDays*this.day;dog.hp=0;this.feed(`dog:hurt:${dog.id}:${Math.floor(this.now())}`,t('pets.dog.feed.hurt',{name:dog.name}));this.changed();}
+  lodge(dog){
+    const hunter=this.scene.workerSystem?.workers?.get(dog.hunterId),b=hunter?.assignedWorkplaceId!=null?this.scene.buildings?.find(b=>b.id===hunter.assignedWorkplaceId):(this.scene.buildings??[]).find(b=>b.type==='hunting_lodge'&&buildingIsComplete(b));
+    if(b){const d=buildingDefinition(b);return {x:b.x+d.width/2,y:b.y+d.height+.6};}return {x:PLAYER_START.x+.5,y:PLAYER_START.y+3};
+  }
+  newDog(fields){const id=`dog-${++this.seq}`,dog={id,name:DOGS.names[(this.seq-1)%DOGS.names.length],x:PLAYER_START.x,y:PLAYER_START.y,hunterId:null,state:'unassigned',hp:DOGS.maxHP,injuredUntil:null,leaveAt:null,leaving:false,tried:false,tamerId:null,home:null,target:null,...fields};this.dogs.set(id,dog);this.changed();return dog;}
+  updateDogs(delta){
+    const now=this.now(),seconds=delta/1000,workers=this.scene.workerSystem?.workers;
+    for(const dog of [...this.dogs.values()]){
+      if(dog.hunterId!=null){const h=workers?.get(dog.hunterId);if(!h||!h.isAlive||h.profession!=='hunter'){dog.hunterId=null;dog.state='unassigned';this.feed(`dog:free:${dog.id}:${Math.floor(now)}`,t('pets.dog.feed.unassigned',{name:dog.name}));this.changed();}}
+      if(dog.injuredUntil!=null){dog.hp=Math.min(DOGS.maxHP,dog.hp+DOGS.maxHP*seconds*1000/(DOGS.healDays*this.day));if(now>=dog.injuredUntil){dog.injuredUntil=null;dog.hp=DOGS.maxHP;this.changed();}}
+      if(dog.leaving){this.step(dog,dog.target,DOGS.speed*seconds);if(dog.x<0||dog.y<0||dog.x>COLUMNS||dog.y>ROWS||Math.hypot(dog.x-dog.target.x,dog.y-dog.target.y)<.2){this.dogs.delete(dog.id);this.changed();}continue;}
+      if(dog.state==='caravan'){const c=this.scene.caravans?.active;if(!c||this.caravanDog?.dogId!==dog.id){this.dogs.delete(dog.id);this.changed();continue;}const p=c.position??c.tile??{x:dog.x,y:dog.y};this.step(dog,{x:p.x+1.2,y:p.y+.6},DOGS.speed*seconds);continue;}
+      if(dog.state==='stray'){
+        if(dog.tamerId!=null){const h=workers?.get(dog.tamerId);if(!h?.isAlive||h.profession!=='hunter'||this.dogOf(h)){dog.tamerId=null;continue;}
+          this.step(dog,h.position,DOGS.speed*seconds);if(Math.hypot(dog.x-h.position.x,dog.y-h.position.y)<=DOGS.tame.meetDistance)this.tryTame(dog,h);continue;}
+        if(dog.leaveAt!=null&&now>=dog.leaveAt){this.leave(dog);continue;}
+        this.wander(dog,dog.home,seconds);continue;
+      }
+      const h=dog.hunterId!=null?workers?.get(dog.hunterId):null;
+      if(h&&dog.injuredUntil==null&&h.position){const dx=dog.x-h.position.x,dy=dog.y-h.position.y,d=Math.hypot(dx,dy);if(d>DOGS.followDistance)this.step(dog,{x:h.position.x+dx/d*DOGS.followDistance*.8,y:h.position.y+dy/d*DOGS.followDistance*.8},DOGS.speed*seconds*(d>4?1.6:1));}
+      else this.wander(dog,this.lodge(dog),seconds);
+    }
+    // Hunters run faster and hit harder with their dog close.
+    for(const h of this.hunters()){const d=this.activeDog(h);h.speedFactor=d?DOGS.huntSpeed:1;h.damageFactor=d?DOGS.huntDamage:1;}
+    // A stray dog near the castle about every 6 days (one at a time); it stays 2–3 days.
+    if(this.nextDogAt==null)this.nextDogAt=now+DOGS.stray.intervalDays*this.day*(.6+this.random()*.8);
+    if(now>=this.nextDogAt){this.nextDogAt=null;if(![...this.dogs.values()].some(d=>d.state==='stray')){const [lo,hi]=DOGS.stray.distance,spot=this.spotNear(lo,hi);
+      if(spot){const [a,b]=DOGS.stray.stayDays,dog=this.newDog({x:spot.x+.5,y:spot.y+.5,home:{x:spot.x+.5,y:spot.y+.5},state:'stray',leaveAt:now+(a+this.random()*(b-a))*this.day});this.feed(`dog:stray:${dog.id}`,t('pets.dog.feed.stray',{name:dog.name}));}}}
+    // Caravans: about one in three brings a hunting dog as an escort (120 Gold).
+    const c=this.scene.caravans?.active;
+    if(!c){if(this.caravanDog){this.caravanDog=null;this.changed();}}
+    else if(this.caravanDog?.caravanId!==c.id){let dogId=null;if(this.random()<DOGS.caravanChance){const p=c.position??c.tile??{x:0,y:0};dogId=this.newDog({x:p.x+1,y:p.y+.5,state:'caravan'}).id;}this.caravanDog={caravanId:c.id,dogId};this.changed();}
+  }
+  wander(animal,home,seconds){
+    if(!home)return;const far=Math.hypot(animal.x-home.x,animal.y-home.y)>CATS.wanderRadius+1.5;
+    if(far)animal.target={...home};else if(!animal.target||Math.hypot(animal.x-animal.target.x,animal.y-animal.target.y)<.15){animal.wait=(animal.wait??0)-seconds;if(animal.wait>0)return;const a=this.random()*Math.PI*2,r=this.random()*CATS.wanderRadius;animal.target={x:clamp(home.x+Math.cos(a)*r,.5,COLUMNS-.5),y:clamp(home.y+Math.sin(a)*r,.5,ROWS-.5)};animal.wait=1+this.random()*4;}
+    this.step(animal,animal.target,DOGS.speed*.5*seconds);
+  }
+  spotNear(lo,hi){const map=this.scene.map;for(let i=0;i<200;i++){const a=this.random()*Math.PI*2,r=lo+this.random()*(hi-lo),x=Math.round(PLAYER_START.x+Math.cos(a)*r),y=Math.round(PLAYER_START.y+Math.sin(a)*r);if(map?.[y]?.[x]===0)return {x,y};}return null;}
+  // "Try to tame": the stray runs to the chosen Hunter; when they meet, one try decides.
+  startTaming(dogId,hunterId){
+    const dog=this.dogs.get(dogId),h=this.scene.workerSystem?.workers?.get(hunterId);
+    if(!dog||dog.state!=='stray'||dog.tried||dog.leaving||!h||h.profession!=='hunter'||this.dogOf(h))return false;
+    dog.tamerId=h.id;this.changed();return true;
+  }
+  tryTame(dog,hunter){
+    dog.tried=true;dog.tamerId=null;const chance=tameChance(this.huntingLevel(hunter)),ok=this.random()<chance;
+    if(ok){dog.state='owned';dog.hunterId=hunter.id;dog.leaveAt=null;dog.home=null;this.scene.skillSystem?.addXP?.(hunter,'hunting',DOGS.tame.xp);this.feed(`dog:tamed:${dog.id}`,t('pets.dog.feed.tamed',{name:dog.name,hunter:hunter.name??''}),true);}
+    else{this.feed(`dog:fled:${dog.id}`,t('pets.dog.feed.fled',{name:dog.name}));this.leave(dog);}
+    this.changed();return ok;
+  }
+  assignDog(dogId,hunterId){
+    const dog=this.dogs.get(dogId),h=this.scene.workerSystem?.workers?.get(hunterId);
+    if(!dog||!['owned','unassigned'].includes(dog.state)||!h||h.profession!=='hunter'||(this.dogOf(h)&&this.dogOf(h)!==dog))return false;
+    dog.hunterId=h.id;dog.state='owned';this.changed();return true;
+  }
+  dogForSale(){const c=this.scene.caravans?.active;return c&&c.phase==='trading'&&this.caravanDog?.caravanId===c.id&&this.caravanDog.dogId&&this.dogs.has(this.caravanDog.dogId)?this.dogs.get(this.caravanDog.dogId):null;}
+  buyDog(hunterId){
+    const dog=this.dogForSale(),c=this.scene.caravans?.active,h=this.scene.workerSystem?.workers?.get(hunterId);
+    if(!dog)return {ok:false,error:'noDog'};if(!h||h.profession!=='hunter'||this.dogOf(h))return {ok:false,error:'hunter'};
+    if(this.scene.inventory.count('gold')<DOGS.price||!this.scene.inventory.spend('gold',DOGS.price,{source:'Trade Purchase'}))return {ok:false,error:'gold'};
+    c.gold+=DOGS.price;this.caravanDog.dogId=null;dog.state='owned';dog.hunterId=h.id;this.changed();this.scene.updateInventory?.();return {ok:true,dog};
+  }
+  atPoint(x,y){let best=null;for(const cat of [...this.cats.values(),...this.dogs.values()]){const v=cat.view;if(!v||!v.visible)continue;const d=Math.hypot(v.x-x,v.y-6-y);if(d<16&&(!best||v.depth>best.view.depth))best=cat;}return best;}
   exportState(){
     const round=v=>Math.round(v*1000)/1000;
     return {seq:this.seq,rats:Object.fromEntries([...this.rats].map(([k,v])=>[k,round(v)])),loss:Object.fromEntries([...this.loss].map(([k,v])=>[k,round(v)])),notified:Object.fromEntries(this.notified),
       cats:[...this.cats.values()].map(c=>({id:c.id,name:c.name,x:round(c.x),y:round(c.y),buildingId:c.buildingId,state:c.state,leaveAt:c.leaveAt,leaving:c.leaving,kittenAt:c.kittenAt,motherId:c.motherId,home:c.home?{x:round(c.home.x),y:round(c.home.y)}:null,target:c.target?{x:round(c.target.x),y:round(c.target.y)}:null})),
-      nextStrayAt:this.nextStrayAt,caravanCats:this.caravanCats?{...this.caravanCats}:null};
+      nextStrayAt:this.nextStrayAt,caravanCats:this.caravanCats?{...this.caravanCats}:null,
+      dogs:[...this.dogs.values()].map(d=>({id:d.id,name:d.name,x:round(d.x),y:round(d.y),hunterId:d.hunterId,state:d.state,hp:round(d.hp),injuredUntil:d.injuredUntil,leaveAt:d.leaveAt,leaving:d.leaving,tried:d.tried,tamerId:d.tamerId,home:d.home?{x:round(d.home.x),y:round(d.home.y)}:null,target:d.target?{x:round(d.target.x),y:round(d.target.y)}:null})),
+      nextDogAt:this.nextDogAt,caravanDog:this.caravanDog?{...this.caravanDog}:null};
   }
   importState(state){
     const s=state??emptyDomesticState();this.seq=s.seq??0;this.rats=new Map(Object.entries(s.rats??{}));this.loss=new Map(Object.entries(s.loss??{}));this.notified=new Map(Object.entries(s.notified??{}));
     for(const cat of this.cats?.values()??[])cat.view?.destroy?.();
-    this.cats=new Map((s.cats??[]).map(c=>[c.id,{...c,wait:0}]));this.nextStrayAt=s.nextStrayAt??null;this.caravanCats=s.caravanCats?{...s.caravanCats}:null;this.changed();
+    this.cats=new Map((s.cats??[]).map(c=>[c.id,{...c,wait:0}]));this.nextStrayAt=s.nextStrayAt??null;this.caravanCats=s.caravanCats?{...s.caravanCats}:null;
+    for(const dog of this.dogs?.values()??[])dog.view?.destroy?.();this.dogs=new Map((s.dogs??[]).map(d=>[d.id,{...d,wait:0}]));this.nextDogAt=s.nextDogAt??null;this.caravanDog=s.caravanDog?{...s.caravanDog}:null;this.changed();
   }
-  destroy(){for(const cat of this.cats.values())cat.view?.destroy?.();this.listeners.clear();}
+  destroy(){for(const cat of [...this.cats.values(),...this.dogs.values()])cat.view?.destroy?.();this.listeners.clear();}
 }
 // Save validation (schema 52).
-export function validateDomesticState(d,{check,number,integer,array,day,buildingIds,locationIds,time}){
-  check(d&&typeof d==='object'&&Object.keys(d).sort().join()==='caravanCats,cats,loss,nextStrayAt,notified,rats,seq');integer(d.seq,0);
+export function validateDomesticState(d,{check,number,integer,array,day,buildingIds,locationIds,workerIds=new Set(),time}){
+  check(d&&typeof d==='object'&&Object.keys(d).sort().join()==='caravanCats,caravanDog,cats,dogs,loss,nextDogAt,nextStrayAt,notified,rats,seq');integer(d.seq,0);
   for(const [id,v]of Object.entries(d.rats)){check(locationIds.has(id));number(v,0,RATS.max);}
   for(const [id,v]of Object.entries(d.loss)){check(locationIds.has(id));number(v,0,1);}
   for(const [id,v]of Object.entries(d.notified)){check(locationIds.has(id)&&['none','many','infestation'].includes(v));}
@@ -176,5 +255,16 @@ export function validateDomesticState(d,{check,number,integer,array,day,building
   for(const c of d.cats)if(c.motherId!==null)check(typeof c.motherId==='string');
   if(d.nextStrayAt!==null)number(d.nextStrayAt,0);
   if(d.caravanCats!==null){check(typeof d.caravanCats.caravanId==='string');integer(d.caravanCats.count,0,5);}
+  array(d.dogs,200);const dogIds=new Set();
+  for(const g of d.dogs){
+    check(g&&typeof g.id==='string'&&/^dog-\d+$/.test(g.id)&&Number(g.id.slice(4))<=d.seq&&!dogIds.has(g.id));dogIds.add(g.id);check(typeof g.name==='string'&&g.name.length<=40);
+    number(g.x,-100,COLUMNS+100);number(g.y,-100,ROWS+100);check(['stray','owned','unassigned','caravan'].includes(g.state)&&typeof g.leaving==='boolean'&&typeof g.tried==='boolean');
+    check((g.state==='owned')===(g.hunterId!==null));if(g.hunterId!==null)check(workerIds.has(g.hunterId));if(g.tamerId!==null)check(g.state==='stray'&&workerIds.has(g.tamerId));
+    number(g.hp,0,DOGS.maxHP);for(const k of ['injuredUntil','leaveAt'])if(g[k]!==null)number(g[k],0);
+    for(const k of ['home','target'])if(g[k]!==null){check(g[k]&&typeof g[k]==='object');number(g[k].x,-100,COLUMNS+100);number(g[k].y,-100,ROWS+100);}
+  }
+  if(new Set(d.dogs.filter(g=>g.hunterId!==null).map(g=>g.hunterId)).size!==d.dogs.filter(g=>g.hunterId!==null).length)check(false);
+  if(d.nextDogAt!==null)number(d.nextDogAt,0);
+  if(d.caravanDog!==null){check(typeof d.caravanDog.caravanId==='string');check(d.caravanDog.dogId===null||dogIds.has(d.caravanDog.dogId));}
   void day;void time;
 }

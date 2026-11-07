@@ -148,7 +148,8 @@ export class WorkerAI {
       const dropRoute=this.route(worker,drops.map(d=>d.tile));
       if(dropRoute){const drop=drops.find(d=>tileKey(d.tile)===tileKey(dropRoute.destination));this.reserve(worker,`drop:${drop.id}`,{kind:'collectMeat',targetId:drop.id},dropRoute);}
       else{
-        const animals=[...this.scene.animalSystem.animals.values()].filter(a=>a.isAlive&&a.definition.gameplay.huntable&&this.withinRange(worker,a.tile)
+        // Z2: game that the Hunter's dog tracks (within 8 tiles of it) can be chosen too.
+        const animals=[...this.scene.animalSystem.animals.values()].filter(a=>a.isAlive&&a.definition.gameplay.huntable&&(this.withinRange(worker,a.tile)||this.scene.domestic?.tracks?.(worker,a.tile))
           &&this.system.reservations.available(`animal:${a.id}`,worker.id)&&this.scene.huntingSystem.target!==a);
         const goals=new Map();for(const animal of animals)for(const tile of adjacentTiles(animal,this.scene.map))if(this.scene.map[tile.y]?.[tile.x]===0)goals.set(tileKey(tile),{tile,animal});
         const route=this.route(worker,[...goals.values()].map(p=>p.tile));

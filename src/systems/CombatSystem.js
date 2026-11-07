@@ -50,7 +50,9 @@ export class CombatSystem {
       for(const [attacker,target]of this.attacks){
         if(!attacker.isAlive||!target.isAlive){this.stopAttack(attacker);continue;}
         if(!this.canFight(attacker)||!this.canFight(target)||!inAttackRange(attacker,target,this.map)||!this.canTarget(attacker,target))continue;
-        const rate=Math.max(0,attacker.attackDPS)*(1-clampArmor(target.armor)/100);
+        const rate=Math.max(0,attacker.attackDPS)*(attacker.damageFactor??1)*(1-clampArmor(target.armor)/100);
+        // Domestic animals Z2: a hunting dog close to its Hunter takes the bites meant for him.
+        const shield=rate>0?this.shield?.(target,attacker):null;if(shield){shield.absorb(rate*remaining);continue;}
         if(rate>0){rates.set(target,(rates.get(target)??0)+rate);if(!contributors.has(target))contributors.set(target,[]);contributors.get(target).push({attacker,rate});}
       }
       if(!rates.size)break;

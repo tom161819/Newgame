@@ -17,3 +17,15 @@ export const CATS=Object.freeze({
   names:Object.freeze(['Micka','Mourek','Líza','Bára','Tygr','Čiči','Pacinka','Kocour Jan','Šmudla','Mňau','Zrzek','Bělka','Rozárka','Sazka','Fousek','Pepř']),
 });
 export const ratLevel=population=>{let level='none';for(const [id,from]of RATS.levels)if(population>=from&&(id==='none'?population<=0:true))level=id;return population<=0?'none':level;};
+// Domestic animals Z2: the hunting dog. One dog per Hunter; it never eats from the stores and never dies.
+// tame: 20 % + 8 % per hunting level, at most 90 %, one try per stray. Hunting with the dog: the Hunter moves 30 %
+// faster and deals 50 % more damage while the dog is close (about +30 % meat a day, see the change record); game within 8 tiles of the dog can be chosen as a target
+// (and shows as a faint outline under Fog of War). A dog at 0 HP is injured: it goes home and heals in a day.
+export const DOGS=Object.freeze({
+  maxHP:60,healDays:1,speed:2.2,followDistance:1.4,closeEnough:3,trackRadius:8,huntSpeed:1.3,huntDamage:1.5,
+  tame:Object.freeze({base:.2,perLevel:.08,max:.9,xp:20,meetDistance:1.5}),
+  stray:Object.freeze({intervalDays:6,stayDays:Object.freeze([2,3]),distance:Object.freeze([5,10])}),
+  caravanChance:1/3,price:120,
+  names:Object.freeze(['Alík','Rek','Bety','Ferda','Hektor','Žeryk','Brok','Lesan','Dina','Sultán','Bodlák','Vlasta']),
+});
+export const tameChance=level=>Math.min(DOGS.tame.max,DOGS.tame.base+DOGS.tame.perLevel*Math.max(1,level??1));

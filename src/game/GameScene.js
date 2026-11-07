@@ -275,7 +275,7 @@ export class GameScene extends Phaser.Scene {
     this.wageSystem=new WageSystem(this,{onPayroll:()=>this.updateInventory()});this.economyPanel=new EconomyPanel(this);
     this.buildingBar.close();this.updateInventory();
     this.gettingStarted=new GettingStartedPanel(this);
-    this.domestic=new DomesticAnimalSystem(this);this.domesticViews=new DomesticViews(this,this.domestic);this.catPanel=new CatPanel(this);
+    this.domestic=new DomesticAnimalSystem(this);this.combat.shield=(target,attacker)=>this.domestic?.shield(target,attacker);this.domesticViews=new DomesticViews(this,this.domestic);this.catPanel=new CatPanel(this);
     this.marketplacePanel=new MarketplacePanel(this);this.builderWorkshopPanel=new BuilderWorkshopPanel(this);this.policyPanel=new PolicyPanel(this);
     this.updateTimeDisplay();
     this.setStatus(t('status.idle'));
@@ -437,7 +437,7 @@ export class GameScene extends Phaser.Scene {
     if(unknown&&!this.fog.isInMap(goal)){this.setStatus(OUTSIDE_SIGHT);return;}
     this.demolitionUI.select(selected?.kind==='building'?selected.object:null);
     if(selected?.kind==='human'){this.unitPanel.open(selected.object);return;}
-    if(selected?.kind==='cat'){this.catPanel.open(selected.object);return;}
+    if(selected?.kind==='cat'){if(selected.object.id.startsWith('dog-'))this.catPanel.openDog(selected.object);else this.catPanel.open(selected.object);return;}
     if(selected?.kind==='stockpile'){this.storagePanel.open(null,selected.object.location.id);return;}
     if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){if(this.kingLogistics.workflowSiteId!==selected.object.id){this.kingLogistics.cancel();this.constructionSystem.commandKing(selected.object);}this.constructionUI.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).crop){this.farmingPanel.open(selected.object);return;}
@@ -731,7 +731,7 @@ export class GameScene extends Phaser.Scene {
     const cargoText=`${cargoLabel(this,this.character)} · ${transportLabel(this,this.character)}`;if(cargoStatus.textContent!==cargoText){cargoStatus.textContent=cargoText;cargoStatus.title=cargoText;}
     this.dropSystem.update(view,this.fog);
     if(this.input.manager.isOver)this.updateHover(this.input.activePointer);
-    for(const animal of this.animalSystem.animals.values())animal.view.setVisible(!animal.mounted&&!['ridden','harnessed'].includes(this.stables?.horses.get(animal.id)?.state)&&this.fog.isVisibleObject(animal)&&animal.view.x>view.x-60&&animal.view.x<view.right+60&&animal.view.y>view.y-40&&animal.view.y<view.bottom+70);
+    for(const animal of this.animalSystem.animals.values()){const seen=this.fog.isVisibleObject(animal),tracked=!seen&&animal.isAlive&&animal.definition.gameplay?.huntable&&this.domestic?.tracked(animal);animal.view.setAlpha?.(seen?1:.35);animal.view.setVisible(!animal.mounted&&!['ridden','harnessed'].includes(this.stables?.horses.get(animal.id)?.state)&&(seen||tracked)&&animal.view.x>view.x-60&&animal.view.x<view.right+60&&animal.view.y>view.y-40&&animal.view.y<view.bottom+70);}
     for(const worker of this.workerSystem?.liveWorkers()??[])worker.view.setVisible(this.fog.isVisibleObject(worker)&&worker.view.x>view.x-40&&worker.view.x<view.right+40&&worker.view.y>view.y-20&&worker.view.y<view.bottom+60);
     for(const resource of this.resources.values()){
       const definition=this.objectRegistry.require(resource.getData('objectId'));
