@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "assetId": "horse",
+  "variantId": "horse-grey-fur",
+  "name": "Grey horse – B · Rendered coat (hair)",
+  "category": "units",
+  "version": 1,
+  "specHash": "ddf6977c",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 162,
+  "height": 148,
+  "anchor": {
+    "x": 81,
+    "y": 80
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.54054
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 81,
+    "y": 112
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.75676
+  },
+  "visualHeight": 112,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.957,
+  "lights": [],
+  "x2": {
+    "width": 324,
+    "height": 320,
+    "anchor": {
+      "x": 162,
+      "y": 160
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 40,
+    "supersampling": 4,
+    "seconds": 191.3,
+    "renderHash": "0ebfc6ee",
+    "script": "scripts/blender/render.py"
+  }
+}

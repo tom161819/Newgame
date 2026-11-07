@@ -23,10 +23,10 @@ const style = JSON.parse(await readFile(path.join(root, 'art/style-guide.json'),
 const asset = await findAsset(assetId), variant = asset.variants.find(v => v.id === variantId);
 if (!variant) throw new Error(`No variant ${variantId} in ${assetId}`);
 const model = GENERATORS[asset.generator].build(variant.spec, { footprint: asset.footprint, style });
-const used = [...new Set(model.primitives.map(p => p.material))];
+const used = [...new Set([...model.primitives.map(p => p.material), ...(model.skeleton ? [model.skeleton.material, model.skeleton.sock] : [])])];
 const materials = Object.fromEntries(used.map(id => [id, { ...style.materials[id], hex: style.palette[style.materials[id].color] ?? style.materials[id].color }]));
 await writeFile(path.resolve(out), `${JSON.stringify({
-  assetId, variantId, footprint: asset.footprint, height: model.height, primitives: model.primitives, materials,
+  assetId, variantId, look: variant.baked?.look ?? null, footprint: asset.footprint, height: model.height, primitives: model.primitives, skeleton: model.skeleton ?? null, materials,
   light: style.light, projection: { pixelsPerUnit: PIXELS_PER_UNIT, elevation: ELEVATION, cameraDirection: cameraDirection() },
 }, null, 1)}\n`);
 console.log(`Wrote ${out}: ${model.primitives.length} primitives, ${used.length} materials.`);

@@ -240,8 +240,141 @@ def prism(part, rnd, mat):
     return bm_to_object(bm, part['material'], part['at'], three_rotation(part.get('rotation', 0.0), part.get('tilt')), mat)
 
 
+# ---------------------------------------------------------------- organic looks (animals)
+# Owner, 7 Nov 2026: horses and the bear must look semi-realistic and hand-painted, not low-poly. With `look` set
+# (variant.baked.look) the round parts (spheres and cylinders) are built smooth and fused per material: high-res
+# spheres and tubes, joined, voxel-remeshed into one surface and relaxed, so muscles flow into each other.
+#   sculpt  – smooth fused body, soft fur-grain bump in the material
+#   fur     – sculpt + rendered hair strands on the coat
+#   painted – sculpt, then a painterly post-process on the 4x render (brush smoothing, edge accents, rim light)
+ORGANIC = ('sphere', 'cylinder')
+
+
+def smooth_sphere(part, mat):
+    rx, ry, rz = part['radii']
+    bm = bmesh.new()
+    bmesh.ops.create_uvsphere(bm, u_segments=24, v_segments=14, radius=1.0)
+    for v in bm.verts:
+        v.co = Vector((v.co.x * rx, v.co.z * ry + ry, -v.co.y * rz))
+    return bm_to_object(bm, part['material'], part['at'], three_rotation(part.get('rotation', 0.0), part.get('tilt')), mat)
+
+
+def smooth_tube(part, mat):
+    bm = bmesh.new()
+    rb, rt, h = part['radiusBottom'], part.get('radiusTop', part['radiusBottom']), part['height']
+    bmesh.ops.create_cone(bm, cap_ends=True, segments=18, radius1=max(rb, 1e-4), radius2=max(rt, 1e-4), depth=h)
+    for v in bm.verts:
+        v.co = Vector((v.co.x, v.co.z + h / 2, -v.co.y))
+    return bm_to_object(bm, part['material'], part['at'], three_rotation(0.0, part.get('tilt')), mat)
+
+
+def fuse(objects, voxel, smooth_repeat):
+    """Join objects of one material, voxel-remesh them into one closed surface and relax the seams."""
+    if not objects:
+        return None
+    bpy.ops.object.select_all(action='DESELECT')
+    for o in objects:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = objects[0]
+    if len(objects) > 1:
+        bpy.ops.object.join()
+    obj = bpy.context.view_layer.objects.active
+    rem = obj.modifiers.new('remesh', 'REMESH'); rem.mode = 'VOXEL'; rem.voxel_size = voxel; rem.adaptivity = 0.0
+    sm = obj.modifiers.new('smooth', 'CORRECTIVE_SMOOTH'); sm.iterations = smooth_repeat; sm.factor = 0.8; sm.use_only_smooth = True
+    bpy.ops.object.modifier_apply(modifier='remesh')
+    bpy.ops.object.modifier_apply(modifier='smooth')
+    lap = obj.modifiers.new('lap', 'LAPLACIANSMOOTH'); lap.iterations = 6; lap.lambda_factor = 0.6
+    bpy.ops.object.modifier_apply(modifier='lap')
+    bpy.ops.object.shade_smooth()
+    return obj
+
+
+def fur_grain(mat, strength):
+    """Fine stretched noise as a bump: the grain of a short coat."""
+    nt = mat.node_tree; nodes, links = nt.nodes, nt.links
+    bsdf = nodes['Principled BSDF']
+    coords = nodes.new('ShaderNodeTexCoord')
+    mapping = nodes.new('ShaderNodeMapping'); mapping.inputs['Scale'].default_value = (90.0, 90.0, 320.0)
+    links.new(coords.outputs['Object'], mapping.inputs['Vector'])
+    noise = nodes.new('ShaderNodeTexNoise'); noise.inputs['Scale'].default_value = 1.0; noise.inputs['Detail'].default_value = 8.0
+    links.new(mapping.outputs['Vector'], noise.inputs['Vector'])
+    bump = nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value = strength; bump.inputs['Distance'].default_value = 0.004
+    links.new(noise.outputs['Fac'], bump.inputs['Height'])
+    links.new(bump.outputs['Normal'], bsdf.inputs['Normal'])
+    bsdf.inputs['Roughness'].default_value = 0.78
+    if 'Sheen Weight' in bsdf.inputs:
+        bsdf.inputs['Sheen Weight'].default_value = 0.35
+
+
+def add_fur(obj, length, count):
+    ps = obj.modifiers.new('fur', 'PARTICLE_SYSTEM').particle_system.settings
+    ps.type = 'HAIR'; ps.count = count; ps.hair_length = length; ps.use_advanced_hair = True
+    ps.child_type = 'INTERPOLATED'; ps.rendered_child_count = 3; ps.child_length = 0.9
+    ps.root_radius = 0.0016; ps.tip_radius = 0.0002; ps.use_hair_bspline = True
+    ps.normal_factor = 1.0; ps.tangent_factor = 0.0
+    ps.object_align_factor = (0.0, 0.0, -length * 0.8)  # hair lies down a little (the factor is in scene units)
+    ps.roughness_1 = 0.004; ps.roughness_endpoint = 0.002
+    ps.material = 1
+
+
+def build_skin(model, mats):
+    """One smooth body from the animal's skeleton (joints with radii): Skin modifier + subdivision, then lower legs in
+    the sock material (dark points, hooves' stockings)."""
+    sk = model['skeleton']
+    mesh = bpy.data.meshes.new('body')
+    mesh.from_pydata([tb(v[:3]) for v in sk['verts']], [tuple(e) for e in sk['edges']], [])
+    obj = bpy.data.objects.new('body', mesh); bpy.context.scene.collection.objects.link(obj)
+    skin = obj.modifiers.new('skin', 'SKIN'); skin.use_smooth_shade = True; skin.branch_smoothing = 0.6
+    for i, v in enumerate(sk['verts']):
+        obj.data.skin_vertices[0].data[i].radius = (v[3], v[3])
+    obj.data.skin_vertices[0].data[0].use_root = True
+    sub = obj.modifiers.new('sub', 'SUBSURF'); sub.levels = 3; sub.render_levels = 3
+    bpy.ops.object.select_all(action='DESELECT'); obj.select_set(True); bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.modifier_apply(modifier='skin'); bpy.ops.object.modifier_apply(modifier='sub')
+    lap = obj.modifiers.new('lap', 'CORRECTIVE_SMOOTH'); lap.iterations = 4; lap.factor = 0.5
+    bpy.ops.object.modifier_apply(modifier='lap')
+    bpy.ops.object.shade_smooth()
+    obj.data.materials.append(mats[sk['material']]); obj.data.materials.append(mats[sk['sock']])
+    limit = sk.get('sockFrom', 0.0)
+    for poly in obj.data.polygons:
+        if sk['sock'] != sk['material'] and poly.center.z < limit:
+            poly.material_index = 1
+    return obj
+
+
+def build_organic(model, rnd, mats, look):
+    groups, rest = {}, []
+    if model.get('skeleton'):
+        body = build_skin(model, mats)
+        fur_grain(mats[model['skeleton']['material']], 0.12 if look != 'fur' else 0.05)
+        if look == 'fur':
+            add_fur(body, length=0.012 * max(0.4, model['height']), count=5000)
+        model = {**model, 'primitives': [p for p in model['primitives'] if not p.get('skin')]}
+    for part in model['primitives']:
+        if part['shape'] in ORGANIC and material_kind(part['material']) != 'stone':
+            mat = mats[part['material']]
+            obj = smooth_sphere(part, mat) if part['shape'] == 'sphere' else smooth_tube(part, mat)
+            groups.setdefault(part['material'], []).append(obj)
+        else:
+            rest.append(part)
+    scale = max(0.4, model['height'])
+    for mid, objs in groups.items():
+        obj = fuse(objs, voxel=0.0045 * scale, smooth_repeat=8)
+        if obj is None:
+            continue
+        coat = len(objs) > 4 and material_kind(mid) == 'plain' and not model.get('skeleton')
+        if coat:
+            fur_grain(mats[mid], 0.12 if look != 'fur' else 0.05)
+        if look == 'fur' and coat:
+            add_fur(obj, length=0.016 * scale, count=int(2500 * len(objs) ** 0.5))
+    return rest
+
+
 def build(model, rnd):
     mats = {mid: make_material(mid, spec, material_kind(mid)) for mid, spec in model['materials'].items()}
+    if model.get('look'):
+        rest = build_organic(model, rnd, mats, model['look'])
+        model = {**model, 'primitives': rest}
     for part in model['primitives']:
         mat, kind, shape = mats[part['material']], material_kind(part['material']), part['shape']
         if shape == 'box':
@@ -355,6 +488,37 @@ def render_to(scene, path):
 
 # ---------------------------------------------------------------- post
 
+def painterly(img):
+    """Hand-painted finish on the 4x render: smear colour into brush-sized patches (Kuwahara-like mode filter),
+    deepen the edges, add a warm rim on the sun side and a slightly lifted saturation. Alpha is kept."""
+    from PIL import ImageFilter, ImageEnhance
+    rgba = (np.clip(img, 0, 1) * 255).astype(np.uint8)
+    pil = Image.fromarray(rgba, 'RGBA'); rgb = pil.convert('RGB')
+    painted = rgb.filter(ImageFilter.ModeFilter(11)).filter(ImageFilter.SMOOTH_MORE)
+    painted = Image.blend(painted, rgb, 0.2)
+    painted = ImageEnhance.Color(painted).enhance(1.22)
+    painted = ImageEnhance.Contrast(painted).enhance(1.12)
+    # Brush texture: directional strokes as a light overlay.
+    rs = np.random.default_rng(7); strokes = rs.random((painted.height, painted.width)).astype(np.float32)
+    from scipy.ndimage import uniform_filter1d
+    strokes = uniform_filter1d(uniform_filter1d(strokes, 9, axis=1), 3, axis=0)
+    tex = Image.fromarray(np.uint8(np.clip((strokes - 0.5) * 6 + 0.5, 0, 1) * 255))
+    arr0 = np.asarray(painted).astype(np.float32) / 255
+    painted = Image.fromarray(np.uint8(np.clip(arr0 * (0.92 + 0.16 * (np.asarray(tex)[..., None] / 255)), 0, 1) * 255))
+    arr = np.asarray(painted).astype(np.float32) / 255
+    a = img[..., 3]
+    # Edge accent: darker where the alpha falls off (an inked outline at sprite scale).
+    from scipy.ndimage import uniform_filter
+    edge = np.clip(a - uniform_filter(a, 9), 0, 1)
+    arr *= (1 - np.clip(edge * 2.2, 0, 0.45))[..., None]
+    # Rim light on the upper-left (towards the sun): lighten where alpha drops to the upper left.
+    shifted = np.roll(np.roll(a, 6, axis=0), 6, axis=1)
+    rim = np.clip(a - shifted, 0, 1)[..., None]
+    arr = arr + rim * 0.18 * np.array([1.0, 0.92, 0.75])
+    out = np.concatenate([np.clip(arr, 0, 1), img[..., 3:4]], axis=-1)
+    return out
+
+
 def premultiply(img):
     out = img.copy()
     out[..., :3] *= out[..., 3:4]
@@ -409,6 +573,8 @@ def main():
     shadow_alpha = np.clip(with_shadow[..., 3] - objects[..., 3], 0, 1)
     full = np.percentile(shadow_alpha[shadow_alpha > 0.05], 95) if np.any(shadow_alpha > 0.05) else 1.0
     shadow_alpha = np.clip(shadow_alpha / max(full, 1e-3), 0, 1) * model['light']['shadow']['opacity']
+    if model.get('look') == 'painted':
+        objects = painterly(objects)
     obj = premultiply(objects)
     pre = obj + np.stack([np.zeros_like(shadow_alpha)] * 3 + [shadow_alpha], axis=-1) * (1 - obj[..., 3:4])
     fw, fh = model['footprint']['width'] / 2, model['footprint']['height'] / 2

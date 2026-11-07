@@ -61,6 +61,60 @@
         "pose": "attack",
         "facing": 1
       }
+    },
+    {
+      "id": "bear-brown-sculpt",
+      "name": "Brown bear – A · Sculpted (smooth, realistic)",
+      "version": 2,
+      "notes": "Rendered with Blender (Cycles) at 4× and downsampled to game size; same footprint 2×2.",
+      "spec": {
+        "species": "bear",
+        "breed": "brown",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "22370e6a",
+        "samples": 96
+      }
+    },
+    {
+      "id": "bear-brown-fur",
+      "name": "Brown bear – B · Rendered coat (hair)",
+      "version": 2,
+      "notes": "Rendered with Blender (Cycles) at 4× and downsampled to game size; same footprint 2×2.",
+      "spec": {
+        "species": "bear",
+        "breed": "brown",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "fur",
+        "renderHash": "c82cc4fe",
+        "samples": 40
+      }
+    },
+    {
+      "id": "bear-brown-painted",
+      "name": "Brown bear – C · Hand-painted finish",
+      "version": 2,
+      "notes": "Rendered with Blender (Cycles) at 4× and downsampled to game size; same footprint 2×2.",
+      "spec": {
+        "species": "bear",
+        "breed": "brown",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "painted",
+        "renderHash": "308f40c1",
+        "samples": 96
+      }
     }
   ]
 }

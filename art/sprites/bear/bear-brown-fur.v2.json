@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "assetId": "bear",
+  "variantId": "bear-brown-fur",
+  "name": "Brown bear – B · Rendered coat (hair)",
+  "category": "units",
+  "version": 2,
+  "specHash": "ed1738b1",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 158,
+  "height": 136,
+  "anchor": {
+    "x": 79,
+    "y": 68
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.5
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 79,
+    "y": 100
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.73529
+  },
+  "visualHeight": 100,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.715,
+  "lights": [],
+  "x2": {
+    "width": 316,
+    "height": 272,
+    "anchor": {
+      "x": 158,
+      "y": 136
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 40,
+    "supersampling": 4,
+    "seconds": 150.2,
+    "renderHash": "c82cc4fe",
+    "script": "scripts/blender/render.py"
+  }
+}

@@ -3,7 +3,7 @@
   "id": "boar",
   "name": "Wild Boar",
   "category": "units",
-  "description": "Wild boar, revision 4 (owner: body OK; a real boar's head – smaller, almost no neck, carried low, tusks curving up): deep heavy forequarters, wedge head with a disc snout, upturned tusks, bristle crest, short dark legs; sow, striped piglet; walk in 8 directions, charge.",
+  "description": "Wild boar, revision 5 (owner: body OK; a real boar's head – smaller, almost no neck, carried almost level with the back, tusks curving up): deep heavy forequarters, wedge head with a disc snout, upturned tusks, bristle crest, short dark legs; sow, striped piglet; walk in 8 directions, charge.",
   "footprint": {
     "width": 2,
     "height": 2
@@ -14,7 +14,7 @@
     {
       "id": "boar-boar",
       "name": "Wild boar",
-      "version": 4,
+      "version": 5,
       "spec": {
         "species": "boar",
         "breed": "boar",
@@ -24,7 +24,7 @@
     {
       "id": "boar-sow",
       "name": "Sow",
-      "version": 3,
+      "version": 4,
       "spec": {
         "species": "boar",
         "breed": "sow",
@@ -34,7 +34,7 @@
     {
       "id": "boar-piglet",
       "name": "Striped piglet",
-      "version": 4,
+      "version": 5,
       "spec": {
         "species": "boar",
         "breed": "piglet",
@@ -44,7 +44,7 @@
     {
       "id": "boar-boar-attack",
       "name": "Boar charging",
-      "version": 4,
+      "version": 5,
       "spec": {
         "species": "boar",
         "breed": "boar",

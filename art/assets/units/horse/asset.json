@@ -143,6 +143,114 @@
         "pose": "run",
         "facing": 2
       }
+    },
+    {
+      "id": "horse-bay-sculpt",
+      "name": "Bay horse – A · Sculpted (smooth, realistic)",
+      "version": 1,
+      "notes": "Rendered with Blender (Cycles) at 4× and downsampled to game size; same footprint 2×2.",
+      "spec": {
+        "species": "horse",
+        "breed": "bay",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "2a910221",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-grey-sculpt",
+      "name": "Grey horse – A · Sculpted (smooth, realistic)",
+      "version": 1,
+      "notes": "Rendered with Blender (Cycles) at 4× and downsampled to game size; same footprint 2×2.",
+      "spec": {
+        "species": "horse",
+        "breed": "grey",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "1278e521",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-bay-fur",
+      "name": "Bay horse – B · Rendered coat (hair)",
+      "version": 1,
+      "notes": "Rendered with Blender (Cycles) at 4× and downsampled to game size; same footprint 2×2.",
+      "spec": {
+        "species": "horse",
+        "breed": "bay",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "fur",
+        "renderHash": "d42fdca0",
+        "samples": 40
+      }
+    },
+    {
+      "id": "horse-grey-fur",
+      "name": "Grey horse – B · Rendered coat (hair)",
+      "version": 1,
+      "notes": "Rendered with Blender (Cycles) at 4× and downsampled to game size; same footprint 2×2.",
+      "spec": {
+        "species": "horse",
+        "breed": "grey",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "fur",
+        "renderHash": "0ebfc6ee",
+        "samples": 40
+      }
+    },
+    {
+      "id": "horse-bay-painted",
+      "name": "Bay horse – C · Hand-painted finish",
+      "version": 1,
+      "notes": "Rendered with Blender (Cycles) at 4× and downsampled to game size; same footprint 2×2.",
+      "spec": {
+        "species": "horse",
+        "breed": "bay",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "painted",
+        "renderHash": "9a42c9c3",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-grey-painted",
+      "name": "Grey horse – C · Hand-painted finish",
+      "version": 1,
+      "notes": "Rendered with Blender (Cycles) at 4× and downsampled to game size; same footprint 2×2.",
+      "spec": {
+        "species": "horse",
+        "breed": "grey",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "painted",
+        "renderHash": "bb516f72",
+        "samples": 96
+      }
     }
   ]
 }

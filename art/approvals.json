@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-07T20:19:38.885Z",
+  "updatedAt": "2026-11-07T20:54:24.649Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -1263,6 +1263,22 @@
     "roof-fire": {
       "preferred": null,
       "variants": {
+        "roof-fire-thatch-smoke": {
+          "comments": [
+            {
+              "at": "2026-11-07T20:30:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "je vyřešeno fire labem",
+              "version": 1
+            }
+          ],
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bfe8e245",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T20:30:00.000Z",
+          "version": 1
+        },
         "roof-fire-thatch-burning": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
@@ -2230,19 +2246,26 @@
       "preferred": null,
       "variants": {
         "bear-brown": {
-          "status": "review",
-          "version": 2,
-          "specHash": "91b8d68a",
-          "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
               "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
               "text": "předělat ať je více realistický a přidat další variantu",
               "version": 1
+            },
+            {
+              "at": "2026-11-07T20:30:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "Současný model medvěda působí příliš jednoduše a low-poly. Chci výrazný vizuální posun… (viz Studio: semi-realistický 2.5D, mohutný, drápy, hustý kožich; 2×–4× interní rozlišení; 3 výrazně odlišné návrhy stylu)",
+              "version": 2
             }
           ],
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "91b8d68a",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T20:30:00.000Z",
+          "version": 2,
           "history": [
             {
               "version": 1,
@@ -2251,6 +2274,54 @@
               "at": "2026-11-07T19:05:00.000Z"
             }
           ]
+        },
+        "bear-dark": {
+          "comments": [
+            {
+              "at": "2026-11-07T20:30:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "Současný model medvěda působí příliš jednoduše a low-poly. Chci výrazný vizuální posun… (viz Studio: semi-realistický 2.5D, mohutný, drápy, hustý kožich; 2×–4× interní rozlišení; 3 výrazně odlišné návrhy stylu)",
+              "version": 1
+            }
+          ],
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "57601023",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T20:30:00.000Z",
+          "version": 1
+        },
+        "bear-grizzled": {
+          "comments": [
+            {
+              "at": "2026-11-07T20:30:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "Současný model medvěda působí příliš jednoduše a low-poly. Chci výrazný vizuální posun… (viz Studio: semi-realistický 2.5D, mohutný, drápy, hustý kožich; 2×–4× interní rozlišení; 3 výrazně odlišné návrhy stylu)",
+              "version": 1
+            }
+          ],
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "17eaa90a",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T20:30:00.000Z",
+          "version": 1
+        },
+        "bear-cub": {
+          "comments": [
+            {
+              "at": "2026-11-07T20:30:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "Současný model medvěda působí příliš jednoduše a low-poly. Chci výrazný vizuální posun… (viz Studio: semi-realistický 2.5D, mohutný, drápy, hustý kožich; 2×–4× interní rozlišení; 3 výrazně odlišné návrhy stylu)",
+              "version": 1
+            }
+          ],
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f30877ff",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T20:30:00.000Z",
+          "version": 1
         },
         "bear-brown-attack": {
           "status": "review",
@@ -2281,6 +2352,11 @@
       "preferred": null,
       "variants": {
         "boar-boar": {
+          "status": "review",
+          "version": 5,
+          "specHash": "b7633db1",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -2299,14 +2375,14 @@
               "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
               "text": "tělo ok, předělej hlavu at vypadá jako divočák, stejně tak i ostatní modely divočáků (menší hlava - krk ne tak nahoru vlastně skoro žadný krk a v zahnutý zuby nahoru)",
               "version": 3
+            },
+            {
+              "at": "2026-11-07T20:30:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "pořád má hlau moc vysoko, divčák má hlavu skoro vodorovně se hřbetem",
+              "version": 4
             }
           ],
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "b367b493",
-          "status": "revision-requested",
-          "updatedAt": "2026-11-07T20:12:00.000Z",
-          "version": 3,
           "history": [
             {
               "version": 1,
@@ -2319,6 +2395,12 @@
               "specHash": "b76b8c76",
               "status": "revision-requested",
               "at": "2026-11-07T19:50:00.000Z"
+            },
+            {
+              "version": 4,
+              "specHash": "b36575fc",
+              "status": "revision-requested",
+              "at": "2026-11-07T20:30:00.000Z"
             }
           ]
         },
@@ -3221,11 +3303,6 @@
       "preferred": null,
       "variants": {
         "horse-bay": {
-          "status": "review",
-          "version": 3,
-          "specHash": "1828f414",
-          "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -3238,8 +3315,20 @@
               "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
               "text": "Vylepši současné modely koní v Asset Studiu do realističtějšího stylu středověké izometrické 2.5D hry.\n\nKoně mají nyní příliš hranaté, jednoduché tvary. Chci:\n\nAnatomicky věrnější proporce, svalnatější tělo, přirozenou hlavu, krk a štíhlejší nohy s kopyty.\n\nDetailnější srst, hřívu, ocas a jemné barevné přechody.\n\nPřirozené stínování, objem a propracovanější siluetu.\n\nZachovat všechny 4 barevné varianty a jednotný výtvarný styl.\n\nCílový vzhled: realistický, detailní hand-painted styl podobný kvalitním izometrickým strategickým hrám. Žádný cartoon ani low-poly vzhled.\n\nZachovej izometrickou perspektivu, rozměry footprintu a kompatibilitu s rendererem. Připrav nové varianty ke schválení v Asset Studiu, zatím je nenasazuj. použij to u všech modelu koní a u u horse wagon a merchant",
               "version": 2
+            },
+            {
+              "at": "2026-11-07T20:30:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "Současná verze v3 stále působí příliš jednoduše a low-poly… (viz Studio: semi-realistický 2.5D, anatomie, štíhlé nohy, kopyta, hříva, ocas; 2×–4× interní rozlišení; footprint 2×2; 3 výrazně odlišné návrhy; zatím nenasazovat)",
+              "version": 3
             }
           ],
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1828f414",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T20:30:00.000Z",
+          "version": 3,
           "history": [
             {
               "version": 1,
@@ -3256,19 +3345,26 @@
           ]
         },
         "horse-chestnut": {
-          "status": "review",
-          "version": 2,
-          "specHash": "1f84f1df",
-          "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
               "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
               "text": "předělat ať je více realistický a přidat další varianty (alespoň další 3)",
               "version": 1
+            },
+            {
+              "at": "2026-11-07T20:30:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "Současná verze v3 stále působí příliš jednoduše a low-poly… (viz Studio: semi-realistický 2.5D, anatomie, štíhlé nohy, kopyta, hříva, ocas; 2×–4× interní rozlišení; footprint 2×2; 3 výrazně odlišné návrhy; zatím nenasazovat)",
+              "version": 3
             }
           ],
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2388c9c2",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T20:30:00.000Z",
+          "version": 3,
           "history": [
             {
               "version": 1,
@@ -3277,6 +3373,38 @@
               "at": "2026-11-07T19:05:00.000Z"
             }
           ]
+        },
+        "horse-grey": {
+          "comments": [
+            {
+              "at": "2026-11-07T20:30:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "Současná verze v3 stále působí příliš jednoduše a low-poly… (viz Studio: semi-realistický 2.5D, anatomie, štíhlé nohy, kopyta, hříva, ocas; 2×–4× interní rozlišení; footprint 2×2; 3 výrazně odlišné návrhy; zatím nenasazovat)",
+              "version": 3
+            }
+          ],
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c81c0a83",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T20:30:00.000Z",
+          "version": 3
+        },
+        "horse-black": {
+          "comments": [
+            {
+              "at": "2026-11-07T20:30:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "Současná verze v3 stále působí příliš jednoduše a low-poly… (viz Studio: semi-realistický 2.5D, anatomie, štíhlé nohy, kopyta, hříva, ocas; 2×–4× interní rozlišení; footprint 2×2; 3 výrazně odlišné návrhy; zatím nenasazovat)",
+              "version": 3
+            }
+          ],
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3fdd66d1",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T20:30:00.000Z",
+          "version": 3
         }
       }
     },
@@ -3328,6 +3456,22 @@
               "at": "2026-11-07T19:05:00.000Z"
             }
           ]
+        },
+        "horse-wagon-farm-wood": {
+          "comments": [
+            {
+              "at": "2026-11-07T20:30:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "povoz budeme řešit až se schávlí kun",
+              "version": 2
+            }
+          ],
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "35d9cba1",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T20:30:00.000Z",
+          "version": 2
         },
         "horse-wagon-hay": {
           "status": "review",
