@@ -376,9 +376,9 @@ export class GameScene extends Phaser.Scene {
         this.towerViews.set(result.building.id,this.createBuildingView(this.selectedBuilding,result.building));if(provisional)this.rememberBlueprint(result.building);
         const message=this.selectedBuilding.crop&&result.building.farmId==null?t('farmPlots.orphan'):t(provisional?'status.blueprintProvisional':'status.blueprintReady',{name:this.selectedBuilding.name,cost:formatCost(this.selectedBuilding.cost,this.objectRegistry)});
         this.updateInventory();
-        // Keep the same tool after each accepted farm/orchard order. Revalidate the occupied
-        // footprint immediately so a second click cannot create or pay for another order there.
-        if(['farmhouse','orchard'].includes(this.selectedBuilding.id)){
+        // Keep the same tool after each accepted order of a repeat-placement building (Farmhouse, Wheat Field, Orchard).
+        // Revalidate the occupied footprint immediately so a second click cannot create or pay for another order there.
+        if(this.selectedBuilding.repeatPlacement){
           this.previewKey=null;this.updateBuildingPreview();this.updateBuildingUI();this.setStatus(message);
         }else this.cancelBuilding(message);
       }

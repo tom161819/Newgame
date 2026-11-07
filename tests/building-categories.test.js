@@ -26,3 +26,9 @@ test('#132 menuOrder sorts within a category and must be a number',()=>{
   assert.equal(buildingsInCategory(registry,'food').at(-1).id,'unordered_food','buildings without an order follow the ordered ones');
   assert.throws(()=>registry.register({...base,id:'bad_order',menuOrder:'first'}),/pořadí/);
 });
+test('Farmhouse, Wheat Field and Orchard keep their tool after an order; other buildings are placed once',()=>{
+  const repeat=objectRegistry.buildables().filter(d=>d.repeatPlacement).map(d=>d.id).sort();
+  assert.deepEqual(repeat,['farmhouse','orchard','wheat_field']);
+  const registry=new ObjectRegistry(objectRegistry.all()),base=structuredClone(registry.require('tower'));
+  assert.throws(()=>registry.register({...base,id:'bad_repeat',repeatPlacement:'yes'}),/opakované/);
+});

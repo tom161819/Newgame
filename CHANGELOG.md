@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-11-07
+<!-- version: {"title":"Wheat Field tool stays selected","type":"fix","reconstructed":false,"saveVersion":37} -->
+### Fixed
+- The Wheat Field tool stays selected after placing a field, like the Farmhouse and Orchard, so more fields can be ordered with successive clicks. Escape, right click or choosing another building ends the tool.
+
 ## [0.9.0] - 2026-11-07
 <!-- version: {"title":"Homes and the daily rest","type":"feature","reconstructed":false,"saveVersion":37} -->
 ### Added

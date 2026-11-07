@@ -32,6 +32,7 @@ export function validateDefinition(definition) {
   if(d.buildingCategory!==undefined&&(d.category!=='building'||!Object.hasOwn(BUILDING_CATEGORIES,d.buildingCategory)))fail(id,'neplatná stavební kategorie.');
   if(d.requiresCompletedBuildings!==undefined&&(d.category!=='building'||!Array.isArray(d.requiresCompletedBuildings)||new Set(d.requiresCompletedBuildings).size!==d.requiresCompletedBuildings.length||d.requiresCompletedBuildings.some(value=>typeof value!=='string'||!value)))fail(id,'neplatné stavební podmínky.');
   if(d.unlockDescription!==undefined&&(d.category!=='building'||typeof d.unlockDescription!=='string'||!d.unlockDescription.trim()))fail(id,'neplatný popis odemčení.');
+  if(d.repeatPlacement!==undefined&&(d.category!=='building'||typeof d.repeatPlacement!=='boolean'))fail(id,'neplatné opakované pokládání.');
   if(d.menuOrder!==undefined&&(d.category!=='building'||!finite(d.menuOrder)))fail(id,'neplatné pořadí v menu.');
   if(d.constructionTime!==undefined&&(!finite(d.constructionTime)||d.constructionTime<=0||d.category!=='building'))fail(id,'neplatná doba výstavby.');
   if (d.collectible && d.category !== 'resource') fail(id, 'sběratelný objekt musí být surovina.');
