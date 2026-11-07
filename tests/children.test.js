@@ -107,3 +107,34 @@ test('children, hidden houses and snowmen survive a save; the same children come
   assert.equal(r.childrenSystem.hidden.get(house.id),c.hidden.get(house.id));assert.equal(r.childrenSystem.snowmen.length,1);
   const bad=structuredClone(state);bad.children.kids[0].state='flying';assert.throws(()=>validateGameState(bad));
 });
+
+test('D2 decorations: Swing Tree within 4 tiles +1, Well within 6 tiles +1, one of each counts, shown in the needs; all of it capped at +8', () => {
+  const {s,c,place,people}=world(),family=place('house',40,40),far=place('house',70,40);const folk=people(6);let homes=s.needs.homes();
+  place('swing_tree',43,40);place('well',40,45);homes=s.needs.homes();
+  assert.deepEqual(c.decorBonus(family),{swing:1,well:1});assert.deepEqual(c.decorBonus(far),{swing:0,well:0});
+  place('swing_tree',39,43);assert.deepEqual(c.decorBonus(family),{swing:1,well:1},'a second swing tree adds nothing');
+  const inFamily=folk.find(w=>homes.get(w.id)?.buildingId===family.id),st=s.needs.status(inFamily);
+  assert.equal(st.swing,1);assert.equal(st.well,1);assert.equal(st.surroundingsCapped,0);
+  place('village_green',44,43);const all=c.surroundings(family,s.needs.homes());
+  assert.deepEqual([all.green,all.family,all.swing,all.well,all.total,all.capped],[4,2,1,1,8,0],'green + family + swing + well = the +8 cap');
+  // The cap holds even if the values grow (e.g. a future bonus): pretend a bigger green.
+  const original=c.greenBonus.bind(c);c.greenBonus=()=>({near:7,family:2});const capped=c.surroundings(family,s.needs.homes());c.greenBonus=original;
+  assert.equal(capped.total,8);assert.equal(capped.capped,3);
+});
+
+test('D2 placement: a Haystack only near a farm, decorations never on a worn path or paving', async () => {
+  const {placementError}=await import('../src/game/buildings.js');
+  const {s,place}=world();place('house',40,40);const def=id=>s.objectRegistry.require(id),err=(id,x,y)=>placementError(s.map,{x,y},{has:k=>s.resourceOccupancy.has(k),naturalContext:{mining:{placementError:()=>null,accessError:()=>null,canBuildOver:()=>false},scene:s}},[],def(id),s.buildings);
+  assert.equal(err('swing_tree',50,50),null);assert.equal(err('well',50,52),null);
+  const farm=place('farmhouse',60,60);assert.ok(farm);
+  assert.equal(err('haystack',64,61),null,'next to the farmhouse');assert.match(err('haystack',50,50),/6/,'far from any farm');
+  s.pathWear.setPaved({x:50,y:50},true);assert.ok(err('swing_tree',50,50),'not on paving');
+  const i=s.pathWear.index({x:52,y:52});s.pathWear.levels[i]=2;assert.ok(err('well',52,52),'not on a worn path');
+});
+
+test('D2 play: children swing on a Swing Tree and jump into a Haystack near their house', () => {
+  const {s,c,place,people,tick}=world(),house=place('house',40,40);people(5);s.needs.homes();
+  const tree=place('swing_tree',44,40),farm=place('farmhouse',46,44),hay=place('haystack',44,43);void farm;
+  const seen={swing:0,hay:0};for(let i=0;i<240;i++){tick(1000);seen.swing=Math.max(seen.swing,c.playingAtDecoration(tree.id));seen.hay=Math.max(seen.hay,c.playingAtDecoration(hay.id));}
+  assert.ok(seen.swing>0,'someone swings');assert.ok(seen.hay>0,'someone jumps into the hay');
+});

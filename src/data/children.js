@@ -28,6 +28,22 @@ export const CHILDREN=Object.freeze({
   }),
 });
 
+// Children and the Village Green D2: small 1×1 decorations by the houses. A Swing Tree gives houses within 4 tiles +1
+// and children swing on it; a Well gives houses within 6 tiles +1 (later maybe water for the Bakery or fire fighting:
+// `well` is kept as its own block so a function can be added); a Haystack stands only within 6 tiles of a farm
+// (Farmhouse or Wheat Field) and children jump into it, no happiness. More of one kind never adds more. All
+// "around the house" bonuses together (green, family, swing, well) are capped at +8.
+export const HOUSE_DECORATIONS=Object.freeze({
+  swing_tree:Object.freeze({range:4,happiness:1,play:'swing'}),
+  well:Object.freeze({range:6,happiness:1}),
+  haystack:Object.freeze({farmRange:6,farms:Object.freeze(['farmhouse','wheat_field']),play:'hay'}),
+  // Children of a house within this many tiles may go to play at a swing tree or a haystack.
+  playReach:8,playChance:.35,
+  // Decorations are not built on a worn path (level 2 and up) or on paving.
+  pathLevel:2,
+});
+export const SURROUNDINGS_CAP=8;
+
 export const VILLAGE_GREEN=Object.freeze({
   range:10,happiness:4,familyBonus:2,
   // Evening: in the first part of rest time a few residents living in range sit on the green, then go home.

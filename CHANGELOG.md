@@ -5,6 +5,16 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.39.0] - 2026-11-07
+<!-- version: {"title":"Swing Tree, Haystack and Well","type":"feature","reconstructed":false,"saveVersion":55} -->
+### Added
+- Three small decorations in the Housing menu:
+  - **Swing Tree** (4 Wood): houses within 4 tiles get +1 happiness, and children swing on it.
+  - **Well** (6 Stone, 2 Wood): houses within 6 tiles get +1 happiness.
+  - **Haystack** (2 Wood): only within 6 tiles of a Farmhouse or Wheat Field. Children jump into it; it gives no happiness.
+- Decorations cannot be built on a worn path or on paving.
+- All bonuses from around a house (Village Green, family, swing, well) together are capped at +8.
+
 ## [0.38.2] - 2026-11-07
 <!-- version: {"title":"Castle with a bergfried","type":"feature","reconstructed":false,"saveVersion":55} -->
 ### Changed

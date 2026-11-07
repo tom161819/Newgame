@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 import { objectRegistry,ObjectRegistry } from '../src/systems/ObjectRegistry.js';
 import { BUILDING_CATEGORIES,buildingsInCategory } from '../src/data/buildingCategories.js';
 test('each implemented building has a central valid menu category; All contains only actual buildables',()=>{
-  const all=buildingsInCategory(objectRegistry,'all');assert.deepEqual(new Set(all),new Set(objectRegistry.buildables()));assert.equal(all.length,30);
+  const all=buildingsInCategory(objectRegistry,'all');assert.deepEqual(new Set(all),new Set(objectRegistry.buildables()));assert.equal(all.length,33);
   // #132: menuOrder only reorders inside a category; every other building keeps its place in All.
   objectRegistry.buildables().forEach((d,i)=>{if(d.buildingCategory!=='food')assert.equal(all[i],d);else assert.equal(all[i].buildingCategory,'food');});
   for(const d of objectRegistry.byCategory('building'))assert.ok(Object.hasOwn(BUILDING_CATEGORIES,d.buildingCategory));
   assert.deepEqual(buildingsInCategory(objectRegistry,'defense').map(d=>d.id),['tower','castle','wall','wall_gate','barracks','bowyer','swordsmith','armorer','armory']);
   assert.deepEqual(buildingsInCategory(objectRegistry,'food').map(d=>d.id),['granary','farmhouse','wheat_field','orchard','hunting_lodge','fisherman_hut','mill','bakery']);
   assert.deepEqual(buildingsInCategory(objectRegistry,'industry').map(d=>d.id),['builder_workshop','quarry','wheelwright_workshop','lumberjack_hut','iron_mine','smelter']);assert.deepEqual(buildingsInCategory(objectRegistry,'logistics').map(d=>d.id),['warehouse','marketplace','stables']);
-  assert.deepEqual(buildingsInCategory(objectRegistry,'housing').map(d=>d.id),['house','village_green']);assert.deepEqual(buildingsInCategory(objectRegistry,'infrastructure').map(d=>d.id),['stone_pavement','brazier']);
+  assert.deepEqual(buildingsInCategory(objectRegistry,'housing').map(d=>d.id),['house','village_green','swing_tree','haystack','well']);assert.deepEqual(buildingsInCategory(objectRegistry,'infrastructure').map(d=>d.id),['stone_pavement','brazier']);
 });
 test('data-only additions join their registered category automatically; uncategorized legacy extensions remain in All',()=>{
   const registry=new ObjectRegistry(objectRegistry.all()),base=structuredClone(registry.require('tower'));

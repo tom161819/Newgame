@@ -1,5 +1,5 @@
 import { POPULATION } from '../jobs.js';
-import { VILLAGE_GREEN } from '../children.js';
+import { VILLAGE_GREEN,HOUSE_DECORATIONS } from '../children.js';
 // Each completed House raises the resident capacity by POPULATION.houseCapacity (5).
 export const housingBuildings=[
   {id:'house',name:'House',width:2,height:2,cost:{wood:10,stone:4},constructionTime:20000,visualHeight:129,buildable:true,
@@ -16,3 +16,18 @@ housingBuildings.push({id:'village_green',name:'Village Green',width:3,height:3,
   description:`A grass square with a linden tree where children play and neighbours meet in the evening. Houses within ${VILLAGE_GREEN.range} tiles: +${VILLAGE_GREEN.happiness} happiness, family houses +${VILLAGE_GREEN.familyBonus} more.`,
   category:'building',buildingCategory:'housing',sprite:'/assets/buildings/village_green/village_green.svg',walkable:true,collectible:false,interactions:[],
   renderMode:'procedural',renderer:'village_green',origin:{x:.5,y:.9},depth:{offset:0}});
+// Children and the Village Green D2: decorations by the houses (1×1, Housing menu). Provisional drawings until the
+// Studio art (g-deti-naves-grafika) is approved. Not on water, a ford, a worn path or paving; the Haystack only near a farm.
+const W=HOUSE_DECORATIONS;
+housingBuildings.push(...[
+  {id:'swing_tree',name:'Swing Tree',cost:{wood:4},constructionTime:6000,visualHeight:90,requiresCompletedBuildings:['house'],
+    unlockDescription:'Requires a completed House before placing a Swing Tree.',decoration:{kind:'swing_tree',range:W.swing_tree.range,happiness:W.swing_tree.happiness},
+    description:`An old tree with a swing. Houses within ${W.swing_tree.range} tiles: +${W.swing_tree.happiness} happiness; children swing on it.`},
+  {id:'haystack',name:'Haystack',cost:{wood:2},constructionTime:4000,visualHeight:44,requiresCompletedBuildings:['farmhouse'],
+    unlockDescription:'Requires a completed Farmhouse before placing a Haystack.',decoration:{kind:'haystack',farmRange:W.haystack.farmRange},
+    description:`A stack of hay by a farm (within ${W.haystack.farmRange} tiles of a Farmhouse or Wheat Field). Children jump into it.`},
+  {id:'well',name:'Well',cost:{stone:6,wood:2},constructionTime:10000,visualHeight:60,requiresCompletedBuildings:['house'],
+    unlockDescription:'Requires a completed House before placing a Well.',decoration:{kind:'well',range:W.well.range,happiness:W.well.happiness},
+    description:`A stone well. Houses within ${W.well.range} tiles: +${W.well.happiness} happiness.`},
+].map(d=>({...d,width:1,height:1,buildable:true,category:'building',buildingCategory:'housing',sprite:`/assets/buildings/${d.id}/${d.id}.svg`,walkable:false,
+  collectible:false,interactions:[],renderMode:'procedural',renderer:'decoration',origin:{x:.5,y:.9},depth:{offset:0}})));

@@ -4,6 +4,7 @@ import { CatPanel } from '../ui/CatPanel.js';
 import { ChildrenSystem } from '../systems/ChildrenSystem.js';
 import { ChildViews } from './ChildViews.js';
 import { VillageGreenView } from './VillageGreenView.js';
+import { DecorationView } from './DecorationView.js';
 import { VillagePanel } from '../ui/VillagePanel.js';
 import { IssueIcons } from './IssueIcons.js';
 import { SideCards } from '../ui/SideCards.js';
@@ -179,6 +180,7 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('crop',(_definition,context)=>new CropPlotView(this,context.building,context.preview));
     this.assets.registerRenderer('pavement',(_definition,context)=>new PavementView(this,context.building,context.preview));
     this.assets.registerRenderer('village_green',(_definition,context)=>new VillageGreenView(this,context.building,context.preview));
+    this.assets.registerRenderer('decoration',(_definition,context)=>new DecorationView(this,context.building,context.preview));
     // #100: rock layer (terrainGrid), ground layer (grass, sand, water) and bushes; water cells block but stay see-through.
     // World v2 step 1: a new game draws its whole starting world from the world code (seed + settings), one random
     // stream per part; a loaded game keeps its saved world and its code.
@@ -195,7 +197,7 @@ export class GameScene extends Phaser.Scene {
     this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
     this.inventory=new Inventory();if(!this.loadState)this.inventory.add('gold',this.gameSettings.startingGold);
     this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);this.regeneration=new RegenerationSystem();
-    this.seasons=new SeasonSystem(this.gameTime,{enabled:this.gameSettings.seasonsEnabled,initialWeather:this.loadState?(this.loadState.seasons?.weather??'Sunny'):undefined});this.terrain.setSeason(this.seasons.season);for(const b of this.buildings??[])if(b.type==='village_green')this.towerViews.get(b.id)?.setSeason?.(this.seasons.season);
+    this.seasons=new SeasonSystem(this.gameTime,{enabled:this.gameSettings.seasonsEnabled,initialWeather:this.loadState?(this.loadState.seasons?.weather??'Sunny'):undefined});this.terrain.setSeason(this.seasons.season);for(const b of this.buildings??[])if((b.type==='village_green'||this.objectRegistry.get(b.type)?.decoration))this.towerViews.get(b.id)?.setSeason?.(this.seasons.season);
     this.seasonTransition=new SeasonTransition(this);this.terrain.seasonMix=(x,y,season)=>this.seasonTransition.mix(x,y,season);
     this.unsubscribeSeason=this.seasons.onChange(()=>{const changed=this.terrain.season!==this.seasons.season;this.terrain.setSeason(this.seasons.season);if(changed&&this.worldCamera){this.terrain.invalidateArea(this.mapMemory.observeTerrain(this.terrainGrid,this.pathWear,this.seasons.season,this.map));this.terrain.update(this.cameras.main,this.fog,this.mapMemory);}this.updateTimeDisplay();this.settingsPanel?.syncSeasons();});
     this.activities=new GameActivityBus();this.experienceSystem=new ExperienceSystem(this.activities);

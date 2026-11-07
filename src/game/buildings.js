@@ -9,6 +9,7 @@ import { tileKey } from './stones.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { adjacentTiles } from './interaction.js';
 import { buildingUnlockStatus } from '../systems/BuildingUnlockManager.js';
+import { HOUSE_DECORATIONS } from '../data/children.js';
 export { buildingIsComplete } from './buildingState.js';
 
 const towerDefinition = () => objectRegistry.require('tower');
@@ -62,6 +63,12 @@ export function placementError(map,anchor,resources,reservedTiles=[],definition=
   const ground=natural?.scene?.groundGrid;if(definition.crop&&ground&&tiles.some(tile=>!isFertileGround(ground[tile.y]?.[tile.x])))return t('status.needsGrass');
   // World v2: nothing is built on a ford.
   if(ground&&tiles.some(tile=>isFordGround(ground[tile.y]?.[tile.x])))return t('status.notOnFord');
+  // Children D2: decorations stay off worn paths and paving; a Haystack only stands near a farm.
+  if(definition.decoration){
+    const wear=natural?.scene?.pathWear;if(wear&&tiles.some(tile=>wear.isPaved(tile)||wear.level(tile)>=HOUSE_DECORATIONS.pathLevel))return t('status.notOnPath');
+    const range=definition.decoration.farmRange;
+    if(range&&!buildings.some(b=>HOUSE_DECORATIONS.haystack.farms.includes(b.type)&&Math.hypot(b.x+buildingDefinition(b).width/2-(anchor.x+.5),b.y+buildingDefinition(b).height/2-(anchor.y+.5))<=range))return t('status.needsFarmNearby',{range});
+  }
   if(tiles.some(tile=>resources.has(tileKey(tile))&&!natural?.mining.canBuildOver(definition,tile)))return t('status.resourceHere');
   if(tiles.some(tile=>reservedTiles.some(p=>tileKey(p)===tileKey(tile))))return t('status.unitHere');
   if(tiles.some(tile=>buildings.some(building=>building.tiles.some(p=>tileKey(p)===tileKey(tile)))))return t('status.buildingHere');

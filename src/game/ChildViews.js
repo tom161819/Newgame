@@ -9,6 +9,8 @@ function drawChild(g,child,phase){
   const [tunic,hair]=LOOKS[child.look%LOOKS.length],a=child.activity?.kind,moving=!!child.moving,dir=(child.facing?.x??0)-(child.facing?.y??0)>=0?1:-1,step=moving?Math.sin(phase*(a==='tag'?2.2:1.6))*2:0;g.clear();
   let lift=0,sway=0;
   if(!moving&&child.state==='out'&&a==='swing'){sway=Math.sin(phase*.9)*6;lift=3;}
+  // Children D2: jumping into the haystack (a high hop, then a short rest in the hay).
+  if(!moving&&child.state==='out'&&a==='hay'){lift=Math.max(0,Math.sin(phase*.7))*10;}
   if(!moving&&child.state==='out'&&a==='snowball')lift=Math.max(0,Math.sin(phase*1.3))*1.5;
   g.fillStyle(0x26271b,.25);g.fillEllipse(sway,1,14,5);
   g.fillStyle(0x4a3d2c);g.fillRect(sway-3,-7-lift,2.4,7+step*.5);g.fillRect(sway+.8,-7-lift,2.4,7-step*.5);

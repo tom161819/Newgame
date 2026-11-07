@@ -1,4 +1,4 @@
-import { CHILDREN,VILLAGE_GREEN,hashOf,seeded,childCount,allocateChildren } from '../data/children.js';
+import { CHILDREN,VILLAGE_GREEN,HOUSE_DECORATIONS,SURROUNDINGS_CAP,hashOf,seeded,childCount,allocateChildren } from '../data/children.js';
 import { isWaterGround } from '../data/worldTerrain.js';
 import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { findPath } from '../game/pathfinding.js';
@@ -43,6 +43,19 @@ export class ChildrenSystem {
     if(!this.isHouse(house))return {near:0,family:0};const c=this.center(house);
     if(!this.greens().some(g=>this.distance(this.center(g),c)<=VILLAGE_GREEN.range))return {near:0,family:0};
     return {near:VILLAGE_GREEN.happiness,family:this.isFamily(house,homes)?VILLAGE_GREEN.familyBonus:0};
+  }
+  // Children D2: completed decorations of one kind (Swing Tree, Well, Haystack).
+  decorations(kind){return (this.scene.buildings??[]).filter(b=>b.type===kind&&buildingIsComplete(b));}
+  // Swing Tree within 4 tiles +1, Well within 6 tiles +1 (one of each counts).
+  decorBonus(house){
+    if(!this.isHouse(house))return {swing:0,well:0};const c=this.center(house);
+    const near=kind=>this.decorations(kind).some(d=>this.distance(this.center(d),c)<=HOUSE_DECORATIONS[kind].range)?HOUSE_DECORATIONS[kind].happiness:0;
+    return {swing:near('swing_tree'),well:near('well')};
+  }
+  // Everything "around the house" (green, family, swing, well), capped at +8; `capped` is what the cap took away.
+  surroundings(house,homes){
+    const g=this.greenBonus(house,homes),d=this.decorBonus(house),sum=g.near+g.family+d.swing+d.well,total=Math.min(SURROUNDINGS_CAP,sum);
+    return {green:g.near,family:g.family,swing:d.swing,well:d.well,total,capped:sum-total};
   }
   housesInRange(green){const c=this.center(green);return (this.scene.buildings??[]).filter(b=>this.isHouse(b)&&this.distance(this.center(b),c)<=VILLAGE_GREEN.range);}
   nearestGreen(point,reach=CHILDREN.greenReach){let best=null,bestD=Infinity;for(const g of this.greens()){const d=this.distance(this.center(g),point);if(d<=reach&&d<bestD){best=g;bestD=d;}}return best;}
@@ -120,9 +133,18 @@ export class ChildrenSystem {
     if(green&&(feast||this.random()<CHILDREN.greenChance)){const tiles=this.greenTiles(green),spot=tiles[Math.floor(this.random()*tiles.length)];
       activity={kind:season==='Winter'?pick(CHILDREN.activities.snow):pick(CHILDREN.activities.green),center:spot,greenId:green.id,until};}
     else if(season==='Summer'&&this.random()<CHILDREN.shoreChance){const spots=this.shoreSpots(house);if(spots.length)activity={kind:'shore',center:spots[Math.floor(this.random()*spots.length)],until};}
+    if(!activity&&season!=='Winter'&&this.random()<HOUSE_DECORATIONS.playChance)activity=this.decorationActivity(c,until);
     if(!activity){const spot=this.spotNear(c,CHILDREN.homeRadius,house);activity={kind:season==='Winter'?pick(CHILDREN.activities.snow):pick(CHILDREN.activities.house),center:spot??this.door(house,child)??{x:Math.floor(child.x),y:Math.floor(child.y)},until};}
     child.activity=activity;child.local=null;this.goTo(child,activity.center);
   }
+  // Children D2: swing on a Swing Tree or jump into a Haystack within 8 tiles of the house (a free tile beside it).
+  decorationActivity(c,until){
+    const options=['swing_tree','haystack'].flatMap(kind=>this.decorations(kind).filter(d=>this.distance(this.center(d),c)<=HOUSE_DECORATIONS.playReach).map(d=>({d,kind})));
+    if(!options.length)return null;const {d,kind}=options[Math.floor(this.random()*options.length)];
+    const spots=towerNeighbors(d).filter(t=>this.scene.map[t.y]?.[t.x]===0);if(!spots.length)return null;
+    return {kind:HOUSE_DECORATIONS[kind].play,center:spots[Math.floor(this.random()*spots.length)],decorationId:d.id,until};
+  }
+  playingAtDecoration(id){return [...this.children.values()].filter(c=>c.state==='out'&&c.activity?.decorationId===id).length;}
   finish(child){
     const a=child.activity;if(!a||a.kind!=='snowman'||this.scene.seasons?.season!=='Winter'||this.snowmen.length>=CHILDREN.snowman.max||this.random()>=CHILDREN.snowman.chance)return;
     if(this.snowmen.some(s=>Math.hypot(s.x-a.center.x,s.y-a.center.y)<2))return;
@@ -160,7 +182,7 @@ export class ChildrenSystem {
   // Short hops around the activity spot (no path search): chasing, rolling a hoop, kicking a ball, the swing.
   play(child,seconds){
     const a=child.activity,c={x:a.center.x+.5,y:a.center.y+.5},map=this.scene.map;child.moving=false;
-    if(['swing','snowman','snowball'].includes(a.kind)&&!child.local){child.facing={x:0,y:1};return;}
+    if(['swing','snowman','snowball','hay'].includes(a.kind)&&!child.local){child.facing={x:0,y:1};return;}
     const radius={tag:1.8,hoop:1.3,ball:1.5,shore:1.2,snowball:1,snowman:.6}[a.kind]??1.2,speed=a.kind==='tag'?CHILDREN.runSpeed:a.kind==='hoop'?CHILDREN.speed*1.2:CHILDREN.speed*.8;
     if(!child.local||Math.hypot(child.local.x-child.x,child.local.y-child.y)<.08){
       child.wait=(child.wait??0)-seconds;if(child.wait>0)return;
