@@ -1,5 +1,5 @@
 import { validateRockMining } from './RockMiningState.js';
-import { CARAVAN_RULES,MERCHANT_TYPES } from '../data/trade.js';
+import { CARAVAN_RULES,MERCHANT_TYPES,validateAutoTrade } from '../data/trade.js';
 import { ORDER_STATUSES,validateTradeStats } from './TradeSystem.js';
 import { TAX_RATES,RATIONS,FEAST } from '../data/policy.js';
 import { ROCK_MINING } from '../data/rockMining.js';
@@ -36,7 +36,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=48;
+export const SAVE_VERSION=49;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -474,9 +474,9 @@ export function validateGameState(input,registry=objectRegistry){
     const total=s.time?.totalElapsed??0,dayMs=s.gameSettings.dayLengthSeconds*1000;check((p.feastUntil===null)===(p.lastFeastAt===null));if(p.lastFeastAt!==null){number(p.lastFeastAt,0,total);check(Math.abs(p.feastUntil-p.lastFeastAt-FEAST.days*dayMs)<1e-6);}}
   // Trade F1.3: orders (schema 39). Open orders belong to the active caravan and an existing Marketplace.
   if(s.trade!==undefined){
-    const v=s.trade;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='orders,seq,stats');validateTradeStats(v.stats,{check,number,integer,array,resource:id=>definition(id,'resource'),day:s.time?.day??1});integer(v.seq,0);array(v.orders,200);const ids=new Set();
+    const v=s.trade;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='auto,orders,seq,stats');validateAutoTrade(v.auto,{check,integer,resource:id=>definition(id,'resource')});validateTradeStats(v.stats,{check,number,integer,array,resource:id=>definition(id,'resource'),day:s.time?.day??1});integer(v.seq,0);array(v.orders,200);const ids=new Set();
     for(const o of v.orders){
-      check(o&&typeof o==='object'&&Object.keys(o).sort().join()==='caravanId,delivered,id,marketplaceId,placedAt,price,quantity,resource,side,status');
+      check(o&&typeof o==='object'&&Object.keys(o).filter(k=>k!=='auto').sort().join()==='caravanId,delivered,id,marketplaceId,placedAt,price,quantity,resource,side,status'&&(o.auto===undefined||o.auto===true));
       check(typeof o.id==='string'&&/^trade-\d+$/.test(o.id)&&Number(o.id.slice(6))<=v.seq&&!ids.has(o.id));ids.add(o.id);
       definition(o.resource,'resource');check(['buy','sell'].includes(o.side)&&ORDER_STATUSES.includes(o.status));integer(o.quantity,1,100000);integer(o.delivered,0,o.quantity);integer(o.price,1,1000000);
       number(o.placedAt,0);check(typeof o.caravanId==='string');integer(o.marketplaceId,0);

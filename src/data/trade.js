@@ -16,6 +16,25 @@ const round=value=>Math.max(1,Math.round(value));
 // an order keeps the price agreed at confirmation.
 export const PRICE_MODEL=Object.freeze({min:.75,max:1.35,kingdomWeight:.2,merchantWeight:.15,defaultReference:50,
   referenceStock:Object.freeze({iron_bar:10,bow:5,sword:3,armor:2}),historyDays:20,recentTrades:12});
+// Trade F3 (automatic trade, S14 §12–13): off by default. Each good has one rule – sell above a reserve at a minimum
+// price, or buy when the stock falls below a level, up to a target, at a maximum price – never both, so a good cannot be
+// bought and sold back automatically. Rules are checked every `checkMs` of game time while a caravan trades, and each
+// good gets at most one automatic order per caravan visit. `budget` caps the Gold automatic buying spends per visit.
+export const AUTO_TRADE=Object.freeze({checkMs:2000,defaultBudget:100,maxBudget:5000,maxAmount:10000,maxPrice:100000,foodReserveDays:3,mealsPerDay:2,
+  defaults:Object.freeze({sell:Object.freeze({keep:50,minPrice:1}),buy:Object.freeze({below:20,upTo:50,maxPrice:null})})});
+const AUTO_KEYS={sell:['keep','minPrice'],buy:['below','upTo','maxPrice']};
+// A clean rule or an error id. Amounts are whole numbers; a buy target must not be below its trigger level.
+export function autoRule(rule){
+  if(!rule||!['sell','buy'].includes(rule.mode))return {error:'mode'};
+  const out={mode:rule.mode};for(const key of AUTO_KEYS[rule.mode]){const v=Number(rule[key]),max=key.endsWith('rice')?AUTO_TRADE.maxPrice:AUTO_TRADE.maxAmount,min=key.endsWith('rice')?1:0;if(!Number.isSafeInteger(v)||v<min||v>max)return {error:key};out[key]=v;}
+  if(out.mode==='buy'&&out.upTo<out.below)return {error:'upTo'};
+  return {rule:out};
+}
+export function validateAutoTrade(a,{check,integer,resource}){
+  check(a&&typeof a==='object'&&Object.keys(a).sort().join()==='budget,enabled,rules,visit');check(typeof a.enabled==='boolean');integer(a.budget,0,AUTO_TRADE.maxBudget);
+  check(a.rules&&typeof a.rules==='object');for(const [id,rule]of Object.entries(a.rules)){resource(id);const r=autoRule(rule);check(!r.error&&Object.keys(rule).sort().join()===Object.keys(r.rule).sort().join());}
+  if(a.visit!==null){check(a.visit&&typeof a.visit==='object'&&Object.keys(a.visit).sort().join()==='caravanId,done,spent'&&typeof a.visit.caravanId==='string');integer(a.visit.spent,0);check(Array.isArray(a.visit.done)&&new Set(a.visit.done).size===a.visit.done.length);for(const id of a.visit.done)resource(id);}
+}
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export function demand({resource,kingdomStock=null,merchantStock=null,merchantTypical=null}={}){
   const reference=PRICE_MODEL.referenceStock[resource]??PRICE_MODEL.defaultReference,reasons=[];let factor=1;

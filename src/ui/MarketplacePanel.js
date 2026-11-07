@@ -1,6 +1,6 @@
 import { t } from '../i18n/index.js';
 import { element } from './objectLabels.js';
-import { priceTable,TRADE_RULES,PRICE_MODEL } from '../data/trade.js';
+import { priceTable,price,TRADE_RULES,PRICE_MODEL,AUTO_TRADE } from '../data/trade.js';
 import { buildingDefinition } from '../game/buildings.js';
 
 // Trade F1.1 (#59): the Marketplace panel. Caravans (F1.2) and orders (F1.3) are not in the game yet, so the panel shows
@@ -26,6 +26,7 @@ export class MarketplacePanel {
     this.renderTrade(b);
     const rows=this.prices().map(row=>{const tr=element('tr');tr.dataset.marketResource=row.resource;tr.append(element('th','',row.name),this.priceCell(row,'buy'),this.priceCell(row,'sell'));return tr;});
     document.querySelector('#marketplace-prices tbody').replaceChildren(...rows);
+    this.renderAuto();
     this.renderStats();
   }
   // Trade F2: live prices from the kingdom's and the caravan's stock.
@@ -36,6 +37,51 @@ export class MarketplacePanel {
     cell.dataset.priceFactor=String(Math.round(row.factor*100));
     cell.title=row.reasons?.length?row.reasons.map(r=>t(`market.reason.${r.id}`,{percent:Math.abs(r.percent)})).join('\n'):t('market.reason.normal');
     return cell;
+  }
+  // Trade F3: automatic trade. One rule per good: Sell above a reserve at a minimum price, or Buy below a level up to a
+  // target at a maximum price. Changes apply at once; the section is not rebuilt while the player edits it.
+  renderAuto({force=false}={}){
+    const root=document.querySelector('#marketplace-auto-body'),summary=document.querySelector('#marketplace-auto-summary'),trade=this.scene.trade;if(!root||!trade?.auto)return;
+    const a=trade.auto,count=Object.keys(a.rules).length;
+    summary.textContent=t('market.auto.summary',{state:t(a.enabled?'market.auto.on':'market.auto.off'),count});
+    if(!force&&root.contains(document.activeElement))return;
+    const enabled=element('label','market-auto-enabled'),box=element('input');box.type='checkbox';box.id='auto-trade-enabled';box.checked=a.enabled;
+    box.addEventListener('change',()=>{trade.setAutoEnabled(box.checked);this.renderAuto({force:true});document.querySelector('#auto-trade-enabled')?.focus();});enabled.append(box,' ',t('market.auto.enable'));
+    const budgetLabel=element('label','market-auto-budget',t('market.auto.budget')+' '),budget=this.number('auto-trade-budget',a.budget,0,AUTO_TRADE.maxBudget);
+    budget.addEventListener('change',()=>{if(!trade.setAutoBudget(Number(budget.value)))budget.value=String(trade.auto.budget);});budgetLabel.append(budget);
+    const table=element('table','market-auto-table'),head=element('tr');for(const key of ['good','mode','settings'])head.append(element('th','',t(`market.auto.${key}`)));const thead=element('thead');thead.append(head);
+    const body=element('tbody');
+    for(const row of this.prices()){
+      const rule=a.rules[row.resource],tr=element('tr');tr.dataset.autoResource=row.resource;
+      const mode=element('select','market-auto-mode');mode.dataset.autoMode=row.resource;mode.setAttribute('aria-label',t('market.auto.modeOf',{good:row.name}));
+      for(const m of ['off','sell','buy']){const o=element('option','',t(`market.auto.mode.${m}`));o.value=m;o.selected=(rule?.mode??'off')===m;mode.append(o);}
+      mode.addEventListener('change',()=>{const m=mode.value;trade.setAutoRule(row.resource,m==='off'?null:{mode:m,...this.autoDefaults(row,m)});this.renderAuto({force:true});document.querySelector(`[data-auto-mode="${row.resource}"]`)?.focus();});
+      const settings=element('td','market-auto-settings');
+      if(rule){
+        const fields=rule.mode==='sell'?['keep','minPrice']:['below','upTo','maxPrice'];
+        for(const key of fields){const label=element('label','',t(`market.auto.${key}`)+' '),input=this.number(`auto-${row.resource}-${key}`,rule[key],key.endsWith('rice')?1:0,key.endsWith('rice')?AUTO_TRADE.maxPrice:AUTO_TRADE.maxAmount);input.dataset.autoField=key;input.dataset.autoResource=row.resource;
+          input.addEventListener('change',()=>{const result=trade.setAutoRule(row.resource,{...trade.auto.rules[row.resource],[key]:Number(input.value)});input.classList.toggle('invalid',!result.ok);if(!result.ok)input.title=t(`market.auto.error.${result.error}`);else{input.title='';this.renderAutoNote(row.resource);}});
+          label.append(input);settings.append(label,' ');}
+        settings.append(element('span','market-auto-note'));
+      }else settings.append(element('span','market-auto-hint',t('market.auto.price',{buy:row.buy,sell:row.sell})));
+      const td=element('td');td.append(mode);tr.append(element('th','',row.name),td,settings);body.append(tr);
+    }
+    table.append(thead,body);
+    root.replaceChildren(element('p','market-help',t('market.auto.help')),enabled,' ',budgetLabel,table);
+    for(const id of Object.keys(a.rules))this.renderAutoNote(id);
+  }
+  number(id,value,min,max){const el=element('input','market-qty');el.type='number';el.id=id;el.min=String(min);el.max=String(max);el.step='1';el.value=String(value);return el;}
+  // Starting values for a new rule: sell what is above the price-model reference; buy up to it at about 10 % over today's price.
+  autoDefaults(row,mode){
+    const reference=PRICE_MODEL.referenceStock[row.resource]??PRICE_MODEL.defaultReference;
+    if(mode==='sell')return {keep:reference,minPrice:Math.max(1,price(row.resource,'sell')??1)};
+    return {below:Math.max(1,Math.round(reference/2)),upTo:reference,maxPrice:Math.max(row.buy,Math.round((price(row.resource,'buy')??1)*1.1))};
+  }
+  renderAutoNote(resource){
+    const note=document.querySelector(`[data-auto-resource="${resource}"] .market-auto-note`);if(!note)return;const trade=this.scene.trade,w=trade.autoWarning(resource);
+    const row=this.prices().find(r=>r.resource===resource),parts=[t('market.auto.price',{buy:row?.buy??'–',sell:row?.sell??'–'})];
+    if(trade.auto.visit&&trade.auto.visit.caravanId===this.scene.caravans?.active?.id&&trade.auto.visit.done.includes(resource))parts.push(t('market.auto.doneThisVisit'));
+    note.textContent=parts.join(' · ');note.classList.toggle('warning',!!w);if(w)note.textContent+=' · '+t('market.auto.foodWarning',{left:w.left,reserve:w.reserve,days:AUTO_TRADE.foodReserveDays});
   }
   // Trade F2: totals, the best goods, recent trades and a price history chart.
   renderStats(){

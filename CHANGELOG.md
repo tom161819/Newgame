@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-11-07
+<!-- version: {"title":"Automatic trade","type":"feature","reconstructed":false,"saveVersion":49} -->
+### Added
+- Automatic trade at the Marketplace (off by default). For each good, choose Auto sell (keep a reserve, sell the rest at a minimum price) or Auto buy (when stock falls below a level, buy up to a target at a maximum price). Buying stays within a budget per caravan. Each good is traded at most once per visit. A warning shows if selling food would leave less than three days of meals.
+
 ## [0.20.0] - 2026-11-07
 <!-- version: {"title":"Live market prices","type":"feature","reconstructed":false,"saveVersion":48} -->
 ### Added

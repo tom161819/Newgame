@@ -1,4 +1,6 @@
-import { price,tradeableResources,demand,merchantTypical,PRICE_MODEL } from '../data/trade.js';
+import { price,tradeableResources,demand,merchantTypical,PRICE_MODEL,AUTO_TRADE,autoRule } from '../data/trade.js';
+import { EDIBLE_RESOURCES } from '../data/seasons.js';
+import { t } from '../i18n/index.js';
 import { GOLD_LIMIT } from '../data/economy.js';
 import { buildingIsComplete } from '../game/buildings.js';
 
@@ -12,6 +14,7 @@ export const ORDER_STATUSES=Object.freeze(['Pending','Transporting','PartiallyCo
 export const ORDER_ERRORS=Object.freeze(['notEnoughGold','notEnoughResources','merchantOutOfStock','merchantGold','storage','marketFull','caravanLeaving','treasuryFull','otherSide','noCaravan','quantity']);
 const OPEN=new Set(['Pending','Transporting']);
 export const marketId=building=>`market-${building.id??building}`;
+export const emptyAutoTrade=()=>({enabled:false,budget:AUTO_TRADE.defaultBudget,rules:{},visit:null});
 export const emptyTradeStats=()=>({sold:0,bought:0,transactions:0,byResource:{},recent:[],history:{}});
 // Save validation of the statistics (schema 48).
 export function validateTradeStats(st,{check,number,integer,array,resource,day}){
@@ -22,7 +25,7 @@ export function validateTradeStats(st,{check,number,integer,array,resource,day})
 }
 export class TradeSystem {
   constructor(scene){
-    this.scene=scene;this.orders=[];this.seq=0;this.listeners=new Set();this.stats=emptyTradeStats();
+    this.scene=scene;this.orders=[];this.seq=0;this.listeners=new Set();this.stats=emptyTradeStats();this.auto=emptyAutoTrade();
     if(scene.caravans)scene.caravans.deliveryPending=caravan=>this.openOrders(caravan.id).some(o=>o.status==='Transporting');
   }
   get storage(){return this.scene.foodStorage;}
@@ -49,6 +52,55 @@ export class TradeSystem {
   // On arrival: the offered prices of every good the caravan sells or would buy.
   recordOffers(caravan=this.caravan){if(!caravan)return;for(const d of tradeableResources(this.scene.objectRegistry)){const sell=this.unitPrice(d.id,'sell',caravan),buy=(caravan.stock[d.id]??0)>0?this.unitPrice(d.id,'buy',caravan):null;if(sell!==null)this.history(d.id,{...(buy!==null?{buy}:{}),sell});}this.changed();}
   summary(){const s=this.stats,top=Object.entries(s.byResource).sort((a,b)=>b[1].value-a[1].value).slice(0,3).map(([resource,row])=>({resource,...row}));return {sold:s.sold,bought:s.bought,balance:s.sold-s.bought,transactions:s.transactions,top,recent:s.recent};}
+  // Trade F3: automatic trade settings.
+  setAutoEnabled(on){this.auto.enabled=!!on;this.autoCheckedAt=undefined;this.changed();}
+  setAutoBudget(gold){const v=Number(gold);if(!Number.isSafeInteger(v)||v<0||v>AUTO_TRADE.maxBudget)return false;this.auto.budget=v;this.changed();return true;}
+  // One rule per good (mode 'sell' or 'buy'); 'off' or null removes it. Returns {ok} or {ok:false,error}.
+  setAutoRule(resource,rule){
+    if(!tradeableResources(this.scene.objectRegistry).some(d=>d.id===resource))return {ok:false,error:'resource'};
+    if(!rule||rule.mode==='off'){delete this.auto.rules[resource];this.changed();return {ok:true};}
+    const r=autoRule(rule);if(r.error)return {ok:false,error:r.error};this.auto.rules[resource]=r.rule;this.autoCheckedAt=undefined;this.changed();return {ok:true,rule:r.rule};
+  }
+  residents(){return (this.scene.workerSystem?.liveWorkers?.().length??0)+1;}
+  // How much food the kingdom should keep: every resident's meals for AUTO_TRADE.foodReserveDays days.
+  foodReserve(){return this.residents()*AUTO_TRADE.mealsPerDay*AUTO_TRADE.foodReserveDays;}
+  // A warning when an automatic sale of food would leave less edible food than the reserve.
+  autoWarning(resource,rule=this.auto.rules[resource]){
+    if(rule?.mode!=='sell'||!EDIBLE_RESOURCES.includes(resource))return null;
+    const total=EDIBLE_RESOURCES.reduce((n,id)=>n+(this.storage?.available(id)??0),0),sold=Math.max(0,(this.storage?.available(resource)??0)-rule.keep),left=total-sold,reserve=this.foodReserve();
+    return left<reserve&&(sold>0||rule.keep<reserve)?{reserve,left}:null;
+  }
+  // The amount an automatic rule would trade now (0 = nothing), within every limit the manual window has.
+  autoQuantity(resource,rule,c=this.caravan){
+    const market=this.market(c.marketplaceId),room=market?market.capacity-this.marketUsed(c.marketplaceId):0;if(room<=0)return 0;
+    if(rule.mode==='sell'){
+      const unit=this.unitPrice(resource,'sell');if(unit===null||unit<rule.minPrice)return 0;
+      const owed=this.openOrders(c.id).filter(o=>o.side==='sell').reduce((n,o)=>n+(o.quantity-o.delivered)*o.price,0),limit=this.scene.inventory.limit?.('gold')??GOLD_LIMIT;
+      return Math.max(0,Math.min(this.storage.available(resource)-rule.keep,Math.floor((c.gold-owed)/unit),Math.floor((limit-this.scene.inventory.count('gold')-this.pendingSaleGold())/unit),room));
+    }
+    const coming=this.openOrders().filter(o=>o.side==='buy'&&o.resource===resource).reduce((n,o)=>n+o.quantity-o.delivered,0),stock=this.storage.available(resource)+coming+(market.stock[resource]??0);
+    if(stock>=rule.below)return 0;const unit=this.unitPrice(resource,'buy');if(unit===null||unit>rule.maxPrice)return 0;
+    return Math.max(0,Math.min(rule.upTo-stock,c.stock[resource]??0,Math.floor((this.auto.budget-(this.auto.visit?.spent??0))/unit),Math.floor(this.freeGold()/unit),this.storeRoom(resource)-coming-(market.stock[resource]??0),room));
+  }
+  // Checked from update(): while a caravan trades, each rule may place one order per visit, small enough to be carried
+  // before the caravan leaves.
+  autoTrade(){
+    const a=this.auto,c=this.caravan;if(!a.enabled||!c||c.phase!=='trading'||c.waiting||!Object.keys(a.rules).length)return false;
+    const now=this.scene.gameTime?.totalElapsed??0;if(this.autoCheckedAt!==undefined&&now-this.autoCheckedAt<AUTO_TRADE.checkMs&&now>=this.autoCheckedAt)return false;this.autoCheckedAt=now;
+    if(a.visit?.caravanId!==c.id)a.visit={caravanId:c.id,spent:0,done:[]};
+    const leavesIn=this.scene.caravans.status()?.active?.leavesIn??0;let placed=false;
+    for(const [resource,rule]of Object.entries(a.rules)){
+      if(a.visit.done.includes(resource))continue;
+      let quantity=this.autoQuantity(resource,rule,c);
+      while(quantity>=1&&this.estimate(rule.mode,resource,quantity,c.marketplaceId)>leavesIn)quantity=Math.floor(quantity/2);
+      if(quantity<1)continue;
+      const result=this.place(rule.mode,resource,quantity);if(!result.ok)continue;
+      result.order.auto=true;a.visit.done.push(resource);if(rule.mode==='buy')a.visit.spent+=quantity*result.order.price;placed=true;
+      const good=this.scene.objectRegistry.get(resource)?.name??resource;
+      this.scene.eventFeed?.push(`trade:auto:${result.order.id}`,t(`market.auto.feed.${rule.mode}`,{quantity,good,price:result.order.price}));
+    }
+    if(placed)this.changed();return placed;
+  }
   onChange(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   changed(){for(const listener of this.listeners)listener();}
   openOrders(caravanId=null){return this.orders.filter(o=>OPEN.has(o.status)&&(caravanId===null||o.caravanId===caravanId));}
@@ -100,6 +152,7 @@ export class TradeSystem {
   cancel(id){const o=this.orders.find(o=>o.id===id&&OPEN.has(o.status));if(!o)return false;o.status=o.delivered>0?'PartiallyCompleted':'Cancelled';this.changed();return true;}
   caravanLeft(caravan){let any=false;for(const o of this.openOrders(caravan.id)){o.status=o.delivered>0?'PartiallyCompleted':'Cancelled';any=true;}if(any)this.changed();}
   update(){
+    this.autoTrade();
     const c=this.caravan;let dirty=false;
     for(const o of this.openOrders()){
       if(!c||c.id!==o.caravanId||!this.marketplace(o.marketplaceId)){o.status=o.delivered>0?'PartiallyCompleted':'Failed';dirty=true;continue;}
@@ -149,7 +202,7 @@ export class TradeSystem {
     return tasks;
   }
   // Open orders and the last 30 finished ones (for the panel) are kept.
-  exportState(){const closed=this.orders.filter(o=>!OPEN.has(o.status)).slice(-30);return {seq:this.seq,orders:this.orders.filter(o=>OPEN.has(o.status)||closed.includes(o)).map(o=>({...o})),stats:structuredClone(this.stats)};}
-  importState(state){this.seq=state?.seq??0;this.orders=(state?.orders??[]).map(o=>({...o}));this.stats=state?.stats?structuredClone(state.stats):emptyTradeStats();this.changed();}
+  exportState(){const closed=this.orders.filter(o=>!OPEN.has(o.status)).slice(-30);return {seq:this.seq,orders:this.orders.filter(o=>OPEN.has(o.status)||closed.includes(o)).map(o=>({...o})),stats:structuredClone(this.stats),auto:structuredClone(this.auto)};}
+  importState(state){this.seq=state?.seq??0;this.orders=(state?.orders??[]).map(o=>({...o}));this.stats=state?.stats?structuredClone(state.stats):emptyTradeStats();this.auto=state?.auto?structuredClone(state.auto):emptyAutoTrade();this.autoCheckedAt=undefined;this.changed();}
   destroy(){this.listeners.clear();if(this.scene.caravans)this.scene.caravans.deliveryPending=()=>false;}
 }

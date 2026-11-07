@@ -57,10 +57,21 @@ export async function marketplaceSmoke(context,url,instrument){
     const stats=await page.locator('#marketplace-stats').textContent();assert.match(stats,new RegExp(`Sold for ${20*unit} Gold`));assert.match(stats,new RegExp(`sold \\d+ Wood at ${unit} Gold`));assert.match(stats,/Top goods: Wood/);
     await page.locator('#marketplace-chart-good').selectOption('wood');assert.ok(await page.locator('.market-chart circle.sell').count()>=1);
     if(process.env.SMOKE_SHOTS)await page.locator('#marketplace-stats').screenshot({path:`${process.env.SMOKE_SHOTS}/trade-stats.png`});
+    // F3: automatic trade rules in the Marketplace panel (off by default; one rule per good; invalid values are refused).
+    assert.match(await page.locator('#marketplace-auto-summary').textContent(),/Automatic trade: off, 0 rules/);
+    await page.locator('#marketplace-auto-summary').click();await page.locator('[data-auto-mode="stone"]').selectOption('sell');
+    await page.locator('#auto-stone-keep').fill('-1');await page.locator('#auto-stone-keep').dispatchEvent('change');assert.equal(await page.locator('#auto-stone-keep.invalid').count(),1);
+    await page.locator('#auto-stone-keep').fill('40');await page.locator('#auto-stone-keep').dispatchEvent('change');
+    await page.locator('[data-auto-mode="apple"]').selectOption('buy');await page.locator('#auto-apple-upTo').fill('70');await page.locator('#auto-apple-upTo').dispatchEvent('change');
+    assert.deepEqual(await page.evaluate(()=>{const a=window.__game.registry.get('application').scene.trade.auto;return {enabled:a.enabled,stone:a.rules.stone,apple:a.rules.apple.upTo};}),{enabled:false,stone:{mode:'sell',keep:40,minPrice:2},apple:70});
+    await page.locator('#auto-trade-enabled').check();assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.trade.auto.enabled),true);
+    await page.locator('#marketplace-title').click();await page.waitForTimeout(1200);assert.match(await page.locator('#marketplace-auto-summary').textContent(),/on, 2 rules/);
+    if(process.env.SMOKE_SHOTS)await page.locator('#marketplace-auto').screenshot({path:`${process.env.SMOKE_SHOTS}/auto-trade.png`});
+    await page.locator('#auto-trade-enabled').uncheck();
     await page.keyboard.press('Escape');
     assert.ok(gold0>=gold1);
     const gone=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.caravans.leave();for(let i=0;i<20000&&s.caravans.active;i++){s.caravans.update(100);s.caravanViews.update();}return {active:s.caravans.active,view:s.caravanViews.view,next:s.caravans.nextVisitAt};});
     assert.equal(gone.active,null);assert.equal(gone.view,null);assert.ok(gone.next>0);
-    console.log('PASS Marketplace: locked until a Warehouse is finished, placed from the Logistics menu, panel with goods space, loading spots and live prices with reasons; trade statistics and price history after a sale; a summoned caravan drives in from the edge, trades, leaves and the next one is scheduled');
+    console.log('PASS Marketplace: locked until a Warehouse is finished, placed from the Logistics menu, panel with goods space, loading spots and live prices with reasons; trade statistics and price history after a sale; automatic trade rules; a summoned caravan drives in from the edge, trades, leaves and the next one is scheduled');
   }finally{await page.close();}
 }

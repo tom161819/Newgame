@@ -595,6 +595,17 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .marketplace-dialog.trading .market-prices, .marketplace-dialog.trading .market-prices-head { display: none; }
 .market-price.up { color: #e0a06b; }
 .market-price.down { color: #9fd08a; }
+.market-auto { margin-top: 10px; border-top: 1px solid #4a4a33; padding-top: 6px; font-size: 12px; }
+.market-auto summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+.market-auto-budget { margin-left: 16px; }
+.market-auto-budget input { width: 5em; }
+.market-auto-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+.market-auto-table th, .market-auto-table td { padding: 2px 6px; border-bottom: 1px solid #4a4a33; text-align: left; white-space: nowrap; }
+.market-auto-settings label { margin-right: 6px; }
+.market-auto-settings input { width: 4.5em; }
+.market-auto-settings input.invalid { outline: 1px solid #e0806b; }
+.market-auto-note, .market-auto-hint { color: #a89f80; }
+.market-auto-note.warning { color: #e0a06b; }
 .market-stats { margin-top: 10px; border-top: 1px solid #4a4a33; padding-top: 6px; font-size: 12px; }
 .market-stats h3 { margin: 0 0 4px; font-size: 14px; }
 .market-stats p { margin: 2px 0; }
