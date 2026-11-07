@@ -2272,12 +2272,11 @@
       "preferred": null,
       "variants": {
         "boar-boar": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "status": "review",
+          "version": 3,
+          "specHash": "b367b493",
           "note": "",
-          "specHash": "b76b8c76",
-          "status": "revision-requested",
-          "updatedAt": "2026-11-07T19:50:00.000Z",
-          "version": 2,
+          "updatedAt": "2026-11-07T19:30:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -2298,16 +2297,21 @@
               "specHash": "b76dcb0d",
               "status": "revision-requested",
               "at": "2026-11-07T19:05:00.000Z"
+            },
+            {
+              "version": 2,
+              "specHash": "b76b8c76",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:50:00.000Z"
             }
           ]
         },
         "boar-sow": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "status": "review",
+          "version": 2,
+          "specHash": "2447918f",
           "note": "",
-          "specHash": "244fe054",
-          "status": "revision-requested",
-          "updatedAt": "2026-11-07T19:50:00.000Z",
-          "version": 1,
+          "updatedAt": "2026-11-07T19:30:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:50:00.000Z",
@@ -2315,15 +2319,22 @@
               "text": "to není hezký divočák, má moc protáhlou hlavu, a vypadá nepřirozeně, udělej proporčně přesnějšího divočáka",
               "version": 1
             }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "244fe054",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:50:00.000Z"
+            }
           ]
         },
         "boar-piglet": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "status": "review",
+          "version": 3,
+          "specHash": "94d65016",
           "note": "",
-          "specHash": "90d40b33",
-          "status": "revision-requested",
-          "updatedAt": "2026-11-07T19:50:00.000Z",
-          "version": 2,
+          "updatedAt": "2026-11-07T19:30:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:50:00.000Z",
@@ -2331,21 +2342,36 @@
               "text": "to není hezký divočák, má moc protáhlou hlavu, a vypadá nepřirozeně, udělej proporčně přesnějšího divočáka",
               "version": 2
             }
+          ],
+          "history": [
+            {
+              "version": 2,
+              "specHash": "90d40b33",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:50:00.000Z"
+            }
           ]
         },
         "boar-boar-attack": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "status": "review",
+          "version": 3,
+          "specHash": "3dbe87f8",
           "note": "",
-          "specHash": "41bc4fad",
-          "status": "revision-requested",
-          "updatedAt": "2026-11-07T19:50:00.000Z",
-          "version": 2,
+          "updatedAt": "2026-11-07T19:30:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:50:00.000Z",
               "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
               "text": "to není hezký divočák, má moc protáhlou hlavu, a vypadá nepřirozeně, udělej proporčně přesnějšího divočáka",
               "version": 2
+            }
+          ],
+          "history": [
+            {
+              "version": 2,
+              "specHash": "41bc4fad",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:50:00.000Z"
             }
           ]
         }
@@ -3048,12 +3074,11 @@
       "preferred": null,
       "variants": {
         "horse-bay": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "status": "review",
+          "version": 3,
+          "specHash": "1828f414",
           "note": "",
-          "specHash": "1c26bbc9",
-          "status": "revision-requested",
-          "updatedAt": "2026-11-07T19:50:00.000Z",
-          "version": 2,
+          "updatedAt": "2026-11-07T19:30:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -3074,6 +3099,12 @@
               "specHash": "1c247d32",
               "status": "revision-requested",
               "at": "2026-11-07T19:05:00.000Z"
+            },
+            {
+              "version": 2,
+              "specHash": "1c26bbc9",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:50:00.000Z"
             }
           ]
         },

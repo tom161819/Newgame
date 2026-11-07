@@ -1,7 +1,9 @@
 // Thematic props shared by building recipes. Each helper returns primitives
 // standing on the ground at (x, z) in model units; `r` turns the prop around
 // the vertical axis where that matters. Only style-guide materials are used.
-import { box, cylinder, sphere, prism, lean, horse, rotateParts } from './shapes.js';
+import { box, cylinder, sphere, prism, lean, horse, rotateParts, turnParts } from './shapes.js';
+import { build as buildAnimal } from './animal.js';
+const scaleAt = (p, k, dx, dz) => { const o = { ...p, at: [p.at[0] * k + dx, p.at[1] * k, p.at[2] * k + dz] }; for (const key of ['height', 'radiusBottom', 'radiusTop']) if (p[key] !== undefined) o[key] = p[key] * k; if (p.size) o.size = p.size.map(v => v * k); if (p.radii) o.radii = p.radii.map(v => v * k); return o; };
 
 const T = Math.PI / 4;
 
@@ -135,7 +137,11 @@ Object.assign(PROPS, {
       local.push(sphere([0.07, 0.05, 0.06], [-0.25, bed + 0.06, -0.1], 'cloth_linen', 1));
     }
     const turned = rotateParts(local, -angle).map(p => ({ ...p, at: [p.at[0] + x, p.at[1], p.at[2] + z] }));
-    if (withHorse) { const ax = Math.cos(angle), az = Math.sin(angle); turned.push(...horse([x + ax * (L / 2 + 0.52), 0, z + az * (L / 2 + 0.52)], { angle, coat, saddle: false, scale: 0.85 }).parts); }
+    if (withHorse) { // revision 3: the merchant's horse is the realistic animal-recipe horse in harness
+      const ax = Math.cos(angle), az = Math.sin(angle), breed = { horse_chestnut: 'chestnut', horse_grey: 'grey', horse_bay: 'bay', horse_dark: 'black' }[coat] ?? 'bay';
+      const made = turnParts(buildAnimal({ species: 'horse', breed, harness: true }, { footprint: { width: 1, height: 1 } }).primitives, Math.PI / 4 - angle);
+      turned.push(...made.map(p => scaleAt(p, 0.8, x + ax * (L / 2 + 0.52), z + az * (L / 2 + 0.52))));
+    }
     return turned;
   },
   // Wheelwright (#92 revision): a spoked wheel. plane 'x' stands it upright with its face toward +z, 'z' upright

@@ -3,7 +3,7 @@
   "id": "horse",
   "name": "Horse",
   "category": "units",
-  "description": "Horses, revision 2 (owner 7 Nov 2026: more realistic, at least 3 more looks): deeper barrel, arched neck, longer head, heavier legs; bay, chestnut with a blaze, grey, black, pony, palomino, dun with a dorsal stripe, piebald, dapple grey and a heavy draught horse with feathered fetlocks. Walk and run in 8 directions; saddled, harnessed and galloping stills.",
+  "description": "Horses, revision 3 (owner: realistic hand-painted look, no low-poly): muscle masses over the anatomical skeleton (shoulder, forearm, croup, gaskin), slim cannons and dark hooves, cheeks and nostrils, mane, forelock and tail in hanging strands, a lighter sheen along the back and a darker belly for soft gradients; dark points on bays and duns. Bay, chestnut, grey, black, pony, palomino, dun, piebald, dapple grey, draught; saddled, harnessed and galloping.",
   "footprint": {
     "width": 2,
     "height": 2
@@ -14,7 +14,7 @@
     {
       "id": "horse-bay",
       "name": "Bay horse",
-      "version": 2,
+      "version": 3,
       "spec": {
         "species": "horse",
         "breed": "bay",
@@ -24,7 +24,7 @@
     {
       "id": "horse-chestnut",
       "name": "Chestnut horse with a white blaze",
-      "version": 2,
+      "version": 3,
       "spec": {
         "species": "horse",
         "breed": "chestnut",
@@ -34,7 +34,7 @@
     {
       "id": "horse-grey",
       "name": "Grey horse",
-      "version": 2,
+      "version": 3,
       "spec": {
         "species": "horse",
         "breed": "grey",
@@ -44,7 +44,7 @@
     {
       "id": "horse-black",
       "name": "Black horse",
-      "version": 2,
+      "version": 3,
       "spec": {
         "species": "horse",
         "breed": "black",
@@ -54,7 +54,7 @@
     {
       "id": "horse-pony",
       "name": "Pony",
-      "version": 2,
+      "version": 3,
       "spec": {
         "species": "horse",
         "breed": "pony",
@@ -64,7 +64,7 @@
     {
       "id": "horse-palomino",
       "name": "Palomino",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "horse",
         "breed": "palomino",
@@ -74,7 +74,7 @@
     {
       "id": "horse-dun",
       "name": "Dun with a dorsal stripe",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "horse",
         "breed": "dun",
@@ -84,7 +84,7 @@
     {
       "id": "horse-piebald",
       "name": "Piebald",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "horse",
         "breed": "piebald",
@@ -94,7 +94,7 @@
     {
       "id": "horse-dapple",
       "name": "Dapple grey",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "horse",
         "breed": "dapple",
@@ -104,7 +104,7 @@
     {
       "id": "horse-draught",
       "name": "Draught horse",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "horse",
         "breed": "draught",
@@ -114,7 +114,7 @@
     {
       "id": "horse-bay-saddled",
       "name": "Bay horse saddled (knight's mount)",
-      "version": 2,
+      "version": 3,
       "spec": {
         "species": "horse",
         "breed": "bay",
@@ -125,7 +125,7 @@
     {
       "id": "horse-grey-harness",
       "name": "Grey horse in harness",
-      "version": 2,
+      "version": 3,
       "spec": {
         "species": "horse",
         "breed": "grey",
@@ -136,7 +136,7 @@
     {
       "id": "horse-chestnut-run",
       "name": "Chestnut horse galloping",
-      "version": 2,
+      "version": 3,
       "spec": {
         "species": "horse",
         "breed": "chestnut",

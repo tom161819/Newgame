@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "horse",
+  "variantId": "horse-dun",
+  "name": "Dun with a dorsal stripe",
+  "category": "units",
+  "version": 2,
+  "specHash": "774b176c",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 69,
+  "anchor": {
+    "x": 65,
+    "y": 35
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.50725
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 67
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97101
+  },
+  "visualHeight": 67,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.069,
+  "lights": []
+}

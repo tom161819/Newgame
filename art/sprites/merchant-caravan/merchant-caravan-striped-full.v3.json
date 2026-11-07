@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "merchant-caravan",
+  "variantId": "merchant-caravan-striped-full",
+  "name": "Striped wagon, full",
+  "category": "units",
+  "version": 3,
+  "specHash": "8615fd97",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 79,
+  "anchor": {
+    "x": 65,
+    "y": 45
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.56962
+  },
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "base": {
+    "x": 97,
+    "y": 77
+  },
+  "baseOrigin": {
+    "x": 0.74046,
+    "y": 0.97468
+  },
+  "visualHeight": 77,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -37.44,
+      "y": -52.48,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 0.855,
+  "lights": [
+    {
+      "type": "torch",
+      "x": 59.56,
+      "y": 24.52,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+.fl-main { display: flex; align-items: stretch; justify-content: stretch; padding: 0; min-height: calc(100dvh - var(--topbar-h, 60px)); background: #1a1d16; }
+#fl-canvas { width: 100%; height: calc(100dvh - var(--topbar-h, 60px)); display: block; cursor: crosshair; touch-action: none; }
+.fl-params { display: flex; flex-direction: column; gap: 6px; }
+.fl-param { display: grid; grid-template-columns: 1fr 52px; gap: 2px 8px; align-items: center; font-size: 13px; }
+.fl-param input[type=range] { grid-column: 1 / -1; width: 100%; }
+.fl-param output { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.fl-param small { grid-column: 1 / -1; color: var(--muted); font-size: 11px; margin-top: -2px; }
+@media (max-width: 760px) { #fl-canvas { height: 62vh; } }
