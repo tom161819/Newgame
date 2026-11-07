@@ -229,8 +229,10 @@ test('the game never imports Asset Studio code or art and keeps its own build en
   const files = [];
   const walk = dir => { for (const entry of readdirSync(path.join(root, dir), { withFileTypes: true })) { const file = `${dir}/${entry.name}`; if (entry.isDirectory()) walk(file); else if (file.endsWith('.js')) files.push(file); } };
   walk('src');
-  // Game code may name an approved export (artSource) but never imports studio code or art files.
-  for (const file of files) assert.doesNotMatch(readFileSync(path.join(root, file), 'utf8'), /(?:from\s*|import\s*\()\s*['"][^'"]*(?:studio\/|\/art\/)/, file);
+  // Game code may name an approved export (artSource) but never imports studio code or art files. The one exception is
+  // art/ui: the UI Lab config, its theme CSS, fonts and applyUiConfig are shared on purpose (plan m-ui-lab-do-hry).
+  for (const file of files) assert.doesNotMatch(readFileSync(path.join(root, file), 'utf8'), /(?:from\s*|import\s*\()\s*['"][^'"]*(?:studio\/|\/art\/(?!ui\/))/, file);
+  for (const file of files) for (const [, spec] of readFileSync(path.join(root, file), 'utf8').matchAll(/(?:from\s*|import\s*)['"]([^'"]*\/art\/ui\/[^'"]*)['"]/g)) assert.match(spec, /\/art\/ui\/(ui-config\.json|presets\.js|uiConfig\.js|ui-fonts\.js|ui-theme\.css)$/, `${file}: only the shared UI Lab files`);
   assert.doesNotMatch(readFileSync(path.join(root, 'index.html'), 'utf8'), /studio/);
   assert.doesNotMatch(readFileSync(path.join(root, 'vite.config.js'), 'utf8'), /studio/);
 });

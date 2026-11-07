@@ -1,3 +1,4 @@
+import { UI_STYLES,applyUiStyle,currentUiStyle,storedUiStyle,uiStyleLabel } from './UiTheme.js';
 import { MEMORY_BRIGHTNESS,clampMemoryBrightness } from '../systems/FogOfWarSystem.js';
 const STORAGE_KEY='newgame.settings';
 export function readSettings(storage){
@@ -14,7 +15,7 @@ export class SettingsPanel {
     this.onOpenChange=onOpenChange;
     this.button=document.querySelector('#settings-button');this.panel=document.querySelector('#settings-panel');
     this.toggle=document.querySelector('#fog-toggle');this.explorationToggle=document.querySelector('#exploration-toggle');this.controller=new AbortController();const options={signal:this.controller.signal};
-    this.pathToggle=document.querySelector('#path-wear-toggle');this.backgroundToggle=document.querySelector('#background-toggle');
+    this.pathToggle=document.querySelector('#path-wear-toggle');this.backgroundToggle=document.querySelector('#background-toggle');this.styleSelect=document.querySelector('#settings-ui-style');
     this.brightness=document.querySelector('#memory-brightness');this.brightnessValue=document.querySelector('#memory-brightness-value');
     let storage;try{storage=window.localStorage;}catch{}
     this.settings=readSettings(storage);this.toggle.checked=this.settings.fogOfWar;this.explorationToggle.checked=this.settings.explorationMode;this.pathToggle.checked=this.settings.pathWearDebug;if(this.backgroundToggle)this.backgroundToggle.checked=this.settings.runInBackground;this.syncBrightness();this.setOpen(false);
@@ -25,6 +26,9 @@ export class SettingsPanel {
     this.explorationToggle.addEventListener('change',()=>{this.settings.explorationMode=this.explorationToggle.checked;saveSettings(storage,this.settings);onChange(this.settings);},options);
     this.pathToggle.addEventListener('change',()=>{this.settings.pathWearDebug=this.pathToggle.checked;saveSettings(storage,this.settings);onChange(this.settings);},options);
     // #60: Run in Background is a browser setting like the brightness: stored here only, never in a save.
+    // UI Lab style: the owner's Studio design, one of the four starting styles or the original look (this browser only).
+    if(this.styleSelect){this.styleSelect.replaceChildren(...UI_STYLES.map(style=>{const o=document.createElement('option');o.value=style.id;o.textContent=uiStyleLabel(style);return o;}));this.styleSelect.value=currentUiStyle()??storedUiStyle();
+      this.styleSelect.addEventListener('change',()=>applyUiStyle(this.styleSelect.value),options);}
     this.backgroundToggle?.addEventListener('change',()=>{this.settings.runInBackground=this.backgroundToggle.checked;saveSettings(storage,{runInBackground:this.settings.runInBackground});onChange(this.settings);},options);
     // Live while dragging; stored in this browser only, never in a save (#129).
     const setBrightness=value=>{this.settings.memoryBrightness=clampMemoryBrightness(value);this.syncBrightness();saveSettings(storage,{memoryBrightness:this.settings.memoryBrightness});onChange(this.settings);};

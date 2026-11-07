@@ -73,6 +73,7 @@ import { walkSmoke } from './walk-smoke.mjs';
 import { childrenSmoke } from './children-smoke.mjs';
 import { employmentSpreadSmoke } from './employment-spread-smoke.mjs';
 import { storageNoticesSmoke } from './storage-notices-smoke.mjs';
+import { uiThemeSmoke } from './ui-theme-smoke.mjs';
 
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
@@ -98,7 +99,10 @@ const origin=`http://127.0.0.1:${server.address().port}`;
 async function runSmoke(){let browser;
 try{
   const runtime=await browserRuntime();browser=await runtime.chromium.launch({executablePath:runtime.executablePath,args:['--no-sandbox','--disable-dev-shm-usage']});
-  const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage(),errors=[],requests=[];page.on('request',request=>requests.push(request.url()));
+  const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage(),errors=[],requests=[];
+  // UI Lab styles (m-ui-lab-do-hry): SMOKE_UI_STYLE=stone-castle (or olive, wood-iron, parchment, classic) runs the whole
+  // smoke in that style; without it the game uses the owner's Studio design, as players get it.
+  if(process.env.SMOKE_UI_STYLE)await context.addInitScript(style=>{try{localStorage.setItem('newgame.uiStyle',style);}catch{}},process.env.SMOKE_UI_STYLE);page.on('request',request=>requests.push(request.url()));
   const instrument=async p=>{
     p.on('pageerror',e=>errors.push(e.message));p.on('response',r=>{if(r.status()>=400)errors.push(`${r.status()} ${r.url()}`);});
     // Instrument the served copy only; no test globals are shipped in the game.
@@ -165,6 +169,7 @@ try{
   if(args.includes('--full')||args.includes('--children'))await childrenSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--employment-spread'))await employmentSpreadSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--storage-notices'))await storageNoticesSmoke(context,origin+base,instrument);
+  if(args.includes('--full')||args.includes('--ui-theme'))await uiThemeSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--ledger'))await ledgerSmoke(page);
   if(args.includes('--full')||args.includes('--smelting'))await smeltingSmoke(page);
   if(args.includes('--full')||args.includes('--military'))await militarySmoke(page);

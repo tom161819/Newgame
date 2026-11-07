@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.34.0] - 2026-11-07
+<!-- version: {"title":"UI Lab in the game","type":"feature","reconstructed":false,"saveVersion":54} -->
+### Changed
+- The game now uses the interface you designed in the Studio's UI Lab: olive colours, Cinzel small-capital headings, iron rivets, thicker frames and rounded corners, with the Settings, Employment and resource details rearranged as you set them. Settings has a new Interface style choice: your design, the four starting styles (Olive, Dark wood and iron, Parchment and ink, Stone castle) or the original look. The choice is stored in this browser only.
+
 ## [0.33.0] - 2026-11-07
 <!-- version: {"title":"Food menu warnings instead of locks","type":"feature","reconstructed":false,"saveVersion":54} -->
 ### Changed

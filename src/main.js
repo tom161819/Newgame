@@ -6,10 +6,15 @@ import '@fontsource-variable/figtree';
 import '@fontsource-variable/source-serif-4';
 import { initCompactHud } from './ui/CompactHud.js';
 import './style.css';
+import '../art/ui/ui-fonts.js';
+import '../art/ui/ui-theme.css';
+import { applyUiStyle } from './ui/UiTheme.js';
 
 for(const link of document.querySelectorAll('[data-version-archive]'))link.href=window.__NEWGAME_ARCHIVE_ROOT__??`${import.meta.env.BASE_URL}versions/`;
 
 initCompactHud();
+// UI Lab look and layout (owner's design from the Studio by default), before the main menu shows.
+applyUiStyle();
 
 // Canvas stays the default: shared terrain textures and simple shapes are fast
 // even without a GPU. ?renderer=webgl or ?renderer=auto opts into WebGL for testing.
