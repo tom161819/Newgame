@@ -8,6 +8,8 @@ export const ICON_SIZE = 40;
 export const SETS = Object.freeze({
   tax: { label: 'Taxes', levels: ['none', 'low', 'normal', 'high', 'very-high'], names: ['None', 'Low', 'Normal', 'High', 'Very high'] },
   ration: { label: 'Rations', levels: ['small', 'normal', 'generous'], names: ['Small', 'Normal', 'Generous'] },
+  // Domestic animals (g-domaci-zvirata-grafika): the cat and the hunting dog in the trade window and the panels.
+  pets: { label: 'Domestic animals', levels: ['cat', 'dog'], names: ['Cat', 'Hunting dog'] },
 });
 const OUT = 'outline', W = 1.4;
 
@@ -96,6 +98,44 @@ function basket(cx, baseY, contents) {
 
 // ---------- the sets ----------
 // Each look returns one shape list per level, from the least to the most.
+// ---------- domestic animals ----------
+// A tabby cat sitting in profile, tail curled round its paws.
+function catSitting() {
+  return [line('M15 35.5 Q5.5 36.5 6.5 29.5', OUT, 4.6), line('M15 35.5 Q5.5 36.5 6.5 29.5', 'horse_grey', 2.6),
+    path('M12.5 36.5 Q9.5 26 15 19.5 Q19.5 15.5 24.5 18.5 Q28.5 25 27.5 36.5 Z', 'horse_grey'),
+    line('M14 25 q2.5 1 4.5 0', 'stone_dark', 1.3), line('M13.2 29.5 q3 1.1 5.5 0', 'stone_dark', 1.3), line('M13.5 33.5 q3 1 5.5 0', 'stone_dark', 1.3),
+    path('M22.5 25 L23 36.5 L26.6 36.5 L26.2 24.5 Z', 'horse_grey'),
+    path('M18.6 11.5 L19.4 4.5 L24 9.6 Z', 'horse_grey'), path('M24.6 9.6 L29.6 5 L29.8 11.8 Z', 'horse_grey'),
+    circle(24.5, 14.5, 6.2, 'horse_grey'), line('M21.5 9.5 l1.5 2.6 M24.5 8.5 l0 2.8 M27.2 9.4 l-1.2 2.6', 'stone_dark', 1.1),
+    ellipse(27, 14, 1, 1.3, 'soot', null), path('M30.3 15.6 l-1.5 1.1 l-0.3 -1.5 Z', 'blossom', null), line('M29 17.5 l4.5 -0.6 M29 18.4 l4.3 0.8', OUT, 0.6)];
+}
+// A tan hound sitting in profile, with a brown ear and a red collar.
+function dogSitting() {
+  return [line('M10.5 33 Q4 30.5 5 23.5', OUT, 4.4), line('M10.5 33 Q4 30.5 5 23.5', 'wool', 2.4),
+    path('M8.5 37.5 Q7 28 13.5 23 Q19.5 19 25 21.5 L27.5 37.5 Z', 'wool'),
+    path('M21.5 24.5 Q21.5 15.5 26 11.5 L31.5 15.5 Q28.5 21.5 27.5 27 Z', 'wool'),
+    path('M22.5 25.5 L23 37.5 L26.8 37.5 L26.4 24.5 Z', 'wool'),
+    ellipse(28, 12.5, 6.2, 5.6, 'wool'), path('M31 10.5 L37.5 12.6 Q38.5 16.8 33.5 17.6 L30 17 Z', 'wool'),
+    ellipse(37.3, 13.4, 1.4, 1.2, 'soot', null), ellipse(29.6, 10.9, 1, 1.2, 'soot', null),
+    path('M24.3 9 Q21.8 15.5 24.2 20.5 Q27.6 17.5 27.8 9.6 Z', 'horse_dark'),
+    line('M22.3 20.2 Q26 22.6 30.2 18.6', OUT, 3.2), line('M22.3 20.2 Q26 22.6 30.2 18.6', 'cloth_red', 1.8), circle(26.2, 22.8, 1.2, 'gold')];
+}
+// Heads seen from the front: a ginger cat and a hound.
+function catHead() {
+  return [path('M10 18 L8.5 4.5 L18.5 11.5 Z', 'cloth_ochre'), path('M21.5 11.5 L31.5 4.5 L30 18 Z', 'cloth_ochre'),
+    path('M11.3 14.5 L10.6 8 L15.6 11.6 Z', 'blossom', null), path('M24.4 11.6 L29.4 8 L28.7 14.5 Z', 'blossom', null),
+    ellipse(20, 22, 11.5, 10.5, 'cloth_ochre'), line('M17 13 l1 3 M20 12 l0 3.2 M23 13 l-1 3', 'horse_chestnut', 1.3),
+    ellipse(20, 27.5, 5.6, 3.8, 'linen', null), ellipse(15.3, 20.5, 1.7, 2.4, 'soot', null), ellipse(24.7, 20.5, 1.7, 2.4, 'soot', null),
+    path('M18.4 24.6 L21.6 24.6 L20 26.4 Z', 'blossom', null), line('M14.5 27 l-7 -1 M14.5 28.5 l-7 1 M25.5 27 l7 -1 M25.5 28.5 l7 1', OUT, 0.6)];
+}
+function dogHead() {
+  return [ellipse(20, 20.5, 9.8, 11, 'wool'),
+    path('M12 12.5 Q4 17 6.5 30.5 Q10.8 31.5 13.2 24 Z', 'horse_dark'), path('M28 12.5 Q36 17 33.5 30.5 Q29.2 31.5 26.8 24 Z', 'horse_dark'),
+    ellipse(20, 27.5, 6.4, 5.2, 'linen'), ellipse(20, 24.8, 2.8, 1.9, 'soot', null), line('M20 26.5 l0 2.2 M17.5 29.5 q2.5 1.4 5 0', OUT, 0.8),
+    ellipse(16, 18.5, 1.4, 1.7, 'soot', null), ellipse(24, 18.5, 1.4, 1.7, 'soot', null),
+    path('M11.5 33 Q20 38 28.5 33 L28.5 36.2 Q20 41.2 11.5 36.2 Z', 'cloth_red'), circle(20, 38.8, 1.6, 'gold')];
+}
+
 const LOOKS = {
   tax: {
     heaps: () => [purseEmpty(20, 30),
@@ -116,6 +156,10 @@ const LOOKS = {
     basket: () => [[...cloth(20, 33), ...crust(19.5, 26)],
       [...bowl(17, 33, 13, 'heap'), ...crust(30.5, 30)],
       basket(20, 36, [...loaf(13, 19.5, 1.05), ...fish(26, 20.5), ...meat(18.5, 21.5), ...apple(27.5, 15.5, 4.4), ...apple(8.5, 21, 3.8)])],
+  },
+  pets: {
+    seated: () => [catSitting(), dogSitting()],
+    heads: () => [catHead(), dogHead()],
   },
 };
 

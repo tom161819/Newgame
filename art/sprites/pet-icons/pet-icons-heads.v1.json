@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "assetId": "pet-icons",
+  "variantId": "pet-icons-heads",
+  "name": "Heads from the front",
+  "category": "ui",
+  "version": 1,
+  "specHash": "94132f51",
+  "generator": "icon",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 88,
+  "height": 40,
+  "anchor": {
+    "x": 44,
+    "y": 40
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 1
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 44,
+    "y": 56
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 1.4
+  },
+  "visualHeight": 56,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0,
+  "lights": [],
+  "icons": [
+    {
+      "level": "cat",
+      "name": "Cat",
+      "size": 40,
+      "svg": "art/sprites/pet-icons/pet-icons-heads.v1.cat.svg",
+      "png": "art/sprites/pet-icons/pet-icons-heads.v1.cat.png",
+      "png2x": "art/sprites/pet-icons/pet-icons-heads.v1.cat@2x.png"
+    },
+    {
+      "level": "dog",
+      "name": "Hunting dog",
+      "size": 40,
+      "svg": "art/sprites/pet-icons/pet-icons-heads.v1.dog.svg",
+      "png": "art/sprites/pet-icons/pet-icons-heads.v1.dog.png",
+      "png2x": "art/sprites/pet-icons/pet-icons-heads.v1.dog@2x.png"
+    }
+  ]
+}

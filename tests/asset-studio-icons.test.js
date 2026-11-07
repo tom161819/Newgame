@@ -14,7 +14,9 @@ const json = file => JSON.parse(readFileSync(path.join(root, file), 'utf8'));
 const style = json('art/style-guide.json');
 const specs = readdirSync(path.join(root, 'art/assets')).flatMap(category => readdirSync(path.join(root, 'art/assets', category)).map(id => json(`art/assets/${category}/${id}/asset.json`)));
 const catalog = buildCatalog({ specs, generators: GENERATORS, style, gameDefinitions: objectDefinitions });
-const sets = catalog.studio.filter(asset => GENERATORS[asset.generator].kind === 'icon');
+const allSets = catalog.studio.filter(asset => GENERATORS[asset.generator].kind === 'icon');
+// The slider sets (taxes, rations) grow from level to level; the pet icons are a plain pair.
+const sets = allSets.filter(asset => asset.variants.every(v => v.spec.set === 'tax' || v.spec.set === 'ration'));
 const pngSize = file => { const data = readFileSync(path.join(root, file)); return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) }; };
 // How much of something an icon shows: the area of its gold (taxes) or food (rations) shapes.
 const GOLD = new Set(['gold', 'gold_dark']), FOOD = new Set(['porridge', 'bread', 'meat', 'apple', 'steel']);
@@ -66,4 +68,11 @@ test('exported icons: SVG and PNG at 1× and 2× for every level, matching the c
       assert.equal(readFileSync(path.join(root, icon.svg), 'utf8'), `${toSvg(drawn.shapes, style, drawn.fit)}\n`, `${icon.svg} is current`);
     }
   }
+});
+
+test('domestic animal icons: a cat and a hunting dog in two looks, valid UI specs', () => {
+  const pets = allSets.find(asset => asset.id === 'pet-icons');
+  assert.ok(pets);assert.equal(pets.category, 'ui');assert.ok(pets.variants.length >= 2);
+  assert.deepEqual(validateAssetSpec(specs.find(s => s.id === 'pet-icons'), { generators: GENERATORS, style }), []);
+  for (const variant of pets.variants) assert.deepEqual(icons(variant.spec).map(i => i.level), ['cat', 'dog']);
 });
