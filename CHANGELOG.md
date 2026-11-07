@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.37.0] - 2026-11-07
+<!-- version: {"title":"Kingdom Policy and Employments cards","type":"feature","reconstructed":false,"saveVersion":54} -->
+### Added
+- Two more pop-out cards beside Population: Kingdom Policy above it and Employments below it. A tab opens and closes each card, and opening one card closes the others.
+  - The Policy card shows the same sliders and overview as the Castle panel; a change in either place shows in the other.
+  - The Employments card is the Castle's employment window, so clicking the Castle still opens it.
+
 ## [0.36.0] - 2026-11-07
 <!-- version: {"title":"Kingdom Policy sliders","type":"feature","reconstructed":false,"saveVersion":54} -->
 ### Changed

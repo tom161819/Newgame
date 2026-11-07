@@ -5,14 +5,17 @@ import { createPolicySlider } from './PolicySliders.js';
 
 // #103: the Kingdom policy section of the Castle panel (tax rate and food rations with their effects).
 export class PolicyPanel {
-  constructor(scene){
-    this.scene=scene;this.controller=new AbortController();const taxSlot=document.querySelector('#policy-tax-slot'),rationSlot=document.querySelector('#policy-rations-slot');
+  // `root` is the Kingdom policy section: the Castle panel's (default) or the Kingdom Policy card's copy. Parts are found by
+  // data-policy roles inside it, so both show the same policy with the same code; only the Castle's sliders keep the old ids.
+  constructor(scene,{root=document.querySelector('section.kingdom-policy'),ids=true}={}){
+    this.root=root;const $=role=>root?.querySelector(`[data-policy="${role}"]`)??null;this.$=$;
+    this.scene=scene;this.controller=new AbortController();const taxSlot=$('tax-slot'),rationSlot=$('rations-slot');
     if(!taxSlot||!rationSlot||!scene.policy)return;const options={signal:this.controller.signal};
     // Owner request (7 Nov): sliders with level icons instead of the two selects (see PolicySliders.js).
-    this.sliders=[createPolicySlider(scene,'tax',{id:'policy-tax'}),createPolicySlider(scene,'rations',{id:'policy-rations'})];taxSlot.replaceChildren(this.sliders[0].root);rationSlot.replaceChildren(this.sliders[1].root);
+    this.sliders=[createPolicySlider(scene,'tax',{id:ids?'policy-tax':null}),createPolicySlider(scene,'rations',{id:ids?'policy-rations':null})];taxSlot.replaceChildren(this.sliders[0].root);rationSlot.replaceChildren(this.sliders[1].root);
     this.tax=this.sliders[0].input;this.rations=this.sliders[1].input;
-    document.querySelector('#policy-cancel')?.addEventListener('click',()=>scene.policy.cancel(),options);
-    document.querySelector('#policy-feast')?.addEventListener('click',()=>{if(scene.policy.holdFeast())scene.updateInventory?.();this.render();},options);
+    $('cancel')?.addEventListener('click',()=>scene.policy.cancel(),options);
+    $('feast')?.addEventListener('click',()=>{if(scene.policy.holdFeast())scene.updateInventory?.();this.render();},options);
     this.unsubscribe=scene.policy.onChange(()=>this.render());this.render();
     // The overview follows the day (income, food, Happiness): refreshed every second while the Castle panel is open.
     this.timer=setInterval(()=>{if(!this.tax.closest('[hidden]'))this.render();},1000);
@@ -23,19 +26,19 @@ export class PolicyPanel {
     if(!this.tax)return;const p=this.scene.policy;
     for(const slider of this.sliders??[])slider.render();
     const residents=p.residents().length,rate=TAX_RATES[p.tax],ration=RATIONS[p.rations];
-    document.querySelector('#policy-tax-effect').textContent=t('policy.taxEffect',{each:rate.perResident.toFixed(2),total:p.dailyTaxes().toFixed(2),count:residents,happiness:this.signed(rate.happiness)});
-    document.querySelector('#policy-rations-effect').textContent=t('policy.rationsEffect',{portions:ration.portions,cap:ration.foodCap,happiness:this.signed(ration.happiness)});
+    this.$('tax-effect').textContent=t('policy.taxEffect',{each:rate.perResident.toFixed(2),total:p.dailyTaxes().toFixed(2),count:residents,happiness:this.signed(rate.happiness)});
+    this.$('rations-effect').textContent=t('policy.rationsEffect',{portions:ration.portions,cap:ration.foodCap,happiness:this.signed(ration.happiness)});
     // Policy v2 P1: what changes tomorrow, the daily balance, the Happiness forecast and the strike risk.
-    const pending=document.querySelector('#policy-pending');if(!pending)return;pending.hidden=!p.pending;
-    if(p.pending){const changes=[];if(p.pending.tax!==p.tax)changes.push(t('policy.pendingTax',{tax:t(`policy.tax.${p.pending.tax}`)}));if(p.pending.rations!==p.rations)changes.push(t('policy.pendingRations',{rations:t(`policy.rations.${p.pending.rations}`)}));document.querySelector('#policy-pending-text').textContent=t('policy.fromTomorrow',{changes:changes.join(', ')});}
-    const b=p.balance();document.querySelector('#policy-gold').textContent=t('policy.goldBalance',{castle:this.money(b.castle),taxes:this.money(b.taxes),trade:this.money(b.trade),wages:this.money(-b.wages),total:this.money(b.total)})+(b.nextTotal!==null&&b.nextTotal!==b.total?` ${t('policy.goldTomorrow',{total:this.money(b.nextTotal)})}`:'');
-    const f=p.food();document.querySelector('#policy-food').textContent=f?t('policy.foodBalance',{produced:f.production.toFixed(1),eaten:f.consumption.toFixed(1),net:this.money(f.net).replace(/\.(\d)\d$/,'.$1'),days:Number.isFinite(f.days)?Math.floor(f.days):'∞'}):'';
+    const pending=this.$('pending');if(!pending)return;pending.hidden=!p.pending;
+    if(p.pending){const changes=[];if(p.pending.tax!==p.tax)changes.push(t('policy.pendingTax',{tax:t(`policy.tax.${p.pending.tax}`)}));if(p.pending.rations!==p.rations)changes.push(t('policy.pendingRations',{rations:t(`policy.rations.${p.pending.rations}`)}));this.$('pending-text').textContent=t('policy.fromTomorrow',{changes:changes.join(', ')});}
+    const b=p.balance();this.$('gold').textContent=t('policy.goldBalance',{castle:this.money(b.castle),taxes:this.money(b.taxes),trade:this.money(b.trade),wages:this.money(-b.wages),total:this.money(b.total)})+(b.nextTotal!==null&&b.nextTotal!==b.total?` ${t('policy.goldTomorrow',{total:this.money(b.nextTotal)})}`:'');
+    const f=p.food();this.$('food').textContent=f?t('policy.foodBalance',{produced:f.production.toFixed(1),eaten:f.consumption.toFixed(1),net:this.money(f.net).replace(/\.(\d)\d$/,'.$1'),days:Number.isFinite(f.days)?Math.floor(f.days):'∞'}):'';
     const summary=this.scene.needs?.summary?.(),now=summary?.happiness;
     const target=p.pending?p.target(p.pending):p.target(),change=target-p.happiness(),days=Math.ceil(Math.abs(change)/5-1e-9)+(p.pending?1:0);
-    document.querySelector('#policy-happiness').textContent=now==null?t('policy.happinessNone'):Math.abs(change)<.5?t('policy.happinessSteady',{now}):t('policy.happinessForecast',{now,next:Math.max(0,Math.min(100,Math.round(now+change))),days});
+    this.$('happiness').textContent=now==null?t('policy.happinessNone'):Math.abs(change)<.5?t('policy.happinessSteady',{now}):t('policy.happinessForecast',{now,next:Math.max(0,Math.min(100,Math.round(now+change))),days});
     // Policy v2 P3: the Feast button with its cost, or why it cannot be held now.
-    const feast=p.feastStatus(),button=document.querySelector('#policy-feast');if(button){button.disabled=!feast.ok;document.querySelector('#policy-feast-status').textContent=p.feastBonus()?t('policy.feastRunning',{days:p.feastDaysLeft().toFixed(1)}):feast.ok?t('policy.feastCost',feast.cost):t(`policy.feastNo.${feast.reason}`,{days:feast.days??0,...feast.cost});}
-    const risk=document.querySelector('#policy-risk');risk.hidden=!summary?.atRisk;if(summary?.atRisk)risk.textContent=t('policy.risk',{count:summary.atRisk});
+    const feast=p.feastStatus(),button=this.$('feast');if(button){button.disabled=!feast.ok;this.$('feast-status').textContent=p.feastBonus()?t('policy.feastRunning',{days:p.feastDaysLeft().toFixed(1)}):feast.ok?t('policy.feastCost',feast.cost):t(`policy.feastNo.${feast.reason}`,{days:feast.days??0,...feast.cost});}
+    const risk=this.$('risk');risk.hidden=!summary?.atRisk;if(summary?.atRisk)risk.textContent=t('policy.risk',{count:summary.atRisk});
   }
   destroy(){this.controller.abort();this.unsubscribe?.();clearInterval(this.timer);for(const slider of this.sliders??[])slider.destroy();}
 }

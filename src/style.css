@@ -689,3 +689,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .policy-slider .policy-icon svg { display:block; width:40px; height:40px; }
 .policy-slider input[type=range] { grid-area:range; width:100%; min-width:120px; accent-color:#e3c57a; }
 .policy-slider .policy-level { grid-area:level; text-align:right; font-variant:small-caps; color:#e3c57a; }
+
+/* Side cards (owner, 7 Nov): Kingdom Policy above Population, Employments below; positioned by SideCards.place(). */
+.side-card-tab { top:auto; }
+.policy-card { z-index:31; }
+html[data-ui-population="left"] :is(.policy-card, .employment-panel) { right:auto; left:52px; }
+.policy-card-section h4 { margin-top:10px; }

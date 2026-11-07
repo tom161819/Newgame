@@ -16,7 +16,7 @@ export async function policySmoke(context,url,instrument){
     await page.locator('#policy-tax').waitFor({state:'visible'});
     assert.equal(await level(page,'#policy-tax'),'normal');assert.equal(await level(page,'#policy-rations'),'normal');
     await slide(page,'#policy-tax','high');await slide(page,'#policy-rations','generous');
-    assert.equal(await page.locator('.policy-slider-tax .policy-icon').getAttribute('data-icon'),'tax:high','a heap of gold');
+    assert.equal(await page.locator('#employment-panel .policy-slider-tax .policy-icon').getAttribute('data-icon'),'tax:high','a heap of gold');
     // Policy v2 P1: the choice waits for the morning; the panel says so and offers Cancel.
     await page.locator('#policy-pending:not([hidden])').waitFor();assert.match(await page.locator('#policy-pending-text').textContent(),/From tomorrow: High taxes, Generous .* rations\./);
     assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.policy.tax),'normal');assert.equal(await level(page,'#policy-tax'),'high','the slider shows the pending level');
@@ -30,12 +30,12 @@ export async function policySmoke(context,url,instrument){
     assert.equal(await page.locator('#policy-pending').isHidden(),true);assert.match(await page.locator('#policy-happiness').textContent(),/Happiness \d+/);
     await slide(page,'#policy-tax','none');await page.locator('#policy-cancel').click();assert.equal(await page.locator('#policy-pending').isHidden(),true);
     // Very high taxes show the big chest of gold; then back.
-    await slide(page,'#policy-tax','very_high');assert.equal(await page.locator('.policy-slider-tax .policy-icon').getAttribute('data-icon'),'tax:very_high');await page.locator('#policy-cancel').click();
+    await slide(page,'#policy-tax','very_high');assert.equal(await page.locator('#employment-panel .policy-slider-tax .policy-icon').getAttribute('data-icon'),'tax:very_high');await page.locator('#policy-cancel').click();
     // Policy v2 P2: Small rations (set in the Granary window) cap the Food need at 60 the next morning; the Castle slider follows.
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,st=s.foodStorage,g=s.objectRegistry.require('granary');let spot=null;const c=s.character.tile;
       for(let r=4;r<25&&!spot;r++)for(let y=c.y-r;y<=c.y+r&&!spot;y++)for(let x=c.x-r;x<=c.x+r&&!spot;x++){const tiles=[];for(let dy=0;dy<g.height;dy++)for(let dx=0;dx<g.width;dx++)tiles.push({x:x+dx,y:y+dy});if(tiles.every(t=>s.map[t.y]?.[t.x]===0&&!s.resourceOccupancy.has(`${t.x},${t.y}`)&&!s.reservedTiles().some(p=>p.x===t.x&&p.y===t.y)))spot={x,y,tiles};}
       const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type:'granary',definition:g,x:spot.x,y:spot.y,tiles:spot.tiles};s.buildings.push(b);for(const t of spot.tiles)s.map[t.y][t.x]=1;s.towerViews.set(b.id,s.createBuildingView(g,b));st.register(b);s.events.emit('buildings:changed');s.employmentPanel.close?.();s.storagePanel.open(b);});
-    await page.locator('#granary-rations').waitFor({state:'visible'});await slide(page,'#granary-rations','small');assert.equal(await page.locator('.policy-slider-rations .policy-icon').first().getAttribute('data-icon'),'rations:small');
+    await page.locator('#granary-rations').waitFor({state:'visible'});await slide(page,'#granary-rations','small');assert.equal(await page.locator('#storage-dialog .policy-slider-rations .policy-icon').getAttribute('data-icon'),'rations:small');
     await page.keyboard.press('Escape');await page.evaluate(()=>window.__game.registry.get('application').scene.employmentPanel.open());assert.equal(await level(page,'#policy-rations'),'small','the same policy in the Castle panel');
     const cap=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.gameTime.update(s.gameTime.dayDuration-s.gameTime.elapsed+1);const w=s.policy.residents()[0];return s.needs.status(w).foodCap;});
     assert.equal(cap,60);assert.match(await page.locator('#policy-rations-effect').textContent(),/at most 60/);
