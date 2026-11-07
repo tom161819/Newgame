@@ -104,6 +104,8 @@ export function loadGameState(scene,input){
   scene.experienceSystem?.importState(state.experienceSystem);
   scene.skillSystem?.importState(state.skillSystem);scene.workerSystem?.importState(state.population);
   if(scene.workerSystem&&state.workers===undefined)scene.workerSystem.spawnInitial();
+  // Children D1: after the residents and their homes, so the same children come back where they were.
+  scene.childrenSystem?.importState(state.children);
   scene.wageSystem?.importState(state.wages);
   scene.resourceLedger?.importState(state.resourceLedger);
   scene.workplaceSystem?.importState(state.workplaces);

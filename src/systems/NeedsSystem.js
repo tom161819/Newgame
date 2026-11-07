@@ -91,8 +91,10 @@ export class NeedsSystem {
     const variety=this.scene.foodSystem?.varietyBonus?.(worker.id)??0,kinds=this.scene.foodSystem?.recentKinds?.(worker.id)?.length??0,feast=this.scene.policy?.feastBonus?.()??0;
     // Domestic animals Z1: a cat living in the resident's house.
     const house=home?.kind==='house'?this.scene.buildings?.find(b=>b.id===home.buildingId):null,cat=this.scene.domestic?.catAtHome?.(house)?CATS.homeHappiness:0;
-    const happiness=happinessOf(needs,penalty-policy+contextTotal-variety-feast-cat),mood=moodFor(happiness),foodCap=this.scene.policy?.foodCap?.()??100;
-    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,policyTarget:this.scene.policy?.target?.()??0,policyContext:context,foodCap,variety,varietyKinds:kinds,feast,cat,feastDaysLeft:this.scene.policy?.feastDaysLeft?.()??0,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty,Math.max(0,-policy)+contextTotal),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
+    // Children D1: a Village Green within reach of the house (+4) and, for a family house, a place for the children (+2).
+    const greenBonus=this.scene.childrenSystem?.greenBonus?.(house,homes)??{near:0,family:0},green=greenBonus.near,greenFamily=greenBonus.family;
+    const happiness=happinessOf(needs,penalty-policy+contextTotal-variety-feast-cat-green-greenFamily),mood=moodFor(happiness),foodCap=this.scene.policy?.foodCap?.()??100;
+    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,policyTarget:this.scene.policy?.target?.()??0,policyContext:context,foodCap,variety,varietyKinds:kinds,feast,cat,green,greenFamily,feastDaysLeft:this.scene.policy?.feastDaysLeft?.()??0,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty,Math.max(0,-policy)+contextTotal),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
   }
   summary(){
     const homes=this.homes(),list=this.residents().map(w=>this.status(w,homes));

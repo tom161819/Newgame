@@ -69,6 +69,7 @@ export default {
   'object.treasure_chest.name':'Treasure Chest','object.treasure_chest.description':'An iron-bound wooden chest with 50–100 Gold, a Sword and Armor. Its contents can be taken once.',
   'job.idle':'Unemployed','job.woodcutter':'Woodcutter','job.miner':'Miner','job.fisher':'Fisher','job.hunter':'Hunter','job.builder':'Builder','job.farmer':'Farmer','job.miller':'Miller','job.baker':'Baker','job.smelter_operator':'Smelter Operator','job.hauler':'Hauler','job.soldier':'Soldier',
   'skill.woodcutting':'Woodcutting','skill.mining':'Mining','skill.hunting':'Hunting','skill.fishing':'Fishing','skill.construction':'Construction','skill.farming':'Farming','skill.combat':'Combat','skill.milling':'Milling','skill.baking':'Baking','skill.logistics':'Logistics','skill.smelting':'Smelting',
+  'object.village_green.name':"Village Green",'object.village_green.description':"A grass square with a linden tree where children play and neighbours meet in the evening. Houses within 10 tiles: +4 happiness, family houses +2 more.",'object.village_green.unlock':"Requires a completed House before placing a Village Green.",
   'object.marketplace.name':'Marketplace','object.marketplace.description':'A market square with stalls where merchant caravans will trade. Goods space for 80 units and 2 loading spots.','object.marketplace.unlock':'Requires a completed Warehouse before placing a Marketplace.',
   'object.wall_gate.name':'Gate','object.wall_gate.description':'A gate in the wall: people pass through it, and from it you climb up to the wall walk.',
 };

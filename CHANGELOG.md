@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.29.0] - 2026-11-07
+<!-- version: {"title":"Children and the Village Green","type":"feature","reconstructed":false,"saveVersion":54} -->
+### Added
+- Children and the Village Green. Houses with at least two residents have up to three children. Children are not residents: they don't eat, work or count towards the population. By day they play tag, roll hoops and kick balls near their house or on a Village Green, in summer by the water, and in winter about half of them go out to throw snowballs and build snowmen. At rest time they go home, and they run home when a wild boar comes near. The Village Green (Housing, 10 Wood + 6 Stone, after the first House) is a 3×3 grass square people walk across. Houses within 10 tiles get +4 happiness, family houses +2 more. Its placement preview and panel show the reach. In the evening a few neighbours sit there, and during a Feast everyone gathers on the nearest green. Click a House to see its residents and children, or a child to see who it is.
+
 ## [0.28.0] - 2026-11-07
 <!-- version: {"title":"Walk cycle","type":"feature","reconstructed":false,"saveVersion":53} -->
 ### Improved

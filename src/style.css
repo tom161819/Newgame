@@ -656,6 +656,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 /* Domestic animals Z1: cat panel */
 .cat-dialog { min-width:300px; max-width:440px; }
+.village-dialog { min-width:300px; max-width:440px; }
+.village-dialog p { margin:6px 0; }
+.village-help { font-size:13px; color:#c8bd9c; }
 .cat-homes { list-style:none; padding:0; margin:6px 0; display:grid; gap:4px; }
 .cat-homes button { width:100%; text-align:left; padding:6px 10px; }
 .cat-help, .cat-state { font-size:13px; color:#c8bd9c; }
