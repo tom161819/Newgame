@@ -214,8 +214,8 @@
     {
       "id": "builders-workshop-material-yard",
       "name": "Material yard with shed (3 × 3)",
-      "version": 3,
-      "notes": "Revision 3 (owner: the shed should have a closed side wall, a carpenter's bench or workbench with tools visible underneath, and the fence should have an entrance): plank wall with a small window on the side the camera sees, a bench with vise, saw, mallet and plane under the roof, a tool board on the back wall, a lantern, and a gateway in the front fence.",
+      "version": 4,
+      "notes": "Revision 3 (owner: the shed should have a closed side wall, a carpenter's bench or workbench with tools visible underneath, and the fence should have an entrance): plank wall with a small window on the side the camera sees, a bench with vise, saw, mallet and plane under the roof, a tool board on the back wall, a lantern, and a gateway in the front fence. Revision 4 (owner: no torch): the door/shed torch is gone.",
       "spec": {
         "body": {
           "kind": "shed",
@@ -224,7 +224,7 @@
           "frontHeight": 0.95,
           "backHeight": 0.55,
           "sideWall": "both",
-          "lantern": true,
+          "lantern": false,
           "at": [
             -0.6,
             -0.84

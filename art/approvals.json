@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-07T11:30:00.000Z",
+  "updatedAt": "2026-11-07T11:10:00.000Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -67,16 +67,34 @@
       "variants": {
         "bakery-house-yard-oven": {
           "status": "review",
-          "version": 2,
-          "specHash": "9ef1acab",
-          "note": "Revision 2 for review (owner's comments in the history).",
-          "updatedAt": "2026-11-07T11:30:00.000Z",
+          "version": 3,
+          "specHash": "2e7c77dd",
+          "note": "Revision 3 for review (owner's comments in the history).",
+          "updatedAt": "2026-11-07T11:10:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T10:10:01.331Z",
               "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
               "text": "ať to vpydá více jako pekárna",
               "version": 1
+            },
+            {
+              "at": "2026-11-07T10:44:54.108Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "stánek pěknej, ať ho nemá ale před dveřma, budova by mohla být větší  třeba 3x2 a nějakým způsobem být vidět pekařská pec",
+              "version": 2
+            },
+            {
+              "at": "2026-11-07T10:44:56.720Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "stánek pěknej, ať ho nemá ale před dveřma, budova by mohla být větší  třeba 3x2 a nějakým způsobem být vidět pekařská pec",
+              "version": 2
+            },
+            {
+              "at": "2026-11-07T10:45:00.454Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "stánek pěknej, ať ho nemá ale před dveřma, budova by mohla být větší  třeba 3x2 a nějakým způsobem být vidět pekařská pec",
+              "version": 2
             }
           ],
           "history": [
@@ -85,6 +103,12 @@
               "specHash": "71125ed5",
               "status": "revision-requested",
               "at": "2026-11-07T10:10:01.332Z"
+            },
+            {
+              "version": 2,
+              "specHash": "9ef1acab",
+              "status": "revision-requested",
+              "at": "2026-11-07T10:45:00.454Z"
             }
           ]
         }
@@ -185,16 +209,28 @@
         },
         "builders-workshop-material-yard": {
           "status": "review",
-          "version": 3,
-          "specHash": "7061dcf2",
-          "note": "Revision 3 for review (owner's comments in the history).",
-          "updatedAt": "2026-11-07T11:30:00.000Z",
+          "version": 4,
+          "specHash": "22170ec8",
+          "note": "Revision 4 for review (owner's comments in the history).",
+          "updatedAt": "2026-11-07T11:10:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T10:11:53.944Z",
               "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
               "text": "přístřešek ať má uzavřenou boční stěnu a je pod ním vidět dělnický stůl nebo ponk s nářadí, plot ať má vstup",
               "version": 2
+            },
+            {
+              "at": "2026-11-07T10:45:40.684Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to e mi líbí, ale odtraň tu pochoden",
+              "version": 3
+            },
+            {
+              "at": "2026-11-07T10:47:13.445Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "bez pochodně",
+              "version": 3
             }
           ],
           "history": [
@@ -209,6 +245,12 @@
               "specHash": "2baaace1",
               "status": "revision-requested",
               "at": "2026-11-07T10:11:53.944Z"
+            },
+            {
+              "version": 3,
+              "specHash": "7061dcf2",
+              "status": "revision-requested",
+              "at": "2026-11-07T10:47:13.445Z"
             }
           ]
         },
@@ -225,11 +267,13 @@
       "preferred": "farmstead-thatched",
       "variants": {
         "farmstead-thatched": {
-          "status": "review",
-          "version": 2,
+          "approvedAt": "2026-11-07T10:45:58.711Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "d08716a4",
-          "note": "Revision 2 for review (owner's comments in the history).",
-          "updatedAt": "2026-11-07T11:30:00.000Z",
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:45:58.711Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T10:13:54.020Z",
@@ -252,6 +296,14 @@
               "at": "2026-11-07T10:14:38.880Z"
             }
           ]
+        },
+        "farmstead-stone": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "af2a97c1",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:46:02.549Z",
+          "version": 1
         }
       }
     },
@@ -281,10 +333,10 @@
       "variants": {
         "house-timber": {
           "status": "review",
-          "version": 2,
-          "specHash": "65a79400",
-          "note": "Revision 2 for review (owner's comments in the history).",
-          "updatedAt": "2026-11-07T11:30:00.000Z",
+          "version": 3,
+          "specHash": "8b6116fc",
+          "note": "Revision 3 for review (owner's comments in the history).",
+          "updatedAt": "2026-11-07T11:10:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T10:15:06.484Z",
@@ -297,6 +349,18 @@
               "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
               "text": "vylepšit, více detailů",
               "version": 1
+            },
+            {
+              "at": "2026-11-07T10:46:25.256Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "bez pochodně",
+              "version": 2
+            },
+            {
+              "at": "2026-11-07T10:46:29.767Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "bez pochodně",
+              "version": 2
             }
           ],
           "history": [
@@ -305,6 +369,12 @@
               "specHash": "90ec1a7b",
               "status": "revision-requested",
               "at": "2026-11-07T10:15:14.787Z"
+            },
+            {
+              "version": 2,
+              "specHash": "65a79400",
+              "status": "revision-requested",
+              "at": "2026-11-07T10:46:29.767Z"
             }
           ]
         }
@@ -336,11 +406,13 @@
       "preferred": "iron-mine-adit",
       "variants": {
         "iron-mine-adit": {
-          "status": "review",
-          "version": 2,
+          "approvedAt": "2026-11-07T10:46:54.251Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "d2139820",
-          "note": "Revision 2 for review (owner's comments in the history).",
-          "updatedAt": "2026-11-07T11:30:00.000Z",
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:46:54.251Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T09:45:10.677Z",
@@ -359,11 +431,12 @@
           ]
         },
         "iron-mine-headframe": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "7af560d5",
-          "note": "Proposed by Claude for review (#92); the game keeps its current drawing until one variant is approved.",
-          "updatedAt": "2026-11-06T18:45:00.000Z"
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:46:56.439Z",
+          "version": 1
         }
       }
     },

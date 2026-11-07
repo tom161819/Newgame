@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "bakery-house",
+  "variantId": "bakery-house-yard-oven",
+  "name": "Bakery with yard oven",
+  "category": "buildings",
+  "version": 3,
+  "specHash": "2e7c77dd",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 163,
+  "height": 147,
+  "anchor": {
+    "x": 81,
+    "y": 105
+  },
+  "origin": {
+    "x": 0.49693,
+    "y": 0.71429
+  },
+  "footprint": {
+    "width": 3,
+    "height": 2
+  },
+  "base": {
+    "x": 97,
+    "y": 145
+  },
+  "baseOrigin": {
+    "x": 0.59509,
+    "y": 0.98639
+  },
+  "visualHeight": 145,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "brazier",
+      "x": 16.61,
+      "y": -36.77,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    }
+  ],
+  "modelHeight": 2.24,
+  "lights": [
+    {
+      "type": "brazier",
+      "x": 113.61,
+      "y": 108.23,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    }
+  ]
+}

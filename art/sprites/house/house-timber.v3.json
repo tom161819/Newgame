@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "house",
+  "variantId": "house-timber",
+  "name": "Half-timbered with thatch",
+  "category": "buildings",
+  "version": 3,
+  "specHash": "8b6116fc",
+  "generator": "house",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 143,
+  "anchor": {
+    "x": 65,
+    "y": 109
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.76224
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 141
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98601
+  },
+  "visualHeight": 141,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.49,
+  "lights": []
+}

@@ -307,3 +307,20 @@ Object.assign(PROPS, {
     return out;
   },
 });
+
+// Bakery revision 3: the bread oven in its own open shed beside the house, so the oven itself is the landmark:
+// a big stone dome on a plinth with a glowing mouth toward +z, a flue, a tiled roof on four posts.
+Object.assign(PROPS, {
+  ovenShed: (x, z, { width = 0.8, depth = 0.75 } = {}) => {
+    const out = [box([width - 0.06, 0.16, depth - 0.12], [x, 0, z - 0.02], 'stone_dark'),
+      sphere([width * 0.4, 0.26, depth * 0.36], [x, 0.14, z - 0.06], 'stone_light', 1),
+      box([0.2, 0.15, 0.06], [x + 0.02, 0.16, z + depth * 0.3], 'soot'), box([0.15, 0.08, 0.04], [x + 0.02, 0.17, z + depth * 0.33], 'coals'),
+      box([0.24, 0.035, 0.08], [x + 0.02, 0.31, z + depth * 0.3], 'stone'),
+      box([0.12, 0.62, 0.12], [x - width * 0.22, 0.3, z - depth * 0.22], 'stone')];
+    for (const [dx, dz, h] of [[-1, -1, 0.66], [1, -1, 0.66], [-1, 1, 0.82], [1, 1, 0.82]]) out.push(box([0.06, h, 0.06], [x + dx * (width / 2 - 0.04), 0, z + dz * (depth / 2 - 0.04)], 'wood_dark'));
+    const steps = 5;
+    for (let i = 0; i < steps; i++) { const t = (i + 0.5) / steps; out.push(box([width + 0.1, 0.035, (depth + 0.14) / steps + 0.03], [x, 0.66 + 0.16 * t, z - depth / 2 - 0.07 + t * (depth + 0.14)], 'roof_tile')); }
+    out.lights = [{ type: 'brazier', at: [x + 0.02, 0.22, z + depth * 0.36] }];
+    return out;
+  },
+});

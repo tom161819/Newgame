@@ -297,7 +297,8 @@ test('approved production buildings use their Asset Studio exports byte for byte
       // The owner asked for a rework of art the game already uses: the game keeps the exported version (it is in the
       // record's history with the same spec) until the new version is approved and wired in.
       assert.ok((record.history ?? []).some(h => h.version === meta.version && h.specHash === meta.specHash), `${gameId}: v${meta.version} is in the history`);
-      assert.ok(['review', 'revision-requested'].includes(record.status), `${gameId}: the new version is still being reviewed`);
+      // The new version is under review, or approved and waiting for Mechaniky to wire it in.
+      assert.ok(['review', 'revision-requested', 'approved'].includes(record.status), `${gameId}: the new version is reviewed or approved`);
     } else {
       assert.equal(record.status, 'approved', gameId);
       assert.equal(record.specHash, meta.specHash);

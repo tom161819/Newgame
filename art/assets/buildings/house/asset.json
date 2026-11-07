@@ -13,8 +13,8 @@
     {
       "id": "house-timber",
       "name": "Half-timbered with thatch",
-      "version": 2,
-      "notes": "Revision 2 (owner: improve, more detail): diagonal braces in the timber frame, shutter pairs and flower boxes, a framed door with a plank canopy and a stone step, a ridge cap and a chimney; a bench by the door, a woodpile with a chopping block and a rain barrel.",
+      "version": 3,
+      "notes": "Revision 2 (owner: improve, more detail): diagonal braces in the timber frame, shutter pairs and flower boxes, a framed door with a plank canopy and a stone step, a ridge cap and a chimney; a bench by the door, a woodpile with a chopping block and a rain barrel. Revision 3 (owner: no torch): the door/shed torch is gone.",
       "spec": {
         "walls": "timber",
         "width": 1.35,
@@ -25,7 +25,7 @@
         "roofMaterial": "thatch",
         "windows": 1,
         "chimney": true,
-        "lantern": true,
+        "lantern": false,
         "details": true,
         "props": [
           {

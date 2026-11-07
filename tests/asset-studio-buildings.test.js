@@ -113,14 +113,19 @@ test('revision 7 Nov (second): mine hill, builder yard v3, bakery v2 and farmste
     assert.deepEqual(checkModel(model, { footprint: a.footprint, style }), []); }
   // Builder's yard v3: a closed side wall the camera sees, a carpenter's bench with tools under the roof, a gateway.
   { const { a, v, model } = build('builders-workshop', 'builders-workshop-material-yard');
-    assert.equal(v.version, 3); assert.equal(v.spec.body.sideWall, 'both');
+    assert.equal(v.version, 4); assert.equal(v.spec.body.sideWall, 'both');
+    assert.ok(!model.lights.some(l => l.type === 'torch'), 'v4: no torch (owner)');
     for (const type of ['carpenterBench', 'toolBoard', 'gateway']) assert.ok(v.spec.props.some(p => p.type === type), type);
     assert.ok(PROPS.carpenterBench(0, 0, {}).some(p => p.material === 'steel'), 'a saw on the bench');
     assert.deepEqual(checkModel(model, { footprint: a.footprint, style }), []); }
-  // Bakery v2: a bread stall with loaves, a pretzel sign, bread baskets and a baker's peel by the oven.
+  // Bakery v3 on 3x2: the domed oven in its own open shed (glowing mouth, flue), the stall in the yard corner away
+  // from the door, a pretzel sign, bread baskets and a baker's peel.
   { const { a, v, model } = build('bakery-house', 'bakery-house-yard-oven');
-    assert.equal(v.version, 2);
-    for (const type of ['breadStall', 'bakerSign', 'breadBasket', 'peel', 'oven']) assert.ok(v.spec.props.some(p => p.type === type), type);
+    assert.equal(v.version, 3); assert.deepEqual(a.footprint, { width: 3, height: 2 });
+    for (const type of ['ovenShed', 'breadStall', 'bakerSign', 'breadBasket', 'peel']) assert.ok(v.spec.props.some(p => p.type === type), type);
+    assert.ok(model.lights.some(l => l.type === 'brazier'), 'the oven glows');
+    const stall = v.spec.props.find(p => p.type === 'breadStall'), body = v.spec.body, doorX = body.at[0] - body.width * 0.18;
+    assert.ok(Math.abs(stall.at[0] - doorX) > 0.8, 'the stall is not in front of the door');
     assert.ok(PROPS.breadStall(0, 0, {}).filter(p => p.material === 'cloth_ochre').length >= 5, 'loaves on the stall');
     assert.deepEqual(checkModel(model, { footprint: a.footprint, style }), []); }
   // Farmstead v2 on 3x3: haycocks, a tool rack, a plough, a hen house and grain sacks.
@@ -132,7 +137,7 @@ test('revision 7 Nov (second): mine hill, builder yard v3, bakery v2 and farmste
 
 test('house v2 details: braces, flower boxes, door canopy and yard props; houses without details are unchanged', () => {
   const house = json('art/assets/buildings/house/asset.json'), timber = house.variants.find(v => v.id === 'house-timber');
-  assert.equal(timber.version, 2); assert.equal(timber.spec.details, true);
+  assert.equal(timber.version, 3); assert.equal(timber.spec.details, true); assert.equal(timber.spec.lantern, false, 'v3: no torch (owner)');
   const model = GENERATORS.house.build(timber.spec, { footprint: house.footprint, style });
   assert.ok(model.primitives.some(p => p.material === 'blossom'), 'flower boxes');
   assert.ok(model.primitives.some(p => p.tilt && p.material === 'wood_dark'), 'diagonal braces');
