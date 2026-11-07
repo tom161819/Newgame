@@ -42,10 +42,10 @@ export async function worldSmoke(context,url,instrument){
       const s=window.__game.registry.get('application').scene,p={x:(100*64/2)+(tile.x-tile.y)*32,y:128+(tile.x+tile.y+1)*16};s.cameras.main.centerOn(p.x,p.y);s.cameras.main.setZoom(1.6);
       await new Promise(r=>setTimeout(r,700));
       const time=()=>{const t0=performance.now();for(let cy=0;cy<10;cy++)for(let cx=0;cx<10;cx++){s.terrain.dirtyChunks.add(`${cx},${cy}`);s.terrain.chunkTexture(cx,cy);}return (performance.now()-t0)/100;};
-      time();const withLayers=time(),zones=s.grassZones,reeds=s.reeds;s.grassZones=null;s.reeds=new Set();const without=time();s.grassZones=zones;s.reeds=reeds;time();
+      time();const withLayers=time(),zones=s.grassZones,reeds=s.reeds;s.grassZones=null;s.reeds=new Set();s.terrain.shoreStyle='edges';const without=time();s.grassZones=zones;s.reeds=reeds;s.terrain.shoreStyle='round';time();
       return {withLayers,without};
     },world.ford);
-    console.log(`  chunk paint: ${paint.withLayers.toFixed(2)} ms with World v2 layers, ${paint.without.toFixed(2)} ms without`);
+    console.log(`  chunk paint: ${paint.withLayers.toFixed(2)} ms with World v2 layers (zones, decals, reeds, rounded shores), ${paint.without.toFixed(2)} ms without (edge feathering)`);
     if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/world-ford.png`});
     const shown=await page.evaluate(async tile=>{
       const s=window.__game.registry.get('application').scene,p={x:(100*64/2)+(tile[0]-tile[1])*32,y:128+(tile[0]+tile[1]+1)*16};s.cameras.main.centerOn(p.x,p.y);

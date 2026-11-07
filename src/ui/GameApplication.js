@@ -65,7 +65,7 @@ export class GameApplication {
   }
   onGameReady(scene){this.scene=scene;
     // Developer console (trade F1.2): mkDev.summonCaravan() brings the next caravan now when a Marketplace is finished.
-    try{globalThis.mkDev={summonCaravan:()=>this.scene?.caravans?.summon()??false,setPathRenderer:style=>this.scene?.terrain?.setPathStyle(style)??false,pathStats:()=>this.scene?.terrain?.v2?.stats};}catch{/* no global object */}
+    try{globalThis.mkDev={summonCaravan:()=>this.scene?.caravans?.summon()??false,setPathRenderer:style=>this.scene?.terrain?.setPathStyle(style)??false,setShoreStyle:style=>this.scene?.terrain?.setShoreStyle(style)??false,pathStats:()=>this.scene?.terrain?.v2?.stats};}catch{/* no global object */}
     this.autosave.reset();if(this.pendingGettingStarted){this.pendingGettingStarted=false;scene.gettingStarted?.show();}}
   labelAutosaveIntervals(){for(const option of document.querySelectorAll('#autosave-interval option'))option.textContent=t('autosave.interval',{count:Number(option.value)/60000});}
   // A language switch re-renders the texts built in code; static markup is handled by applyTranslations.

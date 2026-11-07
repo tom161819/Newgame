@@ -36,6 +36,11 @@ const GROUND_WINTER=[null,'rgba(232,237,220,.55)',null,'rgba(226,236,244,.28)','
 const ZONE_TINT=[[0,0,0,0],[38,104,36,.2],[196,168,82,.26],[84,62,32,.2],[0,0,0,0],[128,128,118,.2]];
 // Small decorations per zone: [kind, chance per tile, count range].
 const ZONE_DECALS=[[['tuft',.3,[1,2]]],[['tuft',.5,[1,3]]],[['dryTuft',.3,[1,2]]],[['leaf',.55,[2,4]],['tuft',.15,[1,1]]],[['flower',.75,[2,5]],['tuft',.3,[1,2]]],[['pebble',.6,[1,3]],['tuft',.15,[1,1]]]];
+// World v2 step 3 (rounded shores): the four corners of a tile take the share of land among the four tiles that meet
+// there; a pixel's land share is the bilinear mix of its tile's corners and the shore is the 0.5 contour (marching
+// squares with interpolation), so river and lake edges run in curves instead of diamond steps. Fords count as water.
+const WATERY=new Set([GROUND.SHALLOW,GROUND.DEEP,GROUND.FORD]);
+const CORNER_TILES=[[[0,0],[-1,0],[0,-1],[-1,-1]],[[0,0],[0,-1],[1,0],[1,-1]],[[0,0],[1,0],[0,1],[1,1]],[[0,0],[0,1],[-1,0],[-1,1]]]; // top, right, bottom, left
 function terrainHash(x, y) { return ((Math.imul(x + 17, 374761393) ^ Math.imul(y + 29, 668265263)) >>> 0); }
 
 export class TerrainRenderer {
@@ -56,7 +61,7 @@ export class TerrainRenderer {
     this.groundKinds=GROUND_TERRAIN_IDS.map((id,code)=>code===GROUND.GRASS?null:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer)));
     this.bushSprites=new Map();this.bushPool=[];
     // #116: paths are drawn by the V2 renderer (the owner's pesinav2 style); N12 stays as a developer fallback.
-    this.pathStyle='v2';this.v2=new PathV2Layer(this);
+    this.pathStyle='v2';this.shoreStyle='round';this.v2=new PathV2Layer(this);
     this.wearTextures=PATH_WEAR.terrainIds.map(id=>({key:assets?.hasTexture(id)?assets.textureKey(id):this.groundTextures[0].key,variants:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer))}));
   }
 
@@ -64,6 +69,8 @@ export class TerrainRenderer {
   setPathWear(system){this.wear=system;this.unsubscribeWear=system.subscribe(tile=>this.invalidateArea([tile],true,2));}
   // Developer switch (console mkDev.setPathRenderer('n12'|'v2')): repaint every chunk with the other path renderer.
   setPathStyle(style){if(!['v2','n12'].includes(style)||style===this.pathStyle)return false;this.pathStyle=style;this.v2?.invalidate();this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';return true;}
+  // Developer switch (console mkDev.setShoreStyle('round'|'edges')): rounded shores (World v2 step 3) or the older edge feathering.
+  setShoreStyle(style){if(!['round','edges'].includes(style)||style===this.shoreStyle)return false;this.shoreStyle=style;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';return true;}
   setDebug(value){this.debugEnabled=!!value;this.lastView='';if(!value)this.debugGraphics.clear();}
   setSeason(season){if(season===this.season)return;this.season=season;this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
   // Whole chunks, repainted in one pass, give the same pixels as a fresh draw (season transition).
@@ -183,15 +190,16 @@ export class TerrainRenderer {
     this.edgeCache.set(id,canvas);return canvas;
   }
   blendEdges(context,x,y,ground,left,top,season){
+    const shore=other=>this.shoreStyle==='round'&&(WATERY.has(other)!==WATERY.has(ground)||!WATERY.has(other)&&!WATERY.has(ground)&&(other===GROUND.GRASS)!==(ground===GROUND.GRASS)||[other,ground].includes(GROUND.DEEP)&&[other,ground].includes(GROUND.SHALLOW));
     for(const [index,edge]of EDGES.entries()){
       const nx=x+edge.dx,ny=y+edge.dy;if(nx<0||ny<0||nx>=COLUMNS||ny>=ROWS)continue;
-      const other=this.groundAt(nx,ny);if(GROUND_RANK[other]<=GROUND_RANK[ground])continue;
+      const other=this.groundAt(nx,ny);if(GROUND_RANK[other]<=GROUND_RANK[ground]||shore(other))continue;
       const overlay=this.featheredEdge(this.groundKey(nx,ny,other,season),index);if(overlay)context.drawImage(overlay,left,top);
     }
     // A higher ground that touches only this corner rounds it off (neither side neighbour already blends it in).
     for(const [index,corner]of CORNERS.entries()){
       const nx=x+corner.dx,ny=y+corner.dy;if(nx<0||ny<0||nx>=COLUMNS||ny>=ROWS)continue;
-      const other=this.groundAt(nx,ny);if(GROUND_RANK[other]<=GROUND_RANK[ground])continue;
+      const other=this.groundAt(nx,ny);if(GROUND_RANK[other]<=GROUND_RANK[ground]||shore(other))continue;
       if(corner.edges.some(e=>{const g=this.groundAt(x+EDGES[e].dx,y+EDGES[e].dy);return GROUND_RANK[g]>=GROUND_RANK[other];}))continue;
       const overlay=this.featheredEdge(this.groundKey(nx,ny,other,season),4+index);if(overlay)context.drawImage(overlay,left,top);
     }
@@ -207,6 +215,64 @@ export class TerrainRenderer {
     if(sprite.texture?.key!==key)sprite.setTexture(key);return true;
   }
 
+  // Rounded shores: corner land shares, the shore mask for them and the other side's texture drawn through it.
+  landCorners(x,y){
+    const own=this.groundAt(x,y);return CORNER_TILES.map(list=>list.reduce((n,[dx,dy])=>{const nx=x+dx,ny=y+dy,g=nx<0||ny<0||nx>=COLUMNS||ny>=ROWS?own:this.groundAt(nx,ny);return n+(WATERY.has(g)?0:.25);},0));
+  }
+  shoreMask(corners,land){
+    const id=`${corners.join(',')}|${land?1:0}`;this.shoreMasks??=new Map();if(this.shoreMasks.has(id))return this.shoreMasks.get(id);
+    const canvas=document.createElement('canvas');canvas.width=64;canvas.height=32;const c=canvas.getContext('2d'),image=c.createImageData(64,32),[tp,rt,bt,lf]=corners;
+    for(let py=0;py<32;py++)for(let px=0;px<64;px++){
+      const s=Math.max(0,Math.min(1,((py+.5)/16+(px+.5-32)/32)/2)),t=Math.max(0,Math.min(1,((py+.5)/16-(px+.5-32)/32)/2));
+      const v=tp*(1-s)*(1-t)+rt*s*(1-t)+bt*s*t+lf*(1-s)*t,k=Math.max(0,Math.min(1,(v-.4)/.2)),a=k*k*(3-2*k);
+      image.data[(py*64+px)*4+3]=Math.round((land?a:1-a)*255);
+    }
+    c.putImageData(image,0,0);this.shoreMasks.set(id,canvas);return canvas;
+  }
+  // The texture of the other side (land over a water tile, water over a land tile), clipped by the shore mask.
+  shoreOverlay(key,corners,land){
+    if(typeof document==='undefined'||!key||!this.scene.textures.exists?.(key))return null;
+    const id=`${key}|${corners.join(',')}|${land?1:0}`;this.shoreCache??=new Map();if(this.shoreCache.has(id))return this.shoreCache.get(id);
+    if(this.shoreCache.size>2400)this.shoreCache.clear();
+    const canvas=document.createElement('canvas');canvas.width=64;canvas.height=32;const c=canvas.getContext('2d'),frame=this.scene.textures.get(key).get();
+    c.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,0,0,64,32);c.globalCompositeOperation='destination-in';c.drawImage(this.shoreMask(corners,land),0,0);
+    this.shoreCache.set(id,canvas);return canvas;
+  }
+  // The same contour between grass and bare ground (sand, mud, pebbles, desert): rounded banks and desert rims.
+  grassCorners(x,y){
+    const own=this.groundAt(x,y);return CORNER_TILES.map(list=>list.reduce((n,[dx,dy])=>{const nx=x+dx,ny=y+dy,g=nx<0||ny<0||nx>=COLUMNS||ny>=ROWS?own:this.groundAt(nx,ny);return n+(g===GROUND.GRASS?.25:0);},0));
+  }
+  roundBank(context,x,y,ground,left,top,season){
+    if(this.shoreStyle!=='round'||WATERY.has(ground))return false;
+    const corners=this.grassCorners(x,y),grass=ground===GROUND.GRASS;
+    if(grass?corners.every(v=>v===1):corners.every(v=>v===0))return false;
+    let best=null;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if((!dx&&!dy)||nx<0||ny<0||nx>=COLUMNS||ny>=ROWS)continue;const g=this.groundAt(nx,ny);if(WATERY.has(g)||(g===GROUND.GRASS)===grass)continue;
+      const score=grass?(g===ground?0:5-GROUND_RANK[g]):1;if(!best||score>best.score)best={x:nx,y:ny,g,score};}
+    if(!best)return false;
+    const overlay=this.shoreOverlay(this.groundKey(best.x,best.y,best.g,season),corners,!grass);if(overlay)context.drawImage(overlay,left,top);
+    return true;
+  }
+  // Inside the water: the deep channel's edge against the shallows follows the same rounded contour.
+  roundDeep(context,x,y,ground,left,top,season){
+    if(this.shoreStyle!=='round'||(ground!==GROUND.DEEP&&ground!==GROUND.SHALLOW))return false;
+    const corners=CORNER_TILES.map(list=>list.reduce((n,[dx,dy])=>{const g=this.groundAt(x+dx,y+dy);return n+(g===GROUND.DEEP||!WATERY.has(g)&&ground===GROUND.DEEP?.25:0);},0)),deep=ground===GROUND.DEEP;
+    if(deep?corners.every(v=>v===1):corners.every(v=>v===0))return false;
+    let best=null;for(let dy=-1;dy<=1&&!best;dy++)for(let dx=-1;dx<=1&&!best;dx++){const g=this.groundAt(x+dx,y+dy);if((dx||dy)&&g===(deep?GROUND.SHALLOW:GROUND.DEEP))best={x:x+dx,y:y+dy,g};}
+    if(!best)return false;
+    const overlay=this.shoreOverlay(this.groundKey(best.x,best.y,best.g,season),corners,!deep);if(overlay)context.drawImage(overlay,left,top);
+    return true;
+  }
+  roundShore(context,x,y,ground,left,top,season){
+    if(this.shoreStyle!=='round')return false;
+    const corners=this.landCorners(x,y),watery=WATERY.has(ground);
+    if(watery?corners.every(v=>v===0):corners.every(v=>v===1))return false;
+    // The neighbour that supplies the other side: land of the highest rank for water tiles, the shallowest water for land.
+    let best=null;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if((!dx&&!dy)||nx<0||ny<0||nx>=COLUMNS||ny>=ROWS)continue;const g=this.groundAt(nx,ny);if(WATERY.has(g)===watery)continue;
+      const score=watery?GROUND_RANK[g]:g===GROUND.SHALLOW?3:g===GROUND.FORD?2:1;if(!best||score>best.score)best={x:nx,y:ny,g,score};}
+    if(!best)return false;
+    const overlay=this.shoreOverlay(this.groundKey(best.x,best.y,best.g,season),corners,watery);if(overlay)context.drawImage(overlay,left,top);
+    return true;
+  }
   // World v2: grass zone wash (3×3 average), decals, reeds and ford stones. Deterministic per tile (hash).
   zoneTint(x,y){
     const zones=this.scene.grassZones;if(!zones)return null;let r=0,g=0,b=0,a=0,n=0;
@@ -278,6 +344,9 @@ export class TerrainRenderer {
             const key=groundKeys[terrainHash(x,y)%groundKeys.length],frame=this.scene.textures.get(key).get();
             context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,point.x-left-32,point.y-origin.y-16,64,32);
             this.blendEdges(context,x,y,ground,point.x-left-32,point.y-origin.y-16,season);
+            this.roundDeep(context,x,y,ground,point.x-left-32,point.y-origin.y-16,season);
+            this.roundBank(context,x,y,ground,point.x-left-32,point.y-origin.y-16,season);
+            this.roundShore(context,x,y,ground,point.x-left-32,point.y-origin.y-16,season);
             const winter=GROUND_WINTER[ground],mix=state===VISIBILITY.VISIBLE?this.seasonMix?.(x,y,season):null,amount=season==='Winter'?(mix?mix.amount:1):mix?.from==='Winter'?1-mix.amount:0;
             if(winter&&amount>0){context.globalCompositeOperation='source-atop';context.globalAlpha=amount;context.fillStyle=winter;polygon(TILE_BLEED);context.fill();context.globalAlpha=1;}
             context.globalCompositeOperation='source-over';
@@ -298,7 +367,9 @@ export class TerrainRenderer {
           const tint=(mix&&mixTint(mix.from,season,mix.amount))??{Spring:'rgba(95,145,65,.08)',Summer:'rgba(185,159,70,.09)',Autumn:'rgba(158,105,45,.17)',Winter:'rgba(232,237,220,.83)'}[season];
           if(tint&&!grassSeason){context.globalCompositeOperation='source-atop';context.fillStyle=tint;polygon(TILE_BLEED);context.fill();}
           const zoneTint=season==='Winter'?null:this.zoneTint(x,y);if(zoneTint){context.globalCompositeOperation='source-atop';context.fillStyle=zoneTint;polygon(TILE_BLEED);context.fill();}
-          context.globalCompositeOperation='source-over';this.paintDecals(context,x,y,point.x-left,point.y-origin.y,season,occupied);
+          context.globalCompositeOperation='source-over';
+          const bank=this.roundBank(context,x,y,GROUND.GRASS,point.x-left-32,point.y-origin.y-16,season),shore=this.roundShore(context,x,y,GROUND.GRASS,point.x-left-32,point.y-origin.y-16,season);
+          if(!bank&&!shore)this.paintDecals(context,x,y,point.x-left,point.y-origin.y,season,occupied);
           context.restore();
         }
       }

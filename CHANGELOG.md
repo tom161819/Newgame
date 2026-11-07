@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-11-07
+<!-- version: {"title":"Rounded shores","type":"feature","reconstructed":false,"saveVersion":51} -->
+### Improved
+- Rounded shores: rivers, lakes, sandy, muddy and pebbly banks, the desert's edge and the deep channel now curve smoothly instead of following the tile diamonds.
+
 ## [0.24.0] - 2026-11-07
 <!-- version: {"title":"World generator 2","type":"feature","reconstructed":false,"saveVersion":51} -->
 ### Changed

@@ -80,3 +80,18 @@ test('generator 2 saves: grass zones and reeds survive a save; broken ones are r
   const bad=JSON.parse(JSON.stringify(serializeGameState(s)));bad.grassZones[0]='9'.repeat(100);assert.throws(()=>validateGameState(bad));
   const dry=JSON.parse(JSON.stringify(serializeGameState(s)));dry.reeds.push([50,50]);assert.throws(()=>validateGameState(dry),undefined,'reeds only in shallow water');
 });
+
+test('rounded shores (step 3): corner land shares drive the contour; water/land and grass/bank pairs skip edge feathering', async () => {
+  const { TerrainRenderer }=await import('../src/game/TerrainRenderer.js');
+  const ground=emptyGround();for(let y=0;y<100;y++)for(let x=50;x<100;x++)ground[y][x]=x<52?GROUND.BEACH:GROUND.SHALLOW;
+  const r=Object.create(TerrainRenderer.prototype);Object.assign(r,{scene:{groundGrid:ground},shoreStyle:'round'});
+  // A straight shore: on the land tile next to the water the two corners on the water side are half land.
+  assert.deepEqual(r.landCorners(51,10),[1,.5,.5,1],'top and left corners on land, right and bottom on the shore');
+  assert.deepEqual(r.landCorners(52,10),[.5,0,0,.5]);assert.deepEqual(r.landCorners(20,10),[1,1,1,1]);
+  assert.deepEqual(r.grassCorners(50,10),[.5,0,0,.5],'the sand tile next to grass');assert.deepEqual(r.grassCorners(49,10),[1,.5,.5,1]);
+  // Feathering still blends sand into deep/shallow pairs only when shores are not rounded.
+  const drawn=[];r.groundKey=()=> 'k';r.featheredEdge=()=>({});const context={drawImage:()=>drawn.push(1)};
+  r.blendEdges(context,52,10,GROUND.SHALLOW,0,0,'Summer');assert.equal(drawn.length,0,'no feathered sand over the water');
+  r.shoreStyle='edges';r.blendEdges(context,52,10,GROUND.SHALLOW,0,0,'Summer');assert.ok(drawn.length>0,'the old feathering with the developer switch');
+  assert.equal(r.roundShore(context,20,10,GROUND.GRASS,0,0,'Summer'),false,'off with the switch');
+});
