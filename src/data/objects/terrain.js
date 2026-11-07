@@ -17,6 +17,17 @@ const wearSurfaces=[
   renderMode:'sprite',origin:{x:.5,y:.5},visualHeight:0,depth:{offset:-100},
   visual:{wearLevel:level,pathColor:d.color,pathEdge:d.edge,pathWidth:d.width,...(level?{pathSoftness:2}:{})},
 }));
+// #100 Ground types approved in the Studio (art/sprites/wild-ground, 7 Nov): four interchangeable tiles each,
+// picked per tile like grass. Water and sand keep their look in every season (snow only dusts the beach).
+const groundTiles=(folder,name)=>[0,1,2,3].map(i=>`/assets/terrain/${folder}/wild-ground-${name}.v1.tile-${i}.png`);
+const wildGround=[
+  {id:'beach_sand',name:'Plážový písek',description:'Písek u řek a jezer. Dá se po něm chodit i stavět, nic na něm neroste.',folder:'sand',art:'beach'},
+  {id:'desert_sand',name:'Pouštní písek',description:'Suchá poušť. Dá se po ní chodit i stavět, nerostou na ní stromy ani pole.',folder:'sand',art:'desert'},
+  {id:'shallow_water',name:'Mělká voda',description:'Okraj řeky nebo jezera. Neprůchozí a nezastavitelná, přes vodu se dá střílet.',folder:'water',art:'shallow',walkable:false},
+  {id:'deep_water',name:'Hluboká voda',description:'Proud řeky a střed jezera. Neprůchozí a nezastavitelná, přes vodu se dá střílet.',folder:'water',art:'deep',walkable:false},
+].map(d=>({id:d.id,name:d.name,description:d.description,category:'terrain',sprite:groundTiles(d.folder,d.art)[0],spriteVariants:groundTiles(d.folder,d.art),
+  artSource:`art/sprites/wild-ground/wild-ground-${d.art}.v1.json`,width:1,height:1,walkable:d.walkable??true,collectible:false,buildable:false,cost:{},interactions:[],
+  renderMode:'sprite',origin:{x:.5,y:.5},visualHeight:0,depth:{offset:-100}}));
 export const terrain = [
   {
     id: 'grass', name: 'Tráva', category: 'terrain', sprite: '/assets/terrain/grass/grass.png',
@@ -33,4 +44,5 @@ export const terrain = [
     visual: { colors: [0xb4a578, 0xb2aa7c, 0xa4a271] }, depth: { offset: -100 },
   },
   ...wearSurfaces,
+  ...wildGround,
 ];

@@ -13,7 +13,9 @@ import { UnitSelection } from '../ui/UnitSelection.js';
 import { t } from '../i18n/index.js';
 import { localized } from '../i18n/names.js';
 import Phaser from 'phaser';
-import { COLUMNS, ROWS, PLAYER_START, createMap, isWalkable, tileCenter } from './map.js';
+import { COLUMNS, ROWS, PLAYER_START, isWalkable, tileCenter } from './map.js';
+import { generateWorld, mapFromWorld, emptyGround, importGround, importBushes } from './worldGeneration.js';
+import { isFertileGround } from '../data/worldTerrain.js';
 import { tilePolygon, worldToTile, gridToWorld } from './isometric.js';
 import { TerrainRenderer } from './TerrainRenderer.js';
 import { WorldCamera } from './WorldCamera.js';
@@ -160,9 +162,10 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('food_building',(_definition,context)=>new WorkplaceView(this,context.building,context.preview));
     this.assets.registerRenderer('crop',(_definition,context)=>new CropPlotView(this,context.building,context.preview));
     this.assets.registerRenderer('pavement',(_definition,context)=>new PavementView(this,context.building,context.preview));
-    const base=this.objectRegistry.require('grass'),obstacle=this.objectRegistry.require('rock_outcrop');
-    this.terrainGrid=this.loadState?this.loadState.terrain.map(row=>[...row]):createMap(Math.random);
-    this.map=this.terrainGrid.map(row=>row.map(value=>(value?obstacle:base).walkable?0:1));
+    // #100: rock layer (terrainGrid), ground layer (grass, sand, water) and bushes; water cells block but stay see-through.
+    const world=this.loadState?{terrain:this.loadState.terrain.map(row=>[...row]),ground:this.loadState.ground?importGround(this.loadState.ground):emptyGround(),bushes:importBushes(this.loadState.bushes??[])}:generateWorld(Math.random);
+    this.terrainGrid=world.terrain;this.groundGrid=world.ground;this.bushes=world.bushes;
+    this.map=mapFromWorld(this.terrainGrid,this.groundGrid);
     this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
     this.inventory=new Inventory();if(!this.loadState)this.inventory.add('gold',this.gameSettings.startingGold);
     this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);this.regeneration=new RegenerationSystem();
@@ -171,7 +174,7 @@ export class GameScene extends Phaser.Scene {
     this.unsubscribeSeason=this.seasons.onChange(()=>{const changed=this.terrain.season!==this.seasons.season;this.terrain.setSeason(this.seasons.season);if(changed&&this.worldCamera){this.terrain.invalidateArea(this.mapMemory.observeTerrain(this.terrainGrid,this.pathWear,this.seasons.season,this.map));this.terrain.update(this.cameras.main,this.fog,this.mapMemory);}this.updateTimeDisplay();this.settingsPanel?.syncSeasons();});
     this.activities=new GameActivityBus();this.experienceSystem=new ExperienceSystem(this.activities);
     this.skillSystem=new SkillSystem(this);
-    this.pathWear=new PathWearSystem({map:this.map,terrain:this.terrainGrid,time:this.gameTime});this.terrain.setPathWear(this.pathWear);
+    this.pathWear=new PathWearSystem({map:this.map,terrain:this.terrainGrid,time:this.gameTime,isGrass:tile=>this.terrainGrid[tile.y]?.[tile.x]===0&&isFertileGround(this.groundGrid[tile.y]?.[tile.x])});this.terrain.setPathWear(this.pathWear);
     this.pauseManager=new PauseManager(this);
     this.noticeRemaining=0;document.querySelector('#day-notice').hidden=true;
     this.resources=new Map();this.stones=this.resources; // Kompatibilní označení původního seznamu kamenů.

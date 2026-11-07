@@ -7,6 +7,8 @@ import { buildingDemolitionRefund } from '../data/demolition.js';
 import { t } from '../i18n/index.js';
 import { objectRegistry } from './ObjectRegistry.js';
 import { COLUMNS,ROWS } from '../game/config.js';
+import { exportGround,importGround,validGroundRows,exportBushes,emptyGround } from '../game/worldGeneration.js';
+import { isWaterGround,BUSH_TYPES } from '../data/worldTerrain.js';
 import { wearLevel } from '../data/pathWear.js';
 import { getXPRequired,totalXPForLevel,createProgress } from '../data/experience.js';
 import { JOBS,SKILL_IDS,WORK_RULES,POPULATION } from '../data/jobs.js';
@@ -32,7 +34,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=41;
+export const SAVE_VERSION=42;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -59,7 +61,7 @@ export function serializeGameState(scene){
   const provisionalKeys=new Set(scene.buildings.filter(b=>b.unverified).map(b=>`building:${b.id}`));
   exploration.objects=exploration.objects.filter(entry=>!provisionalKeys.has(entry.key));
   return {
-    saveVersion:SAVE_VERSION,gameSettings:{...gameSettings(scene.gameSettings),...(scene.seasons?{seasonsEnabled:scene.seasons.enabled}:{})},terrain:scene.terrainGrid.map(row=>[...row]),
+    saveVersion:SAVE_VERSION,gameSettings:{...gameSettings(scene.gameSettings),...(scene.seasons?{seasonsEnabled:scene.seasons.enabled}:{})},terrain:scene.terrainGrid.map(row=>[...row]),ground:exportGround(scene.groundGrid??emptyGround()),bushes:exportBushes(scene.bushes??new Map()),
     exploration,
     naturalResources:scene.naturalResources?.exportState()??emptyNaturalState(),
     resourceLedger:scene.resourceLedger?.exportState()??emptyLedgerState(scene.gameTime),
@@ -146,13 +148,17 @@ export function validateGameState(input,registry=objectRegistry){
   const dayDuration=s.gameSettings.dayLengthSeconds*1000;
   s.wildlifeRespawn??={elapsed:0};number(s.wildlifeRespawn.elapsed,0,(WILDLIFE_INTERVALS[s.gameSettings.wildlifeRespawn]||1)-1e-7);
   array(s.terrain,ROWS);check(s.terrain.length===ROWS);for(const row of s.terrain){array(row,COLUMNS);check(row.length===COLUMNS&&row.every(n=>n===0||n===1));}
+  // #100 ground layer (water has no rock) and bushes (open ground, one per tile).
+  s.ground??=exportGround(emptyGround());s.bushes??=[];check(validGroundRows(s.ground));const ground=importGround(s.ground),open=(x,y)=>s.terrain[y]?.[x]===0&&!isWaterGround(ground[y]?.[x]);
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLUMNS;x++)if(isWaterGround(ground[y][x]))check(s.terrain[y][x]===0);
+  array(s.bushes,COLUMNS*ROWS);{const seen=new Set();for(const b of s.bushes){array(b,3);check(b.length===3);integer(b[0],0,COLUMNS-1);integer(b[1],0,ROWS-1);integer(b[2],0,BUSH_TYPES.length-1);check(open(b[0],b[1])&&!seen.has(`${b[0]},${b[1]}`));seen.add(`${b[0]},${b[1]}`);}}
   for(const key of ['buildings','resources','animals','drops','chests','spawners'])array(s[key]);
   if(s.workers!==undefined)array(s.workers);
   const bIds=unique(s.buildings),aIds=unique(s.animals),dIds=unique(s.drops),cIds=unique(s.chests);
   const wIds=unique(s.workers??[]),unitIds=new Set(['king',...aIds,...wIds]);
   const occupied=new Set(),solid=new Set();
   const occupy=(p,w=1,h=1)=>{tile(p);for(let dy=0;dy<h;dy++)for(let dx=0;dx<w;dx++){
-    const x=p.x+dx,y=p.y+dy,key=`${x},${y}`;check(s.terrain[y]?.[x]===0&&!occupied.has(key));occupied.add(key);
+    const x=p.x+dx,y=p.y+dy,key=`${x},${y}`;check(open(x,y)&&!occupied.has(key));occupied.add(key);
   }};
   const siteAssignments=new Set();
   // A provisional site (placed outside sight) claims no tiles until verified: it may lie over hidden terrain or resources.
@@ -209,7 +215,7 @@ export function validateGameState(input,registry=objectRegistry){
     else check(r.natural===undefined);
     for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){
     // Rock edges may sit under a neighbouring Quarry; unique reciprocal primary bindings are checked below.
-    const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`,overlap=s.buildings.find(b=>!b.unverified&&x>=b.x&&x<b.x+definition(b.type).width&&y>=b.y&&y<b.y+definition(b.type).height),allowedOverlap=d.tree&&r.natural.stage===0||r.type==='stone_deposit'&&overlap?.type==='quarry'&&overlap.quarryMode==='finite';check(s.terrain[y]?.[x]===0&&(!occupied.has(key)||allowedOverlap)&&!resourceTiles.has(key));resourceTiles.add(key);if(d.deposit||d.tree&&r.natural.stage===3)solid.add(key);
+    const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`,overlap=s.buildings.find(b=>!b.unverified&&x>=b.x&&x<b.x+definition(b.type).width&&y>=b.y&&y<b.y+definition(b.type).height),allowedOverlap=d.tree&&r.natural.stage===0||r.type==='stone_deposit'&&overlap?.type==='quarry'&&overlap.quarryMode==='finite';check(open(x,y)&&(!occupied.has(key)||allowedOverlap)&&!resourceTiles.has(key));resourceTiles.add(key);if(d.deposit||d.tree&&r.natural.stage===3)solid.add(key);
   }}
   const boundDeposits=new Set();for(const b of s.buildings){
     if(b.type==='quarry'){check(['finite','legacy','unbound'].includes(b.quarryMode));if(b.quarryMode==='legacy')check(buildingIsComplete(b)&&b.depositId===undefined);if(b.quarryMode==='unbound')check(b.depositId===undefined);}
@@ -222,7 +228,7 @@ export function validateGameState(input,registry=objectRegistry){
     integer(c.contents?.gold,50,100);array(c.contents?.equipment,10);for(const id of c.contents.equipment)definition(id,'equipment');
     if(c.opening){number(c.animation?.elapsed,0,350);if(c.animation.lid){number(c.animation.lid.y,-100,100);number(c.animation.lid.rotation,-10,10);}}
   }
-  for(const d of s.drops){check(typeof d.id==='string');check(definition(d.resource,'resource').collectible);tile(d.tile);integer(d.amount,1);d.rewardRemaining??=1;number(d.rewardRemaining);d.rewardUnits??=d.resource==='stone'?d.amount:0;number(d.rewardUnits,0,d.amount);check(s.terrain[d.tile.y][d.tile.x]===0&&!solid.has(`${d.tile.x},${d.tile.y}`));}
+  for(const d of s.drops){check(typeof d.id==='string');check(definition(d.resource,'resource').collectible);tile(d.tile);integer(d.amount,1);d.rewardRemaining??=1;number(d.rewardRemaining);d.rewardUnits??=d.resource==='stone'?d.amount:0;number(d.rewardUnits,0,d.amount);check(open(d.tile.x,d.tile.y)&&!solid.has(`${d.tile.x},${d.tile.y}`));}
   const skillsState=skills=>{
     check(skills&&typeof skills==='object'&&!Array.isArray(skills)&&Object.keys(skills).length===SKILL_IDS.length);
       for(const id of SKILL_IDS){const e=skills[id];check(e&&typeof e.enabled==='boolean');integer(e.maxLevel,1,50);integer(e.level,1,e.maxLevel);number(e.gainMultiplier,0,1e6);number(e.currentXP);number(e.totalXP,0,totalXPForLevel(e.maxLevel));
@@ -373,7 +379,7 @@ export function validateGameState(input,registry=objectRegistry){
     const w=s.pathWear;for(const key of ['scores','levels','lastPassDays']){array(w[key],COLUMNS*ROWS);check(w[key].length===COLUMNS*ROWS);}
     integer(w.lastDecayDay,1,s.time.day);
     // S11 pavement: sorted unique tile indices on open, non-rock ground.
-    array(w.paved,COLUMNS*ROWS);for(let i=0;i<w.paved.length;i++){integer(w.paved[i],0,COLUMNS*ROWS-1);if(i)check(w.paved[i]>w.paved[i-1]);check(s.terrain[Math.floor(w.paved[i]/COLUMNS)]?.[w.paved[i]%COLUMNS]===0);}
+    array(w.paved,COLUMNS*ROWS);for(let i=0;i<w.paved.length;i++){integer(w.paved[i],0,COLUMNS*ROWS-1);if(i)check(w.paved[i]>w.paved[i-1]);check(open(w.paved[i]%COLUMNS,Math.floor(w.paved[i]/COLUMNS)));}
     for(let i=0;i<COLUMNS*ROWS;i++){integer(w.scores[i]);integer(w.levels[i],0,3);integer(w.lastPassDays[i],0,s.time.day);check(w.levels[i]===wearLevel(w.scores[i]));if(w.scores[i])check(w.lastPassDays[i]>0);}
   }
   number(s.camera?.zoom,MIN_ZOOM,MAX_ZOOM);number(s.camera.x,-1e6,1e6);number(s.camera.y,-1e6,1e6);check(typeof s.camera.following==='boolean');
@@ -429,7 +435,7 @@ export function validateGameState(input,registry=objectRegistry){
     check(base<=POPULATION.maximum);}
   if(s.vehicles!==undefined){const v=s.vehicles;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='modes,nextId,vehicles');integer(v.nextId,1);array(v.vehicles);const ids=new Set(),operators=new Set(),workers=new Map(s.workers.map(w=>[w.id,w]));
     for(const x of v.vehicles){check(x&&Object.keys(x).sort().join()==='horseId,id,operatorId,state,type,x,y'&&(x.horseId===null||x.type==='horse_wagon'&&(s.stables?.horses??[]).some(h=>h.id===x.horseId&&h.state==='harnessed'&&h.vehicleId===x.id))&&Object.hasOwn(VEHICLES,x.type)&&['parked','reserved','inUse'].includes(x.state));const m=String(x.id).match(/^vehicle-(\d+)$/);check(m&&Number(m[1])<v.nextId&&!ids.has(x.id));ids.add(x.id);
-      integer(x.x,0,COLUMNS-1);integer(x.y,0,ROWS-1);check(s.terrain[x.y][x.x]===0);check((x.state==='parked')===(x.operatorId==null));if(x.operatorId!=null){const w=workers.get(x.operatorId);check(w?.isAlive&&w.profession==='hauler'&&!operators.has(x.operatorId));operators.add(x.operatorId);}}
+      integer(x.x,0,COLUMNS-1);integer(x.y,0,ROWS-1);check(open(x.x,x.y));check((x.state==='parked')===(x.operatorId==null));if(x.operatorId!=null){const w=workers.get(x.operatorId);check(w?.isAlive&&w.profession==='hauler'&&!operators.has(x.operatorId));operators.add(x.operatorId);}}
     check(v.modes&&typeof v.modes==='object');for(const [id,mode]of Object.entries(v.modes))check(workers.has(id)&&TRANSPORT_MODES.includes(mode)&&mode!=='auto');}
   // C08 units and training orders: one per living Soldier, a known type, its exact kit; a Knight has his horse (S12).
   const st0=new Set((s.stables?.horses??[]).filter(h=>h.riderId).map(h=>h.riderId));

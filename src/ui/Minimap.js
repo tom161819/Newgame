@@ -9,6 +9,8 @@ export const MINIMAP=Object.freeze({scale:2,refreshMs:250,overlayMs:100,cssSize:
 export const MINIMAP_COLORS=Object.freeze({
   unknown:[66,68,64],rock:[128,124,112],paved:[178,168,146],wear:[150,124,84],building:[182,112,56],tree:[36,80,38],deposit:[160,160,170],stockpile:[200,160,90],chest:[226,190,80],
   ground:{Spring:[92,140,64],Summer:[104,146,58],Autumn:[150,130,62],Winter:[206,210,212]},
+  // #100 ground types (index = ground code; grass uses the seasonal colours above).
+  groundType:{1:[214,196,140],2:[204,170,104],3:[98,160,190],4:[52,104,150]},
 });
 const KIND={none:0,building:1,tree:2,deposit:3,stockpile:4,chest:5};
 const KIND_COLOR=[null,MINIMAP_COLORS.building,MINIMAP_COLORS.tree,MINIMAP_COLORS.deposit,MINIMAP_COLORS.stockpile,MINIMAP_COLORS.chest];
@@ -25,7 +27,7 @@ function stamp(kinds,width,entry,kind){if(!kind)return;for(let dy=0;dy<(entry.he
 
 // Pure: RGBA pixels (one per tile) for the player's current knowledge. Never reads hidden live state.
 export function minimapPixels(scene,out){
-  const fog=scene.fog,width=fog.width,height=fog.height,season=scene.seasons?.season??'Spring',memory=scene.mapMemory,wear=scene.pathWear,grid=scene.terrainGrid;
+  const fog=scene.fog,width=fog.width,height=fog.height,season=scene.seasons?.season??'Spring',memory=scene.mapMemory,wear=scene.pathWear,grid=scene.terrainGrid,groundGrid=scene.groundGrid;
   const pixels=out??new Uint8ClampedArray(width*height*4),states=new Uint8Array(width*height),live=new Uint8Array(width*height),remembered=new Uint8Array(width*height);
   for(let y=0;y<height;y++)for(let x=0;x<width;x++)states[y*width+x]=fog.displayState({x,y});
   // Live objects only where they are in sight; remembered copies only where they are not.
@@ -43,7 +45,7 @@ export function minimapPixels(scene,out){
       else{
         const [rock,level,knownSeason,,paved]=visible||!fog.enabled?liveTile:known??[0,0,season,0,0];
         const kind=visible||!fog.enabled?live[i]:remembered[i];
-        color=kind?KIND_COLOR[kind]:rock?MINIMAP_COLORS.rock:paved?MINIMAP_COLORS.paved:level>1?MINIMAP_COLORS.wear:MINIMAP_COLORS.ground[knownSeason]??MINIMAP_COLORS.ground.Spring;
+        color=kind?KIND_COLOR[kind]:rock?MINIMAP_COLORS.rock:paved?MINIMAP_COLORS.paved:level>1?MINIMAP_COLORS.wear:MINIMAP_COLORS.groundType[groundGrid?.[y]?.[x]]??MINIMAP_COLORS.ground[knownSeason]??MINIMAP_COLORS.ground.Spring;
         if(!visible&&fog.enabled)color=mute(color);
       }
     }

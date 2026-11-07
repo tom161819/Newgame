@@ -1,3 +1,4 @@
+import { isFertileGround } from '../data/worldTerrain.js';
 import { t } from '../i18n/index.js';
 import { FORESTRY,treeBlocks,treeState } from '../data/naturalResources.js';
 import { reachableTiles,findPathToAny } from '../game/pathfinding.js';
@@ -38,7 +39,7 @@ export class NaturalResourcesSystem {
     if(!possible.length)return 0;const reachable=new Set(possible.map(tileKey)),centers=Array.from({length:FORESTRY.clusters},()=>possible[Math.floor(random()*possible.length)]);let added=0;
     for(let attempt=0;attempt<count*80&&added<count;attempt++){
       const center=centers[attempt%centers.length],radius=Math.sqrt(random())*(5+random()*5),angle=random()*Math.PI*2,tile={x:Math.round(center.x+Math.cos(angle)*radius),y:Math.round(center.y+Math.sin(angle)*radius)},key=tileKey(tile);
-      if(!reachable.has(key)||s.map[tile.y]?.[tile.x]!==0||tile.x<2||tile.y<2||tile.x>97||tile.y>97||reserved.has(key)||s.resourceOccupancy.has(key)||Math.hypot(tile.x-start.x,tile.y-start.y)<=FORESTRY.protectedRadius)continue;
+      if(!reachable.has(key)||s.map[tile.y]?.[tile.x]!==0||!isFertileGround(s.groundGrid?.[tile.y]?.[tile.x])||tile.x<2||tile.y<2||tile.x>97||tile.y>97||reserved.has(key)||s.resourceOccupancy.has(key)||Math.hypot(tile.x-start.x,tile.y-start.y)<=FORESTRY.protectedRadius)continue;
       const stage=random()<.6?3:random()<.8?2:1;if(stage===3&&!this.preservesRoutes(tile))continue;
       const growthDays=stage<3?random()*FORESTRY.stageDays[stage]:0,state=treeState(`tree-${this.nextId++}`,{stage,growthDays,ageDays:stage===3?8+random()*20:(stage===1?1:4)+growthDays});state.growthCheckpoint=this.growthClock;state.ageCheckpoint=this.ageClock;
       s.addResource(s.objectRegistry.require(random()<.6?'oak_tree':'pine_tree'),tile,state);added++;

@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-11-07
+<!-- version: {"title":"Rivers, beaches, desert and bushes","type":"feature","reconstructed":false,"saveVersion":42} -->
+### Added
+- New worlds are more varied: a winding river crosses the whole map, with sandy fords where you can walk across. There is also a lake, sandy beaches along the water and a desert far from your start.
+- Bushes grow in clusters on the meadows, and dry scrub grows in the desert.
+- Water cannot be walked on or built on, but archers can shoot across it. Shores blend softly into the beach and grass, and the minimap shows water and sand.
+
+### Changed
+- Nothing grows on sand: no trees grow on beaches or in the desert, and fields and orchards need grass. Houses and other buildings can still be built on sand.
+- Saved games use a new format (42) for the ground and bushes. Games saved by earlier versions cannot be loaded; start a new game.
+
 ## [0.13.1] - 2026-11-07
 <!-- version: {"title":"Smoother happiness checks","type":"feature","reconstructed":false,"saveVersion":41} -->
 ### Changed

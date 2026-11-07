@@ -1,3 +1,4 @@
+import { isFertileGround } from '../data/worldTerrain.js';
 import { availableFarm } from '../data/farmPlots.js';
 import { t } from '../i18n/index.js';
 import { dataName } from '../i18n/names.js';
@@ -55,6 +56,8 @@ export function placementError(map,anchor,resources,reservedTiles=[],definition=
   if(tiles.some(tile=>tile.x<0||tile.y<0||tile.y>=map.length||tile.x>=map[0].length))return t('status.insideMap');
   const natural=resources.naturalContext,special=natural?.mining.placementError(definition,anchor);if(special)return special;
   if(tiles.some(tile=>!isWalkable(map,tile.x,tile.y)&&!natural?.mining.canBuildOver(definition,tile)))return t('status.needsTiles',{width:definition.width,height:definition.height});
+  // #100: fields and orchards need grass; nothing grows on beach or desert sand.
+  const ground=natural?.scene?.groundGrid;if(definition.crop&&ground&&tiles.some(tile=>!isFertileGround(ground[tile.y]?.[tile.x])))return t('status.needsGrass');
   if(tiles.some(tile=>resources.has(tileKey(tile))&&!natural?.mining.canBuildOver(definition,tile)))return t('status.resourceHere');
   if(tiles.some(tile=>reservedTiles.some(p=>tileKey(p)===tileKey(tile))))return t('status.unitHere');
   if(tiles.some(tile=>buildings.some(building=>building.tiles.some(p=>tileKey(p)===tileKey(tile)))))return t('status.buildingHere');

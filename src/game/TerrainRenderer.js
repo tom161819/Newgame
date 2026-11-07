@@ -7,6 +7,7 @@ import { canStep } from './pathfinding.js';
 import { VISIBILITY, FOG_STYLE } from '../systems/FogOfWarSystem.js';
 import { memoryTexture } from './memoryTexture.js';
 import { MEMORY_DIRECTIONS } from '../systems/MapMemory.js';
+import { GROUND, GROUND_TERRAIN_IDS, BUSH_TYPES } from '../data/worldTerrain.js';
 
 const CHUNK_SIZE = 10;
 const TILE_BLEED = .8;
@@ -17,6 +18,17 @@ function mixTint(from,to,t){const a=SEASON_TINT[from],b=SEASON_TINT[to];if(!a||!
 
 const WINTER_VEIL=[0,1.9,1.3,1]; // light tracks fade most under snow
 function mixColour(a,b,t){const p=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)),x=p(a),y=p(b);return`rgb(${x.map((v,i)=>Math.round(v+(y[i]-v)*t)).join(',')})`;}
+// #100 Ground blending: along an edge to a ground that ranks higher (grass over desert over beach over shallow over
+// deep water), the neighbour's texture fades into this tile, so shores and the desert rim are soft, not diamond steps.
+const GROUND_RANK=[4,2,3,1,0];
+// Edge order N (x-1), E (y-1), S (x+1), W (y+1): the shared edge's midpoint in the 64 × 32 tile and the unit normal
+// pointing into the tile, perpendicular to the edge on screen so the fade runs parallel to it.
+const EDGES=[{dx:-1,dy:0,start:[16,8],normal:[1,2]},{dx:0,dy:-1,start:[48,8],normal:[-1,2]},{dx:1,dy:0,start:[48,24],normal:[-1,-2]},{dx:0,dy:1,start:[16,24],normal:[1,-2]}];
+const FEATHER=12; // px into the tile (the centre is about 14 px from an edge)
+// Diagonal neighbours touch only a corner: N-E top, E-S right, S-W bottom, W-N left vertex.
+const CORNERS=[{dx:-1,dy:-1,at:[32,0],edges:[0,1]},{dx:1,dy:-1,at:[64,16],edges:[1,2]},{dx:1,dy:1,at:[32,32],edges:[2,3]},{dx:-1,dy:1,at:[0,16],edges:[3,0]}];
+// Winter: snow dusts the beach and lightly frosts water; the desert has no snow.
+const GROUND_WINTER=[null,'rgba(232,237,220,.55)',null,'rgba(226,236,244,.28)','rgba(226,236,244,.18)'];
 function terrainHash(x, y) { return ((Math.imul(x + 17, 374761393) ^ Math.imul(y + 29, 668265263)) >>> 0); }
 
 export class TerrainRenderer {
@@ -34,6 +46,8 @@ export class TerrainRenderer {
     // Seasonal grass textures (wear level 0); summer uses the ordinary grass variants.
     const grass=registry.get?.(PATH_WEAR.terrainIds[0]);
     this.seasonGrass=Object.fromEntries(Object.entries(grass?.seasonVariants??{}).map(([season,list])=>[season,list.map((_,i)=>`season-${season}-${i}`).filter(layer=>assets?.hasTexture(grass.id,layer)).map(layer=>assets.key(grass.id,layer))]).filter(([,keys])=>keys.length));
+    this.groundKinds=GROUND_TERRAIN_IDS.map((id,code)=>code===GROUND.GRASS?null:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer)));
+    this.bushSprites=new Map();this.bushPool=[];
     this.wearTextures=PATH_WEAR.terrainIds.map(id=>({key:assets?.hasTexture(id)?assets.textureKey(id):this.groundTextures[0].key,variants:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer))}));
   }
 
@@ -136,6 +150,52 @@ export class TerrainRenderer {
   }
 
 
+  groundAt(x,y){return this.scene.groundGrid?.[y]?.[x]??GROUND.GRASS;}
+  // Texture of a neighbour's ground as it would be drawn there (seasonal grass included).
+  groundKey(x,y,ground,season){
+    if(ground!==GROUND.GRASS){const keys=this.groundKinds[ground];return keys?.length?keys[terrainHash(x,y)%keys.length]:null;}
+    const seasonal=this.seasonGrass[season],wear=this.wearTextures[0];
+    if(season!=='Summer'&&seasonal?.length)return seasonal[terrainHash(x,y)%seasonal.length];
+    return wear?.variants.length?wear.variants[terrainHash(x,y)%wear.variants.length]:null;
+  }
+  // The neighbour's texture faded towards this tile's centre: a 64 × 32 canvas per (texture, edge), cached.
+  featheredEdge(key,edge){
+    if(typeof document==='undefined'||!key||!this.scene.textures.exists?.(key))return null;
+    this.edgeCache??=new Map();const id=`${key}|${edge}`;if(this.edgeCache.has(id))return this.edgeCache.get(id);
+    const canvas=document.createElement('canvas');canvas.width=64;canvas.height=32;const c=canvas.getContext('2d'),frame=this.scene.textures.get(key).get();
+    c.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,0,0,64,32);
+    let gradient;
+    if(edge>=4){const [cx,cy]=CORNERS[edge-4].at;c.translate(cx,cy);c.scale(2,1);gradient=c.createRadialGradient(0,0,0,0,0,FEATHER*.75);}
+    else{const {start:[sx,sy],normal:[nx,ny]}=EDGES[edge],length=Math.hypot(nx,ny);gradient=c.createLinearGradient(sx,sy,sx+nx/length*FEATHER,sy+ny/length*FEATHER);}
+    gradient.addColorStop(0,'rgba(0,0,0,.92)');gradient.addColorStop(.5,'rgba(0,0,0,.45)');gradient.addColorStop(1,'rgba(0,0,0,0)');
+    c.globalCompositeOperation='destination-in';c.fillStyle=gradient;c.fillRect(-64,-32,128,64);
+    this.edgeCache.set(id,canvas);return canvas;
+  }
+  blendEdges(context,x,y,ground,left,top,season){
+    for(const [index,edge]of EDGES.entries()){
+      const nx=x+edge.dx,ny=y+edge.dy;if(nx<0||ny<0||nx>=COLUMNS||ny>=ROWS)continue;
+      const other=this.groundAt(nx,ny);if(GROUND_RANK[other]<=GROUND_RANK[ground])continue;
+      const overlay=this.featheredEdge(this.groundKey(nx,ny,other,season),index);if(overlay)context.drawImage(overlay,left,top);
+    }
+    // A higher ground that touches only this corner rounds it off (neither side neighbour already blends it in).
+    for(const [index,corner]of CORNERS.entries()){
+      const nx=x+corner.dx,ny=y+corner.dy;if(nx<0||ny<0||nx>=COLUMNS||ny>=ROWS)continue;
+      const other=this.groundAt(nx,ny);if(GROUND_RANK[other]<=GROUND_RANK[ground])continue;
+      if(corner.edges.some(e=>{const g=this.groundAt(x+EDGES[e].dx,y+EDGES[e].dy);return GROUND_RANK[g]>=GROUND_RANK[other];}))continue;
+      const overlay=this.featheredEdge(this.groundKey(nx,ny,other,season),4+index);if(overlay)context.drawImage(overlay,left,top);
+    }
+  }
+  // A bush shows on open ground only: not under a building, resource, paving or a well-trodden path.
+  bushVisible(x,y,occupied){
+    const key=`${x},${y}`;return this.scene.map?.[y]?.[x]===0&&!this.scene.resourceOccupancy?.has(key)&&!occupied.has(key)&&!this.wear?.isPaved?.({x,y})&&(this.wear?.level({x,y})??0)<2;
+  }
+  buildingTiles(){const tiles=new Set();for(const b of this.scene.buildings??[])for(const t of b.tiles??[])tiles.add(`${t.x},${t.y}`);return tiles;}
+  paintBush(sprite,type,state,fog){
+    const id=BUSH_TYPES[type];let key=this.assets?.hasTexture(id)?this.assets.key(id):null;if(!key)return false;
+    if(state===VISIBILITY.EXPLORED){const texture=this.scene.textures.get(key);key=memoryTexture(this.scene,texture,texture.get(),fog.memoryBrightness)??key;}
+    if(sprite.texture?.key!==key)sprite.setTexture(key);return true;
+  }
+
   tileData(tile){return this.memory?.terrainAt(tile,this.map,this.wear,this.season)??[this.map[tile.y]?.[tile.x]??0,this.wear?.level(tile)??0,this.season,0,this.wear?.isPaved?.(tile)?1:0];}
 
   chunkTexture(cx, cy) {
@@ -166,6 +226,17 @@ export class TerrainRenderer {
           if(dirty){context.save();polygon();context.clip();context.clearRect(point.x-left-33,point.y-origin.y-17,66,34);context.restore();}
           context.save();polygon(TILE_BLEED);context.clip();
           if(state===VISIBILITY.UNEXPLORED){context.fillStyle='#000';polygon(TILE_BLEED);context.fill();context.restore();continue;}
+          const ground=this.groundAt(x,y),groundKeys=ground?this.groundKinds[ground]:null;
+          if(groundKeys?.length){
+            if(state===VISIBILITY.EXPLORED)context.filter=`grayscale(${(1-FOG_STYLE.saturation)*100}%) brightness(${(this.fog?.brightness(tile)??FOG_STYLE.brightness)*100}%)`;
+            const key=groundKeys[terrainHash(x,y)%groundKeys.length],frame=this.scene.textures.get(key).get();
+            context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,point.x-left-32,point.y-origin.y-16,64,32);
+            this.blendEdges(context,x,y,ground,point.x-left-32,point.y-origin.y-16,season);
+            const winter=GROUND_WINTER[ground],mix=state===VISIBILITY.VISIBLE?this.seasonMix?.(x,y,season):null,amount=season==='Winter'?(mix?mix.amount:1):mix?.from==='Winter'?1-mix.amount:0;
+            if(winter&&amount>0){context.globalCompositeOperation='source-atop';context.globalAlpha=amount;context.fillStyle=winter;polygon(TILE_BLEED);context.fill();context.globalAlpha=1;}
+            if(this.wear)paths.push({x,y,polygon,filter:context.filter,veil:season==='Winter'?.45:0});
+            context.restore();continue;
+          }
           const wear=this.wear?this.wearTextures[0]:null,entry=wear?(wear.variants.length?{key:wear.variants[terrainHash(x,y)%wear.variants.length]}:wear):this.groundTextures[terrainHash(x,y)%this.groundTextures.length];
           if(state===VISIBILITY.EXPLORED)context.filter=`grayscale(${(1-FOG_STYLE.saturation)*100}%) brightness(${(this.fog?.brightness(tile)??FOG_STYLE.brightness)*100}%)`;
           const draw=key=>{const frame=this.scene.textures.get(key).get(key===entry.key?entry.frame:undefined);context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,point.x-left-32,point.y-origin.y-16,64,32);};
@@ -275,7 +346,7 @@ export class TerrainRenderer {
     this.fog=fog;this.memory=memory;
     this.updateFog(camera,fog);
     const view = camera.worldView;
-    const cacheKey = [Math.floor(view.x / 16), Math.floor(view.y / 16), Math.ceil(view.width), Math.ceil(view.height),fog?`${fog.enabled}:${fog.explorationEnabled}`:'',this.debugEnabled?this.wear?.levelRevision??0:0,this.debugEnabled?this.wear?.revision:0,this.debugEnabled].join(',');
+    const cacheKey = [Math.floor(view.x / 16), Math.floor(view.y / 16), Math.ceil(view.width), Math.ceil(view.height),fog?`${fog.enabled}:${fog.explorationEnabled}`:'',this.debugEnabled?this.wear?.levelRevision??0:0,this.debugEnabled?this.wear?.revision:0,this.debugEnabled,this.scene.bushes?.size?`${this.scene.buildings?.length}:${this.scene.naturalResources?.topologyRevision}:${this.scene.resourceOccupancy?.size}:${this.wear?.levelRevision}`:''].join(',');
     // Performance: path wear repaints only its own tiles (invalidateArea), so it no longer re-walks every visible tile.
     // Sight moving by a step only re-tints the rock outcrops whose visibility changed; the full walk over every visible
     // tile runs when the camera moves, the Fog mode changes, or a newly seen rock has no sprite yet.
@@ -296,7 +367,7 @@ export class TerrainRenderer {
     const maxX=Math.min(COLUMNS-1,Math.ceil(Math.max(...corners.map(p=>p.x)))+1);
     const minY=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.y)))-1);
     const maxY=Math.min(ROWS-1,Math.ceil(Math.max(...corners.map(p=>p.y)))+1);
-    const visible = new Set(), neededChunks = new Set(), chunkIds = new Set();
+    const visible = new Set(), neededChunks = new Set(), chunkIds = new Set(), shownBushes=new Set();let occupied=null;
     let visibleCount = 0;
     for(let y=minY;y<=maxY;y++) for(let x=minX;x<=maxX;x++) {
       const p=tileCenter({x,y});
@@ -307,6 +378,15 @@ export class TerrainRenderer {
         this.debugGraphics.fillStyle(colors[level],level ? .36 : .08);this.debugGraphics.fillPoints([{x:p.x-31,y:p.y},{x:p.x,y:p.y-15},{x:p.x+31,y:p.y},{x:p.x,y:p.y+15}],true);
       }
       const chunk=Math.floor(y/CHUNK_SIZE)*64+Math.floor(x/CHUNK_SIZE);if(!chunkIds.has(chunk)){chunkIds.add(chunk);neededChunks.add(`${Math.floor(x/CHUNK_SIZE)},${Math.floor(y/CHUNK_SIZE)}`);}
+      const bush=this.scene.bushes?.get(`${x},${y}`);
+      if(bush!==undefined){
+        occupied??=this.buildingTiles();const state=fog?.displayState({x,y})??VISIBILITY.VISIBLE;
+        if(state!==VISIBILITY.UNEXPLORED&&(!fog?.enabled||fog.isInSightTile({x,y})||fog.explored[y*fog.width+x])&&this.bushVisible(x,y,occupied)){
+          const key=`${x},${y}`,id=BUSH_TYPES[bush],definition=this.registry.get?.(id),sprite=this.bushSprites.get(key)??this.bushPool.pop()??this.scene.add.image(0,0,this.assets?.textureKey(id)??'__DEFAULT');
+          if(this.paintBush(sprite,bush,state,fog)){sprite.setOrigin(definition?.origin?.x??.5,definition?.origin?.y??.6).setPosition(p.x,p.y).setDepth(p.y+(definition?.depth?.offset??0)).setVisible(true);this.bushSprites.set(key,sprite);shownBushes.add(key);}
+          else{sprite.setVisible(false);this.bushPool.push(sprite);this.bushSprites.delete(key);}
+        }
+      }
       // Only rock outcrops need sprites: ordinary ground stops here without any fog or memory lookups.
       if(!this.map[y]?.[x])continue;
       const state=fog?.displayState({x,y})??VISIBILITY.VISIBLE;
@@ -322,6 +402,7 @@ export class TerrainRenderer {
       tile.setVisible(false);this.wallPool.push(tile);
       this.tiles.delete(key);
     }
+    for(const [key,sprite]of this.bushSprites)if(!shownBushes.has(key)){sprite.setVisible(false);this.bushPool.push(sprite);this.bushSprites.delete(key);}
     for (const [key, chunk] of this.chunks) if (!neededChunks.has(key)) {
       chunk.setVisible(false); this.chunkPool.push(chunk); this.chunks.delete(key);
     }

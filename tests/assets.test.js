@@ -9,10 +9,10 @@ import { ResourceSpawner, resourceCandidates, generateResourcePositions, tileKey
 const definition = (id, changes = {}) => ({ ...structuredClone(objectRegistry.require('stone')), id, ...changes });
 
 test('registry exposes the existing game objects, categories and buildable menu', () => {
-  assert.equal(objectRegistry.all().length, 65);
+  assert.equal(objectRegistry.all().length, 73); // +8 in 0.14.0 (#100): four ground types and four bushes
   assert.deepEqual(objectRegistry.buildables().map(d => d.id), ['tower','castle','wall','wall_gate','quarry','hunting_lodge','barracks','farmhouse','wheat_field','orchard','mill','bakery','granary','warehouse','marketplace','house','stone_pavement','stables','wheelwright_workshop','lumberjack_hut','iron_mine','brazier','smelter','bowyer','swordsmith','armorer','armory']);
-  assert.deepEqual(objectRegistry.byCategory('terrain').map(d => d.id), ['grass','dirt','grass_normal','grass_trampled_1','grass_trampled_2','grass_trampled_3']);
-  assert.equal(objectRegistry.forGallery('all').length, 65);
+  assert.deepEqual(objectRegistry.byCategory('terrain').map(d => d.id), ['grass','dirt','grass_normal','grass_trampled_1','grass_trampled_2','grass_trampled_3','beach_sand','desert_sand','shallow_water','deep_water']);
+  assert.equal(objectRegistry.forGallery('all').length, 73);
   assert.equal(objectRegistry.forGallery('resource')[0].id, 'stone');
   assert.equal(objectRegistry.require('tower').cost.stone, 10);
   assert.equal(objectRegistry.get('missing'), null);
@@ -110,14 +110,15 @@ test('asset URLs retain the Pages prefix; PNG/WebP/sheets load once per object t
   const manager = new AssetManager(scene,registry,{baseURL:'/Newgame/'});
   // 65 registered objects (the Marketplace from 0.9.5, the Gate from 0.11.1) + the animated test object, plus the tower's front layer, the four approved grass tiles
   // the nine approved tree looks (six oak, three pine) and twelve seasonal grass tiles (spring, autumn, winter).
-  assert.equal(manager.queue(),94);assert.equal(manager.queue(),0);
-  assert.equal(calls.length,94); // +2: the Mill still body and sails layers (#99)
+  // #100 (0.14.0): +8 objects (four ground types, four bushes) and four tiles for each ground type: 94 + 8 + 16.
+  assert.equal(manager.queue(),118);assert.equal(manager.queue(),0);
+  assert.equal(calls.length,118); // +2: the Mill still body and sails layers (#99)
   assert.ok(calls.some(c=>c[2].endsWith('.webp')));
   assert.deepEqual(calls.find(c=>c[0]==='sheet'),['sheet','asset:animated:main','/Newgame/assets/resources/stone/stone.png',{frameWidth:32,frameHeight:48}]);
 });
 
-test('terrain tiles may list interchangeable sprite variants that load as extra layers; only approved grass uses them', () => {
-  assert.deepEqual(objectRegistry.all().filter(d=>d.spriteVariants).map(d=>d.id),['grass_normal'],'only the approved grass set is wired in');
+test('terrain tiles may list interchangeable sprite variants that load as extra layers; grass and the #100 ground types use them', () => {
+  assert.deepEqual(objectRegistry.all().filter(d=>d.spriteVariants).map(d=>d.id),['grass_normal','beach_sand','desert_sand','shallow_water','deep_water'],'grass and the four ground types are wired in');
   const grass=objectRegistry.require('grass_normal'),registry=new ObjectRegistry(objectRegistry.all().filter(d=>d.id!=='grass_normal'));
   registry.register({...grass,seasonVariants:undefined,spriteVariants:['/assets/terrain/path_wear/a.png','/assets/terrain/path_wear/b.png']});
   const calls=[],scene={load:{on(){},image(...args){calls.push(args);},spritesheet(){}},textures:{exists:()=>false}};
