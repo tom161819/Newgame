@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "assetId": "shore-transitions",
+  "variantId": "shore-transitions-water-mud",
+  "name": "Water / mud",
+  "category": "terrain",
+  "version": 1,
+  "specHash": "3568e393",
+  "generator": "ground",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 384,
+  "height": 192,
+  "anchor": {
+    "x": 192,
+    "y": 96
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.5
+  },
+  "footprint": {
+    "width": 6,
+    "height": 6
+  },
+  "base": {
+    "x": 192,
+    "y": 192
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 1
+  },
+  "visualHeight": 192,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0,
+  "lights": [],
+  "surface": {
+    "mode": "transition",
+    "tileWidth": 64,
+    "tileHeight": 32,
+    "frames": 16,
+    "frameMeaning": "interchangeable grass tiles, pick by tile hash",
+    "gameWear": null
+  }
+}
