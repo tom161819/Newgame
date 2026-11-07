@@ -1,3 +1,4 @@
+import { createBackgroundSimulation } from '../ui/BackgroundSimulationUI.js';
 import { RockMiningTool } from '../ui/RockMiningTool.js';
 import { DemolitionSystem } from '../systems/DemolitionSystem.js';
 import { finishDemolition } from './buildingRemoval.js';
@@ -222,7 +223,7 @@ export class GameScene extends Phaser.Scene {
     this.combat.on('death',(unit,killer)=>this.onUnitDeath(unit,killer));
     this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
     this.mapMemory=new MapMemory(this.fog);this.memoryRenderer=new MapMemoryRenderer(this,this.mapMemory);
-    this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.fog.setExplorationEnabled(settings.explorationMode);this.fog.setMemoryBrightness(settings.memoryBrightness);this.terrain.setDebug(settings.pathWearDebug);this.refreshVisibility();},open=>this.pauseManager.set('settings',open),{seasons:this.seasons,onSeasonsChange:enabled=>{this.gameSettings=gameSettings({...this.gameSettings,seasonsEnabled:enabled});this.seasons.setEnabled(enabled);this.refreshVisibility();}});
+    this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.fog.setExplorationEnabled(settings.explorationMode);this.fog.setMemoryBrightness(settings.memoryBrightness);this.terrain.setDebug(settings.pathWearDebug);this.background?.setEnabled(settings.runInBackground);this.refreshVisibility();},open=>this.pauseManager.set('settings',open),{seasons:this.seasons,onSeasonsChange:enabled=>{this.gameSettings=gameSettings({...this.gameSettings,seasonsEnabled:enabled});this.seasons.setEnabled(enabled);this.refreshVisibility();}});
     this.fog.setEnabled(this.settingsPanel.settings.fogOfWar);
     this.fog.setMemoryBrightness(this.settingsPanel.settings.memoryBrightness);
     if(!this.loadState){this.settingsPanel.applySettings({...this.settingsPanel.settings,fogOfWar:this.gameSettings.fogOfWar,explorationMode:this.gameSettings.explorationMode});this.fog.setEnabled(this.gameSettings.fogOfWar);}
@@ -262,10 +263,11 @@ export class GameScene extends Phaser.Scene {
     this.worldCamera=new WorldCamera(this,this.player);this.staffingIndicators=new MissingWorkersIndicators(this);
     this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState){this.naturalResources.generate();this.naturalResources.mining.generate();}
     this.resourceLedger=new ResourceTransactionLedger(this);if(this.loadState)this.resourceLedger.suspend();this.inventoryBar.setLedger(this.resourceLedger);
-    const onBackground=()=>{this.visibilityPaused=true;this.tweens.pauseAll();this.setGalleryInput(false);};
-    const onForeground=()=>{this.visibilityPaused=false;this.activeFramePending=true;if(!this.gameOver&&!this.gameTime.paused)this.tweens.resumeAll();this.setGalleryInput(true);};
+    const onBackground=()=>{this.background?.hide();this.visibilityPaused=true;this.tweens.pauseAll();this.setGalleryInput(false);};
+    const onForeground=()=>{this.visibilityPaused=false;this.activeFramePending=true;if(!this.gameOver&&!this.gameTime.paused)this.tweens.resumeAll();this.setGalleryInput(true);this.background?.show();};
     this.game.events.on(Phaser.Core.Events.PAUSE,onBackground);this.game.events.on(Phaser.Core.Events.RESUME,onForeground);
     this.controls=new AbortController();
+    this.background=createBackgroundSimulation(this);
     // Automatic employment ON/OFF in Settings; it belongs to this game and is saved with it.
     const autoToggle=document.querySelector('#auto-employment-toggle');autoToggle.checked=this.employment.enabled;autoToggle.addEventListener('change',()=>this.employment.setEnabled(autoToggle.checked),{signal:this.controls.signal});
     this.unsubscribeEmployment=this.employment.onChange(()=>{autoToggle.checked=this.employment.enabled;});
@@ -302,7 +304,7 @@ export class GameScene extends Phaser.Scene {
       this.settingsPanel.destroy();this.fpsOverlay.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
       this.clearWallPreviews();
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
-      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.marketplacePanel.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
+      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.marketplacePanel.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.pavementTool.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
       this.demolitionUI.destroy();this.demolition.destroy();this.farmConnections.destroy();this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
@@ -639,6 +641,8 @@ export class GameScene extends Phaser.Scene {
     const output=document.querySelector('#vision-status');if(output.textContent!==text)output.textContent=text;
   }
   update(_time,delta) {
+    // #60: while catching up after a hidden tab, every frame runs a batch of simulation steps and draws once.
+    if(this.background?.running&&!this.visibilityPaused){this.background.step();this.activeFramePending=true;this.updateTimeDisplay();this.updateFoodDisplay();this.refreshVisibility();return;}
     if(this.gameOver||this.gameTime.paused||this.visibilityPaused)return;
     // Phaser delta je vyhlazené a při pomalých snímcích ořezané. Herní čas,
     // pohyb i DPS používají skutečné aktivní milisekundy mezi snímky.
@@ -650,24 +654,32 @@ export class GameScene extends Phaser.Scene {
     // První snímek po Load/Resume pouze obnoví obraz. Nulový čas nesmí
     // změnit uloženou animaci, rozpracovanou AI ani příkazy jednotek.
     if(!delta){this.refreshVisibility();return;}
+    const activeDelta=this.simulationStep(delta);this.updateTimeDisplay();if(activeDelta===null)return;
+    this.updateFoodDisplay();this.worldCamera.update(delta);this.refreshVisibility();this.lightSources.update(delta);
+    if(this.buildMode&&!document.querySelector('dialog[open]')){if(this.previewTracking)this.previewAnchor=this.pointerTile(this.input.activePointer);this.updateBuildingPreview();}
+  }
+  // #60: one step of the authoritative simulation, shared by normal frames and the background catch-up. Drawing and
+  // the HUD are refreshed by the caller. Returns the active game time, or null when the King fell during the step.
+  // Sight and the explored-map memory between catch-up steps (normal frames do this in refreshVisibility).
+  observeWorld(){captureMapKnowledge(this);}
+  simulationStep(delta){
     // Časové úseky uzavírají mzdy před novou prací, změnou skillu nebo úmrtím tohoto snímku.
-    const activeDelta=this.gameTime.update(delta);this.updateTimeDisplay();this.millSails?.update(activeDelta);
+    const activeDelta=this.gameTime.update(delta);this.millSails?.update(activeDelta);
     this.character.update(delta);this.naturalResources.updateKing(delta);this.player.animate(delta,this.character.walking&&[PLAYER_STATE.GROUND,PLAYER_STATE.ON_WALL].includes(this.character.state),this.character.direction);
     this.kingLogistics.update(delta);
     this.logisticsTasks.update();
     this.animalSystem.update(delta);this.huntingSystem.update(delta);this.mountSystem.update(delta);this.workerSystem.update(delta);const covered=this.combat.update(delta);
-    if(this.gameOver)return;
+    if(this.gameOver)return null;
     this.constructionSystem.update(delta);this.demolition.update(delta);
     this.farmingSystem.update(delta);
     this.foodProduction.update(delta);this.military.update(delta);this.vehicles.update();this.stables.update(delta);this.caravans.update(delta);this.trade.update();this.caravanViews.update();this.vehicleViews.update();this.employment.update();this.diagnostics.update();
     this.regeneration.update(delta,[this.character,...this.animalSystem.animals.values(),...this.workerSystem.liveWorkers()],covered);
-    this.combatFeedback.update(activeDelta);this.foodSystem.update(activeDelta);this.updateFoodDisplay();
+    this.combatFeedback.update(activeDelta);this.foodSystem.update(activeDelta);
     this.experienceFeedback.update(activeDelta);
     for(const spawner of this.resourceSpawners)spawner.update(activeDelta);
     this.wildlifeRespawn.update(activeDelta);
     this.noticeRemaining=Math.max(0,this.noticeRemaining-activeDelta);if(!this.noticeRemaining)document.querySelector('#day-notice').hidden=true;
-    this.worldCamera.update(delta);this.refreshVisibility();this.lightSources.update(delta);
-    if(this.buildMode&&!document.querySelector('dialog[open]')){if(this.previewTracking)this.previewAnchor=this.pointerTile(this.input.activePointer);this.updateBuildingPreview();}
+    return activeDelta;
   }
   refreshVisibility(){
     if(this.inventoryRevision!==this.foodStorage.revision){this.inventoryRevision=this.foodStorage.revision;this.updateInventory();}

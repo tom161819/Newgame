@@ -112,6 +112,8 @@
       <p data-i18n="settings.seasonsHint">OFF keeps permanent summer and remembers the seasonal cycle. Weather and game days continue.</p>
       <label class="setting-row" for="path-wear-toggle"><span data-i18n="settings.pathWear">Show Path Wear Debug</span><input id="path-wear-toggle" type="checkbox" role="switch" /></label>
       <p data-i18n="settings.pathWearHint">Barvy vyšlapání a počet průchodů pod ukazatelem myši.</p>
+      <label class="setting-row" for="background-toggle" title="Continue game simulation when the browser tab is inactive." data-i18n-attr="title:settings.backgroundTip"><span data-i18n="settings.background">Run in Background</span><input id="background-toggle" type="checkbox" role="switch" /></label>
+      <p data-i18n="settings.backgroundHint">Browsers stop hidden tabs, so the missed time is caught up when you return (at most 15 minutes per absence). Stored in this browser only.</p>
       <h3 class="settings-subheading" data-i18n="dev.title">Developer</h3>
       <label class="setting-row" for="dev-fps-toggle"><span data-i18n="dev.showFps">Show FPS · F3</span><input id="dev-fps-toggle" type="checkbox" role="switch" /></label>
       <p data-i18n="dev.showFpsHint">Frames per second, the slowest frame and stutters over 50 ms in the last 5 seconds. Stored in this browser only, never in a save.</p>
@@ -148,6 +150,15 @@
       <table id="marketplace-prices" class="market-prices"><thead><tr><th data-i18n="market.good">Good</th><th data-i18n="market.buy">Buy</th><th data-i18n="market.sell">Sell</th></tr></thead><tbody></tbody></table>
       <details id="marketplace-auto" class="market-auto"><summary id="marketplace-auto-summary"></summary><div id="marketplace-auto-body"></div></details>
       <section id="marketplace-stats" class="market-stats" aria-live="polite"></section>
+    </dialog>
+    <dialog id="catch-up-dialog" class="game-dialog catch-up-dialog" aria-labelledby="catch-up-title">
+      <h2 id="catch-up-title" data-i18n="background.updating">Updating kingdom…</h2>
+      <progress id="catch-up-progress" max="100" value="0"></progress><p id="catch-up-status" role="status"></p>
+    </dialog>
+    <dialog id="away-summary" class="game-dialog away-summary" aria-labelledby="away-title">
+      <h2 id="away-title" data-i18n="background.awayTitle">While you were away</h2>
+      <div id="away-summary-body"></div>
+      <button id="away-continue" type="button" data-i18n="background.continue">Continue</button>
     </dialog>
     <dialog id="builder-workshop-dialog" class="game-dialog builder-workshop-dialog" aria-labelledby="builder-workshop-title">
       <div class="dialog-heading"><h2 id="builder-workshop-title" data-i18n="object.builder_workshop.name">Builder's Workshop</h2><button id="close-builder-workshop" type="button" data-i18n="common.close">Close ×</button></div>

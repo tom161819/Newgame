@@ -107,7 +107,7 @@ export function serializeGameState(scene){
     time:scene.gameTime.exportState(),food:scene.foodSystem.exportState(),wildlifeRespawn:scene.wildlifeRespawn?.exportState()??{elapsed:0},
     spawners:scene.resourceSpawners.map(s=>({id:s.definition.id,...s.exportState()})),production:scene.production.exportState(),
     camera:{zoom:camera.zoom,x:camera.scrollX+camera.width/2,y:camera.scrollY+camera.height/2,following:scene.worldCamera.following},
-    settings:(({memoryBrightness,...game})=>game)(scene.settingsPanel.settings),
+    settings:(({memoryBrightness,runInBackground,...game})=>game)(scene.settingsPanel.settings),
     commands:{hunt:scene.huntingSystem.target?.id??null,huntRepath:scene.huntingSystem.repath,mount:scene.mountSystem.target?.id??null,mountRepath:scene.mountSystem.repath,
       attacks:[...scene.combat.attacks].map(([a,t])=>[a.id,t.id]),pendingChest:scene.treasureSystem.pending},
     counters:{animal:scene.animalSystem.nextId,drop:scene.dropSystem.nextId,chest:scene.treasureSystem.nextId},

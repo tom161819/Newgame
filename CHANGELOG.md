@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-11-07
+<!-- version: {"title":"Run in Background","type":"feature","reconstructed":false,"saveVersion":49} -->
+### Added
+- Run in Background (Settings, off by default). Browsers pause hidden tabs, so when you come back the kingdom catches up on the missed time (up to 15 minutes per absence) and then shows a "While you were away" summary: time passed, stock changes, finished buildings, new villagers and events. Any time beyond 15 minutes is listed as not simulated.
+
 ## [0.21.0] - 2026-11-07
 <!-- version: {"title":"Automatic trade","type":"feature","reconstructed":false,"saveVersion":49} -->
 ### Added
