@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-07T11:10:00.000Z",
+  "updatedAt": "2026-11-07T11:11:49.542Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -66,11 +66,13 @@
       "preferred": "bakery-house-yard-oven",
       "variants": {
         "bakery-house-yard-oven": {
-          "status": "review",
-          "version": 3,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "2e7c77dd",
-          "note": "Revision 3 for review (owner's comments in the history).",
-          "updatedAt": "2026-11-07T11:10:00.000Z",
+          "status": "approved",
+          "updatedAt": "2026-11-07T11:09:38.457Z",
+          "version": 3,
+          "approvedAt": "2026-11-07T11:09:38.457Z",
           "comments": [
             {
               "at": "2026-11-07T10:10:01.331Z",
@@ -111,6 +113,14 @@
               "at": "2026-11-07T10:45:00.454Z"
             }
           ]
+        },
+        "bakery-house-stall": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "312c474f",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T11:09:41.052Z",
+          "version": 1
         }
       }
     },
@@ -178,11 +188,12 @@
       "preferred": "builders-workshop-material-yard",
       "variants": {
         "builders-workshop-open-shed": {
-          "status": "review",
-          "version": 2,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "893cfd2c",
-          "note": "v2: 3 × 3 as the owner asked (7 Nov 2026).",
-          "updatedAt": "2026-11-07T00:45:00.000Z",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T11:10:00.374Z",
+          "version": 2,
           "history": [
             {
               "version": 1,
@@ -193,11 +204,12 @@
           ]
         },
         "builders-workshop-house-awning": {
-          "status": "review",
-          "version": 2,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "abfe49fd",
-          "note": "v2: 3 × 3 as the owner asked (7 Nov 2026).",
-          "updatedAt": "2026-11-07T00:45:00.000Z",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T11:10:01.958Z",
+          "version": 2,
           "history": [
             {
               "version": 1,
@@ -208,11 +220,13 @@
           ]
         },
         "builders-workshop-material-yard": {
-          "status": "review",
-          "version": 4,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "22170ec8",
-          "note": "Revision 4 for review (owner's comments in the history).",
-          "updatedAt": "2026-11-07T11:10:00.000Z",
+          "status": "approved",
+          "updatedAt": "2026-11-07T11:09:51.083Z",
+          "version": 4,
+          "approvedAt": "2026-11-07T11:09:51.083Z",
           "comments": [
             {
               "at": "2026-11-07T10:11:53.944Z",
@@ -255,11 +269,12 @@
           ]
         },
         "builders-workshop-blender": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "abfc0b66",
-          "note": "Blender pilot: the same layout rendered by Blender for comparison.",
-          "updatedAt": "2026-11-07T00:58:00.000Z"
+          "status": "rejected",
+          "updatedAt": "2026-11-07T11:10:03.338Z",
+          "version": 1
         }
       }
     },
@@ -332,11 +347,13 @@
       "preferred": "house-timber",
       "variants": {
         "house-timber": {
-          "status": "review",
-          "version": 3,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "8b6116fc",
-          "note": "Revision 3 for review (owner's comments in the history).",
-          "updatedAt": "2026-11-07T11:10:00.000Z",
+          "status": "approved",
+          "updatedAt": "2026-11-07T11:10:29.498Z",
+          "version": 3,
+          "approvedAt": "2026-11-07T11:10:29.498Z",
           "comments": [
             {
               "at": "2026-11-07T10:15:06.484Z",
@@ -377,6 +394,22 @@
               "at": "2026-11-07T10:46:29.767Z"
             }
           ]
+        },
+        "house-stone": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2cf4b872",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T11:10:32.791Z",
+          "version": 1
+        },
+        "house-wood": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1d7d3382",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T11:10:33.538Z",
+          "version": 1
         }
       }
     },
@@ -1038,11 +1071,13 @@
           "version": 1
         },
         "ruined-tower-winter": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "1595d210",
-          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
-          "updatedAt": "2026-11-06T03:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T11:10:44.842Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T11:10:44.842Z"
         }
       }
     },
@@ -1134,11 +1169,13 @@
           ]
         },
         "ruined-wall-blender": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "65c7d893",
-          "note": "Blender pilot (#149): the Breach layout rendered by Blender for comparison; decoration only.",
-          "updatedAt": "2026-11-06T23:55:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:56:03.799Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:56:03.799Z"
         }
       }
     },
@@ -1177,6 +1214,15 @@
     "torch-post": {
       "preferred": "torch-post-brazier",
       "variants": {
+        "torch-post-iron": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "363c2830",
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:57:10.390Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:57:10.390Z"
+        },
         "torch-post-brazier": {
           "status": "approved",
           "version": 1,
@@ -1284,6 +1330,14 @@
     "equipment-bow": {
       "preferred": "equipment-bow-quiver",
       "variants": {
+        "equipment-bow-plain": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e403d587",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:55:59.580Z",
+          "version": 1
+        },
         "equipment-bow-quiver": {
           "status": "approved",
           "version": 1,
@@ -1815,18 +1869,21 @@
       "preferred": "merchant-caravan-empty",
       "variants": {
         "merchant-caravan-full": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "af6eb3ca",
-          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:56:20.201Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:56:20.201Z"
         },
         "merchant-caravan-unloading": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "4858f070",
-          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:56:13.273Z",
+          "version": 1
         },
         "merchant-caravan-empty": {
           "approvedAt": "2026-11-07T06:13:09.119Z",
@@ -1871,13 +1928,46 @@
     "military-directions": {
       "preferred": "military-directions-4",
       "variants": {
+        "military-directions-0": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "8ac797ea",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:56:48.272Z",
+          "version": 1
+        },
+        "military-directions-1": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "39a2923d",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:56:48.272Z",
+          "version": 1
+        },
+        "military-directions-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "da0dbc6c",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:56:48.272Z",
+          "version": 1
+        },
+        "military-directions-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "da2c7bf7",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:56:48.272Z",
+          "version": 1
+        },
         "military-directions-4": {
-          "status": "approved",
-          "version": 1,
-          "specHash": "3d173c7e",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-04T21:39:54.751Z",
-          "approvedAt": "2026-11-04T21:39:54.751Z"
+          "specHash": "3d173c7e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:56:48.272Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:56:48.272Z"
         },
         "military-directions-5": {
           "status": "approved",
@@ -2067,6 +2157,14 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:06:34.772Z",
           "approvedAt": "2026-11-04T19:06:34.772Z"
+        },
+        "soldier-female": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "aaad75c6",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T11:10:50.596Z",
+          "version": 1
         }
       }
     },
