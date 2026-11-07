@@ -40,7 +40,7 @@ export default {
   'staffing.editor.help':'Changes apply to all buildings of this type. Excess employees become Unemployed. Export these authoring data for use in another browser; game saves do not contain them. Import the same data before loading affected saves.',
 
   // Independent Granary capacities (#123).
-  'storage.granary.raw':'Raw Materials {used}/{capacity} · Incoming {incoming} · Free {free}',
+  "storage.fill":"How full the store is","storage.group.materials":"Materials","storage.group.food":"Food","storage.group.equipment":"Equipment","storage.reservedShort":"reserved {count}","storage.empty":"Empty.","storage.hiddenEmpty":"{count} empty kinds of goods not shown.",'storage.granary.raw':'Raw Materials {used}/{capacity} · Incoming {incoming} · Free {free}',
   'storage.granary.food':'Food {used}/{capacity} · Incoming {incoming} · Free {free}',
   // Seasonal field tending (#122).
   'work.message.Tending crops':'Tending crops',

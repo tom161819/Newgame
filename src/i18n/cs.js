@@ -40,7 +40,7 @@ export default {
   'staffing.editor.help':'Změny platí pro všechny budovy tohoto typu. Nadbyteční zaměstnanci se stanou nezaměstnanými. Pro jiný prohlížeč exportujte tato autorská data; herní uložené pozice je neobsahují. Před načtením dotčených pozic importujte stejná data.',
 
   // Independent Granary capacities (#123).
-  'storage.granary.raw':'Suroviny {used}/{capacity} · Na cestě {incoming} · Volno {free}',
+  "storage.fill":"Zaplnění skladu","storage.group.materials":"Materiály","storage.group.food":"Jídlo","storage.group.equipment":"Výbava","storage.reservedShort":"rezervováno {count}","storage.empty":"Prázdný.","storage.hiddenEmpty":"Prázdné druhy zboží nejsou vidět: {count}.",'storage.granary.raw':'Suroviny {used}/{capacity} · Na cestě {incoming} · Volno {free}',
   'storage.granary.food':'Jídlo {used}/{capacity} · Na cestě {incoming} · Volno {free}',
   // Seasonal field tending (#122).
   'work.message.Tending crops':'Péče o plodiny',

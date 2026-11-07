@@ -74,6 +74,7 @@ import { childrenSmoke } from './children-smoke.mjs';
 import { employmentSpreadSmoke } from './employment-spread-smoke.mjs';
 import { storageNoticesSmoke } from './storage-notices-smoke.mjs';
 import { uiThemeSmoke } from './ui-theme-smoke.mjs';
+import { storageWindowSmoke } from './storage-window-smoke.mjs';
 
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
@@ -170,6 +171,7 @@ try{
   if(args.includes('--full')||args.includes('--employment-spread'))await employmentSpreadSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--storage-notices'))await storageNoticesSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--ui-theme'))await uiThemeSmoke(context,origin+base,instrument);
+  if(args.includes('--full')||args.includes('--storage-window'))await storageWindowSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--ledger'))await ledgerSmoke(page);
   if(args.includes('--full')||args.includes('--smelting'))await smeltingSmoke(page);
   if(args.includes('--full')||args.includes('--military'))await militarySmoke(page);

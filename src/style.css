@@ -666,3 +666,18 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .cat-help, .cat-state { font-size:13px; color:#c8bd9c; }
 .cat-message { color:#e0806b; }
 .rats-line.many, .rats-line.infestation { color:#e0a06b; }
+
+/* Storage window (owner, 7 Nov): one compact table per store. */
+.storage-fill { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:4px 10px; margin:4px 0 8px; }
+.storage-fill meter { width:100%; height:10px; }
+.storage-fill-text { grid-column:1 / -1; font-size:12px; color:#b9b598; }
+.storage-table { width:100%; border-collapse:collapse; font-size:14px; }
+.storage-table td, .storage-table th { padding:2px 6px; line-height:1.25; }
+.storage-group th { text-align:left; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#c9b77e; padding-top:8px; border-bottom:1px solid #5b5a40; }
+.storage-name { width:100%; }
+.storage-name-inner { display:flex; align-items:center; gap:6px; }
+.storage-icon { width:20px; height:20px; object-fit:contain; flex:none; }
+.storage-icon-temp { display:inline-grid; place-items:center; border-radius:50%; background:#7b6a3c; color:#fff3d6; font-size:11px; font-weight:700; }
+.storage-amount { text-align:right; font-variant-numeric:tabular-nums; width:4.5em; }
+.storage-reserved { text-align:right; font-size:11px; color:#9a9680; white-space:nowrap; }
+.storage-hidden, .storage-empty { font-size:12px; color:#9a9680; margin:4px 0 0; }

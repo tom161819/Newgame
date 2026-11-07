@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.35.0] - 2026-11-07
+<!-- version: {"title":"Tidier storage window","type":"feature","reconstructed":false,"saveVersion":54} -->
+### Improved
+- The Storage window is tidier.
+  - Each store shows one compact table: an icon, the name, the amount right-aligned and anything reserved in small grey.
+  - Goods are grouped under Materials, Food and Equipment, and empty kinds are hidden.
+  - A bar at the top shows how full the store is ("42 / 200").
+  - The "Collect with King" buttons are gone.
+
 ## [0.34.0] - 2026-11-07
 <!-- version: {"title":"UI Lab in the game","type":"feature","reconstructed":false,"saveVersion":54} -->
 ### Changed
