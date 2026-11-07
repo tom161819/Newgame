@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "assetId": "horse-wagon",
+  "variantId": "horse-wagon-hay",
+  "name": "Hay wagon",
+  "category": "units",
+  "version": 4,
+  "specHash": "5b86b12e",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 78,
+  "anchor": {
+    "x": 65,
+    "y": 44
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.5641
+  },
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "base": {
+    "x": 97,
+    "y": 76
+  },
+  "baseOrigin": {
+    "x": 0.74046,
+    "y": 0.97436
+  },
+  "visualHeight": 76,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.957,
+  "lights": [],
+  "x2": {
+    "width": 259,
+    "height": 152,
+    "anchor": {
+      "x": 129,
+      "y": 86
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 96,
+    "supersampling": 4,
+    "seconds": 81.1,
+    "renderHash": "feec9fb7",
+    "script": "scripts/blender/render.py"
+  }
+}

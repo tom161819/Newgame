@@ -5,11 +5,21 @@ import { box, cylinder, sphere, prism, turnParts } from './shapes.js';
 import { PROPS } from './props.js';
 import { build as buildAnimal } from './animal.js';
 
-const place = (parts, x, z, angle) => turnParts(parts, -angle).map(p => ({ ...p, at: [p.at[0] + x, p.at[1], p.at[2] + z] }));
-// A harnessed horse standing with its front along +x, hooves at local (hx, 0, hz).
-const horseAt = (hx, hz, { coat = 'bay', scale = 0.8 } = {}) => {
-  const breed = coat, made = buildAnimal({ species: 'horse', breed, harness: true }, { footprint: { width: 1, height: 1 } }).primitives;
-  return turnParts(made, Math.PI / 4).map(p => scaled(p, scale, hx, hz));
+// Skeletons (the approved Blender horse body) travel with the parts: rotated and moved the same way.
+const turnVerts = (verts, a) => { const c = Math.cos(a), s = Math.sin(a); return verts.map(([x, y, z, r]) => [x * c + z * s, y, -x * s + z * c, r]); };
+const place = (parts, x, z, angle) => {
+  const out = turnParts(parts, -angle).map(p => ({ ...p, at: [p.at[0] + x, p.at[1], p.at[2] + z] }));
+  out.skeletons = (parts.skeletons ?? []).map(sk => ({ ...sk, verts: turnVerts(sk.verts, -angle).map(([a, b, c, r]) => [a + x, b, c + z, r]) }));
+  return out;
+};
+const pushAll = (into, parts) => { into.push(...parts); if (parts.skeletons?.length) into.skeletons = [...(into.skeletons ?? []), ...parts.skeletons]; return into; };
+// A harnessed horse standing with its front along +x, hooves at local (hx, 0, hz). Owner, 7 Nov 2026: the approved
+// realistic horse (Blender skin) at the same size as the standalone horse (scale 1).
+const horseAt = (hx, hz, { coat = 'bay', scale = 1 } = {}) => {
+  const made = buildAnimal({ species: 'horse', breed: coat, harness: true, skin: true }, { footprint: { width: 2, height: 2 } });
+  const parts = turnParts(made.primitives, Math.PI / 4).map(p => scaled(p, scale, hx, hz));
+  if (made.skeleton) parts.skeletons = [{ ...made.skeleton, verts: turnVerts(made.skeleton.verts, Math.PI / 4).map(([x, y, z, r]) => [x * scale + hx, y * scale, z * scale + hz, r * scale]), sockFrom: made.skeleton.sockFrom * scale }];
+  return parts;
 };
 function scaled(p, k, dx, dz) {
   const out = { ...p, at: [p.at[0] * k + dx, p.at[1] * k, p.at[2] * k + dz] };
@@ -113,10 +123,10 @@ Object.assign(PROPS, {
     if (pair) L.push(box([0.75, 0.035, 0.035], [len / 2 + shift + 0.36, y - 0.04, 0], 'wood_dark'));
     else for (const s of [-1, 1]) L.push(box([0.6, 0.03, 0.03], [len / 2 + shift + 0.28, y - 0.03, s * 0.13], 'wood_dark'));
     if (!two && kind !== 'timber') L.push(box([0.1, 0.04, wid - 0.06], [len / 2 + shift - 0.06, y + 0.2, 0], 'wood_dark'), box([0.03, 0.2, 0.03], [len / 2 + shift - 0.06, y, wid / 2 - 0.05], 'wood_dark'), box([0.03, 0.2, 0.03], [len / 2 + shift - 0.06, y, -wid / 2 + 0.05], 'wood_dark'));
-    const hx = len / 2 + shift + 0.4;
+    const hx = len / 2 + shift + 0.5;
     for (const s of pair ? [-0.27, -0.03, 0.03, 0.27] : [-0.1, 0.1]) L.push(box([0.42, 0.012, 0.012], [len / 2 + shift + 0.27, y + 0.08, s], 'leather', { tilt: [0, 0.18] })); // traces to the collar
-    if (pair) L.push(...horseAt(hx, 0.15, { coat }), ...horseAt(hx, -0.15, { coat: coat === 'bay' ? 'chestnut' : coat }));
-    else L.push(...horseAt(hx, 0, { coat, scale: two ? 0.7 : 0.8 }));
+    if (pair) { pushAll(L, horseAt(hx, 0.2, { coat })); pushAll(L, horseAt(hx, -0.2, { coat: coat === 'bay' ? 'chestnut' : coat })); }
+    else pushAll(L, horseAt(hx, 0, { coat }));
     return place(L, x0, z0, angle);
   },
 
@@ -155,8 +165,8 @@ Object.assign(PROPS, {
     // Lantern on a hook at the front of the bench.
     const lantern = [box([0.04, 0.14, 0.02], [shift + len / 2 - 0.02, y + 0.22, wid / 2 - 0.04], 'wood_dark'), box([0.04, 0.05, 0.04], [shift + len / 2 + 0.01, y + 0.3, wid / 2 - 0.04], 'iron')];
     L.push(...lantern);
-    if (pair) L.push(box([0.75, 0.035, 0.035], [len / 2 + shift + 0.36, y - 0.04, 0], 'wood_dark'), ...horseAt(len / 2 + shift + 0.4, 0.15, { coat }), ...horseAt(len / 2 + shift + 0.4, -0.15, { coat: 'black' }));
-    else L.push(...[-1, 1].map(s => box([0.6, 0.03, 0.03], [len / 2 + shift + 0.28, y - 0.03, s * 0.13], 'wood_dark')), ...horseAt(len / 2 + shift + 0.4, 0, { coat }));
+    if (pair) { L.push(box([0.75, 0.035, 0.035], [len / 2 + shift + 0.36, y - 0.04, 0], 'wood_dark')); pushAll(L, horseAt(len / 2 + shift + 0.5, 0.2, { coat })); pushAll(L, horseAt(len / 2 + shift + 0.5, -0.2, { coat: 'black' })); }
+    else { L.push(...[-1, 1].map(s => box([0.6, 0.03, 0.03], [len / 2 + shift + 0.28, y - 0.03, s * 0.13], 'wood_dark'))); pushAll(L, horseAt(len / 2 + shift + 0.5, 0, { coat })); }
     const out = place(L, x0, z0, angle);
     const lx = shift + len / 2 + 0.01, lz = wid / 2 - 0.04, c = Math.cos(angle), s = Math.sin(angle);
     return Object.assign(out, { lights: [{ type: 'torch', at: [x0 + lx * c - lz * s, y + 0.32, z0 + lx * s + lz * c] }] });

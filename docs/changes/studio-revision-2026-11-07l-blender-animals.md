@@ -50,3 +50,16 @@ None.
 - After the owner picks a style, bake the remaining colours and poses in that look.
 - Then bake the horses for the wagons and caravans.
 - Walk cycles in a baked look need one render per frame and direction (8 × stride frames). Plan the render time for that.
+
+## Follow-up: approved horse in the wagons and caravans (owner, 7 Nov 2026 late evening)
+- **Owner's decisions:**
+  - approved: the horse's styles A (sculpt) and B (fur), the boar and sow, all World v2 textures, reeds, ford stones, ground decals and the round-shore sets;
+  - rejected: the old primitive horse-bay.
+- **Wagons and caravans.** "Put the approved horse into the caravan and the horse wagon, at the same size as the normal horse."
+  - Every horse-wagon and merchant-caravan variant is now pulled by the skinned realistic horse at scale 1.
+  - All of them are baked with Blender in the sculpt look.
+  - How it works:
+    - Props carry `skeletons`, and the workshop recipe returns them.
+    - blender-model.mjs passes them on, and render.py skins each one.
+    - props.js `wagon` (the first caravan variants) uses the same horse.
+- **Preferred horse:** horse-bay-sculpt.

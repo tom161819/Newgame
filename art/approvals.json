@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-07T20:54:24.649Z",
+  "updatedAt": "2026-11-07T21:50:51.394Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -1180,6 +1180,115 @@
         }
       }
     },
+    "ford-stones": {
+      "preferred": "ford-stones-large",
+      "variants": {
+        "ford-stones-large": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0656bd2c",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ford-stones-medium": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "27354e20",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ford-stones-small": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ca306280",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ford-stones-single": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3b512d38",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "ground-decals": {
+      "preferred": "ground-decals-tufts",
+      "variants": {
+        "ground-decals-tufts": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c9c4f860",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ground-decals-tufts-dry": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e01a765b",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ground-decals-flowers": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "eccde3e8",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ground-decals-flowers-yellow": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5af979e1",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ground-decals-flowers-white": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "85346457",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ground-decals-pebbles": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "10a30cf6",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ground-decals-leaves": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "591a699e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
     "haystack": {
       "preferred": "haystack-cocks",
       "variants": {
@@ -1256,6 +1365,56 @@
           "specHash": "9adefce8",
           "status": "approved",
           "updatedAt": "2026-11-07T06:06:29.060Z",
+          "version": 1
+        }
+      }
+    },
+    "reeds": {
+      "preferred": "reeds-clump",
+      "variants": {
+        "reeds-clump": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "66f27d1f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "reeds-tall": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8a02c1a6",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "reeds-sparse": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b81b38e7",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "reeds-clump-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2cd22bcb",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "reeds-tall-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bef31af6",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
           "version": 1
         }
       }
@@ -1844,6 +2003,252 @@
         }
       }
     },
+    "grass-zone-dry": {
+      "preferred": "grass-zone-dry-summer",
+      "variants": {
+        "grass-zone-dry-summer": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2bc41b17",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-dry-spring": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "df03174e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-dry-autumn": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c7f45694",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-dry-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3ffa59f4",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "grass-zone-flowers": {
+      "preferred": "grass-zone-flowers-summer",
+      "variants": {
+        "grass-zone-flowers-summer": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8938425d",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-flowers-spring": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "714d36de",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-flowers-autumn": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "34bf3b3f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-flowers-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ced87089",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "grass-zone-forest": {
+      "preferred": "grass-zone-forest-summer",
+      "variants": {
+        "grass-zone-forest-summer": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bca66b4f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-forest-spring": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "efcc45ec",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-forest-autumn": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b0d0312e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-forest-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "535995ac",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "grass-zone-lush": {
+      "preferred": "grass-zone-lush-summer",
+      "variants": {
+        "grass-zone-lush-summer": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6fa96419",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-lush-spring": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ac38ba44",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-lush-autumn": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "740230a0",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-lush-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "72e83dbe",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "grass-zone-meadow": {
+      "preferred": "grass-zone-meadow-summer",
+      "variants": {
+        "grass-zone-meadow-summer": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "999d40e2",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-meadow-spring": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4a57910e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-meadow-autumn": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "47ec2703",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-meadow-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c462b663",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "grass-zone-stony": {
+      "preferred": "grass-zone-stony-summer",
+      "variants": {
+        "grass-zone-stony-summer": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "787255ee",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-stony-spring": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "28d9a0eb",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-stony-autumn": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "98912088",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-stony-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4696952f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
     "season-ground": {
       "preferred": "season-ground-spring",
       "variants": {
@@ -1886,6 +2291,97 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:06:16.574Z",
           "approvedAt": "2026-11-04T19:06:16.574Z"
+        }
+      }
+    },
+    "shore-ground": {
+      "preferred": "shore-ground-ford",
+      "variants": {
+        "shore-ground-ford": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c7cc8053",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "shore-ground-mud": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3e9a9a1d",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "shore-ground-rocks": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6b866a75",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "shore-ground-water-edge": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d5640d99",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "shore-transitions": {
+      "preferred": "shore-transitions-water-grass",
+      "variants": {
+        "shore-transitions-water-grass": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "33b83106",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "shore-transitions-water-sand": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7ea1e715",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "shore-transitions-water-mud": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3568e393",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "shore-transitions-water-rocks": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7b3315d3",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "shore-transitions-sand-grass": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c75fd074",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
         }
       }
     },
@@ -2349,14 +2845,16 @@
       }
     },
     "boar": {
-      "preferred": null,
+      "preferred": "boar-boar",
       "variants": {
         "boar-boar": {
-          "status": "review",
-          "version": 5,
-          "specHash": "b7633db1",
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "b7633db1",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 5,
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -2405,11 +2903,13 @@
           ]
         },
         "boar-sow": {
-          "status": "review",
-          "version": 2,
-          "specHash": "2447918f",
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "2856a265",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 4,
           "comments": [
             {
               "at": "2026-11-07T19:50:00.000Z",
@@ -3300,9 +3800,15 @@
       }
     },
     "horse": {
-      "preferred": null,
+      "preferred": "horse-bay-sculpt",
       "variants": {
         "horse-bay": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1828f414",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T21:52:49.084Z",
+          "version": 3,
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -3323,12 +3829,6 @@
               "version": 3
             }
           ],
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "1828f414",
-          "status": "revision-requested",
-          "updatedAt": "2026-11-07T20:30:00.000Z",
-          "version": 3,
           "history": [
             {
               "version": 1,
@@ -3405,6 +3905,42 @@
           "status": "revision-requested",
           "updatedAt": "2026-11-07T20:30:00.000Z",
           "version": 3
+        },
+        "horse-bay-sculpt": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "532d499b",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "horse-grey-sculpt": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ddf6977c",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "horse-bay-fur": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "532d499b",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "horse-grey-fur": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ddf6977c",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
         }
       }
     },

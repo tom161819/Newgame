@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "assetId": "horse-wagon",
+  "variantId": "horse-wagon-pair-draught",
+  "name": "Two draught horses with iron bars",
+  "category": "units",
+  "version": 3,
+  "specHash": "b33efd4b",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 74,
+  "anchor": {
+    "x": 65,
+    "y": 40
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.54054
+  },
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "base": {
+    "x": 97,
+    "y": 72
+  },
+  "baseOrigin": {
+    "x": 0.74046,
+    "y": 0.97297
+  },
+  "visualHeight": 72,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.957,
+  "lights": [],
+  "x2": {
+    "width": 259,
+    "height": 145,
+    "anchor": {
+      "x": 129,
+      "y": 79
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 96,
+    "supersampling": 4,
+    "seconds": 84.2,
+    "renderHash": "de1daa7a",
+    "script": "scripts/blender/render.py"
+  }
+}

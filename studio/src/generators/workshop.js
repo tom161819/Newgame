@@ -137,18 +137,19 @@ function body(spec, style) {
 
 export function build(spec, { footprint, style }) {
   const made = spec.body?.kind === 'none' ? { parts: [], lights: [] } : body(spec.body ?? {}, style), [bx, bz] = spec.body?.at ?? [0, 0];
-  const parts = shift(made.parts, bx, bz), lights = shiftLights(made.lights, bx, bz);
+  const parts = shift(made.parts, bx, bz), lights = shiftLights(made.lights, bx, bz), skeletons = [];
   for (const prop of spec.props ?? []) {
     const helper = PROPS[prop.type];
     if (!helper) throw new RangeError(`Unknown prop ${prop.type}`);
     const made = prop.type === 'fence' ? helper(...prop.from, ...prop.to) : helper(prop.at[0], prop.at[1], prop);
     parts.push(...made);
     if (made.lights) lights.push(...made.lights);
+    if (made.skeletons) skeletons.push(...made.skeletons);
   }
   if (spec.ground) parts.unshift(box([footprint.width - 0.18, 0.02, footprint.height - 0.18], [0, 0, 0], spec.ground));
   let height = 0;
   for (const p of parts) height = Math.max(height, p.at[1] + (p.size?.[1] ?? p.height ?? (p.radii ? p.radii[1] * 2 : 0)));
-  return { primitives: parts, lights, height, ...(made.pivot ? { rotor: { at: [made.pivot[0] + bx, made.pivot[1], made.pivot[2] + bz] } } : {}) };
+  return { primitives: parts, lights, height, ...(skeletons.length ? { skeletons } : {}), ...(made.pivot ? { rotor: { at: [made.pivot[0] + bx, made.pivot[1], made.pivot[2] + bz] } } : {}) };
 }
 
 export default { id: 'workshop', version: 1, label: 'Workshop with props', params, build };

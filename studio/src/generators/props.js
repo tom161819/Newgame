@@ -112,7 +112,7 @@ Object.assign(PROPS, {
   // back, tailgate down, crates beside). horse: a draught horse in the shafts.
   wagon: (x0, z0, { angle = 0, load = 'full', horse: withHorse = true, cover = 'cloth_linen', coat = 'horse_chestnut' } = {}) => {
     // (x0, z0) is the middle of the whole rig, wagon and horse together.
-    const x = x0 - Math.cos(angle) * (withHorse ? 0.45 : 0), z = z0 - Math.sin(angle) * (withHorse ? 0.45 : 0);
+    const x = x0 - Math.cos(angle) * (withHorse ? 0.5 : 0), z = z0 - Math.sin(angle) * (withHorse ? 0.5 : 0);
     const L = 0.86, W = 0.44, bed = 0.26, local = [];
     local.push(box([L, 0.06, W], [0, bed, 0], 'wood'), box([L, 0.13, 0.03], [0, bed + 0.06, W / 2 - 0.015], 'wood'), box([L, 0.13, 0.03], [0, bed + 0.06, -W / 2 + 0.015], 'wood'), box([0.03, 0.13, W], [L / 2 - 0.015, bed + 0.06, 0], 'wood'));
     if (load !== 'unloading') local.push(box([0.03, 0.13, W], [-L / 2 + 0.015, bed + 0.06, 0], 'wood'));
@@ -137,12 +137,12 @@ Object.assign(PROPS, {
       local.push(sphere([0.07, 0.05, 0.06], [-0.25, bed + 0.06, -0.1], 'cloth_linen', 1));
     }
     const turned = rotateParts(local, -angle).map(p => ({ ...p, at: [p.at[0] + x, p.at[1], p.at[2] + z] }));
-    if (withHorse) { // revision 3: the merchant's horse is the realistic animal-recipe horse in harness
+    if (withHorse) { // the approved realistic horse (Blender skin), same size as the standalone horse
       const ax = Math.cos(angle), az = Math.sin(angle), breed = { horse_chestnut: 'chestnut', horse_grey: 'grey', horse_bay: 'bay', horse_dark: 'black' }[coat] ?? 'bay';
-      const made = turnParts(buildAnimal({ species: 'horse', breed, harness: true }, { footprint: { width: 1, height: 1 } }).primitives, Math.PI / 4 - angle);
-      turned.push(...made.map(p => scaleAt(p, 0.8, x + ax * (L / 2 + 0.52), z + az * (L / 2 + 0.52))));
-    }
-    return turned;
+      const made = buildAnimal({ species: 'horse', breed, harness: true, skin: true }, { footprint: { width: 2, height: 2 } }), hx = x + ax * (L / 2 + 0.6), hz = z + az * (L / 2 + 0.6), a = Math.PI / 4 - angle, c = Math.cos(a), sn = Math.sin(a);
+      turned.push(...turnParts(made.primitives, a).map(p => scaleAt(p, 1, hx, hz)));
+      if (made.skeleton) turned.skeletons = [{ ...made.skeleton, verts: made.skeleton.verts.map(([px, py, pz, r]) => [px * c + pz * sn + hx, py, -px * sn + pz * c + hz, r]) }];
+    }    return turned;
   },
   // Wheelwright (#92 revision): a spoked wheel. plane 'x' stands it upright with its face toward +z, 'z' upright
   // facing +x, 'flat' lays it down at height y (on a wheel stand). done < 1 leaves part of the rim unbuilt, so the

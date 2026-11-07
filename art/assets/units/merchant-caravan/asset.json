@@ -3,7 +3,7 @@
   "id": "merchant-caravan",
   "name": "Merchant caravan wagon",
   "category": "units",
-  "description": "Obchod F1 (#59): the merchant's own wagon with a draught horse (never the player's). Full on arrival, unloading at the marketplace, empty when leaving. Revision 2 (owner 7 Nov 2026): striped hooped wagon, a wooden house wagon and a long two-horse wagon. Shown driving along grid x: like the player's carts (VehicleViews) the game mirrors one view for the other direction.",
+  "description": "Obchod F1 (#59): the merchant's own wagon with a draught horse (never the player's). Full on arrival, unloading at the marketplace, empty when leaving. Revision 2 (owner 7 Nov 2026): striped hooped wagon, a wooden house wagon and a long two-horse wagon. Shown driving along grid x: like the player's carts (VehicleViews) the game mirrors one view for the other direction. Revision (owner 7 Nov 2026): pulled by the approved realistic horse (Blender, sculpted look) at the same size as the standalone horse; baked with Blender.",
   "footprint": {
     "width": 3,
     "height": 1
@@ -14,7 +14,7 @@
     {
       "id": "merchant-caravan-full",
       "name": "Full wagon",
-      "version": 2,
+      "version": 3,
       "notes": "Red canvas cover (unlike the player's carts) on hoops, crates, sacks and a barrel showing at the back.",
       "spec": {
         "body": {
@@ -31,12 +31,18 @@
             "cover": "cloth_red"
           }
         ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "823738b7",
+        "samples": 96
       }
     },
     {
       "id": "merchant-caravan-unloading",
       "name": "Unloading",
-      "version": 2,
+      "version": 3,
       "notes": "Cover rolled forward, tailgate down, crates and a sack on the ground behind.",
       "spec": {
         "body": {
@@ -53,12 +59,18 @@
             "cover": "cloth_red"
           }
         ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "2478e562",
+        "samples": 96
       }
     },
     {
       "id": "merchant-caravan-empty",
       "name": "Empty wagon",
-      "version": 2,
+      "version": 3,
       "notes": "Bare hoops, one sack left: leaving the marketplace.",
       "spec": {
         "body": {
@@ -75,12 +87,18 @@
             "coat": "horse_grey"
           }
         ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "df1118cf",
+        "samples": 96
       }
     },
     {
       "id": "merchant-caravan-striped-full",
       "name": "Striped wagon, full",
-      "version": 3,
+      "version": 4,
       "notes": "Red-and-linen striped canvas, chest on the tail, lantern.",
       "spec": {
         "body": {
@@ -96,12 +114,18 @@
             "kind": "striped"
           }
         ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "0cd5389f",
+        "samples": 96
       }
     },
     {
       "id": "merchant-caravan-striped-unloading",
       "name": "Striped wagon, unloading",
-      "version": 3,
+      "version": 4,
       "notes": "",
       "spec": {
         "body": {
@@ -118,12 +142,18 @@
             "load": "unloading"
           }
         ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "15fd25a6",
+        "samples": 96
       }
     },
     {
       "id": "merchant-caravan-striped-empty",
       "name": "Striped wagon, empty",
-      "version": 3,
+      "version": 4,
       "notes": "",
       "spec": {
         "body": {
@@ -141,12 +171,18 @@
             "coat": "grey"
           }
         ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "10c875a9",
+        "samples": 96
       }
     },
     {
       "id": "merchant-caravan-house-full",
       "name": "House wagon",
-      "version": 3,
+      "version": 4,
       "notes": "Wooden box wagon with a shingle roof, chimney, windows and steps.",
       "spec": {
         "body": {
@@ -164,12 +200,18 @@
             "cover": "cloth_blue"
           }
         ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "c4c4c02a",
+        "samples": 96
       }
     },
     {
       "id": "merchant-caravan-house-unloading",
       "name": "House wagon, unloading",
-      "version": 3,
+      "version": 4,
       "notes": "",
       "spec": {
         "body": {
@@ -188,12 +230,18 @@
             "cover": "cloth_blue"
           }
         ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "b24dc5ca",
+        "samples": 96
       }
     },
     {
       "id": "merchant-caravan-pair-full",
       "name": "Long two-horse caravan",
-      "version": 3,
+      "version": 4,
       "notes": "Long covered wagon, spare wheel, two horses.",
       "spec": {
         "body": {
@@ -210,6 +258,12 @@
             "cover": "cloth_ochre"
           }
         ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "cbf7b787",
+        "samples": 96
       }
     }
   ]

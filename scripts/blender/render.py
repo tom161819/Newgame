@@ -317,10 +317,10 @@ def add_fur(obj, length, count):
     ps.material = 1
 
 
-def build_skin(model, mats):
+def build_skin(model, mats, sk=None):
     """One smooth body from the animal's skeleton (joints with radii): Skin modifier + subdivision, then lower legs in
     the sock material (dark points, hooves' stockings)."""
-    sk = model['skeleton']
+    sk = sk or model['skeleton']
     mesh = bpy.data.meshes.new('body')
     mesh.from_pydata([tb(v[:3]) for v in sk['verts']], [tuple(e) for e in sk['edges']], [])
     obj = bpy.data.objects.new('body', mesh); bpy.context.scene.collection.objects.link(obj)
@@ -344,6 +344,11 @@ def build_skin(model, mats):
 
 def build_organic(model, rnd, mats, look):
     groups, rest = {}, []
+    for extra in model.get('skeletons') or []:  # horses in vehicles
+        build_skin(model, mats, extra)
+        fur_grain(mats[extra['material']], 0.12)
+    if model.get('skeletons'):
+        model = {**model, 'primitives': [p for p in model['primitives'] if not p.get('skin')]}
     if model.get('skeleton'):
         body = build_skin(model, mats)
         fur_grain(mats[model['skeleton']['material']], 0.12 if look != 'fur' else 0.05)
