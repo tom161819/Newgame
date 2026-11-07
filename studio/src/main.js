@@ -1,5 +1,6 @@
 import './styles.css';
 import { trackTopbarHeight } from './lib/topbarHeight.js';
+import { UI_PRESETS } from '../../art/ui/presets.js';
 import { loadStudioData } from './data.js';
 import { buildCatalog, filterCatalog, CATEGORIES } from './lib/specs.js';
 import { STATUS_LABELS, readLocal, writeLocal, reviewState, reviewSummary, updateLocal, discardLocal, buildExportManifest, pendingChanges, gameArtSources, inGame } from './lib/approvals.js';
@@ -105,7 +106,7 @@ function spriteFor(asset, variant, scale = 1) {
   if (!spriteCache.has(key)) {
     const generator = generators[asset.generator];
     if (variant.baked) spriteCache.set(key, bakedSprite(asset, variant, scale));
-    else if (generator.kind === 'surface') spriteCache.set(key, generator.paint(variant.spec, { footprint: asset.footprint, style, scale }));
+    else if (generator.kind === 'surface' || generator.kind === 'icon') spriteCache.set(key, generator.paint(variant.spec, { footprint: asset.footprint, style, scale }));
     else spriteCache.set(key, renderModel(generator.build(variant.spec, { footprint: asset.footprint, style }), { style, footprint: asset.footprint, scale }));
   }
   return spriteCache.get(key);
@@ -176,7 +177,7 @@ function libraryItem(item) {
   if (item.source === 'game') { if (item.sprite) thumb.append(h('img', { src: item.sprite, alt: '' })); }
   else if (glReady) {
     try {
-      const sprite = spriteFor(item, preferredVariant(item), 1), c = h('canvas', { width: 84, height: 84 });
+      const sprite = isIconSet(item) ? { canvas: spriteFor(item, preferredVariant(item), 2).icons.at(-1).canvas, width: 80, height: 80 } : spriteFor(item, preferredVariant(item), 1), c = h('canvas', { width: 84, height: 84 });
       const ctx = c.getContext('2d'), k = Math.min(78 / sprite.width, 78 / sprite.height);
       ctx.drawImage(sprite.canvas, (84 - sprite.width * k) / 2, (84 - sprite.height * k) / 2, sprite.width * k, sprite.height * k);
       thumb.append(c);
@@ -220,9 +221,10 @@ function assetHeader(asset, extra) {
 
 function studioAssetView(asset) {
   const status = assetStatus(asset);
-  const tabs = [['compare', 'Compare variants'], ['scene', 'Scene & lighting'], ...(walks(asset) ? [['walk', 'Walk cycle']] : []), ['details', 'Spec & files']];
+  const iconSet = isIconSet(asset);
+  const tabs = [['compare', 'Compare variants'], ...(iconSet ? [] : [['scene', 'Scene & lighting']]), ...(walks(asset) ? [['walk', 'Walk cycle']] : []), ['details', 'Spec & files']];
   const tabBar = h('div', { class: 'tabs', role: 'tablist' }, tabs.map(([id, label]) => h('button', { type: 'button', role: 'tab', id: `tab-${id}`, 'aria-selected': String(state.tab === id), onclick: () => { state.tab = id; saveUi(); renderAll(); } }, label)));
-  const body = state.tab === 'scene' ? sceneView(asset) : state.tab === 'details' ? detailsView(asset) : state.tab === 'walk' && walks(asset) ? walkView(asset) : compareView(asset);
+  const body = state.tab === 'scene' && !iconSet ? sceneView(asset) : state.tab === 'details' ? detailsView(asset) : state.tab === 'walk' && walks(asset) ? walkView(asset) : compareView(asset);
   return [assetHeader(asset, h('div', { class: 'review-line' }, pill(status.status), status.local ? h('span', { class: 'pill local' }, 'local changes') : null)), tabBar, ...body];
 }
 
@@ -241,7 +243,10 @@ function zoomControl(key, id, min, max, step) {
 const timeOptions = TIMES.map(t => [t, style.timeOfDay[t].label]);
 const setTime = time => { state.time = time; saveUi(); renderAll(); };
 
+const isIconSet = asset => generators[asset.generator]?.kind === 'icon';
 function compareView(asset) {
+  if (isIconSet(asset)) return [h('p', { class: 'review-note' }, 'Each card shows the set on the panels of the four UI Lab styles: at 22 px (the size of the resource icons in the top bar), at 40 px (1×) and at 2×.'),
+    h('section', { class: 'variants', 'aria-label': 'Variants' }, (pendingMode() && review(asset).pending.length ? asset.variants.filter(v => review(asset).pending.includes(v.id)) : asset.variants).map(variant => variantCard(asset, variant)))];
   const controls = toolbar([
     zoomControl('zoom', 'compare-zoom', 0.5, 4, 0.25),
     segmented('Background', BACKGROUNDS.map(b => [b.id, b.label]), state.background, id => { state.background = id; saveUi(); renderAll(); }),
@@ -263,8 +268,9 @@ function variantCard(asset, variant) {
   const setAside = review.effective.status === 'rejected' && review.effective.note === NOT_CHOSEN;
   const othersWaiting = asset.variants.filter(v => v.id !== variant.id && reviewState({ repo: data.approvals, local: state.local, assetId: asset.id, variant: v }).awaitsOwner).length;
   const base = spriteFor(asset, variant, 1), height = heightInPixels(base.modelHeight);
-  const canvas = h('canvas', { class: 'variant-canvas', 'data-variant': variant.id, role: 'img', 'aria-label': `${variant.name} rendered at ${state.zoom}× on ${state.background}` });
-  canvas._paint = () => paintVariant(canvas, asset, variant);
+  const iconSet = isIconSet(asset);
+  const canvas = h('canvas', { class: `variant-canvas${iconSet ? ' icon-canvas' : ''}`, 'data-variant': variant.id, role: 'img', 'aria-label': iconSet ? `${variant.name} on the four UI styles at 22 px, 1× and 2×` : `${variant.name} rendered at ${state.zoom}× on ${state.background}` });
+  canvas._paint = () => (iconSet ? paintIconSet(canvas, asset, variant) : paintVariant(canvas, asset, variant));
   // #212 decisions on this exact version: Approve, Request revision (needs a comment), Reject; Back to review undoes.
   const comment = h('textarea', { id: `note-${variant.id}`, placeholder: 'Comment for this version (required for Request revision)', 'aria-label': `Comment on ${variant.name} v${variant.version}` });
   const error = h('p', { class: 'review-error', role: 'alert', hidden: true });
@@ -296,7 +302,9 @@ function variantCard(asset, variant) {
   return h('article', { class: `variant-card${review.preferred ? ' preferred' : ''}`, 'data-variant': variant.id },
     h('header', {}, h('div', {}, h('h3', {}, variant.name), h('span', { class: 'sub' }, `${variant.id} · v${variant.version} · #${variant.hash}`)), h('span', { class: 'pills' }, pill(review.outdated ? 'outdated' : review.effective.status, review.outdated ? 'Outdated' : undefined), live ? h('span', { class: 'pill ingame', title: 'The game uses exactly this exported version' }, 'In game') : null)),
     canvas,
-    h('dl', { class: 'facts' },
+    iconSet ? h('dl', { class: 'facts' },
+      h('dt', {}, 'Icons'), h('dd', {}, base.icons.map(i => i.name).join(' · ')),
+      h('dt', {}, 'Size'), h('dd', {}, '40 × 40 px at 1×, 80 × 80 at 2×, and SVG (like the resource icons, shown at 22 px in the top bar)')) : h('dl', { class: 'facts' },
       h('dt', {}, 'Sprite'), h('dd', {}, `${base.width} × ${base.height} px at 1×`),
       h('dt', {}, 'Footprint'), h('dd', {}, `${asset.footprint.width} × ${asset.footprint.height} tiles (${asset.footprint.width * 64} px wide)`),
       h('dt', {}, 'Height'), h('dd', {}, `${base.modelHeight.toFixed(2)} units · ${Math.round(height)} px above ground`),
@@ -329,6 +337,33 @@ function pendingPill(record) {
   return h('span', { class: 'pill local shared', title: 'Saved in the shared Studio; Claude takes it over into the repository at the start of the next chat' }, `Shared: ${status}${by}`);
 }
 
+// UI icon sets: one row per UI Lab style (its panel colour and text), icons at the top-bar size (22 px) and at 1×, then 2×.
+function paintIconSet(canvas, asset, variant) {
+  const generator = generators[asset.generator], list = generator.icons(variant.spec), dpr = Math.min(2, window.devicePixelRatio || 1);
+  const n = list.length, rowH = 58, head = 22, big = 80, cssH = head + UI_PRESETS.length * rowH + big + 26;
+  if (canvas.style.height !== `${cssH}px`) canvas.style.height = `${cssH}px`;
+  const width = Math.round(canvas.clientWidth * dpr), height = Math.round(cssH * dpr);
+  if (!width) return;
+  if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
+  const ctx = canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, width, height);
+  const cssW = width / dpr, label = 118, small = 22, gapS = 8, mid = 40, gapM = 10, x22 = label, x40 = label + n * (small + gapS) + 12;
+  ctx.font = '600 11px system-ui, sans-serif'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#6f6a5c';
+  ctx.fillText('22 px', x22, head / 2); ctx.fillText(`1× · ${list.map(i => i.name).join(' → ')}`, x40, head / 2);
+  UI_PRESETS.forEach((preset, row) => {
+    const y = head + row * rowH, t = preset.tokens;
+    ctx.fillStyle = t.panel; ctx.fillRect(0, y, cssW, rowH);
+    ctx.fillStyle = t.line; ctx.fillRect(0, y + rowH - 1, cssW, 1);
+    ctx.fillStyle = t.ink; ctx.font = '600 12px system-ui, sans-serif'; ctx.fillText(preset.name.replace(/ \(current\)$/, ''), 10, y + rowH / 2, label - 16);
+    list.forEach((icon, i) => {
+      ctx.save(); ctx.translate(x22 + i * (small + gapS), y + (rowH - small) / 2); generator.drawIcon(ctx, icon.shapes, style, small, icon.fit); ctx.restore();
+      ctx.save(); ctx.translate(x40 + i * (mid + gapM), y + (rowH - mid) / 2); generator.drawIcon(ctx, icon.shapes, style, mid, icon.fit); ctx.restore();
+    });
+  });
+  const y = head + UI_PRESETS.length * rowH + 8, t = UI_PRESETS[0].tokens;
+  ctx.fillStyle = t.panelRaised; ctx.fillRect(0, y - 8, cssW, big + 26);
+  ctx.fillStyle = t.muted; ctx.font = '600 11px system-ui, sans-serif'; ctx.fillText('2×', 10, y + big / 2);
+  list.forEach((icon, i) => { ctx.save(); ctx.translate(40 + i * (big + 8), y); generator.drawIcon(ctx, icon.shapes, style, big, icon.fit); ctx.restore(); });
+}
 function paintVariant(canvas, asset, variant, seconds = performance.now() / 1000) {
   const dpr = Math.min(2, window.devicePixelRatio || 1), width = Math.round(canvas.clientWidth * dpr), height = Math.round(canvas.clientHeight * dpr);
   if (!width || !height) return;
@@ -757,7 +792,18 @@ function exportSprite(assetId, variantId, { facings = false } = {}) {
   if (turned.length) meta.facings = turned.map((s, k) => ({ facing: k, width: s.width, height: s.height, anchor: s.anchor, origin: { x: +(s.anchor.x / s.width).toFixed(5), y: +(s.anchor.y / s.height).toFixed(5) } }));
   const walk = turned.length && walksVariant(variant) ? walkSheet(asset, variant, 1) : null;
   if (walk) meta.walk = walkMeta(walk);
-  return { walk: walk?.canvas.toDataURL('image/png') ?? null, facingPngs: turned.map(s => s.canvas.toDataURL('image/png')), png: sprite.canvas.toDataURL('image/png'), front: sprite.front?.toDataURL('image/png') ?? null, still: sprite.still?.toDataURL('image/png') ?? null, rotor: sprite.rotor?.toDataURL('image/png') ?? null, sheet: sprite.sheet?.toDataURL('image/png') ?? null, tiles: sprite.tiles?.map(tile => tile.toDataURL('image/png')) ?? [], meta, paths: { ...variant.paths, spriteTiles: (sprite.tiles ?? []).map((_, i) => `${variant.paths.spriteTileBase}${i}.png`), ...(walk ? { spriteWalk: variant.paths.sprite.replace(/\.png$/, '.walk.png') } : {}) } };
+  // UI icon sets: every level on its own, as SVG and as PNG at 1× and 2×.
+  const iconFiles = [], iconTexts = [];
+  if (sprite.icons) {
+    const generator = generators[asset.generator], twice = spriteFor(asset, variant, 2), base = variant.paths.spriteIconBase;
+    meta.icons = generator.icons(variant.spec).map((icon, i) => {
+      const files = { svg: `${base}${icon.level}.svg`, png: `${base}${icon.level}.png`, png2x: `${base}${icon.level}@2x.png` };
+      iconTexts.push({ path: files.svg, text: `${generator.toSvg(icon.shapes, style, icon.fit)}\n` });
+      iconFiles.push({ path: files.png, png: sprite.icons[i].canvas.toDataURL('image/png') }, { path: files.png2x, png: twice.icons[i].canvas.toDataURL('image/png') });
+      return { level: icon.level, name: icon.name, size: 40, ...files };
+    });
+  }
+  return { iconFiles, iconTexts, walk: walk?.canvas.toDataURL('image/png') ?? null, facingPngs: turned.map(s => s.canvas.toDataURL('image/png')), png: sprite.canvas.toDataURL('image/png'), front: sprite.front?.toDataURL('image/png') ?? null, still: sprite.still?.toDataURL('image/png') ?? null, rotor: sprite.rotor?.toDataURL('image/png') ?? null, sheet: sprite.sheet?.toDataURL('image/png') ?? null, tiles: sprite.tiles?.map(tile => tile.toDataURL('image/png')) ?? [], meta, paths: { ...variant.paths, spriteTiles: (sprite.tiles ?? []).map((_, i) => `${variant.paths.spriteTileBase}${i}.png`), ...(walk ? { spriteWalk: variant.paths.sprite.replace(/\.png$/, '.walk.png') } : {}) } };
 }
 function exportPng(asset, variant) {
   const { png, paths } = exportSprite(asset.id, variant.id);

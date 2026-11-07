@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "assetId": "tax-icons",
+  "variantId": "tax-icons-stacks",
+  "name": "Purse and coin stacks",
+  "category": "ui",
+  "version": 1,
+  "specHash": "e960e446",
+  "generator": "icon",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 232,
+  "height": 40,
+  "anchor": {
+    "x": 116,
+    "y": 40
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 1
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 116,
+    "y": 56
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 1.4
+  },
+  "visualHeight": 56,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0,
+  "lights": [],
+  "icons": [
+    {
+      "level": "none",
+      "name": "None",
+      "size": 40,
+      "svg": "art/sprites/tax-icons/tax-icons-stacks.v1.none.svg",
+      "png": "art/sprites/tax-icons/tax-icons-stacks.v1.none.png",
+      "png2x": "art/sprites/tax-icons/tax-icons-stacks.v1.none@2x.png"
+    },
+    {
+      "level": "low",
+      "name": "Low",
+      "size": 40,
+      "svg": "art/sprites/tax-icons/tax-icons-stacks.v1.low.svg",
+      "png": "art/sprites/tax-icons/tax-icons-stacks.v1.low.png",
+      "png2x": "art/sprites/tax-icons/tax-icons-stacks.v1.low@2x.png"
+    },
+    {
+      "level": "normal",
+      "name": "Normal",
+      "size": 40,
+      "svg": "art/sprites/tax-icons/tax-icons-stacks.v1.normal.svg",
+      "png": "art/sprites/tax-icons/tax-icons-stacks.v1.normal.png",
+      "png2x": "art/sprites/tax-icons/tax-icons-stacks.v1.normal@2x.png"
+    },
+    {
+      "level": "high",
+      "name": "High",
+      "size": 40,
+      "svg": "art/sprites/tax-icons/tax-icons-stacks.v1.high.svg",
+      "png": "art/sprites/tax-icons/tax-icons-stacks.v1.high.png",
+      "png2x": "art/sprites/tax-icons/tax-icons-stacks.v1.high@2x.png"
+    },
+    {
+      "level": "very-high",
+      "name": "Very high",
+      "size": 40,
+      "svg": "art/sprites/tax-icons/tax-icons-stacks.v1.very-high.svg",
+      "png": "art/sprites/tax-icons/tax-icons-stacks.v1.very-high.png",
+      "png2x": "art/sprites/tax-icons/tax-icons-stacks.v1.very-high@2x.png"
+    }
+  ]
+}

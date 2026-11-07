@@ -139,7 +139,17 @@
     "water_light": "#6fa3b3",
     "foam": "#dfeae6",
     "olive_scrub": "#7d7a45",
-    "grass_scrub": "#a79a5e"
+    "grass_scrub": "#a79a5e",
+    "gold": "#e2bd52",
+    "gold_light": "#f6e39a",
+    "gold_dark": "#94672a",
+    "outline": "#2a2118",
+    "leather_light": "#93673f",
+    "bread": "#c99050",
+    "bread_crust": "#8e5a2a",
+    "porridge": "#e3d2a6",
+    "meat": "#a8653a",
+    "apple": "#b8362c"
   },
   "materials": {
     "stone": {

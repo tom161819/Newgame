@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "assetId": "ration-icons",
+  "variantId": "ration-icons-basket",
+  "name": "Bread crust, bowl and basket",
+  "category": "ui",
+  "version": 1,
+  "specHash": "435861a9",
+  "generator": "icon",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 136,
+  "height": 40,
+  "anchor": {
+    "x": 68,
+    "y": 40
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 1
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 68,
+    "y": 56
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 1.4
+  },
+  "visualHeight": 56,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0,
+  "lights": [],
+  "icons": [
+    {
+      "level": "small",
+      "name": "Small",
+      "size": 40,
+      "svg": "art/sprites/ration-icons/ration-icons-basket.v1.small.svg",
+      "png": "art/sprites/ration-icons/ration-icons-basket.v1.small.png",
+      "png2x": "art/sprites/ration-icons/ration-icons-basket.v1.small@2x.png"
+    },
+    {
+      "level": "normal",
+      "name": "Normal",
+      "size": 40,
+      "svg": "art/sprites/ration-icons/ration-icons-basket.v1.normal.svg",
+      "png": "art/sprites/ration-icons/ration-icons-basket.v1.normal.png",
+      "png2x": "art/sprites/ration-icons/ration-icons-basket.v1.normal@2x.png"
+    },
+    {
+      "level": "generous",
+      "name": "Generous",
+      "size": 40,
+      "svg": "art/sprites/ration-icons/ration-icons-basket.v1.generous.svg",
+      "png": "art/sprites/ration-icons/ration-icons-basket.v1.generous.png",
+      "png2x": "art/sprites/ration-icons/ration-icons-basket.v1.generous@2x.png"
+    }
+  ]
+}

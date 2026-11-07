@@ -12,6 +12,7 @@ export const CATEGORIES = Object.freeze([
   { id: 'resources', label: 'Resources' },
   { id: 'decorations', label: 'Decorations' },
   { id: 'equipment', label: 'Equipment' },
+  { id: 'ui', label: 'UI icons' },
 ]);
 export const CATEGORY_IDS = Object.freeze(CATEGORIES.map(c => c.id));
 const ID = /^[a-z][a-z0-9-]*$/;
@@ -54,7 +55,7 @@ export function validateAssetSpec(spec, { generators, style, path = spec?.id }) 
     if (!Number.isInteger(variant?.version) || variant.version < 1) fail(`${where}: version must be a positive integer.`);
     if (!variant?.spec || typeof variant.spec !== 'object') { fail(`${where}: spec object is required.`); continue; }
     if (!generator || !footprint) continue;
-    if (generator.kind === 'surface') { for (const problem of generator.validate(variant.spec, { style })) fail(`${where}: ${problem}`); continue; }
+    if (generator.kind === 'surface' || generator.kind === 'icon') { for (const problem of generator.validate(variant.spec, { style })) fail(`${where}: ${problem}`); continue; }
     try {
       const model = generator.build(variant.spec, { footprint, style });
       for (const problem of checkModel(model, { footprint, style })) fail(`${where}: ${problem}`);
@@ -124,6 +125,8 @@ export function assetPaths(asset, variant) {
     spriteStill: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.still.png` : null,
     spriteRotor: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.rotor.png` : null,
     spriteMeta: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.json` : null,
+    // UI icon sets also export each level on its own: <spriteIconBase><level>.png, <level>@2x.png and <level>.svg
+    spriteIconBase: variant ? `art/sprites/${asset.id}/${variant.id}.v${variant.version}.` : null,
   };
 }
 

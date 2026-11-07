@@ -61,6 +61,21 @@ try {
     await page.locator('#library-list').evaluate(l => { l.scrollTop = 0; });
   }
   pass('library list scrolls on its own: the page stays, the preview of the last design is in view, a linked design is revealed in the list');
+  // g-ikony-dane-jidlo: UI icon sets are reviewed like any design, shown on the four UI Lab styles, exported per level.
+  {
+    await page.locator('.library-item', { hasText: /^Tax icons/ }).first().click();
+    assert.equal(await page.locator('.variant-card').count(), 2, 'two looks of the tax icons');
+    assert.equal(await page.locator('[role="tab"]', { hasText: 'Scene' }).count(), 0, 'icons have no scene tab');
+    assert.ok(await luminance(page, '.variant-card canvas.icon-canvas') > 20, 'the icon set is drawn');
+    assert.match(await page.locator('.variant-card .facts').first().textContent(), /None · Low · Normal · High · Very high/);
+    const out = await page.evaluate(() => window.assetStudio.exportSprite('tax-icons', 'tax-icons-heaps'));
+    assert.deepEqual(out.meta.icons.map(i => i.level), ['none', 'low', 'normal', 'high', 'very-high']);
+    assert.equal(out.iconFiles.length, 10); assert.equal(out.iconTexts.length, 5);
+    assert.match(out.iconTexts[4].text, /^<svg xmlns="http:\/\/www.w3.org\/2000\/svg" width="40" height="40"/);
+    await page.locator('.library-item', { hasText: /^Ration icons/ }).first().click();
+    assert.equal(await page.locator('.variant-card').count(), 2, 'two looks of the ration icons');
+  }
+  pass('UI icon sets: two looks each, drawn on the four UI styles at 22 px, 1× and 2×, exported as SVG and PNG per level');
 
   await page.getByRole('button', { name: /^Decorations/ }).click();
   const decorations = await page.locator('.library-item .name').allTextContents();

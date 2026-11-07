@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "id": "ration-icons",
+  "name": "Ration icons",
+  "category": "ui",
+  "description": "Icons for the ration slider in Kingdom Policy (plan m-politika-soupatka): three levels of food, Small → Generous. 40 × 40 like the resource icons, exported as SVG and PNG at 1× and 2×.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "icon",
+  "variants": [
+    {
+      "id": "ration-icons-bowls",
+      "name": "Bowls and a full plate",
+      "version": 1,
+      "notes": "Half-empty bowl · heaped bowl with a spoon · plate with bread, meat, fish and an apple.",
+      "spec": {
+        "set": "ration",
+        "look": "bowls"
+      }
+    },
+    {
+      "id": "ration-icons-basket",
+      "name": "Bread crust, bowl and basket",
+      "version": 1,
+      "notes": "Crust of bread on a cloth · heaped bowl and bread · basket with bread, meat, fish and apples.",
+      "spec": {
+        "set": "ration",
+        "look": "basket"
+      }
+    }
+  ]
+}
