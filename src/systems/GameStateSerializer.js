@@ -36,7 +36,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=44;
+export const SAVE_VERSION=45;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -466,7 +466,10 @@ export function validateGameState(input,registry=objectRegistry){
     }
   }
   // #103: kingdom policy (schema 40).
-  if(s.policy!==undefined){const p=s.policy;check(p&&typeof p==='object'&&Object.keys(p).sort().join()==='lastTaxDay,rations,tax');check(Object.hasOwn(TAX_RATES,p.tax)&&Object.hasOwn(RATIONS,p.rations));integer(p.lastTaxDay,1,s.time?.day??Number.MAX_SAFE_INTEGER);}
+  if(s.policy!==undefined){const p=s.policy;check(p&&typeof p==='object'&&Object.keys(p).sort().join()==='effect,lastTaxDay,pending,rations,tax');check(Object.hasOwn(TAX_RATES,p.tax)&&Object.hasOwn(RATIONS,p.rations));integer(p.lastTaxDay,1,s.time?.day??Number.MAX_SAFE_INTEGER);
+    // Policy v2 P1 (schema 45): a pending policy for tomorrow and the Happiness effect on its way to the target.
+    if(p.pending!==null){check(typeof p.pending==='object'&&Object.keys(p.pending).sort().join()==='rations,tax'&&Object.hasOwn(TAX_RATES,p.pending.tax)&&Object.hasOwn(RATIONS,p.pending.rations)&&(p.pending.tax!==p.tax||p.pending.rations!==p.rations));}
+    const effects=Object.values(TAX_RATES).flatMap(a=>Object.values(RATIONS).map(b=>a.happiness+b.happiness));number(p.effect,Math.min(...effects),Math.max(...effects));}
   // Trade F1.3: orders (schema 39). Open orders belong to the active caravan and an existing Marketplace.
   if(s.trade!==undefined){
     const v=s.trade;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='orders,seq');integer(v.seq,0);array(v.orders,200);const ids=new Set();

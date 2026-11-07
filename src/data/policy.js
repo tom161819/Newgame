@@ -8,3 +8,6 @@ export const RATIONS=Object.freeze({
   small:Object.freeze({portions:.5,happiness:-15}),normal:Object.freeze({portions:1,happiness:0}),generous:Object.freeze({portions:1.5,happiness:10}),
 });
 export const DEFAULT_POLICY=Object.freeze({tax:'normal',rations:'normal'});
+// Policy v2 P1: a new policy takes effect the next morning, and its Happiness effect moves towards the new value by
+// `effectPerDay` points per game day (smoothly during the day), in both directions.
+export const POLICY_RULES=Object.freeze({effectPerDay:5,tradeAverageDays:3});

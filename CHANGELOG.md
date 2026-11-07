@@ -5,6 +5,20 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-11-07
+<!-- version: {"title":"Policy from the morning","type":"feature","reconstructed":false,"saveVersion":45} -->
+### Added
+- The Castle panel now has a Kingdom overview:
+  - gold per day (Castle, taxes, trade and wages);
+  - food per day and how many days the stores last;
+  - where Happiness is heading;
+  - how many residents are at risk of a strike.
+
+### Changed
+- A new tax rate or new rations take effect the next morning. The panel shows "From tomorrow: …" with a Cancel button, so switching policy around dawn no longer dodges taxes.
+- Residents get used to a policy gradually: its effect on Happiness changes by 5 points a day. The resident's Happiness tooltip shows where the effect is heading.
+- Saved games use a new format (45) for the pending policy. Games saved by earlier versions cannot be loaded; start a new game.
+
 ## [0.16.0] - 2026-11-07
 <!-- version: {"title":"Natural paths","type":"feature","reconstructed":false,"saveVersion":44} -->
 ### Added

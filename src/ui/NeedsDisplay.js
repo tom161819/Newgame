@@ -24,7 +24,9 @@ export function renderNeeds(root,status){
   const lines=[element('h3','',t('needs.title')),...NEED_IDS.map(id=>bar(id,status[id])),bar('happiness',status.happiness),mood,work,element('p','need-problem',t('needs.problemLine',{problem:problemLabel(status.mainProblem)})),element('p','need-home',t('needs.homeLine',{home:homeLabel(status.home)}))];
   if(status.unpaidPenalty>0)lines.push(element('p','need-unpaid',t('needs.unpaidLine',{penalty:status.unpaidPenalty})));
   // #103 policy and #58 C2 strike / emigration state.
-  if(status.policy)lines.push(element('p','need-policy',t('needs.policyLine',{value:`${status.policy>0?'+':''}${status.policy}`})));
+  // Policy v2 P1: the effect moves towards its target; the line shows both while it is on its way.
+  const signed=n=>`${n>0?'+':n<0?'−':''}${Math.abs(n)}`,policyNow=Math.round(status.policy??0),policyTarget=status.policyTarget??policyNow;
+  if(policyNow||policyTarget)lines.push(element('p','need-policy',Math.round(status.policy??0)===policyTarget&&Math.abs((status.policy??0)-policyTarget)<.01?t('needs.policyLine',{value:signed(policyNow)}):t('needs.policyLineMoving',{value:signed(policyNow),target:signed(policyTarget)})));
   if(status.leaving)lines.push(element('p','need-strike',t('needs.leavingLine')));
   else if(status.strike)lines.push(element('p','need-strike',t('needs.strikeLine')));
   else if(status.lowDays>0)lines.push(element('p','need-risk',t('needs.riskLine',{days:status.lowDays})));

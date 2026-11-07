@@ -83,7 +83,7 @@ export class NeedsSystem {
     const r=this.records.get(worker.id)??{food:100,rest:100,attackedAt:null},home=homes.get(worker.id)??null,safety=this.safetyDetail(worker,r),needs={food:Math.round(r.food),rest:Math.round(r.rest),housing:home?100:0,safety:safety.value};
     // #103: taxes and rations move Happiness (bonus or penalty), kept apart from the unpaid-wage penalty.
     const penalty=this.unpaidPenalty(worker),policy=this.scene.policy?.happiness?.()??0,happiness=happinessOf(needs,penalty-policy),mood=moodFor(happiness);
-    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
+    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,policyTarget:this.scene.policy?.target?.()??0,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
   }
   summary(){
     const homes=this.homes(),list=this.residents().map(w=>this.status(w,homes));
