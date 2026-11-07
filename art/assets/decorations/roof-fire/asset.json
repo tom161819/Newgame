@@ -1,0 +1,121 @@
+{
+  "schema": 1,
+  "id": "roof-fire",
+  "name": "Fire on a roof",
+  "category": "decorations",
+  "description": "Day and night N3 (plan g-noc-grafika): a burning roof in three stages – smouldering, burning, blazing – on thatch and shingles. The flames are runtime brazier lights (they flicker, a loop), smoke is a column of puffs leaning downwind, burnt patches turn to soot. The game puts the same flames and smoke on its own burning building; after it burns out it becomes the burnt-building ruin.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "workshop",
+  "variants": [
+    {
+      "id": "roof-fire-thatch-smoke",
+      "name": "Thatch roof smouldering",
+      "version": 1,
+      "notes": "Smoke only, an ember glow in the window.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "roofFire",
+            "at": [
+              0,
+              0
+            ],
+            "stage": "smoke"
+          }
+        ]
+      }
+    },
+    {
+      "id": "roof-fire-thatch-burning",
+      "name": "Thatch roof burning",
+      "version": 1,
+      "notes": "Three flames along the ridge, burnt patches.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "roofFire",
+            "at": [
+              0,
+              0
+            ],
+            "stage": "burning"
+          }
+        ]
+      }
+    },
+    {
+      "id": "roof-fire-thatch-blaze",
+      "name": "Thatch roof ablaze",
+      "version": 1,
+      "notes": "Flames along the whole roof, thick smoke.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "roofFire",
+            "at": [
+              0,
+              0
+            ],
+            "stage": "blaze"
+          }
+        ]
+      }
+    },
+    {
+      "id": "roof-fire-shingle-burning",
+      "name": "Shingle roof burning",
+      "version": 1,
+      "notes": "",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "roofFire",
+            "at": [
+              0,
+              0
+            ],
+            "stage": "burning",
+            "roof": "roof_shingle"
+          }
+        ]
+      }
+    },
+    {
+      "id": "roof-fire-shingle-blaze",
+      "name": "Shingle roof ablaze",
+      "version": 1,
+      "notes": "",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "roofFire",
+            "at": [
+              0,
+              0
+            ],
+            "stage": "blaze",
+            "roof": "roof_shingle"
+          }
+        ]
+      }
+    }
+  ]
+}

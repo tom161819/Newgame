@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "assetId": "night-icons",
+  "variantId": "night-icons-plain",
+  "name": "Plain icons",
+  "category": "ui",
+  "version": 1,
+  "specHash": "6f62b262",
+  "generator": "icon",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 280,
+  "height": 40,
+  "anchor": {
+    "x": 140,
+    "y": 40
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 1
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 140,
+    "y": 56
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 1.4
+  },
+  "visualHeight": 56,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0,
+  "lights": [],
+  "icons": [
+    {
+      "level": "pitch",
+      "name": "Pitch",
+      "size": 40,
+      "svg": "art/sprites/night-icons/night-icons-plain.v1.pitch.svg",
+      "png": "art/sprites/night-icons/night-icons-plain.v1.pitch.png",
+      "png2x": "art/sprites/night-icons/night-icons-plain.v1.pitch@2x.png"
+    },
+    {
+      "level": "torch",
+      "name": "Torch",
+      "size": 40,
+      "svg": "art/sprites/night-icons/night-icons-plain.v1.torch.svg",
+      "png": "art/sprites/night-icons/night-icons-plain.v1.torch.png",
+      "png2x": "art/sprites/night-icons/night-icons-plain.v1.torch@2x.png"
+    },
+    {
+      "level": "no-torch",
+      "name": "No torch",
+      "size": 40,
+      "svg": "art/sprites/night-icons/night-icons-plain.v1.no-torch.svg",
+      "png": "art/sprites/night-icons/night-icons-plain.v1.no-torch.png",
+      "png2x": "art/sprites/night-icons/night-icons-plain.v1.no-torch@2x.png"
+    },
+    {
+      "level": "wolves",
+      "name": "Wolves",
+      "size": 40,
+      "svg": "art/sprites/night-icons/night-icons-plain.v1.wolves.svg",
+      "png": "art/sprites/night-icons/night-icons-plain.v1.wolves.png",
+      "png2x": "art/sprites/night-icons/night-icons-plain.v1.wolves@2x.png"
+    },
+    {
+      "level": "thief",
+      "name": "Thief",
+      "size": 40,
+      "svg": "art/sprites/night-icons/night-icons-plain.v1.thief.svg",
+      "png": "art/sprites/night-icons/night-icons-plain.v1.thief.png",
+      "png2x": "art/sprites/night-icons/night-icons-plain.v1.thief@2x.png"
+    },
+    {
+      "level": "fire",
+      "name": "Fire",
+      "size": 40,
+      "svg": "art/sprites/night-icons/night-icons-plain.v1.fire.svg",
+      "png": "art/sprites/night-icons/night-icons-plain.v1.fire.png",
+      "png2x": "art/sprites/night-icons/night-icons-plain.v1.fire@2x.png"
+    }
+  ]
+}

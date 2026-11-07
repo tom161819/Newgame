@@ -10,6 +10,8 @@ export const SETS = Object.freeze({
   ration: { label: 'Rations', levels: ['small', 'normal', 'generous'], names: ['Small', 'Normal', 'Generous'] },
   // Domestic animals (g-domaci-zvirata-grafika): the cat and the hunting dog in the trade window and the panels.
   pets: { label: 'Domestic animals', levels: ['cat', 'dog'], names: ['Cat', 'Hunting dog'] },
+  // Day and night (g-noc-grafika): pitch and torch goods, the "No torch" warning and the night-threat alerts for the HUD.
+  night: { label: 'Night', levels: ['pitch', 'torch', 'no-torch', 'wolves', 'thief', 'fire'], names: ['Pitch', 'Torch', 'No torch', 'Wolves', 'Thief', 'Fire'] },
 });
 const OUT = 'outline', W = 1.4;
 
@@ -161,7 +163,55 @@ const LOOKS = {
     seated: () => [catSitting(), dogSitting()],
     heads: () => [catHead(), dogHead()],
   },
+  night: {
+    plain: () => [pitchBarrel(20, 36), torch(20, 38), [...torch(20, 38, false), ...noSign(20, 21, 15)], wolfHead(20, 20), thief(20, 37), roofFire(20, 37)],
+    badges: () => [badge(pitchBarrel(20, 32), 'wood'), badge(torch(20, 37), 'gold'), badge([...torch(20, 38, false), ...noSign(20, 20, 13)], 'banner_red'), badge(wolfHead(20, 20), 'banner_red'), badge(thief(20, 35), 'banner_red'), badge(roofFire(20, 36), 'banner_red')],
+  },
 };
+
+// ---------- night (g-noc-grafika) ----------
+const flame = (cx, baseY, h, w = h * 0.55) => [path(d`M${cx} ${baseY - h} Q${cx + w * 0.4} ${baseY - h * 0.6} ${cx + w * 0.55} ${baseY - h * 0.35} Q${cx + w * 0.6} ${baseY} ${cx} ${baseY} Q${cx - w * 0.6} ${baseY} ${cx - w * 0.55} ${baseY - h * 0.35} Q${cx - w * 0.5} ${baseY - h * 0.55} ${cx - w * 0.15} ${baseY - h * 0.75} Q${cx - w * 0.05} ${baseY - h * 0.55} ${cx} ${baseY - h} Z`, 'fire_edge'),
+  path(d`M${cx} ${baseY - h * 0.72} Q${cx + w * 0.35} ${baseY - h * 0.35} ${cx + w * 0.3} ${baseY - h * 0.15} Q${cx} ${baseY + 1} ${cx - w * 0.3} ${baseY - h * 0.15} Q${cx - w * 0.3} ${baseY - h * 0.4} ${cx} ${baseY - h * 0.72} Z`, 'fire', null),
+  ellipse(cx, baseY - h * 0.2, w * 0.17, h * 0.17, 'fire_core', null)];
+function pitchBarrel(cx, baseY) {
+  const top = baseY - 22;
+  return [path(d`M${cx - 10} ${top} Q${cx - 13} ${baseY - 11} ${cx - 10} ${baseY} L${cx + 10} ${baseY} Q${cx + 13} ${baseY - 11} ${cx + 10} ${top} Z`, 'wood'),
+    line(d`M${cx - 11.3} ${top + 5} Q${cx} ${top + 7.5} ${cx + 11.3} ${top + 5} M${cx - 11.3} ${baseY - 5} Q${cx} ${baseY - 2.5} ${cx + 11.3} ${baseY - 5}`, 'iron', 2),
+    line(d`M${cx - 4} ${top + 1} L${cx - 4.5} ${baseY - 0.5} M${cx + 4} ${top + 1} L${cx + 4.5} ${baseY - 0.5}`, 'wood_dark', 0.9),
+    ellipse(cx, top, 10, 3.2, 'soot'), ellipse(cx - 2, top - 0.5, 4, 1.1, null, 'charcoal', 1),
+    path(d`M${cx + 5} ${top + 1} Q${cx + 9} ${top + 6} ${cx + 8} ${top + 11} Q${cx + 6.5} ${top + 12} ${cx + 6} ${top + 9} Q${cx + 5} ${top + 5} ${cx + 3} ${top + 2} Z`, 'soot', null)];
+}
+function torch(cx, baseY, lit = true) {
+  const out = [path(d`M${cx - 2} ${baseY} L${cx - 3} ${baseY - 18} L${cx + 3} ${baseY - 18} L${cx + 2} ${baseY} Z`, 'wood_dark'),
+    path(d`M${cx - 4.5} ${baseY - 17} L${cx + 4.5} ${baseY - 17} L${cx + 4} ${baseY - 23} L${cx - 4} ${baseY - 23} Z`, 'linen'),
+    line(d`M${cx - 4.3} ${baseY - 19} L${cx + 4.3} ${baseY - 19} M${cx - 4.1} ${baseY - 21} L${cx + 4.1} ${baseY - 21}`, 'soot', 0.8)];
+  if (lit) out.push(...flame(cx, baseY - 22, 14, 10));
+  else out.push(line(d`M${cx - 1} ${baseY - 24} Q${cx - 4} ${baseY - 28} ${cx} ${baseY - 31} Q${cx + 3} ${baseY - 34} ${cx - 1} ${baseY - 37}`, 'stone', 1.6));
+  return out;
+}
+const noSign = (cx, cy, r) => [circle(cx, cy, r, null, 'outline', 5), circle(cx, cy, r, null, 'banner_red', 3), line(d`M${cx - r * 0.7} ${cy + r * 0.7} L${cx + r * 0.7} ${cy - r * 0.7}`, 'outline', 5), line(d`M${cx - r * 0.7} ${cy + r * 0.7} L${cx + r * 0.7} ${cy - r * 0.7}`, 'banner_red', 3)];
+function wolfHead(cx, cy, fill = 'stone') {
+  return [path(d`M${cx - 11} ${cy - 2} L${cx - 9} ${cy - 15} L${cx - 3.5} ${cy - 8} L${cx + 3.5} ${cy - 8} L${cx + 9} ${cy - 15} L${cx + 11} ${cy - 2} Q${cx + 9} ${cy + 6} ${cx} ${cy + 13} Q${cx - 9} ${cy + 6} ${cx - 11} ${cy - 2} Z`, fill),
+    path(d`M${cx - 4.5} ${cy + 2} Q${cx} ${cy - 1} ${cx + 4.5} ${cy + 2} L${cx + 2.5} ${cy + 10} Q${cx} ${cy + 13} ${cx - 2.5} ${cy + 10} Z`, 'stone_light', null),
+    path(d`M${cx - 7} ${cy - 3} L${cx - 2} ${cy - 1.5} L${cx - 3.5} ${cy + 0.5} Z`, 'gold'), path(d`M${cx + 7} ${cy - 3} L${cx + 2} ${cy - 1.5} L${cx + 3.5} ${cy + 0.5} Z`, 'gold'),
+    ellipse(cx, cy + 10, 2.4, 1.6, 'soot', null), path(d`M${cx - 8.2} ${cy - 12} L${cx - 6} ${cy - 6} L${cx - 8} ${cy - 6} Z`, 'soot', null), path(d`M${cx + 8.2} ${cy - 12} L${cx + 6} ${cy - 6} L${cx + 8} ${cy - 6} Z`, 'soot', null)];
+}
+function thief(cx, baseY) {
+  return [path(d`M${cx + 4} ${baseY - 18} Q${cx + 15} ${baseY - 20} ${cx + 14} ${baseY - 8} Q${cx + 13} ${baseY - 2} ${cx + 5} ${baseY - 4} Z`, 'linen'),
+    line(d`M${cx + 5} ${baseY - 17} L${cx + 7} ${baseY - 20}`, 'wool', 1.4),
+    path(d`M${cx - 9} ${baseY} L${cx - 7} ${baseY - 16} Q${cx - 6} ${baseY - 27} ${cx} ${baseY - 29} Q${cx + 7} ${baseY - 27} ${cx + 7} ${baseY - 17} L${cx + 9} ${baseY} Z`, 'charcoal'),
+    path(d`M${cx - 4.5} ${baseY - 23} Q${cx} ${baseY - 26} ${cx + 4.5} ${baseY - 23} L${cx + 4} ${baseY - 18} Q${cx} ${baseY - 16} ${cx - 4} ${baseY - 18} Z`, 'soot', null),
+    line(d`M${cx - 2.6} ${baseY - 21} L${cx - 0.8} ${baseY - 20.6} M${cx + 0.8} ${baseY - 20.6} L${cx + 2.6} ${baseY - 21}`, 'gold_light', 1.3),
+    ...coin(cx - 12, baseY + 0.5, 3.2)];
+}
+function roofFire(cx, baseY) {
+  return [path(d`M${cx - 16} ${baseY - 10} L${cx} ${baseY - 22} L${cx + 16} ${baseY - 10} Z`, 'thatch'),
+    path(d`M${cx - 13} ${baseY - 10} L${cx + 13} ${baseY - 10} L${cx + 13} ${baseY} L${cx - 13} ${baseY} Z`, 'plaster'),
+    path(d`M${cx - 3} ${baseY} L${cx - 3} ${baseY - 7} L${cx + 3} ${baseY - 7} L${cx + 3} ${baseY} Z`, 'wood_dark'),
+    ...flame(cx - 6, baseY - 14, 16, 11), ...flame(cx + 6, baseY - 12, 13, 9),
+    ellipse(cx + 10, baseY - 32, 5, 3, 'stone', null), ellipse(cx + 4, baseY - 35, 3.5, 2.2, 'stone_light', null)];
+}
+const badge = (shapes, ring = 'banner_red') => [circle(20, 20, 18.5, 'charcoal', ring, 2.4), ...shapes];
 
 // ---------- fitting a set into the icon ----------
 // Bounds of a shape list (paths: every point, control points included), with half the stroke.

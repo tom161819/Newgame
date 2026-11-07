@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "id": "torch-bracket",
+  "name": "Torch bracket",
+  "category": "decorations",
+  "description": "Day and night (plan g-noc-grafika): a burning torch in an iron bracket on the town wall and on a tower. Light type torch; the flame and glow are added at runtime like the torch post. Shown on a piece of wall / tower so it reads in the Studio; preview it at dusk and night in Scene & lighting.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "workshop",
+  "variants": [
+    {
+      "id": "torch-bracket-wall-arm",
+      "name": "Wall bracket, plain arm",
+      "version": 1,
+      "notes": "Iron plate, arm and strut, cup with a pitch torch; soot stain above.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "wallTorch",
+            "at": [
+              0,
+              0.1
+            ],
+            "style": "arm"
+          }
+        ]
+      }
+    },
+    {
+      "id": "torch-bracket-wall-scroll",
+      "name": "Wall bracket, forged scroll",
+      "version": 1,
+      "notes": "Decorative scroll and a drip tray: for the gate and the castle.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "wallTorch",
+            "at": [
+              0,
+              0.1
+            ],
+            "style": "scroll"
+          }
+        ]
+      }
+    },
+    {
+      "id": "torch-bracket-tower-cage",
+      "name": "Tower bracket, iron cage",
+      "version": 1,
+      "notes": "High on the tower, the torch in a wind cage.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "towerTorch",
+            "at": [
+              0,
+              0.24
+            ],
+            "style": "cage"
+          }
+        ]
+      }
+    },
+    {
+      "id": "torch-bracket-tower-door",
+      "name": "Tower bracket by the door",
+      "version": 1,
+      "notes": "Low plain arm beside the tower door.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "towerTorch",
+            "at": [
+              0,
+              0.24
+            ],
+            "style": "arm",
+            "high": false
+          }
+        ]
+      }
+    }
+  ]
+}
