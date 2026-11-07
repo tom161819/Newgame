@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { directionName,DIRECTION_POSES } from './directions.js';
 import { CargoBundleView } from './CargoBundleView.js';
 import { HUMAN_APPEARANCE as COLORS } from '../data/humanAppearance.js';
-import { APPROVED_VILLAGER_ART,PROFESSION_LOOKS,FACING_INDEX,villagerSex } from '../data/objects/approvedArt.js';
+import { APPROVED_VILLAGER_ART,PROFESSION_LOOKS,FACING_INDEX,villagerSex,walkFrame,walkKey,hasWalk } from '../data/objects/approvedArt.js';
 import { assetURL } from '../systems/AssetManager.js';
 
 // Approved villager looks load per look on first use (8 directions each).
@@ -12,6 +12,7 @@ function ensureLook(scene,look,ready){
   if(state==='ready')return true;if(state){state.add(ready);return false;}
   const art=APPROVED_VILLAGER_ART[look],waiting=new Set([ready]);scene.__villagerLooks.set(look,waiting);
   for(let k=0;k<8;k++)if(!scene.textures.exists(lookKey(look,k)))scene.load.image(lookKey(look,k),assetURL(`${art.base}.facing-${k}.png`,scene.assets?.baseURL??import.meta.env?.BASE_URL??'/'));
+  const w=art.walk;if(w&&!scene.textures.exists(walkKey(look)))scene.load.spritesheet(walkKey(look),assetURL(`${art.base}.walk.png`,scene.assets?.baseURL??import.meta.env?.BASE_URL??'/'),{frameWidth:w.frameWidth,frameHeight:w.frameHeight});
   scene.load.once('complete',()=>{if(![0,1,2,3,4,5,6,7].every(k=>scene.textures.exists(lookKey(look,k))))return;scene.__villagerLooks.set(look,'ready');for(const fn of waiting)fn();});
   if(!scene.load.isLoading())scene.load.start();return false;
 }
@@ -37,8 +38,11 @@ export class HumanView extends Phaser.GameObjects.Container {
     const on=!!(this.look&&this.lookReady),k=FACING_INDEX[this.facing]??0;
     for(const part of [this.shadow,this.leftLeg,this.rightLeg,this.body,...this.arms])part.setVisible(!on);
     if(!on){this.art.setVisible(false);return;}
-    const origin=APPROVED_VILLAGER_ART[this.look].origins[k];
-    this.art.setTexture(lookKey(this.look,k)).setOrigin(origin.x,origin.y).setVisible(true);this.tool.setVisible(false);this.weapon.setVisible(false);
+    const art=APPROVED_VILLAGER_ART[this.look];this.tool.setVisible(false);this.weapon.setVisible(false);
+    if(hasWalk(this.scene,this.look)){const frame=walkFrame(k,this.walked??0,art.walk.fps,!!this.isWalking),key=walkKey(this.look);
+      if(this.artFrame!==`${key}:${frame}`){this.artFrame=`${key}:${frame}`;this.art.setTexture(key,frame).setOrigin(art.walk.origin.x,art.walk.origin.y);}this.art.setVisible(true);return;}
+    const origin=art.origins[k];this.artFrame=null;
+    this.art.setTexture(lookKey(this.look,k)).setOrigin(origin.x,origin.y).setVisible(true);
   }
   paint(){
     const pose=DIRECTION_POSES[this.facing],g=this.body.clear(),width=pose.profile?4:6,hx=pose.screenX;
@@ -55,8 +59,10 @@ export class HumanView extends Phaser.GameObjects.Container {
     this.leftLeg.setPosition(-3+pose.screenX*stride,-5+pose.screenY*stride);this.rightLeg.setPosition(3-pose.screenX*stride,-5-pose.screenY*stride);
     this.arms[0].rotation=stride*.07;this.arms[1].rotation=-stride*.07;
     this.updateLook();
-    // Approved looks walk with a light bob and sway instead of moving legs.
-    if(this.art.visible){this.art.y=moving?-Math.abs(Math.sin(this.phase))*1.6:0;this.art.rotation=moving?Math.sin(this.phase)*.035:0;}
+    // Approved looks with a walk sheet step frame by frame (no bob); without one they bob and sway lightly.
+    if(this.art.visible){
+      if(hasWalk(this.scene,this.look)){this.walked=moving?(this.walked??0)+delta:0;this.applyArt();this.art.y=0;this.art.rotation=0;}
+      else{this.art.y=moving?-Math.abs(Math.sin(this.phase))*1.6:0;this.art.rotation=moving?Math.sin(this.phase)*.035:0;}}
   }
   setAttackPose(delta,active,direction){
     if(this.art.visible){this.weapon.setVisible(false);if(active){this.attackPhase=(this.attackPhase??0)+delta*.011;this.art.rotation=Math.sin(this.attackPhase)*.12;}return;}

@@ -69,6 +69,7 @@ import { backgroundSmoke } from './background-smoke.mjs';
 import { worldCodeSmoke } from './world-code-smoke.mjs';
 import { petsSmoke } from './pets-smoke.mjs';
 import { dogSmoke } from './dog-smoke.mjs';
+import { walkSmoke } from './walk-smoke.mjs';
 
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
@@ -157,6 +158,7 @@ try{
   if(args.includes('--full')||args.includes('--world-code'))await worldCodeSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--pets'))await petsSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--dog'))await dogSmoke(context,origin+base,instrument);
+  if(args.includes('--full')||args.includes('--walk'))await walkSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--ledger'))await ledgerSmoke(page);
   if(args.includes('--full')||args.includes('--smelting'))await smeltingSmoke(page);
   if(args.includes('--full')||args.includes('--military'))await militarySmoke(page);

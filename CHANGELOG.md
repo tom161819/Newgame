@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.28.0] - 2026-11-07
+<!-- version: {"title":"Walk cycle","type":"feature","reconstructed":false,"saveVersion":53} -->
+### Improved
+- Villagers and soldiers really walk now: their legs step through the approved walk animation in all eight directions instead of the whole figure bobbing, and they stand still with both feet down when they stop.
+
 ## [0.27.1] - 2026-11-07
 <!-- version: {"title":"Dogs roam around their Hunter","type":"feature","reconstructed":false,"saveVersion":53} -->
 ### Improved
