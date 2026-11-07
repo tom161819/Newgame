@@ -1,50 +1,33 @@
-# Coordination: Claude and Codex
+# Coordination between the Claude chats
 
-Shared register of active work. Rules are in [AGENTS.md](../AGENTS.md) (section *Collaboration between Claude and Codex*). Update this file in your own task branch: add a row before editing, update it when the pull request opens, move it to *Done* after the merge.
+Since 6 Nov 2026 the work runs without GitHub (rules: [AGENTS.md](../AGENTS.md)). The **task register is the claude.ai page *MK – development plan***; this file only records who holds what right now and a short dated history. The GitHub-era register (pull requests, Issues, Codex queue, merge order) is in the Git history of this file up to commit `3fb20b4`.
 
-Files held lists the files a task changes. Another task avoids them unless necessary, and then says so here and in its pull request.
+## Areas
 
-## Agreed merge order
+| Chat | Holds |
+|---|---|
+| Mechaniky / original chat | `src/**`, `index.html`, `public/` (not `public/versions/`), game tests, `scripts/*-smoke.mjs` for the game, releases, the game page |
+| Grafika | `art/**`, `studio/**`, `scripts/studio-*`, `scripts/blender*`, Studio tests, the Asset Studio page |
+| Úkoly | the plan page only |
+| Koncepty | briefs (`zadani-*.md` in the claude.ai project); reads the store, never pushes |
 
-**#174 version gate is enforced from release 0.4.0 (M3, Claude PR from `claude/m3-release`).** From then on, every PR into `main` that changes the game (`src/`, `index.html`, `public/` except `public/versions/`, `vite.config.js`) must run `npm run release:prepare -- patch` (or `-- minor` when SAVE_VERSION changes) so it carries the next version and an empty Unreleased. Every PR touching anything outside `docs/` adds `docs/changes/<issue>-<slug>.md` from `docs/changes/TEMPLATE.md`. Check with `npm run version:check`. If two PRs take the same number, the later one merges `main` and prepares the next number. Rules: AGENTS.md *Versions, releases and change records*.
-
-Urgent current Pages repair: Codex right-click smoke isolation first (main9703b37 Pages42190334050 failed in pave-under after real Move fixture leaked), 179/#96 and180/#128 are merged and deployed;183/#130 is next, then124. Restore the smoke snapshot, preserve game commands and all assertions.
-
-PR138/151 and PR142 (#122) have successful actual Pages. PR164 (#123) merged da21f0c and its Pages42159725044 retry completed build/deploy SUCCESS. PR165 (#143) merged90eb356 after exact-head CI42160766881 and Pages42163373128 build/deploy SUCCESS. PR166 and167 have merged and actual successful Pages; see verified Done entries.
-
-Merge order for Codex #96: Claude integration PR178 (d7e7c94), then Codex repeated placement. Necessary overlap: GameScene placement and the shared one-blueprint smoke helper; preserve all Claude panel/minimap/input changes and fresh-site retries.
+Shared: `docs/COORDINATION.md`, `docs/changes/`, `package.json`, `CHANGELOG.md` – merge both sides by hand.
 
 ## Active
 
-Necessary shared-test overlap with Claude197: Codex194 keeps the Needs smoke paused across snapshot/Load and releases pause only after exact Food assertion. A real resumed frame changed15 to15.90275 before the assertion; no Needs gameplay or tooltip logic changes. Preserve197 tooltip checks when integrating.
-
-
-| Task | Owner | Branch | PR | Status | Files held |
-|---|---|---|---|---|---|
-| #210 asset review workflow, AR-1 #211 manifest statuses/comments/history | Claude | `claude/asset-review-manifest` | — | In review | studio/src/lib/approvals.js, studio/src/main.js (one constant), tests/asset-review-manifest.test.js, tests/asset-studio.test.js |
-| #210 AR-2 #212 Studio review UI (stacked on AR-1) | Claude | `claude/asset-review-ui` | — | In review | studio/src/main.js, studio/src/styles.css, scripts/studio-smoke.mjs |
-| AUD65 #94 Manual rock mining | Codex | `codex/manual-rock-mining` (stacked on124) | [#194](https://github.com/tom161819/Newgame/pull/194) | Implemented; schema36/release0.8.0 after185 actual Pages;750 tests/version/changelog/build + native real-mouse10Stones/ledger/Load/phone/commands/Needs/eventfeed PASS | own rock marking tool/UI, GameScene/GameApplication narrow input/Escape hooks, MiningWork/WorkerAI/WorkplaceSystem/free Miner selection, current schema serializer/loader/terrain validation, XP/SkillSystem, physical Drop/FoodProduction reuse and cargo provenance, i18n, own tests/browser/docs |
-
-## Codex queue (developer: Codex always has several issues queued)
-
-In this order; one `status:ready` at a time. When an issue is merged, verified on Pages and closed, the next one becomes `status:ready`. Whoever sees fewer than three queued Codex issues adds more from the backlog. Claude does this at every check.
-
-1. Done: [#96](https://github.com/tom161819/Newgame/issues/96), [#128](https://github.com/tom161819/Newgame/issues/128), [#130](https://github.com/tom161819/Newgame/issues/130) (0.6.0), [#124](https://github.com/tom161819/Newgame/issues/124) (0.7.0)
-2. [#94](https://github.com/tom161819/Newgame/issues/94) AUD65 manual marking of rocks for Miners
-3. [#118](https://github.com/tom161819/Newgame/issues/118) NEW01-A Builders' workshop (mechanics; the art stays with Claude in #119)
-4. [#98](https://github.com/tom161819/Newgame/issues/98) AUD71-A idle residents sit on a placeholder porch at their workplace (follows #124's central idle rule; porch art stays with Claude in #114)
-5. [#132](https://github.com/tom161819/Newgame/issues/132) NEW08-A food building menu order and hut unlocking (moved from Claude's backlog)
-6. [#97](https://github.com/tom161819/Newgame/issues/97) AUD69-70 working castle gate; walls reached only through a tower or the gate (mechanics; new gate art via Claude's Asset Studio)
-7. [#100](https://github.com/tom161819/Newgame/issues/100) AUD75 world generation: rivers, beaches, desert, bushes (new terrain art via Claude's Asset Studio)
-8. [#91](https://github.com/tom161819/Newgame/issues/91) AUD41 Asset Library developer edit mode and balance tools
-9. [#103](https://github.com/tom161819/Newgame/issues/103) AUD80-81 Kingdom policy: tax rate and food rations in the Castle panel, feeding #58's NeedsSystem (handed over from Claude; after the schema chain #196–#202; Claude's #58 phase C2 follows it)
+Set the plan item to `rozpracovano` instead of adding rows here. Add a line only when a task holds files outside its chat's area.
 
 ## Kept backups (do not delete without the developer)
 
 - `claude/serene-wright-97oy7k` at `0a48e67`: WIP checkpoint of the alpha policy and renderer switch; fully merged through #3 and #4. Delete it when the developer agrees.
 - `backup/master-progress`: Codex stage history; source of `claude/merge-stages-07-08`.
 
-## Done
+## Done (without GitHub)
+
+- 2026-11-07 original chat: 0.9.3 Getting started help behind the HUD "?" (`9fd7d45`); 0.9.2 friendlier start – Castle on by default, 500 Gold limit, 40 of each resource, 160-unit Starter Stockpile, one Castle (`5301288`); 0.9.1 Wheat Field keeps its tool (`b8d12d9`); 0.9.0 homes and the daily rest, #58 phase B, schema 37 (`c040390`); 0.8.2 Granary first in the Food menu, #132 (`096fb0e`); Studio shared review and `build:artifact` (`3b99d1a`, `8dcb722`).
+- 2026-11-07 chat Grafika: broken wall v2, Blender pilot and `blender:bake`, Path Lab wear levels (`bf856cb`); Studio concepts for every task waiting on art (`d0df979`).
+
+## Done (GitHub era)
 
 - 2026-11-06 Claude: #99 mill sails ([#207](https://github.com/tom161819/Newgame/pull/207), 0.8.1); #92 visual fallbacks audit + six profession concepts ([#208](https://github.com/tom161819/Newgame/pull/208)) and Barracks/Wheelwright/Iron Mine concepts ([#209](https://github.com/tom161819/Newgame/pull/209)), awaiting the owner's choice.
 - 2026-11-06 Claude: #116 Path renderer V2 in the Path Lab ([#205](https://github.com/tom161819/Newgame/pull/205)), awaiting the owner's preset choice; Pages deploy retries ([#206](https://github.com/tom161819/Newgame/pull/206)).

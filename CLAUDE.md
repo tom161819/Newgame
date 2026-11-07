@@ -1,12 +1,12 @@
 @AGENTS.md
 
-# Claude Code
+# Claude
 
-`AGENTS.md` (imported above) holds the rules shared with Codex: collaboration through branches and pull requests, the project workflow and, once merged, the alpha save policy. Follow them exactly; this file only adds Claude-specific notes.
+`AGENTS.md` (imported above) holds the rules for every Claude chat working without GitHub: the shared store instead of a remote, the plan page instead of Issues, releases, change records and the alpha save policy. This file only adds Claude-specific notes.
 
-- Branches: `claude/<task>`, one per task, created from current `main` (or from the open pull request it depends on). Never push commits directly to `main`, and never push to `codex/*` or `backup/*`.
-- Keep `docs/COORDINATION.md` current: add your task before editing, update its status when you open a pull request, and move it to Done after the merge.
-- Use the GitHub MCP tools for pull requests. Pull requests target `main`; merge your own verified pull request with a merge commit (rule 3 in AGENTS.md) and confirm the GitHub Pages run succeeded.
+- The owner writes in Czech; answer in Czech. Game UI texts are English with a Czech translation (`src/i18n/`).
+- Start of a chat: pull the store, `npm ci`, `npm test`, read the plan page and pick your area's next task (priority, then order). After a release or a finished task start the next one; if blocked, record why on the task (`ceka` + comment) and take another.
+- Keep `docs/COORDINATION.md` short: who works on what now and a dated Done line per release.
 - Historical builds in `public/versions/` are generated and immutable. Do not read minified snapshots to learn the architecture; use the source, catalog and manifests.
-- The source is dense (many statements per line). Never reformat existing code; keep diffs minimal to avoid merge conflicts with Codex.
-- Versions and releases follow *Versions, releases and change records* in AGENTS.md (#174): a game change ships as the next PATCH (MINOR for a new `SAVE_VERSION`) through `npm run release:prepare`, every pull request outside `docs/` adds `docs/changes/<issue>-<slug>.md`, run `npm run version:check` before opening the PR, and confirm that the tag-release workflow tagged `v<version>` after the merge.
+- The source is dense (many statements per line). Never reformat existing code; keep diffs minimal so chats merge cleanly.
+- Versions and releases follow *Versions, releases and change records* in AGENTS.md: a game change ships as the next PATCH (MINOR for a new `SAVE_VERSION`) through `npm run release:prepare`, every commit outside `docs/` adds `docs/changes/<slug>.md` with a "Notes for the next agent" section, and `npm run version:check -- --base=HEAD^1` passes before the commit is pushed.
