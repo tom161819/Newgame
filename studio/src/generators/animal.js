@@ -250,14 +250,14 @@ function horseSkin(spec, plan, { breed, coat, mark, sock, P, rot }) {
   const barrel = j(0.05 * L, 0.73 * H, 0.27 * H * heavy), chest = j(0.28 * L, 0.76 * H, 0.23 * H * heavy), shoulder = j(0.44 * L, 0.72 * H, 0.15 * H * heavy);
   [[tail, butt], [butt, croup], [croup, loin], [loin, barrel], [barrel, chest], [chest, shoulder]].forEach(([a, c]) => b(a, c));
   for (const sd of [-1, 1]) {
-    const w = 0.13 * H * heavy * sd, cn = heavy;
-    const fs = j(0.36 * L, 0.6 * H, 0.1 * H * heavy, w), fe = j(0.32 * L, 0.46 * H, 0.075 * H * cn, w), fk = j(0.34 * L, 0.26 * H, 0.045 * H * cn, w * 0.9), ff = j(0.35 * L, 0.07 * H, 0.038 * H * cn, w * 0.9);
+    const w = 0.13 * H * heavy * sd, cn = heavy, run = spec.pose === 'run', g = run ? (sd > 0 ? 1 : 0.6) : 0; // gallop: forelegs reach, hind legs push off
+    const fs = j(0.36 * L, 0.6 * H, 0.1 * H * heavy, w), fe = j(0.32 * L + g * 0.12 * L, 0.46 * H + g * 0.08 * H, 0.075 * H * cn, w), fk = j(0.34 * L + g * 0.3 * L, 0.3 * H + g * 0.12 * H, 0.045 * H * cn, w * 0.9), ff = j(0.35 * L + g * 0.36 * L, 0.07 * H + g * 0.2 * H, 0.038 * H * cn, w * 0.9);
     b(chest, fs); b(fs, fe); b(fe, fk); b(fk, ff);
-    const hs = j(-0.3 * L, 0.58 * H, 0.12 * H * heavy, w), hk = j(-0.46 * L, 0.3 * H, 0.05 * H * cn, w * 0.9), hf = j(-0.42 * L, 0.07 * H, 0.038 * H * cn, w * 0.9);
+    const hs = j(-0.3 * L, 0.58 * H, 0.12 * H * heavy, w), hk = j(-0.46 * L - g * 0.12 * L, 0.3 * H + g * 0.06 * H, 0.05 * H * cn, w * 0.9), hf = j(-0.42 * L - g * 0.32 * L, 0.07 * H + g * 0.1 * H, 0.038 * H * cn, w * 0.9);
     b(croup, hs); b(hs, hk); b(hk, hf);
-    for (const [f, fr] of [[0.35 * L, 1], [-0.42 * L, 1]]) {
-      parts.push(cylinder({ radiusBottom: 0.05 * H * cn * fr, radiusTop: 0.04 * H * cn, height: 0.05 * H, segments: 10 }, P(f + 0.01, 0, w * 0.9), plan.hoof ?? 'horse_dark'));
-      if (breed === 'draught') parts.push(ell(f, 0.12 * H, w * 0.9, [0.06 * H, 0.07 * H, 0.06 * H], 'cloth_linen'));
+    for (const [f, lift] of [[0.35 * L + g * 0.36 * L, g * 0.2 * H], [-0.42 * L - g * 0.32 * L, g * 0.1 * H]]) {
+      parts.push(cylinder({ radiusBottom: 0.05 * H * cn, radiusTop: 0.04 * H * cn, height: 0.05 * H, segments: 10 }, P(f + 0.01, lift, w * 0.9), plan.hoof ?? 'horse_dark'));
+      if (breed === 'draught') parts.push(ell(f, 0.12 * H + lift, w * 0.9, [0.06 * H, 0.07 * H, 0.06 * H], 'cloth_linen'));
     }
   }
   const n1 = j(0.42 * L, 0.98 * H, 0.14 * H * heavy), n2 = j(0.52 * L, 1.14 * H, 0.1 * H), poll = j(0.6 * L, 1.3 * H, 0.07 * H), jaw = j(0.66 * L, 1.22 * H, 0.085 * H), muzzle = j(0.8 * L, 1.02 * H, 0.05 * H);
@@ -324,7 +324,7 @@ export function build(spec, { footprint }) {
   const coat = spec.coat ?? coatDefault, mark = spec.marking ?? markDefault, pose = spec.pose ?? 'stand', stride = Math.max(-1, Math.min(1, spec.stride ?? (pose === 'run' ? 1 : 0)));
   const fx = Math.cos(FRONT), fz = Math.sin(FRONT), sx = -fz, sz = fx, rot = -FRONT;
   const P = (f, up, s = 0) => [fx * f + sx * s, up, fz * f + sz * s];
-  if (species === 'horse' && spec.skin && (spec.pose ?? 'stand') === 'stand') {
+  if (species === 'horse' && spec.skin && ['stand', 'run'].includes(spec.pose ?? 'stand')) {
     const sock = plan.socks ?? (breed === 'bay' || breed === 'dun' ? 'horse_dark' : coat), made = horseSkin(spec, plan, { breed, coat, mark, sock, P, rot });
     const a = (spec.facing ?? 0) * Math.PI / 4, c = Math.cos(a), sn = Math.sin(a), turned = (spec.facing ? turnParts(made.parts, a) : made.parts).map(p => ({ ...p, overhang: true }));
     const skeleton = { ...made.skeleton, verts: made.skeleton.verts.map(([x, y, z, r]) => [x * c + z * sn, y, -x * sn + z * c, r]) };

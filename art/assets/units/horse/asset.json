@@ -431,6 +431,24 @@
         "renderHash": "0af722b2",
         "samples": 96
       }
+    },
+    {
+      "id": "horse-chestnut-run-sculpt",
+      "name": "Chestnut horse galloping – A · Sculpted (approved style)",
+      "version": 1,
+      "spec": {
+        "species": "horse",
+        "breed": "chestnut",
+        "pose": "run",
+        "facing": 2,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "0c9f9f79",
+        "samples": 96
+      }
     }
   ]
 }
