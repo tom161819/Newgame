@@ -9,6 +9,8 @@ export const UNIT_TYPES=Object.freeze({
   archer:Object.freeze({equipment:Object.freeze({weapon:'bow'}),modifiers:Object.freeze({maxHP:10,attackRange:5}),trainingTime:30000,goldCost:8,wageBonus:1,requiredCombatLevel:1}),
   knight:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'armor'}),mount:'horse',modifiers:Object.freeze({maxHP:100,attackBonus:50,armor:10}),trainingTime:60000,goldCost:25,wageBonus:4,requiredCombatLevel:4}),
 });
+// m-start-v2 (owner 7 Nov 2026): a new game starts with this garrison at the Castle, with its own equipment.
+export const START_GARRISON=Object.freeze([Object.freeze({type:'soldier',count:2}),Object.freeze({type:'archer',count:2})]);
 export const UNIT_TYPE_IDS=Object.freeze(Object.keys(UNIT_TYPES));
 // A Knight rides a tamed horse from the Stables: it is reserved for the training and kept by the Knight.
 export const KNIGHT_SPEED=1.5;

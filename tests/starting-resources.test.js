@@ -6,6 +6,8 @@ import { GOLD_LIMIT } from '../src/data/economy.js';
 import { objectRegistry } from '../src/systems/ObjectRegistry.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
+import { LOGISTICS_RULES } from '../src/data/logistics.js';
+const CAP=STARTING_RESOURCE_CAPACITY;
 globalThis.document={querySelector:()=>({textContent:''})};
 
 // N04 (#35): starting physical resources under Starting Gold, placed once in the Starter Stockpile.
@@ -16,23 +18,24 @@ const total=(s,id)=>s.foodStorage.resourceBreakdown().find(r=>r.resource===id)?.
 test('defaults add nothing: the start economy and the empty Starter Stockpile stay as before',()=>{
   assert.deepEqual(Object.keys(STARTING_RESOURCES),['startingStone','startingWood','startingIronOre','startingBread']);
   for(const key of Object.keys(STARTING_RESOURCES))assert.equal(DEFAULT_GAME_SETTINGS[key],0);
-  assert.equal(STARTING_RESOURCE_CAPACITY,160,'owner request 7 Nov 2026: the Starter Stockpile holds 160');
+  assert.equal(STARTING_RESOURCE_CAPACITY,LOGISTICS_RULES.starterCapacity,'the start-settings limit follows the Starter Stockpile');
+  assert.equal(STARTING_RESOURCE_CAPACITY,300,'owner request m-start-v2 7 Nov 2026: the Starter Stockpile holds 300');
   const s=scene();assert.deepEqual(starter(s).stock,{});for(const id of Object.values(STARTING_RESOURCES))assert.equal(total(s,id),0);
 });
-test('settings accept 5-unit steps up to a combined 160 and reject anything else',()=>{
+test(`settings accept 5-unit steps up to a combined ${CAP} and reject anything else`,()=>{
   assert.equal(gameSettings({startingStone:10,startingWood:15,startingIronOre:5,startingBread:10}).startingBread,10);
-  assert.equal(gameSettings({startingStone:160}).startingStone,160);
-  assert.equal(gameSettings({startingStone:40,startingWood:40,startingIronOre:40,startingBread:40}).startingBread,40);
-  for(const bad of [{startingStone:-5},{startingWood:3},{startingIronOre:165},{startingBread:'10'},{startingStone:100,startingWood:65},{startingStone:40,startingWood:40,startingIronOre:40,startingBread:45}])assert.throws(()=>gameSettings(bad),JSON.stringify(bad));
+  assert.equal(gameSettings({startingStone:CAP}).startingStone,CAP);
+  const quarter=CAP/4;assert.equal(gameSettings({startingStone:quarter,startingWood:quarter,startingIronOre:quarter,startingBread:quarter}).startingBread,quarter);
+  for(const bad of [{startingStone:-5},{startingWood:3},{startingIronOre:CAP+5},{startingBread:'10'},{startingStone:CAP-60,startingWood:65},{startingStone:quarter,startingWood:quarter,startingIronOre:quarter,startingBread:quarter+5}])assert.throws(()=>gameSettings(bad),JSON.stringify(bad));
 });
-test('the New Game Setup proposes a built Castle, 500 Gold, 40 Stone, 60 Wood, 40 Bread and no Iron Ore (owner 7 Nov 2026: basic buildings are wooden)',()=>{
+test('the New Game Setup proposes a built Castle, 500 Gold, 40 Stone, 60 Wood, 200 Bread and no Iron Ore (owner 7 Nov 2026: basic buildings are wooden)',()=>{
   assert.equal(NEW_GAME_DEFAULTS.startingCastle,true);assert.equal(NEW_GAME_DEFAULTS.startingGold,500);assert.equal(GOLD_LIMIT,Infinity,'gold has no limit since 0.51');
-  assert.deepEqual(Object.keys(STARTING_RESOURCES).map(key=>NEW_GAME_DEFAULTS[key]),[40,60,0,40]);
+  assert.deepEqual(Object.keys(STARTING_RESOURCES).map(key=>NEW_GAME_DEFAULTS[key]),[40,60,0,200],'owner request m-start-v2 7 Nov 2026');
   assert.doesNotThrow(()=>gameSettings(NEW_GAME_DEFAULTS));
   const s=scene(NEW_GAME_DEFAULTS);assert.ok(s.buildings.some(b=>b.type==='castle'),'one built Castle');
-  const stock=x=>Object.fromEntries(Object.entries(starter(x).stock).filter(([,n])=>n>0));assert.deepEqual(stock(s),{stone:40,wood:60,bread:40});assert.equal(s.foodStorage.room(starter(s).id),20,'140 of 160');
+  const stock=x=>Object.fromEntries(Object.entries(starter(x).stock).filter(([,n])=>n>0));assert.deepEqual(stock(s),{stone:40,wood:60,bread:200});assert.equal(s.foodStorage.room(starter(s).id),CAP-300,`300 of ${CAP}`);
   const off=scene({...NEW_GAME_DEFAULTS,startingCastle:false});assert.equal(off.buildings.some(b=>b.type==='castle'),false,'the Castle can be switched off');
-  assert.deepEqual(stock(off),{stone:40,wood:60,bread:40});
+  assert.deepEqual(stock(off),{stone:40,wood:60,bread:200});
 });
 test('chosen goods are deposited physically exactly once and are separate from Initial Stones on the map',()=>{
   const settings={startingStone:10,startingWood:15,startingIronOre:5,startingBread:10,initialStoneCount:55},s=scene(settings);
@@ -48,7 +51,7 @@ test('current-schema Save/Load keeps the settings and the stock without depositi
   assert.equal(data.gameSettings.startingStone,20);
   const r=workerScene(undefined,{construction:true,logistics:true,starter:false,gameSettings:gameSettings(data.gameSettings)});loadGameState(r,data);
   assert.deepEqual(starter(r).stock,{stone:20,bread:20});assert.equal(total(r,'stone'),20);assert.deepEqual(serializeGameState(r),data);
-  const bad=structuredClone(data);bad.gameSettings.startingWood=125;assert.throws(()=>validateGameState(bad),'a save whose start settings overflow the stockpile is rejected');
+  const bad=structuredClone(data);bad.gameSettings.startingWood=CAP-35;assert.throws(()=>validateGameState(bad),'a save whose start settings overflow the stockpile is rejected');
 });
 test('a new game with the same settings starts its own stockpile from scratch',()=>{
   const a=scene({startingWood:20}),b=scene({startingWood:20});assert.deepEqual(starter(a).stock,{wood:20});assert.deepEqual(starter(b).stock,{wood:20});

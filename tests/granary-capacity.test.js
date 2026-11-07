@@ -5,6 +5,8 @@ import { buildingTiles } from '../src/game/buildings.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
 import { GRANARY_GROUP_CAPACITY } from '../src/data/granaryCapacity.js';
+import { LOGISTICS_RULES } from '../src/data/logistics.js';
+const CAP=LOGISTICS_RULES.starterCapacity;
 const RAW=GRANARY_GROUP_CAPACITY.raw,FOOD=GRANARY_GROUP_CAPACITY.food;
 globalThis.document={querySelector:()=>({textContent:''})};
 const scene=(starter=true)=>workerScene(undefined,{construction:true,logistics:true,starter});
@@ -27,7 +29,7 @@ test('each Granary has its own groups; Warehouse, Starter Stockpile and producti
  const {s,id,storage}=fixture(),other=building(s,'granary',58,45),warehouse=building(s,'warehouse',64,45),bakery=building(s,'bakery',70,45),starter=[...storage.locations.values()].find(l=>l.kind==='fallback'&&l.allowed.includes('wheat'));
  storage.deposit(id,'wheat',RAW);assert.equal(storage.room(`granary-${other.id}`,'wheat'),RAW);assert.equal(storage.room(`granary-${other.id}`,'bread'),FOOD);
  assert.ok(storage.deposit(`warehouse-${warehouse.id}`,'wood',150));assert.ok(storage.deposit(`warehouse-${warehouse.id}`,'stone',50));assert.equal(storage.room(`warehouse-${warehouse.id}`,'iron'),0);assert.equal(storage.groups(`warehouse-${warehouse.id}`),null);
- assert.ok(storage.deposit(starter.id,'wheat',80));assert.ok(storage.deposit(starter.id,'bread',80));assert.equal(storage.room(starter.id,'apple'),0);assert.ok(storage.deposit(`input-${bakery.id}`,'flour',20));assert.equal(storage.room(`input-${bakery.id}`,'flour'),0);snapshot(s);
+ assert.ok(storage.deposit(starter.id,'wheat',80));assert.ok(storage.deposit(starter.id,'bread',CAP-80));assert.equal(storage.room(starter.id,'apple'),0);assert.ok(storage.deposit(`input-${bakery.id}`,'flour',20));assert.equal(storage.room(`input-${bakery.id}`,'flour'),0);snapshot(s);
 });
 test('two Haulers cannot overbook food capacity when raw is full; real reserved transport survives a loaded roundtrip',()=>{
  const {s,id,storage}=fixture(),starter=[...storage.locations.values()].find(l=>l.kind==='fallback'&&l.allowed.includes('bread'));storage.deposit(id,'wheat',RAW);storage.deposit(id,'bread',FOOD-6);storage.deposit(starter.id,'bread',12);
@@ -41,7 +43,7 @@ test('current-schema saves preserve independent groups and reject per-group over
  for(const stock of [{wheat:RAW+1},{bread:FOOD+1},{wheat:RAW-50,flour:51},{bread:FOOD-50,meat:51}]){const bad=structuredClone(data);bad.foodStorage.locations.find(l=>l.id===id).stock=stock;for(const key of Object.keys(bad.inventory))if(['wheat','bread','flour','meat'].includes(key))delete bad.inventory[key];assert.throws(()=>validateGameState(bad));assert.deepEqual(serializeGameState(s),data);}
 });
 test('a Bakery cannot book four food outputs into only two food slots even with all raw capacity free',()=>{
- const {s,id,storage}=fixture(),bakery=building(s,'bakery',58,45),starter=[...storage.locations.values()].find(l=>l.kind==='fallback'&&l.allowed.includes('bread'));storage.deposit(id,'bread',FOOD-2);storage.deposit(starter.id,'bread',160);storage.deposit(`input-${bakery.id}`,'flour',2);
+ const {s,id,storage}=fixture(),bakery=building(s,'bakery',58,45),starter=[...storage.locations.values()].find(l=>l.kind==='fallback'&&l.allowed.includes('bread'));storage.deposit(id,'bread',FOOD-2);storage.deposit(starter.id,'bread',CAP);storage.deposit(`input-${bakery.id}`,'flour',2);
  const w=s.workerSystem.create({x:57,y:45});s.workplaceSystem.assign(bakery,w);s.simulate(6000);assert.equal(s.foodProduction.records.get(bakery.id).cycle,null);assert.equal(storage.room(id,'wheat'),RAW);assert.equal(storage.room(id,'bread'),2);
- storage.withdraw(id,'bread',4);until(s,()=>s.foodProduction.records.get(bakery.id).completed===1&&!w.cargo&&s.inventory.count('bread')===FOOD+158);snapshot(s);
+ storage.withdraw(id,'bread',4);until(s,()=>s.foodProduction.records.get(bakery.id).completed===1&&!w.cargo&&s.inventory.count('bread')===FOOD+CAP-2);snapshot(s);
 });

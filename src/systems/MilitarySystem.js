@@ -1,4 +1,4 @@
-import { UNIT_TYPES,unitKit,KNIGHT_SPEED } from '../data/military.js';
+import { UNIT_TYPES,unitKit,KNIGHT_SPEED ,START_GARRISON} from '../data/military.js';
 import { MILITARY_ITEMS } from '../data/militaryEquipment.js';
 import { buildingIsComplete } from '../game/buildings.js';
 import { recalculateStats } from './UnitStats.js';
@@ -31,6 +31,15 @@ export class MilitarySystem {
   missing(barracksId,resource){const kit=this.storage?.locations.get(`kit-${barracksId}`);if(!kit)return 0;return Math.max(0,(this.kitNeeds(barracksId)[resource]??0)-(kit.stock[resource]??0)-this.storage.incoming(kit.id,resource));}
   // Armory stock that could still go to this order (shown as available kits in the panel).
   available(resource){return this.storage?.available(resource)??0;}
+  // New game only: the starting garrison (START_GARRISON) joins the first residents, within the population capacity.
+  enlistStartingGarrison(random=Math.random){const ws=this.scene.workerSystem,out=[];for(const {type,count} of START_GARRISON)for(let i=0;i<count;i++){if(ws.liveSubjects().length>=ws.capacity())return out;const w=ws.spawnNearStart(random);if(w&&this.enlist(w,type))out.push(w);}ws.updateUI();return out;}
+  // New game only: a resident becomes a trained unit with the unit's own equipment (no Armory stock is used).
+  // Garrison units (garrison:true) serve the Castle: they need no Barracks and stay soldiers until dismissed.
+  enlist(worker,type){
+    if(!worker?.isAlive||!UNIT_TYPES[type]||UNIT_TYPES[type].mount)return false;
+    if(!this.scene.workerSystem.jobs.assign(worker,'soldier'))return false;
+    this.units.set(worker.id,{type,equipment:{...UNIT_TYPES[type].equipment},garrison:true});this.apply(worker);worker.currentHP=worker.maxHP;return true;
+  }
   train(worker,type){
     const reason=this.blocker(worker,type);if(reason)return reason;const spec=UNIT_TYPES[type],id=this.nextOrder++;
     if(!this.scene.inventory.spend('gold',spec.goldCost,{source:'Military Training',id:`military-training:${id}`,entityId:worker.id}))return 'gold';
@@ -103,7 +112,7 @@ export class MilitarySystem {
   update(delta){
     if(this.scene.gameOver||this.scene.gameTime?.paused||!this.storage)return;
     // A unit moved out of its Barracks (new job, Unemployed) hands its gear back: it drops where the resident stands.
-    for(const workerId of [...this.units.keys()]){const w=this.scene.workerSystem.workers.get(workerId);if(!w?.isAlive)this.units.delete(workerId);else if(w.profession!=='soldier'||!this.barracks(w.assignedWorkplaceId))this.release(w);}
+    for(const workerId of [...this.units.keys()]){const w=this.scene.workerSystem.workers.get(workerId);if(!w?.isAlive)this.units.delete(workerId);else if(w.profession!=='soldier'||(!this.barracks(w.assignedWorkplaceId)&&!this.units.get(workerId).garrison))this.release(w);}
     for(const order of [...this.orders.values()].sort((a,b)=>a.id-b.id)){
       const worker=this.scene.workerSystem.workers.get(order.workerId);
       if(!worker?.isAlive||worker.assignedWorkplaceId!==order.barracksId||!this.barracks(order.barracksId)){this.cancel(order.id);continue;}
@@ -118,9 +127,9 @@ export class MilitarySystem {
     for(const[id,n]of Object.entries(order.items))this.scene.resourceLedger?.expense(id,n,'Military Equipment',{id:`military-equip:${order.id}:${id}`,entityId:worker.id});
     this.apply(worker);worker.currentHP=worker.maxHP;this.scene.activities?.emit('unitTrained',{actor:worker,objectType:order.type,quantity:1});this.scene.updateInventory?.();
   }
-  exportState(){return {units:[...this.units].map(([workerId,u])=>({workerId,type:u.type,equipment:{...u.equipment}})),orders:[...this.orders.values()].map(o=>structuredClone(o)),nextOrder:this.nextOrder};}
+  exportState(){return {units:[...this.units].map(([workerId,u])=>({workerId,type:u.type,equipment:{...u.equipment},...(u.garrison?{garrison:true}:{})})),orders:[...this.orders.values()].map(o=>structuredClone(o)),nextOrder:this.nextOrder};}
   importState(data){
-    this.units=new Map((data?.units??[]).map(u=>[u.workerId,{type:u.type,equipment:{...u.equipment}}]));
+    this.units=new Map((data?.units??[]).map(u=>[u.workerId,{type:u.type,equipment:{...u.equipment},...(u.garrison?{garrison:true}:{})}]));
     this.orders=new Map((data?.orders??[]).map(o=>[o.id,structuredClone(o)]));this.nextOrder=data?.nextOrder??1;
   }
 }

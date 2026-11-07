@@ -6,6 +6,8 @@ import { treeState } from '../src/data/naturalResources.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
 import { captureMapKnowledge } from '../src/game/mapMemoryObjects.js';
+import { LOGISTICS_RULES } from '../src/data/logistics.js';
+const CAP=LOGISTICS_RULES.starterCapacity;
 
 globalThis.document={querySelector:()=>({textContent:''})};
 function fixture(starter=true){const s=workerScene(undefined,{naturalResources:true,construction:true,logistics:true,starter});s.workerSystem.unsubscribe();return s;}
@@ -29,7 +31,7 @@ test('three workers reserve different trees and work positions without duplicati
   until(s,()=>trees.every(t=>t.natural.stage===0));assert.equal(totalWood(s),18);until(s,()=>s.inventory.count('wood')===18);s.simulate(5000);assert.equal(totalWood(s),18);assert.equal(s.naturalResources.forestry.summary(b).harvested,18);for(const w of workers){assert.equal(w.experience.totalXP,15);assert.equal(w.skills.woodcutting.totalXP,18);}assert.equal(s.foodStorage.reservations.size,0);
 });
 test('a full store prevents a new cutting cycle; releasing capacity permits exactly one real harvest',()=>{
-  const s=fixture(),b=hut(s),t=tree(s),w=worker(s,b);s.inventory.add('wood',160);s.simulate(6000);assert.equal(w.workTask,null);assert.match(w.workMessage,/storage/);assert.equal(t.natural.workDone,0);assert.equal(s.dropSystem.drops.size,0);assert.equal(w.experience.totalXP,0);s.inventory.spend('wood',6);until(s,()=>s.inventory.count('wood')===160);assert.equal(t.natural.stage,0);assert.equal(w.experience.totalXP,15);assert.equal(s.dropSystem.drops.size,0);
+  const s=fixture(),b=hut(s),t=tree(s),w=worker(s,b);s.inventory.add('wood',CAP);s.simulate(6000);assert.equal(w.workTask,null);assert.match(w.workMessage,/storage/);assert.equal(t.natural.workDone,0);assert.equal(s.dropSystem.drops.size,0);assert.equal(w.experience.totalXP,0);s.inventory.spend('wood',6);until(s,()=>s.inventory.count('wood')===CAP);assert.equal(t.natural.stage,0);assert.equal(w.experience.totalXP,15);assert.equal(s.dropSystem.drops.size,0);
 });
 test('chopping, ground pickup and loaded delivery roundtrip exactly, without repeated input, Wood or XP',()=>{
   for(const stage of ['chopTree','foodPickup','foodDeliver']){const s=fixture(),b=hut(s),t=tree(s),w=worker(s,b);until(s,()=>w.workTask?.kind===stage&&(stage!=='chopTree'||t.natural.workDone>2500));const saved=validateGameState(serializeGameState(s)),r=fixture(false);loadGameState(r,saved);assert.deepEqual(serializeGameState(r),saved);until(r,()=>r.inventory.count('wood')===6);r.simulate(500);assert.equal(totalWood(r),6);assert.equal(r.workerSystem.workers.get(w.id).experience.totalXP,15);assert.equal(r.workerSystem.workers.get(w.id).skills.woodcutting.totalXP,18);assert.equal(r.foodStorage.reservations.size,0);}

@@ -8,7 +8,7 @@ export const DEFAULT_GAME_SETTINGS=Object.freeze({difficulty:'normal',wildlifePo
 // Owner request 7 Nov 2026: the New Game Setup proposes a built Castle (can be switched off), Gold at its limit (500)
 // and 40 of each starting resource, which fills the Starter Stockpile (4 × 40 = 160). DEFAULT_GAME_SETTINGS stays the
 // neutral base for older saves and automated scenarios.
-export const NEW_GAME_DEFAULTS=Object.freeze({...DEFAULT_GAME_SETTINGS,startingCastle:true,startingGold:500,startingStone:40,startingWood:60,startingIronOre:0,startingBread:40});
+export const NEW_GAME_DEFAULTS=Object.freeze({...DEFAULT_GAME_SETTINGS,startingCastle:true,startingGold:500,startingStone:40,startingWood:60,startingIronOre:0,startingBread:200});
 // Physical goods placed once in the Starter Stockpile; their total fits its capacity.
 export const STARTING_RESOURCES=Object.freeze({startingStone:'stone',startingWood:'wood',startingIronOre:'iron_ore',startingBread:'bread'});
 export const STARTING_RESOURCE_STEP=5,STARTING_RESOURCE_CAPACITY=LOGISTICS_RULES.starterCapacity;

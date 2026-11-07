@@ -3,7 +3,8 @@ export const SKILLS=Object.freeze(localizeSkills({woodcutting:'Woodcutting',mini
 export const SKILL_IDS=Object.freeze(Object.keys(SKILLS));
 export const WORK_RULES=Object.freeze({efficiencyPerLevel:.01,miningDuration:1500,searchInterval:500,workRadius:24,
   fleeRatio:.3,recoverRatio:.8,combatXPPerDamage:1,combatXPPerTarget:40});
-export const POPULATION=Object.freeze({initial:3,maximum:20,houseCapacity:5,migrantsPerDay:1,wanderRadius:5,recentDeathDays:3});
+// m-start-v2 (owner 7 Nov 2026): the Castle settlement holds 10 people (was 20); Houses add their capacity.
+export const POPULATION=Object.freeze({initial:3,maximum:10,houseCapacity:5,migrantsPerDay:1,wanderRadius:5,recentDeathDays:3});
 export const JOBS=Object.freeze(localizeJobs({
   idle:Object.freeze({portraitColor:'#62655d',name:'Unemployed',skill:null}),
   woodcutter:Object.freeze({portraitColor:'#365e42',name:'Woodcutter',skill:'woodcutting',workplace:'lumberjack_hut',requiresWorkplace:true}),

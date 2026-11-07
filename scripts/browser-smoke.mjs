@@ -12,6 +12,7 @@ import { populationJobMenuSmoke } from './population-job-menu-smoke.mjs';
 import { e1Smoke } from './e1-smoke.mjs';
 import { e2Smoke,quickStartSmoke } from './e2-smoke.mjs';
 import { e4Smoke } from './e4-smoke.mjs';
+import { startV2Smoke } from './start-v2-smoke.mjs';
 import { employment2Smoke } from './employment-2-smoke.mjs';
 import { animalLooksSmoke } from './animal-looks-smoke.mjs';
 import { tutorialSmoke } from './tutorial-smoke.mjs';
@@ -178,7 +179,7 @@ try{
   // the earlier empty start (no Castle, no Gold, empty stockpile) that the steps below were written for.
   assert.equal(await page.locator('#setup-castle').isChecked(),true);assert.equal(await page.locator('#setup-gold').inputValue(),'500');
   // E1 (owner 7 Nov 2026): basic buildings are wooden, so the start has more wood and no Iron Ore.
-  for(const [id,value] of [['stone','40'],['wood','60'],['iron-ore','0'],['bread','40']])assert.equal(await page.locator(`#setup-start-${id}`).inputValue(),value);
+  for(const [id,value] of [['stone','40'],['wood','60'],['iron-ore','0'],['bread','200']])assert.equal(await page.locator(`#setup-start-${id}`).inputValue(),value);
   await page.locator('#setup-castle').uncheck();
   for(const selector of ['#setup-gold','#setup-start-stone','#setup-start-wood','#setup-start-iron-ore','#setup-start-bread'])await page.locator(selector).evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
@@ -189,6 +190,7 @@ try{
   await step('building-costs',()=>buildingCostsSmoke(context,origin+base,instrument));
   await step('e2',()=>quickStartSmoke(context,origin+base,instrument));
   await step('animal-looks',()=>animalLooksSmoke(context,origin+base,instrument));
+  await step('start-v2',()=>startV2Smoke(context,origin+base,instrument));
   await step('tutorial',()=>tutorialSmoke(context,origin+base,instrument));
   await step('marketplace',()=>marketplaceSmoke(context,origin+base,instrument));
   await step('gate',()=>gateSmoke(context,origin+base,instrument));
@@ -331,17 +333,17 @@ try{
   assert.equal(await page.evaluate(id=>window.__game.registry.get('application').saves.get(id).then(r=>!!r),stored.id),true,'starting a new game never deletes the old save');
   await page.evaluate(id=>window.__game.registry.get('application').saves.delete(id),stored.id);
   console.log(`PASS actual historical schema ${isolated.schema} save is reported as incompatible with schema ${record.saveVersion}; the world and the stored slot stay unchanged and New Game is offered`);
-  // N04: starting resources on the restarted New Game screen go into the Starter Stockpile once, capped at its 160 units
+  // N04: starting resources on the restarted New Game screen go into the Starter Stockpile once, capped at its 300 units (m-start-v2)
   // (0.9.2: the setup proposes 40 of each, which fills it).
   {const set=(name,value)=>page.locator(`#game-setup-form [name="${name}"]`).evaluate((e,v)=>{e.value=String(v);e.dispatchEvent(new Event('input',{bubbles:true}));},value);
-  await page.locator('.setup-advanced summary').click();assert.equal(await page.locator('#setup-resources-total').textContent(),'140 / 160');
-  await set('startingIronOre',0);await set('startingBread',0);await set('startingStone',100);await set('startingWood',100);assert.equal(await page.locator('#setup-start-wood').inputValue(),'60','the slider stops at the remaining room');assert.equal(await page.locator('#setup-resources-total').textContent(),'140 / 160');
-  assert.match(await page.locator('#setup-summary').textContent(),/Stockpile: 100 stone, 60 wood/);
+  await page.locator('.setup-advanced summary').click();assert.equal(await page.locator('#setup-resources-total').textContent(),'300 / 300');
+  await set('startingIronOre',0);await set('startingBread',0);await set('startingStone',200);await set('startingWood',200);assert.equal(await page.locator('#setup-start-wood').inputValue(),'100','the slider stops at the remaining room');assert.equal(await page.locator('#setup-resources-total').textContent(),'300 / 300');
+  assert.match(await page.locator('#setup-summary').textContent(),/Stockpile: 200 stone, 100 wood/);
   await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'setup fits a phone');await page.setViewportSize({width:1440,height:1000});
   await page.locator('#start-game').click();await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
   const start=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,starter=s.buildings.find(b=>b.type==='starter_stockpile');return {stock:s.foodStorage.locations.get(`stockpile-${starter.id}`).stock,loose:s.resourceCount('stone'),initial:s.gameSettings.initialStoneCount,stone:s.inventory.count('stone'),settings:window.__game.registry.get('application').snapshot().gameSettings};});
-  assert.deepEqual(start.stock,{stone:100,wood:60});assert.equal(start.stone,100);assert.equal(start.loose,start.initial,'loose map stones follow Initial Stones only');assert.equal(start.settings.startingWood,60);
-  console.log(`PASS New Game starting resources: capped 160-unit Starter Stockpile, 100 Stone + 60 Wood deposited once, ${start.loose} loose map stones kept separate, phone-width setup`);}
+  assert.deepEqual(start.stock,{stone:200,wood:100});assert.equal(start.stone,200);assert.equal(start.loose,start.initial,'loose map stones follow Initial Stones only');assert.equal(start.settings.startingWood,100);
+  console.log(`PASS New Game starting resources: capped 300-unit Starter Stockpile, 200 Stone + 100 Wood deposited once, ${start.loose} loose map stones kept separate, phone-width setup`);}
   const archivePage=await context.newPage();await instrument(archivePage);await archivePage.goto(origin+base+'versions/');assert.equal(await archivePage.locator('[data-version-label]').count(),catalog.versions.length+(catalog.versions.some(v=>v.current)?0:1));
   await archivePage.setViewportSize({width:390,height:844});assert.equal(await archivePage.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   const first=catalog.builds.at(-1);await archivePage.goto(origin+first.archiveURL);await archivePage.locator('canvas:not(.minimap-canvas)').waitFor();

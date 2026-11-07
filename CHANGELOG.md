@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.53.0] - 2026-11-08
+<!-- version: {"title":"Start 2: bread, room for 10, garrison","type":"feature","reconstructed":false,"saveVersion":58} -->
+### Changed
+- A new game starts with 200 Bread. The Starter Stockpile now holds 300.
+- The Castle has room for 10 residents, and each House adds more. The event feed says when the settlement is full.
+- A new game starts with 2 Soldiers and 2 Archers at the Castle. They count towards the 10 residents and need no Barracks.
+
+
 ## [0.52.0] - 2026-11-07
 <!-- version: {"title":"Bigger Granary, unlimited gold, one Iron","type":"feature","reconstructed":false,"saveVersion":58} -->
 ### Changed

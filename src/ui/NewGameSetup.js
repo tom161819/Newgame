@@ -3,11 +3,11 @@ import { NEW_GAME_DEFAULTS,gameSettings,STARTING_RESOURCES,STARTING_RESOURCE_CAP
 import { encodeWorldCode,decodeWorldCode,defaultWorldLevels,randomSeed,applyPresets,presetsFromLevels } from '../data/worldCode.js';
 
 // Quick starts (values for the form; anything not listed keeps the New Game default). Starting resources stay within
-// the Starter Stockpile's 160 units.
+// the Starter Stockpile's 300 units.
 export const SETUP_PRESETS=Object.freeze({
-  calm:Object.freeze({difficulty:'easy',nightWolves:false,nightThieves:false,nightFires:false,startingWood:70,startingStone:50,startingBread:40}),
+  calm:Object.freeze({difficulty:'easy',nightWolves:false,nightThieves:false,nightFires:false,startingWood:70,startingStone:50,startingBread:180}),
   normal:Object.freeze({}),
-  challenge:Object.freeze({difficulty:'hard',startingWood:40,startingStone:20,startingBread:30}),
+  challenge:Object.freeze({difficulty:'hard',startingWood:40,startingStone:20,startingBread:120}),
 });
 export class NewGameSetup {
   constructor({onStart,onBack}){
@@ -26,7 +26,7 @@ export class NewGameSetup {
     this.custom=document.querySelector('#setup-custom');
     this.custom?.addEventListener('toggle',()=>{try{localStorage.setItem('newgame.setupCustom',this.custom.open?'open':'closed');}catch{/* still toggles */}});
     for(const button of this.root.querySelectorAll('[data-setup-preset]'))button.addEventListener('click',()=>this.applyPreset(button.dataset.setupPreset));
-    // The Starter Stockpile holds STARTING_RESOURCE_CAPACITY (160) units: a slider that would overflow it is held at the remaining room.
+    // The Starter Stockpile holds STARTING_RESOURCE_CAPACITY (300) units: a slider that would overflow it is held at the remaining room.
     this.form.addEventListener('input',event=>{const key=event.target?.name;if(Object.hasOwn(STARTING_RESOURCES,key)){const e=this.form.elements,others=Object.keys(STARTING_RESOURCES).filter(k=>k!==key).reduce((n,k)=>n+Number(e[k].value),0);if(Number(e[key].value)+others>STARTING_RESOURCE_CAPACITY)e[key].value=String(STARTING_RESOURCE_CAPACITY-others);}this.refresh();});
   }
   value(){const e=this.form.elements;return gameSettings({difficulty:e.difficulty.value,wildlifePopulation:['rare','normal','abundant'][Number(e.wildlifePopulation.value)],treasureCount:Number(e.treasureCount.value),initialStoneCount:Number(e.initialStoneCount.value),fogOfWar:e.fogOfWar.checked,explorationMode:e.explorationMode.checked,seasonsEnabled:e.seasonsEnabled.checked,autoEmployment:e.autoEmployment.checked,nightWolves:e.nightWolves?.checked??true,nightThieves:e.nightThieves?.checked??true,nightFires:e.nightFires?.checked??true,startingCastle:e.startingCastle.checked,dayLengthSeconds:Number(e.dayLengthSeconds.value),wildlifeRespawn:e.wildlifeRespawn.value,startingGold:Number(e.startingGold.value),...Object.fromEntries(Object.keys(STARTING_RESOURCES).map(k=>[k,Number(e[k].value)])),worldCode:this.worldCode()});}

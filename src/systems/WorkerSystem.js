@@ -1,3 +1,4 @@
+import { t } from '../i18n/index.js';
 import { IdleGathering } from './IdleGathering.js';
 import { syncWorkerUniform } from '../data/idleGathering.js';
 import { UnitCommands } from './UnitCommands.js';
@@ -62,6 +63,8 @@ export class WorkerSystem {
     view.setData('worker',worker);this.workers.set(id,worker);this.updateUI();return worker;
   }
   // World v2: the first villagers stand where the world's 'villagers' stream puts them (seeded worlds).
+  // One more resident near the start (the starting garrison, m-start-v2); null when there is no free tile.
+  spawnNearStart(random=Math.random){const origin=this.origin(),candidates=this.candidates().filter(t=>Math.max(Math.abs(t.x-origin.x),Math.abs(t.y-origin.y))<=6);return candidates.length?this.create(candidates[Math.floor(random()*candidates.length)]):null;}
   spawnInitial(random=Math.random){
     const origin=this.origin();
     for(let i=0;i<POPULATION.initial;i++){
@@ -72,6 +75,8 @@ export class WorkerSystem {
   }
   onNewDay(day){
     if(day<=this.lastMigrationDay)return;this.lastMigrationDay=day;
+    // m-start-v2: a full settlement says so once per capacity (the line comes back after new Houses fill up too).
+    const capacity=this.capacity();if(this.liveSubjects().length>=capacity&&this.scene.eventFeed?.push)this.scene.eventFeed.push(`population-full:${capacity}`,t('feed.populationFull',{capacity}));
     for(let i=0;i<POPULATION.migrantsPerDay&&this.liveSubjects().length<this.capacity();i++){
       if(this.scene.attractiveness&&!this.scene.attractiveness.shouldSettle())continue;
       const map=this.scene.map,origin=this.origin(),candidates=this.candidates().filter(t=>(t.x<=1||t.y<=1||t.x>=map[0].length-2||t.y>=map.length-2)&&Math.hypot(t.x-origin.x,t.y-origin.y)>25);
