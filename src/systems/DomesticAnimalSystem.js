@@ -1,4 +1,4 @@
-import { RATS,CATS,DOGS,ratLevel,tameChance } from '../data/domesticAnimals.js';
+import { RATS,CATS,DOGS,ratLevel,tameChance,HOUSE_RATS } from '../data/domesticAnimals.js';
 import { FOOD_RESOURCE_IDS } from '../data/foodProduction.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { PLAYER_START,COLUMNS,ROWS } from '../game/config.js';
@@ -36,6 +36,22 @@ export class DomesticAnimalSystem {
   // One cat per 120 food of capacity; the Starter Stockpile mixes food with materials, so there only its food counts.
   catsNeeded(buildingId){const capacity=this.buildingLocations(buildingId).reduce((n,l)=>n+(l.kind==='fallback'?this.foodStored(l):l.capacity),0);return Math.max(1,Math.ceil(capacity/CATS.capacityPerCat));}
   isHouse(building){return !!this.scene.objectRegistry?.get?.(building?.type)?.housing;}
+  // m-zvirata-2 (52): rats in Houses with no assigned cat within HOUSE_RATS.catRadius tiles for HOUSE_RATS.afterDays.
+  houseHasRats(house){const since=this.houseRats?.get(house?.id);return since!=null&&this.now()-since>=HOUSE_RATS.afterDays*this.day;}
+  housesWithRats(){return (this.scene.buildings??[]).filter(b=>this.isHouse(b)&&this.houseHasRats(b));}
+  updateHouseRats(){
+    this.houseRats??=new Map();this.houseRatsNotified??=new Set();const now=this.now(),keep=new Set();
+    const guards=[...this.cats.values()].filter(c=>c.buildingId!=null&&c.state!=='kitten').map(c=>this.scene.buildings?.find(b=>b.id===c.buildingId)).filter(Boolean);
+    for(const b of this.scene.buildings??[]){
+      if(!this.isHouse(b)||!buildingIsComplete(b))continue;keep.add(b.id);
+      const cx=b.x+(b.tiles?.length?Math.sqrt(b.tiles.length)/2:1),cy=b.y+(b.tiles?.length?Math.sqrt(b.tiles.length)/2:1);
+      const covered=guards.some(g=>Math.hypot(g.x-cx,g.y-cy)<=HOUSE_RATS.catRadius);
+      if(covered){this.houseRats.delete(b.id);this.houseRatsNotified.delete(b.id);continue;}
+      if(!this.houseRats.has(b.id))this.houseRats.set(b.id,now);
+      if(this.houseHasRats(b)&&!this.houseRatsNotified.has(b.id)){this.houseRatsNotified.add(b.id);this.feed(`rats:house:${b.id}:${Math.floor(now/this.day)}`,t('pets.feed.houseRats'),false);}
+    }
+    for(const id of [...this.houseRats.keys()])if(!keep.has(id))this.houseRats.delete(id);
+  }
   catAtHome(house){return !!house&&this.isHouse(house)&&this.catsAt(house.id).length>0;}
   // Buildings a cat can live at: food stores and houses (one cat per house).
   homes(){
@@ -49,7 +65,7 @@ export class DomesticAnimalSystem {
   status(buildingId){const rats=this.buildingRats(buildingId),loss=this.buildingLocations(buildingId).reduce((n,l)=>n+this.lossPerDay(l.id),0);return {rats:Math.round(rats),level:ratLevel(rats),loss:Math.round(loss*10)/10,cats:this.catsAt(buildingId).length,needed:this.catsNeeded(buildingId)};}
 
   update(delta){
-    if(!(delta>0)||!this.storage)return;const days=delta/this.day;let dirty=false;
+    if(!(delta>0)||!this.storage)return;const days=delta/this.day;let dirty=false;this.updateHouseRats();
     for(const l of this.foodLocations()){
       const cats=l.buildingId==null?0:this.catsAt(l.buildingId).filter(c=>!c.walking).length,cover=cats?Math.min(1,cats/this.catsNeeded(l.buildingId)):0;
       const stored=this.foodStored(l),fill=l.capacity?stored/l.capacity:0,before=this.ratsAt(l.id);let pop=before;
@@ -93,13 +109,15 @@ export class DomesticAnimalSystem {
   updateStray(){
     const now=this.now(),rats=this.foodLocations().some(l=>this.ratsAt(l.id)>=RATS.levels[2][1]);
     const interval=(rats?CATS.stray.ratIntervalDays:CATS.stray.intervalDays)*this.day;
+    // m-zvirata-2: before any cat has come the first one is due on day 1–2.
+    if(this.nextStrayAt==null&&!this.cats.size&&!this.firstCatDone&&now<CATS.stray.firstDays[1]*this.day){const [a,b]=CATS.stray.firstDays;this.nextStrayAt=Math.max(now,(a+this.random()*(b-a))*this.day);}
     if(this.nextStrayAt==null||rats&&this.nextStrayAt>now+interval)this.nextStrayAt=now+interval*(.6+this.random()*.8);
     for(const cat of this.cats.values())if(cat.state==='stray'&&cat.leaveAt!=null&&now>=cat.leaveAt&&!cat.leaving)this.leave(cat);
     if(now<this.nextStrayAt)return;
     this.nextStrayAt=null;if([...this.cats.values()].some(c=>c.state==='stray'&&c.leaveAt!=null))return;
     if(this.cats.size>=this.cap())return;
     const spot=this.straySpot();if(!spot)return;
-    const cat=this.newCat({x:spot.x+.5,y:spot.y+.5,home:{x:spot.x+.5,y:spot.y+.5},state:'stray',leaveAt:now+CATS.stray.stayDays*this.day});
+    const cat=this.newCat({x:spot.x+.5,y:spot.y+.5,home:{x:spot.x+.5,y:spot.y+.5},state:'stray',leaveAt:now+CATS.stray.stayDays*this.day});this.firstCatDone=true;
     this.feed(`cat:stray:${cat.id}`,t('pets.feed.stray',{name:cat.name}));
   }
   straySpot(){
@@ -183,6 +201,7 @@ export class DomesticAnimalSystem {
     // Hunters run faster and hit harder with their dog close.
     for(const h of this.hunters()){const d=this.activeDog(h);h.speedFactor=d?DOGS.huntSpeed:1;h.damageFactor=d?DOGS.huntDamage:1;}
     // A stray dog near the castle about every 6 days (one at a time); it stays 2–3 days.
+    if(this.nextDogAt==null&&!this.dogs.size&&now<DOGS.stray.firstDays[1]*this.day){const [a,b]=DOGS.stray.firstDays;this.nextDogAt=Math.max(now,(a+this.random()*(b-a))*this.day);}
     if(this.nextDogAt==null)this.nextDogAt=now+DOGS.stray.intervalDays*this.day*(.6+this.random()*.8);
     if(now>=this.nextDogAt){this.nextDogAt=null;if(![...this.dogs.values()].some(d=>d.state==='stray')){const [lo,hi]=DOGS.stray.distance,spot=this.spotNear(lo,hi);
       if(spot){const [a,b]=DOGS.stray.stayDays,dog=this.newDog({x:spot.x+.5,y:spot.y+.5,home:{x:spot.x+.5,y:spot.y+.5},state:'stray',leaveAt:now+(a+this.random()*(b-a))*this.day});this.feed(`dog:stray:${dog.id}`,t('pets.dog.feed.stray',{name:dog.name}));}}}
@@ -251,19 +270,22 @@ export class DomesticAnimalSystem {
       cats:[...this.cats.values()].map(c=>({id:c.id,name:c.name,x:round(c.x),y:round(c.y),buildingId:c.buildingId,state:c.state,leaveAt:c.leaveAt,leaving:c.leaving,kittenAt:c.kittenAt,motherId:c.motherId,home:c.home?{x:round(c.home.x),y:round(c.home.y)}:null,target:c.target?{x:round(c.target.x),y:round(c.target.y)}:null})),
       nextStrayAt:this.nextStrayAt,caravanCats:this.caravanCats?{...this.caravanCats}:null,
       dogs:[...this.dogs.values()].map(d=>({id:d.id,name:d.name,x:round(d.x),y:round(d.y),hunterId:d.hunterId,state:d.state,hp:round(d.hp),injuredUntil:d.injuredUntil,leaveAt:d.leaveAt,leaving:d.leaving,tried:d.tried,tamerId:d.tamerId,home:d.home?{x:round(d.home.x),y:round(d.home.y)}:null,target:d.target?{x:round(d.target.x),y:round(d.target.y)}:null})),
-      nextDogAt:this.nextDogAt,caravanDog:this.caravanDog?{...this.caravanDog}:null};
+      nextDogAt:this.nextDogAt,caravanDog:this.caravanDog?{...this.caravanDog}:null,
+      ...(this.houseRats?.size?{houseRats:Object.fromEntries([...this.houseRats].map(([k,v])=>[String(k),v]))}:{})};
   }
   importState(state){
     const s=state??emptyDomesticState();this.seq=s.seq??0;this.rats=new Map(Object.entries(s.rats??{}));this.loss=new Map(Object.entries(s.loss??{}));this.notified=new Map(Object.entries(s.notified??{}));
     for(const cat of this.cats?.values()??[])cat.view?.destroy?.();
     this.cats=new Map((s.cats??[]).map(c=>[c.id,{...c,wait:0}]));this.nextStrayAt=s.nextStrayAt??null;this.caravanCats=s.caravanCats?{...s.caravanCats}:null;
-    for(const dog of this.dogs?.values()??[])dog.view?.destroy?.();this.dogs=new Map((s.dogs??[]).map(d=>[d.id,{...d,wait:0}]));this.nextDogAt=s.nextDogAt??null;this.caravanDog=s.caravanDog?{...s.caravanDog}:null;this.changed();
+    for(const dog of this.dogs?.values()??[])dog.view?.destroy?.();this.dogs=new Map((s.dogs??[]).map(d=>[d.id,{...d,wait:0}]));this.nextDogAt=s.nextDogAt??null;this.caravanDog=s.caravanDog?{...s.caravanDog}:null;
+    this.houseRats=new Map(Object.entries(s.houseRats??{}).map(([k,v])=>[Number(k),v]));this.houseRatsNotified=new Set([...this.houseRats.keys()].filter(id=>this.houseHasRats({id})));this.changed();
   }
   destroy(){for(const cat of [...this.cats.values(),...this.dogs.values()])cat.view?.destroy?.();this.listeners.clear();}
 }
 // Save validation (schema 52).
 export function validateDomesticState(d,{check,number,integer,array,day,buildingIds,locationIds,workerIds=new Set(),time}){
-  check(d&&typeof d==='object'&&Object.keys(d).sort().join()==='caravanCats,caravanDog,cats,dogs,loss,nextDogAt,nextStrayAt,notified,rats,seq');integer(d.seq,0);
+  check(d&&typeof d==='object'&&['caravanCats,caravanDog,cats,dogs,loss,nextDogAt,nextStrayAt,notified,rats,seq','caravanCats,caravanDog,cats,dogs,houseRats,loss,nextDogAt,nextStrayAt,notified,rats,seq'].includes(Object.keys(d).sort().join()));integer(d.seq,0);
+  if(d.houseRats!==undefined){check(d.houseRats&&typeof d.houseRats==='object'&&!Array.isArray(d.houseRats));for(const [id,since] of Object.entries(d.houseRats)){check(buildingIds.has(Number(id)));number(since,0);}}
   for(const [id,v]of Object.entries(d.rats)){check(locationIds.has(id));number(v,0,RATS.max);}
   for(const [id,v]of Object.entries(d.loss)){check(locationIds.has(id));number(v,0,1);}
   for(const [id,v]of Object.entries(d.notified)){check(locationIds.has(id)&&['none','many','infestation'].includes(v));}

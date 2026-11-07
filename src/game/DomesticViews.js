@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { gridToWorld } from './isometric.js';
-import { RATS } from '../data/domesticAnimals.js';
+import { RATS,RAT_MOVES } from '../data/domesticAnimals.js';
 import { ratLevel } from '../data/domesticAnimals.js';
 import { directionName } from './directions.js';
 import { animalLook,ensureAnimalLook,applyAnimalArt } from './animalArt.js';
@@ -37,6 +37,29 @@ function drawRat(g,phase){g.clear();g.fillStyle(0x4a4038);g.fillEllipse(0,-1.5,7
 export class DomesticViews {
   constructor(scene,system){this.scene=scene;this.system=system;this.rats=new Map();this.phase=0;}
   visible(position){return !this.scene.fog||this.scene.fog.isVisibleObject({position});}
+  // m-zvirata-2 (38): a small, faint mark over strays (cats and dogs not yet taken in); it goes once they are.
+  wildMark(v,wild){
+    if(wild&&!v.wild){v.wild=this.scene.add.text(0,-30,'?',{fontFamily:'Georgia,serif',fontSize:'11px',color:'#f3ead2',stroke:'#2a2a1e',strokeThickness:2}).setOrigin(.5,1).setAlpha(.55);v.add(v.wild);}
+    if(v.wild)v.wild.setVisible(!!wild);
+  }
+  // m-zvirata-2 (34): one rat's wandering round its store – to a random point within RAT_MOVES.radius tiles, a short
+  // sniff, a quick dash, and now and then hiding (gone for a few seconds). Drawing only; nothing is saved.
+  ratStep(rat,l,dt){
+    const cx=l.x+(l.width??1)/2,cy=l.y+(l.height??1)/2,r=Math.random;
+    if(rat.x==null){const a=r()*Math.PI*2,d=(l.width??1)/2+.4;rat.x=cx+Math.cos(a)*d;rat.y=cy+Math.sin(a)*d;rat.wait=r()*1.5;}
+    if(rat.hidden>0){rat.hidden-=dt;if(rat.hidden<=0){rat.hidden=0;rat.target=null;}return false;}
+    if(rat.wait>0){rat.wait-=dt;rat.moving=false;return true;}
+    if(!rat.target){
+      if(r()<RAT_MOVES.hideChance&&!rat.justHid){rat.target={x:cx+(r()-.5)*(l.width??1)*.6,y:cy+(r()-.5)*(l.height??1)*.6,hide:true};}
+      else{const [lo,hi]=RAT_MOVES.radius,a=r()*Math.PI*2,d=lo+r()*(hi-lo);rat.target={x:cx+Math.cos(a)*d,y:cy+Math.sin(a)*d};}
+      rat.justHid=false;rat.speed=RAT_MOVES.dash*(.6+r()*.8);
+    }
+    const dx=rat.target.x-rat.x,dy=rat.target.y-rat.y,dist=Math.hypot(dx,dy),step=rat.speed*dt;rat.facing={x:dx,y:dy};rat.moving=true;
+    if(dist<=step){rat.x=rat.target.x;rat.y=rat.target.y;const hide=rat.target.hide;rat.target=null;rat.moving=false;
+      if(hide){const [a,b]=RAT_MOVES.hideSeconds;rat.hidden=a+r()*(b-a);rat.justHid=true;return false;}
+      const [a,b]=RAT_MOVES.sniff;rat.wait=a+r()*(b-a);return true;}
+    rat.x+=dx/dist*step;rat.y+=dy/dist*step;return true;
+  }
   // The approved look of a cat or dog view; true when the art is drawn (the figure is then hidden).
   art(v,species,id,{young=false,facing,moving,delta,pose=null}={}){
     const look=animalLook(species,id,{young});if(!look)return false;
@@ -51,6 +74,7 @@ export class DomesticViews {
       if(!cat.view){const v=new Phaser.GameObjects.Container(this.scene,0,0);this.scene.add.existing(v);v.figure=this.scene.add.graphics();v.add(v.figure);v.coat=COATS[Number(cat.id.slice(4))%COATS.length];cat.view=v;}
       const p=gridToWorld(cat.x,cat.y),v=cat.view,moving=!!cat.target&&Math.hypot(cat.x-cat.target.x,cat.y-cat.target.y)>.05;
       v.setPosition(p.x,p.y);v.setDepth(p.y+2);v.setVisible(this.visible({x:cat.x,y:cat.y}));
+      this.wildMark(v,cat.state==='stray'&&v.visible);
       const young=cat.state==='kitten',drawn=v.visible&&this.art(v,'cat',cat.id,{young,facing:cat.facing,moving,delta});v.setScale(young&&!drawn?.7:1);
       if(v.visible&&!drawn)drawCat(v.figure,v.coat,cat.facing??{x:1,y:0},this.phase+Number(cat.id.slice(4)),moving);
     }
@@ -58,6 +82,7 @@ export class DomesticViews {
       if(!dog.view){const v=new Phaser.GameObjects.Container(this.scene,0,0);this.scene.add.existing(v);v.figure=this.scene.add.graphics();v.add(v.figure);v.coat=DOG_COATS[Number(dog.id.slice(4))%DOG_COATS.length];dog.view=v;}
       const p=gridToWorld(dog.x,dog.y),v=dog.view,moving=!!dog.target&&Math.hypot(dog.x-dog.target.x,dog.y-dog.target.y)>.05;
       v.setPosition(p.x,p.y);v.setDepth(p.y+2);v.setVisible(this.visible({x:dog.x,y:dog.y}));
+      this.wildMark(v,dog.state==='stray'&&v.visible);
       const injured=dog.injuredUntil!=null,sitting=!!dog.sitting&&!moving;
       const drawn=v.visible&&this.art(v,'dog',dog.id,{facing:dog.facing,moving:moving&&!injured,delta,pose:injured?'wounded':sitting?'sit':null});
       if(v.visible&&!drawn)drawDog(v.figure,v.coat,dog.facing??{x:1,y:0},this.phase+Number(dog.id.slice(4)),moving,injured,sitting);
@@ -69,11 +94,11 @@ export class DomesticViews {
       let group=this.rats.get(l.id);if(!group){group=[];this.rats.set(l.id,group);}
       while(group.length<count){const g=this.scene.add.graphics();g.art=this.scene.add.image(0,0,'__DEFAULT').setVisible(false);g.walked=0;group.push(g);}
       while(group.length>count){const g=group.pop();g.art.destroy();g.destroy();}
-      group.forEach((g,i)=>{const angle=this.phase*.25+i*2.1+l.x,edge=(l.width??1)/2+.35,x=l.x+(l.width??1)/2+Math.cos(angle)*edge,y=l.y+(l.height??1)/2+Math.sin(angle)*edge,p=gridToWorld(x,y);
-        g.setPosition(p.x,p.y);g.setDepth(p.y+1);g.setVisible(this.visible({x,y}));
-        // Rats run round the store: they face along the circle (its tangent) and look like one of the approved rats.
-        const look=animalLook('rat',`${l.id}:${i}`);if(look)ensureAnimalLook(this.scene,look);g.walked+=delta;
-        const drawn=g.visible&&!!look&&applyAnimalArt(this.scene,g.art,look,{facing:directionName({x:-Math.sin(angle),y:Math.cos(angle)})??'SE',moving:true,walkedMs:g.walked});
+      group.forEach((g,i)=>{g.rat??={};const out=this.ratStep(g.rat,l,delta/1000),x=g.rat.x,y=g.rat.y,p=gridToWorld(x,y),angle=Math.atan2(g.rat.facing?.y??0,g.rat.facing?.x??1);
+        g.setPosition(p.x,p.y);g.setDepth(p.y+1);g.setVisible(out&&this.visible({x,y}));
+        // Rats wander round the store (ratStep), facing where they run, in one of the approved rat looks.
+        const look=animalLook('rat',`${l.id}:${i}`);if(look)ensureAnimalLook(this.scene,look);if(g.rat.moving)g.walked+=delta;
+        const drawn=g.visible&&!!look&&applyAnimalArt(this.scene,g.art,look,{facing:directionName(g.rat.facing??{x:1,y:0})??'SE',moving:!!g.rat.moving,walkedMs:g.walked});
         g.art.setPosition(p.x,p.y).setDepth(p.y+1);if(!g.visible)g.art.setVisible(false);
         if(drawn)g.clear();else if(g.visible){drawRat(g,this.phase*3+i);g.setScale(Math.cos(angle)>0?1:-1,1);}});
     }

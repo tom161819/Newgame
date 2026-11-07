@@ -48,11 +48,13 @@ test('cats: one clears a normal store (−25 a day), a big store needs two; a ca
   const other=d.newCat({x:36,y:60});assert.equal(d.assign(other.id,house.id),false,'one cat per house');assert.equal(CATS.homeHappiness,3);
 });
 
-test('strays come about every 4 days (2 with Many rats), stay 2 days and leave; Take in always works and can be reassigned', () => {
+test('the first stray comes on day 1–2 (m-zvirata-2), stays 2 days and leaves; Take in always works and can be reassigned', () => {
   const {s,d,store,granary,days,feed}=world({wheat:50});
-  days(4.5);const stray=[...d.cats.values()].find(c=>c.state==='stray');assert.ok(stray,'a stray arrived');assert.ok(feed.some(t=>/stray cat/.test(t)));
+  days(1.95);const stray=[...d.cats.values()].find(c=>c.state==='stray');assert.ok(stray,'a stray arrived');assert.ok(feed.some(t=>/stray cat/.test(t)));
   const dist=Math.hypot(stray.home.x-50.5,stray.home.y-50.5);assert.ok(dist>=CATS.stray.distance[0]-1&&dist<=CATS.stray.distance[1]+1);
   days(2.2);assert.equal(stray.leaving,true,'leaves after 2 days');
+  // Later strays come about every 8 days (4 with Many rats): none soon after the first left.
+  const before=d.seq;days(2);assert.equal([...d.cats.values()].filter(c=>c.state==='stray'&&!c.leaving).length,0,'no new stray right away');void before;
   const {d:d2,store:s2,granary:g2,days:days2}=world({wheat:50});d2.rats.set(s2.id,50);days2(2.5);const second=[...d2.cats.values()].find(c=>c.state==='stray');assert.ok(second,'sooner with rats');
   assert.equal(d2.assign(second.id,g2.id),true);assert.equal(second.state,'home');days2(3);assert.equal(second.leaving,false,'a taken-in cat stays');void s;void store;void granary;
 });
@@ -75,4 +77,16 @@ test('domestic animals survive a save; broken states are rejected', () => {
   assert.equal(r.domestic.ratsAt(store.id),42.5);assert.equal(r.domestic.cats.get(cat.id).buildingId,granary.id);
   const bad=structuredClone(serializeGameState(s));bad.domestic.cats[0].buildingId=9999;assert.throws(()=>validateGameState(bad));
   const many=structuredClone(serializeGameState(s));many.domestic.rats[store.id]=150;assert.throws(()=>validateGameState(many));
+});
+
+test('m-zvirata-2: rats move into a House with no assigned cat within 10 tiles after 2 days; a cat nearby keeps them out',()=>{
+  const {d,granary,place,days,feed}=world({wheat:50});
+  const far=place('house',granary.x+20,granary.y+14),near=place('house',granary.x+4,granary.y+4);
+  days(2.2);assert.equal(d.houseHasRats(far),true);assert.equal(d.houseHasRats(near),true,'no cat anywhere yet');assert.ok(feed.some(t=>/Rats in a House/.test(t)));
+  const cat=d.newCat({x:granary.x,y:granary.y+2});assert.equal(d.assign(cat.id,granary.id),true);days(.1);
+  assert.equal(d.houseHasRats(near),false,'a cat within 10 tiles');assert.equal(d.houseHasRats(far),true,'too far for the cat');
+  const saved=JSON.parse(JSON.stringify(d.exportState()));assert.ok(saved.houseRats&&Object.keys(saved.houseRats).includes(String(far.id)));
+});
+test('m-zvirata-2: the first stray dog comes on day 2–3',()=>{
+  const {d,days}=world({wheat:50});days(1.0);assert.equal([...d.dogs.values()].length,0);days(2.0);assert.ok([...d.dogs.values()].some(g=>g.state==='stray'),'a stray dog by day 3');
 });

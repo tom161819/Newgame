@@ -1,5 +1,5 @@
 import { TORCHES } from '../data/torches.js';
-import { CATS } from '../data/domesticAnimals.js';
+import { CATS ,HOUSE_RATS} from '../data/domesticAnimals.js';
 import { NEEDS,DAILY_REST,DISCONTENT,clampNeed,moodFor,happinessOf,mainProblem,attractivenessFor } from '../data/needs.js';
 import { POPULATION } from '../data/jobs.js';
 import { buildingIsComplete } from '../game/buildings.js';
@@ -94,7 +94,7 @@ export class NeedsSystem {
     // Policy v2 P3: meal variety and a running Feast add to Happiness at once.
     const variety=this.scene.foodSystem?.varietyBonus?.(worker.id)??0,kinds=this.scene.foodSystem?.recentKinds?.(worker.id)?.length??0,feast=this.scene.policy?.feastBonus?.()??0;
     // Domestic animals Z1: a cat living in the resident's house.
-    const house=home?.kind==='house'?this.scene.buildings?.find(b=>b.id===home.buildingId):null,cat=this.scene.domestic?.catAtHome?.(house)?CATS.homeHappiness:0;
+    const house=home?.kind==='house'?this.scene.buildings?.find(b=>b.id===home.buildingId):null,cat=(this.scene.domestic?.catAtHome?.(house)?CATS.homeHappiness:0)+(this.scene.domestic?.houseHasRats?.(house)?HOUSE_RATS.happiness:0);
     // Children D1: a Village Green within reach of the house (+4) and, for a family house, a place for the children (+2).
     // Children D2: a Swing Tree (+1) and a Well (+1) nearby; all of it together is capped at +8 (`surroundingsCapped`).
     const around=this.scene.childrenSystem?.surroundings?.(house,homes)??{green:0,family:0,swing:0,well:0,total:0,capped:0},green=around.green,greenFamily=around.family,swing=around.swing,well=around.well;

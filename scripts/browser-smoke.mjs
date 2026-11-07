@@ -14,6 +14,7 @@ import { e2Smoke,quickStartSmoke } from './e2-smoke.mjs';
 import { e4Smoke } from './e4-smoke.mjs';
 import { startV2Smoke } from './start-v2-smoke.mjs';
 import { resourceGroupsSmoke } from './resource-groups-smoke.mjs';
+import { animals2Smoke } from './animals-2-smoke.mjs';
 import { employment2Smoke } from './employment-2-smoke.mjs';
 import { animalLooksSmoke } from './animal-looks-smoke.mjs';
 import { tutorialSmoke } from './tutorial-smoke.mjs';
@@ -193,6 +194,7 @@ try{
   await step('animal-looks',()=>animalLooksSmoke(context,origin+base,instrument));
   await step('start-v2',()=>startV2Smoke(context,origin+base,instrument));
   await step('resource-groups',()=>resourceGroupsSmoke(context,origin+base,instrument));
+  await step('animals-2',()=>animals2Smoke(context,origin+base,instrument));
   await step('tutorial',()=>tutorialSmoke(context,origin+base,instrument));
   await step('marketplace',()=>marketplaceSmoke(context,origin+base,instrument));
   await step('gate',()=>gateSmoke(context,origin+base,instrument));

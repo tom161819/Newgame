@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.56.0] - 2026-11-08
+<!-- version: {"title":"Animals 2","type":"feature","reconstructed":false,"saveVersion":58} -->
+### Changed
+- The first stray cat comes on day 1–2 and the first stray dog on day 2–3. After that, strays come about half as often as before.
+- Rats scurry further around their store, stop to sniff and sometimes hide.
+- Stray cats and dogs show a small faint ? until they are taken in.
+
+### Added
+- Rats move into Houses that have no cat living within 10 tiles. Residents of those houses are a little less happy.
+
+
 ## [0.55.0] - 2026-11-08
 <!-- version: {"title":"Trade improvements","type":"feature","reconstructed":false,"saveVersion":58} -->
 ### Added
