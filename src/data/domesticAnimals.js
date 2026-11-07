@@ -9,8 +9,9 @@ export const RATS=Object.freeze({max:100,base:1.5,growth:5.3,emptyDecay:6,
   lossOrder:Object.freeze(['wheat','flour','apple','bread','meat','fish']),
   views:Object.freeze({none:0,few:1,many:3,infestation:5}),ledgerSource:'Rats'});
 export const CATS=Object.freeze({
-  // A cat clears 25 rats a day in its building; one cat covers up to 120 food of capacity, a bigger store needs two.
-  catch:25,capacityPerCat:120,homeHappiness:3,speed:1.1,wanderRadius:3,
+  // A cat clears 25 rats a day in its building; one cat covers up to 600 food of capacity, a bigger store needs more.
+  // (600 since 0.51: the Granary grew from 200 + 200 to 1000 + 1000, so it still needs the same number of cats.)
+  catch:25,capacityPerCat:600,homeHappiness:3,speed:1.1,wanderRadius:3,
   stray:Object.freeze({intervalDays:4,ratIntervalDays:2,stayDays:2,distance:Object.freeze([15,25]),leaveSpeed:1.3}),
   price:30,merchants:Object.freeze({food:[0,2],general:[0,1]}),merchantChance:.5,
   kitten:Object.freeze({everyDays:10,chance:.5,houseDistance:8}),

@@ -5,7 +5,7 @@ import { FOOD_RESOURCE_IDS } from '../src/data/foodProduction.js';
 import { GRANARY_GROUP_CAPACITY,granaryGroup,granaryUsage } from '../src/data/granaryCapacity.js';
 
 test('each actually accepted Granary good belongs to exactly one registry-backed group',()=>{
- assert.deepEqual(GRANARY_GROUP_CAPACITY,{raw:200,food:200});assert.ok(Object.isFrozen(GRANARY_GROUP_CAPACITY));
+ assert.deepEqual(GRANARY_GROUP_CAPACITY,{raw:1000,food:1000});assert.ok(Object.isFrozen(GRANARY_GROUP_CAPACITY));
  assert.deepEqual(Object.fromEntries(FOOD_RESOURCE_IDS.map(id=>[id,granaryGroup(id,objectRegistry)])),{meat:'food',wheat:'raw',flour:'raw',bread:'food',apple:'food',fish:'food'});
  for(const id of ['stone','wood','iron_ore','gold','bow','sword','armor','farmhouse','missing'])assert.equal(granaryGroup(id,objectRegistry),null);
 });

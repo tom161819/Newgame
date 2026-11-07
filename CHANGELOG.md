@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.52.0] - 2026-11-07
+<!-- version: {"title":"Bigger Granary, unlimited gold, one Iron","type":"feature","reconstructed":false,"saveVersion":58} -->
+### Changed
+- A Granary holds 1000 raw food goods and 1000 finished food.
+- Gold has no upper limit.
+- Iron Bars and Iron are now one resource, Iron, smelted from Iron Ore and Wood. Swords, armour and carts use it. Saves from older versions cannot be loaded; start a new game.
+
+
 ## [0.51.0] - 2026-11-07
 <!-- version: {"title":"Employment 2","type":"feature","reconstructed":false,"saveVersion":57} -->
 ### Changed

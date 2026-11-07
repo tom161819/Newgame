@@ -20,10 +20,10 @@ test('Bow, Sword and Armor go only to an Armory; Warehouses and the Starter Stoc
   assert.equal(r.require('armory').storage.capacity,40);
 });
 
-test('workshops really make one Bow, Sword and Armor from stored Wood and Iron Bars; Haulers carry them to the Armory; Save/Load mid-way',()=>{
+test('workshops really make one Bow, Sword and Armor from stored Wood and Iron; Haulers carry them to the Armory; Save/Load mid-way',()=>{
   let s=scene();const warehouse=building(s,'warehouse',44,44),armory=building(s,'armory',60,44);
   const shops={bowyer:building(s,'bowyer',50,50),swordsmith:building(s,'swordsmith',54,50),armorer:building(s,'armorer',58,50)};
-  s.foodStorage.deposit(`warehouse-${warehouse.id}`,'wood',40);s.foodStorage.deposit(`warehouse-${warehouse.id}`,'iron_bar',16);
+  s.foodStorage.deposit(`warehouse-${warehouse.id}`,'wood',40);s.foodStorage.deposit(`warehouse-${warehouse.id}`,'iron',16);
   for(const [type,b]of Object.entries(shops)){const w=worker(s,b,{x:b.x,y:b.y+3});assert.equal(w.profession,type);}
   worker(s,null,{x:46,y:48});worker(s,null,{x:47,y:48});
   until(s,()=>Object.values(shops).every(b=>s.foodProduction.records.get(b.id)?.cycle));

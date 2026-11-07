@@ -5,6 +5,8 @@ import { placeBuilding,buildingIsComplete } from '../src/game/buildings.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
 import { totalXPForLevel } from '../src/data/experience.js';
+import { GRANARY_GROUP_CAPACITY } from '../src/data/granaryCapacity.js';
+const RAW=GRANARY_GROUP_CAPACITY.raw,FOOD=GRANARY_GROUP_CAPACITY.food;
 globalThis.document={querySelector:()=>({textContent:''})};
 const scene=()=>workerScene(undefined,{construction:true,foodProduction:true});
 function building(s,type,x,y,blueprint=false){const definition=s.objectRegistry.require(type);ensureBuildingPrerequisites(s,definition);Object.entries(definition.cost).forEach(([r,k])=>s.inventory.add(r,k));const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition});assert.ifError(result.error);if(blueprint)s.constructionSystem.plan(result.building);s.towerViews.set(result.building.id,s.createBuildingView(definition,result.building));return result.building;}
@@ -21,10 +23,10 @@ test('Mill, Bakery and Granary retain exact prices, footprints, physical constru
     assert.equal(s.constructionSystem.commandKing(b),true);until(s,()=>buildingIsComplete(b));assert.equal([...s.foodStorage.locations.values()].some(l=>l.buildingId===b.id),true);
   }
 });
-test('one authoritative food inventory enforces 30 fallback and independent 200-unit Granary groups, reservations, edible resources and preserves overflowing legacy stock',()=>{
+test('one authoritative food inventory enforces 30 fallback and independent raw and food Granary groups, reservations, edible resources and preserves overflowing legacy stock',()=>{
   const s=scene(),storage=s.foodStorage;assert.equal(storage.deposit('food-camp','apple',30),true);assert.equal(storage.deposit('food-camp','apple',1),false);assert.equal(s.inventory.resources.has('apple'),false);assert.equal(s.inventory.count('apple'),30);
-  const b=building(s,'granary',48,45);assert.equal(storage.deposit(`granary-${b.id}`,'wheat',200),true);assert.equal(storage.findDestination(s.character,'bread',1)?.location.id,`granary-${b.id}`);assert.equal(storage.room(`granary-${b.id}`,'wheat'),0);assert.equal(storage.room(`granary-${b.id}`,'bread'),200);const b2=building(s,'granary',54,45);assert.equal(storage.room(`granary-${b2.id}`),400);
-  const stock=storage.reserve('stock',`granary-${b.id}`,'wheat',4,'fixture');assert.equal(s.inventory.count('wheat'),196);assert.equal(storage.take(stock).amount,4);assert.equal(storage.take(stock),null);assert.equal(s.inventory.count('wheat'),196);
+  const b=building(s,'granary',48,45);assert.equal(storage.deposit(`granary-${b.id}`,'wheat',RAW),true);assert.equal(storage.findDestination(s.character,'bread',1)?.location.id,`granary-${b.id}`);assert.equal(storage.room(`granary-${b.id}`,'wheat'),0);assert.equal(storage.room(`granary-${b.id}`,'bread'),FOOD);const b2=building(s,'granary',54,45);assert.equal(storage.room(`granary-${b2.id}`),RAW+FOOD);
+  const stock=storage.reserve('stock',`granary-${b.id}`,'wheat',4,'fixture');assert.equal(s.inventory.count('wheat'),RAW-4);assert.equal(storage.take(stock).amount,4);assert.equal(storage.take(stock),null);assert.equal(s.inventory.count('wheat'),RAW-4);
   storage.importState(null,{apple:75,meat:20});assert.equal(storage.locations.get('food-camp').legacyOverflow,65);assert.equal(s.inventory.count('apple'),75);assert.equal(storage.room('food-camp'),0);s.inventory.spend('apple',70);assert.equal(storage.locations.get('food-camp').legacyOverflow,0);assert.equal(s.inventory.count('meat'),20);assert.equal(s.foodSystem.availablePortions,25);
   s.inventory.add('bread',3);assert.equal(s.foodSystem.availablePortions,28);assert.equal(s.inventory.count('wheat'),0);s.inventory.add('flour',1);s.inventory.add('wheat',1);assert.equal(s.foodSystem.availablePortions,28);
 });
@@ -44,8 +46,8 @@ test('full Wheat Field → Granary → Mill → Granary → Bakery → Granary c
   until(s,()=>s.inventory.count('bread')===12,150000);assert.equal(record.completed,2);assert.equal(s.foodProduction.records.get(bakery.id).completed,3);assert.equal(m.experience.totalXP,16);assert.equal(b.experience.totalXP,30);assert.equal(b.skills.baking.totalXP,30);assert.equal(s.inventory.count('wheat'),0);assert.equal(s.inventory.count('flour'),0);assert.ok(s.pathWear.active.size>0);
 });
 test('production requires assigned physical workers, waits for missing input and full output capacity; Auto OFF preserves an active cycle',()=>{
-  const {s,stock,mill,record,workers:[w]}=millFixture();s.simulate(4000);assert.equal(record.cycle,null);assert.match(w.workMessage,/wheat/);s.foodStorage.deposit(stock,'wheat',4);s.foodStorage.deposit(stock,'flour',196);until(s,()=>w.cargo?.resource==='wheat');s.foodStorage.deposit(stock,'flour',4);s.simulate(5000);assert.equal(record.cycle,null);assert.match(w.workMessage,/full|unreachable/);
-  s.inventory.spend('flour',10);until(s,()=>record.cycle?.workDone>=5000);s.foodProduction.toggle(mill.id,false);const progress=record.cycle.workDone;s.simulate(10000);assert.equal(record.cycle.workDone,progress);assert.equal(record.completed,0);s.foodProduction.toggle(mill.id,true);until(s,()=>record.completed===1);until(s,()=>s.inventory.count('flour')===193);assert.equal(s.inventory.count('wheat'),0);
+  const {s,stock,mill,record,workers:[w]}=millFixture();s.simulate(4000);assert.equal(record.cycle,null);assert.match(w.workMessage,/wheat/);s.foodStorage.deposit(stock,'wheat',4);s.foodStorage.deposit(stock,'flour',RAW-4);until(s,()=>w.cargo?.resource==='wheat');s.foodStorage.deposit(stock,'flour',4);s.simulate(5000);assert.equal(record.cycle,null);assert.match(w.workMessage,/full|unreachable/);
+  s.inventory.spend('flour',10);until(s,()=>record.cycle?.workDone>=5000);s.foodProduction.toggle(mill.id,false);const progress=record.cycle.workDone;s.simulate(10000);assert.equal(record.cycle.workDone,progress);assert.equal(record.completed,0);s.foodProduction.toggle(mill.id,true);until(s,()=>record.completed===1);until(s,()=>s.inventory.count('flour')===RAW-7);assert.equal(s.inventory.count('wheat'),0);
 });
 test('two Millers cooperate without duplicate inputs or XP; skill levels change active work duration and their daily wages',()=>{
   const durations=[];
@@ -92,6 +94,6 @@ test('an unreachable source never becomes remote input; a blocked return keeps i
   for(let y=0;y<100;y++)s.map[y][52]=0;until(s,()=>s.inventory.count('flour')===3);assert.equal(record.completed,1);assert.equal(quantities(s).wheat,undefined);
 });
 test('a full raw group prevents wheat harvesting; legacy overflow and a destroyed granary preserve every physical unit on the ground',()=>{
-  const s=scene(),granary=building(s,'granary',48,45),home=building(s,'farmhouse',44,45),field=building(s,'wheat_field',44,50),f=worker(s,home,{x:43,y:45});s.foodStorage.deposit(`granary-${granary.id}`,'flour',200);s.gameTime.update(240000);s.simulate(5000);assert.equal(f.cargo,null);assert.equal(f.workTask,null);assert.equal(s.farmingSystem.records.get(field.id).cycle,0);
-  s.buildings=s.buildings.filter(b=>b!==granary);s.tick(25);assert.equal(quantities(s).flour,200);assert.equal(s.inventory.count('flour'),0);assert.equal(s.foodStorage.locations.has(`granary-${granary.id}`),false);until(s,()=>s.inventory.count('wheat')===8);assert.equal(s.farmingSystem.records.get(field.id).cycle,1);validateGameState(serializeGameState(s));
+  const s=scene(),granary=building(s,'granary',48,45),home=building(s,'farmhouse',44,45),field=building(s,'wheat_field',44,50),f=worker(s,home,{x:43,y:45});s.foodStorage.deposit(`granary-${granary.id}`,'flour',RAW);s.gameTime.update(240000);s.simulate(5000);assert.equal(f.cargo,null);assert.equal(f.workTask,null);assert.equal(s.farmingSystem.records.get(field.id).cycle,0);
+  s.buildings=s.buildings.filter(b=>b!==granary);s.tick(25);assert.equal(quantities(s).flour,RAW);assert.equal(s.inventory.count('flour'),0);assert.equal(s.foodStorage.locations.has(`granary-${granary.id}`),false);until(s,()=>s.inventory.count('wheat')===8);assert.equal(s.farmingSystem.records.get(field.id).cycle,1);validateGameState(serializeGameState(s));
 });

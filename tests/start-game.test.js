@@ -15,15 +15,12 @@ globalThis.document??={querySelector:()=>({textContent:''})};
 const scene=settings=>workerScene(undefined,{construction:true,logistics:true,gameSettings:gameSettings(settings)});
 const starter=s=>s.foodStorage.locations.get(`stockpile-${s.buildings.find(b=>b.type==='starter_stockpile').id}`);
 
-test('Gold has a limit of 500: income above it is not added and only what fits is recorded',()=>{
+test('Gold has no limit (owner 7 Nov 2026, was 500): all income is added and recorded',()=>{
   const inventory=new Inventory(),income=[];inventory.ledger={income:(r,n)=>income.push([r,n]),expense(){}};
-  assert.equal(inventory.limit('gold'),GOLD_LIMIT);assert.equal(inventory.limit('stone'),null);
-  inventory.add('gold',480);inventory.add('gold',50);assert.equal(inventory.count('gold'),500);
-  inventory.add('gold',5);assert.equal(inventory.count('gold'),500);
-  assert.deepEqual(income,[['gold',480],['gold',20]],'the ledger counts only gold that was actually added');
-  assert.equal(inventory.spend('gold',100),true);inventory.add('gold',30);assert.equal(inventory.count('gold'),430);
-  inventory.add('stone',900);assert.equal(inventory.count('stone'),900,'other inventory counts have no limit here');
-  const old=new Inventory();old.importState({gold:750});old.add('gold',10);assert.equal(old.count('gold'),750,'an older save above the limit keeps its gold but gains none');
+  assert.equal(inventory.limit('gold'),null);assert.equal(GOLD_LIMIT,Infinity);
+  inventory.add('gold',480);inventory.add('gold',50);inventory.add('gold',1000);assert.equal(inventory.count('gold'),1530);
+  assert.deepEqual(income,[['gold',480],['gold',50],['gold',1000]]);
+  assert.equal(inventory.spend('gold',100),true);assert.equal(inventory.count('gold'),1430);
 });
 
 test('only one Castle: a second one is refused in the menu and in placement, a starting Castle counts',()=>{

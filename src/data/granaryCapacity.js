@@ -1,5 +1,6 @@
 // Independent group limits. FoodStorageSystem remains the only stock/reservation owner.
-export const GRANARY_GROUP_CAPACITY=Object.freeze({raw:200,food:200});
+// Owner 7 Nov 2026 (m-suroviny-sklady-zlato-zelezo): 1000 raw food goods and 1000 finished food (was 200 / 200).
+export const GRANARY_GROUP_CAPACITY=Object.freeze({raw:1000,food:1000});
 
 // The Granary registry definition decides what it accepts; resource metadata
 // decides whether that accepted good is an edible finished food or a raw input.

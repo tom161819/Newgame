@@ -18,6 +18,5 @@ export const logisticsBuildings=[
   shadow:{baked:true,x:10,y:-10,width:d.width*59,height:d.height*21,color:0x30291c,alpha:.3}}));
 export const materialDefinitions=[
   {id:'wood',name:'Wood',symbol:'🪵',inventoryOrder:12,description:'Timber stored in a Warehouse or Starter Stockpile.'},
-  {id:'iron',name:'Iron',symbol:'▰',inventoryOrder:14,description:'Iron stored in a Warehouse or Starter Stockpile.'},
 ].map(d=>({...d,inventoryLabel:d.name,quantityNames:[d.name,d.name,d.name],category:'resource',sprite:`/assets/resources/${d.id}/${d.id}.svg`,
   width:1,height:1,walkable:true,collectible:true,buildable:false,cost:{},interactions:['collect'],renderMode:'sprite',origin:{x:.5,y:.75},visualHeight:28,visual:{displayWidth:28,displayHeight:28},depth:{offset:.08}}));

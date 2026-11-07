@@ -133,7 +133,7 @@ export default {
   'treasure.empty':'Truhla je prázdná.','treasure.gold':'{count} zlata',
   'tree.stage.0':'Pařez','tree.stage.1':'Semenáček','tree.stage.2':'Mladý strom','tree.stage.3':'Vzrostlý strom','tree.info':'{stage} · {wood} dřeva · {seconds} sekund aktivní práce · XP dřevorubectví {xp}',
   'deposit.info':'{remaining} / {max} {resource} · {state} · bez obnovy','deposit.depleted':'Ložisko vytěženo','deposit.assigned':'Přiřazeno k těžební budově','deposit.available':'Volné pro těžební budovu',
-  'object.stone.plural':'Kameny','object.iron_bar.plural':'Železné pruty',
+  'object.stone.plural':'Kameny','object.iron.plural':'Železo',
   'construction.phase.Completed':'Dokončeno','construction.phase.Blueprint':'Plán','construction.phase.Foundations':'Základy','construction.phase.Structure':'Hrubá stavba','construction.phase.Nearly complete':'Téměř hotovo',
   'construction.builders':'Stavitelé: {working} pracují / {slots} míst · {reserved} rezervováno','construction.waitMaterials':'Čeká se na doručení materiálu','construction.waitBuilders':'Čeká se na stavitele','construction.remaining':'Zbývá: {seconds} s',
   'construction.kingDelivering':'Král: nosí materiál','construction.kingBuilding':'Král: staví','construction.kingTravelling':'Král: jde na staveniště','construction.kingNone':'Král: nepřiřazen',

@@ -14,10 +14,10 @@ function stabledHorse(s,stables,tile){const h=s.animalSystem.create(s.objectRegi
 function until(s,p,max=400000){let t=0;while(!p()&&t<max){s.tick(50);t+=50;}assert.ok(p(),`not reached after ${t} ms`);return t;}
 const roundtrip=s=>{const saved=validateGameState(serializeGameState(s)),r=scene(false);loadGameState(r,structuredClone(saved));assert.deepEqual(validateGameState(serializeGameState(r)),saved);return r;};
 
-test('Horse Wagon: the Wheelwright\'s second recipe, 30 Wood + 6 Iron Bars + a tamed horse, 90 s; ten times the load',()=>{
+test('Horse Wagon: the Wheelwright\'s second recipe, 30 Wood + 6 Iron + a tamed horse, 90 s; ten times the load',()=>{
   const s=scene(),d=s.objectRegistry.require('wheelwright_workshop');
   assert.deepEqual(Object.keys(d.recipes),['wheelbarrow','horse_wagon']);assert.equal(d.recipes.wheelbarrow,d.recipe,'the Wheelbarrow stays the default');
-  assert.deepEqual([d.recipes.horse_wagon.input,d.recipes.horse_wagon.output,d.recipes.horse_wagon.duration,d.recipes.horse_wagon.horse],[{wood:30,iron_bar:6},{horse_wagon:1},90000,true]);
+  assert.deepEqual([d.recipes.horse_wagon.input,d.recipes.horse_wagon.output,d.recipes.horse_wagon.duration,d.recipes.horse_wagon.horse],[{wood:30,iron:6},{horse_wagon:1},90000,true]);
   assert.ok(d.bufferCapacity>=36,'the input buffer holds a whole wagon batch');
   assert.deepEqual([loadCapacity({vehicleType:'horse_wagon'}),carryCapacity({vehicleType:'horse_wagon'},'stone'),carryCapacity({vehicleType:'horse_wagon'},'wood')],[400,40,80]);
   assert.ok(TRANSPORT_MODES.includes('horse_wagon'));
@@ -25,7 +25,7 @@ test('Horse Wagon: the Wheelwright\'s second recipe, 30 Wood + 6 Iron Bars + a t
 
 test('no tamed horse, no wagon: the batch waits without using materials; then the horse is reserved, harnessed and leaves the Stables; Save/Load mid-batch',()=>{
   let s=scene();const warehouse=building(s,'warehouse',40,44),shop=building(s,'wheelwright_workshop',52,50),stables=building(s,'stables',60,40);
-  s.foodStorage.deposit(`warehouse-${warehouse.id}`,'wood',30);s.foodStorage.deposit(`warehouse-${warehouse.id}`,'iron_bar',6);
+  s.foodStorage.deposit(`warehouse-${warehouse.id}`,'wood',30);s.foodStorage.deposit(`warehouse-${warehouse.id}`,'iron',6);
   const a=person(s,{x:50,y:55},{home:shop});person(s,{x:51,y:55},{home:shop});
   assert.equal(s.foodProduction.setRecipe(shop.id,'horse_wagon'),true);assert.equal(s.foodProduction.setRecipe(shop.id,'cart'),false);
   until(s,()=>a.workMessage==='Waiting for a tamed horse in the Stables');
@@ -61,7 +61,7 @@ test('a Hauler in Auto prefers the Horse Wagon to a Wheelbarrow and carries 40 S
 
 test('a cancelled wagon batch gives the horse back: the workshop is demolished mid-batch',()=>{
   const s=scene(),warehouse=building(s,'warehouse',40,44),shop=building(s,'wheelwright_workshop',52,50),stables=building(s,'stables',60,40),horse=stabledHorse(s,stables,{x:61,y:41});
-  s.foodStorage.deposit(`warehouse-${warehouse.id}`,'wood',30);s.foodStorage.deposit(`warehouse-${warehouse.id}`,'iron_bar',6);
+  s.foodStorage.deposit(`warehouse-${warehouse.id}`,'wood',30);s.foodStorage.deposit(`warehouse-${warehouse.id}`,'iron',6);
   person(s,{x:50,y:55},{home:shop});s.foodProduction.setRecipe(shop.id,'horse_wagon');
   until(s,()=>s.stables.horses.get(horse.id)?.state==='reserved');
   s.buildings.splice(s.buildings.indexOf(shop),1);s.tick(200);

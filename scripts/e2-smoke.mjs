@@ -15,7 +15,7 @@ export async function e2Smoke(page){
   assert.match(await page.locator('#game-time').textContent(),/^Day \d+$/);assert.match(await page.locator('#game-time').getAttribute('title'),/left/);
   const shown=await page.evaluate(()=>[...document.querySelectorAll('#inventory-items .inventory-item')].filter(i=>!i.hidden).map(i=>i.querySelector('[data-resource-count]')?.dataset.resourceCount).filter(Boolean));
   for(const id of ['gold','stone','wood'])assert.ok(shown.includes(id),`${id} always shows`);
-  for(const id of ['sword','armor','iron_bar','horse_wagon'])assert.equal(shown.includes(id),false,`${id} hides until the kingdom has some`);
+  for(const id of ['sword','armor','iron','horse_wagon'])assert.equal(shown.includes(id),false,`${id} hides until the kingdom has some`);
   if(await page.locator('#hud-details').isVisible())await page.locator('#hud-details-toggle').click();
   assert.equal(await page.locator('#asset-library-button').isVisible(),false,'the Asset Library lives in More');
   await page.locator('#hud-details-toggle').click();assert.equal(await page.locator('#asset-library-button').isVisible(),true);await page.locator('#hud-details-toggle').click();

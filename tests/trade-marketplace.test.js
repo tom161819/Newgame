@@ -12,7 +12,7 @@ globalThis.document={querySelector:()=>({textContent:''})};
 
 test('tradeable goods come from the resource registry and all have a price', () => {
   const ids=tradeableResources(objectRegistry).map(d=>d.id);
-  for(const id of ['stone','wood','iron_ore','iron_bar','wheat','apple','flour','bread','meat','bow','sword','armor'])assert.ok(ids.includes(id),id);
+  for(const id of ['stone','wood','iron_ore','iron','wheat','apple','flour','bread','meat','bow','sword','armor'])assert.ok(ids.includes(id),id);
   for(const id of ['gold','wheelbarrow','horse_wagon','oak_tree','stone_deposit'])assert.equal(ids.includes(id),false,id);
   for(const id of ids)assert.ok(BASE_PRICES[id]>0,`${id} has a base price`);
   assert.equal(priceTable(objectRegistry).length,ids.length);
@@ -25,8 +25,8 @@ test('a caravan sells at 115 % and buys at 80 %, rounded to whole Gold, at least
   assert.equal(price('x','buy',{basePrice:.2}),2);assert.equal(price('x','sell',{basePrice:.2}),1);
   assert.equal(price('dragon','buy'),null);assert.throws(()=>price('wood','steal'));
   // Making goods from bought inputs and selling them is never free money, and processed goods are worth their inputs.
-  assert.ok(BASE_PRICES.iron_bar>=3*BASE_PRICES.iron_ore+2*BASE_PRICES.wood);assert.ok(BASE_PRICES.sword>=3*BASE_PRICES.iron_bar+2*BASE_PRICES.wood);
-  assert.ok(BASE_PRICES.armor>=5*BASE_PRICES.iron_bar+2*BASE_PRICES.wood);assert.ok(BASE_PRICES.bow>=8*BASE_PRICES.wood);
+  assert.ok(BASE_PRICES.iron>=3*BASE_PRICES.iron_ore+2*BASE_PRICES.wood);assert.ok(BASE_PRICES.sword>=3*BASE_PRICES.iron+2*BASE_PRICES.wood);
+  assert.ok(BASE_PRICES.armor>=5*BASE_PRICES.iron+2*BASE_PRICES.wood);assert.ok(BASE_PRICES.bow>=8*BASE_PRICES.wood);
 });
 
 test('the Marketplace is a 3×3 Logistics building for 12 Stone + 8 Wood, unlocked by a completed Warehouse', () => {

@@ -25,8 +25,8 @@ test('settings accept 5-unit steps up to a combined 160 and reject anything else
   assert.equal(gameSettings({startingStone:40,startingWood:40,startingIronOre:40,startingBread:40}).startingBread,40);
   for(const bad of [{startingStone:-5},{startingWood:3},{startingIronOre:165},{startingBread:'10'},{startingStone:100,startingWood:65},{startingStone:40,startingWood:40,startingIronOre:40,startingBread:45}])assert.throws(()=>gameSettings(bad),JSON.stringify(bad));
 });
-test('the New Game Setup proposes a built Castle, Gold at its limit, 40 Stone, 60 Wood, 40 Bread and no Iron Ore (owner 7 Nov 2026: basic buildings are wooden)',()=>{
-  assert.equal(NEW_GAME_DEFAULTS.startingCastle,true);assert.equal(NEW_GAME_DEFAULTS.startingGold,GOLD_LIMIT);assert.equal(GOLD_LIMIT,500);
+test('the New Game Setup proposes a built Castle, 500 Gold, 40 Stone, 60 Wood, 40 Bread and no Iron Ore (owner 7 Nov 2026: basic buildings are wooden)',()=>{
+  assert.equal(NEW_GAME_DEFAULTS.startingCastle,true);assert.equal(NEW_GAME_DEFAULTS.startingGold,500);assert.equal(GOLD_LIMIT,Infinity,'gold has no limit since 0.51');
   assert.deepEqual(Object.keys(STARTING_RESOURCES).map(key=>NEW_GAME_DEFAULTS[key]),[40,60,0,40]);
   assert.doesNotThrow(()=>gameSettings(NEW_GAME_DEFAULTS));
   const s=scene(NEW_GAME_DEFAULTS);assert.ok(s.buildings.some(b=>b.type==='castle'),'one built Castle');

@@ -1,6 +1,7 @@
 // Suroviny jsou vedené podle názvu: později lze stejně přidat wood, iron apod.
 import { GOLD_LIMIT } from '../data/economy.js';
-export const RESOURCE_LIMITS=Object.freeze({gold:GOLD_LIMIT});
+// No resource has a limit now (gold had 500 until 0.51); kept as a table for future limits.
+export const RESOURCE_LIMITS=Object.freeze(Number.isFinite(GOLD_LIMIT)?{gold:GOLD_LIMIT}:{});
 export class Inventory {
   constructor() {
     this.resources = new Map();

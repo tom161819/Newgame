@@ -16,7 +16,7 @@ export const vehicleDefinitions=[
     width:3,height:3,walkable:false,collectible:false,buildable:true,cost:{stone:12,wood:15},constructionTime:40000,
     workplace:WORKPLACES.wheelwright_workshop,recipe:PRODUCTION_RECIPES.wheelwright_workshop,recipes:WHEELWRIGHT_RECIPES,autoEmployment:true,bufferCapacity:40,
     interactions:['manage_workers'],renderMode:'procedural',renderer:'workplace',origin:{x:.5,y:.9},visualHeight:110,depth:{offset:0},
-    description:"Two Wheelwrights build a Wheelbarrow (10 Wood, 2 Iron Bars, 30 s) or a Horse Wagon (30 Wood, 6 Iron Bars and a tamed horse from the Stables, 90 s). It is left beside the workshop for a Hauler to take."},
+    description:"Two Wheelwrights build a Wheelbarrow (10 Wood, 2 Iron, 30 s) or a Horse Wagon (30 Wood, 6 Iron and a tamed horse from the Stables, 90 s). It is left beside the workshop for a Hauler to take."},
   {id:'wheelbarrow',name:'Wheelbarrow',inventoryLabel:'Wheelbarrows',quantityNames:['Wheelbarrow','Wheelbarrows','Wheelbarrows'],inventoryOrder:19,category:'resource',resourceCategory:'vehicle',
     sprite:'/assets/resources/wheelbarrow/wheelbarrow.svg',width:1,height:1,walkable:true,collectible:true,buildable:false,cost:{},interactions:[],
     renderMode:'procedural',origin:{x:.5,y:.6},visualHeight:30,depth:{offset:.08},

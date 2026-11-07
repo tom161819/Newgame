@@ -132,7 +132,7 @@ export default {
   'treasure.empty':'The chest is empty.','treasure.gold':'{count} Gold',
   'tree.stage.0':'Stump','tree.stage.1':'Sapling','tree.stage.2':'Young tree','tree.stage.3':'Mature tree','tree.info':'{stage} · {wood} Wood · {seconds} seconds of active work · Woodcutting XP {xp}',
   'deposit.info':'{remaining} / {max} {resource} · {state} · No respawn','deposit.depleted':'Deposit Depleted','deposit.assigned':'Assigned to a mining building','deposit.available':'Available for a mining building',
-  'object.stone.plural':'Stones','object.iron_bar.plural':'Iron Bars',
+  'object.stone.plural':'Stones','object.iron.plural':'Iron',
   'construction.phase.Completed':'Completed','construction.phase.Blueprint':'Blueprint','construction.phase.Foundations':'Foundations','construction.phase.Structure':'Structure','construction.phase.Nearly complete':'Nearly complete',
   'construction.builders':'Builders: {working} working / {slots} slots · {reserved} reserved','construction.waitMaterials':'Waiting for delivered materials','construction.waitBuilders':'Waiting for builders','construction.remaining':'Remaining: {seconds} s',
   'construction.kingDelivering':'King: Delivering materials','construction.kingBuilding':'King: Building','construction.kingTravelling':'King: Travelling to construction site','construction.kingNone':'King: Not assigned',

@@ -12,7 +12,7 @@ export function storageResources(definition,registry){return definition.storage.
 // S12: carrying by weight. Every physical resource has a load weight (game units, not kilograms); a person carries
 // 40 load units by hand (the developer's balance choice over the spec's 10: 4 Stone, 8 Wood or 40 food), a Hauler
 // 2 more for every 5 Logistics levels. Gold is never carried.
-export const RESOURCE_WEIGHTS=Object.freeze({pitch:2,torch:1,stone:10,iron:10,iron_ore:10,wood:5,iron_bar:5,armor:8,sword:4,bow:3,meat:1,wheat:1,apple:1,flour:1,bread:1,fish:1});
+export const RESOURCE_WEIGHTS=Object.freeze({pitch:2,torch:1,stone:10,iron:5,iron_ore:10,wood:5,armor:8,sword:4,bow:3,meat:1,wheat:1,apple:1,flour:1,bread:1,fish:1});
 export const loadWeight=resource=>RESOURCE_WEIGHTS[resource]??1;
 // S12: a vehicle multiplies the load; one transport mode at a time, never combined.
 export const VEHICLES=Object.freeze({wheelbarrow:Object.freeze({multiplier:5,speed:.9}),horse_wagon:Object.freeze({multiplier:10,speed:1.1,requiresHorse:true})});

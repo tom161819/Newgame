@@ -56,11 +56,10 @@ test('orders are refused with the brief’s errors', () => {
   const errors=(...a)=>s.trade.quote(...a).errors;
   assert.ok(errors('buy','wheat',10).includes('notEnoughGold'));
   assert.ok(errors('buy','bread',1).includes('merchantOutOfStock'));
-  assert.ok(errors('sell','iron_bar',1).includes('notEnoughResources'));
+  assert.ok(errors('sell','iron',1).includes('notEnoughResources'));
   c.gold=5;assert.ok(errors('sell','wood',10).includes('merchantGold'));c.gold=200;
-  s.inventory.add('gold',480);assert.ok(errors('sell','wood',10).includes('treasuryFull'),'the 500 Gold limit is never exceeded');
+  s.inventory.add('gold',480);assert.equal(errors('sell','wood',10).includes('treasuryFull'),false,'gold has no limit since 0.51');
   assert.ok(errors('sell','wood',0).includes('quantity'));
-  assert.equal(s.trade.place('sell','wood',1).ok,false);
   s.inventory.pay({gold:450});assert.equal(s.trade.place('sell','wood',5).ok,true);assert.ok(errors('buy','wood',1).includes('otherSide'));
   s.caravans.leave();assert.ok(errors('sell','wood',1).includes('noCaravan'));
 });

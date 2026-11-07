@@ -9,8 +9,8 @@ export const EQUIPMENT_SLOTS=Object.freeze(['weapon','armor','mount']);
 // logistics carries them like any material; only an Armory stores them. The king's treasure Sword and Armor
 // (basic_sword, basic_armor) stay separate equipment; C08 equips units from these goods with the same modifiers.
 export const MILITARY_ITEMS=Object.freeze({
-  sword:Object.freeze({itemId:'sword',slot:'weapon',recipe:Object.freeze({iron_bar:3,wood:2}),workshop:'swordsmith',modifiersFrom:'basic_sword'}),
-  armor:Object.freeze({itemId:'armor',slot:'armor',recipe:Object.freeze({iron_bar:5,wood:2}),workshop:'armorer',modifiersFrom:'basic_armor'}),
+  sword:Object.freeze({itemId:'sword',slot:'weapon',recipe:Object.freeze({iron:3,wood:2}),workshop:'swordsmith',modifiersFrom:'basic_sword'}),
+  armor:Object.freeze({itemId:'armor',slot:'armor',recipe:Object.freeze({iron:5,wood:2}),workshop:'armorer',modifiersFrom:'basic_armor'}),
   bow:Object.freeze({itemId:'bow',slot:'weapon',recipe:Object.freeze({wood:8}),workshop:'bowyer',modifiers:Object.freeze({attackBonus:40}),range:6}),
 });
 
@@ -36,6 +36,6 @@ export const HORSE_CONTRACT=Object.freeze({animal:'horse',source:'stables',reser
 // Audit (2026-11-05, main 185f9e5): what exists now. Stables, Wheelwright and the Horse Wagon belong to Stage 12.
 export const MILITARY_AUDIT=Object.freeze({
   stables:'implemented (S12 phase C: Stablehands and the King tame wild horses)',wheelwright_workshop:'implemented (S12 phase B: Wheelbarrow; phase D: Horse Wagon)',horse_wagon:'implemented (S12 phase D: Wheelwright recipe with a harnessed tamed horse)',
-  iron_bar:'implemented (Smelter)',barracks:'implemented (C08: trains Soldier, Swordsman and Archer from Armory equipment; Knight locked until Stables)',horse:'implemented (wild; king mount only)',
+  iron:'implemented (Smelter)',barracks:'implemented (C08: trains Soldier, Swordsman and Archer from Armory equipment; Knight locked until Stables)',horse:'implemented (wild; king mount only)',
   equipment:'implemented for the king (weapon and armor slots)',
 });
