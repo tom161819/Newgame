@@ -38,3 +38,10 @@ None. The design is a static file, not save data.
   the file to equal the base look. The olive preset is still checked against `BASE_CONFIG`.
 - **Stale snapshots:** the Lab's snapshots show v0.13. New windows, such as trade, appear in the Lab only after
   `npm run ui:capture` (Grafika).
+
+## Snapshots refreshed at 0.22.0
+
+- `npm run ui:capture` was run again at 0.22.0. It now captures 13 windows, adding **Marketplace (trade)**: a
+  Marketplace placed whole, then `marketplacePanel.open`. Fixtures take `type>panelName`; the default panel is
+  `workplacePanel`.
+- The Studio smoke test now expects the Lab to open on the style in `ui-config.json`. Before, it expected `olive`.

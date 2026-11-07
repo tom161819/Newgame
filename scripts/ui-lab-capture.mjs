@@ -44,6 +44,7 @@ const PANELS = [
   { id: 'unit-dialog', title: 'King / unit', kind: 'docked', open: 'unit', close: 'key:Escape' },
   { id: 'workplace-dialog', title: 'Workplace (Lumberjack Hut)', kind: 'dialog', open: 'fixture:lumberjack_hut', close: 'key:Escape' },
   { id: 'pause-menu', title: 'Pause menu', kind: 'dialog', open: 'key:Escape', close: 'key:Escape' },
+  { id: 'marketplace-dialog', title: 'Marketplace (trade)', kind: 'dialog', open: 'fixture:marketplace>marketplacePanel', close: 'key:Escape' },
 ];
 
 try {
@@ -95,7 +96,8 @@ try {
       else if (type === 'scene') await page.evaluate(name => window.__game.registry.get('application').scene[name].open(), arg);
       else if (type === 'unit') await page.evaluate(() => { const s = window.__game.registry.get('application').scene; s.unitPanel.open(s.character ?? s.king); });
       else if (type === 'clicks') { for (const selector of arg.split('|')) await page.locator(selector).click(); }
-      else if (type === 'fixture') await page.evaluate(type => {
+      else if (type === 'fixture') await page.evaluate(spec => {
+        const [type, panelName = 'workplacePanel'] = spec.split('>');
         // A finished building placed whole near the King (as the game smokes do), then its panel.
         const s = window.__game.registry.get('application').scene, d = s.objectRegistry.require(type), c = s.character.tile, taken = new Set(s.reservedTiles().map(t => `${t.x},${t.y}`));
         let tiles = null, anchor = null;
@@ -105,7 +107,7 @@ try {
         }
         const b = { id: Math.max(0, ...s.buildings.map(b => b.id)) + 1, type, definition: d, ...anchor, tiles };
         s.buildings.push(b); for (const t of tiles) s.map[t.y][t.x] = 1; s.towerViews.set(b.id, s.createBuildingView(d, b));
-        s.workplaceSystem?.register?.(b); s.workplacePanel.open(b);
+        s.workplaceSystem?.register?.(b); s[panelName].open(b);
       }, arg);
     };
     try {

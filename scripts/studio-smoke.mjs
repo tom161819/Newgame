@@ -392,7 +392,7 @@ try {
     const { page: lab, errors: labErrors } = await open(context, 'ui-lab.html');
     await lab.waitForFunction(() => window.uiLab?.ready, null, { timeout: 20000 });
     const frameAttr = name => lab.evaluate(n => window.uiLab.frameDoc().documentElement.getAttribute(n), name);
-    assert.equal(await frameAttr('data-ui-theme'), 'olive');
+    assert.equal(await frameAttr('data-ui-theme'), JSON.parse(await readFile(new URL('../art/ui/ui-config.json', import.meta.url), 'utf8')).style, 'the Lab opens on the look the game uses');
     assert.ok(await lab.evaluate(() => !!window.uiLab.frameDoc().querySelector('.inventory #inventory-items')), 'the captured HUD is in the preview');
     await lab.locator('[data-preset="parchment"]').click();
     assert.equal(await frameAttr('data-ui-theme'), 'parchment'); assert.equal(await frameAttr('data-ui-light'), 'true');
