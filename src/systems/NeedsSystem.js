@@ -86,8 +86,10 @@ export class NeedsSystem {
     // #103: taxes and rations move Happiness (bonus or penalty), kept apart from the unpaid-wage penalty.
     // Policy v2 P2: situation penalties (unpaid but taxed, promised food missing, taxed while hungry) act at once.
     const penalty=this.unpaidPenalty(worker),policy=this.scene.policy?.happiness?.()??0,context=this.scene.policy?.contextPenalties?.(worker,{hungry:needs.food<NEEDS.food.low})??[],contextTotal=context.reduce((n,c)=>n+c.value,0);
-    const happiness=happinessOf(needs,penalty-policy+contextTotal),mood=moodFor(happiness),foodCap=this.scene.policy?.foodCap?.()??100;
-    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,policyTarget:this.scene.policy?.target?.()??0,policyContext:context,foodCap,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty,Math.max(0,-policy)+contextTotal),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
+    // Policy v2 P3: meal variety and a running Feast add to Happiness at once.
+    const variety=this.scene.foodSystem?.varietyBonus?.(worker.id)??0,kinds=this.scene.foodSystem?.recentKinds?.(worker.id)?.length??0,feast=this.scene.policy?.feastBonus?.()??0;
+    const happiness=happinessOf(needs,penalty-policy+contextTotal-variety-feast),mood=moodFor(happiness),foodCap=this.scene.policy?.foodCap?.()??100;
+    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,policyTarget:this.scene.policy?.target?.()??0,policyContext:context,foodCap,variety,varietyKinds:kinds,feast,feastDaysLeft:this.scene.policy?.feastDaysLeft?.()??0,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty,Math.max(0,-policy)+contextTotal),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
   }
   summary(){
     const homes=this.homes(),list=this.residents().map(w=>this.status(w,homes));

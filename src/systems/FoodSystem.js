@@ -1,17 +1,18 @@
 import { DAY_DURATION } from './GameTimeSystem.js';
 import { EDIBLE_RESOURCES,FOOD_ECONOMY_DAYS,HUNGRY_WORK_MULTIPLIER } from '../data/seasons.js';
+import { MEAL_VARIETY } from '../data/policy.js';
 
 // One meal scheduler serves standalone models and the scene's central game clock.
 export class FoodSystem {
   constructor(inventory,_definition,onChange=()=>{},{time=null,scene=null,subscribe=false}={}){
-    Object.assign(this,{inventory,onChange,time,scene});this.residents=new Map();this.history=[];this.productionEvents=new Set();this.lastProcessedDay=time?.day??1;this.syncResidents();
+    Object.assign(this,{inventory,onChange,time,scene});this.variety=true;this.residents=new Map();this.history=[];this.productionEvents=new Set();this.lastProcessedDay=time?.day??1;this.syncResidents();
     if(subscribe){this.unsubscribe=time.onAdvance(delta=>this.advance(delta));this.unsubscribeDay=time.onNewDay(day=>{this.lastProcessedDay=day;this.trimHistory();});}
   }
   get dayDuration(){return this.time?.dayDuration??DAY_DURATION;}
   units(){return[this.scene?.character??{id:'king',isAlive:true},...(this.scene?.workerSystem?.liveWorkers()??[]).filter(w=>w.isSubject!==false)];}
-  syncResidents(){for(const u of this.units())if(u.isAlive&&!this.residents.has(u.id))this.residents.set(u.id,{id:u.id,progress:0,hungry:false,compensation:0});}
+  syncResidents(){for(const u of this.units())if(u.isAlive&&!this.residents.has(u.id))this.residents.set(u.id,{id:u.id,progress:0,hungry:false,compensation:0,meals:{}});}
   get elapsed(){return(this.residents.get('king')?.progress??0)*this.dayDuration/2;}
-  set elapsed(value){this.residents.set('king',{id:'king',progress:value/(this.dayDuration/2),hungry:false,compensation:0});}
+  set elapsed(value){this.residents.set('king',{id:'king',progress:value/(this.dayDuration/2),hungry:false,compensation:0,meals:this.residents.get('king')?.meals??{}});}
   get remainingSeconds(){return Math.ceil((this.dayDuration/2-this.elapsed)/1000);}
   get dailyConsumption(){return this.units().reduce((n,u)=>n+(u.isAlive?(u.id==='king'?2:1):0),0);}
   get availablePortions(){return EDIBLE_RESOURCES.reduce((n,id)=>n+this.inventory.count(id),0);}
@@ -20,7 +21,18 @@ export class FoodSystem {
   workMultiplier(actor){return actor.id!=='king'&&this.residents.get(actor.id)?.hungry?HUNGRY_WORK_MULTIPLIER:1;}
   bucket(){const day=this.time?.day??this.lastProcessedDay;let record=this.history.find(r=>r.day===day);if(!record){record={day,produced:0,consumed:0};this.history.push(record);}return record;}
   trimHistory(){const day=this.time?.day??this.lastProcessedDay;this.history=this.history.filter(r=>r.day>day-FOOD_ECONOMY_DAYS);}
-  eat(actor=this.scene?.character??{id:'king'}){for(const id of EDIBLE_RESOURCES)if(this.inventory.count(id)>0&&this.inventory.spend(id,1,{source:actor.id==='king'?'King Consumption':'Villager Consumption',entityId:actor.id})){this.bucket().consumed++;return true;}return false;}
+  // Policy v2 P3: a resident takes the available kind he ate longest ago (never eaten first, then the food order), so
+  // the kinds alternate; the day each kind was last eaten is kept for the meal-variety bonus. Deterministic.
+  eat(actor=this.scene?.character??{id:'king'},{source=null}={}){
+    if(!this.residents.has(actor.id))this.syncResidents();
+    const record=this.residents.get(actor.id),last=record?.meals??{},day=this.time?.day??this.lastProcessedDay;
+    const order=EDIBLE_RESOURCES.map((id,i)=>({id,i,day:this.variety?last[id]??-Infinity:0})).sort((a,b)=>a.day-b.day||a.i-b.i);
+    for(const {id}of order)if(this.inventory.count(id)>0&&this.inventory.spend(id,1,{source:source??(actor.id==='king'?'King Consumption':'Villager Consumption'),entityId:actor.id})){this.bucket().consumed++;if(record){record.meals={...last,[id]:day};}return true;}
+    return false;
+  }
+  // Kinds of food a resident ate within the last MEAL_VARIETY.days days (today included).
+  recentKinds(id){const day=this.time?.day??this.lastProcessedDay,meals=this.residents.get(id)?.meals??{};return EDIBLE_RESOURCES.filter(k=>meals[k]!==undefined&&day-meals[k]<MEAL_VARIETY.days);}
+  varietyBonus(id){const kinds=this.recentKinds(id);return (MEAL_VARIETY.bonus[Math.min(kinds.length,MEAL_VARIETY.bonus.length-1)]??0)+(kinds.length>1&&kinds.includes('bread')?MEAL_VARIETY.bread:0);}
   recover(){if(this.time?.paused||this.scene?.gameOver)return false;let changed=false;for(const u of this.units())if(u.isAlive){const record=this.residents.get(u.id);if(record?.hungry&&this.eat(u)){record.hungry=false;changed=true;}}if(changed)this.onChange();return changed;}
   advance(delta){
     if(!Number.isFinite(delta)||delta<=0||this.scene?.gameOver||this.time?.paused)return;
@@ -42,7 +54,7 @@ export class FoodSystem {
   overview(){const day=this.time?.day??this.lastProcessedDay;this.trimHistory();return{storage:this.availablePortions,daily:this.dailyConsumption,production:this.history.reduce((n,r)=>n+r.produced,0)/Math.min(day,FOOD_ECONOMY_DAYS),days:this.dailyConsumption?this.availablePortions/this.dailyConsumption:0,unfed:this.hungryCount};}
   exportState(){this.syncResidents();return{elapsed:this.elapsed,residents:structuredClone([...this.residents.values()]),history:structuredClone(this.history),productionEvents:[...this.productionEvents],lastProcessedDay:this.time?.day??this.lastProcessedDay};}
   importState(data){
-    this.residents=new Map((data.residents??[{id:'king',progress:data.elapsed/60000,hungry:false,compensation:0}]).map(r=>[r.id,structuredClone(r)]));
+    this.residents=new Map((data.residents??[{id:'king',progress:data.elapsed/60000,hungry:false,compensation:0}]).map(r=>[r.id,{meals:{},...structuredClone(r)}]));
     this.history=structuredClone(data.history??[]);this.productionEvents=new Set(data.productionEvents??[]);this.lastProcessedDay=data.lastProcessedDay??this.time?.day??1;this.syncResidents();
   }
   destroy(){this.unsubscribe?.();this.unsubscribeDay?.();this.residents.clear();}

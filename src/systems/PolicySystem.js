@@ -1,4 +1,5 @@
-import { TAX_RATES,RATIONS,DEFAULT_POLICY,POLICY_RULES } from '../data/policy.js';
+import { TAX_RATES,RATIONS,DEFAULT_POLICY,POLICY_RULES,FEAST } from '../data/policy.js';
+import { t } from '../i18n/index.js';
 
 // #103: tax rate and food rations. Taxes are collected at the start of each day from the permanent residents (Gold,
 // ledger source "Taxes"); rations scale how often residents (not the King) eat; both add to every resident's Happiness.
@@ -6,7 +7,7 @@ import { TAX_RATES,RATIONS,DEFAULT_POLICY,POLICY_RULES } from '../data/policy.js
 // collected), so switching around dawn cannot dodge taxes; the Happiness effect then moves 5 points a day to its target.
 export class PolicySystem {
   constructor(scene){
-    this.scene=scene;this.tax=DEFAULT_POLICY.tax;this.rations=DEFAULT_POLICY.rations;this.pending=null;this.effect=this.target();this.lastTaxDay=scene.gameTime?.day??1;this.listeners=new Set();
+    this.scene=scene;this.tax=DEFAULT_POLICY.tax;this.rations=DEFAULT_POLICY.rations;this.pending=null;this.effect=this.target();this.feastUntil=null;this.lastFeastAt=null;this.lastTaxDay=scene.gameTime?.day??1;this.listeners=new Set();
     this.unsubscribe=scene.gameTime?.onNewDay?.(day=>this.collect(day));
     this.unsubscribeAdvance=scene.gameTime?.onAdvance?.(delta=>this.advance(delta));
   }
@@ -49,6 +50,27 @@ export class PolicySystem {
     if(amount>0)this.scene.inventory.add('gold',amount,{source:'Taxes',id:`taxes:${day}`,type:'production'});
     return amount;
   }
+  // Policy v2 P3: the Feast. One portion of food (eaten like a meal, so it counts for variety) and one Gold per resident;
+  // +15 Happiness for every resident for 2 days; again 5 days after the last one began.
+  now(){return this.scene.gameTime?.totalElapsed??0;}
+  feastCost(){const n=this.residents().length;return {food:Math.ceil(n*FEAST.foodPerResident),gold:Math.ceil(n*FEAST.goldPerResident),residents:n};}
+  feastStatus(){
+    const day=this.scene.gameTime?.dayDuration??120000,cost=this.feastCost(),wait=this.lastFeastAt===null?0:this.lastFeastAt+FEAST.cooldownDays*day-this.now();
+    if(wait>0)return {ok:false,reason:'cooldown',days:Math.ceil(wait/day),cost};
+    if(!cost.residents)return {ok:false,reason:'noResidents',cost};
+    if((this.scene.foodSystem?.availablePortions??0)<cost.food)return {ok:false,reason:'food',cost};
+    if(this.scene.inventory.count('gold')<cost.gold)return {ok:false,reason:'gold',cost};
+    return {ok:true,cost};
+  }
+  holdFeast(){
+    const status=this.feastStatus();if(!status.ok)return false;const s=this.scene,day=s.gameTime?.dayDuration??120000;
+    for(const w of this.residents())for(let i=0;i<FEAST.foodPerResident;i++)s.foodSystem?.eat?.(w,{source:'Feast'});
+    s.inventory.spend('gold',status.cost.gold,{source:'Feast',type:'consumption'});
+    this.lastFeastAt=this.now();this.feastUntil=this.now()+FEAST.days*day;
+    s.eventFeed?.push?.(`feast:${this.lastFeastAt}`,t('policy.feastNotice'),{important:true});s.needs?.refresh?.();this.changed();return true;
+  }
+  feastBonus(){return this.feastUntil!==null&&this.now()<this.feastUntil?FEAST.happiness:0;}
+  feastDaysLeft(){return this.feastBonus()?(this.feastUntil-this.now())/(this.scene.gameTime?.dayDuration??120000):0;}
   // Gold per day: Castle income, taxes and the average trade result of the last days, minus wages.
   balance(){
     const s=this.scene,castle=s.production?.dailyIncome?.().gold??0,wages=(s.workerSystem?.liveWorkers?.()??[]).reduce((n,w)=>n+(s.wageSystem?.dailyWage?.(w)??0),0);
@@ -58,7 +80,7 @@ export class PolicySystem {
   }
   // Food per day (production − consumption from the food history) and how many days the stock lasts at these rations.
   food(){const o=this.scene.foodSystem?.overview?.();if(!o)return null;return {production:o.production,consumption:o.daily,net:o.production-o.daily,days:o.days};}
-  exportState(){return {tax:this.tax,rations:this.rations,lastTaxDay:this.lastTaxDay,pending:this.pending?{...this.pending}:null,effect:this.effect};}
-  importState(state){if(!state)return;this.tax=state.tax;this.rations=state.rations;this.lastTaxDay=state.lastTaxDay;this.pending=state.pending?{...state.pending}:null;this.effect=state.effect;this.changed();}
+  exportState(){return {tax:this.tax,rations:this.rations,lastTaxDay:this.lastTaxDay,pending:this.pending?{...this.pending}:null,effect:this.effect,feastUntil:this.feastUntil,lastFeastAt:this.lastFeastAt};}
+  importState(state){if(!state)return;this.tax=state.tax;this.rations=state.rations;this.lastTaxDay=state.lastTaxDay;this.pending=state.pending?{...state.pending}:null;this.effect=state.effect;this.feastUntil=state.feastUntil;this.lastFeastAt=state.lastFeastAt;this.changed();}
   destroy(){this.unsubscribe?.();this.unsubscribeAdvance?.();this.listeners.clear();}
 }

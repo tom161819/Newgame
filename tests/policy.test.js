@@ -49,7 +49,7 @@ test('rations change how often residents eat and their Happiness; taxes move Hap
 test('policy is saved and loaded; an unknown rate is rejected', () => {
   const s=world();s.policy.set('tax','high');s.policy.set('rations','small');s.gameTime.update(day(s));
   s.policy.set('tax','low');s.gameTime.update(day(s)/2);
-  const saved=validateGameState(serializeGameState(s));assert.deepEqual({...saved.policy,effect:undefined},{tax:'high',rations:'small',lastTaxDay:2,pending:{tax:'low',rations:'small'},effect:undefined});
+  const saved=validateGameState(serializeGameState(s));assert.deepEqual({...saved.policy,effect:undefined},{tax:'high',rations:'small',lastTaxDay:2,pending:{tax:'low',rations:'small'},effect:undefined,feastUntil:null,lastFeastAt:null});
   assert.ok(Math.abs(saved.policy.effect+2.5)<1e-6,'half a day at 5 points a day towards −25');
   for(const corrupt of [p=>p.pending={tax:'high',rations:'small'},p=>p.pending={tax:'pirate',rations:'small'},p=>p.effect=-40,p=>delete p.effect]){const bad=structuredClone(saved);corrupt(bad.policy);assert.throws(()=>validateGameState(bad));}
   const bad=structuredClone(saved);bad.policy.tax='robbery';assert.throws(()=>validateGameState(bad));
@@ -96,4 +96,29 @@ test('Policy v2 P2: rations cap the Food need; Generous adds a small bonus; situ
   now('high','normal');assert.deepEqual(p.contextPenalties(w,{hungry:true}).map(c=>[c.id,c.value]),[['hungryTaxes',5]]);assert.deepEqual(p.contextPenalties(w,{hungry:false}),[]);
   now('very_high','normal');assert.equal(s.needs.status(w).mainProblem,'policy','the policy is the biggest loss');
   for(const status of [s.needs.status(w)])assert.ok(status.happiness>=0&&status.happiness<=100);
+});
+
+test('Policy v2 P3: residents alternate kinds of food; 2/3/4 kinds give +3/+5/+7 and bread +2; nothing is invented', () => {
+  const s=world({residents:1}),w=s.workerSystem.liveWorkers()[0],f=s.foodSystem;
+  for(const id of ['apple','bread','meat','fish'])s.inventory.add(id,5);
+  const eaten=[];for(let i=0;i<4;i++){const before=Object.fromEntries(['apple','bread','meat','fish'].map(id=>[id,s.inventory.count(id)]));f.eat(w);eaten.push(Object.keys(before).find(id=>s.inventory.count(id)<before[id]));}
+  assert.deepEqual(eaten,['apple','bread','meat','fish'],'each meal takes the kind eaten longest ago');assert.equal(f.varietyBonus(w.id),7+2);
+  const solo=world({residents:1}),v=solo.workerSystem.liveWorkers()[0];solo.inventory.add('apple',5);solo.foodSystem.eat(v);solo.foodSystem.eat(v);assert.equal(solo.foodSystem.varietyBonus(v.id),0,'one kind: no bonus');
+  solo.inventory.add('meat',1);solo.foodSystem.eat(v);assert.equal(solo.foodSystem.varietyBonus(v.id),3);
+  // Three days later the old kinds no longer count.
+  solo.gameTime.update(solo.gameTime.dayDuration*3);solo.inventory.add('apple',1);solo.foodSystem.eat(v);assert.deepEqual(solo.foodSystem.recentKinds(v.id),['apple']);
+  const base=s.needs.status(w);assert.equal(base.variety,9);assert.equal(base.varietyKinds,4);
+});
+
+test('Policy v2 P3: a Feast costs one food and one Gold per resident, gives +15 for 2 days and can be held again after 5 days', () => {
+  const s=world({residents:3}),p=s.policy,n=p.residents().length,day=s.gameTime.dayDuration;
+  assert.equal(p.feastStatus().reason,'food');s.inventory.add('bread',n);assert.equal(p.feastStatus().reason,'gold');s.inventory.add('gold',n+2);
+  assert.deepEqual(p.feastStatus(),{ok:true,cost:{food:n,gold:n,residents:n}});
+  const w=p.residents()[0],before=s.needs.status(w).happiness;assert.equal(p.holdFeast(),true);
+  assert.equal(s.inventory.count('bread'),0);assert.equal(s.inventory.count('gold'),2);assert.equal(p.feastBonus(),15);assert.equal(s.needs.status(w).happiness,Math.min(100,before+15+(s.needs.status(w).variety-0)));
+  assert.equal(p.feastStatus().reason,'cooldown');assert.equal(p.feastStatus().days,5);
+  const saved=validateGameState(serializeGameState(s));assert.equal(saved.policy.feastUntil-saved.policy.lastFeastAt,2*day);
+  for(const corrupt of [q=>q.feastUntil=null,q=>q.feastUntil+=1,q=>q.lastFeastAt=-5]){const bad=structuredClone(saved);corrupt(bad.policy);assert.throws(()=>validateGameState(bad));}
+  s.gameTime.update(2*day+1);assert.equal(p.feastBonus(),0,'over after 2 days');assert.equal(p.feastStatus().days,3);
+  s.gameTime.update(3*day);s.inventory.add('bread',10);s.inventory.add('gold',10);assert.equal(p.feastStatus().ok,true,'again after 5 days');
 });

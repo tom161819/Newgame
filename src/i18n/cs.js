@@ -293,6 +293,8 @@ export default {
   'market.status.Pending':'Čeká','market.status.Transporting':'Přenáší se','market.status.PartiallyCompleted':'Částečně hotovo','market.status.Completed':'Hotovo','market.status.Cancelled':'Zrušeno','market.status.Failed':'Nepovedlo se',
   'ledger.Trade Purchase':'Nákup od karavany','ledger.Trade Sale':'Prodej karavaně',
   'status.noWallAccess':'Na tuhle hradbu nevede žádná brána ani věž.',
+  'policy.feast':'Uspořádat hostinu','policy.feastCost':'{food} jídla a {gold} zlata: +15 spokojenosti na 2 dny.','policy.feastRunning':'Hostina: zbývá {days} dne/dní.','policy.feastNo.cooldown':'Možná za {days} den/dny.','policy.feastNo.food':'Málo jídla (potřeba {food} porcí).','policy.feastNo.gold':'Málo zlata (potřeba {gold}).','policy.feastNo.noResidents':'Nemá kdo hodovat.','policy.feastNotice':'Království pořádá hostinu!','ledger.Feast':'Hostina',
+  'needs.varietyLine':'Pestrá strava ({kinds} druhy): spokojenost {value}','needs.feastLine':'Hostina: spokojenost {value} (zbývá {days} dne/dní)',
   'policy.cancel':'Zrušit','policy.overview':'Přehled království','policy.fromTomorrow':'Od zítřka: {changes}.','policy.pendingTax':'daně {tax}','policy.pendingRations':'příděly {rations}',
   'policy.goldBalance':'Zlato za den: hrad {castle}, daně {taxes}, obchod {trade}, mzdy {wages} = {total}.','policy.goldTomorrow':'Od zítřka: {total}.',
   'policy.foodBalance':'Jídlo za den: vyrobeno {produced}, snědeno {eaten} ({net}); zásoby vydrží {days} dní při těchto přídělech.',

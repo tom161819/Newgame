@@ -1,7 +1,7 @@
 import { validateRockMining } from './RockMiningState.js';
 import { CARAVAN_RULES,MERCHANT_TYPES } from '../data/trade.js';
 import { ORDER_STATUSES } from './TradeSystem.js';
-import { TAX_RATES,RATIONS } from '../data/policy.js';
+import { TAX_RATES,RATIONS,FEAST } from '../data/policy.js';
 import { ROCK_MINING } from '../data/rockMining.js';
 import { buildingDemolitionRefund } from '../data/demolition.js';
 import { t } from '../i18n/index.js';
@@ -36,7 +36,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=46;
+export const SAVE_VERSION=47;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -466,10 +466,12 @@ export function validateGameState(input,registry=objectRegistry){
     }
   }
   // #103: kingdom policy (schema 40).
-  if(s.policy!==undefined){const p=s.policy;check(p&&typeof p==='object'&&Object.keys(p).sort().join()==='effect,lastTaxDay,pending,rations,tax');check(Object.hasOwn(TAX_RATES,p.tax)&&Object.hasOwn(RATIONS,p.rations));integer(p.lastTaxDay,1,s.time?.day??Number.MAX_SAFE_INTEGER);
+  if(s.policy!==undefined){const p=s.policy;check(p&&typeof p==='object'&&Object.keys(p).sort().join()==='effect,feastUntil,lastFeastAt,lastTaxDay,pending,rations,tax');check(Object.hasOwn(TAX_RATES,p.tax)&&Object.hasOwn(RATIONS,p.rations));integer(p.lastTaxDay,1,s.time?.day??Number.MAX_SAFE_INTEGER);
     // Policy v2 P1 (schema 45): a pending policy for tomorrow and the Happiness effect on its way to the target.
     if(p.pending!==null){check(typeof p.pending==='object'&&Object.keys(p.pending).sort().join()==='rations,tax'&&Object.hasOwn(TAX_RATES,p.pending.tax)&&Object.hasOwn(RATIONS,p.pending.rations)&&(p.pending.tax!==p.tax||p.pending.rations!==p.rations));}
-    const effects=Object.values(TAX_RATES).flatMap(a=>Object.values(RATIONS).map(b=>a.happiness+b.happiness));number(p.effect,Math.min(...effects),Math.max(...effects));}
+    const effects=Object.values(TAX_RATES).flatMap(a=>Object.values(RATIONS).map(b=>a.happiness+b.happiness));number(p.effect,Math.min(...effects),Math.max(...effects));
+    // Policy v2 P3 (schema 47): the Feast running until feastUntil and the start of the last one.
+    const total=s.time?.totalElapsed??0,dayMs=s.gameSettings.dayLengthSeconds*1000;check((p.feastUntil===null)===(p.lastFeastAt===null));if(p.lastFeastAt!==null){number(p.lastFeastAt,0,total);check(Math.abs(p.feastUntil-p.lastFeastAt-FEAST.days*dayMs)<1e-6);}}
   // Trade F1.3: orders (schema 39). Open orders belong to the active caravan and an existing Marketplace.
   if(s.trade!==undefined){
     const v=s.trade;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='orders,seq');integer(v.seq,0);array(v.orders,200);const ids=new Set();

@@ -292,6 +292,8 @@ export default {
   'market.status.Pending':'Pending','market.status.Transporting':'Transporting','market.status.PartiallyCompleted':'Partly completed','market.status.Completed':'Completed','market.status.Cancelled':'Cancelled','market.status.Failed':'Failed',
   'ledger.Trade Purchase':'Trade Purchase','ledger.Trade Sale':'Trade Sale',
   'status.noWallAccess':'This wall has no Gate or Tower to climb up from.',
+  'policy.feast':'Hold a feast','policy.feastCost':'{food} food and {gold} Gold: +15 Happiness for 2 days.','policy.feastRunning':'Feast: {days} day(s) left.','policy.feastNo.cooldown':'Available in {days} day(s).','policy.feastNo.food':'Not enough food ({food} portions needed).','policy.feastNo.gold':'Not enough Gold ({gold} needed).','policy.feastNo.noResidents':'No residents to feast.','policy.feastNotice':'The kingdom holds a feast!','ledger.Feast':'Feast',
+  'needs.varietyLine':'Varied meals ({kinds} kinds): Happiness {value}','needs.feastLine':'Feast: Happiness {value} ({days} day(s) left)',
   'policy.cancel':'Cancel','policy.overview':'Kingdom overview','policy.fromTomorrow':'From tomorrow: {changes}.','policy.pendingTax':'{tax} taxes','policy.pendingRations':'{rations} rations',
   'policy.goldBalance':'Gold per day: Castle {castle}, taxes {taxes}, trade {trade}, wages {wages} = {total}.','policy.goldTomorrow':'From tomorrow: {total}.',
   'policy.foodBalance':'Food per day: {produced} made, {eaten} eaten ({net}); stores last {days} days at these rations.',

@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-11-07
+<!-- version: {"title":"Varied meals and feasts","type":"feature","reconstructed":false,"saveVersion":47} -->
+### Added
+- Varied meals: residents now take turns with the kinds of food they eat (apples, bread, meat, fish). Eating 2, 3 or 4 different kinds within three days adds +3, +5 or +7 Happiness, and bread adds +2 more.
+- Feasts: the Castle panel has a "Hold a feast" button. A feast costs one portion of food and one Gold per resident and gives everyone +15 Happiness for two days. The next feast can be held five days after the last one began.
+
+### Changed
+- Saved games use a new format (47). Games saved by earlier versions cannot be loaded; start a new game.
+
 ## [0.18.0] - 2026-11-07
 <!-- version: {"title":"Rations and fair taxes","type":"feature","reconstructed":false,"saveVersion":46} -->
 ### Changed

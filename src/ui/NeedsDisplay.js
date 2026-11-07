@@ -27,6 +27,8 @@ export function renderNeeds(root,status){
   // Policy v2 P1: the effect moves towards its target; the line shows both while it is on its way.
   const signed=n=>`${n>0?'+':n<0?'−':''}${Math.abs(n)}`,policyNow=Math.round(status.policy??0),policyTarget=status.policyTarget??policyNow;
   if(policyNow||policyTarget)lines.push(element('p','need-policy',Math.round(status.policy??0)===policyTarget&&Math.abs((status.policy??0)-policyTarget)<.01?t('needs.policyLine',{value:signed(policyNow)}):t('needs.policyLineMoving',{value:signed(policyNow),target:signed(policyTarget)})));
+  if(status.variety)lines.push(element('p','need-variety',t('needs.varietyLine',{kinds:status.varietyKinds,value:`+${status.variety}`})));
+  if(status.feast)lines.push(element('p','need-feast',t('needs.feastLine',{value:`+${status.feast}`,days:status.feastDaysLeft.toFixed(1)})));
   for(const c of status.policyContext??[])lines.push(element('p','need-policy-context',t(`needs.context.${c.id}`,{value:`−${c.value}`})));
   if(status.leaving)lines.push(element('p','need-strike',t('needs.leavingLine')));
   else if(status.strike)lines.push(element('p','need-strike',t('needs.strikeLine')));

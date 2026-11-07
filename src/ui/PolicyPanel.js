@@ -9,6 +9,7 @@ export class PolicyPanel {
     if(!this.tax||!this.rations)return;const options={signal:this.controller.signal};
     this.tax.addEventListener('change',()=>scene.policy.set('tax',this.tax.value),options);this.rations.addEventListener('change',()=>scene.policy.set('rations',this.rations.value),options);
     document.querySelector('#policy-cancel')?.addEventListener('click',()=>scene.policy.cancel(),options);
+    document.querySelector('#policy-feast')?.addEventListener('click',()=>{if(scene.policy.holdFeast())scene.updateInventory?.();this.render();},options);
     this.unsubscribe=scene.policy.onChange(()=>this.render());this.render();
     // The overview follows the day (income, food, Happiness): refreshed every second while the Castle panel is open.
     this.timer=setInterval(()=>{if(!this.tax.closest('[hidden]'))this.render();},1000);
@@ -30,6 +31,8 @@ export class PolicyPanel {
     const summary=this.scene.needs?.summary?.(),now=summary?.happiness;
     const target=p.pending?p.target(p.pending):p.target(),change=target-p.happiness(),days=Math.ceil(Math.abs(change)/5-1e-9)+(p.pending?1:0);
     document.querySelector('#policy-happiness').textContent=now==null?t('policy.happinessNone'):Math.abs(change)<.5?t('policy.happinessSteady',{now}):t('policy.happinessForecast',{now,next:Math.max(0,Math.min(100,Math.round(now+change))),days});
+    // Policy v2 P3: the Feast button with its cost, or why it cannot be held now.
+    const feast=p.feastStatus(),button=document.querySelector('#policy-feast');if(button){button.disabled=!feast.ok;document.querySelector('#policy-feast-status').textContent=p.feastBonus()?t('policy.feastRunning',{days:p.feastDaysLeft().toFixed(1)}):feast.ok?t('policy.feastCost',feast.cost):t(`policy.feastNo.${feast.reason}`,{days:feast.days??0,...feast.cost});}
     const risk=document.querySelector('#policy-risk');risk.hidden=!summary?.atRisk;if(summary?.atRisk)risk.textContent=t('policy.risk',{count:summary.atRisk});
   }
   destroy(){this.controller.abort();this.unsubscribe?.();clearInterval(this.timer);}

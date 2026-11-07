@@ -16,3 +16,6 @@ export const POLICY_RULES=Object.freeze({effectPerDay:5,tradeAverageDays:3,
   // Policy v2 P2: penalties that depend on the resident's situation; they act at once (not gradually).
   context:Object.freeze({taxedUnpaid:10,promisedFood:10,hungryTaxes:5,hungryTaxRates:Object.freeze(['high','very_high'])}),
 });
+// Policy v2 P3: meal variety (kinds of food a resident ate in the last `days` game days, bread counts extra) and the Feast.
+export const MEAL_VARIETY=Object.freeze({days:3,bonus:Object.freeze([0,0,3,5,7]),bread:2});
+export const FEAST=Object.freeze({foodPerResident:1,goldPerResident:1,happiness:15,days:2,cooldownDays:5});
