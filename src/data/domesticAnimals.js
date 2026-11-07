@@ -22,7 +22,10 @@ export const ratLevel=population=>{let level='none';for(const [id,from]of RATS.l
 // faster and deals 50 % more damage while the dog is close (about +30 % meat a day, see the change record); game within 8 tiles of the dog can be chosen as a target
 // (and shows as a faint outline under Fog of War). A dog at 0 HP is injured: it goes home and heals in a day.
 export const DOGS=Object.freeze({
-  maxHP:60,healDays:1,speed:2.2,followDistance:1.4,closeEnough:3,trackRadius:8,huntSpeed:1.3,huntDamage:1.5,
+  maxHP:60,healDays:1,speed:2.2,followDistance:1.4,
+  // Around its Hunter the dog roams irregularly within a small circle; at the hunting lodge it sits and now and then
+  // runs a quick round before sitting down again.
+  roam:{radius:2.2,retarget:[.8,3],catchUp:3.4,pause:[0,1.2]},atLodge:{radius:2.5,sit:[6,14],runRadius:2.6,runSpeed:1.7,rounds:[2,4]},closeEnough:3,trackRadius:8,huntSpeed:1.3,huntDamage:1.5,
   tame:Object.freeze({base:.2,perLevel:.08,max:.9,xp:20,meetDistance:1.5}),
   stray:Object.freeze({intervalDays:6,stayDays:Object.freeze([2,3]),distance:Object.freeze([5,10])}),
   caravanChance:1/3,price:120,

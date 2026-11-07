@@ -71,7 +71,7 @@ export class DomesticAnimalSystem {
   buildingName(id){const b=this.scene.buildings?.find(b=>b.id===id);return b?(this.scene.objectRegistry?.get?.(b.type)?.name??b.type):t('pets.stockpile');}
   feed(key,text,important=false){this.scene.eventFeed?.push(key,text,{important});}
   anchor(cat){
-    if(cat.buildingId!=null){const b=this.scene.buildings?.find(b=>b.id===cat.buildingId);if(b){const d=buildingDefinition(b);return {x:b.x+d.width/2,y:b.y+d.height+.6};}}
+    if(cat.buildingId!=null){const b=this.scene.buildings?.find(b=>b.id===cat.buildingId);if(b){const d=buildingDefinition(b);return {x:b.x+d.width/2,y:b.y+d.height+.6,lodge:true};}}
     if(cat.motherId!=null){const m=this.cats.get(cat.motherId);if(m)return {x:m.x,y:m.y};}
     return cat.home??{x:cat.x,y:cat.y};
   }
@@ -160,7 +160,7 @@ export class DomesticAnimalSystem {
   injure(dog){dog.injuredUntil=this.now()+DOGS.healDays*this.day;dog.hp=0;this.feed(`dog:hurt:${dog.id}:${Math.floor(this.now())}`,t('pets.dog.feed.hurt',{name:dog.name}));this.changed();}
   lodge(dog){
     const hunter=this.scene.workerSystem?.workers?.get(dog.hunterId),b=hunter?.assignedWorkplaceId!=null?this.scene.buildings?.find(b=>b.id===hunter.assignedWorkplaceId):(this.scene.buildings??[]).find(b=>b.type==='hunting_lodge'&&buildingIsComplete(b));
-    if(b){const d=buildingDefinition(b);return {x:b.x+d.width/2,y:b.y+d.height+.6};}return {x:PLAYER_START.x+.5,y:PLAYER_START.y+3};
+    if(b){const d=buildingDefinition(b);return {x:b.x+d.width/2,y:b.y+d.height+.6,lodge:true};}return {x:PLAYER_START.x+.5,y:PLAYER_START.y+3};
   }
   newDog(fields){const id=`dog-${++this.seq}`,dog={id,name:DOGS.names[(this.seq-1)%DOGS.names.length],x:PLAYER_START.x,y:PLAYER_START.y,hunterId:null,state:'unassigned',hp:DOGS.maxHP,injuredUntil:null,leaveAt:null,leaving:false,tried:false,tamerId:null,home:null,target:null,...fields};this.dogs.set(id,dog);this.changed();return dog;}
   updateDogs(delta){
@@ -177,8 +177,8 @@ export class DomesticAnimalSystem {
         this.wander(dog,dog.home,seconds);continue;
       }
       const h=dog.hunterId!=null?workers?.get(dog.hunterId):null;
-      if(h&&dog.injuredUntil==null&&h.position){const dx=dog.x-h.position.x,dy=dog.y-h.position.y,d=Math.hypot(dx,dy);if(d>DOGS.followDistance)this.step(dog,{x:h.position.x+dx/d*DOGS.followDistance*.8,y:h.position.y+dy/d*DOGS.followDistance*.8},DOGS.speed*seconds*(d>4?1.6:1));}
-      else this.wander(dog,this.lodge(dog),seconds);
+      if(h&&dog.injuredUntil==null&&h.position){const home=this.lodge(dog);if(this.atLodge(h,home))this.lodgeIdle(dog,home,seconds);else this.roam(dog,h.position,seconds);}
+      else{dog.sitting=false;this.wander(dog,this.lodge(dog),seconds);}
     }
     // Hunters run faster and hit harder with their dog close.
     for(const h of this.hunters()){const d=this.activeDog(h);h.speedFactor=d?DOGS.huntSpeed:1;h.damageFactor=d?DOGS.huntDamage:1;}
@@ -190,6 +190,29 @@ export class DomesticAnimalSystem {
     const c=this.scene.caravans?.active;
     if(!c){if(this.caravanDog){this.caravanDog=null;this.changed();}}
     else if(this.caravanDog?.caravanId!==c.id){let dogId=null;if(this.random()<DOGS.caravanChance){const p=c.position??c.tile??{x:0,y:0};dogId=this.newDog({x:p.x+1,y:p.y+.5,state:'caravan'}).id;}this.caravanDog={caravanId:c.id,dogId};this.changed();}
+  }
+  atLodge(hunter,home){return !!home?.lodge&&Math.hypot(hunter.position.x-home.x,hunter.position.y-home.y)<=DOGS.atLodge.radius;}
+  // Following: a random spot in a small circle around the Hunter, changed every second or few, with short pauses
+  // to sniff; a dog left behind runs to catch up.
+  roam(dog,center,seconds){
+    const R=DOGS.roam,range=(a)=>a[0]+this.random()*(a[1]-a[0]);dog.sitting=false;dog.mode='roam';
+    const d=Math.hypot(dog.x-center.x,dog.y-center.y);
+    if(d>R.catchUp){dog.offset=null;dog.wait=0;this.step(dog,{x:center.x+(dog.x-center.x)/d*R.radius*.6,y:center.y+(dog.y-center.y)/d*R.radius*.6},DOGS.speed*1.6*seconds);return;}
+    dog.retargetIn=(dog.retargetIn??0)-seconds;
+    const target=dog.offset?{x:clamp(center.x+dog.offset.x,.5,COLUMNS-.5),y:clamp(center.y+dog.offset.y,.5,ROWS-.5)}:null;
+    if(target&&Math.hypot(dog.x-target.x,dog.y-target.y)<.12){dog.target=null;dog.wait=(dog.wait??range(R.pause))-seconds;if(dog.wait>0&&dog.retargetIn>0)return;dog.offset=null;}
+    if(!dog.offset||dog.retargetIn<=0){const a=this.random()*Math.PI*2,r=(.45+this.random()*.55)*R.radius;dog.offset={x:Math.cos(a)*r,y:Math.sin(a)*r};dog.retargetIn=range(R.retarget);dog.wait=range(R.pause);}
+    dog.target={x:clamp(center.x+dog.offset.x,.5,COLUMNS-.5),y:clamp(center.y+dog.offset.y,.5,ROWS-.5)};this.step(dog,dog.target,DOGS.speed*seconds);
+  }
+  // At the lodge: sit by the door; after a while run a few quick rounds around it and sit again.
+  lodgeIdle(dog,home,seconds){
+    const L=DOGS.atLodge,range=(a)=>a[0]+this.random()*(a[1]-a[0]),seat={x:home.x+.7,y:home.y+.2};
+    if(dog.mode!=='lodge'){dog.mode='lodge';dog.rounds=0;dog.target={...seat};dog.sitting=false;dog.sitFor=range(L.sit);}
+    if(dog.target){this.step(dog,dog.target,DOGS.speed*(dog.rounds>0?L.runSpeed:1)*seconds);if(Math.hypot(dog.x-dog.target.x,dog.y-dog.target.y)>.1)return;
+      if(dog.rounds>0){dog.rounds--;const a=this.random()*Math.PI*2,r=(.5+this.random()*.5)*L.runRadius;dog.target=dog.rounds>0?{x:clamp(home.x+Math.cos(a)*r,.5,COLUMNS-.5),y:clamp(home.y+Math.sin(a)*r,.5,ROWS-.5)}:{...seat};return;}
+      dog.target=null;dog.sitting=true;dog.facing={x:0,y:1};return;}
+    dog.sitFor-=seconds;if(dog.sitFor>0)return;
+    dog.sitting=false;dog.rounds=Math.round(range(L.rounds));dog.sitFor=range(L.sit);const a=this.random()*Math.PI*2;dog.target={x:clamp(home.x+Math.cos(a)*L.runRadius,.5,COLUMNS-.5),y:clamp(home.y+Math.sin(a)*L.runRadius,.5,ROWS-.5)};
   }
   wander(animal,home,seconds){
     if(!home)return;const far=Math.hypot(animal.x-home.x,animal.y-home.y)>CATS.wanderRadius+1.5;

@@ -17,10 +17,13 @@ function drawCat(g,coat,facing,phase,walking){
   g.fillStyle(0xd9c25a);g.fillCircle(8.5*dir,-10.5,.9);
 }
 const DOG_COATS=[[0x7a5232,0x4b321f],[0xe4dccb,0x5a4a3a],[0x8d8f92,0x55575b]];
-function drawDog(g,coat,facing,phase,walking,injured){
+function drawDog(g,coat,facing,phase,walking,injured,sitting){
   const [body,dark]=coat,dir=facing.x-facing.y>=0?1:-1,step=walking?Math.sin(phase*1.6)*2:0;g.clear();
   g.fillStyle(0x26271b,.3);g.fillEllipse(0,1,24,8);
   if(injured){g.fillStyle(body);g.fillEllipse(0,-3,22,7);g.fillCircle(10*dir,-4,4.5);g.fillStyle(0xf2efe6);g.fillRect(-3,-6,6,3);return;}
+  if(sitting){g.fillStyle(dark);g.fillRect(3*dir-1,-9,2.4,9);g.fillRect(6*dir-1,-9,2.4,9);g.fillStyle(body);g.fillEllipse(-3*dir,-4,13,8);g.fillEllipse(2*dir,-11,11,13);
+    g.lineStyle(2.2,body);g.beginPath();g.moveTo(-9*dir,-2);g.lineTo(-13*dir,-1+Math.sin(phase*.7));g.strokePath();
+    g.fillCircle(6*dir,-19,5);g.fillEllipse(10*dir,-18,6,3.5);g.fillStyle(dark);g.fillEllipse(4*dir,-19,3,6);g.fillStyle(0x1d1a17);g.fillCircle(12.5*dir,-18.5,1);return;}
   g.fillStyle(dark);for(const [x,s]of [[-7,step],[-4,-step],[5,step],[8,-step]])g.fillRect(x*dir-1,-6,2.4,6+s*.5);
   g.fillStyle(body);g.fillEllipse(0,-9,22,9);
   g.lineStyle(2.2,body);g.beginPath();g.moveTo(-10*dir,-10);g.lineTo(-14*dir,-15+Math.sin(phase)*2);g.strokePath();
@@ -43,7 +46,7 @@ export class DomesticViews {
       if(!dog.view){const v=new Phaser.GameObjects.Container(this.scene,0,0);this.scene.add.existing(v);v.figure=this.scene.add.graphics();v.add(v.figure);v.coat=DOG_COATS[Number(dog.id.slice(4))%DOG_COATS.length];dog.view=v;}
       const p=gridToWorld(dog.x,dog.y),v=dog.view,moving=!!dog.target&&Math.hypot(dog.x-dog.target.x,dog.y-dog.target.y)>.05;
       v.setPosition(p.x,p.y);v.setDepth(p.y+2);v.setVisible(this.visible({x:dog.x,y:dog.y}));
-      if(v.visible)drawDog(v.figure,v.coat,dog.facing??{x:1,y:0},this.phase+Number(dog.id.slice(4)),moving||dog.state==='owned',dog.injuredUntil!=null);
+      if(v.visible)drawDog(v.figure,v.coat,dog.facing??{x:1,y:0},this.phase+Number(dog.id.slice(4)),moving,dog.injuredUntil!=null,!!dog.sitting&&!moving);
     }
     // Rats: one group per store with food, sized by the level.
     const seen=new Set();

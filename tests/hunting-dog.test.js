@@ -63,3 +63,19 @@ test('dogs survive a save; two dogs for one Hunter are rejected', () => {
   assert.equal(r.domestic.dogs.get(dog.id).hunterId,h.id);assert.equal(r.domestic.dogs.get(dog.id).hp,30);
   const bad=structuredClone(serializeGameState(s));bad.domestic.dogs[1].state='owned';bad.domestic.dogs[1].hunterId=h.id;assert.throws(()=>validateGameState(bad));
 });
+
+test('a dog roams irregularly around its Hunter within a small circle; at the lodge it sits and now and then runs a round', () => {
+  let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+  const {s,d,hunter,tick}=world(rnd),h=hunter(50),dog=d.newDog({x:50,y:46.5,state:'owned',hunterId:h.id});
+  const spots=new Set();let far=0;
+  for(let i=0;i<300;i++){tick(100,100);const r=Math.hypot(dog.x-h.position.x,dog.y-h.position.y);far=Math.max(far,r);spots.add(`${Math.round(dog.x*2)},${Math.round(dog.y*2)}`);}
+  assert.ok(far<=DOGS.roam.catchUp,`stays close (${far.toFixed(2)})`);assert.ok(far<=DOGS.closeEnough,'close enough for the bonus');assert.ok(spots.size>=6,`not a fixed path (${spots.size} spots)`);
+  h.position.x+=10;let max=0;for(let i=0;i<40;i++){tick(100,100);max=Math.max(max,Math.hypot(dog.x-h.position.x,dog.y-h.position.y));}
+  assert.ok(Math.hypot(dog.x-h.position.x,dog.y-h.position.y)<=DOGS.roam.catchUp,'it catches up when left behind');
+  // The Hunter at his lodge: the dog sits by the door most of the time and sometimes runs around.
+  s.buildings.push({id:'lodge-test',type:'hunting_lodge',x:40,y:40,constructionComplete:true});h.assignedWorkplaceId='lodge-test';
+  const home=d.lodge(dog);assert.equal(home.lodge,true);
+  h.position={x:home.x,y:home.y};let sat=0,ran=0;for(let i=0;i<600;i++){tick(100,100);if(dog.sitting)sat++;else if(dog.rounds>0)ran++;}
+  assert.ok(sat>300,`mostly sits (${sat}/600)`);assert.ok(ran>0,'now and then runs a round');
+  assert.ok(Math.hypot(dog.x-home.x,dog.y-home.y)<=DOGS.atLodge.runRadius+1,'stays by the lodge');
+});

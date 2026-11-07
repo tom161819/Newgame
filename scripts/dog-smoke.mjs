@@ -15,7 +15,7 @@ export async function dogSmoke(context,url,instrument){
     const point=await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,g=s.domestic.dogs.get(id),cam=s.cameras.main,r=s.game.canvas.getBoundingClientRect();s.domesticViews.update(16);
       return {x:r.left+(g.view.x-cam.worldView.x)*cam.zoom*(r.width/s.game.canvas.width),y:r.top+(g.view.y-8-cam.worldView.y)*cam.zoom*(r.height/s.game.canvas.height)};},setup.dog);
     await page.mouse.click(point.x,point.y);await page.locator('#cat-dialog[open]').waitFor({timeout:5000});
-    assert.match(await page.locator('#cat-details').textContent(),/stray dog/i);assert.match(await page.locator(`[data-dog-hunter="${setup.hunter}"]`).textContent(),/28 %/);
+    assert.match(await page.locator('#cat-details').textContent(),/stray dog/i);await page.waitForFunction(id=>/28 %/.test(document.querySelector(`[data-dog-hunter="${id}"]`)?.textContent??''),setup.hunter,{timeout:5000});
     if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/stray-dog.png`});
     await page.locator(`[data-dog-hunter="${setup.hunter}"]`).click();
     await page.waitForFunction(id=>window.__game.registry.get('application').scene.domestic.dogs.get(id)?.state==='owned',setup.dog,{timeout:60000});

@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.27.1] - 2026-11-07
+<!-- version: {"title":"Dogs roam around their Hunter","type":"feature","reconstructed":false,"saveVersion":53} -->
+### Improved
+- Hunting dogs now roam around their Hunter in an irregular little circle, stopping now and then to sniff, instead of trotting behind him on a fixed line. When the Hunter is at his lodge, the dog sits by the door and every so often runs a few quick rounds before sitting down again.
+
 ## [0.27.0] - 2026-11-07
 <!-- version: {"title":"Hunting dogs","type":"feature","reconstructed":false,"saveVersion":53} -->
 ### Added
