@@ -55,7 +55,7 @@ try {
   const waitingCount = Number((await page.locator('#library-review [data-review="pending"] .count').textContent()).trim());
   const waiting = await page.locator('.library-item .name').allTextContents();
   assert.equal(waiting.length, waitingCount, 'the button counts what is listed');
-  for (const name of ['Ruined tower', 'Broken wall', 'Burnt building', 'Scattered bricks and stones']) assert.ok(waiting.includes(name), `${name} waits for approval`);
+  for (const name of ['Ruined tower', 'Broken wall', 'Wheelwright Workshop']) assert.ok(waiting.includes(name), `${name} waits for approval`);
   assert.equal(await page.locator('.library-item .pill.game').count(), 0, 'no In game sprite');
   assert.equal(await page.locator('.library-item .pill.approved').count(), 0, 'no fully approved design');
   await page.locator('.library-item', { hasText: 'Ruined tower' }).click();
