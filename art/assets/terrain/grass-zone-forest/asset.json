@@ -1,0 +1,184 @@
+{
+  "schema": 1,
+  "id": "grass-zone-forest",
+  "name": "Grass zone: Forest floor",
+  "category": "terrain",
+  "description": "World v2 grass zone (plan g-svet-textury): Forest floor (moss, leaves). 4 interchangeable 64×32 tiles per season, seamless with each other; the game blends up to three zones per tile with noise masks.",
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "generator": "ground",
+  "variants": [
+    {
+      "id": "grass-zone-forest-summer",
+      "name": "Summer",
+      "version": 1,
+      "spec": {
+        "mode": "grass",
+        "base": "#4d5f30",
+        "shades": [
+          "#3a4a26",
+          "#465a2c",
+          "moss",
+          "#5c6a36"
+        ],
+        "patchiness": 0.7,
+        "blades": {
+          "density": 30,
+          "height": [
+            2,
+            5
+          ],
+          "colours": [
+            "#4a6a2a",
+            "moss",
+            "#5a7a34"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 0,
+          "colours": []
+        },
+        "tiles": 4,
+        "seed": 37,
+        "leaves": {
+          "density": 10,
+          "colours": [
+            "leaf_autumn_dark",
+            "#6b5a34",
+            "twigs"
+          ]
+        }
+      }
+    },
+    {
+      "id": "grass-zone-forest-spring",
+      "name": "Spring",
+      "version": 1,
+      "spec": {
+        "mode": "grass",
+        "base": "#4d5f30",
+        "shades": [
+          "#3a4a26",
+          "#465a2c",
+          "moss",
+          "#5c6a36"
+        ],
+        "patchiness": 0.7,
+        "blades": {
+          "density": 30,
+          "height": [
+            2,
+            5
+          ],
+          "colours": [
+            "#4a6a2a",
+            "moss",
+            "#5a7a34",
+            "leaf_spring"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 2,
+          "colours": [
+            "blossom",
+            "leaf_spring"
+          ]
+        },
+        "tiles": 4,
+        "seed": 37,
+        "leaves": {
+          "density": 10,
+          "colours": [
+            "leaf_autumn_dark",
+            "#6b5a34",
+            "twigs"
+          ]
+        }
+      }
+    },
+    {
+      "id": "grass-zone-forest-autumn",
+      "name": "Autumn",
+      "version": 1,
+      "spec": {
+        "mode": "grass",
+        "base": "grass_autumn",
+        "shades": [
+          "#6f7438",
+          "#80833f",
+          "grass_autumn",
+          "grass_dry"
+        ],
+        "patchiness": 0.7,
+        "blades": {
+          "density": 30,
+          "height": [
+            2,
+            5
+          ],
+          "colours": [
+            "#7a7c3c",
+            "#968f4e",
+            "#5f6a32"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 0,
+          "colours": []
+        },
+        "tiles": 4,
+        "seed": 37,
+        "leaves": {
+          "density": 18,
+          "colours": [
+            "leaf_autumn",
+            "leaf_autumn_light",
+            "leaf_autumn_dark"
+          ]
+        }
+      }
+    },
+    {
+      "id": "grass-zone-forest-winter",
+      "name": "Winter (snow)",
+      "version": 1,
+      "spec": {
+        "mode": "grass",
+        "base": "grass_frost",
+        "shades": [
+          "#6c7a5e",
+          "#7c8a6a",
+          "grass_frost",
+          "#9aa48a"
+        ],
+        "patchiness": 0.7,
+        "blades": {
+          "density": 18,
+          "height": [
+            2,
+            5
+          ],
+          "colours": [
+            "#738064",
+            "#8e9a7e"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 0,
+          "colours": []
+        },
+        "tiles": 4,
+        "seed": 37,
+        "snow": {
+          "coverage": 0.85
+        }
+      }
+    }
+  ]
+}

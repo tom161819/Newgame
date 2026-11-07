@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "id": "reeds",
+  "name": "Reeds",
+  "category": "decorations",
+  "description": "World v2 (plan g-svet-textury): reeds in the shallows of grassy banks, a decoration that never blocks. Three clumps and their dry winter look.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "workshop",
+  "variants": [
+    {
+      "id": "reeds-clump",
+      "name": "Reed clump",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "reeds",
+            "seed": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "reeds-tall",
+      "name": "Tall reeds with cattails",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "reeds",
+            "seed": 5,
+            "count": 18,
+            "height": 0.7,
+            "heads": 0.6
+          }
+        ]
+      }
+    },
+    {
+      "id": "reeds-sparse",
+      "name": "Sparse reeds",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "reeds",
+            "seed": 7,
+            "count": 8,
+            "height": 0.45,
+            "spread": 0.24
+          }
+        ]
+      }
+    },
+    {
+      "id": "reeds-clump-winter",
+      "name": "Reed clump, winter (dry)",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "reeds",
+            "seed": 3,
+            "season": "winter"
+          }
+        ]
+      }
+    },
+    {
+      "id": "reeds-tall-winter",
+      "name": "Tall reeds, winter (dry)",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "reeds",
+            "seed": 5,
+            "count": 18,
+            "height": 0.7,
+            "heads": 0.6,
+            "season": "winter"
+          }
+        ]
+      }
+    }
+  ]
+}

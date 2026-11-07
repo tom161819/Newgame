@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "reeds",
+  "variantId": "reeds-sparse",
+  "name": "Sparse reeds",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "b81b38e7",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 37,
+  "anchor": {
+    "x": 33,
+    "y": 19
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.51351
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 35
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.94595
+  },
+  "visualHeight": 35,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.511,
+  "lights": []
+}

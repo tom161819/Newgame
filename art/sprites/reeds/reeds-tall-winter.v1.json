@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "reeds",
+  "variantId": "reeds-tall-winter",
+  "name": "Tall reeds, winter (dry)",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "bef31af6",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 54,
+  "anchor": {
+    "x": 33,
+    "y": 36
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.66667
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 52
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.96296
+  },
+  "visualHeight": 52,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.776,
+  "lights": []
+}

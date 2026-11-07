@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "id": "shore-ground",
+  "name": "Ford and shores",
+  "category": "terrain",
+  "description": "World v2 ground (plan g-svet-textury): the FORD shallow with pebbles and ripples, MUD bank, SHORE_ROCKS bank and the foamy water edge. 4 interchangeable 64×32 tiles each.",
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "generator": "ground",
+  "variants": [
+    {
+      "id": "shore-ground-ford",
+      "name": "Ford: shallow with pebbles",
+      "version": 1,
+      "notes": "Passable at ×0.6; pebbles and ripples over shallow water.",
+      "spec": {
+        "mode": "grass",
+        "base": "water_light",
+        "shades": [
+          "#5f97a6",
+          "water_light",
+          "#86b8c2",
+          "#9cc6c8"
+        ],
+        "patchiness": 0.6,
+        "blades": {
+          "density": 0,
+          "height": [
+            1,
+            2
+          ],
+          "colours": [
+            "water"
+          ],
+          "tufts": 1
+        },
+        "flowers": {
+          "density": 7,
+          "colours": [
+            "stone_light",
+            "stone",
+            "foam",
+            "#a8cdd2",
+            "rock"
+          ]
+        },
+        "tiles": 4,
+        "seed": 51
+      }
+    },
+    {
+      "id": "shore-ground-mud",
+      "name": "Mud bank",
+      "version": 1,
+      "notes": "Dark wet earth with puddle glints and a few sedge blades.",
+      "spec": {
+        "mode": "grass",
+        "base": "soil_dark",
+        "shades": [
+          "#3e2e22",
+          "soil_dark",
+          "soil",
+          "#6a5038"
+        ],
+        "patchiness": 0.7,
+        "blades": {
+          "density": 10,
+          "height": [
+            2,
+            5
+          ],
+          "colours": [
+            "olive_scrub",
+            "grass_scrub",
+            "#5e6a34"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 2.5,
+          "colours": [
+            "water_light",
+            "#4a3a2c",
+            "soil"
+          ]
+        },
+        "tiles": 4,
+        "seed": 53
+      }
+    },
+    {
+      "id": "shore-ground-rocks",
+      "name": "Stony bank",
+      "version": 1,
+      "notes": "Pebbles and cobbles between thin grass.",
+      "spec": {
+        "mode": "grass",
+        "base": "#8a8476",
+        "shades": [
+          "#6e695e",
+          "stone_dark",
+          "#8a8476",
+          "stone_light"
+        ],
+        "patchiness": 0.6,
+        "blades": {
+          "density": 12,
+          "height": [
+            2,
+            4
+          ],
+          "colours": [
+            "grass_scrub",
+            "#5e7a3a"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 9,
+          "colours": [
+            "stone_light",
+            "stone",
+            "rock",
+            "stone_dark",
+            "rock"
+          ]
+        },
+        "tiles": 4,
+        "seed": 55
+      }
+    },
+    {
+      "id": "shore-ground-water-edge",
+      "name": "Water edge with foam",
+      "version": 1,
+      "notes": "Shallow water with a broken line of foam, for the shore transition.",
+      "spec": {
+        "mode": "grass",
+        "base": "water_light",
+        "shades": [
+          "water",
+          "water_light",
+          "#86b8c2",
+          "water_light"
+        ],
+        "patchiness": 0.5,
+        "blades": {
+          "density": 0,
+          "height": [
+            1,
+            2
+          ],
+          "colours": [
+            "water"
+          ],
+          "tufts": 1
+        },
+        "flowers": {
+          "density": 8,
+          "colours": [
+            "foam",
+            "foam",
+            "#d8ecee"
+          ]
+        },
+        "tiles": 4,
+        "seed": 57
+      }
+    }
+  ]
+}

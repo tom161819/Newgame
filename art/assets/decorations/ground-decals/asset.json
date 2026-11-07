@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "id": "ground-decals",
+  "name": "Ground decals",
+  "category": "decorations",
+  "description": "World v2 (plan g-svet-textury): small details over the grass texture, placed per tile by zone (hash); hidden under buildings, paving and worn paths. No effect on play.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "workshop",
+  "variants": [
+    {
+      "id": "ground-decals-tufts",
+      "name": "Grass tufts",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "decals",
+            "kind": "tufts",
+            "seed": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "ground-decals-tufts-dry",
+      "name": "Dry grass tufts",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "decals",
+            "kind": "tufts",
+            "seed": 2,
+            "colours": [
+              "grass_scrub",
+              "olive_scrub",
+              "twigs"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ground-decals-flowers",
+      "name": "Flowers (mixed)",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "decals",
+            "kind": "flowers",
+            "seed": 3,
+            "count": 12
+          }
+        ]
+      }
+    },
+    {
+      "id": "ground-decals-flowers-yellow",
+      "name": "Yellow flowers",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "decals",
+            "kind": "flowers",
+            "seed": 4,
+            "count": 10,
+            "colours": [
+              "gold_trim"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ground-decals-flowers-white",
+      "name": "White and violet flowers",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "decals",
+            "kind": "flowers",
+            "seed": 5,
+            "count": 10,
+            "colours": [
+              "cloth_linen",
+              "banner_blue"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ground-decals-pebbles",
+      "name": "Pebbles",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "decals",
+            "kind": "pebbles",
+            "seed": 6,
+            "count": 12
+          }
+        ]
+      }
+    },
+    {
+      "id": "ground-decals-leaves",
+      "name": "Fallen leaves (autumn)",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "decals",
+            "kind": "leaves",
+            "seed": 7,
+            "count": 16
+          }
+        ]
+      }
+    }
+  ]
+}
