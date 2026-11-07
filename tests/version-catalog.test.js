@@ -54,8 +54,10 @@ test('release preparation preserves all historical entries, advances only the of
 test('static archive escapes authored text, preserves every canonical URL and links to actual release changes',()=>{
   const catalog=assemble();catalog.versions[0].title='<img src=x onerror=alert(1)>';const html=catalogHTML(catalog);
   assert.ok(html.includes('&lt;img'));assert.ok(!html.includes('<img'));assert.ok(html.includes('?changelog=0.1.0%2Barchive.1'));assert.ok(html.includes(`href="${record.basePath}"`));
-  assert.ok(html.includes('Reconstructed archive labels'));assert.ok(html.includes('original v0.01.00'),'#174: two-digit MINOR/PATCH for players');
-  assert.ok(html.includes('Archive build 1 — Original source'));assert.ok(html.includes('data-build-number="1"'));assert.ok(html.includes(`title="0.1.0+git.${a}"`));assert.ok(html.includes('not a release version'));
+  assert.ok(html.includes('Reconstructed archive labels'));
+  // m-verzovani-archivu: snapshots show their time-ordered number (#174 two-digit places); the old label is the tooltip.
+  const build=catalog.builds[0];assert.ok(build.number,'every snapshot has a number');
+  assert.ok(html.includes(`data-archive-number="${build.number}"`));assert.ok(html.includes(`title="Archive build 1 · v0.01.00 · ${a.slice(0,7)}"`));assert.ok(html.includes('data-build-number="1"'));assert.ok(html.includes('not a release'));
 });
 test('git-archive builds use exact exported provenance and original metadata without nested archives',async()=>{
   const root=await mkdtemp(path.join(tmpdir(),'newgame-catalog-'));

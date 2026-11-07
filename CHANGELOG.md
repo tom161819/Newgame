@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.22.1] - 2026-11-07
+<!-- version: {"title":"Archive numbers in time order","type":"feature","reconstructed":false,"saveVersion":49} -->
+### Changed
+- Version Archive: every development snapshot now has its own number, in time order after the release before it (for example v0.01.01, v0.01.02… after v0.01.00; snapshots before v0.01.00 are v0.00.01…). Hover a heading to see its former label. Links to archived versions are unchanged.
+
 ## [0.22.0] - 2026-11-07
 <!-- version: {"title":"Run in Background","type":"feature","reconstructed":false,"saveVersion":49} -->
 ### Added

@@ -14,7 +14,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.4.0"
+    "originalVersion": "0.4.0",
+    "number": "0.4.0",
+    "legacyLabel": "Archive build 192 · v0.04.00 · 375f1aa"
   },
   {
     "schema": 1,
@@ -31,7 +33,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.3.0"
+    "originalVersion": "0.3.0",
+    "number": "0.3.0",
+    "legacyLabel": "Archive build 109 · v0.03.00 · 02a3a43"
   },
   {
     "schema": 1,
@@ -48,7 +52,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.3.0"
+    "originalVersion": "0.3.0",
+    "number": "0.2.1",
+    "legacyLabel": "Archive build 102 · v0.03.00 · f053be1"
   },
   {
     "schema": 1,
@@ -65,7 +71,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.2.0"
+    "originalVersion": "0.2.0",
+    "number": "0.2.0",
+    "legacyLabel": "Archive build 86 · v0.02.00 · fa56c96"
   },
   {
     "schema": 1,
@@ -82,7 +90,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.24",
+    "legacyLabel": "Archive build 77 · v0.01.00 · 0024c16"
   },
   {
     "schema": 1,
@@ -99,7 +109,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.23",
+    "legacyLabel": "Archive build 71 · v0.01.00 · a4f51ec"
   },
   {
     "schema": 1,
@@ -116,7 +128,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.22",
+    "legacyLabel": "Archive build 70 · v0.01.00 · 8b79627"
   },
   {
     "schema": 1,
@@ -133,7 +147,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.21",
+    "legacyLabel": "Archive build 69 · v0.01.00 · 1d9dd46"
   },
   {
     "schema": 1,
@@ -150,7 +166,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.20",
+    "legacyLabel": "Archive build 67 · v0.01.00 · 5074450"
   },
   {
     "schema": 1,
@@ -167,7 +185,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.19",
+    "legacyLabel": "Archive build 65 · v0.01.00 · fcdb80f"
   },
   {
     "schema": 1,
@@ -184,7 +204,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.18",
+    "legacyLabel": "Archive build 64 · v0.01.00 · 8ba14e1"
   },
   {
     "schema": 1,
@@ -201,7 +223,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.17",
+    "legacyLabel": "Archive build 63 · v0.01.00 · e721a68"
   },
   {
     "schema": 1,
@@ -218,7 +242,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.16",
+    "legacyLabel": "Archive build 62 · v0.01.00 · 9e93982"
   },
   {
     "schema": 1,
@@ -235,7 +261,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.15",
+    "legacyLabel": "Archive build 61 · v0.01.00 · a454fe9"
   },
   {
     "schema": 1,
@@ -252,7 +280,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.14",
+    "legacyLabel": "Archive build 60 · v0.01.00 · f4e621b"
   },
   {
     "schema": 1,
@@ -269,7 +299,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.13",
+    "legacyLabel": "Archive build 59 · v0.01.00 · fb5aaf2"
   },
   {
     "schema": 1,
@@ -286,7 +318,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.12",
+    "legacyLabel": "Archive build 58 · v0.01.00 · e864b0b"
   },
   {
     "schema": 1,
@@ -303,7 +337,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.11",
+    "legacyLabel": "Archive build 57 · v0.01.00 · e2fe98c"
   },
   {
     "schema": 1,
@@ -320,7 +356,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.10",
+    "legacyLabel": "Archive build 56 · v0.01.00 · 74628eb"
   },
   {
     "schema": 1,
@@ -337,7 +375,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.9",
+    "legacyLabel": "Archive build 55 · v0.01.00 · ddc9168"
   },
   {
     "schema": 1,
@@ -354,7 +394,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.8",
+    "legacyLabel": "Archive build 54 · v0.01.00 · 1545aea"
   },
   {
     "schema": 1,
@@ -371,7 +413,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.7",
+    "legacyLabel": "Archive build 53 · v0.01.00 · 5e9b134"
   },
   {
     "schema": 1,
@@ -388,7 +432,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.6",
+    "legacyLabel": "Archive build 52 · v0.01.00 · 6631139"
   },
   {
     "schema": 1,
@@ -405,7 +451,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.5",
+    "legacyLabel": "Archive build 51 · v0.01.00 · 4ecbf09"
   },
   {
     "schema": 1,
@@ -422,7 +470,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.4",
+    "legacyLabel": "Archive build 50 · v0.01.00 · 339904f"
   },
   {
     "schema": 1,
@@ -439,7 +489,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.3",
+    "legacyLabel": "Archive build 49 · v0.01.00 · d859f3c"
   },
   {
     "schema": 1,
@@ -456,7 +508,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.2",
+    "legacyLabel": "Archive build 48 · v0.01.00 · 4dd41fb"
   },
   {
     "schema": 1,
@@ -473,7 +527,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.1",
+    "legacyLabel": "Archive build 47 · v0.01.00 · fbba1d9"
   },
   {
     "schema": 1,
@@ -490,7 +546,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.1.0",
+    "legacyLabel": "Archive build 46 · v0.01.00 · e8d41eb"
   },
   {
     "schema": 1,
@@ -507,7 +565,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.45",
+    "legacyLabel": "Archive build 45 · v0.01.00 · 2d72b21"
   },
   {
     "schema": 1,
@@ -524,7 +584,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.44",
+    "legacyLabel": "Archive build 44 · v0.01.00 · e0c4f54"
   },
   {
     "schema": 1,
@@ -541,7 +603,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.43",
+    "legacyLabel": "Archive build 43 · v0.01.00 · 0b2377a"
   },
   {
     "schema": 1,
@@ -558,7 +622,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.42",
+    "legacyLabel": "Archive build 42 · v0.01.00 · 6570b7e"
   },
   {
     "schema": 1,
@@ -575,7 +641,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.41",
+    "legacyLabel": "Archive build 41 · v0.01.00 · f22ded0"
   },
   {
     "schema": 1,
@@ -592,7 +660,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.40",
+    "legacyLabel": "Archive build 40 · v0.01.00 · e571ab7"
   },
   {
     "schema": 1,
@@ -609,7 +679,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.39",
+    "legacyLabel": "Archive build 39 · v0.01.00 · ed58610"
   },
   {
     "schema": 1,
@@ -626,7 +698,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.38",
+    "legacyLabel": "Archive build 38 · v0.01.00 · 09ad285"
   },
   {
     "schema": 1,
@@ -643,7 +717,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.37",
+    "legacyLabel": "Archive build 37 · v0.01.00 · e4f092f"
   },
   {
     "schema": 1,
@@ -660,7 +736,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.36",
+    "legacyLabel": "Archive build 36 · v0.01.00 · e104791"
   },
   {
     "schema": 1,
@@ -677,7 +755,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.35",
+    "legacyLabel": "Archive build 35 · v0.01.00 · 43766dc"
   },
   {
     "schema": 1,
@@ -694,7 +774,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.34",
+    "legacyLabel": "Archive build 34 · v0.01.00 · b09d568"
   },
   {
     "schema": 1,
@@ -711,7 +793,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.33",
+    "legacyLabel": "Archive build 33 · v0.01.00 · 5636967"
   },
   {
     "schema": 1,
@@ -728,7 +812,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.32",
+    "legacyLabel": "Archive build 32 · v0.01.00 · 0af9b89"
   },
   {
     "schema": 1,
@@ -745,7 +831,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.31",
+    "legacyLabel": "Archive build 31 · v0.01.00 · dbdaeb9"
   },
   {
     "schema": 1,
@@ -762,7 +850,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.30",
+    "legacyLabel": "Archive build 30 · v0.01.00 · 1244147"
   },
   {
     "schema": 1,
@@ -779,7 +869,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.29",
+    "legacyLabel": "Archive build 29 · v0.01.00 · eb69116"
   },
   {
     "schema": 1,
@@ -796,7 +888,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.28",
+    "legacyLabel": "Archive build 28 · v0.01.00 · fc979b1"
   },
   {
     "schema": 1,
@@ -813,7 +907,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.27",
+    "legacyLabel": "Archive build 27 · v0.01.00 · 1899d3a"
   },
   {
     "schema": 1,
@@ -830,7 +926,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.26",
+    "legacyLabel": "Archive build 26 · v0.01.00 · c8a87c7"
   },
   {
     "schema": 1,
@@ -847,7 +945,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.25",
+    "legacyLabel": "Archive build 25 · v0.01.00 · b8daafb"
   },
   {
     "schema": 1,
@@ -864,7 +964,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.24",
+    "legacyLabel": "Archive build 24 · v0.01.00 · 29a9cec"
   },
   {
     "schema": 1,
@@ -881,7 +983,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.23",
+    "legacyLabel": "Archive build 23 · v0.01.00 · af5077a"
   },
   {
     "schema": 1,
@@ -898,7 +1002,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.22",
+    "legacyLabel": "Archive build 22 · v0.01.00 · 574ef6b"
   },
   {
     "schema": 1,
@@ -915,7 +1021,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.21",
+    "legacyLabel": "Archive build 21 · v0.01.00 · 72bdb41"
   },
   {
     "schema": 1,
@@ -932,7 +1040,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.20",
+    "legacyLabel": "Archive build 20 · v0.01.00 · cd77265"
   },
   {
     "schema": 1,
@@ -949,7 +1059,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.19",
+    "legacyLabel": "Archive build 19 · v0.01.00 · f379c51"
   },
   {
     "schema": 1,
@@ -966,7 +1078,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.18",
+    "legacyLabel": "Archive build 18 · v0.01.00 · a6c29fa"
   },
   {
     "schema": 1,
@@ -983,7 +1097,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.17",
+    "legacyLabel": "Archive build 17 · v0.01.00 · c967ce8"
   },
   {
     "schema": 1,
@@ -1000,7 +1116,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.16",
+    "legacyLabel": "Archive build 16 · v0.01.00 · 6d189b0"
   },
   {
     "schema": 1,
@@ -1017,7 +1135,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.15",
+    "legacyLabel": "Archive build 15 · v0.01.00 · b0018a3"
   },
   {
     "schema": 1,
@@ -1034,7 +1154,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.14",
+    "legacyLabel": "Archive build 14 · v0.01.00 · c361499"
   },
   {
     "schema": 1,
@@ -1051,7 +1173,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.13",
+    "legacyLabel": "Archive build 13 · v0.01.00 · 9c81483"
   },
   {
     "schema": 1,
@@ -1068,7 +1192,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.12",
+    "legacyLabel": "Archive build 12 · v0.01.00 · 81ab03e"
   },
   {
     "schema": 1,
@@ -1085,7 +1211,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.11",
+    "legacyLabel": "Archive build 11 · v0.01.00 · e1f70f7"
   },
   {
     "schema": 1,
@@ -1102,7 +1230,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.10",
+    "legacyLabel": "Archive build 10 · v0.01.00 · 3d1c2f2"
   },
   {
     "schema": 1,
@@ -1119,7 +1249,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.9",
+    "legacyLabel": "Archive build 9 · v0.01.00 · 6ae12dc"
   },
   {
     "schema": 1,
@@ -1136,7 +1268,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.8",
+    "legacyLabel": "Archive build 8 · v0.01.00 · 4d3d63f"
   },
   {
     "schema": 1,
@@ -1153,7 +1287,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.7",
+    "legacyLabel": "Archive build 7 · v0.01.00 · 2e0974c"
   },
   {
     "schema": 1,
@@ -1170,7 +1306,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.6",
+    "legacyLabel": "Archive build 6 · v0.01.00 · 6714fc5"
   },
   {
     "schema": 1,
@@ -1187,7 +1325,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.5",
+    "legacyLabel": "Archive build 5 · v0.01.00 · bf049d5"
   },
   {
     "schema": 1,
@@ -1204,7 +1344,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.4",
+    "legacyLabel": "Archive build 4 · v0.01.00 · 162efeb"
   },
   {
     "schema": 1,
@@ -1221,7 +1363,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.3",
+    "legacyLabel": "Archive build 3 · v0.01.00 · f94d77a"
   },
   {
     "schema": 1,
@@ -1238,7 +1382,9 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.2",
+    "legacyLabel": "Archive build 2 · v0.01.00 · 1c078de"
   },
   {
     "schema": 1,
@@ -1255,6 +1401,8 @@
       "build": true,
       "browser": true
     },
-    "originalVersion": "0.1.0"
+    "originalVersion": "0.1.0",
+    "number": "0.0.1",
+    "legacyLabel": "Archive build 1 · v0.01.00 · 7291dc3"
   }
 ]
