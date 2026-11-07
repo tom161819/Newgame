@@ -1,5 +1,9 @@
 import Phaser from 'phaser';
 import { directionName,DIRECTION_POSES } from './directions.js';
+import { animalLook,ensureAnimalLook,applyAnimalArt } from './animalArt.js';
+
+// Species drawn with an approved Studio look once it loads (m-zvirata-nahodny-vzhled); the others keep the drawing.
+const ART_SPECIES=new Set(['wolf']);
 
 export class AnimalView extends Phaser.GameObjects.Container {
   constructor(scene,x,y,definition){
@@ -9,6 +13,7 @@ export class AnimalView extends Phaser.GameObjects.Container {
   }
   animate(delta,moving,direction){
     this.phase+=delta*0.012;this.facing=directionName(direction)??this.facing;this.isWalking=moving;
+    if(this.drawArt(delta,moving))return;
     const pose=DIRECTION_POSES[this.facing],g=this.figure.clear(),v=this.definition.visual;
     const sx=pose.screenX,sy=pose.screenY,scale=v.bodyScale??1,stride=moving?Math.sin(this.phase)*3:0;
     g.fillStyle(0x26271b,0.3);g.fillEllipse(0,2,32*scale,13*scale);
@@ -33,6 +38,17 @@ export class AnimalView extends Phaser.GameObjects.Container {
       g.fillStyle(0x7c392b);g.fillEllipse(0,-22,16,7);
     }
     g.fillStyle(0x181e19);g.fillCircle(hx+sx*3-2,hy-2,1.4);g.fillCircle(hx+sx*3+2,hy-2,1.4);
+  }
+  // A wolf gets one of the approved wolf looks by its id (stable after Load); attacking shows the attack pose of that
+  // look when it has one, a look without it keeps walking frames.
+  drawArt(delta,moving){
+    const animal=this.getData?.('animal');if(!ART_SPECIES.has(this.definition.id)||!animal)return false;
+    const look=animalLook(this.definition.id,animal.id);if(!look)return false;
+    if(!this.art){this.art=this.scene.add.image(0,0,'__DEFAULT').setVisible(false);this.add(this.art);this.walked=0;}
+    if(this.look!==look){this.look=look;ensureAnimalLook(this.scene,look);}
+    if(moving)this.walked+=delta;
+    const on=applyAnimalArt(this.scene,this.art,look,{facing:this.facing,moving,walkedMs:this.walked,pose:animal.attackTarget?'attack':null});
+    this.figure.setVisible(!on);if(on)this.figure.clear();return on;
   }
   containsPoint(worldX,worldY){
     const x=worldX-this.x,y=worldY-this.y,scale=this.definition.visual.bodyScale??1,pose=DIRECTION_POSES[this.facing];

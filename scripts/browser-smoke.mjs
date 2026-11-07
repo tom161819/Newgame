@@ -12,6 +12,7 @@ import { populationJobMenuSmoke } from './population-job-menu-smoke.mjs';
 import { e1Smoke } from './e1-smoke.mjs';
 import { e2Smoke,quickStartSmoke } from './e2-smoke.mjs';
 import { e4Smoke } from './e4-smoke.mjs';
+import { animalLooksSmoke } from './animal-looks-smoke.mjs';
 import { tutorialSmoke } from './tutorial-smoke.mjs';
 import { workplaceOutputSmoke } from './workplace-output-smoke.mjs';
 import { granaryCapacitySmoke } from './granary-capacity-smoke.mjs';
@@ -186,6 +187,7 @@ try{
   await step('getting-started',()=>gettingStartedSmoke(context,origin+base,instrument));
   await step('building-costs',()=>buildingCostsSmoke(context,origin+base,instrument));
   await step('e2',()=>quickStartSmoke(context,origin+base,instrument));
+  await step('animal-looks',()=>animalLooksSmoke(context,origin+base,instrument));
   await step('tutorial',()=>tutorialSmoke(context,origin+base,instrument));
   await step('marketplace',()=>marketplaceSmoke(context,origin+base,instrument));
   await step('gate',()=>gateSmoke(context,origin+base,instrument));

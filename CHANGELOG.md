@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.50.0] - 2026-11-07
+<!-- version: {"title":"Animals in their approved looks","type":"feature","reconstructed":false,"saveVersion":57} -->
+### Added
+- Cats, kittens, dogs, rats and wolves use the approved looks from the Asset Studio. Each animal gets one of the approved looks at random and keeps it after loading. Dogs sit and limp when wounded, wolves bare their teeth when they attack.
+
+
 ## [0.49.0] - 2026-11-07
 <!-- version: {"title":"Easier start, tutorial and royal tasks","type":"feature","reconstructed":false,"saveVersion":57} -->
 ### Added
