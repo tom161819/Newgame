@@ -251,6 +251,150 @@
         "renderHash": "bb516f72",
         "samples": 96
       }
+    },
+    {
+      "id": "horse-chestnut-sculpt",
+      "name": "Chestnut horse – A · Sculpted (approved style)",
+      "version": 1,
+      "notes": "The approved realistic horse (Blender, sculpted look) in this coat.",
+      "spec": {
+        "species": "horse",
+        "breed": "chestnut",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "61c412c3",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-black-sculpt",
+      "name": "Black horse – A · Sculpted (approved style)",
+      "version": 1,
+      "notes": "The approved realistic horse (Blender, sculpted look) in this coat.",
+      "spec": {
+        "species": "horse",
+        "breed": "black",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "a6d016a9",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-palomino-sculpt",
+      "name": "Palomino – A · Sculpted (approved style)",
+      "version": 1,
+      "notes": "The approved realistic horse (Blender, sculpted look) in this coat.",
+      "spec": {
+        "species": "horse",
+        "breed": "palomino",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "dd0f5b53",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-dun-sculpt",
+      "name": "Dun – A · Sculpted (approved style)",
+      "version": 1,
+      "notes": "The approved realistic horse (Blender, sculpted look) in this coat.",
+      "spec": {
+        "species": "horse",
+        "breed": "dun",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "842d5e5e",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-piebald-sculpt",
+      "name": "Piebald – A · Sculpted (approved style)",
+      "version": 1,
+      "notes": "The approved realistic horse (Blender, sculpted look) in this coat.",
+      "spec": {
+        "species": "horse",
+        "breed": "piebald",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "87f3e92c",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-dapple-sculpt",
+      "name": "Dapple grey – A · Sculpted (approved style)",
+      "version": 1,
+      "notes": "The approved realistic horse (Blender, sculpted look) in this coat.",
+      "spec": {
+        "species": "horse",
+        "breed": "dapple",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "c3110f5e",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-draught-sculpt",
+      "name": "Draught horse – A · Sculpted (approved style)",
+      "version": 1,
+      "notes": "The approved realistic horse (Blender, sculpted look) in this coat.",
+      "spec": {
+        "species": "horse",
+        "breed": "draught",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "5ebc09b0",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-pony-sculpt",
+      "name": "Pony – A · Sculpted (approved style)",
+      "version": 1,
+      "notes": "The approved realistic horse (Blender, sculpted look) in this coat.",
+      "spec": {
+        "species": "horse",
+        "breed": "pony",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "06a2398b",
+        "samples": 96
+      }
     }
   ]
 }
