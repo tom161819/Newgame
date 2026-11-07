@@ -20,7 +20,8 @@ function four(s,home,planned=false){return [[49,40],[49,44],[53,40],[53,44]].map
 test('four mixed plots occupy one farm; deterministic nearest free farm includes unfinished and provisional claims',()=>{
   const a=data(1,'farmhouse',45,40),b=data(2,'farmhouse',57,40),plots=[data(3,'wheat_field',48,40,1),data(4,'orchard',48,44,1),data(5,'wheat_field',52,44,1),{...data(6,'orchard',52,40,1),unverified:true,construction:{state:'planned'}}],buildings=[a,b,...plots],next=data(7,'wheat_field',49,48);
   assert.equal(availableFarm(next,buildings,definitionOf).id,2);buildings.push(next);reconcileFarmPlots(buildings,definitionOf);assert.equal(next.farmId,2);assert.equal(farmPlots(a,buildings,definitionOf).length,4);
-  const tied=data(8,'orchard',50,40);assert.equal(availableFarm(tied,[{...b,x:56},a],definitionOf).id,1);b.construction={state:'planned'};assert.equal(availableFarm(next,buildings,definitionOf),null);
+  const tied=data(8,'orchard',50,40);assert.equal(availableFarm(tied,[{...b,x:56},a],definitionOf).id,1);b.construction={state:'planned'};assert.equal(availableFarm(next,buildings,definitionOf).id,2,'a planned Farmhouse also takes plots');
+  const c=data(9,'farmhouse',66,52),late=data(10,'wheat_field',60,44);assert.equal(availableFarm(late,buildings,definitionOf).id,2);assert.equal(availableFarm(late,[...buildings,c],definitionOf).id,9,'a finished Farmhouse with room beats a nearer planned one');
 });
 
 test('fifth physical plot remains orphan, then connects when another completed farm adds room without stealing old plots',()=>{

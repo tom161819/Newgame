@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.47.1] - 2026-11-07
+<!-- version: {"title":"Fields of planned Farmhouses","type":"feature","reconstructed":false,"saveVersion":57} -->
+### Changed
+- Fields drawn next to a planned Farmhouse (a blueprint or one still being built) are connected to it right away and no longer report "no Farmhouse has room". They wait for the Farmhouse and its Farmer; the field's panel says so.
+- Fields that no Farmhouse has room for give one summary notice with their count instead of one notice per field. Clicking it shows the first field.
+- Advice to build a missing producer (for example a Mill for a Bakery, or a field for a Farmhouse chain) is no longer given once that building is planned.
+
 ## [0.47.0] - 2026-11-07
 <!-- version: {"title":"Kingdom overview in the top bar","type":"feature","reconstructed":false,"saveVersion":57} -->
 ### Added

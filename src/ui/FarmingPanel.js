@@ -1,6 +1,7 @@
 import { localized } from '../i18n/names.js';
 import { t } from '../i18n/index.js';
 import { buildingDefinition } from '../game/buildings.js';
+import { farmReady } from '../data/farmPlots.js';
 
 export class FarmingPanel {
   constructor(scene){
@@ -15,7 +16,7 @@ export class FarmingPanel {
     if(!this.dialog.open||!this.building)return;
     const scene=this.scene,building=this.building;if(!scene.buildings.includes(building)||!scene.fog.isVisibleObject(building)){this.close();return;}
     const record=scene.farmingSystem.sync(building),spec=buildingDefinition(building).crop,worker=scene.workerSystem.workers.get(record.reservedBy);
-    const farm=scene.buildings.find(b=>b.id===building.farmId);this.ownership.textContent=farm?t('farmPlots.owner',{name:buildingDefinition(farm).name,id:farm.id}):t('farmPlots.orphan');
+    const farm=scene.buildings.find(b=>b.id===building.farmId);this.ownership.textContent=farm?t(farmReady(farm)?'farmPlots.owner':'farmPlots.waitingFarm',{name:buildingDefinition(farm).name,id:farm.id}):t('farmPlots.orphan');
     document.querySelector('#farming-title').textContent=buildingDefinition(building).name;
     document.querySelector('#farming-stage').textContent=t('farming.stage',{stage:record.stage,name:localized(`crop.${building.type}.stage.${record.stage}`,spec.stages[record.stage])});
     document.querySelector('#farming-growth').value=record.growthDays/spec.growthDays*100;

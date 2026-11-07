@@ -21,6 +21,8 @@ export default {
   'construction.refundNone':'This plot costs no materials; cancellation returns none.',
   'notice.noFarmer':'{name}: the plot is waiting for a Farmer from its Farmhouse.',
   'notice.noFarm':'{name}: no Farmhouse has room for this plot. Build another Farmhouse.',
+  'notice.noFarmMany':'{count} fields have no Farmhouse with room. Build another Farmhouse.',
+  'farmPlots.waitingFarm':'Connected to {name} #{id} – waiting for the Farmhouse to be built.',
   'work.establishing':'Establishing {name}',
 
   'farmPlots.count':'Plots {count} / {capacity}',

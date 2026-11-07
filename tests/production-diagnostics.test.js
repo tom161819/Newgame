@@ -71,7 +71,7 @@ test('completion advice is immediate despite stock and no staff, deduplicated ac
 });
 test('Bakery requires a completed Mill; existing predecessors and reloaded buildings do not replay completion advice',()=>{
  const s=scene(),bakery=building(s,'bakery',54,45);s.activities.emit('buildingCompleted',{objectIds:[bakery.id]});assert.deepEqual(s.diagnostics.active()[0].params,{producer:'mill'});
- const mill=building(s,'mill',60,45,{blueprint:true});advance(s,DIAGNOSTICS.checkInterval);assert.equal(reasons(s).length,1);
+ const mill=building(s,'mill',60,45,{blueprint:true});advance(s,DIAGNOSTICS.checkInterval);assert.deepEqual(reasons(s),[],'a planned Mill is enough – no advice to build one');
  mill.construction.state='complete';s.constructionSystem.sites.delete(mill.id);s.activities.emit('buildingCompleted',{objectIds:[mill.id]});assert.equal(s.diagnostics.active().some(i=>i.params.producer==='mill'),false);
  const next=building(s,'bakery',54,52);s.activities.emit('buildingCompleted',{objectIds:[next.id]});assert.equal(s.log.filter(i=>i.params.producer==='mill').length,1);
  s.diagnostics.destroy();s.diagnostics=new ProductionDiagnostics(s);advance(s,DIAGNOSTICS.reminder*2);assert.deepEqual(reasons(s),[],'loading existing complete buildings emits no completion event');

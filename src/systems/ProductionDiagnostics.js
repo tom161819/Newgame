@@ -2,6 +2,7 @@ import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { DIAGNOSTICS,INPUT_SOURCES,COMPLETION_SOURCES,GATHER_OUTPUTS,DEPLETION_SOURCES,STORAGE_WAIT_MESSAGES } from '../data/diagnostics.js';
 import { storageResources } from '../data/logistics.js';
 import { noticeText } from '../ui/noticeText.js';
+import { farmReady } from '../data/farmPlots.js';
 
 // Lasting problems that block work or production, each identified by (entity, reason). A problem is reported once
 // it has lasted DIAGNOSTICS.persistence, repeated at most every DIAGNOSTICS.reminder while it lasts, and dropped as
@@ -12,7 +13,7 @@ export class ProductionDiagnostics {
   completed(ids){
     for(const id of ids){
       const building=this.scene.buildings.find(b=>b.id===id),producer=building&&COMPLETION_SOURCES[building.type];
-      if(!producer||!buildingIsComplete(building)||this.hasBuilding(producer))continue;
+      if(!producer||!buildingIsComplete(building)||this.hasPlanned(producer))continue;
       // One piece of advice per missing link, even when several workers or
       // several new buildings complete the same chain.
       const key=`chain:${building.type}:${producer}`;if(this.completionNotices.has(key))continue;
@@ -23,13 +24,15 @@ export class ProductionDiagnostics {
   }
   resolveCompletionNotices(){
     let changed=false;for(const [key,issue]of this.completionNotices){
-      if(this.hasBuilding(issue.params.producer)||!this.scene.buildings.some(b=>b.id===issue.entityId&&buildingIsComplete(b))){this.completionNotices.delete(key);changed=true;}
+      if(this.hasPlanned(issue.params.producer)||!this.scene.buildings.some(b=>b.id===issue.entityId&&buildingIsComplete(b))){this.completionNotices.delete(key);changed=true;}
     }if(changed)this.changed();
   }
   onChange(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   changed(){this.revision++;for(const listener of this.listeners)listener();}
   residents(profession){return this.scene.workerSystem.liveSubjects().filter(w=>w.profession===profession&&(!w.commandState||w.commandState.state==='Working'));}
   hasBuilding(type){return this.scene.buildings.some(b=>b.type===type&&buildingIsComplete(b));}
+  // Built, under construction or only drawn as a blueprint: advice to "build X" is pointless once X is planned.
+  hasPlanned(type){return this.scene.buildings.some(b=>b.type===type&&!b.demolition);}
   // Builders who can build now: on their job (no Move/Hold order), not striking and not leaving the kingdom. Builders
   // without a Builder's Workshop place count (they only work slower – that has its own notice).
   availableBuilders(){const needs=this.scene.needs?.records;return this.residents('builder').filter(w=>{const r=needs?.get?.(w.id);return !r?.strike&&!r?.leaving;}).length;}
@@ -38,15 +41,18 @@ export class ProductionDiagnostics {
   // check (supplied sites only, C04) never fired in a new game. Fields wait for their Farmer instead.
   constructionIssues(){
     const c=this.scene.constructionSystem;if(!c)return [];
-    const found=[],builders=this.availableBuilders(),waiting=[];
+    const found=[],builders=this.availableBuilders(),waiting=[],orphans=[];
     for(const site of c.sites.values()){
       if(site.unverified||site.demolition||site.construction.assignedBuilders.length)continue;
       if(buildingDefinition(site).crop){
         if(!c.materials.ready(site))continue;
-        const home=this.scene.buildings.find(b=>b.id===site.farmId),farmers=home&&this.residents('farmer').some(w=>w.assignedWorkplaceId===home.id);
-        if(!home||!farmers)found.push({entityId:site.id,reason:home?'noFarmer':'noFarm',category:'construction',params:{}});
+        const home=this.scene.buildings.find(b=>b.id===site.farmId);
+        // A plot of a planned or unfinished Farmhouse is waiting as intended – its panel says so, Notices stay quiet.
+        if(!home)orphans.push(site);else if(farmReady(home)&&!this.residents('farmer').some(w=>w.assignedWorkplaceId===home.id))found.push({entityId:site.id,reason:'noFarmer',category:'construction',params:{}});
       }else waiting.push(site);
     }
+    // One notice for all plots no Farmhouse (built or planned) has room for, pointing at the first one.
+    if(orphans.length){const first=orphans.reduce((a,b)=>a.id<=b.id?a:b);found.push({entityId:first.id,reason:'noFarm',category:'construction',params:{count:orphans.length}});}
     if(!builders&&waiting.length){const first=waiting.reduce((a,b)=>a.id<=b.id?a:b);found.push({entityId:first.id,reason:'noBuilder',category:'construction',params:{count:waiting.length}});}
     return found;
   }
@@ -60,8 +66,8 @@ export class ProductionDiagnostics {
       const missing=need-(input.stock[resource]??0)-s.foodStorage.incoming(input.id,resource);if(missing<=0)continue;
       if(s.foodStorage.available(resource)>=missing){if(!this.residents('hauler').length)return {reason:'noHauler',params:{resource}};continue;}
       const source=INPUT_SOURCES[resource];if(!source)return {reason:'noInput',params:{resource}};
-      if(!this.hasBuilding(source.building))return {reason:'noProducer',params:{resource,producer:source.building}};
-      if(source.field&&!this.hasBuilding(source.field))return {reason:'noField',params:{resource,producer:source.field}};
+      if(!this.hasBuilding(source.building))return this.hasPlanned(source.building)?null:{reason:'noProducer',params:{resource,producer:source.building}};
+      if(source.field&&!this.hasBuilding(source.field))return this.hasPlanned(source.field)?null:{reason:'noField',params:{resource,producer:source.field}};
       if(!s.buildings.some(b=>b.type===source.building&&s.workplaceSystem.employees(b).some(w=>!w.commandState||w.commandState.state==='Working')))return {reason:'noProducerWorkers',params:{resource,profession:source.profession}};
       // Producers exist and work: the input is on its way (crops growing, a season, a long trip). Not a problem.
     }

@@ -42,3 +42,16 @@ test('Hold and losing the owning farm stop physical establishment without remote
 test('C04 names a missing owning Farmer or Farmhouse and resolves without misreporting Builders',()=>{
   const {s,home,plot}=fixture(),builder=s.workerSystem.create({x:48,y:44});s.workerSystem.jobs.assign(builder,'builder');const diagnostics=new ProductionDiagnostics(s);assert.deepEqual(diagnostics.constructionIssues().map(i=>i.reason),['noFarmer']);const w=farmer(s,home);assert.deepEqual(diagnostics.constructionIssues(),[]);s.workerSystem.commands.hold(w);assert.deepEqual(diagnostics.constructionIssues().map(i=>i.reason),['noFarmer']);plot.farmId=null;assert.deepEqual(diagnostics.constructionIssues().map(i=>i.reason),['noFarm']);diagnostics.destroy();
 });
+
+test('a planned Farmhouse owns its plots: no Notices for them; orphan plots give one summary notice; cancelling the plan brings it back',async()=>{
+  const {noticeText}=await import('../src/ui/noticeText.js'),{t}=await import('../src/i18n/index.js');
+  const s=scene(),home=build(s,'farmhouse',45,40,true),plots=[[49,40],[49,44],[53,40],[53,44]].map(([x,y])=>build(s,'wheat_field',x,y,true));
+  assert.equal(buildingIsComplete(home),false);assert.deepEqual(plots.map(p=>p.farmId),plots.map(()=>home.id),'a blueprint Farmhouse takes its four plots');
+  const diagnostics=new ProductionDiagnostics(s);assert.deepEqual(diagnostics.constructionIssues().filter(i=>i.category==='construction'&&i.reason!=='noBuilder'),[]);
+  const extra=[[45,46],[49,48]].map(([x,y])=>build(s,'wheat_field',x,y,true));assert.deepEqual(extra.map(p=>p.farmId),[null,null]);
+  let farm=diagnostics.constructionIssues().filter(i=>i.reason==='noFarm');assert.equal(farm.length,1,'one notice for all orphan plots');assert.equal(farm[0].entityId,Math.min(...extra.map(p=>p.id)));assert.equal(farm[0].params.count,2);
+  assert.equal(noticeText(s,farm[0]),t('notice.noFarmMany',{count:2}));
+  s.constructionSystem.cancel(home);s.events?.emit?.('buildings:changed');s.farmingSystem.reconcilePlots();
+  farm=diagnostics.constructionIssues().filter(i=>i.reason==='noFarm');assert.equal(farm[0]?.params.count,6,'without the planned Farmhouse every plot is an orphan again');
+  diagnostics.destroy();
+});

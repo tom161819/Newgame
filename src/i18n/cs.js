@@ -21,6 +21,8 @@ export default {
   'construction.refundNone':'Pole nestojí žádný materiál; zrušení nic nevrací.',
   'notice.noFarmer':'{name}: pole čeká na farmáře své farmy.',
   'notice.noFarm':'{name}: žádná farma nemá pro toto pole místo. Postav další farmu.',
+  'notice.noFarmMany':'Polí bez farmy s volným místem: {count}. Postav další farmu.',
+  'farmPlots.waitingFarm':'Připojeno k {name} č. {id} – čeká, až se farma postaví.',
   'work.establishing':'Zakládá: {name}',
 
   'farmPlots.count':'Pole {count} / {capacity}',
