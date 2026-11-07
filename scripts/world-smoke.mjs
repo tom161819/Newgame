@@ -10,15 +10,23 @@ export async function worldSmoke(context,url,instrument){
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.terrain&&window.__game.registry.get('application').scene.minimap);
     await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
     const world=await page.evaluate(()=>{
-      const s=window.__game.registry.get('application').scene,counts=[0,0,0,0,0];s.groundGrid.flat().forEach(c=>counts[c]++);
+      const s=window.__game.registry.get('application').scene,counts=[0,0,0,0,0,0,0,0];s.groundGrid.flat().forEach(c=>counts[c]++);
       let shore=null;for(let y=1;y<99&&!shore;y++)for(let x=1;x<99&&!shore;x++)if(s.groundGrid[y][x]===4&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>s.groundGrid[y+dy][x+dx]===3))shore={x,y};
       const bushes=[...s.bushes.keys()].map(k=>k.split(',').map(Number));
-      return {counts,shore,bushes:bushes.length,firstBush:bushes[0],waterCell:shore?s.map[shore.y][shore.x]:null,loaded:s.terrain.groundKinds.slice(1).map(k=>k.length)};
+      const near=type=>[...s.resources.values()].map(v=>v.getData('object')).filter(o=>o&&(type==='tree'?o.definition.tree:o.type===type)&&Math.hypot(o.x-50,o.y-50)<=20).length;
+      let ford=null;for(let y=1;y<99&&!ford;y++)for(let x=1;x<99&&!ford;x++)if(s.groundGrid[y][x]===5)ford={x,y};
+      const zones=[0,0,0,0,0,0];s.grassZones.flat().forEach((z,i)=>{if(s.groundGrid.flat()[i]===0)zones[z]++;});
+      return {counts,shore,bushes:bushes.length,firstBush:bushes[0],waterCell:shore?s.map[shore.y][shore.x]:null,loaded:s.terrain.groundKinds.slice(1).map(k=>k.length),ford,fordCell:ford?s.map[ford.y][ford.x]:null,fordSpeed:ford?s.pathWear.speedMultiplier(s.character,ford):null,zones,reeds:s.reeds.size,code:s.gameSettings.worldCode,startTrees:near('tree'),startStones:near('stone')};
     });
     assert.ok(world.counts[3]>50&&world.counts[4]>50,`river and lake water (${world.counts})`);
-    assert.ok(world.counts[1]>50&&world.counts[2]>150,`beaches and a desert (${world.counts})`);
+    assert.ok(world.counts[1]>30&&world.counts[2]>150,`beaches and a desert (${world.counts})`);
+    // World v2 generator 2: stony fords (walkable at ×0.6), muddy and pebbly banks, grass zones.
+    assert.ok(world.counts[5]>10&&world.counts[6]+world.counts[7]>20,`fords and varied banks (${world.counts}, ${world.code})`);
+    assert.equal(world.fordCell,0,'a ford can be walked');assert.equal(world.fordSpeed,.6,'more slowly');
+    assert.ok(world.zones.filter(n=>n>50).length>=5,`grass zones (${world.zones})`);
+    assert.ok(world.startTrees>=25&&world.startStones>=10,`fair start: ${world.startTrees} trees and ${world.startStones} stones within 20 tiles`);
     assert.ok(world.bushes>100,'bushes');assert.equal(world.waterCell,2,'water blocks walking');
-    assert.deepEqual(world.loaded,[4,4,4,4],'four tiles for each ground type');
+    assert.deepEqual(world.loaded,[4,4,4,4,4,4,4],'four tiles for each ground type');
     // Look at the shore with Fog of War off: the deep-water tile is painted blue in the ground layer.
     const colour=await page.evaluate(async tile=>{
       const s=window.__game.registry.get('application').scene;s.fog.setEnabled(false);s.refreshVisibility?.();if(s.worldCamera)s.worldCamera.following=false;
@@ -29,12 +37,22 @@ export async function worldSmoke(context,url,instrument){
     },world.shore);
     assert.ok(colour.b>colour.r+25,`deep water is blue (${JSON.stringify(colour)})`);
     if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/world-shore.png`});
+    // A ford up close, and the cost of painting chunks with the new layers (zones, decals, reeds, ford stones) and without.
+    const paint=await page.evaluate(async tile=>{
+      const s=window.__game.registry.get('application').scene,p={x:(100*64/2)+(tile.x-tile.y)*32,y:128+(tile.x+tile.y+1)*16};s.cameras.main.centerOn(p.x,p.y);s.cameras.main.setZoom(1.6);
+      await new Promise(r=>setTimeout(r,700));
+      const time=()=>{const t0=performance.now();for(let cy=0;cy<10;cy++)for(let cx=0;cx<10;cx++){s.terrain.dirtyChunks.add(`${cx},${cy}`);s.terrain.chunkTexture(cx,cy);}return (performance.now()-t0)/100;};
+      time();const withLayers=time(),zones=s.grassZones,reeds=s.reeds;s.grassZones=null;s.reeds=new Set();const without=time();s.grassZones=zones;s.reeds=reeds;time();
+      return {withLayers,without};
+    },world.ford);
+    console.log(`  chunk paint: ${paint.withLayers.toFixed(2)} ms with World v2 layers, ${paint.without.toFixed(2)} ms without`);
+    if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/world-ford.png`});
     const shown=await page.evaluate(async tile=>{
       const s=window.__game.registry.get('application').scene,p={x:(100*64/2)+(tile[0]-tile[1])*32,y:128+(tile[0]+tile[1]+1)*16};s.cameras.main.centerOn(p.x,p.y);
       await new Promise(r=>setTimeout(r,600));return [...s.terrain.bushSprites.values()].filter(v=>v.visible).length;
     },world.firstBush);
     assert.ok(shown>0,'bush sprites are drawn near a bush');
     if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/world-bushes.png`});
-    console.log(`PASS #100 world: river, lake, beaches, desert and ${world.bushes} bushes; water blocks walking, ground tiles loaded, water drawn blue, bush sprites shown`);
+    console.log(`PASS #100 world (generator 2): river with ${world.counts[5]} ford tiles, varied banks, ${world.reeds} reeds, grass zones, lake, desert and ${world.bushes} bushes; water blocks walking, ground tiles loaded, water drawn blue, bush sprites shown`);
   }finally{await page.close();}
 }

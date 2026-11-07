@@ -54,6 +54,7 @@ export default {
   'object.beach_sand.name':'Beach Sand','object.beach_sand.description':'Sand along rivers and lakes. You can walk and build on it; nothing grows on it.',
   'object.desert_sand.name':'Desert Sand','object.desert_sand.description':'Dry desert. You can walk and build on it; no trees or fields grow on it.',
   'object.shallow_water.name':'Shallow Water','object.shallow_water.description':'The edge of a river or lake. It cannot be walked or built on; arrows fly across water.',
+  'object.ford_shallows.name':"Ford",'object.ford_shallows.description':"A stony shallow crossing of the river. It can be waded (more slowly) but not built on or paved.",'object.mud_bank.name':"Muddy Bank",'object.mud_bank.description':"A muddy bank by the water. It can be walked and built on; nothing grows on it.",'object.shore_rocks.name':"Pebbly Bank",'object.shore_rocks.description':"Pebbles by the water. They can be walked and built on; nothing grows on them.",
   'object.deep_water.name':'Deep Water','object.deep_water.description':'The river current and the middle of a lake. It cannot be walked or built on; arrows fly across water.',
   'object.bush_meadow.name':'Meadow Bush','object.bush_meadow.description':'A dense green bush in the meadow.',
   'object.bush_berry.name':'Berry Bush','object.bush_berry.description':'A bush with red berries.',

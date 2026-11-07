@@ -10,11 +10,12 @@ export const footprintDistance=(a,b)=>Math.hypot(Math.max(0,a.x-b.x-width(b)+1,b
 export class MineralSystem {
   constructor(scene,natural){Object.assign(this,{scene,natural});this.accessCache=new Map();}
   deposits(){return [...this.natural.byId.values()].filter(o=>o.definition.deposit);}
-  generate(random=Math.random){
+  // World v2: `weight(anchor)` 0–1 makes deposits more likely in stony country (generator 2's stone weights).
+  generate(random=Math.random,weight=null){
     const s=this.scene,protectedTiles=this.natural.reserved(),start=s.character.tile;let added=0;
     for(const [type,rule]of Object.entries(MINERAL_DEPOSITS))for(let count=0,attempt=0;count<rule.count&&attempt<5000;attempt++){
       const anchor={x:2+Math.floor(random()*95),y:2+Math.floor(random()*95)},definition=s.objectRegistry.require(type),tiles=buildingTiles(anchor,definition);
-      if(Math.hypot(anchor.x-start.x,anchor.y-start.y)<=9||!tiles.every(t=>s.map[t.y]?.[t.x]===0&&!s.resourceOccupancy.has(tileKey(t))&&!protectedTiles.has(tileKey(t))))continue;
+      if(Math.hypot(anchor.x-start.x,anchor.y-start.y)<=9||weight&&random()>weight(anchor)||!tiles.every(t=>s.map[t.y]?.[t.x]===0&&!s.isFordTile?.(t)&&!s.resourceOccupancy.has(tileKey(t))&&!protectedTiles.has(tileKey(t))))continue;
       const before=reachableTiles(s.map,this.natural.origins()).length;for(const t of tiles)s.map[t.y][t.x]=1;const after=reachableTiles(s.map,this.natural.origins()).length;for(const t of tiles)s.map[t.y][t.x]=0;if(after!==before-tiles.length)continue;
       const max=rule.min+Math.floor(random()*(rule.max-rule.min+1)),state={id:`deposit-${this.natural.nextDepositId++}`,kind:'deposit',remaining:max,max,boundBuildingId:null};s.addResource(definition,anchor,state);count++;added++;
     }

@@ -10,7 +10,7 @@ export const MINIMAP_COLORS=Object.freeze({
   unknown:[66,68,64],rock:[128,124,112],paved:[178,168,146],wear:[150,124,84],building:[182,112,56],tree:[36,80,38],deposit:[160,160,170],stockpile:[200,160,90],chest:[226,190,80],
   ground:{Spring:[92,140,64],Summer:[104,146,58],Autumn:[150,130,62],Winter:[206,210,212]},
   // #100 ground types (index = ground code; grass uses the seasonal colours above).
-  groundType:{1:[214,196,140],2:[204,170,104],3:[98,160,190],4:[52,104,150]},
+  groundType:{1:[214,196,140],2:[204,170,104],3:[98,160,190],4:[52,104,150],5:[132,168,176],6:[122,98,68],7:[150,148,138]},
 });
 const KIND={none:0,building:1,tree:2,deposit:3,stockpile:4,chest:5};
 const KIND_COLOR=[null,MINIMAP_COLORS.building,MINIMAP_COLORS.tree,MINIMAP_COLORS.deposit,MINIMAP_COLORS.stockpile,MINIMAP_COLORS.chest];

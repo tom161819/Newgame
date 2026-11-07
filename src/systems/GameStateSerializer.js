@@ -7,8 +7,8 @@ import { buildingDemolitionRefund } from '../data/demolition.js';
 import { t } from '../i18n/index.js';
 import { objectRegistry } from './ObjectRegistry.js';
 import { COLUMNS,ROWS } from '../game/config.js';
-import { exportGround,importGround,validGroundRows,exportBushes,emptyGround } from '../game/worldGeneration.js';
-import { isWaterGround,BUSH_TYPES } from '../data/worldTerrain.js';
+import { exportGround,importGround,validGroundRows,exportBushes,emptyGround,exportZones,emptyZones,validZoneRows,exportReeds } from '../game/worldGeneration.js';
+import { isWaterGround,isRiverGround,BUSH_TYPES,GROUND } from '../data/worldTerrain.js';
 import { validateFishingState,waterBodies } from './FishingSystem.js';
 import { FISHING } from '../data/fishing.js';
 import { wearLevel } from '../data/pathWear.js';
@@ -36,7 +36,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=50;
+export const SAVE_VERSION=51;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -63,7 +63,7 @@ export function serializeGameState(scene){
   const provisionalKeys=new Set(scene.buildings.filter(b=>b.unverified).map(b=>`building:${b.id}`));
   exploration.objects=exploration.objects.filter(entry=>!provisionalKeys.has(entry.key));
   return {
-    saveVersion:SAVE_VERSION,gameSettings:{...gameSettings(scene.gameSettings),...(scene.seasons?{seasonsEnabled:scene.seasons.enabled}:{})},terrain:scene.terrainGrid.map(row=>[...row]),ground:exportGround(scene.groundGrid??emptyGround()),bushes:exportBushes(scene.bushes??new Map()),
+    saveVersion:SAVE_VERSION,gameSettings:{...gameSettings(scene.gameSettings),...(scene.seasons?{seasonsEnabled:scene.seasons.enabled}:{})},terrain:scene.terrainGrid.map(row=>[...row]),ground:exportGround(scene.groundGrid??emptyGround()),bushes:exportBushes(scene.bushes??new Map()),grassZones:exportZones(scene.grassZones??emptyZones()),reeds:exportReeds(scene.reeds??new Set()),
     exploration,
     naturalResources:scene.naturalResources?.exportState()??emptyNaturalState(),
     resourceLedger:scene.resourceLedger?.exportState()??emptyLedgerState(scene.gameTime),
@@ -153,7 +153,10 @@ export function validateGameState(input,registry=objectRegistry){
   array(s.terrain,ROWS);check(s.terrain.length===ROWS);for(const row of s.terrain){array(row,COLUMNS);check(row.length===COLUMNS&&row.every(n=>n===0||n===1));}
   // #100 ground layer (water has no rock) and bushes (open ground, one per tile).
   s.ground??=exportGround(emptyGround());s.bushes??=[];check(validGroundRows(s.ground));const ground=importGround(s.ground),open=(x,y)=>s.terrain[y]?.[x]===0&&!isWaterGround(ground[y]?.[x]);
-  for(let y=0;y<ROWS;y++)for(let x=0;x<COLUMNS;x++)if(isWaterGround(ground[y][x]))check(s.terrain[y][x]===0);
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLUMNS;x++)if(isRiverGround(ground[y][x]))check(s.terrain[y][x]===0);
+  // World v2: grass zones (one digit per tile) and reeds (shallow water tiles, one each).
+  s.grassZones??=exportZones(emptyZones());check(validZoneRows(s.grassZones));s.reeds??=[];array(s.reeds,COLUMNS*ROWS);
+  {const seen=new Set();for(const r of s.reeds){array(r,2);check(r.length===2);integer(r[0],0,COLUMNS-1);integer(r[1],0,ROWS-1);check(ground[r[1]][r[0]]===GROUND.SHALLOW&&!seen.has(`${r[0]},${r[1]}`));seen.add(`${r[0]},${r[1]}`);}}
   array(s.bushes,COLUMNS*ROWS);{const seen=new Set();for(const b of s.bushes){array(b,3);check(b.length===3);integer(b[0],0,COLUMNS-1);integer(b[1],0,ROWS-1);integer(b[2],0,BUSH_TYPES.length-1);check(open(b[0],b[1])&&!seen.has(`${b[0]},${b[1]}`));seen.add(`${b[0]},${b[1]}`);}}
   for(const key of ['buildings','resources','animals','drops','chests','spawners'])array(s[key]);
   if(s.workers!==undefined)array(s.workers);

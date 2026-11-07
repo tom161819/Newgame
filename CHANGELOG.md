@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-11-07
+<!-- version: {"title":"World generator 2","type":"feature","reconstructed":false,"saveVersion":51} -->
+### Changed
+- New world generator: a wider river with pools and stony fords you can wade across (more slowly, and nothing can be built on them). The banks change along the river between sand, grass with reeds, mud and pebbles. Trees and bushes gather along the water but leave paths to it, and forests and rocks follow the landscape. Grass varies between meadow, lush, dry, forest floor, flowery and stony patches, with small details such as tufts, flowers, pebbles and autumn leaves. Every start has enough trees, stones, grass and water nearby. World codes now begin with MKW2.
+### Added
+- Water option for world codes: a river with a tributary (the first digit set to 2).
+
 ## [0.23.0] - 2026-11-07
 <!-- version: {"title":"World codes","type":"feature","reconstructed":false,"saveVersion":50} -->
 ### Added

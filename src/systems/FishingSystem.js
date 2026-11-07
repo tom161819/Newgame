@@ -1,7 +1,7 @@
 import { t } from '../i18n/index.js';
 import { FISHING,stockCapacity,stockFactor,stockState } from '../data/fishing.js';
 import { WORK_RULES } from '../data/jobs.js';
-import { GROUND,isWaterGround } from '../data/worldTerrain.js';
+import { GROUND,isWaterGround,isRiverGround } from '../data/worldTerrain.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 
 const SIDES=[[1,0],[-1,0],[0,1],[0,-1]];
@@ -25,7 +25,7 @@ export class FishingSystem {
     for(let y=hut.y-r;y<hut.y+d.height+r;y++)for(let x=hut.x-r;x<hut.x+d.width+r;x++){
       if(s.map[y]?.[x]!==0||x>=hut.x&&x<hut.x+d.width&&y>=hut.y&&y<hut.y+d.height)continue;
       let best=null;
-      for(const [dx,dy]of SIDES){const g=s.groundGrid?.[y+dy]?.[x+dx];if(!isWaterGround(g))continue;if(!best||g===GROUND.DEEP)best={ground:g,body:this.bodyAt(x+dx,y+dy)};}
+      for(const [dx,dy]of SIDES){let g=s.groundGrid?.[y+dy]?.[x+dx];if(!isRiverGround(g))continue;if(g===GROUND.FORD)g=GROUND.SHALLOW;if(!best||g===GROUND.DEEP)best={ground:g,body:this.bodyAt(x+dx,y+dy)};}
       if(best)out.push({tile:{x,y},body:best.body,depth:best.ground});
     }
     return out;
@@ -95,9 +95,10 @@ export class FishingSystem {
 export function waterBodies(ground){
   const rows=ground?.length??0,columns=ground?.[0]?.length??0,ids=new Int32Array(rows*columns).fill(-1),bodies=[];
   for(let y=0;y<rows;y++)for(let x=0;x<columns;x++){
-    if(!isWaterGround(ground[y][x])||ids[y*columns+x]>=0)continue;
+    // World v2: fords belong to their river, so a river with fords stays one water body.
+    if(!isRiverGround(ground[y][x])||ids[y*columns+x]>=0)continue;
     const id=bodies.length,stack=[[x,y]];let tiles=0;ids[y*columns+x]=id;
-    while(stack.length){const [cx,cy]=stack.pop();tiles++;for(const [dx,dy]of SIDES){const nx=cx+dx,ny=cy+dy;if(nx<0||ny<0||nx>=columns||ny>=rows||ids[ny*columns+nx]>=0||!isWaterGround(ground[ny][nx]))continue;ids[ny*columns+nx]=id;stack.push([nx,ny]);}}
+    while(stack.length){const [cx,cy]=stack.pop();tiles++;for(const [dx,dy]of SIDES){const nx=cx+dx,ny=cy+dy;if(nx<0||ny<0||nx>=columns||ny>=rows||ids[ny*columns+nx]>=0||!isRiverGround(ground[ny][nx]))continue;ids[ny*columns+nx]=id;stack.push([nx,ny]);}}
     bodies.push({id,tiles,capacity:stockCapacity(tiles)});
   }
   return {width:columns,ids,bodies};

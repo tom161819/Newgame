@@ -54,6 +54,7 @@ export default {
   'object.beach_sand.name':'Plážový písek','object.beach_sand.description':'Písek u řek a jezer. Dá se po něm chodit i stavět, nic na něm neroste.',
   'object.desert_sand.name':'Pouštní písek','object.desert_sand.description':'Suchá poušť. Dá se po ní chodit i stavět, nerostou na ní stromy ani pole.',
   'object.shallow_water.name':'Mělká voda','object.shallow_water.description':'Okraj řeky nebo jezera. Neprůchozí a nezastavitelná, přes vodu se dá střílet.',
+  'object.ford_shallows.name':"Brod",'object.ford_shallows.description':"Mělčina s kameny přes řeku. Dá se přebrodit (pomaleji), nedá se na ní stavět ani dláždit.",'object.mud_bank.name':"Bahnitý břeh",'object.mud_bank.description':"Hlinitý břeh u vody. Dá se po něm chodit i stavět, nic na něm neroste.",'object.shore_rocks.name':"Kamenitý břeh",'object.shore_rocks.description':"Oblázky u vody. Dá se po nich chodit i stavět, nic na nich neroste.",
   'object.deep_water.name':'Hluboká voda','object.deep_water.description':'Proud řeky a střed jezera. Neprůchozí a nezastavitelná, přes vodu se dá střílet.',
   'object.bush_meadow.name':'Luční keř','object.bush_meadow.description':'Hustý zelený keř na louce.',
   'object.bush_berry.name':'Keř s bobulemi','object.bush_berry.description':'Keř s červenými bobulemi.',

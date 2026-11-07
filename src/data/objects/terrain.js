@@ -29,6 +29,15 @@ const wildGround=[
 ].map(d=>({id:d.id,name:d.name,description:d.description,category:'terrain',sprite:groundTiles(d.folder,d.art)[0],spriteVariants:groundTiles(d.folder,d.art),
   artSource:`art/sprites/wild-ground/wild-ground-${d.art}.v1.json`,width:1,height:1,walkable:d.walkable??true,collectible:false,buildable:false,cost:{},interactions:[],
   renderMode:'sprite',origin:{x:.5,y:.5},visualHeight:0,depth:{offset:-100}}));
+// World v2 (generator 2): ford, mud and pebbly banks. Provisional tiles (derived from the approved sand and water)
+// until the Studio's World v2 textures (plan g-svet-textury) are approved; no artSource yet.
+const provisional=(folder,name)=>[0,1,2,3].map(i=>`/assets/terrain/${folder}/provisional-${name}.v0.tile-${i}.png`);
+const worldV2Ground=[
+  {id:'ford_shallows',name:'Brod',description:'Mělčina s kameny přes řeku. Dá se přebrodit (pomaleji), nedá se na ní stavět ani dláždit.',tiles:provisional('water','ford')},
+  {id:'mud_bank',name:'Bahnitý břeh',description:'Hlinitý břeh u vody. Dá se po něm chodit i stavět, nic na něm neroste.',tiles:provisional('banks','mud')},
+  {id:'shore_rocks',name:'Kamenitý břeh',description:'Oblázky u vody. Dá se po nich chodit i stavět, nic na nich neroste.',tiles:provisional('banks','shore-rocks')},
+].map(d=>({id:d.id,name:d.name,description:d.description,category:'terrain',sprite:d.tiles[0],spriteVariants:d.tiles,provisional:true,
+  width:1,height:1,walkable:true,collectible:false,buildable:false,cost:{},interactions:[],renderMode:'sprite',origin:{x:.5,y:.5},visualHeight:0,depth:{offset:-100}}));
 export const terrain = [
   {
     id: 'grass', name: 'Tráva', category: 'terrain', sprite: '/assets/terrain/grass/grass.png',
@@ -46,4 +55,5 @@ export const terrain = [
   },
   ...wearSurfaces,
   ...wildGround,
+  ...worldV2Ground,
 ];

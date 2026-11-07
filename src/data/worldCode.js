@@ -1,13 +1,14 @@
 // World v2 step 1 (plan m-svet-kod-sveta, brief zadani-svet-v2.md): the world code MKW<generator>-<settings>-<seed>.
 // <generator> is WORLD_GENERATOR_VERSION; <settings> is one digit (level 0–9) per WORLD_SETTINGS entry in this order;
 // <seed> is base36 in capitals, 1–8 characters. New settings are only added at the end, with a new generator version.
-// Level 5 (and the listed default for the count-like settings) reproduces the 0.14.0 generator's values.
-export const WORLD_GENERATOR_VERSION=1;
+// Generator 2 (World v2 step 2a): a wider river with stony fords, varied banks, an optional tributary (rivers 2),
+// grass zones (their size: grass zone scale). Level 5 keeps the base values in WORLD_GENERATION.
+export const WORLD_GENERATOR_VERSION=2;
 export const WORLD_SEED_MAX=36**8-1;
 // key: id used in code and Studio; max: highest level; default: today's world; scale: level → multiplier (or value).
 const linear=(at0,at5,at9)=>level=>level<=5?at0+(at5-at0)*level/5:at5+(at9-at5)*(level-5)/4;
 export const WORLD_SETTINGS=Object.freeze([
-  {key:'rivers',name:'Rivers',max:1,default:1,describe:l=>l?'one river':'no river'},
+  {key:'rivers',name:'Rivers',max:2,default:1,describe:l=>['no river','one river','a river with a tributary'][l]},
   {key:'riverWidth',name:'River width',max:9,default:5,value:linear(.6,1,1.4),describe:l=>`×${linear(.6,1,1.4)(l).toFixed(2)} width`},
   {key:'meanders',name:'Meanders',max:9,default:5,value:linear(0,1,1.8),describe:l=>`×${linear(0,1,1.8)(l).toFixed(2)} bends`},
   {key:'fords',name:'Fords',max:9,default:5,value:linear(1.8,1,.55),describe:l=>`every ${Math.round(22*linear(1.8,1,.55)(l))} tiles`},
@@ -18,7 +19,7 @@ export const WORLD_SETTINGS=Object.freeze([
   {key:'forest',name:'Forest density',max:9,default:5,value:linear(.15,1,1.9),describe:l=>`${Math.round(200*linear(.15,1,1.9)(l))} trees`},
   {key:'rocks',name:'Rocks',max:9,default:5,value:linear(.2,1,1.8),describe:l=>`${Math.round(65*linear(.2,1,1.8)(l))} outcrops`},
   {key:'bushes',name:'Bushes',max:9,default:5,value:linear(0,1,2),describe:l=>`${Math.round(26*linear(0,1,2)(l))} clusters`},
-  {key:'grassScale',name:'Grass zone scale',max:9,default:5,reserved:true,describe:()=>'no effect in generator 1'},
+  {key:'grassScale',name:'Grass zone scale',max:9,default:5,value:linear(.5,1,1.8),describe:l=>`×${linear(.5,1,1.8)(l).toFixed(2)} zone size`},
 ]);
 // Owner-approved defaults (world:sync from the Studio may change them; keep one digit per setting).
 export const DEFAULT_WORLD_LEVELS=Object.freeze([1,5,5,5,1,5,5,5,5,5,5,5]);
@@ -47,7 +48,7 @@ export function settingsFromLevels(levels=defaultWorldLevels()){
   if(!validLevels(levels))throw new WorldCodeError('invalid','Invalid world code');
   const v=key=>{const i=WORLD_SETTINGS.findIndex(s=>s.key===key);return WORLD_SETTINGS[i].value?WORLD_SETTINGS[i].value(levels[i]):levels[i];};
   return {rivers:v('rivers'),riverWidth:v('riverWidth'),meanders:v('meanders'),fordSpacing:v('fords'),lakes:v('lakes'),desert:v('desert'),
-    sandyBanks:v('sandyBanks'),bankVegetation:v('bankVegetation'),forest:v('forest'),rocks:v('rocks'),bushes:v('bushes')};
+    sandyBanks:v('sandyBanks'),bankVegetation:v('bankVegetation'),forest:v('forest'),rocks:v('rocks'),bushes:v('bushes'),grassScale:v('grassScale')};
 }
 // The simple New Game choices and the levels they set (Water: rivers, river width, lakes; Desert; Forest).
 export const WORLD_PRESETS=Object.freeze({

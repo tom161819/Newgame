@@ -7,7 +7,7 @@ import { canStep } from './pathfinding.js';
 import { VISIBILITY, FOG_STYLE } from '../systems/FogOfWarSystem.js';
 import { memoryTexture } from './memoryTexture.js';
 import { MEMORY_DIRECTIONS } from '../systems/MapMemory.js';
-import { GROUND, GROUND_TERRAIN_IDS, BUSH_TYPES } from '../data/worldTerrain.js';
+import { GROUND, GROUND_TERRAIN_IDS, BUSH_TYPES, GRASS_ZONE } from '../data/worldTerrain.js';
 import { PathV2Layer } from './PathV2Layer.js';
 
 const CHUNK_SIZE = 10;
@@ -21,7 +21,8 @@ const WINTER_VEIL=[0,2.2,1.9,1.3,1]; // light tracks fade most under snow
 function mixColour(a,b,t){const p=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)),x=p(a),y=p(b);return`rgb(${x.map((v,i)=>Math.round(v+(y[i]-v)*t)).join(',')})`;}
 // #100 Ground blending: along an edge to a ground that ranks higher (grass over desert over beach over shallow over
 // deep water), the neighbour's texture fades into this tile, so shores and the desert rim are soft, not diamond steps.
-const GROUND_RANK=[4,2,3,1,0];
+// World v2: ford sits between shallow water and sand; mud and pebbles blend into grass like sand.
+const GROUND_RANK=[4,2,3,1,0,1.5,2.2,2.4];
 // Edge order N (x-1), E (y-1), S (x+1), W (y+1): the shared edge's midpoint in the 64 × 32 tile and the unit normal
 // pointing into the tile, perpendicular to the edge on screen so the fade runs parallel to it.
 const EDGES=[{dx:-1,dy:0,start:[16,8],normal:[1,2]},{dx:0,dy:-1,start:[48,8],normal:[-1,2]},{dx:1,dy:0,start:[48,24],normal:[-1,-2]},{dx:0,dy:1,start:[16,24],normal:[1,-2]}];
@@ -29,7 +30,12 @@ const FEATHER=12; // px into the tile (the centre is about 14 px from an edge)
 // Diagonal neighbours touch only a corner: N-E top, E-S right, S-W bottom, W-N left vertex.
 const CORNERS=[{dx:-1,dy:-1,at:[32,0],edges:[0,1]},{dx:1,dy:-1,at:[64,16],edges:[1,2]},{dx:1,dy:1,at:[32,32],edges:[2,3]},{dx:-1,dy:1,at:[0,16],edges:[3,0]}];
 // Winter: snow dusts the beach and lightly frosts water; the desert has no snow.
-const GROUND_WINTER=[null,'rgba(232,237,220,.55)',null,'rgba(226,236,244,.28)','rgba(226,236,244,.18)'];
+const GROUND_WINTER=[null,'rgba(232,237,220,.55)',null,'rgba(226,236,244,.28)','rgba(226,236,244,.18)','rgba(226,236,244,.3)','rgba(232,237,220,.5)','rgba(232,237,220,.45)'];
+// World v2 grass zones: provisional colour washes over the approved grass until the zone textures (g-svet-textury)
+// are approved. Each tile averages its 3×3 neighbourhood, so zones fade into each other instead of ending on a diamond.
+const ZONE_TINT=[[0,0,0,0],[38,104,36,.2],[196,168,82,.26],[84,62,32,.2],[0,0,0,0],[128,128,118,.2]];
+// Small decorations per zone: [kind, chance per tile, count range].
+const ZONE_DECALS=[[['tuft',.3,[1,2]]],[['tuft',.5,[1,3]]],[['dryTuft',.3,[1,2]]],[['leaf',.55,[2,4]],['tuft',.15,[1,1]]],[['flower',.75,[2,5]],['tuft',.3,[1,2]]],[['pebble',.6,[1,3]],['tuft',.15,[1,1]]]];
 function terrainHash(x, y) { return ((Math.imul(x + 17, 374761393) ^ Math.imul(y + 29, 668265263)) >>> 0); }
 
 export class TerrainRenderer {
@@ -201,6 +207,38 @@ export class TerrainRenderer {
     if(sprite.texture?.key!==key)sprite.setTexture(key);return true;
   }
 
+  // World v2: grass zone wash (3×3 average), decals, reeds and ford stones. Deterministic per tile (hash).
+  zoneTint(x,y){
+    const zones=this.scene.grassZones;if(!zones)return null;let r=0,g=0,b=0,a=0,n=0;
+    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const z=zones[y+dy]?.[x+dx];const own=zones[y][x];const t=ZONE_TINT[(this.groundAt(x+dx,y+dy)===GROUND.GRASS?z:own)??own]??ZONE_TINT[0];r+=t[0]*t[3];g+=t[1]*t[3];b+=t[2]*t[3];a+=t[3];n++;}
+    return a>.001?`rgba(${Math.round(r/a)},${Math.round(g/a)},${Math.round(b/a)},${(a/n).toFixed(3)})`:null;
+  }
+  decalPoint(h,i,cx,cy){const u=((h>>>(i*5))&31)/31-.5,v=((h>>>(i*5+3))&31)/31-.5;return {x:cx+(u-v)*36,y:cy+(u+v)*18};}
+  paintDecals(context,x,y,cx,cy,season,occupied){
+    const zone=this.scene.grassZones?.[y]?.[x];if(zone==null||occupied?.has(`${x},${y}`)||this.wear?.isPaved?.({x,y})||(this.wear?.level({x,y})??0)>=2||this.scene.resourceOccupancy?.has(`${x},${y}`))return;
+    let h=terrainHash(x*7+3,y*13+5);
+    const list=season==='Autumn'?[...ZONE_DECALS[zone],['leaf',.35,[1,3]]]:ZONE_DECALS[zone];
+    for(const [kind,chance,[lo,hi]]of list){
+      h=Math.imul(h^0x9e3779b9,2654435761)>>>0;if((h%1000)/1000>=chance)continue;if(season==='Winter'&&kind!=='pebble')continue;
+      const count=lo+h%(hi-lo+1);
+      for(let i=0;i<count;i++){const p=this.decalPoint(Math.imul(h,i+7)>>>0,i%3,cx,cy),k=(h>>>(i*3))&7;context.beginPath();
+        if(kind==='tuft'||kind==='dryTuft'){context.strokeStyle=kind==='tuft'?(season==='Autumn'?'rgba(110,98,40,.7)':'rgba(48,92,34,.65)'):'rgba(150,128,62,.7)';context.lineWidth=1;for(const d of [-2,0,2]){context.moveTo(p.x+d*.6,p.y);context.lineTo(p.x+d,p.y-3-(k&1));}context.stroke();}
+        else if(kind==='flower'){context.fillStyle=['#f1ecd8','#f2d45c','#b88ad6','#e7a0b8'][k&3];context.arc(p.x,p.y-1,1.2,0,Math.PI*2);context.fill();}
+        else if(kind==='pebble'){context.fillStyle=k&1?'rgba(150,148,138,.9)':'rgba(118,116,108,.9)';context.ellipse(p.x,p.y,1.8+(k&1),1.1,0,0,Math.PI*2);context.fill();}
+        else if(kind==='leaf'){context.fillStyle=['rgba(168,98,38,.75)','rgba(190,140,52,.75)','rgba(120,78,40,.75)'][k%3];context.ellipse(p.x,p.y,1.6,.9,k,0,Math.PI*2);context.fill();}}
+    }
+  }
+  paintReeds(context,x,y,cx,cy,season){
+    if(!this.scene.reeds?.has(`${x},${y}`))return;const h=terrainHash(x*11+1,y*5+7),colour=season==='Winter'||season==='Autumn'?'rgba(176,150,88,.95)':'rgba(70,118,52,.95)';
+    context.strokeStyle=colour;context.lineWidth=1.2;context.beginPath();
+    for(let i=0;i<7;i++){const p=this.decalPoint(Math.imul(h,i+3)>>>0,i%3,cx,cy),height=6+((h>>>i)&7);context.moveTo(p.x,p.y);context.quadraticCurveTo(p.x+1,p.y-height/2,p.x+((h>>>(i+2))&1?2:-2),p.y-height);}
+    context.stroke();
+  }
+  paintFordStones(context,x,y,cx,cy){
+    const h=terrainHash(x*5+9,y*7+2);for(let i=0;i<3;i++){const p=this.decalPoint(Math.imul(h,i+5)>>>0,i,cx,cy),r=2.4+((h>>>(i*4))&3)*.7;
+      context.fillStyle='rgba(92,92,86,.95)';context.beginPath();context.ellipse(p.x,p.y+.8,r+.6,r*.62+.4,0,0,Math.PI*2);context.fill();
+      context.fillStyle='rgba(156,154,144,.95)';context.beginPath();context.ellipse(p.x,p.y,r,r*.6,0,0,Math.PI*2);context.fill();}
+  }
   tileData(tile){return this.memory?.terrainAt(tile,this.map,this.wear,this.season)??[this.map[tile.y]?.[tile.x]??0,this.wear?.level(tile)??0,this.season,0,this.wear?.isPaved?.(tile)?1:0];}
 
   chunkTexture(cx, cy) {
@@ -218,7 +256,7 @@ export class TerrainRenderer {
       if(dirty&&this.pathStyle==='v2'&&this.v2?.geo&&[...dirty].some(i=>this.v2.near(i%COLUMNS,Math.floor(i/COLUMNS))))dirty=null;
       if(!dirty)context.clearRect(0,0,texture.width,texture.height);
       // Ground first for every tile, tracks second: a neighbour's ground overlap can then never cover a track's edge.
-      const paths=[];
+      const paths=[],occupied=this.buildingTiles();
       for (let y = cy * CHUNK_SIZE; y < (cy + 1) * CHUNK_SIZE; y++) {
         for (let x = cx * CHUNK_SIZE; x < (cx + 1) * CHUNK_SIZE; x++) {
           if(dirty&&!dirty.has(y*COLUMNS+x))continue;
@@ -242,6 +280,9 @@ export class TerrainRenderer {
             this.blendEdges(context,x,y,ground,point.x-left-32,point.y-origin.y-16,season);
             const winter=GROUND_WINTER[ground],mix=state===VISIBILITY.VISIBLE?this.seasonMix?.(x,y,season):null,amount=season==='Winter'?(mix?mix.amount:1):mix?.from==='Winter'?1-mix.amount:0;
             if(winter&&amount>0){context.globalCompositeOperation='source-atop';context.globalAlpha=amount;context.fillStyle=winter;polygon(TILE_BLEED);context.fill();context.globalAlpha=1;}
+            context.globalCompositeOperation='source-over';
+            if(ground===GROUND.FORD)this.paintFordStones(context,x,y,point.x-left,point.y-origin.y);
+            else if(ground===GROUND.SHALLOW)this.paintReeds(context,x,y,point.x-left,point.y-origin.y,season);
             if(this.wear)paths.push({x,y,polygon,filter:context.filter,veil:season==='Winter'?.45:0});
             context.restore();continue;
           }
@@ -256,6 +297,8 @@ export class TerrainRenderer {
           if(this.wear)paths.push({x,y,polygon,filter:context.filter,veil:mix?(mix.from==='Winter'?1-mix.amount:0)*.45+(season==='Winter'?mix.amount:0)*.45:season==='Winter'?.45:0});
           const tint=(mix&&mixTint(mix.from,season,mix.amount))??{Spring:'rgba(95,145,65,.08)',Summer:'rgba(185,159,70,.09)',Autumn:'rgba(158,105,45,.17)',Winter:'rgba(232,237,220,.83)'}[season];
           if(tint&&!grassSeason){context.globalCompositeOperation='source-atop';context.fillStyle=tint;polygon(TILE_BLEED);context.fill();}
+          const zoneTint=season==='Winter'?null:this.zoneTint(x,y);if(zoneTint){context.globalCompositeOperation='source-atop';context.fillStyle=zoneTint;polygon(TILE_BLEED);context.fill();}
+          context.globalCompositeOperation='source-over';this.paintDecals(context,x,y,point.x-left,point.y-origin.y,season,occupied);
           context.restore();
         }
       }

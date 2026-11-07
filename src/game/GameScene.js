@@ -18,8 +18,8 @@ import { t } from '../i18n/index.js';
 import { localized } from '../i18n/names.js';
 import Phaser from 'phaser';
 import { COLUMNS, ROWS, PLAYER_START, isWalkable, tileCenter } from './map.js';
-import { generateWorld, mapFromWorld, emptyGround, importGround, importBushes } from './worldGeneration.js';
-import { isFertileGround } from '../data/worldTerrain.js';
+import { generateWorld, mapFromWorld, emptyGround, importGround, importBushes, emptyZones, importZones, importReeds } from './worldGeneration.js';
+import { isFertileGround, isFordGround, FORD_SPEED, WORLD_GENERATION } from '../data/worldTerrain.js';
 import { tilePolygon, worldToTile, gridToWorld } from './isometric.js';
 import { TerrainRenderer } from './TerrainRenderer.js';
 import { WorldCamera } from './WorldCamera.js';
@@ -175,8 +175,12 @@ export class GameScene extends Phaser.Scene {
     if(!this.loadState&&!this.gameSettings.worldCode)this.gameSettings=gameSettings({...this.gameSettings,worldCode:randomWorldCode()});
     const worldCode=this.gameSettings.worldCode?decodeWorldCode(this.gameSettings.worldCode):null;
     this.worldLevels=worldCode?.levels??defaultWorldLevels();this.worldRandom=worldCode?worldStreams(worldCode.seed):()=>Math.random;
-    const world=this.loadState?{terrain:this.loadState.terrain.map(row=>[...row]),ground:this.loadState.ground?importGround(this.loadState.ground):emptyGround(),bushes:importBushes(this.loadState.bushes??[])}:generateWorld(Math.random,{levels:this.worldLevels,streams:this.worldRandom});
-    this.terrainGrid=world.terrain;this.groundGrid=world.ground;this.bushes=world.bushes;
+    const world=this.loadState?{terrain:this.loadState.terrain.map(row=>[...row]),ground:this.loadState.ground?importGround(this.loadState.ground):emptyGround(),bushes:importBushes(this.loadState.bushes??[]),
+      zones:this.loadState.grassZones?importZones(this.loadState.grassZones):emptyZones(),reeds:importReeds(this.loadState.reeds)}:generateWorld(Math.random,{levels:this.worldLevels,streams:this.worldRandom});
+    this.terrainGrid=world.terrain;this.groundGrid=world.ground;this.bushes=world.bushes;this.grassZones=world.zones;this.reeds=world.reeds;
+    // Generator 2's weights for where forests and ore deposits grow (new games only; not saved).
+    this.worldWeights=world.forestWeight?{forest:world.forestWeight,stone:world.stoneWeight}:null;
+    this.fordKeys=new Set();for(let y=0;y<this.groundGrid.length;y++)for(let x=0;x<this.groundGrid[y].length;x++)if(isFordGround(this.groundGrid[y][x]))this.fordKeys.add(`${x},${y}`);
     this.map=mapFromWorld(this.terrainGrid,this.groundGrid);
     this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
     this.inventory=new Inventory();if(!this.loadState)this.inventory.add('gold',this.gameSettings.startingGold);
@@ -186,7 +190,7 @@ export class GameScene extends Phaser.Scene {
     this.unsubscribeSeason=this.seasons.onChange(()=>{const changed=this.terrain.season!==this.seasons.season;this.terrain.setSeason(this.seasons.season);if(changed&&this.worldCamera){this.terrain.invalidateArea(this.mapMemory.observeTerrain(this.terrainGrid,this.pathWear,this.seasons.season,this.map));this.terrain.update(this.cameras.main,this.fog,this.mapMemory);}this.updateTimeDisplay();this.settingsPanel?.syncSeasons();});
     this.activities=new GameActivityBus();this.experienceSystem=new ExperienceSystem(this.activities);
     this.skillSystem=new SkillSystem(this);
-    this.pathWear=new PathWearSystem({map:this.map,terrain:this.terrainGrid,time:this.gameTime,isGrass:tile=>this.terrainGrid[tile.y]?.[tile.x]===0&&isFertileGround(this.groundGrid[tile.y]?.[tile.x])});this.terrain.setPathWear(this.pathWear);
+    this.pathWear=new PathWearSystem({map:this.map,terrain:this.terrainGrid,time:this.gameTime,groundSpeed:tile=>isFordGround(this.groundGrid[tile.y]?.[tile.x])?FORD_SPEED:1,isGrass:tile=>this.terrainGrid[tile.y]?.[tile.x]===0&&isFertileGround(this.groundGrid[tile.y]?.[tile.x])});this.terrain.setPathWear(this.pathWear);
     this.pauseManager=new PauseManager(this);
     this.noticeRemaining=0;document.querySelector('#day-notice').hidden=true;
     this.resources=new Map();this.stones=this.resources; // Kompatibilní označení původního seznamu kamenů.
@@ -209,12 +213,15 @@ export class GameScene extends Phaser.Scene {
       const spawnSettings=resourceSpawnSettings(definition,this.gameSettings);
       const spawner=new ResourceSpawner({
         map:this.map,resources:this.resourceOccupancy,definition,spawnSettings,
-        getOrigins:()=>this.resourceOrigins(),getReserved:()=>this.reservedTiles(),
+        getOrigins:()=>this.resourceOrigins(),getReserved:()=>[...this.reservedTiles(),...this.fordTiles()],
         getCount:()=>this.resourceCount(definition.id),spawn:tile=>this.addResource(definition,tile),
       });
       this.resourceSpawners.push(spawner);
       if(!this.loadState&&definition.walkable){
-        const candidates=generateResourcePositions(this.map,PLAYER_START,spawnSettings.initial,this.worldRandom(`resource:${definition.id}`),this.resourceOccupancy,definition);
+        const occupied=new Map([...this.resourceOccupancy,...[...this.fordKeys].map(k=>[k,'ford'])]),F=WORLD_GENERATION.fairStart;
+        // Fair start: some loose stones close to the castle first.
+        if(definition.id==='stone'){const near=generateResourcePositions(this.map,PLAYER_START,10000,this.worldRandom('start-stones'),occupied,definition).filter(t=>{const d=Math.hypot(t.x-PLAYER_START.x,t.y-PLAYER_START.y);return d>5&&d<=F.radius;}).slice(0,Math.min(F.stones,spawnSettings.initial));for(const tile of near){this.addResource(definition,tile);occupied.set(tileKey(tile),'stone');}}
+        const candidates=generateResourcePositions(this.map,PLAYER_START,Math.max(0,spawnSettings.initial-this.resourceCount(definition.id)),this.worldRandom(`resource:${definition.id}`),occupied,definition);
         for(const tile of candidates)if(resourceTiles(tile,definition).every(p=>!this.resourceOccupancy.has(tileKey(p))))this.addResource(definition,tile);
       }
       if(!this.loadState){const random=spawner.random;spawner.random=this.worldRandom(`resource-fill:${definition.id}`);while(this.resourceCount(definition.id)<spawnSettings.initial&&spawner.spawnOne()){}spawner.random=random;}
@@ -269,7 +276,9 @@ export class GameScene extends Phaser.Scene {
     this.updateTimeDisplay();
     this.setStatus(t('status.idle'));
     this.worldCamera=new WorldCamera(this,this.player);this.staffingIndicators=new MissingWorkersIndicators(this);
-    this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState){this.naturalResources.generate(this.worldRandom('trees'),Math.round(WORLD_FORESTRY.initialTrees*settingsFromLevels(this.worldLevels).forest));this.naturalResources.mining.generate(this.worldRandom('minerals'));}
+    this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState){const weights=this.worldWeights,at=(grid,t)=>grid[t.y*this.groundGrid[0].length+t.x]??0,F=WORLD_GENERATION.fairStart;
+      this.naturalResources.generate(this.worldRandom('trees'),Math.round(WORLD_FORESTRY.initialTrees*settingsFromLevels(this.worldLevels).forest),{weight:weights?t=>at(weights.forest,t):null,start:settingsFromLevels(this.worldLevels).forest>=.5?{center:PLAYER_START,radius:F.radius,trees:F.trees}:null});
+      this.naturalResources.mining.generate(this.worldRandom('minerals'),weights?t=>.25+.75*at(weights.stone,t):null);}
     // World v2: a fingerprint of the starting world as generated (terrain, water, bushes, every placed resource, animals,
     // chests), so tests and the Studio can check that a world code always gives the same world.
     this.startWorldFingerprint=this.loadState?null:this.worldFingerprint();
@@ -341,6 +350,8 @@ export class GameScene extends Phaser.Scene {
     this.gameTime.setPaused(value);if(value||this.visibilityPaused)this.tweens.pauseAll();else{this.activeFramePending=true;this.tweens.resumeAll();}this.setGalleryInput(!value);
   }
 
+  isFordTile(tile){return this.fordKeys?.has(`${tile.x},${tile.y}`)??false;}
+  fordTiles(){return [...(this.fordKeys??[])].map(k=>{const [x,y]=k.split(',').map(Number);return {x,y};});}
   reservedTiles(){return [...this.character.reservedTiles(),...(this.animalSystem?.reservedTiles()??[]),...(this.workerSystem?.reservedTiles()??[]),...(this.foodStorage?.reservedTiles()??[]),...this.buildings.flatMap(b=>b.tiles)];}
   updateHover(pointer){
     const tooltip=document.querySelector('#object-tooltip');

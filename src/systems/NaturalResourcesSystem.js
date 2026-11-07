@@ -34,15 +34,30 @@ export class NaturalResourcesSystem {
     const s=this.scene,origins=this.origins(),before=reachableTiles(s.map,origins).length,old=s.map[tile.y][tile.x];if(old!==0)return false;s.map[tile.y][tile.x]=1;
     const after=reachableTiles(s.map,origins).length;s.map[tile.y][tile.x]=old;return after===before-1;
   }
-  generate(random=Math.random,count=FORESTRY.initialTrees){
+  // World v2: `weight(tile)` 0–1 (generator 2's forest weights) puts forests where the landscape wants them;
+  // `start` {radius, trees} adds a grove near the castle when the start would have too few trees (fair start).
+  generate(random=Math.random,count=FORESTRY.initialTrees,{weight=null,start:fair=null}={}){
     const s=this.scene,start=s.character.tile,reserved=this.reserved(),possible=reachableTiles(s.map,[start]).filter(t=>t.x>1&&t.y>1&&t.x<98&&t.y<98&&Math.hypot(t.x-start.x,t.y-start.y)>FORESTRY.protectedRadius&&!reserved.has(tileKey(t))&&!s.resourceOccupancy.has(tileKey(t)));
-    if(!possible.length)return 0;const reachable=new Set(possible.map(tileKey)),centers=Array.from({length:FORESTRY.clusters},()=>possible[Math.floor(random()*possible.length)]);let added=0;
+    if(!possible.length)return 0;const reachable=new Set(possible.map(tileKey)),pick=()=>{for(let i=0;i<60;i++){const t=possible[Math.floor(random()*possible.length)];if(!weight||random()<weight(t))return t;}return possible[Math.floor(random()*possible.length)];},centers=Array.from({length:FORESTRY.clusters},pick);let added=0;
     for(let attempt=0;attempt<count*80&&added<count;attempt++){
       const center=centers[attempt%centers.length],radius=Math.sqrt(random())*(5+random()*5),angle=random()*Math.PI*2,tile={x:Math.round(center.x+Math.cos(angle)*radius),y:Math.round(center.y+Math.sin(angle)*radius)},key=tileKey(tile);
-      if(!reachable.has(key)||s.map[tile.y]?.[tile.x]!==0||!isFertileGround(s.groundGrid?.[tile.y]?.[tile.x])||tile.x<2||tile.y<2||tile.x>97||tile.y>97||reserved.has(key)||s.resourceOccupancy.has(key)||Math.hypot(tile.x-start.x,tile.y-start.y)<=FORESTRY.protectedRadius)continue;
+      if(!reachable.has(key)||weight&&random()>Math.max(.15,weight(tile))||s.map[tile.y]?.[tile.x]!==0||!isFertileGround(s.groundGrid?.[tile.y]?.[tile.x])||tile.x<2||tile.y<2||tile.x>97||tile.y>97||reserved.has(key)||s.resourceOccupancy.has(key)||Math.hypot(tile.x-start.x,tile.y-start.y)<=FORESTRY.protectedRadius)continue;
       const stage=random()<.6?3:random()<.8?2:1;if(stage===3&&!this.preservesRoutes(tile))continue;
       const growthDays=stage<3?random()*FORESTRY.stageDays[stage]:0,state=treeState(`tree-${this.nextId++}`,{stage,growthDays,ageDays:stage===3?8+random()*20:(stage===1?1:4)+growthDays});state.growthCheckpoint=this.growthClock;state.ageCheckpoint=this.ageClock;
       s.addResource(s.objectRegistry.require(random()<.6?'oak_tree':'pine_tree'),tile,state);added++;
+    }
+    if(fair&&count>0){
+      const near=()=>[...this.byId.values()].filter(o=>o.definition.tree&&Math.hypot(o.x-fair.center.x,o.y-fair.center.y)<=fair.radius).length;
+      const ring=possible.filter(t=>{const d=Math.hypot(t.x-fair.center.x,t.y-fair.center.y);return d>=fair.radius*.5&&d<=fair.radius-3;});
+      for(let grove=0;grove<4&&ring.length&&near()<fair.trees;grove++){
+        const center=ring[Math.floor(random()*ring.length)];
+        for(let attempt=0;attempt<400&&near()<fair.trees;attempt++){
+          const r=Math.sqrt(random())*5,a=random()*Math.PI*2,tile={x:Math.round(center.x+Math.cos(a)*r),y:Math.round(center.y+Math.sin(a)*r)},key=tileKey(tile);
+          if(!reachable.has(key)||s.map[tile.y]?.[tile.x]!==0||!isFertileGround(s.groundGrid?.[tile.y]?.[tile.x])||reserved.has(key)||s.resourceOccupancy.has(key)||Math.hypot(tile.x-fair.center.x,tile.y-fair.center.y)<=FORESTRY.protectedRadius||!this.preservesRoutes(tile))continue;
+          const state=treeState(`tree-${this.nextId++}`,{stage:3,growthDays:0,ageDays:8+random()*20});state.growthCheckpoint=this.growthClock;state.ageCheckpoint=this.ageClock;
+          s.addResource(s.objectRegistry.require(random()<.6?'oak_tree':'pine_tree'),tile,state);added++;
+        }
+      }
     }
     return added;
   }

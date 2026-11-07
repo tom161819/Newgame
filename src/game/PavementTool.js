@@ -20,7 +20,7 @@ export class PavementTool {
   inSight(tile){return !this.scene.fog?.enabled||this.scene.fog.isVisibleTile(tile);}
   tiles(end){return pavementTiles(this.mode,this.anchor??end,this.anchor?end:end).slice(0,PAVEMENT.maxOrderTiles+1);}
   plan(tiles){
-    const s=this.scene,visible=tiles.filter(tile=>this.inSight(tile)),hidden=tiles.filter(tile=>!this.inSight(tile));
+    const s=this.scene,ford=tile=>s.isFordTile?.(tile),visible=tiles.filter(tile=>this.inSight(tile)&&!ford(tile)),hidden=tiles.filter(tile=>!this.inSight(tile)||ford(tile));
     const plan=pavementPlan({map:s.map,tiles:visible,resources:s.resourceOccupancy,buildings:s.buildings,pathWear:s.pathWear,inventory:s.inventory,registry:s.objectRegistry});
     return {...plan,invalid:[...plan.invalid,...hidden]};
   }
