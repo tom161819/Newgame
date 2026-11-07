@@ -579,3 +579,17 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .market-prices th, .market-prices td { padding: 3px 8px; border-bottom: 1px solid #4a4a33; text-align: right; }
 .market-prices th:first-child { text-align: left; font-weight: 500; }
 .market-prices thead th { color: #c8bd9c; font-weight: 600; }
+
+/* Trade window (F1.3). */
+.marketplace-dialog { width: min(760px,96vw); }
+.market-trade { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 6px; }
+.market-trade th, .market-trade td { padding: 2px 6px; border-bottom: 1px solid #4a4a33; text-align: right; white-space: nowrap; }
+.market-trade th:first-child, .market-trade tbody th { text-align: left; font-weight: 500; }
+.market-qty { width: 56px; }
+.market-actions button { font-size: 11px; padding: 2px 6px; margin-left: 2px; }
+.market-quote { min-height: 1.4em; font-size: 12px; color: #d8cda9; }
+.market-quote.error { color: #e0806b; }
+.market-order-list { margin: 2px 0 8px; padding-left: 18px; font-size: 12px; }
+.market-order.status-Completed { color: #9fc172; }
+.market-order.status-Cancelled, .market-order.status-Failed { color: #b49a8a; }
+.marketplace-dialog.trading .market-prices, .marketplace-dialog.trading .market-prices-head { display: none; }

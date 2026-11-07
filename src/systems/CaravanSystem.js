@@ -60,7 +60,7 @@ export class CaravanSystem {
     this.schedule();return false;
   }
   leave(){
-    const c=this.active;if(!c)return;c.phase='leaving';c.departAt=null;c.waiting=false;
+    const c=this.active;if(!c)return;this.scene.trade?.caravanLeft(c);c.phase='leaving';c.departAt=null;c.waiting=false;
     const edges=edgeTiles(this.scene.map),preferred=[c.entry,...edges].filter(p=>this.scene.map[p.y]?.[p.x]===0);
     const route=findPathToAny(this.scene.map,c.nextTile??c.tile,preferred.length?preferred:edges);
     c.path=route?.path??[];this.feed(null,'left');this.changed();

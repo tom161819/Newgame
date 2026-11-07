@@ -17,7 +17,7 @@ export async function marketplaceSmoke(context,url,instrument){
     const finished=type=>page.evaluate(type=>{
       const s=window.__game.registry.get('application').scene,d=s.objectRegistry.require(type),c=s.character.tile,occupied=new Set(s.reservedTiles().map(t=>`${t.x},${t.y}`));let tiles,anchor;
       for(let y=c.y+4;y<c.y+20&&!anchor;y++)for(let x=c.x-14;x<c.x+14&&!anchor;x++){const candidate=[];for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++)candidate.push({x:x+dx,y:y+dy});if(candidate.every(t=>s.map[t.y]?.[t.x]===0&&!occupied.has(`${t.x},${t.y}`)&&!s.resourceOccupancy.has(`${t.x},${t.y}`))){anchor={x,y};tiles=candidate;}}
-      const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,...anchor,tiles};s.buildings.push(b);for(const t of tiles)s.map[t.y][t.x]=1;s.towerViews.set(b.id,s.createBuildingView(d,b));s.events.emit('buildings:changed');s.updateInventory();return b.id;
+      const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,...anchor,tiles};s.buildings.push(b);for(const t of tiles)s.map[t.y][t.x]=1;s.towerViews.set(b.id,s.createBuildingView(d,b));s.foodStorage.register(b);s.events.emit('buildings:changed');s.updateInventory();return b.id;
     },type);
     await finished('warehouse');
     const {id}=await placeBlueprint(page,'marketplace');
@@ -38,7 +38,17 @@ export async function marketplaceSmoke(context,url,instrument){
     assert.ok(arrived.start.x===0||arrived.start.y===0||arrived.start.x===99||arrived.start.y===99);assert.equal(arrived.phase,'trading');assert.equal(arrived.view,true);assert.ok(arrived.stock>=1);
     await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;s.marketplacePanel.open(s.buildings.find(b=>b.id===id));},market);
     assert.match(await page.locator('#marketplace-status').textContent(),/is here\. Leaving in \d+:\d\d/);assert.match(await page.locator('#marketplace-status').textContent(),/Merchant’s Gold: \d+/);
+    // F1.3: sell 20 Wood through the trade window; Gold arrives only when Haulers have carried it and the caravan takes it.
+    const gold0=await page.evaluate(()=>window.__game.registry.get('application').scene.inventory.count('gold'));
+    await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.pay({gold:Math.max(0,s.inventory.count('gold')-400)},{source:'Smoke'});});
+    const gold1=await page.evaluate(()=>window.__game.registry.get('application').scene.inventory.count('gold'));
+    await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;for(const w of s.workerSystem.liveWorkers().slice(0,3))s.workerSystem.jobs.assign(w,'hauler');const c=s.caravans.active;c.departAt=s.gameTime.totalElapsed+.75*s.gameTime.dayDuration;});
+    await page.locator('[data-trade-qty="wood"]').fill('20');await page.locator('[data-trade-side="sell"][data-trade-resource="wood"]').click();
+    await page.locator('[data-trade-order]').first().waitFor();assert.match(await page.locator('[data-trade-order]').first().textContent(),/Sell 20 Wood/);if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/trade-window.png`});
     await page.keyboard.press('Escape');
+    await page.waitForFunction(()=>window.__game.registry.get('application').scene.trade.orders[0]?.status==='Completed',null,{timeout:150000});
+    assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.inventory.count('gold')),gold1+20*3,'paid on hand-over, 3 Gold per Wood');
+    assert.ok(gold0>=gold1);
     const gone=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.caravans.leave();for(let i=0;i<20000&&s.caravans.active;i++){s.caravans.update(100);s.caravanViews.update();}return {active:s.caravans.active,view:s.caravanViews.view,next:s.caravans.nextVisitAt};});
     assert.equal(gone.active,null);assert.equal(gone.view,null);assert.ok(gone.next>0);
     console.log('PASS Marketplace: locked until a Warehouse is finished, placed from the Logistics menu, panel with goods space, loading spots and prices; a summoned caravan drives in from the edge, trades, leaves and the next one is scheduled');

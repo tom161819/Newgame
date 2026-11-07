@@ -1,4 +1,5 @@
 import { removeBuildingShell } from '../game/buildingRemoval.js';
+import { tradeableResources } from '../data/trade.js';
 import { GRANARY_GROUP_CAPACITY,granaryGroup,granaryUsage } from '../data/granaryCapacity.js';
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
 import { recipeResources } from '../data/production.js';
@@ -31,6 +32,8 @@ export class FoodStorageSystem {
       add(stockLocationId(building),d.starter?'fallback':'storage',d.storage.capacity,storageResources(d,this.scene.objectRegistry));
       if(d.starter){const camp=this.locations.get('food-camp');if(camp&&!this.used(camp)&&!this.incoming(camp.id)){this.locations.delete(camp.id);this.changed();}}
     }
+    // Trade F1.3: the Marketplace's goods space. Kind 'market' is never a store (isStock), so only trade tasks use it.
+    if(d.trade&&this.physicalMaterials)add(`market-${building.id}`,'market',d.trade.capacity,tradeableResources(this.scene.objectRegistry).map(r=>r.id));
     if(d.recipe){add(`input-${building.id}`,'input',d.bufferCapacity,recipeResources(d,'input'));add(`output-${building.id}`,'output',d.bufferCapacity,recipeResources(d,'output'));}
     // C08: a Barracks keeps the Bows, Swords and Armor Haulers bring for the units it trains.
     if(d.kit)add(`kit-${building.id}`,'kit',d.kit.capacity,equipmentResources(this.scene.objectRegistry));

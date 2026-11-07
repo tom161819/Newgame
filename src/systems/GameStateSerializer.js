@@ -1,5 +1,6 @@
 import { validateRockMining } from './RockMiningState.js';
 import { CARAVAN_RULES,MERCHANT_TYPES } from '../data/trade.js';
+import { ORDER_STATUSES } from './TradeSystem.js';
 import { ROCK_MINING } from '../data/rockMining.js';
 import { buildingDemolitionRefund } from '../data/demolition.js';
 import { t } from '../i18n/index.js';
@@ -30,7 +31,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=38;
+export const SAVE_VERSION=39;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -74,6 +75,7 @@ export function serializeGameState(scene){
     ...(scene.stables?{stables:scene.stables.exportState()}:{}),
     ...(scene.needs?{needs:scene.needs.exportState()}:{}),
     ...(scene.caravans?{caravans:scene.caravans.exportState()}:{}),
+    ...(scene.trade?{trade:scene.trade.exportState()}:{}),
     ...(scene.kingLogistics?{kingLogistics:scene.kingLogistics.exportState()}:{}),
     ...(scene.logisticsTasks?{logistics:{version:1,...(scene.constructionSystem?.materials.enabled?{materialsVersion:1}:{})}}:{}),
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
@@ -447,6 +449,18 @@ export function validateGameState(input,registry=objectRegistry){
       check(typeof c.warned==='boolean'&&typeof c.waiting==='boolean');
       if(c.phase==='trading'){number(c.departAt,0);check(c.departAt<=now+CARAVAN_RULES.stay*s.gameSettings.dayLengthSeconds*1000+1e-6);}else check(c.departAt===null&&!c.waiting);
       if(c.phase!=='leaving'){const m=s.buildings.find(b=>b.id===c.marketplaceId);check(m&&m.type==='marketplace');}else integer(c.marketplaceId,0);
+    }
+  }
+  // Trade F1.3: orders (schema 39). Open orders belong to the active caravan and an existing Marketplace.
+  if(s.trade!==undefined){
+    const v=s.trade;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='orders,seq');integer(v.seq,0);array(v.orders,200);const ids=new Set();
+    for(const o of v.orders){
+      check(o&&typeof o==='object'&&Object.keys(o).sort().join()==='caravanId,delivered,id,marketplaceId,placedAt,price,quantity,resource,side,status');
+      check(typeof o.id==='string'&&/^trade-\d+$/.test(o.id)&&Number(o.id.slice(6))<=v.seq&&!ids.has(o.id));ids.add(o.id);
+      definition(o.resource,'resource');check(['buy','sell'].includes(o.side)&&ORDER_STATUSES.includes(o.status));integer(o.quantity,1,100000);integer(o.delivered,0,o.quantity);integer(o.price,1,1000000);
+      number(o.placedAt,0);check(typeof o.caravanId==='string');integer(o.marketplaceId,0);
+      if(['Pending','Transporting'].includes(o.status)){check(s.caravans?.active?.id===o.caravanId&&s.caravans.active.marketplaceId===o.marketplaceId);check(s.buildings.some(b=>b.id===o.marketplaceId&&b.type==='marketplace'));}
+      if(o.status==='Completed')check(o.delivered===o.quantity);
     }
   }
   validateRockMining(s,registry,{check,integer,number,array});

@@ -5,6 +5,18 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-07
+<!-- version: {"title":"Trading with caravans","type":"feature","reconstructed":false,"saveVersion":39} -->
+### Added
+- Trading with caravans. While a caravan is at the Marketplace, its panel shows a trade table: what the caravan has, what the kingdom has free, the Buy and Sell price, an amount with Max buttons, and Buy / Sell. Before you confirm it shows the total, your Gold, the room in your stores and a rough delivery time, with a warning when it may not be done before the caravan leaves.
+- Selling: Haulers carry the goods to the Marketplace; you get the Gold only when the caravan takes them, at the price agreed when you ordered. Buying: the caravan unloads onto the Marketplace and is paid per unloaded unit; Haulers carry the goods into a fitting store (Starter Stockpile, Warehouse, Granary or Armory).
+- Orders show their progress (Pending, Transporting, Completed, Partly completed, Cancelled) and can be cancelled. A caravan waits up to a quarter day longer for a running sale. When it leaves, the rest of each order is cancelled: unsold goods go back to the stores and unused Gold stays yours.
+- Clear reasons when an order is not possible: not enough Gold or free goods, the merchant is out of stock or of Gold, no room in the stores or on the Marketplace, the caravan is leaving, or the treasury would go over 500 Gold.
+- The daily resource statistics show Trade Purchase and Trade Sale.
+
+### Changed
+- Saved games use a new format (39) for the Marketplace goods space and trade orders. Games saved by earlier versions cannot be loaded; start a new game.
+
 ## [0.10.0] - 2026-11-07
 <!-- version: {"title":"Merchant caravans","type":"feature","reconstructed":false,"saveVersion":38} -->
 ### Added

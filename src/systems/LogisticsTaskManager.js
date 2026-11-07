@@ -13,7 +13,7 @@ export class LogisticsTaskManager {
     for(const [key,expires]of this.failedRoutes)if(expires<=now)this.failedRoutes.delete(key);
     for(const key of this.producerWaits.keys())if(!this.scene.foodProduction.records.has(Number(key.split(':')[0])))this.producerWaits.delete(key);
     const storage=this.storage,stores=[...storage.locations.values()].filter(l=>storage.isStock(l));
-    this.catalog.push(...(this.scene.constructionSystem?.materials.candidates()??[]),...(this.scene.military?.candidates()??[]));
+    this.catalog.push(...(this.scene.constructionSystem?.materials.candidates()??[]),...(this.scene.military?.candidates()??[]),...(this.scene.trade?.candidates()??[]));
     for(const record of this.scene.foodProduction.records.values()){
       const building=this.scene.foodProduction.building(record.buildingId);if(!building)continue;
       const recipe=this.scene.foodProduction.recipe(building),input=storage.locations.get(`input-${building.id}`);

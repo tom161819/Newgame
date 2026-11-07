@@ -1,4 +1,5 @@
 import { GRANARY_GROUP_CAPACITY,granaryUsage } from '../data/granaryCapacity.js';
+import { tradeableResources } from '../data/trade.js';
 import { paidCost } from '../data/demolition.js';
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
 import { pavementWorkArea } from '../game/pavement.js';
@@ -28,6 +29,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     if(d.storage&&(physical||!d.storage.accepts))expected.set(stockLocationId(b),{...base,kind:d.starter?'fallback':'storage',capacity:savedCapacity===LOGISTICS_RULES.legacyStarterCapacity?savedCapacity:d.storage.capacity,allowed:storageResources(d,registry)});
     if(d.recipe)for(const kind of ['input','output'])expected.set(`${kind}-${b.id}`,{...base,kind,capacity:d.bufferCapacity,allowed:recipeResources(d,kind)});
     if(d.kit)expected.set(`kit-${b.id}`,{...base,kind:'kit',capacity:d.kit.capacity,allowed:equipmentResources(registry)});
+    if(d.trade&&physical)expected.set(`market-${b.id}`,{...base,kind:'market',capacity:d.trade.capacity,allowed:tradeableResources(registry).map(r=>r.id)});
   }
   const sites=new Map();
   if(physical)for(const b of s.buildings){
