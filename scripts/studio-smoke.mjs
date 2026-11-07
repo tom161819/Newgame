@@ -387,8 +387,60 @@ try {
   }
   pass('Buildings in game: every game building with its price, edit/add/remove a resource (never the last), invalid amounts refused, proposals saved to the page database with the reviewer, others live by name, forged ignored, Discard, Viewer read-only');
 
+  {
+    // UI Lab: the game's real interface restyled, docked by dragging, windows rearranged; designs to the page database.
+    const { page: lab, errors: labErrors } = await open(context, 'ui-lab.html');
+    await lab.waitForFunction(() => window.uiLab?.ready, null, { timeout: 20000 });
+    const frameAttr = name => lab.evaluate(n => window.uiLab.frameDoc().documentElement.getAttribute(n), name);
+    assert.equal(await frameAttr('data-ui-theme'), 'olive');
+    assert.ok(await lab.evaluate(() => !!window.uiLab.frameDoc().querySelector('.inventory #inventory-items')), 'the captured HUD is in the preview');
+    await lab.locator('[data-preset="parchment"]').click();
+    assert.equal(await frameAttr('data-ui-theme'), 'parchment'); assert.equal(await frameAttr('data-ui-light'), 'true');
+    const panelBg = await lab.evaluate(() => { const d = window.uiLab.frameDoc(); return d.defaultView.getComputedStyle(d.documentElement).getPropertyValue('--ui-panel').trim(); });
+    assert.equal(panelBg, '#efe2c2');
+    // Drag the resource bar handle onto the bottom spot.
+    const handle = lab.locator('.ul-handle[data-region="hud"]'), hb = await handle.boundingBox();
+    await lab.mouse.move(hb.x + 10, hb.y + 6); await lab.mouse.down();
+    const zone = lab.locator('.ul-zone[data-zone="bottom"]'); await zone.waitFor(); const zb = await zone.boundingBox();
+    await lab.mouse.move(zb.x + zb.width / 2, zb.y + zb.height / 2, { steps: 6 }); await lab.mouse.up();
+    assert.equal(await lab.evaluate(() => window.uiLab.config().layout.hud), 'bottom');
+    assert.equal(await frameAttr('data-ui-hud'), 'bottom');
+    const hud = await lab.evaluate(() => { const d = window.uiLab.frameDoc(), r = d.querySelector('.inventory').getBoundingClientRect(), v = d.querySelector('.viewport').getBoundingClientRect(); return { bottom: v.bottom - r.bottom, top: r.top - v.top }; });
+    assert.ok(hud.bottom < 20 && hud.top > 200, `resource bar docked at the bottom (${JSON.stringify(hud)})`);
+    // A window: hide one section and move another; the preview follows.
+    await lab.locator('.ul-tabs [data-tab="windows"]').click();
+    await lab.locator('#ul-window').selectOption('storage-dialog');
+    await lab.locator('.ul-section').first().waitFor();
+    const keys = await lab.locator('.ul-section').evaluateAll(els => els.map(e => e.dataset.section));
+    assert.ok(keys.length >= 3, 'the storage window has sections');
+    await lab.locator(`.ul-section[data-section="${keys[1]}"] input[type="checkbox"]`).uncheck();
+    assert.equal(await lab.evaluate(k => { const d = window.uiLab.frameDoc(); return [...d.querySelectorAll('#storage-dialog [data-ui-hidden]')].length; }, keys[1]), 1);
+    await lab.locator(`.ul-section[data-section="${keys[2]}"] button[aria-label^="Move"][aria-label$="up"]`).click();
+    const cfg = await lab.evaluate(() => window.uiLab.config().panels['storage-dialog']);
+    assert.deepEqual(cfg.hidden, [keys[1]]); assert.equal(cfg.order[1], keys[2]);
+    // Saved designs (this browser, outside Claude).
+    await lab.locator('.ul-tabs [data-tab="designs"]').click();
+    await lab.getByRole('button', { name: 'Save design' }).click();
+    assert.equal((await lab.evaluate(() => window.uiLab.designs())).length, 1);
+    assert.deepEqual(labErrors, []); await lab.close();
+
+    const owner = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+    await owner.addInitScript(fakeDb, true);
+    const { page: sl, errors: slErrors } = await open(owner, 'ui-lab.html');
+    await sl.waitForFunction(() => window.uiLab?.ready);
+    await sl.locator('[data-preset="stone-castle"]').click();
+    await sl.locator('.ul-tabs [data-tab="designs"]').click();
+    await sl.getByRole('button', { name: 'Save and use in game' }).click();
+    await sl.waitForFunction(() => window.__fakeClaude.docs.has('ui/stone-castle'));
+    const doc = await sl.evaluate(() => window.__fakeClaude.docs.get('ui/stone-castle'));
+    assert.equal(doc.forGame, true); assert.equal(doc.by, 'u-owner'); assert.equal(doc.config.style, 'stone-castle'); assert.equal(doc.config.layout.buildingsBar, 'top');
+    assert.match(await sl.locator('#ul-summary').textContent(), /waits for the game — write „převzít UI“/);
+    assert.deepEqual(slErrors, []); await owner.close();
+  }
+  pass('UI Lab: real game interface in the preview, four styles, drag-to-dock (resource bar to the bottom), window sections hidden and reordered, designs saved locally and to the page database marked for the game');
+
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 } });
-  for (const path of ['index.html#watchtower', 'index.html#style-guide', 'phaser-demo.html', 'path-lab.html', 'buildings.html']) {
+  for (const path of ['index.html#watchtower', 'index.html#style-guide', 'phaser-demo.html', 'path-lab.html', 'buildings.html', 'ui-lab.html']) {
     const { page: small, errors: smallErrors } = await open(phone, path);
     await small.waitForTimeout(800);
     assert.equal(await small.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${path} fits a phone`);

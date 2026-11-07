@@ -1,0 +1,54 @@
+/* UI Lab: controls on the left, the scaled game screen on the right; stacks on a phone. */
+.ul-shell { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: 0; min-height: calc(100% - 60px); }
+.ul-controls { border-right: 1px solid var(--line); background: var(--surface); padding: 14px 12px 40px max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 12px; min-width: 0; max-height: calc(100dvh - 60px); overflow: auto; position: sticky; top: 0; }
+.ul-controls > * { flex-shrink: 0; }
+.ul-tabs { width: 100%; }
+.ul-tabs [role="tab"] { flex: 1; }
+.ul-panel { display: flex; flex-direction: column; gap: 10px; }
+.ul-panel h3 { margin: 8px 0 0; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.ul-field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.ul-field > span { color: var(--muted); font-size: 12px; }
+.ul-field select, .ul-field input[type="text"], .ul-panel textarea, .ul-toolbar select { font: inherit; font-size: 13px; padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); min-width: 0; }
+.ul-panel textarea { font-family: var(--font-mono); font-size: 11.5px; width: 100%; }
+.ul-hint { margin: 0; color: var(--muted); font-size: 12.5px; }
+.ul-presets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ul-preset { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.ul-preset.active { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.ul-preset strong { font-size: 13px; }
+.ul-preset small { color: var(--muted); font-size: 11px; }
+.ul-swatches { display: flex; gap: 3px; }
+.ul-swatches i { width: 18px; height: 14px; border-radius: 3px; border: 1px solid rgb(0 0 0 / .2); }
+.ul-colors { display: flex; flex-direction: column; gap: 5px; }
+.ul-color { display: grid; grid-template-columns: 32px minmax(0, 1fr) 118px; gap: 6px; align-items: center; font-size: 12.5px; }
+.ul-color input[type="color"] { width: 32px; height: 24px; padding: 0; border: 1px solid var(--line); border-radius: 4px; background: none; }
+.ul-color input[type="text"] { font-family: var(--font-mono); font-size: 11.5px; padding: 3px 5px; border: 1px solid var(--line); border-radius: 5px; background: var(--bg); color: var(--ink); min-width: 0; }
+.ul-sections { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.ul-section { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto auto auto; gap: 6px; align-items: center; padding: 5px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); cursor: grab; }
+.ul-section.drop { border-color: var(--accent); }
+.ul-section.is-hidden .ul-section-label { opacity: .5; text-decoration: line-through; }
+.ul-section .button { padding: 2px 7px; }
+.ul-grip { color: var(--muted); }
+.ul-section-label { display: flex; flex-direction: column; min-width: 0; font-size: 12.5px; overflow-wrap: anywhere; }
+.ul-section-label small { color: var(--muted); font-family: var(--font-mono); font-size: 10.5px; }
+.ul-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.ul-designs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ul-designs li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; gap: 6px; align-items: center; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; }
+.ul-designs li.for-game { border-color: var(--status-approved); }
+.ul-designs li div { display: flex; flex-direction: column; min-width: 0; }
+.ul-designs small { color: var(--muted); font-size: 11px; }
+.ul-stage-wrap { min-width: 0; padding: 14px max(18px, env(safe-area-inset-right, 0px)) 30px 18px; display: flex; flex-direction: column; gap: 10px; }
+.ul-stage { position: relative; width: 100%; overflow: hidden; border-radius: var(--radius); border: 1px solid var(--line); background: #222; box-shadow: var(--shadow); }
+#ul-frame { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; border: 0; transform-origin: 0 0; background: #25291e; }
+.ul-overlay { position: absolute; inset: 0; pointer-events: none; }
+.ul-overlay > * { pointer-events: auto; }
+.ul-overlay.dragging { cursor: grabbing; pointer-events: auto; } /* covers the iframe so the drag keeps its pointer */
+.ul-handle { position: absolute; z-index: 2; display: inline-flex; gap: 3px; align-items: center; padding: 2px 7px; border: 1px solid #fff; border-radius: 999px; background: rgb(46 90 134 / .92); color: #fff; font: 600 11px/1.4 var(--font-body); cursor: grab; touch-action: none; white-space: nowrap; box-shadow: 0 1px 4px rgb(0 0 0 / .4); }
+.ul-handle.dragging { background: var(--brass); }
+.ul-zone { position: absolute; z-index: 1; display: grid; place-items: center; border: 2px dashed rgb(255 255 255 / .85); border-radius: 8px; background: rgb(46 90 134 / .28); color: #fff; font: 600 12px var(--font-body); text-shadow: 0 1px 2px #000; pointer-events: none; }
+.ul-zone.current { border-style: solid; }
+.ul-zone.over { background: rgb(168 116 31 / .55); border-color: #ffe7a8; }
+.ul-note { margin: 0; color: var(--muted); font-size: 12px; }
+@media (max-width: 860px) {
+  .ul-shell { grid-template-columns: 1fr; }
+  .ul-controls { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); }
+}

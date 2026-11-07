@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "name": "Stone castle",
+  "style": "stone-castle",
+  "tokens": { "page": "#191b1e", "panel": "#3a3d42", "panelRaised": "#484c52", "glass": "rgb(40 43 48 / .92)", "line": "#9aa0a8", "lineSoft": "#5f646c", "ink": "#eef0f2", "muted": "#b6bbc2", "accent": "#cda43f", "button": "#50565f", "buttonInk": "#f3f4f6", "field": "#2a2d32", "good": "#8fc27b", "bad": "#e36b5b", "fontUi": "figtree", "fontDisplay": "cinzel", "fontScale": 1, "radius": 2, "borderWidth": 2, "texture": "stone", "frame": "carved", "shadow": "hard", "headings": "uppercase", "light": false },
+  "layout": { "hud": "top", "buildingsBar": "top", "settings": "left", "population": "right", "cornerStack": "bottom-right", "dialogs": "center", "unitPanel": "right", "camera": "bottom-left", "header": "hidden", "density": "compact" },
+  "panels": {}
+}

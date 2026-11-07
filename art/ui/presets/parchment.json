@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "name": "Parchment and ink",
+  "style": "parchment",
+  "tokens": { "page": "#3a2e22", "panel": "#efe2c2", "panelRaised": "#f7eed6", "glass": "rgb(242 230 200 / .93)", "line": "#6f5230", "lineSoft": "#b49a6c", "ink": "#2b2116", "muted": "#5f4c34", "accent": "#8e2f1d", "button": "#e4d1a7", "buttonInk": "#2b2116", "field": "#fbf5e4", "good": "#3d6a29", "bad": "#9e2f1e", "fontUi": "garamond", "fontDisplay": "fell", "fontScale": 1.05, "radius": 3, "borderWidth": 2, "texture": "parchment", "frame": "inked", "shadow": "soft", "headings": "normal", "light": true },
+  "layout": { "hud": "top", "buildingsBar": "bottom", "settings": "left", "population": "right", "cornerStack": "bottom-right", "dialogs": "right", "unitPanel": "left", "camera": "bottom-left", "header": "shown", "density": "comfortable" },
+  "panels": {}
+}

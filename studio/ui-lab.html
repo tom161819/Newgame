@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Asset Studio · UI Lab</title>
+    <meta name="claude:viewport-fit-sides" content="cover" />
+    <link rel="icon" href="data:," />
+    <meta name="description" content="Restyle and rearrange the game's real interface: styles, docking, window sections and text." />
+  </head>
+  <body class="ui-lab-page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><strong>UI Lab</strong><span class="brand-sub" id="ul-sub">The game's real interface · styles, layout, windows</span></div></div>
+      <nav class="views" aria-label="Studio views"><a href="./index.html#assets">Assets</a><a href="./index.html#style-guide">Style guide</a><a href="./buildings.html">Buildings in game</a><a href="./ui-lab.html" aria-current="page">UI Lab</a><a href="./phaser-demo.html">Phaser demo</a><a href="./path-lab.html">Path Lab</a></nav>
+      <div class="review-status">
+        <span id="ul-summary" class="review-summary" aria-live="polite"></span>
+      </div>
+    </header>
+    <p id="studio-alert" class="studio-alert" role="alert" hidden></p>
+    <div class="ul-shell">
+      <aside class="ul-controls" aria-label="UI Lab controls">
+        <div class="segmented ul-tabs" role="tablist" aria-label="Lab sections">
+          <button type="button" role="tab" data-tab="style" aria-selected="true">Style</button>
+          <button type="button" role="tab" data-tab="layout" aria-selected="false">Layout</button>
+          <button type="button" role="tab" data-tab="windows" aria-selected="false">Windows</button>
+          <button type="button" role="tab" data-tab="designs" aria-selected="false">Designs</button>
+        </div>
+        <div id="ul-panel" class="ul-panel"></div>
+      </aside>
+      <main class="ul-stage-wrap" aria-label="Preview">
+        <div class="toolbar ul-toolbar">
+          <label class="tool">Window <select id="ul-window" aria-label="Window shown in the preview"><option value="">None (map and bars)</option></select></label>
+          <label class="check"><input type="checkbox" id="ul-original" /> Original game look</label>
+          <label class="check"><input type="checkbox" id="ul-docking" checked /> Drag handles</label>
+          <span class="feedback" id="ul-status" aria-live="polite"></span>
+        </div>
+        <div class="ul-stage" id="ul-stage">
+          <iframe id="ul-frame" title="Game interface preview" tabindex="-1"></iframe>
+          <div id="ul-overlay" class="ul-overlay" aria-hidden="true"></div>
+        </div>
+        <p class="ul-note">Snapshot of the game's interface (<code>npm run ui:capture</code>), shown at 1440 × 900 and scaled to fit. Drag a handle onto a highlighted spot to dock that part of the screen.</p>
+      </main>
+    </div>
+  </body>
+  <script type="module" src="./src/ui-lab/main.js"></script>
+</html>

@@ -19,6 +19,6 @@ export default defineConfig({
     emptyOutDir: true,
     assetsDir: 'files',
     chunkSizeWarningLimit: 2500,
-    rollupOptions: { input: { index: `${studio}index.html`, 'phaser-demo': `${studio}phaser-demo.html`, 'path-lab': `${studio}path-lab.html`, buildings: `${studio}buildings.html` } },
+    rollupOptions: { input: { index: `${studio}index.html`, 'phaser-demo': `${studio}phaser-demo.html`, 'path-lab': `${studio}path-lab.html`, buildings: `${studio}buildings.html`, 'ui-lab': `${studio}ui-lab.html` } },
   },
 });

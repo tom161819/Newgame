@@ -1,0 +1,117 @@
+/* UI Lab theme layer (art/ui/uiConfig.js). Loaded after the game's style.css. Every rule is scoped under
+   html[data-ui-theme], which only applyUiConfig sets: without a config the game looks exactly as before.
+   Tokens arrive as --ui-* custom properties; layout and look switches as data-ui-* attributes on <html>. */
+
+/* ---------- tokens → the game's own variables ---------- */
+html[data-ui-theme] {
+  --font-ui: var(--ui-font); --font-display: var(--ui-font-display);
+  --panel: var(--ui-panel); --panel-raised: var(--ui-panel-raised); --glass: var(--ui-glass);
+  --line: var(--ui-line); --line-soft: var(--ui-line-soft); --gold: var(--ui-accent); --ink: var(--ui-ink); --muted: var(--ui-muted);
+  --ui-texture: none; --ui-frame-layer: none; --ui-surface-shadow: 0 10px 28px rgb(0 0 0 / .45);
+  font-size: calc(14px * var(--ui-font-scale, 1));
+  color: var(--ui-ink); background: var(--ui-page);
+}
+html[data-ui-theme] body { color: var(--ui-ink); font-family: var(--ui-font); }
+
+/* Textures: CSS only, layered under each surface. */
+html[data-ui-texture="wood"] { --ui-texture: repeating-linear-gradient(92deg, rgb(255 220 170 / .045) 0 2px, transparent 2px 7px, rgb(0 0 0 / .07) 7px 9px, transparent 9px 15px), repeating-linear-gradient(88deg, rgb(0 0 0 / .05) 0 1px, transparent 1px 23px), linear-gradient(180deg, rgb(255 230 190 / .05), rgb(0 0 0 / .12)); }
+html[data-ui-texture="parchment"] { --ui-texture: radial-gradient(ellipse at 18% 12%, rgb(160 120 60 / .14), transparent 45%), radial-gradient(ellipse at 85% 80%, rgb(140 100 50 / .16), transparent 50%), radial-gradient(ellipse at 60% 35%, rgb(255 255 240 / .35), transparent 55%), linear-gradient(180deg, rgb(255 250 235 / .3), rgb(120 90 40 / .1)); }
+html[data-ui-texture="stone"] { --ui-texture: repeating-linear-gradient(0deg, transparent 0 26px, rgb(0 0 0 / .14) 26px 28px), repeating-linear-gradient(90deg, transparent 0 54px, rgb(0 0 0 / .1) 54px 56px), radial-gradient(circle at 30% 20%, rgb(255 255 255 / .06), transparent 40%), linear-gradient(180deg, rgb(255 255 255 / .05), rgb(0 0 0 / .14)); }
+
+/* Frames: the border line plus an optional decoration layer on top of the texture. */
+html[data-ui-frame="rivets"] { --ui-frame-layer: radial-gradient(circle at 9px 9px, #c9b48a 0 2px, #4a3a28 2.5px 3.5px, transparent 4px), radial-gradient(circle at calc(100% - 9px) 9px, #c9b48a 0 2px, #4a3a28 2.5px 3.5px, transparent 4px), radial-gradient(circle at 9px calc(100% - 9px), #c9b48a 0 2px, #4a3a28 2.5px 3.5px, transparent 4px), radial-gradient(circle at calc(100% - 9px) calc(100% - 9px), #c9b48a 0 2px, #4a3a28 2.5px 3.5px, transparent 4px); }
+html[data-ui-shadow="hard"] { --ui-surface-shadow: 4px 5px 0 rgb(0 0 0 / .45); }
+html[data-ui-shadow="none"] { --ui-surface-shadow: none; }
+
+/* ---------- surfaces: bars, sidebars, windows, floating chips, tooltips ---------- */
+html[data-ui-theme] :is(.buildings-bar, .buildings-panel, .settings-panel, .population-panel, .employment-panel, .game-dialog, #game-over, .notices-panel, .population-tooltip, #object-tooltip, .staffing-tooltip, .resource-economy-tooltip, #day-notice) {
+  color: var(--ui-ink);
+  border: var(--ui-border) solid var(--ui-line);
+  border-radius: var(--ui-radius);
+  background: var(--ui-frame-layer), var(--ui-texture), linear-gradient(180deg, var(--ui-panel-raised), var(--ui-panel));
+  box-shadow: var(--ui-surface-shadow);
+}
+html[data-ui-theme] :is(.inventory, .camera-controls > *, .settings-button, .population-tab) {
+  color: var(--ui-ink);
+  border: var(--ui-border) solid var(--ui-line-soft);
+  background: var(--ui-texture), var(--ui-glass);
+  box-shadow: var(--ui-surface-shadow);
+}
+html[data-ui-theme] .inventory { border-radius: var(--ui-radius); }
+html[data-ui-theme] :is(.settings-button, .population-tab) { border-radius: min(var(--ui-radius), 10px); }
+html[data-ui-frame="inked"] :is(.buildings-bar, .buildings-panel, .settings-panel, .population-panel, .employment-panel, .game-dialog, #game-over, .notices-panel, .inventory) { border-style: double; border-width: calc(var(--ui-border) + 2px); }
+html[data-ui-frame="carved"] :is(.buildings-bar, .buildings-panel, .settings-panel, .population-panel, .employment-panel, .game-dialog, #game-over, .notices-panel, .inventory) { box-shadow: inset 0 2px 0 rgb(255 255 255 / .12), inset 0 -3px 0 rgb(0 0 0 / .3), inset 2px 0 0 rgb(255 255 255 / .06), inset -2px 0 0 rgb(0 0 0 / .2), var(--ui-surface-shadow); }
+html[data-ui-frame="rivets"] :is(.buildings-bar, .buildings-panel, .settings-panel, .population-panel, .employment-panel, .game-dialog, .notices-panel, .inventory) { padding-inline: max(16px, 1em); }
+html[data-ui-theme] .viewport { outline-color: var(--ui-line-soft); border-radius: var(--ui-radius); }
+html[data-ui-theme] .game-dialog::backdrop { background: color-mix(in srgb, var(--ui-page) 70%, transparent); }
+
+/* ---------- type ---------- */
+html[data-ui-theme] :is(h1, h2, h3, h4, .game-title, .dialog-heading h2, .settings-heading h2, .population-tooltip h3) { font-family: var(--ui-font-display); color: var(--ui-ink); }
+html[data-ui-theme] :is(.dialog-heading h2, .settings-heading h2) { font-size: 1.45em; }
+html[data-ui-headings="smallcaps"] :is(h1, h2, h3, h4, .game-title) { font-variant: small-caps; letter-spacing: .04em; }
+html[data-ui-headings="uppercase"] :is(h1, h2, h3, h4, .game-title) { text-transform: uppercase; letter-spacing: .08em; font-size: .92em; }
+html[data-ui-theme] :is(.eyebrow, .game-subtitle) { color: var(--ui-accent); }
+html[data-ui-theme] .inventory output { color: var(--ui-accent); }
+html[data-ui-theme] [data-ui-panel-font], html[data-ui-theme] [data-ui-panel-font] :is(h2, h3, h4, p, small, span, label, li, td, th, button, select, input) { font-family: var(--ui-panel-font); }
+
+/* ---------- controls ---------- */
+html[data-ui-theme] button { color: var(--ui-button-ink); border-color: var(--ui-line); border-radius: min(var(--ui-radius), 8px); background: linear-gradient(180deg, color-mix(in srgb, var(--ui-button) 88%, white), var(--ui-button)); }
+html[data-ui-theme] button:hover { border-color: var(--ui-accent); background: linear-gradient(180deg, color-mix(in srgb, var(--ui-button) 75%, white), color-mix(in srgb, var(--ui-button) 92%, white)); }
+html[data-ui-theme] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) { color: var(--ui-ink); background: var(--ui-field); border-color: var(--ui-line); }
+html[data-ui-theme] :is(button, a, input, select):focus-visible { outline-color: var(--ui-accent); }
+html[data-ui-theme] progress { accent-color: var(--ui-accent); }
+
+/* ---------- light styles (parchment): dark text everywhere the game assumed light text ---------- */
+html[data-ui-light="true"] :is(.buildings-bar, .buildings-panel, .settings-panel, .population-panel, .employment-panel, .game-dialog, #game-over, .notices-panel, .inventory, .camera-controls, .population-tooltip, #object-tooltip, .staffing-tooltip, .resource-economy-tooltip, #day-notice, .settings-button, .population-tab) :is(p, small, span, label, li, td, th, dt, dd, strong, b, em, output, summary, legend, a, h2, h3, h4, div, caption) { color: var(--ui-ink); }
+html[data-ui-light="true"] :is(.buildings-panel, .settings-panel, .population-panel, .employment-panel, .game-dialog, .notices-panel, .inventory) :is(small, .muted, [class*="help"], [class*="note"], [class*="summary"]) { color: var(--ui-muted); }
+html[data-ui-light="true"] :is([data-tone="positive"], [class*="positive"], .good, [class*="-ok"]) { color: var(--ui-good) !important; }
+html[data-ui-light="true"] :is([data-tone="negative"], [class*="negative"], [class*="warning"], .bad, [class*="danger"], [class*="alert"]) { color: var(--ui-bad) !important; }
+html[data-ui-light="true"] .inventory output, html[data-ui-light="true"] .game-version { color: var(--ui-accent); }
+html[data-ui-light="true"] .game-header :is(.game-title, .game-subtitle) { color: var(--ui-panel); }
+html[data-ui-light="true"] :is(table, tr, td, th) { border-color: var(--ui-line-soft); }
+html[data-ui-light="true"] .missing-workers, html[data-ui-light="true"] .missing-workers * { color: #fff3d6; }
+
+/* ---------- layout ---------- */
+/* Resource bar at the bottom of the map: it grows upwards when expanded; the bottom corner tools move up. */
+html[data-ui-hud="bottom"] .inventory { top: auto; bottom: 8px; display: flex; flex-direction: column-reverse; }
+html[data-ui-hud="bottom"] .inventory .hud-details { margin: 0 0 6px; padding: 0 0 7px; border-top: 0; border-bottom: 1px solid var(--ui-line-soft); }
+html[data-ui-hud="bottom"][data-ui-camera^="bottom"] .camera-controls { bottom: 64px; }
+html[data-ui-hud="bottom"][data-ui-corner-stack^="bottom"] .corner-stack { bottom: 64px; max-height: calc(100% - 80px); }
+html[data-ui-hud="top"][data-ui-corner-stack^="top"] .corner-stack, html[data-ui-hud="top"][data-ui-camera^="top"] .camera-controls { top: 64px; }
+/* Buildings bar above the map; its menu then opens downwards. */
+html[data-ui-buildings-bar="top"] .buildings-bar { order: -1; margin: 0 0 4px; }
+html[data-ui-buildings-bar="top"] .game-header { order: -2; }
+html[data-ui-buildings-bar="top"] .buildings-panel { bottom: auto; top: calc(100% + 8px); }
+/* Side tabs and their sidebars. When both sit on one side they stack (settings above population). */
+html[data-ui-settings="right"] .settings-button { left: auto; right: 8px; }
+html[data-ui-settings="right"] .settings-panel { left: auto; right: 52px; }
+html[data-ui-settings="right"] .settings-panel:not(.open) { transform: translateX(calc(100% + 60px)); }
+html[data-ui-population="left"] .population-tab { right: auto; left: 8px; }
+html[data-ui-population="left"] .population-panel { right: auto; left: 52px; }
+html[data-ui-population="left"] .population-panel:not(.open) { transform: translateX(calc(-100% - 60px)); }
+html[data-ui-population="left"][data-ui-settings="left"] .settings-button, html[data-ui-population="right"][data-ui-settings="right"] .settings-button { top: 30%; }
+html[data-ui-population="left"][data-ui-settings="left"] .population-tab, html[data-ui-population="right"][data-ui-settings="right"] .population-tab { top: 45%; }
+html[data-ui-population="left"] .employment-panel { right: auto; left: 58px; }
+/* Notices, event feed and minimap column. */
+html[data-ui-corner-stack$="left"] .corner-stack { right: auto; left: 12px; align-items: flex-start; }
+html[data-ui-corner-stack$="left"] .event-feed { align-items: flex-start; }
+html[data-ui-corner-stack^="top"] .corner-stack { bottom: auto; top: 10px; flex-direction: column-reverse; }
+html[data-ui-corner-stack="bottom-left"][data-ui-camera="bottom-left"] .camera-controls, html[data-ui-corner-stack="top-left"][data-ui-camera="top-left"] .camera-controls { left: auto; right: 8px; }
+/* Camera chips. */
+html[data-ui-camera="bottom-right"] .camera-controls { left: auto; right: 8px; justify-content: flex-end; }
+html[data-ui-camera="bottom-right"][data-ui-corner-stack="bottom-right"] .camera-controls { right: auto; left: 8px; }
+html[data-ui-camera="top-left"] .camera-controls { bottom: auto; top: 8px; }
+/* Windows: centred (default), or docked to the left or right edge beside the map. */
+html[data-ui-dialogs="left"] .game-dialog:not(.docked-panel)[open] { margin: auto auto auto 16px; }
+html[data-ui-dialogs="right"] .game-dialog:not(.docked-panel)[open] { margin: auto 16px auto auto; }
+html[data-ui-unit-panel="left"] #unit-dialog.docked-panel { inset: 144px auto auto 16px; }
+/* Title line, density. */
+html[data-ui-header="hidden"] .game-header { display: none; }
+html[data-ui-density="compact"] { font-size: calc(13px * var(--ui-font-scale, 1)); }
+html[data-ui-density="compact"] :is(.game-dialog, .settings-panel, .population-panel, .employment-panel, .buildings-panel) { padding: 11px 13px; }
+html[data-ui-density="compact"] .dialog-heading { margin-bottom: 9px; }
+html[data-ui-density="compact"] .buildings-bar { padding: 4px; gap: 5px; }
+html[data-ui-density="compact"] button { padding-block: 5px; }
+
+/* Sections hidden in the UI Lab. */
+html[data-ui-theme] [data-ui-hidden] { display: none !important; }
