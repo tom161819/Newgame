@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.40.0] - 2026-11-07
+<!-- version: {"title":"Workplace porches","type":"feature","reconstructed":false,"saveVersion":55} -->
+### Added
+- Workplaces have a porch in front of them, drawn with the art approved in the Asset Studio:
+  - trade porches for the Mill, Bakery, Quarry, Iron Mine and Smelter;
+  - profession porches for the Lumberjack, Farmhouse, smiths and Hunting Lodge;
+  - a shared veranda for the other workplaces;
+  - the Barracks has none.
+- Workers with nothing to do (no input, full storage, nothing to hunt…) sit on the porch and now and then pick their nose. They get up as soon as there is work, at rest time or when given an order.
+- The porch stays walkable and the building keeps its size. When something is built on the porch's tiles, the porch moves to another free side.
+
 ## [0.39.0] - 2026-11-07
 <!-- version: {"title":"Swing Tree, Haystack and Well","type":"feature","reconstructed":false,"saveVersion":55} -->
 ### Added

@@ -5,6 +5,7 @@ import { ChildrenSystem } from '../systems/ChildrenSystem.js';
 import { ChildViews } from './ChildViews.js';
 import { VillageGreenView } from './VillageGreenView.js';
 import { DecorationView } from './DecorationView.js';
+import { PorchSystem } from '../systems/PorchSystem.js';
 import { VillagePanel } from '../ui/VillagePanel.js';
 import { IssueIcons } from './IssueIcons.js';
 import { SideCards } from '../ui/SideCards.js';
@@ -284,7 +285,7 @@ export class GameScene extends Phaser.Scene {
     this.wageSystem=new WageSystem(this,{onPayroll:()=>this.updateInventory()});this.economyPanel=new EconomyPanel(this);
     this.buildingBar.close();this.updateInventory();
     this.gettingStarted=new GettingStartedPanel(this);
-    this.domestic=new DomesticAnimalSystem(this);this.combat.shield=(target,attacker)=>this.domestic?.shield(target,attacker);this.domesticViews=new DomesticViews(this,this.domestic);this.issueIcons=new IssueIcons(this);this.childrenSystem=new ChildrenSystem(this);this.childViews=new ChildViews(this,this.childrenSystem);this.villagePanel=new VillagePanel(this);this.catPanel=new CatPanel(this);
+    this.domestic=new DomesticAnimalSystem(this);this.combat.shield=(target,attacker)=>this.domestic?.shield(target,attacker);this.domesticViews=new DomesticViews(this,this.domestic);this.issueIcons=new IssueIcons(this);this.childrenSystem=new ChildrenSystem(this);this.porches=new PorchSystem(this);this.childViews=new ChildViews(this,this.childrenSystem);this.villagePanel=new VillagePanel(this);this.catPanel=new CatPanel(this);
     this.marketplacePanel=new MarketplacePanel(this);this.builderWorkshopPanel=new BuilderWorkshopPanel(this);this.policyPanel=new PolicyPanel(this);this.sideCards=new SideCards(this);
     this.updateTimeDisplay();
     this.setStatus(t('status.idle'));
@@ -337,7 +338,7 @@ export class GameScene extends Phaser.Scene {
       this.settingsPanel.destroy();this.fpsOverlay.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
       this.clearWallPreviews();
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
-      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.marketplacePanel.destroy();this.catPanel?.destroy();this.domesticViews?.destroy();this.domestic?.destroy();this.villagePanel?.destroy();this.issueIcons?.destroy();this.sideCards?.destroy();this.childViews?.destroy();this.childrenSystem?.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
+      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.marketplacePanel.destroy();this.catPanel?.destroy();this.domesticViews?.destroy();this.domestic?.destroy();this.villagePanel?.destroy();this.issueIcons?.destroy();this.sideCards?.destroy();this.childViews?.destroy();this.childrenSystem?.destroy();this.porches?.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.pavementTool.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
       this.demolitionUI.destroy();this.demolition.destroy();this.farmConnections.destroy();this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
@@ -730,6 +731,7 @@ export class GameScene extends Phaser.Scene {
     this.wildlifeRespawn.update(activeDelta);
     this.domestic?.update(activeDelta);
     this.childrenSystem?.update(activeDelta);
+    this.porches?.update(activeDelta);
     this.noticeRemaining=Math.max(0,this.noticeRemaining-activeDelta);if(!this.noticeRemaining)document.querySelector('#day-notice').hidden=true;
     return activeDelta;
   }

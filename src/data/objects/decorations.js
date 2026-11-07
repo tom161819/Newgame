@@ -1,3 +1,4 @@
+import { PORCH_ART,porchId } from '../porches.js';
 export const decorations = [
   {
     id: 'rock_outcrop', name: 'Skalní překážka', category: 'decoration', sprite: '/assets/decorations/rocks/rock-outcrop.webp',
@@ -30,3 +31,8 @@ export const decorations = [
     description: 'Suchá křovina na poušti.', renderMode: 'sprite', origin: { x: 0.49254, y: 0.55 }, visualHeight: 38, depth: { offset: 0.04 },
   },
 ];
+// #98 Workplace porches: walkable decorations drawn in front of workplaces by PorchSystem (never placed by the player).
+decorations.push(...Object.entries(PORCH_ART).map(([variant,art])=>({
+  id:porchId(variant),name:'Porch',category:'decoration',sprite:art.sprite,artSource:art.artSource,width:2,height:1,walkable:true,collectible:false,buildable:false,
+  cost:{},interactions:[],description:'Seats in front of a workplace where idle workers sit.',renderMode:'sprite',origin:art.origin,visualHeight:art.visualHeight,depth:{offset:0},porch:{variant},
+})));

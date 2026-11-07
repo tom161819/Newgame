@@ -77,6 +77,14 @@ export class HumanView extends Phaser.GameObjects.Container {
     this.arms[0].rotation=-.5+swing*.3;this.arms[1].rotation=-.6+swing*.4;
     this.tool.clear().lineStyle(2,0x9e814e).lineBetween(6,-26,x+8,y+7).lineStyle(4,0x8e9586).lineBetween(x+3,y+4,x+11,y+4);
   }
+  // #98 Sitting on a porch (provisional pose until seated sprites exist): the figure sinks onto the seat, legs folded
+  // under it, and now and then picks his nose.
+  setSeated(on){
+    if(!on){if(this.seatedOn){this.seatedOn=false;this.setScale(1,1);this.nose?.setVisible(false);}return;}
+    this.seatedOn=true;this.setScale(1,.8);
+    if(!this.nose){this.nose=this.scene.add.rectangle(2,-36,2,5,COLORS.armSkin).setVisible(false);this.add(this.nose);}
+    this.seatPhase=((this.seatPhase??Math.random()*9000)+16)%9000;this.nose.setVisible(this.seatPhase<1200);
+  }
   setCargo(cargo){this.cargoBundle.update(cargo);}
   // #58 C2: a small red "!" over a striking or leaving resident.
   setDiscontent(on){
