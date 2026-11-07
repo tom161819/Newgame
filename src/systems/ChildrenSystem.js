@@ -2,7 +2,7 @@ import { CHILDREN,VILLAGE_GREEN,HOUSE_DECORATIONS,SURROUNDINGS_CAP,hashOf,seeded
 import { isWaterGround } from '../data/worldTerrain.js';
 import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { findPath } from '../game/pathfinding.js';
-import { isRestTime } from './DailyRest.js';
+import { isRestTime,restStart } from './DailyRest.js';
 import { COLUMNS,ROWS } from '../game/config.js';
 import { t } from '../i18n/index.js';
 
@@ -63,7 +63,7 @@ export class ChildrenSystem {
   playingAt(greenId){return [...this.children.values()].filter(c=>c.state==='out'&&c.activity?.greenId===greenId).length;}
   feast(){return (this.scene.policy?.feastBonus?.()??0)>0;}
   restWindow(){
-    const g=this.scene.gameTime;if(!isRestTime(g))return null;const start=g.dayDuration*.75,part=(g.elapsed-start)/(g.dayDuration-start);
+    const g=this.scene.gameTime;if(!isRestTime(g))return null;const start=g.dayDuration*restStart(g),part=(g.elapsed-start)/(g.dayDuration-start);
     return {evening:part<VILLAGE_GREEN.eveningFraction};
   }
 

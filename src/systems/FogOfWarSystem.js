@@ -43,6 +43,8 @@ export class FogOfWarSystem {
     this.size=profile.size;this.radius=profile.radius;
     const sources=[{id:'character',center:profile.center,radius:profile.radius}];
     for(const [id,provider]of this.providers){const value=provider();if(!value)continue;const list=Array.isArray(value)?value:[value];list.forEach((source,i)=>{if(source)sources.push({id:Array.isArray(value)?`${id}:${source.id??i}`:id,center:source.center,radius:source.radius});});}
+    // Day and night N1: at night sight shrinks to a third outside light (`sightScale` returns a function, or null by day).
+    const scale=this.sightScale?.();if(scale)for(const source of sources)source.radius=source.radius*scale(source.center);
     for(const source of sources)if(!Number.isFinite(source.radius)||source.radius<0||!Number.isFinite(source.center?.x)||!Number.isFinite(source.center?.y))throw new TypeError('Invalid logical vision source.');
     // Incremental coverage: only a source that moved, appeared or left touches the map; the others keep their counted circles.
     const next=new Map(),touched=[],was=[],stamp=++this.stamp,coverage=this.coverage,stamps=this.stamps;

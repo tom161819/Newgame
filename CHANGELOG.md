@@ -5,6 +5,19 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.41.0] - 2026-11-07
+<!-- version: {"title":"Day and night","type":"feature","reconstructed":false,"saveVersion":55} -->
+### Added
+- Day and night:
+  - Every day has a dawn, day, dusk and night. The night starts at 82 % of the day in summer, 75 % in spring and autumn and 62 % in winter, and shifts gradually through the year.
+  - The HUD shows the part of the day; at night its tooltip shows the moon.
+- At night the world gets dark and bluish. Torches, braziers and the castle light up their surroundings, and house windows glow from dusk until the family goes to bed. A full moon (every 8 days) is a little brighter.
+- At night everybody, soldiers too, sees only a third of the usual distance unless they stand in the light of a torch or brazier.
+- Nights run three times faster by default (Settings → Speed up nights: Off, ×2, ×3). **Skip to dawn** in the HUD runs the night much faster and stops by itself at dawn. A wild animal attack stops the speed-up.
+- At night the HUD shows how many constructions are waiting for the morning.
+### Changed
+- Residents go to sleep when the night starts, so later in summer and earlier in winter. Soldiers keep the night watch and sleep in the first third of the day instead.
+
 ## [0.40.0] - 2026-11-07
 <!-- version: {"title":"Workplace porches","type":"feature","reconstructed":false,"saveVersion":55} -->
 ### Added

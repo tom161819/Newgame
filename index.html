@@ -59,6 +59,7 @@
             <div class="hud-status">
               <span id="game-time" class="game-time">Day 1</span>
               <span id="season-weather" class="game-time">Spring · Day 1 / 5 · Year 1</span>
+              <span id="day-part" class="game-time day-part" data-part="day">Day</span><button id="skip-to-dawn" class="hud-toggle" type="button" hidden data-i18n="night.skip">Skip to dawn</button><span id="night-plans" class="game-time" hidden></span>
               <div class="health-status"><progress id="king-health-bar" max="100" value="100" aria-label="Životy krále" data-i18n-attr="aria-label:hud.kingHealth"></progress><output id="king-health">HP: 100 / 100</output></div>
               <button id="king-profile" type="button" class="experience-status" aria-label="Přehled krále" data-i18n-attr="aria-label:hud.kingOverview"><output id="king-level">King | LVL 1</output><progress id="king-xp-bar" max="100" value="0" aria-label="Zkušenosti krále" data-i18n-attr="aria-label:hud.kingXp"></progress><output id="king-xp">XP 0 / 100</output></button>
             </div>
@@ -116,6 +117,7 @@
       <div class="settings-heading"><h2 id="settings-title" data-i18n="settings.title">Settings</h2><button id="close-settings" type="button" aria-label="Zavřít nastavení" data-i18n-attr="aria-label:settings.close">×</button></div>
       <label class="setting-row" for="settings-language"><span data-i18n="language.label">Language</span><select id="settings-language" data-language-select></select></label>
       <div class="ui-style-setting setting-row"><label for="settings-ui-style" data-i18n="uiStyle.label">Interface style</label><select id="settings-ui-style"></select></div>
+      <div class="night-speed-setting setting-row"><label for="settings-night-speed" data-i18n="night.speedLabel">Speed up nights</label><select id="settings-night-speed"></select></div>
       <label class="setting-row" for="fog-toggle"><span data-i18n="settings.fog">Fog of War</span><input id="fog-toggle" type="checkbox" role="switch" /></label>
       <label class="setting-row" for="exploration-toggle"><span data-i18n="settings.exploration">Exploration</span><input id="exploration-toggle" type="checkbox" role="switch" checked/></label>
       <p data-i18n="settings.fogHint">Omezí viditelnost objektů podle dohledu krále. Terén zůstává viditelný.</p>

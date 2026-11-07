@@ -1,4 +1,5 @@
 import { DAILY_REST } from '../data/needs.js';
+import { DAY_NIGHT } from '../data/dayNight.js';
 import { WORK_RULES } from '../data/jobs.js';
 import { buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
@@ -9,7 +10,12 @@ import { tileKey } from '../game/stones.js';
 // the resident then simply carries on with his job from where he is (no teleporting). Soldiers keep their guard,
 // manual orders (Move, Hold) take priority, and fleeing or recovering hunters are handled before rest.
 // Where he rests: next to his House, next to the Castle for the settlement's base places, otherwise where he stands.
-export const isRestTime=gameTime=>!!gameTime&&gameTime.elapsed>=gameTime.dayDuration*DAILY_REST.startFraction;
+// Day and night N1: sleep starts with the night (DayNightSystem sets `restStartFraction` on the game time); without it
+// the old fixed start (75 % of the day) applies.
+export const restStart=gameTime=>gameTime?.restStartFraction?.()??DAILY_REST.startFraction;
+export const isRestTime=gameTime=>!!gameTime&&gameTime.elapsed>=gameTime.dayDuration*restStart(gameTime);
+// Soldiers keep the night watch and sleep in the first third of the day instead (only with the day/night cycle).
+export const isSoldierRestTime=gameTime=>!!gameTime?.restStartFraction&&gameTime.elapsed>=gameTime.dayDuration*DAY_NIGHT.soldierRest.from&&gameTime.elapsed<gameTime.dayDuration*DAY_NIGHT.soldierRest.to;
 export const RESTING_STATES=Object.freeze(['Going Home','Resting']);
 
 export class DailyRest {
@@ -17,12 +23,14 @@ export class DailyRest {
   rest(worker){return this.scene.needs?.records.get(worker.id)?.rest??100;}
   eligible(worker){
     return !!this.scene.needs&&worker.isAlive&&worker.isSubject!==false&&!worker.arriving&&this.system.workers.get(worker.id)===worker
-      &&(!worker.commandState||worker.commandState.state==='Working')&&!DAILY_REST.exempt.includes(worker.profession);
+      &&(!worker.commandState||worker.commandState.state==='Working')&&(!DAILY_REST.exempt.includes(worker.profession)||this.nightWatch(worker));
   }
-  wants(worker){return isRestTime(this.scene.gameTime)||this.rest(worker)<DAILY_REST.tiredBelow;}
+  // A soldier on the night watch (day/night cycle on) rests in the first third of the day, never at night.
+  nightWatch(worker){return worker.profession==='soldier'&&!!this.scene.gameTime?.restStartFraction;}
+  wants(worker){if(this.nightWatch(worker))return isSoldierRestTime(this.scene.gameTime);return isRestTime(this.scene.gameTime)||this.rest(worker)<DAILY_REST.tiredBelow;}
   // A task in hand, cargo or a Stablehand's taming job is finished first; the resident picks no new work meanwhile.
   busy(worker){return !!(worker.workTask||worker.cargo||this.scene.stables?.jobs?.has(worker.id));}
-  done(worker){return !isRestTime(this.scene.gameTime)&&this.rest(worker)>=DAILY_REST.rested;}
+  done(worker){if(this.nightWatch(worker))return !isSoldierRestTime(this.scene.gameTime);return !isRestTime(this.scene.gameTime)&&this.rest(worker)>=DAILY_REST.rested;}
   // Returns true while the resident goes home or rests; WorkerAI then skips his job for this frame.
   update(worker){
     if(!this.eligible(worker)){if(worker.restPhase)this.stop(worker);return false;}
