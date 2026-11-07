@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "child",
+  "variantId": "child-girl-kerchief-swing",
+  "name": "Girl on a swing",
+  "category": "units",
+  "version": 1,
+  "specHash": "96e90e0e",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 70,
+  "anchor": {
+    "x": 33,
+    "y": 52
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.74286
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 68
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.97143
+  },
+  "visualHeight": 68,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.313,
+  "lights": []
+}

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "fishing",
+  "variantId": "fishing-female-fish-wait",
+  "name": "Fisher (woman) waiting for a bite",
+  "category": "units",
+  "version": 1,
+  "specHash": "4e6ac1ff",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 65,
+  "anchor": {
+    "x": 33,
+    "y": 43
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.66154
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 59
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.90769
+  },
+  "visualHeight": 59,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.377,
+  "lights": []
+}

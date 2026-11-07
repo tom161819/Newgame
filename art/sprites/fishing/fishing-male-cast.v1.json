@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "fishing",
+  "variantId": "fishing-male-cast",
+  "name": "Fisher (man) casting",
+  "category": "units",
+  "version": 1,
+  "specHash": "d889b5e8",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 99,
+  "anchor": {
+    "x": 33,
+    "y": 81
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.81818
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 97
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.9798
+  },
+  "visualHeight": 97,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.865,
+  "lights": []
+}

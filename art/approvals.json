@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-07T19:08:54.974Z",
+  "updatedAt": "2026-11-07T19:56:57.137Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -1260,6 +1260,27 @@
         }
       }
     },
+    "roof-fire": {
+      "preferred": null,
+      "variants": {
+        "roof-fire-thatch-burning": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "89d30aab",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "comments": [
+            {
+              "at": "2026-11-07T19:50:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "tak takhle ne, oheň bude chtít celkový rework i kouř, šlo by na to vytvořit samostatnou sekci ve studiu? možnost dám tam budovu a spustit oheň a ladit parametry, a musí vypadat více realisticky",
+              "version": 1
+            }
+          ]
+        }
+      }
+    },
     "ruin-foundations": {
       "preferred": "ruin-foundations-house",
       "variants": {
@@ -1515,6 +1536,47 @@
           "updatedAt": "2026-11-07T16:26:53.382Z",
           "version": 1,
           "approvedAt": "2026-11-07T16:26:53.382Z"
+        }
+      }
+    },
+    "torch-bracket": {
+      "preferred": "torch-bracket-wall-arm",
+      "variants": {
+        "torch-bracket-wall-arm": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2000e376",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "torch-bracket-wall-scroll": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "85e2af51",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "torch-bracket-tower-cage": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "847e4eac",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "torch-bracket-tower-door": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e53276f7",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
         }
       }
     },
@@ -2030,6 +2092,20 @@
         }
       }
     },
+    "night-icons": {
+      "preferred": "night-icons-badges",
+      "variants": {
+        "night-icons-badges": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cfc8c9f4",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        }
+      }
+    },
     "pet-icons": {
       "preferred": "pet-icons-seated",
       "variants": {
@@ -2196,17 +2272,24 @@
       "preferred": null,
       "variants": {
         "boar-boar": {
-          "status": "review",
-          "version": 2,
-          "specHash": "b76b8c76",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "b76b8c76",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
               "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
               "text": "předělat do realistického divočáka, tohle je nějakej pakun",
               "version": 1
+            },
+            {
+              "at": "2026-11-07T19:50:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to není hezký divočák, má moc protáhlou hlavu, a vypadá nepřirozeně, udělej proporčně přesnějšího divočáka",
+              "version": 2
             }
           ],
           "history": [
@@ -2215,6 +2298,54 @@
               "specHash": "b76dcb0d",
               "status": "revision-requested",
               "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "boar-sow": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "244fe054",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "comments": [
+            {
+              "at": "2026-11-07T19:50:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to není hezký divočák, má moc protáhlou hlavu, a vypadá nepřirozeně, udělej proporčně přesnějšího divočáka",
+              "version": 1
+            }
+          ]
+        },
+        "boar-piglet": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "90d40b33",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "comments": [
+            {
+              "at": "2026-11-07T19:50:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to není hezký divočák, má moc protáhlou hlavu, a vypadá nepřirozeně, udělej proporčně přesnějšího divočáka",
+              "version": 2
+            }
+          ]
+        },
+        "boar-boar-attack": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "41bc4fad",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "comments": [
+            {
+              "at": "2026-11-07T19:50:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to není hezký divočák, má moc protáhlou hlavu, a vypadá nepřirozeně, udělej proporčně přesnějšího divočáka",
+              "version": 2
             }
           ]
         }
@@ -2400,14 +2531,16 @@
       }
     },
     "deer": {
-      "preferred": null,
+      "preferred": "deer-stag",
       "variants": {
         "deer-stag": {
-          "status": "review",
-          "version": 2,
-          "specHash": "c08377c5",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "c08377c5",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -2425,12 +2558,23 @@
             }
           ]
         },
-        "deer-hind": {
-          "status": "review",
-          "version": 2,
-          "specHash": "5ff60fa3",
+        "deer-pricket": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "79ff7971",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "deer-hind": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5ff60fa3",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -2447,6 +2591,33 @@
               "at": "2026-11-07T19:05:00.000Z"
             }
           ]
+        },
+        "deer-calf": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6e3605f3",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "deer-stag-run": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "10156e62",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "deer-hind-run": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "266b488f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
         }
       }
     },
@@ -2673,14 +2844,16 @@
       }
     },
     "fox": {
-      "preferred": null,
+      "preferred": "fox-red",
       "variants": {
         "fox-red": {
-          "status": "review",
-          "version": 2,
-          "specHash": "3bb761fc",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "3bb761fc",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -2698,12 +2871,32 @@
             }
           ]
         },
-        "fox-red-sit": {
-          "status": "review",
-          "version": 2,
-          "specHash": "ab1b6fc1",
+        "fox-pale": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "3f0fd874",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "fox-cross": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e0b0182a",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "fox-red-sit": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ab1b6fc1",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -2722,11 +2915,13 @@
           ]
         },
         "fox-red-run": {
-          "status": "review",
-          "version": 2,
-          "specHash": "914e389d",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "914e389d",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -2747,14 +2942,16 @@
       }
     },
     "hare": {
-      "preferred": null,
+      "preferred": "hare-brown",
       "variants": {
         "hare-brown": {
-          "status": "review",
-          "version": 2,
-          "specHash": "13827b6a",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "13827b6a",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -2772,12 +2969,32 @@
             }
           ]
         },
-        "hare-brown-sit": {
-          "status": "review",
-          "version": 2,
-          "specHash": "ed227ac7",
+        "hare-grey": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "69644924",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "hare-white": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "be998794",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "hare-brown-sit": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ed227ac7",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -2794,6 +3011,15 @@
               "at": "2026-11-07T19:05:00.000Z"
             }
           ]
+        },
+        "hare-brown-run": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "db3f6e48",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
         }
       }
     },
@@ -2822,17 +3048,24 @@
       "preferred": null,
       "variants": {
         "horse-bay": {
-          "status": "review",
-          "version": 2,
-          "specHash": "1c26bbc9",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "1c26bbc9",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
               "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
               "text": "předělat ať je více realistický a přidat další varianty (alespoň další 3)",
               "version": 1
+            },
+            {
+              "at": "2026-11-07T19:50:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "Vylepši současné modely koní v Asset Studiu do realističtějšího stylu středověké izometrické 2.5D hry.\n\nKoně mají nyní příliš hranaté, jednoduché tvary. Chci:\n\nAnatomicky věrnější proporce, svalnatější tělo, přirozenou hlavu, krk a štíhlejší nohy s kopyty.\n\nDetailnější srst, hřívu, ocas a jemné barevné přechody.\n\nPřirozené stínování, objem a propracovanější siluetu.\n\nZachovat všechny 4 barevné varianty a jednotný výtvarný styl.\n\nCílový vzhled: realistický, detailní hand-painted styl podobný kvalitním izometrickým strategickým hrám. Žádný cartoon ani low-poly vzhled.\n\nZachovej izometrickou perspektivu, rozměry footprintu a kompatibilitu s rendererem. Připrav nové varianty ke schválení v Asset Studiu, zatím je nenasazuj. použij to u všech modelu koní a u u horse wagon a merchant",
+              "version": 2
             }
           ],
           "history": [
@@ -3362,14 +3595,16 @@
       }
     },
     "roe": {
-      "preferred": null,
+      "preferred": "roe-buck",
       "variants": {
         "roe-buck": {
-          "status": "review",
-          "version": 2,
-          "specHash": "d4e65991",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "d4e65991",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -3388,11 +3623,13 @@
           ]
         },
         "roe-doe": {
-          "status": "review",
-          "version": 2,
-          "specHash": "2b41f45e",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "2b41f45e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -3409,6 +3646,33 @@
               "at": "2026-11-07T19:05:00.000Z"
             }
           ]
+        },
+        "roe-fawn": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4431b20f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "roe-doe-run": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "23ae4b65",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "roe-buck-run": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6e77758b",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
         }
       }
     },

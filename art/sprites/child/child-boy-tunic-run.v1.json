@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "child",
+  "variantId": "child-boy-tunic-run",
+  "name": "Boy running (tag)",
+  "category": "units",
+  "version": 1,
+  "specHash": "80f60302",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 56,
+  "anchor": {
+    "x": 33,
+    "y": 38
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.67857
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 54
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.96429
+  },
+  "visualHeight": 54,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.896,
+  "lights": []
+}

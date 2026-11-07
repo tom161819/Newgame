@@ -9,7 +9,7 @@ import { checkModel, modelBounds } from '../studio/src/lib/specs.js';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const json = file => JSON.parse(readFileSync(path.join(root, file), 'utf8'));
 const style = json('art/style-guide.json');
-const units = readdirSync(path.join(root, 'art/assets/units')).map(id => json(`art/assets/units/${id}/asset.json`)).filter(a => a.generator === 'figure' && !a.id.startsWith('military-') && a.id !== 'merchant' && !['child', 'thief', 'firefighter', 'torchbearer'].includes(a.id)); // children, the thief, the fire-bucket villager and the torchbearer are not professions (#7 Nov batch) // the merchant (obchod F1) visits, he is not a villager profession
+const units = readdirSync(path.join(root, 'art/assets/units')).map(id => json(`art/assets/units/${id}/asset.json`)).filter(a => a.generator === 'figure' && !a.id.startsWith('military-') && a.id !== 'merchant' && !['child', 'thief', 'firefighter', 'torchbearer', 'fishing'].includes(a.id)); // children, the thief, the fire-bucket villager and the torchbearer are not professions (#7 Nov batch); fishing holds the fisher's animation key frames // the merchant (obchod F1) visits, he is not a villager profession
 const PROFESSIONS = ['villager', 'woodcutter', 'miner', 'hunter', 'builder', 'farmer', 'miller', 'baker', 'hauler', 'soldier', 'smelter-operator', 'swordsmith-worker', 'armorer-worker', 'bowyer-worker', 'wheelwright', 'stablehand', 'fisher', 'pitch-maker']; // #92 concepts, then the fisher and pitch maker (7 Nov batch)
 
 test('every profession has a man and a woman, at human scale inside one tile', () => {

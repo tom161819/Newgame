@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "id": "fishing",
+  "name": "Fishing animation",
+  "category": "units",
+  "description": "Fishing key frames for the fisher (plan g-rybarstvi): casting, waiting for a bite with the line in the water, pulling out a fish – man and woman, same clothes as the approved fisher.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "variants": [
+    {
+      "id": "fishing-male-cast",
+      "name": "Fisher (man) casting",
+      "version": 1,
+      "notes": "Fishing animation key frame (plan g-rybarstvi).",
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_blue",
+        "legs": "cloth_brown",
+        "sleeves": "cloth_wool",
+        "headgear": "brimmed",
+        "headgearMaterial": "cloth_wool",
+        "hair": "hair_grey",
+        "beard": true,
+        "apron": "leather",
+        "action": "cast",
+        "facing": 0
+      }
+    },
+    {
+      "id": "fishing-male-fish-wait",
+      "name": "Fisher (man) waiting for a bite",
+      "version": 1,
+      "notes": "Fishing animation key frame (plan g-rybarstvi).",
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_blue",
+        "legs": "cloth_brown",
+        "sleeves": "cloth_wool",
+        "headgear": "brimmed",
+        "headgearMaterial": "cloth_wool",
+        "hair": "hair_grey",
+        "beard": true,
+        "apron": "leather",
+        "action": "fish-wait",
+        "facing": 0
+      }
+    },
+    {
+      "id": "fishing-male-catch",
+      "name": "Fisher (man) pulling out a fish",
+      "version": 1,
+      "notes": "Fishing animation key frame (plan g-rybarstvi).",
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_blue",
+        "legs": "cloth_brown",
+        "sleeves": "cloth_wool",
+        "headgear": "brimmed",
+        "headgearMaterial": "cloth_wool",
+        "hair": "hair_grey",
+        "beard": true,
+        "apron": "leather",
+        "action": "catch",
+        "facing": 0
+      }
+    },
+    {
+      "id": "fishing-female-cast",
+      "name": "Fisher (woman) casting",
+      "version": 1,
+      "notes": "Fishing animation key frame (plan g-rybarstvi).",
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_blue",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_linen",
+        "hair": "hair_brown",
+        "hairStyle": "braid",
+        "apron": "leather",
+        "action": "cast",
+        "facing": 0
+      }
+    },
+    {
+      "id": "fishing-female-fish-wait",
+      "name": "Fisher (woman) waiting for a bite",
+      "version": 1,
+      "notes": "Fishing animation key frame (plan g-rybarstvi).",
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_blue",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_linen",
+        "hair": "hair_brown",
+        "hairStyle": "braid",
+        "apron": "leather",
+        "action": "fish-wait",
+        "facing": 0
+      }
+    },
+    {
+      "id": "fishing-female-catch",
+      "name": "Fisher (woman) pulling out a fish",
+      "version": 1,
+      "notes": "Fishing animation key frame (plan g-rybarstvi).",
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_blue",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_linen",
+        "hair": "hair_brown",
+        "hairStyle": "braid",
+        "apron": "leather",
+        "action": "catch",
+        "facing": 0
+      }
+    }
+  ]
+}

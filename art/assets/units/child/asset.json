@@ -3,7 +3,7 @@
   "id": "child",
   "name": "Children",
   "category": "units",
-  "description": "Village children (plan g-deti-naves-grafika): smaller than adults, simple medieval clothes in many colours, readable as kids at 1×.",
+  "description": "Village children (plan g-deti-naves-grafika): smaller than adults, simple medieval clothes in many colours, readable as kids at 1×. Game poses: running and tagging, hoop and stick, kicking a ball, swinging, throwing a snowball, rolling a snowman, jumping into hay.",
   "footprint": {
     "width": 1,
     "height": 1
@@ -98,6 +98,148 @@
         "hair": "hair_auburn",
         "hairStyle": "long",
         "tool": "basket"
+      }
+    },
+    {
+      "id": "child-boy-tunic-run",
+      "name": "Boy running (tag)",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "male",
+        "height": 0.78,
+        "build": 0.88,
+        "garment": "cloth_red",
+        "legs": "cloth_brown",
+        "headgear": "none",
+        "hair": "hair_blond",
+        "hairStyle": "short",
+        "action": "run",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-girl-braid-tag",
+      "name": "Girl tagging",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "female",
+        "height": 0.76,
+        "build": 0.86,
+        "garment": "cloth_blue",
+        "headgear": "none",
+        "hair": "hair_blond",
+        "hairStyle": "braid",
+        "apron": "cloth_linen",
+        "action": "tag",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-boy-cap-hoop",
+      "name": "Boy with a hoop and stick",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "male",
+        "height": 0.74,
+        "build": 0.86,
+        "garment": "cloth_green",
+        "legs": "cloth_grey",
+        "headgear": "cap",
+        "headgearMaterial": "cloth_wool",
+        "hair": "hair_brown",
+        "action": "hoop",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-boy-ball-kick",
+      "name": "Boy kicking a ball",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "male",
+        "height": 0.7,
+        "build": 0.85,
+        "garment": "cloth_ochre",
+        "legs": "cloth_brown",
+        "headgear": "none",
+        "hair": "hair_auburn",
+        "action": "kick",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-girl-kerchief-swing",
+      "name": "Girl on a swing",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "female",
+        "height": 0.72,
+        "build": 0.85,
+        "garment": "cloth_red",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_ochre",
+        "hair": "hair_brown",
+        "action": "swing",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-boy-tunic-throw",
+      "name": "Boy throwing a snowball",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "male",
+        "height": 0.78,
+        "build": 0.88,
+        "garment": "cloth_red",
+        "legs": "cloth_brown",
+        "headgear": "none",
+        "hair": "hair_blond",
+        "hairStyle": "short",
+        "action": "throw",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-girl-braid-snow",
+      "name": "Girl rolling a snowball for a snowman",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "female",
+        "height": 0.76,
+        "build": 0.86,
+        "garment": "cloth_blue",
+        "headgear": "none",
+        "hair": "hair_blond",
+        "hairStyle": "braid",
+        "apron": "cloth_linen",
+        "action": "roll-snow",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-boy-cap-hay",
+      "name": "Boy jumping into hay",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "male",
+        "height": 0.74,
+        "build": 0.86,
+        "garment": "cloth_green",
+        "legs": "cloth_grey",
+        "headgear": "cap",
+        "headgearMaterial": "cloth_wool",
+        "hair": "hair_brown",
+        "action": "hay-jump",
+        "facing": 0
       }
     }
   ]
