@@ -1,19 +1,11 @@
 # Upgrade progress
 
-## Aktuální audit Issue47 — 2026-11-04
+## Aktuální stav — 7. 11. 2026 (bez GitHubu)
 
-GitHub Issues jsou hlavní fronta. PR22 je skutečně merged; hlavní větev65b4bf8
-obsahuje i Claudův N02/PR62 a Save15. Její Pages41924183243 má Success a plný
-scope dodal všech9povinných předpokladových kontrol; bez duplicitní lokální
-instalace/full testů/buildu. Tagv0.3.0 byl nyní skutečně zveřejněn na původním
-02a3a43 (archivní Save14, strom49b1e79,71přesných Git souborů), bez úpravy archivů.
+Hra je ve verzi **0.9.4**. Vydané milníky: M1 0.2.0, M2 0.3.0, M3 0.4.0 (tag `v0.4.0`). Etapy 01–12 jsou DONE (tabulka níže).
+Etapa 13 (#58 potřeby a spokojenost) běží po fázích: A 0.5.0 (PR #191, SAVE 33), C část 1 0.6.1 (PR #193), B domovy a denní odpočinek 0.9.0 (`c040390`, SAVE 37); zbývá C2 (po daních a přídělech #103) a D. Etapa 14 (#59 obchod) je rozdělená na F1.1 tržiště, F1.2 karavana, F1.3 objednávky (zadání `zadani-obchod-f1.md` v projektu MK); etapa 15 čeká.
 
-M2 dosud není RELEASED: přímý release:verify opravdu selhal až na veřejném HTTPS
-katalogu. Nový read-only post-Pages workflow je připravený ke standardnímu PR;
-13regresí ověřovače, YAML/Bash a skutečný tag/no-tag/Git-error krok prošly.
-Samotný nový workflow ještě neběžel a Issue/PR API claim/publikace jsou blokované.
-Neodblokovat48 ani pozdější závislé úkoly. C01 WIPdd728a0 je bezpečně uložený.
-[Aktuální důkazy](verification/issue-47/README.md), [předání](MERGE_QUEUE.md).
+Od 6. 11. 2026 je GitHub účet zablokovaný: vývoj běží v chatech projektu MK, kód se předává přes sdílené úložiště a **úkoly vede stránka *MK – plán vývoje*** (pravidla v `AGENTS.md`). Sekce níže jsou historie z doby GitHubu; vydání milníku M4 bude potřebovat úpravu `release-gate` (dnes vyžaduje GitHub Pages a archiv).
 
 ## Historické záznamy před aktuálním auditem
 
@@ -59,8 +51,8 @@ Etapy01–06 i dodatečný audit archivu jsou DONE; M1 RELEASED0.2.0,07–10 jso
 | 10 | 35: Quarry Placement & Iron Smelter | M2 | DONE | `0f4ebce931d912c18ff33a6148697b9514bb9249`; Quarry/Smelter/3Ore+2Wood→1Bar/Smelting/Save14,438 testů/build/current native; plný browser společné verze0f76b96 prošel před poslední drobnou validací. PR11 core merged, finální follow-up připraven;71 archivů/2314 HTTP souborů;[report](verification/master-10.md). |
 | 11 | 37: Stone Pavement & Courtyards | M3 | DONE | `3c08916272b6271fa377f06ed52c22ad51b2b899`; merged [PR136](https://github.com/tom161819/Newgame/pull/136) (#56): pavement layer in PathWear, Single/Line/Area/Remove, physical blueprints (1 Stone per 2 tiles), +25 % without stacking on paths, Fog/Map Memory, Save/Load; follow-ups [PR159](https://github.com/tom161819/Newgame/pull/159) pavement under buildings and [PR173](https://github.com/tom161819/Newgame/pull/173) Builder goal fix. Browser `--pavement`/`--pave-under` PASS in the full Pages runs. |
 | 12 | 34: Wheelwright, Wagons, Stables & Housing | M3 | DONE | `a9aa16f0ee4bfb58911b55254d60d4e9b3b11b2a` (final part, [PR158](https://github.com/tom161819/Newgame/pull/158) Horse Wagon). The stage is merged in parts: [PR133](https://github.com/tom161819/Newgame/pull/133) House/population capacity, [PR139](https://github.com/tom161819/Newgame/pull/139) carry weights, [PR153](https://github.com/tom161819/Newgame/pull/153) Wheelwright/Wheelbarrow, [PR154](https://github.com/tom161819/Newgame/pull/154) Stables/taming/Knight horse, [PR158](https://github.com/tom161819/Newgame/pull/158) Horse Wagon; fixes [PR160](https://github.com/tom161819/Newgame/pull/160)/[PR170](https://github.com/tom161819/Newgame/pull/170). Browser `--wheelwright --stables --horse-wagon --housing` PASS in the full Pages runs. |
-| 13 | 26: Villager Needs & Happiness | M4 | PENDING | Nezahájeno |
-| 14 | 27: Merchants, Caravans & Trade | M4 | PENDING | Nezahájeno |
+| 13 | 26: Villager Needs & Happiness | M4 | IN PROGRESS | A 0.5.0 (PR #191), C část 1 0.6.1 (PR #193), B 0.9.0 (`c040390`); zbývá C2 a D |
+| 14 | 27: Merchants, Caravans & Trade | M4 | PENDING | F1 rozdělené na F1.1–F1.3 v plánu vývoje (zadání schváleno 7. 11.) |
 | 15 | 29B: Background Simulation & Catch-up | M5 | PENDING | Nezahájeno |
 
 ## Dodatečný audit archivu — DONE
