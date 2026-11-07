@@ -252,6 +252,23 @@ try {
   }
   pass('Path Lab: N12 reference renders the editable map, deep-linked scenario and season, Experimental V2 differs and repaints from its sliders (preset → Custom), real painting with undo/redo, JSON export/import validation, saved variant');
 
+  {
+    // V03 animation: figures get a Walk cycle tab; the exported walk sheet has 8 directions × 3 frames.
+    const { page: walk, errors: walkErrors } = await open(context, 'index.html#villager');
+    await walk.waitForFunction(() => window.assetStudio?.ready);
+    await walk.locator('#tab-walk').click();
+    await walk.waitForSelector('.walk-canvas');
+    assert.equal(await walk.locator('.walk-canvas').count(), 2, 'one walk preview per variant');
+    const sheet = await walk.evaluate(() => window.assetStudio.exportSprite('villager', 'villager-male', { facings: true }));
+    assert.deepEqual(sheet.meta.walk.cycle, ['idle', 'stride-a', 'idle', 'stride-b']);
+    assert.match(sheet.paths.spriteWalk, /villager-male\.v1\.walk\.png$/);
+    assert.equal(await walk.locator('#tab-walk').count(), 1);
+    await walk.goto(walk.url().replace(/#.*$/, '#watchtower')); await walk.waitForSelector('#tab-compare');
+    assert.equal(await walk.locator('#tab-walk').count(), 0, 'buildings have no walk cycle');
+    assert.deepEqual(walkErrors, []); await walk.close();
+  }
+  pass('walk cycle: figures show eight directions walking (standing, right foot, standing, left foot) and export a walk sheet; buildings have no walk tab');
+
   // Shared review: the Studio published as a page in Claude, with a stand-in for the page runtime (db, user,
   // downloads). Decisions go to the shared database, other reviewers' decisions appear live, names resolve from ids.
   const sharedContext = await browser.newContext({ viewport: { width: 1440, height: 1000 } });

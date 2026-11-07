@@ -203,9 +203,9 @@ function assetHeader(asset, extra) {
 
 function studioAssetView(asset) {
   const status = assetStatus(asset);
-  const tabs = [['compare', 'Compare variants'], ['scene', 'Scene & lighting'], ['details', 'Spec & files']];
+  const tabs = [['compare', 'Compare variants'], ['scene', 'Scene & lighting'], ...(walks(asset) ? [['walk', 'Walk cycle']] : []), ['details', 'Spec & files']];
   const tabBar = h('div', { class: 'tabs', role: 'tablist' }, tabs.map(([id, label]) => h('button', { type: 'button', role: 'tab', id: `tab-${id}`, 'aria-selected': String(state.tab === id), onclick: () => { state.tab = id; saveUi(); renderAll(); } }, label)));
-  const body = state.tab === 'scene' ? sceneView(asset) : state.tab === 'details' ? detailsView(asset) : compareView(asset);
+  const body = state.tab === 'scene' ? sceneView(asset) : state.tab === 'details' ? detailsView(asset) : state.tab === 'walk' && walks(asset) ? walkView(asset) : compareView(asset);
   return [assetHeader(asset, h('div', { class: 'review-line' }, pill(status.status), status.local ? h('span', { class: 'pill local' }, 'local changes') : null)), tabBar, ...body];
 }
 
@@ -327,6 +327,56 @@ function paintVariant(canvas, asset, variant, seconds = performance.now() / 1000
   if (state.bounds) drawBounds(ctx, { x: origin.x - sprite.anchor.x * display, y: origin.y - sprite.anchor.y * display, width: sprite.width * display, height: sprite.height * display, label: `${base.width}×${base.height} px`, dark: state.background === 'dark' || state.time === 'night' });
 }
 
+// ---------- walk cycle (V03 animation) ----------
+// Figures walk in three poses per direction: standing, right foot forward (stride +1) and left foot forward (−1),
+// played standing → right → standing → left. Mounted figures and fixed-direction sheets do not walk.
+const WALK_FRAMES = [['idle', 0], ['stride-a', 1], ['stride-b', -1]], WALK_CYCLE = ['idle', 'stride-a', 'idle', 'stride-b'], WALK_FPS = 6;
+const walkCache = new Map();
+const walksVariant = variant => !variant.spec.mount && variant.spec.facing === undefined;
+const walks = asset => asset.generator === 'figure' && asset.variants.some(walksVariant);
+function walkFrame(asset, variant, facing, stride, scale = 1) {
+  const key = `${variant.id}:${variant.hash}:${facing}:${stride}:${scale}`;
+  if (!walkCache.has(key)) walkCache.set(key, renderModel(generators.figure.build({ ...variant.spec, facing, stride }, { footprint: asset.footprint, style }), { style, footprint: asset.footprint, scale }));
+  return walkCache.get(key);
+}
+// One sheet per variant: rows = facings 0–7, columns = idle, stride-a, stride-b. Every cell shares one anchor (the
+// feet), so the game swaps frames without moving the figure.
+function walkSheet(asset, variant, scale = 1) {
+  const frames = Array.from({ length: 8 }, (_, k) => WALK_FRAMES.map(([, stride]) => walkFrame(asset, variant, k, stride, scale)));
+  const all = frames.flat(), ax = Math.max(...all.map(f => f.anchor.x)), ay = Math.max(...all.map(f => f.anchor.y));
+  const fw = ax + Math.max(...all.map(f => f.width - f.anchor.x)), fh = ay + Math.max(...all.map(f => f.height - f.anchor.y));
+  const canvas = document.createElement('canvas');
+  canvas.width = fw * WALK_FRAMES.length; canvas.height = fh * 8;
+  const ctx = canvas.getContext('2d');
+  frames.forEach((row, k) => row.forEach((f, i) => ctx.drawImage(f.canvas, i * fw + ax - f.anchor.x, k * fh + ay - f.anchor.y)));
+  return { canvas, frameWidth: fw, frameHeight: fh, anchor: { x: ax, y: ay } };
+}
+function walkMeta(sheet) {
+  return { frameWidth: sheet.frameWidth, frameHeight: sheet.frameHeight, anchor: sheet.anchor, origin: { x: +(sheet.anchor.x / sheet.frameWidth).toFixed(5), y: +(sheet.anchor.y / sheet.frameHeight).toFixed(5) }, columns: WALK_FRAMES.map(([id]) => id), rows: 'facing 0–7 (0 faces the viewer, then turning to screen right)', cycle: WALK_CYCLE, fps: WALK_FPS };
+}
+function walkView(asset) {
+  const controls = toolbar([zoomControl('zoom', 'walk-zoom', 0.5, 4, 0.25), segmented('Background', BACKGROUNDS.map(b => [b.id, b.label]), state.background, id => { state.background = id; saveUi(); renderAll(); })]);
+  if (!glReady) return [controls, h('p', { class: 'empty' }, 'WebGL is unavailable in this browser, so 3D recipes cannot be rendered.')];
+  const cards = asset.variants.filter(walksVariant).map(variant => {
+    const canvas = h('canvas', { class: 'walk-canvas', 'data-variant': variant.id, role: 'img', 'aria-label': `${variant.name} walking in eight directions` });
+    canvas._paint = seconds => paintWalk(canvas, asset, variant, seconds);
+    return h('article', { class: 'variant-card walk-card', 'data-variant': variant.id }, h('header', {}, h('div', {}, h('h3', {}, variant.name), h('span', { class: 'sub' }, `${variant.id} · v${variant.version}`)), h('span', { class: 'pills' }, pill(reviewState({ repo: data.approvals, local: state.local, assetId: asset.id, variant }).effective.status))), canvas);
+  });
+  return [controls, h('p', { class: 'review-note' }, `Walk cycle: standing → right foot forward → standing → left foot forward at ${WALK_FPS} frames per second, in all eight directions. Approved figures are exported with a walk sheet (`, h('code', { class: 'mono' }, '<variant>.v<N>.walk.png'), '): 8 rows (directions) × 3 frames, one shared anchor at the feet.'), h('section', { class: 'variants walk-list', 'aria-label': 'Walk cycles' }, cards)];
+}
+function paintWalk(canvas, asset, variant, seconds = performance.now() / 1000) {
+  const dpr = Math.min(2, window.devicePixelRatio || 1), width = Math.round(canvas.clientWidth * dpr), height = Math.round(canvas.clientHeight * dpr);
+  if (!width || !height) return;
+  if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
+  const ctx = canvas.getContext('2d'), zoom = state.zoom * dpr, renderScale = Math.min(4, Math.max(1, Math.ceil(zoom))), display = zoom / renderScale;
+  const frame = reducedMotion ? 'idle' : WALK_CYCLE[Math.floor(seconds * WALK_FPS) % WALK_CYCLE.length], stride = WALK_FRAMES.find(([id]) => id === frame)[1];
+  ctx.clearRect(0, 0, width, height);
+  drawBackground(ctx, state.background, { width, height, origin: { x: width / 2, y: height - 20 * dpr }, zoom, footprint: asset.footprint, dark: state.background === 'dark' });
+  for (let k = 0; k < 8; k++) {
+    const sprite = walkFrame(asset, variant, k, stride, renderScale), x = Math.round(width * (k + 0.5) / 8), y = Math.round(height - 14 * dpr);
+    drawSprite(ctx, sprite, x, y, display, true);
+  }
+}
 function sceneView(asset) {
   const canvas = h('canvas', { class: 'scene-canvas', id: 'scene-canvas', role: 'img', 'aria-label': `Test map with ${asset.name} at ${state.time}` });
   canvas._paint = seconds => paintScene(canvas, asset, seconds);
@@ -657,9 +707,11 @@ function exportSprite(assetId, variantId, { facings = false } = {}) {
   if (variant.baked) return { baked: true, facingPngs: [], png: sprite.canvas.toDataURL('image/png'), front: null, still: null, rotor: null, sheet: null, tiles: [], meta: structuredClone(data.exportedMeta[variant.paths.spriteMeta] ?? null), paths: { ...variant.paths, spriteTiles: [] } };
   const meta = spriteMetadata({ asset, variant, style, sprite, generator: generators[asset.generator] });
   // Figures can also be rendered in the eight walking directions (facing 0–7, 0 = towards the viewer).
-  const turned = facings && asset.generator === 'figure' ? Array.from({ length: 8 }, (_, k) => renderModel(generators.figure.build({ ...variant.spec, facing: k }, { footprint: asset.footprint, style }), { style, footprint: asset.footprint, scale: 1 })) : [];
+  const turned = facings && asset.generator === 'figure' && variant.spec.facing === undefined ? Array.from({ length: 8 }, (_, k) => renderModel(generators.figure.build({ ...variant.spec, facing: k }, { footprint: asset.footprint, style }), { style, footprint: asset.footprint, scale: 1 })) : [];
   if (turned.length) meta.facings = turned.map((s, k) => ({ facing: k, width: s.width, height: s.height, anchor: s.anchor, origin: { x: +(s.anchor.x / s.width).toFixed(5), y: +(s.anchor.y / s.height).toFixed(5) } }));
-  return { facingPngs: turned.map(s => s.canvas.toDataURL('image/png')), png: sprite.canvas.toDataURL('image/png'), front: sprite.front?.toDataURL('image/png') ?? null, still: sprite.still?.toDataURL('image/png') ?? null, rotor: sprite.rotor?.toDataURL('image/png') ?? null, sheet: sprite.sheet?.toDataURL('image/png') ?? null, tiles: sprite.tiles?.map(tile => tile.toDataURL('image/png')) ?? [], meta, paths: { ...variant.paths, spriteTiles: (sprite.tiles ?? []).map((_, i) => `${variant.paths.spriteTileBase}${i}.png`) } };
+  const walk = turned.length && walksVariant(variant) ? walkSheet(asset, variant, 1) : null;
+  if (walk) meta.walk = walkMeta(walk);
+  return { walk: walk?.canvas.toDataURL('image/png') ?? null, facingPngs: turned.map(s => s.canvas.toDataURL('image/png')), png: sprite.canvas.toDataURL('image/png'), front: sprite.front?.toDataURL('image/png') ?? null, still: sprite.still?.toDataURL('image/png') ?? null, rotor: sprite.rotor?.toDataURL('image/png') ?? null, sheet: sprite.sheet?.toDataURL('image/png') ?? null, tiles: sprite.tiles?.map(tile => tile.toDataURL('image/png')) ?? [], meta, paths: { ...variant.paths, spriteTiles: (sprite.tiles ?? []).map((_, i) => `${variant.paths.spriteTileBase}${i}.png`), ...(walk ? { spriteWalk: variant.paths.sprite.replace(/\.png$/, '.walk.png') } : {}) } };
 }
 function exportPng(asset, variant) {
   const { png, paths } = exportSprite(asset.id, variant.id);
@@ -673,7 +725,7 @@ function exportMeta(asset, variant) {
 // ---------- painting & animation ----------
 function paintVisible(seconds) {
   for (const canvas of document.querySelectorAll('#main canvas')) canvas._paint?.(seconds);
-  if (!reducedMotion && state.time !== 'day' && state.view === 'assets') startAnimation();
+  if (!reducedMotion && (state.time !== 'day' || state.tab === 'walk') && state.view === 'assets') startAnimation();
 }
 let frame = null, last = 0;
 function startAnimation() {

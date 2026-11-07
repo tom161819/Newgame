@@ -37,5 +37,111 @@
   "frontLayer": false,
   "gameLights": [],
   "modelHeight": 1.863,
-  "lights": []
+  "lights": [],
+  "facings": [
+    {
+      "facing": 0,
+      "width": 84,
+      "height": 96,
+      "anchor": {
+        "x": 33,
+        "y": 78
+      },
+      "origin": {
+        "x": 0.39286,
+        "y": 0.8125
+      }
+    },
+    {
+      "facing": 1,
+      "width": 74,
+      "height": 100,
+      "anchor": {
+        "x": 33,
+        "y": 82
+      },
+      "origin": {
+        "x": 0.44595,
+        "y": 0.82
+      }
+    },
+    {
+      "facing": 2,
+      "width": 67,
+      "height": 100,
+      "anchor": {
+        "x": 33,
+        "y": 82
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.82
+      }
+    },
+    {
+      "facing": 3,
+      "width": 67,
+      "height": 94,
+      "anchor": {
+        "x": 33,
+        "y": 76
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.80851
+      }
+    },
+    {
+      "facing": 4,
+      "width": 73,
+      "height": 86,
+      "anchor": {
+        "x": 39,
+        "y": 68
+      },
+      "origin": {
+        "x": 0.53425,
+        "y": 0.7907
+      }
+    },
+    {
+      "facing": 5,
+      "width": 67,
+      "height": 81,
+      "anchor": {
+        "x": 33,
+        "y": 63
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.77778
+      }
+    },
+    {
+      "facing": 6,
+      "width": 67,
+      "height": 82,
+      "anchor": {
+        "x": 33,
+        "y": 64
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.78049
+      }
+    },
+    {
+      "facing": 7,
+      "width": 76,
+      "height": 88,
+      "anchor": {
+        "x": 33,
+        "y": 70
+      },
+      "origin": {
+        "x": 0.43421,
+        "y": 0.79545
+      }
+    }
+  ]
 }

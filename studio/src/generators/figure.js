@@ -3,7 +3,7 @@
 // a tool or load and colours, all from style-guide materials. The figure faces
 // the camera: "side" runs along the shoulders (screen right is +side) and
 // "front" towards the viewer.
-import { box, cylinder, sphere, clamp, lean, horse, rotateParts } from './shapes.js';
+import { box, cylinder, sphere, clamp, lean, horse, rotateParts, turnParts, axisMatrix, matMul, orientation } from './shapes.js';
 
 export const params = [
   { key: 'sex', values: ['male', 'female'], description: 'Tunic and hose, or a long dress.' },
@@ -27,12 +27,20 @@ export const params = [
   { key: 'tabard', description: 'Surcoat colour worn over the armour.' },
   { key: 'mount', description: '{ coat, barding, saddle }: rides a horse (knights).' },
   { key: 'facing', description: 'Turn in eighths of a full circle (0–7); 0 faces the viewer. For direction sheets.' },
+  { key: 'stride', description: 'Walk pose −1…1 (animation frames): +1 puts the right foot forward and swings the free arms the other way; 0 or omitted is the standing figure.' },
 ];
 
 const S = Math.SQRT1_2, TURN = Math.PI / 4;
 // Model point from (side, height, front).
 const at = (side, y, front) => [(side + front) * S, y, (front - side) * S];
 const turned = (size, side, y, front, material) => box(size, at(side, y, front), material, { rotation: TURN });
+// Walk animation: a turned box whose base sits `front` units ahead and whose top leans back by `lean` radians
+// (positive = top towards the viewer's front), i.e. a leg or arm swinging about its hip or shoulder.
+const SIDE_AXIS = [S, 0, -S];
+const swung = (size, side, y, front, theta, material) => box(size, at(side, y, front), material, orientation(matMul(axisMatrix(SIDE_AXIS, theta), [[Math.cos(TURN), 0, Math.sin(TURN)], [0, 1, 0], [-Math.sin(TURN), 0, Math.cos(TURN)]])));
+// Which hands are busy: the right one holds a tool, the left one a bow, basket, bucket or shield.
+const RIGHT_TOOLS = new Set(['axe', 'pickaxe', 'hammer', 'sword', 'greatsword', 'lance', 'spear', 'pitchfork', 'peel', 'tongs', 'mallet', 'stave']);
+const LEFT_TOOLS = new Set(['bow', 'basket', 'bucket']);
 
 export function build(spec, { style }) {
   const female = spec.sex === 'female';
@@ -42,10 +50,15 @@ export function build(spec, { style }) {
   const sleeves = spec.sleeves ?? armour ?? garment, legs = spec.legs ?? (spec.armor === 'mail' || spec.armor === 'plate' ? armour : 'cloth_brown'), hatMaterial = spec.headgearMaterial ?? 'cloth_brown';
   const parts = [];
   // Feet, legs or skirt.
-  for (const side of [-1, 1]) parts.push(turned([0.08 * w, y(0.05), 0.13], side * 0.055 * w, 0, 0.02, 'leather'));
+  // Walking (#V03 animation): feet step along the front axis, legs swing about the hip; 0 is the standing pose.
+  const stride = spec.mount ? 0 : clamp(spec.stride ?? 0, -1, 1), step = side => stride * side * (female ? 0.06 : 0.1);
+  for (const side of [-1, 1]) parts.push(turned([0.08 * w, y(0.05), 0.13], side * 0.055 * w, 0, 0.02 + step(side), 'leather'));
   if (female) parts.push(cylinder({ radiusBottom: 0.2 * w, radiusTop: 0.125 * w, height: y(0.6), segments: 10 }, [0, y(0.03), 0], spec.mount ? legs : garment));
   else {
-    for (const side of [-1, 1]) parts.push(turned([0.075 * w, y(0.36), 0.085], side * 0.055 * w, y(0.04), 0, legs));
+    for (const side of [-1, 1]) {
+      const f = step(side), L = y(0.36);
+      parts.push(f ? swung([0.075 * w, Math.hypot(L, f), 0.085], side * 0.055 * w, y(0.04), f, Math.atan2(-f, L), legs) : turned([0.075 * w, L, 0.085], side * 0.055 * w, y(0.04), 0, legs));
+    }
     parts.push(cylinder({ radiusBottom: 0.16 * w, radiusTop: 0.125 * w, height: y(0.3), segments: 8 }, [0, y(0.34), 0], garment));
   }
   const lowerEnd = female ? 3 : 4;
@@ -55,9 +68,12 @@ export function build(spec, { style }) {
   // A woman's apron hangs in front of the flared skirt, so it starts where the skirt is already wide.
   if (spec.apron) parts.push(turned([0.2 * w, y(female ? 0.27 : 0.36), 0.02], 0, y(female ? 0.35 : 0.3), female ? 0.168 * w : 0.14 * w, spec.apron));
   const shoulder = 0.175 * w, hand = y(0.47);
+  const kind = spec.tool ?? 'none', busy = side => side > 0 ? RIGHT_TOOLS.has(kind) : LEFT_TOOLS.has(kind) || !!spec.shield;
   for (const side of [-1, 1]) {
-    parts.push(turned([0.07, y(0.33), 0.075], side * shoulder, y(0.52), 0, sleeves));
-    parts.push(sphere([0.04, 0.035, 0.04], at(side * shoulder, hand, 0.01), skin, 1));
+    // A free arm swings against the leg on its side; an arm holding something stays still.
+    const g = busy(side) ? 0 : -stride * side * 0.07, A = y(0.33);
+    parts.push(g ? swung([0.07, Math.hypot(A, g), 0.075], side * shoulder, y(0.52), g, Math.atan2(-g, A), sleeves) : turned([0.07, A, 0.075], side * shoulder, y(0.52), 0, sleeves));
+    parts.push(sphere([0.04, 0.035, 0.04], at(side * shoulder, hand, 0.01 + g), skin, 1));
   }
   // Neck, head, hair, beard.
   parts.push(cylinder({ radiusBottom: 0.04, height: y(0.04), segments: 8 }, [0, y(0.86), 0], skin));
@@ -94,7 +110,7 @@ export function build(spec, { style }) {
     // A horse is longer than a tile: like tree canopies it may overhang by the style allowance.
     parts.length = 0; parts.push(...mount.parts.map(p => ({ ...p, overhang: true })), ...seated.map(p => ({ ...p, overhang: true })));
   }
-  if (spec.facing) { const turnedParts = rotateParts(parts, spec.facing * Math.PI / 4); parts.length = 0; parts.push(...turnedParts); }
+  if (spec.facing) { const turnedParts = turnParts(parts, spec.facing * Math.PI / 4); parts.length = 0; parts.push(...turnedParts); }
   const top = Math.max(headTop, ...parts.map(p => p.at[1] + (p.size?.[1] ?? p.height ?? (p.radii ? p.radii[1] * 2 : 0))));
   return { primitives: parts, lights: [], height: top };
 }

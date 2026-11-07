@@ -70,3 +70,44 @@ test('direction sheet: eight facings of one soldier, turning keeps the model in 
   const full = rotateParts(rotateParts(base.primitives, Math.PI), Math.PI);
   full.forEach((p, i) => p.at.forEach((v, j) => assert.ok(Math.abs(v - base.primitives[i].at[j]) < 1e-9)));
 });
+
+test('walk cycle: stride 0 is the standing figure; a stride steps the feet and swings legs and free arms about hip and shoulder', async () => {
+  const { partMatrix } = await import('../studio/src/generators/shapes.js');
+  const figure = GENERATORS.figure;
+  const standing = figure.build({ sex: 'male' }, { style }), still = figure.build({ sex: 'male', stride: 0 }, { style });
+  assert.deepEqual(still, standing);
+  for (const facing of [0, 1, 2, 5]) {
+    const model = figure.build({ sex: 'male', stride: 1, facing }, { style });
+    const swung = model.primitives.filter(p => p.shape === 'box' && p.tilt);
+    assert.equal(swung.length, 4, 'two legs and two free arms swing');
+    // The top of every swinging box stays at the hip (0.40) or shoulder (0.85), whatever the direction.
+    for (const p of swung) {
+      const m = partMatrix(p), top = p.at[1] + m[1][1] * p.size[1];
+      assert.ok(Math.abs(top - 0.4) < 1e-9 || Math.abs(top - 0.85) < 1e-9, `${facing} ${p.material} ${top}`);
+    }
+    assert.notDeepEqual(model, figure.build({ sex: 'male', stride: -1, facing }, { style }));
+  }
+  // Busy hands stay put: a swordsman with a shield swings only his legs; a rider does not walk.
+  assert.equal(figure.build({ sex: 'male', tool: 'sword', shield: true, stride: 1 }, { style }).primitives.filter(p => p.tilt && p.shape === 'box').length, 2);
+  assert.deepEqual(figure.build({ sex: 'male', mount: { coat: 'horse_bay' }, stride: 1 }, { style }), figure.build({ sex: 'male', mount: { coat: 'horse_bay' } }, { style }));
+});
+
+test('approved walking figures are exported with a walk sheet: 8 directions × 3 frames sharing one anchor', () => {
+  const approvals = JSON.parse(readFileSync(path.join(root, 'art/approvals.json'), 'utf8')).assets;
+  let sheets = 0;
+  for (const id of readdirSync(path.join(root, 'art/assets/units'))) {
+    const asset = JSON.parse(readFileSync(path.join(root, `art/assets/units/${id}/asset.json`), 'utf8'));
+    if (asset.generator !== 'figure') continue;
+    for (const variant of asset.variants) {
+      if (approvals[asset.id]?.variants?.[variant.id]?.status !== 'approved' || variant.spec.mount || variant.spec.facing !== undefined) continue;
+      const base = `art/sprites/${asset.id}/${variant.id}.v${variant.version}`, meta = JSON.parse(readFileSync(path.join(root, `${base}.json`), 'utf8'));
+      assert.deepEqual(meta.walk.columns, ['idle', 'stride-a', 'stride-b'], variant.id);
+      assert.deepEqual(meta.walk.cycle, ['idle', 'stride-a', 'idle', 'stride-b']);
+      const png = readFileSync(path.join(root, `${base}.walk.png`));
+      assert.equal(png.readUInt32BE(16), meta.walk.frameWidth * 3, `${variant.id} sheet width`);
+      assert.equal(png.readUInt32BE(20), meta.walk.frameHeight * 8, `${variant.id} sheet height`);
+      sheets++;
+    }
+  }
+  assert.ok(sheets >= 40, `${sheets} walk sheets`);
+});

@@ -26,6 +26,7 @@ try {
     const facings = asset.category === 'units' && approvedVariant(asset.id, variant.id);
     const result = await page.evaluate(([a, v, f]) => window.assetStudio.exportSprite(a, v, { facings: f }), [asset.id, variant.id, facings]);
     if (result.baked) { console.log(`Skipped ${result.paths.sprite}: baked by Blender (npm run blender:bake).`); continue; }
+    if (result.walk) await writeFile(path.join(root, result.paths.spriteWalk), Buffer.from(result.walk.replace(/^data:image\/png;base64,/, ''), 'base64'));
     for (const [k, png] of result.facingPngs.entries()) await writeFile(path.join(root, result.paths.sprite.replace(/\.png$/, `.facing-${k}.png`)), Buffer.from(png.replace(/^data:image\/png;base64,/, ''), 'base64'));
     const png = Buffer.from(result.png.replace(/^data:image\/png;base64,/, ''), 'base64');
     await mkdir(path.join(root, path.dirname(result.paths.sprite)), { recursive: true });

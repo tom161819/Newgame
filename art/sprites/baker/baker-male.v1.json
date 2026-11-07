@@ -143,5 +143,30 @@
         "y": 0.73134
       }
     }
-  ]
+  ],
+  "walk": {
+    "frameWidth": 67,
+    "frameHeight": 71,
+    "anchor": {
+      "x": 33,
+      "y": 53
+    },
+    "origin": {
+      "x": 0.49254,
+      "y": 0.74648
+    },
+    "columns": [
+      "idle",
+      "stride-a",
+      "stride-b"
+    ],
+    "rows": "facing 0–7 (0 faces the viewer, then turning to screen right)",
+    "cycle": [
+      "idle",
+      "stride-a",
+      "idle",
+      "stride-b"
+    ],
+    "fps": 6
+  }
 }

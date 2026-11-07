@@ -229,3 +229,9 @@ button.link { border: 0; background: none; padding: 0; color: var(--accent); tex
 
 /* Shared review: a decision saved for every reviewer, waiting for Claude to take it over. */
 .pill.local.shared { white-space: normal; }
+/* Walk cycle (V03 animation): eight directions side by side. */
+.walk-list { grid-template-columns: 1fr; }
+.walk-canvas { width: 100%; height: 150px; display: block; border-top: 1px solid var(--line); border-radius: 0 0 var(--radius) var(--radius); }
+.walk-card header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 10px 12px; }
+.walk-card h3 { margin: 0; font-size: 15px; }
+.walk-card .sub { color: var(--muted); font-size: 12px; }

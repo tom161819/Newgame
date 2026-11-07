@@ -86,3 +86,34 @@ export function rotateParts(parts, angle) {
     return out;
   });
 }
+
+// Full orientation of a box or prism as a 3×3 matrix (row-major), matching Three's XYZ Euler order:
+// rotation.y = rotation, rotation.x / z = tilt, matrix Rx · Ry · Rz.
+const Rx = a => [[1, 0, 0], [0, Math.cos(a), -Math.sin(a)], [0, Math.sin(a), Math.cos(a)]];
+const Ry = a => [[Math.cos(a), 0, Math.sin(a)], [0, 1, 0], [-Math.sin(a), 0, Math.cos(a)]];
+const Rz = a => [[Math.cos(a), -Math.sin(a), 0], [Math.sin(a), Math.cos(a), 0], [0, 0, 1]];
+export const matMul = (a, b) => a.map(row => [0, 1, 2].map(j => row[0] * b[0][j] + row[1] * b[1][j] + row[2] * b[2][j]));
+export const partMatrix = part => matMul(matMul(Rx(part.tilt?.[0] ?? 0), Ry(part.rotation ?? 0)), Rz(part.tilt?.[1] ?? 0));
+// Rotation by `angle` about a unit `axis` (Rodrigues).
+export function axisMatrix([x, y, z], angle) {
+  const c = Math.cos(angle), s = Math.sin(angle), t = 1 - c;
+  return [[c + x * x * t, x * y * t - z * s, x * z * t + y * s], [y * x * t + z * s, c + y * y * t, y * z * t - x * s], [z * x * t - y * s, z * y * t + x * s, c + z * z * t]];
+}
+// Matrix → { rotation, tilt } (Three's Euler XYZ decomposition); tilt is left out when it is zero.
+export function orientation(m) {
+  const ey = Math.asin(clamp(m[0][2], -1, 1));
+  const [ex, ez] = Math.abs(m[0][2]) < 0.9999999 ? [Math.atan2(-m[1][2], m[2][2]), Math.atan2(-m[0][1], m[0][0])] : [Math.atan2(m[2][1], m[1][1]), 0];
+  return Math.abs(ex) < 1e-12 && Math.abs(ez) < 1e-12 ? { rotation: ey } : { rotation: ey, tilt: [ex, ez] };
+}
+// Like rotateParts, but a tilted box or prism keeps its exact orientation (rotateParts only adds to its rotation, which
+// is right for upright boxes and leaning cylinders). Upright parts come out exactly as from rotateParts.
+export function turnParts(parts, angle) {
+  return rotateParts(parts, angle).map((p, i) => {
+    const src = parts[i];
+    if ((src.shape !== 'box' && src.shape !== 'prism') || !src.tilt) return p;
+    const { rotation, tilt } = orientation(matMul(Ry(angle), partMatrix(src)));
+    const out = { ...p, rotation };
+    if (tilt) out.tilt = tilt; else delete out.tilt;
+    return out;
+  });
+}
