@@ -1,25 +1,35 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-07T06:17:31.628Z",
+  "updatedAt": "2026-11-07T10:20:08.818Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
       "preferred": "armorer-timber",
       "variants": {
         "armorer-timber": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "b358728f",
-          "note": "Proposed by Claude for review; the building is not in the game yet (Codex C07).",
-          "updatedAt": "2026-11-04T21:00:00.000Z"
+          "status": "rejected",
+          "updatedAt": "2026-11-07T06:29:55.668Z",
+          "version": 1
         },
         "armorer-forge": {
-          "status": "approved",
-          "version": 1,
-          "specHash": "53e287eb",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-04T21:39:06.929Z",
-          "approvedAt": "2026-11-04T21:39:06.929Z"
+          "specHash": "53e287eb",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:30:06.812Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T06:30:06.812Z"
+        },
+        "armorer-display": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c24421f6",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T06:29:56.771Z",
+          "version": 1
         }
       }
     },
@@ -27,11 +37,20 @@
       "preferred": "armory-stone",
       "variants": {
         "armory-stone": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "3609b6ed",
-          "note": "Proposed by Claude for review; the building is not in the game yet (Codex C07).",
-          "updatedAt": "2026-11-04T21:00:00.000Z"
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:09:30.133Z",
+          "version": 1
+        },
+        "armory-timber": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7f2f4aa6",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:09:31.683Z",
+          "version": 1
         },
         "armory-fortified": {
           "status": "approved",
@@ -47,12 +66,20 @@
       "preferred": "bakery-house-yard-oven",
       "variants": {
         "bakery-house-yard-oven": {
-          "status": "approved",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "71125ed5",
-          "note": "Approved by the developer in Asset Studio on 2026-11-04.",
-          "updatedAt": "2026-11-04T19:03:12.948Z",
-          "approvedAt": "2026-11-04T19:03:12.948Z"
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T10:10:01.332Z",
+          "version": 1,
+          "comments": [
+            {
+              "at": "2026-11-07T10:10:01.331Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "ať to vpydá více jako pekárna",
+              "version": 1
+            }
+          ]
         }
       }
     },
@@ -60,47 +87,59 @@
       "preferred": "barracks-hall-stone",
       "variants": {
         "barracks-hall-timber": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
           "specHash": "cbb65133",
-          "note": "Proposed by Claude for review (#92); the game keeps its current drawing until one variant is approved.",
-          "updatedAt": "2026-11-06T18:45:00.000Z"
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:10:10.121Z",
+          "version": 1
         },
         "barracks-hall-stone": {
-          "approvedAt": "2026-11-07T06:12:42.448Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
           "specHash": "0b7359ac",
           "status": "approved",
-          "updatedAt": "2026-11-07T06:12:42.448Z",
-          "version": 1
+          "updatedAt": "2026-11-07T10:10:10.121Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:10:10.121Z"
         },
         "barracks-hall-blender": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
           "specHash": "0b7359ac",
-          "note": "Blender pilot: the same layout rendered by Blender for comparison.",
-          "updatedAt": "2026-11-07T00:58:00.000Z"
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:10:10.121Z",
+          "version": 1
         }
       }
     },
     "bowyer": {
-      "preferred": "bowyer-timber",
+      "preferred": "bowyer-stone",
       "variants": {
         "bowyer-timber": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
           "specHash": "2a9e5b47",
-          "note": "Proposed by Claude for review; the building is not in the game yet (Codex C07).",
-          "updatedAt": "2026-11-04T21:00:00.000Z"
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:10:35.997Z",
+          "version": 1
+        },
+        "bowyer-drying-shed": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "583cbdc2",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:10:35.997Z",
+          "version": 1
         },
         "bowyer-stone": {
-          "status": "approved",
-          "version": 1,
-          "specHash": "92c39d13",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-04T21:39:28.443Z",
-          "approvedAt": "2026-11-04T21:39:28.443Z"
+          "specHash": "92c39d13",
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:10:35.997Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:10:35.997Z"
         }
       }
     },
@@ -138,13 +177,20 @@
           ]
         },
         "builders-workshop-material-yard": {
-          "approvedAt": "2026-11-07T06:12:03.176Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
           "specHash": "2baaace1",
-          "status": "approved",
-          "updatedAt": "2026-11-07T06:12:03.176Z",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T10:11:53.944Z",
           "version": 2,
+          "comments": [
+            {
+              "at": "2026-11-07T10:11:53.944Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "přístřešek ať má uzavřenou boční stěnu a je pod ním vidět dělnický stůl nebo ponk s nářadí, plot ať má vstup",
+              "version": 2
+            }
+          ],
           "history": [
             {
               "version": 1,
@@ -167,12 +213,26 @@
       "preferred": "farmstead-thatched",
       "variants": {
         "farmstead-thatched": {
-          "status": "approved",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "5e606ee1",
-          "note": "Approved by the developer in Asset Studio on 2026-11-04.",
-          "updatedAt": "2026-11-04T19:03:57.530Z",
-          "approvedAt": "2026-11-04T19:03:57.530Z"
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T10:14:38.880Z",
+          "version": 1,
+          "comments": [
+            {
+              "at": "2026-11-07T10:13:54.020Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "může zabírat více místa ať to vpadá víc jako farmhouse s více nářadím a nástroji , kopky sena, pytle atd",
+              "version": 1
+            },
+            {
+              "at": "2026-11-07T10:14:38.879Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "vylepšit vzhled, může být klidně na 3x3, více nástrojů k farmaření, pytle, nástroje, kupky sena atd.",
+              "version": 1
+            }
+          ]
         }
       }
     },
@@ -201,12 +261,26 @@
       "preferred": "house-timber",
       "variants": {
         "house-timber": {
-          "status": "approved",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "90ec1a7b",
-          "note": "Approved by the developer in Asset Studio on 2026-11-04.",
-          "updatedAt": "2026-11-04T19:04:47.318Z",
-          "approvedAt": "2026-11-04T19:04:47.318Z"
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T10:15:14.787Z",
+          "version": 1,
+          "comments": [
+            {
+              "at": "2026-11-07T10:15:06.484Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "vylepšit, více detailů",
+              "version": 1
+            },
+            {
+              "at": "2026-11-07T10:15:14.787Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "vylepšit, více detailů",
+              "version": 1
+            }
+          ]
         }
       }
     },
@@ -214,12 +288,21 @@
       "preferred": "hunting-lodge-log",
       "variants": {
         "hunting-lodge-log": {
-          "status": "approved",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "29c42966",
-          "note": "Approved by the developer in Asset Studio on 2026-11-04.",
-          "updatedAt": "2026-11-04T19:04:56.828Z",
-          "approvedAt": "2026-11-04T19:04:56.828Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:15:20.816Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:15:20.816Z"
+        },
+        "hunting-lodge-thatch": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "c288ff31",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:15:20.816Z",
+          "version": 1
         }
       }
     },
@@ -227,11 +310,20 @@
       "preferred": "iron-mine-adit",
       "variants": {
         "iron-mine-adit": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "a8f8ccb5",
-          "note": "Proposed by Claude for review (#92); the game keeps its current drawing until one variant is approved.",
-          "updatedAt": "2026-11-06T18:45:00.000Z"
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T09:45:10.677Z",
+          "version": 1,
+          "comments": [
+            {
+              "at": "2026-11-07T09:45:10.677Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to se mi nelíbí, přepracuj to na hezčí železný důl ať je to více tématický a lépe to vypadá na ložsiku železa",
+              "version": 1
+            }
+          ]
         },
         "iron-mine-headframe": {
           "status": "review",
@@ -246,12 +338,21 @@
       "preferred": "lumber-camp-hut",
       "variants": {
         "lumber-camp-hut": {
-          "status": "approved",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "fb16ec6c",
-          "note": "Approved by the developer in Asset Studio on 2026-11-04.",
-          "updatedAt": "2026-11-04T19:05:01.370Z",
-          "approvedAt": "2026-11-04T19:05:01.370Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:15:39.652Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:15:39.652Z"
+        },
+        "lumber-camp-sawhorse": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "e73c165a",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:15:39.652Z",
+          "version": 1
         }
       }
     },
@@ -259,40 +360,51 @@
       "preferred": "marketplace-square",
       "variants": {
         "marketplace-square": {
-          "approvedAt": "2026-11-07T06:13:35.767Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
           "specHash": "227e75b8",
           "status": "approved",
-          "updatedAt": "2026-11-07T06:13:35.767Z",
-          "version": 1
+          "updatedAt": "2026-11-07T10:15:45.674Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:15:45.674Z"
         },
         "marketplace-hall": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
           "specHash": "7c7d11b8",
-          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:15:45.674Z",
+          "version": 1
         },
         "marketplace-stalls-bay": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
           "specHash": "4cf6452b",
-          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:15:45.674Z",
+          "version": 1
         }
       }
     },
     "quarry": {
       "preferred": "quarry-pit",
       "variants": {
+        "quarry-cliff": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "4e464b20",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:16:09.139Z",
+          "version": 1
+        },
         "quarry-pit": {
-          "status": "approved",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "02ee820b",
-          "note": "Approved by the developer in Asset Studio on 2026-11-04.",
-          "updatedAt": "2026-11-04T19:06:04.784Z",
-          "approvedAt": "2026-11-04T19:06:04.784Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:16:09.139Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:16:09.139Z"
         }
       }
     },
@@ -337,32 +449,51 @@
       "preferred": "smelter-bloomery",
       "variants": {
         "smelter-bloomery": {
-          "status": "approved",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "b3a0419e",
-          "note": "Approved by the developer in Asset Studio on 2026-11-04.",
-          "updatedAt": "2026-11-04T19:06:27.850Z",
-          "approvedAt": "2026-11-04T19:06:27.850Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:16:20.381Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:16:20.381Z"
+        },
+        "smelter-yard": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "7e2b5725",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:16:20.381Z",
+          "version": 1
         }
       }
     },
     "stables": {
-      "preferred": "stables-timber",
+      "preferred": "stables-shelter",
       "variants": {
         "stables-timber": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
           "specHash": "c12a6ce9",
-          "note": "Proposed by Claude for review; the building is not in the game yet (Codex C07).",
-          "updatedAt": "2026-11-04T21:00:00.000Z"
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:16:36.985Z",
+          "version": 1
+        },
+        "stables-stone": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "d8ada10f",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:16:36.985Z",
+          "version": 1
         },
         "stables-shelter": {
-          "status": "approved",
-          "version": 1,
-          "specHash": "03d361a6",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-04T21:40:09.111Z",
-          "approvedAt": "2026-11-04T21:40:09.111Z"
+          "specHash": "03d361a6",
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:16:36.985Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:16:36.985Z"
         }
       }
     },
@@ -370,12 +501,21 @@
       "preferred": "stone-wall-crenellated",
       "variants": {
         "stone-wall-crenellated": {
-          "status": "approved",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "0bf964f4",
-          "note": "Approved by the developer in Asset Studio on 2026-11-04.",
-          "updatedAt": "2026-11-04T19:06:58.084Z",
-          "approvedAt": "2026-11-04T19:06:58.084Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:18:28.657Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:18:28.657Z"
+        },
+        "stone-wall-palisade": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "623ad6ee",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:18:28.657Z",
+          "version": 1
         }
       }
     },
@@ -383,12 +523,29 @@
       "preferred": "swordsmith-stone",
       "variants": {
         "swordsmith-stone": {
-          "status": "approved",
-          "version": 1,
-          "specHash": "85e2ce33",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-04T21:55:16.366Z",
-          "approvedAt": "2026-11-04T21:55:16.366Z"
+          "specHash": "85e2ce33",
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:16:49.845Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:16:49.845Z"
+        },
+        "swordsmith-lean-to": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6f1dbbb9",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:16:49.845Z",
+          "version": 1
+        },
+        "swordsmith-yard": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "bbb540ef",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:16:49.845Z",
+          "version": 1
         }
       }
     },
@@ -396,18 +553,22 @@
       "preferred": "wall-gate-portcullis",
       "variants": {
         "wall-gate-closed": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "8fa102fc",
-          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:12:13.388Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:12:13.388Z"
         },
         "wall-gate-open": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "49d778d8",
-          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:12:15.788Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:12:15.788Z"
         },
         "wall-gate-portcullis": {
           "approvedAt": "2026-11-07T06:11:13.855Z",
@@ -419,18 +580,22 @@
           "version": 1
         },
         "wall-gate-open-y": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "117b1126",
-          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:12:20.962Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:12:20.962Z"
         },
         "wall-gate-stair": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "2ce6afc6",
-          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:12:04.170Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:12:04.170Z"
         }
       }
     },
@@ -480,7 +645,7 @@
       }
     },
     "wall-kit-preview": {
-      "preferred": "wall-kit-preview-corner",
+      "preferred": "wall-kit-preview-gate",
       "variants": {
         "wall-kit-preview-corner": {
           "status": "approved",
@@ -491,19 +656,22 @@
           "approvedAt": "2026-11-04T21:55:45.942Z"
         },
         "wall-kit-preview-enclosure": {
-          "status": "approved",
-          "version": 1,
-          "specHash": "6378f78f",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-04T21:55:46.774Z",
-          "approvedAt": "2026-11-04T21:55:46.774Z"
+          "specHash": "6378f78f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:18:05.922Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:18:05.922Z"
         },
         "wall-kit-preview-gate": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "9a9652cf",
-          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:18:14.876Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:18:14.876Z"
         }
       }
     },
@@ -511,19 +679,21 @@
       "preferred": "warehouse-store-stone",
       "variants": {
         "warehouse-store-timber": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
           "specHash": "3d08139f",
-          "note": "Proposed by Claude for review; not used by the game until approved.",
-          "updatedAt": "2026-11-04T19:00:00.000Z"
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:18:35.154Z",
+          "version": 1
         },
         "warehouse-store-stone": {
-          "status": "approved",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "3e89fc0a",
-          "note": "Approved by the developer in Asset Studio on 2026-11-04.",
-          "updatedAt": "2026-11-04T19:07:10.762Z",
-          "approvedAt": "2026-11-04T19:07:10.762Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:18:35.154Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:18:35.154Z"
         }
       }
     },
@@ -531,12 +701,29 @@
       "preferred": "watchtower-square",
       "variants": {
         "watchtower-square": {
-          "status": "approved",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "91b92f67",
-          "note": "Approved by the developer on 2026-11-04 and integrated into the game.",
-          "updatedAt": "2026-11-04T13:00:36.000Z",
-          "approvedAt": "2026-11-04T13:00:36.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:18:41.561Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:18:41.561Z"
+        },
+        "watchtower-round": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "efafb039",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:18:41.561Z",
+          "version": 1
+        },
+        "watchtower-timber": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "b5b8950e",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:18:41.561Z",
+          "version": 1
         }
       }
     },
@@ -544,11 +731,13 @@
       "preferred": "wheelwright-yard-shed",
       "variants": {
         "wheelwright-yard-shed": {
-          "status": "review",
-          "version": 2,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "b067e051",
-          "note": "Revision 2 after the owner's comment: half-open shed showing the work, a half-built wheel on its stand, bigger spoked wheels, a stall for one horse.",
-          "updatedAt": "2026-11-07T06:21:51.364Z",
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:18:55.178Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T10:18:55.178Z",
           "comments": [
             {
               "at": "2026-11-07T06:08:43.204Z",
@@ -567,11 +756,12 @@
           ]
         },
         "wheelwright-yard-stone": {
-          "status": "review",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
           "specHash": "814c0922",
-          "note": "Proposed by Claude for review (#92); the game keeps its current drawing until one variant is approved.",
-          "updatedAt": "2026-11-06T18:45:00.000Z"
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:18:55.178Z",
+          "version": 1
         }
       }
     },
@@ -579,12 +769,21 @@
       "preferred": "windmill-tower",
       "variants": {
         "windmill-tower": {
-          "status": "approved",
-          "version": 1,
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "dfe4b764",
-          "note": "Approved by the developer in Asset Studio on 2026-11-04.",
-          "updatedAt": "2026-11-04T19:05:13.082Z",
-          "approvedAt": "2026-11-04T19:05:13.082Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T10:16:00.556Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T10:16:00.556Z"
+        },
+        "windmill-post": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Not chosen: another variant was chosen for the game.",
+          "specHash": "6b4180a3",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T10:16:00.556Z",
+          "version": 1
         }
       }
     },
