@@ -25,3 +25,6 @@ None in the game. Path Lab JSON schema 2 (schema 1 imports).
 ## Notes for the next agent
 - Tune the look in the lab first (`levelBlend`, `widthGrass`, `GRASS_TRACK` colours in v2.js); bring it into the game only when the owner picks V2 settings.
 - If the game gets the grass level, the wear system needs a fourth level and N12 a grass track; until then lab level 1 is lab-only.
+
+## Owner's pick: pesinav2 (2026-11-07)
+The owner exported his settings and test map as `pesinav2`. They are committed as `art/path-lab/pesinav2.json` (schema 2) and as the preset "V2 pesinav2 (owner)"; the scenario list has a "pesinav2 (owner map + settings)" button that loads both. A test checks the preset equals the file's config. When V2 goes into the game, start from this preset. (The JSON was retyped from the chat: one duplicated grass tile near the end was removed so the map is exactly 24 × 24.)

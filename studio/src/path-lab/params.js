@@ -27,6 +27,8 @@ export const PRESETS = Object.freeze([
   { id: 'natural-subtle', name: 'V2 Natural subtle', renderer: 'v2', note: 'Gentle bends, narrow paths.', config: v2({ meanderStrength: 0.25, meanderFrequency: 0.14, cornerRounding: 0.55, edgeIrregularity: 0.25, areaExpansion: 0.3, blendDistance: 1.2 }) },
   { id: 'organic', name: 'V2 Organic', renderer: 'v2', note: 'A little more meander, soft natural transitions.', config: v2({ meanderStrength: 0.45, meanderFrequency: 0.2, cornerRounding: 0.7, edgeIrregularity: 0.4, areaExpansion: 0.45, blendDistance: 1.6, width2: 11 }) },
   { id: 'wild', name: 'V2 Wild', renderer: 'v2', note: 'Experimental, clearly irregular.', config: v2({ meanderStrength: 0.8, meanderFrequency: 0.3, meanderSmoothness: 0.45, cornerRounding: 0.85, edgeIrregularity: 0.75, noiseScale: 0.8, areaExpansion: 0.7, areaSmoothness: 0.4, blendDistance: 2.2 }) },
+  // The owner's pick (2026-11-07), also committed with its test map as art/path-lab/pesinav2.json.
+  { id: 'pesinav2', name: 'V2 pesinav2 (owner)', renderer: 'v2', note: 'The owner\'s chosen settings (7 Nov 2026): strong meander, wide soft curves, smooth level transitions.', config: v2({ meanderStrength: 0.96, meanderFrequency: 0.2, meanderSmoothness: 0.7, cornerRounding: 0.77, minCurveRadius: 1.25, widthGrass: 6, width1: 7, width2: 12, width3: 16, levelBlend: 0.54, edgeIrregularity: 0.47, edgeSoftness: 0.61, noiseScale: 1.75, areaExpansion: 0.32, areaSmoothness: 0.92, blendDistance: 2.2 }) },
   { id: 'custom', name: 'Custom (V2)', renderer: 'v2', note: 'Your own V2 settings: save them as a variant or export JSON.' },
 ]);
 // Which renderers exist in this build: 'v2' is the Experimental renderer of #116 (studio/src/path-lab/v2.js).

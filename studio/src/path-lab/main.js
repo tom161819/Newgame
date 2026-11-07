@@ -9,6 +9,7 @@ import { currentPathRenderer } from './current.js';
 import { createV2Renderer } from './v2.js';
 import { objectRegistry } from '../../../src/systems/ObjectRegistry.js';
 import { tileCenter } from '../../../src/game/isometric.js';
+import ownerMap from '../../../art/path-lab/pesinav2.json';
 
 const urls = import.meta.glob('../../../public/assets/terrain/{grass/lush,grass/seasons,path_wear/earth}/*.png', { eager: true, query: '?url', import: 'default' });
 const pick = pattern => Object.entries(urls).filter(([path]) => pattern.test(path)).sort(([a], [b]) => a.localeCompare(b)).map(([, url]) => url);
@@ -141,6 +142,10 @@ function segmentedAll() {
 
 function bindPanels() {
   $('#lab-scenarios').replaceChildren(...SCENARIOS.map(s => { const b = document.createElement('button'); b.type = 'button'; b.className = 'button'; b.textContent = s.name; b.dataset.scenario = s.id; if (s.priority) b.dataset.priority = ''; b.addEventListener('click', () => { loadMap(scenarioMap(s.id), `Scenario: ${s.name}`); history = new History(state.map); }); return b; }));
+  // The owner's own map with its settings (art/path-lab/pesinav2.json): loads map, preset and seed together.
+  const owner = document.createElement('button'); owner.type = 'button'; owner.className = 'button'; owner.textContent = 'pesinav2 (owner map + settings)'; owner.dataset.scenario = 'pesinav2';
+  owner.addEventListener('click', () => { apply({ ...ownerMap, preset: 'pesinav2' }, 'Loaded pesinav2: the owner\'s map and settings'); history = new History(state.map); });
+  $('#lab-scenarios').append(owner);
   $('#lab-preset').replaceChildren(...PRESETS.map(p => { const o = document.createElement('option'); o.value = p.id; o.textContent = p.renderer !== 'current' && !RENDERERS[p.renderer] ? `${p.name} (proposal)` : p.name; return o; }));
   $('#lab-preset').addEventListener('change', e => applyPreset(e.target.value));
   for (const key of ['grid', 'levels', 'centerline']) $(`#lab-${key}`).addEventListener('change', e => { state.overlays[key] = e.target.checked; draw(); });

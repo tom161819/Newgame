@@ -42,7 +42,7 @@ test('#115/#116 Path Lab parameters and presets: every V2 control is real data i
   const keys = ['meanderStrength', 'meanderFrequency', 'meanderSmoothness', 'cornerRounding', 'minCurveRadius', 'widthGrass', 'width1', 'width2', 'width3', 'levelBlend', 'edgeIrregularity', 'edgeSoftness', 'noiseScale', 'areaExpansion', 'areaSmoothness', 'blendDistance'];
   assert.deepEqual(PARAMS.map(p => p.key), keys);
   for (const p of PARAMS) assert.ok(p.min < p.max && p.default >= p.min && p.default <= p.max && p.tip, p.key);
-  assert.deepEqual(PRESETS.map(p => p.id), ['current', 'natural-subtle', 'organic', 'wild', 'custom']);
+  assert.deepEqual(PRESETS.map(p => p.id), ['current', 'natural-subtle', 'organic', 'wild', 'pesinav2', 'custom']);
   for (const p of PRESETS.filter(p => p.config)) for (const [k, v] of Object.entries(p.config)) assert.equal(clampParam(k, v), v, `${p.id}.${k} in range`);
   assert.equal(RENDERERS.current, true);assert.equal(RENDERERS.v2, true, 'V2 (#116) is registered');assert.equal(Object.keys(defaultConfig()).length, keys.length);
 });
@@ -125,4 +125,11 @@ test('V2 wear level is a smooth field: no jump at tile edges, along a 1 → 4 pa
   const g = (() => { const c = tileCenter({ x: 7.5, y: 8 }); return { x: c.x, y: c.y * 2 }; })();
   assert.ok(Math.abs(levelAt(sharp, g.x, g.y) - 2.5) > Math.abs(levelAt(soft, g.x, g.y) - 2.5) - 0.05, 'Level transition widens the blend');
   assert.equal(levelAt(geometry(new WearMap(8), cfg('organic'), 1), 0, 0), null);
+});
+
+test("The owner's pesinav2 map and settings are committed, valid and match the preset", async () => {
+  const { readFileSync } = await import('node:fs');
+  const data = JSON.parse(readFileSync(new URL('../art/path-lab/pesinav2.json', import.meta.url), 'utf8'));
+  const lab = importLab(data, { presets: PRESETS, params: PARAMS });assert.equal(lab.map.size, 24);assert.ok(lab.map.count() > 100);
+  assert.deepEqual(PRESETS.find(p => p.id === 'pesinav2').config, { ...defaultConfig(), ...data.config }, 'preset = the exported settings');
 });
