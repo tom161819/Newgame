@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-11-07
+<!-- version: {"title":"Smoother happiness checks","type":"feature","reconstructed":false,"saveVersion":41} -->
+### Changed
+- Happiness checks for strikes now work out the residents' homes once per check instead of once per resident, so large villages stay smooth (100 residents tested).
+
 ## [0.13.0] - 2026-11-07
 <!-- version: {"title":"Strikes and emigration","type":"feature","reconstructed":false,"saveVersion":41} -->
 ### Added

@@ -28,13 +28,13 @@ export class NeedsSystem {
     for(const id of [...this.records.keys()])if(!live.has(id))this.records.delete(id);
     this.revision++;this.refresh();
     // #58 C2: a strike ends as soon as Happiness is back at 45.
-    for(const worker of this.residents()){const r=this.records.get(worker.id);if(r?.strike&&this.status(worker).happiness>=DISCONTENT.strikeEndsAt){r.strike=false;r.lowDays=0;this.scene.eventFeed?.push(`strike-end:${worker.id}:${now}`,`${worker.name}: back to work after the strike.`);}}
+    for(const worker of this.residents()){const r=this.records.get(worker.id);if(r?.strike&&this.status(worker,homes).happiness>=DISCONTENT.strikeEndsAt){r.strike=false;r.lowDays=0;this.scene.eventFeed?.push(`strike-end:${worker.id}:${now}`,`${worker.name}: back to work after the strike.`);}}
   }
   // #58 C2, at the end of each day: count whole days of low Happiness; start strikes and emigration.
   closeDay(){
-    let changed=false;
+    let changed=false;const homes=this.homes();
     for(const worker of this.residents()){
-      const r=this.record(worker),h=this.status(worker).happiness;
+      const r=this.record(worker),h=this.status(worker,homes).happiness;
       r.lowDays=h<DISCONTENT.strikeBelow?r.lowDays+1:0;r.criticalDays=h<DISCONTENT.emigrateBelow?r.criticalDays+1:0;
       if(!r.strike&&!r.leaving&&r.lowDays>=DISCONTENT.strikeDays){r.strike=true;changed=true;this.scene.eventFeed?.push(`strike:${worker.id}:${this.scene.gameTime?.day}`,`${worker.name} is on strike: Happiness has been below ${DISCONTENT.strikeBelow} for ${DISCONTENT.strikeDays} days.`,{important:true});}
       if(!r.leaving&&r.criticalDays>=DISCONTENT.emigrateDays){r.leaving=true;r.strike=false;changed=true;this.scene.eventFeed?.push(`leaving:${worker.id}`,`${worker.name} is leaving the kingdom.`,{important:true});}

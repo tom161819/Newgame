@@ -2,8 +2,8 @@
 
 ## Aktuální stav — 7. 11. 2026 (bez GitHubu)
 
-Hra je ve verzi **0.11.0**. Vydané milníky: M1 0.2.0, M2 0.3.0, M3 0.4.0 (tag `v0.4.0`). Etapy 01–12 jsou DONE (tabulka níže).
-Etapa 13 (#58 potřeby a spokojenost) běží po fázích: A 0.5.0 (PR #191, SAVE 33), C část 1 0.6.1 (PR #193), B domovy a denní odpočinek 0.9.0 (`c040390`, SAVE 37); zbývá C2 (po daních a přídělech #103) a D. Etapa 14 (#59 obchod): ruční obchod F1 je hotový (tržiště 0.9.5, karavany 0.10.0, obchodní okno 0.11.0), zbývá F2 živé ceny a F3 automatický obchod; etapa 15 čeká.
+Hra je ve verzi **0.13.1**. Vydané milníky: M1 0.2.0, M2 0.3.0, M3 0.4.0 (tag `v0.4.0`). Etapy 01–12 jsou DONE (tabulka níže).
+Etapa 13 (#58 potřeby a spokojenost) je hotová: A 0.5.0, C1 0.6.1, B domovy a odpočinek 0.9.0, daně a příděly 0.12.0, C2 stávky a emigrace 0.13.0, D 0.13.1. Etapa 14 (#59 obchod): ruční obchod F1 je hotový (tržiště 0.9.5, karavany 0.10.0, obchodní okno 0.11.0), zbývá F2 živé ceny a F3 automatický obchod; etapa 15 čeká.
 
 Od 6. 11. 2026 je GitHub účet zablokovaný: vývoj běží v chatech projektu MK, kód se předává přes sdílené úložiště a **úkoly vede stránka *MK – plán vývoje*** (pravidla v `AGENTS.md`). Sekce níže jsou historie z doby GitHubu; vydání milníku M4 bude potřebovat úpravu `release-gate` (dnes vyžaduje GitHub Pages a archiv).
 
@@ -51,7 +51,7 @@ Etapy01–06 i dodatečný audit archivu jsou DONE; M1 RELEASED0.2.0,07–10 jso
 | 10 | 35: Quarry Placement & Iron Smelter | M2 | DONE | `0f4ebce931d912c18ff33a6148697b9514bb9249`; Quarry/Smelter/3Ore+2Wood→1Bar/Smelting/Save14,438 testů/build/current native; plný browser společné verze0f76b96 prošel před poslední drobnou validací. PR11 core merged, finální follow-up připraven;71 archivů/2314 HTTP souborů;[report](verification/master-10.md). |
 | 11 | 37: Stone Pavement & Courtyards | M3 | DONE | `3c08916272b6271fa377f06ed52c22ad51b2b899`; merged [PR136](https://github.com/tom161819/Newgame/pull/136) (#56): pavement layer in PathWear, Single/Line/Area/Remove, physical blueprints (1 Stone per 2 tiles), +25 % without stacking on paths, Fog/Map Memory, Save/Load; follow-ups [PR159](https://github.com/tom161819/Newgame/pull/159) pavement under buildings and [PR173](https://github.com/tom161819/Newgame/pull/173) Builder goal fix. Browser `--pavement`/`--pave-under` PASS in the full Pages runs. |
 | 12 | 34: Wheelwright, Wagons, Stables & Housing | M3 | DONE | `a9aa16f0ee4bfb58911b55254d60d4e9b3b11b2a` (final part, [PR158](https://github.com/tom161819/Newgame/pull/158) Horse Wagon). The stage is merged in parts: [PR133](https://github.com/tom161819/Newgame/pull/133) House/population capacity, [PR139](https://github.com/tom161819/Newgame/pull/139) carry weights, [PR153](https://github.com/tom161819/Newgame/pull/153) Wheelwright/Wheelbarrow, [PR154](https://github.com/tom161819/Newgame/pull/154) Stables/taming/Knight horse, [PR158](https://github.com/tom161819/Newgame/pull/158) Horse Wagon; fixes [PR160](https://github.com/tom161819/Newgame/pull/160)/[PR170](https://github.com/tom161819/Newgame/pull/170). Browser `--wheelwright --stables --horse-wagon --housing` PASS in the full Pages runs. |
-| 13 | 26: Villager Needs & Happiness | M4 | IN PROGRESS | A 0.5.0 (PR #191), C část 1 0.6.1 (PR #193), B 0.9.0 (`c040390`); zbývá C2 a D |
+| 13 | 26: Villager Needs & Happiness | M4 | DONE | A 0.5.0 (PR #191), C1 0.6.1 (PR #193), B 0.9.0 (`c040390`), politika 0.12.0 (`f0a3ade`), C2 stávky a emigrace 0.13.0 (`a31aa49`), D 0.13.1 |
 | 14 | 27: Merchants, Caravans & Trade | M4 | IN PROGRESS | F1 hotová: F1.1 tržiště 0.9.5, F1.2 karavana 0.10.0 (SAVE 38), F1.3 obchod 0.11.0 (SAVE 39, `618bb93`); zbývá F2 živé ceny a F3 automatický obchod |
 | 15 | 29B: Background Simulation & Catch-up | M5 | PENDING | Nezahájeno |
 
