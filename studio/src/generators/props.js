@@ -138,6 +138,28 @@ Object.assign(PROPS, {
     if (withHorse) { const ax = Math.cos(angle), az = Math.sin(angle); turned.push(...horse([x + ax * (L / 2 + 0.52), 0, z + az * (L / 2 + 0.52)], { angle, coat, saddle: false, scale: 0.85 }).parts); }
     return turned;
   },
+  // Wheelwright (#92 revision): a spoked wheel. plane 'x' stands it upright with its face toward +z, 'z' upright
+  // facing +x, 'flat' lays it down at height y (on a wheel stand). done < 1 leaves part of the rim unbuilt, so the
+  // bare spoke ends show; tire adds a thin iron band round a finished wheel.
+  spokedWheel: (x, z, { radius = 0.22, plane = 'x', spokes = 10, done = 1, y = 0, thick = 0.035, tire = done >= 1 } = {}) => spokedWheel(x, z, { radius, plane, spokes, done, y, thick, tire }),
+  // Wheel stand: a low post with a half-built wheel lying on it, spokes in, felloes being fitted.
+  wheelStand: (x, z, { radius = 0.24, done = 0.55 } = {}) => [cylinder({ radiusBottom: 0.07, radiusTop: 0.055, height: 0.26, segments: 8 }, [x, 0, z], 'bark'), ...spokedWheel(x, z, { radius, plane: 'flat', spokes: 12, done, y: 0.28, thick: 0.035, tire: false })],
+  // Bundle of shaped spokes and felloe blanks waiting on the floor.
+  spokesBundle: (x, z, { r = 0 } = {}) => rotateParts([...[-0.06, -0.03, 0, 0.03, 0.06].map((o, i) => box([0.3, 0.022, 0.022], [0, (i % 2) * 0.022, o], 'wood')), ...[0, 1].map(i => box([0.18, 0.03, 0.05], [0.02, 0.045, -0.02 + i * 0.06], 'wood_dark', { rotation: 0.3 }))], r).map(p => ({ ...p, at: [p.at[0] + x, p.at[1], p.at[2] + z] })),
+  // Stall for one horse: posts, a plank back wall, low side boards (so the horse shows), a sloping roof, hay rack and straw. Built open toward
+  // local +z with the horse standing along local x, then turned by r (quarter turns: π/2 opens it toward +x).
+  horseStall: (x, z, { r = 0, length = 1.1, depth = 0.62, coat = 'horse_bay', horse: withHorse = true } = {}) => {
+    const front = 1.08, back = 0.86, local = [];
+    for (const lx of [-length / 2 + 0.03, length / 2 - 0.03]) local.push(box([0.06, front, 0.06], [lx, 0, depth / 2 - 0.03], 'wood_dark'), box([0.06, back, 0.06], [lx, 0, -depth / 2 + 0.03], 'wood_dark'));
+    local.push(box([length - 0.04, back * 0.85, 0.04], [0, 0, -depth / 2 + 0.02], 'wood'), box([0.04, 0.4, depth - 0.08], [-length / 2 + 0.02, 0, 0], 'wood'), box([0.04, 0.4, depth * 0.55], [length / 2 - 0.02, 0, -depth * 0.2], 'wood'));
+    local.push(box([length + 0.04, 0.05, 0.06], [0, front - 0.05, depth / 2 - 0.03], 'wood_dark'));
+    const steps = 5;
+    for (let i = 0; i < steps; i++) { const t = (i + 0.5) / steps, lz = -depth / 2 - 0.06 + t * (depth + 0.16); local.push(box([length + 0.1, 0.035, (depth + 0.16) / steps + 0.03], [0, back + (front - back) * t, lz], 'roof_shingle')); }
+    local.push(box([length - 0.1, 0.015, depth - 0.1], [0, 0, 0], 'thatch'), box([0.34, 0.14, 0.12], [-length / 2 + 0.26, 0.3, -depth / 2 + 0.1], 'wood_dark'), box([0.3, 0.06, 0.09], [-length / 2 + 0.26, 0.42, -depth / 2 + 0.1], 'thatch'));
+    local.push(box([0.05, 0.03, 0.03], [length / 2 - 0.12, 0.5, depth / 2 - 0.03], 'iron'));
+    if (withHorse) local.push(...horse([0.02, 0, 0.08], { angle: Math.PI, coat, scale: 0.8 }).parts);
+    return rotateParts(local, r).map(p => ({ ...p, at: [p.at[0] + x, p.at[1], p.at[2] + z] }));
+  },
   // Builder's yard (#119): squared beams, planks and a sawhorse.
   planks: (x, z, { count = 5, length = 0.7, r = 0 } = {}) => Array.from({ length: count }, (_, i) => box([length, 0.025, 0.12], [x + Math.sin(r) * (i % 2) * 0.02, i * 0.026, z + Math.cos(r) * (i % 2) * 0.02], i % 3 ? 'wood' : 'wood_dark', { rotation: r })),
   beams: (x, z, { count = 4, length = 0.8, r = 0 } = {}) => Array.from({ length: count }, (_, i) => box([length, 0.08, 0.08], [x + Math.sin(r) * (i % 2) * 0.09, Math.floor(i / 2) * 0.08, z + Math.cos(r) * (i % 2) * 0.09], 'wood', { rotation: r })),
@@ -145,5 +167,28 @@ Object.assign(PROPS, {
   ladder: (x, z, { r = 0, height = 0.8 } = {}) => rotateParts([box([0.025, height, 0.025], [-0.08, 0, 0], 'wood'), box([0.025, height, 0.025], [0.08, 0, 0], 'wood'), ...Array.from({ length: Math.round(height / 0.14) }, (_, i) => box([0.17, 0.02, 0.02], [0, 0.1 + i * 0.14, 0], 'wood_dark'))], r).map(p => ({ ...p, at: [p.at[0] + x, p.at[1], p.at[2] + z] })),
   mortarTub: (x, z) => [box([0.3, 0.1, 0.2], [x, 0, z], 'wood_dark'), box([0.26, 0.01, 0.16], [x, 0.1, z], 'plaster'), box([0.04, 0.02, 0.2], [x + 0.12, 0.11, z], 'iron', { rotation: 0.5 })],
 });
+
+
+// Spoked wheel made of boxes: spokes from the hub and short straight felloes round the rim. Each piece runs from
+// point a to point b in the wheel plane (u, v); upright wheels lean their boxes about the base (tilt), flat ones turn
+// about the vertical axis.
+function spokedWheel(x, z, { radius, plane, spokes, done, y, thick, tire }) {
+  const flat = plane === 'flat', cy = flat ? y : radius + 0.01, parts = [];
+  const piece = (a, b, width, depth, material, lift = 0) => {
+    const du = b[0] - a[0], dv = b[1] - a[1], length = Math.hypot(du, dv);
+    if (flat) return box([length, depth, width], [x + (a[0] + b[0]) / 2, y + lift, z + (a[1] + b[1]) / 2], material, { rotation: Math.atan2(-dv, du) });
+    if (plane === 'x') return box([width, length, depth], [x + a[0], cy + a[1], z], material, { tilt: [0, Math.atan2(-du, dv)] });
+    return box([depth, length, width], [x, cy + a[1], z + a[0]], material, { tilt: [Math.atan2(du, dv), 0] });
+  };
+  const at = (r, phi) => [r * Math.cos(phi), r * Math.sin(phi)], rim = radius - 0.018, segs = 16;
+  for (let i = 0; i < spokes; i++) { const phi = (i + 0.25) * 2 * Math.PI / spokes; parts.push(piece(at(0.035, phi), at(rim - 0.012, phi), 0.018, thick * 0.55, 'wood', thick * 0.22)); }
+  for (let k = 0; k < Math.round(segs * done); k++) parts.push(piece(at(rim, k * 2 * Math.PI / segs), at(rim, (k + 1) * 2 * Math.PI / segs), 0.036, thick, 'wood_dark'));
+  if (tire) for (let k = 0; k < segs; k++) parts.push(piece(at(radius - 0.004, k * 2 * Math.PI / segs), at(radius - 0.004, (k + 1) * 2 * Math.PI / segs), 0.01, thick * 1.05, 'iron'));
+  const hub = thick + 0.035;
+  if (flat) parts.push(cylinder({ radiusBottom: 0.045, height: hub, segments: 10 }, [x, y - 0.0175, z], 'iron'));
+  else if (plane === 'x') parts.push(cylinder({ radiusBottom: 0.045, height: hub, segments: 10, tilt: [Math.PI / 2, 0] }, [x, cy, z - hub / 2], 'iron'));
+  else parts.push(cylinder({ radiusBottom: 0.045, height: hub, segments: 10, tilt: [0, -Math.PI / 2] }, [x - hub / 2, cy, z], 'iron'));
+  return parts;
+}
 
 export const PROP_TYPES = Object.keys(PROPS);

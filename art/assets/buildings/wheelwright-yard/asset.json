@@ -13,72 +13,145 @@
   "variants": [
     {
       "id": "wheelwright-yard-shed",
-      "name": "Workshop with open shed",
-      "version": 1,
-      "notes": "A low timber workshop and an open shed where a cart is being built; wheels and logs around.",
+      "name": "Half-open workshop with horse stall",
+      "version": 2,
+      "notes": "Revision 2 (owner: show what the building is for): a half-open work shed with plank back and side walls so the work shows; a wheel half-built on its stand (spokes in, felloes being fitted), bigger spoked wheels in a rack and against the back wall, a cart in the yard, timber and a stall for one horse.",
       "spec": {
         "body": {
-          "kind": "house",
-          "walls": "wood",
+          "kind": "shed",
+          "width": 2.0,
+          "depth": 1.2,
+          "frontHeight": 1.2,
+          "backHeight": 0.72,
+          "sideWall": true,
+          "lantern": true,
           "roofMaterial": "roof_shingle",
-          "width": 1.4,
-          "depth": 1.1,
-          "wallHeight": 0.85,
-          "roofHeight": 0.6,
-          "ridge": "z",
-          "windows": 1,
           "at": [
-            -0.6,
-            -0.6
+            -0.35,
+            -0.75
           ]
         },
         "props": [
           {
-            "type": "awning",
+            "type": "wheelStand",
             "at": [
-              0.55,
-              -0.6
+              -0.5,
+              -0.45
             ],
-            "width": 1.1,
-            "depth": 0.7,
-            "height": 0.75
+            "radius": 0.24,
+            "done": 0.55
           },
           {
-            "type": "cart",
+            "type": "spokedWheel",
             "at": [
-              0.55,
-              -0.55
+              0.5,
+              0.08
+            ],
+            "plane": "x",
+            "radius": 0.24
+          },
+          {
+            "type": "workbench",
+            "at": [
+              0.1,
+              -0.9
             ]
           },
           {
-            "type": "wheel",
+            "type": "toolRack",
             "at": [
-              -0.1,
-              0.45
+              0.38,
+              -1.25
             ]
           },
           {
-            "type": "wheel",
+            "type": "spokesBundle",
             "at": [
               0.3,
-              0.55
+              -0.42
+            ]
+          },
+          {
+            "type": "horseStall",
+            "at": [
+              1.07,
+              -0.85
+            ],
+            "r": 1.5707963267948966,
+            "coat": "horse_grey"
+          },
+          {
+            "type": "wagon",
+            "at": [
+              -0.25,
+              0.6
+            ],
+            "load": "empty",
+            "horse": false
+          },
+          {
+            "type": "spokedWheel",
+            "at": [
+              1.25,
+              0.15
+            ],
+            "plane": "z",
+            "radius": 0.22
+          },
+          {
+            "type": "spokedWheel",
+            "at": [
+              1.25,
+              0.62
+            ],
+            "plane": "z",
+            "radius": 0.22
+          },
+          {
+            "type": "spokedWheel",
+            "at": [
+              1.25,
+              1.09
+            ],
+            "plane": "z",
+            "radius": 0.22,
+            "done": 0.75
+          },
+          {
+            "type": "fence",
+            "from": [
+              1.36,
+              -0.1
+            ],
+            "to": [
+              1.36,
+              1.34
+            ]
+          },
+          {
+            "type": "sawhorse",
+            "at": [
+              -1.05,
+              0.2
             ]
           },
           {
             "type": "logs",
             "at": [
-              0.9,
-              0.85
+              -1.0,
+              1.1
             ],
             "count": 6,
             "length": 0.7
           },
           {
-            "type": "workbench",
+            "type": "beams",
             "at": [
-              -0.8,
-              0.6
-            ]
+              0.25,
+              1.15
+            ],
+            "count": 4,
+            "length": 0.8
           }
         ]
       }

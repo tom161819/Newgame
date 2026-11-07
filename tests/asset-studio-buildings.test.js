@@ -81,3 +81,21 @@ test('marketplace, merchant wagon and bushes are concepts that fit their tiles',
   const turned = PROPS.wagon(0, 0, { angle: Math.PI / 2, horse: false });assert.ok(Math.max(...turned.map(p => Math.abs(p.at[0]))) < 0.4, 'angle turns the wagon to run along z');
   for (const spec of [{ kind: 'bush' }, { kind: 'bush', dry: true }, { kind: 'bush', berries: 'cloth_red' }]) { const model = GENERATORS.tree.build(spec, { footprint: { width: 1, height: 1 }, style }); assert.deepEqual(checkModel(model, { footprint: { width: 1, height: 1 }, style }), []); assert.ok(model.height < 1.3, 'a bush stays low'); }
 });
+
+test('wheelwright revision 2: half-open shed, a half-built wheel, spoked wheels and a stall for one horse', () => {
+  const spec = workshops.find(a => a.id === 'wheelwright-yard').variants.find(v => v.id === 'wheelwright-yard-shed');
+  assert.equal(spec.version, 2);
+  assert.equal(spec.spec.body.kind, 'shed');
+  const types = spec.spec.props.map(p => p.type);
+  for (const type of ['wheelStand', 'spokedWheel', 'horseStall']) assert.ok(types.includes(type), type);
+  // A half-built wheel leaves part of its rim out; a finished one has the full rim and an iron tire.
+  const felloes = parts => parts.filter(p => p.material === 'wood_dark').length;
+  assert.ok(felloes(PROPS.wheelStand(0, 0, { done: 0.5 })) < felloes(PROPS.spokedWheel(0, 0, {})));
+  assert.ok(PROPS.spokedWheel(0, 0, {}).some(p => p.material === 'iron' && p.shape === 'box'));
+  // Upright wheels stand on the ground; the stall really has a horse in it.
+  for (const plane of ['x', 'z']) assert.ok(PROPS.spokedWheel(0, 0, { plane, radius: 0.24 }).every(p => p.at[1] >= 0), plane);
+  assert.ok(PROPS.horseStall(0, 0, { r: Math.PI / 2 }).some(p => p.material === 'horse_bay'));
+  const variant = catalog.find(a => a.id === 'wheelwright-yard').variants.find(v => v.id === 'wheelwright-yard-shed');
+  const model = GENERATORS.workshop.build(variant.spec, { footprint: { width: 3, height: 3 }, style });
+  assert.deepEqual(checkModel(model, { footprint: { width: 3, height: 3 }, style }), []);
+});

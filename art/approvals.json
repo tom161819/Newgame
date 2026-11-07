@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-07T00:45:00.000Z",
+  "updatedAt": "2026-11-07T06:17:31.628Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -67,11 +67,13 @@
           "updatedAt": "2026-11-06T18:45:00.000Z"
         },
         "barracks-hall-stone": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:12:42.448Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "0b7359ac",
-          "note": "Proposed by Claude for review (#92); the game keeps its current drawing until one variant is approved.",
-          "updatedAt": "2026-11-06T18:45:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:12:42.448Z",
+          "version": 1
         },
         "barracks-hall-blender": {
           "status": "review",
@@ -136,11 +138,13 @@
           ]
         },
         "builders-workshop-material-yard": {
-          "status": "review",
-          "version": 2,
+          "approvedAt": "2026-11-07T06:12:03.176Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "2baaace1",
-          "note": "v2: 3 × 3 as the owner asked (7 Nov 2026).",
-          "updatedAt": "2026-11-07T00:45:00.000Z",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:12:03.176Z",
+          "version": 2,
           "history": [
             {
               "version": 1,
@@ -251,6 +255,34 @@
         }
       }
     },
+    "marketplace": {
+      "preferred": "marketplace-square",
+      "variants": {
+        "marketplace-square": {
+          "approvedAt": "2026-11-07T06:13:35.767Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "227e75b8",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:13:35.767Z",
+          "version": 1
+        },
+        "marketplace-hall": {
+          "status": "review",
+          "version": 1,
+          "specHash": "7c7d11b8",
+          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "marketplace-stalls-bay": {
+          "status": "review",
+          "version": 1,
+          "specHash": "4cf6452b",
+          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        }
+      }
+    },
     "quarry": {
       "preferred": "quarry-pit",
       "variants": {
@@ -357,6 +389,48 @@
           "note": "",
           "updatedAt": "2026-11-04T21:55:16.366Z",
           "approvedAt": "2026-11-04T21:55:16.366Z"
+        }
+      }
+    },
+    "wall-gate": {
+      "preferred": "wall-gate-portcullis",
+      "variants": {
+        "wall-gate-closed": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8fa102fc",
+          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "wall-gate-open": {
+          "status": "review",
+          "version": 1,
+          "specHash": "49d778d8",
+          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "wall-gate-portcullis": {
+          "approvedAt": "2026-11-07T06:11:13.855Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "89e2d3a7",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:11:13.855Z",
+          "version": 1
+        },
+        "wall-gate-open-y": {
+          "status": "review",
+          "version": 1,
+          "specHash": "117b1126",
+          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "wall-gate-stair": {
+          "status": "review",
+          "version": 1,
+          "specHash": "2ce6afc6",
+          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
         }
       }
     },
@@ -471,10 +545,26 @@
       "variants": {
         "wheelwright-yard-shed": {
           "status": "review",
-          "version": 1,
-          "specHash": "eabfa632",
-          "note": "Proposed by Claude for review (#92); the game keeps its current drawing until one variant is approved.",
-          "updatedAt": "2026-11-06T18:45:00.000Z"
+          "version": 2,
+          "specHash": "b067e051",
+          "note": "Revision 2 after the owner's comment: half-open shed showing the work, a half-built wheel on its stand, bigger spoked wheels, a stall for one horse.",
+          "updatedAt": "2026-11-07T06:21:51.364Z",
+          "comments": [
+            {
+              "at": "2026-11-07T06:08:43.204Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "ať jí více poznat k čemu je budova určena, může být klidně na půl otevřená aby bylo vidět dovniř na práci, at je tam nějký rozdělaný kolo atd, kola můžou být trochu větší, ať je tam taky uzvauště pro jednoho koně",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "eabfa632",
+              "status": "revision-requested",
+              "at": "2026-11-07T06:08:43.204Z"
+            }
+          ]
         },
         "wheelwright-yard-stone": {
           "status": "review",
@@ -502,25 +592,81 @@
       "preferred": "burnt-building-timber",
       "variants": {
         "burnt-building-timber": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:11:49.781Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "9c7c3339",
-          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
-          "updatedAt": "2026-11-06T03:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:11:49.781Z",
+          "version": 1
         },
         "burnt-building-stone": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:11:50.837Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "0aa0b3ad",
-          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
-          "updatedAt": "2026-11-06T03:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:11:50.837Z",
+          "version": 1
         },
         "burnt-building-collapsed": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:11:51.958Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "45ac407d",
-          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
-          "updatedAt": "2026-11-06T03:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:11:51.958Z",
+          "version": 1
+        }
+      }
+    },
+    "profession-porch": {
+      "preferred": "profession-porch-smith",
+      "variants": {
+        "profession-porch-woodcutter": {
+          "approvedAt": "2026-11-07T06:06:10.590Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6f77f961",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:06:10.590Z",
+          "version": 1
+        },
+        "profession-porch-farmer": {
+          "approvedAt": "2026-11-07T06:06:12.364Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e5b5d925",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:06:12.364Z",
+          "version": 1
+        },
+        "profession-porch-baker": {
+          "approvedAt": "2026-11-07T06:06:16.176Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1d8e076e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:06:16.176Z",
+          "version": 1
+        },
+        "profession-porch-smith": {
+          "approvedAt": "2026-11-07T06:06:30.183Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f193de81",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:06:30.183Z",
+          "version": 1
+        },
+        "profession-porch-hunter": {
+          "approvedAt": "2026-11-07T06:06:29.060Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9adefce8",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:06:29.060Z",
+          "version": 1
         }
       }
     },
@@ -528,25 +674,31 @@
       "preferred": "ruin-foundations-house",
       "variants": {
         "ruin-foundations-house": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:13:51.251Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "4e3a7c84",
-          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
-          "updatedAt": "2026-11-06T03:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:13:51.251Z",
+          "version": 1
         },
         "ruin-foundations-hall": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:13:52.087Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "8c393f73",
-          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
-          "updatedAt": "2026-11-06T03:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:13:52.087Z",
+          "version": 1
         },
         "ruin-foundations-traces": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:13:52.707Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "64745f56",
-          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
-          "updatedAt": "2026-11-06T03:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:13:52.707Z",
+          "version": 1
         }
       }
     },
@@ -554,25 +706,31 @@
       "preferred": "ruined-tower-stump",
       "variants": {
         "ruined-tower-stump": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:10:57.754Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "1c180699",
-          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
-          "updatedAt": "2026-11-06T03:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:10:57.754Z",
+          "version": 1
         },
         "ruined-tower-broken": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:11:02.716Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "fd4f1983",
-          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
-          "updatedAt": "2026-11-06T03:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:11:02.716Z",
+          "version": 1
         },
         "ruined-tower-overgrown": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:11:04.305Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "23fd6aff",
-          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
-          "updatedAt": "2026-11-06T03:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:11:04.305Z",
+          "version": 1
         },
         "ruined-tower-winter": {
           "status": "review",
@@ -587,11 +745,13 @@
       "preferred": "ruined-wall-breach",
       "variants": {
         "ruined-wall-breach": {
-          "status": "review",
-          "version": 2,
+          "approvedAt": "2026-11-06T23:50:14.759Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "65d02758",
-          "note": "v2: rough rubble masonry (stonewall recipe) after the owner's revision request.",
-          "updatedAt": "2026-11-06T23:40:00.000Z",
+          "status": "approved",
+          "updatedAt": "2026-11-06T23:50:14.759Z",
+          "version": 2,
           "history": [
             {
               "version": 1,
@@ -602,11 +762,13 @@
           ]
         },
         "ruined-wall-low": {
-          "status": "review",
-          "version": 2,
+          "approvedAt": "2026-11-06T23:50:15.687Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "1ec78c97",
-          "note": "v2: rough rubble masonry (stonewall recipe) after the owner's revision request.",
-          "updatedAt": "2026-11-06T23:40:00.000Z",
+          "status": "approved",
+          "updatedAt": "2026-11-06T23:50:15.687Z",
+          "version": 2,
           "history": [
             {
               "version": 1,
@@ -617,11 +779,13 @@
           ]
         },
         "ruined-wall-crumbling": {
-          "status": "review",
-          "version": 2,
+          "approvedAt": "2026-11-06T23:25:00.693Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "f4881641",
-          "note": "v2: rough rubble masonry (stonewall recipe) after the owner's revision request.",
-          "updatedAt": "2026-11-06T23:40:00.000Z",
+          "status": "approved",
+          "updatedAt": "2026-11-06T23:25:00.693Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-06T22:56:44.806Z",
@@ -640,11 +804,13 @@
           ]
         },
         "ruined-wall-overgrown": {
-          "status": "review",
-          "version": 2,
+          "approvedAt": "2026-11-06T23:24:59.777Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "c919ca2c",
-          "note": "v2: rough rubble masonry (stonewall recipe) after the owner's revision request.",
-          "updatedAt": "2026-11-06T23:40:00.000Z",
+          "status": "approved",
+          "updatedAt": "2026-11-06T23:24:59.777Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-06T22:53:05.510Z",
@@ -675,25 +841,31 @@
       "preferred": "scattered-stones-heap",
       "variants": {
         "scattered-stones-heap": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:10:11.423Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "8edb4c3c",
-          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
-          "updatedAt": "2026-11-06T03:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:10:11.423Z",
+          "version": 1
         },
         "scattered-stones-spread": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:10:12.343Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "7cd3f5d8",
-          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
-          "updatedAt": "2026-11-06T03:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:10:12.343Z",
+          "version": 1
         },
         "scattered-stones-grass": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:10:13.491Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "6f0ac52e",
-          "note": "Proposed by Claude for review (#149); decoration only, not used by the game until approved.",
-          "updatedAt": "2026-11-06T03:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:10:13.491Z",
+          "version": 1
         }
       }
     },
@@ -714,32 +886,40 @@
       "preferred": "trade-porch-mill",
       "variants": {
         "trade-porch-mill": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:09:38.619Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "a8ac9f28",
-          "note": "Proposed by Claude for review (#114); seating concept for #98, not used by the game until approved.",
-          "updatedAt": "2026-11-06T16:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:09:38.619Z",
+          "version": 1
         },
         "trade-porch-bakery": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:09:40.848Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "d724449a",
-          "note": "Proposed by Claude for review (#114); seating concept for #98, not used by the game until approved.",
-          "updatedAt": "2026-11-06T16:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:09:40.848Z",
+          "version": 1
         },
         "trade-porch-quarry": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:09:39.736Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "5551e60b",
-          "note": "Proposed by Claude for review (#114); seating concept for #98, not used by the game until approved.",
-          "updatedAt": "2026-11-06T16:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:09:39.736Z",
+          "version": 1
         },
         "trade-porch-smelter": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:09:42.419Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "a8c43185",
-          "note": "Proposed by Claude for review (#114); seating concept for #98, not used by the game until approved.",
-          "updatedAt": "2026-11-06T16:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:09:42.419Z",
+          "version": 1
         }
       }
     },
@@ -747,25 +927,31 @@
       "preferred": "workplace-porch-veranda",
       "variants": {
         "workplace-porch-veranda": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:06:50.789Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "f63c375b",
-          "note": "Proposed by Claude for review (#114); seating concept for #98, not used by the game until approved.",
-          "updatedAt": "2026-11-06T16:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:06:50.789Z",
+          "version": 1
         },
         "workplace-porch-awning": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:06:52.102Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "a936c96c",
-          "note": "Proposed by Claude for review (#114); seating concept for #98, not used by the game until approved.",
-          "updatedAt": "2026-11-06T16:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:06:52.102Z",
+          "version": 1
         },
         "workplace-porch-bench": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:06:52.926Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "f519ca47",
-          "note": "Proposed by Claude for review (#114); seating concept for #98, not used by the game until approved.",
-          "updatedAt": "2026-11-06T16:00:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:06:52.926Z",
+          "version": 1
         }
       }
     },
@@ -927,6 +1113,47 @@
         }
       }
     },
+    "wild-ground": {
+      "preferred": "wild-ground-beach",
+      "variants": {
+        "wild-ground-beach": {
+          "approvedAt": "2026-11-07T06:10:34.006Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5a4a3dee",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:10:34.006Z",
+          "version": 1
+        },
+        "wild-ground-desert": {
+          "approvedAt": "2026-11-07T06:10:34.832Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f55ecc48",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:10:34.832Z",
+          "version": 1
+        },
+        "wild-ground-shallow": {
+          "approvedAt": "2026-11-07T06:10:35.896Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3b6e1fbf",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:10:35.896Z",
+          "version": 1
+        },
+        "wild-ground-deep": {
+          "approvedAt": "2026-11-07T06:10:36.641Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "85112ac3",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:10:36.641Z",
+          "version": 1
+        }
+      }
+    },
     "worn-path": {
       "preferred": "worn-path-earth",
       "variants": {
@@ -953,6 +1180,47 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:07:42.280Z",
           "approvedAt": "2026-11-04T19:07:42.280Z"
+        }
+      }
+    },
+    "bush": {
+      "preferred": "bush-meadow",
+      "variants": {
+        "bush-meadow": {
+          "approvedAt": "2026-11-07T06:11:40.955Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0bb75fc",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:11:40.955Z",
+          "version": 1
+        },
+        "bush-berry": {
+          "approvedAt": "2026-11-07T06:11:41.875Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0fe03e7e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:11:41.875Z",
+          "version": 1
+        },
+        "bush-flowering": {
+          "approvedAt": "2026-11-07T06:11:42.986Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6db21b52",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:11:42.986Z",
+          "version": 1
+        },
+        "bush-scrub": {
+          "approvedAt": "2026-11-07T06:11:44.074Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ad8c1482",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:11:44.074Z",
+          "version": 1
         }
       }
     },
@@ -1068,18 +1336,22 @@
       "preferred": "armorer-worker-male",
       "variants": {
         "armorer-worker-male": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:12:47.481Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "2522a561",
-          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
-          "updatedAt": "2026-11-06T18:30:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:12:47.481Z",
+          "version": 1
         },
         "armorer-worker-female": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:12:48.117Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "c758bc28",
-          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
-          "updatedAt": "2026-11-06T18:30:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:12:48.117Z",
+          "version": 1
         }
       }
     },
@@ -1108,19 +1380,22 @@
       "preferred": "bowyer-worker-male",
       "variants": {
         "bowyer-worker-male": {
+          "approvedAt": "2026-11-07T06:12:05.957Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
           "specHash": "1618bc2b",
-          "status": "review",
-          "updatedAt": "2026-11-06T22:45:40.496Z",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:12:05.957Z",
           "version": 1
         },
         "bowyer-worker-female": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:12:06.597Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "d5a494e4",
-          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
-          "updatedAt": "2026-11-06T18:30:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:12:06.597Z",
+          "version": 1
         }
       }
     },
@@ -1205,6 +1480,57 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:04:51.259Z",
           "approvedAt": "2026-11-04T19:04:51.259Z"
+        }
+      }
+    },
+    "merchant": {
+      "preferred": "merchant-male",
+      "variants": {
+        "merchant-male": {
+          "approvedAt": "2026-11-07T06:13:18.530Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "20758a9f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:13:18.530Z",
+          "version": 1
+        },
+        "merchant-female": {
+          "approvedAt": "2026-11-07T06:13:19.411Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d423aa4a",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:13:19.411Z",
+          "version": 1
+        }
+      }
+    },
+    "merchant-caravan": {
+      "preferred": "merchant-caravan-empty",
+      "variants": {
+        "merchant-caravan-full": {
+          "status": "review",
+          "version": 1,
+          "specHash": "af6eb3ca",
+          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "merchant-caravan-unloading": {
+          "status": "review",
+          "version": 1,
+          "specHash": "4858f070",
+          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "merchant-caravan-empty": {
+          "approvedAt": "2026-11-07T06:13:09.119Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "88901c59",
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:13:09.119Z",
+          "version": 1
         }
       }
     },
@@ -1407,18 +1733,22 @@
       "preferred": "smelter-operator-male",
       "variants": {
         "smelter-operator-male": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:10:00.562Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "2668b864",
-          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
-          "updatedAt": "2026-11-06T18:30:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:10:00.562Z",
+          "version": 1
         },
         "smelter-operator-female": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:10:01.158Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "b4c2d3d5",
-          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
-          "updatedAt": "2026-11-06T18:30:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:10:01.158Z",
+          "version": 1
         }
       }
     },
@@ -1439,18 +1769,22 @@
       "preferred": "stablehand-male",
       "variants": {
         "stablehand-male": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:09:55.421Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "b61eb2c4",
-          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
-          "updatedAt": "2026-11-06T18:30:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:09:55.421Z",
+          "version": 1
         },
         "stablehand-female": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:09:56.052Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "e6ce13ec",
-          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
-          "updatedAt": "2026-11-06T18:30:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:09:56.052Z",
+          "version": 1
         }
       }
     },
@@ -1458,18 +1792,22 @@
       "preferred": "swordsmith-worker-male",
       "variants": {
         "swordsmith-worker-male": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:09:48.960Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "d4831829",
-          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
-          "updatedAt": "2026-11-06T18:30:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:09:48.960Z",
+          "version": 1
         },
         "swordsmith-worker-female": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:09:49.936Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "0c1013a9",
-          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
-          "updatedAt": "2026-11-06T18:30:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:09:49.936Z",
+          "version": 1
         }
       }
     },
@@ -1498,18 +1836,22 @@
       "preferred": "wheelwright-male",
       "variants": {
         "wheelwright-male": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:08:50.781Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "71d4f3ab",
-          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
-          "updatedAt": "2026-11-06T18:30:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:08:50.781Z",
+          "version": 1
         },
         "wheelwright-female": {
-          "status": "review",
-          "version": 1,
+          "approvedAt": "2026-11-07T06:08:52.174Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
           "specHash": "a5170561",
-          "note": "Proposed by Claude for review (#92); profession look concept, the game keeps its current look until approved.",
-          "updatedAt": "2026-11-06T18:30:00.000Z"
+          "status": "approved",
+          "updatedAt": "2026-11-07T06:08:52.174Z",
+          "version": 1
         }
       }
     },
@@ -1531,223 +1873,6 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:07:23.159Z",
           "approvedAt": "2026-11-04T19:07:23.159Z"
-        }
-      }
-    },
-    "marketplace": {
-      "preferred": null,
-      "variants": {
-        "marketplace-square": {
-          "status": "review",
-          "version": 1,
-          "specHash": "227e75b8",
-          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "marketplace-hall": {
-          "status": "review",
-          "version": 1,
-          "specHash": "7c7d11b8",
-          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "marketplace-stalls-bay": {
-          "status": "review",
-          "version": 1,
-          "specHash": "4cf6452b",
-          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        }
-      }
-    },
-    "merchant-caravan": {
-      "preferred": null,
-      "variants": {
-        "merchant-caravan-full": {
-          "status": "review",
-          "version": 1,
-          "specHash": "af6eb3ca",
-          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "merchant-caravan-unloading": {
-          "status": "review",
-          "version": 1,
-          "specHash": "4858f070",
-          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "merchant-caravan-empty": {
-          "status": "review",
-          "version": 1,
-          "specHash": "88901c59",
-          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        }
-      }
-    },
-    "merchant": {
-      "preferred": null,
-      "variants": {
-        "merchant-male": {
-          "status": "review",
-          "version": 1,
-          "specHash": "20758a9f",
-          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "merchant-female": {
-          "status": "review",
-          "version": 1,
-          "specHash": "d423aa4a",
-          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        }
-      }
-    },
-    "wall-gate": {
-      "preferred": null,
-      "variants": {
-        "wall-gate-closed": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8fa102fc",
-          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "wall-gate-open": {
-          "status": "review",
-          "version": 1,
-          "specHash": "49d778d8",
-          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "wall-gate-portcullis": {
-          "status": "review",
-          "version": 1,
-          "specHash": "89e2d3a7",
-          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "wall-gate-open-y": {
-          "status": "review",
-          "version": 1,
-          "specHash": "117b1126",
-          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "wall-gate-stair": {
-          "status": "review",
-          "version": 1,
-          "specHash": "2ce6afc6",
-          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        }
-      }
-    },
-    "wild-ground": {
-      "preferred": null,
-      "variants": {
-        "wild-ground-beach": {
-          "status": "review",
-          "version": 1,
-          "specHash": "5a4a3dee",
-          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "wild-ground-desert": {
-          "status": "review",
-          "version": 1,
-          "specHash": "f55ecc48",
-          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "wild-ground-shallow": {
-          "status": "review",
-          "version": 1,
-          "specHash": "3b6e1fbf",
-          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "wild-ground-deep": {
-          "status": "review",
-          "version": 1,
-          "specHash": "85112ac3",
-          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        }
-      }
-    },
-    "bush": {
-      "preferred": null,
-      "variants": {
-        "bush-meadow": {
-          "status": "review",
-          "version": 1,
-          "specHash": "c0bb75fc",
-          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "bush-berry": {
-          "status": "review",
-          "version": 1,
-          "specHash": "0fe03e7e",
-          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "bush-flowering": {
-          "status": "review",
-          "version": 1,
-          "specHash": "6db21b52",
-          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        },
-        "bush-scrub": {
-          "status": "review",
-          "version": 1,
-          "specHash": "ad8c1482",
-          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:45:00.000Z"
-        }
-      }
-    },
-    "profession-porch": {
-      "preferred": null,
-      "variants": {
-        "profession-porch-woodcutter": {
-          "status": "review",
-          "version": 1,
-          "specHash": "6f77f961",
-          "note": "Proposed by Claude for review (#114 themed porches for #98); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:55:00.000Z"
-        },
-        "profession-porch-farmer": {
-          "status": "review",
-          "version": 1,
-          "specHash": "e5b5d925",
-          "note": "Proposed by Claude for review (#114 themed porches for #98); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:55:00.000Z"
-        },
-        "profession-porch-baker": {
-          "status": "review",
-          "version": 1,
-          "specHash": "1d8e076e",
-          "note": "Proposed by Claude for review (#114 themed porches for #98); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:55:00.000Z"
-        },
-        "profession-porch-smith": {
-          "status": "review",
-          "version": 1,
-          "specHash": "f193de81",
-          "note": "Proposed by Claude for review (#114 themed porches for #98); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:55:00.000Z"
-        },
-        "profession-porch-hunter": {
-          "status": "review",
-          "version": 1,
-          "specHash": "9adefce8",
-          "note": "Proposed by Claude for review (#114 themed porches for #98); not used by the game until approved.",
-          "updatedAt": "2026-11-07T00:55:00.000Z"
         }
       }
     }

@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "wheelwright-yard",
+  "variantId": "wheelwright-yard-shed",
+  "name": "Half-open workshop with horse stall",
+  "category": "buildings",
+  "version": 2,
+  "specHash": "b067e051",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 204,
+  "height": 128,
+  "anchor": {
+    "x": 97,
+    "y": 78
+  },
+  "origin": {
+    "x": 0.47549,
+    "y": 0.60938
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 126
+  },
+  "baseOrigin": {
+    "x": 0.47549,
+    "y": 0.98437
+  },
+  "visualHeight": 126,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": 23.04,
+      "y": -84.25,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 1.2,
+  "lights": [
+    {
+      "type": "torch",
+      "x": 120.04,
+      "y": 41.75,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}
