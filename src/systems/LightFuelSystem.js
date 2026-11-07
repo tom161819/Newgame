@@ -12,7 +12,7 @@ export class LightFuelSystem {
   locationId(building){return `fuel-${building.id}`;}
   stock(building){const d=buildingDefinition(building).fuel,l=this.storage?.locations.get(this.locationId(building));return l?.stock[d.resource]??0;}
   // Light from a building is on: places without fuel always; fuelled places only on a night they took fuel.
-  isLit(building){return !buildingDefinition(building).fuel||this.lit.has(building.id);}
+  isLit(building){const d=buildingDefinition(building);if(d.campfire)return !!this.scene.nightThreats?.campfireBurning(building);return !d.fuel||this.lit.has(building.id);}
   onChange(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   changed(){for(const l of this.listeners)l();}
   register(building){if(buildingDefinition(building).fuel)this.storage?.register(building);}

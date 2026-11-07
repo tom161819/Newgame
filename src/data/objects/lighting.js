@@ -24,4 +24,14 @@ export const lightingBuildings = [
     lights: [{ type: 'torch', x: 0, y: -82.23, color: '#ffb25a', radius: 102.4, intensity: 0.95, flicker: { amplitude: 0.12, speed: 7 }, flameSize: 1 }],
     fuel: TORCHES.places.torch_post,
   },
+  {
+    // Day and night N3: a campfire anywhere with local wood (a tree or a bush within 6 tiles); nothing from the stores.
+    // Burns one night (wolves keep away from it), then ashes for a day. Provisional drawing until the Studio art.
+    id: 'campfire', name: 'Campfire', category: 'building', buildingCategory: 'infrastructure', sprite: '/assets/buildings/campfire/campfire.svg',
+    width: 1, height: 1, walkable: false, collectible: false, buildable: true, cost: {}, constructionTime: 5000, repeatPlacement: false,
+    interactions: [], description: 'A fire of brushwood gathered on the spot. Burns one night; wolves keep away from its light.',
+    renderMode: 'procedural', renderer: 'campfire', origin: { x: 0.5, y: 0.8 }, visualHeight: 30, depth: { offset: 0 },
+    campfire: { woodRange: 6, radius: 5 },
+    lights: [{ type: 'campfire', x: 0, y: -10, color: '#ff9a3c', radius: 160, intensity: 1, flicker: { amplitude: 0.2, speed: 6 }, flameSize: 1.3 }],
+  },
 ];

@@ -107,6 +107,7 @@ export function loadGameState(scene,input){
   // Children D1: after the residents and their homes, so the same children come back where they were.
   scene.childrenSystem?.importState(state.children);
   scene.lightFuel?.importState(state.lightFuel);
+  scene.nightThreats?.importState(state.nightThreats);
   scene.wageSystem?.importState(state.wages);
   scene.resourceLedger?.importState(state.resourceLedger);
   scene.workplaceSystem?.importState(state.workplaces);

@@ -80,6 +80,6 @@ test('a house without a burning light within 6 tiles is dark at night: Safety âˆ
 test('save: which places burn tonight and who carries a torch (schema 56); Tend torches is kept on the soldier', () => {
   const {s,f,place,at}=world(),post=place('torch_post',60,60);s.foodStorage.deposit(`fuel-${post.id}`,'torch',2);at(s.dayNight.nightStart()-.05);
   const soldier=s.workerSystem.create({x:40,y:40});soldier.profession='soldier';soldier.tendTorches=true;
-  const state=validateGameState(serializeGameState(s));assert.equal(SAVE_VERSION,56);assert.deepEqual(state.lightFuel.lit,[post.id]);assert.equal(state.workers.find(w=>w.id===soldier.id).tendTorches,true);
+  const state=validateGameState(serializeGameState(s));assert.ok(SAVE_VERSION>=56);assert.deepEqual(state.lightFuel.lit,[post.id]);assert.equal(state.workers.find(w=>w.id===soldier.id).tendTorches,true);
   assert.equal(validLightFuelState({lit:['x'],hands:[],litDay:1,wasDark:true}),false);void f;
 });

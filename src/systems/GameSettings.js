@@ -2,7 +2,9 @@ import { LOGISTICS_RULES } from '../data/logistics.js';
 import { decodeWorldCode } from '../data/worldCode.js';
 export const DEFAULT_GAME_SETTINGS=Object.freeze({difficulty:'normal',wildlifePopulation:'normal',treasureCount:1,initialStoneCount:30,
   fogOfWar:true,explorationMode:true,seasonsEnabled:true,startingCastle:false,dayLengthSeconds:120,wildlifeRespawn:'normal',startingGold:0,
-  startingStone:0,startingWood:0,startingIronOre:0,startingBread:0,autoEmployment:true,worldCode:null});
+  startingStone:0,startingWood:0,startingIronOre:0,startingBread:0,autoEmployment:true,worldCode:null,
+  // Day and night N3: night threats (each can be switched off).
+  nightWolves:true,nightThieves:true,nightFires:true});
 // Owner request 7 Nov 2026: the New Game Setup proposes a built Castle (can be switched off), Gold at its limit (500)
 // and 40 of each starting resource, which fills the Starter Stockpile (4 × 40 = 160). DEFAULT_GAME_SETTINGS stays the
 // neutral base for older saves and automated scenarios.
@@ -26,7 +28,7 @@ export function gameSettings(input=DEFAULT_GAME_SETTINGS){
   if(!Object.hasOwn(DIFFICULTIES,s.difficulty)||!Object.hasOwn(WILDLIFE_COUNTS,s.wildlifePopulation)
     ||!Number.isInteger(s.treasureCount)||s.treasureCount<0||s.treasureCount>10
     ||!Number.isInteger(s.initialStoneCount)||s.initialStoneCount<0||s.initialStoneCount>100||s.initialStoneCount%5!==0
-    ||typeof s.fogOfWar!=='boolean'||typeof s.explorationMode!=='boolean'||typeof s.seasonsEnabled!=='boolean'||typeof s.autoEmployment!=='boolean'||typeof s.startingCastle!=='boolean'||![60,120,240].includes(s.dayLengthSeconds)
+    ||typeof s.fogOfWar!=='boolean'||['nightWolves','nightThieves','nightFires'].some(k=>typeof s[k]!=='boolean')||typeof s.explorationMode!=='boolean'||typeof s.seasonsEnabled!=='boolean'||typeof s.autoEmployment!=='boolean'||typeof s.startingCastle!=='boolean'||![60,120,240].includes(s.dayLengthSeconds)
     ||!Object.hasOwn(WILDLIFE_INTERVALS,s.wildlifeRespawn)||!Number.isInteger(s.startingGold)||s.startingGold<0||s.startingGold>500||s.startingGold%25!==0
     ||!validWorldCode(s.worldCode)
     ||Object.keys(STARTING_RESOURCES).some(k=>!Number.isInteger(s[k])||s[k]<0||s[k]>STARTING_RESOURCE_CAPACITY||s[k]%STARTING_RESOURCE_STEP!==0)||startingResourceTotal(s)>STARTING_RESOURCE_CAPACITY)throw new Error('Neplatné nastavení nové hry.');

@@ -10,6 +10,12 @@ import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { adjacentTiles } from './interaction.js';
 import { buildingUnlockStatus } from '../systems/BuildingUnlockManager.js';
 import { HOUSE_DECORATIONS } from '../data/children.js';
+// Local wood for a campfire (kept here, not imported from the threat system, to avoid an import cycle).
+export function campfireWood(scene,tile,range){
+  for(const key of scene.bushes?.keys?.()??scene.bushes??[]){const [x,y]=String(key).split(',').map(Number);if(Math.hypot(x-tile.x,y-tile.y)<=range)return true;}
+  for(const o of scene.naturalResources?.byId?.values?.()??[])if(o.definition?.tree&&Math.hypot(o.x-tile.x,o.y-tile.y)<=range)return true;
+  return false;
+}
 export { buildingIsComplete } from './buildingState.js';
 
 const towerDefinition = () => objectRegistry.require('tower');
@@ -63,6 +69,8 @@ export function placementError(map,anchor,resources,reservedTiles=[],definition=
   const ground=natural?.scene?.groundGrid;if(definition.crop&&ground&&tiles.some(tile=>!isFertileGround(ground[tile.y]?.[tile.x])))return t('status.needsGrass');
   // World v2: nothing is built on a ford.
   if(ground&&tiles.some(tile=>isFordGround(ground[tile.y]?.[tile.x])))return t('status.notOnFord');
+  // Day and night N3: a campfire needs local wood (a tree or a bush within 6 tiles).
+  if(definition.campfire&&natural?.scene&&!campfireWood(natural.scene,{x:anchor.x,y:anchor.y},definition.campfire.woodRange))return t('campfire.noWood',{range:definition.campfire.woodRange});
   // Children D2: decorations stay off worn paths and paving; a Haystack only stands near a farm.
   if(definition.decoration){
     const wear=natural?.scene?.pathWear;if(wear&&tiles.some(tile=>wear.isPaved(tile)||wear.level(tile)>=HOUSE_DECORATIONS.pathLevel))return t('status.notOnPath');

@@ -16,8 +16,12 @@ export class NightControls {
     this.skip?.addEventListener('click',()=>{scene.dayNight.skipToDawn();this.update();},options);
     if(this.select){this.select.replaceChildren(...DAY_NIGHT.nightSpeeds.map(v=>{const o=document.createElement('option');o.value=String(v);o.textContent=v===1?t('night.speedOff'):`×${v}`;return o;}));
       this.select.value=String(readNightSpeed());this.select.addEventListener('change',()=>saveNightSpeed(Number(this.select.value)),options);}
+    // N3: night threat switches in Settings (the game's own switches, saved with the game).
+    this.threatBoxes=Object.fromEntries(['wolves','thieves','fires'].map(id=>[id,document.querySelector(`#settings-threat-${id}`)]));
+    for(const [id,box] of Object.entries(this.threatBoxes)){if(!box)continue;box.checked=scene.nightThreats?.enabled[id]!==false;box.addEventListener('change',()=>scene.nightThreats?.setEnabled(id,box.checked),options);}
     this.update();
   }
+  syncThreats(){for(const [id,box] of Object.entries(this.threatBoxes??{}))if(box)box.checked=this.scene.nightThreats?.enabled[id]!==false;}
   plannedCount(){return (this.scene.buildings??[]).filter(b=>b.construction&&b.construction.state!=='complete').length;}
   update(){
     const dn=this.scene.dayNight,part=dn.part(),night=part==='night';

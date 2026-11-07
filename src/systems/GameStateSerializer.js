@@ -1,3 +1,4 @@
+import { validNightThreatState } from './NightThreatSystem.js';
 import { validLightFuelState } from './LightFuelSystem.js';
 import { validateRockMining } from './RockMiningState.js';
 import { CARAVAN_RULES,MERCHANT_TYPES,validateAutoTrade } from '../data/trade.js';
@@ -39,7 +40,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=56;
+export const SAVE_VERSION=57;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -88,6 +89,7 @@ export function serializeGameState(scene){
     ...(scene.domestic?{domestic:scene.domestic.exportState()}:{}),
     ...(scene.childrenSystem?{children:scene.childrenSystem.exportState()}:{}),
     ...(scene.lightFuel?{lightFuel:scene.lightFuel.exportState()}:{}),
+    ...(scene.nightThreats?{nightThreats:scene.nightThreats.exportState()}:{}),
     ...(scene.policy?{policy:scene.policy.exportState()}:{}),
     ...(scene.kingLogistics?{kingLogistics:scene.kingLogistics.exportState()}:{}),
     ...(scene.logisticsTasks?{logistics:{version:1,...(scene.constructionSystem?.materials.enabled?{materialsVersion:1}:{})}}:{}),
@@ -486,6 +488,8 @@ export function validateGameState(input,registry=objectRegistry){
   // Children D1 (schema 54): which children exist follows from the homes; saved are positions, hidden houses, snowmen.
   // Day and night N2 (schema 56): which light places burn tonight and which soldiers carry a torch.
   if(s.lightFuel!==undefined)check(validLightFuelState(s.lightFuel)&&s.lightFuel.lit.every(id=>s.buildings.some(b=>b.id===id)));
+  // Day and night N3 (schema 57): threat switches and campfires.
+  if(s.nightThreats!==undefined)check(validNightThreatState(s.nightThreats,new Set(s.buildings.map(b=>b.id))));
   if(s.children!==undefined)validateChildrenState(s.children,{check,number,integer,array,buildingIds:new Set(s.buildings.map(b=>b.id))});
   if(s.domestic!==undefined)validateDomesticState(s.domestic,{check,number,integer,array,day:s.time?.day??1,buildingIds:new Set(s.buildings.map(b=>b.id)),locationIds:new Set((s.foodStorage?.locations??[]).map(l=>l.id)),workerIds:new Set((s.workers??[]).map(w=>w.id)),time:s.time});
   if(s.trade!==undefined){

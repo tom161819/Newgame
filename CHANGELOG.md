@@ -5,6 +5,18 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.43.0] - 2026-11-07
+<!-- version: {"title":"Night threat switches and campfire","type":"feature","reconstructed":false,"saveVersion":57} -->
+### Added
+- Night threats (wolves, thieves, fires) each have an on/off switch, both in the New Game setup and in Settings during a game. They are on by default; the threats themselves follow in the next versions.
+- **Campfire** (Infrastructure):
+  - built anywhere a tree or a bush stands within 6 tiles, and costs nothing from the stores;
+  - burns for one night, starting at once if it is made at night;
+  - leaves ashes for a day and then disappears.
+  - A soldier can make one beside him (**Make campfire** in the unit panel).
+### Removed
+- Saves from older versions no longer load (save version 57).
+
 ## [0.42.0] - 2026-11-07
 <!-- version: {"title":"Pitch, torches and night safety","type":"feature","reconstructed":false,"saveVersion":56} -->
 ### Added
