@@ -11,6 +11,8 @@ import { tileCenter } from '../src/game/map.js';
 const wall=objectRegistry.require('wall');
 const map=()=>Array.from({length:20},()=>Array(20).fill(0));
 const makeWall=(x,y,id)=>({id,x,y,type:'wall',definition:wall,tiles:[{x,y}]});
+// #97: the wall walk is reached only at a Gate or beside a Tower.
+const gate=objectRegistry.require('wall_gate'),makeGate=(x,y,id)=>({id,x,y,type:'wall_gate',definition:gate,tiles:[{x,y}]});
 
 test('castle costs ten stones, blocks exactly 3x3, and uses a 75% sight bonus',()=>{
   const castle=objectRegistry.require('castle'),world=map(),inventory=new Inventory(),buildings=[];
@@ -65,13 +67,15 @@ test('roof navigation only joins shared edges and finds an exit beyond a surroun
   const a=makeWall(2,2,1),diagonal=makeWall(3,3,2);assert.equal(findRoofPath([a,diagonal],a,diagonal),null);
   const bridge=makeWall(3,2,3);assert.deepEqual(findRoofPath([a,bridge,diagonal],a,diagonal).map(b=>b.id),[3,2]);
   const world=map(),buildings=[];
-  for(let y=4;y<=6;y++)for(let x=4;x<=6;x++){buildings.push(makeWall(x,y,buildings.length+1));world[y][x]=1;}
+  for(let y=4;y<=6;y++)for(let x=4;x<=6;x++){const g=x===6&&y===6;buildings.push((g?makeGate:makeWall)(x,y,buildings.length+1));world[y][x]=g?0:1;}
   const center=buildings.find(b=>b.x===5&&b.y===5),route=planRoofExit(world,buildings,center,{kind:'move',goal:{x:0,y:0}});
   assert.ok(route);assert.ok(route.roofPath.length>0);assert.equal(world[route.exit.y][route.exit.x],0);
+  assert.equal(route.wall.type,'wall_gate','the only way down is the Gate, even though other segments are nearer the goal');
+  assert.equal(planRoofExit(world,buildings.filter(b=>b.type==='wall'),center,{kind:'move',goal:{x:0,y:0}}),null,'without a Gate or Tower there is no way down');
 });
 
 test('king climbs, walks continuously on joined walls, retargets without jumping and descends before ground movement',()=>{
-  const buildings=Array.from({length:5},(_,i)=>makeWall(4+i,4,i+1)),world=map();for(const b of buildings)world[b.y][b.x]=1;
+  const buildings=Array.from({length:5},(_,i)=>(i===0?makeGate:makeWall)(4+i,4,i+1)),world=map();for(const b of buildings)world[b.y][b.x]=b.type==='wall_gate'?0:1;
   const sprite={...tileCenter({x:0,y:0}),setPosition(x,y){this.x=x;this.y=y;return this;},setDepth(n){this.depth=n;return this;}},animations=[];
   const scene={map:world,buildings,wallMap:wallIndex(buildings),marker:{visible:false,setVisible(v){this.visible=v;}},
     setStatus(){},showMarker(){this.marker.visible=true;},updateBuildingUI(){},tweens:{add(tween){animations.push(tween);}}};
@@ -86,4 +90,19 @@ test('king climbs, walks continuously on joined walls, retargets without jumping
   c.command({kind:'enter',tower:buildings[4]});c.update(20000);assert.deepEqual(c.tile,{x:8,y:4});assert.equal(c.currentTower.id,5);
   c.command({kind:'move',goal:{x:1,y:1}});c.update(20000);assert.equal(c.state,'exitingTower');assert.notDeepEqual(c.tile,{x:1,y:1});
   complete();c.update(20000);assert.equal(c.state,'ground');assert.deepEqual(c.tile,{x:1,y:1});assert.equal(world[c.tile.y][c.tile.x],0);
+});
+
+test('#97: a Gate is walkable on the ground; a plain wall is climbed via its Gate or a Tower, never directly', () => {
+  const buildings=[makeGate(4,4,1),makeWall(5,4,2),makeWall(6,4,3)],world=map();world[4][5]=world[4][6]=1;
+  assert.equal(gate.walkable,true);assert.equal(gate.navigation.walkableTop,true);
+  const sprite={...tileCenter({x:0,y:0}),setPosition(x,y){this.x=x;this.y=y;return this;},setDepth(n){this.depth=n;return this;}},animations=[],status=[];
+  const scene={map:world,buildings,wallMap:wallIndex(buildings),marker:{visible:false,setVisible(v){this.visible=v;}},setStatus(s){status.push(s);},showMarker(){this.marker.visible=true;},updateBuildingUI(){},tweens:{add(t){animations.push(t);}}};
+  const c=new PlayerController(scene,sprite,{x:6,y:6});const complete=()=>{const a=animations.shift();assert.ok(a);sprite.setPosition(a.x,a.y);a.onComplete();};
+  assert.equal(c.command({kind:'enter',tower:buildings[2]}),true);c.update(20000);complete();assert.equal(c.state,'onWall');
+  c.update(20000);assert.deepEqual(c.tile,{x:6,y:4},'climbed at the Gate and walked along the top to the clicked segment');
+  const lone=[makeWall(10,10,9)],w2=map();w2[10][10]=1;const s2={...scene,map:w2,buildings:lone,wallMap:wallIndex(lone)};const k=new PlayerController(s2,{...sprite},{x:12,y:12});
+  assert.equal(k.command({kind:'enter',tower:lone[0]}),false,'a wall without a Gate or Tower cannot be climbed');
+  // A wall touching a Tower is its stair.
+  const tower={id:20,x:11,y:9,type:'tower',tiles:[{x:11,y:9},{x:12,y:9},{x:11,y:10},{x:12,y:10}]};assert.equal(k.command({kind:'enter',tower:lone[0]}),false);
+  const s3={...s2,buildings:[...lone,tower]};const k3=new PlayerController(s3,{...sprite},{x:12,y:12});assert.equal(k3.command({kind:'enter',tower:lone[0]}),true);
 });

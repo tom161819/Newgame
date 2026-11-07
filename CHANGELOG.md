@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-11-07
+<!-- version: {"title":"Gate in the wall","type":"feature","reconstructed":false,"saveVersion":39} -->
+### Added
+- Gate (Castle & Defense, 4 Stone): a gate in the wall. People walk through it on the ground; the wall walk continues over it, and the opening turns to fit the wall it stands in (temporary picture from the Asset Studio concept).
+
+### Changed
+- The King climbs up to the wall walk only at a Gate or where a wall touches a Tower, and comes down only there. Clicking any wall segment sends him to the nearest Gate or Tower stair and along the top to that segment. A wall without a Gate or Tower cannot be climbed.
+
 ## [0.11.0] - 2026-11-07
 <!-- version: {"title":"Trading with caravans","type":"feature","reconstructed":false,"saveVersion":39} -->
 ### Added

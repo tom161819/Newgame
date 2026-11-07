@@ -7,7 +7,7 @@ import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { advanceMovement } from './movement.js';
 import { canStep } from './pathfinding.js';
 import { knownMap } from './knownMap.js';
-import { isWall,wallIndex,findRoofPath,planRoofExit } from './walls.js';
+import { isWall,wallIndex,findRoofPath,planRoofExit,isWallAccess,wallAccessPoints } from './walls.js';
 import { createCombatStats } from '../systems/CombatSystem.js';
 import { createExperience } from '../data/experience.js';
 
@@ -88,6 +88,14 @@ export class PlayerController {
       return true;
     }
 
+    // #97: a wall is climbed only at a Gate or next to a Tower; the King walks to the nearest such stair and then along the top.
+    this.pendingWall=null;
+    if(order.kind==='enter'&&isWall(order.tower)&&!isWallAccess(order.tower,this.scene.buildings)){
+      const map=order.explore?knownMap(this.scene):this.scene.map,start=this.nextTile??this.tile,options=this.scene.pathWear?.routingOptions(this);let best=null;
+      for(const access of wallAccessPoints(this.scene.buildings,order.tower)){const r=planGroundOrder(map,start,{kind:'enter',tower:access},options);if(r&&(!best||r.path.length<best.route.path.length))best={access,route:r};}
+      if(!best){this.scene.setStatus(t('status.noWallAccess'));return false;}
+      this.pendingWall=order.tower;order={...order,tower:best.access};
+    }
     const route = planGroundOrder(order.explore?knownMap(this.scene):this.scene.map, this.nextTile ?? this.tile, order,this.scene.pathWear?.routingOptions(this));
     if (!route) {
       this.scene.setStatus(t('status.noPath'));
@@ -165,6 +173,7 @@ export class PlayerController {
   }
 
   climb(tower) {
+    if(isWall(tower)&&!isWallAccess(tower,this.scene.buildings)){this.command({kind:'enter',tower});return;}
     // Animaci nelze spustit z dálky, z obsazeného políčka ani během kroku.
     if (!buildingIsComplete(tower)||!buildingDefinition(tower).interactions.includes('enter') || this.nextTile || !isWalkable(this.scene.map, this.tile.x, this.tile.y)
       || !towerNeighbors(tower).some(tile => tileKey(tile) === tileKey(this.tile))) return;
@@ -184,6 +193,7 @@ export class PlayerController {
       this.tile={x:tower.x,y:tower.y};this.position={x:tower.x+.5,y:tower.y+.5};this.path=[];this.nextTile=null;
       this.setState(PLAYER_STATE.ON_WALL);
       this.scene.setStatus(t('status.onWall'));
+      const target=this.pendingWall;this.pendingWall=null;if(target&&target!==tower)this.commandOnWall({kind:'enter',tower:target});
     }else{
       this.setState(PLAYER_STATE.ON_TOWER);
       this.scene.setStatus(t('status.onPlatform'));

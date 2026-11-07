@@ -57,4 +57,5 @@ export default {
   'job.idle':'Unemployed','job.woodcutter':'Woodcutter','job.miner':'Miner','job.hunter':'Hunter','job.builder':'Builder','job.farmer':'Farmer','job.miller':'Miller','job.baker':'Baker','job.smelter_operator':'Smelter Operator','job.hauler':'Hauler','job.soldier':'Soldier',
   'skill.woodcutting':'Woodcutting','skill.mining':'Mining','skill.hunting':'Hunting','skill.construction':'Construction','skill.farming':'Farming','skill.combat':'Combat','skill.milling':'Milling','skill.baking':'Baking','skill.logistics':'Logistics','skill.smelting':'Smelting',
   'object.marketplace.name':'Marketplace','object.marketplace.description':'A market square with stalls where merchant caravans will trade. Goods space for 80 units and 2 loading spots.','object.marketplace.unlock':'Requires a completed Warehouse before placing a Marketplace.',
+  'object.wall_gate.name':'Gate','object.wall_gate.description':'A gate in the wall: people pass through it, and from it you climb up to the wall walk.',
 };

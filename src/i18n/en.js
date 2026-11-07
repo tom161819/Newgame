@@ -287,4 +287,5 @@ export default {
   'market.orders':'Orders','market.cancel':'Cancel','market.order.buy':'Buy {quantity} {good} at {price}: {delivered}/{quantity} · {status}','market.order.sell':'Sell {quantity} {good} at {price}: {delivered}/{quantity} · {status}',
   'market.status.Pending':'Pending','market.status.Transporting':'Transporting','market.status.PartiallyCompleted':'Partly completed','market.status.Completed':'Completed','market.status.Cancelled':'Cancelled','market.status.Failed':'Failed',
   'ledger.Trade Purchase':'Trade Purchase','ledger.Trade Sale':'Trade Sale',
+  'status.noWallAccess':'This wall has no Gate or Tower to climb up from.',
 };

@@ -278,7 +278,10 @@ export class GameScene extends Phaser.Scene {
     this.input.on('pointerupoutside',()=>{this.rockMiningTool.cancelDrag();this.unitSelection.cancelDrag();this.clearWallPreviews();});
     this.input.on('pointermove',pointer=>{this.rockMiningTool.move(pointer);this.unitSelection.move(pointer);this.updateHover(pointer);if(this.buildMode&&!this.assetGallery.isOpen){if(!this.dragAnchor)this.wallLastLine=null;this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
     this.input.on('gameout',()=>{this.rockMiningTool.cancelDrag();this.unitSelection.cancelDrag();this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;this.clearWallPreviews();document.querySelector('#object-tooltip').hidden=true;});
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{
+    // #97: a Gate opens across its wall: in a wall running east–west the opening faces the other way (mirrored sprite).
+    this.orientGates=()=>{const index=wallIndex(this.buildings,true);for(const b of this.buildings){if(b.type!=='wall_gate')continue;const v=this.towerViews.get(b.id),sprite=v?.back?.sprite??v?.view?.back?.sprite;if(!sprite)continue;const n=connectionsFor(index,b),flip=(n.E||n.W)&&!(n.N||n.S),o=b.definition?.origin??{x:.38372,y:.84348};sprite.setFlipX(flip);sprite.setOrigin(flip?1-o.x:o.x,o.y);}};
+    this.events.on('buildings:changed',this.orientGates);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{this.events.off('buildings:changed',this.orientGates);
       this.rockMiningTool.destroy();this.unitSelection.destroy();this.minimap?.destroy();this.eventFeed?.destroy();this.millSails?.destroy();this.kingCargoControl.destroy();this.kingLogistics.destroy();this.lightSources.destroy();
       this.memoryRenderer.destroy();
       this.populationSidebar.destroy();
@@ -463,6 +466,7 @@ export class GameScene extends Phaser.Scene {
     let view=this.assets.createView(definition.id,{building:object,preview});
     if(!preview&&definition.lights?.length&&buildingIsComplete(building)&&this.lightSources)view=this.lightSources.attach(view,object);
     if(!preview&&definition.crop&&buildingIsComplete(building))view.setGrowth?.(this.farmingSystem?.records.get(building.id)?.stage??0);
+    if(!preview&&definition.id==='wall_gate')this.time?.delayedCall?.(0,()=>this.orientGates?.());
     return !preview&&!buildingIsComplete(building)?new ConstructionView(this,building,view):view;
   }
   selectableHumans(){return this.workerSystem?.liveWorkers()??[];}

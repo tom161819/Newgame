@@ -57,4 +57,5 @@ export default {
   'job.idle':'Nezaměstnaný','job.woodcutter':'Dřevorubec','job.miner':'Horník','job.hunter':'Lovec','job.builder':'Stavitel','job.farmer':'Farmář','job.miller':'Mlynář','job.baker':'Pekař','job.smelter_operator':'Hutník','job.hauler':'Nosič','job.soldier':'Voják',
   'skill.woodcutting':'Dřevorubectví','skill.mining':'Těžba','skill.hunting':'Lov','skill.construction':'Stavění','skill.farming':'Zemědělství','skill.combat':'Boj','skill.milling':'Mletí','skill.baking':'Pečení','skill.logistics':'Logistika','skill.smelting':'Tavení',
   'object.marketplace.name':'Tržiště','object.marketplace.description':'Náměstí se stánky, kde budou obchodovat kupecké karavany. Prostor na zboží pro 80 jednotek a 2 nakládací místa.','object.marketplace.unlock':'Tržiště jde postavit až po dokončeném Skladu.',
+  'object.wall_gate.name':'Brána','object.wall_gate.description':'Brána ve zdi: lidé jí procházejí a z ní se vystupuje na hradby.',
 };

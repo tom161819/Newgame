@@ -35,6 +35,15 @@ export const buildings = [
     platform:{x:0,y:-84},depth:{offset:0},visual:{wallHeight:68},
     shadow:{baked:true,x:8,y:-8,width:65,height:24,color:0x30291c,alpha:.3},
   },
+  // #97: a gate in the wall. People walk through it on the ground; the wall walk continues over it, and together with the
+  // Towers it is where the King climbs up to and down from the wall walk. Provisional art: the Studio concept "Gate, open".
+  {
+    id:'wall_gate',name:'Gate',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/wall_gate/wall-gate-open.v1.png',
+    width:1,height:1,walkable:true,collectible:false,buildable:true,cost:{stone:4},constructionTime:12000,
+    interactions:['enter','exit','walk_top'],description:'A gate in the wall: people pass through it, and from it you climb up to the wall walk.',
+    visibility:{multiplier:1.75},navigation:{walkableTop:true,access:true},
+    renderMode:'sprite',origin:{x:.38372,y:.84348},visualHeight:113,platform:{x:0,y:-84},depth:{offset:0},
+  },
   ...[
     {id:'quarry',name:'Quarry',buildingCategory:'industry',width:3,height:3,cost:{stone:15},constructionTime:30000,visualHeight:95,description:'Kamenolom se třemi místy pro horníky. Musí překrývat skutečné kamenné ložisko a mít dostupný přístup. Těží pouze svou přiřazenou konečnou zásobu.'},
     {id:'hunting_lodge',name:'Hunting Lodge',buildingCategory:'food',menuOrder:50,requiresCompletedBuildings:['granary'],unlockDescription:'Requires a completed Granary before placing new Hunting Lodges.',width:2,height:2,cost:{stone:10},constructionTime:25000,visualHeight:110,description:'Lovecká chata pro dva lovce. Lovci přinášejí maso ze skutečných úlovků.'},

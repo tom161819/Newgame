@@ -4,6 +4,8 @@ import { tileKey } from './stones.js';
 
 export const WALL_DIRECTIONS=Object.freeze([{name:'N',x:0,y:-1},{name:'E',x:1,y:0},{name:'S',x:0,y:1},{name:'W',x:-1,y:0}]);
 export const isWall=building=>buildingDefinition(building).navigation?.walkableTop===true;
+// #97: the wall walk is reached only at a Gate or where a wall touches a Tower (its stair).
+export const isWallAccess=(building,buildings)=>isWall(building)&&(buildingDefinition(building).navigation?.access===true||buildings.some(b=>b.type==='tower'&&buildingIsComplete(b)&&b.tiles?.some(t=>Math.abs(t.x-building.x)+Math.abs(t.y-building.y)===1)));
 export const wallIndex=(buildings,includeUnfinished=false)=>new Map(buildings.filter(b=>isWall(b)&&(includeUnfinished||buildingIsComplete(b))).map(b=>[tileKey(b),b]));
 
 export function wallLine(start,end){
@@ -53,6 +55,8 @@ function reconstruct(tree,end){
   const result=[];for(let key=tileKey(end);tree.parents.get(key)!==null;key=tree.parents.get(key))result.push(tree.index.get(key));
   return result.reverse();
 }
+// Access points of the wall network a segment belongs to (for climbing up from the ground).
+export function wallAccessPoints(buildings,wall){return connectedWalls(buildings,wall).filter(w=>isWallAccess(w,buildings));}
 export function connectedWalls(buildings,start){const tree=roofTree(buildings,start);return [...tree.parents.keys()].map(key=>tree.index.get(key)).filter(Boolean);}
 export function findRoofPath(buildings,start,end){
   if(!isWall(start)||!isWall(end))return null;
@@ -61,7 +65,7 @@ export function findRoofPath(buildings,start,end){
 export function planRoofExit(map,buildings,start,order,options){
   const tree=roofTree(buildings,start);let best=null;
   for(const [key,roofCost]of tree.distances){
-    const wall=tree.index.get(key),route=planTowerExit(map,wall,order,options);if(!route)continue;
+    const wall=tree.index.get(key);if(!isWallAccess(wall,buildings))continue;const route=planTowerExit(map,wall,order,options);if(!route)continue;
     const totalCost=roofCost+route.cost;
     if(!best||totalCost<best.totalCost)best={...route,totalCost,wall,roofPath:reconstruct(tree,wall)};
   }

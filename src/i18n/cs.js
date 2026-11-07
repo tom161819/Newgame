@@ -288,4 +288,5 @@ export default {
   'market.orders':'Objednávky','market.cancel':'Zrušit','market.order.buy':'Nákup {quantity} × {good} po {price}: {delivered}/{quantity} · {status}','market.order.sell':'Prodej {quantity} × {good} po {price}: {delivered}/{quantity} · {status}',
   'market.status.Pending':'Čeká','market.status.Transporting':'Přenáší se','market.status.PartiallyCompleted':'Částečně hotovo','market.status.Completed':'Hotovo','market.status.Cancelled':'Zrušeno','market.status.Failed':'Nepovedlo se',
   'ledger.Trade Purchase':'Nákup od karavany','ledger.Trade Sale':'Prodej karavaně',
+  'status.noWallAccess':'Na tuhle hradbu nevede žádná brána ani věž.',
 };
