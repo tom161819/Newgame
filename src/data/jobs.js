@@ -1,5 +1,5 @@
 import { localizeJobs,localizeSkills } from '../i18n/names.js';
-export const SKILLS=Object.freeze(localizeSkills({woodcutting:'Woodcutting',mining:'Mining',hunting:'Hunting',construction:'Construction',farming:'Farming',combat:'Combat',milling:'Milling',baking:'Baking',logistics:'Logistics',smelting:'Smelting',crafting:'Crafting'}));
+export const SKILLS=Object.freeze(localizeSkills({woodcutting:'Woodcutting',mining:'Mining',hunting:'Hunting',construction:'Construction',farming:'Farming',combat:'Combat',milling:'Milling',baking:'Baking',logistics:'Logistics',smelting:'Smelting',crafting:'Crafting',fishing:'Fishing'}));
 export const SKILL_IDS=Object.freeze(Object.keys(SKILLS));
 export const WORK_RULES=Object.freeze({efficiencyPerLevel:.01,miningDuration:1500,searchInterval:500,workRadius:24,
   fleeRatio:.3,recoverRatio:.8,combatXPPerDamage:1,combatXPPerTarget:40});
@@ -9,6 +9,7 @@ export const JOBS=Object.freeze(localizeJobs({
   woodcutter:Object.freeze({portraitColor:'#365e42',name:'Woodcutter',skill:'woodcutting',workplace:'lumberjack_hut',requiresWorkplace:true}),
   miner:Object.freeze({portraitColor:'#4b6980',name:'Miner',skill:'mining',workplace:'quarry',requiresWorkplace:false}),
   hunter:Object.freeze({portraitColor:'#304d3b',name:'Hunter',skill:'hunting',workplace:'hunting_lodge',requiresWorkplace:false}),
+  fisher:Object.freeze({portraitColor:'#3f7a8c',name:'Fisher',skill:'fishing',workplace:'fisherman_hut',requiresWorkplace:true}),
   builder:Object.freeze({portraitColor:'#8b603e',name:'Builder',skill:'construction',workplace:null,requiresWorkplace:false}),
   farmer:Object.freeze({portraitColor:'#7d7835',name:'Farmer',skill:'farming',workplace:'farmhouse',requiresWorkplace:true}),
   miller:Object.freeze({portraitColor:'#9d8058',name:'Miller',skill:'milling',workplace:'mill',requiresWorkplace:true}),

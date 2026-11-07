@@ -29,7 +29,7 @@ export class WorkplaceSystem {
       const stableJob=this.scene.stables?.jobs.get(worker.id),horse=stableJob&&this.scene.stables.horse(stableJob.horseId);
       if(stableJob?.phase==='taming'&&horse?.isAlive&&canInteractAdjacent(this.scene.map,worker,horse))return true;
       const task=worker.workTask;
-      return ['mineDeposit','chopTree','harvest','build','mine','mineDrop','collectMeat'].includes(task?.kind)&&this.scene.workerSystem.ai.atGoal(worker,task.goal);
+      return ['mineDeposit','chopTree','harvest','build','mine','mineDrop','collectMeat','fish'].includes(task?.kind)&&this.scene.workerSystem.ai.atGoal(worker,task.goal);
     });
   }
   staffing(building){const spec=buildingDefinition(building).workplace,present=this.present(building).length;return {present,output:staffingOutput(spec,present),missing:Math.max(0,spec.capacity-present),factor:staffingWorkFactor(spec,present)};}

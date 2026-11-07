@@ -37,6 +37,7 @@ export class FoodSystem {
     if(!EDIBLE_RESOURCES.includes(resource)||!Number.isSafeInteger(amount)||amount<=0||!eventId||this.productionEvents.has(eventId))return;
     this.productionEvents.add(eventId);this.bucket().produced+=amount;this.trimHistory();
     if(resource==='meat')this.scene?.resourceLedger?.income(resource,amount,'Hunting',{id:`hunting:${eventId}`,entityId:eventId,type:'production'});
+    if(resource==='fish')this.scene?.resourceLedger?.income(resource,amount,'Fishing',{id:`fishing:${eventId}`,entityId:eventId,type:'production'});
   }
   overview(){const day=this.time?.day??this.lastProcessedDay;this.trimHistory();return{storage:this.availablePortions,daily:this.dailyConsumption,production:this.history.reduce((n,r)=>n+r.produced,0)/Math.min(day,FOOD_ECONOMY_DAYS),days:this.dailyConsumption?this.availablePortions/this.dailyConsumption:0,unfed:this.hungryCount};}
   exportState(){this.syncResidents();return{elapsed:this.elapsed,residents:structuredClone([...this.residents.values()]),history:structuredClone(this.history),productionEvents:[...this.productionEvents],lastProcessedDay:this.time?.day??this.lastProcessedDay};}

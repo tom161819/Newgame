@@ -9,10 +9,10 @@ import { ResourceSpawner, resourceCandidates, generateResourcePositions, tileKey
 const definition = (id, changes = {}) => ({ ...structuredClone(objectRegistry.require('stone')), id, ...changes });
 
 test('registry exposes the existing game objects, categories and buildable menu', () => {
-  assert.equal(objectRegistry.all().length, 74); // +8 in 0.14.0 (#100): four ground types and four bushes
-  assert.deepEqual(objectRegistry.buildables().map(d => d.id), ['tower','castle','wall','wall_gate','builder_workshop','quarry','hunting_lodge','barracks','farmhouse','wheat_field','orchard','mill','bakery','granary','warehouse','marketplace','house','stone_pavement','stables','wheelwright_workshop','lumberjack_hut','iron_mine','brazier','smelter','bowyer','swordsmith','armorer','armory']);
+  assert.equal(objectRegistry.all().length, 76); // +2 in 0.15.0: Fisherman's Hut and Fish // +8 in 0.14.0 (#100): four ground types and four bushes
+  assert.deepEqual(objectRegistry.buildables().map(d => d.id), ['tower','castle','wall','wall_gate','builder_workshop','quarry','hunting_lodge','fisherman_hut','barracks','farmhouse','wheat_field','orchard','mill','bakery','granary','warehouse','marketplace','house','stone_pavement','stables','wheelwright_workshop','lumberjack_hut','iron_mine','brazier','smelter','bowyer','swordsmith','armorer','armory']);
   assert.deepEqual(objectRegistry.byCategory('terrain').map(d => d.id), ['grass','dirt','grass_normal','grass_trampled_1','grass_trampled_2','grass_trampled_3','beach_sand','desert_sand','shallow_water','deep_water']);
-  assert.equal(objectRegistry.forGallery('all').length, 74);
+  assert.equal(objectRegistry.forGallery('all').length, 76);
   assert.equal(objectRegistry.forGallery('resource')[0].id, 'stone');
   assert.equal(objectRegistry.require('tower').cost.stone, 10);
   assert.equal(objectRegistry.get('missing'), null);
@@ -54,7 +54,7 @@ test('a building added only as data uses its footprint, cost and navigation sett
   const extra = registry.register({ ...structuredClone(registry.require('tower')),
     id:'test_lodge',width:3,height:1,cost:{stone:12},interactions:[],renderMode:'sprite',
   });
-  assert.deepEqual(registry.buildables().map(d => d.id), ['tower','castle','wall','wall_gate','builder_workshop','quarry','hunting_lodge','barracks','farmhouse','wheat_field','orchard','mill','bakery','granary','warehouse','marketplace','house','stone_pavement','stables','wheelwright_workshop','lumberjack_hut','iron_mine','brazier','smelter','bowyer','swordsmith','armorer','armory','test_lodge']);
+  assert.deepEqual(registry.buildables().map(d => d.id), ['tower','castle','wall','wall_gate','builder_workshop','quarry','hunting_lodge','fisherman_hut','barracks','farmhouse','wheat_field','orchard','mill','bakery','granary','warehouse','marketplace','house','stone_pavement','stables','wheelwright_workshop','lumberjack_hut','iron_mine','brazier','smelter','bowyer','swordsmith','armorer','armory','test_lodge']);
   const map = Array.from({length:8},()=>Array(8).fill(0)), inventory = new Inventory(), buildings = [];
   inventory.add('stone',11);
   const options = {map,inventory,buildings,resources:new Map(),anchor:{x:2,y:3},definition:extra};
@@ -112,8 +112,9 @@ test('asset URLs retain the Pages prefix; PNG/WebP/sheets load once per object t
   // the nine approved tree looks (six oak, three pine) and twelve seasonal grass tiles (spring, autumn, winter).
   // #100 (0.14.0): +8 objects (four ground types, four bushes) and four tiles for each ground type: 94 + 8 + 16.
   // #118 (0.14.1): +1 Builder's Workshop.
-  assert.equal(manager.queue(),119);assert.equal(manager.queue(),0);
-  assert.equal(calls.length,119); // +2: the Mill still body and sails layers (#99)
+  // Fishing R1 (0.15.0): +2 (Fisherman's Hut, Fish).
+  assert.equal(manager.queue(),121);assert.equal(manager.queue(),0);
+  assert.equal(calls.length,121); // +2: the Mill still body and sails layers (#99)
   assert.ok(calls.some(c=>c[2].endsWith('.webp')));
   assert.deepEqual(calls.find(c=>c[0]==='sheet'),['sheet','asset:animated:main','/Newgame/assets/resources/stone/stone.png',{frameWidth:32,frameHeight:48}]);
 });

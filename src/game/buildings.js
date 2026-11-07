@@ -1,4 +1,4 @@
-import { isFertileGround } from '../data/worldTerrain.js';
+import { isFertileGround,WATER_CELL } from '../data/worldTerrain.js';
 import { availableFarm } from '../data/farmPlots.js';
 import { t } from '../i18n/index.js';
 import { dataName } from '../i18n/names.js';
@@ -57,6 +57,8 @@ export function placementError(map,anchor,resources,reservedTiles=[],definition=
   const natural=resources.naturalContext,special=natural?.mining.placementError(definition,anchor);if(special)return special;
   if(tiles.some(tile=>!isWalkable(map,tile.x,tile.y)&&!natural?.mining.canBuildOver(definition,tile)))return t('status.needsTiles',{width:definition.width,height:definition.height});
   // #100: fields and orchards need grass; nothing grows on beach or desert sand.
+  // Fishing R1: a Fisherman's Hut must touch water on at least one side (remembered water counts outside sight).
+  if(definition.fishing&&!towerNeighbors({...anchor,definition}).some(tile=>map[tile.y]?.[tile.x]===WATER_CELL))return t('status.needsWater');
   const ground=natural?.scene?.groundGrid;if(definition.crop&&ground&&tiles.some(tile=>!isFertileGround(ground[tile.y]?.[tile.x])))return t('status.needsGrass');
   if(tiles.some(tile=>resources.has(tileKey(tile))&&!natural?.mining.canBuildOver(definition,tile)))return t('status.resourceHere');
   if(tiles.some(tile=>reservedTiles.some(p=>tileKey(p)===tileKey(tile))))return t('status.unitHere');

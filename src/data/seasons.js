@@ -9,6 +9,6 @@ export const WEATHER_PROBABILITIES=Object.freeze({
 });
 export function calendar(day){const n=day-1;return{season:SEASONS[Math.floor(n/SEASON_DAYS)%4],year:Math.floor(n/(SEASON_DAYS*4))+1,dayOfYear:n%(SEASON_DAYS*4)+1,dayInSeason:n%SEASON_DAYS+1};}
 export function seasonalCropStage(type,growth,required,season){const stage=cropStage(growth,required);return type==='orchard'&&season==='Winter'?0:type==='orchard'&&season==='Spring'?Math.min(1,stage):stage;}
-export const EDIBLE_RESOURCES=Object.freeze(['apple','bread','meat']);
+export const EDIBLE_RESOURCES=Object.freeze(['apple','bread','meat','fish']);
 export const FOOD_ECONOMY_DAYS=5;
 export const HUNGRY_WORK_MULTIPLIER=.8;

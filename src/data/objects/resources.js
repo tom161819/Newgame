@@ -19,6 +19,15 @@ export const resources = [
     consumption:{amount:1,interval:60000}, // Legacy save phase; active meals use the central daily Food System.
   },
   {
+    id:'fish',name:'Fish',inventoryLabel:'Fish',symbol:'🐟',inventoryOrder:22,quantityNames:['ryba','ryby','ryb'],
+    category:'resource',sprite:'/assets/resources/fish/fish.svg',width:1,height:1,
+    walkable:true,collectible:true,buildable:false,cost:{},interactions:['collect'],
+    description:'Fish caught by Fishers. Stored in a Granary and eaten like other food.',edible:true,
+    renderMode:'sprite',origin:{x:.5,y:.75},visualHeight:24,
+    visual:{displayWidth:28,displayHeight:28},depth:{offset:.08},
+    shadow:{baked:false,x:0,y:3,width:28,height:11,color:0x30291c,alpha:.3},
+  },
+  {
     id:'gold',name:'Gold',inventoryLabel:'Gold',symbol:'🪙',inventoryOrder:0,quantityNames:['Gold','Gold','Gold'],
     category:'resource',sprite:'/assets/resources/gold/gold.svg',width:1,height:1,
     walkable:true,collectible:true,buildable:false,cost:{},interactions:['collect'],

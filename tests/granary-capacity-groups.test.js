@@ -6,7 +6,7 @@ import { GRANARY_GROUP_CAPACITY,granaryGroup,granaryUsage } from '../src/data/gr
 
 test('each actually accepted Granary good belongs to exactly one registry-backed group',()=>{
  assert.deepEqual(GRANARY_GROUP_CAPACITY,{raw:200,food:200});assert.ok(Object.isFrozen(GRANARY_GROUP_CAPACITY));
- assert.deepEqual(Object.fromEntries(FOOD_RESOURCE_IDS.map(id=>[id,granaryGroup(id,objectRegistry)])),{meat:'food',wheat:'raw',flour:'raw',bread:'food',apple:'food'});
+ assert.deepEqual(Object.fromEntries(FOOD_RESOURCE_IDS.map(id=>[id,granaryGroup(id,objectRegistry)])),{meat:'food',wheat:'raw',flour:'raw',bread:'food',apple:'food',fish:'food'});
  for(const id of ['stone','wood','iron_ore','gold','bow','sword','armor','farmhouse','missing'])assert.equal(granaryGroup(id,objectRegistry),null);
 });
 test('raw and food quantities stay separate without mutation, double credit or silent overflow clipping',()=>{

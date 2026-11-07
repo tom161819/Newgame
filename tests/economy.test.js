@@ -27,8 +27,8 @@ test('new subjects get exactly one permanent talent and random level 3â€“8 / 1â€
     s.workerSystem.jobs.assign(w,'miner');s.workerSystem.jobs.assign(w,'hunter');assert.deepEqual({talent:w.naturalTalent,initial:w.initialSkills,skills:w.skills},before);
   }
   // Explicitly exercise all talent choices, independently of PRNG sample distribution.
-  for(let i=0;i<6;i++){const w=worker(s);delete w.naturalTalent;initializeNaturalTalent(w,{random:()=>i/6+.001});seen.add(w.naturalTalent);}
-  assert.equal(seen.size,6);
+  for(let i=0;i<7;i++){const w=worker(s);delete w.naturalTalent;initializeNaturalTalent(w,{random:()=>i/7+.001});seen.add(w.naturalTalent);}
+  assert.equal(seen.size,7);
 });
 
 test('talent grants precisely 20% skill XP, leaves overall XP and direct stats unchanged and respects replay/combat caps',()=>{

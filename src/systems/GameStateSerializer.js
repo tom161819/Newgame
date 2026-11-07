@@ -9,6 +9,8 @@ import { objectRegistry } from './ObjectRegistry.js';
 import { COLUMNS,ROWS } from '../game/config.js';
 import { exportGround,importGround,validGroundRows,exportBushes,emptyGround } from '../game/worldGeneration.js';
 import { isWaterGround,BUSH_TYPES } from '../data/worldTerrain.js';
+import { validateFishingState,waterBodies } from './FishingSystem.js';
+import { FISHING } from '../data/fishing.js';
 import { wearLevel } from '../data/pathWear.js';
 import { getXPRequired,totalXPForLevel,createProgress } from '../data/experience.js';
 import { JOBS,SKILL_IDS,WORK_RULES,POPULATION } from '../data/jobs.js';
@@ -34,7 +36,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=42;
+export const SAVE_VERSION=43;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -70,6 +72,7 @@ export function serializeGameState(scene){
     ...(scene.wageSystem?{wages:scene.wageSystem.exportState()}:{}),
     ...(scene.workplaceSystem?{workplaces:scene.workplaceSystem.exportState()}:{}),
     ...(scene.constructionSystem?{constructionSystem:scene.constructionSystem.exportState()}:{}),
+    ...(scene.fishing?{fishing:scene.fishing.exportState()}:{}),
     ...(scene.farmingSystem?{farming:scene.farmingSystem.exportState()}:{}),
     ...(scene.seasons?{seasons:scene.seasons.exportState()}:{}),
     ...(scene.employment?{employment:scene.employment.exportState()}:{}),
@@ -288,12 +291,14 @@ export function validateGameState(input,registry=objectRegistry){
       if(w.stoneCollection!==undefined){check(w.stoneCollection&&typeof w.stoneCollection.enabled==='boolean'&&Object.keys(w.stoneCollection).length===2);integer(w.stoneCollection.radius,0,IDLE_STONE.maxRadius);}if(w.profession==='hauler')check(w.stoneCollection);if(!w.isAlive)check(['Dead','Left Kingdom'].includes(w.workState)&&!w.workTask&&!w.arriving);else check(w.workState!=='Left Kingdom');
       check(Object.hasOwn(JOBS,w.displayProfession)&&['idle',w.profession].includes(w.displayProfession));
       const t=w.workTask;if(t){
-        check(w.isAlive&&['mine','mineDrop','hunt','collectMeat','build','dismantle','harvest','chopTree','mineDeposit','mineRock','foodPickup','foodDeliver','produce'].includes(t.kind));tile(t.goal);number(t.progressMs,0,t.kind==='mineRock'?ROCK_MINING.duration:t.kind==='mineDeposit'?(definition(s.buildings.find(b=>b.id===w.assignedWorkplaceId)?.type).mining?.duration??0):t.kind==='harvest'?(definition(s.buildings.find(b=>b.id===t.targetId)?.type).crop?.workDuration??0):WORK_RULES.miningDuration);
-        const prefix=t.kind==='mine'?'resource':t.kind==='hunt'?'animal':'drop',expected=t.kind==='mineRock'?`rock:${t.targetId}`:t.kind==='mineDeposit'?`mineral:${t.targetId}:${w.id}`:t.kind==='chopTree'?`natural:${t.targetId}`:t.kind==='produce'?`production-slot:${t.goal.x},${t.goal.y}`:['foodPickup','foodDeliver'].includes(t.kind)?`food-task:${t.transferId}`:['build','dismantle'].includes(t.kind)?`construction-slot:${t.goal.x},${t.goal.y}`:t.kind==='harvest'?`crop:${t.targetId}`:`${prefix}:${t.targetId}`;check(t.reservation===expected&&!reservations.has(t.reservation));reservations.add(t.reservation);
+        check(w.isAlive&&['mine','mineDrop','hunt','collectMeat','build','dismantle','harvest','chopTree','mineDeposit','mineRock','foodPickup','foodDeliver','produce','fish'].includes(t.kind));tile(t.goal);number(t.progressMs,0,t.kind==='fish'?s.gameSettings.dayLengthSeconds*1000*FISHING.maxTripDays:t.kind==='mineRock'?ROCK_MINING.duration:t.kind==='mineDeposit'?(definition(s.buildings.find(b=>b.id===w.assignedWorkplaceId)?.type).mining?.duration??0):t.kind==='harvest'?(definition(s.buildings.find(b=>b.id===t.targetId)?.type).crop?.workDuration??0):WORK_RULES.miningDuration);
+        const prefix=t.kind==='mine'?'resource':t.kind==='hunt'?'animal':'drop',expected=t.kind==='fish'?`natural-slot:${t.goal.x},${t.goal.y}`:t.kind==='mineRock'?`rock:${t.targetId}`:t.kind==='mineDeposit'?`mineral:${t.targetId}:${w.id}`:t.kind==='chopTree'?`natural:${t.targetId}`:t.kind==='produce'?`production-slot:${t.goal.x},${t.goal.y}`:['foodPickup','foodDeliver'].includes(t.kind)?`food-task:${t.transferId}`:['build','dismantle'].includes(t.kind)?`construction-slot:${t.goal.x},${t.goal.y}`:t.kind==='harvest'?`crop:${t.targetId}`:`${prefix}:${t.targetId}`;check(t.reservation===expected&&!reservations.has(t.reservation));reservations.add(t.reservation);
         if(t.kind==='foodPickup'&&t.sourceDropId){check(!reservations.has(`drop:${t.sourceDropId}`));reservations.add(`drop:${t.sourceDropId}`);}
         if(['mine','mineDrop'].includes(t.kind)){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);check(home?.type!=='iron_mine'&&!['finite','unbound'].includes(home?.quarryMode));}
         if(t.kind==='mineRock')check(w.profession==='miner'&&w.assignedWorkplaceId==null&&w.manualRockId===t.targetId);
         if(t.kind==='mine')check((w.profession==='miner'&&t.idleStone===undefined||w.profession==='hauler'&&t.idleStone===true&&w.stoneCollection?.enabled)&&s.resources.some(r=>r.type==='stone'&&`${r.tile.x},${r.tile.y}`===t.targetId));
+        if(t.kind==='fish'){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);check(w.profession==='fisher'&&home?.id===t.targetId&&home.type==='fisherman_hut'&&buildingIsComplete(home)&&open(t.goal.x,t.goal.y));
+          integer(t.caught,0,FISHING.basket-1);number(t.fraction,0,FISHING.basket+1);check(Object.hasOwn(FISHING.depth,t.depth)&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>ground[t.goal.y+dy]?.[t.goal.x+dx]===t.depth));integer(t.bodyId,0);}
         if(t.kind==='hunt')check(w.profession==='hunter'&&aIds.has(t.targetId));if(t.kind==='collectMeat')check(w.profession==='hunter'&&dIds.has(t.targetId));
         if(t.kind==='mineDrop')check(w.profession==='miner'&&s.drops.some(d=>d.id===t.targetId&&d.resource==='stone'));
         if(t.kind==='chopTree'){const target=treeIds.get(t.targetId),home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),slot=`natural-slot:${t.goal.x},${t.goal.y}`;check(w.profession==='woodcutter'&&home?.type==='lumberjack_hut'&&buildingIsComplete(home)&&target?.natural.stage===3&&Math.abs(target.tile.x-t.goal.x)+Math.abs(target.tile.y-t.goal.y)===1&&!reservations.has(slot));reservations.add(slot);}
@@ -325,6 +330,7 @@ export function validateGameState(input,registry=objectRegistry){
       }}
     }
   }
+  if(s.fishing!==undefined)validateFishingState(s.fishing,{bodies:waterBodies(ground).bodies,buildingIds:new Set(s.buildings.filter(b=>b.type==='fisherman_hut').map(b=>b.id)),check,integer,number});
   if(s.workplaces!==undefined){
     array(s.workplaces?.records);const recorded=new Set(),assigned=new Set();
     for(const record of s.workplaces.records){

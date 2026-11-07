@@ -5,6 +5,18 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-11-07
+<!-- version: {"title":"Fishing","type":"feature","reconstructed":false,"saveVersion":43} -->
+### Added
+- Fishing: build a Fisherman's Hut (Food, 12 Wood + 4 Stone, after a Granary) next to a river or lake. Its two Fishers fish from the shore and carry their baskets of fish to a Granary.
+- Fish is a new food. Residents eat it like other food, and caravans buy and sell it for 3 Gold.
+- Fishing is a new skill, with the Natural Fisher talent.
+- The catch depends on the water and the time of year: deep water gives more than shallow water, Spring and rain help, and frost hurts. Winter halves the catch, but fish still feed the kingdom when the fields don't.
+- Every river and lake has its own fish stock, and too much fishing empties it. The hut's panel shows whether fish are Plentiful, Thinning or Overfished, and an overfished water gives nothing until the stock grows back.
+
+### Changed
+- Saved games use a new format (43) for fish stocks and the fishing skill. Games saved by earlier versions cannot be loaded; start a new game.
+
 ## [0.14.1] - 2026-11-07
 <!-- version: {"title":"Builder's Workshop","type":"feature","reconstructed":false,"saveVersion":42} -->
 ### Added
