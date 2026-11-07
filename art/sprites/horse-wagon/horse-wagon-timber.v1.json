@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "horse-wagon",
+  "variantId": "horse-wagon-timber",
+  "name": "Timber wagon",
+  "category": "units",
+  "version": 1,
+  "specHash": "27430f6b",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 70,
+  "anchor": {
+    "x": 65,
+    "y": 36
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.51429
+  },
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "base": {
+    "x": 97,
+    "y": 68
+  },
+  "baseOrigin": {
+    "x": 0.74046,
+    "y": 0.97143
+  },
+  "visualHeight": 68,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.357,
+  "lights": []
+}

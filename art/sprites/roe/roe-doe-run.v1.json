@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "roe",
+  "variantId": "roe-doe-run",
+  "name": "Roe doe running",
+  "category": "units",
+  "version": 1,
+  "specHash": "23ac0cce",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 45,
+  "anchor": {
+    "x": 33,
+    "y": 27
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.6
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 43
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.95556
+  },
+  "visualHeight": 43,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.628,
+  "lights": []
+}

@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "bear",
+  "name": "Brown Bear",
+  "category": "units",
+  "description": "Brown bear with a shoulder hump and round ears; walk in 8 directions, attack.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "animal",
+  "plannedGameObjectId": "bear",
+  "variants": [
+    {
+      "id": "bear-brown",
+      "name": "Brown bear",
+      "version": 1,
+      "spec": {
+        "species": "bear",
+        "breed": "brown",
+        "facing": 1
+      }
+    },
+    {
+      "id": "bear-brown-attack",
+      "name": "Bear attacking",
+      "version": 1,
+      "spec": {
+        "species": "bear",
+        "breed": "brown",
+        "pose": "attack",
+        "facing": 1
+      }
+    }
+  ]
+}

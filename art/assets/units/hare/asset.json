@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "hare",
+  "name": "Hare",
+  "category": "units",
+  "description": "Brown hare with long black-tipped ears; walk in 8 directions, sitting up.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "animal",
+  "plannedGameObjectId": "hare",
+  "variants": [
+    {
+      "id": "hare-brown",
+      "name": "Brown hare",
+      "version": 1,
+      "spec": {
+        "species": "hare",
+        "breed": "brown",
+        "facing": 1
+      }
+    },
+    {
+      "id": "hare-brown-sit",
+      "name": "Hare sitting",
+      "version": 1,
+      "spec": {
+        "species": "hare",
+        "breed": "brown",
+        "pose": "sit",
+        "facing": 1
+      }
+    }
+  ]
+}

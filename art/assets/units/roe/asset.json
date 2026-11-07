@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "roe",
+  "name": "Roe Deer",
+  "category": "units",
+  "description": "Small roe deer: buck with short antlers and a doe; walk in 8 directions.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "animal",
+  "plannedGameObjectId": "roe",
+  "variants": [
+    {
+      "id": "roe-buck",
+      "name": "Roe buck",
+      "version": 1,
+      "spec": {
+        "species": "roe",
+        "breed": "buck",
+        "facing": 1
+      }
+    },
+    {
+      "id": "roe-doe",
+      "name": "Roe doe",
+      "version": 1,
+      "spec": {
+        "species": "roe",
+        "breed": "doe",
+        "facing": 1
+      }
+    },
+    {
+      "id": "roe-doe-run",
+      "name": "Roe doe running",
+      "version": 1,
+      "spec": {
+        "species": "roe",
+        "breed": "doe",
+        "pose": "run",
+        "facing": 2
+      }
+    }
+  ]
+}

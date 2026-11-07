@@ -1,0 +1,174 @@
+{
+  "schema": 1,
+  "id": "horse-wagon",
+  "name": "Horse Wagon",
+  "category": "units",
+  "description": "The player's Horse Wagon (revision 2, owner 7 Nov 2026): farm wagon, hay wagon, tipping tumbril, timber wagon and a two-horse wagon, with the new anatomical horses in harness. Built along grid x; the game mirrors one view for the other direction.",
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "horse_wagon",
+  "variants": [
+    {
+      "id": "horse-wagon-farm-empty",
+      "name": "Farm wagon, empty",
+      "version": 1,
+      "notes": "Four-wheeled flatbed with plank sides and a bench.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "farm"
+          }
+        ]
+      }
+    },
+    {
+      "id": "horse-wagon-farm-sacks",
+      "name": "Farm wagon with sacks",
+      "version": 1,
+      "notes": "",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "farm",
+            "load": "sacks",
+            "coat": "chestnut"
+          }
+        ]
+      }
+    },
+    {
+      "id": "horse-wagon-hay",
+      "name": "Hay wagon",
+      "version": 1,
+      "notes": "Ladder sides, heaped hay, grey horse.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "hay",
+            "load": "hay",
+            "coat": "grey"
+          }
+        ]
+      }
+    },
+    {
+      "id": "horse-wagon-tumbril-stone",
+      "name": "Tumbril with stone",
+      "version": 1,
+      "notes": "Two-wheeled tipping cart.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "tumbril",
+            "load": "stone",
+            "coat": "pony"
+          }
+        ]
+      }
+    },
+    {
+      "id": "horse-wagon-tumbril-tipped",
+      "name": "Tumbril tipping",
+      "version": 1,
+      "notes": "Bed tipped back to dump soil.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "tumbril",
+            "load": "soil",
+            "coat": "pony",
+            "tipped": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "horse-wagon-timber",
+      "name": "Timber wagon",
+      "version": 1,
+      "notes": "Long wagon with logs chained on bolsters.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "timber",
+            "load": "logs",
+            "coat": "black"
+          }
+        ]
+      }
+    },
+    {
+      "id": "horse-wagon-pair-barrels",
+      "name": "Two-horse wagon with barrels",
+      "version": 1,
+      "notes": "Big iron-banded wagon on a pole with two horses.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "pair",
+            "load": "barrels"
+          }
+        ]
+      }
+    }
+  ]
+}

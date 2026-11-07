@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "id": "horse",
+  "name": "Horse",
+  "category": "units",
+  "description": "Horses (owner 7 Nov 2026): bay, chestnut with a blaze, grey, black and a shaggy pony; anatomical skeleton with hooves and a mane; walk and run in 8 directions, saddled and harnessed stills.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "animal",
+  "plannedGameObjectId": "horse",
+  "variants": [
+    {
+      "id": "horse-bay",
+      "name": "Bay horse",
+      "version": 1,
+      "spec": {
+        "species": "horse",
+        "breed": "bay",
+        "facing": 1
+      }
+    },
+    {
+      "id": "horse-chestnut",
+      "name": "Chestnut horse with a white blaze",
+      "version": 1,
+      "spec": {
+        "species": "horse",
+        "breed": "chestnut",
+        "facing": 1
+      }
+    },
+    {
+      "id": "horse-grey",
+      "name": "Grey horse",
+      "version": 1,
+      "spec": {
+        "species": "horse",
+        "breed": "grey",
+        "facing": 1
+      }
+    },
+    {
+      "id": "horse-black",
+      "name": "Black horse",
+      "version": 1,
+      "spec": {
+        "species": "horse",
+        "breed": "black",
+        "facing": 1
+      }
+    },
+    {
+      "id": "horse-pony",
+      "name": "Pony",
+      "version": 1,
+      "spec": {
+        "species": "horse",
+        "breed": "pony",
+        "facing": 1
+      }
+    },
+    {
+      "id": "horse-bay-saddled",
+      "name": "Bay horse saddled (knight's mount)",
+      "version": 1,
+      "spec": {
+        "species": "horse",
+        "breed": "bay",
+        "pose": "stand",
+        "saddle": true,
+        "facing": 2
+      }
+    },
+    {
+      "id": "horse-grey-harness",
+      "name": "Grey horse in harness",
+      "version": 1,
+      "spec": {
+        "species": "horse",
+        "breed": "grey",
+        "harness": true,
+        "facing": 2
+      }
+    },
+    {
+      "id": "horse-chestnut-run",
+      "name": "Chestnut horse galloping",
+      "version": 1,
+      "spec": {
+        "species": "horse",
+        "breed": "chestnut",
+        "pose": "run",
+        "facing": 2
+      }
+    }
+  ]
+}

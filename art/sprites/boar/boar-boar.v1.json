@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "boar",
+  "variantId": "boar-boar",
+  "name": "Wild boar",
+  "category": "units",
+  "version": 1,
+  "specHash": "b76dcb0d",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 39,
+  "anchor": {
+    "x": 33,
+    "y": 21
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.53846
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 37
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.94872
+  },
+  "visualHeight": 37,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.616,
+  "lights": []
+}

@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "deer",
+  "name": "Red Deer",
+  "category": "units",
+  "description": "Wild red deer for the forests: stag with antlers, hind; walk and run in 8 directions.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "animal",
+  "plannedGameObjectId": "deer",
+  "variants": [
+    {
+      "id": "deer-stag",
+      "name": "Stag",
+      "version": 1,
+      "spec": {
+        "species": "deer",
+        "breed": "stag",
+        "facing": 1
+      }
+    },
+    {
+      "id": "deer-hind",
+      "name": "Hind",
+      "version": 1,
+      "spec": {
+        "species": "deer",
+        "breed": "hind",
+        "facing": 1
+      }
+    },
+    {
+      "id": "deer-stag-run",
+      "name": "Stag running",
+      "version": 1,
+      "spec": {
+        "species": "deer",
+        "breed": "stag",
+        "pose": "run",
+        "facing": 2
+      }
+    }
+  ]
+}

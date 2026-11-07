@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "id": "fox",
+  "name": "Fox",
+  "category": "units",
+  "description": "Red fox with a white tail tip and dark ears; walk and run in 8 directions, sitting.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "animal",
+  "plannedGameObjectId": "fox",
+  "variants": [
+    {
+      "id": "fox-red",
+      "name": "Red fox",
+      "version": 1,
+      "spec": {
+        "species": "fox",
+        "breed": "red",
+        "facing": 1
+      }
+    },
+    {
+      "id": "fox-red-sit",
+      "name": "Fox sitting",
+      "version": 1,
+      "spec": {
+        "species": "fox",
+        "breed": "red",
+        "pose": "sit",
+        "facing": 1
+      }
+    },
+    {
+      "id": "fox-red-run",
+      "name": "Fox running",
+      "version": 1,
+      "spec": {
+        "species": "fox",
+        "breed": "red",
+        "pose": "run",
+        "facing": 2
+      }
+    }
+  ]
+}

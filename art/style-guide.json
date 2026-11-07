@@ -122,6 +122,8 @@
     "horse_dark": "#3e2c22",
     "horse_grey": "#a49c90",
     "horse_chestnut": "#94552c",
+    "antler": "#b8a27e",
+    "bone": "#e6dcc4",
     "steel": "#9aa1a6",
     "steel_dark": "#5f666b",
     "gold_trim": "#c4a24a",
@@ -480,6 +482,20 @@
       "repeat": 1,
       "variation": 0.06,
       "description": "Chestnut horse coat."
+    },
+    "antler": {
+      "color": "antler",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.08,
+      "description": "Deer antler."
+    },
+    "bone": {
+      "color": "bone",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Tusks and bone."
     },
     "steel": {
       "color": "steel",

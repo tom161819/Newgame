@@ -3,7 +3,7 @@
   "id": "merchant-caravan",
   "name": "Merchant caravan wagon",
   "category": "units",
-  "description": "Obchod F1 (#59): the merchant's own covered wagon with a draught horse (never the player's). Full on arrival, unloading at the marketplace, empty when leaving. Shown driving along grid x: like the player's carts (VehicleViews) the game mirrors one view for the other direction.",
+  "description": "Obchod F1 (#59): the merchant's own wagon with a draught horse (never the player's). Full on arrival, unloading at the marketplace, empty when leaving. Revision 2 (owner 7 Nov 2026): striped hooped wagon, a wooden house wagon and a long two-horse wagon. Shown driving along grid x: like the player's carts (VehicleViews) the game mirrors one view for the other direction.",
   "footprint": {
     "width": 3,
     "height": 1
@@ -73,6 +73,141 @@
             ],
             "load": "empty",
             "coat": "horse_grey"
+          }
+        ]
+      }
+    },
+    {
+      "id": "merchant-caravan-striped-full",
+      "name": "Striped wagon, full",
+      "version": 1,
+      "notes": "Red-and-linen striped canvas, chest on the tail, lantern.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "caravan",
+            "kind": "striped"
+          }
+        ]
+      }
+    },
+    {
+      "id": "merchant-caravan-striped-unloading",
+      "name": "Striped wagon, unloading",
+      "version": 1,
+      "notes": "",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "caravan",
+            "kind": "striped",
+            "load": "unloading"
+          }
+        ]
+      }
+    },
+    {
+      "id": "merchant-caravan-striped-empty",
+      "name": "Striped wagon, empty",
+      "version": 1,
+      "notes": "",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "caravan",
+            "kind": "striped",
+            "load": "empty",
+            "coat": "grey"
+          }
+        ]
+      }
+    },
+    {
+      "id": "merchant-caravan-house-full",
+      "name": "House wagon",
+      "version": 1,
+      "notes": "Wooden box wagon with a shingle roof, chimney, windows and steps.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "caravan",
+            "kind": "house",
+            "coat": "bay",
+            "cover": "cloth_blue"
+          }
+        ]
+      }
+    },
+    {
+      "id": "merchant-caravan-house-unloading",
+      "name": "House wagon, unloading",
+      "version": 1,
+      "notes": "",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "caravan",
+            "kind": "house",
+            "load": "unloading",
+            "coat": "bay",
+            "cover": "cloth_blue"
+          }
+        ]
+      }
+    },
+    {
+      "id": "merchant-caravan-pair-full",
+      "name": "Long two-horse caravan",
+      "version": 1,
+      "notes": "Long covered wagon, spare wheel, two horses.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "caravan",
+            "kind": "pair",
+            "cover": "cloth_ochre"
           }
         ]
       }

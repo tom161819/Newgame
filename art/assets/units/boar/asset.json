@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "boar",
+  "name": "Wild Boar",
+  "category": "units",
+  "description": "Wild boar with tusks and a bristly ridge, striped piglet; walk in 8 directions, charging attack.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "animal",
+  "plannedGameObjectId": "boar",
+  "variants": [
+    {
+      "id": "boar-boar",
+      "name": "Wild boar",
+      "version": 1,
+      "spec": {
+        "species": "boar",
+        "breed": "boar",
+        "facing": 1
+      }
+    },
+    {
+      "id": "boar-piglet",
+      "name": "Striped piglet",
+      "version": 1,
+      "spec": {
+        "species": "boar",
+        "breed": "piglet",
+        "facing": 1
+      }
+    },
+    {
+      "id": "boar-boar-attack",
+      "name": "Boar charging",
+      "version": 1,
+      "spec": {
+        "species": "boar",
+        "breed": "boar",
+        "pose": "attack",
+        "facing": 1
+      }
+    }
+  ]
+}
