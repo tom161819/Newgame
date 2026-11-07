@@ -29,11 +29,11 @@ function hut(s,anchor={x:49,y:43}){
 function fisher(s,b){const w=s.workerSystem.create({x:46,y:46});assert.equal(s.workplaceSystem.assign(b,w),true);w.naturalTalent='woodcutting';return w;}
 const fishStock=s=>s.inventory.count('fish');
 
-test('Fishing data: fish is food and a trade good; the hut is a food workplace for two Fishers after a Granary',()=>{
+test('Fishing data: fish is food and a trade good; the hut is a food workplace for two Fishers that recommends a Granary',()=>{
   assert.ok(EDIBLE_RESOURCES.includes('fish')&&FOOD_RESOURCE_IDS.includes('fish'));assert.equal(BASE_PRICES.fish,3);
   assert.ok(MERCHANT_TYPES.food.stock.fish&&MERCHANT_TYPES.general.stock.fish);
   const d=objectRegistry.require('fisherman_hut');
-  assert.deepEqual([d.width,d.height,d.buildingCategory,d.cost,d.requiresCompletedBuildings],[2,2,'food',{wood:12,stone:4},['granary']]);
+  assert.deepEqual([d.width,d.height,d.buildingCategory,d.cost,d.requiresCompletedBuildings,d.recommendsCompletedBuildings],[2,2,'food',{wood:12,stone:4},undefined,['granary']]);
   assert.deepEqual(d.workplace,{capacity:2,profession:'fisher',skill:'fishing'});
   assert.deepEqual([stockCapacity(3),stockCapacity(50),stockCapacity(500)],[40,200,400]);
   assert.deepEqual([stockFactor(.8),stockFactor(.25),stockFactor(.09)],[1,.5,0]);
@@ -84,7 +84,7 @@ test('fish stocks and a Fisher mid-trip survive Save/Load; corrupt fishing state
 });
 
 test('the Fishers use the nearest reachable shore by walking distance, with no radius; far away means fewer fish a day',()=>{
-  const near=lakeScene(),h1=hut(near),far=lakeScene(),h2=hut(far,{x:28,y:43});
+  const near=lakeScene(),far=lakeScene();for(const x of [near,far])ensureBuildingPrerequisites(x,{requiresCompletedBuildings:['granary']});const h1=hut(near),h2=hut(far,{x:28,y:43});
   assert.equal(near.fishing.distance(h1),1,'right at the water');assert.ok(far.fishing.distance(h2)>=20,`about twenty tiles (${far.fishing.distance(h2)})`);
   assert.ok(far.fishing.spots(h2).every((p,i,a)=>!i||a[i-1].distance<=p.distance),'nearest first');
   assert.match(far.fishing.summary(h2),/Water: \d+ tiles away/);

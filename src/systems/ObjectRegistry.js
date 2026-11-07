@@ -31,6 +31,8 @@ export function validateDefinition(definition) {
     || new Set(d.interactions).size !== d.interactions.length) fail(id, 'neplatné interakce.');
   if (d.buildable && d.category !== 'building') fail(id, 'postavitelný objekt musí být budova.');
   if(d.buildingCategory!==undefined&&(d.category!=='building'||!Object.hasOwn(BUILDING_CATEGORIES,d.buildingCategory)))fail(id,'neplatná stavební kategorie.');
+  // Owner request (7 Nov): Food buildings only warn about a missing earlier building; they are never locked by it.
+  if(d.recommendsCompletedBuildings!==undefined&&(d.category!=='building'||!Array.isArray(d.recommendsCompletedBuildings)||new Set(d.recommendsCompletedBuildings).size!==d.recommendsCompletedBuildings.length||d.recommendsCompletedBuildings.some(value=>typeof value!=='string'||!value)))fail(id,'neplatná doporučení staveb.');
   if(d.requiresCompletedBuildings!==undefined&&(d.category!=='building'||!Array.isArray(d.requiresCompletedBuildings)||new Set(d.requiresCompletedBuildings).size!==d.requiresCompletedBuildings.length||d.requiresCompletedBuildings.some(value=>typeof value!=='string'||!value)))fail(id,'neplatné stavební podmínky.');
   if(d.unlockDescription!==undefined&&(d.category!=='building'||typeof d.unlockDescription!=='string'||!d.unlockDescription.trim()))fail(id,'neplatný popis odemčení.');
   if(d.maxCount!==undefined&&(d.category!=='building'||!Number.isSafeInteger(d.maxCount)||d.maxCount<1))fail(id,'neplatný nejvyšší počet budov.');
@@ -136,6 +138,7 @@ export class ObjectRegistry {
       if(definition.mining&&known.get(definition.mining.depositType)?.deposit?.resource!==definition.mining.resource)fail(definition.id,'incompatible mineral deposit.');
       for(const id of definition.treasure?.equipment??[])if(known.get(id)?.category!=='equipment')fail(definition.id,`neznámé vybavení ${id}.`);
       for(const id of definition.requiresCompletedBuildings??[])if(id===definition.id||known.get(id)?.category!=='building')fail(definition.id,`neplatná požadovaná budova ${id}.`);
+      for(const id of definition.recommendsCompletedBuildings??[])if(id===definition.id||known.get(id)?.category!=='building')fail(definition.id,`neplatná doporučená budova ${id}.`);
     }
     const visited=new Set(),visiting=new Set();
     const visit=id=>{if(visiting.has(id))fail(id,'cyklické stavební podmínky.');if(visited.has(id))return;visiting.add(id);for(const requirement of known.get(id)?.requiresCompletedBuildings??[])visit(requirement);visiting.delete(id);visited.add(id);};

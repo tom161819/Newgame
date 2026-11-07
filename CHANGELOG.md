@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.33.0] - 2026-11-07
+<!-- version: {"title":"Food menu warnings instead of locks","type":"feature","reconstructed":false,"saveVersion":54} -->
+### Changed
+- Nothing in the Food menu is locked any more. You can place a Hunting Lodge, Fisherman's Hut or Farmhouse before a Granary, fields before a Farmhouse, a Mill before a Wheat Field and a Bakery before a Mill. Until the earlier building is finished, the menu shows a red warning such as "Needs a Granary to store food" or "Needs a Wheat Field". Other menus keep their locks.
+
 ## [0.32.0] - 2026-11-07
 <!-- version: {"title":"Fisherman's Hut anywhere","type":"feature","reconstructed":false,"saveVersion":54} -->
 ### Changed

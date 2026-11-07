@@ -17,7 +17,7 @@ export function gettingStartedProblems(registry,steps=GETTING_STARTED_STEPS){
     if(ids.has(step.id))problems.push(`duplicate step ${step.id}`);ids.add(step.id);
     const definition=registry.get(step.buildingId);
     if(!definition||definition.category!=='building')problems.push(`${step.id}: unknown building ${step.buildingId}`);
-    else for(const required of definition.requiresCompletedBuildings??[])if(!earlier.has(required))problems.push(`${step.id}: needs ${required} before it`);
+    else for(const required of [...(definition.requiresCompletedBuildings??[]),...(definition.recommendsCompletedBuildings??[])])if(!earlier.has(required))problems.push(`${step.id}: needs ${required} before it`);
     earlier.add(step.buildingId);
   }
   return problems;

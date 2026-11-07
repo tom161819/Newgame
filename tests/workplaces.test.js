@@ -28,7 +28,7 @@ test('workplace definitions use exact prices/footprints, reject occupied cells a
   }
   assert.equal(s.workerSystem.workers.size,11);const displaced=workers[0];s.workplaceSystem.remove(workers[3]);assert.equal(s.workplaceSystem.assign(l,displaced),true);assert.equal(s.workplaceSystem.summary(q).count,2);assert.equal(s.workplaceSystem.summary(l).count,2);assert.equal(displaced.profession,'hunter');
   s.workplaceSystem.remove(displaced);assert.equal(displaced.profession,'idle');assert.equal(displaced.assignedWorkplaceId,null);
-  const fail=placeBuilding({map:s.map,anchor:{x:55,y:50},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:q.definition});assert.ok(fail.error);assert.equal(s.buildings.length,4,'quarry, Granary (#132 prerequisite), lodge and barracks');
+  const fail=placeBuilding({map:s.map,anchor:{x:55,y:50},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:q.definition});assert.ok(fail.error);assert.equal(s.buildings.length,3,'quarry, lodge and barracks (the lodge only recommends a Granary since 0.33.0)');
   for(const type of ['quarry','hunting_lodge','barracks'])s.activities.emit('buildingCompleted',{actor:s.character,objectType:type},`built-${type}`);
   assert.equal(s.character.experience.totalXP,45);assert.equal(s.character.skills.construction.totalXP,45);
   s.activities.emit('buildingCompleted',{actor:s.character,objectType:'quarry'},'built-quarry');assert.equal(s.character.experience.totalXP,45);

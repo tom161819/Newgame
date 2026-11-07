@@ -58,9 +58,10 @@ export class BuildingBar {
     for(const {button,availability,definition,card,lock}of this.choices.values()){
       const status=this.unlocks?.status(definition)??{unlocked:true};
       button.disabled=!status.unlocked;card.classList.toggle('building-locked',!status.unlocked);lock.textContent=status.unlocked?'':`🔒 ${t('building.locked')}`;
-      card.title=status.unlocked?definition.description:status.description;
-      availability.textContent=status.unlocked?missingCost(definition.cost,inventory,this.registry):status.description;
-      availability.classList.toggle('shortage',!status.unlocked||!inventory.canAfford(definition.cost));
+      const warning=status.unlocked?status.warning??'':'';
+      card.title=status.unlocked?[definition.description,warning].filter(Boolean).join('\n'):status.description;
+      availability.textContent=status.unlocked?[warning,missingCost(definition.cost,inventory,this.registry)].filter(Boolean).join(' · '):status.description;
+      availability.classList.toggle('shortage',!status.unlocked||!inventory.canAfford(definition.cost)||!!warning);availability.classList.toggle('building-warning',!!warning);card.classList.toggle('building-warned',!!warning);
       button.setAttribute('aria-pressed',String(selected?.id===definition.id));
     }
     this.cancel.hidden=!selected;

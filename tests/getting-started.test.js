@@ -31,6 +31,6 @@ test('a step is done only when its building is completed', () => {
 
 test('the order check reports a step that needs a later building and an unknown building', () => {
   const registry=objectRegistry;
-  assert.deepEqual(gettingStartedProblems(registry,[{id:'farm',buildingId:'farmhouse'},{id:'granary',buildingId:'granary'}]),['farm: needs granary before it']);
+  assert.deepEqual(gettingStartedProblems(registry,[{id:'farm',buildingId:'farmhouse'},{id:'granary',buildingId:'granary'}]),['farm: needs granary before it'],'recommended earlier buildings keep the guide order too');
   assert.deepEqual(gettingStartedProblems(registry,[{id:'x',buildingId:'dragon_lair'}]),['x: unknown building dragon_lair']);
 });

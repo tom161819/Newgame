@@ -9,7 +9,7 @@ export async function gettingStartedSmoke(context,url,instrument){
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.gettingStarted);
     const dialog=page.locator('#help-dialog');await page.locator('#help-dialog[open]').waitFor({timeout:10000});
-    assert.equal(await page.locator('#help-steps .help-step').count(),7);
+    assert.equal(await page.locator('#help-steps .help-step').count(),8,'eight steps since the Builder\'s Workshop (0.14.1)');
     assert.equal(await page.locator('#help-steps .help-step.current').getAttribute('data-help-step'),'warehouse');
     assert.equal(await page.locator('#help-steps .help-step.done').count(),0);
     assert.equal(await page.locator('#help-toggle').evaluate(b=>b.classList.contains('has-alert')),true,'the ? button is marked until every step is done');
@@ -41,8 +41,8 @@ export async function gettingStartedSmoke(context,url,instrument){
     await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id);b.construction.workDone=b.construction.requiredWork;b.construction.progress=100;s.constructionSystem.finish(b);},site);
     await page.locator('#help-toggle').click();
     assert.equal(await page.locator('[data-help-step="warehouse"]').evaluate(e=>e.classList.contains('done')),true);
-    assert.equal(await page.locator('#help-steps .help-step.current').getAttribute('data-help-step'),'granary');
-    assert.match(await page.locator('#help-summary').textContent(),/^1 of 7 done/);
+    assert.equal(await page.locator('#help-steps .help-step.current').getAttribute('data-help-step'),'builder_workshop');
+    assert.match(await page.locator('#help-summary').textContent(),/^1 of 8 done/);
     await page.keyboard.press('Escape');
     console.log('PASS Getting started: opens once on New Game, Esc / close / ? work, a step opens the Buildings menu, a completed Warehouse (not its site) ticks step 1');
   }finally{await page.close();}

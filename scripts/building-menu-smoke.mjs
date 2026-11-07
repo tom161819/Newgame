@@ -41,11 +41,12 @@ export async function buildingMenuSmoke(page){
   await page.locator('#buildings-tab').click();await page.locator('[data-building-category="food"]').click();assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.buildMode),false);
   const hasUnlocks=await page.evaluate(()=>!!window.__game.registry.get('application').scene.buildingUnlocks);
   if(hasUnlocks){
-    assert.equal(await page.locator('#farmhouse-choice').isDisabled(),true);assert.equal(await page.locator('#wheat_field-choice').isDisabled(),true);assert.equal(await page.locator('#orchard-choice').isDisabled(),true);assert.equal(await page.locator('#granary-choice').isDisabled(),false);
-    assert.match(await page.locator('#farmhouse-availability').textContent(),/Build a Granary/);
-    assert.equal(await page.locator('#hunting_lodge-choice').isDisabled(),true);assert.match(await page.locator('#hunting_lodge-availability').textContent(),/Build a Granary/);
+    // Food menu (owner, 7 Nov): nothing is locked; a missing earlier building is a red warning under the choice.
+    for(const id of ['granary','farmhouse','wheat_field','orchard','hunting_lodge','fisherman_hut','mill','bakery'])assert.equal(await page.locator(`#${id}-choice`).isDisabled(),false,id);
+    assert.match(await page.locator('#farmhouse-availability').textContent(),/Needs a Granary to store food/);assert.match(await page.locator('#hunting_lodge-availability').textContent(),/Needs a Granary to store food/);
+    assert.match(await page.locator('#wheat_field-availability').textContent(),/Needs a Farmhouse/);assert.equal(await page.locator('#hunting_lodge-availability.building-warning').count(),1);
     assert.equal(await page.locator('#building-options [data-building-id]').first().getAttribute('data-building-id'),'granary','the Granary leads the Food menu');
-    assert.equal(await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;return s.startBuilding(s.objectRegistry.require('farmhouse'));}),false);
+    assert.equal(await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,ok=s.startBuilding(s.objectRegistry.require('farmhouse'));s.cancelBuilding?.();return ok;}),true,'a Farmhouse can be chosen before a Granary');
   }
   const before=await page.evaluate(()=>window.__game.registry.get('application').scene.cameras.main.scrollY);await page.keyboard.down('w');await page.waitForTimeout(140);await page.keyboard.up('w');
   assert.ok(await page.evaluate(before=>window.__game.registry.get('application').scene.cameras.main.scrollY<before,before),'Camera remains operable with Buildings open.');
@@ -53,7 +54,7 @@ export async function buildingMenuSmoke(page){
   await page.locator('[data-building-category="all"]').click();await mobileLastBuildingSmoke(page);await page.locator('#buildings-tab').click();await page.setViewportSize({width:1440,height:1000});
   await page.evaluate(async()=>{await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));window.__game.registry.get('application').scene.worldCamera.syncSize();});
   await page.locator('#asset-library-button').click();await page.locator('#asset-categories [data-category="building"]').click();await page.locator('#asset-grid [data-object-id="farmhouse"]').click();assert.match(await page.locator('#asset-detail').textContent(),/Food & Farming/);
-  if(hasUnlocks)assert.match(await page.locator('#asset-detail').textContent(),/Requires a completed Granary/);
+  if(hasUnlocks)assert.match(await page.locator('#asset-detail').textContent(),/Recommended first \(warning only\)Granary/);
   await page.locator('#close-asset-gallery').click();
   console.log('PASS registered building categories, All/empty tabs, horizontal building strip (buttons, wheel, keyboard), preview cancellation, camera controls and mobile last-building selection');
 }
@@ -118,21 +119,21 @@ export async function buildingUnlockGameplaySmoke(page){
   if(!await page.evaluate(()=>!!window.__game.registry.get('application').scene.buildingUnlocks))return;
   await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('stone',29);s.inventory.add('apple',8);s.updateInventory();});
   const granary=await placeBlueprint(page,'granary');
-  await page.locator('#buildings-tab').click();await page.locator('[data-building-category="food"]').click();assert.equal(await page.locator('#farmhouse-choice').isDisabled(),true);assert.match(await page.locator('#farmhouse-availability').textContent(),/completed Granary/);await page.locator('#buildings-tab').click();
+  await page.locator('#buildings-tab').click();await page.locator('[data-building-category="food"]').click();assert.equal(await page.locator('#farmhouse-choice').isDisabled(),false,'Food menu: never locked');assert.match(await page.locator('#farmhouse-availability').textContent(),/Needs a Granary to store food/);assert.match(await page.locator('#hunting_lodge-availability').textContent(),/Needs a Granary/);assert.equal(await page.locator('#hunting_lodge-availability.building-warning').count(),1,'red warning');await page.locator('#buildings-tab').click();
   await supplyAndBuild(page,granary);
-  await page.locator('#buildings-tab').click();assert.equal(await page.locator('#farmhouse-choice').isDisabled(),false);assert.equal(await page.locator('#hunting_lodge-choice').isDisabled(),false,'#132 a completed Granary unlocks the Hunting Lodge');assert.equal(await page.locator('#wheat_field-choice').isDisabled(),true);await page.locator('#buildings-tab').click();
+  await page.locator('#buildings-tab').click();assert.equal(await page.locator('#farmhouse-choice').isDisabled(),false);assert.doesNotMatch(await page.locator('#hunting_lodge-availability').textContent(),/Needs/,'the warning goes with a completed Granary');assert.equal(await page.locator('#wheat_field-choice').isDisabled(),false);assert.match(await page.locator('#wheat_field-availability').textContent(),/Needs a Farmhouse/);await page.locator('#buildings-tab').click();
   const farm=await placeBlueprint(page,'farmhouse');
   const saved=await page.evaluate(()=>{const app=window.__game.registry.get('application');app.scene.pauseManager.set('test',true);return app.snapshot();});
   await page.evaluate(async state=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__restored=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('test',true);window.__restored=true;app.onGameReady=ready;};await app.load(state);},saved);
   await page.waitForFunction(()=>window.__restored);assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').snapshot()),saved);
-  assert.equal(await page.locator('#farmhouse-choice').isDisabled(),false);assert.equal(await page.locator('#wheat_field-choice').isDisabled(),true);await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('test',false));
+  assert.equal(await page.locator('#farmhouse-choice').isDisabled(),false);assert.match(await page.locator('#wheat_field-availability').textContent(),/Needs a Farmhouse/);await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('test',false));
   await supplyAndBuild(page,farm);
-  await page.locator('#buildings-tab').click();assert.equal(await page.locator('#wheat_field-choice').isDisabled(),false);assert.equal(await page.locator('#orchard-choice').isDisabled(),false);await page.locator('#buildings-tab').click();
+  await page.locator('#buildings-tab').click();assert.doesNotMatch(await page.locator('#wheat_field-availability').textContent(),/Needs/);assert.doesNotMatch(await page.locator('#orchard-availability').textContent(),/Needs/);await page.locator('#buildings-tab').click();
   const field=await placeBlueprint(page,'wheat_field');
   // There is no completed-building demolition UI yet. Exercise the actual
   // world-change event with a consistent removal fixture, not a new mechanic.
   const removedFarm=await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id),saved={...b,definition:undefined};s.buildings.splice(s.buildings.indexOf(b),1);for(const t of b.tiles)s.map[t.y][t.x]=s.terrainGrid[t.y][t.x];s.towerViews.get(id).destroy();s.towerViews.delete(id);s.events.emit('buildings:changed');return saved;},farm.id);
-  await page.locator('#buildings-tab').click();assert.equal(await page.locator('#wheat_field-choice').isDisabled(),true);assert.equal(await page.locator('#orchard-choice').isDisabled(),true);await page.locator('#buildings-tab').click();
+  await page.locator('#buildings-tab').click();assert.match(await page.locator('#wheat_field-availability').textContent(),/Needs a Farmhouse/);assert.equal(await page.locator('#orchard-choice').isDisabled(),false);await page.locator('#buildings-tab').click();
   assert.equal(await page.evaluate(id=>{const b=window.__game.registry.get('application').scene.buildings.find(b=>b.id===id);return b.farmId===null&&b.construction.workDone===0;},field.id),true);
   // Restore the same completed-house fixture after testing its removal. Goods
   // are unchanged; establishment must wait for the returned owner and a Farmer.

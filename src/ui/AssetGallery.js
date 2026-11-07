@@ -60,6 +60,7 @@ export class AssetGallery {
       [t('asset.cost'),formatCost(definition.cost,this.registry)],[t('asset.interactionsLabel'),definition.interactions.join(', ')||t('asset.none')]];
     if(definition.category==='building')rows.push([t('asset.buildingCategory'),buildingCategoryLabel(definition)]);
     if(definition.category==='building')rows.push([t('asset.unlockRequirements'),(definition.requiresCompletedBuildings??[]).map(id=>this.registry.require(id).name).join(', ')||t('population.none')],[t('asset.unlockDescription'),definition.unlockDescription?localized(`object.${definition.id}.unlock`,definition.unlockDescription):t('asset.availableFromStart')]);
+    if(definition.recommendsCompletedBuildings?.length)rows.push([t('asset.recommends'),definition.recommendsCompletedBuildings.map(id=>this.registry.require(id).name).join(', ')]);
     if(definition.stats)rows.push([t('asset.maxHp'),String(definition.stats.maxHP)],['DPS',String(definition.stats.attackDPS)],[t('unit.armor'),`${definition.stats.armor} %`],[t('asset.attackRange'),t('asset.tiles',{count:definition.stats.attackRange})]);
     if(definition.stats)rows.push([t('panel.hpRegen'),`${definition.stats.hpRegenPerSecond??0} HP/s`]);
     if(definition.experience)rows.push([t('asset.initialLevel'),String(definition.experience.initialLevel)],[t('asset.maxLevel'),String(definition.experience.maxLevel)],[t('asset.gainsXp'),yes(definition.experience.enabled)],[t('asset.xpMultiplier'),`${definition.experience.gainMultiplier}×`]);
