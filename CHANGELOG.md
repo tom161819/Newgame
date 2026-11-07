@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.55.0] - 2026-11-08
+<!-- version: {"title":"Trade improvements","type":"feature","reconstructed":false,"saveVersion":58} -->
+### Added
+- Automatic trade has a Keep between mode: buy when you have less than one amount, sell when you have more than another.
+- Caravans bring porters who carry goods to the Marketplace, and guards. Richer caravans have more guards. Caravans carry more Gold and goods as the game goes on (up to 1000 Gold).
+- Parked Wheelbarrows and Horse Wagons can be sold to the merchant.
+
+### Changed
+- A Wheelbarrow takes 10 times longer to build.
+
+
 ## [0.54.0] - 2026-11-08
 <!-- version: {"title":"Resource overview","type":"feature","reconstructed":false,"saveVersion":58} -->
 ### Added

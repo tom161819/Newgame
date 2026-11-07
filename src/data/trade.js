@@ -22,12 +22,22 @@ export const PRICE_MODEL=Object.freeze({min:.75,max:1.35,kingdomWeight:.2,mercha
 // good gets at most one automatic order per caravan visit. `budget` caps the Gold automatic buying spends per visit.
 export const AUTO_TRADE=Object.freeze({checkMs:2000,defaultBudget:100,maxBudget:5000,maxAmount:10000,maxPrice:100000,foodReserveDays:3,mealsPerDay:2,
   defaults:Object.freeze({sell:Object.freeze({keep:50,minPrice:1}),buy:Object.freeze({below:20,upTo:50,maxPrice:null})})});
-const AUTO_KEYS={sell:['keep','minPrice'],buy:['below','upTo','maxPrice']};
+// m-obchod-vylepseni (25): 'between' keeps a good between two levels: buy below `below`, sell above `above`.
+const AUTO_KEYS={sell:['keep','minPrice'],buy:['below','upTo','maxPrice'],between:['below','above','maxPrice','minPrice']};
 // A clean rule or an error id. Amounts are whole numbers; a buy target must not be below its trigger level.
+// What a rule does with the current stock: a plain buy or sell rule, or for 'between' the one side that applies now
+// (below the buy level → buy up to it, above the sell level → sell down to it; never both).
+export function effectiveAutoRule(rule,stock){
+  if(rule?.mode!=='between')return rule??null;
+  if(stock<rule.below)return {mode:'buy',below:rule.below,upTo:rule.below,maxPrice:rule.maxPrice};
+  if(stock>rule.above)return {mode:'sell',keep:rule.above,minPrice:rule.minPrice};
+  return null;
+}
 export function autoRule(rule){
-  if(!rule||!['sell','buy'].includes(rule.mode))return {error:'mode'};
+  if(!rule||!['sell','buy','between'].includes(rule.mode))return {error:'mode'};
   const out={mode:rule.mode};for(const key of AUTO_KEYS[rule.mode]){const v=Number(rule[key]),max=key.endsWith('rice')?AUTO_TRADE.maxPrice:AUTO_TRADE.maxAmount,min=key.endsWith('rice')?1:0;if(!Number.isSafeInteger(v)||v<min||v>max)return {error:key};out[key]=v;}
   if(out.mode==='buy'&&out.upTo<out.below)return {error:'upTo'};
+  if(out.mode==='between'&&out.above<=out.below)return {error:'above'};
   return {rule:out};
 }
 export function validateAutoTrade(a,{check,integer,resource}){
@@ -54,7 +64,14 @@ export function price(resource,side,context={}){
 }
 export function priceTable(registry,contextFor=()=>({})){return tradeableResources(registry).map(d=>{const context=contextFor(d.id)??{};return {resource:d.id,name:d.name,base:BASE_PRICES[d.id]??null,buy:price(d.id,'buy',context),sell:price(d.id,'sell',context),factor:context.factor??1,reasons:context.reasons??[]};});}
 // Trade F1.2: merchant caravans. Times are in game days (the day length follows the game settings).
+// m-obchod-vylepseni (57): a merchant buys parked Wheelbarrows and Horse Wagons (with their horse) for the value of
+// their inputs (Wheelbarrow 10 Wood + 2 Iron; Horse Wagon 30 Wood + 6 Iron + a horse worth 160) at the usual sell factor.
+export const VEHICLE_VALUES=Object.freeze({wheelbarrow:120,horse_wagon:520});
+export function vehicleSalePrice(type){const v=VEHICLE_VALUES[type];return v?Math.max(1,Math.round(v*TRADE_RULES.sellFactor)):null;}
 export const CARAVAN_RULES=Object.freeze({minInterval:2,maxInterval:4,stay:.75,maxWait:.25,leavingWarning:.1,speed:1.6,goldMin:100,goldMax:300,
+  // m-obchod-vylepseni (48): caravans grow richer – the top of the gold range rises from goldMax (day 1) to richGoldMax
+  // by richByDay; goods grow with the gold (up to ×2). Escort: porters 0–2, guards 1–6 by the gold (none below guardFrom).
+  richGoldMax:1000,richByDay:30,stockGrowth:1,porterChance:.5,maxPorters:2,guardFrom:200,goldPerGuard:170,maxGuards:6,
   spawnAttempts:8,retryAfter:1,maxRoute:2000});
 // Each type carries some of its goods (at least one), each amount random within its range.
 export const MERCHANT_TYPES=Object.freeze({

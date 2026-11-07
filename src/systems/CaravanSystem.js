@@ -16,12 +16,17 @@ export function edgeTiles(map){
   const tiles=[];for(let x=0;x<COLUMNS;x++)tiles.push({x,y:0},{x,y:ROWS-1});for(let y=1;y<ROWS-1;y++)tiles.push({x:0,y},{x:COLUMNS-1,y});
   return tiles.filter(p=>map[p.y]?.[p.x]===0);
 }
-export function rollMerchant(random=Math.random){
+// day: the game day of the visit (wealth grows with it). Returns the merchant's type, stock, gold and escort.
+export function caravanGoldMax(day=1){const R=CARAVAN_RULES,k=Math.min(1,Math.max(0,(day-1)/R.richByDay));return Math.round(R.goldMax+(R.richGoldMax-R.goldMax)*k);}
+export function caravanEscort(gold,random=Math.random){const R=CARAVAN_RULES,guards=gold<R.guardFrom?0:Math.min(R.maxGuards,Math.max(1,Math.round(gold/R.goldPerGuard)));let porters=0;for(let i=0;i<R.maxPorters;i++)if(random()<R.porterChance)porters++;return {porters,guards};}
+export function rollMerchant(random=Math.random,day=1){
   const types=Object.keys(MERCHANT_TYPES),type=types[Math.floor(random()*types.length)%types.length],stock={};
   const entries=Object.entries(MERCHANT_TYPES[type].stock);
   for(const [resource,[min,max]]of entries)if(random()<.75)stock[resource]=randomInt(random,min,max);
   if(!Object.keys(stock).length){const [resource,[min,max]]=entries[Math.floor(random()*entries.length)%entries.length];stock[resource]=randomInt(random,min,max);}
-  return {type,stock,gold:randomInt(random,CARAVAN_RULES.goldMin,CARAVAN_RULES.goldMax)};
+  const gold=randomInt(random,CARAVAN_RULES.goldMin,caravanGoldMax(day)),grow=1+CARAVAN_RULES.stockGrowth*(gold-CARAVAN_RULES.goldMin)/(CARAVAN_RULES.richGoldMax-CARAVAN_RULES.goldMin);
+  for(const id of Object.keys(stock))stock[id]=Math.max(1,Math.round(stock[id]*grow));
+  return {type,stock,gold,escort:caravanEscort(gold,random)};
 }
 export class CaravanSystem {
   constructor(scene,{random=Math.random}={}){
@@ -51,7 +56,7 @@ export class CaravanSystem {
     for(let attempt=0;attempt<CARAVAN_RULES.spawnAttempts&&edges.length;attempt++){
       const marketplace=markets[Math.floor(this.random()*markets.length)%markets.length],entry=edges[Math.floor(this.random()*edges.length)%edges.length];
       const route=this.route(entry,this.goals(marketplace));if(!route)continue;
-      const merchant=rollMerchant(this.random);
+      const merchant=rollMerchant(this.random,this.scene.gameTime?.day??1);
       this.active={id:`caravan-${++this.seq}`,...merchant,marketplaceId:marketplace.id,phase:'arriving',entry:{...entry},tile:{...entry},position:{x:entry.x+.5,y:entry.y+.5},
         path:route.path,nextTile:null,speed:CARAVAN_RULES.speed,departAt:null,warned:false,waiting:false,canEnterTile:this.enter};
       this.nextVisitAt=null;this.feed(null,'arriving',{type:t(`caravan.type.${merchant.type}`)});this.changed();return true;
@@ -101,11 +106,11 @@ export class CaravanSystem {
   exportState(){
     const c=this.active;
     return {seq:this.seq,nextVisitAt:this.nextVisitAt,active:c?{id:c.id,type:c.type,stock:{...c.stock},gold:c.gold,marketplaceId:c.marketplaceId,phase:c.phase,entry:{...c.entry},tile:{...c.tile},
-      position:{...c.position},path:c.path.map(p=>({...p})),nextTile:c.nextTile?{...c.nextTile}:null,departAt:c.departAt,warned:c.warned,waiting:c.waiting}:null};
+      position:{...c.position},path:c.path.map(p=>({...p})),nextTile:c.nextTile?{...c.nextTile}:null,departAt:c.departAt,warned:c.warned,waiting:c.waiting,escort:{...(c.escort??{porters:0,guards:0})}}:null};
   }
   importState(state){
     this.seq=state?.seq??0;this.nextVisitAt=state?.nextVisitAt??null;const c=state?.active;
-    this.active=c?{...structuredClone(c),speed:CARAVAN_RULES.speed,direction:null,walking:false,canEnterTile:this.enter}:null;this.changed();
+    this.active=c?{escort:{porters:0,guards:0},...structuredClone(c),speed:CARAVAN_RULES.speed,direction:null,walking:false,canEnterTile:this.enter}:null;this.changed();
   }
   destroy(){this.scene.events?.off?.('buildings:changed',this.buildingsChanged);this.listeners.clear();this.active=null;}
 }

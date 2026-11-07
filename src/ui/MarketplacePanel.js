@@ -64,11 +64,11 @@ export class MarketplacePanel {
     for(const row of this.prices()){
       const rule=a.rules[row.resource],tr=element('tr');tr.dataset.autoResource=row.resource;
       const mode=element('select','market-auto-mode');mode.dataset.autoMode=row.resource;mode.setAttribute('aria-label',t('market.auto.modeOf',{good:row.name}));
-      for(const m of ['off','sell','buy']){const o=element('option','',t(`market.auto.mode.${m}`));o.value=m;o.selected=(rule?.mode??'off')===m;mode.append(o);}
+      for(const m of ['off','sell','buy','between']){const o=element('option','',t(`market.auto.mode.${m}`));o.value=m;o.selected=(rule?.mode??'off')===m;mode.append(o);}
       mode.addEventListener('change',()=>{const m=mode.value;trade.setAutoRule(row.resource,m==='off'?null:{mode:m,...this.autoDefaults(row,m)});this.renderAuto({force:true});document.querySelector(`[data-auto-mode="${row.resource}"]`)?.focus();});
       const settings=element('td','market-auto-settings');
       if(rule){
-        const fields=rule.mode==='sell'?['keep','minPrice']:['below','upTo','maxPrice'];
+        const fields={sell:['keep','minPrice'],buy:['below','upTo','maxPrice'],between:['below','above','maxPrice','minPrice']}[rule.mode];
         for(const key of fields){const label=element('label','',t(`market.auto.${key}`)+' '),input=this.number(`auto-${row.resource}-${key}`,rule[key],key.endsWith('rice')?1:0,key.endsWith('rice')?AUTO_TRADE.maxPrice:AUTO_TRADE.maxAmount);input.dataset.autoField=key;input.dataset.autoResource=row.resource;
           input.addEventListener('change',()=>{const result=trade.setAutoRule(row.resource,{...trade.auto.rules[row.resource],[key]:Number(input.value)});input.classList.toggle('invalid',!result.ok);if(!result.ok)input.title=t(`market.auto.error.${result.error}`);else{input.title='';this.renderAutoNote(row.resource);}});
           label.append(input);settings.append(label,' ');}
@@ -85,6 +85,8 @@ export class MarketplacePanel {
   autoDefaults(row,mode){
     const reference=PRICE_MODEL.referenceStock[row.resource]??PRICE_MODEL.defaultReference;
     if(mode==='sell')return {keep:reference,minPrice:Math.max(1,price(row.resource,'sell')??1)};
+    // Keep between (owner example: below 50 buy, above 300 sell).
+    if(mode==='between')return {below:50,above:300,maxPrice:Math.max(row.buy,Math.round((price(row.resource,'buy')??1)*1.1)),minPrice:Math.max(1,price(row.resource,'sell')??1)};
     return {below:Math.max(1,Math.round(reference/2)),upTo:reference,maxPrice:Math.max(row.buy,Math.round((price(row.resource,'buy')??1)*1.1))};
   }
   renderAutoNote(resource){
@@ -180,6 +182,12 @@ export class MarketplacePanel {
     // Domestic animals Z1: Food and General merchants sometimes sell a cat (30 Gold); the buyer picks its home.
     const cats=this.scene.domestic?.catsForSale?.()??0,extra=[];
     if(cats){const buy=element('button','market-buy-cat',t('pets.buyButton',{price:CATS.price,count:cats}));buy.type='button';buy.id='market-buy-cat';buy.addEventListener('click',()=>this.scene.catPanel?.open(null,'buy'));extra.push(buy);}
+    // m-obchod-vylepseni (57): parked Wheelbarrows and Horse Wagons can be sold to the merchant.
+    const vehicles=trade.vehiclesForSale?.()??[];
+    if(vehicles.length){const box=element('p','market-vehicles');box.id='market-vehicles';box.append(element('strong','',t('market.vehicles')+' '));
+      for(const v of vehicles){const sell=element('button','market-sell-vehicle',t('market.sellVehicle',{good:this.scene.objectRegistry.get(v.type)?.name??v.type,price:v.price}));sell.type='button';sell.dataset.sellVehicle=v.id;
+        sell.addEventListener('click',()=>{trade.sellVehicle(v.id);this.lastResult=null;this.tradeKey=null;this.render();});box.append(sell,' ');}
+      extra.push(box);}
     const dog=this.scene.domestic?.dogForSale?.();
     if(dog){const buy=element('button','market-buy-dog',t('pets.dog.buyButton',{price:DOGS.price,name:dog.name}));buy.type='button';buy.id='market-buy-dog';buy.addEventListener('click',()=>this.scene.catPanel?.openDog(dog,'buyDog'));extra.push(buy);}
     root.replaceChildren(element('h3','',t('market.trade',{gold:c.gold})),table,quote,...extra);this.decorate(root);this.renderQuote();

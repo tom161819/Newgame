@@ -470,7 +470,8 @@ export function validateGameState(input,registry=objectRegistry){
     const v=s.caravans,now=s.time?.totalElapsed??Number.MAX_SAFE_INTEGER;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='active,nextVisitAt,seq');integer(v.seq,0);
     check(v.nextVisitAt===null||(Number.isFinite(v.nextVisitAt)&&v.nextVisitAt>=0));
     if(v.active!==null){
-      const c=v.active;check(c&&typeof c==='object'&&Object.keys(c).sort().join()==='departAt,entry,gold,id,marketplaceId,nextTile,path,phase,position,stock,tile,type,waiting,warned');
+      const c=v.active;check(c&&typeof c==='object'&&['departAt,entry,gold,id,marketplaceId,nextTile,path,phase,position,stock,tile,type,waiting,warned','departAt,entry,escort,gold,id,marketplaceId,nextTile,path,phase,position,stock,tile,type,waiting,warned'].includes(Object.keys(c).sort().join()));
+      if(c.escort!==undefined){check(c.escort&&Object.keys(c.escort).sort().join()==='guards,porters');integer(c.escort.porters,0,CARAVAN_RULES.maxPorters);integer(c.escort.guards,0,CARAVAN_RULES.maxGuards);}
       check(typeof c.id==='string'&&/^caravan-\d+$/.test(c.id)&&Number(c.id.slice(8))<=v.seq&&v.nextVisitAt===null);check(Object.hasOwn(MERCHANT_TYPES,c.type));check(['arriving','trading','leaving'].includes(c.phase));
       check(c.stock&&typeof c.stock==='object'&&!Array.isArray(c.stock));for(const [id,n]of Object.entries(c.stock)){definition(id,'resource');integer(n,0,100000);}integer(c.gold,0,1000000);
       tile(c.entry);tile(c.tile);position(c.position);array(c.path,10000);for(const p of c.path)tile(p);if(c.nextTile!==null)tile(c.nextTile);

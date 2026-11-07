@@ -26,10 +26,15 @@ test('caravans come only while a finished Marketplace exists, every 2–4 days',
   for(let i=0;i<20;i++){w=world();w.scene.gameTime.totalElapsed=i*1000;w.system.random=()=>i/19;w.system.update(100);const wait=w.system.nextVisitAt-i*1000;assert.ok(wait>=2*DAY-1e-6&&wait<=4*DAY+1e-6,String(wait));}
 });
 
-test('a merchant has a type, some of its goods within range and 100–300 Gold', () => {
+test('a merchant has a type, goods, 100–300 Gold on day 1 and up to 1000 later, with an escort by the gold', () => {
   let r=1;const random=()=>{r=(r*48271)%2147483647;return r/2147483647;};
   for(let i=0;i<200;i++){const m=rollMerchant(random),spec=MERCHANT_TYPES[m.type];assert.ok(spec);assert.ok(Object.keys(m.stock).length>=1);
-    for(const [id,n]of Object.entries(m.stock)){const [min,max]=spec.stock[id];assert.ok(n>=min&&n<=max,`${m.type} ${id} ${n}`);}assert.ok(m.gold>=100&&m.gold<=300);}
+    // m-obchod-vylepseni: goods grow with the gold (×1 at 100 Gold … ×2 at 1000).
+    const grow=1+(m.gold-100)/900;for(const [id,n]of Object.entries(m.stock)){const [min,max]=spec.stock[id];assert.ok(n>=Math.max(1,Math.round(min))&&n<=Math.round(max*grow),`${m.type} ${id} ${n}`);}assert.ok(m.gold>=100&&m.gold<=300,'day 1: 100–300');
+    assert.ok(m.escort.porters>=0&&m.escort.porters<=2);assert.equal(m.escort.guards,m.gold<200?0:Math.min(6,Math.max(1,Math.round(m.gold/170))));}
+  // Richer later: by day 30 the gold reaches up to 1000 and the escort grows with it.
+  let top=0;for(let i=0;i<300;i++){const m=rollMerchant(random,31);assert.ok(m.gold>=100&&m.gold<=1000);top=Math.max(top,m.gold);assert.ok(m.escort.guards<=6);}
+  assert.ok(top>700,`rich caravans later (${top})`);
 });
 
 test('a caravan drives from a map edge to the Marketplace, trades 0.75 day, warns, leaves and the next one is scheduled', () => {

@@ -1,4 +1,4 @@
-import { price,tradeableResources,demand,merchantTypical,PRICE_MODEL,AUTO_TRADE,autoRule } from '../data/trade.js';
+import { price,tradeableResources,demand,merchantTypical,PRICE_MODEL,AUTO_TRADE,autoRule ,effectiveAutoRule,vehicleSalePrice} from '../data/trade.js';
 import { EDIBLE_RESOURCES } from '../data/seasons.js';
 import { t } from '../i18n/index.js';
 import { GOLD_LIMIT } from '../data/economy.js';
@@ -66,6 +66,7 @@ export class TradeSystem {
   foodReserve(){return this.residents()*AUTO_TRADE.mealsPerDay*AUTO_TRADE.foodReserveDays;}
   // A warning when an automatic sale of food would leave less edible food than the reserve.
   autoWarning(resource,rule=this.auto.rules[resource]){
+    if(rule?.mode==='between')rule={mode:'sell',keep:rule.above};
     if(rule?.mode!=='sell'||!EDIBLE_RESOURCES.includes(resource))return null;
     const total=EDIBLE_RESOURCES.reduce((n,id)=>n+(this.storage?.available(id)??0),0),sold=Math.max(0,(this.storage?.available(resource)??0)-rule.keep),left=total-sold,reserve=this.foodReserve();
     return left<reserve&&(sold>0||rule.keep<reserve)?{reserve,left}:null;
@@ -91,13 +92,14 @@ export class TradeSystem {
     const leavesIn=this.scene.caravans.status()?.active?.leavesIn??0;let placed=false;
     for(const [resource,rule]of Object.entries(a.rules)){
       if(a.visit.done.includes(resource))continue;
-      let quantity=this.autoQuantity(resource,rule,c);
-      while(quantity>=1&&this.estimate(rule.mode,resource,quantity,c.marketplaceId)>leavesIn)quantity=Math.floor(quantity/2);
+      const eff=effectiveAutoRule(rule,this.storage.available(resource));if(!eff)continue;
+      let quantity=this.autoQuantity(resource,eff,c);
+      while(quantity>=1&&this.estimate(eff.mode,resource,quantity,c.marketplaceId)>leavesIn)quantity=Math.floor(quantity/2);
       if(quantity<1)continue;
-      const result=this.place(rule.mode,resource,quantity);if(!result.ok)continue;
-      result.order.auto=true;a.visit.done.push(resource);if(rule.mode==='buy')a.visit.spent+=quantity*result.order.price;placed=true;
+      const result=this.place(eff.mode,resource,quantity);if(!result.ok)continue;
+      result.order.auto=true;a.visit.done.push(resource);if(eff.mode==='buy')a.visit.spent+=quantity*result.order.price;placed=true;
       const good=this.scene.objectRegistry.get(resource)?.name??resource;
-      this.scene.eventFeed?.push(`trade:auto:${result.order.id}`,t(`market.auto.feed.${rule.mode}`,{quantity,good,price:result.order.price}));
+      this.scene.eventFeed?.push(`trade:auto:${result.order.id}`,t(`market.auto.feed.${eff.mode}`,{quantity,good,price:result.order.price}));
     }
     if(placed)this.changed();return placed;
   }
@@ -109,6 +111,17 @@ export class TradeSystem {
   // Gold promised to running purchases is not free to spend on another one.
   reservedGold(){return this.openOrders().filter(o=>o.side==='buy').reduce((n,o)=>n+(o.quantity-o.delivered)*o.price,0);}
   pendingSaleGold(){return this.openOrders().filter(o=>o.side==='sell').reduce((n,o)=>n+(o.quantity-o.delivered)*o.price,0);}
+  // Vehicles a merchant would buy now: parked ones (not in use or reserved), each with its price.
+  vehiclesForSale(){const v=this.scene.vehicles;if(!v)return [];return [...v.vehicles.values()].filter(x=>x.state==='parked'&&vehicleSalePrice(x.type)).map(x=>({id:x.id,type:x.type,price:vehicleSalePrice(x.type)}));}
+  // The merchant takes the vehicle (and a wagon's horse) at once and pays from his Gold.
+  sellVehicle(id){
+    const c=this.caravan,v=this.scene.vehicles?.vehicles.get(id);if(!c||c.phase!=='trading')return {ok:false,error:'noCaravan'};
+    if(!v||v.state!=='parked')return {ok:false,error:'vehicle'};const price=vehicleSalePrice(v.type);if(!price)return {ok:false,error:'vehicle'};if(c.gold<price)return {ok:false,error:'merchantGold'};
+    if(v.horseId!=null){const st=this.scene.stables;st?.horses.delete(v.horseId);const horse=this.scene.animalSystem?.animals.get(v.horseId);if(horse)this.scene.animalSystem.remove(horse);}
+    this.scene.vehicles.vehicles.delete(id);this.scene.vehicles.changed();c.gold-=price;
+    this.scene.inventory.add('gold',price,{source:'Trade Sale',type:'sale',id:`vehicle-sale:${id}`});this.scene.updateInventory?.();
+    this.scene.eventFeed?.push(`trade:vehicle:${id}`,t('market.vehicleSold',{good:this.scene.objectRegistry.get(v.type)?.name??v.type,price}));this.changed();return {ok:true,price};
+  }
   freeGold(){return Math.max(0,this.scene.inventory.count('gold')-this.reservedGold());}
   // Room for bought goods in every store that takes them (Granary groups, Warehouses, Armory, Starter Stockpile).
   storeRoom(resource){return [...this.storage.locations.values()].filter(l=>this.storage.isStock(l)&&l.allowed.includes(resource)).reduce((n,l)=>n+this.storage.room(l.id,resource),0);}

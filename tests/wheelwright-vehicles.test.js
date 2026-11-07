@@ -10,12 +10,12 @@ globalThis.document??={querySelector:()=>({textContent:''})};
 const scene=(starter=true)=>{const s=workerScene(undefined,{construction:true,foodProduction:true,logistics:true,ledger:true,starter});s.workerSystem.unsubscribe();return s;};
 function building(s,type,x,y){const d=s.objectRegistry.require(type);ensureBuildingPrerequisites(s,d);for(const [id,n]of Object.entries(d.cost))s.inventory.add(id,n);const r=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(r.error);s.towerViews.set(r.building.id,s.createBuildingView(d,r.building));s.foodStorage.register(r.building);return r.building;}
 function person(s,tile,{home=null,job=null}={}){const w=s.workerSystem.create(tile);if(home)assert.equal(s.workplaceSystem.assign(home,w),true);else s.workerSystem.jobs.assign(w,job);if(job==='hauler')w.stoneCollection={enabled:false,radius:80};return w;}
-function until(s,p,max=300000){let t=0;while(!p()&&t<max){s.tick(50);t+=50;}assert.ok(p(),`not reached after ${t} ms`);return t;}
+function until(s,p,max=900000){let t=0;while(!p()&&t<max){s.tick(50);t+=50;}assert.ok(p(),`not reached after ${t} ms`);return t;}
 const restore=state=>{const r=scene(false);loadGameState(r,structuredClone(state));return r;};
 
 test("the Wheelwright's Workshop: 3×3, 12 Stone + 15 Wood, two Wheelwrights; a Wheelbarrow is never a stored good",()=>{
   const s=scene(),d=s.objectRegistry.require('wheelwright_workshop');
-  assert.deepEqual([d.width,d.height,d.cost,d.workplace.capacity,d.workplace.profession,d.recipe.input,d.recipe.output,d.recipe.duration],[3,3,{stone:12,wood:15},2,'wheelwright',{wood:10,iron:2},{wheelbarrow:1},30000]);
+  assert.deepEqual([d.width,d.height,d.cost,d.workplace.capacity,d.workplace.profession,d.recipe.input,d.recipe.output,d.recipe.duration],[3,3,{stone:12,wood:15},2,'wheelwright',{wood:10,iron:2},{wheelbarrow:1},300000]);
   for(const id of ['warehouse','starter_stockpile','granary','armory'])assert.equal(storageResources(s.objectRegistry.require(id),s.objectRegistry).includes('wheelbarrow'),false,id);
   assert.equal(physicalResources(s.objectRegistry).includes('wheelbarrow'),false);
   assert.deepEqual([loadCapacity({}),loadCapacity({vehicleType:'wheelbarrow'}),carryCapacity({vehicleType:'wheelbarrow'},'stone')],[40,200,20],'five times the load: 20 Stone per trip');

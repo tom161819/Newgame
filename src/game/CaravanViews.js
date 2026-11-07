@@ -33,6 +33,17 @@ function wagon(scene,keyName,full){
   for(const x of [48,66]){g.fillStyle(0x5a4a3a);g.fillCircle(x,39,6);g.lineStyle(1.5,0x2e241a);g.strokeCircle(x,39,6);}
   g.generateTexture(keyName,80,50);g.destroy();return keyName;
 }
+// m-obchod-vylepseni (48): the escort – porters carrying goods between the wagon and the Marketplace while trading, and
+// guards (spear and shield) walking with the wagon and standing around it. Provisional drawings like the wagon above.
+function figure(scene,keyName,kind){
+  if(scene.textures.exists(keyName))return keyName;
+  const g=scene.make.graphics({x:0,y:0,add:false});g.fillStyle(0x2e241a,.3);g.fillEllipse(12,33,16,5);
+  const coat=kind==='guard'?0x5b6470:0x8a6a44;g.fillStyle(0x3a3026);g.fillRect(8,24,3,9);g.fillRect(13,24,3,9);
+  g.fillStyle(coat);g.fillRect(7,13,10,12);g.fillStyle(0xe2b48c);g.fillCircle(12,9,3.4);
+  if(kind==='guard'){g.fillStyle(0x7d8790);g.fillEllipse(12,6.5,8,4);g.lineStyle(1.5,0x6b4a2e);g.lineBetween(20,2,20,30);g.fillStyle(0xc9ced4);g.fillTriangle(18.5,3,21.5,3,20,-1);g.fillStyle(0x8e2f24);g.fillEllipse(6,19,6,9);}
+  else{g.fillStyle(0xcdb488);g.fillEllipse(17,12,9,8);g.lineStyle(1,0x8a7450);g.strokeEllipse(17,12,9,8);}
+  g.generateTexture(keyName,26,36);g.destroy();return keyName;
+}
 export class CaravanViews {
   constructor(scene){this.scene=scene;this.view=null;this.id=null;}
   update(){
@@ -46,7 +57,19 @@ export class CaravanViews {
     const w=gridToWorld(c.position.x,c.position.y),dir=c.direction??{x:0,y:0};
     this.view.setPosition(w.x,w.y).setDepth(w.y+.02).setVisible(!s.fog?.enabled||s.fog.isVisibleTile(c.tile));
     if(dir.x||dir.y)this.view.setFlipX(dir.x-dir.y<0);
+    this.escort(c,true);
   }
-  clear(){this.view?.destroy();this.view=null;this.id=null;}
+  escort(c,visible){
+    const s=this.scene,e=c.escort??{porters:0,guards:0};this.people??=[];const want=[...Array(e.guards).fill('guard'),...Array(e.porters).fill('porter')];
+    while(this.people.length>want.length)this.people.pop().destroy();
+    want.forEach((kind,i)=>{if(!this.people[i]||this.people[i].kind!==kind){this.people[i]?.destroy();const img=s.add.image(0,0,figure(s,`caravan-${kind}`,kind)).setOrigin(.5,.92);img.kind=kind;this.people[i]=img;}});
+    const now=s.gameTime?.totalElapsed??0,market=s.buildings?.find(b=>b.id===c.marketplaceId),center=market?{x:market.x+(market.definition?.width??3)/2,y:market.y+(market.definition?.height??3)/2}:null;
+    let g=0,p=0;
+    for(const img of this.people){let x,y;
+      if(img.kind==='guard'){const a=(g++/Math.max(1,e.guards))*Math.PI*2+.4,r=c.phase==='trading'?1.6:1.1;x=c.position.x+Math.cos(a)*r;y=c.position.y+Math.sin(a)*r;}
+      else{const i=p++;if(c.phase==='trading'&&center){const k=((now/2600+i*.5)%1),f=k<.5?k*2:2-k*2;x=c.position.x+(center.x-c.position.x)*f;y=c.position.y+(center.y-c.position.y)*f;}else{x=c.position.x+.6+i*.5;y=c.position.y-.6;}}
+      const w=gridToWorld(x,y);img.setPosition(w.x,w.y).setDepth(w.y+.01).setVisible(visible&&(!s.fog?.enabled||s.fog.isVisibleTile({x:Math.floor(x),y:Math.floor(y)})));}
+  }
+  clear(){this.view?.destroy();this.view=null;this.id=null;for(const p of this.people??[])p.destroy();this.people=[];}
   destroy(){this.clear();}
 }

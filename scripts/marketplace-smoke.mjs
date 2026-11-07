@@ -44,6 +44,16 @@ export async function marketplaceSmoke(context,url,instrument){
     if(process.env.SMOKE_SHOTS){await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,v=s.caravanViews.view;s.fog?.setEnabled?.(false);s.worldCamera&&(s.worldCamera.following=false);s.cameras.main.centerOn(v.x,v.y);s.cameras.main.setZoom(1.6);});await page.waitForTimeout(500);await page.screenshot({path:`${process.env.SMOKE_SHOTS}/caravan.png`});}
     assert.ok(arrived.start.x===0||arrived.start.y===0||arrived.start.x===99||arrived.start.y===99);assert.equal(arrived.phase,'trading');assert.equal(arrived.view,true);assert.ok(arrived.stock>=1);
     await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;s.marketplacePanel.open(s.buildings.find(b=>b.id===id));},market);
+    // m-obchod-vylepseni: escort drawn with the caravan; a parked Wheelbarrow sold to the merchant; Keep between offered.
+    const escort=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,c=s.caravans.active;c.escort={porters:2,guards:3};c.gold=Math.max(c.gold,200);s.caravanViews.update();
+      const k=s.character.tile;s.vehicles.create('wheelbarrow',{x:k.x+2,y:k.y+2});return {people:s.caravanViews.people.length,guards:s.caravanViews.people.filter(p=>p.kind==='guard').length,gold:c.gold};});
+    assert.deepEqual([escort.people,escort.guards],[5,3]);
+    await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;s.marketplacePanel.tradeKey=null;s.marketplacePanel.render();},market);
+    const sellVehicle=page.locator('.market-sell-vehicle').first();await sellVehicle.waitFor();assert.match(await sellVehicle.textContent(),/Sell Wheelbarrow \(\d+ Gold\)/);
+    const goldBefore=await page.evaluate(()=>window.__game.registry.get('application').scene.inventory.count('gold'));await sellVehicle.click();
+    assert.equal(await page.evaluate(()=>[...window.__game.registry.get('application').scene.vehicles.vehicles.values()].filter(v=>v.type==='wheelbarrow').length),0);
+    assert.ok(await page.evaluate(()=>window.__game.registry.get('application').scene.inventory.count('gold'))>goldBefore,'paid for the Wheelbarrow');
+    assert.ok(await page.locator('[data-auto-mode="wood"] option[value="between"]').count()===1,'Keep between offered');
     assert.match(await page.locator('#marketplace-status').textContent(),/is here\. Leaving in \d+:\d\d/);assert.match(await page.locator('#marketplace-status').textContent(),/Merchant’s Gold: \d+/);
     // F1.3: sell 20 Wood through the trade window; Gold arrives only when Haulers have carried it and the caravan takes it.
     const gold0=await page.evaluate(()=>window.__game.registry.get('application').scene.inventory.count('gold'));
