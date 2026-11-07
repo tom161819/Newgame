@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.48.0] - 2026-11-07
+<!-- version: {"title":"Quick job choice in the Population list","type":"feature","reconstructed":false,"saveVersion":57} -->
+### Added
+- Each resident in the Population list has a job button between the name and Locate. The unemployed get a highlighted "Assign job" button, everyone else a quieter "Change job" one.
+  - It opens a menu of professions with the free places in their buildings, for example "Woodcutter (2 free)". Professions with no free place are greyed out with "(full)" but can still be chosen.
+  - The current job is ticked. Employed residents can also be dismissed with "Unemploy".
+  - After a choice the resident goes to a building of that profession with a free place, exactly as when the job is changed in the resident's panel.
+
 ## [0.47.1] - 2026-11-07
 <!-- version: {"title":"Fields of planned Farmhouses","type":"feature","reconstructed":false,"saveVersion":57} -->
 ### Changed

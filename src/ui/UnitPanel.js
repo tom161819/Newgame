@@ -1,3 +1,4 @@
+import { changeProfession } from './jobChange.js';
 import { localized,workMessageLabel } from '../i18n/names.js';
 import { t,language } from '../i18n/index.js';
 import { SKILLS,JOBS,WORK_RULES } from '../data/jobs.js';
@@ -14,7 +15,7 @@ export class UnitPanel {
     document.querySelector('#close-unit').addEventListener('click',()=>this.close(),options);
     document.querySelector('#king-profile').addEventListener('click',()=>this.open(scene.character),options);
     this.jobSelect=document.querySelector('#assign-job');this.jobSelect.replaceChildren(...Object.entries(JOBS).map(([id,job])=>{const option=element('option','',job.name);option.value=id;return option;}));
-    this.jobSelect.addEventListener('change',()=>{if(this.unit){if(this.jobSelect.value==='idle')scene.employment?.hold(this.unit);else scene.employment?.release(this.unit);scene.workerSystem.jobs.assign(this.unit,this.jobSelect.value);scene.workplaceSystem?.assignFree?.(this.unit);}this.refresh();},options);
+    this.jobSelect.addEventListener('change',()=>{if(this.unit)changeProfession(scene,this.unit,this.jobSelect.value);this.refresh();},options);
     this.stoneToggle=document.querySelector('#stone-collect');this.stoneRadius=document.querySelector('#stone-radius');
     // S12: a Hauler's transport mode (Auto takes a free Wheelbarrow when one exists).
     this.transportRow=document.createElement('label');this.transportRow.className='transport-mode';this.transportRow.append(document.createTextNode(t('transport.mode')+' '));

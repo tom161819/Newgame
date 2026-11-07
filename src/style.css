@@ -714,3 +714,17 @@ html[data-ui-population="left"] :is(.policy-card, .employment-panel) { right:aut
 .hud-left-slot #king-cargo-deliver[hidden], .hud-left-slot #king-cargo-status[hidden] { display:none !important; }
 .hud-left-slot:has(#king-cargo-deliver:not([hidden])) #kingdom-overview, .hud-left-slot:has(#king-cargo-status:not([hidden])) #kingdom-overview { display:none; }
 @media (min-width: 761px) { .hud-left-slot { width:24.5rem; } }
+
+/* Quick job menu in the Population list (owner 7. 11. 2026). */
+.population-job { flex-shrink:0; width:30px; padding:2px; font-size:13px; line-height:1; color:#c9c4a3; }
+.population-job.is-unemployed { color:#f4d98e; border-color:#d4b96f; background:#4a4524; font-weight:700; }
+.population-job[aria-expanded="true"] { border-color:#f0d78b; background:#4a5236; }
+.population-job-menu { position:fixed; z-index:40; overflow:auto; overscroll-behavior:contain; padding:4px; border:1px solid #ab9458; border-radius:4px; background:#222e24fa; box-shadow:0 6px 24px #0009; }
+.population-job-menu[hidden] { display:none; }
+.population-job-menu .population-job-item { display:flex; align-items:center; gap:6px; width:100%; min-height:0; margin:0; padding:4px 6px; border:0; border-left:3px solid var(--job-color,#62655d); border-radius:0; background:none; box-shadow:none; transform:none; color:#e8dfbf; text-align:left; font-size:11px; line-height:1.35; }
+.population-job-menu .population-job-item:hover:not(:disabled), .population-job-menu .population-job-item:focus-visible { background:#394331; border-color:var(--job-color,#62655d); outline:none; }
+.population-job-menu .population-job-item.is-full { color:#9a9a84; }
+.population-job-menu .population-job-item:disabled { cursor:default; color:#f0d78b; background:#2f3a2b; }
+.population-job-check { width:12px; flex-shrink:0; color:#f0d78b; }
+.population-job-separator { margin:4px 2px; border:0; border-top:1px solid #545d42; }
+.population-job-menu .population-job-unemploy { border-left-color:transparent; color:#f0b38a; }
