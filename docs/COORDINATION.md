@@ -26,6 +26,7 @@ Set the plan item to `rozpracovano` instead of adding rows here. Add a line only
 
 - 2026-11-07 original chat: 0.11.0 trading with caravans, trade F1.3, schema 39 (`618bb93`); 0.10.0 merchant caravans, F1.2, schema 38 (`7f7fa0b`); 0.9.5 Marketplace and prices, F1.1 (`8da1d22`); 0.9.4 Asset Library building prices and `prices:sync` (`68e1724`, `e3d36e3`).
 - 2026-11-07 original chat: 0.9.3 Getting started help behind the HUD "?" (`9fd7d45`); 0.9.2 friendlier start – Castle on by default, 500 Gold limit, 40 of each resource, 160-unit Starter Stockpile, one Castle (`5301288`); 0.9.1 Wheat Field keeps its tool (`b8d12d9`); 0.9.0 homes and the daily rest, #58 phase B, schema 37 (`c040390`); 0.8.2 Granary first in the Food menu, #132 (`096fb0e`); Studio shared review and `build:artifact` (`3b99d1a`, `8dcb722`).
+- 2026-11-07 chat Grafika: Studio revision (55 approvals and 7 picks taken over, Wheelwright Workshop shed v2 in review); Studio page Buildings in game with price proposals in the page database (`prices/<id>`, applied by „převzít ceny“ / `prices:sync`).
 - 2026-11-07 chat Grafika: broken wall v2, Blender pilot and `blender:bake`, Path Lab wear levels (`bf856cb`); Studio concepts for every task waiting on art (`d0df979`).
 
 ## Done (GitHub era)

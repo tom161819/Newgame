@@ -301,8 +301,77 @@ try {
   await sharedContext.close();
   pass('shared review: decisions are saved to the page database with the reviewer id, other reviewers appear live with names, forged rows are ignored, files are offered through the page');
 
+  // Buildings in game (#91): prices from the game code; proposals go to the page database (`prices/<id>`).
+  const fakeDb = canWrite => {
+    const docs = new Map(), listeners = new Map();
+    const snapshotOf = collection => { const list = [...docs].filter(([p]) => p.startsWith(`${collection}/`)).map(([p, d]) => ({ id: p.split('/')[1], exists: true, data: () => structuredClone(d) })); return { docs: list, size: list.length, empty: !list.length }; };
+    const notify = collection => setTimeout(() => (listeners.get(collection) ?? []).forEach(fn => fn(snapshotOf(collection))), 0);
+    const doc = path => ({ path, set: async data => { if (!canWrite) throw Object.assign(new Error('denied'), { code: 'invalid_argument' }); docs.set(path, structuredClone(data)); notify(path.split('/')[0]); }, delete: async () => { docs.delete(path); notify(path.split('/')[0]); } });
+    const db = { doc, collection: name => ({ doc: id => doc(`${name}/${id}`), onSnapshot(next) { listeners.set(name, [...(listeners.get(name) ?? []), next]); setTimeout(() => next(snapshotOf(name)), 20); return () => {}; } }) };
+    window.__fakeClaude = { docs, put(path, data) { docs.set(path, data); notify(path.split('/')[0]); } };
+    window.claude = { use: async name => ({ db, user: { id: async () => 'u-owner', can: async () => canWrite, profiles: async ids => Object.fromEntries(ids.map(id => [id, { name: id === 'u-art' ? 'Jana' : '' }])) } })[name] ?? null };
+  };
+  {
+    const { page: local, errors: localErrors } = await open(context, 'buildings.html');
+    await local.waitForSelector('.bg-row');
+    const count = await local.evaluate(() => window.buildingsStudio.table().count);
+    assert.ok(count >= 20, 'every building of the game is listed');
+    assert.equal(await local.locator('.bg-row').count(), count);
+    assert.equal(await local.evaluate(() => window.buildingsStudio.mode()), 'local');
+    assert.match(await local.locator('#bg-mode').textContent(), /stay in this browser/);
+    assert.deepEqual(localErrors, []); await local.close();
+
+    const owner = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    await owner.addInitScript(fakeDb, true);
+    const { page: bp, errors: bpErrors } = await open(owner, 'buildings.html');
+    await bp.waitForFunction(() => window.buildingsStudio?.mode() === 'shared');
+    const game = await bp.evaluate(() => window.buildingsStudio.table().categories.flatMap(c => c.buildings).find(b => b.id === 'warehouse').cost);
+    const row = bp.locator('.bg-row[data-building="warehouse"]');
+    await row.getByRole('button', { name: 'Edit price' }).click();
+    const first = Object.keys(game)[0];
+    await row.locator(`input[data-resource="${first}"]`).fill('0');
+    assert.match(await row.locator('.bg-error').textContent(), /whole number/, 'invalid amount is refused');
+    await row.locator(`input[data-resource="${first}"]`).fill(String(game[first] + 2));
+    const add = Object.keys(game).includes('wood') ? 'iron' : 'wood';
+    await row.locator('.bg-select').selectOption(add); await row.locator('.bg-amount').fill('4');
+    await row.getByRole('button', { name: '+ Add resource' }).click();
+    assert.equal(await row.locator(`input[data-resource="${add}"]`).inputValue(), '4');
+    await row.locator('.bg-note input').fill('smoke');
+    await row.getByRole('button', { name: 'Save price change' }).click();
+    await bp.waitForFunction(() => window.__fakeClaude.docs.has('prices/warehouse'));
+    const saved = await bp.evaluate(() => window.__fakeClaude.docs.get('prices/warehouse'));
+    assert.equal(saved.buildingId, 'warehouse'); assert.equal(saved.by, 'u-owner'); assert.equal(saved.note, 'smoke');
+    assert.equal(saved.cost[first], game[first] + 2); assert.equal(saved.cost[add], 4);
+    await bp.waitForSelector('.bg-row[data-building="warehouse"].changed');
+    assert.match(await bp.locator('#bg-summary').textContent(), /1 price change waiting for Claude — write „převzít ceny“/);
+    assert.match(await row.locator('.bg-flash').textContent(), /převzít ceny/);
+    // The last resource cannot be removed.
+    await row.getByRole('button', { name: 'Edit proposal' }).click();
+    while (await row.locator('input[data-resource]').count() > 1) await row.locator('.bg-remove').first().click();
+    assert.ok(await row.locator('.bg-remove').isDisabled(), 'the last resource stays');
+    await row.getByRole('button', { name: 'Cancel' }).click();
+    // Another reviewer's proposal appears live with her name; a forged one is ignored.
+    await bp.evaluate(() => window.__fakeClaude.put('prices/castle', { buildingId: 'castle', cost: { stone: 99 }, by: 'u-art', at: '2026-11-07T08:00:00.000Z', note: '' }));
+    await bp.evaluate(() => window.__fakeClaude.put('prices/bogus', { buildingId: 'castle', cost: { unicorn: 1 }, at: '2026-11-07T09:00:00.000Z' }));
+    await bp.waitForFunction(() => /Jana/.test(document.querySelector('.bg-row[data-building="castle"] .bg-meta')?.textContent ?? ''));
+    assert.match(await bp.locator('#bg-summary').textContent(), /2 price changes waiting/);
+    await row.getByRole('button', { name: 'Discard' }).click();
+    await bp.waitForFunction(() => !window.__fakeClaude.docs.has('prices/warehouse'));
+    assert.deepEqual(await bp.evaluate(() => window.buildingsStudio.proposals().map(p => p.buildingId)), ['castle']);
+    assert.deepEqual(bpErrors, []); await owner.close();
+
+    const viewer = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    await viewer.addInitScript(fakeDb, false);
+    const { page: vp, errors: vpErrors } = await open(viewer, 'buildings.html');
+    await vp.waitForFunction(() => window.buildingsStudio?.mode() === 'shared');
+    await vp.waitForFunction(() => document.querySelector('.bg-row[data-building="warehouse"] button')?.disabled === true);
+    assert.match(await vp.locator('#bg-mode').textContent(), /needs Contributor access/);
+    assert.deepEqual(vpErrors, []); await viewer.close();
+  }
+  pass('Buildings in game: every game building with its price, edit/add/remove a resource (never the last), invalid amounts refused, proposals saved to the page database with the reviewer, others live by name, forged ignored, Discard, Viewer read-only');
+
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 } });
-  for (const path of ['index.html#watchtower', 'index.html#style-guide', 'phaser-demo.html', 'path-lab.html']) {
+  for (const path of ['index.html#watchtower', 'index.html#style-guide', 'phaser-demo.html', 'path-lab.html', 'buildings.html']) {
     const { page: small, errors: smallErrors } = await open(phone, path);
     await small.waitForTimeout(800);
     assert.equal(await small.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${path} fits a phone`);

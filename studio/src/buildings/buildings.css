@@ -1,0 +1,44 @@
+/* Buildings in game (#91): one row per building, readable down to a 390 px phone. */
+.bg-main { max-width: 1100px; }
+.bg-intro p { margin: 0 0 6px; max-width: 70ch; }
+.bg-mode { color: var(--muted); font-size: 13px; }
+.bg-search { flex: 1 1 220px; min-width: 0; }
+.bg-search input { width: 100%; }
+.bg-category h2 { font-family: var(--font-display); font-size: 19px; margin: 8px 0 8px; }
+.bg-category h2 .count { color: var(--muted); font-size: 13px; font-family: var(--font-body); font-weight: 500; }
+.bg-row { display: grid; grid-template-columns: 64px minmax(140px, 1fr) minmax(160px, 1.4fr) auto; gap: 8px 16px; align-items: center; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 8px; }
+.bg-row.changed { border-color: var(--status-review); box-shadow: inset 3px 0 0 var(--status-review); }
+.bg-row.editing { box-shadow: var(--shadow); }
+.bg-thumb { width: 64px; height: 48px; display: grid; place-items: center; }
+.bg-thumb img { max-width: 64px; max-height: 48px; image-rendering: auto; }
+.bg-thumb-none { color: var(--muted); font-size: 22px; }
+.bg-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.bg-name .sub { color: var(--muted); font-size: 12.5px; overflow-wrap: anywhere; }
+.bg-cost { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.bg-cost li { border: 1px solid var(--line); border-radius: 999px; padding: 1px 9px; font-size: 12.5px; white-space: nowrap; }
+.bg-cost li.changed { border-color: var(--status-review); color: var(--status-review); font-weight: 600; }
+.bg-cost li.added { border-color: var(--status-approved); color: var(--status-approved); font-weight: 600; }
+.bg-cost li.removed { color: var(--muted); text-decoration: line-through; }
+.bg-meta { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+.bg-row-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.bg-flash, .bg-editor { grid-column: 1 / -1; }
+.bg-flash { margin: 0; }
+.bg-editor { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.bg-editor h4 { margin: 0; font-size: 14px; }
+.bg-lines { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.bg-line { display: grid; grid-template-columns: minmax(80px, 140px) 90px auto; gap: 8px; align-items: center; }
+.bg-line.changed label { color: var(--status-review); font-weight: 600; }
+.bg-line.added label { color: var(--status-approved); font-weight: 600; }
+.bg-editor input, .bg-editor select { font: inherit; font-size: 13px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); min-width: 0; }
+.bg-add { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.bg-add .bg-amount { width: 90px; }
+.bg-note { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--muted); }
+.bg-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.bg-remove { justify-self: start; }
+.bg-remove:disabled, .bg-row-actions .button:disabled { opacity: 0.45; cursor: not-allowed; }
+@media (max-width: 720px) {
+  .bg-row { grid-template-columns: 56px minmax(0, 1fr); }
+  .bg-row > .bg-cost, .bg-row > .bg-proposal, .bg-row-actions { grid-column: 1 / -1; }
+  .bg-row-actions { justify-content: flex-start; }
+  .topbar .review-status { margin-left: 0; }
+}

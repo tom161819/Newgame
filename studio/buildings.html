@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Asset Studio · Buildings in game</title>
+    <meta name="claude:viewport-fit-sides" content="cover" />
+    <link rel="icon" href="data:," />
+    <meta name="description" content="Every building the game offers, with its price; propose new prices for Claude to apply." />
+  </head>
+  <body class="buildings-page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><strong>Buildings in game</strong><span class="brand-sub" id="bg-version">Prices from the game's code</span></div></div>
+      <nav class="views" aria-label="Studio views"><a href="./index.html#assets">Assets</a><a href="./index.html#style-guide">Style guide</a><a href="./buildings.html" aria-current="page">Buildings in game</a><a href="./phaser-demo.html">Phaser demo</a><a href="./path-lab.html">Path Lab</a></nav>
+      <div class="review-status">
+        <span id="bg-summary" class="review-summary" aria-live="polite"></span>
+        <button id="bg-copy" type="button" class="button">Copy prices JSON</button>
+      </div>
+    </header>
+    <p id="studio-alert" class="studio-alert" role="alert" hidden></p>
+    <main id="bg-main" class="workspace bg-main" tabindex="-1">
+      <div class="bg-intro">
+        <p>The game's code is the only source of truth for prices. A change you save here is a <strong>proposal</strong>: everyone with this page sees it at once, and Claude applies it to the game when you write <strong>„převzít ceny“</strong> in the MK chat Mechaniky.</p>
+        <p id="bg-mode" class="bg-mode"></p>
+      </div>
+      <div class="toolbar">
+        <label class="search bg-search"><span class="visually-hidden">Search buildings</span><input id="bg-search" type="search" placeholder="Search building or id" autocomplete="off" /></label>
+        <label class="check"><input id="bg-only-changed" type="checkbox" /> Only price changes</label>
+      </div>
+      <div id="bg-table"></div>
+    </main>
+  </body>
+  <script type="module" src="./src/buildings/main.js"></script>
+</html>

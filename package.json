@@ -29,6 +29,7 @@
     "studio:smoke": "node scripts/studio-smoke.mjs",
     "studio:export": "node scripts/studio-export.mjs",
     "studio:sync": "node scripts/studio-sync.mjs",
+    "studio:game-buildings": "node scripts/studio-game-buildings.mjs",
     "blender:bake": "node scripts/blender-bake.mjs",
     "prices:sync": "node scripts/prices-sync.mjs"
   },
