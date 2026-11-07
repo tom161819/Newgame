@@ -46,7 +46,7 @@ test('ground variants are valid, exported with a tile sheet and stay drafts or r
       assert.equal(meta.specHash, variant.hash, `${variant.id}: export is stale, run npm run studio:export`);
       assert.ok(existsSync(path.join(root, variant.paths.spriteSheet)));
       assert.deepEqual(sheet, { width: meta.surface.frames * 64, height: 32 }, `${variant.id} sheet holds 64 × 32 frames`);
-      assert.equal(meta.surface.frames, variant.spec.mode === 'path' ? WEAR_STAGES : variant.spec.tiles);
+      assert.equal(meta.surface.frames, variant.spec.mode === 'path' ? WEAR_STAGES : variant.spec.mode === 'transition' ? 16 : variant.spec.tiles);
       const review = approvals.assets[asset.id]?.variants?.[variant.id];
       if (review?.status === 'approved') assert.equal(review.specHash, variant.hash, `${variant.id}: approval matches the current spec`);
     }
