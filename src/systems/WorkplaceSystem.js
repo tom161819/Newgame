@@ -51,6 +51,22 @@ export class WorkplaceSystem {
       .sort((a,b)=>(b.skills[spec.skill]?.level??1)-(a.skills[spec.skill]?.level??1)||a.id.localeCompare(b.id,undefined,{numeric:true}));
     for(const worker of candidates){if(record.workerIds.length>=spec.capacity)break;if(this.scene.workerSystem.ai.route(worker,towerNeighbors(building)))this.assign(building,worker);}
   }
+  // After a manual profession change: a free seat of that profession, the emptiest building first, then the nearest
+  // reachable one. Returns the building, or null when no building of the profession has room (the resident then stays
+  // without a workplace). Professions without buildings (Hauler, Builder, Unemployed) are left alone.
+  hasWorkplaces(profession){return this.scene.objectRegistry?.buildables?.().some(d=>d.workplace?.profession===profession)??false;}
+  assignFree(worker){
+    const profession=worker?.profession;if(!worker?.isAlive||!profession||profession==='idle'||worker.assignedWorkplaceId!=null)return null;
+    const p=worker.position??{x:(worker.tile?.x??0)+.5,y:(worker.tile?.y??0)+.5},options=[];
+    for(const building of this.scene.buildings){
+      const spec=buildingDefinition(building).workplace;if(spec?.profession!==profession||!buildingIsComplete(building)||building.unverified||this.scene.employment?.blockReason(building))continue;
+      const record=this.register(building);if(!record||record.workerIds.length>=spec.capacity)continue;
+      const d=buildingDefinition(building);options.push({building,staff:record.workerIds.length,distance:Math.hypot(building.x+d.width/2-p.x,building.y+d.height/2-p.y)});
+    }
+    options.sort((a,b)=>a.staff-b.staff||a.distance-b.distance||a.building.id-b.building.id);
+    for(const o of options)if(this.scene.workerSystem.ai.route(worker,towerNeighbors(o.building))&&this.assign(o.building,worker))return o.building;
+    return null;
+  }
   assign(building,worker){
     if(!worker?.isAlive||worker.isSubject===false||this.scene.gameOver||!this.scene.buildings.includes(building)||!this.scene.workerSystem.workers.has(worker.id))return false;
     const spec=buildingDefinition(building).workplace,record=this.register(building);if(!spec||!record)return false;

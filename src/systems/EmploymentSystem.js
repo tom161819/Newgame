@@ -2,7 +2,7 @@ import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/bu
 import { EMPLOYMENT_PRESETS,EMPLOYMENT_PROFESSIONS,PRIORITY_RANGE,presetOf } from '../data/employment.js';
 
 // Automatic employment: fills free workplace seats with available Unemployed residents only. Seats are filled by
-// profession priority (5 → 1), then by building id; for each seat the best resident is chosen across the whole
+// profession priority (5 → 1); within one priority the building with the fewest staff goes first, then by building id; for each seat the best resident is chosen across the whole
 // kingdom: a natural talent for the skill first, then skill level, XP in the skill, overall level, stable id.
 // Employed residents are never moved. Someone the player made Unemployed by hand stays so until assigned by hand.
 export const compareForSkill=skill=>(a,b)=>Number(b.naturalTalent===skill)-Number(a.naturalTalent===skill)
@@ -66,10 +66,12 @@ export class EmploymentSystem {
       for(const priority of [...new Set(seats.map(seat=>seat.priority))]){
         const open=new Map();for(const seat of seats)if(seat.priority===priority)open.set(seat.building.id,{...seat,count:(open.get(seat.building.id)?.count??0)+1});
         while(pool.length&&open.size){
-          let best=null;
+          // Same priority: the emptiest building first (0 staff before 1, 1 before 2…), so new residents spread over
+          // the Quarry and the Hunting Lodge instead of all filling one; then the strongest match as before.
+          let best=null;const staffed=building=>this.scene.workplaceSystem.register(building)?.workerIds.length??0;
           for(const seat of open.values()){
             const worker=pool.filter(w=>reachable(w,seat.building)).sort(compareForSkill(seat.spec.skill))[0];if(!worker)continue;
-            const key=strength(worker,seat.spec.skill),wins=!best||stronger(key,best.key);
+            const key=[-staffed(seat.building),...strength(worker,seat.spec.skill)],wins=!best||stronger(key,best.key);
             if(wins)best={seat,worker,key};
           }
           if(!best)break;

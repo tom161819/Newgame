@@ -20,9 +20,9 @@ export async function staffingIndicatorsSmoke(page){
   await icon(fixture.q).hover();await page.locator('#staffing-tooltip:not([hidden])').waitFor();assert.match(await page.locator('#staffing-tooltip').textContent(),/Missing WorkersQuarryWorkers: 0 \/ 3Missing: 3/);const opacity=await icon(fixture.q).evaluate(async e=>{const a=getComputedStyle(e).opacity;await new Promise(resolve=>setTimeout(resolve,300));return[a,getComputedStyle(e).opacity];});assert.notEqual(opacity[0],opacity[1]);
   await icon(fixture.q).click();await page.locator('#workplace-dialog[open]').waitFor();assert.equal(await page.locator('#workplace-name').textContent(),'Quarry');assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').scene.character.order),fixture.kingOrder);
   await page.locator('#assign-workplace-worker').click();
-  // Assign Worker lists three groups in a fixed order; Unemployed residents come first.
-  assert.deepEqual(await page.locator('[data-candidate-group]').evaluateAll(groups=>groups.map(g=>g.dataset.candidateGroup)),['unemployed','elsewhere','same']);
-  assert.equal(await page.locator(`[data-candidate-group="unemployed"] [data-assign-worker="${fixture.workers[0]}"]`).count(),1);
+  // Assign Worker lists three groups in a fixed order: this profession without a workplace, others without one, working elsewhere.
+  assert.deepEqual(await page.locator('[data-candidate-group]').evaluateAll(groups=>groups.map(g=>g.dataset.candidateGroup)),['profession','free','employed']);
+  assert.equal(await page.locator(`[data-candidate-group="free"] [data-assign-worker="${fixture.workers[0]}"]`).count(),1);
   await page.locator(`[data-assign-worker="${fixture.workers[0]}"]`).click();
   const assignment=await page.evaluate(f=>{const s=window.__game.registry.get('application').scene,w=s.workerSystem.workers.get(f.workers[0]),status=s.staffingIndicators.model.records.get(f.q);return{assigned:w.assignedWorkplaceId,profession:w.profession,actual:s.workplaceSystem.records.get(f.q).workerIds,cached:status?.count,revision:s.staffingIndicators.model.revision};},fixture);assert.equal(assignment.assigned,fixture.q,JSON.stringify(assignment));assert.equal(assignment.cached,1,JSON.stringify(assignment));
   await page.locator('#close-workplace').click();await page.waitForFunction(id=>document.querySelector(`[data-staffing-building="${id}"]`)?.dataset.workers==='1',fixture.q);assert.equal(await icon(fixture.q).getAttribute('data-staffing-tone'),'partial');assert.equal(await icon(fixture.q).getAttribute('data-workers'),'1');

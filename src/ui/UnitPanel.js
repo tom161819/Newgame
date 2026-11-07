@@ -14,7 +14,7 @@ export class UnitPanel {
     document.querySelector('#close-unit').addEventListener('click',()=>this.close(),options);
     document.querySelector('#king-profile').addEventListener('click',()=>this.open(scene.character),options);
     this.jobSelect=document.querySelector('#assign-job');this.jobSelect.replaceChildren(...Object.entries(JOBS).map(([id,job])=>{const option=element('option','',job.name);option.value=id;return option;}));
-    this.jobSelect.addEventListener('change',()=>{if(this.unit){if(this.jobSelect.value==='idle')scene.employment?.hold(this.unit);else scene.employment?.release(this.unit);scene.workerSystem.jobs.assign(this.unit,this.jobSelect.value);}this.refresh();},options);
+    this.jobSelect.addEventListener('change',()=>{if(this.unit){if(this.jobSelect.value==='idle')scene.employment?.hold(this.unit);else scene.employment?.release(this.unit);scene.workerSystem.jobs.assign(this.unit,this.jobSelect.value);scene.workplaceSystem?.assignFree?.(this.unit);}this.refresh();},options);
     this.stoneToggle=document.querySelector('#stone-collect');this.stoneRadius=document.querySelector('#stone-radius');
     // S12: a Hauler's transport mode (Auto takes a free Wheelbarrow when one exists).
     this.transportRow=document.createElement('label');this.transportRow.className='transport-mode';this.transportRow.append(document.createTextNode(t('transport.mode')+' '));
@@ -54,7 +54,7 @@ export class UnitPanel {
       document.querySelector('#unit-talent').textContent=t('unit.talent',{talent:localized(`talent.${u.naturalTalent}`,TALENTS[u.naturalTalent]),bonus:TALENT_XP_BONUS*100,skill:SKILLS[u.naturalTalent]});
       document.querySelector('#unit-unpaid').textContent=t('unit.unpaid',{amount:s.wageSystem.unpaid(u).toFixed(2)});
       const workshop=u.profession==='builder'?s.builderWorkshops?.workshopFor(u):null;
-      document.querySelector('#unit-workplace').textContent=u.profession==='builder'&&s.builderWorkshops&&!workshop?t('unit.noBuilderWorkshop',{percent:50}):t('unit.workplace',{place:u.profession==='hauler'?t('unit.wholeKingdom'):(workshop??s.workplaceSystem?.building(u))?.definition.name??t('unit.notAssigned')});
+      document.querySelector('#unit-workplace').textContent=u.profession==='builder'&&s.builderWorkshops&&!workshop?t('unit.noBuilderWorkshop',{percent:50}):t('unit.workplace',{place:u.profession==='hauler'?t('unit.wholeKingdom'):(workshop??s.workplaceSystem?.building(u))?.definition.name??(u.profession!=='idle'&&s.workplaceSystem?.hasWorkplaces?.(u.profession)?t('unit.noFreeWorkplace'):t('unit.notAssigned'))});
       // Z2: a Hunter's dog.
       {const dog=u.profession==='hunter'?s.domestic?.dogOf?.(u):null,el=document.querySelector('#unit-workplace');if(dog)el.textContent+=` · ${t('pets.dog.unitLine',{name:dog.name,state:dog.injuredUntil!=null?t('pets.dog.injuredShort'):''}).trim()}`;}
     }

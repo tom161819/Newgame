@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.30.0] - 2026-11-07
+<!-- version: {"title":"Employment spreads people out","type":"feature","reconstructed":false,"saveVersion":54} -->
+### Changed
+- Employment spreads people out. When several buildings have the same priority, new residents go first to the building with the fewest workers. The Quarry and the Hunting Lodge now fill in turns, so one doesn't take everyone. People who already have a job are never moved, and a higher priority still comes first. Partly staffed buildings now show a yellow icon (empty ones stay red).
+- Changing a resident's profession by hand puts them straight into a building of that profession with a free seat, the emptiest one first, then the nearest. If no building has room, the unit panel says "No free workplace".
+- The Assign Worker list puts people of the building's profession without a workplace first, then everyone else without a workplace, and last those who already work in another building.
+
 ## [0.29.1] - 2026-11-07
 <!-- version: {"title":"No-builders notice is back","type":"fix","reconstructed":false,"saveVersion":54} -->
 ### Fixed

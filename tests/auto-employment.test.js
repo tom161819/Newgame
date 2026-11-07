@@ -88,3 +88,24 @@ test('current-schema exclusions roundtrip exactly and reject corrupted rules wit
  const r=fixture({starter:false});loadGameState(r,structuredClone(state));assert.deepEqual(r.employment.exportState(),state.employment);assert.equal(r.employment.blockReason(r.buildings.find(b=>b.id===a.id)),'type');
  for(const change of [e=>e.blockedBuildings.push(a.id),e=>e.blockedBuildings=[9999],e=>e.blockedBuildings=[-1],e=>e.blockedTypes=['castle'],e=>e.blockedTypes.push('quarry'),e=>delete e.blockedTypes]){const bad=structuredClone(state);change(bad.employment);assert.throws(()=>validateGameState(bad));assert.deepEqual(serializeGameState(s),state);}
 });
+
+test('same priority: the emptiest building first, so a Quarry and a Lumberjack Hut fill in turns; higher priority still wins; employed stay',()=>{
+  const s=fixture(),quarry=build(s,'quarry',55,50),lodge=build(s,'lumberjack_hut',62,50);
+  const people=[1,2,3].map(i=>resident(s,48+i,{talent:'mining',levels:{mining:5}}));s.employment.run();
+  const staff=b=>s.workplaceSystem.employees(b).length;
+  assert.deepEqual([staff(quarry),staff(lodge)],[2,1],'1st Quarry, 2nd Lumberjack Hut, 3rd Quarry again – even with mining talent everywhere');
+  const order=people.map(w=>w.assignedWorkplaceId);assert.deepEqual(order.filter(id=>id===quarry.id).length,2);
+  const s2=fixture(),q2=build(s2,'quarry',55,50),l2=build(s2,'lumberjack_hut',62,50);s2.employment.setPriority('miner',5);[1,2,3].forEach(i=>resident(s2,48+i));s2.employment.run();
+  assert.deepEqual([s2.workplaceSystem.employees(q2).length,s2.workplaceSystem.employees(l2).length],[3,0],'higher priority first');
+  const before=people.map(w=>w.assignedWorkplaceId);resident(s,52);s.employment.run();assert.deepEqual(people.map(w=>w.assignedWorkplaceId),before,'nobody is moved');
+  assert.equal(staff(lodge),2,'the newcomer goes to the emptier building');
+});
+
+test('a manual profession change takes a free seat (emptiest, then nearest); with no room the resident stays without a workplace',()=>{
+  const s=fixture(),near=build(s,'quarry',55,50),far=build(s,'quarry',80,50),busy=resident(s,56);assert.equal(s.workplaceSystem.assign(near,busy),true);
+  const w=resident(s,54);s.workerSystem.jobs.assign(w,'miner');assert.equal(s.workplaceSystem.assignFree(w)?.id,far.id,'the empty quarry before the half-full one');
+  const v=resident(s,53);s.workerSystem.jobs.assign(v,'miner');assert.equal(s.workplaceSystem.assignFree(v)?.id,near.id,'both have one: the nearer');
+  for(let i=0;i<3;i++){const x=resident(s,50+i);s.workerSystem.jobs.assign(x,'miner');s.workplaceSystem.assignFree(x);}
+  const late=resident(s,49);s.workerSystem.jobs.assign(late,'miner');assert.equal(s.workplaceSystem.assignFree(late),null,'all six seats taken');assert.equal(late.assignedWorkplaceId,null);assert.equal(late.profession,'miner');
+  const hauler=resident(s,47);s.workerSystem.jobs.assign(hauler,'hauler');assert.equal(s.workplaceSystem.assignFree(hauler),null);assert.equal(s.workplaceSystem.hasWorkplaces('hauler'),false);assert.equal(s.workplaceSystem.hasWorkplaces('miner'),true);
+});

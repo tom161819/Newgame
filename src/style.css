@@ -29,7 +29,7 @@ header p { margin: 0 0 9px; color: #bdb99d; font-size: 12px; line-height: 1.5; }
 #game canvas { display: block; }
 .worker-indicators { position:fixed; z-index:8; overflow:hidden; pointer-events:none; }
 .missing-workers { position:absolute; left:0; top:0; display:grid; place-items:center; padding:2px; border:1px solid #f0d8a2; border-radius:50%; color:#fff3d6; background:#9c332a; box-shadow:0 1px 4px #10150ed9; pointer-events:auto; animation:staffing-pulse 1.5s ease-in-out infinite; will-change:transform,opacity; }
-.missing-workers[data-staffing-tone="partial"] { background:#a65c17; }
+.missing-workers[data-staffing-tone="partial"] { background:#d2a619; color:#2a2108; }
 .missing-workers svg { display:block; width:100%; height:100%; fill:currentColor; }
 .missing-workers:focus-visible { outline:2px solid #ffe99d; outline-offset:2px; }
 .staffing-tooltip { position:fixed; z-index:21; display:grid; gap:3px; max-width:220px; padding:8px 10px; border:1px solid #a28b56; border-radius:4px; color:#ece2c4; background:#252c1cf5; font-size:12px; pointer-events:none; box-shadow:0 3px 10px #0006; }
@@ -446,7 +446,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .candidate-group h3 { margin:10px 0 2px; font-size:13px; color:#e6d7a8; }
 .candidate-list { list-style:none; padding:0; margin:0; display:grid; gap:6px; }
 .workplace-candidate { align-items:center; }
-.workplace-candidate.candidate-unemployed { background:#2b3424; border-color:#7b8a5a; box-shadow:inset 3px 0 0 #8fa266; }
+.workplace-candidate.candidate-profession { background:#2b3424; border-color:#7b8a5a; box-shadow:inset 3px 0 0 #8fa266; }
 .candidate-portrait { width:28px; height:34px; object-fit:contain; flex-shrink:0; }
 .candidate-details { display:grid; gap:2px; flex:1; min-width:0; }
 .candidate-details span { color:#c9c3a3; font-size:11px; }

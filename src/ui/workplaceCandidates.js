@@ -1,7 +1,8 @@
-// Assign Worker groups, in this fixed order: Unemployed, employed in another profession, already in this profession.
+// Assign Worker groups, in this fixed order: people of this profession without a workplace, other people without a
+// workplace (another profession or Unemployed), and last those who already work in a building.
 // Every group is sorted by the skill the building needs: level, then XP in that skill, then a natural talent for it,
 // then overall level, then the stable worker id.
-export const CANDIDATE_GROUPS=Object.freeze(['unemployed','elsewhere','same']);
+export const CANDIDATE_GROUPS=Object.freeze(['profession','free','employed']);
 
 const workerNumber=id=>Number(String(id).match(/(\d+)$/)?.[1]??Number.MAX_SAFE_INTEGER);
 export function compareCandidates(skill){
@@ -12,8 +13,8 @@ export function compareCandidates(skill){
     ||workerNumber(a.id)-workerNumber(b.id)||String(a.id).localeCompare(String(b.id));
 }
 export function candidateGroups(workers,{profession,skill}){
-  const groups={unemployed:[],elsewhere:[],same:[]};
-  for(const worker of workers)groups[worker.profession===profession?'same':worker.profession==='idle'?'unemployed':'elsewhere'].push(worker);
+  const groups={profession:[],free:[],employed:[]};
+  for(const worker of workers)groups[worker.assignedWorkplaceId!=null?'employed':worker.profession===profession?'profession':'free'].push(worker);
   for(const list of Object.values(groups))list.sort(compareCandidates(skill));
   return groups;
 }
