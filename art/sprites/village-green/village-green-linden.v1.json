@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "village-green",
+  "variantId": "village-green-linden",
+  "name": "Linden with swing and well",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "1017e4b6",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 140,
+  "anchor": {
+    "x": 97,
+    "y": 90
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.64286
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 138
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98571
+  },
+  "visualHeight": 138,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.066,
+  "lights": []
+}

@@ -7,6 +7,7 @@
 import houseRecipe from './house.js';
 import { box, cylinder, prism, sphere, clamp, squareFrustum } from './shapes.js';
 import { PROPS, PROP_TYPES } from './props.js';
+import './props-village.js';
 
 export const params = [
   { key: 'body.kind', values: ['house', 'raised', 'windmill', 'furnace', 'barn', 'shed', 'hall', 'mine', 'none'], description: 'Main structure: house, granary on staddle stones, tower windmill with sails, bloomery furnace, big barn, open lean-to shed (posts, sloping roof, low back wall; work stays visible underneath), open market hall (posts carrying a gable roof, open on all sides), mine (rocky hill over an ore deposit with a timbered adit on its +z face), or none (props only, e.g. equipment).' },

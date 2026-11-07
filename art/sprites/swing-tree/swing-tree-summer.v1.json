@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "swing-tree",
+  "variantId": "swing-tree-summer",
+  "name": "Linden with rope swing",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "f73f4371",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 75,
+  "anchor": {
+    "x": 33,
+    "y": 57
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.76
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 73
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.97333
+  },
+  "visualHeight": 73,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.3,
+  "lights": []
+}

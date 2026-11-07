@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "village-green",
+  "variantId": "village-green-maypole",
+  "name": "Maypole green",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "65a3c66c",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 107,
+  "anchor": {
+    "x": 97,
+    "y": 57
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.53271
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 105
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98131
+  },
+  "visualHeight": 105,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.38,
+  "lights": []
+}

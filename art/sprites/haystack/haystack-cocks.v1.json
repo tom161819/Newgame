@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "haystack",
+  "variantId": "haystack-cocks",
+  "name": "Haycocks",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "0cc31f7e",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 42,
+  "anchor": {
+    "x": 33,
+    "y": 24
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.57143
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 40
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.95238
+  },
+  "visualHeight": 40,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.46,
+  "lights": []
+}

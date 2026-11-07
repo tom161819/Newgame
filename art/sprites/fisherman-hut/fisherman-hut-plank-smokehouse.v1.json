@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "fisherman-hut",
+  "variantId": "fisherman-hut-plank-smokehouse",
+  "name": "Plank hut with smokehouse",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "4759d185",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 112,
+  "anchor": {
+    "x": 65,
+    "y": 78
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.69643
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 110
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98214
+  },
+  "visualHeight": 110,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "brazier",
+      "x": 27.84,
+      "y": -30.28,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    }
+  ],
+  "modelHeight": 1.44,
+  "lights": [
+    {
+      "type": "brazier",
+      "x": 92.84,
+      "y": 79.72,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    }
+  ]
+}

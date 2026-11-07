@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "id": "haystack",
+  "name": "Haystack",
+  "category": "decorations",
+  "description": "Haystack (plan g-deti-naves-grafika, 1×1): near farms; children jump into it.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "haystack",
+  "variants": [
+    {
+      "id": "haystack-dome",
+      "name": "Dome haystack",
+      "version": 1,
+      "notes": "A round haystack around a pole with a rake.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "haystack",
+            "at": [
+              0,
+              0
+            ],
+            "size": 1.1
+          }
+        ]
+      }
+    },
+    {
+      "id": "haystack-cocks",
+      "name": "Haycocks",
+      "version": 1,
+      "notes": "Three small haycocks.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "haycock",
+            "at": [
+              -0.15,
+              -0.1
+            ],
+            "size": 0.9
+          },
+          {
+            "type": "haycock",
+            "at": [
+              0.18,
+              0.05
+            ],
+            "size": 0.75
+          },
+          {
+            "type": "haycock",
+            "at": [
+              -0.05,
+              0.25
+            ],
+            "size": 0.6
+          }
+        ]
+      }
+    },
+    {
+      "id": "haystack-snow",
+      "name": "Winter",
+      "version": 1,
+      "notes": "The dome haystack under snow.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "haystack",
+            "at": [
+              0,
+              0
+            ],
+            "size": 1.1,
+            "snow": true
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,311 @@
+{
+  "schema": 1,
+  "id": "starter-stockpile",
+  "name": "Starter Stockpile (temporary storage)",
+  "category": "buildings",
+  "description": "Temporary storage at the start of the game (plan g-docasny-sklad): clearly a makeshift camp store, poorer than the Warehouse but tidy and readable at 1×.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "workshop",
+  "gameObjectId": "starter_stockpile",
+  "variants": [
+    {
+      "id": "starter-stockpile-tarp-camp",
+      "name": "Tarp camp store",
+      "version": 1,
+      "notes": "Trodden earth, a sagging linen tarp on posts over sacks and barrels, staked logs, a stone pile, crates, a tally post, a wheelbarrow and a lantern on a pole.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "groundPatch",
+            "at": [
+              0,
+              0
+            ],
+            "width": 1.78,
+            "depth": 1.78
+          },
+          {
+            "type": "canvasShelter",
+            "at": [
+              -0.22,
+              -0.35
+            ],
+            "width": 0.9,
+            "depth": 0.7
+          },
+          {
+            "type": "sacks",
+            "at": [
+              -0.5,
+              -0.42
+            ],
+            "count": 4
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -0.15,
+              -0.45
+            ],
+            "count": 3
+          },
+          {
+            "type": "stakedLogs",
+            "at": [
+              0.5,
+              -0.4
+            ],
+            "count": 9,
+            "length": 0.62,
+            "r": 1.5708
+          },
+          {
+            "type": "stonePile",
+            "at": [
+              0.5,
+              0.35
+            ],
+            "size": 1.1
+          },
+          {
+            "type": "crates",
+            "at": [
+              -0.62,
+              0.3
+            ],
+            "count": 3
+          },
+          {
+            "type": "tallyPost",
+            "at": [
+              0.05,
+              0.62
+            ]
+          },
+          {
+            "type": "lanternPole",
+            "at": [
+              -0.82,
+              0.75
+            ]
+          },
+          {
+            "type": "wheelbarrow",
+            "at": [
+              0.0,
+              0.12
+            ],
+            "r": 0.6
+          },
+          {
+            "type": "stones",
+            "at": [
+              0.75,
+              0.75
+            ],
+            "count": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "starter-stockpile-pole-shed",
+      "name": "Pole shed with fence",
+      "version": 1,
+      "notes": "A simple shingled roof on poles over neatly sorted goods, a low pole fence along the yard, logs and stone outside.",
+      "spec": {
+        "body": {
+          "kind": "shed",
+          "width": 1.1,
+          "depth": 0.7,
+          "height": 0.7,
+          "at": [
+            -0.35,
+            -0.5
+          ]
+        },
+        "props": [
+          {
+            "type": "groundPatch",
+            "at": [
+              0,
+              0
+            ],
+            "width": 1.8,
+            "depth": 1.8,
+            "material": "fieldstone_dark"
+          },
+          {
+            "type": "sacks",
+            "at": [
+              -0.6,
+              -0.5
+            ],
+            "count": 4
+          },
+          {
+            "type": "crates",
+            "at": [
+              -0.25,
+              -0.55
+            ],
+            "count": 4
+          },
+          {
+            "type": "barrels",
+            "at": [
+              0.05,
+              -0.6
+            ],
+            "count": 2
+          },
+          {
+            "type": "logs",
+            "at": [
+              0.55,
+              -0.4
+            ],
+            "count": 6,
+            "length": 0.55
+          },
+          {
+            "type": "stoneStack",
+            "at": [
+              0.55,
+              0.1
+            ]
+          },
+          {
+            "type": "fenceLine",
+            "at": [
+              -0.88,
+              0.88
+            ],
+            "to": [
+              0.88,
+              0.88
+            ]
+          },
+          {
+            "type": "fenceLine",
+            "at": [
+              0.88,
+              0.2
+            ],
+            "to": [
+              0.88,
+              0.88
+            ]
+          },
+          {
+            "type": "goodsPile",
+            "at": [
+              -0.45,
+              0.35
+            ]
+          },
+          {
+            "type": "tallyPost",
+            "at": [
+              0.3,
+              0.6
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "starter-stockpile-cart-camp",
+      "name": "Wagon camp",
+      "version": 1,
+      "notes": "A covered wagon left as the first store, a tarp lean-to beside it, sacks, logs and stones on the ground and a cold fire ring: the settlers have just arrived.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "groundPatch",
+            "at": [
+              0,
+              0
+            ],
+            "width": 1.75,
+            "depth": 1.75
+          },
+          {
+            "type": "wagon",
+            "at": [
+              -0.25,
+              -0.3
+            ],
+            "angle": 0,
+            "load": "full",
+            "horse": false
+          },
+          {
+            "type": "tarp",
+            "at": [
+              0.5,
+              -0.55
+            ]
+          },
+          {
+            "type": "sacks",
+            "at": [
+              0.55,
+              -0.15
+            ],
+            "count": 3
+          },
+          {
+            "type": "stakedLogs",
+            "at": [
+              0.45,
+              0.45
+            ],
+            "count": 7,
+            "length": 0.55
+          },
+          {
+            "type": "stonePile",
+            "at": [
+              -0.55,
+              0.5
+            ],
+            "size": 0.9
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -0.05,
+              0.4
+            ],
+            "count": 2
+          },
+          {
+            "type": "lanternPole",
+            "at": [
+              0.85,
+              -0.8
+            ]
+          },
+          {
+            "type": "campfire",
+            "at": [
+              -0.7,
+              0.05
+            ],
+            "lit": false
+          }
+        ]
+      }
+    }
+  ]
+}

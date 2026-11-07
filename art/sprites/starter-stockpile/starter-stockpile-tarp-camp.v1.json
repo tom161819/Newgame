@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "starter-stockpile",
+  "variantId": "starter-stockpile-tarp-camp",
+  "name": "Tarp camp store",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "4311f7d8",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 82,
+  "anchor": {
+    "x": 65,
+    "y": 48
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.58537
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 80
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97561
+  },
+  "visualHeight": 80,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -46.4,
+      "y": -55.89,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 0.865,
+  "lights": [
+    {
+      "type": "torch",
+      "x": 18.6,
+      "y": 24.11,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

@@ -1,0 +1,264 @@
+{
+  "schema": 1,
+  "id": "fisherman-hut",
+  "name": "Fisherman's Hut",
+  "category": "buildings",
+  "description": "Fisherman's hut (plan g-rybarstvi-grafika): nets, boat, fish racks and baskets make it unmistakable; two Fishers live and work here.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "workshop",
+  "gameObjectId": "fisherman_hut",
+  "variants": [
+    {
+      "id": "fisherman-hut-reed-cottage",
+      "name": "Thatched shore cottage",
+      "version": 1,
+      "notes": "Low timber cottage with a reed thatch, an upturned boat on trestles, nets drying on a rack, split fish on a drying rack, an eel trap, baskets of fish, oars and a fish sign.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "timber",
+          "roofMaterial": "thatch",
+          "width": 1.0,
+          "depth": 0.85,
+          "wallHeight": 0.72,
+          "roofHeight": 0.62,
+          "ridge": "x",
+          "windows": 1,
+          "chimney": true,
+          "at": [
+            -0.38,
+            -0.42
+          ]
+        },
+        "props": [
+          {
+            "type": "groundPatch",
+            "at": [
+              0.2,
+              0.3
+            ],
+            "width": 1.4,
+            "depth": 0.9
+          },
+          {
+            "type": "boat",
+            "at": [
+              0.5,
+              -0.42
+            ],
+            "upturned": true,
+            "r": 1.5708
+          },
+          {
+            "type": "netRack",
+            "at": [
+              -0.45,
+              0.42
+            ]
+          },
+          {
+            "type": "fishRack",
+            "at": [
+              0.35,
+              0.5
+            ]
+          },
+          {
+            "type": "eelTrap",
+            "at": [
+              0.7,
+              0.05
+            ],
+            "r": 0.4
+          },
+          {
+            "type": "fishBasket",
+            "at": [
+              0.05,
+              0.25
+            ]
+          },
+          {
+            "type": "fishBasket",
+            "at": [
+              -0.05,
+              0.4
+            ]
+          },
+          {
+            "type": "oars",
+            "at": [
+              0.82,
+              -0.82
+            ]
+          },
+          {
+            "type": "fishSign",
+            "at": [
+              0.15,
+              -0.05
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "fisherman-hut-plank-smokehouse",
+      "name": "Plank hut with smokehouse",
+      "version": 1,
+      "notes": "Dark plank hut with a shingle roof, a little fish smokehouse glowing at its base, a boat with oars on the ground, a net on poles, barrels of salted fish and a drying rack.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 0.9,
+          "depth": 0.8,
+          "wallHeight": 0.75,
+          "roofHeight": 0.55,
+          "ridge": "z",
+          "windows": 1,
+          "chimney": false,
+          "at": [
+            -0.38,
+            -0.36
+          ]
+        },
+        "props": [
+          {
+            "type": "smokeHut",
+            "at": [
+              0.55,
+              -0.5
+            ]
+          },
+          {
+            "type": "boat",
+            "at": [
+              0.35,
+              0.45
+            ],
+            "upturned": false,
+            "r": 0.5
+          },
+          {
+            "type": "netRack",
+            "at": [
+              -0.55,
+              0.45
+            ],
+            "r": 1.5708,
+            "width": 0.5
+          },
+          {
+            "type": "barrels",
+            "at": [
+              0.62,
+              0.0
+            ],
+            "count": 2
+          },
+          {
+            "type": "fishBasket",
+            "at": [
+              -0.05,
+              0.15
+            ]
+          },
+          {
+            "type": "fishRack",
+            "at": [
+              0.08,
+              -0.02
+            ],
+            "count": 4
+          },
+          {
+            "type": "fishSign",
+            "at": [
+              -0.15,
+              0.68
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "fisherman-hut-stilt-net-loft",
+      "name": "Hut on stilts with landing stage",
+      "version": 1,
+      "notes": "A timber hut raised on posts, a short landing stage, a boat on trestles, nets, an eel trap and drying fish: a lake-shore fishery.",
+      "spec": {
+        "body": {
+          "kind": "raised",
+          "walls": "timber",
+          "roofMaterial": "thatch",
+          "width": 0.9,
+          "depth": 0.8,
+          "wallHeight": 0.65,
+          "roofHeight": 0.55,
+          "ridge": "x",
+          "windows": 1,
+          "lift": 0.35,
+          "at": [
+            -0.4,
+            -0.38
+          ]
+        },
+        "props": [
+          {
+            "type": "pier",
+            "at": [
+              0.5,
+              -0.4
+            ],
+            "length": 0.8,
+            "width": 0.3,
+            "r": 1.5708
+          },
+          {
+            "type": "boat",
+            "at": [
+              0.45,
+              0.45
+            ],
+            "upturned": true
+          },
+          {
+            "type": "netRack",
+            "at": [
+              -0.35,
+              0.55
+            ]
+          },
+          {
+            "type": "fishRack",
+            "at": [
+              -0.7,
+              0.12
+            ],
+            "r": 1.5708,
+            "count": 5
+          },
+          {
+            "type": "eelTrap",
+            "at": [
+              0.0,
+              0.3
+            ]
+          },
+          {
+            "type": "fishBasket",
+            "at": [
+              0.08,
+              0.68
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

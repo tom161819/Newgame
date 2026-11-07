@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "id": "snowman",
+  "name": "Snowman",
+  "category": "decorations",
+  "description": "Snowman built by children in winter (plan g-deti-naves-grafika); melts in spring.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "snowman",
+  "variants": [
+    {
+      "id": "snowman-bucket",
+      "name": "Snowman with a bucket",
+      "version": 1,
+      "notes": "Three snowballs, a carrot nose, twig arms and a wooden bucket hat.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "snowman",
+            "at": [
+              0,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "snowman-scarf",
+      "name": "Snowman with scarf and cap",
+      "version": 1,
+      "notes": "A red scarf and a blue woollen cap.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "snowman",
+            "at": [
+              0,
+              0
+            ],
+            "hat": "cap"
+          }
+        ]
+      }
+    }
+  ]
+}

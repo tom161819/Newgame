@@ -1,0 +1,303 @@
+{
+  "schema": 1,
+  "id": "village-green",
+  "name": "Village Green",
+  "category": "buildings",
+  "description": "Village green 3×3 (plan g-deti-naves-grafika): a grassy common where children play and adults sit in the evening.",
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "generator": "workshop",
+  "gameObjectId": "village_green",
+  "variants": [
+    {
+      "id": "village-green-linden",
+      "name": "Linden with swing and well",
+      "version": 1,
+      "notes": "A big linden in the middle with a rope swing, a stone well, benches, a flower bed, a ball and a hoop left by the children.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "groundPatch",
+            "at": [
+              0.1,
+              0.1
+            ],
+            "width": 1.5,
+            "depth": 1.5,
+            "material": "soil"
+          },
+          {
+            "type": "stones",
+            "at": [
+              0.1,
+              0.1
+            ],
+            "count": 7,
+            "spread": 0.95,
+            "material": "fieldstone"
+          },
+          {
+            "type": "greenTree",
+            "at": [
+              -0.15,
+              -0.2
+            ],
+            "size": 1.35
+          },
+          {
+            "type": "ropeSwing",
+            "at": [
+              0.05,
+              0.05
+            ],
+            "height": 0.6
+          },
+          {
+            "type": "stoneWell",
+            "at": [
+              0.85,
+              -0.75
+            ]
+          },
+          {
+            "type": "bench",
+            "at": [
+              -0.75,
+              0.55
+            ],
+            "length": 0.5
+          },
+          {
+            "type": "bench",
+            "at": [
+              0.35,
+              0.85
+            ],
+            "length": 0.5,
+            "r": 1.5708
+          },
+          {
+            "type": "flowerBed",
+            "at": [
+              -0.95,
+              -0.95
+            ]
+          },
+          {
+            "type": "ball",
+            "at": [
+              0.65,
+              0.45
+            ]
+          },
+          {
+            "type": "hoop",
+            "at": [
+              -0.4,
+              0.9
+            ]
+          },
+          {
+            "type": "stones",
+            "at": [
+              1.1,
+              1.05
+            ],
+            "count": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "village-green-maypole",
+      "name": "Maypole green",
+      "version": 1,
+      "notes": "A ribboned maypole, a swing frame, a sweep well, a way cross with flowers, log benches and a haystack: festive and open for games.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "groundPatch",
+            "at": [
+              0.1,
+              0.1
+            ],
+            "width": 1.5,
+            "depth": 1.5,
+            "material": "soil"
+          },
+          {
+            "type": "stones",
+            "at": [
+              0.1,
+              0.1
+            ],
+            "count": 7,
+            "spread": 0.95,
+            "material": "fieldstone"
+          },
+          {
+            "type": "maypole",
+            "at": [
+              0,
+              0
+            ]
+          },
+          {
+            "type": "swingFrame",
+            "at": [
+              -0.8,
+              -0.75
+            ]
+          },
+          {
+            "type": "sweepWell",
+            "at": [
+              0.8,
+              -0.8
+            ]
+          },
+          {
+            "type": "wayCross",
+            "at": [
+              -1.1,
+              0.9
+            ]
+          },
+          {
+            "type": "logSeat",
+            "at": [
+              0.75,
+              0.75
+            ],
+            "length": 0.45
+          },
+          {
+            "type": "logSeat",
+            "at": [
+              0.45,
+              1.05
+            ],
+            "length": 0.4,
+            "r": 1.5708
+          },
+          {
+            "type": "flowerBed",
+            "at": [
+              -0.5,
+              0.85
+            ]
+          },
+          {
+            "type": "ball",
+            "at": [
+              0.4,
+              0.3
+            ]
+          },
+          {
+            "type": "haystack",
+            "at": [
+              1.05,
+              0.15
+            ],
+            "size": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "id": "village-green-oak-cross",
+      "name": "Old oak with stone cross",
+      "version": 1,
+      "notes": "An old oak with a bench, a stone cross, a well with a little roof and a haystack the children jump into.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "groundPatch",
+            "at": [
+              0.1,
+              0.1
+            ],
+            "width": 1.5,
+            "depth": 1.5,
+            "material": "soil"
+          },
+          {
+            "type": "stones",
+            "at": [
+              0.1,
+              0.1
+            ],
+            "count": 7,
+            "spread": 0.95,
+            "material": "fieldstone"
+          },
+          {
+            "type": "greenTree",
+            "at": [
+              0.2,
+              -0.3
+            ],
+            "size": 1.25
+          },
+          {
+            "type": "bench",
+            "at": [
+              0.2,
+              0.3
+            ],
+            "length": 0.55
+          },
+          {
+            "type": "wayCross",
+            "at": [
+              -0.9,
+              -0.9
+            ]
+          },
+          {
+            "type": "stoneWell",
+            "at": [
+              -0.8,
+              0.6
+            ]
+          },
+          {
+            "type": "haystack",
+            "at": [
+              0.95,
+              0.75
+            ],
+            "size": 0.85
+          },
+          {
+            "type": "hoop",
+            "at": [
+              -0.2,
+              0.85
+            ]
+          },
+          {
+            "type": "flowerBed",
+            "at": [
+              0.9,
+              -0.9
+            ],
+            "r": 1.5708
+          }
+        ]
+      }
+    }
+  ]
+}

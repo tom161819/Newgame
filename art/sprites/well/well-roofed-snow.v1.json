@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "well",
+  "variantId": "well-roofed-snow",
+  "name": "Stone well in winter",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "8294c468",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 63,
+  "anchor": {
+    "x": 33,
+    "y": 45
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.71429
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 61
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.96825
+  },
+  "visualHeight": 61,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.01,
+  "lights": []
+}

@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "id": "swing-tree",
+  "name": "Swing Tree",
+  "category": "decorations",
+  "description": "Tree with a swing (plan g-deti-naves-grafika, 1×1): +1 for houses nearby; children swing on it.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "swing_tree",
+  "variants": [
+    {
+      "id": "swing-tree-summer",
+      "name": "Linden with rope swing",
+      "version": 1,
+      "notes": "Summer foliage, a rope swing on a low branch.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "greenTree",
+            "at": [
+              -0.1,
+              -0.1
+            ],
+            "size": 0.85
+          },
+          {
+            "type": "ropeSwing",
+            "at": [
+              0.0,
+              0.1
+            ],
+            "height": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "id": "swing-tree-autumn",
+      "name": "Autumn",
+      "version": 1,
+      "notes": "The same tree in autumn colours.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "greenTree",
+            "at": [
+              -0.1,
+              -0.1
+            ],
+            "size": 0.85,
+            "season": "autumn"
+          },
+          {
+            "type": "ropeSwing",
+            "at": [
+              0.0,
+              0.1
+            ],
+            "height": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "id": "swing-tree-winter",
+      "name": "Winter",
+      "version": 1,
+      "notes": "Bare branches, snow at the foot.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "greenTree",
+            "at": [
+              -0.1,
+              -0.1
+            ],
+            "size": 0.85,
+            "season": "winter"
+          },
+          {
+            "type": "ropeSwing",
+            "at": [
+              0.0,
+              0.1
+            ],
+            "height": 0.5
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "pitch-kiln",
+  "variantId": "pitch-kiln-stone-oven",
+  "name": "Stone pitch oven with shed",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "1191704c",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 118,
+  "anchor": {
+    "x": 65,
+    "y": 84
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.71186
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 116
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98305
+  },
+  "visualHeight": 116,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "brazier",
+      "x": 6.4,
+      "y": -22.73,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    }
+  ],
+  "modelHeight": 1.69,
+  "lights": [
+    {
+      "type": "brazier",
+      "x": 71.4,
+      "y": 93.27,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    }
+  ]
+}

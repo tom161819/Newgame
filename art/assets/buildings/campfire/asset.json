@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "id": "campfire",
+  "name": "Campfire",
+  "category": "buildings",
+  "description": "Campfire (plan g-noc-grafika): built anywhere for one night, keeps wolves away; burns out to a cold fire ring by morning.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "campfire",
+  "variants": [
+    {
+      "id": "campfire-burning",
+      "name": "Burning campfire",
+      "version": 1,
+      "notes": "Stone ring, crossed logs burning, a log seat and a bedroll.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "campfire",
+            "at": [
+              0,
+              0
+            ],
+            "lit": true
+          },
+          {
+            "type": "logSeat",
+            "at": [
+              0.0,
+              -0.32
+            ],
+            "length": 0.38
+          },
+          {
+            "type": "bedroll",
+            "at": [
+              0.25,
+              0.2
+            ],
+            "r": 1.2
+          }
+        ]
+      }
+    },
+    {
+      "id": "campfire-cold",
+      "name": "Burnt-out fire ring",
+      "version": 1,
+      "notes": "The morning after: charred logs and ash in the stone ring.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "campfire",
+            "at": [
+              0,
+              0
+            ],
+            "lit": false
+          },
+          {
+            "type": "logSeat",
+            "at": [
+              0.0,
+              -0.32
+            ],
+            "length": 0.38
+          },
+          {
+            "type": "stones",
+            "at": [
+              0.28,
+              0.25
+            ],
+            "count": 3,
+            "spread": 0.08
+          },
+          {
+            "type": "billets",
+            "at": [
+              -0.38,
+              0.22
+            ],
+            "r": 1.5708
+          }
+        ]
+      }
+    }
+  ]
+}

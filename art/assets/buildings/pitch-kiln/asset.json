@@ -1,0 +1,172 @@
+{
+  "schema": 1,
+  "id": "pitch-kiln",
+  "name": "Pitch Kiln",
+  "category": "buildings",
+  "description": "Pitch kiln (Smolárna, plan g-noc-grafika, 2×2): makes pitch and torches. Dark, smoky and tar-stained, unlike any other workshop.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "pitch_kiln",
+  "variants": [
+    {
+      "id": "pitch-kiln-turf-kiln",
+      "name": "Turf-covered tar kiln",
+      "version": 1,
+      "notes": "A domed earth-and-turf tar kiln smoking at the top, its run-off spout feeding a trough, a cauldron of pitch on a tripod fire, tarred barrels, resinous stumps, billets and a crate of finished torches; a lean-to for the pitch maker.",
+      "spec": {
+        "body": {
+          "kind": "shed",
+          "width": 0.8,
+          "depth": 0.55,
+          "height": 0.62,
+          "at": [
+            -0.5,
+            -0.6
+          ]
+        },
+        "props": [
+          {
+            "type": "groundPatch",
+            "at": [
+              0,
+              0
+            ],
+            "width": 1.8,
+            "depth": 1.8
+          },
+          {
+            "type": "tarKiln",
+            "at": [
+              0.35,
+              -0.35
+            ],
+            "size": 1.05
+          },
+          {
+            "type": "tarCauldron",
+            "at": [
+              -0.45,
+              0.35
+            ]
+          },
+          {
+            "type": "tarBarrels",
+            "at": [
+              0.45,
+              0.45
+            ],
+            "count": 4
+          },
+          {
+            "type": "stumpPile",
+            "at": [
+              -0.75,
+              -0.05
+            ]
+          },
+          {
+            "type": "billets",
+            "at": [
+              -0.15,
+              -0.1
+            ]
+          },
+          {
+            "type": "torchBundle",
+            "at": [
+              0.0,
+              0.55
+            ]
+          },
+          {
+            "type": "lanternPole",
+            "at": [
+              -0.85,
+              0.8
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "pitch-kiln-stone-oven",
+      "name": "Stone pitch oven with shed",
+      "version": 1,
+      "notes": "A small stone building with a chimney, a domed oven, a pitch cauldron, tarred barrels and crates of torches; tidier, a later-game workshop.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "stone",
+          "roofMaterial": "roof_shingle",
+          "width": 0.85,
+          "depth": 0.72,
+          "wallHeight": 0.7,
+          "roofHeight": 0.5,
+          "ridge": "x",
+          "windows": 1,
+          "chimney": true,
+          "at": [
+            -0.38,
+            -0.42
+          ]
+        },
+        "props": [
+          {
+            "type": "oven",
+            "at": [
+              0.45,
+              -0.45
+            ]
+          },
+          {
+            "type": "tarCauldron",
+            "at": [
+              0.5,
+              0.3
+            ]
+          },
+          {
+            "type": "tarBarrels",
+            "at": [
+              -0.6,
+              0.35
+            ],
+            "count": 3
+          },
+          {
+            "type": "torchBundle",
+            "at": [
+              -0.1,
+              0.4
+            ]
+          },
+          {
+            "type": "torchBundle",
+            "at": [
+              0.08,
+              0.62
+            ]
+          },
+          {
+            "type": "stumpPile",
+            "at": [
+              0.75,
+              0.75
+            ]
+          },
+          {
+            "type": "billets",
+            "at": [
+              -0.2,
+              0.0
+            ],
+            "r": 1.5708
+          }
+        ]
+      }
+    }
+  ]
+}

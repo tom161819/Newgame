@@ -1,0 +1,121 @@
+{
+  "schema": 1,
+  "assetId": "pitch-kiln",
+  "variantId": "pitch-kiln-turf-kiln",
+  "name": "Turf-covered tar kiln",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "ec5ca2de",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 90,
+  "anchor": {
+    "x": 65,
+    "y": 56
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.62222
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 88
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97778
+  },
+  "visualHeight": 88,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "brazier",
+      "x": 11.89,
+      "y": -29.53,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    },
+    {
+      "type": "brazier",
+      "x": -25.6,
+      "y": -37.13,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    },
+    {
+      "type": "torch",
+      "x": -48.96,
+      "y": -55.57,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 0.86,
+  "lights": [
+    {
+      "type": "brazier",
+      "x": 76.89,
+      "y": 58.47,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    },
+    {
+      "type": "brazier",
+      "x": 39.4,
+      "y": 50.87,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    },
+    {
+      "type": "torch",
+      "x": 16.04,
+      "y": 32.43,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

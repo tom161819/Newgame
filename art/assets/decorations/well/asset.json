@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "id": "well",
+  "name": "Well",
+  "category": "decorations",
+  "description": "Well (plan g-deti-naves-grafika, 1×1): +1 for houses nearby; later water for baking and fire-fighting.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "well",
+  "variants": [
+    {
+      "id": "well-roofed",
+      "name": "Stone well with roof",
+      "version": 1,
+      "notes": "Fieldstone well with a little shingle roof, windlass and bucket.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "stoneWell",
+            "at": [
+              0,
+              0
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "well-sweep",
+      "name": "Sweep well",
+      "version": 1,
+      "notes": "A wooden well with a long counterweighted sweep pole.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "sweepWell",
+            "at": [
+              0.1,
+              0.05
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "well-roofed-snow",
+      "name": "Stone well in winter",
+      "version": 1,
+      "notes": "The roofed well with snow.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "stoneWell",
+            "at": [
+              0,
+              0
+            ],
+            "snow": true
+          }
+        ]
+      }
+    }
+  ]
+}

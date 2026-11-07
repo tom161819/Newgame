@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "starter-stockpile",
+  "variantId": "starter-stockpile-pole-shed",
+  "name": "Pole shed with fence",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "cc96a0c2",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 89,
+  "anchor": {
+    "x": 65,
+    "y": 55
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.61798
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 87
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97753
+  },
+  "visualHeight": 87,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.86,
+  "lights": []
+}
