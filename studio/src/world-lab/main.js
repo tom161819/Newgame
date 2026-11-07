@@ -2,6 +2,7 @@
 // database and propose the default settings for the mechanics chat ("převzít svět").
 import '../styles.css';
 import './world-lab.css';
+import { trackTopbarHeight } from '../lib/topbarHeight.js';
 import {
   WORLD_GENERATOR_VERSION, WORLD_SETTINGS, WORLD_PRESETS, DEFAULT_WORLD_LEVELS, applyPresets, presetsFromLevels, randomSeed,
   readCode, makeCode, worldFor, checks, readFavourite, defaultsProposal, slug, PLAYER_START, COLUMNS, ROWS,
@@ -219,6 +220,7 @@ window.worldLab = {
   applyCode, setLevel: (key, level) => { const i = WORLD_SETTINGS.findIndex(s => s.key === key); state.levels[i] = level; renderSettings(); regenerate(); },
   favourites: () => [...state.favourites.values()], proposal: () => state.proposal, focus: () => ({ ...state.focus }),
 };
+trackTopbarHeight();
 preload();
 renderSettings(); renderSummary(); loadFavourites(readLocalFavourites());
 regenerate();

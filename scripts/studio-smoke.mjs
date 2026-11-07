@@ -38,6 +38,29 @@ try {
   assert.ok(assets.some(a => a.id === 'watchtower' && a.variants.length >= 3) && assets.some(a => a.id === 'torch-post'));
   assert.ok(await page.locator('.library-item').count() >= assets.length + 10, 'studio and game assets are listed');
   pass(`gallery lists ${assets.length} studio assets and ${await page.evaluate(() => window.assetStudio.gameAssets().length)} current game sprites`);
+  // g-studio-menu-rolovani: the library list scrolls on its own; choosing the last design keeps the preview in view.
+  {
+    const listBox = () => page.evaluate(() => { const l = document.querySelector('#library-list'); return { top: l.scrollTop, max: l.scrollHeight - l.clientHeight, page: scrollY }; });
+    assert.ok((await listBox()).max > 300, 'the library list is longer than the window and scrolls');
+    assert.ok((await page.locator('#library-review').boundingBox()).height > 30, 'the filters above the list keep their size');
+    await page.locator('#library-list').hover();
+    await page.mouse.wheel(0, 20000); await page.waitForTimeout(300);
+    const scrolled = await listBox();
+    assert.ok(scrolled.top > 300 && scrolled.page === 0, `the list scrolls, the page stays (${JSON.stringify(scrolled)})`);
+    await page.locator('.library-item').last().click();
+    const after = await listBox();
+    assert.ok(Math.abs(after.top - scrolled.top) < 40 && after.page === 0, `the list keeps its position (${JSON.stringify(after)})`);
+    const head = await page.locator('#main h1').boundingBox();
+    assert.ok(head && head.y > 0 && head.y < 400, 'the preview of the last design is in view');
+    const lastHash = await page.evaluate(() => location.hash);
+    const { page: linked } = await open(context, `index.html${lastHash}`);
+    await linked.waitForFunction(() => window.assetStudio?.ready);
+    const shown = await linked.evaluate(() => { const l = document.querySelector('#library-list').getBoundingClientRect(), i = document.querySelector('.library-item[aria-current="true"]').getBoundingClientRect(); return i.top >= l.top - 1 && i.bottom <= l.bottom + 1; });
+    assert.ok(shown, 'a design opened by link is scrolled into view in the list');
+    await linked.close();
+    await page.locator('#library-list').evaluate(l => { l.scrollTop = 0; });
+  }
+  pass('library list scrolls on its own: the page stays, the preview of the last design is in view, a linked design is revealed in the list');
 
   await page.getByRole('button', { name: /^Decorations/ }).click();
   const decorations = await page.locator('.library-item .name').allTextContents();

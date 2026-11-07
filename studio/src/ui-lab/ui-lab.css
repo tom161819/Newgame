@@ -1,6 +1,6 @@
 /* UI Lab: controls on the left, the scaled game screen on the right; stacks on a phone. */
 .ul-shell { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: 0; min-height: calc(100% - 60px); }
-.ul-controls { border-right: 1px solid var(--line); background: var(--surface); padding: 14px 12px 40px max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 12px; min-width: 0; max-height: calc(100dvh - 60px); overflow: auto; position: sticky; top: 0; }
+.ul-controls { border-right: 1px solid var(--line); background: var(--surface); padding: 14px 12px 40px max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 12px; min-width: 0; max-height: calc(100dvh - var(--topbar-h, 60px)); overflow: auto; overscroll-behavior: contain; position: sticky; top: var(--topbar-h, 60px); }
 .ul-controls > * { flex-shrink: 0; }
 .ul-tabs { width: 100%; }
 .ul-tabs [role="tab"] { flex: 1; }

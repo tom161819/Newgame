@@ -1,6 +1,6 @@
 /* World Lab: settings on the left; map, checks and the isometric window on the right; stacks on a phone. */
 .wl-shell { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); min-height: calc(100% - 60px); }
-.wl-controls { border-right: 1px solid var(--line); background: var(--surface); padding: 14px 12px 40px max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 16px; min-width: 0; max-height: calc(100dvh - 60px); overflow: auto; position: sticky; top: 0; }
+.wl-controls { border-right: 1px solid var(--line); background: var(--surface); padding: 14px 12px 40px max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 16px; min-width: 0; max-height: calc(100dvh - var(--topbar-h, 60px)); overflow: auto; overscroll-behavior: contain; position: sticky; top: var(--topbar-h, 60px); }
 .wl-controls section { display: flex; flex-direction: column; gap: 8px; }
 .wl-controls h3 { margin: 0; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; align-items: baseline; }
 .wl-controls h3 .link { text-transform: none; letter-spacing: 0; font-size: 12px; }

@@ -3,6 +3,7 @@
 // (art/ui/ui-theme.css) and the shared applyUiConfig (art/ui/uiConfig.js) that the game uses too. Designs are kept in
 // the Studio page's database (`ui/<id>`); the one marked for the game is taken over by the Mechaniky chat („převzít UI“).
 import '../styles.css';
+import { trackTopbarHeight } from '../lib/topbarHeight.js';
 import './ui-lab.css';
 import {
   normalizeUiConfig, applyUiConfig, sectionsOf, FONTS, TEXTURES, FRAMES, SHADOWS, HEADINGS, COLOR_TOKENS, LAYOUT, PANELS,
@@ -390,3 +391,4 @@ renderControls();
 renderSummary();
 buildFrame();
 connectShared();
+trackTopbarHeight();

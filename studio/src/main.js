@@ -1,4 +1,5 @@
 import './styles.css';
+import { trackTopbarHeight } from './lib/topbarHeight.js';
 import { loadStudioData } from './data.js';
 import { buildCatalog, filterCatalog, CATEGORIES } from './lib/specs.js';
 import { STATUS_LABELS, readLocal, writeLocal, reviewState, reviewSummary, updateLocal, discardLocal, buildExportManifest, pendingChanges, gameArtSources, inGame } from './lib/approvals.js';
@@ -146,7 +147,7 @@ function renderLibrary() {
     c.label, c.id === 'all' ? null : h('span', { class: 'count' }, counts[c.id])));
   $('#library-categories').replaceChildren(...chips);
   const items = filterCatalog(catalog.all, libraryFilter({ category: state.category, query: state.query }));
-  const list = $('#library-list');
+  const list = $('#library-list'), scrollTop = list.scrollTop;
   if (!items.length) { list.replaceChildren(h('li', { class: 'empty' }, state.review === 'pending' ? 'Nothing here waits for your review: every studio design in this filter is decided for its current version, and current game sprites are hidden.' : reviewFilterOn() ? 'No designs in this review state.' : 'No assets match this filter.')); return; }
   const groups = [['studio', 'Studio assets'], ['game', 'Current game sprites']];
   list.replaceChildren(...groups.flatMap(([source, label]) => {
@@ -154,6 +155,21 @@ function renderLibrary() {
     if (!group.length) return [];
     return [h('li', { class: 'library-group' }, label), ...group.map(item => h('li', {}, libraryItem(item)))];
   }));
+  list.scrollTop = scrollTop;
+}
+// Scroll the library list (only the list, not the page) so the selected design is visible.
+function revealSelected() {
+  const list = $('#library-list'), item = list.querySelector('.library-item[aria-current="true"]');
+  if (!item) return;
+  const top = item.getBoundingClientRect().top - list.getBoundingClientRect().top + list.scrollTop, bottom = top + item.offsetHeight;
+  if (top < list.scrollTop) list.scrollTop = top - 8;
+  else if (bottom > list.scrollTop + list.clientHeight) list.scrollTop = bottom - list.clientHeight + 8;
+}
+// Wide layout: after choosing a design, bring the top of the preview into view if the page was scrolled past it.
+function revealWorkspace() {
+  if (!matchMedia('(min-width: 821px)').matches) return;
+  const main = $('#main'), bar = document.querySelector('.topbar')?.getBoundingClientRect().bottom ?? 0;
+  if (main.getBoundingClientRect().top < bar) window.scrollTo({ top: window.scrollY + main.getBoundingClientRect().top - bar });
 }
 function libraryItem(item) {
   const thumb = h('span', { class: 'thumb' });
@@ -178,6 +194,7 @@ function select(id) {
   if (location.hash !== `#${assetHash(id)}`) history.replaceState(null, '', `#${assetHash(id)}`);
   renderAll();
   $('#main').focus({ preventScroll: true });
+  revealSelected(); revealWorkspace();
 }
 
 // ---------- workspace ----------
@@ -780,7 +797,9 @@ function route() {
     if (match) state.selected = match.id;
   }
   renderAll();
+  revealSelected();
 }
+trackTopbarHeight();
 $('#library-search').addEventListener('input', event => { state.query = event.target.value; renderLibrary(); });
 window.addEventListener('hashchange', route);
 let resizeTimer;
