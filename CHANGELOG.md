@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.50.1] - 2026-11-07
+<!-- version: {"title":"Tutorial look follows the UI style","type":"feature","reconstructed":false,"saveVersion":57} -->
+### Changed
+- The tutorial bubble, pointer, tips, speed buttons and Royal tasks card follow the chosen interface style. The speed buttons show icons. The UI Lab offers a golden arrow or a pointing hand as the tutorial pointer.
+
+
 ## [0.50.0] - 2026-11-07
 <!-- version: {"title":"Animals in their approved looks","type":"feature","reconstructed":false,"saveVersion":57} -->
 ### Added

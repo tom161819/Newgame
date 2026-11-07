@@ -2,7 +2,7 @@
   "schema": 1,
   "name": "Dark wood and iron",
   "style": "wood-iron",
-  "tokens": { "page": "#1c140e", "panel": "#3a2a1c", "panelRaised": "#4a3524", "glass": "rgb(44 31 20 / .92)", "line": "#8d6c3f", "lineSoft": "#5f4730", "ink": "#f4e7cd", "muted": "#cbb48f", "accent": "#eab65b", "button": "#5c422a", "buttonInk": "#f7e8c9", "field": "#2a1e14", "good": "#acc66e", "bad": "#e47a5f", "fontUi": "figtree", "fontDisplay": "cinzel", "fontScale": 1, "radius": 5, "borderWidth": 2, "texture": "wood", "frame": "rivets", "shadow": "hard", "headings": "smallcaps", "light": false },
+  "tokens": { "page": "#1c140e", "panel": "#3a2a1c", "panelRaised": "#4a3524", "glass": "rgb(44 31 20 / .92)", "line": "#8d6c3f", "lineSoft": "#5f4730", "ink": "#f4e7cd", "muted": "#cbb48f", "accent": "#eab65b", "button": "#5c422a", "buttonInk": "#f7e8c9", "field": "#2a1e14", "good": "#acc66e", "bad": "#e47a5f", "fontUi": "figtree", "fontDisplay": "cinzel", "fontScale": 1, "radius": 5, "borderWidth": 2, "texture": "wood", "frame": "rivets", "shadow": "hard", "headings": "smallcaps", "light": false, "pointer": "arrow" },
   "layout": { "hud": "bottom", "buildingsBar": "bottom", "settings": "left", "population": "right", "cornerStack": "top-right", "dialogs": "center", "unitPanel": "right", "camera": "top-left", "header": "shown", "density": "comfortable" },
   "panels": {}
 }

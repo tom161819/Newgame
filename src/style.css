@@ -795,3 +795,36 @@ html[data-ui-population="left"] :is(.policy-card, .employment-panel) { right:aut
 .royal-goals.goal-flash { animation:royal-goal-flash 1.2s ease-out; }
 @keyframes royal-goal-flash { 0% { box-shadow:0 0 0 0 rgba(255,224,138,.9); background:rgba(90,72,30,.95); } 100% { box-shadow:0 0 0 14px rgba(255,224,138,0); } }
 @media (max-width:640px) { .royal-goals { font-size:12px; } }
+
+/* g-e3-tutorial-vzhled: the tutorial bubble, arrow, tick, speed buttons and Royal tasks card follow the UI style
+   (game variables, overridden by the UI Lab themes). Pointer: golden arrow (default) or pointing hand,
+   html[data-ui-pointer="hand"]. Speed buttons show icons (pause, one to three play triangles); labels stay in aria-label. */
+.tutorial-bubble { border:var(--ui-border,1px) solid var(--gold); border-radius:var(--ui-radius,8px); background:var(--panel); color:var(--ink); box-shadow:0 8px 28px #000a, inset 0 1px 0 rgb(255 255 255 / .06); }
+.tutorial-bubble::after { content:""; position:absolute; inset:-1px auto -1px -1px; width:4px; border-radius:var(--ui-radius,8px) 0 0 var(--ui-radius,8px); background:var(--gold); }
+.tutorial-count { color:var(--gold); font-weight:600; }
+.tutorial-text { font-size:14px; color:var(--ink); }
+.tutorial-actions .tutorial-show, .tutorial-actions .tutorial-next { border-color:var(--gold); background:color-mix(in srgb, var(--gold) 28%, var(--panel)); color:var(--ink); font-weight:600; }
+.tutorial-actions .tutorial-skip { background:transparent; border-color:var(--line-soft); color:var(--muted); }
+.tutorial-close { color:var(--muted); }
+.tutorial-arrow { width:40px; height:26px; background:var(--gold); filter:drop-shadow(0 0 2px #000) drop-shadow(0 2px 3px #000a); }
+.tutorial-arrow.offscreen { background:color-mix(in srgb, var(--gold) 70%, #fff); width:30px; height:20px; }
+html[data-ui-pointer="hand"] .tutorial-arrow { clip-path:none; -webkit-mask:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MCAyNiI+PGcgZmlsbD0iI2ZmZiI+PHJlY3QgeD0iMCIgeT0iNyIgd2lkdGg9IjciIGhlaWdodD0iMTUiIHJ4PSIxLjUiLz48cmVjdCB4PSI2IiB5PSI1IiB3aWR0aD0iMTciIGhlaWdodD0iMTgiIHJ4PSI1Ii8+PHJlY3QgeD0iMTgiIHk9IjUiIHdpZHRoPSIyMSIgaGVpZ2h0PSI2LjUiIHJ4PSIzLjIiLz48cmVjdCB4PSIxOCIgeT0iMTEuNSIgd2lkdGg9IjkiIGhlaWdodD0iNC4yIiByeD0iMi4xIi8+PHJlY3QgeD0iMTgiIHk9IjE1LjQiIHdpZHRoPSI4LjUiIGhlaWdodD0iNCIgcng9IjIiLz48cmVjdCB4PSIxNyIgeT0iMTkiIHdpZHRoPSI3LjUiIGhlaWdodD0iNCIgcng9IjIiLz48ZWxsaXBzZSBjeD0iMTUiIGN5PSI1IiByeD0iNi41IiByeT0iMyIvPjwvZz48L3N2Zz4=") center / contain no-repeat; mask:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MCAyNiI+PGcgZmlsbD0iI2ZmZiI+PHJlY3QgeD0iMCIgeT0iNyIgd2lkdGg9IjciIGhlaWdodD0iMTUiIHJ4PSIxLjUiLz48cmVjdCB4PSI2IiB5PSI1IiB3aWR0aD0iMTciIGhlaWdodD0iMTgiIHJ4PSI1Ii8+PHJlY3QgeD0iMTgiIHk9IjUiIHdpZHRoPSIyMSIgaGVpZ2h0PSI2LjUiIHJ4PSIzLjIiLz48cmVjdCB4PSIxOCIgeT0iMTEuNSIgd2lkdGg9IjkiIGhlaWdodD0iNC4yIiByeD0iMi4xIi8+PHJlY3QgeD0iMTgiIHk9IjE1LjQiIHdpZHRoPSI4LjUiIGhlaWdodD0iNCIgcng9IjIiLz48cmVjdCB4PSIxNyIgeT0iMTkiIHdpZHRoPSI3LjUiIGhlaWdodD0iNCIgcng9IjIiLz48ZWxsaXBzZSBjeD0iMTUiIGN5PSI1IiByeD0iNi41IiByeT0iMyIvPjwvZz48L3N2Zz4=") center / contain no-repeat; }
+.tutorial-done { color:var(--good,#b9e28a); }
+.tutorial-bubble.is-tip::after { background:var(--good,#9fbf7a); }
+.speed-controls .speed-button { position:relative; min-width:30px; height:24px; padding:0 6px; font-size:0; color:var(--ink); }
+.speed-controls .speed-button::before { content:""; display:block; height:12px; margin:auto; background:currentColor; -webkit-mask:var(--speed-icon) center / contain no-repeat; mask:var(--speed-icon) center / contain no-repeat; }
+.speed-controls .speed-button[data-speed="0"] { --speed-icon:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNCAxOCI+PGcgZmlsbD0iI2ZmZiI+PHJlY3QgeD0iMiIgeT0iMyIgd2lkdGg9IjMuNiIgaGVpZ2h0PSIxMiIgcng9IjEiLz48cmVjdCB4PSI4LjQiIHk9IjMiIHdpZHRoPSIzLjYiIGhlaWdodD0iMTIiIHJ4PSIxIi8+PC9nPjwvc3ZnPg=="); }
+.speed-controls .speed-button[data-speed="0"]::before { width:10px; }
+.speed-controls .speed-button[data-speed="1"] { --speed-icon:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNCAxOCI+PGcgZmlsbD0iI2ZmZiI+PHBhdGggZD0iTTIgMyBMMTEgOSBMMiAxNVoiLz48L2c+PC9zdmc+"); }
+.speed-controls .speed-button[data-speed="1"]::before { width:9px; }
+.speed-controls .speed-button[data-speed="2"] { --speed-icon:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMyAxOCI+PGcgZmlsbD0iI2ZmZiI+PHBhdGggZD0iTTIgMyBMMTEgOSBMMiAxNVoiLz48cGF0aCBkPSJNMTEgMyBMMjAgOSBMMTEgMTVaIi8+PC9nPjwvc3ZnPg=="); }
+.speed-controls .speed-button[data-speed="2"]::before { width:15px; }
+.speed-controls .speed-button[data-speed="3"] { --speed-icon:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAxOCI+PGcgZmlsbD0iI2ZmZiI+PHBhdGggZD0iTTIgMyBMMTEgOSBMMiAxNVoiLz48cGF0aCBkPSJNMTEgMyBMMjAgOSBMMTEgMTVaIi8+PHBhdGggZD0iTTIwIDMgTDI5IDkgTDIwIDE1WiIvPjwvZz48L3N2Zz4="); }
+.speed-controls .speed-button[data-speed="3"]::before { width:21px; }
+.speed-controls .speed-button[aria-pressed="true"] { border-color:var(--gold); background:color-mix(in srgb, var(--gold) 30%, var(--panel)); color:var(--gold); }
+.speed-controls.is-paused .speed-button[data-speed="0"] { background:color-mix(in srgb, var(--bad,#e0806b) 40%, var(--panel)); color:var(--ink); }
+.royal-goals { background:var(--glass); color:var(--ink); border:var(--ui-border,1px) solid var(--line); border-radius:var(--ui-radius,8px); }
+.royal-goals > summary { color:var(--gold); }
+.royal-goal progress { accent-color:var(--gold); }
+.royal-goal-count { color:var(--ink); }
+.royal-goal small { color:var(--muted); }

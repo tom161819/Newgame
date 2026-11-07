@@ -59,10 +59,15 @@ test('a config becomes CSS variables and html attributes the theme layer underst
   assert.equal(attrs['data-ui-theme'], 'parchment');
   assert.equal(attrs['data-ui-light'], 'true');
   assert.equal(attrs['data-ui-dialogs'], 'right');
+  // g-e3-tutorial-vzhled: the pointer defaults to the golden arrow; the hand has its rules in the game CSS.
+  assert.equal(attrs['data-ui-pointer'], 'arrow');
+  assert.equal(rootAttributes(normalizeUiConfig({ ...parchment, tokens: { ...parchment.tokens, pointer: 'hand' } }).config)['data-ui-pointer'], 'hand');
+  assert.equal(normalizeUiConfig({ ...parchment, tokens: { ...parchment.tokens, pointer: 'finger' } }).config.tokens.pointer, 'arrow');
+  assert.ok(readFileSync(path.join(root, 'src/style.css'), 'utf8').includes('html[data-ui-pointer="hand"] .tutorial-arrow'));
   // Every switch the attributes can take has rules in ui-theme.css.
   const css = readFileSync(path.join(root, 'art/ui/ui-theme.css'), 'utf8');
   for (const p of UI_PRESETS) for (const [name, value] of Object.entries(rootAttributes(p))) {
-    if (name === 'data-ui-theme' || ['top', 'bottom', 'left', 'center', 'right', 'shown', 'comfortable', 'bottom-right', 'bottom-left', 'none', 'plain', 'soft', 'normal', 'false'].includes(value) && !css.includes(`[${name}="${value}"]`)) continue;
+    if (name === 'data-ui-theme' || ['top', 'bottom', 'left', 'center', 'right', 'shown', 'comfortable', 'bottom-right', 'bottom-left', 'none', 'plain', 'soft', 'normal', 'false', 'arrow'].includes(value) && !css.includes(`[${name}="${value}"]`)) continue;
     assert.ok(css.includes(`[${name}="${value}"]`) || css.includes(`[${name}^=`) || css.includes(`[${name}$=`), `${name}="${value}" has rules`);
   }
   assert.ok(!/(^|\n)[^/\n]*\{/.test(css.replace(/html\[data-ui-[^\]]*\][^{]*\{/g, '').replace(/@[^{]*\{/g, '').replace(/\/\*[\s\S]*?\*\//g, '')), 'every rule is scoped under html[data-ui-*]');

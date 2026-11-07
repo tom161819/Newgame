@@ -6,7 +6,7 @@ import '../styles.css';
 import { trackTopbarHeight } from '../lib/topbarHeight.js';
 import './ui-lab.css';
 import {
-  normalizeUiConfig, applyUiConfig, sectionsOf, FONTS, TEXTURES, FRAMES, SHADOWS, HEADINGS, COLOR_TOKENS, LAYOUT, PANELS,
+  normalizeUiConfig, applyUiConfig, sectionsOf, FONTS, TEXTURES, FRAMES, SHADOWS, HEADINGS, POINTERS, COLOR_TOKENS, LAYOUT, PANELS,
 } from '../../../art/ui/uiConfig.js';
 import { UI_PRESETS } from '../../../art/ui/presets.js';
 import gameConfig from '../../../art/ui/ui-config.json';
@@ -90,6 +90,35 @@ function applyToFrame() {
   requestAnimationFrame(renderOverlay);
 }
 
+// g-e3-tutorial-vzhled: the tutorial is not part of the captured snapshot, so the Lab draws a sample with the game's own
+// classes (bubble with Show me / Skip, pointer at the Buildings tab, an off-screen pointer at the edge, the tick, a tip,
+// the speed buttons and the Royal tasks card). The style and the Pointer choice apply to it like to the real game.
+const TUTORIAL_DEMO = 'tutorial';
+function tutorialDemo(doc) {
+  const el = (tag, cls, text) => { const e = doc.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; e.dataset.ulDemo = ''; return e; };
+  const at = (e, css) => { Object.assign(e.style, css); doc.body.append(e); return e; };
+  const button = (cls, text) => { const b = el('button', cls, text); b.type = 'button'; return b; };
+  const bubble = (count, text, actions, tip = false) => { const b = el('div', `tutorial-bubble${tip ? ' is-tip' : ''}`); b.append(el('small', 'tutorial-count', count), el('p', 'tutorial-text', text)); const a = el('div', 'tutorial-actions'); a.append(...actions); b.append(a, button('tutorial-close', '×')); return b; };
+  const tab = doc.getElementById('buildings-tab')?.getBoundingClientRect() ?? { left: 40, top: 840, width: 110, height: 40 };
+  const cx = tab.left + tab.width / 2;
+  // A map step (place the Granary on a green spot) and a bar step (pointer above the Buildings tab).
+  at(bubble('Step 3 of 10', 'Build a Granary: food needs a dry store or it spoils.', [button('tutorial-skip', 'Skip'), button('tutorial-show', 'Show me')]), { left: '200px', top: '400px', width: '300px' });
+  at(el('div', 'tutorial-arrow'), { left: '560px', top: '450px', transform: 'translate(-50%,-50%) rotate(0deg)', animation: 'none' });
+  at(el('div', 'tutorial-arrow'), { left: `${cx + 120}px`, top: `${tab.top - 34}px`, transform: 'translate(-50%,-50%) rotate(90deg)', animation: 'none' });
+  at(el('div', 'tutorial-arrow offscreen'), { left: '1410px', top: '420px', transform: 'translate(-50%,-50%) rotate(0deg)', animation: 'none' });
+  at(el('div', 'tutorial-done', '✓'), { left: '720px', top: '300px' });
+  at(bubble('Tip', 'Night is coming: Torches and a Campfire keep wolves away from the houses.', [button('tutorial-skip', 'No more tips'), button('tutorial-next', 'Got it')], true), { left: '470px', top: '150px', width: '300px' });
+  const speed = el('div', 'speed-controls'); speed.append(...[[0, '‖'], [1, '1×'], [2, '2×'], [3, '3×']].map(([n, t]) => { const b = button('speed-button', t); b.dataset.speed = String(n); b.setAttribute('aria-pressed', String(n === 1)); return b; }));
+  const wrap = el('div', ''); wrap.append(speed); at(wrap, { position: 'fixed', left: '840px', top: '150px', padding: '6px 8px', background: 'var(--glass)', border: 'var(--ui-border,1px) solid var(--line-soft)', borderRadius: 'var(--ui-radius,8px)' });
+  const goals = el('details', 'royal-goals'); goals.open = true; goals.append(el('summary', '', 'Royal tasks · 1 / 8'));
+  const list = el('ol', 'royal-goals-list');
+  for (const [name, n, max, reward] of [['Build 3 houses', 2, 3, '20 gold'], ['Reach 10 residents', 6, 10, '20 wood'], ['Bake the first bread', 0, 1, '30 gold']]) {
+    const li = el('li', 'royal-goal'), bar = el('progress'); bar.max = max; bar.value = n;
+    li.append(el('strong', '', name), el('span', 'royal-goal-count', `${n} / ${max}`), bar, el('small', '', `Reward: ${reward}`)); list.append(li);
+  }
+  goals.append(list); at(goals, { position: 'fixed', right: '90px', top: '420px', margin: '0' });
+}
+
 // Windows open in the preview with the content the game showed when it was captured.
 function showWindow(id) {
   const doc = frameDoc();
@@ -99,6 +128,8 @@ function showWindow(id) {
   for (const [pid, original] of originals) { const el = doc.getElementById(pid); if (el) el.replaceWith(original.cloneNode(true)); }
   state.window = id;
   $('#ul-window').value = id;
+  for (const el of doc.querySelectorAll('[data-ul-demo]')) el.remove();
+  if (id === TUTORIAL_DEMO) tutorialDemo(doc);
   if (id) {
     const snap = snapshots.panels.find(p => p.id === id);
     let el = doc.getElementById(id);
@@ -221,6 +252,8 @@ function styleView() {
     field('Heading font', select(FONTS, t.fontDisplay, v => set('fontDisplay', v))),
     field(`Text size ${Math.round(t.fontScale * 100)} %`, range(0.8, 1.4, 0.05, t.fontScale, v => { set('fontScale', v); renderControls(); })),
     field('Headings', select(HEADINGS, t.headings, v => set('headings', v))),
+    h('h3', {}, 'Tutorial and tips'),
+    field('Pointer', select(POINTERS, t.pointer ?? 'arrow', v => set('pointer', v)), 'Window → Tutorial shows the bubble, arrow, tick, speed buttons and Royal tasks.'),
     h('h3', {}, 'Frames and surfaces'),
     field('Texture', select(TEXTURES, t.texture, v => set('texture', v))),
     field('Frame', select(FRAMES, t.frame, v => set('frame', v))),
@@ -373,6 +406,7 @@ async function resolveNames() {
 // ---------- boot ----------
 for (const tab of document.querySelectorAll('.ul-tabs [role="tab"]')) tab.addEventListener('click', () => { state.tab = tab.dataset.tab; renderControls(); });
 for (const id of windowIds()) $('#ul-window').append(h('option', { value: id }, PANELS[id]));
+$('#ul-window').append(h('option', { value: TUTORIAL_DEMO }, 'Tutorial, tips, speed and Royal tasks'));
 $('#ul-window').addEventListener('change', e => showWindow(e.target.value));
 $('#ul-original').addEventListener('change', e => { state.original = e.target.checked; applyToFrame(); });
 $('#ul-docking').addEventListener('change', e => { state.docking = e.target.checked; renderOverlay(); });

@@ -20,6 +20,8 @@ export const TEXTURES = Object.freeze({ none: 'Flat', wood: 'Wood grain', parchm
 export const FRAMES = Object.freeze({ plain: 'Thin line', rivets: 'Iron rivets', inked: 'Inked double line', carved: 'Carved bevel' });
 export const SHADOWS = Object.freeze({ soft: 'Soft', hard: 'Hard', none: 'None' });
 export const HEADINGS = Object.freeze({ normal: 'Normal', smallcaps: 'Small capitals', uppercase: 'Capitals' });
+// g-e3-tutorial-vzhled: what points at the next step in the tutorial and tips.
+export const POINTERS = Object.freeze({ arrow: 'Golden arrow', hand: 'Pointing hand' });
 
 // Colour tokens, each mapped to a CSS custom property --ui-<name>.
 export const COLOR_TOKENS = Object.freeze([
@@ -66,7 +68,7 @@ export const BASE_CONFIG = Object.freeze({
     page: '#25291e', panel: '#2c3124', panelRaised: '#363c2c', glass: 'rgb(30 35 25 / .86)', line: '#79704b', lineSoft: '#5b5a40',
     ink: '#ede5c9', muted: '#b9b598', accent: '#e3c57a', button: '#4d503a', buttonInk: '#ece2c4', field: '#26321f', good: '#9fc172', bad: '#e0806b',
     fontUi: 'figtree', fontDisplay: 'source-serif', fontScale: 1, radius: 12, borderWidth: 1,
-    texture: 'none', frame: 'plain', shadow: 'soft', headings: 'normal', light: false,
+    texture: 'none', frame: 'plain', shadow: 'soft', headings: 'normal', light: false, pointer: 'arrow',
   },
   layout: { hud: 'top', buildingsBar: 'bottom', settings: 'left', population: 'right', cornerStack: 'bottom-right', dialogs: 'center', unitPanel: 'right', camera: 'bottom-left', header: 'shown', density: 'comfortable' },
   panels: {},
@@ -91,6 +93,7 @@ export function normalizeUiConfig(input, base = BASE_CONFIG) {
   tokens.frame = pick(t.frame, FRAMES, bt.frame);
   tokens.shadow = pick(t.shadow, SHADOWS, bt.shadow);
   tokens.headings = pick(t.headings, HEADINGS, bt.headings);
+  tokens.pointer = pick(t.pointer, POINTERS, bt.pointer ?? 'arrow');
   tokens.light = typeof t.light === 'boolean' ? t.light : bt.light;
   const l = src.layout && typeof src.layout === 'object' ? src.layout : {}, layout = {};
   for (const [key, { values }] of Object.entries(LAYOUT)) {
@@ -126,7 +129,7 @@ export function cssVariables(config) {
 }
 // Data attributes on <html> that switch the theme and layout rules.
 export function rootAttributes(config) {
-  const { tokens, layout } = config, attrs = { 'data-ui-theme': config.style, 'data-ui-texture': tokens.texture, 'data-ui-frame': tokens.frame, 'data-ui-shadow': tokens.shadow, 'data-ui-headings': tokens.headings, 'data-ui-light': tokens.light ? 'true' : 'false' };
+  const { tokens, layout } = config, attrs = { 'data-ui-theme': config.style, 'data-ui-texture': tokens.texture, 'data-ui-frame': tokens.frame, 'data-ui-shadow': tokens.shadow, 'data-ui-headings': tokens.headings, 'data-ui-pointer': tokens.pointer ?? 'arrow', 'data-ui-light': tokens.light ? 'true' : 'false' };
   for (const key of Object.keys(LAYOUT)) attrs[`data-ui-${key.replace(/[A-Z]/g, c => `-${c.toLowerCase()}`)}`] = layout[key];
   return attrs;
 }

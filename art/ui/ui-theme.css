@@ -24,7 +24,7 @@ html[data-ui-shadow="hard"] { --ui-surface-shadow: 4px 5px 0 rgb(0 0 0 / .45); }
 html[data-ui-shadow="none"] { --ui-surface-shadow: none; }
 
 /* ---------- surfaces: bars, sidebars, windows, floating chips, tooltips ---------- */
-html[data-ui-theme] :is(.buildings-bar, .buildings-panel, .settings-panel, .population-panel, .employment-panel, .game-dialog, #game-over, .notices-panel, .population-tooltip, #object-tooltip, .staffing-tooltip, .resource-economy-tooltip, #day-notice) {
+html[data-ui-theme] :is(.buildings-bar, .buildings-panel, .settings-panel, .population-panel, .employment-panel, .game-dialog, #game-over, .notices-panel, .population-tooltip, #object-tooltip, .staffing-tooltip, .resource-economy-tooltip, #day-notice, .tutorial-bubble, .royal-goals) {
   color: var(--ui-ink);
   border: var(--ui-border) solid var(--ui-line);
   border-radius: var(--ui-radius);
