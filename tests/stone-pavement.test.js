@@ -77,7 +77,7 @@ test('Fog of War shows the last known pavement; changes out of sight stay hidden
 
 test('cancelling an unfinished order refunds by the usual rules; finished pavement is removed without refund; a building may not go on it twice',()=>{
   const s=scene();s.inventory.add('stone',10);const before=s.inventory.count('stone'),r=order(s,pavementTiles('line',{x:60,y:60},{x:63,y:60}));
-  for(const b of [...r.buildings])s.constructionSystem.cancel(b);assert.equal(s.inventory.count('stone'),before,'untouched blueprint: full refund');
+  for(const b of [...r.buildings])s.constructionSystem.cancel(b);assert.equal(s.inventory.count('stone'),before,'untouched blueprint: full refund');s.inventory.add('stone',10);
   s.pathWear.setPaved({x:70,y:70},true);const tower=placeBuilding({map:s.map,anchor:{x:70,y:70},resources:s.resourceOccupancy,reservedTiles:[],inventory:s.inventory,buildings:s.buildings,definition:s.objectRegistry.require('tower')});
   assert.equal(tower.error??null,null,'a building can stand on paved ground; the surface is kept underneath');assert.equal(s.pathWear.isPaved({x:70,y:70}),true);
 });

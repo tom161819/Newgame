@@ -58,7 +58,7 @@ function scene(terrain=Array.from({length:100},()=>Array(100).fill(0))){
   return s;
 }
 function fixture(){
-  const s=scene();s.terrainGrid[2][2]=1;s.map[2][2]=1;s.inventory.add('stone',40);s.inventory.add('gold',71);s.inventory.add('meat',8);
+  const s=scene();s.terrainGrid[2][2]=1;s.map[2][2]=1;s.inventory.add('stone',60);s.inventory.add('gold',71);s.inventory.add('meat',8);
   for(const type of ['basic_sword','basic_armor']){s.inventory.add(type);s.equipment.equip(type);}
   for(const [type,x,y]of [['castle',20,20],['tower',30,30],['wall',40,40],['wall',41,40]]){
     const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:[],inventory:s.inventory,buildings:s.buildings,definition:objectRegistry.require(type)});assert.ifError(result.error);

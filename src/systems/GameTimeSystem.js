@@ -40,7 +40,12 @@ export class GameTimeSystem {
   get eventTime(){return this.advanceEndTime??this.totalElapsed;}
   get label(){
     const format=n=>`${String(Math.floor(n/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;
-    return t('hud.day',{day:this.day,remaining:format(this.remainingSeconds),total:format(this.dayDuration/1000)});
+    return t('hud.day',{day:this.day});
+  }
+  // E2 (report 0.48.0): the minutes of the day only in the tooltip.
+  get tooltip(){
+    const format=n=>`${String(Math.floor(n/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;
+    return t('hud.dayTip',{day:this.day,remaining:format(this.remainingSeconds),total:format(this.dayDuration/1000)});
   }
   destroy(){this.listeners.clear();this.dayClosedListeners?.clear();this.advanceListeners.clear();this.afterAdvanceListeners.clear();this.boundaries.clear();}
 }

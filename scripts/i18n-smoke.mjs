@@ -1,3 +1,4 @@
+import { openAssetLibrary } from './building-menu-smoke.mjs';
 import assert from 'node:assert/strict';
 
 // N07 (#38): Czech/English switch in the main menu, translated screens, remembered across a reload, then back to English.
@@ -26,7 +27,7 @@ export async function i18nGameSmoke(page){
   assert.equal(await page.locator('#settings-language').inputValue(),'en');await page.locator('#settings-language').selectOption('cs');
   assert.equal(await text('#settings-title'),'Nastavení');assert.equal(await page.locator('#main-language').inputValue(),'cs','both pickers stay in sync');
   await page.locator('#close-settings').click();
-  assert.match(await text('#game-time'),/^Den \d+ \| /);assert.match(await text('#season-weather'),/^(Jaro|Léto|Podzim|Zima)/);assert.equal(await text('#buildings-tab'),'Budovy');
+  assert.match(await text('#game-time'),/^Den \d+$/);assert.match(await text('#season-weather'),/^(Jaro|Léto|Podzim|Zima)/);assert.equal(await text('#buildings-tab'),'Budovy');
   assert.match(await text('#vision-status'),/^(Mlha války: VYP|Dohled: )/);assert.match(await text('#king-health'),/^Životy: /);assert.match(await text('#king-level'),/^Král \| úroveň \d+$/);
   assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.objectRegistry.require('warehouse').name),'Sklad');
   const body=await page.evaluate(()=>document.querySelector('main').innerText);assert.doesNotMatch(body,/undefined|\{\w+\}/);
@@ -41,10 +42,10 @@ export async function i18nGameSmoke(page){
   await page.locator('#population-tab').click();await page.locator('#population-panel.open').waitFor();
   assert.match(await text('#population-summary'),/^Obyvatelé: \d+ · zaměstnaní: \d+ · nezaměstnaní: \d+$/);assert.equal(await page.locator('#population-order option[value="desc"]').textContent(),'Sestupně');
   assert.doesNotMatch(await page.locator('#population-panel').innerText(),/undefined|\{\w+\}/);await page.locator('#close-population').click();
-  await page.locator('#asset-library-button').click();await page.locator('#asset-gallery[open]').waitFor();
+  await openAssetLibrary(page);await page.locator('#asset-gallery[open]').waitFor();
   assert.match(await text('#asset-count'),/^\d+ \/ \d+ objektů$/);assert.doesNotMatch(await page.locator('#asset-gallery').innerText(),/undefined|\{\w+\}/);await page.locator('#close-asset-gallery').click();
   await page.locator('#settings-button').click();await page.locator('#settings-language').selectOption('en');await page.locator('#close-settings').click();
-  assert.match(await text('#game-time'),/^Day \d+ \| /);assert.equal(await text('#buildings-tab'),'Buildings');assert.match(await text('#king-level'),/^King \| LVL \d+$/);
+  assert.match(await text("#game-time"),/^Day \d+$/);assert.equal(await text('#buildings-tab'),'Buildings');assert.match(await text('#king-level'),/^King \| LVL \d+$/);
   assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.objectRegistry.require('warehouse').name),'Warehouse');
   console.log('PASS in-game language switch from Settings: day, season, sight, HP, level, Buildings tab, object names, storage, character, population and Asset Library panels follow at once; pickers in sync; back to English');
 }

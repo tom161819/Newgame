@@ -14,9 +14,9 @@ const horse=(s,tile)=>s.animalSystem.create(s.objectRegistry.require('horse'),ti
 function stablehand(s,stables,tile){const w=s.workerSystem.create(tile);assert.equal(s.workplaceSystem.assign(stables,w),true);assert.equal(w.profession,'stablehand');return w;}
 function until(s,p,max=200000){let t=0;while(!p()&&t<max){s.tick(50);t+=50;}assert.ok(p(),`not reached after ${t} ms`);return t;}
 
-test('Stables: 5×5, 15 Wood + 10 Stone, two Stablehands, room for 4 tamed horses; six wild horses at a new game',()=>{
+test('Stables: 5×5, 20 Wood (owner price 0.49), two Stablehands, room for 4 tamed horses; six wild horses at a new game',()=>{
   const s=workerScene(),d=s.objectRegistry.require('stables');
-  assert.deepEqual([d.width,d.height,d.cost,d.workplace.capacity,d.workplace.profession,d.horseCapacity],[5,5,{wood:15,stone:10},2,'stablehand',4]);
+  assert.deepEqual([d.width,d.height,d.cost,d.workplace.capacity,d.workplace.profession,d.horseCapacity],[5,5,{wood:20},2,'stablehand',4]);
   assert.equal(s.objectRegistry.require('horse').gameplay.initialCount,STABLE_RULES.wildHorses);
 });
 

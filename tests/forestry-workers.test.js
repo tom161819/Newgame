@@ -9,14 +9,14 @@ import { captureMapKnowledge } from '../src/game/mapMemoryObjects.js';
 
 globalThis.document={querySelector:()=>({textContent:''})};
 function fixture(starter=true){const s=workerScene(undefined,{naturalResources:true,construction:true,logistics:true,starter});s.workerSystem.unsubscribe();return s;}
-function hut(s){const d=s.objectRegistry.require('lumberjack_hut');s.inventory.add('stone',8);const result=placeBuilding({map:s.map,anchor:{x:44,y:43},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(result.error);const b=result.building;s.towerViews.set(b.id,s.createBuildingView(d,b));return b;}
+function hut(s){const d=s.objectRegistry.require('lumberjack_hut');s.inventory.add('wood',6);const result=placeBuilding({map:s.map,anchor:{x:44,y:43},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(result.error);const b=result.building;s.towerViews.set(b.id,s.createBuildingView(d,b));return b;}
 function tree(s,tile={x:49,y:45}){const n=treeState(`tree-${s.naturalResources.nextId++}`);n.ageCheckpoint=s.naturalResources.ageClock;n.growthCheckpoint=s.naturalResources.growthClock;s.addResource(s.objectRegistry.require('oak_tree'),tile,n);return s.naturalResources.byId.get(n.id);}
 function worker(s,building){for(let y=46;y<55;y++)for(let x=40;x<45;x++)if(s.map[y][x]===0&&!s.reservedTiles().some(t=>t.x===x&&t.y===y)){const w=s.workerSystem.create({x,y});assert.equal(s.workplaceSystem.assign(building,w),true);return w;}throw Error('No worker fixture location.');}
 function until(s,condition,limit=65000){for(let elapsed=0;elapsed<limit&&!condition();elapsed+=50)s.tick(50);assert.ok(condition(),`Unfinished forestry action: ${JSON.stringify([...s.workerSystem.workers.values()].map(w=>({state:w.workState,message:w.workMessage,task:w.workTask,cargo:w.cargo})))}`);}
 const totalWood=s=>s.inventory.count('wood')+[...s.dropSystem.drops.values()].filter(d=>d.resource==='wood').reduce((n,d)=>n+d.amount,0)+s.workerSystem.liveWorkers().filter(w=>w.cargo?.resource==='wood').reduce((n,w)=>n+w.cargo.amount,0);
 
-test('Lumberjack Hut uses8 Stone,2×2,three actual seats and waits for blueprint completion',()=>{
-  const s=fixture(),b=hut(s),d=b.definition;assert.equal(s.inventory.count('stone'),0);assert.equal(b.tiles.length,4);assert.equal(d.workRadius,18);assert.deepEqual(d.workplace,{capacity:3,profession:'woodcutter',skill:'woodcutting'});
+test('Lumberjack Hut uses 6 Wood (0.49),2×2,three actual seats and waits for blueprint completion',()=>{
+  const s=fixture(),b=hut(s),d=b.definition;assert.equal(s.inventory.count('wood'),0);assert.equal(b.tiles.length,4);assert.equal(d.workRadius,18);assert.deepEqual(d.workplace,{capacity:3,profession:'woodcutter',skill:'woodcutting'});
   s.workplaceSystem.records.delete(b.id);s.constructionSystem.plan(b);const w=s.workerSystem.create({x:42,y:46});assert.equal(s.workplaceSystem.assign(b,w),false);s.tick(100);assert.equal(w.profession,'idle');assert.equal(s.inventory.count('wood'),0);
 });
 test('a Woodcutter reserves real tree/output capacity, approaches, cuts, picks ground Wood and walks to the original store',()=>{

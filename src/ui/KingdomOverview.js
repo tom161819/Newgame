@@ -15,7 +15,7 @@ export function kingdomOverview(scene){
   const happiness=avg('happiness');
   return {population:residents.length,capacity:workers?.capacity?.()??residents.length,unemployed:residents.filter(w=>w.profession==='idle').length,
     happiness,mood:happiness==null?null:moodFor(happiness).id,food:avg('food'),rest:avg('rest'),housing:avg('housing'),safety:avg('safety'),
-    attractiveness:attraction?Math.round(attraction.value):null,factors};
+    attractiveness:attraction?Math.round(attraction.value):null,factors,settleBlock:attraction?.blockReason?.()??null};
 }
 export class KingdomOverview {
   constructor(scene,{document:doc=globalThis.document}={}){
@@ -40,7 +40,8 @@ export class KingdomOverview {
       ...['happiness','food','rest','housing','safety'].map(k=>row(t(`overview.need.${k}`),pct(o[k]),tone(o[k]))),
       row(t('overview.moodLabel'),o.mood?t(`needs.mood.${o.mood}`):'—',tone(o.happiness))];
     if(o.attractiveness!=null){rows.push(element('h4','',t('overview.attractiveness')),row(t('overview.attractivenessValue'),`${o.attractiveness} %`,tone(o.attractiveness)));
-      for(const [id,v] of o.factors)rows.push(row(t(`overview.factor.${id}`),v>0?`+${v}`:String(v),v<0?'bad':'good'));}
+      for(const [id,v] of o.factors)rows.push(row(t(`overview.factor.${id}`),v>0?`+${v}`:String(v),v<0?'bad':'good'));
+      if(o.settleBlock)rows.push(element('p','overview-block',t(`overview.settleBlock.${o.settleBlock}`)));}
     this.panel.replaceChildren(...rows);
   }
   destroy(){this.abort?.abort();}

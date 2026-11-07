@@ -16,7 +16,7 @@ function scene(terrain,options={}){
   const s=workerScene(terrain,{construction:true,...options});s.fog.setEnabled(true);s.fog.update();s.log=[];s.activities.on(e=>s.log.push(e));s.statuses=[];s.setStatus=text=>s.statuses.push(text);return s;
 }
 function place(s,type,anchor){
-  const d=s.objectRegistry.require(type);s.inventory.add('stone',d.cost.stone);
+  const d=s.objectRegistry.require(type);Object.entries(d.cost).forEach(([r,k])=>s.inventory.add(r,k));
   const provisional=isProvisional(s.fog,[anchor]),known=provisional?knownPlacementError(s,anchor,d):null;if(known)return {error:known};
   const r=placeBuilding({map:s.map,anchor,resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d,reserveMaterials:true,provisional});
   if(r.building)s.constructionSystem.plan(r.building);return r;

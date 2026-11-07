@@ -59,7 +59,7 @@ export class NightThreatSystem {
   houses(){return (this.scene.buildings??[]).filter(b=>buildingIsComplete(b)&&this.scene.objectRegistry?.get?.(b.type)?.housing);}
   // At nightfall a pack may come (a roll per night, more often in winter) from far away at the map edge, outside light.
   spawnWolves(day){
-    const W=NIGHT_THREATS.wolves,s=this.scene;this.wolfDay=day;if(!this.enabled.wolves||!s.animalSystem)return [];
+    const W=NIGHT_THREATS.wolves,s=this.scene;this.wolfDay=day;if(!this.enabled.wolves||!s.animalSystem||!this.started())return [];
     const season=s.seasons?.enabled===false?'Summer':s.seasons?.season??'Summer';if(this.random()>=(W.chance[season]??.3))return [];
     const def=s.objectRegistry.require('wolf'),rows=s.map.length,cols=s.map[0].length,far=t=>[s.character?.tile,...this.houses()].filter(Boolean).every(p=>Math.hypot(p.x-t.x,p.y-t.y)>=W.spawnDistance);
     const lights=this.scaryLights(),taken=new Set((s.reservedTiles?.()??[]).map(t=>`${t.x},${t.y}`));let start=null;
@@ -139,7 +139,7 @@ export class NightThreatSystem {
     return null;
   }
   spawnThief(day){
-    const T=NIGHT_THREATS.thieves,s=this.scene;this.thiefDay=day;if(!this.enabled.thieves||!s.workerSystem)return null;
+    const T=NIGHT_THREATS.thieves,s=this.scene;this.thiefDay=day;if(!this.enabled.thieves||!s.workerSystem||!this.started())return null;
     const targets=this.thiefTargets();if(!targets.length||this.random()>=this.thiefChance(targets))return null;
     const target=targets[Math.floor(this.random()*targets.length)],start=this.edgeTile(t=>Math.hypot(t.x-target.center.x,t.y-target.center.y)>=T.spawnDistance,T);if(!start)return null;
     const thief=s.workerSystem.create(start,{isSubject:false,name:t('threats.thiefName')});thief.workState='Moving to Target';thief.workMessage='Sneaking';
@@ -204,11 +204,14 @@ export class NightThreatSystem {
   fireRisk(){const F=NIGHT_THREATS.fires,s=this.scene;return F.chance*(F.weather[s.seasons?.weather]??1)*(s.seasons?.season==='Winter'?F.winter:1);}
   // At nightfall every burning flame may set a wooden building within 2 tiles alight (one roll per building a night).
   igniteFires(day){
-    this.fireDay=day;if(!this.enabled.fires)return [];const F=NIGHT_THREATS.fires,s=this.scene,flames=[];
+    this.fireDay=day;if(!this.enabled.fires||!this.started())return [];const F=NIGHT_THREATS.fires,s=this.scene,flames=[];
     for(const l of s.lightSources?.lights?.()??[]){if(!['torch','brazier','campfire'].includes(l.type))continue;const p=worldToGrid(l.x,l.y);flames.push({x:p.x,y:p.y,buildingId:l.buildingId});}
     const out=[],risk=this.fireRisk();
     for(const b of s.buildings??[]){if(!this.flammable(b)||this.fires.has(b.id))continue;
-      if(!flames.some(f=>f.buildingId!==b.id&&this.gap(b,f)<=F.range))continue;if(this.random()<risk)out.push(this.ignite(b));}
+      if(!flames.some(f=>f.buildingId!==b.id&&this.gap(b,f)<=F.range))continue;if(this.random()<risk){
+        // The first spark only warns: neighbours put it out, the building stays.
+        if(!this.fireWarned){this.fireWarned=true;s.eventFeed?.push?.(`fire-warning:${day}`,t('nightThreats.fireWarning',{name:buildingDefinition(b).name}),{important:true});return out;}
+        out.push(this.ignite(b));}}
     return out;
   }
   ignite(b){
@@ -279,15 +282,22 @@ export class NightThreatSystem {
     if(this.scene.dayNight?.part()==='day')this.reportMorning(day);
     this.checkWolvesNear(day);
   }
-  exportState(){return {enabled:{...this.enabled},wolfDay:this.wolfDay,thiefDay:this.thiefDay,thieves:[...this.thieves.values()].map(t=>({id:t.id,state:t.state,target:{...t.target},loot:t.loot?{...t.loot}:null,pursuer:t.pursuer})),reports:this.reports.map(r=>({...r})),fireDay:this.fireDay,fires:[...this.fires.values()].map(f=>({id:f.id,intensity:Math.round(f.intensity*100)/100,health:Math.round(f.health*100)/100})),campfires:[...this.campfires].map(([id,c])=>({id,litDay:c.litDay,ashesDay:c.ashesDay})).sort((a,b)=>a.id-b.id)};}
-  importState(data){if(!data)return;this.enabled={...this.enabled,...data.enabled};this.wolfDay=data.wolfDay??null;this.thiefDay=data.thiefDay??null;this.fireDay=data.fireDay??null;this.fires=new Map((data.fires??[]).map(f=>[f.id,{...f}]));this.reports=(data.reports??[]).map(r=>({...r}));
+  exportState(){return {enabled:{...this.enabled},...(this.fireWarned?{fireWarned:true}:{}),wolfDay:this.wolfDay,thiefDay:this.thiefDay,thieves:[...this.thieves.values()].map(t=>({id:t.id,state:t.state,target:{...t.target},loot:t.loot?{...t.loot}:null,pursuer:t.pursuer})),reports:this.reports.map(r=>({...r})),fireDay:this.fireDay,fires:[...this.fires.values()].map(f=>({id:f.id,intensity:Math.round(f.intensity*100)/100,health:Math.round(f.health*100)/100})),campfires:[...this.campfires].map(([id,c])=>({id,litDay:c.litDay,ashesDay:c.ashesDay})).sort((a,b)=>a.id-b.id)};}
+  // Threats wait until the kingdom stands: enough finished Houses or the start year passed (plan m-e1-hrozby-pozdeji).
+  started(){
+    const S=NIGHT_THREATS.start,s=this.scene;
+    if((s.buildings??[]).filter(b=>b.type==='house'&&buildingIsComplete(b)).length>=S.houses)return true;
+    if(s.seasons?.enabled!==false&&s.seasons?.calendar)return s.seasons.calendar.year>=S.year;
+    return (s.gameTime?.day??1)>S.daysWithoutSeasons;
+  }
+  importState(data){if(!data)return;this.fireWarned=!!data.fireWarned;this.enabled={...this.enabled,...data.enabled};this.wolfDay=data.wolfDay??null;this.thiefDay=data.thiefDay??null;this.fireDay=data.fireDay??null;this.fires=new Map((data.fires??[]).map(f=>[f.id,{...f}]));this.reports=(data.reports??[]).map(r=>({...r}));
     this.thieves=new Map((data.thieves??[]).map(t=>[t.id,{...t,target:{...t.target},loot:t.loot?{...t.loot}:null,since:this.scene?.gameTime?.totalElapsed??0,repath:0}]));this.campfires=new Map((data.campfires??[]).map(c=>[c.id,{litDay:c.litDay,ashesDay:c.ashesDay}]));}
   destroy(){this.listeners.clear();}
 }
 export function validNightThreatState(data,buildingIds){
   const n=v=>v===null||Number.isSafeInteger(v)&&v>=1;
   // `wolfDay` came in 0.44.0; saves of 0.43.0 (same schema 57) have none.
-  return !!data&&typeof data==='object'&&!!data.enabled&&(data.wolfDay===undefined||n(data.wolfDay))&&NIGHT_THREATS.ids.every(id=>typeof data.enabled[id]==='boolean')&&Object.keys(data.enabled).length===NIGHT_THREATS.ids.length&&Object.keys(data).every(k=>['enabled','campfires','wolfDay','thiefDay','thieves','reports','fireDay','fires'].includes(k))&&(data.fireDay===undefined||n(data.fireDay))
+  return !!data&&typeof data==='object'&&!!data.enabled&&(data.wolfDay===undefined||n(data.wolfDay))&&NIGHT_THREATS.ids.every(id=>typeof data.enabled[id]==='boolean')&&Object.keys(data.enabled).length===NIGHT_THREATS.ids.length&&Object.keys(data).every(k=>['enabled','campfires','wolfDay','thiefDay','thieves','reports','fireDay','fires','fireWarned'].includes(k))&&(data.fireWarned===undefined||data.fireWarned===true)&&(data.fireDay===undefined||n(data.fireDay))
     &&(data.fires===undefined||Array.isArray(data.fires)&&data.fires.every(f=>f&&buildingIds.has(f.id)&&Number.isFinite(f.intensity)&&f.intensity>0&&f.intensity<=100&&Number.isFinite(f.health)&&f.health>0&&f.health<=100))&&(data.thiefDay===undefined||n(data.thiefDay))
     &&(data.thieves===undefined||Array.isArray(data.thieves)&&data.thieves.every(t=>t&&typeof t.id==='string'&&['sneaking','escaping','fleeing'].includes(t.state)&&t.target&&typeof t.target.id==='string'&&(t.loot===null||Number.isFinite(t.loot.amount)&&t.loot.amount>0&&typeof t.loot.resource==='string')))
     &&(data.reports===undefined||Array.isArray(data.reports))

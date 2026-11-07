@@ -1,3 +1,4 @@
+import { FOOD_OUTLOOK,foodDays } from '../data/foodOutlook.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { DIAGNOSTICS,INPUT_SOURCES,COMPLETION_SOURCES,GATHER_OUTPUTS,DEPLETION_SOURCES,STORAGE_WAIT_MESSAGES } from '../data/diagnostics.js';
 import { storageResources } from '../data/logistics.js';
@@ -49,12 +50,25 @@ export class ProductionDiagnostics {
         const home=this.scene.buildings.find(b=>b.id===site.farmId);
         // A plot of a planned or unfinished Farmhouse is waiting as intended – its panel says so, Notices stay quiet.
         if(!home)orphans.push(site);else if(farmReady(home)&&!this.residents('farmer').some(w=>w.assignedWorkplaceId===home.id))found.push({entityId:site.id,reason:'noFarmer',category:'construction',params:{}});
-      }else waiting.push(site);
+      }else{
+        waiting.push(site);
+        // Materials the stores hold but nobody brings (plan m-e1-stavitele-material).
+        const now=this.scene.gameTime.totalElapsed;
+        if(c.materials.enabled&&!c.materials.ready(site)&&this.materialsInStock(site)){site.materialWaitSince??=now;if(now-site.materialWaitSince>=DIAGNOSTICS.materialWait)found.push({entityId:site.id,reason:'waitingMaterial',category:'construction',params:{}});}
+        else delete site.materialWaitSince;
+      }
     }
     // One notice for all plots no Farmhouse (built or planned) has room for, pointing at the first one.
     if(orphans.length){const first=orphans.reduce((a,b)=>a.id<=b.id?a:b);found.push({entityId:first.id,reason:'noFarm',category:'construction',params:{count:orphans.length}});}
     if(!builders&&waiting.length){const first=waiting.reduce((a,b)=>a.id<=b.id?a:b);found.push({entityId:first.id,reason:'noBuilder',category:'construction',params:{count:waiting.length}});}
     return found;
+  }
+  // True when some material a site still needs is lying in the kingdom's stores, free to take.
+  materialsInStock(site){
+    const st=this.scene.foodStorage,need=site.materialSupply?.required??{},loc=st?.locations.get(`site-${site.id}`);if(!st)return false;
+    // Stock booked for this site at placement still in a store, or free stock of a missing material.
+    if([...st.reservations.values()].some(r=>r.owner===`site-${site.id}`&&r.kind!=='capacity'&&r.amount>0))return true;
+    return Object.entries(need).some(([resource,n])=>n-(loc?.stock?.[resource]??0)-(loc?st.incoming(loc.id,resource):0)>0&&st.available(resource)>0);
   }
   // Production: a staffed building switched on that lacks an input, with the nearest cause that can be checked.
   // Intentionally paused production, unstaffed buildings and inputs on their way or still growing are not problems.
@@ -108,8 +122,10 @@ export class ProductionDiagnostics {
   }
   // The current issue of one building (for its panel and the icon over it), most important first.
   buildingIssue(id){let best=null;for(const issue of this.issues.values())if(issue.entityId===id&&issue.lastNotified!=null&&(!best||issue.reason!=='outputFull'))best=issue;return best;}
+  // Plan m-e1-jidlo-vydrz: the kingdom's edible stores last less than 3 days (one kingdom notice with the days left).
+  foodIssues(){const days=foodDays(this.scene.foodSystem);return days<FOOD_OUTLOOK.warnDays?[{entityId:0,reason:'foodLow',category:'production',params:{days:Math.floor(days)},feed:true}]:[];}
   detect(){
-    const found=[...this.constructionIssues(),...this.depletionIssues(),...this.storageIssues()];
+    const found=[...this.constructionIssues(),...this.depletionIssues(),...this.storageIssues(),...this.foodIssues()];
     for(const record of this.scene.foodProduction?.records.values()??[]){const issue=this.productionIssue(record);if(issue)found.push({entityId:record.buildingId,category:'production',...issue});}
     return found;
   }

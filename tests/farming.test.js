@@ -26,7 +26,7 @@ function farm(options={}){const s=scene(options),home=building(s,'farmhouse',45,
 
 test('farm buildings retain exact costs, 3x3 footprints (the Farmhouse is 3x3 since 0.38.0) and original physical blueprints; unfinished sites neither grow nor employ farmers',()=>{
   const s=scene();for(const [type,cost,width,x]of [['farmhouse',10,3,45],['wheat_field',0,3,50],['orchard',0,3,55]]){
-    const b=building(s,type,x,40,true);assert.equal(b.definition.cost.stone??0,cost);assert.equal(b.tiles.length,width*width);assert.equal(s.inventory.count('stone'),0);assert.equal(buildingIsComplete(b),false);for(const t of b.tiles)assert.equal(s.map[t.y][t.x],1);
+    const b=building(s,type,x,40,true);assert.equal(Object.values(b.definition.cost).reduce((a,n)=>a+n,0),cost);assert.equal(b.tiles.length,width*width);assert.equal(s.inventory.count('stone'),0);assert.equal(buildingIsComplete(b),false);for(const t of b.tiles)assert.equal(s.map[t.y][t.x],1);
     assert.equal(s.farmingSystem.records.has(b.id),false);const w=s.workerSystem.create({x:x-1,y:43});assert.equal(s.workplaceSystem.assign(b,w),false);
   }
   s.gameTime.update(600000);assert.equal(s.farmingSystem.records.size,0);assert.equal(s.inventory.count('wheat'),0);assert.equal(s.inventory.count('apple'),0);

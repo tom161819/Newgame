@@ -8,7 +8,7 @@ import { DIAGNOSTICS } from '../src/data/diagnostics.js';
 
 globalThis.document??={querySelector:()=>({textContent:''})};
 
-function scene(){const s=workerScene(undefined,{construction:true,foodProduction:true});s.diagnostics=new ProductionDiagnostics(s);s.log=[];s.activities.on(e=>{if(e.type==='productionIssue')s.log.push(e);});return s;}
+function scene(){const s=workerScene(undefined,{construction:true,foodProduction:true});s.diagnostics=new ProductionDiagnostics(s);s.diagnostics.foodIssues=()=>[];/* no food stores here; the food notice has its own test */s.log=[];s.activities.on(e=>{if(e.type==='productionIssue')s.log.push(e);});return s;}
 function building(s,type,x,y,{blueprint=false}={}){const d=s.objectRegistry.require(type);ensureBuildingPrerequisites(s,d);for(const[id,n]of Object.entries(d.cost))s.inventory.add(id,n);const r=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(r.error);if(blueprint)s.constructionSystem.plan(r.building);s.towerViews.set(r.building.id,s.createBuildingView(d,r.building));return r.building;}
 function employ(s,home,profession,x=53){const w=s.workerSystem.create({x,y:44});if(home)assert.equal(s.workplaceSystem.assign(home,w),true);else s.workerSystem.jobs.assign(w,profession);return w;}
 // Advance game time only through the diagnostics' own clock, without simulating the whole kingdom.
@@ -74,7 +74,7 @@ test('Bakery requires a completed Mill; existing predecessors and reloaded build
  const mill=building(s,'mill',60,45,{blueprint:true});advance(s,DIAGNOSTICS.checkInterval);assert.deepEqual(reasons(s),[],'a planned Mill is enough – no advice to build one');
  mill.construction.state='complete';s.constructionSystem.sites.delete(mill.id);s.activities.emit('buildingCompleted',{objectIds:[mill.id]});assert.equal(s.diagnostics.active().some(i=>i.params.producer==='mill'),false);
  const next=building(s,'bakery',54,52);s.activities.emit('buildingCompleted',{objectIds:[next.id]});assert.equal(s.log.filter(i=>i.params.producer==='mill').length,1);
- s.diagnostics.destroy();s.diagnostics=new ProductionDiagnostics(s);advance(s,DIAGNOSTICS.reminder*2);assert.deepEqual(reasons(s),[],'loading existing complete buildings emits no completion event');
+ s.diagnostics.destroy();s.diagnostics=new ProductionDiagnostics(s);s.diagnostics.foodIssues=()=>[];advance(s,DIAGNOSTICS.reminder*2);assert.deepEqual(reasons(s),[],'loading existing complete buildings emits no completion event');
 });
 test('C04 actual blockers take precedence over structural advice without duplicating the panel row',()=>{
  const s=scene(),mill=building(s,'mill',54,45);s.activities.emit('buildingCompleted',{objectIds:[mill.id]});employ(s,mill,'miller');advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);
@@ -126,4 +126,19 @@ test('storage full: one notice naming the goods and the store to build; the stuc
   assert.equal(s.feed.filter(f=>f.key.includes('storageFull')).length,1);
   s.foodStorage.locations.get('stock-1').capacity=50;s.foodStorage.locations.get('stock-2').capacity=50;advance(s,DIAGNOSTICS.checkInterval);
   assert.equal(s.diagnostics.active().length,0,'room again: all gone');
+});
+
+test('E1: a site whose booked materials sit in a store gets a waiting-for-material notice; Builders then carry them although a Hauler is free',async()=>{
+  const {hireUnemployed}=await import('../src/ui/jobChange.js');
+  const s=workerScene(undefined,{construction:true,logistics:true});s.diagnostics=new ProductionDiagnostics(s);
+  const d=s.objectRegistry.require('tower');ensureBuildingPrerequisites(s,d);Object.entries(d.cost).forEach(([r,n])=>s.inventory.add(r,n));
+  const r=placeBuilding({map:s.map,anchor:{x:56,y:44},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d,reserveMaterials:true});assert.ifError(r.error);s.constructionSystem.plan(r.building);
+  const site=r.building;assert.equal(s.constructionSystem.materials.ready(site),false);assert.equal(s.diagnostics.materialsInStock(site),true,'the booked stone is still in the starter stockpile');
+  s.diagnostics.constructionIssues();assert.equal(typeof site.materialWaitSince,'number');
+  s.gameTime.totalElapsed+=DIAGNOSTICS.materialWait;assert.ok(s.diagnostics.constructionIssues().some(i=>i.reason==='waitingMaterial'&&i.entityId===site.id));
+  // Hire from the notice: the unemployed resident with the best skill.
+  const a=s.workerSystem.create({x:50,y:44}),b=s.workerSystem.create({x:51,y:44});b.skills.construction.level=4;
+  assert.equal(hireUnemployed(s,'builder'),b);assert.equal(b.profession,'builder');assert.equal(hireUnemployed(s,'hauler'),a);assert.equal(hireUnemployed(s,'hauler'),null,'nobody left');
+  // The Hauler is free, yet the Builder of a stuck site fetches the stone.
+  b.aiCooldown=0;s.constructionSystem.builderAI.carryMaterials(b);assert.ok(b.workTask||b.cargo||b.workMessage!=='Waiting for construction','the Builder took a delivery');
 });

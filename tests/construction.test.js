@@ -13,7 +13,7 @@ import { MountSystem } from '../src/systems/MountSystem.js';
 const scene=()=>workerScene(undefined,{construction:true});
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-6,`${a} !== ${b}`);
 function site(s,type='tower',x=50,y=50){
-  const d=s.objectRegistry.require(type);s.inventory.add('stone',d.cost.stone);const r=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ok(r.building,r.error);s.constructionSystem.plan(r.building);s.towerViews.set(r.building.id,s.createBuildingView(d,r.building));return r.building;
+  const d=s.objectRegistry.require(type);Object.entries(d.cost).forEach(([r,k])=>s.inventory.add(r,k));const r=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ok(r.building,r.error);s.constructionSystem.plan(r.building);s.towerViews.set(r.building.id,s.createBuildingView(d,r.building));return r.building;
 }
 function builder(s,x=47,y=50){const w=s.workerSystem.create({x,y});s.workerSystem.jobs.assign(w,'builder');return w;}
 function until(s,condition,max=65000){let ms=0;while(!condition()&&ms<max){s.tick(50);ms+=50;}assert.ok(condition(),`No condition after ${ms} ms`);return ms;}
@@ -59,7 +59,7 @@ test('king builds only after walking, can stop and resume, assists an existing b
 
 test('a mounted king automatically dismounts before building and a king on a finished tower descends before any work',()=>{
   const s=scene(),b=site(s,'wall',45,40),horse=s.animalSystem.create(s.objectRegistry.require('horse'),{x:41,y:40}),bystander=s.workerSystem.create({x:40,y:39});bystander.aiCooldown=1e8;s.fog.update=()=>{};s.mountSystem=new MountSystem(s);assert.equal(s.mountSystem.mount(horse),true);assert.equal(s.character.speed,7);assert.equal(s.constructionSystem.commandKing(b),true);assert.equal(s.character.mountedHorse,null);assert.equal(horse.mounted,false);assert.notDeepEqual(horse.tile,bystander.tile);assert.equal(s.character.speed,3.5);until(s,()=>buildingIsComplete(b));assert.equal(s.character.experience.totalXP,2);
-  const r=scene(),d=r.objectRegistry.require('tower');r.inventory.add('stone',10);const {building:tower}=placeBuilding({map:r.map,anchor:{x:42,y:40},resources:r.resourceOccupancy,reservedTiles:r.reservedTiles(),inventory:r.inventory,buildings:r.buildings,definition:d});assert.equal(r.character.command({kind:'enter',tower}),true);until(r,()=>r.character.state==='enteringTower');r.character.completeClimb(tower);
+  const r=scene(),d=r.objectRegistry.require('tower');r.inventory.add('stone',20);const {building:tower}=placeBuilding({map:r.map,anchor:{x:42,y:40},resources:r.resourceOccupancy,reservedTiles:r.reservedTiles(),inventory:r.inventory,buildings:r.buildings,definition:d});assert.equal(r.character.command({kind:'enter',tower}),true);until(r,()=>r.character.state==='enteringTower');r.character.completeClimb(tower);
   const wall=site(r,'wall',48,40);assert.equal(r.constructionSystem.commandKing(wall),true);assert.equal(r.character.state,'exitingTower');r.tick(500);assert.equal(wall.construction.workDone,0);r.character.completeDescent(r.character.exitTile);until(r,()=>buildingIsComplete(wall));assert.equal(r.character.experience.totalXP,2);
 });
 
@@ -69,8 +69,8 @@ test('adjacent blueprints cannot assign two builders to the same shared work til
 });
 
 test('cancellation refunds all planned material or floor(half) after real work, releases slots and never pays XP',()=>{
-  const s=scene(),planned=site(s,'quarry');assert.equal(s.constructionSystem.cancel(planned),true);assert.equal(s.inventory.count('stone'),15);assert.equal(s.constructionSystem.cancel(planned),false);assert.equal(s.inventory.count('stone'),15);for(const t of planned.tiles)assert.equal(s.map[t.y][t.x],0);
-  const b=site(s,'quarry'),w=builder(s);until(s,()=>b.construction.workDone>0);assert.equal(s.constructionSystem.cancel(b),true);assert.equal(s.inventory.count('stone'),22);assert.equal(w.experience.totalXP,0);assert.equal(w.workTask,null);assert.equal(s.workerSystem.reservations.owners.size,0);assert.ok(site(s,'wall').id>b.id);
+  const s=scene(),planned=site(s,'quarry');assert.equal(s.constructionSystem.cancel(planned),true);assert.equal(s.inventory.count('wood'),15);assert.equal(s.constructionSystem.cancel(planned),false);assert.equal(s.inventory.count('wood'),15);for(const t of planned.tiles)assert.equal(s.map[t.y][t.x],0);
+  const b=site(s,'quarry'),w=builder(s);until(s,()=>b.construction.workDone>0);assert.equal(s.constructionSystem.cancel(b),true);assert.equal(s.inventory.count('wood'),22);assert.equal(w.experience.totalXP,0);assert.equal(w.workTask,null);assert.equal(s.workerSystem.reservations.owners.size,0);assert.ok(site(s,'wall').id>b.id);
 });
 
 test('wall dragging charges only fresh segments and only completed segments join the usable roof graph',()=>{
@@ -98,7 +98,7 @@ test('precise Save/Load restores partial work, contributions, paid material, bui
 
 test('older completed buildings keep all functions without rebuilding, repaying material or granting historical XP',()=>{
   globalThis.document??={querySelector:()=>({textContent:''})};
-  const old=workerScene(),d=old.objectRegistry.require('castle');old.inventory.add('stone',10);placeBuilding({map:old.map,anchor:{x:50,y:50},resources:old.resourceOccupancy,reservedTiles:old.reservedTiles(),inventory:old.inventory,buildings:old.buildings,definition:d});const saved=serializeGameState(old),r=scene();loadGameState(r,saved);assert.equal(buildingIsComplete(r.buildings[0]),true);assert.equal(r.constructionSystem.sites.size,0);assert.equal(r.production.dailyIncome().gold,5);assert.equal(r.character.experience.totalXP,0);assert.equal(r.inventory.count('stone'),0);validateGameState(serializeGameState(r));
+  const old=workerScene(),d=old.objectRegistry.require('castle');old.inventory.add('stone',20);placeBuilding({map:old.map,anchor:{x:50,y:50},resources:old.resourceOccupancy,reservedTiles:old.reservedTiles(),inventory:old.inventory,buildings:old.buildings,definition:d});const saved=serializeGameState(old),r=scene();loadGameState(r,saved);assert.equal(buildingIsComplete(r.buildings[0]),true);assert.equal(r.constructionSystem.sites.size,0);assert.equal(r.production.dailyIncome().gold,5);assert.equal(r.character.experience.totalXP,0);assert.equal(r.inventory.count('stone'),0);validateGameState(serializeGameState(r));
 });
 
 test('a Builder whose reserved goal tile becomes occupied by a standing unit picks another free side instead of waiting forever',()=>{

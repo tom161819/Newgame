@@ -13,10 +13,10 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),regis
 const p=(buildingId,cost,at='2026-11-07T01:00:00Z')=>({buildingId,cost,by:'owner',at,note:''});
 
 test('the plan applies changed, added and removed resources and reports what it ignores', () => {
-  const plan=planPriceSync([p('house',{wood:6,stone:4,gold:5}),p('warehouse',{wood:30}),p('nothing',{stone:1}),p('tower',{dragon:1}),p('mill',{}),p('bakery',{stone:0}),p('farmhouse',{stone:10})],registry);
-  assert.deepEqual(plan.applied.map(c=>[c.buildingId,c.cost,c.added,c.removed]),[['house',{wood:6,stone:4,gold:5},['gold'],[]],['warehouse',{wood:30},['wood'],['stone']]]);
-  assert.deepEqual(plan.ignored.map(i=>[i.buildingId,i.reason]),[['nothing','unknown building'],['tower','unknown resource dragon'],['mill','empty price'],['bakery','invalid amount of stone'],['farmhouse','unchanged']]);
-  assert.deepEqual([...plan.remove].sort(),['farmhouse','house','warehouse'],'unchanged proposals are already in the game; invalid ones stay for the owner');
+  const plan=planPriceSync([p('house',{wood:6,gold:5}),p('mill',{wood:30}),p('nothing',{stone:1}),p('tower',{dragon:1}),p('wall_gate',{}),p('bakery',{stone:0}),p('quarry',{wood:15})],registry);
+  assert.deepEqual(plan.applied.map(c=>[c.buildingId,c.cost,c.added,c.removed]),[['house',{wood:6,gold:5},['gold'],[]],['mill',{wood:30},[],['stone']]]);
+  assert.deepEqual(plan.ignored.map(i=>[i.buildingId,i.reason]),[['nothing','unknown building'],['tower','unknown resource dragon'],['wall_gate','empty price'],['bakery','invalid amount of stone'],['quarry','unchanged']]);
+  assert.deepEqual([...plan.remove].sort(),['house','mill','quarry'],'unchanged proposals are already in the game; invalid ones stay for the owner');
 });
 
 test('Studio documents are read with their ids, and the newest proposal for a building wins', () => {
@@ -46,7 +46,7 @@ test('prices:sync writes the new defaults into a copy of the game and the regist
   const out=JSON.parse(execFileSync(process.execPath,[path.join(tmp,'scripts/prices-sync.mjs'),input,'--json'],{encoding:'utf8'}));
   assert.deepEqual(out.applied.map(c=>c.buildingId).sort(),['bowyer','brazier','house','tower','wheat_field']);
   const costs=JSON.parse(execFileSync(process.execPath,['--input-type=module','-e',`const {objectRegistry:r}=await import(${JSON.stringify(path.join(tmp,'src/systems/ObjectRegistry.js'))});console.log(JSON.stringify(Object.fromEntries(['house','bowyer','brazier','tower','wheat_field','warehouse'].map(id=>[id,r.require(id).cost]))));`],{encoding:'utf8'}));
-  assert.deepEqual(costs,{house:{wood:6,gold:5},bowyer:{stone:9},brazier:{stone:2,wood:1},tower:{stone:12},wheat_field:{wood:1},warehouse:{stone:10}});
+  assert.deepEqual(costs,{house:{wood:6,gold:5},bowyer:{stone:9},brazier:{stone:2,wood:1},tower:{stone:12},wheat_field:{wood:1},warehouse:{stone:10,wood:4}});
   const dry=JSON.parse(execFileSync(process.execPath,[path.join(tmp,'scripts/prices-sync.mjs'),input,'--json','--dry-run'],{encoding:'utf8'}));
   assert.equal(dry.applied.length,0,'after applying, the same proposals are unchanged');assert.equal(dry.ignored.filter(i=>i.reason==='unchanged').length,5);
 });

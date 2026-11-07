@@ -33,7 +33,7 @@ test('Fishing data: fish is food and a trade good; the hut is a food workplace f
   assert.ok(EDIBLE_RESOURCES.includes('fish')&&FOOD_RESOURCE_IDS.includes('fish'));assert.equal(BASE_PRICES.fish,3);
   assert.ok(MERCHANT_TYPES.food.stock.fish&&MERCHANT_TYPES.general.stock.fish);
   const d=objectRegistry.require('fisherman_hut');
-  assert.deepEqual([d.width,d.height,d.buildingCategory,d.cost,d.requiresCompletedBuildings,d.recommendsCompletedBuildings],[2,2,'food',{wood:12,stone:4},undefined,['granary']]);
+  assert.deepEqual([d.width,d.height,d.buildingCategory,d.cost,d.requiresCompletedBuildings,d.recommendsCompletedBuildings],[2,2,'food',{wood:10},undefined,['granary']]);
   assert.deepEqual(d.workplace,{capacity:2,profession:'fisher',skill:'fishing'});
   assert.deepEqual([stockCapacity(3),stockCapacity(50),stockCapacity(500)],[40,200,400]);
   assert.deepEqual([stockFactor(.8),stockFactor(.25),stockFactor(.09)],[1,.5,0]);

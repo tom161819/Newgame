@@ -4,6 +4,7 @@ import { dailyResourceLabel,dailyResourceTone } from './resourceEconomy.js';
 import { t } from '../i18n/index.js';
 
 // Vykresluje původní Inventory; nevytváří druhý inventář ani nové suroviny.
+const ALWAYS_SHOWN=new Set(['gold','stone','wood']);
 export class InventoryBar {
   constructor(registry,assets,inventory) {
     Object.assign(this,{registry,assets,inventory});
@@ -27,7 +28,9 @@ export class InventoryBar {
       this.outputs.set(definition.id,output);
       const delta=element('small','resource-delta',dailyResourceLabel(definition.id,this.ledger?.summary(definition.id)));delta.dataset.resourceDelta=definition.id;delta.dataset.tone=dailyResourceTone(this.ledger?.summary(definition.id));this.deltas.set(definition.id,delta);
       // N2: resources marked `inventoryHideZero` (Pitch, Torches) appear in the bar only while the kingdom has some.
-      if(definition.inventoryHideZero){item.dataset.hideZero='true';item.hidden=this.format(definition.id)==='0';}
+      // N2: `inventoryHideZero` resources (Pitch, Torches) show only while the kingdom has some. E2 (report 0.48.0): every
+      // other resource but Gold, Stone and Wood appears once the kingdom has had some (kept for the session).
+      item.dataset.reveal=definition.inventoryHideZero?'zero':ALWAYS_SHOWN.has(definition.id)?'always':'seen';item.hidden=this.hideItem(definition.id,this.format(definition.id),item.dataset.reveal);
       item.append(image,element('span','',definition.inventoryLabel??definition.name),output,delta);return item;
     });
     // Owner request 7 Nov 2026: how full the stores are (Starter Stockpile and Warehouses), as used / capacity.
@@ -45,6 +48,7 @@ export class InventoryBar {
   format(id){const limit=this.inventory.limit?.(id);return id==='gold'?`${this.inventory.count(id).toFixed(2)}${limit!=null?` / ${limit}`:''}`:String(this.inventory.count(id));}
   resetCameraKeys(){for(const key of Object.values(this.ledger?.scene.worldCamera?.keys??{}))key.reset?.();}
   setLedger(ledger){this.unsubscribeLedger?.();this.ledger=ledger;this.unsubscribeLedger=ledger.onChange(()=>this.update());this.update();}
-  update() { for(const [id,output]of this.outputs){const count=this.format(id);if(output.textContent!==count)output.textContent=count;const item=output.parentElement;if(item?.dataset.hideZero){const hide=count==='0';if(item.hidden!==hide)item.hidden=hide;}const summary=this.ledger?.summary(id),delta=this.deltas.get(id),text=dailyResourceLabel(id,summary),tone=dailyResourceTone(summary);if(delta.textContent!==text)delta.textContent=text;if(delta.dataset.tone!==tone)delta.dataset.tone=tone;}if(this.storeOutput){const text=this.storeText();if(this.storeOutput.textContent!==text)this.storeOutput.textContent=text;this.storeItem.hidden=!text;}this.tooltip.refresh(); }
+  hideItem(id,count,reveal){this.seen??=new Set();if(count!=='0')this.seen.add(id);return reveal==='zero'?count==='0':reveal==='seen'?!this.seen.has(id):false;}
+  update() { for(const [id,output]of this.outputs){const count=this.format(id);if(output.textContent!==count)output.textContent=count;const item=output.parentElement;if(item?.dataset.reveal){const hide=this.hideItem(id,count,item.dataset.reveal);if(item.hidden!==hide)item.hidden=hide;}const summary=this.ledger?.summary(id),delta=this.deltas.get(id),text=dailyResourceLabel(id,summary),tone=dailyResourceTone(summary);if(delta.textContent!==text)delta.textContent=text;if(delta.dataset.tone!==tone)delta.dataset.tone=tone;}if(this.storeOutput){const text=this.storeText();if(this.storeOutput.textContent!==text)this.storeOutput.textContent=text;this.storeItem.hidden=!text;}this.tooltip.refresh(); }
   destroy() { this.unsubscribe();this.unsubscribeAssets();this.unsubscribeLedger?.();this.controller.abort();this.tooltip.destroy(); }
 }

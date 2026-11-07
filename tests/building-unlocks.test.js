@@ -26,7 +26,7 @@ test('Food menu (owner, 7 Nov): nothing is locked; a building without its earlie
   for(const id of ['marketplace','village_green'])assert.equal(s.buildingUnlocks.status(definition(id)).unlocked,false,`other categories keep their locks (${id})`);
 });
 test('a Hunting Lodge can be placed before a Granary; the warning stays for an unfinished Granary and goes once it is complete',()=>{
-  const s=scene();s.inventory.add('stone',40);
+  const s=scene();(s.inventory.add('stone',40),s.inventory.add('wood',40));
   assert.ifError(place(s,'hunting_lodge').error,'placed without a Granary');
   const granary=place(s,'granary',50,44).building;s.constructionSystem.plan(granary);s.events.emit('buildings:changed');
   assert.match(s.buildingUnlocks.status(definition('hunting_lodge')).warning,/Granary/);
@@ -35,18 +35,18 @@ test('a Hunting Lodge can be placed before a Granary; the warning stays for an u
   assert.equal(s.buildingUnlocks.status(definition('hunting_lodge')).warning,'');
 });
 test('the placement transaction still rejects locked objects (other categories) before payment, reservations, occupancy or world mutation',()=>{
-  const s=scene();s.inventory.add('stone',30);s.inventory.add('wood',30);const before=serializeGameState(s);
+  const s=scene();(s.inventory.add('stone',30),s.inventory.add('wood',30));s.inventory.add('wood',30);const before=serializeGameState(s);
   for(const id of ['marketplace','village_green']){assert.ok(place(s,id).error);assert.deepEqual(serializeGameState(s),before);}
 });
 test('a Farmhouse before its Granary only warns; crops warn until a Farmhouse is complete',()=>{
-  const s=scene();s.inventory.add('stone',30);const farmFirst=place(s,'farmhouse',56,44);assert.ifError(farmFirst.error,'Farmhouse without a Granary');s.constructionSystem.plan(farmFirst.building);
+  const s=scene();(s.inventory.add('stone',30),s.inventory.add('wood',40));const farmFirst=place(s,'farmhouse',56,44);assert.ifError(farmFirst.error,'Farmhouse without a Granary');s.constructionSystem.plan(farmFirst.building);
   assert.match(s.buildingUnlocks.status(definition('wheat_field')).warning,/Farmhouse/);
   const granary=build(s,'granary',44,44);assert.equal(s.buildingUnlocks.status(definition('farmhouse')).warning,'');
   const farm=build(s,'farmhouse',50,44);assert.equal(s.buildingUnlocks.status(definition('wheat_field')).warning,'');assert.equal(s.buildingUnlocks.status(definition('orchard')).warning,'');
   assert.ok(granary&&s.buildings.find(b=>b.id===farm.id));validateGameState(serializeGameState(s));
 });
 test('losing the earlier building brings the warning back; orphan plots still wait for their Farmers',()=>{
-  const s=scene();s.inventory.add('stone',30);const granary=build(s,'granary',44,44),farm=build(s,'farmhouse',50,44);
+  const s=scene();(s.inventory.add('stone',30),s.inventory.add('wood',30));const granary=build(s,'granary',44,44),farm=build(s,'farmhouse',50,44);
   s.buildings=s.buildings.filter(b=>b!==granary);s.events.emit('buildings:changed');assert.match(s.buildingUnlocks.status(definition('farmhouse')).warning,/Granary/);assert.equal(s.buildingUnlocks.status(definition('farmhouse')).unlocked,true);
   const field=place(s,'wheat_field',54,44);assert.ifError(field.error);s.constructionSystem.plan(field.building);s.buildings=s.buildings.filter(b=>b!==farm);s.events.emit('buildings:changed');
   assert.match(s.buildingUnlocks.status(definition('wheat_field')).warning,/Farmhouse/);assert.ifError(place(s,'orchard',60,44).error,'an orchard can still be planned');assert.ok(s.buildings.includes(field.building));
@@ -73,13 +73,13 @@ test('data-only registry additions refresh unlock listeners and use their regist
   for(let frame=0;frame<500;frame++)assert.equal(manager.status(added).unlocked,true);assert.equal(changed,1);manager.destroy();
 });
 test('Save/Load derives warnings from actual buildings without saving any unlock state',()=>{
-  const s=scene();s.inventory.add('stone',30);build(s,'granary',44,44);build(s,'farmhouse',50,44);const saved=validateGameState(serializeGameState(s)),r=scene({starter:false});loadGameState(r,saved);assert.deepEqual(serializeGameState(r),saved);
+  const s=scene();(s.inventory.add('stone',30),s.inventory.add('wood',30));build(s,'granary',44,44);build(s,'farmhouse',50,44);const saved=validateGameState(serializeGameState(s)),r=scene({starter:false});loadGameState(r,saved);assert.deepEqual(serializeGameState(r),saved);
   assert.equal(r.buildingUnlocks.status(definition('wheat_field')).warning,'');assert.equal(Object.hasOwn(saved,'buildingUnlocks'),false);
   const legacy=structuredClone(saved);legacy.buildings=legacy.buildings.filter(b=>b.type!=='granary');legacy.foodStorage.locations=legacy.foodStorage.locations.filter(l=>l.kind!=='storage');
   legacy.workplaces.records=legacy.workplaces.records.filter(record=>legacy.buildings.some(b=>b.id===record.buildingId));
   const old=scene({starter:false});loadGameState(old,legacy);assert.equal(old.buildings.some(b=>b.type==='farmhouse'),true);assert.match(old.buildingUnlocks.status(definition('farmhouse')).warning,/Granary/);assert.equal(old.buildingUnlocks.status(definition('wheat_field')).warning,'');validateGameState(serializeGameState(old));
 });
 test('canceling an unfinished Granary releases its payment; the warning stays',()=>{
-  const s=scene();s.inventory.add('stone',10);const {building}=place(s,'granary');s.constructionSystem.plan(building);assert.match(s.buildingUnlocks.status(definition('farmhouse')).warning,/Granary/);
-  assert.equal(s.constructionSystem.cancel(building),true);assert.match(s.buildingUnlocks.status(definition('farmhouse')).warning,/Granary/);assert.equal(s.inventory.count('stone'),10);assert.equal(s.character.experience.totalXP,0);validateGameState(serializeGameState(s));
+  const s=scene();s.inventory.add('wood',12);const {building}=place(s,'granary');s.constructionSystem.plan(building);assert.match(s.buildingUnlocks.status(definition('farmhouse')).warning,/Granary/);
+  assert.equal(s.constructionSystem.cancel(building),true);assert.match(s.buildingUnlocks.status(definition('farmhouse')).warning,/Granary/);assert.equal(s.inventory.count('wood'),12);assert.equal(s.character.experience.totalXP,0);validateGameState(serializeGameState(s));
 });

@@ -60,7 +60,7 @@ test('100 held units do not plan any route each frame',()=>{
 
 
 test('Hold releases a Builder slot without losing progress; another Builder resumes the same site',()=>{
- const s=workerScene(undefined,{construction:true}),d=s.objectRegistry.require('tower');s.inventory.add('stone',d.cost.stone);
+ const s=workerScene(undefined,{construction:true}),d=s.objectRegistry.require('tower');Object.entries(d.cost).forEach(([r,k])=>s.inventory.add(r,k));
  const result=placeBuilding({map:s.map,anchor:{x:60,y:60},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(result.error);const site=result.building;s.constructionSystem.plan(site);s.towerViews.set(site.id,s.createBuildingView(d,site));
  const w=s.workerSystem.create({x:59,y:60});s.workerSystem.jobs.assign(w,'builder');until(s,()=>site.construction.workDone>500);const work=site.construction.workDone;s.workerSystem.commands.hold(w);
  assert.equal(s.constructionSystem.assignments.has(w.id),false);assert.equal(site.construction.assignedBuilders.includes(w.id),false);s.simulate(500);assert.equal(site.construction.workDone,work);validateGameState(serializeGameState(s));

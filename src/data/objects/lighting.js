@@ -8,7 +8,7 @@ export const lightingBuildings = [
     id: 'brazier', name: 'Brazier', category: 'building', buildingCategory: 'infrastructure',
     sprite: '/assets/buildings/brazier/torch-post-brazier.v1.png', artSource: 'art/sprites/torch-post/torch-post-brazier.v1.json',
     width: 1, height: 1, walkable: false, collectible: false, buildable: true, cost: { stone: 3 }, constructionTime: 8000,
-    interactions: [], description: 'Kamenná pánev s ohněm. Osvětlí okolí, až hra dostane noc.',
+    interactions: [], description: 'A stone fire basin. It lights its surroundings at night.',
     renderMode: 'sprite', origin: { x: 0.49254, y: 0.96721 }, visualHeight: 59, depth: { offset: 0 },
     lights: [{ type: 'brazier', x: 0, y: -56.37, color: '#ff9d4a', radius: 134.4, intensity: 1, flicker: { amplitude: 0.16, speed: 5.5 }, flameSize: 1.6 }],
     // Day and night N2: burns 1 Wood a night (store of 2), brought by Haulers.

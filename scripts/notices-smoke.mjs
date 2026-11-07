@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { placeBlueprint } from './building-menu-smoke.mjs';
 // Right-bottom notices for a real supplied site with no Builder: shown, filtered by category, dismissed.
 export async function noticesSmoke(page){
-  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('stone',10);s.updateInventory();});
+  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('stone',20);s.updateInventory();});
   const site=await placeBlueprint(page,'tower');
   // No Builder in the kingdom: one notice right away, before any materials arrive (the C04 check waited for them, so it
   // never fired in a new game where nobody delivers). Made to last now instead of waiting the 10 s in game time.
@@ -17,8 +17,9 @@ export async function noticesSmoke(page){
   await page.locator('[data-notice-category="construction"]').click();assert.equal(await page.locator('#notices-list li').count(),0);assert.equal(await page.locator('[data-notice-category="construction"]').getAttribute('aria-pressed'),'false');
   await page.locator('[data-notice-category="construction"]').click();assert.equal(await page.locator('#notices-list li').count(),1);
   await page.locator('[data-dismiss-notice]').click();assert.equal(await page.locator('#notices-list li').count(),0);assert.equal(await page.locator('#notices-panel').isHidden(),true);
-  await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;window.__noticeRestore();delete window.__noticeRestore;s.constructionSystem.cancel(s.buildings.find(b=>b.id===id));s.inventory.spend('stone',10);s.updateInventory();s.diagnostics.nextCheck=0;s.diagnostics.update();},site.id);
+  await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;window.__noticeRestore();delete window.__noticeRestore;s.constructionSystem.cancel(s.buildings.find(b=>b.id===id));s.inventory.spend('stone',20);s.updateInventory();s.diagnostics.nextCheck=0;s.diagnostics.update();},site.id);
   assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.inventory.count('stone')),0,'the fixture stone is taken back');
-  assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.diagnostics.issues.size),0);
+  // E1: the empty smoke start has no food, so a foodLow notice may stay; the construction issues are gone.
+  assert.equal(await page.evaluate(()=>[...window.__game.registry.get('application').scene.diagnostics.issues.values()].filter(i=>i.reason!=='foodLow').length),0);
   console.log('PASS right-bottom notices: lasting no-Builder site reported, category filter, dismiss, resolved when the site is gone');
 }

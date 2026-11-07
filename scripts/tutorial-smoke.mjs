@@ -1,0 +1,54 @@
+import assert from 'node:assert/strict';
+import { clickWorld } from './building-menu-smoke.mjs';
+// E3 arrow tutorial in its own page: a New Game starts it instead of the Getting started window; the arrow points at the
+// next click; every step ticks by doing it through the real interface (Population job menu, Buildings menu, map clicks,
+// Mark rocks, speed); "Skip" and the Settings switch work.
+const scene=page=>page.evaluate(()=>{const s=window.__game.registry.get('application').scene;return {step:s.tutorial.progress().current?.id??null,active:s.tutorial.active};});
+async function arrowOn(page,selector){
+  await page.waitForFunction(sel=>{const a=document.querySelector('#tutorial-arrow'),t=document.querySelector(sel);if(!a||a.hidden||!t)return false;const r=a.getBoundingClientRect(),q=t.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;return Math.hypot(cx-(q.left+q.width/2),cy-(q.top+q.height/2))<Math.max(q.width,q.height)/2+60;},selector,{timeout:8000});
+}
+async function placeHere(page,id){
+  const spot=await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,d=s.objectRegistry.require(id),c=s.buildings.find(b=>b.type==='castle')??s.character.tile;
+    for(let r=3;r<24;r++)for(let y=c.y-r;y<=c.y+r;y++)for(let x=c.x-r;x<=c.x+r;x++){if(Math.max(Math.abs(x-c.x),Math.abs(y-c.y))!==r)continue;const keep=s.selectedBuilding,mode=s.buildMode;s.selectedBuilding=d;s.buildMode=true;s.previewAnchor={x,y};s.previewKey=null;s.updateBuildingPreview();const ok=String(s.previewKey).endsWith(':false:null');s.selectedBuilding=keep;s.buildMode=mode;if(ok)return {x:s.map.length*32+(x-y)*32,y:128+(x+y+1)*16};}return null;},id);
+  assert.ok(spot,`room for ${id}`);await clickWorld(page,spot,{forBlueprint:true});
+  await page.waitForFunction(id=>window.__game.registry.get('application').scene.buildings.some(b=>b.type===id),id);
+  if(await page.evaluate(()=>!!window.__game.registry.get('application').scene.buildMode))await page.keyboard.press('Escape');
+}
+// Follow the arrow: Buildings tab → category → card, then the map.
+async function buildStep(page,id){
+  if(!await page.locator('#buildings-panel').isVisible()){await arrowOn(page,'#buildings-tab');await page.locator('#buildings-tab').click();}
+  const card=`#${id}-choice`;if(!await page.locator(card).isVisible()){const cat=await page.evaluate(id=>window.__game.registry.get('application').scene.objectRegistry.get(id).buildingCategory,id);await arrowOn(page,`[data-building-category="${cat}"]`);await page.locator(`[data-building-category="${cat}"]`).click();}
+  await arrowOn(page,card);await page.locator(card).click();await page.waitForFunction(()=>/green|zelené/i.test(document.querySelector('#tutorial-bubble .tutorial-text').textContent),null,{timeout:5000});
+  await placeHere(page,id);
+}
+export async function tutorialSmoke(context,url,instrument){
+  const page=await context.newPage();await instrument?.(page);
+  try{
+    await page.goto(url);await page.evaluate(()=>localStorage.setItem('newgame.tutorial','on'));await page.reload();
+    await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.tutorial?.active);
+    assert.equal(await page.locator('#help-dialog').evaluate(d=>d.open),false,'no Getting started window over the map');
+    assert.equal((await scene(page)).step,'king');assert.equal(await page.locator('#tutorial-bubble').isVisible(),true);
+    await page.locator('#tutorial-bubble .tutorial-next').click();assert.equal((await scene(page)).step,'builder');
+    await arrowOn(page,'#population-tab');await page.locator('#population-tab').click();
+    await arrowOn(page,'.population-row .population-job.is-unemployed');await page.locator('.population-row .population-job.is-unemployed').first().click();
+    await arrowOn(page,'#population-job-menu [data-job="builder"]');await page.locator('#population-job-menu [data-job="builder"]').click();
+    await page.locator('#close-population').click();await page.waitForFunction(()=>window.__game.registry.get('application').scene.tutorial.progress().current?.id==='granary');
+    await buildStep(page,'granary');
+    await buildStep(page,'farmhouse');await buildStep(page,'wheat_field');await buildStep(page,'hunting_lodge');await buildStep(page,'lumberjack_hut');
+    assert.equal((await scene(page)).step,'stone');await arrowOn(page,'#mark-rocks');
+    await page.locator('#tutorial-bubble .tutorial-skip').click();assert.equal((await scene(page)).step,'house','Skip moves on');
+    if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/tutorial-house.png`});
+    // Settings: switch off and on again – it resumes at the first step not done.
+    await page.evaluate(()=>{const c=document.querySelector('#settings-tutorial');c.checked=false;c.dispatchEvent(new Event('change'));});assert.equal(await page.locator('#tutorial-bubble').isVisible(),false);
+    await page.evaluate(()=>{const c=document.querySelector('#settings-tutorial');c.checked=true;c.dispatchEvent(new Event('change'));});await page.waitForFunction(()=>!document.querySelector('#tutorial-bubble').hidden);
+    assert.equal((await scene(page)).step,'stone','skips are forgotten when the tutorial is switched back on');
+    // Tips (m-e3-tipy): with the tutorial off, the first time more than 3 residents are idle a tip points at Population.
+    await page.evaluate(()=>{localStorage.setItem('newgame.tips','on');localStorage.removeItem('newgame.tipsSeen');const s=window.__game.registry.get('application').scene;const c=document.querySelector('#settings-tutorial');c.checked=false;c.dispatchEvent(new Event('change'));s.tutorial.tipsSeen.clear();for(let i=0;i<4;i++)s.workerSystem.create({x:s.character.tile.x+1,y:s.character.tile.y+i});});
+    await page.waitForFunction(()=>document.querySelector('#tutorial-bubble.is-tip')&&!document.querySelector('#tutorial-bubble').hidden,null,{timeout:8000});
+    assert.match(await page.locator('#tutorial-bubble .tutorial-text').textContent(),/no work/);await arrowOn(page,'#population-tab');
+    await page.locator('#tutorial-bubble .tutorial-next').click();assert.equal(await page.locator('#tutorial-bubble').isVisible(),false);
+    assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('newgame.tipsSeen'))),['unemployed'],'a tip shows once');
+    await page.evaluate(()=>localStorage.setItem('newgame.tips','off'));
+    console.log('PASS E3 tutorial: starts instead of the Getting started window, arrow on every click (Population job menu, Buildings tab, category, card), steps tick from the world, Skip, Settings off/on; a one-time tip with an arrow');
+  }finally{await page.evaluate(()=>localStorage.setItem('newgame.tutorial','off')).catch(()=>{});await page.close();}
+}

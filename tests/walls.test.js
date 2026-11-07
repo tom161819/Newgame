@@ -14,9 +14,9 @@ const makeWall=(x,y,id)=>({id,x,y,type:'wall',definition:wall,tiles:[{x,y}]});
 // #97: the wall walk is reached only at a Gate or beside a Tower.
 const gate=objectRegistry.require('wall_gate'),makeGate=(x,y,id)=>({id,x,y,type:'wall_gate',definition:gate,tiles:[{x,y}]});
 
-test('castle costs ten stones, blocks exactly 3x3, and uses a 75% sight bonus',()=>{
+test('castle costs twenty stones (owner price 0.49), blocks exactly 3x3, and uses a 75% sight bonus',()=>{
   const castle=objectRegistry.require('castle'),world=map(),inventory=new Inventory(),buildings=[];
-  inventory.add('stone',10);
+  inventory.add('stone',20);
   const result=placeBuilding({map:world,anchor:{x:4,y:5},resources:new Map(),inventory,buildings,definition:castle});
   assert.ok(result.building);assert.equal(inventory.count('stone'),0);assert.equal(result.building.tiles.length,9);
   assert.deepEqual(result.building.tiles,buildingTiles({x:4,y:5},castle));

@@ -14,7 +14,7 @@ export async function builderWorkshopSmoke(context,url,instrument){
     const worker=await page.evaluate(id=>{
       const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id),d=s.objectRegistry.require('builder_workshop');
       // Finished as a fixture (construction itself is covered by the construction smokes).
-      delete b.construction;s.towerViews.get(b.id)?.destroy?.();s.towerViews.set(b.id,s.createBuildingView(d,b));s.events.emit('buildings:changed');
+      delete b.construction;s.constructionSystem.sites.delete(b.id);s.towerViews.get(b.id)?.destroy?.();s.towerViews.set(b.id,s.createBuildingView(d,b));s.events.emit('buildings:changed');
       const w=[...s.workerSystem.workers.values()].find(w=>w.isAlive);s.workerSystem.jobs.assign(w,'builder');return w.id;
     },id);
     assert.equal(await page.evaluate(({id,worker})=>{const s=window.__game.registry.get('application').scene;return s.builderWorkshops.workshopFor(s.workerSystem.workers.get(worker))?.id===id;},{id,worker}),true,'the Builder has a place');

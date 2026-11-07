@@ -1,3 +1,4 @@
+import { saveRecordStatus } from './SaveLoadMenu.js';
 import { SaveGameManager } from '../systems/SaveGameManager.js';
 import { serializeGameState,validateGameState } from '../systems/GameStateSerializer.js';
 import { SaveLoadMenu } from './SaveLoadMenu.js';
@@ -30,6 +31,8 @@ export class GameApplication {
     this.setup=new NewGameSetup({onStart:settings=>{this.pendingGettingStarted=true;this.start(null,settings);},onBack:()=>{this.setup.close();this.showMainMenu();}});
     document.querySelector('#new-game').addEventListener('click',()=>{this.main.hidden=true;this.setup.open();});
     document.querySelector('#main-load-game').addEventListener('click',()=>this.openSaves('load'));
+    // E2 (report 0.48.0): Continue loads the newest compatible save straight away.
+    document.querySelector('#continue-game')?.addEventListener('click',async()=>{const record=await this.latestSave();if(record)await this.load(record.state);});
     document.querySelector('#resume-game').addEventListener('click',()=>this.resume());
     for(const button of document.querySelectorAll('[data-game-menu]'))button.addEventListener('click',()=>{
       const action=button.dataset.gameMenu;if(action==='main')this.returnToMain();else this.openSaves(action);
@@ -47,7 +50,9 @@ export class GameApplication {
       else this.showPause();
     });
   }
-  showMainMenu(){this.scene=null;this.main.hidden=false;document.body.classList.remove('in-game');document.querySelector('main').inert=true;document.querySelector('#new-game').disabled=false;document.querySelector('#main-load-game').disabled=false;document.querySelector('#new-game').focus();
+  async latestSave(){try{return (await this.saves.list()).find(r=>saveRecordStatus(r).compatible&&r.state)??null;}catch{return null;}}
+  async refreshContinue(){const button=document.querySelector('#continue-game');if(!button)return;const record=await this.latestSave();button.hidden=!record;if(record)button.title=t('menu.continueTitle',{name:record.name||t('saves.unnamed')});}
+  showMainMenu(){this.refreshContinue();this.scene=null;this.main.hidden=false;document.body.classList.remove('in-game');document.querySelector('main').inert=true;document.querySelector('#new-game').disabled=false;document.querySelector('#main-load-game').disabled=false;document.querySelector('#new-game').focus();
     if(this.pendingSetup){this.pendingSetup=false;this.main.hidden=true;this.setup.open();}}
   // Opens Game Setup from anywhere. A running game is stopped first; nothing is saved or deleted.
   openNewGameSetup(){
@@ -66,7 +71,7 @@ export class GameApplication {
   onGameReady(scene){this.scene=scene;
     // Developer console (trade F1.2): mkDev.summonCaravan() brings the next caravan now when a Marketplace is finished.
     try{globalThis.mkDev={summonCaravan:()=>this.scene?.caravans?.summon()??false,fillChildren:count=>{this.scene?.childrenSystem?.setDev(count);return !!this.scene?.childrenSystem;},setPathRenderer:style=>this.scene?.terrain?.setPathStyle(style)??false,setShoreStyle:style=>this.scene?.terrain?.setShoreStyle(style)??false,pathStats:()=>this.scene?.terrain?.v2?.stats};}catch{/* no global object */}
-    this.autosave.reset();if(this.pendingGettingStarted){this.pendingGettingStarted=false;scene.gettingStarted?.show();}}
+    this.autosave.reset();if(this.pendingGettingStarted){this.pendingGettingStarted=false;if(!scene.tutorial?.start())scene.gettingStarted?.show();}else scene.tutorial?.resume();}
   labelAutosaveIntervals(){for(const option of document.querySelectorAll('#autosave-interval option'))option.textContent=t('autosave.interval',{count:Number(option.value)/60000});}
   // A language switch re-renders the texts built in code; static markup is handled by applyTranslations.
   relabel(){for(const select of this.languageSelects)select.value=language();this.labelAutosaveIntervals();this.autosaveStatus(this.autosaveFailure);this.setup?.refresh();this.saveMenu.relabel();this.changelog?.relabel?.();this.archive?.relabel?.();this.scene?.relabelUI?.();}

@@ -1,3 +1,4 @@
+import { DIAGNOSTICS } from '../data/diagnostics.js';
 import { t } from '../i18n/index.js';
 import { dataName } from '../i18n/names.js';
 import { findPathToAny } from '../game/pathfinding.js';
@@ -13,7 +14,8 @@ export class BuilderAI {
   carryMaterials(worker){
     if(worker.profession!=='builder')return false;
     const logistics=this.construction.scene.logisticsTasks;
-    if(logistics&&this.construction.materials.enabled&&!logistics.freeHauler()){
+    const now=this.construction.scene.gameTime?.totalElapsed??0,stuck=[...this.construction.sites.values()].some(site=>site.materialWaitSince!=null&&now-site.materialWaitSince>=DIAGNOSTICS.materialWait);
+    if(logistics&&this.construction.materials.enabled&&(!logistics.freeHauler()||stuck)){
       const cooldown=worker.aiCooldown;worker.aiCooldown=0;
       if(logistics.updateWorker(worker,{constructionOnly:true})){this.construction.scene.workerSystem.gather?.release(worker);return true;}
       worker.aiCooldown=cooldown;

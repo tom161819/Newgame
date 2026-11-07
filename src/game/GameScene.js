@@ -1,3 +1,7 @@
+import { TutorialGuide } from '../ui/TutorialGuide.js';
+import { SpeedControls } from '../ui/SpeedControls.js';
+import { FOOD_OUTLOOK,foodDays } from '../data/foodOutlook.js';
+import { placeableDefinition,freeOffer } from './freeBuildings.js';
 import { DomesticAnimalSystem } from '../systems/DomesticAnimalSystem.js';
 import { DomesticViews } from './DomesticViews.js';
 import { CatPanel } from '../ui/CatPanel.js';
@@ -149,6 +153,10 @@ import { captureMapKnowledge,rememberBlueprint } from './mapMemoryObjects.js';
 import { MapMemoryRenderer } from './MapMemoryRenderer.js';
 import { PopulationSidebar } from '../ui/PopulationSidebar.js';
 import { LightSourceSystem } from '../systems/LightSourceSystem.js';
+import { RoyalGoals } from '../systems/RoyalGoals.js';
+import { RoyalGoalsPanel } from '../ui/RoyalGoalsPanel.js';
+import { CompletionFlash } from '../ui/CompletionFlash.js';
+import { bindSoundSetting } from '../ui/sound.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
@@ -276,7 +284,7 @@ export class GameScene extends Phaser.Scene {
     this.attractiveness=new KingdomAttractivenessSystem(this);this.foodEconomyPanel=new FoodEconomyPanel(this);
     this.inventoryBar=new InventoryBar(this.objectRegistry,this.assets,this.inventory);
     this.buildingUnlocks=new BuildingUnlockManager(this);
-    this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,unlocks:this.buildingUnlocks,onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
+    this.buildingBar=new BuildingBar({registry:this.objectRegistry,assets:this.assets,unlocks:this.buildingUnlocks,freeOffer:definition=>freeOffer(this,definition),onSelect:definition=>this.startBuilding(definition),onCancel:()=>this.cancelBuilding()});
     this.assetGallery=new AssetGallery({registry:this.objectRegistry,assets:this.assets,onWorkplaceApply:()=>{this.workplaceSystem.reconcileDefinitions();if(this.selectedBuilding)this.selectedBuilding=this.objectRegistry.require(this.selectedBuilding.id);},onCostApply:()=>{if(this.selectedBuilding)this.selectedBuilding=this.objectRegistry.require(this.selectedBuilding.id);this.updateInventory();},onOpen:()=>this.setGalleryInput(false),onClose:()=>this.setGalleryInput(true)});
     this.equipmentPanel=new EquipmentPanel(this);
     this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=t('hud.population',{count,maximum});}});if(!this.loadState)this.workerSystem.spawnInitial(this.worldRandom('villagers'));this.builderWorkshops=new BuilderWorkshopSystem(this);this.fishing=new FishingSystem(this);
@@ -284,7 +292,7 @@ export class GameScene extends Phaser.Scene {
     this.fog.registerSource('subjects',()=>this.workerSystem.liveSubjects().map(subjectSight));
     this.workplaceSystem=new WorkplaceSystem(this);this.workplacePanel=new WorkplacePanel(this);
     this.constructionSystem=new ConstructionSystem(this,{onProgress:site=>this.towerViews.get(site.id)?.updateProgress?.(site),
-      onComplete:site=>{this.towerViews.get(site.id)?.destroy();if(buildingDefinition(site).pavement){this.towerViews.delete(site.id);this.terrain.invalidateArea([site]);this.updateInventory();this.constructionUI?.refresh();return;}this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.built',{name:buildingDefinition(site).name}));},
+      onComplete:site=>{this.towerViews.get(site.id)?.destroy();if(buildingDefinition(site).pavement){this.towerViews.delete(site.id);this.terrain.invalidateArea([site]);this.updateInventory();this.constructionUI?.refresh();return;}this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.built',{name:buildingDefinition(site).name}));this.completionFlash?.flash(site);},
       onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);if(this.mapMemory?.objects.delete(`building:${site.id}`))this.mapMemory.revision++;this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.siteCancelled'));}});
     this.demolition=new DemolitionSystem(this,{complete:(building,refund)=>finishDemolition(this,building,refund)});
     this.constructionUI=new ConstructionUI(this);
@@ -299,7 +307,7 @@ export class GameScene extends Phaser.Scene {
     this.wageSystem=new WageSystem(this,{onPayroll:()=>this.updateInventory()});this.economyPanel=new EconomyPanel(this);
     this.buildingBar.close();this.updateInventory();
     this.gettingStarted=new GettingStartedPanel(this);
-    this.domestic=new DomesticAnimalSystem(this);this.combat.shield=(target,attacker)=>this.domestic?.shield(target,attacker);this.domesticViews=new DomesticViews(this,this.domestic);this.issueIcons=new IssueIcons(this);this.childrenSystem=new ChildrenSystem(this);this.porches=new PorchSystem(this);this.nightOverlay=new NightOverlay(this,this.dayNight);this.fuelIcons=new FuelIcons(this);this.fireViews=new FireViews(this);this.kingdomOverview=new KingdomOverview(this);this.helpArrow=new HelpArrow(this);this.nightControls=new NightControls(this);this.dayNight.attention=()=>!!this.nightThreats?.wolvesNear||!!this.nightThreats?.fires.size||[...this.combat.attacks.keys()].some(attacker=>attacker.profession===undefined&&attacker!==this.character);this.childViews=new ChildViews(this,this.childrenSystem);this.villagePanel=new VillagePanel(this);this.catPanel=new CatPanel(this);
+    this.domestic=new DomesticAnimalSystem(this);this.combat.shield=(target,attacker)=>this.domestic?.shield(target,attacker);this.domesticViews=new DomesticViews(this,this.domestic);this.issueIcons=new IssueIcons(this);this.childrenSystem=new ChildrenSystem(this);this.porches=new PorchSystem(this);this.nightOverlay=new NightOverlay(this,this.dayNight);this.fuelIcons=new FuelIcons(this);this.fireViews=new FireViews(this);this.kingdomOverview=new KingdomOverview(this);this.speedControls=new SpeedControls(this);this.tutorial=new TutorialGuide(this);this.royalGoals=new RoyalGoals(this);this.royalGoalsPanel=new RoyalGoalsPanel(this,this.royalGoals);this.completionFlash=new CompletionFlash(this);this.soundController=new AbortController();bindSoundSetting(document,this.soundController.signal);this.helpArrow=new HelpArrow(this);this.nightControls=new NightControls(this);this.dayNight.attention=()=>!!this.nightThreats?.wolvesNear||!!this.nightThreats?.fires.size||[...this.combat.attacks.keys()].some(attacker=>attacker.profession===undefined&&attacker!==this.character);this.childViews=new ChildViews(this,this.childrenSystem);this.villagePanel=new VillagePanel(this);this.catPanel=new CatPanel(this);
     this.marketplacePanel=new MarketplacePanel(this);this.builderWorkshopPanel=new BuilderWorkshopPanel(this);this.policyPanel=new PolicyPanel(this);this.sideCards=new SideCards(this);
     this.updateTimeDisplay();
     this.setStatus(t('status.idle'));
@@ -352,7 +360,7 @@ export class GameScene extends Phaser.Scene {
       this.settingsPanel.destroy();this.fpsOverlay.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
       this.clearWallPreviews();
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
-      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.marketplacePanel.destroy();this.catPanel?.destroy();this.domesticViews?.destroy();this.domestic?.destroy();this.villagePanel?.destroy();this.issueIcons?.destroy();this.sideCards?.destroy();this.childViews?.destroy();this.childrenSystem?.destroy();this.porches?.destroy();this.lightFuel?.destroy();this.nightThreats?.destroy();this.fuelIcons?.destroy();this.fireViews?.destroy();this.kingdomOverview?.destroy();this.helpArrow?.destroy();this.nightOverlay?.destroy();this.nightControls?.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
+      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.royalGoalsPanel?.destroy();this.royalGoals?.destroy();this.completionFlash?.destroy();this.soundController?.abort();this.marketplacePanel.destroy();this.catPanel?.destroy();this.domesticViews?.destroy();this.domestic?.destroy();this.villagePanel?.destroy();this.issueIcons?.destroy();this.sideCards?.destroy();this.childViews?.destroy();this.childrenSystem?.destroy();this.porches?.destroy();this.lightFuel?.destroy();this.nightThreats?.destroy();this.fuelIcons?.destroy();this.fireViews?.destroy();this.kingdomOverview?.destroy();this.speedControls?.destroy();this.tutorial?.destroy();this.helpArrow?.destroy();this.nightOverlay?.destroy();this.nightControls?.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.pavementTool.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
       this.demolitionUI.destroy();this.demolition.destroy();this.farmConnections.destroy();this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
@@ -551,13 +559,13 @@ export class GameScene extends Phaser.Scene {
     this.huntingSystem.cancel();this.mountSystem.cancel();
     this.treasureSystem.cancelRequest();
     this.clearWallPreviews();
-    this.unitSelection?.clear();this.constructionSystem.stopKing();this.character.stopForBuilding();this.selectedBuilding=definition;
+    this.unitSelection?.clear();this.constructionSystem.stopKing();this.character.stopForBuilding();definition=placeableDefinition(this,definition);this.selectedBuilding=definition;
     this.preview.destroy();this.preview=this.createBuildingView(definition,{x:0,y:0},true);this.preview.setVisible(false);
     this.buildMode=true;this.previewKey=null;this.previewAnchor=null;this.previewTracking=false;this.game.canvas.style.cursor='crosshair';this.pavementTool.clear();
     this.updateBuildingUI();this.setStatus(t('status.placing',{name:definition.name,size:t('building.size',{width:definition.width,height:definition.height}),cost:formatCost(definition.cost,this.objectRegistry)}));
     return true;
   }
-  cancelBuilding(message='Režim stavění zrušen. Můžeš se znovu pohybovat a sbírat suroviny.') {
+  cancelBuilding(message=t('status.buildCancelled')) {
     this.clearWallPreviews();
     this.buildMode=false;this.pavementTool?.clear();this.selectedBuilding=null;this.previewAnchor=null;this.previewTracking=false;this.previewKey=null;
     this.preview.setVisible(false);this.game.canvas.style.cursor='';this.updateBuildingUI();this.setStatus(message);
@@ -646,10 +654,11 @@ export class GameScene extends Phaser.Scene {
   updateInventory() { this.inventoryBar.update();this.updateBuildingUI();this.updateWorldCount();this.updateFoodDisplay();this.equipmentPanel?.refresh();this.economyPanel?.update(); }
   // Language switch during play: refresh every HUD text that is built in code.
   relabelUI(){
+    this.speedControls?.render();this.tutorial?.relabel();this.royalGoalsPanel?.relabel();
     this.updateTimeDisplay();this.updateFoodDisplay();this.updateWorldCount();this.updateMountUI?.();this.combatFeedback?.refresh();this.experienceFeedback?.refresh();this.workerSystem?.updateUI();this.inventoryBar?.update();this.gettingStarted?.relabel();this.marketplacePanel?.relabel();this.policyPanel?.render();this.buildingBar?.selectCategory?.(this.buildingBar.category);if(this.populationSidebar){this.populationSidebar.renderOptions();this.populationSidebar.lastRefresh=-Infinity;}this.updateBuildingUI();
     if(this.worldCamera?.following)document.querySelector('#camera-mode').textContent=t('hud.cameraKing');
   }
-  updateTimeDisplay(){const output=document.querySelector('#game-time');if(output.textContent!==this.gameTime.label)output.textContent=this.gameTime.label;const seasons=document.querySelector('#season-weather');if(seasons.textContent!==this.seasons.label)seasons.textContent=this.seasons.label;}
+  updateTimeDisplay(){const output=document.querySelector('#game-time');if(output.textContent!==this.gameTime.label)output.textContent=this.gameTime.label;output.title=this.gameTime.tooltip;const seasonTip=document.querySelector('#season-weather');if(seasonTip)seasonTip.title=this.seasons.tooltip;const seasons=document.querySelector('#season-weather');if(seasons.textContent!==this.seasons.label)seasons.textContent=this.seasons.label;}
   onDailyIncome(day,totals){
     const labels=new Set(this.buildings.map(b=>buildingDefinition(b).production).filter(p=>p?.interval==='day'&&totals[p.resource]).map(p=>localized(`production.${p.resource}`,p.label)).filter(Boolean));
     const details=Object.entries(totals).map(([id,amount])=>`+${amount} ${this.objectRegistry.require(id).name}`).join(' · ');
@@ -657,8 +666,10 @@ export class GameScene extends Phaser.Scene {
     notice.hidden=false;this.noticeRemaining=4000;this.updateInventory();
   }
   updateFoodDisplay(){
-    const text=t('hud.food',{count:this.foodSystem.dailyConsumption});
+    // Plan m-e1-jidlo-vydrz: how long the edible stores last; portions a day in the tooltip.
+    const days=foodDays(this.foodSystem),text=Number.isFinite(days)?t('hud.foodDays',{days:Math.floor(days),count:Math.floor(days)}):t('hud.food',{count:this.foodSystem.dailyConsumption});
     const output=document.querySelector('#food-countdown');if(output.textContent!==text)output.textContent=text;
+    output.dataset.tone=days<FOOD_OUTLOOK.warnDays?'bad':days<FOOD_OUTLOOK.warnDays*2?'warn':'good';output.title=t('hud.foodTip',{count:this.foodSystem.dailyConsumption});
     const warning=document.querySelector('#food-warning');warning.hidden=!this.foodSystem.shortage;warning.textContent=t('hud.foodShortage',{count:this.foodSystem.hungryCount});
   }
   updateBuildingUI() { this.buildingBar.update(this.inventory,this.buildMode?this.selectedBuilding:null); }
@@ -712,9 +723,10 @@ export class GameScene extends Phaser.Scene {
     // změnit uloženou animaci, rozpracovanou AI ani příkazy jednotek.
     if(!delta){this.refreshVisibility();return;}
     // Day and night N1: nights run faster (Settings: off/×2/×3), Skip to dawn faster still; a fight stops it.
-    const steps=this.dayNight.speed(readNightSpeed());let activeDelta=0;
-    for(let i=0;i<steps;i++){const step=this.simulationStep(delta);if(step===null)return;activeDelta+=step;if(i&&!this.dayNight.isNight())break;}
-    this.updateTimeDisplay();this.nightControls?.update();this.nightOverlay?.update();this.fuelIcons?.update();this.fireViews?.update(delta);this.kingdomOverview?.update();this.helpArrow?.update();
+    // E2: the player's pause stops the simulation (the map stays usable); 2× and 3× repeat the same steps per frame.
+    const steps=this.dayNight.speed(readNightSpeed()),speed=this.playerPaused?0:(this.gameSpeed??1);let activeDelta=0;
+    for(let g=0;g<speed;g++)for(let i=0;i<steps;i++){const step=this.simulationStep(delta);if(step===null)return;activeDelta+=step;if(i&&!this.dayNight.isNight())break;}
+    this.updateTimeDisplay();this.nightControls?.update();this.nightOverlay?.update();this.fuelIcons?.update();this.fireViews?.update(delta);this.kingdomOverview?.update();this.helpArrow?.update();this.tutorial?.update();this.royalGoalsPanel?.update();this.completionFlash?.update(delta);
     this.updateFoodDisplay();this.worldCamera.update(delta);this.refreshVisibility();this.lightSources.update(delta);
     if(this.buildMode&&!document.querySelector('dialog[open]')){if(this.previewTracking)this.previewAnchor=this.pointerTile(this.input.activePointer);this.updateBuildingPreview();}
   }
@@ -749,7 +761,7 @@ export class GameScene extends Phaser.Scene {
     this.domestic?.update(activeDelta);
     this.childrenSystem?.update(activeDelta);
     this.porches?.update(activeDelta);
-    this.lightFuel?.update();
+    this.royalGoals?.update(activeDelta);this.lightFuel?.update();
     this.nightThreats?.update(activeDelta);
     this.noticeRemaining=Math.max(0,this.noticeRemaining-activeDelta);if(!this.noticeRemaining)document.querySelector('#day-notice').hidden=true;
     return activeDelta;

@@ -27,3 +27,11 @@ export function jobChoices(scene,worker){
     return {id,name:job.name,color:job.portraitColor,free,full:needsSeat&&free===0,current:worker?.profession===id};
   });
 }
+
+// One click from a notice (plan m-e1-stavitele-material): the unemployed resident best at the profession's skill takes
+// the job. Returns the resident, or null when nobody is free (the caller then opens the Population list).
+export function hireUnemployed(scene,profession){
+  const skill=JOBS[profession]?.skill,free=scene.workerSystem.liveSubjects().filter(w=>w.profession==='idle'&&!w.leaving&&!w.arriving&&scene.needs?.records?.get?.(w.id)?.leaving!==true);
+  free.sort((a,b)=>(b.skills?.[skill]?.level??1)-(a.skills?.[skill]?.level??1)||String(a.id).localeCompare(String(b.id),undefined,{numeric:true}));
+  const worker=free[0];if(!worker)return null;changeProfession(scene,worker,profession);return worker;
+}

@@ -16,8 +16,8 @@ const unit=(id,x=0,y=0)=>({...createCombatStats(objectRegistry.require(id)),id,d
 
 test('days last exactly 120 seconds, pause freezes time and every crossed boundary emits once in order',()=>{
   const time=new GameTimeSystem(),events=[];time.onNewDay(day=>events.push([day,time.elapsed]));
-  assert.equal(DAY_DURATION,120000);assert.equal(time.label,'Day 1 | 02:00 / 02:00');
-  time.update(119999);assert.equal(time.day,1);assert.equal(time.label,'Day 1 | 00:01 / 02:00');
+  assert.equal(DAY_DURATION,120000);assert.equal(time.label,'Day 1');assert.equal(time.tooltip,'Day 1 – 02:00 of 02:00 left');
+  time.update(119999);assert.equal(time.day,1);assert.equal(time.tooltip,'Day 1 – 00:01 of 02:00 left');
   time.setPaused(true);assert.equal(time.update(50000),0);assert.equal(time.day,1);time.setPaused(false);
   time.update(1);assert.equal(time.day,2);assert.deepEqual(events,[[2,0]]);time.update(245000);
   assert.equal(time.day,4);assert.equal(time.elapsed,5000);assert.deepEqual(events,[[2,0],[3,0],[4,0]]);assert.equal(time.totalElapsed,365000);

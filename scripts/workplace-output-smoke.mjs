@@ -1,3 +1,4 @@
+import { openAssetLibrary } from './building-menu-smoke.mjs';
 import assert from 'node:assert/strict';
 export async function workplaceOutputSmoke(page){
   const original=await page.evaluate(()=>{const app=window.__game.registry.get('application');return {save:app.snapshot(),overrides:structuredClone(app.scene.objectRegistry.workplaceOverrides),stored:localStorage.getItem('newgame.workplace-authoring.v1')};});
@@ -8,7 +9,7 @@ export async function workplaceOutputSmoke(page){
     if(!anchor)throw Error('No staffing fixture room');const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type:'mill',definition:d,...anchor,tiles};s.buildings.push(b);for(const t of tiles)s.map[t.y][t.x]=1;s.towerViews.set(b.id,s.createBuildingView(d,b));s.events.emit('buildings:changed');s.workplaceSystem.register(b);
     const workers=[];for(const tile of [{x:b.x,y:b.y-1},{x:b.x+1,y:b.y-1}]){const w=s.workerSystem.create(tile);if(!s.workplaceSystem.assign(b,w))throw Error('Staffing assignment failed');w.workplaceReached=true;workers.push(w.id);}s.refreshVisibility();return {id:b.id,workers};
   });
-  await page.click('#asset-library-button');await page.locator('[data-object-id="mill"]').click();
+  await openAssetLibrary(page);await page.locator('[data-object-id="mill"]').click();
   const editor=page.locator('[data-workplace-editor="mill"]');await editor.locator('summary').click();await editor.locator('[data-staffing-curve]').fill('0, 25, 100');
   assert.match(await editor.locator('[data-staffing-preview]').textContent(),/2 → 100 % \/ 1 → 25 %/);
   await editor.locator('[data-staffing-apply]').click();
@@ -17,7 +18,7 @@ export async function workplaceOutputSmoke(page){
   const one=await page.evaluate(f=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===f.id),w=s.workerSystem.workers.get(f.workers[1]);w.path=[{x:w.tile.x+1,y:w.tile.y}];const summary=s.workplaceSystem.staffing(b);s.workplacePanel.open(b);return summary;},fixture);
   assert.equal(one.present,1);assert.equal(one.output,.25);assert.match(await page.locator('#workplace-staffing-output').textContent(),/25%.*1 worker missing/);
   await page.click('#close-workplace');await page.evaluate(f=>{window.__game.registry.get('application').scene.workerSystem.workers.get(f.workers[1]).path=[];},fixture);
-  await page.click('#asset-library-button');await page.locator('[data-object-id="mill"]').click();await editor.locator('summary').click();await editor.locator('[data-staffing-capacity]').fill('1');await editor.locator('[data-staffing-curve]').fill('0, 100');await editor.locator('[data-staffing-apply]').click();await page.click('#close-asset-gallery');
+  await openAssetLibrary(page);await page.locator('[data-object-id="mill"]').click();await editor.locator('summary').click();await editor.locator('[data-staffing-capacity]').fill('1');await editor.locator('[data-staffing-curve]').fill('0, 100');await editor.locator('[data-staffing-apply]').click();await page.click('#close-asset-gallery');
   const reduced=await page.evaluate(f=>{const app=window.__game.registry.get('application'),s=app.scene,b=s.buildings.find(b=>b.id===f.id);return {workers:s.workplaceSystem.employees(b).map(w=>w.id),removed:s.workerSystem.workers.get(f.workers[1]).profession,held:s.employment.held.has(f.workers[1]),save:app.snapshot()};},fixture);
   assert.deepEqual(reduced.workers,[fixture.workers[0]]);assert.equal(reduced.removed,'idle');assert.equal(reduced.held,true);
   const load=async save=>{await page.evaluate(save=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__staffingOutputReady=false;app.onGameReady=s=>{ready(s);s.pauseManager.set('workplace-output-smoke',true);window.__staffingOutputReady=true;app.onGameReady=ready;};app.load(save);},save);await page.waitForFunction(()=>window.__staffingOutputReady);};

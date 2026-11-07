@@ -53,7 +53,7 @@ export async function buildingMenuSmoke(page){
   await page.setViewportSize({width:390,height:844});const overflow=await page.locator('#building-categories').evaluate(e=>e.scrollWidth>e.clientWidth);assert.equal(overflow,true);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   await page.locator('[data-building-category="all"]').click();await mobileLastBuildingSmoke(page);await page.locator('#buildings-tab').click();await page.setViewportSize({width:1440,height:1000});
   await page.evaluate(async()=>{await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));window.__game.registry.get('application').scene.worldCamera.syncSize();});
-  await page.locator('#asset-library-button').click();await page.locator('#asset-categories [data-category="building"]').click();await page.locator('#asset-grid [data-object-id="farmhouse"]').click();assert.match(await page.locator('#asset-detail').textContent(),/Food & Farming/);
+  await openAssetLibrary(page);await page.locator('#asset-categories [data-category="building"]').click();await page.locator('#asset-grid [data-object-id="farmhouse"]').click();assert.match(await page.locator('#asset-detail').textContent(),/Food & Farming/);
   if(hasUnlocks)assert.match(await page.locator('#asset-detail').textContent(),/Recommended first \(warning only\)Granary/);
   await page.locator('#close-asset-gallery').click();
   console.log('PASS registered building categories, All/empty tabs, horizontal building strip (buttons, wheel, keyboard), preview cancellation, camera controls and mobile last-building selection');
@@ -85,6 +85,10 @@ export async function clickBuilding(page,id){
 // rightly refuses the blueprint. Choose a fresh site and click again instead of waiting for a placement that never comes.
 export async function placeBlueprint(page,type){
   const placed=()=>page.evaluate(type=>window.__game.registry.get('application').scene.buildings.filter(b=>b.type===type&&b.construction?.state==='planned').length,type);
+  // E1 (0.49.0) changed many prices and the starting stores; a smoke that needs a blueprint gets the missing materials
+  // added first (only what is missing), so each smoke keeps testing its own feature.
+  await page.evaluate(type=>{const s=window.__game.registry.get('application').scene,d=s.objectRegistry.require(type);let added=false;
+    for(const [id,n] of Object.entries(d.cost??{})){const have=s.inventory.count(id);if(have<n){s.inventory.add(id,n-have,{source:'Smoke fixture'});added=true;}}if(added)s.updateInventory?.();},type);
   const before=await placed();let point;
   for(let attempt=0;attempt<4;attempt++){
     point=await chooseBlueprintSite(page,type);
@@ -117,7 +121,7 @@ export async function supplyAndBuild(page,{id,point}){
 }
 export async function buildingUnlockGameplaySmoke(page){
   if(!await page.evaluate(()=>!!window.__game.registry.get('application').scene.buildingUnlocks))return;
-  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('stone',29);s.inventory.add('apple',8);s.updateInventory();});
+  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('stone',10);window.__unlockStone=s.inventory.count('stone');/* E1: the Granary and Farmhouse are wooden (wood comes from the placeBlueprint top-up); the stone stays untouched */s.inventory.add('apple',8);s.updateInventory();});
   const granary=await placeBlueprint(page,'granary');
   await page.locator('#buildings-tab').click();await page.locator('[data-building-category="food"]').click();assert.equal(await page.locator('#farmhouse-choice').isDisabled(),false,'Food menu: never locked');assert.match(await page.locator('#farmhouse-availability').textContent(),/Needs a Granary to store food/);assert.match(await page.locator('#hunting_lodge-availability').textContent(),/Needs a Granary/);assert.equal(await page.locator('#hunting_lodge-availability.building-warning').count(),1,'red warning');await page.locator('#buildings-tab').click();
   await supplyAndBuild(page,granary);
@@ -140,15 +144,18 @@ export async function buildingUnlockGameplaySmoke(page){
   await page.evaluate(saved=>{const s=window.__game.registry.get('application').scene,b={...saved,definition:s.objectRegistry.require(saved.type)};s.buildings.push(b);for(const t of b.tiles)s.map[t.y][t.x]=1;s.towerViews.set(b.id,s.createBuildingView(b.definition,b));s.events.emit('buildings:changed');const w=s.workerSystem.liveSubjects().find(w=>w.profession==='idle');if(!w||!s.workplaceSystem.assign(b,w))throw Error('No Farmer available for establishment');s.employment.release(w);s.workerSystem.commands.resume(w);},removedFarm);
   await clickBuilding(page,field.id);await page.locator('#construction-dialog[open]').waitFor();assert.equal(await page.locator('#construction-king-work').isDisabled(),true);assert.equal(await page.locator('#construction-king-work').isVisible(),false);await page.locator('#close-construction').click();
   await page.waitForFunction(id=>window.__game.registry.get('application').scene.buildings.find(b=>b.id===id)?.construction?.state==='complete',field.id,{timeout:60000});
-  assert.equal(await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;return s.farmingSystem.records.has(id)&&s.inventory.count('stone')===10;},field.id),true);
+  assert.equal(await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;return s.farmingSystem.records.has(id)&&s.inventory.count('stone')===window.__unlockStone;},field.id),true);
   console.log('PASS actual Granary→Farmhouse physical supply/build, live unlocks and exact mid-blueprint Load; orphan waits, owner reconnects and a Farmer establishes the free field');
-  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('stone',3);s.updateInventory();
+  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('stone',3);const need=s.objectRegistry.require('tower').cost.stone??0;if(s.inventory.count('stone')<need)s.inventory.add('stone',need-s.inventory.count('stone'));window.__towerStone=s.inventory.count('stone');s.updateInventory();
     // Reproduce a real staffing button covering the camera-centred anchor.
     const bounds=s.game.canvas.getBoundingClientRect(),control=document.createElement('button');control.id='native-blueprint-ui-obstruction';control.textContent='⚙';window.__blueprintUIHits=0;
     Object.assign(control.style,{position:'fixed',left:`${bounds.left+bounds.width/2-15}px`,top:`${bounds.top+bounds.height/2-15}px`,width:'30px',height:'30px',minWidth:'0',minHeight:'0',padding:'0',margin:'0',border:'0',zIndex:'10000',pointerEvents:'auto'});control.addEventListener('pointerdown',()=>window.__blueprintUIHits++);document.body.append(control);
   });
   let tower;try{tower=await placeBlueprint(page,'tower');assert.equal(await page.evaluate(()=>window.__blueprintUIHits),0,'Blueprint placement uses exposed canvas instead of clicking a UI overlay.');}
   finally{await page.evaluate(()=>{document.querySelector('#native-blueprint-ui-obstruction')?.remove();delete window.__blueprintUIHits;});}
-  await clickBuilding(page,tower.id);await page.locator('#construction-dialog[open]').waitFor();await page.locator('#cancel-construction').click();assert.equal(await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;return !s.buildings.some(b=>b.id===id)&&s.inventory.count('stone')===13;},tower.id),true);
+  await clickBuilding(page,tower.id);await page.locator('#construction-dialog[open]').waitFor();await page.locator('#cancel-construction').click();assert.equal(await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;return !s.buildings.some(b=>b.id===id)&&s.inventory.count('stone')===window.__towerStone;},tower.id),true);
   console.log('PASS actual unstarted blueprint cancellation restores the reserved price without duplicating materials');
 }
+
+// E2: the Asset Library button lives in the More panel of the top bar.
+export async function openAssetLibrary(page){if(await page.locator('#hud-details').isHidden())await page.locator('#hud-details-toggle').click();await page.locator('#asset-library-button').click();}

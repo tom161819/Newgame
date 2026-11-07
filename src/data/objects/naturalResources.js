@@ -6,5 +6,5 @@ export const naturalDefinitions=[['oak_tree','Oak'],['pine_tree','Pine']].map(([
   tree:{...FORESTRY.trees[id],stages:TREE_STAGES},renderMode:'procedural',renderer:'tree',origin:{x:.5,y:.94},visualHeight:id==='pine_tree'?104:88,depth:{offset:.12},
   visual:{hitArea:{x:-27,y:id==='pine_tree'?-104:-88,width:54,height:id==='pine_tree'?112:96}},
 }));
-export const forestryBuildings=[{id:'lumberjack_hut',name:'Lumberjack Hut',category:'building',buildingCategory:'industry',sprite:'/assets/buildings/lumberjack_hut/lumberjack_hut.svg',width:2,height:2,walkable:false,collectible:false,buildable:true,cost:{stone:8},constructionTime:25000,workplace:WORKPLACES.lumberjack_hut,workRadius:18,
+export const forestryBuildings=[{id:'lumberjack_hut',name:'Lumberjack Hut',category:'building',buildingCategory:'industry',sprite:'/assets/buildings/lumberjack_hut/lumberjack_hut.svg',width:2,height:2,walkable:false,collectible:false,buildable:true,cost:{wood:6},constructionTime:25000,workplace:WORKPLACES.lumberjack_hut,workRadius:18,
   description:'Three Woodcutters reserve mature trees within 18 tiles, physically chop and carry timber to existing storage.',interactions:['manage_workers'],renderMode:'procedural',renderer:'workplace',origin:{x:.5,y:.9},visualHeight:110,depth:{offset:0},shadow:{baked:true,x:12,y:-15,width:118,height:42,color:0x30291c,alpha:.3}}];

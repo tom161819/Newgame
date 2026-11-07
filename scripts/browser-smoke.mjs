@@ -9,6 +9,10 @@ import { farmerEstablishmentSmoke } from './farmer-establishment-smoke.mjs';
 import { farmPlotsSmoke } from './farm-plots-smoke.mjs';
 import { farmBlueprintSmoke } from './farm-blueprint-smoke.mjs';
 import { populationJobMenuSmoke } from './population-job-menu-smoke.mjs';
+import { e1Smoke } from './e1-smoke.mjs';
+import { e2Smoke,quickStartSmoke } from './e2-smoke.mjs';
+import { e4Smoke } from './e4-smoke.mjs';
+import { tutorialSmoke } from './tutorial-smoke.mjs';
 import { workplaceOutputSmoke } from './workplace-output-smoke.mjs';
 import { granaryCapacitySmoke } from './granary-capacity-smoke.mjs';
 import { farmerTendingSmoke } from './farmer-tending-smoke.mjs';
@@ -95,6 +99,14 @@ const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice
 const base=projectBase(args.find(a=>a.startsWith('--base='))?.slice(7)??'/Newgame/'),dist=path.join(root,'dist');
 const catalog=JSON.parse(await readFile(path.join(dist,'versions/catalog.json'),'utf8'));
 const currentOnly=args.includes('--current-only');
+// --keep-going (0.49.0): a failing scenario is reported and the run goes on, so one run lists every failure. Scenarios
+// on the shared main page may then start from an unusual state: re-run a failed one alone with its own flag.
+const keepGoing=args.includes('--keep-going'),failures=[];
+const selected=name=>args.includes('--full')||args.includes(`--${name}`);
+async function step(name,run){
+  if(!selected(name))return;if(!keepGoing)return run();
+  const started=Date.now();try{await run();}catch(error){failures.push(name);console.log(`FAIL --${name} (${Math.round((Date.now()-started)/1000)} s): ${String(error?.message??error).split('\n')[0].slice(0,300)}`);}
+}
 if(!currentOnly)await stageArchivedSnapshots({source:path.join(root,'public/versions'),target:path.join(dist,'versions')});
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.png':'image/png','.svg':'image/svg+xml','.webp':'image/webp'};
 const server=createServer(async(req,res)=>{
@@ -117,6 +129,9 @@ try{
   const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage(),errors=[],requests=[];
   // UI Lab styles (m-ui-lab-do-hry): SMOKE_UI_STYLE=stone-castle (or olive, wood-iron, parchment, classic) runs the whole
   // smoke in that style; without it the game uses the owner's Studio design, as players get it.
+  // E2: the New Game setup folds its form under Custom settings; the smokes work with it open.
+  await context.addInitScript(()=>{try{if(!localStorage.getItem('newgame.setupCustom'))localStorage.setItem('newgame.setupCustom','open');if(!localStorage.getItem('newgame.tutorial'))localStorage.setItem('newgame.tutorial','off');if(!localStorage.getItem('newgame.tips'))localStorage.setItem('newgame.tips','off');}catch{}});
+  // E3: the smokes were written for the Getting started window after New Game; the arrow tutorial has its own smoke.
   if(process.env.SMOKE_UI_STYLE)await context.addInitScript(style=>{try{localStorage.setItem('newgame.uiStyle',style);}catch{}},process.env.SMOKE_UI_STYLE);page.on('request',request=>requests.push(request.url()));
   const instrument=async p=>{
     p.on('pageerror',e=>errors.push(e.message));p.on('response',r=>{if(r.status()>=400)errors.push(`${r.status()} ${r.url()}`);});
@@ -152,101 +167,107 @@ try{
   console.log(`PASS main-menu archive, ${catalog.versions.length} milestones / ${catalog.builds.length} actual snapshots, linked collapsible changelog, mobile`);
   }
 
-  if(args.includes('--full')||args.includes('--i18n'))await i18nSmoke(page);
+  await step('i18n',()=>i18nSmoke(page));
   await page.locator('#new-game').click();await page.locator('.setup-advanced summary').click();await page.locator('#setup-fog').uncheck();await page.locator('#setup-respawn').selectOption('off');
   // Residents stay where the smokes put them; Auto Employment has its own smoke.
   assert.equal(await page.locator('#setup-auto-employment').isChecked(),true);await page.locator('#setup-auto-employment').uncheck();
-  if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full')||args.includes('--seasons-menu'))await page.locator('#setup-seasons').uncheck();}
-  // Owner request 7 Nov 2026: the setup proposes a Castle, 500 Gold and 40 of each starting resource. This scenario keeps
+  if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);await step('seasons-menu',()=>page.locator('#setup-seasons').uncheck());}
+  // Owner request 7 Nov 2026: the setup proposes a Castle, 500 Gold and the starting resources. This scenario keeps
   // the earlier empty start (no Castle, no Gold, empty stockpile) that the steps below were written for.
   assert.equal(await page.locator('#setup-castle').isChecked(),true);assert.equal(await page.locator('#setup-gold').inputValue(),'500');
-  for(const id of ['stone','wood','iron-ore','bread'])assert.equal(await page.locator(`#setup-start-${id}`).inputValue(),'40');
+  // E1 (owner 7 Nov 2026): basic buildings are wooden, so the start has more wood and no Iron Ore.
+  for(const [id,value] of [['stone','40'],['wood','60'],['iron-ore','0'],['bread','40']])assert.equal(await page.locator(`#setup-start-${id}`).inputValue(),value);
   await page.locator('#setup-castle').uncheck();
   for(const selector of ['#setup-gold','#setup-start-stone','#setup-start-wood','#setup-start-iron-ore','#setup-start-bread'])await page.locator(selector).evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
   // A New Game from the setup opens Getting started once (0.9.3); the scenario below starts with it closed.
   await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');assert.equal(await page.locator('#help-dialog').evaluate(d=>d.open),false);
-  if(args.includes('--full')||args.includes('--getting-started'))await gettingStartedSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--building-costs'))await buildingCostsSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--marketplace'))await marketplaceSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--gate'))await gateSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--world'))await worldSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--builder-workshop'))await builderWorkshopSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--fishing'))await fishingSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--paths-v2'))await pathsV2Smoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--policy'))await policySmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--background'))await backgroundSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--world-code'))await worldCodeSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--pets'))await petsSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--dog'))await dogSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--walk'))await walkSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--children'))await childrenSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--employment-spread'))await employmentSpreadSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--storage-notices'))await storageNoticesSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--ui-theme'))await uiThemeSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--storage-window'))await storageWindowSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--side-cards'))await sideCardsSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--chosen-art'))await chosenArtSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--castle-art'))await castleArtSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--decorations'))await houseDecorationsSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--porch'))await porchSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--day-night'))await dayNightSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--torches'))await torchesSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--campfire'))await campfireSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--wolves'))await wolvesSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--thieves'))await thievesSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--fire'))await fireSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--overview'))await kingdomOverviewSmoke(context,origin+base,instrument);
-  if(args.includes('--full')||args.includes('--ledger'))await ledgerSmoke(page);
-  if(args.includes('--full')||args.includes('--smelting'))await smeltingSmoke(page);
-  if(args.includes('--full')||args.includes('--military'))await militarySmoke(page);
-  if(args.includes('--full')||args.includes('--wheelwright'))await wheelwrightSmoke(page);
-  if(args.includes('--full')||args.includes('--stables'))await stablesSmoke(page);
-  if(args.includes('--full')||args.includes('--horse-wagon'))await horseWagonSmoke(page);
-  if(args.includes('--full')||args.includes('--pavement'))await pavementSmoke(page,{screenshot:process.env.PAVEMENT_SHOT??null});
-  if(args.includes('--full')||args.includes('--right-click'))await rightClickSmoke(page);
-  if(args.includes('--full')||args.includes('--pave-under'))await paveUnderSmoke(page);
-  if(args.includes('--full')||args.includes('--dev-fps'))await devFpsSmoke(page);
-  if(args.includes('--full')||args.includes('--fog-brightness'))await memoryBrightnessSmoke(page,{screenshot:process.env.BRIGHTNESS_SHOT??null});
-  if(args.includes('--full')||args.includes('--needs'))await needsSmoke(page,{screenshot:process.env.NEEDS_SHOT??null});
-  if(args.includes('--full')||args.includes('--mill-sails'))await millSailsSmoke(page,{screenshot:process.env.MILL_SHOT??null});
-  if(args.includes('--full')||args.includes('--hud-cargo'))await hudCargoSmoke(page,{screenshot:process.env.HUD_CARGO_SHOT??null});
-  if(args.includes('--full')||args.includes('--minimap'))await minimapSmoke(page,{screenshot:process.env.MINIMAP_SHOT??null});
-  if(args.includes('--full')||args.includes('--event-feed'))await eventFeedSmoke(page,{screenshot:process.env.FEED_SHOT??null});
-  if(args.includes('--full')||args.includes('--walls'))await wallVisibilitySmoke(page);
-  if(args.includes('--full')||args.includes('--housing'))await housingSmoke(page);
-  if(args.includes('--full')||args.includes('--zoom'))await zoomSmoke(page);
-  if(args.includes('--full')||args.includes('--minerals'))await mineralSmoke(page);
-  if(args.includes('--full')||args.includes('--forestry'))await forestrySmoke(page);
-  if(args.includes('--full')||args.includes('--forestry-workers'))await forestryHutSmoke(page);
-  if(args.includes('--full')||args.includes('--population')){await populationSidebarSmoke(page);await populationNavigationSmoke(page);await populationIntegrationSmoke(page);}
-  if(args.includes('--full')||args.includes('--workplace-output'))await workplaceOutputSmoke(page);
-  if(args.includes('--full')||args.includes('--granary-capacity'))await granaryCapacitySmoke(page);
-  if(args.includes('--full')||args.includes('--farmer-establishment'))await farmerEstablishmentSmoke(page);
-  if(args.includes('--full')||args.includes('--rock-mining'))await rockMiningSmoke(page,{screenshot:args.includes('--rock-shot')?'/tmp/newgame-rock-mining.png':null});
-  if(args.includes('--full')||args.includes('--castle-gathering'))await castleGatheringSmoke(page,{screenshot:args.includes('--gather-shot')?'/tmp/newgame-castle-gathering.png':null});
-  if(args.includes('--full')||args.includes('--demolition'))await demolitionSmoke(page,{screenshot:args.includes('--demolition-shot')?'/tmp/newgame-demolition-confirm.png':null});
-  if(args.includes('--full')||args.includes('--stockpile-cleanup'))await stockpileCleanupSmoke(page);
-  if(args.includes('--full')||args.includes('--repeat-placement'))await repeatPlacementSmoke(page);
-  if(args.includes('--full')||args.includes('--farm-plots'))await farmPlotsSmoke(page);
-  if(args.includes('--full')||args.includes('--farm-blueprint'))await farmBlueprintSmoke(page);
-  if(args.includes('--full')||args.includes('--job-menu'))await populationJobMenuSmoke(page);
-  if(args.includes('--full')||args.includes('--farmer-tending'))await farmerTendingSmoke(page);
-  if(args.includes('--full')||args.includes('--staffing'))await staffingIndicatorsSmoke(page);
-  if(args.includes('--full')||args.includes('--idle-stone'))await idleStoneSmoke(page);
-  if(args.includes('--full')||args.includes('--wildlife-clearance'))await wildlifeClearanceSmoke(page);
-  if(args.includes('--full')||args.includes('--unit-commands'))await unitCommandSmoke(page);
-  if(args.includes('--full')||args.includes('--employment-exclusions'))await employmentExclusionsSmoke(page);
-  if(args.includes('--full')||args.includes('--employment'))await employmentSmoke(page);
-  if(args.includes('--full')||args.includes('--chain-notices'))await chainNoticesSmoke(page);
-  if(args.includes('--full')||args.includes('--notices'))await noticesSmoke(page);
-  if(args.includes('--full')||args.includes('--fog')){await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);await hiddenInteractionSmoke(page);}
-  if(args.includes('--full')||args.includes('--i18n'))await i18nGameSmoke(page);
-  if(args.includes('--full')||args.includes('--save-transfer'))await saveTransferSmoke(page);
-  if(args.includes('--full')||args.includes('--autosave'))await autosaveSmoke(page);
-  if(args.includes('--full')||args.includes('--seasons-menu'))await seasonsMenuSmoke(page);
-  if(args.includes('--full')||args.includes('--season-transition'))await seasonTransitionSmoke(page);
+  await step('getting-started',()=>gettingStartedSmoke(context,origin+base,instrument));
+  await step('building-costs',()=>buildingCostsSmoke(context,origin+base,instrument));
+  await step('e2',()=>quickStartSmoke(context,origin+base,instrument));
+  await step('tutorial',()=>tutorialSmoke(context,origin+base,instrument));
+  await step('marketplace',()=>marketplaceSmoke(context,origin+base,instrument));
+  await step('gate',()=>gateSmoke(context,origin+base,instrument));
+  await step('world',()=>worldSmoke(context,origin+base,instrument));
+  await step('builder-workshop',()=>builderWorkshopSmoke(context,origin+base,instrument));
+  await step('fishing',()=>fishingSmoke(context,origin+base,instrument));
+  await step('paths-v2',()=>pathsV2Smoke(context,origin+base,instrument));
+  await step('policy',()=>policySmoke(context,origin+base,instrument));
+  await step('background',()=>backgroundSmoke(context,origin+base,instrument));
+  await step('world-code',()=>worldCodeSmoke(context,origin+base,instrument));
+  await step('pets',()=>petsSmoke(context,origin+base,instrument));
+  await step('dog',()=>dogSmoke(context,origin+base,instrument));
+  await step('walk',()=>walkSmoke(context,origin+base,instrument));
+  await step('children',()=>childrenSmoke(context,origin+base,instrument));
+  await step('employment-spread',()=>employmentSpreadSmoke(context,origin+base,instrument));
+  await step('storage-notices',()=>storageNoticesSmoke(context,origin+base,instrument));
+  await step('ui-theme',()=>uiThemeSmoke(context,origin+base,instrument));
+  await step('storage-window',()=>storageWindowSmoke(context,origin+base,instrument));
+  await step('side-cards',()=>sideCardsSmoke(context,origin+base,instrument));
+  await step('chosen-art',()=>chosenArtSmoke(context,origin+base,instrument));
+  await step('castle-art',()=>castleArtSmoke(context,origin+base,instrument));
+  await step('decorations',()=>houseDecorationsSmoke(context,origin+base,instrument));
+  await step('porch',()=>porchSmoke(context,origin+base,instrument));
+  await step('day-night',()=>dayNightSmoke(context,origin+base,instrument));
+  await step('torches',()=>torchesSmoke(context,origin+base,instrument));
+  await step('campfire',()=>campfireSmoke(context,origin+base,instrument));
+  await step('wolves',()=>wolvesSmoke(context,origin+base,instrument));
+  await step('thieves',()=>thievesSmoke(context,origin+base,instrument));
+  await step('fire',()=>fireSmoke(context,origin+base,instrument));
+  await step('overview',()=>kingdomOverviewSmoke(context,origin+base,instrument));
+  await step('ledger',()=>ledgerSmoke(page));
+  await step('smelting',()=>smeltingSmoke(page));
+  await step('military',()=>militarySmoke(page));
+  await step('wheelwright',()=>wheelwrightSmoke(page));
+  await step('stables',()=>stablesSmoke(page));
+  await step('horse-wagon',()=>horseWagonSmoke(page));
+  await step('pavement',()=>pavementSmoke(page,{screenshot:process.env.PAVEMENT_SHOT??null}));
+  await step('right-click',()=>rightClickSmoke(page));
+  await step('pave-under',()=>paveUnderSmoke(page));
+  await step('dev-fps',()=>devFpsSmoke(page));
+  await step('fog-brightness',()=>memoryBrightnessSmoke(page,{screenshot:process.env.BRIGHTNESS_SHOT??null}));
+  await step('needs',()=>needsSmoke(page,{screenshot:process.env.NEEDS_SHOT??null}));
+  await step('mill-sails',()=>millSailsSmoke(page,{screenshot:process.env.MILL_SHOT??null}));
+  await step('hud-cargo',()=>hudCargoSmoke(page,{screenshot:process.env.HUD_CARGO_SHOT??null}));
+  await step('minimap',()=>minimapSmoke(page,{screenshot:process.env.MINIMAP_SHOT??null}));
+  await step('event-feed',()=>eventFeedSmoke(page,{screenshot:process.env.FEED_SHOT??null}));
+  await step('walls',()=>wallVisibilitySmoke(page));
+  await step('housing',()=>housingSmoke(page));
+  await step('zoom',()=>zoomSmoke(page));
+  await step('minerals',()=>mineralSmoke(page));
+  await step('forestry',()=>forestrySmoke(page));
+  await step('forestry-workers',()=>forestryHutSmoke(page));
+  await step('population',async()=>{await populationSidebarSmoke(page);await populationNavigationSmoke(page);await populationIntegrationSmoke(page);});
+  await step('workplace-output',()=>workplaceOutputSmoke(page));
+  await step('granary-capacity',()=>granaryCapacitySmoke(page));
+  await step('farmer-establishment',()=>farmerEstablishmentSmoke(page));
+  await step('rock-mining',()=>rockMiningSmoke(page,{screenshot:args.includes('--rock-shot')?'/tmp/newgame-rock-mining.png':null}));
+  await step('castle-gathering',()=>castleGatheringSmoke(page,{screenshot:args.includes('--gather-shot')?'/tmp/newgame-castle-gathering.png':null}));
+  await step('demolition',()=>demolitionSmoke(page,{screenshot:args.includes('--demolition-shot')?'/tmp/newgame-demolition-confirm.png':null}));
+  await step('stockpile-cleanup',()=>stockpileCleanupSmoke(page));
+  await step('repeat-placement',()=>repeatPlacementSmoke(page));
+  await step('farm-plots',()=>farmPlotsSmoke(page));
+  await step('farm-blueprint',()=>farmBlueprintSmoke(page));
+  await step('job-menu',()=>populationJobMenuSmoke(page));
+  await step('e1',()=>e1Smoke(page));
+  await step('e2',()=>e2Smoke(page));
+  await step('e4',()=>e4Smoke(page));
+  await step('farmer-tending',()=>farmerTendingSmoke(page));
+  await step('staffing',()=>staffingIndicatorsSmoke(page));
+  await step('idle-stone',()=>idleStoneSmoke(page));
+  await step('wildlife-clearance',()=>wildlifeClearanceSmoke(page));
+  await step('unit-commands',()=>unitCommandSmoke(page));
+  await step('employment-exclusions',()=>employmentExclusionsSmoke(page));
+  await step('employment',()=>employmentSmoke(page));
+  await step('chain-notices',()=>chainNoticesSmoke(page));
+  await step('notices',()=>noticesSmoke(page));
+  await step('fog',async()=>{await explorationMenuSmoke(page);await staticMemoryRendererSmoke(page);await hiddenInteractionSmoke(page);});
+  await step('i18n',()=>i18nGameSmoke(page));
+  await step('save-transfer',()=>saveTransferSmoke(page));
+  await step('autosave',()=>autosaveSmoke(page));
+  await step('seasons-menu',()=>seasonsMenuSmoke(page));
+  await step('season-transition',()=>seasonTransitionSmoke(page));
   await buildingMenuSmoke(page);
   const point=await page.evaluate(()=>{
     const s=window.__game.registry.get('application').scene;
@@ -275,7 +296,7 @@ try{
   await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('test',false));await page.waitForFunction(()=>window.__game.registry.get('application').scene.inventory.count('stone')===1,null,{timeout:20000});
   assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.character.experience.totalXP),3);
   console.log('PASS New Game, real mouse movement/pickup, physical delivery, exact IndexedDB Save/Load in transit, no duplicated stock or XP');
-  if(args.includes('--full')||args.includes('--building-unlocks'))await buildingUnlockGameplaySmoke(page);
+  await step('building-unlocks',()=>buildingUnlockGameplaySmoke(page));
   if(currentOnly){assert.equal(requests.some(url=>/\/versions\/[a-f0-9]{40}\//.test(url)),false);assert.equal(requests.some(url=>url.includes('/versions/catalog.json')),false);assert.deepEqual(errors,[]);await context.close();console.log('PASS cold current game starts and plays without requesting an archive catalog, historical script or historical graphic');return;}
 
   const original=catalog.versions.find(v=>v.version==='0.1.0'&&v.available);assert.ok(original,'Original official archive is required.');
@@ -309,8 +330,8 @@ try{
   // N04: starting resources on the restarted New Game screen go into the Starter Stockpile once, capped at its 160 units
   // (0.9.2: the setup proposes 40 of each, which fills it).
   {const set=(name,value)=>page.locator(`#game-setup-form [name="${name}"]`).evaluate((e,v)=>{e.value=String(v);e.dispatchEvent(new Event('input',{bubbles:true}));},value);
-  await page.locator('.setup-advanced summary').click();assert.equal(await page.locator('#setup-resources-total').textContent(),'160 / 160');
-  await set('startingIronOre',0);await set('startingBread',0);await set('startingStone',100);await set('startingWood',100);assert.equal(await page.locator('#setup-start-wood').inputValue(),'60','the slider stops at the remaining room');assert.equal(await page.locator('#setup-resources-total').textContent(),'160 / 160');
+  await page.locator('.setup-advanced summary').click();assert.equal(await page.locator('#setup-resources-total').textContent(),'140 / 160');
+  await set('startingIronOre',0);await set('startingBread',0);await set('startingStone',100);await set('startingWood',100);assert.equal(await page.locator('#setup-start-wood').inputValue(),'60','the slider stops at the remaining room');assert.equal(await page.locator('#setup-resources-total').textContent(),'140 / 160');
   assert.match(await page.locator('#setup-summary').textContent(),/Stockpile: 100 stone, 60 wood/);
   await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'setup fits a phone');await page.setViewportSize({width:1440,height:1000});
   await page.locator('#start-game').click();await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
@@ -327,3 +348,4 @@ try{
 }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 }
 await runSmoke();
+if(failures.length){console.log(`FAILED ${failures.length}: ${failures.map(f=>`--${f}`).join(' ')}`);process.exitCode=1;}else if(keepGoing)console.log('ALL SMOKES PASSED');

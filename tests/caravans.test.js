@@ -73,7 +73,7 @@ test('a demolished Marketplace sends the caravan away; a road blocked meanwhile 
 
 test('Save/Load in the middle of a visit continues without duplicating the merchant’s goods', () => {
   const s=workerScene(undefined,{construction:true,logistics:true,gameSettings:gameSettings()});s.caravans=new CaravanSystem(s);
-  const starter=`stockpile-${s.buildings.find(b=>b.type==='starter_stockpile').id}`;s.foodStorage.deposit(starter,'stone',22);s.foodStorage.deposit(starter,'wood',8);
+  const starter=`stockpile-${s.buildings.find(b=>b.type==='starter_stockpile').id}`;s.foodStorage.deposit(starter,'stone',22);s.foodStorage.deposit(starter,'wood',12);
   for(const [type,x,y] of [['warehouse',58,40],['marketplace',44,48]]){const r=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:s.objectRegistry.require(type)});assert.ifError(r.error);s.towerViews.set(r.building.id,s.createBuildingView(r.building.definition,r.building));}
   assert.equal(s.caravans.summon(),true);for(let i=0;i<30;i++)s.caravans.update(100);
   const saved=validateGameState(serializeGameState(s));assert.equal(saved.caravans.active.phase,'arriving');

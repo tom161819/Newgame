@@ -8,7 +8,7 @@ import { FOOD_RULES } from '../foodProduction.js';
 import { STABLE_RULES } from '../stables.js';
 export const vehicleDefinitions=[
   {id:'stables',name:'Stables',category:'building',buildingCategory:'logistics',sprite:'/assets/buildings/stables/stables-shelter.v1.png',
-    width:5,height:5,walkable:false,collectible:false,buildable:true,cost:{wood:15,stone:10},constructionTime:45000,
+    width:5,height:5,walkable:false,collectible:false,buildable:true,cost:{wood:20},constructionTime:45000,
     workplace:WORKPLACES.stables,horseCapacity:STABLE_RULES.horseCapacity,autoEmployment:true,interactions:['manage_workers'],
     renderMode:'sprite',origin:{x:0.49845,y:0.99065},visualHeight:212,depth:{offset:0},
     description:'A stable with a fenced paddock for 4 tamed horses. Two Stablehands tame wild horses and lead them in.'},

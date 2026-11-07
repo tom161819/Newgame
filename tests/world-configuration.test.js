@@ -45,7 +45,7 @@ test('fast days scale daily food consumption while stone spawns keep their origi
   const s=configured({dayLengthSeconds:60});s.inventory.add('meat',4);const tile={x:5,y:5};for(let i=0;i<30;i++)s.pathWear.enter(s.character,tile);
   for(let day=0;day<3;day++){s.gameTime.update(60000);s.foodSystem.update(60000);s.resourceSpawners[0].update(60000);}
   assert.equal(s.gameTime.day,4);assert.equal(s.resources.size,9);assert.equal(s.inventory.count('meat'),0);assert.equal(s.pathWear.scores[505],25);
-  const t=new GameTimeSystem(60000);let calls=0;t.onNewDay(()=>calls++);t.update(180001);assert.equal(calls,3);assert.equal(t.elapsed,1);t.setPaused(true);t.update(60000);assert.equal(calls,3);assert.equal(t.label,'Day 4 | 01:00 / 01:00');
+  const t=new GameTimeSystem(60000);let calls=0;t.onNewDay(()=>calls++);t.update(180001);assert.equal(calls,3);assert.equal(t.elapsed,1);t.setPaused(true);t.update(60000);assert.equal(calls,3);assert.equal(t.label,'Day 4');
 });
 test('respawn Off/Slow/Normal/Fast uses active milliseconds, fills one missing species per attempt and never exceeds the wildlife target',()=>{
   for(const wildlifeRespawn of ['off','slow','normal','fast']){

@@ -728,3 +728,70 @@ html[data-ui-population="left"] :is(.policy-card, .employment-panel) { right:aut
 .population-job-check { width:12px; flex-shrink:0; color:#f0d78b; }
 .population-job-separator { margin:4px 2px; border:0; border-top:1px solid #545d42; }
 .population-job-menu .population-job-unemploy { border-left-color:transparent; color:#f0b38a; }
+
+/* Plan m-e1-stavitele-material: a hire button in a notice row. */
+.notice .notice-action { flex-shrink:0; padding:3px 7px; font-size:11px; border-color:#d4b96f; background:#4a4524; color:#f4d98e; }
+
+/* Plan m-e1-jidlo-vydrz: food days in the HUD. */
+#food-countdown[data-tone='bad'] { color:#f0a080; }
+#food-countdown[data-tone='warn'] { color:#e8cf7a; }
+.overview-block { margin:6px 0 0; font-size:11px; color:#f0b38a; }
+
+/* Plan m-e2-rychlost-hry: pause and speed in the HUD. */
+.speed-controls { display:inline-flex; gap:2px; vertical-align:middle; }
+.speed-controls .speed-button { min-width:26px; padding:2px 5px; font-size:11px; line-height:1.2; border-radius:3px; }
+.speed-controls .speed-button[aria-pressed="true"] { border-color:#f0d78b; background:#5a5430; color:#fff2c4; }
+.speed-controls.is-paused .speed-button[data-speed="0"] { background:#7a4a24; }
+
+/* E2: tools and camera details inside the More panel. */
+.hud-more-tools, .hud-more-camera { display:inline-flex; gap:8px; align-items:center; font-size:11px; }
+.hud-more-camera span { color:#c7c4a4; }
+
+/* E2 (report 0.48.0): Continue first, the archive and the changelog as small links. */
+.main-menu-links { display:flex; gap:14px; justify-content:center; margin-top:4px; }
+.main-menu-links .menu-link { padding:4px 8px; font-size:13px; border-color:transparent; background:none; box-shadow:none; text-decoration:underline; color:#d8c88f; }
+.main-menu-links .menu-link:hover { background:#2b3a33; }
+
+/* E2: quick starts at the top of the New Game setup. */
+.setup-quick { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:12px 0; }
+.setup-quick #setup-quick-title { grid-column:1/-1; margin:0; }
+.setup-preset { display:flex; flex-direction:column; gap:4px; align-items:flex-start; text-align:left; padding:10px; }
+.setup-preset small { font-size:11px; color:#c8c2a3; }
+.setup-preset[aria-checked="true"] { border-color:#f0d78b; background:#4d4a2c; }
+.setup-start-top { grid-column:1/-1; padding:12px; font-size:16px; border-color:#d4b96f; background:#5a5430; }
+.setup-custom > summary { cursor:pointer; margin:8px 0; color:#e0c88f; }
+@media (max-width:600px){ .setup-quick { grid-template-columns:1fr; } }
+
+/* E3 tutorial: bubble, arrow and the tick after a step. */
+.tutorial-bubble { position:fixed; z-index:45; padding:12px 14px 10px; border:1px solid #d4b96f; border-radius:6px; background:#26301ffa; color:#f0e6c4; box-shadow:0 8px 28px #000a; }
+.tutorial-bubble[hidden], .tutorial-arrow[hidden], .tutorial-done[hidden] { display:none; }
+.tutorial-text { margin:4px 0 10px; font-size:13px; line-height:1.45; }
+.tutorial-count { color:#c9b97f; font-size:10px; text-transform:uppercase; letter-spacing:.06em; }
+.tutorial-actions { display:flex; gap:6px; justify-content:flex-end; }
+.tutorial-actions button { padding:4px 10px; font-size:12px; }
+.tutorial-actions .tutorial-show, .tutorial-actions .tutorial-next { border-color:#f0d78b; background:#5a5430; }
+.tutorial-close { position:absolute; top:4px; right:6px; padding:0 6px; border:0; background:none; box-shadow:none; color:#c9b97f; font-size:16px; }
+.tutorial-arrow { position:fixed; z-index:46; width:34px; height:22px; pointer-events:none; background:#f4d98e; clip-path:polygon(0 30%,60% 30%,60% 0,100% 50%,60% 100%,60% 70%,0 70%); filter:drop-shadow(0 0 4px #000); animation:tutorial-pulse 1s ease-in-out infinite; }
+.tutorial-arrow.offscreen { background:#ffe7a3; }
+@keyframes tutorial-pulse { 50% { opacity:.55; } }
+.tutorial-done { position:fixed; z-index:47; left:50%; top:24%; transform:translate(-50%,-50%); font-size:48px; color:#b9e28a; text-shadow:0 0 12px #000; pointer-events:none; }
+.tutorial-done.pop { animation:tutorial-pop .9s ease-out forwards; }
+@keyframes tutorial-pop { from { opacity:1; transform:translate(-50%,-50%) scale(.6); } to { opacity:0; transform:translate(-50%,-80%) scale(1.2); } }
+@media (prefers-reduced-motion:reduce){ .tutorial-arrow, .tutorial-done.pop { animation:none; } }
+
+/* E3 tips share the tutorial bubble. */
+.tutorial-bubble.is-tip { border-color:#9fbf7a; }
+.tutorial-bubble.is-tip .tutorial-count { color:#b9d98f; }
+
+/* E4: Royal tasks card above the event feed. */
+.royal-goals { width:min(260px,calc(100vw - 72px)); margin-right:34px; background:rgba(28,24,18,.88); color:#f3ead2; border:1px solid rgba(240,209,116,.45); border-radius:8px; padding:6px 10px; font-size:13px; box-shadow:0 2px 8px rgba(0,0,0,.35); }
+.royal-goals[hidden] { display:none; }
+.royal-goals > summary { cursor:pointer; font-weight:600; color:#ffe09a; list-style-position:inside; }
+.royal-goals-list { list-style:none; margin:6px 0 0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.royal-goal { display:grid; grid-template-columns:1fr auto; gap:2px 8px; align-items:center; }
+.royal-goal progress { grid-column:1 / -1; width:100%; height:6px; accent-color:#e0b84f; }
+.royal-goal small { grid-column:1 / -1; color:#cdbf9c; }
+.royal-goal-count { font-variant-numeric:tabular-nums; color:#e8dcbc; }
+.royal-goals.goal-flash { animation:royal-goal-flash 1.2s ease-out; }
+@keyframes royal-goal-flash { 0% { box-shadow:0 0 0 0 rgba(255,224,138,.9); background:rgba(90,72,30,.95); } 100% { box-shadow:0 0 0 14px rgba(255,224,138,0); } }
+@media (max-width:640px) { .royal-goals { font-size:12px; } }

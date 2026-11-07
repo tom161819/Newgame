@@ -4,7 +4,9 @@ import assert from 'node:assert/strict';
 export async function explorationMenuSmoke(page){
   await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.pauseManager.set('fog-smoke',true);window.__fogSmoke={position:{...s.character.position},tile:{...s.character.tile},fog:s.fog.enabled,exploration:s.fog.explorationEnabled,subjects:s.fog.providers.get('subjects')};
     // These pixels are measured around the king's own sight circle; wandering subjects would light parts of it.
-    s.fog.providers.delete('subjects');s.fog.update();});
+    s.fog.providers.delete('subjects');s.fog.update();
+    // The pixels are measured in daylight: at night the additive light glow of the night overlay tints even unknown ground.
+    const o=s.nightOverlay;if(o){window.__fogSmoke.nightUpdate=o.update;o.update=()=>{};o.dark?.setVisible(false);o.glow?.setVisible(false);}});
   await page.locator('#settings-button').click();await page.locator('#fog-toggle').check();await page.locator('#exploration-toggle').check();
   const seam=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,c=s.cameras.main;return {king:{...s.character.tile},camera:{scrollX:c.scrollX,scrollY:c.scrollY,width:c.width,height:c.height,zoom:c.zoom},width:s.fog.width,height:s.fog.height,states:Array.from({length:s.fog.width*s.fog.height},(_,i)=>s.fog.state({x:i%s.fog.width,y:Math.floor(i/s.fog.width)}))};});
   const seamPoint=unknownFogSeam({...seam,state:tile=>seam.states[tile.y*seam.width+tile.x]},seam.camera,seam.king);
@@ -28,7 +30,7 @@ export async function explorationMenuSmoke(page){
   });
   assert.equal(history.state,1);assert.deepEqual(history.remembered,history.old);assert.equal(history.unknown,0);assert.ok(history.count>black.seen);
   const original=await page.evaluate(()=>window.__fogSmoke);await page.locator('#fog-toggle').setChecked(original.fog);await page.locator('#exploration-toggle').setChecked(original.exploration);await page.locator('#close-settings').click();
-  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;if(window.__fogSmoke.subjects)s.fog.providers.set('subjects',window.__fogSmoke.subjects);s.fog.update();s.pauseManager.set('fog-smoke',false);delete window.__fogSmoke;});
+  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;if(window.__fogSmoke.subjects)s.fog.providers.set('subjects',window.__fogSmoke.subjects);s.fog.update();if(window.__fogSmoke.nightUpdate)s.nightOverlay.update=window.__fogSmoke.nightUpdate;s.pauseManager.set('fog-smoke',false);delete window.__fogSmoke;});
   console.log('PASS native circular exploration, black/grey/normal terrain pixels, independent runtime switches, unchanged discovery on test reveal and frozen known terrain');
 }
 
@@ -54,9 +56,9 @@ export async function staticMemoryRendererSmoke(page){
 
 export async function hiddenInteractionSmoke(page){
   await page.locator('#settings-button').click();await page.locator('#fog-toggle').check();await page.locator('#exploration-toggle').check();await page.locator('#path-wear-toggle').check();await page.locator('#close-settings').click();
-  // Every living subject is its own sight source (radius 7.5) next to the king's.
+  // Every living subject is its own sight source (radius 7.5, halved at night) next to the king's.
   const sight=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,f=s.fog;f.update();const subjects=s.workerSystem.liveSubjects();return {sources:f.sources.length,subjects:subjects.length,radii:[...new Set(f.sources.slice(1).map(x=>x.radius))],own:subjects.every(w=>f.isInSightTile({x:Math.floor(w.position.x),y:Math.floor(w.position.y)}))};});
-  assert.ok(sight.subjects>0);assert.equal(sight.sources,sight.subjects+1);assert.deepEqual(sight.radii,[7.5]);assert.equal(sight.own,true);
+  assert.ok(sight.subjects>0);assert.equal(sight.sources,sight.subjects+1);assert.equal(sight.radii.length,1);assert.ok([7.5,3.75].includes(sight.radii[0]),`subject sight 7.5 by day, half at night (${sight.radii})`);assert.equal(sight.own,true);
   const original=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,c=s.cameras.main;const state={x:c.scrollX+c.width/2,y:c.scrollY+c.height/2,zoom:c.zoom,following:s.worldCamera.following,count:s.buildings.length};s.worldCamera.following=false;c.centerOn(3200,3150).setZoom(.9);c.preRender();return state;});
   const clickTile=async tile=>{const point=await page.evaluate(tile=>{const s=window.__game.registry.get('application').scene,c=s.cameras.main,p={x:3200+(tile.x-tile.y)*32,y:128+(tile.x+tile.y+1)*16};return{x:(p.x-(c.scrollX+c.width/2))*c.zoom+c.width/2,y:(p.y-(c.scrollY+c.height/2))*c.zoom+c.height/2,w:c.width,h:c.height};},tile),bounds=await page.locator('canvas:not(.minimap-canvas)').boundingBox();await page.mouse.move(bounds.x+point.x*bounds.width/point.w,bounds.y+point.y*bounds.height/point.h);await page.mouse.click(bounds.x+point.x*bounds.width/point.w,bounds.y+point.y*bounds.height/point.h);};
   // Unseen ground is a valid destination: the king sets out, and the reply is the same whatever lies hidden there.

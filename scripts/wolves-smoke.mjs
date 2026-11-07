@@ -9,7 +9,7 @@ export async function wolvesSmoke(context,url,instrument){
     await page.goto(url);await page.evaluate(()=>localStorage.setItem('newgame.nightSpeed','1'));await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW2-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.nightThreats);
     await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
-    const pack=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,g=s.gameTime,n=s.nightThreats;n.random=()=>0;g.update(g.dayDuration*(s.dayNight.nightStart()+.01)-g.elapsed);
+    const pack=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,g=s.gameTime,n=s.nightThreats;n.started=()=>true;/* E1: threats begin later in a real game */n.random=()=>0;g.update(g.dayDuration*(s.dayNight.nightStart()+.01)-g.elapsed);
       const wolves=n.spawnWolves(g.day);n.random=Math.random;
       // Bring the pack closer to the village for the check (the walk from the edge takes a while).
       const c=s.character.tile;wolves.forEach((w,i)=>{const t={x:c.x+14+i,y:c.y+6};if(s.map[t.y]?.[t.x]===0){w.tile=t;w.position={x:t.x+.5,y:t.y+.5};w.path=[];}});

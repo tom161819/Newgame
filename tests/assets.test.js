@@ -14,7 +14,7 @@ test('registry exposes the existing game objects, categories and buildable menu'
   assert.deepEqual(objectRegistry.byCategory('terrain').map(d => d.id), ['grass','dirt','grass_normal','grass_trodden','grass_trampled_1','grass_trampled_2','grass_trampled_3','beach_sand','desert_sand','shallow_water','deep_water','ford_shallows','mud_bank','shore_rocks']);
   assert.equal(objectRegistry.forGallery('all').length, 100);
   assert.equal(objectRegistry.forGallery('resource')[0].id, 'stone');
-  assert.equal(objectRegistry.require('tower').cost.stone, 10);
+  assert.equal(objectRegistry.require('tower').cost.stone, 20);
   assert.equal(objectRegistry.get('missing'), null);
   assert.throws(() => objectRegistry.require('missing'), /Neznámý objekt/);
 });

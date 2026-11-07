@@ -2,7 +2,7 @@ import { FOOD_RESOURCE_IDS } from '../foodProduction.js';
 import { LOGISTICS_RULES } from '../logistics.js';
 import { TRADE_RULES } from '../trade.js';
 export const logisticsBuildings=[
-  {id:'warehouse',name:'Warehouse',width:3,height:3,cost:{stone:10},constructionTime:30000,visualHeight:125,buildable:true,
+  {id:'warehouse',name:'Warehouse',width:3,height:3,cost:{stone:10,wood:4},constructionTime:30000,visualHeight:125,buildable:true,
     storage:{capacity:200,resources:['stone','wood','iron'],accepts:'materials'},description:'A physical store for 200 building materials. Haulers serve every store in the kingdom.'},
   {id:'starter_stockpile',name:'Starter Stockpile',width:2,height:2,cost:{},visualHeight:55,buildable:false,starter:true,
     storage:{capacity:LOGISTICS_RULES.starterCapacity,resources:['stone','wood','iron',...FOOD_RESOURCE_IDS],accepts:'all'},description:`A starting store with space for ${LOGISTICS_RULES.starterCapacity} materials and food units combined.`},

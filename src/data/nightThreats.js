@@ -3,6 +3,9 @@
 // one finishes).
 export const NIGHT_THREATS=Object.freeze({
   ids:Object.freeze(['wolves','thieves','fires']),
+  // Plan m-e1-hrozby-pozdeji (owner 7 Nov 2026): threats start once the kingdom is on its feet – 5 finished Houses or
+  // the second year, whichever comes first (days counted when seasons are off). The first fire only warns.
+  start:Object.freeze({houses:5,year:2,daysWithoutSeasons:20}),
   // Wolves come only at night from far away (map edge, outside light), in packs of 2–4, more often in winter; at dawn
   // they leave. They hunt wild animals and people outdoors, never step into a burning light's radius (a lone torch in
   // hand does not scare them) and flee from 3 or more soldiers within 4 tiles.

@@ -13,6 +13,8 @@ globalThis.document??={querySelector:()=>({textContent:''})};
 function world(settings){
   const s=workerScene(undefined,{logistics:true,workplaces:true});for(const a of [...s.animalSystem.animals.values()])s.animalSystem.remove?.(a);
   s.bushes=new Map([['50,50',0]]);s.dayNight=new DayNightSystem(s);s.lightFuel=new LightFuelSystem(s);s.nightThreats=new NightThreatSystem(s,settings);
+  // These scenes test the threats themselves: the kingdom is past the quiet start and has had its first fire warning.
+  s.nightThreats.started=()=>true;s.nightThreats.fireWarned=true;
   const at=fraction=>{const g=s.gameTime,target=g.dayDuration*fraction;g.update(target>g.elapsed?target-g.elapsed:g.dayDuration-g.elapsed+target);s.nightThreats.update();};
   const error=(x,y)=>placementError(s.map,{x,y},{has:k=>s.resourceOccupancy.has(k),naturalContext:{mining:{placementError:()=>null,accessError:()=>null,canBuildOver:()=>false},scene:s}},[],s.objectRegistry.require('campfire'),s.buildings);
   return {s,n:s.nightThreats,at,error};
@@ -135,4 +137,14 @@ test('fires: a burning flame near a wooden building may set it alight at night; 
   n.ignite(house);for(let i=0;i<2000&&n.burning(house);i++)n.updateFires(100);
   assert.equal(s.buildings.includes(house),false,'burnt down');assert.ok(s.buildings.some(b=>b.type==='burnt_ruins'&&b.x===60&&b.y===60),'ruins left');
   const off=world();off.n.setEnabled('fires',false);off.s.lightSources={lights:()=>[{type:'torch',...gridToWorld(62.5,61),radius:100}]};off.n.random=()=>0;assert.deepEqual(off.n.igniteFires(1),[],'switched off');
+});
+
+test('E1: threats wait for 5 finished Houses or the second year; the first spark only warns',async()=>{
+  const {NightThreatSystem:N}=await import('../src/systems/NightThreatSystem.js');
+  const houses=n=>Array.from({length:n},(_,i)=>({id:i+1,type:'house'}));
+  const make=({n=0,year=1,seasons=true,day=1}={})=>new N({buildings:houses(n),seasons:seasons?{enabled:true,calendar:{year}}:{enabled:false},gameTime:{day}});
+  assert.equal(make().started(),false);assert.equal(make({n:4}).started(),false);assert.equal(make({n:5}).started(),true,'5 Houses');
+  assert.equal(make({year:2}).started(),true,'second year');assert.equal(make({seasons:false,day:20}).started(),false);assert.equal(make({seasons:false,day:21}).started(),true);
+  const r=make({n:5});assert.deepEqual(r.exportState().fireWarned,undefined);r.fireWarned=true;const saved=r.exportState();assert.equal(saved.fireWarned,true);
+  const back=make();back.importState(saved);assert.equal(back.fireWarned,true);
 });

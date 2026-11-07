@@ -12,6 +12,7 @@ export class SeasonSystem {
   }
   get calendar(){return calendar(this.cycleDay);}
   get season(){return this.enabled?this.calendar.season:'Summer';}
+  get tooltip(){const c=this.calendar;return this.enabled?t('hud.seasonTip',{day:c.dayInSeason,year:c.year}):'';}
   get label(){const c=this.calendar,weather=t(`weather.${this.weather}`);return this.enabled?t('hud.season',{season:t(`season.${c.season}`),day:c.dayInSeason,year:c.year,weather}):t('hud.seasonsOff',{weather});}
   rollWeather(){let value=this.random();for(const [weather,probability]of Object.entries(WEATHER_PROBABILITIES[this.season])){value-=probability;if(value<0)return weather;}return'Frost';}
   growthMultiplier(){return Math.max(0,SEASON_GROWTH[this.season]*WEATHER_GROWTH[this.weather]);}

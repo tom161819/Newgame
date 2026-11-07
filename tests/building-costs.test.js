@@ -28,13 +28,13 @@ test('a price is at least one known resource, each a whole number from 1', () =>
 });
 
 test('the Asset Library can change an amount, add a resource and remove one; reset restores the default', () => {
-  const r=fresh();assert.deepEqual(r.require('house').cost,{wood:10,stone:4});
-  set(r,{house:{wood:6,stone:4,gold:5}});assert.deepEqual(r.require('house').cost,{wood:6,stone:4,gold:5},'changed wood, added gold');
-  set(r,{house:{wood:6}});assert.deepEqual(r.require('house').cost,{wood:6},'stone removed: the override is the whole price');
-  assert.deepEqual(r.costDefaults.get('house'),{wood:10,stone:4},'the default stays known');
-  assert.deepEqual(costDiff(r.costDefaults.get('house'),r.require('house').cost).map(d=>`${d.resource}:${d.state}`),['wood:changed','stone:removed']);
-  set(r,{house:{wood:6},farmhouse:{stone:10}});assert.deepEqual(r.costOverrides,{house:{wood:6}},'an override equal to the default is dropped');
-  set(r,{});assert.deepEqual(r.require('house').cost,{wood:10,stone:4});assert.deepEqual(r.costOverrides,{});
+  const r=fresh();assert.deepEqual(r.require('tower').cost,{stone:20});
+  set(r,{tower:{stone:8,wood:4,gold:5}});assert.deepEqual(r.require('tower').cost,{stone:8,wood:4,gold:5},'changed stone, added wood and gold');
+  set(r,{tower:{wood:4}});assert.deepEqual(r.require('tower').cost,{wood:4},'stone removed: the override is the whole price');
+  assert.deepEqual(r.costDefaults.get('tower'),{stone:20},'the default stays known');
+  assert.deepEqual(costDiff(r.costDefaults.get('tower'),r.require('tower').cost).map(d=>`${d.resource}:${d.state}`).sort(),['stone:removed','wood:added']);
+  set(r,{tower:{wood:4},quarry:{wood:15}});assert.deepEqual(r.costOverrides,{tower:{wood:4}},'an override equal to the default is dropped');
+  set(r,{});assert.deepEqual(r.require('tower').cost,{stone:20});assert.deepEqual(r.costOverrides,{});
 });
 
 test('invalid price lists change nothing', () => {
@@ -55,7 +55,7 @@ test('a new site books the new price; it keeps that price after a reset, through
   const b=place(48,43);
   assert.deepEqual(b.materialSupply.required,{stone:4,wood:2});assert.deepEqual(b.construction.investedMaterials,{stone:4,wood:2});
   assert.deepEqual(paidCost(b,r.require('tower')),{stone:4,wood:2});
-  set(r,{});assert.deepEqual(r.require('tower').cost,{stone:10});
+  set(r,{});assert.deepEqual(r.require('tower').cost,{stone:20});
   assert.deepEqual(s.constructionSystem.materials.required(b),{stone:4,wood:2},'the site still asks for what it booked');
   const saved=validateGameState(serializeGameState(s),r);
   const restored=workerScene(undefined,{construction:true,logistics:true,starter:false,gameSettings:gameSettings()});restored.objectRegistry=r;loadGameState(restored,saved);
@@ -63,7 +63,7 @@ test('a new site books the new price; it keeps that price after a reset, through
   const bad=structuredClone(saved),site=bad.buildings.find(x=>x.id===b.id);site.construction.investedMaterials.stone=3;assert.throws(()=>validateGameState(bad,r),'a site price that matches neither the price nor its booked supply is rejected');
   const finished={construction:{state:'complete',investedMaterials:{stone:4,wood:2}}};
   assert.deepEqual(buildingDemolitionRefund(finished,r.require('tower')),{stone:2,wood:1});
-  assert.deepEqual(buildingDemolitionRefund({},r.require('castle')),{stone:5},'without a construction record the definition price counts');
+  assert.deepEqual(buildingDemolitionRefund({},r.require('castle')),{stone:10},'without a construction record the definition price counts');
 });
 
 test('prices are stored in this browser only and exported in the shared proposal format', () => {

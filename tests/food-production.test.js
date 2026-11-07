@@ -7,7 +7,7 @@ import { loadGameState } from '../src/systems/GameStateLoader.js';
 import { totalXPForLevel } from '../src/data/experience.js';
 globalThis.document={querySelector:()=>({textContent:''})};
 const scene=()=>workerScene(undefined,{construction:true,foodProduction:true});
-function building(s,type,x,y,blueprint=false){const definition=s.objectRegistry.require(type);ensureBuildingPrerequisites(s,definition);s.inventory.add('stone',definition.cost.stone);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition});assert.ifError(result.error);if(blueprint)s.constructionSystem.plan(result.building);s.towerViews.set(result.building.id,s.createBuildingView(definition,result.building));return result.building;}
+function building(s,type,x,y,blueprint=false){const definition=s.objectRegistry.require(type);ensureBuildingPrerequisites(s,definition);Object.entries(definition.cost).forEach(([r,k])=>s.inventory.add(r,k));const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition});assert.ifError(result.error);if(blueprint)s.constructionSystem.plan(result.building);s.towerViews.set(result.building.id,s.createBuildingView(definition,result.building));return result.building;}
 function worker(s,home,tile={x:53,y:44}){const w=s.workerSystem.create(tile);assert.equal(s.workplaceSystem.assign(home,w),true);return w;}
 function until(s,predicate,maximum=60000){let elapsed=0;while(!predicate()&&elapsed<maximum){s.tick(25);elapsed+=25;}assert.ok(predicate(),`Condition not reached after ${elapsed}ms: ${JSON.stringify(s.workerSystem.liveWorkers().map(w=>({job:w.profession,task:w.workTask,cargo:w.cargo,message:w.workMessage})))}`);return elapsed;}
 function millFixture({employees=1}={}){const s=scene(),granary=building(s,'granary',48,45),mill=building(s,'mill',54,45),workers=[];for(let i=0;i<employees;i++)workers.push(worker(s,mill,{x:53+i,y:44}));return {s,granary,mill,workers,stock:`granary-${granary.id}`,input:`input-${mill.id}`,output:`output-${mill.id}`,record:s.foodProduction.records.get(mill.id)};}
@@ -15,8 +15,8 @@ const quantities=s=>{const amounts={};const add=(id,n)=>amounts[id]=(amounts[id]
 const restore=data=>{const s=scene();loadGameState(s,data);return s;};
 
 test('Mill, Bakery and Granary retain exact prices, footprints, physical construction and no production before completion',()=>{
-  const s=scene();for(const[type,cost,[bw,bh],x]of [['mill',12,[2,2],45],['bakery',10,[3,2],49],['granary',10,[3,3],57]]){
-    const b=building(s,type,x,40,true);assert.equal(b.definition.cost.stone,cost);assert.equal(b.tiles.length,bw*bh,`${type} is ${bw}×${bh} (the Bakery is 3×2 since 0.38.0)`);assert.equal(s.inventory.count('stone'),0);assert.equal(buildingIsComplete(b),false);assert.equal(s.foodProduction.records.has(b.id),false);assert.equal([...s.foodStorage.locations.values()].some(l=>l.buildingId===b.id),false);
+  const s=scene();for(const[type,cost,[bw,bh],x]of [['mill',24,[2,2],45],['bakery',20,[3,2],49],['granary',12,[3,3],57]]){
+    const b=building(s,type,x,40,true);assert.equal(Object.values(b.definition.cost).reduce((a,n)=>a+n,0),cost);assert.equal(b.tiles.length,bw*bh,`${type} is ${bw}×${bh} (the Bakery is 3×2 since 0.38.0)`);assert.equal(s.inventory.count('stone'),0);assert.equal(buildingIsComplete(b),false);assert.equal(s.foodProduction.records.has(b.id),false);assert.equal([...s.foodStorage.locations.values()].some(l=>l.buildingId===b.id),false);
     const w=s.workerSystem.create({x:x-1,y:42});assert.equal(s.workplaceSystem.assign(b,w),false);
     assert.equal(s.constructionSystem.commandKing(b),true);until(s,()=>buildingIsComplete(b));assert.equal([...s.foodStorage.locations.values()].some(l=>l.buildingId===b.id),true);
   }

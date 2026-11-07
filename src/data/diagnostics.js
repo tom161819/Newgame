@@ -1,6 +1,9 @@
 // Production and work diagnostics: how often to look, how long a problem must last before it is reported, and
 // how often the same lasting problem may be repeated (all in game time).
-export const DIAGNOSTICS=Object.freeze({checkInterval:2000,persistence:10000,reminder:30000});
+export const DIAGNOSTICS=Object.freeze({checkInterval:2000,persistence:10000,reminder:30000,
+  // Plan m-e1-stavitele-material: a site whose materials are in the stores but have not arrived for this long gets a
+  // notice, and its Builders start carrying them themselves even while a Hauler is free (a quarter of a game day).
+  materialWait:30000});
 export const NOTICE_CATEGORIES=Object.freeze(['construction','production']);
 // Where a production input comes from: the building that makes it, a field it needs, and the profession that works it.
 export const INPUT_SOURCES=Object.freeze({

@@ -4,8 +4,11 @@ import { element,formatCost,missingCost } from './objectLabels.js';
 import { BUILDING_CATEGORIES,buildingsInCategory } from '../data/buildingCategories.js';
 
 export class BuildingBar {
-  constructor({registry,assets,onSelect,onCancel,unlocks}) {
-    Object.assign(this,{registry,assets,onSelect,onCancel,unlocks});this.category='all';
+  constructor({registry,assets,onSelect,onCancel,unlocks,freeOffer=()=>false}) {
+    this.freeOffer=freeOffer;
+    Object.assign(this,{registry,assets,onSelect,onCancel,unlocks});
+    // E2 (report 0.48.0): open on the last used category, Food & Farming the first time (not the defences).
+    let saved=null;try{saved=localStorage.getItem('newgame.buildingCategory');}catch{/* default */}this.category=saved==='all'||Object.hasOwn(BUILDING_CATEGORIES,saved??'')?saved:'food';
     this.controller=new AbortController();
     this.tab=document.querySelector('#buildings-tab');this.panel=document.querySelector('#buildings-panel');
     this.list=document.querySelector('#building-options');this.cancel=document.querySelector('#cancel-building');
@@ -47,7 +50,7 @@ export class BuildingBar {
   updateScroll(){if(!this.prev||!this.next)return;const max=this.list.scrollWidth-this.list.clientWidth,overflow=max>1;this.prev.hidden=this.next.hidden=!overflow;this.prev.disabled=this.list.scrollLeft<=1;this.next.disabled=this.list.scrollLeft>=max-1;}
   selectCategory(category){
     if(category!=='all'&&!Object.hasOwn(BUILDING_CATEGORIES,category))return;
-    this.category=category;
+    this.category=category;try{localStorage.setItem('newgame.buildingCategory',category);}catch{/* still switches */}
     if(this.selected&&!buildingsInCategory(this.registry,category).some(d=>d.id===this.selected.id))this.onCancel();
     this.render();
   }
@@ -60,8 +63,9 @@ export class BuildingBar {
       button.disabled=!status.unlocked;card.classList.toggle('building-locked',!status.unlocked);lock.textContent=status.unlocked?'':`🔒 ${t('building.locked')}`;
       const warning=status.unlocked?status.warning??'':'';
       card.title=status.unlocked?[definition.description,warning].filter(Boolean).join('\n'):status.description;
-      availability.textContent=status.unlocked?[warning,missingCost(definition.cost,inventory,this.registry)].filter(Boolean).join(' · '):status.description;
-      availability.classList.toggle('shortage',!status.unlocked||!inventory.canAfford(definition.cost)||!!warning);availability.classList.toggle('building-warning',!!warning);card.classList.toggle('building-warned',!!warning);
+      const free=status.unlocked&&this.freeOffer(definition);
+      availability.textContent=status.unlocked?[warning,free?t('building.freeOffer'):missingCost(definition.cost,inventory,this.registry)].filter(Boolean).join(' · '):status.description;
+      availability.classList.toggle('shortage',!status.unlocked||!free&&!inventory.canAfford(definition.cost)||!!warning);card.classList.toggle('building-free',!!free);availability.classList.toggle('building-warning',!!warning);card.classList.toggle('building-warned',!!warning);
       button.setAttribute('aria-pressed',String(selected?.id===definition.id));
     }
     this.cancel.hidden=!selected;

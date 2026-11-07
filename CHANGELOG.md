@@ -5,6 +5,33 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.49.0] - 2026-11-07
+<!-- version: {"title":"Easier start, tutorial and royal tasks","type":"feature","reconstructed":false,"saveVersion":57} -->
+### Added
+- A notice says when a construction site's materials are in the stores but nobody brings them. Its Builders then carry them themselves.
+- "No builders" and the waiting-materials notice have a button that gives the job to the best unemployed resident.
+- If the kingdom has no wood and no Lumberjack Hut, one Lumberjack Hut can be built for free.
+- A tutorial leads a new game one step at a time: an arrow shows where to click and a bubble says why. Each step ticks itself when it is done; there is Show me, Skip, and a switch in Settings.
+- Pause and 1×, 2×, 3× speed in the top bar, also with the keys P and 1–3. While paused you can still build and look around.
+- The main menu has Continue, which loads the newest save. A new game can start from three quick starts: Calm start, Normal or Challenge.
+- The top bar shows how many days the food lasts. A notice warns when it is less than 3 days.
+- One-time tips explain new things after the tutorial, with an arrow. They can be turned off in Settings.
+- Royal tasks: a small card shows three goals at a time (for example 3 Houses or the first bread). Each pays a reward of gold, wood or stone once.
+- A finished building flashes golden and plays a short chime. Settings has a Sound switch.
+
+### Changed
+- Browser smoke: `--keep-going` lists every failing scenario in one run.
+- Basic buildings are built from wood: Granary, Farmhouse, Hunting Lodge, Fisherman's Hut, Lumberjack Hut, House and Builder's Workshop. Other prices follow the owner's settings from the Asset Studio, for example the Stone Tower and the Castle cost 20 Stone and the Quarry 15 Wood.
+- A new game starts with 60 Wood and no Iron Ore.
+- Newcomers stop arriving while food lasts less than 2 days or more than 3 residents have no work. The kingdom overview says why.
+- Wolves, thieves and fires begin once the kingdom has 5 Houses or in the second year. The first spark only warns.
+- The camera label, the cancelled-building message and the Brazier description are translated properly.
+- The top bar always shows Gold, Stone and Wood. Other resources appear once the kingdom has had some.
+- The time reads "Day 3" and "Spring · Sunny"; the hours and the day of the season are in the tooltips.
+- The Asset Library, older versions and the camera and sight details moved into More. The Version Archive and Changelog are small links in the main menu.
+- The Getting started list under ? follows the tutorial order and no longer opens over the map at the start.
+- The New Game settings are folded under Custom settings. The Buildings menu opens on Food & Farming, then on the category used last.
+
 ## [0.48.0] - 2026-11-07
 <!-- version: {"title":"Quick job choice in the Population list","type":"feature","reconstructed":false,"saveVersion":57} -->
 ### Added

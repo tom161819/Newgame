@@ -133,11 +133,11 @@ test('při změně cíle uprostřed diagonály král dokončí právě procháze
 test('stavba nesmí uzavřít boční roh rozběhnuté diagonály', () => {
   const w=setup();w.character.command({kind:'move',goal:{x:2,y:2}});w.character.update(10000);
   w.character.command({kind:'move',goal:{x:3,y:3}});w.character.update(50);
-  const inventory=new Inventory();inventory.add('stone',10);
+  const inventory=new Inventory();inventory.add('stone',20);
   const anchor={x:3,y:1},stones=new Map(),buildings=[w.tower];
   assert.equal(placementError(w.scene.map,anchor,stones,[w.character.tile,w.character.nextTile]),null);
   assert.ok(placeTower({map:w.scene.map,anchor,stones,inventory,buildings,reservedTiles:w.character.reservedTiles()}).error);
-  assert.equal(inventory.count('stone'),10);
+  assert.equal(inventory.count('stone'),20);
   w.character.stopForBuilding();w.character.update(10000);
   assert.deepEqual(w.character.tile,{x:3,y:3});
   assert.ok(placeTower({map:w.scene.map,anchor,stones,inventory,buildings,reservedTiles:w.character.reservedTiles()}).tower);

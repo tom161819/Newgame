@@ -11,7 +11,7 @@ const worker=(s,x=50,y=50)=>s.workerSystem.create({x,y});
 const stone=(s,x,y)=>s.addResource(s.objectRegistry.require('stone'),{x,y});
 function build(s,type,x=55,y=50){
   ensureBuildingPrerequisites(s,s.objectRegistry.require(type)); // #132: a Hunting Lodge needs a completed Granary first.
-  s.inventory.add('stone',s.objectRegistry.require(type).cost.stone);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:s.objectRegistry.require(type)});
+  Object.entries(s.objectRegistry.require(type).cost).forEach(([r,k])=>s.inventory.add(r,k));const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:s.objectRegistry.require(type)});
   assert.ok(result.building,result.error);const b=result.building;s.towerViews.set(b.id,s.createBuildingView(b.definition,b));return b;
 }
 function until(s,condition,max=30000){let elapsed=0;while(!condition()&&elapsed<max){s.tick(50);elapsed+=50;}assert.ok(condition(),`Condition not reached after ${elapsed}ms`);return elapsed;}
@@ -20,7 +20,7 @@ const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} !== ${b}`);
 test('workplace definitions use exact prices/footprints, reject occupied cells and enforce 3/2/5 unique existing employees',()=>{
   const s=scene(),q=build(s,'quarry'),l=build(s,'hunting_lodge',61,50),b=build(s,'barracks',67,50);
   assert.equal(s.inventory.count('stone'),0);assert.equal(q.tiles.length,9);assert.equal(l.tiles.length,4);assert.equal(b.tiles.length,9);
-  assert.equal(q.definition.cost.stone,15);assert.equal(l.definition.cost.stone,10);assert.equal(b.definition.cost.stone,20);
+  assert.deepEqual(q.definition.cost,{wood:15});assert.deepEqual(l.definition.cost,{wood:8});assert.deepEqual(b.definition.cost,{stone:12,wood:10});
   const workers=Array.from({length:11},(_,i)=>worker(s,45+i,56));let offset=0;
   for(const [building,capacity,profession]of [[q,3,'miner'],[l,2,'hunter'],[b,5,'soldier']]){
     for(let i=0;i<capacity;i++){const w=workers[offset++],old=structuredClone({id:w.id,skills:w.skills,initial:w.initialSkills,talent:w.naturalTalent,overall:w.experience,hp:w.currentHP});assert.equal(s.workplaceSystem.assign(building,w),true);assert.equal(w.profession,profession);assert.equal(w.assignedWorkplaceId,building.id);assert.deepEqual({id:w.id,skills:w.skills,initial:w.initialSkills,talent:w.naturalTalent,overall:w.experience,hp:w.currentHP},old);}

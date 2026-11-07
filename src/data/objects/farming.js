@@ -3,7 +3,7 @@ import { FARMING_RULES } from '../farming.js';
 
 export const farmingBuildings = [
   {
-    id:'farmhouse',name:'Farmhouse',menuOrder:20,repeatPlacement:true,width:3,height:3,cost:{stone:10},constructionTime:25000,
+    id:'farmhouse',name:'Farmhouse',menuOrder:20,repeatPlacement:true,width:3,height:3,cost:{wood:10},constructionTime:25000,
     recommendsCompletedBuildings:['granary'],
     description:'A farmhouse with three Farmer workplaces. Farmers tend crops within 15 tiles.',
     walkable:false,workplace:WORKPLACES.farmhouse,workRadius:FARMING_RULES.workRadius,

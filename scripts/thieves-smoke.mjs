@@ -9,7 +9,7 @@ export async function thievesSmoke(context,url,instrument){
     await page.goto(url);await page.evaluate(()=>localStorage.setItem('newgame.nightSpeed','1'));await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW2-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.nightThreats);
     await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
-    const start=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,g=s.gameTime,n=s.nightThreats;g.update(g.dayDuration*(s.dayNight.nightStart()+.01)-g.elapsed);
+    const start=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,g=s.gameTime,n=s.nightThreats;n.started=()=>true;/* E1: threats begin later in a real game */g.update(g.dayDuration*(s.dayNight.nightStart()+.01)-g.elapsed);
       s.needs.summary=()=>({happiness:15});s.dayNight.darkAt=()=>true;n.random=()=>0;n.thiefDay=null;const thief=n.spawnThief(g.day);n.random=Math.random;if(!thief)return null;
       const st=n.thieves.get(thief.id),b=s.buildings.find(x=>x.id===st.target.buildingId);
       // Bring him to the store door (the walk from the edge takes a while).
