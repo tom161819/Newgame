@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-07T11:11:49.542Z",
+  "updatedAt": "2026-11-07T13:04:12.071Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -275,6 +275,38 @@
           "status": "rejected",
           "updatedAt": "2026-11-07T11:10:03.338Z",
           "version": 1
+        }
+      }
+    },
+    "castle": {
+      "preferred": "castle-keep",
+      "variants": {
+        "castle-curtain": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d41232ab",
+          "status": "approved",
+          "updatedAt": "2026-11-07T13:02:00.230Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T13:02:00.230Z"
+        },
+        "castle-keep": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5cd38fa0",
+          "status": "approved",
+          "updatedAt": "2026-11-07T13:01:56.726Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T13:01:56.726Z"
+        },
+        "castle-motte": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "490c5464",
+          "status": "approved",
+          "updatedAt": "2026-11-07T13:02:01.432Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T13:02:01.432Z"
         }
       }
     },
@@ -1688,6 +1720,51 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:05:46.618Z",
           "approvedAt": "2026-11-04T19:05:46.618Z"
+        }
+      }
+    },
+    "ration-icons": {
+      "preferred": "ration-icons-bowls",
+      "variants": {
+        "ration-icons-bowls": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2ece419e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T13:02:58.298Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T13:02:58.298Z"
+        },
+        "ration-icons-basket": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "435861a9",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T13:03:02.608Z",
+          "version": 1
+        }
+      }
+    },
+    "tax-icons": {
+      "preferred": "tax-icons-stacks",
+      "variants": {
+        "tax-icons-heaps": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "37ccb9ce",
+          "status": "approved",
+          "updatedAt": "2026-11-07T13:03:23.330Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T13:03:23.330Z"
+        },
+        "tax-icons-stacks": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e960e446",
+          "status": "approved",
+          "updatedAt": "2026-11-07T13:03:15.820Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T13:03:15.820Z"
         }
       }
     },
