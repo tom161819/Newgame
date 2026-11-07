@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.38.0] - 2026-11-07
+<!-- version: {"title":"Studio art chosen for the game","type":"feature","reconstructed":false,"saveVersion":55} -->
+### Changed
+- Buildings use the art chosen in the Asset Studio: House v3, Builder's Workshop v4, Farmhouse (thatched farmstead v2) and Bakery v3.
+- The Farmhouse is now 3×3 tiles and the Bakery 3×2 tiles to fit the new art.
+### Added
+- New approved art for the Iron Mine (adit), Barracks (stone hall), Marketplace (square) and Wheelwright's Workshop (yard with a shed).
+- Merchant caravans use the approved wagon art, with a full and an empty look.
+### Removed
+- Saves from older versions no longer load (save version 55).
+
 ## [0.37.0] - 2026-11-07
 <!-- version: {"title":"Kingdom Policy and Employments cards","type":"feature","reconstructed":false,"saveVersion":54} -->
 ### Added

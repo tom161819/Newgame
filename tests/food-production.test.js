@@ -15,8 +15,8 @@ const quantities=s=>{const amounts={};const add=(id,n)=>amounts[id]=(amounts[id]
 const restore=data=>{const s=scene();loadGameState(s,data);return s;};
 
 test('Mill, Bakery and Granary retain exact prices, footprints, physical construction and no production before completion',()=>{
-  const s=scene();for(const[type,cost,size,x]of [['mill',12,2,45],['bakery',10,2,51],['granary',10,3,57]]){
-    const b=building(s,type,x,40,true);assert.equal(b.definition.cost.stone,cost);assert.equal(b.tiles.length,size*size);assert.equal(s.inventory.count('stone'),0);assert.equal(buildingIsComplete(b),false);assert.equal(s.foodProduction.records.has(b.id),false);assert.equal([...s.foodStorage.locations.values()].some(l=>l.buildingId===b.id),false);
+  const s=scene();for(const[type,cost,[bw,bh],x]of [['mill',12,[2,2],45],['bakery',10,[3,2],49],['granary',10,[3,3],57]]){
+    const b=building(s,type,x,40,true);assert.equal(b.definition.cost.stone,cost);assert.equal(b.tiles.length,bw*bh,`${type} is ${bw}×${bh} (the Bakery is 3×2 since 0.38.0)`);assert.equal(s.inventory.count('stone'),0);assert.equal(buildingIsComplete(b),false);assert.equal(s.foodProduction.records.has(b.id),false);assert.equal([...s.foodStorage.locations.values()].some(l=>l.buildingId===b.id),false);
     const w=s.workerSystem.create({x:x-1,y:42});assert.equal(s.workplaceSystem.assign(b,w),false);
     assert.equal(s.constructionSystem.commandKing(b),true);until(s,()=>buildingIsComplete(b));assert.equal([...s.foodStorage.locations.values()].some(l=>l.buildingId===b.id),true);
   }

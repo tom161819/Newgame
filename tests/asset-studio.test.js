@@ -390,3 +390,14 @@ test('the connected wall uses the approved wall kit: a block and one parapet per
   assert.equal(wall.renderer, 'fortification', 'FortificationView keeps the procedural fallback and the castle');
   assert.equal(wall.visual.wallHeight, 68);
 });
+
+test('the merchant caravan uses the approved full and empty wagons byte for byte (the unloading look was rejected)', async () => {
+  const { APPROVED_CARAVAN_ART } = await import('../src/data/objects/approvedArt.js');
+  assert.deepEqual(Object.keys(APPROVED_CARAVAN_ART).sort(), ['empty', 'full']);
+  for (const [kind, art] of Object.entries(APPROVED_CARAVAN_ART)) {
+    const meta = json(art.artSource);assert.equal(approvals.assets[meta.assetId].variants[meta.variantId]?.status, 'approved', kind);
+    assert.ok(readFileSync(path.join(root, `public${art.sprite}`)).equals(readFileSync(path.join(root, `art/sprites/${meta.assetId}/${meta.variantId}.v${meta.version}.png`))), kind);
+    assert.deepEqual(art.origin, meta.origin);
+  }
+  assert.equal(approvals.assets['merchant-caravan'].variants['merchant-caravan-unloading']?.status, 'rejected');
+});

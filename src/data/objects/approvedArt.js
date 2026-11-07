@@ -4,19 +4,28 @@
 // tests/asset-studio.test.js checks that files and numbers match the export.
 // The procedural renderer stays as the fallback if an image cannot load.
 export const APPROVED_BUILDING_ART=Object.freeze({
-  house:{"sprite":"/assets/buildings/house/house-timber.v1.png","artSource":"art/sprites/house/house-timber.v1.json","origin":{"x":0.48872,"y":0.98473},"visualHeight":129,"lights":[{"type":"torch","x":-22.4,"y":-59.96,"color":"#ffb25a","radius":102.4,"intensity":0.95,"flicker":{"amplitude":0.12,"speed":7},"flameSize":1}]},
+  house:{"sprite":"/assets/buildings/house/house-timber.v3.png","artSource":"art/sprites/house/house-timber.v3.json","origin":{"x":0.49618,"y":0.98601},"visualHeight":141},
   swordsmith:{"sprite":"/assets/buildings/swordsmith/swordsmith-stone.v1.png","artSource":"art/sprites/swordsmith/swordsmith-stone.v1.json","origin":{"x":0.49618,"y":0.98473},"visualHeight":129,"lights":[{"type":"brazier","x":6.4,"y":-34.09,"color":"#ff9d4a","radius":134.4,"intensity":1,"flicker":{"amplitude":0.16,"speed":5.5},"flameSize":1.6}]},
-  farmhouse:{"sprite":"/assets/buildings/farmhouse/farmstead-thatched.v1.png","artSource":"art/sprites/farmstead/farmstead-thatched.v1.json","origin":{"x":0.49618,"y":0.98462},"visualHeight":128},
+  farmhouse:{"sprite":"/assets/buildings/farmhouse/farmstead-thatched.v2.png","artSource":"art/sprites/farmstead/farmstead-thatched.v2.json","origin":{"x":0.49744,"y":0.98765},"visualHeight":160,"lights":[{"type":"torch","x":-14.11,"y":-95.82,"color":"#ffb25a","radius":102.4,"intensity":0.95,"flicker":{"amplitude":0.12,"speed":7},"flameSize":1}]},
   granary:{"sprite":"/assets/buildings/granary/granary-store-raised.v1.png","artSource":"art/sprites/granary-store/granary-store-raised.v1.json","origin":{"x":0.49744,"y":0.98817},"visualHeight":167},
-  bakery:{"sprite":"/assets/buildings/bakery/bakery-house-yard-oven.v1.png","artSource":"art/sprites/bakery-house/bakery-house-yard-oven.v1.json","origin":{"x":0.49618,"y":0.98551},"visualHeight":136},
+  bakery:{"sprite":"/assets/buildings/bakery/bakery-house-yard-oven.v3.png","artSource":"art/sprites/bakery-house/bakery-house-yard-oven.v3.json","origin":{"x":0.59509,"y":0.98639},"visualHeight":145,"lights":[{"type":"brazier","x":16.61,"y":-36.77,"color":"#ff9d4a","radius":134.4,"intensity":1,"flicker":{"amplitude":0.16,"speed":5.5},"flameSize":1.6}]},
   mill:{"sprite":"/assets/buildings/mill/windmill-tower.v1.png","artSource":"art/sprites/windmill/windmill-tower.v1.json","origin":{"x":0.49618,"y":0.9845},"visualHeight":127,"rotor":{"still":"/assets/buildings/mill/windmill-tower.v1.still.png","sprite":"/assets/buildings/mill/windmill-tower.v1.rotor.png","pivot":{"x":0,"y":-86},"origin":{"x":0.49618,"y":0.31783}}},
   warehouse:{"sprite":"/assets/buildings/warehouse/warehouse-store-stone.v1.png","artSource":"art/sprites/warehouse-store/warehouse-store-stone.v1.json","origin":{"x":0.49744,"y":0.98802},"visualHeight":165},
   hunting_lodge:{"sprite":"/assets/buildings/hunting_lodge/hunting-lodge-log.v1.png","artSource":"art/sprites/hunting-lodge/hunting-lodge-log.v1.json","origin":{"x":0.49618,"y":0.98425},"visualHeight":125},
   lumberjack_hut:{"sprite":"/assets/buildings/lumberjack_hut/lumber-camp-hut.v1.png","artSource":"art/sprites/lumber-camp/lumber-camp-hut.v1.json","origin":{"x":0.49618,"y":0.98319},"visualHeight":117},
   quarry:{"sprite":"/assets/buildings/quarry/quarry-pit.v1.png","artSource":"art/sprites/quarry/quarry-pit.v1.json","origin":{"x":0.49744,"y":0.98551},"visualHeight":136},
-  builder_workshop:{"sprite":"/assets/buildings/builder_workshop/builders-workshop-material-yard.v2.png","artSource":"art/sprites/builders-workshop/builders-workshop-material-yard.v2.json","origin":{"x":0.49744,"y":0.98319},"visualHeight":117},
+  builder_workshop:{"sprite":"/assets/buildings/builder_workshop/builders-workshop-material-yard.v4.png","artSource":"art/sprites/builders-workshop/builders-workshop-material-yard.v4.json","origin":{"x":0.49744,"y":0.98361},"visualHeight":120},
   smelter:{"sprite":"/assets/buildings/smelter/smelter-bloomery.v1.png","artSource":"art/sprites/smelter/smelter-bloomery.v1.json","origin":{"x":0.49744,"y":0.98413},"visualHeight":124,"lights":[{"type":"brazier","x":0,"y":-31.68,"color":"#ff9d4a","radius":134.4,"intensity":1,"flicker":{"amplitude":0.16,"speed":5.5},"flameSize":1.6}]},
+
+  iron_mine:{"sprite":"/assets/buildings/iron_mine/iron-mine-adit.v2.png","artSource":"art/sprites/iron-mine/iron-mine-adit.v2.json","origin":{"x":0.49744,"y":0.98333},"visualHeight":118,"lights":[{"type":"torch","x":-1.71,"y":-60.61,"color":"#ffb25a","radius":102.4,"intensity":0.95,"flicker":{"amplitude":0.12,"speed":7},"flameSize":1}]},
+  barracks:{"sprite":"/assets/buildings/barracks/barracks-hall-stone.v1.png","artSource":"art/sprites/barracks-hall/barracks-hall-stone.v1.json","origin":{"x":0.49744,"y":0.9878},"visualHeight":162},
+  marketplace:{"sprite":"/assets/buildings/marketplace/marketplace-square.v1.png","artSource":"art/sprites/marketplace/marketplace-square.v1.json","origin":{"x":0.49744,"y":0.98276},"visualHeight":114},
+  wheelwright_workshop:{"sprite":"/assets/buildings/wheelwright_workshop/wheelwright-yard-shed.v2.png","artSource":"art/sprites/wheelwright-yard/wheelwright-yard-shed.v2.json","origin":{"x":0.47549,"y":0.98437},"visualHeight":126,"lights":[{"type":"torch","x":23.04,"y":-84.25,"color":"#ffb25a","radius":102.4,"intensity":0.95,"flicker":{"amplitude":0.12,"speed":7},"flameSize":1}]},
 });
+
+// Approved merchant caravan (Studio merchant-caravan, chosen 7 Nov): full = goods on board, empty = bare wagon bed. The
+// unloading look was rejected; the full wagon is used while unloading. Origin = the studio anchor (footprint centre).
+export const APPROVED_CARAVAN_ART=Object.freeze({"full":{"sprite":"/assets/vehicles/caravan/merchant-caravan-full.v1.png","artSource":"art/sprites/merchant-caravan/merchant-caravan-full.v1.json","origin":{"x":0.49618,"y":0.5641}},"empty":{"sprite":"/assets/vehicles/caravan/merchant-caravan-empty.v1.png","artSource":"art/sprites/merchant-caravan/merchant-caravan-empty.v1.json","origin":{"x":0.49618,"y":0.52778}}});
 
 // Approved tree art by growth look and season (origin = the studio anchor, the
 // tile centre where trees stand). TreeView picks one per stage, season and tile;

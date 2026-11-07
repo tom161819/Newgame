@@ -1,4 +1,14 @@
 import { gridToWorld } from './isometric.js';
+import { APPROVED_CARAVAN_ART } from '../data/objects/approvedArt.js';
+import { assetURL } from '../systems/AssetManager.js';
+
+// The approved Studio wagon loads on first use; until then (or if it fails) the procedural wagon below is drawn.
+const artKey=kind=>`caravan-art:${kind}`;
+function ensureArt(scene){
+  if(scene.__caravanArt||!scene.load)return;scene.__caravanArt=true;let queued=0;
+  for(const [kind,art]of Object.entries(APPROVED_CARAVAN_ART))if(!scene.textures.exists(artKey(kind))){scene.load.image(artKey(kind),assetURL(art.sprite,scene.assets?.baseURL??import.meta.env?.BASE_URL??'/'));queued++;}
+  if(queued&&!scene.load.isLoading())scene.load.start();
+}
 
 // Trade F1.2: provisional procedural merchant caravan (horse, wagon with a red canvas cover, merchant on the box) until the
 // Grafika task g-obchod-trziste-povoz delivers sprites. Full = goods on board (cover up), empty = bare wagon bed.
@@ -28,9 +38,11 @@ export class CaravanViews {
   update(){
     const s=this.scene,c=s.caravans?.active;
     if(!c){this.clear();return;}
-    const full=Object.values(c.stock).some(n=>n>0),texture=wagon(s,full?FULL:EMPTY,full);
-    if(!this.view||this.id!==c.id){this.clear();this.view=s.add.image(0,0,texture).setOrigin(.5,.82);this.view.caravanId=c.id;this.id=c.id;}
+    ensureArt(s);const full=Object.values(c.stock).some(n=>n>0),kind=full?'full':'empty',art=s.textures?.exists?.(artKey(kind))?APPROVED_CARAVAN_ART[kind]:null;
+    const texture=art?artKey(kind):wagon(s,full?FULL:EMPTY,full);
+    if(!this.view||this.id!==c.id){this.clear();this.view=s.add.image(0,0,texture);this.view.caravanId=c.id;this.id=c.id;}
     if(this.view.texture.key!==texture)this.view.setTexture(texture);
+    if(art)this.view.setOrigin(art.origin.x,art.origin.y);else this.view.setOrigin(.5,.82);
     const w=gridToWorld(c.position.x,c.position.y),dir=c.direction??{x:0,y:0};
     this.view.setPosition(w.x,w.y).setDepth(w.y+.02).setVisible(!s.fog?.enabled||s.fog.isVisibleTile(c.tile));
     if(dir.x||dir.y)this.view.setFlipX(dir.x-dir.y<0);

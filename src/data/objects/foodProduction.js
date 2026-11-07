@@ -5,7 +5,7 @@ import { FOOD_RECIPES,FOOD_RULES,FOOD_RESOURCE_IDS } from '../foodProduction.js'
 export const foodBuildings=[
   {id:'mill',name:'Mill',menuOrder:60,recommendsCompletedBuildings:['wheat_field'],width:2,height:2,cost:{stone:12},constructionTime:25000,visualHeight:150,
     workplace:WORKPLACES.mill,recipe:FOOD_RECIPES.mill,description:'Two Millers grind 4 Wheat into 3 Flour with 30 seconds of active work. Inputs and outputs are physically carried.'},
-  {id:'bakery',name:'Bakery',menuOrder:70,recommendsCompletedBuildings:['mill'],width:2,height:2,cost:{stone:10},constructionTime:25000,visualHeight:110,
+  {id:'bakery',name:'Bakery',menuOrder:70,recommendsCompletedBuildings:['mill'],width:3,height:2,cost:{stone:10},constructionTime:25000,visualHeight:110,
     workplace:WORKPLACES.bakery,recipe:FOOD_RECIPES.bakery,description:'Two Bakers turn 2 Flour into 4 Bread with 30 seconds of active work and physical deliveries.'},
   {id:'granary',name:'Granary',menuOrder:10,width:3,height:3,cost:{stone:10},constructionTime:30000,visualHeight:125,
     storage:{capacity:GRANARY_GROUP_CAPACITY.raw,resources:FOOD_RESOURCE_IDS},description:'A physical store with separate room for 200 raw inputs and 200 finished food units. Haulers serve every store in the kingdom.'},

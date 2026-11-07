@@ -26,7 +26,7 @@ test("#118 Builder's Workshop is a 3x3 industry building available from the star
   const d=objectRegistry.require('builder_workshop');
   assert.deepEqual([d.width,d.height,d.buildingCategory,d.buildable],[3,3,'industry',true]);
   assert.deepEqual(d.cost,{wood:20,stone:10});assert.equal(d.builderWorkshop.capacity,4);assert.equal(d.requiresCompletedBuildings,undefined);
-  assert.equal(d.renderMode,'sprite');assert.equal(d.sprite,'/assets/buildings/builder_workshop/builders-workshop-material-yard.v2.png');
+  assert.equal(d.renderMode,'sprite');assert.equal(d.sprite,'/assets/buildings/builder_workshop/builders-workshop-material-yard.v4.png');
   assert.equal(d.workplace,undefined,'not a workplace: Builders never need it to work');
 });
 
