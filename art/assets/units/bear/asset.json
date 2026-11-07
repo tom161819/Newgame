@@ -3,7 +3,7 @@
   "id": "bear",
   "name": "Brown Bear",
   "category": "units",
-  "description": "Brown bear with a shoulder hump and round ears; walk in 8 directions, attack.",
+  "description": "Brown bear, revision 2 (more realistic, more variant): massive, shoulder hump, thick legs with big paws, lighter muzzle and round ears; brown, dark, grizzled and a cub; attack.",
   "footprint": {
     "width": 2,
     "height": 2
@@ -14,7 +14,7 @@
     {
       "id": "bear-brown",
       "name": "Brown bear",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "bear",
         "breed": "brown",
@@ -22,9 +22,39 @@
       }
     },
     {
+      "id": "bear-dark",
+      "name": "Dark bear",
+      "version": 1,
+      "spec": {
+        "species": "bear",
+        "breed": "dark",
+        "facing": 1
+      }
+    },
+    {
+      "id": "bear-grizzled",
+      "name": "Grizzled bear",
+      "version": 1,
+      "spec": {
+        "species": "bear",
+        "breed": "grizzled",
+        "facing": 1
+      }
+    },
+    {
+      "id": "bear-cub",
+      "name": "Bear cub",
+      "version": 1,
+      "spec": {
+        "species": "bear",
+        "breed": "cub",
+        "facing": 1
+      }
+    },
+    {
       "id": "bear-brown-attack",
       "name": "Bear attacking",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "bear",
         "breed": "brown",

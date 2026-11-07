@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-07T18:31:31.159Z",
+  "updatedAt": "2026-11-07T19:08:54.974Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -2141,6 +2141,85 @@
         }
       }
     },
+    "bear": {
+      "preferred": null,
+      "variants": {
+        "bear-brown": {
+          "status": "review",
+          "version": 2,
+          "specHash": "91b8d68a",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další variantu",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "91bca821",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "bear-brown-attack": {
+          "status": "review",
+          "version": 2,
+          "specHash": "306761cd",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další variantu",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "30652336",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        }
+      }
+    },
+    "boar": {
+      "preferred": null,
+      "variants": {
+        "boar-boar": {
+          "status": "review",
+          "version": 2,
+          "specHash": "b76b8c76",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat do realistického divočáka, tohle je nějakej pakun",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "b76dcb0d",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        }
+      }
+    },
     "bowyer-worker": {
       "preferred": "bowyer-worker-male",
       "variants": {
@@ -2317,6 +2396,57 @@
           "updatedAt": "2026-11-07T18:06:00Z",
           "version": 1,
           "approvedAt": "2026-11-07T18:06:00Z"
+        }
+      }
+    },
+    "deer": {
+      "preferred": null,
+      "variants": {
+        "deer-stag": {
+          "status": "review",
+          "version": 2,
+          "specHash": "c08377c5",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "c081392e",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "deer-hind": {
+          "status": "review",
+          "version": 2,
+          "specHash": "5ff60fa3",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "5ffe5e68",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
         }
       }
     },
@@ -2542,6 +2672,131 @@
         }
       }
     },
+    "fox": {
+      "preferred": null,
+      "variants": {
+        "fox-red": {
+          "status": "review",
+          "version": 2,
+          "specHash": "3bb761fc",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další variantu",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "3bb0a637",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "fox-red-sit": {
+          "status": "review",
+          "version": 2,
+          "specHash": "ab1b6fc1",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další variantu",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "ab19312a",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "fox-red-run": {
+          "status": "review",
+          "version": 2,
+          "specHash": "914e389d",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další variantu",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "914bfa06",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        }
+      }
+    },
+    "hare": {
+      "preferred": null,
+      "variants": {
+        "hare-brown": {
+          "status": "review",
+          "version": 2,
+          "specHash": "13827b6a",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "1384ba01",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "hare-brown-sit": {
+          "status": "review",
+          "version": 2,
+          "specHash": "ed227ac7",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další variantu",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "ed29368c",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        }
+      }
+    },
     "hauler": {
       "preferred": "hauler-male",
       "variants": {
@@ -2560,6 +2815,200 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:04:26.016Z",
           "approvedAt": "2026-11-04T19:04:26.016Z"
+        }
+      }
+    },
+    "horse": {
+      "preferred": null,
+      "variants": {
+        "horse-bay": {
+          "status": "review",
+          "version": 2,
+          "specHash": "1c26bbc9",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty (alespoň další 3)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "1c247d32",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "horse-chestnut": {
+          "status": "review",
+          "version": 2,
+          "specHash": "1f84f1df",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty (alespoň další 3)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "1f8d40a4",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        }
+      }
+    },
+    "horse-wagon": {
+      "preferred": null,
+      "variants": {
+        "horse-wagon-farm-empty": {
+          "status": "review",
+          "version": 2,
+          "specHash": "4526588e",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty (svycházet z koní které budou vytvřeny taky)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "45289725",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "horse-wagon-farm-sacks": {
+          "status": "review",
+          "version": 2,
+          "specHash": "dd3c5428",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty (svycházet z koní které budou vytvřeny taky)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "dd359863",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "horse-wagon-hay": {
+          "status": "review",
+          "version": 2,
+          "specHash": "57822db4",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty (svycházet z koní které budou vytvřeny taky)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "5779deef",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "horse-wagon-tumbril-stone": {
+          "status": "review",
+          "version": 2,
+          "specHash": "84fbd79f",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty (svycházet z koní které budou vytvřeny taky)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "85029364",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "horse-wagon-timber": {
+          "status": "review",
+          "version": 2,
+          "specHash": "2749cb30",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty (svycházet z koní které budou vytvřeny taky)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "27430f6b",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "horse-wagon-pair-barrels": {
+          "status": "review",
+          "version": 2,
+          "specHash": "533e94b7",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty (svycházet z koní které budou vytvřeny taky)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "5345507c",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
         }
       }
     },
@@ -2912,6 +3361,57 @@
         }
       }
     },
+    "roe": {
+      "preferred": null,
+      "variants": {
+        "roe-buck": {
+          "status": "review",
+          "version": 2,
+          "specHash": "d4e65991",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "d4e41afa",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "roe-doe": {
+          "status": "review",
+          "version": 2,
+          "specHash": "2b41f45e",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "2b4432f5",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        }
+      }
+    },
     "smelter-operator": {
       "preferred": "smelter-operator-male",
       "variants": {
@@ -3098,6 +3598,43 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:06:49.604Z",
           "approvedAt": "2026-11-04T19:06:49.604Z"
+        }
+      }
+    },
+    "wheelbarrow": {
+      "preferred": "wheelbarrow-plank-empty",
+      "variants": {
+        "wheelbarrow-plank-empty": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b29b62f3",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:05:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:05:00.000Z"
+        },
+        "wheelbarrow-plank-stone": {
+          "status": "review",
+          "version": 2,
+          "specHash": "bae7ad1d",
+          "note": "",
+          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "at je víc naložený materálem když je plný kolečko, stejně tak vytvoř modely stejného loečka pro naložení materiálem (dřevo, železo ruda, železo bar, ryby, masi, chleba a mix surovin)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "bae56e86",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
         }
       }
     },

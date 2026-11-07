@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "deer",
+  "variantId": "deer-hind-run",
+  "name": "Hind running",
+  "category": "units",
+  "version": 1,
+  "specHash": "266b488f",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 54,
+  "anchor": {
+    "x": 33,
+    "y": 36
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.66667
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 52
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.96296
+  },
+  "visualHeight": 52,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.885,
+  "lights": []
+}

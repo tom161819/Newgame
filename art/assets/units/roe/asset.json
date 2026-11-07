@@ -3,7 +3,7 @@
   "id": "roe",
   "name": "Roe Deer",
   "category": "units",
-  "description": "Small roe deer: buck with short antlers and a doe; walk in 8 directions.",
+  "description": "Roe deer, revision 2 (more realistic, more variants): buck with short antlers, doe, spotted fawn; walk and run in 8 directions.",
   "footprint": {
     "width": 1,
     "height": 1
@@ -14,7 +14,7 @@
     {
       "id": "roe-buck",
       "name": "Roe buck",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "roe",
         "breed": "buck",
@@ -24,7 +24,7 @@
     {
       "id": "roe-doe",
       "name": "Roe doe",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "roe",
         "breed": "doe",
@@ -32,12 +32,33 @@
       }
     },
     {
-      "id": "roe-doe-run",
-      "name": "Roe doe running",
+      "id": "roe-fawn",
+      "name": "Spotted roe fawn",
       "version": 1,
       "spec": {
         "species": "roe",
+        "breed": "fawn",
+        "facing": 1
+      }
+    },
+    {
+      "id": "roe-doe-run",
+      "name": "Roe doe running",
+      "version": 2,
+      "spec": {
+        "species": "roe",
         "breed": "doe",
+        "pose": "run",
+        "facing": 2
+      }
+    },
+    {
+      "id": "roe-buck-run",
+      "name": "Roe buck running",
+      "version": 1,
+      "spec": {
+        "species": "roe",
+        "breed": "buck",
         "pose": "run",
         "facing": 2
       }

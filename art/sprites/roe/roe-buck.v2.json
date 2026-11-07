@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "roe",
+  "variantId": "roe-buck",
+  "name": "Roe buck",
+  "category": "units",
+  "version": 2,
+  "specHash": "d4e65991",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 43,
+  "anchor": {
+    "x": 33,
+    "y": 25
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.5814
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 41
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.95349
+  },
+  "visualHeight": 41,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.703,
+  "lights": []
+}

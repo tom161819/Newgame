@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "horse-wagon",
+  "variantId": "horse-wagon-hay",
+  "name": "Hay wagon",
+  "category": "units",
+  "version": 2,
+  "specHash": "57822db4",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 77,
+  "anchor": {
+    "x": 65,
+    "y": 43
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.55844
+  },
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "base": {
+    "x": 97,
+    "y": 75
+  },
+  "baseOrigin": {
+    "x": 0.74046,
+    "y": 0.97403
+  },
+  "visualHeight": 75,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.84,
+  "lights": []
+}

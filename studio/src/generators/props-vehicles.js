@@ -23,13 +23,23 @@ function scaled(p, k, dx, dz) {
 // Spoked wheel standing in the x–y plane at local (wx, wz): spokes in the given count, an iron tyre.
 const wheel = (wx, wz, r, { spokes = 8, thick = 0.035 } = {}) => PROPS.spokedWheel(wx, wz, { radius: r, plane: 'x', spokes, thick });
 // Loads lying in a bed at height y over the area [length × width] around (cx, cz).
+// Revision 2 (owner: "a full barrow should be heaped with material"): every load rises in a mound above the rim.
 function load(kind, cx, y, cz, length, width) {
-  const parts = [];
-  if (kind === 'stone') for (const [f, s, k] of [[-0.3, -0.2, 1], [0.1, 0.25, 0.9], [0.3, -0.1, 0.8], [0, 0, 1.1]]) parts.push(sphere([length * 0.2 * k, width * 0.2 * k, width * 0.24 * k], [cx + f * length, y, cz + s * width], 'fieldstone', 1));
-  if (kind === 'soil' || kind === 'manure') parts.push(sphere([length * 0.45, width * 0.3, width * 0.45], [cx, y - width * 0.05, cz], kind === 'soil' ? 'soil' : 'horse_dark', 1));
-  if (kind === 'logs') for (let i = 0; i < 5; i++) parts.push(cylinder({ radiusBottom: width * 0.13, height: length * 1.05, segments: 8, tilt: [0, -Math.PI / 2] }, [cx - length * 0.52, y + width * 0.13 + (i > 2 ? width * 0.22 : 0), cz + (i > 2 ? (i - 3.5) * width * 0.26 : (i - 1) * width * 0.28)], 'bark'));
-  if (kind === 'sacks') for (const [f, s, up] of [[-0.25, -0.22, 0], [-0.25, 0.22, 0], [0.2, -0.2, 0], [0.2, 0.2, 0], [0, 0, 1]]) parts.push(sphere([length * 0.2, width * 0.17, width * 0.22], [cx + f * length, y + up * width * 0.28, cz + s * width], 'cloth_linen', 1));
-  if (kind === 'hay') parts.push(sphere([length * 0.6, width * 0.75, width * 0.68], [cx, y - width * 0.2, cz], 'thatch', 1), sphere([length * 0.45, width * 0.4, width * 0.5], [cx, y + width * 0.45, cz], 'thatch', 1));
+  const parts = [], rnd = (i, k) => ((Math.sin(i * 12.9898 + k * 78.233) * 43758.5453) % 1 + 1) % 1;
+  // n pieces laid in layers that shrink upwards (a heap); each piece gets (f, layer height, s, index).
+  const heap = (n, layers, fn) => { let i = 0; for (let l = 0; l < layers; l++) { const k = 1 - l / (layers + 0.6), per = Math.max(1, Math.round(n * k / layers * 1.6)); for (let j = 0; j < per && i < n; j++, i++) fn((rnd(i, 1) - 0.5) * length * 0.9 * k, y + l * width * 0.2, (rnd(i, 2) - 0.5) * width * 0.6 * k, i); } };
+  if (kind === 'stone') heap(14, 4, (f, h, s, i) => parts.push(sphere([width * (0.13 + rnd(i, 3) * 0.06), width * 0.12, width * (0.13 + rnd(i, 4) * 0.05)], [cx + f, h, cz + s], i % 3 ? 'fieldstone' : 'stone_light', 1)));
+  if (kind === 'ore') heap(16, 4, (f, h, s, i) => parts.push(sphere([width * (0.11 + rnd(i, 3) * 0.06), width * 0.11, width * 0.12], [cx + f, h, cz + s], i % 3 ? 'ore' : 'stone_dark', 1)));
+  if (kind === 'soil' || kind === 'manure') parts.push(sphere([length * 0.5, width * 0.45, width * 0.5], [cx, y - width * 0.1, cz], kind === 'soil' ? 'soil' : 'horse_dark', 1), sphere([length * 0.3, width * 0.3, width * 0.32], [cx, y + width * 0.25, cz], kind === 'soil' ? 'soil' : 'horse_dark', 1));
+  if (kind === 'logs') for (let i = 0; i < 6; i++) { const row = i < 3 ? 0 : i < 5 ? 1 : 2, k = [3, 2, 1][row], j = i - [0, 3, 5][row]; parts.push(cylinder({ radiusBottom: width * 0.14, height: length * 1.05, segments: 8, tilt: [0, -Math.PI / 2] }, [cx - length * 0.52, y + width * 0.14 + row * width * 0.24, cz + (j - (k - 1) / 2) * width * 0.29], 'bark')); }
+  if (kind === 'wood') heap(12, 4, (f, h, s, i) => parts.push(box([length * 0.42, width * 0.13, width * 0.15], [cx + f * 0.4, h, cz + s], i % 4 ? 'wood' : 'bark', { rotation: (rnd(i, 5) - 0.5) * 0.6 })));
+  if (kind === 'ironbars') for (let l = 0; l < 4; l++) for (let j = 0; j < 4 - l; j++) parts.push(box([length * 0.7, width * 0.09, width * 0.14], [cx, y + l * width * 0.1, cz + (j - (3 - l) / 2) * width * 0.18], l % 2 ? 'steel' : 'iron', { rotation: l % 2 ? 0.08 : -0.05 }));
+  if (kind === 'fish') heap(11, 3, (f, h, s, i) => { const r = (rnd(i, 5) - 0.5) * 2.4; parts.push(sphere([length * 0.2, width * 0.07, width * 0.09], [cx + f, h, cz + s], 'fish', 1, { rotation: r }), box([width * 0.08, width * 0.1, width * 0.02], [cx + f - Math.cos(r) * length * 0.2, h, cz + s + Math.sin(r) * length * 0.2], 'stone_dark', { rotation: r })); });
+  if (kind === 'meat') heap(7, 3, (f, h, s, i) => parts.push(sphere([length * 0.17, width * 0.15, width * 0.17], [cx + f, h, cz + s], i % 2 ? 'meat' : 'meat_raw', 1, { rotation: rnd(i, 6) * 3 }), box([width * 0.05, width * 0.05, width * 0.14], [cx + f + length * 0.17, h + width * 0.1, cz + s], 'bone', { rotation: rnd(i, 6) * 3 })));
+  if (kind === 'bread') heap(12, 4, (f, h, s, i) => parts.push(sphere([width * 0.16, width * 0.1, width * 0.12], [cx + f, h, cz + s], i % 3 ? 'bread' : 'bread_crust', 1, { rotation: rnd(i, 7) * 3 })));
+  if (kind === 'mixed') { parts.push(...load('ore', cx - length * 0.22, y, cz - width * 0.15, length * 0.45, width * 0.5), ...load('wood', cx + length * 0.15, y, cz - width * 0.15, length * 0.6, width * 0.5)); parts.push(sphere([length * 0.16, width * 0.18, width * 0.2], [cx - length * 0.05, y + width * 0.15, cz + width * 0.22], 'cloth_linen', 1), sphere([width * 0.14, width * 0.09, width * 0.11], [cx + length * 0.25, y + width * 0.12, cz + width * 0.2], 'bread', 1), sphere([length * 0.13, width * 0.06, width * 0.08], [cx + length * 0.1, y + width * 0.3, cz + width * 0.1], 'fish', 1, { rotation: 0.6 })); }
+  if (kind === 'sacks') for (const [f, s, up] of [[-0.25, -0.22, 0], [-0.25, 0.22, 0], [0.2, -0.2, 0], [0.2, 0.2, 0], [0, 0, 1], [-0.1, 0.1, 1.6]]) parts.push(sphere([length * 0.2, width * 0.17, width * 0.22], [cx + f * length, y + up * width * 0.28, cz + s * width], 'cloth_linen', 1));
+  if (kind === 'hay') parts.push(sphere([length * 0.62, width * 0.8, width * 0.7], [cx, y - width * 0.2, cz], 'thatch', 1), sphere([length * 0.48, width * 0.45, width * 0.52], [cx, y + width * 0.5, cz], 'thatch', 1));
   if (kind === 'barrels') for (const f of [-0.28, 0.02, 0.3]) parts.push(...PROPS.barrel(cx + f * length, cz, { y }));
   if (kind === 'goods') { parts.push(box([length * 0.3, width * 0.4, width * 0.4], [cx - length * 0.25, y, cz - width * 0.2], 'wood'), box([length * 0.25, width * 0.32, width * 0.32], [cx + length * 0.1, y, cz + width * 0.2], 'wood_dark'), sphere([length * 0.14, width * 0.15, width * 0.18], [cx + length * 0.3, y, cz - width * 0.15], 'cloth_linen', 1)); parts.push(...PROPS.barrel(cx - length * 0.05, cz + width * 0.25, { y })); }
   return parts;
@@ -50,7 +60,7 @@ Object.assign(PROPS, {
       for (const s of [-1, 1]) L.push(box([0.62, 0.025, 0.025], [-0.08, y - 0.02, s * 0.1], 'wood_dark'), box([0.06, 0.03, 0.03], [-0.38, y - 0.02, s * 0.11], 'leather'), box([0.025, 0.12, 0.025], [-0.13, 0, s * 0.1], 'wood_dark'));
       if (tub) L.push(cylinder({ radiusBottom: 0.085, height: 0.04, segments: 14, tilt: [Math.PI / 2, 0] }, [0.25, 0.085, -0.02], 'wood_dark'), cylinder({ radiusBottom: 0.09, height: 0.03, segments: 14, tilt: [Math.PI / 2, 0] }, [0.25, 0.085, -0.015], 'iron'));
       else L.push(...wheel(0.25, 0, 0.09, { spokes: 6, thick: 0.03 }));
-      L.push(...load(what, -0.01, y + 0.03, 0, len * 0.8, wid * 0.8));
+      L.push(...load(what, -0.01, y + 0.04, 0, len * 0.95, wid * 1.35)); // heaped above the rim
     } else if (kind === 'handcart') {
       const len = 0.5, wid = 0.34, y = 0.2;
       L.push(box([len, 0.03, wid], [0, y, 0], 'wood'), box([0.05, 0.05, wid + 0.1], [0, y - 0.05, 0], 'wood_dark'));
@@ -71,7 +81,7 @@ Object.assign(PROPS, {
   // kind: 'farm' (four-wheeled flatbed with rails), 'hay' (ladder-sided hay wagon), 'tumbril' (two-wheeled tipping cart),
   // 'timber' (long log wagon), 'pair' (big wagon with two horses). load as for barrows; coat: horse breed.
   horseWagon: (x0, z0, { angle = 0, kind = 'farm', load: what = 'empty', coat = 'bay', tipped = false } = {}) => {
-    const L = [], two = kind === 'tumbril', pair = kind === 'pair', len = two ? 0.56 : kind === 'timber' ? 1.0 : pair ? 0.96 : 0.8, wid = pair ? 0.5 : 0.42, y = two ? 0.24 : 0.28;
+    const L = [], two = kind === 'tumbril' || kind === 'ore', pair = kind === 'pair', len = two ? 0.56 : kind === 'timber' ? 1.0 : pair ? 0.96 : 0.8, wid = pair ? 0.5 : 0.42, y = two ? 0.24 : 0.28;
     const shift = pair ? -0.5 : -0.42; // the bed sits behind the horse; (x0, z0) is the middle of the rig
     const bed = [];
     if (kind === 'timber') {
@@ -84,7 +94,10 @@ Object.assign(PROPS, {
         const h = two ? 0.16 : pair ? 0.15 : 0.1;
         for (const s of [-1, 1]) bed.push(box([len, h, 0.03], [0, y + 0.04, s * (wid / 2 - 0.015)], kind === 'farm' ? 'wood' : 'wood_dark'));
         bed.push(box([0.03, h, wid], [-len / 2 + 0.015, y + 0.04, 0], 'wood'), box([0.03, h, wid], [len / 2 - 0.015, y + 0.04, 0], 'wood'));
-        if (pair) for (const s of [-1, 1]) for (const f of [-0.3, 0, 0.3]) bed.push(box([0.025, h + 0.01, 0.035], [f * len, y + 0.04, s * (wid / 2)], 'iron'));
+        if (pair || kind === 'ore') for (const s of [-1, 1]) for (const f of [-0.3, 0, 0.3]) bed.push(box([0.025, h + 0.01, 0.035], [f * len, y + 0.04, s * (wid / 2)], 'iron'));
+        // Plank seams and corner stakes on every box side (revision 2: more realistic carpentry).
+        for (const s of [-1, 1]) { bed.push(box([len - 0.02, 0.008, 0.034], [0, y + 0.04 + h * 0.5, s * (wid / 2 - 0.015)], 'wood_dark')); for (const f of [-0.5, 0.5]) bed.push(box([0.035, h + 0.05, 0.035], [f * (len - 0.03), y, s * (wid / 2 - 0.01)], 'wood_dark')); }
+        if (kind === 'covered') { bed.push(prism([wid + 0.06, 0.3, len * 0.85], [-0.02, y + 0.04 + h, 0], 'cloth_linen', { rotation: Math.PI / 2 })); for (const f of [-0.3, 0, 0.3]) bed.push(box([0.025, 0.02, wid + 0.07], [f * len, y + 0.05 + h, 0], 'wood_dark')); }
       }
     }
     bed.push(...load(what, 0, y + 0.06, 0, len * 0.85, wid * 0.85));
@@ -101,6 +114,7 @@ Object.assign(PROPS, {
     else for (const s of [-1, 1]) L.push(box([0.6, 0.03, 0.03], [len / 2 + shift + 0.28, y - 0.03, s * 0.13], 'wood_dark'));
     if (!two && kind !== 'timber') L.push(box([0.1, 0.04, wid - 0.06], [len / 2 + shift - 0.06, y + 0.2, 0], 'wood_dark'), box([0.03, 0.2, 0.03], [len / 2 + shift - 0.06, y, wid / 2 - 0.05], 'wood_dark'), box([0.03, 0.2, 0.03], [len / 2 + shift - 0.06, y, -wid / 2 + 0.05], 'wood_dark'));
     const hx = len / 2 + shift + 0.4;
+    for (const s of pair ? [-0.27, -0.03, 0.03, 0.27] : [-0.1, 0.1]) L.push(box([0.42, 0.012, 0.012], [len / 2 + shift + 0.27, y + 0.08, s], 'leather', { tilt: [0, 0.18] })); // traces to the collar
     if (pair) L.push(...horseAt(hx, 0.15, { coat }), ...horseAt(hx, -0.15, { coat: coat === 'bay' ? 'chestnut' : coat }));
     else L.push(...horseAt(hx, 0, { coat, scale: two ? 0.7 : 0.8 }));
     return place(L, x0, z0, angle);

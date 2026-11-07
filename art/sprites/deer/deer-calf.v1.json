@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "deer",
+  "variantId": "deer-calf",
+  "name": "Spotted calf",
+  "category": "units",
+  "version": 1,
+  "specHash": "6e3605f3",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 40,
+  "anchor": {
+    "x": 33,
+    "y": 22
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.55
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 38
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.95
+  },
+  "visualHeight": 38,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.608,
+  "lights": []
+}

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "deer",
+  "variantId": "deer-stag",
+  "name": "Stag",
+  "category": "units",
+  "version": 2,
+  "specHash": "c08377c5",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 58,
+  "anchor": {
+    "x": 33,
+    "y": 40
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.68966
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 56
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.96552
+  },
+  "visualHeight": 56,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.092,
+  "lights": []
+}

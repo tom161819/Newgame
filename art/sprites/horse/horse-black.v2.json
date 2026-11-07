@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "horse",
+  "variantId": "horse-black",
+  "name": "Black horse",
+  "category": "units",
+  "version": 2,
+  "specHash": "3be1321c",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 68,
+  "anchor": {
+    "x": 65,
+    "y": 34
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.5
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 66
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97059
+  },
+  "visualHeight": 66,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.032,
+  "lights": []
+}

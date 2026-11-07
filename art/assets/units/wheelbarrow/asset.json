@@ -3,7 +3,7 @@
   "id": "wheelbarrow",
   "name": "Wheelbarrow",
   "category": "units",
-  "description": "The Hauler's vehicle (S12, revision 2, owner 7 Nov 2026): plank and tub barrows, a two-wheeled hand cart and a sack barrow, empty and loaded. Built along grid x; the game mirrors one view for the other direction.",
+  "description": "The Hauler's vehicle (S12, revision 2, owner 7 Nov 2026). The approved plank barrow, now also heaped with each material: stone, wood, iron ore, iron bars, fish, meat, bread and a mixed load; plus tub barrow, hand cart and sack barrow. Built along grid x; the game mirrors one view for the other direction.",
   "footprint": {
     "width": 2,
     "height": 1
@@ -15,7 +15,7 @@
       "id": "wheelbarrow-plank-empty",
       "name": "Plank barrow, empty",
       "version": 1,
-      "notes": "Open plank barrow, six-spoked wheel, leather grips.",
+      "notes": "Approved.",
       "spec": {
         "body": {
           "kind": "none"
@@ -34,9 +34,8 @@
     },
     {
       "id": "wheelbarrow-plank-stone",
-      "name": "Plank barrow with stone",
-      "version": 1,
-      "notes": "",
+      "name": "Plank barrow heaped with stone",
+      "version": 2,
       "spec": {
         "body": {
           "kind": "none"
@@ -55,10 +54,156 @@
       }
     },
     {
+      "id": "wheelbarrow-plank-wood",
+      "name": "Plank barrow with wood",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "barrow",
+            "kind": "plank",
+            "load": "wood"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wheelbarrow-plank-ore",
+      "name": "Plank barrow with iron ore",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "barrow",
+            "kind": "plank",
+            "load": "ore"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wheelbarrow-plank-ironbars",
+      "name": "Plank barrow with iron bars",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "barrow",
+            "kind": "plank",
+            "load": "ironbars"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wheelbarrow-plank-fish",
+      "name": "Plank barrow with fish",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "barrow",
+            "kind": "plank",
+            "load": "fish"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wheelbarrow-plank-meat",
+      "name": "Plank barrow with meat",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "barrow",
+            "kind": "plank",
+            "load": "meat"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wheelbarrow-plank-bread",
+      "name": "Plank barrow with bread",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "barrow",
+            "kind": "plank",
+            "load": "bread"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wheelbarrow-plank-mixed",
+      "name": "Plank barrow with a mixed load",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "barrow",
+            "kind": "plank",
+            "load": "mixed"
+          }
+        ]
+      }
+    },
+    {
       "id": "wheelbarrow-tub-soil",
       "name": "Tub barrow with soil",
-      "version": 1,
-      "notes": "Deep box barrow with iron bands and a solid wheel.",
+      "version": 2,
       "spec": {
         "body": {
           "kind": "none"
@@ -79,8 +224,7 @@
     {
       "id": "wheelbarrow-tub-logs",
       "name": "Tub barrow with logs",
-      "version": 1,
-      "notes": "",
+      "version": 2,
       "spec": {
         "body": {
           "kind": "none"
@@ -101,8 +245,7 @@
     {
       "id": "wheelbarrow-handcart-sacks",
       "name": "Hand cart with sacks",
-      "version": 1,
-      "notes": "Two wheels, side rails and long shafts.",
+      "version": 2,
       "spec": {
         "body": {
           "kind": "none"
@@ -123,8 +266,7 @@
     {
       "id": "wheelbarrow-handcart-hay",
       "name": "Hand cart with hay",
-      "version": 1,
-      "notes": "",
+      "version": 2,
       "spec": {
         "body": {
           "kind": "none"
@@ -146,7 +288,6 @@
       "id": "wheelbarrow-sack-barrow",
       "name": "Sack barrow",
       "version": 1,
-      "notes": "Upright sack barrow on two small wheels.",
       "spec": {
         "body": {
           "kind": "none"

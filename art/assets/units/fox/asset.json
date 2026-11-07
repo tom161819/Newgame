@@ -3,7 +3,7 @@
   "id": "fox",
   "name": "Fox",
   "category": "units",
-  "description": "Red fox with a white tail tip and dark ears; walk and run in 8 directions, sitting.",
+  "description": "Fox, revision 2 (more realistic, more variants): slim body, black stockings and ears, white chest and tail tip, big brush; red, pale and dark cross fox; sitting and running.",
   "footprint": {
     "width": 1,
     "height": 1
@@ -14,7 +14,7 @@
     {
       "id": "fox-red",
       "name": "Red fox",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "fox",
         "breed": "red",
@@ -22,9 +22,29 @@
       }
     },
     {
+      "id": "fox-pale",
+      "name": "Pale fox",
+      "version": 1,
+      "spec": {
+        "species": "fox",
+        "breed": "pale",
+        "facing": 1
+      }
+    },
+    {
+      "id": "fox-cross",
+      "name": "Cross fox (dark)",
+      "version": 1,
+      "spec": {
+        "species": "fox",
+        "breed": "cross",
+        "facing": 1
+      }
+    },
+    {
       "id": "fox-red-sit",
       "name": "Fox sitting",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "fox",
         "breed": "red",
@@ -35,7 +55,7 @@
     {
       "id": "fox-red-run",
       "name": "Fox running",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "fox",
         "breed": "red",

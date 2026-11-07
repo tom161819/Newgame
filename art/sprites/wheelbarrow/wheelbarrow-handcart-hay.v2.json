@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wheelbarrow",
+  "variantId": "wheelbarrow-handcart-hay",
+  "name": "Hand cart with hay",
+  "category": "units",
+  "version": 2,
+  "specHash": "67fed731",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 99,
+  "height": 53,
+  "anchor": {
+    "x": 49,
+    "y": 27
+  },
+  "origin": {
+    "x": 0.49495,
+    "y": 0.50943
+  },
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "base": {
+    "x": 65,
+    "y": 51
+  },
+  "baseOrigin": {
+    "x": 0.65657,
+    "y": 0.96226
+  },
+  "visualHeight": 51,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.635,
+  "lights": []
+}

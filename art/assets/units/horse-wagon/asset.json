@@ -3,7 +3,7 @@
   "id": "horse-wagon",
   "name": "Horse Wagon",
   "category": "units",
-  "description": "The player's Horse Wagon (revision 2, owner 7 Nov 2026): farm wagon, hay wagon, tipping tumbril, timber wagon and a two-horse wagon, with the new anatomical horses in harness. Built along grid x; the game mirrors one view for the other direction.",
+  "description": "The player's Horse Wagon, revision 2 (owner: more realistic, more variants, use the new horses): plank seams, corner stakes, iron fittings and leather traces to a collar harness on the revised horses. Farm wagon, covered wagon, hay wagon, tumbril, ore cart, timber wagon and a two-horse wagon. Built along grid x; the game mirrors one view for the other direction.",
   "footprint": {
     "width": 3,
     "height": 1
@@ -14,8 +14,7 @@
     {
       "id": "horse-wagon-farm-empty",
       "name": "Farm wagon, empty",
-      "version": 1,
-      "notes": "Four-wheeled flatbed with plank sides and a bench.",
+      "version": 2,
       "spec": {
         "body": {
           "kind": "none"
@@ -35,8 +34,7 @@
     {
       "id": "horse-wagon-farm-sacks",
       "name": "Farm wagon with sacks",
-      "version": 1,
-      "notes": "",
+      "version": 2,
       "spec": {
         "body": {
           "kind": "none"
@@ -56,10 +54,53 @@
       }
     },
     {
+      "id": "horse-wagon-farm-wood",
+      "name": "Farm wagon with firewood",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "farm",
+            "load": "wood",
+            "coat": "dun"
+          }
+        ]
+      }
+    },
+    {
+      "id": "horse-wagon-covered",
+      "name": "Covered wagon",
+      "version": 1,
+      "notes": "Linen cover on hoops.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "covered",
+            "coat": "palomino"
+          }
+        ]
+      }
+    },
+    {
       "id": "horse-wagon-hay",
       "name": "Hay wagon",
-      "version": 1,
-      "notes": "Ladder sides, heaped hay, grey horse.",
+      "version": 2,
       "spec": {
         "body": {
           "kind": "none"
@@ -81,8 +122,7 @@
     {
       "id": "horse-wagon-tumbril-stone",
       "name": "Tumbril with stone",
-      "version": 1,
-      "notes": "Two-wheeled tipping cart.",
+      "version": 2,
       "spec": {
         "body": {
           "kind": "none"
@@ -102,10 +142,10 @@
       }
     },
     {
-      "id": "horse-wagon-tumbril-tipped",
-      "name": "Tumbril tipping",
+      "id": "horse-wagon-ore",
+      "name": "Ore cart",
       "version": 1,
-      "notes": "Bed tipped back to dump soil.",
+      "notes": "Two-wheeled iron-bound cart for the mine.",
       "spec": {
         "body": {
           "kind": "none"
@@ -117,10 +157,9 @@
               0
             ],
             "type": "horseWagon",
-            "kind": "tumbril",
-            "load": "soil",
-            "coat": "pony",
-            "tipped": true
+            "kind": "ore",
+            "load": "ore",
+            "coat": "draught"
           }
         ]
       }
@@ -128,8 +167,7 @@
     {
       "id": "horse-wagon-timber",
       "name": "Timber wagon",
-      "version": 1,
-      "notes": "Long wagon with logs chained on bolsters.",
+      "version": 2,
       "spec": {
         "body": {
           "kind": "none"
@@ -151,8 +189,7 @@
     {
       "id": "horse-wagon-pair-barrels",
       "name": "Two-horse wagon with barrels",
-      "version": 1,
-      "notes": "Big iron-banded wagon on a pole with two horses.",
+      "version": 2,
       "spec": {
         "body": {
           "kind": "none"
@@ -166,6 +203,28 @@
             "type": "horseWagon",
             "kind": "pair",
             "load": "barrels"
+          }
+        ]
+      }
+    },
+    {
+      "id": "horse-wagon-pair-draught",
+      "name": "Two draught horses with iron bars",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "pair",
+            "load": "ironbars",
+            "coat": "draught"
           }
         ]
       }

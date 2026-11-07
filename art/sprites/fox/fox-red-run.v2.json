@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "fox",
+  "variantId": "fox-red-run",
+  "name": "Fox running",
+  "category": "units",
+  "version": 2,
+  "specHash": "914e389d",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 39,
+  "anchor": {
+    "x": 33,
+    "y": 21
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.53846
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 37
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.94872
+  },
+  "visualHeight": 37,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.503,
+  "lights": []
+}

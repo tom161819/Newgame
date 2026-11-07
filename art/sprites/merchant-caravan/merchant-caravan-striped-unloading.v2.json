@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "merchant-caravan",
+  "variantId": "merchant-caravan-striped-unloading",
+  "name": "Striped wagon, unloading",
+  "category": "units",
+  "version": 2,
+  "specHash": "d671381f",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 71,
+  "anchor": {
+    "x": 65,
+    "y": 37
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.52113
+  },
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "base": {
+    "x": 97,
+    "y": 69
+  },
+  "baseOrigin": {
+    "x": 0.74046,
+    "y": 0.97183
+  },
+  "visualHeight": 69,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -37.44,
+      "y": -52.48,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 0.826,
+  "lights": [
+    {
+      "type": "torch",
+      "x": 59.56,
+      "y": 16.52,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

@@ -3,7 +3,7 @@
   "id": "hare",
   "name": "Hare",
   "category": "units",
-  "description": "Brown hare with long black-tipped ears; walk in 8 directions, sitting up.",
+  "description": "Hare, revision 2 (more realistic, more variants): rounded back high behind, big hind legs, long black-tipped ears; brown, grey and white winter hare; sitting and running.",
   "footprint": {
     "width": 1,
     "height": 1
@@ -14,7 +14,7 @@
     {
       "id": "hare-brown",
       "name": "Brown hare",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "hare",
         "breed": "brown",
@@ -22,14 +22,45 @@
       }
     },
     {
+      "id": "hare-grey",
+      "name": "Grey hare",
+      "version": 1,
+      "spec": {
+        "species": "hare",
+        "breed": "grey",
+        "facing": 1
+      }
+    },
+    {
+      "id": "hare-white",
+      "name": "White winter hare",
+      "version": 1,
+      "spec": {
+        "species": "hare",
+        "breed": "white",
+        "facing": 1
+      }
+    },
+    {
       "id": "hare-brown-sit",
       "name": "Hare sitting",
-      "version": 1,
+      "version": 2,
       "spec": {
         "species": "hare",
         "breed": "brown",
         "pose": "sit",
         "facing": 1
+      }
+    },
+    {
+      "id": "hare-brown-run",
+      "name": "Hare running",
+      "version": 1,
+      "spec": {
+        "species": "hare",
+        "breed": "brown",
+        "pose": "run",
+        "facing": 2
       }
     }
   ]

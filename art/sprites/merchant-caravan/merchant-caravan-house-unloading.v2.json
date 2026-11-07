@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "merchant-caravan",
+  "variantId": "merchant-caravan-house-unloading",
+  "name": "House wagon, unloading",
+  "category": "units",
+  "version": 2,
+  "specHash": "128de48b",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 82,
+  "anchor": {
+    "x": 65,
+    "y": 48
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.58537
+  },
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "base": {
+    "x": 97,
+    "y": 80
+  },
+  "baseOrigin": {
+    "x": 0.74046,
+    "y": 0.97561
+  },
+  "visualHeight": 80,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -37.44,
+      "y": -52.48,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 0.88,
+  "lights": [
+    {
+      "type": "torch",
+      "x": 59.56,
+      "y": 27.52,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

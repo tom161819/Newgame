@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wheelbarrow",
+  "variantId": "wheelbarrow-plank-wood",
+  "name": "Plank barrow with wood",
+  "category": "units",
+  "version": 1,
+  "specHash": "a89d3dc8",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 99,
+  "height": 51,
+  "anchor": {
+    "x": 49,
+    "y": 25
+  },
+  "origin": {
+    "x": 0.49495,
+    "y": 0.4902
+  },
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "base": {
+    "x": 65,
+    "y": 49
+  },
+  "baseOrigin": {
+    "x": 0.65657,
+    "y": 0.96078
+  },
+  "visualHeight": 49,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.346,
+  "lights": []
+}

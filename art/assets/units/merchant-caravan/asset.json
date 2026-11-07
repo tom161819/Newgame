@@ -80,7 +80,7 @@
     {
       "id": "merchant-caravan-striped-full",
       "name": "Striped wagon, full",
-      "version": 1,
+      "version": 2,
       "notes": "Red-and-linen striped canvas, chest on the tail, lantern.",
       "spec": {
         "body": {
@@ -101,7 +101,7 @@
     {
       "id": "merchant-caravan-striped-unloading",
       "name": "Striped wagon, unloading",
-      "version": 1,
+      "version": 2,
       "notes": "",
       "spec": {
         "body": {
@@ -123,7 +123,7 @@
     {
       "id": "merchant-caravan-striped-empty",
       "name": "Striped wagon, empty",
-      "version": 1,
+      "version": 2,
       "notes": "",
       "spec": {
         "body": {
@@ -146,7 +146,7 @@
     {
       "id": "merchant-caravan-house-full",
       "name": "House wagon",
-      "version": 1,
+      "version": 2,
       "notes": "Wooden box wagon with a shingle roof, chimney, windows and steps.",
       "spec": {
         "body": {
@@ -169,7 +169,7 @@
     {
       "id": "merchant-caravan-house-unloading",
       "name": "House wagon, unloading",
-      "version": 1,
+      "version": 2,
       "notes": "",
       "spec": {
         "body": {
@@ -193,7 +193,7 @@
     {
       "id": "merchant-caravan-pair-full",
       "name": "Long two-horse caravan",
-      "version": 1,
+      "version": 2,
       "notes": "Long covered wagon, spare wheel, two horses.",
       "spec": {
         "body": {
