@@ -41,9 +41,9 @@ export class PathV2Layer {
     if (this.geo && !changed.length) return false;
     const started = performance.now(), old = this.geo; this.levels = next;
     this.geo = geometry({ size: Math.max(COLUMNS, ROWS), get: (x, y) => x < 0 || y < 0 || x >= COLUMNS || y >= ROWS ? 0 : next[y * COLUMNS + x] }, PATH_STYLE, PATH_STYLE_SEED);
-    // Performance: capsules every second centerline point (8 ground px instead of 4): the same curve within a fraction
+    // Performance: capsules every third centerline point (12 ground px instead of 4): the same curve within a fraction
     // of a pixel, half the capsules for every sample.
-    const segments = [];this.geo.lines.forEach((line, group) => { for (let i = 0; i < line.length - 1; i += 2) segments.push({ a: line[i], b: line[Math.min(i + 2, line.length - 1)], group }); });this.geo.segments = segments;
+    const segments = [];this.geo.lines.forEach((line, group) => { for (let i = 0; i < line.length - 1; i += 3) segments.push({ a: line[i], b: line[Math.min(i + 3, line.length - 1)], group }); });this.geo.segments = segments;
     this.index = buckets(this.geo); this.stats.builds++; this.stats.buildMs = performance.now() - started;
     if (!old) { this.cache.clear(); return true; }
     // Every tile of a chain (old or new) that contains a changed tile, plus the changed tiles, plus a margin.

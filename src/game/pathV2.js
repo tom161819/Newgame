@@ -26,7 +26,8 @@ export function noise(x, y, seed, detail = 0) {
 
 // --- topology --------------------------------------------------------------------------------------------------------
 export const ground = tile => { const c = tileCenter(tile); return { x: c.x, y: c.y * 2 }; };
-const key = (x, y) => `${x},${y}`;
+// Game only (performance): numeric keys instead of strings (less garbage); the iteration order is unchanged.
+const key = (x, y) => (y + 16) * 8192 + (x + 16);
 export function topology(map) {
   const worn = (x, y) => map.get(x, y) > 0;
   const area = (x, y) => worn(x, y) && [[0, 0], [-1, 0], [0, -1], [-1, -1]].some(([ox, oy]) => [[0, 0], [1, 0], [0, 1], [1, 1]].every(([dx, dy]) => worn(x + ox + dx, y + oy + dy)));
@@ -40,7 +41,7 @@ export function topology(map) {
   }
   // Chains: start at every node that is not a plain pass-through (degree ≠ 2, or an area), walk until the next such node.
   const passThrough = n => !n.area && n.links.length === 2, used = new Set(), chains = [];
-  const edgeKey = (a, b) => (a.y * 1000 + a.x < b.y * 1000 + b.x ? `${key(a.x, a.y)}|${key(b.x, b.y)}` : `${key(b.x, b.y)}|${key(a.x, a.y)}`);
+  const edgeKey = (a, b) => (a.y * 1000 + a.x < b.y * 1000 + b.x ? key(a.x, a.y) * 2097152 + key(b.x, b.y) : key(b.x, b.y) * 2097152 + key(a.x, a.y));
   const walk = (start, next) => { const tiles = [start]; let prev = start, cur = next; used.add(edgeKey(start, next));
     while (passThrough(cur)) { tiles.push(cur); const nxt = cur.links.find(l => l !== prev && !used.has(edgeKey(cur, l))); if (!nxt) break; used.add(edgeKey(cur, nxt)); prev = cur; cur = nxt; if (cur === start) break; }
     tiles.push(cur); return tiles; };
@@ -126,11 +127,11 @@ export function geometry(map, config = PATH_STYLE, seed = 1) {
   // Game only (performance): the nearest area is looked up in a grid of cells as large as the blend reach, so only the
   // area tiles within reach are measured; the result equals the lab's search over every area tile.
   if (blend > 0 && areaCentres.length) {
-    const reach = blend + Math.max(...areaCentres.map(a => a.r)), grid = new Map(), cellOf = v => Math.floor(v / reach);
-    for (const a of areaCentres) { const k = `${cellOf(a.x)},${cellOf(a.y)}`; if (!grid.has(k)) grid.set(k, []); grid.get(k).push(a); }
+    const reach = blend + Math.max(...areaCentres.map(a => a.r)), grid = new Map(), cellOf = v => Math.floor(v / reach), cellKey = (gx, gy) => (gx + 512) * 4096 + gy + 512;
+    for (const a of areaCentres) { const k = cellKey(cellOf(a.x), cellOf(a.y)); if (!grid.has(k)) grid.set(k, []); grid.get(k).push(a); }
     for (const line of lines) for (const p of line) {
       let d = Infinity, r = 0; const gx = cellOf(p.x), gy = cellOf(p.y);
-      for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) for (const a of grid.get(`${gx + ox},${gy + oy}`) ?? []) { const dd = Math.hypot(a.x - p.x, a.y - p.y) - a.r; if (dd < d) { d = dd; r = a.r; } }
+      for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) for (const a of grid.get(cellKey(gx + ox, gy + oy)) ?? []) { const dd = Math.hypot(a.x - p.x, a.y - p.y) - a.r; if (dd < d) { d = dd; r = a.r; } }
       if (d < blend) p.width = p.width + (Math.max(p.width, r * 1.1) - p.width) * fade(1 - Math.max(0, d) / blend) * 0.85;
     }
   }
@@ -185,12 +186,15 @@ export function fieldAt(geo, x, y, candidates = null, maxDistance = Infinity) {
 
 // Spatial buckets so a pixel only looks at nearby shapes.
 export function buckets(geo, cell = 96) {
-  const grid = new Map(), add = (gx, gy, list, item) => { const k2 = `${gx},${gy}`; if (!grid.has(k2)) grid.set(k2, { segments: [], discs: [], tiles: [], worn: [] }); grid.get(k2)[list].push(item); };
-  const reach = 40 + geo.config.areaSmoothness * 30;
+  const grid = new Map(), add = (gx, gy, list, item) => { const k2 = (gx + 512) * 4096 + gy + 512; if (!grid.has(k2)) grid.set(k2, { segments: [], discs: [], tiles: [], worn: [] }); grid.get(k2)[list].push(item); };
+  // Game only (performance): a shape farther than this from a point cannot change what is drawn there (the surface is
+  // drawn only within halo + softness ≈ 10 px plus edge noise ≈ 6 px, and a farther shape joins a nearer one only within
+  // the smooth-minimum range k ≈ 26 px), so fewer cells hold each shape. The lab uses 40 + 30 × areaSmoothness.
+  const reach = 16 + 6 + geo.config.areaSmoothness * 22 + 4;
   for (const s of geo.segments) { const r = Math.max(s.a.width, s.b.width) / 2 + reach; for (let gx = Math.floor((Math.min(s.a.x, s.b.x) - r) / cell); gx <= Math.floor((Math.max(s.a.x, s.b.x) + r) / cell); gx++) for (let gy = Math.floor((Math.min(s.a.y, s.b.y) - r) / cell); gy <= Math.floor((Math.max(s.a.y, s.b.y) + r) / cell); gy++) add(gx, gy, 'segments', s); }
   for (const t of geo.tiles) { const r = t.half + reach; for (let gx = Math.floor((t.x - r) / cell); gx <= Math.floor((t.x + r) / cell); gx++) for (let gy = Math.floor((t.y - r) / cell); gy <= Math.floor((t.y + r) / cell); gy++) add(gx, gy, 'tiles', t); }
   for (const t of geo.worn ?? []) { const r = geo.sigma * 3 + 20; for (let gx = Math.floor((t.x - r) / cell); gx <= Math.floor((t.x + r) / cell); gx++) for (let gy = Math.floor((t.y - r) / cell); gy <= Math.floor((t.y + r) / cell); gy++) add(gx, gy, 'worn', t); }
   for (const d of geo.discs) { const r = d.r + reach; for (let gx = Math.floor((d.x - r) / cell); gx <= Math.floor((d.x + r) / cell); gx++) for (let gy = Math.floor((d.y - r) / cell); gy <= Math.floor((d.y + r) / cell); gy++) add(gx, gy, 'discs', d); }
-  return { cell, at: (x, y) => grid.get(`${Math.floor(x / cell)},${Math.floor(y / cell)}`) ?? null };
+  return { cell, at: (x, y) => grid.get((Math.floor(x / cell) + 512) * 4096 + Math.floor(y / cell) + 512) ?? null };
 }
 

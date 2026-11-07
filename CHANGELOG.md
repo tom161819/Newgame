@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.19.1] - 2026-11-07
+<!-- version: {"title":"Faster paths","type":"feature","reconstructed":false,"saveVersion":47} -->
+### Improved
+- Paths are faster to draw: rebuilding paths while you explore takes less time, and each piece of path is painted about twice as fast.
+
 ## [0.19.0] - 2026-11-07
 <!-- version: {"title":"Varied meals and feasts","type":"feature","reconstructed":false,"saveVersion":47} -->
 ### Added

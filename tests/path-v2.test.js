@@ -21,8 +21,10 @@ test('#116 the game copy of the V2 geometry gives the lab\'s shapes and field fo
   const gameIndex = buckets(game), labIndex = lab.buckets(studio);
   for (let i = 0; i < 400; i++) {
     const x = 400 + (i * 37) % 1100, y = 300 + (i * 53) % 900, a = gameIndex.at(x, y), b = labIndex.at(x, y);
-    if (!a || !b) { assert.equal(!!a, !!b); continue; }
+    if (!a || !b) { if (b && !a) assert.ok(lab.fieldAt(studio, x, y, b).distance > 15, `nothing drawn where the game skips ${x},${y}`); continue; }
     const f = fieldAt(game, x, y, a), g = lab.fieldAt(studio, x, y, b);
+    // The game looks up fewer far shapes (they cannot change what is drawn): compare where the surface is drawn.
+    if (g.distance > 15) { assert.ok(f.distance > 15 || Math.abs(f.distance - g.distance) < 1e-9, `far at ${x},${y}`); continue; }
     assert.ok(Math.abs(f.distance - g.distance) < 1e-9 && Math.abs(f.level - g.level) < 1e-9, `field at ${x},${y}`);
   }
 });
