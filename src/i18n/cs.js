@@ -294,4 +294,5 @@ export default {
   'policy.rations.small':'Malé (½ porce denně)','policy.rations.normal':'Běžné (1 porce denně)','policy.rations.generous':'Štědré (1½ porce denně)',
   'policy.taxEffect':'{each} zlata za obyvatele každé ráno: {total} zlata/den od {count} obyvatel. Spokojenost {happiness}.',
   'policy.rationsEffect':'Každý obyvatel sní {portions} porce denně. Spokojenost {happiness}.','ledger.Taxes':'Daně',
+  'needs.policyLine':'Politika království: spokojenost {value}','needs.strikeLine':'Stávkuje: do práce se vrátí při spokojenosti 45.','needs.leavingLine':'Odchází z království.','needs.riskLine':'Nespokojený {days} den/dny: stávka po 2 dnech pod 25, odchod po 3 dnech pod 15.',
 };

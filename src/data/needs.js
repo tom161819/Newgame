@@ -35,3 +35,6 @@ export function mainProblem(needs,unpaidPenalty=0){
   if(unpaidPenalty>0)losses.push({id:'wages',loss:unpaidPenalty,value:0});
   const worst=losses.filter(l=>l.id==='wages'||l.value<70).sort((a,b)=>b.loss-a.loss)[0];return worst?worst.id:null;
 }
+
+// #58 phase C2 (S13 §8–9): strikes and emigration.
+export const DISCONTENT=Object.freeze({strikeBelow:25,strikeDays:2,strikeEndsAt:45,emigrateBelow:15,emigrateDays:3,retryMs:5000});

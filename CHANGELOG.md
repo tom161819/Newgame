@@ -5,6 +5,16 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-11-07
+<!-- version: {"title":"Strikes and emigration","type":"feature","reconstructed":false,"saveVersion":41} -->
+### Added
+- Strikes: a resident whose Happiness stays below 25 for two whole days goes on strike. He finishes what he is doing, goes home and stops working: no goods, no experience and no wages while on strike, but he keeps his profession and workplace. At Happiness 45 he goes back to work. A red "!" shows over him and the event feed reports it.
+- Emigration: a resident below 15 Happiness for three days leaves. He gives up his job, walks to the edge of the map and leaves the kingdom ("A villager has left your kingdom due to poor living conditions."). He is not counted as a death.
+- The resident panel shows how many days he has been unhappy, whether he is on strike or leaving, and the effect of the kingdom policy; the population line counts strikers and residents at risk.
+
+### Changed
+- Saved games use a new format (41) for strike and emigration counters. Games saved by earlier versions cannot be loaded; start a new game.
+
 ## [0.12.0] - 2026-11-07
 <!-- version: {"title":"Kingdom policy: taxes and rations","type":"feature","reconstructed":false,"saveVersion":40} -->
 ### Added

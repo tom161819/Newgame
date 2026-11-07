@@ -23,6 +23,11 @@ export function renderNeeds(root,status){
   const work=element('p','need-work',t('needs.workLine',{factor:status.workModifier.toFixed(2)}));work.dataset.work=String(status.workModifier);
   const lines=[element('h3','',t('needs.title')),...NEED_IDS.map(id=>bar(id,status[id])),bar('happiness',status.happiness),mood,work,element('p','need-problem',t('needs.problemLine',{problem:problemLabel(status.mainProblem)})),element('p','need-home',t('needs.homeLine',{home:homeLabel(status.home)}))];
   if(status.unpaidPenalty>0)lines.push(element('p','need-unpaid',t('needs.unpaidLine',{penalty:status.unpaidPenalty})));
+  // #103 policy and #58 C2 strike / emigration state.
+  if(status.policy)lines.push(element('p','need-policy',t('needs.policyLine',{value:`${status.policy>0?'+':''}${status.policy}`})));
+  if(status.leaving)lines.push(element('p','need-strike',t('needs.leavingLine')));
+  else if(status.strike)lines.push(element('p','need-strike',t('needs.strikeLine')));
+  else if(status.lowDays>0)lines.push(element('p','need-risk',t('needs.riskLine',{days:status.lowDays})));
   root.replaceChildren(...lines);
 }
 export class KingdomHappinessIndicator {

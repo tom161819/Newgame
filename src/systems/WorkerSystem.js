@@ -11,18 +11,19 @@ import { TaskReservationSystem } from './TaskReservationSystem.js';
 import { JobSystem } from './JobSystem.js';
 import { WorkerAI } from './WorkerAI.js';
 import { DailyRest } from './DailyRest.js';
+import { Discontent } from './Discontent.js';
 import { initializeNaturalTalent } from './NaturalTalentSystem.js';
 
 const names=['Matěj','Anna','Jakub','Eliška','Pavel','Marie','Jan','Tereza','Ondřej','Klára'];
 export class WorkerSystem {
   constructor(scene,{onChange=()=>{}}={}){
     this.scene=scene;this.onChange=onChange;this.workers=new Map();this.nextId=1;this.lastMigrationDay=scene.gameTime.day;this.listeners=new Set();
-    this.reservations=new TaskReservationSystem();this.ai=new WorkerAI(this);this.commands=new UnitCommands(this);this.jobs=new JobSystem(this);this.gather=new IdleGathering(this);this.rest=new DailyRest(this);
+    this.reservations=new TaskReservationSystem();this.ai=new WorkerAI(this);this.commands=new UnitCommands(this);this.jobs=new JobSystem(this);this.gather=new IdleGathering(this);this.rest=new DailyRest(this);this.discontent=new Discontent(this);
     this.unsubscribe=scene.gameTime.onNewDay(day=>this.onNewDay(day));this.buildingsChanged=()=>{this.gather.doorsKey=null;this.updateUI();};scene.events?.on?.('buildings:changed',this.buildingsChanged);
   }
   liveWorkers(){return [...this.workers.values()].filter(w=>w.isAlive);}
   liveSubjects(){return this.liveWorkers().filter(w=>w.isSubject!==false);}
-  recentDeaths(){const now=this.scene.gameTime.totalElapsed,retention=POPULATION.recentDeathDays*this.scene.gameTime.dayDuration;return [...this.workers.values()].filter(w=>!w.isAlive&&w.isSubject!==false&&Number.isFinite(w.diedAt)&&now-w.diedAt>=0&&now-w.diedAt<retention-1e-7).sort((a,b)=>b.diedAt-a.diedAt||a.id.localeCompare(b.id,undefined,{numeric:true}));}
+  recentDeaths(){const now=this.scene.gameTime.totalElapsed,retention=POPULATION.recentDeathDays*this.scene.gameTime.dayDuration;return [...this.workers.values()].filter(w=>!w.isAlive&&w.workState!=='Left Kingdom'&&w.isSubject!==false&&Number.isFinite(w.diedAt)&&now-w.diedAt>=0&&now-w.diedAt<retention-1e-7).sort((a,b)=>b.diedAt-a.diedAt||a.id.localeCompare(b.id,undefined,{numeric:true}));}
   subscribe(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   reservedTiles(){return this.liveWorkers().flatMap(w=>w.reservedTiles());}
   origin(worker=null){

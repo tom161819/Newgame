@@ -35,6 +35,8 @@ export class WorkerAI {
     if(this.scene.foodProduction?.handleTransport(worker)){worker.update(delta);return;}
     // #58 phase B: rest time (or exhaustion) sends a free resident home before he picks new work.
     if(this.system.rest?.update(worker)){worker.update(delta);return;}
+    // #58 phase C2: a striker stays home, an emigrant walks out of the kingdom.
+    if(this.system.discontent?.update(worker)){worker.update(delta);return;}
     if(worker.profession==='idle'){this.idle(worker);worker.update(delta);return;}
     if(this.scene.naturalResources?.miningWork.rocks.eligible(worker)){this.scene.naturalResources.miningWork.rocks.update(worker,delta);worker.update(delta);return;}
     const job=JOBS[worker.profession];

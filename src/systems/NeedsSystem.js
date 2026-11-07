@@ -1,4 +1,4 @@
-import { NEEDS,DAILY_REST,clampNeed,moodFor,happinessOf,mainProblem,attractivenessFor } from '../data/needs.js';
+import { NEEDS,DAILY_REST,DISCONTENT,clampNeed,moodFor,happinessOf,mainProblem,attractivenessFor } from '../data/needs.js';
 import { POPULATION } from '../data/jobs.js';
 import { buildingIsComplete } from '../game/buildings.js';
 
@@ -10,9 +10,10 @@ export class NeedsSystem {
   constructor(scene,{subscribe=true}={}){
     this.scene=scene;this.records=new Map();this.assignments=new Map();this.pending=0;this.revision=0;this.work=new Map();
     if(subscribe&&scene.gameTime?.onAdvance)this.unsubscribe=scene.gameTime.onAdvance(delta=>this.advance(delta));
+    if(subscribe&&scene.gameTime?.onDayClosed)this.unsubscribeDay=scene.gameTime.onDayClosed(()=>this.closeDay());
   }
   residents(){return (this.scene.workerSystem?.liveWorkers()??[]).filter(w=>w.isAlive&&w.isSubject!==false);}
-  record(worker){let r=this.records.get(worker.id);if(!r){r={id:worker.id,food:100,rest:100,hp:worker.currentHP,attackedAt:null};this.records.set(worker.id,r);}return r;}
+  record(worker){let r=this.records.get(worker.id);if(!r){r={id:worker.id,food:100,rest:100,hp:worker.currentHP,attackedAt:null,lowDays:0,criticalDays:0,strike:false,leaving:false};this.records.set(worker.id,r);}return r;}
   advance(delta){if(!Number.isFinite(delta)||delta<=0)return;this.pending+=delta;if(this.pending<NEEDS.updateMs)return;const step=this.pending;this.pending=0;this.step(step);}
   step(ms){
     const day=this.scene.gameTime?.dayDuration??120000,fraction=ms/day,now=this.scene.gameTime?.totalElapsed??0,live=new Set(),homes=this.homes();
@@ -26,6 +27,19 @@ export class NeedsSystem {
     }
     for(const id of [...this.records.keys()])if(!live.has(id))this.records.delete(id);
     this.revision++;this.refresh();
+    // #58 C2: a strike ends as soon as Happiness is back at 45.
+    for(const worker of this.residents()){const r=this.records.get(worker.id);if(r?.strike&&this.status(worker).happiness>=DISCONTENT.strikeEndsAt){r.strike=false;r.lowDays=0;this.scene.eventFeed?.push(`strike-end:${worker.id}:${now}`,`${worker.name}: back to work after the strike.`);}}
+  }
+  // #58 C2, at the end of each day: count whole days of low Happiness; start strikes and emigration.
+  closeDay(){
+    let changed=false;
+    for(const worker of this.residents()){
+      const r=this.record(worker),h=this.status(worker).happiness;
+      r.lowDays=h<DISCONTENT.strikeBelow?r.lowDays+1:0;r.criticalDays=h<DISCONTENT.emigrateBelow?r.criticalDays+1:0;
+      if(!r.strike&&!r.leaving&&r.lowDays>=DISCONTENT.strikeDays){r.strike=true;changed=true;this.scene.eventFeed?.push(`strike:${worker.id}:${this.scene.gameTime?.day}`,`${worker.name} is on strike: Happiness has been below ${DISCONTENT.strikeBelow} for ${DISCONTENT.strikeDays} days.`,{important:true});}
+      if(!r.leaving&&r.criticalDays>=DISCONTENT.emigrateDays){r.leaving=true;r.strike=false;changed=true;this.scene.eventFeed?.push(`leaving:${worker.id}`,`${worker.name} is leaving the kingdom.`,{important:true});}
+    }
+    if(changed){this.revision++;this.refresh();}
   }
   // Phase C: derived once per update, never saved: the mood's work factor per resident and Kingdom Happiness in attractiveness.
   refresh(){const homes=this.homes(),list=[];this.work=new Map();for(const w of this.residents()){const s=this.status(w,homes);if(!s)continue;this.work.set(w.id,s.workModifier);list.push(s.happiness);}
@@ -69,18 +83,18 @@ export class NeedsSystem {
     const r=this.records.get(worker.id)??{food:100,rest:100,attackedAt:null},home=homes.get(worker.id)??null,safety=this.safetyDetail(worker,r),needs={food:Math.round(r.food),rest:Math.round(r.rest),housing:home?100:0,safety:safety.value};
     // #103: taxes and rations move Happiness (bonus or penalty), kept apart from the unpaid-wage penalty.
     const penalty=this.unpaidPenalty(worker),policy=this.scene.policy?.happiness?.()??0,happiness=happinessOf(needs,penalty-policy),mood=moodFor(happiness);
-    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,mainProblem:mainProblem(needs,penalty),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
+    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
   }
   summary(){
     const homes=this.homes(),list=this.residents().map(w=>this.status(w,homes));
-    if(!list.length)return {population:0,happiness:null,hungry:0,tired:0,homeless:0,striking:0,atRisk:0};
-    return {population:list.length,happiness:Math.round(list.reduce((n,s)=>n+s.happiness,0)/list.length),hungry:list.filter(s=>s.hungry).length,tired:list.filter(s=>s.tired).length,homeless:list.filter(s=>s.homeless).length,striking:0,atRisk:list.filter(s=>s.mood==='critical').length};
+    if(!list.length)return {population:0,happiness:null,hungry:0,tired:0,homeless:0,striking:0,leaving:0,atRisk:0};
+    return {population:list.length,happiness:Math.round(list.reduce((n,s)=>n+s.happiness,0)/list.length),hungry:list.filter(s=>s.hungry).length,tired:list.filter(s=>s.tired).length,homeless:list.filter(s=>s.homeless).length,striking:list.filter(s=>s.strike).length,leaving:list.filter(s=>s.leaving).length,atRisk:list.filter(s=>s.mood==='critical'||s.criticalDays>0).length};
   }
   get kingdomHappiness(){return this.summary().happiness;}
   // Only living residents are saved: a record of someone who died or left since the last update is dropped here.
   exportState(){const live=new Set(this.residents().map(w=>w.id)),homes=this.homes();return {pending:this.pending,
-    homes:[...homes].sort(([a],[b])=>order(a)-order(b)).map(([id,h])=>({id,kind:h.kind,...(h.kind==='house'?{buildingId:h.buildingId}:{})})),records:[...this.records.values()].filter(r=>live.has(r.id)).sort((a,b)=>order(a.id)-order(b.id)).map(r=>({id:r.id,food:r.food,rest:r.rest,hp:r.hp,attackedAt:r.attackedAt}))};}
+    homes:[...homes].sort(([a],[b])=>order(a)-order(b)).map(([id,h])=>({id,kind:h.kind,...(h.kind==='house'?{buildingId:h.buildingId}:{})})),records:[...this.records.values()].filter(r=>live.has(r.id)).sort((a,b)=>order(a.id)-order(b.id)).map(r=>({id:r.id,food:r.food,rest:r.rest,hp:r.hp,attackedAt:r.attackedAt,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,strike:!!r.strike,leaving:!!r.leaving}))};}
   importState(data){this.pending=data?.pending??0;this.records=new Map((data?.records??[]).map(r=>[r.id,{...r}]));
     this.assignments=new Map((data?.homes??[]).map(h=>[h.id,h.kind==='house'?{kind:'house',buildingId:h.buildingId}:{kind:'settlement'}]));this.revision++;this.refresh();}
-  destroy(){this.unsubscribe?.();this.records.clear();this.assignments.clear();this.work.clear();this.scene.attractiveness?.modifiers?.delete('happiness');}
+  destroy(){this.unsubscribe?.();this.unsubscribeDay?.();this.records.clear();this.assignments.clear();this.work.clear();this.scene.attractiveness?.modifiers?.delete('happiness');}
 }

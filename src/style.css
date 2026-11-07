@@ -599,3 +599,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .kingdom-policy h3 { margin: 0 0 6px; font-size: 15px; }
 .kingdom-policy label { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; }
 .policy-effect { margin: 2px 0 8px; font-size: 12px; color: #c8bd9c; }
+.need-strike { color: #e0806b; font-weight: 600; }
+.need-risk { color: #e0b34f; }
+.need-policy { color: #c8bd9c; }

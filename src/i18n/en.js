@@ -293,4 +293,5 @@ export default {
   'policy.rations.small':'Small (½ portion a day)','policy.rations.normal':'Normal (1 portion a day)','policy.rations.generous':'Generous (1½ portions a day)',
   'policy.taxEffect':'{each} Gold per resident each morning: {total} Gold/day from {count} residents. Happiness {happiness}.',
   'policy.rationsEffect':'Each resident eats {portions} portions a day. Happiness {happiness}.','ledger.Taxes':'Taxes',
+  'needs.policyLine':'Kingdom policy: Happiness {value}','needs.strikeLine':'On strike: works again at Happiness 45.','needs.leavingLine':'Leaving the kingdom.','needs.riskLine':'Unhappy for {days} day(s): strikes after 2 days below 25, leaves after 3 days below 15.',
 };

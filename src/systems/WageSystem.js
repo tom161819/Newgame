@@ -11,6 +11,8 @@ export class WageSystem {
   }
   dailyWage(worker){
     const base=BASE_DAILY_WAGES[worker.profession]??0;if(!worker.isAlive||worker.isSubject===false||!base)return 0;
+    // #58 C2: no wage accrues while a resident strikes (debts from before stay).
+    if(this.scene.needs?.records?.get(worker.id)?.strike)return 0;
     return base+Math.floor(((worker.skills[JOBS[worker.profession].skill]?.level??1)-1)/WAGE_LEVEL_INTERVAL)+(this.scene.military?.wageBonus(worker)??0);
   }
   accrue(delta){

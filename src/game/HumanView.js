@@ -72,4 +72,10 @@ export class HumanView extends Phaser.GameObjects.Container {
     this.tool.clear().lineStyle(2,0x9e814e).lineBetween(6,-26,x+8,y+7).lineStyle(4,0x8e9586).lineBetween(x+3,y+4,x+11,y+4);
   }
   setCargo(cargo){this.cargoBundle.update(cargo);}
+  // #58 C2: a small red "!" over a striking or leaving resident.
+  setDiscontent(on){
+    if(!!on===!!this.discontentIcon?.visible)return;
+    if(on&&!this.discontentIcon){const g=this.scene.add.graphics();g.fillStyle(0xb8322a,1);g.fillCircle(0,-58,6);g.lineStyle(1.5,0xf3e3c4,1);g.strokeCircle(0,-58,6);g.fillStyle(0xffffff,1);g.fillRect(-1,-62,2,5);g.fillRect(-1,-55.5,2,1.8);this.discontentIcon=g;this.add(g);}
+    this.discontentIcon?.setVisible(!!on);
+  }
 }

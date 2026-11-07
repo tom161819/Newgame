@@ -32,7 +32,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=40;
+export const SAVE_VERSION=41;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -275,11 +275,11 @@ export function validateGameState(input,registry=objectRegistry){
       check(w.isSubject||(!w.workTask&&w.assignedWorkplaceId==null&&w.profession==='idle'&&!w.cargo&&!(w.pendingWorkRewards?.length)));
       const match=String(w.id).match(/^worker-(\d+)$/);check(match&&Number(match[1])>0&&Number(match[1])<s.population.nextId);
       check(typeof w.arriving==='boolean');number(w.aiCooldown,-1e9,1e9);number(w.wanderWait,-1e9,1e9);check(w.assignedWorkplaceId==null||bIds.has(w.assignedWorkplaceId));
-      check(['Holding','MovingToHold','Idle','Searching for Work','Moving to Target','Working','Returning','Waiting','Fleeing','Recovering','Arriving','Dead','Going to Workplace','Searching for Target','Traveling to Target','Returning to Workplace','Patrolling','Going Home','Resting'].includes(w.workState));
+      check(['Holding','MovingToHold','Idle','Searching for Work','Moving to Target','Working','Returning','Waiting','Fleeing','Recovering','Arriving','Dead','Going to Workplace','Searching for Target','Traveling to Target','Returning to Workplace','Patrolling','Going Home','Resting','On Strike','Leaving Kingdom','Left Kingdom'].includes(w.workState));
       // #58 phase B: only a living resident goes home or rests.
       if(w.restPhase!==undefined)check(['going','resting'].includes(w.restPhase)&&w.isAlive&&w.isSubject);
       check(typeof w.workMessage==='string'&&w.workMessage.length<200);
-      if(w.stoneCollection!==undefined){check(w.stoneCollection&&typeof w.stoneCollection.enabled==='boolean'&&Object.keys(w.stoneCollection).length===2);integer(w.stoneCollection.radius,0,IDLE_STONE.maxRadius);}if(w.profession==='hauler')check(w.stoneCollection);if(!w.isAlive)check(w.workState==='Dead'&&!w.workTask&&!w.arriving);
+      if(w.stoneCollection!==undefined){check(w.stoneCollection&&typeof w.stoneCollection.enabled==='boolean'&&Object.keys(w.stoneCollection).length===2);integer(w.stoneCollection.radius,0,IDLE_STONE.maxRadius);}if(w.profession==='hauler')check(w.stoneCollection);if(!w.isAlive)check(['Dead','Left Kingdom'].includes(w.workState)&&!w.workTask&&!w.arriving);else check(w.workState!=='Left Kingdom');
       check(Object.hasOwn(JOBS,w.displayProfession)&&['idle',w.profession].includes(w.displayProfession));
       const t=w.workTask;if(t){
         check(w.isAlive&&['mine','mineDrop','hunt','collectMeat','build','dismantle','harvest','chopTree','mineDeposit','mineRock','foodPickup','foodDeliver','produce'].includes(t.kind));tile(t.goal);number(t.progressMs,0,t.kind==='mineRock'?ROCK_MINING.duration:t.kind==='mineDeposit'?(definition(s.buildings.find(b=>b.id===w.assignedWorkplaceId)?.type).mining?.duration??0):t.kind==='harvest'?(definition(s.buildings.find(b=>b.id===t.targetId)?.type).crop?.workDuration??0):WORK_RULES.miningDuration);
@@ -418,7 +418,7 @@ export function validateGameState(input,registry=objectRegistry){
   // S13 needs: one record per living permanent resident at most, values 0–100, an attack time never in the future.
   if(s.needs!==undefined){const n=s.needs;check(n&&typeof n==='object'&&Object.keys(n).sort().join()==='homes,pending,records');number(n.pending,0,s.time?.totalElapsed??Number.MAX_SAFE_INTEGER);array(n.records);array(n.homes);
     const residents=new Set((s.workers??[]).filter(w=>w.isAlive&&w.isSubject).map(w=>w.id)),seen=new Set();
-    for(const r of n.records){check(r&&Object.keys(r).sort().join()==='attackedAt,food,hp,id,rest'&&residents.has(r.id)&&!seen.has(r.id));seen.add(r.id);number(r.food,0,100);number(r.rest,0,100);check(Number.isFinite(r.hp));if(r.attackedAt!==null)number(r.attackedAt,0,s.time?.totalElapsed??Number.MAX_SAFE_INTEGER);}
+    for(const r of n.records){check(r&&Object.keys(r).sort().join()==='attackedAt,criticalDays,food,hp,id,leaving,lowDays,rest,strike'&&residents.has(r.id)&&!seen.has(r.id));integer(r.lowDays,0,100000);integer(r.criticalDays,0,100000);check(typeof r.strike==='boolean'&&typeof r.leaving==='boolean'&&!(r.strike&&r.leaving));seen.add(r.id);number(r.food,0,100);number(r.rest,0,100);check(Number.isFinite(r.hp));if(r.attackedAt!==null)number(r.attackedAt,0,s.time?.totalElapsed??Number.MAX_SAFE_INTEGER);}
     // #58 phase B homes: each living resident at most once, a House seat in a completed House within its capacity,
     // or one of the settlement's base places.
     const homed=new Set(),seats=new Map();let base=0;
