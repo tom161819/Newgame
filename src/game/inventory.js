@@ -1,4 +1,6 @@
 // Suroviny jsou vedené podle názvu: později lze stejně přidat wood, iron apod.
+import { GOLD_LIMIT } from '../data/economy.js';
+export const RESOURCE_LIMITS=Object.freeze({gold:GOLD_LIMIT});
 export class Inventory {
   constructor() {
     this.resources = new Map();
@@ -15,9 +17,11 @@ export class Inventory {
 
   add(resource, amount = 1,details={}) {
     if(this.storage?.manages(resource)){this.storage.addToInventory(resource,amount);if(details.track!==false)this.ledger?.income(resource,amount,details.source??'Other Existing Income',details);return this.count(resource);}
-    const count = this.count(resource) + amount;
+    // A limited resource (Gold) takes only what fits; an amount already above the limit (an older save) is kept.
+    const current=this.count(resource),limit=RESOURCE_LIMITS[resource],added=limit===undefined?amount:Math.max(0,Math.min(amount,limit-current));
+    const count = current + added;
     this.resources.set(resource, count);
-    if(details.track!==false)this.ledger?.income(resource,amount,details.source??'Other Existing Income',details);
+    if(details.track!==false&&added>0)this.ledger?.income(resource,added,details.source??'Other Existing Income',details);
     return count;
   }
 
@@ -29,6 +33,8 @@ export class Inventory {
     if(details.track!==false)this.ledger?.expense(resource,amount,details.source??'Other Existing Expenses',details);
     return true;
   }
+
+  limit(resource){return RESOURCE_LIMITS[resource]??null;}
 
   canAfford(cost) {
     for (const amount of Object.values(cost)) if (!Number.isSafeInteger(amount) || amount < 0) throw new RangeError('Neplatná cena.');

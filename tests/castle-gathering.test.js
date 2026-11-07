@@ -7,6 +7,7 @@ import { serializeGameState,validateGameState,SAVE_VERSION } from '../src/system
 import { loadGameState } from '../src/systems/GameStateLoader.js';
 globalThis.document??={querySelector:()=>({textContent:''})};
 const scene=(starter=true)=>{const s=workerScene(undefined,{construction:true,foodProduction:true,logistics:true,starter});s.workerSystem.unsubscribe();return s;};
+function addExisting(s,type,x,y){const definition=s.objectRegistry.require(type),tiles=[];for(let dy=0;dy<definition.height;dy++)for(let dx=0;dx<definition.width;dx++){tiles.push({x:x+dx,y:y+dy});s.map[y+dy][x+dx]=1;}const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition,x,y,tiles};s.buildings.push(b);s.towerViews.set(b.id,s.createBuildingView(definition,b));return b;}
 function add(s,type,x,y){const definition=s.objectRegistry.require(type);ensureBuildingPrerequisites(s,definition);for(const [r,n]of Object.entries(definition.cost))s.inventory.add(r,n);const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition});assert.ifError(result.error);s.towerViews.set(result.building.id,s.createBuildingView(definition,result.building));return result.building;}
 function until(s,p,max=90000){for(let t=0;t<max&&!p();t+=25)s.tick(25);assert.ok(p());}
 function person(s,x,y,job='idle'){const w=s.workerSystem.create({x,y});s.workerSystem.jobs.assign(w,job);if(job==='hauler')w.stoneCollection={enabled:false,radius:80};return w;}
@@ -23,7 +24,8 @@ test('idle Castle travel never delays a new global delivery and the Hauler retur
  until(s,()=>s.foodStorage.locations.get(`warehouse-${warehouse.id}`).stock.wood===6);assert.equal(w.assignedWorkplaceId,null);until(s,()=>s.workerSystem.gather.atHome(w));assert.equal(w.displayProfession,'hauler');validateGameState(serializeGameState(s));
 });
 test('multiple Castles choose a reachable one; losing it uses bounded local idle instead of crossing walls',()=>{
- const s=scene(),near=add(s,'castle',50,40),far=add(s,'castle',70,50),w=person(s,30,50);
+ // A second Castle can no longer be placed (maxCount 1), but older saves may hold two: add it as such a save would.
+ const s=scene(),near=add(s,'castle',50,40),far=addExisting(s,'castle',70,50),w=person(s,30,50);
  for(let y=near.y-5;y<=near.y+7;y++)for(let x=near.x-5;x<=near.x+7;x++)if(x===near.x-5||x===near.x+7||y===near.y-5||y===near.y+7)s.map[y][x]=1;
  until(s,()=>s.workerSystem.gather.atHome(w));assert.equal(s.workerSystem.gather.claims.get(w.id).homeId,far.id);const before={...w.position};s.buildings.splice(s.buildings.indexOf(far),1);for(const t of far.tiles)s.map[t.y][t.x]=0;s.constructionSystem.revision++;
  s.simulate(1000);assert.equal(s.workerSystem.gather.claims.get(w.id).kind,'local');assert.ok(Math.hypot(w.position.x-before.x,w.position.y-before.y)<4);

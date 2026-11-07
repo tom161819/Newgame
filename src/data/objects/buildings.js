@@ -16,7 +16,7 @@ export const buildings = [
   },
   {
     id:'castle',name:'Castle',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/castle/castle.svg',
-    width:3,height:3,walkable:false,collectible:false,buildable:true,cost:{stone:10},
+    width:3,height:3,walkable:false,collectible:false,buildable:true,cost:{stone:10},maxCount:1,
     constructionTime:45000,
     production:{resource:'gold',amount:5,interval:'day',label:'Castle income'},
     interactions:['enter','exit'],description:'Kamenná pevnost s horní plošinou a cimbuřím. Z plošiny poskytuje o 75 % větší dohled.',

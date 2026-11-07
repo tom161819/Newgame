@@ -1,9 +1,10 @@
 import { FOOD_RESOURCE_IDS } from '../foodProduction.js';
+import { LOGISTICS_RULES } from '../logistics.js';
 export const logisticsBuildings=[
   {id:'warehouse',name:'Warehouse',width:3,height:3,cost:{stone:10},constructionTime:30000,visualHeight:125,buildable:true,
     storage:{capacity:200,resources:['stone','wood','iron'],accepts:'materials'},description:'A physical store for 200 building materials. Haulers serve every store in the kingdom.'},
   {id:'starter_stockpile',name:'Starter Stockpile',width:2,height:2,cost:{},visualHeight:55,buildable:false,starter:true,
-    storage:{capacity:40,resources:['stone','wood','iron',...FOOD_RESOURCE_IDS],accepts:'all'},description:'A small starting store with space for 40 materials and food units combined.'},
+    storage:{capacity:LOGISTICS_RULES.starterCapacity,resources:['stone','wood','iron',...FOOD_RESOURCE_IDS],accepts:'all'},description:`A starting store with space for ${LOGISTICS_RULES.starterCapacity} materials and food units combined.`},
 ].map(d=>({...d,category:'building',buildingCategory:'logistics',sprite:`/assets/buildings/${d.id}/${d.id}.svg`,walkable:false,collectible:false,
   interactions:['inspect_storage'],renderMode:'procedural',renderer:'food_building',origin:{x:.5,y:.9},depth:{offset:0},
   shadow:{baked:true,x:10,y:-10,width:d.width*59,height:d.height*21,color:0x30291c,alpha:.3}}));

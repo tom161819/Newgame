@@ -3,18 +3,20 @@ import { buildingIsComplete } from '../game/buildingState.js';
 
 const unlocked=Object.freeze({unlocked:true,missing:[],description:''});
 function worldIndex(buildings){
-  const complete=new Set(),pending=new Set();
-  for(const b of buildings)(buildingIsComplete(b)?complete:pending).add(b.type??b.definition?.id??'tower');
-  return {complete,pending};
+  const complete=new Set(),pending=new Set(),counts=new Map();
+  for(const b of buildings){const type=b.type??b.definition?.id??'tower';(buildingIsComplete(b)?complete:pending).add(type);counts.set(type,(counts.get(type)??0)+1);}
+  return {complete,pending,counts};
 }
 function evaluate(definition,index,registry){
+  // A building with maxCount (the Castle) cannot be placed again once that many exist, built or planned.
+  if(definition.maxCount&&(index.counts.get(definition.id)??0)>=definition.maxCount)return {unlocked:false,missing:[],description:t('unlock.alreadyBuilt'),limit:true};
   const missing=(definition.requiresCompletedBuildings??[]).filter(id=>!index.complete.has(id));if(!missing.length)return unlocked;
   const description=missing.map(id=>{const name=registry?.get(id)?.name??id;return t(index.pending.has(id)?'unlock.pending':'unlock.build',{name});}).join(' · ');
   return {unlocked:false,missing,description};
 }
 // The placement transaction reads the current world; the UI uses an event-updated index.
 export function buildingUnlockStatus(definition,buildings,registry){
-  if(!definition.requiresCompletedBuildings?.length)return unlocked;
+  if(!definition.requiresCompletedBuildings?.length&&!definition.maxCount)return unlocked;
   return evaluate(definition,worldIndex(buildings),registry);
 }
 export class BuildingUnlockManager {

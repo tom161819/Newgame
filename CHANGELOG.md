@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-11-07
+<!-- version: {"title":"Friendlier start of a game","type":"feature","reconstructed":false,"saveVersion":37} -->
+### Changed
+- A new game now proposes a Castle, 500 Gold and 40 Stone, Wood, Iron Ore and Bread. All of it can still be changed in the setup before starting; together the starting resources can be at most 160.
+- The starting stockpile holds 160 resources in total instead of 40, so the proposed start fills it; build a Warehouse for more room. Games saved earlier keep their stockpile of 40.
+- Gold is limited to 500. The top bar shows Gold as amount / 500 and a new Stores item with how full the stockpile and warehouses are.
+- Only one Castle can stand in the kingdom. When it is built, its button says Already built.
+
 ## [0.9.1] - 2026-11-07
 <!-- version: {"title":"Wheat Field tool stays selected","type":"fix","reconstructed":false,"saveVersion":37} -->
 ### Fixed

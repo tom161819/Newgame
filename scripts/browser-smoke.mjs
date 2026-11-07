@@ -120,6 +120,12 @@ try{
   // Residents stay where the smokes put them; Auto Employment has its own smoke.
   assert.equal(await page.locator('#setup-auto-employment').isChecked(),true);await page.locator('#setup-auto-employment').uncheck();
   if(await page.locator('#setup-seasons').count()){assert.equal(await page.locator('#setup-seasons').isChecked(),true);if(args.includes('--full')||args.includes('--seasons-menu'))await page.locator('#setup-seasons').uncheck();}
+  // Owner request 7 Nov 2026: the setup proposes a Castle, 500 Gold and 40 of each starting resource. This scenario keeps
+  // the earlier empty start (no Castle, no Gold, empty stockpile) that the steps below were written for.
+  assert.equal(await page.locator('#setup-castle').isChecked(),true);assert.equal(await page.locator('#setup-gold').inputValue(),'500');
+  for(const id of ['stone','wood','iron-ore','bread'])assert.equal(await page.locator(`#setup-start-${id}`).inputValue(),'40');
+  await page.locator('#setup-castle').uncheck();
+  for(const selector of ['#setup-gold','#setup-start-stone','#setup-start-wood','#setup-start-iron-ore','#setup-start-bread'])await page.locator(selector).evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
   if(args.includes('--full')||args.includes('--ledger'))await ledgerSmoke(page);

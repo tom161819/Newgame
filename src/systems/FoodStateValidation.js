@@ -4,7 +4,7 @@ import { pavementWorkArea } from '../game/pavement.js';
 import { recipeFor,recipeResources } from '../data/production.js';
 import { PLAYER_START } from '../game/config.js';
 import { buildingIsComplete } from '../game/buildings.js';
-import { physicalResources,materialResources,storageResources,stockLocationId,carryCapacity,equipmentResources,MAX_TRIP_UNITS } from '../data/logistics.js';
+import { physicalResources,materialResources,storageResources,stockLocationId,carryCapacity,equipmentResources,MAX_TRIP_UNITS,LOGISTICS_RULES } from '../data/logistics.js';
 
 export function validateFoodState(s,registry,{check,number,integer,array}){
   const storage=s.foodStorage,production=s.foodProduction;
@@ -22,7 +22,9 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   const producers=s.buildings.filter(b=>buildingIsComplete(b)&&registry.require(b.type).recipe);
   for(const b of s.buildings)if(buildingIsComplete(b)){
     const d=registry.require(b.type),base={buildingId:b.id,x:b.x,y:b.y,width:d.width,height:d.height};
-    if(d.storage&&(physical||!d.storage.accepts))expected.set(stockLocationId(b),{...base,kind:d.starter?'fallback':'storage',capacity:d.storage.capacity,allowed:storageResources(d,registry)});
+    // A Starter Stockpile from a game started before 0.9.2 keeps its original 40 units (owner request: older saves unchanged).
+    const savedCapacity=d.starter?storage.locations.find(l=>l.id===stockLocationId(b))?.capacity:undefined;
+    if(d.storage&&(physical||!d.storage.accepts))expected.set(stockLocationId(b),{...base,kind:d.starter?'fallback':'storage',capacity:savedCapacity===LOGISTICS_RULES.legacyStarterCapacity?savedCapacity:d.storage.capacity,allowed:storageResources(d,registry)});
     if(d.recipe)for(const kind of ['input','output'])expected.set(`${kind}-${b.id}`,{...base,kind,capacity:d.bufferCapacity,allowed:recipeResources(d,kind)});
     if(d.kit)expected.set(`kit-${b.id}`,{...base,kind:'kit',capacity:d.kit.capacity,allowed:equipmentResources(registry)});
   }
