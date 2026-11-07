@@ -1,3 +1,6 @@
+import { DomesticAnimalSystem } from '../systems/DomesticAnimalSystem.js';
+import { DomesticViews } from './DomesticViews.js';
+import { CatPanel } from '../ui/CatPanel.js';
 import { decodeWorldCode,randomWorldCode,defaultWorldLevels,settingsFromLevels } from '../data/worldCode.js';
 import { worldStreams } from './seededRandom.js';
 import { FORESTRY as WORLD_FORESTRY } from '../data/naturalResources.js';
@@ -272,6 +275,7 @@ export class GameScene extends Phaser.Scene {
     this.wageSystem=new WageSystem(this,{onPayroll:()=>this.updateInventory()});this.economyPanel=new EconomyPanel(this);
     this.buildingBar.close();this.updateInventory();
     this.gettingStarted=new GettingStartedPanel(this);
+    this.domestic=new DomesticAnimalSystem(this);this.domesticViews=new DomesticViews(this,this.domestic);this.catPanel=new CatPanel(this);
     this.marketplacePanel=new MarketplacePanel(this);this.builderWorkshopPanel=new BuilderWorkshopPanel(this);this.policyPanel=new PolicyPanel(this);
     this.updateTimeDisplay();
     this.setStatus(t('status.idle'));
@@ -324,7 +328,7 @@ export class GameScene extends Phaser.Scene {
       this.settingsPanel.destroy();this.fpsOverlay.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
       this.clearWallPreviews();
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
-      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.marketplacePanel.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
+      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.marketplacePanel.destroy();this.catPanel?.destroy();this.domesticViews?.destroy();this.domestic?.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.pavementTool.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
       this.demolitionUI.destroy();this.demolition.destroy();this.farmConnections.destroy();this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
@@ -433,6 +437,7 @@ export class GameScene extends Phaser.Scene {
     if(unknown&&!this.fog.isInMap(goal)){this.setStatus(OUTSIDE_SIGHT);return;}
     this.demolitionUI.select(selected?.kind==='building'?selected.object:null);
     if(selected?.kind==='human'){this.unitPanel.open(selected.object);return;}
+    if(selected?.kind==='cat'){this.catPanel.open(selected.object);return;}
     if(selected?.kind==='stockpile'){this.storagePanel.open(null,selected.object.location.id);return;}
     if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){if(this.kingLogistics.workflowSiteId!==selected.object.id){this.kingLogistics.cancel();this.constructionSystem.commandKing(selected.object);}this.constructionUI.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).crop){this.farmingPanel.open(selected.object);return;}
@@ -488,6 +493,7 @@ export class GameScene extends Phaser.Scene {
       const view=unit.view??unit.sprite;if(this.fog.isVisibleObject(unit)&&this.assets.hitTest(view,x,y))hits.push({kind:'human',object:unit,depth:view.depth});
     }
     if(animal)hits.push({kind:'animal',object:animal,depth:animal.view.depth});
+    const cat=this.domestic?.atPoint(x,y);if(cat)hits.push({kind:'cat',object:cat,depth:cat.view.depth+1});
     if(chest)hits.push({kind:'chest',object:chest,depth:chest.view.depth});
     if(drop)hits.push({kind:'drop',object:drop,depth:drop.view.depth});
     if(resource)hits.push({kind:'resource',object:resource,depth:resource.depth});
@@ -708,13 +714,14 @@ export class GameScene extends Phaser.Scene {
     this.experienceFeedback.update(activeDelta);
     for(const spawner of this.resourceSpawners)spawner.update(activeDelta);
     this.wildlifeRespawn.update(activeDelta);
+    this.domestic?.update(activeDelta);
     this.noticeRemaining=Math.max(0,this.noticeRemaining-activeDelta);if(!this.noticeRemaining)document.querySelector('#day-notice').hidden=true;
     return activeDelta;
   }
   refreshVisibility(){
     if(this.inventoryRevision!==this.foodStorage.revision){this.inventoryRevision=this.foodStorage.revision;this.updateInventory();}
     document.querySelector('#path-wear-info').hidden=!this.settingsPanel.settings.pathWearDebug;
-    captureMapKnowledge(this);this.updateMountUI();this.updateWorldCount();
+    captureMapKnowledge(this);this.updateMountUI();this.updateWorldCount();this.domesticViews?.update(16);
     this.terrain.update(this.cameras.main,this.fog,this.mapMemory);
     const view=this.cameras.main.worldView;
     this.legacyStockpiles?.update(view,this.fog);

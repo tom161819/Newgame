@@ -653,3 +653,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .pause-world { font-size:13px; color:#c8bd9c; }
 .pause-world code { font:13px ui-monospace,monospace; color:#f0e3bb; user-select:all; }
 .pause-world button { margin-left:6px; padding:4px 8px; font-size:12px; }
+
+/* Domestic animals Z1: cat panel */
+.cat-dialog { min-width:300px; max-width:440px; }
+.cat-homes { list-style:none; padding:0; margin:6px 0; display:grid; gap:4px; }
+.cat-homes button { width:100%; text-align:left; padding:6px 10px; }
+.cat-help, .cat-state { font-size:13px; color:#c8bd9c; }
+.cat-message { color:#e0806b; }
+.rats-line.many, .rats-line.infestation { color:#e0a06b; }

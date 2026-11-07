@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-11-07
+<!-- version: {"title":"Rats and cats","type":"feature","reconstructed":false,"saveVersion":52} -->
+### Added
+- Rats and cats. Rats breed in stores with food (Granary, Starter Stockpile, food buildings) and eat 1 %, 3 % or 6 % of the food a day depending on how many there are. Store panels show the rats and the daily loss. Cats keep them down: take in a stray cat (click it), buy one from a Food or General merchant for 30 Gold, or wait for kittens. Assign each cat to a store (one cat per 120 food) or a house, where it gives the residents +3 happiness.
+
 ## [0.25.0] - 2026-11-07
 <!-- version: {"title":"Rounded shores","type":"feature","reconstructed":false,"saveVersion":51} -->
 ### Improved

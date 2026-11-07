@@ -1,6 +1,7 @@
 import { t } from '../i18n/index.js';
 import { element } from './objectLabels.js';
 import { priceTable,price,TRADE_RULES,PRICE_MODEL,AUTO_TRADE } from '../data/trade.js';
+import { CATS } from '../data/domesticAnimals.js';
 import { buildingDefinition } from '../game/buildings.js';
 
 // Trade F1.1 (#59): the Marketplace panel. Caravans (F1.2) and orders (F1.3) are not in the game yet, so the panel shows
@@ -167,7 +168,10 @@ export class MarketplacePanel {
     for(const key of ['good','caravan','kingdom','buy','sell','quantity',''])hr.append(element('th','',key?t(`market.${key}`):''));head.append(hr);
     const body=element('tbody');body.append(...rows);table.append(head,body);
     const quote=element('p','market-quote');quote.id='marketplace-quote';quote.setAttribute('role','status');
-    root.replaceChildren(element('h3','',t('market.trade',{gold:c.gold})),table,quote);this.renderQuote();
+    // Domestic animals Z1: Food and General merchants sometimes sell a cat (30 Gold); the buyer picks its home.
+    const cats=this.scene.domestic?.catsForSale?.()??0,extra=[];
+    if(cats){const buy=element('button','market-buy-cat',t('pets.buyButton',{price:CATS.price,count:cats}));buy.type='button';buy.id='market-buy-cat';buy.addEventListener('click',()=>this.scene.catPanel?.open(null,'buy'));extra.push(buy);}
+    root.replaceChildren(element('h3','',t('market.trade',{gold:c.gold})),table,quote,...extra);this.renderQuote();
   }
   maximum(side,resource){
     const trade=this.scene.trade,c=this.scene.caravans.active,unit=trade.unitPrice(resource,side);if(!c||!unit)return 1;
