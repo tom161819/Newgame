@@ -1,4 +1,5 @@
 import { GRANARY_GROUP_CAPACITY,granaryUsage } from '../data/granaryCapacity.js';
+import { paidCost } from '../data/demolition.js';
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
 import { pavementWorkArea } from '../game/pavement.js';
 import { recipeFor,recipeResources } from '../data/production.js';
@@ -32,7 +33,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   if(physical)for(const b of s.buildings){
     if(!buildingIsComplete(b)&&s.logistics?.materialsVersion===1)check(b.materialSupply);
     if(!b.materialSupply)continue;check(!buildingIsComplete(b));
-    const d=registry.require(b.type),supply=b.materialSupply,required=Object.fromEntries(Object.entries(d.cost).filter(([id])=>resources.includes(id)));
+    const d=registry.require(b.type),supply=b.materialSupply,required=Object.fromEntries(Object.entries(paidCost(b,d)).filter(([id])=>resources.includes(id)));
     check(supply.version===1&&typeof supply.legacyPaid==='boolean'&&JSON.stringify(supply.required)===JSON.stringify(required));sites.set(b.id,b);
     const area=d.pavement?pavementWorkArea(s.buildings,b,registry):{x:b.x,y:b.y,width:d.width,height:d.height};
     expected.set(`site-${b.id}`,{kind:'site',buildingId:b.id,x:area.x,y:area.y,width:area.width,height:area.height,capacity:Object.values(required).reduce((n,v)=>n+v,0),allowed:Object.keys(required)});

@@ -2,7 +2,7 @@ import { countName } from '../i18n/names.js';
 import { t } from '../i18n/index.js';
 import { element } from './objectLabels.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
-import { demolitionRefund } from '../data/demolition.js';
+import { buildingDemolitionRefund } from '../data/demolition.js';
 const text=(node,value)=>{if(node.textContent!==value)node.textContent=value;};
 export class DemolitionUI {
   constructor(scene){
@@ -34,7 +34,7 @@ export class DemolitionUI {
     if(!b||!this.scene.fog.isVisibleObject(b))return 'unavailable';if(b.type==='castle')return 'castle';if(b.type==='starter_stockpile')return 'starter';
     if(!buildingIsComplete(b))return 'unfinished';if(!this.scene.demolition.eligible(b))return 'unavailable';if(this.scene.demolition.roofBlocked(b))return 'roof';return null;
   }
-  refundLabel(b){const refund=demolitionRefund(buildingDefinition(b));return Object.keys(refund).length?Object.entries(refund).map(([id,n])=>countName(this.scene.objectRegistry.require(id),n)).join(', '):t('demolition.noRefund');}
+  refundLabel(b){const refund=buildingDemolitionRefund(b,buildingDefinition(b));return Object.keys(refund).length?Object.entries(refund).map(([id,n])=>countName(this.scene.objectRegistry.require(id),n)).join(', '):t('demolition.noRefund');}
   ask(){
     const b=this.building(this.buildingId);if(this.reason(b)||b.demolition)return;
     this.pendingId=b.id;text(document.querySelector('#demolition-confirm-text'),t('demolition.confirmText',{name:buildingDefinition(b).name,refund:this.refundLabel(b)}));

@@ -5,6 +5,18 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.9.4] - 2026-11-07
+<!-- version: {"title":"Building prices in the Asset Library","type":"feature","reconstructed":false,"saveVersion":37} -->
+### Added
+- The Asset Library can change the price of a building for testing: change an amount, add another resource or remove one (a building always costs at least one resource). Changed amounts are bold, added resources green and removed ones struck through with Restore; the card and the Buildings menu show the new price at once.
+- Reset to default for one building, Reset all prices, and Copy prices JSON, which copies the changed prices in the format the development chat uses to make them the game's defaults.
+
+### Changed
+- A building keeps the price it was placed with: its site asks for exactly that, and demolition returns half of what was really paid. Changed prices are kept only in this browser, never in a saved game.
+
+### Fixed
+- The Starter Stockpile description now says it holds 160 units.
+
 ## [0.9.3] - 2026-11-07
 <!-- version: {"title":"Getting started help","type":"feature","reconstructed":false,"saveVersion":37} -->
 ### Added

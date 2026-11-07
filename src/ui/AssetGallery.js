@@ -1,4 +1,5 @@
 import { workplaceAuthoringEditor } from './WorkplaceAuthoringEditor.js';
+import { buildingCostEditor } from './BuildingCostEditor.js';
 import { t } from '../i18n/index.js';
 import { localized } from '../i18n/names.js';
 import { SKILLS,JOBS } from '../data/jobs.js';
@@ -7,8 +8,8 @@ import { element,formatCost,formatModifiers,CATEGORY_LABELS } from './objectLabe
 import { buildingCategoryLabel } from '../data/buildingCategories.js';
 
 export class AssetGallery {
-  constructor({registry,assets,onOpen,onClose,onWorkplaceApply}) {
-    Object.assign(this,{registry,assets,onOpen,onClose,onWorkplaceApply});
+  constructor({registry,assets,onOpen,onClose,onWorkplaceApply,onCostApply}) {
+    Object.assign(this,{registry,assets,onOpen,onClose,onWorkplaceApply,onCostApply});
     this.dialog=document.querySelector('#asset-gallery');this.grid=document.querySelector('#asset-grid');
     this.detail=document.querySelector('#asset-detail');this.tabs=document.querySelector('#asset-categories');
     this.category='all';this.selectedId=null;this.restored=true;
@@ -39,7 +40,7 @@ export class AssetGallery {
       const image=element('img','asset-thumbnail');image.src=this.assets.previewURL(definition);image.alt=definition.name;
       button.append(image,element('strong','',definition.name),element('small','',t('building.size',{width:definition.width,height:definition.height})));
       button.append(element('small','asset-flags',t('asset.flags',{walkable:yes(definition.walkable),collectible:yes(definition.collectible),buildable:yes(definition.buildable)})));
-      if(definition.category==='building')button.append(element('span','asset-cost',formatCost(definition.cost,this.registry)));
+      if(definition.category==='building'){const cost=element('span','asset-cost',formatCost(definition.cost,this.registry));if(this.registry.costOverrides?.[definition.id]){cost.classList.add('asset-cost-changed');cost.title=t('costEditor.cardChanged',{price:formatCost(this.registry.costDefaults.get(definition.id),this.registry)});}button.append(cost);}
       button.append(element('span','asset-description',definition.description),element('small','',t('asset.interactions',{list:definition.interactions.join(', ')||t('asset.none')})));
       return button;
     });
@@ -73,6 +74,7 @@ export class AssetGallery {
     if(definition.treasure)rows.push([t('asset.contents'),`${t('treasure.gold',{count:`${definition.treasure.goldMin}–${definition.treasure.goldMax}`})} + ${definition.treasure.equipment.map(id=>this.registry.require(id).name).join(', ')}`]);
     for(const [name,value]of rows)list.append(element('dt','',name),element('dd','',value));
     this.detail.append(list);
+    if(this.registry.costDefaults?.has(definition.id))this.detail.append(buildingCostEditor(this.registry,definition,this.onCostApply));
     if(definition.workplace)this.detail.append(workplaceAuthoringEditor(this.registry,definition,this.onWorkplaceApply));
     const technical=element('details','asset-technical');technical.append(element('summary','',t('asset.graphics')));
     technical.append(element('p','',definition.sprite),element('p','',t('asset.origin',{x:definition.origin?.x??0.5,y:definition.origin?.y??1,height:definition.visualHeight??0})));

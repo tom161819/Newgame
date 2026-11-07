@@ -3,7 +3,7 @@ import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { CONSTRUCTION_RULES } from '../data/construction.js';
 import { advanceConstruction } from './ConstructionProgress.js';
 
-import { demolitionRefund } from '../data/demolition.js';
+import { buildingDemolitionRefund } from '../data/demolition.js';
 export { demolitionRefund } from '../data/demolition.js';
 // Uses ConstructionSystem's existing BuilderAI, perimeter reservations and physical work allocation.
 // The completion callback must reconcile the real building lifecycle atomically before returning true.
@@ -20,7 +20,7 @@ export class DemolitionSystem {
   roofBlocked(building){const king=this.scene.character;return buildingDefinition(building).interactions?.includes('enter')&&(king.state!=='ground'||king.transitioning);}
   request(building){
     if(!this.eligible(building)||this.scene.gameOver||this.jobs.has(building.id)||this.scene.fog&&!this.scene.fog.isVisibleObject(building)||this.roofBlocked(building))return false;
-    const d=buildingDefinition(building),record={state:'planned',requiredWork:d.constructionTime??CONSTRUCTION_RULES.defaultTime,workDone:0,progress:0,contributions:{},assignedBuilders:[],refund:demolitionRefund(d)};
+    const d=buildingDefinition(building),record={state:'planned',requiredWork:d.constructionTime??CONSTRUCTION_RULES.defaultTime,workDone:0,progress:0,contributions:{},assignedBuilders:[],refund:buildingDemolitionRefund(building,d)};
     building.demolition=record;this.jobs.set(building.id,record);this.scene.constructionSystem.revision++;return true;
   }
   site(id){const building=this.target(id),record=this.jobs.get(id);return building&&record?{...building,demolition:true,construction:record}:null;}

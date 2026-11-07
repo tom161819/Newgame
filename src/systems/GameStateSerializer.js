@@ -1,6 +1,6 @@
 import { validateRockMining } from './RockMiningState.js';
 import { ROCK_MINING } from '../data/rockMining.js';
-import { demolitionRefund } from '../data/demolition.js';
+import { buildingDemolitionRefund } from '../data/demolition.js';
 import { t } from '../i18n/index.js';
 import { objectRegistry } from './ObjectRegistry.js';
 import { COLUMNS,ROWS } from '../game/config.js';
@@ -163,7 +163,12 @@ export function validateGameState(input,registry=objectRegistry){
       number(c.workDone,0,c.requiredWork);number(c.progress,0,100);check(Math.abs(c.progress-100*c.workDone/c.requiredWork)<1e-6);
       check(c.state==='planned'?c.workDone===0:c.state==='complete'?c.workDone===c.requiredWork:c.workDone>0&&c.workDone<c.requiredWork);
       check(typeof c.rewardsGranted==='boolean'&&c.rewardsGranted===(c.state==='complete'));
-      check(c.investedMaterials&&typeof c.investedMaterials==='object'&&JSON.stringify(Object.entries(c.investedMaterials).sort())===JSON.stringify(Object.entries(d.cost).sort()));
+      // The price booked at placement. Since 0.9.4 the Asset Library can change prices in one browser, so it may differ from
+      // today's price: a finished building keeps any valid price; a site must match today's or the default price, or the
+      // materials its supply booked (physical materials).
+      const invested=c.investedMaterials,samePrice=(x,y)=>!!x&&!!y&&JSON.stringify(Object.entries(x).sort())===JSON.stringify(Object.entries(y).sort());
+      check(invested&&typeof invested==='object'&&!Array.isArray(invested)&&Object.entries(invested).every(([id,n])=>registry.get(id)?.category==='resource'&&Number.isSafeInteger(n)&&n>=0));
+      check(c.state==='complete'||samePrice(invested,d.cost)||samePrice(invested,registry.costDefaults?.get(d.id))||(!!b.materialSupply?.required&&Object.entries(b.materialSupply.required).every(([id,n])=>invested[id]===n)));
       check(c.contributions&&typeof c.contributions==='object'&&!Array.isArray(c.contributions));let work=0;
       for(const [id,amount]of Object.entries(c.contributions)){check(id==='king'||wIds.has(id));number(amount,Number.MIN_VALUE,c.requiredWork);work+=amount;}check(Math.abs(work-c.workDone)<1e-6);
       array(c.assignedBuilders,CONSTRUCTION_RULES.maximumBuilders);check(new Set(c.assignedBuilders).size===c.assignedBuilders.length);if(c.state==='complete')check(!c.assignedBuilders.length);
@@ -176,7 +181,7 @@ export function validateGameState(input,registry=objectRegistry){
     check(c&&typeof c==='object'&&!Array.isArray(c)&&Object.keys(c).every(k=>['state','requiredWork','workDone','progress','contributions','assignedBuilders','refund'].includes(k)));
     check(['planned','building'].includes(c.state));number(c.requiredWork,1,86400000);check(c.requiredWork===(d.constructionTime??CONSTRUCTION_RULES.defaultTime));
     number(c.workDone,0,c.requiredWork);number(c.progress,0,100);check(Math.abs(c.progress-100*c.workDone/c.requiredWork)<1e-6);check(c.state==='planned'?c.workDone===0:c.workDone>0);
-    check(c.refund&&typeof c.refund==='object'&&JSON.stringify(Object.entries(c.refund).sort())===JSON.stringify(Object.entries(demolitionRefund(d)).sort()));
+    check(c.refund&&typeof c.refund==='object'&&JSON.stringify(Object.entries(c.refund).sort())===JSON.stringify(Object.entries(buildingDemolitionRefund(b,d)).sort()));
     check(c.contributions&&typeof c.contributions==='object'&&!Array.isArray(c.contributions));let work=0;
     for(const [id,amount]of Object.entries(c.contributions)){check(wIds.has(id));number(amount,Number.MIN_VALUE,c.requiredWork);work+=amount;}check(Math.abs(work-c.workDone)<1e-6);
     array(c.assignedBuilders,CONSTRUCTION_RULES.maximumBuilders);check(new Set(c.assignedBuilders).size===c.assignedBuilders.length);

@@ -82,7 +82,7 @@ export class LogisticsTaskManager {
       for(const location of this.storage.locations.values())if(this.storage.isStock(location)&&location.allowed.includes('stone'))areas.push({id:location.id,kind:'storage',x:location.x+(location.width-1)/2,y:location.y+(location.height-1)/2,goals:this.storage.goals(location)});
       // Sites extend the collection area, not the material ownership rules:
       // fresh loose stone still goes to normal storage before any site booking.
-      for(const site of this.scene.constructionSystem?.sites.values()??[])if(!site.unverified&&(buildingDefinition(site).cost.stone??0)>0){const location=this.storage.locations.get(`site-${site.id}`);if(location)areas.push({id:location.id,kind:'site',...centre(site),goals:this.storage.goals(location)});}
+      for(const site of this.scene.constructionSystem?.sites.values()??[])if(!site.unverified&&(site.materialSupply?.required?.stone??buildingDefinition(site).cost.stone??0)>0){const location=this.storage.locations.get(`site-${site.id}`);if(location)areas.push({id:location.id,kind:'site',...centre(site),goals:this.storage.goals(location)});}
       cache=this.stoneAreaCache={expires:now+LOGISTICS_RULES.planningInterval,revision,areas,regions:new Map()};
     }
     const start=worker.nextTile??worker.tile,key=tileKey(start);let region=cache.regions.get(key);

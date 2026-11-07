@@ -56,6 +56,7 @@ import { horseWagonSmoke } from './horse-wagon-smoke.mjs';
 import { housingSmoke } from './housing-smoke.mjs';
 import { forestrySmoke,forestryHutSmoke } from './forestry-smoke.mjs';
 import { gettingStartedSmoke } from './getting-started-smoke.mjs';
+import { buildingCostsSmoke } from './building-costs-smoke.mjs';
 
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
@@ -132,6 +133,7 @@ try{
   // A New Game from the setup opens Getting started once (0.9.3); the scenario below starts with it closed.
   await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');assert.equal(await page.locator('#help-dialog').evaluate(d=>d.open),false);
   if(args.includes('--full')||args.includes('--getting-started'))await gettingStartedSmoke(context,origin+base,instrument);
+  if(args.includes('--full')||args.includes('--building-costs'))await buildingCostsSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--ledger'))await ledgerSmoke(page);
   if(args.includes('--full')||args.includes('--smelting'))await smeltingSmoke(page);
   if(args.includes('--full')||args.includes('--military'))await militarySmoke(page);

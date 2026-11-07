@@ -1,5 +1,5 @@
 import { buildingDefinition,buildingIsComplete } from './buildings.js';
-import { demolitionRefund } from '../data/demolition.js';
+import { buildingDemolitionRefund } from '../data/demolition.js';
 
 // Shared collision/render cleanup. Callers must first preserve contents and enforce their own removal policy.
 // Starter Stockpile uses its empty-store policy; demolition uses completed physical Builder work.
@@ -17,7 +17,7 @@ export function removeBuildingShell(scene,building,{maximumWear=false}={}){
 const equal=(a,b)=>JSON.stringify(Object.entries(a).sort())===JSON.stringify(Object.entries(b).sort());
 export function finishDemolition(scene,building,refund){
   const record=building?.demolition,d=building&&buildingDefinition(building),system=scene.demolition;
-  if(!system?.eligible(building)||!buildingIsComplete(building)||!record||record.workDone<record.requiredWork||!equal(refund,record.refund)||!equal(refund,demolitionRefund(d))||system.roofBlocked(building))return false;
+  if(!system?.eligible(building)||!buildingIsComplete(building)||!record||record.workDone<record.requiredWork||!equal(refund,record.refund)||!equal(refund,buildingDemolitionRefund(building,d))||system.roofBlocked(building))return false;
   const storage=scene.foodStorage,locations=[...storage.locations.values()].filter(l=>l.buildingId===building.id),ids=new Set(locations.map(l=>l.id));
   // A completed vehicle is a physical vehicle, never an ordinary resource refund or a deleted recipe buffer.
   scene.vehicles?.rollOut();

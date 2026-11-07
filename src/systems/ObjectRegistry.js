@@ -1,4 +1,5 @@
 import { validateWorkplaceOverrides,readWorkplaceAuthoring } from '../data/workplaceAuthoring.js';
+import { validateCostOverrides,readBuildingCosts,sameCost } from '../data/buildingCostAuthoring.js';
 import { validStaffing } from '../data/workplaces.js';
 import { objectDefinitions } from '../data/objects/index.js';
 import { JOBS,SKILL_IDS } from '../data/jobs.js';
@@ -118,7 +119,7 @@ export function validateDefinition(definition) {
 }
 
 export class ObjectRegistry {
-  constructor(definitions = []) { this.definitions = new Map(); this.listeners = new Set(); this.registerAll(definitions);this.workplaceDefaults=new Map(this.all().filter(d=>d.workplace).map(d=>[d.id,d.workplace]));this.workplaceOverrides={}; }
+  constructor(definitions = []) { this.definitions = new Map(); this.listeners = new Set(); this.registerAll(definitions);this.workplaceDefaults=new Map(this.all().filter(d=>d.workplace).map(d=>[d.id,d.workplace]));this.workplaceOverrides={};this.costDefaults=new Map(this.buildables().map(d=>[d.id,d.cost]));this.costOverrides={}; }
 
   registerAll(definitions) {
     const pending = new Map();
@@ -152,6 +153,18 @@ export class ObjectRegistry {
     for(const [id,definition]of pending)this.definitions.set(id,definition);
     this.workplaceOverrides=structuredClone(overrides);for(const listener of this.listeners)listener();return overrides;
   }
+  // Resources a building price may use: what the HUD counts (collectible), without vehicles and equipment.
+  costResources(){return this.byCategory('resource').filter(d=>d.collectible&&!['vehicle','equipment'].includes(d.resourceCategory));}
+  // Asset Library prices (#91): each override replaces the whole price of a buildable building; the rest keep defaults.
+  configureCosts(input){
+    const overrides=validateCostOverrides(input,this.costDefaults,new Set(this.costResources().map(d=>d.id))),pending=new Map();
+    for(const [id,base]of this.costDefaults){
+      const current=this.require(id),cost=overrides[id]??base;if(sameCost(current.cost,cost))continue;
+      const definition={...current,cost};validateDefinition(definition);pending.set(id,freezeDeep(definition));
+    }
+    for(const [id,definition]of pending)this.definitions.set(id,definition);
+    this.costOverrides=structuredClone(overrides);if(pending.size)for(const listener of this.listeners)listener();return overrides;
+  }
   register(definition) { this.registerAll([definition]); return this.require(definition.id); }
   get(id) { return this.definitions.get(id) ?? null; }
   require(id) { const d = this.get(id); if (!d) throw new Error(`Neznámý objekt: ${id}`); return d; }
@@ -166,3 +179,4 @@ export const objectRegistry = new ObjectRegistry(objectDefinitions);
 
 // Per-browser authored data is loaded before any game/save validation, never from a save.
 try{const authored=readWorkplaceAuthoring(globalThis.localStorage);if(authored)objectRegistry.configureWorkplaces(authored);}catch{/* Invalid authoring cannot prevent a new game with defaults. */}
+try{const costs=readBuildingCosts(globalThis.localStorage);if(costs)objectRegistry.configureCosts(costs);}catch{/* Invalid prices cannot prevent a new game with default prices. */}

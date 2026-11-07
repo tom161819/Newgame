@@ -1,6 +1,7 @@
 import { dataName } from '../i18n/names.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { pavementWorkArea } from '../game/pavement.js';
+import { paidCost } from '../data/demolition.js';
 
 // Site stock is part of the same physical storage ledger as warehouses. The
 // requirement is a recipe, not another copy of the invested resources.
@@ -10,7 +11,8 @@ export class ConstructionMaterialsSystem {
   get enabled(){return !!this.storage?.physicalMaterials;}
   site(id){return this.scene.buildings.find(b=>b.id===id&&!buildingIsComplete(b))??null;}
   owner(id){return `site-${id}`;}
-  required(building){return Object.fromEntries(Object.entries(buildingDefinition(building).cost).filter(([id])=>this.storage.manages(id)));}
+  // The price booked by the site (investedMaterials) once it exists; before that today's price.
+  required(building){return Object.fromEntries(Object.entries(paidCost(building,buildingDefinition(building))).filter(([id])=>this.storage.manages(id)));}
   location(building){
     const id=this.owner(building.id),d=buildingDefinition(building);let location=this.storage.locations.get(id);
     const area=this.area(building);
