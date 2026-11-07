@@ -28,17 +28,24 @@ export class ProductionDiagnostics {
   changed(){this.revision++;for(const listener of this.listeners)listener();}
   residents(profession){return this.scene.workerSystem.liveSubjects().filter(w=>w.profession===profession&&(!w.commandState||w.commandState.state==='Working'));}
   hasBuilding(type){return this.scene.buildings.some(b=>b.type===type&&buildingIsComplete(b));}
-  // Construction: a supplied site nobody can build, because the kingdom has no Builder.
+  // Builders who can build now: on their job (no Move/Hold order), not striking and not leaving the kingdom. Builders
+  // without a Builder's Workshop place count (they only work slower – that has its own notice).
+  availableBuilders(){const needs=this.scene.needs?.records;return this.residents('builder').filter(w=>{const r=needs?.get?.(w.id);return !r?.strike&&!r?.leaving;}).length;}
+  // Construction: one kingdom notice while any construction waits and no Builder can build it. It no longer waits for
+  // the materials: with physical delivery a site never gets its materials when nobody delivers them, so the old
+  // check (supplied sites only, C04) never fired in a new game. Fields wait for their Farmer instead.
   constructionIssues(){
     const c=this.scene.constructionSystem;if(!c)return [];
-    const found=[],builders=this.residents('builder').length;
+    const found=[],builders=this.availableBuilders(),waiting=[];
     for(const site of c.sites.values()){
-      if(site.unverified||!c.materials.ready(site)||site.construction.assignedBuilders.length)continue;
+      if(site.unverified||site.demolition||site.construction.assignedBuilders.length)continue;
       if(buildingDefinition(site).crop){
+        if(!c.materials.ready(site))continue;
         const home=this.scene.buildings.find(b=>b.id===site.farmId),farmers=home&&this.residents('farmer').some(w=>w.assignedWorkplaceId===home.id);
         if(!home||!farmers)found.push({entityId:site.id,reason:home?'noFarmer':'noFarm',category:'construction',params:{}});
-      }else if(!builders)found.push({entityId:site.id,reason:'noBuilder',category:'construction',params:{}});
+      }else waiting.push(site);
     }
+    if(!builders&&waiting.length){const first=waiting.reduce((a,b)=>a.id<=b.id?a:b);found.push({entityId:first.id,reason:'noBuilder',category:'construction',params:{count:waiting.length}});}
     return found;
   }
   // Production: a staffed building switched on that lacks an input, with the nearest cause that can be checked.

@@ -4,14 +4,16 @@ import { placeBlueprint } from './building-menu-smoke.mjs';
 export async function noticesSmoke(page){
   await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('stone',10);s.updateInventory();});
   const site=await placeBlueprint(page,'tower');
+  // No Builder in the kingdom: one notice right away, before any materials arrive (the C04 check waited for them, so it
+  // never fired in a new game where nobody delivers). Made to last now instead of waiting the 10 s in game time.
   const notice=await page.evaluate(id=>{
-    const s=window.__game.registry.get('application').scene,d=s.diagnostics,materials=s.constructionSystem.materials,ready=materials.ready;
-    // Supplied (the delivery itself is covered by the construction smokes) and lasting: report it now.
-    materials.ready=site=>site.id===id||ready.call(materials,site);d.nextCheck=0;d.update();
-    const issue=d.issues.get(`${id}:noBuilder`);issue.firstSeen-=60000;d.nextCheck=0;d.update();window.__noticeRestore=()=>{materials.ready=ready;};return {reason:issue.reason,reported:issue.lastNotified!=null};
+    const s=window.__game.registry.get('application').scene,d=s.diagnostics;window.__noticeRestore=()=>{};
+    d.nextCheck=0;d.update();const issue=d.issues.get(`${id}:noBuilder`);issue.firstSeen-=60000;d.nextCheck=0;d.update();return {reason:issue.reason,reported:issue.lastNotified!=null,ready:s.constructionSystem.materials.ready(s.buildings.find(b=>b.id===id))};
   },site.id);
-  assert.deepEqual(notice,{reason:'noBuilder',reported:true});
-  await page.locator('#notices-panel:not([hidden])').waitFor();assert.match(await page.locator('#notices-list').textContent(),/Stone Tower: construction waiting, no Builder available/);
+  assert.deepEqual(notice,{reason:'noBuilder',reported:true,ready:false});
+  await page.locator('#notices-panel:not([hidden])').waitFor();assert.match(await page.locator('#notices-list').textContent(),/No builders – assign a villager to the Builder profession \(1 construction\(s\) waiting\)/);
+  if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/no-builder-notice.png`});
+  await page.locator('#notices-list .notice-text').first().click();await page.locator('#employment-panel:not([hidden])').waitFor();await page.locator('#close-employment').click();
   await page.locator('[data-notice-category="construction"]').click();assert.equal(await page.locator('#notices-list li').count(),0);assert.equal(await page.locator('[data-notice-category="construction"]').getAttribute('aria-pressed'),'false');
   await page.locator('[data-notice-category="construction"]').click();assert.equal(await page.locator('#notices-list li').count(),1);
   await page.locator('[data-dismiss-notice]').click();assert.equal(await page.locator('#notices-list li').count(),0);assert.equal(await page.locator('#notices-panel').isHidden(),true);

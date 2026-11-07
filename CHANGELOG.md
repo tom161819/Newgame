@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.29.1] - 2026-11-07
+<!-- version: {"title":"No-builders notice is back","type":"fix","reconstructed":false,"saveVersion":54} -->
+### Fixed
+- The "no builders" notice is back. As soon as a construction waits and no Builder can work, because there is none or all are on strike, the Notices box shows "No builders – assign a villager to the Builder profession". Clicking it opens Employments. It had stopped appearing because it waited for the construction materials, and in a new game nobody delivers them.
+
 ## [0.29.0] - 2026-11-07
 <!-- version: {"title":"Children and the Village Green","type":"feature","reconstructed":false,"saveVersion":54} -->
 ### Added

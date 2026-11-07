@@ -44,9 +44,9 @@ test('a Mill without Wheat names the nearest real cause; paused, unstaffed or st
   const empty=building(s,'mill',60,45);advance(s,DIAGNOSTICS.persistence*2);assert.equal(s.diagnostics.active().some(i=>i.entityId===empty.id),false,'an unstaffed mill is not told to produce');
 });
 
-test('two identical buildings keep separate issues; 120 buildings are checked cheaply',()=>{
+test('two waiting sites without a Builder make one kingdom notice that counts them; 120 buildings are checked cheaply',()=>{
   const s=scene();for(let i=0;i<2;i++)building(s,'tower',60+i*4,50,{blueprint:true});advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);
-  assert.equal(new Set(s.diagnostics.active().map(i=>i.key)).size,2);
+  assert.equal(s.diagnostics.active().length,1);assert.equal(s.diagnostics.active()[0].params.count,2);
   for(let i=0;i<118;i++)building(s,'wall',5+(i%40)*2,5+Math.floor(i/40)*2,{blueprint:true});
   const started=performance.now();advance(s,DIAGNOSTICS.checkInterval*50);const perCheck=(performance.now()-started)/50;
   assert.ok(perCheck<20,`one check of 120 sites took ${perCheck.toFixed(2)} ms`);
@@ -79,4 +79,15 @@ test('Bakery requires a completed Mill; existing predecessors and reloaded build
 test('C04 actual blockers take precedence over structural advice without duplicating the panel row',()=>{
  const s=scene(),mill=building(s,'mill',54,45);s.activities.emit('buildingCompleted',{objectIds:[mill.id]});employ(s,mill,'miller');advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);
  assert.equal(s.diagnostics.active().length,1);assert.equal(s.diagnostics.active()[0].reason,'noProducer');s.foodProduction.records.get(mill.id).auto=false;advance(s,DIAGNOSTICS.checkInterval);assert.deepEqual(reasons(s),['missingChainSource']);
+});
+
+test('no Builder: one kingdom notice even before any materials arrive, gone with a Builder, back when all Builders strike; a click opens Employments',()=>{
+  const s=scene();const site=building(s,'tower',60,50,{blueprint:true});building(s,'tower',64,50,{blueprint:true});
+  // Physical delivery: nobody has brought the materials yet (no Haulers, no Builders).
+  s.constructionSystem.materials.ready=()=>false;assert.equal(s.constructionSystem.materials.ready(site),false);
+  advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);const notices=s.diagnostics.active().filter(i=>i.reason==='noBuilder');
+  assert.equal(notices.length,1,'one notice for the kingdom');assert.equal(notices[0].params.count,2);
+  const builder=employ(s,null,'builder');advance(s,DIAGNOSTICS.checkInterval);assert.ok(!reasons(s).includes('noBuilder'),'a Builder is available');
+  s.needs.records.set(builder.id,{...(s.needs.records.get(builder.id)??{food:100,rest:100}),strike:true});advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(reasons(s).includes('noBuilder'),'every Builder strikes');
+  s.needs.records.get(builder.id).strike=false;advance(s,DIAGNOSTICS.checkInterval);assert.ok(!reasons(s).includes('noBuilder'));
 });

@@ -16,14 +16,14 @@ export class NoticesPanel {
     this.panel.addEventListener('click',event=>{
       const dismiss=event.target.closest('[data-dismiss-notice]')?.dataset.dismissNotice;if(dismiss){scene.diagnostics.dismiss(dismiss);return;}
       const category=event.target.closest('[data-notice-category]')?.dataset.noticeCategory;if(category){if(this.muted.has(category))this.muted.delete(category);else this.muted.add(category);try{localStorage.setItem(MUTED_KEY,JSON.stringify([...this.muted]));}catch{/* still works without storage */}this.render();return;}
-      const open=event.target.closest('[data-notice-entity]')?.dataset.noticeEntity;if(open)this.openEntity(Number(open));
+      const target=event.target.closest('[data-notice-entity]');if(target?.dataset.noticeReason==='noBuilder'&&scene.employmentPanel){scene.employmentPanel.open();return;}const open=target?.dataset.noticeEntity;if(open)this.openEntity(Number(open));
     },options);
     this.unsubscribe=scene.diagnostics.onChange(()=>this.render());this.render();
   }
   text(issue){
     const s=this.scene,building=s.buildings.find(b=>b.id===issue.entityId),name=building?buildingDefinition(building).name:'',p=issue.params??{};
     const resource=p.resource?s.objectRegistry.get(p.resource)?.name??p.resource:'',producer=p.producer?s.objectRegistry.get(p.producer)?.name??p.producer:'',profession=p.profession?JOBS[p.profession]?.name??p.profession:'';
-    return t(`notice.${issue.reason}`,{name,resource,producer,profession});
+    return t(`notice.${issue.reason}`,{name,resource,producer,profession,count:p.count??1});
   }
   openEntity(id){
     const s=this.scene,building=s.buildings.find(b=>b.id===id);if(!building||!s.fog.isVisibleObject(building))return;
@@ -34,7 +34,7 @@ export class NoticesPanel {
     this.filters.replaceChildren(...NOTICE_CATEGORIES.map(category=>{const button=element('button','notice-filter',t(`notice.category.${category}`));button.type='button';button.dataset.noticeCategory=category;button.setAttribute('aria-pressed',String(!this.muted.has(category)));return button;}));
     this.list.replaceChildren(...visible.map(issue=>{
       const row=element('li',`notice notice-${issue.category}`),open=element('button','notice-text',this.text(issue)),close=element('button','notice-dismiss','×');
-      open.type=close.type='button';open.dataset.noticeEntity=issue.entityId;close.dataset.dismissNotice=issue.key;close.setAttribute('aria-label',t('notice.dismiss'));row.dataset.noticeKey=issue.key;row.append(open,close);return row;
+      open.type=close.type='button';open.dataset.noticeEntity=issue.entityId;open.dataset.noticeReason=issue.reason;close.dataset.dismissNotice=issue.key;close.setAttribute('aria-label',t('notice.dismiss'));row.dataset.noticeKey=issue.key;row.append(open,close);return row;
     }));
     // The panel stays visible while categories are muted so they can be switched back on.
     this.panel.hidden=!visible.length&&!this.muted.size;
