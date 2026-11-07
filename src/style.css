@@ -859,3 +859,24 @@ tr[data-resource-group="gold"] { background:var(--group-gold); } tr[data-resourc
 tr[data-resource-group="foodRaw"] { background:var(--group-foodRaw); } tr[data-resource-group="food"] { background:var(--group-food); }
 tr[data-resource-group="equipment"] { background:var(--group-equipment); }
 .market-good-icon { width:16px; height:16px; margin-right:5px; vertical-align:-3px; object-fit:contain; }
+/* m-wiki-napoveda: the Wiki window and the small "i" on feed lines and notices. */
+.wiki-toggle { min-width:auto; padding:0 9px; font-weight:600; }
+.wiki-dialog { width:min(860px,calc(100vw - 24px)); max-height:min(640px,calc(100vh - 40px)); padding:12px 14px; }
+.wiki-dialog .dialog-heading { display:flex; gap:10px; align-items:center; }
+.wiki-dialog #wiki-search { flex:1; max-width:280px; }
+.wiki-body { display:grid; grid-template-columns:230px 1fr; gap:14px; min-height:360px; max-height:calc(min(640px,100vh - 40px) - 70px); }
+.wiki-nav { overflow:auto; border-right:1px solid var(--line-soft); padding-right:8px; font-size:13px; }
+.wiki-nav ul { list-style:none; margin:4px 0 8px; padding:0 0 0 8px; }
+.wiki-nav summary { cursor:pointer; font-weight:600; color:var(--gold); margin:4px 0; }
+.wiki-link { color:var(--ink); text-decoration:none; } .wiki-link:hover, .wiki-link[aria-current="page"] { color:var(--gold); text-decoration:underline; }
+.wiki-page { overflow:auto; font-size:14px; line-height:1.5; }
+.wiki-page-category { color:var(--muted); text-transform:uppercase; letter-spacing:.06em; font-size:11px; }
+.wiki-page-title { display:flex; align-items:center; gap:8px; margin:2px 0 8px; }
+.wiki-icon { width:32px; height:32px; object-fit:contain; }
+.wiki-facts { display:grid; grid-template-columns:max-content 1fr; gap:3px 12px; margin:0 0 10px; }
+.wiki-facts dt { color:var(--muted); } .wiki-facts dd { margin:0; }
+.wiki-related a { color:var(--gold); }
+.wiki-back { margin-bottom:6px; padding:2px 8px; font-size:12px; }
+.wiki-info { display:inline-grid; place-items:center; width:16px; height:16px; min-width:0; min-height:0; padding:0; margin-left:4px; border-radius:50%; font:italic 700 11px/1 Georgia,serif; vertical-align:middle; pointer-events:auto; cursor:pointer; }
+.event-feed .wiki-info { pointer-events:auto !important; }
+@media (max-width:640px) { .wiki-body { grid-template-columns:1fr; } .wiki-nav { border-right:0; border-bottom:1px solid var(--line-soft); max-height:160px; } }

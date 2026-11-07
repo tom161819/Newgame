@@ -1,5 +1,7 @@
 import { t } from '../i18n/index.js';
 import { buildingDefinition } from '../game/buildings.js';
+import { wikiTopicForFeed } from '../data/wiki.js';
+import { wikiInfoButton } from './WikiPanel.js';
 
 // #105: a short, fading feed of notable events above the minimap. It listens to the existing sources (seasons, the
 // GameActivityBus, the population and the food system) instead of keeping a second event queue. Lasting work problems
@@ -26,7 +28,10 @@ export class EventFeed {
   push(key,text,{important=false}={}){
     if(this.seen.has(key))return false;this.seen.add(key);
     const entry={key,text,important,expireAt:this.now()+(important?FEED.importantLifeMs:FEED.lifeMs),node:null};
-    if(this.list){entry.node=this.list.ownerDocument.createElement('li');entry.node.className=`feed-entry${important?' important':''}`;entry.node.textContent=text;this.list.prepend(entry.node);}
+    if(this.list){entry.node=this.list.ownerDocument.createElement('li');entry.node.className=`feed-entry${important?' important':''}`;entry.node.textContent=text;
+      // m-wiki-napoveda: lines with a Wiki topic get a small "i".
+      const topic=wikiTopicForFeed(key);if(topic&&this.scene.wikiPanel)entry.node.append(' ',wikiInfoButton(this.scene,topic,this.list.ownerDocument));
+      this.list.prepend(entry.node);}
     this.entries.unshift(entry);while(this.entries.length>FEED.maxEntries)this.remove(this.entries.at(-1));
     return true;
   }

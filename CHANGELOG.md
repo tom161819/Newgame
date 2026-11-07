@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.57.0] - 2026-11-08
+<!-- version: {"title":"Wiki","type":"feature","reconstructed":false,"saveVersion":58} -->
+### Added
+- A Wiki next to the ? button, with search and categories. Buildings, resources and professions have pages built from the game's data. Hand-written pages cover rats and cats, hunting dogs, fire, needs and happiness, taxes, trade, winter and builders.
+- Messages and notices about these topics have a small i that opens the matching Wiki page.
+- When rats first appear, a tip suggests getting a cat.
+
+
 ## [0.56.0] - 2026-11-08
 <!-- version: {"title":"Animals 2","type":"feature","reconstructed":false,"saveVersion":58} -->
 ### Changed

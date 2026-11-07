@@ -8,7 +8,7 @@ export const DEFAULT_GAME_SETTINGS=Object.freeze({difficulty:'normal',wildlifePo
   // m-start-v2: 2 Soldiers and 2 Archers at the start (New Game proposes it; scenarios and older settings start without).
   startingGarrison:false});
 // Owner request 7 Nov 2026: the New Game Setup proposes a built Castle (can be switched off), Gold at its limit (500)
-// and 40 of each starting resource, which fills the Starter Stockpile (4 × 40 = 160). DEFAULT_GAME_SETTINGS stays the
+// and starting resources that fill the Starter Stockpile (m-start-v2: 40 Stone + 60 Wood + 200 Bread = 300). DEFAULT_GAME_SETTINGS stays the
 // neutral base for older saves and automated scenarios.
 export const NEW_GAME_DEFAULTS=Object.freeze({...DEFAULT_GAME_SETTINGS,startingCastle:true,startingGold:500,startingStone:40,startingWood:60,startingIronOre:0,startingBread:200,startingGarrison:true});
 // Physical goods placed once in the Starter Stockpile; their total fits its capacity.

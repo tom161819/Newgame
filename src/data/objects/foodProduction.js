@@ -8,7 +8,7 @@ export const foodBuildings=[
   {id:'bakery',name:'Bakery',menuOrder:70,recommendsCompletedBuildings:['mill'],width:3,height:2,cost:{stone:10,wood:10},constructionTime:25000,visualHeight:110,
     workplace:WORKPLACES.bakery,recipe:FOOD_RECIPES.bakery,description:'Two Bakers turn 2 Flour into 4 Bread with 30 seconds of active work and physical deliveries.'},
   {id:'granary',name:'Granary',menuOrder:10,width:3,height:3,cost:{wood:12},constructionTime:30000,visualHeight:125,
-    storage:{capacity:GRANARY_GROUP_CAPACITY.raw,resources:FOOD_RESOURCE_IDS},description:'A physical store with separate room for 200 raw inputs and 200 finished food units. Haulers serve every store in the kingdom.'},
+    storage:{capacity:GRANARY_GROUP_CAPACITY.raw,resources:FOOD_RESOURCE_IDS},description:'A physical store with separate room for 1000 raw inputs and 1000 finished food units. Haulers serve every store in the kingdom.'},
 ].map(d=>({...d,category:'building',buildingCategory:'food',sprite:`/assets/buildings/${d.id}/${d.id}.svg`,walkable:false,collectible:false,buildable:true,
   interactions:d.storage?['inspect_storage']:['manage_workers'],renderMode:'procedural',renderer:'food_building',origin:{x:.5,y:.9},depth:{offset:0},
   bufferCapacity:d.recipe?FOOD_RULES.bufferCapacity:undefined,

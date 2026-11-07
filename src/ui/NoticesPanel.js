@@ -1,3 +1,5 @@
+import { WIKI_NOTICE_TOPICS } from '../data/wiki.js';
+import { wikiInfoButton } from './WikiPanel.js';
 import { hireUnemployed } from './jobChange.js';
 import { t } from '../i18n/index.js';
 import { NOTICE_CATEGORIES } from '../data/diagnostics.js';
@@ -35,7 +37,9 @@ export class NoticesPanel {
       const row=element('li',`notice notice-${issue.category}`),open=element('button','notice-text',this.text(issue)),close=element('button','notice-dismiss','×');
       open.type=close.type='button';open.dataset.noticeEntity=issue.entityId;open.dataset.noticeReason=issue.reason;close.dataset.dismissNotice=issue.key;close.setAttribute('aria-label',t('notice.dismiss'));row.dataset.noticeKey=issue.key;
       // A notice that one more Builder or Hauler fixes offers that hire right in the row.
-      const hire=NOTICE_HIRES[issue.reason];if(hire){const button=element('button','notice-action',t(`notice.hire.${hire}`));button.type='button';button.dataset.noticeAction=hire;row.append(open,button,close);}else row.append(open,close);return row;
+      const hire=NOTICE_HIRES[issue.reason];if(hire){const button=element('button','notice-action',t(`notice.hire.${hire}`));button.type='button';button.dataset.noticeAction=hire;row.append(open,button,close);}else row.append(open,close);
+      // m-wiki-napoveda: a notice with a Wiki topic has a small "i" that opens it.
+      const topic=WIKI_NOTICE_TOPICS[issue.reason];if(topic)close.before(wikiInfoButton(this.scene,topic));return row;
     }));
     // The panel stays visible while categories are muted so they can be switched back on.
     this.panel.hidden=!visible.length&&!this.muted.size;

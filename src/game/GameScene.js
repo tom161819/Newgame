@@ -157,6 +157,7 @@ import { RoyalGoals } from '../systems/RoyalGoals.js';
 import { RoyalGoalsPanel } from '../ui/RoyalGoalsPanel.js';
 import { CompletionFlash } from '../ui/CompletionFlash.js';
 import { StorePreview } from '../ui/StorePreview.js';
+import { WikiPanel } from '../ui/WikiPanel.js';
 import { bindSoundSetting } from '../ui/sound.js';
 
 export class GameScene extends Phaser.Scene {
@@ -307,7 +308,7 @@ export class GameScene extends Phaser.Scene {
     this.production=new ProductionSystem(this.gameTime,this.inventory,()=>this.buildings,(day,totals)=>this.onDailyIncome(day,totals));
     this.wageSystem=new WageSystem(this,{onPayroll:()=>this.updateInventory()});this.economyPanel=new EconomyPanel(this);
     this.buildingBar.close();this.updateInventory();
-    this.gettingStarted=new GettingStartedPanel(this);
+    this.gettingStarted=new GettingStartedPanel(this);this.wikiPanel=new WikiPanel(this);
     this.domestic=new DomesticAnimalSystem(this);this.combat.shield=(target,attacker)=>this.domestic?.shield(target,attacker);this.domesticViews=new DomesticViews(this,this.domestic);this.issueIcons=new IssueIcons(this);this.childrenSystem=new ChildrenSystem(this);this.porches=new PorchSystem(this);this.nightOverlay=new NightOverlay(this,this.dayNight);this.fuelIcons=new FuelIcons(this);this.fireViews=new FireViews(this);this.kingdomOverview=new KingdomOverview(this);this.speedControls=new SpeedControls(this);this.tutorial=new TutorialGuide(this);this.royalGoals=new RoyalGoals(this);this.royalGoalsPanel=new RoyalGoalsPanel(this,this.royalGoals);this.completionFlash=new CompletionFlash(this);this.storePreview=new StorePreview(this);this.soundController=new AbortController();bindSoundSetting(document,this.soundController.signal);this.helpArrow=new HelpArrow(this);this.nightControls=new NightControls(this);this.dayNight.attention=()=>!!this.nightThreats?.wolvesNear||!!this.nightThreats?.fires.size||[...this.combat.attacks.keys()].some(attacker=>attacker.profession===undefined&&attacker!==this.character);this.childViews=new ChildViews(this,this.childrenSystem);this.villagePanel=new VillagePanel(this);this.catPanel=new CatPanel(this);
     this.marketplacePanel=new MarketplacePanel(this);this.builderWorkshopPanel=new BuilderWorkshopPanel(this);this.policyPanel=new PolicyPanel(this);this.sideCards=new SideCards(this);
     this.updateTimeDisplay();
@@ -361,7 +362,7 @@ export class GameScene extends Phaser.Scene {
       this.settingsPanel.destroy();this.fpsOverlay.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
       this.clearWallPreviews();
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
-      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.royalGoalsPanel?.destroy();this.royalGoals?.destroy();this.completionFlash?.destroy();this.storePreview?.destroy();this.soundController?.abort();this.marketplacePanel.destroy();this.catPanel?.destroy();this.domesticViews?.destroy();this.domestic?.destroy();this.villagePanel?.destroy();this.issueIcons?.destroy();this.sideCards?.destroy();this.childViews?.destroy();this.childrenSystem?.destroy();this.porches?.destroy();this.lightFuel?.destroy();this.nightThreats?.destroy();this.fuelIcons?.destroy();this.fireViews?.destroy();this.kingdomOverview?.destroy();this.speedControls?.destroy();this.tutorial?.destroy();this.helpArrow?.destroy();this.nightOverlay?.destroy();this.nightControls?.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
+      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.wikiPanel?.destroy();this.royalGoalsPanel?.destroy();this.royalGoals?.destroy();this.completionFlash?.destroy();this.storePreview?.destroy();this.soundController?.abort();this.marketplacePanel.destroy();this.catPanel?.destroy();this.domesticViews?.destroy();this.domestic?.destroy();this.villagePanel?.destroy();this.issueIcons?.destroy();this.sideCards?.destroy();this.childViews?.destroy();this.childrenSystem?.destroy();this.porches?.destroy();this.lightFuel?.destroy();this.nightThreats?.destroy();this.fuelIcons?.destroy();this.fireViews?.destroy();this.kingdomOverview?.destroy();this.speedControls?.destroy();this.tutorial?.destroy();this.helpArrow?.destroy();this.nightOverlay?.destroy();this.nightControls?.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.pavementTool.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
       this.demolitionUI.destroy();this.demolition.destroy();this.farmConnections.destroy();this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
@@ -656,7 +657,7 @@ export class GameScene extends Phaser.Scene {
   updateInventory() { this.inventoryBar.update();this.updateBuildingUI();this.updateWorldCount();this.updateFoodDisplay();this.equipmentPanel?.refresh();this.economyPanel?.update(); }
   // Language switch during play: refresh every HUD text that is built in code.
   relabelUI(){
-    this.speedControls?.render();this.tutorial?.relabel();this.royalGoalsPanel?.relabel();
+    this.speedControls?.render();this.tutorial?.relabel();this.wikiPanel?.relabel();this.royalGoalsPanel?.relabel();
     this.updateTimeDisplay();this.updateFoodDisplay();this.updateWorldCount();this.updateMountUI?.();this.combatFeedback?.refresh();this.experienceFeedback?.refresh();this.workerSystem?.updateUI();this.inventoryBar?.update();this.gettingStarted?.relabel();this.marketplacePanel?.relabel();this.policyPanel?.render();this.buildingBar?.selectCategory?.(this.buildingBar.category);if(this.populationSidebar){this.populationSidebar.renderOptions();this.populationSidebar.lastRefresh=-Infinity;}this.updateBuildingUI();
     if(this.worldCamera?.following)document.querySelector('#camera-mode').textContent=t('hud.cameraKing');
   }

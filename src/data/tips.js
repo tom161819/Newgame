@@ -9,4 +9,6 @@ export const TIPS=Object.freeze([
   {id:'dog',target:'dog'},
   {id:'caravan',target:null},
   {id:'winter',target:'#season-weather'},
+  // m-wiki-napoveda (33): the first rats – get a cat; "More" opens the Wiki on Rats & Cats.
+  {id:'rats',target:'#notices-panel',wiki:'rats'},
 ].map(tip=>Object.freeze(tip)));

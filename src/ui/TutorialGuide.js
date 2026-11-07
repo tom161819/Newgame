@@ -43,7 +43,7 @@ export class TutorialGuide {
   skip(){const p=this.progress();if(p.current)this.skipped.add(p.current.id);this.update(true);}
   pendingBuilding(step){const types=new Set(this.scene.buildings.map(b=>b.type));return step.buildingIds?.find(id=>!types.has(id))??step.buildingIds?.[0];}
   showMe(){
-    if(this.tip){this.closeTip();this.scene.gettingStarted?.show();return;}
+    if(this.tip){const wiki=this.tip.wiki;this.closeTip();if(wiki&&this.scene.wikiPanel)this.scene.wikiPanel.open(wiki);else this.scene.gettingStarted?.show();return;}
     const s=this.scene,step=this.progress().current;if(!step)return;
     if(step.id==='builder'){s.populationSidebar?.setOpen(true);return;}
     if(step.id==='speed'){s.speedControls?.setSpeed(2);this.next();return;}
@@ -127,6 +127,7 @@ export class TutorialGuide {
       case 'dog':return [...(s.domestic?.dogs?.values?.()??[])].some(d=>d.state==='stray');
       case 'caravan':return !!s.caravans?.active;
       case 'winter':return s.seasons?.enabled!==false&&s.seasons?.season==='Winter';
+      case 'rats':return (s.domestic?.foodLocations?.()??[]).some(l=>(s.domestic.ratsAt(l.id)??0)>=1)&&![...(s.domestic?.cats?.values?.()??[])].some(c=>c.buildingId!=null);
       default:return false;
     }
   }
