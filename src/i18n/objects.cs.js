@@ -3,6 +3,7 @@ export default {
   'object.grass.name':'Tráva','object.grass.description':'Suchá tráva na průchozím izometrickém políčku.',
   'object.dirt.name':'Hlína','object.dirt.description':'Udusaná zem a písčité odstíny krajiny.',
   'object.grass_normal.name':'Tráva — neporušená','object.grass_normal.description':'Původní vysoká tráva.',
+  'object.grass_trodden.name':'Tráva — ušlapaná','object.grass_trodden.description':'Tmavě zelená stopa v trávě po prvních průchodech; ještě bez hlíny a bez zrychlení.',
   'object.grass_trampled_1.name':'Tráva — sešlapaná 1','object.grass_trampled_1.description':'Lehce sešlapaná tráva od pěti průchodů. Rychlost +5 %.',
   'object.grass_trampled_2.name':'Tráva — sešlapaná 2','object.grass_trampled_2.description':'Travnatohlinitá pěšina od patnácti průchodů. Rychlost +10 %.',
   'object.grass_trampled_3.name':'Tráva — sešlapaná 3','object.grass_trampled_3.description':'Výrazná hlinitá cesta od třiceti průchodů. Rychlost +15 %.',

@@ -36,7 +36,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=43;
+export const SAVE_VERSION=44;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -386,7 +386,7 @@ export function validateGameState(input,registry=objectRegistry){
     integer(w.lastDecayDay,1,s.time.day);
     // S11 pavement: sorted unique tile indices on open, non-rock ground.
     array(w.paved,COLUMNS*ROWS);for(let i=0;i<w.paved.length;i++){integer(w.paved[i],0,COLUMNS*ROWS-1);if(i)check(w.paved[i]>w.paved[i-1]);check(open(w.paved[i]%COLUMNS,Math.floor(w.paved[i]/COLUMNS)));}
-    for(let i=0;i<COLUMNS*ROWS;i++){integer(w.scores[i]);integer(w.levels[i],0,3);integer(w.lastPassDays[i],0,s.time.day);check(w.levels[i]===wearLevel(w.scores[i]));if(w.scores[i])check(w.lastPassDays[i]>0);}
+    for(let i=0;i<COLUMNS*ROWS;i++){integer(w.scores[i]);integer(w.levels[i],0,4);integer(w.lastPassDays[i],0,s.time.day);check(w.levels[i]===wearLevel(w.scores[i]));if(w.scores[i])check(w.lastPassDays[i]>0);}
   }
   number(s.camera?.zoom,MIN_ZOOM,MAX_ZOOM);number(s.camera.x,-1e6,1e6);number(s.camera.y,-1e6,1e6);check(typeof s.camera.following==='boolean');
   check(typeof s.settings?.fogOfWar==='boolean');if(s.settings.pathWearDebug!==undefined)check(typeof s.settings.pathWearDebug==='boolean');const c=s.commands;check(c);check(c.hunt==null||aIds.has(c.hunt));check(c.mount==null||aIds.has(c.mount));

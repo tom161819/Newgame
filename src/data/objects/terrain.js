@@ -8,10 +8,11 @@ const seasonTiles=name=>[0,1,2,3].map(i=>`/assets/terrain/grass/seasons/season-g
 const GRASS_SEASONS={Spring:seasonTiles('spring'),Autumn:seasonTiles('autumn'),Winter:seasonTiles('snow')};
 const wearSurfaces=[
   {id:'grass_normal',name:'Grass — Normal',description:'Původní vysoká tráva.',color:'#74854b',edge:'#86975c',width:0,sprite:GRASS_TILES[0],variants:GRASS_TILES,artSource:'art/sprites/grass-ground/grass-ground-lush.v1.json'},
+  {id:'grass_trodden',name:'Grass — Trodden',description:'Ušlapaná tráva: tmavě zelená stopa po prvních průchodech, ještě bez hlíny.',color:'#33561c',edge:'#466b28',width:6,sprite:GRASS_TILES[0],artSource:'art/sprites/grass-ground/grass-ground-lush.v1.json'},
   {id:'grass_trampled_1',name:'Grass — Trampled 1',description:'Lehce sešlapaná tráva od pěti průchodů. Rychlost +5 %.',color:'#5b6f3a',edge:'#5f7840',width:6},
   {id:'grass_trampled_2',name:'Grass — Trampled 2',description:'Travnatohlinitá pěšina od patnácti průchodů. Rychlost +10 %.',color:'#62553b',edge:'#5c6a3c',width:10},
   {id:'grass_trampled_3',name:'Grass — Trampled 3',description:'Výrazná hlinitá cesta od třiceti průchodů. Rychlost +15 %.',color:'#4e4232',edge:'#55543a',width:14},
-].map((d,level)=>({id:d.id,name:d.name,description:d.description,category:'terrain',sprite:d.sprite??`/assets/terrain/path_wear/earth/worn-path-earth.v1.tile-${level}.png`,
+].map((d,level)=>({id:d.id,name:d.name,description:d.description,category:'terrain',sprite:d.sprite??`/assets/terrain/path_wear/earth/worn-path-earth.v1.tile-${level-1}.png`,
   ...(d.variants?{spriteVariants:d.variants,seasonVariants:GRASS_SEASONS}:{}),artSource:d.artSource??'art/sprites/worn-path/worn-path-earth.v1.json',
   width:1,height:1,walkable:true,collectible:false,buildable:false,cost:{},interactions:[],
   renderMode:'sprite',origin:{x:.5,y:.5},visualHeight:0,depth:{offset:-100},

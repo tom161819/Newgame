@@ -3,6 +3,7 @@ export default {
   'object.grass.name':'Grass','object.grass.description':'Dry grass on a walkable isometric tile.',
   'object.dirt.name':'Dirt','object.dirt.description':'Packed earth and sandy shades of the land.',
   'object.grass_normal.name':'Grass — Normal','object.grass_normal.description':'Original tall grass.',
+  'object.grass_trodden.name':'Grass — Trodden','object.grass_trodden.description':'A dark green track in the grass after the first passes; no soil yet, no speed bonus.',
   'object.grass_trampled_1.name':'Grass — Trampled 1','object.grass_trampled_1.description':'Lightly trampled grass after five passes. Speed +5 %.',
   'object.grass_trampled_2.name':'Grass — Trampled 2','object.grass_trampled_2.description':'A grassy earth path after fifteen passes. Speed +10 %.',
   'object.grass_trampled_3.name':'Grass — Trampled 3','object.grass_trampled_3.description':'A clear earth track after thirty passes. Speed +15 %.',

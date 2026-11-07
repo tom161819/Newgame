@@ -165,8 +165,8 @@ test('central pause retains independent menu/settings reasons and resumes only a
 
 test('wear scores, levels and last passage survive world save/load; old saves default to untouched grass',()=>{
   const s=fixture();for(let i=0;i<16;i++)s.pathWear.enter(s.character,{x:55,y:55});
-  const data=serializeGameState(s),r=restore(data);assert.deepEqual(r.pathWear.exportState(),s.pathWear.exportState());assert.equal(r.pathWear.level({x:55,y:55}),2);
-  for(const corrupt of [s=>s.pathWear.scores.pop(),s=>s.pathWear.levels[5555]=3,s=>s.pathWear.lastPassDays[5555]=999,s=>s.pathWear.lastDecayDay=999]){
+  const data=serializeGameState(s),r=restore(data);assert.deepEqual(r.pathWear.exportState(),s.pathWear.exportState());assert.equal(r.pathWear.level({x:55,y:55}),3);
+  for(const corrupt of [s=>s.pathWear.scores.pop(),s=>s.pathWear.levels[5555]=1,s=>s.pathWear.lastPassDays[5555]=999,s=>s.pathWear.lastDecayDay=999]){
     const bad=structuredClone(data);corrupt(bad);assert.throws(()=>validateGameState(bad));
   }
   const legacy=structuredClone(data);delete legacy.pathWear;delete legacy.settings.pathWearDebug;

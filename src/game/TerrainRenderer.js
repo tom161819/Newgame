@@ -8,6 +8,7 @@ import { VISIBILITY, FOG_STYLE } from '../systems/FogOfWarSystem.js';
 import { memoryTexture } from './memoryTexture.js';
 import { MEMORY_DIRECTIONS } from '../systems/MapMemory.js';
 import { GROUND, GROUND_TERRAIN_IDS, BUSH_TYPES } from '../data/worldTerrain.js';
+import { PathV2Layer } from './PathV2Layer.js';
 
 const CHUNK_SIZE = 10;
 const TILE_BLEED = .8;
@@ -16,7 +17,7 @@ const TILE_BLEED = .8;
 const SEASON_TINT={Spring:[95,145,65,.08],Summer:[185,159,70,.09],Autumn:[158,105,45,.17],Winter:[232,237,220,.83]};
 function mixTint(from,to,t){const a=SEASON_TINT[from],b=SEASON_TINT[to];if(!a||!b)return null;const c=a.map((v,i)=>v+(b[i]-v)*t);return`rgba(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])},${c[3].toFixed(3)})`;}
 
-const WINTER_VEIL=[0,1.9,1.3,1]; // light tracks fade most under snow
+const WINTER_VEIL=[0,2.2,1.9,1.3,1]; // light tracks fade most under snow
 function mixColour(a,b,t){const p=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)),x=p(a),y=p(b);return`rgb(${x.map((v,i)=>Math.round(v+(y[i]-v)*t)).join(',')})`;}
 // #100 Ground blending: along an edge to a ground that ranks higher (grass over desert over beach over shallow over
 // deep water), the neighbour's texture fades into this tile, so shores and the desert rim are soft, not diamond steps.
@@ -48,11 +49,15 @@ export class TerrainRenderer {
     this.seasonGrass=Object.fromEntries(Object.entries(grass?.seasonVariants??{}).map(([season,list])=>[season,list.map((_,i)=>`season-${season}-${i}`).filter(layer=>assets?.hasTexture(grass.id,layer)).map(layer=>assets.key(grass.id,layer))]).filter(([,keys])=>keys.length));
     this.groundKinds=GROUND_TERRAIN_IDS.map((id,code)=>code===GROUND.GRASS?null:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer)));
     this.bushSprites=new Map();this.bushPool=[];
+    // #116: paths are drawn by the V2 renderer (the owner's pesinav2 style); N12 stays as a developer fallback.
+    this.pathStyle='v2';this.v2=new PathV2Layer(this);
     this.wearTextures=PATH_WEAR.terrainIds.map(id=>({key:assets?.hasTexture(id)?assets.textureKey(id):this.groundTextures[0].key,variants:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer))}));
   }
 
   // A wear change can turn neighbours into (or out of) a trodden area, which reaches their own neighbours: repaint 5×5.
   setPathWear(system){this.wear=system;this.unsubscribeWear=system.subscribe(tile=>this.invalidateArea([tile],true,2));}
+  // Developer switch (console mkDev.setPathRenderer('n12'|'v2')): repaint every chunk with the other path renderer.
+  setPathStyle(style){if(!['v2','n12'].includes(style)||style===this.pathStyle)return false;this.pathStyle=style;this.v2?.invalidate();this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';return true;}
   setDebug(value){this.debugEnabled=!!value;this.lastView='';if(!value)this.debugGraphics.clear();}
   setSeason(season){if(season===this.season)return;this.season=season;this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
   // Whole chunks, repainted in one pass, give the same pixels as a fresh draw (season transition).
@@ -207,7 +212,10 @@ export class TerrainRenderer {
       // kamery se pak kreslí desítky bloků, ne tisíce samostatných obrázků.
       const texture = this.scene.textures.exists(key)?this.scene.textures.get(key):this.scene.textures.createCanvas(key, CHUNK_SIZE * 64, CHUNK_SIZE * 32);
       const context = texture.getContext();
-      const dirty=this.dirtyTiles.get(`${cx},${cy}`);
+      let dirty=this.dirtyTiles.get(`${cx},${cy}`);
+      // V2 paths are one continuous image per chunk: a partial repaint near a path would leave antialiased tile edges
+      // between old and new pixels, so a chunk with a dirty tile near a path is repainted whole (cached overlays, cheap).
+      if(dirty&&this.pathStyle==='v2'&&this.v2?.geo&&[...dirty].some(i=>this.v2.near(i%COLUMNS,Math.floor(i/COLUMNS))))dirty=null;
       if(!dirty)context.clearRect(0,0,texture.width,texture.height);
       // Ground first for every tile, tracks second: a neighbour's ground overlap can then never cover a track's edge.
       const paths=[];
@@ -251,7 +259,8 @@ export class TerrainRenderer {
           context.restore();
         }
       }
-      for(const p of paths){context.save();p.polygon(TILE_BLEED);context.clip();context.filter=p.filter;this.drawPaths(context,p.x,p.y,left,origin.y,p.veil,()=>{p.polygon();context.clip();});context.restore();}
+      if(this.pathStyle==='v2'&&this.v2)this.v2.drawChunk(context,cx,cy,left,origin.y,paths);
+      else for(const p of paths){context.save();p.polygon(TILE_BLEED);context.clip();context.filter=p.filter;this.drawPaths(context,p.x,p.y,left,origin.y,p.veil,()=>{p.polygon();context.clip();});context.restore();}
       // S11 Stone Pavement on top of ground and tracks; under Fog of War only the remembered surface is drawn.
       for(const p of paths){const paved=tile=>this.tileData(tile)[4]===1;if(!paved(p))continue;const c=tileCenter(p);context.save();context.filter=p.filter;
         drawCobbles(context,c.x-left,c.y-origin.y,{tileX:p.x,tileY:p.y,winter:p.veil>.3,edges:{N:!paved({x:p.x-1,y:p.y}),E:!paved({x:p.x,y:p.y-1}),S:!paved({x:p.x+1,y:p.y}),W:!paved({x:p.x,y:p.y+1})}});context.restore();}
@@ -345,6 +354,7 @@ export class TerrainRenderer {
   update(camera,fog=null,memory=this.memory) {
     this.fog=fog;this.memory=memory;
     this.updateFog(camera,fog);
+    if(this.wear&&this.pathStyle==='v2'){this.v2?.frame();this.v2?.refresh();}
     const view = camera.worldView;
     const cacheKey = [Math.floor(view.x / 16), Math.floor(view.y / 16), Math.ceil(view.width), Math.ceil(view.height),fog?`${fog.enabled}:${fog.explorationEnabled}`:'',this.debugEnabled?this.wear?.levelRevision??0:0,this.debugEnabled?this.wear?.revision:0,this.debugEnabled,this.scene.bushes?.size?`${this.scene.buildings?.length}:${this.scene.naturalResources?.topologyRevision}:${this.scene.resourceOccupancy?.size}:${this.wear?.levelRevision}`:''].join(',');
     // Performance: path wear repaints only its own tiles (invalidateArea), so it no longer re-walks every visible tile.
@@ -374,7 +384,7 @@ export class TerrainRenderer {
       if(p.x<view.x-padding||p.x>view.right+padding||p.y<view.y-padding||p.y>view.bottom+padding)continue;
       visibleCount++;
       if(this.debugEnabled&&this.wear?.isGrass({x,y})&&(!fog||fog.isVisibleTile({x,y}))){
-        const colors=[0x87a18a,0xc6cf75,0xdfac67,0xe38b57],level=this.wear.level({x,y});
+        const colors=[0x87a18a,0x7fbf6a,0xc6cf75,0xdfac67,0xe38b57],level=this.wear.level({x,y});
         this.debugGraphics.fillStyle(colors[level],level ? .36 : .08);this.debugGraphics.fillPoints([{x:p.x-31,y:p.y},{x:p.x,y:p.y-15},{x:p.x+31,y:p.y},{x:p.x,y:p.y+15}],true);
       }
       const chunk=Math.floor(y/CHUNK_SIZE)*64+Math.floor(x/CHUNK_SIZE);if(!chunkIds.has(chunk)){chunkIds.add(chunk);neededChunks.add(`${Math.floor(x/CHUNK_SIZE)},${Math.floor(y/CHUNK_SIZE)}`);}

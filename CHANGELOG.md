@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-11-07
+<!-- version: {"title":"Natural paths","type":"feature","reconstructed":false,"saveVersion":44} -->
+### Added
+- Paths look natural now. Trodden ground is drawn in the owner's chosen "pesinav2" style: paths bend gently and widen into trodden squares, and one wear level fades smoothly into the next.
+- A new first stage of wear: trampled grass, a dark green track that appears after a few passes, before the first soil path. It gives no speed bonus yet; the soil stages that follow keep their bonuses.
+
+### Changed
+- Saved games use a new format (44) for the four wear levels. Games saved by earlier versions cannot be loaded; start a new game.
+
 ## [0.15.0] - 2026-11-07
 <!-- version: {"title":"Fishing","type":"feature","reconstructed":false,"saveVersion":43} -->
 ### Added

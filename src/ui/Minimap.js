@@ -45,7 +45,7 @@ export function minimapPixels(scene,out){
       else{
         const [rock,level,knownSeason,,paved]=visible||!fog.enabled?liveTile:known??[0,0,season,0,0];
         const kind=visible||!fog.enabled?live[i]:remembered[i];
-        color=kind?KIND_COLOR[kind]:rock?MINIMAP_COLORS.rock:paved?MINIMAP_COLORS.paved:level>1?MINIMAP_COLORS.wear:MINIMAP_COLORS.groundType[groundGrid?.[y]?.[x]]??MINIMAP_COLORS.ground[knownSeason]??MINIMAP_COLORS.ground.Spring;
+        color=kind?KIND_COLOR[kind]:rock?MINIMAP_COLORS.rock:paved?MINIMAP_COLORS.paved:level>2?MINIMAP_COLORS.wear:MINIMAP_COLORS.groundType[groundGrid?.[y]?.[x]]??MINIMAP_COLORS.ground[knownSeason]??MINIMAP_COLORS.ground.Spring;
         if(!visible&&fog.enabled)color=mute(color);
       }
     }

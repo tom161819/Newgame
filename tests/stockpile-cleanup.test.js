@@ -24,9 +24,9 @@ test('only an empty, idle, visible Starter Stockpile after a completed Warehouse
 test('removal clears the real footprint once, leaves ordinary maximum wear, decays and survives current Save/Load',()=>{
  const s=scene(),b=starter(s);add(s,'warehouse');empty(s);const tiles=b.tiles.map(t=>({...t})),id=location(s).id,day=s.gameTime.day;
  assert.equal(s.foodStorage.dismantleStarter(b).removed,true);assert.equal(s.foodStorage.locations.has(id),false);assert.equal(s.buildings.includes(b),false);
- for(const tile of tiles){assert.equal(s.map[tile.y][tile.x],0);assert.equal(s.pathWear.level(tile),3);assert.equal(s.pathWear.lastPassDays[s.pathWear.index(tile)],day);}
+ for(const tile of tiles){assert.equal(s.map[tile.y][tile.x],0);assert.equal(s.pathWear.level(tile),4);assert.equal(s.pathWear.lastPassDays[s.pathWear.index(tile)],day);}
  assert.equal(s.foodStorage.dismantleStarter(b).removed,false);const state=validateGameState(serializeGameState(s)),r=scene({starter:false});loadGameState(r,state);
- assert.equal(starter(r),undefined);assert.equal(r.foodStorage.locations.has(id),false);for(const tile of tiles)assert.equal(r.pathWear.level(tile),3);
+ assert.equal(starter(r),undefined);assert.equal(r.foodStorage.locations.has(id),false);for(const tile of tiles)assert.equal(r.pathWear.level(tile),4);
  r.pathWear.onNewDay(day+PATH_WEAR.recoveryDelayDays+10);for(const tile of tiles)assert.equal(r.pathWear.level(tile),0);
  validateGameState(serializeGameState(s));
 });
