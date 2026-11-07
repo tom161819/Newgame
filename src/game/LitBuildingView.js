@@ -21,7 +21,9 @@ export class LitBuildingView {
   worldLights() { return this.lights.map(light => ({ ...light, x: this.base.x + light.x, y: this.base.y + light.y })); }
   drawFlames(seconds) {
     const g = this.flames.clear();
+    // A window light (flameSize 0, e.g. the castle keep) only glows: no flame is drawn.
     for (const light of this.worldLights()) {
+      if (!(light.flameSize > 0)) continue;
       const f = flicker(seconds * 1.6, light.flicker, light.seed), size = 7 * light.flameSize, sway = Math.sin(seconds * 9 + light.seed) * size * 0.1;
       g.fillStyle(FIRE.glow, 0.28); g.fillCircle(light.x, light.y - size * 0.35, size * 1.25 * f);
       g.fillStyle(FIRE.body, 0.95); g.fillEllipse(light.x + sway * 0.5, light.y - size * 0.4 * f, size * 0.95, size * 1.7 * f);

@@ -58,7 +58,7 @@ export function validateDefinition(definition) {
   if (d.artSprites !== undefined && (!plainObject(d.artSprites) || Object.entries(d.artSprites).some(([key, art]) => !/^[a-z][a-z0-9-]*$/.test(key) || !plainObject(art) || typeof art.sprite !== 'string' || !/^\/assets\/(?!.*\.\.)[^?#]+\.(png|webp)$/i.test(art.sprite) || !plainObject(art.origin) || ![art.origin.x, art.origin.y].every(finite)))) fail(id, 'neplatné schválené obrázky.');
   if (d.visual !== undefined && !plainObject(d.visual)) fail(id, 'neplatné vizuální parametry.');
   if (d.lights !== undefined && (!Array.isArray(d.lights) || d.lights.some(l => !plainObject(l) || typeof l.type !== 'string' || ![l.x, l.y, l.radius, l.intensity, l.flameSize].every(finite)
-    || !/^#[0-9a-f]{6}$/i.test(l.color) || l.radius <= 0 || l.intensity < 0 || l.flameSize <= 0 || !plainObject(l.flicker) || ![l.flicker.amplitude, l.flicker.speed].every(finite)))) fail(id, 'neplatný zdroj světla.');
+    || !/^#[0-9a-f]{6}$/i.test(l.color) || l.radius <= 0 || l.intensity < 0 || l.flameSize < 0 || !plainObject(l.flicker) || ![l.flicker.amplitude, l.flicker.speed].every(finite)))) fail(id, 'neplatný zdroj světla.');
   if (d.artSource !== undefined && (typeof d.artSource !== 'string' || !/^art\/sprites\/[a-z0-9-]+\/[a-z0-9.-]+\.json$/.test(d.artSource))) fail(id, 'neplatný odkaz na zdroj grafiky.');
   if (d.visibility !== undefined && (!plainObject(d.visibility) || !finite(d.visibility.multiplier) || d.visibility.multiplier<=0)) fail(id, 'neplatný bonus dohledu.');
   if (d.navigation !== undefined && (!plainObject(d.navigation) || typeof d.navigation.walkableTop!=='boolean'

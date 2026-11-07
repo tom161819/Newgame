@@ -113,8 +113,8 @@ test('asset URLs retain the Pages prefix; PNG/WebP/sheets load once per object t
   // #100 (0.14.0): +8 objects (four ground types, four bushes) and four tiles for each ground type: 94 + 8 + 16.
   // #118 (0.14.1): +1 Builder's Workshop.
   // Fishing R1 (0.15.0): +2 (Fisherman's Hut, Fish).
-  assert.equal(manager.queue(),138);assert.equal(manager.queue(),0);
-  assert.equal(calls.length,138); // +1: the Village Green sprite (children D1) // +15: three World v2 ground types, a main sprite and four variants each // +2: the Mill still body and sails layers (#99)
+  assert.equal(manager.queue(),139);assert.equal(manager.queue(),0);
+  assert.equal(calls.length,139); // +1: the castle keep front layer (0.38.2) // +1: the Village Green sprite (children D1) // +15: three World v2 ground types, a main sprite and four variants each // +2: the Mill still body and sails layers (#99)
   assert.ok(calls.some(c=>c[2].endsWith('.webp')));
   assert.deepEqual(calls.find(c=>c[0]==='sheet'),['sheet','asset:animated:main','/Newgame/assets/resources/stone/stone.png',{frameWidth:32,frameHeight:48}]);
 });

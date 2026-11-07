@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.38.2] - 2026-11-07
+<!-- version: {"title":"Castle with a bergfried","type":"feature","reconstructed":false,"saveVersion":55} -->
+### Changed
+- The castle uses the art chosen in the Asset Studio: a fortified castle with a tall keep (bergfried). The King stands on top of the keep behind its battlements. Torches burn at the gate and the windows glow.
+
 ## [0.38.1] - 2026-11-07
 <!-- version: {"title":"Approved Kingdom Policy icons","type":"feature","reconstructed":false,"saveVersion":55} -->
 ### Changed

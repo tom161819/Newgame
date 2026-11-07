@@ -15,13 +15,17 @@ export const buildings = [
     shadow: { baked: true, x: 8, y: -20, width: 114, height: 43, color: 0x30291c, alpha: 0.3 },
   },
   {
-    id:'castle',name:'Castle',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/castle/castle.svg',
+    // Approved Asset Studio castle with a bergfried (art/sprites/castle/castle-keep.v1.json, chosen 7 Nov); the King stands
+    // on the keep platform behind the front battlements. FortificationView stays the fallback.
+    id:'castle',name:'Castle',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/castle/castle-keep.v1.png',
+    frontSprite:'/assets/buildings/castle/castle-keep.v1.front.png',artSource:'art/sprites/castle/castle-keep.v1.json',
     width:3,height:3,walkable:false,collectible:false,buildable:true,cost:{stone:10},maxCount:1,
     constructionTime:45000,
     production:{resource:'gold',amount:5,interval:'day',label:'Castle income'},
     interactions:['enter','exit'],description:'Kamenná pevnost s horní plošinou a cimbuřím. Z plošiny poskytuje o 75 % větší dohled.',
-    visibility:{multiplier:1.75},renderMode:'procedural',renderer:'fortification',
-    origin:{x:.5,y:238/250},visualHeight:235,platform:{x:0,y:-168},depth:{offset:0},
+    visibility:{multiplier:1.75},renderMode:'sprite',renderer:'fortification',
+    origin:{"x": 0.4899, "y": 0.99206},frontOrigin:{"x": 0.4899, "y": 0.99206},visualHeight:250,platform:{"x": 0, "y": -199},depth:{offset:0},
+    lights:[{"type": "window", "x": -23.36, "y": -156.49, "color": "#ffcf7a", "radius": 28.8, "intensity": 0.75, "flicker": {"amplitude": 0.03, "speed": 1.5}, "flameSize": 0}, {"type": "window", "x": 13.44, "y": -151.85, "color": "#ffcf7a", "radius": 28.8, "intensity": 0.75, "flicker": {"amplitude": 0.03, "speed": 1.5}, "flameSize": 0}, {"type": "window", "x": 16.96, "y": -64.47, "color": "#ffcf7a", "radius": 28.8, "intensity": 0.75, "flicker": {"amplitude": 0.03, "speed": 1.5}, "flameSize": 0}, {"type": "torch", "x": -43.52, "y": -69, "color": "#ffb25a", "radius": 102.4, "intensity": 0.95, "flicker": {"amplitude": 0.12, "speed": 7}, "flameSize": 1}, {"type": "torch", "x": -24.32, "y": -59.4, "color": "#ffb25a", "radius": 102.4, "intensity": 0.95, "flicker": {"amplitude": 0.12, "speed": 7}, "flameSize": 1}],
     visual:{wallHeight:120},
     shadow:{baked:true,x:12,y:-25,width:190,height:70,color:0x30291c,alpha:.3},
   },
