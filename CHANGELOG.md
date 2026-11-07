@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.31.0] - 2026-11-07
+<!-- version: {"title":"Used-up source and full storage notices","type":"feature","reconstructed":false,"saveVersion":54} -->
+### Added
+- New warnings for a used-up source and for full stores.
+  - When a Quarry or Iron Mine has used up its deposit, or a Lumberjack Hut has no trees left in range, you get one event-feed line, a notice, a warning sign over the building and a line in its panel ("No Stone left in range – build a new Quarry near rocks"). They disappear when the source is back or the building is gone.
+  - When goods have nowhere to go because every store that takes them is full, the notice names them and the store to build, e.g. "Storage full: Wood has nowhere to go – build a Warehouse". This covers materials, food and equipment. The buildings that are stuck because of it get a sign and the line "Output full – no storage space". The event feed reports it once, and it clears as soon as there is room.
+
 ## [0.30.0] - 2026-11-07
 <!-- version: {"title":"Employment spreads people out","type":"feature","reconstructed":false,"saveVersion":54} -->
 ### Changed

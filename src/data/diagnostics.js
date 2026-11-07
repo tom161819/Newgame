@@ -12,3 +12,9 @@ export const INPUT_SOURCES=Object.freeze({
 
 // Structural advice on completion, independent of current input stock or staffing.
 export const COMPLETION_SOURCES=Object.freeze({mill:'wheat_field',bakery:'mill'});
+
+// Gathering workplaces: what they bring in, and what a depleted one should be rebuilt near (notice advice).
+export const GATHER_OUTPUTS=Object.freeze({quarry:'stone',iron_mine:'iron_ore',lumberjack_hut:'wood',hunting_lodge:'meat',fisherman_hut:'fish'});
+export const DEPLETION_SOURCES=Object.freeze({quarry:'stone_deposit',iron_mine:'iron_deposit',lumberjack_hut:'trees'});
+// Work messages of a resident who holds goods (or would mine/chop) but finds no storage room for them.
+export const STORAGE_WAIT_MESSAGES=Object.freeze(['Waiting for reachable storage capacity','Waiting for reachable timber storage capacity','rock.noStorage','Mined material preserved on the ground','Timber preserved on the ground']);

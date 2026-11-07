@@ -1,8 +1,8 @@
 import { t } from '../i18n/index.js';
-import { JOBS } from '../data/jobs.js';
 import { NOTICE_CATEGORIES } from '../data/diagnostics.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { element } from './objectLabels.js';
+import { noticeText } from './noticeText.js';
 
 const MUTED_KEY='newgame.notices.muted';
 const readMuted=()=>{try{const list=JSON.parse(localStorage.getItem(MUTED_KEY)??'[]');return new Set(Array.isArray(list)?list.filter(c=>NOTICE_CATEGORIES.includes(c)):[]);}catch{return new Set();}};
@@ -20,11 +20,7 @@ export class NoticesPanel {
     },options);
     this.unsubscribe=scene.diagnostics.onChange(()=>this.render());this.render();
   }
-  text(issue){
-    const s=this.scene,building=s.buildings.find(b=>b.id===issue.entityId),name=building?buildingDefinition(building).name:'',p=issue.params??{};
-    const resource=p.resource?s.objectRegistry.get(p.resource)?.name??p.resource:'',producer=p.producer?s.objectRegistry.get(p.producer)?.name??p.producer:'',profession=p.profession?JOBS[p.profession]?.name??p.profession:'';
-    return t(`notice.${issue.reason}`,{name,resource,producer,profession,count:p.count??1});
-  }
+  text(issue){return noticeText(this.scene,issue);}
   openEntity(id){
     const s=this.scene,building=s.buildings.find(b=>b.id===id);if(!building||!s.fog.isVisibleObject(building))return;
     if(!buildingIsComplete(building))s.constructionUI?.open(building);else if(buildingDefinition(building).workplace)s.workplacePanel.open(building);

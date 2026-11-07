@@ -91,3 +91,39 @@ test('no Builder: one kingdom notice even before any materials arrive, gone with
   s.needs.records.set(builder.id,{...(s.needs.records.get(builder.id)??{food:100,rest:100}),strike:true});advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(reasons(s).includes('noBuilder'),'every Builder strikes');
   s.needs.records.get(builder.id).strike=false;advance(s,DIAGNOSTICS.checkInterval);assert.ok(!reasons(s).includes('noBuilder'));
 });
+
+// Owner points 14–15 on a small hand-made kingdom (only what the checks read).
+function mini({buildings=[],trees=[],locations=[],workers=[],registry}={}){
+  const feed=[],byId=new Map(trees.map((t,i)=>[`tree-${i}`,{x:t.x,y:t.y,definition:{tree:{}},natural:{stage:t.stage??3}}]));
+  const st={physicalMaterials:true,locations:new Map(locations.map(l=>[l.id,{stock:{},allowed:[],capacity:0,...l}])),isStock:l=>l.kind==='storage'||l.kind==='fallback',
+    used:l=>Object.values(l.stock).reduce((n,v)=>n+v,0),room(id){const l=this.locations.get(id);return Math.max(0,l.capacity-this.used(l));}};
+  const s={buildings,naturalResources:{byId},foodStorage:st,gameTime:{totalElapsed:0,paused:false},eventFeed:{push:(key,text)=>{feed.push({key,text});return true;}},
+    workerSystem:{liveSubjects:()=>workers},objectRegistry:registry,activities:null,needs:null};
+  s.diagnostics=new ProductionDiagnostics(s);s.feed=feed;return s;
+}
+test('a quarry or mine with its deposit used up and a lumberjack hut with no trees left get one notice each (feed once), gone when it comes back',()=>{
+  const objectRegistry=null;
+  const quarry={id:1,type:'quarry',x:10,y:10,quarryMode:'finite',depositId:'d1'},hut={id:2,type:'lumberjack_hut',x:40,y:40},legacy={id:3,type:'quarry',x:60,y:60,quarryMode:'legacy'};
+  const s=mini({buildings:[quarry,hut,legacy],trees:[{x:80,y:80}],registry:objectRegistry});s.naturalResources.byId.set('d1',{natural:{remaining:0}});
+  advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);
+  const depleted=s.diagnostics.active().filter(i=>i.reason==='depleted').map(i=>[i.entityId,i.params.resource]);assert.deepEqual(depleted.sort(),[[1,'stone'],[2,'wood']]);
+  assert.equal(s.feed.length,2,'one feed line each');advance(s,DIAGNOSTICS.reminder*3);assert.equal(s.feed.length,2,'no spam');
+  assert.match(s.feed.map(f=>f.text).join(' | '),/Quarry has run out of stone/i);assert.equal(s.diagnostics.buildingIssue(1).reason,'depleted');
+  s.naturalResources.byId.get('d1').natural.remaining=5;s.naturalResources.byId.set('young',{x:41,y:41,definition:{tree:{}},natural:{stage:0}});advance(s,DIAGNOSTICS.checkInterval);
+  assert.equal(s.diagnostics.active().filter(i=>i.reason==='depleted').length,0,'gone: stone again, a young tree will grow');
+});
+
+test('storage full: one notice naming the goods and the store to build; the stuck building gets its own line; gone once there is room',()=>{
+  const registry={get:id=>({wood:{name:'Wood'},sword:{name:'Sword'},warehouse:{name:'Warehouse'},armory:{name:'Armory'}})[id]??null,
+    buildables:()=>[{id:'warehouse',storage:{accepts:'materials'}},{id:'armory',storage:{accepts:'equipment'}}],require:id=>({id})};
+  const s=mini({registry,buildings:[{id:5,type:'lumberjack_hut',x:40,y:40},{id:6,type:'swordsmith',x:50,y:50}],trees:[{x:41,y:41}],
+    locations:[{id:'stock-1',kind:'storage',allowed:['wood','stone'],capacity:10,stock:{wood:10}},{id:'stock-2',kind:'storage',allowed:['sword'],capacity:4,stock:{sword:4}},{id:'output-6',kind:'output',buildingId:6,allowed:['sword'],capacity:2,stock:{sword:2}}],
+    workers:[{id:'w1',assignedWorkplaceId:5,workMessage:'Waiting for reachable timber storage capacity',cargo:null}]});
+  s.diagnostics.storageHelper=resource=>({wood:'warehouse',sword:'armory'})[resource];
+  advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);
+  const full=s.diagnostics.active().find(i=>i.reason==='storageFull');assert.deepEqual(full.params.groups,[{helper:'armory',resources:['sword']},{helper:'warehouse',resources:['wood']}]);
+  assert.deepEqual(s.diagnostics.active().filter(i=>i.reason==='outputFull').map(i=>i.entityId).sort(),[5,6]);
+  assert.equal(s.feed.filter(f=>f.key.includes('storageFull')).length,1);
+  s.foodStorage.locations.get('stock-1').capacity=50;s.foodStorage.locations.get('stock-2').capacity=50;advance(s,DIAGNOSTICS.checkInterval);
+  assert.equal(s.diagnostics.active().length,0,'room again: all gone');
+});

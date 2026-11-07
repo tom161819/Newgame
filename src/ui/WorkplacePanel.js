@@ -5,6 +5,7 @@ import { JOBS,SKILLS } from '../data/jobs.js';
 import { TALENTS } from '../data/economy.js';
 import { element } from './objectLabels.js';
 import { CANDIDATE_GROUPS,candidateGroups } from './workplaceCandidates.js';
+import { buildingIssueLine } from './noticeText.js';
 import { renderMilitary,militarySignature,handleMilitaryClick } from './militaryPanel.js';
 
 export class WorkplacePanel {
@@ -19,6 +20,8 @@ export class WorkplacePanel {
     this.forestryDetails=element('section');this.forestryDetails.id='forestry-details';this.forestryDetails.hidden=true;this.forestryTrees=element('p');this.forestryTrees.id='forestry-tree-count';this.forestryTotal=element('p');this.forestryTotal.id='forestry-output-total';this.forestryToday=element('p');this.forestryToday.id='forestry-output-today';this.forestryDetails.append(this.forestryTrees,this.forestryTotal,this.forestryToday);this.dialog.insertBefore(this.forestryDetails,document.querySelector('#food-production-details'));
     this.militaryDetails=element('section','military-details');this.militaryDetails.id='military-details';this.militaryDetails.hidden=true;this.dialog.insertBefore(this.militaryDetails,document.querySelector('#food-production-details'));
     this.miningDetails=element('p');this.miningDetails.id='mining-details';this.miningDetails.hidden=true;this.dialog.insertBefore(this.miningDetails,this.forestryDetails);
+    // Owner points 14–15: a depleted source or a full output, with advice (the same issue the notice and the icon show).
+    this.issueLine=element('p','workplace-issue');this.issueLine.id='workplace-issue';this.issueLine.hidden=true;this.dialog.insertBefore(this.issueLine,this.miningDetails);
     document.querySelector('#close-workplace').addEventListener('click',()=>this.close(),options);
     document.querySelector('#assign-workplace-worker').addEventListener('click',()=>{document.querySelector('#workplace-candidates').hidden=!document.querySelector('#workplace-candidates').hidden;},options);
     // S12: a workshop with several recipes (Wheelwright: Wheelbarrow or Horse Wagon); a running batch keeps its recipe.
@@ -48,6 +51,7 @@ export class WorkplacePanel {
     for(const kind of ['local','type'])this.exclusionLabels[kind].textContent=t(`employment.exclude.${kind}`,{name:spec.name});this.exclusionReason.textContent=t(`employment.exclude.${blocked??'allowed'}`+'Status');this.exclusionHelp.textContent=t('employment.exclude.help');
     const production=spec.recipe?s.foodProduction.records.get(b.id):null;
     const forestry=spec.id==='lumberjack_hut'?s.naturalResources.forestry.summary(b):null;this.forestryDetails.hidden=!forestry;
+    const issue=buildingIssueLine(s,s.diagnostics?.buildingIssue?.(b.id));this.issueLine.hidden=!issue;this.issueLine.textContent=issue??'';
     const stable=spec.horseCapacity&&s.stables?s.stables.summary(b.id):null,mining=spec.mining?s.naturalResources?.mining.summary(b):stable?t('stables.summary',{count:stable.horses.length,capacity:stable.capacity,taming:stable.taming}):spec.fishing&&s.fishing?s.fishing.summary(b):null;this.miningDetails.hidden=!mining;this.miningDetails.textContent=mining??'';
     const signature=JSON.stringify([blocked,this.exclusionInputs.local.checked,this.exclusionInputs.type.checked,summary,production,forestry,mining,production?s.foodStorage.revision:0,employees.map(w=>[w.id,w.workState,w.workMessage,w.skills[spec.workplace.skill].level]),militarySignature(s,b),candidates.map(w=>[w.id,w.profession,w.assignedWorkplaceId,w.naturalTalent,w.skills[spec.workplace.skill].level,w.skills[spec.workplace.skill].totalXP]),this.pendingMove]);if(signature===this.signature)return;this.signature=signature;
     if(forestry){this.forestryTrees.textContent=t(forestry.known?'workplace.knownTrees':'workplace.trees',{count:forestry.trees});this.forestryTotal.textContent=t('workplace.timber',{count:forestry.harvested});this.forestryToday.textContent=t('workplace.woodToday',{count:forestry.today});}
@@ -91,5 +95,5 @@ export class WorkplacePanel {
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){this.dialog.close();this.restoreInput();this.scene.farmConnections?.refresh();}
-  destroy(){this.close();this.controller.abort();this.farmCount.remove();this.staffingStatus.remove();this.exclusions.remove();this.forestryDetails.remove();this.miningDetails.remove();this.militaryDetails.remove();}
+  destroy(){this.close();this.controller.abort();this.farmCount.remove();this.staffingStatus.remove();this.exclusions.remove();this.forestryDetails.remove();this.miningDetails.remove();this.issueLine.remove();this.militaryDetails.remove();}
 }
