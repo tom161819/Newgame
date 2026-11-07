@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.44.0] - 2026-11-07
+<!-- version: {"title":"Wolves at night","type":"feature","reconstructed":false,"saveVersion":57} -->
+### Added
+- **Wolves:** at night a pack of 2–4 may come from far away at the map edge, most often in winter.
+  - They hunt wild animals and people outdoors (residents asleep at home are safe).
+  - They never step into the light of a torch, brazier, campfire or the castle; a lone torch in someone's hand does not scare them.
+  - They run from three or more soldiers and leave at dawn.
+  - Hunters and soldiers can kill them for 2 meat.
+- "Wolves near the houses!" is reported once and stops the night speed-up while they stay near.
+- Wolves can be switched off (Night wolves).
+
 ## [0.43.0] - 2026-11-07
 <!-- version: {"title":"Night threat switches and campfire","type":"feature","reconstructed":false,"saveVersion":57} -->
 ### Added

@@ -13,6 +13,18 @@ export const animals = [
   animations:{mode:'procedural',states:['idle','walk'],directions:['N','NE','E','SE','S','SW','W','NW']},
 }));
 
+// Day and night N3: the wolf comes only at night (NightThreatSystem spawns it, never the world or the respawn).
+animals.push({
+  id:'wolf',name:'Wolf',category:'animal',sprite:'/assets/characters/wolf/wolf.svg',
+  width:1,height:1,walkable:false,collectible:false,buildable:false,cost:{},interactions:['hunt'],
+  description:'A grey wolf that hunts in packs at night. Keeps away from fire. Leaves 2 meat.',
+  renderMode:'procedural',renderer:'animal',origin:{x:.5,y:.85},visualHeight:50,
+  visual:{bodyColor:0x6e6e6a,bodyScale:.85,hitArea:{x:-22,y:-44,width:44,height:48}},depth:{offset:.1},
+  gameplay:{movementSpeed:1.6,initialCount:0,behavior:'wander',huntable:true,meatDrop:2,wanderRadius:4,nightPredator:true},
+  stats:{maxHP:45,attackDPS:8,armor:0,attackRange:1},
+  animations:{mode:'procedural',states:['idle','walk'],directions:['N','NE','E','SE','S','SW','W','NW']},
+});
+
 animals.push({
   id:'horse',name:'Horse',category:'animal',sprite:'/assets/characters/horse/horse.svg',
   width:1,height:1,walkable:false,collectible:false,buildable:false,cost:{},interactions:['mount'],

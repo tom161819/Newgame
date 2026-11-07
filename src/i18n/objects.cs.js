@@ -52,6 +52,7 @@ export default {
   'object.pitch_kiln.name':"Smolárna",'object.pitch_kiln.description':"Dva smolaři pálí ze 2 dřev 1 smůlu a z 1 dřeva a 1 smůly dělají 3 pochodně. Nejdřív udržují 20 pochodní ve skladech.",
   'object.torch_post.name':"Sloup s pochodní",'object.torch_post.description':"Železný sloup s pochodní. V noci osvětlí 5 políček kolem; spálí 1 pochodeň za noc.",
   'object.campfire.name':"Táborák",'object.campfire.description':"Oheň z klestí nasbíraného na místě. Hoří jednu noc; vlci se jeho světlu vyhnou.",
+  'object.wolf.name':"Vlk",'object.wolf.description':"Šedý vlk, který v noci loví ve smečce. Ohni se vyhne. Zanechá 2 maso.",
   'object.iron_bar.name':'Železný prut','object.iron_bar.description':'Hotové železo vytavené ze 3 železných rud a 2 dřev. Ukládá se ve skladech; liší se od surové rudy. Připraveno pro pokročilou výrobu.',
   'object.king.name':'Král','object.king.description':'Korunovaný vládce s červeným pláštěm. Chodí v osmi směrech, sbírá suroviny a vstupuje do věží.',
   'object.peasant.name':'Poddaný','object.peasant.description':'Obyvatel s vlastním talentem (+20 % příslušných XP), šesti skilly a jednou placenou profesí.',

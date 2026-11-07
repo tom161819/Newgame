@@ -52,6 +52,7 @@ export default {
   'object.pitch_kiln.name':"Pitch Kiln",'object.pitch_kiln.description':"Two Pitch Makers burn 2 Wood into 1 Pitch, and dip 1 Wood in 1 Pitch for 3 Torches. They keep 20 Torches in the stores first.",
   'object.torch_post.name':"Torch Post",'object.torch_post.description':"An iron post with a torch. Lights 5 tiles around it at night; burns 1 Torch a night.",
   'object.campfire.name':"Campfire",'object.campfire.description':"A fire of brushwood gathered on the spot. Burns one night; wolves keep away from its light.",
+  'object.wolf.name':"Wolf",'object.wolf.description':"A grey wolf that hunts in packs at night. Keeps away from fire. Leaves 2 meat.",
   'object.iron_bar.name':'Iron Bar','object.iron_bar.description':'Finished iron smelted from 3 Iron Ore and 2 Wood. Stored in Warehouses; distinct from raw ore. Prepared for advanced manufacturing.',
   'object.king.name':'King','object.king.description':'A crowned ruler in a red cloak. He walks in eight directions, gathers resources and enters towers.',
   'object.peasant.name':'Resident','object.peasant.description':'A resident with a natural talent (+20 % of the matching XP), six skills and one paid profession.',

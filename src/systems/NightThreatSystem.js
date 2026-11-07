@@ -1,6 +1,10 @@
 import { NIGHT_THREATS } from '../data/nightThreats.js';
 import { buildingDefinition,buildingIsComplete,buildingTiles,placementError,campfireWood } from '../game/buildings.js';
 import { removeBuildingShell } from '../game/buildingRemoval.js';
+import { adjacentTiles } from '../game/interaction.js';
+import { inAttackRange } from './CombatSystem.js';
+import { isWalkable } from '../game/map.js';
+import { t } from '../i18n/index.js';
 
 // Day and night N3: the switches of the night threats (wolves, thieves, fires; from the New Game setup, changeable in
 // Settings) and the campfire. A campfire is built from local wood (a tree or a bush within 6 tiles) and costs nothing
@@ -9,7 +13,7 @@ export const hasLocalWood=(scene,tile,range=NIGHT_THREATS.campfire.woodRange)=>c
 export class NightThreatSystem {
   constructor(scene,settings=scene.gameSettings){
     this.scene=scene;this.enabled={wolves:settings?.nightWolves!==false,thieves:settings?.nightThieves!==false,fires:settings?.nightFires!==false};
-    this.campfires=new Map();this.listeners=new Set();
+    this.campfires=new Map();this.listeners=new Set();this.wolfDay=null;this.wolvesNear=false;this.random=Math.random;
   }
   onChange(l){this.listeners.add(l);return()=>this.listeners.delete(l);}
   changed(){for(const l of this.listeners)l();}
@@ -43,13 +47,92 @@ export class NightThreatSystem {
     }
     return null;
   }
-  update(){this.updateCampfires();}
-  exportState(){return {enabled:{...this.enabled},campfires:[...this.campfires].map(([id,c])=>({id,litDay:c.litDay,ashesDay:c.ashesDay})).sort((a,b)=>a.id-b.id)};}
-  importState(data){if(!data)return;this.enabled={...this.enabled,...data.enabled};this.campfires=new Map((data.campfires??[]).map(c=>[c.id,{litDay:c.litDay,ashesDay:c.ashesDay}]));}
+  // --- wolves ------------------------------------------------------------------------------------------------------
+  wolves(){return [...(this.scene.animalSystem?.animals?.values?.()??[])].filter(a=>a.isAlive&&a.active!==false&&a.definition.gameplay.nightPredator);}
+  // Burning lights wolves keep out of (a torch in a hand does not count).
+  scaryLights(){return (this.scene.dayNight?.flameLights?.()??[]).filter(l=>l.workerId==null);}
+  lit(tile,lights=this.scaryLights()){return lights.some(l=>Math.hypot(l.x-(tile.x+.5),l.y-(tile.y+.5))<=l.radius);}
+  houses(){return (this.scene.buildings??[]).filter(b=>buildingIsComplete(b)&&this.scene.objectRegistry?.get?.(b.type)?.housing);}
+  // At nightfall a pack may come (a roll per night, more often in winter) from far away at the map edge, outside light.
+  spawnWolves(day){
+    const W=NIGHT_THREATS.wolves,s=this.scene;this.wolfDay=day;if(!this.enabled.wolves||!s.animalSystem)return [];
+    const season=s.seasons?.enabled===false?'Summer':s.seasons?.season??'Summer';if(this.random()>=(W.chance[season]??.3))return [];
+    const def=s.objectRegistry.require('wolf'),rows=s.map.length,cols=s.map[0].length,far=t=>[s.character?.tile,...this.houses()].filter(Boolean).every(p=>Math.hypot(p.x-t.x,p.y-t.y)>=W.spawnDistance);
+    const lights=this.scaryLights(),taken=new Set((s.reservedTiles?.()??[]).map(t=>`${t.x},${t.y}`));let start=null;
+    for(let i=0;i<300&&!start;i++){const side=Math.floor(this.random()*4),a=Math.floor(this.random()*(side%2?rows:cols)),d=Math.floor(this.random()*W.edge);
+      const tile=side===0?{x:a,y:d}:side===1?{x:cols-1-d,y:a}:side===2?{x:a,y:rows-1-d}:{x:d,y:a};
+      if(isWalkable(s.map,tile.x,tile.y)&&!taken.has(`${tile.x},${tile.y}`)&&far(tile)&&!this.lit(tile,lights))start=tile;}
+    if(!start)return [];const [lo,hi]=W.pack,count=lo+Math.floor(this.random()*(hi-lo+1)),out=[];
+    for(let r=0;r<4&&out.length<count;r++)for(let dy=-r;dy<=r&&out.length<count;dy++)for(let dx=-r;dx<=r&&out.length<count;dx++){
+      const tile={x:start.x+dx,y:start.y+dy};if(!isWalkable(s.map,tile.x,tile.y)||taken.has(`${tile.x},${tile.y}`))continue;taken.add(`${tile.x},${tile.y}`);
+      const wolf=s.animalSystem.create(def,tile);wolf.wolf={state:'hunting',repath:0,since:s.gameTime?.totalElapsed??0};out.push(wolf);}
+    return out;
+  }
+  // Prey outdoors and out of light: wild animals, the King and residents who are not asleep inside a house.
+  prey(lights){
+    const s=this.scene,out=[];
+    for(const a of s.animalSystem?.animals?.values?.()??[])if(a.isAlive&&a.active!==false&&!a.definition.gameplay.nightPredator&&a.definition.gameplay.huntable&&!a.mounted)out.push(a);
+    if(s.character?.isAlive!==false&&s.character?.state==='ground')out.push(s.character);
+    for(const w of s.workerSystem?.liveSubjects?.()??[])if(!(w.restPhase==='resting'&&s.needs?.homeOf?.(w)?.kind==='house'))out.push(w);
+    return out.filter(p=>p.position&&!this.lit({x:Math.floor(p.position.x),y:Math.floor(p.position.y)},lights));
+  }
+  soldiersNear(wolf){const W=NIGHT_THREATS.wolves;return (this.scene.workerSystem?.liveWorkers?.()??[]).filter(w=>w.profession==='soldier'&&w.isAlive&&Math.hypot(w.position.x-wolf.position.x,w.position.y-wolf.position.y)<=W.fleeRange);}
+  edgeGoal(wolf){
+    const s=this.scene,rows=s.map.length,cols=s.map[0].length,{x,y}=wolf.tile,options=[{x:0,y},{x:cols-1,y},{x,y:0},{x,y:rows-1}];
+    options.sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y));return options;
+  }
+  // Called by AnimalSystem for every wolf; true = handled this frame.
+  leadsWolf(wolf,delta){
+    const s=this.scene,W=NIGHT_THREATS.wolves,state=wolf.wolf??=({state:'hunting',repath:0,since:s.gameTime?.totalElapsed??0}),combat=s.combat;
+    const part=s.dayNight?.part(),now=s.gameTime?.totalElapsed??0;
+    const away=goal=>{combat?.stopAttack(wolf);wolf.retaliationTarget=null;state.target=null;state.repath-=delta;if(state.repath<=0||(!wolf.nextTile&&!wolf.path.length)){state.repath=W.repathMs*3;wolf.moveTo(goal);}};
+    // Dawn: the pack leaves for the edge and is gone there (or after a while).
+    if(part==='dawn'||part==='day'||state.state==='leaving'){
+      if(state.state!=='leaving'){state.state='leaving';state.since=now;}
+      const edge=this.edgeGoal(wolf);if(edge.some(t=>t.x===wolf.tile.x&&t.y===wolf.tile.y)||now-state.since>W.leaveMs){combat?.stopAttack(wolf);s.animalSystem.remove(wolf);return true;}
+      away(edge.slice(0,2).map(t=>({x:Math.max(0,Math.min(s.map[0].length-1,t.x)),y:Math.max(0,Math.min(s.map.length-1,t.y))})));return true;
+    }
+    // Three or more soldiers close by: run.
+    const soldiers=this.soldiersNear(wolf);
+    if(soldiers.length>=W.fleeSoldiers){const cx=soldiers.reduce((n,w)=>n+w.position.x,0)/soldiers.length,cy=soldiers.reduce((n,w)=>n+w.position.y,0)/soldiers.length,dx=wolf.position.x-cx,dy=wolf.position.y-cy,l=Math.hypot(dx,dy)||1;
+      away([{x:Math.round(wolf.tile.x+dx/l*8),y:Math.round(wolf.tile.y+dy/l*8)}].filter(t=>isWalkable(s.map,t.x,t.y)));return true;}
+    const lights=this.scaryLights();
+    // Standing in light (a torch was lit nearby): step out of it.
+    if(this.lit(wolf.tile,lights)){const out=[];for(let r=1;r<8&&!out.length;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){const t={x:wolf.tile.x+dx,y:wolf.tile.y+dy};if(isWalkable(s.map,t.x,t.y)&&!this.lit(t,lights))out.push(t);}away(out.slice(0,6));return true;}
+    let target=state.target;
+    if(!target?.isAlive||target.active===false||this.lit({x:Math.floor(target.position.x),y:Math.floor(target.position.y)},lights)||(target.restPhase==='resting'&&s.needs?.homeOf?.(target)?.kind==='house')){
+      target=null;const prey=this.prey(lights).filter(p=>Math.hypot(p.position.x-wolf.position.x,p.position.y-wolf.position.y)<=W.huntRange&&!(state.avoid?.has(p.id)));
+      prey.sort((a,b)=>Math.hypot(a.position.x-wolf.position.x,a.position.y-wolf.position.y)-Math.hypot(b.position.x-wolf.position.x,b.position.y-wolf.position.y));target=prey[0]??null;state.target=target;
+    }
+    if(!target){combat?.stopAttack(wolf);if(!wolf.nextTile&&!wolf.path.length){state.repath-=delta;if(state.repath<=0){state.repath=2500;const g={x:wolf.tile.x+Math.floor(this.random()*9)-4,y:wolf.tile.y+Math.floor(this.random()*9)-4};if(isWalkable(s.map,g.x,g.y)&&!this.lit(g,lights))wolf.moveTo([g]);}}return true;}
+    if(combat?.canFight?.(target)!==false&&inAttackRange(wolf,target,s.map)){
+      wolf.path=[];combat.startAttack(wolf,target);const dx=target.position.x-wolf.position.x,dy=target.position.y-wolf.position.y,l=Math.hypot(dx,dy);if(l&&!wolf.nextTile)wolf.direction={x:dx/l,y:dy/l};return true;
+    }
+    combat?.stopAttack(wolf);state.repath-=delta;
+    if(state.repath<=0){state.repath=W.repathMs;wolf.moveTo(adjacentTiles(target,s.map));
+      // Never into a light: give the target up for a while when the way goes through one.
+      if(wolf.path.some(t=>this.lit(t,lights))){wolf.path=[];(state.avoid??=new Set()).add(target.id);state.target=null;}}
+    return true;
+  }
+  checkWolvesNear(day){
+    const W=NIGHT_THREATS.wolves,houses=this.houses();
+    const near=this.wolves().some(w=>houses.some(h=>{const d=buildingDefinition(h);return Math.hypot(h.x+d.width/2-w.position.x,h.y+d.height/2-w.position.y)<=W.nearHouses;}));
+    if(near&&!this.wolvesNear){this.scene.eventFeed?.push?.(`wolves-near:${day}`,t('threats.wolvesNear'),{important:true});}
+    this.wolvesNear=near;
+  }
+  update(){
+    this.updateCampfires();
+    const day=this.scene.gameTime?.day??1;
+    if(this.scene.dayNight?.isNight()&&this.wolfDay!==day)this.spawnWolves(day);
+    this.checkWolvesNear(day);
+  }
+  exportState(){return {enabled:{...this.enabled},wolfDay:this.wolfDay,campfires:[...this.campfires].map(([id,c])=>({id,litDay:c.litDay,ashesDay:c.ashesDay})).sort((a,b)=>a.id-b.id)};}
+  importState(data){if(!data)return;this.enabled={...this.enabled,...data.enabled};this.wolfDay=data.wolfDay??null;this.campfires=new Map((data.campfires??[]).map(c=>[c.id,{litDay:c.litDay,ashesDay:c.ashesDay}]));}
   destroy(){this.listeners.clear();}
 }
 export function validNightThreatState(data,buildingIds){
   const n=v=>v===null||Number.isSafeInteger(v)&&v>=1;
-  return !!data&&typeof data==='object'&&!!data.enabled&&NIGHT_THREATS.ids.every(id=>typeof data.enabled[id]==='boolean')&&Object.keys(data.enabled).length===NIGHT_THREATS.ids.length
+  // `wolfDay` came in 0.44.0; saves of 0.43.0 (same schema 57) have none.
+  return !!data&&typeof data==='object'&&!!data.enabled&&(data.wolfDay===undefined||n(data.wolfDay))&&NIGHT_THREATS.ids.every(id=>typeof data.enabled[id]==='boolean')&&Object.keys(data.enabled).length===NIGHT_THREATS.ids.length&&Object.keys(data).every(k=>['enabled','campfires','wolfDay'].includes(k))
     &&Array.isArray(data.campfires)&&data.campfires.every(c=>c&&buildingIds.has(c.id)&&n(c.litDay)&&n(c.ashesDay));
 }

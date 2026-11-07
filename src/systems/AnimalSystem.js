@@ -41,6 +41,8 @@ export class AnimalSystem {
     for(const animal of this.animals.values()){
       if(!animal.active||!animal.isAlive)continue;
       if(animal.mounted||this.scene.stables?.holds(animal))continue;
+      // N3: wolves are led by the night threat system (hunting, keeping out of light, leaving at dawn).
+      if(animal.definition.gameplay.nightPredator&&this.scene.nightThreats?.leadsWolf?.(animal,delta)){animal.update(delta);continue;}
       const target=animal.retaliationTarget;
       if(target){
         if(!target.isAlive){this.stopRetaliation(animal);}

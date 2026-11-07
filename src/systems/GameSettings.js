@@ -40,5 +40,5 @@ export function configuredStats(definition,settings){
   else if(definition.gameplay?.huntable){stats.maxHP*=d.animalHP;stats.attackDPS*=d.animalDPS;}
   return stats;
 }
-export const animalInitialCount=(definition,settings)=>definition.gameplay.huntable?WILDLIFE_COUNTS[settings?.wildlifePopulation??'normal']:definition.gameplay.initialCount;
+export const animalInitialCount=(definition,settings)=>definition.gameplay.nightPredator?0:definition.gameplay.huntable?WILDLIFE_COUNTS[settings?.wildlifePopulation??'normal']:definition.gameplay.initialCount;
 export const resourceSpawnSettings=(definition,settings)=>definition.id==='stone'?{...definition.spawn,initial:settings?.initialStoneCount??definition.spawn.initial,max:Math.max(definition.spawn.max,settings?.initialStoneCount??0)}:definition.spawn;

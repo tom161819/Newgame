@@ -45,3 +45,47 @@ test('save: threat switches and campfires (schema 57)', () => {
   assert.equal(validNightThreatState({enabled:{wolves:true,thieves:true},campfires:[]},new Set()),false);
   const r=new NightThreatSystem({});r.importState(state.nightThreats);assert.equal(r.enabled.thieves,false);assert.equal(r.campfireBurning(fire),true);
 });
+
+import { animalInitialCount } from '../src/systems/GameSettings.js';
+import { objectRegistry as registry } from '../src/systems/ObjectRegistry.js';
+const night=(s,extra=.05)=>{const g=s.gameTime,target=g.dayDuration*(s.dayNight.nightStart()+extra);g.update(target>g.elapsed?target-g.elapsed:g.dayDuration-g.elapsed+target);};
+const tick=(s,ms,step=50)=>{for(let t=0;t<ms;t+=step){s.gameTime.update(step);s.animalSystem.update(step);s.combat?.update?.(step);}};
+
+test('wolves never come with the world or the wildlife respawn; at night a pack of 2–4 comes from the map edge, far away and out of light', () => {
+  const wolf=registry.require('wolf');assert.equal(animalInitialCount(wolf,{wildlifePopulation:'abundant'}),0);assert.equal(wolf.gameplay.nightPredator,true);
+  const {s,n}=world();n.random=()=>0;night(s);n.update();
+  const pack=n.wolves();assert.ok(pack.length>=2&&pack.length<=4,`pack of ${pack.length}`);
+  const cols=s.map[0].length,rows=s.map.length;assert.ok(pack.every(w=>Math.min(w.tile.x,w.tile.y,cols-1-w.tile.x,rows-1-w.tile.y)<=6),'at the edge');
+  n.update();assert.equal(n.wolves().length,pack.length,'one pack a night');
+  const off=world();off.n.setEnabled('wolves',false);off.n.random=()=>0;night(off.s);off.n.update();assert.equal(off.n.wolves().length,0,'switched off');
+});
+
+test('a wolf hunts people outdoors, never steps into a burning light, flees from three soldiers and leaves at dawn', () => {
+  const {s,n}=world();n.random=()=>.99;night(s);n.update();const def=registry.require('wolf');
+  const wolf=s.animalSystem.create(def,{x:70,y:70});const victim=s.workerSystem.create({x:74,y:70});victim.restPhase=null;
+  tick(s,6000);assert.ok(Math.hypot(wolf.position.x-victim.position.x,wolf.position.y-victim.position.y)<2,'reaches the resident');
+  assert.equal(s.combat.attacks.get(wolf),victim,'and attacks');
+  // A torch post burns by the next resident: the wolf gives him up.
+  const other=s.workerSystem.create({x:85,y:70});s.combat.stopAttack(wolf);victim.isAlive=false;
+  s.dayNight.flameLights=()=>[{x:85.5,y:70.5,radius:5}];wolf.wolf.target=null;tick(s,4000);
+  assert.ok(Math.hypot(wolf.position.x-85.5,wolf.position.y-70.5)>5,'stays out of the light');void other;
+  // Three soldiers: the wolf runs.
+  s.dayNight.flameLights=()=>[];const near=[0,1,2].map(i=>{const w=s.workerSystem.create({x:wolf.tile.x+1,y:wolf.tile.y+i-1});w.profession='soldier';return w;});
+  const before=Math.hypot(wolf.position.x-near[0].position.x,wolf.position.y-near[0].position.y);tick(s,3000);
+  assert.ok(Math.hypot(wolf.position.x-near[0].position.x,wolf.position.y-near[0].position.y)>before,'runs from the soldiers');
+  // Dawn: gone.
+  const g=s.gameTime;g.update(g.dayDuration-g.elapsed+g.dayDuration*.02);tick(s,45000,100);assert.equal(s.animalSystem.animals.has(wolf.id),false,'left at dawn');
+});
+
+test('wolves near the houses: one notice and the night speed-up stops; the wolf state survives Save', () => {
+  const {s,n}=world();n.random=()=>.99;const house=s.objectRegistry.require('house');
+  night(s);n.update();const wolf=s.animalSystem.create(registry.require('wolf'),{x:40,y:40});s.buildings.push({id:999,type:'house',definition:house,x:42,y:40,tiles:[{x:42,y:40},{x:43,y:40},{x:42,y:41},{x:43,y:41}]});
+  s.eventFeed={pushed:[],push(key,text){this.pushed.push({key,text});return true;}};n.update();assert.equal(n.wolvesNear,true);assert.equal(s.eventFeed.pushed.length,1);n.update();assert.equal(s.eventFeed.pushed.length,1,'once');
+  s.buildings.pop();void wolf;
+  const state=validateGameState(serializeGameState(s));assert.equal(state.nightThreats.wolfDay,s.gameTime.day);
+});
+
+test('a 0.43.0 save (schema 57 without wolfDay) still loads', () => {
+  assert.equal(validNightThreatState({enabled:{wolves:true,thieves:true,fires:true},campfires:[]},new Set()),true);
+  assert.equal(validNightThreatState({enabled:{wolves:true,thieves:true,fires:true},campfires:[],wolfDay:'x'},new Set()),false);
+});
