@@ -155,6 +155,9 @@ div.review { display: flex; flex-direction: column; gap: 8px; padding: 10px 14px
 .button.danger { color: var(--danger); border-color: var(--danger); background: transparent; }
 .star { border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 6px; padding: 5px 10px; font: inherit; font-size: 13px; cursor: pointer; }
 .star[aria-pressed="true"] { color: var(--brass); border-color: var(--brass); font-weight: 600; }
+.choose-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+.choose-row .alt-note { font-family: inherit; }
+.pill.chosen { color: var(--brass); border-color: var(--brass); font-weight: 600; }
 
 .scene-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .scene-canvas { display: block; width: 100%; height: 520px; }

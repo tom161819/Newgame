@@ -94,6 +94,24 @@ try {
   await page.locator('.variant-card').first().getByRole('button', { name: 'Reject' }).click();
   assert.equal(await page.evaluate(id => Object.values(window.assetStudio.local().assets).map(a => a.variants?.[id]).find(Boolean).status, ruinId), 'rejected');
   await page.locator('#library-review [data-review="all"]').click();
+  // Choose for the game: one click approves + ★ and sets the other waiting variants aside, so the design stops waiting.
+  await page.locator('.library-item', { hasText: 'Wheelwright Workshop' }).first().click();
+  const wheelIds = await page.locator('.variant-card').evaluateAll(cards => cards.map(c => c.dataset.variant));
+  assert.ok(wheelIds.length >= 2, 'the wheelwright has alternatives to choose from');
+  await page.locator(`.variant-card[data-variant="${wheelIds[0]}"]`).getByRole('button', { name: 'Choose for the game' }).click();
+  assert.match(await page.locator(`.variant-card[data-variant="${wheelIds[0]}"] .review-saved`).textContent(), /chosen for the game/);
+  assert.equal(await page.locator(`.variant-card[data-variant="${wheelIds[0]}"] .pill.chosen`).count(), 1);
+  const wheel = await page.evaluate(() => window.assetStudio.local().assets['wheelwright-yard']);
+  assert.equal(wheel.preferred, wheelIds[0]); assert.equal(wheel.variants[wheelIds[0]].status, 'approved');
+  for (const id of wheelIds.slice(1)) assert.equal(wheel.variants[id].status, 'rejected', `${id} set aside`);
+  assert.match(await page.locator(`.variant-card[data-variant="${wheelIds[1]}"] .alt-note`).textContent(), /Not chosen/);
+  // Already chosen earlier (approved + ★) with others still waiting: one button sets those aside.
+  await page.locator(`.variant-card[data-variant="${wheelIds[1]}"]`).getByRole('button', { name: 'Back to review' }).click();
+  await page.locator(`.variant-card[data-variant="${wheelIds[0]}"]`).getByRole('button', { name: 'Set aside the other 1' }).click();
+  assert.equal(await page.evaluate(id => window.assetStudio.local().assets['wheelwright-yard'].variants[id].status, wheelIds[1]), 'rejected');
+  await page.locator('#library-review [data-review="pending"]').click();
+  assert.ok(!(await page.locator('.library-item .name').allTextContents()).includes('Wheelwright Workshop'), 'a chosen design no longer waits');
+  await page.locator('#library-review [data-review="all"]').click();
   pass('review decisions: In game badge only on art the game uses, Request revision needs a comment (Send for rework, hint clears, confirmation) stored with the version, history shows it, Reject, filters Revision requested / In game');
   // Blender pilot: the baked variant shows the committed render, sized and anchored by its sidecar.
   await page.locator('.library-item', { hasText: 'Broken wall' }).first().click();

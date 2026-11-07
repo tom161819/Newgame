@@ -242,6 +242,9 @@ function compareView(asset) {
 const savedFlash = new Map();
 function variantCard(asset, variant) {
   const review = reviewState({ repo: data.approvals, local: state.local, assetId: asset.id, variant });
+  const chosen = review.preferred && review.effective.status === 'approved' && !review.outdated;
+  const setAside = review.effective.status === 'rejected' && review.effective.note === NOT_CHOSEN;
+  const othersWaiting = asset.variants.filter(v => v.id !== variant.id && reviewState({ repo: data.approvals, local: state.local, assetId: asset.id, variant: v }).awaitsOwner).length;
   const base = spriteFor(asset, variant, 1), height = heightInPixels(base.modelHeight);
   const canvas = h('canvas', { class: 'variant-canvas', 'data-variant': variant.id, role: 'img', 'aria-label': `${variant.name} rendered at ${state.zoom}× on ${state.background}` });
   canvas._paint = () => paintVariant(canvas, asset, variant);
@@ -266,6 +269,7 @@ function variantCard(asset, variant) {
   const flash = savedFlash.get(key), fresh = flash && Date.now() - flash.at < 120000;
   const saved = fresh ? h('p', { class: 'review-saved', role: 'status' }, flash.status === 'revision-requested'
     ? (sharedMode() ? 'Saved: sent for rework. Write „spustit revizi“ in the MK chat and Claude starts on it.' : 'Saved in this browser: sent for rework. Hand the review over to Claude to start on it.')
+    : flash.status === 'chosen' ? 'Saved: chosen for the game (approved and ★). The other variants that waited are set aside as not chosen.'
     : `Saved: ${STATUS_LABELS[flash.status] ?? flash.status}.`) : null;
   const note = h('div', { class: 'review-comment' }, comment, h('div', { class: 'review-send' }, send, h('span', { class: 'sub' }, 'Writes the comment and asks for a new version.')), error, saved);
   const record = review.effective, entries = [...(record.history ?? []).map(h2 => ({ kind: 'version', ...h2 })), ...(record.comments ?? []).map(c => ({ kind: 'comment', ...c }))].sort((a, b) => a.version - b.version || String(a.at).localeCompare(String(b.at)));
@@ -286,6 +290,13 @@ function variantCard(asset, variant) {
     h('div', { class: 'review' },
       h('div', { class: 'review-line' }, h('span', {}, repoLabel), review.pending ? pendingPill(review.pending) : null, review.outdated ? h('span', { class: 'pill outdated', title: 'The spec changed after this review' }, 'Outdated') : null),
       h('div', { class: 'review-row' }, statusButtons, h('button', { type: 'button', class: 'star', 'aria-pressed': String(review.preferred), disabled: readOnly, onclick: () => changeReview(asset, variant, { preferred: !review.preferred }) }, review.preferred ? '★ Preferred' : '☆ Prefer')),
+      // One click for "this one goes into the game": approve + ★; the asset's other undecided variants stop waiting.
+      h('div', { class: 'choose-row' },
+        chosen ? h('span', { class: 'pill chosen', title: 'Approved and ★ preferred: this variant goes into the game' }, '✓ Chosen for the game') : null,
+        chosen && othersWaiting ? h('button', { type: 'button', class: 'button choose-for-game', disabled: readOnly, title: 'This variant is already chosen; set the other variants still waiting for review aside as not chosen.', onclick: () => { savedFlash.set(key, { status: 'chosen', at: Date.now() }); chooseForGame(asset, variant); } }, `Set aside the other ${othersWaiting}`)
+          : chosen ? null
+          : h('button', { type: 'button', class: 'button choose-for-game', disabled: readOnly, title: 'Approve this variant and make it the one the game uses (★). The other variants still waiting for review are set aside as not chosen.', onclick: () => { savedFlash.set(key, { status: 'chosen', at: Date.now() }); chooseForGame(asset, variant); } }, 'Choose for the game'),
+        setAside ? h('span', { class: 'sub alt-note' }, 'Not chosen: another variant goes into the game. Approve it later if you change your mind.') : null),
       readOnly ? h('p', { class: 'feedback' }, 'You can view this review. Deciding needs Contributor access to the Studio page.') : null,
       note, history,
       h('div', { class: 'card-actions' },
@@ -594,6 +605,24 @@ function paintRuler(canvas) {
 }
 
 // ---------- review ----------
+// "Choose for the game": this variant approved + ★ in one step; the asset's other variants still waiting for review
+// (draft, review, or outdated) are set aside as rejected with a fixed note, so the owner need not reject them one by one.
+// Variants sent for rework keep their request; later versions or new variants wait again as usual.
+const NOT_CHOSEN = 'Not chosen: another variant was chosen for the game.';
+function chooseForGame(asset, variant) {
+  const before = state.local, by = sharedMode() ? shared.uid ?? undefined : undefined;
+  const own = reviewState({ repo: data.approvals, local: state.local, assetId: asset.id, variant });
+  let next = updateLocal(state.local, { assetId: asset.id, variant, status: 'approved', preferred: true, by, ...(own.effective.note === NOT_CHOSEN ? { note: '' } : {}) });
+  for (const other of asset.variants) {
+    if (other.id === variant.id) continue;
+    const s = reviewState({ repo: data.approvals, local: next, assetId: asset.id, variant: other });
+    if (s.awaitsOwner) next = updateLocal(next, { assetId: asset.id, variant: other, status: 'rejected', note: NOT_CHOSEN, by });
+  }
+  state.local = next;
+  if (sharedMode()) saveShared(docWrites(before, next, { by: shared.uid }));
+  else if (!writeLocal(storage, state.local)) showAlert('This browser blocks local storage, so review changes last only until the page is closed. Export them before leaving.');
+  renderAll();
+}
 function changeReview(asset, variant, change) {
   const before = state.local, by = sharedMode() ? shared.uid ?? undefined : undefined;
   let next = updateLocal(state.local, { assetId: asset.id, variant, ...change, by });
