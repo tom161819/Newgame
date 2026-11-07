@@ -1,4 +1,4 @@
-import { isFertileGround,isFordGround,WATER_CELL } from '../data/worldTerrain.js';
+import { isFertileGround,isFordGround } from '../data/worldTerrain.js';
 import { availableFarm } from '../data/farmPlots.js';
 import { t } from '../i18n/index.js';
 import { dataName } from '../i18n/names.js';
@@ -58,7 +58,7 @@ export function placementError(map,anchor,resources,reservedTiles=[],definition=
   if(tiles.some(tile=>!isWalkable(map,tile.x,tile.y)&&!natural?.mining.canBuildOver(definition,tile)))return t('status.needsTiles',{width:definition.width,height:definition.height});
   // #100: fields and orchards need grass; nothing grows on beach or desert sand.
   // Fishing R1: a Fisherman's Hut must touch water on at least one side (remembered water counts outside sight).
-  if(definition.fishing&&!towerNeighbors({...anchor,definition}).some(tile=>map[tile.y]?.[tile.x]===WATER_CELL))return t('status.needsWater');
+  // Since 0.32.0 a Fisherman's Hut may stand anywhere; its Fishers walk to the nearest reachable shore.
   const ground=natural?.scene?.groundGrid;if(definition.crop&&ground&&tiles.some(tile=>!isFertileGround(ground[tile.y]?.[tile.x])))return t('status.needsGrass');
   // World v2: nothing is built on a ford.
   if(ground&&tiles.some(tile=>isFordGround(ground[tile.y]?.[tile.x])))return t('status.notOnFord');

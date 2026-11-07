@@ -40,12 +40,12 @@ test('Fishing data: fish is food and a trade good; the hut is a food workplace f
   assert.deepEqual([stockState(.6),stockState(.3),stockState(.05)],['plentiful','thinning','overfished']);
 });
 
-test('water bodies are found by flood fill; a hut must touch water',()=>{
+test('water bodies are found by flood fill; since 0.32.0 a hut may stand anywhere',()=>{
   const ground=emptyGround();for(let x=0;x<10;x++)ground[5][x]=GROUND.DEEP;for(let y=20;y<23;y++)for(let x=20;x<23;x++)ground[y][x]=GROUND.SHALLOW;
   const water=waterBodies(ground);assert.equal(water.bodies.length,2);assert.deepEqual(water.bodies.map(b=>[b.tiles,b.capacity]),[[10,40],[9,40]]);
   const s=lakeScene();ensureBuildingPrerequisites(s,objectRegistry.require('fisherman_hut'));
   const error=anchor=>placementError(s.map,anchor,s.resourceOccupancy,[],objectRegistry.require('fisherman_hut'),s.buildings);
-  assert.equal(error({x:49,y:43}),null);assert.match(error({x:30,y:30}),/water/);
+  assert.equal(error({x:49,y:43}),null);assert.equal(error({x:30,y:30}),null,'far from water is allowed');
   assert.equal(s.fishing.bodies.length,1);assert.equal(s.fishing.capacity(0),400);
 });
 
@@ -81,4 +81,22 @@ test('fish stocks and a Fisher mid-trip survive Save/Load; corrupt fishing state
   for(const corrupt of [d=>d.fishing.stocks[0][1]=401,d=>d.fishing.stocks.push([1,10]),d=>d.fishing.catches.push([999,1,1]),d=>{const x=d.workers.find(x=>x.id===w.id);x.workTask.caught=FISHING.basket;},d=>{const x=d.workers.find(x=>x.id===w.id);x.workTask.depth=1;}]){
     const copy=JSON.parse(JSON.stringify(data));corrupt(copy);assert.throws(()=>validateGameState(copy));
   }
+});
+
+test('the Fishers use the nearest reachable shore by walking distance, with no radius; far away means fewer fish a day',()=>{
+  const near=lakeScene(),h1=hut(near),far=lakeScene(),h2=hut(far,{x:28,y:43});
+  assert.equal(near.fishing.distance(h1),1,'right at the water');assert.ok(far.fishing.distance(h2)>=20,`about twenty tiles (${far.fishing.distance(h2)})`);
+  assert.ok(far.fishing.spots(h2).every((p,i,a)=>!i||a[i-1].distance<=p.distance),'nearest first');
+  assert.match(far.fishing.summary(h2),/Water: \d+ tiles away/);
+  const caught=(s,b)=>{const w=fisher(s,b);s.foodSystem.eat=()=>true;for(let i=0;i<4800;i++)s.tick(50);const r=s.fishing.catches.get(b.id);return (r?.today??0)+(r?.yesterday??0);};
+  const a=caught(near,h1),b=caught(far,h2);assert.ok(a>b,`a hut by the water catches more (${a} > ${b})`);assert.ok(b>0,'the far one still fishes');
+});
+
+test('two Fishers never share a spot; a hut with no reachable water says so and gets a notice',async()=>{
+  const s=lakeScene(),b=hut(s),[w1,w2]=[fisher(s,b),fisher(s,b)];for(let i=0;i<200;i++)s.tick(50);
+  assert.ok(w1.workTask&&w2.workTask);assert.notDeepEqual(w1.workTask.goal,w2.workTask.goal);
+  const dry=workerScene(undefined,{naturalResources:true,construction:true,logistics:true});dry.workerSystem.unsubscribe();dry.groundGrid=emptyGround();dry.fishing=new FishingSystem(dry);for(const a of [...dry.animalSystem.animals.values()])dry.animalSystem.remove(a);
+  const h=hut(dry,{x:62,y:62});assert.deepEqual(dry.fishing.spots(h),[]);assert.equal(dry.fishing.summary(h),'No reachable water');assert.equal(dry.fishing.previewDistance({x:30,y:30},objectRegistry.require('fisherman_hut')),null);
+  const w=fisher(dry,h);for(let i=0;i<1200&&w.workMessage!=='No reachable fishing spot';i++)dry.tick(50);assert.equal(w.workMessage,'No reachable fishing spot');assert.equal(w.workTask,null);
+  const { ProductionDiagnostics }=await import('../src/systems/ProductionDiagnostics.js');const d=new ProductionDiagnostics(dry);assert.ok(d.depletionIssues().some(i=>i.entityId===h.id&&i.reason==='noWater'));
 });

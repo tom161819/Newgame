@@ -1,8 +1,8 @@
-// Fishing R1 (owner-approved concept, 7 Nov 2026). A Fisher walks to a free shore tile within `radius` of his Fisherman's
-// Hut, fishes until his basket holds `basket` fish (or `maxTripDays` pass) and carries the catch to a Granary.
+// Fishing R1 (owner-approved concept, 7 Nov 2026). A Fisher walks to the nearest free shore tile his Fisherman's Hut can
+// reach (no fixed radius since 0.32.0; `nearestSpots` free spots are offered to the path search), fishes until his basket holds `basket` fish (or `maxTripDays` pass) and carries the catch to a Granary.
 // About `perDay` fish per game day at a full fish stock, skill 1, in Summer, without weather.
 export const FISHING=Object.freeze({
-  perDay:6,basket:5,radius:8,maxTripDays:1,xp:3,
+  perDay:6,basket:5,nearestSpots:12,spotCacheMs:10000,maxTripDays:1,xp:3,
   // Water next to the shore spot: deep water gives more fish than shallow water (ground codes, src/data/worldTerrain.js).
   depth:Object.freeze({3:.8,4:1.2}),
   season:Object.freeze({Spring:1.1,Summer:1,Autumn:1,Winter:.5}),

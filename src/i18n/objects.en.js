@@ -27,7 +27,7 @@ export default {
   'object.wall.name':'Stone Wall','object.wall.description':'A connectable stone wall. Drag to build a straight line; you can walk along the top between connected segments.',
   'object.quarry.name':'Quarry','object.quarry.description':'A quarry with three Miner workplaces. It must cover a real stone deposit and be reachable. It mines only its assigned finite deposit.',
   'object.builder_workshop.name':'Builder\'s Workshop','object.builder_workshop.description':'An open workshop and material yard for Builders. Each workshop serves 4 Builders; Builders without one work 50 % slower.',
-  'object.fisherman_hut.name':'Fisherman\'s Hut','object.fisherman_hut.description':'A hut on the shore for two Fishers. It must stand next to water; Fishers fish from the shore and carry the catch to a Granary.',
+  'object.fisherman_hut.name':'Fisherman\'s Hut','object.fisherman_hut.description':"A hut for two Fishers. It can stand anywhere: Fishers walk to the nearest reachable shore and carry the catch to a Granary, so a hut close to water catches more.",
   'object.hunting_lodge.name':'Hunting Lodge','object.hunting_lodge.description':'A hunting lodge for two Hunters. Hunters bring meat from real kills.',
   'object.barracks.name':'Barracks','object.barracks.description':'Barracks with five places for existing residents. Soldiers patrol the surroundings.',
   'object.farmhouse.name':'Farmhouse','object.farmhouse.description':'A farmhouse with three Farmer workplaces. Farmers tend crops within 15 tiles.',

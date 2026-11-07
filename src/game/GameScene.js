@@ -560,7 +560,8 @@ export class GameScene extends Phaser.Scene {
     const key=`${tileKey(anchor)}:${provisional}:${error}`;
     if(key!==this.previewKey){
       this.preview.paint({x:anchor.x,y:anchor.y,type:definition.id,definition,tiles:buildingTiles(anchor,definition)},error?0xf27777:provisional?0xe3c46b:0x71dba6);
-      this.previewKey=key;this.setStatus(error??t(provisional?'status.provisionalPlace':'status.validPlace',{name:definition.name,cost:formatCost(definition.cost,this.objectRegistry)}));
+      this.previewKey=key;let water='';if(!error&&definition.fishing&&this.fishing){const distance=this.fishing.previewDistance(anchor,definition);water=` · ${distance?t('fishing.previewWater',{distance}):t('fishing.previewNoWater')}`;}
+      this.setStatus(error??t(provisional?'status.provisionalPlace':'status.validPlace',{name:definition.name,cost:formatCost(definition.cost,this.objectRegistry)})+water);
     }
     this.preview.setVisible(true);
   }

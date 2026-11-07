@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.32.0] - 2026-11-07
+<!-- version: {"title":"Fisherman's Hut anywhere","type":"feature","reconstructed":false,"saveVersion":54} -->
+### Changed
+- A Fisherman's Hut can be built anywhere, not only next to water. Its Fishers walk to the nearest reachable shore, with no 8-tile limit, so a hut far from the water catches less. The build preview shows how far the water is, and the hut's panel says "Water: 12 tiles away". A hut with no reachable water says "No reachable water" and gets a warning sign and a notice.
+
 ## [0.31.0] - 2026-11-07
 <!-- version: {"title":"Used-up source and full storage notices","type":"feature","reconstructed":false,"saveVersion":54} -->
 ### Added

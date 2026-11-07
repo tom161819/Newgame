@@ -2,7 +2,7 @@ import { t } from '../i18n/index.js';
 import { FISHING,stockCapacity,stockFactor,stockState } from '../data/fishing.js';
 import { WORK_RULES } from '../data/jobs.js';
 import { GROUND,isWaterGround,isRiverGround } from '../data/worldTerrain.js';
-import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
+import { buildingDefinition,buildingIsComplete,towerNeighbors,buildingTiles } from '../game/buildings.js';
 
 const SIDES=[[1,0],[-1,0],[0,1],[0,-1]];
 // Fishing R1: water bodies and their fish stocks, Fishers' trips to the shore and the catch statistics per hut.
@@ -19,19 +19,37 @@ export class FishingSystem {
   capacity(id){return this.bodies[id]?.capacity??0;}
   ratio(id){const c=this.capacity(id);return c?(this.stocks.get(id)??0)/c:0;}
   state(id){return stockState(this.ratio(id));}
-  // Free shore tiles within reach of a hut: walkable, outside the hut, beside water. Deep water wins if both touch it.
-  spots(hut){
-    const s=this.scene,d=buildingDefinition(hut),r=d.fishing?.radius??FISHING.radius,out=[];
-    for(let y=hut.y-r;y<hut.y+d.height+r;y++)for(let x=hut.x-r;x<hut.x+d.width+r;x++){
-      if(s.map[y]?.[x]!==0||x>=hut.x&&x<hut.x+d.width&&y>=hut.y&&y<hut.y+d.height)continue;
-      let best=null;
-      for(const [dx,dy]of SIDES){let g=s.groundGrid?.[y+dy]?.[x+dx];if(!isRiverGround(g))continue;if(g===GROUND.FORD)g=GROUND.SHALLOW;if(!best||g===GROUND.DEEP)best={ground:g,body:this.bodyAt(x+dx,y+dy)};}
-      if(best)out.push({tile:{x,y},body:best.body,depth:best.ground});
+  // Owner request (7 Nov): the hut may stand anywhere. Its Fishers use the nearest reachable shore tiles – walkable
+  // tiles beside water, by walking distance from the hut – with no fixed radius, so a hut far from water simply
+  // catches less (longer walks). Distances come from one breadth-first search over the walkable map per hut, cached
+  // until the map changes (buildings, cleared resources) or a few game seconds pass.
+  shoreKey(){return `${this.scene.naturalResources?.topologyRevision??0}:${this.scene.buildings?.length??0}`;}
+  isShore(x,y){
+    if(this.scene.map[y]?.[x]!==0)return null;let best=null;
+    for(const [dx,dy]of SIDES){let g=this.scene.groundGrid?.[y+dy]?.[x+dx];if(!isRiverGround(g))continue;if(g===GROUND.FORD)g=GROUND.SHALLOW;if(!best||g===GROUND.DEEP)best={ground:g,body:this.bodyAt(x+dx,y+dy)};}
+    return best;
+  }
+  // Walking distance (tiles, 4-neighbour steps) from the given start tiles to every reachable shore tile, nearest first.
+  shoreFrom(starts,skip=null){
+    const map=this.scene.map,rows=map.length,cols=map[0]?.length??0,dist=new Int32Array(rows*cols).fill(-1),queue=[],out=[];
+    for(const t of starts)if(map[t.y]?.[t.x]===0&&dist[t.y*cols+t.x]<0){dist[t.y*cols+t.x]=0;queue.push(t.x,t.y);}
+    for(let i=0;i<queue.length;i+=2){
+      const x=queue[i],y=queue[i+1],d=dist[y*cols+x],shore=skip?.(x,y)?null:this.isShore(x,y);if(shore)out.push({tile:{x,y},body:shore.body,depth:shore.ground,distance:d});
+      for(const [dx,dy]of SIDES){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=cols||ny>=rows||dist[ny*cols+nx]>=0||map[ny][nx]!==0)continue;dist[ny*cols+nx]=d+1;queue.push(nx,ny);}
     }
     return out;
   }
-  // The water body a hut fishes in: the one with the most shore spots in reach (for the panel).
-  hutBody(hut){const counts=new Map();for(const p of this.spots(hut))counts.set(p.body,(counts.get(p.body)??0)+1);return [...counts].sort((a,b)=>b[1]-a[1]||a[0]-b[0])[0]?.[0]??-1;}
+  spots(hut){
+    const key=this.shoreKey(),now=this.scene.gameTime?.totalElapsed??0;this.spotCache??=new Map();const cached=this.spotCache.get(hut.id);
+    if(cached&&cached.key===key&&now<cached.until)return cached.spots;
+    const d=buildingDefinition(hut),inside=(x,y)=>x>=hut.x&&x<hut.x+d.width&&y>=hut.y&&y<hut.y+d.height,spots=this.shoreFrom(towerNeighbors(hut),inside);
+    this.spotCache.set(hut.id,{key,until:now+FISHING.spotCacheMs,spots});return spots;
+  }
+  // For the placement preview: walking distance from a planned hut to the nearest shore, or null.
+  previewDistance(anchor,definition){const tiles=new Set(buildingTiles(anchor,definition).map(t=>`${t.x},${t.y}`)),near=this.shoreFrom(towerNeighbors({...anchor,definition}),(x,y)=>tiles.has(`${x},${y}`));return near.length?near[0].distance+1:null;}
+  distance(hut){const first=this.spots(hut)[0];return first?first.distance+1:null;}
+  // The water body a hut actually fishes in: the most common one among its nearest shore spots (for the panel).
+  hutBody(hut){const counts=new Map();for(const p of this.spots(hut).slice(0,FISHING.nearestSpots))counts.set(p.body,(counts.get(p.body)??0)+1);return [...counts].sort((a,b)=>b[1]-a[1]||a[0]-b[0])[0]?.[0]??-1;}
   slot(tile){return `natural-slot:${tile.x},${tile.y}`;}
   wait(worker,message){worker.workState='Waiting';worker.workMessage=message;worker.aiCooldown=WORK_RULES.searchInterval;}
   release(worker){const task=worker.workTask;if(task?.kind!=='fish')return;this.scene.workerSystem.reservations.release(task.reservation,worker.id);}
@@ -43,7 +61,8 @@ export class FishingSystem {
     let task=worker.workTask;
     if(!task){
       if(worker.aiCooldown>0)return;
-      const all=this.spots(home),open=all.filter(p=>this.ratio(p.body)>=FISHING.stock.overfished&&system.reservations.available(this.slot(p.tile),worker.id));
+      // The nearest few free spots on water that is not overfished; the path search then picks the closest of them.
+      const all=this.spots(home),open=all.filter(p=>this.ratio(p.body)>=FISHING.stock.overfished&&system.reservations.available(this.slot(p.tile),worker.id)).slice(0,FISHING.nearestSpots);
       if(!open.length){this.wait(worker,all.some(p=>this.ratio(p.body)>=FISHING.stock.overfished)?'No free fishing spot':all.length?'Overfished':'No reachable fishing spot');return;}
       const route=system.ai.route(worker,open.map(p=>p.tile));if(!route){this.wait(worker,'No reachable fishing spot');return;}
       const spot=open.find(p=>p.tile.x===route.destination.x&&p.tile.y===route.destination.y)??open[0],reservation=this.slot(spot.tile);
@@ -82,7 +101,7 @@ export class FishingSystem {
   summary(hut){
     const body=this.hutBody(hut),record=this.catches.get(hut.id)??{today:0,yesterday:0};
     if(body<0)return t('fishing.noWater');
-    return t('fishing.summary',{state:t(`fishing.state.${this.state(body)}`),stock:Math.floor(this.stocks.get(body)??0),capacity:this.capacity(body),today:record.today,yesterday:record.yesterday,season:Math.round(this.modifier(GROUND.DEEP)/FISHING.depth[GROUND.DEEP]*100)});
+    return t('fishing.water',{distance:this.distance(hut)})+' · '+t('fishing.summary',{state:t(`fishing.state.${this.state(body)}`),stock:Math.floor(this.stocks.get(body)??0),capacity:this.capacity(body),today:record.today,yesterday:record.yesterday,season:Math.round(this.modifier(GROUND.DEEP)/FISHING.depth[GROUND.DEEP]*100)});
   }
   exportState(){return {version:1,nextCatch:this.nextCatch,stocks:[...this.stocks].map(([id,n])=>[id,Math.round(n*1000)/1000]),warned:[...this.warned],catches:[...this.catches].map(([id,r])=>[id,r.today,r.yesterday])};}
   importState(state){

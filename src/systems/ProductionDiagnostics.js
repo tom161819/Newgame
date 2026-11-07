@@ -71,13 +71,15 @@ export class ProductionDiagnostics {
   // bound to one finite deposit; a lumberjack hut counts every tree (also young ones) in its working radius, so it is
   // only "out of wood" when nothing will grow back there. Gone as soon as something appears again or the building goes.
   depletionIssues(){
-    const s=this.scene,natural=s.naturalResources,found=[];if(!natural)return found;
+    const s=this.scene,natural=s.naturalResources,found=[];if(!natural&&!s.fishing)return found;
     for(const b of s.buildings){
-      if(!buildingIsComplete(b)||b.unverified||!DEPLETION_SOURCES[b.type])continue;let empty=false;
+      if(!natural||!buildingIsComplete(b)||b.unverified||!DEPLETION_SOURCES[b.type])continue;let empty=false;
       if(b.type==='lumberjack_hut'){const c={x:b.x+.5,y:b.y+.5},r=buildingDefinition(b).workRadius??0;empty=![...natural.byId.values()].some(t=>t.definition?.tree&&Math.hypot(t.x-c.x,t.y-c.y)<=r);}
       else if(b.quarryMode!=='legacy'&&b.quarryMode!=='unbound'){const d=b.depositId!=null?natural.byId.get(b.depositId):null;empty=!!d&&d.natural.remaining===0;}
       if(empty)found.push({entityId:b.id,reason:'depleted',category:'production',params:{resource:GATHER_OUTPUTS[b.type],source:DEPLETION_SOURCES[b.type]},feed:true});
     }
+    // A Fisherman's Hut may stand anywhere (0.32.0): one with no reachable shore at all has nothing to do.
+    for(const b of s.buildings)if(b.type==='fisherman_hut'&&buildingIsComplete(b)&&!b.unverified&&s.fishing&&!s.fishing.spots(b).length)found.push({entityId:b.id,reason:'noWater',category:'production',params:{}});
     return found;
   }
   // Goods that want a store: in production output buffers, or held by residents who wait for storage room.
@@ -99,7 +101,7 @@ export class ProductionDiagnostics {
     return found;
   }
   // The current issue of one building (for its panel and the icon over it), most important first.
-  buildingIssue(id){let best=null;for(const issue of this.issues.values())if(issue.entityId===id&&issue.lastNotified!=null&&(!best||issue.reason==='depleted'))best=issue;return best;}
+  buildingIssue(id){let best=null;for(const issue of this.issues.values())if(issue.entityId===id&&issue.lastNotified!=null&&(!best||issue.reason!=='outputFull'))best=issue;return best;}
   detect(){
     const found=[...this.constructionIssues(),...this.depletionIssues(),...this.storageIssues()];
     for(const record of this.scene.foodProduction?.records.values()??[]){const issue=this.productionIssue(record);if(issue)found.push({entityId:record.buildingId,category:'production',...issue});}
