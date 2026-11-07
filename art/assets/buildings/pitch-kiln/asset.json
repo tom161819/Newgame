@@ -9,7 +9,7 @@
     "height": 2
   },
   "generator": "workshop",
-  "plannedGameObjectId": "pitch_kiln",
+  "gameObjectId": "pitch_kiln",
   "variants": [
     {
       "id": "pitch-kiln-turf-kiln",

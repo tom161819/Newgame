@@ -9,7 +9,7 @@
     "height": 1
   },
   "generator": "workshop",
-  "plannedGameObjectId": "well",
+  "gameObjectId": "well",
   "variants": [
     {
       "id": "well-roofed",

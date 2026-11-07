@@ -9,7 +9,7 @@
     "height": 1
   },
   "generator": "workshop",
-  "plannedGameObjectId": "swing_tree",
+  "gameObjectId": "swing_tree",
   "variants": [
     {
       "id": "swing-tree-summer",

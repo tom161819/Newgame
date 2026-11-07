@@ -9,7 +9,7 @@
     "height": 1
   },
   "generator": "workshop",
-  "plannedGameObjectId": "haystack",
+  "gameObjectId": "haystack",
   "variants": [
     {
       "id": "haystack-dome",
