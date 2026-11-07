@@ -55,6 +55,7 @@ import { stablesSmoke } from './stables-smoke.mjs';
 import { horseWagonSmoke } from './horse-wagon-smoke.mjs';
 import { housingSmoke } from './housing-smoke.mjs';
 import { forestrySmoke,forestryHutSmoke } from './forestry-smoke.mjs';
+import { gettingStartedSmoke } from './getting-started-smoke.mjs';
 
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
@@ -128,6 +129,9 @@ try{
   for(const selector of ['#setup-gold','#setup-start-stone','#setup-start-wood','#setup-start-iron-ore','#setup-start-bread'])await page.locator(selector).evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
+  // A New Game from the setup opens Getting started once (0.9.3); the scenario below starts with it closed.
+  await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');assert.equal(await page.locator('#help-dialog').evaluate(d=>d.open),false);
+  if(args.includes('--full')||args.includes('--getting-started'))await gettingStartedSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--ledger'))await ledgerSmoke(page);
   if(args.includes('--full')||args.includes('--smelting'))await smeltingSmoke(page);
   if(args.includes('--full')||args.includes('--military'))await militarySmoke(page);
@@ -234,16 +238,17 @@ try{
   assert.equal(await page.evaluate(id=>window.__game.registry.get('application').saves.get(id).then(r=>!!r),stored.id),true,'starting a new game never deletes the old save');
   await page.evaluate(id=>window.__game.registry.get('application').saves.delete(id),stored.id);
   console.log(`PASS actual historical schema ${isolated.schema} save is reported as incompatible with schema ${record.saveVersion}; the world and the stored slot stay unchanged and New Game is offered`);
-  // N04: starting resources on the restarted New Game screen go into the Starter Stockpile once, capped at its 40 units.
+  // N04: starting resources on the restarted New Game screen go into the Starter Stockpile once, capped at its 160 units
+  // (0.9.2: the setup proposes 40 of each, which fills it).
   {const set=(name,value)=>page.locator(`#game-setup-form [name="${name}"]`).evaluate((e,v)=>{e.value=String(v);e.dispatchEvent(new Event('input',{bubbles:true}));},value);
-  await page.locator('.setup-advanced summary').click();assert.equal(await page.locator('#setup-resources-total').textContent(),'0 / 40');
-  await set('startingStone',25);await set('startingWood',25);assert.equal(await page.locator('#setup-start-wood').inputValue(),'15','the slider stops at the remaining room');assert.equal(await page.locator('#setup-resources-total').textContent(),'40 / 40');
-  assert.match(await page.locator('#setup-summary').textContent(),/Stockpile: 25 stone, 15 wood/);
+  await page.locator('.setup-advanced summary').click();assert.equal(await page.locator('#setup-resources-total').textContent(),'160 / 160');
+  await set('startingIronOre',0);await set('startingBread',0);await set('startingStone',100);await set('startingWood',100);assert.equal(await page.locator('#setup-start-wood').inputValue(),'60','the slider stops at the remaining room');assert.equal(await page.locator('#setup-resources-total').textContent(),'160 / 160');
+  assert.match(await page.locator('#setup-summary').textContent(),/Stockpile: 100 stone, 60 wood/);
   await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'setup fits a phone');await page.setViewportSize({width:1440,height:1000});
   await page.locator('#start-game').click();await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
   const start=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,starter=s.buildings.find(b=>b.type==='starter_stockpile');return {stock:s.foodStorage.locations.get(`stockpile-${starter.id}`).stock,loose:s.resourceCount('stone'),initial:s.gameSettings.initialStoneCount,stone:s.inventory.count('stone'),settings:window.__game.registry.get('application').snapshot().gameSettings};});
-  assert.deepEqual(start.stock,{stone:25,wood:15});assert.equal(start.stone,25);assert.equal(start.loose,start.initial,'loose map stones follow Initial Stones only');assert.equal(start.settings.startingWood,15);
-  console.log(`PASS New Game starting resources: capped 40-unit Starter Stockpile, 25 Stone + 15 Wood deposited once, ${start.loose} loose map stones kept separate, phone-width setup`);}
+  assert.deepEqual(start.stock,{stone:100,wood:60});assert.equal(start.stone,100);assert.equal(start.loose,start.initial,'loose map stones follow Initial Stones only');assert.equal(start.settings.startingWood,60);
+  console.log(`PASS New Game starting resources: capped 160-unit Starter Stockpile, 100 Stone + 60 Wood deposited once, ${start.loose} loose map stones kept separate, phone-width setup`);}
   const archivePage=await context.newPage();await instrument(archivePage);await archivePage.goto(origin+base+'versions/');assert.equal(await archivePage.locator('[data-version-label]').count(),catalog.versions.length+(catalog.versions.some(v=>v.current)?0:1));
   await archivePage.setViewportSize({width:390,height:844});assert.equal(await archivePage.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   const first=catalog.builds.at(-1);await archivePage.goto(origin+first.archiveURL);await archivePage.locator('canvas:not(.minimap-canvas)').waitFor();

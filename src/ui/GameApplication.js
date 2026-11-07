@@ -55,13 +55,15 @@ export class GameApplication {
     this.main.hidden=true;this.setup.open();
   }
   start(state=null,settings){
+    // A new game from the setup opens Getting started once; a loaded game never does.
+    this.pendingGettingStarted=!state;
     this.archive.close(false);
     this.changelog.close(false);
     this.setup.close();
     this.pauseDialog.close();this.main.hidden=true;document.body.classList.add('in-game');document.querySelector('main').inert=false;
     this.game.scene.stop('MainMenu');this.game.scene.stop('Game');this.scene=null;this.game.scene.start('Game',{state,settings});
   }
-  onGameReady(scene){this.scene=scene;this.autosave.reset();}
+  onGameReady(scene){this.scene=scene;this.autosave.reset();if(this.pendingGettingStarted){this.pendingGettingStarted=false;scene.gettingStarted?.show();}}
   labelAutosaveIntervals(){for(const option of document.querySelectorAll('#autosave-interval option'))option.textContent=t('autosave.interval',{count:Number(option.value)/60000});}
   // A language switch re-renders the texts built in code; static markup is handled by applyTranslations.
   relabel(){for(const select of this.languageSelects)select.value=language();this.labelAutosaveIntervals();this.autosaveStatus(this.autosaveFailure);this.setup?.refresh();this.saveMenu.relabel();this.changelog?.relabel?.();this.archive?.relabel?.();this.scene?.relabelUI?.();}

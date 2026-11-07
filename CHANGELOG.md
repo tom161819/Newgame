@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.9.3] - 2026-11-07
+<!-- version: {"title":"Getting started help","type":"feature","reconstructed":false,"saveVersion":37} -->
+### Added
+- A "?" button at the right of the top bar opens Getting started: a checklist of the first buildings (Warehouse, Granary, Farmhouse, Hunting Lodge, Wheat Field, House, Lumberjack Hut), each with a sentence on why. A step ticks itself when its building is finished; the next step is highlighted, and clicking a step opens the Buildings menu on that building.
+- A new game opens Getting started once. Until every step is done the "?" button carries a small dot. Loaded games never open it by themselves, and buildings already standing in them show as done.
+
 ## [0.9.2] - 2026-11-07
 <!-- version: {"title":"Friendlier start of a game","type":"feature","reconstructed":false,"saveVersion":37} -->
 ### Changed

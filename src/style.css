@@ -532,3 +532,21 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .demolition-actions{margin-top:1rem;padding-top:1rem;border-top:1px solid #a9987255}
 .demolition-actions progress{display:block;width:100%;margin:.5rem 0}
 .demolition-actions progress[hidden]{display:none}
+
+/* Getting started (owner request 7 Nov 2026): the "?" HUD button and its checklist. */
+.help-toggle { min-width: 28px; font-weight: 700; }
+.help-dialog { width: min(520px,94vw); }
+.help-summary { margin: -6px 0 12px; color: #d8cda9; font-size: 14px; }
+.help-summary.help-all-set { color: #b9d98f; font-weight: 600; }
+.help-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.help-step-button { width: 100%; display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 10px; padding: 8px 10px; text-align: left; border: 1px solid #5d5a3e; border-radius: 4px; background: #262c1d; color: inherit; cursor: pointer; }
+.help-step-button:hover, .help-step-button:focus-visible { border-color: #c9ad62; background: #2f3523; }
+.help-step-mark { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1px solid #978657; font-size: 13px; font-weight: 700; }
+.help-step-text { display: grid; gap: 2px; }
+.help-step-text small { color: #c8bd9c; font-size: 12px; line-height: 1.35; }
+.help-step-state { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #a99f80; }
+.help-step.current .help-step-button { border-color: #e0b34f; box-shadow: 0 0 0 1px #e0b34f55 inset; }
+.help-step.current .help-step-mark { background: #e0b34f; color: #262c1d; border-color: #e0b34f; }
+.help-step.done .help-step-mark { background: #6f8f45; border-color: #6f8f45; color: #f3efd9; }
+.help-step.done .help-step-text strong { color: #b9c79a; }
+.help-step.done .help-step-state { color: #9fc172; }

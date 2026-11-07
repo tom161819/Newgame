@@ -59,6 +59,7 @@ import { EquipmentSystem } from '../systems/EquipmentSystem.js';
 import { TreasureSystem } from '../systems/TreasureSystem.js';
 import { EquipmentPanel } from '../ui/EquipmentPanel.js';
 import { TreasurePanel } from '../ui/TreasurePanel.js';
+import { GettingStartedPanel } from '../ui/GettingStartedPanel.js';
 import { ChestView } from './ChestView.js';
 import { PauseManager } from '../systems/PauseManager.js';
 import { loadGameState } from '../systems/GameStateLoader.js';
@@ -241,6 +242,7 @@ export class GameScene extends Phaser.Scene {
     this.production=new ProductionSystem(this.gameTime,this.inventory,()=>this.buildings,(day,totals)=>this.onDailyIncome(day,totals));
     this.wageSystem=new WageSystem(this,{onPayroll:()=>this.updateInventory()});this.economyPanel=new EconomyPanel(this);
     this.buildingBar.close();this.updateInventory();
+    this.gettingStarted=new GettingStartedPanel(this);
     this.updateTimeDisplay();
     this.setStatus(t('status.idle'));
     this.worldCamera=new WorldCamera(this,this.player);this.staffingIndicators=new MissingWorkersIndicators(this);
@@ -283,7 +285,7 @@ export class GameScene extends Phaser.Scene {
       this.settingsPanel.destroy();this.fpsOverlay.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
       this.clearWallPreviews();
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
-      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
+      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.pavementTool.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
       this.demolitionUI.destroy();this.demolition.destroy();this.farmConnections.destroy();this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
@@ -565,7 +567,7 @@ export class GameScene extends Phaser.Scene {
   updateInventory() { this.inventoryBar.update();this.updateBuildingUI();this.updateWorldCount();this.updateFoodDisplay();this.equipmentPanel?.refresh();this.economyPanel?.update(); }
   // Language switch during play: refresh every HUD text that is built in code.
   relabelUI(){
-    this.updateTimeDisplay();this.updateFoodDisplay();this.updateWorldCount();this.updateMountUI?.();this.combatFeedback?.refresh();this.experienceFeedback?.refresh();this.workerSystem?.updateUI();this.inventoryBar?.update();this.buildingBar?.selectCategory?.(this.buildingBar.category);if(this.populationSidebar){this.populationSidebar.renderOptions();this.populationSidebar.lastRefresh=-Infinity;}this.updateBuildingUI();
+    this.updateTimeDisplay();this.updateFoodDisplay();this.updateWorldCount();this.updateMountUI?.();this.combatFeedback?.refresh();this.experienceFeedback?.refresh();this.workerSystem?.updateUI();this.inventoryBar?.update();this.gettingStarted?.relabel();this.buildingBar?.selectCategory?.(this.buildingBar.category);if(this.populationSidebar){this.populationSidebar.renderOptions();this.populationSidebar.lastRefresh=-Infinity;}this.updateBuildingUI();
     if(this.worldCamera?.following)document.querySelector('#camera-mode').textContent=t('hud.cameraKing');
   }
   updateTimeDisplay(){const output=document.querySelector('#game-time');if(output.textContent!==this.gameTime.label)output.textContent=this.gameTime.label;const seasons=document.querySelector('#season-weather');if(seasons.textContent!==this.seasons.label)seasons.textContent=this.seasons.label;}
