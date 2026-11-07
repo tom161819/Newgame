@@ -4,42 +4,42 @@
   "variantId": "pitch-kiln-turf-kiln",
   "name": "Turf-covered tar kiln",
   "category": "buildings",
-  "version": 1,
-  "specHash": "ec5ca2de",
+  "version": 2,
+  "specHash": "dd84b900",
   "generator": "workshop",
   "generatorVersion": 1,
   "styleGuide": "medieval-kingdom-painted-isometric@1",
   "scale": 1,
-  "width": 131,
-  "height": 90,
+  "width": 195,
+  "height": 120,
   "anchor": {
-    "x": 65,
-    "y": 56
+    "x": 97,
+    "y": 70
   },
   "origin": {
-    "x": 0.49618,
-    "y": 0.62222
+    "x": 0.49744,
+    "y": 0.58333
   },
   "footprint": {
-    "width": 2,
-    "height": 2
+    "width": 3,
+    "height": 3
   },
   "base": {
-    "x": 65,
-    "y": 88
+    "x": 97,
+    "y": 118
   },
   "baseOrigin": {
-    "x": 0.49618,
-    "y": 0.97778
+    "x": 0.49744,
+    "y": 0.98333
   },
-  "visualHeight": 88,
+  "visualHeight": 118,
   "platform": null,
   "frontLayer": false,
   "gameLights": [
     {
       "type": "brazier",
-      "x": 11.89,
-      "y": -29.53,
+      "x": 12.96,
+      "y": -39.66,
       "color": "#ff9d4a",
       "radius": 134.4,
       "intensity": 1,
@@ -51,8 +51,8 @@
     },
     {
       "type": "brazier",
-      "x": -25.6,
-      "y": -37.13,
+      "x": -30.4,
+      "y": -57.13,
       "color": "#ff9d4a",
       "radius": 134.4,
       "intensity": 1,
@@ -64,8 +64,8 @@
     },
     {
       "type": "torch",
-      "x": -48.96,
-      "y": -55.57,
+      "x": -76.16,
+      "y": -70.77,
       "color": "#ffb25a",
       "radius": 102.4,
       "intensity": 0.95,
@@ -76,12 +76,12 @@
       "flameSize": 1
     }
   ],
-  "modelHeight": 0.86,
+  "modelHeight": 1.12,
   "lights": [
     {
       "type": "brazier",
-      "x": 76.89,
-      "y": 58.47,
+      "x": 109.96,
+      "y": 78.34,
       "color": "#ff9d4a",
       "radius": 134.4,
       "intensity": 1,
@@ -93,8 +93,8 @@
     },
     {
       "type": "brazier",
-      "x": 39.4,
-      "y": 50.87,
+      "x": 66.6,
+      "y": 60.87,
       "color": "#ff9d4a",
       "radius": 134.4,
       "intensity": 1,
@@ -106,8 +106,8 @@
     },
     {
       "type": "torch",
-      "x": 16.04,
-      "y": 32.43,
+      "x": 20.84,
+      "y": 47.23,
       "color": "#ffb25a",
       "radius": 102.4,
       "intensity": 0.95,

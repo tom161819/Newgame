@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "fisherman-hut-large",
+  "variantId": "fisherman-hut-large-stage-hut",
+  "name": "Hut on stilts with landing stage",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "f05c7811",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 156,
+  "anchor": {
+    "x": 97,
+    "y": 106
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.67949
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 154
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98718
+  },
+  "visualHeight": 154,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.89,
+  "lights": []
+}

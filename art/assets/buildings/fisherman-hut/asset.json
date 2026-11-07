@@ -189,8 +189,8 @@
     {
       "id": "fisherman-hut-stilt-net-loft",
       "name": "Hut on stilts with landing stage",
-      "version": 1,
-      "notes": "A timber hut raised on posts, a short landing stage, a boat on trestles, nets, an eel trap and drying fish: a lake-shore fishery.",
+      "version": 2,
+      "notes": "Revision 2 (owner: a bigger net hanging on the house wall, some rods, a water barrel or tub): a timber hut on posts with a big net pegged along its front wall, a landing stage, a boat on trestles, a rack of fishing rods, a live-fish tub, an eel trap and drying fish.",
       "spec": {
         "body": {
           "kind": "raised",
@@ -210,6 +210,16 @@
         },
         "props": [
           {
+            "type": "wallNet",
+            "at": [
+              -0.42,
+              0.06
+            ],
+            "width": 0.72,
+            "height": 0.42,
+            "y": 0.38
+          },
+          {
             "type": "pier",
             "at": [
               0.5,
@@ -228,17 +238,24 @@
             "upturned": true
           },
           {
-            "type": "netRack",
+            "type": "rodRack",
             "at": [
               -0.35,
-              0.55
+              0.62
+            ]
+          },
+          {
+            "type": "waterTub",
+            "at": [
+              0.0,
+              0.3
             ]
           },
           {
             "type": "fishRack",
             "at": [
-              -0.7,
-              0.12
+              -0.72,
+              0.15
             ],
             "r": 1.5708,
             "count": 5
@@ -246,15 +263,16 @@
           {
             "type": "eelTrap",
             "at": [
-              0.0,
-              0.3
-            ]
+              0.75,
+              0.0
+            ],
+            "r": 1.2
           },
           {
             "type": "fishBasket",
             "at": [
-              0.08,
-              0.68
+              0.12,
+              0.72
             ]
           }
         ]

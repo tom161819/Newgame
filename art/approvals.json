@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-07T13:04:12.071Z",
+  "updatedAt": "2026-11-07T16:35:08.685Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -278,6 +278,29 @@
         }
       }
     },
+    "campfire": {
+      "preferred": "campfire-burning",
+      "variants": {
+        "campfire-burning": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "50106d4a",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:23:21.858Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:23:21.858Z"
+        },
+        "campfire-cold": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ca1b56c0",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:23:23.582Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:23:23.582Z"
+        }
+      }
+    },
     "castle": {
       "preferred": "castle-keep",
       "variants": {
@@ -351,6 +374,34 @@
           "status": "rejected",
           "updatedAt": "2026-11-07T10:46:02.549Z",
           "version": 1
+        }
+      }
+    },
+    "fisherman-hut": {
+      "preferred": null,
+      "variants": {
+        "fisherman-hut-stilt-net-loft": {
+          "status": "review",
+          "version": 2,
+          "specHash": "69d826b5",
+          "note": "",
+          "updatedAt": "2026-11-07T17:40:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T16:25:24.015Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "vypadá dobře, jeno mpořidej větší síť která třeba visí na zdi budovy a nějaké pruty ,  a sud s vodou nebo káď, udělej i varianty 3x3 aby se tam všechno vešlo, budova může zůstat stejně velké nebo trochu větší",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "5111fd5c",
+              "status": "revision-requested",
+              "at": "2026-11-07T16:25:24.015Z"
+            }
+          ]
         }
       }
     },
@@ -557,6 +608,34 @@
         }
       }
     },
+    "pitch-kiln": {
+      "preferred": null,
+      "variants": {
+        "pitch-kiln-stone-oven": {
+          "status": "review",
+          "version": 2,
+          "specHash": "2d9bd415",
+          "note": "",
+          "updatedAt": "2026-11-07T17:40:00Z",
+          "comments": [
+            {
+              "at": "2026-11-07T16:26:23.158Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "zase vych zvětšil budovu 3x3 ať jedno pole má příslušenství ale budova je větší",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "1191704c",
+              "status": "revision-requested",
+              "at": "2026-11-07T16:26:23.158Z"
+            }
+          ]
+        }
+      }
+    },
     "quarry": {
       "preferred": "quarry-pit",
       "variants": {
@@ -668,6 +747,36 @@
         }
       }
     },
+    "starter-stockpile": {
+      "preferred": "starter-stockpile-tarp-camp",
+      "variants": {
+        "starter-stockpile-tarp-camp": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4311f7d8",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:26:41.093Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:26:41.093Z"
+        },
+        "starter-stockpile-pole-shed": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cc96a0c2",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T16:26:44.653Z",
+          "version": 1
+        },
+        "starter-stockpile-cart-camp": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f1ba8485",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T16:26:45.393Z",
+          "version": 1
+        }
+      }
+    },
     "stone-wall": {
       "preferred": "stone-wall-crenellated",
       "variants": {
@@ -717,6 +826,38 @@
           "status": "rejected",
           "updatedAt": "2026-11-07T10:16:49.845Z",
           "version": 1
+        }
+      }
+    },
+    "village-green": {
+      "preferred": "village-green-linden",
+      "variants": {
+        "village-green-linden": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1017e4b6",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:27:04.174Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:27:04.174Z"
+        },
+        "village-green-maypole": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "65a3c66c",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:27:04.839Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:27:04.839Z"
+        },
+        "village-green-oak-cross": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "661ed035",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:27:05.795Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:27:05.795Z"
         }
       }
     },
@@ -990,6 +1131,36 @@
         }
       }
     },
+    "haystack": {
+      "preferred": "haystack-cocks",
+      "variants": {
+        "haystack-dome": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "eb1151c7",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T16:25:39.919Z",
+          "version": 1
+        },
+        "haystack-cocks": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0cc31f7e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:25:33.524Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:25:33.524Z"
+        },
+        "haystack-snow": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "29162360",
+          "status": "rejected",
+          "updatedAt": "2026-11-07T16:25:41.142Z",
+          "version": 1
+        }
+      }
+    },
     "profession-porch": {
       "preferred": "profession-porch-smith",
       "variants": {
@@ -1243,6 +1414,61 @@
         }
       }
     },
+    "snowman": {
+      "preferred": "snowman-bucket",
+      "variants": {
+        "snowman-bucket": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e820ae59",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:26:29.016Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:26:29.016Z"
+        },
+        "snowman-scarf": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cab99718",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:26:30.092Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:26:30.092Z"
+        }
+      }
+    },
+    "swing-tree": {
+      "preferred": "swing-tree-summer",
+      "variants": {
+        "swing-tree-summer": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f73f4371",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:26:51.118Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:26:51.118Z"
+        },
+        "swing-tree-autumn": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "edf21452",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:26:52.235Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:26:52.235Z"
+        },
+        "swing-tree-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "43baa64d",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:26:53.382Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:26:53.382Z"
+        }
+      }
+    },
     "torch-post": {
       "preferred": "torch-post-brazier",
       "variants": {
@@ -1303,6 +1529,38 @@
           "status": "approved",
           "updatedAt": "2026-11-07T06:09:42.419Z",
           "version": 1
+        }
+      }
+    },
+    "well": {
+      "preferred": "well-roofed",
+      "variants": {
+        "well-roofed": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "937f5ec1",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:27:22.122Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:27:22.122Z"
+        },
+        "well-sweep": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "44826dd2",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:27:24.384Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:27:24.384Z"
+        },
+        "well-roofed-snow": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8294c468",
+          "status": "approved",
+          "updatedAt": "2026-11-07T16:27:24.808Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T16:27:24.808Z"
         }
       }
     },

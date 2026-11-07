@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "assetId": "pitch-kiln",
+  "variantId": "pitch-kiln-stone-oven",
+  "name": "Stone pitch house with yard",
+  "category": "buildings",
+  "version": 2,
+  "specHash": "2d9bd415",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 152,
+  "anchor": {
+    "x": 97,
+    "y": 102
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.67105
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 150
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98684
+  },
+  "visualHeight": 150,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "brazier",
+      "x": 28.8,
+      "y": -35.53,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    },
+    {
+      "type": "torch",
+      "x": 3.84,
+      "y": -30.77,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 2.14,
+  "lights": [
+    {
+      "type": "brazier",
+      "x": 125.8,
+      "y": 114.47,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.6
+    },
+    {
+      "type": "torch",
+      "x": 100.84,
+      "y": 119.23,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

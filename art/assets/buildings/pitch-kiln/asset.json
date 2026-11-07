@@ -3,10 +3,10 @@
   "id": "pitch-kiln",
   "name": "Pitch Kiln",
   "category": "buildings",
-  "description": "Pitch kiln (Smolárna, plan g-noc-grafika, 2×2): makes pitch and torches. Dark, smoky and tar-stained, unlike any other workshop.",
+  "description": "Pitch kiln (Smolárna, plan g-noc-grafika): makes pitch and torches. Dark, smoky and tar-stained, unlike any other workshop. 3×3 (owner, revision 2): a bigger building, one row of tiles for the yard. The game's pitch kiln is 2×2 today: using this needs the footprint changed.",
   "footprint": {
-    "width": 2,
-    "height": 2
+    "width": 3,
+    "height": 3
   },
   "generator": "workshop",
   "gameObjectId": "pitch_kiln",
@@ -14,17 +14,19 @@
     {
       "id": "pitch-kiln-turf-kiln",
       "name": "Turf-covered tar kiln",
-      "version": 1,
-      "notes": "A domed earth-and-turf tar kiln smoking at the top, its run-off spout feeding a trough, a cauldron of pitch on a tripod fire, tarred barrels, resinous stumps, billets and a crate of finished torches; a lean-to for the pitch maker.",
+      "version": 2,
+      "notes": "A large domed earth-and-turf tar kiln smoking at the top, its run-off spout feeding a trough, a big lean-to for the pitch maker, a cauldron of pitch on a tripod fire, tarred barrels, resinous stumps, billets and crates of finished torches.",
       "spec": {
         "body": {
           "kind": "shed",
-          "width": 0.8,
-          "depth": 0.55,
-          "height": 0.62,
+          "width": 1.5,
+          "depth": 0.8,
+          "frontHeight": 0.9,
+          "backHeight": 0.6,
+          "sideWall": "left",
           "at": [
-            -0.5,
-            -0.6
+            -0.55,
+            -0.85
           ]
         },
         "props": [
@@ -34,58 +36,73 @@
               0,
               0
             ],
-            "width": 1.8,
-            "depth": 1.8
+            "width": 2.7,
+            "depth": 2.7
           },
           {
             "type": "tarKiln",
             "at": [
-              0.35,
+              0.55,
               -0.35
             ],
-            "size": 1.05
+            "size": 1.5
           },
           {
             "type": "tarCauldron",
             "at": [
-              -0.45,
-              0.35
+              -0.65,
+              0.3
             ]
           },
           {
             "type": "tarBarrels",
             "at": [
-              0.45,
-              0.45
+              0.65,
+              0.75
             ],
             "count": 4
           },
           {
+            "type": "tarBarrels",
+            "at": [
+              -0.9,
+              -0.85
+            ],
+            "count": 3
+          },
+          {
             "type": "stumpPile",
             "at": [
-              -0.75,
-              -0.05
+              -1.05,
+              0.95
             ]
           },
           {
             "type": "billets",
             "at": [
-              -0.15,
-              -0.1
+              -0.25,
+              0.1
             ]
           },
           {
             "type": "torchBundle",
             "at": [
-              0.0,
-              0.55
+              0.05,
+              0.95
+            ]
+          },
+          {
+            "type": "torchBundle",
+            "at": [
+              0.3,
+              1.1
             ]
           },
           {
             "type": "lanternPole",
             "at": [
-              -0.85,
-              0.8
+              -1.25,
+              1.25
             ]
           }
         ]
@@ -93,77 +110,93 @@
     },
     {
       "id": "pitch-kiln-stone-oven",
-      "name": "Stone pitch oven with shed",
-      "version": 1,
-      "notes": "A small stone building with a chimney, a domed oven, a pitch cauldron, tarred barrels and crates of torches; tidier, a later-game workshop.",
+      "name": "Stone pitch house with yard",
+      "version": 2,
+      "notes": "Revision 2 (owner: 3×3, a bigger building, one tile of accessories): a long stone pitch house with a chimney and a tiled pent roof over the oven door; the yard along the front holds the domed pitch oven, a cauldron on a tripod fire, tarred barrels, crates of torches, resinous stumps and billets.",
       "spec": {
         "body": {
           "kind": "house",
           "walls": "stone",
           "roofMaterial": "roof_shingle",
-          "width": 0.85,
-          "depth": 0.72,
-          "wallHeight": 0.7,
-          "roofHeight": 0.5,
+          "width": 1.75,
+          "depth": 1.15,
+          "wallHeight": 0.95,
+          "roofHeight": 0.7,
           "ridge": "x",
-          "windows": 1,
+          "windows": 2,
           "chimney": true,
           "at": [
-            -0.38,
-            -0.42
+            -0.4,
+            -0.5
           ]
         },
         "props": [
           {
             "type": "oven",
             "at": [
-              0.45,
-              -0.45
+              0.95,
+              -0.75
             ]
           },
           {
             "type": "tarCauldron",
             "at": [
-              0.5,
-              0.3
+              0.95,
+              0.05
             ]
           },
           {
             "type": "tarBarrels",
             "at": [
-              -0.6,
-              0.35
+              0.8,
+              0.75
             ],
-            "count": 3
+            "count": 4
+          },
+          {
+            "type": "torchBundle",
+            "at": [
+              0.15,
+              0.95
+            ]
           },
           {
             "type": "torchBundle",
             "at": [
               -0.1,
-              0.4
-            ]
-          },
-          {
-            "type": "torchBundle",
-            "at": [
-              0.08,
-              0.62
+              1.1
             ]
           },
           {
             "type": "stumpPile",
             "at": [
-              0.75,
-              0.75
+              -1.0,
+              0.95
             ]
           },
           {
             "type": "billets",
             "at": [
-              -0.2,
-              0.0
+              -0.55,
+              0.85
             ],
             "r": 1.5708
+          },
+          {
+            "type": "lanternPole",
+            "at": [
+              1.25,
+              1.25
+            ]
+          },
+          {
+            "type": "groundPatch",
+            "at": [
+              0.3,
+              0.55
+            ],
+            "width": 2.4,
+            "depth": 0.9
           }
         ]
       }

@@ -1,45 +1,45 @@
 {
   "schema": 1,
-  "assetId": "pitch-kiln",
-  "variantId": "pitch-kiln-stone-oven",
-  "name": "Stone pitch oven with shed",
+  "assetId": "fisherman-hut-large",
+  "variantId": "fisherman-hut-large-net-house",
+  "name": "Net house with yard",
   "category": "buildings",
   "version": 1,
-  "specHash": "1191704c",
+  "specHash": "eb17d300",
   "generator": "workshop",
   "generatorVersion": 1,
   "styleGuide": "medieval-kingdom-painted-isometric@1",
   "scale": 1,
-  "width": 131,
-  "height": 118,
+  "width": 195,
+  "height": 152,
   "anchor": {
-    "x": 65,
-    "y": 84
+    "x": 97,
+    "y": 102
   },
   "origin": {
-    "x": 0.49618,
-    "y": 0.71186
+    "x": 0.49744,
+    "y": 0.67105
   },
   "footprint": {
-    "width": 2,
-    "height": 2
+    "width": 3,
+    "height": 3
   },
   "base": {
-    "x": 65,
-    "y": 116
+    "x": 97,
+    "y": 150
   },
   "baseOrigin": {
-    "x": 0.49618,
-    "y": 0.98305
+    "x": 0.49744,
+    "y": 0.98684
   },
-  "visualHeight": 116,
+  "visualHeight": 150,
   "platform": null,
   "frontLayer": false,
   "gameLights": [
     {
       "type": "brazier",
-      "x": 6.4,
-      "y": -22.73,
+      "x": 18.24,
+      "y": -25.48,
       "color": "#ff9d4a",
       "radius": 134.4,
       "intensity": 1,
@@ -50,12 +50,12 @@
       "flameSize": 1.6
     }
   ],
-  "modelHeight": 1.69,
+  "modelHeight": 1.99,
   "lights": [
     {
       "type": "brazier",
-      "x": 71.4,
-      "y": 93.27,
+      "x": 115.24,
+      "y": 124.52,
       "color": "#ff9d4a",
       "radius": 134.4,
       "intensity": 1,

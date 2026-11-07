@@ -84,6 +84,24 @@ Object.assign(PROPS, {
     ...[-1, 1].flatMap(s => [box([0.05, 0.16, 0.05], [-length / 2 + 0.08, 0, s * (width / 2 - 0.02)], 'wood_dark'), box([0.05, 0.16, 0.05], [length / 2 - 0.05, 0, s * (width / 2 - 0.02)], 'wood_dark')]),
   ], x, z, r),
 
+  // A big net hung on a house wall (r = 0: on a +z face; r = π/2: on a +x face), pegged at the top, with floats.
+  wallNet: (x, z, { r = 0, width = 0.7, height = 0.55, y = 0.12 } = {}) => {
+    const out = [box([width + 0.06, 0.03, 0.03], [0, y + height, 0.02], 'wood_dark')];
+    const cols = Math.round(width / 0.07), rows = Math.round(height / 0.07);
+    for (let i = 0; i <= cols; i++) out.push(box([0.006, height * (0.85 + 0.15 * Math.sin(i)), 0.008], [-width / 2 + i * width / cols, y + height * (0.15 - 0.15 * Math.sin(i)), 0.035], 'cloth_wool'));
+    for (let j = 0; j < rows; j++) out.push(box([width * (0.95 - j * 0.03), 0.006, 0.008], [0, y + height - (j + 1) * height / (rows + 0.5), 0.035], 'cloth_wool'));
+    for (let i = 0; i < 6; i++) out.push(sphere([0.02, 0.02, 0.018], [-width / 2 + 0.06 + i * (width - 0.12) / 5, y + height - 0.05, 0.05], i % 2 ? 'cloth_red' : 'cloth_ochre', 0));
+    out.push(sphere([width * 0.35, 0.05, 0.05], [0, 0.0, 0.08], 'cloth_wool', 1));
+    return place(out, x, z, r);
+  },
+  // Fishing rods leaning on a rail, lines hanging.
+  rodRack: (x, z, { r = 0, count = 4 } = {}) => place([box([0.04, 0.3, 0.04], [-0.2, 0, 0], 'wood_dark'), box([0.04, 0.3, 0.04], [0.2, 0, 0], 'wood_dark'), box([0.46, 0.03, 0.03], [0, 0.28, 0], 'wood_dark'),
+    ...Array.from({ length: count }, (_, i) => [box([0.016, 0.85, 0.016], [-0.15 + i * 0.1, 0, -0.08], 'wood', { tilt: [0.32, 0] }), box([0.004, 0.25, 0.004], [-0.15 + i * 0.1, 0.55, 0.15], 'cloth_linen')]).flat()], x, z, r),
+  // A water tub / barrel for live fish: staves, hoops, dark water and a fish showing.
+  waterTub: (x, z, { kind = 'tub' } = {}) => kind === 'tub'
+    ? [cylinder({ radiusBottom: 0.17, radiusTop: 0.2, height: 0.18, segments: 14 }, [x, 0, z], 'wood'), cylinder({ radiusBottom: 0.205, height: 0.02, segments: 14 }, [x, 0.12, z], 'iron'), cylinder({ radiusBottom: 0.18, height: 0.005, segments: 14 }, [x, 0.17, z], 'opening'),
+      ...PROPS.fish(x + 0.03, z, { y: 0.165, r: 0.6 }), box([0.04, 0.03, 0.36], [x, 0.18, z], 'wood_dark', { rotation: 0.4 })]
+    : [cylinder({ radiusBottom: 0.11, radiusTop: 0.12, height: 0.3, segments: 12 }, [x, 0, z], 'wood'), ...[0.06, 0.24].map(y => cylinder({ radiusBottom: 0.123, height: 0.02, segments: 12 }, [x, y, z], 'iron')), cylinder({ radiusBottom: 0.11, height: 0.005, segments: 12 }, [x, 0.3, z], 'opening'), cylinder({ radiusBottom: 0.04, radiusTop: 0.05, height: 0.06, segments: 8 }, [x + 0.07, 0.3, z + 0.05], 'wood_dark')],
   // ---------- pitch kiln ----------
   // An earth-covered tar kiln: stone base, a mound of turf with a smoking vent, the tar run-off spout into a trough.
   tarKiln: (x, z, { size = 1 } = {}) => withLights([
