@@ -56,4 +56,5 @@ export default {
   'object.treasure_chest.name':'Truhla s pokladem','object.treasure_chest.description':'Dřevěná truhla s kováním. Obsahuje 50–100 zlata, meč a brnění. Obsah lze vyzvednout jednou.',
   'job.idle':'Nezaměstnaný','job.woodcutter':'Dřevorubec','job.miner':'Horník','job.hunter':'Lovec','job.builder':'Stavitel','job.farmer':'Farmář','job.miller':'Mlynář','job.baker':'Pekař','job.smelter_operator':'Hutník','job.hauler':'Nosič','job.soldier':'Voják',
   'skill.woodcutting':'Dřevorubectví','skill.mining':'Těžba','skill.hunting':'Lov','skill.construction':'Stavění','skill.farming':'Zemědělství','skill.combat':'Boj','skill.milling':'Mletí','skill.baking':'Pečení','skill.logistics':'Logistika','skill.smelting':'Tavení',
+  'object.marketplace.name':'Tržiště','object.marketplace.description':'Náměstí se stánky, kde budou obchodovat kupecké karavany. Prostor na zboží pro 80 jednotek a 2 nakládací místa.','object.marketplace.unlock':'Tržiště jde postavit až po dokončeném Skladu.',
 };

@@ -1,7 +1,7 @@
 // #121: a right click on the map closes the ordinary open panels (one central place, not a handler per panel).
 // Confirmations, the pause and Save/Load menus and Game Over are never closed this way; while one of them is open a
 // right click does nothing. The click that closes panels is consumed: it never also orders a Move.
-export const DISMISSIBLE_PANELS=Object.freeze(['building-detail-dialog','workplace-dialog','unit-dialog','storage-dialog','construction-dialog','farming-dialog','equipment-dialog','treasure-dialog','food-economy-dialog','natural-resource-dialog','asset-gallery','help-dialog']);
+export const DISMISSIBLE_PANELS=Object.freeze(['building-detail-dialog','workplace-dialog','unit-dialog','storage-dialog','construction-dialog','farming-dialog','equipment-dialog','treasure-dialog','food-economy-dialog','natural-resource-dialog','asset-gallery','help-dialog','marketplace-dialog']);
 const dismissible=dialog=>DISMISSIBLE_PANELS.includes(dialog.id);
 // Closes like Escape does (each panel's own `cancel` handler restores input); a panel without one is closed directly.
 export function dismissPanel(dialog){

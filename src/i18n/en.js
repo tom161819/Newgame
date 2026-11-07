@@ -268,4 +268,6 @@ export default {
   'costEditor.cost.invalid':'This price is not valid.','costEditor.cost.empty':'A building must cost at least one resource.','costEditor.cost.amount':'{resource}: enter a whole number from 1 to {max}.',
   'costEditor.cost.unknownResource':'Unknown resource {resource}.','costEditor.cost.unknownBuilding':'Unknown building.','costEditor.cost.file':'This price list is not valid.',
   'costEditor.cardChanged':'Changed in this browser; default price {price}',
+  'market.noCaravan':'No caravan yet. Merchant caravans will visit a finished Marketplace in a later update.','market.space':'Goods space: {used} / {capacity}','market.loadingSpots':'Loading spots: {count}','market.noOrders':'No trade orders.',
+  'market.prices':'Prices','market.pricesHelp':'What a caravan charges (Buy) and pays (Sell), in Gold per unit.','market.good':'Good','market.buy':'Buy','market.sell':'Sell',
 };

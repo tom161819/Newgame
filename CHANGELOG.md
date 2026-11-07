@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.9.5] - 2026-11-07
+<!-- version: {"title":"Marketplace and trade prices","type":"feature","reconstructed":false,"saveVersion":37} -->
+### Added
+- Marketplace (Logistics, 3 × 3, 12 Stone + 8 Wood), unlocked by a finished Warehouse. It has goods space for 80 units and 2 loading spots for the merchant caravans that come in a later update. Its panel shows the goods space, the caravan status and the price list.
+- A price list for trade: what a caravan charges and pays for every good, from Wheat (3 / 2 Gold) to Armor (270 / 188 Gold). A caravan sells at 115 % and buys at 80 % of the base price, so buying and selling straight back never makes a profit.
+
 ## [0.9.4] - 2026-11-07
 <!-- version: {"title":"Building prices in the Asset Library","type":"feature","reconstructed":false,"saveVersion":37} -->
 ### Added

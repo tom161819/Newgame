@@ -269,4 +269,6 @@ export default {
   'costEditor.cost.invalid':'Tahle cena není platná.','costEditor.cost.empty':'Budova musí stát aspoň jednu surovinu.','costEditor.cost.amount':'{resource}: zadej celé číslo od 1 do {max}.',
   'costEditor.cost.unknownResource':'Neznámá surovina {resource}.','costEditor.cost.unknownBuilding':'Neznámá budova.','costEditor.cost.file':'Ceník není platný.',
   'costEditor.cardChanged':'Změněno v tomto prohlížeči; výchozí cena {price}',
+  'market.noCaravan':'Zatím žádná karavana. Kupecké karavany začnou jezdit k dokončenému tržišti v jedné z dalších verzí.','market.space':'Prostor na zboží: {used} / {capacity}','market.loadingSpots':'Nakládací místa: {count}','market.noOrders':'Žádné obchodní objednávky.',
+  'market.prices':'Ceny','market.pricesHelp':'Kolik karavana chce (nákup) a kolik platí (prodej), ve zlatě za kus.','market.good':'Zboží','market.buy':'Nákup','market.sell':'Prodej',
 };
