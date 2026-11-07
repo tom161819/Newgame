@@ -37,5 +37,136 @@
   "frontLayer": false,
   "gameLights": [],
   "modelHeight": 0.673,
-  "lights": []
+  "lights": [],
+  "facings": [
+    {
+      "facing": 0,
+      "width": 67,
+      "height": 44,
+      "anchor": {
+        "x": 33,
+        "y": 26
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.59091
+      }
+    },
+    {
+      "facing": 1,
+      "width": 67,
+      "height": 42,
+      "anchor": {
+        "x": 33,
+        "y": 24
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.57143
+      }
+    },
+    {
+      "facing": 2,
+      "width": 67,
+      "height": 47,
+      "anchor": {
+        "x": 33,
+        "y": 29
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.61702
+      }
+    },
+    {
+      "facing": 3,
+      "width": 67,
+      "height": 50,
+      "anchor": {
+        "x": 33,
+        "y": 32
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.64
+      }
+    },
+    {
+      "facing": 4,
+      "width": 67,
+      "height": 52,
+      "anchor": {
+        "x": 33,
+        "y": 34
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.65385
+      }
+    },
+    {
+      "facing": 5,
+      "width": 67,
+      "height": 51,
+      "anchor": {
+        "x": 33,
+        "y": 33
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.64706
+      }
+    },
+    {
+      "facing": 6,
+      "width": 67,
+      "height": 47,
+      "anchor": {
+        "x": 33,
+        "y": 29
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.61702
+      }
+    },
+    {
+      "facing": 7,
+      "width": 67,
+      "height": 42,
+      "anchor": {
+        "x": 33,
+        "y": 24
+      },
+      "origin": {
+        "x": 0.49254,
+        "y": 0.57143
+      }
+    }
+  ],
+  "walk": {
+    "frameWidth": 67,
+    "frameHeight": 52,
+    "anchor": {
+      "x": 33,
+      "y": 34
+    },
+    "origin": {
+      "x": 0.49254,
+      "y": 0.65385
+    },
+    "columns": [
+      "idle",
+      "stride-a",
+      "stride-b"
+    ],
+    "rows": "facing 0–7 (0 faces the viewer, then turning to screen right)",
+    "cycle": [
+      "idle",
+      "stride-a",
+      "idle",
+      "stride-b"
+    ],
+    "fps": 6
+  }
 }

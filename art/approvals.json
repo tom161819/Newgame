@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-07T18:09:34.918Z",
+  "updatedAt": "2026-11-07T18:31:31.159Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -2223,6 +2223,15 @@
           "version": 1,
           "approvedAt": "2026-11-07T18:06:00Z"
         },
+        "cat-white": {
+          "approvedAt": "2026-11-07T18:30:00Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3ee10c90",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:30:00Z",
+          "version": 1
+        },
         "cat-kitten": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
@@ -2312,14 +2321,16 @@
       }
     },
     "dog": {
-      "preferred": null,
+      "preferred": "dog-hound",
       "variants": {
         "dog-hound": {
-          "status": "review",
-          "version": 2,
-          "specHash": "3c6b0765",
+          "approvedAt": "2026-11-07T18:30:00Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00Z",
+          "specHash": "3c6b0765",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:30:00Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T18:06:00Z",
@@ -2338,11 +2349,13 @@
           ]
         },
         "dog-sheepdog": {
-          "status": "review",
-          "version": 2,
-          "specHash": "39920583",
+          "approvedAt": "2026-11-07T18:30:00Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00Z",
+          "specHash": "39920583",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:30:00Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T18:06:00Z",
@@ -2361,11 +2374,13 @@
           ]
         },
         "dog-mastiff": {
-          "status": "review",
-          "version": 2,
-          "specHash": "5b789480",
+          "approvedAt": "2026-11-07T18:30:00Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00Z",
+          "specHash": "5b789480",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:30:00Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T18:06:00Z",
@@ -2384,11 +2399,13 @@
           ]
         },
         "dog-hound-sit": {
-          "status": "review",
-          "version": 2,
-          "specHash": "aa199160",
+          "approvedAt": "2026-11-07T18:30:00Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00Z",
+          "specHash": "aa199160",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:30:00Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T18:06:00Z",
@@ -2407,11 +2424,13 @@
           ]
         },
         "dog-hound-run": {
-          "status": "review",
-          "version": 2,
-          "specHash": "d5150bc4",
+          "approvedAt": "2026-11-07T18:30:00Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00Z",
+          "specHash": "d5150bc4",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:30:00Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T18:06:00Z",
@@ -2430,11 +2449,13 @@
           ]
         },
         "dog-mastiff-wounded": {
-          "status": "review",
-          "version": 2,
-          "specHash": "f9dd8745",
+          "approvedAt": "2026-11-07T18:30:00Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00Z",
+          "specHash": "f9dd8745",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:30:00Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T18:06:00Z",
@@ -2982,14 +3003,16 @@
       }
     },
     "thief": {
-      "preferred": null,
+      "preferred": "thief-hooded",
       "variants": {
         "thief-hooded": {
-          "status": "review",
-          "version": 2,
-          "specHash": "1a654f7d",
+          "approvedAt": "2026-11-07T18:30:00Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00Z",
+          "specHash": "1a654f7d",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:30:00Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T18:06:00Z",
@@ -3008,11 +3031,13 @@
           ]
         },
         "thief-cutpurse": {
-          "status": "review",
-          "version": 2,
-          "specHash": "c406df0d",
+          "approvedAt": "2026-11-07T18:30:00Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00Z",
+          "specHash": "c406df0d",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:30:00Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T18:06:00Z",
@@ -3100,14 +3125,16 @@
       }
     },
     "wolf": {
-      "preferred": null,
+      "preferred": "wolf-grey",
       "variants": {
         "wolf-grey": {
-          "status": "review",
-          "version": 2,
-          "specHash": "822810ea",
+          "approvedAt": "2026-11-07T18:30:00Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00Z",
+          "specHash": "822810ea",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:30:00Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T18:06:00Z",
@@ -3126,11 +3153,13 @@
           ]
         },
         "wolf-dark": {
-          "status": "review",
-          "version": 2,
-          "specHash": "b8ae8ce9",
+          "approvedAt": "2026-11-07T18:30:00Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00Z",
+          "specHash": "b8ae8ce9",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:30:00Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T18:06:00Z",
@@ -3149,11 +3178,13 @@
           ]
         },
         "wolf-grey-attack": {
-          "status": "review",
-          "version": 2,
-          "specHash": "74dbe301",
+          "approvedAt": "2026-11-07T18:30:00Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00Z",
+          "specHash": "74dbe301",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:30:00Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T18:06:00Z",
@@ -3172,11 +3203,13 @@
           ]
         },
         "wolf-dark-run": {
-          "status": "review",
-          "version": 2,
-          "specHash": "043697ba",
+          "approvedAt": "2026-11-07T18:30:00Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00Z",
+          "specHash": "043697ba",
+          "status": "approved",
+          "updatedAt": "2026-11-07T18:30:00Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T18:06:00Z",
