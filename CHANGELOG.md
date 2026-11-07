@@ -5,6 +5,16 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-07
+<!-- version: {"title":"Homes and the daily rest","type":"feature","reconstructed":false,"saveVersion":37} -->
+### Added
+- Residents now have a real home and a daily routine. Each permanent resident is given a seat in a completed House, or one of the settlement's 20 base places, and keeps it; when a House is finished, residents from the base places move in, and if a House is lost its residents look for another place. Residents without any place are homeless.
+- In the last quarter of every game day residents finish the task in hand, take no new work and walk home to rest: to their House, to the Castle for the base places, or where they stand without a home. Rest recovers fastest at home, a little slower at the Castle and slowly without a home. A very tired resident (Rest below 20 %) rests earlier. When the night is over and Rest is back, they carry on with their work. Soldiers stay on guard, and a Move or Hold order always comes first.
+- The villager panel shows Going Home and Resting with where the resident rests.
+
+### Changed
+- Saved games use a new format (37) for homes and the daily rest. Games saved by earlier versions cannot be loaded; start a new game.
+
 ## [0.8.2] - 2026-11-07
 <!-- version: {"title":"Granary first in the Food menu","type":"feature","reconstructed":false,"saveVersion":36} -->
 ### Changed

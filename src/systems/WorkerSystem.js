@@ -10,13 +10,14 @@ import { POPULATION } from '../data/jobs.js';
 import { TaskReservationSystem } from './TaskReservationSystem.js';
 import { JobSystem } from './JobSystem.js';
 import { WorkerAI } from './WorkerAI.js';
+import { DailyRest } from './DailyRest.js';
 import { initializeNaturalTalent } from './NaturalTalentSystem.js';
 
 const names=['Matěj','Anna','Jakub','Eliška','Pavel','Marie','Jan','Tereza','Ondřej','Klára'];
 export class WorkerSystem {
   constructor(scene,{onChange=()=>{}}={}){
     this.scene=scene;this.onChange=onChange;this.workers=new Map();this.nextId=1;this.lastMigrationDay=scene.gameTime.day;this.listeners=new Set();
-    this.reservations=new TaskReservationSystem();this.ai=new WorkerAI(this);this.commands=new UnitCommands(this);this.jobs=new JobSystem(this);this.gather=new IdleGathering(this);
+    this.reservations=new TaskReservationSystem();this.ai=new WorkerAI(this);this.commands=new UnitCommands(this);this.jobs=new JobSystem(this);this.gather=new IdleGathering(this);this.rest=new DailyRest(this);
     this.unsubscribe=scene.gameTime.onNewDay(day=>this.onNewDay(day));this.buildingsChanged=()=>{this.gather.doorsKey=null;this.updateUI();};scene.events?.on?.('buildings:changed',this.buildingsChanged);
   }
   liveWorkers(){return [...this.workers.values()].filter(w=>w.isAlive);}

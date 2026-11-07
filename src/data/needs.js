@@ -12,6 +12,14 @@ export const NEEDS=Object.freeze({
   activeStates:Object.freeze(['Working','Traveling to Target','Searching for Target','Going to Workplace','Returning to Workplace','Patrolling','Fleeing','MovingToHold']),
   updateMs:1000,
 });
+// #58 phase B daily life: the last quarter of every game day is rest time (it follows the Game Setup day length).
+// A resident finishes the task in hand, takes no new one, walks home and rests; a very tired one rests early. Rest ends
+// when rest time is over and Rest is back at `rested`. Recovery depends on where the resident sleeps.
+export const DAILY_REST=Object.freeze({
+  startFraction:.75,tiredBelow:20,rested:60,
+  recoverPerDay:Object.freeze({house:400,settlement:300,homeless:150}),
+  exempt:Object.freeze(['soldier']),
+});
 export const clampNeed=value=>Math.max(0,Math.min(100,value));
 // Kingdom Happiness (average of residents) as a modifier of the existing Kingdom Attractiveness (#58 phase C).
 export const HAPPINESS_ATTRACTIVENESS=Object.freeze([{min:80,value:15},{min:50,value:0},{min:30,value:-20},{min:0,value:-45}]);

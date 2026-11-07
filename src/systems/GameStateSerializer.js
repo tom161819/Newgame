@@ -6,7 +6,7 @@ import { objectRegistry } from './ObjectRegistry.js';
 import { COLUMNS,ROWS } from '../game/config.js';
 import { wearLevel } from '../data/pathWear.js';
 import { getXPRequired,totalXPForLevel,createProgress } from '../data/experience.js';
-import { JOBS,SKILL_IDS,WORK_RULES } from '../data/jobs.js';
+import { JOBS,SKILL_IDS,WORK_RULES,POPULATION } from '../data/jobs.js';
 import { CONSTRUCTION_RULES } from '../data/construction.js';
 import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { pavementHost } from '../game/pavement.js';
@@ -29,7 +29,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=36;
+export const SAVE_VERSION=37;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -77,7 +77,7 @@ export function serializeGameState(scene){
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
     ...(scene.workerSystem?{population:scene.workerSystem.exportState(),workers:[...scene.workerSystem.workers.values()].map(w=>({...serializeActor(w),commandState:copy(w.commandState??{state:'Working',goal:null}),name:w.name,profession:w.profession,displayProfession:w.displayProfession,manualRockId:w.manualRockId,isSubject:w.isSubject!==false,diedAt:w.diedAt??null,
       ...(w.naturalTalent?{naturalTalent:w.naturalTalent,initialSkills:copy(w.initialSkills)}:{}),
-      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),workplaceReached:w.workplaceReached,cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
+      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),workplaceReached:w.workplaceReached,...(w.restPhase?{restPhase:w.restPhase}:{}),cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
       workState:w.workState,workMessage:w.workMessage??'',workTask:copy(w.workTask),assignedWorkplaceId:w.assignedWorkplaceId,arriving:w.arriving,aiCooldown:w.aiCooldown}))}:{}),
     ...(scene.pathWear?{pathWear:scene.pathWear.exportState()}:{}),
     player:{...serializeActor(c),state:c.state,currentTowerId:c.currentTower?.id??null,horseId:c.mountedHorse?.id??null,
@@ -264,7 +264,9 @@ export function validateGameState(input,registry=objectRegistry){
       check(w.isSubject||(!w.workTask&&w.assignedWorkplaceId==null&&w.profession==='idle'&&!w.cargo&&!(w.pendingWorkRewards?.length)));
       const match=String(w.id).match(/^worker-(\d+)$/);check(match&&Number(match[1])>0&&Number(match[1])<s.population.nextId);
       check(typeof w.arriving==='boolean');number(w.aiCooldown,-1e9,1e9);number(w.wanderWait,-1e9,1e9);check(w.assignedWorkplaceId==null||bIds.has(w.assignedWorkplaceId));
-      check(['Holding','MovingToHold','Idle','Searching for Work','Moving to Target','Working','Returning','Waiting','Fleeing','Recovering','Arriving','Dead','Going to Workplace','Searching for Target','Traveling to Target','Returning to Workplace','Patrolling'].includes(w.workState));
+      check(['Holding','MovingToHold','Idle','Searching for Work','Moving to Target','Working','Returning','Waiting','Fleeing','Recovering','Arriving','Dead','Going to Workplace','Searching for Target','Traveling to Target','Returning to Workplace','Patrolling','Going Home','Resting'].includes(w.workState));
+      // #58 phase B: only a living resident goes home or rests.
+      if(w.restPhase!==undefined)check(['going','resting'].includes(w.restPhase)&&w.isAlive&&w.isSubject);
       check(typeof w.workMessage==='string'&&w.workMessage.length<200);
       if(w.stoneCollection!==undefined){check(w.stoneCollection&&typeof w.stoneCollection.enabled==='boolean'&&Object.keys(w.stoneCollection).length===2);integer(w.stoneCollection.radius,0,IDLE_STONE.maxRadius);}if(w.profession==='hauler')check(w.stoneCollection);if(!w.isAlive)check(w.workState==='Dead'&&!w.workTask&&!w.arriving);
       check(Object.hasOwn(JOBS,w.displayProfession)&&['idle',w.profession].includes(w.displayProfession));
@@ -403,9 +405,17 @@ export function validateGameState(input,registry=objectRegistry){
     for(const [id,n]of count)check(n<=registry.require('stables').horseCapacity);check(st.ridden==null||animals.get(st.ridden)?.mounted===true);}
   // S12 vehicles: unique ids on open ground; an operator is one living Hauler at most once; modes are known.
   // S13 needs: one record per living permanent resident at most, values 0–100, an attack time never in the future.
-  if(s.needs!==undefined){const n=s.needs;check(n&&typeof n==='object'&&Object.keys(n).sort().join()==='pending,records');number(n.pending,0,s.time?.totalElapsed??Number.MAX_SAFE_INTEGER);array(n.records);
+  if(s.needs!==undefined){const n=s.needs;check(n&&typeof n==='object'&&Object.keys(n).sort().join()==='homes,pending,records');number(n.pending,0,s.time?.totalElapsed??Number.MAX_SAFE_INTEGER);array(n.records);array(n.homes);
     const residents=new Set((s.workers??[]).filter(w=>w.isAlive&&w.isSubject).map(w=>w.id)),seen=new Set();
-    for(const r of n.records){check(r&&Object.keys(r).sort().join()==='attackedAt,food,hp,id,rest'&&residents.has(r.id)&&!seen.has(r.id));seen.add(r.id);number(r.food,0,100);number(r.rest,0,100);check(Number.isFinite(r.hp));if(r.attackedAt!==null)number(r.attackedAt,0,s.time?.totalElapsed??Number.MAX_SAFE_INTEGER);}}
+    for(const r of n.records){check(r&&Object.keys(r).sort().join()==='attackedAt,food,hp,id,rest'&&residents.has(r.id)&&!seen.has(r.id));seen.add(r.id);number(r.food,0,100);number(r.rest,0,100);check(Number.isFinite(r.hp));if(r.attackedAt!==null)number(r.attackedAt,0,s.time?.totalElapsed??Number.MAX_SAFE_INTEGER);}
+    // #58 phase B homes: each living resident at most once, a House seat in a completed House within its capacity,
+    // or one of the settlement's base places.
+    const homed=new Set(),seats=new Map();let base=0;
+    for(const h of n.homes){check(h&&residents.has(h.id)&&!homed.has(h.id));homed.add(h.id);
+      if(h.kind==='settlement'){check(Object.keys(h).sort().join()==='id,kind');base++;continue;}
+      check(h.kind==='house'&&Object.keys(h).sort().join()==='buildingId,id,kind');const house=s.buildings.find(b=>b.id===h.buildingId),d=house&&buildingDefinition(house);
+      check(house&&d?.housing&&buildingIsComplete(house));seats.set(house.id,(seats.get(house.id)??0)+1);check(seats.get(house.id)<=(d.housing.capacity??POPULATION.houseCapacity));}
+    check(base<=POPULATION.maximum);}
   if(s.vehicles!==undefined){const v=s.vehicles;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='modes,nextId,vehicles');integer(v.nextId,1);array(v.vehicles);const ids=new Set(),operators=new Set(),workers=new Map(s.workers.map(w=>[w.id,w]));
     for(const x of v.vehicles){check(x&&Object.keys(x).sort().join()==='horseId,id,operatorId,state,type,x,y'&&(x.horseId===null||x.type==='horse_wagon'&&(s.stables?.horses??[]).some(h=>h.id===x.horseId&&h.state==='harnessed'&&h.vehicleId===x.id))&&Object.hasOwn(VEHICLES,x.type)&&['parked','reserved','inUse'].includes(x.state));const m=String(x.id).match(/^vehicle-(\d+)$/);check(m&&Number(m[1])<v.nextId&&!ids.has(x.id));ids.add(x.id);
       integer(x.x,0,COLUMNS-1);integer(x.y,0,ROWS-1);check(s.terrain[x.y][x.x]===0);check((x.state==='parked')===(x.operatorId==null));if(x.operatorId!=null){const w=workers.get(x.operatorId);check(w?.isAlive&&w.profession==='hauler'&&!operators.has(x.operatorId));operators.add(x.operatorId);}}

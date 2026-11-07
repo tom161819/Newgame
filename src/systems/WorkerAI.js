@@ -26,13 +26,15 @@ export class WorkerAI {
   }
   update(worker,delta){
     if(!worker.isAlive)return;
-    if(this.system.commands.update(worker,delta))return;
+    if(this.system.commands.update(worker,delta)){if(worker.restPhase)this.system.rest?.stop(worker);return;}
     worker.aiCooldown-=delta;
     if(worker.arriving){this.arrival(worker);worker.update(delta);return;}
     if((worker.profession==='hunter'&&worker.currentHP<worker.maxHP*WORK_RULES.fleeRatio)||['Fleeing','Recovering'].includes(worker.workState)){
       this.recover(worker);worker.update(delta);return;
     }
     if(this.scene.foodProduction?.handleTransport(worker)){worker.update(delta);return;}
+    // #58 phase B: rest time (or exhaustion) sends a free resident home before he picks new work.
+    if(this.system.rest?.update(worker)){worker.update(delta);return;}
     if(worker.profession==='idle'){this.idle(worker);worker.update(delta);return;}
     if(this.scene.naturalResources?.miningWork.rocks.eligible(worker)){this.scene.naturalResources.miningWork.rocks.update(worker,delta);worker.update(delta);return;}
     const job=JOBS[worker.profession];

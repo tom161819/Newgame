@@ -62,7 +62,8 @@ test('a physical construction site extends collection without granting unbooked 
   const location=s.foodStorage.locations.get(`site-${site.id}`),before=structuredClone(location.stock),tile={x:73,y:75};
   s.addResource(s.objectRegistry.require('stone'),tile);assert.ok(s.logisticsTasks.stoneAreas(h).some(a=>a.id===location.id));
   assert.equal(s.logisticsTasks.startStone(h),true);assert.equal(h.workTask.targetId,'73,75');assert.deepEqual(location.stock,before);
-  h.stoneCollection.radius=0;s.tick(25);assert.equal(h.workTask,null);assert.equal(s.workerSystem.reservations.available('resource:73,75','other'),true);assert.deepEqual(location.stock,before);h.stoneCollection.radius=4;const total=stored(s);until(s,()=>!s.resources.has('73,75')&&!h.cargo&&stored(s)===total+1,120000);assert.equal(s.constructionSystem.materials.ready(site),true);snapshot(s);
+  h.stoneCollection.radius=0;s.tick(25);assert.equal(h.workTask,null);assert.equal(s.workerSystem.reservations.available('resource:73,75','other'),true);assert.deepEqual(location.stock,before);h.stoneCollection.radius=4;const total=stored(s);// #58 phase B: the last quarter of each day the Hauler rests near the Castle, so allow a second day.
+  until(s,()=>!s.resources.has('73,75')&&!h.cargo&&stored(s)===total+1,240000);assert.equal(s.constructionSystem.materials.ready(site),true);snapshot(s);
 });
 test('without any reachable material hub idle collection pauses',()=>{
   const s=workerScene(undefined,{construction:true,logistics:true,starter:false,gameSettings:gameSettings({startingCastle:false})}),h=hauler(s);
