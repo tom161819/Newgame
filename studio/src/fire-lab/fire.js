@@ -21,6 +21,18 @@ export const PARAMS = [
   { key: 'char', label: 'Charring of the building', min: 0, max: 1, step: 0.01, value: 0.35, hint: 'How dark the burnt parts get while the fire burns.' },
 ];
 export const DEFAULTS = Object.fromEntries(PARAMS.map(p => [p.key, p.value]));
+// Torches and small fires (owner, 7 Nov 2026: "add torches and their fire to the Fire Lab"): the same particle model
+// on the light points of torch posts, brackets, braziers, campfires and torches in hand; no spreading, no charring.
+export const TORCH_HIDDEN = new Set(['spots', 'spread', 'char']);
+export const TORCH_DEFAULTS = { ...Object.fromEntries(PARAMS.map(p => [p.key, p.value])), intensity: 0.55, flameHeight: 16, flameWidth: 5, turbulence: 0.6, heat: 0.55, spread: 0, wind: 0.15, smoke: 0.3, smokeDark: 0.5, smokeRise: 30, smokeSize: 7, embers: 0.25, glow: 0.8, char: 0 };
+export const TORCH_PRESETS = {
+  'Pitch torch': { ...TORCH_DEFAULTS },
+  'Iron cage torch': { ...TORCH_DEFAULTS, flameHeight: 20, flameWidth: 6, heat: 0.65, smoke: 0.2 },
+  Brazier: { ...TORCH_DEFAULTS, intensity: 0.8, flameHeight: 22, flameWidth: 11, heat: 0.7, smoke: 0.35, smokeSize: 10, embers: 0.45, glow: 1 },
+  Campfire: { ...TORCH_DEFAULTS, intensity: 0.85, flameHeight: 26, flameWidth: 12, heat: 0.6, smoke: 0.5, smokeSize: 12, smokeRise: 35, embers: 0.6, glow: 1 },
+  'Windy night': { ...TORCH_DEFAULTS, wind: 0.9, turbulence: 0.9, flameHeight: 13, embers: 0.5 },
+  'Dying ember': { ...TORCH_DEFAULTS, intensity: 0.2, flameHeight: 7, flameWidth: 4, heat: 0.2, smoke: 0.5, embers: 0.1, glow: 0.35 },
+};
 export const PRESETS = {
   Smouldering: { intensity: 0.12, flameHeight: 18, flameWidth: 8, heat: 0.25, spots: 2, smoke: 0.85, smokeDark: 0.35, smokeRise: 28, smokeSize: 26, embers: 0.1, glow: 0.25, char: 0.15, turbulence: 0.4 },
   Burning: { ...DEFAULTS },

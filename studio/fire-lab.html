@@ -10,7 +10,7 @@
   </head>
   <body class="world-lab-page fire-lab-page">
     <header class="topbar">
-      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><strong>Fire Lab</strong><span class="brand-sub">Burning buildings · flames, smoke, embers, glow</span></div></div>
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><strong>Fire Lab</strong><span class="brand-sub">Burning buildings, torches and fires · flames, smoke, embers, glow</span></div></div>
       <nav class="views" aria-label="Studio views"><a href="./index.html#assets">Assets</a><a href="./index.html#style-guide">Style guide</a><a href="./buildings.html">Buildings in game</a><a href="./ui-lab.html">UI Lab</a><a href="./world-lab.html">World Lab</a><a href="./fire-lab.html" aria-current="page">Fire Lab</a><a href="./phaser-demo.html">Phaser demo</a><a href="./path-lab.html">Path Lab</a></nav>
       <div class="review-status"><span id="fl-summary" class="review-summary" aria-live="polite"></span></div>
     </header>
@@ -18,7 +18,11 @@
     <div class="wl-shell">
       <aside class="wl-controls" aria-label="Fire settings">
         <section>
-          <h3>Building</h3>
+          <h3>What burns</h3>
+          <div id="fl-kind" class="wl-presets"></div>
+        </section>
+        <section>
+          <h3>Object</h3>
           <select id="fl-building" aria-label="Building"></select>
           <div class="wl-row"><button type="button" class="button primary" id="fl-ignite">Ignite</button><button type="button" class="button" id="fl-douse">Put out</button><button type="button" class="button" id="fl-reset">Reset</button></div>
           <p class="wl-hint">Click the building to add a fire spot, Shift-click to remove the nearest one. Without spots the fire picks points along the roof.</p>

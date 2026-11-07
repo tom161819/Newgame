@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "building-fire",
+  "description": "Fire on a burning building, tuned by the owner in the Studio's Fire Lab (proposal \"v1\", 7 Nov 2026, on the bakery with yard oven). The game builds its fire effect from these parameters with the particle model in studio/src/fire-lab/fire.js (flames, smoke, embers, glow, charring). Units: px at 1× sprite scale, px/s.",
+  "approvedAt": "2026-11-07T20:18:11.027Z",
+  "params": {
+    "intensity": 0.7,
+    "flameHeight": 55,
+    "flameWidth": 14,
+    "turbulence": 0.55,
+    "heat": 0.6,
+    "spots": 6,
+    "spread": 0.35,
+    "wind": 0.62,
+    "smoke": 0.6,
+    "smokeDark": 0.55,
+    "smokeRise": 45,
+    "smokeSize": 22,
+    "embers": 0.4,
+    "glow": 0.7,
+    "char": 0.35
+  }
+}

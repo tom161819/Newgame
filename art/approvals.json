@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-07T19:56:57.137Z",
+  "updatedAt": "2026-11-07T20:19:38.885Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -2095,6 +2095,15 @@
     "night-icons": {
       "preferred": "night-icons-badges",
       "variants": {
+        "night-icons-plain": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6f62b262",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
         "night-icons-badges": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
@@ -2272,11 +2281,6 @@
       "preferred": null,
       "variants": {
         "boar-boar": {
-          "status": "review",
-          "version": 3,
-          "specHash": "b367b493",
-          "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -2289,8 +2293,20 @@
               "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
               "text": "to není hezký divočák, má moc protáhlou hlavu, a vypadá nepřirozeně, udělej proporčně přesnějšího divočáka",
               "version": 2
+            },
+            {
+              "at": "2026-11-07T20:12:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "tělo ok, předělej hlavu at vypadá jako divočák, stejně tak i ostatní modely divočáků (menší hlava - krk ne tak nahoru vlastně skoro žadný krk a v zahnutý zuby nahoru)",
+              "version": 3
             }
           ],
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b367b493",
+          "status": "revision-requested",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 3,
           "history": [
             {
               "version": 1,
@@ -2553,6 +2569,78 @@
           "updatedAt": "2026-11-07T18:06:00Z",
           "version": 1,
           "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "child-boy-tunic-run": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "80f60302",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-girl-braid-tag": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1efd5148",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-boy-cap-hoop": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4b267dfc",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-boy-ball-kick": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "163ffb9b",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-girl-kerchief-swing": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "96e90e0e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-boy-tunic-throw": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c7814fb7",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-girl-braid-snow": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6c9e0c51",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-boy-cap-hay": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1e4d9887",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
         }
       }
     },
@@ -2866,6 +2954,65 @@
           "updatedAt": "2026-11-07T18:06:00Z",
           "version": 1,
           "approvedAt": "2026-11-07T18:06:00Z"
+        }
+      }
+    },
+    "fishing": {
+      "preferred": "fishing-male-cast",
+      "variants": {
+        "fishing-male-cast": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d889b5e8",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "fishing-male-fish-wait": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "47e8fc85",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "fishing-male-catch": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "98fe9206",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "fishing-female-cast": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0efa36be",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "fishing-female-fish-wait": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4e6ac1ff",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "fishing-female-catch": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bd1dd378",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
         }
       }
     },
@@ -3909,11 +4056,13 @@
           "approvedAt": "2026-11-07T19:05:00.000Z"
         },
         "wheelbarrow-plank-stone": {
-          "status": "review",
-          "version": 2,
-          "specHash": "bae7ad1d",
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "bae7ad1d",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-07T19:05:00.000Z",
@@ -3930,6 +4079,114 @@
               "at": "2026-11-07T19:05:00.000Z"
             }
           ]
+        },
+        "wheelbarrow-plank-wood": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a89d3dc8",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "wheelbarrow-plank-ore": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "797b8c83",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "wheelbarrow-plank-ironbars": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6f727e61",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "wheelbarrow-plank-fish": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fbff016f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "wheelbarrow-plank-meat": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "89769396",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "wheelbarrow-plank-bread": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "242178a5",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "wheelbarrow-plank-mixed": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9552b918",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "wheelbarrow-tub-soil": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6ca666ae",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 2
+        },
+        "wheelbarrow-tub-logs": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "856665fa",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 2
+        },
+        "wheelbarrow-handcart-sacks": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7efe1478",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 2
+        },
+        "wheelbarrow-handcart-hay": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "67fed731",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 2
+        },
+        "wheelbarrow-sack-barrow": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4b579510",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
         }
       }
     },

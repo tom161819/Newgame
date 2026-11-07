@@ -35,7 +35,7 @@ const PLANS = {
   deer: { len: 0.68, back: 0.58, depth: 0.22, width: 0.16, leg: 0.38, head: 0.075, snout: 0.13, skullW: 0.85, ears: 'point', earSize: 0.95, tail: { length: 0.08, radius: 0.025, up: 0.4, bushy: 1 }, hoof: 'soot', neckUp: 0.62, long: true, legK: 0.8 },
   fawn: { len: 0.4, back: 0.38, depth: 0.14, width: 0.11, leg: 0.26, head: 0.06, snout: 0.07, ears: 'point', earSize: 1.1, tail: { length: 0.04, radius: 0.015, up: 0.4, bushy: 1 }, hoof: 'soot', neckUp: 0.5, long: true, legK: 0.8 },
   roe: { len: 0.46, back: 0.42, depth: 0.16, width: 0.12, leg: 0.28, head: 0.058, snout: 0.075, skullW: 0.85, ears: 'point', earSize: 1.05, tail: { length: 0.03, radius: 0.02, up: 0.4, bushy: 1 }, hoof: 'soot', neckUp: 0.55, long: true, legK: 0.75 },
-  boar: { len: 0.66, back: 0.42, depth: 0.27, width: 0.22, leg: 0.15, head: 0.13, snout: 0.12, skullH: 1.15, skullW: 0.85, ears: 'point', earSize: 0.5, tail: { length: 0.12, radius: 0.012, up: -1.2, bushy: 1 }, hoof: 'soot', socks: 'soot', ridge: true, neckUp: -0.04, hips: 0.88, legK: 1.15, wedge: true, headDown: 0.5 },
+  boar: { len: 0.66, back: 0.42, depth: 0.27, width: 0.22, leg: 0.15, head: 0.1, snout: 0.11, skullH: 1.1, skullW: 0.9, ears: 'point', earSize: 0.5, tail: { length: 0.12, radius: 0.012, up: -1.2, bushy: 1 }, hoof: 'soot', socks: 'soot', ridge: true, neckUp: -0.16, hips: 0.88, legK: 1.15, wedge: true, headDown: 0.45, shortNeck: true },
   piglet: { len: 0.3, back: 0.18, depth: 0.12, width: 0.1, leg: 0.06, head: 0.06, snout: 0.05, skullH: 1.1, ears: 'point', earSize: 0.5, tail: { length: 0.05, radius: 0.008, up: -1.0, bushy: 1 }, hoof: 'soot', neckUp: -0.05, hips: 0.92, wedge: true, headDown: 0.4 },
   fox: { len: 0.42, back: 0.27, depth: 0.11, width: 0.095, leg: 0.15, head: 0.06, snout: 0.1, skullW: 0.9, ears: 'point', earSize: 1.2, tail: { length: 0.34, radius: 0.04, up: -0.3, bushy: 1.7 }, socks: 'soot', neckUp: 0.3, legK: 0.85 },
   hare: { len: 0.26, back: 0.2, depth: 0.12, width: 0.1, leg: 0.08, head: 0.05, snout: 0.035, ears: 'long', tail: { length: 0.03, radius: 0.022, up: 0.6, bushy: 1 }, hips: 1.25, neckUp: 0.25, hindK: 1.5 },
@@ -120,7 +120,7 @@ function canine(spec, plan, { species, breed, coat, mark, pose, stride, P, rot }
   parts.push(...legs);
   // Neck and head. The neck rises forward from the chest; the attack pose lowers and stretches it.
   const neckBase = [chestFront - L * 0.04, chestTop - D * 0.25], headUp = lie ? D * 0.75 : attack ? withers - hd * 0.2 : chestTop + (sit ? H * 0.38 : H * 0.3);
-  const skull = [chestFront + (lie ? L * 0.22 : attack ? L * 0.3 : L * (plan.neckUp !== undefined && plan.neckUp < 0.1 ? 0.2 : 0.12)), headUp];
+  const skull = [chestFront + (lie ? L * 0.22 : attack ? L * 0.3 : L * (plan.shortNeck ? 0.1 : plan.neckUp !== undefined && plan.neckUp < 0.1 ? 0.2 : 0.12)), headUp];
   const nx = skull[0] - neckBase[0], ny = skull[1] - neckBase[1], neckPitch = Math.atan2(ny, nx);
   parts.push(ell((neckBase[0] + skull[0]) / 2, (neckBase[1] + skull[1]) / 2 + hd * 0.1, 0, [Math.hypot(nx, ny) / 2 + hd * 0.25, hd * 0.85 * (wolf ? 1.15 : 1), W * 0.36], coat, neckPitch));
   if (wolf) parts.push(ell(neckBase[0] + nx * 0.35, neckBase[1] + ny * 0.35 + hd * 0.2, 0, [hd * 1.25, hd * 1.35, W * 0.52], coat === 'horse_grey' ? 'stone_light' : 'horse_grey', neckPitch));
@@ -212,7 +212,10 @@ function canine(spec, plan, { species, breed, coat, mark, pose, stride, P, rot }
   if (breed === 'stag' && !sit) parts.push(ell(neckBase[0] + nx * 0.45, neckBase[1] + ny * 0.45 - hd * 0.5, 0, [hd * 1.0, hd * 0.9, W * 0.42], 'horse_dark', neckPitch)); // shaggy throat mane
   if (breed === 'grizzled') parts.push(ell(chestF, withers - D * 0.25, 0, [L * 0.25, D * 0.3, W * 0.5], 'hair_blond'));
   if (plan.hump) parts.push(ell(chestF, withers - D * 0.05, 0, [L * 0.18, D * 0.25, W * 0.36], species === 'boar' ? 'soot' : coat)); // bristly ridge / shoulder hump
-  if (species === 'boar' && breed === 'boar') for (const s of [-1, 1]) parts.push(limb([tipF - hd * 0.2, tipY - hd * 0.1, s * hd * 0.3], [tipF - hd * 0.55, tipY - hd * 0.35, s * hd * 0.32], hd * 0.06, hd * 0.1, 'bone'));
+  if (species === 'boar' && breed === 'boar') for (const s of [-1, 1]) { // tusks: out of the lower jaw, curving up and back
+    const a = [tipF - hd * 0.35, tipY + hd * 0.05, s * hd * 0.32], b = [tipF - hd * 0.15, tipY + hd * 0.4, s * hd * 0.42], c = [tipF - hd * 0.4, tipY + hd * 0.7, s * hd * 0.4];
+    parts.push(limb(a, b, hd * 0.09, hd * 0.07, 'bone'), limb(b, c, hd * 0.07, hd * 0.03, 'bone'));
+  }
   if (breed === 'piglet') for (const f of [-0.2, 0, 0.2]) parts.push(ell(L * f, (withers + hips) / 2 - D * 0.15, 0, [L * 0.12, D * 0.08, W * 0.52], 'hair_blond')); // stripes
   if (species === 'fox') parts.push(ell(tipT[0], Math.max(tipT[1], plan.tail.radius * 1.5) + plan.tail.radius * 0.6, 0, [plan.tail.radius * 1.8, plan.tail.radius * 1.4, plan.tail.radius * 1.4], 'cloth_linen')); // white tail tip
   if (species === 'hare' || species === 'roe' || species === 'deer') parts.push(ell(rumpF - L * 0.22, hips - D * 0.2, 0, [plan.tail.radius * 1.5, plan.tail.radius * 1.5, plan.tail.radius * 1.5], 'cloth_linen'));
