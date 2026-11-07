@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wall-gate",
+  "variantId": "wall-gate-stair",
+  "name": "Stair to the wall walk",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "2ce6afc6",
+  "generator": "wallkit",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 75,
+  "height": 84,
+  "anchor": {
+    "x": 33,
+    "y": 66
+  },
+  "origin": {
+    "x": 0.44,
+    "y": 0.78571
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 82
+  },
+  "baseOrigin": {
+    "x": 0.44,
+    "y": 0.97619
+  },
+  "visualHeight": 82,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.735,
+  "lights": []
+}

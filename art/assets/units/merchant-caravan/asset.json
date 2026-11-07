@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "id": "merchant-caravan",
+  "name": "Merchant caravan wagon",
+  "category": "units",
+  "description": "Obchod F1 (#59): the merchant's own covered wagon with a draught horse (never the player's). Full on arrival, unloading at the marketplace, empty when leaving. Shown driving along grid x: like the player's carts (VehicleViews) the game mirrors one view for the other direction.",
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "merchant_caravan",
+  "variants": [
+    {
+      "id": "merchant-caravan-full",
+      "name": "Full wagon",
+      "version": 1,
+      "notes": "Red canvas cover (unlike the player's carts) on hoops, crates, sacks and a barrel showing at the back.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "wagon",
+            "at": [
+              0,
+              0
+            ],
+            "load": "full",
+            "cover": "cloth_red"
+          }
+        ]
+      }
+    },
+    {
+      "id": "merchant-caravan-unloading",
+      "name": "Unloading",
+      "version": 1,
+      "notes": "Cover rolled forward, tailgate down, crates and a sack on the ground behind.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "wagon",
+            "at": [
+              0.35,
+              0
+            ],
+            "load": "unloading",
+            "cover": "cloth_red"
+          }
+        ]
+      }
+    },
+    {
+      "id": "merchant-caravan-empty",
+      "name": "Empty wagon",
+      "version": 1,
+      "notes": "Bare hoops, one sack left: leaving the marketplace.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "wagon",
+            "at": [
+              0,
+              0
+            ],
+            "load": "empty",
+            "coat": "horse_grey"
+          }
+        ]
+      }
+    }
+  ]
+}

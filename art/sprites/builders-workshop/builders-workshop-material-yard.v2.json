@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "builders-workshop",
+  "variantId": "builders-workshop-material-yard",
+  "name": "Material yard with shed (3 × 3)",
+  "category": "buildings",
+  "version": 2,
+  "specHash": "2baaace1",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 119,
+  "anchor": {
+    "x": 97,
+    "y": 69
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.57983
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 117
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98319
+  },
+  "visualHeight": 117,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.856,
+  "lights": []
+}

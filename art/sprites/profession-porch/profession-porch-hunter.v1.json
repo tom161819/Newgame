@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "profession-porch",
+  "variantId": "profession-porch-hunter",
+  "name": "Hunter's porch (2 seats)",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "9adefce8",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 99,
+  "height": 83,
+  "anchor": {
+    "x": 49,
+    "y": 57
+  },
+  "origin": {
+    "x": 0.49495,
+    "y": 0.68675
+  },
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "base": {
+    "x": 65,
+    "y": 81
+  },
+  "baseOrigin": {
+    "x": 0.65657,
+    "y": 0.9759
+  },
+  "visualHeight": 81,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.96,
+  "lights": []
+}

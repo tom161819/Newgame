@@ -51,8 +51,8 @@
     "blender": "5.2.3 LTS",
     "samples": 96,
     "supersampling": 4,
-    "seconds": 94.3,
-    "renderHash": "83166932",
+    "seconds": 109.7,
+    "renderHash": "7a797fdf",
     "script": "scripts/blender/render.py"
   }
 }

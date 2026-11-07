@@ -1,0 +1,315 @@
+{
+  "schema": 1,
+  "id": "profession-porch",
+  "name": "Workplace porch by profession",
+  "category": "decorations",
+  "description": "#114 art for #98 (owner's wish, 7 Nov 2026): a themed porch in front of each workplace with a seat for every possible worker, where idle workers sit. A strip of 2 × 1 tiles along the building's front, never on its door. `seats` lists the seat points ([x, z] in tile units, figure facing the camera) for #98. Concepts for review.",
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "generator": "workshop",
+  "variants": [
+    {
+      "id": "profession-porch-woodcutter",
+      "name": "Woodcutter's porch (3 seats)",
+      "version": 1,
+      "notes": "Split logs as benches round a chopping stump with an axe; firewood under a little roof.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "logs",
+            "at": [
+              -0.6,
+              0.12
+            ],
+            "count": 2,
+            "length": 0.4
+          },
+          {
+            "type": "stool",
+            "at": [
+              -0.05,
+              0.18
+            ]
+          },
+          {
+            "type": "logs",
+            "at": [
+              0.25,
+              0.12
+            ],
+            "count": 2,
+            "length": 0.4
+          },
+          {
+            "type": "stump",
+            "at": [
+              -0.2,
+              -0.2
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.7,
+              -0.15
+            ]
+          }
+        ],
+        "seats": [
+          [
+            -0.6,
+            0.15
+          ],
+          [
+            -0.05,
+            0.18
+          ],
+          [
+            0.25,
+            0.15
+          ]
+        ]
+      }
+    },
+    {
+      "id": "profession-porch-farmer",
+      "name": "Farmer's porch (2 seats)",
+      "version": 1,
+      "notes": "Hay bales to sit on, sacks of grain, a basket and the tool rack with forks.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "hay",
+            "at": [
+              -0.55,
+              0.12
+            ]
+          },
+          {
+            "type": "hay",
+            "at": [
+              -0.05,
+              0.14
+            ],
+            "r": 0.3
+          },
+          {
+            "type": "sacks",
+            "at": [
+              0.4,
+              0.0
+            ],
+            "count": 3
+          },
+          {
+            "type": "basket",
+            "at": [
+              0.75,
+              0.25
+            ]
+          },
+          {
+            "type": "toolRack",
+            "at": [
+              0.65,
+              -0.3
+            ]
+          }
+        ],
+        "seats": [
+          [
+            -0.55,
+            0.12
+          ],
+          [
+            -0.05,
+            0.14
+          ]
+        ]
+      }
+    },
+    {
+      "id": "profession-porch-baker",
+      "name": "Baker's porch (2 seats)",
+      "version": 1,
+      "notes": "A bench and a table with a bread basket under a striped awning; flour sacks by the wall.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "awning",
+            "at": [
+              -0.2,
+              -0.05
+            ],
+            "width": 1.1,
+            "depth": 0.55,
+            "height": 0.7
+          },
+          {
+            "type": "bench",
+            "at": [
+              -0.35,
+              0.12
+            ],
+            "length": 0.55
+          },
+          {
+            "type": "table",
+            "at": [
+              0.05,
+              -0.12
+            ]
+          },
+          {
+            "type": "basket",
+            "at": [
+              0.05,
+              -0.12
+            ],
+            "y": 0.26
+          },
+          {
+            "type": "sacks",
+            "at": [
+              0.62,
+              -0.15
+            ],
+            "count": 2
+          }
+        ],
+        "seats": [
+          [
+            -0.48,
+            0.12
+          ],
+          [
+            -0.22,
+            0.12
+          ]
+        ]
+      }
+    },
+    {
+      "id": "profession-porch-smith",
+      "name": "Smith's porch (2 seats)",
+      "version": 1,
+      "notes": "Two stools by a quench tub and an anvil on a stump; a weapon crate and a shield leaning against it.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "stool",
+            "at": [
+              -0.6,
+              0.15
+            ]
+          },
+          {
+            "type": "stool",
+            "at": [
+              -0.3,
+              0.2
+            ]
+          },
+          {
+            "type": "quench",
+            "at": [
+              0.05,
+              0.0
+            ]
+          },
+          {
+            "type": "anvil",
+            "at": [
+              0.4,
+              0.1
+            ]
+          },
+          {
+            "type": "weaponCrate",
+            "at": [
+              0.72,
+              -0.2
+            ]
+          }
+        ],
+        "seats": [
+          [
+            -0.6,
+            0.15
+          ],
+          [
+            -0.3,
+            0.2
+          ]
+        ]
+      }
+    },
+    {
+      "id": "profession-porch-hunter",
+      "name": "Hunter's porch (2 seats)",
+      "version": 1,
+      "notes": "A bench under the hide rack, antlers on a post and a barrel.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              -0.35,
+              0.15
+            ],
+            "length": 0.55
+          },
+          {
+            "type": "hideRack",
+            "at": [
+              0.25,
+              -0.2
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.7,
+              0.15
+            ]
+          },
+          {
+            "type": "banner",
+            "at": [
+              -0.85,
+              -0.3
+            ],
+            "material": "leather"
+          }
+        ],
+        "seats": [
+          [
+            -0.48,
+            0.15
+          ],
+          [
+            -0.22,
+            0.15
+          ]
+        ]
+      }
+    }
+  ]
+}

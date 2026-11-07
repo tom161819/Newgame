@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "id": "bush",
+  "name": "Bushes and scrub",
+  "category": "trees",
+  "description": "#100 World generation: low bushes for meadows and forest edges, berry and flowering shrubs, and dry scrub for beaches and desert. One tile each, much lower than trees, so they never hide buildings.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "tree",
+  "plannedGameObjectId": "bush",
+  "variants": [
+    {
+      "id": "bush-meadow",
+      "name": "Meadow bush",
+      "version": 1,
+      "spec": {
+        "kind": "bush",
+        "height": 0.6,
+        "crown": 0.34,
+        "clusters": 6,
+        "seed": 3
+      }
+    },
+    {
+      "id": "bush-berry",
+      "name": "Berry bush",
+      "version": 1,
+      "spec": {
+        "kind": "bush",
+        "height": 0.55,
+        "crown": 0.32,
+        "clusters": 6,
+        "seed": 7,
+        "berries": "cloth_red"
+      }
+    },
+    {
+      "id": "bush-flowering",
+      "name": "Flowering bush",
+      "version": 1,
+      "spec": {
+        "kind": "bush",
+        "height": 0.7,
+        "crown": 0.36,
+        "clusters": 7,
+        "seed": 11,
+        "berries": "blossom",
+        "season": "spring"
+      }
+    },
+    {
+      "id": "bush-scrub",
+      "name": "Dry scrub",
+      "version": 1,
+      "spec": {
+        "kind": "bush",
+        "height": 0.5,
+        "crown": 0.3,
+        "clusters": 6,
+        "seed": 5,
+        "dry": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "marketplace",
+  "variantId": "marketplace-hall",
+  "name": "Market hall",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "7c7d11b8",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 147,
+  "anchor": {
+    "x": 97,
+    "y": 97
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.65986
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 145
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98639
+  },
+  "visualHeight": 145,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": 28.96,
+      "y": -59.42,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 1.61,
+  "lights": [
+    {
+      "type": "torch",
+      "x": 125.96,
+      "y": 85.58,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

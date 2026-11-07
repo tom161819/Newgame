@@ -99,6 +99,34 @@ def make_material(mid, spec, kind):
         bump.inputs['Distance'].default_value = 0.02
         links.new(noise.outputs['Fac'], bump.inputs['Height'])
         links.new(bump.outputs['Normal'], bsdf.inputs['Normal'])
+    # Coursed textures of the style guide (bricks, shingles, planks) as procedural brick patterns on the part's UVs,
+    # which are laid out in world units (see uv_world), so courses have the same size on every part.
+    pattern = spec.get('texture')
+    if pattern in ('bricks', 'shingles', 'planks') and kind != 'dark':
+        uv = nodes.new('ShaderNodeUVMap')
+        brick = nodes.new('ShaderNodeTexBrick')
+        brick.offset, brick.squash = (0.5, 1.0)
+        size = {'bricks': (0.3, 0.15, 0.012), 'shingles': (0.22, 0.12, 0.01), 'planks': (1.6, 0.17, 0.008)}[pattern]
+        brick.inputs['Scale'].default_value = 1.0
+        brick.inputs['Brick Width'].default_value = size[0]
+        brick.inputs['Row Height'].default_value = size[1]
+        brick.inputs['Mortar Size'].default_value = size[2]
+        brick.inputs['Mortar Smooth'].default_value = 0.3
+        brick.inputs['Bias'].default_value = 0.0
+        brick.inputs['Color1'].default_value = tuple(c * (1 - variation) for c in base[:3]) + (1.0,)
+        brick.inputs['Color2'].default_value = tuple(min(1.0, c * (1 + variation * 0.6)) for c in base[:3]) + (1.0,)
+        brick.inputs['Mortar'].default_value = tuple(c * 0.55 for c in base[:3]) + (1.0,)
+        links.new(uv.outputs['UV'], brick.inputs['Vector'])
+        # Keep the noise grain on top of the pattern.
+        grain = nodes.new('ShaderNodeMix'); grain.data_type = 'RGBA'; grain.blend_type = 'OVERLAY'
+        grain.inputs['Factor'].default_value = 0.35
+        links.new(brick.outputs['Color'], grain.inputs['A']); links.new(shift.outputs['Color'], grain.inputs['B'])
+        for link in list(bsdf.inputs['Base Color'].links): links.remove(link)
+        lift = nodes.new('ShaderNodeBrightContrast'); lift.inputs['Bright'].default_value = 0.0
+        links.new(grain.outputs['Result'], lift.inputs['Color'])
+        links.new(lift.outputs['Color'], bsdf.inputs['Base Color'])
+        bump = nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value = 0.4; bump.inputs['Distance'].default_value = 0.01
+        links.new(brick.outputs['Fac'], bump.inputs['Height']); links.new(bump.outputs['Normal'], bsdf.inputs['Normal'])
     if kind == 'dark':
         bsdf.inputs['Base Color'].default_value = base
         for link in list(bsdf.inputs['Base Color'].links): links.remove(link)
@@ -119,6 +147,25 @@ def material_kind(mid):
 
 # ---------------------------------------------------------------- geometry
 
+def uv_world(bm, prism_faces=False):
+    """UVs in world units (local Three space): walls get (horizontal, height), tops (x, z). Sloped prism faces use
+    (along the ridge, up the slope) so roof courses run parallel to the ridge."""
+    layer = bm.loops.layers.uv.verify()
+    for f in bm.faces:
+        n = f.normal
+        ax = max(range(3), key=lambda i: abs(n[i]))
+        for loop in f.loops:
+            c = loop.vert.co
+            if prism_faces and abs(n[1]) > 0.2 and abs(n[1]) < 0.98:
+                loop[layer].uv = (c.z, c.y / max(0.2, abs(n.x) if abs(n.x) > abs(n.z) else 1.0) * 1.3)
+            elif ax == 0:
+                loop[layer].uv = (c.z, c.y)
+            elif ax == 2:
+                loop[layer].uv = (c.x, c.y)
+            else:
+                loop[layer].uv = (c.x, c.z)
+
+
 def bm_to_object(bm, name, at, rot, mat):
     """Move a bmesh built in Three local space (bottom centre at the origin) to the model position, in Blender axes."""
     for v in bm.verts:
@@ -133,11 +180,19 @@ def bm_to_object(bm, name, at, rot, mat):
 
 
 def stone(part, rnd, mat, rough=True):
+    """A box. Small stone boxes (ruins) become chipped field stones; big ones stay straight with bevelled edges."""
     w, h, d = part['size']
     bm = bmesh.new()
     bmesh.ops.create_cube(bm, size=1.0)
     for v in bm.verts:
         v.co = Vector((v.co.x * w, v.co.y * h + h / 2, v.co.z * d))
+    small_part = w < 0.5 and h < 0.5
+    if rough and not small_part:
+        # A big block (wall, plinth): keep it straight, only round the edges a little so they catch the light.
+        bmesh.ops.bevel(bm, geom=list(bm.edges), offset=min(0.02, min(w, h, d) * 0.2), offset_type='OFFSET', segments=1, affect='EDGES', clamp_overlap=True)
+        rough = False
+    bm.normal_update()
+    uv_world(bm)
     if rough:
         # Rounded, chipped field stone: bevelled edges, one subdivision, then a noise displacement along the normals
         # (seeded per stone) and a little corner jitter, so no two stones share a shape.
@@ -180,6 +235,8 @@ def prism(part, rnd, mat):
     for f in [(0, 2, 1), (3, 4, 5), (0, 1, 4, 3), (1, 2, 5, 4), (2, 0, 3, 5)]:
         bm.faces.new([verts[i] for i in f])
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.normal_update()
+    uv_world(bm, prism_faces=True)
     return bm_to_object(bm, part['material'], part['at'], three_rotation(part.get('rotation', 0.0), part.get('tilt')), mat)
 
 

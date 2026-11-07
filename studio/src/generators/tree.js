@@ -4,7 +4,9 @@
 import { cylinder, cylinderTop, sphere, canopy, clamp, seeded } from './shapes.js';
 
 export const params = [
-  { key: 'kind', values: ['oak', 'pine'], description: 'Broadleaf crown or conifer tiers.' },
+  { key: 'kind', values: ['oak', 'pine', 'bush'], description: 'Broadleaf crown, conifer tiers, or a low bush (#100: shrubs for meadows, shores and dry land).' },
+  { key: 'berries', description: 'Bush: material of small berries or flowers on the leaves (e.g. cloth_red, blossom).' },
+  { key: 'dry', description: 'Bush: sparse dry scrub with twigs showing (desert, dunes).' },
   { key: 'height', unit: 'units', description: 'Overall height (style range 1.6–3.6).' },
   { key: 'crown', unit: 'units', description: 'Crown radius, clamped to the footprint plus the canopy overhang.' },
   { key: 'trunk', unit: 'units', description: 'Trunk radius at the base.' },
@@ -25,6 +27,24 @@ export function build(spec, { footprint, style }) {
   const height = clamp(spec.height ?? 2.6, 1.0, 4.2), trunk = clamp(spec.trunk ?? 0.09, 0.04, 0.2);
   const crown = clamp(spec.crown ?? 0.6, 0.2, limit), random = seeded(spec.seed ?? 1), parts = [];
   const season = spec.season ?? 'summer', leaf = id => LEAVES[season]?.[id] ?? id;
+  if (spec.kind === 'bush') {
+    // Low shrub: a few overlapping leaf clumps on short twigs, lighter towards the sun. Dry scrub: thinner clumps
+    // in olive and straw tones with bare twigs between them.
+    const h = clamp(spec.height ?? 0.6, 0.25, 1.2), r = clamp(spec.crown ?? 0.32, 0.12, Math.min(0.48, limit)), n = clamp(Math.round(spec.clusters ?? 5), 3, 8);
+    const dry = !!spec.dry, leafy = dry ? ['olive_scrub', 'grass_scrub', 'olive_scrub'] : [leaf('foliage_dark'), leaf('foliage'), leaf('foliage_light')];
+    let top = 0;
+    for (let i = 0; i < (dry ? 5 : 3); i++) { const a = random() * Math.PI * 2, t = 0.25 + random() * 0.35; parts.push({ shape: 'cylinder', radiusBottom: 0.018, radiusTop: 0.008, height: h * (dry ? 0.9 : 0.55), segments: 5, at: [Math.cos(a) * 0.04, 0, Math.sin(a) * 0.04], material: 'twigs', tilt: [Math.sin(a) * t, -Math.cos(a) * t] }); }
+    for (let i = 0; i < n; i++) {
+      const a = i / n * Math.PI * 2 + random() * 0.7, d = r * (0.25 + random() * 0.45), s = r * (dry ? 0.32 : 0.48) * (0.75 + random() * 0.45);
+      const x = Math.cos(a) * d, z = Math.sin(a) * d, y = (dry ? h * 0.35 : h * 0.12) + random() * h * 0.3;
+      if (Math.hypot(x, z) + s > limit) continue;
+      parts.push(canopy(sphere([s, s * (dry ? 0.6 : 0.78), s], [x, y, z], leafy[x + z > 0.03 ? 2 : x + z < -0.03 ? 0 : 1], dry ? 0 : 1)));
+      if (spec.berries && i % 2 === 0) parts.push(canopy(sphere([0.035, 0.03, 0.035], [x + s * 0.5, y + s * 1.2, z + s * 0.5], spec.berries, 0)));
+      top = Math.max(top, y + s * (dry ? 1.2 : 1.56));
+    }
+    if (!dry) { const s = r * 0.5; parts.push(canopy(sphere([s, s * 0.8, s], [r * 0.08, h * 0.38, r * 0.08], leaf('foliage_light')))); top = Math.max(top, h * 0.38 + s * 1.6); }
+    return { primitives: parts, lights: [], height: top + 0.02 };
+  }
   if (spec.kind === 'pine') {
     const tiers = clamp(Math.round(spec.tiers ?? 3), 2, 5), base = height * 0.18;
     parts.push(cylinder({ radiusBottom: trunk, radiusTop: trunk * 0.6, height: height * 0.4, segments: 7 }, [0, 0, 0], 'bark'));

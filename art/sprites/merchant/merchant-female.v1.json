@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "merchant",
+  "variantId": "merchant-female",
+  "name": "Merchant (woman)",
+  "category": "units",
+  "version": 1,
+  "specHash": "d423aa4a",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 61,
+  "anchor": {
+    "x": 33,
+    "y": 43
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.70492
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 59
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.96721
+  },
+  "visualHeight": 59,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.036,
+  "lights": []
+}

@@ -65,7 +65,7 @@
           {
             "type": "hayStack",
             "at": [
-              1.0,
+              1,
               0.95
             ]
           },
@@ -149,6 +149,80 @@
             ]
           }
         ]
+      }
+    },
+    {
+      "id": "barracks-hall-blender",
+      "name": "Stone barracks (Blender)",
+      "version": 1,
+      "notes": "Blender pilot: the Stone barracks layout rendered by Blender (Cycles) for comparison: bevelled chipped stones, soft sky light and shadows. Pre-rendered; runtime lights (torches) are not part of a baked sprite yet.",
+      "spec": {
+        "body": {
+          "kind": "barn",
+          "walls": "stone",
+          "roofMaterial": "roof_tile",
+          "width": 2.4,
+          "depth": 1.3,
+          "wallHeight": 1.05,
+          "roofHeight": 0.8,
+          "ridge": "x",
+          "ironBands": true,
+          "at": [
+            -0.15,
+            -0.7
+          ]
+        },
+        "props": [
+          {
+            "type": "shield",
+            "at": [
+              1.3,
+              -0.2
+            ]
+          },
+          {
+            "type": "shield",
+            "at": [
+              1.3,
+              -0.65
+            ],
+            "material": "banner_blue"
+          },
+          {
+            "type": "swordRack",
+            "at": [
+              -0.8,
+              0.6
+            ]
+          },
+          {
+            "type": "weaponCrate",
+            "at": [
+              0.1,
+              0.75
+            ]
+          },
+          {
+            "type": "banner",
+            "at": [
+              1.2,
+              0.9
+            ]
+          },
+          {
+            "type": "armorStand",
+            "at": [
+              -0.2,
+              1.1
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "twin": "barracks-hall-stone",
+        "renderHash": "79ca4d71",
+        "samples": 96
       }
     }
   ]

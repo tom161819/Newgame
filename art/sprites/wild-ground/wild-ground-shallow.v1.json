@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "assetId": "wild-ground",
+  "variantId": "wild-ground-shallow",
+  "name": "Shallow water",
+  "category": "terrain",
+  "version": 1,
+  "specHash": "3b6e1fbf",
+  "generator": "ground",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 256,
+  "height": 128,
+  "anchor": {
+    "x": 128,
+    "y": 64
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.5
+  },
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "base": {
+    "x": 128,
+    "y": 128
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 1
+  },
+  "visualHeight": 128,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0,
+  "lights": [],
+  "surface": {
+    "mode": "grass",
+    "tileWidth": 64,
+    "tileHeight": 32,
+    "frames": 4,
+    "frameMeaning": "interchangeable grass tiles, pick by tile hash",
+    "gameWear": null
+  }
+}

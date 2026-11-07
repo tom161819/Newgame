@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "id": "wall-gate",
+  "name": "Castle gate and wall stair",
+  "category": "buildings",
+  "description": "#97 Functional castle gate: a wall tile with a passage, oak doors and an optional portcullis, the same height as the wall so the walk continues over it. Plus a stone stair that climbs to the wall walk (the walls are reached only from a tower, a gate or a stair). Pieces of the wall kit; concepts for review.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "wallkit",
+  "plannedGameObjectId": "castle_gate",
+  "variants": [
+    {
+      "id": "wall-gate-closed",
+      "name": "Gate, closed",
+      "version": 1,
+      "notes": "Passage along grid x, oak doors shut.",
+      "spec": {
+        "piece": "gate",
+        "axis": "x",
+        "state": "closed",
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-gate-open",
+      "name": "Gate, open",
+      "version": 1,
+      "notes": "Doors swung back against the jambs: units walk through.",
+      "spec": {
+        "piece": "gate",
+        "axis": "x",
+        "state": "open",
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-gate-portcullis",
+      "name": "Gate with portcullis",
+      "version": 1,
+      "notes": "Open doors behind a half-raised iron portcullis.",
+      "spec": {
+        "piece": "gate",
+        "axis": "x",
+        "state": "portcullis",
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-gate-open-y",
+      "name": "Gate, open (other direction)",
+      "version": 1,
+      "notes": "Passage along grid y, for a wall running along x.",
+      "spec": {
+        "piece": "gate",
+        "axis": "z",
+        "state": "open",
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-gate-stair",
+      "name": "Stair to the wall walk",
+      "version": 1,
+      "notes": "Steps up along grid x to the walk; placed beside a wall or gate tile.",
+      "spec": {
+        "piece": "stair",
+        "axis": "x"
+      }
+    }
+  ]
+}

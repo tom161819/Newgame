@@ -9,7 +9,7 @@ import { box, cylinder, prism, sphere, clamp } from './shapes.js';
 import { PROPS, PROP_TYPES } from './props.js';
 
 export const params = [
-  { key: 'body.kind', values: ['house', 'raised', 'windmill', 'furnace', 'barn', 'shed', 'none'], description: 'Main structure: house, granary on staddle stones, tower windmill with sails, bloomery furnace, big barn, open lean-to shed (posts, sloping roof, low back wall; work stays visible underneath), or none (props only, e.g. equipment).' },
+  { key: 'body.kind', values: ['house', 'raised', 'windmill', 'furnace', 'barn', 'shed', 'hall', 'none'], description: 'Main structure: house, granary on staddle stones, tower windmill with sails, bloomery furnace, big barn, open lean-to shed (posts, sloping roof, low back wall; work stays visible underneath), open market hall (posts carrying a gable roof, open on all sides), or none (props only, e.g. equipment).' },
   { key: 'body', description: 'House parameters (walls, width, depth, wallHeight, ridge, roofHeight, roofMaterial, windows, chimney, lantern) or the kind-specific ones.' },
   { key: 'body.at', unit: 'units', description: '[x, z] centre of the body; the rest of the footprint is the yard.' },
   { key: 'body.ironBands', description: 'Barn: iron bands across the double doors (armory).' },
@@ -67,7 +67,7 @@ function body(spec, style) {
   if (kind === 'shed') {
     // Open lean-to work shed (#119): posts carry a roof that slopes down to a low plank back wall, so the
     // benches, beams and tools underneath stay visible from the isometric camera (front faces +x and +z).
-    const width = clamp(spec.width ?? 1.5, 0.8, 1.9), depth = clamp(spec.depth ?? 1.0, 0.6, 1.5), front = clamp(spec.frontHeight ?? 0.85, 0.6, 1.2), back = clamp(spec.backHeight ?? 0.55, 0.35, front), roof = spec.roofMaterial ?? 'roof_shingle';
+    const width = clamp(spec.width ?? 1.5, 0.8, 2.6), depth = clamp(spec.depth ?? 1.0, 0.6, 1.5), front = clamp(spec.frontHeight ?? 0.85, 0.6, 1.2), back = clamp(spec.backHeight ?? 0.55, 0.35, front), roof = spec.roofMaterial ?? 'roof_shingle';
     const parts = [];
     for (const x of [-width / 2 + 0.04, 0, width / 2 - 0.04]) parts.push(box([0.06, front, 0.06], [x, 0, depth / 2 - 0.04], 'wood_dark'), box([0.06, back, 0.06], [x, 0, -depth / 2 + 0.04], 'wood_dark'));
     // Back wall of planks up to the low eave, a beam under each eave, the sloping roof as thin overlapping steps.
@@ -77,6 +77,17 @@ function body(spec, style) {
     for (let i = 0; i < steps; i++) { const t = (i + 0.5) / steps, z = -depth / 2 - 0.08 + t * (depth + 0.22), y = back + (front - back) * t; parts.push(box([width + 0.1, 0.035, (depth + 0.22) / steps + 0.03], [0, y, z], roof)); }
     if (spec.sideWall) parts.push(box([0.04, back * 0.8, depth - 0.1], [-width / 2 + 0.03, 0, 0], 'wood'));
     return { parts, lights: spec.lantern ? [{ type: 'torch', at: [width / 2 - 0.1, front - 0.12, depth / 2 - 0.02] }] : [] };
+  }
+  if (kind === 'hall') {
+    // Open market hall (obchod F1): timber posts on stone pads carrying a gable roof, open on every side, so the
+    // stalls and goods underneath stay visible. Ridge along x by default.
+    const width = clamp(spec.width ?? 2.2, 1.2, 2.7), depth = clamp(spec.depth ?? 1.4, 0.8, 2.0), eave = clamp(spec.wallHeight ?? 0.9, 0.7, 1.3), roofHeight = clamp(spec.roofHeight ?? 0.6, 0.3, 1.0);
+    const parts = [box([width + 0.06, 0.05, depth + 0.06], [0, 0, 0], spec.floor ?? 'stone_light')], posts = Math.max(2, Math.round(width / 0.6));
+    for (let i = 0; i <= posts; i++) for (const z of [-depth / 2 + 0.05, depth / 2 - 0.05]) { const x = -width / 2 + 0.05 + i * (width - 0.1) / posts; parts.push(box([0.1, 0.06, 0.1], [x, 0.05, z], 'stone'), box([0.07, eave - 0.05, 0.07], [x, 0.1, z], 'wood_dark')); }
+    for (const z of [-depth / 2 + 0.05, depth / 2 - 0.05]) parts.push(box([width, 0.07, 0.08], [0, eave, z], 'wood_dark'));
+    for (const x of [-width / 2 + 0.05, width / 2 - 0.05]) parts.push(box([0.08, 0.07, depth], [x, eave, 0], 'wood_dark'));
+    parts.push(prism([depth + 0.24, roofHeight, width + 0.24], [0, eave + 0.07, 0], spec.roofMaterial ?? 'roof_tile', { rotation: Math.PI / 2 }));
+    return { parts, lights: spec.lantern ? [{ type: 'torch', at: [width / 2 - 0.05, eave - 0.1, depth / 2 + 0.02] }] : [] };
   }
   throw new RangeError(`Unknown workshop body ${kind}`);
 }

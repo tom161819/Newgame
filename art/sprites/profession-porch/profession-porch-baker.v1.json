@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "profession-porch",
+  "variantId": "profession-porch-baker",
+  "name": "Baker's porch (2 seats)",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "1d8e076e",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 99,
+  "height": 73,
+  "anchor": {
+    "x": 49,
+    "y": 47
+  },
+  "origin": {
+    "x": 0.49495,
+    "y": 0.64384
+  },
+  "footprint": {
+    "width": 2,
+    "height": 1
+  },
+  "base": {
+    "x": 65,
+    "y": 71
+  },
+  "baseOrigin": {
+    "x": 0.65657,
+    "y": 0.9726
+  },
+  "visualHeight": 71,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.73,
+  "lights": []
+}

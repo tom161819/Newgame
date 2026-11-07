@@ -1,7 +1,7 @@
 // Thematic props shared by building recipes. Each helper returns primitives
 // standing on the ground at (x, z) in model units; `r` turns the prop around
 // the vertical axis where that matters. Only style-guide materials are used.
-import { box, cylinder, sphere, prism, lean, horse } from './shapes.js';
+import { box, cylinder, sphere, prism, lean, horse, rotateParts } from './shapes.js';
 
 const T = Math.PI / 4;
 
@@ -80,6 +80,70 @@ Object.assign(PROPS, {
   table: (x, z, { r = 0 } = {}) => [box([0.4, 0.04, 0.26], [x, 0.24, z], 'wood', { rotation: r }), ...[[-0.16, -0.09], [0.16, -0.09], [-0.16, 0.09], [0.16, 0.09]].map(([dx, dz]) => box([0.04, 0.24, 0.04], [x + dx * Math.cos(r) + dz * Math.sin(r), 0, z - dx * Math.sin(r) + dz * Math.cos(r)], 'wood_dark'))],
   basket: (x, z, { y = 0 } = {}) => [cylinder({ radiusBottom: 0.07, radiusTop: 0.09, height: 0.09, segments: 10 }, [x, y, z], 'twigs'), sphere([0.045, 0.03, 0.035], [x - 0.02, y + 0.09, z], 'cloth_ochre', 1), sphere([0.04, 0.028, 0.032], [x + 0.03, y + 0.09, z + 0.02], 'cloth_ochre', 1)],
   saddleRack: (x, z) => [box([0.04, 0.32, 0.04], [x - 0.12, 0, z], 'wood_dark'), box([0.04, 0.32, 0.04], [x + 0.12, 0, z], 'wood_dark'), box([0.3, 0.05, 0.08], [x, 0.3, z], 'wood_dark'), box([0.24, 0.06, 0.26], [x, 0.35, z], 'leather'), box([0.04, 0.14, 0.28], [x, 0.24, z], 'banner')],
+});
+
+// Trade (obchod F1): market stalls, goods and the merchant's covered wagon.
+const GOODS = { food: ['cloth_ochre', 'foliage_autumn_light', 'cloth_red', 'wheat'], cloth: ['cloth_blue', 'cloth_red', 'cloth_linen', 'cloth_green'], tools: ['iron', 'steel', 'wood_dark', 'leather'], pottery: ['roof_tile', 'plaster', 'stone_light', 'roof_tile'] };
+const goodsColour = (kind, i) => { const list = GOODS[kind] ?? GOODS.food; const id = list[i % list.length]; return id === 'wheat' ? 'thatch' : id; };
+Object.assign(PROPS, {
+  // A market stall: four posts, a counter with goods and a sloping striped cloth roof. Front (+x/+z) faces the camera.
+  stall: (x, z, { r = 0, cloth = 'cloth_red', stripe = 'cloth_linen', goods = 'food', width = 0.62, depth = 0.4 } = {}) => {
+    const local = [];
+    for (const [dx, dz, h] of [[-width / 2 + 0.03, depth / 2 - 0.03, 0.62], [width / 2 - 0.03, depth / 2 - 0.03, 0.62], [-width / 2 + 0.03, -depth / 2 + 0.03, 0.74], [width / 2 - 0.03, -depth / 2 + 0.03, 0.74]]) local.push(box([0.04, h, 0.04], [dx, 0, dz], 'wood_dark'));
+    local.push(box([width - 0.04, 0.2, 0.16], [0, 0, depth / 2 - 0.1], 'wood'), box([width, 0.03, 0.2], [0, 0.2, depth / 2 - 0.1], 'wood_dark'));
+    // Striped cloth roof: alternating thin slats tilted down towards the front.
+    const stripes = 5;
+    for (let i = 0; i < stripes; i++) local.push(box([width / stripes + 0.005, 0.02, depth + 0.14], [-width / 2 + (i + 0.5) * width / stripes, 0.66, 0], i % 2 ? stripe : cloth, { tilt: [0.2, 0] }));
+    // Goods on the counter and a crate or basket below.
+    for (let i = 0; i < 4; i++) local.push(sphere([0.045, 0.035, 0.04], [-width / 2 + 0.1 + i * (width - 0.2) / 3, 0.23, depth / 2 - 0.1], goodsColour(goods, i), 1));
+    local.push(box([0.16, 0.14, 0.14], [-width / 2 + 0.14, 0, -depth / 2 + 0.12], 'wood'), sphere([0.07, 0.05, 0.06], [width / 2 - 0.14, 0, -depth / 2 + 0.12], goodsColour(goods, 2), 1));
+    return rotateParts(local, r).map(p => ({ ...p, at: [p.at[0] + x, p.at[1], p.at[2] + z] }));
+  },
+  goodsPile: (x, z, { kind = 'food' } = {}) => [...PROPS.sacks(x, z, { count: 3 }), ...PROPS.crate(x + 0.26, z - 0.05, { size: 0.2 }), sphere([0.06, 0.045, 0.05], [x + 0.28, 0.2, z - 0.05], goodsColour(kind, 1), 1), ...PROPS.barrel(x - 0.12, z + 0.22)],
+  well: (x, z) => [cylinder({ radiusBottom: 0.2, radiusTop: 0.2, height: 0.24, segments: 12 }, [x, 0, z], 'stone'), cylinder({ radiusBottom: 0.15, height: 0.005, segments: 12 }, [x, 0.24, z], 'opening'), box([0.035, 0.52, 0.035], [x - 0.17, 0.2, z], 'wood_dark'), box([0.035, 0.52, 0.035], [x + 0.17, 0.2, z], 'wood_dark'), box([0.4, 0.035, 0.04], [x, 0.7, z], 'wood_dark'), prism([0.46, 0.16, 0.3], [x, 0.72, z], 'roof_shingle'), cylinder({ radiusBottom: 0.05, height: 0.08, segments: 8 }, [x, 0.42, z], 'wood')],
+  scales: (x, z) => [box([0.04, 0.5, 0.04], [x, 0, z], 'wood_dark'), box([0.36, 0.025, 0.025], [x, 0.5, z], 'iron', { rotation: Math.PI / 4 }), cylinder({ radiusBottom: 0.07, radiusTop: 0.08, height: 0.02, segments: 10 }, [x - 0.12, 0.34, z + 0.12], 'iron'), cylinder({ radiusBottom: 0.07, radiusTop: 0.08, height: 0.02, segments: 10 }, [x + 0.12, 0.38, z - 0.12], 'iron')],
+  // A marked loading place (obchod F1: the marketplace has two): a low plank platform with a post and a rope.
+  loadingBay: (x, z, { r = 0 } = {}) => rotateParts([box([0.5, 0.04, 0.36], [0, 0, 0], 'wood'), ...[-0.12, 0.0, 0.12].map(dz => box([0.5, 0.045, 0.02], [0, 0, dz], 'wood_dark')), box([0.04, 0.34, 0.04], [0.27, 0, 0.2], 'wood_dark'), box([0.12, 0.08, 0.02], [0.27, 0.34, 0.2], 'cloth_ochre')], r).map(p => ({ ...p, at: [p.at[0] + x, p.at[1], p.at[2] + z] })),
+  hitchingPost: (x, z, { length = 0.6, r = 0 } = {}) => rotateParts([box([0.04, 0.32, 0.04], [-length / 2, 0, 0], 'wood_dark'), box([0.04, 0.32, 0.04], [length / 2, 0, 0], 'wood_dark'), box([length + 0.06, 0.04, 0.04], [0, 0.28, 0], 'wood')], r).map(p => ({ ...p, at: [p.at[0] + x, p.at[1], p.at[2] + z] })),
+  // The merchant's covered wagon (obchod F1). Built along +x and turned to face `angle` (0 = +x, π/2 = +z).
+  // load: 'full' (canvas cover, goods showing at the back), 'empty' (no cover, bare bed), 'unloading' (cover rolled
+  // back, tailgate down, crates beside). horse: a draught horse in the shafts.
+  wagon: (x0, z0, { angle = 0, load = 'full', horse: withHorse = true, cover = 'cloth_linen', coat = 'horse_chestnut' } = {}) => {
+    // (x0, z0) is the middle of the whole rig, wagon and horse together.
+    const x = x0 - Math.cos(angle) * (withHorse ? 0.45 : 0), z = z0 - Math.sin(angle) * (withHorse ? 0.45 : 0);
+    const L = 0.86, W = 0.44, bed = 0.26, local = [];
+    local.push(box([L, 0.06, W], [0, bed, 0], 'wood'), box([L, 0.13, 0.03], [0, bed + 0.06, W / 2 - 0.015], 'wood'), box([L, 0.13, 0.03], [0, bed + 0.06, -W / 2 + 0.015], 'wood'), box([0.03, 0.13, W], [L / 2 - 0.015, bed + 0.06, 0], 'wood'));
+    if (load !== 'unloading') local.push(box([0.03, 0.13, W], [-L / 2 + 0.015, bed + 0.06, 0], 'wood'));
+    else local.push(box([0.2, 0.025, W - 0.04], [-L / 2 - 0.09, bed - 0.05, 0], 'wood', { tilt: [0, -0.5] }));
+    local.push(box([0.06, 0.06, W + 0.1], [0.27, 0.13, 0], 'wood_dark'), box([0.06, 0.06, W + 0.1], [-0.27, 0.13, 0], 'wood_dark'));
+    for (const wx of [0.27, -0.27]) for (const side of [1, -1]) {
+      const wheel = lean({ length: 0.035, radiusBottom: wx > 0 ? 0.14 : 0.16, segments: 12 }, side > 0 ? Math.PI / 2 : -Math.PI / 2, Math.PI / 2, [wx, wx > 0 ? 0.14 : 0.16, side * (W / 2 + 0.03)], 'wood_dark');
+      local.push(wheel.part);
+    }
+    // Shafts to the horse and the driver's bench.
+    local.push(box([0.5, 0.03, 0.03], [L / 2 + 0.24, bed - 0.02, 0.16], 'wood_dark'), box([0.5, 0.03, 0.03], [L / 2 + 0.24, bed - 0.02, -0.16], 'wood_dark'), box([0.1, 0.04, W - 0.04], [L / 2 - 0.08, bed + 0.2, 0], 'wood_dark'));
+    if (load === 'full') {
+      for (const gx of [-0.3, -0.12]) local.push(box([0.15, 0.15, 0.15], [gx, bed + 0.06, -0.08], 'wood'), sphere([0.08, 0.06, 0.07], [gx + 0.02, bed + 0.06, 0.1], 'cloth_linen', 1));
+      local.push(...PROPS.barrel(0.1, 0.08, { y: bed + 0.06 }));
+      local.push(prism([W + 0.06, 0.3, L * 0.78], [-0.04, bed + 0.2, 0], cover, { rotation: Math.PI / 2 }));
+      for (const hx of [-0.36, -0.04, 0.26]) local.push(box([0.03, 0.03, W + 0.07], [hx, bed + 0.19, 0], 'wood_dark'));
+    } else if (load === 'unloading') {
+      local.push(prism([W + 0.06, 0.24, 0.24], [0.24, bed + 0.2, 0], cover, { rotation: Math.PI / 2 }), box([0.15, 0.15, 0.15], [0.02, bed + 0.06, 0.06], 'wood'));
+      local.push(...PROPS.crate(-L / 2 - 0.3, 0.2, { size: 0.18 }), ...PROPS.sack(-L / 2 - 0.32, -0.12), ...PROPS.crate(-L / 2 - 0.18, -0.25, { size: 0.16, r: 0.4 }));
+    } else {
+      for (const hx of [-0.36, -0.04, 0.26]) { local.push(box([0.025, 0.2, 0.025], [hx, bed + 0.06, W / 2 - 0.02], 'wood_dark'), box([0.025, 0.2, 0.025], [hx, bed + 0.06, -W / 2 + 0.02], 'wood_dark')); }
+      local.push(sphere([0.07, 0.05, 0.06], [-0.25, bed + 0.06, -0.1], 'cloth_linen', 1));
+    }
+    const turned = rotateParts(local, -angle).map(p => ({ ...p, at: [p.at[0] + x, p.at[1], p.at[2] + z] }));
+    if (withHorse) { const ax = Math.cos(angle), az = Math.sin(angle); turned.push(...horse([x + ax * (L / 2 + 0.52), 0, z + az * (L / 2 + 0.52)], { angle, coat, saddle: false, scale: 0.85 }).parts); }
+    return turned;
+  },
+  // Builder's yard (#119): squared beams, planks and a sawhorse.
+  planks: (x, z, { count = 5, length = 0.7, r = 0 } = {}) => Array.from({ length: count }, (_, i) => box([length, 0.025, 0.12], [x + Math.sin(r) * (i % 2) * 0.02, i * 0.026, z + Math.cos(r) * (i % 2) * 0.02], i % 3 ? 'wood' : 'wood_dark', { rotation: r })),
+  beams: (x, z, { count = 4, length = 0.8, r = 0 } = {}) => Array.from({ length: count }, (_, i) => box([length, 0.08, 0.08], [x + Math.sin(r) * (i % 2) * 0.09, Math.floor(i / 2) * 0.08, z + Math.cos(r) * (i % 2) * 0.09], 'wood', { rotation: r })),
+  sawhorse: (x, z, { r = 0, log = true } = {}) => rotateParts([...[-0.15, 0.15].flatMap(dx => [box([0.03, 0.26, 0.03], [dx, 0, -0.07], 'wood_dark', { tilt: [0.25, 0] }), box([0.03, 0.26, 0.03], [dx, 0, 0.07], 'wood_dark', { tilt: [-0.25, 0] })]), box([0.42, 0.04, 0.04], [0, 0.24, 0], 'wood_dark'), ...(log ? [box([0.6, 0.08, 0.08], [0.05, 0.28, 0], 'bark')] : [])], r).map(p => ({ ...p, at: [p.at[0] + x, p.at[1], p.at[2] + z] })),
+  ladder: (x, z, { r = 0, height = 0.8 } = {}) => rotateParts([box([0.025, height, 0.025], [-0.08, 0, 0], 'wood'), box([0.025, height, 0.025], [0.08, 0, 0], 'wood'), ...Array.from({ length: Math.round(height / 0.14) }, (_, i) => box([0.17, 0.02, 0.02], [0, 0.1 + i * 0.14, 0], 'wood_dark'))], r).map(p => ({ ...p, at: [p.at[0] + x, p.at[1], p.at[2] + z] })),
+  mortarTub: (x, z) => [box([0.3, 0.1, 0.2], [x, 0, z], 'wood_dark'), box([0.26, 0.01, 0.16], [x, 0.1, z], 'plaster'), box([0.04, 0.02, 0.2], [x + 0.12, 0.11, z], 'iron', { rotation: 0.5 })],
 });
 
 export const PROP_TYPES = Object.keys(PROPS);

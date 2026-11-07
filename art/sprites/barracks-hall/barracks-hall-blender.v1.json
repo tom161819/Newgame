@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "assetId": "barracks-hall",
+  "variantId": "barracks-hall-blender",
+  "name": "Stone barracks (Blender)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "0b7359ac",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 197,
+  "height": 164,
+  "anchor": {
+    "x": 97,
+    "y": 114
+  },
+  "origin": {
+    "x": 0.49239,
+    "y": 0.69512
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 162
+  },
+  "baseOrigin": {
+    "x": 0.49239,
+    "y": 0.9878
+  },
+  "visualHeight": 162,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.99,
+  "lights": [],
+  "x2": {
+    "width": 391,
+    "height": 325,
+    "anchor": {
+      "x": 193,
+      "y": 227
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 96,
+    "supersampling": 4,
+    "seconds": 161.4,
+    "renderHash": "79ca4d71",
+    "script": "scripts/blender/render.py"
+  }
+}

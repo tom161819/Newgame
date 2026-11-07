@@ -14,12 +14,13 @@ const style = json('art/style-guide.json');
 const workshops = readdirSync(path.join(root, 'art/assets/buildings')).map(id => json(`art/assets/buildings/${id}/asset.json`)).filter(a => a.generator === 'workshop');
 const catalog = buildCatalog({ specs: workshops, generators: GENERATORS, style }).studio;
 
-test('every prop uses style materials and fits a 2 × 2 site when placed at its centre', () => {
+test('every prop uses style materials and fits a 2 × 2 site (the wagon 3 × 3) when placed at its centre', () => {
   assert.ok(PROP_TYPES.length >= 20);
   for (const type of PROP_TYPES) {
     const parts = type === 'fence' ? PROPS.fence(-0.5, 0, 0.5, 0) : PROPS[type](0, 0, {});
     assert.ok(parts.length > 0, type);
-    assert.deepEqual(checkModel({ primitives: parts }, { footprint: { width: 2, height: 2 }, style }), [], type);
+    const site = type === 'wagon' ? 3 : 2; // the caravan wagon with its horse is a vehicle about two tiles long
+    assert.deepEqual(checkModel({ primitives: parts }, { footprint: { width: site, height: site }, style }), [], type);
   }
 });
 
@@ -57,4 +58,26 @@ test('wall kit: a full-tile block at the game wall height and one parapet per si
   const preview = json('art/assets/buildings/wall-kit-preview/asset.json'), cells = preview.variants[0].spec.cells.length;
   const model = GENERATORS.wallkit.build(preview.variants[0].spec, { footprint: preview.footprint, style });
   assert.equal(model.primitives.filter(p => p.material === 'stone_dark').length, cells, 'one block per cell');
+});
+
+// #97 gate, obchod F1 market and wagon, #100 bushes (7 Nov 2026 concepts).
+test('the castle gate is a passable wall tile and the stair climbs to the wall walk', async () => {
+  const { WALL_HEIGHT } = await import('../studio/src/generators/wallkit.js');
+  const gate = state => GENERATORS.wallkit.build({ piece: 'gate', axis: 'x', state }, { footprint: { width: 1, height: 1 }, style });
+  const blocking = model => model.primitives.filter(p => p.shape === 'box' && p.material.startsWith('stone') && p.at[1] < 0.5 && p.size[1] > 0.3 && Math.abs(p.at[2]) < 0.2);
+  for (const state of ['closed', 'open', 'portcullis']) { const model = gate(state); assert.deepEqual(checkModel(model, { footprint: { width: 1, height: 1 }, style }), [], state); assert.equal(blocking(model).length, 0, `${state}: no masonry in the passage`); assert.ok(model.height >= WALL_HEIGHT, 'the walk continues over the gate'); }
+  const doors = state => gate(state).primitives.filter(p => p.material === 'wood' && Math.abs(p.at[2]) < 0.2 && p.size?.[0] < 0.1).length;
+  assert.ok(doors('closed') >= 2 && doors('open') === 0, 'closed doors stand across the passage, open ones lie against the jambs');
+  const stair = GENERATORS.wallkit.build({ piece: 'stair', axis: 'x' }, { footprint: { width: 1, height: 1 }, style });
+  const steps = stair.primitives.filter(p => p.size[2] > 0.5).sort((a, b) => a.at[0] - b.at[0]).map(p => p.size[1]);
+  assert.ok(steps.every((h, i) => !i || h > steps[i - 1]) && Math.abs(steps.at(-1) - WALL_HEIGHT) < 1e-9, 'steps rise to the wall walk');
+});
+
+test('marketplace, merchant wagon and bushes are concepts that fit their tiles', () => {
+  for (const id of ['marketplace', 'builders-workshop']) assert.deepEqual(json(`art/assets/buildings/${id}/asset.json`).footprint, { width: 3, height: 3 }, `${id} is 3 × 3`);
+  const wagon = load => PROPS.wagon(0, 0, { load });
+  for (const load of ['full', 'unloading', 'empty']) assert.deepEqual(checkModel({ primitives: wagon(load) }, { footprint: { width: 3, height: 3 }, style }), [], load);
+  assert.ok(wagon('full').some(p => p.shape === 'prism' && p.material === 'cloth_linen') && !wagon('empty').some(p => p.shape === 'prism'), 'cover only when loaded');
+  const turned = PROPS.wagon(0, 0, { angle: Math.PI / 2, horse: false });assert.ok(Math.max(...turned.map(p => Math.abs(p.at[0]))) < 0.4, 'angle turns the wagon to run along z');
+  for (const spec of [{ kind: 'bush' }, { kind: 'bush', dry: true }, { kind: 'bush', berries: 'cloth_red' }]) { const model = GENERATORS.tree.build(spec, { footprint: { width: 1, height: 1 }, style }); assert.deepEqual(checkModel(model, { footprint: { width: 1, height: 1 }, style }), []); assert.ok(model.height < 1.3, 'a bush stays low'); }
 });

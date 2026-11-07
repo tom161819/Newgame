@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "id": "wild-ground",
+  "name": "Sand and water ground",
+  "category": "terrain",
+  "description": "#100 World generation: tile sets for beaches, desert and rivers or lakes, seamless like the grass tiles (the game picks one per tile by its hash). Water is a flat calm surface; shore blending and animation come with the mechanics.",
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "generator": "ground",
+  "variants": [
+    {
+      "id": "wild-ground-beach",
+      "name": "Beach sand",
+      "version": 1,
+      "notes": "Pale sand with a few shells and pebbles and sparse dune grass.",
+      "spec": {
+        "mode": "grass",
+        "base": "sand",
+        "shades": [
+          "sand_dark",
+          "sand",
+          "sand_light",
+          "sand"
+        ],
+        "patchiness": 0.45,
+        "blades": {
+          "density": 4,
+          "height": [
+            2,
+            5
+          ],
+          "colours": [
+            "grass_scrub",
+            "olive_scrub"
+          ],
+          "tufts": 3
+        },
+        "tiles": 4,
+        "seed": 21,
+        "flowers": {
+          "density": 2,
+          "colours": [
+            "foam",
+            "stone_light",
+            "sand_dark"
+          ]
+        }
+      }
+    },
+    {
+      "id": "wild-ground-desert",
+      "name": "Desert sand",
+      "version": 1,
+      "notes": "Warmer, rippled dune sand with stones and almost no plants.",
+      "spec": {
+        "mode": "grass",
+        "base": "dune",
+        "shades": [
+          "dune_shade",
+          "dune",
+          "sand_light",
+          "dune"
+        ],
+        "patchiness": 0.7,
+        "blades": {
+          "density": 2,
+          "height": [
+            2,
+            4
+          ],
+          "colours": [
+            "grass_scrub"
+          ],
+          "tufts": 2
+        },
+        "tiles": 4,
+        "seed": 23,
+        "flowers": {
+          "density": 2.5,
+          "colours": [
+            "stone_dark",
+            "rock",
+            "dune_shade"
+          ]
+        }
+      }
+    },
+    {
+      "id": "wild-ground-shallow",
+      "name": "Shallow water",
+      "version": 1,
+      "notes": "Light river water over a sandy bed; a few glints.",
+      "spec": {
+        "mode": "grass",
+        "base": "water_light",
+        "shades": [
+          "water",
+          "water_light",
+          "#7fb2bd",
+          "water_light"
+        ],
+        "patchiness": 0.55,
+        "blades": {
+          "density": 0,
+          "height": [
+            1,
+            2
+          ],
+          "colours": [
+            "water"
+          ],
+          "tufts": 1
+        },
+        "tiles": 4,
+        "seed": 25,
+        "flowers": {
+          "density": 3,
+          "colours": [
+            "foam",
+            "#a8cdd2"
+          ]
+        }
+      }
+    },
+    {
+      "id": "wild-ground-deep",
+      "name": "Deep water",
+      "version": 1,
+      "notes": "Dark lake or river water with slow patches and rare glints.",
+      "spec": {
+        "mode": "grass",
+        "base": "water",
+        "shades": [
+          "water_deep",
+          "#355f73",
+          "water",
+          "#4a8197"
+        ],
+        "patchiness": 0.6,
+        "blades": {
+          "density": 0,
+          "height": [
+            1,
+            2
+          ],
+          "colours": [
+            "water_deep"
+          ],
+          "tufts": 1
+        },
+        "tiles": 4,
+        "seed": 27,
+        "flowers": {
+          "density": 1.2,
+          "colours": [
+            "water_light",
+            "foam"
+          ]
+        }
+      }
+    }
+  ]
+}

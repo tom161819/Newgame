@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "assetId": "builders-workshop",
+  "variantId": "builders-workshop-blender",
+  "name": "Workshop house with awning (Blender)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "abfc0b66",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 152,
+  "anchor": {
+    "x": 97,
+    "y": 102
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.67105
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 150
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98684
+  },
+  "visualHeight": 150,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.74,
+  "lights": [],
+  "x2": {
+    "width": 387,
+    "height": 301,
+    "anchor": {
+      "x": 193,
+      "y": 203
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 96,
+    "supersampling": 4,
+    "seconds": 150.9,
+    "renderHash": "8ed7ff8b",
+    "script": "scripts/blender/render.py"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wall-gate",
+  "variantId": "wall-gate-open",
+  "name": "Gate, open",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "49d778d8",
+  "generator": "wallkit",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 86,
+  "height": 115,
+  "anchor": {
+    "x": 33,
+    "y": 97
+  },
+  "origin": {
+    "x": 0.38372,
+    "y": 0.84348
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 113
+  },
+  "baseOrigin": {
+    "x": 0.38372,
+    "y": 0.98261
+  },
+  "visualHeight": 113,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.075,
+  "lights": []
+}

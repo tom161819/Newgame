@@ -1,0 +1,302 @@
+{
+  "schema": 1,
+  "id": "marketplace",
+  "name": "Marketplace",
+  "category": "buildings",
+  "description": "Obchod F1 (#59): marketplace 3 × 3 where the merchant caravan stops. Stalls with goods, two marked loading places where the wagon unloads, a hitching post. Concepts for review; until one is approved the game uses a temporary look.",
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "marketplace",
+  "variants": [
+    {
+      "id": "marketplace-square",
+      "name": "Market square",
+      "version": 1,
+      "notes": "Paved square with three striped stalls (food, cloth, tools), a well and scales; the open front corner is where the caravan stops. Two marked loading places (plank platforms) at the front corner.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "ground": "stone_light",
+        "props": [
+          {
+            "type": "stall",
+            "at": [
+              -0.75,
+              -0.95
+            ],
+            "cloth": "cloth_red",
+            "goods": "food"
+          },
+          {
+            "type": "stall",
+            "at": [
+              0.35,
+              -1.0
+            ],
+            "cloth": "cloth_blue",
+            "goods": "cloth"
+          },
+          {
+            "type": "stall",
+            "at": [
+              -1.0,
+              0.15
+            ],
+            "r": 1.5708,
+            "cloth": "cloth_ochre",
+            "goods": "tools"
+          },
+          {
+            "type": "well",
+            "at": [
+              0.15,
+              0.05
+            ]
+          },
+          {
+            "type": "scales",
+            "at": [
+              -0.35,
+              0.85
+            ]
+          },
+          {
+            "type": "goodsPile",
+            "at": [
+              0.75,
+              -0.45
+            ]
+          },
+          {
+            "type": "loadingBay",
+            "at": [
+              0.55,
+              0.65
+            ]
+          },
+          {
+            "type": "loadingBay",
+            "at": [
+              1.05,
+              0.15
+            ]
+          },
+          {
+            "type": "hitchingPost",
+            "at": [
+              -0.2,
+              1.25
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "marketplace-hall",
+      "name": "Market hall",
+      "version": 1,
+      "notes": "An open timber hall with a tiled roof over counters, sacks and barrels; crates wait at the loading place in front. Two marked loading places (plank platforms) at the front corner.",
+      "spec": {
+        "body": {
+          "kind": "hall",
+          "width": 2.5,
+          "depth": 1.45,
+          "wallHeight": 0.92,
+          "roofHeight": 0.62,
+          "lantern": true,
+          "at": [
+            -0.1,
+            -0.55
+          ]
+        },
+        "props": [
+          {
+            "type": "table",
+            "at": [
+              -0.7,
+              -0.6
+            ]
+          },
+          {
+            "type": "table",
+            "at": [
+              0.15,
+              -0.6
+            ]
+          },
+          {
+            "type": "sacks",
+            "at": [
+              0.6,
+              -0.95
+            ],
+            "count": 3
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -1.05,
+              -1.05
+            ],
+            "count": 3
+          },
+          {
+            "type": "basket",
+            "at": [
+              -0.65,
+              -0.6
+            ],
+            "y": 0.26
+          },
+          {
+            "type": "basket",
+            "at": [
+              0.2,
+              -0.6
+            ],
+            "y": 0.26
+          },
+          {
+            "type": "crates",
+            "at": [
+              0.3,
+              0.65
+            ],
+            "count": 4
+          },
+          {
+            "type": "goodsPile",
+            "at": [
+              -0.9,
+              0.65
+            ]
+          },
+          {
+            "type": "loadingBay",
+            "at": [
+              0.65,
+              0.8
+            ]
+          },
+          {
+            "type": "loadingBay",
+            "at": [
+              1.1,
+              0.25
+            ]
+          },
+          {
+            "type": "hitchingPost",
+            "at": [
+              -0.2,
+              1.25
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "marketplace-stalls-bay",
+      "name": "Stalls and wagon bay",
+      "version": 1,
+      "notes": "Stalls along the back and side, an open unloading bay with a parked handcart, goods piles and a hitching post: the trading place reads from far away. Two marked loading places (plank platforms) at the front corner.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "stall",
+            "at": [
+              -0.85,
+              -1.0
+            ],
+            "cloth": "cloth_green",
+            "goods": "food"
+          },
+          {
+            "type": "stall",
+            "at": [
+              0.2,
+              -1.05
+            ],
+            "cloth": "cloth_red",
+            "goods": "pottery"
+          },
+          {
+            "type": "stall",
+            "at": [
+              -1.05,
+              0.0
+            ],
+            "r": 1.5708,
+            "cloth": "cloth_blue",
+            "goods": "cloth"
+          },
+          {
+            "type": "cart",
+            "at": [
+              0.35,
+              0.5
+            ]
+          },
+          {
+            "type": "crates",
+            "at": [
+              -0.4,
+              0.6
+            ],
+            "count": 3
+          },
+          {
+            "type": "banner",
+            "at": [
+              1.2,
+              -1.2
+            ]
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -0.95,
+              1.0
+            ],
+            "count": 2
+          },
+          {
+            "type": "goodsPile",
+            "at": [
+              0.75,
+              -0.4
+            ]
+          },
+          {
+            "type": "loadingBay",
+            "at": [
+              0.7,
+              0.85
+            ]
+          },
+          {
+            "type": "loadingBay",
+            "at": [
+              1.1,
+              0.3
+            ]
+          },
+          {
+            "type": "hitchingPost",
+            "at": [
+              -0.2,
+              1.25
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

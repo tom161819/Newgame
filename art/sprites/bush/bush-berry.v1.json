@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "bush",
+  "variantId": "bush-berry",
+  "name": "Berry bush",
+  "category": "trees",
+  "version": 1,
+  "specHash": "0fe03e7e",
+  "generator": "tree",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 41,
+  "anchor": {
+    "x": 33,
+    "y": 23
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.56098
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 39
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.95122
+  },
+  "visualHeight": 39,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.485,
+  "lights": []
+}

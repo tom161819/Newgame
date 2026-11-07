@@ -103,6 +103,81 @@
           ]
         ]
       }
+    },
+    {
+      "id": "wall-kit-preview-gate",
+      "name": "Enclosure with gate and stair",
+      "version": 1,
+      "notes": "#97: a gate in the front wall (open) and a stair inside leading up to the walk.",
+      "spec": {
+        "piece": "assembly",
+        "merlons": 3,
+        "cells": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            2
+          ]
+        ],
+        "gates": [
+          {
+            "cell": [
+              2,
+              3
+            ],
+            "axis": "z",
+            "state": "open"
+          }
+        ],
+        "stairs": [
+          {
+            "cell": [
+              1,
+              1
+            ],
+            "axis": "x"
+          }
+        ]
+      }
     }
   ]
 }

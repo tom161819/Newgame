@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-06T23:40:00.000Z",
+  "updatedAt": "2026-11-07T00:45:00.000Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -72,6 +72,13 @@
           "specHash": "0b7359ac",
           "note": "Proposed by Claude for review (#92); the game keeps its current drawing until one variant is approved.",
           "updatedAt": "2026-11-06T18:45:00.000Z"
+        },
+        "barracks-hall-blender": {
+          "status": "review",
+          "version": 1,
+          "specHash": "0b7359ac",
+          "note": "Blender pilot: the same layout rendered by Blender for comparison.",
+          "updatedAt": "2026-11-07T00:58:00.000Z"
         }
       }
     },
@@ -100,24 +107,55 @@
       "variants": {
         "builders-workshop-open-shed": {
           "status": "review",
-          "version": 1,
-          "specHash": "fbc62623",
-          "note": "Proposed by Claude for review (#119); the game keeps the #118 placeholder until one variant is approved.",
-          "updatedAt": "2026-11-06T15:30:00.000Z"
+          "version": 2,
+          "specHash": "893cfd2c",
+          "note": "v2: 3 × 3 as the owner asked (7 Nov 2026).",
+          "updatedAt": "2026-11-07T00:45:00.000Z",
+          "history": [
+            {
+              "version": 1,
+              "specHash": "fbc62623",
+              "status": "review",
+              "at": "2026-11-06T15:30:00.000Z"
+            }
+          ]
         },
         "builders-workshop-house-awning": {
           "status": "review",
-          "version": 1,
-          "specHash": "49557077",
-          "note": "Proposed by Claude for review (#119); the game keeps the #118 placeholder until one variant is approved.",
-          "updatedAt": "2026-11-06T15:30:00.000Z"
+          "version": 2,
+          "specHash": "abfe49fd",
+          "note": "v2: 3 × 3 as the owner asked (7 Nov 2026).",
+          "updatedAt": "2026-11-07T00:45:00.000Z",
+          "history": [
+            {
+              "version": 1,
+              "specHash": "49557077",
+              "status": "review",
+              "at": "2026-11-06T15:30:00.000Z"
+            }
+          ]
         },
         "builders-workshop-material-yard": {
           "status": "review",
+          "version": 2,
+          "specHash": "2baaace1",
+          "note": "v2: 3 × 3 as the owner asked (7 Nov 2026).",
+          "updatedAt": "2026-11-07T00:45:00.000Z",
+          "history": [
+            {
+              "version": 1,
+              "specHash": "95f3a15b",
+              "status": "review",
+              "at": "2026-11-06T15:30:00.000Z"
+            }
+          ]
+        },
+        "builders-workshop-blender": {
+          "status": "review",
           "version": 1,
-          "specHash": "95f3a15b",
-          "note": "Proposed by Claude for review (#119); the game keeps the #118 placeholder until one variant is approved.",
-          "updatedAt": "2026-11-06T15:30:00.000Z"
+          "specHash": "abfc0b66",
+          "note": "Blender pilot: the same layout rendered by Blender for comparison.",
+          "updatedAt": "2026-11-07T00:58:00.000Z"
         }
       }
     },
@@ -385,6 +423,13 @@
           "note": "",
           "updatedAt": "2026-11-04T21:55:46.774Z",
           "approvedAt": "2026-11-04T21:55:46.774Z"
+        },
+        "wall-kit-preview-gate": {
+          "status": "review",
+          "version": 1,
+          "specHash": "9a9652cf",
+          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
         }
       }
     },
@@ -1486,6 +1531,223 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:07:23.159Z",
           "approvedAt": "2026-11-04T19:07:23.159Z"
+        }
+      }
+    },
+    "marketplace": {
+      "preferred": null,
+      "variants": {
+        "marketplace-square": {
+          "status": "review",
+          "version": 1,
+          "specHash": "227e75b8",
+          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "marketplace-hall": {
+          "status": "review",
+          "version": 1,
+          "specHash": "7c7d11b8",
+          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "marketplace-stalls-bay": {
+          "status": "review",
+          "version": 1,
+          "specHash": "4cf6452b",
+          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        }
+      }
+    },
+    "merchant-caravan": {
+      "preferred": null,
+      "variants": {
+        "merchant-caravan-full": {
+          "status": "review",
+          "version": 1,
+          "specHash": "af6eb3ca",
+          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "merchant-caravan-unloading": {
+          "status": "review",
+          "version": 1,
+          "specHash": "4858f070",
+          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "merchant-caravan-empty": {
+          "status": "review",
+          "version": 1,
+          "specHash": "88901c59",
+          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        }
+      }
+    },
+    "merchant": {
+      "preferred": null,
+      "variants": {
+        "merchant-male": {
+          "status": "review",
+          "version": 1,
+          "specHash": "20758a9f",
+          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "merchant-female": {
+          "status": "review",
+          "version": 1,
+          "specHash": "d423aa4a",
+          "note": "Proposed by Claude for review (Obchod F1 (#59)); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        }
+      }
+    },
+    "wall-gate": {
+      "preferred": null,
+      "variants": {
+        "wall-gate-closed": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8fa102fc",
+          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "wall-gate-open": {
+          "status": "review",
+          "version": 1,
+          "specHash": "49d778d8",
+          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "wall-gate-portcullis": {
+          "status": "review",
+          "version": 1,
+          "specHash": "89e2d3a7",
+          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "wall-gate-open-y": {
+          "status": "review",
+          "version": 1,
+          "specHash": "117b1126",
+          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "wall-gate-stair": {
+          "status": "review",
+          "version": 1,
+          "specHash": "2ce6afc6",
+          "note": "Proposed by Claude for review (#97 castle gate); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        }
+      }
+    },
+    "wild-ground": {
+      "preferred": null,
+      "variants": {
+        "wild-ground-beach": {
+          "status": "review",
+          "version": 1,
+          "specHash": "5a4a3dee",
+          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "wild-ground-desert": {
+          "status": "review",
+          "version": 1,
+          "specHash": "f55ecc48",
+          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "wild-ground-shallow": {
+          "status": "review",
+          "version": 1,
+          "specHash": "3b6e1fbf",
+          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "wild-ground-deep": {
+          "status": "review",
+          "version": 1,
+          "specHash": "85112ac3",
+          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        }
+      }
+    },
+    "bush": {
+      "preferred": null,
+      "variants": {
+        "bush-meadow": {
+          "status": "review",
+          "version": 1,
+          "specHash": "c0bb75fc",
+          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "bush-berry": {
+          "status": "review",
+          "version": 1,
+          "specHash": "0fe03e7e",
+          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "bush-flowering": {
+          "status": "review",
+          "version": 1,
+          "specHash": "6db21b52",
+          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        },
+        "bush-scrub": {
+          "status": "review",
+          "version": 1,
+          "specHash": "ad8c1482",
+          "note": "Proposed by Claude for review (#100 world generation); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:45:00.000Z"
+        }
+      }
+    },
+    "profession-porch": {
+      "preferred": null,
+      "variants": {
+        "profession-porch-woodcutter": {
+          "status": "review",
+          "version": 1,
+          "specHash": "6f77f961",
+          "note": "Proposed by Claude for review (#114 themed porches for #98); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:55:00.000Z"
+        },
+        "profession-porch-farmer": {
+          "status": "review",
+          "version": 1,
+          "specHash": "e5b5d925",
+          "note": "Proposed by Claude for review (#114 themed porches for #98); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:55:00.000Z"
+        },
+        "profession-porch-baker": {
+          "status": "review",
+          "version": 1,
+          "specHash": "1d8e076e",
+          "note": "Proposed by Claude for review (#114 themed porches for #98); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:55:00.000Z"
+        },
+        "profession-porch-smith": {
+          "status": "review",
+          "version": 1,
+          "specHash": "f193de81",
+          "note": "Proposed by Claude for review (#114 themed porches for #98); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:55:00.000Z"
+        },
+        "profession-porch-hunter": {
+          "status": "review",
+          "version": 1,
+          "specHash": "9adefce8",
+          "note": "Proposed by Claude for review (#114 themed porches for #98); not used by the game until approved.",
+          "updatedAt": "2026-11-07T00:55:00.000Z"
         }
       }
     }

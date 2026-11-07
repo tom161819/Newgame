@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "id": "merchant",
+  "name": "Merchant",
+  "category": "units",
+  "description": "Obchod F1 (#59): the travelling merchant who drives the caravan and trades at the marketplace. Richer cloth than the villagers; not a villager (no needs, not counted).",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "figure",
+  "plannedGameObjectId": "merchant",
+  "variants": [
+    {
+      "id": "merchant-male",
+      "name": "Merchant (man)",
+      "version": 1,
+      "spec": {
+        "sex": "male",
+        "garment": "cloth_red",
+        "sleeves": "cloth_ochre",
+        "legs": "cloth_brown",
+        "headgear": "brimmed",
+        "headgearMaterial": "cloth_brown",
+        "hair": "hair_grey",
+        "beard": true,
+        "tool": "sack",
+        "build": 1.15
+      }
+    },
+    {
+      "id": "merchant-female",
+      "name": "Merchant (woman)",
+      "version": 1,
+      "spec": {
+        "sex": "female",
+        "garment": "cloth_blue",
+        "apron": "cloth_linen",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_ochre",
+        "hair": "hair_auburn",
+        "tool": "basket"
+      }
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "marketplace",
+  "variantId": "marketplace-square",
+  "name": "Market square",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "227e75b8",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 116,
+  "anchor": {
+    "x": 97,
+    "y": 66
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.56897
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 114
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98276
+  },
+  "visualHeight": 114,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.88,
+  "lights": []
+}

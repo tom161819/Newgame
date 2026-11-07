@@ -128,7 +128,18 @@
     "banner_blue": "#2f4d7a",
     "coals": "#c4472a",
     "soot": "#2e2925",
-    "charcoal": "#3d3129"
+    "charcoal": "#3d3129",
+    "sand": "#d2bd8a",
+    "sand_light": "#e4d3a3",
+    "sand_dark": "#b49b69",
+    "dune": "#d8b678",
+    "dune_shade": "#b8935a",
+    "water_deep": "#2f5f78",
+    "water": "#3f7a92",
+    "water_light": "#6fa3b3",
+    "foam": "#dfeae6",
+    "olive_scrub": "#7d7a45",
+    "grass_scrub": "#a79a5e"
   },
   "materials": {
     "stone": {
@@ -502,7 +513,9 @@
     "fieldstone_dark": { "color": "stone_dark", "texture": "noise", "repeat": 0.5, "variation": 0.2, "description": "Damp or dirty stone: lower courses and fallen stones of ruins." },
     "rubble_fill": { "color": "mortar", "texture": "noise", "repeat": 0.6, "variation": 0.14, "description": "Dark mortar and rubble core inside a broken wall; shows where stones are missing." },
     "moss": { "color": "moss", "texture": "noise", "repeat": 0.5, "variation": 0.2, "description": "Moss on old stone tops and in shaded joints." },
-    "soil": { "color": "soil", "texture": "noise", "repeat": 0.8, "variation": 0.18, "description": "Bare trodden earth and dust around the foot of ruins and props." }
+    "soil": { "color": "soil", "texture": "noise", "repeat": 0.8, "variation": 0.18, "description": "Bare trodden earth and dust around the foot of ruins and props." },
+    "olive_scrub": { "color": "olive_scrub", "texture": "noise", "repeat": 0.6, "variation": 0.2, "description": "Dry, dusty olive leaves of desert and dune scrub (#100)." },
+    "grass_scrub": { "color": "grass_scrub", "texture": "noise", "repeat": 0.6, "variation": 0.2, "description": "Straw-coloured dry grass and scrub tips (#100)." }
   },
   "light": {
     "sun": {
