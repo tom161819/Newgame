@@ -37,6 +37,8 @@ export class FoodStorageSystem {
     if(d.recipe){add(`input-${building.id}`,'input',d.bufferCapacity,recipeResources(d,'input'));add(`output-${building.id}`,'output',d.bufferCapacity,recipeResources(d,'output'));}
     // C08: a Barracks keeps the Bows, Swords and Armor Haulers bring for the units it trains.
     if(d.kit)add(`kit-${building.id}`,'kit',d.kit.capacity,equipmentResources(this.scene.objectRegistry));
+    // Day and night N2: a light place's fuel store (Torches or Wood for one or two nights).
+    if(d.fuel&&this.physicalMaterials)add(`fuel-${building.id}`,'fuel',d.fuel.capacity,[d.fuel.resource]);
   }
   isStock(location){return location.kind==='storage'||location.kind==='fallback';}
   used(location){return sum(location.stock);}

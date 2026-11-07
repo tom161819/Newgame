@@ -7,7 +7,9 @@ import { VillageGreenView } from './VillageGreenView.js';
 import { DecorationView } from './DecorationView.js';
 import { PorchSystem } from '../systems/PorchSystem.js';
 import { DayNightSystem } from '../systems/DayNightSystem.js';
+import { LightFuelSystem } from '../systems/LightFuelSystem.js';
 import { NightOverlay } from './NightOverlay.js';
+import { FuelIcons } from './FuelIcons.js';
 import { NightControls,readNightSpeed } from '../ui/NightControls.js';
 import { VillagePanel } from '../ui/VillagePanel.js';
 import { IssueIcons } from './IssueIcons.js';
@@ -202,7 +204,7 @@ export class GameScene extends Phaser.Scene {
     this.inventory=new Inventory();if(!this.loadState)this.inventory.add('gold',this.gameSettings.startingGold);
     this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);this.regeneration=new RegenerationSystem();
     this.seasons=new SeasonSystem(this.gameTime,{enabled:this.gameSettings.seasonsEnabled,initialWeather:this.loadState?(this.loadState.seasons?.weather??'Sunny'):undefined});this.terrain.setSeason(this.seasons.season);for(const b of this.buildings??[])if((b.type==='village_green'||this.objectRegistry.get(b.type)?.decoration))this.towerViews.get(b.id)?.setSeason?.(this.seasons.season);
-    this.dayNight=new DayNightSystem(this);
+    this.dayNight=new DayNightSystem(this);this.lightFuel=new LightFuelSystem(this);
     this.seasonTransition=new SeasonTransition(this);this.terrain.seasonMix=(x,y,season)=>this.seasonTransition.mix(x,y,season);
     this.unsubscribeSeason=this.seasons.onChange(()=>{const changed=this.terrain.season!==this.seasons.season;this.terrain.setSeason(this.seasons.season);if(changed&&this.worldCamera){this.terrain.invalidateArea(this.mapMemory.observeTerrain(this.terrainGrid,this.pathWear,this.seasons.season,this.map));this.terrain.update(this.cameras.main,this.fog,this.mapMemory);}this.updateTimeDisplay();this.settingsPanel?.syncSeasons();});
     this.activities=new GameActivityBus();this.experienceSystem=new ExperienceSystem(this.activities);
@@ -291,7 +293,7 @@ export class GameScene extends Phaser.Scene {
     this.wageSystem=new WageSystem(this,{onPayroll:()=>this.updateInventory()});this.economyPanel=new EconomyPanel(this);
     this.buildingBar.close();this.updateInventory();
     this.gettingStarted=new GettingStartedPanel(this);
-    this.domestic=new DomesticAnimalSystem(this);this.combat.shield=(target,attacker)=>this.domestic?.shield(target,attacker);this.domesticViews=new DomesticViews(this,this.domestic);this.issueIcons=new IssueIcons(this);this.childrenSystem=new ChildrenSystem(this);this.porches=new PorchSystem(this);this.nightOverlay=new NightOverlay(this,this.dayNight);this.nightControls=new NightControls(this);this.dayNight.attention=()=>[...this.combat.attacks.keys()].some(attacker=>attacker.profession===undefined&&attacker!==this.character);this.childViews=new ChildViews(this,this.childrenSystem);this.villagePanel=new VillagePanel(this);this.catPanel=new CatPanel(this);
+    this.domestic=new DomesticAnimalSystem(this);this.combat.shield=(target,attacker)=>this.domestic?.shield(target,attacker);this.domesticViews=new DomesticViews(this,this.domestic);this.issueIcons=new IssueIcons(this);this.childrenSystem=new ChildrenSystem(this);this.porches=new PorchSystem(this);this.nightOverlay=new NightOverlay(this,this.dayNight);this.fuelIcons=new FuelIcons(this);this.nightControls=new NightControls(this);this.dayNight.attention=()=>[...this.combat.attacks.keys()].some(attacker=>attacker.profession===undefined&&attacker!==this.character);this.childViews=new ChildViews(this,this.childrenSystem);this.villagePanel=new VillagePanel(this);this.catPanel=new CatPanel(this);
     this.marketplacePanel=new MarketplacePanel(this);this.builderWorkshopPanel=new BuilderWorkshopPanel(this);this.policyPanel=new PolicyPanel(this);this.sideCards=new SideCards(this);
     this.updateTimeDisplay();
     this.setStatus(t('status.idle'));
@@ -344,7 +346,7 @@ export class GameScene extends Phaser.Scene {
       this.settingsPanel.destroy();this.fpsOverlay.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
       this.clearWallPreviews();
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
-      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.marketplacePanel.destroy();this.catPanel?.destroy();this.domesticViews?.destroy();this.domestic?.destroy();this.villagePanel?.destroy();this.issueIcons?.destroy();this.sideCards?.destroy();this.childViews?.destroy();this.childrenSystem?.destroy();this.porches?.destroy();this.nightOverlay?.destroy();this.nightControls?.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
+      this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.marketplacePanel.destroy();this.catPanel?.destroy();this.domesticViews?.destroy();this.domestic?.destroy();this.villagePanel?.destroy();this.issueIcons?.destroy();this.sideCards?.destroy();this.childViews?.destroy();this.childrenSystem?.destroy();this.porches?.destroy();this.lightFuel?.destroy();this.fuelIcons?.destroy();this.nightOverlay?.destroy();this.nightControls?.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.pavementTool.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
       this.demolitionUI.destroy();this.demolition.destroy();this.farmConnections.destroy();this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
@@ -706,7 +708,7 @@ export class GameScene extends Phaser.Scene {
     // Day and night N1: nights run faster (Settings: off/×2/×3), Skip to dawn faster still; a fight stops it.
     const steps=this.dayNight.speed(readNightSpeed());let activeDelta=0;
     for(let i=0;i<steps;i++){const step=this.simulationStep(delta);if(step===null)return;activeDelta+=step;if(i&&!this.dayNight.isNight())break;}
-    this.updateTimeDisplay();this.nightControls?.update();this.nightOverlay?.update();
+    this.updateTimeDisplay();this.nightControls?.update();this.nightOverlay?.update();this.fuelIcons?.update();
     this.updateFoodDisplay();this.worldCamera.update(delta);this.refreshVisibility();this.lightSources.update(delta);
     if(this.buildMode&&!document.querySelector('dialog[open]')){if(this.previewTracking)this.previewAnchor=this.pointerTile(this.input.activePointer);this.updateBuildingPreview();}
   }
@@ -741,6 +743,7 @@ export class GameScene extends Phaser.Scene {
     this.domestic?.update(activeDelta);
     this.childrenSystem?.update(activeDelta);
     this.porches?.update(activeDelta);
+    this.lightFuel?.update();
     this.noticeRemaining=Math.max(0,this.noticeRemaining-activeDelta);if(!this.noticeRemaining)document.querySelector('#day-notice').hidden=true;
     return activeDelta;
   }

@@ -15,6 +15,7 @@ export const WORKPLACES=Object.freeze({
   wheelwright_workshop:Object.freeze({capacity:2,profession:'wheelwright',skill:'crafting'}),
   swordsmith:Object.freeze({capacity:2,profession:'swordsmith',skill:'crafting'}),
   armorer:Object.freeze({capacity:2,profession:'armorer',skill:'crafting'}),
+  pitch_kiln:Object.freeze({capacity:2,profession:'pitch_maker',skill:'crafting'}),
 });
 
 // Curves describe total output relative to a full workplace of equal-skill workers.

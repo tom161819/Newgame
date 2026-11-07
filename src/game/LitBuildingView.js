@@ -12,13 +12,17 @@ const FIRE = { glow: 0xffa040, body: 0xffb347, core: 0xfff1b8 };
 // the building base). Everything else is delegated to the wrapped view.
 export class LitBuildingView {
   constructor(scene, inner, building, system, seed = 1) {
-    this.inner = inner; this.system = system; this.definition = buildingDefinition(building);
+    this.scene = scene; this.inner = inner; this.system = system; this.building = building; this.definition = buildingDefinition(building);
     this.base = towerBase(building); this.visible = true;
     this.lights = this.definition.lights.map((light, index) => ({ ...light, seed: seed + index }));
     this.flames = scene.add.graphics().setDepth(buildingDepth(building) + 0.35);
     this.drawFlames(0);
   }
-  worldLights() { return this.lights.map(light => ({ ...light, x: this.base.x + light.x, y: this.base.y + light.y })); }
+  // Day and night N2: a fuelled place (Torch Post, Brazier, tower) burns only on a night it took fuel.
+  worldLights() {
+    if (this.scene.lightFuel && !this.scene.lightFuel.isLit(this.building)) return [];
+    return this.lights.map(light => ({ ...light, buildingId: this.building.id, x: this.base.x + light.x, y: this.base.y + light.y }));
+  }
   drawFlames(seconds) {
     const g = this.flames.clear();
     // A window light (flameSize 0, e.g. the castle keep) only glows: no flame is drawn.

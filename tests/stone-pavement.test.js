@@ -20,7 +20,7 @@ function until(s,p,max=300000){let t=0;while(!p()&&t<max){s.tick(50);t+=50;}asse
 const time=()=>({day:1,onNewDay:()=>()=>{}});
 
 test('Infrastructure lists Stone Pavement; Single, Line (also diagonal) and Area select the right tiles',()=>{
-  const s=scene();assert.deepEqual(buildingsInCategory(s.objectRegistry,'infrastructure').map(d=>d.id),['stone_pavement','brazier']);
+  const s=scene();assert.deepEqual(buildingsInCategory(s.objectRegistry,'infrastructure').map(d=>d.id),['stone_pavement','brazier','torch_post']);
   assert.deepEqual(pavementTiles('single',{x:3,y:3},{x:9,y:9}),[{x:3,y:3}]);
   assert.deepEqual(pavementTiles('line',{x:0,y:0},{x:3,y:0}),[{x:0,y:0},{x:1,y:0},{x:2,y:0},{x:3,y:0}]);
   assert.deepEqual(pavementTiles('line',{x:0,y:0},{x:3,y:3}),[{x:0,y:0},{x:1,y:1},{x:2,y:2},{x:3,y:3}]);

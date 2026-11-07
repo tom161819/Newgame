@@ -81,6 +81,7 @@ import { castleArtSmoke } from './castle-art-smoke.mjs';
 import { houseDecorationsSmoke } from './house-decorations-smoke.mjs';
 import { porchSmoke } from './porch-smoke.mjs';
 import { dayNightSmoke } from './day-night-smoke.mjs';
+import { torchesSmoke } from './torches-smoke.mjs';
 
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
@@ -184,6 +185,7 @@ try{
   if(args.includes('--full')||args.includes('--decorations'))await houseDecorationsSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--porch'))await porchSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--day-night'))await dayNightSmoke(context,origin+base,instrument);
+  if(args.includes('--full')||args.includes('--torches'))await torchesSmoke(context,origin+base,instrument);
   if(args.includes('--full')||args.includes('--ledger'))await ledgerSmoke(page);
   if(args.includes('--full')||args.includes('--smelting'))await smeltingSmoke(page);
   if(args.includes('--full')||args.includes('--military'))await militarySmoke(page);

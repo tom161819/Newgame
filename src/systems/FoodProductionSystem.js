@@ -1,3 +1,4 @@
+import { TORCHES } from '../data/torches.js';
 import { dataName } from '../i18n/names.js';
 import { FOOD_RULES } from '../data/foodProduction.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
@@ -174,8 +175,19 @@ export class FoodProductionSystem {
     if(haulReward)this.scene.activities.emit('transportDelivered',{actor:worker,objectType:'hauler',quantity:amount,distance:task.loadedDistance},`haul-receipt-${task.transferId}`);
     this.scene.workerSystem.ai.cancel(worker);worker.workState='Searching for Work';this.scene.updateInventory();
   }
+  // Day and night N2: the Pitch Kiln makes Torches while the stores hold fewer than the target and Pitch is at hand
+  // (in its input or in a store), otherwise Pitch. A running batch keeps its own recipe.
+  chooseRecipes(){
+    for(const record of this.records.values()){
+      const building=this.building(record.buildingId),d=building&&buildingDefinition(building);if(!d?.recipeChoice)continue;
+      const input=this.storage.locations.get(`input-${building.id}`),pitch=(input?.stock.pitch??0)+this.storage.incoming(input?.id,'pitch')+this.storage.available('pitch');
+      const key=this.storage.available('torch')<TORCHES.torchTarget&&pitch>0?d.recipeChoice:defaultRecipeKey(d);
+      if(record.recipe!==key){record.recipe=key;this.scene.logisticsTasks?.invalidate?.();}
+    }
+  }
   update(delta){
     if(this.scene.gameOver||this.scene.gameTime.paused)return;
+    this.chooseRecipes();
     if(this.scene.gameTime.totalElapsed>=this.nextEmployment){this.nextEmployment=this.scene.gameTime.totalElapsed+FOOD_RULES.searchInterval;
       for(const record of this.records.values()){const building=this.building(record.buildingId);if(record.auto&&building&&buildingDefinition(building).autoEmployment){if(this.scene.employment)this.scene.employment.request();else this.scene.workplaceSystem.autoEmploy(building);}}}
     for(const worker of this.scene.workerSystem.liveWorkers()){

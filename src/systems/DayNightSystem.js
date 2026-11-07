@@ -1,3 +1,4 @@
+import { TORCHES } from '../data/torches.js';
 import { DAY_NIGHT,nightStartFor,dayPart,darknessAt,moonLight } from '../data/dayNight.js';
 import { worldToGrid } from '../game/isometric.js';
 import { buildingDefinition,buildingIsComplete,towerBase } from '../game/buildings.js';
@@ -10,6 +11,8 @@ import { SEASON_DAYS,SEASONS } from '../data/seasons.js';
 export class DayNightSystem {
   constructor(scene){
     this.scene=scene;this.skipping=false;
+    // N2: torches carried by soldiers on the night watch light and let them see.
+    this.extraLights=()=>scene.lightFuel?.handLights?.()??[];
     // Daily rest (sleep) starts with the night (DailyRest reads this through the game time).
     if(scene.gameTime)scene.gameTime.restStartFraction=()=>this.nightStart();
   }
@@ -25,10 +28,30 @@ export class DayNightSystem {
   ambientAlpha(){const d=this.darkness();return d*(DAY_NIGHT.ambient.night-DAY_NIGHT.ambient.fullMoon*this.moon());}
   // Lights that let people see at night (torches, braziers, campfires), in tile coordinates.
   lights(){
-    const out=[];for(const l of this.scene.lightSources?.lights?.()??[]){if(!DAY_NIGHT.litTypes.includes(l.type))continue;const p=worldToGrid(l.x,l.y);out.push({x:p.x,y:p.y,radius:l.radius/DAY_NIGHT.pxPerTile});}
+    const out=[],s=this.scene;
+    for(const l of s.lightSources?.lights?.()??[]){
+      if(!DAY_NIGHT.litTypes.includes(l.type))continue;const p=worldToGrid(l.x,l.y);
+      // N2: tower and wall holders light the map, but give sight only with someone on watch within 3 tiles.
+      const b=l.buildingId!=null?s.buildings?.find(x=>x.id===l.buildingId):null,fuel=b&&buildingDefinition(b).fuel;
+      if(fuel?.watched&&!this.watchers().some(w=>Math.hypot(w.x-p.x,w.y-p.y)<=fuel.watched))continue;
+      out.push({x:p.x,y:p.y,radius:this.reach(l,fuel)});
+    }
     for(const extra of this.extraLights?.()??[])out.push(extra);
     return out;
   }
+  // N2: every burning flame (no watch needed) and torches in hand, in tiles; cached for a game second. Used for the
+  // houses' night safety.
+  flameLights(){
+    const g=this.time,key=g?Math.floor(g.totalElapsed/1000):0;if(this.flameCache?.key===key)return this.flameCache.lights;
+    const lights=[],s=this.scene;for(const l of s.lightSources?.lights?.()??[]){if(!DAY_NIGHT.litTypes.includes(l.type))continue;const p=worldToGrid(l.x,l.y),b=l.buildingId!=null?s.buildings?.find(x=>x.id===l.buildingId):null;lights.push({x:p.x,y:p.y,radius:this.reach(l,b&&buildingDefinition(b).fuel)});}
+    lights.push(...(this.extraLights?.()??[]));this.flameCache={key,lights};return lights;
+  }
+  // A house is dark at night when no flame burns within 6 tiles of it.
+  darkAt(point){if(!this.isNight())return false;return !this.flameLights().some(l=>Math.hypot(l.x-point.x,l.y-point.y)<=TORCHES.darkHouse.range);}
+  // Reach of a light in tiles: a fuelled place's own radius (N2), otherwise the glow radius in pixels / 32.
+  reach(light,fuel){return fuel?.radius??light.radius/DAY_NIGHT.pxPerTile;}
+  // People who can keep watch: the King and living residents (positions in tiles).
+  watchers(){const s=this.scene;return [s.character?.position,...(s.workerSystem?.liveSubjects?.()??[]).map(w=>w.position)].filter(Boolean);}
   inLight(point,lights=this.lights()){return lights.some(l=>Math.hypot(l.x-point.x,l.y-point.y)<=l.radius);}
   // Sight multiplier at a point: 1 by day or in light, 1/3 at night outside light, in between at dusk and dawn
   // (in sixths, so the fog is repainted only a few times while it darkens).

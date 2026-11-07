@@ -26,6 +26,8 @@ export class InventoryBar {
       output.setAttribute('aria-live','polite');output.setAttribute('aria-atomic','true');
       this.outputs.set(definition.id,output);
       const delta=element('small','resource-delta',dailyResourceLabel(definition.id,this.ledger?.summary(definition.id)));delta.dataset.resourceDelta=definition.id;delta.dataset.tone=dailyResourceTone(this.ledger?.summary(definition.id));this.deltas.set(definition.id,delta);
+      // N2: resources marked `inventoryHideZero` (Pitch, Torches) appear in the bar only while the kingdom has some.
+      if(definition.inventoryHideZero){item.dataset.hideZero='true';item.hidden=this.format(definition.id)==='0';}
       item.append(image,element('span','',definition.inventoryLabel??definition.name),output,delta);return item;
     });
     // Owner request 7 Nov 2026: how full the stores are (Starter Stockpile and Warehouses), as used / capacity.
@@ -43,6 +45,6 @@ export class InventoryBar {
   format(id){const limit=this.inventory.limit?.(id);return id==='gold'?`${this.inventory.count(id).toFixed(2)}${limit!=null?` / ${limit}`:''}`:String(this.inventory.count(id));}
   resetCameraKeys(){for(const key of Object.values(this.ledger?.scene.worldCamera?.keys??{}))key.reset?.();}
   setLedger(ledger){this.unsubscribeLedger?.();this.ledger=ledger;this.unsubscribeLedger=ledger.onChange(()=>this.update());this.update();}
-  update() { for(const [id,output]of this.outputs){const count=this.format(id);if(output.textContent!==count)output.textContent=count;const summary=this.ledger?.summary(id),delta=this.deltas.get(id),text=dailyResourceLabel(id,summary),tone=dailyResourceTone(summary);if(delta.textContent!==text)delta.textContent=text;if(delta.dataset.tone!==tone)delta.dataset.tone=tone;}if(this.storeOutput){const text=this.storeText();if(this.storeOutput.textContent!==text)this.storeOutput.textContent=text;this.storeItem.hidden=!text;}this.tooltip.refresh(); }
+  update() { for(const [id,output]of this.outputs){const count=this.format(id);if(output.textContent!==count)output.textContent=count;const item=output.parentElement;if(item?.dataset.hideZero){const hide=count==='0';if(item.hidden!==hide)item.hidden=hide;}const summary=this.ledger?.summary(id),delta=this.deltas.get(id),text=dailyResourceLabel(id,summary),tone=dailyResourceTone(summary);if(delta.textContent!==text)delta.textContent=text;if(delta.dataset.tone!==tone)delta.dataset.tone=tone;}if(this.storeOutput){const text=this.storeText();if(this.storeOutput.textContent!==text)this.storeOutput.textContent=text;this.storeItem.hidden=!text;}this.tooltip.refresh(); }
   destroy() { this.unsubscribe();this.unsubscribeAssets();this.unsubscribeLedger?.();this.controller.abort();this.tooltip.destroy(); }
 }

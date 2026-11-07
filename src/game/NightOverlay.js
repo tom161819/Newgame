@@ -1,4 +1,5 @@
 import { DAY_NIGHT } from '../data/dayNight.js';
+import { gridToWorld } from './isometric.js';
 
 // Day and night N1: the light map. One render texture the size of the screen lies over the world (below the HTML UI):
 // it is filled with a bluish ambient darkness and the lights cut soft holes into it (erase with a radial brush); a
@@ -26,7 +27,8 @@ export class NightOverlay {
     // The textures sit in world space over exactly the camera view, scaled back by the zoom.
     for(const rt of [this.dark,this.glow])rt.setPosition(view.x,view.y).setScale(1/zoom).setVisible(true);
     this.dark.clear().fill(DAY_NIGHT.ambient.color,alpha);this.glow.clear();
-    const lights=[...(this.scene.lightSources?.lights?.()??[]),...this.dayNight.houseWindows()],margin=200;
+    const hands=(this.scene.lightFuel?.handLights?.()??[]).map(h=>{const p=gridToWorld(h.x,h.y);return {x:p.x,y:p.y-30,radius:h.radius*DAY_NIGHT.pxPerTile,type:'torch'};});
+    const lights=[...(this.scene.lightSources?.lights?.()??[]),...this.dayNight.houseWindows(),...hands],margin=200;
     for(const l of lights){
       if(l.x<view.x-margin||l.x>view.right+margin||l.y<view.y-margin||l.y>view.bottom+margin)continue;
       const sx=(l.x-view.x)*zoom,sy=(l.y-view.y)*zoom,size=Math.max(24,l.radius*2.2*zoom)*(l.strength??1);

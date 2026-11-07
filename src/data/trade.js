@@ -6,7 +6,7 @@ export const TRADE_RULES=Object.freeze({buyMarkup:1.15,sellFactor:.8,marketplace
 // Bow, a Swordsmith 3 Bars + 2 Wood (128) into a Sword and an Armorer 5 Bars + 2 Wood (208) into Armor. At the proposed
 // prices making them would destroy value, so they are priced at their inputs plus roughly 10–15 % for the work.
 // `iron` is the older Iron resource that Warehouses still store; it trades like Iron Ore.
-export const BASE_PRICES=Object.freeze({wheat:2,apple:3,stone:3,wood:4,meat:5,fish:3,flour:5,bread:7,iron_ore:9,iron:9,iron_bar:40,bow:36,sword:145,armor:235});
+export const BASE_PRICES=Object.freeze({wheat:2,apple:3,stone:3,wood:4,meat:5,fish:3,flour:5,bread:7,iron_ore:9,iron:9,iron_bar:40,bow:36,sword:145,armor:235,pitch:4,torch:2});
 // Tradeable goods come from the resource registry: everything the HUD counts except Gold and vehicles.
 export function tradeableResources(registry){return registry.byCategory('resource').filter(d=>d.collectible&&d.id!=='gold'&&d.resourceCategory!=='vehicle');}
 const round=value=>Math.max(1,Math.round(value));
@@ -58,9 +58,9 @@ export const CARAVAN_RULES=Object.freeze({minInterval:2,maxInterval:4,stay:.75,m
   spawnAttempts:8,retryAfter:1,maxRoute:2000});
 // Each type carries some of its goods (at least one), each amount random within its range.
 export const MERCHANT_TYPES=Object.freeze({
-  general:{stock:{wheat:[10,30],apple:[10,25],bread:[5,20],fish:[5,15],wood:[10,30],stone:[10,30],iron_ore:[5,15]}},
+  general:{stock:{wheat:[10,30],apple:[10,25],bread:[5,20],fish:[5,15],wood:[10,30],stone:[10,30],iron_ore:[5,15],torch:[5,15]}},
   food:{stock:{wheat:[20,60],apple:[15,40],flour:[10,30],bread:[10,30],meat:[5,20],fish:[5,20]}},
-  building_materials:{stock:{stone:[30,80],wood:[30,80]}},
+  building_materials:{stock:{stone:[30,80],wood:[30,80],pitch:[5,15],torch:[10,30]}},
   ore_iron:{stock:{iron_ore:[20,60],iron_bar:[3,10]}},
   arms:{stock:{bow:[1,4],sword:[1,3],armor:[1,2],iron_bar:[2,6]}},
 });

@@ -99,6 +99,8 @@ export const PROFESSION_LOOKS=Object.freeze({
   miller:{male:'miller-male',female:'miller-female'},baker:{male:'baker-male',female:'baker-female'},
   hauler:{male:'hauler-male',female:'hauler-female'},soldier:{male:'soldier-male',female:'soldier-male'},
   smelter_operator:{male:'miner-male',female:'miner-female'},
+  // Day and night N2: Pitch Makers wear the woodcutter's look until they get their own design.
+  pitch_maker:{male:'woodcutter-male',female:'woodcutter-female'},
 });
 // Villagers carry Czech given names; the game stores no sex, so the look follows the name.
 const FEMALE_NAMES=new Set(['Anna','Eliška','Marie','Tereza','Klára']);

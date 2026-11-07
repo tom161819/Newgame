@@ -29,6 +29,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     if(d.storage&&(physical||!d.storage.accepts))expected.set(stockLocationId(b),{...base,kind:d.starter?'fallback':'storage',capacity:savedCapacity===LOGISTICS_RULES.legacyStarterCapacity?savedCapacity:d.storage.capacity,allowed:storageResources(d,registry)});
     if(d.recipe)for(const kind of ['input','output'])expected.set(`${kind}-${b.id}`,{...base,kind,capacity:d.bufferCapacity,allowed:recipeResources(d,kind)});
     if(d.kit)expected.set(`kit-${b.id}`,{...base,kind:'kit',capacity:d.kit.capacity,allowed:equipmentResources(registry)});
+    if(d.fuel&&physical)expected.set(`fuel-${b.id}`,{...base,kind:'fuel',capacity:d.fuel.capacity,allowed:[d.fuel.resource]});
     if(d.trade&&physical)expected.set(`market-${b.id}`,{...base,kind:'market',capacity:d.trade.capacity,allowed:tradeableResources(registry).map(r=>r.id)});
   }
   const sites=new Map();
@@ -42,6 +43,8 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   }
   const granaries=new Set(s.buildings.filter(b=>b.type==='granary'&&buildingIsComplete(b)).map(stockLocationId));
   const locations=new Map(),reservations=new Map(),used=l=>Object.values(l.stock).reduce((n,v)=>n+v,0);
+  // N2: a light place's fuel store is created when the place is registered (or on the first refill), so it may be absent.
+  for(const id of [...expected.keys()])if(id.startsWith('fuel-')&&!storage.locations.some(l=>l.id===id))expected.delete(id);
   check(storage.locations.length===expected.size);
   for(const l of storage.locations){
     const e=expected.get(l.id);check(e&&!locations.has(l.id));locations.set(l.id,l);

@@ -22,4 +22,5 @@ export const JOBS=Object.freeze(localizeJobs({
   wheelwright:Object.freeze({portraitColor:'#8a5a2b',name:'Wheelwright',skill:'crafting',workplace:'wheelwright_workshop',requiresWorkplace:true}),
   swordsmith:Object.freeze({portraitColor:'#5d6470',name:'Swordsmith',skill:'crafting',workplace:'swordsmith',requiresWorkplace:true}),
   armorer:Object.freeze({portraitColor:'#58606b',name:'Armorer',skill:'crafting',workplace:'armorer',requiresWorkplace:true}),
+  pitch_maker:Object.freeze({portraitColor:'#4a3a2a',name:'Pitch Maker',skill:'crafting',workplace:'pitch_kiln',requiresWorkplace:true}),
 }));

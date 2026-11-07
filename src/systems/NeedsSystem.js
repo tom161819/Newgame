@@ -1,3 +1,4 @@
+import { TORCHES } from '../data/torches.js';
 import { CATS } from '../data/domesticAnimals.js';
 import { NEEDS,DAILY_REST,DISCONTENT,clampNeed,moodFor,happinessOf,mainProblem,attractivenessFor } from '../data/needs.js';
 import { POPULATION } from '../data/jobs.js';
@@ -68,12 +69,15 @@ export class NeedsSystem {
   }
   homeOf(worker){return this.homes().get(worker?.id)??null;}
   // Safety and the reasons behind it (shown as the tooltip of the Safety bar).
-  safetyDetail(worker,record){
+  safetyDetail(worker,record,home){
     const s=NEEDS.safety,p=worker.position??{x:worker.tile?.x??0,y:worker.tile?.y??0},near=(b,range)=>{const d=b.definition??this.scene.objectRegistry?.get?.(b.type)??{width:1,height:1};return Math.hypot(b.x+d.width/2-p.x,b.y+d.height/2-p.y)<=range;};
     const done=(this.scene.buildings??[]).filter(b=>buildingIsComplete(b)),factors=[['base',s.base]];
     if(done.some(b=>b.type==='castle'&&near(b,s.castle.range)))factors.push(['castle',s.castle.bonus]);
     if(done.some(b=>b.type==='tower'&&near(b,s.tower.range)))factors.push(['tower',s.tower.bonus]);
     if(done.some(b=>b.type==='barracks'&&near(b,s.guard.range))||this.residents().some(o=>o!==worker&&o.profession==='soldier'&&Math.hypot(o.position.x-p.x,o.position.y-p.y)<=s.guard.range))factors.push(['guard',s.guard.bonus]);
+    // Day and night N2: at night a house without a burning light within 6 tiles is dark: −30.
+    if(home===undefined&&this.scene.dayNight?.isNight())home=this.homeOf(worker);const house=home?.kind==='house'?(this.scene.buildings??[]).find(b=>b.id===home.buildingId):null;
+    if(house&&this.scene.dayNight){const d=house.definition??this.scene.objectRegistry?.get?.(house.type)??{width:2,height:2};if(this.scene.dayNight.darkAt({x:house.x+d.width/2,y:house.y+d.height/2}))factors.push(['dark',-TORCHES.darkHouse.penalty]);}
     if(record?.attackedAt!=null){const day=this.scene.gameTime?.dayDuration??120000,age=(this.scene.gameTime?.totalElapsed??0)-record.attackedAt,left=1-age/(s.attack.days*day);if(left>0)factors.push(['attack',-Math.round(s.attack.penalty*left)]);}
     return {value:Math.round(clampNeed(factors.reduce((n,[,v])=>n+v,0))),factors};
   }
@@ -83,7 +87,7 @@ export class NeedsSystem {
   status(worker,homes=this.homes()){
     // Only permanent residents: the King keeps his own HP and meals, visitors have no needs.
     if(!worker?.isAlive||worker.isSubject===false||this.scene.workerSystem?.workers.get(worker.id)!==worker)return null;
-    const r=this.records.get(worker.id)??{food:100,rest:100,attackedAt:null},home=homes.get(worker.id)??null,safety=this.safetyDetail(worker,r),needs={food:Math.round(r.food),rest:Math.round(r.rest),housing:home?100:0,safety:safety.value};
+    const r=this.records.get(worker.id)??{food:100,rest:100,attackedAt:null},home=homes.get(worker.id)??null,safety=this.safetyDetail(worker,r,home),needs={food:Math.round(r.food),rest:Math.round(r.rest),housing:home?100:0,safety:safety.value};
     // #103: taxes and rations move Happiness (bonus or penalty), kept apart from the unpaid-wage penalty.
     // Policy v2 P2: situation penalties (unpaid but taxed, promised food missing, taxed while hungry) act at once.
     const penalty=this.unpaidPenalty(worker),policy=this.scene.policy?.happiness?.()??0,context=this.scene.policy?.contextPenalties?.(worker,{hungry:needs.food<NEEDS.food.low})??[],contextTotal=context.reduce((n,c)=>n+c.value,0);

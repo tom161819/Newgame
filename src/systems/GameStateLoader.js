@@ -49,7 +49,7 @@ export function loadGameState(scene,input){
     else initializeNaturalTalent(worker,{legacy:true});
     for(const key of ['profession','displayProfession','manualRockId','workState','workMessage','assignedWorkplaceId','arriving','aiCooldown'])worker[key]=data[key];
     if(data.stoneCollection)worker.stoneCollection=structuredClone(data.stoneCollection);
-    worker.workplaceReached=data.workplaceReached??false;worker.restPhase=data.restPhase??null;worker.cargo=structuredClone(data.cargo??null);worker.pendingWorkRewards=structuredClone(data.pendingWorkRewards??[]);
+    worker.workplaceReached=data.workplaceReached??false;worker.restPhase=data.restPhase??null;worker.tendTorches=!!data.tendTorches;worker.cargo=structuredClone(data.cargo??null);worker.pendingWorkRewards=structuredClone(data.pendingWorkRewards??[]);
     worker.commandState=structuredClone(data.commandState);worker.workTask=structuredClone(data.workTask);worker.active=worker.isAlive;
     if(worker.workTask)scene.workerSystem.reservations.reserve(worker.workTask.reservation,worker.id);
     if(['chopTree','mineDeposit','mineRock'].includes(worker.workTask?.kind))scene.workerSystem.reservations.reserve(`natural-slot:${worker.workTask.goal.x},${worker.workTask.goal.y}`,worker.id);
@@ -106,6 +106,7 @@ export function loadGameState(scene,input){
   if(scene.workerSystem&&state.workers===undefined)scene.workerSystem.spawnInitial();
   // Children D1: after the residents and their homes, so the same children come back where they were.
   scene.childrenSystem?.importState(state.children);
+  scene.lightFuel?.importState(state.lightFuel);
   scene.wageSystem?.importState(state.wages);
   scene.resourceLedger?.importState(state.resourceLedger);
   scene.workplaceSystem?.importState(state.workplaces);

@@ -16,6 +16,12 @@ export const PRODUCTION_RECIPES=Object.freeze({
 // the batch starts and harnessed to the finished wagon; the horse is never consumed.
 export const HORSE_WAGON_RECIPE=Object.freeze({input:Object.freeze({wood:30,iron_bar:6}),output:Object.freeze({horse_wagon:1}),duration:90000,skill:'crafting',xp:30,vehicle:true,horse:true,
   inputSources:Object.freeze({wood:'Wheelwrighting',iron_bar:'Wheelwrighting'}),outputSource:'Wheelwright Production'});
+// Day and night N2: the Pitch Kiln burns Wood into Pitch, and dips Wood into Pitch for Torches. It makes Torches while
+// the stores hold fewer than TORCHES.torchTarget and it has Pitch, otherwise Pitch (FoodProductionSystem picks).
+export const PITCH_RECIPES=Object.freeze({
+  pitch:Object.freeze({input:Object.freeze({wood:2}),output:Object.freeze({pitch:1}),duration:30000,skill:'crafting',xp:8,inputSources:Object.freeze({wood:'Pitch Making'}),outputSource:'Pitch Kiln Production'}),
+  torches:Object.freeze({input:Object.freeze({wood:1,pitch:1}),output:Object.freeze({torch:3}),duration:20000,skill:'crafting',xp:8,inputSources:Object.freeze({wood:'Torch Making',pitch:'Torch Making'}),outputSource:'Pitch Kiln Production'}),
+});
 export const WHEELWRIGHT_RECIPES=Object.freeze({wheelbarrow:PRODUCTION_RECIPES.wheelwright_workshop,horse_wagon:HORSE_WAGON_RECIPE});
 // A workshop with several recipes (definition.recipes) makes the one chosen in its production record; others use definition.recipe.
 export const recipeFor=(definition,key)=>definition.recipes?.[key]??definition.recipe;

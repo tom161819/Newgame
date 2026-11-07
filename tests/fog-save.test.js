@@ -16,6 +16,8 @@ function fixture(){
   const d=s.objectRegistry.require('tower'),{building,error}=placeBuilding({map:s.map,anchor:{x:44,y:40},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(error);
   s.towerViews.set(building.id,s.createBuildingView(d,building));s.addResource(s.objectRegistry.require('stone'),{x:42,y:40});captureMapKnowledge(s);
   move(s,80,80);s.resources.get('42,40').destroy();s.resources.delete('42,40');s.resourceOccupancy.delete('42,40');
+  // A removed building takes its storage places (a tower's fuel store since N2) with it, as in the game.
+  s.foodStorage.removeBuilding(building);
   s.buildings.splice(s.buildings.indexOf(building),1);s.towerViews.get(building.id).destroy();s.towerViews.delete(building.id);for(const tile of building.tiles)s.map[tile.y][tile.x]=0;
   s.gameTime.update(12345);return {s,building};
 }

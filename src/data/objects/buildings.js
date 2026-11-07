@@ -1,3 +1,4 @@
+import { TORCHES } from '../torches.js';
 import { WORKPLACES } from '../workplaces.js';
 import { MINING_WORK } from '../minerals.js';
 export const buildings = [
@@ -12,6 +13,8 @@ export const buildings = [
     renderMode: 'sprite', renderer: 'tower', origin: { x: 0.39634, y: 0.99107 }, frontOrigin: { x: 0.39634, y: 0.99107 }, visualHeight: 222,
     platform: { x: 0, y: -183.28 }, depth: { offset: 0 },
     lights: [{ type: 'torch', x: -15.88, y: -72.15, color: '#ffb25a', radius: 102.4, intensity: 0.95, flicker: { amplitude: 0.12, speed: 7 }, flameSize: 1 }],
+    // Day and night N2: two torch holders (2 Torches a night); their sight counts only with someone on the tower.
+    fuel: TORCHES.places.tower,
     shadow: { baked: true, x: 8, y: -20, width: 114, height: 43, color: 0x30291c, alpha: 0.3 },
   },
   {

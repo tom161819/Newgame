@@ -1,3 +1,4 @@
+import { validLightFuelState } from './LightFuelSystem.js';
 import { validateRockMining } from './RockMiningState.js';
 import { CARAVAN_RULES,MERCHANT_TYPES,validateAutoTrade } from '../data/trade.js';
 import { ORDER_STATUSES,validateTradeStats } from './TradeSystem.js';
@@ -38,7 +39,7 @@ import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=55;
+export const SAVE_VERSION=56;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -86,13 +87,14 @@ export function serializeGameState(scene){
     ...(scene.trade?{trade:scene.trade.exportState()}:{}),
     ...(scene.domestic?{domestic:scene.domestic.exportState()}:{}),
     ...(scene.childrenSystem?{children:scene.childrenSystem.exportState()}:{}),
+    ...(scene.lightFuel?{lightFuel:scene.lightFuel.exportState()}:{}),
     ...(scene.policy?{policy:scene.policy.exportState()}:{}),
     ...(scene.kingLogistics?{kingLogistics:scene.kingLogistics.exportState()}:{}),
     ...(scene.logisticsTasks?{logistics:{version:1,...(scene.constructionSystem?.materials.enabled?{materialsVersion:1}:{})}}:{}),
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
     ...(scene.workerSystem?{population:scene.workerSystem.exportState(),workers:[...scene.workerSystem.workers.values()].map(w=>({...serializeActor(w),commandState:copy(w.commandState??{state:'Working',goal:null}),name:w.name,profession:w.profession,displayProfession:w.displayProfession,manualRockId:w.manualRockId,isSubject:w.isSubject!==false,diedAt:w.diedAt??null,
       ...(w.naturalTalent?{naturalTalent:w.naturalTalent,initialSkills:copy(w.initialSkills)}:{}),
-      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),workplaceReached:w.workplaceReached,...(w.restPhase?{restPhase:w.restPhase}:{}),cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
+      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),workplaceReached:w.workplaceReached,...(w.restPhase?{restPhase:w.restPhase}:{}),...(w.tendTorches?{tendTorches:true}:{}),cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
       workState:w.workState,workMessage:w.workMessage??'',workTask:copy(w.workTask),assignedWorkplaceId:w.assignedWorkplaceId,arriving:w.arriving,aiCooldown:w.aiCooldown}))}:{}),
     ...(scene.pathWear?{pathWear:scene.pathWear.exportState()}:{}),
     player:{...serializeActor(c),state:c.state,currentTowerId:c.currentTower?.id??null,horseId:c.mountedHorse?.id??null,
@@ -294,6 +296,7 @@ export function validateGameState(input,registry=objectRegistry){
       check(['Holding','MovingToHold','Idle','Searching for Work','Moving to Target','Working','Returning','Waiting','Fleeing','Recovering','Arriving','Dead','Going to Workplace','Searching for Target','Traveling to Target','Returning to Workplace','Patrolling','Going Home','Resting','On Strike','Leaving Kingdom','Left Kingdom'].includes(w.workState));
       // #58 phase B: only a living resident goes home or rests.
       if(w.restPhase!==undefined)check(['going','resting'].includes(w.restPhase)&&w.isAlive&&w.isSubject);
+      if(w.tendTorches!==undefined)check(w.tendTorches===true);
       check(typeof w.workMessage==='string'&&w.workMessage.length<200);
       if(w.stoneCollection!==undefined){check(w.stoneCollection&&typeof w.stoneCollection.enabled==='boolean'&&Object.keys(w.stoneCollection).length===2);integer(w.stoneCollection.radius,0,IDLE_STONE.maxRadius);}if(w.profession==='hauler')check(w.stoneCollection);if(!w.isAlive)check(['Dead','Left Kingdom'].includes(w.workState)&&!w.workTask&&!w.arriving);else check(w.workState!=='Left Kingdom');
       check(Object.hasOwn(JOBS,w.displayProfession)&&['idle',w.profession].includes(w.displayProfession));
@@ -481,6 +484,8 @@ export function validateGameState(input,registry=objectRegistry){
     const total=s.time?.totalElapsed??0,dayMs=s.gameSettings.dayLengthSeconds*1000;check((p.feastUntil===null)===(p.lastFeastAt===null));if(p.lastFeastAt!==null){number(p.lastFeastAt,0,total);check(Math.abs(p.feastUntil-p.lastFeastAt-FEAST.days*dayMs)<1e-6);}}
   // Trade F1.3: orders (schema 39). Open orders belong to the active caravan and an existing Marketplace.
   // Children D1 (schema 54): which children exist follows from the homes; saved are positions, hidden houses, snowmen.
+  // Day and night N2 (schema 56): which light places burn tonight and which soldiers carry a torch.
+  if(s.lightFuel!==undefined)check(validLightFuelState(s.lightFuel)&&s.lightFuel.lit.every(id=>s.buildings.some(b=>b.id===id)));
   if(s.children!==undefined)validateChildrenState(s.children,{check,number,integer,array,buildingIds:new Set(s.buildings.map(b=>b.id))});
   if(s.domestic!==undefined)validateDomesticState(s.domestic,{check,number,integer,array,day:s.time?.day??1,buildingIds:new Set(s.buildings.map(b=>b.id)),locationIds:new Set((s.foodStorage?.locations??[]).map(l=>l.id)),workerIds:new Set((s.workers??[]).map(w=>w.id)),time:s.time});
   if(s.trade!==undefined){

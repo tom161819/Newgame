@@ -28,6 +28,10 @@ export class UnitPanel {
     for(const [action,icon]of [['hold','⏸'],['resume','▶']]){const button=element('button','icon-command',icon);button.type='button';button.dataset.unitCommand=action;button.addEventListener('click',()=>{scene.workerSystem.commands[action](this.unit);this.refresh();scene.unitSelection?.draw();},options);this.commandControls.append(button);}
     document.querySelector('#unit-job-controls').append(this.commandControls);
     // S13: the resident's needs, Happiness, mood, main problem and home.
+    // Day and night N2: a soldier with "Tend torches" refills light places near his post.
+    this.tendRow=element('label','unit-tend-torches');this.tendRow.id='unit-tend-torches';this.tendToggle=document.createElement('input');this.tendToggle.type='checkbox';this.tendToggle.id='unit-tend-toggle';
+    this.tendRow.append(this.tendToggle,element('span','',t('unit.tendTorches')));this.tendRow.hidden=true;document.querySelector('#unit-job-controls').append(this.tendRow);
+    this.tendToggle.addEventListener('change',()=>{if(this.unit?.profession==='soldier'){this.unit.tendTorches=this.tendToggle.checked||undefined;this.refresh();}},options);
     this.needs=element('section','unit-needs');this.needs.id='unit-needs';this.needs.hidden=true;document.querySelector('#unit-job-controls').after(this.needs);
     this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.close();},options);
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!e.repeat&&this.dialog.open&&!blockingDialog(document)){e.preventDefault();this.close();}},options);this.dialog.addEventListener('close',()=>this.restoreInput(),options);
@@ -49,6 +53,7 @@ export class UnitPanel {
     for(const [key,value]of Object.entries(values))document.querySelector(`[data-unit-stat="${key}"]`).textContent=value;
     const worker=s.workerSystem?.workers.has(u.id)&&u.isSubject!==false;document.querySelector('#unit-job-controls').hidden=!worker;
     if(worker){this.commandControls.hidden=!s.workerSystem.commands.owns(u);const state=u.commandState?.state,holding=state==='Holding'||state==='MovingToHold';for(const button of this.commandControls.children){const action=button.dataset.unitCommand,label=t(`command.${action}`);button.setAttribute('aria-label',label);button.dataset.tooltip=label;button.disabled=!!s.gameTime.paused||(action==='hold'?state==='Holding':!holding);if(action==='hold')button.setAttribute('aria-pressed',String(holding));}for(const option of this.jobSelect.options)option.textContent=JOBS[option.value].name;this.jobSelect.value=u.profession;document.querySelector('#unit-profession').textContent=JOBS[u.profession].name;document.querySelector('#unit-work-state').textContent=`${(['Holding','MovingToHold'].includes(u.commandState?.state)?t(`command.${u.commandState.state}`):localized(`work.state.${u.workState}`,u.workState))}${u.workMessage?` · ${workMessageLabel(u.workMessage)}`:''}${s.foodSystem.workMultiplier(u)<1?` · ${t('unit.hungry')}`:''}`;
+      this.tendRow.hidden=u.profession!=='soldier';if(!this.tendRow.hidden)this.tendToggle.checked=!!u.tendTorches;
       const hauler=u.profession==='hauler'&&u.stoneCollection;document.querySelector('#unit-stone-controls').hidden=!hauler;if(hauler){this.transportMode.value=s.vehicles?.mode(u)??'auto';this.stoneToggle.checked=u.stoneCollection.enabled;if(document.activeElement!==this.stoneRadius)this.stoneRadius.value=u.stoneCollection.radius;}
       document.querySelector('#unit-wage').textContent=t('unit.wage',{amount:s.wageSystem.dailyWage(u).toFixed(2)});
       document.querySelector('#unit-talent').textContent=t('unit.talent',{talent:localized(`talent.${u.naturalTalent}`,TALENTS[u.naturalTalent]),bonus:TALENT_XP_BONUS*100,skill:SKILLS[u.naturalTalent]});

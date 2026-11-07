@@ -5,6 +5,32 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.42.0] - 2026-11-07
+<!-- version: {"title":"Pitch, torches and night safety","type":"feature","reconstructed":false,"saveVersion":56} -->
+### Added
+- **Pitch Kiln** (Industry, 8 Wood + 4 Stone, 2 Pitch Makers):
+  - burns 2 Wood into 1 Pitch, and dips 1 Wood in 1 Pitch for 3 Torches;
+  - keeps 20 Torches in the stores first, then makes Pitch.
+  - Pitch and Torches can also be bought from merchants.
+- **Torch Post** (2 Wood + 1 Stone, approved Studio art):
+  - lights about 5 tiles at night and burns 1 Torch a night.
+- **Fuel for light places:**
+  - the Brazier now burns 1 Wood a night;
+  - every tower has two torch holders (2 Torches a night);
+  - a place lights up by itself at dusk when it has fuel and goes out in the morning;
+  - an empty place stays dark, shows a "No fuel" sign and is reported once each evening.
+- **Refilling light places:**
+  - Haulers keep them full during the day;
+  - when no Hauler is free, a Pitch Maker refills them in the afternoon;
+  - a soldier with **Tend torches** ticked (unit panel) refills places near his post.
+- **Torches in hand:** soldiers on the night watch take a Torch at dusk, so they see fully and light their surroundings.
+- **Tower sight at night:** tower holders give sight only when someone stands within 3 tiles.
+- **Dark houses:** at night a house without a burning light within 6 tiles has −30 Safety ("Dark at night").
+### Changed
+- Pitch and Torches appear in the resource bar only when the kingdom has some.
+### Removed
+- Saves from older versions no longer load (save version 56).
+
 ## [0.41.0] - 2026-11-07
 <!-- version: {"title":"Day and night","type":"feature","reconstructed":false,"saveVersion":55} -->
 ### Added

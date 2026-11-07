@@ -13,7 +13,7 @@ export class LogisticsTaskManager {
     for(const [key,expires]of this.failedRoutes)if(expires<=now)this.failedRoutes.delete(key);
     for(const key of this.producerWaits.keys())if(!this.scene.foodProduction.records.has(Number(key.split(':')[0])))this.producerWaits.delete(key);
     const storage=this.storage,stores=[...storage.locations.values()].filter(l=>storage.isStock(l));
-    this.catalog.push(...(this.scene.constructionSystem?.materials.candidates()??[]),...(this.scene.military?.candidates()??[]),...(this.scene.trade?.candidates()??[]));
+    this.catalog.push(...(this.scene.constructionSystem?.materials.candidates()??[]),...(this.scene.military?.candidates()??[]),...(this.scene.trade?.candidates()??[]),...(this.scene.lightFuel?.candidates()??[]));
     for(const record of this.scene.foodProduction.records.values()){
       const building=this.scene.foodProduction.building(record.buildingId);if(!building)continue;
       const recipe=this.scene.foodProduction.recipe(building),input=storage.locations.get(`input-${building.id}`);
@@ -39,14 +39,17 @@ export class LogisticsTaskManager {
   // Haulers serve the whole kingdom without a workplace. A Builder calls this with
   // constructionOnly when no Hauler is free, reusing the same bookings.
   freeHauler(){return this.scene.workerSystem.liveWorkers().some(w=>(!w.commandState||w.commandState.state==='Working')&&w.profession==='hauler'&&!w.arriving&&!w.restPhase&&!w.workTask&&!w.cargo&&!['Fleeing','Recovering'].includes(w.workState));}
-  updateWorker(worker,{constructionOnly=false}={}){
+  // Day and night N2: `fuelOnly` (a Pitch Maker or a soldier tending torches) takes only light-fuel deliveries, `near`
+  // keeps them within a range of a point.
+  updateWorker(worker,{constructionOnly=false,fuelOnly=false,near=null}={}){
     if(worker.workTask||worker.cargo||worker.aiCooldown>0)return false;
     worker.aiCooldown=LOGISTICS_RULES.planningInterval;worker.workState='Waiting';worker.workMessage='Waiting for transport';this.update();
     const storage=this.storage,cap=resource=>carryCapacity(worker,resource),score=task=>{
       const source=task.sourceDropId?this.scene.dropSystem.drops.get(task.sourceDropId)?.tile:storage.locations.get(task.sourceId),target=storage.locations.get(task.destinationId);
       return source&&target?Math.hypot(worker.position.x-source.x,worker.position.y-source.y)+Math.hypot(source.x-target.x,source.y-target.y):Infinity;
     };
-    const candidates=this.catalog.filter(task=>!constructionOnly||task.siteId!=null).map(task=>({task,score:score(task)})).filter(t=>Number.isFinite(t.score)).sort((a,b)=>a.task.priority-b.task.priority||a.score-b.score);
+    const inRange=task=>{if(!near)return true;const d=storage.locations.get(task.destinationId);return !!d&&Math.hypot(d.x-near.x,d.y-near.y)<=near.range;};
+    const candidates=this.catalog.filter(task=>(!constructionOnly||task.siteId!=null)&&(!fuelOnly||task.fuel)&&inRange(task)).map(task=>({task,score:score(task)})).filter(t=>Number.isFinite(t.score)).sort((a,b)=>a.task.priority-b.task.priority||a.score-b.score);
     let attempts=0;
     for(const {task}of candidates){
       const destination=storage.locations.get(task.destinationId),drop=task.sourceDropId&&this.scene.dropSystem.drops.get(task.sourceDropId),existingCap=storage.reservations.get(task.capacityReservation);
