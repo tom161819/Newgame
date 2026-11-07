@@ -51,6 +51,11 @@ try {
 
   // #127 Needs review: only designs still waiting for approval; game sprites and approved designs hidden; remembered.
   await page.locator('#library-search').fill('');await page.locator('#library-categories button', { hasText: /^All/ }).click();
+  // Every design may already be decided in the repository: put three back to review in this browser first.
+  for (const name of [/^Ruined tower/, /^Broken wall/, /^Bakery/]) {
+    await page.locator('.library-item', { hasText: name }).first().click();
+    for (const button of await page.locator('.variant-card').getByRole('button', { name: 'Back to review' }).all()) await button.click();
+  }
   await page.locator('#library-review [data-review="pending"]').click();
   const waitingCount = Number((await page.locator('#library-review [data-review="pending"] .count').textContent()).trim());
   const waiting = await page.locator('.library-item .name').allTextContents();
@@ -457,8 +462,54 @@ try {
   }
   pass('UI Lab: real game interface in the preview, four styles, drag-to-dock (resource bar to the bottom), window sections hidden and reordered, designs saved locally and to the page database marked for the game');
 
+  // World Lab (g-world-lab): the game's own generator, codes, checks, favourites (`worlds/<id>`) and the default proposal.
+  {
+    const { page: wl, errors: wlErrors } = await open(context, 'world-lab.html');
+    await wl.waitForFunction(() => window.worldLab?.ready);
+    const first = await wl.evaluate(() => window.worldLab.code());
+    assert.match(first, /^MKW2-155515555555-[0-9A-Z]{1,8}$/);
+    await wl.locator('#wl-settings [data-setting="lakes"]').evaluate(input => { input.value = '3'; input.dispatchEvent(new Event('input', { bubbles: true })); });
+    await wl.waitForFunction(code => window.worldLab.code() !== code && window.worldLab.report()?.lakes >= 0, first);
+    assert.match(await wl.evaluate(() => window.worldLab.code()), /^MKW2-1555355/);
+    await wl.locator('#wl-code').fill('MKW2-155515555555-ABC123');
+    await wl.getByRole('button', { name: 'Apply' }).click();
+    await wl.waitForFunction(() => window.worldLab.seed() === parseInt('ABC123', 36));
+    await wl.waitForTimeout(300);
+    const a = await wl.evaluate(() => window.worldLab.report());
+    await wl.locator('#wl-code').fill('MKW9-155515555555-ABC123');
+    await wl.getByRole('button', { name: 'Apply' }).click();
+    assert.equal(await wl.locator('#wl-code').getAttribute('aria-invalid'), 'true');
+    await wl.locator('#wl-compare-input').fill('MKW2-155515555555-ABC123'); await wl.locator('#wl-compare-input').dispatchEvent('change');
+    await wl.waitForFunction(() => window.worldLab.reportB());
+    assert.deepEqual(await wl.evaluate(() => window.worldLab.reportB()), a, 'the same code gives the same world');
+    assert.ok(await luminance(wl, '#wl-iso') > 20, 'the isometric window is drawn with the game art');
+    assert.ok(await luminance(wl, '#wl-map') > 40, 'the map is drawn');
+    assert.deepEqual(wlErrors, []); await wl.close();
+
+    const owner = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+    await owner.addInitScript(fakeDb, true);
+    await owner.addInitScript(() => { window.__worldSeed = () => window.__fakeClaude.put('worlds/old', { code: 'MKW1-15551555555-ABC', name: 'Old one', at: '2026-10-01T00:00:00Z', by: 'u-art' }); });
+    const { page: sw, errors: swErrors } = await open(owner, 'world-lab.html');
+    await sw.waitForFunction(() => window.worldLab?.ready);
+    await sw.evaluate(() => window.__worldSeed());
+    await sw.locator('#wl-fav-name').fill('Říční údolí');
+    await sw.getByRole('button', { name: 'Save to favourites' }).click();
+    await sw.waitForFunction(() => window.worldLab.favourites().length === 2);
+    const saved = await sw.evaluate(() => [...window.__fakeClaude.docs].find(([p]) => p.startsWith('worlds/ricni-udoli-'))?.[1]);
+    assert.equal(saved.by, 'u-owner'); assert.equal(saved.name, 'Říční údolí'); assert.equal(saved.code, await sw.evaluate(() => window.worldLab.code()));
+    assert.match(await sw.locator('.wl-fav[data-id="old"]').textContent(), /old generator.*Jana/s);
+    await sw.getByRole('button', { name: 'Propose as default' }).click();
+    await sw.waitForFunction(() => window.__fakeClaude.docs.has('worldDefaults/proposal'));
+    const proposal = await sw.evaluate(() => window.__fakeClaude.docs.get('worldDefaults/proposal'));
+    assert.deepEqual(proposal.levels, await sw.evaluate(() => window.worldLab.levels())); assert.equal(proposal.by, 'u-owner'); assert.equal(proposal.generator, 2);
+    await sw.waitForTimeout(100);
+    assert.match(await sw.locator('#wl-summary').textContent(), /převzít svět/);
+    assert.deepEqual(swErrors, []); await owner.close();
+  }
+  pass('World Lab: the game generator from a code, sliders change the code, the same code gives the same world, game art in the isometric window, favourites and the default proposal in the page database');
+
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 } });
-  for (const path of ['index.html#watchtower', 'index.html#style-guide', 'phaser-demo.html', 'path-lab.html', 'buildings.html', 'ui-lab.html']) {
+  for (const path of ['index.html#watchtower', 'index.html#style-guide', 'phaser-demo.html', 'path-lab.html', 'buildings.html', 'ui-lab.html', 'world-lab.html']) {
     const { page: small, errors: smallErrors } = await open(phone, path);
     await small.waitForTimeout(800);
     assert.equal(await small.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${path} fits a phone`);

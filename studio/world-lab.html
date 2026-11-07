@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Asset Studio · World Lab</title>
+    <meta name="claude:viewport-fit-sides" content="cover" />
+    <link rel="icon" href="data:," />
+    <meta name="description" content="Try world codes with the game's own generator: settings, checks, favourites and the default proposal." />
+  </head>
+  <body class="world-lab-page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><strong>World Lab</strong><span class="brand-sub">The game's world generator · codes, settings, checks</span></div></div>
+      <nav class="views" aria-label="Studio views"><a href="./index.html#assets">Assets</a><a href="./index.html#style-guide">Style guide</a><a href="./buildings.html">Buildings in game</a><a href="./ui-lab.html">UI Lab</a><a href="./world-lab.html" aria-current="page">World Lab</a><a href="./phaser-demo.html">Phaser demo</a><a href="./path-lab.html">Path Lab</a></nav>
+      <div class="review-status"><span id="wl-summary" class="review-summary" aria-live="polite"></span></div>
+    </header>
+    <p id="studio-alert" class="studio-alert" role="alert" hidden></p>
+    <div class="wl-shell">
+      <aside class="wl-controls" aria-label="World settings">
+        <section>
+          <h3>World code</h3>
+          <div class="wl-row"><input type="text" id="wl-code" spellcheck="false" aria-label="World code" /><button type="button" class="button" id="wl-apply">Apply</button></div>
+          <div class="wl-row"><button type="button" class="button" id="wl-copy">Copy world code</button><label class="wl-field wl-seed"><span>Seed</span><input type="text" id="wl-seed" spellcheck="false" aria-label="Seed (base 36)" /></label><button type="button" class="button" id="wl-random">Random</button></div>
+        </section>
+        <section>
+          <h3>Like New Game</h3>
+          <div id="wl-presets" class="wl-presets"></div>
+        </section>
+        <section>
+          <h3>All settings <button type="button" class="link" id="wl-reset">Game defaults</button></h3>
+          <div id="wl-settings" class="wl-settings"></div>
+        </section>
+        <section>
+          <h3>Favourites</h3>
+          <div class="wl-row"><input type="text" id="wl-fav-name" placeholder="Name" aria-label="Favourite name" /><button type="button" class="button" id="wl-fav-save" data-needs-write>Save to favourites</button></div>
+          <input type="text" id="wl-fav-note" placeholder="Note (optional)" aria-label="Favourite note" />
+          <ul id="wl-favourites" class="wl-favourites"></ul>
+        </section>
+        <section>
+          <h3>Default for new games</h3>
+          <p class="wl-hint">Proposes these settings (not the seed) as the game's defaults. The mechanics chat takes them over on „převzít svět“.</p>
+          <input type="text" id="wl-default-note" placeholder="Why (optional)" aria-label="Note for the default proposal" />
+          <button type="button" class="button primary" id="wl-propose" data-needs-write>Propose as default</button>
+        </section>
+      </aside>
+      <main class="wl-main" aria-label="World preview">
+        <div class="toolbar wl-toolbar">
+          <label class="tool">Overlay <select id="wl-overlay" aria-label="Overlay"><option value="none">None</option><option value="forest">Where forests grow</option><option value="stone">Where stones and ore grow</option></select></label>
+          <button type="button" class="button" id="wl-center">To the castle</button>
+          <label class="tool">Compare with <input type="text" id="wl-compare-input" placeholder="Paste another world code" spellcheck="false" aria-label="World code to compare" /></label>
+          <span class="feedback" id="wl-status" aria-live="polite"></span>
+        </div>
+        <div class="wl-grid">
+          <div class="wl-card" id="wl-map-wrap">
+            <h4>Map <small>click or drag to move the view</small></h4>
+            <canvas id="wl-map" aria-label="Whole map from above"></canvas>
+            <div id="wl-zones" class="wl-zones"></div>
+          </div>
+          <div class="wl-card">
+            <h4>Checks</h4>
+            <div id="wl-checks" class="wl-checks"></div>
+          </div>
+          <div class="wl-card wl-compare" id="wl-compare" hidden>
+            <h4>B <code id="wl-compare-code"></code> <button type="button" class="link" id="wl-compare-close">Close</button></h4>
+            <canvas id="wl-map-b" aria-label="Map of the compared code"></canvas>
+            <div id="wl-checks-b" class="wl-checks"></div>
+          </div>
+        </div>
+        <div class="wl-card wl-iso-card">
+          <h4>In the game's art <small>28 × 28 tiles · drag to move · trees, stones and ore are placed when a game starts (use the overlays)</small></h4>
+          <canvas id="wl-iso" aria-label="Isometric view with the game's terrain art"></canvas>
+        </div>
+      </main>
+    </div>
+  </body>
+  <script type="module" src="./src/world-lab/main.js"></script>
+</html>
