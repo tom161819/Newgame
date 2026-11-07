@@ -292,9 +292,17 @@ test('approved production buildings use their Asset Studio exports byte for byte
     const definition = definitions.get(gameId), meta = json(art.artSource), repo = approvals.assets[meta.assetId];
     assert.equal(definition.renderMode, 'sprite', gameId);
     assert.equal(repo.preferred, meta.variantId, `${gameId}: the game uses the preferred variant`);
-    assert.equal(repo.variants[meta.variantId].status, 'approved');
-    assert.equal(repo.variants[meta.variantId].specHash, meta.specHash);
-    assert.equal(catalog.studio.find(a => a.id === meta.assetId).variants.find(v => v.id === meta.variantId).hash, meta.specHash);
+    const record = repo.variants[meta.variantId];
+    if (record.version > meta.version) {
+      // The owner asked for a rework of art the game already uses: the game keeps the exported version (it is in the
+      // record's history with the same spec) until the new version is approved and wired in.
+      assert.ok((record.history ?? []).some(h => h.version === meta.version && h.specHash === meta.specHash), `${gameId}: v${meta.version} is in the history`);
+      assert.ok(['review', 'revision-requested'].includes(record.status), `${gameId}: the new version is still being reviewed`);
+    } else {
+      assert.equal(record.status, 'approved', gameId);
+      assert.equal(record.specHash, meta.specHash);
+      assert.equal(catalog.studio.find(a => a.id === meta.assetId).variants.find(v => v.id === meta.variantId).hash, meta.specHash);
+    }
     assert.deepEqual([definition.width, definition.height], [meta.footprint.width, meta.footprint.height], `${gameId}: footprint matches`);
     assert.ok(readFileSync(path.join(root, `public${definition.sprite}`)).equals(readFileSync(path.join(root, `art/sprites/${meta.assetId}/${meta.variantId}.v${meta.version}.png`))), `${gameId}: sprite equals the export`);
     assert.deepEqual(definition.origin, meta.baseOrigin);

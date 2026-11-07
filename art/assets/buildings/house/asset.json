@@ -4,29 +4,96 @@
   "name": "House",
   "category": "buildings",
   "description": "A 2 × 2 dwelling for five residents (Housing, stage 12). Three looks for poorer and richer districts.",
-  "footprint": { "width": 2, "height": 2 },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
   "generator": "house",
   "variants": [
     {
       "id": "house-timber",
       "name": "Half-timbered with thatch",
-      "version": 1,
-      "notes": "Plaster and dark timber frame, straw roof, lantern by the door.",
-      "spec": { "walls": "timber", "width": 1.5, "depth": 1.3, "wallHeight": 1.15, "ridge": "z", "roofHeight": 0.85, "roofMaterial": "thatch", "windows": 1, "chimney": false, "lantern": true }
+      "version": 2,
+      "notes": "Revision 2 (owner: improve, more detail): diagonal braces in the timber frame, shutter pairs and flower boxes, a framed door with a plank canopy and a stone step, a ridge cap and a chimney; a bench by the door, a woodpile with a chopping block and a rain barrel.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": true,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "house-stone",
       "name": "Stone house with tile roof",
       "version": 1,
       "notes": "Wealthier look: dressed stone, clay tiles, chimney.",
-      "spec": { "walls": "stone", "width": 1.55, "depth": 1.35, "wallHeight": 1.2, "ridge": "x", "roofHeight": 0.8, "roofMaterial": "roof_tile", "windows": 2, "chimney": true, "lantern": false }
+      "spec": {
+        "walls": "stone",
+        "width": 1.55,
+        "depth": 1.35,
+        "wallHeight": 1.2,
+        "ridge": "x",
+        "roofHeight": 0.8,
+        "roofMaterial": "roof_tile",
+        "windows": 2,
+        "chimney": true,
+        "lantern": false
+      }
     },
     {
       "id": "house-wood",
       "name": "Plank cottage",
       "version": 1,
       "notes": "Cheapest look: plank walls and wooden shingles.",
-      "spec": { "walls": "wood", "width": 1.35, "depth": 1.2, "wallHeight": 1.0, "ridge": "z", "roofHeight": 0.7, "roofMaterial": "roof_shingle", "windows": 1, "chimney": true, "lantern": false }
+      "spec": {
+        "walls": "wood",
+        "width": 1.35,
+        "depth": 1.2,
+        "wallHeight": 1.0,
+        "ridge": "z",
+        "roofHeight": 0.7,
+        "roofMaterial": "roof_shingle",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false
+      }
     }
   ]
 }

@@ -99,3 +99,45 @@ test('wheelwright revision 2: half-open shed, a half-built wheel, spoked wheels 
   const model = GENERATORS.workshop.build(variant.spec, { footprint: { width: 3, height: 3 }, style });
   assert.deepEqual(checkModel(model, { footprint: { width: 3, height: 3 }, style }), []);
 });
+
+test('revision 7 Nov (second): mine hill, builder yard v3, bakery v2 and farmstead v2 answer the owner and fit their plots', () => {
+  const variant = (assetId, id) => workshops.find(a => a.id === assetId).variants.find(v => v.id === id);
+  const build = (assetId, id) => { const a = workshops.find(x => x.id === assetId), v = variant(assetId, id); const model = GENERATORS.workshop.build(v.spec, { footprint: a.footprint, style }); return { a, v, model }; };
+  // Iron mine v2: the adit is cut into a rocky hill with ore veins, rails lead to a loaded mine cart, a torch at the portal.
+  { const { a, v, model } = build('iron-mine', 'iron-mine-adit');
+    assert.equal(v.version, 2); assert.equal(v.spec.body.kind, 'mine');
+    assert.ok(model.primitives.filter(p => p.material === 'ore').length >= 8, 'ore veins and heaps');
+    assert.ok(model.primitives.some(p => p.material === 'soot'), 'a dark adit opening');
+    assert.ok(model.lights.some(l => l.type === 'torch'));
+    for (const type of ['rails', 'minecart', 'oreHeap', 'pickRack']) assert.ok(v.spec.props.some(p => p.type === type), type);
+    assert.deepEqual(checkModel(model, { footprint: a.footprint, style }), []); }
+  // Builder's yard v3: a closed side wall the camera sees, a carpenter's bench with tools under the roof, a gateway.
+  { const { a, v, model } = build('builders-workshop', 'builders-workshop-material-yard');
+    assert.equal(v.version, 3); assert.equal(v.spec.body.sideWall, 'both');
+    for (const type of ['carpenterBench', 'toolBoard', 'gateway']) assert.ok(v.spec.props.some(p => p.type === type), type);
+    assert.ok(PROPS.carpenterBench(0, 0, {}).some(p => p.material === 'steel'), 'a saw on the bench');
+    assert.deepEqual(checkModel(model, { footprint: a.footprint, style }), []); }
+  // Bakery v2: a bread stall with loaves, a pretzel sign, bread baskets and a baker's peel by the oven.
+  { const { a, v, model } = build('bakery-house', 'bakery-house-yard-oven');
+    assert.equal(v.version, 2);
+    for (const type of ['breadStall', 'bakerSign', 'breadBasket', 'peel', 'oven']) assert.ok(v.spec.props.some(p => p.type === type), type);
+    assert.ok(PROPS.breadStall(0, 0, {}).filter(p => p.material === 'cloth_ochre').length >= 5, 'loaves on the stall');
+    assert.deepEqual(checkModel(model, { footprint: a.footprint, style }), []); }
+  // Farmstead v2 on 3x3: haycocks, a tool rack, a plough, a hen house and grain sacks.
+  { const { a, v, model } = build('farmstead', 'farmstead-thatched');
+    assert.deepEqual(a.footprint, { width: 3, height: 3 }); assert.equal(v.version, 2);
+    for (const type of ['haycock', 'farmTools', 'plough', 'henHouse', 'sacks']) assert.ok(v.spec.props.some(p => p.type === type), type);
+    assert.deepEqual(checkModel(model, { footprint: a.footprint, style }), []); }
+});
+
+test('house v2 details: braces, flower boxes, door canopy and yard props; houses without details are unchanged', () => {
+  const house = json('art/assets/buildings/house/asset.json'), timber = house.variants.find(v => v.id === 'house-timber');
+  assert.equal(timber.version, 2); assert.equal(timber.spec.details, true);
+  const model = GENERATORS.house.build(timber.spec, { footprint: house.footprint, style });
+  assert.ok(model.primitives.some(p => p.material === 'blossom'), 'flower boxes');
+  assert.ok(model.primitives.some(p => p.tilt && p.material === 'wood_dark'), 'diagonal braces');
+  assert.ok(model.primitives.some(p => p.material === 'bark'), 'a woodpile from the yard props');
+  assert.deepEqual(checkModel(model, { footprint: house.footprint, style }), []);
+  const plain = GENERATORS.house.build({ ...timber.spec, details: false, props: [] }, { footprint: house.footprint, style });
+  assert.ok(plain.primitives.length < model.primitives.length && !plain.primitives.some(p => p.material === 'blossom'));
+});

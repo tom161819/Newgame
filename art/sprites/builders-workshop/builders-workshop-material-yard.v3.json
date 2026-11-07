@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "builders-workshop",
+  "variantId": "builders-workshop-material-yard",
+  "name": "Material yard with shed (3 × 3)",
+  "category": "buildings",
+  "version": 3,
+  "specHash": "7061dcf2",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 122,
+  "anchor": {
+    "x": 97,
+    "y": 72
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.59016
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 120
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98361
+  },
+  "visualHeight": 120,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": 14.72,
+      "y": -84.69,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 0.952,
+  "lights": [
+    {
+      "type": "torch",
+      "x": 111.72,
+      "y": 35.31,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

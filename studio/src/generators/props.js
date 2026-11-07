@@ -192,3 +192,118 @@ function spokedWheel(x, z, { radius, plane, spokes, done, y, thick, tire }) {
 }
 
 export const PROP_TYPES = Object.keys(PROPS);
+
+// Mining (#92 revision): rails from the adit, a loaded mine cart, ore heaps, pickaxes and pit props.
+Object.assign(PROPS, {
+  // Straight track along +z (r = 0) or +x (r = π/2) from (x, z), `length` long: sleepers and two iron rails.
+  rails: (x, z, { length = 0.9, r = 0 } = {}) => {
+    const ax = Math.sin(r), az = Math.cos(r), out = [], n = Math.max(2, Math.round(length / 0.16));
+    for (let i = 0; i <= n; i++) out.push(box([0.24, 0.025, 0.05], [x + ax * length * i / n, 0, z + az * length * i / n], 'wood_dark', { rotation: r }));
+    for (const side of [-0.07, 0.07]) out.push(box([0.02, 0.02, length + 0.06], [x + ax * length / 2 + az * side, 0.025, z + az * length / 2 - ax * side], 'iron', { rotation: r }));
+    return out;
+  },
+  minecart: (x, z, { r = 0, load = true } = {}) => {
+    const out = [box([0.2, 0.15, 0.28], [x, 0.07, z], 'wood_dark', { rotation: r }), box([0.21, 0.025, 0.29], [x, 0.2, z], 'iron', { rotation: r }), box([0.21, 0.025, 0.29], [x, 0.09, z], 'iron', { rotation: r })];
+    for (const [dx, dz] of [[-0.1, -0.09], [0.1, -0.09], [-0.1, 0.09], [0.1, 0.09]]) out.push(cylinder({ radiusBottom: 0.045, height: 0.025, segments: 8, tilt: [0, Math.PI / 2] }, [x + dx * Math.cos(r) + dz * Math.sin(r), 0.0, z - dx * Math.sin(r) + dz * Math.cos(r)], 'iron'));
+    if (load) out.push(sphere([0.1, 0.07, 0.13], [x, 0.18, z], 'ore', 0), sphere([0.05, 0.04, 0.05], [x + 0.04, 0.22, z - 0.06], 'rock', 0));
+    return out;
+  },
+  oreHeap: (x, z, { size = 1 } = {}) => [sphere([0.24 * size, 0.12 * size, 0.2 * size], [x, 0, z], 'ore', 1), sphere([0.12 * size, 0.08 * size, 0.1 * size], [x + 0.16 * size, 0, z + 0.14 * size], 'ore', 0), sphere([0.08 * size, 0.06 * size, 0.07 * size], [x - 0.15 * size, 0, z + 0.1 * size], 'rock', 0), sphere([0.07, 0.05, 0.06], [x - 0.02, 0.14 * size, z + 0.02], 'ore', 0)],
+  // Pickaxes and a shovel leaning on a low rail.
+  pickRack: (x, z, { r = 0 } = {}) => {
+    const out = [box([0.04, 0.26, 0.04], ground(along(x, z, r, -0.16)), 'wood_dark'), box([0.04, 0.26, 0.04], ground(along(x, z, r, 0.16)), 'wood_dark'), box([0.38, 0.03, 0.04], [x, 0.24, z], 'wood_dark', { rotation: r })];
+    for (const d of [-0.09, 0.03]) { const [px, pz] = along(x, z, r, d); out.push(box([0.025, 0.3, 0.025], [px, 0, pz + 0.03], 'wood'), box([0.16, 0.03, 0.03], [px, 0.28, pz + 0.03], 'iron', { rotation: r })); }
+    const [sx, sz] = along(x, z, r, 0.12); out.push(box([0.025, 0.3, 0.025], [sx, 0.05, sz + 0.03], 'wood'), box([0.07, 0.09, 0.02], [sx, 0, sz + 0.03], 'iron', { rotation: r }));
+    return out;
+  },
+  pitProps: (x, z, { count = 5, r = 0 } = {}) => PROPS.logs(x, z, { count, length: 0.5, r }),
+});
+
+// Builder's yard revision 3: a carpenter's bench (ponk) with tools on it and a tool board, and a fence gateway.
+Object.assign(PROPS, {
+  carpenterBench: (x, z, { r = 0 } = {}) => {
+    const at = (dx, dz) => [x + dx * Math.cos(r) + dz * Math.sin(r), z - dx * Math.sin(r) + dz * Math.cos(r)];
+    const out = [box([0.62, 0.06, 0.24], [x, 0.26, z], 'wood', { rotation: r })];
+    for (const [dx, dz] of [[-0.26, -0.08], [0.26, -0.08], [-0.26, 0.08], [0.26, 0.08]]) { const [px, pz] = at(dx, dz); out.push(box([0.05, 0.26, 0.05], [px, 0, pz], 'wood_dark')); }
+    const [sx, sz] = at(0, 0); out.push(box([0.56, 0.03, 0.2], [sx, 0.08, sz], 'wood_dark', { rotation: r }));
+    // Vise jaw, a saw, a mallet and a plane on top; a plank being worked.
+    const [vx, vz] = at(-0.29, 0.1); out.push(box([0.06, 0.1, 0.06], [vx, 0.22, vz], 'wood_dark', { rotation: r }));
+    const [px, pz] = at(-0.05, -0.03); out.push(box([0.4, 0.025, 0.1], [px, 0.32, pz], 'stone_light', { rotation: r + 0.08 }));
+    const [wx, wz] = at(0.2, 0.05); out.push(box([0.2, 0.012, 0.06], [wx, 0.32, wz], 'steel', { rotation: r + 0.4 }), box([0.06, 0.03, 0.03], [wx - 0.09, 0.32, wz], 'wood_dark', { rotation: r + 0.4 }));
+    const [mx, mz] = at(0.12, -0.07); out.push(box([0.07, 0.05, 0.05], [mx, 0.32, mz], 'wood_dark', { rotation: r }), box([0.02, 0.02, 0.12], [mx, 0.335, mz + 0.06], 'wood', { rotation: r }));
+    const [lx, lz] = at(-0.2, -0.08); out.push(box([0.11, 0.04, 0.04], [lx, 0.32, lz], 'wood', { rotation: r }), box([0.03, 0.03, 0.03], [lx, 0.36, lz], 'wood_dark'));
+    return out;
+  },
+  // Tool board on a wall facing +z (r = 0): saw, axe, hammer and a coil of rope hanging on pegs.
+  toolBoard: (x, z, { r = 0, y = 0.36 } = {}) => {
+    const out = [box([0.5, 0.26, 0.02], [x, y, z], 'wood_dark', { rotation: r })];
+    const at = d => [x + Math.cos(r) * d, z - Math.sin(r) * d + 0.02 * Math.cos(r)];
+    const [a, b] = at(-0.15); out.push(box([0.16, 0.08, 0.012], [a, y + 0.1, b], 'steel', { rotation: r }));
+    const [c, d] = at(0.0); out.push(box([0.025, 0.2, 0.02], [c, y + 0.03, d], 'wood'), box([0.07, 0.05, 0.02], [c, y + 0.19, d], 'iron', { rotation: r }));
+    const [e, f] = at(0.13); out.push(box([0.02, 0.15, 0.02], [e, y + 0.05, f], 'wood'), box([0.07, 0.035, 0.03], [e, y + 0.18, f], 'iron', { rotation: r }));
+    const [g, k] = at(0.21); out.push(cylinder({ radiusBottom: 0.04, height: 0.02, segments: 8, tilt: [Math.PI / 2, 0] }, [g, y + 0.06, k], 'cloth_linen'));
+    return out;
+  },
+  // Two taller gate posts with a cross beam: the yard entrance between two fence runs.
+  gateway: (x, z, { r = 0, width = 0.5 } = {}) => {
+    const out = [];
+    for (const d of [-width / 2, width / 2]) out.push(box([0.06, 0.48, 0.06], [x + Math.cos(r) * d, 0, z - Math.sin(r) * d], 'wood_dark'));
+    out.push(box([width + 0.14, 0.05, 0.06], [x, 0.44, z], 'wood_dark', { rotation: r }));
+    return out;
+  },
+});
+
+// Bakery revision 2: loaves, a bread stall, a hanging pretzel sign, a baker's peel and bread baskets.
+Object.assign(PROPS, {
+  loaf: (x, z, { y = 0, r = 0 } = {}) => [sphere([0.06, 0.035, 0.04], [x, y, z], 'cloth_ochre', 1, { rotation: r }), box([0.05, 0.006, 0.008], [x, y + 0.062, z], 'cloth_brown', { rotation: r + 0.6 })],
+  breadStall: (x, z, { r = 0 } = {}) => {
+    const at = (dx, dz) => [x + dx * Math.cos(r) + dz * Math.sin(r), z - dx * Math.sin(r) + dz * Math.cos(r)];
+    const [fx, fz] = at(0, 0.12);
+    const out = [box([0.56, 0.05, 0.26], [x, 0.24, z], 'wood', { rotation: r }), box([0.56, 0.2, 0.02], [fx, 0.04, fz], 'wood_dark', { rotation: r })];
+    for (const [dx, dz] of [[-0.25, -0.1], [0.25, -0.1]]) { const [px, pz] = at(dx, dz); out.push(box([0.04, 0.62, 0.04], [px, 0, pz], 'wood_dark')); }
+    for (const [dx, dz] of [[-0.25, 0.1], [0.25, 0.1]]) { const [px, pz] = at(dx, dz); out.push(box([0.04, 0.5, 0.04], [px, 0, pz], 'wood_dark')); }
+    // Striped cloth awning sloping toward the customer side (+z when r = 0).
+    const [ax, az] = at(0, 0.02); out.push(box([0.64, 0.025, 0.34], [ax, 0.58, az], 'cloth_red', { rotation: r, tilt: [0.25, 0] }));
+    for (const d of [-0.2, 0, 0.2]) { const [sx, sz] = at(d, 0.02); out.push(box([0.07, 0.03, 0.34], [sx, 0.585, sz], 'cloth_linen', { rotation: r, tilt: [0.25, 0] })); }
+    for (const [dx, dz, rr] of [[-0.18, -0.04, 0.3], [-0.05, 0.05, -0.2], [0.08, -0.05, 0.5], [0.2, 0.05, 0], [-0.12, 0.08, 1.2]]) { const [lx, lz] = at(dx, dz); out.push(...PROPS.loaf(lx, lz, { y: 0.29, r: rr })); }
+    return out;
+  },
+  breadBasket: (x, z, { y = 0 } = {}) => [cylinder({ radiusBottom: 0.08, radiusTop: 0.1, height: 0.08, segments: 10 }, [x, y, z], 'wood'), ...PROPS.loaf(x - 0.03, z, { y: y + 0.06, r: 0.4 }), ...PROPS.loaf(x + 0.03, z + 0.03, { y: y + 0.07, r: -0.6 })],
+  // Wrought-iron bracket from a wall facing +z with a hanging pretzel sign (r = π/2 for a wall facing +x).
+  bakerSign: (x, z, { y = 0.75, r = 0 } = {}) => {
+    const ox = Math.sin(r), oz = Math.cos(r);
+    return [box([0.03, 0.03, 0.26], [x + ox * 0.13, y, z + oz * 0.13], 'iron', { rotation: r }), box([0.012, 0.08, 0.012], [x + ox * 0.22, y - 0.08, z + oz * 0.22], 'iron'),
+      cylinder({ radiusBottom: 0.1, height: 0.03, segments: 12, tilt: [Math.PI / 2 * oz, Math.PI / 2 * ox] }, [x + ox * 0.22, y - 0.24, z + oz * 0.22], 'cloth_ochre'),
+      cylinder({ radiusBottom: 0.04, height: 0.035, segments: 8, tilt: [Math.PI / 2 * oz, Math.PI / 2 * ox] }, [x + ox * 0.22, y - 0.2, z + oz * 0.22], 'opening')];
+  },
+  // Baker's peel leaning against a wall or the oven.
+  peel: (x, z, { r = 0 } = {}) => [box([0.03, 0.5, 0.025], [x, 0.12, z], 'wood', { rotation: r, tilt: [0.25, 0] }), box([0.16, 0.14, 0.015], [x, 0, z - 0.03], 'wood', { rotation: r, tilt: [0.25, 0] })],
+});
+
+// Farmstead revision 2: haycocks, a plough, a farm-tool rack (pitchfork, scythe, rake, flail) and a hen house.
+Object.assign(PROPS, {
+  haycock: (x, z, { size = 1 } = {}) => [cylinder({ radiusBottom: 0.2 * size, radiusTop: 0.16 * size, height: 0.2 * size, segments: 10 }, [x, 0, z], 'thatch'), cylinder({ radiusBottom: 0.16 * size, radiusTop: 0.02, height: 0.22 * size, segments: 10 }, [x, 0.2 * size, z], 'thatch'), box([0.02, 0.1, 0.02], [x, 0.4 * size, z], 'wood_dark')],
+  plough: (x, z, { r = 0 } = {}) => {
+    const at = d => [x + Math.cos(r) * d, z - Math.sin(r) * d];
+    const [bx, bz] = at(0), [hx, hz] = at(-0.24), [sx, sz] = at(0.18);
+    return [box([0.5, 0.04, 0.05], [bx, 0.1, bz], 'wood', { rotation: r }), box([0.04, 0.24, 0.04], [hx, 0.08, hz], 'wood_dark', { rotation: r, tilt: [0, 0.4] }),
+      box([0.14, 0.04, 0.12], [sx, 0, sz], 'iron', { rotation: r + 0.4 }), box([0.03, 0.12, 0.03], [sx - Math.cos(r) * 0.04, 0, sz + Math.sin(r) * 0.04], 'wood_dark'),
+      cylinder({ radiusBottom: 0.07, height: 0.02, segments: 10, tilt: [Math.PI / 2 * Math.cos(r), Math.PI / 2 * Math.sin(r)] }, [...at(0.3)].length === 2 ? [at(0.3)[0], 0.0, at(0.3)[1]] : [x, 0, z], 'wood_dark')];
+  },
+  farmTools: (x, z, { r = 0 } = {}) => {
+    const p = d => { const [px, pz] = along(x, z, r, d); return [px, pz + 0.03 * Math.cos(r)]; };
+    const out = [box([0.04, 0.42, 0.04], ground(along(x, z, r, -0.2)), 'wood_dark'), box([0.04, 0.42, 0.04], ground(along(x, z, r, 0.2)), 'wood_dark'), box([0.46, 0.03, 0.04], [x, 0.38, z], 'wood_dark', { rotation: r })];
+    { const [a, b] = p(-0.12); out.push(box([0.02, 0.44, 0.02], [a, 0.02, b], 'wood'), box([0.08, 0.06, 0.012], [a, 0.0, b], 'iron', { rotation: r })); }
+    { const [a, b] = p(-0.02); out.push(box([0.02, 0.46, 0.02], [a, 0.04, b], 'wood'), box([0.2, 0.025, 0.02], [a + 0.06 * Math.cos(r), 0.46, b], 'steel', { rotation: r + 0.3 })); }
+    { const [a, b] = p(0.08); out.push(box([0.02, 0.44, 0.02], [a, 0.02, b], 'wood'), box([0.12, 0.02, 0.02], [a, 0.02, b], 'wood_dark', { rotation: r })); }
+    { const [a, b] = p(0.16); out.push(box([0.02, 0.4, 0.02], [a, 0.02, b], 'wood'), box([0.018, 0.14, 0.018], [a, 0.36, b], 'wood_dark', { tilt: [0, 0.6] })); }
+    return out;
+  },
+  henHouse: (x, z, { r = 0 } = {}) => {
+    const out = [];
+    for (const [dx, dz] of [[-0.14, -0.1], [0.14, -0.1], [-0.14, 0.1], [0.14, 0.1]]) out.push(box([0.035, 0.12, 0.035], [x + dx, 0, z + dz], 'wood_dark'));
+    out.push(box([0.34, 0.2, 0.26], [x, 0.12, z], 'wood', { rotation: r }), prism([0.3, 0.12, 0.38], [x, 0.32, z], 'roof_shingle', { rotation: r + Math.PI / 2 }), box([0.06, 0.08, 0.02], [x + 0.05, 0.16, z + 0.135], 'opening'), box([0.05, 0.02, 0.22], [x + 0.05, 0.0, z + 0.22], 'wood', { tilt: [-0.5, 0] }));
+    for (const [dx, dz, m] of [[0.32, 0.25, 'cloth_linen'], [0.45, 0.12, 'cloth_brown'], [0.25, 0.42, 'cloth_linen']]) out.push(sphere([0.06, 0.05, 0.045], [x + dx, 0, z + dz], m, 0), sphere([0.03, 0.03, 0.03], [x + dx + 0.05, 0.06, z + dz], m, 0), box([0.015, 0.025, 0.015], [x + dx + 0.06, 0.1, z + dz], 'cloth_red'));
+    return out;
+  },
+});

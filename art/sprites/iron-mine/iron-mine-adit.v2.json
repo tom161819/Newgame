@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "assetId": "iron-mine",
+  "variantId": "iron-mine-adit",
+  "name": "Mine adit in an ore hill",
+  "category": "buildings",
+  "version": 2,
+  "specHash": "d2139820",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 120,
+  "anchor": {
+    "x": 97,
+    "y": 70
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.58333
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 118
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98333
+  },
+  "visualHeight": 118,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -1.71,
+      "y": -60.61,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 1.21,
+  "lights": [
+    {
+      "type": "torch",
+      "x": 95.29,
+      "y": 57.39,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 1
+    }
+  ]
+}

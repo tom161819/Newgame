@@ -5,11 +5,11 @@
 // logs, an oven or ore. Each prop is listed in the spec, so new buildings are
 // mostly data: see studio/src/generators/props.js for the catalogue.
 import houseRecipe from './house.js';
-import { box, cylinder, prism, sphere, clamp } from './shapes.js';
+import { box, cylinder, prism, sphere, clamp, squareFrustum } from './shapes.js';
 import { PROPS, PROP_TYPES } from './props.js';
 
 export const params = [
-  { key: 'body.kind', values: ['house', 'raised', 'windmill', 'furnace', 'barn', 'shed', 'hall', 'none'], description: 'Main structure: house, granary on staddle stones, tower windmill with sails, bloomery furnace, big barn, open lean-to shed (posts, sloping roof, low back wall; work stays visible underneath), open market hall (posts carrying a gable roof, open on all sides), or none (props only, e.g. equipment).' },
+  { key: 'body.kind', values: ['house', 'raised', 'windmill', 'furnace', 'barn', 'shed', 'hall', 'mine', 'none'], description: 'Main structure: house, granary on staddle stones, tower windmill with sails, bloomery furnace, big barn, open lean-to shed (posts, sloping roof, low back wall; work stays visible underneath), open market hall (posts carrying a gable roof, open on all sides), mine (rocky hill over an ore deposit with a timbered adit on its +z face), or none (props only, e.g. equipment).' },
   { key: 'body', description: 'House parameters (walls, width, depth, wallHeight, ridge, roofHeight, roofMaterial, windows, chimney, lantern) or the kind-specific ones.' },
   { key: 'body.at', unit: 'units', description: '[x, z] centre of the body; the rest of the footprint is the yard.' },
   { key: 'body.ironBands', description: 'Barn: iron bands across the double doors (armory).' },
@@ -75,7 +75,15 @@ function body(spec, style) {
     parts.push(box([width + 0.04, 0.05, 0.06], [0, front - 0.05, depth / 2 - 0.04], 'wood_dark'), box([width + 0.04, 0.05, 0.06], [0, back - 0.05, -depth / 2 + 0.04], 'wood_dark'));
     const steps = 6;
     for (let i = 0; i < steps; i++) { const t = (i + 0.5) / steps, z = -depth / 2 - 0.08 + t * (depth + 0.22), y = back + (front - back) * t; parts.push(box([width + 0.1, 0.035, (depth + 0.22) / steps + 0.03], [0, y, z], roof)); }
-    if (spec.sideWall) parts.push(box([0.04, back * 0.8, depth - 0.1], [-width / 2 + 0.03, 0, 0], 'wood'));
+    // Side walls: true or 'left' closes the -x end (low, under the back eave); 'right' or 'both' also closes the +x end
+    // the camera sees, as a plank wall up to the sloping roof with a small window, so the shed reads as a workshop.
+    if (spec.sideWall === true || spec.sideWall === 'left' || spec.sideWall === 'both') parts.push(box([0.04, back * 0.8, depth - 0.1], [-width / 2 + 0.03, 0, 0], 'wood'));
+    if (spec.sideWall === 'right' || spec.sideWall === 'both') {
+      const x = width / 2 - 0.03;
+      for (let i = 0; i < 4; i++) { const t0 = i / 4, t1 = (i + 1) / 4, h = back + (front - back) * ((t0 + t1) / 2) - 0.04; parts.push(box([0.04, h, (depth - 0.08) / 4], [x, 0, -depth / 2 + 0.04 + (depth - 0.08) * (t0 + t1) / 2], 'wood')); }
+      parts.push(box([0.05, 0.05, depth - 0.06], [x + 0.005, 0.02, 0], 'wood_dark'), box([0.05, 0.05, depth - 0.06], [x + 0.005, back * 0.75, 0], 'wood_dark'));
+      parts.push(box([0.045, 0.14, 0.16], [x + 0.005, back * 0.35, 0.02], 'opening'));
+    }
     return { parts, lights: spec.lantern ? [{ type: 'torch', at: [width / 2 - 0.1, front - 0.12, depth / 2 - 0.02] }] : [] };
   }
   if (kind === 'hall') {
@@ -88,6 +96,37 @@ function body(spec, style) {
     for (const x of [-width / 2 + 0.05, width / 2 - 0.05]) parts.push(box([0.08, 0.07, depth], [x, eave, 0], 'wood_dark'));
     parts.push(prism([depth + 0.24, roofHeight, width + 0.24], [0, eave + 0.07, 0], spec.roofMaterial ?? 'roof_tile', { rotation: Math.PI / 2 }));
     return { parts, lights: spec.lantern ? [{ type: 'torch', at: [width / 2 - 0.05, eave - 0.1, depth / 2 + 0.02] }] : [] };
+  }
+  if (kind === 'mine') {
+    // Iron mine (#92 revision): a rocky hill over the deposit built from low-poly boulders, rust-red ore veins on the
+    // slopes the camera sees and a timbered adit in a cut face toward the camera (+z), with a plank hood and a torch.
+    // `width`/`depth` size the main mound, `height` its top; `aditX` moves the entrance along the face.
+    const rx = clamp(spec.width ?? 1.7, 1.0, 2.4) / 2, rz = clamp(spec.depth ?? 1.3, 0.8, 2.0) / 2, ry = clamp(spec.height ?? 0.9, 0.5, 1.4) / 2, adit = spec.aditX ?? 0.1, cz = -rz * 0.25;
+    // Front (+z) and right (+x) surface of the main mound, so veins and the portal sit on it.
+    const front = (x, y) => cz + rz * Math.sqrt(Math.max(0, 1 - (x / rx) ** 2 - ((y - ry) / ry) ** 2));
+    const right = (z, y) => rx * Math.sqrt(Math.max(0, 1 - ((z - cz) / rz) ** 2 - ((y - ry) / ry) ** 2));
+    const parts = [
+      sphere([rx, ry, rz], [0, 0, cz], 'rock', 2),
+      sphere([rx * 0.62, ry * 0.7, rz * 0.7], [-rx * 0.62, 0, cz + rz * 0.35], 'fieldstone_dark', 1),
+      sphere([rx * 0.6, ry * 0.62, rz * 0.62], [rx * 0.55, 0, cz - rz * 0.45], 'rock', 1),
+      sphere([rx * 0.45, ry * 0.42, rz * 0.45], [-rx * 0.2, ry * 1.3, cz - rz * 0.3], 'fieldstone_dark', 1),
+      sphere([rx * 0.22, ry * 0.25, rz * 0.24], [rx * 0.25, ry * 1.55, cz - rz * 0.1], 'rock', 1),
+    ];
+    for (const [x, z, r, m] of [[-rx * 1.05, cz + rz * 0.95, 0.13, 'rock'], [rx * 1.0, cz + rz * 0.6, 0.11, 'fieldstone_dark'], [rx * 0.75, cz + rz * 1.05, 0.08, 'rock']]) parts.push(sphere([r, r * 0.7, r * 0.9], [x, 0, z], m, 1));
+    // Veins: clusters of rust-red ore lumps half sunk into the slopes.
+    for (const [x, y, r] of [[adit + 0.45, ry * 0.85, 0.11], [adit + 0.58, ry * 1.15, 0.08], [adit - 0.48, ry * 1.0, 0.1], [adit - 0.6, ry * 0.7, 0.07], [rx * 0.72, ry * 0.4, 0.09], [-rx * 0.1, ry * 1.55, 0.09]]) parts.push(sphere([r, r * 0.7, r * 0.6], [x, y, front(x, y + r * 0.35) - r * 0.35], 'ore', 1));
+    for (const [z, y, r] of [[cz + rz * 0.35, ry * 0.75, 0.1], [cz - rz * 0.15, ry * 1.15, 0.09], [cz + rz * 0.05, ry * 0.45, 0.07]]) parts.push(sphere([r * 0.6, r * 0.7, r], [right(z, y + r * 0.35) - r * 0.35, y, z], 'ore', 1));
+    // Moss and scrub on the crown and around the foot tie the hill into the ground.
+    for (const [x, y, z, r] of [[-rx * 0.3, ry * 2 + 0.05, cz - rz * 0.35, 0.2], [rx * 0.3, ry * 2.4, cz - rz * 0.2, 0.14], [-rx * 0.7, ry * 1.2, cz + rz * 0.2, 0.16], [rx * 0.75, ry * 1.1, cz - rz * 0.5, 0.15]]) parts.push(sphere([r, r * 0.35, r * 0.8], [x, y - r * 0.2, z], 'moss', 1));
+    for (const [x, z, r] of [[-rx * 0.95, cz + rz * 0.55, 0.1], [rx * 1.05, cz - rz * 0.1, 0.09], [-rx * 0.35, cz + rz * 1.0, 0.07]]) parts.push(sphere([r, r * 0.7, r], [x, 0, z], 'grass_scrub', 1));
+    // The adit: a cut face of dressed stone, a dark opening, two posts and a lintel, a plank hood, trodden soil in front.
+    const oh = 0.46, fz = front(adit, oh * 0.5) + 0.04;
+    parts.push(box([0.7, oh + 0.18, 0.34], [adit, 0, fz - 0.2], 'fieldstone'));
+    parts.push(box([0.32, oh - 0.03, 0.05], [adit, 0.01, fz - 0.03], 'soot'));
+    for (const dx of [-0.2, 0.2]) parts.push(box([0.08, oh, 0.08], [adit + dx, 0, fz + 0.02], 'wood_dark'));
+    parts.push(box([0.54, 0.08, 0.1], [adit, oh, fz + 0.02], 'wood_dark'), box([0.64, 0.035, 0.2], [adit, oh + 0.08, fz + 0.04], 'roof_shingle'));
+    parts.push(box([0.44, 0.012, 0.3], [adit, 0, fz + 0.18], 'soil'));
+    return { parts, lights: [{ type: 'torch', at: [adit + 0.27, oh - 0.1, fz + 0.06] }], adit: [adit, fz + 0.36] };
   }
   throw new RangeError(`Unknown workshop body ${kind}`);
 }

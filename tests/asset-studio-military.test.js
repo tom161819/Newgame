@@ -23,7 +23,8 @@ test('V02 military buildings: C07 footprints, at least three variants, trade pro
     assert.equal(asset.gameObjectId, undefined);
     assert.ok(asset.variants.length >= 3, `${id}: three comparable variants`);
     assert.deepEqual(validateAssetSpec(asset, { generators: GENERATORS, style }), [], id);
-    for (const variant of asset.variants) assert.ok(['approved', 'review', undefined].includes(approvals.assets[id]?.variants?.[variant.id]?.status), variant.id);
+    // Rejected variants (set aside when the owner chose another for the game) are allowed; they are never used.
+    for (const variant of asset.variants) assert.ok(['approved', 'review', 'rejected', undefined].includes(approvals.assets[id]?.variants?.[variant.id]?.status), variant.id);
     const game = objectDefinitions.find(d => d.id === id);
     // C07 built it: the game shows an approved export of it, byte for byte, never a look still in review.
     const used = asset.variants.find(v => game.sprite.endsWith(`/${v.id}.v1.png`));

@@ -55,7 +55,7 @@ try {
   const waitingCount = Number((await page.locator('#library-review [data-review="pending"] .count').textContent()).trim());
   const waiting = await page.locator('.library-item .name').allTextContents();
   assert.equal(waiting.length, waitingCount, 'the button counts what is listed');
-  for (const name of ['Ruined tower', 'Broken wall', 'Wheelwright Workshop']) assert.ok(waiting.includes(name), `${name} waits for approval`);
+  for (const name of ['Ruined tower', 'Broken wall', 'Iron Mine']) assert.ok(waiting.includes(name), `${name} waits for approval`);
   assert.equal(await page.locator('.library-item .pill.game').count(), 0, 'no In game sprite');
   assert.equal(await page.locator('.library-item .pill.approved').count(), 0, 'no fully approved design');
   await page.locator('.library-item', { hasText: 'Ruined tower' }).click();
@@ -95,22 +95,22 @@ try {
   assert.equal(await page.evaluate(id => Object.values(window.assetStudio.local().assets).map(a => a.variants?.[id]).find(Boolean).status, ruinId), 'rejected');
   await page.locator('#library-review [data-review="all"]').click();
   // Choose for the game: one click approves + ★ and sets the other waiting variants aside, so the design stops waiting.
-  await page.locator('.library-item', { hasText: 'Wheelwright Workshop' }).first().click();
+  await page.locator('.library-item', { hasText: 'Iron Mine' }).first().click();
   const wheelIds = await page.locator('.variant-card').evaluateAll(cards => cards.map(c => c.dataset.variant));
-  assert.ok(wheelIds.length >= 2, 'the wheelwright has alternatives to choose from');
+  assert.ok(wheelIds.length >= 2, 'the iron mine has alternatives to choose from');
   await page.locator(`.variant-card[data-variant="${wheelIds[0]}"]`).getByRole('button', { name: 'Choose for the game' }).click();
   assert.match(await page.locator(`.variant-card[data-variant="${wheelIds[0]}"] .review-saved`).textContent(), /chosen for the game/);
   assert.equal(await page.locator(`.variant-card[data-variant="${wheelIds[0]}"] .pill.chosen`).count(), 1);
-  const wheel = await page.evaluate(() => window.assetStudio.local().assets['wheelwright-yard']);
+  const wheel = await page.evaluate(() => window.assetStudio.local().assets['iron-mine']);
   assert.equal(wheel.preferred, wheelIds[0]); assert.equal(wheel.variants[wheelIds[0]].status, 'approved');
   for (const id of wheelIds.slice(1)) assert.equal(wheel.variants[id].status, 'rejected', `${id} set aside`);
   assert.match(await page.locator(`.variant-card[data-variant="${wheelIds[1]}"] .alt-note`).textContent(), /Not chosen/);
   // Already chosen earlier (approved + ★) with others still waiting: one button sets those aside.
   await page.locator(`.variant-card[data-variant="${wheelIds[1]}"]`).getByRole('button', { name: 'Back to review' }).click();
   await page.locator(`.variant-card[data-variant="${wheelIds[0]}"]`).getByRole('button', { name: 'Set aside the other 1' }).click();
-  assert.equal(await page.evaluate(id => window.assetStudio.local().assets['wheelwright-yard'].variants[id].status, wheelIds[1]), 'rejected');
+  assert.equal(await page.evaluate(id => window.assetStudio.local().assets['iron-mine'].variants[id].status, wheelIds[1]), 'rejected');
   await page.locator('#library-review [data-review="pending"]').click();
-  assert.ok(!(await page.locator('.library-item .name').allTextContents()).includes('Wheelwright Workshop'), 'a chosen design no longer waits');
+  assert.ok(!(await page.locator('.library-item .name').allTextContents()).includes('Iron Mine'), 'a chosen design no longer waits');
   await page.locator('#library-review [data-review="all"]').click();
   pass('review decisions: In game badge only on art the game uses, Request revision needs a comment (Send for rework, hint clears, confirmation) stored with the version, history shows it, Reject, filters Revision requested / In game');
   // Blender pilot: the baked variant shows the committed render, sized and anchored by its sidecar.
@@ -168,7 +168,7 @@ try {
   assert.equal(record.status, 'approved'); assert.match(record.specHash, /^[0-9a-f]{8}$/); assert.equal(record.version, 1); assert.ok(record.approvedAt);
   assert.equal(local.assets.watchtower.preferred, 'watchtower-round');
   assert.match(await page.locator('#review-summary').textContent(), /local changes? not in the repository/);
-  assert.match(await round.locator('.review-line').first().textContent(), /Repository: not reviewed.*Local: Approved/s);
+  assert.match(await round.locator('.review-line').first().textContent(), /Repository: (not reviewed|[A-Z][a-z]+ v1).*Local: Approved/s);
   await page.reload(); await page.waitForFunction(() => window.assetStudio?.ready);
   assert.equal(await page.locator('.variant-card[data-variant="watchtower-round"] .segmented.status [aria-pressed="true"]').textContent(), 'Approve');
   pass('approving stores version, spec hash and time locally, survives reload and stays marked as not committed');

@@ -14,7 +14,7 @@
     {
       "id": "bakery-house-yard-oven",
       "name": "Bakery with yard oven",
-      "version": 1,
+      "version": 2,
       "spec": {
         "body": {
           "kind": "house",
@@ -34,37 +34,67 @@
         },
         "props": [
           {
+            "type": "bakerSign",
+            "at": [
+              0.22,
+              -0.15
+            ],
+            "r": 1.5708,
+            "y": 0.85
+          },
+          {
             "type": "oven",
             "at": [
-              0.45,
-              0.3
+              0.5,
+              -0.42
             ]
           },
           {
             "type": "firewood",
             "at": [
               0.55,
-              -0.6
+              -0.85
+            ]
+          },
+          {
+            "type": "peel",
+            "at": [
+              0.86,
+              -0.18
+            ]
+          },
+          {
+            "type": "breadStall",
+            "at": [
+              -0.3,
+              0.62
+            ]
+          },
+          {
+            "type": "breadBasket",
+            "at": [
+              0.28,
+              0.42
+            ]
+          },
+          {
+            "type": "breadBasket",
+            "at": [
+              0.45,
+              0.62
             ]
           },
           {
             "type": "sacks",
             "at": [
-              -0.6,
-              0.55
+              0.6,
+              0.2
             ],
-            "count": 3
-          },
-          {
-            "type": "workbench",
-            "at": [
-              0.0,
-              0.8
-            ]
+            "count": 4
           }
         ]
       },
-      "notes": "Recommended concept for review."
+      "notes": "Revision 2 (owner: should look more like a bakery): a bread stall with a striped awning and loaves in front, a pretzel sign on the wall, baskets of bread, flour sacks, the domed oven with firewood and a baker's peel."
     },
     {
       "id": "bakery-house-stall",
