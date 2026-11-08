@@ -27,10 +27,13 @@ test('S13 every resident has own needs; Food follows only the existing daily mea
   s.foodSystem.syncResidents();s.foodSystem.residents.get(a.id).hungry=true;a.workState='Working';b.workState='Waiting';
   s.needs.step(day(s)/2);
   const ra=s.needs.records.get(a.id),rb=s.needs.records.get(b.id);
-  assert.equal(ra.food,100-NEEDS.food.declinePerDay/2,'a missed meal lowers Food gradually');assert.equal(rb.food,100);
-  assert.equal(ra.rest,100-NEEDS.rest.drainPerDay/2,'work tires');assert.equal(rb.rest,100,'waiting does not');
+  assert.equal(ra.food,100-NEEDS.food.declinePerDay/2,'a missed meal lowers Food gradually');
+  // #68: a fed resident heads for the Normal-rations target (60 % with no kinds eaten yet) at the same rate, not in a jump.
+  assert.equal(rb.food,100-NEEDS.food.declinePerDay/2);
+  assert.equal(ra.rest,100-NEEDS.rest.drainPerDay/2,'work tires');assert.equal(rb.rest,100,'waiting does not');ra.food=50;
   assert.equal(s.inventory.count('bread'),bread,'needs never consume food themselves');
-  s.foodSystem.residents.get(a.id).hungry=false;s.needs.step(day(s)/4);assert.equal(ra.food,100,'after a real meal Food recovers');
+  const meals=s.foodSystem.residents.get(a.id);meals.hungry=false;meals.meals={apple:s.gameTime.day,bread:s.gameTime.day,meat:s.gameTime.day,fish:s.gameTime.day};
+  s.needs.step(day(s)/4);assert.equal(ra.food,50+NEEDS.food.recoverPerDay/4,'after a real meal Food recovers gradually');
   a.workState='Waiting';s.needs.step(day(s)/4);assert.equal(ra.rest,100-NEEDS.rest.drainPerDay/2-NEEDS.rest.drainPerDay/4+NEEDS.rest.recoverPerDay/4,'half a day of work, a quarter more, then a quarter of rest');
   const st=s.needs.status(a);assert.equal(st.housing,100);assert.equal(st.home.kind,'settlement');assert.ok(st.happiness>0&&st.happiness<=100);
 });

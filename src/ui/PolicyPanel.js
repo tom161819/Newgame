@@ -27,7 +27,7 @@ export class PolicyPanel {
     for(const slider of this.sliders??[])slider.render();
     const residents=p.residents().length,rate=TAX_RATES[p.tax],ration=RATIONS[p.rations];
     this.$('tax-effect').textContent=t('policy.taxEffect',{each:rate.perResident.toFixed(2),total:p.dailyTaxes().toFixed(2),count:residents,happiness:this.signed(rate.happiness)});
-    this.$('rations-effect').textContent=t('policy.rationsEffect',{portions:ration.portions,cap:ration.foodCap,happiness:this.signed(ration.happiness)});
+    this.$('rations-effect').textContent=t('policy.rationsEffect',{portions:ration.portions,base:ration.food});
     // Policy v2 P1: what changes tomorrow, the daily balance, the Happiness forecast and the strike risk.
     const pending=this.$('pending');if(!pending)return;pending.hidden=!p.pending;
     if(p.pending){const changes=[];if(p.pending.tax!==p.tax)changes.push(t('policy.pendingTax',{tax:t(`policy.tax.${p.pending.tax}`)}));if(p.pending.rations!==p.rations)changes.push(t('policy.pendingRations',{rations:t(`policy.rations.${p.pending.rations}`)}));this.$('pending-text').textContent=t('policy.fromTomorrow',{changes:changes.join(', ')});}

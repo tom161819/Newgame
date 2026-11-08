@@ -4,11 +4,14 @@ export const TAX_RATES=Object.freeze({
   none:Object.freeze({perResident:0,happiness:10}),low:Object.freeze({perResident:.25,happiness:5}),normal:Object.freeze({perResident:.5,happiness:0}),
   high:Object.freeze({perResident:1,happiness:-10}),very_high:Object.freeze({perResident:1.5,happiness:-20}),
 });
-// Policy v2 P2: rations work through the Food need. They cap it (Small keeps it at 60); only Generous adds a small
-// "well fed" bonus to Happiness, which moves gradually like the tax effect.
+// Policy v2 P2 / m-pridely-procenta (#68): rations work only through the Food need. `food` is the base of the Food need
+// (Small 30, Normal 60, Generous 80 %); meal variety adds to it (MEAL_VARIETY). Rations add nothing to Happiness directly.
 export const RATIONS=Object.freeze({
-  small:Object.freeze({portions:.5,happiness:0,foodCap:60}),normal:Object.freeze({portions:1,happiness:0,foodCap:100}),generous:Object.freeze({portions:1.5,happiness:5,foodCap:100}),
+  small:Object.freeze({portions:.5,food:30}),normal:Object.freeze({portions:1,food:60}),generous:Object.freeze({portions:1.5,food:80}),
 });
+// Before #68 Generous added +5 to the policy Happiness effect; saves from then may still hold an effect up to +5 above
+// the tax effect (it then moves back to the target like any policy change). Only the save validator uses it.
+export const LEGACY_RATIONS_EFFECT=5;
 export const DEFAULT_POLICY=Object.freeze({tax:'normal',rations:'normal'});
 // Policy v2 P1: a new policy takes effect the next morning, and its Happiness effect moves towards the new value by
 // `effectPerDay` points per game day (smoothly during the day), in both directions.
@@ -16,6 +19,11 @@ export const POLICY_RULES=Object.freeze({effectPerDay:5,tradeAverageDays:3,
   // Policy v2 P2: penalties that depend on the resident's situation; they act at once (not gradually).
   context:Object.freeze({taxedUnpaid:10,promisedFood:10,hungryTaxes:5,hungryTaxRates:Object.freeze(['high','very_high'])}),
 });
-// Policy v2 P3: meal variety (kinds of food a resident ate in the last `days` game days, bread counts extra) and the Feast.
-export const MEAL_VARIETY=Object.freeze({days:3,bonus:Object.freeze([0,0,3,5,7]),bread:2});
+// Policy v2 P3 / #68: meal variety = the kinds of food (EDIBLE_RESOURCES) a resident ate in the last `days` game days;
+// each kind adds `perKind` % to the Food need target, at most `max`. A resident who got no food has a target of 0.
+export const MEAL_VARIETY=Object.freeze({days:3,perKind:5,max:100});
+export function foodNeedTarget(rations,kinds,hungry=false){
+  const base=RATIONS[rations]?.food??RATIONS.normal.food,variety=kinds*MEAL_VARIETY.perKind;
+  return {base,kinds,variety,target:hungry?0:Math.min(MEAL_VARIETY.max,base+variety),hungry:!!hungry};
+}
 export const FEAST=Object.freeze({foodPerResident:1,goldPerResident:1,happiness:15,days:2,cooldownDays:5});

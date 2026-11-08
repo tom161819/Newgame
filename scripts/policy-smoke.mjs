@@ -31,14 +31,14 @@ export async function policySmoke(context,url,instrument){
     await slide(page,'#policy-tax','none');await page.locator('#policy-cancel').click();assert.equal(await page.locator('#policy-pending').isHidden(),true);
     // Very high taxes show the big chest of gold; then back.
     await slide(page,'#policy-tax','very_high');assert.equal(await page.locator('#employment-panel .policy-slider-tax .policy-icon').getAttribute('data-icon'),'tax:very_high');await page.locator('#policy-cancel').click();
-    // Policy v2 P2: Small rations (set in the Granary window) cap the Food need at 60 the next morning; the Castle slider follows.
+    // Policy v2 P2 / #68: Small rations (set in the Granary window) set the Food need base to 30 the next morning; the Castle slider follows.
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,st=s.foodStorage,g=s.objectRegistry.require('granary');let spot=null;const c=s.character.tile;
       for(let r=4;r<25&&!spot;r++)for(let y=c.y-r;y<=c.y+r&&!spot;y++)for(let x=c.x-r;x<=c.x+r&&!spot;x++){const tiles=[];for(let dy=0;dy<g.height;dy++)for(let dx=0;dx<g.width;dx++)tiles.push({x:x+dx,y:y+dy});if(tiles.every(t=>s.map[t.y]?.[t.x]===0&&!s.resourceOccupancy.has(`${t.x},${t.y}`)&&!s.reservedTiles().some(p=>p.x===t.x&&p.y===t.y)))spot={x,y,tiles};}
       const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type:'granary',definition:g,x:spot.x,y:spot.y,tiles:spot.tiles};s.buildings.push(b);for(const t of spot.tiles)s.map[t.y][t.x]=1;s.towerViews.set(b.id,s.createBuildingView(g,b));st.register(b);s.events.emit('buildings:changed');s.employmentPanel.close?.();s.storagePanel.open(b);});
     await page.locator('#granary-rations').waitFor({state:'visible'});await slide(page,'#granary-rations','small');assert.equal(await page.locator('#storage-dialog .policy-slider-rations .policy-icon').getAttribute('data-icon'),'rations:small');
     await page.keyboard.press('Escape');await page.evaluate(()=>window.__game.registry.get('application').scene.employmentPanel.open());assert.equal(await level(page,'#policy-rations'),'small','the same policy in the Castle panel');
-    const cap=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.gameTime.update(s.gameTime.dayDuration-s.gameTime.elapsed+1);const w=s.policy.residents()[0];return s.needs.status(w).foodCap;});
-    assert.equal(cap,60);assert.match(await page.locator('#policy-rations-effect').textContent(),/at most 60/);
+    const cap=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.gameTime.update(s.gameTime.dayDuration-s.gameTime.elapsed+1);const w=s.policy.residents()[0];return s.needs.status(w).foodBase;});
+    assert.equal(cap,30);assert.match(await page.locator('#policy-rations-effect').textContent(),/Food need is 30 %/);
     // Policy v2 P3: the Feast button spends food and Gold and starts +15 Happiness for 2 days.
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('gold',20);s.inventory.add('bread',20);s.policyPanel.render();});
     const before=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;return {bread:s.inventory.count('bread'),gold:s.inventory.count('gold'),n:s.policy.residents().length};});
@@ -46,6 +46,6 @@ export async function policySmoke(context,url,instrument){
     const after=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;return {food:s.foodSystem.availablePortions,bread:s.inventory.count('bread'),gold:s.inventory.count('gold'),bonus:s.policy.feastBonus()};});
     assert.equal(after.bonus,15);assert.equal(before.gold-after.gold,before.n);assert.match(await page.locator('#policy-feast-status').textContent(),/Feast: 2\.0 day/);assert.equal(await page.locator('#policy-feast').isDisabled(),true);
     if(process.env.SMOKE_SHOTS){await slide(page,'#policy-tax','low');await page.waitForTimeout(300);await page.screenshot({path:`${process.env.SMOKE_SHOTS}/policy-v2.png`});}
-    console.log('PASS Kingdom policy (sliders with level icons; the Granary rations slider is the same policy): a new tax rate and rations take effect the next morning (pending line, Cancel), then change taxes and income; the Happiness effect moves gradually; overview of gold, food and Happiness; Small rations cap the Food need at 60; a Feast costs food and Gold and gives +15');
+    console.log('PASS Kingdom policy (sliders with level icons; the Granary rations slider is the same policy): a new tax rate and rations take effect the next morning (pending line, Cancel), then change taxes and income; the Happiness effect moves gradually; overview of gold, food and Happiness; Small rations set the Food need base to 30; a Feast costs food and Gold and gives +15');
   }finally{await page.close();}
 }

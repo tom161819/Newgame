@@ -8,7 +8,8 @@ export const problemLabel=problem=>problem?t(`needs.problem.${problem}`):t('need
 // #58 phase D: each bar's tooltip says what moves the value, so the reason for dissatisfaction is visible.
 const signed=v=>v>0?`+${v}`:String(v).replace('-','−');
 export function needTooltip(id,status){
-  if(id==='food')return t(status.hungry?'needs.tip.foodLow':'needs.tip.food')+(status.foodCap<100?` · ${t('needs.tip.foodCap',{cap:status.foodCap})}`:'');
+  // #68: "Normal rations 60 % + 3 kinds of food 15 % = 75 %"; a resident without food heads for 0.
+  if(id==='food')return status.hungry||status.foodUnfed?t('needs.tip.foodLow'):t('needs.tip.food',{rations:t(`needs.tip.rations.${status.foodRations??'normal'}`),base:status.foodBase,kinds:t('needs.tip.foodKinds',{count:status.foodKinds??0,value:status.foodVariety??0}),target:status.foodTarget});
   if(id==='rest')return t('needs.tip.rest');
   if(id==='housing')return t('needs.tip.housing',{home:homeLabel(status.home)});
   if(id==='safety')return (status.safetyFactors??[]).map(([k,v],i)=>`${t(`needs.safety.${k}`)} ${i?signed(v):v}`).join(' · ');
@@ -33,7 +34,6 @@ export function renderNeeds(root,status){
   if(status.swing)lines.push(element('p','need-swing',t('needs.swingLine',{value:`+${status.swing}`})));
   if(status.well)lines.push(element('p','need-well',t('needs.wellLine',{value:`+${status.well}`})));
   if(status.surroundingsCapped)lines.push(element('p','need-surroundings-cap',t('needs.surroundingsCapLine',{cap:8,value:`−${status.surroundingsCapped}`})));
-  if(status.variety)lines.push(element('p','need-variety',t('needs.varietyLine',{kinds:status.varietyKinds,value:`+${status.variety}`})));
   if(status.feast)lines.push(element('p','need-feast',t('needs.feastLine',{value:`+${status.feast}`,days:status.feastDaysLeft.toFixed(1)})));
   for(const c of status.policyContext??[])lines.push(element('p','need-policy-context',t(`needs.context.${c.id}`,{value:`−${c.value}`})));
   if(status.leaving)lines.push(element('p','need-strike',t('needs.leavingLine')));

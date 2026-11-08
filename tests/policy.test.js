@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { workerScene } from './helpers/workerScene.js';
 import { gameSettings } from '../src/systems/GameSettings.js';
 import { PolicySystem } from '../src/systems/PolicySystem.js';
-import { TAX_RATES,RATIONS } from '../src/data/policy.js';
+import { TAX_RATES,RATIONS,foodNeedTarget } from '../src/data/policy.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
 globalThis.document={querySelector:()=>({textContent:''})};
@@ -23,7 +23,7 @@ test('policy has five tax rates and three rations; Normal is the default and inv
   assert.equal(s.policy.set('tax','very_high'),true);assert.equal(s.policy.set('rations','generous'),true);
   // Policy v2 P1: the choice waits for the morning; the effect then moves towards the new target.
   assert.deepEqual([s.policy.tax,s.policy.rations,s.policy.happiness()],['normal','normal',0]);assert.deepEqual(s.policy.pending,{tax:'very_high',rations:'generous'});
-  assert.equal(s.policy.apply(),true);assert.deepEqual([s.policy.tax,s.policy.rations,s.policy.target(),s.policy.pending],['very_high','generous',-15,null]);
+  assert.equal(s.policy.apply(),true);assert.deepEqual([s.policy.tax,s.policy.rations,s.policy.target(),s.policy.pending],['very_high','generous',-20,null]);
 });
 
 test('taxes are collected once each morning from every permanent resident while the Castle stands', () => {
@@ -43,7 +43,8 @@ test('rations change how often residents eat and their Happiness; taxes move Hap
   const s=world({residents:1}),w=s.workerSystem.liveWorkers()[0],base=s.needs.status(w).happiness;
   const now=(tax,rations='normal')=>{s.policy.set('tax',tax);s.policy.set('rations',rations);s.policy.apply();s.policy.effect=s.policy.target();};
   now('very_high');assert.equal(s.needs.status(w).happiness,Math.max(0,base-20));
-  now('none','generous');assert.equal(s.needs.status(w).happiness,Math.min(100,base+15));
+  // #68: rations no longer add to Happiness directly (Generous raises the Food need instead).
+  now('none','generous');assert.equal(s.needs.status(w).happiness,Math.min(100,base+10));
 });
 
 test('policy is saved and loaded; an unknown rate is rejected', () => {
@@ -51,7 +52,9 @@ test('policy is saved and loaded; an unknown rate is rejected', () => {
   s.policy.set('tax','low');s.gameTime.update(day(s)/2);
   const saved=validateGameState(serializeGameState(s));assert.deepEqual({...saved.policy,effect:undefined},{tax:'high',rations:'small',lastTaxDay:2,pending:{tax:'low',rations:'small'},effect:undefined,feastUntil:null,lastFeastAt:null});
   assert.ok(Math.abs(saved.policy.effect+2.5)<1e-6,'half a day at 5 points a day towards −25');
-  for(const corrupt of [p=>p.pending={tax:'high',rations:'small'},p=>p.pending={tax:'pirate',rations:'small'},p=>p.effect=-40,p=>delete p.effect]){const bad=structuredClone(saved);corrupt(bad.policy);assert.throws(()=>validateGameState(bad));}
+  for(const corrupt of [p=>p.pending={tax:'high',rations:'small'},p=>p.pending={tax:'pirate',rations:'small'},p=>p.effect=-40,p=>p.effect=15.01,p=>delete p.effect]){const bad=structuredClone(saved);corrupt(bad.policy);assert.throws(()=>validateGameState(bad));}
+  // #68: a save from before the change may still hold the removed Generous +5 on top of No taxes (+10).
+  const legacy=structuredClone(saved);legacy.policy.effect=15;assert.doesNotThrow(()=>validateGameState(legacy));
   const bad=structuredClone(saved);bad.policy.tax='robbery';assert.throws(()=>validateGameState(bad));
   const r=workerScene(saved.terrain,{starter:false,gameSettings:gameSettings()});r.policy=new PolicySystem(r);loadGameState(r,saved);assert.deepEqual(r.policy.exportState(),saved.policy);
 });
@@ -78,36 +81,69 @@ test('Policy v2 P1: the balance adds Castle income, taxes and trade, minus wages
   const f=s.policy.food();assert.deepEqual(Object.keys(f),['production','consumption','net','days']);assert.equal(f.net,f.production-f.consumption);
 });
 
-test('Policy v2 P2: rations cap the Food need; Generous adds a small bonus; situation penalties act at once with reasons', () => {
+test('#68: the Food need comes from rations and variety: Small/Normal/Generous 30/60/80, +5 per kind, at most 100, 0 without food', () => {
+  const s=world({residents:1}),w=s.workerSystem.liveWorkers()[0],p=s.policy,f=s.foodSystem,today=()=>s.gameTime.day;
+  const rations=r=>{p.set('rations',r);p.apply();},settle=()=>{for(let i=0;i<30;i++)s.needs.step(s.gameTime.dayDuration/10);},meals=kinds=>{f.syncResidents();const r=f.residents.get(w.id);r.hungry=false;r.meals=Object.fromEntries(kinds.map(k=>[k,today()]));};
+  const target=()=>s.needs.status(w).foodTarget;
+  for(const [r,v] of [['small',30],['normal',60],['generous',80]]){rations(r);meals([]);assert.equal(target(),v,r);assert.equal(p.foodBase(),v);}
+  rations('normal');for(const [kinds,v] of [[['apple'],65],[['apple','bread'],70],[['apple','bread','meat'],75],[['apple','bread','meat','fish'],80]]){meals(kinds);assert.equal(target(),v,`${kinds.length} kinds`);}
+  rations('generous');meals(['apple','bread','meat','fish']);assert.equal(target(),100,'80 + 20');
+  assert.equal(foodNeedTarget('generous',5).target,100,'capped at 100');assert.equal(foodNeedTarget('small',2).target,40);
+  f.residents.get(w.id).hungry=true;assert.equal(target(),0,'no food: 0 %');assert.equal(s.needs.status(w).foodUnfed,true);
+  // The value moves towards the target at the old rates (falls 50, rises 100 a game day), never jumps.
+  rations('normal');meals(['apple']);const r=s.needs.records.get(w.id)??(s.needs.step(1),s.needs.records.get(w.id));r.food=100;
+  s.needs.step(s.gameTime.dayDuration/10);assert.equal(r.food,95,'falls gradually');settle();assert.equal(s.needs.status(w).food,65);
+  rations('generous');meals(['apple','bread','meat','fish']);s.needs.step(s.gameTime.dayDuration/10);assert.equal(r.food,75,'rises gradually');settle();assert.equal(s.needs.status(w).food,100);
+  // Portions per day are unchanged (0.5 / 1 / 1.5), see the rations test above.
+  assert.deepEqual(Object.values(RATIONS).map(x=>x.portions),[.5,1,1.5]);
+});
+
+test('#68: the Food tooltip shows rations + variety = target (en + cs); a resident without food sees the hunger text', async () => {
+  const { needTooltip }=await import('../src/ui/NeedsDisplay.js');const { setLanguage }=await import('../src/i18n/index.js');
+  const st={foodRations:'normal',foodBase:60,foodKinds:3,foodVariety:15,foodTarget:75,hungry:false,foodUnfed:false};
+  assert.equal(needTooltip('food',st),'Normal rations 60 % + 3 kinds of food 15 % = 75 %');
+  assert.equal(needTooltip('food',{...st,foodRations:'small',foodBase:30,foodKinds:1,foodVariety:5,foodTarget:35}),'Small rations 30 % + 1 kind of food 5 % = 35 %');
+  assert.match(needTooltip('food',{...st,foodUnfed:true}),/^Missed meals/);
+  setLanguage('cs',{persist:false});try{
+    assert.equal(needTooltip('food',st),'Běžné příděly 60 % + 3 druhy jídla 15 % = 75 %');
+    assert.equal(needTooltip('food',{...st,foodRations:'generous',foodBase:80,foodKinds:0,foodVariety:0,foodTarget:80}),'Štědré příděly 80 % + 0 druhů jídla 0 % = 80 %');
+  }finally{setLanguage('en',{persist:false});}
+  const s=world({residents:1}),w=s.workerSystem.liveWorkers()[0];s.needs.step(1000);assert.equal(needTooltip('food',s.needs.status(w)),'Normal rations 60 % + 0 kinds of food 0 % = 60 %');
+});
+
+test('Policy v2 P2 / #68: Small rations lower Happiness through the Food need; no ration bonus; situation penalties act at once with reasons', () => {
   const s=world({residents:1}),w=s.workerSystem.liveWorkers()[0],p=s.policy,now=(tax,rations)=>{p.set('tax',tax);p.set('rations',rations);p.apply();p.effect=p.target();};
   s.inventory.add('bread',100);now('normal','small');for(let i=0;i<20;i++)s.needs.step(s.gameTime.dayDuration/10);
-  assert.equal(s.needs.status(w).food,60,'Small rations hold Food at 60');assert.equal(s.needs.status(w).foodCap,60);
-  now('normal','normal');for(let i=0;i<20;i++)s.needs.step(s.gameTime.dayDuration/10);assert.equal(s.needs.status(w).food,100);
-  // Small with High taxes: about the old −15 through the Food weight (0.35 × 40 = 14).
+  assert.equal(s.needs.status(w).food,30,'Small rations hold Food at 30');assert.equal(s.needs.status(w).foodBase,30);
+  now('normal','normal');for(let i=0;i<20;i++)s.needs.step(s.gameTime.dayDuration/10);assert.equal(s.needs.status(w).food,60);
+  // Small vs Normal: 0.35 × 30 = 10.5 Happiness through the Food weight.
   now('normal','small');for(let i=0;i<20;i++)s.needs.step(s.gameTime.dayDuration/10);const small=s.needs.status(w).happiness;now('normal','normal');for(let i=0;i<20;i++)s.needs.step(s.gameTime.dayDuration/10);
-  assert.equal(s.needs.status(w).happiness-small,14);
-  now('normal','generous');assert.equal(p.target(),5);
+  assert.ok(Math.abs(s.needs.status(w).happiness-small-10.5)<=.5);
+  now('normal','generous');assert.equal(p.target(),0,'#68: no Generous +5');assert.equal(p.target({tax:'none',rations:'generous'}),10);
   // 1. Taxed but unpaid.
   s.wageSystem.unpaid=()=>2;assert.deepEqual(p.contextPenalties(w).map(c=>[c.id,c.value]),[['taxedUnpaid',10]]);now('none','normal');assert.deepEqual(p.contextPenalties(w),[]);s.wageSystem.unpaid=()=>0;
-  // 2. Promised generous food that never came: −10 and no well-fed bonus.
-  now('normal','generous');const fed=s.foodSystem.residents;s.foodSystem.residents=new Map([[w.id,{hungry:true}]]);assert.deepEqual(p.contextPenalties(w).map(c=>[c.id,c.value]),[['promisedFood',15]]);
-  const st=s.needs.status(w);assert.ok(st.policyContext.length===1);s.foodSystem.residents=fed;assert.equal(s.needs.status(w).happiness-st.happiness,15);
+  // 2. Promised generous food that never came: −10.
+  now('normal','generous');const fed=s.foodSystem.residents;s.foodSystem.residents=new Map([[w.id,{hungry:true}]]);assert.deepEqual(p.contextPenalties(w).map(c=>[c.id,c.value]),[['promisedFood',10]]);
+  const st=s.needs.status(w);assert.ok(st.policyContext.length===1);s.foodSystem.residents=fed;assert.equal(s.needs.status(w).happiness-st.happiness,10);
   // 3. High taxes while hungry.
   now('high','normal');assert.deepEqual(p.contextPenalties(w,{hungry:true}).map(c=>[c.id,c.value]),[['hungryTaxes',5]]);assert.deepEqual(p.contextPenalties(w,{hungry:false}),[]);
   now('very_high','normal');assert.equal(s.needs.status(w).mainProblem,'policy','the policy is the biggest loss');
   for(const status of [s.needs.status(w)])assert.ok(status.happiness>=0&&status.happiness<=100);
 });
 
-test('Policy v2 P3: residents alternate kinds of food; 2/3/4 kinds give +3/+5/+7 and bread +2; nothing is invented', () => {
+test('Policy v2 P3 / #68: residents alternate kinds of food; variety raises the Food need, not Happiness directly; nothing is invented', () => {
   const s=world({residents:1}),w=s.workerSystem.liveWorkers()[0],f=s.foodSystem;
   for(const id of ['apple','bread','meat','fish'])s.inventory.add(id,5);
   const eaten=[];for(let i=0;i<4;i++){const before=Object.fromEntries(['apple','bread','meat','fish'].map(id=>[id,s.inventory.count(id)]));f.eat(w);eaten.push(Object.keys(before).find(id=>s.inventory.count(id)<before[id]));}
-  assert.deepEqual(eaten,['apple','bread','meat','fish'],'each meal takes the kind eaten longest ago');assert.equal(f.varietyBonus(w.id),7+2);
-  const solo=world({residents:1}),v=solo.workerSystem.liveWorkers()[0];solo.inventory.add('apple',5);solo.foodSystem.eat(v);solo.foodSystem.eat(v);assert.equal(solo.foodSystem.varietyBonus(v.id),0,'one kind: no bonus');
-  solo.inventory.add('meat',1);solo.foodSystem.eat(v);assert.equal(solo.foodSystem.varietyBonus(v.id),3);
+  assert.deepEqual(eaten,['apple','bread','meat','fish'],'each meal takes the kind eaten longest ago');assert.equal(f.recentKinds(w.id).length,4);assert.equal(f.varietyBonus,undefined,'the P3 Happiness bonus is gone');
+  const solo=world({residents:1}),v=solo.workerSystem.liveWorkers()[0];solo.inventory.add('apple',5);solo.foodSystem.eat(v);solo.foodSystem.eat(v);assert.deepEqual(solo.foodSystem.recentKinds(v.id),['apple'],'one kind');
+  solo.inventory.add('meat',1);solo.foodSystem.eat(v);assert.deepEqual(solo.foodSystem.recentKinds(v.id),['apple','meat']);
   // Three days later the old kinds no longer count.
   solo.gameTime.update(solo.gameTime.dayDuration*3);solo.inventory.add('apple',1);solo.foodSystem.eat(v);assert.deepEqual(solo.foodSystem.recentKinds(v.id),['apple']);
-  const base=s.needs.status(w);assert.equal(base.variety,9);assert.equal(base.varietyKinds,4);
+  const base=s.needs.status(w);assert.equal(base.foodKinds,4);assert.equal(base.foodTarget,80);assert.equal(base.variety,undefined);
+  // Happiness = the weighted needs + nothing for variety: the same resident with the same needs but one kind is equally happy.
+  const one=world({residents:1}),u=one.workerSystem.liveWorkers()[0];one.inventory.add('apple',1);one.foodSystem.eat(u);
+  assert.equal(one.needs.status(u).happiness,s.needs.status(w).happiness,'same stored Food need, same Happiness');
 });
 
 test('Policy v2 P3: a Feast costs one food and one Gold per resident, gives +15 for 2 days and can be held again after 5 days', () => {
@@ -115,7 +151,7 @@ test('Policy v2 P3: a Feast costs one food and one Gold per resident, gives +15 
   assert.equal(p.feastStatus().reason,'food');s.inventory.add('bread',n);assert.equal(p.feastStatus().reason,'gold');s.inventory.add('gold',n+2);
   assert.deepEqual(p.feastStatus(),{ok:true,cost:{food:n,gold:n,residents:n}});
   const w=p.residents()[0],before=s.needs.status(w).happiness;assert.equal(p.holdFeast(),true);
-  assert.equal(s.inventory.count('bread'),0);assert.equal(s.inventory.count('gold'),2);assert.equal(p.feastBonus(),15);assert.equal(s.needs.status(w).happiness,Math.min(100,before+15+(s.needs.status(w).variety-0)));
+  assert.equal(s.inventory.count('bread'),0);assert.equal(s.inventory.count('gold'),2);assert.equal(p.feastBonus(),15);assert.equal(s.needs.status(w).happiness,Math.min(100,before+15));
   assert.equal(p.feastStatus().reason,'cooldown');assert.equal(p.feastStatus().days,5);
   const saved=validateGameState(serializeGameState(s));assert.equal(saved.policy.feastUntil-saved.policy.lastFeastAt,2*day);
   for(const corrupt of [q=>q.feastUntil=null,q=>q.feastUntil+=1,q=>q.lastFeastAt=-5]){const bad=structuredClone(saved);corrupt(bad.policy);assert.throws(()=>validateGameState(bad));}

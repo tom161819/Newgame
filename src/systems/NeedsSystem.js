@@ -1,6 +1,7 @@
 import { TORCHES } from '../data/torches.js';
 import { CATS ,HOUSE_RATS} from '../data/domesticAnimals.js';
 import { NEEDS,DAILY_REST,DISCONTENT,clampNeed,moodFor,happinessOf,mainProblem,attractivenessFor } from '../data/needs.js';
+import { foodNeedTarget } from '../data/policy.js';
 import { POPULATION } from '../data/jobs.js';
 import { buildingIsComplete } from '../game/buildings.js';
 
@@ -20,10 +21,9 @@ export class NeedsSystem {
   step(ms){
     const day=this.scene.gameTime?.dayDuration??120000,fraction=ms/day,now=this.scene.gameTime?.totalElapsed??0,live=new Set(),homes=this.homes();
     for(const worker of this.residents()){
-      live.add(worker.id);const r=this.record(worker),hungry=!!this.scene.foodSystem?.residents?.get(worker.id)?.hungry;
-      // Policy v2 P2: rations cap the Food need; above the cap it falls back to it like a hungry resident's.
-      const cap=this.scene.policy?.foodCap?.()??100;
-      r.food=hungry?clampNeed(r.food-NEEDS.food.declinePerDay*fraction):r.food>cap?Math.max(cap,r.food-NEEDS.food.declinePerDay*fraction):Math.min(cap,r.food+NEEDS.food.recoverPerDay*fraction);
+      live.add(worker.id);const r=this.record(worker),target=this.foodDetail(worker).target;
+      // #68: the Food need moves towards its target (rations + variety, 0 when hungry) at the usual rates, never jumps.
+      r.food=r.food>target?Math.max(target,r.food-NEEDS.food.declinePerDay*fraction):Math.min(target,r.food+NEEDS.food.recoverPerDay*fraction);
       // Phase B: resting at home recovers fastest, in the settlement's base places a little slower, without a home slowly.
       const rate=worker.workState==='Resting'?DAILY_REST.recoverPerDay[homes.get(worker.id)?.kind??'homeless']:NEEDS.activeStates.includes(worker.workState)?-NEEDS.rest.drainPerDay:NEEDS.rest.recoverPerDay;
       r.rest=clampNeed(r.rest+rate*fraction);
@@ -81,6 +81,9 @@ export class NeedsSystem {
     if(record?.attackedAt!=null){const day=this.scene.gameTime?.dayDuration??120000,age=(this.scene.gameTime?.totalElapsed??0)-record.attackedAt,left=1-age/(s.attack.days*day);if(left>0)factors.push(['attack',-Math.round(s.attack.penalty*left)]);}
     return {value:Math.round(clampNeed(factors.reduce((n,[,v])=>n+v,0))),factors};
   }
+  // #68: the Food need target of one resident: rations base + 5 % per kind of food eaten in the last 3 days (max 100),
+  // 0 for a resident who got no food. Without a policy system the rations are Normal.
+  foodDetail(worker){const f=this.scene.foodSystem;return foodNeedTarget(this.scene.policy?.rations??'normal',f?.recentKinds?.(worker.id)?.length??0,!!f?.residents?.get(worker.id)?.hungry);}
   safety(worker,record){return this.safetyDetail(worker,record).value;}
   unpaidPenalty(worker){const gold=this.scene.wageSystem?.unpaid?.(worker)??0;return Math.min(NEEDS.unpaid.max,Math.round(gold*NEEDS.unpaid.perGold));}
   // Everything shown for one resident, derived from the stored state (never from the frame rate).
@@ -91,15 +94,15 @@ export class NeedsSystem {
     // #103: taxes and rations move Happiness (bonus or penalty), kept apart from the unpaid-wage penalty.
     // Policy v2 P2: situation penalties (unpaid but taxed, promised food missing, taxed while hungry) act at once.
     const penalty=this.unpaidPenalty(worker),policy=this.scene.policy?.happiness?.()??0,context=this.scene.policy?.contextPenalties?.(worker,{hungry:needs.food<NEEDS.food.low})??[],contextTotal=context.reduce((n,c)=>n+c.value,0);
-    // Policy v2 P3: meal variety and a running Feast add to Happiness at once.
-    const variety=this.scene.foodSystem?.varietyBonus?.(worker.id)??0,kinds=this.scene.foodSystem?.recentKinds?.(worker.id)?.length??0,feast=this.scene.policy?.feastBonus?.()??0;
+    // Policy v2 P3: a running Feast adds to Happiness at once (#68: meal variety acts through the Food need).
+    const feast=this.scene.policy?.feastBonus?.()??0,food=this.foodDetail(worker);
     // Domestic animals Z1: a cat living in the resident's house.
     const house=home?.kind==='house'?this.scene.buildings?.find(b=>b.id===home.buildingId):null,cat=(this.scene.domestic?.catAtHome?.(house)?CATS.homeHappiness:0)+(this.scene.domestic?.houseHasRats?.(house)?HOUSE_RATS.happiness:0);
     // Children D1: a Village Green within reach of the house (+4) and, for a family house, a place for the children (+2).
     // Children D2: a Swing Tree (+1) and a Well (+1) nearby; all of it together is capped at +8 (`surroundingsCapped`).
     const around=this.scene.childrenSystem?.surroundings?.(house,homes)??{green:0,family:0,swing:0,well:0,total:0,capped:0},green=around.green,greenFamily=around.family,swing=around.swing,well=around.well;
-    const happiness=happinessOf(needs,penalty-policy+contextTotal-variety-feast-cat-around.total),mood=moodFor(happiness),foodCap=this.scene.policy?.foodCap?.()??100;
-    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,policyTarget:this.scene.policy?.target?.()??0,policyContext:context,foodCap,variety,varietyKinds:kinds,feast,cat,green,greenFamily,swing,well,surroundingsCapped:around.capped,feastDaysLeft:this.scene.policy?.feastDaysLeft?.()??0,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty,Math.max(0,-policy)+contextTotal),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
+    const happiness=happinessOf(needs,penalty-policy+contextTotal-feast-cat-around.total),mood=moodFor(happiness);
+    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,policyTarget:this.scene.policy?.target?.()??0,policyContext:context,foodRations:this.scene.policy?.rations??'normal',foodBase:food.base,foodKinds:food.kinds,foodVariety:food.variety,foodTarget:food.target,foodUnfed:food.hungry,feast,cat,green,greenFamily,swing,well,surroundingsCapped:around.capped,feastDaysLeft:this.scene.policy?.feastDaysLeft?.()??0,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty,Math.max(0,-policy)+contextTotal),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
   }
   summary(){
     const homes=this.homes(),list=this.residents().map(w=>this.status(w,homes));
