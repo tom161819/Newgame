@@ -292,26 +292,29 @@ function bearSkin(spec, plan, { breed, coat, mark, P, rot, attack }) {
   const H = plan.back, L = plan.len, cub = breed === 'cub', verts = [], edges = [], parts = [];
   const j = (f, y, r, sd = 0) => { verts.push([f, y, sd, r]); return verts.length - 1; }, b = (a, c) => edges.push([a, c]);
   const ell = (f, y, sd, radii, material) => sphere(radii, P(f, y - radii[1], sd), material, 1, { rotation: rot });
-  const tail = j(-0.5 * L, 0.66 * H, 0.08 * H), rump = j(-0.36 * L, 0.68 * H, 0.3 * H), belly = j(-0.08 * L, 0.6 * H, 0.36 * H), hump = j(0.16 * L, 0.86 * H, 0.32 * H), chest = j(0.3 * L, 0.6 * H, 0.28 * H);
+  // Heavy build (review 8 Nov): broad rump and shoulder hump, a natural belly hanging below the trunk.
+  const tail = j(-0.5 * L, 0.66 * H, 0.08 * H), rump = j(-0.36 * L, 0.68 * H, 0.32 * H), belly = j(-0.08 * L, 0.6 * H, 0.42 * H), hump = j(0.16 * L, 0.9 * H, 0.38 * H), chest = j(0.3 * L, 0.6 * H, 0.33 * H);
   [[tail, rump], [rump, belly], [belly, hump], [hump, chest]].forEach(([a, c]) => b(a, c));
+  if (!cub) parts.push(ell(-0.04 * L, 0.58 * H, 0, [0.3 * L, 0.24 * H, 0.3 * H], coat)); // belly hanging below the trunk
   for (const sd of [-1, 1]) {
-    const w = 0.3 * H * sd, lunge = attack ? 0.1 * L : 0;
-    const fs = j(0.32 * L, 0.4 * H, 0.17 * H, w), fe = j(0.32 * L + lunge * 0.5, 0.26 * H, 0.14 * H, w), fw = j(0.34 * L + lunge, 0.08 * H, 0.12 * H, w);
+    const w = 0.34 * H * sd, lunge = attack ? 0.1 * L : 0;
+    const fs = j(0.32 * L, 0.4 * H, 0.21 * H, w), fe = j(0.32 * L + lunge * 0.5, 0.26 * H, 0.17 * H, w), fw = j(0.34 * L + lunge, 0.08 * H, 0.14 * H, w);
     b(chest, fs); b(fs, fe); b(fe, fw);
-    const hs = j(-0.34 * L, 0.42 * H, 0.18 * H, w), hk = j(-0.36 * L, 0.24 * H, 0.13 * H, w), hw = j(-0.32 * L, 0.08 * H, 0.12 * H, w);
+    const hs = j(-0.34 * L, 0.42 * H, 0.22 * H, w), hk = j(-0.36 * L, 0.24 * H, 0.16 * H, w), hw = j(-0.32 * L, 0.08 * H, 0.14 * H, w);
     b(rump, hs); b(hs, hk); b(hk, hw);
     for (const f of [0.36 * L + lunge, -0.3 * L]) {
       parts.push(ell(f, 0.06 * H, w, [0.11 * H, 0.06 * H, 0.1 * H], mark));
-      for (const k of [-1, 0, 1]) parts.push(cylinder({ radiusBottom: 0.008 * H, radiusTop: 0.002, height: 0.05 * H, segments: 4, tilt: [k * 0.2, -1.2] }, P(f + 0.08 * H, 0.03 * H, w + k * 0.035 * H), 'bone'));
+      for (const k of [-1, 0, 1]) parts.push(cylinder({ radiusBottom: 0.011 * H, radiusTop: 0.002, height: 0.07 * H, segments: 4, tilt: [k * 0.2, -1.2] }, P(f + 0.08 * H, 0.03 * H, w + k * 0.035 * H), 'bone'));
     }
   }
-  const headUp = attack ? 0.62 : 0.66, n1 = j(0.46 * L, (headUp + 0.02) * H, 0.2 * H), skull = j(0.6 * L, headUp * H - 0.02 * H, 0.16 * H), snout = j(0.74 * L, (headUp - 0.1) * H, 0.08 * H);
+  const headUp = attack ? 0.58 : 0.6, n1 = j(0.46 * L, (headUp + 0.02) * H, 0.2 * H), skull = j(0.6 * L, headUp * H - 0.02 * H, 0.16 * H), snout = j(0.74 * L, (headUp - 0.1) * H, 0.08 * H);
   b(chest, n1); b(n1, skull); b(skull, snout);
   parts.push(ell(0.78 * L, (headUp - 0.06) * H, 0, [0.05 * H, 0.04 * H, 0.05 * H], 'soot')); // nose
   parts.push(ell(0.72 * L, (headUp - 0.1) * H, 0, [0.08 * H, 0.06 * H, 0.08 * H], plan.muzzle ?? 'hair_brown'));
   for (const sd of [-1, 1]) {
     parts.push(ell(0.56 * L, (headUp + 0.16) * H, sd * 0.11 * H, [0.045 * H, 0.05 * H, 0.03 * H], coat), ell(0.66 * L, (headUp + 0.05) * H, sd * 0.08 * H, [0.018 * H, 0.016 * H, 0.012 * H], 'soot'));
   }
+  if (!attack && !cub) parts.push(ell(0.73 * L, (headUp - 0.15) * H, 0, [0.05 * H, 0.018 * H, 0.04 * H], 'cloth_red'), ...[-1, 1].map(sd => ell(0.75 * L, (headUp - 0.135) * H, sd * 0.028 * H, [0.007 * H, 0.013 * H, 0.007 * H], 'bone')));
   if (attack) parts.push(ell(0.74 * L, (headUp - 0.16) * H, 0, [0.06 * H, 0.025 * H, 0.05 * H], 'cloth_red'), ...[-1, 1].map(sd => ell(0.75 * L, (headUp - 0.14) * H, sd * 0.03 * H, [0.008 * H, 0.016 * H, 0.008 * H], 'bone')));
   if (breed === 'grizzled') parts.push(ell(0.16 * L, 0.98 * H, 0, [0.28 * L, 0.06 * H, 0.26 * H], 'hair_blond'));
   return { parts, skeleton: { verts: verts.map(([f, y, sd, r]) => [...P(f, y, sd), r]), edges, material: coat, sock: mark, sockFrom: 0.1 * H } };

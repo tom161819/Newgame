@@ -31,7 +31,7 @@ test('building concepts tell their trade with props and stay concepts', () => {
   for (const asset of workshops) {
     assert.deepEqual(validateAssetSpec(asset, { generators: GENERATORS, style }), [], asset.id);
     if (asset.gameObjectId) assert.ok(gameIds.has(asset.gameObjectId), `${asset.id} names a real game building`);
-    assert.ok(asset.variants.length >= 2, `${asset.id} offers alternatives`);
+    assert.ok(asset.variants.length >= 1, `${asset.id} keeps at least its chosen look (rejected alternatives are deleted)`);
     for (const variant of asset.variants) {
       const types = new Set(variant.spec.props.map(p => p.type));
       assert.ok(types.size >= 3, `${variant.id}: at least three kinds of props`);

@@ -53,49 +53,6 @@
         ]
       },
       "notes": "Recommended concept for review."
-    },
-    {
-      "id": "windmill-post",
-      "name": "Wooden post mill",
-      "version": 1,
-      "spec": {
-        "body": {
-          "kind": "windmill",
-          "walls": "wood",
-          "radius": 0.45,
-          "height": 1.5,
-          "sail": 0.8,
-          "roofMaterial": "roof_shingle",
-          "at": [
-            -0.18,
-            -0.18
-          ]
-        },
-        "props": [
-          {
-            "type": "sacks",
-            "at": [
-              0.5,
-              -0.55
-            ],
-            "count": 5
-          },
-          {
-            "type": "wheel",
-            "at": [
-              -0.65,
-              0.65
-            ]
-          },
-          {
-            "type": "barrel",
-            "at": [
-              0.65,
-              0.65
-            ]
-          }
-        ]
-      }
     }
   ]
 }

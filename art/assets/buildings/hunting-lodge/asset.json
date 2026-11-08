@@ -65,61 +65,6 @@
         ]
       },
       "notes": "Recommended concept for review."
-    },
-    {
-      "id": "hunting-lodge-thatch",
-      "name": "Thatched lodge with drying racks",
-      "version": 1,
-      "spec": {
-        "body": {
-          "kind": "house",
-          "walls": "timber",
-          "roofMaterial": "thatch",
-          "width": 1.0,
-          "depth": 0.95,
-          "wallHeight": 0.85,
-          "roofHeight": 0.8,
-          "ridge": "z",
-          "windows": 1,
-          "at": [
-            -0.3,
-            -0.3
-          ]
-        },
-        "props": [
-          {
-            "type": "hideRack",
-            "at": [
-              0.55,
-              0.25
-            ]
-          },
-          {
-            "type": "hideRack",
-            "at": [
-              0.55,
-              0.7
-            ]
-          },
-          {
-            "type": "antlers",
-            "at": [
-              -0.48,
-              0.21
-            ],
-            "y": 0.82
-          },
-          {
-            "type": "logs",
-            "at": [
-              -0.75,
-              0.55
-            ],
-            "count": 3,
-            "length": 0.4
-          }
-        ]
-      }
     }
   ]
 }

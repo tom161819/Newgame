@@ -12,206 +12,6 @@
   "plannedGameObjectId": "builder_workshop",
   "variants": [
     {
-      "id": "builders-workshop-open-shed",
-      "name": "Open lean-to shed (3 × 3)",
-      "version": 2,
-      "notes": "A long open shed across the back (roof on posts, low plank back wall): two benches, a sawhorse and the tool rack stay visible under it. The yard in front holds logs, planks, beams, stone and a mortar tub.",
-      "spec": {
-        "body": {
-          "kind": "shed",
-          "width": 2.5,
-          "depth": 1.15,
-          "frontHeight": 0.95,
-          "backHeight": 0.55,
-          "lantern": true,
-          "at": [
-            -0.1,
-            -0.76
-          ]
-        },
-        "props": [
-          {
-            "type": "workbench",
-            "at": [
-              -0.75,
-              -0.8
-            ]
-          },
-          {
-            "type": "workbench",
-            "at": [
-              0.05,
-              -0.75
-            ],
-            "r": 0.3
-          },
-          {
-            "type": "sawhorse",
-            "at": [
-              0.75,
-              -0.8
-            ]
-          },
-          {
-            "type": "toolRack",
-            "at": [
-              -1.05,
-              -1.22
-            ]
-          },
-          {
-            "type": "logs",
-            "at": [
-              0.45,
-              0.45
-            ],
-            "count": 6,
-            "length": 0.75
-          },
-          {
-            "type": "planks",
-            "at": [
-              -0.75,
-              0.35
-            ],
-            "count": 6,
-            "length": 0.8
-          },
-          {
-            "type": "beams",
-            "at": [
-              -0.4,
-              1
-            ],
-            "count": 4,
-            "length": 0.85
-          },
-          {
-            "type": "stoneStack",
-            "at": [
-              0.95,
-              1.05
-            ]
-          },
-          {
-            "type": "mortarTub",
-            "at": [
-              0.2,
-              -0.05
-            ]
-          },
-          {
-            "type": "crates",
-            "at": [
-              -1.2,
-              0.85
-            ],
-            "count": 2
-          }
-        ]
-      }
-    },
-    {
-      "id": "builders-workshop-house-awning",
-      "name": "Workshop house with awning (3 × 3)",
-      "version": 2,
-      "notes": "A small timber workshop house at the back left with a broad work awning beside it (bench, sawhorse, ladder against the awning post). Material yard in front with logs, beams, a stone stack and a handcart.",
-      "spec": {
-        "body": {
-          "kind": "house",
-          "walls": "timber",
-          "width": 1.4,
-          "depth": 1.1,
-          "wallHeight": 0.95,
-          "roofHeight": 0.65,
-          "ridge": "x",
-          "windows": 1,
-          "chimney": false,
-          "lantern": true,
-          "at": [
-            -0.6,
-            -0.62
-          ]
-        },
-        "props": [
-          {
-            "type": "awning",
-            "at": [
-              0.72,
-              -0.72
-            ],
-            "width": 1.1,
-            "depth": 0.85,
-            "height": 0.78
-          },
-          {
-            "type": "workbench",
-            "at": [
-              0.55,
-              -0.85
-            ]
-          },
-          {
-            "type": "sawhorse",
-            "at": [
-              0.75,
-              -0.35
-            ],
-            "r": 1.57
-          },
-          {
-            "type": "logs",
-            "at": [
-              -0.95,
-              0.55
-            ],
-            "count": 6,
-            "length": 0.7
-          },
-          {
-            "type": "beams",
-            "at": [
-              0.2,
-              0.45
-            ],
-            "count": 4,
-            "length": 0.75,
-            "r": 1.57
-          },
-          {
-            "type": "stoneStack",
-            "at": [
-              1,
-              0.95
-            ]
-          },
-          {
-            "type": "planks",
-            "at": [
-              -0.2,
-              1.05
-            ],
-            "count": 5,
-            "length": 0.75
-          },
-          {
-            "type": "cart",
-            "at": [
-              0.85,
-              0.25
-            ]
-          },
-          {
-            "type": "toolRack",
-            "at": [
-              1.2,
-              -1.15
-            ]
-          }
-        ]
-      }
-    },
-    {
       "id": "builders-workshop-material-yard",
       "name": "Material yard with shed (3 × 3)",
       "version": 4,
@@ -220,7 +20,7 @@
         "body": {
           "kind": "shed",
           "width": 1.6,
-          "depth": 1.0,
+          "depth": 1,
           "frontHeight": 0.95,
           "backHeight": 0.55,
           "sideWall": "both",
@@ -301,21 +101,21 @@
             "type": "stoneStack",
             "at": [
               0.95,
-              1.0
+              1
             ]
           },
           {
             "type": "mortarTub",
             "at": [
               0.05,
-              1.0
+              1
             ]
           },
           {
             "type": "sawhorse",
             "at": [
               -0.5,
-              1.0
+              1
             ]
           },
           {
@@ -360,112 +160,6 @@
             ]
           }
         ]
-      }
-    },
-    {
-      "id": "builders-workshop-blender",
-      "name": "Workshop house with awning (Blender)",
-      "version": 1,
-      "notes": "Blender render of the 3 × 3 workshop house with awning, so the Blender look can be judged on a building (#119 waited for the Blender pilot).",
-      "spec": {
-        "body": {
-          "kind": "house",
-          "walls": "timber",
-          "width": 1.4,
-          "depth": 1.1,
-          "wallHeight": 0.95,
-          "roofHeight": 0.65,
-          "ridge": "x",
-          "windows": 1,
-          "chimney": false,
-          "lantern": true,
-          "at": [
-            -0.6,
-            -0.62
-          ]
-        },
-        "props": [
-          {
-            "type": "awning",
-            "at": [
-              0.72,
-              -0.72
-            ],
-            "width": 1.1,
-            "depth": 0.85,
-            "height": 0.78
-          },
-          {
-            "type": "workbench",
-            "at": [
-              0.55,
-              -0.85
-            ]
-          },
-          {
-            "type": "sawhorse",
-            "at": [
-              0.75,
-              -0.35
-            ],
-            "r": 1.57
-          },
-          {
-            "type": "logs",
-            "at": [
-              -0.95,
-              0.55
-            ],
-            "count": 6,
-            "length": 0.7
-          },
-          {
-            "type": "beams",
-            "at": [
-              0.2,
-              0.45
-            ],
-            "count": 4,
-            "length": 0.75,
-            "r": 1.57
-          },
-          {
-            "type": "stoneStack",
-            "at": [
-              1,
-              0.95
-            ]
-          },
-          {
-            "type": "planks",
-            "at": [
-              -0.2,
-              1.05
-            ],
-            "count": 5,
-            "length": 0.75
-          },
-          {
-            "type": "cart",
-            "at": [
-              0.85,
-              0.25
-            ]
-          },
-          {
-            "type": "toolRack",
-            "at": [
-              1.2,
-              -1.15
-            ]
-          }
-        ]
-      },
-      "baked": {
-        "renderer": "blender",
-        "twin": "builders-workshop-house-awning",
-        "renderHash": "8ed7ff8b",
-        "samples": 96
       }
     }
   ]

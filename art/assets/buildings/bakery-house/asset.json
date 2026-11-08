@@ -22,7 +22,7 @@
           "roofMaterial": "roof_tile",
           "width": 1.6,
           "depth": 1.05,
-          "wallHeight": 1.0,
+          "wallHeight": 1,
           "roofHeight": 0.75,
           "ridge": "x",
           "windows": 2,
@@ -97,72 +97,6 @@
         ]
       },
       "notes": "Revision 3 (owner: the stall is nice but not in front of the door; a bigger building, e.g. 3x2; the bread oven should be visible): the bakery is 3x2 with a longer house; the domed bread oven stands in its own open, tiled shed beside the house with a glowing mouth and a flue; the bread stall moved to the yard corner, clear of the door; the pretzel sign, baskets, flour sacks, firewood and the peel stay. The game's bakery is 2x2 today: using this needs the footprint changed to 3x2."
-    },
-    {
-      "id": "bakery-house-stall",
-      "name": "Stone bakery with bread stall",
-      "version": 1,
-      "spec": {
-        "body": {
-          "kind": "house",
-          "walls": "stone",
-          "roofMaterial": "roof_shingle",
-          "width": 1.0,
-          "depth": 1.0,
-          "wallHeight": 0.95,
-          "roofHeight": 0.75,
-          "ridge": "x",
-          "windows": 1,
-          "chimney": true,
-          "lantern": true,
-          "at": [
-            -0.3,
-            -0.3
-          ]
-        },
-        "props": [
-          {
-            "type": "awning",
-            "at": [
-              0.5,
-              0.45
-            ],
-            "width": 0.6,
-            "depth": 0.4,
-            "height": 0.55
-          },
-          {
-            "type": "crates",
-            "at": [
-              0.38,
-              0.4
-            ],
-            "count": 2
-          },
-          {
-            "type": "firewood",
-            "at": [
-              0.55,
-              -0.6
-            ]
-          },
-          {
-            "type": "sacks",
-            "at": [
-              -0.62,
-              0.6
-            ],
-            "count": 2
-          },
-          {
-            "type": "barrel",
-            "at": [
-              -0.1,
-              0.8
-            ]
-          }
-        ]
-      }
     }
   ]
 }

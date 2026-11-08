@@ -40,34 +40,6 @@
       }
     },
     {
-      "id": "merchant-caravan-unloading",
-      "name": "Unloading",
-      "version": 3,
-      "notes": "Cover rolled forward, tailgate down, crates and a sack on the ground behind.",
-      "spec": {
-        "body": {
-          "kind": "none"
-        },
-        "props": [
-          {
-            "type": "wagon",
-            "at": [
-              0.35,
-              0
-            ],
-            "load": "unloading",
-            "cover": "cloth_red"
-          }
-        ]
-      },
-      "baked": {
-        "renderer": "blender",
-        "look": "sculpt",
-        "renderHash": "2478e562",
-        "samples": 96
-      }
-    },
-    {
       "id": "merchant-caravan-empty",
       "name": "Empty wagon",
       "version": 3,

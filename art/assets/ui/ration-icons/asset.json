@@ -19,16 +19,6 @@
         "set": "ration",
         "look": "bowls"
       }
-    },
-    {
-      "id": "ration-icons-basket",
-      "name": "Bread crust, bowl and basket",
-      "version": 1,
-      "notes": "Crust of bread on a cloth · heaped bowl and bread · basket with bread, meat, fish and apples.",
-      "spec": {
-        "set": "ration",
-        "look": "basket"
-      }
     }
   ]
 }

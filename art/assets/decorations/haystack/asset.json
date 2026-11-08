@@ -12,27 +12,6 @@
   "gameObjectId": "haystack",
   "variants": [
     {
-      "id": "haystack-dome",
-      "name": "Dome haystack",
-      "version": 1,
-      "notes": "A round haystack around a pole with a rake.",
-      "spec": {
-        "body": {
-          "kind": "none"
-        },
-        "props": [
-          {
-            "type": "haystack",
-            "at": [
-              0,
-              0
-            ],
-            "size": 1.1
-          }
-        ]
-      }
-    },
-    {
       "id": "haystack-cocks",
       "name": "Haycocks",
       "version": 1,
@@ -65,28 +44,6 @@
               0.25
             ],
             "size": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "id": "haystack-snow",
-      "name": "Winter",
-      "version": 1,
-      "notes": "The dome haystack under snow.",
-      "spec": {
-        "body": {
-          "kind": "none"
-        },
-        "props": [
-          {
-            "type": "haystack",
-            "at": [
-              0,
-              0
-            ],
-            "size": 1.1,
-            "snow": true
           }
         ]
       }

@@ -11,26 +11,6 @@
   "generator": "workshop",
   "variants": [
     {
-      "id": "equipment-bow-plain",
-      "name": "Yew bow on a stand",
-      "version": 1,
-      "spec": {
-        "body": {
-          "kind": "none"
-        },
-        "props": [
-          {
-            "type": "bowRack",
-            "at": [
-              0,
-              0
-            ],
-            "count": 1
-          }
-        ]
-      }
-    },
-    {
       "id": "equipment-bow-quiver",
       "name": "Bow with quiver",
       "version": 1,

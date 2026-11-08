@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "assetId": "bear",
-  "variantId": "bear-grizzled",
-  "name": "Grizzled bear",
+  "variantId": "bear-brown-sculpt",
+  "name": "Brown bear – A · Sculpted (smooth, realistic)",
   "category": "units",
-  "version": 1,
-  "specHash": "17eaa90a",
-  "generator": "animal",
+  "version": 3,
+  "specHash": "e91970fc",
+  "generator": "blender",
   "generatorVersion": 1,
   "styleGuide": "medieval-kingdom-painted-isometric@1",
   "scale": 1,
@@ -36,6 +36,23 @@
   "platform": null,
   "frontLayer": false,
   "gameLights": [],
-  "modelHeight": 0.884,
-  "lights": []
+  "modelHeight": 0.715,
+  "lights": [],
+  "x2": {
+    "width": 259,
+    "height": 131,
+    "anchor": {
+      "x": 129,
+      "y": 65
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 96,
+    "supersampling": 4,
+    "seconds": 59.9,
+    "renderHash": "9de1cda1",
+    "script": "scripts/blender/render.py"
+  }
 }

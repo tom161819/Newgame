@@ -12,61 +12,10 @@
   "plannedGameObjectId": "bear",
   "variants": [
     {
-      "id": "bear-brown",
-      "name": "Brown bear",
-      "version": 2,
-      "spec": {
-        "species": "bear",
-        "breed": "brown",
-        "facing": 1
-      }
-    },
-    {
-      "id": "bear-dark",
-      "name": "Dark bear",
-      "version": 1,
-      "spec": {
-        "species": "bear",
-        "breed": "dark",
-        "facing": 1
-      }
-    },
-    {
-      "id": "bear-grizzled",
-      "name": "Grizzled bear",
-      "version": 1,
-      "spec": {
-        "species": "bear",
-        "breed": "grizzled",
-        "facing": 1
-      }
-    },
-    {
-      "id": "bear-cub",
-      "name": "Bear cub",
-      "version": 1,
-      "spec": {
-        "species": "bear",
-        "breed": "cub",
-        "facing": 1
-      }
-    },
-    {
-      "id": "bear-brown-attack",
-      "name": "Bear attacking",
-      "version": 2,
-      "spec": {
-        "species": "bear",
-        "breed": "brown",
-        "pose": "attack",
-        "facing": 1
-      }
-    },
-    {
       "id": "bear-brown-sculpt",
       "name": "Brown bear – A · Sculpted (smooth, realistic)",
-      "version": 2,
-      "notes": "Rendered with Blender (Cycles) at 4× and downsampled to game size; same footprint 2×2.",
+      "version": 3,
+      "notes": "Heavier build with a natural belly, lowered head and bared teeth (review 8 Nov). Rendered with Blender (Cycles) at 4×.",
       "spec": {
         "species": "bear",
         "breed": "brown",
@@ -76,43 +25,7 @@
       "baked": {
         "renderer": "blender",
         "look": "sculpt",
-        "renderHash": "22370e6a",
-        "samples": 96
-      }
-    },
-    {
-      "id": "bear-brown-fur",
-      "name": "Brown bear – B · Rendered coat (hair)",
-      "version": 2,
-      "notes": "Rendered with Blender (Cycles) at 4× and downsampled to game size; same footprint 2×2.",
-      "spec": {
-        "species": "bear",
-        "breed": "brown",
-        "facing": 1,
-        "skin": true
-      },
-      "baked": {
-        "renderer": "blender",
-        "look": "fur",
-        "renderHash": "c82cc4fe",
-        "samples": 40
-      }
-    },
-    {
-      "id": "bear-brown-painted",
-      "name": "Brown bear – C · Hand-painted finish",
-      "version": 2,
-      "notes": "Rendered with Blender (Cycles) at 4× and downsampled to game size; same footprint 2×2.",
-      "spec": {
-        "species": "bear",
-        "breed": "brown",
-        "facing": 1,
-        "skin": true
-      },
-      "baked": {
-        "renderer": "blender",
-        "look": "painted",
-        "renderHash": "308f40c1",
+        "renderHash": "9de1cda1",
         "samples": 96
       }
     }

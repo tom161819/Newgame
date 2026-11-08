@@ -58,42 +58,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "house-stone",
-      "name": "Stone house with tile roof",
-      "version": 1,
-      "notes": "Wealthier look: dressed stone, clay tiles, chimney.",
-      "spec": {
-        "walls": "stone",
-        "width": 1.55,
-        "depth": 1.35,
-        "wallHeight": 1.2,
-        "ridge": "x",
-        "roofHeight": 0.8,
-        "roofMaterial": "roof_tile",
-        "windows": 2,
-        "chimney": true,
-        "lantern": false
-      }
-    },
-    {
-      "id": "house-wood",
-      "name": "Plank cottage",
-      "version": 1,
-      "notes": "Cheapest look: plank walls and wooden shingles.",
-      "spec": {
-        "walls": "wood",
-        "width": 1.35,
-        "depth": 1.2,
-        "wallHeight": 1.0,
-        "ridge": "z",
-        "roofHeight": 0.7,
-        "roofMaterial": "roof_shingle",
-        "windows": 1,
-        "chimney": true,
-        "lantern": false
-      }
     }
   ]
 }

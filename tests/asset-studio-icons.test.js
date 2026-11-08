@@ -26,7 +26,7 @@ test('tax and ration icon sets: two looks each, valid specs in the UI category',
   assert.deepEqual(sets.map(a => a.id).sort(), ['ration-icons', 'tax-icons']);
   for (const asset of sets) {
     assert.equal(asset.category, 'ui');
-    assert.ok(asset.variants.length >= 2, `${asset.id} has at least two looks to choose from`);
+    assert.ok(asset.variants.length >= 1, `${asset.id} keeps at least its chosen look`);
     assert.deepEqual(validateAssetSpec(specs.find(s => s.id === asset.id), { generators: GENERATORS, style }), []);
   }
   assert.deepEqual(validate({ set: 'tax', look: 'nope' }), ['look must be one of heaps, stacks.']);
@@ -72,7 +72,7 @@ test('exported icons: SVG and PNG at 1× and 2× for every level, matching the c
 
 test('domestic animal icons: a cat and a hunting dog in two looks, valid UI specs', () => {
   const pets = allSets.find(asset => asset.id === 'pet-icons');
-  assert.ok(pets);assert.equal(pets.category, 'ui');assert.ok(pets.variants.length >= 2);
+  assert.ok(pets);assert.equal(pets.category, 'ui');assert.ok(pets.variants.length >= 1);
   assert.deepEqual(validateAssetSpec(specs.find(s => s.id === 'pet-icons'), { generators: GENERATORS, style }), []);
   for (const variant of pets.variants) assert.deepEqual(icons(variant.spec).map(i => i.level), ['cat', 'dog']);
 });

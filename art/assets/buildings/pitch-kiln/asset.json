@@ -12,103 +12,6 @@
   "gameObjectId": "pitch_kiln",
   "variants": [
     {
-      "id": "pitch-kiln-turf-kiln",
-      "name": "Turf-covered tar kiln",
-      "version": 2,
-      "notes": "A large domed earth-and-turf tar kiln smoking at the top, its run-off spout feeding a trough, a big lean-to for the pitch maker, a cauldron of pitch on a tripod fire, tarred barrels, resinous stumps, billets and crates of finished torches.",
-      "spec": {
-        "body": {
-          "kind": "shed",
-          "width": 1.5,
-          "depth": 0.8,
-          "frontHeight": 0.9,
-          "backHeight": 0.6,
-          "sideWall": "left",
-          "at": [
-            -0.55,
-            -0.85
-          ]
-        },
-        "props": [
-          {
-            "type": "groundPatch",
-            "at": [
-              0,
-              0
-            ],
-            "width": 2.7,
-            "depth": 2.7
-          },
-          {
-            "type": "tarKiln",
-            "at": [
-              0.55,
-              -0.35
-            ],
-            "size": 1.5
-          },
-          {
-            "type": "tarCauldron",
-            "at": [
-              -0.65,
-              0.3
-            ]
-          },
-          {
-            "type": "tarBarrels",
-            "at": [
-              0.65,
-              0.75
-            ],
-            "count": 4
-          },
-          {
-            "type": "tarBarrels",
-            "at": [
-              -0.9,
-              -0.85
-            ],
-            "count": 3
-          },
-          {
-            "type": "stumpPile",
-            "at": [
-              -1.05,
-              0.95
-            ]
-          },
-          {
-            "type": "billets",
-            "at": [
-              -0.25,
-              0.1
-            ]
-          },
-          {
-            "type": "torchBundle",
-            "at": [
-              0.05,
-              0.95
-            ]
-          },
-          {
-            "type": "torchBundle",
-            "at": [
-              0.3,
-              1.1
-            ]
-          },
-          {
-            "type": "lanternPole",
-            "at": [
-              -1.25,
-              1.25
-            ]
-          }
-        ]
-      }
-    },
-    {
       "id": "pitch-kiln-stone-oven",
       "name": "Stone pitch house with yard",
       "version": 2,
@@ -170,7 +73,7 @@
           {
             "type": "stumpPile",
             "at": [
-              -1.0,
+              -1,
               0.95
             ]
           },
