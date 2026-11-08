@@ -17,3 +17,8 @@ studio build, World Lab screenshots A/B, studio smoke.
 
 ## Notes for the next agent
 After approval the game part is m-souvisla-zeme: same maths per 16 × 16 chunk into a cached canvas in TerrainRenderer; settings from `groundProposal/default` („převzít zemi“).
+
+### Round 2 (owner 8 Nov)
+- Colour picker per grass zone (6 shades), slider "Shades flowing into each other" (ring-averaged zone weights).
+- Plants drawn on top, each with its own slider: small and large flowers, thistles, small shrubs, three tall grass tufts (green, dry, dark sedge), plus plant size; they prefer suitable zones and zone borders.
+- Time of day (dawn, day, dusk, night), season (spring – winter with snow cover) and weather (clear, overcast, rain, fog, snow) for the view.

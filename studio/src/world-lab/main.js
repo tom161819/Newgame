@@ -8,7 +8,7 @@ import {
   readCode, makeCode, worldFor, checks, readFavourite, defaultsProposal, slug, PLAYER_START, COLUMNS, ROWS,
 } from './model.js';
 import { drawTopDown, drawIso, preload, whenImagesLoad } from './render.js';
-import { GROUND_DEFAULTS, GROUND_SETTINGS } from './ground.js';
+import { GROUND_DEFAULTS, GROUND_SETTINGS, ZONE_NAMES, TIMES, SEASONS, WEATHERS } from './ground.js';
 
 const $ = selector => document.querySelector(selector);
 const STORAGE = 'asset-studio.world-lab.v1', FAVOURITES = 'worlds', DEFAULTS = 'worldDefaults', SPAN = 28;
@@ -30,7 +30,7 @@ const state = {
   levels: Array.isArray(saved?.levels) && saved.levels.length === WORLD_SETTINGS.length ? saved.levels : [...DEFAULT_WORLD_LEVELS],
   seed: Number.isSafeInteger(saved?.seed) ? saved.seed : randomSeed(),
   overlay: 'none', focus: { x: PLAYER_START.x, y: PLAYER_START.y }, world: null, report: null,
-  ground: { mode: saved?.ground?.mode === 'tiles' ? 'tiles' : 'continuous', settings: { ...GROUND_DEFAULTS, ...(saved?.ground?.settings ?? {}) } },
+  ground: { mode: saved?.ground?.mode === 'tiles' ? 'tiles' : 'continuous', settings: { ...structuredClone(GROUND_DEFAULTS), ...(saved?.ground?.settings ?? {}) } },
   compare: '', worldB: null, reportB: null, favourites: new Map(), proposal: null,
 };
 const shared = { mode: 'local', db: null, user: null, uid: null, canWrite: null, names: new Map() };
@@ -234,16 +234,21 @@ function saveGround() { try { localStorage.setItem(STORAGE, JSON.stringify({ lev
 let groundTimer = null;
 function renderGround() {
   for (const b of document.querySelectorAll('#wl-ground [data-ground]')) b.setAttribute('aria-pressed', String(b.dataset.ground === state.ground.mode));
-  const box = $('#wl-ground-settings');
-  box.hidden = state.ground.mode !== 'continuous';
-  box.replaceChildren(...GROUND_SETTINGS.map(s => {
+  const box = $('#wl-ground-settings'), redraw = () => { saveGround(); clearTimeout(groundTimer); groundTimer = setTimeout(drawAll, 90); };
+  const seg = (label, list, key) => h('div', { class: 'wl-seg' }, h('span', {}, label), h('div', { class: 'segmented', role: 'group', 'aria-label': label }, list.map(([id, text]) => h('button', { type: 'button', 'aria-pressed': String(state.ground.settings[key] === id), onclick: () => { state.ground.settings[key] = id; saveGround(); renderGround(); drawAll(); } }, text))));
+  const scene = h('div', { class: 'wl-ground-scene' }, seg('Time of day', TIMES, 'time'), seg('Season', SEASONS, 'season'), seg('Weather', WEATHERS, 'weather'));
+  const colours = h('div', { class: 'wl-ground-colours' }, h('span', {}, 'Grass shades'), ZONE_NAMES.map((name, i) => h('label', { class: 'wl-colour' }, h('input', { type: 'color', value: state.ground.settings.zoneColors[i], 'aria-label': name, oninput: e => { state.ground.settings.zoneColors = state.ground.settings.zoneColors.map((c, j) => j === i ? e.target.value : c); redraw(); } }), name)));
+  scene.hidden = false;
+  const sliders = GROUND_SETTINGS.map(s => {
     const out = h('output', {}, String(state.ground.settings[s.key]));
-    const input = h('input', { type: 'range', min: s.min, max: s.max, step: s.step, value: state.ground.settings[s.key], 'aria-label': s.label, oninput: e => { state.ground.settings[s.key] = +e.target.value; out.textContent = e.target.value; saveGround(); clearTimeout(groundTimer); groundTimer = setTimeout(drawAll, 90); } });
+    const input = h('input', { type: 'range', min: s.min, max: s.max, step: s.step, value: state.ground.settings[s.key], 'aria-label': s.label, oninput: e => { state.ground.settings[s.key] = +e.target.value; out.textContent = e.target.value; redraw(); } });
     return h('label', { class: 'wl-setting' }, h('span', {}, s.label), input, out);
-  }));
+  });
+  const plants = sliders.filter((_, i) => GROUND_SETTINGS[i].group === 'plants'), ground = sliders.filter((_, i) => GROUND_SETTINGS[i].group !== 'plants');
+  box.replaceChildren(scene, ...(state.ground.mode === 'continuous' ? [colours, h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Ground'), ground), h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Plants'), plants)] : []));
 }
 for (const b of document.querySelectorAll('#wl-ground [data-ground]')) b.addEventListener('click', () => { state.ground.mode = b.dataset.ground; saveGround(); renderGround(); drawAll(); });
-$('#wl-ground-reset').addEventListener('click', () => { state.ground.settings = { ...GROUND_DEFAULTS }; saveGround(); renderGround(); drawAll(); });
+$('#wl-ground-reset').addEventListener('click', () => { state.ground.settings = structuredClone(GROUND_DEFAULTS); saveGround(); renderGround(); drawAll(); });
 $('#wl-ground-copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText(JSON.stringify(state.ground.settings)); $('#wl-ground-status').textContent = 'Copied.'; } catch { $('#wl-ground-status').textContent = JSON.stringify(state.ground.settings); } });
 $('#wl-ground-propose').addEventListener('click', async () => {
   const status = $('#wl-ground-status');

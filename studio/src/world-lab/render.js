@@ -4,7 +4,7 @@ import { COLUMNS, ROWS, PLAYER_START, GROUND, tileColor, BUSH_COLOR, REED_COLOR 
 import { GROUND_TERRAIN_IDS, BUSH_TYPES } from '../../../src/data/worldTerrain.js';
 import { terrain as TERRAIN_DEFS } from '../../../src/data/objects/terrain.js';
 import { decorations as DECORATION_DEFS } from '../../../src/data/objects/decorations.js';
-import { paintContinuousGround } from './ground.js';
+import { paintContinuousGround, plantsFor, drawPlant, drawAtmosphere } from './ground.js';
 
 const assetUrls = import.meta.glob('../../../public/assets/{terrain,decorations}/**/*.{png,webp,svg}', { eager: true, query: '?url', import: 'default' });
 const urlFor = path => assetUrls[`../../../public${path}`] ?? null;
@@ -87,8 +87,10 @@ export function drawIso(canvas, world, { focus, span = 28, ground = null }) {
     const isGrass = (x, y) => world.ground[y]?.[x] === GROUND.GRASS, zoneAt = (x, y) => world.zones[y]?.[x] ?? 0;
     const toWorld = (px, py) => { const a = (px - canvas.width / 2) / (W / 2), b = (py - headroom) / (H / 2); return [x0 + (a + b) / 2, y0 + (b - a) / 2]; };
     paintContinuousGround(ctx, { width: canvas.width, height: canvas.height, toWorld, isGrass, zoneAt, settings: ground.settings });
+    for (const p of plantsFor({ x0, y0, span, isGrass, zoneAt, settings: ground.settings })) objects.push({ kind: 'plant', plant: p, x: p.fx, y: p.fy, sx: (p.fx - x0 - (p.fy - y0)) * (W / 2) + canvas.width / 2, sy: (p.fx - x0 + (p.fy - y0)) * (H / 2) + headroom });
   }
   for (const o of objects.sort((a, b) => a.x + a.y - (b.x + b.y))) {
+    if (o.kind === 'plant') { drawPlant(ctx, o.plant, o.sx, o.sy, ground?.settings?.season); continue; }
     if (o.kind === 'reeds') {
       ctx.strokeStyle = 'rgb(150 160 70)'; ctx.lineWidth = 1.5;
       for (let k = 0; k < 5; k++) { const px = o.sx - 14 + hash(o.x, o.y, k) * 28, py = o.sy + 10 + hash(o.x, o.y, k + 9) * 12; ctx.beginPath(); ctx.moveTo(px, py + 8); ctx.lineTo(px + (hash(o.x, o.y, k + 3) - 0.5) * 4, py - 6); ctx.stroke(); }
@@ -99,6 +101,7 @@ export function drawIso(canvas, world, { focus, span = 28, ground = null }) {
     const ox = def.origin?.x ?? 0.5, oy = def.origin?.y ?? 0.5;
     ctx.drawImage(img, o.sx - img.width * ox, o.sy + H / 2 - img.height * oy);
   }
+  if (ground?.settings) drawAtmosphere(ctx, { width: canvas.width, height: canvas.height, time: ground.settings.time, weather: ground.settings.weather, seed: x0 * 31 + y0 });
   // The castle's tile, marked (buildings are not part of the generator).
   if (PLAYER_START.x >= x0 && PLAYER_START.x < x0 + span && PLAYER_START.y >= y0 && PLAYER_START.y < y0 + span) {
     const { sx, sy } = at(PLAYER_START.x, PLAYER_START.y); ctx.strokeStyle = '#ffdf8a'; ctx.lineWidth = 2; diamond(sx, sy); ctx.stroke();
