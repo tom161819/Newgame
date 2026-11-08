@@ -74,6 +74,22 @@ for(const id of Object.values(CHILD_LOOKS).flat()){
   children.looks[id]={sheet,artSource:`art/sprites/child/${id}.v${version}.json`,walk:{frameWidth:m.walk.frameWidth,frameHeight:m.walk.frameHeight,origin:round(m.walk.origin),fps:m.walk.fps??6},poses:{}};
 }
 for(const [look,pose] of CHILD_POSES){if(!children.looks[look])continue;const art=await still('child',`${look}-${pose}`,'characters/children');if(art)children.looks[look].poses[pose]=art;}
+// Children's game loops (approved 8 Nov): child-play-<variant>.v1.anim.png, rows = facing 0–7 as in the walk sheets,
+// columns = the frames of the clip in meta.anim. Each loop is drawn on one of the six looks (same sex, clothes, headgear
+// and hair in art/assets/units/child/asset.json), so it plays for children of that look while they play its game:
+// tag = the boy chasing (child-boy-tunic), tag-girl = the girl catching (child-girl-braid), both for the game `tag`.
+const CHILD_PLAY={tag:'tag','tag-girl':'tag',hoop:'hoop',ball:'ball',swing:'swing',snowball:'snowball',snowman:'snowman',hay:'hay'};
+const childSpecs=Object.fromEntries(JSON.parse(await readFile(path.join(root,'art/assets/units/child/asset.json'),'utf8')).variants.map(v=>[v.id,v.spec]));
+const sameFigure=(a,b)=>['sex','garment','legs','headgear','headgearMaterial','hair','hairStyle','apron'].every(k=>(a?.[k]??null)===(b?.[k]??null));
+for(const [name,game] of Object.entries(CHILD_PLAY)){
+  const id=`child-play-${name}`,version=approved('child',id);if(!version)continue;const m=await meta('child',id,version);
+  if(!m.anim){skipped.push(`child/${id}: no meta.anim`);continue;}
+  const look=Object.keys(children.looks).find(l=>sameFigure(childSpecs[l],childSpecs[id]));if(!look){skipped.push(`child/${id}: no matching look`);continue;}
+  const sheet=await copy('child',`${id}.v${version}.anim.png`,'characters/children');if(!sheet)continue;
+  const a=m.anim,clip=a.loop?.[0]??Object.keys(a.clips)[0];
+  children.looks[look].play??={};
+  children.looks[look].play[game]={sheet,artSource:`art/sprites/child/${id}.v${version}.json`,frameWidth:a.frameWidth,frameHeight:a.frameHeight,origin:round(a.origin),fps:a.fps,columns:a.columns.length,frames:a.clips[clip]};
+}
 
 // ---- Fishing loop (m-animace-rybar): one sheet per sex, rows = facing 0–7, columns = the clip frames in meta.anim.
 const fishing={};

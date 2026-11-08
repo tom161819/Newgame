@@ -4,7 +4,7 @@ import { mkdir } from 'node:fs/promises';
 // m-nasadit-schvalenou-grafiku + m-animace-rybar in a real page: the art deployed with this update loads without 404s
 // and is drawn – a Fisher plays the fishing loop through a catch (cast → sit-idle → bite → reel → store), horses and the
 // other wild animals, a Horse Wagon and a Wheelbarrow, the grass zones and shore transitions, a night badge in the event
-// feed and the Fire Lab fire on a building. Screenshots in /tmp/shots/ (SMOKE_SHOTS overrides the folder).
+// feed, the Fire Lab fire on a building and children playing their game loops (tag, hoop). Screenshots in /tmp/shots/ (SMOKE_SHOTS overrides the folder).
 export async function approvedArtSmoke(context,url,instrument){
   const shots=process.env.SMOKE_SHOTS??'/tmp/shots';await mkdir(shots,{recursive:true});
   const page=await context.newPage();await instrument?.(page);const missing=[],errors=[];
@@ -65,6 +65,19 @@ export async function approvedArtSmoke(context,url,instrument){
 
     // ---- Children (dev fill), the night badge in the feed and the Fire Lab fire on the hut.
     await page.evaluate(()=>window.mkDev?.fillChildren?.(4));
+    // Children's game loops: three children out play tag (the tunic boy and the braid girl) and hoop (the cap boy); each
+    // plays its look's loop in its facing, frame by frame, instead of the key frame.
+    await page.waitForFunction(()=>[...window.__game.registry.get('application').scene.childrenSystem.children.values()].filter(c=>c.state==='out').length>=3,null,{timeout:30000});
+    const kids=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,cs=s.childrenSystem,out=[...cs.children.values()].filter(c=>c.state==='out').slice(0,3);
+      const plan=[['boy',0,'tag','child-play:child-boy-tunic:tag'],['girl',0,'tag','child-play:child-girl-braid:tag'],['boy',1,'hoop','child-play:child-boy-cap:hoop']];
+      const k=s.character.tile;return out.map((c,i)=>{const [sex,look,kind,key]=plan[i];c.sex=sex;c.look=look;c.x=k.x+1.5+i*.9;c.y=k.y+2.5;c.local=null;c.path=[];
+        c.activity={kind,center:{x:Math.floor(c.x),y:Math.floor(c.y)},until:cs.now()+1e9};return {id:c.id,key};});});
+    await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,k=s.character;if(s.worldCamera){s.worldCamera.following=false;s.worldCamera.panTarget=null;}const t=k.tile;s.cameras.main.setZoom(2.6).centerOn(s.map.length*32+(t.x-t.y+.5)*32,128+(t.x+t.y+5)*16);});
+    await page.waitForFunction(kids=>{const cs=window.__game.registry.get('application').scene.childrenSystem;return kids.every(({id,key})=>{const a=cs.children.get(id)?.view?.art;return a?.visible&&a.texture.key===key;});},kids,{timeout:30000}).catch(async e=>{
+      throw Error(`${e.message}: ${JSON.stringify(await page.evaluate(kids=>{const cs=window.__game.registry.get('application').scene.childrenSystem;return kids.map(({id})=>{const c=cs.children.get(id),a=c?.view?.art;return {state:c?.state,kind:c?.activity?.kind,vis:c?.view?.visible,key:a?.texture.key};});},kids))}`);});
+    const frames=new Set();for(let i=0;i<8;i++){frames.add(await page.evaluate(id=>window.__game.registry.get('application').scene.childrenSystem.children.get(id).view.art.frame.name,kids[0].id));await page.waitForTimeout(130);}
+    assert.ok(frames.size>=2,`the tag loop animates (frames ${[...frames].join(',')})`);
+    await page.screenshot({path:`${shots}/children-play.png`});
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.eventFeed.push('wolves-near:999','Wolves are near the village.');});
     await page.waitForFunction(()=>{const img=document.querySelector('#event-feed .feed-icon');return img&&img.complete&&img.naturalWidth>0;},null,{timeout:15000});
     const fire=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.type==='fisherman_hut');s.nightThreats.ignite(b);s.fireViews.update(16);const g=s.fireViews.views.get(b.id);return {model:!!g?.model,x:g.x,y:g.y};});
@@ -75,6 +88,6 @@ export async function approvedArtSmoke(context,url,instrument){
 
     // ---- No deployed texture failed to load.
     assert.deepEqual(missing.filter(m=>/\/assets\//.test(m)),[],'no 404s');assert.deepEqual(errors,[]);
-    console.log(`PASS Approved art: Fisher loop ${clips.join(' → ')}; ${Object.entries(animals).map(([t,l])=>`${l.length} ${t}`).join(', ')} with Studio looks; Horse Wagon and Wheelbarrow art; zones and shore transitions loaded; night badge in the feed; Fire Lab fire; screenshots in ${shots}`);
+    console.log(`PASS Approved art: Fisher loop ${clips.join(' → ')}; ${Object.entries(animals).map(([t,l])=>`${l.length} ${t}`).join(', ')} with Studio looks; Horse Wagon and Wheelbarrow art; zones and shore transitions loaded; night badge in the feed; Fire Lab fire; children play tag (boy + girl loops) and hoop, frames ${[...frames].join(",")}; screenshots in ${shots}`);
   }finally{await page.close();}
 }

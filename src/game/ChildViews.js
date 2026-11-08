@@ -3,19 +3,29 @@ import { gridToWorld } from './isometric.js';
 import { MOVEMENT_SPEED_SCALE } from '../data/movement.js';
 import { FACING_INDEX,walkFrame } from '../data/objects/approvedArt.js';
 import { directionName } from './directions.js';
-import { APPROVED_DEPLOY_ART as ART,childLook,childPose,requestTexture,stillKey,facesLeft } from './deployArt.js';
+import { APPROVED_DEPLOY_ART as ART,childLook,childPose,childPlay,childPlayFrame,requestTexture,stillKey,facesLeft } from './deployArt.js';
 
 // m-nasadit-schvalenou-grafiku: the approved children (six looks with walk sheets, by sex and colour set) and their play
 // key frames (hoop, ball, swing, tag, snowball, snowman, hay) replace the drawing once loaded; a look without the
 // activity's key frame plays its walk sheet. Missing or failed art keeps the drawing below.
+// The children's game loops (approved 8 Nov) replace the key frame of a look while its child plays that game; until a
+// sheet is in (or if it fails) the key frame or walk sheet stays. Hidden children are not drawn, so they do not animate.
 const childWalkKey=look=>`child-walk:${look}`;
-function drawChildArt(scene,v,child,walkedMs){
+const childPlayKey=(look,game)=>`child-play:${look}:${game}`;
+function drawChildArt(scene,v,child,walkedMs,deltaMs=0){
   const look=childLook(child),art=look&&ART.children.looks[look];if(!art){v.art?.setVisible(false);return false;}
   if(!requestTexture(scene,childWalkKey(look),art.sheet,art.walk)){v.art?.setVisible(false);return false;}
   if(!v.art){v.art=scene.add.image(0,0,childWalkKey(look));v.add(v.art);}
+  const play=childPlay(child,look),playKey=play&&childPlayKey(look,child.activity.kind),k=FACING_INDEX[directionName(child.facing)??'SE']??0;
+  if(play&&requestTexture(scene,playKey,play.sheet,play)){
+    // Children's game loops: the look's loop for the game, in the child's facing; the play time restarts per game.
+    if(v.playing!==playKey){v.playing=playKey;v.played=0;}else v.played+=deltaMs;
+    v.art.setTexture(playKey,childPlayFrame(play,k,v.played)).setOrigin(play.origin.x,play.origin.y).setFlipX(false).setVisible(true);return true;
+  }
+  v.playing=null;
   const pose=childPose(child,look),poseArt=pose&&art.poses[pose],poseKey=poseArt&&stillKey(scene,poseArt);
   if(poseKey){v.art.setTexture(poseKey).setOrigin(poseArt.origin.x,poseArt.origin.y).setFlipX(facesLeft(child.facing));}
-  else{const k=FACING_INDEX[directionName(child.facing)??'SE']??0;v.art.setTexture(childWalkKey(look),walkFrame(k,walkedMs,art.walk.fps,!!child.moving)).setOrigin(art.walk.origin.x,art.walk.origin.y).setFlipX(false);}
+  else{v.art.setTexture(childWalkKey(look),walkFrame(k,walkedMs,art.walk.fps,!!child.moving)).setOrigin(art.walk.origin.x,art.walk.origin.y).setFlipX(false);}
   v.art.setVisible(true);return true;
 }
 
@@ -58,7 +68,7 @@ export class ChildViews {
       const v=child.view,p=gridToWorld(child.x,child.y),onScreen=!view||p.x>view.x-40&&p.x<view.right+40&&p.y>view.y-40&&p.y<view.bottom+60;
       v.setPosition(p.x,p.y);v.setDepth(p.y+1.5);v.setVisible(child.state!=='inside'&&onScreen&&this.visible({x:child.x,y:child.y}));
       v.setAlpha(child.state==='leaving'?.7:1);
-      if(v.visible){v.walked=child.moving?(v.walked??0)+delta*MOVEMENT_SPEED_SCALE:0;const art=drawChildArt(this.scene,v,child,v.walked);v.figure.setVisible(!art);if(!art)drawChild(v.figure,child,this.phase+child.index*1.7+child.houseId);}
+      if(v.visible){v.walked=child.moving?(v.walked??0)+delta*MOVEMENT_SPEED_SCALE:0;const art=drawChildArt(this.scene,v,child,v.walked,delta);v.figure.setVisible(!art);if(!art)drawChild(v.figure,child,this.phase+child.index*1.7+child.houseId);}
     }
     for(const child of [...this.known??[]])if(!s.children.has(child.id)){child.view?.destroy();child.view=null;}
     this.known=[...s.children.values()];

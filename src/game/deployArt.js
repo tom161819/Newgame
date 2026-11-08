@@ -57,6 +57,15 @@ export function childPose(child,look,art=ART.children){
   if(child?.state!=='out'||!child.activity)return null;
   return (CHILD_POSE[child.activity.kind]??[]).find(p=>poses[p])??null;
 }
+// Children's game loops: the game a child plays maps to the loop of its look (tag → child-play-tag for the tunic boy,
+// child-play-tag-girl for the braid girl; hoop, ball, swing, snowball, snowman and hay to their sheet). Null when the
+// child plays nothing (or flees) or its look has no loop for the game: then the key frame / walk sheet stays.
+export function childPlay(child,look,art=ART.children){
+  if(child?.state!=='out'||!child.activity)return null;
+  return art.looks?.[look]?.play?.[child.activity.kind]??null;
+}
+// Sheet frame of a loop for a facing row (0–7) after `playedMs` of play: the clip's frames in turn at the loop's fps.
+export function childPlayFrame(play,row,playedMs){const f=play.frames?.length?play.frames:[0];return row*play.columns+f[Math.floor(playedMs*play.fps/1000)%f.length];}
 
 // ---- Night icons: the round badge for a sign (thief, wolves, fire, no-torch, torch, pitch).
 export function nightIcon(level,art=ART.nightIcons){return art[level]??null;}

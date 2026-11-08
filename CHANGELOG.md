@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.70.0] - 2026-11-08
+<!-- version: {"title":"Children play","type":"feature","reconstructed":false,"saveVersion":59} -->
+### Added
+- Children play the approved game animations from the Studio: tag, hoop, ball, swing, snowball, snowman and the jump into the hay. Each loop is drawn for one child look, so only children with that look animate. Other children keep their current look.
+
 ## [0.69.0] - 2026-11-08
 <!-- version: {"title":"Animals 3","type":"feature","reconstructed":false,"saveVersion":59} -->
 ### Changed
