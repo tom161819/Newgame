@@ -16,7 +16,7 @@ export class StorePreview {
     this.scene=scene;this.delay=delay;this.root=doc.createElement('div');this.root.id='store-preview';this.root.className='store-preview';this.root.setAttribute('role','tooltip');this.root.hidden=true;doc.body.append(this.root);
     this.key=null;this.timer=null;
   }
-  locationsOf(building){return [...(this.scene.foodStorage?.locations?.values()??[])].filter(l=>l.buildingId===building.id&&['fallback','storage'].includes(l.kind));}
+  locationsOf(building){return [...(this.scene.foodStorage?.locations?.values()??[])].filter(l=>l.buildingId===building.id&&['fallback','storage','pile'].includes(l.kind));}
   // target: {key, locations:()=>[...], x, y} or null.
   hover(target){
     if(!target){this.hide();return;}

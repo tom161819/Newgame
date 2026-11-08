@@ -57,7 +57,9 @@ export class ForestryWork {
   }
   beginChop(worker,object,route){
     const s=this.scene,system=s.workerSystem;let task;
-    const output=s.foodStorage?.findDestination(worker,'wood',object.definition.tree.wood);if(!output){this.wait(worker,'Waiting for reachable timber storage capacity');return;}
+    const amount=object.definition.tree.wood,pile=s.foodStorage?.pileFor(this.workplace(worker));if(pile&&s.foodStorage.room(pile.id,'wood')<amount){this.wait(worker,'Output pile full');return;}
+    // m-sklady-materialu-koncept (49): timber goes on the pile by the hut; Haulers take it to a store.
+    const output=pile?{location:pile}:s.foodStorage?.findDestination(worker,'wood',amount);if(!output){this.wait(worker,'Waiting for reachable timber storage capacity');return;}
     const transferId=`food-transfer-${s.foodProduction.nextTransfer++}`,capacityReservation=s.foodStorage.reserve('capacity',output.location.id,'wood',object.definition.tree.wood,transferId);if(!capacityReservation)return;
     const reservation=this.natural.reservation(object),slot=this.slot(route.destination);
     if(!system.reservations.reserve(reservation,worker.id)||!system.reservations.reserve(slot,worker.id)){system.reservations.release(reservation,worker.id);s.foodStorage.release(capacityReservation);return;}

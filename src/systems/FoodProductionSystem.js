@@ -165,12 +165,14 @@ export class FoodProductionSystem {
     if(!this.storage.put(task.capacityReservation,amount,{transportCancelled:worker.cargo.transportCancelled})){worker.workState='Waiting';worker.workMessage='Waiting for storage capacity';return;}
     if(destination.kind==='site')this.scene.constructionSystem.materials.delivered();
     const resource=worker.cargo.resource,haulReward=task.hauling&&worker.profession==='hauler'&&!worker.cargo.transportCancelled&&Number.isFinite(task.loadedDistance);worker.cargo.amount-=amount;
-    if(this.storage.isStock(destination)){
+    // m-sklady-materialu-koncept (49): a producer's own pile counts as its delivery (stats and deferred rewards).
+    const handedOver=this.storage.isStock(destination)||destination.kind==='pile'&&destination.buildingId===worker.assignedWorkplaceId;
+    if(handedOver){
       const workplace=this.scene.workplaceSystem.records.get(worker.assignedWorkplaceId);if(workplace)workplace.delivered[resource]=(workplace.delivered[resource]??0)+amount;
     }
     if(!worker.cargo.amount){
       worker.cargo=null;const rewards=worker.pendingWorkRewards??[];worker.pendingWorkRewards=[];
-      if(this.storage.isStock(destination))for(const event of rewards){const {type,...data}=event;this.scene.activities.emit(type,{...data,actor:worker});}
+      if(handedOver)for(const event of rewards){const {type,...data}=event;this.scene.activities.emit(type,{...data,actor:worker});}
     }
     if(haulReward)this.scene.activities.emit('transportDelivered',{actor:worker,objectType:'hauler',quantity:amount,distance:task.loadedDistance},`haul-receipt-${task.transferId}`);
     this.scene.workerSystem.ai.cancel(worker);worker.workState='Searching for Work';this.scene.updateInventory();

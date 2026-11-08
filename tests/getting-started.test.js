@@ -10,7 +10,7 @@ const complete=type=>({type});
 const site=type=>({type,construction:{state:'planned'}});
 
 test('Getting started lists the first buildings in an achievable order', () => {
-  assert.deepEqual(GETTING_STARTED_STEPS.map(s=>s.buildingId),['granary','farmhouse','wheat_field','hunting_lodge','lumberjack_hut','house','warehouse','builder_workshop']);
+  assert.deepEqual(GETTING_STARTED_STEPS.map(s=>s.buildingId),['granary','farmhouse','wheat_field','hunting_lodge','lumberjack_hut','house','material_yard','builder_workshop']);
   assert.deepEqual(gettingStartedProblems(objectRegistry),[]);
 });
 

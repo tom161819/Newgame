@@ -1,5 +1,15 @@
 import { FOOD_RESOURCE_IDS } from './foodProduction.js';
-export const LOGISTICS_RULES=Object.freeze({starterCapacity:300,legacyStarterCapacity:40,warehouseCapacity:200,loadUnits:40,planningInterval:500});
+export const LOGISTICS_RULES=Object.freeze({starterCapacity:300,legacyStarterCapacity:40,warehouseCapacity:200,yardCapacity:400,outputPileCapacity:20,loadUnits:40,planningInterval:500});
+// m-sklady-materialu-koncept (21, 49): one open Material Yard holds the raw building materials; a Warehouse no longer
+// takes them. Producers (Quarry, Iron Mine, Lumberjack Hut) drop output on a small pile by their building for Haulers.
+export const YARD_RESOURCES=Object.freeze(['wood','stone','iron_ore','iron']);
+// Visible pile size 0 (empty) to 4 (full) for an amount against the amount that fills one pile.
+export const PILE_STAGES=4;
+// m-sklady-materialu-koncept (49): producers whose workers drop output on a pile by the building (Haulers take it away).
+export const OUTPUT_PILES=Object.freeze({quarry:'stone',iron_mine:'iron_ore',lumberjack_hut:'wood'});
+export const outputPile=definition=>OUTPUT_PILES[definition?.id]?{resource:OUTPUT_PILES[definition.id],capacity:LOGISTICS_RULES.outputPileCapacity}:null;
+export const pileLocationId=building=>`pile-${building.id}`;
+export const pileStage=(amount,full)=>amount>0&&full>0?Math.min(PILE_STAGES,Math.ceil(amount/full*PILE_STAGES)):0;
 // Idle Haulers pick up loose stones within a radius (tiles) of reachable Castles, material storage or active sites.
 export const IDLE_STONE=Object.freeze({defaultRadius:80,maxRadius:150,pickupDuration:1000,candidates:40});
 export const defaultStoneCollection=()=>({enabled:true,radius:IDLE_STONE.defaultRadius});
@@ -8,7 +18,7 @@ export const equipmentResources=registry=>registry.byCategory('resource').filter
 export const materialResources=registry=>registry.byCategory('resource').filter(d=>d.collectible&&d.id!=='gold'&&!FOOD_RESOURCE_IDS.includes(d.id)&&d.resourceCategory!=='equipment'&&d.resourceCategory!=='vehicle').map(d=>d.id);
 // Vehicles (S12) are real objects on the map, never stored or carried goods.
 export const physicalResources=registry=>registry.byCategory('resource').filter(d=>d.collectible&&d.id!=='gold'&&d.resourceCategory!=='vehicle').map(d=>d.id);
-export function storageResources(definition,registry){return definition.storage.accepts==='materials'?materialResources(registry):definition.storage.accepts==='all'?physicalResources(registry).filter(id=>registry.get(id)?.resourceCategory!=='equipment'):definition.storage.accepts==='equipment'?equipmentResources(registry):[...definition.storage.resources];}
+export function storageResources(definition,registry){return definition.storage.accepts==='materials'?materialResources(registry).filter(id=>!YARD_RESOURCES.includes(id)):definition.storage.accepts==='all'?physicalResources(registry).filter(id=>registry.get(id)?.resourceCategory!=='equipment'):definition.storage.accepts==='equipment'?equipmentResources(registry):[...definition.storage.resources];}
 // S12: carrying by weight. Every physical resource has a load weight (game units, not kilograms); a person carries
 // 40 load units by hand (the developer's balance choice over the spec's 10: 4 Stone, 8 Wood or 40 food), a Hauler
 // 2 more for every 5 Logistics levels. Gold is never carried.
@@ -22,4 +32,4 @@ export const MAX_TRIP_UNITS=(LOGISTICS_RULES.loadUnits+20)*Math.max(...Object.va
 export function loadCapacity(actor){return (LOGISTICS_RULES.loadUnits+(actor.profession==='hauler'?Math.floor(((actor.skills?.logistics?.level??1)-1)/5)*2:0))*(VEHICLES[actor.vehicleType]?.multiplier??1);}
 // How many pieces of one resource fit in one trip (at least one, so heavy goods still move); without a resource, load units.
 export function carryCapacity(actor,resource=null){const units=loadCapacity(actor);return resource?Math.max(1,Math.floor(units/loadWeight(resource))):units;}
-export const stockLocationId=building=>`${building.type==='starter_stockpile'?'stockpile':building.type==='warehouse'?'warehouse':building.type==='armory'?'armory':'granary'}-${building.id}`;
+export const stockLocationId=building=>`${building.type==='starter_stockpile'?'stockpile':building.type==='warehouse'?'warehouse':building.type==='material_yard'?'yard':building.type==='armory'?'armory':'granary'}-${building.id}`;

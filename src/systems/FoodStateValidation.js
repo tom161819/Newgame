@@ -6,7 +6,7 @@ import { pavementWorkArea } from '../game/pavement.js';
 import { recipeFor,recipeResources } from '../data/production.js';
 import { PLAYER_START } from '../game/config.js';
 import { buildingIsComplete } from '../game/buildings.js';
-import { physicalResources,materialResources,storageResources,stockLocationId,carryCapacity,equipmentResources,MAX_TRIP_UNITS,LOGISTICS_RULES } from '../data/logistics.js';
+import { physicalResources,materialResources,storageResources,stockLocationId,carryCapacity,equipmentResources,MAX_TRIP_UNITS,LOGISTICS_RULES,outputPile,pileLocationId } from '../data/logistics.js';
 
 export function validateFoodState(s,registry,{check,number,integer,array}){
   const storage=s.foodStorage,production=s.foodProduction;
@@ -30,6 +30,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     if(d.recipe)for(const kind of ['input','output'])expected.set(`${kind}-${b.id}`,{...base,kind,capacity:d.bufferCapacity,allowed:recipeResources(d,kind)});
     if(d.kit)expected.set(`kit-${b.id}`,{...base,kind:'kit',capacity:d.kit.capacity,allowed:equipmentResources(registry)});
     if(d.fuel&&physical)expected.set(`fuel-${b.id}`,{...base,kind:'fuel',capacity:d.fuel.capacity,allowed:[d.fuel.resource]});
+    const pile=physical&&outputPile(d);if(pile)expected.set(pileLocationId(b),{...base,kind:'pile',capacity:pile.capacity,allowed:[pile.resource]});
     if(d.trade&&physical)expected.set(`market-${b.id}`,{...base,kind:'market',capacity:d.trade.capacity,allowed:tradeableResources(registry).map(r=>r.id)});
   }
   const sites=new Map();
@@ -87,6 +88,8 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
       capacity(c.outputReservation,c.id,outId,outAmount);
     }else if(r.outputReservation){const cap=reservations.get(r.outputReservation);capacity(r.outputReservation,cap?.owner,outId,outAmount);check((locations.get(`output-${b.id}`).stock[outId]??0)>=outAmount);}
   }
+  // m-sklady-materialu-koncept (49): producers deliver to their own output pile (a store only without one).
+  const ownOutput=(w,id)=>{const l=locations.get(id);return !!l&&(l.kind==='pile'?l.buildingId===w.assignedWorkplaceId:['fallback','storage'].includes(l.kind));};
   for(const w of s.workers??[]){
     const t=w.workTask;if(!t)continue;
     if(['foodPickup','foodDeliver','produce','harvest','chopTree','mineDeposit'].includes(t.kind)&&t.transferId){const match=t.transferId.match(/^food-transfer-(\d+)$/);check(match);integer(Number(match[1]),1,production.nextTransfer-1);}
@@ -94,8 +97,8 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     if(t.kind==='harvest'){
       const crop=registry.require(s.buildings.find(b=>b.id===t.targetId).type).crop;check(t.capacityReservation&&locations.has(t.destinationId));capacity(t.capacityReservation,t.transferId,crop.resource,crop.yield);continue;
     }
-    if(t.kind==='chopTree'){const tree=s.resources.find(r=>r.natural?.id===t.targetId),yieldAmount=registry.require(tree?.type).tree.wood;check(t.amount===yieldAmount&&locations.has(t.destinationId)&&['fallback','storage'].includes(locations.get(t.destinationId).kind));capacity(t.capacityReservation,t.transferId,'wood',yieldAmount);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);continue;}
-    if(t.kind==='mineDeposit'){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),resource=registry.require(home.type).mining.resource;check(t.amount===1&&locations.has(t.destinationId)&&['fallback','storage'].includes(locations.get(t.destinationId).kind));capacity(t.capacityReservation,t.transferId,resource,1);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);continue;}
+    if(t.kind==='chopTree'){const tree=s.resources.find(r=>r.natural?.id===t.targetId),yieldAmount=registry.require(tree?.type).tree.wood;check(t.amount===yieldAmount&&ownOutput(w,t.destinationId));capacity(t.capacityReservation,t.transferId,'wood',yieldAmount);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);continue;}
+    if(t.kind==='mineDeposit'){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),resource=registry.require(home.type).mining.resource;check(t.amount===1&&ownOutput(w,t.destinationId));capacity(t.capacityReservation,t.transferId,resource,1);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);continue;}
     if(!['foodPickup','foodDeliver'].includes(t.kind))continue;
     check(resources.includes(t.resource)&&locations.has(t.destinationId));integer(t.amount,1,carryCapacity({...w,vehicleType:s.vehicles?.vehicles.find(v=>v.operatorId===w.id&&v.state==='inUse')?.type??null},t.resource));
     const sourceDrop=t.sourceDropId&&s.drops.find(d=>d.id===t.sourceDropId);

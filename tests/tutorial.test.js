@@ -17,8 +17,8 @@ test('steps tick from the state of the world, in order, and a skipped step count
   p=tutorialProgress(scene({buildings:world,jobs:['builder']}),{seen});assert.equal(p.current.id,'stone','a building also passes the king step');
   p=tutorialProgress(scene({buildings:world,jobs:['builder'],marked:true}));assert.equal(p.current.id,'house');
   p=tutorialProgress(scene({buildings:[...world,b('house')],jobs:['builder'],marked:true}));assert.equal(p.current.id,'house','a House must be finished');
-  p=tutorialProgress(scene({buildings:[...world,b('house',true),b('warehouse'),b('builder_workshop')],jobs:['builder'],marked:true}));assert.equal(p.current.id,'speed');
-  p=tutorialProgress(scene({buildings:[...world,b('house',true),b('warehouse'),b('builder_workshop')],jobs:['builder'],marked:true,speed:2}));assert.equal(p.allDone,true);
+  p=tutorialProgress(scene({buildings:[...world,b('house',true),b('material_yard'),b('builder_workshop')],jobs:['builder'],marked:true}));assert.equal(p.current.id,'speed');
+  p=tutorialProgress(scene({buildings:[...world,b('house',true),b('material_yard'),b('builder_workshop')],jobs:['builder'],marked:true,speed:2}));assert.equal(p.allDone,true);
   assert.equal(tutorialProgress(scene(),{skipped:new Set(['king','builder'])}).current.id,'granary');
   assert.equal(TUTORIAL_STEPS.length,10);
 });

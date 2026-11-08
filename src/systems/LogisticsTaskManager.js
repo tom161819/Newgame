@@ -27,6 +27,10 @@ export class LogisticsTaskManager {
         for(const destination of stores)if(destination.allowed.includes(outputResource)&&(cap?destination.id===cap.locationId:storage.room(destination.id,outputResource)>0))this.catalog.push({priority:30,sourceId:output.id,destinationId:destination.id,resource:outputResource,amount:available,capacityReservation:cap?.id,outputBuildingId:building.id});
       }
     }
+    // m-sklady-materialu-koncept (49): empty producer piles into the nearest Material Yard; the Starter Stockpile
+    // (or any other store taking the good) only while no yard has room.
+    for(const pile of storage.locations.values())if(pile.kind==='pile')for(const resource of Object.keys(pile.stock)){const amount=storage.free(pile.id,resource);if(amount>0)
+      for(const destination of stores)if(destination.allowed.includes(resource)&&storage.room(destination.id,resource)>0)this.catalog.push({priority:destination.kind==='storage'?30:32,sourceId:pile.id,destinationId:destination.id,resource,amount});}
     // One-way consolidation only: never shuttle goods between dedicated stores.
     for(const source of stores.filter(l=>l.kind==='fallback'))for(const [resource]of Object.entries(source.stock))if(storage.free(source.id,resource)>0)
       for(const destination of stores.filter(l=>l.kind==='storage'&&l.allowed.includes(resource)&&storage.room(l.id,resource)>0))this.catalog.push({priority:40,sourceId:source.id,destinationId:destination.id,resource,amount:storage.free(source.id,resource)});

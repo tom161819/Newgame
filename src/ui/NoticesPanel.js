@@ -11,7 +11,7 @@ const MUTED_KEY='newgame.notices.muted';
 const readMuted=()=>{try{const list=JSON.parse(localStorage.getItem(MUTED_KEY)??'[]');return new Set(Array.isArray(list)?list.filter(c=>NOTICE_CATEGORIES.includes(c)):[]);}catch{return new Set();}};
 // Right-bottom notices: lasting production and work problems. Each can be dismissed (until its next reminder) and
 // whole categories can be muted. Clicking one opens the building's panel when the building is in sight.
-const NOTICE_HIRES=Object.freeze({noBuilder:'builder',waitingMaterial:'hauler'});
+const NOTICE_HIRES=Object.freeze({noBuilder:'builder',waitingMaterial:'hauler',pileNoHauler:'hauler'});
 export class NoticesPanel {
   constructor(scene){
     this.scene=scene;this.panel=document.querySelector('#notices-panel');this.list=document.querySelector('#notices-list');this.filters=document.querySelector('#notices-filters');this.muted=readMuted();

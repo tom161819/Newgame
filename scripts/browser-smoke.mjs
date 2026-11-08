@@ -22,6 +22,7 @@ import { walls2Smoke } from './walls-2-smoke.mjs';
 import { residents3Smoke } from './residents-3-smoke.mjs';
 import { worldLook2Smoke } from './world-look-2-smoke.mjs';
 import { uiWindowsSmoke } from './ui-windows-smoke.mjs';
+import { materialYardSmoke } from './material-yard-smoke.mjs';
 import { employment2Smoke } from './employment-2-smoke.mjs';
 import { animalLooksSmoke } from './animal-looks-smoke.mjs';
 import { tutorialSmoke } from './tutorial-smoke.mjs';
@@ -209,6 +210,7 @@ try{
   await step('residents-3',()=>residents3Smoke(context,origin+base,instrument));
   await step('world-look-2',()=>worldLook2Smoke(context,origin+base,instrument));
   await step('ui-windows',()=>uiWindowsSmoke(context,origin+base,instrument));
+  await step('material-yard',()=>materialYardSmoke(context,origin+base,instrument));
   await step('tutorial',()=>tutorialSmoke(context,origin+base,instrument));
   await step('marketplace',()=>marketplaceSmoke(context,origin+base,instrument));
   await step('gate',()=>gateSmoke(context,origin+base,instrument));

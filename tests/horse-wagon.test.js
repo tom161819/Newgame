@@ -24,8 +24,8 @@ test('Horse Wagon: the Wheelwright\'s second recipe, 30 Wood + 6 Iron + a tamed 
 });
 
 test('no tamed horse, no wagon: the batch waits without using materials; then the horse is reserved, harnessed and leaves the Stables; Save/Load mid-batch',()=>{
-  let s=scene();const warehouse=building(s,'warehouse',40,44),shop=building(s,'wheelwright_workshop',52,50),stables=building(s,'stables',60,40);
-  s.foodStorage.deposit(`warehouse-${warehouse.id}`,'wood',30);s.foodStorage.deposit(`warehouse-${warehouse.id}`,'iron',6);
+  let s=scene();const warehouse=building(s,'material_yard',40,44),shop=building(s,'wheelwright_workshop',52,50),stables=building(s,'stables',60,40);
+  s.foodStorage.deposit(`yard-${warehouse.id}`,'wood',30);s.foodStorage.deposit(`yard-${warehouse.id}`,'iron',6);
   const a=person(s,{x:50,y:55},{home:shop});person(s,{x:51,y:55},{home:shop});
   assert.equal(s.foodProduction.setRecipe(shop.id,'horse_wagon'),true);assert.equal(s.foodProduction.setRecipe(shop.id,'cart'),false);
   until(s,()=>a.workMessage==='Waiting for a tamed horse in the Stables');
@@ -45,7 +45,7 @@ test('no tamed horse, no wagon: the batch waits without using materials; then th
 });
 
 test('a Hauler in Auto prefers the Horse Wagon to a Wheelbarrow and carries 40 Stone per trip; the horse travels with it; a dead horse leaves the wagon unusable',()=>{
-  let s=scene();const stables=building(s,'stables',60,40),horse=stabledHorse(s,stables,{x:61,y:41});building(s,'warehouse',40,44);
+  let s=scene();const stables=building(s,'stables',60,40),horse=stabledHorse(s,stables,{x:61,y:41});building(s,'material_yard',40,44);
   s.stables.reserveForWorkshop(horse.id,999);const wagon=s.vehicles.create('horse_wagon',{x:48,y:58});s.stables.horses.set(horse.id,{state:'harnessed',vehicleId:wagon.id});wagon.horseId=horse.id;
   s.vehicles.create('wheelbarrow',{x:46,y:55});const hauler=person(s,{x:46,y:56},{job:'hauler'});
   until(s,()=>s.vehicles.held(hauler));assert.equal(hauler.vehicleType,'horse_wagon','the wagon first, although the Wheelbarrow is nearer');
@@ -60,8 +60,8 @@ test('a Hauler in Auto prefers the Horse Wagon to a Wheelbarrow and carries 40 S
 });
 
 test('a cancelled wagon batch gives the horse back: the workshop is demolished mid-batch',()=>{
-  const s=scene(),warehouse=building(s,'warehouse',40,44),shop=building(s,'wheelwright_workshop',52,50),stables=building(s,'stables',60,40),horse=stabledHorse(s,stables,{x:61,y:41});
-  s.foodStorage.deposit(`warehouse-${warehouse.id}`,'wood',30);s.foodStorage.deposit(`warehouse-${warehouse.id}`,'iron',6);
+  const s=scene(),warehouse=building(s,'material_yard',40,44),shop=building(s,'wheelwright_workshop',52,50),stables=building(s,'stables',60,40),horse=stabledHorse(s,stables,{x:61,y:41});
+  s.foodStorage.deposit(`yard-${warehouse.id}`,'wood',30);s.foodStorage.deposit(`yard-${warehouse.id}`,'iron',6);
   person(s,{x:50,y:55},{home:shop});s.foodProduction.setRecipe(shop.id,'horse_wagon');
   until(s,()=>s.stables.horses.get(horse.id)?.state==='reserved');
   s.buildings.splice(s.buildings.indexOf(shop),1);s.tick(200);

@@ -10,6 +10,6 @@ export const GETTING_STARTED_STEPS=Object.freeze([
   {id:'hunting_lodge',buildingId:'hunting_lodge'},
   {id:'lumberjack_hut',buildingId:'lumberjack_hut'},
   {id:'house',buildingId:'house'},
-  {id:'warehouse',buildingId:'warehouse'},
+  {id:'material_yard',buildingId:'material_yard'},
   {id:'builder_workshop',buildingId:'builder_workshop'},
 ].map(step=>Object.freeze(step)));

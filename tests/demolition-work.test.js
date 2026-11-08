@@ -42,12 +42,12 @@ test('completed physical demolition refunds floor50% as ground ownership once, n
  let current;const {s,b,worker}=fixture({complete:(b,refund)=>finishDemolition(current,b,refund)});current=s;const before=s.inventory.count('stone'),expected=demolitionRefund(b.definition);s.demolition.request(b);worker();until(s,()=>!s.buildings.includes(b));assert.equal(s.inventory.count('stone'),before);
  const drops=[...s.dropSystem.drops.values()].filter(d=>d.resource==='stone');assert.equal(drops.reduce((n,d)=>n+d.amount,0),expected.stone);assert.equal(finishDemolition(s,b,expected),false);s.simulate(1000);assert.equal([...s.dropSystem.drops.values()].filter(d=>d.resource==='stone').reduce((n,d)=>n+d.amount,0),expected.stone);validateGameState(serializeGameState(s));
 });
-test('Warehouse demolition preserves stored and committed site stock, reservations and current Save/Load',async()=>{
+test('Material Yard demolition preserves stored and committed site stock, reservations and current Save/Load',async()=>{
  const {finishDemolition}=await import('../src/game/buildingRemoval.js'),{serializeGameState,validateGameState}=await import('../src/systems/GameStateSerializer.js');
- const {s,b}=fixture({type:'warehouse'});s.foodStorage.register(b);const id=`warehouse-${b.id}`;s.foodStorage.deposit(id,'stone',12);s.foodStorage.deposit(id,'wood',19);
+ const {s,b}=fixture({type:'material_yard'});s.foodStorage.register(b);const id=`yard-${b.id}`;s.foodStorage.deposit(id,'stone',12);s.foodStorage.deposit(id,'wood',19);
  const d=s.objectRegistry.require('house'),result=placeBuilding({map:s.map,anchor:{x:70,y:50},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d,reserveMaterials:true});assert.ifError(result.error);s.constructionSystem.plan(result.building);
  const expected=s.foodStorage.resourceBreakdown().find(r=>r.resource==='wood').total;s.demolition.request(b);Object.assign(b.demolition,{state:'building',workDone:b.demolition.requiredWork,progress:100});
- const refundWood=b.demolition.refund.wood??0;assert.equal(finishDemolition(s,b,b.demolition.refund),true);assert.equal(s.foodStorage.locations.has(id),false);assert.equal(s.foodStorage.resourceBreakdown().find(r=>r.resource==='wood').total,expected+refundWood,'the wooden Warehouse refunds half its wood (0.49)');
+ const refundWood=b.demolition.refund.wood??0;assert.equal(finishDemolition(s,b,b.demolition.refund),true);assert.equal(s.foodStorage.locations.has(id),false);assert.equal(s.foodStorage.resourceBreakdown().find(r=>r.resource==='wood').total,expected+refundWood,'the wooden Material Yard refunds half its wood (0.49)');
  const committed=[...s.dropSystem.drops.values()].filter(d=>d.siteId===result.building.id);assert.equal(committed.filter(d=>d.resource==='wood').reduce((n,d)=>n+d.amount,0),10);assert.equal(committed.filter(d=>d.resource==='stone').reduce((n,d)=>n+d.amount,0),0,'a House is wood only since 0.49');assert.equal([...s.foodStorage.reservations.values()].some(r=>r.locationId===id),false);validateGameState(serializeGameState(s));
 });
 test('occupied Mill removal returns its active recipe inputs and leaves no worker or capacity ghost',async()=>{
@@ -75,9 +75,9 @@ test('Stables demolition preserves live horses, keeps a reserved training horse 
  const order=s.military.order(rider);assert.ok(order);s.military.cancel(order.id);assert.equal(reserved.isAlive,true);assert.equal(s.stables.horses.has(reserved.id),false);validateGameState(serializeGameState(s));
 });
 
-test('loaded Hauler cargo targeting a demolished Warehouse stays owned and reaches the remaining starter store',async()=>{
+test('loaded Hauler cargo targeting a demolished Material Yard stays owned and reaches the remaining starter store',async()=>{
  const {finishDemolition}=await import('../src/game/buildingRemoval.js'),{serializeGameState,validateGameState}=await import('../src/systems/GameStateSerializer.js');
- const {s,b}=fixture({type:'warehouse'});s.foodStorage.register(b);const start=[...s.foodStorage.locations.values()].find(l=>l.kind==='fallback'&&l.buildingId!=null);assert.ok(start);s.foodStorage.deposit(start.id,'wood',6);const w=s.workerSystem.create({x:start.x-1,y:start.y});s.workerSystem.jobs.assign(w,'hauler');w.stoneCollection={enabled:false,radius:80};until(s,()=>w.cargo?.resource==='wood'&&w.workTask?.destinationId===`warehouse-${b.id}`);const amount=w.cargo.amount;
+ const {s,b}=fixture({type:'material_yard'});s.foodStorage.register(b);const start=[...s.foodStorage.locations.values()].find(l=>l.kind==='fallback'&&l.buildingId!=null);assert.ok(start);s.foodStorage.deposit(start.id,'wood',6);const w=s.workerSystem.create({x:start.x-1,y:start.y});s.workerSystem.jobs.assign(w,'hauler');w.stoneCollection={enabled:false,radius:80};until(s,()=>w.cargo?.resource==='wood'&&w.workTask?.destinationId===`yard-${b.id}`);const amount=w.cargo.amount;
  s.demolition.request(b);Object.assign(b.demolition,{state:'building',workDone:b.demolition.requiredWork,progress:100});assert.equal(finishDemolition(s,b,b.demolition.refund),true);assert.equal(w.cargo.amount,amount);assert.equal(w.workTask,null);validateGameState(serializeGameState(s));until(s,()=>s.inventory.count('wood')===6);assert.equal(w.cargo,null);validateGameState(serializeGameState(s));
 });
 test('Farmhouse demolition safely releases its Farmer and leaves the existing plot orphaned without growth loss',async()=>{

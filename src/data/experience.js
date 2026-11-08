@@ -10,7 +10,7 @@ export const XP_REWARDS=Object.freeze({
   transportDelivered:Object.freeze({hauler:1}),
   resourceCollected:Object.freeze({stone:3}),dropCollected:Object.freeze({meat:2}),fishCaught:Object.freeze({fish:3}),
   animalKilled:Object.freeze({rabbit:10,deer:20,wild_boar:35}),
-  buildingCompleted:Object.freeze({wall:2,tower:15,castle:30,house:10,quarry:15,hunting_lodge:10,fisherman_hut:8,barracks:20,farmhouse:10,wheat_field:5,orchard:8,mill:12,bakery:10,granary:10,warehouse:10,lumberjack_hut:8,iron_mine:12,brazier:3,smelter:15,pitch_kiln:10,torch_post:2}),
+  buildingCompleted:Object.freeze({wall:2,tower:15,castle:30,house:10,quarry:15,hunting_lodge:10,fisherman_hut:8,barracks:20,farmhouse:10,wheat_field:5,orchard:8,mill:12,bakery:10,granary:10,warehouse:10,material_yard:8,lumberjack_hut:8,iron_mine:12,brazier:3,smelter:15,pitch_kiln:10,torch_post:2}),
   foodProduced:Object.freeze(Object.fromEntries(Object.entries(PRODUCTION_RECIPES).map(([id,recipe])=>[id,recipe.xp]))),
   cropHarvested:Object.freeze(Object.fromEntries(Object.entries(FARMING_RULES.crops).map(([id,crop])=>[id,crop.xp]))),
 });

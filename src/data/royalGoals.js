@@ -8,7 +8,7 @@ export const ROYAL_GOALS=Object.freeze([
   Object.freeze({id:'pop20',kind:'population',target:20,reward:Object.freeze({gold:40})}),
   Object.freeze({id:'wall',kind:'buildings',building:'wall',target:1,reward:Object.freeze({stone:15})}),
   Object.freeze({id:'gold100',kind:'gold',target:100,reward:Object.freeze({wood:30})}),
-  Object.freeze({id:'warehouse',kind:'buildings',building:'warehouse',target:1,reward:Object.freeze({stone:10})}),
+  Object.freeze({id:'material_yard',kind:'buildings',building:'material_yard',target:1,reward:Object.freeze({stone:10})}),
   Object.freeze({id:'barracks',kind:'buildings',building:'barracks',target:1,reward:Object.freeze({gold:50})})
 ]);
 export const ROYAL_GOALS_ACTIVE=3;

@@ -19,9 +19,9 @@ test('three unemployed and three global Haulers gather at distinct Castle anchor
  const positions=people.map(w=>key(w.tile));s.simulate(8000);assert.ok(people.some((w,i)=>key(w.tile)!==positions[i]));assert.equal(new Set([...s.workerSystem.gather.claims.values()].map(c=>key(c.goal))).size,6);validateGameState(serializeGameState(s));
 });
 test('idle Castle travel never delays a new global delivery and the Hauler returns after unloading',()=>{
- const s=scene();add(s,'castle',55,50);const warehouse=add(s,'warehouse',70,50),w=person(s,25,35,'hauler');until(s,()=>s.workerSystem.gather.claims.has(w.id));assert.ok(w.path.length>0);
+ const s=scene();add(s,'castle',55,50);const warehouse=add(s,'material_yard',70,50),w=person(s,25,35,'hauler');until(s,()=>s.workerSystem.gather.claims.has(w.id));assert.ok(w.path.length>0);
  const starter=[...s.foodStorage.locations.values()].find(l=>l.kind==='fallback'&&l.buildingId!=null);s.foodStorage.deposit(starter.id,'wood',6);s.simulate(750);assert.equal(w.workTask?.kind,'foodPickup');assert.equal(s.workerSystem.gather.claims.has(w.id),false);
- until(s,()=>s.foodStorage.locations.get(`warehouse-${warehouse.id}`).stock.wood===6);assert.equal(w.assignedWorkplaceId,null);until(s,()=>s.workerSystem.gather.atHome(w));assert.equal(w.displayProfession,'hauler');validateGameState(serializeGameState(s));
+ until(s,()=>s.foodStorage.locations.get(`yard-${warehouse.id}`).stock.wood===6);assert.equal(w.assignedWorkplaceId,null);until(s,()=>s.workerSystem.gather.atHome(w));assert.equal(w.displayProfession,'hauler');validateGameState(serializeGameState(s));
 });
 test('multiple Castles choose a reachable one; losing it uses bounded local idle instead of crossing walls',()=>{
  // A second Castle can no longer be placed (maxCount 1), but older saves may hold two: add it as such a save would.

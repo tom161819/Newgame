@@ -11,7 +11,7 @@ export const TUTORIAL_STEPS=Object.freeze([
   {id:'lumberjack_hut',check:'planned',buildingIds:['lumberjack_hut']},
   {id:'stone',check:'stone',target:'#mark-rocks',buildingIds:['quarry']},
   {id:'house',check:'built',buildingIds:['house']},
-  {id:'storage',check:'planned',buildingIds:['warehouse','builder_workshop']},
+  {id:'storage',check:'planned',buildingIds:['material_yard','builder_workshop']},
   {id:'speed',check:'speed',target:'#speed-controls [data-speed="2"]'},
 ].map(step=>Object.freeze(step)));
 // The king step ends by itself after this many real milliseconds (or "Next").

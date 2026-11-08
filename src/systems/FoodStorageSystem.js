@@ -7,7 +7,7 @@ import { PLAYER_START } from '../game/config.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { findPathToAny } from '../game/pathfinding.js';
 import { tileKey } from '../game/stones.js';
-import { physicalResources,materialResources,storageResources,stockLocationId,equipmentResources } from '../data/logistics.js';
+import { physicalResources,materialResources,storageResources,stockLocationId,equipmentResources,outputPile,pileLocationId } from '../data/logistics.js';
 
 const sum=values=>Object.values(values).reduce((a,b)=>a+b,0);
 const positive=n=>Number.isSafeInteger(n)&&n>0;
@@ -39,7 +39,11 @@ export class FoodStorageSystem {
     if(d.kit)add(`kit-${building.id}`,'kit',d.kit.capacity,equipmentResources(this.scene.objectRegistry));
     // Day and night N2: a light place's fuel store (Torches or Wood for one or two nights).
     if(d.fuel&&this.physicalMaterials)add(`fuel-${building.id}`,'fuel',d.fuel.capacity,[d.fuel.resource]);
+    // m-sklady-materialu-koncept (49): a producer's output pile; never a store, Haulers empty it into the stores.
+    const pile=this.physicalMaterials&&outputPile(d);if(pile)add(pileLocationId(building),'pile',pile.capacity,[pile.resource]);
   }
+  // m-sklady-materialu-koncept (49): a producer's output pile, if it has one.
+  pileFor(building){return building?this.locations.get(pileLocationId(building))??null:null;}
   isStock(location){return location.kind==='storage'||location.kind==='fallback';}
   used(location){return sum(location.stock);}
   reserved(locationId,resource){return [...this.reservations.values()].filter(r=>r.kind==='stock'&&r.locationId===locationId&&r.resource===resource).reduce((n,r)=>n+r.amount,0);}
@@ -163,7 +167,7 @@ export class FoodStorageSystem {
   starterRemovalStatus(building){
     const s=this.scene;
     if(!building||building.type!=='starter_stockpile'||!s.buildings.includes(building)||!buildingIsComplete(building))return 'unavailable';
-    if(!s.buildings.some(b=>b.type==='warehouse'&&buildingIsComplete(b)))return 'warehouse';
+    if(!s.buildings.some(b=>b.type==='material_yard'&&buildingIsComplete(b)))return 'yard';
     const locations=[...this.locations.values()].filter(l=>l.buildingId===building.id),ids=new Set(locations.map(l=>l.id));
     if(!locations.length||locations.some(l=>this.used(l)>0))return 'stock';
     if([...this.reservations.values()].some(r=>ids.has(r.locationId)))return 'busy';

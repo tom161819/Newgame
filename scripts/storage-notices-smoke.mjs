@@ -35,17 +35,19 @@ export async function storageNoticesSmoke(context,url,instrument){
     assert.match(await page.locator('#workplace-issue').textContent(),/No Stone left in range – build a new Quarry near rocks\./);
     if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/quarry-depleted.png`});
     await page.locator('#close-workplace').click();
-    // 2. Every store that takes wood is full; the Woodcutters chop and find nowhere to put the wood.
-    await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,st=s.foodStorage;for(const l of st.locations.values())if(st.isStock(l)&&l.allowed.includes('wood')){const room=st.room(l.id,'wood');if(room>0)l.stock.stone=(l.stock.stone??0)+room;}st.changed();});
-    await page.waitForFunction(()=>{const s=window.__game.registry.get('application').scene;return s.workerSystem.liveSubjects().some(w=>w.workMessage==='Waiting for reachable timber storage capacity'||w.workMessage==='Timber preserved on the ground');},null,{timeout:120000});
+    // 2. Every store that takes wood is full and the hut's output pile (m-sklady-materialu-koncept) is full too: the
+    // Woodcutters wait with nowhere to put the wood.
+    await page.evaluate(hut=>{const s=window.__game.registry.get('application').scene,st=s.foodStorage;for(const l of st.locations.values())if(st.isStock(l)&&l.allowed.includes('wood')){const room=st.room(l.id,'wood');if(room>0)l.stock.stone=(l.stock.stone??0)+room;}
+      const pile=st.locations.get(`pile-${hut}`);pile.stock.wood=pile.capacity-(st.incoming(pile.id,'wood'));st.changed();},hut.id);
+    await page.waitForFunction(()=>{const s=window.__game.registry.get('application').scene;return s.workerSystem.liveSubjects().some(w=>['Output pile full','Waiting for reachable timber storage capacity','Timber preserved on the ground'].includes(w.workMessage));},null,{timeout:120000});
     await settle(page);
-    assert.match(await page.locator('#notices-list').textContent(),/Storage full: Wood has nowhere to go – build a Warehouse\./);
+    assert.match(await page.locator('#notices-list').textContent(),/Storage full: Wood has nowhere to go – build a Material Yard\./);
     assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.issueIcons.icons.has(id),hut.id),true,'warning sign over the Lumberjack Hut');
     const feed=await page.evaluate(()=>document.querySelector('#event-feed')?.textContent??'');
     if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/storage-full.png`});
     // 3. Room again.
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,st=s.foodStorage;for(const l of st.locations.values())if(st.isStock(l))l.stock.stone=0;st.changed();});
     await settle(page);assert.doesNotMatch(await page.locator('#notices-list').textContent(),/Storage full/);
-    console.log(`PASS Notices 14–15: depleted Quarry (notice, sign, panel line), Storage full for Wood with the Warehouse advice and a sign over the Lumberjack Hut, cleared with room${/Storage full/.test(feed)?', in the event feed':''}`);
+    console.log(`PASS Notices 14–15: depleted Quarry (notice, sign, panel line), Storage full for Wood with the Material Yard advice and a sign over the Lumberjack Hut, cleared with room${/Storage full/.test(feed)?', in the event feed':''}`);
   }finally{await page.close();}
 }

@@ -25,10 +25,10 @@ test('incoming reservations, partial deposits and cancellation share only the ma
  assert.equal(storage.reserve('capacity',id,'wheat',1,'other'),null);assert.equal(storage.reserve('capacity',id,'apple',1,'other'),null);assert.equal(storage.deposit(id,'wheat',1),false);assert.equal(storage.room(id,'bread'),0);
  assert.ok(storage.put(raw,3));assert.ok(storage.put(food,2));assert.equal(storage.room(id,'flour'),0);storage.release(raw);assert.equal(storage.room(id,'wheat'),2);assert.equal(storage.room(id,'apple'),0);assert.ok(storage.deposit(id,'flour',2));assert.ok(storage.put(food,3));assert.equal(storage.put(food,1),false);assert.equal(storage.put(raw,2),false);assert.equal(storage.used(storage.locations.get(id)),RAW+FOOD);snapshot(s);
 });
-test('each Granary has its own groups; Warehouse, Starter Stockpile and production buffers retain shared limits',()=>{
- const {s,id,storage}=fixture(),other=building(s,'granary',58,45),warehouse=building(s,'warehouse',64,45),bakery=building(s,'bakery',70,45),starter=[...storage.locations.values()].find(l=>l.kind==='fallback'&&l.allowed.includes('wheat'));
+test('each Granary has its own groups; Material Yard, Starter Stockpile and production buffers retain shared limits',()=>{
+ const {s,id,storage}=fixture(),other=building(s,'granary',58,45),warehouse=building(s,'material_yard',64,45),bakery=building(s,'bakery',70,45),starter=[...storage.locations.values()].find(l=>l.kind==='fallback'&&l.allowed.includes('wheat'));
  storage.deposit(id,'wheat',RAW);assert.equal(storage.room(`granary-${other.id}`,'wheat'),RAW);assert.equal(storage.room(`granary-${other.id}`,'bread'),FOOD);
- assert.ok(storage.deposit(`warehouse-${warehouse.id}`,'wood',150));assert.ok(storage.deposit(`warehouse-${warehouse.id}`,'stone',50));assert.equal(storage.room(`warehouse-${warehouse.id}`,'iron'),0);assert.equal(storage.groups(`warehouse-${warehouse.id}`),null);
+ assert.ok(storage.deposit(`yard-${warehouse.id}`,'wood',300));assert.ok(storage.deposit(`yard-${warehouse.id}`,'stone',100));assert.equal(storage.room(`yard-${warehouse.id}`,'iron'),0);assert.equal(storage.groups(`yard-${warehouse.id}`),null);
  assert.ok(storage.deposit(starter.id,'wheat',80));assert.ok(storage.deposit(starter.id,'bread',CAP-80));assert.equal(storage.room(starter.id,'apple'),0);assert.ok(storage.deposit(`input-${bakery.id}`,'flour',20));assert.equal(storage.room(`input-${bakery.id}`,'flour'),0);snapshot(s);
 });
 test('two Haulers cannot overbook food capacity when raw is full; real reserved transport survives a loaded roundtrip',()=>{

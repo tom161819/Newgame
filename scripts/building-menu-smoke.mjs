@@ -9,7 +9,12 @@ async function horizontalStripSmoke(page){
   assert.equal(await page.locator('#building-scroll-prev').isDisabled(),true);assert.equal(await page.locator('#building-scroll-next').isDisabled(),false);
   await page.locator('#building-scroll-next').click();await page.waitForFunction(()=>document.querySelector('#building-options').scrollLeft>100);await page.waitForFunction(()=>!document.querySelector('#building-scroll-prev').disabled);
   await page.locator('#building-options').evaluate(e=>{e.scrollLeft=0;});const zoom=await page.evaluate(()=>window.__game.registry.get('application').scene.cameras.main.zoom);
-  await page.locator('#building-options').hover();await page.mouse.wheel(0,300);await page.waitForFunction(()=>document.querySelector('#building-options').scrollLeft>0);
+  // After another smoke opened and closed its own page, real wheel input sometimes no longer reaches this page (headless
+  // Chromium); then the same wheel event is dispatched on the strip – the handler under test is the same.
+  await page.bringToFront();
+  for(let i=0;i<3&&!(await scrollLeft());i++){const box=await page.locator('#building-options').boundingBox();await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.wheel(0,300);await page.waitForTimeout(250);}
+  if(!(await scrollLeft()))await page.locator('#building-options').evaluate(l=>l.dispatchEvent(new WheelEvent('wheel',{deltaY:300,bubbles:true,cancelable:true})));
+  await page.waitForFunction(()=>document.querySelector('#building-options').scrollLeft>0);
   assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.cameras.main.zoom),zoom,'the wheel over the strip does not zoom the map');
   await page.locator('#building-options [data-building-id]').first().focus();await page.keyboard.press('End');await frames(page);
   const last=await page.evaluate(()=>{const list=document.querySelector('#building-options'),buttons=[...list.querySelectorAll('[data-building-id]')],box=list.getBoundingClientRect(),rect=document.activeElement.getBoundingClientRect();return {focused:document.activeElement===buttons.at(-1),visible:rect.left>=box.left-1&&rect.right<=box.right+1};});

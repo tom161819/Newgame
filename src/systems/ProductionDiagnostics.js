@@ -108,7 +108,9 @@ export class ProductionDiagnostics {
   storageIssues(){
     const s=this.scene,st=s.foodStorage;if(!st||!st.physicalMaterials&&!s.constructionSystem?.materials?.enabled)return [];
     const found=[],pending=new Map(),blocked=new Map(),add=(map,resource,id)=>{if(!map.has(resource))map.set(resource,new Set());if(id!=null)map.get(resource).add(id);};
-    for(const l of st.locations.values())if(l.kind==='output')for(const [resource,n]of Object.entries(l.stock))if(n>0){add(pending,resource,null);if(st.room(l.id)<=0)add(blocked,resource,l.buildingId);}
+    // m-sklady-materialu-koncept (49): a full producer pile with no Hauler to empty it stops the producer.
+    if(!this.residents('hauler').length)for(const l of st.locations.values())if(l.kind==='pile'&&st.room(l.id)<=0)found.push({entityId:l.buildingId,reason:'pileNoHauler',category:'production',params:{resource:l.allowed[0]}});
+    for(const l of st.locations.values())if(l.kind==='output'||l.kind==='pile')for(const [resource,n]of Object.entries(l.stock))if(n>0){add(pending,resource,null);if(st.room(l.id)<=0)add(blocked,resource,l.buildingId);}
     for(const w of s.workerSystem?.liveSubjects?.()??[]){
       if(!STORAGE_WAIT_MESSAGES.includes(w.workMessage))continue;const b=s.buildings.find(x=>x.id===w.assignedWorkplaceId),resource=w.cargo?.resource??GATHER_OUTPUTS[b?.type];
       if(resource){add(pending,resource,null);add(blocked,resource,b?.id??null);}

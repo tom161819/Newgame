@@ -1,6 +1,6 @@
 import { t } from '../i18n/index.js';
 import { carryCapacity } from '../data/logistics.js';
-export function storageName(scene,id){const location=scene.foodStorage.locations.get(id);if(!location)return t('transport.unavailable');const building=scene.buildings.find(b=>b.id===location.buildingId);return building?`${building.definition.name} #${building.id}${location.kind==='site'?` ${t('transport.site')}`:location.kind==='input'?` ${t('transport.input')}`:location.kind==='output'?` ${t('transport.output')}`:''}`:id==='legacy-materials'?t('transport.legacy'):t('transport.camp');}
+export function storageName(scene,id){const location=scene.foodStorage.locations.get(id);if(!location)return t('transport.unavailable');const building=scene.buildings.find(b=>b.id===location.buildingId);return building?`${building.definition.name} #${building.id}${location.kind==='site'?` ${t('transport.site')}`:location.kind==='input'?` ${t('transport.input')}`:location.kind==='output'?` ${t('transport.output')}`:location.kind==='pile'?` ${t('transport.pile')}`:''}`:id==='legacy-materials'?t('transport.legacy'):t('transport.camp');}
 export function cargoLabel(scene,actor){const cargo=actor.cargo;return `${t('transport.cargo',{load:cargo?`${cargo.amount} ${scene.objectRegistry.require(cargo.resource).name}`:t('transport.empty'),capacity:carryCapacity(actor,cargo?.resource)})}${cargo?.siteId!=null?` · ${storageName(scene,`site-${cargo.siteId}`)}`:''}`;}
 export function transportLabel(scene,actor){
   const task=actor===scene.character?scene.kingLogistics.task:actor.workTask;

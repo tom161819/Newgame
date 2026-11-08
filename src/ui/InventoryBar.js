@@ -43,13 +43,13 @@ export class InventoryBar {
     this.storeOutput=element('output','',this.storeText());this.storeOutput.id='storage-capacity';this.storeOutput.setAttribute('aria-label',t('hud.storeCapacity'));
     store.append(element('span','',t('hud.storeCapacity')),this.storeOutput);store.hidden=!this.storeUsage();
     // (24) Resting on the gauge shows what the stores hold (StorePreview, shared with the map).
-    const stores=()=>[...(this.inventory.storage?.locations?.values()??[])].filter(l=>(l.kind==='fallback'&&l.buildingId!=null)||String(l.id).startsWith('warehouse-'));
+    const stores=()=>[...(this.inventory.storage?.locations?.values()??[])].filter(l=>(l.kind==='fallback'&&l.buildingId!=null)||/^(warehouse|yard)-/.test(String(l.id)));
     store.addEventListener('pointerenter',e=>this.ledger?.scene?.storePreview?.hover({key:'hud-store',locations:stores,x:e.clientX,y:e.clientY,below:true}),{signal:this.controller.signal});
     store.addEventListener('pointerleave',()=>this.ledger?.scene?.storePreview?.hover(null),{signal:this.controller.signal});
     this.storeItem=store;this.root.replaceChildren(...groups,store);
   }
   storeUsage(){
-    const locations=[...(this.inventory.storage?.locations?.values()??[])].filter(l=>(l.kind==='fallback'&&l.buildingId!=null)||String(l.id).startsWith('warehouse-'));
+    const locations=[...(this.inventory.storage?.locations?.values()??[])].filter(l=>(l.kind==='fallback'&&l.buildingId!=null)||/^(warehouse|yard)-/.test(String(l.id)));
     if(!locations.length)return null;return {used:locations.reduce((n,l)=>n+Object.values(l.stock).reduce((a,v)=>a+v,0),0),capacity:locations.reduce((n,l)=>n+l.capacity,0)};
   }
   storeText(){const u=this.storeUsage();return u?`${u.used} / ${u.capacity}`:'';}

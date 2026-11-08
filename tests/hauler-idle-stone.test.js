@@ -43,16 +43,16 @@ test('without a Castle an accessible Starter Stockpile is a collection centre',(
   const s=workerScene(undefined,{construction:true,logistics:true,gameSettings:gameSettings({startingCastle:false})});s.addResource(s.objectRegistry.require('stone'),{x:50,y:50});
   const h=hauler(s);until(s,()=>stored(s)===1&&!h.cargo);assert.equal(castle(s),undefined);snapshot(s);
 });
-test('a distant Warehouse expands the per-unit radius and shares connectivity between Haulers',()=>{
-  const s=scene(),b=building(s,'warehouse',75,75),a=hauler(s,{x:73,y:74}),h=hauler(s,{x:72,y:74});a.stoneCollection.radius=0;h.stoneCollection.radius=5;
+test('a distant Material Yard expands the per-unit radius and shares connectivity between Haulers',()=>{
+  const s=scene(),b=building(s,'material_yard',75,75),a=hauler(s,{x:73,y:74}),h=hauler(s,{x:72,y:74});a.stoneCollection.radius=0;h.stoneCollection.radius=5;
   s.addResource(s.objectRegistry.require('stone'),{x:73,y:75});
   const areas=s.logisticsTasks.stoneAreas(a),cache=s.logisticsTasks.stoneAreaCache;s.logisticsTasks.stoneAreas(h);
   assert.equal(s.logisticsTasks.stoneAreaCache,cache);assert.equal(cache.regions.get('73,74'),cache.regions.get('72,74'));
-  assert.ok(areas.some(x=>x.id===`warehouse-${b.id}`));until(s,()=>stored(s)===1&&!h.cargo);assert.equal(a.workTask,null);snapshot(s);
+  assert.ok(areas.some(x=>x.id===`yard-${b.id}`));until(s,()=>stored(s)===1&&!h.cargo);assert.equal(a.workTask,null);snapshot(s);
 });
-test('an inaccessible Warehouse cannot expand the collection area; connectivity expires after terrain changes',()=>{
-  const s=scene(),b=building(s,'warehouse',75,75),h=hauler(s,{x:70,y:74});h.stoneCollection.radius=5;
-  const location=s.foodStorage.locations.get(`warehouse-${b.id}`);assert.ok(s.logisticsTasks.stoneAreas(h).some(a=>a.id===location.id));
+test('an inaccessible Material Yard cannot expand the collection area; connectivity expires after terrain changes',()=>{
+  const s=scene(),b=building(s,'material_yard',75,75),h=hauler(s,{x:70,y:74});h.stoneCollection.radius=5;
+  const location=s.foodStorage.locations.get(`yard-${b.id}`);assert.ok(s.logisticsTasks.stoneAreas(h).some(a=>a.id===location.id));
   for(const t of s.foodStorage.goals(location))s.map[t.y][t.x]=1;
   s.gameTime.totalElapsed+=501;assert.equal(s.logisticsTasks.stoneAreas(h).some(a=>a.id===location.id),false);
   s.addResource(s.objectRegistry.require('stone'),{x:71,y:75});assert.equal(s.logisticsTasks.startStone(h),false);assert.equal(h.workTask,null);
@@ -77,13 +77,13 @@ test('two Haulers never reserve the same stone; a full store stops new pickups w
   s.simulate(10000);assert.equal(stored(s)+[a,b].reduce((n,w)=>n+(w.cargo?.amount??0),0)+loose(s),total,'no stone lost or duplicated');assert.ok([a,b].every(w=>!w.workTask||w.workTask.kind!=='mine'||w.cargo==null));snapshot(s);
 });
 test('real construction transport takes priority over loose stone, even on the way to a stone',()=>{
-  const s=scene(),warehouse=building(s,'warehouse',58,52);s.foodStorage.deposit(`warehouse-${warehouse.id}`,'stone',30);stone(s,-25,-20);const h=hauler(s,{x:62,y:57});
+  const s=scene(),warehouse=building(s,'material_yard',58,52);s.foodStorage.deposit(`yard-${warehouse.id}`,'stone',30);stone(s,-25,-20);const h=hauler(s,{x:62,y:57});
   until(s,()=>h.workTask?.kind==='mine');const site=building(s,'tower',62,48,true);
   until(s,()=>h.workTask?.siteId===site.id||h.cargo?.siteId===site.id);assert.equal(s.workerSystem.reservations.owners.has(`resource:${h.workTask?.targetId}`),false);
   until(s,()=>s.constructionSystem.materials.ready(site));snapshot(s);
 });
 test('a new real delivery preempts an at-goal stone pickup before any material is collected',()=>{
-  const s=scene(),warehouse=building(s,'warehouse',58,52);s.foodStorage.deposit(`warehouse-${warehouse.id}`,'stone',30);const tile=stone(s,6,4),key=`${tile.x},${tile.y}`,h=hauler(s,{x:56,y:56});
+  const s=scene(),warehouse=building(s,'material_yard',58,52);s.foodStorage.deposit(`yard-${warehouse.id}`,'stone',30);const tile=stone(s,6,4),key=`${tile.x},${tile.y}`,h=hauler(s,{x:56,y:56});
   until(s,()=>h.workTask?.kind==='mine'&&s.workerSystem.ai.atGoal(h,h.workTask.goal));
   const site=building(s,'tower',62,48,true);until(s,()=>h.workTask?.siteId===site.id||!s.resources.has(key),1000);
   assert.equal(h.workTask?.siteId,site.id);assert.equal(s.resources.has(key),true);assert.equal(s.workerSystem.reservations.available(`resource:${key}`,'other'),true);snapshot(s);

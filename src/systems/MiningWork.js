@@ -21,7 +21,9 @@ export class MiningWork {
       if(this.claims(object.natural.id)>=object.natural.remaining){this.wait(worker,'Remaining deposit units are reserved');return;}
       const goals=towerNeighbors(rule.overlap?home:object).filter(t=>s.map[t.y]?.[t.x]===0&&system.reservations.available(this.slot(t),worker.id)),route=system.ai.route(worker,goals);
       if(!route){this.wait(worker,'No reachable deposit work position');return;}
-      const output=s.foodStorage.findDestination(worker,rule.resource,1);if(!output){this.wait(worker,'Waiting for reachable storage capacity');return;}
+      const pile=s.foodStorage.pileFor(home);if(pile&&s.foodStorage.room(pile.id,rule.resource)<1){this.wait(worker,'Output pile full');return;}
+      // m-sklady-materialu-koncept (49): mined units go on the pile by the building; Haulers take them to a store.
+      const output=pile?{location:pile}:s.foodStorage.findDestination(worker,rule.resource,1);if(!output){this.wait(worker,'Waiting for reachable storage capacity');return;}
       const transferId=`food-transfer-${s.foodProduction.nextTransfer++}`,capacityReservation=s.foodStorage.reserve('capacity',output.location.id,rule.resource,1,transferId);if(!capacityReservation)return;
       if(!system.reservations.reserve(this.slot(route.destination),worker.id)){s.foodStorage.release(capacityReservation);return;}
       worker.workTask=task={kind:'mineDeposit',targetId:object.natural.id,goal:{...route.destination},reservation:`mineral:${object.natural.id}:${worker.id}`,progressMs:0,transferId,capacityReservation,destinationId:output.location.id,amount:1};system.reservations.reserve(task.reservation,worker.id);worker.path=route.path;worker.workState='Traveling to Target';worker.workMessage='Travelling to deposit';

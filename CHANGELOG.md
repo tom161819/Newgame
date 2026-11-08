@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.65.0] - 2026-11-08
+<!-- version: {"title":"Material Yard","type":"feature","reconstructed":false,"saveVersion":59} -->
+### Added
+- Material Yard: an open 4×2 yard for wood, stone, iron ore and iron, holding 400 in total. Each good has its own field, and its pile grows as goods arrive.
+- Quarries, Iron Mines and Lumberjack Huts put what they produce on a small pile (20) beside the building. Haulers carry it to the nearest Material Yard. When the pile is full, the workers wait. With no Hauler, a notice offers to hire one.
+### Changed
+- The Warehouse no longer stores wood, stone, iron ore or iron; it keeps crafted goods. The starter tasks and royal goals now ask for a Material Yard. The Starter Stockpile can be removed once a Material Yard stands.
+- Saves from older versions cannot be loaded (save version 59).
+
 ## [0.64.0] - 2026-11-08
 <!-- version: {"title":"UI windows and minimap","type":"feature","reconstructed":false,"saveVersion":58} -->
 ### Added
