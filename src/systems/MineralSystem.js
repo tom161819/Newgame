@@ -2,6 +2,7 @@ import { MINERAL_DEPOSITS,resourceBlocks } from '../data/minerals.js';
 import { reachableTiles } from '../game/pathfinding.js';
 import { buildingTiles,buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
+import { clearsObstacles } from '../data/rockMining.js';
 
 const width=o=>o.width??o.definition.width,height=o=>o.height??o.definition.height;
 export const rectanglesOverlap=(a,b)=>a.x<b.x+width(b)&&a.x+width(a)>b.x&&a.y<b.y+height(b)&&a.y+height(a)>b.y;
@@ -35,7 +36,10 @@ export class MineralSystem {
     return null;
   }
   canBuildOver(definition,tile){
-    const s=this.scene,view=s.resources.get(s.resourceOccupancy.get(tileKey(tile))),object=view?.getData('object');if(!object||s.terrainGrid[tile.y]?.[tile.x]!==0)return false;
+    const s=this.scene,view=s.resources.get(s.resourceOccupancy.get(tileKey(tile))),object=view?.getData('object');
+    // m-oznacovani-tezby (56): a wall, tower or gate plan may cover a rock outcrop or a tree; both get marked for removal.
+    if(clearsObstacles(definition)){if(s.terrainGrid[tile.y]?.[tile.x]===1)return !object;if(object?.definition.tree&&object.natural?.stage>0&&s.terrainGrid[tile.y]?.[tile.x]===0)return true;}
+    if(!object||s.terrainGrid[tile.y]?.[tile.x]!==0)return false;
     if(object.definition.tree&&object.natural.stage===0)return![...s.dropSystem.drops.values()].some(d=>tileKey(d.tile)===tileKey(tile));
     return !!definition.mining?.overlap&&object.type===definition.mining.depositType&&object.natural.remaining>0&&object.natural.boundBuildingId==null;
   }

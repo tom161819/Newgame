@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.60.0] - 2026-11-08
+<!-- version: {"title":"Marking and walls over obstacles","type":"feature","reconstructed":false,"saveVersion":58} -->
+### Added
+- The marking tool ("Mark to clear") also marks trees and bushes. Woodcutters take marked trees first, wherever they stand. Marked bushes and saplings are cut down and give nothing.
+- Walls, towers and gates can be planned over trees, bushes and rocks. Whatever is in the way is marked automatically, and the wall is built once the spot is clear. If no miner is free, one miner leaves his workplace to clear the rocks for the plan and then goes back.
+- Cancelling the plan removes only the marks the plan made.
+### Changed
+- Marks are small and faint during normal play and stand out only while marking or unmarking.
+
 ## [0.59.0] - 2026-11-08
 <!-- version: {"title":"Fires","type":"feature","reconstructed":false,"saveVersion":58} -->
 ### Changed

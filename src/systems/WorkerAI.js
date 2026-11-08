@@ -40,7 +40,8 @@ export class WorkerAI {
     // #58 phase C2: a striker stays home, an emigrant walks out of the kingdom.
     if(this.system.discontent?.update(worker)){worker.update(delta);return;}
     if(worker.profession==='idle'){this.idle(worker);worker.update(delta);return;}
-    if(this.scene.naturalResources?.miningWork.rocks.eligible(worker)){this.scene.naturalResources.miningWork.rocks.update(worker,delta);worker.update(delta);return;}
+    // m-oznacovani-tezby (56): borrow lends one employed Miner to the rocks of wall plans when no free Miner exists.
+    if(this.scene.naturalResources?.miningWork.rocks.eligible(worker)||this.scene.naturalResources?.miningWork.rocks.borrow(worker)){this.scene.naturalResources.miningWork.rocks.update(worker,delta);worker.update(delta);return;}
     const job=JOBS[worker.profession];
     const workplace=this.scene.workplaceSystem;
     if((job.requiresWorkplace||workplace?.requiresWorkplace(worker.profession))&&!worker.assignedWorkplaceId){worker.workState='Waiting';worker.workMessage='Waiting for workplace';worker.update(delta);return;}

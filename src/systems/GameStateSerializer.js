@@ -7,7 +7,7 @@ import { ORDER_STATUSES,validateTradeStats } from './TradeSystem.js';
 import { validateDomesticState } from './DomesticAnimalSystem.js';
 import { validateChildrenState } from './ChildrenSystem.js';
 import { TAX_RATES,RATIONS,FEAST } from '../data/policy.js';
-import { ROCK_MINING } from '../data/rockMining.js';
+import { ROCK_MINING,CLEARING,clearsObstacles } from '../data/rockMining.js';
 import { buildingDemolitionRefund } from '../data/demolition.js';
 import { t } from '../i18n/index.js';
 import { objectRegistry } from './ObjectRegistry.js';
@@ -98,7 +98,7 @@ export function serializeGameState(scene){
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
     ...(scene.workerSystem?{population:scene.workerSystem.exportState(),workers:[...scene.workerSystem.workers.values()].map(w=>({...serializeActor(w),commandState:copy(w.commandState??{state:'Working',goal:null}),name:w.name,profession:w.profession,displayProfession:w.displayProfession,manualRockId:w.manualRockId,isSubject:w.isSubject!==false,diedAt:w.diedAt??null,
       ...(w.naturalTalent?{naturalTalent:w.naturalTalent,initialSkills:copy(w.initialSkills)}:{}),
-      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),workplaceReached:w.workplaceReached,...(w.restPhase?{restPhase:w.restPhase}:{}),...(w.tendTorches?{tendTorches:true}:{}),cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
+      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),workplaceReached:w.workplaceReached,...(w.restPhase?{restPhase:w.restPhase}:{}),...(w.tendTorches?{tendTorches:true}:{}),...(w.clearingLoan?{clearingLoan:true}:{}),cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
       workState:w.workState,workMessage:w.workMessage??'',workTask:copy(w.workTask),assignedWorkplaceId:w.assignedWorkplaceId,arriving:w.arriving,aiCooldown:w.aiCooldown}))}:{}),
     ...(scene.pathWear?{pathWear:scene.pathWear.exportState()}:{}),
     player:{...serializeActor(c),state:c.state,currentTowerId:c.currentTower?.id??null,horseId:c.mountedHorse?.id??null,
@@ -173,8 +173,9 @@ export function validateGameState(input,registry=objectRegistry){
   const bIds=unique(s.buildings),aIds=unique(s.animals),dIds=unique(s.drops),cIds=unique(s.chests);
   const wIds=unique(s.workers??[]),unitIds=new Set(['king',...aIds,...wIds]);
   const occupied=new Set(),solid=new Set();
-  const occupy=(p,w=1,h=1)=>{tile(p);for(let dy=0;dy<h;dy++)for(let dx=0;dx<w;dx++){
-    const x=p.x+dx,y=p.y+dy,key=`${x},${y}`;check(open(x,y)&&!occupied.has(key));occupied.add(key);
+  // m-oznacovani-tezby (56): an unfinished wall, tower or gate may stand over a marked rock (checked in RockMiningState).
+  const occupy=(p,w=1,h=1,rock=false)=>{tile(p);for(let dy=0;dy<h;dy++)for(let dx=0;dx<w;dx++){
+    const x=p.x+dx,y=p.y+dy,key=`${x},${y}`;check((open(x,y)||rock&&s.terrain[y]?.[x]===1)&&!occupied.has(key));occupied.add(key);
   }};
   const siteAssignments=new Set();
   // A provisional site (placed outside sight) claims no tiles until verified: it may lie over hidden terrain or resources.
@@ -185,7 +186,7 @@ export function validateGameState(input,registry=objectRegistry){
     if(b.unverified){tile(b);for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){const x=b.x+dx,y=b.y+dy,key=`${x},${y}`;check(s.terrain[y]?.[x]!==undefined&&!provisional.has(key));provisional.add(key);}}
     // #150: a pavement site may lie on the floor of a finished building (not farmland); it claims no tile of its own.
     else if(d.pavement&&pavementHost(s.buildings,b,registry))tile(b);
-    else occupy(b,d.width,d.height);
+    else occupy(b,d.width,d.height,clearsObstacles(d)&&!buildingIsComplete(b));
     if(!b.unverified&&(!d.walkable||!buildingIsComplete(b)))for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++)solid.add(`${b.x+dx},${b.y+dy}`);
     if(b.construction){
       const c=b.construction;check(['planned','building','complete'].includes(c.state));number(c.requiredWork,1,86400000);check(c.requiredWork===(d.constructionTime??CONSTRUCTION_RULES.defaultTime));
@@ -232,7 +233,7 @@ export function validateGameState(input,registry=objectRegistry){
     else check(r.natural===undefined);
     for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){
     // Rock edges may sit under a neighbouring Quarry; unique reciprocal primary bindings are checked below.
-    const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`,overlap=s.buildings.find(b=>!b.unverified&&x>=b.x&&x<b.x+definition(b.type).width&&y>=b.y&&y<b.y+definition(b.type).height),allowedOverlap=d.tree&&r.natural.stage===0||r.type==='stone_deposit'&&overlap?.type==='quarry'&&overlap.quarryMode==='finite';check(open(x,y)&&(!occupied.has(key)||allowedOverlap)&&!resourceTiles.has(key));resourceTiles.add(key);if(d.deposit||d.tree&&r.natural.stage===3)solid.add(key);
+    const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`,overlap=s.buildings.find(b=>!b.unverified&&x>=b.x&&x<b.x+definition(b.type).width&&y>=b.y&&y<b.y+definition(b.type).height),allowedOverlap=d.tree&&(r.natural.stage===0||!!overlap&&clearsObstacles(definition(overlap.type))&&!buildingIsComplete(overlap))||r.type==='stone_deposit'&&overlap?.type==='quarry'&&overlap.quarryMode==='finite';check(open(x,y)&&(!occupied.has(key)||allowedOverlap)&&!resourceTiles.has(key));resourceTiles.add(key);if(d.deposit||d.tree&&r.natural.stage===3)solid.add(key);
   }}
   const boundDeposits=new Set();for(const b of s.buildings){
     if(b.type==='quarry'){check(['finite','legacy','unbound'].includes(b.quarryMode));if(b.quarryMode==='legacy')check(buildingIsComplete(b)&&b.depositId===undefined);if(b.quarryMode==='unbound')check(b.depositId===undefined);}
@@ -303,15 +304,19 @@ export function validateGameState(input,registry=objectRegistry){
       // #58 phase B: only a living resident goes home or rests.
       if(w.restPhase!==undefined)check(['going','resting'].includes(w.restPhase)&&w.isAlive&&w.isSubject);
       if(w.tendTorches!==undefined)check(w.tendTorches===true);
+      // m-oznacovani-tezby (56): a Miner lent out to the rocks of a wall plan keeps his workplace.
+      if(w.clearingLoan!==undefined)check(w.clearingLoan===true&&w.isAlive&&w.isSubject&&w.profession==='miner'&&w.assignedWorkplaceId!=null);
       check(typeof w.workMessage==='string'&&w.workMessage.length<200);
       if(w.stoneCollection!==undefined){check(w.stoneCollection&&typeof w.stoneCollection.enabled==='boolean'&&Object.keys(w.stoneCollection).length===2);integer(w.stoneCollection.radius,0,IDLE_STONE.maxRadius);}if(w.profession==='hauler')check(w.stoneCollection);if(!w.isAlive)check(['Dead','Left Kingdom'].includes(w.workState)&&!w.workTask&&!w.arriving);else check(w.workState!=='Left Kingdom');
       check(Object.hasOwn(JOBS,w.displayProfession)&&['idle',w.profession].includes(w.displayProfession));
       const t=w.workTask;if(t){
-        check(w.isAlive&&['mine','mineDrop','hunt','collectMeat','build','dismantle','harvest','chopTree','mineDeposit','mineRock','foodPickup','foodDeliver','produce','fish'].includes(t.kind));tile(t.goal);number(t.progressMs,0,t.kind==='fish'?s.gameSettings.dayLengthSeconds*1000*FISHING.maxTripDays:t.kind==='mineRock'?ROCK_MINING.duration:t.kind==='mineDeposit'?(definition(s.buildings.find(b=>b.id===w.assignedWorkplaceId)?.type).mining?.duration??0):t.kind==='harvest'?(definition(s.buildings.find(b=>b.id===t.targetId)?.type).crop?.workDuration??0):WORK_RULES.miningDuration);
-        const prefix=t.kind==='mine'?'resource':t.kind==='hunt'?'animal':'drop',expected=t.kind==='fish'?`natural-slot:${t.goal.x},${t.goal.y}`:t.kind==='mineRock'?`rock:${t.targetId}`:t.kind==='mineDeposit'?`mineral:${t.targetId}:${w.id}`:t.kind==='chopTree'?`natural:${t.targetId}`:t.kind==='produce'?`production-slot:${t.goal.x},${t.goal.y}`:['foodPickup','foodDeliver'].includes(t.kind)?`food-task:${t.transferId}`:['build','dismantle'].includes(t.kind)?`construction-slot:${t.goal.x},${t.goal.y}`:t.kind==='harvest'?`crop:${t.targetId}`:`${prefix}:${t.targetId}`;check(t.reservation===expected&&!reservations.has(t.reservation));reservations.add(t.reservation);
+        check(w.isAlive&&['mine','mineDrop','hunt','collectMeat','build','dismantle','harvest','chopTree','clearMark','mineDeposit','mineRock','foodPickup','foodDeliver','produce','fish'].includes(t.kind));tile(t.goal);number(t.progressMs,0,t.kind==='clearMark'?Math.max(CLEARING.bushMs,CLEARING.saplingMs):t.kind==='fish'?s.gameSettings.dayLengthSeconds*1000*FISHING.maxTripDays:t.kind==='mineRock'?ROCK_MINING.duration:t.kind==='mineDeposit'?(definition(s.buildings.find(b=>b.id===w.assignedWorkplaceId)?.type).mining?.duration??0):t.kind==='harvest'?(definition(s.buildings.find(b=>b.id===t.targetId)?.type).crop?.workDuration??0):WORK_RULES.miningDuration);
+        const prefix=t.kind==='mine'?'resource':t.kind==='hunt'?'animal':'drop',expected=t.kind==='fish'?`natural-slot:${t.goal.x},${t.goal.y}`:t.kind==='mineRock'?`rock:${t.targetId}`:t.kind==='clearMark'?`clear:${t.targetId}`:t.kind==='mineDeposit'?`mineral:${t.targetId}:${w.id}`:t.kind==='chopTree'?`natural:${t.targetId}`:t.kind==='produce'?`production-slot:${t.goal.x},${t.goal.y}`:['foodPickup','foodDeliver'].includes(t.kind)?`food-task:${t.transferId}`:['build','dismantle'].includes(t.kind)?`construction-slot:${t.goal.x},${t.goal.y}`:t.kind==='harvest'?`crop:${t.targetId}`:`${prefix}:${t.targetId}`;check(t.reservation===expected&&!reservations.has(t.reservation));reservations.add(t.reservation);
         if(t.kind==='foodPickup'&&t.sourceDropId){check(!reservations.has(`drop:${t.sourceDropId}`));reservations.add(`drop:${t.sourceDropId}`);}
         if(['mine','mineDrop'].includes(t.kind)){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);check(home?.type!=='iron_mine'&&!['finite','unbound'].includes(home?.quarryMode));}
-        if(t.kind==='mineRock')check(w.profession==='miner'&&w.assignedWorkplaceId==null&&w.manualRockId===t.targetId);
+        if(t.kind==='mineRock')check(w.profession==='miner'&&(w.assignedWorkplaceId==null||w.clearingLoan===true)&&w.manualRockId===t.targetId);
+        // m-oznacovani-tezby (51): a Woodcutter cutting a marked bush or sapling (the mark itself: RockMiningState).
+        if(t.kind==='clearMark'){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),slot=`natural-slot:${t.goal.x},${t.goal.y}`;check(w.profession==='woodcutter'&&home?.type==='lumberjack_hut'&&buildingIsComplete(home)&&typeof t.targetId==='string'&&/^(tree|bush):/.test(t.targetId)&&!reservations.has(slot));reservations.add(slot);}
         if(t.kind==='mine')check((w.profession==='miner'&&t.idleStone===undefined||w.profession==='hauler'&&t.idleStone===true&&w.stoneCollection?.enabled)&&s.resources.some(r=>r.type==='stone'&&`${r.tile.x},${r.tile.y}`===t.targetId));
         if(t.kind==='fish'){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);check(w.profession==='fisher'&&home?.id===t.targetId&&home.type==='fisherman_hut'&&buildingIsComplete(home)&&open(t.goal.x,t.goal.y));
           integer(t.caught,0,FISHING.basket-1);number(t.fraction,0,FISHING.basket+1);check(Object.hasOwn(FISHING.depth,t.depth)&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>ground[t.goal.y+dy]?.[t.goal.x+dx]===t.depth));integer(t.bodyId,0);}

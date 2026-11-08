@@ -15,7 +15,7 @@ export class NaturalResourcesSystem {
     this.unsubscribe=scene.gameTime.onAdvance(delta=>this.advance(delta));
     this.forestry=new ForestryWork(scene,this);
     this.miningWork=new MiningWork(scene,this);
-    this.mining=new MineralSystem(scene,this);Object.defineProperty(scene.resourceOccupancy,'naturalContext',{value:this,configurable:true});this.worldChanged=()=>{this.topologyRevision++;this.mining.reconcile();};scene.events?.on('buildings:changed',this.worldChanged);
+    this.mining=new MineralSystem(scene,this);Object.defineProperty(scene.resourceOccupancy,'naturalContext',{value:this,configurable:true});this.worldChanged=()=>{this.topologyRevision++;this.mining.reconcile();this.miningWork.rocks.reconcile();};scene.events?.on('buildings:changed',this.worldChanged);
     for(const view of scene.resources.values())this.register(view.getData('object'));
   }
   register(object){if(object?.natural){this.byId.set(object.natural.id,object);this.topologyRevision++;}}
@@ -106,8 +106,10 @@ export class NaturalResourcesSystem {
     const n=object.natural,rule=object.definition.tree;if(n.stage!==3||!actor.isAlive||actor.nextTile||actor.path.length||!this.goals(object).some(t=>t.x===actor.tile.x&&t.y===actor.tile.y)||this.scene.workerSystem.reservations.owners.get(this.reservation(object))!==actor.id)return false;
     n.workDone=Math.min(rule.chopDuration,n.workDone+delta*this.scene.skillSystem.workEfficiency(actor,'woodcutting'));this.view(object)?.showWork?.(n.workDone/rule.chopDuration);if(n.workDone+1e-7<rule.chopDuration)return false;
     // Commit the stump before drops/XP: another actor, frame or load cannot repeat a harvest.
-    n.stage=0;n.growthDays=0;n.growthCheckpoint=this.growthClock;n.workDone=0;n.cycle++;this.refreshMap(object);this.view(object)?.setNaturalState?.(object);this.scene.workerSystem.reservations.release(this.reservation(object),actor.id);if(actor.id==='king')this.kingTask=null;
-    this.scene.dropSystem.create('wood',{x:object.x,y:object.y},rule.wood,null,{rewardRemaining:0,rewardUnits:0});
+    // m-oznacovani-tezby (51): a felled tree is no longer marked.
+    n.stage=0;n.growthDays=0;n.growthCheckpoint=this.growthClock;n.workDone=0;n.cycle++;this.miningWork.rocks.trees.delete(n.id);this.refreshMap(object);this.view(object)?.setNaturalState?.(object);this.scene.workerSystem.reservations.release(this.reservation(object),actor.id);if(actor.id==='king')this.kingTask=null;
+    // m-oznacovani-tezby (56): a tree under a wall plan drops its wood where the cutter stands, not inside the site.
+    this.scene.dropSystem.create('wood',this.scene.map[object.y][object.x]===0?{x:object.x,y:object.y}:{...actor.tile},rule.wood,null,{rewardRemaining:0,rewardUnits:0});
     this.scene.activities.emit('treeChopped',{actor,objectType:object.type,quantity:1,objectIds:[n.id]},`tree:${n.id}:${n.cycle}`);this.scene.setStatus(t('status.woodBesideStump',{count:rule.wood}));return true;
   }
   exportState(){this.flushGrowth();return{nextId:this.nextId,nextDepositId:this.nextDepositId,growthClock:this.growthClock,ageClock:this.ageClock,refreshElapsed:this.refreshElapsed,kingTask:structuredClone(this.kingTask),rockMining:this.miningWork.rocks.exportState()};}

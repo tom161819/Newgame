@@ -81,7 +81,7 @@ export class FoodProductionSystem {
     const amount=Math.min(cargo.amount,this.storage.room(route.location.id,cargo.resource),carryCapacity(worker,cargo.resource)),transferId=`food-transfer-${this.nextTransfer++}`;
     const capacityReservation=this.storage.reserve('capacity',route.location.id,cargo.resource,amount,transferId);if(!capacityReservation)return false;
     if(site)this.storage.reservations.get(capacityReservation).siteId=site.id;
-    if(!this.setTask(worker,'foodDeliver',route,{transferId,destinationId:route.location.id,resource:cargo.resource,amount,capacityReservation,...(site?{siteId:site.id}:{}),...(cargo.rockId!=null&&worker.profession==='miner'&&worker.assignedWorkplaceId==null?{manualMining:true,rockId:cargo.rockId}:{})})){this.storage.release(capacityReservation);return false;}
+    if(!this.setTask(worker,'foodDeliver',route,{transferId,destinationId:route.location.id,resource:cargo.resource,amount,capacityReservation,...(site?{siteId:site.id}:{}),...(cargo.rockId!=null&&worker.profession==='miner'&&(worker.assignedWorkplaceId==null||worker.clearingLoan)?{manualMining:true,rockId:cargo.rockId}:{})})){this.storage.release(capacityReservation);return false;}
     return true;
   }
   handles(worker){return ['foodPickup','foodDeliver'].includes(worker.workTask?.kind)||!!worker.cargo&&this.storage.manages(worker.cargo.resource);}

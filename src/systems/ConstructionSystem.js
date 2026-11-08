@@ -19,11 +19,14 @@ export class ConstructionSystem {
   plan(building){
     if(building.construction)return building;
     building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;if(building.type==='quarry'&&!building.depositId)building.quarryMode='unbound';initializeConstructionSite(building);this.materials.registerLegacy(building);// S11: a pavement blueprint never blocks the way; people keep walking over it while it is laid.
-    if(!building.unverified&&!buildingDefinition(building).pavement)for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.revision++;this.scene.events?.emit('buildings:changed');return building;
+    if(!building.unverified&&!buildingDefinition(building).pavement)for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.clearing()?.markPlan(building);this.revision++;this.scene.events?.emit('buildings:changed');return building;
   }
   getSite(id){return this.sites.get(id)??this.scene.demolition?.site(id)??null;}
   workSites(){return [...this.sites.values(),...(this.scene.demolition?.sites()??[])];}
-  ready(site){return site.demolition===true||this.materials.ready(site);}
+  // m-oznacovani-tezby (56): a wall, tower or gate is built only once its rocks and trees are gone (bushes do not block).
+  clearing(){return this.scene.naturalResources?.miningWork.rocks??null;}
+  obstructed(site){return !!this.clearing()?.obstructed(site);}
+  ready(site){return site.demolition===true||this.materials.ready(site)&&!this.obstructed(site);}
   actor(id){return id==='king'?this.scene.character:this.scene.workerSystem.workers.get(id);}
   slotKey(goal){return `construction-slot:${tileKey(goal)}`;}
   goals(site,actor){const area=buildingDefinition(site).pavement?this.materials.area(site):null;return towerNeighbors(area?.host??site).filter(t=>this.scene.map[t.y]?.[t.x]===0&&this.scene.workerSystem.reservations.available(this.slotKey(t),actor.id));}
@@ -55,6 +58,7 @@ export class ConstructionSystem {
     this.stopKing();const king=this.scene.character;
     this.scene.huntingSystem.cancel?.();this.scene.mountSystem.cancel?.();this.scene.treasureSystem.cancelRequest?.();
     if(!this.sites.has(site.id)||this.scene.gameOver||king.transitioning)return false;
+    if(this.obstructed(site)){this.scene.setStatus(t('construction.obstructed'));return false;}
     if(!this.materials.ready(site)){
       if(fetch&&this.scene.kingLogistics?.startMaterials(site,{build:true})){this.scene.setStatus(t('status.kingFetches'));return true;}
       this.scene.setStatus(t('status.waitMaterials'));return false;
@@ -83,7 +87,7 @@ export class ConstructionSystem {
     // reservedTiles() also lists building footprints (this site included); only units standing on the site make it wait.
     const footprints=new Set(this.scene.buildings.flatMap(b=>b.tiles).map(tileKey)),occupied=new Set((this.scene.reservedTiles?.()??[]).map(tileKey).filter(key=>!footprints.has(key)));
     if(site.tiles.some(tile=>occupied.has(tileKey(tile))))return false;
-    delete site.unverified;for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=1;
+    delete site.unverified;for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=1;this.clearing()?.markPlan(site);
     const natural=this.scene.resourceOccupancy?.naturalContext;if(natural){natural.mining.bind(site);natural.topologyRevision++;}
     this.scene.terrain?.invalidateArea(site.tiles);this.revision++;this.scene.events?.emit('buildings:changed');return true;
   }
@@ -91,7 +95,7 @@ export class ConstructionSystem {
     this.materials.syncAreas();
     for(const site of [...this.sites.values()])if(site.unverified)this.verifyProvisional(site);
     for(const site of [...this.sites.values()]){
-      if(site.unverified||!this.materials.ready(site))continue;
+      if(site.unverified||!this.materials.ready(site)||this.obstructed(site))continue;
       const participants=[];
       for(const id of [...site.construction.assignedBuilders]){
         const actor=this.actor(id),assignment=this.assignments.get(id);
@@ -121,6 +125,7 @@ export class ConstructionSystem {
     }
     // S11: a finished pavement tile becomes the terrain surface layer; its site record goes away.
     if(buildingDefinition(site).pavement){const i=this.scene.buildings.indexOf(site);if(i>=0)this.scene.buildings.splice(i,1);this.scene.pathWear?.setPaved(site,true);}
+    this.clearing()?.planFinished(site);
     this.scene.events?.emit('buildings:changed');this.onComplete(site);return true;
   }
   // obstacle: a provisional site found blocked; reported once as constructionCancelled (reason obstacle).
@@ -128,7 +133,7 @@ export class ConstructionSystem {
     if(!this.sites.has(site.id))return false;
     const c=site.construction,refund=Object.fromEntries(Object.entries(c.investedMaterials).map(([id,n])=>[id,c.workDone>0?Math.floor(n*.5):n]));
     for(const id of [...c.assignedBuilders]){const actor=this.actor(id);if(!actor)continue;if(id==='king')this.stopKing();else this.scene.workerSystem.ai.cancel(actor);}
-    this.sites.delete(site.id);this.scene.buildings.splice(this.scene.buildings.indexOf(site),1);
+    this.sites.delete(site.id);this.scene.buildings.splice(this.scene.buildings.indexOf(site),1);this.clearing()?.clearPlan(site.id);
     // A provisional site never claimed its tiles, so the map under it is left exactly as it is.
     if(!site.unverified){for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=this.scene.terrainGrid[tile.y][tile.x];this.scene.naturalResources?.mining.restoreTiles(site.tiles);}
     if(!this.materials.cancel(site,refund))for(const [id,n]of Object.entries(refund))this.scene.inventory.add(id,n,{source:'Construction Refund',type:'refund',id:`construction-refund:${site.id}:${id}`,entityId:site.id});this.revision++;this.scene.events?.emit('buildings:changed');this.onCancel(site,refund);

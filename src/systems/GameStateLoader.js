@@ -50,10 +50,10 @@ export function loadGameState(scene,input){
     else initializeNaturalTalent(worker,{legacy:true});
     for(const key of ['profession','displayProfession','manualRockId','workState','workMessage','assignedWorkplaceId','arriving','aiCooldown'])worker[key]=data[key];
     if(data.stoneCollection)worker.stoneCollection=structuredClone(data.stoneCollection);
-    worker.workplaceReached=data.workplaceReached??false;worker.restPhase=data.restPhase??null;worker.tendTorches=!!data.tendTorches;worker.cargo=structuredClone(data.cargo??null);worker.pendingWorkRewards=structuredClone(data.pendingWorkRewards??[]);
+    worker.workplaceReached=data.workplaceReached??false;worker.restPhase=data.restPhase??null;worker.tendTorches=!!data.tendTorches;worker.clearingLoan=!!data.clearingLoan;worker.cargo=structuredClone(data.cargo??null);worker.pendingWorkRewards=structuredClone(data.pendingWorkRewards??[]);
     worker.commandState=structuredClone(data.commandState);worker.workTask=structuredClone(data.workTask);worker.active=worker.isAlive;
     if(worker.workTask)scene.workerSystem.reservations.reserve(worker.workTask.reservation,worker.id);
-    if(['chopTree','mineDeposit','mineRock'].includes(worker.workTask?.kind))scene.workerSystem.reservations.reserve(`natural-slot:${worker.workTask.goal.x},${worker.workTask.goal.y}`,worker.id);
+    if(['chopTree','clearMark','mineDeposit','mineRock'].includes(worker.workTask?.kind))scene.workerSystem.reservations.reserve(`natural-slot:${worker.workTask.goal.x},${worker.workTask.goal.y}`,worker.id);
     if(worker.workTask?.kind==='foodPickup'&&worker.workTask.sourceDropId)scene.workerSystem.reservations.reserve(`drop:${worker.workTask.sourceDropId}`,worker.id);
     if(!worker.isAlive)worker.view.destroy();else{const pos=gridToWorld(worker.position.x,worker.position.y);worker.view.setPosition(pos.x,pos.y).setDepth(pos.y+.1);worker.view.animate?.(0,worker.walking,worker.direction);}
   }

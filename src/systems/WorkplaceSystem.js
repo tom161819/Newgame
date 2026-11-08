@@ -29,7 +29,7 @@ export class WorkplaceSystem {
       const stableJob=this.scene.stables?.jobs.get(worker.id),horse=stableJob&&this.scene.stables.horse(stableJob.horseId);
       if(stableJob?.phase==='taming'&&horse?.isAlive&&canInteractAdjacent(this.scene.map,worker,horse))return true;
       const task=worker.workTask;
-      return ['mineDeposit','chopTree','harvest','build','mine','mineDrop','collectMeat','fish'].includes(task?.kind)&&this.scene.workerSystem.ai.atGoal(worker,task.goal);
+      return ['mineDeposit','chopTree','clearMark','harvest','build','mine','mineDrop','collectMeat','fish'].includes(task?.kind)&&this.scene.workerSystem.ai.atGoal(worker,task.goal);
     });
   }
   staffing(building){const spec=buildingDefinition(building).workplace,present=this.present(building).length;return {present,output:staffingOutput(spec,present),missing:Math.max(0,spec.capacity-present),factor:staffingWorkFactor(spec,present)};}
@@ -75,7 +75,7 @@ export class WorkplaceSystem {
     worker.assignedWorkplaceId=building.id;worker.workplaceReached=false;worker.arriving=false;worker.workState='Going to Workplace';worker.aiCooldown=0;record.workerIds.push(worker.id);this.changed(building.id);return true;
   }
   detach(worker){
-    worker.manualRockId=null;
+    worker.manualRockId=null;worker.clearingLoan=false;
     this.scene.workerSystem.ai.cancel(worker);
     const changed=[];for(const record of this.records.values()){const before=record.workerIds.length;record.workerIds=record.workerIds.filter(id=>id!==worker.id);if(before!==record.workerIds.length)changed.push(record.buildingId);}
     this.dropCargo(worker);worker.assignedWorkplaceId=null;worker.workplaceReached=false;for(const id of changed)this.changed(id);
