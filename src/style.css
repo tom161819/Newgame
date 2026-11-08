@@ -261,6 +261,13 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 .setup-card { flex-shrink:0; }
 .setup-card fieldset { margin:24px 0; padding:0; border:0; min-width:0; }
 .setup-card legend, .setup-advanced summary { font:20px Georgia,serif; color:#d9c48d; }
+.setup-generator { margin-top:10px; }
+.setup-generator summary { cursor:pointer; }
+.world-preview { display:block; width:100%; max-width:560px; image-rendering:pixelated; border:1px solid #6b7253; border-radius:4px; margin-top:8px; aspect-ratio:auto; }
+.world-sliders { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:4px 16px; margin-top:6px; }
+.world-sliders input { width:100%; }
+.world-sliders label { display:flex; justify-content:space-between; gap:8px; font-size:.9em; }
+.world-sliders output { opacity:.75; }
 .world-code-row { display:flex; gap:6px; margin-top:10px; }
 .world-code-row input { padding:10px; color:#e5dcbf; background:#172622; border:1px solid #6b7253; border-radius:4px; }
 .world-code-row input[aria-invalid=true] { border-color:#e0806b; }

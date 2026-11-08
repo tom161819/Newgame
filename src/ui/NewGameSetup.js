@@ -1,5 +1,6 @@
 import { t } from '../i18n/index.js';
 import { NEW_GAME_DEFAULTS,gameSettings,STARTING_RESOURCES,STARTING_RESOURCE_CAPACITY,startingResourceTotal } from '../systems/GameSettings.js';
+import { WorldGenerator } from './WorldGenerator.js';
 import { encodeWorldCode,decodeWorldCode,defaultWorldLevels,randomSeed,applyPresets,presetsFromLevels } from '../data/worldCode.js';
 
 // Quick starts (values for the form; anything not listed keeps the New Game default). Starting resources stay within
@@ -19,6 +20,9 @@ export class NewGameSetup {
     document.querySelector('#setup-new-seed').addEventListener('click',()=>{this.world.seed=randomSeed();this.writeCode();});
     document.querySelector('#setup-copy-code').addEventListener('click',()=>{const code=this.codeInput.value.trim();if(code)navigator.clipboard?.writeText(code).catch(()=>{});this.codeInput.select();});
     for(const name of ['worldWater','worldDesert','worldForest'])this.form.elements[name].addEventListener('change',()=>{const e=this.form.elements;this.world.levels=applyPresets(this.world.levels,{water:e.worldWater.value,desert:e.worldDesert.value,forest:e.worldForest.value});this.writeCode();});
+    // World generator (bod 1): sliders per world setting + map preview; it only edits this.world, the code follows.
+    const genHost=document.querySelector('#world-generator');
+    if(genHost){this.generator=new WorldGenerator(genHost,{get:()=>this.world,set:world=>{this.world=world;this.writeCode();}});document.querySelector('#setup-generator').addEventListener('toggle',event=>{if(event.target.open)this.generator.refresh();});}
     document.querySelector('#setup-back').addEventListener('click',onBack);
     document.querySelector('#setup-reset').addEventListener('click',()=>this.reset());
     // E2 (report 0.48.0): three quick starts and Start at the top; the full form folds under Custom settings, which
@@ -33,10 +37,10 @@ export class NewGameSetup {
   // The code to start with: the typed one when valid, a fresh random seed when the field is empty.
   worldCode(){const text=this.codeInput?.value.trim().toUpperCase()??'';if(!text)return null;try{decodeWorldCode(text);return text;}catch{return null;}}
   worldValid(){const text=this.codeInput.value.trim();if(!text)return true;try{decodeWorldCode(text);return true;}catch{return false;}}
-  writeCode(){this.codeInput.value=encodeWorldCode({levels:this.world.levels,seed:this.world.seed});this.showError(null);this.syncPresets();this.refresh();}
+  writeCode(){this.codeInput.value=encodeWorldCode({levels:this.world.levels,seed:this.world.seed});this.showError(null);this.syncPresets();this.refresh();this.generator?.refresh();}
   readCode(){
     const text=this.codeInput.value.trim();if(!text){this.showError(null);this.refresh();return;}
-    try{const {levels,seed}=decodeWorldCode(text);this.world={levels,seed};this.showError(null);this.syncPresets();}
+    try{const {levels,seed}=decodeWorldCode(text);this.world={levels,seed};this.showError(null);this.syncPresets();this.generator?.refresh();}
     catch(error){this.showError(error.reason==='generator'?t('setup.worldCodeGenerator',{message:error.message}):t('setup.worldCodeInvalid'));}
     this.refresh();
   }

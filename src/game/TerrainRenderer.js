@@ -11,6 +11,15 @@ import { GROUND, GROUND_TERRAIN_IDS, BUSH_TYPES, GRASS_ZONE } from '../data/worl
 import { PathV2Layer } from './PathV2Layer.js';
 import { APPROVED_DEPLOY_ART } from '../data/objects/approvedDeployArt.js';
 import { requestTexture } from './deployArt.js';
+import { paintContinuousGround, makeWaterField, plantsFor, waterObjectsFor, drawPlant, seasonOf } from '../render/continuousGround.js';
+import groundArt from '../data/groundStyle.json' with { type: 'json' };
+
+// Continuous ground (plan m-souvisla-zeme): the approved World Lab look (art/effects/ground.json) paints land and water
+// of a whole chunk as one surface – no tile grid, soft zone transitions, natural river banks, plants and stones.
+const GROUND_SETTINGS = groundArt.settings;
+const SEASON_YEAR = { Winter: 0.02, Spring: 0.3, Summer: 0.5, Autumn: 0.76 };
+const LAND_MATERIAL = { [GROUND.BEACH]: 6, [GROUND.DESERT]: 7, [GROUND.MUD]: 8, [GROUND.SHORE_ROCKS]: 9 };
+const WATER_DEPTH = { [GROUND.FORD]: 0.15, [GROUND.SHALLOW]: 0.5, [GROUND.DEEP]: 1 };
 
 const CHUNK_SIZE = 10;
 const TILE_BLEED = .8;
@@ -71,7 +80,7 @@ export class TerrainRenderer {
     this.groundKinds=GROUND_TERRAIN_IDS.map((id,code)=>code===GROUND.GRASS?null:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer)));
     this.bushSprites=new Map();this.bushPool=[];
     // #116: paths are drawn by the V2 renderer (the owner's pesinav2 style); N12 stays as a developer fallback.
-    this.pathStyle='v2';this.shoreStyle='round';this.v2=new PathV2Layer(this);this.requestGroundArt();
+    this.pathStyle='v2';this.shoreStyle='round';this.groundStyle='continuous';this.v2=new PathV2Layer(this);this.requestGroundArt();
     this.wearTextures=PATH_WEAR.terrainIds.map(id=>({key:assets?.hasTexture(id)?assets.textureKey(id):this.groundTextures[0].key,variants:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer))}));
   }
 
@@ -150,6 +159,23 @@ export class TerrainRenderer {
   setPathStyle(style){if(!['v2','n12'].includes(style)||style===this.pathStyle)return false;this.pathStyle=style;this.v2?.invalidate();this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';return true;}
   // Developer switch (console mkDev.setShoreStyle('round'|'edges')): rounded shores (World v2 step 3) or the older edge feathering.
   setShoreStyle(style){if(!['round','edges'].includes(style)||style===this.shoreStyle)return false;this.shoreStyle=style;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';return true;}
+  // Developer switch (console mkDev.setGroundStyle('tiles'|'continuous')).
+  setGroundStyle(style){if(!['tiles','continuous'].includes(style)||style===this.groundStyle)return false;this.groundStyle=style;this.repaintEverything();return true;}
+  // One chunk of continuous ground (land, water, plants, water plants) in chunk-canvas pixels.
+  paintContinuousChunk(context,cx,cy,left,top,season,occupied){
+    const x0=cx*CHUNK_SIZE,y0=cy*CHUNK_SIZE,cell=(x,y)=>this.groundAt(Math.max(0,Math.min(COLUMNS-1,x)),Math.max(0,Math.min(ROWS-1,y)));
+    const isLand=(x,y)=>{const g=cell(x,y);return g===GROUND.GRASS||LAND_MATERIAL[g]!==undefined;},zoneAt=(x,y)=>{const g=cell(x,y);return g===GROUND.GRASS?(this.scene.grassZones?.[Math.max(0,Math.min(ROWS-1,y))]?.[Math.max(0,Math.min(COLUMNS-1,x))]??0):LAND_MATERIAL[g]??0;};
+    const depthAt=(x,y)=>WATER_DEPTH[cell(x,y)]??-1,settings={...GROUND_SETTINGS,year:SEASON_YEAR[season]??0.5};
+    const toWorld=(px,py)=>{const g=worldToGrid(px+left,py+top);return [g.x,g.y];},ownTile=(x,y)=>x>=x0&&y>=y0&&x<x0+CHUNK_SIZE&&y<y0+CHUNK_SIZE,seen=(x,y)=>(this.fog?.displayState({x,y})??VISIBILITY.VISIBLE)!==VISIBILITY.UNEXPLORED,
+      // One tile of overlap into seen neighbour chunks (same pixels there) hides the seam between chunk textures.
+      inWorld=(x,y)=>x>=0&&y>=0&&x<COLUMNS&&y<ROWS&&(ownTile(x,y)||(x>=x0-1&&y>=y0-1&&x<=x0+CHUNK_SIZE&&y<=y0+CHUNK_SIZE&&seen(x,y))),own=(fx,fy)=>ownTile(Math.floor(fx),Math.floor(fy))&&seen(Math.floor(fx),Math.floor(fy));
+    const field=makeWaterField({x0,y0,span:CHUNK_SIZE,depthAt,settings});
+    paintContinuousGround(context,{width:context.canvas.width,height:context.canvas.height,toWorld,isGrass:isLand,zoneAt,depthAt,inWorld,field,settings,step:6});
+    const screen=(fx,fy)=>{const p=gridToWorld(fx,fy);return [p.x-left,p.y-top];},name=seasonOf(settings.year),free=(fx,fy)=>own(fx,fy)&&!occupied.has(`${Math.floor(fx)},${Math.floor(fy)}`)&&this.map[Math.floor(fy)]?.[Math.floor(fx)]!==1;
+    for(const p of waterObjectsFor({x0:x0-1,y0:y0-1,span:CHUNK_SIZE+2,field,depthAt,settings}))if(free(p.fx,p.fy)){const [sx,sy]=screen(p.fx,p.fy);drawPlant(context,p,sx,sy,name);}
+    const plants=plantsFor({x0:x0-1,y0:y0-1,span:CHUNK_SIZE+2,isGrass:isLand,zoneAt,depthAt,field,settings}).filter(p=>free(p.fx,p.fy)).sort((a,b)=>a.fx+a.fy-b.fx-b.fy);
+    for(const p of plants){const [sx,sy]=screen(p.fx,p.fy);drawPlant(context,p,sx,sy,name);}
+  }
   setDebug(value){this.debugEnabled=!!value;this.lastView='';if(!value)this.debugGraphics.clear();}
   setSeason(season){if(season===this.season)return;this.season=season;this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
   // Whole chunks, repainted in one pass, give the same pixels as a fresh draw (season transition).
@@ -405,9 +431,13 @@ export class TerrainRenderer {
       // V2 paths are one continuous image per chunk: a partial repaint near a path would leave antialiased tile edges
       // between old and new pixels, so a chunk with a dirty tile near a path is repainted whole (cached overlays, cheap).
       if(dirty&&this.pathStyle==='v2'&&this.v2?.geo&&[...dirty].some(i=>this.v2.near(i%COLUMNS,Math.floor(i/COLUMNS))))dirty=null;
+      const continuous=this.groundStyle==='continuous';
+      if(continuous)dirty=null;
       if(!dirty)context.clearRect(0,0,texture.width,texture.height);
       // Ground first for every tile, tracks second: a neighbour's ground overlap can then never cover a track's edge.
       const paths=[],occupied=this.buildingTiles();
+      if(continuous)this.paintContinuousChunk(context,cx,cy,left,origin.y,this.season,occupied);
+      const remembered={};
       for (let y = cy * CHUNK_SIZE; y < (cy + 1) * CHUNK_SIZE; y++) {
         for (let x = cx * CHUNK_SIZE; x < (cx + 1) * CHUNK_SIZE; x++) {
           if(dirty&&!dirty.has(y*COLUMNS+x))continue;
@@ -423,6 +453,12 @@ export class TerrainRenderer {
           if(dirty){context.save();polygon();context.clip();context.clearRect(point.x-left-33,point.y-origin.y-17,66,34);context.restore();}
           context.save();polygon(TILE_BLEED);context.clip();
           if(state===VISIBILITY.UNEXPLORED){context.fillStyle='#000';polygon(TILE_BLEED);context.fill();context.restore();continue;}
+          if(continuous){
+            // Remembered (explored, not visible) ground: the same desaturation and darkening as the tiles get by filter.
+            if(state===VISIBILITY.EXPLORED){const v=Math.round(255*(this.fog?.brightness(tile)??FOG_STYLE.brightness));(remembered[v]??=[]).push({x:point.x-left,y:point.y-origin.y});context.filter=`grayscale(${(1-FOG_STYLE.saturation)*100}%) brightness(${(this.fog?.brightness(tile)??FOG_STYLE.brightness)*100}%)`;}
+            if(this.wear)paths.push({x,y,polygon,filter:context.filter,veil:season==='Winter'?.45:0});
+            context.restore();continue;
+          }
           const ground=this.groundAt(x,y),groundKeys=ground?this.groundKinds[ground]:null;
           if(groundKeys?.length){
             if(state===VISIBILITY.EXPLORED)context.filter=`grayscale(${(1-FOG_STYLE.saturation)*100}%) brightness(${(this.fog?.brightness(tile)??FOG_STYLE.brightness)*100}%)`;
@@ -461,6 +497,8 @@ export class TerrainRenderer {
           context.restore();
         }
       }
+      // Remembered ground (explored, not in sight): one path per brightness, so overlapping diamond edges never darken twice.
+      for(const [v,list] of Object.entries(remembered)){context.save();context.beginPath();for(const c of list){context.moveTo(c.x-32.5,c.y);context.lineTo(c.x,c.y-16.25);context.lineTo(c.x+32.5,c.y);context.lineTo(c.x,c.y+16.25);context.closePath();}context.globalCompositeOperation='saturation';context.fillStyle=`rgba(128,128,128,${1-FOG_STYLE.saturation})`;context.fill();context.globalCompositeOperation='multiply';context.fillStyle=`rgb(${v},${v},${v})`;context.fill();context.restore();}
       if(this.pathStyle==='v2'&&this.v2)this.v2.drawChunk(context,cx,cy,left,origin.y,paths);
       else for(const p of paths){context.save();p.polygon(TILE_BLEED);context.clip();context.filter=p.filter;this.drawPaths(context,p.x,p.y,left,origin.y,p.veil,()=>{p.polygon();context.clip();});context.restore();}
       // S11 Stone Pavement on top of ground and tracks; under Fog of War only the remembered surface is drawn.

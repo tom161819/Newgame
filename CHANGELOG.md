@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.73.0] - 2026-11-08
+<!-- version: {"title":"New Game setup has a World generator: sliders for rivers, lakes, forest, desert and more, with a preview of the whole map.","type":"feature","reconstructed":false,"saveVersion":60} -->
+### Added
+- New Game setup has a World generator: sliders for rivers, lakes, forest, desert and more, with a preview of the whole map. The world code follows your choices, so you can share it.
+### Changed
+- The ground is now one continuous landscape: grass, sand, mud and river banks blend smoothly instead of showing tile squares, with flowers, thistles, shrubs, tall grass and stones that change with the seasons, and reeds, water lilies and stones in the river shallows.
+
 ## [0.72.0] - 2026-11-08
 <!-- version: {"title":"Farmhouse store","type":"feature","reconstructed":false,"saveVersion":60} -->
 ### Changed
