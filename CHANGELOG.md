@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.63.0] - 2026-11-08
+<!-- version: {"title":"World look 2","type":"feature","reconstructed":false,"saveVersion":58} -->
+### Changed
+- The edge of the fog of war is now a soft fade instead of tile-by-tile steps.
+- Water with fish shows small fish shadows swimming, and now and then a ring on the surface. More fish show where the water is plentiful, almost none where it is overfished.
+### Fixed
+- The Marketplace no longer floats above the ground, and the Smelter is no longer drawn too tall. Both stand on their 3×3 footprint at Studio scale.
+
 ## [0.62.0] - 2026-11-08
 <!-- version: {"title":"Residents 3","type":"feature","reconstructed":false,"saveVersion":58} -->
 ### Added

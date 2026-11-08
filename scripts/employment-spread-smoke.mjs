@@ -10,7 +10,7 @@ const finish=(page,ids)=>page.evaluate(ids=>ids.map(id=>{const s=window.__game.r
 // A Quarry must cover a stone deposit: find a spot the game itself accepts, then place it through the real menu.
 async function placeValid(page,type){
   const spot=await page.evaluate(type=>{const s=window.__game.registry.get('application').scene,d=s.objectRegistry.require(type),c=s.character.tile;
-    for(let r=2;r<30;r++)for(let y=c.y-r;y<=c.y+r;y++)for(let x=c.x-r;x<=c.x+r;x++){if(Math.max(Math.abs(x-c.x),Math.abs(y-c.y))!==r)continue;s.selectedBuilding=d;s.buildMode=true;s.previewAnchor={x,y};s.previewKey=null;s.updateBuildingPreview();const ok=String(s.previewKey).endsWith(':false:null');s.buildMode=false;s.selectedBuilding=null;if(ok)return {x,y,point:{x:s.map.length*32+(x-y)*32,y:128+(x+y+1)*16}};}return null;},type);
+    for(let r=2;r<30;r++)for(let y=c.y-r;y<=c.y+r;y++)for(let x=c.x-r;x<=c.x+r;x++){if(Math.max(Math.abs(x-c.x),Math.abs(y-c.y))!==r)continue;s.selectedBuilding=d;s.buildMode=true;s.previewAnchor={x,y};s.previewKey=null;s.updateBuildingPreview();/* 0.61.0: the preview key ends with the gate axis */const ok=String(s.previewKey).endsWith(':false:null:null');s.buildMode=false;s.selectedBuilding=null;if(ok)return {x,y,point:{x:s.map.length*32+(x-y)*32,y:128+(x+y+1)*16}};}return null;},type);
   if(!spot)throw new Error(`no valid ${type} site`);
   await page.locator('#buildings-tab').click();await page.locator('[data-building-category="all"]').click();await page.locator(`#${type}-choice`).click();await clickWorld(page,spot.point,{forBlueprint:true});
   const id=await page.evaluate(type=>window.__game.registry.get('application').scene.buildings.filter(b=>b.type===type).at(-1)?.id,type);if(id==null)throw new Error(`${type} not placed`);

@@ -17,7 +17,7 @@ export async function pathsV2Smoke(context,url,instrument){
       for(let i=1;i<8;i++)set(c.x+6+i,c.y+i,3);
       for(let y=c.y+5;y<c.y+8;y++)for(let x=c.x-2;x<c.x+2;x++)set(x,y,32);
       if(s.worldCamera)s.worldCamera.following=false;const p=s.player;s.cameras.main.centerOn(p.x,p.y);
-      return {levels:[1,2,3,4].map(l=>w.levels.filter(v=>v===l).length)};
+      return {levels:[1,2,3,4].map(l=>w.levels.filter(v=>v===l).length),centre:{...c}};
     });
     assert.ok(setup.levels.every(n=>n>0),`all four wear levels present (${setup.levels})`);
     await page.waitForTimeout(1500);
@@ -31,8 +31,9 @@ export async function pathsV2Smoke(context,url,instrument){
     const v2Frame=await frame();await walk();await page.waitForTimeout(3500);const v2Walk=await walk();await page.waitForTimeout(3500);
     if(process.env.SMOKE_SHOTS){await page.screenshot({path:`${process.env.SMOKE_SHOTS}/paths-v2.png`});await page.evaluate(()=>window.__game.registry.get('application').scene.cameras.main.setZoom(2));await page.waitForTimeout(800);await page.screenshot({path:`${process.env.SMOKE_SHOTS}/paths-v2-zoom2.png`});await page.evaluate(()=>window.__game.registry.get('application').scene.cameras.main.setZoom(1));}
     // A wear change repaints only the tiles around it (the game is paused so walking residents add no wear meanwhile).
-    const repaint=await page.evaluate(async()=>{const s=window.__game.registry.get('application').scene;s.playerPaused=true;await new Promise(r=>setTimeout(r,300));const w=s.pathWear,c=s.character.tile,before={...s.terrain.v2.stats};
-      let t=null;for(let i=-6;i<=6&&!t;i++){const p={x:c.x+6,y:c.y+i};if(w.level(p)>0&&w.level(p)<4)t=p;}const i=w.index(t);w.scores[i]=40;w.refreshLevel(i);await new Promise(r=>setTimeout(r,1500));const after=s.terrain.v2.stats;s.playerPaused=false;return {painted:after.painted-before.painted,ms:after.paintMs-before.paintMs,builds:after.builds-before.builds,buildMs:after.buildMs};});
+    // 0.62.0 walks 25 % slower: the King may not be back from the walk yet, so look around the painted roads' centre.
+    const repaint=await page.evaluate(async c=>{const s=window.__game.registry.get('application').scene;s.playerPaused=true;await new Promise(r=>setTimeout(r,300));const w=s.pathWear,before={...s.terrain.v2.stats};
+      let t=null;for(let i=-6;i<=6&&!t;i++){const p={x:c.x+6,y:c.y+i};if(w.level(p)>0&&w.level(p)<4)t=p;}const i=w.index(t);w.scores[i]=40;w.refreshLevel(i);await new Promise(r=>setTimeout(r,1500));const after=s.terrain.v2.stats;s.playerPaused=false;return {painted:after.painted-before.painted,ms:after.paintMs-before.paintMs,builds:after.builds-before.builds,buildMs:after.buildMs};},setup.centre);
     assert.ok(repaint.builds===1&&repaint.painted>0&&repaint.painted<200,`local repaint (${JSON.stringify(repaint)})`);
     assert.equal(await page.evaluate(()=>window.mkDev.setPathRenderer('n12')),true);await page.waitForTimeout(1200);
     const n12Frame=await frame(),n12Walk=await walk();

@@ -9,7 +9,7 @@ async function arrowOn(page,selector){
 }
 async function placeHere(page,id){
   const spot=await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,d=s.objectRegistry.require(id),c=s.buildings.find(b=>b.type==='castle')??s.character.tile;
-    for(let r=3;r<24;r++)for(let y=c.y-r;y<=c.y+r;y++)for(let x=c.x-r;x<=c.x+r;x++){if(Math.max(Math.abs(x-c.x),Math.abs(y-c.y))!==r)continue;const keep=s.selectedBuilding,mode=s.buildMode;s.selectedBuilding=d;s.buildMode=true;s.previewAnchor={x,y};s.previewKey=null;s.updateBuildingPreview();const ok=String(s.previewKey).endsWith(':false:null');s.selectedBuilding=keep;s.buildMode=mode;if(ok)return {x:s.map.length*32+(x-y)*32,y:128+(x+y+1)*16};}return null;},id);
+    for(let r=3;r<24;r++)for(let y=c.y-r;y<=c.y+r;y++)for(let x=c.x-r;x<=c.x+r;x++){if(Math.max(Math.abs(x-c.x),Math.abs(y-c.y))!==r)continue;const keep=s.selectedBuilding,mode=s.buildMode;s.selectedBuilding=d;s.buildMode=true;s.previewAnchor={x,y};s.previewKey=null;s.updateBuildingPreview();/* 0.61.0: the preview key ends with the gate axis */const ok=String(s.previewKey).endsWith(':false:null:null');s.selectedBuilding=keep;s.buildMode=mode;if(ok)return {x:s.map.length*32+(x-y)*32,y:128+(x+y+1)*16};}return null;},id);
   assert.ok(spot,`room for ${id}`);await clickWorld(page,spot,{forBlueprint:true});
   await page.waitForFunction(id=>window.__game.registry.get('application').scene.buildings.some(b=>b.type===id),id);
   if(await page.evaluate(()=>!!window.__game.registry.get('application').scene.buildMode))await page.keyboard.press('Escape');

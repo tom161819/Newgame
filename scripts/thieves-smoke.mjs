@@ -10,7 +10,7 @@ export async function thievesSmoke(context,url,instrument){
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.nightThreats);
     await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
     const start=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,g=s.gameTime,n=s.nightThreats;n.started=()=>true;/* E1: threats begin later in a real game */g.update(g.dayDuration*(s.dayNight.nightStart()+.01)-g.elapsed);
-      s.needs.summary=()=>({happiness:15});s.dayNight.darkAt=()=>true;n.random=()=>0;n.thiefDay=null;const thief=n.spawnThief(g.day);n.random=Math.random;if(!thief)return null;
+      s.needs.summary=()=>({happiness:15});/* m-start-v2: the Castle garrison stands by the store and would spot him at once; this check brings its own soldier */for(const w of s.workerSystem.liveWorkers())if(w.profession==='soldier')s.workerSystem.jobs.assign(w,'idle');s.dayNight.darkAt=()=>true;n.random=()=>0;n.thiefDay=null;const thief=n.spawnThief(g.day);n.random=Math.random;if(!thief)return null;
       const st=n.thieves.get(thief.id),b=s.buildings.find(x=>x.id===st.target.buildingId);
       // Bring him to the store door (the walk from the edge takes a while).
       const near=[];for(let dy=-1;dy<=b.definition.height;dy++)for(let dx=-1;dx<=b.definition.width;dx++){const t={x:b.x+dx,y:b.y+dy};if(s.map[t.y]?.[t.x]===0&&(dx<0||dy<0||dx>=b.definition.width||dy>=b.definition.height))near.push(t);}

@@ -20,6 +20,7 @@ import { eventsSmoke } from './events-smoke.mjs';
 import { markingSmoke } from './marking-smoke.mjs';
 import { walls2Smoke } from './walls-2-smoke.mjs';
 import { residents3Smoke } from './residents-3-smoke.mjs';
+import { worldLook2Smoke } from './world-look-2-smoke.mjs';
 import { employment2Smoke } from './employment-2-smoke.mjs';
 import { animalLooksSmoke } from './animal-looks-smoke.mjs';
 import { tutorialSmoke } from './tutorial-smoke.mjs';
@@ -205,6 +206,7 @@ try{
   await step('marking',()=>markingSmoke(context,origin+base,instrument));
   await step('walls-2',()=>walls2Smoke(context,origin+base,instrument));
   await step('residents-3',()=>residents3Smoke(context,origin+base,instrument));
+  await step('world-look-2',()=>worldLook2Smoke(context,origin+base,instrument));
   await step('tutorial',()=>tutorialSmoke(context,origin+base,instrument));
   await step('marketplace',()=>marketplaceSmoke(context,origin+base,instrument));
   await step('gate',()=>gateSmoke(context,origin+base,instrument));

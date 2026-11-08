@@ -13,7 +13,9 @@ export async function kingdomOverviewSmoke(context,url,instrument){
       await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
       await page.waitForFunction(()=>/\d+ \/ \d+/.test(document.querySelector('#overview-population').textContent));
       const chips=await page.evaluate(()=>['#overview-population','#overview-unemployed','#overview-mood'].map(id=>document.querySelector(id).textContent));
-      assert.match(chips[0],/3 \/ \d+/);assert.match(chips[1],/Unemployed \d/);assert.match(chips[2],/%|—/);
+      // m-start-v2 start: King, two residents and the Castle garrison, so the chip shows the live resident count.
+      const residents=await page.evaluate(()=>window.__game.registry.get('application').scene.workerSystem.liveSubjects().length);
+      assert.ok(residents>=3);assert.match(chips[0],new RegExp(`${residents} \\/ \\d+`));assert.match(chips[1],/Unemployed \d/);assert.match(chips[2],/%|—/);
       assert.equal(await page.locator('#help-arrow').isVisible(),true,'the help arrow at the start');
       // No overlap between the overview and the food status.
       const boxes=await page.evaluate(()=>['#kingdom-overview','.food-status','.hud-status'].map(q=>{const r=document.querySelector(q).getBoundingClientRect();return {l:r.left,r:r.right,t:r.top,b:r.bottom};}));

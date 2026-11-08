@@ -108,7 +108,10 @@ export function villagerSex(name=''){const first=String(name).split(' ')[0];retu
 
 export function withApprovedArt(definition){
   const building=APPROVED_BUILDING_ART[definition.id],tree=APPROVED_TREE_ART[definition.id];
-  if(building)return{...definition,...structuredClone(building),renderMode:'sprite'};
+  // m-svet-vzhled-2 (35): Studio exports are drawn at game scale (scale 1), so a placeholder's displayWidth/Height
+  // must not stretch them (the Marketplace and Smelter PNGs were pulled up off their footprint).
+  if(building){const {displayWidth,displayHeight,...visual}=definition.visual??{},rest={...definition,...structuredClone(building),renderMode:'sprite'};
+    if(definition.visual)rest.visual=visual;return rest;}
   if(tree)return{...definition,artSprites:structuredClone(tree)};
   return definition;
 }
