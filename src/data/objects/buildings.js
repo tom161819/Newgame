@@ -7,7 +7,8 @@ export const buildings = [
     id: 'tower', name: 'Stone Tower', category: 'building', buildingCategory:'defense', sprite: '/assets/buildings/tower/watchtower-square.v1.png',
     frontSprite: '/assets/buildings/tower/watchtower-square.v1.front.png', artSource: 'art/sprites/watchtower/watchtower-square.v1.json',
     visibility: { multiplier: 2 },
-    width: 2, height: 2, walkable: false, collectible: false, buildable: true,
+    // m-staveni-zdi-studna (59): the tool stays selected after placing; a Tower may replace Stone Wall segments.
+    width: 2, height: 2, walkable: false, collectible: false, buildable: true, repeatPlacement: true, replacesWall: true,
     cost: { stone: 20 }, interactions: ['enter', 'exit'], description: 'Kamenná strážní věž s horní plošinou a cimbuřím.',
     constructionTime:20000,
     renderMode: 'sprite', renderer: 'tower', origin: { x: 0.39634, y: 0.99107 }, frontOrigin: { x: 0.39634, y: 0.99107 }, visualHeight: 222,
@@ -34,7 +35,7 @@ export const buildings = [
   },
   {
     id:'wall',name:'Stone Wall',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/wall/wall.svg',
-    width:1,height:1,walkable:false,collectible:false,buildable:true,cost:{stone:1},
+    width:1,height:1,walkable:false,collectible:false,buildable:true,cost:{stone:1},repeatPlacement:true,
     constructionTime:5000,
     interactions:['enter','exit','walk_top'],description:'Spojitelná kamenná hradba. Tažením postavíš rovnou řadu a po vrcholu lze chodit mezi spojenými segmenty.',
     visibility:{multiplier:1.75},navigation:{walkableTop:true},construction:{mode:'line'},
@@ -46,7 +47,8 @@ export const buildings = [
   // Towers it is where the King climbs up to and down from the wall walk. Provisional art: the Studio concept "Gate, open".
   {
     id:'wall_gate',name:'Gate',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/wall_gate/wall-gate-open.v1.png',
-    width:1,height:1,walkable:true,collectible:false,buildable:true,cost:{stone:5},constructionTime:12000,
+    // m-staveni-zdi-studna (59): repeat placement; placed over a Stone Wall segment it replaces it; R turns it (gateAxis).
+    width:1,height:1,walkable:true,collectible:false,buildable:true,cost:{stone:5},constructionTime:12000,repeatPlacement:true,replacesWall:true,
     interactions:['enter','exit','walk_top'],description:'A gate in the wall: people pass through it, and from it you climb up to the wall walk.',
     visibility:{multiplier:1.75},navigation:{walkableTop:true,access:true},
     renderMode:'sprite',origin:{x:.38372,y:.84348},visualHeight:113,platform:{x:0,y:-84},depth:{offset:0},

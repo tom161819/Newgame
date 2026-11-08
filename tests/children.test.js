@@ -129,7 +129,9 @@ test('D2 placement: a Haystack only near a farm, decorations never on a worn pat
   const farm=place('farmhouse',60,60);assert.ok(farm);
   assert.equal(err('haystack',64,61),null,'next to the farmhouse');assert.match(err('haystack',50,50),/6/,'far from any farm');
   s.pathWear.setPaved({x:50,y:50},true);assert.ok(err('swing_tree',50,50),'not on paving');
-  const i=s.pathWear.index({x:52,y:52});s.pathWear.levels[i]=2;assert.ok(err('well',52,52),'not on a worn path');
+  const i=s.pathWear.index({x:52,y:52});s.pathWear.levels[i]=2;assert.ok(err('swing_tree',52,52),'not on a worn path');
+  // m-staveni-zdi-studna (61): a Well may stand on a worn path and on paving.
+  assert.equal(err('well',52,52),null,'a Well on a worn path');assert.equal(err('well',50,50),null,'a Well on paving');
 });
 
 test('D2 play: children swing on a Swing Tree and jump into a Haystack near their house', () => {

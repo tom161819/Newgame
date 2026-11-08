@@ -62,7 +62,12 @@ export function placementError(map,anchor,resources,reservedTiles=[],definition=
   const tiles=buildingTiles(anchor,definition);
   if(tiles.some(tile=>tile.x<0||tile.y<0||tile.y>=map.length||tile.x>=map[0].length))return t('status.insideMap');
   const natural=resources.naturalContext,special=natural?.mining.placementError(definition,anchor);if(special)return special;
-  if(tiles.some(tile=>!isWalkable(map,tile.x,tile.y)&&!natural?.mining.canBuildOver(definition,tile)))return t('status.needsTiles',{width:definition.width,height:definition.height});
+  // m-staveni-zdi-studna (59): Stone Wall segments under a Gate or Tower are replaced, so their tiles count as the ground
+  // beneath them (the terrain, or a tree/rock the plan may clear); only the King standing on such a segment blocks it.
+  const walls=wallsReplacedBy(buildings,tiles,definition),under=new Set(walls.flatMap(b=>b.tiles.map(tileKey))),replaced=tile=>under.has(tileKey(tile));
+  const terrain=natural?.scene?.terrainGrid,open=tile=>replaced(tile)?(terrain?.[tile.y]?.[tile.x]??0)===0:isWalkable(map,tile.x,tile.y);
+  if(tiles.some(tile=>!open(tile)&&!natural?.mining.canBuildOver(definition,tile)))return t('status.needsTiles',{width:definition.width,height:definition.height});
+  const king=natural?.scene?.character;if(king&&king.state!=='ground'&&walls.some(w=>w===king.currentTower||[king.tile,king.nextTile].some(p=>p&&replaced(p))))return t('status.wallReplaceKing');
   // #100: fields and orchards need grass; nothing grows on beach or desert sand.
   // Fishing R1: a Fisherman's Hut must touch water on at least one side (remembered water counts outside sight).
   // Since 0.32.0 a Fisherman's Hut may stand anywhere; its Fishers walk to the nearest reachable shore.
@@ -72,30 +77,40 @@ export function placementError(map,anchor,resources,reservedTiles=[],definition=
   // Day and night N3: a campfire needs local wood (a tree or a bush within 6 tiles).
   if(definition.campfire&&natural?.scene&&!campfireWood(natural.scene,{x:anchor.x,y:anchor.y},definition.campfire.woodRange))return t('campfire.noWood',{range:definition.campfire.woodRange});
   // Children D2: decorations stay off worn paths and paving; a Haystack only stands near a farm.
+  // m-staveni-zdi-studna (61): a Well may stand anywhere buildable, paths and paving included.
   if(definition.decoration){
-    const wear=natural?.scene?.pathWear;if(wear&&tiles.some(tile=>wear.isPaved(tile)||wear.level(tile)>=HOUSE_DECORATIONS.pathLevel))return t('status.notOnPath');
+    const wear=natural?.scene?.pathWear;if(wear&&definition.decoration.kind!=='well'&&tiles.some(tile=>wear.isPaved(tile)||wear.level(tile)>=HOUSE_DECORATIONS.pathLevel))return t('status.notOnPath');
     const range=definition.decoration.farmRange;
     if(range&&!buildings.some(b=>HOUSE_DECORATIONS.haystack.farms.includes(b.type)&&Math.hypot(b.x+buildingDefinition(b).width/2-(anchor.x+.5),b.y+buildingDefinition(b).height/2-(anchor.y+.5))<=range))return t('status.needsFarmNearby',{range});
   }
   if(tiles.some(tile=>resources.has(tileKey(tile))&&!natural?.mining.canBuildOver(definition,tile)))return t('status.resourceHere');
-  if(tiles.some(tile=>reservedTiles.some(p=>tileKey(p)===tileKey(tile))))return t('status.unitHere');
-  if(tiles.some(tile=>buildings.some(building=>building.tiles.some(p=>tileKey(p)===tileKey(tile)))))return t('status.buildingHere');
+  if(tiles.some(tile=>!replaced(tile)&&reservedTiles.some(p=>tileKey(p)===tileKey(tile))))return t('status.unitHere');
+  if(tiles.some(tile=>buildings.some(building=>!walls.includes(building)&&building.tiles.some(p=>tileKey(p)===tileKey(tile)))))return t('status.buildingHere');
   return natural?.mining.accessError(map,definition,anchor)??null;
 }
 
+// m-staveni-zdi-studna (59): the Stone Wall segments (planned or finished, never a Gate) a Gate or Tower footprint replaces.
+export function wallsReplacedBy(buildings,tiles,definition){
+  if(!definition.replacesWall)return [];const keys=new Set(tiles.map(tileKey));
+  return buildings.filter(b=>b.type==='wall'&&b.tiles.some(p=>keys.has(tileKey(p))));
+}
 // provisional: a blueprint outside sight, already validated by knownPlacementError; it claims no map tiles until verified.
-export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,inventory,buildings,definition=towerDefinition(),reserveMaterials=false,provisional=false}) {
+// replaceWalls(walls,building): removes the replaced wall segments after payment and returns a settle() callback run once the
+// new building stands (refunds). Without it a footprint over a wall is refused.
+export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,inventory,buildings,definition=towerDefinition(),reserveMaterials=false,provisional=false,replaceWalls=null,fields=null}) {
   const error=provisional?null:placementError(map,anchor,resources,reservedTiles,definition,buildings);
   if(error)return {error};
+  const walls=wallsReplacedBy(buildings,buildingTiles(anchor,definition),definition);if(walls.length&&!replaceWalls)return {error:t('status.buildingHere')};
   const construction=inventory.storage?.scene.constructionSystem,materials=reserveMaterials&&construction?.materials.enabled?construction.materials:null;
-  const building={id:Math.max(buildings.reduce((n,b)=>Math.max(n,b.id),0)+1,materials?construction.nextId:1),type:definition.id,definition,x:anchor.x,y:anchor.y,tiles:buildingTiles(anchor,definition)};
+  const building={id:Math.max(buildings.reduce((n,b)=>Math.max(n,b.id),0)+1,materials?construction.nextId:1),type:definition.id,definition,x:anchor.x,y:anchor.y,tiles:buildingTiles(anchor,definition),...(fields??{})};
   if(definition.crop)building.farmId=availableFarm(building,buildings,buildingDefinition)?.id??null;
   if(!(materials?materials.prepare(building):inventory.pay(definition.cost,{source:`${dataName(definition)} Construction`,entityId:building.id})))return {error:t('status.noFunds')};
-  if(provisional){building.unverified=true;buildings.push(building);if(definition.id==='quarry')building.quarryMode='unbound';return {building};}
+  const settle=walls.length?replaceWalls(walls,building):null,replaced=walls.length?{replaced:walls}:{};
+  if(provisional){building.unverified=true;buildings.push(building);if(definition.id==='quarry')building.quarryMode='unbound';const refund=settle?.();return {building,...replaced,...(refund?{refund}:{})};}
   for(const tile of building.tiles)map[tile.y][tile.x]=definition.walkable?0:1;
   buildings.push(building);
   if(resources.naturalContext){resources.naturalContext.mining.bind(building);resources.naturalContext.topologyRevision++;}else if(definition.id==='quarry')building.quarryMode=reserveMaterials?'unbound':'legacy';
-  return {building};
+  const refund=settle?.();return {building,...replaced,...(refund?{refund}:{})};
 }
 export function placeTower(options) {
   const result=placeBuilding({...options,definition:towerDefinition()});

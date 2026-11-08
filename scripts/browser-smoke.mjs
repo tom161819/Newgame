@@ -18,6 +18,7 @@ import { animals2Smoke } from './animals-2-smoke.mjs';
 import { wikiSmoke } from './wiki-smoke.mjs';
 import { eventsSmoke } from './events-smoke.mjs';
 import { markingSmoke } from './marking-smoke.mjs';
+import { walls2Smoke } from './walls-2-smoke.mjs';
 import { employment2Smoke } from './employment-2-smoke.mjs';
 import { animalLooksSmoke } from './animal-looks-smoke.mjs';
 import { tutorialSmoke } from './tutorial-smoke.mjs';
@@ -201,6 +202,7 @@ try{
   await step('wiki',()=>wikiSmoke(context,origin+base,instrument));
   await step('events',()=>eventsSmoke(context,origin+base,instrument));
   await step('marking',()=>markingSmoke(context,origin+base,instrument));
+  await step('walls-2',()=>walls2Smoke(context,origin+base,instrument));
   await step('tutorial',()=>tutorialSmoke(context,origin+base,instrument));
   await step('marketplace',()=>marketplaceSmoke(context,origin+base,instrument));
   await step('gate',()=>gateSmoke(context,origin+base,instrument));

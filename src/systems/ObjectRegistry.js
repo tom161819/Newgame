@@ -37,6 +37,7 @@ export function validateDefinition(definition) {
   if(d.unlockDescription!==undefined&&(d.category!=='building'||typeof d.unlockDescription!=='string'||!d.unlockDescription.trim()))fail(id,'neplatný popis odemčení.');
   if(d.maxCount!==undefined&&(d.category!=='building'||!Number.isSafeInteger(d.maxCount)||d.maxCount<1))fail(id,'neplatný nejvyšší počet budov.');
   if(d.repeatPlacement!==undefined&&(d.category!=='building'||typeof d.repeatPlacement!=='boolean'))fail(id,'neplatné opakované pokládání.');
+  if(d.replacesWall!==undefined&&(d.category!=='building'||typeof d.replacesWall!=='boolean'))fail(id,'neplatné nahrazení hradby.');
   if(d.trade!==undefined&&(d.category!=='building'||!plainObject(d.trade)||!Number.isSafeInteger(d.trade.capacity)||d.trade.capacity<1||!Number.isSafeInteger(d.trade.loadingSpots)||d.trade.loadingSpots<1))fail(id,'neplatné tržiště.');
   if(d.menuOrder!==undefined&&(d.category!=='building'||!finite(d.menuOrder)))fail(id,'neplatné pořadí v menu.');
   if(d.constructionTime!==undefined&&(!finite(d.constructionTime)||d.constructionTime<=0||d.category!=='building'))fail(id,'neplatná doba výstavby.');

@@ -31,8 +31,9 @@ export async function repeatPlacementSmoke(page){
   // Owner bug 7. 11.: the Wheat Field tool used to close after one order; it now behaves like the Orchard.
   await select('wheat_field');const wheatBefore=await state();for(let i=0;i<2;i++){await clickWorld(page,await chooseBlueprintSite(page,'wheat_field'),{forBlueprint:true});assert.equal((await state()).type,'wheat_field','the Wheat Field tool stays selected');}
   const wheat=await state();assert.equal(wheat.sites.length,wheatBefore.sites.length+2);assert.equal(wheat.stone,wheatBefore.stone);await page.keyboard.press('Escape');assert.equal((await state()).mode,false);
-  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,c=s.objectRegistry.require('tower').cost;for(const [id,n] of Object.entries(c))s.inventory.add(id,n);s.updateInventory();});
-  await select('orchard');await select('tower');assert.equal((await state()).type,'tower');await clickWorld(page,await chooseBlueprintSite(page,'tower'),{forBlueprint:true});assert.equal((await state()).mode,false,'other buildings remain single placement');
+  // m-staveni-zdi-studna (59): the Tower now keeps its tool too; a House is the single-placement example.
+  await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,c=s.objectRegistry.require('house').cost;for(const [id,n] of Object.entries(c))s.inventory.add(id,n);s.updateInventory();});
+  await select('orchard');await select('house');assert.equal((await state()).type,'house');await clickWorld(page,await chooseBlueprintSite(page,'house'),{forBlueprint:true});assert.equal((await state()).mode,false,'other buildings remain single placement');
   await select('orchard');
   const unseen=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.settingsPanel.applySettings({...s.settingsPanel.settings,fogOfWar:true});s.fog.setEnabled(true);s.refreshVisibility();const d=s.objectRegistry.require('orchard'),points=[];for(let y=5;y<85&&points.length<2;y++)for(let x=5;x<85&&points.length<2;x++){const tiles=[];for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++)tiles.push({x:x+dx,y:y+dy});if(tiles.some(t=>s.fog.isInSightTile(t))||s.buildings.some(b=>b.tiles.some(t=>tiles.some(p=>p.x===t.x&&p.y===t.y)))||points.some(p=>Math.hypot(p.tx-x,p.ty-y)<8))continue;points.push({tx:x,ty:y,x:s.map.length*32+(x-y)*32,y:128+(x+y+1)*16});}if(points.length!==2)throw Error('No unseen fixture sites');return points;});
   const fogBefore=await state();for(const point of unseen){await clickWorld(page,point,{forBlueprint:true});assert.equal((await state()).type,'orchard');}
@@ -43,5 +44,5 @@ export async function repeatPlacementSmoke(page){
   await select('orchard');const saved=await page.evaluate(()=>window.__game.registry.get('application').snapshot()),expected=(await state()).sites;
   const load=async save=>{await page.evaluate(save=>{const app=window.__game.registry.get('application'),ready=app.onGameReady.bind(app);window.__repeatReady=false;app.onGameReady=s=>{ready(s);window.__repeatReady=true;app.onGameReady=ready;};app.load(save);},save);await page.waitForFunction(()=>window.__repeatReady);};
   await load(saved);assert.equal((await state()).mode,false);assert.deepEqual((await state()).sites,expected);await load(baseline);
-  console.log('PASS repeated farm/orchard native placement, rapid duplicate/invalid/funds protection, preview, Escape/right-click/type switch, single-placement tower, unseen provisional sites and current Save/Load');
+  console.log('PASS repeated farm/orchard native placement, rapid duplicate/invalid/funds protection, preview, Escape/right-click/type switch, single-placement house, unseen provisional sites and current Save/Load');
 }

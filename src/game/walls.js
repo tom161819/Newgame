@@ -17,6 +17,15 @@ export function wallLine(start,end){
 export function connectionsFor(index,building){
   return Object.fromEntries(WALL_DIRECTIONS.map(d=>[d.name,index.has(tileKey({x:building.x+d.x,y:building.y+d.y}))]));
 }
+// m-staveni-zdi-studna (59): a wall run on one axis turns a Gate along it ('x': joined E/W, drawn flipped; 'y': joined N/S).
+// A Gate with no such run (alone, at a corner or a crossing) keeps its stored gateAxis, chosen with R while placing.
+export function gateAxis(index,building){
+  const n=connectionsFor(index,building),ew=n.E||n.W,ns=n.N||n.S;
+  if(ew&&!ns)return 'x';if(ns&&!ew)return 'y';return building.gateAxis==='x'?'x':'y';
+}
+export const gateAxisLocked=(index,building)=>{const n=connectionsFor(index,building);return (n.E||n.W)!==(n.N||n.S);};
+// R while placing: turns the pending axis unless the wall run under the cursor decides it (then it stays and locked is true).
+export function turnGate(index,anchor,axis){return anchor&&gateAxisLocked(index,anchor)?{axis:axis==='x'?'x':'y',locked:true}:{axis:axis==='x'?'y':'x',locked:false};}
 export function wallLinePlan({map,tiles,resources,reservedTiles=[],buildings,definition,inventory}){
   const existing=wallIndex(buildings,true),fresh=tiles.filter(tile=>!existing.has(tileKey(tile)));
   if(!fresh.length)return {error:t('status.wallExists'),tiles:[],cost:{}};

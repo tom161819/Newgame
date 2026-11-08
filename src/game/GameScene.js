@@ -79,7 +79,8 @@ import { SettingsPanel } from '../ui/SettingsPanel.js';
 import { FpsOverlay } from '../ui/FpsOverlay.js';
 import { installPanelDismiss,closeOpenPanels } from '../ui/PanelDismiss.js';
 import { FortificationView } from './FortificationView.js';
-import { wallLine,wallLinePlan,placeWallLine,wallIndex,connectionsFor,connectedWalls,isWall } from './walls.js';
+import { wallLine,wallLinePlan,placeWallLine,wallIndex,connectionsFor,connectedWalls,isWall,gateAxis,turnGate } from './walls.js';
+import { replaceWalls } from './wallReplacement.js';
 import { CombatSystem } from '../systems/CombatSystem.js';
 import { CombatFeedback } from '../ui/CombatFeedback.js';
 import { GameTimeSystem } from '../systems/GameTimeSystem.js';
@@ -337,6 +338,7 @@ export class GameScene extends Phaser.Scene {
     document.querySelector('#restart-game').addEventListener('click',()=>{this.gameOverDialog.close();this.scene.restart({settings:this.gameSettings});},{signal:this.controls.signal});
     const onDismount=event=>{if(!event.repeat&&!this.assetGallery.isOpen)dismount();};
     this.input.keyboard.on('keydown-H',onDismount);this.updateMountUI();
+    const onRotate=event=>{if(!event.repeat&&!this.assetGallery.isOpen)this.rotateGate();};this.input.keyboard.on('keydown-R',onRotate);
     this.combatFeedback.refresh();
     this.input.mouse.disableContextMenu();
     this.unitSelection=new UnitSelection(this);this.rockMiningTool=new RockMiningTool(this);this.minimap=new Minimap(this);this.eventFeed=new EventFeed(this);this.millSails=new MillSails(this);
@@ -349,7 +351,8 @@ export class GameScene extends Phaser.Scene {
     this.input.on('pointermove',pointer=>{this.rockMiningTool.move(pointer);this.unitSelection.move(pointer);this.updateHover(pointer);if(this.buildMode&&!this.assetGallery.isOpen){if(!this.dragAnchor)this.wallLastLine=null;this.previewTracking=true;this.previewAnchor=this.pointerTile(pointer);this.updateBuildingPreview();}});
     this.input.on('gameout',()=>{this.storePreview?.hide();this.rockMiningTool.cancelDrag();this.unitSelection.cancelDrag();this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;this.clearWallPreviews();document.querySelector('#object-tooltip').hidden=true;});
     // #97: a Gate opens across its wall: in a wall running east–west the opening faces the other way (mirrored sprite).
-    this.orientGates=()=>{const index=wallIndex(this.buildings,true);for(const b of this.buildings){if(b.type!=='wall_gate')continue;const v=this.towerViews.get(b.id),sprite=v?.back?.sprite??v?.view?.back?.sprite;if(!sprite)continue;const n=connectionsFor(index,b),flip=(n.E||n.W)&&!(n.N||n.S),o=b.definition?.origin??{x:.38372,y:.84348};sprite.setFlipX(flip);sprite.setOrigin(flip?1-o.x:o.x,o.y);}};
+    // m-staveni-zdi-studna (59): the axis comes from the wall run, else from the Gate's stored gateAxis (gateAxis in walls.js).
+    this.orientGates=()=>{const index=wallIndex(this.buildings,true);for(const b of this.buildings)if(b.type==='wall_gate')this.flipGateView(this.towerViews.get(b.id),b,gateAxis(index,b)==='x');};
     this.events.on('buildings:changed',this.orientGates);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{this.events.off('buildings:changed',this.orientGates);
       this.rockMiningTool.destroy();this.unitSelection.destroy();this.minimap?.destroy();this.eventFeed?.destroy();this.millSails?.destroy();this.kingCargoControl.destroy();this.kingLogistics.destroy();this.lightSources.destroy();
@@ -360,7 +363,7 @@ export class GameScene extends Phaser.Scene {
       this.noticesPanel.destroy();this.diagnostics.destroy();this.employmentPanel.destroy();this.unsubscribeEmployment?.();this.employment.destroy();this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
       this.buildingUnlocks.destroy();
       this.animalSystem.destroy();this.dropSystem.destroy();document.querySelector('#object-tooltip').hidden=true;
-      this.settingsPanel.destroy();this.fpsOverlay.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);
+      this.settingsPanel.destroy();this.fpsOverlay.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);this.input.keyboard.off('keydown-R',onRotate);
       this.clearWallPreviews();
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
       this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.wikiPanel?.destroy();this.royalGoalsPanel?.destroy();this.royalGoals?.destroy();this.completionFlash?.destroy();this.storePreview?.destroy();this.dangerMarks?.destroy();this.soundController?.abort();this.marketplacePanel.destroy();this.catPanel?.destroy();this.domesticViews?.destroy();this.domestic?.destroy();this.villagePanel?.destroy();this.issueIcons?.destroy();this.sideCards?.destroy();this.childViews?.destroy();this.childrenSystem?.destroy();this.porches?.destroy();this.lightFuel?.destroy();this.nightThreats?.destroy();this.fuelIcons?.destroy();this.fireViews?.destroy();this.kingdomOverview?.destroy();this.speedControls?.destroy();this.tutorial?.destroy();this.helpArrow?.destroy();this.nightOverlay?.destroy();this.nightControls?.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
@@ -452,14 +455,18 @@ export class GameScene extends Phaser.Scene {
       // Outside sight a blueprint is provisional: checked against known ground now, against the real site once seen.
       const provisional=isProvisional(this.fog,buildingTiles(goal,this.selectedBuilding)),known=provisional?knownPlacementError(this,goal,this.selectedBuilding):null;
       if(known){this.previewKey=null;this.updateBuildingPreview();this.setStatus(known);return;}
-      const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding,reserveMaterials:true,provisional});
+      // m-staveni-zdi-studna (59): a Gate or Tower over Stone Wall segments replaces them; a Gate keeps the axis it was placed with.
+      const fields=this.selectedBuilding.id==='wall_gate'?{gateAxis:gateAxis(wallIndex(this.buildings,true),{...goal,gateAxis:this.gateAxis})}:null;
+      const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding,reserveMaterials:true,provisional,fields,replaceWalls:(walls,building)=>replaceWalls(this,walls,building)});
       if(result.error){this.previewKey=null;this.updateBuildingPreview();this.setStatus(result.error);}
       else{
         this.constructionSystem.plan(result.building);
         this.towerViews.set(result.building.id,this.createBuildingView(this.selectedBuilding,result.building));if(provisional)this.rememberBlueprint(result.building);
-        const message=this.selectedBuilding.crop&&result.building.farmId==null?t('farmPlots.orphan'):t(provisional?'status.blueprintProvisional':'status.blueprintReady',{name:this.selectedBuilding.name,cost:formatCost(this.selectedBuilding.cost,this.objectRegistry)});
+        let message=this.selectedBuilding.crop&&result.building.farmId==null?t('farmPlots.orphan'):t(provisional?'status.blueprintProvisional':'status.blueprintReady',{name:this.selectedBuilding.name,cost:formatCost(this.selectedBuilding.cost,this.objectRegistry)});
+        if(result.replaced)message+=` ${t('status.wallReplaced',{count:result.replaced.length,refund:Object.keys(result.refund??{}).length?formatCost(result.refund,this.objectRegistry):t('demolition.noRefund')})}`;
         this.updateInventory();
-        // Keep the same tool after each accepted order of a repeat-placement building (Farmhouse, Wheat Field, Orchard).
+        // Keep the same tool after each accepted order of a repeat-placement building (Farmhouse, Wheat Field, Orchard;
+        // m-staveni-zdi-studna (59): Stone Wall, Tower and Gate too).
         // Revalidate the occupied footprint immediately so a second click cannot create or pay for another order there.
         if(this.selectedBuilding.repeatPlacement){
           this.previewKey=null;this.updateBuildingPreview();this.updateBuildingUI();this.setStatus(message);
@@ -549,6 +556,16 @@ export class GameScene extends Phaser.Scene {
     if(!preview&&definition.id==='wall_gate')this.time?.delayedCall?.(0,()=>this.orientGates?.());
     return !preview&&!buildingIsComplete(building)?new ConstructionView(this,building,view):view;
   }
+  flipGateView(view,building,flip){
+    const sprite=view?.back?.sprite??view?.view?.back?.sprite;if(!sprite)return;const o=building.definition?.origin??{x:.38372,y:.84348};sprite.setFlipX(flip);sprite.setOrigin(flip?1-o.x:o.x,o.y);
+  }
+  // m-staveni-zdi-studna (59): R (or Shift+wheel) turns the Gate being placed; a wall run under the cursor still decides.
+  rotateGate(){
+    if(!this.buildMode||this.selectedBuilding?.id!=='wall_gate')return false;
+    const turn=turnGate(wallIndex(this.buildings,true),this.previewAnchor,this.gateAxis);
+    if(turn.locked){this.setStatus(t('status.gateFollowsWall'));return true;}
+    this.gateAxis=turn.axis;this.previewKey=null;this.updateBuildingPreview();return true;
+  }
   selectableHumans(){return this.workerSystem?.liveWorkers()??[];}
   towerAtPoint(x,y,tile) {
     return [...this.buildings].filter(building=>this.fog.isVisibleObject(building)).sort((a,b)=>towerBase(b).y-towerBase(a).y).find(building=>this.towerViews.get(building.id).contains(x,y)||building.tiles.some(part=>tileKey(part)===tileKey(tile)));
@@ -566,7 +583,7 @@ export class GameScene extends Phaser.Scene {
     this.unitSelection?.clear();this.constructionSystem.stopKing();this.character.stopForBuilding();definition=placeableDefinition(this,definition);this.selectedBuilding=definition;
     this.preview.destroy();this.preview=this.createBuildingView(definition,{x:0,y:0},true);this.preview.setVisible(false);
     this.buildMode=true;this.previewKey=null;this.previewAnchor=null;this.previewTracking=false;this.game.canvas.style.cursor='crosshair';this.pavementTool.clear();
-    this.updateBuildingUI();this.setStatus(t('status.placing',{name:definition.name,size:t('building.size',{width:definition.width,height:definition.height}),cost:formatCost(definition.cost,this.objectRegistry)}));
+    this.updateBuildingUI();this.setStatus(t('status.placing',{name:definition.name,size:t('building.size',{width:definition.width,height:definition.height}),cost:formatCost(definition.cost,this.objectRegistry)})+(definition.id==='wall_gate'?` · ${t('build.rotateHint')}`:''));
     return true;
   }
   cancelBuilding(message=t('status.buildCancelled')) {
@@ -587,11 +604,13 @@ export class GameScene extends Phaser.Scene {
     const provisional=isProvisional(this.fog,buildingTiles(anchor,definition));
     const error=(provisional?knownPlacementError(this,anchor,definition):placementError(this.map,anchor,this.resourceOccupancy,this.reservedTiles(),definition,this.buildings,this.buildingUnlocks))
       ??(!this.inventory.canAfford(definition.cost)?t('status.noFunds'):null);
-    const key=`${tileKey(anchor)}:${provisional}:${error}`;
+    const gate=definition.id==='wall_gate'?gateAxis(wallIndex(this.buildings,true),{...anchor,gateAxis:this.gateAxis}):null;
+    const key=`${tileKey(anchor)}:${provisional}:${error}:${gate}`;
     if(key!==this.previewKey){
       this.preview.paint({x:anchor.x,y:anchor.y,type:definition.id,definition,tiles:buildingTiles(anchor,definition)},error?0xf27777:provisional?0xe3c46b:0x71dba6);
-      this.previewKey=key;let water='';if(!error&&definition.fishing&&this.fishing){const distance=this.fishing.previewDistance(anchor,definition);water=` · ${distance?t('fishing.previewWater',{distance}):t('fishing.previewNoWater')}`;}
-      this.setStatus(error??t(provisional?'status.provisionalPlace':'status.validPlace',{name:definition.name,cost:formatCost(definition.cost,this.objectRegistry)})+water);
+      let water='',hint='';if(gate){this.flipGateView(this.preview,{definition},gate==='x');hint=` · ${t('build.rotateHint')}`;}
+      this.previewKey=key;if(!error&&definition.fishing&&this.fishing){const distance=this.fishing.previewDistance(anchor,definition);water=` · ${distance?t('fishing.previewWater',{distance}):t('fishing.previewNoWater')}`;}
+      this.setStatus((error??t(provisional?'status.provisionalPlace':'status.validPlace',{name:definition.name,cost:formatCost(definition.cost,this.objectRegistry)})+water)+hint);
     }
     this.preview.setVisible(true);
   }
@@ -627,7 +646,10 @@ export class GameScene extends Phaser.Scene {
     if(result.error){this.wallLastLine=tiles;this.previewTracking=false;this.previewKey=null;this.updateBuildingPreview();return;}
     for(const building of result.buildings){this.constructionSystem.plan(building);this.towerViews.set(building.id,this.createBuildingView(this.selectedBuilding,building));if(building.unverified)this.rememberBlueprint(building);}
     this.refreshWallConnections();this.updateInventory();
-    this.cancelBuilding(t('status.wallBlueprints',{count:result.buildings.length,cost:formatCost(result.cost,this.objectRegistry)}));
+    const message=t('status.wallBlueprints',{count:result.buildings.length,cost:formatCost(result.cost,this.objectRegistry)});
+    // m-staveni-zdi-studna (59): the wall tool stays selected for the next line (Esc, right click or another building ends it).
+    if(this.selectedBuilding.repeatPlacement){this.clearWallPreviews();this.previewAnchor=this.pointerTile(pointer);this.previewTracking=true;this.previewKey=null;this.updateBuildingPreview();this.updateBuildingUI();this.setStatus(message);}
+    else this.cancelBuilding(message);
   }
   refreshWallConnections(){
     this.wallMap=wallIndex(this.buildings);

@@ -264,6 +264,11 @@ export default {
   'demolition.confirm':'Potvrdit rozebrání',
   'demolition.cancel':'Zrušit rozebírání',
   'demolition.refund':'Získané suroviny: {refund} (50 %, zaokrouhleno dolů).',
+  // m-staveni-zdi-studna (59): brána/věž přes hradbu, otáčení brány.
+  'status.wallReplaced':'Nahrazuje úseky hradby: {count}; vráceno: {refund}.',
+  'status.wallReplaceKing':'Na tomto úseku hradby stojí král. Nejdřív musí sestoupit.',
+  'status.gateFollowsWall':'Brána se tu řídí směrem hradby.',
+  'build.rotateHint':'R – otočit',
   'demolition.noRefund':'žádné',
   'demolition.confirmText':'Rozebrat budovu {name}? Práci musí odvést stavitelé. Po dokončení zůstane na zemi {refund} pro nosiče. Při zrušení se suroviny nevracejí.',
   'demolition.queued':'Rozebrání objednáno. Čeká se na stavitele.',

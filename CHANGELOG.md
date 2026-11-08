@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.61.0] - 2026-11-08
+<!-- version: {"title":"Walls 2","type":"feature","reconstructed":false,"saveVersion":58} -->
+### Added
+- A Gate or Tower can be placed on a wall and replaces the wall segments under it. A finished segment gives back part of its stone, using the demolition rule.
+- While placing a Gate, R (or Shift+wheel) turns it. On a wall line the Gate follows the wall.
+### Changed
+- Walls, Towers and Gates stay selected after placing, so you can keep building. Esc or right click ends it.
+- A Well can be built on paths and paving too.
+
 ## [0.60.0] - 2026-11-08
 <!-- version: {"title":"Marking and walls over obstacles","type":"feature","reconstructed":false,"saveVersion":58} -->
 ### Added

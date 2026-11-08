@@ -263,6 +263,11 @@ export default {
   'demolition.confirm':'Confirm Dismantle',
   'demolition.cancel':'Cancel Dismantling',
   'demolition.refund':'Recovered materials: {refund} (50 %, rounded down).',
+  // m-staveni-zdi-studna (59): Gate/Tower over a wall, Gate rotation.
+  'status.wallReplaced':'Replaces {count} wall segment(s); recovered: {refund}.',
+  'status.wallReplaceKing':'The King stands on this wall segment. Come down first.',
+  'status.gateFollowsWall':'The Gate follows the wall here.',
+  'build.rotateHint':'R – rotate',
   'demolition.noRefund':'none',
   'demolition.confirmText':'Dismantle {name}? Builders must do the work. After completion, {refund} will be left on the ground for Haulers. Cancelling gives no materials.',
   'demolition.queued':'Dismantling ordered. Waiting for Builders.',

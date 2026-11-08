@@ -18,6 +18,7 @@ housingBuildings.push({id:'village_green',name:'Village Green',width:3,height:3,
   renderMode:'procedural',renderer:'village_green',origin:{x:.5,y:.9},depth:{offset:0}});
 // Children and the Village Green D2: decorations by the houses (1×1, Housing menu). Provisional drawings until the
 // Studio art (g-deti-naves-grafika) is approved. Not on water, a ford, a worn path or paving; the Haystack only near a farm.
+// m-staveni-zdi-studna (61): the Well is the exception: anywhere buildable (paths and paving too).
 const W=HOUSE_DECORATIONS;
 housingBuildings.push(...[
   {id:'swing_tree',name:'Swing Tree',cost:{wood:4},constructionTime:6000,visualHeight:90,requiresCompletedBuildings:['house'],
