@@ -111,7 +111,7 @@ export function serializeGameState(scene){
       render:{x:scene.player.x,y:scene.player.y,depth:scene.player.depth},
       transition:c.transitioning?{remaining:Math.max(1,(c.transitionTween?.duration??900)-(c.transitionTween?.elapsed??0))}:null},
     inventory:scene.inventory.exportState(),equipment:scene.equipment.exportState(),
-    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.burntFrom?{burntFrom:b.burntFrom}:{}),...(buildingDefinition(b).crop?{farmId:b.farmId??null}:{}),...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.unverified?{unverified:true}:{}),...(b.type==='wall_gate'&&['x','y'].includes(b.gateAxis)?{gateAxis:b.gateAxis}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.demolition?{demolition:copy(b.demolition)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
+    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.burntFrom?{burntFrom:b.burntFrom}:{}),...(buildingDefinition(b).crop?{farmId:b.farmId??null}:{}),...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.depleted?{depleted:true}:{}),...(b.unverified?{unverified:true}:{}),...(b.type==='wall_gate'&&['x','y'].includes(b.gateAxis)?{gateAxis:b.gateAxis}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.demolition?{demolition:copy(b.demolition)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
     resources:[...scene.resources.values()].map(v=>({type:v.getData('objectId'),tile:point(v.getData('tile')),...(v.getData('object').natural?{natural:copy(v.getData('object').natural)}:{})})),
     drops:[...scene.dropSystem.drops.values()].map(d=>({id:d.id,resource:d.resource,tile:point(d.tile),amount:d.amount,rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0),haulEligible:d.haulEligible!==false,...(d.siteId!=null?{siteId:d.siteId}:{})})),
     animals:[...scene.animalSystem.animals.values()].map(a=>({...serializeActor(a),retaliationId:a.retaliationTarget?.id??null})),
@@ -242,6 +242,8 @@ export function validateGameState(input,registry=objectRegistry){
   }}
   const boundDeposits=new Set();for(const b of s.buildings){
     if(b.type==='quarry'){check(['finite','legacy','unbound'].includes(b.quarryMode));if(b.quarryMode==='legacy')check(buildingIsComplete(b)&&b.depositId===undefined);if(b.quarryMode==='unbound')check(b.depositId===undefined);}
+    // m-vytezeny-dul-ctverecky (64): optional `depleted: true` only on a finished mine whose bound deposit is empty.
+    check(b.depleted===undefined||b.depleted===true&&buildingIsComplete(b)&&(b.type==='iron_mine'||b.type==='quarry'&&b.quarryMode==='finite')&&depositIds.get(b.depositId)?.natural.remaining===0);
     if(b.type==='iron_mine'||b.type==='quarry'&&b.quarryMode==='finite'){const r=depositIds.get(b.depositId),spec=definition(b.type).mining;check(r&&r.type===spec.depositType&&r.natural.boundBuildingId===b.id&&!boundDeposits.has(b.depositId));boundDeposits.add(b.depositId);if(spec.overlap)check(r.tile.x<b.x+3&&r.tile.x+2>b.x&&r.tile.y<b.y+3&&r.tile.y+2>b.y);else{const dx=Math.max(0,b.x-r.tile.x-1,r.tile.x-b.x-2),dy=Math.max(0,b.y-r.tile.y-1,r.tile.y-b.y-2);check(Math.hypot(dx,dy)<=spec.range);}}
   }
   for(const r of depositIds.values())if(r.natural.boundBuildingId!=null)check(boundDeposits.has(r.natural.id));
@@ -365,7 +367,7 @@ export function validateGameState(input,registry=objectRegistry){
     for(const record of s.workplaces.records){
       check(bIds.has(record.buildingId)&&!recorded.has(record.buildingId));recorded.add(record.buildingId);
       const b=s.buildings.find(b=>b.id===record.buildingId),spec=definition(b.type).workplace;check(spec&&buildingIsComplete(b)&&record.capacity===spec.capacity);
-      array(record.workerIds,spec.capacity);check(new Set(record.workerIds).size===record.workerIds.length);
+      array(record.workerIds,spec.capacity);check(new Set(record.workerIds).size===record.workerIds.length&&(!b.depleted||!record.workerIds.length));
       for(const id of record.workerIds){const worker=s.workers?.find(w=>w.id===id);check(worker?.isAlive&&worker.isSubject&&worker.assignedWorkplaceId===b.id&&worker.profession===spec.profession&&!assigned.has(id));assigned.add(id);}
       check(record.delivered&&typeof record.delivered==='object'&&!Array.isArray(record.delivered));for(const [id,n]of Object.entries(record.delivered)){check(definition(id).category==='resource'&&id!=='gold');integer(n);}
       if(record.forestry){check(b.type==='lumberjack_hut');integer(record.forestry.harvested,0);integer(record.forestry.day,1,s.time.day);integer(record.forestry.producedToday,0,record.forestry.harvested);}

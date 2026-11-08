@@ -46,6 +46,11 @@ export class WorkplaceView {
       }
       if(d.id==='granary')for(const [dx,dy]of [[.5,2.8],[1,2.8],[1.5,2.8]]){const p=point(x+dx,y+dy);g.fillStyle(tint??0xc2a66c);g.fillEllipse(p.x,p.y-9,13,21);g.lineStyle(2,tint??0x78603b);g.lineBetween(p.x-5,p.y-15,p.x+5,p.y-15);}
     }
+    // m-vytezeny-dul-ctverecky (64): a depleted mine gets crossed boards across its adit / pit.
+    if(building.depleted&&!tint){
+      const l=point(x+.5,y+h-.1),r=point(x+w-.5,y+h-.1);
+      g.lineStyle(6,0x5a4127);g.lineBetween(l.x,l.y-58,r.x,r.y-10);g.lineBetween(l.x,l.y-10,r.x,r.y-58);g.lineStyle(2,0x8a6a44);g.lineBetween(l.x,l.y-60,r.x,r.y-12);g.lineBetween(l.x,l.y-12,r.x,r.y-60);
+    }
     this.hitArea=new Phaser.Geom.Polygon([point(x,y,d.visualHeight),point(x+w,y,d.visualHeight),b,c,e,point(x,y+h,d.visualHeight)]);
   }
   contains(x,y){return Phaser.Geom.Polygon.Contains(this.hitArea,x-this.base.x,y-this.base.y);}

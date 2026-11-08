@@ -4,7 +4,7 @@ import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 // recovering or resting; physical presence and work activity do not define it.
 export function staffingStatus(scene,building){
   const definition=buildingDefinition(building),capacity=definition.workplace?.capacity;
-  if(!buildingIsComplete(building)||!Number.isInteger(capacity)||capacity<=0)return null;
+  if(!buildingIsComplete(building)||building.depleted||!Number.isInteger(capacity)||capacity<=0)return null;
   const ids=new Set(scene.workplaceSystem.records.get(building.id)?.workerIds??[]);
   const count=[...ids].reduce((n,id)=>{const worker=scene.workerSystem.workers.get(id);return n+Number(!!worker?.isAlive&&worker.isSubject!==false&&worker.assignedWorkplaceId===building.id);},0);
   // m-zamestnani-2: a building with employment switched off shows its own sign instead of missing workers.

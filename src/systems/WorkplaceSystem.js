@@ -59,7 +59,7 @@ export class WorkplaceSystem {
     const profession=worker?.profession;if(!worker?.isAlive||!profession||profession==='idle'||worker.assignedWorkplaceId!=null)return null;
     const p=worker.position??{x:(worker.tile?.x??0)+.5,y:(worker.tile?.y??0)+.5},options=[];
     for(const building of this.scene.buildings){
-      const spec=buildingDefinition(building).workplace;if(spec?.profession!==profession||!buildingIsComplete(building)||building.unverified||this.scene.employment?.blockReason(building))continue;
+      const spec=buildingDefinition(building).workplace;if(spec?.profession!==profession||!buildingIsComplete(building)||building.unverified||building.depleted||this.scene.employment?.blockReason(building))continue;
       const record=this.register(building);if(!record||record.workerIds.length>=spec.capacity)continue;
       const d=buildingDefinition(building);options.push({building,staff:record.workerIds.length,distance:Math.hypot(building.x+d.width/2-p.x,building.y+d.height/2-p.y)});
     }
@@ -70,7 +70,8 @@ export class WorkplaceSystem {
   assign(building,worker){
     if(!worker?.isAlive||worker.isSubject===false||this.scene.gameOver||!this.scene.buildings.includes(building)||!this.scene.workerSystem.workers.has(worker.id))return false;
     const spec=buildingDefinition(building).workplace,record=this.register(building);if(!spec||!record)return false;
-    if(worker.assignedWorkplaceId===building.id)return true;if(this.scene.employment?.blockReason(building)||record.workerIds.length>=spec.capacity)return false;
+    if(worker.assignedWorkplaceId===building.id)return true;// m-vytezeny-dul-ctverecky (64): a depleted mine takes nobody, with or without automatic employment.
+    if(building.depleted||this.scene.employment?.blockReason(building)||record.workerIds.length>=spec.capacity)return false;
     this.detach(worker);worker.displayProfession='idle';this.scene.workerSystem.jobs.assign(worker,spec.profession);
     worker.assignedWorkplaceId=building.id;worker.workplaceReached=false;worker.arriving=false;worker.workState='Going to Workplace';worker.aiCooldown=0;record.workerIds.push(worker.id);this.changed(building.id);return true;
   }

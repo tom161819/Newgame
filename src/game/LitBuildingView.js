@@ -21,6 +21,8 @@ export class LitBuildingView {
   // Day and night N2: a fuelled place (Torch Post, Brazier, tower) burns only on a night it took fuel.
   worldLights() {
     if (this.scene.lightFuel && !this.scene.lightFuel.isLit(this.building)) return [];
+    // m-vytezeny-dul-ctverecky (64): the torch of a depleted mine is out.
+    if (this.depleted ?? this.building.depleted) return [];
     return this.lights.map(light => ({ ...light, buildingId: this.building.id, x: this.base.x + light.x, y: this.base.y + light.y }));
   }
   drawFlames(seconds) {
@@ -34,7 +36,7 @@ export class LitBuildingView {
       g.fillStyle(FIRE.core, 1); g.fillEllipse(light.x + sway, light.y - size * 0.25, size * 0.45, size * 0.85);
     }
   }
-  paint(building, tint = null) { this.inner.paint(building, tint); this.base = towerBase(building); this.drawFlames(this.system?.seconds ?? 0); }
+  paint(building, tint = null) { this.depleted = !!building.depleted; this.inner.paint(building, tint); this.base = towerBase(building); this.drawFlames(this.system?.seconds ?? 0); }
   // The wrapped view's parts stay reachable (visibility checks, map memory, tests).
   get back() { return this.inner.back; }
   get front() { return this.inner.front; }

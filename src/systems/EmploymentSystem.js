@@ -21,7 +21,8 @@ export class EmploymentSystem {
   // Events only mark the plan as due; it runs once in the next update, never inside the event that asked for it.
   request(){this.pruneExclusions();this.dirty=true;}
   workplace(building){return !!building&&this.scene.buildings.includes(building)&&buildingIsComplete(building)&&!building.unverified&&!!buildingDefinition(building).workplace;}
-  blockReason(building){return this.blockedTypes.has(building?.type)?'type':this.blockedBuildings.has(building?.id)?'local':null;}
+  // m-vytezeny-dul-ctverecky (64): a depleted mine offers no seats at all (automatic, manual or a profession change).
+  blockReason(building){return building?.depleted?'depleted':this.blockedTypes.has(building?.type)?'type':this.blockedBuildings.has(building?.id)?'local':null;}
   // m-zamestnani-2 (35, owner 7 Nov 2026): switching employment off empties the building at once, also while its
   // workers are in the middle of a task (the task is cancelled, cargo is dropped, a production cycle stays with the
   // building). They become Unemployed and automatic employment may place them elsewhere.

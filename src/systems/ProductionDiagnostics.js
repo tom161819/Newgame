@@ -40,6 +40,8 @@ export class ProductionDiagnostics {
       return this.notify(issue,found,now);
     }
     // Danger (0 days) is never held back between separate events, but a lasting one is not repeated every check.
+    // A one-off notice (a depleted mine) is reported once while it lasts.
+    if(found.once)return false;
     if(now-issue.lastNotified<Math.max(this.repeatMs(issue.reason),DIAGNOSTICS.persistence))return false;
     return this.notify(issue,found,now);
   }
@@ -143,7 +145,9 @@ export class ProductionDiagnostics {
       if(!natural||!buildingIsComplete(b)||b.unverified||!DEPLETION_SOURCES[b.type])continue;let empty=false;
       if(b.type==='lumberjack_hut'){const c={x:b.x+.5,y:b.y+.5},r=buildingDefinition(b).workRadius??0;empty=![...natural.byId.values()].some(t=>t.definition?.tree&&Math.hypot(t.x-c.x,t.y-c.y)<=r);}
       else if(b.quarryMode!=='legacy'&&b.quarryMode!=='unbound'){const d=b.depositId!=null?natural.byId.get(b.depositId):null;empty=!!d&&d.natural.remaining===0;}
-      if(empty)found.push({entityId:b.id,reason:'depleted',category:'production',params:{resource:GATHER_OUTPUTS[b.type],source:DEPLETION_SOURCES[b.type]},feed:true});
+      // m-vytezeny-dul-ctverecky (64): a depleted mine keeps this one row ("The Iron Mine is exhausted"), never repeated.
+      if(b.depleted)found.push({entityId:b.id,reason:'depleted',category:'production',params:{resource:GATHER_OUTPUTS[b.type],source:DEPLETION_SOURCES[b.type],exhausted:true},feed:true,once:true});
+      else if(empty)found.push({entityId:b.id,reason:'depleted',category:'production',params:{resource:GATHER_OUTPUTS[b.type],source:DEPLETION_SOURCES[b.type]},feed:true});
     }
     // A Fisherman's Hut may stand anywhere (0.32.0): one with no reachable shore at all has nothing to do.
     for(const b of s.buildings)if(b.type==='fisherman_hut'&&buildingIsComplete(b)&&!b.unverified&&s.fishing&&!s.fishing.spots(b).length)found.push({entityId:b.id,reason:'noWater',category:'production',params:{}});

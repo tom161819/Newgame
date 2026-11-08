@@ -357,4 +357,9 @@ export default {
   'kingSkills.leadershipTip':'Leadership +1 level: residents within the King\'s sight work +{each} % faster per level (now +{now} %, max level {max}).',
   'kingSkills.stewardshipTip':'Stewardship +1 level: tax yield +{each} % per level, Happiness unchanged (now +{now} %, max level {max}).',
   'kingSkills.skillTip':'{skill} +1 level for 1 point: +{each} % {skill} work speed.','kingSkills.combatTip':'{skill} +1 level for 1 point: +{each} % attack damage in combat.',
+  // m-vytezeny-dul-ctverecky (64): a mine whose finite deposit is used up.
+  'building.depleted.iron_mine':'Depleted Iron Mine','building.depleted.quarry':'Depleted Quarry',
+  'building.depletedInfo':'The deposit is exhausted: nobody works here any more. Demolish the building to get part of its cost back.',
+  'employment.exclude.depletedStatus':'The deposit is exhausted – this building takes no workers.',
+  'notice.mineExhausted':'The {name} is exhausted.',
 };

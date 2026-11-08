@@ -3,6 +3,7 @@ import { reachableTiles } from '../game/pathfinding.js';
 import { buildingTiles,buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
 import { clearsObstacles } from '../data/rockMining.js';
+import { depletableMine } from '../game/depletedMine.js';
 
 const width=o=>o.width??o.definition.width,height=o=>o.height??o.definition.height;
 export const rectanglesOverlap=(a,b)=>a.x<b.x+width(b)&&a.x+width(a)>b.x&&a.y<b.y+height(b)&&a.y+height(a)>b.y;
@@ -52,6 +53,27 @@ export class MineralSystem {
   }
   bind(building){
     if(!building.definition.mining)return;const deposit=this.select(building.definition,building);if(!deposit)throw new Error('Missing validated finite deposit.');building.depositId=deposit.natural.id;if(building.type==='quarry')building.quarryMode='finite';deposit.natural.boundBuildingId=building.id;
+  }
+  // m-vytezeny-dul-ctverecky (64): a mine whose bound deposit reached 0 becomes depleted once its last load is on the
+  // pile (no resident of it carries or brings mined goods). Called every simulation step; also turns a loaded save
+  // with an exhausted deposit into a depleted mine. Returns the buildings that changed.
+  updateDepletion(){
+    const s=this.scene,changed=[];
+    for(const b of s.buildings){
+      if(b.depleted||!depletableMine(b)||!buildingIsComplete(b)||b.unverified)continue;
+      const d=this.natural.byId.get(b.depositId);if(!d||d.natural.remaining>0||d.natural.boundBuildingId!==b.id)continue;
+      if((s.workplaceSystem?.employees(b)??[]).some(w=>w.cargo||['foodPickup','foodDeliver'].includes(w.workTask?.kind)))continue;
+      this.deplete(b);changed.push(b);
+    }
+    return changed;
+  }
+  // The workers leave: the same profession in another building with a free seat, else Unemployed (automatic
+  // employment may then place them by its usual rules). Nobody is held back, so this is not a manual dismissal.
+  deplete(building){
+    const s=this.scene,ws=s.workplaceSystem;building.depleted=true;
+    for(const worker of [...(ws?.employees(building)??[])]){ws.detach(worker);if(!ws.assignFree(worker))ws.remove(worker);}
+    const view=s.towerViews?.get(building.id);view?.paint?.(building);
+    ws?.changed(building.id);s.employment?.request();
   }
   registerBuilding(building){if(building.type==='quarry'&&building.quarryMode===undefined)building.quarryMode=buildingIsComplete(building)?'legacy':'unbound';}
   summary(building){

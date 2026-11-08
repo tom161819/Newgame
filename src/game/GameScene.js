@@ -55,6 +55,7 @@ import '../ui/resourceLedger.css';
 import { Inventory } from './inventory.js';
 import { drawStone, generateResourcePositions, resourceTiles, tileKey, ResourceSpawner } from './stones.js';
 import { placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors, buildingDefinition,buildingDepth,buildingIsComplete } from './buildings.js';
+import { footprintShown,applyFootprint,selectedBuildingIds } from './footprintHighlight.js';
 import { TowerView } from './TowerView.js';
 import { KingView } from './KingView.js';
 import { PlayerController, PLAYER_STATE } from './PlayerController.js';
@@ -793,7 +794,7 @@ export class GameScene extends Phaser.Scene {
     this.character.update(delta);this.naturalResources.updateKing(delta);this.player.animate(delta,this.character.walking&&[PLAYER_STATE.GROUND,PLAYER_STATE.ON_WALL].includes(this.character.state),this.character.direction);
     this.kingLogistics.update(delta);
     this.logisticsTasks.update();
-    this.animalSystem.update(delta);this.huntingSystem.update(delta);this.mountSystem.update(delta);this.workerSystem.update(delta);const covered=this.combat.update(delta);
+    this.animalSystem.update(delta);this.huntingSystem.update(delta);this.mountSystem.update(delta);this.workerSystem.update(delta);this.naturalResources.mining.updateDepletion();const covered=this.combat.update(delta);
     if(this.gameOver)return null;
     this.constructionSystem.update(delta);this.demolition.update(delta);
     this.farmingSystem.update(delta);
@@ -830,7 +831,10 @@ export class GameScene extends Phaser.Scene {
       const definition=this.objectRegistry.require(resource.getData('objectId'));
       resource.setVisible(this.fog.isVisibleObject(resource.getData('object'))&&resource.x>view.x-64&&resource.x<view.right+64&&resource.y>view.y-40&&resource.y<view.bottom+(definition.visualHeight??40));
     }
-    for(const building of this.buildings){const visual=this.towerViews.get(building.id);visual.setVisible(this.fog.isVisibleObject(building)&&visual.inView(view));}
+    // m-vytezeny-dul-ctverecky (63): footprint squares of finished buildings only while placing or for the selected one.
+    const selectedIds=selectedBuildingIds(this);
+    for(const building of this.buildings){const visual=this.towerViews.get(building.id),shown=this.fog.isVisibleObject(building)&&visual.inView(view);visual.setVisible(shown);
+      if(shown&&buildingIsComplete(building))applyFootprint(visual,footprintShown({selected:selectedIds.has(building.id),buildMode:!!this.buildMode}));}
     this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);
     this.combatFeedback?.refresh();
     this.experienceFeedback?.refreshVisibility();this.unitPanel?.refresh();

@@ -3,6 +3,7 @@ import { buildingTiles } from './buildings.js';
 import { ConstructionView } from './ConstructionView.js';
 import { FOG_STYLE } from '../systems/FogOfWarSystem.js';
 import { memoryTexture } from './memoryTexture.js';
+import { footprintShown,applyFootprint } from './footprintHighlight.js';
 
 export function memoryColor(color,brightness=FOG_STYLE.brightness){
   const r=(color>>>16)&255,g=(color>>>8)&255,b=color&255,luminance=.2126*r+.7152*g+.0722*b;
@@ -59,6 +60,8 @@ export class MapMemoryRenderer {
       needed.add(key);let record=this.views.get(key);
       if(record?.entry!==entry||record.brightness!==fog.memoryBrightness){record?.view.destroy();record={entry,brightness:fog.memoryBrightness,view:this.create(entry)};this.views.set(key,record);}
       record.view.setVisible(true);
+      // m-vytezeny-dul-ctverecky (63): a remembered finished building shows its footprint only while placing.
+      if(entry.kind==='building')applyFootprint(record.view,footprintShown({complete:!entry.visual.construction||entry.visual.construction.state==='complete',buildMode:!!this.scene.buildMode}));
     }
     for(const [key,record]of this.views)if(!needed.has(key)){record.view.destroy();this.views.delete(key);}
   }
