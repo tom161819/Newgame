@@ -100,7 +100,7 @@ test('approved walking figures are exported with a walk sheet: 8 directions × 3
     const asset = JSON.parse(readFileSync(path.join(root, `art/assets/units/${id}/asset.json`), 'utf8'));
     if (asset.generator !== 'figure') continue;
     for (const variant of asset.variants) {
-      if (approvals[asset.id]?.variants?.[variant.id]?.status !== 'approved' || variant.spec.mount || variant.spec.facing !== undefined) continue;
+      if (approvals[asset.id]?.variants?.[variant.id]?.status !== 'approved' || variant.spec.mount || variant.spec.facing !== undefined || variant.animation) continue; // work animations have their own sheet
       const base = `art/sprites/${asset.id}/${variant.id}.v${variant.version}`, meta = JSON.parse(readFileSync(path.join(root, `${base}.json`), 'utf8'));
       assert.deepEqual(meta.walk.columns, ['idle', 'stride-a', 'stride-b'], variant.id);
       assert.deepEqual(meta.walk.cycle, ['idle', 'stride-a', 'idle', 'stride-b']);

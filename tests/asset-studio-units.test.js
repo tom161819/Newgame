@@ -40,3 +40,16 @@ test('professions differ in headgear, tool and garment, not just colour', () => 
   assert.ok(woman.primitives.some(p => p.shape === 'cylinder' && p.radiusBottom >= 0.19), 'women wear a long skirt');
   assert.equal(man.primitives.filter(p => p.material === 'cloth_brown' && p.shape === 'box').length, 2, 'men wear hose');
 });
+
+test('approved work animations (fishing loop) are exported as one sheet: 8 direction rows × poses, clips index the columns', () => {
+  const root = new URL('..', import.meta.url).pathname, read = p => JSON.parse(readFileSync(root + p, 'utf8'));
+  const asset = read('art/assets/units/fishing/asset.json'), approvals = read('art/approvals.json').assets.fishing.variants;
+  for (const variant of asset.variants.filter(v => v.animation && approvals[v.id]?.status === 'approved')) {
+    const base = `art/sprites/fishing/${variant.id}.v${variant.version}`, meta = read(`${base}.json`).anim;
+    const poses = [...new Set(Object.values(variant.animation.clips).flat())];
+    assert.deepEqual(meta.columns, poses); assert.deepEqual(meta.rows, [0, 1, 2, 3, 4, 5, 6, 7]);
+    for (const [clip, cols] of Object.entries(meta.clips)) assert.deepEqual(cols.map(i => meta.columns[i]), variant.animation.clips[clip], clip);
+    const png = readFileSync(root + `${base}.anim.png`);
+    assert.equal(png.readUInt32BE(16), meta.frameWidth * poses.length); assert.equal(png.readUInt32BE(20), meta.frameHeight * 8);
+  }
+});
