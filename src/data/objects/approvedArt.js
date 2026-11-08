@@ -21,6 +21,8 @@ export const APPROVED_BUILDING_ART=Object.freeze({
   barracks:{"sprite":"/assets/buildings/barracks/barracks-hall-stone.v1.png","artSource":"art/sprites/barracks-hall/barracks-hall-stone.v1.json","origin":{"x":0.49744,"y":0.9878},"visualHeight":162},
   marketplace:{"sprite":"/assets/buildings/marketplace/marketplace-square.v1.png","artSource":"art/sprites/marketplace/marketplace-square.v1.json","origin":{"x":0.49744,"y":0.98276},"visualHeight":114},
   wheelwright_workshop:{"sprite":"/assets/buildings/wheelwright_workshop/wheelwright-yard-shed.v2.png","artSource":"art/sprites/wheelwright-yard/wheelwright-yard-shed.v2.json","origin":{"x":0.47549,"y":0.98437},"visualHeight":126,"lights":[{"type":"torch","x":23.04,"y":-84.25,"color":"#ffb25a","radius":102.4,"intensity":0.95,"flicker":{"amplitude":0.12,"speed":7},"flameSize":1}]},
+  // m-svet-vzhled-2 (32): the stilt hut with the net loft (v2, 2 × 2 like the game); no lights, no seasonal exports.
+  fisherman_hut:{"sprite":"/assets/buildings/fisherman_hut/fisherman-hut-stilt-net-loft.v2.png","artSource":"art/sprites/fisherman-hut/fisherman-hut-stilt-net-loft.v2.json","origin":{"x":0.49618,"y":0.984},"visualHeight":123},
 });
 
 // The merchant caravan styles (plain, striped, house, pair) are generated with the other approved art of plan
@@ -53,7 +55,7 @@ export const APPROVED_WALL_ART=Object.freeze({
   S:{sprite:'/assets/buildings/wall/kit/wall-kit-parapet-s.v1.png',artSource:'art/sprites/wall-kit/wall-kit-parapet-s.v1.json',origin:{"x":0.49254,"y":0.9802}},
   W:{sprite:'/assets/buildings/wall/kit/wall-kit-parapet-w.v1.png',artSource:'art/sprites/wall-kit/wall-kit-parapet-w.v1.json',origin:{"x":0.49254,"y":0.98261}},
 });
-export const TIMBER_SCAFFOLD_BUILDINGS=Object.freeze(['farmhouse','granary','hunting_lodge','lumberjack_hut']);
+export const TIMBER_SCAFFOLD_BUILDINGS=Object.freeze(['farmhouse','granary','hunting_lodge','lumberjack_hut','fisherman_hut']);
 
 // Approved villager looks (art/sprites/<profession>/<variant>.v1.facing-<k>.png,
 // eight walking directions, origin = the studio anchor at the figure's feet).

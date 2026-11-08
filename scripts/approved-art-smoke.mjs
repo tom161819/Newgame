@@ -29,8 +29,14 @@ export async function approvedArtSmoke(context,url,instrument){
       const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type:'fisherman_hut',definition:d,x:best.x,y:best.y,tiles:best.tiles};
       s.buildings.push(b);for(const t of b.tiles)s.map[t.y][t.x]=1;s.towerViews.set(b.id,s.createBuildingView(d,b));s.events.emit('buildings:changed');
       const w=[...s.workerSystem.workers.values()].find(w=>w.isAlive&&w.isSubject!==false);s.workplaceSystem.assign(b,w);w.position={x:best.x+2.5,y:best.y+.5};w.tile={x:best.x+2,y:best.y};w.path=[];w.nextTile=null;
-      return {worker:w.id};
+      return {worker:w.id,hut:b.id,x:best.x,y:best.y};
     });
+    // m-svet-vzhled-2 (32): the shore hut is the approved stilt hut (not the temporary drawing), anchored at its front corner.
+    const hut=await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,v=s.towerViews.get(id),spr=v?.back?.sprite;
+      return {key:spr?.texture?.key,w:spr?.displayWidth,h:spr?.displayHeight,ox:spr?.originX,oy:spr?.originY,x:v.back.x,y:v.back.y};},fisher.hut);
+    assert.equal(hut.key,'asset:fisherman_hut:main',`the hut uses the approved texture (${JSON.stringify(hut)})`);
+    assert.deepEqual([hut.w,hut.h],[131,125],'drawn at Studio scale');assert.ok(Math.abs(hut.oy-0.984)<1e-6,'origin from the export base');
+    await shot('fisherman-hut',hut.x,hut.y-50,2.6);
     await page.waitForFunction(id=>{const w=window.__game.registry.get('application').scene.workerSystem.workers.get(id);return w.workTask?.kind==='fish'&&w.workState==='Working';},fisher.worker,{timeout:120000});
     // Frames change only on screen: look at the Fisher.
     await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,w=s.workerSystem.workers.get(id);if(s.worldCamera){s.worldCamera.following=false;s.worldCamera.panTarget=null;}s.cameras.main.centerOn(w.view.x,w.view.y);},fisher.worker);

@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.71.0] - 2026-11-08
+<!-- version: {"title":"Fisherman's Hut art","type":"feature","reconstructed":false,"saveVersion":59} -->
+### Changed
+- The Fisherman's Hut uses the approved Studio look (a hut on stilts with a net loft) instead of the temporary drawing. While it is being built, it shows a timber scaffold like other wooden buildings.
+
 ## [0.70.0] - 2026-11-08
 <!-- version: {"title":"Children play","type":"feature","reconstructed":false,"saveVersion":59} -->
 ### Added
