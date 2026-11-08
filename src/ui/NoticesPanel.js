@@ -23,8 +23,11 @@ export class NoticesPanel {
       const action=event.target.closest('[data-notice-action]')?.dataset.noticeAction;if(action){if(!hireUnemployed(scene,action))scene.populationSidebar?.setOpen(true);scene.diagnostics.recheck?.();return;}
       const target=event.target.closest('[data-notice-entity]');if(target?.dataset.noticeReason==='noBuilder'&&scene.employmentPanel){scene.employmentPanel.open();return;}const open=target?.dataset.noticeEntity;if(open)this.openEntity(Number(open));
     },options);
+    // Request 28: a right click collapses the card (PanelDismiss); a click on its title opens it again. Page only.
+    this.title=document.querySelector('#notices-title');this.title?.addEventListener('click',()=>this.setCollapsed(!this.collapsed),options);this.setCollapsed(false);
     this.unsubscribe=scene.diagnostics.onChange(()=>this.render());this.render();
   }
+  setCollapsed(value){this.collapsed=!!value;this.panel.classList.toggle('collapsed',this.collapsed);this.title?.setAttribute('aria-expanded',String(!this.collapsed));}
   text(issue){return noticeText(this.scene,issue);}
   openEntity(id){
     const s=this.scene,building=s.buildings.find(b=>b.id===id);if(!building||!s.fog.isVisibleObject(building))return;

@@ -478,6 +478,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .notices-panel { width:min(340px,calc(100vw - 32px)); max-height:40dvh; overflow:auto; padding:10px 12px; border:1px solid #8a7a4f; border-radius:10px; background:rgb(38 43 31 / .94); box-shadow:0 10px 28px rgb(6 9 5 / .5); }
 .notices-heading { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; }
 .notices-heading h2 { margin:0; font-size:13px; }
+.notices-heading h2 { cursor:pointer; }
+.notices-panel.collapsed :is(.notices-list,.notices-filters) { display:none; }
+.notices-panel.collapsed .notices-heading { margin-bottom:0; }
+.notices-panel.collapsed .notices-heading h2::after { content:' ▸'; color:var(--muted,#b9b598); }
 .notices-filters { display:flex; gap:4px; }
 .notice-filter { font-size:11px; padding:3px 7px; }
 .notice-filter[aria-pressed="false"] { opacity:.55; text-decoration:line-through; }
@@ -519,9 +523,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .unit-command-controls .icon-command::after { content:attr(data-tooltip); position:absolute; left:50%; bottom:calc(100% + 6px); transform:translateX(-50%); white-space:nowrap; padding:3px 8px; border-radius:4px; background:#141b12; border:1px solid #978657; color:#ece2c4; font-size:12px; opacity:0; pointer-events:none; transition:opacity .12s; z-index:2; }
 .unit-command-controls .icon-command:hover::after, .unit-command-controls .icon-command:focus-visible::after { opacity:1; }
 /* #104: minimap in the bottom-right corner, the square grid turned into the isometric diamond. */
-.minimap { position:relative; flex:none; --minimap-size:150px; width:calc(var(--minimap-size) * 1.4142); height:calc(var(--minimap-size) * .7071); height:106px; cursor:pointer; filter:drop-shadow(0 2px 6px #000a); touch-action:none; }
+.minimap { position:relative; flex:none; --minimap-size:calc(150px * var(--minimap-scale, 1)); width:calc(var(--minimap-size) * 1.4142); height:calc(var(--minimap-size) * .7071); cursor:pointer; filter:drop-shadow(0 2px 6px #000a); touch-action:none; }
 .minimap canvas { position:absolute; left:50%; top:50%; width:var(--minimap-size); height:var(--minimap-size); margin:calc(var(--minimap-size) / -2) 0 0 calc(var(--minimap-size) / -2); transform:scaleY(.5) rotate(45deg); image-rendering:pixelated; border:1px solid #b99a53; }
-@media(max-width:760px){ .minimap { --minimap-size:105px; } }
+@media(max-width:760px){ .minimap { --minimap-size:calc(105px * var(--minimap-scale, 1)); } }
+/* Request 55: + / − in the minimap's top-right corner change its on-screen size (Minimap.js MINIMAP_SIZES). */
+.minimap-size { position:absolute; top:0; right:0; z-index:1; display:flex; gap:3px; }
+.minimap-size button { width:20px; height:20px; min-height:0; padding:0; display:grid; place-items:center; border:1px solid var(--line, #79704b); border-radius:5px; background:var(--glass, rgb(30 35 25 / .86)); color:var(--ink, #ede5c9); font:700 13px/1 var(--font-ui, system-ui); cursor:pointer; }
+.minimap-size button:hover:not(:disabled) { border-color:var(--gold, #e3c57a); color:var(--gold, #e3c57a); }
+.minimap-size button:focus-visible { outline:2px solid var(--gold, #e3c57a); outline-offset:1px; }
+.minimap-size button:disabled { opacity:.4; cursor:default; }
 /* #105: the bottom-right column of the map, top to bottom notices → event feed → minimap, so none covers another. */
 .corner-stack { position:absolute; right:12px; bottom:10px; z-index:9; display:flex; flex-direction:column; align-items:flex-end; gap:8px; max-height:calc(100% - 20px); pointer-events:none; }
 .corner-stack > * { pointer-events:auto; }

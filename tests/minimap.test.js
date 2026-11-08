@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { minimapPixels,minimapPointToGrid,MINIMAP_COLORS,Minimap } from '../src/ui/Minimap.js';
+import { minimapPixels,minimapPointToGrid,MINIMAP_COLORS,Minimap,MINIMAP_SIZES,MINIMAP_SIZE_DEFAULT,MINIMAP_SIZE_KEY,clampMinimapStep,readMinimapStep,writeMinimapStep } from '../src/ui/Minimap.js';
 import { FogOfWarSystem } from '../src/systems/FogOfWarSystem.js';
 import { MapMemory } from '../src/systems/MapMemory.js';
 
@@ -47,5 +47,27 @@ test('#104 the minimap repaints only when knowledge changes, at most every 250 m
   const m=new Minimap(s,{document:doc,now:()=>now});
   for(let i=0;i<60;i++){now+=16;m.update();}assert.equal(m.redraws,1,'one repaint in a second without changes');
   s.fog.character.position={x:60.5,y:50.5};s.fog.character.tile={x:60,y:50};s.fog.update();now+=300;m.update();assert.equal(m.redraws,2,'sight moved');
+  m.destroy();
+});
+
+test('request 55: minimap size steps clamp, are remembered in localStorage only and survive broken storage',()=>{
+  assert.ok(MINIMAP_SIZES.length>=3&&MINIMAP_SIZES.length<=4);assert.equal(MINIMAP_SIZES[MINIMAP_SIZE_DEFAULT],1);
+  assert.ok(MINIMAP_SIZES.every((v,i)=>!i||v>MINIMAP_SIZES[i-1]),'steps grow');
+  assert.equal(clampMinimapStep(-3),0);assert.equal(clampMinimapStep(99),MINIMAP_SIZES.length-1);assert.equal(clampMinimapStep(NaN),MINIMAP_SIZE_DEFAULT);assert.equal(clampMinimapStep(1.5),MINIMAP_SIZE_DEFAULT);
+  const data=new Map(),storage={getItem:k=>data.get(k)??null,setItem:(k,v)=>data.set(k,v)};
+  assert.equal(readMinimapStep(storage),MINIMAP_SIZE_DEFAULT,'nothing stored: default');
+  writeMinimapStep(2,storage);assert.equal(data.get(MINIMAP_SIZE_KEY),'2');assert.equal(readMinimapStep(storage),2);
+  data.set(MINIMAP_SIZE_KEY,'junk');assert.equal(readMinimapStep(storage),MINIMAP_SIZE_DEFAULT);
+  const broken={getItem(){throw new Error('denied');},setItem(){throw new Error('denied');}};
+  assert.equal(readMinimapStep(broken),MINIMAP_SIZE_DEFAULT);assert.doesNotThrow(()=>writeMinimapStep(1,broken));
+  // The + / − buttons move one step, stop at the ends and store the choice.
+  const s=world(),ctx={putImageData(){},createImageData:(w,h)=>({data:new Uint8ClampedArray(w*h*4)})},listeners=[];
+  const el=()=>{const e={attrs:{},style:{props:{},setProperty(k,v){this.props[k]=v;}},append(){},setAttribute(k,v){this.attrs[k]=v;},addEventListener(type,f){if(type==='click')listeners.push([e,f]);},remove(){},getContext:()=>ctx,width:0,height:0};return e;};
+  data.set(MINIMAP_SIZE_KEY,'2');const m=new Minimap(s,{document:{createElement:el,querySelector:()=>({append(){}})},storage});
+  assert.equal(m.sizeStep,2,'restored from storage');assert.equal(m.root.style.props['--minimap-scale'],String(MINIMAP_SIZES[2]));
+  const click=button=>listeners.find(([e])=>e===button)[1]({stopPropagation(){}});
+  for(let i=0;i<5;i++)click(m.biggerButton);assert.equal(m.sizeStep,MINIMAP_SIZES.length-1);assert.equal(m.biggerButton.disabled,true);assert.equal(m.smallerButton.disabled,false);
+  for(let i=0;i<9;i++)click(m.smallerButton);assert.equal(m.sizeStep,0);assert.equal(m.smallerButton.disabled,true);assert.equal(data.get(MINIMAP_SIZE_KEY),'0');
+  assert.equal(m.root.attrs['data-size'],'0');assert.ok(m.biggerButton.title&&m.biggerButton.title!==m.smallerButton.title,'tooltips');
   m.destroy();
 });

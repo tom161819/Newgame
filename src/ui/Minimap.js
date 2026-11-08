@@ -12,6 +12,16 @@ export const MINIMAP_COLORS=Object.freeze({
   // #100 ground types (index = ground code; grass uses the seasonal colours above).
   groundType:{1:[214,196,140],2:[204,170,104],3:[98,160,190],4:[52,104,150],5:[132,168,176],6:[122,98,68],7:[150,148,138]},
 });
+// Request 55: + / − buttons change the minimap's on-screen size in a few steps (the content has no zoom of its own).
+// The step is remembered in this browser only (localStorage), never in a save.
+export const MINIMAP_SIZES=Object.freeze([.75,1,1.35,1.7]);
+export const MINIMAP_SIZE_DEFAULT=1;
+export const MINIMAP_SIZE_KEY='newgame.minimap.size';
+export const clampMinimapStep=step=>Number.isInteger(step)?Math.max(0,Math.min(MINIMAP_SIZES.length-1,step)):MINIMAP_SIZE_DEFAULT;
+export function readMinimapStep(storage=globalThis.localStorage){
+  try{const raw=storage?.getItem(MINIMAP_SIZE_KEY);return raw==null?MINIMAP_SIZE_DEFAULT:clampMinimapStep(Number(raw));}catch{return MINIMAP_SIZE_DEFAULT;}
+}
+export function writeMinimapStep(step,storage=globalThis.localStorage){try{storage?.setItem(MINIMAP_SIZE_KEY,String(clampMinimapStep(step)));}catch{/* works without storage */}}
 const KIND={none:0,building:1,tree:2,deposit:3,stockpile:4,chest:5};
 const KIND_COLOR=[null,MINIMAP_COLORS.building,MINIMAP_COLORS.tree,MINIMAP_COLORS.deposit,MINIMAP_COLORS.stockpile,MINIMAP_COLORS.chest];
 const mute=c=>c.map(v=>Math.round(v*.5+28));
@@ -61,20 +71,31 @@ export function minimapPointToGrid(rect,point,{size=100,cssSize=MINIMAP.cssSize}
 }
 
 export class Minimap {
-  constructor(scene,{document:doc=globalThis.document,now=()=>performance.now()}={}){
+  constructor(scene,{document:doc=globalThis.document,now=()=>performance.now(),storage=globalThis.localStorage}={}){
+    this.storage=storage;
     this.scene=scene;this.now=now;this.signature=null;this.nextRefresh=0;this.nextOverlay=0;this.redraws=0;
     const fog=scene.fog;this.size={width:fog.width,height:fog.height};
-    this.root=doc.createElement('div');this.root.id='minimap';this.root.className='minimap';this.root.setAttribute('role','img');
-    this.canvas=doc.createElement('canvas');this.canvas.className='minimap-canvas';this.canvas.width=fog.width*MINIMAP.scale;this.canvas.height=fog.height*MINIMAP.scale;this.root.append(this.canvas);
+    this.root=doc.createElement('div');this.root.id='minimap';this.root.className='minimap';this.root.setAttribute('role','group');
+    this.canvas=doc.createElement('canvas');this.canvas.className='minimap-canvas';this.canvas.setAttribute('role','img');this.canvas.width=fog.width*MINIMAP.scale;this.canvas.height=fog.height*MINIMAP.scale;this.root.append(this.canvas);
     this.base=doc.createElement('canvas');this.base.width=fog.width;this.base.height=fog.height;
     this.context=this.canvas.getContext('2d');this.baseContext=this.base.getContext('2d');this.image=this.baseContext?.createImageData(fog.width,fog.height);
     this.controller=new AbortController();const options={signal:this.controller.signal};
     // Navigation: a click centres the camera on that known or unknown spot; it reveals nothing.
-    this.root.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();this.panTo(minimapPointToGrid(this.root.getBoundingClientRect(),{x:e.clientX,y:e.clientY},{size:fog.width,cssSize:this.canvas.offsetWidth||MINIMAP.cssSize}));},options);
+    this.sizeControls=doc.createElement('div');this.sizeControls.className='minimap-size';
+    const sizeButton=(delta,text)=>{const b=doc.createElement('button');b.type='button';b.textContent=text;b.setAttribute('data-minimap-size',delta>0?'bigger':'smaller');b.addEventListener('click',e=>{e.stopPropagation();this.resize(delta);},{signal:this.controller.signal});return b;};
+    this.biggerButton=sizeButton(1,'+');this.smallerButton=sizeButton(-1,'−');this.sizeControls.append(this.biggerButton,this.smallerButton);this.root.append(this.sizeControls);
+    this.root.addEventListener('pointerdown',e=>{if(e.target?.closest?.('.minimap-size')){e.stopPropagation();return;}e.preventDefault();e.stopPropagation();this.panTo(minimapPointToGrid(this.root.getBoundingClientRect(),{x:e.clientX,y:e.clientY},{size:fog.width,cssSize:this.canvas.offsetWidth||MINIMAP.cssSize}));},options);
     for(const type of ['click','mousedown','mouseup','wheel','contextmenu'])this.root.addEventListener(type,e=>e.stopPropagation(),options);
-    (doc.querySelector('#corner-stack')??doc.querySelector('#game')??scene.game?.canvas?.parentElement)?.append(this.root);this.label();this.offLanguage=onLanguageChange(()=>this.label());
+    (doc.querySelector('#corner-stack')??doc.querySelector('#game')??scene.game?.canvas?.parentElement)?.append(this.root);this.setSizeStep(readMinimapStep(storage),{save:false});this.label();this.offLanguage=onLanguageChange(()=>this.label());
   }
-  label(){this.root.setAttribute('aria-label',t('minimap.label'));this.root.title=t('minimap.hint');}
+  resize(delta){this.setSizeStep(this.sizeStep+delta);}
+  setSizeStep(step,{save=true}={}){
+    this.sizeStep=clampMinimapStep(step);this.root.style?.setProperty?.('--minimap-scale',String(MINIMAP_SIZES[this.sizeStep]));this.root.setAttribute('data-size',String(this.sizeStep));
+    if(this.biggerButton){this.biggerButton.disabled=this.sizeStep>=MINIMAP_SIZES.length-1;this.smallerButton.disabled=this.sizeStep<=0;}
+    if(save)writeMinimapStep(this.sizeStep,this.storage);
+  }
+  label(){this.root.setAttribute('aria-label',t('minimap.label'));this.canvas.setAttribute('aria-label',t('minimap.label'));this.root.title=t('minimap.hint');
+    for(const [b,key] of [[this.biggerButton,'minimap.bigger'],[this.smallerButton,'minimap.smaller']])if(b){b.title=t(key);b.setAttribute('aria-label',t(key));}}
   panTo(point){
     const s=this.scene,camera=s.worldCamera;if(!camera||s.gameOver)return;
     const x=Math.max(0,Math.min(this.size.width,point.x)),y=Math.max(0,Math.min(this.size.height,point.y)),world=gridToWorld(x,y);

@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.64.0] - 2026-11-08
+<!-- version: {"title":"UI windows and minimap","type":"feature","reconstructed":false,"saveVersion":58} -->
+### Added
+- Right-clicking inside any window or card closes or folds it, like Population already did. Text fields keep the browser's menu, and save or confirm dialogs stay open.
+- The minimap has + and − buttons that change its size in 4 steps. The size is remembered in the browser.
+- The Notices panel can be folded.
+
 ## [0.63.0] - 2026-11-08
 <!-- version: {"title":"World look 2","type":"feature","reconstructed":false,"saveVersion":58} -->
 ### Changed

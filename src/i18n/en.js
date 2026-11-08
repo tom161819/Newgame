@@ -87,6 +87,8 @@ export default {
   "command.selected": "Selected: {count} · Right-click to move and hold",
   "minimap.label": "Minimap of explored land",
   "minimap.hint": "Minimap: grey is unexplored, muted is remembered. Click to move the camera there.",
+  "minimap.bigger": "Larger minimap",
+  "minimap.smaller": "Smaller minimap",
   "command.hold": "Hold Here",
   "command.resume": "Resume Previous Job",
   "command.inspect": "Unit Details",

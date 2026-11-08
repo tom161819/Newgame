@@ -87,6 +87,8 @@ export default {
   "command.selected": "Vybráno: {count} · Pravým tlačítkem přesunout a držet pozici",
   "minimap.label": "Minimapa prozkoumané krajiny",
   "minimap.hint": "Minimapa: šedá je neprozkoumané území, tlumené barvy jsou zapamatované. Kliknutím tam přesunete kameru.",
+  "minimap.bigger": "Zvětšit minimapu",
+  "minimap.smaller": "Zmenšit minimapu",
   "command.hold": "Držet pozici zde",
   "command.resume": "Pokračovat v původní práci",
   "command.inspect": "Podrobnosti jednotky",
