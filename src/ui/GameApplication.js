@@ -100,7 +100,9 @@ export class GameApplication {
     if(status?.type==='saved')this.autosaveFailure=null;output.classList.remove('failed');output.textContent=base;if(status?.recovered)this.notify(t('autosave.recovered'));
   }
   async load(input){const state=validateGameState(input);this.start(state);}
-  snapshot(){if(!this.scene||this.scene.gameOver)throw new Error(t('app.startFirst'));return validateGameState(serializeGameState(this.scene));}
+  snapshot(){if(!this.scene||this.scene.gameOver)throw new Error(t('app.startFirst'));const state=serializeGameState(this.scene);
+    // m-ulozeni-brod: a state that fails the check is a bug in the running game, not a damaged save – say so and keep playing.
+    try{return validateGameState(state);}catch(error){console.error('Save check failed:',error);throw new Error(t('saves.saveFailed'));}}
   showPause(){
     if(!this.scene||this.scene.gameOver)return;
     this.scene.pauseManager.set('menu',true);this.scene.settingsPanel.setOpen(false);

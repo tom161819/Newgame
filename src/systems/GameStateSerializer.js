@@ -1,3 +1,4 @@
+import { fishingGround } from './FishingSystem.js';
 import { validNightThreatState } from './NightThreatSystem.js';
 import { validRoyalGoalState } from './RoyalGoals.js';
 import { validKingSkillState } from './KingSkills.js';
@@ -333,7 +334,7 @@ export function validateGameState(input,registry=objectRegistry){
         if(t.kind==='clearMark'){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),slot=`natural-slot:${t.goal.x},${t.goal.y}`;check(w.profession==='woodcutter'&&home?.type==='lumberjack_hut'&&buildingIsComplete(home)&&typeof t.targetId==='string'&&/^(tree|bush):/.test(t.targetId)&&!reservations.has(slot));reservations.add(slot);}
         if(t.kind==='mine')check((w.profession==='miner'&&t.idleStone===undefined||w.profession==='hauler'&&t.idleStone===true&&w.stoneCollection?.enabled)&&s.resources.some(r=>r.type==='stone'&&`${r.tile.x},${r.tile.y}`===t.targetId));
         if(t.kind==='fish'){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);check(w.profession==='fisher'&&home?.id===t.targetId&&home.type==='fisherman_hut'&&buildingIsComplete(home)&&open(t.goal.x,t.goal.y));
-          integer(t.caught,0,FISHING.basket-1);number(t.fraction,0,FISHING.basket+1);check(Object.hasOwn(FISHING.depth,t.depth)&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>ground[t.goal.y+dy]?.[t.goal.x+dx]===t.depth));integer(t.bodyId,0);}
+          integer(t.caught,0,FISHING.basket-1);number(t.fraction,0,FISHING.basket+1);check(Object.hasOwn(FISHING.depth,t.depth)&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>fishingGround(ground[t.goal.y+dy]?.[t.goal.x+dx])===t.depth));integer(t.bodyId,0);}
         if(t.kind==='hunt')check(w.profession==='hunter'&&aIds.has(t.targetId));if(t.kind==='collectMeat')check(w.profession==='hunter'&&dIds.has(t.targetId));
         if(t.kind==='mineDrop')check(w.profession==='miner'&&s.drops.some(d=>d.id===t.targetId&&d.resource==='stone'));
         if(t.kind==='chopTree'){const target=treeIds.get(t.targetId),home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),slot=`natural-slot:${t.goal.x},${t.goal.y}`;check(w.profession==='woodcutter'&&home?.type==='lumberjack_hut'&&buildingIsComplete(home)&&target?.natural.stage===3&&Math.abs(target.tile.x-t.goal.x)+Math.abs(target.tile.y-t.goal.y)===1&&!reservations.has(slot));reservations.add(slot);}

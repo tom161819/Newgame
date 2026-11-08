@@ -8,6 +8,8 @@ const SIDES=[[1,0],[-1,0],[0,1],[0,-1]];
 // Fishing R1: water bodies and their fish stocks, Fishers' trips to the shore and the catch statistics per hut.
 // Water bodies come from the ground layer (#100) by flood fill; their ids follow the scan order, so the same map always
 // gives the same ids and the stocks can be saved by id.
+// m-ulozeni-brod: a ford fishes like shallow water – shared with the save check so both agree.
+export function fishingGround(g){return g===GROUND.FORD?GROUND.SHALLOW:g;}
 export class FishingSystem {
   constructor(scene){
     this.scene=scene;this.nextCatch=1;this.catches=new Map();this.warned=new Set();
@@ -26,7 +28,7 @@ export class FishingSystem {
   shoreKey(){return `${this.scene.naturalResources?.topologyRevision??0}:${this.scene.buildings?.length??0}`;}
   isShore(x,y){
     if(this.scene.map[y]?.[x]!==0)return null;let best=null;
-    for(const [dx,dy]of SIDES){let g=this.scene.groundGrid?.[y+dy]?.[x+dx];if(!isRiverGround(g))continue;if(g===GROUND.FORD)g=GROUND.SHALLOW;if(!best||g===GROUND.DEEP)best={ground:g,body:this.bodyAt(x+dx,y+dy)};}
+    for(const [dx,dy]of SIDES){let g=this.scene.groundGrid?.[y+dy]?.[x+dx];if(!isRiverGround(g))continue;g=fishingGround(g);if(!best||g===GROUND.DEEP)best={ground:g,body:this.bodyAt(x+dx,y+dy)};}
     return best;
   }
   // Walking distance (tiles, 4-neighbour steps) from the given start tiles to every reachable shore tile, nearest first.

@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.77.2] - 2026-11-08
+<!-- version: {"title":"Save next to a ford","type":"fix","reconstructed":false,"saveVersion":60} -->
+### Fixed
+- The game can be saved again while a Fisher fishes next to a ford. Before, saving and autosave failed with a "damaged save" message.
+- If saving ever fails, the message now says the game could not be saved and that the next autosave will try again.
+
 ## [0.77.1] - 2026-11-08
 <!-- version: {"title":"World Editor: the close-up zooms with the mouse wheel (or + and -), moves with the arrow keys, WASD or by dragging, and is as tall as the map preview.","type":"feature","reconstructed":false,"saveVersion":60} -->
 ### Changed

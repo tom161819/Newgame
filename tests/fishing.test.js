@@ -100,3 +100,12 @@ test('two Fishers never share a spot; a hut with no reachable water says so and 
   const w=fisher(dry,h);for(let i=0;i<1200&&w.workMessage!=='No reachable fishing spot';i++)dry.tick(50);assert.equal(w.workMessage,'No reachable fishing spot');assert.equal(w.workTask,null);
   const { ProductionDiagnostics }=await import('../src/systems/ProductionDiagnostics.js');const d=new ProductionDiagnostics(dry);assert.ok(d.depletionIssues().some(i=>i.entityId===h.id&&i.reason==='noWater'));
 });
+
+test('m-ulozeni-brod: a Fisher on a bank next to a ford (fished as shallow water) can still be saved and loaded',()=>{
+  const s=lakeScene();for(let y=36;y<=50;y++)for(let x=51;x<=60;x++)if(s.groundGrid[y][x]===GROUND.SHALLOW)s.groundGrid[y][x]=GROUND.FORD;
+  const b=hut(s),w=fisher(s,b);
+  for(let i=0;i<4000&&!(w.workTask?.kind==='fish'&&w.workTask.caught>=1);i++)s.tick(50);
+  assert.equal(w.workTask?.kind,'fish');assert.equal(w.workTask.depth,GROUND.SHALLOW,'a ford counts as shallow water');
+  const data=validateGameState(JSON.parse(JSON.stringify(serializeGameState(s))));
+  assert.equal(data.workers.find(x=>x.id===w.id).workTask.kind,'fish');
+});
