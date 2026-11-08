@@ -41,7 +41,7 @@ function sprite(id, onload) {
   if (!entry) { const img = new Image(); entry = { img, ready: false }; img.onload = () => { entry.ready = true; onload?.(); }; img.src = `${import.meta.env?.BASE_URL ?? '/'}${path.replace(/^\//, '')}`; images.set(path, entry); }
   return entry.ready ? entry.img : null;
 }
-export function drawIsoPreview(canvas, world, { focus, span = 18, settings, onImage }) {
+export function drawIsoPreview(canvas, world, { focus, span = 18, settings, seed = 0, onImage }) {
   const W = 64, H = 32, headroom = 48;
   const x0 = Math.max(0, Math.min(COLUMNS - span, Math.round(focus.x - span / 2))), y0 = Math.max(0, Math.min(ROWS - span, Math.round(focus.y - span / 2)));
   canvas.width = span * W; canvas.height = span * H + headroom + 8;
@@ -57,7 +57,7 @@ export function drawIsoPreview(canvas, world, { focus, span = 18, settings, onIm
   const season = SEASONS.find(([id]) => yearOf(id) === settings.year)?.[0] ?? 'summer', objects = [];
   const free = (fx, fy) => world.terrain[Math.floor(fy)]?.[Math.floor(fx)] !== 1 && !world.bushes?.has?.(`${Math.floor(fx)},${Math.floor(fy)}`);
   for (const p of waterObjectsFor({ x0, y0, span, field, depthAt, settings })) { const [sx, sy] = screen(p.fx, p.fy); if (p.flat) drawPlant(ctx, p, sx, sy, season); else objects.push({ plant: p, d: p.fx + p.fy, sx, sy }); }
-  for (const p of plantsFor({ x0, y0, span, isGrass, zoneAt, depthAt, field, settings })) if (free(p.fx, p.fy)) { const [sx, sy] = screen(p.fx, p.fy); objects.push({ plant: p, d: p.fx + p.fy, sx, sy }); }
+  for (const p of plantsFor({ x0, y0, span, isGrass, zoneAt, depthAt, field, settings, seed })) if (free(p.fx, p.fy)) { const [sx, sy] = screen(p.fx, p.fy); objects.push({ plant: p, d: p.fx + p.fy, sx, sy }); }
   for (let y = y0; y < y0 + span; y++) for (let x = x0; x < x0 + span; x++) {
     const id = world.terrain[y][x] === 1 ? 'rock_outcrop' : world.bushes?.has?.(`${x},${y}`) ? BUSH_TYPES[world.bushes.get(`${x},${y}`)] ?? BUSH_TYPES[0] : null;
     if (id) { const [sx, sy] = screen(x, y); objects.push({ id, d: x + y + 1, sx, sy: sy + H / 2 }); }
@@ -186,7 +186,7 @@ export class WorldEditor {
     this.map.width = COLUMNS * scale; this.map.height = ROWS * scale;
     const ctx = this.map.getContext('2d'); ctx.imageSmoothingEnabled = false; ctx.drawImage(small, 0, 0, COLUMNS * scale, ROWS * scale);
     ctx.fillStyle = '#b3261e'; ctx.fillRect((PLAYER_START.x - 1) * scale, (PLAYER_START.y - 1) * scale, 3 * scale, 3 * scale);
-    const view = drawIsoPreview(this.iso, world, { focus: this.focus, settings: this.previewSettings(), onImage: () => { clearTimeout(this.imageTimer); this.imageTimer = setTimeout(() => this.draw(), 60); } });
+    const view = drawIsoPreview(this.iso, world, { focus: this.focus, settings: this.previewSettings(), seed: this.state.seed, onImage: () => { clearTimeout(this.imageTimer); this.imageTimer = setTimeout(() => this.draw(), 60); } });
     ctx.strokeStyle = 'rgb(255 255 255 / .9)'; ctx.lineWidth = 2; ctx.strokeRect(view.x0 * scale, view.y0 * scale, view.span * scale, view.span * scale);
     this.lastMs = performance.now() - started; this.root.dataset.drawn = String((Number(this.root.dataset.drawn) || 0) + 1);
   }

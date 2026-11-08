@@ -93,6 +93,7 @@ import { policySmoke } from './policy-smoke.mjs';
 import { backgroundSmoke } from './background-smoke.mjs';
 import { worldCodeSmoke } from './world-code-smoke.mjs';
 import { worldEditorSmoke } from './world-editor-smoke.mjs';
+import { flowerNoiseSmoke } from './flower-noise-smoke.mjs';
 import { petsSmoke } from './pets-smoke.mjs';
 import { dogSmoke } from './dog-smoke.mjs';
 import { walkSmoke } from './walk-smoke.mjs';
@@ -235,6 +236,7 @@ try{
   await step('background',()=>backgroundSmoke(context,origin+base,instrument));
   await step('world-code',()=>worldCodeSmoke(context,origin+base,instrument));
   await step('world-editor',()=>worldEditorSmoke(context,origin+base,instrument));
+  await step('flower-noise',()=>flowerNoiseSmoke(context,origin+base,instrument));
   await step('pets',()=>petsSmoke(context,origin+base,instrument));
   await step('dog',()=>dogSmoke(context,origin+base,instrument));
   await step('walk',()=>walkSmoke(context,origin+base,instrument));

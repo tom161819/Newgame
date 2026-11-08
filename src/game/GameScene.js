@@ -216,7 +216,7 @@ export class GameScene extends Phaser.Scene {
     // stream per part; a loaded game keeps its saved world and its code.
     if(!this.loadState&&!this.gameSettings.worldCode)this.gameSettings=gameSettings({...this.gameSettings,worldCode:randomWorldCode()});
     const worldCode=this.gameSettings.worldCode?decodeWorldCode(this.gameSettings.worldCode):null;
-    this.worldLevels=worldCode?.levels??defaultWorldLevels();this.worldRandom=worldCode?worldStreams(worldCode.seed):()=>Math.random;
+    this.worldLevels=worldCode?.levels??defaultWorldLevels();this.worldSeed=worldCode?.seed??0;this.worldRandom=worldCode?worldStreams(worldCode.seed):()=>Math.random;
     const world=this.loadState?{terrain:this.loadState.terrain.map(row=>[...row]),ground:this.loadState.ground?importGround(this.loadState.ground):emptyGround(),bushes:importBushes(this.loadState.bushes??[]),
       zones:this.loadState.grassZones?importZones(this.loadState.grassZones):emptyZones(),reeds:importReeds(this.loadState.reeds)}:generateWorld(Math.random,{levels:this.worldLevels,streams:this.worldRandom});
     this.terrainGrid=world.terrain;this.groundGrid=world.ground;this.bushes=world.bushes;this.grassZones=world.zones;this.reeds=world.reeds;

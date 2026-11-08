@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.76.0] - 2026-11-08
+<!-- version: {"title":"Flower noise","type":"feature","reconstructed":false,"saveVersion":60} -->
+### Changed
+- Flowers now vary across the map. About a quarter of the land is a rich meadow, most is normal, and about a third is almost bare grass. The pattern comes from the world seed. The World Editor's Plants tab has two new sliders: Flowers – area scale and Flowers – contrast. Contrast 0 looks as before.
+
 ## [0.75.0] - 2026-11-08
 <!-- version: {"title":"World Editor","type":"feature","reconstructed":false,"saveVersion":60} -->
 ### Added

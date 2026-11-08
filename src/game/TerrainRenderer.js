@@ -185,7 +185,7 @@ export class TerrainRenderer {
     paintContinuousGround(context,{width:context.canvas.width,height:context.canvas.height,toWorld,isGrass:isLand,zoneAt,depthAt,inWorld,inside,field,settings,step:6});
     const screen=(fx,fy)=>{const p=gridToWorld(fx,fy);return [p.x-left,p.y-top];},name=seasonOf(settings.year),free=(fx,fy)=>own(fx,fy)&&!occupied.has(`${Math.floor(fx)},${Math.floor(fy)}`)&&this.map[Math.floor(fy)]?.[Math.floor(fx)]!==1;
     for(const p of waterObjectsFor({x0:x0-1,y0:y0-1,span:CHUNK_SIZE+2,field,depthAt,settings}))if(free(p.fx,p.fy)){const [sx,sy]=screen(p.fx,p.fy);drawPlant(context,p,sx,sy,name);}
-    const plants=plantsFor({x0:x0-1,y0:y0-1,span:CHUNK_SIZE+2,isGrass:isLand,zoneAt,depthAt,field,settings}).filter(p=>free(p.fx,p.fy)).sort((a,b)=>a.fx+a.fy-b.fx-b.fy);
+    const plants=plantsFor({x0:x0-1,y0:y0-1,span:CHUNK_SIZE+2,isGrass:isLand,zoneAt,depthAt,field,settings,seed:this.scene.worldSeed??0}).filter(p=>free(p.fx,p.fy)).sort((a,b)=>a.fx+a.fy-b.fx-b.fy);
     for(const p of plants){const [sx,sy]=screen(p.fx,p.fy);drawPlant(context,p,sx,sy,name);}
   }
   setDebug(value){this.debugEnabled=!!value;this.lastView='';if(!value)this.debugGraphics.clear();}

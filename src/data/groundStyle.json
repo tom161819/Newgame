@@ -14,6 +14,8 @@
     "flatStones": 0.06,
     "flatStonesAlpha": 1,
     "flow": 0.35,
+    "flowerAreaScale": 24,
+    "flowerContrast": 6,
     "flowersLarge": 1,
     "flowersLargeAlpha": 1,
     "flowersSmall": 0.85,

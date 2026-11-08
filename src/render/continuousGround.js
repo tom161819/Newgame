@@ -10,7 +10,7 @@
 const GROUND_DEFAULTS_ALPHA = {};
 export const GROUND_DEFAULTS_BASE = {
   patchSize: 18, patchStrength: 0.16, edgeWidth: 1.6, blend: 1.2, detail: 0.22, speckles: 1,
-  flowersSmall: 0.6, flowersLarge: 0.25, thistles: 0.15, shrubs: 0.12, tuftGreen: 0.5, tuftDry: 0.3, tuftDark: 0.2, plantSize: 1,
+  flowersSmall: 0.6, flowersLarge: 0.25, thistles: 0.15, shrubs: 0.12, tuftGreen: 0.5, tuftDry: 0.3, tuftDark: 0.2, plantSize: 1, flowerAreaScale: 24, flowerContrast: 6,
   pebbles: 0.4, gravel: 0.2, stones: 0.12, flatStones: 0.06,
   shoreCurve: 0.6, shoreSmooth: 0.7, shoreFoam: 0.35, wetBank: 0.5, ripples: 0.5, depthBlend: 1, flow: 0.6,
   waterRocks: 0.4, waterPebbles: 0.6, reedBeds: 0.5, lilies: 0.3, algae: 0.4,
@@ -39,6 +39,8 @@ export const GROUND_SETTINGS = [
   { key: 'tuftDry', label: 'Tall grass – dry', min: 0, max: 2, step: 0.05, group: 'plants' },
   { key: 'tuftDark', label: 'Tall grass – dark sedge', min: 0, max: 2, step: 0.05, group: 'plants' },
   { key: 'plantSize', label: 'Plant size', min: 0.6, max: 1.6, step: 0.05, group: 'plants' },
+  { key: 'flowerAreaScale', label: 'Flowers – area scale (tiles)', min: 6, max: 60, step: 1, group: 'plants' },
+  { key: 'flowerContrast', label: 'Flowers – contrast (0 = same everywhere)', min: 0, max: 9, step: 1, group: 'plants' },
   { key: 'shoreCurve', label: 'Shore curve', min: 0, max: 1, step: 0.05, group: 'water' },
   { key: 'shoreSmooth', label: 'Natural river shape (no tile steps)', min: 0, max: 1, step: 0.05, group: 'water' },
   { key: 'flow', label: 'Flowing water', min: 0, max: 1, step: 0.05, group: 'water' },
@@ -256,15 +258,29 @@ const KINDS = OBJECT_KINDS;
 const PER_TILE = { flowersSmall: 1.2, flowersLarge: 0.35, thistles: 0.18, shrubs: 0.12, tuftGreen: 0.7, tuftDry: 0.45, tuftDark: 0.3, pebbles: 1.4, gravel: 0.3, stones: 0.35, flatStones: 0.12 };
 // Where each kind likes to grow (zone index → factor).
 const LIKES = { flowersSmall: [1, 0.7, 0.4, 0.3, 2.2, 0.5, 0, 0, 0.05, 0], flowersLarge: [1, 0.6, 0.3, 0.2, 2.4, 0.3, 0, 0, 0, 0], thistles: [0.6, 0.3, 1.8, 0.3, 0.5, 1.6, 0.2, 0.6, 0, 0.3], shrubs: [0.5, 0.8, 0.6, 2.2, 0.4, 1, 0.1, 0.2, 0.3, 0.4], tuftGreen: [1, 1.8, 0.4, 1, 0.8, 0.5, 0.1, 0, 0.6, 0.2], tuftDry: [0.6, 0.3, 2.2, 0.5, 0.5, 1.4, 0.5, 0.6, 0.2, 0.4], tuftDark: [0.5, 1.2, 0.3, 1.8, 0.4, 0.6, 0.2, 0, 1.8, 0.4], pebbles: [0.7, 0.4, 1.2, 0.8, 0.5, 2.6, 0.7, 1.2, 0.6, 3], gravel: [0.4, 0.2, 1, 0.5, 0.3, 2.8, 0.5, 0.8, 0.3, 3], stones: [0.5, 0.3, 1, 1, 0.3, 2.6, 0.3, 1, 0.4, 2.6], flatStones: [0.4, 0.3, 0.8, 1, 0.2, 2.4, 0.2, 0.6, 0.3, 2.4] };
-export function plantsFor({ x0, y0, span, isGrass, zoneAt, depthAt = () => -1, field = null, settings = GROUND_DEFAULTS }) {
+// Flower density by area (plan m-kvety-sum): a large smooth noise (own salt from the world seed) multiplies the
+// flower density – at the default contrast 6 about 30 % of the land is almost bare (×0.05), 45 % normal (×1) and
+// 25 % rich (×1.8), with soft borders. Contrast 0 = ×1 everywhere (the look before 0.76); 9 = ×0 … ×2.1.
+// Two smooth octaves only (no fine octave), so a border runs over several tiles (at most ~0.5 change per tile).
+const FLOWER_LO = 0.46, FLOWER_HI = 0.61, FLOWER_EDGE = 0.09;
+const flowerSalt = seed => 6000 + Math.floor(hash(seed % 46656, Math.floor(seed / 46656), 811) * 1e6);
+export function flowerDensity(x, y, settings = GROUND_DEFAULTS, seed = 0) {
+  const c = settings.flowerContrast ?? GROUND_DEFAULTS.flowerContrast; if (!(c > 0)) return 1;
+  const sc = Math.max(1, settings.flowerAreaScale ?? GROUND_DEFAULTS.flowerAreaScale), salt = flowerSalt(Math.max(0, Math.floor(seed) || 0));
+  const v = noise(x / sc, y / sc, salt) * 0.75 + noise(x * 2.03 / sc, y * 2.03 / sc, salt + 1) * 0.25;
+  const ramp = (a, b) => smooth(Math.max(0, Math.min(1, (v - a) / (b - a))));
+  const m = 0.05 + 0.95 * ramp(FLOWER_LO - FLOWER_EDGE, FLOWER_LO + FLOWER_EDGE) + 0.75 * ramp(FLOWER_HI - FLOWER_EDGE, FLOWER_HI + FLOWER_EDGE);
+  return Math.max(0, 1 + (m - 1) * c / 6);
+}
+export function plantsFor({ x0, y0, span, isGrass, zoneAt, depthAt = () => -1, field = null, settings = GROUND_DEFAULTS, seed = 0 }) {
   const wetAt = field ? field.wet : (fx, fy) => wetness(fx, fy, depthAt, settings);
   const s = { ...GROUND_DEFAULTS, ...settings }, out = [];
   for (let y = y0 - 2; y < y0 + span + 2; y++) for (let x = x0 - 2; x < x0 + span + 2; x++) {
     if (!isGrass(x, y)) continue;
-    const z = zoneAt(x, y), edge = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => isGrass(x + dx, y + dy) && zoneAt(x + dx, y + dy) !== z) ? 1.6 : 1;
+    const z = zoneAt(x, y), edge = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => isGrass(x + dx, y + dy) && zoneAt(x + dx, y + dy) !== z) ? 1.6 : 1, bloom = flowerDensity(x + 0.5, y + 0.5, s, seed);
     KINDS.forEach((kind, k) => {
       const year = s.year ?? yearOf(s.season), growth = curve(CURVES[kind].grow, year), wither = curve(CURVES[kind].wither, year);
-      const want = (s[kind] ?? 0) * PER_TILE[kind] * LIKES[kind][z] * edge * growth;
+      const want = (s[kind] ?? 0) * PER_TILE[kind] * LIKES[kind][z] * edge * growth * (kind === 'flowersSmall' || kind === 'flowersLarge' ? bloom : 1);
       // The same spot keeps its plant as the year turns: plants appear one by one as growth rises.
       for (let n = 0; n < 3; n++) if (hash(x, y, 100 + k * 7 + n) < want / 3 && wetAt(x + hash(x, y, 200 + k * 7 + n), y + hash(x, y, 300 + k * 7 + n)) < 0.4) out.push({ kind, fx: x + hash(x, y, 200 + k * 7 + n), fy: y + hash(x, y, 300 + k * 7 + n), size: s.plantSize * (0.7 + hash(x, y, 400 + k * 7 + n) * 0.6) * (0.45 + 0.55 * growth), seed: hash(x, y, 500 + k * 7 + n), alpha: s[`${kind}Alpha`] ?? 1, wither, snow: seasonLook(year).snow });
     });

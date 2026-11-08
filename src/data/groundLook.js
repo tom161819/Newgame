@@ -8,20 +8,21 @@ import { GROUND_DEFAULTS, GROUND_SETTINGS } from '../render/continuousGround.js'
 // Fish are the game's own FishShadows (they do not read the ground settings), so their sliders are left out.
 const NOT_IN_GAME = new Set(['fishAmount', 'fishSize', 'fishOpacity']);
 export const GROUND_LOOK_SETTINGS = Object.freeze(GROUND_SETTINGS.filter(s => !NOT_IN_GAME.has(s.key)).map(s => Object.freeze({ ...s })));
+const WHOLE = new Set(['duckFamilies', 'flowerContrast', 'flowerAreaScale']);
 const BY_KEY = new Map(GROUND_LOOK_SETTINGS.map(s => [s.key, s]));
 // What the game paints without an override.
 export const GAME_GROUND_SETTINGS = Object.freeze({ ...GROUND_DEFAULTS, ...groundStyle.settings });
 export const defaultGroundLook = () => Object.fromEntries(GROUND_LOOK_SETTINGS.map(s => [s.key, GAME_GROUND_SETTINGS[s.key]]));
 
 // Strict check (saves): a plain object with only known keys, each a finite number in the slider's range
-// (duck families a whole number). Returns a clean copy; throws on anything else.
+// (duck families, flower contrast and flower area scale whole numbers). Returns a clean copy; throws on anything else.
 export function validateGroundLook(input) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Invalid ground look');
   const out = {};
   for (const [key, value] of Object.entries(input)) {
     const def = BY_KEY.get(key);
     if (!def || typeof value !== 'number' || !Number.isFinite(value) || value < def.min - 1e-9 || value > def.max + 1e-9) throw new Error('Invalid ground look');
-    if (key === 'duckFamilies' && !Number.isInteger(value)) throw new Error('Invalid ground look');
+    if (WHOLE.has(key) && !Number.isInteger(value)) throw new Error('Invalid ground look');
     out[key] = value;
   }
   return out;
