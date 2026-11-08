@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.69.0] - 2026-11-08
+<!-- version: {"title":"Animals 3","type":"feature","reconstructed":false,"saveVersion":59} -->
+### Changed
+- Cats are 1.5× bigger. They are easier to see next to people but still smaller than a dog.
+- The dog taming choice shows "Chance to tame: 44 %".
+- The Mill, Bakery and Farmhouse panels show their rats. A cat can be taken in, reassigned or bought from a caravan for any of them. Each one raises the kingdom's cat limit by one.
+
 ## [0.68.0] - 2026-11-08
 <!-- version: {"title":"Tutorial v2 and economy fixes","type":"feature","reconstructed":false,"saveVersion":59} -->
 ### Added

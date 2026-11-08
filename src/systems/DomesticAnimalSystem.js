@@ -1,4 +1,4 @@
-import { RATS,CATS,DOGS,ratLevel,tameChance,HOUSE_RATS } from '../data/domesticAnimals.js';
+import { RATS,CATS,DOGS,ratLevel,tameChance,HOUSE_RATS,RAT_BUILDINGS } from '../data/domesticAnimals.js';
 import { FOOD_RESOURCE_IDS } from '../data/foodProduction.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { PLAYER_START,COLUMNS,ROWS } from '../game/config.js';
@@ -54,14 +54,21 @@ export class DomesticAnimalSystem {
     for(const id of [...this.houseRats.keys()])if(!keep.has(id))this.houseRats.delete(id);
   }
   catAtHome(house){return !!house&&this.isHouse(house)&&this.catsAt(house.id).length>0;}
-  // Buildings a cat can live at: food stores and houses (one cat per house).
+  // m-zvirata-3 (71): rat buildings – complete buildings listed in RAT_BUILDINGS plus any other that keeps food in
+  // its own store. Rats live in their food locations; a cat can live at each of them.
+  ratBuildings(){
+    const ids=new Set(this.foodLocations().map(l=>l.buildingId).filter(id=>id!=null));
+    return (this.scene.buildings??[]).filter(b=>buildingIsComplete(b)&&(ids.has(b.id)||RAT_BUILDINGS.includes(b.type)));
+  }
+  // Buildings a cat can live at: rat buildings and houses (one cat per house).
   homes(){
-    const ids=new Set(this.foodLocations().map(l=>l.buildingId).filter(id=>id!=null)),list=[];
+    const ids=new Set(this.ratBuildings().map(b=>b.id)),list=[];
     for(const b of this.scene.buildings??[])if(buildingIsComplete(b)&&(ids.has(b.id)||this.isHouse(b)))list.push(b);
     return list.sort((a,b)=>this.buildingRats(b.id)-this.buildingRats(a.id)||a.id-b.id);
   }
   canHome(building,cat=null){return !!building&&this.homes().some(b=>b.id===building.id)&&!(this.isHouse(building)&&this.catsAt(building.id).some(c=>c!==cat));}
-  cap(){return 1+new Set(this.foodLocations().map(l=>l.buildingId)).size+(this.scene.buildings??[]).filter(b=>buildingIsComplete(b)&&this.isHouse(b)).length;}
+  // Kingdom cat cap: 1 + rat buildings (and the camp food store while it exists) + Houses.
+  cap(){const camp=this.foodLocations().some(l=>l.buildingId==null)?1:0;return 1+camp+this.ratBuildings().length+(this.scene.buildings??[]).filter(b=>buildingIsComplete(b)&&this.isHouse(b)).length;}
   lossPerDay(locationId){const l=this.storage?.locations.get(locationId);return l?this.foodStored(l)*RATS.loss[ratLevel(this.ratsAt(locationId))]:0;}
   status(buildingId){const rats=this.buildingRats(buildingId),loss=this.buildingLocations(buildingId).reduce((n,l)=>n+this.lossPerDay(l.id),0);return {rats:Math.round(rats),level:ratLevel(rats),loss:Math.round(loss*10)/10,cats:this.catsAt(buildingId).length,needed:this.catsNeeded(buildingId)};}
 

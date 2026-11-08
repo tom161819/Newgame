@@ -6,7 +6,7 @@ import { placeBuilding } from '../src/game/buildings.js';
 import { CaravanSystem } from '../src/systems/CaravanSystem.js';
 import { TradeSystem } from '../src/systems/TradeSystem.js';
 import { DomesticAnimalSystem } from '../src/systems/DomesticAnimalSystem.js';
-import { RATS,CATS,ratLevel } from '../src/data/domesticAnimals.js';
+import { RATS,CATS,ratLevel,RAT_BUILDINGS,CAT_SIZE,catScale,tameChance } from '../src/data/domesticAnimals.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
 globalThis.document={querySelector:()=>({textContent:''})};
@@ -89,4 +89,55 @@ test('m-zvirata-2: rats move into a House with no assigned cat within 10 tiles a
 });
 test('m-zvirata-2: the first stray dog comes on day 2–3',()=>{
   const {d,days}=world({wheat:50});days(1.0);assert.equal([...d.dogs.values()].length,0);days(2.0);assert.ok([...d.dogs.values()].some(g=>g.state==='stray'),'a stray dog by day 3');
+});
+
+// m-zvirata-3 (owner 67, 69, 71).
+test('m-zvirata-3 (71): rats move into the Mill and the Bakery by their stock and a cat clears them; losses take grain and flour first',()=>{
+  const {s,d,place,days}=world({wheat:0});
+  const mill=place('mill',64,40),bakery=place('bakery',64,46),input=b=>s.foodStorage.locations.get(`input-${b.id}`),output=b=>s.foodStorage.locations.get(`output-${b.id}`);
+  for(const b of [mill,bakery])assert.ok(RAT_BUILDINGS.includes(b.type)&&d.ratBuildings().some(r=>r.id===b.id),`${b.type} is a rat building`);
+  assert.equal(s.foodStorage.deposit(input(mill).id,'wheat',20),true);assert.equal(s.foodStorage.deposit(input(bakery).id,'flour',20),true);
+  d.random=()=>.99;d.nextStrayAt=Infinity;days(5.5);
+  assert.equal(ratLevel(d.buildingRats(mill.id)),'many','a full Mill buffer: Many in about 5 days, as a full Granary');
+  assert.equal(ratLevel(d.buildingRats(bakery.id)),'many');assert.ok(input(bakery).stock.flour<20,'rats ate flour');
+  s.foodStorage.deposit(output(bakery).id,'bread',10);d.rats.set(output(bakery).id,80);const bread=output(bakery).stock.bread;
+  const r=s.foodStorage.reserve('stock',output(bakery).id,'bread',bread,'test');void r;days(2);assert.equal(output(bakery).stock.bread,bread,'reserved bread is never eaten');
+  assert.ok(d.status(bakery.id).loss>0);assert.equal(d.status(bakery.id).needed,1);
+  const cat=d.newCat({x:bakery.x,y:bakery.y+3});assert.equal(d.canHome(bakery),true);assert.equal(d.assign(cat.id,bakery.id),true);
+  for(let i=0;i<6;i++)days(1);assert.equal(d.buildingRats(bakery.id),0,'the cat cleared the Bakery');assert.ok(d.buildingRats(mill.id)>0,'the Mill still has rats');
+  assert.deepEqual(RATS.lossOrder.slice(0,2),['wheat','flour']);
+});
+
+test('m-zvirata-3 (71): a cat can live at a Farmhouse; rat buildings raise the cat cap; Farmhouse rats follow its own food',()=>{
+  const {s,d,place,granary}=world({wheat:0});const cap=d.cap();
+  const farm=place('farmhouse',64,40);assert.equal(d.cap(),cap+1,'a Farmhouse raises the cap');
+  const mill=place('mill',70,40);assert.equal(d.cap(),cap+2);const bakery=place('bakery',70,46);assert.equal(d.cap(),cap+3);
+  assert.ok(d.homes().some(b=>b.id===farm.id)&&d.homes().some(b=>b.id===mill.id)&&d.homes().some(b=>b.id===bakery.id));
+  const cat=d.newCat({x:farm.x,y:farm.y+3});assert.equal(d.assign(cat.id,farm.id),true);assert.equal(cat.buildingId,farm.id);
+  const second=d.newCat({x:farm.x,y:farm.y+3});assert.equal(d.assign(second.id,farm.id),true,'more than one cat may live at a Farmhouse');
+  assert.equal(d.status(farm.id).rats,0,'no food of its own, no rats');assert.equal(d.status(farm.id).needed,1);
+  // Caravan purchase to a Bakery.
+  s.caravans=new CaravanSystem(s);s.trade=new TradeSystem(s);place('warehouse',76,40);place('marketplace',44,48);assert.equal(s.caravans.summon(),true);for(let i=0;i<20000&&s.caravans.active.phase==='arriving';i++)s.caravans.update(100);
+  s.inventory.add('gold',100);d.updateCaravan();d.caravanCats.count=1;const r=d.buyCat(bakery.id);assert.equal(r.ok,true);assert.equal(r.cat.buildingId,bakery.id);
+  // Reassign from the Granary to the Mill.
+  const g=d.newCat({x:granary.x,y:granary.y+2});d.assign(g.id,granary.id);assert.equal(d.assign(g.id,mill.id),true);assert.equal(g.buildingId,mill.id);
+});
+
+test('m-zvirata-3 (69, 67): the taming offer says "Chance to tame"; the cat scale comes from data',async()=>{
+  const {t,setLanguage}=await import('../src/i18n/index.js');
+  setLanguage('en',{persist:false});assert.equal(t('pets.dog.tameOption',{hunter:'Jan',level:3,chance:44}),'Jan · hunting 3 · Chance to tame: 44 %');
+  setLanguage('cs',{persist:false});assert.equal(t('pets.dog.tameOption',{hunter:'Jan',level:3,chance:44}),'Jan · lov 3 · Šance na ochočení: 44 %');setLanguage('en',{persist:false});
+  assert.equal(Math.round(tameChance(3)*100),44);
+  assert.equal(CAT_SIZE.adult,1.5);assert.equal(catScale(),1.5);assert.equal(catScale({young:true}),CAT_SIZE.kitten);assert.ok(Math.abs(catScale({young:true,drawn:false})-CAT_SIZE.kitten*CAT_SIZE.kittenFigure)<1e-9);
+  // A tomcat's side view is 26 px wide in the sheet, a hound's 41 px: scaled, the cat stays smaller than the dog.
+  assert.ok(26*catScale()<41,'not bigger than a dog');assert.ok(26*catScale()>=36,'about 1.5× the old tomcat');
+});
+
+test('m-zvirata-3: rats and a cat at a Bakery survive a save (schema unchanged)',()=>{
+  const {s,d,place}=world({wheat:0});const bakery=place('bakery',64,46),farm=place('farmhouse',64,40),input=`input-${bakery.id}`;
+  s.foodStorage.deposit(input,'flour',10);d.rats.set(input,40.25);const cat=d.newCat({x:bakery.x,y:bakery.y+3});d.assign(cat.id,bakery.id);const fc=d.newCat({x:farm.x,y:farm.y+3});d.assign(fc.id,farm.id);
+  const saved=validateGameState(serializeGameState(s));assert.equal(saved.domestic.rats[input],40.25);
+  const r=workerScene(saved.terrain,{construction:true,logistics:true,starter:false,gameSettings:gameSettings()});r.domestic=new DomesticAnimalSystem(r);loadGameState(r,saved);
+  assert.equal(r.domestic.ratsAt(input),40.25);assert.equal(r.domestic.cats.get(cat.id).buildingId,bakery.id);assert.equal(r.domestic.cats.get(fc.id).buildingId,farm.id);
+  const bad=structuredClone(serializeGameState(s));bad.domestic.cats.find(c=>c.id===cat.id).buildingId=9999;assert.throws(()=>validateGameState(bad));
 });

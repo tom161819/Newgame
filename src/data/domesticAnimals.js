@@ -24,6 +24,18 @@ export const CATS=Object.freeze({
 // such a House are a little less happy.
 export const RAT_MOVES=Object.freeze({radius:Object.freeze([1.5,7]),hideChance:.25,hideSeconds:Object.freeze([3,8]),dash:2.4,sniff:Object.freeze([.6,2.2])});
 export const HOUSE_RATS=Object.freeze({catRadius:10,afterDays:2,happiness:-3});
+// m-zvirata-3 (71): buildings rats move into and a cat can live at (besides Houses). Rats live in the food a building
+// keeps in its own store (Granary stock, Starter Stockpile food, the Mill's and Bakery's input/output buffers) and
+// follow the Granary rules (growth by fill, losses 1/3/6 %, grain and flour first, reserved food never). Any other
+// building that keeps food in its own store counts too. Each listed building raises the kingdom's cat cap by one.
+// The Farmhouse keeps no food of its own today (Farmers carry the harvest to the stores), so rats there only appear
+// once it holds food; a cat can still live there and guards the Houses near it.
+export const RAT_BUILDINGS=Object.freeze(['granary','starter_stockpile','mill','bakery','farmhouse']);
+// m-zvirata-3 (67): cats were too small next to people. The approved cat sprites (and the kitten's own smaller
+// sprite) are drawn at this scale: a tomcat side view 26×14 px → 39×21 px, just under a hound (41×22 px).
+// `kittenFigure` is the extra factor for the provisional drawn kitten (used only when the art has not loaded).
+export const CAT_SIZE=Object.freeze({adult:1.5,kitten:1.5,kittenFigure:.7});
+export const catScale=({young=false,drawn=true}={})=>young?CAT_SIZE.kitten*(drawn?1:CAT_SIZE.kittenFigure):CAT_SIZE.adult;
 export const ratLevel=population=>{let level='none';for(const [id,from]of RATS.levels)if(population>=from&&(id==='none'?population<=0:true))level=id;return population<=0?'none':level;};
 // Domestic animals Z2: the hunting dog. One dog per Hunter; it never eats from the stores and never dies.
 // tame: 20 % + 8 % per hunting level, at most 90 %, one try per stray. Hunting with the dog: the Hunter moves 30 %

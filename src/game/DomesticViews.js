@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { gridToWorld } from './isometric.js';
 import { RATS,RAT_MOVES } from '../data/domesticAnimals.js';
-import { ratLevel } from '../data/domesticAnimals.js';
+import { ratLevel,catScale } from '../data/domesticAnimals.js';
 import { directionName } from './directions.js';
 import { animalLook,ensureAnimalLook,applyAnimalArt } from './animalArt.js';
 import { MOVEMENT_SPEED_SCALE } from '../data/movement.js';
@@ -76,7 +76,7 @@ export class DomesticViews {
       const p=gridToWorld(cat.x,cat.y),v=cat.view,moving=!!cat.target&&Math.hypot(cat.x-cat.target.x,cat.y-cat.target.y)>.05;
       v.setPosition(p.x,p.y);v.setDepth(p.y+2);v.setVisible(this.visible({x:cat.x,y:cat.y}));
       this.wildMark(v,cat.state==='stray'&&v.visible);
-      const young=cat.state==='kitten',drawn=v.visible&&this.art(v,'cat',cat.id,{young,facing:cat.facing,moving,delta});v.setScale(young&&!drawn?.7:1);
+      const young=cat.state==='kitten',drawn=v.visible&&this.art(v,'cat',cat.id,{young,facing:cat.facing,moving,delta});v.setScale(catScale({young,drawn}));if(v.wild)v.wild.setScale(1/v.scaleX).setY(-30/v.scaleX);
       if(v.visible&&!drawn)drawCat(v.figure,v.coat,cat.facing??{x:1,y:0},this.phase+Number(cat.id.slice(4)),moving);
     }
     for(const dog of s.dogs.values()){
