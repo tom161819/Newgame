@@ -2,7 +2,8 @@ import { t } from '../i18n/index.js';
 import { cornerStack } from './EventFeed.js';
 import { playChime } from './sound.js';
 
-export const rewardText=reward=>Object.entries(reward??{}).map(([id,n])=>t(`goals.res.${id}`,{n})).join(', ');
+// m-kral-odmeny-xp: the King's skill points (goal.skillPoints) are listed with the resources.
+export const rewardText=(reward,points=0)=>[...Object.entries(reward??{}).map(([id,n])=>t(`goals.res.${id}`,{n})),...(points>0?[t('goals.res.points',{count:points})]:[])].join(', ');
 // E4: a small folding card above the event feed with the three active Royal tasks, their progress and reward.
 // Hidden while the tutorial shows its bubble so the first minutes stay calm. A finished task flashes, plays a short
 // chime (Settings → Sound) and leaves a line in the event feed.
@@ -17,7 +18,7 @@ export class RoyalGoalsPanel {
     this.render(true);
   }
   completed(goal){
-    const reward=rewardText(goal.reward),text=t('goals.doneLine',{name:t(`goals.${goal.id}`),reward});
+    const reward=rewardText(goal.reward,goal.skillPoints),text=t('goals.doneLine',{name:t(`goals.${goal.id}`),reward});
     this.scene.eventFeed?.push(`royal-goal:${goal.id}`,text,{important:true});this.scene.setStatus?.(text);playChime('goal');
     this.root.classList.remove('goal-flash');void this.root.offsetWidth;this.root.classList.add('goal-flash');
   }
@@ -35,7 +36,7 @@ export class RoyalGoalsPanel {
       const name=this.doc.createElement('strong');name.textContent=t(`goals.${goal.id}`);
       const count=this.doc.createElement('span');count.className='royal-goal-count';count.textContent=`${value} / ${goal.target}`;
       const bar=this.doc.createElement('progress');bar.max=goal.target;bar.value=value;
-      const reward=this.doc.createElement('small');reward.textContent=t('goals.reward',{reward:rewardText(goal.reward)});
+      const reward=this.doc.createElement('small');reward.textContent=t('goals.reward',{reward:rewardText(goal.reward,goal.skillPoints)});
       li.append(name,count,bar,reward);return li;
     }));
   }

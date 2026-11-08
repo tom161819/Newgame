@@ -350,4 +350,11 @@ export default {
   'policy.taxEffect':'{each} Gold per resident each morning: {total} Gold/day from {count} residents. Happiness {happiness}.',
   'policy.rationsEffect':'Each resident eats {portions} portions a day; the Food need reaches at most {cap}. Happiness {happiness}.','ledger.Taxes':'Taxes',
   'needs.policyLine':'Kingdom policy: Happiness {value}','needs.strikeLine':'On strike: works again at Happiness 45.','needs.leavingLine':'Leaving the kingdom.','needs.riskLine':'Unhappy for {days} day(s): strikes after 2 days below 25, leaves after 3 days below 15.',
+  // m-kral-odmeny-xp: King skill points from Royal tasks.
+  'kingSkills.earned':{one:'The King earned {count} skill point.',other:'The King earned {count} skill points.'},'goals.res.points':{one:'{count} skill point',other:'{count} skill points'},
+  'kingSkills.title':'King skills','kingSkills.points':'Free skill points: {count}','kingSkills.level':'{level} / {max}',
+  'kingSkills.leadership':'Leadership','kingSkills.stewardship':'Stewardship','kingSkills.leadershipNow':'+{now} % work in sight','kingSkills.stewardshipNow':'+{now} % taxes',
+  'kingSkills.leadershipTip':'Leadership +1 level: residents within the King\'s sight work +{each} % faster per level (now +{now} %, max level {max}).',
+  'kingSkills.stewardshipTip':'Stewardship +1 level: tax yield +{each} % per level, Happiness unchanged (now +{now} %, max level {max}).',
+  'kingSkills.skillTip':'{skill} +1 level for 1 point: +{each} % {skill} work speed.','kingSkills.combatTip':'{skill} +1 level for 1 point: +{each} % attack damage in combat.',
 };

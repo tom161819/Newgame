@@ -8,6 +8,7 @@ import { carryCapacity,IDLE_STONE,defaultStoneCollection,TRANSPORT_MODES } from 
 import { cargoLabel,transportLabel } from './transportLabels.js';
 import { blockingDialog } from './dockedPanels.js';
 import { renderNeeds } from './NeedsDisplay.js';
+import { KingSkillsSection } from './KingSkillsSection.js';
 
 export class UnitPanel {
   constructor(scene){
@@ -37,6 +38,8 @@ export class UnitPanel {
     this.campfireButton.addEventListener('click',()=>{const u=this.unit;if(u?.profession!=='soldier')return;const b=scene.nightThreats?.makeCampfire(u);scene.setStatus?.(b?t('campfire.made',{name:u.name}):t('campfire.cannot'));this.refresh();},options);
     this.tendToggle.addEventListener('change',()=>{if(this.unit?.profession==='soldier'){this.unit.tendTorches=this.tendToggle.checked||undefined;this.refresh();}},options);
     this.needs=element('section','unit-needs');this.needs.id='unit-needs';this.needs.hidden=true;document.querySelector('#unit-job-controls').after(this.needs);
+    // m-kral-odmeny-xp: the King's skill points and royal skills.
+    this.kingSkills=new KingSkillsSection(scene,this.dialog,{onChange:()=>this.refresh()});
     this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.close();},options);
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!e.repeat&&this.dialog.open&&!blockingDialog(document)){e.preventDefault();this.close();}},options);this.dialog.addEventListener('close',()=>this.restoreInput(),options);
   }
@@ -75,8 +78,9 @@ export class UnitPanel {
       const rows=Object.entries(SKILLS).map(([id,name])=>{const skill=u.skills[id],talented=id===u.naturalTalent,row=element('div',`skill-row${talented?' talented-skill':''}`);row.dataset.skill=id;row.append(element('strong','',`${name}${talented?' ★':''}`),element('span','',t('unit.skillLevel',{level:skill.level})),element('span','',skill.level===skill.maxLevel?t('unit.xpMax'):t('unit.skillXp',{current:format(skill.currentXP),next:skill.xpToNextLevel})),element('small','',id==='logistics'?t('unit.haulerCapacity',{count:carryCapacity({...u,profession:'hauler'})}):`${Math.round((1+(skill.level-1)*WORK_RULES.efficiencyPerLevel)*100)} %${talented?' · +20 % XP':''}`));return row;});
       document.querySelector('#unit-skills').replaceChildren(...rows);this.skillSignature=`${u.id}:${signature}`;
     }
+    this.kingSkills?.render(u);
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){this.dialog.close();this.restoreInput();if(!this.destroyed)this.scene.unitSelection?.draw();}
-  destroy(){this.destroyed=true;this.close();this.needs?.remove();this.controller.abort();this.commandControls.remove();this.transportRow.remove();}
+  destroy(){this.destroyed=true;this.close();this.needs?.remove();this.kingSkills?.destroy();this.controller.abort();this.commandControls.remove();this.transportRow.remove();}
 }
