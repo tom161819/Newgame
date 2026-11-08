@@ -34,5 +34,31 @@ Owner, 8 Nov 2026 (Grafika chat): "nahraj pesiny v0 a udelej revizi asetu k nasa
   - Designs.
   The fields save as you type, and a list of all comments is shown. Claude takes them over when asked ("UI poznámky").
 
+## Implementation decisions
+- **One atlas, not separate sprites.** About 70 separate sprites would exceed the 512-file cap of the page. Looks are picked from deposit ids and tile coordinates, so nothing new is saved.
+- **The old approved bushes stay as the fallback.** The new species replace meadow, berry and flowering on screen, and the desert scrub keeps its own art. Placement and the world code are unchanged.
+- **2 × 2 deposits use the medium and small Studio sizes.** The large (3 × 3) size does not fit the 2 × 2 footprint, so it stays out of the game.
+- **The Fisher uses only the walk sheet.** It carries all eight directions, so no facing PNGs are needed. The sheets are inlined as data URLs.
+
 ## Save/Load impact
 A map-memory deposit may carry `visual.look` (optional). Older saves load unchanged.
+
+## Testing
+- tests/nature-art.test.js checks the following:
+  - every atlas frame is an approved export, pixel for pixel, with its metadata origin;
+  - rejected variants are never packed;
+  - the looks exist for every season and stage;
+  - the Fisher walk sheets are the approved exports, byte for byte.
+- tests/path-v2.test.js checks that PATH_STYLE equals the owner's pesiny-v3 proposal.
+- Browser:
+  - fishing smoke: a walking Fisher shows the fisher walk sheet;
+  - main smoke: Save/Load passes;
+  - a screenshot check of deposits, shrubs and rocks.
+- The Studio smoke checks that the UI Lab comment field saves `uiNotes/style:colours`. The World Lab generator assertion now follows WORLD_GENERATOR_VERSION.
+
+## Notes for the next agent
+- The game page holds 512 of the 512 files a published page may have (the atlas was the last free slot).
+  - Any new file must replace one, or go into a JS module (data URL) or an atlas.
+  - Inlining small assets in the game build is a recommended Mechaniky task.
+- Re-run scripts/export-nature-art.mjs and scripts/export-fisher-walk.mjs after a Studio revision of those assets.
+- The thickets, ridge, 2 × 2 obstacles and 3 × 3 deposits are approved but need game objects (Mechaniky).

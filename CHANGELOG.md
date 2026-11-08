@@ -4,6 +4,9 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+
+## [0.79.0] - 2026-11-08
+<!-- version: {"title":"New approved nature art: stone and iron deposits shrink as they are mined, snow-covered in winter.","type":"feature","reconstructed":false,"saveVersion":60} -->
 ### Added
 - New approved nature art: stone and iron deposits shrink as they are mined, snow-covered in winter. There are new rock obstacles and five shrub species with seasonal looks. Wheat fields go from sown to ripe, and orchard apple trees go from blossom to fruit.
 ### Changed
