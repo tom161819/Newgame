@@ -165,7 +165,7 @@ export function wetness(fx, fy, depthAt, settings = GROUND_DEFAULTS) { // single
   const wx = fx - 0.5, wy = fy - 0.5, ix = Math.floor(wx), iy = Math.floor(wy), ax = smooth(wx - ix), ay = smooth(wy - iy), wet = (x, y) => (depthAt(x, y) >= 0 ? 1 : 0);
   return wet(ix, iy) * (1 - ax) * (1 - ay) + wet(ix + 1, iy) * ax * (1 - ay) + wet(ix, iy + 1) * (1 - ax) * ay + wet(ix + 1, iy + 1) * ax * ay;
 }
-export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zoneAt, depthAt = () => -1, inWorld = () => true, field = null, settings = GROUND_DEFAULTS, step = 4 }) {
+export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zoneAt, depthAt = () => -1, inWorld = () => true, inside = null, field = null, settings = GROUND_DEFAULTS, step = 4 }) {
   const wetAt = field ? field.wet : (fx, fy) => wetness(fx, fy, depthAt, settings), mask = new Uint8Array(width * height);
   const s = { ...GROUND_DEFAULTS, ...settings }, img = ctx.getImageData(0, 0, width, height), out = img.data, grain = detail();
   const warpScale = 1 / 3.2, warp = s.edgeWidth, colors = GROUND_DEFAULTS_BASE.zoneColors.map((c, i) => hex(s.zoneColors?.[i] ?? c)), wcolors = GROUND_DEFAULTS_BASE.waterColors.map((c, i) => hex(s.waterColors?.[i] ?? c)), season = seasonLook(s.year ?? yearOf(s.season));
@@ -211,7 +211,7 @@ export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zo
     let fx = c0x + bxw * py - ax, fy = c0y + byw * py - ay;
     for (let px = 0; px < width; px++) {
       fx += ax; fy += ay;
-      if (!inWorld(Math.floor(fx), Math.floor(fy))) continue;
+      if (inside ? !inside(fx, fy) : !inWorld(Math.floor(fx), Math.floor(fy))) continue;
       const gx = Math.min(gw - 2, Math.floor(px / step)), vx = (px - gx * step) / step, i = gy * gw + gx, i1 = i + 1, i2 = i + gw, i3 = i2 + 1;
       const w00 = (1 - vx) * (1 - vy), w10 = vx * (1 - vy), w01 = (1 - vx) * vy, w11 = vx * vy;
       const wetV = WET[i] * w00 + WET[i1] * w10 + WET[i2] * w01 + WET[i3] * w11, o = (py * width + px) * 4;

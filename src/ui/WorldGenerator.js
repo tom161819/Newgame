@@ -34,6 +34,18 @@ export function previewPixels(world) {
   return data;
 }
 
+// Slider value in the player's language (the Studio keeps the English describe() from worldCode.js).
+const COUNTS = { fords: 22, forest: 200, rocks: 65, bushes: 26 };
+export function describe(setting, level) {
+  const k = setting.key, v = setting.value?.(level);
+  if (k === 'rivers') return t(`setup.gen.rivers.${level}`);
+  if (k === 'lakes') return t('setup.gen.lakesCount', { count: level });
+  if (k === 'desert' && !level) return t('setup.gen.none');
+  if (k === 'fords') return t('setup.gen.fordsEvery', { count: Math.round(COUNTS.fords * v) });
+  if (k in COUNTS) return t(`setup.gen.${k}Count`, { count: Math.round(COUNTS[k] * v) });
+  return `×${Number(v).toFixed(2)}`;
+}
+
 export class WorldGenerator {
   // host: element to fill; get/set the setup's {levels, seed}; onChange after a slider moves.
   constructor(host, { get, set }) {
@@ -53,7 +65,7 @@ export class WorldGenerator {
   // Update the sliders and redraw the preview (debounced: a world takes a few tens of ms to generate).
   refresh() {
     const { levels } = this.get();
-    for (const [i, { input, out, s }] of this.sliders.entries()) { input.value = levels[i]; out.textContent = s.describe(levels[i]); }
+    for (const [i, { input, out, s }] of this.sliders.entries()) { input.value = levels[i]; out.textContent = describe(s, levels[i]); }
     clearTimeout(this.timer); this.timer = setTimeout(() => this.draw(), 120);
   }
   draw() {

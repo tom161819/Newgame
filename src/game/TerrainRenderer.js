@@ -1,6 +1,6 @@
 import { drawCobbles } from './cobbles.js';
-import { COLUMNS, ROWS } from './config.js';
-import { tileCenter, worldToGrid, gridToWorld } from './isometric.js';
+import { COLUMNS, ROWS, TILE_WIDTH, TILE_HEIGHT } from './config.js';
+import { tileCenter, worldToGrid, gridToWorld, ORIGIN } from './isometric.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { PATH_WEAR } from '../data/pathWear.js';
 import { canStep } from './pathfinding.js';
@@ -91,7 +91,7 @@ export class TerrainRenderer {
     const pending=want.filter(([key,src])=>!requestTexture(this.scene,key,src,{frameWidth:64,frameHeight:32}));
     if(pending.length&&this.scene.load?.once)this.scene.load.once('complete',()=>{if(!this.scene.sys?.isActive?.()&&this.scene.sys)return;this.repaintEverything();});
   }
-  repaintEverything(){this.edgeCache?.clear();this.shoreCache?.clear();this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
+  repaintEverything(){this.edgeCache?.clear();this.groundCache?.clear();this.shoreCache?.clear();this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
   // The grass tile ref of a zone in a season ("key#frame"), or null when that strip is not loaded.
   zoneRef(x,y,season){
     const zone=ZONE_ART[this.scene.grassZones?.[y]?.[x]],s=SEASON_ART[season],art=zone&&APPROVED_DEPLOY_ART.zones?.[zone]?.[s];if(!art)return null;
@@ -161,6 +161,15 @@ export class TerrainRenderer {
   setShoreStyle(style){if(!['round','edges'].includes(style)||style===this.shoreStyle)return false;this.shoreStyle=style;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';return true;}
   // Developer switch (console mkDev.setGroundStyle('tiles'|'continuous')).
   setGroundStyle(style){if(!['tiles','continuous'].includes(style)||style===this.groundStyle)return false;this.groundStyle=style;this.repaintEverything();return true;}
+  greyRemembered(context,cx,cy,left,top){
+    const W=context.canvas.width,H=context.canvas.height,x0=cx*CHUNK_SIZE,y0=cy*CHUNK_SIZE,factor=new Float32Array(CHUNK_SIZE*CHUNK_SIZE),sat=FOG_STYLE.saturation;
+    for(let y=0;y<CHUNK_SIZE;y++)for(let x=0;x<CHUNK_SIZE;x++){const t={x:x0+x,y:y0+y};if(this.fog?.displayState(t)===VISIBILITY.EXPLORED)factor[y*CHUNK_SIZE+x]=this.fog.brightness?.(t)??FOG_STYLE.brightness;}
+    const image=context.getImageData(0,0,W,H),d=image.data,hw=TILE_WIDTH/2,hh=TILE_HEIGHT/2;
+    for(let py=0;py<H;py++){const vert=(py+top-ORIGIN.y)/hh;for(let px=0;px<W;px++){const o=(py*W+px)*4;if(!d[o+3])continue;const hor=(px+left-ORIGIN.x)/hw;
+      const tx=Math.min(CHUNK_SIZE-1,Math.max(0,Math.floor((vert+hor)/2)-x0)),ty=Math.min(CHUNK_SIZE-1,Math.max(0,Math.floor((vert-hor)/2)-y0)),f=factor[ty*CHUNK_SIZE+tx];if(!f)continue;
+      const r=d[o],g=d[o+1],b=d[o+2],l=.3*r+.59*g+.11*b;d[o]=(l+(r-l)*sat)*f;d[o+1]=(l+(g-l)*sat)*f;d[o+2]=(l+(b-l)*sat)*f;}}
+    context.putImageData(image,0,0);
+  }
   // One chunk of continuous ground (land, water, plants, water plants) in chunk-canvas pixels.
   paintContinuousChunk(context,cx,cy,left,top,season,occupied){
     const x0=cx*CHUNK_SIZE,y0=cy*CHUNK_SIZE,cell=(x,y)=>this.groundAt(Math.max(0,Math.min(COLUMNS-1,x)),Math.max(0,Math.min(ROWS-1,y)));
@@ -169,9 +178,11 @@ export class TerrainRenderer {
     const toWorld=(px,py)=>{const g=worldToGrid(px+left,py+top);return [g.x,g.y];},ownTile=(x,y)=>x>=x0&&y>=y0&&x<x0+CHUNK_SIZE&&y<y0+CHUNK_SIZE,seen=(x,y)=>(this.fog?.displayState({x,y})??VISIBILITY.VISIBLE)!==VISIBILITY.UNEXPLORED,
 
       // Only this chunk's own tiles: painting into neighbour chunks drew light seams over their remembered (fogged) ground.
-      inWorld=(x,y)=>ownTile(x,y),own=(fx,fy)=>ownTile(Math.floor(fx),Math.floor(fy))&&seen(Math.floor(fx),Math.floor(fy));
+      inWorld=(x,y)=>ownTile(x,y),own=(fx,fy)=>ownTile(Math.floor(fx),Math.floor(fy));
     const field=makeWaterField({x0,y0,span:CHUNK_SIZE,depthAt,settings});
-    paintContinuousGround(context,{width:context.canvas.width,height:context.canvas.height,toWorld,isGrass:isLand,zoneAt,depthAt,inWorld,field,settings,step:6});
+    // A hair of bleed past the chunk's own tiles: chunk textures are filtered when zoomed, so a hard edge would show a dark line.
+    const e=0.05,inside=(fx,fy)=>fx>=x0-e&&fy>=y0-e&&fx<x0+CHUNK_SIZE+e&&fy<y0+CHUNK_SIZE+e&&fx>=0&&fy>=0&&fx<COLUMNS&&fy<ROWS;
+    paintContinuousGround(context,{width:context.canvas.width,height:context.canvas.height,toWorld,isGrass:isLand,zoneAt,depthAt,inWorld,inside,field,settings,step:6});
     const screen=(fx,fy)=>{const p=gridToWorld(fx,fy);return [p.x-left,p.y-top];},name=seasonOf(settings.year),free=(fx,fy)=>own(fx,fy)&&!occupied.has(`${Math.floor(fx)},${Math.floor(fy)}`)&&this.map[Math.floor(fy)]?.[Math.floor(fx)]!==1;
     for(const p of waterObjectsFor({x0:x0-1,y0:y0-1,span:CHUNK_SIZE+2,field,depthAt,settings}))if(free(p.fx,p.fy)){const [sx,sy]=screen(p.fx,p.fy);drawPlant(context,p,sx,sy,name);}
     const plants=plantsFor({x0:x0-1,y0:y0-1,span:CHUNK_SIZE+2,isGrass:isLand,zoneAt,depthAt,field,settings}).filter(p=>free(p.fx,p.fy)).sort((a,b)=>a.fx+a.fy-b.fx-b.fy);
@@ -434,10 +445,31 @@ export class TerrainRenderer {
       if(dirty&&this.pathStyle==='v2'&&this.v2?.geo&&[...dirty].some(i=>this.v2.near(i%COLUMNS,Math.floor(i/COLUMNS))))dirty=null;
       const continuous=this.groundStyle==='continuous';
       if(continuous)dirty=null;
+      let groundStamp=null;
+      if(continuous){
+        // A season change or a new building repaints the ground of one chunk per frame (about 50 ms each); the others
+        // keep their old picture (and stay dirty) until their turn, so the change rolls over the view without a freeze.
+        let occ='';for(const b of this.scene.buildings??[])for(const t of b.tiles??[])if(Math.floor(t.x/CHUNK_SIZE)===cx&&Math.floor(t.y/CHUNK_SIZE)===cy)occ+=`${t.x},${t.y};`;
+        groundStamp=`${this.season}|${occ}`;const cached=this.groundCache?.get(`${cx},${cy}`);
+        if(cached&&cached.stamp!==groundStamp&&!(this.groundPaintsLeft>0)&&this.chunks.has(`${cx},${cy}`))return { key, x: left, y: origin.y };
+      }
       if(!dirty)context.clearRect(0,0,texture.width,texture.height);
       // Ground first for every tile, tracks second: a neighbour's ground overlap can then never cover a track's edge.
       const paths=[],occupied=this.buildingTiles();
-      if(continuous)this.paintContinuousChunk(context,cx,cy,left,origin.y,this.season,occupied);
+      if(continuous){
+        // The painted ground (land, water, plants) does not depend on the fog: it is cached per chunk and only redrawn
+        // when the season or the buildings on the chunk change. Fog changes then cost one drawImage plus the overlays.
+        const ck=`${cx},${cy}`,stamp=groundStamp;let cached=(this.groundCache??=new Map()).get(ck);
+        if(!cached||cached.stamp!==stamp){this.groundPaintsLeft--;const canvas=cached?.canvas??document.createElement('canvas');canvas.width=texture.width;canvas.height=texture.height;const c2=canvas.getContext('2d');c2.clearRect(0,0,canvas.width,canvas.height);this.paintContinuousChunk(c2,cx,cy,left,origin.y,this.season,occupied);cached={canvas,stamp};this.groundCache.set(ck,cached);this.paintStats.groundPaints=(this.paintStats.groundPaints??0)+1;}
+        context.drawImage(cached.canvas,0,0);
+        // Plants near the chunk edge reach into neighbour tiles: black them out where that neighbour is unexplored.
+        context.fillStyle='#000';
+        for(let ty=cy*CHUNK_SIZE-1;ty<=(cy+1)*CHUNK_SIZE;ty++)for(let tx=cx*CHUNK_SIZE-1;tx<=(cx+1)*CHUNK_SIZE;tx++){
+          if(tx>=cx*CHUNK_SIZE&&ty>=cy*CHUNK_SIZE&&tx<(cx+1)*CHUNK_SIZE&&ty<(cy+1)*CHUNK_SIZE)continue;
+          const inside=tx>=0&&ty>=0&&tx<COLUMNS&&ty<ROWS;if(inside&&(this.fog?.displayState({x:tx,y:ty})??VISIBILITY.VISIBLE)!==VISIBILITY.UNEXPLORED)continue;
+          const p=tileCenter({x:tx,y:ty}),px=p.x-left,py=p.y-origin.y;context.beginPath();context.moveTo(px-33,py);context.lineTo(px,py-16.5);context.lineTo(px+33,py);context.lineTo(px,py+16.5);context.closePath();context.fill();
+        }
+      }
       const remembered={};
       for (let y = cy * CHUNK_SIZE; y < (cy + 1) * CHUNK_SIZE; y++) {
         for (let x = cx * CHUNK_SIZE; x < (cx + 1) * CHUNK_SIZE; x++) {
@@ -456,7 +488,7 @@ export class TerrainRenderer {
           if(state===VISIBILITY.UNEXPLORED){context.fillStyle='#000';polygon(TILE_BLEED);context.fill();context.restore();continue;}
           if(continuous){
             // Remembered (explored, not visible) ground: the same desaturation and darkening as the tiles get by filter.
-            if(state===VISIBILITY.EXPLORED){const v=Math.round(255*(this.fog?.brightness(tile)??FOG_STYLE.brightness));(remembered[v]??=[]).push({x:point.x-left,y:point.y-origin.y});context.filter=`grayscale(${(1-FOG_STYLE.saturation)*100}%) brightness(${(this.fog?.brightness(tile)??FOG_STYLE.brightness)*100}%)`;}
+            if(state===VISIBILITY.EXPLORED){const v=Math.round(255*(this.fog?.brightness(tile)??FOG_STYLE.brightness));(remembered[v]??=[]).push(1);context.filter=`grayscale(${(1-FOG_STYLE.saturation)*100}%) brightness(${(this.fog?.brightness(tile)??FOG_STYLE.brightness)*100}%)`;}
             if(this.wear)paths.push({x,y,polygon,filter:context.filter,veil:season==='Winter'?.45:0});
             context.restore();continue;
           }
@@ -498,8 +530,9 @@ export class TerrainRenderer {
           context.restore();
         }
       }
-      // Remembered ground (explored, not in sight): one path per brightness, so overlapping diamond edges never darken twice.
-      for(const [v,list] of Object.entries(remembered)){context.save();context.beginPath();for(const c of list){context.moveTo(c.x-32.5,c.y);context.lineTo(c.x,c.y-16.25);context.lineTo(c.x+32.5,c.y);context.lineTo(c.x,c.y+16.25);context.closePath();}context.globalCompositeOperation='saturation';context.fillStyle=`rgba(128,128,128,${1-FOG_STYLE.saturation})`;context.fill();context.globalCompositeOperation='multiply';context.fillStyle=`rgb(${v},${v},${v})`;context.fill();context.restore();}
+      // Remembered ground (explored, not in sight): greyed and darkened per pixel, by the same tile rule the ground was
+      // painted with (bleed included), so no light or dark lines show along tile or chunk edges.
+      if(continuous&&Object.keys(remembered).length)this.greyRemembered(context,cx,cy,left,origin.y);
       if(this.pathStyle==='v2'&&this.v2)this.v2.drawChunk(context,cx,cy,left,origin.y,paths);
       else for(const p of paths){context.save();p.polygon(TILE_BLEED);context.clip();context.filter=p.filter;this.drawPaths(context,p.x,p.y,left,origin.y,p.veil,()=>{p.polygon();context.clip();});context.restore();}
       // S11 Stone Pavement on top of ground and tracks; under Fog of War only the remembered surface is drawn.
@@ -576,14 +609,14 @@ export class TerrainRenderer {
       const changed=[...previous].filter(index=>!current.has(index));
       for(const index of current)if(!previous.has(index))changed.push(index);
       this.paintedVisibility=new Set(current);this.fogRevision=fog.revision;
-      if(fog.enabled)this.invalidateArea(changed.map(index=>({x:index%fog.width,y:Math.floor(index/fog.width)})),false);
+      if(fog.enabled)this.invalidateArea(changed.map(index=>({x:index%fog.width,y:Math.floor(index/fog.width)})),this.groundStyle==='continuous');
     }
   }
 
   // Performance: a newly visible chunk is painted at once (never a hole); already shown chunks that became dirty
   // (fog, path wear, pavement, season) repaint at most two per frame, so a wave of changes never freezes a frame.
   repaintDirty(){
-    let budget=this.repaintAll?Infinity:2;this.repaintAll=false;
+    this.groundPaintsLeft=this.repaintAll&&!this.chunks.size?Infinity:1;let budget=this.repaintAll?Infinity:this.groundStyle==='continuous'?8:2;this.repaintAll=false;
     for (const key of this.neededChunks??[]) {
       const shown=this.chunks.has(key);if(shown&&!this.dirtyChunks.has(key))continue;if(shown&&budget--<=0)continue;
       const [cx,cy] = key.split(',').map(Number), texture = this.chunkTexture(cx,cy);

@@ -5,6 +5,16 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.74.0] - 2026-11-08
+<!-- version: {"title":"Rivers flow: light streaks drift with the current, and three duck families paddle on the water; in spring and summer ducklings follow them.","type":"feature","reconstructed":false,"saveVersion":60} -->
+### Added
+- Rivers flow: light streaks drift with the current, and three duck families paddle on the water; in spring and summer ducklings follow them.
+- Settings → Renderer lets you choose Canvas, WebGL or Auto (the page reloads).
+### Fixed
+- Fog of War with the new ground: the land around the king no longer stays dark, remembered land is evenly grey without grid lines, and nothing peeks out of unexplored black.
+- The game runs much faster with the new ground: the ground is painted once and kept, and a season change rolls over the map instead of freezing it.
+- The World generator sliders are described in your language.
+
 ## [0.73.1] - 2026-11-08
 <!-- version: {"title":"Explored land out of sight no longer shows light lines and stripes along a large grid; it is evenly greyed again.","type":"fix","reconstructed":false,"saveVersion":60} -->
 ### Fixed

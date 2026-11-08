@@ -29,3 +29,12 @@ npm test (all pass), build, browser: new game with code MKW2-155515555555-1, riv
 
 ## 0.73.1 fix (owner report: fog of war broken)
 Each chunk painted one tile into its neighbour chunks to hide seams; those pixels were never greyed by the neighbour's remembered overlay, so explored ground showed light stripes along chunk borders. Chunks now paint only their own tiles. A faint seam between remembered chunks can remain.
+
+## 0.74.0 (owner: fog still broken, 9 FPS; report items 1–5; WebGL)
+- Cause of both: every fog change repainted whole chunks with the continuous painter (~55 ms each) and only 2 dirty chunks per frame were allowed, so the view lagged (dark around the king) and FPS fell.
+- Ground (land, water, plants) is cached per chunk (key: season + buildings on the chunk) and drawn with one drawImage; fog repaints are cheap, so 8 dirty chunks per frame. A stale ground (season, new building) repaints one chunk per frame; others keep their old picture meanwhile.
+- Remembered ground is greyed per pixel (greyRemembered) with the same tile rule as the paint; ground has a 0.05-tile bleed so zoomed chunk edges show no line. Fog changes also dirty neighbour chunks; neighbour tiles that are unexplored get blacked over plant tops.
+- RiverLife.js: flow streaks (makeWaterField.flow per 16×16 chunk) + 3 duck families (duckSites, drawDuck pre-rendered in 16 headings), only in sight, none in winter.
+- Settings → Renderer select (localStorage newgame.renderer; ?renderer= still wins).
+- Generator slider texts via i18n (describe()). The 404 was not reproducible (2 of 3 runs clean).
+- Save/Load: none. Testing: npm test, headless walk/fog/season runs (FPS ~50 in software rendering).

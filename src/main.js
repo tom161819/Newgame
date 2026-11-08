@@ -18,7 +18,12 @@ applyUiStyle();
 
 // Canvas stays the default: shared terrain textures and simple shapes are fast
 // even without a GPU. ?renderer=webgl or ?renderer=auto opts into WebGL for testing.
-const renderer=chooseRenderer(parseRendererPreference(window.location.search),requireHardware=>probeWebGL(document,{requireHardware}));
+// Settings → Renderer remembers the choice in this browser (an artifact page cannot take ?renderer= in its address).
+let savedRenderer=null;try{savedRenderer=localStorage.getItem('newgame.renderer');}catch{/* default */}
+const rendererPreference=new URLSearchParams(window.location.search).has('renderer')?parseRendererPreference(window.location.search):parseRendererPreference(`?renderer=${savedRenderer??''}`);
+const rendererChoice=document.querySelector('#renderer-choice');
+if(rendererChoice){rendererChoice.value=rendererPreference;rendererChoice.addEventListener('change',()=>{try{localStorage.setItem('newgame.renderer',rendererChoice.value);}catch{/* not saved */}window.location.reload();});}
+const renderer=chooseRenderer(rendererPreference,requireHardware=>probeWebGL(document,{requireHardware}));
 const rendererStatus=document.querySelector('#renderer-status');if(rendererStatus)rendererStatus.textContent=rendererLabel(renderer);
 
 new Phaser.Game({
