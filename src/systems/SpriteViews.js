@@ -1,6 +1,7 @@
 import { directionName } from '../game/directions.js';
 import { towerBase, buildingDepth } from '../game/buildings.js';
 import { tilePolygon } from '../game/isometric.js';
+import { DEPLETED_TINT } from '../game/depletedMine.js';
 
 // Stejné rozhraní jako procedurální pohledy: pozice, hloubka, viditelnost a animace.
 export class SpriteObjectView {
@@ -88,10 +89,12 @@ export class SpriteBuildingView {
   paint(building,tint=null) {
     this.base=towerBase(building);
     const depth=buildingDepth(building);
-    this.back.setPosition(this.base.x,this.base.y).setDepth(this.preview?10001:depth).setTint(tint);
+    // m-vytezeny-dul-ctverecky (64): a depleted mine is drawn darker (provisional; final art may come from Grafika).
+    const look=tint??(building.depleted?DEPLETED_TINT:null);
+    this.back.setPosition(this.base.x,this.base.y).setDepth(this.preview?10001:depth).setTint(look);
     this.front.setPosition(this.base.x,this.base.y).setDepth(this.preview?10002:depth+0.3);
-    this.rotor?.setPosition(this.base.x+this.definition.rotor.pivot.x,this.base.y+this.definition.rotor.pivot.y).setDepth(this.preview?10001.5:depth+0.2);if(this.rotor){if(tint)this.rotor.setTint(tint);else this.rotor.clearTint();}
-    if(this.front.setTint)this.front.setTint(tint);
+    this.rotor?.setPosition(this.base.x+this.definition.rotor.pivot.x,this.base.y+this.definition.rotor.pivot.y).setDepth(this.preview?10001.5:depth+0.2);if(this.rotor){if(look)this.rotor.setTint(look);else this.rotor.clearTint();}
+    if(this.front.setTint)this.front.setTint(look);
     const floor=this.footprint.clear().setDepth(this.preview?10000:-90);
     floor.fillStyle(tint??0x777450,this.preview?0.3:0.25);floor.lineStyle(1,tint??0xb3a477,0.8);
     for(const tile of building.tiles){floor.fillPoints(tilePolygon(tile),true);floor.strokePoints(tilePolygon(tile),true);}

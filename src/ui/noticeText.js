@@ -12,7 +12,7 @@ export function noticeText(scene,issue){
   const lower=id=>id?resName(id).toLocaleLowerCase():'';
   if(issue.reason==='missingChainSource')return t('notice.missingChainSource',{name,resource:lower(p.resource),producer});
   if(issue.reason==='chainNoConsumer')return t('notice.chainNoConsumer',{resource,consumer:resName(p.consumer),output:lower(p.output)});
-  const key=issue.reason==='noFarm'&&(p.count??1)>1?'noFarmMany':issue.reason;
+  const key=issue.reason==='noFarm'&&(p.count??1)>1?'noFarmMany':issue.reason==='depleted'&&p.exhausted?'mineExhausted':issue.reason;
   return t(`notice.${key}`,{name,resource,producer,profession,count:p.count??1,source:p.source?t(`notice.source.${p.source}`):''});
 }
 // Request 66: every way to food, from the building data (buildings that make an edible resource, processed food as

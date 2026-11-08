@@ -6,6 +6,7 @@ import { TALENTS } from '../data/economy.js';
 import { element } from './objectLabels.js';
 import { CANDIDATE_GROUPS,candidateGroups } from './workplaceCandidates.js';
 import { buildingIssueLine } from './noticeText.js';
+import { buildingName } from '../game/depletedMine.js';
 import { renderMilitary,militarySignature,handleMilitaryClick } from './militaryPanel.js';
 
 export class WorkplacePanel {
@@ -53,7 +54,7 @@ export class WorkplacePanel {
     const spec=buildingDefinition(b),summary=s.workplaceSystem.summary(b),employees=s.workplaceSystem.employees(b),candidates=s.workerSystem.liveSubjects();
     const plots=b.type==='farmhouse'?s.farmingSystem?.plotSummary(b):null;this.farmCount.hidden=!plots;if(plots)this.farmCount.textContent=t('farmPlots.count',plots);
     const employment=s.employment,blocked=employment?.blockReason(b)??null;
-    this.exclusions.hidden=!employment;this.exclusionInputs.local.checked=employment?.blockedBuildings.has(b.id)??false;this.exclusionInputs.type.checked=employment?.blockedTypes.has(b.type)??false;
+    this.exclusions.hidden=!employment||!!b.depleted;this.exclusionInputs.local.checked=employment?.blockedBuildings.has(b.id)??false;this.exclusionInputs.type.checked=employment?.blockedTypes.has(b.type)??false;
     for(const kind of ['local','type'])this.exclusionLabels[kind].textContent=t(`employment.exclude.${kind}`,{name:spec.name});this.exclusionReason.textContent=t(`employment.exclude.${blocked??'allowed'}`+'Status');this.exclusionHelp.textContent=t('employment.exclude.help');
     const production=spec.recipe?s.foodProduction.records.get(b.id):null;
     const forestry=spec.id==='lumberjack_hut'?s.naturalResources.forestry.summary(b):null;this.forestryDetails.hidden=!forestry;
@@ -74,18 +75,18 @@ export class WorkplacePanel {
       document.querySelector('#food-production-missing').textContent=cycle?t('workplace.batch',{list:format(cycle.inputs)}):t('workplace.missing',{list:format(Object.fromEntries(Object.entries(recipe.input).map(([id,n])=>[id,Math.max(0,n-(input.stock[id]??0))])))});
       const toggle=document.querySelector('#toggle-food-production');toggle.textContent=t('workplace.auto',{state:t(production.auto?'state.on':'state.off')});toggle.setAttribute('aria-pressed',String(production.auto));
     }
-    document.querySelector('#workplace-name').textContent=spec.name;const image=document.querySelector('#workplace-image');image.src=s.assets.previewURL(spec);image.alt=spec.name;
-    this.staffingStatus.textContent=t('staffing.status',{count:summary.missing,percent:Math.round(summary.output*100),missing:summary.missing,present:summary.present});
+    document.querySelector('#workplace-name').textContent=buildingName(b);const image=document.querySelector('#workplace-image');image.src=s.assets.previewURL(spec);image.alt=buildingName(b);
+    this.staffingStatus.textContent=b.depleted?t('building.depletedInfo'):t('staffing.status',{count:summary.missing,percent:Math.round(summary.output*100),missing:summary.missing,present:summary.present});
     document.querySelector('#workplace-count').textContent=t('workplace.workers',{count:summary.count,capacity:summary.capacity});
     document.querySelector('#workplace-wages').textContent=t('workplace.wages',{amount:summary.wages.toFixed(2)});
     document.querySelector('#workplace-average').textContent=t('workplace.average',{skill:SKILLS[spec.workplace.skill],value:summary.averageSkill.toFixed(2)});
     document.querySelector('#workplace-production').textContent=t('workplace.delivered',{list:Object.entries(summary.delivered).map(([id,n])=>`${s.objectRegistry.require(id).name} ${n}`).join(' · ')||'0'});
     const rows=employees.map(w=>{const row=element('li','workplace-worker'),text=element('span','',`${w.name} · ${t('workplace.skillLevel',{skill:SKILLS[spec.workplace.skill],level:w.skills[spec.workplace.skill].level})} · ${localized(`work.state.${w.workState}`,w.workState)}${w.workMessage?` — ${workMessageLabel(w.workMessage)}`:''}`),remove=element('button','',t('workplace.remove'));remove.type='button';remove.dataset.removeWorker=w.id;row.append(text,remove);return row;});
-    for(let i=summary.count;i<summary.capacity;i++)rows.push(element('li','empty-slot',t('workplace.emptySlot')));document.querySelector('#workplace-workers').replaceChildren(...rows);renderMilitary(s,b,this.militaryDetails,employees);
+    if(!b.depleted)for(let i=summary.count;i<summary.capacity;i++)rows.push(element('li','empty-slot',t('workplace.emptySlot')));document.querySelector('#workplace-workers').replaceChildren(...rows);renderMilitary(s,b,this.militaryDetails,employees);
     document.querySelector('#assign-workplace-worker').disabled=!!blocked||summary.count>=summary.capacity;
     // Three groups in a fixed order (this profession without a workplace, others without one, already working: elsewhere or as a Hauler/Builder), each sorted by the skill this building needs.
     const skill=spec.workplace.skill,groups=candidateGroups(candidates,spec.workplace),full=summary.count>=summary.capacity;
-    const workplaceName=w=>{const home=s.buildings.find(x=>x.id===w.assignedWorkplaceId);return home?buildingDefinition(home).name:JOBS[w.profession].name;};
+    const workplaceName=w=>{const home=s.buildings.find(x=>x.id===w.assignedWorkplaceId);return home?buildingName(home):JOBS[w.profession].name;};
     const row=(w,group)=>{
       const item=element('li',`workplace-worker workplace-candidate candidate-${group}`),here=w.assignedWorkplaceId===b.id,portrait=element('img','candidate-portrait');portrait.alt='';portrait.src=s.populationSidebar?.portrait(w)??'';
       const details=element('span','candidate-details');details.append(element('strong','',w.name),element('span','',`${t('workplace.skillXP',{skill:SKILLS[skill],level:w.skills[skill].level,xp:Math.floor(w.skills[skill].totalXP??0)})} · ${localized(`talent.${w.naturalTalent}`,TALENTS[w.naturalTalent])}`),element('span','',`${t('workplace.currentJob',{job:w.profession==='idle'?JOBS.idle.name:workplaceName(w)})} · ${t('unit.wage',{amount:s.workplaceSystem.predictedWage(w,spec.workplace.profession).toFixed(2)})}`));

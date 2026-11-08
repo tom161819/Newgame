@@ -358,4 +358,9 @@ export default {
   'kingSkills.leadershipTip':'Vůdcovství +1 úroveň: obyvatelé v králově dohledu pracují o {each} % rychleji za úroveň (teď +{now} %, nejvýš úroveň {max}).',
   'kingSkills.stewardshipTip':'Správcovství +1 úroveň: výnos daní +{each} % za úroveň, spokojenost beze změny (teď +{now} %, nejvýš úroveň {max}).',
   'kingSkills.skillTip':'{skill} +1 úroveň za 1 bod: +{each} % rychlost práce ({skill}).','kingSkills.combatTip':'{skill} +1 úroveň za 1 bod: +{each} % poškození útoku v boji.',
+  // m-vytezeny-dul-ctverecky (64): důl, jehož konečné ložisko je vytěžené.
+  'building.depleted.iron_mine':'Vytěžený důl','building.depleted.quarry':'Vytěžený lom',
+  'building.depletedInfo':'Ložisko je vytěžené: nikdo tu už nepracuje. Zbourejte budovu a získáte zpět část její ceny.',
+  'employment.exclude.depletedStatus':'Ložisko je vytěžené – budova nepřijímá pracovníky.',
+  'notice.mineExhausted':'{name} je vytěžen.',
 };

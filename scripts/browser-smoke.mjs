@@ -26,6 +26,7 @@ import { materialYardSmoke } from './material-yard-smoke.mjs';
 import { approvedArtSmoke } from './approved-art-smoke.mjs';
 import { kingXpSmoke } from './king-xp-smoke.mjs';
 import { notices2Smoke } from './notices-2-smoke.mjs';
+import { depletedMineSmoke } from './depleted-mine-smoke.mjs';
 import { employment2Smoke } from './employment-2-smoke.mjs';
 import { animalLooksSmoke } from './animal-looks-smoke.mjs';
 import { tutorialSmoke } from './tutorial-smoke.mjs';
@@ -217,6 +218,7 @@ try{
   await step('approved-art',()=>approvedArtSmoke(context,origin+base,instrument));
   await step('king-xp',()=>kingXpSmoke(context,origin+base,instrument));
   await step('notices-2',()=>notices2Smoke(context,origin+base,instrument));
+  await step('depleted-mine',()=>depletedMineSmoke(context,origin+base,instrument));
   await step('tutorial',()=>tutorialSmoke(context,origin+base,instrument));
   await step('marketplace',()=>marketplaceSmoke(context,origin+base,instrument));
   await step('gate',()=>gateSmoke(context,origin+base,instrument));

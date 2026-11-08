@@ -3,6 +3,7 @@ import { t } from '../i18n/index.js';
 import { element } from './objectLabels.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { buildingDemolitionRefund } from '../data/demolition.js';
+import { buildingName } from '../game/depletedMine.js';
 const text=(node,value)=>{if(node.textContent!==value)node.textContent=value;};
 export class DemolitionUI {
   constructor(scene){
@@ -27,7 +28,7 @@ export class DemolitionUI {
   openSelected(){
     const b=this.building(this.selectedId);if(!b||!this.scene.fog.isVisibleObject(b))return;
     if(this.scene.character.state==='ground'&&this.scene.character.order?.kind==='enter'&&this.scene.character.order.tower?.id===b.id)this.scene.character.stopForBuilding();
-    text(document.querySelector('#building-detail-title'),`${buildingDefinition(b).name} #${b.id}`);text(document.querySelector('#building-detail-description'),buildingDefinition(b).description);
+    text(document.querySelector('#building-detail-title'),`${buildingName(b)} #${b.id}`);text(document.querySelector('#building-detail-description'),buildingDefinition(b).description);
     this.scene.setGalleryInput(false);if(!this.dialog.open)this.dialog.showModal();this.attach(this.dialog,b);this.refresh();
   }
   reason(b){
@@ -37,12 +38,12 @@ export class DemolitionUI {
   refundLabel(b){const refund=buildingDemolitionRefund(b,buildingDefinition(b));return Object.keys(refund).length?Object.entries(refund).map(([id,n])=>countName(this.scene.objectRegistry.require(id),n)).join(', '):t('demolition.noRefund');}
   ask(){
     const b=this.building(this.buildingId);if(this.reason(b)||b.demolition)return;
-    this.pendingId=b.id;text(document.querySelector('#demolition-confirm-text'),t('demolition.confirmText',{name:buildingDefinition(b).name,refund:this.refundLabel(b)}));
+    this.pendingId=b.id;text(document.querySelector('#demolition-confirm-text'),t('demolition.confirmText',{name:buildingName(b),refund:this.refundLabel(b)}));
     this.scene.setGalleryInput(false);this.confirm.showModal();
   }
   refresh(){
     const selected=this.building(this.selectedId);this.inspect.hidden=!selected||!this.scene.fog.isVisibleObject(selected);
-    if(selected){const label=t('demolition.inspect',{name:buildingDefinition(selected).name});text(this.inspect,label);this.inspect.title=label;}
+    if(selected){const label=t('demolition.inspect',{name:buildingName(selected)});text(this.inspect,label);this.inspect.title=label;}
     const b=this.building(this.buildingId);if(!b){this.section.hidden=true;if(this.host?.open)this.host.close();return;}
     this.section.hidden=!this.host?.open;if(this.section.hidden)return;
     const reason=this.reason(b),record=b.demolition;
