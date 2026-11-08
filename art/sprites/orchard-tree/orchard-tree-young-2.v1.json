@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "orchard-tree",
+  "variantId": "orchard-tree-young-2",
+  "name": "Young tree 2",
+  "category": "nature",
+  "version": 1,
+  "specHash": "f5a99a2a",
+  "generator": "vegetation",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 45,
+  "anchor": {
+    "x": 33,
+    "y": 27
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.6
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 43
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.95556
+  },
+  "visualHeight": 43,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.84,
+  "lights": []
+}

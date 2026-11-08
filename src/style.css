@@ -983,3 +983,7 @@ tr[data-resource-group="equipment"] { background:var(--group-equipment); }
 .dev-balance-row output { font-variant-numeric: tabular-nums; }
 .dev-balance-overview { white-space: pre-wrap; font: 11px/1.5 ui-monospace,monospace; margin: 8px 0; }
 .dev-balance-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+/* g-tutorial-sipky: animation of the medieval pointers (their looks are in art/ui/ui-theme.css). */
+@keyframes tutorial-nudge { 50% { scale:1.12; filter:drop-shadow(0 2px 2px #000c) drop-shadow(0 0 10px #ffd98aaa); } }
+@media (prefers-reduced-motion:reduce){ html[data-ui-pointer] .tutorial-arrow { animation:none; } }

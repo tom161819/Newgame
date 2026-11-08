@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "orchard-tree",
+  "variantId": "orchard-tree-fruit-2",
+  "name": "With apples 2",
+  "category": "nature",
+  "version": 1,
+  "specHash": "b2b72c20",
+  "generator": "vegetation",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 67,
+  "anchor": {
+    "x": 33,
+    "y": 49
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.73134
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 65
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.97015
+  },
+  "visualHeight": 65,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.218,
+  "lights": []
+}

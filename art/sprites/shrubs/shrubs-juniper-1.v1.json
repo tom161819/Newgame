@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "shrubs",
+  "variantId": "shrubs-juniper-1",
+  "name": "Juniper – small",
+  "category": "nature",
+  "version": 1,
+  "specHash": "11fca13b",
+  "generator": "vegetation",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 37,
+  "anchor": {
+    "x": 33,
+    "y": 19
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.51351
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 35
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.94595
+  },
+  "visualHeight": 35,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.6,
+  "lights": []
+}

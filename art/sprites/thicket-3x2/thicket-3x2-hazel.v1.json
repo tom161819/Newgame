@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "thicket-3x2",
+  "variantId": "thicket-3x2-hazel",
+  "name": "Hazel thicket",
+  "category": "nature",
+  "version": 1,
+  "specHash": "71358398",
+  "generator": "vegetation",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 163,
+  "height": 93,
+  "anchor": {
+    "x": 81,
+    "y": 51
+  },
+  "origin": {
+    "x": 0.49693,
+    "y": 0.54839
+  },
+  "footprint": {
+    "width": 3,
+    "height": 2
+  },
+  "base": {
+    "x": 97,
+    "y": 91
+  },
+  "baseOrigin": {
+    "x": 0.59509,
+    "y": 0.97849
+  },
+  "visualHeight": 91,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.834,
+  "lights": []
+}

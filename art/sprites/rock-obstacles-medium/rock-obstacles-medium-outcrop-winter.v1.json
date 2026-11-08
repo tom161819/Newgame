@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "rock-obstacles-medium",
+  "variantId": "rock-obstacles-medium-outcrop-winter",
+  "name": "Rock outcrop – winter",
+  "category": "nature",
+  "version": 1,
+  "specHash": "6d0e1d67",
+  "generator": "outcrop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 70,
+  "anchor": {
+    "x": 65,
+    "y": 36
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.51429
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 68
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97143
+  },
+  "visualHeight": 68,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.886,
+  "lights": []
+}

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "iron-deposit-medium",
+  "variantId": "iron-deposit-medium-red-winter",
+  "name": "Red-brown ore – winter",
+  "category": "nature",
+  "version": 1,
+  "specHash": "a64915e5",
+  "generator": "outcrop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 75,
+  "anchor": {
+    "x": 65,
+    "y": 41
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.54667
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 73
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97333
+  },
+  "visualHeight": 73,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.921,
+  "lights": []
+}

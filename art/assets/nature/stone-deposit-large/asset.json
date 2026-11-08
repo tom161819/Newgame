@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "id": "stone-deposit-large",
+  "name": "Stone deposit – large (3×3)",
+  "category": "nature",
+  "description": "Concept for review (g-loziska-skaly): richer rocks than today (more pieces, strata, cracks, lichen, gravel at the foot that fades into the ground). The owner picks; footprints and stages then go to Mechaniky (generator, mining of larger deposits).",
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "generator": "outcrop",
+  "variants": [
+    {
+      "id": "stone-deposit-large-granite-7",
+      "name": "Granite",
+      "version": 1,
+      "notes": "Granite stone deposit, large.",
+      "spec": {
+        "kind": "stone",
+        "rock": "granite",
+        "seed": 7
+      }
+    },
+    {
+      "id": "stone-deposit-large-limestone-7",
+      "name": "Limestone",
+      "version": 1,
+      "notes": "Limestone stone deposit, large.",
+      "spec": {
+        "kind": "stone",
+        "rock": "limestone",
+        "seed": 7
+      }
+    },
+    {
+      "id": "stone-deposit-large-slate-7",
+      "name": "Slate",
+      "version": 1,
+      "notes": "Slate stone deposit, large.",
+      "spec": {
+        "kind": "stone",
+        "rock": "slate",
+        "seed": 7
+      }
+    },
+    {
+      "id": "stone-deposit-large-mossy-7",
+      "name": "Mossy rock",
+      "version": 1,
+      "notes": "Mossy rock stone deposit, large.",
+      "spec": {
+        "kind": "stone",
+        "rock": "mossy",
+        "seed": 7
+      }
+    },
+    {
+      "id": "stone-deposit-large-granite-winter",
+      "name": "Granite – winter",
+      "version": 1,
+      "notes": "Snow on the upper faces.",
+      "spec": {
+        "kind": "stone",
+        "rock": "granite",
+        "seed": 7,
+        "season": "winter"
+      }
+    }
+  ]
+}

@@ -15,6 +15,8 @@ import ruins from './ruins.js';
 import icon from './icon.js';
 import castle from './castle.js';
 import animal from './animal.js';
+import outcrop from './outcrop.js';
+import vegetation from './vegetation.js';
 
 export const GENERATORS = Object.freeze({
   [watchtower.id]: watchtower,
@@ -32,4 +34,6 @@ export const GENERATORS = Object.freeze({
   [icon.id]: icon,
   [castle.id]: castle,
   [animal.id]: animal,
+  [outcrop.id]: outcrop,
+  [vegetation.id]: vegetation,
 });

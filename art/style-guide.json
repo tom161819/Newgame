@@ -153,7 +153,22 @@
     "bread_crust": "#8e5a2a",
     "porridge": "#e3d2a6",
     "meat": "#a8653a",
-    "apple": "#b8362c"
+    "apple": "#b8362c",
+    "granite": "#8e8a84",
+    "granite_dark": "#68655f",
+    "granite_light": "#b0aca4",
+    "limestone": "#c4bba4",
+    "limestone_dark": "#a39a82",
+    "limestone_light": "#dcd4bd",
+    "slate": "#5f646a",
+    "slate_dark": "#45494f",
+    "slate_light": "#7d838a",
+    "ore_red": "#8a4a32",
+    "ore_red_dark": "#653322",
+    "ore_dark": "#3d3a3a",
+    "ore_rust": "#a2582c",
+    "lichen": "#a8a67a",
+    "gravel": "#8b8273"
   },
   "materials": {
     "stone": {
@@ -578,7 +593,23 @@
     "moss": { "color": "moss", "texture": "noise", "repeat": 0.5, "variation": 0.2, "description": "Moss on old stone tops and in shaded joints." },
     "soil": { "color": "soil", "texture": "noise", "repeat": 0.8, "variation": 0.18, "description": "Bare trodden earth and dust around the foot of ruins and props." },
     "olive_scrub": { "color": "olive_scrub", "texture": "noise", "repeat": 0.6, "variation": 0.2, "description": "Dry, dusty olive leaves of desert and dune scrub (#100)." },
-    "grass_scrub": { "color": "grass_scrub", "texture": "noise", "repeat": 0.6, "variation": 0.2, "description": "Straw-coloured dry grass and scrub tips (#100)." }
+    "grass_scrub": { "color": "grass_scrub", "texture": "noise", "repeat": 0.6, "variation": 0.2, "description": "Straw-coloured dry grass and scrub tips (#100)." },
+    "granite": { "color": "granite", "texture": "noise", "repeat": 0.9, "variation": 0.16, "description": "Grey granite of stone deposits and boulders (g-loziska-skaly)." },
+    "granite_dark": { "color": "granite_dark", "texture": "noise", "repeat": 0.9, "variation": 0.16, "description": "Shaded granite." },
+    "granite_light": { "color": "granite_light", "texture": "noise", "repeat": 0.9, "variation": 0.16, "description": "Weathered granite tops." },
+    "limestone": { "color": "limestone", "texture": "noise", "repeat": 0.9, "variation": 0.16, "description": "Pale layered limestone." },
+    "limestone_dark": { "color": "limestone_dark", "texture": "noise", "repeat": 0.9, "variation": 0.16, "description": "Shaded limestone." },
+    "limestone_light": { "color": "limestone_light", "texture": "noise", "repeat": 0.9, "variation": 0.16, "description": "Sunlit limestone." },
+    "slate": { "color": "slate", "texture": "noise", "repeat": 0.9, "variation": 0.16, "description": "Dark layered slate." },
+    "slate_dark": { "color": "slate_dark", "texture": "noise", "repeat": 0.9, "variation": 0.16, "description": "Shaded slate." },
+    "slate_light": { "color": "slate_light", "texture": "noise", "repeat": 0.9, "variation": 0.16, "description": "Weathered slate edges." },
+    "ore_red": { "color": "ore_red", "texture": "noise", "repeat": 0.7, "variation": 0.16, "description": "Red-brown iron ore outcrop." },
+    "ore_red_dark": { "color": "ore_red_dark", "texture": "noise", "repeat": 0.7, "variation": 0.16, "description": "Shaded red ore." },
+    "ore_dark": { "color": "ore_dark", "texture": "noise", "repeat": 0.7, "variation": 0.16, "description": "Dark iron ore with metal glints." },
+    "ore_rust": { "color": "ore_rust", "texture": "noise", "repeat": 0.7, "variation": 0.16, "description": "Rusty streaks and veins of iron ore." },
+    "lichen": { "color": "lichen", "texture": "noise", "repeat": 0.9, "variation": 0.16, "description": "Pale lichen spots on old rock." },
+    "gravel": { "color": "gravel", "texture": "noise", "repeat": 0.9, "variation": 0.16, "description": "Loose gravel and grit at the foot of rocks." },
+    "apple": { "color": "apple", "texture": "noise", "repeat": 0.5, "variation": 0.12, "description": "Red apples on orchard trees and in baskets." }
   },
   "light": {
     "sun": {

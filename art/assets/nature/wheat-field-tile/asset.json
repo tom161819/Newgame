@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "id": "wheat-field-tile",
+  "name": "Wheat field – tile by phase",
+  "category": "nature",
+  "description": "Concept for review (g-sad-pole-kere). The owner picks; phases, sizes and footprints then go to Mechaniky. One tile of the field (the game paints fields per tile); ripe has two wind frames.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "vegetation",
+  "variants": [
+    {
+      "id": "wheat-field-tile-ploughed",
+      "name": "Ploughed",
+      "version": 1,
+      "notes": "Wheat field tile: ploughed.",
+      "spec": {
+        "kind": "wheat",
+        "phase": "ploughed",
+        "wind": 0,
+        "seed": 4
+      }
+    },
+    {
+      "id": "wheat-field-tile-sown",
+      "name": "Sown",
+      "version": 1,
+      "notes": "Wheat field tile: sown.",
+      "spec": {
+        "kind": "wheat",
+        "phase": "sown",
+        "wind": 0,
+        "seed": 4
+      }
+    },
+    {
+      "id": "wheat-field-tile-sprouts",
+      "name": "Sprouts",
+      "version": 1,
+      "notes": "Wheat field tile: sprouts.",
+      "spec": {
+        "kind": "wheat",
+        "phase": "sprouts",
+        "wind": 0,
+        "seed": 4
+      }
+    },
+    {
+      "id": "wheat-field-tile-green",
+      "name": "Tall green",
+      "version": 1,
+      "notes": "Wheat field tile: tall green.",
+      "spec": {
+        "kind": "wheat",
+        "phase": "green",
+        "wind": 0,
+        "seed": 4
+      }
+    },
+    {
+      "id": "wheat-field-tile-ripe",
+      "name": "Ripe (wind 1)",
+      "version": 1,
+      "notes": "Wheat field tile: ripe (wind 1).",
+      "spec": {
+        "kind": "wheat",
+        "phase": "ripe",
+        "wind": 0,
+        "seed": 4
+      }
+    },
+    {
+      "id": "wheat-field-tile-ripe2",
+      "name": "Ripe (wind 2)",
+      "version": 1,
+      "notes": "Wheat field tile: ripe (wind 2).",
+      "spec": {
+        "kind": "wheat",
+        "phase": "ripe",
+        "wind": 1,
+        "seed": 4
+      }
+    },
+    {
+      "id": "wheat-field-tile-stubble",
+      "name": "Stubble with sheaves",
+      "version": 1,
+      "notes": "Wheat field tile: stubble with sheaves.",
+      "spec": {
+        "kind": "wheat",
+        "phase": "stubble",
+        "wind": 0,
+        "seed": 4
+      }
+    },
+    {
+      "id": "wheat-field-tile-winter",
+      "name": "Winter",
+      "version": 1,
+      "notes": "Wheat field tile: winter.",
+      "spec": {
+        "kind": "wheat",
+        "phase": "winter",
+        "wind": 0,
+        "seed": 4
+      }
+    }
+  ]
+}

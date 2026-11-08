@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wheat-field-tile",
+  "variantId": "wheat-field-tile-green",
+  "name": "Tall green",
+  "category": "nature",
+  "version": 1,
+  "specHash": "f8595cda",
+  "generator": "vegetation",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 44,
+  "anchor": {
+    "x": 33,
+    "y": 26
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.59091
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 42
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.95455
+  },
+  "visualHeight": 42,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.725,
+  "lights": []
+}

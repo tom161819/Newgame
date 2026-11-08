@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "id": "stone-deposit-medium",
+  "name": "Stone deposit – medium (2×2)",
+  "category": "nature",
+  "description": "Concept for review (g-loziska-skaly): richer rocks than today (more pieces, strata, cracks, lichen, gravel at the foot that fades into the ground). The owner picks; footprints and stages then go to Mechaniky (generator, mining of larger deposits).",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "outcrop",
+  "variants": [
+    {
+      "id": "stone-deposit-medium-granite-5",
+      "name": "Granite",
+      "version": 1,
+      "notes": "Granite stone deposit, medium.",
+      "spec": {
+        "kind": "stone",
+        "rock": "granite",
+        "seed": 5
+      }
+    },
+    {
+      "id": "stone-deposit-medium-limestone-5",
+      "name": "Limestone",
+      "version": 1,
+      "notes": "Limestone stone deposit, medium.",
+      "spec": {
+        "kind": "stone",
+        "rock": "limestone",
+        "seed": 5
+      }
+    },
+    {
+      "id": "stone-deposit-medium-slate-5",
+      "name": "Slate",
+      "version": 1,
+      "notes": "Slate stone deposit, medium.",
+      "spec": {
+        "kind": "stone",
+        "rock": "slate",
+        "seed": 5
+      }
+    },
+    {
+      "id": "stone-deposit-medium-mossy-5",
+      "name": "Mossy rock",
+      "version": 1,
+      "notes": "Mossy rock stone deposit, medium.",
+      "spec": {
+        "kind": "stone",
+        "rock": "mossy",
+        "seed": 5
+      }
+    },
+    {
+      "id": "stone-deposit-medium-granite-stage1",
+      "name": "Granite – started",
+      "version": 1,
+      "notes": "Mining stage 1: the front is cut back.",
+      "spec": {
+        "kind": "stone",
+        "rock": "granite",
+        "seed": 5,
+        "stage": 1
+      }
+    },
+    {
+      "id": "stone-deposit-medium-granite-stage2",
+      "name": "Granite – nearly mined",
+      "version": 1,
+      "notes": "Mining stage 2: the front is cut back.",
+      "spec": {
+        "kind": "stone",
+        "rock": "granite",
+        "seed": 5,
+        "stage": 2
+      }
+    },
+    {
+      "id": "stone-deposit-medium-granite-stage3",
+      "name": "Granite – mined out",
+      "version": 1,
+      "notes": "Mining stage 3: the front is cut back.",
+      "spec": {
+        "kind": "stone",
+        "rock": "granite",
+        "seed": 5,
+        "stage": 3
+      }
+    },
+    {
+      "id": "stone-deposit-medium-granite-winter",
+      "name": "Granite – winter",
+      "version": 1,
+      "notes": "Snow on the upper faces.",
+      "spec": {
+        "kind": "stone",
+        "rock": "granite",
+        "seed": 5,
+        "season": "winter"
+      }
+    }
+  ]
+}

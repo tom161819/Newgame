@@ -21,7 +21,7 @@ export const FRAMES = Object.freeze({ plain: 'Thin line', rivets: 'Iron rivets',
 export const SHADOWS = Object.freeze({ soft: 'Soft', hard: 'Hard', none: 'None' });
 export const HEADINGS = Object.freeze({ normal: 'Normal', smallcaps: 'Small capitals', uppercase: 'Capitals' });
 // g-e3-tutorial-vzhled: what points at the next step in the tutorial and tips.
-export const POINTERS = Object.freeze({ arrow: 'Golden arrow', hand: 'Pointing hand' });
+export const POINTERS = Object.freeze({ arrow: 'Golden arrow', hand: 'Pointing hand', forged: 'Forged iron arrow', manicula: 'Gloved hand (manicula)', pennant: 'Red pennant', parchment: 'Gilded parchment arrow' });
 
 // Colour tokens, each mapped to a CSS custom property --ui-<name>.
 export const COLOR_TOKENS = Object.freeze([

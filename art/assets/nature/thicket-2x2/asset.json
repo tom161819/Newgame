@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "id": "thicket-2x2",
+  "name": "Thicket – 2×2",
+  "category": "nature",
+  "description": "Concept for review (g-sad-pole-kere). The owner picks; phases, sizes and footprints then go to Mechaniky. One continuous growth, not copies of one bush.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "vegetation",
+  "variants": [
+    {
+      "id": "thicket-2x2-hazel",
+      "name": "Hazel thicket",
+      "version": 1,
+      "notes": "Hazel with some rosehip.",
+      "spec": {
+        "kind": "thicket",
+        "species": "hazel",
+        "mix": [
+          "hazel",
+          "hazel",
+          "rosehip"
+        ],
+        "season": "summer",
+        "seed": 3
+      }
+    },
+    {
+      "id": "thicket-2x2-bramble",
+      "name": "Bramble thicket",
+      "version": 1,
+      "notes": "Brambles and rosehip.",
+      "spec": {
+        "kind": "thicket",
+        "species": "bramble",
+        "mix": [
+          "bramble",
+          "rosehip",
+          "bramble"
+        ],
+        "season": "summer",
+        "seed": 5
+      }
+    },
+    {
+      "id": "thicket-2x2-autumn",
+      "name": "Mixed thicket – autumn",
+      "version": 1,
+      "notes": "Hazel, rosehip, bramble in autumn.",
+      "spec": {
+        "kind": "thicket",
+        "mix": [
+          "hazel",
+          "rosehip",
+          "bramble"
+        ],
+        "season": "autumn",
+        "seed": 9
+      }
+    },
+    {
+      "id": "thicket-2x2-winter",
+      "name": "Mixed thicket – winter",
+      "version": 1,
+      "notes": "Bare with snow, juniper stays green.",
+      "spec": {
+        "kind": "thicket",
+        "mix": [
+          "hazel",
+          "juniper",
+          "rosehip"
+        ],
+        "season": "winter",
+        "seed": 9
+      }
+    }
+  ]
+}

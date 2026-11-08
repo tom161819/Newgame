@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "rock-ridge",
+  "variantId": "rock-ridge-slate",
+  "name": "Slate ridge",
+  "category": "nature",
+  "version": 1,
+  "specHash": "c0a9714b",
+  "generator": "outcrop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 99,
+  "anchor": {
+    "x": 97,
+    "y": 49
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.49495
+  },
+  "footprint": {
+    "width": 4,
+    "height": 2
+  },
+  "base": {
+    "x": 129,
+    "y": 97
+  },
+  "baseOrigin": {
+    "x": 0.66154,
+    "y": 0.9798
+  },
+  "visualHeight": 97,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.601,
+  "lights": []
+}

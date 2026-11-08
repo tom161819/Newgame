@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "iron-deposit-medium",
+  "variantId": "iron-deposit-medium-dark-5",
+  "name": "Dark ore",
+  "category": "nature",
+  "version": 1,
+  "specHash": "386028aa",
+  "generator": "outcrop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 73,
+  "anchor": {
+    "x": 65,
+    "y": 39
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.53425
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 71
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.9726
+  },
+  "visualHeight": 71,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.921,
+  "lights": []
+}

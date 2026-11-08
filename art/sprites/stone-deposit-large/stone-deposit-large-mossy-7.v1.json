@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "stone-deposit-large",
+  "variantId": "stone-deposit-large-mossy-7",
+  "name": "Mossy rock",
+  "category": "nature",
+  "version": 1,
+  "specHash": "030b9819",
+  "generator": "outcrop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 104,
+  "anchor": {
+    "x": 97,
+    "y": 54
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.51923
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 102
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98077
+  },
+  "visualHeight": 102,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.308,
+  "lights": []
+}
