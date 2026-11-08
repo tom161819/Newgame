@@ -15,6 +15,9 @@ export function cornerStack(doc=globalThis.document,parent=doc?.querySelector?.(
   if(!stack&&doc?.createElement&&parent){stack=doc.createElement('div');stack.id='corner-stack';stack.className='corner-stack';parent.append(stack);}
   return stack??null;
 }
+// m-drobnosti-076 (report 0.76.0 point 11): "zemřel" / "zemřela" by the resident's sex (identity.sex since 0.62.0);
+// a resident without an identity keeps the neutral line.
+export const deathLine=(w,cause)=>t(w?.identity?.sex==='f'?'feed.diedOf.f':w?.identity?.sex==='m'?'feed.diedOf.m':'feed.diedOf',{name:w?.name??'',cause});
 export class EventFeed {
   constructor(scene,{document:doc=globalThis.document,now=()=>performance.now()}={}){
     this.scene=scene;this.now=now;this.entries=[];this.seen=new Set();this.list=doc?.createElement?.('ol')??null;
@@ -33,13 +36,13 @@ export class EventFeed {
   push(key,text,{important=false,target=null}={}){
     if(this.seen.has(key))return false;this.seen.add(key);
     const entry={key,text,important,expireAt:this.now()+(important?FEED.importantLifeMs:FEED.lifeMs),node:null};
-    if(this.list){entry.node=this.list.ownerDocument.createElement('li');entry.node.className=`feed-entry${important?' important':''}`;entry.node.textContent=text;
+    if(this.list){entry.node=this.list.ownerDocument.createElement('li');entry.node.className=`feed-entry${important?' important':''}`;entry.node.textContent=text;entry.node.title=text;
       // m-nasadit-schvalenou-grafiku: night lines (thieves, wolves, fire, unlit lights) lead with the approved badge.
       const icon=feedIcon(key);if(icon){const base=this.scene.assets?.baseURL??import.meta.env?.BASE_URL??'/',img=this.list.ownerDocument.createElement('img');
         img.className='feed-icon';img.alt='';img.width=img.height=18;img.src=assetURL(icon.png,base);img.srcset=`${assetURL(icon.png,base)} 1x, ${assetURL(icon.png2x,base)} 2x`;
         img.onerror=()=>img.remove?.();entry.node.prepend?.(img,' ');}
       // m-wiki-napoveda: lines with a Wiki topic get a small "i".
-      if(target){entry.node.classList.add('is-locatable');entry.node.tabIndex=0;entry.node.title=t('feed.locate');const go=e=>{if(e.target.closest?.('.wiki-info'))return;this.scene.focusOn?.(target);};entry.node.addEventListener('click',go);entry.node.addEventListener('keydown',e=>{if(e.key==='Enter')go(e);});}
+      if(target){entry.node.classList.add('is-locatable');entry.node.tabIndex=0;entry.node.title=`${text}\n${t('feed.locate')}`;const go=e=>{if(e.target.closest?.('.wiki-info'))return;this.scene.focusOn?.(target);};entry.node.addEventListener('click',go);entry.node.addEventListener('keydown',e=>{if(e.key==='Enter')go(e);});}
       const topic=wikiTopicForFeed(key);if(topic&&this.scene.wikiPanel)entry.node.append(' ',wikiInfoButton(this.scene,topic,this.list.ownerDocument));
       this.list.prepend(entry.node);}
     this.entries.unshift(entry);while(this.entries.length>FEED.maxEntries)this.remove(this.entries.at(-1));
@@ -57,7 +60,7 @@ export class EventFeed {
   onPopulation(){
     const now=new Set(this.living().map(w=>w.id)),workers=this.scene.workerSystem?.workers;
     for(const id of now)if(!this.residents.has(id))this.push(`arrived:${id}`,t('feed.arrived',{name:workers?.get(id)?.name??id}),{target:workers?.get(id)});
-    for(const id of this.residents)if(!now.has(id)){const w=workers?.get(id)??this.scene.workerSystem?.recentDeaths?.().find(d=>d.id===id);this.push(`gone:${id}`,w&&w.isAlive===false&&w.workState!=='Left Kingdom'?t('feed.diedOf',{name:w.name,cause:deathCauseText(this.scene,w.deathCause)}):w&&w.isAlive===false?t('feed.died',{name:w.name}):t('feed.left',{name:w?.name??id}),{important:w?.isAlive===false,target:w?{x:w.position?.x??w.tile?.x,y:w.position?.y??w.tile?.y}:null});}
+    for(const id of this.residents)if(!now.has(id)){const w=workers?.get(id)??this.scene.workerSystem?.recentDeaths?.().find(d=>d.id===id);this.push(`gone:${id}`,w&&w.isAlive===false&&w.workState!=='Left Kingdom'?deathLine(w,deathCauseText(this.scene,w.deathCause)):w&&w.isAlive===false?t('feed.died',{name:w.name}):t('feed.left',{name:w?.name??id}),{important:w?.isAlive===false,target:w?{x:w.position?.x??w.tile?.x,y:w.position?.y??w.tile?.y}:null});}
     this.residents=now;
   }
   update(){

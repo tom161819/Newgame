@@ -9,6 +9,10 @@ import { MineralSystem } from './MineralSystem.js';
 import { resourceBlocks } from '../data/minerals.js';
 import { MiningWork } from './MiningWork.js';
 
+// m-drobnosti-076 (report 0.76.0 point 10): "wood lies by the stump" only for the King's own felling while he is the
+// one the player controls (no residents selected) – he stands at that stump. A Woodcutter's felling stays silent (it
+// carries the wood itself), and the King's wood is taken by the Haulers like any other loose drop.
+export const stumpMessageShown=(scene,actor)=>!!actor&&actor===scene?.character&&!(scene.unitSelection?.ids?.size>0);
 export class NaturalResourcesSystem {
   constructor(scene){
     this.scene=scene;this.nextId=1;this.nextDepositId=1;this.growthClock=0;this.ageClock=0;this.refreshElapsed=0;this.byId=new Map();this.kingTask=null;this.topologyRevision=0;
@@ -110,7 +114,7 @@ export class NaturalResourcesSystem {
     n.stage=0;n.growthDays=0;n.growthCheckpoint=this.growthClock;n.workDone=0;n.cycle++;this.miningWork.rocks.trees.delete(n.id);this.refreshMap(object);this.view(object)?.setNaturalState?.(object);this.scene.workerSystem.reservations.release(this.reservation(object),actor.id);if(actor.id==='king')this.kingTask=null;
     // m-oznacovani-tezby (56): a tree under a wall plan drops its wood where the cutter stands, not inside the site.
     this.scene.dropSystem.create('wood',this.scene.map[object.y][object.x]===0?{x:object.x,y:object.y}:{...actor.tile},rule.wood,null,{rewardRemaining:0,rewardUnits:0});
-    this.scene.activities.emit('treeChopped',{actor,objectType:object.type,quantity:1,objectIds:[n.id]},`tree:${n.id}:${n.cycle}`);this.scene.setStatus(t('status.woodBesideStump',{count:rule.wood}));return true;
+    this.scene.activities.emit('treeChopped',{actor,objectType:object.type,quantity:1,objectIds:[n.id]},`tree:${n.id}:${n.cycle}`);if(stumpMessageShown(this.scene,actor))this.scene.setStatus(t('status.woodBesideStump',{count:rule.wood}));return true;
   }
   exportState(){this.flushGrowth();return{nextId:this.nextId,nextDepositId:this.nextDepositId,growthClock:this.growthClock,ageClock:this.ageClock,refreshElapsed:this.refreshElapsed,kingTask:structuredClone(this.kingTask),rockMining:this.miningWork.rocks.exportState()};}
   importState(data){this.cancelKing();const {rockMining,...rest}=structuredClone(data);Object.assign(this,rest);this.miningWork.rocks.importState(rockMining);if(this.kingTask){const object=this.byId.get(this.kingTask.treeId);this.scene.workerSystem.reservations.reserve(this.reservation(object),'king');}this.refreshSeason();}

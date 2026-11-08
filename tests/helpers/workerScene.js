@@ -59,7 +59,7 @@ export function ensureBuildingPrerequisites(scene,definition){
   }
 }
 
-export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,morale=false,workplaces=false,construction=false,farming=false,foodProduction=false,seasons=false,logistics=false,naturalResources=false,ledger=false,starter=true,gameSettings}={}){
+export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(0)),{randomizeTalents=false,morale=false,workplaces=false,construction=false,farming=false,foodProduction=false,seasons=false,logistics=false,naturalResources=false,ledger=false,starter=true,gameSettings,start={x:40,y:40}}={}){
   const scene={objectRegistry,gameSettings,terrainGrid:terrain.map(r=>[...r]),map:terrain.map(r=>[...r]),inventory:new Inventory(),gameOver:false,
     resources:new Map(),resourceOccupancy:new Map(),buildings:[],towerViews:new Map(),animations:[],
     marker:{visible:false,setVisible(v){this.visible=v;}},showMarker(){this.marker.visible=true;},setStatus(){},updateBuildingUI(){},updateInventory(){},updateTimeDisplay(){},refreshVisibility(){},
@@ -74,7 +74,7 @@ export function workerScene(terrain=Array.from({length:100},()=>Array(100).fill(
     animate(){},setMounted(){},setOpened(){},destroy(){this.scene=null;}};}
   scene.assets={createView:view};scene.createBuildingView=(d,b)=>{scene.naturalResources?.mining.registerBuilding(b);scene.workplaceSystem?.register(b);scene.farmingSystem?.register(b);scene.foodStorage?.register(b);scene.foodProduction?.register(b);return view(d.id,tileCenter(b));};
   scene.tweens={add(config){const t={...config,elapsed:0};scene.animations.push(t);return t;}};
-  scene.player=view('king',tileCenter({x:40,y:40}));scene.character=new PlayerController(scene,scene.player,{x:40,y:40});
+  scene.player=view('king',tileCenter(start));scene.character=new PlayerController(scene,scene.player,{...start});
   scene.fog=new FogOfWarSystem(scene.character,scene.settingsPanel.settings.fogOfWar,{explorationEnabled:scene.settingsPanel.settings.explorationMode});scene.mapMemory=new MapMemory(scene.fog);
   scene.gameTime=new GameTimeSystem((gameSettings?.dayLengthSeconds??120)*1000);scene.activities=new GameActivityBus();scene.experienceSystem=new ExperienceSystem(scene.activities);scene.skillSystem=new SkillSystem(scene);scene.skillSystem.initialize(scene.character);
   if(seasons)scene.seasons=new SeasonSystem(scene.gameTime,{enabled:gameSettings?.seasonsEnabled??true});

@@ -37,7 +37,7 @@ export class PolicyPanel {
     const target=p.pending?p.target(p.pending):p.target(),change=target-p.happiness(),days=Math.ceil(Math.abs(change)/5-1e-9)+(p.pending?1:0);
     this.$('happiness').textContent=now==null?t('policy.happinessNone'):Math.abs(change)<.5?t('policy.happinessSteady',{now}):t('policy.happinessForecast',{now,next:Math.max(0,Math.min(100,Math.round(now+change))),days});
     // Policy v2 P3: the Feast button with its cost, or why it cannot be held now.
-    const feast=p.feastStatus(),button=this.$('feast');if(button){button.disabled=!feast.ok;this.$('feast-status').textContent=p.feastBonus()?t('policy.feastRunning',{days:p.feastDaysLeft().toFixed(1)}):feast.ok?t('policy.feastCost',feast.cost):t(`policy.feastNo.${feast.reason}`,{days:feast.days??0,...feast.cost});}
+    const feast=p.feastStatus(),button=this.$('feast');if(button){button.disabled=!feast.ok;this.$('feast-status').textContent=p.feastBonus()?t('policy.feastRunning',{days:p.feastDaysLeft().toFixed(1)}):feast.ok?t('policy.feastCost',feast.cost):t(`policy.feastNo.${feast.reason}`,{days:feast.days??0,count:feast.days??0,...feast.cost});}
     const risk=this.$('risk');risk.hidden=!summary?.atRisk;if(summary?.atRisk)risk.textContent=t('policy.risk',{count:summary.atRisk});
   }
   destroy(){this.controller.abort();this.unsubscribe?.();clearInterval(this.timer);for(const slider of this.sliders??[])slider.destroy();}

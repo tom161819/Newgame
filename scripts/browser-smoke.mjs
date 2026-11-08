@@ -104,6 +104,7 @@ import { storageNoticesSmoke } from './storage-notices-smoke.mjs';
 import { uiThemeSmoke } from './ui-theme-smoke.mjs';
 import { storageWindowSmoke } from './storage-window-smoke.mjs';
 import { sideCardsSmoke } from './side-cards-smoke.mjs';
+import { uiFixes076Smoke } from './ui-fixes-076-smoke.mjs';
 import { chosenArtSmoke } from './chosen-art-smoke.mjs';
 import { castleArtSmoke } from './castle-art-smoke.mjs';
 import { houseDecorationsSmoke } from './house-decorations-smoke.mjs';
@@ -248,6 +249,7 @@ try{
   await step('ui-theme',()=>uiThemeSmoke(context,origin+base,instrument));
   await step('storage-window',()=>storageWindowSmoke(context,origin+base,instrument));
   await step('side-cards',()=>sideCardsSmoke(context,origin+base,instrument));
+  await step('ui-fixes-076',()=>uiFixes076Smoke(context,origin+base,instrument));
   await step('chosen-art',()=>chosenArtSmoke(context,origin+base,instrument));
   await step('castle-art',()=>castleArtSmoke(context,origin+base,instrument));
   await step('decorations',()=>houseDecorationsSmoke(context,origin+base,instrument));
