@@ -30,3 +30,6 @@ After approval the game part is m-souvisla-zeme: same maths per 16 × 16 chunk i
 ### Round 4 (owner 8 Nov)
 - Opacity slider for every plant and stone kind (sink them into the ground).
 - Stones: pebbles, gravel patches, stones and large flat stones, each with amount and opacity; they prefer the stony zone and get a snow cap in winter.
+
+### Round 5 (owner 8 Nov)
+- Beach sand, desert sand, mud bank and shore rocks are painted the same way and blend with the grass (own colour pickers, detail and speckles). Water (shallow, deep, ford) is never painted or blended, so river banks stay sharp. Plants and stones also grow on these grounds where they fit.

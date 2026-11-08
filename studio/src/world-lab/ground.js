@@ -12,10 +12,10 @@ export const GROUND_DEFAULTS_BASE = {
   patchSize: 18, patchStrength: 0.16, edgeWidth: 1.6, blend: 1.2, detail: 0.22, speckles: 1,
   flowersSmall: 0.6, flowersLarge: 0.25, thistles: 0.15, shrubs: 0.12, tuftGreen: 0.5, tuftDry: 0.3, tuftDark: 0.2, plantSize: 1,
   pebbles: 0.4, gravel: 0.2, stones: 0.12, flatStones: 0.06,
-  zoneColors: ['#689640', '#4a8834', '#8c9650', '#62763e', '#649642', '#76845a'],
+  zoneColors: ['#689640', '#4a8834', '#8c9650', '#62763e', '#649642', '#76845a', '#d6c38c', '#dcbf7e', '#7a5f43', '#9a958a'],
   time: 'day', season: 'summer', year: 0.5, weather: 'clear',
 };
-export const ZONE_NAMES = ['Meadow', 'Lush grass', 'Dry grass', 'Forest floor', 'Flowery', 'Stony'];
+export const ZONE_NAMES = ['Meadow', 'Lush grass', 'Dry grass', 'Forest floor', 'Flowery', 'Stony', 'Beach sand', 'Desert sand', 'Mud bank', 'Shore rocks'];
 export const TIMES = [['dawn', 'Dawn'], ['day', 'Day'], ['dusk', 'Dusk'], ['night', 'Night']];
 export const SEASONS = [['spring', 'Spring'], ['summer', 'Summer'], ['autumn', 'Autumn'], ['winter', 'Winter']];
 export const WEATHERS = [['clear', 'Clear'], ['overcast', 'Overcast'], ['rain', 'Rain'], ['fog', 'Fog'], ['snow', 'Snow']];
@@ -82,6 +82,11 @@ const ZONES = [
   { base: [98, 118, 62], speck: [[118, 86, 52], 0.014] },
   { base: [100, 150, 66], speck: [[236, 228, 236], 0.012], speck2: [[226, 112, 140], 0.006], speck3: [[238, 206, 82], 0.006] },
   { base: [118, 132, 90], speck: [[156, 154, 146], 0.02] },
+  // Other land (plan g-souvisla-zeme, round 5): painted the same way, blending with the grass; water stays tiles.
+  { base: [214, 195, 140], speck: [[176, 160, 120], 0.03], speck2: [[240, 230, 200], 0.02], detail: 0.45 },
+  { base: [220, 191, 126], speck: [[190, 160, 100], 0.02], detail: 0.5 },
+  { base: [122, 95, 67], speck: [[92, 72, 52], 0.04], speck2: [[150, 128, 96], 0.02], detail: 0.8 },
+  { base: [154, 149, 138], speck: [[120, 116, 108], 0.08], speck2: [[186, 182, 172], 0.05], detail: 1.2 },
 ];
 
 const hash = (x, y, s = 0) => { let h = (x * 374761393 + y * 668265263 + s * 2246822519) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
@@ -112,11 +117,11 @@ function detail() {
   return (detailField = f);
 }
 
-// Paints the grass of the iso window into `ctx`. `isGrass(x, y)` and `zoneAt(x, y)` read the world; `toWorld(px, py)`
+// Paints the land (grass zones and the other land grounds) of the iso window into `ctx`. `isGrass(x, y)` and `zoneAt(x, y)` read the world; `toWorld(px, py)`
 // turns a canvas pixel into a map position (tile x, y as floats).
 export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zoneAt, settings = GROUND_DEFAULTS }) {
   const s = { ...GROUND_DEFAULTS, ...settings }, img = ctx.getImageData(0, 0, width, height), out = img.data, field = detail();
-  const warpScale = 1 / 3.2, warp = s.edgeWidth, colors = (s.zoneColors ?? GROUND_DEFAULTS.zoneColors).map(hex), season = seasonLook(s.year ?? yearOf(s.season));
+  const warpScale = 1 / 3.2, warp = s.edgeWidth, colors = GROUND_DEFAULTS_BASE.zoneColors.map((c, i) => hex(s.zoneColors?.[i] ?? c)), season = seasonLook(s.year ?? yearOf(s.season));
   for (let py = 0; py < height; py++) for (let px = 0; px < width; px++) {
     const [fx, fy] = toWorld(px + 0.5, py + 0.5), tx = Math.floor(fx), ty = Math.floor(fy);
     if (!isGrass(tx, ty)) continue;
@@ -143,7 +148,7 @@ export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zo
     const light = 1 + p1 * s.patchStrength * 2.2, dry = Math.max(0, p2) * s.patchStrength * 1.6;
     r = r * light + dry * 70; g = g * light + dry * 30; b = b * light - dry * 10;
     // Fine detail in world space (anchored to the canvas pixel grid, which is a fixed linear map of the world).
-    const d = field[((py % DH) * DW) + (px % DW)] * s.detail;
+    const d = field[((py % DH) * DW) + (px % DW)] * s.detail * (speckZone.detail ?? 1);
     r *= 1 + d; g *= 1 + d; b *= 1 + d * 0.8;
     // Season: shift the colour; winter snow lies thinner where the patch noise is low.
     r *= season.mul[0]; g *= season.mul[1]; b *= season.mul[2];
@@ -163,7 +168,7 @@ export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zo
 const KINDS = OBJECT_KINDS;
 const PER_TILE = { flowersSmall: 1.2, flowersLarge: 0.35, thistles: 0.18, shrubs: 0.12, tuftGreen: 0.7, tuftDry: 0.45, tuftDark: 0.3, pebbles: 1.4, gravel: 0.3, stones: 0.35, flatStones: 0.12 };
 // Where each kind likes to grow (zone index → factor).
-const LIKES = { flowersSmall: [1, 0.7, 0.4, 0.3, 2.2, 0.5], flowersLarge: [1, 0.6, 0.3, 0.2, 2.4, 0.3], thistles: [0.6, 0.3, 1.8, 0.3, 0.5, 1.6], shrubs: [0.5, 0.8, 0.6, 2.2, 0.4, 1], tuftGreen: [1, 1.8, 0.4, 1, 0.8, 0.5], tuftDry: [0.6, 0.3, 2.2, 0.5, 0.5, 1.4], tuftDark: [0.5, 1.2, 0.3, 1.8, 0.4, 0.6], pebbles: [0.7, 0.4, 1.2, 0.8, 0.5, 2.6], gravel: [0.4, 0.2, 1, 0.5, 0.3, 2.8], stones: [0.5, 0.3, 1, 1, 0.3, 2.6], flatStones: [0.4, 0.3, 0.8, 1, 0.2, 2.4] };
+const LIKES = { flowersSmall: [1, 0.7, 0.4, 0.3, 2.2, 0.5, 0, 0, 0.05, 0], flowersLarge: [1, 0.6, 0.3, 0.2, 2.4, 0.3, 0, 0, 0, 0], thistles: [0.6, 0.3, 1.8, 0.3, 0.5, 1.6, 0.2, 0.6, 0, 0.3], shrubs: [0.5, 0.8, 0.6, 2.2, 0.4, 1, 0.1, 0.2, 0.3, 0.4], tuftGreen: [1, 1.8, 0.4, 1, 0.8, 0.5, 0.1, 0, 0.6, 0.2], tuftDry: [0.6, 0.3, 2.2, 0.5, 0.5, 1.4, 0.5, 0.6, 0.2, 0.4], tuftDark: [0.5, 1.2, 0.3, 1.8, 0.4, 0.6, 0.2, 0, 1.8, 0.4], pebbles: [0.7, 0.4, 1.2, 0.8, 0.5, 2.6, 0.7, 1.2, 0.6, 3], gravel: [0.4, 0.2, 1, 0.5, 0.3, 2.8, 0.5, 0.8, 0.3, 3], stones: [0.5, 0.3, 1, 1, 0.3, 2.6, 0.3, 1, 0.4, 2.6], flatStones: [0.4, 0.3, 0.8, 1, 0.2, 2.4, 0.2, 0.6, 0.3, 2.4] };
 export function plantsFor({ x0, y0, span, isGrass, zoneAt, settings = GROUND_DEFAULTS }) {
   const s = { ...GROUND_DEFAULTS, ...settings }, out = [];
   for (let y = y0 - 2; y < y0 + span + 2; y++) for (let x = x0 - 2; x < x0 + span + 2; x++) {

@@ -84,7 +84,11 @@ export function drawIso(canvas, world, { focus, span = 28, ground = null }) {
     else if (world.bushes.has(key)) objects.push({ kind: BUSH_TYPES[world.bushes.get(key)] ?? BUSH_TYPES[0], x, y, sx, sy });
   }
   if (ground?.mode === 'continuous') {
-    const isGrass = (x, y) => world.ground[y]?.[x] === GROUND.GRASS, zoneAt = (x, y) => world.zones[y]?.[x] ?? 0;
+    // Land materials: grass zones 0–5, then beach, desert, mud bank, shore rocks; water (shallow, deep, ford) is not
+    // painted and never blends, so river banks stay sharp.
+    const LAND = { [GROUND.BEACH]: 6, [GROUND.DESERT]: 7, [GROUND.MUD]: 8, [GROUND.SHORE_ROCKS]: 9 };
+    const isGrass = (x, y) => { const g = world.ground[y]?.[x]; return g === GROUND.GRASS || LAND[g] !== undefined; };
+    const zoneAt = (x, y) => { const g = world.ground[y]?.[x]; return g === GROUND.GRASS ? world.zones[y]?.[x] ?? 0 : LAND[g] ?? 0; };
     const toWorld = (px, py) => { const a = (px - canvas.width / 2) / (W / 2), b = (py - headroom) / (H / 2); return [x0 + (a + b) / 2, y0 + (b - a) / 2]; };
     paintContinuousGround(ctx, { width: canvas.width, height: canvas.height, toWorld, isGrass, zoneAt, settings: ground.settings });
     for (const p of plantsFor({ x0, y0, span, isGrass, zoneAt, settings: ground.settings })) objects.push({ kind: 'plant', plant: p, x: p.fx, y: p.fy, sx: (p.fx - x0 - (p.fy - y0)) * (W / 2) + canvas.width / 2, sy: (p.fx - x0 + (p.fy - y0)) * (H / 2) + headroom });
