@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "assetId": "bear",
+  "variantId": "bear-brown-sculpt",
+  "name": "Brown bear – A · Sculpted (smooth, realistic)",
+  "category": "units",
+  "version": 3,
+  "specHash": "e91970fc",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 67,
+  "anchor": {
+    "x": 65,
+    "y": 33
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.49254
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 65
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97015
+  },
+  "visualHeight": 65,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.715,
+  "lights": [],
+  "x2": {
+    "width": 259,
+    "height": 131,
+    "anchor": {
+      "x": 129,
+      "y": 65
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 96,
+    "supersampling": 4,
+    "seconds": 59.9,
+    "renderHash": "9de1cda1",
+    "script": "scripts/blender/render.py"
+  }
+}

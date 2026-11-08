@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "id": "ford-stones",
+  "name": "Ford stones",
+  "category": "decorations",
+  "description": "World v2 (plan g-svet-textury): wet boulders that stand out of a FORD, placed per tile; four sizes.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "workshop",
+  "variants": [
+    {
+      "id": "ford-stones-large",
+      "name": "Large boulder group",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "fordStones",
+            "seed": 2,
+            "count": 3,
+            "size": 1.4
+          }
+        ]
+      }
+    },
+    {
+      "id": "ford-stones-medium",
+      "name": "Medium stones",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "fordStones",
+            "seed": 4,
+            "count": 3,
+            "size": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "ford-stones-small",
+      "name": "Small stones",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "fordStones",
+            "seed": 6,
+            "count": 4,
+            "size": 0.6
+          }
+        ]
+      }
+    },
+    {
+      "id": "ford-stones-single",
+      "name": "Single stone",
+      "version": 1,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "fordStones",
+            "seed": 8,
+            "count": 1,
+            "size": 0.9
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "assetId": "merchant-caravan",
+  "variantId": "merchant-caravan-house-full",
+  "name": "House wagon",
+  "category": "units",
+  "version": 4,
+  "specHash": "6547d0cc",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 82,
+  "anchor": {
+    "x": 65,
+    "y": 48
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.58537
+  },
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "base": {
+    "x": 97,
+    "y": 80
+  },
+  "baseOrigin": {
+    "x": 0.74046,
+    "y": 0.97561
+  },
+  "visualHeight": 80,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.957,
+  "lights": [],
+  "x2": {
+    "width": 259,
+    "height": 161,
+    "anchor": {
+      "x": 129,
+      "y": 95
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 96,
+    "supersampling": 4,
+    "seconds": 76.9,
+    "renderHash": "c4c4c02a",
+    "script": "scripts/blender/render.py"
+  }
+}

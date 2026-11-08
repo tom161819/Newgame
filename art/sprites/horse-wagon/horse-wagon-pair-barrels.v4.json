@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "assetId": "horse-wagon",
+  "variantId": "horse-wagon-pair-barrels",
+  "name": "Two-horse wagon with barrels",
+  "category": "units",
+  "version": 4,
+  "specHash": "574da58d",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 74,
+  "anchor": {
+    "x": 65,
+    "y": 40
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.54054
+  },
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "base": {
+    "x": 97,
+    "y": 72
+  },
+  "baseOrigin": {
+    "x": 0.74046,
+    "y": 0.97297
+  },
+  "visualHeight": 72,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.957,
+  "lights": [],
+  "x2": {
+    "width": 259,
+    "height": 145,
+    "anchor": {
+      "x": 129,
+      "y": 79
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 96,
+    "supersampling": 4,
+    "seconds": 83.9,
+    "renderHash": "010f8eed",
+    "script": "scripts/blender/render.py"
+  }
+}

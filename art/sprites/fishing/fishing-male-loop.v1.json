@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "assetId": "fishing",
+  "variantId": "fishing-male-loop",
+  "name": "Fisher (man) – fishing loop",
+  "category": "units",
+  "version": 1,
+  "specHash": "067891f0",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 74,
+  "anchor": {
+    "x": 65,
+    "y": 40
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.54054
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 72
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97297
+  },
+  "visualHeight": 72,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.365,
+  "lights": [],
+  "anim": {
+    "frameWidth": 132,
+    "frameHeight": 122,
+    "anchor": {
+      "x": 65,
+      "y": 88
+    },
+    "origin": {
+      "x": 0.49242,
+      "y": 0.72131
+    },
+    "columns": [
+      "cast-back",
+      "cast",
+      "cast-out",
+      "sit-idle",
+      "sit-idle-b",
+      "twitch",
+      "bite",
+      "bite-b",
+      "reel-a",
+      "reel-b",
+      "catch",
+      "store"
+    ],
+    "rows": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "rowsNote": "facing 0–7 (0 faces the viewer, then turning to screen right); the fisher faces the water",
+    "fps": 5,
+    "clips": {
+      "cast": [
+        0,
+        1,
+        2
+      ],
+      "sit-idle": [
+        3,
+        4
+      ],
+      "twitch": [
+        3,
+        5,
+        5,
+        3
+      ],
+      "bite": [
+        6,
+        7
+      ],
+      "reel": [
+        8,
+        9
+      ],
+      "store": [
+        10,
+        11
+      ]
+    },
+    "loop": [
+      "cast",
+      "sit-idle",
+      "sit-idle",
+      "twitch",
+      "sit-idle",
+      "bite",
+      "reel",
+      "reel",
+      "reel",
+      "store"
+    ]
+  }
+}

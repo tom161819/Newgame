@@ -1,19 +1,11 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-07T18:31:31.159Z",
+  "updatedAt": "2026-11-08T06:35:39.135Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
-      "preferred": "armorer-timber",
+      "preferred": "armorer-forge",
       "variants": {
-        "armorer-timber": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "b358728f",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T06:29:55.668Z",
-          "version": 1
-        },
         "armorer-forge": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
@@ -22,36 +14,12 @@
           "updatedAt": "2026-11-07T06:30:06.812Z",
           "version": 1,
           "approvedAt": "2026-11-07T06:30:06.812Z"
-        },
-        "armorer-display": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "c24421f6",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T06:29:56.771Z",
-          "version": 1
         }
       }
     },
     "armory": {
-      "preferred": "armory-stone",
+      "preferred": "armory-fortified",
       "variants": {
-        "armory-stone": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "3609b6ed",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:09:30.133Z",
-          "version": 1
-        },
-        "armory-timber": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "7f2f4aa6",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:09:31.683Z",
-          "version": 1
-        },
         "armory-fortified": {
           "status": "approved",
           "version": 1,
@@ -113,28 +81,12 @@
               "at": "2026-11-07T10:45:00.454Z"
             }
           ]
-        },
-        "bakery-house-stall": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "312c474f",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T11:09:41.052Z",
-          "version": 1
         }
       }
     },
     "barracks-hall": {
       "preferred": "barracks-hall-stone",
       "variants": {
-        "barracks-hall-timber": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "cbb65133",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:10:10.121Z",
-          "version": 1
-        },
         "barracks-hall-stone": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
@@ -143,36 +95,12 @@
           "updatedAt": "2026-11-07T10:10:10.121Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:10:10.121Z"
-        },
-        "barracks-hall-blender": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "0b7359ac",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:10:10.121Z",
-          "version": 1
         }
       }
     },
     "bowyer": {
       "preferred": "bowyer-stone",
       "variants": {
-        "bowyer-timber": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "2a9e5b47",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:10:35.997Z",
-          "version": 1
-        },
-        "bowyer-drying-shed": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "583cbdc2",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:10:35.997Z",
-          "version": 1
-        },
         "bowyer-stone": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
@@ -187,38 +115,6 @@
     "builders-workshop": {
       "preferred": "builders-workshop-material-yard",
       "variants": {
-        "builders-workshop-open-shed": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "893cfd2c",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T11:10:00.374Z",
-          "version": 2,
-          "history": [
-            {
-              "version": 1,
-              "specHash": "fbc62623",
-              "status": "review",
-              "at": "2026-11-06T15:30:00.000Z"
-            }
-          ]
-        },
-        "builders-workshop-house-awning": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "abfe49fd",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T11:10:01.958Z",
-          "version": 2,
-          "history": [
-            {
-              "version": 1,
-              "specHash": "49557077",
-              "status": "review",
-              "at": "2026-11-06T15:30:00.000Z"
-            }
-          ]
-        },
         "builders-workshop-material-yard": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
@@ -267,14 +163,6 @@
               "at": "2026-11-07T10:47:13.445Z"
             }
           ]
-        },
-        "builders-workshop-blender": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "abfc0b66",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T11:10:03.338Z",
-          "version": 1
         }
       }
     },
@@ -366,36 +254,12 @@
               "at": "2026-11-07T10:14:38.880Z"
             }
           ]
-        },
-        "farmstead-stone": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "af2a97c1",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:46:02.549Z",
-          "version": 1
         }
       }
     },
     "fisherman-hut": {
       "preferred": "fisherman-hut-stilt-net-loft",
       "variants": {
-        "fisherman-hut-reed-cottage": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "2920cefa",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T18:06:00Z",
-          "version": 1
-        },
-        "fisherman-hut-plank-smokehouse": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "4759d185",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T18:06:00Z",
-          "version": 1
-        },
         "fisherman-hut-stilt-net-loft": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
@@ -420,27 +284,6 @@
               "at": "2026-11-07T16:25:24.015Z"
             }
           ]
-        }
-      }
-    },
-    "fisherman-hut-large": {
-      "preferred": null,
-      "variants": {
-        "fisherman-hut-large-net-house": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "eb17d300",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T18:06:00Z",
-          "version": 1
-        },
-        "fisherman-hut-large-stage-hut": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "f05c7811",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T18:06:00Z",
-          "version": 1
         }
       }
     },
@@ -516,22 +359,6 @@
               "at": "2026-11-07T10:46:29.767Z"
             }
           ]
-        },
-        "house-stone": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "2cf4b872",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T11:10:32.791Z",
-          "version": 1
-        },
-        "house-wood": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "1d7d3382",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T11:10:33.538Z",
-          "version": 1
         }
       }
     },
@@ -546,14 +373,6 @@
           "updatedAt": "2026-11-07T10:15:20.816Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:15:20.816Z"
-        },
-        "hunting-lodge-thatch": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "c288ff31",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:15:20.816Z",
-          "version": 1
         }
       }
     },
@@ -584,14 +403,6 @@
               "at": "2026-11-07T09:45:10.677Z"
             }
           ]
-        },
-        "iron-mine-headframe": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "7af560d5",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:46:56.439Z",
-          "version": 1
         }
       }
     },
@@ -606,14 +417,6 @@
           "updatedAt": "2026-11-07T10:15:39.652Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:15:39.652Z"
-        },
-        "lumber-camp-sawhorse": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "e73c165a",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:15:39.652Z",
-          "version": 1
         }
       }
     },
@@ -628,36 +431,12 @@
           "updatedAt": "2026-11-07T10:15:45.674Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:15:45.674Z"
-        },
-        "marketplace-hall": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "7c7d11b8",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:15:45.674Z",
-          "version": 1
-        },
-        "marketplace-stalls-bay": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "4cf6452b",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:15:45.674Z",
-          "version": 1
         }
       }
     },
     "pitch-kiln": {
       "preferred": "pitch-kiln-stone-oven",
       "variants": {
-        "pitch-kiln-turf-kiln": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "dd84b900",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T18:06:00Z",
-          "version": 2
-        },
         "pitch-kiln-stone-oven": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
@@ -688,14 +467,6 @@
     "quarry": {
       "preferred": "quarry-pit",
       "variants": {
-        "quarry-cliff": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "4e464b20",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:16:09.139Z",
-          "version": 1
-        },
         "quarry-pit": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
@@ -755,36 +526,12 @@
           "updatedAt": "2026-11-07T10:16:20.381Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:16:20.381Z"
-        },
-        "smelter-yard": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "7e2b5725",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:16:20.381Z",
-          "version": 1
         }
       }
     },
     "stables": {
       "preferred": "stables-shelter",
       "variants": {
-        "stables-timber": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "c12a6ce9",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:16:36.985Z",
-          "version": 1
-        },
-        "stables-stone": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "d8ada10f",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:16:36.985Z",
-          "version": 1
-        },
         "stables-shelter": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
@@ -807,22 +554,6 @@
           "updatedAt": "2026-11-07T16:26:41.093Z",
           "version": 1,
           "approvedAt": "2026-11-07T16:26:41.093Z"
-        },
-        "starter-stockpile-pole-shed": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "cc96a0c2",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T16:26:44.653Z",
-          "version": 1
-        },
-        "starter-stockpile-cart-camp": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "f1ba8485",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T16:26:45.393Z",
-          "version": 1
         }
       }
     },
@@ -837,14 +568,6 @@
           "updatedAt": "2026-11-07T10:18:28.657Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:18:28.657Z"
-        },
-        "stone-wall-palisade": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "623ad6ee",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:18:28.657Z",
-          "version": 1
         }
       }
     },
@@ -859,22 +582,6 @@
           "updatedAt": "2026-11-07T10:16:49.845Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:16:49.845Z"
-        },
-        "swordsmith-lean-to": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "6f1dbbb9",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:16:49.845Z",
-          "version": 1
-        },
-        "swordsmith-yard": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "bbb540ef",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:16:49.845Z",
-          "version": 1
         }
       }
     },
@@ -1039,14 +746,6 @@
     "warehouse-store": {
       "preferred": "warehouse-store-stone",
       "variants": {
-        "warehouse-store-timber": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "3d08139f",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:18:35.154Z",
-          "version": 1
-        },
         "warehouse-store-stone": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
@@ -1069,22 +768,6 @@
           "updatedAt": "2026-11-07T10:18:41.561Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:18:41.561Z"
-        },
-        "watchtower-round": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "efafb039",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:18:41.561Z",
-          "version": 1
-        },
-        "watchtower-timber": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "b5b8950e",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:18:41.561Z",
-          "version": 1
         }
       }
     },
@@ -1115,14 +798,6 @@
               "at": "2026-11-07T06:08:43.204Z"
             }
           ]
-        },
-        "wheelwright-yard-stone": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "814c0922",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:18:55.178Z",
-          "version": 1
         }
       }
     },
@@ -1137,14 +812,6 @@
           "updatedAt": "2026-11-07T10:16:00.556Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:16:00.556Z"
-        },
-        "windmill-post": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Not chosen: another variant was chosen for the game.",
-          "specHash": "6b4180a3",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:16:00.556Z",
-          "version": 1
         }
       }
     },
@@ -1180,17 +847,118 @@
         }
       }
     },
+    "ford-stones": {
+      "preferred": "ford-stones-large",
+      "variants": {
+        "ford-stones-large": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0656bd2c",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ford-stones-medium": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "27354e20",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ford-stones-small": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ca306280",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ford-stones-single": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3b512d38",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "ground-decals": {
+      "preferred": "ground-decals-tufts",
+      "variants": {
+        "ground-decals-tufts": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c9c4f860",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ground-decals-tufts-dry": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e01a765b",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ground-decals-flowers": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "eccde3e8",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ground-decals-flowers-yellow": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5af979e1",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ground-decals-flowers-white": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "85346457",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ground-decals-pebbles": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "10a30cf6",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "ground-decals-leaves": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "591a699e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
     "haystack": {
       "preferred": "haystack-cocks",
       "variants": {
-        "haystack-dome": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "eb1151c7",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T16:25:39.919Z",
-          "version": 1
-        },
         "haystack-cocks": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
@@ -1199,14 +967,6 @@
           "updatedAt": "2026-11-07T16:25:33.524Z",
           "version": 1,
           "approvedAt": "2026-11-07T16:25:33.524Z"
-        },
-        "haystack-snow": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "29162360",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T16:25:41.142Z",
-          "version": 1
         }
       }
     },
@@ -1256,6 +1016,56 @@
           "specHash": "9adefce8",
           "status": "approved",
           "updatedAt": "2026-11-07T06:06:29.060Z",
+          "version": 1
+        }
+      }
+    },
+    "reeds": {
+      "preferred": "reeds-clump",
+      "variants": {
+        "reeds-clump": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "66f27d1f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "reeds-tall": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8a02c1a6",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "reeds-sparse": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b81b38e7",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "reeds-clump-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2cd22bcb",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "reeds-tall-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bef31af6",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
           "version": 1
         }
       }
@@ -1518,6 +1328,47 @@
         }
       }
     },
+    "torch-bracket": {
+      "preferred": "torch-bracket-wall-arm",
+      "variants": {
+        "torch-bracket-wall-arm": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2000e376",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "torch-bracket-wall-scroll": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "85e2af51",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "torch-bracket-tower-cage": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "847e4eac",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "torch-bracket-tower-door": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e53276f7",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        }
+      }
+    },
     "torch-post": {
       "preferred": "torch-post-brazier",
       "variants": {
@@ -1669,14 +1520,6 @@
     "equipment-bow": {
       "preferred": "equipment-bow-quiver",
       "variants": {
-        "equipment-bow-plain": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "e403d587",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:55:59.580Z",
-          "version": 1
-        },
         "equipment-bow-quiver": {
           "status": "approved",
           "version": 1,
@@ -1766,6 +1609,252 @@
         }
       }
     },
+    "grass-zone-dry": {
+      "preferred": "grass-zone-dry-summer",
+      "variants": {
+        "grass-zone-dry-summer": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2bc41b17",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-dry-spring": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "df03174e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-dry-autumn": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c7f45694",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-dry-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3ffa59f4",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "grass-zone-flowers": {
+      "preferred": "grass-zone-flowers-summer",
+      "variants": {
+        "grass-zone-flowers-summer": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8938425d",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-flowers-spring": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "714d36de",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-flowers-autumn": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "34bf3b3f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-flowers-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ced87089",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "grass-zone-forest": {
+      "preferred": "grass-zone-forest-summer",
+      "variants": {
+        "grass-zone-forest-summer": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bca66b4f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-forest-spring": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "efcc45ec",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-forest-autumn": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b0d0312e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-forest-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "535995ac",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "grass-zone-lush": {
+      "preferred": "grass-zone-lush-summer",
+      "variants": {
+        "grass-zone-lush-summer": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6fa96419",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-lush-spring": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ac38ba44",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-lush-autumn": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "740230a0",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-lush-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "72e83dbe",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "grass-zone-meadow": {
+      "preferred": "grass-zone-meadow-summer",
+      "variants": {
+        "grass-zone-meadow-summer": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "999d40e2",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-meadow-spring": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4a57910e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-meadow-autumn": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "47ec2703",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-meadow-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c462b663",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "grass-zone-stony": {
+      "preferred": "grass-zone-stony-summer",
+      "variants": {
+        "grass-zone-stony-summer": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "787255ee",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-stony-spring": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "28d9a0eb",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-stony-autumn": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "98912088",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "grass-zone-stony-winter": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4696952f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
     "season-ground": {
       "preferred": "season-ground-spring",
       "variants": {
@@ -1808,6 +1897,97 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:06:16.574Z",
           "approvedAt": "2026-11-04T19:06:16.574Z"
+        }
+      }
+    },
+    "shore-ground": {
+      "preferred": "shore-ground-ford",
+      "variants": {
+        "shore-ground-ford": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c7cc8053",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "shore-ground-mud": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3e9a9a1d",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "shore-ground-rocks": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6b866a75",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "shore-ground-water-edge": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d5640d99",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "shore-transitions": {
+      "preferred": "shore-transitions-water-grass",
+      "variants": {
+        "shore-transitions-water-grass": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "33b83106",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "shore-transitions-water-sand": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7ea1e715",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "shore-transitions-water-mud": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3568e393",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "shore-transitions-water-rocks": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7b3315d3",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "shore-transitions-sand-grass": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c75fd074",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
         }
       }
     },
@@ -2030,6 +2210,29 @@
         }
       }
     },
+    "night-icons": {
+      "preferred": "night-icons-badges",
+      "variants": {
+        "night-icons-plain": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6f62b262",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "night-icons-badges": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cfc8c9f4",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        }
+      }
+    },
     "pet-icons": {
       "preferred": "pet-icons-seated",
       "variants": {
@@ -2041,14 +2244,6 @@
           "updatedAt": "2026-11-07T18:06:00Z",
           "version": 1,
           "approvedAt": "2026-11-07T18:06:00Z"
-        },
-        "pet-icons-heads": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "94132f51",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T18:06:00Z",
-          "version": 1
         }
       }
     },
@@ -2063,14 +2258,6 @@
           "updatedAt": "2026-11-07T13:02:58.298Z",
           "version": 1,
           "approvedAt": "2026-11-07T13:02:58.298Z"
-        },
-        "ration-icons-basket": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "435861a9",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T13:03:02.608Z",
-          "version": 1
         }
       }
     },
@@ -2138,6 +2325,177 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:02:49.546Z",
           "approvedAt": "2026-11-04T19:02:49.546Z"
+        }
+      }
+    },
+    "bear": {
+      "preferred": "bear-brown-sculpt",
+      "variants": {
+        "bear-brown-sculpt": {
+          "approvedAt": "2026-11-08T06:35:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e91970fc",
+          "status": "approved",
+          "updatedAt": "2026-11-08T06:35:00.000Z",
+          "version": 3,
+          "comments": [
+            {
+              "at": "2026-11-08T05:00:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to už je lepší ,ale ať má trochu břicho přirozeně",
+              "version": 2
+            },
+            {
+              "at": "2026-11-08T05:00:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "ať je mohutnější a vpadá nemezoečbě",
+              "version": 2
+            }
+          ],
+          "history": [
+            {
+              "version": 2,
+              "specHash": "ed1738b1",
+              "status": "revision-requested",
+              "at": "2026-11-08T05:00:00.000Z"
+            }
+          ]
+        }
+      }
+    },
+    "boar": {
+      "preferred": "boar-boar",
+      "variants": {
+        "boar-boar": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b7633db1",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 5,
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat do realistického divočáka, tohle je nějakej pakun",
+              "version": 1
+            },
+            {
+              "at": "2026-11-07T19:50:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to není hezký divočák, má moc protáhlou hlavu, a vypadá nepřirozeně, udělej proporčně přesnějšího divočáka",
+              "version": 2
+            },
+            {
+              "at": "2026-11-07T20:12:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "tělo ok, předělej hlavu at vypadá jako divočák, stejně tak i ostatní modely divočáků (menší hlava - krk ne tak nahoru vlastně skoro žadný krk a v zahnutý zuby nahoru)",
+              "version": 3
+            },
+            {
+              "at": "2026-11-07T20:30:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "pořád má hlau moc vysoko, divčák má hlavu skoro vodorovně se hřbetem",
+              "version": 4
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "b76dcb0d",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            },
+            {
+              "version": 2,
+              "specHash": "b76b8c76",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:50:00.000Z"
+            },
+            {
+              "version": 4,
+              "specHash": "b36575fc",
+              "status": "revision-requested",
+              "at": "2026-11-07T20:30:00.000Z"
+            }
+          ]
+        },
+        "boar-sow": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2856a265",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 4,
+          "comments": [
+            {
+              "at": "2026-11-07T19:50:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to není hezký divočák, má moc protáhlou hlavu, a vypadá nepřirozeně, udělej proporčně přesnějšího divočáka",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "244fe054",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:50:00.000Z"
+            }
+          ]
+        },
+        "boar-piglet": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "90d1cc9c",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 5,
+          "approvedAt": "2026-11-08T05:00:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:50:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to není hezký divočák, má moc protáhlou hlavu, a vypadá nepřirozeně, udělej proporčně přesnějšího divočáka",
+              "version": 2
+            }
+          ],
+          "history": [
+            {
+              "version": 2,
+              "specHash": "90d40b33",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:50:00.000Z"
+            }
+          ]
+        },
+        "boar-boar-attack": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "41af83ba",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 5,
+          "approvedAt": "2026-11-08T05:00:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:50:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "to není hezký divočák, má moc protáhlou hlavu, a vypadá nepřirozeně, udělej proporčně přesnějšího divočáka",
+              "version": 2
+            }
+          ],
+          "history": [
+            {
+              "version": 2,
+              "specHash": "41bc4fad",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:50:00.000Z"
+            }
+          ]
         }
       }
     },
@@ -2317,6 +2675,169 @@
           "updatedAt": "2026-11-07T18:06:00Z",
           "version": 1,
           "approvedAt": "2026-11-07T18:06:00Z"
+        },
+        "child-boy-tunic-run": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "80f60302",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-girl-braid-tag": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1efd5148",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-boy-cap-hoop": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4b267dfc",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-boy-ball-kick": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "163ffb9b",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-girl-kerchief-swing": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "96e90e0e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-boy-tunic-throw": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c7814fb7",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-girl-braid-snow": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6c9e0c51",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-boy-cap-hay": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1e4d9887",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "deer": {
+      "preferred": "deer-stag",
+      "variants": {
+        "deer-stag": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c08377c5",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "c081392e",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "deer-pricket": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "79ff7971",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "deer-hind": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5ff60fa3",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "5ffe5e68",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "deer-calf": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6e3605f3",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "deer-stag-run": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "10156e62",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "deer-hind-run": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "266b488f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
         }
       }
     },
@@ -2542,6 +3063,263 @@
         }
       }
     },
+    "fishing": {
+      "preferred": "fishing-male-cast",
+      "variants": {
+        "fishing-male-cast": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d889b5e8",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "fishing-male-fish-wait": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "47e8fc85",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "fishing-male-catch": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "98fe9206",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "fishing-female-cast": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0efa36be",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "fishing-female-fish-wait": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4e6ac1ff",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "fishing-female-catch": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bd1dd378",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "fishing-male-loop": {
+          "approvedAt": "2026-11-08T06:35:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "067891f0",
+          "status": "approved",
+          "updatedAt": "2026-11-08T06:35:00.000Z",
+          "version": 1
+        },
+        "fishing-female-loop": {
+          "approvedAt": "2026-11-08T06:35:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ee32eeba",
+          "status": "approved",
+          "updatedAt": "2026-11-08T06:35:00.000Z",
+          "version": 1
+        }
+      }
+    },
+    "fox": {
+      "preferred": "fox-red",
+      "variants": {
+        "fox-red": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3bb761fc",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další variantu",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "3bb0a637",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "fox-pale": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3f0fd874",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "fox-cross": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e0b0182a",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "fox-red-sit": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ab1b6fc1",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další variantu",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "ab19312a",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "fox-red-run": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "914e389d",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další variantu",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "914bfa06",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        }
+      }
+    },
+    "hare": {
+      "preferred": "hare-brown",
+      "variants": {
+        "hare-brown": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "13827b6a",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "1384ba01",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "hare-grey": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "69644924",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "hare-white": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "be998794",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "hare-brown-sit": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ed227ac7",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další variantu",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "ed29368c",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "hare-brown-run": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "db3f6e48",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        }
+      }
+    },
     "hauler": {
       "preferred": "hauler-male",
       "variants": {
@@ -2560,6 +3338,345 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:04:26.016Z",
           "approvedAt": "2026-11-04T19:04:26.016Z"
+        }
+      }
+    },
+    "horse": {
+      "preferred": "horse-bay-sculpt",
+      "variants": {
+        "horse-bay-sculpt": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "532d499b",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "horse-grey-sculpt": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ddf6977c",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "horse-bay-fur": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "532d499b",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "horse-grey-fur": {
+          "approvedAt": "2026-11-07T21:49:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ddf6977c",
+          "status": "approved",
+          "updatedAt": "2026-11-07T21:49:00.000Z",
+          "version": 1
+        },
+        "horse-chestnut-sculpt": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "816cf891",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "horse-black-sculpt": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "08013012",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "horse-palomino-sculpt": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f1aa4894",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "horse-dun-sculpt": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c4d67b7b",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 4,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "horse-piebald-sculpt": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5a5b1944",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 3,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "horse-dapple-sculpt": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "71468c7c",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 4,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "horse-draught-sculpt": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f515e0b0",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "horse-pony-sculpt": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "10084815",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "horse-bay-saddled-sculpt": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d25189e8",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "horse-grey-harness-sculpt": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3b57e025",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "horse-chestnut-run-sculpt": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d27dcc02",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        }
+      }
+    },
+    "horse-wagon": {
+      "preferred": "horse-wagon-farm-empty",
+      "variants": {
+        "horse-wagon-farm-empty": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "41204214",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 4,
+          "approvedAt": "2026-11-08T05:00:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty (svycházet z koní které budou vytvřeny taky)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "45289725",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "horse-wagon-farm-sacks": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e12d4fea",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 4,
+          "approvedAt": "2026-11-08T05:00:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty (svycházet z koní které budou vytvřeny taky)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "dd359863",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "horse-wagon-farm-wood": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "31dc03ec",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 3,
+          "approvedAt": "2026-11-08T05:00:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T20:30:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "povoz budeme řešit až se schávlí kun",
+              "version": 2
+            }
+          ]
+        },
+        "horse-wagon-covered": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "24479fef",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 3,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "horse-wagon-hay": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5b86b12e",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 4,
+          "approvedAt": "2026-11-08T05:00:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty (svycházet z koní které budou vytvřeny taky)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "5779deef",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "horse-wagon-tumbril-stone": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "890ae875",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 4,
+          "approvedAt": "2026-11-08T05:00:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty (svycházet z koní které budou vytvřeny taky)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "85029364",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "horse-wagon-ore": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2c275fc3",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 3,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "horse-wagon-timber": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2b3ac6f2",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 4,
+          "approvedAt": "2026-11-08T05:00:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty (svycházet z koní které budou vytvřeny taky)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "27430f6b",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "horse-wagon-pair-barrels": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "574da58d",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 4,
+          "approvedAt": "2026-11-08T05:00:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty (svycházet z koní které budou vytvřeny taky)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "5345507c",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "horse-wagon-pair-draught": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b33efd4b",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 3,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
         }
       }
     },
@@ -2613,28 +3730,74 @@
         "merchant-caravan-full": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "af6eb3ca",
+          "specHash": "ab732aac",
           "status": "approved",
-          "updatedAt": "2026-11-07T10:56:20.201Z",
-          "version": 1,
-          "approvedAt": "2026-11-07T10:56:20.201Z"
-        },
-        "merchant-caravan-unloading": {
-          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "",
-          "specHash": "4858f070",
-          "status": "rejected",
-          "updatedAt": "2026-11-07T10:56:13.273Z",
-          "version": 1
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 3,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
         },
         "merchant-caravan-empty": {
-          "approvedAt": "2026-11-07T06:13:09.119Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "specHash": "88901c59",
+          "specHash": "848a05df",
           "status": "approved",
-          "updatedAt": "2026-11-07T06:13:09.119Z",
-          "version": 1
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 3,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "merchant-caravan-striped-full": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "862746b8",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 4,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "merchant-caravan-striped-unloading": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "da8048f5",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 4,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "merchant-caravan-striped-empty": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "741984ad",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 4,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "merchant-caravan-house-full": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6547d0cc",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 4,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "merchant-caravan-house-unloading": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "16896da9",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 4,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
+        },
+        "merchant-caravan-pair-full": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4689f524",
+          "status": "approved",
+          "updatedAt": "2026-11-08T05:00:00.000Z",
+          "version": 4,
+          "approvedAt": "2026-11-08T05:00:00.000Z"
         }
       }
     },
@@ -2912,6 +4075,88 @@
         }
       }
     },
+    "roe": {
+      "preferred": "roe-buck",
+      "variants": {
+        "roe-buck": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d4e65991",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "d4e41afa",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "roe-doe": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2b41f45e",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z",
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "předělat ať je více realistický a přidat další varianty",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "2b4432f5",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "roe-fawn": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4431b20f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "roe-doe-run": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "23ae4b65",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 2,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        },
+        "roe-buck-run": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6e77758b",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:50:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:50:00.000Z"
+        }
+      }
+    },
     "smelter-operator": {
       "preferred": "smelter-operator-male",
       "variants": {
@@ -3098,6 +4343,153 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:06:49.604Z",
           "approvedAt": "2026-11-04T19:06:49.604Z"
+        }
+      }
+    },
+    "wheelbarrow": {
+      "preferred": "wheelbarrow-plank-empty",
+      "variants": {
+        "wheelbarrow-plank-empty": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b29b62f3",
+          "status": "approved",
+          "updatedAt": "2026-11-07T19:05:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-07T19:05:00.000Z"
+        },
+        "wheelbarrow-plank-stone": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bae7ad1d",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 2,
+          "comments": [
+            {
+              "at": "2026-11-07T19:05:00.000Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "at je víc naložený materálem když je plný kolečko, stejně tak vytvoř modely stejného loečka pro naložení materiálem (dřevo, železo ruda, železo bar, ryby, masi, chleba a mix surovin)",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "bae56e86",
+              "status": "revision-requested",
+              "at": "2026-11-07T19:05:00.000Z"
+            }
+          ]
+        },
+        "wheelbarrow-plank-wood": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a89d3dc8",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "wheelbarrow-plank-ore": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "797b8c83",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "wheelbarrow-plank-ironbars": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6f727e61",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "wheelbarrow-plank-fish": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fbff016f",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "wheelbarrow-plank-meat": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "89769396",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "wheelbarrow-plank-bread": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "242178a5",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "wheelbarrow-plank-mixed": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9552b918",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "wheelbarrow-tub-soil": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6ca666ae",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 2
+        },
+        "wheelbarrow-tub-logs": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "856665fa",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 2
+        },
+        "wheelbarrow-handcart-sacks": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7efe1478",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 2
+        },
+        "wheelbarrow-handcart-hay": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "67fed731",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 2
+        },
+        "wheelbarrow-sack-barrow": {
+          "approvedAt": "2026-11-07T20:12:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4b579510",
+          "status": "approved",
+          "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
         }
       }
     },

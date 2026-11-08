@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "assetId": "horse-wagon",
+  "variantId": "horse-wagon-covered",
+  "name": "Covered wagon",
+  "category": "units",
+  "version": 3,
+  "specHash": "24479fef",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 76,
+  "anchor": {
+    "x": 65,
+    "y": 42
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.55263
+  },
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "base": {
+    "x": 97,
+    "y": 74
+  },
+  "baseOrigin": {
+    "x": 0.74046,
+    "y": 0.97368
+  },
+  "visualHeight": 74,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.957,
+  "lights": [],
+  "x2": {
+    "width": 259,
+    "height": 149,
+    "anchor": {
+      "x": 129,
+      "y": 83
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 96,
+    "supersampling": 4,
+    "seconds": 77.2,
+    "renderHash": "6f24ea7f",
+    "script": "scripts/blender/render.py"
+  }
+}

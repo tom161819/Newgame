@@ -1,0 +1,179 @@
+{
+  "schema": 1,
+  "id": "grass-zone-flowers",
+  "name": "Grass zone: Flowering meadow",
+  "category": "terrain",
+  "description": "World v2 grass zone (plan g-svet-textury): Flowering meadow. 4 interchangeable 64×32 tiles per season, seamless with each other; the game blends up to three zones per tile with noise masks.",
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "generator": "ground",
+  "variants": [
+    {
+      "id": "grass-zone-flowers-summer",
+      "name": "Summer",
+      "version": 1,
+      "spec": {
+        "mode": "grass",
+        "base": "#6a9a42",
+        "shades": [
+          "#56843a",
+          "#68943f",
+          "#7aa64c",
+          "#8ab45a"
+        ],
+        "patchiness": 0.5,
+        "blades": {
+          "density": 60,
+          "height": [
+            2,
+            6
+          ],
+          "colours": [
+            "#5d8d38",
+            "#78a648",
+            "meadow_tip"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 9,
+          "colours": [
+            "buttercup",
+            "blossom",
+            "clover",
+            "#e8e4f0",
+            "#9a6ac0"
+          ]
+        },
+        "tiles": 4,
+        "seed": 39
+      }
+    },
+    {
+      "id": "grass-zone-flowers-spring",
+      "name": "Spring",
+      "version": 1,
+      "spec": {
+        "mode": "grass",
+        "base": "#6a9a42",
+        "shades": [
+          "#56843a",
+          "#68943f",
+          "#7aa64c",
+          "#8ab45a"
+        ],
+        "patchiness": 0.5,
+        "blades": {
+          "density": 60,
+          "height": [
+            2,
+            6
+          ],
+          "colours": [
+            "#5d8d38",
+            "#78a648",
+            "meadow_tip",
+            "leaf_spring"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 9,
+          "colours": [
+            "buttercup",
+            "blossom",
+            "clover",
+            "#e8e4f0",
+            "#9a6ac0",
+            "blossom",
+            "leaf_spring"
+          ]
+        },
+        "tiles": 4,
+        "seed": 39
+      }
+    },
+    {
+      "id": "grass-zone-flowers-autumn",
+      "name": "Autumn",
+      "version": 1,
+      "spec": {
+        "mode": "grass",
+        "base": "grass_autumn",
+        "shades": [
+          "#6f7438",
+          "#80833f",
+          "grass_autumn",
+          "grass_dry"
+        ],
+        "patchiness": 0.5,
+        "blades": {
+          "density": 60,
+          "height": [
+            2,
+            6
+          ],
+          "colours": [
+            "#7a7c3c",
+            "#968f4e",
+            "#5f6a32"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 0,
+          "colours": []
+        },
+        "tiles": 4,
+        "seed": 39,
+        "leaves": {
+          "density": 8,
+          "colours": [
+            "leaf_autumn",
+            "leaf_autumn_light",
+            "leaf_autumn_dark"
+          ]
+        }
+      }
+    },
+    {
+      "id": "grass-zone-flowers-winter",
+      "name": "Winter (snow)",
+      "version": 1,
+      "spec": {
+        "mode": "grass",
+        "base": "grass_frost",
+        "shades": [
+          "#6c7a5e",
+          "#7c8a6a",
+          "grass_frost",
+          "#9aa48a"
+        ],
+        "patchiness": 0.5,
+        "blades": {
+          "density": 36,
+          "height": [
+            2,
+            6
+          ],
+          "colours": [
+            "#738064",
+            "#8e9a7e"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 0,
+          "colours": []
+        },
+        "tiles": 4,
+        "seed": 39,
+        "snow": {
+          "coverage": 0.85
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "id": "bear",
+  "name": "Brown Bear",
+  "category": "units",
+  "description": "Brown bear, revision 2 (more realistic, more variant): massive, shoulder hump, thick legs with big paws, lighter muzzle and round ears; brown, dark, grizzled and a cub; attack.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "animal",
+  "plannedGameObjectId": "bear",
+  "variants": [
+    {
+      "id": "bear-brown-sculpt",
+      "name": "Brown bear – A · Sculpted (smooth, realistic)",
+      "version": 3,
+      "notes": "Heavier build with a natural belly, lowered head and bared teeth (review 8 Nov). Rendered with Blender (Cycles) at 4×.",
+      "spec": {
+        "species": "bear",
+        "breed": "brown",
+        "facing": 1,
+        "skin": true
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "9de1cda1",
+        "samples": 96
+      }
+    }
+  ]
+}

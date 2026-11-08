@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "child",
+  "variantId": "child-boy-tunic-throw",
+  "name": "Boy throwing a snowball",
+  "category": "units",
+  "version": 1,
+  "specHash": "c7814fb7",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 59,
+  "anchor": {
+    "x": 33,
+    "y": 41
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.69492
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 57
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.9661
+  },
+  "visualHeight": 57,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.895,
+  "lights": []
+}

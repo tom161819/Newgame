@@ -122,6 +122,10 @@
     "horse_dark": "#3e2c22",
     "horse_grey": "#a49c90",
     "horse_chestnut": "#94552c",
+    "antler": "#b8a27e",
+    "bone": "#e6dcc4",
+    "fish": "#98aab3",
+    "meat_raw": "#b4554a",
     "steel": "#9aa1a6",
     "steel_dark": "#5f666b",
     "gold_trim": "#c4a24a",
@@ -480,6 +484,55 @@
       "repeat": 1,
       "variation": 0.06,
       "description": "Chestnut horse coat."
+    },
+    "antler": {
+      "color": "antler",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.08,
+      "description": "Deer antler."
+    },
+    "bread": {
+      "color": "bread",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.06,
+      "description": "Bread crumb, loaves."
+    },
+    "bread_crust": {
+      "color": "bread_crust",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.06,
+      "description": "Baked crust."
+    },
+    "meat": {
+      "color": "meat",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.06,
+      "description": "Smoked meat, hams."
+    },
+    "meat_raw": {
+      "color": "meat_raw",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.06,
+      "description": "Raw meat."
+    },
+    "fish": {
+      "color": "fish",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.06,
+      "description": "Fresh fish scales."
+    },
+    "bone": {
+      "color": "bone",
+      "texture": "noise",
+      "repeat": 1,
+      "variation": 0.04,
+      "description": "Tusks and bone."
     },
     "steel": {
       "color": "steel",

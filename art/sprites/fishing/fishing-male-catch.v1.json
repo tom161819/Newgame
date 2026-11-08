@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "fishing",
+  "variantId": "fishing-male-catch",
+  "name": "Fisher (man) pulling out a fish",
+  "category": "units",
+  "version": 1,
+  "specHash": "98fe9206",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 90,
+  "anchor": {
+    "x": 65,
+    "y": 56
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.62222
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 88
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97778
+  },
+  "visualHeight": 88,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.815,
+  "lights": []
+}

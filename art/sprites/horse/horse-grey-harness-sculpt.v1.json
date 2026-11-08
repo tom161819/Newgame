@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "assetId": "horse",
+  "variantId": "horse-grey-harness-sculpt",
+  "name": "Grey horse in harness – A · Sculpted (approved style)",
+  "category": "units",
+  "version": 1,
+  "specHash": "3b57e025",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 73,
+  "anchor": {
+    "x": 65,
+    "y": 39
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.53425
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 71
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.9726
+  },
+  "visualHeight": 71,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.957,
+  "lights": [],
+  "x2": {
+    "width": 259,
+    "height": 144,
+    "anchor": {
+      "x": 129,
+      "y": 78
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 96,
+    "supersampling": 4,
+    "seconds": 59.9,
+    "renderHash": "0af722b2",
+    "script": "scripts/blender/render.py"
+  }
+}

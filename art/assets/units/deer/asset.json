@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "id": "deer",
+  "name": "Red Deer",
+  "category": "units",
+  "description": "Wild red deer, revision 2 (more realistic, more variants): slim legs, long neck; stag with branching antlers and a dark throat mane, young pricket stag, hind and a spotted calf; walk and run in 8 directions.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "animal",
+  "plannedGameObjectId": "deer",
+  "variants": [
+    {
+      "id": "deer-stag",
+      "name": "Stag",
+      "version": 2,
+      "spec": {
+        "species": "deer",
+        "breed": "stag",
+        "facing": 1
+      }
+    },
+    {
+      "id": "deer-pricket",
+      "name": "Young stag (pricket)",
+      "version": 1,
+      "spec": {
+        "species": "deer",
+        "breed": "pricket",
+        "facing": 1
+      }
+    },
+    {
+      "id": "deer-hind",
+      "name": "Hind",
+      "version": 2,
+      "spec": {
+        "species": "deer",
+        "breed": "hind",
+        "facing": 1
+      }
+    },
+    {
+      "id": "deer-calf",
+      "name": "Spotted calf",
+      "version": 1,
+      "spec": {
+        "species": "deer",
+        "breed": "calf",
+        "facing": 1
+      }
+    },
+    {
+      "id": "deer-stag-run",
+      "name": "Stag running",
+      "version": 2,
+      "spec": {
+        "species": "deer",
+        "breed": "stag",
+        "pose": "run",
+        "facing": 2
+      }
+    },
+    {
+      "id": "deer-hind-run",
+      "name": "Hind running",
+      "version": 1,
+      "spec": {
+        "species": "deer",
+        "breed": "hind",
+        "pose": "run",
+        "facing": 2
+      }
+    }
+  ]
+}

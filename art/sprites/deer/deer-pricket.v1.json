@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "deer",
+  "variantId": "deer-pricket",
+  "name": "Young stag (pricket)",
+  "category": "units",
+  "version": 1,
+  "specHash": "79ff7971",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 50,
+  "anchor": {
+    "x": 33,
+    "y": 32
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.64
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 48
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.96
+  },
+  "visualHeight": 48,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.922,
+  "lights": []
+}

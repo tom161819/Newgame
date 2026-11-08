@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "reeds",
+  "variantId": "reeds-clump",
+  "name": "Reed clump",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "66f27d1f",
+  "generator": "workshop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 47,
+  "anchor": {
+    "x": 33,
+    "y": 29
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.61702
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 45
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.95745
+  },
+  "visualHeight": 45,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.628,
+  "lights": []
+}

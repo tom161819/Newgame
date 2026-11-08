@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "id": "grass-zone-dry",
+  "name": "Grass zone: Dry grass",
+  "category": "terrain",
+  "description": "World v2 grass zone (plan g-svet-textury): Dry grass (towards the desert). 4 interchangeable 64×32 tiles per season, seamless with each other; the game blends up to three zones per tile with noise masks.",
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "generator": "ground",
+  "variants": [
+    {
+      "id": "grass-zone-dry-summer",
+      "name": "Summer",
+      "version": 1,
+      "spec": {
+        "mode": "grass",
+        "base": "grass_dry",
+        "shades": [
+          "#8a8848",
+          "#9c9850",
+          "grass_dry",
+          "#b8ad6a"
+        ],
+        "patchiness": 0.65,
+        "blades": {
+          "density": 52,
+          "height": [
+            3,
+            7
+          ],
+          "colours": [
+            "#9a9550",
+            "#b0a660",
+            "#82803f"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 0.8,
+          "colours": [
+            "sand_dark",
+            "#c4b47a"
+          ]
+        },
+        "tiles": 4,
+        "seed": 35
+      }
+    },
+    {
+      "id": "grass-zone-dry-spring",
+      "name": "Spring",
+      "version": 1,
+      "spec": {
+        "mode": "grass",
+        "base": "grass_dry",
+        "shades": [
+          "#8a8848",
+          "#9c9850",
+          "grass_dry",
+          "#b8ad6a"
+        ],
+        "patchiness": 0.65,
+        "blades": {
+          "density": 52,
+          "height": [
+            3,
+            7
+          ],
+          "colours": [
+            "#9a9550",
+            "#b0a660",
+            "#82803f",
+            "leaf_spring"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 2,
+          "colours": [
+            "sand_dark",
+            "#c4b47a",
+            "blossom",
+            "leaf_spring"
+          ]
+        },
+        "tiles": 4,
+        "seed": 35
+      }
+    },
+    {
+      "id": "grass-zone-dry-autumn",
+      "name": "Autumn",
+      "version": 1,
+      "spec": {
+        "mode": "grass",
+        "base": "grass_autumn",
+        "shades": [
+          "#8a7c44",
+          "#9a8a4a",
+          "grass_dry",
+          "#b0a060"
+        ],
+        "patchiness": 0.65,
+        "blades": {
+          "density": 52,
+          "height": [
+            3,
+            7
+          ],
+          "colours": [
+            "#7a7c3c",
+            "#968f4e",
+            "#5f6a32"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 0,
+          "colours": []
+        },
+        "tiles": 4,
+        "seed": 35,
+        "leaves": {
+          "density": 8,
+          "colours": [
+            "leaf_autumn",
+            "leaf_autumn_light",
+            "leaf_autumn_dark"
+          ]
+        }
+      }
+    },
+    {
+      "id": "grass-zone-dry-winter",
+      "name": "Winter (snow)",
+      "version": 1,
+      "spec": {
+        "mode": "grass",
+        "base": "grass_frost",
+        "shades": [
+          "#6c7a5e",
+          "#7c8a6a",
+          "grass_frost",
+          "#9aa48a"
+        ],
+        "patchiness": 0.65,
+        "blades": {
+          "density": 31,
+          "height": [
+            3,
+            7
+          ],
+          "colours": [
+            "#738064",
+            "#8e9a7e"
+          ],
+          "tufts": 3
+        },
+        "flowers": {
+          "density": 0,
+          "colours": []
+        },
+        "tiles": 4,
+        "seed": 35,
+        "snow": {
+          "coverage": 0.85
+        }
+      }
+    }
+  ]
+}

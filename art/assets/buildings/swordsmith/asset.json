@@ -20,7 +20,7 @@
           "kind": "house",
           "walls": "stone",
           "roofMaterial": "roof_tile",
-          "width": 1.0,
+          "width": 1,
           "depth": 0.9,
           "wallHeight": 0.9,
           "roofHeight": 0.7,
@@ -64,130 +64,6 @@
         ]
       },
       "notes": "Recommended direction."
-    },
-    {
-      "id": "swordsmith-lean-to",
-      "name": "Timber smithy with lean-to forge",
-      "version": 1,
-      "spec": {
-        "body": {
-          "kind": "house",
-          "walls": "timber",
-          "roofMaterial": "roof_shingle",
-          "width": 1.0,
-          "depth": 0.9,
-          "wallHeight": 0.9,
-          "roofHeight": 0.7,
-          "ridge": "z",
-          "windows": 1,
-          "at": [
-            -0.35,
-            -0.35
-          ]
-        },
-        "props": [
-          {
-            "type": "awning",
-            "at": [
-              0.45,
-              0.42
-            ],
-            "width": 0.7,
-            "depth": 0.55,
-            "height": 0.95
-          },
-          {
-            "type": "forge",
-            "at": [
-              0.45,
-              0.35
-            ]
-          },
-          {
-            "type": "anvil",
-            "at": [
-              -0.05,
-              0.75
-            ]
-          },
-          {
-            "type": "swordRack",
-            "at": [
-              0.75,
-              -0.4
-            ],
-            "r": 1.5707963267948966
-          },
-          {
-            "type": "charcoal",
-            "at": [
-              -0.7,
-              0.65
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "id": "swordsmith-yard",
-      "name": "Forge yard with weapon crates",
-      "version": 1,
-      "spec": {
-        "body": {
-          "kind": "house",
-          "walls": "wood",
-          "roofMaterial": "roof_shingle",
-          "width": 0.9,
-          "depth": 0.9,
-          "wallHeight": 0.9,
-          "roofHeight": 0.7,
-          "ridge": "x",
-          "windows": 1,
-          "at": [
-            -0.35,
-            -0.4
-          ]
-        },
-        "props": [
-          {
-            "type": "forge",
-            "at": [
-              0.45,
-              -0.35
-            ]
-          },
-          {
-            "type": "anvil",
-            "at": [
-              0.55,
-              0.25
-            ]
-          },
-          {
-            "type": "quench",
-            "at": [
-              0.2,
-              0.7
-            ]
-          },
-          {
-            "type": "weaponCrate",
-            "at": [
-              -0.55,
-              0.65
-            ]
-          },
-          {
-            "type": "swordRack",
-            "at": [
-              0.75,
-              0.7
-            ],
-            "r": 1.5707963267948966,
-            "count": 3
-          }
-        ]
-      }
     }
   ]
 }

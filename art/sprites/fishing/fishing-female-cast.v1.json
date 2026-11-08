@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "fishing",
+  "variantId": "fishing-female-cast",
+  "name": "Fisher (woman) casting",
+  "category": "units",
+  "version": 1,
+  "specHash": "0efa36be",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 109,
+  "anchor": {
+    "x": 65,
+    "y": 75
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.68807
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 107
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98165
+  },
+  "visualHeight": 107,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.732,
+  "lights": []
+}

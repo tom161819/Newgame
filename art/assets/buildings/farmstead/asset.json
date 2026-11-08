@@ -145,62 +145,6 @@
         ]
       },
       "notes": "Revision 2 (owner: improve the look, may be 3x3, more farming tools, sacks, hay ricks): a bigger thatched farmhouse on a 3x3 plot with haycocks and a hay stack, a rack with pitchfork, scythe, rake and flail, a plough, a cart, grain sacks and barrels, a hen house with hens, a trough and a fenced yard with a gap for the gate. The game's farmhouse is 2x2 today: using this needs the footprint changed to 3x3."
-    },
-    {
-      "id": "farmstead-stone",
-      "name": "Stone farmhouse with cart",
-      "version": 1,
-      "spec": {
-        "body": {
-          "kind": "house",
-          "walls": "stone",
-          "roofMaterial": "roof_tile",
-          "width": 1.1,
-          "depth": 1.0,
-          "wallHeight": 0.9,
-          "roofHeight": 0.7,
-          "ridge": "z",
-          "windows": 2,
-          "chimney": true,
-          "at": [
-            -0.22,
-            -0.25
-          ]
-        },
-        "props": [
-          {
-            "type": "cart",
-            "at": [
-              0.45,
-              0.5
-            ]
-          },
-          {
-            "type": "sacks",
-            "at": [
-              0.55,
-              0.62
-            ],
-            "count": 2,
-            "y": 0
-          },
-          {
-            "type": "wheel",
-            "at": [
-              0.6,
-              -0.5
-            ]
-          },
-          {
-            "type": "hay",
-            "at": [
-              -0.6,
-              0.68
-            ],
-            "r": 0.4
-          }
-        ]
-      }
     }
   ]
 }

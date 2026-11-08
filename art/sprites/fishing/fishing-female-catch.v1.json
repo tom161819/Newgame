@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "fishing",
+  "variantId": "fishing-female-catch",
+  "name": "Fisher (woman) pulling out a fish",
+  "category": "units",
+  "version": 1,
+  "specHash": "bd1dd378",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 86,
+  "anchor": {
+    "x": 65,
+    "y": 52
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.60465
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 84
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97674
+  },
+  "visualHeight": 84,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.685,
+  "lights": []
+}

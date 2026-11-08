@@ -4,7 +4,10 @@
   "name": "Watchtower",
   "category": "buildings",
   "description": "A 2 × 2 guard tower that the king can climb. Candidate replacement for the procedural Stone Tower.",
-  "footprint": { "width": 2, "height": 2 },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
   "generator": "watchtower",
   "gameObjectId": "tower",
   "variants": [
@@ -24,51 +27,13 @@
         "roof": "none",
         "slits": 2,
         "banner": false,
-        "torches": [{ "face": "left", "offset": 0.42, "height": 1.25 }]
-      }
-    },
-    {
-      "id": "watchtower-round",
-      "name": "Round tower with cone roof",
-      "version": 1,
-      "notes": "Round shaft and a shingle cone; reads well against square buildings.",
-      "spec": {
-        "body": "round",
-        "width": 1.56,
-        "height": 3.5,
-        "taper": 0.9,
-        "material": "stone_light",
-        "plinth": "stone_dark",
-        "top": "crenellated",
-        "roof": "cone",
-        "roofMaterial": "roof_shingle",
-        "roofHeight": 1.25,
-        "slits": 3,
-        "banner": true,
-        "torches": [{ "face": "left", "offset": 0.0, "height": 1.3 }, { "face": "right", "offset": 0.0, "height": 1.3 }]
-      }
-    },
-    {
-      "id": "watchtower-timber",
-      "name": "Stone base with timber hoarding",
-      "version": 1,
-      "notes": "Cheaper frontier look: stone lower half, overhanging wooden gallery and a pyramid roof.",
-      "spec": {
-        "body": "square",
-        "width": 1.5,
-        "height": 2.35,
-        "taper": 1.0,
-        "material": "stone",
-        "plinth": "stone_dark",
-        "top": "hoarding",
-        "hoardingHeight": 1.05,
-        "hoardingMaterial": "wood",
-        "roof": "pyramid",
-        "roofMaterial": "roof_shingle",
-        "roofHeight": 1.0,
-        "slits": 1,
-        "banner": false,
-        "torches": [{ "face": "left", "offset": -0.3, "height": 1.15 }]
+        "torches": [
+          {
+            "face": "left",
+            "offset": 0.42,
+            "height": 1.25
+          }
+        ]
       }
     }
   ]

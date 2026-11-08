@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "id": "fox",
+  "name": "Fox",
+  "category": "units",
+  "description": "Fox, revision 2 (more realistic, more variants): slim body, black stockings and ears, white chest and tail tip, big brush; red, pale and dark cross fox; sitting and running.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "animal",
+  "plannedGameObjectId": "fox",
+  "variants": [
+    {
+      "id": "fox-red",
+      "name": "Red fox",
+      "version": 2,
+      "spec": {
+        "species": "fox",
+        "breed": "red",
+        "facing": 1
+      }
+    },
+    {
+      "id": "fox-pale",
+      "name": "Pale fox",
+      "version": 1,
+      "spec": {
+        "species": "fox",
+        "breed": "pale",
+        "facing": 1
+      }
+    },
+    {
+      "id": "fox-cross",
+      "name": "Cross fox (dark)",
+      "version": 1,
+      "spec": {
+        "species": "fox",
+        "breed": "cross",
+        "facing": 1
+      }
+    },
+    {
+      "id": "fox-red-sit",
+      "name": "Fox sitting",
+      "version": 2,
+      "spec": {
+        "species": "fox",
+        "breed": "red",
+        "pose": "sit",
+        "facing": 1
+      }
+    },
+    {
+      "id": "fox-red-run",
+      "name": "Fox running",
+      "version": 2,
+      "spec": {
+        "species": "fox",
+        "breed": "red",
+        "pose": "run",
+        "facing": 2
+      }
+    }
+  ]
+}

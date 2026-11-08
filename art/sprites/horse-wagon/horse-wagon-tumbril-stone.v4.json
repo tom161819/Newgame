@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "assetId": "horse-wagon",
+  "variantId": "horse-wagon-tumbril-stone",
+  "name": "Tumbril with stone",
+  "category": "units",
+  "version": 4,
+  "specHash": "890ae875",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 68,
+  "anchor": {
+    "x": 65,
+    "y": 34
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.5
+  },
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "base": {
+    "x": 97,
+    "y": 66
+  },
+  "baseOrigin": {
+    "x": 0.74046,
+    "y": 0.97059
+  },
+  "visualHeight": 66,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.653,
+  "lights": [],
+  "x2": {
+    "width": 259,
+    "height": 132,
+    "anchor": {
+      "x": 129,
+      "y": 66
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 96,
+    "supersampling": 4,
+    "seconds": 60.8,
+    "renderHash": "d21c967b",
+    "script": "scripts/blender/render.py"
+  }
+}

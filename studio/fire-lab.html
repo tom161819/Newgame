@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Asset Studio · Fire Lab</title>
+    <meta name="claude:viewport-fit-sides" content="cover" />
+    <link rel="icon" href="data:," />
+    <meta name="description" content="Set a building on fire and tune flames, smoke, embers and glow for the game's fire effect." />
+  </head>
+  <body class="world-lab-page fire-lab-page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><strong>Fire Lab</strong><span class="brand-sub">Burning buildings, torches and fires · flames, smoke, embers, glow</span></div></div>
+      <nav class="views" aria-label="Studio views"><a href="./index.html#assets">Assets</a><a href="./index.html#style-guide">Style guide</a><a href="./buildings.html">Buildings in game</a><a href="./ui-lab.html">UI Lab</a><a href="./world-lab.html">World Lab</a><a href="./fire-lab.html" aria-current="page">Fire Lab</a><a href="./phaser-demo.html">Phaser demo</a><a href="./path-lab.html">Path Lab</a></nav>
+      <div class="review-status"><span id="fl-summary" class="review-summary" aria-live="polite"></span></div>
+    </header>
+    <p id="studio-alert" class="studio-alert" role="alert" hidden></p>
+    <div class="wl-shell">
+      <aside class="wl-controls" aria-label="Fire settings">
+        <section>
+          <h3>What burns</h3>
+          <div id="fl-kind" class="wl-presets"></div>
+        </section>
+        <section>
+          <h3>Object</h3>
+          <select id="fl-building" aria-label="Building"></select>
+          <div class="wl-row"><button type="button" class="button primary" id="fl-ignite">Ignite</button><button type="button" class="button" id="fl-douse">Put out</button><button type="button" class="button" id="fl-reset">Reset</button></div>
+          <p class="wl-hint">Click the building to add a fire spot, Shift-click to remove the nearest one. Without spots the fire picks points along the roof.</p>
+        </section>
+        <section>
+          <h3>Presets</h3>
+          <div id="fl-presets" class="wl-presets"></div>
+        </section>
+        <section>
+          <h3>Parameters <button type="button" class="link" id="fl-defaults">Defaults</button></h3>
+          <div id="fl-params" class="fl-params"></div>
+        </section>
+        <section>
+          <h3>Scene</h3>
+          <div id="fl-scene" class="wl-presets"></div>
+        </section>
+        <section>
+          <h3>Saved settings</h3>
+          <div class="wl-row"><input type="text" id="fl-name" placeholder="Name" aria-label="Name of the setting" /><button type="button" class="button" id="fl-save" data-needs-write>Save</button></div>
+          <ul id="fl-saved" class="wl-favourites"></ul>
+          <button type="button" class="button primary" id="fl-propose" data-needs-write>Propose for the game</button>
+          <p class="wl-hint">Claude takes the proposal over on „revize“ and builds the game's fire effect from it.</p>
+          <button type="button" class="button" id="fl-copy">Copy parameters</button>
+        </section>
+      </aside>
+      <main class="wl-main fl-main" aria-label="Fire preview">
+        <canvas id="fl-canvas" aria-label="Burning building preview"></canvas>
+      </main>
+    </div>
+  </body>
+  <script type="module" src="./src/fire-lab/main.js"></script>
+</html>

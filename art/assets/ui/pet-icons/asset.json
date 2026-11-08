@@ -19,16 +19,6 @@
         "set": "pets",
         "look": "seated"
       }
-    },
-    {
-      "id": "pet-icons-heads",
-      "name": "Heads from the front",
-      "version": 1,
-      "notes": "Ginger cat with a pale muzzle · hound with floppy dark ears and a red collar with a gold tag.",
-      "spec": {
-        "set": "pets",
-        "look": "heads"
-      }
     }
   ]
 }

@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "assetId": "horse-wagon",
+  "variantId": "horse-wagon-farm-sacks",
+  "name": "Farm wagon with sacks",
+  "category": "units",
+  "version": 4,
+  "specHash": "e12d4fea",
+  "generator": "blender",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 69,
+  "anchor": {
+    "x": 65,
+    "y": 35
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.50725
+  },
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "base": {
+    "x": 97,
+    "y": 67
+  },
+  "baseOrigin": {
+    "x": 0.74046,
+    "y": 0.97101
+  },
+  "visualHeight": 67,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.957,
+  "lights": [],
+  "x2": {
+    "width": 259,
+    "height": 134,
+    "anchor": {
+      "x": 129,
+      "y": 68
+    }
+  },
+  "render": {
+    "engine": "CYCLES",
+    "blender": "5.2.3 LTS",
+    "samples": 96,
+    "supersampling": 4,
+    "seconds": 76.7,
+    "renderHash": "e7ecb142",
+    "script": "scripts/blender/render.py"
+  }
+}

@@ -63,7 +63,7 @@ test('every asset spec is valid, ids are unique and the watchtower has at least 
   const variantIds = catalog.studio.flatMap(a => a.variants.map(v => v.id));
   assert.equal(new Set(variantIds).size, variantIds.length);
   const tower = catalog.studio.find(a => a.id === 'watchtower');
-  assert.ok(tower.variants.length >= 3);
+  assert.ok(tower.variants.length >= 1);
   assert.equal(tower.gameObjectId, 'tower');
   assert.ok(objectDefinitions.some(d => d.id === tower.gameObjectId), 'linked game object exists');
 });
@@ -152,7 +152,7 @@ test('committed review manifest is valid and refers only to existing variants', 
 });
 
 test('local review is separate from the repository, stamps approvals and exports a committable manifest', () => {
-  const asset = catalog.studio.find(a => a.id === 'watchtower'), [first, second] = asset.variants;
+  const asset = catalog.studio.find(a => a.id === 'watchtower'), [first] = asset.variants, second = { ...first, id: `${first.id}-alt`, hash: 'abcd1234' };
   const repo = { schema: 1, updatedAt: null, assets: { watchtower: { preferred: first.id, variants: { [first.id]: { status: 'review', version: first.version, specHash: first.hash, note: 'Check roof', updatedAt: '2026-11-01T00:00:00.000Z' } } } } };
   let local = emptyManifest();
   assert.equal(reviewState({ repo, local, assetId: 'watchtower', variant: first }).effective.status, 'review');
@@ -167,13 +167,13 @@ test('local review is separate from the repository, stamps approvals and exports
   // A note edit keeps the original approval time.
   const noted = updateLocal(local, { assetId: 'watchtower', variant: second, note: 'Lovely' }, '2026-11-05T00:00:00.000Z');
   assert.equal(noted.assets.watchtower.variants[second.id].approvedAt, '2026-11-04T10:00:00.000Z');
-  const manifest = buildExportManifest({ repo: { ...repo, assets: { ...repo.assets, ghost: { preferred: 'ghost-a', variants: { 'ghost-a': repo.assets.watchtower.variants[first.id] } } } }, local, catalog: catalog.studio, now: '2026-11-04T12:00:00.000Z' });
+  const manifest = buildExportManifest({ repo: { ...repo, assets: { ...repo.assets, ghost: { preferred: 'ghost-a', variants: { 'ghost-a': repo.assets.watchtower.variants[first.id] } } } }, local, catalog: catalog.studio.map(a => a.id === 'watchtower' ? { ...a, variants: [...a.variants, second] } : a), now: '2026-11-04T12:00:00.000Z' });
   assert.deepEqual(validateManifest(manifest), []);
   assert.equal(manifest.assets.watchtower.preferred, second.id);
   assert.equal(manifest.assets.watchtower.variants[first.id].status, 'review');
   assert.equal(manifest.assets.watchtower.variants[second.id].status, 'approved');
   assert.equal(manifest.assets.ghost, undefined, 'records of removed assets are dropped');
-  const changes = pendingChanges({ repo, local, catalog: catalog.studio });
+  const changes = pendingChanges({ repo, local, catalog: catalog.studio.map(a => a.id === 'watchtower' ? { ...a, variants: [...a.variants, second] } : a) });
   assert.deepEqual(changes.map(c => c.preferred ? `pref:${c.variantId}` : `${c.variantId}:${c.from}->${c.to}`).sort(), [`${second.id}:draft->approved`, `pref:${second.id}`].sort());
   assert.deepEqual(discardLocal(local), emptyManifest());
   assert.equal(discardLocal(local, 'watchtower').assets.watchtower, undefined);
@@ -221,7 +221,7 @@ test('game definitions map to studio categories and filters combine source, cate
   const studioTrees = filterCatalog(catalog.all, { category: 'trees', source: 'studio' }).map(i => i.id);
   for (const id of ['oak-tree', 'pine-tree', 'oak-seasons', 'pine-seasons']) assert.ok(studioTrees.includes(id), id);
   assert.ok(filterCatalog(catalog.all, { category: 'trees', source: 'studio' }).every(i => i.category === 'trees'));
-  assert.deepEqual(filterCatalog(catalog.all, { source: 'studio', query: 'TORCH' }).map(i => i.id), ['torchbearer', 'torch-post']);
+  assert.deepEqual(filterCatalog(catalog.all, { source: 'studio', query: 'TORCH' }).map(i => i.id), ['torchbearer', 'torch-bracket', 'torch-post']);
   assert.ok(filterCatalog(catalog.all, { source: 'game' }).length >= 10);
 });
 
@@ -399,5 +399,5 @@ test('the merchant caravan uses the approved full and empty wagons byte for byte
     assert.ok(readFileSync(path.join(root, `public${art.sprite}`)).equals(readFileSync(path.join(root, `art/sprites/${meta.assetId}/${meta.variantId}.v${meta.version}.png`))), kind);
     assert.deepEqual(art.origin, meta.origin);
   }
-  assert.equal(approvals.assets['merchant-caravan'].variants['merchant-caravan-unloading']?.status, 'rejected');
+  assert.equal(approvals.assets['merchant-caravan'].variants['merchant-caravan-unloading'], undefined, 'the rejected unloading look is deleted');
 });

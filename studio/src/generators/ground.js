@@ -12,7 +12,7 @@
 import { TILE_W, TILE_H, WEAR_STAGES, pixelToTile, tileToPixel, edgeDistance, smoothstep, hexToRgb, mixRgb, resolveColour, periodicFbm, periodicNoise, tileRandom, validateSurfaceSpec } from '../lib/surface.js';
 
 export const params = [
-  { key: 'mode', values: ['grass', 'path'], description: 'Grass tiles, or the three trampled stages of a path over that grass.' },
+  { key: 'mode', values: ['grass', 'path', 'transition'], description: 'Grass tiles, the three trampled stages of a path, or 16 marching-squares transition tiles between two grounds.' },
   { key: 'base', description: 'Main grass colour (#rrggbb or palette name).' },
   { key: 'shades', description: 'Colours the patchy noise blends between, dark to light.' },
   { key: 'patchiness', description: 'Contrast of the large colour patches, 0–1.' },
@@ -27,6 +27,9 @@ export const params = [
   { key: 'preview', description: 'Path mode: wear levels along the preview strip (0–3), e.g. a path that fades back into grass.' },
   { key: 'snow', description: '{ coverage 0–1, colour, shade }: snow drifts that tile seamlessly; blades mostly hidden.' },
   { key: 'leaves', description: '{ density, colours }: fallen leaves per tile (autumn).' },
+  { key: 'outer', description: 'Transition mode: the ground outside the shape (e.g. water), a grass spec.' },
+  { key: 'inner', description: 'Transition mode: the ground inside (e.g. grass), a grass spec.' },
+  { key: 'edge', description: 'Transition mode: { colour, width } band along the boundary (foam, wet rim).' },
   { key: 'seed', description: 'Integer seed; change it for a different but equivalent layout.' },
 ];
 
@@ -145,8 +148,43 @@ export function drawConnection(ctx, centre, [dx, dy], stage, s) {
   ctx.restore();
 }
 
+// ---------- round shores (g-svet-kulate-brehy) ----------
+// Marching squares: 16 tiles per pair of grounds. Tile index = corner bits (1 = inner ground at that corner):
+// bit 0 the top corner (u=0, v=0), bit 1 the right corner (u=1, v=0), bit 2 the bottom (u=1, v=1), bit 3 the left
+// (u=0, v=1). The boundary is the 0.5 contour of the bilinear corner field, bent into a curve and roughened by
+// periodic noise that matches across neighbouring tiles; an optional edge band (foam, wet sand) follows it.
+export const TRANSITION_CASES = 16;
+function cornerField(index, u, v) {
+  const c = k => (index >> k) & 1, a = c(0), b = c(1), d = c(2), e = c(3);
+  const f = a * (1 - u) * (1 - v) + b * u * (1 - v) + d * u * v + e * (1 - u) * v;
+  return 0.5 + (f - 0.5) * (1 + 0.6 * Math.abs(f - 0.5) * 2); // steeper near the corners: rounder curves
+}
+function paintTransition(s, spec, style, index, variant) {
+  const seed = spec.seed ?? 1, outer = paintTile(s, { ...spec.outer, mode: 'grass' }, style, variant, spec.outer.seed ?? seed), inner = paintTile(s, { ...spec.inner, mode: 'grass' }, style, variant, spec.inner.seed ?? seed + 1);
+  const canvas = tileCanvas(s), ctx = canvas.getContext('2d', { willReadFrequently: true }), w = canvas.width, h = canvas.height;
+  const A = outer.getContext('2d').getImageData(0, 0, w, h).data, B = inner.getContext('2d').getImageData(0, 0, w, h).data, out = ctx.createImageData(w, h), o = out.data;
+  const edge = spec.edge ? rgb(style, spec.edge.colour) : null, ew = spec.edge?.width ?? 0.05, soft = spec.softness ?? 0.035, rough = spec.roughness ?? 0.12;
+  for (let py = 0; py < h; py++) for (let px = 0; px < w; px++) {
+    const { u, v } = pixelToTile((px + 0.5) / s, (py + 0.5) / s), i = (py * w + px) * 4;
+    const f = cornerField(index, Math.min(1, Math.max(0, u)), Math.min(1, Math.max(0, v))) + (periodicFbm(seed + 71, u, v, 3, 3) - 0.5) * rough;
+    const m = smoothstep(0.5 - soft, 0.5 + soft, f);
+    for (let k = 0; k < 4; k++) o[i + k] = A[i + k] * (1 - m) + B[i + k] * m;
+    if (edge) { // a band on the outer side of the boundary (foam on water, a wet rim), broken by noise
+      const band = Math.max(0, 1 - Math.abs(f - 0.5 + ew * 0.6) / ew) * smoothstep(0.35, 0.6, periodicFbm(seed + 89, u, v, 2, 6));
+      for (let k = 0; k < 3; k++) o[i + k] = o[i + k] * (1 - band * 0.8) + edge[k] * band * 0.8;
+    }
+  }
+  ctx.putImageData(out, 0, 0);
+  return canvas;
+}
+const cornerAt = (spec, footprint, cx, cy) => { // preview: an inner pond / island of the outer ground
+  const w = footprint.width, h = footprint.height, dx = (cx - w / 2) / (w / 2 - 0.6), dy = (cy - h / 2) / (h / 2 - 0.6);
+  return Math.hypot(dx * 1.1, dy) + 0.18 * Math.sin(cx * 1.7 + cy * 0.9) < 0.85 ? 1 : 0;
+};
+
 // Tile canvases (index = sheet frame) for a variant spec.
 export function paintTiles(spec, { style, scale = 1 }) {
+  if (spec.mode === 'transition') return Array.from({ length: TRANSITION_CASES }, (_, i) => paintTransition(scale, spec, style, i, 0));
   const grass = spec.mode === 'grass' ? spec : spec.ground, seed = spec.seed ?? 1;
   if (spec.mode === 'grass') return Array.from({ length: grass.tiles ?? 4 }, (_, i) => paintTile(scale, grass, style, i, seed));
   const stages = resolveStages(spec, style);
@@ -156,6 +194,7 @@ export const resolveStages = (spec, style) => spec.stages.map(stage => ({ ...sta
 
 // Which sheet frame sits on grid tile (gx, gy) of the preview patch.
 export function previewFrame(spec, footprint, gx, gy) {
+  if (spec.mode === 'transition') { const c = (x, y) => cornerAt(spec, footprint, x, y); return { frame: c(gx, gy) | c(gx + 1, gy) << 1 | c(gx + 1, gy + 1) << 2 | c(gx, gy + 1) << 3, level: 0 }; }
   if (spec.mode === 'grass') return { frame: Math.floor(periodicNoise(spec.seed ?? 1, 64, (gx + 0.5) / 64, (gy + 0.5) / 64) * (spec.tiles ?? 4)) % (spec.tiles ?? 4), level: 0 };
   const row = Math.floor(footprint.height / 2), ramp = spec.preview ?? [1, 2, 3, 3, 2, 1];
   const level = gy === row ? ramp[gx % ramp.length] ?? 0 : 0;

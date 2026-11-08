@@ -12,66 +12,6 @@
   "plannedGameObjectId": "armorer",
   "variants": [
     {
-      "id": "armorer-timber",
-      "name": "Timber armorer",
-      "version": 1,
-      "spec": {
-        "body": {
-          "kind": "house",
-          "walls": "timber",
-          "roofMaterial": "roof_shingle",
-          "width": 1.0,
-          "depth": 0.9,
-          "wallHeight": 0.9,
-          "roofHeight": 0.7,
-          "ridge": "x",
-          "windows": 1,
-          "at": [
-            -0.3,
-            -0.35
-          ]
-        },
-        "props": [
-          {
-            "type": "armorStand",
-            "at": [
-              0.45,
-              0.4
-            ]
-          },
-          {
-            "type": "armorStand",
-            "at": [
-              0.75,
-              -0.1
-            ]
-          },
-          {
-            "type": "plates",
-            "at": [
-              -0.55,
-              0.62
-            ]
-          },
-          {
-            "type": "workbench",
-            "at": [
-              0.05,
-              0.75
-            ]
-          },
-          {
-            "type": "anvil",
-            "at": [
-              0.6,
-              0.75
-            ]
-          }
-        ]
-      },
-      "notes": "Recommended direction."
-    },
-    {
       "id": "armorer-forge",
       "name": "Stone armorer with forge",
       "version": 1,
@@ -80,7 +20,7 @@
           "kind": "house",
           "walls": "stone",
           "roofMaterial": "roof_tile",
-          "width": 1.0,
+          "width": 1,
           "depth": 0.9,
           "wallHeight": 0.9,
           "roofHeight": 0.7,
@@ -119,69 +59,6 @@
             "at": [
               0.78,
               -0.3
-            ]
-          }
-        ]
-      }
-    },
-    {
-      "id": "armorer-display",
-      "name": "Workshop with armour display",
-      "version": 1,
-      "spec": {
-        "body": {
-          "kind": "house",
-          "walls": "wood",
-          "roofMaterial": "thatch",
-          "width": 1.0,
-          "depth": 0.9,
-          "wallHeight": 0.9,
-          "roofHeight": 0.7,
-          "ridge": "z",
-          "windows": 1,
-          "at": [
-            -0.35,
-            -0.35
-          ]
-        },
-        "props": [
-          {
-            "type": "awning",
-            "at": [
-              0.45,
-              0.45
-            ],
-            "width": 0.7,
-            "depth": 0.5,
-            "height": 0.8
-          },
-          {
-            "type": "armorStand",
-            "at": [
-              0.3,
-              0.45
-            ]
-          },
-          {
-            "type": "armorStand",
-            "at": [
-              0.62,
-              0.45
-            ],
-            "material": "steel_dark"
-          },
-          {
-            "type": "shield",
-            "at": [
-              0.78,
-              -0.35
-            ]
-          },
-          {
-            "type": "plates",
-            "at": [
-              -0.6,
-              0.7
             ]
           }
         ]

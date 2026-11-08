@@ -222,9 +222,9 @@ function assetHeader(asset, extra) {
 function studioAssetView(asset) {
   const status = assetStatus(asset);
   const iconSet = isIconSet(asset);
-  const tabs = [['compare', 'Compare variants'], ...(iconSet ? [] : [['scene', 'Scene & lighting']]), ...(walks(asset) ? [['walk', 'Walk cycle']] : []), ['details', 'Spec & files']];
+  const tabs = [['compare', 'Compare variants'], ...(iconSet ? [] : [['scene', 'Scene & lighting']]), ...(walks(asset) ? [['walk', 'Walk cycle']] : []), ...(animates(asset) ? [['anim', 'Animation']] : []), ['details', 'Spec & files']];
   const tabBar = h('div', { class: 'tabs', role: 'tablist' }, tabs.map(([id, label]) => h('button', { type: 'button', role: 'tab', id: `tab-${id}`, 'aria-selected': String(state.tab === id), onclick: () => { state.tab = id; saveUi(); renderAll(); } }, label)));
-  const body = state.tab === 'scene' && !iconSet ? sceneView(asset) : state.tab === 'details' ? detailsView(asset) : state.tab === 'walk' && walks(asset) ? walkView(asset) : compareView(asset);
+  const body = state.tab === 'scene' && !iconSet ? sceneView(asset) : state.tab === 'details' ? detailsView(asset) : state.tab === 'walk' && walks(asset) ? walkView(asset) : state.tab === 'anim' && animates(asset) ? animView(asset) : compareView(asset);
   return [assetHeader(asset, h('div', { class: 'review-line' }, pill(status.status), status.local ? h('span', { class: 'pill local' }, 'local changes') : null)), tabBar, ...body];
 }
 
@@ -397,7 +397,7 @@ const WALK_FRAMES = [['idle', 0], ['stride-a', 1], ['stride-b', -1]], WALK_CYCLE
 const walkCache = new Map();
 // Figures walk when shown in their default direction; animals keep a three-quarter still (`facing`) for the card but
 // walk when they stand (the walk frames set their own facing).
-const walksVariant = variant => !variant.spec.mount && (variant.spec.facing === undefined || (variant.spec.species !== undefined && (variant.spec.pose ?? 'stand') === 'stand'));
+const walksVariant = variant => !variant.spec.mount && !variant.animation && (variant.spec.facing === undefined || (variant.spec.species !== undefined && (variant.spec.pose ?? 'stand') === 'stand'));
 const walks = asset => (asset.generator === 'figure' || asset.generator === 'animal') && asset.variants.some(walksVariant);
 function walkFrame(asset, variant, facing, stride, scale = 1) {
   const key = `${variant.id}:${variant.hash}:${facing}:${stride}:${scale}`;
@@ -441,6 +441,60 @@ function paintWalk(canvas, asset, variant, seconds = performance.now() / 1000) {
     const sprite = walkFrame(asset, variant, k, stride, renderScale), x = Math.round(width * (k + 0.5) / 8), y = Math.round(height - 14 * dpr);
     drawSprite(ctx, sprite, x, y, display, true);
   }
+}
+// ---------- work animations (plan g-animace-rybar) ----------
+// A variant with `animation: { fps, clips: { name: [action…] }, loop: [clip…] }` is a set of named clips; every frame is
+// the figure in one action pose. The sheet has one row per direction (facing 0–7) and one column per distinct pose,
+// all cells sharing the anchor at the feet; the metadata lists each clip's columns so the game can play them.
+const animates = asset => asset.generator === 'figure' && asset.variants.some(v => v.animation);
+const animPoses = variant => [...new Set(Object.values(variant.animation.clips).flat())];
+const animSequence = variant => (variant.animation.loop ?? Object.keys(variant.animation.clips)).flatMap(clip => variant.animation.clips[clip].map(pose => ({ clip, pose })));
+const animCache = new Map();
+function animFrame(asset, variant, facing, pose, scale = 1) {
+  const key = `${variant.id}:${variant.hash}:${facing}:${pose}:${scale}`;
+  if (!animCache.has(key)) animCache.set(key, renderModel(generators.figure.build({ ...variant.spec, action: pose, facing }, { footprint: asset.footprint, style }), { style, footprint: asset.footprint, scale }));
+  return animCache.get(key);
+}
+function animSheet(asset, variant, scale = 1) {
+  const poses = animPoses(variant), dirs = variant.animation.directions ?? [0, 1, 2, 3, 4, 5, 6, 7];
+  const frames = dirs.map(k => poses.map(pose => animFrame(asset, variant, k, pose, scale)));
+  const all = frames.flat(), ax = Math.max(...all.map(f => f.anchor.x)), ay = Math.max(...all.map(f => f.anchor.y));
+  const fw = ax + Math.max(...all.map(f => f.width - f.anchor.x)), fh = ay + Math.max(...all.map(f => f.height - f.anchor.y));
+  const canvas = document.createElement('canvas');
+  canvas.width = fw * poses.length; canvas.height = fh * dirs.length;
+  const ctx = canvas.getContext('2d');
+  frames.forEach((row, r) => row.forEach((f, i) => ctx.drawImage(f.canvas, i * fw + ax - f.anchor.x, r * fh + ay - f.anchor.y)));
+  return { canvas, frameWidth: fw, frameHeight: fh, anchor: { x: ax, y: ay }, poses, dirs };
+}
+function animMeta(variant, sheet) {
+  const col = pose => sheet.poses.indexOf(pose);
+  return { frameWidth: sheet.frameWidth, frameHeight: sheet.frameHeight, anchor: sheet.anchor, origin: { x: +(sheet.anchor.x / sheet.frameWidth).toFixed(5), y: +(sheet.anchor.y / sheet.frameHeight).toFixed(5) }, columns: sheet.poses, rows: sheet.dirs, rowsNote: 'facing 0–7 (0 faces the viewer, then turning to screen right); the fisher faces the water', fps: variant.animation.fps, clips: Object.fromEntries(Object.entries(variant.animation.clips).map(([name, poses]) => [name, poses.map(col)])), loop: variant.animation.loop ?? Object.keys(variant.animation.clips) };
+}
+function animView(asset) {
+  const controls = toolbar([zoomControl('zoom', 'anim-zoom', 0.5, 4, 0.25), segmented('Background', BACKGROUNDS.map(b => [b.id, b.label]), state.background, id => { state.background = id; saveUi(); renderAll(); })]);
+  if (!glReady) return [controls, h('p', { class: 'empty' }, 'WebGL is unavailable in this browser, so 3D recipes cannot be rendered.')];
+  const cards = asset.variants.filter(v => v.animation).map(variant => {
+    const canvas = h('canvas', { class: 'walk-canvas anim-canvas', 'data-variant': variant.id, role: 'img', 'aria-label': `${variant.name}: animation in eight directions` });
+    const label = h('span', { class: 'sub anim-clip', 'aria-live': 'polite' }, '');
+    const play = clip => { canvas._clip = clip; canvas._start = performance.now() / 1000; };
+    const buttons = h('div', { class: 'segmented', role: 'group', 'aria-label': 'Clips' }, [['loop', 'Whole loop'], ...Object.keys(variant.animation.clips).map(c => [c, c])].map(([id, text]) => h('button', { type: 'button', onclick: () => play(id === 'loop' ? null : id) }, text)));
+    canvas._paint = seconds => paintAnim(canvas, asset, variant, seconds, label);
+    return h('article', { class: 'variant-card walk-card', 'data-variant': variant.id }, h('header', {}, h('div', {}, h('h3', {}, variant.name), h('span', { class: 'sub' }, `${variant.id} · v${variant.version} · ${animPoses(variant).length} poses · ${variant.animation.fps} fps`)), h('span', { class: 'pills' }, pill(reviewState({ repo: data.approvals, local: state.local, assetId: asset.id, variant }).effective.status))), buttons, label, canvas);
+  });
+  return [controls, h('p', { class: 'review-note' }, 'Fishing loop: cast → sit and wait → twitch now and then → bite → reel → the fish goes into the creel. Pick a clip to play it alone. Approved loops are exported as ', h('code', { class: 'mono' }, '<variant>.v<N>.anim.png'), ' (8 direction rows × poses, one anchor at the feet) with the clip list in the metadata.'), h('section', { class: 'variants walk-list', 'aria-label': 'Animations' }, cards)];
+}
+function paintAnim(canvas, asset, variant, seconds = performance.now() / 1000, label = null) {
+  const dpr = Math.min(2, window.devicePixelRatio || 1), width = Math.round(canvas.clientWidth * dpr), height = Math.round(canvas.clientHeight * dpr);
+  if (!width || !height) return;
+  if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
+  const seq = canvas._clip ? variant.animation.clips[canvas._clip].map(pose => ({ clip: canvas._clip, pose })) : animSequence(variant);
+  const i = reducedMotion ? 0 : Math.floor((seconds - (canvas._start ?? 0)) * variant.animation.fps) % seq.length, step = seq[(i + seq.length) % seq.length];
+  if (label && label.textContent !== `${step.clip} · ${step.pose}`) label.textContent = `${step.clip} · ${step.pose}`;
+  const ctx = canvas.getContext('2d'), zoom = state.zoom * dpr, renderScale = Math.min(4, Math.max(1, Math.ceil(zoom))), display = zoom / renderScale;
+  ctx.clearRect(0, 0, width, height);
+  drawBackground(ctx, state.background, { width, height, origin: { x: width / 2, y: height - 20 * dpr }, zoom, footprint: asset.footprint, dark: state.background === 'dark' });
+  const dirs = variant.animation.directions ?? [0, 1, 2, 3, 4, 5, 6, 7];
+  dirs.forEach((k, n) => drawSprite(ctx, animFrame(asset, variant, k, step.pose, renderScale), Math.round(width * (n + 0.5) / dirs.length), Math.round(height - 24 * dpr), display, true));
 }
 function sceneView(asset) {
   const canvas = h('canvas', { class: 'scene-canvas', id: 'scene-canvas', role: 'img', 'aria-label': `Test map with ${asset.name} at ${state.time}` });
@@ -794,6 +848,8 @@ function exportSprite(assetId, variantId, { facings = false } = {}) {
   if (turned.length) meta.facings = turned.map((s, k) => ({ facing: k, width: s.width, height: s.height, anchor: s.anchor, origin: { x: +(s.anchor.x / s.width).toFixed(5), y: +(s.anchor.y / s.height).toFixed(5) } }));
   const walk = turned.length && walksVariant(variant) ? walkSheet(asset, variant, 1) : null;
   if (walk) meta.walk = walkMeta(walk);
+  const anim = facings && variant.animation && asset.generator === 'figure' ? animSheet(asset, variant, 1) : null;
+  if (anim) meta.anim = animMeta(variant, anim);
   // UI icon sets: every level on its own, as SVG and as PNG at 1× and 2×.
   const iconFiles = [], iconTexts = [];
   if (sprite.icons) {
@@ -805,7 +861,7 @@ function exportSprite(assetId, variantId, { facings = false } = {}) {
       return { level: icon.level, name: icon.name, size: 40, ...files };
     });
   }
-  return { iconFiles, iconTexts, walk: walk?.canvas.toDataURL('image/png') ?? null, facingPngs: turned.map(s => s.canvas.toDataURL('image/png')), png: sprite.canvas.toDataURL('image/png'), front: sprite.front?.toDataURL('image/png') ?? null, still: sprite.still?.toDataURL('image/png') ?? null, rotor: sprite.rotor?.toDataURL('image/png') ?? null, sheet: sprite.sheet?.toDataURL('image/png') ?? null, tiles: sprite.tiles?.map(tile => tile.toDataURL('image/png')) ?? [], meta, paths: { ...variant.paths, spriteTiles: (sprite.tiles ?? []).map((_, i) => `${variant.paths.spriteTileBase}${i}.png`), ...(walk ? { spriteWalk: variant.paths.sprite.replace(/\.png$/, '.walk.png') } : {}) } };
+  return { iconFiles, iconTexts, anim: anim?.canvas.toDataURL('image/png') ?? null, walk: walk?.canvas.toDataURL('image/png') ?? null, facingPngs: turned.map(s => s.canvas.toDataURL('image/png')), png: sprite.canvas.toDataURL('image/png'), front: sprite.front?.toDataURL('image/png') ?? null, still: sprite.still?.toDataURL('image/png') ?? null, rotor: sprite.rotor?.toDataURL('image/png') ?? null, sheet: sprite.sheet?.toDataURL('image/png') ?? null, tiles: sprite.tiles?.map(tile => tile.toDataURL('image/png')) ?? [], meta, paths: { ...variant.paths, spriteTiles: (sprite.tiles ?? []).map((_, i) => `${variant.paths.spriteTileBase}${i}.png`), ...(walk ? { spriteWalk: variant.paths.sprite.replace(/\.png$/, '.walk.png') } : {}), ...(anim ? { spriteAnim: variant.paths.sprite.replace(/\.png$/, '.anim.png') } : {}) } };
 }
 function exportPng(asset, variant) {
   const { png, paths } = exportSprite(asset.id, variant.id);
@@ -819,7 +875,7 @@ function exportMeta(asset, variant) {
 // ---------- painting & animation ----------
 function paintVisible(seconds) {
   for (const canvas of document.querySelectorAll('#main canvas')) canvas._paint?.(seconds);
-  if (!reducedMotion && (state.time !== 'day' || state.tab === 'walk') && state.view === 'assets') startAnimation();
+  if (!reducedMotion && (state.time !== 'day' || state.tab === 'walk' || state.tab === 'anim') && state.view === 'assets') startAnimation();
 }
 let frame = null, last = 0;
 function startAnimation() {

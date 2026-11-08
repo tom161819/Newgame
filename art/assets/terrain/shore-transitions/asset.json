@@ -1,0 +1,409 @@
+{
+  "schema": 1,
+  "id": "shore-transitions",
+  "name": "Round shores (transition tiles)",
+  "category": "terrain",
+  "description": "World v2 step 3 (plan g-svet-kulate-brehy): marching-squares transition sets, 16 tiles per pair of grounds. Tile index = corner bits (1 = inner ground): bit 0 top corner, bit 1 right, bit 2 bottom, bit 3 left. The renderer picks the tile from the four corners of a cell instead of blending along the diamond edges, so shores read as round curves. Preview: a pond of the inner ground.",
+  "footprint": {
+    "width": 6,
+    "height": 6
+  },
+  "generator": "ground",
+  "variants": [
+    {
+      "id": "shore-transitions-water-grass",
+      "name": "Water / grass",
+      "version": 1,
+      "notes": "Grassy bank: a thin broken foam line along the water.",
+      "spec": {
+        "mode": "transition",
+        "outer": {
+          "base": "water_light",
+          "shades": [
+            "water",
+            "water_light",
+            "#7fb2bd",
+            "water_light"
+          ],
+          "patchiness": 0.55,
+          "blades": {
+            "density": 0,
+            "height": [
+              1,
+              2
+            ],
+            "colours": [
+              "water"
+            ],
+            "tufts": 1
+          },
+          "tiles": 4,
+          "seed": 25,
+          "flowers": {
+            "density": 3,
+            "colours": [
+              "foam",
+              "#a8cdd2"
+            ]
+          }
+        },
+        "inner": {
+          "base": "#6f9c44",
+          "shades": [
+            "#58843a",
+            "#6a9442",
+            "#7ea84e",
+            "#90b65e"
+          ],
+          "patchiness": 0.5,
+          "blades": {
+            "density": 64,
+            "height": [
+              2,
+              6
+            ],
+            "colours": [
+              "#5f8e38",
+              "#7aa64a",
+              "meadow_tip"
+            ],
+            "tufts": 3
+          },
+          "flowers": {
+            "density": 1,
+            "colours": [
+              "clover",
+              "buttercup"
+            ]
+          },
+          "tiles": 4,
+          "seed": 31
+        },
+        "edge": {
+          "colour": "foam",
+          "width": 0.05
+        },
+        "seed": 61,
+        "roughness": 0.14,
+        "softness": 0.035
+      }
+    },
+    {
+      "id": "shore-transitions-water-sand",
+      "name": "Water / sand",
+      "version": 1,
+      "notes": "Sandy beach: wide foam where the water laps the sand.",
+      "spec": {
+        "mode": "transition",
+        "outer": {
+          "base": "water_light",
+          "shades": [
+            "water",
+            "water_light",
+            "#7fb2bd",
+            "water_light"
+          ],
+          "patchiness": 0.55,
+          "blades": {
+            "density": 0,
+            "height": [
+              1,
+              2
+            ],
+            "colours": [
+              "water"
+            ],
+            "tufts": 1
+          },
+          "tiles": 4,
+          "seed": 25,
+          "flowers": {
+            "density": 3,
+            "colours": [
+              "foam",
+              "#a8cdd2"
+            ]
+          }
+        },
+        "inner": {
+          "base": "sand",
+          "shades": [
+            "sand_dark",
+            "sand",
+            "sand_light",
+            "sand"
+          ],
+          "patchiness": 0.45,
+          "blades": {
+            "density": 4,
+            "height": [
+              2,
+              5
+            ],
+            "colours": [
+              "grass_scrub",
+              "olive_scrub"
+            ],
+            "tufts": 3
+          },
+          "tiles": 4,
+          "seed": 21,
+          "flowers": {
+            "density": 2,
+            "colours": [
+              "foam",
+              "stone_light",
+              "sand_dark"
+            ]
+          }
+        },
+        "edge": {
+          "colour": "foam",
+          "width": 0.08
+        },
+        "seed": 63,
+        "roughness": 0.14,
+        "softness": 0.035
+      }
+    },
+    {
+      "id": "shore-transitions-water-mud",
+      "name": "Water / mud",
+      "version": 1,
+      "notes": "Muddy bank: a dark wet rim, no foam.",
+      "spec": {
+        "mode": "transition",
+        "outer": {
+          "base": "water_light",
+          "shades": [
+            "water",
+            "water_light",
+            "#7fb2bd",
+            "water_light"
+          ],
+          "patchiness": 0.55,
+          "blades": {
+            "density": 0,
+            "height": [
+              1,
+              2
+            ],
+            "colours": [
+              "water"
+            ],
+            "tufts": 1
+          },
+          "tiles": 4,
+          "seed": 25,
+          "flowers": {
+            "density": 3,
+            "colours": [
+              "foam",
+              "#a8cdd2"
+            ]
+          }
+        },
+        "inner": {
+          "base": "soil_dark",
+          "shades": [
+            "#3e2e22",
+            "soil_dark",
+            "soil",
+            "#6a5038"
+          ],
+          "patchiness": 0.7,
+          "blades": {
+            "density": 10,
+            "height": [
+              2,
+              5
+            ],
+            "colours": [
+              "olive_scrub",
+              "grass_scrub",
+              "#5e6a34"
+            ],
+            "tufts": 3
+          },
+          "flowers": {
+            "density": 2.5,
+            "colours": [
+              "water_light",
+              "#4a3a2c",
+              "soil"
+            ]
+          },
+          "tiles": 4,
+          "seed": 53
+        },
+        "edge": {
+          "colour": "soil_dark",
+          "width": 0.06
+        },
+        "seed": 65,
+        "roughness": 0.14,
+        "softness": 0.035
+      }
+    },
+    {
+      "id": "shore-transitions-water-rocks",
+      "name": "Water / stony bank",
+      "version": 1,
+      "notes": "Stony bank: foam breaking on the pebbles.",
+      "spec": {
+        "mode": "transition",
+        "outer": {
+          "base": "water_light",
+          "shades": [
+            "water",
+            "water_light",
+            "#7fb2bd",
+            "water_light"
+          ],
+          "patchiness": 0.55,
+          "blades": {
+            "density": 0,
+            "height": [
+              1,
+              2
+            ],
+            "colours": [
+              "water"
+            ],
+            "tufts": 1
+          },
+          "tiles": 4,
+          "seed": 25,
+          "flowers": {
+            "density": 3,
+            "colours": [
+              "foam",
+              "#a8cdd2"
+            ]
+          }
+        },
+        "inner": {
+          "base": "#8a8476",
+          "shades": [
+            "#6e695e",
+            "stone_dark",
+            "#8a8476",
+            "stone_light"
+          ],
+          "patchiness": 0.6,
+          "blades": {
+            "density": 12,
+            "height": [
+              2,
+              4
+            ],
+            "colours": [
+              "grass_scrub",
+              "#5e7a3a"
+            ],
+            "tufts": 3
+          },
+          "flowers": {
+            "density": 9,
+            "colours": [
+              "stone_light",
+              "stone",
+              "rock",
+              "stone_dark",
+              "rock"
+            ]
+          },
+          "tiles": 4,
+          "seed": 55
+        },
+        "edge": {
+          "colour": "foam",
+          "width": 0.06
+        },
+        "seed": 67,
+        "roughness": 0.2,
+        "softness": 0.035
+      }
+    },
+    {
+      "id": "shore-transitions-sand-grass",
+      "name": "Sand / grass",
+      "version": 1,
+      "notes": "Beach into grass: a strip of sparse dry grass.",
+      "spec": {
+        "mode": "transition",
+        "outer": {
+          "base": "sand",
+          "shades": [
+            "sand_dark",
+            "sand",
+            "sand_light",
+            "sand"
+          ],
+          "patchiness": 0.45,
+          "blades": {
+            "density": 4,
+            "height": [
+              2,
+              5
+            ],
+            "colours": [
+              "grass_scrub",
+              "olive_scrub"
+            ],
+            "tufts": 3
+          },
+          "tiles": 4,
+          "seed": 21,
+          "flowers": {
+            "density": 2,
+            "colours": [
+              "foam",
+              "stone_light",
+              "sand_dark"
+            ]
+          }
+        },
+        "inner": {
+          "base": "#6f9c44",
+          "shades": [
+            "#58843a",
+            "#6a9442",
+            "#7ea84e",
+            "#90b65e"
+          ],
+          "patchiness": 0.5,
+          "blades": {
+            "density": 64,
+            "height": [
+              2,
+              6
+            ],
+            "colours": [
+              "#5f8e38",
+              "#7aa64a",
+              "meadow_tip"
+            ],
+            "tufts": 3
+          },
+          "flowers": {
+            "density": 1,
+            "colours": [
+              "clover",
+              "buttercup"
+            ]
+          },
+          "tiles": 4,
+          "seed": 31
+        },
+        "edge": {
+          "colour": "grass_dry",
+          "width": 0.07
+        },
+        "seed": 69,
+        "roughness": 0.14,
+        "softness": 0.06
+      }
+    }
+  ]
+}

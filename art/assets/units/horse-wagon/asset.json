@@ -1,0 +1,293 @@
+{
+  "schema": 1,
+  "id": "horse-wagon",
+  "name": "Horse Wagon",
+  "category": "units",
+  "description": "The player's Horse Wagon, revision 2 (owner: more realistic, more variants, use the new horses): plank seams, corner stakes, iron fittings and leather traces to a collar harness on the revised horses. Farm wagon, covered wagon, hay wagon, tumbril, ore cart, timber wagon and a two-horse wagon. Built along grid x; the game mirrors one view for the other direction. Revision (owner 7 Nov 2026): pulled by the approved realistic horse (Blender, sculpted look) at the same size as the standalone horse; baked with Blender.",
+  "footprint": {
+    "width": 3,
+    "height": 1
+  },
+  "generator": "workshop",
+  "plannedGameObjectId": "horse_wagon",
+  "variants": [
+    {
+      "id": "horse-wagon-farm-empty",
+      "name": "Farm wagon, empty",
+      "version": 4,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "farm"
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "f455802b",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-wagon-farm-sacks",
+      "name": "Farm wagon with sacks",
+      "version": 4,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "farm",
+            "load": "sacks",
+            "coat": "chestnut"
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "e7ecb142",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-wagon-farm-wood",
+      "name": "Farm wagon with firewood",
+      "version": 3,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "farm",
+            "load": "wood",
+            "coat": "dun"
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "4b92b31f",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-wagon-covered",
+      "name": "Covered wagon",
+      "version": 3,
+      "notes": "Linen cover on hoops.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "covered",
+            "coat": "palomino"
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "6f24ea7f",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-wagon-hay",
+      "name": "Hay wagon",
+      "version": 4,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "hay",
+            "load": "hay",
+            "coat": "grey"
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "feec9fb7",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-wagon-tumbril-stone",
+      "name": "Tumbril with stone",
+      "version": 4,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "tumbril",
+            "load": "stone",
+            "coat": "pony"
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "d21c967b",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-wagon-ore",
+      "name": "Ore cart",
+      "version": 3,
+      "notes": "Two-wheeled iron-bound cart for the mine.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "ore",
+            "load": "ore",
+            "coat": "draught"
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "90b8b259",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-wagon-timber",
+      "name": "Timber wagon",
+      "version": 4,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "timber",
+            "load": "logs",
+            "coat": "black"
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "3b00f5ba",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-wagon-pair-barrels",
+      "name": "Two-horse wagon with barrels",
+      "version": 4,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "pair",
+            "load": "barrels"
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "010f8eed",
+        "samples": 96
+      }
+    },
+    {
+      "id": "horse-wagon-pair-draught",
+      "name": "Two draught horses with iron bars",
+      "version": 3,
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "at": [
+              0,
+              0
+            ],
+            "type": "horseWagon",
+            "kind": "pair",
+            "load": "ironbars",
+            "coat": "draught"
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "blender",
+        "look": "sculpt",
+        "renderHash": "de1daa7a",
+        "samples": 96
+      }
+    }
+  ]
+}

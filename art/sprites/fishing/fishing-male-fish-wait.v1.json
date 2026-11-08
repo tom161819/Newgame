@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "fishing",
+  "variantId": "fishing-male-fish-wait",
+  "name": "Fisher (man) waiting for a bite",
+  "category": "units",
+  "version": 1,
+  "specHash": "47e8fc85",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 80,
+  "anchor": {
+    "x": 65,
+    "y": 46
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.575
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 78
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.975
+  },
+  "visualHeight": 78,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.485,
+  "lights": []
+}

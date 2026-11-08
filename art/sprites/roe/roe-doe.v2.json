@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "roe",
+  "variantId": "roe-doe",
+  "name": "Roe doe",
+  "category": "units",
+  "version": 2,
+  "specHash": "2b41f45e",
+  "generator": "animal",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 41,
+  "anchor": {
+    "x": 33,
+    "y": 23
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.56098
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 39
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.95122
+  },
+  "visualHeight": 39,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.653,
+  "lights": []
+}

@@ -77,7 +77,12 @@ const num = (value, min, max) => typeof value === 'number' && Number.isFinite(va
 // Problems with a ground spec, or [] when it is valid.
 export function validateSurfaceSpec(spec, { style }) {
   const problems = [], colour = (value, where) => { if (!resolveColour(style, value)) problems.push(`${where}: "${value}" is neither #rrggbb nor a palette colour.`); };
-  if (!['grass', 'path'].includes(spec.mode)) { problems.push('mode must be "grass" or "path".'); return problems; }
+  if (spec.mode === 'transition') { // round shores (g-svet-kulate-brehy): two grass specs and an edge band
+    for (const key of ['outer', 'inner']) problems.push(...validateSurfaceSpec({ ...spec[key], mode: 'grass' }, { style }).map(p => `${key}.${p}`));
+    if (spec.edge) { colour(spec.edge.colour, 'edge.colour'); if (!num(spec.edge.width ?? 0.05, 0, 0.3)) problems.push('edge.width must be 0–0.3.'); }
+    return problems;
+  }
+  if (!['grass', 'path'].includes(spec.mode)) { problems.push('mode must be "grass", "path" or "transition".'); return problems; }
   const grass = spec.mode === 'grass' ? spec : spec.ground;
   if (!grass || typeof grass !== 'object') { problems.push('path variants need a "ground" grass spec.'); return problems; }
   colour(grass.base, 'base');

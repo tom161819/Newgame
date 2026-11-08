@@ -3,7 +3,7 @@
   "id": "child",
   "name": "Children",
   "category": "units",
-  "description": "Village children (plan g-deti-naves-grafika): smaller than adults, simple medieval clothes in many colours, readable as kids at 1×.",
+  "description": "Village children (plan g-deti-naves-grafika): smaller than adults, simple medieval clothes in many colours, readable as kids at 1×. Game poses: running and tagging, hoop and stick, kicking a ball, swinging, throwing a snowball, rolling a snowman, jumping into hay.",
   "footprint": {
     "width": 1,
     "height": 1
@@ -98,6 +98,378 @@
         "hair": "hair_auburn",
         "hairStyle": "long",
         "tool": "basket"
+      }
+    },
+    {
+      "id": "child-boy-tunic-run",
+      "name": "Boy running (tag)",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "male",
+        "height": 0.78,
+        "build": 0.88,
+        "garment": "cloth_red",
+        "legs": "cloth_brown",
+        "headgear": "none",
+        "hair": "hair_blond",
+        "hairStyle": "short",
+        "action": "run",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-girl-braid-tag",
+      "name": "Girl tagging",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "female",
+        "height": 0.76,
+        "build": 0.86,
+        "garment": "cloth_blue",
+        "headgear": "none",
+        "hair": "hair_blond",
+        "hairStyle": "braid",
+        "apron": "cloth_linen",
+        "action": "tag",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-boy-cap-hoop",
+      "name": "Boy with a hoop and stick",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "male",
+        "height": 0.74,
+        "build": 0.86,
+        "garment": "cloth_green",
+        "legs": "cloth_grey",
+        "headgear": "cap",
+        "headgearMaterial": "cloth_wool",
+        "hair": "hair_brown",
+        "action": "hoop",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-boy-ball-kick",
+      "name": "Boy kicking a ball",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "male",
+        "height": 0.7,
+        "build": 0.85,
+        "garment": "cloth_ochre",
+        "legs": "cloth_brown",
+        "headgear": "none",
+        "hair": "hair_auburn",
+        "action": "kick",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-girl-kerchief-swing",
+      "name": "Girl on a swing",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "female",
+        "height": 0.72,
+        "build": 0.85,
+        "garment": "cloth_red",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_ochre",
+        "hair": "hair_brown",
+        "action": "swing",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-boy-tunic-throw",
+      "name": "Boy throwing a snowball",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "male",
+        "height": 0.78,
+        "build": 0.88,
+        "garment": "cloth_red",
+        "legs": "cloth_brown",
+        "headgear": "none",
+        "hair": "hair_blond",
+        "hairStyle": "short",
+        "action": "throw",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-girl-braid-snow",
+      "name": "Girl rolling a snowball for a snowman",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "female",
+        "height": 0.76,
+        "build": 0.86,
+        "garment": "cloth_blue",
+        "headgear": "none",
+        "hair": "hair_blond",
+        "hairStyle": "braid",
+        "apron": "cloth_linen",
+        "action": "roll-snow",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-boy-cap-hay",
+      "name": "Boy jumping into hay",
+      "version": 1,
+      "notes": "Game key frame (plan g-deti-naves-grafika).",
+      "spec": {
+        "sex": "male",
+        "height": 0.74,
+        "build": 0.86,
+        "garment": "cloth_green",
+        "legs": "cloth_grey",
+        "headgear": "cap",
+        "headgearMaterial": "cloth_wool",
+        "hair": "hair_brown",
+        "action": "hay-jump",
+        "facing": 0
+      }
+    },
+    {
+      "id": "child-play-tag",
+      "name": "Children – Tag (chasing)",
+      "version": 1,
+      "notes": "Game animation (plan g-deti-naves-grafika): plays in the Animation tab; export = <variant>.v<N>.anim.png, 8 direction rows × poses.",
+      "spec": {
+        "sex": "male",
+        "height": 0.78,
+        "build": 0.88,
+        "garment": "cloth_red",
+        "legs": "cloth_brown",
+        "headgear": "none",
+        "hair": "hair_blond",
+        "hairStyle": "short",
+        "action": "run"
+      },
+      "animation": {
+        "fps": 4,
+        "clips": {
+          "tag": [
+            "run",
+            "run-b"
+          ]
+        },
+        "loop": [
+          "tag"
+        ]
+      }
+    },
+    {
+      "id": "child-play-tag-girl",
+      "name": "Children – Tag (catching)",
+      "version": 1,
+      "notes": "Game animation (plan g-deti-naves-grafika): plays in the Animation tab; export = <variant>.v<N>.anim.png, 8 direction rows × poses.",
+      "spec": {
+        "sex": "female",
+        "height": 0.76,
+        "build": 0.86,
+        "garment": "cloth_blue",
+        "headgear": "none",
+        "hair": "hair_blond",
+        "hairStyle": "braid",
+        "apron": "cloth_linen",
+        "action": "tag"
+      },
+      "animation": {
+        "fps": 4,
+        "clips": {
+          "tag-girl": [
+            "tag",
+            "tag-b"
+          ]
+        },
+        "loop": [
+          "tag-girl"
+        ]
+      }
+    },
+    {
+      "id": "child-play-hoop",
+      "name": "Children – Hoop rolling",
+      "version": 1,
+      "notes": "Game animation (plan g-deti-naves-grafika): plays in the Animation tab; export = <variant>.v<N>.anim.png, 8 direction rows × poses.",
+      "spec": {
+        "sex": "male",
+        "height": 0.74,
+        "build": 0.86,
+        "garment": "cloth_green",
+        "legs": "cloth_grey",
+        "headgear": "cap",
+        "headgearMaterial": "cloth_wool",
+        "hair": "hair_brown",
+        "action": "hoop"
+      },
+      "animation": {
+        "fps": 4,
+        "clips": {
+          "hoop": [
+            "hoop",
+            "hoop-b"
+          ]
+        },
+        "loop": [
+          "hoop"
+        ]
+      }
+    },
+    {
+      "id": "child-play-ball",
+      "name": "Children – Kicking a ball",
+      "version": 1,
+      "notes": "Game animation (plan g-deti-naves-grafika): plays in the Animation tab; export = <variant>.v<N>.anim.png, 8 direction rows × poses.",
+      "spec": {
+        "sex": "male",
+        "height": 0.7,
+        "build": 0.85,
+        "garment": "cloth_ochre",
+        "legs": "cloth_brown",
+        "headgear": "none",
+        "hair": "hair_auburn",
+        "action": "kick-b"
+      },
+      "animation": {
+        "fps": 4,
+        "clips": {
+          "ball": [
+            "kick-b",
+            "kick"
+          ]
+        },
+        "loop": [
+          "ball"
+        ]
+      }
+    },
+    {
+      "id": "child-play-swing",
+      "name": "Children – On the swing",
+      "version": 1,
+      "notes": "Game animation (plan g-deti-naves-grafika): plays in the Animation tab; export = <variant>.v<N>.anim.png, 8 direction rows × poses.",
+      "spec": {
+        "sex": "female",
+        "height": 0.72,
+        "build": 0.85,
+        "garment": "cloth_red",
+        "headgear": "kerchief",
+        "headgearMaterial": "cloth_ochre",
+        "hair": "hair_brown",
+        "action": "swing"
+      },
+      "animation": {
+        "fps": 4,
+        "clips": {
+          "swing": [
+            "swing",
+            "swing-b"
+          ]
+        },
+        "loop": [
+          "swing"
+        ]
+      }
+    },
+    {
+      "id": "child-play-snowball",
+      "name": "Children – Snowball fight",
+      "version": 1,
+      "notes": "Game animation (plan g-deti-naves-grafika): plays in the Animation tab; export = <variant>.v<N>.anim.png, 8 direction rows × poses.",
+      "spec": {
+        "sex": "male",
+        "height": 0.78,
+        "build": 0.88,
+        "garment": "cloth_red",
+        "legs": "cloth_brown",
+        "headgear": "none",
+        "hair": "hair_blond",
+        "hairStyle": "short",
+        "action": "throw"
+      },
+      "animation": {
+        "fps": 4,
+        "clips": {
+          "snowball": [
+            "throw",
+            "throw-b"
+          ]
+        },
+        "loop": [
+          "snowball"
+        ]
+      }
+    },
+    {
+      "id": "child-play-snowman",
+      "name": "Children – Rolling a snowman",
+      "version": 1,
+      "notes": "Game animation (plan g-deti-naves-grafika): plays in the Animation tab; export = <variant>.v<N>.anim.png, 8 direction rows × poses.",
+      "spec": {
+        "sex": "female",
+        "height": 0.76,
+        "build": 0.86,
+        "garment": "cloth_blue",
+        "headgear": "none",
+        "hair": "hair_blond",
+        "hairStyle": "braid",
+        "apron": "cloth_linen",
+        "action": "roll-snow"
+      },
+      "animation": {
+        "fps": 4,
+        "clips": {
+          "snowman": [
+            "roll-snow",
+            "roll-snow-b"
+          ]
+        },
+        "loop": [
+          "snowman"
+        ]
+      }
+    },
+    {
+      "id": "child-play-hay",
+      "name": "Children – Jumping into hay",
+      "version": 1,
+      "notes": "Game animation (plan g-deti-naves-grafika): plays in the Animation tab; export = <variant>.v<N>.anim.png, 8 direction rows × poses.",
+      "spec": {
+        "sex": "male",
+        "height": 0.74,
+        "build": 0.86,
+        "garment": "cloth_green",
+        "legs": "cloth_grey",
+        "headgear": "cap",
+        "headgearMaterial": "cloth_wool",
+        "hair": "hair_brown",
+        "action": "hay-jump"
+      },
+      "animation": {
+        "fps": 4,
+        "clips": {
+          "hay": [
+            "hay-jump",
+            "hay-jump-b"
+          ]
+        },
+        "loop": [
+          "hay"
+        ]
       }
     }
   ]
