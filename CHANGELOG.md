@@ -5,6 +5,21 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.80.0] - 2026-11-09
+<!-- version: {"title":"Performance","type":"feature","reconstructed":false,"saveVersion":60} -->
+### Changed
+- The game runs much faster in a bigger village. Measured in a browser without a graphics card, at ×3 with 25 residents:
+
+  | | Before | After |
+  |---|---|---|
+  | FPS at ×3 | 7 | about 31 |
+  | FPS at night | 8 | 26–36 |
+
+  The ground is repainted in turns instead of all at once, and on the Canvas renderer it is drawn as one image. Paths are found with fewer allocations and give up early on closed-in goals. Tree growth checks are shared, and the night glow is drawn only around the lights.
+- Ground that leaves your sight may turn grey a few hundred milliseconds later. New footpaths may appear up to about ¾ s later.
+### Added
+- Developer mode has a frame profiler. Press F8 or use the Profiler button in the Balance panel to see the time per frame for each system, the drawing, the fog, the minimap and the UI.
+
 ## [0.79.0] - 2026-11-08
 <!-- version: {"title":"New approved nature art: stone and iron deposits shrink as they are mined, snow-covered in winter.","type":"feature","reconstructed":false,"saveVersion":60} -->
 ### Added
