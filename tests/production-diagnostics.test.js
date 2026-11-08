@@ -4,7 +4,7 @@ import { workerScene } from './helpers/workerScene.js';
 import { ensureBuildingPrerequisites } from './helpers/workerScene.js';
 import { placeBuilding } from '../src/game/buildings.js';
 import { ProductionDiagnostics } from '../src/systems/ProductionDiagnostics.js';
-import { DIAGNOSTICS } from '../src/data/diagnostics.js';
+import { DIAGNOSTICS,noticeRepeatDays } from '../src/data/diagnostics.js';
 
 globalThis.document??={querySelector:()=>({textContent:''})};
 
@@ -14,16 +14,20 @@ function employ(s,home,profession,x=53){const w=s.workerSystem.create({x,y:44});
 // Advance game time only through the diagnostics' own clock, without simulating the whole kingdom.
 const advance=(s,ms)=>{for(let t=0;t<ms;t+=DIAGNOSTICS.checkInterval){s.gameTime.totalElapsed+=DIAGNOSTICS.checkInterval;s.diagnostics.update();}};
 const reasons=s=>s.diagnostics.active().map(i=>i.reason);
+// m-notice-bar-hlasky (72): the same notice repeats at most once per NOTICE_REPEAT game days (a warning: half a day).
+const repeat=(s,reason)=>noticeRepeatDays(reason)*s.gameTime.dayDuration;
+const REMINDER=60000;
 
-test('a supplied site with no Builder is reported after it lasts, repeated at most every 30 s, gone once a Builder exists',()=>{
+test('a supplied site with no Builder is reported after it lasts, repeated at most every half day, gone once a Builder exists',()=>{
   const s=scene(),site=building(s,'tower',60,50,{blueprint:true});assert.equal(s.constructionSystem.materials.ready(site),true);
   advance(s,DIAGNOSTICS.persistence-DIAGNOSTICS.checkInterval);assert.deepEqual(reasons(s),[],'not before it has lasted');
   advance(s,DIAGNOSTICS.checkInterval*2);assert.deepEqual(reasons(s),['noBuilder']);assert.equal(s.log.length,1);
-  advance(s,DIAGNOSTICS.reminder-DIAGNOSTICS.checkInterval*2);assert.equal(s.log.length,1,'no repeat within 30 s');
-  advance(s,DIAGNOSTICS.checkInterval*2);assert.equal(s.log.length,2,'one reminder after 30 s');
+  assert.equal(repeat(s,'noBuilder'),s.gameTime.dayDuration/2);
+  advance(s,repeat(s,'noBuilder')-DIAGNOSTICS.checkInterval*2);assert.equal(s.log.length,1,'no repeat within half a day');
+  advance(s,DIAGNOSTICS.checkInterval*2);assert.equal(s.log.length,2,'one reminder after half a day');assert.equal(s.diagnostics.active()[0].count,2,'one row with a count');
   s.diagnostics.dismiss(s.diagnostics.active()[0].key);assert.deepEqual(reasons(s),[],'dismissed until the next reminder');
   employ(s,null,'builder');advance(s,DIAGNOSTICS.checkInterval);assert.equal(s.diagnostics.issues.size,0,'resolved');
-  advance(s,DIAGNOSTICS.reminder*2);assert.equal(s.log.length,2,'nothing more once resolved');
+  advance(s,REMINDER*2);assert.equal(s.log.length,2,'nothing more once resolved');
 });
 
 test('a problem solved before it lasts is never reported',()=>{
@@ -62,19 +66,23 @@ test('C05 commanded Builders, Haulers and Farmers are not counted as working sou
  const miller=s.workplaceSystem.employees(mill)[0];s.workerSystem.commands.hold(farmer);s.workerSystem.commands.hold(miller);advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(!s.diagnostics.active().some(i=>i.entityId===mill.id),'a deliberately held production crew raises no production alarm');
 });
 
-test('completion advice is immediate despite stock and no staff, deduplicated across workers/buildings and never reminded',()=>{
+test('completion advice is immediate despite stock and no staff, deduplicated across workers/buildings and reminded only every 3 days',()=>{
  const s=scene(),mill=building(s,'mill',54,45);s.foodStorage.locations.get(`input-${mill.id}`).stock.wheat=20;
  s.activities.emit('buildingCompleted',{objectIds:[mill.id]});assert.deepEqual(reasons(s),['missingChainSource']);assert.equal(s.log.length,1);assert.equal(s.log[0].informational,true);
- s.activities.emit('buildingCompleted',{objectIds:[mill.id]});const other=building(s,'mill',60,45);s.activities.emit('buildingCompleted',{objectIds:[other.id]});advance(s,DIAGNOSTICS.reminder*3);assert.equal(s.log.length,1);assert.equal(s.diagnostics.active().length,1);
- s.diagnostics.dismiss(s.diagnostics.active()[0].key);advance(s,DIAGNOSTICS.reminder*3);assert.deepEqual(reasons(s),[]);assert.equal(s.log.length,1);
- building(s,'wheat_field',40,52);advance(s,DIAGNOSTICS.checkInterval);assert.equal(s.diagnostics.completionNotices.size,0);
+ s.activities.emit('buildingCompleted',{objectIds:[mill.id]});const other=building(s,'mill',60,45);s.activities.emit('buildingCompleted',{objectIds:[other.id]});advance(s,REMINDER*3);assert.equal(s.log.length,1);assert.equal(s.diagnostics.active().length,1);
+ s.diagnostics.dismiss(s.diagnostics.active()[0].key);advance(s,REMINDER*2);assert.deepEqual(reasons(s),[]);assert.equal(s.log.length,1);
+ // m-notice-bar-hlasky (70): while the link is missing it is advised again once per 3 game days.
+ advance(s,REMINDER);assert.deepEqual(reasons(s),['missingChainSource']);assert.equal(s.log.length,2);
+ building(s,'wheat_field',40,52);advance(s,DIAGNOSTICS.checkInterval);assert.equal([...s.diagnostics.issues.values()].filter(i=>i.reason==='missingChainSource').length,0);
 });
 test('Bakery requires a completed Mill; existing predecessors and reloaded buildings do not replay completion advice',()=>{
- const s=scene(),bakery=building(s,'bakery',54,45);s.activities.emit('buildingCompleted',{objectIds:[bakery.id]});assert.deepEqual(s.diagnostics.active()[0].params,{producer:'mill'});
+ const s=scene(),bakery=building(s,'bakery',54,45);s.activities.emit('buildingCompleted',{objectIds:[bakery.id]});assert.deepEqual(s.diagnostics.active()[0].params,{producer:'mill',resource:'flour'});
  const mill=building(s,'mill',60,45,{blueprint:true});advance(s,DIAGNOSTICS.checkInterval);assert.deepEqual(reasons(s),[],'a planned Mill is enough – no advice to build one');
  mill.construction.state='complete';s.constructionSystem.sites.delete(mill.id);s.activities.emit('buildingCompleted',{objectIds:[mill.id]});assert.equal(s.diagnostics.active().some(i=>i.params.producer==='mill'),false);
  const next=building(s,'bakery',54,52);s.activities.emit('buildingCompleted',{objectIds:[next.id]});assert.equal(s.log.filter(i=>i.params.producer==='mill').length,1);
- s.diagnostics.destroy();s.diagnostics=new ProductionDiagnostics(s);s.diagnostics.foodIssues=()=>[];advance(s,DIAGNOSTICS.reminder*2);assert.deepEqual(reasons(s),[],'loading existing complete buildings emits no completion event');
+ s.diagnostics.destroy();s.diagnostics=new ProductionDiagnostics(s);s.diagnostics.foodIssues=()=>[];advance(s,DIAGNOSTICS.persistence-DIAGNOSTICS.checkInterval);assert.deepEqual(reasons(s),[],'loading existing complete buildings replays no completion advice at once');
+ // m-notice-bar-hlasky (70): a missing link that lasts is advised again (the Mills still have no Wheat Field).
+ advance(s,DIAGNOSTICS.checkInterval*2);assert.deepEqual(s.diagnostics.active().map(i=>[i.reason,i.params.producer]),[['missingChainSource','wheat_field']]);
 });
 test('C04 actual blockers take precedence over structural advice without duplicating the panel row',()=>{
  const s=scene(),mill=building(s,'mill',54,45);s.activities.emit('buildingCompleted',{objectIds:[mill.id]});employ(s,mill,'miller');advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);
@@ -107,7 +115,7 @@ test('a quarry or mine with its deposit used up and a lumberjack hut with no tre
   const s=mini({buildings:[quarry,hut,legacy],trees:[{x:80,y:80}],registry:objectRegistry});s.naturalResources.byId.set('d1',{natural:{remaining:0}});
   advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);
   const depleted=s.diagnostics.active().filter(i=>i.reason==='depleted').map(i=>[i.entityId,i.params.resource]);assert.deepEqual(depleted.sort(),[[1,'stone'],[2,'wood']]);
-  assert.equal(s.feed.length,2,'one feed line each');advance(s,DIAGNOSTICS.reminder*3);assert.equal(s.feed.length,2,'no spam');
+  assert.equal(s.feed.length,2,'one feed line each');advance(s,REMINDER*3);assert.equal(s.feed.length,2,'no spam');
   assert.match(s.feed.map(f=>f.text).join(' | '),/Quarry has run out of stone/i);assert.equal(s.diagnostics.buildingIssue(1).reason,'depleted');
   s.naturalResources.byId.get('d1').natural.remaining=5;s.naturalResources.byId.set('young',{x:41,y:41,definition:{tree:{}},natural:{stage:0}});advance(s,DIAGNOSTICS.checkInterval);
   assert.equal(s.diagnostics.active().filter(i=>i.reason==='depleted').length,0,'gone: stone again, a young tree will grow');

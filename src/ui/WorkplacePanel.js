@@ -83,7 +83,7 @@ export class WorkplacePanel {
     const rows=employees.map(w=>{const row=element('li','workplace-worker'),text=element('span','',`${w.name} · ${t('workplace.skillLevel',{skill:SKILLS[spec.workplace.skill],level:w.skills[spec.workplace.skill].level})} · ${localized(`work.state.${w.workState}`,w.workState)}${w.workMessage?` — ${workMessageLabel(w.workMessage)}`:''}`),remove=element('button','',t('workplace.remove'));remove.type='button';remove.dataset.removeWorker=w.id;row.append(text,remove);return row;});
     for(let i=summary.count;i<summary.capacity;i++)rows.push(element('li','empty-slot',t('workplace.emptySlot')));document.querySelector('#workplace-workers').replaceChildren(...rows);renderMilitary(s,b,this.militaryDetails,employees);
     document.querySelector('#assign-workplace-worker').disabled=!!blocked||summary.count>=summary.capacity;
-    // Three groups in a fixed order (this profession without a workplace, others without one, working elsewhere), each sorted by the skill this building needs.
+    // Three groups in a fixed order (this profession without a workplace, others without one, already working: elsewhere or as a Hauler/Builder), each sorted by the skill this building needs.
     const skill=spec.workplace.skill,groups=candidateGroups(candidates,spec.workplace),full=summary.count>=summary.capacity;
     const workplaceName=w=>{const home=s.buildings.find(x=>x.id===w.assignedWorkplaceId);return home?buildingDefinition(home).name:JOBS[w.profession].name;};
     const row=(w,group)=>{

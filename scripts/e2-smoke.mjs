@@ -32,7 +32,7 @@ export async function quickStartSmoke(context,url,instrument){
     assert.equal(await page.locator('#setup-custom').evaluate(d=>d.open),false,'the form is folded');assert.equal(await page.locator('.setup-start-top').isVisible(),true);
     await page.locator('[data-setup-preset="calm"]').click();
     const calm=await page.evaluate(()=>{const e=document.querySelector('#game-setup-form').elements;return {difficulty:e.difficulty.value,wolves:e.nightWolves.checked,fires:e.nightFires.checked,wood:e.startingWood.value};});
-    assert.deepEqual(calm,{difficulty:'easy',wolves:false,fires:false,wood:'70'});
+    assert.deepEqual(calm,{difficulty:'easy',wolves:false,fires:false,wood:'100'});
     await page.locator('.setup-start-top').click();await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
     const settings=await page.evaluate(()=>window.__game.registry.get('application').scene.gameSettings);assert.equal(settings.nightFires,false);assert.equal(settings.difficulty,'easy');
     console.log('PASS E2 menu: archive and changelog as links, quick starts on top (Calm start applies), form folded, Start at the top');

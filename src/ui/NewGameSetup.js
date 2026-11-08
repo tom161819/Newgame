@@ -5,7 +5,7 @@ import { encodeWorldCode,decodeWorldCode,defaultWorldLevels,randomSeed,applyPres
 // Quick starts (values for the form; anything not listed keeps the New Game default). Starting resources stay within
 // the Starter Stockpile's 300 units.
 export const SETUP_PRESETS=Object.freeze({
-  calm:Object.freeze({difficulty:'easy',nightWolves:false,nightThieves:false,nightFires:false,startingWood:70,startingStone:50,startingBread:180}),
+  calm:Object.freeze({difficulty:'easy',nightWolves:false,nightThieves:false,nightFires:false,startingWood:100,startingStone:40,startingBread:160}),
   normal:Object.freeze({}),
   challenge:Object.freeze({difficulty:'hard',startingWood:40,startingStone:20,startingBread:120}),
 });

@@ -482,6 +482,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .notices-panel.collapsed :is(.notices-list,.notices-filters) { display:none; }
 .notices-panel.collapsed .notices-heading { margin-bottom:0; }
 .notices-panel.collapsed .notices-heading h2::after { content:' ▸'; color:var(--muted,#b9b598); }
+.notices-heading h2 { flex:0 0 auto; }
+/* m-notice-bar-hlasky (72): fold button with an unread count; a new notice flashes one line while folded. */
+.notices-toggle { position:relative; flex:0 0 auto; min-width:24px; padding:1px 6px; font-size:12px; line-height:1.2; }
+.notices-panel.collapsed .notices-heading h2::after { content:''; }
+.notices-toggle.has-unread { border-color:#e0b85a; color:#ffd77a; }
+.notices-unread { position:absolute; top:-7px; right:-7px; min-width:15px; padding:0 3px; border-radius:8px; background:#c4512f; color:#fff; font-size:10px; line-height:15px; text-align:center; }
+.notices-flash { flex:1 1 auto; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:12px; color:#f4e6b8; opacity:1; transition:opacity 1s ease; }
+.notices-flash.fading { opacity:0; }
+.notices-panel:not(.collapsed) .notices-flash { display:none; }
+.notice-count { display:inline-block; margin-left:4px; padding:0 4px; border-radius:6px; background:#4a4524; color:#f4d98e; font-size:11px; }
 .notices-filters { display:flex; gap:4px; }
 .notice-filter { font-size:11px; padding:3px 7px; }
 .notice-filter[aria-pressed="false"] { opacity:.55; text-decoration:line-through; }

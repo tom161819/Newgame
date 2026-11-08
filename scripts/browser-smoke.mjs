@@ -25,6 +25,7 @@ import { uiWindowsSmoke } from './ui-windows-smoke.mjs';
 import { materialYardSmoke } from './material-yard-smoke.mjs';
 import { approvedArtSmoke } from './approved-art-smoke.mjs';
 import { kingXpSmoke } from './king-xp-smoke.mjs';
+import { notices2Smoke } from './notices-2-smoke.mjs';
 import { employment2Smoke } from './employment-2-smoke.mjs';
 import { animalLooksSmoke } from './animal-looks-smoke.mjs';
 import { tutorialSmoke } from './tutorial-smoke.mjs';
@@ -191,7 +192,7 @@ try{
   // the earlier empty start (no Castle, no Gold, empty stockpile) that the steps below were written for.
   assert.equal(await page.locator('#setup-castle').isChecked(),true);assert.equal(await page.locator('#setup-gold').inputValue(),'500');
   // E1 (owner 7 Nov 2026): basic buildings are wooden, so the start has more wood and no Iron Ore.
-  for(const [id,value] of [['stone','40'],['wood','60'],['iron-ore','0'],['bread','200']])assert.equal(await page.locator(`#setup-start-${id}`).inputValue(),value);
+  for(const [id,value] of [['stone','30'],['wood','90'],['iron-ore','0'],['bread','180']])assert.equal(await page.locator(`#setup-start-${id}`).inputValue(),value);
   await page.locator('#setup-castle').uncheck();await page.locator('#setup-garrison').uncheck();
   for(const selector of ['#setup-gold','#setup-start-stone','#setup-start-wood','#setup-start-iron-ore','#setup-start-bread'])await page.locator(selector).evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
@@ -215,6 +216,7 @@ try{
   await step('material-yard',()=>materialYardSmoke(context,origin+base,instrument));
   await step('approved-art',()=>approvedArtSmoke(context,origin+base,instrument));
   await step('king-xp',()=>kingXpSmoke(context,origin+base,instrument));
+  await step('notices-2',()=>notices2Smoke(context,origin+base,instrument));
   await step('tutorial',()=>tutorialSmoke(context,origin+base,instrument));
   await step('marketplace',()=>marketplaceSmoke(context,origin+base,instrument));
   await step('gate',()=>gateSmoke(context,origin+base,instrument));

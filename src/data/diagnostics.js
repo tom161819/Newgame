@@ -1,6 +1,8 @@
-// Production and work diagnostics: how often to look, how long a problem must last before it is reported, and
-// how often the same lasting problem may be repeated (all in game time).
-export const DIAGNOSTICS=Object.freeze({checkInterval:2000,persistence:10000,reminder:30000,
+import { FOOD_RESOURCE_IDS } from './foodProduction.js';
+
+// Production and work diagnostics: how often to look and how long a problem must last before it is reported (game
+// time). How often the same problem may come again is NOTICE_REPEAT below (in game days).
+export const DIAGNOSTICS=Object.freeze({checkInterval:2000,persistence:10000,
   // Plan m-e1-stavitele-material: a site whose materials are in the stores but have not arrived for this long gets a
   // notice, and its Builders start carrying them themselves even while a Hauler is free (a quarter of a game day).
   materialWait:30000});
@@ -13,8 +15,16 @@ export const INPUT_SOURCES=Object.freeze({
   wood:Object.freeze({building:'lumberjack_hut',profession:'woodcutter'}),
 });
 
-// Structural advice on completion, independent of current input stock or staffing.
-export const COMPLETION_SOURCES=Object.freeze({mill:'wheat_field',bakery:'mill'});
+// m-notice-bar-hlasky (owner request 72): the same notice (same reason + same building or resource) comes again at
+// most once per this many game days – also when the problem goes away and comes back. While it lasts it stays as one
+// row with a count. Danger (attacks, fire) is never held back. A reason not listed is a warning.
+export const NOTICE_REPEAT_DAYS=Object.freeze({info:1,warning:.5,danger:0});
+export const NOTICE_SEVERITY=Object.freeze({depleted:'info',noWater:'info',noInput:'info',noProducer:'info',noField:'info',missingChainSource:'info',chainNoConsumer:'info'});
+// Request 70: advice about a missing link of a production chain (a Bakery without a Mill, wheat without a Mill). The
+// links come from the recipes and crops (productionChains.js); `resources` picks the chains that get this advice.
+export const CHAIN_ADVICE=Object.freeze({repeatDays:3,resources:FOOD_RESOURCE_IDS});
+export const noticeSeverity=reason=>NOTICE_SEVERITY[reason]??'warning';
+export const noticeRepeatDays=reason=>reason==='missingChainSource'||reason==='chainNoConsumer'?CHAIN_ADVICE.repeatDays:NOTICE_REPEAT_DAYS[noticeSeverity(reason)];
 
 // Gathering workplaces: what they bring in, and what a depleted one should be rebuilt near (notice advice).
 export const GATHER_OUTPUTS=Object.freeze({quarry:'stone',iron_mine:'iron_ore',lumberjack_hut:'wood',hunting_lodge:'meat',fisherman_hut:'fish'});

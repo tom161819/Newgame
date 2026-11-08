@@ -22,8 +22,8 @@ test('three groups in a fixed order: this profession without a workplace, others
     person('worker-6','hauler','mining',6,10),person('worker-7','miner','mining',1,0),person('worker-8','miner','mining',4,0),at(person('worker-10','miner','mining',9,0),3)];
   const groups=candidateGroups(people,WORKPLACES.quarry);
   assert.deepEqual(groups.profession.map(w=>w.id),['worker-8','worker-7'],'Miners without a workplace first');
-  assert.deepEqual(groups.free.map(w=>w.id),['worker-6','worker-2','worker-3','worker-4','worker-1','worker-9'],'everyone else without a workplace: level, XP, talent, overall level, id');
-  assert.deepEqual(groups.employed.map(w=>w.id),['worker-10','worker-5'],'already working in a building – last, even a Miner from another quarry');
+  assert.deepEqual(groups.free.map(w=>w.id),['worker-2','worker-3','worker-4','worker-1','worker-9'],'everyone else without a workplace: level, XP, talent, overall level, id');
+  assert.deepEqual(groups.employed.map(w=>w.id),['worker-10','worker-6','worker-5'],'already working – last: in a building (even a Miner from another quarry) or as a Hauler');
   // XP in the skill decides between equal levels.
   assert.deepEqual(candidateGroups([person('worker-1','idle','farming',2,10),person('worker-2','idle','farming',2,40)],WORKPLACES.farmhouse).free.map(w=>w.id),['worker-2','worker-1']);
 });

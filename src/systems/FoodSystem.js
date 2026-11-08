@@ -22,7 +22,7 @@ export class FoodSystem {
   bucket(){const day=this.time?.day??this.lastProcessedDay;let record=this.history.find(r=>r.day===day);if(!record){record={day,produced:0,consumed:0};this.history.push(record);}return record;}
   trimHistory(){const day=this.time?.day??this.lastProcessedDay;this.history=this.history.filter(r=>r.day>day-FOOD_ECONOMY_DAYS);}
   // Policy v2 P3: a resident takes the available kind he ate longest ago (never eaten first, then the food order), so
-  // the kinds alternate; the day each kind was last eaten is kept for the meal-variety bonus. Deterministic.
+  // the kinds alternate; the day each kind was last eaten is kept for meal variety (it raises the Food need, #68). Deterministic.
   eat(actor=this.scene?.character??{id:'king'},{source=null}={}){
     if(!this.residents.has(actor.id))this.syncResidents();
     const record=this.residents.get(actor.id),last=record?.meals??{},day=this.time?.day??this.lastProcessedDay;
@@ -32,7 +32,6 @@ export class FoodSystem {
   }
   // Kinds of food a resident ate within the last MEAL_VARIETY.days days (today included).
   recentKinds(id){const day=this.time?.day??this.lastProcessedDay,meals=this.residents.get(id)?.meals??{};return EDIBLE_RESOURCES.filter(k=>meals[k]!==undefined&&day-meals[k]<MEAL_VARIETY.days);}
-  varietyBonus(id){const kinds=this.recentKinds(id);return (MEAL_VARIETY.bonus[Math.min(kinds.length,MEAL_VARIETY.bonus.length-1)]??0)+(kinds.length>1&&kinds.includes('bread')?MEAL_VARIETY.bread:0);}
   recover(){if(this.time?.paused||this.scene?.gameOver)return false;let changed=false;for(const u of this.units())if(u.isAlive){const record=this.residents.get(u.id);if(record?.hungry&&this.eat(u)){record.hungry=false;changed=true;}}if(changed)this.onChange();return changed;}
   advance(delta){
     if(!Number.isFinite(delta)||delta<=0||this.scene?.gameOver||this.time?.paused)return;
