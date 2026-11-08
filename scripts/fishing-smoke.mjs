@@ -30,6 +30,8 @@ export async function fishingSmoke(context,url,instrument){
       s.foodSystem.eat=()=>true;return {id:b.id,worker:w.id,shoreCount:s.fishing.spots(b).length,distance:s.fishing.distance(b)};
     });
     assert.ok(setup.shoreCount>0,'the hut has shore spots');assert.ok(setup.distance>=15,`the water is far (${setup.distance} tiles)`);
+    // The Fisher walks with the approved Fisher look (walk sheet), not the old drawn figure.
+    await page.waitForFunction(w=>{const v=window.__game.registry.get('application').scene.workerSystem.workers.get(w).view;return v.look?.startsWith('fisher-')&&v.art?.visible&&v.art.texture.key===`villager-walk:${v.look}`;},setup.worker,{timeout:60000});
     await page.waitForFunction(w=>{const t=window.__game.registry.get('application').scene.workerSystem.workers.get(w);return t.workTask?.kind==='fish'&&t.workState==='Working';},setup.worker,{timeout:120000});
     // Skip the real fishing time (a day for a basket): the bite count is advanced, the catch then runs through the game.
     if(process.env.SMOKE_SHOTS){await page.evaluate(w=>{const s=window.__game.registry.get('application').scene,p=s.workerSystem.workers.get(w).position;if(s.worldCamera)s.worldCamera.following=false;s.fog?.setEnabled?.(false);s.cameras.main.centerOn(3200+(p.x-p.y)*32,128+(p.x+p.y)*16);},setup.worker);await page.waitForTimeout(600);await page.screenshot({path:`${process.env.SMOKE_SHOTS}/fishing.png`});}

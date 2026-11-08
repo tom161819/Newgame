@@ -52,3 +52,17 @@
   .ul-shell { grid-template-columns: 1fr; }
   .ul-controls { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); }
 }
+
+/* Comment fields: one per section, for requested changes (uiNotes in the page database). */
+.ul-note { margin: 4px 0 12px; border: 1px dashed var(--line, #8886); border-radius: 6px; padding: 4px 8px; }
+.ul-note > summary { cursor: pointer; font-size: 12px; opacity: .8; list-style: none; }
+.ul-note > summary::-webkit-details-marker { display: none; }
+.ul-note.has-note { border-style: solid; border-color: var(--accent, #c9a14a); }
+.ul-note.has-note > summary { opacity: 1; font-weight: 600; }
+.ul-note-text { display: block; width: 100%; box-sizing: border-box; margin: 6px 0 2px; font: inherit; font-size: 13px; resize: vertical; min-height: 54px; }
+.ul-note-status { display: block; font-size: 11px; opacity: .7; min-height: 1em; }
+.ul-section-notes { display: grid; gap: 2px; }
+.ul-notes-overview ul { padding-left: 18px; margin: 4px 0; }
+.ul-notes-overview li { margin: 4px 0; font-size: 13px; }
+.ul-notes-overview li strong { display: block; font-size: 12px; }
+.ul-notes-overview li span { white-space: pre-wrap; }

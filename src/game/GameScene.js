@@ -128,6 +128,7 @@ import { NaturalResourcesSystem } from '../systems/NaturalResourcesSystem.js';
 import { TreeView } from './TreeView.js';
 import { resourceBlocks } from '../data/minerals.js';
 import { DepositView } from './DepositView.js';
+import { natureReady } from './natureArt.js';
 import { NaturalResourcePanel } from '../ui/NaturalResourcePanel.js';
 import { ConstructionSystem } from '../systems/ConstructionSystem.js';
 import { ConstructionView } from './ConstructionView.js';
@@ -199,6 +200,7 @@ export class GameScene extends Phaser.Scene {
     this.assets.registerRenderer('stone',(definition,context)=>drawStone(this,context.tile,definition));
     this.assets.registerRenderer('tree',(definition,context)=>new TreeView(this,definition,context));
     this.assets.registerRenderer('deposit',(definition,context)=>new DepositView(this,definition,context));
+    natureReady(this); // g-nasadit-prirodu: the nature atlas loads at the start; views fall back until it is in.
     this.assets.registerRenderer('king',(definition,context)=>new KingView(this,context.x,context.y,definition));
     this.assets.registerRenderer('tower',(_definition,context)=>new TowerView(this,context.building,context.preview));
     this.assets.registerRenderer('animal',(definition,context)=>new AnimalView(this,context.x,context.y,definition));

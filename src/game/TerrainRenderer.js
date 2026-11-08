@@ -13,6 +13,7 @@ import { GROUND, GROUND_TERRAIN_IDS, BUSH_TYPES, GRASS_ZONE } from '../data/worl
 import { PathV2Layer } from './PathV2Layer.js';
 import { APPROVED_DEPLOY_ART } from '../data/objects/approvedDeployArt.js';
 import { requestTexture } from './deployArt.js';
+import { natureReady,showNature,outcropLook,bushLook } from './natureArt.js';
 import { paintContinuousGround, makeWaterField, plantsFor, waterObjectsFor, drawPlant, seasonOf } from '../render/continuousGround.js';
 import { groundSettings } from '../data/groundLook.js';
 
@@ -332,7 +333,9 @@ export class TerrainRenderer {
     const key=`${x},${y}`;return this.scene.map?.[y]?.[x]===0&&!this.scene.resourceOccupancy?.has(key)&&!occupied.has(key)&&!this.wear?.isPaved?.({x,y})&&(this.wear?.level({x,y})??0)<2;
   }
   buildingTiles(){const tiles=new Set();for(const b of this.scene.buildings??[])for(const t of b.tiles??[])tiles.add(`${t.x},${t.y}`);return tiles;}
-  paintBush(sprite,type,state,fog){
+  paintBush(sprite,type,state,fog,x,y){
+    const look=x==null?null:bushLook(BUSH_TYPES[type],x,y,this.season);
+    if(look&&this.natureArtReady()&&showNature(this.scene,sprite,look,{remembered:state===VISIBILITY.EXPLORED,brightness:fog?.memoryBrightness}))return 'nature';
     const id=BUSH_TYPES[type];let key=this.assets?.hasTexture(id)?this.assets.key(id):null;if(!key)return false;
     if(state===VISIBILITY.EXPLORED){const texture=this.scene.textures.get(key);key=memoryTexture(this.scene,texture,texture.get(),fog.memoryBrightness)??key;}
     if(sprite.texture?.key!==key)sprite.setTexture(key);return true;
@@ -590,10 +593,16 @@ export class TerrainRenderer {
 
   // Remembered rocks use the same muted memory copy as other remembered objects; visible rocks the original art.
   paintWall(wall,state,fog){
+    // Plan g-nasadit-prirodu: the approved rock obstacle looks per tile and season; the old outcrop art until the
+    // atlas is in.
+    const look=wall.tileX==null?null:outcropLook(wall.tileX,wall.tileY,this.season);
+    if(look&&this.natureArtReady()&&showNature(this.scene,wall,look,{remembered:state===VISIBILITY.EXPLORED,brightness:fog?.memoryBrightness})){wall.natureArt=true;return;}
+    if(wall.natureArt){wall.natureArt=false;wall.setOrigin(this.outcrop.origin?.x??0.5,this.outcrop.origin?.y??1);}
     let key=this.wallTexture;
     if(state===VISIBILITY.EXPLORED){const texture=this.scene.textures.get(this.wallTexture);key=memoryTexture(this.scene,texture,texture.get(),fog.memoryBrightness)??key;}
     if(wall.texture.key!==key)wall.setTexture(key);
   }
+  natureArtReady(){return natureReady(this.scene,()=>{this.lastView='';});}
   updateFog(camera,fog) {
     const mode=`${fog?.enabled}:${fog?.explorationEnabled}`;
     if(mode!==this.fogMode){
@@ -673,7 +682,7 @@ export class TerrainRenderer {
         occupied??=this.buildingTiles();const state=fog?.displayState({x,y})??VISIBILITY.VISIBLE;
         if(state!==VISIBILITY.UNEXPLORED&&(!fog?.enabled||fog.isInSightTile({x,y})||fog.explored[y*fog.width+x])&&this.bushVisible(x,y,occupied)){
           const key=`${x},${y}`,id=BUSH_TYPES[bush],definition=this.registry.get?.(id),sprite=this.bushSprites.get(key)??this.bushPool.pop()??this.scene.add.image(0,0,this.assets?.textureKey(id)??'__DEFAULT');
-          if(this.paintBush(sprite,bush,state,fog)){sprite.setOrigin(definition?.origin?.x??.5,definition?.origin?.y??.6).setPosition(p.x,p.y).setDepth(p.y+(definition?.depth?.offset??0)).setVisible(true);this.bushSprites.set(key,sprite);shownBushes.add(key);}
+          const painted=this.paintBush(sprite,bush,state,fog,x,y);if(painted){if(painted!=='nature')sprite.setOrigin(definition?.origin?.x??.5,definition?.origin?.y??.6);sprite.setPosition(p.x,p.y).setDepth(p.y+(definition?.depth?.offset??0)).setVisible(true);this.bushSprites.set(key,sprite);shownBushes.add(key);}
           else{sprite.setVisible(false);this.bushPool.push(sprite);this.bushSprites.delete(key);}
         }
       }
@@ -685,7 +694,7 @@ export class TerrainRenderer {
       const key=`${x},${y}`; visible.add(key);
       if(this.tiles.has(key)){this.paintWall(this.tiles.get(key),state,fog);continue;}
       const wall=this.wallPool.pop()??this.scene.add.image(0,0,this.wallTexture).setOrigin(this.outcrop.origin?.x??0.5,this.outcrop.origin?.y??1);
-      wall.setPosition(p.x,p.y).setDepth(p.y+(this.outcrop.depth?.offset??0)).setVisible(true);this.paintWall(wall,state,fog);
+      wall.tileX=x;wall.tileY=y;wall.setPosition(p.x,p.y).setDepth(p.y+(this.outcrop.depth?.offset??0)).setVisible(true);this.paintWall(wall,state,fog);
       this.tiles.set(key,wall);
     }
     for(const [key,tile] of this.tiles) if(!visible.has(key)) {
