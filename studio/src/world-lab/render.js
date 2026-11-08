@@ -4,7 +4,7 @@ import { COLUMNS, ROWS, PLAYER_START, GROUND, tileColor, BUSH_COLOR, REED_COLOR 
 import { GROUND_TERRAIN_IDS, BUSH_TYPES } from '../../../src/data/worldTerrain.js';
 import { terrain as TERRAIN_DEFS } from '../../../src/data/objects/terrain.js';
 import { decorations as DECORATION_DEFS } from '../../../src/data/objects/decorations.js';
-import { paintContinuousGround, plantsFor, drawPlant, drawAtmosphere, seasonOf, yearOf, makeWaterField, waterObjectsFor } from './ground.js';
+import { paintContinuousGround, plantsFor, drawPlant, drawAtmosphere, seasonOf, yearOf, makeWaterField, waterObjectsFor, duckSites } from './ground.js';
 
 const assetUrls = import.meta.glob('../../../public/assets/{terrain,decorations}/**/*.{png,webp,svg}', { eager: true, query: '?url', import: 'default' });
 const urlFor = path => assetUrls[`../../../public${path}`] ?? null;
@@ -97,7 +97,9 @@ export function drawIso(canvas, world, { focus, span = 28, ground = null }) {
     const toWorld = (px, py) => { const a = (px - canvas.width / 2) / (W / 2), b = (py - headroom) / (H / 2); return [x0 + (a + b) / 2, y0 + (b - a) / 2]; };
     const field = makeWaterField({ x0, y0, span, depthAt, settings: ground.settings });
     const painted = paintContinuousGround(ctx, { width: canvas.width, height: canvas.height, toWorld, isGrass, zoneAt, depthAt, inWorld, field, settings: ground.settings });
-    canvas._water = { mask: painted.mask, toWorld, field, flow: ground.settings.flow ?? 0 };
+    const screenOf = (fx, fy) => [(fx - x0 - (fy - y0)) * (W / 2) + canvas.width / 2, (fx - x0 + (fy - y0)) * (H / 2) + headroom];
+    if (!world._ducks || world._ducks.count !== (ground.settings.duckFamilies ?? 3)) world._ducks = { count: ground.settings.duckFamilies ?? 3, sites: duckSites(world, ground.settings.duckFamilies ?? 3, (x, y) => { const g = world.ground[y]?.[x]; return g === GROUND.SHALLOW || g === GROUND.DEEP; }) };
+    canvas._water = { mask: painted.mask, toWorld, toScreen: screenOf, field, flow: ground.settings.flow ?? 0, settings: ground.settings, ducks: world._ducks.sites };
     const screen = (fx, fy) => [(fx - x0 - (fy - y0)) * (W / 2) + canvas.width / 2, (fx - x0 + (fy - y0)) * (H / 2) + headroom];
     const season = seasonOf(ground.settings.year ?? yearOf(ground.settings.season));
     for (const p of waterObjectsFor({ x0, y0, span, field, depthAt, settings: ground.settings })) { const [sx, sy] = screen(p.fx, p.fy); if (p.flat) drawPlant(ctx, p, sx, sy, season); else objects.push({ kind: 'plant', plant: p, x: p.fx, y: p.fy, sx, sy }); }

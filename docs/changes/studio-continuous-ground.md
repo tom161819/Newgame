@@ -42,3 +42,8 @@ After approval the game part is m-souvisla-zeme: same maths per 16 × 16 chunk i
 - Flowing water: streaks along the current painted into the water plus an animated overlay of drifting streaks (slider "Flowing water"; off with reduced motion).
 - River colours: presets (Czech river – default, muddy lowland river, clear mountain stream, the old blue) plus the three colour pickers.
 - In the shallows and on the waterline, each with amount and opacity: rocks sticking out of the water, pebbles at the waterline, reeds, water lilies, algae and weed (lilies and algae hidden in winter).
+
+### Round 8 (owner 8 Nov)
+- Fish: animated shadows in deeper water with sliders for amount, size and opacity.
+- Ducks: a set number of families on the whole map (default 3, slider), placed once per world on calm water far apart; they paddle slow loops, with 3–6 ducklings following in spring and summer, none in deep winter.
+- Settings folded into categories (remembered in the browser) so the preview stays in view.

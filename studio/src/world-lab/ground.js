@@ -14,6 +14,7 @@ export const GROUND_DEFAULTS_BASE = {
   pebbles: 0.4, gravel: 0.2, stones: 0.12, flatStones: 0.06,
   shoreCurve: 0.6, shoreSmooth: 0.7, shoreFoam: 0.35, wetBank: 0.5, ripples: 0.5, depthBlend: 1, flow: 0.6,
   waterRocks: 0.4, waterPebbles: 0.6, reedBeds: 0.5, lilies: 0.3, algae: 0.4,
+  fishAmount: 0.5, fishSize: 1, fishOpacity: 0.45, duckFamilies: 3,
   waterColors: ['#8f8d6c', '#647458', '#3c4e44'],
   zoneColors: ['#689640', '#4a8834', '#8c9650', '#62763e', '#649642', '#76845a', '#d6c38c', '#dcbf7e', '#7a5f43', '#9a958a'],
   time: 'day', season: 'summer', year: 0.5, weather: 'clear',
@@ -50,6 +51,10 @@ export const GROUND_SETTINGS = [
   { key: 'reedBeds', label: 'Reeds', min: 0, max: 2, step: 0.05, group: 'waterObjects' },
   { key: 'lilies', label: 'Water lilies', min: 0, max: 2, step: 0.05, group: 'waterObjects' },
   { key: 'algae', label: 'Algae and weed', min: 0, max: 2, step: 0.05, group: 'waterObjects' },
+  { key: 'fishAmount', label: 'Fish – amount', min: 0, max: 2, step: 0.05, group: 'life' },
+  { key: 'fishSize', label: 'Fish – size', min: 0.4, max: 2, step: 0.05, group: 'life' },
+  { key: 'fishOpacity', label: 'Fish – opacity', min: 0.1, max: 1, step: 0.05, group: 'life' },
+  { key: 'duckFamilies', label: 'Duck families on the map', min: 0, max: 6, step: 1, group: 'life' },
   { key: 'pebbles', label: 'Pebbles', min: 0, max: 2, step: 0.05, group: 'stones' },
   { key: 'gravel', label: 'Gravel patches', min: 0, max: 2, step: 0.05, group: 'stones' },
   { key: 'stones', label: 'Stones', min: 0, max: 2, step: 0.05, group: 'stones' },
@@ -327,4 +332,29 @@ function drawWaterShape(ctx, p, sx, sy, rnd, k) {
     case 'lilies': { for (let i = 0; i < 4; i++) { const x = sx + (rnd(i) - 0.5) * 14 * k, y = sy + (rnd(i + 4) - 0.5) * 6 * k, r = (2.4 + rnd(i + 8) * 1.6) * k; ctx.fillStyle = ['#4f7a3a', '#5e8a42', '#45703a'][i % 3]; ctx.beginPath(); ctx.ellipse(x, y, r * 1.2, r * 0.6, 0, 0.35, Math.PI * 2); ctx.lineTo(x, y); ctx.fill(); if (i === 0 && rnd(12) > 0.4) { ctx.fillStyle = rnd(13) > 0.5 ? '#f4eef0' : '#f0c0d0'; ctx.beginPath(); ctx.arc(x, y - 1, 1.6 * k, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#f0cc4a'; ctx.fillRect(x - 0.5, y - 1.5, 1, 1); } } return; }
     case 'algae': { ctx.fillStyle = 'rgb(70 96 46 / .45)'; for (let i = 0; i < 6; i++) { ctx.beginPath(); ctx.ellipse(sx + (rnd(i) - 0.5) * 16 * k, sy + (rnd(i + 6) - 0.5) * 7 * k, (3 + rnd(i + 12) * 4) * k, (1.2 + rnd(i + 18) * 1.4) * k, rnd(i + 24) - 0.5, 0, Math.PI * 2); ctx.fill(); } ctx.strokeStyle = 'rgb(90 120 56 / .5)'; ctx.lineWidth = 0.8; for (let i = 0; i < 5; i++) { const x = sx + (rnd(i + 30) - 0.5) * 14 * k, y = sy + (rnd(i + 36) - 0.5) * 6 * k; ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + 3 * k, y - 1, x + 6 * k, y + 1); ctx.stroke(); } return; }
   }
+}
+
+// ---------- ducks: a few families on the whole map, ducklings in spring and summer ----------
+// Places are chosen once per world: calm water tiles (shallow or deep, not fords) spread far apart.
+export function duckSites(world, count, isWater) {
+  if (!count) return [];
+  const rows = world.ground.length, cols = world.ground[0].length, cand = [];
+  for (let y = 2; y < rows - 2; y++) for (let x = 2; x < cols - 2; x++) if (isWater(x, y) && [[1, 0], [-1, 0], [0, 1], [0, -1]].every(([dx, dy]) => isWater(x + dx, y + dy))) cand.push({ x, y, k: hash(x, y, 991) });
+  cand.sort((a, b) => a.k - b.k);
+  const out = [];
+  for (const c of cand) { if (out.every(o => Math.hypot(o.x - c.x, o.y - c.y) > 28)) out.push(c); if (out.length >= count) break; }
+  return out;
+}
+export function ducklingsFor(year) { const t = ((year % 1) + 1) % 1; return t > 0.27 && t < 0.62 ? 3 + Math.round(hash(Math.floor(t * 10), 1, 995) * 3) : 0; }
+// Draws one duck at (x, y) heading `dir` (radians on screen); `scale` 1 = adult, 0.55 = duckling.
+export function drawDuck(ctx, x, y, dir, scale, winter, duckling) {
+  const k = scale, c = Math.cos(dir), s = Math.sin(dir);
+  ctx.save(); ctx.translate(x, y);
+  ctx.fillStyle = 'rgb(230 236 232 / .35)'; ctx.beginPath(); ctx.ellipse(-c * 4 * k, -s * 2 * k, 6 * k, 2.4 * k, Math.atan2(s * 0.5, c), 0, Math.PI * 2); ctx.fill(); // wake
+  ctx.fillStyle = duckling ? '#b59a52' : '#7a5f3e'; ctx.beginPath(); ctx.ellipse(0, -1.5 * k, 4.2 * k, 2.4 * k, Math.atan2(s * 0.5, c), 0, Math.PI * 2); ctx.fill();
+  if (!duckling) { ctx.fillStyle = '#5b4630'; ctx.beginPath(); ctx.ellipse(-c * 2 * k, -2.2 * k, 2.2 * k, 1.2 * k, Math.atan2(s * 0.5, c), 0, Math.PI * 2); ctx.fill(); }
+  const hx = c * 3.6 * k, hy = s * 1.8 * k - 3.6 * k;
+  ctx.fillStyle = duckling ? '#c9ae60' : '#2f6b3e'; ctx.beginPath(); ctx.arc(hx, hy, 1.7 * k, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#d9a23a'; ctx.beginPath(); ctx.ellipse(hx + c * 1.7 * k, hy + 0.4 * k, 1.1 * k, 0.6 * k, Math.atan2(s * 0.5, c), 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
 }
