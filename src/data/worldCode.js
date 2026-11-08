@@ -3,7 +3,9 @@
 // <seed> is base36 in capitals, 1–8 characters. New settings are only added at the end, with a new generator version.
 // Generator 2 (World v2 step 2a): a wider river with stony fords, varied banks, an optional tributary (rivers 2),
 // grass zones (their size: grass zone scale). Level 5 keeps the base values in WORLD_GENERATION.
-export const WORLD_GENERATOR_VERSION=2;
+// Generator 3 (m-kamenolom-u-hradu, playtest 0.76.0 #13): a Stone Deposit for a Quarry 8–16 tiles from the Castle.
+// A saved game keeps the code it was made with (decode with current:null); only New Game needs the current version.
+export const WORLD_GENERATOR_VERSION=3;
 export const WORLD_SEED_MAX=36**8-1;
 // key: id used in code and Studio; max: highest level; default: today's world; scale: level → multiplier (or value).
 const linear=(at0,at5,at9)=>level=>level<=5?at0+(at5-at0)*level/5:at5+(at9-at5)*(level-5)/4;
@@ -32,11 +34,12 @@ export function encodeWorldCode({generator=WORLD_GENERATOR_VERSION,levels=defaul
   return `MKW${generator}-${levels.join('')}-${seed.toString(36).toUpperCase()}`;
 }
 // Accepts lower case and surrounding spaces. Throws WorldCodeError: 'invalid' or 'generator' (another version).
+// current:null accepts any generator version (the code of a saved game made by an older generator).
 export function decodeWorldCode(code,{current=WORLD_GENERATOR_VERSION}={}){
   const match=typeof code==='string'&&code.trim().toUpperCase().match(/^MKW([1-9]\d{0,3})-(\d{1,40})-([0-9A-Z]{1,8})$/);
   if(!match)throw new WorldCodeError('invalid','Invalid world code');
   const generator=Number(match[1]);
-  if(generator!==current)throw new WorldCodeError('generator',`This world code is for generator version ${generator}; this build uses version ${current}.`);
+  if(current!==null&&generator!==current)throw new WorldCodeError('generator',`This world code is for generator version ${generator}; this build uses version ${current}.`);
   const levels=[...match[2]].map(Number),seed=parseInt(match[3],36);
   if(!validLevels(levels)||!Number.isSafeInteger(seed)||seed>WORLD_SEED_MAX)throw new WorldCodeError('invalid','Invalid world code');
   return {generator,levels,seed};

@@ -9,7 +9,7 @@ export async function worldLook2Smoke(context,url,instrument){
   const scene=fn=>page.evaluate(fn);
   try{
     await page.setViewportSize({width:1280,height:800});
-    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW2-155515555555-1');
+    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW3-155515555555-1');
     if(!await page.locator('#setup-fog').isVisible())await page.locator('.setup-advanced summary').click();await page.locator('#setup-fog').check();
     await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.fishShadows);

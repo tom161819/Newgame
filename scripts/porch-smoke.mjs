@@ -9,7 +9,7 @@ const finish=(page,id)=>page.evaluate(id=>{const s=window.__game.registry.get('a
 export async function porchSmoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);
   try{
-    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW2-155515555555-1');await page.locator('#start-game').click();
+    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW3-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.porches);
     await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('wood',80);s.inventory.add('stone',40);s.updateInventory();s.fog?.setEnabled?.(false);s.gameTime.setPaused?.(false);});

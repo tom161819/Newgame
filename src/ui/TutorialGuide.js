@@ -1,6 +1,6 @@
 import { t } from '../i18n/index.js';
 import { tutorialProgress,nearestRock,tutorialPlacement,markedRocks,freeBubbleSpot,rememberSpeed } from '../systems/Tutorial.js';
-import { tileCenter } from '../game/isometric.js';
+import { tileCenter,gridToWorld } from '../game/isometric.js';
 import { FARM_PLOT_CAPACITY } from '../data/farmPlots.js';
 import { TUTORIAL_KING_MS } from '../data/tutorial.js';
 import { TIPS } from '../data/tips.js';
@@ -75,6 +75,9 @@ export class TutorialGuide {
     }
     // Stone (point 5): once "Mark to clear" is on, the arrow points down at the rock nearest to the Castle.
     if(step.id==='stone'&&s.rockMiningTool?.enabled&&!s.rockMiningTool.remove){const rock=this.rockTile();if(rock){const p=tileCenter(rock);return {world:{x:p.x,y:p.y-10},from:'above'};}}
+    // m-kamenolom-u-hradu: with the Quarry chosen in the build menu, the arrow points down at the free Stone Deposit
+    // nearest to the Castle (every new world has one 8–16 tiles out).
+    if(step.id==='stone'&&s.buildMode&&s.selectedBuilding?.id==='quarry'){const d=this.quarryDeposit();if(d){const p=gridToWorld(d.x+1,d.y+1);return {world:{x:p.x,y:p.y-30},from:'above',placing:true,quarry:true};}}
     if(step.target)return {el:q(step.target)};
     const id=this.pendingBuilding(step);if(!id)return {};
     if(s.buildMode&&s.selectedBuilding?.id===id)return {placing:true};
@@ -87,6 +90,10 @@ export class TutorialGuide {
       return {el:choice};
     }
     const cat=s.objectRegistry?.get(id)?.buildingCategory;return {el:cat?q(`[data-building-category="${cat}"]`):null};
+  }
+  quarryDeposit(){
+    const s=this.scene,mining=s.naturalResources?.mining;if(!mining)return null;const c=mining.startCentre?.()??{x:50,y:50};
+    return mining.deposits().filter(d=>d.type==='stone_deposit'&&d.natural.remaining>0&&d.natural.boundBuildingId==null).sort((a,b)=>Math.hypot(a.x+1-c.x,a.y+1-c.y)-Math.hypot(b.x+1-c.x,b.y+1-c.y)||a.y-b.y||a.x-b.x)[0]??null;
   }
   // The rock the stone step points at: kept while it is still an unmarked rock, otherwise the nearest one to the Castle.
   rockTile(){
@@ -108,7 +115,7 @@ export class TutorialGuide {
     if(!p.current){this.active=false;this.hide();this.scene.eventFeed?.push?.('tutorial-done',t('tutorial.finished'),{important:true});this.currentId=null;return;}
     this.currentId=p.current.id;
     const target=this.target(p.current);
-    const key=target.placing?'tutorial.place':target.from==='above'&&p.current.id==='stone'?'tutorial.step.stoneMark':`tutorial.step.${p.current.id}`;
+    const key=target.quarry?'tutorial.step.stoneQuarry':target.placing?'tutorial.place':target.from==='above'&&p.current.id==='stone'?'tutorial.step.stoneMark':`tutorial.step.${p.current.id}`;
     this.text.textContent=t(key,{name:this.scene.objectRegistry?.get(this.pendingBuilding(p.current)??'')?.name??'',plots:FARM_PLOT_CAPACITY});
     this.count.textContent=t('tutorial.count',{step:p.doneCount+1,total:p.total});
     this.showButton.textContent=t('tutorial.show');this.skipButton.textContent=t('tutorial.skip');this.nextButton.textContent=t('tutorial.next');this.closeButton.title=this.closeButton.ariaLabel=t('tutorial.close');

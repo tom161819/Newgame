@@ -215,7 +215,7 @@ export class GameScene extends Phaser.Scene {
     // World v2 step 1: a new game draws its whole starting world from the world code (seed + settings), one random
     // stream per part; a loaded game keeps its saved world and its code.
     if(!this.loadState&&!this.gameSettings.worldCode)this.gameSettings=gameSettings({...this.gameSettings,worldCode:randomWorldCode()});
-    const worldCode=this.gameSettings.worldCode?decodeWorldCode(this.gameSettings.worldCode):null;
+    const worldCode=this.gameSettings.worldCode?decodeWorldCode(this.gameSettings.worldCode,this.loadState?{current:null}:undefined):null;
     this.worldLevels=worldCode?.levels??defaultWorldLevels();this.worldSeed=worldCode?.seed??0;this.worldRandom=worldCode?worldStreams(worldCode.seed):()=>Math.random;
     const world=this.loadState?{terrain:this.loadState.terrain.map(row=>[...row]),ground:this.loadState.ground?importGround(this.loadState.ground):emptyGround(),bushes:importBushes(this.loadState.bushes??[]),
       zones:this.loadState.grassZones?importZones(this.loadState.grassZones):emptyZones(),reeds:importReeds(this.loadState.reeds)}:generateWorld(Math.random,{levels:this.worldLevels,streams:this.worldRandom});
@@ -325,7 +325,9 @@ export class GameScene extends Phaser.Scene {
     this.worldCamera=new WorldCamera(this,this.player);this.staffingIndicators=new MissingWorkersIndicators(this);
     this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState){const weights=this.worldWeights,at=(grid,t)=>grid[t.y*this.groundGrid[0].length+t.x]??0,F=WORLD_GENERATION.fairStart;
       this.naturalResources.generate(this.worldRandom('trees'),Math.round(WORLD_FORESTRY.initialTrees*settingsFromLevels(this.worldLevels).forest),{weight:weights?t=>at(weights.forest,t):null,start:settingsFromLevels(this.worldLevels).forest>=.5?{center:PLAYER_START,radius:F.radius,trees:F.trees}:null});
-      this.naturalResources.mining.generate(this.worldRandom('minerals'),weights?t=>.25+.75*at(weights.stone,t):null);}
+      this.naturalResources.mining.generate(this.worldRandom('minerals'),weights?t=>.25+.75*at(weights.stone,t):null);
+      // m-kamenolom-u-hradu: a Quarry deposit 8–16 tiles from the Castle in every world (generator 3).
+      this.naturalResources.mining.ensureStartQuarry(this.worldRandom('start-quarry'));}
     // World v2: a fingerprint of the starting world as generated (terrain, water, bushes, every placed resource, animals,
     // chests), so tests and the Studio can check that a world code always gives the same world.
     this.startWorldFingerprint=this.loadState?null:this.worldFingerprint();

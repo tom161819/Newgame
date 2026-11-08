@@ -11,7 +11,7 @@ const settle=page=>page.evaluate(()=>{const d=window.__game.registry.get('applic
 export async function storageNoticesSmoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);
   try{
-    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW2-155515555555-1');await page.locator('#start-game').click();
+    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW3-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.diagnostics);
     await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('wood',40);s.inventory.add('stone',40);s.updateInventory();});

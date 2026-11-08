@@ -29,7 +29,9 @@ export const DIFFICULTIES=Object.freeze({
 export const WILDLIFE_COUNTS=Object.freeze({rare:1,normal:3,abundant:8});
 export const WILDLIFE_INTERVALS=Object.freeze({off:0,slow:120000,normal:60000,fast:30000});
 // World v2: the world code of this game (null only before a New Game picks one, and in test scenarios).
-const validWorldCode=code=>{if(code===null)return true;try{decodeWorldCode(code);return typeof code==='string'&&code===code.trim().toUpperCase();}catch{return false;}};
+// m-kamenolom-u-hradu: any generator version is kept here, so a saved game made by an older generator still loads; a New
+// Game refuses an old code where the world is generated (NewGameSetup, GameScene).
+const validWorldCode=code=>{if(code===null)return true;try{decodeWorldCode(code,{current:null});return typeof code==='string'&&code===code.trim().toUpperCase();}catch{return false;}};
 export function gameSettings(input=DEFAULT_GAME_SETTINGS){
   if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('Neplatné nastavení nové hry.');
   const s={...DEFAULT_GAME_SETTINGS,...input};

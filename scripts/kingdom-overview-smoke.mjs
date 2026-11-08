@@ -8,7 +8,7 @@ export async function kingdomOverviewSmoke(context,url,instrument){
   try{
     for(const [width,height] of [[1280,800],[1920,1080],[900,800]]){
       await page.setViewportSize({width,height});await page.goto(url);await page.evaluate(()=>localStorage.removeItem('newgame.helpSeen'));
-      await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW2-155515555555-1');await page.locator('#start-game').click();
+      await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW3-155515555555-1');await page.locator('#start-game').click();
       await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingdomOverview);
       await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
       await page.waitForFunction(()=>/\d+ \/ \d+/.test(document.querySelector('#overview-population').textContent));

@@ -1,4 +1,4 @@
-import { MINERAL_DEPOSITS,resourceBlocks } from '../data/minerals.js';
+import { MINERAL_DEPOSITS,START_QUARRY,resourceBlocks } from '../data/minerals.js';
 import { reachableTiles } from '../game/pathfinding.js';
 import { buildingTiles,buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
@@ -22,6 +22,53 @@ export class MineralSystem {
       const max=rule.min+Math.floor(random()*(rule.max-rule.min+1)),state={id:`deposit-${this.natural.nextDepositId++}`,kind:'deposit',remaining:max,max,boundBuildingId:null};s.addResource(definition,anchor,state);count++;added++;
     }
     return added;
+  }
+  // m-kamenolom-u-hradu: the centre the start rules measure from (the Castle, else the King's tile).
+  startCentre(){
+    const s=this.scene,castle=s.buildings.find(b=>b.type==='castle');if(castle){const d=buildingDefinition(castle);return {x:castle.x+d.width/2,y:castle.y+d.height/2};}
+    const t=s.character.tile;return {x:t.x+.5,y:t.y+.5};
+  }
+  // A Quarry anchor over the Stone Deposit at `anchor` (placed or not) that the placement rules accept at the start: the
+  // other footprint tiles are open, off fords, free of resources and units, clear of the starting buildings and the King,
+  // and blocking it cuts nothing off the map while a work position stays reachable. Null when there is none.
+  startQuarrySite(anchor,{free=this.startFree(),before=null}={}){
+    const s=this.scene,q=s.objectRegistry.require('quarry'),dep=s.objectRegistry.require('stone_deposit'),depositTiles=buildingTiles(anchor,dep),depositKeys=new Set(depositTiles.map(tileKey));
+    const starts=s.buildings.filter(b=>START_QUARRY.keepClearOf.includes(b.type)).map(b=>({x:b.x,y:b.y,definition:buildingDefinition(b)})),king=s.character.tile,origins=this.natural.origins();
+    const options=[];for(let dy=1-q.height;dy<dep.height;dy++)for(let dx=1-q.width;dx<dep.width;dx++)options.push({x:anchor.x+dx,y:anchor.y+dy});
+    // A footprint that covers the whole deposit first (the obvious spot), then the corner overlaps; ties by position.
+    const covered=o=>depositTiles.filter(t=>t.x>=o.x&&t.x<o.x+q.width&&t.y>=o.y&&t.y<o.y+q.height).length;options.sort((a,b)=>covered(b)-covered(a)||a.y-b.y||a.x-b.x);
+    for(const site of options){
+      const tiles=buildingTiles(site,q);
+      if(!tiles.every(t=>depositKeys.has(tileKey(t))||free(t)))continue;
+      if(tiles.some(t=>t.x===king.x&&t.y===king.y)||starts.some(b=>footprintDistance({...site,definition:q},b)<START_QUARRY.clearance||footprintDistance({...anchor,definition:dep},b)<START_QUARRY.clearance))continue;
+      const blocked=[...new Map([...tiles,...depositTiles].map(t=>[tileKey(t),t])).values()].filter(t=>s.map[t.y][t.x]===0);
+      before??=reachableTiles(s.map,origins).length;for(const t of blocked)s.map[t.y][t.x]=1;const after=reachableTiles(s.map,origins);for(const t of blocked)s.map[t.y][t.x]=0;
+      if(after.length!==before-blocked.length)continue;
+      const reachable=new Set(after.map(tileKey));if(!towerNeighbors({...site,definition:q}).some(t=>reachable.has(tileKey(t))))continue;
+      return site;
+    }
+    return null;
+  }
+  startFree(){
+    const s=this.scene,protectedTiles=this.natural.reserved();
+    return t=>t.x>=1&&t.y>=1&&t.x<s.map[0].length-1&&t.y<s.map.length-1&&s.map[t.y]?.[t.x]===0&&!s.isFordTile?.(t)&&!s.resourceOccupancy.has(tileKey(t))&&!protectedTiles.has(tileKey(t));
+  }
+  // New Game only, after generate(): keeps the world as it is when a Stone Deposit already qualifies, otherwise adds one
+  // (a random qualifying spot from its own stream, so the other deposits and the iron stay where they were).
+  ensureStartQuarry(random=Math.random){
+    const centre=this.startCentre(),{min,max}=START_QUARRY,inRange=a=>{const d=Math.hypot(a.x+1-centre.x,a.y+1-centre.y);return d>=min&&d<=max;};
+    const existing=this.deposits().find(d=>d.type==='stone_deposit'&&inRange(d)&&d.natural.remaining>0&&d.natural.boundBuildingId==null&&this.startQuarrySite(d));
+    if(existing)return {deposit:existing,added:false};
+    const s=this.scene,definition=s.objectRegistry.require('stone_deposit'),free=this.startFree(),candidates=[];
+    for(let y=Math.floor(centre.y-max-1);y<=centre.y+max;y++)for(let x=Math.floor(centre.x-max-1);x<=centre.x+max;x++){const a={x,y};if(inRange(a)&&buildingTiles(a,definition).every(free))candidates.push(a);}
+    for(let i=candidates.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[candidates[i],candidates[j]]=[candidates[j],candidates[i]];}
+    const before=reachableTiles(s.map,this.natural.origins()).length;
+    for(const anchor of candidates){
+      if(!this.startQuarrySite(anchor,{free,before}))continue;
+      const rule=MINERAL_DEPOSITS.stone_deposit,amount=rule.min+Math.floor(random()*(rule.max-rule.min+1)),state={id:`deposit-${this.natural.nextDepositId++}`,kind:'deposit',remaining:amount,max:amount,boundBuildingId:null};
+      s.addResource(definition,anchor,state);return {deposit:this.natural.byId.get(state.id),added:true};
+    }
+    return {deposit:null,added:false};
   }
   candidates(definition,anchor){
     const footprint={...anchor,definition},spec=definition.mining;if(!spec)return[];
