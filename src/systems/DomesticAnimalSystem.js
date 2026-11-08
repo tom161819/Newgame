@@ -48,7 +48,7 @@ export class DomesticAnimalSystem {
       const covered=guards.some(g=>Math.hypot(g.x-cx,g.y-cy)<=HOUSE_RATS.catRadius);
       if(covered){this.houseRats.delete(b.id);this.houseRatsNotified.delete(b.id);continue;}
       if(!this.houseRats.has(b.id))this.houseRats.set(b.id,now);
-      if(this.houseHasRats(b)&&!this.houseRatsNotified.has(b.id)){this.houseRatsNotified.add(b.id);this.feed(`rats:house:${b.id}:${Math.floor(now/this.day)}`,t('pets.feed.houseRats'),false);}
+      if(this.houseHasRats(b)&&!this.houseRatsNotified.has(b.id)){this.houseRatsNotified.add(b.id);this.feed(`rats:house:${b.id}:${Math.floor(now/this.day)}`,t('pets.feed.houseRats'),false,b);}
     }
     for(const id of [...this.houseRats.keys()])if(!keep.has(id))this.houseRats.delete(id);
   }
@@ -85,7 +85,7 @@ export class DomesticAnimalSystem {
     if(dirty)this.scene.updateInventory?.();
   }
   buildingName(id){const b=this.scene.buildings?.find(b=>b.id===id);return b?(this.scene.objectRegistry?.get?.(b.type)?.name??b.type):t('pets.stockpile');}
-  feed(key,text,important=false){this.scene.eventFeed?.push(key,text,{important});}
+  feed(key,text,important=false,target=null){this.scene.eventFeed?.push(key,text,{important,target});}
   anchor(cat){
     if(cat.buildingId!=null){const b=this.scene.buildings?.find(b=>b.id===cat.buildingId);if(b){const d=buildingDefinition(b);return {x:b.x+d.width/2,y:b.y+d.height+.6,lodge:true};}}
     if(cat.motherId!=null){const m=this.cats.get(cat.motherId);if(m)return {x:m.x,y:m.y};}
@@ -118,7 +118,7 @@ export class DomesticAnimalSystem {
     if(this.cats.size>=this.cap())return;
     const spot=this.straySpot();if(!spot)return;
     const cat=this.newCat({x:spot.x+.5,y:spot.y+.5,home:{x:spot.x+.5,y:spot.y+.5},state:'stray',leaveAt:now+CATS.stray.stayDays*this.day});this.firstCatDone=true;
-    this.feed(`cat:stray:${cat.id}`,t('pets.feed.stray',{name:cat.name}));
+    this.feed(`cat:stray:${cat.id}`,t('pets.feed.stray',{name:cat.name}),false,()=>this.cats.get(cat.id)??cat);
   }
   straySpot(){
     const map=this.scene.map,[lo,hi]=CATS.stray.distance;
@@ -204,7 +204,7 @@ export class DomesticAnimalSystem {
     if(this.nextDogAt==null&&!this.dogs.size&&now<DOGS.stray.firstDays[1]*this.day){const [a,b]=DOGS.stray.firstDays;this.nextDogAt=Math.max(now,(a+this.random()*(b-a))*this.day);}
     if(this.nextDogAt==null)this.nextDogAt=now+DOGS.stray.intervalDays*this.day*(.6+this.random()*.8);
     if(now>=this.nextDogAt){this.nextDogAt=null;if(![...this.dogs.values()].some(d=>d.state==='stray')){const [lo,hi]=DOGS.stray.distance,spot=this.spotNear(lo,hi);
-      if(spot){const [a,b]=DOGS.stray.stayDays,dog=this.newDog({x:spot.x+.5,y:spot.y+.5,home:{x:spot.x+.5,y:spot.y+.5},state:'stray',leaveAt:now+(a+this.random()*(b-a))*this.day});this.feed(`dog:stray:${dog.id}`,t('pets.dog.feed.stray',{name:dog.name}));}}}
+      if(spot){const [a,b]=DOGS.stray.stayDays,dog=this.newDog({x:spot.x+.5,y:spot.y+.5,home:{x:spot.x+.5,y:spot.y+.5},state:'stray',leaveAt:now+(a+this.random()*(b-a))*this.day});this.feed(`dog:stray:${dog.id}`,t('pets.dog.feed.stray',{name:dog.name}),false,()=>this.dogs.get(dog.id)??dog);}}}
     // Caravans: about one in three brings a hunting dog as an escort (120 Gold).
     const c=this.scene.caravans?.active;
     if(!c){if(this.caravanDog){this.caravanDog=null;this.changed();}}

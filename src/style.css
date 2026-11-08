@@ -880,3 +880,7 @@ tr[data-resource-group="equipment"] { background:var(--group-equipment); }
 .wiki-info { display:inline-grid; place-items:center; width:16px; height:16px; min-width:0; min-height:0; padding:0; margin-left:4px; border-radius:50%; font:italic 700 11px/1 Georgia,serif; vertical-align:middle; pointer-events:auto; cursor:pointer; }
 .event-feed .wiki-info { pointer-events:auto !important; }
 @media (max-width:640px) { .wiki-body { grid-template-columns:1fr; } .wiki-nav { border-right:0; border-bottom:1px solid var(--line-soft); max-height:160px; } }
+/* m-hlasky-udalosti: clickable feed lines and the Deceased list. */
+.feed-entry.is-locatable { cursor:pointer; pointer-events:auto !important; } .feed-entry.is-locatable:hover { text-decoration:underline dotted; }
+.population-deceased { margin-top:6px; font-size:12px; color:var(--muted); } .population-deceased summary { cursor:pointer; color:var(--ink); }
+.population-deceased ol { margin:4px 0 0; padding-left:18px; max-height:120px; overflow:auto; }

@@ -89,7 +89,9 @@ export class WorkerSystem {
   // Resident capacity: the base settlement plus every completed House.
   capacity(){return POPULATION.maximum+(this.scene.buildings??[]).reduce((n,b)=>n+(buildingIsComplete(b)?this.scene.objectRegistry?.get(b.type)?.housing?.capacity??0:0),0);}
   updateUI(){const count=this.liveSubjects().length,maximum=this.capacity();this.onChange(count,maximum);for(const listener of this.listeners)listener(count,maximum);}
-  exportState(){return {nextId:this.nextId,lastMigrationDay:this.lastMigrationDay};}
-  importState(data){this.nextId=data?.nextId??1;this.lastMigrationDay=data?.lastMigrationDay??this.scene.gameTime.day;this.updateUI();}
+  // m-hlasky-udalosti (41): the last 50 deaths with their cause ('killed:<attacker type>' or 'wounds') and day.
+  recordDeath(worker,cause){this.deceased??=[];this.deceased.push({name:worker.name,profession:worker.displayProfession&&worker.displayProfession!=='idle'?worker.displayProfession:worker.profession,cause,day:this.scene.gameTime?.day??1});if(this.deceased.length>50)this.deceased.splice(0,this.deceased.length-50);}
+  exportState(){return {nextId:this.nextId,lastMigrationDay:this.lastMigrationDay,...(this.deceased?.length?{deceased:this.deceased.map(d=>({...d}))}:{})};}
+  importState(data){this.deceased=(data?.deceased??[]).map(d=>({...d}));this.nextId=data?.nextId??1;this.lastMigrationDay=data?.lastMigrationDay??this.scene.gameTime.day;this.updateUI();}
   destroy(){this.unsubscribe();this.scene.events?.off?.('buildings:changed',this.buildingsChanged);this.gather.clear();this.jobs.destroy();this.listeners.clear();this.reservations.clear();for(const worker of this.workers.values())worker.view.destroy();this.workers.clear();}
 }

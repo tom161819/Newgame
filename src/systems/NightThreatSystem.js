@@ -216,7 +216,7 @@ export class NightThreatSystem {
   }
   ignite(b){
     const F=NIGHT_THREATS.fires,fire={id:b.id,intensity:F.startIntensity,health:100};this.fires.set(b.id,fire);
-    this.scene.eventFeed?.push?.(`fire:${b.id}:${this.scene.gameTime?.day??1}`,t('threats.fire',{name:this.scene.objectRegistry.require(b.type).name}),{important:true});this.changed();return fire;
+    this.scene.eventFeed?.push?.(`fire:${b.id}:${this.scene.gameTime?.day??1}`,t('threats.fire',{name:this.scene.objectRegistry.require(b.type).name}),{important:true,target:b});this.scene.dangerMarks?.mark({x:b.x+1,y:b.y+1});this.changed();return fire;
   }
   burning(b){return this.fires.has(b?.id);}
   // The fire grows, eats the building and may jump to a wooden neighbour; at 0 health it burns down.
@@ -239,7 +239,7 @@ export class NightThreatSystem {
     storage?.removeBuilding?.(b);s.foodProduction?.records?.delete?.(b.id);const d=buildingDefinition(b),anchor={x:b.x,y:b.y};removeBuildingShell(s,b);
     if(d.width>=2&&d.height>=2){const rd=s.objectRegistry.require('burnt_ruins'),ruin={id:Math.max(0,...s.buildings.map(x=>x.id),b.id)+1,type:rd.id,definition:rd,...anchor,tiles:buildingTiles(anchor,rd)};
       for(const tl of ruin.tiles)s.map[tl.y][tl.x]=1;s.buildings.push(ruin);s.towerViews?.set(ruin.id,s.createBuildingView(rd,ruin));}
-    s.events?.emit?.('buildings:changed');s.eventFeed?.push?.(`burnt:${b.id}`,t('threats.burntDown',{name}),{important:true});this.changed();
+    s.events?.emit?.('buildings:changed');s.eventFeed?.push?.(`burnt:${b.id}`,t('threats.burntDown',{name}),{important:true,target:{x:b.x+1,y:b.y+1}});this.changed();
   }
   // Water: the nearest completed Well's neighbours, otherwise walkable tiles beside water near the fire.
   waterGoals(fire){
@@ -270,7 +270,7 @@ export class NightThreatSystem {
   checkWolvesNear(day){
     const W=NIGHT_THREATS.wolves,houses=this.houses();
     const near=this.wolves().some(w=>houses.some(h=>{const d=buildingDefinition(h);return Math.hypot(h.x+d.width/2-w.position.x,h.y+d.height/2-w.position.y)<=W.nearHouses;}));
-    if(near&&!this.wolvesNear){this.scene.eventFeed?.push?.(`wolves-near:${day}`,t('threats.wolvesNear'),{important:true});}
+    if(near&&!this.wolvesNear){const wolf=[...(this.scene.animalSystem?.animals?.values?.()??[])].find(a=>a.type==='wolf'&&a.wolf);this.scene.eventFeed?.push?.(`wolves-near:${day}`,t('threats.wolvesNear'),{important:true,target:wolf?()=>wolf.active?wolf.position:null:null});if(wolf)this.scene.dangerMarks?.mark(wolf.position);}
     this.wolvesNear=near;
   }
   update(delta=0){

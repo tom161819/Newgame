@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.58.0] - 2026-11-08
+<!-- version: {"title":"Event messages and danger marks","type":"feature","reconstructed":false,"saveVersion":58} -->
+### Added
+- Clicking a message in the event feed moves the camera to where it happened (a building, an attack, a fire, wolves, a stray animal, a caravan) and marks the spot with a short golden ring.
+- A red danger mark stays for a while where a resident was attacked or killed, where a fire broke out or where wolves were seen.
+- Every death has a cause (wounds or the attacker). The feed says it, and the Population panel has a folding Deceased list with the last 50 dead, their job, cause and day. The list is kept in saves.
+
 ## [0.57.0] - 2026-11-08
 <!-- version: {"title":"Wiki","type":"feature","reconstructed":false,"saveVersion":58} -->
 ### Added

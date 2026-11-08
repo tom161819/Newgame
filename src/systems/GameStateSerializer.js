@@ -282,6 +282,7 @@ export function validateGameState(input,registry=objectRegistry){
   const depositClaims=new Map(),reservations=new Set(natural.kingTask?[`natural:${natural.kingTask.treeId}`]:[]);
   if(s.workers!==undefined){
     integer(s.population?.nextId,1);integer(s.population.lastMigrationDay,1,s.time?.day??Number.MAX_SAFE_INTEGER);
+    if(s.population.deceased!==undefined){array(s.population.deceased,50);for(const d of s.population.deceased){check(d&&Object.keys(d).sort().join()==='cause,day,name,profession'&&typeof d.name==='string'&&d.name.length<100&&Object.hasOwn(JOBS,d.profession)&&/^(wounds|killed:[a-z_]{1,40})$/.test(d.cause));integer(d.day,1);}}
     for(const w of s.workers){
       if(w.naturalTalent!==undefined||w.initialSkills!==undefined){
         check(Object.hasOwn(TALENTS,w.naturalTalent)&&w.skills);skillsState(w.initialSkills);

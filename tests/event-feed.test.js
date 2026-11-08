@@ -24,7 +24,7 @@ test('#105 feed collects season, completion, arrival, death, attack and shortage
   s.activities.emit('combatDamage',{actor:1,targetId:99,objectType:'wolf',amount:3});
   s.foodSystem.shortage=true;feed.update();feed.update();
   assert.equal(feed.entries.length,FEED.maxEntries,'at most five entries');
-  assert.deepEqual(texts(feed),['Food is running short.','Anna is under attack!','Bohuslav has died.','Cyril has joined the kingdom.','House is finished.']);
+  assert.deepEqual(texts(feed),['Food is running short.','Anna is under attack!','Bohuslav died – wounds.','Cyril has joined the kingdom.','House is finished.']);
   assert.ok(feed.entries[0].important&&!feed.entries.at(-1).important);
 });
 

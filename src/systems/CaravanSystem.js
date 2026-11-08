@@ -44,7 +44,7 @@ export class CaravanSystem {
   marketplaces(){return this.scene.buildings.filter(b=>b.type==='marketplace'&&buildingIsComplete(b)&&!b.unverified);}
   onChange(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   changed(){for(const listener of this.listeners)listener();}
-  feed(id,key,params={},important=false){this.scene.eventFeed?.push(`caravan:${this.active?.id??id}:${key}`,t(`caravan.${key}`,params),{important});}
+  feed(id,key,params={},important=false){const c=this.active;this.scene.eventFeed?.push(`caravan:${c?.id??id}:${key}`,t(`caravan.${key}`,params),{important,target:c?()=>this.active?.id===c.id?this.active.position:c.position:null});}
   schedule(){this.nextVisitAt=this.now+(CARAVAN_RULES.minInterval+this.random()*(CARAVAN_RULES.maxInterval-CARAVAN_RULES.minInterval))*this.day;this.changed();}
   goals(marketplace){return towerNeighbors(marketplace).filter(p=>this.scene.map[p.y]?.[p.x]===0);}
   route(from,goals){if(!goals.length)return null;const route=findPathToAny(this.scene.map,from,goals,this.scene.pathWear?.routingOptions(this.active??{}));return route&&route.path.length<=CARAVAN_RULES.maxRoute?route:null;}

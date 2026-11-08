@@ -1,3 +1,4 @@
+import { deathCauseText } from './DangerMarks.js';
 import { localized } from '../i18n/names.js';
 import { t,language } from '../i18n/index.js';
 import { JOBS,SKILLS } from '../data/jobs.js';
@@ -64,7 +65,14 @@ export class PopulationSidebar {
     const text=t('population.summary',{total:summary.total,employed:summary.employed,unemployed:summary.unemployed});
     const output=document.querySelector('#population-summary');if(output.textContent!==text)output.textContent=text;
     document.querySelector('#population-empty').hidden=this.records.length>0||this.deaths.length>0;document.querySelector('#population-filter-count').textContent=`${t('population.shown',{count:this.records.length,total:summary.total})}${this.deaths.length?` · ${t('population.recentDeathsCount',{count:this.deaths.length})}`:''}`;
-    this.list.style.height=`${this.displayRecords.length*POPULATION_ROW_HEIGHT}px`;this.renderVisible();this.refreshDetails();
+    this.list.style.height=`${this.displayRecords.length*POPULATION_ROW_HEIGHT}px`;this.renderVisible();this.refreshDetails();this.renderDeceased();
+  }
+  // m-hlasky-udalosti (41): the folding Deceased section – everyone who died (last 50), with the cause and the day.
+  renderDeceased(){
+    const box=document.querySelector('#population-deceased'),list=document.querySelector('#population-deceased-list');if(!box||!list)return;const dead=[...(this.scene.workerSystem.deceased??[])].reverse();
+    box.hidden=!dead.length;const sig=JSON.stringify([dead.length,dead[0]?.name,dead[0]?.day]);if(sig===this.deceasedSig&&box.querySelector('summary').textContent)return;this.deceasedSig=sig;
+    box.querySelector('summary').textContent=t('population.deceasedCount',{count:dead.length});
+    list.replaceChildren(...dead.map(d=>element('li','',t('population.deceasedLine',{name:d.name,job:JOBS[d.profession]?.name??d.profession,cause:deathCauseText(this.scene,d.cause),day:d.day}))));
   }
   createRow(id){
     const controller=new AbortController();
