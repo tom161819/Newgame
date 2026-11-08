@@ -1,3 +1,4 @@
+import { devFactor } from '../data/devBalance.js';
 import { t } from '../i18n/index.js';
 import { FISHING,stockCapacity,stockFactor,stockState } from '../data/fishing.js';
 import { WORK_RULES } from '../data/jobs.js';
@@ -78,7 +79,7 @@ export class FishingSystem {
     const factor=stockFactor(this.ratio(task.bodyId)),maxTrip=s.gameTime.dayDuration*FISHING.maxTripDays;
     if(factor===0){if(task.caught)this.finish(worker,task);else{system.ai.cancel(worker);this.wait(worker,'Overfished');}return;}
     worker.workState='Working';
-    const rate=FISHING.perDay/s.gameTime.dayDuration*this.modifier(task.depth)*factor*s.skillSystem.workEfficiency(worker,'fishing')*(s.workplaceSystem.workFactor?.(worker)??1);
+    const rate=FISHING.perDay/s.gameTime.dayDuration*this.modifier(task.depth)*factor*(this.ratio(task.bodyId)>=FISHING.stock.full?FISHING.plentiful:1)*s.skillSystem.workEfficiency(worker,'fishing')*(s.workplaceSystem.workFactor?.(worker)??1)*devFactor('fisher');
     task.progressMs=Math.min(maxTrip,task.progressMs+delta);task.fraction+=delta*rate;
     while(task.fraction>=1&&task.caught<FISHING.basket){task.fraction-=1;task.caught++;this.take(task.bodyId,home);s.activities?.emit('fishCaught',{actor:worker,objectType:'fish',quantity:1},`fish:${this.nextCatch++}`);}
     worker.workMessage=`Fishing ${task.caught}/${FISHING.basket}`;

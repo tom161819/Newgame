@@ -20,7 +20,7 @@ const scene=({buildings=base,jobs=['idle','idle','idle'],marked=false,speed=1}={
 const current=(opts,state)=>tutorialProgress(scene(opts),state).current?.id;
 
 test('m-tutorial-v2 step order: Hauler after Builder, Hunting Lodge first food, four optional steps, Miner after stone',()=>{
-  assert.deepEqual(TUTORIAL_STEPS.map(s=>s.id),['king','builder','hauler','granary','hunting_lodge','fisherman','farm','mill','bakery','lumberjack_hut','stone','miner','house','storage','speed']);
+  assert.deepEqual(TUTORIAL_STEPS.map(s=>s.id),['king','builder','hauler','granary','lumberjack_hut','hunting_lodge','fisherman','farm','mill','bakery','stone','miner','house','storage','speed']);
   assert.deepEqual(TUTORIAL_STEPS.filter(s=>s.optional).map(s=>s.id),['fisherman','farm','mill','bakery']);
   for(const s of TUTORIAL_STEPS)for(const id of s.buildingIds??[])assert.ok(objectRegistry.get(id),id);
   for(const lang of [en,cs])for(const s of TUTORIAL_STEPS)assert.ok(lang[`tutorial.step.${s.id}`],`${s.id} has text`);
@@ -33,17 +33,19 @@ test('steps tick from the state of the world in order; Hauler and Miner are step
   assert.equal(current({jobs:['builder','idle']},{seen}),'hauler');
   assert.equal(current({jobs:['builder','hauler']},{seen}),'granary');
   const jobs=['builder','hauler','idle'];
-  assert.equal(current({buildings:[...base,b('granary')],jobs}),'hunting_lodge','a building also passes the king step');
-  assert.equal(current({buildings:[...base,b('granary'),b('hunting_lodge')],jobs}),'fisherman');
+  assert.equal(current({buildings:[...base,b('granary')],jobs}),'lumberjack_hut','a building also passes the king step; m-drevo-start: wood right after the Granary');
+  assert.equal(current({buildings:[...base,b('granary'),b('lumberjack_hut')],jobs}),'hunting_lodge');
+  assert.equal(current({buildings:[...base,b('granary'),b('lumberjack_hut'),b('hunting_lodge')],jobs}),'fisherman');
   const path=[...base,b('granary'),b('hunting_lodge'),b('lumberjack_hut')];
-  assert.equal(current({buildings:path,jobs}),'stone','a later building step passes the optional steps (loaded games)');
+  assert.equal(current({buildings:path,jobs}),'fisherman','m-drevo-start: the optional food steps now follow the Hunting Lodge');
+  assert.equal(current({buildings:path,jobs},{seen:new Set(['fisherman','farm','mill','bakery'])}),'stone');
   assert.equal(current({buildings:path,jobs,marked:true}),'miner');
   assert.equal(current({buildings:path,jobs:[...jobs,'miner'],marked:true}),'house');
   assert.equal(current({buildings:[...path,b('quarry')],jobs:[...jobs,'miner']}),'house','a Quarry also ends the stone step');
 });
 test('bug 6: marking a rock (RockMiningWork records) ends the stone step; bug 7: a finished House ends the house step',()=>{
   const jobs=['builder','hauler','miner'],path=[...base,b('granary'),b('hunting_lodge'),b('lumberjack_hut')];
-  const s=scene({buildings:path,jobs});assert.equal(tutorialProgress(s).current.id,'stone');
+  const s=scene({buildings:path,jobs});assert.equal(tutorialProgress(s,{seen:new Set(['fisherman','farm','mill','bakery'])}).current.id,'stone');
   s.naturalResources.miningWork.rocks.records.set(7,{id:7,tile:{x:3,y:3},marked:true,produced:0});
   assert.equal(tutorialProgress(s).current.id,'house','the world change is seen on the next recompute');
   const house=b('house');s.buildings=[...path,house];assert.equal(tutorialProgress(s).current.id,'house','a House site is not enough');
@@ -52,8 +54,8 @@ test('bug 6: marking a rock (RockMiningWork records) ends the stone step; bug 7:
   s.gameSpeed=2;assert.equal(tutorialProgress(s).allDone,true);
 });
 test('optional steps close with "Next" (seen) or by building them; Skip still skips any step',()=>{
-  const jobs=['builder','hauler'],w=[...base,b('granary'),b('hunting_lodge')],seen=new Set();
-  for(const [id,next] of [['fisherman','farm'],['farm','mill'],['mill','bakery'],['bakery','lumberjack_hut']]){assert.equal(current({buildings:w,jobs},{seen}),id);seen.add(id);assert.equal(current({buildings:w,jobs},{seen}),next);}
+  const jobs=['builder','hauler'],w=[...base,b('granary'),b('lumberjack_hut'),b('hunting_lodge')],seen=new Set();
+  for(const [id,next] of [['fisherman','farm'],['farm','mill'],['mill','bakery'],['bakery','stone']]){assert.equal(current({buildings:w,jobs},{seen}),id);seen.add(id);assert.equal(current({buildings:w,jobs},{seen}),next);}
   assert.equal(current({buildings:[...w,b('fisherman_hut')],jobs}),'farm','building the Fisherman\'s Hut also moves on');
   assert.equal(current({},{seen:new Set(['king']),skipped:new Set(['builder','hauler'])}),'granary');
   seen.add('builder');assert.equal(current({jobs:['idle']},{seen:new Set(['king','builder'])}),'builder','"seen" does not end a mandatory step');

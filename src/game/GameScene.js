@@ -82,6 +82,8 @@ import { isProvisional,knownPlacementError,knownContext } from './provisionalSit
 import { MountSystem } from '../systems/MountSystem.js';
 import { SettingsPanel } from '../ui/SettingsPanel.js';
 import { FpsOverlay } from '../ui/FpsOverlay.js';
+import { devFactor } from '../data/devBalance.js';
+import { DevBalancePanel } from '../ui/DevBalancePanel.js';
 import { installPanelDismiss,closeOpenPanels } from '../ui/PanelDismiss.js';
 import { FortificationView } from './FortificationView.js';
 import { wallLine,wallLinePlan,placeWallLine,wallIndex,connectionsFor,connectedWalls,isWall,gateAxis,turnGate } from './walls.js';
@@ -290,7 +292,7 @@ export class GameScene extends Phaser.Scene {
     if(!this.loadState){this.settingsPanel.applySettings({...this.settingsPanel.settings,fogOfWar:this.gameSettings.fogOfWar,explorationMode:this.gameSettings.explorationMode});this.fog.setEnabled(this.gameSettings.fogOfWar);}
     this.fog.setExplorationEnabled(this.settingsPanel.settings.explorationMode);
     this.terrain.setDebug(this.settingsPanel.settings.pathWearDebug);
-    let devStorage;try{devStorage=window.localStorage;}catch{}this.fpsOverlay=new FpsOverlay(this.game,{storage:devStorage,camera:()=>this.cameras?.main});
+    let devStorage;try{devStorage=window.localStorage;}catch{}this.fpsOverlay=new FpsOverlay(this.game,{storage:devStorage,camera:()=>this.cameras?.main});this.devBalancePanel=new DevBalancePanel(this,{storage:devStorage});
     this.foodSystem=new FoodSystem(this.inventory,this.objectRegistry.require('meat'),()=>this.updateInventory(),{time:this.gameTime,scene:this,subscribe:true});
     this.attractiveness=new KingdomAttractivenessSystem(this);this.foodEconomyPanel=new FoodEconomyPanel(this);
     this.inventoryBar=new InventoryBar(this.objectRegistry,this.assets,this.inventory);
@@ -371,7 +373,7 @@ export class GameScene extends Phaser.Scene {
       this.noticesPanel.destroy();this.diagnostics.destroy();this.employmentPanel.destroy();this.unsubscribeEmployment?.();this.employment.destroy();this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
       this.buildingUnlocks.destroy();
       this.animalSystem.destroy();this.dropSystem.destroy();document.querySelector('#object-tooltip').hidden=true;
-      this.settingsPanel.destroy();this.fpsOverlay.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);this.input.keyboard.off('keydown-R',onRotate);
+      this.settingsPanel.destroy();this.fpsOverlay.destroy();this.devBalancePanel?.destroy();this.controls.abort();this.input.keyboard.off('keydown-H',onDismount);this.input.keyboard.off('keydown-R',onRotate);
       this.clearWallPreviews();
       this.combatFeedback.destroy();this.combat.clear();this.gameOverDialog.close();
       this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.wikiPanel?.destroy();this.royalGoalsPanel?.destroy();this.royalGoals?.destroy();this.kingSkills?.destroy();this.completionFlash?.destroy();this.storePreview?.destroy();this.dangerMarks?.destroy();this.soundController?.abort();this.marketplacePanel.destroy();this.catPanel?.destroy();this.domesticViews?.destroy();this.domestic?.destroy();this.villagePanel?.destroy();this.issueIcons?.destroy();this.materialPiles?.destroy();this.sideCards?.destroy();this.childViews?.destroy();this.childrenSystem?.destroy();this.porches?.destroy();this.lightFuel?.destroy();this.nightThreats?.destroy();this.fuelIcons?.destroy();this.fireViews?.destroy();this.kingdomOverview?.destroy();this.speedControls?.destroy();this.tutorial?.destroy();this.helpArrow?.destroy();this.nightOverlay?.destroy();this.fogEdge?.destroy();this.fishShadows?.destroy();this.nightControls?.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
@@ -732,7 +734,7 @@ export class GameScene extends Phaser.Scene {
       // m-hlasky-udalosti (41): every death has a cause; a danger mark where it happened (54).
       const by=killer?(killer.definition?.id??killer.type??null):null,cause=by&&/^[a-z_]{1,40}$/.test(by)?`killed:${by}`:'wounds';unit.deathCause=cause;
       if(unit.isSubject!==false)this.workerSystem.recordDeath(unit,cause);this.dangerMarks?.mark(unit.position);this.workerSystem.onDeath(unit);return;}
-    const tile={x:Math.floor(unit.position.x),y:Math.floor(unit.position.y)},amount=unit.definition.gameplay.meatDrop;
+    const tile={x:Math.floor(unit.position.x),y:Math.floor(unit.position.y)},amount=Math.round(unit.definition.gameplay.meatDrop*devFactor('hunter'));
     if(killer){const event={type:'animalKilled',objectType:unit.type,quantity:1,objectId:unit.id};if(!this.workplaceSystem?.deferReward(killer,event))this.activities.emit(event.type,{...event,actor:killer});}
     this.mountSystem.onDeath(unit);this.animalSystem.remove(unit);this.combatFeedback.remove(unit.id);
     const drop=amount>0?this.dropSystem.create('meat',tile,amount):null;this.workerSystem.ai.animalDied(unit,killer,drop);

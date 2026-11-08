@@ -7,7 +7,8 @@ export const TAX_RATES=Object.freeze({
 // Policy v2 P2 / m-pridely-procenta (#68): rations work only through the Food need. `food` is the base of the Food need
 // (Small 30, Normal 60, Generous 80 %); meal variety adds to it (MEAL_VARIETY). Rations add nothing to Happiness directly.
 export const RATIONS=Object.freeze({
-  small:Object.freeze({portions:.5,food:30}),normal:Object.freeze({portions:1,food:60}),generous:Object.freeze({portions:1.5,food:80}),
+// m-jidlo-balanc (playtest 0.76.0 #3): fewer portions (0.5/1/1.5 → 0.4/0.8/1.2); the Food need percentages stay.
+  small:Object.freeze({portions:.4,food:30}),normal:Object.freeze({portions:.8,food:60}),generous:Object.freeze({portions:1.2,food:80}),
 });
 // Before #68 Generous added +5 to the policy Happiness effect; saves from then may still hold an effect up to +5 above
 // the tax effect (it then moves back to the target like any policy change). Only the save validator uses it.

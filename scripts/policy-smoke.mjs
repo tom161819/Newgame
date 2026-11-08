@@ -27,7 +27,7 @@ export async function policySmoke(context,url,instrument){
     // #68: rations no longer change Happiness (they set the Food need), so the target is the tax effect alone.
     assert.ok(state.effect>-1&&state.effect<=0&&state.target===-10,'the Happiness effect moves gradually');
     await page.waitForTimeout(1200);
-    assert.match(await page.locator('#policy-tax-effect').textContent(),/1\.00 Gold per resident.*Happiness −10/);assert.match(await page.locator('#policy-rations-effect').textContent(),/1\.5 portions a day; the Food need is 80 %/);
+    assert.match(await page.locator('#policy-tax-effect').textContent(),/1\.00 Gold per resident.*Happiness −10/);assert.match(await page.locator('#policy-rations-effect').textContent(),/1\.2 portions a day; the Food need is 80 %/);
     assert.equal(await page.locator('#policy-pending').isHidden(),true);assert.match(await page.locator('#policy-happiness').textContent(),/Happiness \d+/);
     await slide(page,'#policy-tax','none');await page.locator('#policy-cancel').click();assert.equal(await page.locator('#policy-pending').isHidden(),true);
     // Very high taxes show the big chest of gold; then back.

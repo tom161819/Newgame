@@ -11,9 +11,10 @@ export const DEFAULT_GAME_SETTINGS=Object.freeze({difficulty:'normal',wildlifePo
 // and starting resources that fill the Starter Stockpile (m-start-v2: 40 Stone + 60 Wood + 200 Bread = 300; m-tutorial-v2: 30 + 90 + 180). DEFAULT_GAME_SETTINGS stays the
 // neutral base for older saves and automated scenarios.
 // m-tutorial-v2 (points 5, 8): 90 Wood pays the tutorial's mandatory buildings (Granary 12 + Hunting Lodge 8 + Lumberjack
-// Hut 6 + House 10 + Material Yard 20 + Builder's Workshop 20 = 76) with a reserve of 14; Stone and Bread make room in
-// the 300-unit Starter Stockpile (30 + 90 + 180 = 300).
-export const NEW_GAME_DEFAULTS=Object.freeze({...DEFAULT_GAME_SETTINGS,startingCastle:true,startingGold:500,startingStone:30,startingWood:90,startingIronOre:0,startingBread:180,startingGarrison:true});
+// Hut 6 + House 10 + Material Yard 20 + Builder's Workshop 20 = 76) with a reserve; Stone and Bread make room in
+// the 300-unit Starter Stockpile. m-drevo-start (playtest 0.76.0 #2): 110 Wood (reserve 34 until the Lumberjack runs)
+// and 160 Bread (food balance m-jidlo-balanc makes it last): 30 + 110 + 160 = 300.
+export const NEW_GAME_DEFAULTS=Object.freeze({...DEFAULT_GAME_SETTINGS,startingCastle:true,startingGold:500,startingStone:30,startingWood:110,startingIronOre:0,startingBread:160,startingGarrison:true});
 // m-tutorial-v2: a start with the Castle brings 2 more residents (5 instead of POPULATION.initial 3), so a Miner is still
 // free after the Builder, Hauler and Hunter. With the starting garrison (4, not free workers) that is 9 of the 10 places.
 export const CASTLE_START_EXTRA_RESIDENTS=2;

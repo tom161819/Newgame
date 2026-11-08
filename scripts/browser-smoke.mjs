@@ -90,6 +90,7 @@ import { builderWorkshopSmoke } from './builder-workshop-smoke.mjs';
 import { fishingSmoke } from './fishing-smoke.mjs';
 import { pathsV2Smoke } from './paths-v2-smoke.mjs';
 import { policySmoke } from './policy-smoke.mjs';
+import { devBalanceSmoke } from './dev-balance-smoke.mjs';
 import { backgroundSmoke } from './background-smoke.mjs';
 import { worldCodeSmoke } from './world-code-smoke.mjs';
 import { worldEditorSmoke } from './world-editor-smoke.mjs';
@@ -197,7 +198,7 @@ try{
   // the earlier empty start (no Castle, no Gold, empty stockpile) that the steps below were written for.
   assert.equal(await page.locator('#setup-castle').isChecked(),true);assert.equal(await page.locator('#setup-gold').inputValue(),'500');
   // E1 (owner 7 Nov 2026): basic buildings are wooden, so the start has more wood and no Iron Ore.
-  for(const [id,value] of [['stone','30'],['wood','90'],['iron-ore','0'],['bread','180']])assert.equal(await page.locator(`#setup-start-${id}`).inputValue(),value);
+  for(const [id,value] of [['stone','30'],['wood','110'],['iron-ore','0'],['bread','160']])assert.equal(await page.locator(`#setup-start-${id}`).inputValue(),value);
   await page.locator('#setup-castle').uncheck();await page.locator('#setup-garrison').uncheck();
   for(const selector of ['#setup-gold','#setup-start-stone','#setup-start-wood','#setup-start-iron-ore','#setup-start-bread'])await page.locator(selector).evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
@@ -233,6 +234,7 @@ try{
   await step('fishing',()=>fishingSmoke(context,origin+base,instrument));
   await step('paths-v2',()=>pathsV2Smoke(context,origin+base,instrument));
   await step('policy',()=>policySmoke(context,origin+base,instrument));
+  await step('dev-balance',()=>devBalanceSmoke(context,origin+base,instrument));
   await step('background',()=>backgroundSmoke(context,origin+base,instrument));
   await step('world-code',()=>worldCodeSmoke(context,origin+base,instrument));
   await step('world-editor',()=>worldEditorSmoke(context,origin+base,instrument));
@@ -373,7 +375,7 @@ try{
   // (0.9.2: the setup proposes 40 of each, which fills it).
   {const set=(name,value)=>page.locator(`#game-setup-form [name="${name}"]`).evaluate((e,v)=>{e.value=String(v);e.dispatchEvent(new Event('input',{bubbles:true}));},value);
   await page.locator('.setup-advanced summary').click();assert.equal(await page.locator('#setup-resources-total').textContent(),'300 / 300');
-  await set('startingIronOre',0);await set('startingBread',0);await set('startingStone',200);await set('startingWood',200);assert.equal(await page.locator('#setup-start-wood').inputValue(),'100','the slider stops at the remaining room');assert.equal(await page.locator('#setup-resources-total').textContent(),'300 / 300');
+  await set('startingIronOre',0);await set('startingBread',0);await set('startingWood',0);/* m-drevo-start: 110 default Wood would cap Stone at 190 */await set('startingStone',200);await set('startingWood',200);assert.equal(await page.locator('#setup-start-wood').inputValue(),'100','the slider stops at the remaining room');assert.equal(await page.locator('#setup-resources-total').textContent(),'300 / 300');
   assert.match(await page.locator('#setup-summary').textContent(),/Stockpile: 200 stone, 100 wood/);
   await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'setup fits a phone');await page.setViewportSize({width:1440,height:1000});
   await page.locator('#start-game').click();await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);

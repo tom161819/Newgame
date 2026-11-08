@@ -2,7 +2,8 @@
 // reach (no fixed radius since 0.32.0; `nearestSpots` free spots are offered to the path search), fishes until his basket holds `basket` fish (or `maxTripDays` pass) and carries the catch to a Granary.
 // About `perDay` fish per game day at a full fish stock, skill 1, in Summer, without weather.
 export const FISHING=Object.freeze({
-  perDay:6,basket:5,nearestSpots:12,spotCacheMs:10000,maxTripDays:1,xp:3,
+  // m-jidlo-balanc (playtest 0.76.0 #3): +50 % (6 → 9 a day); `plentiful` = extra factor while the water is Plentiful.
+  perDay:9,plentiful:1.2,basket:5,nearestSpots:12,spotCacheMs:10000,maxTripDays:1,xp:3,
   // Water next to the shore spot: deep water gives more fish than shallow water (ground codes, src/data/worldTerrain.js).
   depth:Object.freeze({3:.8,4:1.2}),
   season:Object.freeze({Spring:1.1,Summer:1,Autumn:1,Winter:.5}),

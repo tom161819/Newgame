@@ -28,14 +28,14 @@ test(`settings accept 5-unit steps up to a combined ${CAP} and reject anything e
   const quarter=CAP/4;assert.equal(gameSettings({startingStone:quarter,startingWood:quarter,startingIronOre:quarter,startingBread:quarter}).startingBread,quarter);
   for(const bad of [{startingStone:-5},{startingWood:3},{startingIronOre:CAP+5},{startingBread:'10'},{startingStone:CAP-60,startingWood:65},{startingStone:quarter,startingWood:quarter,startingIronOre:quarter,startingBread:quarter+5}])assert.throws(()=>gameSettings(bad),JSON.stringify(bad));
 });
-test('the New Game Setup proposes a built Castle, 500 Gold, 30 Stone, 90 Wood, 180 Bread and no Iron Ore (owner 7 Nov 2026: basic buildings are wooden)',()=>{
+test('the New Game Setup proposes a built Castle, 500 Gold, 30 Stone, 110 Wood, 160 Bread and no Iron Ore (owner 7 Nov 2026: basic buildings are wooden)',()=>{
   assert.equal(NEW_GAME_DEFAULTS.startingCastle,true);assert.equal(NEW_GAME_DEFAULTS.startingGold,500);assert.equal(GOLD_LIMIT,Infinity,'gold has no limit since 0.51');
-  assert.deepEqual(Object.keys(STARTING_RESOURCES).map(key=>NEW_GAME_DEFAULTS[key]),[30,90,0,180],'m-start-v2 7 Nov 2026, wood for the tutorial path m-tutorial-v2');
+  assert.deepEqual(Object.keys(STARTING_RESOURCES).map(key=>NEW_GAME_DEFAULTS[key]),[30,110,0,160],'m-start-v2 7 Nov 2026, wood for the tutorial path m-tutorial-v2, m-drevo-start');
   assert.doesNotThrow(()=>gameSettings(NEW_GAME_DEFAULTS));
   const s=scene(NEW_GAME_DEFAULTS);assert.ok(s.buildings.some(b=>b.type==='castle'),'one built Castle');
-  const stock=x=>Object.fromEntries(Object.entries(starter(x).stock).filter(([,n])=>n>0));assert.deepEqual(stock(s),{stone:30,wood:90,bread:180});assert.equal(s.foodStorage.room(starter(s).id),CAP-300,`300 of ${CAP}`);
+  const stock=x=>Object.fromEntries(Object.entries(starter(x).stock).filter(([,n])=>n>0));assert.deepEqual(stock(s),{stone:30,wood:110,bread:160});assert.equal(s.foodStorage.room(starter(s).id),CAP-300,`300 of ${CAP}`);
   const off=scene({...NEW_GAME_DEFAULTS,startingCastle:false});assert.equal(off.buildings.some(b=>b.type==='castle'),false,'the Castle can be switched off');
-  assert.deepEqual(stock(off),{stone:30,wood:90,bread:180});
+  assert.deepEqual(stock(off),{stone:30,wood:110,bread:160});
 });
 test('chosen goods are deposited physically exactly once and are separate from Initial Stones on the map',()=>{
   const settings={startingStone:10,startingWood:15,startingIronOre:5,startingBread:10,initialStoneCount:55},s=scene(settings);

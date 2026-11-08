@@ -961,3 +961,12 @@ tr[data-resource-group="equipment"] { background:var(--group-equipment); }
 .we-status { color:#d6bb77; font-size:14px; min-height:1.2em; }
 .setup-editor-row { display:flex; flex-wrap:wrap; gap:8px; align-items:baseline; margin:12px 0 0; }
 @media(max-width:1000px) { .we-body, .we-views { grid-template-columns:1fr; } .we-options { max-height:none; } }
+
+/* m-jidlo-balanc: developer Balance panel (hidden Dev mode, src/ui/DevBalancePanel.js). */
+.dev-mode-row button { margin-left: 8px; }
+.dev-balance-panel { position: fixed; right: 12px; top: 90px; z-index: 40; width: min(320px,calc(100vw - 24px)); max-height: 80dvh; overflow: auto; padding: 12px; border: 1px solid #978657; border-radius: 4px; background: #303625fa; color: #e8e2c0; box-shadow: 0 6px 30px #0007; font-size: 12px; }
+.dev-balance-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; margin: 4px 0; }
+.dev-balance-row input { grid-column: 1 / -1; width: 100%; }
+.dev-balance-row output { font-variant-numeric: tabular-nums; }
+.dev-balance-overview { white-space: pre-wrap; font: 11px/1.5 ui-monospace,monospace; margin: 8px 0; }
+.dev-balance-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }

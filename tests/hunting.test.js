@@ -57,7 +57,7 @@ test('animals use diagonal navigation, normalized speed and stop before a newly 
 });
 
 test('hunting follows a moving target, kills only in reach and drops the right quantity without auto-pickup',()=>{
-  for(const [type,quantity]of [['rabbit',5],['deer',10],['wild_boar',15]]){
+  for(const [type,quantity]of [['rabbit',7],['deer',13],['wild_boar',20]]){ // m-jidlo-balanc: +30 % meat
     const s=scene(),definition=objectRegistry.require(type),a=new AnimalController(s,definition,'test',{x:8,y:8},view());
     s.animalSystem.animals.set(a.id,a);assert.equal(s.huntingSystem.attack(a),false);
     assert.equal(s.huntingSystem.command(a),true);a.moveTo([{x:12,y:9}]);

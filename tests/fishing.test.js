@@ -88,8 +88,9 @@ test('the Fishers use the nearest reachable shore by walking distance, with no r
   assert.equal(near.fishing.distance(h1),1,'right at the water');assert.ok(far.fishing.distance(h2)>=20,`about twenty tiles (${far.fishing.distance(h2)})`);
   assert.ok(far.fishing.spots(h2).every((p,i,a)=>!i||a[i-1].distance<=p.distance),'nearest first');
   assert.match(far.fishing.summary(h2),/Water: \d+ tiles away/);
-  const caught=(s,b)=>{const w=fisher(s,b);s.foodSystem.eat=()=>true;for(let i=0;i<9600;i++)s.tick(50);const r=s.fishing.catches.get(b.id);return (r?.today??0)+(r?.yesterday??0);};
-  const a=caught(near,h1),b=caught(far,h2);assert.ok(a>b,`a hut by the water catches more (${a} > ${b})`);assert.ok(b>0,'the far one still fishes');
+  // m-jidlo-balanc: measured as the time to catch 15 fish (with 9 fish a day whole baskets of 5 often tie in a fixed window).
+  const time=(s,b)=>{const w=fisher(s,b);s.foodSystem.eat=()=>true;let n=0,t=0;const take=s.fishing.take.bind(s.fishing);s.fishing.take=(...x)=>{n++;return take(...x);};for(;n<15&&t<9600*3;t++)s.tick(50);return n>=15?t:Infinity;};
+  const a=time(near,h1),b=time(far,h2);assert.ok(a<b,`a hut by the water catches 15 fish sooner (${a} < ${b} ticks)`);assert.ok(Number.isFinite(b),'the far one still fishes');
 });
 
 test('two Fishers never share a spot; a hut with no reachable water says so and gets a notice',async()=>{

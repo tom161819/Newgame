@@ -1,3 +1,6 @@
+// m-jidlo-balanc (playtest 0.76.0 #3): Hunters search game within `huntRadius` tiles (other workers WORK_RULES.workRadius 24);
+// respawned game (Wildlife Respawn interval unchanged) appears within `spawnNearLodge` tiles of a Hunting Lodge when it can.
+export const HUNTING_RULES=Object.freeze({huntRadius:34,spawnNearLodge:30});
 export const WORKPLACE_RULES=Object.freeze({collectMeatDuration:700,patrolRadius:5,patrolWaitMin:2000,patrolWaitMax:4500});
 export const WORKPLACES=Object.freeze({
   iron_mine:Object.freeze({capacity:3,profession:'miner',skill:'mining'}),

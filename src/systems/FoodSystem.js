@@ -1,3 +1,4 @@
+import { devFactor } from '../data/devBalance.js';
 import { DAY_DURATION } from './GameTimeSystem.js';
 import { EDIBLE_RESOURCES,FOOD_ECONOMY_DAYS,HUNGRY_WORK_MULTIPLIER } from '../data/seasons.js';
 import { MEAL_VARIETY } from '../data/policy.js';
@@ -14,7 +15,9 @@ export class FoodSystem {
   get elapsed(){return(this.residents.get('king')?.progress??0)*this.dayDuration/2;}
   set elapsed(value){this.residents.set('king',{id:'king',progress:value/(this.dayDuration/2),hungry:false,compensation:0,meals:this.residents.get('king')?.meals??{}});}
   get remainingSeconds(){return Math.ceil((this.dayDuration/2-this.elapsed)/1000);}
-  get dailyConsumption(){return this.units().reduce((n,u)=>n+(u.isAlive?(u.id==='king'?2:1):0),0);}
+  // m-jidlo-balanc: portions a day at the current rations (Normal 0.8 since then), so the HUD days and the Policy balance match what is eaten.
+  portionsPerDay(u){return u.id==='king'?2:(this.scene?.policy?.portions?.()??1)*devFactor('consumption');}
+  get dailyConsumption(){return Math.round(this.units().reduce((n,u)=>n+(u.isAlive?this.portionsPerDay(u):0),0)*100)/100;}
   get availablePortions(){return EDIBLE_RESOURCES.reduce((n,id)=>n+this.inventory.count(id),0);}
   get hungryCount(){return this.units().filter(u=>u.isAlive&&this.residents.get(u.id)?.hungry).length;}
   get shortage(){return this.hungryCount>0||this.availablePortions<this.dailyConsumption;}
@@ -37,7 +40,7 @@ export class FoodSystem {
     if(!Number.isFinite(delta)||delta<=0||this.scene?.gameOver||this.time?.paused)return;
     this.syncResidents();let changed=this.recover();
     for(const u of this.units())if(u.isAlive){
-      const record=this.residents.get(u.id),rate=(u.id==='king'?2:(this.scene?.policy?.portions?.()??1))/this.dayDuration,corrected=delta*rate-record.compensation,total=record.progress+corrected;
+      const record=this.residents.get(u.id),rate=this.portionsPerDay(u)/this.dayDuration,corrected=delta*rate-record.compensation,total=record.progress+corrected;
       record.compensation=(total-record.progress)-corrected;record.progress=total;
       while(record.progress>=1-1e-10){record.progress=Math.max(0,record.progress-1);record.hungry=!this.eat(u);changed=true;}
     }

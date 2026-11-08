@@ -3,7 +3,7 @@ import { findPathToAny } from '../game/pathfinding.js';
 import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
 import { tileKey } from '../game/stones.js';
 import { JOBS,WORK_RULES,POPULATION } from '../data/jobs.js';
-import { WORKPLACE_RULES } from '../data/workplaces.js';
+import { WORKPLACE_RULES,HUNTING_RULES } from '../data/workplaces.js';
 
 export class WorkerAI {
   constructor(system){this.system=system;this.scene=system.scene;}
@@ -19,7 +19,7 @@ export class WorkerAI {
   }
   origin(worker){return this.system.origin(worker);}
   route(worker,goals){return findPathToAny(this.system.navigationMap(worker),worker.nextTile??worker.tile,goals,this.scene.pathWear?.routingOptions(worker));}
-  withinRange(worker,tile){const origin=this.origin(worker);return Math.max(Math.abs(tile.x-origin.x),Math.abs(tile.y-origin.y))<=WORK_RULES.workRadius;}
+  withinRange(worker,tile){const origin=this.origin(worker),radius=worker.profession==='hunter'?HUNTING_RULES.huntRadius:WORK_RULES.workRadius;return Math.max(Math.abs(tile.x-origin.x),Math.abs(tile.y-origin.y))<=radius;}
   reserve(worker,key,task,route){
     if(!this.system.reservations.reserve(key,worker.id))return false;
     worker.workTask={...task,reservation:key,goal:{...route.destination},progressMs:0};worker.path=route.path;worker.workState=this.scene.workplaceSystem?'Traveling to Target':'Moving to Target';worker.workMessage=['mine','mineDrop'].includes(task.kind)?'Travelling to stone':task.kind==='hunt'?'Following game':'Collecting meat';return true;

@@ -1,7 +1,8 @@
 export const animals = [
-  ['rabbit','Rabbit',5,1.1,0xb5aa92,0.65,15,1],
-  ['deer','Deer',10,1.4,0x9d6b3e,1,40,4],
-  ['wild_boar','Wild Boar',15,1.2,0x625443,0.95,70,12],
+  // m-jidlo-balanc (playtest 0.76.0 #3): ~+30 % meat (5/10/15 → 7/13/20).
+  ['rabbit','Rabbit',7,1.1,0xb5aa92,0.65,15,1],
+  ['deer','Deer',13,1.4,0x9d6b3e,1,40,4],
+  ['wild_boar','Wild Boar',20,1.2,0x625443,0.95,70,12],
 ].map(([id,name,meatDrop,movementSpeed,bodyColor,bodyScale,maxHP,attackDPS])=>({
   id,name,category:'animal',sprite:`/assets/characters/${id}/${id}.svg`,width:1,height:1,
   walkable:false,collectible:false,buildable:false,cost:{},interactions:['hunt'],

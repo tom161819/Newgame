@@ -47,7 +47,7 @@ test('wheat and apples pass all four stages and mature after 2/3 configured game
 });
 test('pause and blueprint time do not grant plant growth; the growth modifier hook affects plants but never yields resources by itself',()=>{
   const {s,wheat}=farm();s.gameTime.setPaused(true);s.gameTime.update(999999);assert.equal(s.farmingSystem.sync(wheat).growthDays,0);s.gameTime.setPaused(false);
-  s.farmingSystem.growthModifier=()=>0;s.gameTime.update(60000);assert.equal(s.farmingSystem.sync(wheat).growthDays,0);s.farmingSystem.growthModifier=()=>1.5;s.gameTime.update(60000);assert.equal(s.farmingSystem.sync(wheat).growthDays,1.5);assert.equal(s.inventory.count('wheat'),0);
+  s.farmingSystem.growthModifier=()=>0;s.gameTime.update(60000);assert.equal(s.farmingSystem.sync(wheat).growthDays,0);s.farmingSystem.growthModifier=()=>1.5;s.gameTime.update(60000);assert.ok(Math.abs(s.farmingSystem.sync(wheat).growthDays-1.5*FARMING_RULES.growthRate)<1e-9,'the hook times the crop growth rate (m-jidlo-balanc 1.2)');assert.equal(s.inventory.count('wheat'),0);
 });
 test('farmer physically visits a workplace and ripe field, works, then gains exactly 8 Wheat plus one overall/Farming XP reward',()=>{
   const {s,home,wheat}=farm();s.gameTime.update(120000);const w=farmer(s,home);w.naturalTalent='farming';const start={...w.position};

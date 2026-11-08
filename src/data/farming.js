@@ -2,6 +2,9 @@ export const FARMING_RULES = Object.freeze({
   workRadius: 15,
   tending: Object.freeze({harvestCheck:250,poseDuration:2500,travelTimeout:15000,maxPlots:12}),
   refreshInterval: 1000,
+  // m-jidlo-balanc (playtest 0.76.0 #3): fields and orchards +20 % – crops grow 1.2× faster (more harvests a season; the
+  // amount per harvest stays, so a harvest saved in progress keeps its reservation).
+  growthRate: 1.2,
   crops: Object.freeze({
     wheat_field: Object.freeze({ resource: 'wheat', growthDays: 2, yield: 8, workDuration: 4000, xp: 8,
       stages: ['Prepared soil', 'Young wheat', 'Growing wheat', 'Ripe wheat'] }),

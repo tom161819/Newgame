@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { objectRegistry } from '../src/systems/ObjectRegistry.js';
 import { workerScene,ensureBuildingPrerequisites } from './helpers/workerScene.js';
 import { placeBuilding,buildingTiles } from '../src/game/buildings.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
@@ -14,6 +15,8 @@ function build(s,type,x=55,y=50){
   Object.entries(s.objectRegistry.require(type).cost).forEach(([r,k])=>s.inventory.add(r,k));const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:s.objectRegistry.require(type)});
   assert.ok(result.building,result.error);const b=result.building;s.towerViews.set(b.id,s.createBuildingView(b.definition,b));return b;
 }
+// m-jidlo-balanc: a Rabbit leaves 7 meat (data).
+const MEAT=objectRegistry.require('rabbit').gameplay.meatDrop;
 function until(s,condition,max=30000){let elapsed=0;while(!condition()&&elapsed<max){s.tick(50);elapsed+=50;}assert.ok(condition(),`Condition not reached after ${elapsed}ms`);return elapsed;}
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} !== ${b}`);
 
@@ -62,8 +65,8 @@ test('reassignment drops an undelivered cargo safely; another miner can recover 
 test('lodge hunter uses real combat, gathers original meat amount, returns and earns Hunting/overall rewards only at delivery',()=>{
   const s=scene(),l=build(s,'hunting_lodge'),w=worker(s,53,50),rabbit=s.animalSystem.create(s.objectRegistry.require('rabbit'),{x:60,y:50});rabbit.wanderWait=1e8;s.workplaceSystem.assign(l,w);
   until(s,()=>!rabbit.isAlive);assert.equal(w.experience.totalXP,0);assert.equal(w.skills.hunting.totalXP,0);near(w.skills.combat.totalXP,15);assert.equal(s.dropSystem.drops.size,1);assert.equal(s.inventory.count('meat'),0);
-  until(s,()=>!!w.cargo);assert.deepEqual(w.cargo,{resource:'meat',amount:5});assert.equal(s.inventory.count('meat'),0);assert.equal(w.experience.totalXP,0);
-  until(s,()=>s.inventory.count('meat')===5);assert.equal(w.experience.totalXP,12);assert.equal(w.skills.hunting.totalXP,10);near(w.skills.combat.totalXP,15);assert.equal(s.workplaceSystem.summary(l).delivered.meat,5);assert.equal(s.character.experience.totalXP,0);
+  until(s,()=>!!w.cargo);assert.deepEqual(w.cargo,{resource:'meat',amount:MEAT});assert.equal(s.inventory.count('meat'),0);assert.equal(w.experience.totalXP,0);
+  until(s,()=>s.inventory.count('meat')===MEAT);assert.equal(w.experience.totalXP,12);assert.equal(w.skills.hunting.totalXP,10);near(w.skills.combat.totalXP,15);assert.equal(s.workplaceSystem.summary(l).delivered.meat,MEAT);assert.equal(s.character.experience.totalXP,0);
 });
 
 test('injured hunter returns to the assigned lodge for recovery without teleporting or continuing retaliation',()=>{
@@ -73,7 +76,7 @@ test('injured hunter returns to the assigned lodge for recovery without teleport
 
 test('an injured hunter deposits already gathered meat immediately on reaching the lodge before resting to full health',()=>{
   const s=scene(),l=build(s,'hunting_lodge'),w=worker(s,53,50),rabbit=s.animalSystem.create(s.objectRegistry.require('rabbit'),{x:60,y:50});rabbit.wanderWait=1e8;s.workplaceSystem.assign(l,w);until(s,()=>!!w.cargo);w.currentHP=17;
-  assert.equal(s.inventory.count('meat'),0);until(s,()=>w.workState==='Recovering');assert.equal(s.inventory.count('meat'),5);assert.equal(w.cargo,null);assert.equal(w.experience.totalXP,12);assert.equal(w.skills.hunting.totalXP,10);assert.ok(w.currentHP<48);s.simulate(500);assert.equal(s.inventory.count('meat'),5);assert.equal(w.experience.totalXP,12);
+  assert.equal(s.inventory.count('meat'),0);until(s,()=>w.workState==='Recovering');assert.equal(s.inventory.count('meat'),MEAT);assert.equal(w.cargo,null);assert.equal(w.experience.totalXP,12);assert.equal(w.skills.hunting.totalXP,10);assert.ok(w.currentHP<48);s.simulate(500);assert.equal(s.inventory.count('meat'),MEAT);assert.equal(w.experience.totalXP,12);
 });
 
 test('barracks patrols reuse the same subject, never initiate neutral combat and defend only when attacked; death releases the slot',()=>{
@@ -103,8 +106,8 @@ test('a hunter saved between the real kill and meat pickup restores pending kill
   // #132: the lodge needs a completed Granary, and a save with a Granary carries the food storage state.
   const s=workerScene(undefined,{workplaces:true,foodProduction:true}),l=build(s,'hunting_lodge'),w=worker(s,53,50),rabbit=s.animalSystem.create(s.objectRegistry.require('rabbit'),{x:60,y:50});rabbit.wanderWait=1e8;s.workplaceSystem.assign(l,w);until(s,()=>!rabbit.isAlive);
   assert.equal(w.cargo,null);assert.equal(w.pendingWorkRewards.length,1);assert.equal(w.pendingWorkRewards[0].type,'animalKilled');
-  const saved=validateGameState(serializeGameState(s)),r=workerScene(saved.terrain,{workplaces:true,foodProduction:true});loadGameState(r,saved);assert.deepEqual(serializeGameState(r),saved);until(r,()=>r.inventory.count('meat')===5);
-  const loaded=r.workerSystem.workers.get(w.id);assert.equal(loaded.experience.totalXP,12);assert.equal(loaded.skills.hunting.totalXP,10);near(loaded.skills.combat.totalXP,15);assert.equal(loaded.pendingWorkRewards.length,0);r.simulate(4000);assert.equal(loaded.experience.totalXP,12);assert.equal(r.inventory.count('meat'),5);
+  const saved=validateGameState(serializeGameState(s)),r=workerScene(saved.terrain,{workplaces:true,foodProduction:true});loadGameState(r,saved);assert.deepEqual(serializeGameState(r),saved);until(r,()=>r.inventory.count('meat')===MEAT);
+  const loaded=r.workerSystem.workers.get(w.id);assert.equal(loaded.experience.totalXP,12);assert.equal(loaded.skills.hunting.totalXP,10);near(loaded.skills.combat.totalXP,15);assert.equal(loaded.pendingWorkRewards.length,0);r.simulate(4000);assert.equal(loaded.experience.totalXP,12);assert.equal(r.inventory.count('meat'),MEAT);
 });
 
 test('a blocked return route keeps the real cargo and grants nothing until the quarry becomes reachable again',()=>{

@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { FARMING_RULES } from '../src/data/farming.js';
 import { workerScene,ensureBuildingPrerequisites } from './helpers/workerScene.js';
 import { WORK_RULES } from '../src/data/jobs.js';
 import { calendar,SEASONS,SEASON_GROWTH,WEATHER_GROWTH,WEATHER_PROBABILITIES } from '../src/data/seasons.js';
@@ -9,6 +10,8 @@ import { placeBuilding } from '../src/game/buildings.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
 globalThis.document={querySelector:()=>({textContent:''})};
+// m-jidlo-balanc: crops grow FARMING_RULES.growthRate (1.2) × faster on top of the season and weather factors.
+const R=FARMING_RULES.growthRate;
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-6,`${a} != ${b}`);
 function scene(seconds=120,{migration=false}={}){const s=workerScene(undefined,{construction:true,foodProduction:true,seasons:true,gameSettings:{dayLengthSeconds:seconds}});s.seasons.random=()=>0;s.seasons.weather='Sunny';if(!migration)s.workerSystem.unsubscribe();return s;}
 function building(s,type,x,y){const definition=s.objectRegistry.require(type);ensureBuildingPrerequisites(s,definition);Object.entries(definition.cost).forEach(([r,k])=>s.inventory.add(r,k));const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition});assert.ifError(result.error);s.towerViews.set(result.building.id,s.createBuildingView(definition,result.building));return result.building;}
@@ -33,15 +36,15 @@ test('seasonal weather distributions sum to one, vary by season, and multiply gr
 });
 test('orchards blossom during spring, develop ripe fruit only in summer/autumn and retain progress through winter without automatic yield',()=>{
   const s=scene(),plot=building(s,'orchard',44,50),f=s.farmingSystem;stock(s,{apple:100});s.gameTime.update(5*s.gameTime.dayDuration);const record=f.sync(plot);assert.equal(s.seasons.season,'Summer');assert.equal(record.growthDays,1);assert.equal(f.ripe(plot),false);
-  s.gameTime.update(s.gameTime.dayDuration);near(f.sync(plot).growthDays,2.43);assert.equal(record.stage,2);s.gameTime.update(s.gameTime.dayDuration);assert.equal(record.stage,3);assert.equal(f.ripe(plot),true);assert.equal(s.inventory.count('apple'),86);
+  s.gameTime.update(s.gameTime.dayDuration);near(f.sync(plot).growthDays,1+1.43*R);assert.equal(record.stage,2);s.gameTime.update(s.gameTime.dayDuration);assert.equal(record.stage,3);assert.equal(f.ripe(plot),true);assert.equal(s.inventory.count('apple'),86);
   s.gameTime.update(8*s.gameTime.dayDuration);assert.equal(s.seasons.season,'Winter');assert.equal(record.stage,0);assert.equal(record.growthDays,3);assert.equal(f.ripe(plot),false);const before=s.inventory.count('apple');s.gameTime.update(5*s.gameTime.dayDuration);assert.equal(record.growthDays,3);assert.equal(s.inventory.count('apple'),before-10);assert.equal(s.seasons.season,'Spring');assert.equal(record.stage,1);assert.equal(record.cycle,0);
 });
 test('winter freezes unfinished wheat exactly and the next spring resumes stored progress; no season deletes stored harvests',()=>{
-  const s=scene();stock(s,{apple:150});s.gameTime.update(14*s.gameTime.dayDuration);const wheat=building(s,'wheat_field',44,50);s.gameTime.update(s.gameTime.dayDuration);const record=s.farmingSystem.sync(wheat);near(record.growthDays,1.1);assert.equal(s.seasons.season,'Winter');const before=s.inventory.count('apple');s.gameTime.update(5*s.gameTime.dayDuration);near(record.growthDays,1.1);assert.equal(s.inventory.count('apple'),before-10);s.gameTime.update(s.gameTime.dayDuration*.1);near(s.farmingSystem.sync(wheat).growthDays,1.232);
+  const s=scene();stock(s,{apple:150});s.gameTime.update(14*s.gameTime.dayDuration);const wheat=building(s,'wheat_field',44,50);s.gameTime.update(s.gameTime.dayDuration);const record=s.farmingSystem.sync(wheat);near(record.growthDays,1.1*R);assert.equal(s.seasons.season,'Winter');const before=s.inventory.count('apple');s.gameTime.update(5*s.gameTime.dayDuration);near(record.growthDays,1.1*R);assert.equal(s.inventory.count('apple'),before-10);s.gameTime.update(s.gameTime.dayDuration*.1);near(s.farmingSystem.sync(wheat).growthDays,1.232*R);
 });
 test('growth uses active game days and weather, not frames or farming levels, across 30 and 144 FPS',()=>{
   const results=[];for(const fps of [30,144]){const s=scene(60),wheat=building(s,'wheat_field',44,50);s.seasons.weather='Drought';s.seasons.random=()=>.92;for(let i=0;i<fps*30;i++)s.gameTime.update(1000/fps);results.push(s.farmingSystem.sync(wheat).growthDays);}
-  near(results[0],.39);near(results[0],results[1]);
+  near(results[0],.39*R);near(results[0],results[1]);
 });
 test('daily consumption is exactly two king portions plus one per living subject at every configured day length and frame rate',()=>{
   for(const seconds of [60,120,240])for(const fps of [20,60,144]){

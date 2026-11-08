@@ -1,3 +1,4 @@
+import { devFactor } from '../data/devBalance.js';
 import { TAX_RATES,RATIONS,DEFAULT_POLICY,POLICY_RULES,FEAST } from '../data/policy.js';
 import { t } from '../i18n/index.js';
 
@@ -44,7 +45,7 @@ export class PolicySystem {
   }
   // The Happiness effect in force now (whole points shown, the exact value used).
   happiness(){return this.effect;}
-  dailyTaxes(tax=this.tax){return Math.round(this.residents().length*TAX_RATES[tax].perResident*(this.scene.kingSkills?.taxMultiplier?.()??1)*100)/100;}
+  dailyTaxes(tax=this.tax){return Math.round(this.residents().length*TAX_RATES[tax].perResident*(this.scene.kingSkills?.taxMultiplier?.()??1)*devFactor('taxes')*100)/100;}
   collect(day){
     if(day<=this.lastTaxDay)return 0;this.lastTaxDay=day;this.apply();
     const castle=this.scene.buildings?.some(b=>b.type==='castle'&&(!b.construction||b.construction.state==='complete'));const amount=castle?this.dailyTaxes():0;

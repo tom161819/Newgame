@@ -42,7 +42,7 @@ test('changing a job releases its task and cancels partly completed work without
 
 test('hunter uses real DPS, loots the resulting meat, gains Hunting and Combat but overall completion XP only once',()=>{
   const s=workerScene(),a=makeWorker(s),rabbit=s.animalSystem.create(s.objectRegistry.require('rabbit'),{x:51,y:50});rabbit.wanderWait=1e8;
-  s.workerSystem.jobs.assign(a,'hunter');s.simulate(4000);assert.equal(rabbit.isAlive,false);assert.equal(s.inventory.count('meat'),5);
+  s.workerSystem.jobs.assign(a,'hunter');s.simulate(4000);assert.equal(rabbit.isAlive,false);assert.equal(s.inventory.count('meat'),rabbit.definition.gameplay.meatDrop);
   assert.equal(a.skills.hunting.totalXP,10);near(a.skills.combat.totalXP,15);assert.equal(a.experience.totalXP,12);assert.equal(s.character.experience.totalXP,0);
   assert.equal(s.dropSystem.drops.size,0);assert.equal(s.workerSystem.reservations.owners.size,0);s.simulate(1000);assert.equal(a.experience.totalXP,12);
 });

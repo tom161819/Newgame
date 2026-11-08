@@ -1,3 +1,4 @@
+import { HUNTING_RULES } from '../data/workplaces.js';
 import { WILDLIFE_COUNTS,WILDLIFE_INTERVALS } from './GameSettings.js';
 import { resourceCandidates } from '../game/stones.js';
 import { FogOfWarSystem } from './FogOfWarSystem.js';
@@ -13,7 +14,9 @@ export class WildlifeRespawnSystem {
     const origins=this.scene.resourceOrigins?.()??[this.scene.character.tile];
     this.animals.clearance.refresh();
     const candidates=resourceCandidates(this.scene.map,origins,this.scene.reservedTiles(),this.scene.resourceOccupancy,definition).filter(tile=>this.animals.clearance.isClear(tile));if(!candidates.length)return false;
-    const sight=new FogOfWarSystem(this.scene.character,true),hidden=candidates.filter(t=>!sight.isVisibleTile(t)),safe=hidden.length?hidden:candidates;
+    // m-jidlo-balanc: respawned game prefers ground within reach of a finished Hunting Lodge (fewer days without a catch).
+    const sight=new FogOfWarSystem(this.scene.character,true),hidden=candidates.filter(t=>!sight.isVisibleTile(t)),pool=hidden.length?hidden:candidates;
+    const lodges=(this.scene.buildings??[]).filter(b=>b.type==='hunting_lodge'&&(!b.construction||b.construction.state==='complete')),near=pool.filter(t=>lodges.some(b=>Math.max(Math.abs(t.x-b.x),Math.abs(t.y-b.y))<=HUNTING_RULES.spawnNearLodge)),safe=near.length?near:pool;
     const tile=safe[Math.floor(this.random()*safe.length)];this.animals.create(definition,tile);return true;
   }
   update(delta){

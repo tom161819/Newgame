@@ -1,3 +1,4 @@
+import { devFactor } from '../data/devBalance.js';
 import { reconcileFarmPlots,farmPlots,FARM_PLOT_CAPACITY } from '../data/farmPlots.js';
 import { dataName } from '../i18n/names.js';
 import { FARMING_RULES } from '../data/farming.js';
@@ -57,7 +58,7 @@ export class FarmingSystem {
   advanceGrowth(delta) {
     if(this.scene.gameOver)return;
     for(const id of Object.keys(this.clocks)){
-      const multiplier=this.growthModifier(id,this.scene.gameTime);
+      const multiplier=this.growthModifier(id,this.scene.gameTime)*FARMING_RULES.growthRate*devFactor('farming');
       if(Number.isFinite(multiplier))this.clocks[id]+=delta/this.scene.gameTime.dayDuration*Math.max(0,multiplier);
     }
     this.refreshElapsed+=delta;

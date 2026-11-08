@@ -53,11 +53,10 @@ export async function tutorialSmoke(context,url,instrument){
     assert.equal((await scene(page)).step,'king');assert.equal(await page.locator('#tutorial-bubble').isVisible(),true);
     await page.locator('#tutorial-bubble .tutorial-next').click();assert.equal((await scene(page)).step,'builder');
     await jobStep(page,'builder','hauler');await jobStep(page,'hauler','granary');
-    await buildStep(page,'granary');await buildStep(page,'hunting_lodge');
+    await buildStep(page,'granary');await buildStep(page,'lumberjack_hut');await buildStep(page,'hunting_lodge');
     await nextStep(page,'fisherman','farm');
     await buildStep(page,'farmhouse');assert.equal((await scene(page)).step,'mill','building an optional step also moves on');
-    await nextStep(page,'mill','bakery');await nextStep(page,'bakery','lumberjack_hut');
-    await buildStep(page,'lumberjack_hut');
+    await nextStep(page,'mill','bakery');await nextStep(page,'bakery','stone');
     // Stone (points 5, 6): "Mark to clear" → the arrow points down at the rock nearest the Castle; marking it ends the step.
     assert.equal((await scene(page)).step,'stone');await arrowOn(page,'#mark-rocks');await page.locator('#mark-rocks').click();
     await page.waitForFunction(()=>/arrow|šipka/i.test(document.querySelector('#tutorial-bubble .tutorial-text').textContent)&&document.querySelector('#tutorial-arrow').style.transform.includes('1.57'),null,{timeout:5000});

@@ -1,7 +1,7 @@
 import { GRANARY_GROUP_CAPACITY,granaryUsage } from '../data/granaryCapacity.js';
 import { tradeableResources } from '../data/trade.js';
 import { paidCost } from '../data/demolition.js';
-import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
+import { FOOD_RESOURCE_IDS,FOOD_RULES,LEGACY_RECIPE_OUTPUTS } from '../data/foodProduction.js';
 import { pavementWorkArea } from '../game/pavement.js';
 import { recipeFor,recipeResources } from '../data/production.js';
 import { PLAYER_START } from '../game/config.js';
@@ -80,7 +80,9 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     check(r.nextCycle===1+r.completed+(r.cycle?1:0));
     // S12: a workshop with recipe choices keeps the chosen one; a running batch keeps the recipe it started with.
     const d=registry.require(b.type);if(d.recipes){check(Object.hasOwn(d.recipes,r.recipe));if(r.cycle)check(Object.hasOwn(d.recipes,r.cycle.recipe));}else check(r.recipe===undefined&&r.cycle?.recipe===undefined);
-    const recipe=recipeFor(d,r.cycle?.recipe??r.recipe),[outId,outAmount]=Object.entries(recipe.output)[0];
+    const recipe=recipeFor(d,r.cycle?.recipe??r.recipe),[outId,current]=Object.entries(recipe.output)[0],legacy=LEGACY_RECIPE_OUTPUTS[b.type]?.[outId],held=id=>reservations.get(id)?.amount;
+    // m-jidlo-balanc: a batch reserved under the earlier output (LEGACY_RECIPE_OUTPUTS) is still valid.
+    const amountOf=id=>legacy!==undefined&&held(id)===legacy?legacy:current,outAmount=amountOf(r.cycle?.outputReservation??r.outputReservation);
     if(recipe.horse&&r.cycle)check(r.cycle.horseId!=null);else if(r.cycle)check(r.cycle.horseId===undefined);
     if(r.cycle){
       const c=r.cycle,match=String(c.id).match(new RegExp(`^food-cycle-${b.id}-(\\d+)$`));check(match);integer(Number(match[1]),1,r.nextCycle-1);

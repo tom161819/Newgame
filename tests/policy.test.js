@@ -38,8 +38,9 @@ test('taxes are collected once each morning from every permanent resident while 
 test('rations change how often residents eat and their Happiness; taxes move Happiness too', () => {
   const eaten=rations=>{const s=world({residents:2});s.inventory.add('bread',100);s.policy.set('rations',rations);s.policy.apply();const start=s.inventory.count('bread');for(let i=0;i<40;i++)s.foodSystem.advance(day(s)/10);return start-s.inventory.count('bread');};
   const small=eaten('small'),normal=eaten('normal'),generous=eaten('generous');
-  // Over 4 days 2 residents eat 4 / 8 / 12 portions; the King always eats his own 2 a day (8).
-  assert.deepEqual([small-8,normal-8,generous-8],[4,8,12]);
+  // Over 4 days each of 2 residents eats 0.4 / 0.8 / 1.2 portions a day (m-jidlo-balanc): 1.6 / 3.2 / 4.8 → 1 / 3 / 4 whole
+  // meals each; the King always eats his own 2 a day (8).
+  assert.deepEqual([small-8,normal-8,generous-8],[2,6,8]);
   const s=world({residents:1}),w=s.workerSystem.liveWorkers()[0],base=s.needs.status(w).happiness;
   const now=(tax,rations='normal')=>{s.policy.set('tax',tax);s.policy.set('rations',rations);s.policy.apply();s.policy.effect=s.policy.target();};
   now('very_high');assert.equal(s.needs.status(w).happiness,Math.max(0,base-20));
@@ -95,7 +96,7 @@ test('#68: the Food need comes from rations and variety: Small/Normal/Generous 3
   s.needs.step(s.gameTime.dayDuration/10);assert.equal(r.food,95,'falls gradually');settle();assert.equal(s.needs.status(w).food,65);
   rations('generous');meals(['apple','bread','meat','fish']);s.needs.step(s.gameTime.dayDuration/10);assert.equal(r.food,75,'rises gradually');settle();assert.equal(s.needs.status(w).food,100);
   // Portions per day are unchanged (0.5 / 1 / 1.5), see the rations test above.
-  assert.deepEqual(Object.values(RATIONS).map(x=>x.portions),[.5,1,1.5]);
+  assert.deepEqual(Object.values(RATIONS).map(x=>x.portions),[.4,.8,1.2]);
 });
 
 test('#68: the Food tooltip shows rations + variety = target (en + cs); a resident without food sees the hunger text', async () => {

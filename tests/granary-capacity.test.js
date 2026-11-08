@@ -49,5 +49,5 @@ test('current-schema saves preserve the Granary and Farmhouse stores and reject 
 test('a Bakery cannot book four food outputs into only two food slots',()=>{
  const {s,id,storage}=fixture(),bakery=building(s,'bakery',58,45),starter=[...storage.locations.values()].find(l=>l.kind==='fallback'&&l.allowed.includes('bread'));storage.deposit(id,'bread',FOOD-2);storage.deposit(starter.id,'bread',CAP);storage.deposit(`input-${bakery.id}`,'flour',2);
  const w=s.workerSystem.create({x:57,y:45});s.workplaceSystem.assign(bakery,w);s.simulate(6000);assert.equal(s.foodProduction.records.get(bakery.id).cycle,null);assert.equal(storage.room(id,'wheat'),0);assert.equal(storage.room(id,'bread'),2);
- storage.withdraw(id,'bread',4);until(s,()=>s.foodProduction.records.get(bakery.id).completed===1&&!w.cargo&&s.inventory.count('bread')===FOOD+CAP-2);snapshot(s);
+ storage.withdraw(id,'bread',4);until(s,()=>s.foodProduction.records.get(bakery.id).completed===1&&!w.cargo&&s.inventory.count('bread')===FOOD+CAP-1);/* m-jidlo-balanc: the batch makes 5 Bread (FOOD-6 + CAP + 5) */snapshot(s);
 });
