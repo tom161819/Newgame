@@ -16,8 +16,20 @@ export function setTutorialEnabled(on,storage=globalThis.localStorage){try{stora
 const visible=el=>!!el&&el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden';
 // m-ui-prekryvy-076 (report 0.76.0 point 4): the windows the bubble (tutorial step or tip) must never cover.
 export const TUTORIAL_WINDOWS='#buildings-panel,#population-panel,#population-job-menu,#policy-card,#employment-panel,#settings-panel,#royal-goals,#unit-command-bar,dialog[open]';
+// A sliding window (the Population panel moves in with `transform`) measured mid-animation is still partly off screen:
+// while a transition or animation runs, take the box it comes to rest at (its transform's translation taken away), so
+// the bubble is not placed where the window is about to be. Pure: `translate` is {x,y} of the current transform.
+export function restingRect(r,translate={x:0,y:0}){
+  const dx=translate?.x||0,dy=translate?.y||0;if(!dx&&!dy)return r;
+  return {left:r.left-dx,right:r.right-dx,top:r.top-dy,bottom:r.bottom-dy,width:r.width,height:r.height,x:r.left-dx,y:r.top-dy};
+}
+export const restingBox=e=>restingRect(e.getBoundingClientRect(),movingTranslation(e));
+function movingTranslation(e){
+  if(!e.getAnimations?.().some(a=>(a.playState==='running'||a.playState==='pending')&&(a.transitionProperty==null||a.transitionProperty==='transform'||a.transitionProperty==='all')))return null;
+  try{const tr=getComputedStyle(e).transform;if(!tr||tr==='none')return null;const m=new DOMMatrixReadOnly(tr);return {x:m.m41,y:m.m42};}catch{return null;}
+}
 export function openWindowRects(doc=globalThis.document,vw=globalThis.innerWidth,vh=globalThis.innerHeight){
-  return [...(doc?.querySelectorAll?.(TUTORIAL_WINDOWS)??[])].filter(visible).map(e=>e.getBoundingClientRect()).filter(r=>r.width>0&&r.height>0&&r.right>0&&r.bottom>0&&r.left<vw&&r.top<vh);
+  return [...(doc?.querySelectorAll?.(TUTORIAL_WINDOWS)??[])].filter(visible).map(e=>restingRect(e.getBoundingClientRect(),movingTranslation(e))).filter(r=>r.width>0&&r.height>0&&r.right>0&&r.bottom>0&&r.left<vw&&r.top<vh);
 }
 export class TutorialGuide {
   constructor(scene,{doc=globalThis.document}={}){
@@ -135,7 +147,7 @@ export class TutorialGuide {
     if(!point){this.arrow.hidden=true;this.positionBubble(null);return;}
     // m-tutorial-v2 point 2: arrow and bubble beside the target (and beside the panel it lives in), never over it.
     const w=Math.min(300,vw-24);this.bubble.style.width=`${w}px`;const h=this.bubble.offsetHeight||90;
-    const boxes=[target.avoid??[]].flat().filter(visible).map(e=>e.getBoundingClientRect());
+    const boxes=[target.avoid??[]].flat().filter(visible).map(restingBox);
     const avoid=boxes.length?{left:Math.min(...boxes.map(b=>b.left)),right:Math.max(...boxes.map(b=>b.right)),top:Math.min(...boxes.map(b=>b.top)),bottom:Math.max(...boxes.map(b=>b.bottom))}:null;
     const {arrow,bubble}=tutorialPlacement({point,rect,avoid,from:target.from??null,vw,vh,bubble:{w,h},windows:openWindowRects(this.doc,vw,vh)});
     this.arrow.hidden=false;this.arrow.style.left=`${Math.round(arrow.x)}px`;this.arrow.style.top=`${Math.round(arrow.y)}px`;this.arrow.style.transform=`translate(-50%,-50%) rotate(${arrow.angle}rad)`;this.arrow.classList.toggle('offscreen',arrow.off);

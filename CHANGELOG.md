@@ -5,6 +5,35 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.78.0] - 2026-11-08
+<!-- version: {"title":"Balance and fixes from the 0.76 playtest","type":"feature","reconstructed":false,"saveVersion":60} -->
+### Changed
+- Wood:
+  - The tutorial asks for the Lumberjack Hut right after the Granary.
+  - Woodcutters fell a tree in 7 s instead of 15 s.
+  - The normal start has 110 wood and 160 bread.
+- Food:
+  - Hunters search further and bring about 30 % more meat.
+  - Game respawns near Hunting Lodges.
+  - Fishers catch 9 fish a day instead of 6, and more on plentiful water.
+  - Fields and orchards grow 20 % faster.
+  - A Bakery batch gives 5 bread.
+  - Portions are smaller: Small 0.4, Normal 0.8, Generous 1.2.
+  - The days-of-food readout counts real portions.
+- Every new world has a Stone Deposit for a Quarry 8–16 tiles from the castle. The tutorial's stone step points to it. World codes are now MKW3; old codes still load in saves but not for a new game.
+- Windows:
+  - The tutorial bubble and tips keep clear of open menus and panels.
+  - The Royal tasks card moves above the open Build menu.
+  - Long event lines wrap.
+  - The King or resident panel and the Policy / Employments cards close each other.
+  - Opened from its tab, Employments no longer shows the Kingdom policy section.
+  - The King panel fits its window.
+- Czech: number forms ("10 kamenů", "na 2 dny"), "zemřel/zemřela" by sex, "Více" instead of "More", and "Materiál" instead of "Sklady" with a tooltip.
+- The Speed tutorial step stays done.
+- The stump message shows only for wood the King chopped.
+### Added
+- A hidden developer mode: click the version in Settings 5 times. Its Balance panel has 11 sliders (0.25–3×) for output, portions, immigration, wages and taxes, plus Reset, Copy values and a live overview. The values stay in the browser only.
+
 ## [0.77.2] - 2026-11-08
 <!-- version: {"title":"Save next to a ford","type":"fix","reconstructed":false,"saveVersion":60} -->
 ### Fixed

@@ -11,6 +11,7 @@ import CS_NAMES from '../src/data/names.cs.js';
 import { stumpMessageShown } from '../src/systems/NaturalResourcesSystem.js';
 import { workerScene } from './helpers/workerScene.js';
 import { treeState } from '../src/data/naturalResources.js';
+import { restingRect } from '../src/ui/TutorialGuide.js';
 
 // m-ui-prekryvy-076 and m-drobnosti-076 (report 0.76.0 points 4–12).
 const R=(l,t,w,h)=>({left:l,top:t,right:l+w,bottom:t+h,width:w,height:h});
@@ -45,6 +46,19 @@ test('the tutorial bubble never covers an open window, the target or the arrow (
   const full=freeBubbleSpot({x:20,y:100,w:300,h:100,vw:400,vh:400,blocked:[R(0,0,400,300)]});assert.equal(full.y,400-100-12,'as low as the screen allows');
 });
 
+test('the bubble clears the Population panel while it still slides in (smoke 03, 1440×900)',()=>{
+  const L=(left,top,right,bottom)=>({left,top,right,bottom,width:right-left,height:bottom-top});
+  const bubble={w:300,h:125},vw=1440,vh=900,unit=L(1084,144,1424,744),rest=L(1058,200,1402,785),row=L(1112,520,1152,560);
+  // The panel measured mid-slide (translateX still 120 px, 342 px, and almost off screen): the resting box is used.
+  for(const dx of [14.5,120,342]){
+    const mid=L(rest.left+dx,rest.top,rest.right+dx,rest.bottom),measured=restingRect(mid,{x:dx,y:0});
+    assert.deepEqual([measured.left,measured.right,measured.top,measured.bottom],[rest.left,rest.right,rest.top,rest.bottom]);
+    const p=tutorialPlacement({point:centre(row),rect:row,avoid:measured,vw,vh,bubble,windows:[measured,unit]}),b=box(p.bubble,bubble);
+    assert.ok(!ov(b,rest)&&!ov(b,unit)&&!ov(b,row),`bubble ${JSON.stringify(b)} over the Population panel or the resident card (slide ${dx})`);
+    assert.ok(b.right<=rest.left,'the bubble sits in the free space left of the panels');
+  }
+  assert.equal(restingRect(rest,null),rest,'a window at rest is measured as it is');
+});
 test('the Royal tasks card moves above the open Build menu or folds; it never covers it (point 5)',()=>{
   const menu=R(18,527,1177,300);
   assert.deepEqual(goalsCardPlacement(R(1125,415,255,165),menu,{top:140}),{shift:580-519,fold:false});

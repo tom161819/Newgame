@@ -22,7 +22,8 @@ export async function uiFixes076Smoke(context,url,instrument){
     // Point 12: the stores counter says Materiál and explains what it counts.
     const store=page.locator('.storage-capacity');if(await store.count()){assert.match(await store.textContent(),/^Materiál/);assert.match(await store.getAttribute('title'),/Jídlo se sem nepočítá/);}
     // Point 4, shot 04: the "Storage and workshop" step with the Build menu open on Logistics.
-    await page.evaluate(s=>{const g=eval(s),t=g.tutorial;for(const step of t.progress().steps)if(step.id!=='storage'&&step.id!=='speed')t.skipped.add(step.id);t.active=true;t.update(true);},S);
+    // The harness starts games with the tutorial switched off; this check needs it on.
+    await page.evaluate(s=>{localStorage.setItem('newgame.tutorial','on');const g=eval(s),t=g.tutorial;for(const step of t.progress().steps)if(step.id!=='storage'&&step.id!=='speed')t.skipped.add(step.id);t.active=true;t.update(true);},S);
     await page.locator('#buildings-tab').click();await page.locator('#buildings-panel:not([hidden])').waitFor();
     await page.locator('[data-building-category="logistics"]').click();await page.evaluate(s=>eval(s).tutorial.update(true),S);await page.waitForTimeout(200);
     let bubble=await rect('#tutorial-bubble');assert.ok(bubble,'the storage step shows its bubble');
