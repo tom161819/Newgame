@@ -9,10 +9,10 @@ import { LOGISTICS_RULES } from '../src/data/logistics.js';
 globalThis.document={querySelector:()=>({textContent:''})};
 
 const scene=()=>workerScene(undefined,{construction:true,logistics:true,gameSettings:gameSettings(NEW_GAME_DEFAULTS)});
-test('defaults: 200 Bread fits the Starter Stockpile next to Stone and Wood',()=>{
-  assert.equal(NEW_GAME_DEFAULTS.startingBread,200);assert.equal(LOGISTICS_RULES.starterCapacity,300);
+test('defaults: 180 Bread fits the Starter Stockpile next to Stone and Wood',()=>{
+  assert.equal(NEW_GAME_DEFAULTS.startingBread,180);assert.equal(LOGISTICS_RULES.starterCapacity,300);
   const s=scene(),starter=[...s.foodStorage.locations.values()].find(l=>l.buildingId===s.buildings.find(b=>b.type==='starter_stockpile').id);
-  assert.equal(starter.stock.bread,200);assert.equal(starter.stock.wood,60);assert.equal(starter.stock.stone,40);
+  assert.equal(starter.stock.bread,180);assert.equal(starter.stock.wood,90);assert.equal(starter.stock.stone,30);
 });
 test('the starting garrison: 2 Soldiers and 2 Archers with their own equipment, inside the population of 10',()=>{
   assert.equal(POPULATION.maximum,10);

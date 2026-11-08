@@ -8,9 +8,15 @@ export const DEFAULT_GAME_SETTINGS=Object.freeze({difficulty:'normal',wildlifePo
   // m-start-v2: 2 Soldiers and 2 Archers at the start (New Game proposes it; scenarios and older settings start without).
   startingGarrison:false});
 // Owner request 7 Nov 2026: the New Game Setup proposes a built Castle (can be switched off), Gold at its limit (500)
-// and starting resources that fill the Starter Stockpile (m-start-v2: 40 Stone + 60 Wood + 200 Bread = 300). DEFAULT_GAME_SETTINGS stays the
+// and starting resources that fill the Starter Stockpile (m-start-v2: 40 Stone + 60 Wood + 200 Bread = 300; m-tutorial-v2: 30 + 90 + 180). DEFAULT_GAME_SETTINGS stays the
 // neutral base for older saves and automated scenarios.
-export const NEW_GAME_DEFAULTS=Object.freeze({...DEFAULT_GAME_SETTINGS,startingCastle:true,startingGold:500,startingStone:40,startingWood:60,startingIronOre:0,startingBread:200,startingGarrison:true});
+// m-tutorial-v2 (points 5, 8): 90 Wood pays the tutorial's mandatory buildings (Granary 12 + Hunting Lodge 8 + Lumberjack
+// Hut 6 + House 10 + Material Yard 20 + Builder's Workshop 20 = 76) with a reserve of 14; Stone and Bread make room in
+// the 300-unit Starter Stockpile (30 + 90 + 180 = 300).
+export const NEW_GAME_DEFAULTS=Object.freeze({...DEFAULT_GAME_SETTINGS,startingCastle:true,startingGold:500,startingStone:30,startingWood:90,startingIronOre:0,startingBread:180,startingGarrison:true});
+// m-tutorial-v2: a start with the Castle brings 2 more residents (5 instead of POPULATION.initial 3), so a Miner is still
+// free after the Builder, Hauler and Hunter. With the starting garrison (4, not free workers) that is 9 of the 10 places.
+export const CASTLE_START_EXTRA_RESIDENTS=2;
 // Physical goods placed once in the Starter Stockpile; their total fits its capacity.
 export const STARTING_RESOURCES=Object.freeze({startingStone:'stone',startingWood:'wood',startingIronOre:'iron_ore',startingBread:'bread'});
 export const STARTING_RESOURCE_STEP=5,STARTING_RESOURCE_CAPACITY=LOGISTICS_RULES.starterCapacity;

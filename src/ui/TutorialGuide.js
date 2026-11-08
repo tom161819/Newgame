@@ -1,5 +1,7 @@
 import { t } from '../i18n/index.js';
-import { tutorialProgress } from '../systems/Tutorial.js';
+import { tutorialProgress,nearestRock,tutorialPlacement,markedRocks } from '../systems/Tutorial.js';
+import { tileCenter } from '../game/isometric.js';
+import { FARM_PLOT_CAPACITY } from '../data/farmPlots.js';
 import { TUTORIAL_KING_MS } from '../data/tutorial.js';
 import { TIPS } from '../data/tips.js';
 import { foodDays } from '../data/foodOutlook.js';
@@ -27,6 +29,9 @@ export class TutorialGuide {
     this.done=doc.createElement('div');this.done.className='tutorial-done';this.done.textContent='✓';this.done.hidden=true;
     for(const e of ['pointerdown','mousedown','mouseup','click','wheel'])this.bubble.addEventListener(e,ev=>ev.stopPropagation(),options);
     doc.body.append(this.bubble,this.arrow,this.done);
+    // m-tutorial-v2 bugs 6–7: the progress also follows the world on a timer, so a step ends even on frames where the
+    // scene's update returns early (a paused or blocked frame).
+    this.timer=globalThis.setInterval?.(()=>{if(this.active)this.update();},500);this.timer?.unref?.();
     // Settings: switch the tutorial off or back on (it resumes at the first step not done yet).
     this.tipSetting=doc.querySelector('#settings-tips');if(this.tipSetting){this.tipSetting.checked=tipsEnabled();this.tipSetting.addEventListener('change',()=>{try{localStorage.setItem(TIPS_KEY,this.tipSetting.checked?'on':'off');}catch{/* session */}if(!this.tipSetting.checked)this.closeTip();},options);}
     try{this.tipsSeen=new Set(JSON.parse(localStorage.getItem(SEEN_KEY)??'[]'));}catch{this.tipsSeen=new Set();}this.tip=null;this.lastTipCheck=-Infinity;
@@ -45,9 +50,9 @@ export class TutorialGuide {
   showMe(){
     if(this.tip){const wiki=this.tip.wiki;this.closeTip();if(wiki&&this.scene.wikiPanel)this.scene.wikiPanel.open(wiki);else this.scene.gettingStarted?.show();return;}
     const s=this.scene,step=this.progress().current;if(!step)return;
-    if(step.id==='builder'){s.populationSidebar?.setOpen(true);return;}
+    if(step.check==='job'){s.populationSidebar?.setOpen(true);return;}
     if(step.id==='speed'){s.speedControls?.setSpeed(2);this.next();return;}
-    if(step.id==='stone'){this.doc.querySelector('#mark-rocks')?.focus();return;}
+    if(step.id==='stone'){if(s.rockMiningTool&&!s.rockMiningTool.enabled)s.rockMiningTool.activate(false);else this.doc.querySelector('#mark-rocks')?.focus();this.update(true);return;}
     if(step.id==='king'){s.worldCamera?.locate?.(s.character??{});return;}
     const id=this.pendingBuilding(step);if(id)s.gettingStarted?.showBuilding(id);
   }
@@ -55,11 +60,16 @@ export class TutorialGuide {
   target(step){
     const s=this.scene,q=sel=>this.doc.querySelector(sel);
     if(step.id==='king')return {world:s.player?{x:s.player.x,y:s.player.y-40}:null};
-    if(step.id==='builder'){
-      const menu=q('#population-job-menu');if(visible(menu))return {el:menu.querySelector('[data-job="builder"]')};
-      if(s.populationSidebar?.open)return {el:q('.population-row .population-job.is-unemployed')??q('.population-row .population-job')};
+    // Builder, Hauler, Miner: the Population tab, then a resident's job button, then the profession in the job menu.
+    // The whole panel is kept clear (m-tutorial-v2 point 2): the arrow and the bubble sit beside it.
+    if(step.check==='job'){
+      const menu=q('#population-job-menu');if(visible(menu))return {el:menu.querySelector(`[data-job="${step.job}"]`),avoid:[menu,q('#population-panel')]};
+      const panel=q('#population-panel');
+      if(s.populationSidebar?.open)return {el:q('.population-row .population-job.is-unemployed')??q('.population-row .population-job'),avoid:[panel]};
       return {el:q('#population-tab')};
     }
+    // Stone (point 5): once "Mark to clear" is on, the arrow points down at the rock nearest to the Castle.
+    if(step.id==='stone'&&s.rockMiningTool?.enabled&&!s.rockMiningTool.remove){const rock=this.rockTile();if(rock){const p=tileCenter(rock);return {world:{x:p.x,y:p.y-10},from:'above'};}}
     if(step.target)return {el:q(step.target)};
     const id=this.pendingBuilding(step);if(!id)return {};
     if(s.buildMode&&s.selectedBuilding?.id===id)return {placing:true};
@@ -72,6 +82,13 @@ export class TutorialGuide {
       return {el:choice};
     }
     const cat=s.objectRegistry?.get(id)?.buildingCategory;return {el:cat?q(`[data-building-category="${cat}"]`):null};
+  }
+  // The rock the stone step points at: kept while it is still an unmarked rock, otherwise the nearest one to the Castle.
+  rockTile(){
+    const s=this.scene,grid=s.terrainGrid;if(!grid)return null;const marked=new Set(markedRocks(s).map(r=>`${r.tile.x},${r.tile.y}`));
+    const ok=t=>grid[t.y]?.[t.x]===1&&!marked.has(`${t.x},${t.y}`)&&(s.fog?.isVisibleTile?.(t)??true);
+    if(this.rock&&ok(this.rock))return this.rock;
+    this.rock=nearestRock(grid,s.workerSystem?.origin?.()??{x:50,y:50},{visible:t=>s.fog?.isVisibleTile?.(t)??true,skip:t=>marked.has(`${t.x},${t.y}`)});return this.rock;
   }
   screenPoint(world){
     const cam=this.scene.cameras?.main,canvas=this.scene.game?.canvas?.getBoundingClientRect?.();if(!cam||!canvas||!world)return null;
@@ -86,10 +103,11 @@ export class TutorialGuide {
     if(!p.current){this.active=false;this.hide();this.scene.eventFeed?.push?.('tutorial-done',t('tutorial.finished'),{important:true});this.currentId=null;return;}
     this.currentId=p.current.id;
     const target=this.target(p.current);
-    this.text.textContent=t(target.placing?'tutorial.place':`tutorial.step.${p.current.id}`,{name:this.scene.objectRegistry?.get(this.pendingBuilding(p.current)??'')?.name??''});
+    const key=target.placing?'tutorial.place':target.from==='above'&&p.current.id==='stone'?'tutorial.step.stoneMark':`tutorial.step.${p.current.id}`;
+    this.text.textContent=t(key,{name:this.scene.objectRegistry?.get(this.pendingBuilding(p.current)??'')?.name??'',plots:FARM_PLOT_CAPACITY});
     this.count.textContent=t('tutorial.count',{step:p.doneCount+1,total:p.total});
     this.showButton.textContent=t('tutorial.show');this.skipButton.textContent=t('tutorial.skip');this.nextButton.textContent=t('tutorial.next');this.closeButton.title=this.closeButton.ariaLabel=t('tutorial.close');
-    this.nextButton.hidden=!['king','speed'].includes(p.current.id);this.showButton.hidden=p.current.id==='king'||!!target.placing;
+    this.nextButton.hidden=!p.current.optional&&!['king','speed'].includes(p.current.id);this.showButton.hidden=p.current.id==='king'||!!target.placing;
     this.bubble.hidden=false;this.place(target);
   }
   place(target){
@@ -97,22 +115,18 @@ export class TutorialGuide {
     if(target.el&&visible(target.el)){rect=target.el.getBoundingClientRect();point={x:rect.left+rect.width/2,y:rect.top+rect.height/2};}
     else if(target.world){const sp=this.screenPoint(target.world);if(sp)point={x:sp.x,y:sp.y};}
     if(!point){this.arrow.hidden=true;this.positionBubble(null);return;}
-    // Off screen: clamp to the edge and point towards the target.
-    const m=28,cx=Math.min(vw-m,Math.max(m,point.x)),cy=Math.min(vh-m,Math.max(m,point.y)),off=cx!==point.x||cy!==point.y;
-    // The arrow sits beside the target (left of it when there is room) and points at it.
-    // Targets in the bottom bar get the arrow from above (pointing down), others from the side with more room.
-    const bottom=!off&&cy>vh-170,gap=rect?(bottom?rect.height:Math.max(rect.width,rect.height))/2+18:22,dx=off?point.x-cx:(cx>vw/2?1:-1),dy=off?point.y-cy:0;
-    const angle=off?Math.atan2(dy,dx):bottom?Math.PI/2:(cx>vw/2?0:Math.PI),ax=off?cx:cx-Math.cos(angle)*gap,ay=off?cy:cy-Math.sin(angle)*gap;
-    this.arrow.hidden=false;this.arrow.style.left=`${Math.round(ax)}px`;this.arrow.style.top=`${Math.round(ay)}px`;this.arrow.style.transform=`translate(-50%,-50%) rotate(${angle}rad)`;this.arrow.classList.toggle('offscreen',off);
-    // The bubble goes on the side the arrow comes from, so it never covers the target.
-    this.positionBubble({x:ax,y:ay,side:bottom?'above':Math.cos(angle)>=0?'left':'right'});
+    // m-tutorial-v2 point 2: arrow and bubble beside the target (and beside the panel it lives in), never over it.
+    const w=Math.min(300,vw-24);this.bubble.style.width=`${w}px`;const h=this.bubble.offsetHeight||90;
+    const boxes=[target.avoid??[]].flat().filter(visible).map(e=>e.getBoundingClientRect());
+    const avoid=boxes.length?{left:Math.min(...boxes.map(b=>b.left)),right:Math.max(...boxes.map(b=>b.right)),top:Math.min(...boxes.map(b=>b.top)),bottom:Math.max(...boxes.map(b=>b.bottom))}:null;
+    const {arrow,bubble}=tutorialPlacement({point,rect,avoid,from:target.from??null,vw,vh,bubble:{w,h}});
+    this.arrow.hidden=false;this.arrow.style.left=`${Math.round(arrow.x)}px`;this.arrow.style.top=`${Math.round(arrow.y)}px`;this.arrow.style.transform=`translate(-50%,-50%) rotate(${arrow.angle}rad)`;this.arrow.classList.toggle('offscreen',arrow.off);
+    this.bubble.style.left=`${bubble.x}px`;this.bubble.style.top=`${bubble.y}px`;
   }
   positionBubble(anchor){
     const b=this.bubble,w=Math.min(300,innerWidth-24);b.style.width=`${w}px`;const h=b.offsetHeight||90;
-    if(anchor?.side==='above'){b.style.left=`${Math.round(Math.max(12,Math.min(innerWidth-w-12,anchor.x-w/2)))}px`;b.style.top=`${Math.round(Math.max(70,anchor.y-h-26))}px`;return;}
-    let x=!anchor?16:anchor.side==='right'?anchor.x+30:anchor.x-w-30,y=anchor?anchor.y-h/2:innerHeight-h-120;
-    if(x<12||x+w>innerWidth-12)x=anchor?(anchor.side==='right'?anchor.x-w-30:anchor.x+30):16;x=Math.max(12,Math.min(innerWidth-w-12,x));y=Math.max(70,Math.min(innerHeight-h-12,y));
-    b.style.left=`${Math.round(x)}px`;b.style.top=`${Math.round(y)}px`;
+    if(anchor){b.style.left=`${Math.round(Math.max(12,Math.min(innerWidth-w-12,anchor.x)))}px`;b.style.top=`${Math.round(Math.max(70,Math.min(innerHeight-h-12,anchor.y)))}px`;return;}
+    b.style.left='16px';b.style.top=`${Math.round(Math.max(70,innerHeight-h-120))}px`;
   }
   flashDone(){this.done.hidden=false;this.done.classList.remove('pop');void this.done.offsetWidth;this.done.classList.add('pop');clearTimeout(this.doneTimer);this.doneTimer=setTimeout(()=>{this.done.hidden=true;},900);}
   // ---- Tips (plan m-e3-tipy) ----
@@ -147,5 +161,5 @@ export class TutorialGuide {
   // "Got it" marks the tip seen; × switches tips off; "More" opens the help (the checklist and its answers).
   closeTip(seen=true){if(!this.tip)return;if(seen){this.tipsSeen.add(this.tip.id);try{localStorage.setItem(SEEN_KEY,JSON.stringify([...this.tipsSeen]));}catch{/* session */}}this.tip=null;this.bubble.classList.remove('is-tip');this.hide();}
   relabel(){this.update(true);}
-  destroy(){this.controller.abort();clearTimeout(this.doneTimer);this.bubble.remove();this.arrow.remove();this.done.remove();}
+  destroy(){this.controller.abort();globalThis.clearInterval?.(this.timer);clearTimeout(this.doneTimer);this.bubble.remove();this.arrow.remove();this.done.remove();}
 }

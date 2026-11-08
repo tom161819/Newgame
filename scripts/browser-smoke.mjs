@@ -191,7 +191,7 @@ try{
   // the earlier empty start (no Castle, no Gold, empty stockpile) that the steps below were written for.
   assert.equal(await page.locator('#setup-castle').isChecked(),true);assert.equal(await page.locator('#setup-gold').inputValue(),'500');
   // E1 (owner 7 Nov 2026): basic buildings are wooden, so the start has more wood and no Iron Ore.
-  for(const [id,value] of [['stone','40'],['wood','60'],['iron-ore','0'],['bread','200']])assert.equal(await page.locator(`#setup-start-${id}`).inputValue(),value);
+  for(const [id,value] of [['stone','30'],['wood','90'],['iron-ore','0'],['bread','180']])assert.equal(await page.locator(`#setup-start-${id}`).inputValue(),value);
   await page.locator('#setup-castle').uncheck();await page.locator('#setup-garrison').uncheck();
   for(const selector of ['#setup-gold','#setup-start-stone','#setup-start-wood','#setup-start-iron-ore','#setup-start-bread'])await page.locator(selector).evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();

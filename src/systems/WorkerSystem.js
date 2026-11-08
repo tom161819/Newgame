@@ -8,6 +8,7 @@ import { reachableTiles } from '../game/pathfinding.js';
 import { towerNeighbors,buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
 import { POPULATION } from '../data/jobs.js';
+import { CASTLE_START_EXTRA_RESIDENTS } from './GameSettings.js';
 import { TaskReservationSystem } from './TaskReservationSystem.js';
 import { JobSystem } from './JobSystem.js';
 import { WorkerAI } from './WorkerAI.js';
@@ -72,8 +73,8 @@ export class WorkerSystem {
   // One more resident near the start (the starting garrison, m-start-v2); null when there is no free tile.
   spawnNearStart(random=Math.random){const origin=this.origin(),candidates=this.candidates().filter(t=>Math.max(Math.abs(t.x-origin.x),Math.abs(t.y-origin.y))<=6);return candidates.length?this.create(candidates[Math.floor(random()*candidates.length)]):null;}
   spawnInitial(random=Math.random){
-    const origin=this.origin();
-    for(let i=0;i<POPULATION.initial;i++){
+    const origin=this.origin(),count=POPULATION.initial+(this.scene.gameSettings?.startingCastle?CASTLE_START_EXTRA_RESIDENTS:0);
+    for(let i=0;i<count;i++){
       const candidates=this.candidates().filter(t=>Math.max(Math.abs(t.x-origin.x),Math.abs(t.y-origin.y))<=5);
       if(!candidates.length)break;this.create(candidates[Math.floor(random()*candidates.length)]);
     }
