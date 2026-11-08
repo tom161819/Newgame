@@ -36,3 +36,14 @@ After approval the game part is m-souvisla-zeme: same maths per 16 × 16 chunk i
 
 ### Round 6 (owner 8 Nov)
 - Water painted too: one smooth, sharp shoreline (bilinear wetness at a slightly warped position, threshold 0.5), ford → shallow → deep blended by depth, pebbles under fords, ripples, foam at the shore, a darker wet band on the bank, icy tint in winter. Sliders: shore curve, foam, wet bank, shallow → deep transition, ripples; colour pickers for ford, shallow and deep water. Plants and stones never stand in the water.
+
+### Round 7 (owner 8 Nov)
+- Natural river shape: water tiles of the view blurred into a smooth field (slider "Natural river shape"), shoreline = its 0.5 contour with a light meander warp; depth blended over water only.
+- Flowing water: streaks along the current painted into the water plus an animated overlay of drifting streaks (slider "Flowing water"; off with reduced motion).
+- River colours: presets (Czech river – default, muddy lowland river, clear mountain stream, the old blue) plus the three colour pickers.
+- In the shallows and on the waterline, each with amount and opacity: rocks sticking out of the water, pebbles at the waterline, reeds, water lilies, algae and weed (lilies and algae hidden in winter).
+
+### Round 8 (owner 8 Nov)
+- Fish: animated shadows in deeper water with sliders for amount, size and opacity.
+- Ducks: a set number of families on the whole map (default 3, slider), placed once per world on calm water far apart; they paddle slow loops, with 3–6 ducklings following in spring and summer, none in deep winter.
+- Settings folded into categories (remembered in the browser) so the preview stays in view.

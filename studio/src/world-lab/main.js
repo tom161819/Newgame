@@ -8,7 +8,7 @@ import {
   readCode, makeCode, worldFor, checks, readFavourite, defaultsProposal, slug, PLAYER_START, COLUMNS, ROWS,
 } from './model.js';
 import { drawTopDown, drawIso, preload, whenImagesLoad } from './render.js';
-import { GROUND_DEFAULTS, GROUND_SETTINGS, ZONE_NAMES, WATER_NAMES, TIMES, SEASONS, WEATHERS, yearOf, seasonOf, OBJECT_KINDS } from './ground.js';
+import { GROUND_DEFAULTS, GROUND_SETTINGS, ZONE_NAMES, WATER_NAMES, WATER_KINDS, WATER_PRESETS, TIMES, ducklingsFor, drawDuck, SEASONS, WEATHERS, yearOf, seasonOf, OBJECT_KINDS } from './ground.js';
 
 const $ = selector => document.querySelector(selector);
 const STORAGE = 'asset-studio.world-lab.v1', FAVOURITES = 'worlds', DEFAULTS = 'worldDefaults', SPAN = 28;
@@ -233,6 +233,7 @@ const readyCheck = setInterval(() => { if (state.world) { window.worldLab.ready 
 // ---------- continuous ground (plan g-souvisla-zeme) ----------
 function saveGround() { try { localStorage.setItem(STORAGE, JSON.stringify({ levels: state.levels, seed: state.seed, ground: state.ground })); } catch { /* memory only */ } }
 let groundTimer = null;
+const openFolds = (() => { try { return new Set(JSON.parse(localStorage.getItem('mk-world-lab.folds') ?? '[]')); } catch { return new Set(); } })();
 function renderGround() {
   for (const b of document.querySelectorAll('#wl-ground [data-ground]')) b.setAttribute('aria-pressed', String(b.dataset.ground === state.ground.mode));
   const box = $('#wl-ground-settings'), redraw = () => { saveGround(); clearTimeout(groundTimer); groundTimer = setTimeout(drawAll, 90); };
@@ -247,10 +248,12 @@ function renderGround() {
   });
   // Plants and stones: amount and opacity side by side for every kind.
   const alpha = kind => { const key = `${kind}Alpha`, out = h('output', {}, String(state.ground.settings[key] ?? 1)); return h('label', { class: 'wl-setting wl-alpha' }, h('span', {}, 'Opacity'), h('input', { type: 'range', min: 0.1, max: 1, step: 0.05, value: state.ground.settings[key] ?? 1, 'aria-label': `${kind} opacity`, oninput: e => { state.ground.settings[key] = +e.target.value; out.textContent = e.target.value; redraw(); } }), out); };
-  const pick = group => GROUND_SETTINGS.map((def, i) => def.group === group ? h('div', { class: 'wl-pair' }, sliders[i], OBJECT_KINDS.includes(def.key) ? alpha(def.key) : null) : null).filter(Boolean);
+  const pick = group => GROUND_SETTINGS.map((def, i) => def.group === group ? h('div', { class: 'wl-pair' }, sliders[i], OBJECT_KINDS.includes(def.key) || WATER_KINDS.includes(def.key) ? alpha(def.key) : null) : null).filter(Boolean);
   const ground = sliders.filter((_, i) => !GROUND_SETTINGS[i].group), water = sliders.filter((_, i) => GROUND_SETTINGS[i].group === 'water');
-  const waterColours = h('div', { class: 'wl-ground-colours' }, h('span', {}, 'Water shades'), WATER_NAMES.map((name, i) => h('label', { class: 'wl-colour' }, h('input', { type: 'color', value: state.ground.settings.waterColors?.[i] ?? GROUND_DEFAULTS.waterColors[i], 'aria-label': name, oninput: e => { state.ground.settings.waterColors = GROUND_DEFAULTS.waterColors.map((c, j) => j === i ? e.target.value : state.ground.settings.waterColors?.[j] ?? c); redraw(); } }), name)));
-  box.replaceChildren(scene, ...(state.ground.mode === 'continuous' ? [colours, h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Ground'), ground), waterColours, h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Water, fords and shore'), water), h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Plants'), pick('plants')), h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Stones'), pick('stones'))] : []));
+  const waterColours = h('div', { class: 'wl-ground-colours' }, h('span', {}, 'Water shades'), h('div', { class: 'segmented', role: 'group', 'aria-label': 'River colour presets' }, WATER_PRESETS.map(([id, label, colours]) => h('button', { type: 'button', onclick: () => { state.ground.settings.waterColors = [...colours]; saveGround(); renderGround(); drawAll(); } }, label))), WATER_NAMES.map((name, i) => h('label', { class: 'wl-colour' }, h('input', { type: 'color', value: state.ground.settings.waterColors?.[i] ?? GROUND_DEFAULTS.waterColors[i], 'aria-label': name, oninput: e => { state.ground.settings.waterColors = GROUND_DEFAULTS.waterColors.map((c, j) => j === i ? e.target.value : state.ground.settings.waterColors?.[j] ?? c); redraw(); } }), name)));
+  // Every category folds; which ones are open is remembered in this browser.
+  const fold = (id, title, ...kids) => { const d = h('details', { class: 'wl-fold', 'data-fold': id }, h('summary', {}, title), h('div', { class: 'wl-ground-grid' }, ...kids)); d.open = openFolds.has(id); d.addEventListener('toggle', () => { if (d.open) openFolds.add(id); else openFolds.delete(id); try { localStorage.setItem('mk-world-lab.folds', JSON.stringify([...openFolds])); } catch { /* memory only */ } }); return d; };
+  box.replaceChildren(scene, ...(state.ground.mode === 'continuous' ? [fold('shades', 'Ground shades', colours), fold('ground', 'Ground', ground), fold('water', 'Water, fords and shore', waterColours, ...water), fold('shallows', 'In the shallows and on the waterline', pick('waterObjects')), fold('plants', 'Plants', pick('plants')), fold('stones', 'Stones', pick('stones')), fold('life', 'Fish and ducks', pick('life'))] : []));
 }
 for (const b of document.querySelectorAll('#wl-ground [data-ground]')) b.addEventListener('click', () => { state.ground.mode = b.dataset.ground; saveGround(); renderGround(); drawAll(); });
 $('#wl-ground-reset').addEventListener('click', () => { state.ground.settings = structuredClone(GROUND_DEFAULTS); saveGround(); renderGround(); drawAll(); });
@@ -267,3 +270,48 @@ window.worldLab = Object.assign(window.worldLab ?? {}, { ground: () => structure
 window.worldLab.setFocus = (x, y) => { state.focus = { x, y }; drawAll(); };
 window.worldLab.findBank = () => { const w = state.world; for (let r = 0; r < 120; r++) for (let y = Math.max(1, PLAYER_START.y - r); y <= Math.min(ROWS - 2, PLAYER_START.y + r); y++) for (let x = Math.max(1, PLAYER_START.x - r); x <= Math.min(COLUMNS - 2, PLAYER_START.x + r); x++) { const g = w.ground[y][x]; if ((g === 1 || g === 6 || g === 7) && [w.ground[y][x + 1], w.ground[y + 1][x]].some(n => n >= 3 && n <= 5)) return { x, y }; } return null; };
 window.worldLab.findGround = code => { const w = state.world; for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLUMNS; x++) if (w.ground[y][x] === code) return { x, y }; return null; };
+
+// ---------- flowing water: short bright streaks drift along the current over the painted river ----------
+const flowCanvas = (() => { const iso = $('#wl-iso'), wrap = document.createElement('div'), c = document.createElement('canvas'); wrap.className = 'wl-iso-wrap'; iso.parentNode.insertBefore(wrap, iso); wrap.append(iso, c); c.className = 'wl-flow'; c.setAttribute('aria-hidden', 'true'); return c; })();
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let streaks = [], fishes = [], lastWater = null;
+function flowTick() {
+  const iso = $('#wl-iso'), water = iso._water, ctx = flowCanvas.getContext('2d');
+  if (flowCanvas.width !== iso.width || flowCanvas.height !== iso.height) { flowCanvas.width = iso.width; flowCanvas.height = iso.height; }
+  ctx.clearRect(0, 0, flowCanvas.width, flowCanvas.height);
+  if (!water || reduceMotion || state.ground.mode !== 'continuous') { requestAnimationFrame(flowTick); return; }
+  if (water !== lastWater) { lastWater = water; streaks = []; fishes = []; }
+  const { mask, field, toWorld } = water, w = iso.width, target = Math.round(260 * water.flow);
+  for (let tries = 0; streaks.length < target && tries < 400; tries++) { const x = Math.random() * w, y = Math.random() * iso.height; if (mask[(y | 0) * w + (x | 0)]) streaks.push({ x, y, life: 40 + Math.random() * 60, age: 0 }); }
+  ctx.lineCap = 'round';
+  for (const st of streaks) {
+    const [fx, fy] = toWorld(st.x, st.y), [tx, ty] = field.flow(fx, fy), vx = (tx - ty) * 0.9, vy = (tx + ty) * 0.45; // map direction → screen (iso)
+    st.x += vx * 0.6; st.y += vy * 0.6; st.age++;
+    const a = Math.sin(Math.PI * st.age / st.life) * 0.35 * water.flow;
+    ctx.strokeStyle = `rgb(235 240 236 / ${a.toFixed(3)})`; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(st.x, st.y); ctx.lineTo(st.x - vx * 7, st.y - vy * 7); ctx.stroke();
+  }
+  streaks = streaks.filter(st => st.age < st.life && mask[(st.y | 0) * w + (st.x | 0)]);
+  // Fish: dark shadows gliding slowly in deeper water, turning now and then.
+  const set = water.settings ?? {}, fishTarget = Math.round(40 * (set.fishAmount ?? 0.5)), fk = set.fishSize ?? 1;
+  for (let tries = 0; fishes.length < fishTarget && tries < 200; tries++) { const x = Math.random() * w, y = Math.random() * iso.height; if (mask[(y | 0) * w + (x | 0)]) { const [fx, fy] = toWorld(x, y); if (field.depth(fx, fy) > 0.3) fishes.push({ x, y, a: Math.random() * Math.PI * 2, t: 0, life: 300 + Math.random() * 600 }); } }
+  if (fishes.length > fishTarget) fishes.length = fishTarget;
+  ctx.fillStyle = `rgb(28 36 30 / ${(set.fishOpacity ?? 0.45).toFixed(2)})`;
+  for (const f of fishes) {
+    f.t++; f.a += (Math.sin(f.t * 0.05 + f.life) * 0.03); const nx = f.x + Math.cos(f.a) * 0.35, ny = f.y + Math.sin(f.a) * 0.18;
+    if (mask[(ny | 0) * w + (nx | 0)]) { f.x = nx; f.y = ny; } else f.a += Math.PI * 0.6;
+    const wig = Math.sin(f.t * 0.3) * 0.15;
+    ctx.save(); ctx.translate(f.x, f.y); ctx.rotate(Math.atan2(Math.sin(f.a) * 0.5, Math.cos(f.a))); ctx.beginPath(); ctx.ellipse(0, 0, 4.5 * fk, 1.4 * fk, 0, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.moveTo(-4 * fk, 0); ctx.lineTo(-6.5 * fk, -1.6 * fk + wig * 4); ctx.lineTo(-6.5 * fk, 1.6 * fk + wig * 4); ctx.fill(); ctx.restore();
+  }
+  fishes = fishes.filter(f => f.t < f.life);
+  // Ducks: each family paddles a slow loop around its spot; in spring and summer ducklings follow in a line.
+  const year = set.year ?? 0.5, little = ducklingsFor(year), winterNow = ((year % 1) + 1) % 1 < 0.12 || ((year % 1) + 1) % 1 > 0.93, now = performance.now() / 1000;
+  if (!winterNow) for (const [i, d] of (water.ducks ?? []).entries()) {
+    const path = t => { const a = t * 0.12 + i * 2.1, r = 1.1 + Math.sin(t * 0.07 + i) * 0.3; return [d.x + 0.5 + Math.cos(a) * r, d.y + 0.5 + Math.sin(a) * r * 0.8]; };
+    const draw = (t, scale, duckling) => { const [fx, fy] = path(t), [ax, ay] = path(t + 0.2), [sx, sy] = water.toScreen(fx, fy), [bx, by] = water.toScreen(ax, ay); if (sx < -20 || sy < -20 || sx > w + 20 || sy > iso.height + 20) return; drawDuck(ctx, sx, sy, Math.atan2(by - sy, bx - sx), scale * 1.7, false, duckling); };
+    for (let n = little; n >= 1; n--) draw(now - n * 2.2, 0.55, true);
+    draw(now, 1, false);
+  }
+  requestAnimationFrame(flowTick);
+}
+requestAnimationFrame(flowTick);

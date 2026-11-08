@@ -12,8 +12,10 @@ export const GROUND_DEFAULTS_BASE = {
   patchSize: 18, patchStrength: 0.16, edgeWidth: 1.6, blend: 1.2, detail: 0.22, speckles: 1,
   flowersSmall: 0.6, flowersLarge: 0.25, thistles: 0.15, shrubs: 0.12, tuftGreen: 0.5, tuftDry: 0.3, tuftDark: 0.2, plantSize: 1,
   pebbles: 0.4, gravel: 0.2, stones: 0.12, flatStones: 0.06,
-  shoreCurve: 0.6, shoreFoam: 0.5, wetBank: 0.5, ripples: 0.5, depthBlend: 1,
-  waterColors: ['#8cb4a0', '#60aac0', '#2c6894'],
+  shoreCurve: 0.6, shoreSmooth: 0.7, shoreFoam: 0.35, wetBank: 0.5, ripples: 0.5, depthBlend: 1, flow: 0.6,
+  waterRocks: 0.4, waterPebbles: 0.6, reedBeds: 0.5, lilies: 0.3, algae: 0.4,
+  fishAmount: 0.5, fishSize: 1, fishOpacity: 0.45, duckFamilies: 3,
+  waterColors: ['#8f8d6c', '#647458', '#3c4e44'],
   zoneColors: ['#689640', '#4a8834', '#8c9650', '#62763e', '#649642', '#76845a', '#d6c38c', '#dcbf7e', '#7a5f43', '#9a958a'],
   time: 'day', season: 'summer', year: 0.5, weather: 'clear',
 };
@@ -38,10 +40,21 @@ export const GROUND_SETTINGS = [
   { key: 'tuftDark', label: 'Tall grass – dark sedge', min: 0, max: 2, step: 0.05, group: 'plants' },
   { key: 'plantSize', label: 'Plant size', min: 0.6, max: 1.6, step: 0.05, group: 'plants' },
   { key: 'shoreCurve', label: 'Shore curve', min: 0, max: 1, step: 0.05, group: 'water' },
+  { key: 'shoreSmooth', label: 'Natural river shape (no tile steps)', min: 0, max: 1, step: 0.05, group: 'water' },
+  { key: 'flow', label: 'Flowing water', min: 0, max: 1, step: 0.05, group: 'water' },
   { key: 'shoreFoam', label: 'Foam at the shore', min: 0, max: 1, step: 0.05, group: 'water' },
   { key: 'wetBank', label: 'Wet bank', min: 0, max: 1, step: 0.05, group: 'water' },
   { key: 'depthBlend', label: 'Shallow → deep transition', min: 0.2, max: 2, step: 0.05, group: 'water' },
   { key: 'ripples', label: 'Ripples', min: 0, max: 1, step: 0.05, group: 'water' },
+  { key: 'waterRocks', label: 'Rocks sticking out of the water', min: 0, max: 2, step: 0.05, group: 'waterObjects' },
+  { key: 'waterPebbles', label: 'Pebbles at the waterline', min: 0, max: 2, step: 0.05, group: 'waterObjects' },
+  { key: 'reedBeds', label: 'Reeds', min: 0, max: 2, step: 0.05, group: 'waterObjects' },
+  { key: 'lilies', label: 'Water lilies', min: 0, max: 2, step: 0.05, group: 'waterObjects' },
+  { key: 'algae', label: 'Algae and weed', min: 0, max: 2, step: 0.05, group: 'waterObjects' },
+  { key: 'fishAmount', label: 'Fish – amount', min: 0, max: 2, step: 0.05, group: 'life' },
+  { key: 'fishSize', label: 'Fish – size', min: 0.4, max: 2, step: 0.05, group: 'life' },
+  { key: 'fishOpacity', label: 'Fish – opacity', min: 0.1, max: 1, step: 0.05, group: 'life' },
+  { key: 'duckFamilies', label: 'Duck families on the map', min: 0, max: 6, step: 1, group: 'life' },
   { key: 'pebbles', label: 'Pebbles', min: 0, max: 2, step: 0.05, group: 'stones' },
   { key: 'gravel', label: 'Gravel patches', min: 0, max: 2, step: 0.05, group: 'stones' },
   { key: 'stones', label: 'Stones', min: 0, max: 2, step: 0.05, group: 'stones' },
@@ -49,7 +62,9 @@ export const GROUND_SETTINGS = [
 ];
 // Every plant and stone kind also has its own opacity ("sink it into the ground"): key <kind>Alpha, 0.1–1.
 export const OBJECT_KINDS = ['flowersSmall', 'flowersLarge', 'thistles', 'shrubs', 'tuftGreen', 'tuftDry', 'tuftDark', 'pebbles', 'gravel', 'stones', 'flatStones'];
-for (const kind of OBJECT_KINDS) GROUND_DEFAULTS_ALPHA[`${kind}Alpha`] = 1;
+export const WATER_KINDS = ['waterRocks', 'waterPebbles', 'reedBeds', 'lilies', 'algae'];
+export const WATER_PRESETS = [['czech', 'Czech river', ['#8f8d6c', '#647458', '#3c4e44']], ['brown', 'Muddy lowland river', ['#8e8466', '#6c654a', '#47432f']], ['clear', 'Clear mountain stream', ['#9fae94', '#6f8f86', '#3f5f62']], ['blue', 'Blue (old)', ['#8cb4a0', '#60aac0', '#2c6894']]];
+for (const kind of [...OBJECT_KINDS, ...WATER_KINDS]) GROUND_DEFAULTS_ALPHA[`${kind}Alpha`] = 1;
 export const GROUND_DEFAULTS = Object.freeze({ ...GROUND_DEFAULTS_BASE, ...GROUND_DEFAULTS_ALPHA });
 const hex = c => [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)];
 // Season shift of the grass colour: [multiply r, g, b] then mix towards a tint.
@@ -127,22 +142,39 @@ function detail() {
 
 // Paints the land (grass zones and the other land grounds) of the iso window into `ctx`. `isGrass(x, y)` and `zoneAt(x, y)` read the world; `toWorld(px, py)`
 // turns a canvas pixel into a map position (tile x, y as floats).
-// Water: how wet a map position is (0 dry … 1 wet), bilinear over tile centres of the water tiles at a slightly
-// warped position, so the shoreline is one smooth, sharp curve instead of tile steps.
-export function wetness(fx, fy, depthAt, settings = GROUND_DEFAULTS) {
-  const c = settings.shoreCurve ?? GROUND_DEFAULTS.shoreCurve, wx = fx - 0.5 + (fbm(fx * 0.6, fy * 0.6, 41) - 0.5) * c * 0.6, wy = fy - 0.5 + (fbm(fx * 0.6, fy * 0.6, 43) - 0.5) * c * 0.6;
-  const ix = Math.floor(wx), iy = Math.floor(wy), ax = smooth(wx - ix), ay = smooth(wy - iy), wet = (x, y) => (depthAt(x, y) >= 0 ? 1 : 0);
+// Water field for one view: the water tiles of the window (plus a margin) blurred into smooth grids.
+// - wet: blurred 0/1 water map; its 0.5 contour is the shoreline, so the river follows a natural curve instead of
+//   the tile steps (more blur passes = rounder), with a light noise warp for meanders;
+// - depth: depth averaged over water only, for the ford → shallow → deep blend;
+// - flow: the direction along the river (perpendicular to the gradient of a strongly blurred wet map).
+export function makeWaterField({ x0, y0, span, depthAt, settings = GROUND_DEFAULTS }) {
+  const s = { ...GROUND_DEFAULTS, ...settings }, M = 8, gx0 = x0 - M, gy0 = y0 - M, N = span + M * 2;
+  const W = new Float32Array(N * N), D = new Float32Array(N * N);
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const d = depthAt(gx0 + x, gy0 + y); W[y * N + x] = d >= 0 ? 1 : 0; D[y * N + x] = d >= 0 ? d : 0; }
+  const blur = (src, passes) => { let a = src.slice(), b = new Float32Array(N * N); for (let p = 0; p < passes; p++) { for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const l = a[y * N + Math.max(0, x - 1)], r = a[y * N + Math.min(N - 1, x + 1)]; b[y * N + x] = (l + 2 * a[y * N + x] + r) / 4; } for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const u = b[Math.max(0, y - 1) * N + x], d = b[Math.min(N - 1, y + 1) * N + x]; a[y * N + x] = (u + 2 * b[y * N + x] + d) / 4; } } return a; };
+  const wetGrid = blur(W, Math.round(s.shoreSmooth * 4)), Dw = blur(D, Math.max(1, Math.round(s.depthBlend * 2))), Ww = blur(W, Math.max(1, Math.round(s.depthBlend * 2))), F = blur(W, 6);
+  const at = (grid, fx, fy) => { const gx = Math.min(N - 1.001, Math.max(0, fx - 0.5 - gx0)), gy = Math.min(N - 1.001, Math.max(0, fy - 0.5 - gy0)), ix = Math.floor(gx), iy = Math.floor(gy), ax = gx - ix, ay = gy - iy, i = iy * N + ix; return grid[i] * (1 - ax) * (1 - ay) + grid[i + 1] * ax * (1 - ay) + grid[i + N] * (1 - ax) * ay + grid[i + N + 1] * ax * ay; };
+  const c = s.shoreCurve * 0.45;
+  return {
+    wet: (fx, fy) => at(wetGrid, fx + (fbm(fx * 0.5, fy * 0.5, 41) - 0.5) * c, fy + (fbm(fx * 0.5, fy * 0.5, 43) - 0.5) * c),
+    depth: (fx, fy) => { const w = at(Ww, fx, fy); return w > 0.001 ? Math.min(1, at(Dw, fx, fy) / w) : 0.4; },
+    flow: (fx, fy) => { const e = 0.6, gx = at(F, fx + e, fy) - at(F, fx - e, fy), gy = at(F, fx, fy + e) - at(F, fx, fy - e), l = Math.hypot(gx, gy); if (l < 1e-4) return [0.7, 0.7]; let tx = -gy / l, ty = gx / l; if (tx + ty * 0.6 < 0) { tx = -tx; ty = -ty; } return [tx, ty]; },
+  };
+}
+export function wetness(fx, fy, depthAt, settings = GROUND_DEFAULTS) { // single-point fallback (no field)
+  const wx = fx - 0.5, wy = fy - 0.5, ix = Math.floor(wx), iy = Math.floor(wy), ax = smooth(wx - ix), ay = smooth(wy - iy), wet = (x, y) => (depthAt(x, y) >= 0 ? 1 : 0);
   return wet(ix, iy) * (1 - ax) * (1 - ay) + wet(ix + 1, iy) * ax * (1 - ay) + wet(ix, iy + 1) * (1 - ax) * ay + wet(ix + 1, iy + 1) * ax * ay;
 }
-export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zoneAt, depthAt = () => -1, inWorld = () => true, settings = GROUND_DEFAULTS }) {
-  const s = { ...GROUND_DEFAULTS, ...settings }, img = ctx.getImageData(0, 0, width, height), out = img.data, field = detail();
+export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zoneAt, depthAt = () => -1, inWorld = () => true, field = null, settings = GROUND_DEFAULTS }) {
+  const wetAt = field ? field.wet : (fx, fy) => wetness(fx, fy, depthAt, settings), mask = new Uint8Array(width * height);
+  const s = { ...GROUND_DEFAULTS, ...settings }, img = ctx.getImageData(0, 0, width, height), out = img.data, grain = detail();
   const warpScale = 1 / 3.2, warp = s.edgeWidth, colors = GROUND_DEFAULTS_BASE.zoneColors.map((c, i) => hex(s.zoneColors?.[i] ?? c)), wcolors = GROUND_DEFAULTS_BASE.waterColors.map((c, i) => hex(s.waterColors?.[i] ?? c)), season = seasonLook(s.year ?? yearOf(s.season));
   for (let py = 0; py < height; py++) for (let px = 0; px < width; px++) {
     const [fx, fy] = toWorld(px + 0.5, py + 0.5), tx = Math.floor(fx), ty = Math.floor(fy);
     if (!inWorld(tx, ty)) continue;
-    const wetV = wetness(fx, fy, depthAt, s), o = (py * width + px) * 4;
+    const wetV = wetAt(fx, fy), o = (py * width + px) * 4;
     if (wetV >= 0.5) { // water pixel
-      const [r, g, b] = waterColor(fx, fy, px, py, wetV, depthAt, s, wcolors, season);
+      const [r, g, b] = waterColor(fx, fy, px, py, wetV, depthAt, s, wcolors, season, field); mask[py * width + px] = 1;
       out[o] = r; out[o + 1] = g; out[o + 2] = b; out[o + 3] = 255; continue;
     }
     if (!isGrass(tx, ty) && depthAt(tx, ty) < 0) continue; // not land, not water (should not happen)
@@ -174,7 +206,7 @@ export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zo
     const light = 1 + p1 * s.patchStrength * 2.2, dry = Math.max(0, p2) * s.patchStrength * 1.6;
     r = r * light + dry * 70; g = g * light + dry * 30; b = b * light - dry * 10;
     // Fine detail in world space (anchored to the canvas pixel grid, which is a fixed linear map of the world).
-    const d = field[((py % DH) * DW) + (px % DW)] * s.detail * (speckZone.detail ?? 1);
+    const d = grain[((py % DH) * DW) + (px % DW)] * s.detail * (speckZone.detail ?? 1);
     r *= 1 + d; g *= 1 + d; b *= 1 + d * 0.8;
     // Season: shift the colour; winter snow lies thinner where the patch noise is low.
     r *= season.mul[0]; g *= season.mul[1]; b *= season.mul[2];
@@ -188,21 +220,19 @@ export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zo
     out[o] = r; out[o + 1] = g; out[o + 2] = b; out[o + 3] = 255;
   }
   ctx.putImageData(img, 0, 0);
+  return { mask };
 }
 // Water colour: ford → shallow → deep blended smoothly by depth, ripples, pebbles under a ford, foam at the shore.
-function waterColor(fx, fy, px, py, wetV, depthAt, s, wcolors, season) {
-  const span = s.depthBlend;
-  // Depth sampled bilinearly over the water tiles only (land neighbours do not count), then blurred over a ring.
-  const sample = (x, y) => { const wx = x - 0.5, wy = y - 0.5, ix = Math.floor(wx), iy = Math.floor(wy), ax = smooth(wx - ix), ay = smooth(wy - iy); let d = 0, t = 0; for (const [cx, cy, w] of [[ix, iy, (1 - ax) * (1 - ay)], [ix + 1, iy, ax * (1 - ay)], [ix, iy + 1, (1 - ax) * ay], [ix + 1, iy + 1, ax * ay]]) { const v = depthAt(cx, cy); if (v >= 0 && w) { d += v * w; t += w; } } return t ? [d / t, t] : null; };
-  let acc = 0, n = 0;
-  for (const [dx, dy, w] of [[0, 0, 2], [span, 0, 1], [-span, 0, 1], [0, span, 1], [0, -span, 1], [span * 0.7, span * 0.7, 1], [-span * 0.7, -span * 0.7, 1]]) { const v = sample(fx + dx, fy + dy); if (v) { acc += v[0] * w; n += w; } }
-  let depth = n ? acc / n : 0.5;
+function waterColor(fx, fy, px, py, wetV, depthAt, s, wcolors, season, field) {
+  let depth = field ? field.depth(fx, fy) : 0.5;
   depth = Math.min(1, Math.max(0, depth + (fbm(fx * 0.5, fy * 0.5, 61) - 0.5) * 0.25));
   const [f, sh, dp] = wcolors, t = depth < 0.5 ? depth / 0.5 : (depth - 0.5) / 0.5, A = depth < 0.5 ? f : sh, B = depth < 0.5 ? sh : dp;
   let r = A[0] + (B[0] - A[0]) * t, g = A[1] + (B[1] - A[1]) * t, b = A[2] + (B[2] - A[2]) * t;
   // Pebbles seen through the ford.
   if (depth < 0.35 && hash(px >> 1, py >> 1, 71) < 0.06 * (1 - depth / 0.35)) { r = r * 0.7 + 50; g = g * 0.7 + 46; b = b * 0.7 + 34; }
   // Ripples: thin bright bands that wander with noise.
+  // Current: streaks running along the flow direction (narrow across it, long along it).
+  if (field && s.flow > 0) { const [tx, ty] = field.flow(fx, fy), across = fx * -ty + fy * tx, along = fx * tx + fy * ty, st = Math.sin(across * 9 + fbm(along * 0.35, across * 2, 79) * 6); if (st > 0.82) { const k = (st - 0.82) / 0.18 * 0.18 * s.flow * (0.5 + fbm(along * 1.4, across * 3, 81)); r += (210 - r) * k; g += (220 - g) * k; b += (215 - b) * k; } }
   if (s.ripples > 0) { const band = Math.sin(fx * 4.3 + fy * 2.1 + fbm(fx * 0.9, fy * 0.9, 67) * 14 + fbm(fx * 3, fy * 3, 69) * 3); if (band > 0.94 && hash(px >> 2, py, 75) > 0.25) { const k = (band - 0.94) / 0.06 * 0.3 * s.ripples; r += (230 - r) * k; g += (240 - g) * k; b += (245 - b) * k; } }
   // Foam right at the shoreline.
   if (wetV < 0.6 && s.shoreFoam > 0) { const k = (1 - (wetV - 0.5) / 0.1) * 0.55 * s.shoreFoam * (0.6 + hash(px, py, 73) * 0.4); r += (236 - r) * k; g += (242 - g) * k; b += (244 - b) * k; }
@@ -217,7 +247,8 @@ const KINDS = OBJECT_KINDS;
 const PER_TILE = { flowersSmall: 1.2, flowersLarge: 0.35, thistles: 0.18, shrubs: 0.12, tuftGreen: 0.7, tuftDry: 0.45, tuftDark: 0.3, pebbles: 1.4, gravel: 0.3, stones: 0.35, flatStones: 0.12 };
 // Where each kind likes to grow (zone index → factor).
 const LIKES = { flowersSmall: [1, 0.7, 0.4, 0.3, 2.2, 0.5, 0, 0, 0.05, 0], flowersLarge: [1, 0.6, 0.3, 0.2, 2.4, 0.3, 0, 0, 0, 0], thistles: [0.6, 0.3, 1.8, 0.3, 0.5, 1.6, 0.2, 0.6, 0, 0.3], shrubs: [0.5, 0.8, 0.6, 2.2, 0.4, 1, 0.1, 0.2, 0.3, 0.4], tuftGreen: [1, 1.8, 0.4, 1, 0.8, 0.5, 0.1, 0, 0.6, 0.2], tuftDry: [0.6, 0.3, 2.2, 0.5, 0.5, 1.4, 0.5, 0.6, 0.2, 0.4], tuftDark: [0.5, 1.2, 0.3, 1.8, 0.4, 0.6, 0.2, 0, 1.8, 0.4], pebbles: [0.7, 0.4, 1.2, 0.8, 0.5, 2.6, 0.7, 1.2, 0.6, 3], gravel: [0.4, 0.2, 1, 0.5, 0.3, 2.8, 0.5, 0.8, 0.3, 3], stones: [0.5, 0.3, 1, 1, 0.3, 2.6, 0.3, 1, 0.4, 2.6], flatStones: [0.4, 0.3, 0.8, 1, 0.2, 2.4, 0.2, 0.6, 0.3, 2.4] };
-export function plantsFor({ x0, y0, span, isGrass, zoneAt, depthAt = () => -1, settings = GROUND_DEFAULTS }) {
+export function plantsFor({ x0, y0, span, isGrass, zoneAt, depthAt = () => -1, field = null, settings = GROUND_DEFAULTS }) {
+  const wetAt = field ? field.wet : (fx, fy) => wetness(fx, fy, depthAt, settings);
   const s = { ...GROUND_DEFAULTS, ...settings }, out = [];
   for (let y = y0 - 2; y < y0 + span + 2; y++) for (let x = x0 - 2; x < x0 + span + 2; x++) {
     if (!isGrass(x, y)) continue;
@@ -226,7 +257,7 @@ export function plantsFor({ x0, y0, span, isGrass, zoneAt, depthAt = () => -1, s
       const year = s.year ?? yearOf(s.season), growth = curve(CURVES[kind].grow, year), wither = curve(CURVES[kind].wither, year);
       const want = (s[kind] ?? 0) * PER_TILE[kind] * LIKES[kind][z] * edge * growth;
       // The same spot keeps its plant as the year turns: plants appear one by one as growth rises.
-      for (let n = 0; n < 3; n++) if (hash(x, y, 100 + k * 7 + n) < want / 3 && wetness(x + hash(x, y, 200 + k * 7 + n), y + hash(x, y, 300 + k * 7 + n), depthAt, s) < 0.4) out.push({ kind, fx: x + hash(x, y, 200 + k * 7 + n), fy: y + hash(x, y, 300 + k * 7 + n), size: s.plantSize * (0.7 + hash(x, y, 400 + k * 7 + n) * 0.6) * (0.45 + 0.55 * growth), seed: hash(x, y, 500 + k * 7 + n), alpha: s[`${kind}Alpha`] ?? 1, wither, snow: seasonLook(year).snow });
+      for (let n = 0; n < 3; n++) if (hash(x, y, 100 + k * 7 + n) < want / 3 && wetAt(x + hash(x, y, 200 + k * 7 + n), y + hash(x, y, 300 + k * 7 + n)) < 0.4) out.push({ kind, fx: x + hash(x, y, 200 + k * 7 + n), fy: y + hash(x, y, 300 + k * 7 + n), size: s.plantSize * (0.7 + hash(x, y, 400 + k * 7 + n) * 0.6) * (0.45 + 0.55 * growth), seed: hash(x, y, 500 + k * 7 + n), alpha: s[`${kind}Alpha`] ?? 1, wither, snow: seasonLook(year).snow });
     });
   }
   return out;
@@ -238,6 +269,7 @@ export function drawPlant(ctx, p, sx, sy, season = 'summer') {
   try { drawShape(ctx, p, sx, sy, season); } finally { ctx.restore(); }
 }
 function drawShape(ctx, p, sx, sy, season) {
+  if (WATER_KINDS.includes(p.kind)) return drawWaterShape(ctx, p, sx, sy, i => hash(Math.floor(p.seed * 1e6), i, 77), p.size);
   const k = p.size, rnd = i => hash(Math.floor(p.seed * 1e6), i, 77), w = p.wither ?? 0, winter = (p.snow ?? 0) > 0.5, autumn = !winter && w > 0.5;
   const brown = (c, amount = w) => mixHex(c, '#9a8650', amount), cols = (FLOWER_COLORS[season].length ? FLOWER_COLORS[season] : FLOWER_COLORS.autumn).map(c => brown(c, w * 0.8));
   const blades = (n, h, colors, spread) => { for (let i = 0; i < n; i++) { const a = (rnd(i) - 0.5) * spread, len = h * (0.6 + rnd(i + 20) * 0.5); ctx.strokeStyle = colors[i % colors.length]; ctx.lineWidth = 1.1; ctx.beginPath(); ctx.moveTo(sx + (rnd(i + 40) - 0.5) * 4 * k, sy); ctx.quadraticCurveTo(sx + a * len * 0.4, sy - len * 0.6, sx + a * len, sy - len); ctx.stroke(); } };
@@ -265,4 +297,64 @@ export function drawAtmosphere(ctx, { width, height, time = 'day', weather = 'cl
   if (weather === 'fog') { const g = ctx.createLinearGradient(0, 0, 0, height); g.addColorStop(0, 'rgb(220 226 230 / .55)'); g.addColorStop(1, 'rgb(220 226 230 / .25)'); ctx.fillStyle = g; ctx.fillRect(0, 0, width, height); for (let i = 0; i < 18; i++) { const x = hash(i, 1, seed) * width, y = hash(i, 2, seed) * height, r = 120 + hash(i, 3, seed) * 220; const rg = ctx.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, 'rgb(235 238 240 / .35)'); rg.addColorStop(1, 'rgb(235 238 240 / 0)'); ctx.fillStyle = rg; ctx.fillRect(x - r, y - r, r * 2, r * 2); } }
   if (weather === 'rain') { ctx.strokeStyle = 'rgb(190 205 225 / .45)'; ctx.lineWidth = 1; ctx.beginPath(); for (let i = 0; i < width * height / 2600; i++) { const x = hash(i, 4, seed) * width, y = hash(i, 5, seed) * height; ctx.moveTo(x, y); ctx.lineTo(x - 4, y + 14); } ctx.stroke(); }
   if (weather === 'snow') { ctx.fillStyle = 'rgb(250 252 255 / .9)'; for (let i = 0; i < width * height / 1400; i++) { const x = hash(i, 6, seed) * width, y = hash(i, 7, seed) * height, r = 0.8 + hash(i, 8, seed) * 1.4; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); } }
+}
+
+// ---------- objects in the shallows and on the waterline ----------
+// Candidate spots on every tile near water; each kind keeps a spot where the wetness / depth suit it.
+const WATER_RULES = {
+  waterRocks: { per: 0.5, ok: (w, d) => w > 0.55 && d < 0.75 },
+  waterPebbles: { per: 1.2, ok: (w) => w > 0.4 && w < 0.62 },
+  reedBeds: { per: 0.9, ok: (w, d) => w > 0.45 && w < 0.8 && d < 0.55 },
+  lilies: { per: 0.5, ok: (w, d) => w > 0.75 && d > 0.25 && d < 0.85 },
+  algae: { per: 0.8, ok: (w) => w > 0.62 },
+};
+export function waterObjectsFor({ x0, y0, span, field, depthAt, settings = GROUND_DEFAULTS }) {
+  const s = { ...GROUND_DEFAULTS, ...settings }, out = [], winter = seasonLook(s.year ?? yearOf(s.season)).snow > 0.5;
+  for (let y = y0 - 2; y < y0 + span + 2; y++) for (let x = x0 - 2; x < x0 + span + 2; x++) {
+    if (![[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => depthAt(x + dx, y + dy) >= 0)) continue;
+    WATER_KINDS.forEach((kind, k) => {
+      const rule = WATER_RULES[kind];
+      if (winter && (kind === 'lilies' || kind === 'algae')) return;
+      for (let n = 0; n < 4; n++) {
+        if (hash(x, y, 900 + k * 9 + n) >= (s[kind] ?? 0) * rule.per / 4) continue;
+        const fx = x + hash(x, y, 910 + k * 9 + n), fy = y + hash(x, y, 920 + k * 9 + n), w = field.wet(fx, fy), d = field.depth(fx, fy);
+        if (rule.ok(w, d)) out.push({ kind, fx, fy, size: 0.75 + hash(x, y, 930 + k * 9 + n) * 0.6, seed: hash(x, y, 940 + k * 9 + n), alpha: s[`${kind}Alpha`] ?? 1, flat: kind === 'lilies' || kind === 'algae', snow: winter ? 1 : 0, wither: 0 });
+      }
+    });
+  }
+  return out;
+}
+function drawWaterShape(ctx, p, sx, sy, rnd, k) {
+  switch (p.kind) {
+    case 'waterRocks': { const r = (3.5 + rnd(1) * 3) * k; ctx.fillStyle = 'rgb(230 236 230 / .45)'; ctx.beginPath(); ctx.ellipse(sx, sy + r * 0.15, r * 1.35, r * 0.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#6f6c64'; ctx.beginPath(); ctx.ellipse(sx, sy - r * 0.25, r, r * 0.62, rnd(2) - 0.5, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = p.snow ? '#eef2f6' : '#8f8b80'; ctx.beginPath(); ctx.ellipse(sx - r * 0.2, sy - r * 0.5, r * 0.6, r * 0.3, rnd(2) - 0.5, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = 'rgb(60 70 50 / .35)'; ctx.fillRect(sx - r, sy - 1, r * 2, 1.5); return; }
+    case 'waterPebbles': { for (let i = 0; i < 5; i++) { const x = sx + (rnd(i) - 0.5) * 11 * k, y = sy + (rnd(i + 5) - 0.5) * 5 * k, r = (0.9 + rnd(i + 9) * 1.1) * k; ctx.fillStyle = ['#8e8a80', '#a6a194', '#76726a', '#b5ae9e'][i % 4]; ctx.beginPath(); ctx.ellipse(x, y, r * 1.3, r * 0.8, 0, 0, Math.PI * 2); ctx.fill(); } return; }
+    case 'reedBeds': { const cols = p.snow ? ['#a69a74', '#8f8463'] : ['#5d7a3a', '#6f8c45', '#4b6630', '#8a8a4a']; for (let i = 0; i < 12; i++) { const bx = sx + (rnd(i) - 0.5) * 10 * k, h = (12 + rnd(i + 20) * 10) * k, lean = (rnd(i + 40) - 0.5) * 5; ctx.strokeStyle = cols[i % cols.length]; ctx.lineWidth = 1.1; ctx.beginPath(); ctx.moveTo(bx, sy); ctx.quadraticCurveTo(bx + lean * 0.3, sy - h * 0.6, bx + lean, sy - h); ctx.stroke(); if (i % 4 === 0 && !p.snow) { ctx.fillStyle = '#6b4a2a'; ctx.fillRect(bx + lean - 1, sy - h - 1, 2.2, 5 * k); } } return; }
+    case 'lilies': { for (let i = 0; i < 4; i++) { const x = sx + (rnd(i) - 0.5) * 14 * k, y = sy + (rnd(i + 4) - 0.5) * 6 * k, r = (2.4 + rnd(i + 8) * 1.6) * k; ctx.fillStyle = ['#4f7a3a', '#5e8a42', '#45703a'][i % 3]; ctx.beginPath(); ctx.ellipse(x, y, r * 1.2, r * 0.6, 0, 0.35, Math.PI * 2); ctx.lineTo(x, y); ctx.fill(); if (i === 0 && rnd(12) > 0.4) { ctx.fillStyle = rnd(13) > 0.5 ? '#f4eef0' : '#f0c0d0'; ctx.beginPath(); ctx.arc(x, y - 1, 1.6 * k, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#f0cc4a'; ctx.fillRect(x - 0.5, y - 1.5, 1, 1); } } return; }
+    case 'algae': { ctx.fillStyle = 'rgb(70 96 46 / .45)'; for (let i = 0; i < 6; i++) { ctx.beginPath(); ctx.ellipse(sx + (rnd(i) - 0.5) * 16 * k, sy + (rnd(i + 6) - 0.5) * 7 * k, (3 + rnd(i + 12) * 4) * k, (1.2 + rnd(i + 18) * 1.4) * k, rnd(i + 24) - 0.5, 0, Math.PI * 2); ctx.fill(); } ctx.strokeStyle = 'rgb(90 120 56 / .5)'; ctx.lineWidth = 0.8; for (let i = 0; i < 5; i++) { const x = sx + (rnd(i + 30) - 0.5) * 14 * k, y = sy + (rnd(i + 36) - 0.5) * 6 * k; ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + 3 * k, y - 1, x + 6 * k, y + 1); ctx.stroke(); } return; }
+  }
+}
+
+// ---------- ducks: a few families on the whole map, ducklings in spring and summer ----------
+// Places are chosen once per world: calm water tiles (shallow or deep, not fords) spread far apart.
+export function duckSites(world, count, isWater) {
+  if (!count) return [];
+  const rows = world.ground.length, cols = world.ground[0].length, cand = [];
+  for (let y = 2; y < rows - 2; y++) for (let x = 2; x < cols - 2; x++) if (isWater(x, y) && [[1, 0], [-1, 0], [0, 1], [0, -1]].every(([dx, dy]) => isWater(x + dx, y + dy))) cand.push({ x, y, k: hash(x, y, 991) });
+  cand.sort((a, b) => a.k - b.k);
+  const out = [];
+  for (const c of cand) { if (out.every(o => Math.hypot(o.x - c.x, o.y - c.y) > 28)) out.push(c); if (out.length >= count) break; }
+  return out;
+}
+export function ducklingsFor(year) { const t = ((year % 1) + 1) % 1; return t > 0.27 && t < 0.62 ? 3 + Math.round(hash(Math.floor(t * 10), 1, 995) * 3) : 0; }
+// Draws one duck at (x, y) heading `dir` (radians on screen); `scale` 1 = adult, 0.55 = duckling.
+export function drawDuck(ctx, x, y, dir, scale, winter, duckling) {
+  const k = scale, c = Math.cos(dir), s = Math.sin(dir);
+  ctx.save(); ctx.translate(x, y);
+  ctx.fillStyle = 'rgb(230 236 232 / .35)'; ctx.beginPath(); ctx.ellipse(-c * 4 * k, -s * 2 * k, 6 * k, 2.4 * k, Math.atan2(s * 0.5, c), 0, Math.PI * 2); ctx.fill(); // wake
+  ctx.fillStyle = duckling ? '#b59a52' : '#7a5f3e'; ctx.beginPath(); ctx.ellipse(0, -1.5 * k, 4.2 * k, 2.4 * k, Math.atan2(s * 0.5, c), 0, Math.PI * 2); ctx.fill();
+  if (!duckling) { ctx.fillStyle = '#5b4630'; ctx.beginPath(); ctx.ellipse(-c * 2 * k, -2.2 * k, 2.2 * k, 1.2 * k, Math.atan2(s * 0.5, c), 0, Math.PI * 2); ctx.fill(); }
+  const hx = c * 3.6 * k, hy = s * 1.8 * k - 3.6 * k;
+  ctx.fillStyle = duckling ? '#c9ae60' : '#2f6b3e'; ctx.beginPath(); ctx.arc(hx, hy, 1.7 * k, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#d9a23a'; ctx.beginPath(); ctx.ellipse(hx + c * 1.7 * k, hy + 0.4 * k, 1.1 * k, 0.6 * k, Math.atan2(s * 0.5, c), 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
 }
