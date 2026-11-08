@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.66.0] - 2026-11-08
+<!-- version: {"title":"King skills","type":"feature","reconstructed":false,"saveVersion":59} -->
+### Added
+- Royal tasks give the King 1–3 skill points. Spend them in the King panel: + on any of his skills (Combat too) or on two new royal skills.
+- Leadership: residents in the King's sight work 3 % faster per level (up to 5).
+- Stewardship: 4 % more taxes per level (up to 5), with no effect on happiness.
+
 ## [0.65.0] - 2026-11-08
 <!-- version: {"title":"Material Yard","type":"feature","reconstructed":false,"saveVersion":59} -->
 ### Added
