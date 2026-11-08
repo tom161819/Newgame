@@ -27,7 +27,7 @@ export const params = [
   { key: 'tabard', description: 'Surcoat colour worn over the armour.' },
   { key: 'mount', description: '{ coat, barding, saddle }: rides a horse (knights).' },
   { key: 'facing', description: 'Turn in eighths of a full circle (0–7); 0 faces the viewer. For direction sheets.' },
-  { key: 'action', values: ['run', 'tag', 'hoop', 'kick', 'swing', 'throw', 'roll-snow', 'hay-jump', 'cast-back', 'cast', 'cast-out', 'sit-idle', 'sit-idle-b', 'twitch', 'bite', 'bite-b', 'reel-a', 'reel-b', 'catch', 'store', 'fish-wait'], description: 'Still pose for an animation key frame (children\'s games, fishing): arms and legs placed by the action, with its props (ball, hoop, swing, snowball, hay, line and fish).' },
+  { key: 'action', values: ['run', 'tag', 'hoop', 'kick', 'swing', 'throw', 'roll-snow', 'hay-jump', 'run-b', 'tag-b', 'hoop-b', 'kick-b', 'swing-b', 'throw-b', 'roll-snow-b', 'hay-jump-b', 'cast-back', 'cast', 'cast-out', 'sit-idle', 'sit-idle-b', 'twitch', 'bite', 'bite-b', 'reel-a', 'reel-b', 'catch', 'store', 'fish-wait'], description: 'Still pose for an animation key frame (children\'s games, fishing): arms and legs placed by the action, with its props (ball, hoop, swing, snowball, hay, line and fish).' },
   { key: 'stride', description: 'Walk pose −1…1 (animation frames): +1 puts the right foot forward and swings the free arms the other way; 0 or omitted is the standing figure.' },
 ];
 
@@ -70,6 +70,19 @@ const ACTIONS = {
   'reel-b': { hands: { 1: [0.14, 0.92, 0.14], '-1': [0.06, 0.74, 0.26] }, feet: { 1: [0.07, 0, -0.14], '-1': [-0.07, 0, 0.14] } },
   store: { hands: { 1: [0.2, 0.62, 0.06], '-1': [-0.22, 0.34, 0.12] }, feet: { 1: [0.07, 0, -0.06], '-1': [-0.08, 0, 0.12] }, bend: 0.1 },
 };
+// Second frames of the children's games (plan g-deti-naves-grafika): the other step of running and tag and the
+// hoop, the wind-up of a kick, the back of a swing, the follow-through of a throw, the next push of a snowball and
+// landing in the hay. Running steps are the first pose mirrored (left and right swapped).
+const mirrored = a => ({ ...a, hands: { 1: [-a.hands['-1'][0], ...a.hands['-1'].slice(1)], '-1': [-a.hands[1][0], ...a.hands[1].slice(1)] }, feet: { 1: [-a.feet['-1'][0], ...a.feet['-1'].slice(1)], '-1': [-a.feet[1][0], ...a.feet[1].slice(1)] } });
+Object.assign(ACTIONS, {
+  'run-b': mirrored(ACTIONS.run), 'tag-b': mirrored(ACTIONS.tag),
+  'hoop-b': { hands: { 1: [0.2, 0.44, 0.3], '-1': [-0.18, 0.56, 0.1] }, feet: { 1: [0.06, 0.08, -0.12], '-1': [-0.06, 0, 0.18] } },
+  'kick-b': { hands: { 1: [0.24, 0.62, 0.12], '-1': [-0.26, 0.6, -0.08] }, feet: { 1: [0.07, 0.18, -0.24], '-1': [-0.06, 0, 0.04] } },
+  'swing-b': { hands: { 1: [0.16, 0.95, -0.02], '-1': [-0.16, 0.95, -0.02] }, feet: { 1: [0.06, 0.22, 0.12], '-1': [-0.06, 0.22, 0.12] }, sit: true, lift: 0.14 },
+  'throw-b': { hands: { 1: [0.18, 0.7, 0.32], '-1': [-0.2, 0.7, -0.14] }, feet: { 1: [0.06, 0, 0.12], '-1': [-0.06, 0.06, -0.18] } },
+  'roll-snow-b': { hands: { 1: [0.1, 0.3, 0.38], '-1': [-0.1, 0.3, 0.38] }, feet: { 1: [0.06, 0, -0.06], '-1': [-0.06, 0.04, -0.2] }, bend: 0.14 },
+  'hay-jump-b': { hands: { 1: [0.32, 0.86, 0.02], '-1': [-0.32, 0.86, 0.02] }, feet: { 1: [0.08, 0.06, 0.06], '-1': [-0.08, 0.06, 0.1] }, lift: 0.1 },
+});
 // Rod of each fishing pose: direction (azimuth: 'front' towards the water, 'back' behind) and tilt from upright;
 // `line`: 'float' drops the line to a float on the water, 'taut' runs it tight to the water, 'flying' streams it
 // out in the cast, 'fish' hangs a caught fish; `bent` bends the tip under a pull.
@@ -178,6 +191,13 @@ export function build(spec, { style }) {
 function actionProps(action, { y, w, handAt }) {
   const hand = side => { const t = handAt(side); return at(t[0] * w, y(t[1]) - 0.035, t[2]); }, g = p => ({ ...p, ground: true });
   switch (action) {
+    case 'run-b': case 'tag-b': return [];
+    case 'hoop-b': { const h = hand(1); return [g(cylinder({ radiusBottom: 0.15, radiusTop: 0.15, height: 0.02, segments: 14, tilt: [Math.PI / 2, 0] }, at(0.22, 0.15, 0.56), 'wood')), lean({ length: 0.3, radiusBottom: 0.012, segments: 4 }, Math.PI / 4, 0.8, h, 'wood_dark').part]; }
+    case 'kick-b': return actionProps('kick', { y, w, handAt });
+    case 'swing-b': return [box([0.34, 0.03, 0.14], at(0, y(0.37), -0.06), 'wood', { rotation: Math.PI / 4 }), ...[-1, 1].map(s => box([0.012, 0.9, 0.012], at(s * 0.17, y(0.37), -0.06), 'twigs', { rotation: Math.PI / 4 }))];
+    case 'throw-b': return [sphere([0.05, 0.05, 0.05], at(0.2, 0.95, 0.5), 'snow', 1), g(sphere([0.05, 0.05, 0.05], at(-0.35, 0.6, 0.6), 'snow', 1))];
+    case 'roll-snow-b': return [g(sphere([0.17, 0.16, 0.17], at(0, 0, 0.5), 'snow', 1))];
+    case 'hay-jump-b': return actionProps('hay-jump', { y, w, handAt });
     case 'hoop': { const h = hand(1); return [g(cylinder({ radiusBottom: 0.15, radiusTop: 0.15, height: 0.02, segments: 14, tilt: [Math.PI / 2, 0] }, at(0.22, 0.15, 0.5), 'wood')), lean({ length: 0.3, radiusBottom: 0.012, segments: 4 }, Math.PI / 4, 0.9, h, 'wood_dark').part]; }
     case 'kick': return [g(sphere([0.07, 0.07, 0.07], at(0.12, 0.23, 0.48), 'leather', 1)), g(sphere([0.072, 0.02, 0.072], at(0.12, 0.27, 0.48), 'cloth_linen', 1))];
     case 'swing': return [box([0.34, 0.03, 0.14], at(0, y(0.37), 0.02), 'wood', { rotation: Math.PI / 4 }), ...[-1, 1].map(s => box([0.012, 0.9, 0.012], at(s * 0.17, y(0.37), 0.02), 'twigs', { rotation: Math.PI / 4 }))];
