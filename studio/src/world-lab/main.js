@@ -8,7 +8,7 @@ import {
   readCode, makeCode, worldFor, checks, readFavourite, defaultsProposal, slug, PLAYER_START, COLUMNS, ROWS,
 } from './model.js';
 import { drawTopDown, drawIso, preload, whenImagesLoad } from './render.js';
-import { GROUND_DEFAULTS, GROUND_SETTINGS, ZONE_NAMES, TIMES, SEASONS, WEATHERS } from './ground.js';
+import { GROUND_DEFAULTS, GROUND_SETTINGS, ZONE_NAMES, TIMES, SEASONS, WEATHERS, yearOf, seasonOf, OBJECT_KINDS } from './ground.js';
 
 const $ = selector => document.querySelector(selector);
 const STORAGE = 'asset-studio.world-lab.v1', FAVOURITES = 'worlds', DEFAULTS = 'worldDefaults', SPAN = 28;
@@ -31,6 +31,7 @@ const state = {
   seed: Number.isSafeInteger(saved?.seed) ? saved.seed : randomSeed(),
   overlay: 'none', focus: { x: PLAYER_START.x, y: PLAYER_START.y }, world: null, report: null,
   ground: { mode: saved?.ground?.mode === 'tiles' ? 'tiles' : 'continuous', settings: { ...structuredClone(GROUND_DEFAULTS), ...(saved?.ground?.settings ?? {}) } },
+  // year: older saves only have a season name
   compare: '', worldB: null, reportB: null, favourites: new Map(), proposal: null,
 };
 const shared = { mode: 'local', db: null, user: null, uid: null, canWrite: null, names: new Map() };
@@ -236,7 +237,7 @@ function renderGround() {
   for (const b of document.querySelectorAll('#wl-ground [data-ground]')) b.setAttribute('aria-pressed', String(b.dataset.ground === state.ground.mode));
   const box = $('#wl-ground-settings'), redraw = () => { saveGround(); clearTimeout(groundTimer); groundTimer = setTimeout(drawAll, 90); };
   const seg = (label, list, key) => h('div', { class: 'wl-seg' }, h('span', {}, label), h('div', { class: 'segmented', role: 'group', 'aria-label': label }, list.map(([id, text]) => h('button', { type: 'button', 'aria-pressed': String(state.ground.settings[key] === id), onclick: () => { state.ground.settings[key] = id; saveGround(); renderGround(); drawAll(); } }, text))));
-  const scene = h('div', { class: 'wl-ground-scene' }, seg('Time of day', TIMES, 'time'), seg('Season', SEASONS, 'season'), seg('Weather', WEATHERS, 'weather'));
+  const scene = h('div', { class: 'wl-ground-scene' }, seg('Time of day', TIMES, 'time'), h('div', { class: 'wl-seg wl-year' }, h('span', {}, 'Season'), h('div', { class: 'segmented', role: 'group', 'aria-label': 'Season' }, SEASONS.map(([id, text]) => h('button', { type: 'button', 'aria-pressed': String(seasonOf(state.ground.settings.year) === id), onclick: () => { state.ground.settings.year = yearOf(id); state.ground.settings.season = id; saveGround(); renderGround(); drawAll(); } }, text))), h('input', { type: 'range', min: 0, max: 1, step: 0.01, value: state.ground.settings.year, 'aria-label': 'Time of year (winter → spring → summer → autumn → winter)', oninput: e => { state.ground.settings.year = +e.target.value; state.ground.settings.season = seasonOf(+e.target.value); for (const b of e.target.parentNode.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.textContent.toLowerCase() === state.ground.settings.season)); redraw(); } }), h('small', {}, 'Winter → spring → summer → autumn → winter')), seg('Weather', WEATHERS, 'weather'));
   const colours = h('div', { class: 'wl-ground-colours' }, h('span', {}, 'Grass shades'), ZONE_NAMES.map((name, i) => h('label', { class: 'wl-colour' }, h('input', { type: 'color', value: state.ground.settings.zoneColors[i], 'aria-label': name, oninput: e => { state.ground.settings.zoneColors = state.ground.settings.zoneColors.map((c, j) => j === i ? e.target.value : c); redraw(); } }), name)));
   scene.hidden = false;
   const sliders = GROUND_SETTINGS.map(s => {
@@ -244,8 +245,11 @@ function renderGround() {
     const input = h('input', { type: 'range', min: s.min, max: s.max, step: s.step, value: state.ground.settings[s.key], 'aria-label': s.label, oninput: e => { state.ground.settings[s.key] = +e.target.value; out.textContent = e.target.value; redraw(); } });
     return h('label', { class: 'wl-setting' }, h('span', {}, s.label), input, out);
   });
-  const plants = sliders.filter((_, i) => GROUND_SETTINGS[i].group === 'plants'), ground = sliders.filter((_, i) => GROUND_SETTINGS[i].group !== 'plants');
-  box.replaceChildren(scene, ...(state.ground.mode === 'continuous' ? [colours, h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Ground'), ground), h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Plants'), plants)] : []));
+  // Plants and stones: amount and opacity side by side for every kind.
+  const alpha = kind => { const key = `${kind}Alpha`, out = h('output', {}, String(state.ground.settings[key] ?? 1)); return h('label', { class: 'wl-setting wl-alpha' }, h('span', {}, 'Opacity'), h('input', { type: 'range', min: 0.1, max: 1, step: 0.05, value: state.ground.settings[key] ?? 1, 'aria-label': `${kind} opacity`, oninput: e => { state.ground.settings[key] = +e.target.value; out.textContent = e.target.value; redraw(); } }), out); };
+  const pick = group => GROUND_SETTINGS.map((def, i) => def.group === group ? h('div', { class: 'wl-pair' }, sliders[i], OBJECT_KINDS.includes(def.key) ? alpha(def.key) : null) : null).filter(Boolean);
+  const ground = sliders.filter((_, i) => !GROUND_SETTINGS[i].group);
+  box.replaceChildren(scene, ...(state.ground.mode === 'continuous' ? [colours, h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Ground'), ground), h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Plants'), pick('plants')), h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Stones'), pick('stones'))] : []));
 }
 for (const b of document.querySelectorAll('#wl-ground [data-ground]')) b.addEventListener('click', () => { state.ground.mode = b.dataset.ground; saveGround(); renderGround(); drawAll(); });
 $('#wl-ground-reset').addEventListener('click', () => { state.ground.settings = structuredClone(GROUND_DEFAULTS); saveGround(); renderGround(); drawAll(); });

@@ -22,3 +22,11 @@ After approval the game part is m-souvisla-zeme: same maths per 16 × 16 chunk i
 - Colour picker per grass zone (6 shades), slider "Shades flowing into each other" (ring-averaged zone weights).
 - Plants drawn on top, each with its own slider: small and large flowers, thistles, small shrubs, three tall grass tufts (green, dry, dark sedge), plus plant size; they prefer suitable zones and zone borders.
 - Time of day (dawn, day, dusk, night), season (spring – winter with snow cover) and weather (clear, overcast, rain, fog, snow) for the view.
+
+### Round 3 (owner 8 Nov)
+- Season is a continuous time-of-year slider (winter → spring → summer → autumn → winter) besides the four buttons.
+- Plants follow the year: growth curves per kind (how many and how big; a spot keeps its plant, so they appear one by one) and a wither curve (browning, petals gone). Ground colour and snow cover blend between seasons.
+
+### Round 4 (owner 8 Nov)
+- Opacity slider for every plant and stone kind (sink them into the ground).
+- Stones: pebbles, gravel patches, stones and large flat stones, each with amount and opacity; they prefer the stony zone and get a snow cap in winter.
