@@ -167,8 +167,9 @@ export class TerrainRenderer {
     const isLand=(x,y)=>{const g=cell(x,y);return g===GROUND.GRASS||LAND_MATERIAL[g]!==undefined;},zoneAt=(x,y)=>{const g=cell(x,y);return g===GROUND.GRASS?(this.scene.grassZones?.[Math.max(0,Math.min(ROWS-1,y))]?.[Math.max(0,Math.min(COLUMNS-1,x))]??0):LAND_MATERIAL[g]??0;};
     const depthAt=(x,y)=>WATER_DEPTH[cell(x,y)]??-1,settings={...GROUND_SETTINGS,year:SEASON_YEAR[season]??0.5};
     const toWorld=(px,py)=>{const g=worldToGrid(px+left,py+top);return [g.x,g.y];},ownTile=(x,y)=>x>=x0&&y>=y0&&x<x0+CHUNK_SIZE&&y<y0+CHUNK_SIZE,seen=(x,y)=>(this.fog?.displayState({x,y})??VISIBILITY.VISIBLE)!==VISIBILITY.UNEXPLORED,
-      // One tile of overlap into seen neighbour chunks (same pixels there) hides the seam between chunk textures.
-      inWorld=(x,y)=>x>=0&&y>=0&&x<COLUMNS&&y<ROWS&&(ownTile(x,y)||(x>=x0-1&&y>=y0-1&&x<=x0+CHUNK_SIZE&&y<=y0+CHUNK_SIZE&&seen(x,y))),own=(fx,fy)=>ownTile(Math.floor(fx),Math.floor(fy))&&seen(Math.floor(fx),Math.floor(fy));
+
+      // Only this chunk's own tiles: painting into neighbour chunks drew light seams over their remembered (fogged) ground.
+      inWorld=(x,y)=>ownTile(x,y),own=(fx,fy)=>ownTile(Math.floor(fx),Math.floor(fy))&&seen(Math.floor(fx),Math.floor(fy));
     const field=makeWaterField({x0,y0,span:CHUNK_SIZE,depthAt,settings});
     paintContinuousGround(context,{width:context.canvas.width,height:context.canvas.height,toWorld,isGrass:isLand,zoneAt,depthAt,inWorld,field,settings,step:6});
     const screen=(fx,fy)=>{const p=gridToWorld(fx,fy);return [p.x-left,p.y-top];},name=seasonOf(settings.year),free=(fx,fy)=>own(fx,fy)&&!occupied.has(`${Math.floor(fx)},${Math.floor(fy)}`)&&this.map[Math.floor(fy)]?.[Math.floor(fx)]!==1;

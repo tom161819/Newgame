@@ -26,3 +26,6 @@ npm test (all pass), build, browser: new game with code MKW2-155515555555-1, riv
 ## Notes for the next agent
 - Ground look tuning: change src/data/groundStyle.json (or propose again from the World Lab and copy the settings).
 - Performance on weak PCs is not measured yet; if needed raise the grid step in paintContinuousChunk.
+
+## 0.73.1 fix (owner report: fog of war broken)
+Each chunk painted one tile into its neighbour chunks to hide seams; those pixels were never greyed by the neighbour's remembered overlay, so explored ground showed light stripes along chunk borders. Chunks now paint only their own tiles. A faint seam between remembered chunks can remain.

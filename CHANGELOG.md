@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.73.1] - 2026-11-08
+<!-- version: {"title":"Explored land out of sight no longer shows light lines and stripes along a large grid; it is evenly greyed again.","type":"fix","reconstructed":false,"saveVersion":60} -->
+### Fixed
+- Explored land out of sight no longer shows light lines and stripes along a large grid; it is evenly greyed again.
+
 ## [0.73.0] - 2026-11-08
 <!-- version: {"title":"New Game setup has a World generator: sliders for rivers, lakes, forest, desert and more, with a preview of the whole map.","type":"feature","reconstructed":false,"saveVersion":60} -->
 ### Added
