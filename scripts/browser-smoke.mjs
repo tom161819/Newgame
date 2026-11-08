@@ -92,6 +92,7 @@ import { pathsV2Smoke } from './paths-v2-smoke.mjs';
 import { policySmoke } from './policy-smoke.mjs';
 import { backgroundSmoke } from './background-smoke.mjs';
 import { worldCodeSmoke } from './world-code-smoke.mjs';
+import { worldEditorSmoke } from './world-editor-smoke.mjs';
 import { petsSmoke } from './pets-smoke.mjs';
 import { dogSmoke } from './dog-smoke.mjs';
 import { walkSmoke } from './walk-smoke.mjs';
@@ -233,6 +234,7 @@ try{
   await step('policy',()=>policySmoke(context,origin+base,instrument));
   await step('background',()=>backgroundSmoke(context,origin+base,instrument));
   await step('world-code',()=>worldCodeSmoke(context,origin+base,instrument));
+  await step('world-editor',()=>worldEditorSmoke(context,origin+base,instrument));
   await step('pets',()=>petsSmoke(context,origin+base,instrument));
   await step('dog',()=>dogSmoke(context,origin+base,instrument));
   await step('walk',()=>walkSmoke(context,origin+base,instrument));
@@ -319,7 +321,7 @@ try{
       s.worldCamera.following=false;s.cameras.main.setZoom(.9).centerOn(point.x,point.y);s.cameras.main.preRender();return point;
     }throw Error('No reachable smoke-test stone site.');
   });
-  const camera=await page.evaluate(()=>{const c=window.__game.registry.get('application').scene.cameras.main;return{x:c.scrollX+c.width/2,y:c.scrollY+c.height/2,w:c.width,h:c.height,z:c.zoom};}),bounds=await page.locator('canvas:not(.minimap-canvas)').boundingBox();
+  const camera=await page.evaluate(()=>{const c=window.__game.registry.get('application').scene.cameras.main;return{x:c.scrollX+c.width/2,y:c.scrollY+c.height/2,w:c.width,h:c.height,z:c.zoom};}),bounds=await page.locator('canvas:not(.minimap-canvas):not(.world-preview):not(.we-map):not(.we-iso)').boundingBox();
   await page.mouse.click(bounds.x+((point.x-camera.x)*camera.z+camera.w/2)*bounds.width/camera.w,bounds.y+((point.y-camera.y)*camera.z+camera.h/2)*bounds.height/camera.h);
   await page.waitForFunction(()=>window.__game.registry.get('application').scene.character.cargo?.amount===1,null,{timeout:20000});
   const waiting=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;return {tile:s.character.tile,task:s.kingLogistics.task,stock:s.inventory.count('stone')};});
@@ -378,7 +380,7 @@ try{
   console.log(`PASS New Game starting resources: capped 300-unit Starter Stockpile, 200 Stone + 100 Wood deposited once, ${start.loose} loose map stones kept separate, phone-width setup`);}
   const archivePage=await context.newPage();await instrument(archivePage);await archivePage.goto(origin+base+'versions/');assert.equal(await archivePage.locator('[data-version-label]').count(),catalog.versions.length+(catalog.versions.some(v=>v.current)?0:1));
   await archivePage.setViewportSize({width:390,height:844});assert.equal(await archivePage.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
-  const first=catalog.builds.at(-1);await archivePage.goto(origin+first.archiveURL);await archivePage.locator('canvas:not(.minimap-canvas)').waitFor();
+  const first=catalog.builds.at(-1);await archivePage.goto(origin+first.archiveURL);await archivePage.locator('canvas:not(.minimap-canvas):not(.world-preview):not(.we-map):not(.we-iso)').waitFor();
   const racePage=await context.newPage();await instrument(racePage);await racePage.route('**/versions/catalog.json',async route=>{const response=await route.fetch();await new Promise(resolve=>setTimeout(resolve,700));await route.fulfill({response});});await racePage.goto(origin+base);await racePage.locator('#main-archive').click();await racePage.locator('#new-game').click();await racePage.locator('#start-game').click();await racePage.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);await racePage.waitForTimeout(800);assert.equal(await racePage.locator('#version-archive-dialog').evaluate(dialog=>dialog.open),false);assert.equal(await racePage.locator('#archive-version-list > article').count(),0);await racePage.close();
   console.log('PASS starting a game cancels a delayed archive opening; hidden snapshot rows are not retained');
   assert.deepEqual(errors,[]);await context.close();

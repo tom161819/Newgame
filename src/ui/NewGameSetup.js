@@ -2,6 +2,7 @@ import { t } from '../i18n/index.js';
 import { NEW_GAME_DEFAULTS,gameSettings,STARTING_RESOURCES,STARTING_RESOURCE_CAPACITY,startingResourceTotal } from '../systems/GameSettings.js';
 import { WorldGenerator } from './WorldGenerator.js';
 import { encodeWorldCode,decodeWorldCode,defaultWorldLevels,randomSeed,applyPresets,presetsFromLevels } from '../data/worldCode.js';
+import { readLast } from '../data/worldEditorStore.js';
 
 // Quick starts (values for the form; anything not listed keeps the New Game default). Starting resources stay within
 // the Starter Stockpile's 300 units.
@@ -24,7 +25,7 @@ export class NewGameSetup {
     const genHost=document.querySelector('#world-generator');
     if(genHost){this.generator=new WorldGenerator(genHost,{get:()=>this.world,set:world=>{this.world=world;this.writeCode();}});document.querySelector('#setup-generator').addEventListener('toggle',event=>{if(event.target.open)this.generator.refresh();});}
     document.querySelector('#setup-back').addEventListener('click',onBack);
-    document.querySelector('#setup-reset').addEventListener('click',()=>this.reset());
+    document.querySelector('#setup-reset').addEventListener('click',()=>{this.offeredLevels=null;this.showEditorNote();this.reset();});
     // E2 (report 0.48.0): three quick starts and Start at the top; the full form folds under Custom settings, which
     // stays open once a player opened it (remembered in this browser).
     this.custom=document.querySelector('#setup-custom');
@@ -46,13 +47,15 @@ export class NewGameSetup {
   }
   showError(text){this.codeError.hidden=!text;this.codeError.textContent=text??'';this.codeInput.setAttribute('aria-invalid',String(!!text));}
   syncPresets(){const p=presetsFromLevels(this.world.levels),e=this.form.elements;for(const [name,key]of [['worldWater','water'],['worldDesert','desert'],['worldForest','forest']]){e[name].value=p[key];e[name].querySelector('option[value="custom"]').hidden=p[key]!=='custom';}}
-  reset(){this.world={levels:defaultWorldLevels(),seed:randomSeed()};if(this.codeInput)this.writeCode();const s=NEW_GAME_DEFAULTS;for(const k of ['difficulty','treasureCount','initialStoneCount','dayLengthSeconds','wildlifeRespawn','startingGold',...Object.keys(STARTING_RESOURCES)])this.form.elements[k].value=s[k];for(const k of ['fogOfWar','explorationMode','seasonsEnabled','startingCastle','startingGarrison','autoEmployment','nightWolves','nightThieves','nightFires'])if(this.form.elements[k])this.form.elements[k].checked=s[k];this.form.elements.wildlifePopulation.value=1;this.refresh();}
+  reset(){this.world={levels:[...(this.offeredLevels??defaultWorldLevels())],seed:randomSeed()};if(this.codeInput)this.writeCode();const s=NEW_GAME_DEFAULTS;for(const k of ['difficulty','treasureCount','initialStoneCount','dayLengthSeconds','wildlifeRespawn','startingGold',...Object.keys(STARTING_RESOURCES)])this.form.elements[k].value=s[k];for(const k of ['fogOfWar','explorationMode','seasonsEnabled','startingCastle','startingGarrison','autoEmployment','nightWolves','nightThieves','nightFires'])if(this.form.elements[k])this.form.elements[k].checked=s[k];this.form.elements.wildlifePopulation.value=1;this.refresh();}
   applyPreset(id){
     const p=SETUP_PRESETS[id];if(!p)return;this.reset();const e=this.form.elements;
     for(const [k,v] of Object.entries(p))if(e[k]){if(typeof v==='boolean')e[k].checked=v;else e[k].value=v;}
     for(const b of this.root.querySelectorAll('[data-setup-preset]'))b.setAttribute('aria-checked',String(b.dataset.setupPreset===id));this.refresh();
   }
-  open(){this.reset();for(const b of this.root.querySelectorAll('[data-setup-preset]'))b.setAttribute('aria-checked',String(b.dataset.setupPreset==='normal'));if(this.custom){let saved=null;try{saved=localStorage.getItem('newgame.setupCustom');}catch{/* closed */}this.custom.open=saved==='open';}this.root.querySelector('.setup-advanced').open=false;this.root.hidden=false;(this.custom&&!this.custom.open?this.root.querySelector('.setup-start-top'):this.form.elements.difficulty)?.focus();}
+  // World Editor: New Game offers the levels last used in the editor (in this browser), with a fresh seed.
+  showEditorNote(){const note=document.querySelector('#setup-editor-note');if(note)note.hidden=!this.offeredLevels;}
+  open(){let storage=null;try{storage=localStorage;}catch{/* no storage */}this.offeredLevels=readLast(storage)?.levels??null;this.showEditorNote();this.reset();for(const b of this.root.querySelectorAll('[data-setup-preset]'))b.setAttribute('aria-checked',String(b.dataset.setupPreset==='normal'));if(this.custom){let saved=null;try{saved=localStorage.getItem('newgame.setupCustom');}catch{/* closed */}this.custom.open=saved==='open';}this.root.querySelector('.setup-advanced').open=false;this.root.hidden=false;(this.custom&&!this.custom.open?this.root.querySelector('.setup-start-top'):this.form.elements.difficulty)?.focus();}
   close(){this.root.hidden=true;}
   refresh(){const s=this.value(),wildlife=t(`setup.wildlife.${s.wildlifePopulation}`,{count:{rare:3,normal:9,abundant:24}[s.wildlifePopulation]}),on=v=>t(v?'state.on':'state.off');this.root.querySelector('[data-setup-output="wildlife"]').textContent=wildlife;for(const k of ['treasureCount','initialStoneCount','startingGold',...Object.keys(STARTING_RESOURCES)])this.root.querySelector(`[data-setup-output="${k}"]`).textContent=s[k];this.root.querySelector('#setup-resources-total').textContent=`${startingResourceTotal(s)} / ${STARTING_RESOURCE_CAPACITY}`;
     const stockpile=startingResourceTotal(s)?t('setup.summary.stockpile',{list:Object.entries(STARTING_RESOURCES).filter(([k])=>s[k]).map(([k,id])=>`${s[k]} ${t(`resource.${id}`)}`).join(', ')}):null;

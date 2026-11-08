@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.75.0] - 2026-11-08
+<!-- version: {"title":"World Editor","type":"feature","reconstructed":false,"saveVersion":60} -->
+### Added
+- A World Editor screen, opened from the main menu under Load Game or from New Game → Custom settings → World.
+  - Every generator slider and the ground-look options (patches, zone transitions, flowers, shrubs, stones, reeds, river look), on tabs.
+  - A map of the whole world and an isometric close-up drawn with the game's ground, with a preview season.
+  - Presets saved in this browser, with Load and Delete.
+  - Default resets everything; ↺ resets one tab.
+  - Copy world code, New seed and Start game.
+- New Game offers the editor's last settings with a fresh seed. A game started with a custom ground look keeps it in its save.
+
 ## [0.74.1] - 2026-11-08
 <!-- version: {"title":"While exploring, newly seen squares no longer flash bright in the dark beyond the soft Fog of War edge.","type":"fix","reconstructed":false,"saveVersion":60} -->
 ### Fixed

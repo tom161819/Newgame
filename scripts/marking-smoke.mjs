@@ -18,7 +18,7 @@ export async function markingSmoke(context,url,instrument){
       const lone={x:row[0].x,y:row[0].y-3},loneId=tree(lone),wallTree=tree(row[1]),rock=row[2];s.terrainGrid[rock.y][rock.x]=1;s.map[rock.y][rock.x]=1;s.naturalResources.mining.restoreTiles([rock]);s.terrain?.invalidateArea?.([rock]);
       s.worldCamera.following=false;s.cameras.main.setZoom(1.25).centerOn(s.map.length*32+(row[1].x-row[1].y)*32,128+(row[1].x+row[1].y+1)*16);return {row,lone,loneId,wallTree,rock};
     });
-    const point=async tile=>{const canvas=await page.locator('canvas:not(.minimap-canvas)').boundingBox(),p=await page.evaluate(tile=>{const s=window.__game.registry.get('application').scene,c=s.cameras.main;return {x:((s.map.length*32+(tile.x-tile.y)*32-c.scrollX-c.width/2)*c.zoom+c.width/2)/c.width,y:((128+(tile.x+tile.y+1)*16-c.scrollY-c.height/2)*c.zoom+c.height/2)/c.height};},tile);return {x:canvas.x+p.x*canvas.width,y:canvas.y+p.y*canvas.height};};
+    const point=async tile=>{const canvas=await page.locator('canvas:not(.minimap-canvas):not(.world-preview):not(.we-map):not(.we-iso)').boundingBox(),p=await page.evaluate(tile=>{const s=window.__game.registry.get('application').scene,c=s.cameras.main;return {x:((s.map.length*32+(tile.x-tile.y)*32-c.scrollX-c.width/2)*c.zoom+c.width/2)/c.width,y:((128+(tile.x+tile.y+1)*16-c.scrollY-c.height/2)*c.zoom+c.height/2)/c.height};},tile);return {x:canvas.x+p.x*canvas.width,y:canvas.y+p.y*canvas.height};};
     await page.waitForTimeout(150);
     // Marking mode: a real click on the tree marks it; Esc ends the mode and the mark stays (drawn faint).
     await page.click('#mark-rocks');await page.waitForTimeout(100);const p=await point(f.lone);await page.mouse.move(p.x,p.y);await page.mouse.down();await page.mouse.up();

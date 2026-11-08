@@ -12,11 +12,11 @@ import { PathV2Layer } from './PathV2Layer.js';
 import { APPROVED_DEPLOY_ART } from '../data/objects/approvedDeployArt.js';
 import { requestTexture } from './deployArt.js';
 import { paintContinuousGround, makeWaterField, plantsFor, waterObjectsFor, drawPlant, seasonOf } from '../render/continuousGround.js';
-import groundArt from '../data/groundStyle.json' with { type: 'json' };
+import { groundSettings } from '../data/groundLook.js';
 
 // Continuous ground (plan m-souvisla-zeme): the approved World Lab look (art/effects/ground.json) paints land and water
 // of a whole chunk as one surface – no tile grid, soft zone transitions, natural river banks, plants and stones.
-const GROUND_SETTINGS = groundArt.settings;
+// World Editor: the approved look (groundStyle.json) with the player's ground-look override on top.
 const SEASON_YEAR = { Winter: 0.02, Spring: 0.3, Summer: 0.5, Autumn: 0.76 };
 const LAND_MATERIAL = { [GROUND.BEACH]: 6, [GROUND.DESERT]: 7, [GROUND.MUD]: 8, [GROUND.SHORE_ROCKS]: 9 };
 const WATER_DEPTH = { [GROUND.FORD]: 0.15, [GROUND.SHALLOW]: 0.5, [GROUND.DEEP]: 1 };
@@ -174,7 +174,7 @@ export class TerrainRenderer {
   paintContinuousChunk(context,cx,cy,left,top,season,occupied){
     const x0=cx*CHUNK_SIZE,y0=cy*CHUNK_SIZE,cell=(x,y)=>this.groundAt(Math.max(0,Math.min(COLUMNS-1,x)),Math.max(0,Math.min(ROWS-1,y)));
     const isLand=(x,y)=>{const g=cell(x,y);return g===GROUND.GRASS||LAND_MATERIAL[g]!==undefined;},zoneAt=(x,y)=>{const g=cell(x,y);return g===GROUND.GRASS?(this.scene.grassZones?.[Math.max(0,Math.min(ROWS-1,y))]?.[Math.max(0,Math.min(COLUMNS-1,x))]??0):LAND_MATERIAL[g]??0;};
-    const depthAt=(x,y)=>WATER_DEPTH[cell(x,y)]??-1,settings={...GROUND_SETTINGS,year:SEASON_YEAR[season]??0.5};
+    const depthAt=(x,y)=>WATER_DEPTH[cell(x,y)]??-1,settings={...groundSettings(),year:SEASON_YEAR[season]??0.5};
     const toWorld=(px,py)=>{const g=worldToGrid(px+left,py+top);return [g.x,g.y];},ownTile=(x,y)=>x>=x0&&y>=y0&&x<x0+CHUNK_SIZE&&y<y0+CHUNK_SIZE,seen=(x,y)=>(this.fog?.displayState({x,y})??VISIBILITY.VISIBLE)!==VISIBILITY.UNEXPLORED,
 
       // Only this chunk's own tiles: painting into neighbour chunks drew light seams over their remembered (fogged) ground.

@@ -24,6 +24,7 @@ import { CONSTRUCTION_RULES } from '../data/construction.js';
 import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { pavementHost } from '../game/pavement.js';
 import { gameSettings,WILDLIFE_INTERVALS } from './GameSettings.js';
+import { groundOverride,validateGroundLook } from '../data/groundLook.js';
 import { farmInRange,FARM_PLOT_CAPACITY } from '../data/farmPlots.js';
 import { FARMING_RULES } from '../data/farming.js';
 import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
@@ -72,6 +73,8 @@ export function serializeGameState(scene){
   return {
     saveVersion:SAVE_VERSION,gameSettings:{...gameSettings(scene.gameSettings),...(scene.seasons?{seasonsEnabled:scene.seasons.enabled}:{})},terrain:scene.terrainGrid.map(row=>[...row]),ground:exportGround(scene.groundGrid??emptyGround()),bushes:exportBushes(scene.bushes??new Map()),grassZones:exportZones(scene.grassZones??emptyZones()),reeds:exportReeds(scene.reeds??new Set()),
     exploration,
+    // World Editor: the player's ground look (optional; absent = the game's own look).
+    ...(groundOverride()?{groundLook:groundOverride()}:{}),
     naturalResources:scene.naturalResources?.exportState()??emptyNaturalState(),
     resourceLedger:scene.resourceLedger?.exportState()??emptyLedgerState(scene.gameTime),
     ...(scene.experienceSystem?{experienceSystem:scene.experienceSystem.exportState()}:{}),
@@ -161,6 +164,7 @@ export function validateGameState(input,registry=objectRegistry){
   for(const d of s.drops??[]){d.haulEligible??=true;check(typeof d.haulEligible==='boolean');}
   try{const settings=gameSettings(s.gameSettings);s.gameSettings={...settings,fogOfWar:s.gameSettings?.fogOfWar??s.settings?.fogOfWar??settings.fogOfWar};}catch{fail();}
   s.saveVersion=SAVE_VERSION;
+  if(s.groundLook!==undefined){try{s.groundLook=validateGroundLook(s.groundLook);}catch{fail();}}
   const dayDuration=s.gameSettings.dayLengthSeconds*1000;
   s.wildlifeRespawn??={elapsed:0};number(s.wildlifeRespawn.elapsed,0,(WILDLIFE_INTERVALS[s.gameSettings.wildlifeRespawn]||1)-1e-7);
   array(s.terrain,ROWS);check(s.terrain.length===ROWS);for(const row of s.terrain){array(row,COLUMNS);check(row.length===COLUMNS&&row.every(n=>n===0||n===1));}

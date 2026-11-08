@@ -2,14 +2,13 @@ import { gridToWorld, worldToGrid } from './isometric.js';
 import { COLUMNS, ROWS } from './config.js';
 import { GROUND } from '../data/worldTerrain.js';
 import { makeWaterField, duckSites, ducklingsFor, drawDuck } from '../render/continuousGround.js';
-import groundStyle from '../data/groundStyle.json' with { type: 'json' };
+import { groundSettings } from '../data/groundLook.js';
 
 // g-kachny-proud-hra (owner 8 Nov 2026, from the World Lab round 8): short bright streaks drift with the current over
 // visible river water, and three duck families paddle slow loops; in spring and summer ducklings follow in a line.
 // Purely visual, nothing under the fog, nothing saved. Fish stay the game's own FishShadows.
 const DEPTH = { [GROUND.FORD]: 0.15, [GROUND.SHALLOW]: 0.5, [GROUND.DEEP]: 1 }, CHUNK = 16, DIRS = 16;
 const DUCK = 'water:duck', FRAME = 30, SEASON_YEAR = { Winter: 0.02, Spring: 0.3, Summer: 0.5, Autumn: 0.76 };
-const FLOW = groundStyle.settings?.flow ?? 0.6;
 
 export class RiverLife {
   constructor(scene) {
@@ -18,7 +17,8 @@ export class RiverLife {
     this.reduce = !!globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     this.ensureTexture();
     const g = scene.groundGrid, water = (x, y) => (g?.[y]?.[x] === GROUND.SHALLOW || g?.[y]?.[x] === GROUND.DEEP);
-    this.sites = g ? duckSites({ ground: g }, 3, water) : [];
+    this.look = groundSettings(); this.flow = this.look.flow ?? 0.6;
+    this.sites = g ? duckSites({ ground: g }, Math.round(this.look.duckFamilies ?? 3), water) : [];
     this.ducks = this.sites.map(() => Array.from({ length: 7 }, (_, n) => scene.add.image(0, 0, DUCK, 0).setDepth(-63).setVisible(false).setScale(n ? 0.55 : 1)));
   }
   // One sheet: adult row, duckling row; DIRS headings drawn with the World Lab's drawDuck.
@@ -31,7 +31,7 @@ export class RiverLife {
   depthAt(x, y) { const g = this.scene.groundGrid?.[Math.max(0, Math.min(ROWS - 1, y))]?.[Math.max(0, Math.min(COLUMNS - 1, x))]; return DEPTH[g] ?? -1; }
   field(x, y) {
     const cx = Math.floor(x / CHUNK), cy = Math.floor(y / CHUNK), key = `${cx},${cy}`;
-    let f = this.fields.get(key); if (!f) { f = makeWaterField({ x0: cx * CHUNK, y0: cy * CHUNK, span: CHUNK, depthAt: (a, b) => this.depthAt(a, b), settings: groundStyle.settings }); this.fields.set(key, f); }
+    let f = this.fields.get(key); if (!f) { f = makeWaterField({ x0: cx * CHUNK, y0: cy * CHUNK, span: CHUNK, depthAt: (a, b) => this.depthAt(a, b), settings: this.look }); this.fields.set(key, f); }
     return f;
   }
   visible(x, y) { const fog = this.scene.fog; return !fog || fog.isVisibleTile({ x: Math.floor(x), y: Math.floor(y) }); }
@@ -42,7 +42,7 @@ export class RiverLife {
     const v = s.cameras.main.worldView, c = [worldToGrid(v.x, v.y), worldToGrid(v.right, v.y), worldToGrid(v.x, v.bottom), worldToGrid(v.right, v.bottom)];
     const minX = Math.max(0, Math.min(...c.map(p => p.x))), maxX = Math.min(COLUMNS, Math.max(...c.map(p => p.x))), minY = Math.max(0, Math.min(...c.map(p => p.y))), maxY = Math.min(ROWS, Math.max(...c.map(p => p.y)));
     // Streaks: spawn on visible, not too shallow water in view; drift along the field's flow direction.
-    const target = Math.round(160 * FLOW);
+    const target = Math.round(160 * this.flow);
     for (let tries = 0; this.streaks.length < target && tries < 60; tries++) {
       const x = minX + Math.random() * (maxX - minX), y = minY + Math.random() * (maxY - minY);
       if (this.depthAt(Math.floor(x), Math.floor(y)) < 0.3 || !this.visible(x, y)) continue;
@@ -51,7 +51,7 @@ export class RiverLife {
     }
     for (const st of this.streaks) {
       const [tx, ty] = this.field(st.x, st.y).flow(st.x, st.y); st.x += tx * 0.012 * step; st.y += ty * 0.012 * step; st.age += step;
-      const a = Math.sin(Math.PI * Math.min(1, st.age / st.life)) * 0.35 * FLOW, p = gridToWorld(st.x, st.y), q = gridToWorld(st.x - tx * 0.22, st.y - ty * 0.22);
+      const a = Math.sin(Math.PI * Math.min(1, st.age / st.life)) * 0.35 * this.flow, p = gridToWorld(st.x, st.y), q = gridToWorld(st.x - tx * 0.22, st.y - ty * 0.22);
       g.lineStyle(1, 0xebf0ec, a); g.lineBetween(p.x, p.y, q.x, q.y);
     }
     this.streaks = this.streaks.filter(st => st.age < st.life && this.depthAt(Math.floor(st.x), Math.floor(st.y)) >= 0.15 && this.visible(st.x, st.y));

@@ -3,6 +3,11 @@ import { SaveGameManager } from '../systems/SaveGameManager.js';
 import { serializeGameState,validateGameState } from '../systems/GameStateSerializer.js';
 import { SaveLoadMenu } from './SaveLoadMenu.js';
 import { NewGameSetup } from './NewGameSetup.js';
+import { WorldEditor } from './WorldEditor.js';
+import { NEW_GAME_DEFAULTS,gameSettings } from '../systems/GameSettings.js';
+import { encodeWorldCode } from '../data/worldCode.js';
+import { setGroundOverride } from '../data/groundLook.js';
+import { activeGroundLook } from '../data/worldEditorStore.js';
 import { ChangelogPanel } from './ChangelogPanel.js';
 import { VersionArchivePanel } from './VersionArchivePanel.js';
 import { gameVersion,releases } from 'virtual:game-release';
@@ -15,7 +20,7 @@ export class GameApplication {
     // The language is chosen before any screen renders; both pickers stay in sync.
     initLanguage(storage);this.languageSelects=[...document.querySelectorAll('[data-language-select]')];
     for(const select of this.languageSelects){select.replaceChildren(...Object.entries(LANGUAGES).map(([id,{label}])=>{const option=document.createElement('option');option.value=id;option.textContent=label;return option;}));select.value=language();select.addEventListener('change',()=>setLanguage(select.value,{storage}));}
-    this.game=game;this.scene=null;this.gameVersion=gameVersion;this.saves=new SaveGameManager();this.saveMenu=new SaveLoadMenu(this);
+    this.storage=storage;this.game=game;this.scene=null;this.gameVersion=gameVersion;this.saves=new SaveGameManager();this.saveMenu=new SaveLoadMenu(this);
     this.autosave=new AutosaveService({saves:this.saves,snapshot:()=>this.snapshot(),settings:readAutosaveSettings(storage),onStatus:status=>this.autosaveStatus(status)});
     const autosaveToggle=document.querySelector('#autosave-toggle'),autosaveInterval=document.querySelector('#autosave-interval');
     if(autosaveToggle&&autosaveInterval){
@@ -30,6 +35,15 @@ export class GameApplication {
     const requestedChanges=new URLSearchParams(window.location.search).get('changelog');if(releases.some(v=>v.version===requestedChanges))this.changelog.open(requestedChanges);
     this.setup=new NewGameSetup({onStart:settings=>{this.pendingGettingStarted=true;this.start(null,settings);},onBack:()=>{this.setup.close();this.showMainMenu();}});
     document.querySelector('#new-game').addEventListener('click',()=>{this.main.hidden=true;this.setup.open();});
+    // World Editor (m-world-editor-obrazovka): a full screen from the main menu or from New Game → Custom settings → World.
+    // Start game uses the editor's world code (with the New Game setup's other choices when it was opened from there).
+    this.worldEditor=new WorldEditor({storage,
+      onStart:world=>{const code=encodeWorldCode(world);this.worldEditor.close();this.pendingGettingStarted=true;
+        if(this.editorFrom==='setup'){this.setup.world={levels:[...world.levels],seed:world.seed};this.setup.writeCode();this.start(null,this.setup.value());}
+        else this.start(null,gameSettings({...NEW_GAME_DEFAULTS,worldCode:code}));},
+      onBack:world=>{if(this.editorFrom==='setup'){this.setup.world={levels:[...world.levels],seed:world.seed};this.setup.writeCode();this.setup.root.hidden=false;document.querySelector('#setup-open-editor')?.focus();}else this.showMainMenu();}});
+    document.querySelector('#main-world-editor')?.addEventListener('click',()=>{this.editorFrom='main';this.main.hidden=true;this.worldEditor.open();});
+    document.querySelector('#setup-open-editor')?.addEventListener('click',()=>{this.editorFrom='setup';this.setup.root.hidden=true;this.worldEditor.open(this.setup.world);});
     document.querySelector('#main-load-game').addEventListener('click',()=>this.openSaves('load'));
     // E2 (report 0.48.0): Continue loads the newest compatible save straight away.
     document.querySelector('#continue-game')?.addEventListener('click',async()=>{const record=await this.latestSave();if(record)await this.load(record.state);});
@@ -52,7 +66,7 @@ export class GameApplication {
   }
   async latestSave(){try{return (await this.saves.list()).find(r=>saveRecordStatus(r).compatible&&r.state)??null;}catch{return null;}}
   async refreshContinue(){const button=document.querySelector('#continue-game');if(!button)return;const record=await this.latestSave();button.hidden=!record;if(record)button.title=t('menu.continueTitle',{name:record.name||t('saves.unnamed')});}
-  showMainMenu(){this.refreshContinue();this.scene=null;this.main.hidden=false;document.body.classList.remove('in-game');document.querySelector('main').inert=true;document.querySelector('#new-game').disabled=false;document.querySelector('#main-load-game').disabled=false;document.querySelector('#new-game').focus();
+  showMainMenu(){this.refreshContinue();this.scene=null;this.main.hidden=false;document.body.classList.remove('in-game');document.querySelector('main').inert=true;document.querySelector('#new-game').disabled=false;document.querySelector('#main-load-game').disabled=false;const editorButton=document.querySelector('#main-world-editor');if(editorButton)editorButton.disabled=false;this.worldEditor?.close();document.querySelector('#new-game').focus();
     if(this.pendingSetup){this.pendingSetup=false;this.main.hidden=true;this.setup.open();}}
   // Opens Game Setup from anywhere. A running game is stopped first; nothing is saved or deleted.
   openNewGameSetup(){
@@ -62,6 +76,8 @@ export class GameApplication {
   }
   // Getting started opens once for a New Game started from the setup (onStart); loads and scripted restarts never open it.
   start(state=null,settings){
+    // The ground look: a loaded game keeps the one in its save; a new game takes this browser's World Editor look.
+    setGroundOverride(state?state.groundLook??null:activeGroundLook(this.storage));
     this.archive.close(false);
     this.changelog.close(false);
     this.setup.close();
@@ -74,7 +90,7 @@ export class GameApplication {
     this.autosave.reset();if(this.pendingGettingStarted){this.pendingGettingStarted=false;if(!scene.tutorial?.start())scene.gettingStarted?.show();}else scene.tutorial?.resume();}
   labelAutosaveIntervals(){for(const option of document.querySelectorAll('#autosave-interval option'))option.textContent=t('autosave.interval',{count:Number(option.value)/60000});}
   // A language switch re-renders the texts built in code; static markup is handled by applyTranslations.
-  relabel(){for(const select of this.languageSelects)select.value=language();this.labelAutosaveIntervals();this.autosaveStatus(this.autosaveFailure);this.setup?.refresh();this.saveMenu.relabel();this.changelog?.relabel?.();this.archive?.relabel?.();this.scene?.relabelUI?.();}
+  relabel(){for(const select of this.languageSelects)select.value=language();this.labelAutosaveIntervals();this.autosaveStatus(this.autosaveFailure);this.setup?.refresh();this.worldEditor?.relabel();this.saveMenu.relabel();this.changelog?.relabel?.();this.archive?.relabel?.();this.scene?.relabelUI?.();}
   // The last successful Autosave stays visible; a failure is announced once per streak.
   autosaveStatus(status=null){
     const output=document.querySelector('#autosave-status');if(!output)return;
