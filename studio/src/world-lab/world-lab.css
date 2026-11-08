@@ -66,3 +66,6 @@
 .wl-ground-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 6px 14px; }
 .wl-ground-grid h5 { grid-column: 1 / -1; margin: 4px 0 0; font-size: 13px; }
 .wl-ground-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.wl-year input[type=range] { width: 260px; }
+.wl-pair { display: grid; gap: 2px; padding: 4px 6px; border: 1px solid var(--line, #444); border-radius: 6px; }
+.wl-alpha { opacity: .85; }

@@ -7,13 +7,18 @@
 // - No baked shading: light and shadows come from the lighting, not from the ground texture.
 // Only grass tiles are painted this way; water, sand and the other grounds keep their tiles in the prototype.
 
-export const GROUND_DEFAULTS = Object.freeze({
+const GROUND_DEFAULTS_ALPHA = {};
+export const GROUND_DEFAULTS_BASE = {
   patchSize: 18, patchStrength: 0.16, edgeWidth: 1.6, blend: 1.2, detail: 0.22, speckles: 1,
   flowersSmall: 0.6, flowersLarge: 0.25, thistles: 0.15, shrubs: 0.12, tuftGreen: 0.5, tuftDry: 0.3, tuftDark: 0.2, plantSize: 1,
-  zoneColors: ['#689640', '#4a8834', '#8c9650', '#62763e', '#649642', '#76845a'],
-  time: 'day', season: 'summer', weather: 'clear',
-});
-export const ZONE_NAMES = ['Meadow', 'Lush grass', 'Dry grass', 'Forest floor', 'Flowery', 'Stony'];
+  pebbles: 0.4, gravel: 0.2, stones: 0.12, flatStones: 0.06,
+  shoreCurve: 0.6, shoreFoam: 0.5, wetBank: 0.5, ripples: 0.5, depthBlend: 1,
+  waterColors: ['#8cb4a0', '#60aac0', '#2c6894'],
+  zoneColors: ['#689640', '#4a8834', '#8c9650', '#62763e', '#649642', '#76845a', '#d6c38c', '#dcbf7e', '#7a5f43', '#9a958a'],
+  time: 'day', season: 'summer', year: 0.5, weather: 'clear',
+};
+export const WATER_NAMES = ['Ford', 'Shallow water', 'Deep water'];
+export const ZONE_NAMES = ['Meadow', 'Lush grass', 'Dry grass', 'Forest floor', 'Flowery', 'Stony', 'Beach sand', 'Desert sand', 'Mud bank', 'Shore rocks'];
 export const TIMES = [['dawn', 'Dawn'], ['day', 'Day'], ['dusk', 'Dusk'], ['night', 'Night']];
 export const SEASONS = [['spring', 'Spring'], ['summer', 'Summer'], ['autumn', 'Autumn'], ['winter', 'Winter']];
 export const WEATHERS = [['clear', 'Clear'], ['overcast', 'Overcast'], ['rain', 'Rain'], ['fog', 'Fog'], ['snow', 'Snow']];
@@ -32,10 +37,50 @@ export const GROUND_SETTINGS = [
   { key: 'tuftDry', label: 'Tall grass – dry', min: 0, max: 2, step: 0.05, group: 'plants' },
   { key: 'tuftDark', label: 'Tall grass – dark sedge', min: 0, max: 2, step: 0.05, group: 'plants' },
   { key: 'plantSize', label: 'Plant size', min: 0.6, max: 1.6, step: 0.05, group: 'plants' },
+  { key: 'shoreCurve', label: 'Shore curve', min: 0, max: 1, step: 0.05, group: 'water' },
+  { key: 'shoreFoam', label: 'Foam at the shore', min: 0, max: 1, step: 0.05, group: 'water' },
+  { key: 'wetBank', label: 'Wet bank', min: 0, max: 1, step: 0.05, group: 'water' },
+  { key: 'depthBlend', label: 'Shallow → deep transition', min: 0.2, max: 2, step: 0.05, group: 'water' },
+  { key: 'ripples', label: 'Ripples', min: 0, max: 1, step: 0.05, group: 'water' },
+  { key: 'pebbles', label: 'Pebbles', min: 0, max: 2, step: 0.05, group: 'stones' },
+  { key: 'gravel', label: 'Gravel patches', min: 0, max: 2, step: 0.05, group: 'stones' },
+  { key: 'stones', label: 'Stones', min: 0, max: 2, step: 0.05, group: 'stones' },
+  { key: 'flatStones', label: 'Large flat stones', min: 0, max: 2, step: 0.05, group: 'stones' },
 ];
+// Every plant and stone kind also has its own opacity ("sink it into the ground"): key <kind>Alpha, 0.1–1.
+export const OBJECT_KINDS = ['flowersSmall', 'flowersLarge', 'thistles', 'shrubs', 'tuftGreen', 'tuftDry', 'tuftDark', 'pebbles', 'gravel', 'stones', 'flatStones'];
+for (const kind of OBJECT_KINDS) GROUND_DEFAULTS_ALPHA[`${kind}Alpha`] = 1;
+export const GROUND_DEFAULTS = Object.freeze({ ...GROUND_DEFAULTS_BASE, ...GROUND_DEFAULTS_ALPHA });
 const hex = c => [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)];
 // Season shift of the grass colour: [multiply r, g, b] then mix towards a tint.
 const SEASON = { spring: { mul: [0.95, 1.06, 0.92], tint: [150, 196, 90], mix: 0.08 }, summer: { mul: [1, 1, 1], tint: [0, 0, 0], mix: 0 }, autumn: { mul: [1.12, 0.92, 0.78], tint: [168, 132, 62], mix: 0.22 }, winter: { mul: [0.9, 0.9, 0.95], tint: [236, 240, 246], mix: 0.72 } };
+
+// The year as one continuous value 0–1 (0 = midwinter, 0.25 spring, 0.5 summer, 0.75 autumn).
+const SEASON_KEYS = ['winter', 'spring', 'summer', 'autumn'];
+export const seasonOf = year => SEASON_KEYS[Math.round(((year % 1) + 1) % 1 * 4) % 4];
+export const yearOf = season => ({ winter: 0, spring: 0.25, summer: 0.5, autumn: 0.75 })[season] ?? 0.5;
+function seasonLook(year) {
+  const t = ((year % 1) + 1) % 1 * 4, i = Math.floor(t) % 4, f = t - Math.floor(t), a = SEASON[SEASON_KEYS[i]], b = SEASON[SEASON_KEYS[(i + 1) % 4]];
+  const lerp = (x, y) => x + (y - x) * f, mixA = a.mix, mixB = b.mix, tintA = mixA ? a.tint : b.tint, tintB = mixB ? b.tint : a.tint;
+  return { mul: a.mul.map((v, k) => lerp(v, b.mul[k])), tint: tintA.map((v, k) => lerp(v, tintB[k])), mix: lerp(mixA, mixB), snow: SEASON_KEYS[i] === 'winter' ? 1 - f : SEASON_KEYS[(i + 1) % 4] === 'winter' ? f : 0 };
+}
+// Growth (how many plants and how big) and wither (browning) over the year, per kind: [year, value] keys, cyclic.
+const CURVES = {
+  flowersSmall: { grow: [[0, 0], [0.22, 0], [0.38, 0.6], [0.5, 1], [0.62, 0.7], [0.74, 0.1], [0.8, 0]], wither: [[0, 1], [0.3, 0], [0.55, 0], [0.75, 1]] },
+  flowersLarge: { grow: [[0, 0], [0.28, 0], [0.42, 0.5], [0.52, 1], [0.64, 0.6], [0.76, 0]], wither: [[0, 1], [0.35, 0], [0.58, 0], [0.76, 1]] },
+  thistles: { grow: [[0, 0.35], [0.25, 0.1], [0.42, 0.5], [0.6, 1], [0.8, 0.8], [0.95, 0.5]], wither: [[0, 1], [0.3, 0.4], [0.45, 0], [0.62, 0], [0.82, 1]] },
+  shrubs: { grow: [[0, 1], [1, 1]], wither: [[0, 1], [0.25, 0.2], [0.35, 0], [0.62, 0], [0.8, 0.9]] },
+  tuftGreen: { grow: [[0, 0.3], [0.2, 0.25], [0.35, 0.7], [0.5, 1], [0.7, 0.9], [0.9, 0.5]], wither: [[0, 1], [0.25, 0.4], [0.35, 0], [0.62, 0], [0.85, 0.9]] },
+  tuftDry: { grow: [[0, 0.6], [0.3, 0.3], [0.5, 0.7], [0.65, 1], [0.85, 0.9]], wither: [[0, 1], [1, 1]] },
+  pebbles: { grow: [[0, 1], [1, 1]], wither: [[0, 0], [1, 0]] }, gravel: { grow: [[0, 1], [1, 1]], wither: [[0, 0], [1, 0]] }, stones: { grow: [[0, 1], [1, 1]], wither: [[0, 0], [1, 0]] }, flatStones: { grow: [[0, 1], [1, 1]], wither: [[0, 0], [1, 0]] },
+  tuftDark: { grow: [[0, 0.5], [0.3, 0.6], [0.5, 1], [0.8, 0.9]], wither: [[0, 0.8], [0.3, 0.2], [0.45, 0], [0.7, 0.1], [0.9, 0.6]] },
+};
+function curve(keys, year) {
+  const t = ((year % 1) + 1) % 1, ks = [...keys, [keys[0][0] + 1, keys[0][1]]];
+  for (let i = 0; i < ks.length - 1; i++) { const [a, va] = ks[i], [b, vb] = ks[i + 1]; if (t >= a && t <= b) return va + (vb - va) * smooth((t - a) / Math.max(1e-6, b - a)); }
+  return keys[keys.length - 1][1];
+}
+const mixHex = (a, b, t) => { const A = hex(a), B = hex(b); return `rgb(${A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(' ')})`; };
 
 // Zones as in worldTerrain (0 meadow, 1 lush, 2 dry, 3 forest floor, 4 flowers, 5 stony): base colour and speckles.
 const ZONES = [
@@ -45,6 +90,11 @@ const ZONES = [
   { base: [98, 118, 62], speck: [[118, 86, 52], 0.014] },
   { base: [100, 150, 66], speck: [[236, 228, 236], 0.012], speck2: [[226, 112, 140], 0.006], speck3: [[238, 206, 82], 0.006] },
   { base: [118, 132, 90], speck: [[156, 154, 146], 0.02] },
+  // Other land (plan g-souvisla-zeme, round 5): painted the same way, blending with the grass; water stays tiles.
+  { base: [214, 195, 140], speck: [[176, 160, 120], 0.03], speck2: [[240, 230, 200], 0.02], detail: 0.45 },
+  { base: [220, 191, 126], speck: [[190, 160, 100], 0.02], detail: 0.5 },
+  { base: [122, 95, 67], speck: [[92, 72, 52], 0.04], speck2: [[150, 128, 96], 0.02], detail: 0.8 },
+  { base: [154, 149, 138], speck: [[120, 116, 108], 0.08], speck2: [[186, 182, 172], 0.05], detail: 1.2 },
 ];
 
 const hash = (x, y, s = 0) => { let h = (x * 374761393 + y * 668265263 + s * 2246822519) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
@@ -75,14 +125,27 @@ function detail() {
   return (detailField = f);
 }
 
-// Paints the grass of the iso window into `ctx`. `isGrass(x, y)` and `zoneAt(x, y)` read the world; `toWorld(px, py)`
+// Paints the land (grass zones and the other land grounds) of the iso window into `ctx`. `isGrass(x, y)` and `zoneAt(x, y)` read the world; `toWorld(px, py)`
 // turns a canvas pixel into a map position (tile x, y as floats).
-export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zoneAt, settings = GROUND_DEFAULTS }) {
+// Water: how wet a map position is (0 dry … 1 wet), bilinear over tile centres of the water tiles at a slightly
+// warped position, so the shoreline is one smooth, sharp curve instead of tile steps.
+export function wetness(fx, fy, depthAt, settings = GROUND_DEFAULTS) {
+  const c = settings.shoreCurve ?? GROUND_DEFAULTS.shoreCurve, wx = fx - 0.5 + (fbm(fx * 0.6, fy * 0.6, 41) - 0.5) * c * 0.6, wy = fy - 0.5 + (fbm(fx * 0.6, fy * 0.6, 43) - 0.5) * c * 0.6;
+  const ix = Math.floor(wx), iy = Math.floor(wy), ax = smooth(wx - ix), ay = smooth(wy - iy), wet = (x, y) => (depthAt(x, y) >= 0 ? 1 : 0);
+  return wet(ix, iy) * (1 - ax) * (1 - ay) + wet(ix + 1, iy) * ax * (1 - ay) + wet(ix, iy + 1) * (1 - ax) * ay + wet(ix + 1, iy + 1) * ax * ay;
+}
+export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zoneAt, depthAt = () => -1, inWorld = () => true, settings = GROUND_DEFAULTS }) {
   const s = { ...GROUND_DEFAULTS, ...settings }, img = ctx.getImageData(0, 0, width, height), out = img.data, field = detail();
-  const warpScale = 1 / 3.2, warp = s.edgeWidth, colors = (s.zoneColors ?? GROUND_DEFAULTS.zoneColors).map(hex), season = SEASON[s.season] ?? SEASON.summer;
+  const warpScale = 1 / 3.2, warp = s.edgeWidth, colors = GROUND_DEFAULTS_BASE.zoneColors.map((c, i) => hex(s.zoneColors?.[i] ?? c)), wcolors = GROUND_DEFAULTS_BASE.waterColors.map((c, i) => hex(s.waterColors?.[i] ?? c)), season = seasonLook(s.year ?? yearOf(s.season));
   for (let py = 0; py < height; py++) for (let px = 0; px < width; px++) {
     const [fx, fy] = toWorld(px + 0.5, py + 0.5), tx = Math.floor(fx), ty = Math.floor(fy);
-    if (!isGrass(tx, ty)) continue;
+    if (!inWorld(tx, ty)) continue;
+    const wetV = wetness(fx, fy, depthAt, s), o = (py * width + px) * 4;
+    if (wetV >= 0.5) { // water pixel
+      const [r, g, b] = waterColor(fx, fy, px, py, wetV, depthAt, s, wcolors, season);
+      out[o] = r; out[o + 1] = g; out[o + 2] = b; out[o + 3] = 255; continue;
+    }
+    if (!isGrass(tx, ty) && depthAt(tx, ty) < 0) continue; // not land, not water (should not happen)
     // Zone weights at a warped position: bilinear over the four nearest tile centres.
     const wx = fx + (fbm(fx * warpScale, fy * warpScale, 3) - 0.5) * warp * 2 - 0.5, wy = fy + (fbm(fx * warpScale, fy * warpScale, 7) - 0.5) * warp * 2 - 0.5;
     const ix = Math.floor(wx), iy = Math.floor(wy), ax = warp > 0 ? smooth(Math.min(1, Math.max(0, wx - ix))) : (wx - ix < 0.5 ? 0 : 1), ay = warp > 0 ? smooth(Math.min(1, Math.max(0, wy - iy))) : (wy - iy < 0.5 ? 0 : 1);
@@ -95,10 +158,15 @@ export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zo
       const cells = ox || oy ? [[kx, ky, (1 - bx) * (1 - by)], [kx + 1, ky, bx * (1 - by)], [kx, ky + 1, (1 - bx) * by], [kx + 1, ky + 1, bx * by]] : [[ix, iy, (1 - ax) * (1 - ay)], [ix + 1, iy, ax * (1 - ay)], [ix, iy + 1, (1 - ax) * ay], [ix + 1, iy + 1, ax * ay]];
       for (const [zx, zy, w0] of cells) {
         const w = w0 * rw; if (!w) continue;
+        if (!isGrass(zx, zy) && (isGrass(tx, ty) || total + w < 1e9)) { if (depthAt(zx, zy) >= 0) continue; }
         const zi = isGrass(zx, zy) ? zoneAt(zx, zy) : zoneAt(tx, ty), c = colors[zi] ?? colors[0];
         r += c[0] * w; g += c[1] * w; b += c[2] * w; total += w;
         if (w > best) { best = w; speckZone = ZONES[zi] ?? ZONES[0]; }
       }
+    }
+    if (!total) { // a dry pixel on a water tile with no land around in the samples: borrow the nearest land
+      let found = null; for (const [dx, dy] of [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]]) if (isGrass(tx + dx, ty + dy)) { found = zoneAt(tx + dx, ty + dy); break; }
+      const c = colors[found ?? 6]; r = c[0]; g = c[1]; b = c[2]; total = 1; speckZone = ZONES[found ?? 6];
     }
     r /= total; g /= total; b /= total;
     // Large patches: lusher / drier / darker in places.
@@ -106,35 +174,59 @@ export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zo
     const light = 1 + p1 * s.patchStrength * 2.2, dry = Math.max(0, p2) * s.patchStrength * 1.6;
     r = r * light + dry * 70; g = g * light + dry * 30; b = b * light - dry * 10;
     // Fine detail in world space (anchored to the canvas pixel grid, which is a fixed linear map of the world).
-    const d = field[((py % DH) * DW) + (px % DW)] * s.detail;
+    const d = field[((py % DH) * DW) + (px % DW)] * s.detail * (speckZone.detail ?? 1);
     r *= 1 + d; g *= 1 + d; b *= 1 + d * 0.8;
     // Season: shift the colour; winter snow lies thinner where the patch noise is low.
     r *= season.mul[0]; g *= season.mul[1]; b *= season.mul[2];
-    if (season.mix) { const m = s.season === 'winter' ? Math.min(1, season.mix + p1 * 0.9 + d * 0.4) : season.mix; r += (season.tint[0] - r) * m; g += (season.tint[1] - g) * m; b += (season.tint[2] - b) * m; }
+    if (season.mix) { const m = season.snow > 0 ? Math.max(0, Math.min(1, season.mix + (p1 * 0.9 + d * 0.4) * season.snow)) : season.mix; r += (season.tint[0] - r) * m; g += (season.tint[1] - g) * m; b += (season.tint[2] - b) * m; }
     // Speckles: flowers, straws, pebbles, fallen leaves of the dominant zone.
-    if (s.speckles > 0 && s.season !== 'winter') for (const sp of [speckZone.speck, speckZone.speck2, speckZone.speck3]) {
+    if (s.speckles > 0 && season.snow < 0.5) for (const sp of [speckZone.speck, speckZone.speck2, speckZone.speck3]) {
       if (sp && hash(px >> 1, py >> 1, sp[0][0]) < sp[1] * s.speckles) { [r, g, b] = sp[0]; break; }
     }
-    const o = (py * width + px) * 4;
+    // Wet bank: a darker band on the land side of the shoreline.
+    if (wetV > 0.3 && s.wetBank > 0) { const k = 1 - (wetV - 0.3) / 0.2 * 0.28 * s.wetBank; r *= k; g *= k; b *= k * 1.02; }
     out[o] = r; out[o + 1] = g; out[o + 2] = b; out[o + 3] = 255;
   }
   ctx.putImageData(img, 0, 0);
 }
+// Water colour: ford → shallow → deep blended smoothly by depth, ripples, pebbles under a ford, foam at the shore.
+function waterColor(fx, fy, px, py, wetV, depthAt, s, wcolors, season) {
+  const span = s.depthBlend;
+  // Depth sampled bilinearly over the water tiles only (land neighbours do not count), then blurred over a ring.
+  const sample = (x, y) => { const wx = x - 0.5, wy = y - 0.5, ix = Math.floor(wx), iy = Math.floor(wy), ax = smooth(wx - ix), ay = smooth(wy - iy); let d = 0, t = 0; for (const [cx, cy, w] of [[ix, iy, (1 - ax) * (1 - ay)], [ix + 1, iy, ax * (1 - ay)], [ix, iy + 1, (1 - ax) * ay], [ix + 1, iy + 1, ax * ay]]) { const v = depthAt(cx, cy); if (v >= 0 && w) { d += v * w; t += w; } } return t ? [d / t, t] : null; };
+  let acc = 0, n = 0;
+  for (const [dx, dy, w] of [[0, 0, 2], [span, 0, 1], [-span, 0, 1], [0, span, 1], [0, -span, 1], [span * 0.7, span * 0.7, 1], [-span * 0.7, -span * 0.7, 1]]) { const v = sample(fx + dx, fy + dy); if (v) { acc += v[0] * w; n += w; } }
+  let depth = n ? acc / n : 0.5;
+  depth = Math.min(1, Math.max(0, depth + (fbm(fx * 0.5, fy * 0.5, 61) - 0.5) * 0.25));
+  const [f, sh, dp] = wcolors, t = depth < 0.5 ? depth / 0.5 : (depth - 0.5) / 0.5, A = depth < 0.5 ? f : sh, B = depth < 0.5 ? sh : dp;
+  let r = A[0] + (B[0] - A[0]) * t, g = A[1] + (B[1] - A[1]) * t, b = A[2] + (B[2] - A[2]) * t;
+  // Pebbles seen through the ford.
+  if (depth < 0.35 && hash(px >> 1, py >> 1, 71) < 0.06 * (1 - depth / 0.35)) { r = r * 0.7 + 50; g = g * 0.7 + 46; b = b * 0.7 + 34; }
+  // Ripples: thin bright bands that wander with noise.
+  if (s.ripples > 0) { const band = Math.sin(fx * 4.3 + fy * 2.1 + fbm(fx * 0.9, fy * 0.9, 67) * 14 + fbm(fx * 3, fy * 3, 69) * 3); if (band > 0.94 && hash(px >> 2, py, 75) > 0.25) { const k = (band - 0.94) / 0.06 * 0.3 * s.ripples; r += (230 - r) * k; g += (240 - g) * k; b += (245 - b) * k; } }
+  // Foam right at the shoreline.
+  if (wetV < 0.6 && s.shoreFoam > 0) { const k = (1 - (wetV - 0.5) / 0.1) * 0.55 * s.shoreFoam * (0.6 + hash(px, py, 73) * 0.4); r += (236 - r) * k; g += (242 - g) * k; b += (244 - b) * k; }
+  // Winter: a light, icy tint on the water.
+  if (season.snow > 0) { const k = season.snow * 0.45; r += (205 - r) * k; g += (222 - g) * k; b += (232 - b) * k; }
+  return [r, g, b];
+}
 
 // ---------- plants on top of the ground ----------
 // Every grass tile gets a few hashed candidate spots; each kind keeps a spot with a chance set by its slider.
-const KINDS = ['flowersSmall', 'flowersLarge', 'thistles', 'shrubs', 'tuftGreen', 'tuftDry', 'tuftDark'];
-const PER_TILE = { flowersSmall: 1.2, flowersLarge: 0.35, thistles: 0.18, shrubs: 0.12, tuftGreen: 0.7, tuftDry: 0.45, tuftDark: 0.3 };
+const KINDS = OBJECT_KINDS;
+const PER_TILE = { flowersSmall: 1.2, flowersLarge: 0.35, thistles: 0.18, shrubs: 0.12, tuftGreen: 0.7, tuftDry: 0.45, tuftDark: 0.3, pebbles: 1.4, gravel: 0.3, stones: 0.35, flatStones: 0.12 };
 // Where each kind likes to grow (zone index → factor).
-const LIKES = { flowersSmall: [1, 0.7, 0.4, 0.3, 2.2, 0.5], flowersLarge: [1, 0.6, 0.3, 0.2, 2.4, 0.3], thistles: [0.6, 0.3, 1.8, 0.3, 0.5, 1.6], shrubs: [0.5, 0.8, 0.6, 2.2, 0.4, 1], tuftGreen: [1, 1.8, 0.4, 1, 0.8, 0.5], tuftDry: [0.6, 0.3, 2.2, 0.5, 0.5, 1.4], tuftDark: [0.5, 1.2, 0.3, 1.8, 0.4, 0.6] };
-export function plantsFor({ x0, y0, span, isGrass, zoneAt, settings = GROUND_DEFAULTS }) {
+const LIKES = { flowersSmall: [1, 0.7, 0.4, 0.3, 2.2, 0.5, 0, 0, 0.05, 0], flowersLarge: [1, 0.6, 0.3, 0.2, 2.4, 0.3, 0, 0, 0, 0], thistles: [0.6, 0.3, 1.8, 0.3, 0.5, 1.6, 0.2, 0.6, 0, 0.3], shrubs: [0.5, 0.8, 0.6, 2.2, 0.4, 1, 0.1, 0.2, 0.3, 0.4], tuftGreen: [1, 1.8, 0.4, 1, 0.8, 0.5, 0.1, 0, 0.6, 0.2], tuftDry: [0.6, 0.3, 2.2, 0.5, 0.5, 1.4, 0.5, 0.6, 0.2, 0.4], tuftDark: [0.5, 1.2, 0.3, 1.8, 0.4, 0.6, 0.2, 0, 1.8, 0.4], pebbles: [0.7, 0.4, 1.2, 0.8, 0.5, 2.6, 0.7, 1.2, 0.6, 3], gravel: [0.4, 0.2, 1, 0.5, 0.3, 2.8, 0.5, 0.8, 0.3, 3], stones: [0.5, 0.3, 1, 1, 0.3, 2.6, 0.3, 1, 0.4, 2.6], flatStones: [0.4, 0.3, 0.8, 1, 0.2, 2.4, 0.2, 0.6, 0.3, 2.4] };
+export function plantsFor({ x0, y0, span, isGrass, zoneAt, depthAt = () => -1, settings = GROUND_DEFAULTS }) {
   const s = { ...GROUND_DEFAULTS, ...settings }, out = [];
   for (let y = y0 - 2; y < y0 + span + 2; y++) for (let x = x0 - 2; x < x0 + span + 2; x++) {
     if (!isGrass(x, y)) continue;
     const z = zoneAt(x, y), edge = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => isGrass(x + dx, y + dy) && zoneAt(x + dx, y + dy) !== z) ? 1.6 : 1;
     KINDS.forEach((kind, k) => {
-      const want = (s[kind] ?? 0) * PER_TILE[kind] * LIKES[kind][z] * edge;
-      for (let n = 0; n < 3; n++) if (hash(x, y, 100 + k * 7 + n) < want / 3) out.push({ kind, fx: x + hash(x, y, 200 + k * 7 + n), fy: y + hash(x, y, 300 + k * 7 + n), size: s.plantSize * (0.7 + hash(x, y, 400 + k * 7 + n) * 0.6), seed: hash(x, y, 500 + k * 7 + n) });
+      const year = s.year ?? yearOf(s.season), growth = curve(CURVES[kind].grow, year), wither = curve(CURVES[kind].wither, year);
+      const want = (s[kind] ?? 0) * PER_TILE[kind] * LIKES[kind][z] * edge * growth;
+      // The same spot keeps its plant as the year turns: plants appear one by one as growth rises.
+      for (let n = 0; n < 3; n++) if (hash(x, y, 100 + k * 7 + n) < want / 3 && wetness(x + hash(x, y, 200 + k * 7 + n), y + hash(x, y, 300 + k * 7 + n), depthAt, s) < 0.4) out.push({ kind, fx: x + hash(x, y, 200 + k * 7 + n), fy: y + hash(x, y, 300 + k * 7 + n), size: s.plantSize * (0.7 + hash(x, y, 400 + k * 7 + n) * 0.6) * (0.45 + 0.55 * growth), seed: hash(x, y, 500 + k * 7 + n), alpha: s[`${kind}Alpha`] ?? 1, wither, snow: seasonLook(year).snow });
     });
   }
   return out;
@@ -142,16 +234,25 @@ export function plantsFor({ x0, y0, span, isGrass, zoneAt, settings = GROUND_DEF
 const FLOWER_COLORS = { spring: ['#f4f0f6', '#f2d24e', '#e88fb0', '#a8b8ee'], summer: ['#f4f0f6', '#f2d24e', '#d9534f', '#b48be0'], autumn: ['#e6b04a', '#c9773a', '#efe6d8'], winter: [] };
 // Draws one plant with its foot at (sx, sy); sizes are in screen pixels at zoom 1.
 export function drawPlant(ctx, p, sx, sy, season = 'summer') {
-  const k = p.size, rnd = i => hash(Math.floor(p.seed * 1e6), i, 77), winter = season === 'winter', autumn = season === 'autumn';
+  ctx.save(); ctx.globalAlpha = Math.max(0.05, Math.min(1, p.alpha ?? 1));
+  try { drawShape(ctx, p, sx, sy, season); } finally { ctx.restore(); }
+}
+function drawShape(ctx, p, sx, sy, season) {
+  const k = p.size, rnd = i => hash(Math.floor(p.seed * 1e6), i, 77), w = p.wither ?? 0, winter = (p.snow ?? 0) > 0.5, autumn = !winter && w > 0.5;
+  const brown = (c, amount = w) => mixHex(c, '#9a8650', amount), cols = (FLOWER_COLORS[season].length ? FLOWER_COLORS[season] : FLOWER_COLORS.autumn).map(c => brown(c, w * 0.8));
   const blades = (n, h, colors, spread) => { for (let i = 0; i < n; i++) { const a = (rnd(i) - 0.5) * spread, len = h * (0.6 + rnd(i + 20) * 0.5); ctx.strokeStyle = colors[i % colors.length]; ctx.lineWidth = 1.1; ctx.beginPath(); ctx.moveTo(sx + (rnd(i + 40) - 0.5) * 4 * k, sy); ctx.quadraticCurveTo(sx + a * len * 0.4, sy - len * 0.6, sx + a * len, sy - len); ctx.stroke(); } };
   switch (p.kind) {
-    case 'flowersSmall': { const cols = FLOWER_COLORS[season]; if (!cols.length) return; for (let i = 0; i < 3; i++) { const x = sx + (rnd(i) - 0.5) * 8 * k, y = sy + (rnd(i + 5) - 0.5) * 4 * k; ctx.fillStyle = '#3d6b2a'; ctx.fillRect(x, y - 3 * k, 1, 3 * k); ctx.fillStyle = cols[Math.floor(rnd(i + 9) * cols.length)]; ctx.fillRect(x - 1, y - 4 * k, 2.2, 2.2); } return; }
-    case 'flowersLarge': { const cols = FLOWER_COLORS[season]; if (!cols.length) return; ctx.strokeStyle = '#3a6427'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + (rnd(1) - 0.5) * 3, sy - 9 * k); ctx.stroke(); ctx.fillStyle = '#4b7a33'; ctx.beginPath(); ctx.ellipse(sx + 2, sy - 3 * k, 2.4 * k, 1.1 * k, -0.5, 0, Math.PI * 2); ctx.fill(); const c = cols[Math.floor(rnd(2) * cols.length)]; ctx.fillStyle = c; for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2; ctx.beginPath(); ctx.arc(sx + Math.cos(a) * 2.2 * k, sy - 9 * k + Math.sin(a) * 1.4 * k, 1.5 * k, 0, Math.PI * 2); ctx.fill(); } ctx.fillStyle = '#f0c63a'; ctx.beginPath(); ctx.arc(sx, sy - 9 * k, 1.1 * k, 0, Math.PI * 2); ctx.fill(); return; }
-    case 'thistles': { const stem = winter ? '#8a8270' : autumn ? '#8a7a4a' : '#5f7a46'; ctx.strokeStyle = stem; ctx.lineWidth = 1.3; for (let i = 0; i < 3; i++) { const tx = sx + (i - 1) * 3 * k, ty = sy - (10 + rnd(i) * 5) * k; ctx.beginPath(); ctx.moveTo(sx + (i - 1) * k, sy); ctx.lineTo(tx, ty); ctx.stroke(); ctx.fillStyle = stem; ctx.beginPath(); ctx.ellipse(tx, ty + 1.5 * k, 1.8 * k, 2.2 * k, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = winter ? '#d8d4cc' : autumn ? '#c9b8a0' : '#b06ac4'; ctx.beginPath(); ctx.ellipse(tx, ty - 0.5 * k, 1.9 * k, 1.4 * k, 0, 0, Math.PI * 2); ctx.fill(); } for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.moveTo(sx, sy - 3 * k); ctx.lineTo(sx + (i - 1.5) * 3 * k, sy - (4 + rnd(i + 3) * 3) * k); ctx.stroke(); } return; }
-    case 'shrubs': { const base = winter ? ['#5b5a4c', '#6b6a5c'] : autumn ? ['#8a6a2e', '#a3772c', '#6f5a2a'] : ['#3f6b2c', '#4f7d34', '#365d26']; ctx.fillStyle = 'rgb(0 0 0 / .18)'; ctx.beginPath(); ctx.ellipse(sx + 2 * k, sy + 1, 8 * k, 3 * k, 0, 0, Math.PI * 2); ctx.fill(); for (let i = 0; i < 6; i++) { ctx.fillStyle = base[i % base.length]; ctx.beginPath(); ctx.arc(sx + (rnd(i) - 0.5) * 10 * k, sy - (3 + rnd(i + 8) * 6) * k, (2.8 + rnd(i + 16) * 2) * k, 0, Math.PI * 2); ctx.fill(); } if (winter) { ctx.fillStyle = '#eef2f6'; ctx.beginPath(); ctx.ellipse(sx, sy - 8 * k, 5 * k, 2 * k, 0, 0, Math.PI * 2); ctx.fill(); } return; }
-    case 'tuftGreen': return blades(9, 12 * k, winter ? ['#8c8a70', '#a19c80'] : autumn ? ['#8f9a4a', '#a59a4e'] : ['#4f8a34', '#62a03e', '#3e7428'], 1.1);
+    case 'flowersSmall': { if (w > 0.85) return; for (let i = 0; i < 3; i++) { const x = sx + (rnd(i) - 0.5) * 8 * k, y = sy + (rnd(i + 5) - 0.5) * 4 * k; ctx.fillStyle = brown('#3d6b2a'); ctx.fillRect(x, y - 3 * k, 1, 3 * k); ctx.fillStyle = cols[Math.floor(rnd(i + 9) * cols.length)]; ctx.fillRect(x - 1, y - 4 * k, 2.2, 2.2); } return; }
+    case 'flowersLarge': { if (w > 0.9) return; ctx.strokeStyle = brown('#3a6427'); ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + (rnd(1) - 0.5) * 3, sy - 9 * k); ctx.stroke(); ctx.fillStyle = brown('#4b7a33'); ctx.beginPath(); ctx.ellipse(sx + 2, sy - 3 * k, 2.4 * k, 1.1 * k, -0.5, 0, Math.PI * 2); ctx.fill(); const c = cols[Math.floor(rnd(2) * cols.length)]; ctx.fillStyle = c; for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2; ctx.beginPath(); ctx.arc(sx + Math.cos(a) * 2.2 * k, sy - 9 * k + Math.sin(a) * 1.4 * k, 1.5 * k, 0, Math.PI * 2); ctx.fill(); } ctx.fillStyle = brown('#f0c63a'); ctx.beginPath(); ctx.arc(sx, sy - 9 * k, 1.1 * k, 0, Math.PI * 2); ctx.fill(); return; }
+    case 'thistles': { const stem = winter ? '#8a8270' : brown('#5f7a46'); ctx.strokeStyle = stem; ctx.lineWidth = 1.3; for (let i = 0; i < 3; i++) { const tx = sx + (i - 1) * 3 * k, ty = sy - (10 + rnd(i) * 5) * k; ctx.beginPath(); ctx.moveTo(sx + (i - 1) * k, sy); ctx.lineTo(tx, ty); ctx.stroke(); ctx.fillStyle = stem; ctx.beginPath(); ctx.ellipse(tx, ty + 1.5 * k, 1.8 * k, 2.2 * k, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = winter ? '#d8d4cc' : mixHex('#b06ac4', '#c9b8a0', w); ctx.beginPath(); ctx.ellipse(tx, ty - 0.5 * k, 1.9 * k, 1.4 * k, 0, 0, Math.PI * 2); ctx.fill(); } for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.moveTo(sx, sy - 3 * k); ctx.lineTo(sx + (i - 1.5) * 3 * k, sy - (4 + rnd(i + 3) * 3) * k); ctx.stroke(); } return; }
+    case 'shrubs': { const base = winter ? ['#5b5a4c', '#6b6a5c'] : ['#3f6b2c', '#4f7d34', '#365d26'].map((c, i) => mixHex(c, ['#8a6a2e', '#a3772c', '#6f5a2a'][i], w)); ctx.fillStyle = 'rgb(0 0 0 / .18)'; ctx.beginPath(); ctx.ellipse(sx + 2 * k, sy + 1, 8 * k, 3 * k, 0, 0, Math.PI * 2); ctx.fill(); for (let i = 0; i < 6; i++) { ctx.fillStyle = base[i % base.length]; ctx.beginPath(); ctx.arc(sx + (rnd(i) - 0.5) * 10 * k, sy - (3 + rnd(i + 8) * 6) * k, (2.8 + rnd(i + 16) * 2) * k, 0, Math.PI * 2); ctx.fill(); } if (winter) { ctx.fillStyle = '#eef2f6'; ctx.beginPath(); ctx.ellipse(sx, sy - 8 * k, 5 * k, 2 * k, 0, 0, Math.PI * 2); ctx.fill(); } return; }
+    case 'tuftGreen': return blades(9, 12 * k, winter ? ['#8c8a70', '#a19c80'] : ['#4f8a34', '#62a03e', '#3e7428'].map(c => brown(c)), 1.1);
     case 'tuftDry': return blades(10, 13 * k, winter ? ['#b8ad8a', '#c9bf9c'] : ['#c2b268', '#d6c47a', '#a8964f'], 1.2);
-    case 'tuftDark': return blades(8, 15 * k, winter ? ['#6e6c5a'] : autumn ? ['#6a6a36', '#5a5a2e'] : ['#2f5a2a', '#3c6a30', '#2a4d24'], 0.7);
+    case 'pebbles': { for (let i = 0; i < 4; i++) { const x = sx + (rnd(i) - 0.5) * 10 * k, y = sy + (rnd(i + 4) - 0.5) * 5 * k, r = (0.9 + rnd(i + 8)) * k; ctx.fillStyle = ['#9a968c', '#b4afa2', '#85817a'][i % 3]; ctx.beginPath(); ctx.ellipse(x, y, r * 1.3, r * 0.8, 0, 0, Math.PI * 2); ctx.fill(); if (winter) { ctx.fillStyle = '#f2f5f8'; ctx.fillRect(x - r, y - r * 0.9, r * 2, r * 0.6); } } return; }
+    case 'gravel': { for (let i = 0; i < 14; i++) { const a = rnd(i) * Math.PI * 2, d = Math.sqrt(rnd(i + 20)) * 9 * k, x = sx + Math.cos(a) * d, y = sy + Math.sin(a) * d * 0.5; ctx.fillStyle = ['#a29d90', '#8b877d', '#bcb6a8', '#77736b'][i % 4]; ctx.fillRect(x, y, 1.6 * k, 1.1 * k); } return; }
+    case 'stones': { const r = (3 + rnd(1) * 2) * k; ctx.fillStyle = 'rgb(0 0 0 / .2)'; ctx.beginPath(); ctx.ellipse(sx + 1.5 * k, sy + 0.8 * k, r * 1.2, r * 0.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#8e8a80'; ctx.beginPath(); ctx.ellipse(sx, sy - r * 0.35, r, r * 0.7, rnd(2) - 0.5, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = winter ? '#f1f4f7' : '#aaa598'; ctx.beginPath(); ctx.ellipse(sx - r * 0.2, sy - r * 0.6, r * 0.6, r * 0.35, rnd(2) - 0.5, 0, Math.PI * 2); ctx.fill(); return; }
+    case 'flatStones': { const r = (6 + rnd(1) * 3) * k; ctx.fillStyle = 'rgb(0 0 0 / .15)'; ctx.beginPath(); ctx.ellipse(sx + k, sy + k, r * 1.05, r * 0.45, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#87837a'; ctx.beginPath(); ctx.ellipse(sx, sy, r, r * 0.42, rnd(3) * 0.4 - 0.2, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = winter ? '#eef2f6' : '#a19c90'; ctx.beginPath(); ctx.ellipse(sx - r * 0.1, sy - r * 0.08, r * 0.82, r * 0.3, rnd(3) * 0.4 - 0.2, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = 'rgb(60 58 52 / .35)'; ctx.lineWidth = 0.8; ctx.beginPath(); ctx.moveTo(sx - r * 0.3, sy - r * 0.15); ctx.lineTo(sx + r * 0.2, sy + r * 0.1); ctx.stroke(); return; }
+    case 'tuftDark': return blades(8, 15 * k, winter ? ['#6e6c5a'] : ['#2f5a2a', '#3c6a30', '#2a4d24'].map(c => brown(c, w * 0.7)), 0.7);
   }
 }
 
