@@ -391,13 +391,13 @@ test('the connected wall uses the approved wall kit: a block and one parapet per
   assert.equal(wall.visual.wallHeight, 68);
 });
 
-test('the merchant caravan uses the approved full and empty wagons byte for byte (the unloading look was rejected)', async () => {
-  const { APPROVED_CARAVAN_ART } = await import('../src/data/objects/approvedArt.js');
-  assert.deepEqual(Object.keys(APPROVED_CARAVAN_ART).sort(), ['empty', 'full']);
-  for (const [kind, art] of Object.entries(APPROVED_CARAVAN_ART)) {
-    const meta = json(art.artSource);assert.equal(approvals.assets[meta.assetId].variants[meta.variantId]?.status, 'approved', kind);
-    assert.ok(readFileSync(path.join(root, `public${art.sprite}`)).equals(readFileSync(path.join(root, `art/sprites/${meta.assetId}/${meta.variantId}.v${meta.version}.png`))), kind);
+test('the merchant caravan uses the approved styles byte for byte (plan m-nasadit-schvalenou-grafiku)', async () => {
+  const { APPROVED_DEPLOY_ART } = await import('../src/data/objects/approvedDeployArt.js');
+  assert.deepEqual(Object.keys(APPROVED_DEPLOY_ART.caravan).sort(), ['house', 'pair', 'plain', 'striped']);
+  for (const [style, states] of Object.entries(APPROVED_DEPLOY_ART.caravan)) for (const [state, art] of Object.entries(states)) {
+    const meta = json(art.artSource);assert.equal(approvals.assets[meta.assetId].variants[meta.variantId]?.status, 'approved', `${style} ${state}`);
+    assert.equal(approvals.assets[meta.assetId].variants[meta.variantId].version, meta.version, `${style} ${state}: the approved version`);
+    assert.ok(readFileSync(path.join(root, `public${art.src}`)).equals(readFileSync(path.join(root, `art/sprites/${meta.assetId}/${meta.variantId}.v${meta.version}.png`))), `${style} ${state}`);
     assert.deepEqual(art.origin, meta.origin);
   }
-  assert.equal(approvals.assets['merchant-caravan'].variants['merchant-caravan-unloading'], undefined, 'the rejected unloading look is deleted');
 });

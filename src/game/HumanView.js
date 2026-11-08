@@ -5,6 +5,7 @@ import { HUMAN_APPEARANCE as COLORS } from '../data/humanAppearance.js';
 import { APPROVED_VILLAGER_ART,PROFESSION_LOOKS,FACING_INDEX,villagerSex,walkFrame,walkKey,hasWalk } from '../data/objects/approvedArt.js';
 import { assetURL } from '../systems/AssetManager.js';
 import { MOVEMENT_SPEED_SCALE } from '../data/movement.js';
+import { FishingAnimator,fishingFrame,fishingSheet,residentSeed } from './fishingAnim.js';
 
 // Approved villager looks load per look on first use (8 directions each).
 const lookKey=(look,k)=>`villager-art:${look}:${k}`;
@@ -85,6 +86,22 @@ export class HumanView extends Phaser.GameObjects.Container {
     this.seatedOn=true;this.setScale(1,.8);
     if(!this.nose){this.nose=this.scene.add.rectangle(2,-36,2,5,COLORS.armSkin).setVisible(false);this.add(this.nose);}
     this.seatPhase=((this.seatPhase??Math.random()*9000)+16)%9000;this.nose.setVisible(this.seatPhase<1200);
+  }
+  // m-animace-rybar: a Fisher at his spot plays the approved fishing loop (cast, sit-idle with twitches, bite → reel →
+  // store on each catch) facing the water. The sheet loads like the walk sheets; until it is in, or if it fails, the
+  // Fisher looks as before. Frames change only while he is on screen and in sight.
+  workerSex(){const w=this.getData?.('worker');return w?.identity?(w.identity.sex==='f'?'female':'male'):villagerSex(w?.name);}
+  setFishing(delta,info){
+    const sheet=info?fishingSheet(this.scene,this.workerSex()):null,art=sheet?.art,key=sheet?.key;
+    if(!sheet){this.fishAnimator?.reset();if(this.fishing){this.fishing=false;this.fishArt?.setVisible(false);this.applyArt();}return false;}
+    if(!this.fishAnimator||this.fishAnimator.art!==art)this.fishAnimator=new FishingAnimator(art,residentSeed(this.getData?.('worker')));
+    const state=this.fishAnimator.update(delta,info);
+    if(info.facing!=null&&info.facing!==this.fishFacing)this.fishFacing=info.facing;
+    if(!this.fishArt){this.fishArt=this.scene.add.image(0,0,key).setVisible(false);this.add(this.fishArt);}
+    this.fishing=true;for(const part of [this.shadow,this.leftLeg,this.rightLeg,this.body,...this.arms,this.art,this.tool,this.weapon])part.setVisible(false);
+    const view=this.scene.cameras?.main?.worldView,onScreen=!view||this.x>view.x-80&&this.x<view.right+80&&this.y>view.y-80&&this.y<view.bottom+120;
+    if(this.visible&&onScreen){const frame=fishingFrame(art,this.fishFacing??0,state.column);if(this.fishFrame!==frame||this.fishArt.texture.key!==key){this.fishFrame=frame;this.fishArt.setTexture(key,frame).setOrigin(art.origin.x,art.origin.y);}this.fishArt.setVisible(true);}
+    return true;
   }
   setCargo(cargo){this.cargoBundle.update(cargo);}
   // #58 C2: a small red "!" over a striking or leaving resident.

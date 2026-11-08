@@ -3,6 +3,8 @@ import { buildingDefinition } from '../game/buildings.js';
 import { wikiTopicForFeed } from '../data/wiki.js';
 import { wikiInfoButton } from './WikiPanel.js';
 import { deathCauseText } from './DangerMarks.js';
+import { feedIcon } from '../game/deployArt.js';
+import { assetURL } from '../systems/AssetManager.js';
 
 // #105: a short, fading feed of notable events above the minimap. It listens to the existing sources (seasons, the
 // GameActivityBus, the population and the food system) instead of keeping a second event queue. Lasting work problems
@@ -32,6 +34,10 @@ export class EventFeed {
     if(this.seen.has(key))return false;this.seen.add(key);
     const entry={key,text,important,expireAt:this.now()+(important?FEED.importantLifeMs:FEED.lifeMs),node:null};
     if(this.list){entry.node=this.list.ownerDocument.createElement('li');entry.node.className=`feed-entry${important?' important':''}`;entry.node.textContent=text;
+      // m-nasadit-schvalenou-grafiku: night lines (thieves, wolves, fire, unlit lights) lead with the approved badge.
+      const icon=feedIcon(key);if(icon){const base=this.scene.assets?.baseURL??import.meta.env?.BASE_URL??'/',img=this.list.ownerDocument.createElement('img');
+        img.className='feed-icon';img.alt='';img.width=img.height=18;img.src=assetURL(icon.png,base);img.srcset=`${assetURL(icon.png,base)} 1x, ${assetURL(icon.png2x,base)} 2x`;
+        img.onerror=()=>img.remove?.();entry.node.prepend?.(img,' ');}
       // m-wiki-napoveda: lines with a Wiki topic get a small "i".
       if(target){entry.node.classList.add('is-locatable');entry.node.tabIndex=0;entry.node.title=t('feed.locate');const go=e=>{if(e.target.closest?.('.wiki-info'))return;this.scene.focusOn?.(target);};entry.node.addEventListener('click',go);entry.node.addEventListener('keydown',e=>{if(e.key==='Enter')go(e);});}
       const topic=wikiTopicForFeed(key);if(topic&&this.scene.wikiPanel)entry.node.append(' ',wikiInfoButton(this.scene,topic,this.list.ownerDocument));

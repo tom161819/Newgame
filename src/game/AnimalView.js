@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { directionName,DIRECTION_POSES } from './directions.js';
 import { animalLook,ensureAnimalLook,applyAnimalArt } from './animalArt.js';
 import { MOVEMENT_SPEED_SCALE } from '../data/movement.js';
+import { wildLook,wildArt,wildPose,stillKey,APPROVED_DEPLOY_ART } from './deployArt.js';
 
 // Species drawn with an approved Studio look once it loads (m-zvirata-nahodny-vzhled); the others keep the drawing.
 const ART_SPECIES=new Set(['wolf']);
@@ -14,7 +15,7 @@ export class AnimalView extends Phaser.GameObjects.Container {
   }
   animate(delta,moving,direction){
     this.phase+=delta*0.012*(moving?MOVEMENT_SPEED_SCALE:1);this.facing=directionName(direction)??this.facing;this.isWalking=moving;
-    if(this.drawArt(delta,moving))return;
+    if(this.drawArt(delta,moving)||this.drawWildArt(delta,moving,direction))return;
     const pose=DIRECTION_POSES[this.facing],g=this.figure.clear(),v=this.definition.visual;
     const sx=pose.screenX,sy=pose.screenY,scale=v.bodyScale??1,stride=moving?Math.sin(this.phase)*3:0;
     g.fillStyle(0x26271b,0.3);g.fillEllipse(0,2,32*scale,13*scale);
@@ -50,6 +51,21 @@ export class AnimalView extends Phaser.GameObjects.Container {
     if(moving)this.walked+=delta;
     const on=applyAnimalArt(this.scene,this.art,look,{facing:this.facing,moving,walkedMs:this.walked,pose:animal.attackTarget?'attack':null});
     this.figure.setVisible(!on);if(on)this.figure.clear();return on;
+  }
+  // m-nasadit-schvalenou-grafiku: horses, deer, wild boars and hares (rabbits) show an approved still look picked by
+  // their id (single images facing the viewer's right, mirrored for left facings, a light bob while walking). The
+  // King's mount is the saddled bay. Without the art (loading or failed) the drawing above stays.
+  drawWildArt(delta,moving){
+    const species=this.definition.id;if(!APPROVED_DEPLOY_ART.wild[species])return false;
+    const animal=this.getData?.('animal'),ridden=!!this.ridden,lookId=ridden?'horse-bay':animal?wildLook(species,animal.id):null,look=wildArt(species,lookId);
+    if(!look){this.art?.setVisible(false);return false;}
+    const pose=wildPose(look,{attacking:!!animal?.attackTarget,moving,tamed:!!(animal&&this.scene.stables?.holds?.(animal)),ridden}),art=pose?look.poses[pose]:look,key=stillKey(this.scene,art);
+    if(!key){this.art?.setVisible(false);this.figure.setVisible(true);return false;}
+    if(!this.art){this.art=this.scene.add.image(0,0,key);this.add(this.art);}
+    const left=['S','SW','W','NW'].includes(this.facing);
+    this.art.setTexture(key).setOrigin(art.origin.x,art.origin.y).setFlipX(left).setVisible(true);
+    this.art.y=moving?-Math.abs(Math.sin(this.phase*.8))*1.5:0;this.wildArt=true;
+    this.figure.setVisible(false);this.figure.clear();return true;
   }
   containsPoint(worldX,worldY){
     const x=worldX-this.x,y=worldY-this.y,scale=this.definition.visual.bodyScale??1,pose=DIRECTION_POSES[this.facing];

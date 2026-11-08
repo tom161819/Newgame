@@ -1,15 +1,9 @@
 import { gridToWorld } from './isometric.js';
-import { APPROVED_CARAVAN_ART } from '../data/objects/approvedArt.js';
-import { assetURL } from '../systems/AssetManager.js';
+import { caravanArt,stillKey } from './deployArt.js';
 
-// The approved Studio wagon loads on first use; until then (or if it fails) the procedural wagon below is drawn.
-const artKey=kind=>`caravan-art:${kind}`;
-function ensureArt(scene){
-  if(scene.__caravanArt||!scene.load)return;scene.__caravanArt=true;let queued=0;
-  for(const [kind,art]of Object.entries(APPROVED_CARAVAN_ART))if(!scene.textures.exists(artKey(kind))){scene.load.image(artKey(kind),assetURL(art.sprite,scene.assets?.baseURL??import.meta.env?.BASE_URL??'/'));queued++;}
-  if(queued&&!scene.load.isLoading())scene.load.start();
-}
-
+// m-nasadit-schvalenou-grafiku: each caravan shows one of the approved styles (plain, striped, house, pair; picked by
+// its id): unloading while it trades where the style has that look, the bare wagon when it has no goods, otherwise
+// the full wagon. The art loads on first use; until then (or if it fails) the procedural wagon below is drawn.
 // Trade F1.2: provisional procedural merchant caravan (horse, wagon with a red canvas cover, merchant on the box) until the
 // Grafika task g-obchod-trziste-povoz delivers sprites. Full = goods on board (cover up), empty = bare wagon bed.
 const FULL='caravan-wagon-full',EMPTY='caravan-wagon-empty';
@@ -49,8 +43,8 @@ export class CaravanViews {
   update(){
     const s=this.scene,c=s.caravans?.active;
     if(!c){this.clear();return;}
-    ensureArt(s);const full=Object.values(c.stock).some(n=>n>0),kind=full?'full':'empty',art=s.textures?.exists?.(artKey(kind))?APPROVED_CARAVAN_ART[kind]:null;
-    const texture=art?artKey(kind):wagon(s,full?FULL:EMPTY,full);
+    const full=Object.values(c.stock).some(n=>n>0),wanted=caravanArt(c.id,{trading:c.phase==='trading',full}),key=stillKey(s,wanted),art=key?wanted:null;
+    const texture=art?key:wagon(s,full?FULL:EMPTY,full);
     if(!this.view||this.id!==c.id){this.clear();this.view=s.add.image(0,0,texture);this.view.caravanId=c.id;this.id=c.id;}
     if(this.view.texture.key!==texture)this.view.setTexture(texture);
     if(art)this.view.setOrigin(art.origin.x,art.origin.y);else this.view.setOrigin(.5,.82);

@@ -87,7 +87,7 @@ export class KingView extends Phaser.GameObjects.Container {
 
   setMounted(definition){
     this.mount?.destroy();this.mount=null;
-    if(definition){this.mount=new AnimalView(this.scene,0,0,definition);this.addAt(this.mount,1);}
+    if(definition){this.mount=new AnimalView(this.scene,0,0,definition);this.mount.ridden=true;this.addAt(this.mount,1);}
     this.shadow.setVisible(!definition);
   }
   setAttackPose(delta,active,direction){

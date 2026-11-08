@@ -9,6 +9,8 @@ import { memoryTexture } from './memoryTexture.js';
 import { MEMORY_DIRECTIONS } from '../systems/MapMemory.js';
 import { GROUND, GROUND_TERRAIN_IDS, BUSH_TYPES, GRASS_ZONE } from '../data/worldTerrain.js';
 import { PathV2Layer } from './PathV2Layer.js';
+import { APPROVED_DEPLOY_ART } from '../data/objects/approvedDeployArt.js';
+import { requestTexture } from './deployArt.js';
 
 const CHUNK_SIZE = 10;
 const TILE_BLEED = .8;
@@ -41,6 +43,14 @@ const ZONE_DECALS=[[['tuft',.3,[1,2]]],[['tuft',.5,[1,3]]],[['dryTuft',.3,[1,2]]
 // squares with interpolation), so river and lake edges run in curves instead of diamond steps. Fords count as water.
 const WATERY=new Set([GROUND.SHALLOW,GROUND.DEEP,GROUND.FORD]);
 const CORNER_TILES=[[[0,0],[-1,0],[0,-1],[-1,-1]],[[0,0],[0,-1],[1,0],[1,-1]],[[0,0],[1,0],[0,1],[1,1]],[[0,0],[0,1],[-1,0],[-1,1]]]; // top, right, bottom, left
+// m-nasadit-schvalenou-grafiku: the approved World v2 grass zones (four tiles per zone and season, one 256 × 32 strip
+// each) replace the provisional zone washes, and the marching-squares transition tiles (16 per pair, bit 0 top, 1 right,
+// 2 bottom, 3 left corner = the inner ground) draw summer shores. Ground refs of strip tiles are "key#frame".
+const ZONE_ART=['meadow','lush','dry','forest','flowers','stony'];
+const SEASON_ART={Spring:'spring',Summer:'summer',Autumn:'autumn',Winter:'winter'};
+const zoneStripKey=(zone,season)=>`ground-zone:${zone}:${season}`,transitionKey=pair=>`ground-transition:${pair}`;
+const SHORE_PAIRS={[GROUND.GRASS]:'water-grass',[GROUND.BEACH]:'water-sand',[GROUND.DESERT]:'water-sand',[GROUND.MUD]:'water-mud',[GROUND.SHORE_ROCKS]:'water-rocks'};
+export function transitionIndex(corners){return corners.reduce((n,v,i)=>n|(v>=.5?1<<i:0),0);}
 function terrainHash(x, y) { return ((Math.imul(x + 17, 374761393) ^ Math.imul(y + 29, 668265263)) >>> 0); }
 
 export class TerrainRenderer {
@@ -61,10 +71,79 @@ export class TerrainRenderer {
     this.groundKinds=GROUND_TERRAIN_IDS.map((id,code)=>code===GROUND.GRASS?null:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer)));
     this.bushSprites=new Map();this.bushPool=[];
     // #116: paths are drawn by the V2 renderer (the owner's pesinav2 style); N12 stays as a developer fallback.
-    this.pathStyle='v2';this.shoreStyle='round';this.v2=new PathV2Layer(this);
+    this.pathStyle='v2';this.shoreStyle='round';this.v2=new PathV2Layer(this);this.requestGroundArt();
     this.wearTextures=PATH_WEAR.terrainIds.map(id=>({key:assets?.hasTexture(id)?assets.textureKey(id):this.groundTextures[0].key,variants:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer))}));
   }
 
+  // Approved zone and transition strips load once; when they are in, every chunk is repainted with them.
+  requestGroundArt(){
+    const want=[];for(const zone of ZONE_ART)for(const [season,art] of Object.entries(APPROVED_DEPLOY_ART.zones?.[zone]??{}))want.push([zoneStripKey(zone,season),art.strip]);
+    for(const [pair,art] of Object.entries(APPROVED_DEPLOY_ART.transitions??{}))want.push([transitionKey(pair),art.strip]);
+    const pending=want.filter(([key,src])=>!requestTexture(this.scene,key,src,{frameWidth:64,frameHeight:32}));
+    if(pending.length&&this.scene.load?.once)this.scene.load.once('complete',()=>{if(!this.scene.sys?.isActive?.()&&this.scene.sys)return;this.repaintEverything();});
+  }
+  repaintEverything(){this.edgeCache?.clear();this.shoreCache?.clear();this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
+  // The grass tile ref of a zone in a season ("key#frame"), or null when that strip is not loaded.
+  zoneRef(x,y,season){
+    const zone=ZONE_ART[this.scene.grassZones?.[y]?.[x]],s=SEASON_ART[season],art=zone&&APPROVED_DEPLOY_ART.zones?.[zone]?.[s];if(!art)return null;
+    const key=zoneStripKey(zone,s);return this.scene.textures.exists?.(key)?`${key}#${terrainHash(x,y)%art.frames}`:null;
+  }
+  // A Phaser frame for a texture key or a "key#frame" ref.
+  frameOf(ref){if(!ref)return null;const i=ref.indexOf('#'),key=i<0?ref:ref.slice(0,i);if(!this.scene.textures.exists?.(key))return null;return this.scene.textures.get(key).get(i<0?undefined:Number(ref.slice(i+1)));}
+  // The approved transition tile for a pair and corner shares, with the game's own textures on both sides: each tile is
+  // the pair's outer ground (as in tile 0), its inner ground (as in tile 15) and the band between (foam, wet rim, dry
+  // grass). The pure outer and inner pixels are replaced by the textures this map draws there (zones, seasons), so the
+  // tiles never show a seam; only the band comes from the tile. Spring and summer only; null without the strip.
+  transitionTile(pair,corners,season,innerRef,outerRef){
+    if(typeof document==='undefined'||!['Spring','Summer'].includes(season)||!pair||!APPROVED_DEPLOY_ART.transitions?.[pair])return null;
+    const key=transitionKey(pair);if(!this.scene.textures.exists?.(key))return null;const index=transitionIndex(corners);
+    const inner=this.frameOf(innerRef),outer=this.frameOf(outerRef);if(!inner||!outer)return null;
+    const id=`${pair}|${index}|${innerRef}|${outerRef}`;this.shoreCache??=new Map();if(this.shoreCache.has(id))return this.shoreCache.get(id);
+    if(this.shoreCache.size>2400)this.shoreCache.clear();const masks=this.transitionMasks(pair,index);
+    const canvas=document.createElement('canvas');canvas.width=64;canvas.height=32;const c=canvas.getContext('2d');
+    const layer=(frame,mask)=>{const l=document.createElement('canvas');l.width=64;l.height=32;const g=l.getContext('2d');g.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,0,0,64,32);g.globalCompositeOperation='destination-in';g.drawImage(mask,0,0);return l;};
+    this.drawFrame(c,masks.tile,0,0);c.drawImage(layer(inner,masks.inner),0,0);c.drawImage(layer(outer,masks.outer),0,0);
+    this.shoreCache.set(id,canvas);return canvas;
+  }
+  // Masks of the pixels of a transition tile that are pure outer (equal to tile 0) or pure inner (equal to tile 15).
+  transitionMasks(pair,index){
+    this.transitionMaskCache??=new Map();const id=`${pair}|${index}`;if(this.transitionMaskCache.has(id))return this.transitionMaskCache.get(id);
+    const texture=this.scene.textures.get(transitionKey(pair)),read=i=>{const f=texture.get(i),cv=document.createElement('canvas');cv.width=64;cv.height=32;const g=cv.getContext('2d',{willReadFrequently:true});g.drawImage(f.source.image,f.cutX,f.cutY,f.cutWidth,f.cutHeight,0,0,64,32);return g.getImageData(0,0,64,32).data;};
+    const tile=read(index),zero=read(0),full=read(15),same=(a,b,i)=>Math.abs(a[i]-b[i])<=2&&Math.abs(a[i+1]-b[i+1])<=2&&Math.abs(a[i+2]-b[i+2])<=2;
+    const mask=test=>{const cv=document.createElement('canvas');cv.width=64;cv.height=32;const g=cv.getContext('2d'),img=g.createImageData(64,32);for(let i=0;i<img.data.length;i+=4)img.data[i+3]=tile[i+3]&&test(i)?255:0;g.putImageData(img,0,0);return cv;};
+    const out={tile:texture.get(index),inner:mask(i=>index===0?false:same(tile,full,i)),outer:mask(i=>index===15?false:same(tile,zero,i)&&!(index!==0&&same(tile,full,i)))};
+    this.transitionMaskCache.set(id,out);return out;
+  }
+  drawFrame(context,frame,left,top){context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,left,top,64,32);}
+  // Zone edges: every other zone among the four tiles at each corner of this tile is drawn over it through a bilinear
+  // mask of its corner shares (shared by the neighbours), so zones fade over about a tile instead of ending on a diamond.
+  blendZones(context,x,y,left,top,season){
+    const zones=this.scene.grassZones,own=zones?.[y]?.[x];if(own==null)return;
+    const zoneAt=(nx,ny)=>nx<0||ny<0||nx>=COLUMNS||ny>=ROWS||this.groundAt(nx,ny)!==GROUND.GRASS?own:zones[ny]?.[nx]??own;
+    const others=new Set();for(const list of CORNER_TILES)for(const [dx,dy] of list){const z=zoneAt(x+dx,y+dy);if(z!==own)others.add(z);}
+    for(const zone of others){
+      const corners=CORNER_TILES.map(list=>list.reduce((n,[dx,dy])=>n+(zoneAt(x+dx,y+dy)===zone?.25:0),0));
+      const s=SEASON_ART[season],art=APPROVED_DEPLOY_ART.zones?.[ZONE_ART[zone]]?.[s],key=zoneStripKey(ZONE_ART[zone],s);if(!art||!this.scene.textures.exists?.(key))continue;
+      const overlay=this.maskedOverlay(`${key}#${terrainHash(x,y)%art.frames}`,corners);if(overlay)context.drawImage(overlay,left,top);
+    }
+  }
+  blendMask(corners){
+    const id=corners.join(',');this.blendMasks??=new Map();if(this.blendMasks.has(id))return this.blendMasks.get(id);
+    const canvas=document.createElement('canvas');canvas.width=64;canvas.height=32;const c=canvas.getContext('2d'),image=c.createImageData(64,32),[tp,rt,bt,lf]=corners;
+    for(let py=0;py<32;py++)for(let px=0;px<64;px++){
+      const u=Math.max(0,Math.min(1,((py+.5)/16+(px+.5-32)/32)/2)),v=Math.max(0,Math.min(1,((py+.5)/16-(px+.5-32)/32)/2));
+      image.data[(py*64+px)*4+3]=Math.round((tp*(1-u)*(1-v)+rt*u*(1-v)+bt*u*v+lf*(1-u)*v)*255);
+    }
+    c.putImageData(image,0,0);this.blendMasks.set(id,canvas);return canvas;
+  }
+  maskedOverlay(ref,corners){
+    const frame=typeof document==='undefined'?null:this.frameOf(ref);if(!frame)return null;
+    const id=`${ref}|${corners.join(',')}|blend`;this.shoreCache??=new Map();if(this.shoreCache.has(id))return this.shoreCache.get(id);
+    if(this.shoreCache.size>2400)this.shoreCache.clear();
+    const canvas=document.createElement('canvas');canvas.width=64;canvas.height=32;const c=canvas.getContext('2d');
+    c.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,0,0,64,32);c.globalCompositeOperation='destination-in';c.drawImage(this.blendMask(corners),0,0);
+    this.shoreCache.set(id,canvas);return canvas;
+  }
   // A wear change can turn neighbours into (or out of) a trodden area, which reaches their own neighbours: repaint 5×5.
   setPathWear(system){this.wear=system;this.unsubscribeWear=system.subscribe(tile=>this.invalidateArea([tile],true,2));}
   // Developer switch (console mkDev.setPathRenderer('n12'|'v2')): repaint every chunk with the other path renderer.
@@ -172,15 +251,16 @@ export class TerrainRenderer {
   // Texture of a neighbour's ground as it would be drawn there (seasonal grass included).
   groundKey(x,y,ground,season){
     if(ground!==GROUND.GRASS){const keys=this.groundKinds[ground];return keys?.length?keys[terrainHash(x,y)%keys.length]:null;}
+    const zone=this.zoneRef(x,y,season);if(zone)return zone;
     const seasonal=this.seasonGrass[season],wear=this.wearTextures[0];
     if(season!=='Summer'&&seasonal?.length)return seasonal[terrainHash(x,y)%seasonal.length];
     return wear?.variants.length?wear.variants[terrainHash(x,y)%wear.variants.length]:null;
   }
   // The neighbour's texture faded towards this tile's centre: a 64 × 32 canvas per (texture, edge), cached.
   featheredEdge(key,edge){
-    if(typeof document==='undefined'||!key||!this.scene.textures.exists?.(key))return null;
+    const frame=typeof document==='undefined'?null:this.frameOf(key);if(!frame)return null;
     this.edgeCache??=new Map();const id=`${key}|${edge}`;if(this.edgeCache.has(id))return this.edgeCache.get(id);
-    const canvas=document.createElement('canvas');canvas.width=64;canvas.height=32;const c=canvas.getContext('2d'),frame=this.scene.textures.get(key).get();
+    const canvas=document.createElement('canvas');canvas.width=64;canvas.height=32;const c=canvas.getContext('2d');
     c.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,0,0,64,32);
     let gradient;
     if(edge>=4){const [cx,cy]=CORNERS[edge-4].at;c.translate(cx,cy);c.scale(2,1);gradient=c.createRadialGradient(0,0,0,0,0,FEATHER*.75);}
@@ -231,10 +311,10 @@ export class TerrainRenderer {
   }
   // The texture of the other side (land over a water tile, water over a land tile), clipped by the shore mask.
   shoreOverlay(key,corners,land){
-    if(typeof document==='undefined'||!key||!this.scene.textures.exists?.(key))return null;
+    const frame=typeof document==='undefined'?null:this.frameOf(key);if(!frame)return null;
     const id=`${key}|${corners.join(',')}|${land?1:0}`;this.shoreCache??=new Map();if(this.shoreCache.has(id))return this.shoreCache.get(id);
     if(this.shoreCache.size>2400)this.shoreCache.clear();
-    const canvas=document.createElement('canvas');canvas.width=64;canvas.height=32;const c=canvas.getContext('2d'),frame=this.scene.textures.get(key).get();
+    const canvas=document.createElement('canvas');canvas.width=64;canvas.height=32;const c=canvas.getContext('2d');
     c.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,0,0,64,32);c.globalCompositeOperation='destination-in';c.drawImage(this.shoreMask(corners,land),0,0);
     this.shoreCache.set(id,canvas);return canvas;
   }
@@ -249,6 +329,9 @@ export class TerrainRenderer {
     let best=null;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if((!dx&&!dy)||nx<0||ny<0||nx>=COLUMNS||ny>=ROWS)continue;const g=this.groundAt(nx,ny);if(WATERY.has(g)||(g===GROUND.GRASS)===grass)continue;
       const score=grass?(g===ground?0:5-GROUND_RANK[g]):1;if(!best||score>best.score)best={x:nx,y:ny,g,score};}
     if(!best)return false;
+    const bare=grass?best.g:ground,grassRef=grass?this.groundKey(x,y,GROUND.GRASS,season):this.groundKey(best.x,best.y,best.g,season),sandRef=grass?this.groundKey(best.x,best.y,best.g,season):this.groundKey(x,y,ground,season);
+    const tile=[GROUND.BEACH,GROUND.DESERT].includes(bare)?this.transitionTile('sand-grass',corners,season,grassRef,sandRef):null;
+    if(tile){context.drawImage(tile,left,top);return true;}
     const overlay=this.shoreOverlay(this.groundKey(best.x,best.y,best.g,season),corners,!grass);if(overlay)context.drawImage(overlay,left,top);
     return true;
   }
@@ -270,6 +353,8 @@ export class TerrainRenderer {
     let best=null;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if((!dx&&!dy)||nx<0||ny<0||nx>=COLUMNS||ny>=ROWS)continue;const g=this.groundAt(nx,ny);if(WATERY.has(g)===watery)continue;
       const score=watery?GROUND_RANK[g]:g===GROUND.SHALLOW?3:g===GROUND.FORD?2:1;if(!best||score>best.score)best={x:nx,y:ny,g,score};}
     if(!best)return false;
+    const landRef=watery?this.groundKey(best.x,best.y,best.g,season):this.groundKey(x,y,ground,season),waterRef=watery?this.groundKey(x,y,ground,season):this.groundKey(best.x,best.y,best.g,season);
+    const tile=this.transitionTile(SHORE_PAIRS[watery?best.g:ground],corners,season,landRef,waterRef);if(tile){context.drawImage(tile,left,top);return true;}
     const overlay=this.shoreOverlay(this.groundKey(best.x,best.y,best.g,season),corners,watery);if(overlay)context.drawImage(overlay,left,top);
     return true;
   }
@@ -345,8 +430,9 @@ export class TerrainRenderer {
             context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,point.x-left-32,point.y-origin.y-16,64,32);
             this.blendEdges(context,x,y,ground,point.x-left-32,point.y-origin.y-16,season);
             this.roundDeep(context,x,y,ground,point.x-left-32,point.y-origin.y-16,season);
-            this.roundBank(context,x,y,ground,point.x-left-32,point.y-origin.y-16,season);
+            // The shore first: an approved transition tile is opaque, the bank's grass then rounds off over it.
             this.roundShore(context,x,y,ground,point.x-left-32,point.y-origin.y-16,season);
+            this.roundBank(context,x,y,ground,point.x-left-32,point.y-origin.y-16,season);
             const winter=GROUND_WINTER[ground],mix=state===VISIBILITY.VISIBLE?this.seasonMix?.(x,y,season):null,amount=season==='Winter'?(mix?mix.amount:1):mix?.from==='Winter'?1-mix.amount:0;
             if(winter&&amount>0){context.globalCompositeOperation='source-atop';context.globalAlpha=amount;context.fillStyle=winter;polygon(TILE_BLEED);context.fill();context.globalAlpha=1;}
             context.globalCompositeOperation='source-over';
@@ -360,15 +446,17 @@ export class TerrainRenderer {
           const draw=key=>{const frame=this.scene.textures.get(key).get(key===entry.key?entry.frame:undefined);context.drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,point.x-left-32,point.y-origin.y-16,64,32);};
           const mix=state===VISIBILITY.VISIBLE?this.seasonMix?.(x,y,season):null;
           // Untouched grass shows the season's own tiles; during a transition the new season fades in over the old one.
-          const seasonal=season=>season==='Summer'?entry.key:this.seasonGrass[season]?.[terrainHash(x,y)%this.seasonGrass[season].length],grassSeason=wear&&seasonal(season)&&(!mix||seasonal(mix.from));
-          if(grassSeason&&mix){draw(seasonal(mix.from));context.globalAlpha=mix.amount;draw(seasonal(season));context.globalAlpha=1;}
-          else draw(grassSeason?seasonal(season):entry.key);
+          const zoned=!!this.zoneRef(x,y,season),seasonal=season=>zoned?this.zoneRef(x,y,season):season==='Summer'?entry.key:this.seasonGrass[season]?.[terrainHash(x,y)%this.seasonGrass[season].length],grassSeason=(zoned||wear)&&seasonal(season)&&(!mix||seasonal(mix.from));
+          const drawRef=ref=>{const frame=ref?.includes('#')?this.frameOf(ref):null;if(frame)this.drawFrame(context,frame,point.x-left-32,point.y-origin.y-16);else draw(ref);};
+          if(grassSeason&&mix){drawRef(seasonal(mix.from));context.globalAlpha=mix.amount;drawRef(seasonal(season));context.globalAlpha=1;}
+          else drawRef(grassSeason?seasonal(season):entry.key);
+          if(zoned)this.blendZones(context,x,y,point.x-left-32,point.y-origin.y-16,season);
           if(this.wear)paths.push({x,y,polygon,filter:context.filter,veil:mix?(mix.from==='Winter'?1-mix.amount:0)*.45+(season==='Winter'?mix.amount:0)*.45:season==='Winter'?.45:0});
           const tint=(mix&&mixTint(mix.from,season,mix.amount))??{Spring:'rgba(95,145,65,.08)',Summer:'rgba(185,159,70,.09)',Autumn:'rgba(158,105,45,.17)',Winter:'rgba(232,237,220,.83)'}[season];
           if(tint&&!grassSeason){context.globalCompositeOperation='source-atop';context.fillStyle=tint;polygon(TILE_BLEED);context.fill();}
-          const zoneTint=season==='Winter'?null:this.zoneTint(x,y);if(zoneTint){context.globalCompositeOperation='source-atop';context.fillStyle=zoneTint;polygon(TILE_BLEED);context.fill();}
+          const zoneTint=season==='Winter'||zoned?null:this.zoneTint(x,y);if(zoneTint){context.globalCompositeOperation='source-atop';context.fillStyle=zoneTint;polygon(TILE_BLEED);context.fill();}
           context.globalCompositeOperation='source-over';
-          const bank=this.roundBank(context,x,y,GROUND.GRASS,point.x-left-32,point.y-origin.y-16,season),shore=this.roundShore(context,x,y,GROUND.GRASS,point.x-left-32,point.y-origin.y-16,season);
+          const shore=this.roundShore(context,x,y,GROUND.GRASS,point.x-left-32,point.y-origin.y-16,season),bank=this.roundBank(context,x,y,GROUND.GRASS,point.x-left-32,point.y-origin.y-16,season);
           if(!bank&&!shore)this.paintDecals(context,x,y,point.x-left,point.y-origin.y,season,occupied);
           context.restore();
         }

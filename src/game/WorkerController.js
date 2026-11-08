@@ -4,6 +4,7 @@ import { createExperience } from '../data/experience.js';
 import { findPathToAny,canStep } from './pathfinding.js';
 import { language } from '../i18n/index.js';
 import { shortName,fullName } from '../data/names.js';
+import { fishingInfo } from './fishingAnim.js';
 
 export class WorkerController extends AnimalController {
   constructor(scene,definition,id,tile,view,name){
@@ -29,5 +30,6 @@ export class WorkerController extends AnimalController {
     this.path=[];this.aiCooldown=100+Math.floor(Math.random()*400);return false;
   }
   stop(){this.path=[];}
-  update(delta){super.update(delta);this.view.setWorkPose?.(delta,this.profession==='farmer'&&this.workState==='Working'&&!this.walking);this.view.setSeated?.(!!this.seated&&!this.walking);}
+  update(delta){super.update(delta);this.view.setWorkPose?.(delta,this.profession==='farmer'&&this.workState==='Working'&&!this.walking);this.view.setSeated?.(!!this.seated&&!this.walking);
+    if(this.profession==='fisher'||this.fishingView)this.fishingView=!!this.view.setFishing?.(delta,fishingInfo(this,this.scene));}
 }

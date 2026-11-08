@@ -5,6 +5,20 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.67.0] - 2026-11-08
+<!-- version: {"title":"Approved art","type":"feature","reconstructed":false,"saveVersion":59} -->
+### Added
+- The fisherman now plays the approved fishing animation: he casts, waits, twitches, then bites, reels and puts each fish in his basket.
+### Changed
+- The game now uses all graphics approved in the Studio:
+  - Horses come in 10 colours, the King's horse has a saddle and tamed horses wear a harness.
+  - Horse wagons and wheelbarrows show their cargo, and caravans come in 4 styles with an unloading look.
+  - Deer, boar and hares have new looks.
+  - Children have new looks and play poses.
+  - The world has new grass zones, shore ground and shore transitions.
+  - Fires use the Fire Lab flames.
+  - Night icons now appear over unlit lights and in the event feed.
+
 ## [0.66.0] - 2026-11-08
 <!-- version: {"title":"King skills","type":"feature","reconstructed":false,"saveVersion":59} -->
 ### Added

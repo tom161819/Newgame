@@ -23,9 +23,8 @@ export const APPROVED_BUILDING_ART=Object.freeze({
   wheelwright_workshop:{"sprite":"/assets/buildings/wheelwright_workshop/wheelwright-yard-shed.v2.png","artSource":"art/sprites/wheelwright-yard/wheelwright-yard-shed.v2.json","origin":{"x":0.47549,"y":0.98437},"visualHeight":126,"lights":[{"type":"torch","x":23.04,"y":-84.25,"color":"#ffb25a","radius":102.4,"intensity":0.95,"flicker":{"amplitude":0.12,"speed":7},"flameSize":1}]},
 });
 
-// Approved merchant caravan (Studio merchant-caravan, chosen 7 Nov): full = goods on board, empty = bare wagon bed. The
-// unloading look was rejected; the full wagon is used while unloading. Origin = the studio anchor (footprint centre).
-export const APPROVED_CARAVAN_ART=Object.freeze({"full":{"sprite":"/assets/vehicles/caravan/merchant-caravan-full.v1.png","artSource":"art/sprites/merchant-caravan/merchant-caravan-full.v1.json","origin":{"x":0.49618,"y":0.5641}},"empty":{"sprite":"/assets/vehicles/caravan/merchant-caravan-empty.v1.png","artSource":"art/sprites/merchant-caravan/merchant-caravan-empty.v1.json","origin":{"x":0.49618,"y":0.52778}}});
+// The merchant caravan styles (plain, striped, house, pair) are generated with the other approved art of plan
+// m-nasadit-schvalenou-grafiku: APPROVED_DEPLOY_ART.caravan in approvedDeployArt.js.
 
 // Approved tree art by growth look and season (origin = the studio anchor, the
 // tile centre where trees stand). TreeView picks one per stage, season and tile;

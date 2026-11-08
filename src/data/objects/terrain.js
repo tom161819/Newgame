@@ -1,3 +1,4 @@
+import { APPROVED_DEPLOY_ART } from './approvedDeployArt.js';
 // Approved Asset Studio art (art/approvals.json): grass-ground-lush for untouched
 // grass (four interchangeable tiles picked per tile) and worn-path-earth (Earth track) for the
 // trampled stages, with its connection-strip colours (metadata gameWear). The game draws the
@@ -29,15 +30,14 @@ const wildGround=[
 ].map(d=>({id:d.id,name:d.name,description:d.description,category:'terrain',sprite:groundTiles(d.folder,d.art)[0],spriteVariants:groundTiles(d.folder,d.art),
   artSource:`art/sprites/wild-ground/wild-ground-${d.art}.v1.json`,width:1,height:1,walkable:d.walkable??true,collectible:false,buildable:false,cost:{},interactions:[],
   renderMode:'sprite',origin:{x:.5,y:.5},visualHeight:0,depth:{offset:-100}}));
-// World v2 (generator 2): ford, mud and pebbly banks. Provisional tiles (derived from the approved sand and water)
-// until the Studio's World v2 textures (plan g-svet-textury) are approved; no artSource yet.
-const provisional=(folder,name)=>[0,1,2,3].map(i=>`/assets/terrain/${folder}/provisional-${name}.v0.tile-${i}.png`);
+// World v2 (generator 2): ford, mud and pebbly banks with the approved Studio shore-ground tiles (plan
+// m-nasadit-schvalenou-grafiku, art/sprites/shore-ground: ford, mud, rocks; four interchangeable tiles each).
 const worldV2Ground=[
-  {id:'ford_shallows',name:'Brod',description:'Mělčina s kameny přes řeku. Dá se přebrodit (pomaleji), nedá se na ní stavět ani dláždit.',tiles:provisional('water','ford')},
-  {id:'mud_bank',name:'Bahnitý břeh',description:'Hlinitý břeh u vody. Dá se po něm chodit i stavět, nic na něm neroste.',tiles:provisional('banks','mud')},
-  {id:'shore_rocks',name:'Kamenitý břeh',description:'Oblázky u vody. Dá se po nich chodit i stavět, nic na nich neroste.',tiles:provisional('banks','shore-rocks')},
-].map(d=>({id:d.id,name:d.name,description:d.description,category:'terrain',sprite:d.tiles[0],spriteVariants:d.tiles,provisional:true,
-  width:1,height:1,walkable:true,collectible:false,buildable:false,cost:{},interactions:[],renderMode:'sprite',origin:{x:.5,y:.5},visualHeight:0,depth:{offset:-100}}));
+  {id:'ford_shallows',name:'Brod',description:'Mělčina s kameny přes řeku. Dá se přebrodit (pomaleji), nedá se na ní stavět ani dláždit.'},
+  {id:'mud_bank',name:'Bahnitý břeh',description:'Hlinitý břeh u vody. Dá se po něm chodit i stavět, nic na něm neroste.'},
+  {id:'shore_rocks',name:'Kamenitý břeh',description:'Oblázky u vody. Dá se po nich chodit i stavět, nic na nich neroste.'},
+].map(d=>{const art=APPROVED_DEPLOY_ART.shore[d.id];return {id:d.id,name:d.name,description:d.description,category:'terrain',sprite:art.tiles[0],spriteVariants:art.tiles,artSource:art.artSource,
+  width:1,height:1,walkable:true,collectible:false,buildable:false,cost:{},interactions:[],renderMode:'sprite',origin:{x:.5,y:.5},visualHeight:0,depth:{offset:-100}};});
 export const terrain = [
   {
     id: 'grass', name: 'Tráva', category: 'terrain', sprite: '/assets/terrain/grass/grass.png',

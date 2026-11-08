@@ -1,4 +1,5 @@
 import { gridToWorld } from './isometric.js';
+import { APPROVED_DEPLOY_ART as ART,wagonVariant,barrowVariant,stillKey,facesLeft } from './deployArt.js';
 
 // S12: procedural Wheelbarrow (a clearly marked fallback until Asset Studio art is approved). A pushed one sits just
 // in front of its Hauler and turns with him; a parked one stands on its tile. Visible only where the player can see.
@@ -27,16 +28,24 @@ function texture(scene){
   g.generateTexture(KEY,48,32);g.destroy();return KEY;
 }
 export class VehicleViews {
-  constructor(scene){this.scene=scene;this.views=new Map();}
+  constructor(scene){this.scene=scene;this.views=new Map();this.facing=new Map();}
+  art(v){const cargo=v.state==='inUse'?this.scene.workerSystem?.workers?.get(v.operatorId)?.cargo:null;
+    if(v.type==='horse_wagon'){const k=wagonVariant(cargo,v.id);return k?ART.wagon[k]:null;}if(v.type==='wheelbarrow'){const k=barrowVariant(cargo);return k?ART.barrow[k]:null;}return null;}
   update(){
     const s=this.scene,system=s.vehicles;if(!system)return;const seen=new Set();
     for(const v of system.vehicles.values()){
       seen.add(v.id);let view=this.views.get(v.id);if(!view){view=s.add.image(0,0,textureFor(s,v.type)).setOrigin(.5,.8);this.views.set(v.id,view);}
       const p=system.position(v),ahead=p.direction?{x:p.x+p.direction.x*.45,y:p.y+p.direction.y*.45}:p,w=gridToWorld(ahead.x,ahead.y);
       const visible=!s.fog?.enabled||s.fog.isVisibleTile({x:Math.floor(p.x),y:Math.floor(p.y)});
-      view.setPosition(w.x,w.y).setDepth(w.y+.02).setVisible(visible).setFlipX(!!p.direction&&p.direction.x-p.direction.y<0);
+      // m-nasadit-schvalenou-grafiku: the approved wagon (horse in front, drawn at the standalone horse's size) or
+      // barrow with the operator's load; the drawing above stays while it loads or if it fails.
+      const art=visible?this.art(v):null,key=art&&stillKey(s,art);
+      if(key){if(view.texture.key!==key)view.setTexture(key);view.setOrigin(art.origin.x,art.origin.y);}
+      else{const fallback=textureFor(s,v.type);if(view.texture.key!==fallback)view.setTexture(fallback);view.setOrigin(.5,.8);}
+      view.setPosition(w.x,w.y).setDepth(w.y+.02).setVisible(visible).setFlipX(key?facesLeft(p.direction??this.facing.get(v.id)):!!p.direction&&p.direction.x-p.direction.y<0);
+      if(p.direction)this.facing.set(v.id,p.direction);
     }
-    for(const [id,view]of this.views)if(!seen.has(id)){view.destroy();this.views.delete(id);}
+    for(const [id,view]of this.views)if(!seen.has(id)){view.destroy();this.views.delete(id);this.facing.delete(id);}
   }
   destroy(){for(const v of this.views.values())v.destroy();this.views.clear();}
 }
