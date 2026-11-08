@@ -29,12 +29,18 @@ export class NightOverlay {
     this.dark.clear().fill(DAY_NIGHT.ambient.color,alpha);this.glow.clear();
     const hands=(this.scene.lightFuel?.handLights?.()??[]).map(h=>{const p=gridToWorld(h.x,h.y);return {x:p.x,y:p.y-30,radius:h.radius*DAY_NIGHT.pxPerTile,type:'torch'};});
     const lights=[...(this.scene.lightSources?.lights?.()??[]),...this.dayNight.houseWindows(),...hands,...(this.scene.fireViews?.lights?.()??[])],margin=200;
+    // performance-1: the additive glow is transparent outside its brushes, so only their box is drawn (the same pixels;
+    // without a GPU a full-screen additive blit cost ~4 ms a frame).
+    let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
     for(const l of lights){
       if(l.x<view.x-margin||l.x>view.right+margin||l.y<view.y-margin||l.y>view.bottom+margin)continue;
       const sx=(l.x-view.x)*zoom,sy=(l.y-view.y)*zoom,size=Math.max(24,l.radius*2.2*zoom)*(l.strength??1);
       this.brush.setDisplaySize(size,size*.8);this.dark.erase(this.brush,sx,sy);
       this.glowBrush.setDisplaySize(size*.9,size*.7).setAlpha(Math.min(1,alpha*1.4));this.glow.draw(this.glowBrush,sx,sy);
+      x0=Math.min(x0,sx-size*.45);x1=Math.max(x1,sx+size*.45);y0=Math.min(y0,sy-size*.35);y1=Math.max(y1,sy+size*.35);
     }
+    x0=Math.max(0,Math.floor(x0)-2);y0=Math.max(0,Math.floor(y0)-2);x1=Math.min(width,Math.ceil(x1)+2);y1=Math.min(height,Math.ceil(y1)+2);
+    if(x1>x0&&y1>y0)this.glow.setCrop(x0,y0,x1-x0,y1-y0);else this.glow.setVisible(false);
     // Phaser 4 buffers drawing commands: render them into the textures.
     this.dark.render();this.glow.render();
   }

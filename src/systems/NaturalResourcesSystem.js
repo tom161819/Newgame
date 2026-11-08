@@ -1,7 +1,7 @@
 import { isFertileGround } from '../data/worldTerrain.js';
 import { t } from '../i18n/index.js';
 import { FORESTRY,treeBlocks,treeState } from '../data/naturalResources.js';
-import { reachableTiles,findPathToAny } from '../game/pathfinding.js';
+import { reachableTiles,reachableCount,findPathToAny } from '../game/pathfinding.js';
 import { tileKey } from '../game/stones.js';
 import { buildingIsComplete,buildingDefinition } from '../game/buildings.js';
 import { ForestryWork } from './ForestryWork.js';
@@ -34,9 +34,10 @@ export class NaturalResourcesSystem {
   refreshMap(object){
     this.mining.restoreTiles(object.tiles);
   }
-  preservesRoutes(tile){
-    const s=this.scene,origins=this.origins(),before=reachableTiles(s.map,origins).length,old=s.map[tile.y][tile.x];if(old!==0)return false;s.map[tile.y][tile.x]=1;
-    const after=reachableTiles(s.map,origins).length;s.map[tile.y][tile.x]=old;return after===before-1;
+  // performance-1: `cache` (one growth pass) keeps the unchanged map's reachable count between the trees it checks.
+  preservesRoutes(tile,cache=null){
+    const s=this.scene,origins=this.origins(),old=s.map[tile.y][tile.x],before=cache?.before??reachableCount(s.map,origins);if(cache)cache.before=before;if(old!==0)return false;s.map[tile.y][tile.x]=1;
+    const after=reachableCount(s.map,origins);s.map[tile.y][tile.x]=old;return after===before-1;
   }
   // World v2: `weight(tile)` 0–1 (generator 2's forest weights) puts forests where the landscape wants them;
   // `start` {radius, trees} adds a grove near the castle when the start would have too few trees (fair start).
@@ -70,15 +71,16 @@ export class NaturalResourcesSystem {
     if(this.refreshElapsed+1e-7>=FORESTRY.refreshInterval){this.refreshElapsed=Math.max(0,this.refreshElapsed-FORESTRY.refreshInterval*Math.floor((this.refreshElapsed+1e-7)/FORESTRY.refreshInterval));this.flushGrowth();}
   }
   flushGrowth(){
-    const reserved=this.reserved();
+    // performance-1: building tiles and the reachable count are read once per pass (both change only with a stage).
+    const reserved=this.reserved(),built=new Set(),routes={};for(const b of this.scene.buildings)for(const t of b.tiles)built.add(tileKey(t));
     for(const object of this.byId.values()){
       if(!object.definition.tree)continue;
       const n=object.natural;n.ageDays+=Math.max(0,this.ageClock-n.ageCheckpoint);n.ageCheckpoint=this.ageClock;const growth=Math.max(0,this.growthClock-n.growthCheckpoint);n.growthCheckpoint=this.growthClock;
-      if(n.stage===3||this.occupiedByBuilding(object))continue;n.growthDays+=growth;
+      if(n.stage===3||built.has(tileKey(object)))continue;n.growthDays+=growth;
       while(n.stage<3&&n.growthDays+1e-9>=FORESTRY.stageDays[n.stage]){
         if(this.growthModifier()===0)break;
-        if(n.stage===2&&(reserved.has(tileKey(object))||this.scene.map[object.y][object.x]!==0||!this.preservesRoutes(object))){n.growthDays=FORESTRY.stageDays[n.stage];break;}
-        n.growthDays=Math.max(0,n.growthDays-FORESTRY.stageDays[n.stage]);n.stage++;if(n.stage===3)n.growthDays=0;this.refreshMap(object);this.view(object)?.setNaturalState?.(object);
+        if(n.stage===2&&(reserved.has(tileKey(object))||this.scene.map[object.y][object.x]!==0||!this.preservesRoutes(object,routes))){n.growthDays=FORESTRY.stageDays[n.stage];break;}
+        n.growthDays=Math.max(0,n.growthDays-FORESTRY.stageDays[n.stage]);n.stage++;if(n.stage===3)n.growthDays=0;this.refreshMap(object);this.view(object)?.setNaturalState?.(object);routes.before=undefined;
       }
     }
   }

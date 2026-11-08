@@ -1,0 +1,26 @@
+{
+  "note": "performance-1 after-measurement (headless Chrome, software rendering). FPS may drop at most 20 % below these.",
+  "renderer": "Canvas",
+  "scenarios": {
+    "start ×1": {
+      "fps": 52.4,
+      "frameMsAvg": 19.09,
+      "simMsAvg": 0.771
+    },
+    "village ×1": {
+      "fps": 31.7,
+      "frameMsAvg": 31.51,
+      "simMsAvg": 2.424
+    },
+    "village ×3": {
+      "fps": 28.5,
+      "frameMsAvg": 35.09,
+      "simMsAvg": 5.674
+    },
+    "night ×1": {
+      "fps": 25.6,
+      "frameMsAvg": 39.02,
+      "simMsAvg": 5.791
+    }
+  }
+}

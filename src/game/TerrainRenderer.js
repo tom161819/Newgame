@@ -15,6 +15,7 @@ import { APPROVED_DEPLOY_ART } from '../data/objects/approvedDeployArt.js';
 import { requestTexture } from './deployArt.js';
 import { paintContinuousGround, makeWaterField, plantsFor, waterObjectsFor, drawPlant, seasonOf } from '../render/continuousGround.js';
 import { groundSettings } from '../data/groundLook.js';
+import { GroundComposite } from './GroundComposite.js';
 
 // Continuous ground (plan m-souvisla-zeme): the approved World Lab look (art/effects/ground.json) paints land and water
 // of a whole chunk as one surface – no tile grid, soft zone transitions, natural river banks, plants and stones.
@@ -24,6 +25,9 @@ const LAND_MATERIAL = { [GROUND.BEACH]: 6, [GROUND.DESERT]: 7, [GROUND.MUD]: 8, 
 const WATER_DEPTH = { [GROUND.FORD]: 0.15, [GROUND.SHALLOW]: 0.5, [GROUND.DEEP]: 1 };
 
 const CHUNK_SIZE = 10;
+// performance-1: already shown dirty chunks repainted a frame (continuous ground) and at most every REPAINT_EVERY_MS,
+// the least time between two repaints of one chunk, and between two path-only ground repaints.
+const REPAINT_PER_FRAME = 1, REPAINT_EVERY_MS = 50, REPAINT_GAP_MS = 200, GROUND_PATH_GAP_MS = 750;
 const TILE_BLEED = .8;
 
 // Season tints as RGBA, for blending between seasons during a transition.
@@ -72,6 +76,8 @@ export class TerrainRenderer {
     this.chunks = new Map(); this.chunkPool = [];
     this.lastView = '';
     this.dirtyChunks=new Set();this.dirtyTiles=new Map();this.paintStats={tiles:0,chunks:0};this.debugEnabled=false;this.debugGraphics=scene.add.graphics().setDepth(-99);
+    // performance-1: with the Canvas renderer the shown chunks are drawn through one composed image (GroundComposite).
+    this.composite=GroundComposite.supported(scene)?new GroundComposite(scene,this):null;
     for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);
     this.createTextures();
     this.outcrop=registry.require('rock_outcrop');
@@ -167,9 +173,14 @@ export class TerrainRenderer {
     const W=context.canvas.width,H=context.canvas.height,x0=cx*CHUNK_SIZE,y0=cy*CHUNK_SIZE,factor=new Float32Array(CHUNK_SIZE*CHUNK_SIZE),sat=FOG_STYLE.saturation;
     for(let y=0;y<CHUNK_SIZE;y++)for(let x=0;x<CHUNK_SIZE;x++){const t={x:x0+x,y:y0+y};if(this.fog?.displayState(t)===VISIBILITY.EXPLORED)factor[y*CHUNK_SIZE+x]=this.fog.brightness?.(t)??FOG_STYLE.brightness;}
     const image=context.getImageData(0,0,W,H),d=image.data,hw=TILE_WIDTH/2,hh=TILE_HEIGHT/2;
-    for(let py=0;py<H;py++){const vert=(py+top-ORIGIN.y)/hh;for(let px=0;px<W;px++){const o=(py*W+px)*4;if(!d[o+3])continue;const hor=(px+left-ORIGIN.x)/hw;
-      const tx=Math.min(CHUNK_SIZE-1,Math.max(0,Math.floor((vert+hor)/2)-x0)),ty=Math.min(CHUNK_SIZE-1,Math.max(0,Math.floor((vert-hor)/2)-y0)),f=factor[ty*CHUNK_SIZE+tx];if(!f)continue;
-      const r=d[o],g=d[o+1],b=d[o+2],l=.3*r+.59*g+.11*b;d[o]=(l+(r-l)*sat)*f;d[o+1]=(l+(g-l)*sat)*f;d[o+2]=(l+(b-l)*sat)*f;}}
+    // performance-1: the pixel → tile rule is fixed per chunk, so it is computed once and kept (same pixels as before).
+    const mapKey=`${cx},${cy}`,maps=this.greyMaps??=new Map();let tileOf=maps.get(mapKey);
+    if(!tileOf||tileOf.length!==W*H){tileOf=new Uint8Array(W*H);
+      for(let py=0;py<H;py++){const vert=(py+top-ORIGIN.y)/hh;for(let px=0;px<W;px++){const hor=(px+left-ORIGIN.x)/hw;
+        tileOf[py*W+px]=Math.min(CHUNK_SIZE-1,Math.max(0,Math.floor((vert-hor)/2)-y0))*CHUNK_SIZE+Math.min(CHUNK_SIZE-1,Math.max(0,Math.floor((vert+hor)/2)-x0));}}
+      if(maps.size>=64)maps.delete(maps.keys().next().value);maps.set(mapKey,tileOf);}
+    for(let p=0,o=0;p<W*H;p++,o+=4){if(!d[o+3])continue;const f=factor[tileOf[p]];if(!f)continue;
+      const r=d[o],g=d[o+1],b=d[o+2],l=.3*r+.59*g+.11*b;d[o]=(l+(r-l)*sat)*f;d[o+1]=(l+(g-l)*sat)*f;d[o+2]=(l+(b-l)*sat)*f;}
     context.putImageData(image,0,0);
   }
   // One chunk of continuous ground (land, water, plants, water plants) in chunk-canvas pixels.
@@ -456,7 +467,11 @@ export class TerrainRenderer {
         // keep their old picture (and stay dirty) until their turn, so the change rolls over the view without a freeze.
         let occ='';for(const b of this.scene.buildings??[])for(const t of b.tiles??[])if(Math.floor(t.x/CHUNK_SIZE)===cx&&Math.floor(t.y/CHUNK_SIZE)===cy)occ+=`${t.x},${t.y};`;
         groundStamp=`${this.season}|${occ}|${this.pathRevAll??0}.${this.pathRev?.get(`${cx},${cy}`)??0}|${this.v2?.geo&&this.pathStyle==='v2'?1:0}`;const cached=this.groundCache?.get(`${cx},${cy}`);
-        if(cached&&cached.stamp!==groundStamp&&!(this.groundPaintsLeft>0)&&this.chunks.has(`${cx},${cy}`))return { key, x: left, y: origin.y };
+        // performance-1: a change of the trodden paths alone (25 walking residents) repaints one chunk's ground (~40 ms
+        // without GPU) at most every GROUND_PATH_GAP_MS; seasons and buildings keep the one-a-frame rule.
+        const pathOnly=cached&&cached.stamp!==groundStamp&&cached.stamp.split('|').filter((_,i)=>i!==2).join('|')===groundStamp.split('|').filter((_,i)=>i!==2).join('|');
+        if(cached&&cached.stamp!==groundStamp&&(!(this.groundPaintsLeft>0)||pathOnly&&performance.now()<(this.nextPathPaint??0))&&this.chunks.has(`${cx},${cy}`))return { key, x: left, y: origin.y };
+        if(pathOnly)this.nextPathPaint=performance.now()+GROUND_PATH_GAP_MS;
       }
       if(!dirty)context.clearRect(0,0,texture.width,texture.height);
       // Ground first for every tile, tracks second: a neighbour's ground overlap can then never cover a track's edge.
@@ -613,7 +628,10 @@ export class TerrainRenderer {
       // frame). Compare against what this renderer actually painted, rather
       // than the last producer delta, which may already have been overwritten.
       const changed=[...previous].filter(index=>!current.has(index));
-      for(const index of current)if(!previous.has(index))changed.push(index);
+      // performance-1: a chunk where ground is seen for the first time is repainted at once (never a black hole in
+      // sight); other fog changes take their turn in repaintDirty.
+      const known=this.knownTiles?.length===fog.explored?.length?this.knownTiles:this.knownTiles=Uint8Array.from(fog.explored??[]);
+      for(const index of current)if(!previous.has(index)){changed.push(index);if(!known[index]){known[index]=1;(this.urgentChunks??=new Set()).add(`${Math.floor(index%fog.width/CHUNK_SIZE)},${Math.floor(Math.floor(index/fog.width)/CHUNK_SIZE)}`);}}
       this.paintedVisibility=new Set(current);this.fogRevision=fog.revision;
       if(fog.enabled)this.invalidateArea(changed.map(index=>({x:index%fog.width,y:Math.floor(index/fog.width)})),this.groundStyle==='continuous');
     }
@@ -622,17 +640,28 @@ export class TerrainRenderer {
   // Performance: a newly visible chunk is painted at once (never a hole); already shown chunks that became dirty
   // (fog, path wear, pavement, season) repaint at most two per frame, so a wave of changes never freezes a frame.
   repaintDirty(){
-    this.groundPaintsLeft=this.repaintAll&&!this.chunks.size?Infinity:1;let budget=this.repaintAll?Infinity:this.groundStyle==='continuous'?8:2;this.repaintAll=false;
-    for (const key of this.neededChunks??[]) {
-      const shown=this.chunks.has(key);if(shown&&!this.dirtyChunks.has(key))continue;if(shown&&budget--<=0)continue;
+    this.groundPaintsLeft=this.repaintAll&&!this.chunks.size?Infinity:1;let budget=this.repaintAll?Infinity:2;const all=this.repaintAll,urgent=this.urgentChunks;this.repaintAll=false;
+    // performance-1: shown dirty chunks (mostly Fog of War edges moving with 25 residents) take turns, least recently
+    // painted first: REPAINT_PER_FRAME (continuous ground) or two a frame. Before, the first eight in view order took
+    // every frame (a chunk with its fog costs ~5–12 ms in a browser without GPU). First-seen ground goes at once.
+    const waiting=[],paint=key=>{
       const [cx,cy] = key.split(',').map(Number), texture = this.chunkTexture(cx,cy);
       const image = this.chunks.get(key)??this.chunkPool.pop() ?? this.scene.add.image(0,0,texture.key).setOrigin(0,0).setDepth(-100);
       image.setTexture(texture.key).setPosition(texture.x,texture.y).setVisible(true);
-      this.chunks.set(key,image);
+      this.chunks.set(key,image);const done=!this.dirtyChunks.has(key);if(done)this.composite?.touch(key);return done;
+    };
+    for (const key of this.neededChunks??[]) {
+      const shown=this.chunks.has(key);if(shown&&!this.dirtyChunks.has(key))continue;if(!shown||urgent?.has(key)){paint(key);continue;}waiting.push(key);
     }
+    urgent?.clear();if(!all&&this.groundStyle==='continuous')budget=performance.now()<(this.nextFogPaint??0)?0:REPAINT_PER_FRAME;
+    // A chunk repainted in the last REPAINT_GAP_MS waits (its fog edge catches up a moment later), so the cost stays
+    // bounded per second however high the frame rate or however many residents walk at the edge of sight.
+    const order=this.paintOrder??=new Map(),painted=this.paintedAt??=new Map(),started=all?0:performance.now();if(!all)waiting.sort((a,b)=>(order.get(a)??0)-(order.get(b)??0));
+    for(const key of waiting){if(budget<=0)break;if(!all&&started-(painted.get(key)??-Infinity)<REPAINT_GAP_MS)continue;if(!paint(key))continue;budget--;order.set(key,this.paintTick=(this.paintTick??0)+1);if(all)painted.delete(key);else{painted.set(key,started);this.nextFogPaint=started+REPAINT_EVERY_MS;}}
+    this.composite?.sync(this.camera??this.scene.cameras?.main);
   }
   update(camera,fog=null,memory=this.memory) {
-    this.fog=fog;this.memory=memory;
+    this.fog=fog;this.memory=memory;this.camera=camera;
     this.updateFog(camera,fog);
     if(this.wear&&this.pathStyle==='v2'){this.v2?.frame();this.v2?.refresh();}
     const view = camera.worldView;
@@ -699,5 +728,5 @@ export class TerrainRenderer {
     this.neededChunks=neededChunks;this.repaintDirty();
     this.visibleCount=visibleCount;
   }
-  destroy(){this.unsubscribeWear?.();this.debugGraphics.destroy();}
+  destroy(){this.unsubscribeWear?.();this.debugGraphics.destroy();this.composite?.destroy();}
 }

@@ -72,6 +72,9 @@ export async function populationNavigationSmoke(page){
   await page.locator('#settings-button').click();await page.locator('#fog-toggle').check();await page.locator('#close-settings').click();
   const fixture=await page.evaluate(()=>{
     const s=window.__game.registry.get('application').scene,occupied=new Set(s.reservedTiles().map(t=>`${t.x},${t.y}`));let hidden,visible;
+    // performance-1: sight grows with the morning light; a faster build reached this fixture at dawn, so the King's
+    // circle grew during the camera pan below. The fixture starts in full daylight (Load restores the baseline after).
+    for(let i=0;i<900&&s.dayNight.darkness()>0;i++){s.gameTime.setPaused(false);s.gameTime.update(1000);s.gameTime.setPaused(true);}
     // Every subject now sees around itself; to test a unit outside sight, only the king's sight stays for this fixture.
     window.__subjectSight=s.fog.providers.get('subjects');s.fog.providers.delete('subjects');s.fog.update();
     for(let y=2;y<98&&(!hidden||!visible);y++)for(let x=2;x<98&&(!hidden||!visible);x++){

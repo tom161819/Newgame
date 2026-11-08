@@ -983,3 +983,5 @@ tr[data-resource-group="equipment"] { background:var(--group-equipment); }
 .dev-balance-row output { font-variant-numeric: tabular-nums; }
 .dev-balance-overview { white-space: pre-wrap; font: 11px/1.5 ui-monospace,monospace; margin: 8px 0; }
 .dev-balance-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+/* performance-1: developer frame profiler overlay (Dev mode, F8). */
+.dev-profiler { position: fixed; left: 12px; bottom: 12px; z-index: 41; margin: 0; padding: 8px 10px; max-height: 70dvh; overflow: auto; pointer-events: none; white-space: pre; font: 11px/1.35 ui-monospace,monospace; color: #e8e2c0; background: rgba(20,18,12,.82); border: 1px solid rgba(232,226,192,.3); border-radius: 6px; }
