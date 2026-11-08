@@ -477,6 +477,23 @@ try {
     assert.equal(await frameAttr('data-ui-hud'), 'bottom');
     const hud = await lab.evaluate(() => { const d = window.uiLab.frameDoc(), r = d.querySelector('.inventory').getBoundingClientRect(), v = d.querySelector('.viewport').getBoundingClientRect(); return { bottom: v.bottom - r.bottom, top: r.top - v.top }; });
     assert.ok(hud.bottom < 20 && hud.top > 200, `resource bar docked at the bottom (${JSON.stringify(hud)})`);
+    // Free placement: drag the minimap box to the top-left corner (it snaps to the edges), resize the event feed.
+    await lab.locator('#ul-free').check();
+    const mini = lab.locator('.ul-free-box[data-free="minimap"]'); await mini.waitFor(); const mb = await mini.boundingBox(), st = await lab.locator('#ul-stage').boundingBox();
+    await lab.mouse.move(mb.x + mb.width / 2, mb.y + mb.height / 2); await lab.mouse.down();
+    await lab.mouse.move(st.x + mb.width / 2 + 3, st.y + mb.height / 2 + 3, { steps: 8 }); await lab.mouse.up();
+    const freeMini = await lab.evaluate(() => window.uiLab.free().minimap);
+    assert.deepEqual([freeMini.ax, freeMini.ay, freeMini.x, freeMini.y], ['left', 'top', 0, 0], `minimap snapped to the top-left corner (${JSON.stringify(freeMini)})`);
+    const miniRect = await lab.evaluate(() => { const r = window.uiLab.frameDoc().querySelector('#minimap').getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), window.uiLab.frameDoc().querySelector('#minimap').getAttribute('data-ui-free')]; });
+    assert.deepEqual(miniRect, [0, 0, 'minimap'], 'the preview shows the minimap where it was placed');
+    const se = lab.locator('.ul-free-box[data-free="buildingsBar"] .ul-rs-e'); await lab.locator('.ul-free-box[data-free="buildingsBar"]').hover(); const sb = await se.boundingBox();
+    await lab.mouse.move(sb.x + 4, sb.y + 4); await lab.mouse.down(); await lab.mouse.move(sb.x - 200, sb.y + 4, { steps: 6 }); await lab.mouse.up();
+    const bar = await lab.evaluate(() => window.uiLab.free().buildingsBar);
+    assert.ok(bar && bar.w > 100 && bar.w < 1400, `the buildings bar was resized (${JSON.stringify(bar)})`);
+    await lab.locator('.ul-free-row[data-free-row="minimap"] button', { hasText: 'Dock again' }).click();
+    assert.equal(await lab.evaluate(() => window.uiLab.free().minimap), undefined);
+    assert.equal(await lab.evaluate(() => window.uiLab.frameDoc().querySelector('#minimap').hasAttribute('data-ui-free')), false);
+    await lab.evaluate(() => window.uiLab.setFreeMode(false));
     // A window: hide one section and move another; the preview follows.
     await lab.locator('.ul-tabs [data-tab="windows"]').click();
     await lab.locator('#ul-window').selectOption('storage-dialog');
@@ -517,7 +534,7 @@ try {
     assert.match(await sl.locator('#ul-summary').textContent(), /1 comment/);
     assert.deepEqual(slErrors, []); await owner.close();
   }
-  pass('UI Lab: real game interface in the preview, four styles, drag-to-dock (resource bar to the bottom), window sections hidden and reordered, designs saved locally and to the page database marked for the game, a comment field per section (uiNotes)');
+  pass('UI Lab: real game interface in the preview, four styles, drag-to-dock (resource bar to the bottom), window sections hidden and reordered, designs saved locally and to the page database marked for the game, a comment field per section (uiNotes), free placement (move with snapping, resize, dock again)');
 
   // World Lab (g-world-lab): the game's own generator, codes, checks, favourites (`worlds/<id>`) and the default proposal.
   {

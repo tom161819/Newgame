@@ -7,6 +7,7 @@ import { trackTopbarHeight } from '../lib/topbarHeight.js';
 import './ui-lab.css';
 import {
   normalizeUiConfig, applyUiConfig, sectionsOf, FONTS, TEXTURES, FRAMES, SHADOWS, HEADINGS, POINTERS, COLOR_TOKENS, LAYOUT, PANELS,
+  FREE_REGIONS, ANCHORS_X, ANCHORS_Y, normalizeFrame,
 } from '../../../art/ui/uiConfig.js';
 import { UI_PRESETS } from '../../../art/ui/presets.js';
 import gameConfig from '../../../art/ui/ui-config.json';
@@ -45,7 +46,7 @@ function h(tag, attrs = {}, ...children) {
 const readDraft = () => { try { const raw = localStorage.getItem(STORAGE); return raw ? JSON.parse(raw) : null; } catch { return null; } };
 const state = {
   config: normalizeUiConfig(readDraft() ?? gameConfig).config,
-  tab: 'style', window: '', original: false, docking: true, drag: null, designs: new Map(), notes: new Map(),
+  tab: 'style', window: '', original: false, docking: true, drag: null, designs: new Map(), notes: new Map(), freeMode: false, selected: null,
 };
 const shared = { mode: 'local', db: null, uid: null, canWrite: null, user: null, names: new Map() };
 const readOnly = () => shared.mode === 'shared' && shared.canWrite === false;
@@ -181,8 +182,9 @@ function regions(doc) {
 }
 function renderOverlay() {
   const doc = frameDoc();
-  overlay.replaceChildren();
-  if (!doc?.body || !state.docking || state.original || readOnly()) return;
+  overlay.replaceChildren(); overlay.classList.toggle('free', state.freeMode);
+  if (!doc?.body || (!state.docking && !state.freeMode) || state.original || readOnly()) return;
+  if (state.freeMode) { renderFreeOverlay(doc); return; }
   const s = scale(), list = regions(doc);
   const px = r => ({ left: `${r.x * s}px`, top: `${r.y * s}px`, width: `${r.w * s}px`, height: `${r.h * s}px` });
   if (state.drag) {
@@ -221,6 +223,139 @@ function startDrag(event, key) {
     else renderOverlay();
   };
   window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
+}
+
+// ---------- free placement: move, snap to edges and resize every bar (g-ui-lab-volne) ----------
+// Boxes over each bar of the preview: drag to move, drag a handle to resize. Edges snap to the screen edges and
+// centre lines and to the other bars (hold Shift to place freely). Arrow keys nudge the selected bar by 1 px
+// (Shift: 10 px), Alt + arrows resize it. The result is a frame anchored to the nearest edge (config.free).
+const SNAP = 10;
+function freeRegions(doc) {
+  return Object.entries(FREE_REGIONS).map(([key, { label, selector }]) => {
+    const el = doc.querySelector(selector); if (!el) return null;
+    const r = el.getBoundingClientRect(); if (!r.width || !r.height) return null;
+    return { key, label, rect: { x: r.left, y: r.top, w: r.width, h: r.height } };
+  }).filter(Boolean);
+}
+function boxStyle(el, r, s) { Object.assign(el.style, { left: `${r.x * s}px`, top: `${r.y * s}px`, width: `${r.w * s}px`, height: `${r.h * s}px` }); }
+function renderFreeOverlay(doc) {
+  const s = scale();
+  overlay.classList.add('free');
+  for (const reg of freeRegions(doc)) {
+    const placed = !!state.config.free?.[reg.key];
+    const box = h('div', { class: `ul-free-box${state.selected === reg.key ? ' selected' : ''}${placed ? ' placed' : ''}`, 'data-free': reg.key, tabindex: '0', role: 'button', 'aria-label': `${reg.label}: drag to move, handles resize` },
+      h('span', { class: 'ul-free-label' }, reg.label, placed ? ' · free' : ''),
+      ...['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'].map(dir => h('i', { class: `ul-rs ul-rs-${dir}`, 'data-dir': dir, 'aria-hidden': 'true' })));
+    boxStyle(box, reg.rect, s);
+    box.addEventListener('pointerdown', event => startFree(event, reg, event.target.dataset?.dir ?? 'move'));
+    box.addEventListener('focus', () => { if (state.selected !== reg.key) { state.selected = reg.key; for (const b of overlay.querySelectorAll('.ul-free-box')) b.classList.toggle('selected', b.dataset.free === reg.key); if (state.tab === 'layout') renderControls(); } });
+    overlay.append(box);
+  }
+}
+// The edges a box may snap to: screen edges, centre lines and the other bars.
+function snapTargets(doc, key) {
+  const xs = [0, W / 2, W], ys = [0, H / 2, H];
+  for (const r of freeRegions(doc)) if (r.key !== key) { xs.push(r.rect.x, r.rect.x + r.rect.w); ys.push(r.rect.y, r.rect.y + r.rect.h); }
+  return { xs, ys };
+}
+function snapAxis(edges, targets) {
+  let best = null;
+  for (const [i, e] of edges.entries()) for (const t of targets) { const d = t - e; if (Math.abs(d) <= SNAP && (!best || Math.abs(d) < Math.abs(best.d))) best = { d, line: t, i }; }
+  return best;
+}
+// A rect in preview pixels → a frame anchored to its nearest edge.
+function frameFromRect(r, { keepW = null, keepH = null } = {}) {
+  const cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+  const ax = Math.abs(cx - W / 2) <= 6 ? 'center' : cx < W / 2 ? 'left' : 'right', ay = Math.abs(cy - H / 2) <= 6 ? 'center' : cy < H / 2 ? 'top' : 'bottom';
+  const x = ax === 'left' ? r.x : ax === 'right' ? W - (r.x + r.w) : cx - W / 2, y = ay === 'top' ? r.y : ay === 'bottom' ? H - (r.y + r.h) : cy - H / 2;
+  return normalizeFrame({ ax, ay, x, y, w: keepW ?? r.w, h: keepH });
+}
+function startFree(event, reg, mode) {
+  if (readOnly() || event.button > 0) return;
+  event.preventDefault(); event.stopPropagation();
+  const doc = frameDoc(), s = scale(), start = { ...reg.rect }, sx = event.clientX, sy = event.clientY, targets = snapTargets(doc, reg.key);
+  const box = event.currentTarget, guides = [h('div', { class: 'ul-guide v' }), h('div', { class: 'ul-guide h' })];
+  overlay.append(...guides); for (const g of guides) g.hidden = true;
+  state.selected = reg.key; box.classList.add('selected', 'dragging'); box.focus({ preventScroll: true });
+  try { box.setPointerCapture(event.pointerId); } catch { /* synthetic events */ }
+  let rect = start, moved = false;
+  const move = e => {
+    const dx = (e.clientX - sx) / s, dy = (e.clientY - sy) / s; if (Math.abs(dx) + Math.abs(dy) > 1) moved = true;
+    let { x, y, w, h: hh } = start;
+    if (mode === 'move') { x += dx; y += dy; }
+    else {
+      if (mode.includes('e')) w = Math.max(24, start.w + dx);
+      if (mode.includes('s')) hh = Math.max(16, start.h + dy);
+      if (mode.includes('w')) { w = Math.max(24, start.w - dx); x = start.x + start.w - w; }
+      if (mode.includes('n')) { hh = Math.max(16, start.h - dy); y = start.y + start.h - hh; }
+    }
+    guides[0].hidden = guides[1].hidden = true;
+    if (!e.shiftKey) {
+      const ex = mode === 'move' ? [x, x + w / 2, x + w] : [mode.includes('w') ? x : null, mode.includes('e') ? x + w : null].filter(v => v != null);
+      const ey = mode === 'move' ? [y, y + hh / 2, y + hh] : [mode.includes('n') ? y : null, mode.includes('s') ? y + hh : null].filter(v => v != null);
+      const bx = ex.length ? snapAxis(ex, targets.xs) : null, by = ey.length ? snapAxis(ey, targets.ys) : null;
+      if (bx) { if (mode === 'move') x += bx.d; else if (mode.includes('w')) { x += bx.d; w -= bx.d; } else w += bx.d; guides[0].hidden = false; guides[0].style.left = `${bx.line * s}px`; }
+      if (by) { if (mode === 'move') y += by.d; else if (mode.includes('n')) { y += by.d; hh -= by.d; } else hh += by.d; guides[1].hidden = false; guides[1].style.top = `${by.line * s}px`; }
+    }
+    rect = { x, y, w, h: hh }; boxStyle(box, rect, s);
+    setStatus(`${reg.label}: ${Math.round(rect.x)}, ${Math.round(rect.y)} · ${Math.round(rect.w)} × ${Math.round(rect.h)} px${e.shiftKey ? '' : ' · Shift = no snapping'}`);
+  };
+  const up = () => {
+    window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up);
+    for (const g of guides) g.remove(); box.classList.remove('dragging');
+    if (!moved) { if (state.tab === 'layout') renderControls(); renderOverlay(); return; }
+    const old = state.config.free?.[reg.key], resizedV = mode !== 'move' && /[ns]/.test(mode);
+    const frame = frameFromRect(rect, { keepH: resizedV ? rect.h : old?.h ?? null });
+    state.config.free = { ...(state.config.free ?? {}), [reg.key]: frame };
+    setStatus(`${reg.label}: anchored ${frame.ay}-${frame.ax}, ${frame.x}/${frame.y} px${frame.w ? ` · ${frame.w}` : ''}${frame.h ? ` × ${frame.h}` : ''}`);
+    changed({ controls: state.tab === 'layout' });
+  };
+  window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
+}
+function nudgeFree(key, dx, dy, resize) {
+  const doc = frameDoc(), reg = doc && freeRegions(doc).find(r => r.key === key); if (!reg) return;
+  const r = { ...reg.rect }, old = state.config.free?.[key];
+  if (resize) { r.w = Math.max(24, r.w + dx); r.h = Math.max(16, r.h + dy); } else { r.x += dx; r.y += dy; }
+  state.config.free = { ...(state.config.free ?? {}), [key]: frameFromRect(r, { keepH: resize && dy ? r.h : old?.h ?? null }) };
+  changed({ controls: state.tab === 'layout' });
+  requestAnimationFrame(() => overlay.querySelector(`.ul-free-box[data-free="${key}"]`)?.focus({ preventScroll: true }));
+}
+window.addEventListener('keydown', e => {
+  if (!state.freeMode || !state.selected || !e.target.closest?.('.ul-free-box')) return;
+  const step = e.shiftKey ? 10 : 1, map = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+  if (map) { e.preventDefault(); nudgeFree(state.selected, map[0], map[1], e.altKey); }
+  else if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); resetFree(state.selected); }
+});
+function resetFree(key) {
+  const next = { ...(state.config.free ?? {}) }; delete next[key];
+  state.config.free = next; setStatus(`${FREE_REGIONS[key].label}: back to its docked place`); changed();
+}
+function freeEditor() {
+  const free = state.config.free ?? {}, num = (key, prop, f) => h('input', { type: 'number', step: '1', value: f[prop] ?? '', placeholder: prop === 'w' || prop === 'h' ? 'auto' : '0', 'aria-label': `${FREE_REGIONS[key].label} ${prop}`, 'data-free-input': `${key}.${prop}`,
+    onchange: e => { const v = e.target.value === '' ? null : Number(e.target.value); state.config.free = { ...free, [key]: normalizeFrame({ ...f, [prop]: v }) }; changed(); } });
+  const pickAnchor = (key, prop, list, f) => h('select', { 'aria-label': `${FREE_REGIONS[key].label} ${prop === 'ax' ? 'horizontal' : 'vertical'} anchor`, onchange: e => { state.config.free = { ...free, [key]: normalizeFrame({ ...f, [prop]: e.target.value }) }; changed(); } },
+    list.map(v => { const o = h('option', { value: v }, v); o.selected = f[prop] === v; return o; }));
+  const rows = Object.entries(FREE_REGIONS).map(([key, { label }]) => {
+    const f = free[key];
+    return h('li', { class: `ul-free-row${state.selected === key ? ' selected' : ''}`, 'data-free-row': key },
+      h('div', { class: 'ul-free-head' }, h('strong', {}, label), f ? h('button', { type: 'button', class: 'button ghost', onclick: () => resetFree(key) }, 'Dock again') : h('small', {}, 'docked — drag it in the preview')),
+      f ? h('div', { class: 'ul-free-grid' }, pickAnchor(key, 'ay', ANCHORS_Y, f), pickAnchor(key, 'ax', ANCHORS_X, f), h('label', {}, 'x ', num(key, 'x', f)), h('label', {}, 'y ', num(key, 'y', f)), h('label', {}, 'w ', num(key, 'w', f)), h('label', {}, 'h ', num(key, 'h', f))) : null);
+  });
+  return [
+    h('h3', {}, 'Free placement'),
+    h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: state.freeMode, onchange: e => setFreeMode(e.target.checked) }), ' Move, snap and resize bars in the preview'),
+    h('p', { class: 'ul-hint' }, 'Drag a bar to move it, drag a handle to resize. Edges snap to the screen edges, the centre and other bars (Shift: no snapping). Arrows nudge 1 px (Shift 10 px), Alt + arrows resize, Delete docks it again. A placed bar keeps its distance from the nearest edge on every screen size.'),
+    h('ul', { class: 'ul-free-list' }, rows),
+    Object.keys(free).length ? h('button', { type: 'button', class: 'button', onclick: () => { state.config.free = {}; setStatus('All bars docked again'); changed(); } }, 'Dock all bars again') : null,
+    note('layout:free', 'Free placement'),
+  ];
+}
+function setFreeMode(on) {
+  state.freeMode = !!on; state.selected = on ? state.selected : null;
+  const box = $('#ul-free'); if (box) box.checked = state.freeMode;
+  overlay.classList.toggle('free', state.freeMode);
+  if (state.tab === 'layout') renderControls();
+  renderOverlay();
 }
 
 // ---------- controls ----------
@@ -273,6 +408,10 @@ function loadPreset(id) {
 }
 
 function layoutView() {
+  if (state.freeMode) return [...freeEditor(), h('h3', {}, 'Docked positions'), ...dockedView()];
+  return [...dockedView(), ...freeEditor()];
+}
+function dockedView() {
   return [
     h('p', { class: 'ul-hint' }, 'Drag a handle in the preview onto a highlighted spot, or choose here.'),
     ...Object.entries(LAYOUT).flatMap(([key, { label, values }]) => [field(label, select(values, state.config.layout[key], v => { state.config.layout[key] = v; changed({ controls: false }); }, { 'data-layout': key })), note(`layout:${key}`, `Layout · ${label}`)]),
@@ -455,6 +594,7 @@ $('#ul-window').append(h('option', { value: TUTORIAL_DEMO }, 'Tutorial, tips, sp
 $('#ul-window').addEventListener('change', e => showWindow(e.target.value));
 $('#ul-original').addEventListener('change', e => { state.original = e.target.checked; applyToFrame(); });
 $('#ul-docking').addEventListener('change', e => { state.docking = e.target.checked; renderOverlay(); });
+$('#ul-free').addEventListener('change', e => { setFreeMode(e.target.checked); if (e.target.checked && state.tab !== 'layout') { state.tab = 'layout'; renderControls(); } });
 $('#ul-sub').textContent = `The game's real interface · captured ${new Date(snapshots.capturedAt).toLocaleDateString()} · ${snapshots.panels.length} windows`;
 window.uiLab = {
   ready: false,
@@ -463,6 +603,8 @@ window.uiLab = {
   showWindow,
   loadPreset,
   setLayout: (key, value) => { state.config.layout[key] = value; changed(); },
+  setFreeMode,
+  free: () => clone(state.config.free ?? {}),
   designs: () => [...state.designs.values()].map(d => ({ id: d.id, name: d.config.name, forGame: d.forGame })),
   notes: () => Object.fromEntries(state.notes),
 };
