@@ -37,5 +37,84 @@
   "frontLayer": false,
   "gameLights": [],
   "modelHeight": 1.265,
-  "lights": []
+  "lights": [],
+  "anim": {
+    "frameWidth": 131,
+    "frameHeight": 116,
+    "anchor": {
+      "x": 65,
+      "y": 82
+    },
+    "origin": {
+      "x": 0.49618,
+      "y": 0.7069
+    },
+    "columns": [
+      "cast-back",
+      "cast",
+      "cast-out",
+      "sit-idle",
+      "sit-idle-b",
+      "twitch",
+      "bite",
+      "bite-b",
+      "reel-a",
+      "reel-b",
+      "catch",
+      "store"
+    ],
+    "rows": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "rowsNote": "facing 0–7 (0 faces the viewer, then turning to screen right); the fisher faces the water",
+    "fps": 5,
+    "clips": {
+      "cast": [
+        0,
+        1,
+        2
+      ],
+      "sit-idle": [
+        3,
+        4
+      ],
+      "twitch": [
+        3,
+        5,
+        5,
+        3
+      ],
+      "bite": [
+        6,
+        7
+      ],
+      "reel": [
+        8,
+        9
+      ],
+      "store": [
+        10,
+        11
+      ]
+    },
+    "loop": [
+      "cast",
+      "sit-idle",
+      "sit-idle",
+      "twitch",
+      "sit-idle",
+      "bite",
+      "reel",
+      "reel",
+      "reel",
+      "store"
+    ]
+  }
 }

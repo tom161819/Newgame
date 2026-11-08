@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-08T05:06:08.747Z",
+  "updatedAt": "2026-11-08T06:35:39.135Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -2332,11 +2332,13 @@
       "preferred": "bear-brown-sculpt",
       "variants": {
         "bear-brown-sculpt": {
-          "status": "review",
-          "version": 3,
-          "specHash": "e91970fc",
+          "approvedAt": "2026-11-08T06:35:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-07T19:30:00.000Z",
+          "specHash": "e91970fc",
+          "status": "approved",
+          "updatedAt": "2026-11-08T06:35:00.000Z",
+          "version": 3,
           "comments": [
             {
               "at": "2026-11-08T05:00:00.000Z",
@@ -3116,6 +3118,24 @@
           "specHash": "bd1dd378",
           "status": "approved",
           "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "fishing-male-loop": {
+          "approvedAt": "2026-11-08T06:35:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "067891f0",
+          "status": "approved",
+          "updatedAt": "2026-11-08T06:35:00.000Z",
+          "version": 1
+        },
+        "fishing-female-loop": {
+          "approvedAt": "2026-11-08T06:35:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ee32eeba",
+          "status": "approved",
+          "updatedAt": "2026-11-08T06:35:00.000Z",
           "version": 1
         }
       }
