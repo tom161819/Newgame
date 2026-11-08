@@ -363,8 +363,8 @@ try {
   assert.match(await timber.locator('.pill.shared').textContent(), /Shared: Revision requested · Tomáš \(you\)/);
   assert.match(await sharedPage.locator('#review-summary').textContent(), /1 decision waiting for Claude — write „spustit revizi“/);
   assert.match(await timber.locator('.review-saved').textContent(), /Write „spustit revizi“ in the MK chat/);
-  // Another reviewer approves the round tower: it appears without a reload, signed with her name.
-  await sharedPage.evaluate(() => window.__fakeClaude.put('reviews/fishing__fishing-male-loop', { assetId: 'fishing', variantId: 'fishing-male-loop', by: 'u-art', at: '2026-11-06T22:00:00.000Z', record: { status: 'approved', version: 1, specHash: window.assetStudio.assets().find(a => a.id === 'fishing').variants.find(v => v.id === 'fishing-male-loop').hash, note: '', updatedAt: '2026-11-06T22:00:00.000Z', approvedAt: '2026-11-06T22:00:00.000Z', decidedBy: 'u-art' } }));
+  // Another reviewer rejects the man's fishing loop: it appears without a reload, signed with her name.
+  await sharedPage.evaluate(() => window.__fakeClaude.put('reviews/fishing__fishing-male-loop', { assetId: 'fishing', variantId: 'fishing-male-loop', by: 'u-art', at: '2026-11-06T22:00:00.000Z', record: { status: 'rejected', version: 1, specHash: window.assetStudio.assets().find(a => a.id === 'fishing').variants.find(v => v.id === 'fishing-male-loop').hash, note: '', updatedAt: '2026-11-06T22:00:00.000Z', approvedAt: '2026-11-06T22:00:00.000Z', decidedBy: 'u-art' } }));
   await sharedPage.waitForFunction(() => /Jana/.test(document.querySelector('.variant-card[data-variant="fishing-male-loop"] .pill.shared')?.textContent ?? ''));
   assert.match(await sharedPage.locator('#review-summary').textContent(), /2 decisions waiting for Claude/);
   // A forged document is ignored instead of breaking the Studio.

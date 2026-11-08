@@ -68,6 +68,11 @@
         </div>
         <div class="wl-card wl-iso-card">
           <h4>In the game's art <small>28 × 28 tiles · drag to move · trees, stones and ore are placed when a game starts (use the overlays)</small></h4>
+          <div class="wl-ground" id="wl-ground">
+            <div class="segmented" role="group" aria-label="Ground drawing"><button type="button" data-ground="tiles">A · Tiles (today)</button><button type="button" data-ground="continuous">B · Continuous ground</button></div>
+            <div id="wl-ground-settings" class="wl-ground-settings"></div>
+            <div class="wl-ground-actions"><button type="button" class="btn" id="wl-ground-reset">Reset</button><button type="button" class="btn" id="wl-ground-copy">Copy settings</button><button type="button" class="btn primary" id="wl-ground-propose">Propose for the game</button><span id="wl-ground-status" class="sub" aria-live="polite"></span></div>
+          </div>
           <canvas id="wl-iso" aria-label="Isometric view with the game's terrain art"></canvas>
         </div>
       </main>

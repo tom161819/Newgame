@@ -55,3 +55,7 @@
   .wl-grid { grid-template-columns: minmax(0, 1fr); }
   .wl-toolbar input[type="text"] { width: 100%; }
 }
+
+.wl-ground { display: grid; gap: 8px; margin: 6px 0 10px; }
+.wl-ground-settings { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 14px; }
+.wl-ground-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
