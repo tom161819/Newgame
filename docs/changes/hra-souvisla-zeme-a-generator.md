@@ -38,3 +38,6 @@ Each chunk painted one tile into its neighbour chunks to hide seams; those pixel
 - Settings → Renderer select (localStorage newgame.renderer; ?renderer= still wins).
 - Generator slider texts via i18n (describe()). The 404 was not reproducible (2 of 3 runs clean).
 - Save/Load: none. Testing: npm test, headless walk/fog/season runs (FPS ~50 in software rendering).
+
+## 0.74.1 (owner: squares pop up while exploring)
+The terrain now repaints fog changes at once (cached ground), but the soft edge mask (FogEdgeLayer) rebuilt at most every 150 ms, so newly seen tiles showed bright and hard-edged in the dark until the mask caught up. FOG_EDGE.rebuildMs 0 (a build takes ~1 ms). Headless walk: no flashes, FPS unchanged.

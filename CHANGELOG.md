@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.74.1] - 2026-11-08
+<!-- version: {"title":"While exploring, newly seen squares no longer flash bright in the dark beyond the soft Fog of War edge.","type":"fix","reconstructed":false,"saveVersion":60} -->
+### Fixed
+- While exploring, newly seen squares no longer flash bright in the dark beyond the soft Fog of War edge.
+
 ## [0.74.0] - 2026-11-08
 <!-- version: {"title":"Rivers flow: light streaks drift with the current, and three duck families paddle on the water; in spring and summer ducklings follow them.","type":"feature","reconstructed":false,"saveVersion":60} -->
 ### Added
