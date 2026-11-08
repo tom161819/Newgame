@@ -4,6 +4,9 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+
+## [0.80.1] - 2026-11-09
+<!-- version: {"title":"UI designs can place every bar and tab freely, anchored to the nearest screen edge and resized.","type":"feature","reconstructed":false,"saveVersion":60} -->
 ### Added
 - UI designs can place every bar and tab freely, anchored to the nearest screen edge and resized. The game applies such a design once it is chosen for the game.
 
