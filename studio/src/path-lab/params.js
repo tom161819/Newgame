@@ -32,5 +32,5 @@ export const PRESETS = Object.freeze([
   { id: 'custom', name: 'Custom (V2)', renderer: 'v2', note: 'Your own V2 settings: save them as a variant or export JSON.' },
 ]);
 // Which renderers exist in this build: 'v2' is the Experimental renderer of #116 (studio/src/path-lab/v2.js).
-export const RENDERERS = { current: true, v2: true };
+export const RENDERERS = { current: true, v2: true, v3: true };
 export const clampParam = (key, value) => { const p = PARAMS.find(x => x.key === key); return p ? Math.min(p.max, Math.max(p.min, Number(value))) : value; };

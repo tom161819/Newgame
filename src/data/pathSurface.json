@@ -1,0 +1,21 @@
+{
+ "trample": 0.3,
+ "trampleDesat": 0.25,
+ "soilShow": 1,
+ "patchScale": 0.45,
+ "edgeSoft": 0.45,
+ "edgeRagged": 0.5,
+ "halo": 0.5,
+ "grain": 1,
+ "pebbles": 0.35,
+ "centreWear": 0.4,
+ "plantClear": 0.8,
+ "winterSnow": 0.6,
+ "earthLight": "#8c7048",
+ "earth": "#7a5c3a",
+ "earthDeep": "#664a30",
+ "sand": "#bd9f6a",
+ "mud": "#55402c",
+ "gravel": "#9a8b72",
+ "snow": "#c9c2b2"
+}

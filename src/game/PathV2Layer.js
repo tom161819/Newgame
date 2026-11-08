@@ -45,14 +45,14 @@ export class PathV2Layer {
     // of a pixel, half the capsules for every sample.
     const segments = [];this.geo.lines.forEach((line, group) => { for (let i = 0; i < line.length - 1; i += 3) segments.push({ a: line[i], b: line[Math.min(i + 3, line.length - 1)], group }); });this.geo.segments = segments;
     this.index = buckets(this.geo); this.stats.builds++; this.stats.buildMs = performance.now() - started;
-    if (!old) { this.cache.clear(); return true; }
+    if (!old) { this.cache.clear(); r.pathChanged?.(null); return true; }
     // Every tile of a chain (old or new) that contains a changed tile, plus the changed tiles, plus a margin.
     const touched = new Set(changed.map(t => `${t.x},${t.y}`)), dirty = new Map(changed.map(t => [`${t.x},${t.y}`, t]));
     for (const geo of [old, this.geo]) for (const chain of geo.topo.chains) if (chain.some(n => touched.has(`${n.x},${n.y}`))) for (const n of chain) dirty.set(`${n.x},${n.y}`, { x: n.x, y: n.y });
     const tiles = [...dirty.values()];
     // Changed tiles keep their old picture as a stand-in until they are repainted (see the frame budget).
     for (const t of tiles) for (let dy = -MARGIN; dy <= MARGIN; dy++) for (let dx = -MARGIN; dx <= MARGIN; dx++) { const entry = this.cache.get((t.y + dy) * COLUMNS + t.x + dx); if (entry) entry.stale = true; }
-    r.invalidateArea(tiles, true, MARGIN);
+    r.invalidateArea(tiles, true, MARGIN); r.pathChanged?.(tiles, MARGIN);
     return true;
   }
   near(x, y) { const c = tileCenter({ x, y }); for (const [dx, dy] of [[0, 0], [-32, 0], [32, 0], [0, -32], [0, 32]]) if (this.index.at(c.x + dx, c.y * 2 + dy)) return true; return false; }

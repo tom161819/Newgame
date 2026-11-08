@@ -39,7 +39,10 @@ export const ground = tile => { const c = tileCenter(tile); return { x: c.x, y: 
 const key = (x, y) => `${x},${y}`;
 export function topology(map) {
   const worn = (x, y) => map.get(x, y) > 0;
-  const area = (x, y) => worn(x, y) && [[0, 0], [-1, 0], [0, -1], [-1, -1]].some(([ox, oy]) => [[0, 0], [1, 0], [0, 1], [1, 1]].every(([dx, dy]) => worn(x + ox + dx, y + oy + dy)));
+  // An area only where the ground is trodden on all sides (owner 8 Nov 2026): a tile belongs to an area when some full
+  // 3 × 3 block of worn tiles contains it. Side-by-side paths or a zigzag (2 × 2 blocks) stay paths, not squares.
+  const BLOCK3 = [-1, 0, 1].flatMap(dy => [-1, 0, 1].map(dx => [dx, dy]));
+  const area = (x, y) => worn(x, y) && BLOCK3.some(([ox, oy]) => BLOCK3.every(([dx, dy]) => worn(x + ox + dx, y + oy + dy)));
   const nodes = new Map();
   for (let y = 0; y < map.size; y++) for (let x = 0; x < map.size; x++) if (worn(x, y)) nodes.set(key(x, y), { x, y, level: map.get(x, y), area: area(x, y), links: [] });
   for (const n of nodes.values()) for (const [dx, dy] of NEIGHBOURS) {

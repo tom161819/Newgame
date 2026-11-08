@@ -26,3 +26,6 @@
 .muted { color: #b9b29a; font-size: 12.5px; margin: 4px 0; }
 .segmented button[disabled] { opacity: .45; cursor: not-allowed; }
 @media (max-width: 900px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } .lab-view { height: 56vh; } }
+.lab-colour { grid-template-columns: 1fr 48px 28px; }
+.lab-colour label { grid-column: auto; }
+.lab-colour input[type=color] { width: 44px; height: 24px; padding: 0; border: 0; background: none; }

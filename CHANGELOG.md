@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.77.0] - 2026-11-08
+<!-- version: {"title":"Paths are now part of the new ground: trampled grass, bare soil that shows through with wear, soil that matches what it lies on (earth, sand, mud), pebbles, and","type":"feature","reconstructed":false,"saveVersion":60} -->
+### Changed
+- Paths are now part of the new ground: trampled grass, bare soil that shows through with wear, soil that matches what it lies on (earth, sand, mud), pebbles, and packed snow in winter, without tile lines or flat colour patches.
+- Trodden areas only form where the ground is worn on all sides; two paths side by side no longer turn into squares.
+
 ## [0.76.0] - 2026-11-08
 <!-- version: {"title":"Flower noise","type":"feature","reconstructed":false,"saveVersion":60} -->
 ### Changed

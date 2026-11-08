@@ -293,7 +293,11 @@ try {
     assert.equal(start.worn, 12, 'deep link loads the straight scenario');assert.equal(start.season, 'Winter');assert.ok(start.size[0] > 1000);
     // #116 Experimental V2: enabled, different from N12 on the same map, sliders repaint it, a change makes the preset Custom.
     const probe = () => lab.evaluate(() => { const c = document.querySelector('#lab-view'), d = c.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, c.width, c.height).data; let h = 0; for (let i = 0; i < d.length; i += 64) h = (h * 31 + d[i] + d[i + 1] * 7) >>> 0; return h; });
-    await lab.locator('#lab-scenarios [data-scenario="path-to-area"]').click();const n12 = await probe();
+    await lab.locator('#lab-scenarios [data-scenario="path-to-area"]').click();
+    // V3 (new continuous ground) is the default; its surface sliders repaint it.
+    assert.equal(await lab.evaluate(() => window.pathLab.state.renderer), 'v3');const v3 = await probe();
+    await lab.locator('#lab-s-trample').fill('1');await lab.locator('#lab-s-trample').dispatchEvent('input');await lab.waitForTimeout(800);assert.notEqual(await probe(), v3, 'a surface slider repaints V3');
+    await lab.locator('#lab-renderer [data-value="current"]').click();await lab.waitForTimeout(300);const n12 = await probe();
     await lab.locator('#lab-preset').selectOption('organic');await lab.waitForTimeout(400);const organic = await probe();assert.notEqual(organic, n12, 'V2 Organic differs from N12');
     assert.equal(await lab.evaluate(() => window.pathLab.state.renderer), 'v2');assert.equal(await lab.locator('#lab-p-meanderStrength').isDisabled(), false);
     await lab.locator('#lab-p-areaExpansion').fill('1');await lab.locator('#lab-p-areaExpansion').dispatchEvent('input');await lab.waitForTimeout(400);

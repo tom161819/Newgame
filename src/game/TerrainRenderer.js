@@ -1,3 +1,5 @@
+import { pathSurface } from '../render/pathSurface.js';
+import PATH_SURFACE from '../data/pathSurface.json' with { type: 'json' };
 import { drawCobbles } from './cobbles.js';
 import { COLUMNS, ROWS, TILE_WIDTH, TILE_HEIGHT } from './config.js';
 import { tileCenter, worldToGrid, gridToWorld, ORIGIN } from './isometric.js';
@@ -182,12 +184,15 @@ export class TerrainRenderer {
     const field=makeWaterField({x0,y0,span:CHUNK_SIZE,depthAt,settings});
     // A hair of bleed past the chunk's own tiles: chunk textures are filtered when zoomed, so a hard edge would show a dark line.
     const e=0.05,inside=(fx,fy)=>fx>=x0-e&&fy>=y0-e&&fx<x0+CHUNK_SIZE+e&&fy<y0+CHUNK_SIZE+e&&fx>=0&&fy>=0&&fx<COLUMNS&&fy<ROWS;
-    paintContinuousGround(context,{width:context.canvas.width,height:context.canvas.height,toWorld,isGrass:isLand,zoneAt,depthAt,inWorld,inside,field,settings,step:6});
+    const surface=this.pathStyle==='v2'&&this.v2?.geo?pathSurface(this.v2.geo,this.v2.index,PATH_SURFACE):null;
+    paintContinuousGround(context,{width:context.canvas.width,height:context.canvas.height,toWorld,isGrass:isLand,zoneAt,depthAt,inWorld,inside,field,settings,step:6,surface});
     const screen=(fx,fy)=>{const p=gridToWorld(fx,fy);return [p.x-left,p.y-top];},name=seasonOf(settings.year),free=(fx,fy)=>own(fx,fy)&&!occupied.has(`${Math.floor(fx)},${Math.floor(fy)}`)&&this.map[Math.floor(fy)]?.[Math.floor(fx)]!==1;
     for(const p of waterObjectsFor({x0:x0-1,y0:y0-1,span:CHUNK_SIZE+2,field,depthAt,settings}))if(free(p.fx,p.fy)){const [sx,sy]=screen(p.fx,p.fy);drawPlant(context,p,sx,sy,name);}
-    const plants=plantsFor({x0:x0-1,y0:y0-1,span:CHUNK_SIZE+2,isGrass:isLand,zoneAt,depthAt,field,settings,seed:this.scene.worldSeed??0}).filter(p=>free(p.fx,p.fy)).sort((a,b)=>a.fx+a.fy-b.fx-b.fy);
+    const plants=plantsFor({x0:x0-1,y0:y0-1,span:CHUNK_SIZE+2,isGrass:isLand,zoneAt,depthAt,field,settings,seed:this.scene.worldSeed??0}).filter(p=>free(p.fx,p.fy)&&(!surface||surface.plantKeep(p.fx,p.fy))).sort((a,b)=>a.fx+a.fy-b.fx-b.fy);
     for(const p of plants){const [sx,sy]=screen(p.fx,p.fy);drawPlant(context,p,sx,sy,name);}
   }
+  // PathV2Layer tells which tiles' paths changed: their chunks get a new ground stamp (repainted one per frame).
+  pathChanged(tiles,margin=2){if(!tiles){this.pathRevAll=(this.pathRevAll??0)+1;return;}this.pathRev??=new Map();const keys=new Set();for(const t of tiles)for(const [dx,dy] of [[-margin,-margin],[margin,-margin],[-margin,margin],[margin,margin],[0,0]])keys.add(`${Math.floor((t.x+dx)/CHUNK_SIZE)},${Math.floor((t.y+dy)/CHUNK_SIZE)}`);for(const k of keys)this.pathRev.set(k,(this.pathRev.get(k)??0)+1);}
   setDebug(value){this.debugEnabled=!!value;this.lastView='';if(!value)this.debugGraphics.clear();}
   setSeason(season){if(season===this.season)return;this.season=season;this.repaintAll=true;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';}
   // Whole chunks, repainted in one pass, give the same pixels as a fresh draw (season transition).
@@ -450,7 +455,7 @@ export class TerrainRenderer {
         // A season change or a new building repaints the ground of one chunk per frame (about 50 ms each); the others
         // keep their old picture (and stay dirty) until their turn, so the change rolls over the view without a freeze.
         let occ='';for(const b of this.scene.buildings??[])for(const t of b.tiles??[])if(Math.floor(t.x/CHUNK_SIZE)===cx&&Math.floor(t.y/CHUNK_SIZE)===cy)occ+=`${t.x},${t.y};`;
-        groundStamp=`${this.season}|${occ}`;const cached=this.groundCache?.get(`${cx},${cy}`);
+        groundStamp=`${this.season}|${occ}|${this.pathRevAll??0}.${this.pathRev?.get(`${cx},${cy}`)??0}|${this.v2?.geo&&this.pathStyle==='v2'?1:0}`;const cached=this.groundCache?.get(`${cx},${cy}`);
         if(cached&&cached.stamp!==groundStamp&&!(this.groundPaintsLeft>0)&&this.chunks.has(`${cx},${cy}`))return { key, x: left, y: origin.y };
       }
       if(!dirty)context.clearRect(0,0,texture.width,texture.height);
@@ -533,7 +538,8 @@ export class TerrainRenderer {
       // Remembered ground (explored, not in sight): greyed and darkened per pixel, by the same tile rule the ground was
       // painted with (bleed included), so no light or dark lines show along tile or chunk edges.
       if(continuous&&Object.keys(remembered).length)this.greyRemembered(context,cx,cy,left,origin.y);
-      if(this.pathStyle==='v2'&&this.v2)this.v2.drawChunk(context,cx,cy,left,origin.y,paths);
+      // Continuous ground: paths are part of the cached ground (pathSurface), no tile overlays.
+      if(this.pathStyle==='v2'&&this.v2&&!continuous)this.v2.drawChunk(context,cx,cy,left,origin.y,paths);
       else for(const p of paths){context.save();p.polygon(TILE_BLEED);context.clip();context.filter=p.filter;this.drawPaths(context,p.x,p.y,left,origin.y,p.veil,()=>{p.polygon();context.clip();});context.restore();}
       // S11 Stone Pavement on top of ground and tracks; under Fog of War only the remembered surface is drawn.
       for(const p of paths){const paved=tile=>this.tileData(tile)[4]===1;if(!paved(p))continue;const c=tileCenter(p);context.save();context.filter=p.filter;

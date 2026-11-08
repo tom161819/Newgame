@@ -167,7 +167,7 @@ export function wetness(fx, fy, depthAt, settings = GROUND_DEFAULTS) { // single
   const wx = fx - 0.5, wy = fy - 0.5, ix = Math.floor(wx), iy = Math.floor(wy), ax = smooth(wx - ix), ay = smooth(wy - iy), wet = (x, y) => (depthAt(x, y) >= 0 ? 1 : 0);
   return wet(ix, iy) * (1 - ax) * (1 - ay) + wet(ix + 1, iy) * ax * (1 - ay) + wet(ix, iy + 1) * (1 - ax) * ay + wet(ix + 1, iy + 1) * ax * ay;
 }
-export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zoneAt, depthAt = () => -1, inWorld = () => true, inside = null, field = null, settings = GROUND_DEFAULTS, step = 4 }) {
+export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zoneAt, depthAt = () => -1, inWorld = () => true, inside = null, field = null, settings = GROUND_DEFAULTS, step = 4, surface = null }) {
   const wetAt = field ? field.wet : (fx, fy) => wetness(fx, fy, depthAt, settings), mask = new Uint8Array(width * height);
   const s = { ...GROUND_DEFAULTS, ...settings }, img = ctx.getImageData(0, 0, width, height), out = img.data, grain = detail();
   const warpScale = 1 / 3.2, warp = s.edgeWidth, colors = GROUND_DEFAULTS_BASE.zoneColors.map((c, i) => hex(s.zoneColors?.[i] ?? c)), wcolors = GROUND_DEFAULTS_BASE.waterColors.map((c, i) => hex(s.waterColors?.[i] ?? c)), season = seasonLook(s.year ?? yearOf(s.season));
@@ -182,6 +182,9 @@ export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zo
     LR[i] = land[0]; LG[i] = land[1]; LB[i] = land[2]; SZ[i] = land[3]; P1[i] = land[4];
     WR[i] = water[0]; WG[i] = water[1]; WB[i] = water[2]; DEP[i] = water[3];
   }
+  // Path surface (pathSurface.js): distance and level on the same coarse grid; skipped where no path is near.
+  const PD = surface ? new Float32Array(n) : null, PL = surface ? new Float32Array(n) : null;
+  if (surface) for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++) { const i = gy * gw + gx, [fx, fy] = toWorld(gx * step + 0.5, gy * step + 0.5), [dd, ll] = surface.sample(fx, fy); PD[i] = dd; PL[i] = ll; }
   function landBase(fx, fy, tx, ty) {
     const wx = fx + (fbm(fx * warpScale, fy * warpScale, 3) - 0.5) * warp * 2 - 0.5, wy = fy + (fbm(fx * warpScale, fy * warpScale, 7) - 0.5) * warp * 2 - 0.5;
     let r = 0, g = 0, b = 0, total = 0, zone = 0, best = -1;
@@ -231,6 +234,10 @@ export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zo
         r *= (1 + d) * mul0; g *= (1 + d) * mul1; b *= (1 + d * 0.8) * mul2;
         if (season.mix) { const p1 = P1[i] * w00 + P1[i1] * w10 + P1[i2] * w01 + P1[i3] * w11, m = season.snow > 0 ? Math.max(0, Math.min(1, season.mix + (p1 * 0.9 + d * 0.4) * season.snow)) : season.mix; r += (season.tint[0] - r) * m; g += (season.tint[1] - g) * m; b += (season.tint[2] - b) * m; }
         if (sp > 0 && snowy) { const h = hash(px >> 1, py >> 1, z.speck[0][0]); if (h < z.speck[1] * sp) [r, g, b] = z.speck[0]; else if (z.speck2 && h < (z.speck[1] + z.speck2[1]) * sp) [r, g, b] = z.speck2[0]; else if (z.speck3 && h < (z.speck[1] + z.speck2[1] + z.speck3[1]) * sp) [r, g, b] = z.speck3[0]; }
+        if (surface && (PD[i] < surface.reach || PD[i1] < surface.reach || PD[i2] < surface.reach || PD[i3] < surface.reach)) {
+          const dist = PD[i] * w00 + PD[i1] * w10 + PD[i2] * w01 + PD[i3] * w11, lv = Math.max(PL[i], PL[i1], PL[i2], PL[i3]) > 0 ? (PL[i] * w00 + PL[i1] * w10 + PL[i2] * w01 + PL[i3] * w11) / Math.max(1e-6, (PL[i] ? w00 : 0) + (PL[i1] ? w10 : 0) + (PL[i2] ? w01 : 0) + (PL[i3] ? w11 : 0)) : 1;
+          const res = surface.apply(r, g, b, dist, lv, SZ[w00 >= 0.25 ? i : w10 >= 0.25 ? i1 : w01 >= 0.25 ? i2 : i3], px, py, fx, fy, d, season); if (res) { r = res[0]; g = res[1]; b = res[2]; }
+        }
         if (wetV > 0.3 && s.wetBank > 0) { const k = 1 - (wetV - 0.3) / 0.2 * 0.28 * s.wetBank; r *= k; g *= k; b *= k * 1.02; }
       }
       out[o] = r; out[o + 1] = g; out[o + 2] = b; out[o + 3] = 255;
