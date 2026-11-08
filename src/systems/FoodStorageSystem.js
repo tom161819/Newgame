@@ -51,7 +51,7 @@ export class FoodStorageSystem {
   free(locationId,resource){const l=this.locations.get(locationId);return l?Math.max(0,(l.stock[resource]??0)-this.reserved(locationId,resource)):0;}
   groups(locationId){
     const l=this.locations.get(locationId);if(!l||l.kind!=='storage'||!this.scene.buildings.some(b=>b.id===l.buildingId&&b.type==='granary'))return null;
-    const used=granaryUsage(l.stock,this.scene.objectRegistry),incoming={raw:0,food:0};
+    const used=granaryUsage(l.stock,this.scene.objectRegistry),incoming=Object.fromEntries(Object.keys(GRANARY_GROUP_CAPACITY).map(group=>[group,0]));
     for(const r of this.reservations.values())if(r.kind==='capacity'&&r.locationId===locationId){const group=granaryGroup(r.resource,this.scene.objectRegistry);if(group)incoming[group]+=r.amount;}
     return Object.fromEntries(Object.entries(GRANARY_GROUP_CAPACITY).map(([group,capacity])=>[group,{capacity,used:used[group],incoming:incoming[group],free:Math.max(0,capacity-used[group]-incoming[group])}]));
   }

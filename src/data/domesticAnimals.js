@@ -28,8 +28,8 @@ export const HOUSE_RATS=Object.freeze({catRadius:10,afterDays:2,happiness:-3});
 // keeps in its own store (Granary stock, Starter Stockpile food, the Mill's and Bakery's input/output buffers) and
 // follow the Granary rules (growth by fill, losses 1/3/6 %, grain and flour first, reserved food never). Any other
 // building that keeps food in its own store counts too. Each listed building raises the kingdom's cat cap by one.
-// The Farmhouse keeps no food of its own today (Farmers carry the harvest to the stores), so rats there only appear
-// once it holds food; a cat can still live there and guards the Houses near it.
+// farmhouse-store (8 Nov 2026): the Farmhouse keeps the Wheat and Flour in its own store, so rats grow there from that
+// stock by the Granary rules and a cat living there clears them (it also guards the Houses near it).
 export const RAT_BUILDINGS=Object.freeze(['granary','starter_stockpile','mill','bakery','farmhouse']);
 // m-zvirata-3 (67): cats were too small next to people. The approved cat sprites (and the kitten's own smaller
 // sprite) are drawn at this scale: a tomcat side view 26×14 px → 39×21 px, just under a hound (41×22 px).

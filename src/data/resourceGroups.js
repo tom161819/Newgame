@@ -8,7 +8,9 @@ export function resourceGroup(definition,registry){
   if(definition.id==='gold')return 'gold';
   if(definition.edible===true)return 'food';
   if(['equipment','vehicle'].includes(definition.resourceCategory))return 'equipment';
-  if(registry?.get?.('granary')?.storage?.resources?.includes(definition.id))return 'foodRaw';
+  // farmhouse-store (8 Nov 2026): raw food (Wheat, Flour) is whatever a food store (Granary or Farmhouse) takes
+  // and nobody can eat; it no longer depends on the Granary alone.
+  if(['granary','farmhouse'].some(id=>registry?.get?.(id)?.storage?.resources?.includes(definition.id)))return 'foodRaw';
   return 'materials';
 }
 // Resources sorted by group, then by their inventory order.

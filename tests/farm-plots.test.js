@@ -38,7 +38,8 @@ test('actual Farmers harvest and tend only their own farm plots in overlapping w
 
 test('farm removal cancels exclusive work safely, releases employees and reassigns plots to another farm',()=>{
   const s=scene(),a=build(s,'farmhouse',45,40),b=build(s,'farmhouse',55,40),plot=build(s,'wheat_field',48,44),w=s.workerSystem.create({x:44,y:40});s.workplaceSystem.assign(a,w);s.gameTime.update(2*s.gameTime.dayDuration);until(s,()=>w.workTask?.kind==='harvest');const before=s.inventory.count('wheat');
-  s.buildings=s.buildings.filter(x=>x!==a);for(const tile of a.tiles)s.map[tile.y][tile.x]=s.terrainGrid[tile.y][tile.x];s.towerViews.get(a.id).destroy();s.towerViews.delete(a.id);s.events.emit('buildings:changed');
+  // farmhouse-store: a removed Farmhouse also loses its grain store (as real demolition does).
+  s.foodStorage?.removeBuilding(a);s.buildings=s.buildings.filter(x=>x!==a);for(const tile of a.tiles)s.map[tile.y][tile.x]=s.terrainGrid[tile.y][tile.x];s.towerViews.get(a.id).destroy();s.towerViews.delete(a.id);s.events.emit('buildings:changed');
   assert.equal(plot.farmId,b.id);assert.equal(w.workTask,null);assert.equal(w.profession,'idle');assert.equal(s.farmingSystem.records.get(plot.id).reservedBy,null);assert.equal(s.workplaceSystem.records.has(a.id),false);assert.equal(s.inventory.count('wheat'),before);validateGameState(serializeGameState(s));
 });
 

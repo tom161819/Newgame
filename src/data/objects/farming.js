@@ -1,11 +1,12 @@
 import { WORKPLACES } from '../workplaces.js';
-import { FARMING_RULES } from '../farming.js';
+import { FARMING_RULES,FARMHOUSE_STORE } from '../farming.js';
 
 export const farmingBuildings = [
   {
     id:'farmhouse',name:'Farmhouse',menuOrder:20,repeatPlacement:true,width:3,height:3,cost:{wood:10},constructionTime:25000,
     recommendsCompletedBuildings:['granary'],
-    description:'A farmhouse with three Farmer workplaces. Farmers tend crops within 15 tiles.',
+    description:`A farmhouse with three Farmer workplaces. Farmers tend crops within 15 tiles. Its store keeps ${FARMHOUSE_STORE.capacity} Wheat and Flour.`,
+    storage:{capacity:FARMHOUSE_STORE.capacity,resources:[...FARMHOUSE_STORE.resources]},
     walkable:false,workplace:WORKPLACES.farmhouse,workRadius:FARMING_RULES.workRadius,
     interactions:['manage_workers'],renderer:'workplace',visualHeight:110,
   },

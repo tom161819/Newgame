@@ -497,7 +497,8 @@ export class GameScene extends Phaser.Scene {
     if(selected?.kind==='building'&&selected.object.type==='castle')this.employmentPanel.open();
     if(selected?.kind==='building'&&buildingDefinition(selected.object).trade){this.marketplacePanel.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).builderWorkshop){this.builderWorkshopPanel.open(selected.object);return;}
-    if(selected?.kind==='building'&&buildingDefinition(selected.object).storage){this.storagePanel.open(selected.object);return;}
+    // farmhouse-store: a workplace with its own store (the Farmhouse) opens the workplace panel, which links to the store.
+    if(selected?.kind==='building'&&buildingDefinition(selected.object).storage&&!buildingDefinition(selected.object).workplace){this.storagePanel.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).workplace){this.workplacePanel.open(selected.object);return;}
     if(this.character.transitioning){this.setStatus(t('status.waitClimb'));return;}
     this.constructionSystem.stopKing();

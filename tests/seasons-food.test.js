@@ -12,7 +12,8 @@ globalThis.document={querySelector:()=>({textContent:''})};
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-6,`${a} != ${b}`);
 function scene(seconds=120,{migration=false}={}){const s=workerScene(undefined,{construction:true,foodProduction:true,seasons:true,gameSettings:{dayLengthSeconds:seconds}});s.seasons.random=()=>0;s.seasons.weather='Sunny';if(!migration)s.workerSystem.unsubscribe();return s;}
 function building(s,type,x,y){const definition=s.objectRegistry.require(type);ensureBuildingPrerequisites(s,definition);Object.entries(definition.cost).forEach(([r,k])=>s.inventory.add(r,k));const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition});assert.ifError(result.error);s.towerViews.set(result.building.id,s.createBuildingView(definition,result.building));return result.building;}
-function stock(s,items){let b=s.buildings.find(b=>b.type==='granary')??building(s,'granary',48,45);for(const [id,n]of Object.entries(items))assert.equal(s.foodStorage.deposit(`granary-${b.id}`,id,n),true);return b;}
+// farmhouse-store (8 Nov 2026): Wheat and Flour go to a Farmhouse store, the rest to the Granary.
+function stock(s,items){let b=s.buildings.find(b=>b.type==='granary')??building(s,'granary',48,45);for(const [id,n]of Object.entries(items)){if(['wheat','flour'].includes(id)){const f=s.buildings.find(b=>b.type==='farmhouse')??building(s,'farmhouse',54,45);assert.equal(s.foodStorage.deposit(`farmhouse-${f.id}`,id,n),true);}else assert.equal(s.foodStorage.deposit(`granary-${b.id}`,id,n),true);}return b;}
 function until(s,predicate,max=15000){let elapsed=0;while(!predicate()&&elapsed<max){s.tick(25);elapsed+=25;}assert.ok(predicate(),`Condition not reached at ${elapsed}`);return elapsed;}
 
 test('central calendar advances four five-day seasons, then a new year, with one weather choice per actual day and no load roll',()=>{

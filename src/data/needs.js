@@ -22,7 +22,7 @@ export const DAILY_REST=Object.freeze({
 });
 export const clampNeed=value=>Math.max(0,Math.min(100,value));
 // Kingdom Happiness (average of residents) as a modifier of the existing Kingdom Attractiveness (#58 phase C).
-export const HAPPINESS_ATTRACTIVENESS=Object.freeze([{min:80,value:15},{min:50,value:0},{min:30,value:-20},{min:0,value:-45}]);
+export const HAPPINESS_ATTRACTIVENESS=Object.freeze([{min:75,value:15},{min:50,value:0},{min:30,value:-20},{min:0,value:-45}]);
 export const attractivenessFor=happiness=>happiness==null?0:HAPPINESS_ATTRACTIVENESS.find(r=>happiness>=r.min).value;
 export const moodFor=happiness=>NEEDS.moods.find(m=>happiness>=m.min)??NEEDS.moods.at(-1);
 // Weighted Happiness minus the separate unpaid-wage penalty (counted once), rounded to 0–100.

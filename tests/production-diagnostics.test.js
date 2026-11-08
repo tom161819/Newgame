@@ -41,10 +41,10 @@ test('a Mill without Wheat names the nearest real cause; paused, unstaffed or st
   building(s,'wheat_field',40,52);advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.deepEqual(reasons(s),['noProducerWorkers']);
   employ(s,farmhouse,'farmer',42);advance(s,DIAGNOSTICS.checkInterval);assert.deepEqual(reasons(s),[],'farmers at work: waiting for the harvest is not a problem');
   // Wheat already in storage but nobody to carry it: that, not the farm, is the cause.
-  s.foodProduction.records.get(mill.id).auto=true;const granary=building(s,'granary',48,52);s.foodStorage.locations.get(`granary-${granary.id}`).stock.wheat=8;
+  s.foodProduction.records.get(mill.id).auto=true;s.foodStorage.locations.get(`farmhouse-${farmhouse.id}`).stock.wheat=8;/* farmhouse-store: Wheat waits in the Farmhouse store */
   advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.deepEqual(reasons(s),['noHauler']);
   employ(s,null,'hauler',44);advance(s,DIAGNOSTICS.checkInterval);assert.deepEqual(reasons(s),[]);
-  s.foodStorage.locations.get(`granary-${granary.id}`).stock.wheat=0;s.foodProduction.records.get(mill.id).auto=false;advance(s,DIAGNOSTICS.persistence*2);assert.deepEqual(reasons(s),[],'switched off on purpose');
+  s.foodStorage.locations.get(`farmhouse-${farmhouse.id}`).stock.wheat=0;s.foodProduction.records.get(mill.id).auto=false;advance(s,DIAGNOSTICS.persistence*2);assert.deepEqual(reasons(s),[],'switched off on purpose');
   const empty=building(s,'mill',60,45);advance(s,DIAGNOSTICS.persistence*2);assert.equal(s.diagnostics.active().some(i=>i.entityId===empty.id),false,'an unstaffed mill is not told to produce');
 });
 
@@ -60,9 +60,9 @@ test('two waiting sites without a Builder make one kingdom notice that counts th
 test('C05 commanded Builders, Haulers and Farmers are not counted as working sources until Resume',()=>{
  const s=scene(),site=building(s,'tower',60,50,{blueprint:true}),builder=employ(s,null,'builder');s.workerSystem.commands.hold(builder);advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(reasons(s).includes('noBuilder'));
  s.workerSystem.commands.resume(builder);advance(s,DIAGNOSTICS.checkInterval);assert.ok(!reasons(s).includes('noBuilder'));
- const mill=building(s,'mill',54,45);employ(s,mill,'miller');const granary=building(s,'granary',48,52);s.foodStorage.locations.get(`granary-${granary.id}`).stock.wheat=8;const hauler=employ(s,null,'hauler',44);s.workerSystem.commands.hold(hauler);
+ const mill=building(s,'mill',54,45);employ(s,mill,'miller');const granary=building(s,'farmhouse',48,52);s.foodStorage.locations.get(`farmhouse-${granary.id}`).stock.wheat=8;const hauler=employ(s,null,'hauler',44);s.workerSystem.commands.hold(hauler);
  advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(reasons(s).includes('noHauler'));s.workerSystem.commands.resume(hauler);advance(s,DIAGNOSTICS.checkInterval);assert.ok(!reasons(s).includes('noHauler'));
- s.foodStorage.locations.get(`granary-${granary.id}`).stock.wheat=0;const farm=building(s,'farmhouse',40,45);building(s,'wheat_field',40,52);const farmer=employ(s,farm,'farmer',42);s.workerSystem.commands.hold(farmer);advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(reasons(s).includes('noProducerWorkers'));s.workerSystem.commands.resume(farmer);advance(s,DIAGNOSTICS.checkInterval);assert.ok(!reasons(s).includes('noProducerWorkers'));
+ s.foodStorage.locations.get(`farmhouse-${granary.id}`).stock.wheat=0;const farm=building(s,'farmhouse',40,45);building(s,'wheat_field',40,52);const farmer=employ(s,farm,'farmer',42);s.workerSystem.commands.hold(farmer);advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(reasons(s).includes('noProducerWorkers'));s.workerSystem.commands.resume(farmer);advance(s,DIAGNOSTICS.checkInterval);assert.ok(!reasons(s).includes('noProducerWorkers'));
  const miller=s.workplaceSystem.employees(mill)[0];s.workerSystem.commands.hold(farmer);s.workerSystem.commands.hold(miller);advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(!s.diagnostics.active().some(i=>i.entityId===mill.id),'a deliberately held production crew raises no production alarm');
 });
 

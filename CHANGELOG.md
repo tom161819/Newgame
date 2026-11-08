@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.72.0] - 2026-11-08
+<!-- version: {"title":"Farmhouse store","type":"feature","reconstructed":false,"saveVersion":60} -->
+### Changed
+- Farmhouses have their own store for Wheat and Flour (200). Farmers bring the harvest there; if every Farmhouse is full it goes to the Starter Stockpile. Haulers take Wheat to the Mill, bring the Flour back and supply the Bakery from there. The Granary no longer stores Wheat or Flour, and the Farmhouse panel shows its store. Rats can now appear in a Farmhouse, and a cat clears them.
+- Happiness of 75 (was 80) already gives the +15 attractiveness bonus.
+- Saves from older versions cannot be loaded (save version 60).
+
 ## [0.71.0] - 2026-11-08
 <!-- version: {"title":"Fisherman's Hut art","type":"feature","reconstructed":false,"saveVersion":59} -->
 ### Changed

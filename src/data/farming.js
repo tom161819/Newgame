@@ -9,4 +9,8 @@ export const FARMING_RULES = Object.freeze({
       stages: ['Resting trees', 'Blossoming trees', 'Small fruit', 'Ripe apples'] }),
   }),
 });
+// Owner decision 8 Nov 2026 (farmhouse-store): every Farmhouse keeps a store for grain – Wheat and Flour only, 200 units
+// together. Farmers bring the harvest here, Haulers supply the Mill and the Bakery from it and take the Mill's Flour
+// back. The Granary no longer takes Wheat or Flour; the Starter Stockpile still does (fallback while no Farmhouse has room).
+export const FARMHOUSE_STORE = Object.freeze({ capacity: 200, resources: Object.freeze(['wheat', 'flour']) });
 export const cropStage = (growth, required) => growth>=required-1e-8?3:Math.min(2,Math.floor(Math.max(0,growth)/required*3+1e-9));

@@ -10,7 +10,8 @@ import { physicalResources,materialResources,storageResources,stockLocationId,ca
 
 export function validateFoodState(s,registry,{check,number,integer,array}){
   const storage=s.foodStorage,production=s.foodProduction;
-  if(!storage){check(!production&&!s.buildings.some(b=>buildingIsComplete(b)&&(registry.require(b.type).storage||registry.require(b.type).recipe))&&!(s.workers??[]).some(w=>['foodPickup','foodDeliver','produce'].includes(w.workTask?.kind)));return;}
+  // farmhouse-store: a Farmhouse is first a workplace; a world without the storage system may still have one (its store is just absent).
+  if(!storage){check(!production&&!s.buildings.some(b=>buildingIsComplete(b)&&(registry.require(b.type).storage&&!registry.require(b.type).workplace||registry.require(b.type).recipe))&&!(s.workers??[]).some(w=>['foodPickup','foodDeliver','produce'].includes(w.workTask?.kind)));return;}
   check(storage&&production);array(storage.locations);array(storage.reservations);array(production.records);integer(storage.nextReservation,1);integer(production.nextTransfer,1);
   const physical=storage.physicalMaterials===true,resources=physical?physicalResources(registry):[...FOOD_RESOURCE_IDS];
   const expected=physical?new Map():new Map([['food-camp',{kind:'fallback',buildingId:null,x:PLAYER_START.x,y:PLAYER_START.y,width:1,height:1,capacity:FOOD_RULES.fallbackCapacity,allowed:[...FOOD_RESOURCE_IDS]}]]);

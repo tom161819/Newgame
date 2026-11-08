@@ -23,21 +23,22 @@ function hauler(s,tile,vehicle=null){
 // Every distinct cargo the Hauler picks up while the scene runs.
 function loads(s,h,ms){const seen=[];let last=null;for(let t=0;t<ms;t+=50){s.tick(50);const c=h.cargo?`${h.cargo.resource}:${h.cargo.amount}`:null;if(c&&c!==last)seen.push(c);last=c;}return seen;}
 
-test('a Hauler with a Wheelbarrow or Horse Wagon carries a full load of food into the Granary; by hand as before',()=>{
+test('a Hauler with a Wheelbarrow or Horse Wagon carries a full load of food into the Granary; by hand as before (Apples: Wheat now goes to a Farmhouse)',()=>{
   for(const [vehicle,factor]of [[null,1],['wheelbarrow',5],['horse_wagon',10]]){
     const s=scene(),granary=building(s,'granary',44,44),h=hauler(s,{x:50,y:50},vehicle),stockpile=s.buildings.find(b=>b.type==='starter_stockpile');
-    assert.equal(carryCapacity(h,'wheat'),40*factor);
-    s.foodStorage.deposit(`stockpile-${stockpile.id}`,'wheat',Math.min(250,s.foodStorage.locations.get(`stockpile-${stockpile.id}`).capacity));
-    const amount=s.foodStorage.locations.get(`stockpile-${stockpile.id}`).stock.wheat;
-    until(s,()=>h.cargo?.resource==='wheat');assert.equal(h.cargo.amount,Math.min(amount,40*factor),`${vehicle??'hands'}: one trip takes the full load`);
-    until(s,()=>(s.foodStorage.locations.get(`granary-${granary.id}`).stock.wheat??0)===amount);
+    assert.equal(carryCapacity(h,'apple'),40*factor);
+    s.foodStorage.deposit(`stockpile-${stockpile.id}`,'apple',Math.min(250,s.foodStorage.locations.get(`stockpile-${stockpile.id}`).capacity));
+    const amount=s.foodStorage.locations.get(`stockpile-${stockpile.id}`).stock.apple;
+    until(s,()=>h.cargo?.resource==='apple');assert.equal(h.cargo.amount,Math.min(amount,40*factor),`${vehicle??'hands'}: one trip takes the full load`);
+    until(s,()=>(s.foodStorage.locations.get(`granary-${granary.id}`).stock.apple??0)===amount);
   }
 });
 
 test('a Hauler with a Wheelbarrow fills a Mill with whole batches in one trip; by hand he still brings one batch',()=>{
   for(const vehicle of ['wheelbarrow','horse_wagon',null]){
-    const s=scene(),granary=building(s,'granary',44,44),mill=building(s,'mill',54,44),miller=s.workerSystem.create({x:55,y:50});assert.equal(s.workplaceSystem.assign(mill,miller),true);
-    const h=hauler(s,{x:50,y:50},vehicle);s.foodStorage.deposit(`granary-${granary.id}`,'wheat',100);
+    // farmhouse-store: the Mill's Wheat comes from a Farmhouse store.
+    const s=scene(),farm=building(s,'farmhouse',44,44),mill=building(s,'mill',54,44),miller=s.workerSystem.create({x:55,y:50});assert.equal(s.workplaceSystem.assign(mill,miller),true);
+    const h=hauler(s,{x:50,y:50},vehicle);assert.equal(s.foodStorage.deposit(`farmhouse-${farm.id}`,'wheat',100),true);
     const wheat=loads(s,h,120000).filter(l=>l.startsWith('wheat:')).map(l=>Number(l.split(':')[1]));assert.ok(wheat.length,'the Hauler supplies the Mill');
     if(vehicle){assert.equal(wheat[0],20,`${vehicle}: the first trip fills the 20-unit input buffer (5 batches of 4 Wheat)`);assert.ok(wheat.every(n=>n>4||n===wheat.at(-1)),'later trips top it up, never one batch at a time');}
     else assert.ok(wheat.every(n=>n===4),'by hand: one batch (4 Wheat) per trip, as before');

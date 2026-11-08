@@ -32,4 +32,4 @@ export const MAX_TRIP_UNITS=(LOGISTICS_RULES.loadUnits+20)*Math.max(...Object.va
 export function loadCapacity(actor){return (LOGISTICS_RULES.loadUnits+(actor.profession==='hauler'?Math.floor(((actor.skills?.logistics?.level??1)-1)/5)*2:0))*(VEHICLES[actor.vehicleType]?.multiplier??1);}
 // How many pieces of one resource fit in one trip (at least one, so heavy goods still move); without a resource, load units.
 export function carryCapacity(actor,resource=null){const units=loadCapacity(actor);return resource?Math.max(1,Math.floor(units/loadWeight(resource))):units;}
-export const stockLocationId=building=>`${building.type==='starter_stockpile'?'stockpile':building.type==='warehouse'?'warehouse':building.type==='material_yard'?'yard':building.type==='armory'?'armory':'granary'}-${building.id}`;
+export const stockLocationId=building=>`${building.type==='starter_stockpile'?'stockpile':building.type==='warehouse'?'warehouse':building.type==='material_yard'?'yard':building.type==='armory'?'armory':building.type==='farmhouse'?'farmhouse':'granary'}-${building.id}`;

@@ -75,7 +75,7 @@ test('data-only registry additions refresh unlock listeners and use their regist
 test('Save/Load derives warnings from actual buildings without saving any unlock state',()=>{
   const s=scene();(s.inventory.add('stone',30),s.inventory.add('wood',30));build(s,'granary',44,44);build(s,'farmhouse',50,44);const saved=validateGameState(serializeGameState(s)),r=scene({starter:false});loadGameState(r,saved);assert.deepEqual(serializeGameState(r),saved);
   assert.equal(r.buildingUnlocks.status(definition('wheat_field')).warning,'');assert.equal(Object.hasOwn(saved,'buildingUnlocks'),false);
-  const legacy=structuredClone(saved);legacy.buildings=legacy.buildings.filter(b=>b.type!=='granary');legacy.foodStorage.locations=legacy.foodStorage.locations.filter(l=>l.kind!=='storage');
+  const legacy=structuredClone(saved);legacy.buildings=legacy.buildings.filter(b=>b.type!=='granary');legacy.foodStorage.locations=legacy.foodStorage.locations.filter(l=>!String(l.id).startsWith('granary-'));
   legacy.workplaces.records=legacy.workplaces.records.filter(record=>legacy.buildings.some(b=>b.id===record.buildingId));
   const old=scene({starter:false});loadGameState(old,legacy);assert.equal(old.buildings.some(b=>b.type==='farmhouse'),true);assert.match(old.buildingUnlocks.status(definition('farmhouse')).warning,/Granary/);assert.equal(old.buildingUnlocks.status(definition('wheat_field')).warning,'');validateGameState(serializeGameState(old));
 });

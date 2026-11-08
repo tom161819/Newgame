@@ -13,6 +13,11 @@ export class WorkplacePanel {
   constructor(scene){
     this.scene=scene;this.dialog=document.querySelector('#workplace-dialog');this.controller=new AbortController();const options={signal:this.controller.signal};this.restored=true;
     this.farmCount=element('p');this.farmCount.id='farm-plot-count';this.farmCount.hidden=true;this.dialog.insertBefore(this.farmCount,document.querySelector('#food-production-details'));
+    // farmhouse-store (8 Nov 2026): a workplace with its own store (the Farmhouse's grain store) shows its fill and opens the store window.
+    this.farmStore=element('section','farm-store');this.farmStore.id='farm-store';this.farmStore.hidden=true;this.farmStoreText=element('p');this.farmStoreText.id='farm-store-text';
+    this.farmStoreButton=element('button','',t('workplace.openStore'));this.farmStoreButton.type='button';this.farmStoreButton.id='farm-store-open';
+    this.farmStoreButton.addEventListener('click',()=>{const b=this.building;if(!b)return;this.close();scene.storagePanel?.open(b);},options);
+    this.farmStore.append(this.farmStoreText,this.farmStoreButton);this.dialog.insertBefore(this.farmStore,document.querySelector('#food-production-details'));
     this.staffingStatus=element('p');this.staffingStatus.id='workplace-staffing-output';this.dialog.insertBefore(this.staffingStatus,document.querySelector('#food-production-details'));
     this.exclusions=element('section');this.exclusions.id='employment-exclusions';this.exclusionInputs={};this.exclusionLabels={};
     for(const kind of ['local','type']){const label=element('label'),input=element('input'),text=element('span');input.type='checkbox';input.dataset.employmentExclusion=kind;this.exclusionInputs[kind]=input;this.exclusionLabels[kind]=text;label.append(input,text);this.exclusions.append(label);
@@ -55,6 +60,8 @@ export class WorkplacePanel {
     const s=this.scene,b=this.building;if(!s.buildings.includes(b)||!s.fog.isVisibleObject(b)){this.close();return;}
     const spec=buildingDefinition(b),summary=s.workplaceSystem.summary(b),employees=s.workplaceSystem.employees(b),candidates=s.workerSystem.liveSubjects();
     const plots=b.type==='farmhouse'?s.farmingSystem?.plotSummary(b):null;this.farmCount.hidden=!plots;if(plots)this.farmCount.textContent=t('farmPlots.count',plots);
+    const store=spec.storage&&s.foodStorage?[...s.foodStorage.locations.values()].find(l=>l.buildingId===b.id&&s.foodStorage.isStock(l)):null;this.farmStore.hidden=!store;
+    if(store){const used=s.foodStorage.used(store),list=Object.entries(store.stock).filter(([,n])=>n>0).map(([id,n])=>`${n} ${s.objectRegistry.require(id).name}`).join(' + ')||t('transport.empty');this.farmStoreText.textContent=t('workplace.store',{used,capacity:store.capacity,list});}
     const employment=s.employment,blocked=employment?.blockReason(b)??null;
     this.exclusions.hidden=!employment||!!b.depleted;this.exclusionInputs.local.checked=employment?.blockedBuildings.has(b.id)??false;this.exclusionInputs.type.checked=employment?.blockedTypes.has(b.type)??false;
     for(const kind of ['local','type'])this.exclusionLabels[kind].textContent=t(`employment.exclude.${kind}`,{name:spec.name});this.exclusionReason.textContent=t(`employment.exclude.${blocked??'allowed'}`+'Status');this.exclusionHelp.textContent=t('employment.exclude.help');

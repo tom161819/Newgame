@@ -17,23 +17,26 @@ function world({wheat=0}={}){
   const place=(type,x,y)=>{const d=s.objectRegistry.require(type);s.foodStorage.deposit(starter,'stone',d.cost.stone??0);s.foodStorage.deposit(starter,'wood',d.cost.wood??0);
     const r=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(r.error);s.towerViews.set(r.building.id,s.createBuildingView(d,r.building));s.foodStorage.register(r.building);return r.building;};
   const granary=place('granary',58,40),store=[...s.foodStorage.locations.values()].find(l=>l.buildingId===granary.id);
-  if(wheat)assert.equal(s.foodStorage.deposit(store.id,'wheat',wheat),true);
+  // farmhouse-store: the Granary no longer takes Wheat, so its food stock in these fixtures is Apples.
+  if(wheat)assert.equal(s.foodStorage.deposit(store.id,'apple',wheat),true);
   const days=n=>{for(let i=0;i<n*10;i++){s.gameTime.update(s.gameTime.dayDuration/10);s.domestic.update(s.gameTime.dayDuration/10);}};
   return {s,d:s.domestic,granary,store,place,days,feed,starter};
 }
 
 test('rats: a full Granary without a cat has Many after about 5 days and an Infestation after about 10; an empty store loses them', () => {
   const {d,store,days,feed}=world({wheat:0});const full=world({wheat:0});
-  full.s.foodStorage.deposit(full.store.id,'wheat',Math.min(full.store.capacity,full.s.foodStorage.room(full.store.id,'wheat')));
+  full.s.foodStorage.deposit(full.store.id,'apple',Math.min(full.store.capacity,full.s.foodStorage.room(full.store.id,'apple')));
   full.days(4);assert.equal(ratLevel(full.d.ratsAt(full.store.id)),'few');full.days(2);assert.equal(ratLevel(full.d.ratsAt(full.store.id)),'many');
   full.days(5);assert.equal(ratLevel(full.d.ratsAt(full.store.id)),'infestation');assert.ok(full.feed.some(t=>/Rats in the Granary/.test(t))&&full.feed.some(t=>/infested/.test(t)));
   days(3);assert.equal(d.ratsAt(store.id),0,'no food, no rats');void feed;
 });
 
 test('rats eat 1 / 3 / 6 % of the food a day, grain first, never reserved food and never below zero', () => {
-  const {s,d,store,days}=world({wheat:100});s.foodStorage.deposit(store.id,'bread',50);
+  // farmhouse-store: grain lives in a Farmhouse store now; rats there follow the Granary rules.
+  const {s,d,place,days:days0}=world({wheat:0}),farm=place('farmhouse',64,40),store=[...s.foodStorage.locations.values()].find(l=>l.buildingId===farm.id&&l.kind==='storage'),days=days0;
+  assert.equal(s.foodStorage.deposit(store.id,'wheat',100),true);assert.equal(s.foodStorage.deposit(store.id,'flour',50),true);
   d.rats.set(store.id,80);const before=s.foodStorage.used(store),loss=d.lossPerDay(store.id);assert.equal(Math.round(loss),Math.round(150*RATS.loss.infestation));
-  days(1);const eaten=before-s.foodStorage.used(store);assert.ok(Math.abs(eaten-loss)<=2,`ate ${eaten}, expected about ${loss}`);assert.equal(s.foodStorage.locations.get(store.id).stock.bread,50,'grain first');
+  days(1);const eaten=before-s.foodStorage.used(store);assert.ok(Math.abs(eaten-loss)<=2,`ate ${eaten}, expected about ${loss}`);assert.equal(s.foodStorage.locations.get(store.id).stock.flour,50,'grain first');
   const r=s.foodStorage.reserve('stock',store.id,'wheat',s.foodStorage.free(store.id,'wheat'),'test');void r;days(5);
   assert.equal(s.foodStorage.reserved(store.id,'wheat'),s.foodStorage.locations.get(store.id).stock.wheat??0,'reserved grain untouched');assert.ok(Object.values(s.foodStorage.locations.get(store.id).stock).every(v=>v>=0));
 });
@@ -115,7 +118,7 @@ test('m-zvirata-3 (71): a cat can live at a Farmhouse; rat buildings raise the c
   assert.ok(d.homes().some(b=>b.id===farm.id)&&d.homes().some(b=>b.id===mill.id)&&d.homes().some(b=>b.id===bakery.id));
   const cat=d.newCat({x:farm.x,y:farm.y+3});assert.equal(d.assign(cat.id,farm.id),true);assert.equal(cat.buildingId,farm.id);
   const second=d.newCat({x:farm.x,y:farm.y+3});assert.equal(d.assign(second.id,farm.id),true,'more than one cat may live at a Farmhouse');
-  assert.equal(d.status(farm.id).rats,0,'no food of its own, no rats');assert.equal(d.status(farm.id).needed,1);
+  assert.equal(d.status(farm.id).rats,0,'an empty Farmhouse store, no rats');assert.equal(d.status(farm.id).needed,1);
   // Caravan purchase to a Bakery.
   s.caravans=new CaravanSystem(s);s.trade=new TradeSystem(s);place('warehouse',76,40);place('marketplace',44,48);assert.equal(s.caravans.summon(),true);for(let i=0;i<20000&&s.caravans.active.phase==='arriving';i++)s.caravans.update(100);
   s.inventory.add('gold',100);d.updateCaravan();d.caravanCats.count=1;const r=d.buyCat(bakery.id);assert.equal(r.ok,true);assert.equal(r.cat.buildingId,bakery.id);
@@ -140,4 +143,14 @@ test('m-zvirata-3: rats and a cat at a Bakery survive a save (schema unchanged)'
   const r=workerScene(saved.terrain,{construction:true,logistics:true,starter:false,gameSettings:gameSettings()});r.domestic=new DomesticAnimalSystem(r);loadGameState(r,saved);
   assert.equal(r.domestic.ratsAt(input),40.25);assert.equal(r.domestic.cats.get(cat.id).buildingId,bakery.id);assert.equal(r.domestic.cats.get(fc.id).buildingId,farm.id);
   const bad=structuredClone(serializeGameState(s));bad.domestic.cats.find(c=>c.id===cat.id).buildingId=9999;assert.throws(()=>validateGameState(bad));
+});
+
+test('farmhouse-store: rats grow in a Farmhouse from its own grain store and a cat living there clears them',()=>{
+  const {s,d,place,days,feed}=world({wheat:0}),farm=place('farmhouse',64,40),store=[...s.foodStorage.locations.values()].find(l=>l.buildingId===farm.id&&l.kind==='storage');
+  assert.ok(store,'the Farmhouse has its own store');assert.deepEqual(store.allowed,['wheat','flour']);assert.equal(store.capacity,200);
+  assert.ok(d.foodLocations().some(l=>l.id===store.id),'a rat location');assert.equal(s.foodStorage.deposit(store.id,'wheat',200),true);
+  days(6);assert.ok(['many','infestation'].includes(ratLevel(d.buildingRats(farm.id))),'a full Farmhouse store breeds rats like a full Granary');
+  assert.ok(store.stock.wheat<200,'rats ate wheat');assert.ok(feed.some(t=>/Farmhouse/.test(t)),'the rats notice names the Farmhouse');
+  const before=d.ratsAt(store.id),cat=d.newCat({x:farm.x,y:farm.y+3});assert.equal(d.assign(cat.id,farm.id),true);assert.equal(d.status(farm.id).needed,1);
+  days(1);assert.ok(d.ratsAt(store.id)<before,'the cat catches rats');days(8);assert.equal(ratLevel(d.ratsAt(store.id)),'none','one cat clears a Farmhouse');
 });
