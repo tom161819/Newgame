@@ -11,6 +11,8 @@ export async function notices2Smoke(context,url,instrument){
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.noticesPanel);
     if(await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>true,()=>false))await page.keyboard.press('Escape');
     await page.waitForFunction(()=>!document.querySelector('dialog[open]'));
+    // Paused: the injected notices are not real problems, so a running diagnostics check would forget them at once.
+    await page.evaluate(()=>window.__game.registry.get('application').scene.gameTime.setPaused(true));
   };
   // Reports one notice right away through the real diagnostics (no 10 s wait).
   const report=found=>page.evaluate(found=>{const d=window.__game.registry.get('application').scene.diagnostics,now=window.__game.registry.get('application').scene.gameTime.totalElapsed;const issue=d.track(found,now);d.notify(issue,found,now);d.changed();return issue.key;},found);
@@ -32,6 +34,8 @@ export async function notices2Smoke(context,url,instrument){
     if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/notices-2-folded.png`});
     // Reload: still folded.
     await start();assert.equal(await page.locator('#notices-panel.collapsed').count(),1,'folded after reload');
+    // A fresh game has no notices (the bar is hidden): report one so the folded bar shows.
+    await report({entityId:0,reason:'foodLow',category:'production',params:{days:1},feed:true});await page.locator('#notices-panel:not([hidden])').waitFor();
     await page.locator('#notices-toggle').click();assert.equal(await page.locator('#notices-panel.collapsed').count(),0);
     assert.equal(await page.evaluate(()=>localStorage.getItem('newgame.notices.collapsed')),'0');assert.equal(await page.locator('#notices-toggle .notices-unread').count(),0);
     // A flickering problem comes back quietly to its one row with a count.

@@ -112,6 +112,12 @@ export class TutorialGuide {
   }
   place(target){
     const vw=innerWidth,vh=innerHeight;let point=null,rect=null;
+    // A target inside a scrolling panel (e.g. a free resident's job button low in a long Population list) may be
+    // scrolled out of the panel: bring it into view once per target, so the arrow points at something visible.
+    if(target.el&&target.avoid&&visible(target.el)&&this.scrolledTarget!==target.el){
+      const r=target.el.getBoundingClientRect(),clip=[target.avoid].flat().filter(visible).map(e=>e.getBoundingClientRect());
+      if(clip.some(c=>r.left<c.right&&r.right>c.left&&(r.top<c.top||r.bottom>c.bottom))){target.el.scrollIntoView?.({block:'nearest',inline:'nearest'});this.scrolledTarget=target.el;}
+    }
     if(target.el&&visible(target.el)){rect=target.el.getBoundingClientRect();point={x:rect.left+rect.width/2,y:rect.top+rect.height/2};}
     else if(target.world){const sp=this.screenPoint(target.world);if(sp)point={x:sp.x,y:sp.y};}
     if(!point){this.arrow.hidden=true;this.positionBubble(null);return;}

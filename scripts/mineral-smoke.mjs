@@ -22,7 +22,14 @@ export async function mineralSmoke(page){
     await page.locator('#assign-workplace-worker').click();await page.locator(`[data-assign-worker="${worker.id}"]`).click();await page.locator('#close-workplace').click();
     await page.waitForFunction(id=>{const w=window.__game.registry.get('application').scene.workerSystem.workers.get(id);return w.workTask?.kind==='mineDeposit'&&w.workTask.progressMs>1500;},worker.id,{timeout:90000});
     const partial=await page.evaluate(()=>{const app=window.__game.registry.get('application');app.scene.pauseManager.set('mineral-smoke',true);return app.snapshot();});await load(partial);assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').snapshot()),partial);
-    await page.evaluate(()=>window.__game.registry.get('application').scene.pauseManager.set('mineral-smoke',false));await page.waitForFunction(id=>window.__game.registry.get('application').scene.workerSystem.workers.get(id).cargo?.amount===1,worker.id,{timeout:30000});
+    // The Miner carries the unit only a few steps to the pile: pause the game the moment he picks it up (a temporary
+    // setter on his cargo), so the loaded-cargo Save/Load below does not depend on polling luck.
+    await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,w=s.workerSystem.workers.get(id);let cargo=w.cargo;
+      Object.defineProperty(w,'cargo',{configurable:true,enumerable:true,get:()=>cargo,set:v=>{cargo=v;if(v?.amount===1){s.pauseManager.set('mineral-smoke',true);window.__mineralCargo=true;}}});
+      window.__mineralCargo=false;s.pauseManager.set('mineral-smoke',false);},worker.id);
+    await page.waitForFunction(()=>window.__mineralCargo,null,{timeout:30000});
+    await page.evaluate(id=>{const w=window.__game.registry.get('application').scene.workerSystem.workers.get(id),cargo=w.cargo;Object.defineProperty(w,'cargo',{configurable:true,enumerable:true,writable:true,value:cargo});},worker.id);
+    assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.workerSystem.workers.get(id).cargo?.amount,worker.id),1);
     const cargo=await page.evaluate(()=>{const app=window.__game.registry.get('application');app.scene.pauseManager.set('mineral-smoke',true);return app.snapshot();});assert.equal(cargo.workers.find(w=>w.id===worker.id).cargo.resource,fixture.resource);assert.equal(cargo.resources.find(r=>r.natural?.id===fixture.depositId).natural.remaining,0);assert.equal(cargo.inventory[fixture.resource]??0,0);
     await load(cargo);assert.deepEqual(await page.evaluate(()=>window.__game.registry.get('application').snapshot()),cargo);
     // m-sklady-materialu-koncept (49): the Miner drops the unit on the building's pile; a Hauler takes it to a store.

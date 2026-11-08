@@ -65,7 +65,7 @@ export function tutorialPlacement({point,rect=null,avoid=null,from=null,vw,vh,bu
     const roomLeft=box.left,roomRight=vw-box.right,roomAbove=box.top-top,roomBelow=vh-box.bottom,need=w+ARROW_LENGTH+gap*2+margin;
     const ay=clamp(cy,box.top+8,box.bottom-8);
     let side=from;
-    if(!side)side=box.bottom>vh-170?'above':roomLeft>=need||roomRight>=need?(roomLeft>=roomRight?'left':'right'):roomAbove>=roomBelow?'above':'below';
+    if(!side)side=!avoid&&r.bottom>vh-170?'above':roomLeft>=need||roomRight>=need?(roomLeft>=roomRight?'left':'right'):roomAbove>=roomBelow?'above':'below';
     if(side==='left'){arrow={x:box.left-gap-half,y:ay,angle:0};bubbleAt={x:arrow.x-half-gap-w,y:ay-h/2};}
     else if(side==='right'){arrow={x:box.right+gap+half,y:ay,angle:Math.PI};bubbleAt={x:arrow.x+half+gap,y:ay-h/2};}
     else if(side==='below'){arrow={x:cx,y:box.bottom+gap+half,angle:-Math.PI/2};bubbleAt={x:cx-w/2,y:arrow.y+half+gap};}

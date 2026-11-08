@@ -8,10 +8,13 @@ async function arrowOn(page,selector){
   await page.waitForFunction(sel=>{const a=document.querySelector('#tutorial-arrow'),t=document.querySelector(sel);if(!a||a.hidden||!t)return false;const r=a.getBoundingClientRect(),q=t.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;return Math.hypot(cx-(q.left+q.width/2),cy-(q.top+q.height/2))<Math.max(q.width,q.height)/2+60;},selector,{timeout:8000});
 }
 async function placeHere(page,id){
+  // The King and animals walk around: a spot found free may be taken when the click lands, so try a fresh spot again.
+  for(let attempt=0;attempt<4;attempt++){
   const spot=await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,d=s.objectRegistry.require(id),c=s.buildings.find(b=>b.type==='castle')??s.character.tile;
     for(let r=3;r<24;r++)for(let y=c.y-r;y<=c.y+r;y++)for(let x=c.x-r;x<=c.x+r;x++){if(Math.max(Math.abs(x-c.x),Math.abs(y-c.y))!==r)continue;const keep=s.selectedBuilding,mode=s.buildMode;s.selectedBuilding=d;s.buildMode=true;s.previewAnchor={x,y};s.previewKey=null;s.updateBuildingPreview();/* 0.61.0: the preview key ends with the gate axis */const ok=String(s.previewKey).endsWith(':false:null:null');s.selectedBuilding=keep;s.buildMode=mode;if(ok)return {x:s.map.length*32+(x-y)*32,y:128+(x+y+1)*16};}return null;},id);
   assert.ok(spot,`room for ${id}`);await clickWorld(page,spot,{forBlueprint:true});
-  await page.waitForFunction(id=>window.__game.registry.get('application').scene.buildings.some(b=>b.type===id),id);
+  if(await page.waitForFunction(id=>window.__game.registry.get('application').scene.buildings.some(b=>b.type===id),id,{timeout:attempt<3?3000:30000}).then(()=>true,e=>{if(attempt===3)throw e;return false;}))break;
+  }
   if(await page.evaluate(()=>!!window.__game.registry.get('application').scene.buildMode))await page.keyboard.press('Escape');
 }
 // m-tutorial-v2 point 2: inside the Population panel the arrow sits beside the panel at the target's height and
@@ -31,7 +34,7 @@ async function jobStep(page,job,next){
 }
 // Optional steps (fisherman, mill, bakery): info with an arrow at the card and a "Next" button.
 async function nextStep(page,id,next){
-  assert.equal((await scene(page)).step,id);assert.equal(await page.locator('#tutorial-bubble .tutorial-next').isVisible(),true,`${id} has Next`);
+  assert.equal((await scene(page)).step,id);assert.equal(await page.locator('#tutorial-bubble .tutorial-next').waitFor({timeout:3000}).then(()=>true,()=>false),true,`${id} has Next`);
   await page.locator('#tutorial-bubble .tutorial-next').click();assert.equal((await scene(page)).step,next);
 }
 // Follow the arrow: Buildings tab → category → card, then the map.

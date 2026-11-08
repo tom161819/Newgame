@@ -49,7 +49,7 @@ export async function depletedMineSmoke(context,url,instrument){
     // The Hauler still empties the pile.
     await page.waitForFunction(f=>!(window.__game.registry.get('application').scene.foodStorage.locations.get(f.pile)?.stock.stone>0),f,{timeout:120000});
     // Panel: new name, no seats, demolition with refund.
-    await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id);s.gameSpeed=1;s.demolitionUI.select(b);s.workplacePanel.open(b);s.refreshVisibility();},quarry);
+    await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id);s.gameSpeed=1;/* only buildings in view get their footprint applied: look at the Quarry first */const c=s.cameras.main,base=s.towerViews.get(id).base;s.worldCamera.following=false;s.worldCamera.panTarget=null;c.setZoom(1.4).centerOn(base.x,base.y-80);c.preRender();s.demolitionUI.select(b);s.workplacePanel.open(b);s.refreshVisibility();},quarry);
     assert.equal(await page.locator('#workplace-name').textContent(),'Depleted Quarry');assert.match(await page.locator('#workplace-staffing-output').textContent(),/exhausted/);
     assert.equal(await page.locator('#workplace-workers .empty-slot').count(),0);assert.match(await page.locator('#demolition-actions').textContent(),/Wood/);
     assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.towerViews.get(id).footprint?.visible,quarry),true,'the selected building shows its footprint');
@@ -66,7 +66,8 @@ export async function depletedMineSmoke(context,url,instrument){
       const w=s.workerSystem.liveSubjects().find(w=>w.isAlive&&!w.assignedWorkplaceId&&w.profession==='idle');s.workerSystem.jobs.assign(w,'builder');s.gameSpeed=3;return b.demolition.refund;},quarry);
     assert.ok(refund.wood>0);
     await page.waitForFunction(id=>!window.__game.registry.get('application').scene.buildings.some(b=>b.id===id),quarry,{timeout:150000});
-    assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.diagnostics.active().some(i=>i.entityId===id),quarry),false,'the notice goes with the building');
+    // The notice goes with the building at the next diagnostics check (every 2 s of game time).
+    assert.equal(await page.waitForFunction(id=>!window.__game.registry.get('application').scene.diagnostics.active().some(i=>i.entityId===id),quarry,{timeout:8000}).then(()=>true,()=>false),true,'the notice goes with the building');
     assert.deepEqual(errors,[]);
     console.log(`PASS depleted-mine: Quarry exhausted → Depleted Quarry (darker, no seats, Miner Unemployed), one notice, pile emptied, demolished with ${JSON.stringify(refund)}; footprints only selected / build mode; screenshot ${dir}/depleted-mine.png`);
   }finally{await page.evaluate(()=>{try{window.__game.registry.get('application').scene.gameSpeed=1;}catch{}}).catch(()=>{});await page.close();}

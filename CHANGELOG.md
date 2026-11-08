@@ -5,6 +5,22 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.68.0] - 2026-11-08
+<!-- version: {"title":"Tutorial v2 and economy fixes","type":"feature","reconstructed":false,"saveVersion":59} -->
+### Added
+- New tutorial order: King, Builder, Hauler, Granary, Hunting Lodge, then optional Fisherman / Farmhouse / Mill / Bakery steps with a Next button, Lumberjack Hut ("even the King can build"), Stone (the arrow points at a rock to mark), Miner, House, Material Yard, Speed. All texts were rewritten. Arrows no longer cover the Population panel.
+- Depleted mines: when an Iron Mine or Quarry runs out, it becomes a darker "Depleted" building with no workers. Its Miners move to another mine or become free. A single notice says so. It can be demolished for a refund.
+- Notices can be folded with a button. While folded, a new notice shows briefly and the button counts unread notices. Advice on missing links in production chains ("Wheat is piling up – build a Mill") appears at most every 3 days.
+### Changed
+- The Food need comes from rations (Small 30 %, Normal 60 %, Generous 80 %) plus 5 % for each kind of food eaten in the last 3 days. The Generous and Varied meals happiness bonuses are gone.
+- The same notice returns at most once per game day (warnings every half day). The low-food advice lists every food source, including the Fisherman's Hut.
+- Haulers with a Wheelbarrow or Wagon fill a Mill or Bakery with several batches in one trip.
+- Haulers and Builders no longer appear as "without a workplace" in the worker picker.
+- Building squares show only while placing or when the building is selected.
+- The normal start has 5 residents and 90 wood.
+### Fixed
+- The tutorial stone and house steps now advance.
+
 ## [0.67.0] - 2026-11-08
 <!-- version: {"title":"Approved art","type":"feature","reconstructed":false,"saveVersion":59} -->
 ### Added
