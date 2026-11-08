@@ -8,7 +8,7 @@ import {
   readCode, makeCode, worldFor, checks, readFavourite, defaultsProposal, slug, PLAYER_START, COLUMNS, ROWS,
 } from './model.js';
 import { drawTopDown, drawIso, preload, whenImagesLoad } from './render.js';
-import { GROUND_DEFAULTS, GROUND_SETTINGS, ZONE_NAMES, TIMES, SEASONS, WEATHERS, yearOf, seasonOf, OBJECT_KINDS } from './ground.js';
+import { GROUND_DEFAULTS, GROUND_SETTINGS, ZONE_NAMES, WATER_NAMES, TIMES, SEASONS, WEATHERS, yearOf, seasonOf, OBJECT_KINDS } from './ground.js';
 
 const $ = selector => document.querySelector(selector);
 const STORAGE = 'asset-studio.world-lab.v1', FAVOURITES = 'worlds', DEFAULTS = 'worldDefaults', SPAN = 28;
@@ -248,8 +248,9 @@ function renderGround() {
   // Plants and stones: amount and opacity side by side for every kind.
   const alpha = kind => { const key = `${kind}Alpha`, out = h('output', {}, String(state.ground.settings[key] ?? 1)); return h('label', { class: 'wl-setting wl-alpha' }, h('span', {}, 'Opacity'), h('input', { type: 'range', min: 0.1, max: 1, step: 0.05, value: state.ground.settings[key] ?? 1, 'aria-label': `${kind} opacity`, oninput: e => { state.ground.settings[key] = +e.target.value; out.textContent = e.target.value; redraw(); } }), out); };
   const pick = group => GROUND_SETTINGS.map((def, i) => def.group === group ? h('div', { class: 'wl-pair' }, sliders[i], OBJECT_KINDS.includes(def.key) ? alpha(def.key) : null) : null).filter(Boolean);
-  const ground = sliders.filter((_, i) => !GROUND_SETTINGS[i].group);
-  box.replaceChildren(scene, ...(state.ground.mode === 'continuous' ? [colours, h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Ground'), ground), h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Plants'), pick('plants')), h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Stones'), pick('stones'))] : []));
+  const ground = sliders.filter((_, i) => !GROUND_SETTINGS[i].group), water = sliders.filter((_, i) => GROUND_SETTINGS[i].group === 'water');
+  const waterColours = h('div', { class: 'wl-ground-colours' }, h('span', {}, 'Water shades'), WATER_NAMES.map((name, i) => h('label', { class: 'wl-colour' }, h('input', { type: 'color', value: state.ground.settings.waterColors?.[i] ?? GROUND_DEFAULTS.waterColors[i], 'aria-label': name, oninput: e => { state.ground.settings.waterColors = GROUND_DEFAULTS.waterColors.map((c, j) => j === i ? e.target.value : state.ground.settings.waterColors?.[j] ?? c); redraw(); } }), name)));
+  box.replaceChildren(scene, ...(state.ground.mode === 'continuous' ? [colours, h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Ground'), ground), waterColours, h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Water, fords and shore'), water), h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Plants'), pick('plants')), h('div', { class: 'wl-ground-grid' }, h('h5', {}, 'Stones'), pick('stones'))] : []));
 }
 for (const b of document.querySelectorAll('#wl-ground [data-ground]')) b.addEventListener('click', () => { state.ground.mode = b.dataset.ground; saveGround(); renderGround(); drawAll(); });
 $('#wl-ground-reset').addEventListener('click', () => { state.ground.settings = structuredClone(GROUND_DEFAULTS); saveGround(); renderGround(); drawAll(); });
@@ -265,3 +266,4 @@ window.worldLab = Object.assign(window.worldLab ?? {}, { ground: () => structure
 // Test hooks: jump the iso window to a river bank (beach or mud next to water).
 window.worldLab.setFocus = (x, y) => { state.focus = { x, y }; drawAll(); };
 window.worldLab.findBank = () => { const w = state.world; for (let r = 0; r < 120; r++) for (let y = Math.max(1, PLAYER_START.y - r); y <= Math.min(ROWS - 2, PLAYER_START.y + r); y++) for (let x = Math.max(1, PLAYER_START.x - r); x <= Math.min(COLUMNS - 2, PLAYER_START.x + r); x++) { const g = w.ground[y][x]; if ((g === 1 || g === 6 || g === 7) && [w.ground[y][x + 1], w.ground[y + 1][x]].some(n => n >= 3 && n <= 5)) return { x, y }; } return null; };
+window.worldLab.findGround = code => { const w = state.world; for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLUMNS; x++) if (w.ground[y][x] === code) return { x, y }; return null; };

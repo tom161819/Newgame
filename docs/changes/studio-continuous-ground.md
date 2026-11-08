@@ -33,3 +33,6 @@ After approval the game part is m-souvisla-zeme: same maths per 16 × 16 chunk i
 
 ### Round 5 (owner 8 Nov)
 - Beach sand, desert sand, mud bank and shore rocks are painted the same way and blend with the grass (own colour pickers, detail and speckles). Water (shallow, deep, ford) is never painted or blended, so river banks stay sharp. Plants and stones also grow on these grounds where they fit.
+
+### Round 6 (owner 8 Nov)
+- Water painted too: one smooth, sharp shoreline (bilinear wetness at a slightly warped position, threshold 0.5), ford → shallow → deep blended by depth, pebbles under fords, ripples, foam at the shore, a darker wet band on the bank, icy tint in winter. Sliders: shore curve, foam, wet bank, shallow → deep transition, ripples; colour pickers for ford, shallow and deep water. Plants and stones never stand in the water.

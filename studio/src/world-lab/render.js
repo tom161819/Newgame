@@ -89,9 +89,13 @@ export function drawIso(canvas, world, { focus, span = 28, ground = null }) {
     const LAND = { [GROUND.BEACH]: 6, [GROUND.DESERT]: 7, [GROUND.MUD]: 8, [GROUND.SHORE_ROCKS]: 9 };
     const isGrass = (x, y) => { const g = world.ground[y]?.[x]; return g === GROUND.GRASS || LAND[g] !== undefined; };
     const zoneAt = (x, y) => { const g = world.ground[y]?.[x]; return g === GROUND.GRASS ? world.zones[y]?.[x] ?? 0 : LAND[g] ?? 0; };
+    const DEPTH = { [GROUND.FORD]: 0.15, [GROUND.SHALLOW]: 0.5, [GROUND.DEEP]: 1 };
+    // Off the map, a position borrows the nearest tile on the map so the edge does not read as water or land.
+    const cell = (x, y) => world.ground[Math.max(0, Math.min(world.ground.length - 1, y))]?.[Math.max(0, Math.min(world.ground[0].length - 1, x))];
+    const depthAt = (x, y) => DEPTH[cell(x, y)] ?? -1, inWorld = (x, y) => world.ground[y]?.[x] !== undefined;
     const toWorld = (px, py) => { const a = (px - canvas.width / 2) / (W / 2), b = (py - headroom) / (H / 2); return [x0 + (a + b) / 2, y0 + (b - a) / 2]; };
-    paintContinuousGround(ctx, { width: canvas.width, height: canvas.height, toWorld, isGrass, zoneAt, settings: ground.settings });
-    for (const p of plantsFor({ x0, y0, span, isGrass, zoneAt, settings: ground.settings })) objects.push({ kind: 'plant', plant: p, x: p.fx, y: p.fy, sx: (p.fx - x0 - (p.fy - y0)) * (W / 2) + canvas.width / 2, sy: (p.fx - x0 + (p.fy - y0)) * (H / 2) + headroom });
+    paintContinuousGround(ctx, { width: canvas.width, height: canvas.height, toWorld, isGrass, zoneAt, depthAt, inWorld, settings: ground.settings });
+    for (const p of plantsFor({ x0, y0, span, isGrass, zoneAt, depthAt, settings: ground.settings })) objects.push({ kind: 'plant', plant: p, x: p.fx, y: p.fy, sx: (p.fx - x0 - (p.fy - y0)) * (W / 2) + canvas.width / 2, sy: (p.fx - x0 + (p.fy - y0)) * (H / 2) + headroom });
   }
   for (const o of objects.sort((a, b) => a.x + a.y - (b.x + b.y))) {
     if (o.kind === 'plant') { drawPlant(ctx, o.plant, o.sx, o.sy, seasonOf(ground.settings.year ?? yearOf(ground.settings.season))); continue; }
