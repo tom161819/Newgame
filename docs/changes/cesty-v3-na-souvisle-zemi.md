@@ -23,3 +23,7 @@ npm test (1104 pass), studio smoke (Path Lab V3 default, surface slider repaints
 ## Notes for the next agent
 - Tree shade over a bare soil area shows a faint regular dapple pattern (the shade layer, not the path).
 - When the owner proposes surface settings, copy pathProposal/default.surface into src/data/pathSurface.json (and config/seed into pathStyle.js if changed).
+
+## 0.77.1 World Editor close-up navigation (owner 8 Nov 2026)
+- src/ui/WorldEditor.js: drawIsoPreview takes `aspect` and centres the focus (fractional) in the canvas; the close-up's height is set to the map preview's height. Wheel or +/- zoom (span 8–48 tiles), arrows/WASD move (not while typing; arrows on a focused slider still move the slider), drag pans; redraws coalesced per animation frame; the generated world is cached per levels+seed so panning does not regenerate it. The map shows the view as a diamond (the canvas corners in tile space).
+- Save/Load: none. Testing: npm test, browser: map 579 px = close-up 579 px, wheel and WASD move the view, no errors.

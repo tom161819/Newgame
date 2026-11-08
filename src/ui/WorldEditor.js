@@ -41,24 +41,30 @@ function sprite(id, onload) {
   if (!entry) { const img = new Image(); entry = { img, ready: false }; img.onload = () => { entry.ready = true; onload?.(); }; img.src = `${import.meta.env?.BASE_URL ?? '/'}${path.replace(/^\//, '')}`; images.set(path, entry); }
   return entry.ready ? entry.img : null;
 }
-export function drawIsoPreview(canvas, world, { focus, span = 18, settings, seed = 0, onImage }) {
-  const W = 64, H = 32, headroom = 48;
-  const x0 = Math.max(0, Math.min(COLUMNS - span, Math.round(focus.x - span / 2))), y0 = Math.max(0, Math.min(ROWS - span, Math.round(focus.y - span / 2)));
-  canvas.width = span * W; canvas.height = span * H + headroom + 8;
+// span = tiles across the canvas (zoom), aspect = height / width of the canvas (the editor matches the map's height).
+export function drawIsoPreview(canvas, world, { focus, span = 18, aspect = 0.55, settings, seed = 0, onImage }) {
+  const W = 64, H = 32, width = Math.round(span * W), height = Math.max(H * 4, Math.round(width * aspect));
+  canvas.width = width; canvas.height = height;
   const ctx = canvas.getContext('2d', { willReadFrequently: true }); ctx.fillStyle = '#1d2418'; ctx.fillRect(0, 0, canvas.width, canvas.height);
   const cell = (x, y) => world.ground[Math.max(0, Math.min(ROWS - 1, y))]?.[Math.max(0, Math.min(COLUMNS - 1, x))];
   const isGrass = (x, y) => { const g = cell(x, y); return g === GROUND.GRASS || LAND[g] !== undefined; };
   const zoneAt = (x, y) => { const g = cell(x, y); return g === GROUND.GRASS ? world.zones[Math.max(0, Math.min(ROWS - 1, y))]?.[Math.max(0, Math.min(COLUMNS - 1, x))] ?? 0 : LAND[g] ?? 0; };
   const depthAt = (x, y) => DEPTH[cell(x, y)] ?? -1, inWorld = (x, y) => x >= 0 && y >= 0 && x < COLUMNS && y < ROWS;
-  const toWorld = (px, py) => { const a = (px - canvas.width / 2) / (W / 2), b = (py - headroom) / (H / 2); return [x0 + (a + b) / 2, y0 + (b - a) / 2]; };
-  const screen = (fx, fy) => [(fx - x0 - (fy - y0)) * (W / 2) + canvas.width / 2, (fx - x0 + (fy - y0)) * (H / 2) + headroom];
-  const field = makeWaterField({ x0, y0, span, depthAt, settings });
+  // The focus tile's centre sits in the middle of the canvas.
+  const cx = focus.x + 0.5, cy = focus.y + 0.5;
+  const toWorld = (px, py) => { const a = (px - width / 2) / (W / 2), b = (py - height / 2) / (H / 2); return [cx + (a + b) / 2, cy + (b - a) / 2]; };
+  const screen = (fx, fy) => [(fx - cx - (fy - cy)) * (W / 2) + width / 2, (fx - cx + (fy - cy)) * (H / 2) + height / 2];
+  const corners = [toWorld(0, 0), toWorld(width, 0), toWorld(0, height), toWorld(width, height)];
+  const x0 = Math.max(0, Math.floor(Math.min(...corners.map(c => c[0]))) - 1), y0 = Math.max(0, Math.floor(Math.min(...corners.map(c => c[1]))) - 1);
+  const x1 = Math.min(COLUMNS, Math.ceil(Math.max(...corners.map(c => c[0]))) + 1), y1 = Math.min(ROWS, Math.ceil(Math.max(...corners.map(c => c[1]))) + 1);
+  const box = Math.max(1, x1 - x0, y1 - y0);
+  const field = makeWaterField({ x0, y0, span: box, depthAt, settings });
   paintContinuousGround(ctx, { width: canvas.width, height: canvas.height, toWorld, isGrass, zoneAt, depthAt, inWorld, field, settings });
   const season = SEASONS.find(([id]) => yearOf(id) === settings.year)?.[0] ?? 'summer', objects = [];
   const free = (fx, fy) => world.terrain[Math.floor(fy)]?.[Math.floor(fx)] !== 1 && !world.bushes?.has?.(`${Math.floor(fx)},${Math.floor(fy)}`);
-  for (const p of waterObjectsFor({ x0, y0, span, field, depthAt, settings })) { const [sx, sy] = screen(p.fx, p.fy); if (p.flat) drawPlant(ctx, p, sx, sy, season); else objects.push({ plant: p, d: p.fx + p.fy, sx, sy }); }
-  for (const p of plantsFor({ x0, y0, span, isGrass, zoneAt, depthAt, field, settings, seed })) if (free(p.fx, p.fy)) { const [sx, sy] = screen(p.fx, p.fy); objects.push({ plant: p, d: p.fx + p.fy, sx, sy }); }
-  for (let y = y0; y < y0 + span; y++) for (let x = x0; x < x0 + span; x++) {
+  for (const p of waterObjectsFor({ x0, y0, span: box, field, depthAt, settings })) { const [sx, sy] = screen(p.fx, p.fy); if (p.flat) drawPlant(ctx, p, sx, sy, season); else objects.push({ plant: p, d: p.fx + p.fy, sx, sy }); }
+  for (const p of plantsFor({ x0, y0, span: box, isGrass, zoneAt, depthAt, field, settings, seed })) if (free(p.fx, p.fy)) { const [sx, sy] = screen(p.fx, p.fy); objects.push({ plant: p, d: p.fx + p.fy, sx, sy }); }
+  for (let y = y0; y < Math.min(ROWS, y0 + box); y++) for (let x = x0; x < Math.min(COLUMNS, x0 + box); x++) {
     const id = world.terrain[y][x] === 1 ? 'rock_outcrop' : world.bushes?.has?.(`${x},${y}`) ? BUSH_TYPES[world.bushes.get(`${x},${y}`)] ?? BUSH_TYPES[0] : null;
     if (id) { const [sx, sy] = screen(x, y); objects.push({ id, d: x + y + 1, sx, sy: sy + H / 2 }); }
   }
@@ -68,11 +74,12 @@ export function drawIsoPreview(canvas, world, { focus, span = 18, settings, seed
     if (img) ctx.drawImage(img, o.sx - img.width * (def.origin?.x ?? 0.5), o.sy - img.height * (def.origin?.y ?? 0.5));
     else { ctx.fillStyle = o.id === 'rock_outcrop' ? '#5c584c' : '#2c5424'; ctx.beginPath(); ctx.ellipse(o.sx, o.sy - 8, 22, 12, 0, 0, Math.PI * 2); ctx.fill(); }
   }
-  if (PLAYER_START.x >= x0 && PLAYER_START.x < x0 + span && PLAYER_START.y >= y0 && PLAYER_START.y < y0 + span) {
+  if (PLAYER_START.x >= x0 && PLAYER_START.x < x0 + box && PLAYER_START.y >= y0 && PLAYER_START.y < y0 + box) {
     const [sx, sy] = screen(PLAYER_START.x, PLAYER_START.y); ctx.strokeStyle = '#ffdf8a'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + W / 2, sy + H / 2); ctx.lineTo(sx, sy + H); ctx.lineTo(sx - W / 2, sy + H / 2); ctx.closePath(); ctx.stroke();
   }
-  return { x0, y0, span };
+  // The view's outline on the top-down map: the four canvas corners in tile space.
+  return { x0, y0, span: box, corners };
 }
 
 // The close-up starts on the river bank nearest the castle (the ground look shows best there), else on the castle.
@@ -102,6 +109,24 @@ export class WorldEditor {
     this.root.querySelector('#we-default').addEventListener('click', () => { confirm.hidden = false; this.root.querySelector('#we-default-yes').focus(); });
     this.root.querySelector('#we-default-no').addEventListener('click', () => { confirm.hidden = true; });
     this.root.querySelector('#we-default-yes').addEventListener('click', () => { confirm.hidden = true; this.resetAll(); this.say(t('editor.defaultDone')); });
+    // Close-up navigation (owner 8 Nov 2026): wheel zooms, arrows/WASD move, drag pans; redraws are coalesced per frame.
+    this.span = 18;
+    this.iso.addEventListener('wheel', event => { event.preventDefault(); this.span = Math.max(8, Math.min(48, Math.round(this.span * (event.deltaY > 0 ? 1.15 : 1 / 1.15)))); this.redrawIso(); }, { passive: false });
+    let drag = null;
+    this.iso.addEventListener('pointerdown', event => { drag = { x: event.clientX, y: event.clientY, focus: { ...this.focus } }; this.iso.setPointerCapture(event.pointerId); });
+    this.iso.addEventListener('pointermove', event => { if (!drag) return; const r = this.iso.getBoundingClientRect(), k = this.span * 64 / r.width, a = -(event.clientX - drag.x) * k / 32, b = -(event.clientY - drag.y) * k / 16; this.focusAuto = false; this.focus = this.clampFocus({ x: drag.focus.x + (a + b) / 2, y: drag.focus.y + (b - a) / 2 }); this.redrawIso(); });
+    const endDrag = () => { drag = null; }; this.iso.addEventListener('pointerup', endDrag); this.iso.addEventListener('pointercancel', endDrag);
+    addEventListener('keydown', event => {
+      if (this.root.hidden || event.ctrlKey || event.metaKey || event.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName ?? '') && document.activeElement.type !== 'range') return;
+      const step = Math.max(1, Math.round(this.span / 6)), keys = { ArrowUp: [-1, -1], w: [-1, -1], ArrowDown: [1, 1], s: [1, 1], ArrowLeft: [-1, 1], a: [-1, 1], ArrowRight: [1, -1], d: [1, -1], '+': 'in', '=': 'in', '-': 'out' };
+      const move = keys[event.key.length === 1 ? event.key.toLowerCase() : event.key]; if (!move) return;
+      if (document.activeElement?.type === 'range' && event.key.startsWith('Arrow')) return;
+      event.preventDefault();
+      if (move === 'in' || move === 'out') this.span = Math.max(8, Math.min(48, Math.round(this.span * (move === 'out' ? 1.15 : 1 / 1.15))));
+      else { this.focusAuto = false; this.focus = this.clampFocus({ x: this.focus.x + move[0] * step / 2, y: this.focus.y + move[1] * step / 2 }); }
+      this.redrawIso();
+    });
+    addEventListener('resize', () => { if (!this.root.hidden) this.redrawIso(); });
     this.map.addEventListener('click', event => { const r = this.map.getBoundingClientRect(); this.focusAuto = false; this.focus = { x: Math.floor((event.clientX - r.left) / r.width * COLUMNS), y: Math.floor((event.clientY - r.top) / r.height * ROWS) }; this.draw(); });
     this.root.addEventListener('keydown', event => { if (event.key === 'Escape' && !this.root.hidden) { event.stopPropagation(); this.root.querySelector('#we-back').click(); } });
     this.state = { levels: defaultWorldLevels(), seed: randomSeed(), ground: defaultGroundLook() };
@@ -177,17 +202,24 @@ export class WorldEditor {
     return [el('p', { class: 'we-help', text: t('editor.presetHelp') }), el('div', { class: 'we-preset-form' }, name, save), list];
   }
   previewSettings() { return { ...GAME_GROUND_SETTINGS, ...this.state.ground, year: yearOf(this.season), season: this.season }; }
+  clampFocus(f) { return { x: Math.max(0, Math.min(COLUMNS - 1, f.x)), y: Math.max(0, Math.min(ROWS - 1, f.y)) }; }
+  redrawIso() { if (this.isoFrame) return; this.isoFrame = requestAnimationFrame(() => { this.isoFrame = 0; this.draw(); }); }
   draw() {
     if (this.root.hidden) return;
-    const started = performance.now(), world = previewWorld(this.state.levels, this.state.seed); this.lastWorld = world;
+    const started = performance.now(), key = `${this.state.levels.join('')}|${this.state.seed}`, world = this.lastWorldKey === key ? this.lastWorld : previewWorld(this.state.levels, this.state.seed); this.lastWorld = world; this.lastWorldKey = key;
     if (this.focusAuto) this.focus = bankNear(world);
     const scale = 4, small = document.createElement('canvas'); small.width = COLUMNS; small.height = ROWS;
     small.getContext('2d').putImageData(new ImageData(previewPixels(world), COLUMNS, ROWS), 0, 0);
     this.map.width = COLUMNS * scale; this.map.height = ROWS * scale;
     const ctx = this.map.getContext('2d'); ctx.imageSmoothingEnabled = false; ctx.drawImage(small, 0, 0, COLUMNS * scale, ROWS * scale);
     ctx.fillStyle = '#b3261e'; ctx.fillRect((PLAYER_START.x - 1) * scale, (PLAYER_START.y - 1) * scale, 3 * scale, 3 * scale);
-    const view = drawIsoPreview(this.iso, world, { focus: this.focus, settings: this.previewSettings(), seed: this.state.seed, onImage: () => { clearTimeout(this.imageTimer); this.imageTimer = setTimeout(() => this.draw(), 60); } });
-    ctx.strokeStyle = 'rgb(255 255 255 / .9)'; ctx.lineWidth = 2; ctx.strokeRect(view.x0 * scale, view.y0 * scale, view.span * scale, view.span * scale);
+    // The close-up is as tall as the map preview; its width follows the figure.
+    const mapBox = this.map.getBoundingClientRect(), isoWidth = this.iso.parentElement.getBoundingClientRect().width || 1;
+    if (mapBox.height) this.iso.style.height = `${Math.round(mapBox.height)}px`;
+    const aspect = mapBox.height ? mapBox.height / isoWidth : 0.55;
+    const view = drawIsoPreview(this.iso, world, { focus: this.focus, span: this.span ?? 18, aspect, settings: this.previewSettings(), seed: this.state.seed, onImage: () => { clearTimeout(this.imageTimer); this.imageTimer = setTimeout(() => this.draw(), 60); } });
+    // Outline of the close-up on the map (a diamond: the canvas rectangle seen from above).
+    ctx.strokeStyle = 'rgb(255 255 255 / .9)'; ctx.lineWidth = 2; ctx.beginPath(); for (const [i, c] of [view.corners[0], view.corners[1], view.corners[3], view.corners[2]].entries()) ctx[i ? 'lineTo' : 'moveTo'](c[0] * scale, c[1] * scale); ctx.closePath(); ctx.stroke();
     this.lastMs = performance.now() - started; this.root.dataset.drawn = String((Number(this.root.dataset.drawn) || 0) + 1);
   }
 }

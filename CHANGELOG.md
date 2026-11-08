@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.77.1] - 2026-11-08
+<!-- version: {"title":"World Editor: the close-up zooms with the mouse wheel (or + and -), moves with the arrow keys, WASD or by dragging, and is as tall as the map preview.","type":"feature","reconstructed":false,"saveVersion":60} -->
+### Changed
+- World Editor: the close-up zooms with the mouse wheel (or + and -), moves with the arrow keys, WASD or by dragging, and is as tall as the map preview.
+
 ## [0.77.0] - 2026-11-08
 <!-- version: {"title":"Paths are now part of the new ground: trampled grass, bare soil that shows through with wear, soil that matches what it lies on (earth, sand, mud), pebbles, and","type":"feature","reconstructed":false,"saveVersion":60} -->
 ### Changed
