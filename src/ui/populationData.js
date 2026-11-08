@@ -45,7 +45,7 @@ export function residentWarnings(scene,worker){
 export function populationDetails(scene,worker){
   const experience=worker.experience,workplace=scene.workplaceSystem?.building(worker);
   return {name:worker.fullName??worker.name,profession:JOBS[worker.profession]?.name??worker.profession,level:experience.level,currentXP:experience.currentXP,totalXP:experience.totalXP,xpToNextLevel:experience.xpToNextLevel,maxLevel:experience.maxLevel,
-    job:localized(`work.state.${worker.workState}`,worker.workState),task:worker.workMessage?workMessageLabel(worker.workMessage):t('population.noTask'),workplace:worker.profession==='hauler'?t('unit.wholeKingdom'):workplace?.definition.name??t('unit.notAssigned'),
+    job:localized(`work.state.${worker.workState}`,worker.workState),task:worker.workMessage?workMessageLabel(worker.workMessage):t('population.noTask'),workplace:worker.profession==='hauler'?t('unit.wholeKingdom'):worker.profession==='builder'?(scene.builderWorkshops?.workshopFor(worker)?.definition?.name??t('unit.wholeKingdom')):workplace?.definition.name??t('unit.notAssigned'),
     talent:TALENTS[worker.naturalTalent]?localized(`talent.${worker.naturalTalent}`,TALENTS[worker.naturalTalent]):t('population.none'),hasTalent:!!TALENTS[worker.naturalTalent],warnings:residentWarnings(scene,worker),
     skills:Object.entries(SKILLS).filter(([id])=>worker.skills[id]).map(([id,name])=>{const skill=worker.skills[id];return {id,name,level:skill.level,currentXP:skill.currentXP,xpToNextLevel:skill.xpToNextLevel,maxLevel:skill.maxLevel,talented:id===worker.naturalTalent};})};
 }

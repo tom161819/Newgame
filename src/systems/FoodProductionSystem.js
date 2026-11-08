@@ -1,10 +1,10 @@
 import { TORCHES } from '../data/torches.js';
 import { dataName } from '../i18n/names.js';
-import { FOOD_RULES } from '../data/foodProduction.js';
+import { FOOD_RULES,FOOD_RESOURCE_IDS } from '../data/foodProduction.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { advanceConstruction } from './ConstructionProgress.js';
 import { tileKey } from '../game/stones.js';
-import { carryCapacity } from '../data/logistics.js';
+import { carryCapacity,VEHICLES } from '../data/logistics.js';
 import { recipeFor,defaultRecipeKey } from '../data/production.js';
 
 const first=object=>Object.entries(object)[0];
@@ -15,6 +15,16 @@ export class FoodProductionSystem {
   recipe(building){return recipeFor(buildingDefinition(building),this.records.get(building.id)?.recipe);}
   cycleRecipe(record,building){return recipeFor(buildingDefinition(building),record.cycle?.recipe??record.recipe);}
   setRecipe(buildingId,key){const record=this.records.get(buildingId),b=record&&this.building(buildingId),d=b&&buildingDefinition(b);if(!d?.recipes||!Object.hasOwn(d.recipes,key))return false;record.recipe=key;this.scene.logisticsTasks?.invalidate?.();return true;}
+  // m-nosici-trakar-pracoviste (62): how much of one input a carrier tops the input buffer up to. A Hauler with a
+  // Wheelbarrow or Horse Wagon fills a food workshop (Mill, Bakery) for as many whole batches as the buffer holds, also
+  // while a batch runs, so one trip is a full load; everyone else (and every non-food workshop) brings one batch
+  // between batches, as before. `bulk` true asks for the vehicle target (the Hauler catalog, which has no worker yet).
+  inputTarget(building,resource,{bulk=false}={}){
+    const recipe=this.recipe(building),need=recipe.input[resource]??0,record=this.records.get(building.id);if(!need)return 0;
+    if(!bulk||!Object.keys(recipe.input).every(id=>FOOD_RESOURCE_IDS.includes(id)))return record?.cycle?0:need;
+    const batch=Object.values(recipe.input).reduce((a,b)=>a+b,0);return need*Math.max(1,Math.floor((buildingDefinition(building).bufferCapacity??batch)/batch));
+  }
+  bulkCarrier(worker){return worker?.profession==='hauler'&&!!VEHICLES[worker.vehicleType];}
   inputShortage(building){const recipe=this.recipe(building);if(Object.keys(recipe.input).length<2)return null;const input=this.storage.locations.get(`input-${building.id}`);return Object.entries(recipe.input).find(([resource,amount])=>(input?.stock[resource]??0)+this.storage.incoming(input?.id,resource)+this.storage.available(resource)<amount)?.[0]??null;}
   building(id){return this.scene.buildings.find(b=>b.id===id&&buildingIsComplete(b)&&buildingDefinition(b).recipe)??null;}
   register(building){

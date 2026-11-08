@@ -17,8 +17,9 @@ export class LogisticsTaskManager {
     for(const record of this.scene.foodProduction.records.values()){
       const building=this.scene.foodProduction.building(record.buildingId);if(!building)continue;
       const recipe=this.scene.foodProduction.recipe(building),input=storage.locations.get(`input-${building.id}`);
-      if(record.auto&&!record.cycle&&input&&!this.scene.foodProduction.inputShortage(building)){
-        for(const [resource,needed]of Object.entries(recipe.input)){const missing=needed-(input.stock[resource]??0)-storage.incoming(input.id,resource);
+      // m-nosici-trakar-pracoviste (62): the catalog offers the vehicle target; updateWorker trims it per carrier.
+      if(record.auto&&input&&!this.scene.foodProduction.inputShortage(building)){
+        for(const resource of Object.keys(recipe.input)){const missing=this.scene.foodProduction.inputTarget(building,resource,{bulk:true})-(input.stock[resource]??0)-storage.incoming(input.id,resource);
           if(missing>0)for(const source of stores)if(storage.free(source.id,resource)>0)this.catalog.push({priority:20,sourceId:source.id,destinationId:input.id,resource,amount:missing});}
       }
       const [outputResource]=Object.entries(recipe.output)[0],output=storage.locations.get(`output-${building.id}`),available=storage.free(output.id,outputResource);
@@ -58,7 +59,7 @@ export class LogisticsTaskManager {
     for(const {task}of candidates){
       const destination=storage.locations.get(task.destinationId),drop=task.sourceDropId&&this.scene.dropSystem.drops.get(task.sourceDropId),existingCap=storage.reservations.get(task.capacityReservation);
       const allocation=task.allocationId&&storage.reservations.get(task.allocationId),available=task.allocationId?(allocation?.owner===`site-${task.siteId}`?allocation.amount:0):drop?.amount??storage.free(task.sourceId,task.resource),room=existingCap?.amount??storage.room(task.destinationId,task.resource);
-      let missing=task.amount;if(destination?.kind==='input'){const b=this.scene.buildings.find(b=>b.id===destination.buildingId),recipe=b&&this.scene.foodProduction.recipe(b);if(!b||this.scene.foodProduction.inputShortage(b))continue;missing=(recipe?.input[task.resource]??0)-(destination.stock[task.resource]??0)-storage.incoming(destination.id,task.resource);}
+      let missing=task.amount;if(destination?.kind==='input'){const b=this.scene.buildings.find(b=>b.id===destination.buildingId),recipe=b&&this.scene.foodProduction.recipe(b);if(!b||this.scene.foodProduction.inputShortage(b))continue;missing=(recipe?this.scene.foodProduction.inputTarget(b,task.resource,{bulk:this.scene.foodProduction.bulkCarrier(worker)}):0)-(destination.stock[task.resource]??0)-storage.incoming(destination.id,task.resource);}
       if(destination?.kind==='kit')missing=this.scene.military?.missing(destination.buildingId,task.resource)??0;
       const amount=Math.min(cap(task.resource),available,room,missing);if(amount<=0||!destination||drop&&!this.scene.workerSystem.reservations.available(`drop:${drop.id}`,worker.id))continue;
       const routeKey=`${worker.id}:${task.sourceDropId??task.sourceId}:${task.destinationId}`;
