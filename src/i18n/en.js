@@ -27,7 +27,7 @@ export default {
   'building.freeOffer':'Free – the kingdom has no wood and no Lumberjack Hut.',
   'notice.waitingMaterial':'{name}: its materials are in the stores, but nobody brings them. Add a Hauler.','notice.hire.builder':'Add a Builder','notice.hire.hauler':'Add a Hauler',
   'nightThreats.fireWarning':'A spark almost set the {name} alight – the neighbours put it out. Keep torches away from wooden buildings and build a Well nearby.',
-  'hud.foodDays':{one:'Food for {days} day',other:'Food for {days} days'},'hud.foodTip':'Edible food in the stores divided by what the kingdom eats a day ({count} portions). Wheat and Flour must be ground and baked first.','notice.foodLow':'Food for only {days} day(s) left: build a Hunting Lodge, a Farmhouse with fields or an Orchard.','overview.settleBlock.food':'Nobody settles while food lasts less than 2 days.','overview.settleBlock.jobs':'Nobody settles while more than 3 residents have no work.',
+  'hud.foodDays':{one:'Food for {days} day',other:'Food for {days} days'},'hud.foodTip':'Edible food in the stores divided by what the kingdom eats a day ({count} portions). Wheat and Flour must be ground and baked first.','notice.foodLow':'Food for only {days} day(s) left. Build more food: {sources}.','overview.settleBlock.food':'Nobody settles while food lasts less than 2 days.','overview.settleBlock.jobs':'Nobody settles while more than 3 residents have no work.',
   'status.buildCancelled':'Building mode cancelled. You can move and gather again.',
   'speed.group':'Game speed','speed.label':'Speed {speed}×','speed.pause':'Pause','speed.resume':'Resume',
   'menu.continue':'Continue','menu.continueTitle':'Continue: {name}',
@@ -79,7 +79,7 @@ export default {
   'employment.exclude.allowedStatus':'New assignments are allowed.',
   'employment.exclude.help':'Switching employment off sends the current workers away at once, even in the middle of their work. Both automatic and manual new assignments follow these rules; a type-wide ban takes priority.',
   // Food-chain completion advice (#125).
-  'notice.missingChainSource':'{name}: no {producer} for long-term production. Existing supplies can still be used.',
+  'notice.missingChainSource':'The {name} needs {resource} from a {producer}.','notice.chainNoConsumer':'{resource} is piling up – build a {consumer} to make {output}.','notice.foodSource.water':'{name} near water','notice.foodSource.farm':'{name} ({farm})','notice.or':' or ','notice.repeated':'×{count}','notice.repeatedTip':'The same notice {count} times; it is not repeated more often.','notice.collapse':'Fold Notices','notice.expand':'Unfold Notices','notice.unread':{one:'{count} new notice',other:'{count} new notices'},
   'hud.deliverCargo':'Deliver to storage','status.cargoAwaitDelivery':'Stone collected. Use Deliver to storage when you are ready.',
   'work.message.No reachable collection area':'No reachable Castle, material storage or construction site',
   'work.state.Holding':'Holding position','work.state.MovingToHold':'Moving to hold position',

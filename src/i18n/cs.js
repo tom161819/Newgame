@@ -27,7 +27,7 @@ export default {
   'building.freeOffer':'Zdarma – království nemá dřevo ani chatu dřevorubce.',
   'notice.waitingMaterial':'{name}: materiál je ve skladu, ale nikdo ho nenese. Přidej nosiče.','notice.hire.builder':'Přidat stavitele','notice.hire.hauler':'Přidat nosiče',
   'nightThreats.fireWarning':'Jiskra málem zapálila budovu {name} – sousedé ji uhasili. Drž pochodně dál od dřevěných staveb a postav poblíž studnu.',
-  'hud.foodDays':{one:'Jídlo na {days} den',few:'Jídlo na {days} dny',other:'Jídlo na {days} dní'},'hud.foodTip':'Jedlé jídlo ve skladech děleno denní spotřebou království ({count} porcí). Pšenice a mouka se musí nejdřív semlít a upéct.','notice.foodLow':'Jídlo zbývá jen na {days} dní: postav loveckou chatu, farmu s poli nebo sad.','overview.settleBlock.food':'Nikdo nepřijde, dokud jídlo vydrží méně než 2 dny.','overview.settleBlock.jobs':'Nikdo nepřijde, dokud je víc než 3 lidí bez práce.',
+  'hud.foodDays':{one:'Jídlo na {days} den',few:'Jídlo na {days} dny',other:'Jídlo na {days} dní'},'hud.foodTip':'Jedlé jídlo ve skladech děleno denní spotřebou království ({count} porcí). Pšenice a mouka se musí nejdřív semlít a upéct.','notice.foodLow':'Jídlo zbývá jen na {days} dní. Zdroje jídla: {sources}.','overview.settleBlock.food':'Nikdo nepřijde, dokud jídlo vydrží méně než 2 dny.','overview.settleBlock.jobs':'Nikdo nepřijde, dokud je víc než 3 lidí bez práce.',
   'status.buildCancelled':'Režim stavění zrušen. Můžeš se znovu pohybovat a sbírat suroviny.',
   'speed.group':'Rychlost hry','speed.label':'Rychlost {speed}×','speed.pause':'Pozastavit','speed.resume':'Pokračovat',
   'menu.continue':'Pokračovat','menu.continueTitle':'Pokračovat: {name}',
@@ -79,7 +79,7 @@ export default {
   'employment.exclude.allowedStatus':'Nové přiřazování je povoleno.',
   'employment.exclude.help':'Vypnutí zaměstnávání propustí současné pracovníky hned, i uprostřed práce. Pravidla platí pro nové automatické i ruční přiřazení; zákaz typu má přednost.',
   // Food-chain completion advice (#125).
-  'notice.missingChainSource':'{name}: pro dlouhodobou výrobu chybí {producer}. Současné zásoby lze dál využít.',
+  'notice.missingChainSource':'{name} potřebuje: {resource} (z budovy {producer}).','notice.chainNoConsumer':'{resource} se hromadí – postav budovu {consumer} (vyrábí: {output}).','notice.foodSource.water':'{name} u vody','notice.foodSource.farm':'{name} ({farm})','notice.or':' nebo ','notice.repeated':'×{count}','notice.repeatedTip':'Stejné upozornění už {count}×; častěji se neopakuje.','notice.collapse':'Sbalit upozornění','notice.expand':'Rozbalit upozornění','notice.unread':{one:'{count} nové upozornění',few:'{count} nová upozornění',other:'{count} nových upozornění'},
   'hud.deliverCargo':'Odnést do skladu','status.cargoAwaitDelivery':'Kámen sebrán. Až budeš chtít, zvol Odnést do skladu.',
   'work.message.No reachable collection area':'Není dostupný hrad, sklad materiálu ani staveniště',
   'work.state.Holding':'Drží pozici','work.state.MovingToHold':'Přesun na určenou pozici',

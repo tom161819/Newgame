@@ -1,32 +1,79 @@
 import { FOOD_OUTLOOK,foodDays } from '../data/foodOutlook.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
-import { DIAGNOSTICS,INPUT_SOURCES,COMPLETION_SOURCES,GATHER_OUTPUTS,DEPLETION_SOURCES,STORAGE_WAIT_MESSAGES } from '../data/diagnostics.js';
+import { DIAGNOSTICS,INPUT_SOURCES,GATHER_OUTPUTS,DEPLETION_SOURCES,STORAGE_WAIT_MESSAGES,CHAIN_ADVICE,noticeRepeatDays } from '../data/diagnostics.js';
+import { chainLinks,isRawSource } from '../data/productionChains.js';
+import { DAY_DURATION } from './GameTimeSystem.js';
 import { storageResources } from '../data/logistics.js';
 import { noticeText } from '../ui/noticeText.js';
 import { farmReady } from '../data/farmPlots.js';
 
 // Lasting problems that block work or production, each identified by (entity, reason). A problem is reported once
-// it has lasted DIAGNOSTICS.persistence, repeated at most every DIAGNOSTICS.reminder while it lasts, and dropped as
-// soon as it is gone. Checked a few times per game second from the actual construction, production and storage
-// state, never per unit or per frame. Nothing is saved: after Load a problem must last again before it is shown.
+// it has lasted DIAGNOSTICS.persistence, repeated at most once per NOTICE_REPEAT (game days by severity) while it
+// lasts, and dropped as soon as it is gone. A problem that comes back within that time returns quietly to its one row
+// (count + 1, no feed line, no new event), so a flickering cause does not pile up lines (request 72). Checked a few
+// times per game second from the actual construction, production and storage state, never per unit or per frame.
+// Nothing is saved: after Load a problem must last again before it is shown.
+const minId=list=>list.reduce((a,b)=>a.id<=b.id?a:b).id;
 export class ProductionDiagnostics {
-  constructor(scene){this.scene=scene;this.issues=new Map();this.listeners=new Set();this.nextCheck=0;this.revision=0;this.completionNotices=new Map();this.unsubscribe=scene.activities?.on(event=>{if(event.type==='buildingCompleted')this.completed(event.objectIds??[]);});}
+  constructor(scene){this.scene=scene;this.issues=new Map();this.memory=new Map();this.listeners=new Set();this.nextCheck=0;this.revision=0;this.unsubscribe=scene.activities?.on(event=>{if(event.type==='buildingCompleted')this.completed(event.objectIds??[]);});}
+  dayMs(){return this.scene.gameTime?.dayDuration??DAY_DURATION;}
+  repeatMs(reason){return noticeRepeatDays(reason)*this.dayMs();}
+  memoryKey(issue){return `${issue.key}:${issue.params?.resource??''}`;}
+  // Chain advice is immediate for a building just completed (structural, independent of stock or staff).
   completed(ids){
-    for(const id of ids){
-      const building=this.scene.buildings.find(b=>b.id===id),producer=building&&COMPLETION_SOURCES[building.type];
-      if(!producer||!buildingIsComplete(building)||this.hasPlanned(producer))continue;
-      // One piece of advice per missing link, even when several workers or
-      // several new buildings complete the same chain.
-      const key=`chain:${building.type}:${producer}`;if(this.completionNotices.has(key))continue;
-      const issue={key,entityId:id,reason:'missingChainSource',category:'production',params:{producer},lastNotified:this.scene.gameTime.totalElapsed,dismissed:false,informational:true};
-      this.completionNotices.set(key,issue);this.scene.activities?.emit('productionIssue',{reason:issue.reason,category:issue.category,objectIds:[id],params:{producer},informational:true});this.changed();
-    }
-    this.resolveCompletionNotices();
+    const time=this.scene.gameTime;if(!time)return;const now=time.totalElapsed;let changed=false;
+    for(const found of this.chainIssues())if(found.objectIds.some(id=>ids.includes(id)))changed=this.observe(this.track(found,now),found,now,{immediate:true})||changed;
+    if(changed)this.changed();
   }
+  track(found,now){
+    // One current reason per entity: a new reason replaces the old one (chain advice has its own key per chain).
+    const key=found.key??`${found.entityId}:${found.reason}`;let issue=this.issues.get(key);
+    if(!issue){issue={...found,key,firstSeen:now,lastNotified:null,dismissed:false,count:0};this.issues.set(key,issue);}
+    issue.params=found.params;issue.entityId=found.entityId;return issue;
+  }
+  // True when the panel must render again.
+  observe(issue,found,now,{immediate=false}={}){
+    if(issue.lastNotified==null){
+      if(!immediate&&now-issue.firstSeen<DIAGNOSTICS.persistence)return false;
+      const past=this.memory.get(this.memoryKey(issue));
+      if(past&&now-past.lastNotified<this.repeatMs(issue.reason)){issue.lastNotified=past.lastNotified;issue.dismissed=past.dismissed;issue.count=past.count+1;return true;}
+      return this.notify(issue,found,now);
+    }
+    // Danger (0 days) is never held back between separate events, but a lasting one is not repeated every check.
+    if(now-issue.lastNotified<Math.max(this.repeatMs(issue.reason),DIAGNOSTICS.persistence))return false;
+    return this.notify(issue,found,now);
+  }
+  notify(issue,found,now){
+    if(!issue.count&&found.feed)this.scene.eventFeed?.push?.(`notice:${issue.key}:${now}`,noticeText(this.scene,issue));
+    issue.lastNotified=now;issue.dismissed=false;issue.count=(issue.count??0)+1;
+    this.scene.activities?.emit('productionIssue',{reason:issue.reason,category:issue.category,objectIds:[issue.entityId],params:{...issue.params},...(issue.informational?{informational:true}:{})});return true;
+  }
+  // Request 70: a missing link of a production chain, from the recipes and crops (productionChains.js) – a consumer
+  // whose input nobody makes or plans (a Bakery and no Mill), or a raw output nobody uses (Wheat and no Mill). A
+  // workshop's unused output (Flour and no Bakery) only counts once some is in the stores. One notice per chain.
+  chainDefinitions(){const r=this.scene.objectRegistry;if(!r?.buildables)return [];if(this.chainCache?.registry!==r){const definitions=r.buildables();this.chainCache={registry:r,definitions,links:chainLinks(definitions,CHAIN_ADVICE.resources)};}return this.chainCache.definitions;}
+  // Drops chain advice whose link is no longer missing (also called between checks, e.g. by the browser smoke).
   resolveCompletionNotices(){
-    let changed=false;for(const [key,issue]of this.completionNotices){
-      if(this.hasPlanned(issue.params.producer)||!this.scene.buildings.some(b=>b.id===issue.entityId&&buildingIsComplete(b))){this.completionNotices.delete(key);changed=true;}
-    }if(changed)this.changed();
+    const live=new Set(this.chainIssues().map(found=>found.key));let changed=false;
+    for(const [key,issue]of [...this.issues])if(issue.informational&&!live.has(key)){this.forget(key,issue);changed=changed||issue.lastNotified!=null;}
+    if(changed)this.changed();
+  }
+  forget(key,issue){
+    this.issues.delete(key);if(issue.lastNotified==null)return false;
+    // Remembered for the repeat interval: if it comes back soon it returns to the same row, without a new line.
+    this.memory.set(this.memoryKey(issue),{lastNotified:issue.lastNotified,count:issue.count,dismissed:issue.dismissed});return true;
+  }
+  chainIssues(){
+    const s=this.scene,definitions=this.chainDefinitions(),found=[];if(!definitions.length||!s.buildings)return found;
+    const complete=type=>s.buildings.filter(b=>b.type===type&&!b.unverified&&!b.demolition&&buildingIsComplete(b));
+    const add=(key,list,reason,params)=>found.push({key,entityId:minId(list),objectIds:list.map(b=>b.id),reason,category:'production',params,informational:true});
+    for(const link of this.chainCache.links){
+      if(!link.producers.some(type=>this.hasPlanned(type)))for(const type of link.consumers){const list=complete(type);if(list.length)add(`chain:${type}:${link.resource}`,list,'missingChainSource',{producer:link.producers[0],resource:link.resource});}
+      if(link.edible||link.consumers.some(type=>this.hasPlanned(type)))continue;
+      const consumer=definitions.find(d=>d.id===link.consumers[0]),output=consumer?.recipe?Object.keys(consumer.recipe.output)[0]:null;
+      for(const type of link.producers){const list=complete(type),d=definitions.find(x=>x.id===type);if(list.length&&(isRawSource(d)||(s.inventory?.count?.(link.resource)??0)>0))add(`chain:${type}:${link.resource}:unused`,list,'chainNoConsumer',{resource:link.resource,consumer:link.consumers[0],output});}
+    }
+    return found;
   }
   onChange(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   changed(){this.revision++;for(const listener of this.listeners)listener();}
@@ -123,30 +170,25 @@ export class ProductionDiagnostics {
     return found;
   }
   // The current issue of one building (for its panel and the icon over it), most important first.
-  buildingIssue(id){let best=null;for(const issue of this.issues.values())if(issue.entityId===id&&issue.lastNotified!=null&&(!best||issue.reason!=='outputFull'))best=issue;return best;}
+  buildingIssue(id){let best=null;for(const issue of this.issues.values())if(issue.entityId===id&&issue.lastNotified!=null&&!issue.informational&&(!best||issue.reason!=='outputFull'))best=issue;return best;}
   // Plan m-e1-jidlo-vydrz: the kingdom's edible stores last less than 3 days (one kingdom notice with the days left).
   foodIssues(){const days=foodDays(this.scene.foodSystem);return days<FOOD_OUTLOOK.warnDays?[{entityId:0,reason:'foodLow',category:'production',params:{days:Math.floor(days)},feed:true}]:[];}
   detect(){
-    const found=[...this.constructionIssues(),...this.depletionIssues(),...this.storageIssues(),...this.foodIssues()];
+    const found=[...this.constructionIssues(),...this.depletionIssues(),...this.storageIssues(),...this.foodIssues(),...this.chainIssues()];
     for(const record of this.scene.foodProduction?.records.values()??[]){const issue=this.productionIssue(record);if(issue)found.push({entityId:record.buildingId,category:'production',...issue});}
     return found;
   }
   update(){
     const time=this.scene.gameTime;if(!time||time.paused||this.scene.gameOver)return;const now=time.totalElapsed;if(now<this.nextCheck)return;this.nextCheck=now+DIAGNOSTICS.checkInterval;
-    this.resolveCompletionNotices();const seen=new Set();let changed=false;
-    for(const found of this.detect()){
-      // One current reason per entity: a new reason replaces the old one.
-      const key=`${found.entityId}:${found.reason}`;seen.add(key);let issue=this.issues.get(key);
-      if(!issue){issue={...found,key,firstSeen:now,lastNotified:null,dismissed:false};this.issues.set(key,issue);}
-      issue.params=found.params;
-      const due=issue.lastNotified==null?now-issue.firstSeen>=DIAGNOSTICS.persistence:now-issue.lastNotified>=DIAGNOSTICS.reminder;
-      if(due){if(issue.lastNotified==null&&found.feed)this.scene.eventFeed?.push?.(`notice:${key}:${issue.firstSeen}`,noticeText(this.scene,issue));issue.lastNotified=now;issue.dismissed=false;issue.reminders=(issue.reminders??0)+1;this.scene.activities?.emit('productionIssue',{reason:issue.reason,category:issue.category,objectIds:[issue.entityId],params:{...issue.params}});changed=true;}
-    }
-    for(const key of [...this.issues.keys()])if(!seen.has(key)){const issue=this.issues.get(key);this.issues.delete(key);if(issue.lastNotified!=null)changed=true;}
+    const seen=new Set();let changed=false;
+    for(const found of this.detect()){const issue=this.track(found,now);seen.add(issue.key);changed=this.observe(issue,found,now)||changed;}
+    for(const [key,issue]of [...this.issues])if(!seen.has(key)&&this.forget(key,issue))changed=true;
+    const keep=CHAIN_ADVICE.repeatDays*this.dayMs();for(const [key,past]of this.memory)if(now-past.lastNotified>=keep)this.memory.delete(key);
     if(changed)this.changed();
   }
   // Reported and not dismissed since its last reminder.
-  active(){const blocking=[...this.issues.values()].filter(issue=>issue.lastNotified!=null&&!issue.dismissed),entities=new Set(blocking.map(i=>i.entityId));return [...blocking,...[...this.completionNotices.values()].filter(i=>!i.dismissed&&!entities.has(i.entityId))].sort((a,b)=>a.lastNotified-b.lastNotified||a.key.localeCompare(b.key));}
-  dismiss(key){const issue=this.issues.get(key)??this.completionNotices.get(key);if(issue&&!issue.dismissed){issue.dismissed=true;this.changed();}}
-  destroy(){this.unsubscribe?.();this.listeners.clear();this.issues.clear();this.completionNotices.clear();}
+  // Chain advice gives way to an actual blocker of the same building (one row per building).
+  active(){const shown=[...this.issues.values()].filter(issue=>issue.lastNotified!=null&&!issue.dismissed),blocking=new Set(shown.filter(i=>!i.informational).map(i=>i.entityId));return shown.filter(i=>!i.informational||!blocking.has(i.entityId)).sort((a,b)=>a.lastNotified-b.lastNotified||a.key.localeCompare(b.key));}
+  dismiss(key){const issue=this.issues.get(key);if(issue&&!issue.dismissed){issue.dismissed=true;this.changed();}}
+  destroy(){this.unsubscribe?.();this.listeners.clear();this.issues.clear();this.memory.clear();}
 }
