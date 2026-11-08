@@ -22,7 +22,7 @@ export const NIGHT_THREATS=Object.freeze({
   // a quarter of a day and can jump to a wooden neighbour within 2 tiles. Residents within 15 tiles fight it with
   // buckets from the nearest Well or shore; a Well close by makes the trips short.
   fires:Object.freeze({chance:.02,range:2,weather:Object.freeze({Drought:2,Rainy:.3}),winter:.5,burnDays:.25,regrowPerSecond:2,bucket:15,
-    spreadEverySeconds:5,spreadChance:.15,helpers:6,helperRange:15,fillMs:1000,throwMs:800,startIntensity:60}),
+    spreadEverySeconds:5,spreadChance:.15,helpers:6,helperRange:15,destroyChance:.1,savedHealth:5,fillMs:1000,throwMs:800,startIntensity:60}),
   campfire:Object.freeze({
     // Built from local wood: a tree or a bush within 6 tiles. Burns one night, then ashes for a day.
     woodRange:6,radius:5,ashesDays:1,

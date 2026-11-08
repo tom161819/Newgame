@@ -129,13 +129,14 @@ test('fires: a burning flame near a wooden building may set it alight at night; 
   const house=place('house',60,60),castle=s.buildings.find(b=>b.type==='castle');assert.equal(n.flammable(house),true);if(castle)assert.equal(n.flammable(castle),false);
   const seasons=s.seasons;s.seasons={season:'Summer',weather:'Drought',enabled:true};assert.ok(Math.abs(n.fireRisk()-.04)<1e-9,'Drought doubles the risk');s.seasons.weather='Rainy';assert.ok(n.fireRisk()<.01);s.seasons=seasons;
   s.lightSources={lights:()=>[{type:'torch',...gridToWorld(62.5,61),radius:100}]};n.random=()=>0;night(s);n.igniteFires(s.gameTime.day);assert.equal(n.burning(house),true,'set alight by the torch post');
-  // Two residents with a Well right next to the house put it out.
-  place('well',63,63);const helpers=[0,1].map(i=>s.workerSystem.create({x:64+i,y:64}));
+  // Two residents with a Well right next to the house put it out (the 90 % roll).
+  n.random=()=>.5;place('well',63,63);const helpers=[0,1].map(i=>s.workerSystem.create({x:64+i,y:64}));
   for(let i=0;i<1200&&n.burning(house);i++){for(const w of helpers){if(!n.firefight(w,50))void 0;w.update(50);}n.updateFires(50);}
   assert.equal(n.burning(house),false,'put out');assert.ok(s.buildings.includes(house),'still standing');
   // Nobody helps: it burns down to ruins and its goods burn.
   n.ignite(house);for(let i=0;i<2000&&n.burning(house);i++)n.updateFires(100);
   assert.equal(s.buildings.includes(house),false,'burnt down');assert.ok(s.buildings.some(b=>b.type==='burnt_ruins'&&b.x===60&&b.y===60),'ruins left');
+  const ruin=s.buildings.find(b=>b.type==='burnt_ruins');assert.equal(ruin.burntFrom,'house');assert.equal(ruin.definition.name,'Burnt House','the ruins say what burnt');
   const off=world();off.n.setEnabled('fires',false);off.s.lightSources={lights:()=>[{type:'torch',...gridToWorld(62.5,61),radius:100}]};off.n.random=()=>0;assert.deepEqual(off.n.igniteFires(1),[],'switched off');
 });
 
@@ -147,4 +148,19 @@ test('E1: threats wait for 5 finished Houses or the second year; the first spark
   assert.equal(make({year:2}).started(),true,'second year');assert.equal(make({seasons:false,day:20}).started(),false);assert.equal(make({seasons:false,day:21}).started(),true);
   const r=make({n:5});assert.deepEqual(r.exportState().fireWarned,undefined);r.fireWarned=true;const saved=r.exportState();assert.equal(saved.fireWarned,true);
   const back=make();back.importState(saved);assert.equal(back.fireWarned,true);
+});
+
+test('m-pozary: the first resident who answers rolls the fate – 10 % the building is lost despite the buckets; saved fires cannot burn down; Save/Load keeps the fate and the ruins name', () => {
+  const {s,n}=world();const place=(type,x,y)=>{const d=s.objectRegistry.require(type);const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,x,y,tiles:[]};for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){b.tiles.push({x:x+dx,y:y+dy});s.map[y+dy][x+dx]=1;}s.buildings.push(b);return b;};
+  const feed=[];s.eventFeed={push:(k,text)=>feed.push(text)};
+  const house=place('house',60,60);place('well',63,63);const helpers=[0,1].map(i=>s.workerSystem.create({x:64+i,y:64}));
+  // The roll is 0.05 < 0.1: lost. The buckets do not help and it burns down.
+  n.random=()=>.05;n.ignite(house);for(let i=0;i<4000&&n.burning(house);i++){for(const w of helpers){n.firefight(w,50);w.update(50);}n.updateFires(50);}
+  assert.ok(feed.some(t=>/Villagers are putting it out/.test(t)),'the feed says the villagers came');
+  assert.equal(s.buildings.includes(house),false,'lost despite the buckets');const ruin=s.buildings.find(b=>b.type==='burnt_ruins');assert.equal(ruin.definition.name,'Burnt House');
+  // Saved: with nobody throwing buckets after the roll, the house keeps a little health and does not burn down.
+  const other=place('house',70,60);n.random=()=>.5;n.ignite(other);const fire=n.fires.get(other.id);fire.fate='saved';for(let i=0;i<2000;i++)n.updateFires(100);
+  assert.equal(n.burning(other),true);assert.ok(s.buildings.includes(other),'a saved fire never burns the building down');
+  const state=validateGameState(serializeGameState(s));assert.equal(state.nightThreats.fires.find(f=>f.id===other.id).fate,'saved');assert.equal(state.buildings.find(b=>b.id===ruin.id).burntFrom,'house');
+  assert.equal(validNightThreatState({...state.nightThreats,fires:[{id:other.id,intensity:10,health:10,fate:'maybe'}]},new Set([other.id])),false);
 });

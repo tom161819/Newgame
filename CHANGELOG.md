@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.59.0] - 2026-11-08
+<!-- version: {"title":"Fires","type":"feature","reconstructed":false,"saveVersion":58} -->
+### Changed
+- Fires: when residents come to put a fire out, the building is saved 9 times in 10. One time in 10 the fire is too strong and the building burns down despite the buckets. The feed says when villagers start putting a fire out.
+- Burnt ruins say what burnt, for example "Burnt House".
+### Fixed
+- A game with burnt ruins on the map can be saved and loaded again.
+
 ## [0.58.0] - 2026-11-08
 <!-- version: {"title":"Event messages and danger marks","type":"feature","reconstructed":false,"saveVersion":58} -->
 ### Added
