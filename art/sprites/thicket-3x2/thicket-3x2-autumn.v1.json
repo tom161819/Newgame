@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "thicket-3x2",
+  "variantId": "thicket-3x2-autumn",
+  "name": "Mixed thicket – autumn",
+  "category": "nature",
+  "version": 1,
+  "specHash": "0b3eab68",
+  "generator": "vegetation",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 163,
+  "height": 83,
+  "anchor": {
+    "x": 81,
+    "y": 41
+  },
+  "origin": {
+    "x": 0.49693,
+    "y": 0.49398
+  },
+  "footprint": {
+    "width": 3,
+    "height": 2
+  },
+  "base": {
+    "x": 97,
+    "y": 81
+  },
+  "baseOrigin": {
+    "x": 0.59509,
+    "y": 0.9759
+  },
+  "visualHeight": 81,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.838,
+  "lights": []
+}

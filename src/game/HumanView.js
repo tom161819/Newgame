@@ -2,7 +2,12 @@ import Phaser from 'phaser';
 import { directionName,DIRECTION_POSES } from './directions.js';
 import { CargoBundleView } from './CargoBundleView.js';
 import { HUMAN_APPEARANCE as COLORS } from '../data/humanAppearance.js';
-import { APPROVED_VILLAGER_ART,PROFESSION_LOOKS,FACING_INDEX,villagerSex,walkFrame,walkKey,hasWalk } from '../data/objects/approvedArt.js';
+import { APPROVED_VILLAGER_ART,PROFESSION_LOOKS,FACING_INDEX,villagerSex,walkFrame,walkKey } from '../data/objects/approvedArt.js';
+import { FISHER_WALK_ART,FISHER_LOOKS } from '../data/fisherWalkArt.js';
+// Approved looks with only a walk sheet (the Fisher): the walk sheet carries all eight directions.
+const villagerArt=look=>APPROVED_VILLAGER_ART[look]??FISHER_WALK_ART[look]??null;
+const professionLooks=profession=>PROFESSION_LOOKS[profession]??(profession==='fisher'?FISHER_LOOKS:null);
+const hasWalk=(scene,look)=>!!villagerArt(look)?.walk&&!!scene?.textures?.exists?.(walkKey(look));
 import { assetURL } from '../systems/AssetManager.js';
 import { MOVEMENT_SPEED_SCALE } from '../data/movement.js';
 import { FishingAnimator,fishingFrame,fishingSheet,residentSeed } from './fishingAnim.js';
@@ -12,7 +17,14 @@ const lookKey=(look,k)=>`villager-art:${look}:${k}`;
 function ensureLook(scene,look,ready){
   scene.__villagerLooks??=new Map();const state=scene.__villagerLooks.get(look);
   if(state==='ready')return true;if(state){state.add(ready);return false;}
-  const art=APPROVED_VILLAGER_ART[look],waiting=new Set([ready]);scene.__villagerLooks.set(look,waiting);
+  const art=villagerArt(look),waiting=new Set([ready]);scene.__villagerLooks.set(look,waiting);
+  if(art.walkSrc){ // walk-only look from a data URL
+    const done=()=>{scene.__villagerLooks.set(look,'ready');for(const fn of waiting)fn();};
+    if(scene.textures.exists(walkKey(look))){done();return true;}
+    scene.load.once(`filecomplete-spritesheet-${walkKey(look)}`,done);
+    scene.load.spritesheet(walkKey(look),art.walkSrc,{frameWidth:art.walk.frameWidth,frameHeight:art.walk.frameHeight});
+    if(!scene.load.isLoading())scene.load.start();return false;
+  }
   for(let k=0;k<8;k++)if(!scene.textures.exists(lookKey(look,k)))scene.load.image(lookKey(look,k),assetURL(`${art.base}.facing-${k}.png`,scene.assets?.baseURL??import.meta.env?.BASE_URL??'/'));
   const w=art.walk;if(w&&!scene.textures.exists(walkKey(look)))scene.load.spritesheet(walkKey(look),assetURL(`${art.base}.walk.png`,scene.assets?.baseURL??import.meta.env?.BASE_URL??'/'),{frameWidth:w.frameWidth,frameHeight:w.frameHeight});
   scene.load.once('complete',()=>{if(![0,1,2,3,4,5,6,7].every(k=>scene.textures.exists(lookKey(look,k))))return;scene.__villagerLooks.set(look,'ready');for(const fn of waiting)fn();});
@@ -31,16 +43,16 @@ export class HumanView extends Phaser.GameObjects.Container {
   // Profession and name decide the approved look; the procedural figure stays until it loads.
   updateLook(){
     const worker=this.getData?.('worker');if(!worker)return;
-    const look=PROFESSION_LOOKS[worker.isSubject===false?worker.profession:(worker.displayProfession??'idle')]?.[worker.identity?(worker.identity.sex==='f'?'female':'male'):villagerSex(worker.name)]??null;
+    const look=professionLooks(worker.isSubject===false?worker.profession:(worker.displayProfession??'idle'))?.[worker.identity?(worker.identity.sex==='f'?'female':'male'):villagerSex(worker.name)]??null;
     if(look===this.look)return;this.look=look;this.lookReady=false;
-    if(look&&APPROVED_VILLAGER_ART[look])this.lookReady=ensureLook(this.scene,look,()=>{if(this.look===look&&this.scene){this.lookReady=true;this.applyArt();}});
+    if(look&&villagerArt(look))this.lookReady=ensureLook(this.scene,look,()=>{if(this.look===look&&this.scene){this.lookReady=true;this.applyArt();}});
     this.applyArt();
   }
   applyArt(){
     const on=!!(this.look&&this.lookReady),k=FACING_INDEX[this.facing]??0;
     for(const part of [this.shadow,this.leftLeg,this.rightLeg,this.body,...this.arms])part.setVisible(!on);
     if(!on){this.art.setVisible(false);return;}
-    const art=APPROVED_VILLAGER_ART[this.look];this.tool.setVisible(false);this.weapon.setVisible(false);
+    const art=villagerArt(this.look);this.tool.setVisible(false);this.weapon.setVisible(false);
     if(hasWalk(this.scene,this.look)){const frame=walkFrame(k,this.walked??0,art.walk.fps,!!this.isWalking),key=walkKey(this.look);
       if(this.artFrame!==`${key}:${frame}`){this.artFrame=`${key}:${frame}`;this.art.setTexture(key,frame).setOrigin(art.walk.origin.x,art.walk.origin.y);}this.art.setVisible(true);return;}
     const origin=art.origins[k];this.artFrame=null;

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { tileCenter,gridToWorld } from './isometric.js';
 import { buildingDefinition,towerBase } from './buildings.js';
+import { cropLook,natureReady,showNature } from './natureArt.js';
 
 // Ground and per-cell plants sort independently, so people can walk among them.
 export class CropPlotView {
@@ -12,9 +13,14 @@ export class CropPlotView {
     this.building=building;this.definition=buildingDefinition(building);this.base=towerBase(building);this.tint=tint;
     const back=gridToWorld(building.x,building.y);
     this.floor.setTexture(this.groundTexture(tint)).setOrigin(this.definition.height/(this.definition.width+this.definition.height),0).setPosition(back.x,back.y).setDepth(this.preview?10000:-90);
-    const plantTexture=this.plantTexture(tint);
+    // Plan g-nasadit-prirodu: approved wheat field tiles and orchard trees per tile (stage and season); the drawn
+    // plants until the atlas is in, and always for tinted placement previews.
+    const art=!tint&&natureReady(this.scene,()=>{if(this.floor?.active)this.paint(this.building,this.tint);});
+    const plantTexture=art?null:this.plantTexture(tint);
     for(const [index,tile]of building.tiles.entries()){
-      const position=tileCenter(tile);this.plants[index].setTexture(plantTexture).setPosition(position.x,position.y).setDepth(this.preview?10001:position.y+.03);
+      const position=tileCenter(tile),plant=this.plants[index],look=art?cropLook(this.definition.id,this.stage,this.season,tile):null;
+      if(!(look&&showNature(this.scene,plant,look)))plant.setTexture(plantTexture??this.plantTexture(tint)).setOrigin(.5,92/112);
+      plant.setPosition(position.x,position.y).setDepth(this.preview?10001:position.y+.03);
     }
     const b=building,d=this.definition;
     this.hitArea=new Phaser.Geom.Polygon([

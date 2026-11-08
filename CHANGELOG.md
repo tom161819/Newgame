@@ -5,6 +5,20 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.79.0] - 2026-11-08
+<!-- version: {"title":"New approved nature art: stone and iron deposits shrink as they are mined, snow-covered in winter.","type":"feature","reconstructed":false,"saveVersion":60} -->
+### Added
+- New approved nature art: stone and iron deposits shrink as they are mined, snow-covered in winter. There are new rock obstacles and five shrub species with seasonal looks. Wheat fields go from sown to ripe, and orchard apple trees go from blossom to fruit.
+### Changed
+- Paths use the owner's new style from the Path Lab: wider, more winding paths with a ragged edge and more visible soil.
+### Fixed
+- Fishers walking to the storage now have their own approved look instead of the old drawn figure.
+
+## [0.78.1] - 2026-11-08
+<!-- version: {"title":"Four medieval tutorial pointers to choose from in the UI design (forged iron arrow, gloved hand, red pennant, gilded parchment arrow); the golden arrow stays th","type":"feature","reconstructed":false,"saveVersion":60} -->
+### Added
+- Four medieval tutorial pointers to choose from in the UI design (forged iron arrow, gloved hand, red pennant, gilded parchment arrow); the golden arrow stays the default.
+
 ## [0.78.0] - 2026-11-08
 <!-- version: {"title":"Balance and fixes from the 0.76 playtest","type":"feature","reconstructed":false,"saveVersion":60} -->
 ### Changed

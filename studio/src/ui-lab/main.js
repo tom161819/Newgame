@@ -45,7 +45,7 @@ function h(tag, attrs = {}, ...children) {
 const readDraft = () => { try { const raw = localStorage.getItem(STORAGE); return raw ? JSON.parse(raw) : null; } catch { return null; } };
 const state = {
   config: normalizeUiConfig(readDraft() ?? gameConfig).config,
-  tab: 'style', window: '', original: false, docking: true, drag: null, designs: new Map(),
+  tab: 'style', window: '', original: false, docking: true, drag: null, designs: new Map(), notes: new Map(),
 };
 const shared = { mode: 'local', db: null, uid: null, canWrite: null, user: null, names: new Map() };
 const readOnly = () => shared.mode === 'shared' && shared.canWrite === false;
@@ -245,23 +245,23 @@ function styleView() {
     return h('div', { class: 'ul-color' }, picker, h('span', {}, label), text);
   }));
   return [
-    h('h3', {}, 'Styles'), presets,
+    h('h3', {}, 'Styles'), presets, note('style:styles', 'Styles'),
     field('Design name', h('input', { type: 'text', maxlength: 60, value: state.config.name, oninput: e => { state.config.name = e.target.value; changed({ controls: false }); } })),
     h('h3', {}, 'Type'),
     field('Text font', select(FONTS, t.fontUi, v => set('fontUi', v))),
     field('Heading font', select(FONTS, t.fontDisplay, v => set('fontDisplay', v))),
     field(`Text size ${Math.round(t.fontScale * 100)} %`, range(0.8, 1.4, 0.05, t.fontScale, v => { set('fontScale', v); renderControls(); })),
-    field('Headings', select(HEADINGS, t.headings, v => set('headings', v))),
+    field('Headings', select(HEADINGS, t.headings, v => set('headings', v))), note('style:type', 'Type'),
     h('h3', {}, 'Tutorial and tips'),
-    field('Pointer', select(POINTERS, t.pointer ?? 'arrow', v => set('pointer', v)), 'Window → Tutorial shows the bubble, arrow, tick, speed buttons and Royal tasks.'),
+    field('Pointer', select(POINTERS, t.pointer ?? 'arrow', v => set('pointer', v)), 'Window → Tutorial shows the bubble, arrow, tick, speed buttons and Royal tasks.'), note('style:tutorial', 'Tutorial and tips'),
     h('h3', {}, 'Frames and surfaces'),
     field('Texture', select(TEXTURES, t.texture, v => set('texture', v))),
     field('Frame', select(FRAMES, t.frame, v => set('frame', v))),
     field('Shadow', select(SHADOWS, t.shadow, v => set('shadow', v))),
     field(`Corner radius ${t.radius} px`, range(0, 24, 1, t.radius, v => { set('radius', v); renderControls(); })),
     field(`Frame line ${t.borderWidth} px`, range(0, 4, 1, t.borderWidth, v => { set('borderWidth', v); renderControls(); })),
-    h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: t.light, onchange: e => set('light', e.target.checked) }), ' Light style (dark text on light panels)'),
-    h('h3', {}, 'Colours'), colors,
+    h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: t.light, onchange: e => set('light', e.target.checked) }), ' Light style (dark text on light panels)'), note('style:frames', 'Frames and surfaces'),
+    h('h3', {}, 'Colours'), colors, note('style:colours', 'Colours'),
   ];
 }
 function loadPreset(id) {
@@ -275,14 +275,15 @@ function loadPreset(id) {
 function layoutView() {
   return [
     h('p', { class: 'ul-hint' }, 'Drag a handle in the preview onto a highlighted spot, or choose here.'),
-    ...Object.entries(LAYOUT).map(([key, { label, values }]) => field(label, select(values, state.config.layout[key], v => { state.config.layout[key] = v; changed({ controls: false }); }, { 'data-layout': key }))),
+    ...Object.entries(LAYOUT).flatMap(([key, { label, values }]) => [field(label, select(values, state.config.layout[key], v => { state.config.layout[key] = v; changed({ controls: false }); }, { 'data-layout': key })), note(`layout:${key}`, `Layout · ${label}`)]),
+    note('layout', 'Layout (overall)'),
   ];
 }
 
 function windowsView() {
   const id = state.window, doc = frameDoc(), el = id && doc?.getElementById(id);
   const picker = field('Window', select({ '': 'Choose a window…', ...Object.fromEntries(windowIds().map(w => [w, PANELS[w]])) }, id, v => showWindow(v)));
-  if (!el) return [h('p', { class: 'ul-hint' }, 'Pick a window to reorder its sections, hide what you do not need and change its text size and font.'), picker];
+  if (!el) return [h('p', { class: 'ul-hint' }, 'Pick a window to reorder its sections, hide what you do not need and change its text size and font.'), picker, note('windows', 'Windows (overall)'), notesOverview()];
   const settings = state.config.panels[id] ?? {}, save = next => { const clean = { ...settings, ...next }; for (const k of Object.keys(clean)) if (clean[k] === undefined || (Array.isArray(clean[k]) && !clean[k].length)) delete clean[k]; if (Object.keys(clean).length) state.config.panels[id] = clean; else delete state.config.panels[id]; changed(); };
   // Sections in the order the config shows them.
   const sections = sectionsOf(el), keys = sections.map(s => s.key), order = [...(settings.order ?? []).filter(k => keys.includes(k)), ...keys.filter(k => !(settings.order ?? []).includes(k))];
@@ -302,8 +303,43 @@ function windowsView() {
   return [picker, h('h3', {}, PANELS[id]), h('p', { class: 'ul-hint' }, 'Drag sections (or use the arrows) to change their order; untick to hide.'), list,
     field(`Text size ${Math.round((settings.textScale ?? 1) * 100)} %`, range(0.8, 1.5, 0.05, settings.textScale ?? 1, v => save({ textScale: v === 1 ? undefined : v }))),
     field('Font', select({ '': 'Same as the style', ...FONTS }, settings.font ?? '', v => save({ font: v || undefined }))),
-    h('button', { type: 'button', class: 'button', onclick: () => { delete state.config.panels[id]; changed(); } }, 'Reset this window')];
+    h('button', { type: 'button', class: 'button', onclick: () => { delete state.config.panels[id]; changed(); } }, 'Reset this window'),
+    h('h3', {}, 'Comments'), note(`window:${id}`, PANELS[id], { open: true }),
+    h('div', { class: 'ul-section-notes' }, order.map(key => note(`window:${id}:${key}`, `${PANELS[id]} · ${label(key)}`)))];
 }
+// ---------- notes: a comment field for every section, kept in the page database (`uiNotes/<scope>`) ----------
+// The owner writes what should change in that part of the interface; Claude reads the notes in the MK chat Grafika
+// („UI poznámky“) and turns them into tasks. Without the database they stay in this browser.
+const NOTES = 'uiNotes';
+const noteId = scope => (String(scope).replace(/[^A-Za-z0-9_\-.~:@+]/g, '_').slice(0, 200) || '_');
+function readLocalNotes() { try { return JSON.parse(localStorage.getItem(`${STORAGE}.notes`) ?? '{}') ?? {}; } catch { return {}; } }
+function note(scope, label, { open = false } = {}) {
+  const id = noteId(scope), current = state.notes.get(id), text = current?.text ?? '';
+  const status = h('small', { class: 'ul-note-status' }, current?.at ? `${current.by ? `${who(current.by)} · ` : ''}${new Date(current.at).toLocaleString()}` : '');
+  let timer = null;
+  const save = async value => {
+    const data = { scope, label, text: value.trim(), ...(shared.uid ? { by: shared.uid } : {}), at: new Date().toISOString() };
+    state.notes.set(id, data); status.textContent = 'Saving…';
+    try {
+      if (shared.mode === 'shared') { if (data.text) await shared.db.doc(`${NOTES}/${id}`).set(data); else await shared.db.doc(`${NOTES}/${id}`).delete(); }
+      else { const all = readLocalNotes(); if (data.text) all[id] = data; else delete all[id]; localStorage.setItem(`${STORAGE}.notes`, JSON.stringify(all)); }
+      status.textContent = data.text ? `Saved ${new Date(data.at).toLocaleTimeString()}` : 'Cleared';
+    } catch (error) { status.textContent = `Not saved: ${error?.message ?? error}`; }
+    renderSummary();
+  };
+  const area = h('textarea', { rows: 3, class: 'ul-note-text', 'data-note': id, placeholder: `What should change in „${label}“?`, 'aria-label': `Comment on ${label}`, disabled: readOnly(),
+    oninput: e => { clearTimeout(timer); const v = e.target.value; status.textContent = '…'; timer = setTimeout(() => save(v), 900); },
+    onblur: e => { if (timer) { clearTimeout(timer); timer = null; save(e.target.value); } } });
+  area.value = text;
+  const box = h('details', { class: `ul-note${text ? ' has-note' : ''}`, 'data-scope': scope }, h('summary', {}, text ? '💬 Comment (written)' : '💬 Comment / requested changes'), area, status);
+  box.open = open || !!text; return box;
+}
+function notesOverview() {
+  const list = [...state.notes.entries()].filter(([, n]) => n.text).sort((a, b) => a[1].scope.localeCompare(b[1].scope));
+  return h('div', { class: 'ul-notes-overview' }, h('h3', {}, `All comments (${list.length})`),
+    list.length ? h('ul', {}, list.map(([, n]) => h('li', {}, h('strong', {}, n.label), h('span', {}, n.text)))) : h('p', { class: 'empty' }, 'No comment yet. Open a section and write what should change.'));
+}
+function loadNotes(docs) { state.notes = new Map(docs.map(d => [d.id, d.data]).filter(([, d]) => d && typeof d.text === 'string')); }
 const windowIds = () => [...new Set([...snapshots.panels.map(p => p.id), 'notices-panel'])].filter(id => PANELS[id]);
 
 // ---------- designs: saved in the page database, one marked for the game ----------
@@ -323,6 +359,7 @@ function designsView() {
       h('button', { type: 'button', class: 'button', onclick: () => { state.config = clone(d.config); setStatus(`Loaded „${d.config.name}“`); changed(); } }, 'Load'),
       h('button', { type: 'button', class: 'button ghost', disabled: readOnly() || d.forGame, onclick: () => markForGame(d.id) }, 'Use in game'),
       h('button', { type: 'button', class: 'button ghost', disabled: readOnly(), 'aria-label': `Delete ${d.config.name}`, onclick: () => deleteDesign(d.id) }, '✕')))) : h('p', { class: 'empty' }, 'No saved design yet.'),
+    note('designs', 'Designs'),
     h('h3', {}, 'JSON'), json,
     h('div', { class: 'ul-actions' },
       h('button', { type: 'button', class: 'button', onclick: async () => { try { await navigator.clipboard.writeText(JSON.stringify(state.config, null, 2)); setStatus('Copied'); } catch { json.select(); setStatus('Copy blocked: the JSON is selected, press Ctrl+C'); } } }, 'Copy JSON'),
@@ -376,7 +413,8 @@ async function deleteDesign(id) {
 }
 function renderSummary() {
   const forGame = [...state.designs.values()].find(d => d.forGame);
-  $('#ul-summary').textContent = forGame ? `„${forGame.config.name}“ waits for the game — write „převzít UI“ in the MK chat Mechaniky.` : `Game uses „${normalizeUiConfig(gameConfig).config.name}“.`;
+  const notes = [...state.notes.values()].filter(n => n.text).length;
+  $('#ul-summary').textContent = (forGame ? `„${forGame.config.name}“ waits for the game — write „převzít UI“ in the MK chat Mechaniky.` : `Game uses „${normalizeUiConfig(gameConfig).config.name}“.`) + (notes ? ` · ${notes} comment${notes === 1 ? '' : 's'} for Claude („UI poznámky“ in the MK chat Grafika)` : '');
 }
 
 // ---------- shared database ----------
@@ -388,6 +426,13 @@ async function connectShared() {
   shared.db = db; shared.user = user;
   shared.uid = user ? await user.id().catch(() => null) : null;
   shared.canWrite = user ? await Promise.resolve(user.can?.('data.write')).catch(() => null) ?? null : null;
+  db.collection(NOTES).onSnapshot(snap => {
+    shared.mode = 'shared';
+    loadNotes(snap.docs.filter(d => d.exists).map(d => ({ id: d.id, data: d.data() })));
+    // Never rebuild the panel under a comment being typed.
+    if (!document.activeElement?.matches?.('.ul-note-text')) renderControls();
+    renderSummary();
+  }, () => {});
   db.collection(COLLECTION).onSnapshot(snap => {
     shared.mode = 'shared';
     loadDesigns(snap.docs.filter(d => d.exists).map(d => ({ id: d.id, data: d.data() })));
@@ -419,8 +464,10 @@ window.uiLab = {
   loadPreset,
   setLayout: (key, value) => { state.config.layout[key] = value; changed(); },
   designs: () => [...state.designs.values()].map(d => ({ id: d.id, name: d.config.name, forGame: d.forGame })),
+  notes: () => Object.fromEntries(state.notes),
 };
 loadDesigns(readLocalDesigns());
+loadNotes(Object.entries(readLocalNotes()).map(([id, data]) => ({ id, data })));
 renderControls();
 renderSummary();
 buildFrame();

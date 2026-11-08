@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "id": "shrubs",
+  "name": "Shrubs – five kinds, three sizes",
+  "category": "nature",
+  "description": "Concept for review (g-sad-pole-kere). The owner picks; phases, sizes and footprints then go to Mechaniky.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "vegetation",
+  "variants": [
+    {
+      "id": "shrubs-hazel-1",
+      "name": "Hazel – small",
+      "version": 1,
+      "notes": "Hazel, small, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "hazel",
+        "size": 1,
+        "season": "summer",
+        "seed": 8
+      }
+    },
+    {
+      "id": "shrubs-hazel-2",
+      "name": "Hazel – medium",
+      "version": 1,
+      "notes": "Hazel, medium, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "hazel",
+        "size": 2,
+        "season": "summer",
+        "seed": 11
+      }
+    },
+    {
+      "id": "shrubs-hazel-3",
+      "name": "Hazel – large",
+      "version": 1,
+      "notes": "Hazel, large, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "hazel",
+        "size": 3,
+        "season": "summer",
+        "seed": 14
+      }
+    },
+    {
+      "id": "shrubs-rosehip-1",
+      "name": "Rosehip – small",
+      "version": 1,
+      "notes": "Rosehip, small, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "rosehip",
+        "size": 1,
+        "season": "summer",
+        "seed": 10
+      }
+    },
+    {
+      "id": "shrubs-rosehip-2",
+      "name": "Rosehip – medium",
+      "version": 1,
+      "notes": "Rosehip, medium, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "rosehip",
+        "size": 2,
+        "season": "summer",
+        "seed": 13
+      }
+    },
+    {
+      "id": "shrubs-rosehip-3",
+      "name": "Rosehip – large",
+      "version": 1,
+      "notes": "Rosehip, large, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "rosehip",
+        "size": 3,
+        "season": "summer",
+        "seed": 16
+      }
+    },
+    {
+      "id": "shrubs-juniper-1",
+      "name": "Juniper – small",
+      "version": 1,
+      "notes": "Juniper, small, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "juniper",
+        "size": 1,
+        "season": "summer",
+        "seed": 10
+      }
+    },
+    {
+      "id": "shrubs-juniper-2",
+      "name": "Juniper – medium",
+      "version": 1,
+      "notes": "Juniper, medium, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "juniper",
+        "size": 2,
+        "season": "summer",
+        "seed": 13
+      }
+    },
+    {
+      "id": "shrubs-juniper-3",
+      "name": "Juniper – large",
+      "version": 1,
+      "notes": "Juniper, large, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "juniper",
+        "size": 3,
+        "season": "summer",
+        "seed": 16
+      }
+    },
+    {
+      "id": "shrubs-bramble-1",
+      "name": "Bramble – small",
+      "version": 1,
+      "notes": "Bramble, small, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "bramble",
+        "size": 1,
+        "season": "summer",
+        "seed": 10
+      }
+    },
+    {
+      "id": "shrubs-bramble-2",
+      "name": "Bramble – medium",
+      "version": 1,
+      "notes": "Bramble, medium, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "bramble",
+        "size": 2,
+        "season": "summer",
+        "seed": 13
+      }
+    },
+    {
+      "id": "shrubs-bramble-3",
+      "name": "Bramble – large",
+      "version": 1,
+      "notes": "Bramble, large, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "bramble",
+        "size": 3,
+        "season": "summer",
+        "seed": 16
+      }
+    },
+    {
+      "id": "shrubs-heather-1",
+      "name": "Heather – small",
+      "version": 1,
+      "notes": "Heather, small, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "heather",
+        "size": 1,
+        "season": "summer",
+        "seed": 10
+      }
+    },
+    {
+      "id": "shrubs-heather-2",
+      "name": "Heather – medium",
+      "version": 1,
+      "notes": "Heather, medium, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "heather",
+        "size": 2,
+        "season": "summer",
+        "seed": 13
+      }
+    },
+    {
+      "id": "shrubs-heather-3",
+      "name": "Heather – large",
+      "version": 1,
+      "notes": "Heather, large, summer.",
+      "spec": {
+        "kind": "shrub",
+        "species": "heather",
+        "size": 3,
+        "season": "summer",
+        "seed": 16
+      }
+    }
+  ]
+}

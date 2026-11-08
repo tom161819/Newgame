@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "id": "rock-obstacles-small",
+  "name": "Rock obstacles – 1×1",
+  "category": "nature",
+  "description": "Concept for review (g-loziska-skaly): richer rocks than today (more pieces, strata, cracks, lichen, gravel at the foot that fades into the ground). The owner picks; footprints and stages then go to Mechaniky (generator, blocking rocks).",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "outcrop",
+  "variants": [
+    {
+      "id": "rock-obstacles-small-boulder-1",
+      "name": "Boulder",
+      "version": 1,
+      "notes": "One big rounded boulder.",
+      "spec": {
+        "kind": "obstacle",
+        "shape": "boulder",
+        "rock": "granite",
+        "seed": 2
+      }
+    },
+    {
+      "id": "rock-obstacles-small-boulder-2",
+      "name": "Mossy boulder",
+      "version": 1,
+      "notes": "Boulder with moss.",
+      "spec": {
+        "kind": "obstacle",
+        "shape": "boulder",
+        "rock": "mossy",
+        "seed": 9
+      }
+    },
+    {
+      "id": "rock-obstacles-small-boulders",
+      "name": "Group of boulders",
+      "version": 1,
+      "notes": "Three or four boulders together.",
+      "spec": {
+        "kind": "obstacle",
+        "shape": "boulders",
+        "rock": "granite",
+        "seed": 4
+      }
+    },
+    {
+      "id": "rock-obstacles-small-bush",
+      "name": "Rock with a bush",
+      "version": 1,
+      "notes": "A rock with shrubs at its foot.",
+      "spec": {
+        "kind": "obstacle",
+        "shape": "bush",
+        "rock": "limestone",
+        "seed": 6
+      }
+    },
+    {
+      "id": "rock-obstacles-small-boulder-winter",
+      "name": "Boulder – winter",
+      "version": 1,
+      "notes": "Snow on top.",
+      "spec": {
+        "kind": "obstacle",
+        "shape": "boulder",
+        "rock": "granite",
+        "seed": 2,
+        "season": "winter"
+      }
+    }
+  ]
+}

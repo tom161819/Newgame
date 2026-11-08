@@ -1,5 +1,6 @@
 // Path Lab (#115): an editable test map for trodden paths. Current (N12) is the production renderer; the
 // Experimental V2 renderer arrives with #116, and until then its controls say so instead of pretending to work.
+import { trackTopbarHeight } from '../lib/topbarHeight.js';
 import '../styles.css';
 import './path-lab.css';
 import { WearMap, LAB_SIZE, SEASONS, SCENARIOS, History, strokeLine, scenarioMap, exportLab, importLab } from './model.js';
@@ -215,3 +216,4 @@ async function start() {
   window.pathLab = { ready: true, state, lastMs: () => scene?.ms, scenario: id => { loadMap(scenarioMap(id), id); history = new History(state.map); }, exportJson: () => current(), importJson: data => apply(data, 'Imported'), tileAt, painted: () => state.map.count(), pixel: (x, y) => Array.from(offscreen.getContext('2d').getImageData(x, y, 1, 1).data), sceneSize: () => [offscreen.width, offscreen.height] };
 }
 start();
+trackTopbarHeight();

@@ -18,6 +18,8 @@ export default defineConfig({
     outDir: fileURLToPath(new URL('../dist-studio', import.meta.url)),
     emptyOutDir: true,
     assetsDir: 'files',
+    // Small sprites go inline into the scripts: an artifact holds at most 512 files (8 Nov 2026: 458 before the rocks and plants).
+    assetsInlineLimit: 16384,
     chunkSizeWarningLimit: 2500,
     rollupOptions: { input: { index: `${studio}index.html`, 'phaser-demo': `${studio}phaser-demo.html`, 'path-lab': `${studio}path-lab.html`, buildings: `${studio}buildings.html`, 'ui-lab': `${studio}ui-lab.html`, 'world-lab': `${studio}world-lab.html`, 'fire-lab': `${studio}fire-lab.html` } },
   },

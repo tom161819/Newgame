@@ -29,3 +29,8 @@
 .lab-colour { grid-template-columns: 1fr 48px 28px; }
 .lab-colour label { grid-column: auto; }
 .lab-colour input[type=color] { width: 44px; height: 24px; padding: 0; border: 0; background: none; }
+/* Owner 8 Nov 2026: the options scroll, the preview stays in view (sticky under the top bar). */
+.lab-layout { align-items: start; }
+.lab-stage-wrap { position: sticky; top: calc(var(--topbar-h, 60px) + 8px); align-self: start; z-index: 2; }
+.lab-view { height: min(calc(100dvh - var(--topbar-h, 60px) - 40px), 760px); }
+@media (max-width: 900px) { .lab-stage-wrap { background: var(--bg, #1b2119); padding-bottom: 6px; } .lab-view { height: 42dvh; } }

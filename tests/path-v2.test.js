@@ -9,14 +9,15 @@ import { PathV2Layer } from '../src/game/PathV2Layer.js';
 import { objectRegistry } from '../src/systems/ObjectRegistry.js';
 
 const preset = JSON.parse(readFileSync(new URL('../art/path-lab/pesinav2.json', import.meta.url)));
+const owner = JSON.parse(readFileSync(new URL('../art/path-lab/pesiny-v3.json', import.meta.url)));
 const wearMap = (size, wear) => ({ size, get: (x, y) => x < 0 || y < 0 || x >= size || y >= size ? 0 : wear[y * size + x] });
 
-test('#116 the game uses the owner\'s pesinav2 settings from the Path Lab export', () => {
-  assert.deepEqual({ ...PATH_STYLE }, preset.config);
+test('the game uses the owner\'s pesiny-v3 settings from the Path Lab proposal', () => {
+  assert.deepEqual({ ...PATH_STYLE }, owner.config);
 });
 
 test('#116 the game copy of the V2 geometry gives the lab\'s shapes and field for the lab test map', () => {
-  const map = wearMap(preset.size, preset.wear), game = geometry(map, PATH_STYLE, preset.seed), studio = lab.geometry(map, preset.config, preset.seed);
+  const map = wearMap(preset.size, preset.wear), game = geometry(map, PATH_STYLE, preset.seed), studio = lab.geometry(map, PATH_STYLE, preset.seed);
   assert.deepEqual(game.lines, studio.lines); assert.deepEqual(game.discs, studio.discs); assert.deepEqual(game.tiles, studio.tiles); assert.equal(game.segments.length, studio.segments.length);
   const gameIndex = buckets(game), labIndex = lab.buckets(studio);
   for (let i = 0; i < 400; i++) {

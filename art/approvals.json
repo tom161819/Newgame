@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-08T08:06:12.307Z",
+  "updatedAt": "2026-11-08T22:15:46.050Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -1569,6 +1569,1099 @@
           "note": "",
           "updatedAt": "2026-11-04T21:40:25.183Z",
           "approvedAt": "2026-11-04T21:40:25.183Z"
+        }
+      }
+    },
+    "iron-deposit-large": {
+      "preferred": "iron-deposit-large-red-7",
+      "variants": {
+        "iron-deposit-large-veins-7": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "15898b2b",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "iron-deposit-large-red-7": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9755b367",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "iron-deposit-large-dark-7": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0f047100",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "iron-deposit-large-red-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fc0f3a7f",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "iron-deposit-medium": {
+      "preferred": "iron-deposit-medium-red-5",
+      "variants": {
+        "iron-deposit-medium-veins-5": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3c760601",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "iron-deposit-medium-red-5": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4d59998d",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "iron-deposit-medium-dark-5": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "386028aa",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "iron-deposit-medium-veins-stage1": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5b498c28",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "iron-deposit-medium-veins-stage2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1891a77f",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "iron-deposit-medium-veins-stage3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6adcb552",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "iron-deposit-medium-red-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a64915e5",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "iron-deposit-small": {
+      "preferred": "iron-deposit-small-red-3",
+      "variants": {
+        "iron-deposit-small-veins-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "558e5e3f",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "iron-deposit-small-veins-8": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0b25a680",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "iron-deposit-small-red-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fcc5f033",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "iron-deposit-small-red-8": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "446c0f24",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "iron-deposit-small-dark-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1e7e474c",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "iron-deposit-small-dark-8": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "196855ab",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "iron-deposit-small-red-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "73cb746b",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "orchard-tree": {
+      "preferred": "orchard-tree-young-2",
+      "variants": {
+        "orchard-tree-young-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f5a99a2a",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "orchard-tree-young-5": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d1f5d219",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "orchard-tree-blossom-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "32f87de9",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "orchard-tree-blossom-5": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d460d8ba",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "orchard-tree-green-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "482e9107",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "orchard-tree-green-5": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a112799c",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "orchard-tree-fruit-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b2b72c20",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "orchard-tree-fruit-5": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c83aeaa3",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "orchard-tree-harvested-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a041c48a",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "orchard-tree-harvested-5": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "74ca00f9",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "orchard-tree-winter-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "82e954a9",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "orchard-tree-winter-5": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3b48cc7a",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "rock-obstacles-medium": {
+      "preferred": "rock-obstacles-medium-outcrop-1",
+      "variants": {
+        "rock-obstacles-medium-outcrop-1": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b873663b",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "rock-obstacles-medium-outcrop-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bd74c3e6",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "rock-obstacles-medium-boulders": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "02ae3f76",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "rock-obstacles-medium-bush": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b024e38a",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "rock-obstacles-medium-outcrop-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6d0e1d67",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "rock-obstacles-small": {
+      "preferred": "rock-obstacles-small-boulder-1",
+      "variants": {
+        "rock-obstacles-small-boulder-1": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e5e0be45",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "rock-obstacles-small-boulder-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cf5f6cb7",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "rock-obstacles-small-boulders": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "34e07d46",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "rock-obstacles-small-bush": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0994b04",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "rock-obstacles-small-boulder-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ca466329",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "rock-ridge": {
+      "preferred": "rock-ridge-granite",
+      "variants": {
+        "rock-ridge-granite": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "026ad4d1",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "rock-ridge-slate": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c0a9714b",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "rock-ridge-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f79b75ad",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "shrubs": {
+      "preferred": "shrubs-hazel-1",
+      "variants": {
+        "shrubs-hazel-1": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f28f3dfb",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-hazel-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ec3bf6e2",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-hazel-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7a0256e8",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-rosehip-1": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "39d6d3b8",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-rosehip-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b42143f6",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-rosehip-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ef01cb94",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-juniper-1": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "11fca13b",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-juniper-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8d0ba389",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-juniper-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "443515df",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-bramble-1": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ca93f83b",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-bramble-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bc37ffb1",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-bramble-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cf9b1e0f",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-heather-1": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2cdd762d",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-heather-2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "88a32b9b",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-heather-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d9bdff41",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "shrubs-seasons": {
+      "preferred": "shrubs-seasons-hazel-spring",
+      "variants": {
+        "shrubs-seasons-hazel-spring": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "198bb8ed",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-seasons-hazel-autumn": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "65756eb2",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-seasons-hazel-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1544cdd5",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-seasons-rosehip-spring": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bfbb0c87",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-seasons-rosehip-autumn": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e894cd34",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-seasons-rosehip-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "d56dc90f",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-seasons-juniper-spring": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5fb598a8",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-seasons-juniper-autumn": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f6eef5ff",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-seasons-juniper-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fda4b950",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-seasons-bramble-spring": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "64c497d4",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-seasons-bramble-autumn": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5c15b52f",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-seasons-bramble-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e2ee69cc",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-seasons-heather-spring": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c6f3297e",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-seasons-heather-autumn": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "5ea63461",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "shrubs-seasons-heather-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "7e993256",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "stone-deposit-large": {
+      "preferred": "stone-deposit-large-granite-7",
+      "variants": {
+        "stone-deposit-large-granite-7": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fe35644c",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "stone-deposit-large-limestone-7": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "115ca26c",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "stone-deposit-large-slate-7": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "73c239c9",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "stone-deposit-large-mossy-7": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "030b9819",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "stone-deposit-large-granite-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b62f1ae8",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "stone-deposit-medium": {
+      "preferred": "stone-deposit-medium-granite-5",
+      "variants": {
+        "stone-deposit-medium-granite-5": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6d43f496",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "stone-deposit-medium-limestone-5": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "9c468e36",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "stone-deposit-medium-slate-5": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4dc9d773",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "stone-deposit-medium-mossy-5": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "3c73af83",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "stone-deposit-medium-granite-stage1": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b8fde7b7",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "stone-deposit-medium-granite-stage2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "99f2ce40",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "stone-deposit-medium-granite-stage3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b11bb7dd",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "stone-deposit-medium-granite-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "1346b212",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "stone-deposit-small": {
+      "preferred": "stone-deposit-small-granite-3",
+      "variants": {
+        "stone-deposit-small-granite-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "eebb8e00",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "stone-deposit-small-granite-8": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "392445bf",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "stone-deposit-small-limestone-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e929e720",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "stone-deposit-small-limestone-8": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "b2d6325f",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "stone-deposit-small-slate-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e8d7f9cd",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "stone-deposit-small-slate-8": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cc732f42",
+          "status": "rejected",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1
+        },
+        "stone-deposit-small-mossy-3": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "bc2d3c1d",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "stone-deposit-small-mossy-8": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "a2ce0012",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "stone-deposit-small-granite-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "45f087f4",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "thicket-2x1": {
+      "preferred": "thicket-2x1-hazel",
+      "variants": {
+        "thicket-2x1-hazel": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "71358398",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "thicket-2x1-bramble": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ea643efb",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "thicket-2x1-autumn": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0b3eab68",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "thicket-2x1-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6c7258ed",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "thicket-2x2": {
+      "preferred": "thicket-2x2-hazel",
+      "variants": {
+        "thicket-2x2-hazel": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "71358398",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "thicket-2x2-bramble": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ea643efb",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "thicket-2x2-autumn": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0b3eab68",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "thicket-2x2-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6c7258ed",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "thicket-3x2": {
+      "preferred": "thicket-3x2-hazel",
+      "variants": {
+        "thicket-3x2-hazel": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "71358398",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "thicket-3x2-bramble": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "ea643efb",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "thicket-3x2-autumn": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "0b3eab68",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "thicket-3x2-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6c7258ed",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        }
+      }
+    },
+    "wheat-field-tile": {
+      "preferred": "wheat-field-tile-ploughed",
+      "variants": {
+        "wheat-field-tile-ploughed": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "4e881f1d",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "wheat-field-tile-sown": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2ddab334",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "wheat-field-tile-sprouts": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "11e71d6b",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "wheat-field-tile-green": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f8595cda",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "wheat-field-tile-ripe": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "dda31e01",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "wheat-field-tile-ripe2": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "8466ebf4",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "wheat-field-tile-stubble": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fe200144",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
+        },
+        "wheat-field-tile-winter": {
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "c119a606",
+          "status": "approved",
+          "updatedAt": "2026-11-08T22:08:00.000Z",
+          "version": 1,
+          "approvedAt": "2026-11-08T22:08:00.000Z"
         }
       }
     },

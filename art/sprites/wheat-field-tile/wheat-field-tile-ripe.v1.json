@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wheat-field-tile",
+  "variantId": "wheat-field-tile-ripe",
+  "name": "Ripe (wind 1)",
+  "category": "nature",
+  "version": 1,
+  "specHash": "dda31e01",
+  "generator": "vegetation",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 48,
+  "anchor": {
+    "x": 33,
+    "y": 30
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.625
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 46
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.95833
+  },
+  "visualHeight": 46,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.816,
+  "lights": []
+}

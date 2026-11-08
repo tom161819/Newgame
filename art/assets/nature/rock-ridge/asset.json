@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "id": "rock-ridge",
+  "name": "Rock ridge – 4×2",
+  "category": "nature",
+  "description": "Concept for review (g-loziska-skaly): richer rocks than today (more pieces, strata, cracks, lichen, gravel at the foot that fades into the ground). The owner picks; footprints and stages then go to Mechaniky (generator, blocking rocks).",
+  "footprint": {
+    "width": 4,
+    "height": 2
+  },
+  "generator": "outcrop",
+  "variants": [
+    {
+      "id": "rock-ridge-granite",
+      "name": "Granite ridge",
+      "version": 1,
+      "notes": "A long rock edge, highest in the middle.",
+      "spec": {
+        "kind": "obstacle",
+        "shape": "ridge",
+        "rock": "granite",
+        "seed": 4
+      }
+    },
+    {
+      "id": "rock-ridge-slate",
+      "name": "Slate ridge",
+      "version": 1,
+      "notes": "Layered dark ridge.",
+      "spec": {
+        "kind": "obstacle",
+        "shape": "ridge",
+        "rock": "slate",
+        "seed": 7
+      }
+    },
+    {
+      "id": "rock-ridge-winter",
+      "name": "Granite ridge – winter",
+      "version": 1,
+      "notes": "Snow on the upper faces.",
+      "spec": {
+        "kind": "obstacle",
+        "shape": "ridge",
+        "rock": "granite",
+        "seed": 4,
+        "season": "winter"
+      }
+    }
+  ]
+}

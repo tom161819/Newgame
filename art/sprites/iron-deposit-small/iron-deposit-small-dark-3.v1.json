@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "iron-deposit-small",
+  "variantId": "iron-deposit-small-dark-3",
+  "name": "Dark ore 3",
+  "category": "nature",
+  "version": 1,
+  "specHash": "1e7e474c",
+  "generator": "outcrop",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 40,
+  "anchor": {
+    "x": 33,
+    "y": 22
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.55
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 38
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.95
+  },
+  "visualHeight": 38,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.482,
+  "lights": []
+}

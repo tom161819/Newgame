@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "id": "iron-deposit-medium",
+  "name": "Iron deposit – medium (2×2)",
+  "category": "nature",
+  "description": "Concept for review (g-loziska-skaly): richer rocks than today (more pieces, strata, cracks, lichen, gravel at the foot that fades into the ground). The owner picks; footprints and stages then go to Mechaniky (generator, mining of larger deposits).",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "outcrop",
+  "variants": [
+    {
+      "id": "iron-deposit-medium-veins-5",
+      "name": "Rust veins",
+      "version": 1,
+      "notes": "Rust veins iron deposit, medium: tells apart from stone at a glance.",
+      "spec": {
+        "kind": "iron",
+        "ore": "veins",
+        "seed": 5
+      }
+    },
+    {
+      "id": "iron-deposit-medium-red-5",
+      "name": "Red-brown ore",
+      "version": 1,
+      "notes": "Red-brown ore iron deposit, medium: tells apart from stone at a glance.",
+      "spec": {
+        "kind": "iron",
+        "ore": "red",
+        "seed": 5
+      }
+    },
+    {
+      "id": "iron-deposit-medium-dark-5",
+      "name": "Dark ore",
+      "version": 1,
+      "notes": "Dark ore iron deposit, medium: tells apart from stone at a glance.",
+      "spec": {
+        "kind": "iron",
+        "ore": "dark",
+        "seed": 5
+      }
+    },
+    {
+      "id": "iron-deposit-medium-veins-stage1",
+      "name": "Rust veins – started",
+      "version": 1,
+      "notes": "Mining stage 1.",
+      "spec": {
+        "kind": "iron",
+        "ore": "veins",
+        "seed": 5,
+        "stage": 1
+      }
+    },
+    {
+      "id": "iron-deposit-medium-veins-stage2",
+      "name": "Rust veins – nearly mined",
+      "version": 1,
+      "notes": "Mining stage 2.",
+      "spec": {
+        "kind": "iron",
+        "ore": "veins",
+        "seed": 5,
+        "stage": 2
+      }
+    },
+    {
+      "id": "iron-deposit-medium-veins-stage3",
+      "name": "Rust veins – mined out",
+      "version": 1,
+      "notes": "Mining stage 3.",
+      "spec": {
+        "kind": "iron",
+        "ore": "veins",
+        "seed": 5,
+        "stage": 3
+      }
+    },
+    {
+      "id": "iron-deposit-medium-red-winter",
+      "name": "Red-brown ore – winter",
+      "version": 1,
+      "notes": "Snow on the upper faces.",
+      "spec": {
+        "kind": "iron",
+        "ore": "red",
+        "seed": 5,
+        "season": "winter"
+      }
+    }
+  ]
+}

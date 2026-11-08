@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "id": "iron-deposit-small",
+  "name": "Iron deposit – small (1×1)",
+  "category": "nature",
+  "description": "Concept for review (g-loziska-skaly): richer rocks than today (more pieces, strata, cracks, lichen, gravel at the foot that fades into the ground). The owner picks; footprints and stages then go to Mechaniky (generator, mining of larger deposits).",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "outcrop",
+  "variants": [
+    {
+      "id": "iron-deposit-small-veins-3",
+      "name": "Rust veins 3",
+      "version": 1,
+      "notes": "Rust veins iron deposit, small: tells apart from stone at a glance.",
+      "spec": {
+        "kind": "iron",
+        "ore": "veins",
+        "seed": 3
+      }
+    },
+    {
+      "id": "iron-deposit-small-veins-8",
+      "name": "Rust veins 8",
+      "version": 1,
+      "notes": "Rust veins iron deposit, small: tells apart from stone at a glance.",
+      "spec": {
+        "kind": "iron",
+        "ore": "veins",
+        "seed": 8
+      }
+    },
+    {
+      "id": "iron-deposit-small-red-3",
+      "name": "Red-brown ore 3",
+      "version": 1,
+      "notes": "Red-brown ore iron deposit, small: tells apart from stone at a glance.",
+      "spec": {
+        "kind": "iron",
+        "ore": "red",
+        "seed": 3
+      }
+    },
+    {
+      "id": "iron-deposit-small-red-8",
+      "name": "Red-brown ore 8",
+      "version": 1,
+      "notes": "Red-brown ore iron deposit, small: tells apart from stone at a glance.",
+      "spec": {
+        "kind": "iron",
+        "ore": "red",
+        "seed": 8
+      }
+    },
+    {
+      "id": "iron-deposit-small-dark-3",
+      "name": "Dark ore 3",
+      "version": 1,
+      "notes": "Dark ore iron deposit, small: tells apart from stone at a glance.",
+      "spec": {
+        "kind": "iron",
+        "ore": "dark",
+        "seed": 3
+      }
+    },
+    {
+      "id": "iron-deposit-small-dark-8",
+      "name": "Dark ore 8",
+      "version": 1,
+      "notes": "Dark ore iron deposit, small: tells apart from stone at a glance.",
+      "spec": {
+        "kind": "iron",
+        "ore": "dark",
+        "seed": 8
+      }
+    },
+    {
+      "id": "iron-deposit-small-red-winter",
+      "name": "Red-brown ore – winter",
+      "version": 1,
+      "notes": "Snow on the upper faces.",
+      "spec": {
+        "kind": "iron",
+        "ore": "red",
+        "seed": 3,
+        "season": "winter"
+      }
+    }
+  ]
+}

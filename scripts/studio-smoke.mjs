@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { browserRuntime } from './browser-runtime.mjs';
 import { buildStudio, serveStudio } from './studio-server.mjs';
+import { WORLD_GENERATOR_VERSION } from '../src/data/worldCode.js';
 
 if (!process.argv.includes('--no-build')) buildStudio();
 const server = await serveStudio();
@@ -504,9 +505,19 @@ try {
     const doc = await sl.evaluate(() => window.__fakeClaude.docs.get('ui/stone-castle'));
     assert.equal(doc.forGame, true); assert.equal(doc.by, 'u-owner'); assert.equal(doc.config.style, 'stone-castle'); assert.equal(doc.config.layout.buildingsBar, 'top');
     assert.match(await sl.locator('#ul-summary').textContent(), /waits for the game — write „převzít UI“/);
+    // A comment field in every section, saved to `uiNotes/<scope>` for Claude.
+    await sl.locator('.ul-tabs [data-tab="style"]').click();
+    assert.ok(await sl.locator('.ul-note').count() >= 5);
+    await sl.locator('.ul-note[data-scope="style:colours"] summary').click();
+    await sl.locator('.ul-note[data-scope="style:colours"] textarea').fill('Tmavší zlatá na nadpisech');
+    await sl.locator('.ul-note[data-scope="style:colours"] textarea').blur();
+    await sl.waitForFunction(() => window.__fakeClaude.docs.has('uiNotes/style:colours'));
+    const noteDoc = await sl.evaluate(() => window.__fakeClaude.docs.get('uiNotes/style:colours'));
+    assert.equal(noteDoc.text, 'Tmavší zlatá na nadpisech'); assert.equal(noteDoc.label, 'Colours'); assert.equal(noteDoc.by, 'u-owner');
+    assert.match(await sl.locator('#ul-summary').textContent(), /1 comment/);
     assert.deepEqual(slErrors, []); await owner.close();
   }
-  pass('UI Lab: real game interface in the preview, four styles, drag-to-dock (resource bar to the bottom), window sections hidden and reordered, designs saved locally and to the page database marked for the game');
+  pass('UI Lab: real game interface in the preview, four styles, drag-to-dock (resource bar to the bottom), window sections hidden and reordered, designs saved locally and to the page database marked for the game, a comment field per section (uiNotes)');
 
   // World Lab (g-world-lab): the game's own generator, codes, checks, favourites (`worlds/<id>`) and the default proposal.
   {
@@ -547,7 +558,7 @@ try {
     await sw.getByRole('button', { name: 'Propose as default' }).click();
     await sw.waitForFunction(() => window.__fakeClaude.docs.has('worldDefaults/proposal'));
     const proposal = await sw.evaluate(() => window.__fakeClaude.docs.get('worldDefaults/proposal'));
-    assert.deepEqual(proposal.levels, await sw.evaluate(() => window.worldLab.levels())); assert.equal(proposal.by, 'u-owner'); assert.equal(proposal.generator, 2);
+    assert.deepEqual(proposal.levels, await sw.evaluate(() => window.worldLab.levels())); assert.equal(proposal.by, 'u-owner'); assert.equal(proposal.generator, WORLD_GENERATOR_VERSION);
     await sw.waitForTimeout(100);
     assert.match(await sw.locator('#wl-summary').textContent(), /převzít svět/);
     assert.deepEqual(swErrors, []); await owner.close();

@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "id": "rock-obstacles-medium",
+  "name": "Rock obstacles – 2×2",
+  "category": "nature",
+  "description": "Concept for review (g-loziska-skaly): richer rocks than today (more pieces, strata, cracks, lichen, gravel at the foot that fades into the ground). The owner picks; footprints and stages then go to Mechaniky (generator, blocking rocks).",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "outcrop",
+  "variants": [
+    {
+      "id": "rock-obstacles-medium-outcrop-1",
+      "name": "Rock outcrop",
+      "version": 1,
+      "notes": "A tall outcrop of granite.",
+      "spec": {
+        "kind": "obstacle",
+        "shape": "outcrop",
+        "rock": "granite",
+        "seed": 3
+      }
+    },
+    {
+      "id": "rock-obstacles-medium-outcrop-2",
+      "name": "Limestone outcrop",
+      "version": 1,
+      "notes": "Layered pale outcrop.",
+      "spec": {
+        "kind": "obstacle",
+        "shape": "outcrop",
+        "rock": "limestone",
+        "seed": 11
+      }
+    },
+    {
+      "id": "rock-obstacles-medium-boulders",
+      "name": "Boulder field",
+      "version": 1,
+      "notes": "Boulders over two by two tiles.",
+      "spec": {
+        "kind": "obstacle",
+        "shape": "boulders",
+        "rock": "mossy",
+        "seed": 5
+      }
+    },
+    {
+      "id": "rock-obstacles-medium-bush",
+      "name": "Outcrop with bushes",
+      "version": 1,
+      "notes": "Rock with shrubs round it.",
+      "spec": {
+        "kind": "obstacle",
+        "shape": "bush",
+        "rock": "granite",
+        "seed": 8
+      }
+    },
+    {
+      "id": "rock-obstacles-medium-outcrop-winter",
+      "name": "Rock outcrop – winter",
+      "version": 1,
+      "notes": "Snow on the upper faces.",
+      "spec": {
+        "kind": "obstacle",
+        "shape": "outcrop",
+        "rock": "granite",
+        "seed": 3,
+        "season": "winter"
+      }
+    }
+  ]
+}

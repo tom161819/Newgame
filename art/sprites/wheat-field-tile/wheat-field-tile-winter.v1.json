@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wheat-field-tile",
+  "variantId": "wheat-field-tile-winter",
+  "name": "Winter",
+  "category": "nature",
+  "version": 1,
+  "specHash": "c119a606",
+  "generator": "vegetation",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 36,
+  "anchor": {
+    "x": 33,
+    "y": 18
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.5
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 34
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.94444
+  },
+  "visualHeight": 34,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.35,
+  "lights": []
+}

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "orchard-tree",
+  "variantId": "orchard-tree-winter-5",
+  "name": "Winter 5",
+  "category": "nature",
+  "version": 1,
+  "specHash": "3b48cc7a",
+  "generator": "vegetation",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 55,
+  "anchor": {
+    "x": 33,
+    "y": 37
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.67273
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 53
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.96364
+  },
+  "visualHeight": 53,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.218,
+  "lights": []
+}

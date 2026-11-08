@@ -1,4 +1,4 @@
-// #116 The owner's path style "V2 pesinav2" (picked in the Path Lab on 7 Nov 2026, art/path-lab/pesinav2.json).
-// The game reads every V2 path parameter from here; tests/path-v2.test.js checks it matches the lab export.
-export const PATH_STYLE=Object.freeze({"meanderStrength": 0.96, "meanderFrequency": 0.2, "meanderSmoothness": 0.7, "cornerRounding": 0.77, "minCurveRadius": 1.25, "widthGrass": 6, "width1": 7, "width2": 12, "width3": 16, "levelBlend": 0.54, "edgeIrregularity": 0.47, "edgeSoftness": 0.61, "noiseScale": 1.75, "areaExpansion": 0.32, "areaSmoothness": 0.92, "blendDistance": 2.2});
+// The owner's path style "pesiny-v3" (proposed from the Path Lab V3 on 8 Nov 2026, art/path-lab/pesiny-v3.json;
+// before: #116 "V2 pesinav2"). The game reads every path parameter from here; tests/path-v2.test.js checks it matches.
+export const PATH_STYLE=Object.freeze({"meanderStrength": 0.88, "meanderFrequency": 0.29, "meanderSmoothness": 0.49, "cornerRounding": 0.44, "minCurveRadius": 0.55, "widthGrass": 6, "width1": 10, "width2": 17, "width3": 24, "levelBlend": 0.33, "edgeIrregularity": 1, "edgeSoftness": 0.45, "noiseScale": 2.15, "areaExpansion": 0.35, "areaSmoothness": 0.26, "blendDistance": 3});
 export const PATH_STYLE_SEED=1;

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "shrubs",
+  "variantId": "shrubs-bramble-1",
+  "name": "Bramble – small",
+  "category": "nature",
+  "version": 1,
+  "specHash": "ca93f83b",
+  "generator": "vegetation",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 67,
+  "height": 35,
+  "anchor": {
+    "x": 33,
+    "y": 17
+  },
+  "origin": {
+    "x": 0.49254,
+    "y": 0.48571
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 33
+  },
+  "baseOrigin": {
+    "x": 0.49254,
+    "y": 0.94286
+  },
+  "visualHeight": 33,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.701,
+  "lights": []
+}

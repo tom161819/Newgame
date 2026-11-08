@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "id": "orchard-tree",
+  "name": "Orchard – apple tree tile by phase",
+  "category": "nature",
+  "description": "Concept for review (g-sad-pole-kere). The owner picks; phases, sizes and footprints then go to Mechaniky. One tile of the orchard (the game paints orchards per tile).",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "vegetation",
+  "variants": [
+    {
+      "id": "orchard-tree-young-2",
+      "name": "Young tree 2",
+      "version": 1,
+      "notes": "Orchard tile: apple tree, young tree.",
+      "spec": {
+        "kind": "apple",
+        "phase": "young",
+        "seed": 2
+      }
+    },
+    {
+      "id": "orchard-tree-young-5",
+      "name": "Young tree 5",
+      "version": 1,
+      "notes": "Orchard tile: apple tree, young tree.",
+      "spec": {
+        "kind": "apple",
+        "phase": "young",
+        "seed": 5
+      }
+    },
+    {
+      "id": "orchard-tree-blossom-2",
+      "name": "Blossom (spring) 2",
+      "version": 1,
+      "notes": "Orchard tile: apple tree, blossom (spring).",
+      "spec": {
+        "kind": "apple",
+        "phase": "blossom",
+        "seed": 2
+      }
+    },
+    {
+      "id": "orchard-tree-blossom-5",
+      "name": "Blossom (spring) 5",
+      "version": 1,
+      "notes": "Orchard tile: apple tree, blossom (spring).",
+      "spec": {
+        "kind": "apple",
+        "phase": "blossom",
+        "seed": 5
+      }
+    },
+    {
+      "id": "orchard-tree-green-2",
+      "name": "Green (summer) 2",
+      "version": 1,
+      "notes": "Orchard tile: apple tree, green (summer).",
+      "spec": {
+        "kind": "apple",
+        "phase": "green",
+        "seed": 2
+      }
+    },
+    {
+      "id": "orchard-tree-green-5",
+      "name": "Green (summer) 5",
+      "version": 1,
+      "notes": "Orchard tile: apple tree, green (summer).",
+      "spec": {
+        "kind": "apple",
+        "phase": "green",
+        "seed": 5
+      }
+    },
+    {
+      "id": "orchard-tree-fruit-2",
+      "name": "With apples 2",
+      "version": 1,
+      "notes": "Orchard tile: apple tree, with apples.",
+      "spec": {
+        "kind": "apple",
+        "phase": "fruit",
+        "seed": 2
+      }
+    },
+    {
+      "id": "orchard-tree-fruit-5",
+      "name": "With apples 5",
+      "version": 1,
+      "notes": "Orchard tile: apple tree, with apples.",
+      "spec": {
+        "kind": "apple",
+        "phase": "fruit",
+        "seed": 5
+      }
+    },
+    {
+      "id": "orchard-tree-harvested-2",
+      "name": "Harvested (autumn) 2",
+      "version": 1,
+      "notes": "Orchard tile: apple tree, harvested (autumn).",
+      "spec": {
+        "kind": "apple",
+        "phase": "harvested",
+        "seed": 2
+      }
+    },
+    {
+      "id": "orchard-tree-harvested-5",
+      "name": "Harvested (autumn) 5",
+      "version": 1,
+      "notes": "Orchard tile: apple tree, harvested (autumn).",
+      "spec": {
+        "kind": "apple",
+        "phase": "harvested",
+        "seed": 5
+      }
+    },
+    {
+      "id": "orchard-tree-winter-2",
+      "name": "Winter 2",
+      "version": 1,
+      "notes": "Orchard tile: apple tree, winter.",
+      "spec": {
+        "kind": "apple",
+        "phase": "winter",
+        "seed": 2
+      }
+    },
+    {
+      "id": "orchard-tree-winter-5",
+      "name": "Winter 5",
+      "version": 1,
+      "notes": "Orchard tile: apple tree, winter.",
+      "spec": {
+        "kind": "apple",
+        "phase": "winter",
+        "seed": 5
+      }
+    }
+  ]
+}

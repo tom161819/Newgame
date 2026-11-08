@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "id": "shrubs-seasons",
+  "name": "Shrubs – seasons",
+  "category": "nature",
+  "description": "Concept for review (g-sad-pole-kere). The owner picks; phases, sizes and footprints then go to Mechaniky.",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "vegetation",
+  "variants": [
+    {
+      "id": "shrubs-seasons-hazel-spring",
+      "name": "Hazel – spring",
+      "version": 1,
+      "notes": "Hazel, medium, spring.",
+      "spec": {
+        "kind": "shrub",
+        "species": "hazel",
+        "size": 2,
+        "season": "spring",
+        "seed": 7
+      }
+    },
+    {
+      "id": "shrubs-seasons-hazel-autumn",
+      "name": "Hazel – autumn",
+      "version": 1,
+      "notes": "Hazel, medium, autumn.",
+      "spec": {
+        "kind": "shrub",
+        "species": "hazel",
+        "size": 2,
+        "season": "autumn",
+        "seed": 7
+      }
+    },
+    {
+      "id": "shrubs-seasons-hazel-winter",
+      "name": "Hazel – winter",
+      "version": 1,
+      "notes": "Hazel, medium, winter.",
+      "spec": {
+        "kind": "shrub",
+        "species": "hazel",
+        "size": 2,
+        "season": "winter",
+        "seed": 7
+      }
+    },
+    {
+      "id": "shrubs-seasons-rosehip-spring",
+      "name": "Rosehip – spring",
+      "version": 1,
+      "notes": "Rosehip, medium, spring.",
+      "spec": {
+        "kind": "shrub",
+        "species": "rosehip",
+        "size": 2,
+        "season": "spring",
+        "seed": 7
+      }
+    },
+    {
+      "id": "shrubs-seasons-rosehip-autumn",
+      "name": "Rosehip – autumn",
+      "version": 1,
+      "notes": "Rosehip, medium, autumn.",
+      "spec": {
+        "kind": "shrub",
+        "species": "rosehip",
+        "size": 2,
+        "season": "autumn",
+        "seed": 7
+      }
+    },
+    {
+      "id": "shrubs-seasons-rosehip-winter",
+      "name": "Rosehip – winter",
+      "version": 1,
+      "notes": "Rosehip, medium, winter.",
+      "spec": {
+        "kind": "shrub",
+        "species": "rosehip",
+        "size": 2,
+        "season": "winter",
+        "seed": 7
+      }
+    },
+    {
+      "id": "shrubs-seasons-juniper-spring",
+      "name": "Juniper – spring",
+      "version": 1,
+      "notes": "Juniper, medium, spring.",
+      "spec": {
+        "kind": "shrub",
+        "species": "juniper",
+        "size": 2,
+        "season": "spring",
+        "seed": 7
+      }
+    },
+    {
+      "id": "shrubs-seasons-juniper-autumn",
+      "name": "Juniper – autumn",
+      "version": 1,
+      "notes": "Juniper, medium, autumn.",
+      "spec": {
+        "kind": "shrub",
+        "species": "juniper",
+        "size": 2,
+        "season": "autumn",
+        "seed": 7
+      }
+    },
+    {
+      "id": "shrubs-seasons-juniper-winter",
+      "name": "Juniper – winter",
+      "version": 1,
+      "notes": "Juniper, medium, winter.",
+      "spec": {
+        "kind": "shrub",
+        "species": "juniper",
+        "size": 2,
+        "season": "winter",
+        "seed": 7
+      }
+    },
+    {
+      "id": "shrubs-seasons-bramble-spring",
+      "name": "Bramble – spring",
+      "version": 1,
+      "notes": "Bramble, medium, spring.",
+      "spec": {
+        "kind": "shrub",
+        "species": "bramble",
+        "size": 2,
+        "season": "spring",
+        "seed": 7
+      }
+    },
+    {
+      "id": "shrubs-seasons-bramble-autumn",
+      "name": "Bramble – autumn",
+      "version": 1,
+      "notes": "Bramble, medium, autumn.",
+      "spec": {
+        "kind": "shrub",
+        "species": "bramble",
+        "size": 2,
+        "season": "autumn",
+        "seed": 7
+      }
+    },
+    {
+      "id": "shrubs-seasons-bramble-winter",
+      "name": "Bramble – winter",
+      "version": 1,
+      "notes": "Bramble, medium, winter.",
+      "spec": {
+        "kind": "shrub",
+        "species": "bramble",
+        "size": 2,
+        "season": "winter",
+        "seed": 7
+      }
+    },
+    {
+      "id": "shrubs-seasons-heather-spring",
+      "name": "Heather – spring",
+      "version": 1,
+      "notes": "Heather, medium, spring.",
+      "spec": {
+        "kind": "shrub",
+        "species": "heather",
+        "size": 2,
+        "season": "spring",
+        "seed": 7
+      }
+    },
+    {
+      "id": "shrubs-seasons-heather-autumn",
+      "name": "Heather – autumn",
+      "version": 1,
+      "notes": "Heather, medium, autumn.",
+      "spec": {
+        "kind": "shrub",
+        "species": "heather",
+        "size": 2,
+        "season": "autumn",
+        "seed": 7
+      }
+    },
+    {
+      "id": "shrubs-seasons-heather-winter",
+      "name": "Heather – winter",
+      "version": 1,
+      "notes": "Heather, medium, winter.",
+      "spec": {
+        "kind": "shrub",
+        "species": "heather",
+        "size": 2,
+        "season": "winter",
+        "seed": 7
+      }
+    }
+  ]
+}

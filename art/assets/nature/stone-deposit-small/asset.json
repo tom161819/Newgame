@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "id": "stone-deposit-small",
+  "name": "Stone deposit – small (1×1)",
+  "category": "nature",
+  "description": "Concept for review (g-loziska-skaly): richer rocks than today (more pieces, strata, cracks, lichen, gravel at the foot that fades into the ground). The owner picks; footprints and stages then go to Mechaniky (generator, mining of larger deposits).",
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "generator": "outcrop",
+  "variants": [
+    {
+      "id": "stone-deposit-small-granite-3",
+      "name": "Granite 3",
+      "version": 1,
+      "notes": "Granite stone deposit, small.",
+      "spec": {
+        "kind": "stone",
+        "rock": "granite",
+        "seed": 3
+      }
+    },
+    {
+      "id": "stone-deposit-small-granite-8",
+      "name": "Granite 8",
+      "version": 1,
+      "notes": "Granite stone deposit, small.",
+      "spec": {
+        "kind": "stone",
+        "rock": "granite",
+        "seed": 8
+      }
+    },
+    {
+      "id": "stone-deposit-small-limestone-3",
+      "name": "Limestone 3",
+      "version": 1,
+      "notes": "Limestone stone deposit, small.",
+      "spec": {
+        "kind": "stone",
+        "rock": "limestone",
+        "seed": 3
+      }
+    },
+    {
+      "id": "stone-deposit-small-limestone-8",
+      "name": "Limestone 8",
+      "version": 1,
+      "notes": "Limestone stone deposit, small.",
+      "spec": {
+        "kind": "stone",
+        "rock": "limestone",
+        "seed": 8
+      }
+    },
+    {
+      "id": "stone-deposit-small-slate-3",
+      "name": "Slate 3",
+      "version": 1,
+      "notes": "Slate stone deposit, small.",
+      "spec": {
+        "kind": "stone",
+        "rock": "slate",
+        "seed": 3
+      }
+    },
+    {
+      "id": "stone-deposit-small-slate-8",
+      "name": "Slate 8",
+      "version": 1,
+      "notes": "Slate stone deposit, small.",
+      "spec": {
+        "kind": "stone",
+        "rock": "slate",
+        "seed": 8
+      }
+    },
+    {
+      "id": "stone-deposit-small-mossy-3",
+      "name": "Mossy rock 3",
+      "version": 1,
+      "notes": "Mossy rock stone deposit, small.",
+      "spec": {
+        "kind": "stone",
+        "rock": "mossy",
+        "seed": 3
+      }
+    },
+    {
+      "id": "stone-deposit-small-mossy-8",
+      "name": "Mossy rock 8",
+      "version": 1,
+      "notes": "Mossy rock stone deposit, small.",
+      "spec": {
+        "kind": "stone",
+        "rock": "mossy",
+        "seed": 8
+      }
+    },
+    {
+      "id": "stone-deposit-small-granite-winter",
+      "name": "Granite – winter",
+      "version": 1,
+      "notes": "Snow on the upper faces.",
+      "spec": {
+        "kind": "stone",
+        "rock": "granite",
+        "seed": 3,
+        "season": "winter"
+      }
+    }
+  ]
+}
