@@ -22,3 +22,5 @@ node --test tests/asset-studio*.test.js.
 
 ## Notes for the next agent
 After approval export .anim.png like the fishing loop.
+
+Approved by the owner on 8 Nov: all eight loops exported as `art/sprites/child/child-play-*.v1.anim.png` with `meta.anim`.

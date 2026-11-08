@@ -55,3 +55,14 @@
   .wl-grid { grid-template-columns: minmax(0, 1fr); }
   .wl-toolbar input[type="text"] { width: 100%; }
 }
+
+.wl-ground { display: grid; gap: 8px; margin: 6px 0 10px; }
+.wl-ground-settings { display: grid; gap: 10px; }
+.wl-ground-scene { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.wl-seg { display: grid; gap: 3px; font-size: 12.5px; }
+.wl-ground-colours { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 12.5px; }
+.wl-colour { display: inline-flex; gap: 5px; align-items: center; }
+.wl-colour input { width: 32px; height: 24px; padding: 0; border: 1px solid var(--line, #888); background: none; }
+.wl-ground-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 6px 14px; }
+.wl-ground-grid h5 { grid-column: 1 / -1; margin: 4px 0 0; font-size: 13px; }
+.wl-ground-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }

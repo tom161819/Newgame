@@ -37,5 +37,42 @@
   "frontLayer": false,
   "gameLights": [],
   "modelHeight": 1.085,
-  "lights": []
+  "lights": [],
+  "anim": {
+    "frameWidth": 67,
+    "frameHeight": 67,
+    "anchor": {
+      "x": 33,
+      "y": 49
+    },
+    "origin": {
+      "x": 0.49254,
+      "y": 0.73134
+    },
+    "columns": [
+      "hay-jump",
+      "hay-jump-b"
+    ],
+    "rows": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "rowsNote": "facing 0–7 (0 faces the viewer, then turning to screen right); the fisher faces the water",
+    "fps": 4,
+    "clips": {
+      "hay": [
+        0,
+        1
+      ]
+    },
+    "loop": [
+      "hay"
+    ]
+  }
 }

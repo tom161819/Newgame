@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-08T06:35:39.135Z",
+  "updatedAt": "2026-11-08T08:06:12.307Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -2746,6 +2746,78 @@
           "specHash": "1e4d9887",
           "status": "approved",
           "updatedAt": "2026-11-07T20:12:00.000Z",
+          "version": 1
+        },
+        "child-play-tag": {
+          "approvedAt": "2026-11-08T07:50:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "cf35911a",
+          "status": "approved",
+          "updatedAt": "2026-11-08T07:50:00.000Z",
+          "version": 1
+        },
+        "child-play-tag-girl": {
+          "approvedAt": "2026-11-08T07:50:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "f59b7ac8",
+          "status": "approved",
+          "updatedAt": "2026-11-08T07:50:00.000Z",
+          "version": 1
+        },
+        "child-play-hoop": {
+          "approvedAt": "2026-11-08T07:50:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6b05bfae",
+          "status": "approved",
+          "updatedAt": "2026-11-08T07:50:00.000Z",
+          "version": 1
+        },
+        "child-play-ball": {
+          "approvedAt": "2026-11-08T07:50:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "6dc20672",
+          "status": "approved",
+          "updatedAt": "2026-11-08T07:50:00.000Z",
+          "version": 1
+        },
+        "child-play-swing": {
+          "approvedAt": "2026-11-08T07:50:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "42a5b406",
+          "status": "approved",
+          "updatedAt": "2026-11-08T07:50:00.000Z",
+          "version": 1
+        },
+        "child-play-snowball": {
+          "approvedAt": "2026-11-08T07:50:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "09e8f115",
+          "status": "approved",
+          "updatedAt": "2026-11-08T07:50:00.000Z",
+          "version": 1
+        },
+        "child-play-snowman": {
+          "approvedAt": "2026-11-08T07:50:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "479a3fbf",
+          "status": "approved",
+          "updatedAt": "2026-11-08T07:50:00.000Z",
+          "version": 1
+        },
+        "child-play-hay": {
+          "approvedAt": "2026-11-08T07:50:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "110a7107",
+          "status": "approved",
+          "updatedAt": "2026-11-08T07:50:00.000Z",
           "version": 1
         }
       }
