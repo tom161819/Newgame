@@ -4,7 +4,7 @@ import { COLUMNS, ROWS, PLAYER_START, GROUND, tileColor, BUSH_COLOR, REED_COLOR 
 import { GROUND_TERRAIN_IDS, BUSH_TYPES } from '../../../src/data/worldTerrain.js';
 import { terrain as TERRAIN_DEFS } from '../../../src/data/objects/terrain.js';
 import { decorations as DECORATION_DEFS } from '../../../src/data/objects/decorations.js';
-import { paintContinuousGround, plantsFor, drawPlant, drawAtmosphere, seasonOf, yearOf } from './ground.js';
+import { paintContinuousGround, plantsFor, drawPlant, drawAtmosphere, seasonOf, yearOf, makeWaterField, waterObjectsFor } from './ground.js';
 
 const assetUrls = import.meta.glob('../../../public/assets/{terrain,decorations}/**/*.{png,webp,svg}', { eager: true, query: '?url', import: 'default' });
 const urlFor = path => assetUrls[`../../../public${path}`] ?? null;
@@ -60,6 +60,7 @@ export function drawTopDown(canvas, world, { scale = 4, overlay = 'none', focus 
 
 // Isometric window of `span` × `span` tiles around `focus`, drawn at the game's 64 × 32 tile size.
 export function drawIso(canvas, world, { focus, span = 28, ground = null }) {
+  canvas._water = null;
   const W = 64, H = 32, x0 = Math.max(0, Math.min(COLUMNS - span, Math.round(focus.x - span / 2))), y0 = Math.max(0, Math.min(ROWS - span, Math.round(focus.y - span / 2)));
   const headroom = 72;
   canvas.width = span * W; canvas.height = span * H + headroom + 8;
@@ -94,8 +95,13 @@ export function drawIso(canvas, world, { focus, span = 28, ground = null }) {
     const cell = (x, y) => world.ground[Math.max(0, Math.min(world.ground.length - 1, y))]?.[Math.max(0, Math.min(world.ground[0].length - 1, x))];
     const depthAt = (x, y) => DEPTH[cell(x, y)] ?? -1, inWorld = (x, y) => world.ground[y]?.[x] !== undefined;
     const toWorld = (px, py) => { const a = (px - canvas.width / 2) / (W / 2), b = (py - headroom) / (H / 2); return [x0 + (a + b) / 2, y0 + (b - a) / 2]; };
-    paintContinuousGround(ctx, { width: canvas.width, height: canvas.height, toWorld, isGrass, zoneAt, depthAt, inWorld, settings: ground.settings });
-    for (const p of plantsFor({ x0, y0, span, isGrass, zoneAt, depthAt, settings: ground.settings })) objects.push({ kind: 'plant', plant: p, x: p.fx, y: p.fy, sx: (p.fx - x0 - (p.fy - y0)) * (W / 2) + canvas.width / 2, sy: (p.fx - x0 + (p.fy - y0)) * (H / 2) + headroom });
+    const field = makeWaterField({ x0, y0, span, depthAt, settings: ground.settings });
+    const painted = paintContinuousGround(ctx, { width: canvas.width, height: canvas.height, toWorld, isGrass, zoneAt, depthAt, inWorld, field, settings: ground.settings });
+    canvas._water = { mask: painted.mask, toWorld, field, flow: ground.settings.flow ?? 0 };
+    const screen = (fx, fy) => [(fx - x0 - (fy - y0)) * (W / 2) + canvas.width / 2, (fx - x0 + (fy - y0)) * (H / 2) + headroom];
+    const season = seasonOf(ground.settings.year ?? yearOf(ground.settings.season));
+    for (const p of waterObjectsFor({ x0, y0, span, field, depthAt, settings: ground.settings })) { const [sx, sy] = screen(p.fx, p.fy); if (p.flat) drawPlant(ctx, p, sx, sy, season); else objects.push({ kind: 'plant', plant: p, x: p.fx, y: p.fy, sx, sy }); }
+    for (const p of plantsFor({ x0, y0, span, isGrass, zoneAt, depthAt, field, settings: ground.settings })) objects.push({ kind: 'plant', plant: p, x: p.fx, y: p.fy, sx: (p.fx - x0 - (p.fy - y0)) * (W / 2) + canvas.width / 2, sy: (p.fx - x0 + (p.fy - y0)) * (H / 2) + headroom });
   }
   for (const o of objects.sort((a, b) => a.x + a.y - (b.x + b.y))) {
     if (o.kind === 'plant') { drawPlant(ctx, o.plant, o.sx, o.sy, seasonOf(ground.settings.year ?? yearOf(ground.settings.season))); continue; }
