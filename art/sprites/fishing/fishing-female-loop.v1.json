@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "fishing",
+  "variantId": "fishing-female-loop",
+  "name": "Fisher (woman) – fishing loop",
+  "category": "units",
+  "version": 1,
+  "specHash": "ee32eeba",
+  "generator": "figure",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 71,
+  "anchor": {
+    "x": 65,
+    "y": 37
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.52113
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 69
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.97183
+  },
+  "visualHeight": 69,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.265,
+  "lights": []
+}
