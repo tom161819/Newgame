@@ -1,5 +1,5 @@
 import { t } from '../i18n/index.js';
-import { tutorialProgress,nearestRock,tutorialPlacement,markedRocks } from '../systems/Tutorial.js';
+import { tutorialProgress,nearestRock,tutorialPlacement,markedRocks,freeBubbleSpot,rememberSpeed } from '../systems/Tutorial.js';
 import { tileCenter } from '../game/isometric.js';
 import { FARM_PLOT_CAPACITY } from '../data/farmPlots.js';
 import { TUTORIAL_KING_MS } from '../data/tutorial.js';
@@ -14,6 +14,11 @@ export const tipsEnabled=(storage=globalThis.localStorage)=>{try{return storage?
 export const tutorialEnabled=(storage=globalThis.localStorage)=>{try{return storage?.getItem(KEY)!=='off';}catch{return true;}};
 export function setTutorialEnabled(on,storage=globalThis.localStorage){try{storage?.setItem(KEY,on?'on':'off');}catch{/* session only */}}
 const visible=el=>!!el&&el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden';
+// m-ui-prekryvy-076 (report 0.76.0 point 4): the windows the bubble (tutorial step or tip) must never cover.
+export const TUTORIAL_WINDOWS='#buildings-panel,#population-panel,#population-job-menu,#policy-card,#employment-panel,#settings-panel,#royal-goals,#unit-command-bar,dialog[open]';
+export function openWindowRects(doc=globalThis.document,vw=globalThis.innerWidth,vh=globalThis.innerHeight){
+  return [...(doc?.querySelectorAll?.(TUTORIAL_WINDOWS)??[])].filter(visible).map(e=>e.getBoundingClientRect()).filter(r=>r.width>0&&r.height>0&&r.right>0&&r.bottom>0&&r.left<vw&&r.top<vh);
+}
 export class TutorialGuide {
   constructor(scene,{doc=globalThis.document}={}){
     this.scene=scene;this.doc=doc;this.active=false;this.seen=new Set();this.skipped=new Set();this.lastCheck=-Infinity;this.currentId=null;
@@ -38,7 +43,7 @@ export class TutorialGuide {
     this.setting=doc.querySelector('#settings-tutorial');if(this.setting){this.setting.checked=tutorialEnabled();this.setting.addEventListener('change',()=>{setTutorialEnabled(this.setting.checked);if(this.setting.checked){this.skipped.clear();this.resume();}else{this.active=false;this.hide();}},options);}
   }
   button(cls,action){const b=this.doc.createElement('button');b.type='button';b.className=cls;b.addEventListener('click',action,{signal:this.controller.signal});return b;}
-  progress(){return tutorialProgress(this.scene,{seen:this.seen,skipped:this.skipped});}
+  progress(){if(rememberSpeed(this.scene,this.seen))try{localStorage.setItem(SPEED_KEY,'1');}catch{/* session */}return tutorialProgress(this.scene,{seen:this.seen,skipped:this.skipped});}
   // A new game from the setup starts it; a loaded game resumes it while it is switched on and not finished.
   start(){if(!tutorialEnabled())return false;this.active=true;this.startedAt=performance.now();this.update(true);return true;}
   resume(){if(tutorialEnabled()&&!this.progress().allDone){this.active=true;this.startedAt=performance.now();this.update(true);}}
@@ -125,14 +130,15 @@ export class TutorialGuide {
     const w=Math.min(300,vw-24);this.bubble.style.width=`${w}px`;const h=this.bubble.offsetHeight||90;
     const boxes=[target.avoid??[]].flat().filter(visible).map(e=>e.getBoundingClientRect());
     const avoid=boxes.length?{left:Math.min(...boxes.map(b=>b.left)),right:Math.max(...boxes.map(b=>b.right)),top:Math.min(...boxes.map(b=>b.top)),bottom:Math.max(...boxes.map(b=>b.bottom))}:null;
-    const {arrow,bubble}=tutorialPlacement({point,rect,avoid,from:target.from??null,vw,vh,bubble:{w,h}});
+    const {arrow,bubble}=tutorialPlacement({point,rect,avoid,from:target.from??null,vw,vh,bubble:{w,h},windows:openWindowRects(this.doc,vw,vh)});
     this.arrow.hidden=false;this.arrow.style.left=`${Math.round(arrow.x)}px`;this.arrow.style.top=`${Math.round(arrow.y)}px`;this.arrow.style.transform=`translate(-50%,-50%) rotate(${arrow.angle}rad)`;this.arrow.classList.toggle('offscreen',arrow.off);
     this.bubble.style.left=`${bubble.x}px`;this.bubble.style.top=`${bubble.y}px`;
   }
   positionBubble(anchor){
     const b=this.bubble,w=Math.min(300,innerWidth-24);b.style.width=`${w}px`;const h=b.offsetHeight||90;
     if(anchor){b.style.left=`${Math.round(Math.max(12,Math.min(innerWidth-w-12,anchor.x)))}px`;b.style.top=`${Math.round(Math.max(70,Math.min(innerHeight-h-12,anchor.y)))}px`;return;}
-    b.style.left='16px';b.style.top=`${Math.round(Math.max(70,innerHeight-h-120))}px`;
+    const at=freeBubbleSpot({x:16,y:Math.max(70,innerHeight-h-120),w,h,vw:innerWidth,vh:innerHeight,blocked:openWindowRects(this.doc),anchor:{x:16,y:innerHeight}});
+    b.style.left=`${Math.round(at.x)}px`;b.style.top=`${Math.round(at.y)}px`;
   }
   flashDone(){this.done.hidden=false;this.done.classList.remove('pop');void this.done.offsetWidth;this.done.classList.add('pop');clearTimeout(this.doneTimer);this.doneTimer=setTimeout(()=>{this.done.hidden=true;},900);}
   // ---- Tips (plan m-e3-tipy) ----

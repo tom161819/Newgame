@@ -16,6 +16,11 @@ export function readLanguage(storage,browserLanguage=globalThis.navigator?.langu
 }
 export function language(){return current;}
 function plural(lang,count){if(!rules.has(lang))rules.set(lang,new Intl.PluralRules(lang));return rules.get(lang).select(Number(count)||0);}
+// m-drobnosti-076 (report 0.76.0 point 11): the plural category of a count (cs: one = 1, few = 2–4, many = a fraction,
+// other = 0 and 5+; en: one / other) and the matching form of a {one,few,many,other} object. t() picks a dictionary
+// object's form by `params.count` the same way, so an amount of resources or days passes its number as `count`.
+export function pluralCategory(count,lang=current){return plural(lang,count);}
+export function pluralForm(forms,count,lang=current){return forms?.[plural(lang,count)]??forms?.other??'';}
 function lookup(lang,key,params){
   let value=LANGUAGES[lang]?.dictionary[key];
   if(value&&typeof value==='object')value=value[plural(lang,params.count)]??value.other;

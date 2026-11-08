@@ -12,6 +12,10 @@ export function initCompactHud(doc = document, storage = safeStorage()) {
     toggle.setAttribute('aria-expanded', String(open));
     toggle.textContent = t(open ? 'hud.less' : 'hud.more');
     toggle.title = t(open ? 'hud.lessTitle' : 'hud.moreTitle');
+    // m-drobnosti-076 (report 0.76.0 point 8): this runs before the language is read, so the label also carries its key
+    // and applyTranslations() (initLanguage, setLanguage) relabels it ("Více" in Czech).
+    toggle.setAttribute('data-i18n', open ? 'hud.less' : 'hud.more');
+    toggle.setAttribute('data-i18n-attr', `title:${open ? 'hud.lessTitle' : 'hud.moreTitle'}`);
     try { storage?.setItem(HUD_DETAILS_KEY, open ? '1' : '0'); } catch { /* optional preference */ }
   };
   let open = false;

@@ -556,6 +556,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .event-feed:empty { display:none; }
 .feed-entry { max-width:100%; padding:4px 9px; border-radius:6px; background:rgb(30 34 24 / .82); border-left:3px solid #b99a53; color:#ece2c4; font-size:12px; line-height:1.35; text-shadow:0 1px 1px #000; animation:feed-in .25s ease-out; }
 .feed-entry.important { border-left-color:#e0794f; }
+/* m-ui-prekryvy-076 (report 0.76.0 point 5): lines stay clear of the side tabs and wrap to at most two lines. */
+.event-feed { margin-right:34px; width:min(300px,calc(100vw - 72px)); }
+.feed-entry { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-clamp:2; overflow:hidden; overflow-wrap:anywhere; }
 .feed-entry .feed-icon { width:18px; height:18px; vertical-align:-4px; }
 @keyframes feed-in { from { opacity:0; transform:translateX(12px); } }
 @media(prefers-reduced-motion:reduce){ .feed-entry { animation:none; } }
@@ -725,6 +728,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 /* Side cards (owner, 7 Nov): Kingdom Policy above Population, Employments below; positioned by SideCards.place(). */
 .side-card-tab { top:auto; }
 .policy-card { z-index:31; }
+.side-card-link { margin:10px 0 0; } /* m-ui-prekryvy-076: Employments card → Policy card */
 html[data-ui-population="left"] :is(.policy-card, .employment-panel) { right:auto; left:52px; }
 .policy-card-section h4 { margin-top:10px; }
 
@@ -917,6 +921,15 @@ tr[data-resource-group="equipment"] { background:var(--group-equipment); }
 .king-skill-list .skill-row, .king-skill-row { grid-template-columns:minmax(105px,1fr) 55px minmax(90px,1fr) 48px 28px; }
 .king-skill-plus { padding:0 6px; min-width:26px; line-height:22px; }
 @media(max-width:440px) { .king-skill-list .skill-row, .king-skill-row { grid-template-columns:minmax(95px,1fr) 52px 1fr 28px; } }
+/* m-ui-prekryvy-076 (report 0.76.0 point 7): the King panel (and any unit panel) fits its window – narrower columns,
+   wrapped descriptions, no sideways scrolling. The + button keeps the first line; a long note (hauler capacity) wraps
+   onto its own line under the row. */
+#unit-dialog { overflow-x:hidden; }
+#unit-dialog .skill-row { grid-template-columns:minmax(0,1.2fr) 40px minmax(0,1fr) minmax(0,46px); gap:6px; }
+#unit-dialog :is(.king-skill-list .skill-row, .king-skill-row) { grid-template-columns:minmax(0,1.2fr) 40px minmax(0,1fr) minmax(0,46px) 26px; }
+#unit-dialog .skill-row > * { min-width:0; overflow-wrap:anywhere; }
+#unit-dialog .skill-row[data-skill="logistics"] small { grid-column:1 / 4; grid-row:2; text-align:left; }
+#unit-dialog .skill-row .king-skill-plus { grid-column:-2; grid-row:1; }
 
 /* World Editor (m-world-editor-obrazovka): a full screen like the main menu – options left, previews right, bar below. */
 .world-editor { position:fixed; inset:0; z-index:100; display:grid; grid-template-rows:auto 1fr auto; gap:12px; padding:16px 20px; overflow:auto; color:#e5dcbf; background:radial-gradient(ellipse at 50% 25%,#334340,#111d1e 65%); }

@@ -8,7 +8,7 @@ export function noticeText(scene,issue){
   const s=scene,building=s.buildings?.find(b=>b.id===issue.entityId),name=building?buildingDefinition(building).name:'',p=issue.params??{},resName=id=>s.objectRegistry?.get?.(id)?.name??id;
   if(issue.reason==='storageFull')return t('notice.storageFull',{list:(p.groups??[]).map(g=>t('notice.storageFullGroup',{resources:g.resources.map(resName).join(', '),building:resName(g.helper)})).join('; ')});
   const resource=p.resource?resName(p.resource):'',producer=p.producer?resName(p.producer):'',profession=p.profession?JOBS[p.profession]?.name??p.profession:'';
-  if(issue.reason==='foodLow')return t('notice.foodLow',{days:p.days??0,sources:foodSourceList(s)});
+  if(issue.reason==='foodLow')return t('notice.foodLow',{days:p.days??0,count:p.days??0,sources:foodSourceList(s)});
   const lower=id=>id?resName(id).toLocaleLowerCase():'';
   if(issue.reason==='missingChainSource')return t('notice.missingChainSource',{name,resource:lower(p.resource),producer});
   if(issue.reason==='chainNoConsumer')return t('notice.chainNoConsumer',{resource,consumer:resName(p.consumer),output:lower(p.output)});

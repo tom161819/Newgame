@@ -1,4 +1,5 @@
 import { PolicyPanel } from './PolicyPanel.js';
+import { t } from '../i18n/index.js';
 
 // Owner request (7 Nov, points 5 and 6): beside the Population tab there are two more pop-out cards – Kingdom Policy
 // above it and Employments below it. They behave like Population: a tab opens and closes the card, and only one card is
@@ -17,13 +18,22 @@ export class SideCards {
       copy.removeAttribute('aria-labelledby');copy.setAttribute('aria-label',source.querySelector('h3')?.textContent??'Kingdom policy');copy.querySelector('h3')?.remove();copy.classList.add('policy-card-section');
       document.querySelector('#policy-card-body').replaceChildren(copy);this.policyPanel=new PolicyPanel(scene,{root:copy,ids:false});
     }
+    // m-ui-prekryvy-076 (report 0.76.0 point 6): opened from its tab, Employments is a side card of its own – the Castle's
+    // Kingdom policy section in it is hidden (Policy has its card) and a link opens the Policy card instead, so the two
+    // never show over or inside each other. Opened from the Castle it stays the whole Castle window, as before.
+    this.castlePolicy=source;const panel=document.querySelector('#employment-panel');
+    if(panel&&source){this.policyLink=document.createElement('button');this.policyLink.type='button';this.policyLink.className='side-card-link';this.policyLink.hidden=true;
+      const label=document.createElement('span');label.dataset.i18n='policy.card';label.textContent=t('policy.card');this.policyLink.append(label,' ›');source.before(this.policyLink);
+      this.policyLink.addEventListener('click',()=>this.openCard('policy'),options);}
     for(const event of ['pointerdown','mousedown','mouseup','click','wheel'])this.policyCard.addEventListener(event,e=>e.stopPropagation(),options);
     this.policyTab.addEventListener('click',()=>this.toggle('policy'),options);this.employmentTab.addEventListener('click',()=>this.toggle('employment'),options);
     document.querySelector('#close-policy-card').addEventListener('click',()=>this.close('policy'),options);
     // Opening any of the three closes the other two (the Castle opening Employments included).
     const setOpen=this.population?.setOpen?.bind(this.population);if(setOpen){this.population.setOpen=value=>{if(value)this.closeOthers('population');setOpen(value);this.sync();};}
     const open=this.employment?.open?.bind(this.employment),close=this.employment?.close?.bind(this.employment);
-    if(open){this.employment.open=()=>{this.closeOthers('employment');open();this.sync();};this.employment.close=()=>{close();this.sync();};}
+    if(open){this.employment.open=({card=false}={})=>{this.closeOthers('employment');this.cardMode(card);open();this.sync();};this.employment.close=()=>{close();this.cardMode(false);this.sync();};}
+    // The King's / a resident's docked panel shares the right edge with Policy and Employments: one of them at a time.
+    const unit=scene.unitPanel,openUnit=unit?.open?.bind(unit);if(openUnit){unit.open=(...args)=>{for(const other of ['policy','employment'])if(this.isOpen(other))this.close(other);return openUnit(...args);};}
     this.layout=()=>this.place();window.addEventListener('resize',this.layout,options);
     this.observer=new MutationObserver(()=>this.place());this.observer.observe(document.documentElement,{attributes:true,attributeFilter:['data-ui-population','data-ui-settings','data-ui-density','style']});
     this.resize=typeof ResizeObserver==='function'?new ResizeObserver(()=>this.place()):null;this.resize?.observe(this.populationTab);
@@ -33,10 +43,12 @@ export class SideCards {
   toggle(name){if(this.isOpen(name))this.close(name);else this.openCard(name);}
   openCard(name){
     this.closeOthers(name);
-    if(name==='policy'){this.policyCard.hidden=false;this.policyPanel?.render();}else if(name==='employment')this.employment?.open();else this.population?.setOpen(true);
+    if(name!=='population'&&this.scene.unitPanel?.dialog?.open)this.scene.unitPanel.close();
+    if(name==='policy'){this.policyCard.hidden=false;this.policyPanel?.render();}else if(name==='employment')this.employment?.open({card:true});else this.population?.setOpen(true);
     this.sync();
   }
   close(name){if(name==='policy')this.policyCard.hidden=true;else if(name==='employment')this.employment?.close();else this.population?.setOpen(false);this.sync();}
+  cardMode(on){if(this.castlePolicy)this.castlePolicy.hidden=!!on;if(this.policyLink)this.policyLink.hidden=!on;}
   closeOthers(name){for(const other of ['policy','population','employment'])if(other!==name&&this.isOpen(other))this.close(other);}
   sync(){if(!this.policyTab)return;this.policyTab.setAttribute('aria-expanded',String(this.isOpen('policy')));this.employmentTab.setAttribute('aria-expanded',String(this.isOpen('employment')));}
   // Policy sits just above the Population tab and Employments just below it, on whichever edge the style docks them.
