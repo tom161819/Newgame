@@ -351,4 +351,11 @@ export default {
   'policy.taxEffect':'{each} zlata za obyvatele každé ráno: {total} zlata/den od {count} obyvatel. Spokojenost {happiness}.',
   'policy.rationsEffect':'Každý obyvatel sní {portions} porce denně; potřeba jídla nejvýš {cap}. Spokojenost {happiness}.','ledger.Taxes':'Daně',
   'needs.policyLine':'Politika království: spokojenost {value}','needs.strikeLine':'Stávkuje: do práce se vrátí při spokojenosti 45.','needs.leavingLine':'Odchází z království.','needs.riskLine':'Nespokojený {days} den/dny: stávka po 2 dnech pod 25, odchod po 3 dnech pod 15.',
+  // m-kral-odmeny-xp: body dovedností krále z královských úkolů.
+  'kingSkills.earned':{one:'Král získal {count} bod dovedností.',few:'Král získal {count} body dovedností.',other:'Král získal {count} bodů dovedností.'},'goals.res.points':{one:'{count} bod dovedností',few:'{count} body dovedností',other:'{count} bodů dovedností'},
+  'kingSkills.title':'Dovednosti krále','kingSkills.points':'Volné body dovedností: {count}','kingSkills.level':'{level} / {max}',
+  'kingSkills.leadership':'Vůdcovství','kingSkills.stewardship':'Správcovství','kingSkills.leadershipNow':'+{now} % práce v dohledu','kingSkills.stewardshipNow':'+{now} % daní',
+  'kingSkills.leadershipTip':'Vůdcovství +1 úroveň: obyvatelé v králově dohledu pracují o {each} % rychleji za úroveň (teď +{now} %, nejvýš úroveň {max}).',
+  'kingSkills.stewardshipTip':'Správcovství +1 úroveň: výnos daní +{each} % za úroveň, spokojenost beze změny (teď +{now} %, nejvýš úroveň {max}).',
+  'kingSkills.skillTip':'{skill} +1 úroveň za 1 bod: +{each} % rychlost práce ({skill}).','kingSkills.combatTip':'{skill} +1 úroveň za 1 bod: +{each} % poškození útoku v boji.',
 };

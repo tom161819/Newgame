@@ -894,3 +894,8 @@ tr[data-resource-group="equipment"] { background:var(--group-equipment); }
 .feed-entry.is-locatable { cursor:pointer; pointer-events:auto !important; } .feed-entry.is-locatable:hover { text-decoration:underline dotted; }
 .population-deceased { margin-top:6px; font-size:12px; color:var(--muted); } .population-deceased summary { cursor:pointer; color:var(--ink); }
 .population-deceased ol { margin:4px 0 0; padding-left:18px; max-height:120px; overflow:auto; }
+/* m-kral-odmeny-xp: King skill points (KingSkillsSection). */
+.king-skills h3 { margin:.6rem 0 .3rem; } .king-skill-points { margin:.2rem 0; color:#e6d28a; }
+.king-skill-list .skill-row, .king-skill-row { grid-template-columns:minmax(105px,1fr) 55px minmax(90px,1fr) 48px 28px; }
+.king-skill-plus { padding:0 6px; min-width:26px; line-height:22px; }
+@media(max-width:440px) { .king-skill-list .skill-row, .king-skill-row { grid-template-columns:minmax(95px,1fr) 52px 1fr 28px; } }

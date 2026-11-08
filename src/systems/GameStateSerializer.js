@@ -1,5 +1,6 @@
 import { validNightThreatState } from './NightThreatSystem.js';
 import { validRoyalGoalState } from './RoyalGoals.js';
+import { validKingSkillState } from './KingSkills.js';
 import { validLightFuelState } from './LightFuelSystem.js';
 import { validateRockMining } from './RockMiningState.js';
 import { CARAVAN_RULES,MERCHANT_TYPES,validateAutoTrade } from '../data/trade.js';
@@ -93,6 +94,7 @@ export function serializeGameState(scene){
     ...(scene.lightFuel?{lightFuel:scene.lightFuel.exportState()}:{}),
     ...(scene.nightThreats?{nightThreats:scene.nightThreats.exportState()}:{}),
     ...(scene.royalGoals?{royalGoals:scene.royalGoals.exportState()}:{}),
+    ...(scene.kingSkills?{kingSkills:scene.kingSkills.exportState()}:{}),
     ...(scene.policy?{policy:scene.policy.exportState()}:{}),
     ...(scene.kingLogistics?{kingLogistics:scene.kingLogistics.exportState()}:{}),
     ...(scene.logisticsTasks?{logistics:{version:1,...(scene.constructionSystem?.materials.enabled?{materialsVersion:1}:{})}}:{}),
@@ -508,6 +510,8 @@ export function validateGameState(input,registry=objectRegistry){
   if(s.nightThreats!==undefined)check(validNightThreatState(s.nightThreats,new Set(s.buildings.map(b=>b.id))));
   // E4: finished Royal tasks and counted production (optional, older saves start with none done).
   if(s.royalGoals!==undefined)check(validRoyalGoalState(s.royalGoals));
+  // m-kral-odmeny-xp: the King's unspent skill points and royal skill levels (optional; points come from finished tasks).
+  if(s.kingSkills!==undefined)check(validKingSkillState(s.kingSkills,s.royalGoals?.done??[]));
   if(s.children!==undefined)validateChildrenState(s.children,{check,number,integer,array,buildingIds:new Set(s.buildings.map(b=>b.id))});
   if(s.domestic!==undefined)validateDomesticState(s.domestic,{check,number,integer,array,day:s.time?.day??1,buildingIds:new Set(s.buildings.map(b=>b.id)),locationIds:new Set((s.foodStorage?.locations??[]).map(l=>l.id)),workerIds:new Set((s.workers??[]).map(w=>w.id)),time:s.time});
   if(s.trade!==undefined){

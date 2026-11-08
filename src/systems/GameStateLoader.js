@@ -110,6 +110,7 @@ export function loadGameState(scene,input){
   scene.lightFuel?.importState(state.lightFuel);
   scene.nightThreats?.importState(state.nightThreats);
   scene.royalGoals?.importState(state.royalGoals);
+  scene.kingSkills?.importState(state.kingSkills);
   scene.wageSystem?.importState(state.wages);
   scene.resourceLedger?.importState(state.resourceLedger);
   scene.workplaceSystem?.importState(state.workplaces);
