@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { directionName,DIRECTION_POSES } from './directions.js';
 import { animalLook,ensureAnimalLook,applyAnimalArt } from './animalArt.js';
+import { MOVEMENT_SPEED_SCALE } from '../data/movement.js';
 
 // Species drawn with an approved Studio look once it loads (m-zvirata-nahodny-vzhled); the others keep the drawing.
 const ART_SPECIES=new Set(['wolf']);
@@ -12,7 +13,7 @@ export class AnimalView extends Phaser.GameObjects.Container {
     this.animate(0,false,{x:0,y:1});
   }
   animate(delta,moving,direction){
-    this.phase+=delta*0.012;this.facing=directionName(direction)??this.facing;this.isWalking=moving;
+    this.phase+=delta*0.012*(moving?MOVEMENT_SPEED_SCALE:1);this.facing=directionName(direction)??this.facing;this.isWalking=moving;
     if(this.drawArt(delta,moving))return;
     const pose=DIRECTION_POSES[this.facing],g=this.figure.clear(),v=this.definition.visual;
     const sx=pose.screenX,sy=pose.screenY,scale=v.bodyScale??1,stride=moving?Math.sin(this.phase)*3:0;

@@ -38,6 +38,7 @@ import { FORESTRY,emptyNaturalState } from '../data/naturalResources.js';
 import { EMPLOYMENT_PROFESSIONS,PRIORITY_RANGE } from '../data/employment.js';
 import { UNIT_TYPES } from '../data/military.js';
 import { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
+import { validIdentity,identityKey } from '../data/names.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
@@ -96,7 +97,7 @@ export function serializeGameState(scene){
     ...(scene.kingLogistics?{kingLogistics:scene.kingLogistics.exportState()}:{}),
     ...(scene.logisticsTasks?{logistics:{version:1,...(scene.constructionSystem?.materials.enabled?{materialsVersion:1}:{})}}:{}),
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
-    ...(scene.workerSystem?{population:scene.workerSystem.exportState(),workers:[...scene.workerSystem.workers.values()].map(w=>({...serializeActor(w),commandState:copy(w.commandState??{state:'Working',goal:null}),name:w.name,profession:w.profession,displayProfession:w.displayProfession,manualRockId:w.manualRockId,isSubject:w.isSubject!==false,diedAt:w.diedAt??null,
+    ...(scene.workerSystem?{population:scene.workerSystem.exportState(),workers:[...scene.workerSystem.workers.values()].map(w=>({...serializeActor(w),commandState:copy(w.commandState??{state:'Working',goal:null}),name:w.name,...(w.identity?{identity:copy(w.identity)}:{}),profession:w.profession,displayProfession:w.displayProfession,manualRockId:w.manualRockId,isSubject:w.isSubject!==false,diedAt:w.diedAt??null,
       ...(w.naturalTalent?{naturalTalent:w.naturalTalent,initialSkills:copy(w.initialSkills)}:{}),
       ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),workplaceReached:w.workplaceReached,...(w.restPhase?{restPhase:w.restPhase}:{}),...(w.tendTorches?{tendTorches:true}:{}),...(w.clearingLoan?{clearingLoan:true}:{}),cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
       workState:w.workState,workMessage:w.workMessage??'',workTask:copy(w.workTask),assignedWorkplaceId:w.assignedWorkplaceId,arriving:w.arriving,aiCooldown:w.aiCooldown}))}:{}),
@@ -286,13 +287,16 @@ export function validateGameState(input,registry=objectRegistry){
   const depositClaims=new Map(),reservations=new Set(natural.kingTask?[`natural:${natural.kingTask.treeId}`]:[]);
   if(s.workers!==undefined){
     integer(s.population?.nextId,1);integer(s.population.lastMigrationDay,1,s.time?.day??Number.MAX_SAFE_INTEGER);
-    if(s.population.deceased!==undefined){array(s.population.deceased,50);for(const d of s.population.deceased){check(d&&Object.keys(d).sort().join()==='cause,day,name,profession'&&typeof d.name==='string'&&d.name.length<100&&Object.hasOwn(JOBS,d.profession)&&/^(wounds|killed:[a-z_]{1,40})$/.test(d.cause));integer(d.day,1);}}
+    if(s.population.deceased!==undefined){array(s.population.deceased,50);for(const d of s.population.deceased){check(d&&['cause,day,name,profession','cause,day,identity,name,profession'].includes(Object.keys(d).sort().join())&&(d.identity===undefined||validIdentity(d.identity))&&typeof d.name==='string'&&d.name.length<100&&Object.hasOwn(JOBS,d.profession)&&/^(wounds|killed:[a-z_]{1,40})$/.test(d.cause));integer(d.day,1);}}
+    const identities=new Set();
     for(const w of s.workers){
       if(w.naturalTalent!==undefined||w.initialSkills!==undefined){
         check(Object.hasOwn(TALENTS,w.naturalTalent)&&w.skills);skillsState(w.initialSkills);
         for(const id of SKILL_IDS)check(w.initialSkills[id].totalXP<=w.skills[id].totalXP+1e-6);
       }
       check(w.type==='peasant');actor(w);check(typeof w.name==='string'&&w.name.length>0&&w.name.length<100&&Object.hasOwn(JOBS,w.profession));
+      // m-obyvatele-jmena-spanek-pohyb (31): an optional identity of name list indices; a name never repeats in a game.
+      if(w.identity!==undefined){check(validIdentity(w.identity)&&!identities.has(identityKey(w.identity)));identities.add(identityKey(w.identity));}
       const command=w.commandState;check(command&&['Working','MovingToHold','Holding'].includes(command.state)&&Object.keys(command).length===2);
       if(command.state==='MovingToHold')tile(command.goal);else check(command.goal===null||command.state==='Holding');
       if(command.state==='Holding'&&command.goal!==null)tile(command.goal);

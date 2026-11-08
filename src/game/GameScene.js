@@ -536,7 +536,7 @@ export class GameScene extends Phaser.Scene {
     if(building)hits.push({kind:'building',object:building,depth:buildingDefinition(building).crop?tileCenter(tile).y-.2:buildingDepth(building)+.3});
     const stockpile=this.legacyStockpiles.atPoint(x,y);if(stockpile)hits.push({kind:'stockpile',object:stockpile,depth:stockpile.depth});
     for(const unit of this.selectableHumans()){
-      const view=unit.view??unit.sprite;if(this.fog.isVisibleObject(unit)&&this.assets.hitTest(view,x,y))hits.push({kind:'human',object:unit,depth:view.depth});
+      const view=unit.view??unit.sprite;if(unit.sleepingIn==null&&this.fog.isVisibleObject(unit)&&this.assets.hitTest(view,x,y))hits.push({kind:'human',object:unit,depth:view.depth});
     }
     if(animal)hits.push({kind:'animal',object:animal,depth:animal.view.depth});
     const cat=this.domestic?.atPoint(x,y);if(cat)hits.push({kind:'cat',object:cat,depth:cat.view.depth+1});
@@ -819,7 +819,7 @@ export class GameScene extends Phaser.Scene {
     this.dropSystem.update(view,this.fog);
     if(this.input.manager.isOver)this.updateHover(this.input.activePointer);
     for(const animal of this.animalSystem.animals.values()){const seen=this.fog.isVisibleObject(animal),tracked=!seen&&animal.isAlive&&animal.definition.gameplay?.huntable&&this.domestic?.tracked(animal);animal.view.setAlpha?.(seen?1:.35);animal.view.setVisible(!animal.mounted&&!['ridden','harnessed'].includes(this.stables?.horses.get(animal.id)?.state)&&(seen||tracked)&&animal.view.x>view.x-60&&animal.view.x<view.right+60&&animal.view.y>view.y-40&&animal.view.y<view.bottom+70);}
-    for(const worker of this.workerSystem?.liveWorkers()??[])worker.view.setVisible(this.fog.isVisibleObject(worker)&&worker.view.x>view.x-40&&worker.view.x<view.right+40&&worker.view.y>view.y-20&&worker.view.y<view.bottom+60);
+    for(const worker of this.workerSystem?.liveWorkers()??[])worker.view.setVisible(worker.sleepingIn==null&&this.fog.isVisibleObject(worker)&&worker.view.x>view.x-40&&worker.view.x<view.right+40&&worker.view.y>view.y-20&&worker.view.y<view.bottom+60);
     for(const resource of this.resources.values()){
       const definition=this.objectRegistry.require(resource.getData('objectId'));
       resource.setVisible(this.fog.isVisibleObject(resource.getData('object'))&&resource.x>view.x-64&&resource.x<view.right+64&&resource.y>view.y-40&&resource.y<view.bottom+(definition.visualHeight??40));

@@ -7,6 +7,7 @@ import { MountSystem } from '../src/systems/MountSystem.js';
 import { serializeGameState,validateGameState,SAVE_VERSION } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
 import { WILDLIFE_BUILDING_MARGIN } from '../src/systems/WildlifeClearance.js';
+import { MOVEMENT_SPEED_SCALE as S } from '../src/data/movement.js';
 
 globalThis.document={querySelector:()=>({textContent:''})};
 const scene=()=>workerScene(undefined,{gameSettings:gameSettings({fogOfWar:false})});
@@ -35,7 +36,7 @@ test('an idle animal in a newly placed margin retreats to clear terrain and resu
 });
 
 test('retaliation and the interactive horse retain their original movement and mounting',()=>{
- const s=scene();building(s);const horse=animal(s,48,50,'horse');horse.wanderWait=0;random(s);s.animalSystem.update(1000);assert.deepEqual(horse.tile,{x:49,y:50},'royal horse is not forbidden from approaching structures');
+ const s=scene();building(s);const horse=animal(s,48,50,'horse');horse.wanderWait=0;random(s);s.animalSystem.update(1000/S);assert.deepEqual(horse.tile,{x:49,y:50},'royal horse is not forbidden from approaching structures');
  const king=s.character;king.tile={x:48,y:50};king.position={x:48.5,y:50.5};king.nextTile=null;king.path=[];const mount=new MountSystem(s);assert.equal(mount.mount(horse),true);assert.equal(mount.dismount(),true);
  const boar=animal(s,48,52,'wild_boar');s.animalSystem.onAttacked(boar,king);s.animalSystem.update(100);assert.equal(boar.retaliationTarget,king);assert.ok(s.combat.attacks.has(boar)||boar.path.length||boar.nextTile,'combat uses its own approach route');
 });

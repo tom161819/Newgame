@@ -3,6 +3,7 @@ import { FOOD_RESOURCE_IDS } from '../data/foodProduction.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { PLAYER_START,COLUMNS,ROWS } from '../game/config.js';
 import { t } from '../i18n/index.js';
+import { MOVEMENT_SPEED_SCALE } from '../data/movement.js';
 
 // Domestic animals Z1 (brief zadani-domaci-zvirata.md): rats breed in every store that holds food (Granary, Starter
 // Stockpile, the food buffers of food buildings) and eat part of the stock; cats keep them down. A cat is not a
@@ -103,7 +104,7 @@ export class DomesticAnimalSystem {
       this.step(cat,cat.target,CATS.speed*seconds*(far?1.6:1));
     }
   }
-  step(cat,target,distance){const dx=target.x-cat.x,dy=target.y-cat.y,d=Math.hypot(dx,dy);if(d<=distance||!d){cat.x=target.x;cat.y=target.y;}else{cat.x+=dx/d*distance;cat.y+=dy/d*distance;}cat.facing={x:dx,y:dy};}
+  step(cat,target,distance){distance*=MOVEMENT_SPEED_SCALE;const dx=target.x-cat.x,dy=target.y-cat.y,d=Math.hypot(dx,dy);if(d<=distance||!d){cat.x=target.x;cat.y=target.y;}else{cat.x+=dx/d*distance;cat.y+=dy/d*distance;}cat.facing={x:dx,y:dy};}
   newCat(fields){const id=`cat-${++this.seq}`,cat={id,name:CATS.names[(this.seq-1)%CATS.names.length],x:PLAYER_START.x,y:PLAYER_START.y,buildingId:null,state:'stray',leaveAt:null,leaving:false,kittenAt:null,motherId:null,home:null,target:null,wait:0,...fields};this.cats.set(id,cat);this.changed();return cat;}
   // A stray at the edge of the village: about every 4 days, every 2 when a store has Many rats; one at a time.
   updateStray(){

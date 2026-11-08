@@ -4,6 +4,7 @@ import { PathWearSystem } from '../src/systems/PathWearSystem.js';
 import { GameTimeSystem,DAY_DURATION } from '../src/systems/GameTimeSystem.js';
 import { PATH_WEAR,wearLevel } from '../src/data/pathWear.js';
 import { advanceMovement,enteredTiles } from '../src/game/movement.js';
+import { MOVEMENT_SPEED_SCALE as S } from '../src/data/movement.js';
 import { objectRegistry } from '../src/systems/ObjectRegistry.js';
 import { TerrainRenderer } from '../src/game/TerrainRenderer.js';
 
@@ -23,10 +24,10 @@ test('central thresholds produce all five levels (trampled grass first, #116) an
 
 test('standing, zero-time frames and repeated updates count no visits; leaving and re-entering counts once',()=>{
   const {wear,scene}=setup(),king=actor(scene);for(let i=0;i<100;i++)advanceMovement(king,100);assert.equal(wear.active.size,0);
-  king.path=[{x:11,y:10},{x:12,y:10},{x:13,y:10}];advanceMovement(king,1000);assert.equal(king.tile.x,13);
+  king.path=[{x:11,y:10},{x:12,y:10},{x:13,y:10}];advanceMovement(king,1000/S);assert.equal(king.tile.x,13);
   for(const x of [11,12,13])assert.equal(wear.scores[1010+x-10],1);
   const snapshot=wear.exportState();for(let i=0;i<100;i++)advanceMovement(king,0);advanceMovement(king,1000);assert.deepEqual(wear.exportState(),snapshot);
-  king.path=[{x:12,y:10},{x:11,y:10},{x:10,y:10}];advanceMovement(king,1000);assert.equal(wear.scores[1010],1);assert.equal(wear.scores[1011],2);
+  king.path=[{x:12,y:10},{x:11,y:10},{x:10,y:10}];advanceMovement(king,1000/S);assert.equal(wear.scores[1010],1);assert.equal(wear.scores[1011],2);
 });
 
 test('high speed and every FPS visit each diagonal cell with no side-corner phantom visits',()=>{
@@ -43,9 +44,9 @@ test('high speed and every FPS visit each diagonal cell with no side-corner phan
 
 test('eight directions preserve normalized speed and count physical cell crossings before the center',()=>{
   for(const [dx,dy]of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]]){
-    const {wear,scene}=setup(),king=actor(scene);king.path=[{x:10+dx,y:10+dy}];advanceMovement(king,100);
+    const {wear,scene}=setup(),king=actor(scene);king.path=[{x:10+dx,y:10+dy}];advanceMovement(king,100/S);
     near(Math.hypot(king.position.x-10.5,king.position.y-10.5),.35);assert.equal(wear.active.size,0);
-    advanceMovement(king,130);assert.equal(wear.active.size,1);assert.equal(wear.scores[(10+dy)*100+10+dx],1);
+    advanceMovement(king,130/S);assert.equal(wear.active.size,1);assert.equal(wear.scores[(10+dy)*100+10+dx],1);
     advanceMovement(king,1000);assert.equal(wear.active.size,1);
   }
 });
@@ -55,7 +56,7 @@ test('surface speed applies only in occupied ground tile and composes with mount
     const {wear,scene}=setup(),king=actor(scene),worker=actor(scene,'npc'),tile={x:11,y:10};
     for(let i=0;i<PATH_WEAR.thresholds[level];i++)wear.enter(worker,tile);
     if(mounted){king.mountedHorse={};king.speed=7;}
-    const base=king.speed,duration=(.5/base+.5/(base*PATH_WEAR.speedMultipliers[level]))*1000;
+    const base=king.speed,duration=(.5/base+.5/(base*PATH_WEAR.speedMultipliers[level]))*1000/S;
     king.path=[tile];advanceMovement(king,duration);near(king.position.x,11.5);assert.equal(king.speed,base);
     assert.equal(wear.scores[1011],PATH_WEAR.thresholds[level]+(mounted?2:1));
   }

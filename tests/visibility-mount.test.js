@@ -9,6 +9,7 @@ import { AnimalSystem } from '../src/systems/AnimalSystem.js';
 import { PlayerController } from '../src/game/PlayerController.js';
 import { HuntingSystem } from '../src/systems/HuntingSystem.js';
 import { tileCenter } from '../src/game/map.js';
+import { MOVEMENT_SPEED_SCALE as S } from '../src/data/movement.js';
 
 const view=()=>({visible:true,data:new Map(),setData(k,v){this.data.set(k,v);return this;},getData(k){return this.data.get(k);},
   setPosition(x,y){this.x=x;this.y=y;return this;},setDepth(d){this.depth=d;return this;},setVisible(v){this.visible=v;return this;},animate(){},setMounted(d){this.mounted=!!d;}});
@@ -71,7 +72,7 @@ test('distant mounts, cancelled commands and blocked dismounts never teleport th
 
 test('mounted movement remains normalized and horses cannot be hunted',()=>{
   const {s,horse}=world();assert.equal(s.huntingSystem.command(horse),false);assert.equal(s.huntingSystem.attack(horse),false);assert.equal(horse.active,true);
-  s.mountSystem.mount(horse);s.character.command({kind:'move',goal:{x:8,y:8}});s.character.update(200);s.mountSystem.update(200);
+  s.mountSystem.mount(horse);s.character.command({kind:'move',goal:{x:8,y:8}});s.character.update(200/S);s.mountSystem.update(200/S);
   assert.ok(Math.abs(Math.hypot(s.character.position.x-5.5,s.character.position.y-5.5)-1.4)<1e-9);
   assert.ok(Math.abs(s.character.position.x-s.character.position.y)<1e-9);
   assert.deepEqual(horse.position,s.character.position);

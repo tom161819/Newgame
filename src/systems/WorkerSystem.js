@@ -14,8 +14,9 @@ import { WorkerAI } from './WorkerAI.js';
 import { DailyRest } from './DailyRest.js';
 import { Discontent } from './Discontent.js';
 import { initializeNaturalTalent } from './NaturalTalentSystem.js';
+import { pickIdentity,identityKey } from '../data/names.js';
+import { hashOf,seeded } from '../data/children.js';
 
-const names=['Matěj','Anna','Jakub','Eliška','Pavel','Marie','Jan','Tereza','Ondřej','Klára'];
 export class WorkerSystem {
   constructor(scene,{onChange=()=>{}}={}){
     this.scene=scene;this.onChange=onChange;this.workers=new Map();this.nextId=1;this.lastMigrationDay=scene.gameTime.day;this.listeners=new Set();
@@ -53,11 +54,16 @@ export class WorkerSystem {
     const occupied=new Set([...this.scene.resourceOccupancy.keys(),...this.scene.reservedTiles().map(tileKey)]);
     return reachableTiles(this.scene.map,this.homeGoals()).filter(t=>!occupied.has(tileKey(t)));
   }
-  create(tile,{id=null,name=null,randomize=true,isSubject=true}={}){
+  // m-obyvatele-jmena-spanek-pohyb (31): identities already used in this game (living, dead and remembered deaths).
+  takenNames(){const out=new Set();for(const w of this.workers.values())if(w.identity)out.add(identityKey(w.identity));for(const d of this.deceased??[])if(d.identity)out.add(identityKey(d.identity));return out;}
+  // Seeded by the world code and the resident id, never repeating a name of this game.
+  newIdentity(id,options){return pickIdentity(seeded(hashOf('resident-name',this.scene.gameSettings?.worldCode??'',id)),this.takenNames(),options);}
+  create(tile,{id=null,name=null,identity=null,randomize=true,isSubject=true}={}){
     if(typeof isSubject!=='boolean')throw new TypeError('Invalid resident ownership.');
-    id??=`worker-${this.nextId++}`;const number=Number(id.split('-')[1]),definition=this.scene.objectRegistry.require('peasant');
+    id??=`worker-${this.nextId++}`;const definition=this.scene.objectRegistry.require('peasant');
     const view=this.scene.assets.createView(definition.id,{...tileCenter(tile),tile});
-    const worker=new WorkerController(this.scene,definition,id,tile,view,name??`${names[(number-1)%names.length]}${number>names.length?` ${Math.ceil(number/names.length)}`:''}`);
+    const worker=new WorkerController(this.scene,definition,id,tile,view,name??'');
+    if(name==null)worker.identity=identity?{...identity}:this.newIdentity(id);
     worker.isSubject=isSubject;this.scene.employment?.request();
     if(randomize)initializeNaturalTalent(worker);
     view.setData('worker',worker);this.workers.set(id,worker);this.updateUI();return worker;
@@ -84,14 +90,18 @@ export class WorkerSystem {
     }
     this.updateUI();
   }
-  update(delta){for(const worker of this.liveWorkers())if(worker.isSubject!==false){this.ai.update(worker,delta);syncWorkerUniform(this.scene,worker);}else worker.update(delta);}
+  update(delta){for(const worker of this.liveWorkers())if(worker.isSubject!==false){this.ai.update(worker,delta);syncWorkerUniform(this.scene,worker);
+    // m-obyvatele-jmena-spanek-pohyb (42): only a resting resident standing still stays inside.
+    if(worker.sleepingIn!=null&&(worker.restPhase!=='resting'||worker.nextTile||worker.path.length))worker.sleepingIn=null;}else worker.update(delta);}
+  // (42) Residents sleeping inside a building now (House or Castle).
+  sleepersIn(buildingId){return this.liveWorkers().filter(w=>w.sleepingIn===buildingId);}
   onDeath(worker){worker.manualRockId=null;this.scene.military?.release(worker,{dead:true});this.scene.vehicles?.release(worker);worker.commandState={state:'Working',goal:null};worker.diedAt??=this.scene.gameTime.totalElapsed;this.scene.workplaceSystem?.detach(worker);this.ai.cancel(worker);worker.active=false;worker.path=[];worker.nextTile=null;worker.walking=false;worker.workState='Dead';worker.workMessage='';worker.arriving=false;worker.view.destroy();this.scene.combatFeedback.remove(worker.id);this.updateUI();}
   // Resident capacity: the base settlement plus every completed House.
   capacity(){return POPULATION.maximum+(this.scene.buildings??[]).reduce((n,b)=>n+(buildingIsComplete(b)?this.scene.objectRegistry?.get(b.type)?.housing?.capacity??0:0),0);}
   updateUI(){const count=this.liveSubjects().length,maximum=this.capacity();this.onChange(count,maximum);for(const listener of this.listeners)listener(count,maximum);}
   // m-hlasky-udalosti (41): the last 50 deaths with their cause ('killed:<attacker type>' or 'wounds') and day.
-  recordDeath(worker,cause){this.deceased??=[];this.deceased.push({name:worker.name,profession:worker.displayProfession&&worker.displayProfession!=='idle'?worker.displayProfession:worker.profession,cause,day:this.scene.gameTime?.day??1});if(this.deceased.length>50)this.deceased.splice(0,this.deceased.length-50);}
-  exportState(){return {nextId:this.nextId,lastMigrationDay:this.lastMigrationDay,...(this.deceased?.length?{deceased:this.deceased.map(d=>({...d}))}:{})};}
-  importState(data){this.deceased=(data?.deceased??[]).map(d=>({...d}));this.nextId=data?.nextId??1;this.lastMigrationDay=data?.lastMigrationDay??this.scene.gameTime.day;this.updateUI();}
+  recordDeath(worker,cause){this.deceased??=[];this.deceased.push({name:worker.name,...(worker.identity?{identity:{...worker.identity}}:{}),profession:worker.displayProfession&&worker.displayProfession!=='idle'?worker.displayProfession:worker.profession,cause,day:this.scene.gameTime?.day??1});if(this.deceased.length>50)this.deceased.splice(0,this.deceased.length-50);}
+  exportState(){return {nextId:this.nextId,lastMigrationDay:this.lastMigrationDay,...(this.deceased?.length?{deceased:this.deceased.map(d=>({...d,...(d.identity?{identity:{...d.identity}}:{})}))}:{})};}
+  importState(data){this.deceased=(data?.deceased??[]).map(d=>({...d,...(d.identity?{identity:{...d.identity}}:{})}));this.nextId=data?.nextId??1;this.lastMigrationDay=data?.lastMigrationDay??this.scene.gameTime.day;this.updateUI();}
   destroy(){this.unsubscribe();this.scene.events?.off?.('buildings:changed',this.buildingsChanged);this.gather.clear();this.jobs.destroy();this.listeners.clear();this.reservations.clear();for(const worker of this.workers.values())worker.view.destroy();this.workers.clear();}
 }

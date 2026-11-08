@@ -1,12 +1,13 @@
 import Phaser from 'phaser';
 import { gridToWorld } from './isometric.js';
+import { MOVEMENT_SPEED_SCALE } from '../data/movement.js';
 
 // Children and the Village Green D1: provisional drawings of children (smaller than adults, six colour sets) and of
 // snowmen until the Studio art (plan g-deti-naves-grafika) is approved. Only children on screen and in sight are
 // redrawn each frame; the rest are hidden and skipped.
 const LOOKS=[[0x8b4a3a,0x5b3a26],[0x4f6a8c,0x3a2a1c],[0x6f7f3e,0xc8a060],[0xb07a3a,0x2a1d14],[0x8a5a8c,0x6b4423],[0x3f7a6e,0xd8b878]];
 function drawChild(g,child,phase){
-  const [tunic,hair]=LOOKS[child.look%LOOKS.length],a=child.activity?.kind,moving=!!child.moving,dir=(child.facing?.x??0)-(child.facing?.y??0)>=0?1:-1,step=moving?Math.sin(phase*(a==='tag'?2.2:1.6))*2:0;g.clear();
+  const [tunic,hair]=LOOKS[child.look%LOOKS.length],a=child.activity?.kind,moving=!!child.moving,dir=(child.facing?.x??0)-(child.facing?.y??0)>=0?1:-1,step=moving?Math.sin(phase*(a==='tag'?2.2:1.6)*MOVEMENT_SPEED_SCALE)*2:0;g.clear();
   let lift=0,sway=0;
   if(!moving&&child.state==='out'&&a==='swing'){sway=Math.sin(phase*.9)*6;lift=3;}
   // Children D2: jumping into the haystack (a high hop, then a short rest in the hay).

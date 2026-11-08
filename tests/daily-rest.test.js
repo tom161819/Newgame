@@ -45,7 +45,7 @@ test('in the last quarter of the day a resident walks to his House, rests faster
   s.simulate(600);assert.equal(isRestTime(s.gameTime),true);assert.equal(w.restPhase,'going');assert.equal(w.workState,'Going Home');
   until(s,()=>w.workState==='Resting');
   assert.ok(towerNeighbors(h).some(t=>t.x===w.tile.x&&t.y===w.tile.y),'he rests next to his House (walked there, no teleport)');
-  assert.equal(w.workMessage,'Resting at home');assert.equal(outside.workMessage,'Resting outdoors (no home)');
+  assert.equal(w.workMessage,'Sleeping at home');assert.equal(w.sleepingIn,h.id,'m-obyvatele-jmena-spanek-pohyb (42): asleep inside');assert.equal(outside.workMessage,'Resting outdoors (no home)');assert.equal(outside.sleepingIn,null);
   s.needs.records.get(w.id).rest=10;s.needs.records.get(outside.id).rest=10;s.simulate(day(s)*.05);
   assert.ok(restOf(s,w)>restOf(s,outside)+5,`home rest ${restOf(s,w)} beats rest in the open ${restOf(s,outside)}`);
   until(s,()=>!isRestTime(s.gameTime));until(s,()=>w.restPhase===null,day(s));

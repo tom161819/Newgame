@@ -5,6 +5,16 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.62.0] - 2026-11-08
+<!-- version: {"title":"Residents 3","type":"feature","reconstructed":false,"saveVersion":58} -->
+### Added
+- Residents have a surname and a home village ("Jaroslav Flaška z Pičína", or "Walter Thatcher of Wetwang" in English). Women's surnames take the female form. No name repeats, so there is no more "Pavel 2". Children take their family's surname. The detail shows the full name; lists show the short one.
+- At night residents go inside their House, or the Castle if they have none, and come out in the morning. The House panel shows who is inside. Locate on a sleeper shows his House. Sleepers are woken if their House catches fire.
+### Changed
+- Everyone walks 25 % slower: residents, the King, soldiers, animals, caravans and vehicles. Walk animations slow down to match. Jobs with a lot of walking, such as hunting and hauling, produce less per day.
+### Fixed
+- Two residents blocking each other no longer keep stepping aside the same way forever.
+
 ## [0.61.0] - 2026-11-08
 <!-- version: {"title":"Walls 2","type":"feature","reconstructed":false,"saveVersion":58} -->
 ### Added

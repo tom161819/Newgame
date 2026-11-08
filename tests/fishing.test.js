@@ -88,7 +88,7 @@ test('the Fishers use the nearest reachable shore by walking distance, with no r
   assert.equal(near.fishing.distance(h1),1,'right at the water');assert.ok(far.fishing.distance(h2)>=20,`about twenty tiles (${far.fishing.distance(h2)})`);
   assert.ok(far.fishing.spots(h2).every((p,i,a)=>!i||a[i-1].distance<=p.distance),'nearest first');
   assert.match(far.fishing.summary(h2),/Water: \d+ tiles away/);
-  const caught=(s,b)=>{const w=fisher(s,b);s.foodSystem.eat=()=>true;for(let i=0;i<4800;i++)s.tick(50);const r=s.fishing.catches.get(b.id);return (r?.today??0)+(r?.yesterday??0);};
+  const caught=(s,b)=>{const w=fisher(s,b);s.foodSystem.eat=()=>true;for(let i=0;i<9600;i++)s.tick(50);const r=s.fishing.catches.get(b.id);return (r?.today??0)+(r?.yesterday??0);};
   const a=caught(near,h1),b=caught(far,h2);assert.ok(a>b,`a hut by the water catches more (${a} > ${b})`);assert.ok(b>0,'the far one still fishes');
 });
 

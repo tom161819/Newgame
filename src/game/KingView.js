@@ -3,6 +3,7 @@ import { directionName, DIRECTION_POSES } from './directions.js';
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { AnimalView } from './AnimalView.js';
 import { CargoBundleView } from './CargoBundleView.js';
+import { MOVEMENT_SPEED_SCALE } from '../data/movement.js';
 
 // Grafická vrstva krále. Controller dodává logický směr, nikoli úhel obrazovky.
 // Každý z osmi směrů má vlastní pózu; později ji může nahradit animovaný sprite.
@@ -106,7 +107,7 @@ export class KingView extends Phaser.GameObjects.Container {
     // v jediném snímku; během klidu ho controller už nemění.
     const facing = directionName(direction);
     if (facing && facing !== this.facing) { this.facing = facing; this.paint(); }
-    this.phase += delta * (moving ? 0.013 : 0.002);
+    this.phase += delta * (moving ? 0.013 * MOVEMENT_SPEED_SCALE : 0.002);
     this.mount?.animate(delta,moving,direction);
     const stride = moving ? Math.sin(this.phase) * 2.6 : 0;
     const length = Math.hypot(this.pose.screenX, this.pose.screenY);

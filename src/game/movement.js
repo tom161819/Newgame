@@ -1,3 +1,4 @@
+import { MOVEMENT_SPEED_SCALE } from '../data/movement.js';
 // Každá skutečně překročená buňka; společný diagonální roh navštíví jen
 // diagonální cíl, nikoliv obě boční buňky. Funguje i pro dlouhé úseky.
 export function enteredTiles(from,to){
@@ -30,7 +31,7 @@ export function advanceMovement(actor, delta) {
     if(distance<1e-12){actor.position=target;actor.tile=actor.nextTile;actor.nextTile=null;continue;}
     actor.walking=true;actor.direction={x:dx/distance,y:dy/distance};
     const from={...actor.position},tile={x:Math.floor(from.x),y:Math.floor(from.y)};
-    const speed=actor.speed*(actor.speedFactor??1)*(wear?.speedMultiplier(actor,tile)??1),ux=dx/distance,uy=dy/distance;
+    const speed=actor.speed*MOVEMENT_SPEED_SCALE*(actor.speedFactor??1)*(wear?.speedMultiplier(actor,tile)??1),ux=dx/distance,uy=dy/distance;
     const boundary=(p,d)=>Math.abs(d)<1e-12?Infinity:Math.max(0,((d>0?Math.floor(p)+1:Math.floor(p))-p)/d);
     const limit=Math.min(distance,boundary(from.x,ux)+1e-10,boundary(from.y,uy)+1e-10);
     const amount=Math.min(limit,speed*remaining);

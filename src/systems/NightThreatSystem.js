@@ -77,7 +77,7 @@ export class NightThreatSystem {
     const s=this.scene,out=[];
     for(const a of s.animalSystem?.animals?.values?.()??[])if(a.isAlive&&a.active!==false&&!a.definition.gameplay.nightPredator&&a.definition.gameplay.huntable&&!a.mounted)out.push(a);
     if(s.character?.isAlive!==false&&s.character?.state==='ground')out.push(s.character);
-    for(const w of s.workerSystem?.liveSubjects?.()??[])if(!(w.restPhase==='resting'&&s.needs?.homeOf?.(w)?.kind==='house'))out.push(w);
+    for(const w of s.workerSystem?.liveSubjects?.()??[])if(!(w.restPhase==='resting'&&s.needs?.homeOf?.(w)?.kind==='house')&&w.sleepingIn==null)out.push(w);
     return out.filter(p=>p.position&&!this.lit({x:Math.floor(p.position.x),y:Math.floor(p.position.y)},lights));
   }
   soldiersNear(wolf){const W=NIGHT_THREATS.wolves;return (this.scene.workerSystem?.liveWorkers?.()??[]).filter(w=>w.profession==='soldier'&&w.isAlive&&Math.hypot(w.position.x-wolf.position.x,w.position.y-wolf.position.y)<=W.fleeRange);}
@@ -104,7 +104,7 @@ export class NightThreatSystem {
     // Standing in light (a torch was lit nearby): step out of it.
     if(this.lit(wolf.tile,lights)){const out=[];for(let r=1;r<8&&!out.length;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){const t={x:wolf.tile.x+dx,y:wolf.tile.y+dy};if(isWalkable(s.map,t.x,t.y)&&!this.lit(t,lights))out.push(t);}away(out.slice(0,6));return true;}
     let target=state.target;
-    if(!target?.isAlive||target.active===false||this.lit({x:Math.floor(target.position.x),y:Math.floor(target.position.y)},lights)||(target.restPhase==='resting'&&s.needs?.homeOf?.(target)?.kind==='house')){
+    if(!target?.isAlive||target.active===false||this.lit({x:Math.floor(target.position.x),y:Math.floor(target.position.y)},lights)||(target.restPhase==='resting'&&s.needs?.homeOf?.(target)?.kind==='house')||target.sleepingIn!=null){
       target=null;const prey=this.prey(lights).filter(p=>Math.hypot(p.position.x-wolf.position.x,p.position.y-wolf.position.y)<=W.huntRange&&!(state.avoid?.has(p.id)));
       prey.sort((a,b)=>Math.hypot(a.position.x-wolf.position.x,a.position.y-wolf.position.y)-Math.hypot(b.position.x-wolf.position.x,b.position.y-wolf.position.y));target=prey[0]??null;state.target=target;
     }
@@ -216,6 +216,8 @@ export class NightThreatSystem {
   }
   ignite(b){
     const F=NIGHT_THREATS.fires,fire={id:b.id,intensity:F.startIntensity,health:100};this.fires.set(b.id,fire);
+    // m-obyvatele-jmena-spanek-pohyb (42): sleepers wake and come out of a burning house.
+    for(const w of this.scene.workerSystem?.sleepersIn?.(b.id)??[])this.scene.workerSystem.rest?.stop?.(w);
     this.scene.eventFeed?.push?.(`fire:${b.id}:${this.scene.gameTime?.day??1}`,t('threats.fire',{name:this.scene.objectRegistry.require(b.type).name}),{important:true,target:b});this.scene.dangerMarks?.mark({x:b.x+1,y:b.y+1});this.changed();return fire;
   }
   burning(b){return this.fires.has(b?.id);}

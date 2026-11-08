@@ -44,10 +44,12 @@ export class DailyRest {
     if(worker.restPhase==='resting'&&worker.greenSeat&&!this.scene.childrenSystem?.eveningSeat?.(worker)){worker.greenSeat=false;worker.restPhase='going';}
     if(this.done(worker)){this.stop(worker);return false;}
     const home=this.scene.needs.homeOf(worker),kind=home?.kind??'homeless';
-    if(worker.restPhase==='going')this.goHome(worker,kind);
+    if(worker.restPhase==='going'){worker.sleepingIn=null;this.goHome(worker,kind);}
     if(worker.restPhase==='resting'){
-      worker.workState='Resting';
-      worker.workMessage=worker.greenSeat?'Sitting on the Village Green':kind==='house'?'Resting at home':kind==='settlement'&&this.castle()?'Resting near the Castle':kind==='settlement'?'Resting at the camp':'Resting outdoors (no home)';
+      // m-obyvatele-jmena-spanek-pohyb (42): at the door of his House (or of the Castle) he sleeps inside, hidden.
+      const shelter=this.shelter(worker,kind),inside=!!shelter&&!worker.nextTile&&!worker.path.length&&towerNeighbors(shelter).some(t=>t.x===worker.tile.x&&t.y===worker.tile.y);
+      worker.sleepingIn=inside?shelter.id:null;worker.workState='Resting';
+      worker.workMessage=inside?(shelter.type==='castle'?'Sleeping in the Castle':'Sleeping at home'):worker.greenSeat?'Sitting on the Village Green':kind==='house'?'Resting at home':kind==='settlement'&&this.castle()?'Resting near the Castle':kind==='settlement'?'Resting at the camp':'Resting outdoors (no home)';
     }
     return true;
   }
@@ -56,8 +58,15 @@ export class DailyRest {
     worker.path=[];worker.restPhase='going';worker.aiCooldown=0;
   }
   stop(worker){
-    worker.restPhase=null;worker.greenSeat=false;worker.aiCooldown=0;
+    worker.restPhase=null;worker.sleepingIn=null;worker.greenSeat=false;worker.aiCooldown=0;
     if(RESTING_STATES.includes(worker.workState)){worker.workState=worker.profession==='idle'?'Idle':'Searching for Target';worker.workMessage='';}
+  }
+  // (42) The building a resting resident sleeps in: his completed House, the Castle for the settlement's base places;
+  // none on the Village Green or while it burns (sleepers come out of a burning house).
+  shelter(worker,kind){
+    if(worker.greenSeat)return null;
+    const b=kind==='house'?this.scene.buildings.find(x=>x.id===this.scene.needs.homeOf(worker)?.buildingId):kind==='settlement'?this.castle():null;
+    return b&&buildingIsComplete(b)&&!this.scene.nightThreats?.burning?.(b)?b:null;
   }
   castle(){return this.scene.buildings.find(b=>b.type==='castle'&&buildingIsComplete(b))??null;}
   goals(kind,worker){

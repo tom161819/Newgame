@@ -51,7 +51,7 @@ test('an injured hunter stops retaliation, walks home and recovers instead of te
   const s=workerScene(),a=makeWorker(s,{x:55,y:50}),boar=s.animalSystem.create(s.objectRegistry.require('wild_boar'),{x:56,y:50});boar.wanderWait=1e8;
   s.workerSystem.jobs.assign(a,'hunter');s.workerSystem.update(0);assert.equal(s.combat.attacks.size,2);a.currentHP=17;
   const position={...a.position};s.workerSystem.update(0);assert.equal(a.workState,'Fleeing');assert.deepEqual(a.position,position);assert.equal(s.combat.attacks.size,0);assert.equal(boar.retaliationTarget,null);
-  s.simulate(1300);assert.equal(a.workState,'Recovering');assert.ok(a.currentHP>17);assert.ok(s.workerSystem.homeGoals().some(t=>t.x===a.tile.x&&t.y===a.tile.y));
+  s.simulate(1800);assert.equal(a.workState,'Recovering');assert.ok(a.currentHP>17);assert.ok(s.workerSystem.homeGoals().some(t=>t.x===a.tile.x&&t.y===a.tile.y));
   a.currentHP=48;s.workerSystem.update(0);assert.equal(a.workState,'Searching for Work');assert.equal(a.experience.totalXP,0);
 });
 

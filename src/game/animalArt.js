@@ -1,6 +1,7 @@
 import { APPROVED_ANIMAL_ART } from '../data/objects/approvedAnimalArt.js';
 import { FACING_INDEX, walkFrame } from '../data/objects/approvedArt.js';
 import { assetURL } from '../systems/AssetManager.js';
+import { MOVEMENT_SPEED_SCALE } from '../data/movement.js';
 
 // Plan m-zvirata-nahodny-vzhled (owner rule 7 Nov 2026): where several looks of an animal are approved, every animal
 // gets one of them at random, seeded by its id, so it keeps the look after Load without anything new in the save.
@@ -33,6 +34,6 @@ export function applyAnimalArt(scene,image,look,{facing='SE',moving=false,walked
   if(pose&&art.poses[pose]&&scene.textures.exists(animalPoseKey(look,pose))){
     const p=art.poses[pose];image.setTexture(animalPoseKey(look,pose)).setOrigin(p.origin.x,p.origin.y).setFlipX(LEFT.has(facing)).setVisible(true);return true;
   }
-  const k=FACING_INDEX[facing]??0;image.setTexture(animalWalkKey(look),walkFrame(k,walkedMs,art.walk.fps,moving)).setOrigin(art.walk.origin.x,art.walk.origin.y).setFlipX(false).setVisible(true);return true;
+  const k=FACING_INDEX[facing]??0;image.setTexture(animalWalkKey(look),walkFrame(k,walkedMs*MOVEMENT_SPEED_SCALE,art.walk.fps,moving)).setOrigin(art.walk.origin.x,art.walk.origin.y).setFlipX(false).setVisible(true);return true;
 }
 export function hasPose(look,pose){return !!lookArt(look)?.poses?.[pose];}

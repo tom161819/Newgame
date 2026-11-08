@@ -4,7 +4,9 @@ import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/bu
 import { findPath } from '../game/pathfinding.js';
 import { isRestTime,restStart } from './DailyRest.js';
 import { COLUMNS,ROWS } from '../game/config.js';
-import { t } from '../i18n/index.js';
+import { t,language } from '../i18n/index.js';
+import { NAME_SIZES,childShortName,childFullName } from '../data/names.js';
+import { MOVEMENT_SPEED_SCALE } from '../data/movement.js';
 
 // Children and the Village Green D1 (brief zadani-deti-naves.md). A family house (a completed House with at least two
 // residents) has 0–3 children, chosen from the house id and the number of residents, at most 40 on the map, spread
@@ -89,10 +91,18 @@ export class ChildrenSystem {
       if(child.state==='inside'||!this.home(child)){this.children.delete(child.id);changed=true;}else if(child.state!=='leaving'){child.state='leaving';child.activity=null;this.goTo(child,this.door(this.home(child),child));}}
     if(changed)this.changed();
   }
+  // m-obyvatele-jmena-spanek-pohyb (31): a family is the house's first resident (lowest id) with a name identity;
+  // children take its surname (female form for a girl) and origin. Families are derived, never saved.
+  family(houseId){const ids=[...(this.residentsByHouse().get(houseId)??[])].sort((a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true}));
+    for(const id of ids){const w=this.scene.workerSystem?.workers?.get(id);if(w?.identity)return w.identity;}return null;}
+  nameOf(child,{full=false}={}){return (full?childFullName:childShortName)(child.sex,child.nameIndex,this.family(child.houseId),language());}
   newChild(houseId,index){
-    const r=seeded(hashOf('child',houseId,index)),sex=r()<.5?'boy':'girl',names=CHILDREN.names[sex],[a,b]=CHILDREN.ages;
+    const r=seeded(hashOf('child',houseId,index)),sex=r()<.5?'boy':'girl',size=NAME_SIZES[sex],[a,b]=CHILDREN.ages;
+    // No two children of one surname share a first name (while the list allows it).
+    const family=this.family(houseId),key=(c,i)=>`${c.sex}:${i}:${this.family(c.houseId)?.surname??c.houseId}`,taken=new Set([...this.children.values()].map(c=>key(c,c.nameIndex)));
+    let nameIndex=Math.floor(r()*size);for(let i=0;i<size&&taken.has(`${sex}:${nameIndex}:${family?.surname??houseId}`);i++)nameIndex=(nameIndex+1)%size;
     const house=(this.scene.buildings??[]).find(h=>h.id===houseId),door=house?this.door(house):null,p=door??(house?this.center(house):{x:0,y:0});
-    return {id:`child-${houseId}-${index}`,houseId,index,sex,name:names[Math.floor(r()*names.length)],age:a+Math.floor(r()*(b-a+1)),look:Math.floor(r()*6),
+    return {id:`child-${houseId}-${index}`,houseId,index,sex,nameIndex,age:a+Math.floor(r()*(b-a+1)),look:Math.floor(r()*6),
       x:p.x+.5,y:p.y+.5,state:'inside',activity:null,path:[],local:null,emergeAt:null,facing:{x:0,y:1}};
   }
 
@@ -174,7 +184,7 @@ export class ChildrenSystem {
   }
   // Walks along the path; true once it is done.
   walk(child,seconds,speed){
-    let left=speed*seconds;
+    speed*=MOVEMENT_SPEED_SCALE;let left=speed*seconds;
     while(left>0&&child.path.length){const next=child.path[0],tx=next.x+.5,ty=next.y+.5,dx=tx-child.x,dy=ty-child.y,d=Math.hypot(dx,dy);
       if(d<=left){child.x=tx;child.y=ty;child.path.shift();left-=d;if(d)child.facing={x:dx,y:dy};}else{child.x+=dx/d*left;child.y+=dy/d*left;child.facing={x:dx,y:dy};left=0;}}
     child.moving=left<speed*seconds;return !child.path.length;
@@ -183,7 +193,7 @@ export class ChildrenSystem {
   play(child,seconds){
     const a=child.activity,c={x:a.center.x+.5,y:a.center.y+.5},map=this.scene.map;child.moving=false;
     if(['swing','snowman','snowball','hay'].includes(a.kind)&&!child.local){child.facing={x:0,y:1};return;}
-    const radius={tag:1.8,hoop:1.3,ball:1.5,shore:1.2,snowball:1,snowman:.6}[a.kind]??1.2,speed=a.kind==='tag'?CHILDREN.runSpeed:a.kind==='hoop'?CHILDREN.speed*1.2:CHILDREN.speed*.8;
+    const radius={tag:1.8,hoop:1.3,ball:1.5,shore:1.2,snowball:1,snowman:.6}[a.kind]??1.2,speed=(a.kind==='tag'?CHILDREN.runSpeed:a.kind==='hoop'?CHILDREN.speed*1.2:CHILDREN.speed*.8)*MOVEMENT_SPEED_SCALE;
     if(!child.local||Math.hypot(child.local.x-child.x,child.local.y-child.y)<.08){
       child.wait=(child.wait??0)-seconds;if(child.wait>0)return;
       let target=null;for(let i=0;i<6&&!target;i++){const ang=a.kind==='hoop'?Math.atan2(child.y-c.y,child.x-c.x)+.9:this.random()*Math.PI*2,r=a.kind==='hoop'?radius:this.random()*radius,x=c.x+Math.cos(ang)*r,y=c.y+Math.sin(ang)*r;

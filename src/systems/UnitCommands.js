@@ -11,7 +11,7 @@ export const commanded=worker=>worker.commandState?.state==='MovingToHold'||work
 export class UnitCommands {
   constructor(system){this.system=system;this.scene=system.scene;}
   owns(worker){return !!worker?.isAlive&&worker.isSubject!==false&&this.system.workers.get(worker.id)===worker&&!worker.leaving;}
-  selectable(worker){return this.owns(worker)&&this.scene.fog.isVisibleObject(worker);}
+  selectable(worker){return this.owns(worker)&&worker.sleepingIn==null&&this.scene.fog.isVisibleObject(worker);}
   interrupt(worker){
     this.system.ai.cancel(worker);worker.manualRockId=null;worker.arriving=false;worker.commandRetry=0;worker.commandWait=0;
     // Complete the already reserved half-step; never snap a moving cargo owner.

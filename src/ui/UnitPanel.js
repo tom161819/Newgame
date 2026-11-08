@@ -48,7 +48,7 @@ export class UnitPanel {
     const managed=this.management&&s.workerSystem?.workers.get(u.id)===u&&u.isSubject!==false&&u.isAlive;
     if((!view?.scene||!s.fog.isVisibleObject(u))&&!managed){this.close();return;}
     const e=s.experienceSystem.getLevelProgress(u),format=n=>String(Math.round(n*100)/100);
-    document.querySelector('#unit-name').textContent=u.name??u.definition.name;
+    document.querySelector('#unit-name').textContent=u.fullName??u.name??u.definition.name;
     document.querySelector('#unit-level').textContent=t('unit.level',{level:e.level,max:e.maxLevel});
     document.querySelector('#unit-xp').textContent=e.level===e.maxLevel?t('unit.xpMax'):t('unit.xpProgress',{current:format(e.currentXP),next:e.xpToNextLevel});
     document.querySelector('#unit-cargo').textContent=cargoLabel(s,u);document.querySelector('#unit-transport').textContent=transportLabel(s,u);

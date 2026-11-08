@@ -1,6 +1,7 @@
 import { deathCauseText } from './DangerMarks.js';
 import { localized } from '../i18n/names.js';
 import { t,language } from '../i18n/index.js';
+import { shortName } from '../data/names.js';
 import { JOBS,SKILLS } from '../data/jobs.js';
 import { element } from './objectLabels.js';
 import { jobChoices,changeProfession } from './jobChange.js';
@@ -72,7 +73,7 @@ export class PopulationSidebar {
     const box=document.querySelector('#population-deceased'),list=document.querySelector('#population-deceased-list');if(!box||!list)return;const dead=[...(this.scene.workerSystem.deceased??[])].reverse();
     box.hidden=!dead.length;const sig=JSON.stringify([dead.length,dead[0]?.name,dead[0]?.day]);if(sig===this.deceasedSig&&box.querySelector('summary').textContent)return;this.deceasedSig=sig;
     box.querySelector('summary').textContent=t('population.deceasedCount',{count:dead.length});
-    list.replaceChildren(...dead.map(d=>element('li','',t('population.deceasedLine',{name:d.name,job:JOBS[d.profession]?.name??d.profession,cause:deathCauseText(this.scene,d.cause),day:d.day}))));
+    list.replaceChildren(...dead.map(d=>element('li','',t('population.deceasedLine',{name:d.identity?shortName(d.identity,language()):d.name,job:JOBS[d.profession]?.name??d.profession,cause:deathCauseText(this.scene,d.cause),day:d.day}))));
   }
   createRow(id){
     const controller=new AbortController();

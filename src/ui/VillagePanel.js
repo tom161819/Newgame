@@ -27,7 +27,9 @@ export class VillagePanel {
       const house=this.object,residents=[...homes].filter(([,h])=>h?.kind==='house'&&h.buildingId===house.id).map(([id])=>workers?.get(id)?.name??id),kids=c?.childrenOf(house.id)??[];
       title.textContent=this.houseName(house);
       lines.push(element('p','village-residents',residents.length?t('village.residents',{names:residents.join(', '),count:residents.length}):t('village.noResidents')));
-      lines.push(element('p','village-children',kids.length?t('village.children',{names:kids.map(k=>t('village.childName',{name:k.name,age:k.age})).join(', ')}):residents.length>=2?t('village.noChildren'):t('village.notFamily')));
+      // m-obyvatele-jmena-spanek-pohyb (42): who sleeps inside right now.
+      const inside=s.workerSystem?.sleepersIn?.(house.id)??[],insideLine=element('p','village-inside',inside.length?t('village.inside',{count:inside.length,names:inside.map(w=>w.name).join(', ')}):t('village.nobodyInside'));insideLine.dataset.inside=String(inside.length);lines.push(insideLine);
+      lines.push(element('p','village-children',kids.length?t('village.children',{names:kids.map(k=>t('village.childName',{name:c.nameOf(k),age:k.age})).join(', ')}):residents.length>=2?t('village.noChildren'):t('village.notFamily')));
       const bonus=c?.greenBonus(house,homes);if(bonus?.near)lines.push(element('p','village-bonus',t('village.houseBonus',{value:bonus.near+bonus.family})));
     }else if(this.kind==='green'){
       const green=this.object,houses=c?.housesInRange(green)??[],families=houses.filter(h=>c.isFamily(h,homes)).length;
@@ -37,7 +39,7 @@ export class VillagePanel {
       const playing=c?.playingAt(green.id)??0;const p=element('p','village-playing',t('village.greenPlaying',{count:playing}));p.dataset.playing=String(playing);lines.push(p);
     }else{
       const child=this.object,house=c?.home(child);
-      title.textContent=t('village.childTitle',{name:child.name});
+      title.textContent=t('village.childTitle',{name:c?.nameOf?.(child,{full:true})??''});
       lines.push(element('p','village-child',t(child.sex==='girl'?'village.girlLine':'village.boyLine',{age:child.age,house:house?this.houseName(house):'—'})));
       lines.push(element('p','village-help',t('village.childHelp')));
     }

@@ -18,7 +18,7 @@ export async function unitCommandSmoke(page){
  });
  const screen=async(id,feet=false)=>page.evaluate(({id,feet})=>{const s=window.__game.registry.get('application').scene,w=s.workerSystem.workers.get(id),c=s.cameras.main,r=s.game.canvas.getBoundingClientRect(),p={x:w.view.x,y:w.view.y-(feet?0:12)};return{x:r.x+((p.x-c.scrollX-c.width/2)*c.zoom+c.width/2)*r.width/c.width,y:r.y+((p.y-c.scrollY-c.height/2)*c.zoom+c.height/2)*r.height/c.height};},{id,feet});
  // #120: one click opens the villager's compact detail at once (docked, not modal); its icon commands use UnitCommands.
- const name=id=>page.evaluate(id=>window.__game.registry.get('application').scene.workerSystem.workers.get(id).name,id);
+ const name=id=>page.evaluate(id=>window.__game.registry.get('application').scene.workerSystem.workers.get(id).fullName,id); // the detail shows the full name (m-obyvatele-jmena-spanek-pohyb)
  let p=await screen(fixture.ids[0]);await page.mouse.click(p.x,p.y);await page.locator('#unit-dialog[open]').waitFor();
  assert.deepEqual(await page.evaluate(()=>[...window.__game.registry.get('application').scene.unitSelection.ids]),[fixture.ids[0]]);assert.equal(await page.locator('#unit-name').textContent(),await name(fixture.ids[0]));
  assert.equal(await page.locator('#unit-dialog').evaluate(d=>d.matches(':modal')),false,'no modal backdrop over the map');assert.equal(await page.locator('#unit-command-bar').isHidden(),true,'no extra selection step');

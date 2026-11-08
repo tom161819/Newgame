@@ -8,6 +8,7 @@ import { placeWallLine } from '../src/game/walls.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
 import { loadGameState } from '../src/systems/GameStateLoader.js';
 import { LOGISTICS_RULES } from '../src/data/logistics.js';
+import { MOVEMENT_SPEED_SCALE as S } from '../src/data/movement.js';
 globalThis.document={querySelector:()=>({textContent:''})};
 // These logistics tests use a Stone Tower and a Warehouse as plain 10-Stone sites; their arithmetic is about bookings and
 // deliveries, not about price, so they keep that fixed price whatever the owner sets in the game (0.49 price sync).
@@ -16,7 +17,7 @@ const scene=()=>{const s=workerScene(undefined,{construction:true,logistics:true
 const starter=s=>`stockpile-${s.buildings.find(b=>b.type==='starter_stockpile').id}`;
 function building(s,type,x=50,y=45,{blueprint=false,paid=false}={}){const d=s.objectRegistry.require(type);if(!blueprint||paid)Object.entries(d.cost).forEach(([r,k])=>s.inventory.add(r,k));const result=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d,reserveMaterials:blueprint&&!paid});assert.ifError(result.error);if(blueprint)s.constructionSystem.plan(result.building);s.towerViews.set(result.building.id,s.createBuildingView(d,result.building));return result.building;}
 function worker(s,b,tile={x:53,y:45}){const w=s.workerSystem.create(tile);assert.equal((b.definition.workplace?s.workplaceSystem.assign(b,w):s.workerSystem.jobs.assign(w,'hauler')),true);return w;}
-function until(s,p,max=60000){let n=0;while(!p()&&n<max){s.tick(25);n+=25;}assert.ok(p(),`Condition not reached (${n}ms): ${JSON.stringify({royal:s.kingLogistics.exportState(),cargo:s.character.cargo,workers:s.workerSystem.liveWorkers().map(w=>({state:w.workState,task:w.workTask,cargo:w.cargo}))})}`);}
+function until(s,p,max=60000/S){let n=0;while(!p()&&n<max){s.tick(25);n+=25;}assert.ok(p(),`Condition not reached (${n}ms): ${JSON.stringify({royal:s.kingLogistics.exportState(),cargo:s.character.cargo,workers:s.workerSystem.liveWorkers().map(w=>({state:w.workState,task:w.workTask,cargo:w.cargo}))})}`);}
 const snapshot=s=>validateGameState(serializeGameState(s),s.objectRegistry);
 function restore(data,registry=REGISTRY){const s=workerScene(undefined,{construction:true,logistics:true,starter:false,gameSettings:gameSettings()});s.objectRegistry=registry;loadGameState(s,data);return s;}
 const quantity=(s,id)=>[...s.foodStorage.locations.values()].reduce((n,l)=>n+(l.stock[id]??0),0)+[s.character,...s.workerSystem.liveWorkers()].reduce((n,w)=>n+(w.cargo?.resource===id?w.cargo.amount:0),0)+[...s.dropSystem.drops.values()].filter(d=>d.resource===id).reduce((n,d)=>n+d.amount,0);

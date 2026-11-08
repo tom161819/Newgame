@@ -12,6 +12,7 @@ import { tileCenter } from '../src/game/map.js';
 import { tileKey } from '../src/game/stones.js';
 import { canStep } from '../src/game/pathfinding.js';
 import { CombatSystem } from '../src/systems/CombatSystem.js';
+import { MOVEMENT_SPEED_SCALE as S } from '../src/data/movement.js';
 
 function view(position={x:0,y:0}){
   return {...position,visible:true,data:new Map(),setData(k,v){this.data.set(k,v);return this;},getData(k){return this.data.get(k);},
@@ -48,7 +49,7 @@ test('animal spawn creates three of each hunted species and six wild horses on f
 test('animals use diagonal navigation, normalized speed and stop before a newly blocked route',()=>{
   const s=scene(),definition=objectRegistry.require('deer'),a=new AnimalController(s,definition,'test',{x:4,y:4},view());
   assert.equal(a.moveTo([{x:7,y:7}]),true);a.update(200);
-  assert.ok(Math.abs(Math.hypot(a.position.x-4.5,a.position.y-4.5)-a.speed*.2)<1e-9);
+  assert.ok(Math.abs(Math.hypot(a.position.x-4.5,a.position.y-4.5)-a.speed*S*.2)<1e-9);
   assert.ok(Math.abs(a.position.x-a.position.y)<1e-9);
   s.map[7][7]=1;a.update(5000);assert.deepEqual(a.tile,{x:5,y:5});assert.equal(a.path.length,0);
   a.moveTo([{x:8,y:8}]);let previous=a.tile;

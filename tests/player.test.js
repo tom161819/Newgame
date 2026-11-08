@@ -6,6 +6,7 @@ import { tileCenter } from '../src/game/map.js';
 import { gridToWorld } from '../src/game/isometric.js';
 import { Inventory } from '../src/game/inventory.js';
 import { placeTower, placementError } from '../src/game/buildings.js';
+import { MOVEMENT_SPEED_SCALE as S } from '../src/data/movement.js';
 
 function setup() {
   const tower = { id: 1, x: 4, y: 4, tiles: towerTiles({ x: 4, y: 4 }) };
@@ -86,7 +87,7 @@ test('obklíčený hráč zůstane nahoře; po uvolnění lze vstup a výstup op
 test('plynulý pohyb používá logickou pozici; změna cíle neposkočí a příjezd ukončí chůzi', () => {
   const w=setup();
   w.character.command({kind:'move',goal:{x:3,y:0}});
-  w.character.update(100);
+  w.character.update(100/S);
   assert.ok(Math.abs(w.character.position.x-0.85)<1e-9);
   assert.equal(w.character.position.y,0.5);
   assert.deepEqual({x:w.sprite.x,y:w.sprite.y},gridToWorld(0.85,0.5));
@@ -105,7 +106,7 @@ test('diagonální a přímý pohyb mají shodnou rychlost a diagonála mění o
   straight.character.command({kind:'move',goal:{x:3,y:0}});
   diagonal.character.command({kind:'move',goal:{x:3,y:3}});
   for(let frame=0;frame<10;frame++){
-    straight.character.update(20);diagonal.character.update(20);
+    straight.character.update(20/S);diagonal.character.update(20/S);
     const p=diagonal.character.position;
     assert.ok(Math.abs(p.x-p.y)<1e-9,'Žádné střídání vodorovných a svislých úseků.');
     assert.equal(diagonal.sprite.x,tileCenter({x:0,y:0}).x);

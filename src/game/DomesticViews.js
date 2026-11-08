@@ -4,6 +4,7 @@ import { RATS,RAT_MOVES } from '../data/domesticAnimals.js';
 import { ratLevel } from '../data/domesticAnimals.js';
 import { directionName } from './directions.js';
 import { animalLook,ensureAnimalLook,applyAnimalArt } from './animalArt.js';
+import { MOVEMENT_SPEED_SCALE } from '../data/movement.js';
 
 // Domestic animals Z1: provisional drawings (cats and rats) until the Studio art (plan g-domaci-zvirata-grafika)
 // is approved. Since m-zvirata-nahodny-vzhled the approved Studio looks are drawn once loaded (one look per animal, seeded
@@ -11,7 +12,7 @@ import { animalLook,ensureAnimalLook,applyAnimalArt } from './animalArt.js';
 // infestation level. Both hide outside sight like other creatures.
 const COATS=[[0x3b3530,0x23201d],[0xc98a4b,0x8e5b2c],[0x9c9a94,0x6d6b66],[0xe8e2d4,0xb9b2a2],[0x5b4636,0x3a2c21]];
 function drawCat(g,coat,facing,phase,walking){
-  const [body,dark]=coat,dir=facing.x-facing.y>=0?1:-1,step=walking?Math.sin(phase)*1.5:0;g.clear();
+  const [body,dark]=coat,dir=facing.x-facing.y>=0?1:-1,step=walking?Math.sin(phase*MOVEMENT_SPEED_SCALE)*1.5:0;g.clear();
   g.fillStyle(0x26271b,.28);g.fillEllipse(0,1,18,6);
   g.fillStyle(dark);g.fillRect(-5,-4,2,4+step);g.fillRect(3,-4,2,4-step);
   g.fillStyle(body);g.fillEllipse(0,-6,15,8);
@@ -21,7 +22,7 @@ function drawCat(g,coat,facing,phase,walking){
 }
 const DOG_COATS=[[0x7a5232,0x4b321f],[0xe4dccb,0x5a4a3a],[0x8d8f92,0x55575b]];
 function drawDog(g,coat,facing,phase,walking,injured,sitting){
-  const [body,dark]=coat,dir=facing.x-facing.y>=0?1:-1,step=walking?Math.sin(phase*1.6)*2:0;g.clear();
+  const [body,dark]=coat,dir=facing.x-facing.y>=0?1:-1,step=walking?Math.sin(phase*1.6*MOVEMENT_SPEED_SCALE)*2:0;g.clear();
   g.fillStyle(0x26271b,.3);g.fillEllipse(0,1,24,8);
   if(injured){g.fillStyle(body);g.fillEllipse(0,-3,22,7);g.fillCircle(10*dir,-4,4.5);g.fillStyle(0xf2efe6);g.fillRect(-3,-6,6,3);return;}
   if(sitting){g.fillStyle(dark);g.fillRect(3*dir-1,-9,2.4,9);g.fillRect(6*dir-1,-9,2.4,9);g.fillStyle(body);g.fillEllipse(-3*dir,-4,13,8);g.fillEllipse(2*dir,-11,11,13);
@@ -54,7 +55,7 @@ export class DomesticViews {
       else{const [lo,hi]=RAT_MOVES.radius,a=r()*Math.PI*2,d=lo+r()*(hi-lo);rat.target={x:cx+Math.cos(a)*d,y:cy+Math.sin(a)*d};}
       rat.justHid=false;rat.speed=RAT_MOVES.dash*(.6+r()*.8);
     }
-    const dx=rat.target.x-rat.x,dy=rat.target.y-rat.y,dist=Math.hypot(dx,dy),step=rat.speed*dt;rat.facing={x:dx,y:dy};rat.moving=true;
+    const dx=rat.target.x-rat.x,dy=rat.target.y-rat.y,dist=Math.hypot(dx,dy),step=rat.speed*MOVEMENT_SPEED_SCALE*dt;rat.facing={x:dx,y:dy};rat.moving=true;
     if(dist<=step){rat.x=rat.target.x;rat.y=rat.target.y;const hide=rat.target.hide;rat.target=null;rat.moving=false;
       if(hide){const [a,b]=RAT_MOVES.hideSeconds;rat.hidden=a+r()*(b-a);rat.justHid=true;return false;}
       const [a,b]=RAT_MOVES.sniff;rat.wait=a+r()*(b-a);return true;}

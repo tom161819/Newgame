@@ -1,5 +1,6 @@
 import { t } from '../i18n/index.js';
-import { WORLD_BOUNDS, clampMapCenter } from './isometric.js';
+import { WORLD_BOUNDS, clampMapCenter, gridToWorld } from './isometric.js';
+import { buildingDefinition } from './buildings.js';
 import { MIN_ZOOM,MAX_ZOOM,DEFAULT_ZOOM,ZOOM_RESPONSE_MS,clampZoom } from '../data/camera.js';
 export { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 
@@ -42,6 +43,10 @@ export class WorldCamera {
   }
 
   locate(unit){
+    // m-obyvatele-jmena-spanek-pohyb (42): a resident asleep inside is found at his House (or the Castle).
+    const shelter=unit.sleepingIn!=null?this.scene.buildings?.find(b=>b.id===unit.sleepingIn):null;
+    if(shelter){const d=buildingDefinition(shelter);if(!unit.isAlive||!this.scene.fog.isVisibleObject(shelter))return false;
+      const p=gridToWorld(shelter.x+d.width/2,shelter.y+d.height/2);this.panTarget=clampMapCenter(p.x,p.y-25);this.following=false;document.querySelector('#camera-mode').textContent=t('hud.cameraSleeping',{name:unit.name,building:d.name});return true;}
     const view=unit.view??unit.sprite;
     if(!unit.isAlive||!view||!this.scene.fog.isVisibleObject(unit))return false;
     // Capture an allowed, currently seen point. Never track a hidden actor.

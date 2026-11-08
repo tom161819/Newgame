@@ -17,10 +17,7 @@ export const CHILDREN=Object.freeze({
   // A child comes out a little after the morning (stagger), not all at once.
   emergeSeconds:Object.freeze([0,8]),
   syncMs:1000,
-  names:Object.freeze({
-    boy:Object.freeze(['Kuba','Vašek','Toník','Pepík','Matýsek','Honzík','Vojta','Ondra','Kubík','Jeník']),
-    girl:Object.freeze(['Anička','Bára','Madla','Terezka','Rozárka','Majda','Verunka','Liduška','Kačka','Julka']),
-  }),
+  // m-obyvatele-jmena-spanek-pohyb (31): first names live in src/data/names.*.js (children), surname from the family.
   ages:Object.freeze([5,12]),
   activities:Object.freeze({
     house:Object.freeze(['tag','hoop','ball']),green:Object.freeze(['tag','hoop','ball','swing']),

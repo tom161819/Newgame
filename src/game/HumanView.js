@@ -4,6 +4,7 @@ import { CargoBundleView } from './CargoBundleView.js';
 import { HUMAN_APPEARANCE as COLORS } from '../data/humanAppearance.js';
 import { APPROVED_VILLAGER_ART,PROFESSION_LOOKS,FACING_INDEX,villagerSex,walkFrame,walkKey,hasWalk } from '../data/objects/approvedArt.js';
 import { assetURL } from '../systems/AssetManager.js';
+import { MOVEMENT_SPEED_SCALE } from '../data/movement.js';
 
 // Approved villager looks load per look on first use (8 directions each).
 const lookKey=(look,k)=>`villager-art:${look}:${k}`;
@@ -29,7 +30,7 @@ export class HumanView extends Phaser.GameObjects.Container {
   // Profession and name decide the approved look; the procedural figure stays until it loads.
   updateLook(){
     const worker=this.getData?.('worker');if(!worker)return;
-    const look=PROFESSION_LOOKS[worker.isSubject===false?worker.profession:(worker.displayProfession??'idle')]?.[villagerSex(worker.name)]??null;
+    const look=PROFESSION_LOOKS[worker.isSubject===false?worker.profession:(worker.displayProfession??'idle')]?.[worker.identity?(worker.identity.sex==='f'?'female':'male'):villagerSex(worker.name)]??null;
     if(look===this.look)return;this.look=look;this.lookReady=false;
     if(look&&APPROVED_VILLAGER_ART[look])this.lookReady=ensureLook(this.scene,look,()=>{if(this.look===look&&this.scene){this.lookReady=true;this.applyArt();}});
     this.applyArt();
@@ -55,13 +56,13 @@ export class HumanView extends Phaser.GameObjects.Container {
   }
   animate(delta,moving,direction){
     const facing=directionName(direction);if(facing&&facing!==this.facing){this.facing=facing;this.paint();}
-    this.isWalking=moving;this.phase+=delta*(moving ? .014 : .002);const stride=moving?Math.sin(this.phase)*2:0,pose=DIRECTION_POSES[this.facing];
+    this.isWalking=moving;this.phase+=delta*(moving ? .014*MOVEMENT_SPEED_SCALE : .002);const stride=moving?Math.sin(this.phase)*2:0,pose=DIRECTION_POSES[this.facing];
     this.leftLeg.setPosition(-3+pose.screenX*stride,-5+pose.screenY*stride);this.rightLeg.setPosition(3-pose.screenX*stride,-5-pose.screenY*stride);
     this.arms[0].rotation=stride*.07;this.arms[1].rotation=-stride*.07;
     this.updateLook();
     // Approved looks with a walk sheet step frame by frame (no bob); without one they bob and sway lightly.
     if(this.art.visible){
-      if(hasWalk(this.scene,this.look)){this.walked=moving?(this.walked??0)+delta:0;this.applyArt();this.art.y=0;this.art.rotation=0;}
+      if(hasWalk(this.scene,this.look)){this.walked=moving?(this.walked??0)+delta*MOVEMENT_SPEED_SCALE:0;this.applyArt();this.art.y=0;this.art.rotation=0;}
       else{this.art.y=moving?-Math.abs(Math.sin(this.phase))*1.6:0;this.art.rotation=moving?Math.sin(this.phase)*.035:0;}}
   }
   setAttackPose(delta,active,direction){
