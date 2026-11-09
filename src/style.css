@@ -42,7 +42,7 @@ header p { margin: 0 0 9px; color: #bdb99d; font-size: 12px; line-height: 1.5; }
 @keyframes staffing-pulse { 0%,100% { opacity:1; } 50% { opacity:.58; } }
 @media (prefers-reduced-motion:reduce) { .missing-workers { animation:none; } }
 /* Camera state floats as small chips in the lower-left corner of the map. */
-.camera-controls { position: absolute; left: 8px; bottom: 8px; z-index: 9; display: flex; align-items: center; max-width: calc(100% - 16px); font-size: 11px; color: #cfc9a9; pointer-events: none; }
+.camera-controls { position: absolute; left: 8px; bottom: calc(8px + var(--buildings-lift, 0px)); z-index: 9; display: flex; align-items: center; max-width: calc(100% - 16px); font-size: 11px; color: #cfc9a9; pointer-events: none; }
 .camera-controls > * { pointer-events: auto; padding: 3px 9px; border: 1px solid var(--line-soft); border-radius: 999px; background: var(--glass); backdrop-filter: blur(6px); }
 .camera-controls button { padding: 4px 10px; font-size: 11px; }
 .camera-controls .fps-overlay { font-variant-numeric: tabular-nums; color: #e8e2c0; }
@@ -512,6 +512,20 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .notices-more { flex:0 0 auto; padding:0 5px; border-radius:6px; background:#4a4524; color:#f4d98e; font-size:11px; }
 .notices-panel:not(.collapsed) .notices-peek, .notices-peek[hidden], .notices-tab[hidden] { display:none; }
 @media(prefers-reduced-motion:reduce){ .notices-panel { transition:none; } }
+/* m-prehled-kralovstvi-pozice (owner comment 2): the grip drags the bar anywhere; NoticesPanel.applyPosition() sets
+   --notices-left / --notices-top (window px). Slid away, a moved bar folds to the nearer side edge: only the tab stays. */
+.notices-grip { flex:0 0 auto; min-width:20px; padding:1px 4px; border:0; background:none; font-size:13px; line-height:1.2; cursor:grab; touch-action:none; color:#c9c09a; }
+.notices-grip:hover { color:#f0d78b; }
+.notices-tab { touch-action:none; }
+.notices-panel.notices-moved { position:fixed; left:var(--notices-left,auto); top:var(--notices-top,auto); z-index:9; transform:none; transition:left .3s ease, top .3s ease; }
+.notices-panel.notices-moved.dragging, .notices-panel.notices-moved.dragging .notices-grip { transition:none; cursor:grabbing; }
+.notices-panel.notices-moved.collapsed { display:flex; align-items:center; gap:4px; width:auto; min-height:0; padding:0; transform:none; background:none; border:0; box-shadow:none; }
+.notices-panel.notices-moved.collapsed.peeking { width:min(340px,calc(100vw - 32px)); padding:4px 6px; background:rgb(38 43 31 / .94); border:1px solid #8a7a4f; box-shadow:0 10px 28px rgb(6 9 5 / .5); }
+.notices-panel.notices-moved .notices-tab { position:static; margin:0; flex:0 0 auto; }
+.notices-panel.notices-moved.edge-left { flex-direction:row-reverse; }
+.notices-panel.notices-moved.edge-left .notices-tab { border-radius:0 8px 8px 0; }
+.notices-panel.notices-moved.edge-left .notices-tab-arrow { display:inline-block; transform:scaleX(-1); }
+@media(prefers-reduced-motion:reduce){ .notices-panel.notices-moved { transition:none; } }
 .notice-count { display:inline-block; margin-left:4px; padding:0 4px; border-radius:6px; background:#4a4524; color:#f4d98e; font-size:11px; }
 .notices-filters { display:flex; gap:4px; }
 .notice-filter { font-size:11px; padding:3px 7px; }
@@ -565,7 +579,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .minimap-size button:focus-visible { outline:2px solid var(--gold, #e3c57a); outline-offset:1px; }
 .minimap-size button:disabled { opacity:.4; cursor:default; }
 /* #105: the bottom-right column of the map, top to bottom notices → event feed → minimap, so none covers another. */
-.corner-stack { position:absolute; right:12px; bottom:10px; z-index:9; display:flex; flex-direction:column; align-items:flex-end; gap:8px; max-height:calc(100% - 20px); pointer-events:none; }
+.corner-stack { position:absolute; right:12px; bottom:calc(10px + var(--buildings-lift, 0px)); z-index:9; display:flex; flex-direction:column; align-items:flex-end; gap:8px; max-height:calc(100% - 20px - var(--buildings-lift, 0px)); pointer-events:none; }
 .corner-stack > * { pointer-events:auto; }
 .event-feed { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; align-items:flex-end; gap:4px; width:min(300px,calc(100vw - 32px)); pointer-events:none !important; }
 .event-feed:empty { display:none; }
@@ -751,8 +765,26 @@ html[data-ui-population="left"] :is(.policy-card, .employment-panel) { right:aut
 .kingdom-overview { position:relative; display:flex; align-items:center; gap:10px; font-size:11px; color:#e2d7ad; cursor:default; padding:1px 4px; border-radius:4px; }
 .kingdom-overview:focus-visible { outline:2px solid #d8c27a; outline-offset:1px; }
 .overview-chip[data-tone="warn"] { color:#e6b062; } .overview-chip[data-tone="bad"] { color:#f08a6c; } .overview-chip[data-tone="good"] { color:#a8d48a; }
-.kingdom-overview-panel { position:absolute; top:calc(100% + 6px); left:0; z-index:20; min-width:240px; padding:10px 12px; background:var(--glass,#262a20f2); border:1px solid var(--line-soft,#6c6440); border-radius:8px; box-shadow:var(--shadow,0 4px 14px #0008); }
-.kingdom-overview-panel h3 { margin:0 0 6px; font-size:12px; } .kingdom-overview-panel h4 { margin:8px 0 3px; font-size:11px; opacity:.8; }
+.kingdom-overview { cursor:pointer; }
+.kingdom-overview:hover { background:rgb(255 240 200 / .07); }
+/* m-prehled-kralovstvi-pozice (plan point 81): the Kingdom overview is a permanent bar in the map's bottom-left corner.
+   KingdomOverview.place() sets left / bottom so it never covers the camera chips, Notices, minimap, side buttons or the
+   open building strip; folded it is a one-line strip. Text +2 px over the old popup, values bold. */
+.kingdom-bar { position:absolute; left:8px; bottom:42px; z-index:9; width:min(330px,calc(100% - 16px)); padding:6px 10px 8px; color:var(--ink,#ede5c9); background:var(--glass,rgb(30 35 25 / .86)); border:1px solid var(--line-soft,#5b5a40); border-radius:10px; box-shadow:var(--shadow,0 4px 14px #0008); backdrop-filter:blur(6px); font-size:13px; }
+.kingdom-bar[hidden] { display:none; }
+.kingdom-bar.collapsed { width:auto; max-width:calc(100% - 16px); padding:3px 8px; }
+.kingdom-bar-toggle { display:flex; align-items:center; gap:8px; width:100%; min-height:0; padding:2px 0; border:0; background:none; color:inherit; font:inherit; text-align:left; cursor:pointer; }
+.kingdom-bar-title { font-family:var(--font-display); font-size:14px; font-weight:650; color:var(--accent,#e3c57a); }
+.kingdom-bar-summary { font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.kingdom-bar:not(.collapsed) .kingdom-bar-summary { display:none; }
+.kingdom-bar-arrow { margin-left:auto; font-size:12px; transition:transform .2s ease; }
+.kingdom-bar.collapsed .kingdom-bar-arrow { transform:rotate(-90deg); }
+.kingdom-bar-toggle:focus-visible { outline:2px solid #d8c27a; outline-offset:2px; border-radius:4px; }
+.kingdom-bar-body { display:grid; grid-template-columns:1fr 1fr; gap:0 14px; margin-top:4px; }
+.kingdom-bar-body[hidden] { display:none; }
+.kingdom-bar-body .overview-block { grid-column:1 / -1; margin:3px 0 0; font-size:12px; color:#e6b062; }
+.kingdom-bar .overview-row strong { font-weight:750; font-variant-numeric:tabular-nums; }
+@media (prefers-reduced-motion:reduce){ .kingdom-bar-arrow { transition:none; } }
 .overview-row { display:flex; justify-content:space-between; gap:12px; line-height:1.5; }
 .overview-row[data-tone="warn"] strong { color:#e6b062; } .overview-row[data-tone="bad"] strong { color:#f08a6c; } .overview-row[data-tone="good"] strong { color:#a8d48a; }
 /* The help arrow: a slow bob and glow (no flashing); static when motion is reduced. */
@@ -1040,3 +1072,8 @@ tr[data-resource-group="equipment"] { background:var(--group-equipment); }
 /* g-tutorial-sipky: animation of the medieval pointers (their looks are in art/ui/ui-theme.css). */
 @keyframes tutorial-nudge { 50% { scale:1.12; filter:drop-shadow(0 2px 2px #000c) drop-shadow(0 0 10px #ffd98aaa); } }
 @media (prefers-reduced-motion:reduce){ html[data-ui-pointer] .tutorial-arrow { animation:none; } }
+/* m-prehled-kralovstvi-pozice (owner comment 3): the open building strip spans the window from the left edge to the
+   right edge (the bar itself is centred, so 50% − 50vw is the window's left edge). While it is open BuildingBar sets
+   --buildings-lift on the map: the camera chips and the corner stack (Notices, events, minimap) move up above it and the
+   Kingdom overview bar stacks above those. A buildings bar placed freely by the UI design keeps its own panel. */
+.buildings-bar:not([data-ui-free]) > .buildings-panel { left:calc(50% - 50vw); right:auto; width:100vw; max-width:none; border-left:0; border-right:0; border-radius:0; }

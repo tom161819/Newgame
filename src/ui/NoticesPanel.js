@@ -7,6 +7,7 @@ import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { element } from './objectLabels.js';
 import { noticeText } from './noticeText.js';
 import { NOTICE_BAR,NoticeBarState,readCollapsed,writeCollapsed,mergeNotices } from './noticeBar.js';
+import { NOTICE_POSITION,anchorPosition,resolvePosition,readPosition,writePosition,clearPosition,edgeTabLeft,fromDom } from './hudLayout.js';
 
 const MUTED_KEY='newgame.notices.muted';
 const readMuted=()=>{try{const list=JSON.parse(localStorage.getItem(MUTED_KEY)??'[]');return new Set(Array.isArray(list)?list.filter(c=>NOTICE_CATEGORIES.includes(c)):[]);}catch{return new Set();}};
@@ -41,6 +42,18 @@ export class NoticesPanel {
     // The one message of a peek: a click opens it like a row (the panel's click handler reads its data).
     this.peek=element('button','notices-peek');this.peek.type='button';this.peek.id='notices-peek';this.peek.hidden=true;
     this.title?.before(this.toggle);this.panel.prepend(this.tab);this.panel.append(this.peek);
+    // m-prehled-kralovstvi-pozice (owner comment 2): the grip (and the tab when slid away) drags the bar anywhere on the
+    // map; kept in this browser; a double-click on the grip puts it back in the corner.
+    this.grip=element('button','notices-grip','⠿');this.grip.type='button';this.grip.id='notices-grip';const drag=t('notice.drag');this.grip.title=drag;this.grip.setAttribute('aria-label',drag);this.toggle.before(this.grip);
+    this.position=readPosition();this.drag=null;this.justDragged=false;
+    for(const source of [this.grip,this.tab]){
+      source.addEventListener('pointerdown',event=>this.dragStart(event,source),options);source.addEventListener('pointermove',event=>this.dragMove(event),options);
+      for(const type of ['pointerup','pointercancel'])source.addEventListener(type,event=>this.dragEnd(event),options);
+    }
+    this.grip.addEventListener('dblclick',()=>this.resetPosition(),options);
+    // The click that ends a drag of the tab does not also slide the bar out.
+    this.panel.addEventListener('click',event=>{if(this.justDragged){this.justDragged=false;event.stopImmediatePropagation();event.preventDefault();}},{...options,capture:true});
+    document.addEventListener('hud-layout',()=>this.placeTab(),options);
     this.panel.addEventListener('pointerenter',()=>this.bar.hover(true,this.now()),options);
     this.panel.addEventListener('pointerleave',()=>{this.bar.hover(false,this.now());this.schedule();},options);
     // The side tabs (Policy / Population / Employments) are placed in JS on resize; the edge tab follows after them.
@@ -51,12 +64,44 @@ export class NoticesPanel {
   now(){return globalThis.performance?.now?.()??Date.now();}
   setCollapsed(value,{persist=true}={}){
     this.collapsed=this.bar.setCollapsed(value);this.panel.classList.toggle('collapsed',this.collapsed);this.title?.setAttribute('aria-expanded',String(!this.collapsed));
-    if(persist)writeCollapsed(this.collapsed);this.drawPeek();this.drawToggle();this.placeTab();
+    if(persist)writeCollapsed(this.collapsed);this.drawPeek();this.drawToggle();this.placeTab();this.layoutChanged();
+  }
+  layoutChanged(){document.dispatchEvent?.(new CustomEvent('hud-layout'));}
+  view(){return fromDom((this.panel.closest('.viewport')??document.documentElement).getBoundingClientRect());}
+  dragStart(event,source){
+    if(event.button!==0||this.panel.hidden)return;const r=(this.collapsed&&!this.panel.classList.contains('peeking')&&!this.position?source:this.panel).getBoundingClientRect();
+    this.drag={id:event.pointerId,x:event.clientX,y:event.clientY,left:r.left,top:r.top,width:r.width,height:r.height,moved:false};source.setPointerCapture?.(event.pointerId);
+  }
+  dragMove(event){
+    const d=this.drag;if(!d||event.pointerId!==d.id)return;const dx=event.clientX-d.x,dy=event.clientY-d.y;
+    if(!d.moved){if(Math.hypot(dx,dy)<NOTICE_POSITION.threshold)return;d.moved=true;this.panel.classList.add('dragging');}
+    const left=d.left+dx,top=d.top+dy;this.position=anchorPosition({left,top,right:left+d.width,bottom:top+d.height},this.view());this.applyPosition();
+  }
+  dragEnd(event){
+    const d=this.drag;if(!d||event.pointerId!==d.id)return;this.drag=null;if(!d.moved)return;
+    this.panel.classList.remove('dragging');writePosition(this.position);this.justDragged=true;setTimeout(()=>{this.justDragged=false;},0);this.placeTab();this.layoutChanged();
+  }
+  resetPosition(){this.position=null;clearPosition();this.applyPosition();this.placeTab();this.layoutChanged();}
+  // A moved bar: fixed at its kept place (clamped on screen); slid away it folds to the nearer side edge of the map. With
+  // a free frame from the UI design (data-ui-free), the design's frame stays the base and the drag is an offset from it.
+  applyPosition(){
+    const p=this.panel,pos=this.position,st=p.style;
+    if(!pos){p.classList.remove('notices-moved','edge-left','edge-right','dragging');for(const k of ['--notices-left','--notices-top','translate'])st.removeProperty(k);return;}
+    const view=this.view();
+    if(p.hasAttribute('data-ui-free')){
+      p.classList.remove('notices-moved','edge-left','edge-right');st.removeProperty('translate');const r=p.getBoundingClientRect();if(!r.width)return;
+      const box=resolvePosition(pos,{width:r.width,height:r.height},view);st.setProperty('translate',`${Math.round(box.left-r.left)}px ${Math.round(box.top-r.top)}px`);return;
+    }
+    const edge=this.collapsed&&!this.drag?.moved;p.classList.add('notices-moved');p.classList.toggle('edge-left',edge&&pos.ax==='left');p.classList.toggle('edge-right',edge&&pos.ax!=='left');
+    const size={width:p.offsetWidth,height:p.offsetHeight},box=resolvePosition(pos,size,view);let left=box.left;
+    if(edge){const sides=[...document.querySelectorAll('.population-tab')].map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.height);left=edgeTabLeft(pos.ax,view,{width:size.width,top:box.top,height:size.height},sides);}
+    st.setProperty('--notices-left',`${left}px`);st.setProperty('--notices-top',`${box.top}px`);
   }
   // Slid away, the tab's right side sits at the game view's right edge (not past it: the panel border is counted) –
   // unless a side tab (Policy / Population / Employments, fixed at the right edge) is at the same height: then it sits
   // just left of the side tabs so neither covers the other (small window heights). Peeking it stays next to the peek.
   placeTab(){
+    if(this.position){this.tab.style.removeProperty('--notices-tab-shift');this.applyPosition();return;}
     const tab=this.tab,stack=this.panel.parentElement;if(!stack||tab.hidden||this.panel.hidden||!this.collapsed){tab.style.removeProperty('--notices-tab-shift');return;}
     const panel=this.panel.getBoundingClientRect(),view=(this.panel.closest('.viewport')??stack).getBoundingClientRect();if(!panel.height)return;
     // Slid away the panel's left side is at the corner stack's right + 12 px (the CSS translate); the tab's right side
@@ -69,6 +114,7 @@ export class NoticesPanel {
   }
   drawToggle(){
     const unread=this.bar.unread,alert=this.bar.alert;
+    const drag=t('notice.drag');if(this.grip&&this.grip.title!==drag){this.grip.title=drag;this.grip.setAttribute('aria-label',drag);}
     this.toggle.textContent='▸';const fold=t('notice.collapse');this.toggle.title=fold;this.toggle.setAttribute('aria-label',fold);this.toggle.setAttribute('aria-expanded',String(!this.collapsed));
     this.tab.replaceChildren(element('span','notices-tab-arrow','◂'));this.tab.classList.toggle('has-unread',alert);this.tab.hidden=!this.collapsed;this.tab.setAttribute('aria-expanded',String(!this.collapsed));
     if(alert)this.tab.append(element('span','notices-alert','!'),element('span','notices-unread',unread>9?'9+':String(unread)));

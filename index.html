@@ -86,7 +86,7 @@
             <span class="inventory-label" data-i18n="hud.inventory">Inventář</span>
             <div id="inventory-items"></div>
             <div class="hud-left-slot">
-            <div id="kingdom-overview" class="kingdom-overview" tabindex="0" role="button" aria-describedby="kingdom-overview-panel"><span id="overview-population" class="overview-chip"></span><span id="overview-unemployed" class="overview-chip"></span><span id="overview-mood" class="overview-chip"></span><div id="kingdom-overview-panel" class="kingdom-overview-panel" role="tooltip" hidden></div></div>
+            <div id="kingdom-overview" class="kingdom-overview" tabindex="0" role="button" aria-controls="kingdom-bar-body" aria-expanded="true"><span id="overview-population" class="overview-chip"></span><span id="overview-unemployed" class="overview-chip"></span><span id="overview-mood" class="overview-chip"></span></div>
             <button id="king-cargo-deliver" type="button" hidden><b aria-hidden="true">⇥</b> <span data-i18n="hud.deliverCargo">Deliver to storage</span></button>
             <span id="king-cargo-status" hidden></span>
             </div>
@@ -117,6 +117,7 @@
         </section>
         <div id="game" aria-label="Izometrická herní mapa 100 × 100 políček" data-i18n-attr="aria-label:hud.map"></div>
         <div id="corner-stack" class="corner-stack"><aside id="notices-panel" class="notices-panel" aria-labelledby="notices-title" hidden><div class="notices-heading"><h2 id="notices-title" data-i18n="notice.title">Notices</h2><span id="notices-filters" class="notices-filters" role="group" aria-label="Notice categories" data-i18n-attr="aria-label:notice.categories"></span></div><ul id="notices-list" class="notices-list" aria-live="polite"></ul></aside></div>
+        <section id="kingdom-bar" class="kingdom-bar" aria-labelledby="kingdom-bar-title" hidden><button id="kingdom-bar-toggle" class="kingdom-bar-toggle" type="button" aria-expanded="true" aria-controls="kingdom-bar-body"><span id="kingdom-bar-title" class="kingdom-bar-title" data-i18n="overview.title">Kingdom overview</span><span id="kingdom-bar-summary" class="kingdom-bar-summary"></span><span class="kingdom-bar-arrow" aria-hidden="true">▾</span></button><div id="kingdom-bar-body" class="kingdom-bar-body"></div></section>
         <div class="camera-controls"><span id="path-wear-info" hidden></span><span id="fps-overlay" class="fps-overlay" role="status" hidden></span><button id="dismount" type="button" hidden data-i18n="hud.dismount">Dismount · H</button><button id="follow-king" type="button" data-i18n="hud.followKing">Na krále · mezerník</button></div>
       </div>
       <div class="status-row"><p id="status" role="status">Vyber kámen nebo volné políčko.</p><footer><span data-i18n="hud.controls">WASD / šipky: kamera · kolečko: zoom</span></footer></div>
