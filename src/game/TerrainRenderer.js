@@ -173,9 +173,13 @@ export class TerrainRenderer {
   setShoreStyle(style){if(!['round','edges'].includes(style)||style===this.shoreStyle)return false;this.shoreStyle=style;this.dirtyTiles.clear();for(let y=0;y<ROWS/CHUNK_SIZE;y++)for(let x=0;x<COLUMNS/CHUNK_SIZE;x++)this.dirtyChunks.add(`${x},${y}`);this.lastView='';return true;}
   // Developer switch (console mkDev.setGroundStyle('tiles'|'continuous')).
   setGroundStyle(style){if(!['tiles','continuous'].includes(style)||style===this.groundStyle)return false;this.groundStyle=style;this.repaintEverything();return true;}
+  // Remembered ground brightness: one value for all remembered land (the player's Memory brightness). The light
+  // brightening at the sight edge (fog.brightness) moved with every step, so a tile's picture depended on when it was
+  // painted; the soft edge itself is FogEdgeLayer's gradient. Owner 9 Nov: fog patches stay equal to a full repaint.
+  memoryFactor(){return this.fog?.memoryBrightness??FOG_STYLE.brightness;}
   greyRemembered(context,cx,cy,left,top){
     const W=context.canvas.width,H=context.canvas.height,x0=cx*CHUNK_SIZE,y0=cy*CHUNK_SIZE,factor=new Float32Array(CHUNK_SIZE*CHUNK_SIZE),sat=FOG_STYLE.saturation;
-    for(let y=0;y<CHUNK_SIZE;y++)for(let x=0;x<CHUNK_SIZE;x++){const t={x:x0+x,y:y0+y};if(this.fog?.displayState(t)===VISIBILITY.EXPLORED)factor[y*CHUNK_SIZE+x]=this.fog.brightness?.(t)??FOG_STYLE.brightness;}
+    for(let y=0;y<CHUNK_SIZE;y++)for(let x=0;x<CHUNK_SIZE;x++){const t={x:x0+x,y:y0+y};if(this.fog?.displayState(t)===VISIBILITY.EXPLORED)factor[y*CHUNK_SIZE+x]=this.memoryFactor();}
     const image=context.getImageData(0,0,W,H),d=image.data,hw=TILE_WIDTH/2,hh=TILE_HEIGHT/2;
     // performance-1: the pixel → tile rule is fixed per chunk, so it is computed once and kept (same pixels as before).
     const mapKey=`${cx},${cy}`,maps=this.greyMaps??=new Map();let tileOf=maps.get(mapKey);
@@ -510,12 +514,16 @@ export class TerrainRenderer {
         // performance-1: a change of the trodden paths alone (25 walking residents) repaints one chunk's ground (~40 ms
         // without GPU) at most every GROUND_PATH_GAP_MS; seasons and buildings keep the one-a-frame rule.
         const pathOnly=cached&&cached.stamp!==groundStamp&&cached.stamp.split('|').filter((_,i)=>i!==2).join('|')===groundStamp.split('|').filter((_,i)=>i!==2).join('|');
-        const throttled=cached&&cached.stamp!==groundStamp&&(!(this.groundPaintsLeft>0)||pathOnly&&performance.now()<(this.nextPathPaint??0))&&this.chunks.has(`${cx},${cy}`);
+        const throttled=cached&&cached.stamp!==groundStamp&&(this.fogOnlyPass||!(this.groundPaintsLeft>0)||pathOnly&&performance.now()<(this.nextPathPaint??0))&&this.chunks.has(`${cx},${cy}`);
         // Fog fix (owner, report 0.83): a chunk where ground is seen for the first time must show it at once. When its
         // ground is due for a repaint that has to wait (one a frame, path wear every GROUND_PATH_GAP_MS), the fog is
         // still redrawn now over the previous ground picture; the chunk stays dirty and its ground follows in its turn.
         // Before, the whole repaint waited, so newly seen land stayed black (and remembered land flat grey) for seconds.
-        if(throttled&&!this.paintingUrgent)return { key, x: left, y: origin.y, painted:false };
+        // Owner 9 Nov ("když odcházím dělá viditelné čtverce za dosahem"): land that left sight must turn remembered
+        // promptly too, not wait for the ground's turn. Any chunk whose fog changed redraws its fog over the previous
+        // ground; a chunk with nothing new for the fog keeps its picture until its ground repaint.
+        const fogChanged=this.fogDirty?.has(`${cx},${cy}`);
+        if(throttled&&!this.paintingUrgent&&!fogChanged)return { key, x: left, y: origin.y, painted:false };
         staleGround=!!throttled;
         if(pathOnly&&!staleGround)this.nextPathPaint=performance.now()+GROUND_PATH_GAP_MS;
       }
@@ -600,13 +608,18 @@ export class TerrainRenderer {
       // painted with (bleed included), so no light or dark lines show along tile or chunk edges.
       if(continuous&&Object.keys(remembered).length)this.greyRemembered(context,cx,cy,left,origin.y);
       // Continuous ground: paths are part of the cached ground (pathSurface), no tile overlays.
-      if(this.pathStyle==='v2'&&this.v2&&!continuous)this.v2.drawChunk(context,cx,cy,left,origin.y,paths);
+      // Owner 9 Nov ("proč tam jsou zase kolečka jako z prvních verzí?"): on continuous ground the paths are painted in
+      // the ground itself (pathSurface). Since 0.77 this chain fell through to the old N12 tile overlay (a circle per
+      // worn tile, straight links, flat fills), drawn on top of the V3 paths: that was the circles and lines.
+      if(continuous){/* paths are part of the cached ground; `paths` is still used for pavement below */}
+      else if(this.pathStyle==='v2'&&this.v2)this.v2.drawChunk(context,cx,cy,left,origin.y,paths);
       else for(const p of paths){context.save();p.polygon(TILE_BLEED);context.clip();context.filter=p.filter;this.drawPaths(context,p.x,p.y,left,origin.y,p.veil,()=>{p.polygon();context.clip();});context.restore();}
       // S11 Stone Pavement on top of ground and tracks; under Fog of War only the remembered surface is drawn.
       for(const p of paths){const paved=tile=>this.tileData(tile)[4]===1;if(!paved(p))continue;const c=tileCenter(p);context.save();context.filter=p.filter;
         drawCobbles(context,c.x-left,c.y-origin.y,{tileX:p.x,tileY:p.y,winter:p.veil>.3,edges:{N:!paved({x:p.x-1,y:p.y}),E:!paved({x:p.x,y:p.y-1}),S:!paved({x:p.x+1,y:p.y}),W:!paved({x:p.x,y:p.y+1})}});context.restore();}
       texture.refresh();
       this.paintStats.chunks++;
+      this.fogDirty?.delete(`${cx},${cy}`);
       // A fog-only repaint over a stale ground picture keeps the chunk dirty: its ground repaints in its turn.
       if(!staleGround){this.dirtyChunks.delete(`${cx},${cy}`);this.dirtyTiles.delete(`${cx},${cy}`);}
       return { key, x: left, y: origin.y, painted:true };
@@ -714,18 +727,74 @@ export class TerrainRenderer {
       // Consumers may skip revisions (Save, several source updates, a paused
       // frame). Compare against what this renderer actually painted, rather
       // than the last producer delta, which may already have been overwritten.
-      const changed=[...previous].filter(index=>!current.has(index));
+      const changed=[...previous].filter(index=>!current.has(index)),firstSeen=[];
       // performance-1: a chunk where ground is seen for the first time is repainted at once (never a black hole in
       // sight); other fog changes take their turn in repaintDirty.
       const known=this.knownTiles?.length===fog.explored?.length?this.knownTiles:this.knownTiles=Uint8Array.from(fog.explored??[]);
-      for(const index of current)if(!previous.has(index)){changed.push(index);if(!known[index]){known[index]=1;const urgent=this.urgentChunks??=new Set(),x=index%fog.width,y=Math.floor(index/fog.width);
+      for(const index of current)if(!previous.has(index)){changed.push(index);if(!known[index]){known[index]=1;firstSeen.push(index);const urgent=this.urgentChunks??=new Set(),x=index%fog.width,y=Math.floor(index/fog.width);
         // The tile's chunk and the chunks whose edge ring (plants reaching over the edge) covers it.
         for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx>=0&&ny>=0&&nx<fog.width&&ny<fog.height)urgent.add(`${Math.floor(nx/CHUNK_SIZE)},${Math.floor(ny/CHUNK_SIZE)}`);}}}
       this.paintedVisibility=new Set(current);this.fogRevision=fog.revision;
-      if(fog.enabled)this.invalidateArea(changed.map(index=>({x:index%fog.width,y:Math.floor(index/fog.width)})),this.groundStyle==='continuous');
+      if(fog.enabled){
+        const tileAt=index=>({x:index%fog.width,y:Math.floor(index/fog.width)});
+        // Owner 9 Nov ("když odcházím dělá viditelné čtverce za dosahem"): continuous ground. Land entering or leaving
+        // sight that was seen before only changes between full colour and the remembered grey of its own tiles, so
+        // those tiles are patched in the chunk picture this frame from the cached ground (fogPatch, a fraction of a
+        // millisecond), instead of the chunk waiting its turn for a full repaint (seconds with many residents moving).
+        // Land seen for the first time, and tiles beside unknown land or pavement, still repaint the chunk.
+        let repaint=changed;
+        if(this.groundStyle==='continuous'){
+          const first=new Set(firstSeen),patch=this.fogPatch??=new Map();repaint=[];
+          for(const index of changed){
+            const t=tileAt(index);
+            if(first.has(index)||!this.patchableTile(t,fog)){repaint.push(index);continue;}
+            const key=`${Math.floor(t.x/CHUNK_SIZE)},${Math.floor(t.y/CHUNK_SIZE)}`;if(!patch.has(key))patch.set(key,new Set());patch.get(key).add(index);
+          }
+        }
+        if(repaint.length)this.invalidateArea(repaint.map(tileAt),this.groundStyle==='continuous');
+        // Chunks whose fog picture changed (own tiles or their edge ring), for the fog-over-stale-ground repaint.
+        const fogDirty=this.fogDirty??=new Set();
+        for(const index of repaint){const x=index%fog.width,y=Math.floor(index/fog.width);for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=x+dx,ny=y+dy;if(nx>=0&&ny>=0&&nx<fog.width&&ny<fog.height)fogDirty.add(`${Math.floor(nx/CHUNK_SIZE)},${Math.floor(ny/CHUNK_SIZE)}`);}}
+      }
     }
   }
 
+  // A tile whose fog change can be patched: explored, with all eight neighbours explored (no black edge bleeds into it)
+  // and no pavement around (cobbles are drawn over the cached ground).
+  patchableTile(t,fog){
+    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const x=t.x+dx,y=t.y+dy;if(x<0||y<0||x>=fog.width||y>=fog.height)continue;
+      if(!fog.explored[y*fog.width+x])return false;if(this.tileData({x,y})?.[4]===1)return false;}
+    return true;
+  }
+  // Applies the queued fog patches: per pixel the same rule as greyRemembered (the pixel's tile, clamped to the chunk),
+  // from the cached ground; pixels of an unknown neighbour tile (the black edge ring) are left as they are.
+  applyFogPatches(){
+    const patches=this.fogPatch;if(!patches?.size)return;this.fogPatch=new Map();
+    const sat=FOG_STYLE.saturation,hw=TILE_WIDTH/2,hh=TILE_HEIGHT/2,fog=this.fog;
+    for(const [key,indices] of patches){
+      const [cx,cy]=key.split(',').map(Number),cached=this.groundCache?.get(key),tex=`terrain-chunk-${cx}-${cy}`;
+      if(!cached||!this.scene.textures.exists(tex)||!fog){this.dirtyChunks.add(key);continue;}
+      const texture=this.scene.textures.get(tex),context=texture.getContext(),W=context.canvas.width,H=context.canvas.height;
+      const origin=gridToWorld(cx*CHUNK_SIZE,cy*CHUNK_SIZE),left=origin.x-CHUNK_SIZE*32,top=origin.y,x0=cx*CHUNK_SIZE,y0=cy*CHUNK_SIZE;
+      let bx0=W,by0=H,bx1=0,by1=0;const states=new Map();
+      for(const index of indices){const t={x:index%fog.width,y:Math.floor(index/fog.width)},p=tileCenter(t),px=p.x-left,py=p.y-top;
+        // Edge tiles also own the clamped ring pixels beyond the chunk edge (as in greyRemembered).
+        const ex=t.x===x0||t.x===x0+CHUNK_SIZE-1||t.y===y0||t.y===y0+CHUNK_SIZE-1?40:0;
+        bx0=Math.min(bx0,px-34-ex);bx1=Math.max(bx1,px+34+ex);by0=Math.min(by0,py-18-ex/2);by1=Math.max(by1,py+18+ex/2);
+        const state=fog.displayState(t);states.set((t.y-y0)*CHUNK_SIZE+(t.x-x0),state===VISIBILITY.EXPLORED?this.memoryFactor():state===VISIBILITY.VISIBLE?0:-1);}
+      bx0=Math.max(0,Math.floor(bx0));by0=Math.max(0,Math.floor(by0));bx1=Math.min(W,Math.ceil(bx1));by1=Math.min(H,Math.ceil(by1));const bw=bx1-bx0,bh=by1-by0;if(bw<=0||bh<=0)continue;
+      const src=cached.canvas.getContext('2d').getImageData(bx0,by0,bw,bh).data,image=context.getImageData(bx0,by0,bw,bh),d=image.data;
+      for(let y=0;y<bh;y++){const vert=(y+by0+top-ORIGIN.y)/hh;for(let x=0;x<bw;x++){
+        const hor=(x+bx0+left-ORIGIN.x)/hw,tx=Math.floor((vert+hor)/2),ty=Math.floor((vert-hor)/2);
+        const lx=Math.min(CHUNK_SIZE-1,Math.max(0,tx-x0)),ly=Math.min(CHUNK_SIZE-1,Math.max(0,ty-y0)),f=states.get(ly*CHUNK_SIZE+lx);if(f===undefined||f<0)continue;
+        if((tx!==x0+lx||ty!==y0+ly)&&(tx<0||ty<0||tx>=COLUMNS||ty>=ROWS||fog.displayState({x:tx,y:ty})===VISIBILITY.UNEXPLORED))continue;
+        const o=(y*bw+x)*4;if(!src[o+3])continue;const r=src[o],g=src[o+1],b=src[o+2];
+        if(f===0){d[o]=r;d[o+1]=g;d[o+2]=b;d[o+3]=src[o+3];continue;}
+        const l=.3*r+.59*g+.11*b;d[o]=(l+(r-l)*sat)*f;d[o+1]=(l+(g-l)*sat)*f;d[o+2]=(l+(b-l)*sat)*f;d[o+3]=src[o+3];
+      }}
+      context.putImageData(image,bx0,by0);texture.refresh();this.composite?.touch(key);this.paintStats.patches=(this.paintStats.patches??0)+indices.size;
+    }
+  }
   // Performance: a newly visible chunk is painted at once (never a hole); already shown chunks that became dirty
   // (fog, path wear, pavement, season) repaint at most two per frame, so a wave of changes never freezes a frame.
   repaintDirty(){
@@ -737,12 +806,19 @@ export class TerrainRenderer {
       const [cx,cy] = key.split(',').map(Number);this.paintingUrgent=urgentPaint;let texture;try{texture=this.chunkTexture(cx,cy);}finally{this.paintingUrgent=false;}
       const image = this.chunks.get(key)??this.chunkPool.pop() ?? this.scene.add.image(0,0,texture.key).setOrigin(0,0).setDepth(-100);
       image.setTexture(texture.key).setPosition(texture.x,texture.y).setVisible(true);
-      this.chunks.set(key,image);const done=!this.dirtyChunks.has(key);if(done||texture.painted)this.composite?.touch(key);return done;
+      this.chunks.set(key,image);const done=!this.dirtyChunks.has(key);if(done||texture.painted)this.composite?.touch(key);return done||!!texture.painted;
     };
     for (const key of this.neededChunks??[]) {
       const shown=this.chunks.has(key);if(shown&&!this.dirtyChunks.has(key))continue;if(!shown||urgent?.has(key)){paint(key,true);continue;}waiting.push(key);
     }
-    urgent?.clear();if(!all&&this.groundStyle==='continuous')budget=performance.now()<(this.nextFogPaint??0)?0:REPAINT_PER_FRAME;
+    urgent?.clear();
+    this.applyFogPatches();
+    // Land beside unknown ground or pavement (not patchable) redraws its fog over the previous ground picture, two
+    // chunks a frame ahead of the ground queue (0.2–4 ms each).
+    if(!all&&this.groundStyle==='continuous'&&this.fogDirty?.size){let fogPaints=2;
+      for(let i=0;i<waiting.length&&fogPaints>0;i++){const key=waiting[i];if(!this.fogDirty.has(key)||!this.groundCache?.has(key))continue;
+        this.fogOnlyPass=true;try{paint(key,true);}finally{this.fogOnlyPass=false;}fogPaints--;if(!this.dirtyChunks.has(key)){waiting.splice(i,1);i--;}}}
+    if(!all&&this.groundStyle==='continuous')budget=performance.now()<(this.nextFogPaint??0)?0:REPAINT_PER_FRAME;
     // A chunk repainted in the last REPAINT_GAP_MS waits (its fog edge catches up a moment later), so the cost stays
     // bounded per second however high the frame rate or however many residents walk at the edge of sight.
     const order=this.paintOrder??=new Map(),painted=this.paintedAt??=new Map(),started=all?0:performance.now();if(!all)waiting.sort((a,b)=>(order.get(a)??0)-(order.get(b)??0));
@@ -760,7 +836,11 @@ export class TerrainRenderer {
     // tile runs when the camera moves, the Fog mode changes, or a newly seen rock has no sprite yet.
     if (cacheKey === this.lastView && fog && this.outcropFogRevision!==fog.revision) {
       const fresh=this.outcropFogRevision===fog.revision-1;this.outcropFogRevision=fog.revision;
-      if(fresh)for(const index of [...fog.added,...fog.removed]){const x=index%fog.width,y=Math.floor(index/fog.width),key=`${x},${y}`;if(!this.tileData({x,y})[0])continue;
+      if(fresh)for(const index of [...fog.added,...fog.removed]){const x=index%fog.width,y=Math.floor(index/fog.width),key=`${x},${y}`;
+        // Owner 9 Nov: a bush that left sight takes its remembered look at once too (only rocks were re-tinted, so with
+        // the camera still a bush stayed in full colour beyond the sight).
+        const bushSprite=this.bushSprites.get(key);if(bushSprite?.visible){const bush=this.scene.bushes?.get(key);if(bush!==undefined){const state=fog.displayState({x,y}),painted=this.paintBush(bushSprite,bush,state,fog,x,y);if(painted&&painted!=='nature'){const d=this.registry.get?.(BUSH_TYPES[bush]);bushSprite.setOrigin(d?.origin?.x??.5,d?.origin?.y??.6);}}}
+        if(!this.tileData({x,y})[0]){const group=this.groupCover?.get(key);if(group){const sprite=this.groupSprites.get(groupKey(group));if(sprite)this.paintGroup(sprite,group,fog);}continue;}
         const group=this.groupCover.get(key);if(group){const sprite=this.groupSprites.get(groupKey(group));if(sprite)this.paintGroup(sprite,group,fog);continue;}
         const tile=this.tiles.get(key);if(!tile){if(fog.added.includes(index)){this.lastView='';break;}continue;}this.paintWall(tile,fog.displayState({x,y}),fog);}
       else this.lastView='';

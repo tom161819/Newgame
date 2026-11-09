@@ -13,6 +13,18 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - The Buildings menu now opens across the whole width of the window, from the left edge to the right edge. While it is open, the Kingdom overview, "Follow the king" and the minimap with Notices move up above it.
 - The Notices bar can be dragged anywhere on the map by its grip (⠿). The browser remembers its place and keeps it on screen when the window size changes. Double-click the grip to put it back in the corner. Slid away, a moved bar folds to the nearer side edge of the map, and its "!" tab stays there.
 
+## [0.84.2] - 2026-11-09
+<!-- version: {"title":"The starter stockpile has its approved Studio look: a tarp camp store with sacks, barrels, logs, crates and a lantern.","type":"feature","reconstructed":false,"saveVersion":61} -->
+### Changed
+- The starter stockpile has its approved Studio look: a tarp camp store with sacks, barrels, logs, crates and a lantern. It was approved on 7 Nov but never wired in.
+
+## [0.84.1] - 2026-11-09
+<!-- version: {"title":"Fog of War: land you walk away from turns grey right away.","type":"fix","reconstructed":false,"saveVersion":61} -->
+### Fixed
+- Fog of War: land you walk away from turns grey right away. It no longer stays in full colour for seconds as squares beyond your sight.
+- Bushes that leave sight take their remembered look at once.
+- Remembered ground has one even brightness. The soft edge comes from the fog edge layer.
+
 ## [0.84.0] - 2026-11-09
 <!-- version: {"title":"Woodcutters and forests, iron mine spot, tips off the HUD","type":"feature","reconstructed":false,"saveVersion":61} -->
 ### Added
