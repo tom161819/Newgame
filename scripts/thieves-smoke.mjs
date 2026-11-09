@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 export async function thievesSmoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);
   try{
-    await page.goto(url);await page.evaluate(()=>localStorage.setItem('newgame.nightSpeed','1'));await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW3-155515555555-1');await page.locator('#start-game').click();
+    await page.goto(url);await page.evaluate(()=>localStorage.setItem('newgame.nightSpeed','1'));await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW4-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.nightThreats);
     await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
     const start=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,g=s.gameTime,n=s.nightThreats;n.started=()=>true;/* E1: threats begin later in a real game */g.update(g.dayDuration*(s.dayNight.nightStart()+.01)-g.elapsed);

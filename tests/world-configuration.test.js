@@ -20,8 +20,8 @@ const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} != ${b}`);
 
 test('advanced central defaults validate all fields, including the four starting resources, and reject malformed day, toggle, gold and respawn settings',()=>{
   assert.deepEqual(DEFAULT_GAME_SETTINGS,{difficulty:'normal',wildlifePopulation:'normal',treasureCount:1,initialStoneCount:30,fogOfWar:true,explorationMode:true,seasonsEnabled:true,startingCastle:false,dayLengthSeconds:120,wildlifeRespawn:'normal',startingGold:0,startingStone:0,startingWood:0,startingIronOre:0,startingBread:0,autoEmployment:true,worldCode:null,nightWolves:true,nightThieves:true,nightFires:true,startingGarrison:false});
-  for(const bad of [null,[],42,{worldCode:'MKW3-1-1'},{worldCode:'mkw3-155515555555-abc'},{worldCode:'MKW0-155515555555-ABC'},{fogOfWar:'true'},{autoEmployment:'yes'},{startingCastle:1},{startingGarrison:'yes'},{dayLengthSeconds:0},{dayLengthSeconds:90},{wildlifeRespawn:'bad'},{startingGold:-25},{startingGold:501},{startingGold:1}])assert.throws(()=>gameSettings(bad));
-  assert.doesNotThrow(()=>gameSettings({startingGold:500,dayLengthSeconds:240,wildlifeRespawn:'off',startingCastle:true,fogOfWar:false,worldCode:'MKW3-155515555555-7KQ9X2'}));
+  for(const bad of [null,[],42,{worldCode:'MKW4-1-1'},{worldCode:'mkw4-155515555555-abc'},{worldCode:'MKW0-155515555555-ABC'},{fogOfWar:'true'},{autoEmployment:'yes'},{startingCastle:1},{startingGarrison:'yes'},{dayLengthSeconds:0},{dayLengthSeconds:90},{wildlifeRespawn:'bad'},{startingGold:-25},{startingGold:501},{startingGold:1}])assert.throws(()=>gameSettings(bad));
+  assert.doesNotThrow(()=>gameSettings({startingGold:500,dayLengthSeconds:240,wildlifeRespawn:'off',startingCastle:true,fogOfWar:false,worldCode:'MKW4-155515555555-7KQ9X2'}));
   // m-kamenolom-u-hradu: a saved game keeps the code of the generator it was made with (New Game refuses old codes elsewhere).
   assert.equal(gameSettings({worldCode:'MKW2-155515555555-7KQ9X2'}).worldCode,'MKW2-155515555555-7KQ9X2');
 });

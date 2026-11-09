@@ -13,7 +13,8 @@ import { GROUND, GROUND_TERRAIN_IDS, BUSH_TYPES, GRASS_ZONE } from '../data/worl
 import { PathV2Layer } from './PathV2Layer.js';
 import { APPROVED_DEPLOY_ART } from '../data/objects/approvedDeployArt.js';
 import { requestTexture } from './deployArt.js';
-import { natureReady,showNature,outcropLook,bushLook } from './natureArt.js';
+import { natureReady,showNature,outcropLook,bushLook,thicketLook,rockGroupLook } from './natureArt.js';
+import { groupTiles,groupKey,groupFront,pruneNatureGroups } from './natureGroups.js';
 import { paintContinuousGround, makeWaterField, plantsFor, waterObjectsFor, drawPlant, seasonOf } from '../render/continuousGround.js';
 import { groundSettings } from '../data/groundLook.js';
 import { GroundComposite } from './GroundComposite.js';
@@ -88,6 +89,8 @@ export class TerrainRenderer {
     this.seasonGrass=Object.fromEntries(Object.entries(grass?.seasonVariants??{}).map(([season,list])=>[season,list.map((_,i)=>`season-${season}-${i}`).filter(layer=>assets?.hasTexture(grass.id,layer)).map(layer=>assets.key(grass.id,layer))]).filter(([,keys])=>keys.length));
     this.groundKinds=GROUND_TERRAIN_IDS.map((id,code)=>code===GROUND.GRASS?null:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer)));
     this.bushSprites=new Map();this.bushPool=[];
+    // velke-prirodni-objekty: one sprite per thicket or rock group (groupKey → image); tile key → group drawn now.
+    this.groupSprites=new Map();this.groupPool=[];this.groupCover=new Map();
     // #116: paths are drawn by the V2 renderer (the owner's pesinav2 style); N12 stays as a developer fallback.
     this.pathStyle='v2';this.shoreStyle='round';this.groundStyle='continuous';this.v2=new PathV2Layer(this);this.requestGroundArt();
     this.wearTextures=PATH_WEAR.terrainIds.map(id=>({key:assets?.hasTexture(id)?assets.textureKey(id):this.groundTextures[0].key,variants:(registry.get?.(id)?.spriteVariants??[]).map((_,i)=>`variant-${i}`).filter(layer=>assets?.hasTexture(id,layer)).map(layer=>assets.key(id,layer))}));
@@ -618,6 +621,40 @@ export class TerrainRenderer {
     if(wall.texture.key!==key)wall.setTexture(key);
   }
   natureArtReady(){return natureReady(this.scene,()=>{this.lastView='';});}
+  // velke-prirodni-objekty: thickets and rock groups in view, each drawn as one approved sprite placed on its footprint
+  // centre (the Studio anchor) and sorted by its front tile. A group is drawn only while every tile is known and its
+  // parts show (a bush under a building or a worn path does not), else its parts are drawn one by one as before.
+  // Returns tile key → group for the tiles it covers.
+  paintNatureGroups(minX,maxX,minY,maxY,fog){
+    const covered=new Map(),shown=new Set(),groups=this.scene.natureGroups;
+    if(groups?.length&&this.natureArtReady()){
+      pruneNatureGroups(this.scene);let occupied=null;
+      for(const g of groups){
+        if(g.x+g.w-1<minX||g.x>maxX||g.y+g.h-1<minY||g.y>maxY)continue;
+        const tiles=groupTiles(g);let ok=true;
+        for(const t of tiles){
+          const state=fog?.displayState(t)??VISIBILITY.VISIBLE;
+          if(state===VISIBILITY.UNEXPLORED||fog?.enabled&&!fog.isInSightTile(t)&&!fog.explored[t.y*fog.width+t.x]){ok=false;break;}
+          if(g.kind==='rocks'?!this.tileData(t)[0]:!this.bushVisible(t.x,t.y,occupied??=this.buildingTiles())){ok=false;break;}
+        }
+        if(!ok)continue;
+        const key=groupKey(g),sprite=this.groupSprites.get(key)??this.groupPool.pop()??this.scene.add.image(0,0,'__WHITE');
+        if(!this.paintGroup(sprite,g,fog)){sprite.setVisible(false);this.groupPool.push(sprite);this.groupSprites.delete(key);continue;}
+        const centre=gridToWorld(g.x+g.w/2,g.y+g.h/2),front=tileCenter(groupFront(g));
+        const offset=g.kind==='rocks'?this.outcrop.depth?.offset??0:this.registry.get?.('bush_meadow')?.depth?.offset??0;
+        sprite.setPosition(centre.x,centre.y).setDepth(front.y+offset).setVisible(true);sprite.natureGroup=g;
+        this.groupSprites.set(key,sprite);shown.add(key);for(const t of tiles)covered.set(`${t.x},${t.y}`,g);
+      }
+    }
+    for(const [key,sprite]of this.groupSprites)if(!shown.has(key)){sprite.setVisible(false);this.groupPool.push(sprite);this.groupSprites.delete(key);}
+    this.groupCover=covered;return covered;
+  }
+  // The look for the season; the remembered (darker) look while no tile of the group is in sight.
+  paintGroup(sprite,g,fog){
+    const tiles=groupTiles(g),visible=!fog||tiles.some(t=>fog.displayState(t)===VISIBILITY.VISIBLE);
+    const look=g.kind==='rocks'?rockGroupLook(g,this.season):thicketLook(g,tiles.map(t=>BUSH_TYPES[this.scene.bushes?.get(`${t.x},${t.y}`)]),this.season);
+    return !!look&&showNature(this.scene,sprite,look,{remembered:!visible,brightness:fog?.memoryBrightness});
+  }
   updateFog(camera,fog) {
     const mode=`${fog?.enabled}:${fog?.explorationEnabled}`;
     if(mode!==this.fogMode){
@@ -681,6 +718,7 @@ export class TerrainRenderer {
     if (cacheKey === this.lastView && fog && this.outcropFogRevision!==fog.revision) {
       const fresh=this.outcropFogRevision===fog.revision-1;this.outcropFogRevision=fog.revision;
       if(fresh)for(const index of [...fog.added,...fog.removed]){const x=index%fog.width,y=Math.floor(index/fog.width),key=`${x},${y}`;if(!this.tileData({x,y})[0])continue;
+        const group=this.groupCover.get(key);if(group){const sprite=this.groupSprites.get(groupKey(group));if(sprite)this.paintGroup(sprite,group,fog);continue;}
         const tile=this.tiles.get(key);if(!tile){if(fog.added.includes(index)){this.lastView='';break;}continue;}this.paintWall(tile,fog.displayState({x,y}),fog);}
       else this.lastView='';
     }
@@ -696,6 +734,7 @@ export class TerrainRenderer {
     const minY=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.y)))-1);
     const maxY=Math.min(ROWS-1,Math.ceil(Math.max(...corners.map(p=>p.y)))+1);
     const visible = new Set(), neededChunks = new Set(), chunkIds = new Set(), shownBushes=new Set();let occupied=null;
+    const grouped=this.paintNatureGroups(minX,maxX,minY,maxY,fog);
     let visibleCount = 0;
     for(let y=minY;y<=maxY;y++) for(let x=minX;x<=maxX;x++) {
       const p=tileCenter({x,y});
@@ -706,6 +745,7 @@ export class TerrainRenderer {
         this.debugGraphics.fillStyle(colors[level],level ? .36 : .08);this.debugGraphics.fillPoints([{x:p.x-31,y:p.y},{x:p.x,y:p.y-15},{x:p.x+31,y:p.y},{x:p.x,y:p.y+15}],true);
       }
       const chunk=Math.floor(y/CHUNK_SIZE)*64+Math.floor(x/CHUNK_SIZE);if(!chunkIds.has(chunk)){chunkIds.add(chunk);neededChunks.add(`${Math.floor(x/CHUNK_SIZE)},${Math.floor(y/CHUNK_SIZE)}`);}
+      if(grouped.has(`${x},${y}`))continue;
       const bush=this.scene.bushes?.get(`${x},${y}`);
       if(bush!==undefined){
         occupied??=this.buildingTiles();const state=fog?.displayState({x,y})??VISIBILITY.VISIBLE;

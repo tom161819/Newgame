@@ -10,7 +10,7 @@ const finish=(page,id)=>page.evaluate(id=>{const s=window.__game.registry.get('a
 export async function residents3Smoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);const errors=[];page.on('pageerror',e=>errors.push(e.message));
   try{
-    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW3-155515555555-1');await page.locator('#start-game').click();
+    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW4-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.childrenSystem);
     await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
     const names=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('wood',60);s.inventory.add('stone',30);s.updateInventory();

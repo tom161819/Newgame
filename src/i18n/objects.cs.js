@@ -20,6 +20,8 @@ export default {
   'object.wood.name':'Dřevo','object.wood.description':'Dřevo uložené ve skladišti materiálu nebo v počátečním skladišti.',
   'object.stone_deposit.name':'Ložisko kamene','object.stone_deposit.description':'Konečné ložisko 80–160 kamene. Nikdy se neobnoví; po vytěžení zůstane skalní útvar.',
   'object.iron_deposit.name':'Ložisko železa','object.iron_deposit.description':'Konečné ložisko 60–120 železné rudy. Nikdy se neobnoví; po vytěžení zůstane skalní útvar.',
+  'object.stone_deposit_large.name':'Velké ložisko kamene','object.stone_deposit_large.description':'Velké konečné ložisko 200–320 kamene (3 × 3). Nikdy se neobnoví; po vytěžení zůstane skalní útvar.',
+  'object.iron_deposit_large.name':'Velké ložisko železa','object.iron_deposit_large.description':'Velké konečné ložisko 150–240 železné rudy (3 × 3). Nikdy se neobnoví; po vytěžení zůstane skalní útvar.',
   'object.iron_ore.name':'Železná ruda','object.iron_ore.description':'Surová železná ruda. Huť z ní s dřevem vyrobí železo.',
   'object.tower.name':'Kamenná věž','object.tower.description':'Kamenná strážní věž s horní plošinou a cimbuřím.',
   'object.castle.name':'Hrad','object.castle.description':'Kamenná pevnost s horní plošinou a cimbuřím. Z plošiny poskytuje o 75 % větší dohled.',

@@ -40,10 +40,13 @@ const first=list=>list.find(has)??null;
 
 // ---- Stone and iron deposits (2 × 2): the medium pile while rich, a smaller one when nearly mined out, a few
 // stones once empty; snow-covered piles in winter. Each deposit keeps one rock (granite or mossy granite).
+// velke-prirodni-objekty: a large (3 × 3) deposit shows the large pile while more than two thirds are left (only the
+// approved granite and red looks exist), then the same medium and small piles as a 2 × 2 deposit.
 export function depositLook({type,id,remaining=1,max=1,depleted=false,season='Spring'}){
-  const iron=type==='iron_deposit',share=max>0?remaining/max:1,winter=season==='Winter';
+  const iron=type==='iron_deposit'||type==='iron_deposit_large',share=max>0?remaining/max:1,winter=season==='Winter';
   const kind=iron?'iron':'stone',rock=iron?'red':pick(['granite','mossy'].filter(r=>has(`stone-deposit-medium-${r}-5`)),`${type}:${id}`)??'granite';
   const level=depleted||remaining<=0?'empty':share<=1/3?'low':share<=2/3?'mid':'full';
+  if(String(type).endsWith('_large')&&level==='full'){const large=first(winter?[`${kind}-deposit-large-${iron?'red':'granite'}-winter`]:[`${kind}-deposit-large-${iron?'red':'granite'}-7`]);if(large)return large;}
   if(winter)return first(level==='full'||level==='mid'?[`${kind}-deposit-medium-${rock==='mossy'?'granite':rock}-winter`]:[`${kind}-deposit-small-${rock==='mossy'?'granite':rock}-winter`]);
   if(level==='full')return first([`${kind}-deposit-medium-${rock}-5`]);
   if(level==='mid')return first([`${kind}-deposit-medium-${rock}-stage1`,`${kind}-deposit-medium-${rock}-5`]);
@@ -81,4 +84,21 @@ export function cropLook(type,stage,season,tile){
     return first([`orchard-tree-${look}-${odd?5:2}`,`orchard-tree-${look}-2`]);
   }
   return null;
+}
+
+// ---- velke-prirodni-objekty: thickets (2 × 1, 2 × 2, 3 × 2) and rock groups (2 × 2 obstacle, 4 × 2 ridge).
+// A thicket is hazel, or bramble when at least half its bushes are berry bushes, in spring and summer; it has one
+// autumn and one winter look. `bushTypes`: the bush type ids of its tiles.
+export function thicketLook({w,h},bushTypes=[],season='Spring'){
+  const size=`thicket-${w}x${h}`;
+  if(season==='Winter'||season==='Autumn')return first([`${size}-${season.toLowerCase()}`,`${size}-hazel`]);
+  const berries=bushTypes.filter(type=>type==='bush_berry').length;
+  return first(berries*2>=bushTypes.length&&berries>0?[`${size}-bramble`,`${size}-hazel`]:[`${size}-hazel`,`${size}-bramble`]);
+}
+const ROCK_GROUP_LOOKS={'2x2':{art:['rock-obstacles-medium-outcrop-1','rock-obstacles-medium-outcrop-2','rock-obstacles-medium-boulders','rock-obstacles-medium-bush'],winter:'rock-obstacles-medium-outcrop-winter'},
+  '4x2':{art:['rock-ridge-granite','rock-ridge-slate'],winter:'rock-ridge-winter'}};
+export function rockGroupLook({x,y,w,h},season='Spring'){
+  const looks=ROCK_GROUP_LOOKS[`${w}x${h}`];if(!looks)return null;
+  if(season==='Winter'&&has(looks.winter))return looks.winter;
+  return pick(looks.art.filter(has),`rock-group:${x},${y}`);
 }

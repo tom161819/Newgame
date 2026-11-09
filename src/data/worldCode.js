@@ -5,7 +5,9 @@
 // grass zones (their size: grass zone scale). Level 5 keeps the base values in WORLD_GENERATION.
 // Generator 3 (m-kamenolom-u-hradu, playtest 0.76.0 #13): a Stone Deposit for a Quarry 8–16 tiles from the Castle.
 // A saved game keeps the code it was made with (decode with current:null); only New Game needs the current version.
-export const WORLD_GENERATOR_VERSION=3;
+// Generator 4 (velke-prirodni-objekty): rock ridges (4 × 2) and 2 × 2 rock obstacles, thickets by the water and at forest
+// edges, large 3 × 3 Stone and Iron Deposits (one ordinary deposit of each fewer).
+export const WORLD_GENERATOR_VERSION=4;
 export const WORLD_SEED_MAX=36**8-1;
 // key: id used in code and Studio; max: highest level; default: today's world; scale: level → multiplier (or value).
 const linear=(at0,at5,at9)=>level=>level<=5?at0+(at5-at0)*level/5:at5+(at9-at5)*(level-5)/4;

@@ -49,6 +49,7 @@ import { localized } from '../i18n/names.js';
 import Phaser from 'phaser';
 import { COLUMNS, ROWS, PLAYER_START, isWalkable, tileCenter } from './map.js';
 import { generateWorld, mapFromWorld, emptyGround, importGround, importBushes, emptyZones, importZones, importReeds } from './worldGeneration.js';
+import { importNatureGroups, pruneNatureGroups, exportNatureGroups, thicketTiles } from './natureGroups.js';
 import { isFertileGround, isFordGround, FORD_SPEED, WORLD_GENERATION } from '../data/worldTerrain.js';
 import { tilePolygon, worldToTile, gridToWorld, clampMapCenter } from './isometric.js';
 import { TerrainRenderer } from './TerrainRenderer.js';
@@ -224,8 +225,10 @@ export class GameScene extends Phaser.Scene {
     const worldCode=this.gameSettings.worldCode?decodeWorldCode(this.gameSettings.worldCode,this.loadState?{current:null}:undefined):null;
     this.worldLevels=worldCode?.levels??defaultWorldLevels();this.worldSeed=worldCode?.seed??0;this.worldRandom=worldCode?worldStreams(worldCode.seed):()=>Math.random;
     const world=this.loadState?{terrain:this.loadState.terrain.map(row=>[...row]),ground:this.loadState.ground?importGround(this.loadState.ground):emptyGround(),bushes:importBushes(this.loadState.bushes??[]),
-      zones:this.loadState.grassZones?importZones(this.loadState.grassZones):emptyZones(),reeds:importReeds(this.loadState.reeds)}:generateWorld(Math.random,{levels:this.worldLevels,streams:this.worldRandom});
+      zones:this.loadState.grassZones?importZones(this.loadState.grassZones):emptyZones(),reeds:importReeds(this.loadState.reeds),natureGroups:importNatureGroups(this.loadState.natureGroups)}:generateWorld(Math.random,{levels:this.worldLevels,streams:this.worldRandom});
     this.terrainGrid=world.terrain;this.groundGrid=world.ground;this.bushes=world.bushes;this.grassZones=world.zones;this.reeds=world.reeds;
+    // velke-prirodni-objekty: thickets and rock groups drawn as one object over their bushes and rock tiles.
+    this.natureGroups=world.natureGroups??[];
     // Generator 2's weights for where forests and ore deposits grow (new games only; not saved).
     this.worldWeights=world.forestWeight?{forest:world.forestWeight,stone:world.stoneWeight}:null;
     this.fordKeys=new Set();for(let y=0;y<this.groundGrid.length;y++)for(let x=0;x<this.groundGrid[y].length;x++)if(isFordGround(this.groundGrid[y][x]))this.fordKeys.add(`${x},${y}`);
@@ -263,12 +266,12 @@ export class GameScene extends Phaser.Scene {
       const spawnSettings=resourceSpawnSettings(definition,this.gameSettings);
       const spawner=new ResourceSpawner({
         map:this.map,resources:this.resourceOccupancy,definition,spawnSettings,
-        getOrigins:()=>this.resourceOrigins(),getReserved:()=>[...this.reservedTiles(),...this.fordTiles()],
+        getOrigins:()=>this.resourceOrigins(),getReserved:()=>[...this.reservedTiles(),...this.fordTiles(),...this.thicketTileList()],
         getCount:()=>this.resourceCount(definition.id),spawn:tile=>this.addResource(definition,tile),
       });
       this.resourceSpawners.push(spawner);
       if(!this.loadState&&definition.walkable){
-        const occupied=new Map([...this.resourceOccupancy,...[...this.fordKeys].map(k=>[k,'ford'])]),F=WORLD_GENERATION.fairStart;
+        const occupied=new Map([...this.resourceOccupancy,...[...this.fordKeys].map(k=>[k,'ford']),...[...thicketTiles(this.natureGroups)].map(k=>[k,'thicket'])]),F=WORLD_GENERATION.fairStart;
         // Fair start: some loose stones close to the castle first.
         if(definition.id==='stone'){const near=generateResourcePositions(this.map,PLAYER_START,10000,this.worldRandom('start-stones'),occupied,definition).filter(t=>{const d=Math.hypot(t.x-PLAYER_START.x,t.y-PLAYER_START.y);return d>5&&d<=F.radius;}).slice(0,Math.min(F.stones,spawnSettings.initial));for(const tile of near){this.addResource(definition,tile);occupied.set(tileKey(tile),'stone');}}
         const candidates=generateResourcePositions(this.map,PLAYER_START,Math.max(0,spawnSettings.initial-this.resourceCount(definition.id)),this.worldRandom(`resource:${definition.id}`),occupied,definition);
@@ -334,6 +337,8 @@ export class GameScene extends Phaser.Scene {
       this.naturalResources.mining.generate(this.worldRandom('minerals'),weights?t=>.25+.75*at(weights.stone,t):null);
       // m-kamenolom-u-hradu: a Quarry deposit 8–16 tiles from the Castle in every world (generator 3).
       this.naturalResources.mining.ensureStartQuarry(this.worldRandom('start-quarry'));}
+    // velke-prirodni-objekty: a group with a tree, deposit or building on a tile is single bushes or rocks again.
+    pruneNatureGroups(this);
     // World v2: a fingerprint of the starting world as generated (terrain, water, bushes, every placed resource, animals,
     // chests), so tests and the Studio can check that a world code always gives the same world.
     this.startWorldFingerprint=this.loadState?null:this.worldFingerprint();
@@ -409,6 +414,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   isFordTile(tile){return this.fordKeys?.has(`${tile.x},${tile.y}`)??false;}
+  // velke-prirodni-objekty: loose stones, new trees and deposits keep off thickets (they would split them).
+  thicketTileList(){return [...thicketTiles(this.natureGroups)].map(k=>{const [x,y]=k.split(',').map(Number);return {x,y};});}
   fordTiles(){return [...(this.fordKeys??[])].map(k=>{const [x,y]=k.split(',').map(Number);return {x,y};});}
   reservedTiles(){return [...this.character.reservedTiles(),...(this.animalSystem?.reservedTiles()??[]),...(this.workerSystem?.reservedTiles()??[]),...(this.foodStorage?.reservedTiles()??[]),...this.buildings.flatMap(b=>b.tiles)];}
   updateHover(pointer){
@@ -796,9 +803,10 @@ export class GameScene extends Phaser.Scene {
     const parts=[this.terrainGrid.map(r=>r.join('')).join('|'),this.groundGrid.map(r=>r.join('')).join('|'),[...this.bushes].sort().join(';'),
       [...this.resources.values()].map(v=>{const o=v.getData('object');return `${v.getData('objectId')}@${o?.tile?.x??o?.x},${o?.tile?.y??o?.y}`;}).sort().join(';'),
       [...this.animalSystem.animals.values()].map(a=>`${a.type??a.definition?.id}@${a.tile.x},${a.tile.y}`).sort().join(';'),
-      [...(this.treasureSystem?.chests.values()??[])].map(c=>`${c.tile?.x??c.x},${c.tile?.y??c.y}:${c.contents?.gold??''}`).sort().join(';')];
+      [...(this.treasureSystem?.chests.values()??[])].map(c=>`${c.tile?.x??c.x},${c.tile?.y??c.y}:${c.contents?.gold??''}`).sort().join(';'),
+      exportNatureGroups(this.natureGroups).map(g=>g.join(':')).join(';')];
     const fnv=text=>{let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0).toString(16).padStart(8,'0');};
-    return {hash:fnv(parts.join('#')),parts:Object.fromEntries(['terrain','ground','bushes','resources','animals','chests'].map((k,i)=>[k,fnv(parts[i])])),counts:{resources:this.resources.size,animals:this.animalSystem.animals.size,chests:this.treasureSystem?.chests.size??0,bushes:this.bushes.size}};
+    return {hash:fnv(parts.join('#')),parts:Object.fromEntries(['terrain','ground','bushes','resources','animals','chests','natureGroups'].map((k,i)=>[k,fnv(parts[i])])),counts:{resources:this.resources.size,animals:this.animalSystem.animals.size,chests:this.treasureSystem?.chests.size??0,bushes:this.bushes.size,natureGroups:this.natureGroups?.length??0}};
   }
   // Sight and the explored-map memory between catch-up steps (normal frames do this in refreshVisibility).
   observeWorld(){captureMapKnowledge(this);}

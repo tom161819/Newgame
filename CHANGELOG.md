@@ -4,6 +4,15 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+### Added
+- Large nature objects in new worlds, drawn with the approved Studio art:
+  - Thickets of 2 × 1, 2 × 2 and 3 × 2 tiles along the water and at forest edges. They are hazel or bramble in spring and summer and have their own autumn and winter looks.
+  - Rock ridges (4 × 2) and larger rock obstacles (2 × 2), with a snowy look in winter.
+  - Large Stone and Iron Deposits (3 × 3) with about twice the stone or ore. They show the large pile until a third is mined, then the medium and small piles.
+- Mark to clear on one tile of a thicket or a rock group marks the whole object. A thicket is cut like its bushes and gives nothing; a rock group gives 10 Stone per tile.
+### Changed
+- New worlds use world generator 4 (codes MKW4-…). One ordinary Stone and one Iron Deposit fewer make room for the large ones. Older world codes still work for their saved games, not for a New Game.
+- Save schema 61. Older saves cannot be loaded.
 
 ## [0.82.0] - 2026-11-09
 <!-- version: {"title":"Dev tool","type":"feature","reconstructed":false,"saveVersion":60} -->

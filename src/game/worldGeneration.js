@@ -1,6 +1,7 @@
 import { COLUMNS, ROWS, PLAYER_START } from './config.js';
 import { GROUND, GROUND_CODES, WORLD_GENERATION as W, WATER_CELL, BUSH_TYPES, GRASS_BUSHES, GRASS_ZONE, GRASS_ZONE_CODES, isWaterGround, isRiverGround } from '../data/worldTerrain.js';
 import { settingsFromLevels } from '../data/worldCode.js';
+import { rockGroupFor,mergeThickets,groupTiles } from './natureGroups.js';
 
 // World generator 2 (World v2 step 2a, zadani-svet-v2.md). Everything is drawn from named random streams (see
 // seededRandom.js), so the same world code gives the same world:
@@ -137,17 +138,22 @@ function distanceField(grid,test,cap=40){
 
 // Rock outcrops (2×2 or 3×2) weighted towards stony country and the desert's edge, never in water or near the start.
 function placeRocks(terrain,ground,random,o,stony,desertDistance){
-  const count=Math.round(65*o.rocks);let placed=0;
+  const count=Math.round(65*o.rocks),widths=W.rocks.widths,groups=[];let placed=0;
   for(let attempt=0;attempt<count*40&&placed<count;attempt++){
     const x=2+Math.floor(random()*94),y=2+Math.floor(random()*94),dd=desertDistance[index(x,y)],weight=.2+.8*Math.max(stony(x,y),dd>0&&dd<W.rocks.desertRim?.9:0);
     if(random()>weight)continue;
-    const w=2+placed%2,tiles=[];for(let dy=0;dy<2;dy++)for(let dx=0;dx<w;dx++)tiles.push({x:x+dx,y:y+dy});
+    const w=widths[placed%widths.length],tiles=[];for(let dy=0;dy<2;dy++)for(let dx=0;dx<w;dx++)tiles.push({x:x+dx,y:y+dy});
     if(tiles.some(t=>!inside(t.x,t.y)||Math.abs(t.x-PLAYER_START.x)<5&&Math.abs(t.y-PLAYER_START.y)<5||![GROUND.GRASS,GROUND.DESERT,GROUND.SHORE_ROCKS].includes(ground[t.y][t.x])))continue;
+    // Generator 4: a placement on open ground only is one rock obstacle (2 × 2) or ridge (4 × 2).
+    const group=tiles.every(t=>terrain[t.y][t.x]===0)?rockGroupFor(x,y,w,2):null;if(group)groups.push(group);
     for(const t of tiles)terrain[t.y][t.x]=1;placed++;
   }
   // The original walls near the start show pathfinding around obstacles (kept from the first prototype).
-  for(let y=44;y<=52;y++)if(y!==50)terrain[y][46]=1;
-  for(let x=52;x<=58;x++)terrain[47][x]=1;
+  const walls=new Set();
+  for(let y=44;y<=52;y++)if(y!==50){terrain[y][46]=1;walls.add(`46,${y}`);}
+  for(let x=52;x<=58;x++){terrain[47][x]=1;walls.add(`${x},47`);}
+  // A group that later rocks grew onto stays a group (its own tiles are still its own); one touching the walls does not.
+  return groups.filter(g=>groupTiles(g).every(t=>!walls.has(`${t.x},${t.y}`)));
 }
 
 function weighted(random,list){let r=random();for(const [value,weight]of list){if((r-=weight)<0)return value;}return list.at(-1)[0];}
@@ -199,9 +205,11 @@ function generateOnce(rng,o){
   const moistNoise=valueNoise(rng('moisture'),W.grass.noiseScale*zoneScale),variation=valueNoise(rng('variation'),W.grass.variationScale*zoneScale);
   const forestNoise=valueNoise(rng('forest'),W.forest.scale),stony=valueNoise(rng('stony'),W.rocks.scale),bankNoise=valueNoise(rng('banks'),9);
   const waterDistance=distanceField(ground,isRiverGround),desertDistance=distanceField(ground,g=>g===GROUND.DESERT);
-  placeRocks(terrain,ground,rng('rocks'),o,(x,y)=>smooth(.5,.78,stony(x,y)),desertDistance);
+  const rockGroups=placeRocks(terrain,ground,rng('rocks'),o,(x,y)=>smooth(.5,.78,stony(x,y)),desertDistance);
   for(let y=0;y<ROWS;y++)for(let x=0;x<COLUMNS;x++)if(isRiverGround(ground[y][x]))terrain[y][x]=0;
   for(const f of fords)for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)if(inside(f.x+dx,f.y+dy))terrain[f.y+dy][f.x+dx]=0;
+  // Rock groups cut by water or a ford are not groups any more (their remaining tiles stay single rocks).
+  const natureGroups=rockGroups.filter(g=>groupTiles(g).every(t=>terrain[t.y][t.x]===1));
   const rockDistance=distanceField(terrain,v=>v===1,10);
   // A path to the water every few tiles along each bank: no bushes or trees there.
   const A=W.bankVegetation;
@@ -219,10 +227,15 @@ function generateOnce(rng,o){
     zones[y][x]=rockDistance[i]<=1||stoneWeight[i]>.995?GRASS_ZONE.STONY:forest>.85?GRASS_ZONE.FOREST_FLOOR:m<.2||dry>.3?GRASS_ZONE.DRY:m>.66?GRASS_ZONE.LUSH:variation(x,y)>.64?GRASS_ZONE.FLOWERS:GRASS_ZONE.MEADOW;
   }
   const bushes=placeBushes(terrain,ground,desert,rng('bushes'),o,lane,bankDensity,waterDistance);
+  // Generator 4: dense bushes by the water and at forest edges merge into thickets (own stream: nothing else moves).
+  const T=W.thickets;
+  natureGroups.push(...mergeThickets({bushes,random:rng('thickets'),fill:T.fill,
+    canGrow:(x,y)=>x>=2&&y>=2&&x<COLUMNS-2&&y<ROWS-2&&ground[y][x]===GROUND.GRASS&&terrain[y][x]===0&&distance(centre(x,y),START)>W.bushClear&&!lane(x,y),
+    qualifies:(x,y)=>{const i=index(x,y),d=waterDistance[i],f=forestWeight[i];return d>=1&&d<=T.waterReach||f>=T.forestEdge[0]&&f<=T.forestEdge[1];}}));
   // Reeds: shallow tiles beside grassy banks, thinned by chance.
   const reeds=new Set(),random=rng('reeds');
   for(const r of reedMarks)for(const [dx,dy]of [[1,0],[-1,0],[0,1],[0,-1]]){const x=r.x+dx,y=r.y+dy,key=`${x},${y}`;if(!inside(x,y)||ground[y][x]!==GROUND.SHALLOW||reeds.has(key))continue;if(random()<W.banks.reeds*(.5+r.roll))reeds.add(key);}
-  return {terrain,ground,bushes,zones,reeds,forestWeight,stoneWeight,
+  return {terrain,ground,bushes,zones,reeds,forestWeight,stoneWeight,natureGroups,
     summary:{fords:fords.length,lake:lakes[0]?{x:lakes[0].x,y:lakes[0].y}:null,lakes:lakes.length,desert:desert?{x:desert.x,y:desert.y}:null,tributary}};
 }
 
@@ -247,7 +260,8 @@ export function generateWorld(random=Math.random,{levels,streams}={}){
   return world;
 }
 
-// Save format: one string of digits per row (ground, grass zones); bushes as [x, y, type index]; reeds as [x, y].
+// Save format: one string of digits per row (ground, grass zones); bushes as [x, y, type index]; reeds as [x, y];
+// large nature objects (thickets, rock groups) through natureGroups.js.
 export function exportGround(ground){return ground.map(row=>row.join(''));}
 export function importGround(rows){return rows.map(row=>[...row].map(Number));}
 export function validGroundRows(rows){return Array.isArray(rows)&&rows.length===ROWS&&rows.every(row=>typeof row==='string'&&row.length===COLUMNS&&[...row].every(c=>GROUND_CODES.includes(Number(c))));}

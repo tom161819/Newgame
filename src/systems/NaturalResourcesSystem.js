@@ -1,3 +1,4 @@
+import { thicketTiles } from '../game/natureGroups.js';
 import { isFertileGround } from '../data/worldTerrain.js';
 import { t } from '../i18n/index.js';
 import { FORESTRY,treeBlocks,treeState } from '../data/naturalResources.js';
@@ -25,7 +26,8 @@ export class NaturalResourcesSystem {
   register(object){if(object?.natural){this.byId.set(object.natural.id,object);this.topologyRevision++;}}
   view(object){return this.scene.resources.get(tileKey(object));}
   growthModifier(){return this.scene.seasons?FORESTRY.seasonGrowth[this.scene.seasons.season]:1;}
-  reserved(){const reserved=new Set([...this.scene.reservedTiles().map(tileKey),...[...(this.scene.dropSystem?.drops.values()??[])].map(d=>tileKey(d.tile))]);for(const key of this.scene.workerSystem.reservations.owners.keys())if(key.startsWith('natural-slot:'))reserved.add(key.slice('natural-slot:'.length));return reserved;}
+  // velke-prirodni-objekty: thicket tiles too, so trees and deposits do not grow into a thicket and split it.
+  reserved(){const reserved=new Set([...this.scene.reservedTiles().map(tileKey),...thicketTiles(this.scene.natureGroups),...[...(this.scene.dropSystem?.drops.values()??[])].map(d=>tileKey(d.tile))]);for(const key of this.scene.workerSystem.reservations.owners.keys())if(key.startsWith('natural-slot:'))reserved.add(key.slice('natural-slot:'.length));return reserved;}
   updateWorker(worker,delta){this.forestry.update(worker,delta);}
   releaseWorker(worker){this.forestry.release(worker);this.miningWork.release(worker);}
   origins(){return this.scene.resourceOrigins?.()??[this.scene.character.nextTile??this.scene.character.tile];}

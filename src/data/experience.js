@@ -1,11 +1,11 @@
 import { FARMING_RULES } from './farming.js';
 import { PRODUCTION_RECIPES } from './production.js';
 import { FORESTRY } from './naturalResources.js';
-import { MINING_WORK } from './minerals.js';
+import { MINING_WORK,MINERAL_DEPOSITS } from './minerals.js';
 export const EXPERIENCE_MAX_LEVEL=50;
 export const XP_REWARDS=Object.freeze({
   manualRockMined:Object.freeze({rock_outcrop:3}),
-  depositMined:Object.freeze(Object.fromEntries(Object.values(MINING_WORK).map(rule=>[rule.depositType,rule.xp]))),
+  depositMined:Object.freeze(Object.fromEntries(Object.values(MINING_WORK).flatMap(rule=>[[rule.depositType,rule.xp],...Object.entries(MINERAL_DEPOSITS).filter(([,d])=>d.family===rule.depositType).map(([id])=>[id,rule.xp])]))),
   treeChopped:Object.freeze(Object.fromEntries(Object.entries(FORESTRY.trees).map(([id,rule])=>[id,rule.xp]))),
   transportDelivered:Object.freeze({hauler:1}),
   resourceCollected:Object.freeze({stone:3}),dropCollected:Object.freeze({meat:2}),fishCaught:Object.freeze({fish:3}),

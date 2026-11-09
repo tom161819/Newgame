@@ -1,4 +1,4 @@
-import { MINERAL_DEPOSITS,START_QUARRY,resourceBlocks } from '../data/minerals.js';
+import { MINERAL_DEPOSITS,START_QUARRY,resourceBlocks,depositFamily } from '../data/minerals.js';
 import { reachableTiles } from '../game/pathfinding.js';
 import { buildingTiles,buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
@@ -72,7 +72,7 @@ export class MineralSystem {
   }
   candidates(definition,anchor){
     const footprint={...anchor,definition},spec=definition.mining;if(!spec)return[];
-    return this.deposits().filter(d=>d.type===spec.depositType&&(spec.overlap?rectanglesOverlap(footprint,d):footprintDistance(footprint,d)<=spec.range)).sort((a,b)=>footprintDistance(footprint,a)-footprintDistance(footprint,b)||a.natural.id.localeCompare(b.natural.id,undefined,{numeric:true}));
+    return this.deposits().filter(d=>depositFamily(d.type)===spec.depositType&&(spec.overlap?rectanglesOverlap(footprint,d):footprintDistance(footprint,d)<=spec.range)).sort((a,b)=>footprintDistance(footprint,a)-footprintDistance(footprint,b)||a.natural.id.localeCompare(b.natural.id,undefined,{numeric:true}));
   }
   select(definition,anchor){const candidates=this.candidates(definition,anchor);return definition.mining.overlap?candidates[0]??null:candidates.find(d=>d.natural.remaining>0&&d.natural.boundBuildingId==null&&this.scene.fog.isVisibleObject(d))??null;}
   placementError(definition,anchor){
@@ -89,7 +89,7 @@ export class MineralSystem {
     if(clearsObstacles(definition)){if(s.terrainGrid[tile.y]?.[tile.x]===1)return !object;if(object?.definition.tree&&object.natural?.stage>0&&s.terrainGrid[tile.y]?.[tile.x]===0)return true;}
     if(!object||s.terrainGrid[tile.y]?.[tile.x]!==0)return false;
     if(object.definition.tree&&object.natural.stage===0)return![...s.dropSystem.drops.values()].some(d=>tileKey(d.tile)===tileKey(tile));
-    return !!definition.mining?.overlap&&object.type===definition.mining.depositType&&object.natural.remaining>0&&object.natural.boundBuildingId==null;
+    return !!definition.mining?.overlap&&depositFamily(object.type)===definition.mining.depositType&&object.natural.remaining>0&&object.natural.boundBuildingId==null;
   }
   accessError(map,definition,anchor){
     if(!definition.mining)return null;const deposit=this.select(definition,anchor);if(!deposit)return this.placementError(definition,anchor);

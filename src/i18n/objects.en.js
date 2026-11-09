@@ -20,6 +20,8 @@ export default {
   'object.wood.name':'Wood','object.wood.description':'Timber stored in a Material Yard or Starter Stockpile.',
   'object.stone_deposit.name':'Stone Deposit','object.stone_deposit.description':'A finite 80–160 Stone deposit. Never regenerates; depletion leaves a rocky formation.',
   'object.iron_deposit.name':'Iron Deposit','object.iron_deposit.description':'A finite 60–120 Iron Ore deposit. Never regenerates; depletion leaves a rocky formation.',
+  'object.stone_deposit_large.name':'Large Stone Deposit','object.stone_deposit_large.description':'A large finite 200–320 Stone deposit (3 × 3). Never regenerates; depletion leaves a rocky formation.',
+  'object.iron_deposit_large.name':'Large Iron Deposit','object.iron_deposit_large.description':'A large finite 150–240 Iron Ore deposit (3 × 3). Never regenerates; depletion leaves a rocky formation.',
   'object.iron_ore.name':'Iron Ore','object.iron_ore.description':'Raw iron-bearing ore. A Smelter processes it with Wood into finished Iron.',
   'object.tower.name':'Stone Tower','object.tower.description':'A stone watchtower with a platform and battlements.',
   'object.castle.name':'Castle','object.castle.description':'A stone fortress with a platform and battlements. Its platform gives 75 % more sight.',

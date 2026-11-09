@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 export async function walls2Smoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);const errors=[];page.on('pageerror',e=>errors.push(e.message));
   try{
-    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW3-155515555555-1');await page.locator('#start-game').click();
+    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW4-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
     const f=await page.evaluate(()=>{
       const s=window.__game.registry.get('application').scene,c=s.character.tile;s.employment?.setEnabled?.(false);s.fog?.setEnabled?.(false);

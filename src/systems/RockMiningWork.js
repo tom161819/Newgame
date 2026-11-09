@@ -1,6 +1,7 @@
 import { ROCK_MINING as RULES,CLEARING,clearsObstacles } from '../data/rockMining.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
+import { groupIndex,groupTiles } from '../game/natureGroups.js';
 import { carryCapacity } from '../data/logistics.js';
 import { t } from '../i18n/index.js';
 
@@ -19,7 +20,12 @@ export class RockMiningWork {
   }
   unmark(r){const s=this.scene;r.marked=false;delete r.planId;for(const w of s.workerSystem.liveWorkers())if(w.manualRockId===r.id){if(w.workTask?.kind==='mineRock')s.workerSystem.ai.cancel(w);w.manualRockId=null;}}
   // m-oznacovani-tezby (51): one tile of the marking tool (its rock, tree and bush); a tile under a wall plan keeps its marks.
+  // velke-prirodni-objekty: a tile of a thicket or rock group marks (or unmarks) the whole group, tile by tile.
   markTile(tile,enabled=true){
+    const group=groupIndex(this.scene.natureGroups).get(tileKey(tile));
+    return group?groupTiles(group).reduce((count,t)=>count+this.markOne(t,enabled),0):this.markOne(tile,enabled);
+  }
+  markOne(tile,enabled=true){
     const s=this.scene;if(s.gameOver||s.gameTime.paused||!this.visible(tile)||!enabled&&this.plannedTiles().has(tileKey(tile)))return 0;
     let count=0;if(s.terrainGrid[tile.y]?.[tile.x]===1&&this.mark(tile,enabled))count++;
     const tree=this.treeAt(tile);if(tree&&this.markTree(tree,enabled))count++;

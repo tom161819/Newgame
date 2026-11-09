@@ -19,6 +19,8 @@ import { objectRegistry } from './ObjectRegistry.js';
 import { COLUMNS,ROWS } from '../game/config.js';
 import { exportGround,importGround,validGroundRows,exportBushes,emptyGround,exportZones,emptyZones,validZoneRows,exportReeds } from '../game/worldGeneration.js';
 import { isWaterGround,isRiverGround,BUSH_TYPES,GROUND } from '../data/worldTerrain.js';
+import { exportNatureGroups,validateNatureGroups,pruneNatureGroups } from '../game/natureGroups.js';
+import { depositFamily } from '../data/minerals.js';
 import { validateFishingState,waterBodies } from './FishingSystem.js';
 import { FISHING } from '../data/fishing.js';
 import { wearLevel } from '../data/pathWear.js';
@@ -48,7 +50,8 @@ import { validIdentity,identityKey } from '../data/names.js';
 import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
-export const SAVE_VERSION=60;
+// 61 (velke-prirodni-objekty): `natureGroups` – thickets, rock obstacles and ridges drawn as one object.
+export const SAVE_VERSION=61;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -75,7 +78,7 @@ export function serializeGameState(scene){
   const provisionalKeys=new Set(scene.buildings.filter(b=>b.unverified).map(b=>`building:${b.id}`));
   exploration.objects=exploration.objects.filter(entry=>!provisionalKeys.has(entry.key));
   return {
-    saveVersion:SAVE_VERSION,gameSettings:{...gameSettings(scene.gameSettings),...(scene.seasons?{seasonsEnabled:scene.seasons.enabled}:{})},terrain:scene.terrainGrid.map(row=>[...row]),ground:exportGround(scene.groundGrid??emptyGround()),bushes:exportBushes(scene.bushes??new Map()),grassZones:exportZones(scene.grassZones??emptyZones()),reeds:exportReeds(scene.reeds??new Set()),
+    saveVersion:SAVE_VERSION,gameSettings:{...gameSettings(scene.gameSettings),...(scene.seasons?{seasonsEnabled:scene.seasons.enabled}:{})},terrain:scene.terrainGrid.map(row=>[...row]),ground:exportGround(scene.groundGrid??emptyGround()),bushes:exportBushes(scene.bushes??new Map()),natureGroups:(pruneNatureGroups(scene),exportNatureGroups(scene.natureGroups)),grassZones:exportZones(scene.grassZones??emptyZones()),reeds:exportReeds(scene.reeds??new Set()),
     exploration,
     // World Editor: the player's ground look (optional; absent = the game's own look).
     ...(groundOverride()?{groundLook:groundOverride()}:{}),
@@ -185,6 +188,8 @@ export function validateGameState(input,registry=objectRegistry){
   s.grassZones??=exportZones(emptyZones());check(validZoneRows(s.grassZones));s.reeds??=[];array(s.reeds,COLUMNS*ROWS);
   {const seen=new Set();for(const r of s.reeds){array(r,2);check(r.length===2);integer(r[0],0,COLUMNS-1);integer(r[1],0,ROWS-1);check(ground[r[1]][r[0]]===GROUND.SHALLOW&&!seen.has(`${r[0]},${r[1]}`));seen.add(`${r[0]},${r[1]}`);}}
   array(s.bushes,COLUMNS*ROWS);{const seen=new Set();for(const b of s.bushes){array(b,3);check(b.length===3);integer(b[0],0,COLUMNS-1);integer(b[1],0,ROWS-1);integer(b[2],0,BUSH_TYPES.length-1);check(open(b[0],b[1])&&!seen.has(`${b[0]},${b[1]}`));seen.add(`${b[0]},${b[1]}`);}}
+  // velke-prirodni-objekty (61): thickets over grass bushes and rock groups over rock tiles, never overlapping.
+  s.natureGroups??=[];validateNatureGroups(s.natureGroups,{bushes:s.bushes,terrain:s.terrain},check);
   for(const key of ['buildings','resources','animals','drops','chests','spawners'])array(s[key]);
   if(s.workers!==undefined)array(s.workers);
   const bIds=unique(s.buildings),aIds=unique(s.animals),dIds=unique(s.drops),cIds=unique(s.chests);
@@ -252,13 +257,13 @@ export function validateGameState(input,registry=objectRegistry){
     else check(r.natural===undefined);
     for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){
     // Rock edges may sit under a neighbouring Quarry; unique reciprocal primary bindings are checked below.
-    const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`,overlap=s.buildings.find(b=>!b.unverified&&x>=b.x&&x<b.x+definition(b.type).width&&y>=b.y&&y<b.y+definition(b.type).height),allowedOverlap=d.tree&&(r.natural.stage===0||!!overlap&&clearsObstacles(definition(overlap.type))&&!buildingIsComplete(overlap))||r.type==='stone_deposit'&&overlap?.type==='quarry'&&overlap.quarryMode==='finite';check(open(x,y)&&(!occupied.has(key)||allowedOverlap)&&!resourceTiles.has(key));resourceTiles.add(key);if(d.deposit||d.tree&&r.natural.stage===3)solid.add(key);
+    const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`,overlap=s.buildings.find(b=>!b.unverified&&x>=b.x&&x<b.x+definition(b.type).width&&y>=b.y&&y<b.y+definition(b.type).height),allowedOverlap=d.tree&&(r.natural.stage===0||!!overlap&&clearsObstacles(definition(overlap.type))&&!buildingIsComplete(overlap))||depositFamily(r.type)==='stone_deposit'&&overlap?.type==='quarry'&&overlap.quarryMode==='finite';check(open(x,y)&&(!occupied.has(key)||allowedOverlap)&&!resourceTiles.has(key));resourceTiles.add(key);if(d.deposit||d.tree&&r.natural.stage===3)solid.add(key);
   }}
   const boundDeposits=new Set();for(const b of s.buildings){
     if(b.type==='quarry'){check(['finite','legacy','unbound'].includes(b.quarryMode));if(b.quarryMode==='legacy')check(buildingIsComplete(b)&&b.depositId===undefined);if(b.quarryMode==='unbound')check(b.depositId===undefined);}
     // m-vytezeny-dul-ctverecky (64): optional `depleted: true` only on a finished mine whose bound deposit is empty.
     check(b.depleted===undefined||b.depleted===true&&buildingIsComplete(b)&&(b.type==='iron_mine'||b.type==='quarry'&&b.quarryMode==='finite')&&depositIds.get(b.depositId)?.natural.remaining===0);
-    if(b.type==='iron_mine'||b.type==='quarry'&&b.quarryMode==='finite'){const r=depositIds.get(b.depositId),spec=definition(b.type).mining;check(r&&r.type===spec.depositType&&r.natural.boundBuildingId===b.id&&!boundDeposits.has(b.depositId));boundDeposits.add(b.depositId);if(spec.overlap)check(r.tile.x<b.x+3&&r.tile.x+2>b.x&&r.tile.y<b.y+3&&r.tile.y+2>b.y);else{const dx=Math.max(0,b.x-r.tile.x-1,r.tile.x-b.x-2),dy=Math.max(0,b.y-r.tile.y-1,r.tile.y-b.y-2);check(Math.hypot(dx,dy)<=spec.range);}}
+    if(b.type==='iron_mine'||b.type==='quarry'&&b.quarryMode==='finite'){const r=depositIds.get(b.depositId),spec=definition(b.type).mining;check(r&&depositFamily(r.type)===spec.depositType&&r.natural.boundBuildingId===b.id&&!boundDeposits.has(b.depositId));boundDeposits.add(b.depositId);const rd=definition(r.type),bd=definition(b.type);if(spec.overlap)check(r.tile.x<b.x+bd.width&&r.tile.x+rd.width>b.x&&r.tile.y<b.y+bd.height&&r.tile.y+rd.height>b.y);else{const dx=Math.max(0,b.x-r.tile.x-rd.width+1,r.tile.x-b.x-bd.width+1),dy=Math.max(0,b.y-r.tile.y-rd.height+1,r.tile.y-b.y-bd.height+1);check(Math.hypot(dx,dy)<=spec.range);}}
   }
   for(const r of depositIds.values())if(r.natural.boundBuildingId!=null)check(boundDeposits.has(r.natural.id));
   if(natural.kingTask!=null){const task=natural.kingTask,r=treeIds.get(task.treeId);check(r&&r.natural.stage===3&&!s.player.horseId&&typeof task.arrived==='boolean'&&Object.keys(task).every(key=>['treeId','goal','arrived'].includes(key)));tile(task.goal);check(Math.abs(task.goal.x-r.tile.x)+Math.abs(task.goal.y-r.tile.y)===1);}
