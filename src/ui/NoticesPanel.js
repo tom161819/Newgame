@@ -37,13 +37,29 @@ export class NoticesPanel {
     this.title?.before(this.toggle);this.panel.prepend(this.tab);this.panel.append(this.peek);
     this.panel.addEventListener('pointerenter',()=>this.bar.hover(true,this.now()),options);
     this.panel.addEventListener('pointerleave',()=>{this.bar.hover(false,this.now());this.schedule();},options);
+    // The side tabs (Policy / Population / Employments) are placed in JS on resize; the edge tab follows after them.
+    globalThis.addEventListener?.('resize',()=>requestAnimationFrame(()=>this.placeTab()),options);
     this.setCollapsed(this.bar.collapsed,{persist:false});
     this.unsubscribe=scene.diagnostics.onChange(()=>this.render());this.render();
   }
   now(){return globalThis.performance?.now?.()??Date.now();}
   setCollapsed(value,{persist=true}={}){
     this.collapsed=this.bar.setCollapsed(value);this.panel.classList.toggle('collapsed',this.collapsed);this.title?.setAttribute('aria-expanded',String(!this.collapsed));
-    if(persist)writeCollapsed(this.collapsed);this.drawPeek();this.drawToggle();
+    if(persist)writeCollapsed(this.collapsed);this.drawPeek();this.drawToggle();this.placeTab();
+  }
+  // Slid away, the tab's right side sits at the game view's right edge (not past it: the panel border is counted) –
+  // unless a side tab (Policy / Population / Employments, fixed at the right edge) is at the same height: then it sits
+  // just left of the side tabs so neither covers the other (small window heights). Peeking it stays next to the peek.
+  placeTab(){
+    const tab=this.tab,stack=this.panel.parentElement;if(!stack||tab.hidden||this.panel.hidden||!this.collapsed){tab.style.removeProperty('--notices-tab-shift');return;}
+    const panel=this.panel.getBoundingClientRect(),view=(this.panel.closest('.viewport')??stack).getBoundingClientRect();if(!panel.height)return;
+    // Slid away the panel's left side is at the corner stack's right + 12 px (the CSS translate); the tab's right side
+    // is the panel's padding edge minus the shift.
+    const base=stack.getBoundingClientRect().right+12+this.panel.clientLeft,top=panel.top+this.panel.clientTop,height=tab.offsetHeight||30,width=tab.offsetWidth||28,gap=4;
+    let right=Math.min(base,view.right);
+    const sides=[...document.querySelectorAll('.population-tab')].map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.height).sort((a,b)=>b.left-a.left);
+    for(const r of sides)if(r.top<top+height+gap&&r.bottom>top-gap&&r.left<right+gap&&r.right>right-width-gap)right=r.left-gap;
+    tab.style.setProperty('--notices-tab-shift',`${Math.round(base-right)}px`);
   }
   drawToggle(){
     const unread=this.bar.unread,alert=this.bar.alert;
@@ -59,6 +75,7 @@ export class NoticesPanel {
       const issue=peek.issue;this.peek.replaceChildren(element('span','notices-peek-text',this.text(issue)));if(peek.more>0)this.peek.append(element('span','notices-more',t('notice.more',{count:peek.more})));
       this.peek.dataset.noticeEntity=issue.entityId;this.peek.dataset.noticeReason=issue.reason;this.peek.dataset.severity=issue.severity??'warning';this.peek.hidden=false;this.schedule();
     }else if(!this.peek.hidden)this.clearTimer=setTimeout(()=>{this.peek.hidden=true;this.peek.replaceChildren();},this.collapsed?NOTICE_BAR.slideMs:0);
+    this.placeTab();
   }
   // Page timers (UI only, not game time): the peek ends after its time unless the pointer holds it.
   schedule(){
@@ -86,7 +103,7 @@ export class NoticesPanel {
     // The panel stays visible while categories are muted so they can be switched back on.
     if(this.bar.observe(visible,this.now()))this.drawPeek();this.drawToggle();
     // Slid away, the tab stays while it has unread notices (or a peek is out).
-    this.panel.hidden=!visible.length&&!this.muted.size&&!this.bar.alert&&!this.bar.peek;
+    this.panel.hidden=!visible.length&&!this.muted.size&&!this.bar.alert&&!this.bar.peek;this.placeTab();
   }
   destroy(){clearTimeout(this.timer);clearTimeout(this.clearTimer);this.controller.abort();this.unsubscribe();}
 }

@@ -145,6 +145,9 @@ test('86: StorePreview shows the building tooltip after the delay and keeps the 
     await new Promise(r=>setTimeout(r,40));assert.equal(p.root.hidden,false,'shown after the delay');assert.equal(p.root.classList.contains('building-tooltip'),true);
     assert.equal(p.root.children[0].textContent,'Granary');
     p.hoverBuilding(granary,100,100,{allowed:false});assert.equal(p.root.hidden,true,'hidden at once when not allowed');
+    // A dialog that opens while the delay runs (Escape → Game Menu) keeps it closed.
+    let dialog=null;doc.querySelector=q=>/dialog\[open\]/.test(q)?dialog:null;p.hoverBuilding(null,0,0);p.hoverBuilding(granary,100,100);dialog={};await new Promise(r=>setTimeout(r,40));assert.equal(p.root.hidden,true,'not over a dialog');
+    dialog=null;doc.querySelector=()=>null;p.hoverBuilding(null,0,0);
     p.enabled=false;p.hoverBuilding(granary,100,100);await new Promise(r=>setTimeout(r,40));assert.equal(p.root.hidden,true,'switched off');
     p.hover({key:'hud-store',locations:()=>p.locationsOf(granary),x:5,y:5,below:true,delay:10});p.hoverBuilding(null,0,0);await new Promise(r=>setTimeout(r,30));assert.equal(p.root.hidden,false,'the gauge preview is not cleared by the map');
     p.destroy();

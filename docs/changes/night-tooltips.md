@@ -103,3 +103,9 @@ setting). The building tooltip saves nothing (setting and dev delay are in this 
 - Non-recipe workplaces (Lumberjack, Hunter, mines) show only workers + status icons; a per-type production line
   (e.g. "Wood today 12") could be added in `buildingTooltipContent.js`.
 - House capacity in data is 5 (the owner's example said 3 / 4).
+- Smoke fix (`--building-tooltip`, "not for the selected building"): the smoke pressed Escape twice after build mode;
+  the second Escape opened the Game Menu. Game bug found there: a building tooltip whose 0.8 s delay started just
+  before a dialog opened still appeared over the dialog (the map then gets no pointer events, so nothing cancelled it).
+  Now the frame loop cancels a pending/shown map tooltip while the pointer is off the map (`input.manager.isOver`
+  false) and StorePreview does not open a building tooltip while a blocking dialog is open (unit test in
+  `tests/night-tooltips.test.js`). The smoke presses Escape only while build mode is on and checks no dialog is open.

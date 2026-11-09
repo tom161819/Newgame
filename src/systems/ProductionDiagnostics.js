@@ -31,6 +31,9 @@ export class ProductionDiagnostics {
     // One current reason per entity: a new reason replaces the old one (chain advice has its own key per chain).
     const key=found.key??`${found.entityId}:${found.reason}`;let issue=this.issues.get(key);
     if(!issue){issue={...found,key,severity:found.severity??noticeSeverity(found.reason),firstSeen:now,lastNotified:null,dismissed:false,count:0};this.issues.set(key,issue);}
+    // A shown row whose text changes while it lasts (a Quarry that runs out and is then marked exhausted, fewer food
+    // days) is redrawn – still the same notice, not a new one.
+    if(issue.lastNotified!=null&&JSON.stringify(issue.params)!==JSON.stringify(found.params))issue.paramsChanged=true;
     issue.params=found.params;issue.entityId=found.entityId;if(issue.lastNotified!=null)issue.updatedAt=now;return issue;
   }
   // True when the panel must render again.
@@ -193,7 +196,7 @@ export class ProductionDiagnostics {
   update(){
     const time=this.scene.gameTime;if(!time||time.paused||this.scene.gameOver)return;const now=time.totalElapsed;if(now<this.nextCheck)return;this.nextCheck=now+DIAGNOSTICS.checkInterval;
     const seen=new Set();let changed=false;
-    for(const found of this.detect()){const issue=this.track(found,now);seen.add(issue.key);changed=this.observe(issue,found,now)||changed;}
+    for(const found of this.detect()){const issue=this.track(found,now);seen.add(issue.key);changed=this.observe(issue,found,now)||changed;if(issue.paramsChanged){issue.paramsChanged=false;changed=true;}}
     for(const [key,issue]of [...this.issues])if(!seen.has(key)&&this.forget(key,issue))changed=true;
     this.prune(now);
     if(changed)this.changed();

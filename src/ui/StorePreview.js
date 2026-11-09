@@ -3,6 +3,7 @@ import { resourceGroup, groupedResources, STORE_PREVIEW_DELAY_MS } from '../data
 import { buildingTooltipsEnabled,setBuildingTooltipsEnabled } from '../data/buildingTooltip.js';
 import { buildingTooltipDelayMs } from '../data/devBalance.js';
 import { buildingTooltipContent } from './buildingTooltipContent.js';
+import { blockingDialog } from './dockedPanels.js';
 
 // m-ui-prehled-surovin (24): resting the pointer on the store gauge in the top bar shows, after STORE_PREVIEW_DELAY_MS,
 // a small preview: used / capacity on the first line, then icon + count for each stored good, sorted and tinted by
@@ -18,7 +19,7 @@ export function storeContents(scene,locations){
 }
 export class StorePreview {
   constructor(scene,{document:doc=globalThis.document,delay=STORE_PREVIEW_DELAY_MS,buildingDelay=null,storage=globalThis.localStorage}={}){
-    this.scene=scene;this.delay=delay;this.buildingDelay=buildingDelay;this.root=doc.createElement('div');this.root.id='store-preview';this.root.className='store-preview';this.root.setAttribute('role','tooltip');this.root.hidden=true;doc.body.append(this.root);
+    this.scene=scene;this.doc=doc;this.delay=delay;this.buildingDelay=buildingDelay;this.root=doc.createElement('div');this.root.id='store-preview';this.root.className='store-preview';this.root.setAttribute('role','tooltip');this.root.hidden=true;doc.body.append(this.root);
     this.key=null;this.timer=null;this.signature=null;this.controller=new AbortController();
     this.enabled=buildingTooltipsEnabled(storage);this.setting=doc.querySelector?.('#settings-building-tooltips')??null;
     if(this.setting){this.setting.checked=this.enabled;this.setting.addEventListener('change',()=>{this.enabled=setBuildingTooltipsEnabled(this.setting.checked,storage);if(!this.enabled&&this.key?.startsWith('building:'))this.hide();},{signal:this.controller.signal});}
@@ -29,7 +30,8 @@ export class StorePreview {
     if(!target){this.hide();return;}
     if(target.key===this.key){this.pending=target;if(!this.root.hidden)this.render(target);this.position(target.x,target.y,target.below);return;}
     this.hide();this.key=target.key;this.pending=target;
-    this.timer=setTimeout(()=>{if(this.key===target.key){this.render(this.pending);this.root.hidden=false;this.position(this.pending.x,this.pending.y,this.pending.below);}},target.delay??this.delay);
+    // A map building tooltip never opens over a dialog that opened meanwhile (Escape → Game Menu).
+    this.timer=setTimeout(()=>{if(this.key===target.key&&!(this.pending?.building&&blockingDialog(this.doc))){this.render(this.pending);this.root.hidden=false;this.position(this.pending.x,this.pending.y,this.pending.below);}},target.delay??this.delay);
   }
   // allowed: false in build mode, while dragging, for the selected building and on touch (GameScene decides).
   hoverBuilding(building,x,y,{allowed=true}={}){

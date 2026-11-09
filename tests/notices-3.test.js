@@ -41,6 +41,14 @@ test('a closed notice comes back at the earliest 4 game days after the close –
   const again=s.gameTime.totalElapsed;s.diagnostics.dismiss(rows(s)[0].key);s.problems=[];advance(s,4*DAY);s.problems=[noBuilder];lasts(s);assert.ok(s.gameTime.totalElapsed-again>4*DAY);assert.equal(rows(s).length,1);assert.equal(s.log.length,3);
 });
 
+test('a shown row whose text changes while it lasts is redrawn, still the same notice (run out → exhausted Quarry)',()=>{
+  const s=scene(),runOut={entityId:4,reason:'depleted',category:'production',params:{resource:'stone',source:'stone_deposit'},feed:true};s.problems=[runOut];lasts(s);
+  let redraws=0;s.diagnostics.onChange(()=>redraws++);advance(s,DIAGNOSTICS.checkInterval*2);assert.equal(redraws,0,'unchanged: no redraw');
+  s.problems=[{...runOut,params:{...runOut.params,exhausted:true},once:true}];advance(s,DIAGNOSTICS.checkInterval);
+  assert.equal(redraws,1,'redrawn once');assert.equal(rows(s)[0].params.exhausted,true);assert.equal(s.log.length,1,'no new event');assert.equal(s.feed.length,1,'no new feed line');
+  advance(s,DIAGNOSTICS.checkInterval*2);assert.equal(redraws,1);
+});
+
 test('danger is never held back: every new occurrence shows at once, also after a close',()=>{
   const s=scene(),fire={entityId:3,reason:'fire',severity:'danger',category:'production',params:{}};s.problems=[fire];lasts(s);assert.equal(rows(s)[0].severity,'danger');assert.equal(s.log.length,1);
   s.problems=[];advance(s,DIAGNOSTICS.checkInterval*2);s.problems=[fire];lasts(s);assert.equal(s.log.length,2,'a second occurrence is reported');

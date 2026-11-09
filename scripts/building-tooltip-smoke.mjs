@@ -44,7 +44,10 @@ export async function buildingTooltipSmoke(context,url,instrument){
     await page.mouse.move(5,780);await page.waitForTimeout(100);assert.equal(await page.locator('#store-preview').isVisible(),false);
     // Build mode: nothing.
     await page.locator('#buildings-tab').click();await page.locator('[data-building-category="all"]').click();await page.locator('#house-choice').click();
-    assert.equal((await rest(page,farm.id)).visible,false,'not in build mode');await page.keyboard.press('Escape');await page.keyboard.press('Escape');
+    assert.equal((await rest(page,farm.id)).visible,false,'not in build mode');
+    // Escape leaves build mode; a second Escape would open the Game Menu (the map then gets no pointer at all).
+    const building=()=>page.evaluate(()=>!!window.__game.registry.get('application').scene.buildMode);
+    for(let i=0;i<2&&await building();i++)await page.keyboard.press('Escape');assert.equal(await building(),false);assert.equal(await page.locator('dialog[open]').count(),0,'no dialog over the map');
     // The selected building (its info panel open): nothing.
     await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;s.demolitionUI.selectedId=id;},farm.id);assert.equal((await rest(page,farm.id)).visible,false,'not for the selected building');
     await page.evaluate(()=>{window.__game.registry.get('application').scene.demolitionUI.selectedId=null;});

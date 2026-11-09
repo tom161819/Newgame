@@ -29,8 +29,15 @@ export async function storageNoticesSmoke(context,url,instrument){
     // 1. The Quarry's deposit runs out.
     await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id);s.naturalResources.byId.get(b.depositId).natural.remaining=0;},quarry.id);
     await settle(page);
-    await page.locator('#notices-panel:not([hidden])').waitFor();assert.match(await page.locator('#notices-list').textContent(),/The Quarry has run out of Stone\./);
-    assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.issueIcons.icons.has(id),quarry.id),true,'warning sign over the Quarry');
+    // A Quarry worker who already found the deposit empty marks the Quarry exhausted (m-vytezeny-dul-ctverecky): then
+    // the same notice reads "is exhausted" and the Quarry shows it by its look, without the sign. Which one comes first
+    // is a race with the game clock; both are right.
+    await page.locator('#notices-panel:not([hidden])').waitFor();
+    const quarryState=id=>{const s=window.__game.registry.get('application').scene,exhausted=s.buildings.find(b=>b.id===id).depleted===true,text=document.querySelector('#notices-list').textContent,sign=s.issueIcons.icons.has(id);
+      return {exhausted,text,sign,ok:(exhausted?/The Quarry is exhausted\./:/The Quarry has run out of Stone\./).test(text)&&sign===!exhausted};};
+    // The state the wait saw (one snapshot: the flag can flip right after it).
+    const state=await page.waitForFunction(`(()=>{const q=(${quarryState})(${quarry.id});return q.ok&&q;})()`,null,{timeout:10000}).then(h=>h.jsonValue(),()=>page.evaluate(quarryState,quarry.id));
+    assert.ok(state.ok,`depleted Quarry: notice, and the sign unless exhausted ${JSON.stringify(state)}`);
     await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;s.workplacePanel.open(s.buildings.find(b=>b.id===id));},quarry.id);
     assert.match(await page.locator('#workplace-issue').textContent(),/No Stone left in range – build a new Quarry near rocks\./);
     if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/quarry-depleted.png`});
@@ -48,6 +55,6 @@ export async function storageNoticesSmoke(context,url,instrument){
     // 3. Room again.
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,st=s.foodStorage;for(const l of st.locations.values())if(st.isStock(l))l.stock.stone=0;st.changed();});
     await settle(page);assert.doesNotMatch(await page.locator('#notices-list').textContent(),/Storage full/);
-    console.log(`PASS Notices 14–15: depleted Quarry (notice, sign, panel line), Storage full for Wood with the Material Yard advice and a sign over the Lumberjack Hut, cleared with room${/Storage full/.test(feed)?', in the event feed':''}`);
+    console.log(`PASS Notices 14–15: depleted Quarry (${state.exhausted?"exhausted notice, no sign":"notice, sign"}, panel line), Storage full for Wood with the Material Yard advice and a sign over the Lumberjack Hut, cleared with room${/Storage full/.test(feed)?', in the event feed':''}`);
   }finally{await page.close();}
 }

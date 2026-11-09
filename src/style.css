@@ -502,7 +502,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .notices-panel.collapsed.peeking { transform:none; padding:4px 6px; }
 .notices-panel.collapsed .notices-heading { display:none; }
 .notices-tab { position:absolute; top:0; right:100%; margin-right:6px; display:flex; align-items:center; gap:3px; min-width:28px; height:30px; padding:0 7px; border-radius:8px 0 0 8px; font-size:13px; line-height:1; box-shadow:0 4px 14px rgb(6 9 5 / .45); }
-.notices-panel.collapsed:not(.peeking) .notices-tab { margin-right:0; }
+.notices-panel.collapsed:not(.peeking) .notices-tab { margin-right:var(--notices-tab-shift,0px); } /* set by NoticesPanel.placeTab() */
 .notices-tab.has-unread { border-color:#e0b85a; color:#ffd77a; }
 .notices-alert { font-weight:800; color:#ffb25a; }
 .notices-unread { min-width:14px; padding:0 3px; border-radius:7px; background:#c4512f; color:#fff; font-size:10px; line-height:14px; text-align:center; }

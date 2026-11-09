@@ -90,3 +90,15 @@ days after its close. The slide-away state is a browser preference, not in the s
 - To add a danger notice to Notices, push a found issue with `severity:'danger'`; it then wins the peek and is never
   held back.
 - The 4 days are `NOTICE_REPEAT_DAYS` (per severity) in `src/data/diagnostics.js`.
+- Smoke fix (`--notices-2`, "tab at the edge"): slid away, the tab stuck 4 px past the game view's right edge (the panel
+  border was not counted) and sat on the Employments / Population side tabs (fixed at the right edge) at 1280×800 and
+  at small heights. Now `NoticesPanel.placeTab()` sets `--notices-tab-shift` (margin-right of the slid-away tab): the
+  tab's right side is at the view's edge, or 4 px left of a side tab at the same height; re-placed on render, slide,
+  peek and window resize. The smoke checks no overlap at 800, 560 and 420 px heights.
+- Smoke fix (`--storage-notices`): the depleted Quarry's notice is "has run out of Stone" or – once a Quarry worker
+  marked it exhausted (m-vytezeny-dul-ctverecky) – "is exhausted" without the sign; which comes first is a race with
+  the game clock, the smoke now accepts either (consistently, one snapshot). Game fix found there: a shown row whose
+  params changed while it lasted (run out → exhausted, fewer food days) was not redrawn (observe returned false);
+  `track` now flags `paramsChanged` and `update` redraws – same notice, no event / feed line / peek. Unit test in
+  `tests/notices-3.test.js`. The smoke's later 120 s wait for the Woodcutters' "Output pile full" timed out once in
+  ~20 runs (world/AI timing, not notices).

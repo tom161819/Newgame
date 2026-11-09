@@ -35,7 +35,15 @@ export async function notices2Smoke(context,url,instrument){
     await page.locator('#notices-toggle').click();assert.equal(await page.locator('#notices-panel.collapsed').count(),1);
     assert.equal(await page.evaluate(()=>localStorage.getItem('newgame.notices.collapsed')),'1');
     await page.waitForTimeout(450);assert.ok(await panelX()>=await edge()-2,'slid off the right edge');
-    const tab=await page.locator('#notices-tab').boundingBox();assert.ok(tab&&tab.width>0&&tab.x+tab.width<=await edge()+1&&tab.x+tab.width>=await edge()-12,'tab at the edge');
+    // The tab sits at the right edge, or just left of a side tab (Policy / Population / Employments) at the same
+    // height; it never covers one – also at small window heights.
+    const tabPlace=async()=>page.evaluate(()=>{const tab=document.querySelector('#notices-tab').getBoundingClientRect(),edge=document.querySelector('.viewport').getBoundingClientRect().right;
+      const sides=[...document.querySelectorAll('.population-tab')].map(e=>e.getBoundingClientRect()).filter(r=>r.width&&r.height);const hit=sides.filter(r=>r.top<tab.bottom&&r.bottom>tab.top&&r.left<tab.right&&r.right>tab.left);
+      const next=sides.filter(r=>r.top<tab.bottom+4&&r.bottom>tab.top-4).map(r=>r.left);return {width:tab.width,right:tab.right,edge,overlap:hit.length,besideTabs:next.length?Math.min(...next):null};});
+    const tabOk=p=>p.width>0&&p.overlap===0&&p.right<=p.edge+1&&(p.right>=p.edge-12||p.besideTabs!==null&&p.right>=p.besideTabs-12);
+    {const p=await tabPlace();assert.ok(tabOk(p),`tab at the edge ${JSON.stringify(p)}`);}
+    for(const height of [560,420]){await page.setViewportSize({width:1280,height});await page.waitForTimeout(450);const p=await tabPlace();assert.ok(tabOk(p),`tab at the edge, no side tab covered at ${height} px ${JSON.stringify(p)}`);}
+    await page.setViewportSize({width:1280,height:800});await page.waitForTimeout(300);
     assert.match(await page.locator('#notices-tab').textContent(),/◂/);assert.equal(await page.locator('#notices-tab .notices-alert').count(),0,'no "!" without unread');
     // A quiet repeat while away: no slide-out, no "!".
     await repeat({entityId:0,reason:'foodLow',category:'production',params:{days:1},feed:true});await page.waitForTimeout(400);
