@@ -48,3 +48,22 @@ test('an explicit complete transition redraw drains visible chunks while normal 
  r.invalidateChunksOf(keys.map(k=>{const [x,y]=k.split(',').map(Number);return {x:x*10,y:y*10};}),{immediate:true});r.repaintDirty();assert.equal(r.dirtyChunks.size,0,'paused scenes have no future simulation frames to finish the seasonal redraw');assert.equal(painted.length,8);
  r.dirtyChunks=new Set(keys);painted=[];r.repaintDirty();assert.equal(painted.length,2,'normal live redraw remains bounded');
 });
+
+test('fog report 0.83: newly seen ground marks its chunk and the neighbour chunks whose edge ring covers it urgent',()=>{
+  const king={definition:objectRegistry.require('king'),state:'ground',position:{x:10.5,y:10.5}},fog=new FogOfWarSystem(king,true),r=renderer();
+  r.updateFog({},fog);r.urgentChunks?.clear();
+  king.position={x:19.5,y:15.5};fog.update();r.updateFog({},fog);
+  // Tiles at x 19 / 20 (chunk border) were seen for the first time: chunk 2,1 paints its ring black-out over them too.
+  assert.ok(r.urgentChunks.has('1,1')&&r.urgentChunks.has('2,1'),[...r.urgentChunks].join(' '));
+});
+
+test('fog report 0.83: an urgent chunk redraws its fog over the previous ground while the ground repaint has to wait',()=>{
+  const r=Object.create(TerrainRenderer.prototype),key='3,4',calls=[];
+  const image=()=>({setTexture(){return this;},setPosition(){return this;},setVisible(){return this;}});
+  Object.assign(r,{scene:{},dirtyTiles:new Map(),neededChunks:[key],chunks:new Map([[key,image()]]),dirtyChunks:new Set([key]),urgentChunks:new Set([key]),groundStyle:'continuous',composite:{touched:[],touch(k){this.touched.push(k);},sync(){}},
+    chunkTexture(x,y){calls.push(this.paintingUrgent);return {key:`${x},${y}`,x,y,painted:!!this.paintingUrgent};}});
+  r.repaintDirty();
+  assert.deepEqual(calls,[true],'painted at once as urgent');
+  assert.deepEqual(r.composite.touched,[key],'a fog-only repaint (chunk still dirty for its ground) still refreshes the composed ground');
+  assert.equal(r.dirtyChunks.has(key),true,'the ground repaint stays pending');
+});

@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.83.1] - 2026-11-09
+<!-- version: {"title":"Fog of War: land seen for the first time no longer stays black for seconds, in black jagged notches or as flat grey strips at the edge of sight.","type":"fix","reconstructed":false,"saveVersion":61} -->
+### Fixed
+- Fog of War: land seen for the first time no longer stays black for seconds, in black jagged notches or as flat grey strips at the edge of sight. This happened with many residents walking at the edge of the known land.
+
 ## [0.83.0] - 2026-11-09
 <!-- version: {"title":"Thickets, rock ridges and large deposits","type":"feature","reconstructed":false,"saveVersion":61} -->
 ### Added
