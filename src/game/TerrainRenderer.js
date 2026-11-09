@@ -22,7 +22,7 @@ import { GroundComposite } from './GroundComposite.js';
 // Continuous ground (plan m-souvisla-zeme): the approved World Lab look (art/effects/ground.json) paints land and water
 // of a whole chunk as one surface – no tile grid, soft zone transitions, natural river banks, plants and stones.
 // World Editor: the approved look (groundStyle.json) with the player's ground-look override on top.
-const SEASON_YEAR = { Winter: 0.02, Spring: 0.3, Summer: 0.5, Autumn: 0.76 };
+import { SEASON_YEAR, SEASON_TRANSITION, blendMask } from './SeasonTransition.js';
 const LAND_MATERIAL = { [GROUND.BEACH]: 6, [GROUND.DESERT]: 7, [GROUND.MUD]: 8, [GROUND.SHORE_ROCKS]: 9 };
 const WATER_DEPTH = { [GROUND.FORD]: 0.15, [GROUND.SHALLOW]: 0.5, [GROUND.DEEP]: 1 };
 
@@ -188,6 +188,40 @@ export class TerrainRenderer {
     context.putImageData(image,0,0);
   }
   // One chunk of continuous ground (land, water, plants, water plants) in chunk-canvas pixels.
+  // m-plynule-prechody: the continuous ground's season look for a chunk – {key} while it shows one season, else the step
+  // key of the gradual change with its mask (SeasonTransition.groundLook). The key is part of the chunk's ground stamp.
+  groundLook(cx,cy){return this.seasonGroundLook?.(cx,cy,this.season,CHUNK_SIZE)??{key:this.season};}
+  // Season of a bush or rock on a tile during the gradual change (the same mask as trees).
+  tileSeason(x,y){return x==null?this.season:this.seasonAt?.({x,y},this.season)??this.season;}
+  // m-plynule-prechody: the ground picture of a chunk for its stamp. A plain season is painted (or taken over from the
+  // layer a finished change left). Mid-change the chunk keeps two plain layers – the old and the new season, each
+  // painted once per change – and every step only blends them again through the noise mask (SeasonTransition
+  // blendMask: a few ms instead of a full repaint), so the change comes in patches without repainting the ground.
+  groundPicture(ck,cx,cy,left,top,texture,occupied,stamp,cached){
+    const look=this.groundLook(cx,cy),rest=stamp.slice(stamp.indexOf('|')),layers=this.seasonLayers??=new Map(),own=layers.get(ck)??{};
+    const fresh=()=>{const c=document.createElement('canvas');c.width=texture.width;c.height=texture.height;return c;};
+    const plain=(season,canvas)=>{canvas.width=texture.width;canvas.height=texture.height;const c2=canvas.getContext('2d');c2.clearRect(0,0,canvas.width,canvas.height);this.paintContinuousChunk(c2,cx,cy,left,top,season,occupied);this.paintStats.groundPaints=(this.paintStats.groundPaints??0)+1;return canvas;};
+    if(!look.blend){
+      // A finished change: the new season's layer is the picture; the old layer is dropped.
+      const done=own[look.key];layers.delete(ck);if(done?.stamp===stamp)return{canvas:done.canvas,stamp};
+      return{canvas:plain(look.key,cached?.canvas??fresh()),stamp};
+    }
+    const layer=season=>{const want=`${season}${rest}`;if(own[season]?.stamp===want)return own[season].canvas;
+      if(cached?.stamp===want){own[season]={stamp:want,canvas:cached.canvas};cached=null;return own[season].canvas;}
+      own[season]={stamp:want,canvas:plain(season,own[season]?.canvas??fresh())};return own[season].canvas;};
+    const a=layer(look.from),b=layer(look.to);layers.delete(ck);layers.set(ck,own);
+    // Memory: two layers (~0.8 MB each) per chunk; chunks in view always keep theirs, of the others only the most
+    // recently blended ones up to SEASON_TRANSITION.layerChunks in all.
+    if(layers.size>SEASON_TRANSITION.layerChunks){const view=this.neededChunks instanceof Set?this.neededChunks:new Set(this.neededChunks??[]);for(const key of [...layers.keys()]){if(layers.size<=SEASON_TRANSITION.layerChunks)break;if(!view.has(key)&&key!==ck)layers.delete(key);}}
+    const canvas=cached?.canvas&&cached.canvas!==a&&cached.canvas!==b?cached.canvas:fresh(),c=canvas.getContext('2d'),W=texture.width,H=texture.height;
+    // The new season through the mask (alpha = blend weight on a coarse grid, smoothed up), over the old one.
+    const step=8,gw=Math.ceil(W/step)+1,gh=Math.ceil(H/step)+1,mask=this.maskCanvas??=document.createElement('canvas');mask.width=gw;mask.height=gh;
+    const m=mask.getContext('2d'),image=m.createImageData(gw,gh);blendMask(image.data,gw,gh,(px,py)=>{const g=worldToGrid(px*step+left,py*step+top);return[g.x,g.y];},look.blend.weight);m.putImageData(image,0,0);
+    const top_=this.blendCanvas??=document.createElement('canvas');top_.width=W;top_.height=H;const t2=top_.getContext('2d');t2.clearRect(0,0,W,H);t2.drawImage(b,0,0);
+    t2.globalCompositeOperation='destination-in';t2.imageSmoothingEnabled=true;t2.drawImage(mask,0,0,gw,gh,0,0,gw*step,gh*step);t2.globalCompositeOperation='source-over';
+    canvas.width=W;canvas.height=H;c.clearRect(0,0,W,H);c.drawImage(a,0,0);c.drawImage(top_,0,0);this.paintStats.groundBlends=(this.paintStats.groundBlends??0)+1;
+    return{canvas,stamp};
+  }
   paintContinuousChunk(context,cx,cy,left,top,season,occupied){
     const x0=cx*CHUNK_SIZE,y0=cy*CHUNK_SIZE,cell=(x,y)=>this.groundAt(Math.max(0,Math.min(COLUMNS-1,x)),Math.max(0,Math.min(ROWS-1,y)));
     const isLand=(x,y)=>{const g=cell(x,y);return g===GROUND.GRASS||LAND_MATERIAL[g]!==undefined;},zoneAt=(x,y)=>{const g=cell(x,y);return g===GROUND.GRASS?(this.scene.grassZones?.[Math.max(0,Math.min(ROWS-1,y))]?.[Math.max(0,Math.min(COLUMNS-1,x))]??0):LAND_MATERIAL[g]??0;};
@@ -348,7 +382,7 @@ export class TerrainRenderer {
   }
   buildingTiles(){const tiles=new Set();for(const b of this.scene.buildings??[])for(const t of b.tiles??[])tiles.add(`${t.x},${t.y}`);return tiles;}
   paintBush(sprite,type,state,fog,x,y){
-    const look=x==null?null:bushLook(BUSH_TYPES[type],x,y,this.season);
+    const look=x==null?null:bushLook(BUSH_TYPES[type],x,y,this.tileSeason(x,y));
     if(look&&this.natureArtReady()&&showNature(this.scene,sprite,look,{remembered:state===VISIBILITY.EXPLORED,brightness:fog?.memoryBrightness}))return 'nature';
     const id=BUSH_TYPES[type];let key=this.assets?.hasTexture(id)?this.assets.key(id):null;if(!key)return false;
     if(state===VISIBILITY.EXPLORED){const texture=this.scene.textures.get(key);key=memoryTexture(this.scene,texture,texture.get(),fog.memoryBrightness)??key;}
@@ -472,7 +506,7 @@ export class TerrainRenderer {
         // A season change or a new building repaints the ground of one chunk per frame (about 50 ms each); the others
         // keep their old picture (and stay dirty) until their turn, so the change rolls over the view without a freeze.
         let occ='';for(const b of this.scene.buildings??[])for(const t of b.tiles??[])if(Math.floor(t.x/CHUNK_SIZE)===cx&&Math.floor(t.y/CHUNK_SIZE)===cy)occ+=`${t.x},${t.y};`;
-        groundStamp=`${this.season}|${occ}|${this.pathRevAll??0}.${this.pathRev?.get(`${cx},${cy}`)??0}|${this.v2?.geo&&this.pathStyle==='v2'?1:0}`;const cached=this.groundCache?.get(`${cx},${cy}`);
+        groundStamp=`${this.groundLook(cx,cy).key}|${occ}|${this.pathRevAll??0}.${this.pathRev?.get(`${cx},${cy}`)??0}|${this.v2?.geo&&this.pathStyle==='v2'?1:0}`;const cached=this.groundCache?.get(`${cx},${cy}`);
         // performance-1: a change of the trodden paths alone (25 walking residents) repaints one chunk's ground (~40 ms
         // without GPU) at most every GROUND_PATH_GAP_MS; seasons and buildings keep the one-a-frame rule.
         const pathOnly=cached&&cached.stamp!==groundStamp&&cached.stamp.split('|').filter((_,i)=>i!==2).join('|')===groundStamp.split('|').filter((_,i)=>i!==2).join('|');
@@ -492,7 +526,7 @@ export class TerrainRenderer {
         // The painted ground (land, water, plants) does not depend on the fog: it is cached per chunk and only redrawn
         // when the season or the buildings on the chunk change. Fog changes then cost one drawImage plus the overlays.
         const ck=`${cx},${cy}`,stamp=groundStamp;let cached=(this.groundCache??=new Map()).get(ck);
-        if(!staleGround&&(!cached||cached.stamp!==stamp)){this.groundPaintsLeft--;const canvas=cached?.canvas??document.createElement('canvas');canvas.width=texture.width;canvas.height=texture.height;const c2=canvas.getContext('2d');c2.clearRect(0,0,canvas.width,canvas.height);this.paintContinuousChunk(c2,cx,cy,left,origin.y,this.season,occupied);cached={canvas,stamp};this.groundCache.set(ck,cached);this.paintStats.groundPaints=(this.paintStats.groundPaints??0)+1;}
+        if(!staleGround&&(!cached||cached.stamp!==stamp)){this.groundPaintsLeft--;const t0=performance.now();cached=this.groundPicture(ck,cx,cy,left,origin.y,texture,occupied,stamp,cached);this.paintStats.groundMs=(this.paintStats.groundMs??0)+performance.now()-t0;this.groundCache.set(ck,cached);}
         context.drawImage(cached.canvas,0,0);
         // Plants near the chunk edge reach into neighbour tiles: black them out where that neighbour is unexplored.
         context.fillStyle='#000';
@@ -620,7 +654,7 @@ export class TerrainRenderer {
   paintWall(wall,state,fog){
     // Plan g-nasadit-prirodu: the approved rock obstacle looks per tile and season; the old outcrop art until the
     // atlas is in.
-    const look=wall.tileX==null?null:outcropLook(wall.tileX,wall.tileY,this.season);
+    const look=wall.tileX==null?null:outcropLook(wall.tileX,wall.tileY,this.tileSeason(wall.tileX,wall.tileY));
     if(look&&this.natureArtReady()&&showNature(this.scene,wall,look,{remembered:state===VISIBILITY.EXPLORED,brightness:fog?.memoryBrightness})){wall.natureArt=true;return;}
     if(wall.natureArt){wall.natureArt=false;wall.setOrigin(this.outcrop.origin?.x??0.5,this.outcrop.origin?.y??1);}
     let key=this.wallTexture;
@@ -659,7 +693,7 @@ export class TerrainRenderer {
   // The look for the season; the remembered (darker) look while no tile of the group is in sight.
   paintGroup(sprite,g,fog){
     const tiles=groupTiles(g),visible=!fog||tiles.some(t=>fog.displayState(t)===VISIBILITY.VISIBLE);
-    const look=g.kind==='rocks'?rockGroupLook(g,this.season):thicketLook(g,tiles.map(t=>BUSH_TYPES[this.scene.bushes?.get(`${t.x},${t.y}`)]),this.season);
+    const gs=this.tileSeason(Math.floor(g.x+g.w/2),Math.floor(g.y+g.h/2)),look=g.kind==='rocks'?rockGroupLook(g,gs):thicketLook(g,tiles.map(t=>BUSH_TYPES[this.scene.bushes?.get(`${t.x},${t.y}`)]),gs);
     return !!look&&showNature(this.scene,sprite,look,{remembered:!visible,brightness:fog?.memoryBrightness});
   }
   updateFog(camera,fog) {

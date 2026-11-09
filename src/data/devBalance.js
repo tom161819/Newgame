@@ -1,5 +1,6 @@
 import { BUILDING_TOOLTIP } from './buildingTooltip.js';
 import { FORESTRY } from './naturalResources.js';
+import { SEASON_TRANSITION } from './seasonTransition.js';
 // m-91-asset-library-dev (owner point 88): the Dev tool coefficients. ONE module read at the points where yields,
 // consumption, wages, taxes, prices, construction and growth are computed (devFactor(key) / devProduction(key)).
 // Since 0.82 the coefficients are part of the GAME: saved in the save (optional field `devBalance`, only the keys that
@@ -13,12 +14,14 @@ export const DEV_ADVANCED_KEYS=Object.freeze(['hunter','fisher','farming','baker
 // m-drevorubci-stromy: the "Forest and wood" group. Own ranges and defaults (the sapling chance is a probability 0–1,
 // the hut boost starts at FORESTRY.hutGrowthBoost); the save keeps only the keys that differ from their default.
 export const DEV_FOREST_KEYS=Object.freeze(['forestGrowth','saplingChance','hutGrowthBoost','woodRadius','chopTime','woodYield']);
-export const DEV_BALANCE_KEYS=Object.freeze([...DEV_MAIN_KEYS,...DEV_ADVANCED_KEYS,...DEV_FOREST_KEYS]);
+// m-plynule-prechody: the "World look" group – how many game days the season change takes and in how many steps.
+export const DEV_LOOK_KEYS=Object.freeze(['seasonDays','seasonSteps']);
+export const DEV_BALANCE_KEYS=Object.freeze([...DEV_MAIN_KEYS,...DEV_ADVANCED_KEYS,...DEV_FOREST_KEYS,...DEV_LOOK_KEYS]);
 // Production buildings whose work the `production` master speeds up (field growth has its own `growth`).
 const PRODUCTION_KEYS=new Set(['hunter','fisher','bakery','mill','woodcutter','mining']);
 export const DEV_BALANCE_RANGE=Object.freeze({min:.25,max:4,step:.25});
-const KEY_RANGES=Object.freeze({saplingChance:Object.freeze({min:0,max:1,step:.05}),hutGrowthBoost:Object.freeze({min:1,max:3,step:.25}),woodRadius:Object.freeze({min:.5,max:2,step:.25}),woodYield:Object.freeze({min:.5,max:3,step:.25})});
-const DEFAULTS=Object.freeze({saplingChance:FORESTRY.saplingChance,hutGrowthBoost:FORESTRY.hutGrowthBoost});
+const KEY_RANGES=Object.freeze({saplingChance:Object.freeze({min:0,max:1,step:.05}),hutGrowthBoost:Object.freeze({min:1,max:3,step:.25}),woodRadius:Object.freeze({min:.5,max:2,step:.25}),woodYield:Object.freeze({min:.5,max:3,step:.25}),seasonDays:SEASON_TRANSITION.dev.days,seasonSteps:SEASON_TRANSITION.dev.steps});
+const DEFAULTS=Object.freeze({saplingChance:FORESTRY.saplingChance,hutGrowthBoost:FORESTRY.hutGrowthBoost,seasonDays:SEASON_TRANSITION.days,seasonSteps:SEASON_TRANSITION.steps});
 export const devRange=key=>KEY_RANGES[key]??DEV_BALANCE_RANGE;
 export const devDefault=key=>DEFAULTS[key]??1;
 export const DEV_BALANCE_STORAGE_KEY='newgame.devBalance';

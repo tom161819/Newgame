@@ -1,5 +1,5 @@
 import { t,onLanguageChange } from '../i18n/index.js';
-import { DEV_MAIN_KEYS,DEV_ADVANCED_KEYS,DEV_FOREST_KEYS,devRange,DEV_QUICK,loadDevBalance,devMode,setDevMode,setDevFactor,resetDevBalance,devBalanceValues,devBalanceJSON,devBalanceChanged,devTooltipDelay,setDevTooltipDelay,onDevBalanceChange } from '../data/devBalance.js';
+import { DEV_MAIN_KEYS,DEV_ADVANCED_KEYS,DEV_FOREST_KEYS,DEV_LOOK_KEYS,devRange,DEV_QUICK,loadDevBalance,devMode,setDevMode,setDevFactor,resetDevBalance,devBalanceValues,devBalanceJSON,devBalanceChanged,devTooltipDelay,setDevTooltipDelay,onDevBalanceChange } from '../data/devBalance.js';
 import { BUILDING_TOOLTIP } from '../data/buildingTooltip.js';
 import { FrameProfiler,PROFILER_RULES } from '../systems/FrameProfiler.js';
 import { arrivalForecast,economyOverview,forestOverview,addDevGold,addDevResources,advanceDevDay,summonDevCaravan,addDevResident } from '../systems/DevTools.js';
@@ -42,6 +42,8 @@ export class DevBalancePanel {
     this.advancedSummary=el(doc,'summary');this.advanced=el(doc,'details',{id:'dev-balance-advanced',className:'dev-balance-advanced'},[this.advancedSummary,...DEV_ADVANCED_KEYS.map(slider)]);
     // m-drevorubci-stromy: "Forest and wood" (saved and reset like the others).
     this.forestSummary=el(doc,'summary');this.forest=el(doc,'details',{id:'dev-balance-forest',className:'dev-balance-advanced dev-balance-forest'},[this.forestSummary,...DEV_FOREST_KEYS.map(slider)]);
+    // m-plynule-prechody: "World look" – the season change (days, steps).
+    this.lookSummary=el(doc,'summary');this.look=el(doc,'details',{id:'dev-balance-look',className:'dev-balance-advanced dev-balance-look'},[this.lookSummary,...DEV_LOOK_KEYS.map(slider)]);
     // Economy overview (read only).
     this.overviewHeading=el(doc,'h3',{className:'dev-balance-subheading'});this.overview=el(doc,'div',{id:'dev-balance-overview',className:'dev-balance-overview'});
     // Quick actions.
@@ -58,7 +60,7 @@ export class DevBalancePanel {
     this.profileButton=el(doc,'button',{type:'button',id:'dev-profiler-toggle'});this.profileButton.setAttribute('aria-pressed','false');
     this.profileOut=el(doc,'pre',{id:'dev-profiler',className:'dev-profiler',hidden:true});this.profileOut.setAttribute('role','status');
     this.profiler=scene?.game?new FrameProfiler(scene.game,{scene:()=>this.scene}):null;
-    this.panel.append(el(doc,'div',{className:'settings-heading'},[this.title,this.close]),arrival,list,this.advanced,this.forest,this.overviewHeading,this.overview,this.actionsHeading,quick,tooltipSection,el(doc,'div',{className:'dev-balance-actions'},[this.reset,this.copy,this.profileButton,this.status]));
+    this.panel.append(el(doc,'div',{className:'settings-heading'},[this.title,this.close]),arrival,list,this.advanced,this.forest,this.look,this.overviewHeading,this.overview,this.actionsHeading,quick,tooltipSection,el(doc,'div',{className:'dev-balance-actions'},[this.reset,this.copy,this.profileButton,this.status]));
     doc.body?.append(this.profileOut);doc.body?.append(this.panel);
     this.profileButton.addEventListener('click',()=>this.setProfiling(!this.profiler?.enabled),options);
     const view=doc.defaultView;
@@ -112,9 +114,9 @@ export class DevBalancePanel {
     this.row.querySelector('label').textContent=t('dev.mode');this.button.title=t('dev.tool.open');this.button.setAttribute('aria-label',t('dev.tool.open'));this.title.textContent=t('dev.tool.title');
     const changed=devBalanceChanged();this.dot.hidden=!changed;this.button.classList?.toggle?.('dev-tool-changed',changed);
     this.close.setAttribute('aria-label',t('dev.balance.close'));this.reset.textContent=t('dev.balance.reset');this.copy.textContent=t('dev.balance.copy');if(this.profileButton){this.profileButton.textContent=t('dev.profiler.toggle');this.profileButton.title=t('dev.profiler.hint');}
-    this.advancedSummary.textContent=t('dev.tool.advanced');this.forestSummary.textContent=t('dev.tool.forest');this.overviewHeading.textContent=t('dev.tool.overview');this.actionsHeading.textContent=t('dev.tool.actions');
+    this.advancedSummary.textContent=t('dev.tool.advanced');this.forestSummary.textContent=t('dev.tool.forest');this.lookSummary.textContent=t('dev.tool.look');this.overviewHeading.textContent=t('dev.tool.overview');this.actionsHeading.textContent=t('dev.tool.actions');
     for(const [id,b]of this.actionButtons)b.textContent=t(`dev.action.${id}`,{gold:DEV_QUICK.gold,amount:DEV_QUICK.resources});
-    const values=devBalanceValues();for(const [key,{input,out,label}]of this.sliders){input.value=String(values[key]);out.textContent=key==='saplingChance'?`${Math.round(values[key]*100)} %`:`×${values[key].toFixed(2)}`;label.textContent=t(`dev.balance.key.${key}`);}
+    const values=devBalanceValues();for(const [key,{input,out,label}]of this.sliders){input.value=String(values[key]);out.textContent=key==='saplingChance'?`${Math.round(values[key]*100)} %`:key==='seasonDays'?t('dev.balance.days',{days:values[key]}):key==='seasonSteps'?String(values[key]):`×${values[key].toFixed(2)}`;label.textContent=t(`dev.balance.key.${key}`);}
     const delay=devTooltipDelay();this.tooltipDelay.value=String(delay);this.tooltipOut.textContent=t('dev.tooltip.value',{seconds:delay.toFixed(1)});this.tooltipLabel.textContent=t('dev.tooltip.delay');this.tooltipHeading.textContent=t('dev.tooltip.title');
     this.renderLive();
   }
