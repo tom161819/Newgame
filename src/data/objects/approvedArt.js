@@ -4,6 +4,8 @@
 // tests/asset-studio.test.js checks that files and numbers match the export.
 // The procedural renderer stays as the fallback if an image cannot load.
 export const APPROVED_BUILDING_ART=Object.freeze({
+  // Owner 9 Nov 2026 ("proč není ve hře úprava dočasného skladiště?"): approved 7 Nov (plan g-docasny-sklad), wired in now.
+  starter_stockpile:{"sprite":"/assets/buildings/starter_stockpile/starter-stockpile-tarp-camp.v1.png","artSource":"art/sprites/starter-stockpile/starter-stockpile-tarp-camp.v1.json","origin":{"x":0.49618,"y":0.97561},"visualHeight":80,"lights":[{"type":"torch","x":-46.4,"y":-55.89,"color":"#ffb25a","radius":102.4,"intensity":0.95,"flicker":{"amplitude":0.12,"speed":7},"flameSize":1}]},
   house:{"sprite":"/assets/buildings/house/house-timber.v3.png","artSource":"art/sprites/house/house-timber.v3.json","origin":{"x":0.49618,"y":0.98601},"visualHeight":141},
   swordsmith:{"sprite":"/assets/buildings/swordsmith/swordsmith-stone.v1.png","artSource":"art/sprites/swordsmith/swordsmith-stone.v1.json","origin":{"x":0.49618,"y":0.98473},"visualHeight":129,"lights":[{"type":"brazier","x":6.4,"y":-34.09,"color":"#ff9d4a","radius":134.4,"intensity":1,"flicker":{"amplitude":0.16,"speed":5.5},"flameSize":1.6}]},
   farmhouse:{"sprite":"/assets/buildings/farmhouse/farmstead-thatched.v2.png","artSource":"art/sprites/farmstead/farmstead-thatched.v2.json","origin":{"x":0.49744,"y":0.98765},"visualHeight":160,"lights":[{"type":"torch","x":-14.11,"y":-95.82,"color":"#ffb25a","radius":102.4,"intensity":0.95,"flicker":{"amplitude":0.12,"speed":7},"flameSize":1}]},

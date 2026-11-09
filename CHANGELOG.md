@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.84.2] - 2026-11-09
+<!-- version: {"title":"The starter stockpile has its approved Studio look: a tarp camp store with sacks, barrels, logs, crates and a lantern.","type":"feature","reconstructed":false,"saveVersion":61} -->
+### Changed
+- The starter stockpile has its approved Studio look: a tarp camp store with sacks, barrels, logs, crates and a lantern. It was approved on 7 Nov but never wired in.
+
 ## [0.84.1] - 2026-11-09
 <!-- version: {"title":"Fog of War: land you walk away from turns grey right away.","type":"fix","reconstructed":false,"saveVersion":61} -->
 ### Fixed
