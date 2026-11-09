@@ -5,6 +5,32 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.81.0] - 2026-11-09
+<!-- version: {"title":"Soldiers, notices, tooltips, night","type":"feature","reconstructed":false,"saveVersion":60} -->
+### Added
+- Population has a Soldiers group that lists every soldier, including the starting garrison. Clicking a soldier centres the camera on him.
+- The Barracks shows what is missing before you can train, for example "Needs an Armory" or "Needs 1 Sword in an Armory. Swordsmith makes Sword from 3 Iron + 2 Wood". Train stays disabled until everything is there. Before, the gold was taken and the order waited forever.
+- Building tooltip: hold the mouse over a building for 0.8 s to see its name and state.
+  - Workplaces show their workers and production.
+  - Stores show their stock.
+  - Houses show their residents.
+  - Construction sites show what they still need.
+  - You can switch it off in Settings. In developer mode the delay can be tuned.
+- New Settings option "Auto speed-up at night". It is off by default. When on, nights run at ×3, the speed indicator shows ☾3×, and the earlier speed returns at dawn. After one year a tip offers to turn it on.
+### Changed
+- Notices:
+  - The same notice shows only once. Repeats only update it.
+  - After you close it, it comes back no sooner than 4 game days later. Danger is never held back.
+  - The closed state is kept in saves.
+  - A notice whose details change, for example from "run out" to "exhausted", is redrawn.
+- The folded notice bar slides into a small icon at the right edge, with an arrow and "!". A new notice slides out as one line for 4 s and goes back.
+- Tutorial:
+  - The arrow no longer covers the Population tab.
+  - The arrow and bubble follow window resizes and opening panels.
+  - Every build step now ends when you place its blueprint, including the House.
+### Fixed
+- Soldiers no longer fall asleep in the Castle right after the start of a new game.
+
 ## [0.80.1] - 2026-11-09
 <!-- version: {"title":"UI designs can place every bar and tab freely, anchored to the nearest screen edge and resized.","type":"feature","reconstructed":false,"saveVersion":60} -->
 ### Added
