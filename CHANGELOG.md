@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.83.2] - 2026-11-09
+<!-- version: {"title":"Paths: residents shuffling between waiting spots at the Castle or their workplace no longer wear round patches and short straight trails into the grass within a","type":"fix","reconstructed":false,"saveVersion":61} -->
+### Fixed
+- Paths: residents shuffling between waiting spots at the Castle or their workplace no longer wear round patches and short straight trails into the grass within a day. Paths now come from real trips.
+- Paths: only bare soil (from level 2) forms a flat worn area. A block of merely trampled grass stays thin trodden lines instead of a dark green circle.
+
 ## [0.83.1] - 2026-11-09
 <!-- version: {"title":"Fog of War: land seen for the first time no longer stays black for seconds, in black jagged notches or as flat grey strips at the edge of sight.","type":"fix","reconstructed":false,"saveVersion":61} -->
 ### Fixed

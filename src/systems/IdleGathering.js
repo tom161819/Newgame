@@ -63,6 +63,8 @@ export class IdleGathering {
     if(!this.system.reservations.reserve(this.key(chosen.goal),worker.id))return !!claim;
     if(claim&&!same(claim.goal,chosen.goal))this.system.reservations.release(this.key(claim.goal),worker.id);
     this.claims.set(worker.id,{...chosen,until:null});worker.path=route.path;
+    // A short step between waiting spots does not wear a path (PathWearSystem.enter); a longer walk to the Castle does.
+    worker.idleStep=route.path.length<=RULES.idleStepTiles?route.path:null;
     message(chosen.kind==='castle'?'Waiting near Castle':chosen.kind==='workplace'?'Waiting near workplace':worker.profession==='idle'?'Unemployed':'Waiting for transport');return true;
   }
 }
