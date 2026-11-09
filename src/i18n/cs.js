@@ -381,4 +381,5 @@ export default {
   'dev.overview.forest':'Les: {mature} vzrostlých / {young} mladých stromů v okruhu {huts} dřevorubeckých chat · dřevo {wood} za den',
   'site.mineInvalid':'{name} sem nelze postavit: {reason}.','site.reason.edge':'Okraj mapy','site.reason.unexplored':'Neprozkoumáno','site.reason.outOfRange':'Mimo ložisko (ložisko železa do 4 políček)','site.reason.depositUnseen':'Ložisko není vidět','site.reason.depleted':'Ložisko je vytěžené','site.reason.taken':'Ložisko už má důl','site.reason.deposit':'Na ložisku – důl stojí vedle něj','site.reason.rock':'Skála','site.reason.water':'Voda','site.reason.ford':'Brod','site.reason.tree':'Strom','site.reason.building':'Budova','site.reason.resource':'Něco tu leží','site.reason.unit':'Někdo tu stojí','site.reason.access':'Nepřístupné',
   'overview.collapse':'Sbalit přehled království','overview.expand':'Zobrazit přehled království','notice.drag':'Tažením přesuneš lištu upozornění · dvojklik: zpět do rohu',
+  'overview.bar.residents':'Obyvatelé','overview.bar.attractiveness':'Atraktivita',
 };

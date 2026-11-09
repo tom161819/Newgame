@@ -34,8 +34,11 @@ export class RoyalGoalsPanel {
     const menu=this.doc.querySelector?.('#buildings-panel'),open=!!menu&&!menu.hidden&&!this.root.hidden;
     if(!open){if(this.shifted||this.autoFolded){this.root.style.transform='';this.shifted=false;if(this.autoFolded)this.root.open=true;this.autoFolded=false;}return;}
     if(now-(this.lastClear??-Infinity)<150)return;this.lastClear=now;
-    this.root.style.transform='';const top=(this.doc.querySelector?.('#game')?.getBoundingClientRect?.().top??0)+8,box=menu.getBoundingClientRect();
+    this.root.style.transform='';const box=menu.getBoundingClientRect(),hud=this.doc.querySelector?.('.inventory')?.getBoundingClientRect?.();
+    // m-prehled-kralovstvi-pozice: the full-width strip lifts the corner stack; the card folds rather than cover the top bar.
+    const top=Math.max((this.doc.querySelector?.('#game')?.getBoundingClientRect?.().top??0)+8,hud&&hud.height&&hud.bottom<box.top?hud.bottom+8:0);
     let place=goalsCardPlacement(this.root.getBoundingClientRect(),box,{top});
+    if(!place.fold&&this.root.open&&this.root.getBoundingClientRect().top<top)place={...place,fold:true};
     if(place.fold&&this.root.open){this.root.open=false;this.autoFolded=true;place=goalsCardPlacement(this.root.getBoundingClientRect(),box,{top});}
     this.shifted=place.shift>0;this.root.style.transform=this.shifted?`translateY(${-Math.ceil(place.shift)}px)`:'';
   }

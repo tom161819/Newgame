@@ -513,14 +513,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .notices-panel:not(.collapsed) .notices-peek, .notices-peek[hidden], .notices-tab[hidden] { display:none; }
 @media(prefers-reduced-motion:reduce){ .notices-panel { transition:none; } }
 /* m-prehled-kralovstvi-pozice (owner comment 2): the grip drags the bar anywhere; NoticesPanel.applyPosition() sets
-   --notices-left / --notices-top (window px). Slid away, a moved bar folds to the nearer side edge: only the tab stays. */
+   --notices-left / --notices-top (window px). Slid away, a moved bar folds to the nearer side edge: only the tab stays.
+   The id selectors outrank the UI theme's surface rule (its :is() list holds ids such as #game-over). */
 .notices-grip { flex:0 0 auto; min-width:20px; padding:1px 4px; border:0; background:none; font-size:13px; line-height:1.2; cursor:grab; touch-action:none; color:#c9c09a; }
 .notices-grip:hover { color:#f0d78b; }
 .notices-tab { touch-action:none; }
 .notices-panel.notices-moved { position:fixed; left:var(--notices-left,auto); top:var(--notices-top,auto); z-index:9; transform:none; transition:left .3s ease, top .3s ease; }
 .notices-panel.notices-moved.dragging, .notices-panel.notices-moved.dragging .notices-grip { transition:none; cursor:grabbing; }
-.notices-panel.notices-moved.collapsed { display:flex; align-items:center; gap:4px; width:auto; min-height:0; padding:0; transform:none; background:none; border:0; box-shadow:none; }
-.notices-panel.notices-moved.collapsed.peeking { width:min(340px,calc(100vw - 32px)); padding:4px 6px; background:rgb(38 43 31 / .94); border:1px solid #8a7a4f; box-shadow:0 10px 28px rgb(6 9 5 / .5); }
+#notices-panel.notices-moved.collapsed { display:flex; align-items:center; gap:4px; width:auto; min-height:0; padding:0; transform:none; }
+#notices-panel.notices-moved.collapsed:not(.peeking) { background:none; border:0; box-shadow:none; }
+#notices-panel.notices-moved.collapsed.peeking { width:min(340px,calc(100vw - 32px)); padding:4px 6px; }
 .notices-panel.notices-moved .notices-tab { position:static; margin:0; flex:0 0 auto; }
 .notices-panel.notices-moved.edge-left { flex-direction:row-reverse; }
 .notices-panel.notices-moved.edge-left .notices-tab { border-radius:0 8px 8px 0; }
@@ -770,7 +772,7 @@ html[data-ui-population="left"] :is(.policy-card, .employment-panel) { right:aut
 /* m-prehled-kralovstvi-pozice (plan point 81): the Kingdom overview is a permanent bar in the map's bottom-left corner.
    KingdomOverview.place() sets left / bottom so it never covers the camera chips, Notices, minimap, side buttons or the
    open building strip; folded it is a one-line strip. Text +2 px over the old popup, values bold. */
-.kingdom-bar { position:absolute; left:8px; bottom:42px; z-index:9; width:min(330px,calc(100% - 16px)); padding:6px 10px 8px; color:var(--ink,#ede5c9); background:var(--glass,rgb(30 35 25 / .86)); border:1px solid var(--line-soft,#5b5a40); border-radius:10px; box-shadow:var(--shadow,0 4px 14px #0008); backdrop-filter:blur(6px); font-size:13px; }
+.kingdom-bar { position:absolute; left:8px; bottom:42px; z-index:9; width:min(350px,calc(100% - 16px)); padding:6px 10px 8px; color:var(--ink,#ede5c9); background:var(--glass,rgb(30 35 25 / .86)); border:1px solid var(--line-soft,#5b5a40); border-radius:10px; box-shadow:var(--shadow,0 4px 14px #0008); backdrop-filter:blur(6px); font-size:13px; }
 .kingdom-bar[hidden] { display:none; }
 .kingdom-bar.collapsed { width:auto; max-width:calc(100% - 16px); padding:3px 8px; }
 .kingdom-bar-toggle { display:flex; align-items:center; gap:8px; width:100%; min-height:0; padding:2px 0; border:0; background:none; color:inherit; font:inherit; text-align:left; cursor:pointer; }
@@ -783,7 +785,11 @@ html[data-ui-population="left"] :is(.policy-card, .employment-panel) { right:aut
 .kingdom-bar-body { display:grid; grid-template-columns:1fr 1fr; gap:0 14px; margin-top:4px; }
 .kingdom-bar-body[hidden] { display:none; }
 .kingdom-bar-body .overview-block { grid-column:1 / -1; margin:3px 0 0; font-size:12px; color:#e6b062; }
-.kingdom-bar .overview-row strong { font-weight:750; font-variant-numeric:tabular-nums; }
+.kingdom-bar .overview-row strong { font-weight:750; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.kingdom-bar .overview-row { gap:8px; }
+.kingdom-bar .overview-row span { min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+/* The title is a plain heading, not a themed button (the UI theme styles every button). */
+#kingdom-bar .kingdom-bar-toggle { min-height:0; padding:2px 0; border:0; border-radius:4px; background:none; box-shadow:none; color:inherit; }
 @media (prefers-reduced-motion:reduce){ .kingdom-bar-arrow { transition:none; } }
 .overview-row { display:flex; justify-content:space-between; gap:12px; line-height:1.5; }
 .overview-row[data-tone="warn"] strong { color:#e6b062; } .overview-row[data-tone="bad"] strong { color:#f08a6c; } .overview-row[data-tone="good"] strong { color:#a8d48a; }
@@ -1076,4 +1082,6 @@ tr[data-resource-group="equipment"] { background:var(--group-equipment); }
    right edge (the bar itself is centred, so 50% − 50vw is the window's left edge). While it is open BuildingBar sets
    --buildings-lift on the map: the camera chips and the corner stack (Notices, events, minimap) move up above it and the
    Kingdom overview bar stacks above those. A buildings bar placed freely by the UI design keeps its own panel. */
-.buildings-bar:not([data-ui-free]) > .buildings-panel { left:calc(50% - 50vw); right:auto; width:100vw; max-width:none; border-left:0; border-right:0; border-radius:0; }
+.buildings-bar:not([data-ui-free]) > .buildings-panel { left:calc(50% - 50vw); right:auto; width:100vw; max-width:none; border-left:0; border-right:0; border-radius:0; padding-inline:56px; }
+/* The strip's ends stay clear of the side buttons fixed at the window edges (Settings / Dev tool left, Policy /
+   Population / Employments right, 8 px + ~38 px wide), so its scroll buttons are never under them. */

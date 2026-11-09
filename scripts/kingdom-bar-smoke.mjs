@@ -34,7 +34,7 @@ export async function kingdomBarSmoke(context,url,instrument){
         return b;
       };
       // 1. Bottom-left corner, fixed, bigger text with bold numbers.
-      const first=await check(`${width} open`);assert.ok(first['#kingdom-bar'].left-view.left<=12,'in the left column');assert.ok(view.bottom-first['#kingdom-bar'].bottom<=60,'at the bottom');
+      const first=await check(`${width} open`);assert.ok(first['#kingdom-bar'].left-view.left<=12,`in the left column ${JSON.stringify({bar:first['#kingdom-bar'],view,first})}`);assert.ok(view.bottom-first['#kingdom-bar'].bottom<=60,'at the bottom');
       const font=await page.evaluate(()=>{const row=document.querySelector('#kingdom-bar-body .overview-row');return {size:parseFloat(getComputedStyle(row).fontSize),bold:Number(getComputedStyle(row.querySelector('strong')).fontWeight)};});
       assert.ok(font.size>=13,`text ≥ 13 px (was 11), got ${font.size}`);assert.ok(font.bold>=700,'values bold');
       for(const word of ['Happiness','Food','Rest','Housing','Safety','Average mood'])assert.ok((await page.locator('#kingdom-bar-body').textContent()).includes(word),word);
@@ -52,6 +52,9 @@ export async function kingdomBarSmoke(context,url,instrument){
       const strip=(await boxes(page,['#buildings-panel']))['#buildings-panel'];assert.ok(strip.left<=1&&strip.right>=width-1,`the strip spans the window ${JSON.stringify(strip)}`);
       const open=await check(`${width} building strip`);
       for(const q of ['.camera-controls','#minimap'])if(open[q])assert.ok(open[q].bottom<=strip.top+1,`${q} above the strip`);
+      // The lifted corner stack never covers the top bar: the Royal tasks card folds instead (RoyalGoalsPanel.clearBuildMenu).
+      await page.waitForTimeout(400);const top=await boxes(page,['.inventory','#royal-goals','#notices-panel']);
+      for(const q of ['#royal-goals','#notices-panel'])if(top[q])assert.ok(!overlap(top[q],top['.inventory']),`${q} clear of the top bar ${JSON.stringify(top)}`);
       if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/kingdom-bar-strip-${width}.png`});
       await page.locator('#buildings-tab').click();await page.waitForTimeout(200);await check(`${width} strip closed`);
       // 2. Drag the Notices bar by its grip to the upper left, keep it after a reload, then reset with a double-click.

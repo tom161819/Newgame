@@ -75,6 +75,26 @@ None. SAVE_VERSION unchanged (61). The fold and the Notices position are browser
   `npm run smoke -- --current-only --kingdom-bar`; `scripts/kingdom-overview-smoke.mjs` (`--overview`) updated to read
   the needs from the bar instead of the removed hover popup.
 
+### Follow-up after the merge to main (browser smokes, 9 Nov)
+
+- `--kingdom-bar` failed with the tab 4 px off the left edge. That was a real bug: the UI theme's surface rule
+  (`html[data-ui-theme] :is(…, .notices-panel, #game-over, …)`) has specificity (1,1,1) because its list holds ids, so
+  it beat the class rules for the folded moved bar and kept its 4 px border and background. The moved and folded rules
+  now use `#notices-panel` and keep the theme look while peeking.
+- In the Studio look the overview bar was 210 px high because "Residents / housing", "Kingdom Attractiveness" and
+  "9 / 10" wrapped. It was pushed right of the Settings button at 1366×768. The bar now uses short labels
+  (`overview.bar.residents`, `overview.bar.attractiveness`, with the full label in the row tooltip), values that do not
+  wrap, and a title that is not drawn as a themed button.
+- The edge-to-edge strip put its ‹ › scroll buttons under the fixed side tabs (z 25), which broke the main smoke's
+  building-menu step. The strip now has `padding-inline:56px`, so its content stays clear of the side buttons at both
+  window edges. The buttons themselves still sit over the strip's edges.
+- At 1366×768 the lifted corner stack pushed the Royal tasks card over the top bar. `RoyalGoalsPanel.clearBuildMenu`
+  now treats the HUD's bottom as its top limit and folds the card when it would reach above it. The fold is undone
+  when the strip closes.
+- Smokes run alone on main: `--kingdom-bar`, `--overview` (it now looks for the bar's "Attractiveness" label),
+  `--notices-2`, `--tips-hud` and the main smoke with the building menu all pass. Screenshots at 1920×1080 and
+  1366×768 were checked by eye.
+
 ## Notes for the next agent
 
 - Needs browser verification: real placement at 1920×1080 and 1366×768 (also with the HUD on two rows and the Dev tool

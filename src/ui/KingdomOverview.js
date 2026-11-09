@@ -67,12 +67,12 @@ export class KingdomOverview {
     if(this.collapsed||!this.body)return;
     const row=(label,value,tn,title)=>{const r=element('div','overview-row');r.dataset.tone=tn??'';if(title)r.title=title;r.append(element('span','',label),element('strong','',value));return r;};
     const pct=v=>v==null?'—':`${v} %`;
-    const rows=[row(t('overview.residents'),`${o.population} / ${o.capacity}`,o.population>=o.capacity?'warn':''),row(t('overview.unemployedLabel'),String(o.unemployed),o.unemployed?'warn':''),
+    const rows=[row(t('overview.bar.residents'),`${o.population} / ${o.capacity}`,o.population>=o.capacity?'warn':'',t('overview.residents')),row(t('overview.unemployedLabel'),String(o.unemployed),o.unemployed?'warn':''),
       ...['happiness','food','rest','housing','safety'].map(k=>row(t(`overview.need.${k}`),pct(o[k]),tone(o[k]))),
       row(t('overview.moodLabel'),o.mood?t(`needs.mood.${o.mood}`):'—',tone(o.happiness))];
     if(o.attractiveness!=null){
       const factors=o.factors.map(([id,v])=>`${t(`overview.factor.${id}`)} ${v>0?`+${v}`:v}`).join('\n');
-      rows.push(row(t('overview.attractiveness'),`${o.attractiveness} %`,tone(o.attractiveness),[t('overview.attractivenessValue'),factors].filter(Boolean).join('\n')));
+      rows.push(row(t('overview.bar.attractiveness'),`${o.attractiveness} %`,tone(o.attractiveness),[t('overview.attractiveness'),t('overview.attractivenessValue'),factors].filter(Boolean).join('\n')));
       if(o.settleBlock)rows.push(element('p','overview-block',t(`overview.settleBlock.${o.settleBlock}`)));
     }
     // Rebuilt only when a value changed, so the 0.5 s refresh does not wake the UI config observer for nothing.

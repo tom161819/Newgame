@@ -22,7 +22,7 @@ export async function kingdomOverviewSmoke(context,url,instrument){
       const overlap=(a,b)=>a.l<b.r-1&&b.l<a.r-1&&a.t<b.b-1&&b.t<a.b-1;assert.ok(!overlap(boxes[0],boxes[1])&&!overlap(boxes[0],boxes[2]),`no overlap at ${width}px: ${JSON.stringify(boxes)}`);
       // m-prehled-kralovstvi-pozice: the needs and attractiveness live in the bottom-left overview bar (no hover popup).
       await page.locator('#kingdom-bar-body').waitFor({state:'visible'});
-      const panel=await page.locator('#kingdom-bar-body').textContent();for(const word of ['Happiness','Food','Rest','Housing','Safety','Average mood','Kingdom Attractiveness'])assert.ok(panel.includes(word),word);
+      const panel=await page.locator('#kingdom-bar-body').textContent();for(const word of ['Happiness','Food','Rest','Housing','Safety','Average mood','Attractiveness'])assert.ok(panel.includes(word),word);
       if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/overview-${width}.png`,clip:{x:0,y:0,width,height:Math.min(height,420)}});
       await page.mouse.move(width/2,height-100);await page.setViewportSize({width:1440,height:1000});
     }

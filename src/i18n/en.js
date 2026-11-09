@@ -380,4 +380,5 @@ export default {
   'dev.overview.forest':'Forest: {mature} mature / {young} young trees in the radius of {huts} Lumberjack Huts · Wood {wood} a day',
   'site.mineInvalid':'{name} cannot stand here: {reason}.','site.reason.edge':'Map edge','site.reason.unexplored':'Unexplored','site.reason.outOfRange':'Out of deposit range (an Iron Deposit within 4 tiles)','site.reason.depositUnseen':'Deposit not in sight','site.reason.depleted':'Deposit depleted','site.reason.taken':'Deposit already has a mine','site.reason.deposit':'On the deposit – the mine stands beside it','site.reason.rock':'Rock','site.reason.water':'Water','site.reason.ford':'Ford','site.reason.tree':'Tree','site.reason.building':'Building','site.reason.resource':'Something lies here','site.reason.unit':'Someone stands here','site.reason.access':'No access',
   'overview.collapse':'Fold the kingdom overview','overview.expand':'Show the kingdom overview','notice.drag':'Drag to move the Notices bar · double-click: back to the corner',
+  'overview.bar.residents':'Residents','overview.bar.attractiveness':'Attractiveness',
 };
