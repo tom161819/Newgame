@@ -17,8 +17,11 @@ export const DAY_NIGHT=Object.freeze({
   ambient:Object.freeze({color:0x0b1433,night:.66,dusk:.25,fullMoon:.12}),moonDays:8,
   // House windows glow from dusk until the family goes to bed (each house within 8 % of a day after night starts).
   houseWindows:Object.freeze({bedtimeSpread:.08,color:0xffcf7a,radius:30}),
-  // Speed up nights: off (1), ×2 or ×3 (default); Skip to dawn runs ×8 until dawn.
-  nightSpeeds:Object.freeze([1,2,3]),defaultNightSpeed:3,skipSpeed:8,
+  // Auto speed-up at night: off (1, default since m-noc-zrychleni, owner point 82), ×2 or ×3 – the game speed (and its
+  // indicator) goes up to that step at night and back at dawn. Skip to dawn runs ×8 steps until dawn.
+  nightSpeeds:Object.freeze([1,2,3]),defaultNightSpeed:1,skipSpeed:8,
+  // The tip "Nights can pass faster" comes once per game after the first game year (day 21 with 5-day seasons).
+  speedTipYears:1,
 });
 
 // Night start (fraction of the day) for a day of the year (1-based, may be fractional); seasons off = summer.
@@ -41,3 +44,5 @@ export function darknessAt(fraction,nightStart){
 }
 // Moon: 0 new … 1 full, a cosine over 8 days (day 1 = new moon).
 export const moonLight=day=>(1-Math.cos(2*Math.PI*(((day-1)%DAY_NIGHT.moonDays)/DAY_NIGHT.moonDays)))/2;
+// m-noc-zrychleni (82): the optional save field `nightSpeedTip` – only `true` (the tip was shown in this game).
+export const validNightSpeedTipState=value=>value===true;

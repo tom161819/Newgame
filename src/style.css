@@ -902,6 +902,21 @@ html[data-ui-pointer="hand"] .tutorial-arrow { clip-path:none; -webkit-mask:url(
 .store-preview-item[data-resource-group="foodRaw"] { background:var(--group-foodRaw); }
 .store-preview-item[data-resource-group="food"] { background:var(--group-food); }
 .store-preview-item[data-resource-group="equipment"] { background:var(--group-equipment); }
+/* m-budovy-tooltip (86): the building tooltip (the same element) – at most 4 short lines, small font, see-through. */
+.store-preview.building-tooltip { max-width:240px; padding:4px 7px; font-size:11px; line-height:1.35; background:color-mix(in srgb,var(--panel) 82%,transparent); }
+.building-tooltip-title { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.building-tooltip-line { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.building-tooltip-stock { display:flex; align-items:center; gap:2px; }
+.building-tooltip-stock .store-preview-item { padding:0 3px; gap:2px; }
+.building-tooltip-stock .store-preview-item img { width:14px; height:14px; }
+.building-tooltip-stock .store-preview-usage { display:inline; margin:0 0 0 4px; }
+/* m-noc-zrychleni (82): the night speed-up step (moon) and the one-time tip. */
+.speed-button.is-night-auto { color:#cfd8ff; }
+.night-speed-tip { position:fixed; top:56px; left:12px; z-index:61; max-width:280px; padding:8px 10px; border:1px solid var(--line); border-radius:var(--ui-radius,6px); background:var(--panel); color:var(--ink); box-shadow:0 4px 14px #0008; font-size:12px; }
+.night-speed-tip[hidden] { display:none; }
+.night-speed-tip-text { margin:0 0 6px; }
+.night-speed-tip-actions { display:flex; gap:6px; justify-content:flex-end; }
+.dev-balance-subheading { margin:8px 0 2px; font-size:12px; }
 tr[data-resource-group="gold"] { background:var(--group-gold); } tr[data-resource-group="materials"] { background:var(--group-materials); }
 tr[data-resource-group="foodRaw"] { background:var(--group-foodRaw); } tr[data-resource-group="food"] { background:var(--group-food); }
 tr[data-resource-group="equipment"] { background:var(--group-equipment); }

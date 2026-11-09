@@ -1,5 +1,6 @@
 import { t,onLanguageChange } from '../i18n/index.js';
-import { DEV_BALANCE_KEYS,DEV_BALANCE_RANGE,DEV_UNLOCK,loadDevBalance,devMode,setDevMode,devFactor,setDevFactor,resetDevBalance,devBalanceValues,devBalanceJSON } from '../data/devBalance.js';
+import { DEV_BALANCE_KEYS,DEV_BALANCE_RANGE,DEV_UNLOCK,loadDevBalance,devMode,setDevMode,devFactor,setDevFactor,resetDevBalance,devBalanceValues,devBalanceJSON,devTooltipDelay,setDevTooltipDelay } from '../data/devBalance.js';
+import { BUILDING_TOOLTIP } from '../data/buildingTooltip.js';
 import { FOOD_ECONOMY_DAYS } from '../data/seasons.js';
 import { FrameProfiler,PROFILER_RULES } from '../systems/FrameProfiler.js';
 
@@ -30,13 +31,19 @@ export class DevBalancePanel {
       input.addEventListener('input',()=>{setDevFactor(key,+input.value);this.render();},options);
       list.append(el(doc,'div',{className:'dev-balance-row'},[label,out,input]));this.sliders.set(key,{input,out,label});
     }
+    // m-budovy-tooltip (86): a small section for the building tooltip delay (0.2–2 s).
+    const range=BUILDING_TOOLTIP.devDelay;this.tooltipHeading=el(doc,'h3',{className:'dev-balance-subheading'});
+    this.tooltipDelay=el(doc,'input',{type:'range',min:String(range.min),max:String(range.max),step:String(range.step),id:'dev-tooltip-delay'});
+    this.tooltipOut=el(doc,'output',{htmlFor:'dev-tooltip-delay'});this.tooltipLabel=el(doc,'label',{htmlFor:'dev-tooltip-delay'});
+    this.tooltipDelay.addEventListener('input',()=>{setDevTooltipDelay(+this.tooltipDelay.value);this.render();},options);
+    const tooltipSection=el(doc,'div',{className:'dev-balance-tooltip'},[this.tooltipHeading,el(doc,'div',{className:'dev-balance-row'},[this.tooltipLabel,this.tooltipOut,this.tooltipDelay])]);
     this.overview=el(doc,'pre',{id:'dev-balance-overview',className:'dev-balance-overview'});
     this.reset=el(doc,'button',{type:'button',id:'dev-balance-reset'});this.copy=el(doc,'button',{type:'button',id:'dev-balance-copy'});this.status=el(doc,'span',{id:'dev-balance-status',className:'dev-balance-status'});this.status.setAttribute('role','status');
     // performance-1: the frame profiler (Dev mode only; F8 or this button). Its table is a fixed overlay over the map.
     this.profileButton=el(doc,'button',{type:'button',id:'dev-profiler-toggle'});this.profileButton.setAttribute('aria-pressed','false');
     this.profileOut=el(doc,'pre',{id:'dev-profiler',className:'dev-profiler',hidden:true});this.profileOut.setAttribute('role','status');
     this.profiler=scene?.game?new FrameProfiler(scene.game,{scene:()=>this.scene}):null;
-    this.panel.append(el(doc,'div',{className:'settings-heading'},[this.title,this.close]),list,this.overview,el(doc,'div',{className:'dev-balance-actions'},[this.reset,this.copy,this.profileButton,this.status]));
+    this.panel.append(el(doc,'div',{className:'settings-heading'},[this.title,this.close]),list,tooltipSection,this.overview,el(doc,'div',{className:'dev-balance-actions'},[this.reset,this.copy,this.profileButton,this.status]));
     doc.body?.append(this.profileOut);
     this.profileButton.addEventListener('click',()=>this.setProfiling(!this.profiler?.enabled),options);
     doc.defaultView?.addEventListener('keydown',e=>{if(e.key==='F8'&&!e.repeat&&devMode()){e.preventDefault();this.setProfiling(!this.profiler?.enabled);}},options);
@@ -68,6 +75,7 @@ export class DevBalancePanel {
     this.row.querySelector('label').textContent=t('dev.mode');this.open.textContent=t('dev.balance.open');this.title.textContent=t('dev.balance.title');
     this.close.setAttribute('aria-label',t('dev.balance.close'));this.reset.textContent=t('dev.balance.reset');this.copy.textContent=t('dev.balance.copy');if(this.profileButton){this.profileButton.textContent=t('dev.profiler.toggle');this.profileButton.title=t('dev.profiler.hint');}
     const values=devBalanceValues();for(const [key,{input,out,label}]of this.sliders){input.value=String(values[key]);out.textContent=`${values[key].toFixed(2)}×`;label.textContent=t(`dev.balance.key.${key}`);}
+    const delay=devTooltipDelay();this.tooltipDelay.value=String(delay);this.tooltipOut.textContent=t('dev.tooltip.value',{seconds:delay.toFixed(1)});this.tooltipLabel.textContent=t('dev.tooltip.delay');this.tooltipHeading.textContent=t('dev.tooltip.title');
     this.renderOverview();
   }
   renderOverview(){

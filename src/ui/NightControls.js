@@ -2,8 +2,8 @@ import { DAY_NIGHT } from '../data/dayNight.js';
 import { t } from '../i18n/index.js';
 
 // Day and night N1 HUD and setting: the part of the day next to the clock, at night a "Skip to dawn" button and
-// "Plans for tomorrow: N" (construction waiting for the morning); in Settings "Speed up nights" (off, ×2, ×3 – kept
-// in this browser, default ×3).
+// "Plans for tomorrow: N" (construction waiting for the morning); in Settings "Auto speed-up at night" (off, ×2, ×3 –
+// kept in this browser; default off since m-noc-zrychleni, a value the player chose earlier is kept).
 const KEY='newgame.nightSpeed';
 export function readNightSpeed(storage=globalThis.localStorage){
   try{const v=Number(storage?.getItem(KEY));return DAY_NIGHT.nightSpeeds.includes(v)?v:DAY_NIGHT.defaultNightSpeed;}catch{return DAY_NIGHT.defaultNightSpeed;}
@@ -23,6 +23,7 @@ export class NightControls {
   }
   syncThreats(){for(const [id,box] of Object.entries(this.threatBoxes??{}))if(box)box.checked=this.scene.nightThreats?.enabled[id]!==false;}
   plannedCount(){return (this.scene.buildings??[]).filter(b=>b.construction&&b.construction.state!=='complete').length;}
+  syncSpeed(){if(this.select)this.select.value=String(readNightSpeed());}
   update(){
     const dn=this.scene.dayNight,part=dn.part(),night=part==='night';
     if(this.part&&this.part.dataset.part!==part){this.part.dataset.part=part;this.part.textContent=t(`night.part.${part}`);this.part.title=night?t(`night.moon.${this.moonName(dn.moon())}`):'';}
