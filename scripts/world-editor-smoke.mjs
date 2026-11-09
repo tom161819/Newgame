@@ -80,7 +80,7 @@ export async function worldEditorSmoke(context, url, instrument) {
     const preview = await page.evaluate(`JSON.stringify({ground:${app}.worldEditor.lastWorld.ground,terrain:${app}.worldEditor.lastWorld.terrain})`);
     await page.locator('#we-start').click();
     await page.waitForFunction(() => window.__game?.registry.get('application').scene?.animalSystem, null, { timeout: 30000 });
-    await page.locator('#help-dialog[open]').waitFor({ timeout: 10000 }).then(() => page.keyboard.press('Escape')).catch(() => {});
+    await page.locator('#help-dialog').waitFor({ timeout: 10000 }).catch(() => {});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const started = await page.evaluate(() => { const a = window.__game.registry.get('application'), s = a.snapshot(), w = a.worldEditor.lastWorld; return { code: s.gameSettings.worldCode, look: s.groundLook ?? null, startTerrain: JSON.stringify(a.scene.startWorldFingerprint ?? null), ground: JSON.stringify(a.scene.groundGrid) }; });
     assert.equal(started.code, code, 'the game uses the editor world code');
     assert.equal(started.ground, JSON.parse(preview) && JSON.stringify(JSON.parse(preview).ground), 'the game ground is the preview ground');

@@ -6,7 +6,7 @@ export async function animals2Smoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
-    await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.domesticViews);await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.domesticViews);await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const loc=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,d=s.domestic,st=s.buildings.find(b=>b.type==='starter_stockpile');s.fog?.setEnabled?.(false);
       const l=d.foodLocations().find(l=>l.buildingId===st.id);d.rats.set(l.id,80);const k=s.character.tile;const c=d.newCat({x:k.x+2.5,y:k.y+2.5,home:{x:k.x+2.5,y:k.y+2.5},state:'stray'});c.wait=1e9;c.target=null;
       if(s.worldCamera)s.worldCamera.following=false;const w={x:s.map.length*32+(st.x-st.y)*32,y:128+(st.x+st.y+2)*16};s.cameras.main.centerOn(w.x,w.y);return {id:l.id,cx:st.x+1,cy:st.y+1,cat:c.id};});

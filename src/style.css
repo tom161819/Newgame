@@ -498,7 +498,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 /* m-notice-bar-zasunuti (80): collapsed, the bar slides off the right edge (past the stack's 12px) and only the tab
    with the arrow and "!" stays at the edge; a new notice slides it out to one message (.peeking) for 4 s. */
 .notices-panel { position:relative; transition:transform .3s ease; }
-.notices-panel.collapsed { overflow:visible; min-height:30px; padding:0; transform:translateX(calc(100% + 12px)); }
+.notices-panel.collapsed { overflow:visible; min-height:30px; padding:0; transform:translateX(calc(100% + 24px)); } /* 24: the corner stack keeps 24 px from the window edge since 9 Nov 2026 */
 .notices-panel.collapsed.peeking { transform:none; padding:4px 6px; }
 .notices-panel.collapsed .notices-heading { display:none; }
 .notices-tab { position:absolute; top:0; right:100%; margin-right:6px; display:flex; align-items:center; gap:3px; min-width:28px; height:30px; padding:0 7px; border-radius:8px 0 0 8px; font-size:13px; line-height:1; box-shadow:0 4px 14px rgb(6 9 5 / .45); }
@@ -1085,3 +1085,52 @@ tr[data-resource-group="equipment"] { background:var(--group-equipment); }
 .buildings-bar:not([data-ui-free]) > .buildings-panel { left:calc(50% - 50vw); right:auto; width:100vw; max-width:none; border-left:0; border-right:0; border-radius:0; padding-inline:56px; }
 /* The strip's ends stay clear of the side buttons fixed at the window edges (Settings / Dev tool left, Policy /
    Population / Employments right, 8 px + ~38 px wide), so its scroll buttons are never under them. */
+
+/* Owner 9 Nov 2026 (Grafika chat): a) the map fills the window from the left edge to the right edge and down to the
+   bottom; the buildings bar (Buildings, Mark to clear) and the status line float over the map. b) the top bar has two
+   rows: resources with the day and weather at the top right; the Kingdom overview and food at the bottom left, the
+   speed and night controls, More and Wiki on the right. The King's health and level are no longer in the bar (the
+   elements stay hidden, still updated). Getting started is its own window under the bar at the right. */
+body { padding: 0; }
+main { width: 100%; position: relative; }
+.game-header { padding: 6px 14px; }
+.viewport, html[data-ui-theme] .viewport { border-radius: 0; outline: 0; box-shadow: none; }
+.status-row { position: absolute; left: 0; right: 0; bottom: 62px; z-index: 9; width: fit-content; max-width: min(760px, calc(100vw - 140px)); margin-inline: auto; min-height: 0; padding: 3px 12px; border: 1px solid var(--line-soft); border-radius: 999px; background: var(--glass); backdrop-filter: blur(6px); pointer-events: none; }
+.status-row footer { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.buildings-bar:not([data-ui-free]) { position: absolute; left: 0; right: 0; bottom: 8px; width: fit-content; max-width: calc(100vw - 120px); margin: 0 auto; }
+html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: auto; top: 44px; }
+.hud-row-top #inventory-items { flex: 1 1 auto; min-width: 0; }
+.hud-clock { display: flex; align-items: baseline; gap: 10px; margin-left: auto; white-space: nowrap; }
+.hud-clock #game-time { font-weight: 650; color: var(--gold); }
+.hud-row-bottom { margin-top: 4px; padding-top: 4px; border-top: 1px solid rgb(255 240 200 / .08); }
+.hud-row-bottom .food-status { display: flex; align-items: center; gap: 8px; }
+.hud-king[hidden] { display: none !important; }
+/* The map now reaches the window edges, where Settings / Dev tool (left) and the side tabs (right) are fixed: the map's
+   corner items keep the 12 px they had from the old page margin. */
+.corner-stack { right: 24px; }
+.camera-controls { left: 20px; }
+.help-window { position: absolute; top: 112px; right: 52px; z-index: 9; width: min(310px, calc(100% - 120px)); max-height: calc(100% - 200px); display: flex; flex-direction: column; padding: 6px 10px; color: var(--ink); background: var(--glass); border: 1px solid var(--line-soft); border-radius: 10px; box-shadow: var(--shadow); backdrop-filter: blur(6px); }
+.help-window[hidden] { display: none; }
+.help-window-summary { display: flex; align-items: center; gap: 8px; padding: 2px 0; cursor: pointer; list-style: none; font-family: var(--font-display); font-weight: 600; color: var(--gold); user-select: none; }
+.help-window-summary::-webkit-details-marker { display: none; }
+.help-window-count { margin-left: auto; font: 600 12px var(--font-ui); font-variant-numeric: tabular-nums; color: var(--muted); }
+.help-window.all-done .help-window-count { color: #9fc172; }
+.help-window-arrow { font-size: 12px; transition: transform .15s; }
+.help-window:not([open]) .help-window-arrow { transform: rotate(90deg); }
+.help-window-body { overflow: auto; min-height: 0; max-height: max(120px, calc(100dvh - 380px)); margin-top: 4px; scrollbar-width: thin; }
+/* <details> lays its content out in a slot that ignores flex sizing, so the list scrolls inside a capped body and the
+   window ends above the minimap. */
+.help-window .help-summary { margin: 0 0 6px; font-size: 12px; line-height: 1.35; }
+.help-window .help-step-button { grid-template-columns: 22px 1fr; gap: 8px; padding: 5px 7px; }
+.help-window .help-step-mark { width: 20px; height: 20px; font-size: 11px; }
+.help-window .help-step-text strong { font-size: 13px; }
+.help-window .help-step-text small { font-size: 11px; }
+.help-window .help-step-state { display: none; }
+@media (max-width: 760px) { .help-window { right: 46px; width: min(260px, calc(100% - 60px)); } }
+/* Food sits right beside the Kingdom overview (no wide fixed slot in the bottom row). */
+@media (min-width: 761px) {
+  /* #101 kept: a fixed slot (no reflow when the King picks something up), now only as wide as the overview chips. */
+  .hud-row-bottom .hud-left-slot { width: 17rem; overflow: hidden; }
+  .hud-row-bottom #king-cargo-deliver { min-height: 0; padding: .15rem .5rem; font-size: 12px; }
+  .hud-row-bottom #king-cargo-status { width: auto; flex: 1 1 0; min-width: 0; }
+}

@@ -16,7 +16,7 @@ export async function uiFixes076Smoke(context,url,instrument){
     await page.goto(url);saved=await page.evaluate(()=>Object.fromEntries(['newgame.language','newgame.tutorial','newgame.tipsSeen','newgame.tutorial.speedSeen','newgame.tips'].map(k=>[k,localStorage.getItem(k)])));await page.evaluate(()=>{localStorage.setItem('newgame.language','cs');localStorage.removeItem('newgame.tutorial');localStorage.removeItem('newgame.tipsSeen');localStorage.removeItem('newgame.tutorial.speedSeen');});await page.reload();
     await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-9H2936D1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.tutorial);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>page.keyboard.press('Escape')).catch(()=>{});
+    await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     // Point 8: the More toggle follows the language read after it was built.
     assert.equal((await page.locator('#hud-details-toggle').textContent()).trim(),'Více');
     // Point 12: the stores counter says Materiál and explains what it counts.
@@ -60,7 +60,7 @@ export async function uiFixes076Smoke(context,url,instrument){
     await shot('03-population-step');
     await page.evaluate(s=>{const g=eval(s);g.tutorial.end();g.unitPanel.close();g.populationSidebar.setOpen(false);},S);
     // Point 7, shot 09: the King panel fits – no sideways scrollbar, the + buttons inside.
-    await page.locator('#king-profile').click();await page.locator('#unit-dialog[open]').waitFor();await page.waitForTimeout(300);
+    await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.unitPanel.open(s.character);});await page.locator('#unit-dialog[open]').waitFor();await page.waitForTimeout(300);
     const king=await page.evaluate(()=>{const d=document.querySelector('#unit-dialog'),r=d.getBoundingClientRect();return {scroll:d.scrollWidth-d.clientWidth,outside:[...d.querySelectorAll('.king-skill-plus')].filter(b=>b.getBoundingClientRect().right>r.right+1).length,buttons:d.querySelectorAll('.king-skill-plus').length};});
     assert.ok(king.scroll<=0,`the King panel scrolls sideways by ${king.scroll}px`);assert.equal(king.outside,0,'every + button inside the panel');assert.ok(king.buttons>0);
     await page.locator('#unit-dialog').evaluate(d=>{d.scrollTop=d.scrollHeight;});await shot('09-king-panel');

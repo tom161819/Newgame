@@ -8,7 +8,7 @@ export async function uiWindowsSmoke(context,url,instrument){
   const start=async()=>{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.minimap);
-    if(await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>true,()=>false))await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.waitForFunction(()=>!document.querySelector('dialog[open]'));
   };
   try{

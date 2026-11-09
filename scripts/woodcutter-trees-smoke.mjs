@@ -11,7 +11,7 @@ export async function woodcutterTreesSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill(CODE);await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.diagnostics&&window.__game.registry.get('application').scene.minimap);
-    if(await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>true,()=>false))await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.fog.setEnabled(false);s.refreshVisibility();});
     assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.employment.enabled),true,'automatic employment is on (New Game default)');
     const hut=await placeBlueprint(page,'lumberjack_hut');

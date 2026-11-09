@@ -104,9 +104,9 @@ export class NoticesPanel {
     if(this.position){this.tab.style.removeProperty('--notices-tab-shift');this.applyPosition();return;}
     const tab=this.tab,stack=this.panel.parentElement;if(!stack||tab.hidden||this.panel.hidden||!this.collapsed){tab.style.removeProperty('--notices-tab-shift');return;}
     const panel=this.panel.getBoundingClientRect(),view=(this.panel.closest('.viewport')??stack).getBoundingClientRect();if(!panel.height)return;
-    // Slid away the panel's left side is at the corner stack's right + 12 px (the CSS translate); the tab's right side
+    // Slid away the panel's left side is at the corner stack's right + 24 px (the CSS translate); the tab's right side
     // is the panel's padding edge minus the shift.
-    const base=stack.getBoundingClientRect().right+12+this.panel.clientLeft,top=panel.top+this.panel.clientTop,height=tab.offsetHeight||30,width=tab.offsetWidth||28,gap=4;
+    const base=stack.getBoundingClientRect().right+24+this.panel.clientLeft,top=panel.top+this.panel.clientTop,height=tab.offsetHeight||30,width=tab.offsetWidth||28,gap=4;
     let right=Math.min(base,view.right);
     const sides=[...document.querySelectorAll('.population-tab')].map(el=>el.getBoundingClientRect()).filter(r=>r.width&&r.height).sort((a,b)=>b.left-a.left);
     for(const r of sides)if(r.top<top+height+gap&&r.bottom>top-gap&&r.left<right+gap&&r.right>right-width-gap)right=r.left-gap;

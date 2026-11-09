@@ -8,7 +8,7 @@ export async function chosenArtSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.towerViews);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const placed=await page.evaluate(()=>{
       const s=window.__game.registry.get('application').scene;s.fog?.setEnabled?.(false);const types=['house','builder_workshop','farmhouse','bakery','iron_mine','barracks','marketplace','wheelwright_workshop'];
       const free=(x,y,w,h)=>{for(let dy=-1;dy<=h;dy++)for(let dx=-1;dx<=w;dx++){const tx=x+dx,ty=y+dy;if(s.map[ty]?.[tx]!==0||s.resourceOccupancy.has(`${tx},${ty}`)||s.buildings.some(b=>b.tiles.some(t=>t.x===tx&&t.y===ty))||s.reservedTiles().some(t=>t.x===tx&&t.y===ty))return false;}return true;};

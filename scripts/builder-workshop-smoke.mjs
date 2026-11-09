@@ -8,8 +8,8 @@ export async function builderWorkshopSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.builderWorkshops);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});
-    assert.match(await page.locator('#help-steps').textContent(),/Builder's Workshop/,'Getting started lists the workshop');await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});
+    assert.match(await page.locator('#help-steps').textContent(),/Builder's Workshop/,'Getting started lists the workshop');
     const {id}=await placeBlueprint(page,'builder_workshop');
     const worker=await page.evaluate(id=>{
       const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id),d=s.objectRegistry.require('builder_workshop');

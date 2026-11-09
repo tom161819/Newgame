@@ -216,7 +216,7 @@ try{
   await page.locator('#setup-stones').evaluate(e=>{e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));});await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
   // A New Game from the setup opens Getting started once (0.9.3); the scenario below starts with it closed.
-  await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');assert.equal(await page.locator('#help-dialog').evaluate(d=>d.open),false);
+  await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});assert.equal(await page.locator('#help-dialog').evaluate(d=>d.open),false);
   await step('getting-started',()=>gettingStartedSmoke(context,origin+base,instrument));
   await step('building-costs',()=>buildingCostsSmoke(context,origin+base,instrument));
   await step('e2',()=>quickStartSmoke(context,origin+base,instrument));

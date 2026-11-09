@@ -7,7 +7,7 @@ export async function dogSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.domestic);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const setup=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,d=s.domestic,w=s.workerSystem.liveWorkers()[0];w.profession='hunter';
       d.random=()=>.01;d.nextDogAt=0;d.update(16);const dog=[...d.dogs.values()].find(g=>g.state==='stray');dog.x=s.character.tile.x+2.5;dog.y=s.character.tile.y+2.5;dog.home={x:dog.x,y:dog.y};dog.target=null;dog.wait=99;
       s.fog?.setEnabled?.(false);if(s.worldCamera)s.worldCamera.following=false;s.domesticViews.update(16);s.cameras.main.centerOn(dog.view.x,dog.view.y);return {dog:dog.id,hunter:w.id};});

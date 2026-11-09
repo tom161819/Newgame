@@ -9,7 +9,7 @@ export async function gateSmoke(context,url,instrument){
     // A fixed world (World v2): the wall fixture needs open, reachable ground south of the start.
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const {id}=await placeBlueprint(page,'wall_gate');
     assert.equal(await page.evaluate(id=>window.__game.registry.get('application').scene.buildings.find(b=>b.id===id).type,id),'wall_gate');
     const line=await page.evaluate(()=>{

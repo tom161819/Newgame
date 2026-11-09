@@ -21,7 +21,7 @@ export async function employmentSpreadSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.employment);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     // 0.49: the Quarry (15 Wood) and the Lumberjack Hut (6 Wood) are paid from the 60 starting Wood.
     // Fog off: blueprints are checked against the real ground at once (a Quarry needs a stone deposit under it).
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.fog.setEnabled(false);s.refreshVisibility();});

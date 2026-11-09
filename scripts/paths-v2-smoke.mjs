@@ -8,7 +8,7 @@ export async function pathsV2Smoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.terrain?.v2);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const setup=await page.evaluate(()=>{
       const s=window.__game.registry.get('application').scene,w=s.pathWear,c=s.character.tile;s.fog.setEnabled(false);s.refreshVisibility?.();
       // A loop road, a spur of trampled grass and a small trodden square, on open grass only.

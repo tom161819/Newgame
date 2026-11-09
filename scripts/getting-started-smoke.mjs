@@ -1,29 +1,29 @@
 import assert from 'node:assert/strict';
 
 // Getting started (owner request 7 Nov 2026), in its own page so the main scenario keeps its world:
-// a New Game from the setup opens the panel once; Esc, the close button and the "?" button work; a step opens the
+// a docked window under the top bar at the right that folds to a strip (remembered); a step opens the
 // Buildings menu on its building; a completed Warehouse ticks step 1 and moves the highlight to step 2.
 export async function gettingStartedSmoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);
   try{
-    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
+    await page.goto(url);await page.evaluate(()=>localStorage.removeItem('newgame.gettingStarted.collapsed'));await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.gettingStarted);
     const dialog=page.locator('#help-dialog');await page.locator('#help-dialog[open]').waitFor({timeout:10000});
     assert.equal(await page.locator('#help-steps .help-step').count(),8,'eight steps since the Builder\'s Workshop (0.14.1)');
     assert.equal(await page.locator('#help-steps .help-step.current').getAttribute('data-help-step'),'granary');
     assert.equal(await page.locator('#help-steps .help-step.done').count(),0);
-    assert.equal(await page.locator('#help-toggle').evaluate(b=>b.classList.contains('has-alert')),true,'the ? button is marked until every step is done');
-    assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.input.enabled),false,'the map waits while the panel is open');
-    await page.keyboard.press('Escape');assert.equal(await dialog.evaluate(d=>d.open),false);
-    assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.input.enabled),true,'closing gives the map back');
-    await page.locator('#help-toggle').click();assert.equal(await dialog.evaluate(d=>d.open),true,'? opens it again');
-    await page.locator('#close-help').click();assert.equal(await dialog.evaluate(d=>d.open),false);
-    // The HUD button stays inside the HUD row and does not cover its neighbours.
-    const boxes=await page.evaluate(()=>['#help-toggle','#hud-details-toggle','#king-profile'].map(s=>{const r=document.querySelector(s).getBoundingClientRect();return {s,l:r.left,r:r.right,t:r.top,b:r.bottom};}));
-    const [help,...others]=boxes;for(const o of others)assert.ok(help.r<=o.l||help.l>=o.r||help.b<=o.t||help.t>=o.b,`? overlaps ${o.s}`);
-    // A step opens the Buildings menu on its building.
-    await page.locator('#help-toggle').click();await page.locator('[data-help-building="granary"]').click();
-    assert.equal(await dialog.evaluate(d=>d.open),false);assert.equal(await page.locator('#buildings-panel').isVisible(),true);
+    // Owner 9 Nov 2026: a docked window under the top bar at the right, not a modal; the map keeps working.
+    assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.input.enabled),true,'the map stays usable');
+    assert.equal(await page.locator('#help-count').textContent(),'0 / 8');
+    const box=await page.evaluate(()=>{const w=document.querySelector('#help-dialog').getBoundingClientRect(),bar=document.querySelector('.inventory').getBoundingClientRect();return {top:w.top,barBottom:bar.bottom,right:w.right,vw:innerWidth};});
+    assert.ok(box.top>=box.barBottom&&box.top<=box.barBottom+16,`under the top bar: ${JSON.stringify(box)}`);assert.ok(box.right>box.vw-80,'at the right');
+    // The heading folds it to a strip and back; the browser remembers the choice.
+    await page.locator('.help-window-summary').click();assert.equal(await dialog.evaluate(d=>d.open),false);
+    assert.equal(await page.evaluate(()=>localStorage.getItem('newgame.gettingStarted.collapsed')),'1');
+    await page.locator('.help-window-summary').click();assert.equal(await dialog.evaluate(d=>d.open),true);
+    // A step opens the Buildings menu on its building; the window stays.
+    await page.locator('[data-help-building="granary"]').click();
+    assert.equal(await dialog.evaluate(d=>d.open),true);assert.equal(await page.locator('#buildings-panel').isVisible(),true);
     assert.equal(await page.evaluate(()=>document.activeElement?.id),'granary-choice');
     assert.equal(await page.locator('[data-building-category="food"]').getAttribute('aria-pressed'),'true');
     await page.locator('#buildings-tab').click();
@@ -36,14 +36,12 @@ export async function gettingStartedSmoke(context,url,instrument){
       }
       const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type:'granary',definition:d,...anchor,tiles};s.buildings.push(b);s.constructionSystem.plan(b);s.towerViews.set(b.id,s.createBuildingView(d,b));s.events.emit('buildings:changed');return b.id;
     });
-    await page.locator('#help-toggle').click();
-    assert.equal(await page.locator('[data-help-step="granary"]').evaluate(e=>e.classList.contains('done')),false,'a construction site is not enough');await page.keyboard.press('Escape');
+    assert.equal(await page.locator('[data-help-step="granary"]').evaluate(e=>e.classList.contains('done')),false,'a construction site is not enough');
     await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id);b.construction.workDone=b.construction.requiredWork;b.construction.progress=100;s.constructionSystem.finish(b);},site);
-    await page.locator('#help-toggle').click();
     assert.equal(await page.locator('[data-help-step="granary"]').evaluate(e=>e.classList.contains('done')),true);
     assert.equal(await page.locator('#help-steps .help-step.current').getAttribute('data-help-step'),'farmhouse');
     assert.match(await page.locator('#help-summary').textContent(),/^1 of 8 done/);
-    await page.keyboard.press('Escape');
-    console.log('PASS Getting started: opens once on New Game, Esc / close / ? work, a step opens the Buildings menu, a completed Granary (not its site) ticks step 1 (E3 order)');
+    assert.equal(await page.locator('#help-count').textContent(),'1 / 8');
+    console.log('PASS Getting started: docked window under the top bar, folds and remembers it, a step opens the Buildings menu, a completed Granary (not its site) ticks step 1 (E3 order)');
   }finally{await page.close();}
 }

@@ -6,7 +6,7 @@ export async function wikiSmoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
-    await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.wikiPanel);await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.wikiPanel);await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.locator('#wiki-toggle').click();await page.locator('#wiki-dialog[open]').waitFor();
     assert.ok(await page.locator('.wiki-category').count()>=6,'categories');
     await page.locator('#wiki-search').fill('granary');await page.locator('.wiki-nav [data-wiki-page="building:granary"]').click();

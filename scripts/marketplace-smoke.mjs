@@ -8,7 +8,7 @@ export async function marketplaceSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.locator('#buildings-tab').click();await page.locator('[data-building-category="logistics"]').click();
     assert.equal(await page.locator('#marketplace-choice').isDisabled(),true,'locked without a finished Warehouse');
     assert.match(await page.locator('#marketplace-availability').textContent(),/Warehouse/);

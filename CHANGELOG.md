@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.86.0] - 2026-11-09
+<!-- version: {"title":"The map now fills the whole window from the left edge to the right edge and down to the bottom.","type":"feature","reconstructed":false,"saveVersion":61} -->
+### Changed
+- The map now fills the whole window from the left edge to the right edge and down to the bottom. The Buildings bar (Buildings, Mark to clear, Unmark) and the status line float over the map at the bottom.
+- The top bar is rearranged. The day and weather are at the top right. The Kingdom overview is at the bottom left of the bar, with the food supply right beside it. The game speed and night controls, More and Wiki are on the right of the second row.
+- The King's health and level are no longer shown in the top bar. Click the King to open his panel.
+- Getting started is now its own window at the right, under the top bar, instead of a dialog behind the "?" button. The map stays usable while it is open. Click its heading to fold it to one line and to open it again. The browser remembers the choice.
+
 ## [0.85.2] - 2026-11-09
 <!-- version: {"title":"Fog of War: the edge of sight no longer has a dark line with lighter remembered land behind it.","type":"fix","reconstructed":false,"saveVersion":61} -->
 ### Fixed

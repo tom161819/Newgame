@@ -6,7 +6,7 @@ export async function eventsSmoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
-    await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.dangerMarks);await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.dangerMarks);await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.fog?.setEnabled?.(false);s.eventFeed.push('smoke:place','Something happened far away',{important:true,target:{x:62,y:38}});});
     // The click is near the screen edge; the pointer then moves to the middle so edge-scrolling does not move the camera.
     await page.locator('#event-feed .is-locatable').first().click();await page.mouse.move(720,450);await page.waitForTimeout(700);

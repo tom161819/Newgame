@@ -8,7 +8,7 @@ export async function walls2Smoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);const errors=[];page.on('pageerror',e=>errors.push(e.message));
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
-    await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const f=await page.evaluate(()=>{
       const s=window.__game.registry.get('application').scene,c=s.character.tile;s.employment?.setEnabled?.(false);s.fog?.setEnabled?.(false);
       for(const w of s.workerSystem.liveSubjects())s.workerSystem.commands.hold(w);for(const a of s.animalSystem.animals.values()){a.path=[];a.wanderWait=1e8;}

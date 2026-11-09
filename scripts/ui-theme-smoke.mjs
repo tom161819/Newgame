@@ -8,7 +8,7 @@ export async function uiThemeSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.workerSystem);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const attrs=()=>page.evaluate(()=>({theme:document.documentElement.dataset.uiTheme??null,frame:document.documentElement.dataset.uiFrame??null,bar:document.documentElement.dataset.uiBuildingsBar??null}));
     assert.deepEqual(await attrs(),{theme:'olive-custom',frame:'rivets',bar:'bottom'},'the owner\'s design by default');
     const covered=sel=>page.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return 'missing';const r=e.getBoundingClientRect();if(!r.width||!r.height)return 'hidden';const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return hit&&(e===hit||e.contains(hit))?null:`covered by ${hit?.id||hit?.className||hit?.tagName}`;},sel);

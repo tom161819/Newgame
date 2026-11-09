@@ -26,7 +26,7 @@ export async function flowerNoiseSmoke(context, url, instrument) {
     // A game in summer, zoomed out over the meadows.
     await page.locator('#new-game:not([disabled])').click(); await page.locator('#setup-world-code').evaluate(e => { e.value = 'MKW5-155515555555-1'; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }); await page.locator('#start-game').click();
     await page.waitForFunction(() => window.__game?.registry.get('application').scene?.terrain);
-    await page.locator('#help-dialog[open]').waitFor({ timeout: 10000 }).then(() => page.keyboard.press('Escape')).catch(() => {});
+    await page.locator('#help-dialog').waitFor({ timeout: 10000 }).catch(() => {});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const look = await page.evaluate(`(() => { const s = ${app}.scene; s.dayNight.ambientAlpha = () => 0; s.worldCamera.following = false; s.fog?.setEnabled?.(false); s.terrain.setSeason('Summer');
       const cam = s.cameras.main, x = 62, y = 18; cam.setZoom(0.55).centerOn(3200 + (x - y) * 32, 128 + (x + y) * 16); cam.preRender();
       return { season: s.terrain.season, seed: s.worldSeed }; })()`);

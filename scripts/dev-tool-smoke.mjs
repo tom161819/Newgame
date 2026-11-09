@@ -9,7 +9,7 @@ export async function devToolSmoke(context,url,instrument){
     await page.goto(url);await page.evaluate(()=>{localStorage.removeItem('newgame.devBalance');localStorage.setItem('newgame.tutorial','off');});await page.reload();
     await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.devBalancePanel);
-    if(await page.locator('#help-dialog').evaluate(d=>d.open))await page.keyboard.press('Escape');
+    await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const icon=page.locator('#dev-tool-button');await icon.waitFor({state:'visible'});await page.waitForTimeout(1100);
     const [s,d]=await Promise.all([page.locator('#settings-button').boundingBox(),icon.boundingBox()]);
     assert.ok(Math.abs((s.x+s.width/2)-(d.x+d.width/2))<=2&&d.y>s.y+s.height&&d.y-(s.y+s.height)<=16,`icon right under Settings (${JSON.stringify(s)} / ${JSON.stringify(d)})`);

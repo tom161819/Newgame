@@ -20,7 +20,7 @@ export async function ironMineSpotSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill(CODE);await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.diagnostics&&window.__game.registry.get('application').scene.minimap);
-    if(await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>true,()=>false))await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const info=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,m=s.naturalResources.mining,c=m.startCentre();s.inventory.add('wood',200);s.updateInventory();
       const iron=m.deposits().filter(d=>d.type.startsWith('iron')).map(d=>({id:d.natural.id,x:d.x,y:d.y,w:d.definition.width,dist:Math.hypot(d.x+d.definition.width/2-c.x,d.y+d.definition.height/2-c.y)})).sort((a,b)=>a.dist-b.dist);
       const nearest=s.naturalResources.byId.get(iron[0].id),site=m.ironMineSite(nearest);

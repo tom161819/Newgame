@@ -9,7 +9,7 @@ export async function devBalanceSmoke(context,url,instrument){
     await page.goto(url);await page.evaluate(()=>localStorage.removeItem('newgame.devBalance'));await page.reload();
     await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.devBalancePanel);
-    if(await page.locator('#help-dialog').evaluate(d=>d.open))await page.keyboard.press('Escape');
+    await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.locator('#dev-tool-button').click();await page.locator('#dev-balance-panel').waitFor({state:'visible'});
     assert.equal(await page.locator('#dev-balance-advanced input[type=range]').count(),7);assert.equal(await page.locator('#dev-balance-fisher').isVisible(),false,'folded');
     await page.locator('#dev-balance-advanced summary').click();await page.locator('#dev-balance-fisher').waitFor({state:'visible'});

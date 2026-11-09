@@ -68,7 +68,7 @@ test('request 28: every window root in the page is registered with the right-cli
     const src=readFileSync(new URL(`../src/ui/${file}`,import.meta.url),'utf8');
     for(const m of src.matchAll(/createElement\('dialog'\);this\.dialog\.id='([^']+)'/g))ids.add(m[1]);
   }
-  assert.ok(ids.size>=26,`found ${ids.size} dialogs`);
+  assert.ok(ids.size>=25,`found ${ids.size} dialogs`);// 25 since Getting started became a docked window (9 Nov 2026)
   for(const id of ids)assert.ok(DISMISSIBLE_PANELS.includes(id)||NEVER_DISMISSED.includes(id),`dialog #${id} must be in DISMISSIBLE_PANELS or NEVER_DISMISSED`);
   for(const id of [...DISMISSIBLE_PANELS,...NEVER_DISMISSED])assert.ok(ids.has(id),`registered #${id} exists`);
   // Side windows: every pop-out card / sidebar with its own close button, plus the folding cards.

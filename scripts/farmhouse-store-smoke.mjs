@@ -13,7 +13,7 @@ export async function farmhouseStoreSmoke(context,url,instrument){
     await page.setViewportSize({width:1280,height:800});
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.foodStorage&&window.__game.registry.get('application').scene.domestic);
-    if(await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>true,()=>false))await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     // A Farmhouse and a Granary built the ordinary way (blueprint, the King carries the materials and builds).
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.employment?.setEnabled(false);s.fog?.setEnabled(false);s.refreshVisibility?.();});
     const farmSite=await placeBlueprint(page,'farmhouse');await supplyAndBuild(page,farmSite);const granarySite=await placeBlueprint(page,'granary');await supplyAndBuild(page,granarySite);

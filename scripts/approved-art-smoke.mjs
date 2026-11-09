@@ -14,7 +14,7 @@ export async function approvedArtSmoke(context,url,instrument){
     await page.setViewportSize({width:1280,height:800});await page.goto(url);
     await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.fishing&&window.__game.registry.get('application').scene.minimap);
-    if(await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>true,()=>false))await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.fog.setEnabled(false);s.refreshVisibility();s.employment?.setEnabled?.(false);s.foodSystem.eat=()=>true;});
 
     // ---- Ground: the zone and transition strips load and the terrain repaints with them.

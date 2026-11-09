@@ -9,7 +9,7 @@ export async function kingXpSmoke(context,url,instrument){
     await page.setViewportSize({width:1280,height:800});
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingSkills);
-    if(await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>true,()=>false))await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.waitForFunction(()=>!document.querySelector('dialog[open]'));
     // Finish the Bread task (one of the first three) by counting one finished Bakery cycle; the check pays once.
     const earned=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;
@@ -19,7 +19,7 @@ export async function kingXpSmoke(context,url,instrument){
     const feed=await page.evaluate(()=>document.body.textContent);
     assert.match(feed,/The King earned \d skill points?\./,'feed line');
     // King panel: points, royal skills and a + on each row.
-    await page.locator('#king-profile').click();await page.locator('#unit-dialog[open]').waitFor();
+    await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.unitPanel.open(s.character);});await page.locator('#unit-dialog[open]').waitFor();
     await page.locator('#king-skills:not([hidden])').waitFor();
     assert.match(await page.locator('#king-skill-points').textContent(),new RegExp(`Free skill points: ${earned.after}`));
     assert.equal(await page.locator('#king-skills [data-king-skill-row]').count(),2);

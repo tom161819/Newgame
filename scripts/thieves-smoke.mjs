@@ -8,7 +8,7 @@ export async function thievesSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.evaluate(()=>localStorage.setItem('newgame.nightSpeed','1'));await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.nightThreats);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const start=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,g=s.gameTime,n=s.nightThreats;n.started=()=>true;/* E1: threats begin later in a real game */g.update(g.dayDuration*(s.dayNight.nightStart()+.01)-g.elapsed);
       s.needs.summary=()=>({happiness:15});/* m-start-v2: the Castle garrison stands by the store and would spot him at once; this check brings its own soldier */for(const w of s.workerSystem.liveWorkers())if(w.profession==='soldier')s.workerSystem.jobs.assign(w,'idle');s.dayNight.darkAt=()=>true;n.random=()=>0;n.thiefDay=null;const thief=n.spawnThief(g.day);n.random=Math.random;if(!thief)return null;
       const st=n.thieves.get(thief.id),b=s.buildings.find(x=>x.id===st.target.buildingId);

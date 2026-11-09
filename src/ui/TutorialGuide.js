@@ -16,7 +16,7 @@ export const tutorialEnabled=(storage=globalThis.localStorage)=>{try{return stor
 export function setTutorialEnabled(on,storage=globalThis.localStorage){try{storage?.setItem(KEY,on?'on':'off');}catch{/* session only */}}
 const visible=el=>!!el&&el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden';
 // m-ui-prekryvy-076 (report 0.76.0 point 4): the windows the bubble (tutorial step or tip) must never cover.
-export const TUTORIAL_WINDOWS='#buildings-panel,#population-panel,#population-job-menu,#policy-card,#employment-panel,#settings-panel,#royal-goals,#unit-command-bar,dialog[open]';
+export const TUTORIAL_WINDOWS='#buildings-panel,#population-panel,#population-job-menu,#policy-card,#employment-panel,#settings-panel,#royal-goals,#unit-command-bar,#help-dialog,dialog[open]';
 // A sliding window (the Population panel moves in with `transform`) measured mid-animation is still partly off screen:
 // while a transition or animation runs, take the box it comes to rest at (its transform's translation taken away), so
 // the bubble is not placed where the window is about to be. Pure: `translate` is {x,y} of the current transform.

@@ -9,7 +9,7 @@ export class WikiPanel {
   constructor(scene,{document:doc=globalThis.document}={}){
     this.scene=scene;this.doc=doc;this.controller=new AbortController();const options={signal:this.controller.signal};this.history=[];this.restored=true;
     this.button=doc.createElement('button');this.button.id='wiki-toggle';this.button.type='button';this.button.className='hud-toggle wiki-toggle';this.button.setAttribute('aria-haspopup','dialog');
-    const help=doc.querySelector('#help-toggle');if(help)help.after(this.button);else doc.body.append(this.button);
+    const help=doc.querySelector('#help-toggle')??doc.querySelector('#hud-details-toggle');if(help)help.after(this.button);else doc.body.append(this.button);
     this.dialog=doc.createElement('dialog');this.dialog.id='wiki-dialog';this.dialog.className='game-dialog wiki-dialog';
     this.search=doc.createElement('input');this.search.type='search';this.search.id='wiki-search';
     this.nav=element('nav','wiki-nav');this.page=element('article','wiki-page');this.page.id='wiki-page';

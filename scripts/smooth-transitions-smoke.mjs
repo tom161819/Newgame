@@ -44,7 +44,7 @@ export async function smoothTransitionsSmoke(context, url, instrument) {
     await page.goto(url); await page.locator('#new-game:not([disabled])').click();
     await page.locator('#setup-world-code').evaluate((e, code) => { e.value = code; e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }, WORLD);
     await page.locator('#start-game').click(); await page.waitForFunction(() => window.__game?.registry.get('application').scene?.seasonTransition);
-    await page.locator('#help-dialog[open]').waitFor({ timeout: 10000 }).then(() => page.keyboard.press('Escape')).catch(() => {});
+    await page.locator('#help-dialog').waitFor({ timeout: 10000 }).catch(() => {});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.evaluate(() => { for (const d of document.querySelectorAll('dialog[open]')) d.close(); });
 
     // ---- 73: fish on the river ----

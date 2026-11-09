@@ -17,7 +17,7 @@ async function start(page,url){
   await page.goto(url);await page.evaluate(keys=>{for(const k of keys)localStorage.removeItem(k);localStorage.setItem('newgame.notices.muted','["construction"]');},KEYS);
   await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingdomOverview);
-  await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+  await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
 }
 export async function kingdomBarSmoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);
@@ -34,7 +34,7 @@ export async function kingdomBarSmoke(context,url,instrument){
         return b;
       };
       // 1. Bottom-left corner, fixed, bigger text with bold numbers.
-      const first=await check(`${width} open`);assert.ok(first['#kingdom-bar'].left-view.left<=12,`in the left column ${JSON.stringify({bar:first['#kingdom-bar'],view,first})}`);assert.ok(view.bottom-first['#kingdom-bar'].bottom<=60,'at the bottom');
+      const first=await check(`${width} open`);assert.ok(first['#kingdom-bar'].left-view.left<=24,`in the left column ${JSON.stringify({bar:first['#kingdom-bar'],view,first})}`);assert.ok(view.bottom-first['#kingdom-bar'].bottom<=60,'at the bottom');
       const font=await page.evaluate(()=>{const row=document.querySelector('#kingdom-bar-body .overview-row');return {size:parseFloat(getComputedStyle(row).fontSize),bold:Number(getComputedStyle(row.querySelector('strong')).fontWeight)};});
       assert.ok(font.size>=13,`text ≥ 13 px (was 11), got ${font.size}`);assert.ok(font.bold>=700,'values bold');
       for(const word of ['Happiness','Food','Rest','Housing','Safety','Average mood'])assert.ok((await page.locator('#kingdom-bar-body').textContent()).includes(word),word);
@@ -44,7 +44,7 @@ export async function kingdomBarSmoke(context,url,instrument){
       assert.equal(await page.locator('#kingdom-bar-body').isVisible(),false);assert.match(await page.locator('#kingdom-bar-summary').textContent(),/\d+ \/ \d+/);
       await check(`${width} folded`);
       await page.reload();await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingdomOverview);
-      await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>page.keyboard.press('Escape')).catch(()=>{});
+      await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
       assert.equal(await bar.evaluate(e=>e.classList.contains('collapsed')),true,'folded after a reload');
       await page.locator('#kingdom-bar-toggle').click();await page.locator('#kingdom-bar-body').waitFor({state:'visible'});assert.equal(await page.evaluate(()=>localStorage.getItem('newgame.kingdomBar.collapsed')),'0');
       // 3. The building strip: edge to edge, the bar above it, the chips and minimap lifted above it too.
@@ -73,7 +73,7 @@ export async function kingdomBarSmoke(context,url,instrument){
       const small=await notices.boundingBox();assert.ok(small.x>=0&&small.y>=0&&small.x+small.width<=1024&&small.y+small.height<=640,`on screen after a resize ${JSON.stringify(small)}`);
       await page.setViewportSize({width,height});await page.waitForTimeout(200);
       await page.reload();await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.noticesPanel);
-      await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>page.keyboard.press('Escape')).catch(()=>{});
+      await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
       assert.equal(await notices.evaluate(e=>e.classList.contains('notices-moved')),true,'moved after a reload');
       await page.locator('#notices-grip').dblclick();assert.equal(await page.evaluate(()=>localStorage.getItem('newgame.notices.position')),null,'the double-click clears it');
       assert.equal(await notices.evaluate(e=>e.classList.contains('notices-moved')),false,'back in the corner stack');

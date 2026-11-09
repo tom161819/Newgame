@@ -28,8 +28,10 @@ export function placeBottomLeft({view,size,obstacles=[],margin=8,gap=6,minTop=vi
 
 // The open building strip spans the whole window width; the map's bottom-anchored items (camera chips, corner stack)
 // are lifted by how far it reaches into the map. Zero when the strip opens downwards (buildings bar at the top).
+// Since the bar floats over the map (owner 9 Nov 2026) a tall strip may reach above the middle of a low window, so the
+// side is told by the strip's centre, not its top.
 export function bottomLift(view,panel,gap=8){
-  if(!panel||panel.top<=view.top+(view.bottom-view.top)/2)return 0;
+  if(!panel||(panel.top+panel.bottom)/2<=view.top+(view.bottom-view.top)/2)return 0;
   return Math.max(0,Math.round(view.bottom-panel.top+gap));
 }
 

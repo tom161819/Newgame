@@ -13,7 +13,7 @@ export async function materialYardSmoke(context,url,instrument){
     await page.setViewportSize({width:1280,height:800});
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.materialPiles);
-    if(await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>true,()=>false))await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.employment.setEnabled(false);s.fog.setEnabled(false);s.refreshVisibility();});
     // The yard comes from the real building menu (Logistics & Trade), the Quarry through the real placement click.
     assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.objectRegistry.require('material_yard').name),'Material Yard');

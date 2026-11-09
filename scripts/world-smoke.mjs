@@ -8,7 +8,7 @@ export async function worldSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.terrain&&window.__game.registry.get('application').scene.minimap);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const world=await page.evaluate(()=>{
       const s=window.__game.registry.get('application').scene,counts=[0,0,0,0,0,0,0,0];s.groundGrid.flat().forEach(c=>counts[c]++);
       let shore=null;for(let y=1;y<99&&!shore;y++)for(let x=1;x<99&&!shore;x++)if(s.groundGrid[y][x]===4&&[[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dy])=>s.groundGrid[y+dy][x+dx]===3))shore={x,y};

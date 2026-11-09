@@ -8,7 +8,7 @@ export async function sideCardsSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.sideCards);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const open=()=>page.evaluate(()=>({policy:!document.querySelector('#policy-card').hidden,population:document.querySelector('#population-panel').classList.contains('open'),employment:!document.querySelector('#employment-panel').hidden}));
     for(const style of ['studio','olive','wood-iron','parchment','stone-castle']){
       await page.evaluate(style=>{const s=document.querySelector('#settings-ui-style');s.value=style;s.dispatchEvent(new Event('change'));},style);await page.waitForTimeout(150);

@@ -7,7 +7,7 @@ export async function walkSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.workerSystem);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.waitForFunction(()=>{const s=window.__game.registry.get('application').scene;return [...s.workerSystem.workers.values()].some(w=>w.view?.artFrame);},null,{timeout:20000});
     const seen=await page.evaluate(async()=>{const s=window.__game.registry.get('application').scene,out={walking:{},standing:[],bob:0};
       for(let i=0;i<60;i++){await new Promise(r=>setTimeout(r,50));

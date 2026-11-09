@@ -11,7 +11,7 @@ export async function storageWindowSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.storagePanel);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('wood',40);s.inventory.add('stone',40);s.updateInventory();});
     const warehouse=await placeBlueprint(page,'material_yard'),granary=await placeBlueprint(page,'granary');assert.deepEqual(await finish(page,[warehouse.id,granary.id]),[true,true]);
     await page.evaluate(({w,g})=>{const s=window.__game.registry.get('application').scene,st=s.foodStorage;st.deposit(`yard-${w}`,'wood',30);st.deposit(`yard-${w}`,'stone',12);

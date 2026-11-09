@@ -7,7 +7,7 @@ export async function petsSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.domestic);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     // Fill the stockpile with grain and leave it without a cat for sixteen days (one long update: rat growth is linear).
     const store=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,d=s.domestic,l=d.foodLocations()[0];
       s.foodStorage.deposit(l.id,'wheat',s.foodStorage.room(l.id,'wheat'));d.nextStrayAt=Infinity;d.update(16*s.gameTime.dayDuration);return {id:l.id,building:l.buildingId,rats:d.ratsAt(l.id)};});

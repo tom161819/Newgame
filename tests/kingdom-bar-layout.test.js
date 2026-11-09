@@ -102,7 +102,7 @@ test('the overview bar folds to a strip, the top-bar chips toggle it and the bro
   assert.match(els.get('kingdom-bar-summary').textContent,/\d+ \/ \d+/,'the strip shows residents and mood');
   assert.equal(new KingdomOverview(scene,{document:fakeDom().doc,storage}).collapsed,true,'kept after a reload');
   fire('kingdom-bar-toggle','click');assert.equal(overview.collapsed,false);assert.equal(readBarCollapsed(storage),false);
-  assert.equal(bar.style.left,'8px','placed in the corner');assert.equal(bar.style.bottom,'8px');
+  assert.equal(bar.style.left,'20px','placed in the corner (20 px from the window edge since 9 Nov 2026)');assert.equal(bar.style.bottom,'20px');
   overview.destroy();assert.equal(bar.hidden,true);
   writeBarCollapsed(true,{setItem(){throw new Error('blocked');}});
   assert.match(kingdomBarSummary({population:3,capacity:8,happiness:null}),/3 \/ 8/);

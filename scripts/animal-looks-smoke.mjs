@@ -8,7 +8,7 @@ export async function animalLooksSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.domestic);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,d=s.domestic,k=s.character.tile;s.fog?.setEnabled?.(false);
       for(let i=0;i<4;i++){const c=d.newCat({x:k.x+1.5+i,y:k.y+2.5,home:{x:k.x+1.5+i,y:k.y+2.5},state:i===3?'kitten':'stray'});c.target=null;c.wait=1e9;}
       const dogs=[0,1,2].map(i=>{const g=d.newDog({x:k.x+1.5+i,y:k.y+4.5,state:'stray',home:{x:k.x+1.5+i,y:k.y+4.5}});g.target=null;g.wait=1e9;return g;});dogs[1].sitting=true;dogs[2].injuredUntil=1e12;

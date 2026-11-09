@@ -49,7 +49,8 @@ export async function tutorialSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.evaluate(()=>localStorage.setItem('newgame.tutorial','on'));await page.reload();
     await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.tutorial?.active);
-    assert.equal(await page.locator('#help-dialog').evaluate(d=>d.open),false,'no Getting started window over the map');
+    assert.equal(await page.locator('dialog[open]').count(),0,'no modal window over the map');
+    {const [w,b]=await page.evaluate(()=>['#help-dialog','#tutorial-bubble'].map(q=>{const r=document.querySelector(q).getBoundingClientRect();return {l:r.left,r:r.right,t:r.top,b:r.bottom};}));assert.ok(w.r<=b.l||b.r<=w.l||w.b<=b.t||b.b<=w.t,'the tutorial bubble keeps clear of Getting started');}
     assert.equal((await scene(page)).step,'king');assert.equal(await page.locator('#tutorial-bubble').isVisible(),true);
     await page.locator('#tutorial-bubble .tutorial-next').click();assert.equal((await scene(page)).step,'builder');
     await jobStep(page,'builder','hauler');await jobStep(page,'hauler','granary');

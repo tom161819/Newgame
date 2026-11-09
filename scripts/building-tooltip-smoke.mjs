@@ -27,7 +27,7 @@ export async function buildingTooltipSmoke(context,url,instrument){
     await page.setViewportSize({width:1280,height:800});
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.storePreview);
-    if(await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>true,()=>false))await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.employment?.setEnabled(false);s.fog?.setEnabled(false);if(s.tutorial){s.tutorial.active=false;s.tutorial.hide?.();}s.refreshVisibility?.();});
     const farm=await placeBlueprint(page,'farmhouse');await supplyAndBuild(page,farm);const house=await placeBlueprint(page,'house');await supplyAndBuild(page,house);
     const site=await placeBlueprint(page,'granary');
@@ -70,7 +70,7 @@ export async function nightSpeedSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.evaluate(()=>localStorage.removeItem('newgame.nightSpeed'));await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.nightSpeedUp);
-    if(await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>true,()=>false))await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     assert.equal(await page.locator('#settings-night-speed').inputValue(),'1','off by default');
     const toNight=()=>page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.gameTime.elapsed=(s.dayNight.nightStart()+.02)*s.gameTime.dayDuration;});
     const toDawn=()=>page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.gameTime.elapsed=s.gameTime.dayDuration-50;});

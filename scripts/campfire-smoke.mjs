@@ -8,7 +8,7 @@ export async function campfireSmoke(context,url,instrument){
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');
     assert.equal(await page.locator('#setup-night-wolves').isChecked(),true);await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.nightThreats);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const switches=await page.evaluate(()=>['wolves','thieves','fires'].map(id=>document.querySelector(`#settings-threat-${id}`).checked));assert.deepEqual(switches,[true,true,true]);
     await page.evaluate(()=>{const box=document.querySelector('#settings-threat-thieves');box.checked=false;box.dispatchEvent(new Event('change'));});
     assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.nightThreats.enabled.thieves),false);

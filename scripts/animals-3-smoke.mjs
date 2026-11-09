@@ -10,7 +10,7 @@ export async function animals3Smoke(context,url,instrument){
     await page.setViewportSize({width:1280,height:800});
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.domesticViews);
-    if(await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>true,()=>false))await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const bakeryId=await page.evaluate(()=>{
       const s=window.__game.registry.get('application').scene;s.employment?.setEnabled(false);s.fog?.setEnabled(false);s.refreshVisibility?.();
       const d=s.objectRegistry.require('bakery'),k=s.character.tile;for(const [r,n]of Object.entries(d.cost))if(s.inventory.count(r)<n)s.inventory.add(r,n-s.inventory.count(r));

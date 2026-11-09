@@ -11,7 +11,7 @@ export async function policySmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.evaluate(()=>window.__game.registry.get('application').scene.employmentPanel.open());
     await page.locator('#policy-tax').waitFor({state:'visible'});
     assert.equal(await level(page,'#policy-tax'),'normal');assert.equal(await level(page,'#policy-rations'),'normal');

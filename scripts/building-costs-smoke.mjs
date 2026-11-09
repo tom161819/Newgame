@@ -8,7 +8,7 @@ const scene=page=>page.evaluate(()=>{const s=window.__game.registry.get('applica
 async function newGame(page){
   await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
-  await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+  await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
 }
 async function openHouse(page){await openAssetLibrary(page);await page.locator('[data-object-id="house"]').click();await page.locator('[data-cost-editor="house"]').waitFor();}
 export async function buildingCostsSmoke(context,url,instrument){

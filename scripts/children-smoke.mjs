@@ -11,7 +11,7 @@ export async function childrenSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.childrenSystem);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('wood',60);s.inventory.add('stone',30);s.updateInventory();for(const a of [...s.animalSystem.animals.values()])if(a.definition.id==='wild_boar')s.animalSystem.remove(a);});
     const population=await page.evaluate(()=>window.__game.registry.get('application').scene.workerSystem.liveSubjects().length);
     for(let i=0;i<2;i++){const site=await placeBlueprint(page,'house');assert.equal(await finish(page,site.id),true);}

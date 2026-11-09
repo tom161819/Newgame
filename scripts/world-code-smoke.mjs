@@ -21,7 +21,7 @@ async function newGame(context,url,instrument,code,{check=false}={}){
   }
   await input.fill(code);await page.locator('#start-game').click();
   await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.animalSystem);
-  await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+  await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
   // The fingerprint is taken when the world is created, before any respawn or growth can happen.
   const world=await page.evaluate(()=>{const app=window.__game.registry.get('application'),s=app.snapshot();return {code:s.gameSettings.worldCode,terrain:s.terrain,ground:s.ground,bushes:s.bushes,natureGroups:s.natureGroups,start:app.scene.startWorldFingerprint};});
   return {page,world};

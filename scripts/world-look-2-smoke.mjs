@@ -13,7 +13,7 @@ export async function worldLook2Smoke(context,url,instrument){
     if(!await page.locator('#setup-fog').isVisible())await page.locator('.setup-advanced summary').click();await page.locator('#setup-fog').check();
     await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.fishShadows);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     // Daylight for the checks and pictures; the King stays home.
     await scene(()=>{const s=window.__game.registry.get('application').scene;s.dayNight.ambientAlpha=()=>0;s.worldCamera.following=false;});
 

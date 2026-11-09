@@ -36,7 +36,7 @@ const PANELS = [
   { id: 'buildings-panel', title: 'Buildings menu', kind: 'bar', open: 'click:#buildings-tab', close: 'click:#buildings-tab' },
   { id: 'population-panel', title: 'Population sidebar', kind: 'sidebar', open: 'click:#population-tab', close: 'click:#close-population' },
   { id: 'settings-panel', title: 'Settings', kind: 'sidebar', open: 'click:#settings-button', close: 'click:#close-settings' },
-  { id: 'help-dialog', title: 'Getting started', kind: 'dialog', open: 'click:#help-toggle', close: 'key:Escape' },
+  { id: 'help-dialog', title: 'Getting started', kind: 'panel', open: 'scene:gettingStarted', close: 'click:.help-window-summary' },
   { id: 'storage-dialog', title: 'Storage', kind: 'dialog', open: 'scene:storagePanel', close: 'key:Escape' },
   { id: 'food-economy-dialog', title: 'Food economy', kind: 'dialog', open: 'clicks:#hud-details-toggle|#open-food-economy', close: 'key:Escape' },
   { id: 'employment-panel', title: 'Employment', kind: 'sidebar', open: 'scene:employmentPanel', close: 'key:Escape' },
@@ -55,7 +55,7 @@ try {
   await page.goto(`${server.url}index.html`);
   await page.locator('#new-game:not([disabled])').click(); await page.locator('#start-game').click();
   await page.waitForFunction(() => window.__game?.registry.get('application').scene?.kingLogistics);
-  await page.locator('#help-dialog[open]').waitFor({ timeout: 15000 }).then(() => page.keyboard.press('Escape')).catch(() => {});
+  await page.locator('#help-dialog').waitFor({ timeout: 15000 }).catch(() => {});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
   await page.evaluate(() => { const s = window.__game.registry.get('application').scene; s.fog?.setEnabled?.(false); });
   // Let the HUD's resource icons and the minimap finish drawing.
   await page.waitForTimeout(5000);

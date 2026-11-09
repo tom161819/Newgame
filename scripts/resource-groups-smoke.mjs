@@ -8,7 +8,7 @@ export async function resourceGroupsSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.storePreview);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');await page.waitForTimeout(600);
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});await page.waitForTimeout(600);
     const groups=await page.evaluate(()=>[...document.querySelectorAll('#inventory-items > .inventory-group')].filter(g=>getComputedStyle(g).display!=='none').map(g=>g.dataset.resourceGroup));
     assert.deepEqual(groups.slice(0,3),['gold','materials','food'],'visible groups in order (gold, materials, food at the start)');
     assert.notEqual(await page.evaluate(()=>getComputedStyle(document.querySelector('.inventory-group[data-resource-group="materials"]')).backgroundColor),'rgba(0, 0, 0, 0)');

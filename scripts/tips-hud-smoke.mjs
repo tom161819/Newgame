@@ -17,7 +17,7 @@ export async function tipsHudSmoke(context,url,instrument){
     await page.evaluate(()=>{localStorage.setItem('newgame.language','cs');localStorage.removeItem('newgame.tipsSeen');localStorage.setItem('newgame.tips','on');localStorage.setItem('newgame.notices.collapsed','1');});await page.reload();
     await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.tutorial);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>page.keyboard.press('Escape')).catch(()=>{});
+    await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     // Shot 03 (the other tips are marked seen so none follows once the night tip folds away): the night tip points at the day part in the top bar.
     await page.evaluate(s=>{const g=eval(s),t=g.tutorial;t.active=false;t.hide();for(const tip of t.tips.tips)if(tip.id!=='night')t.tips.seen.add(tip.id);t.tips.waiting=[];t.tips.open({id:'night',target:'#day-part'},t.gameNow());t.showTip(t.tip);},S);await page.waitForTimeout(200);
     let bubble=await rect('#tutorial-bubble');assert.ok(bubble,'the night tip shows');

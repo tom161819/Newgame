@@ -51,7 +51,7 @@ export class KingdomOverview {
   place(){
     const bar=this.bar,view=bar?.parentElement?.getBoundingClientRect?.();if(!bar||bar.hidden||!view?.width)return;
     const doc=bar.ownerDocument,obstacles=[...doc.querySelectorAll(KINGDOM_BAR_AVOID)].filter(el=>!el.hidden&&!bar.contains(el)&&el.getClientRects().length).map(el=>fromDom(el.getBoundingClientRect())).filter(r=>r.right>view.left&&r.left<view.right&&r.bottom>view.top&&r.top<view.bottom);
-    const box=placeBottomLeft({view:fromDom(view),size:{width:bar.offsetWidth,height:bar.offsetHeight},obstacles});
+    const box=placeBottomLeft({view:fromDom(view),size:{width:bar.offsetWidth,height:bar.offsetHeight},obstacles,margin:20});// 20: the map reaches the window edge (9 Nov 2026)
     const left=`${Math.round(box.left-view.left)}px`,bottom=`${Math.round(view.bottom-box.bottom)}px`;
     if(bar.style.left!==left)bar.style.left=left;if(bar.style.bottom!==bottom)bar.style.bottom=bottom;
   }

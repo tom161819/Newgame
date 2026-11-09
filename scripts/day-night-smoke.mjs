@@ -8,7 +8,7 @@ export async function dayNightSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.dayNight);
-    await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     const state=()=>page.evaluate(()=>{const s=window.__game.registry.get('application').scene,radii=Object.fromEntries([...s.fog.painted].map(([id,v])=>[id,Number(v.key.split(',')[2])]));return {radii,part:s.dayNight.part(),hud:document.querySelector('#day-part').dataset.part,overlay:s.nightOverlay.dark.visible,
       king:radii.character,skip:!document.querySelector('#skip-to-dawn').hidden,elapsed:s.gameTime.elapsed/s.gameTime.dayDuration,day:s.gameTime.day};});
     await page.evaluate(()=>window.__game.registry.get('application').scene.fog?.setEnabled?.(true));

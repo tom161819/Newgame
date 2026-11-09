@@ -10,7 +10,7 @@ export async function notices2Smoke(context,url,instrument){
   const start=async()=>{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.noticesPanel);
-    if(await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>true,()=>false))await page.keyboard.press('Escape');
+    await page.locator('#help-dialog').waitFor({timeout:10000}).catch(()=>{});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.waitForFunction(()=>!document.querySelector('dialog[open]'));
     // Paused: the injected notices are not real problems, so a running diagnostics check would forget them at once.
     await page.evaluate(()=>window.__game.registry.get('application').scene.gameTime.setPaused(true));

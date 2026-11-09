@@ -9,7 +9,7 @@ export async function soldiersSmoke(context,url,instrument){
   try{
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.military);
-    if(await page.locator('#help-dialog[open]').count())await page.keyboard.press('Escape');
+    await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.waitForTimeout(1500);
     // Day 1 dawn: the garrison stands watch instead of going to sleep in the Castle at once.
     const garrison=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;return [...s.military.units.keys()].map(id=>{const w=s.workerSystem.workers.get(id);return {id,asleep:w.sleepingIn!=null,going:w.workState==='Going Home'};});});
