@@ -1,6 +1,6 @@
 import { FOOD_OUTLOOK,foodDays } from '../data/foodOutlook.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
-import { DIAGNOSTICS,INPUT_SOURCES,GATHER_OUTPUTS,DEPLETION_SOURCES,STORAGE_WAIT_MESSAGES,CHAIN_ADVICE,noticeRepeatDays } from '../data/diagnostics.js';
+import { DIAGNOSTICS,INPUT_SOURCES,GATHER_OUTPUTS,DEPLETION_SOURCES,STORAGE_WAIT_MESSAGES,CHAIN_ADVICE,noticeRepeatDays,noticeSeverity,NOTICE_REPEAT_MAX_DAYS,NOTICE_CLOSED_LIMIT } from '../data/diagnostics.js';
 import { chainLinks,isRawSource } from '../data/productionChains.js';
 import { DAY_DURATION } from './GameTimeSystem.js';
 import { storageResources } from '../data/logistics.js';
@@ -8,16 +8,18 @@ import { noticeText } from '../ui/noticeText.js';
 import { farmReady } from '../data/farmPlots.js';
 
 // Lasting problems that block work or production, each identified by (entity, reason). A problem is reported once
-// it has lasted DIAGNOSTICS.persistence, repeated at most once per NOTICE_REPEAT (game days by severity) while it
-// lasts, and dropped as soon as it is gone. A problem that comes back within that time returns quietly to its one row
-// (count + 1, no feed line, no new event), so a flickering cause does not pile up lines (request 72). Checked a few
-// times per game second from the actual construction, production and storage state, never per unit or per frame.
-// Nothing is saved: after Load a problem must last again before it is shown.
+// it has lasted DIAGNOSTICS.persistence and dropped as soon as it is gone. m-hlasky-jednou (owner point 79): the same
+// notice is reported only once – while its row is open nothing repeats it, and a return of the problem within
+// NOTICE_REPEAT_DAYS goes quietly back to its one row (count + 1, no feed line, no new event, the row keeps its
+// place). A row the player closes stays closed until NOTICE_REPEAT_DAYS after the close, whether the problem lasted or
+// came back meanwhile; then it is a new notice. Danger is never held back. Checked a few times per game second from
+// the actual construction, production and storage state, never per unit or per frame. Saved are only the close
+// times (`notices` in the save); after Load a problem must last again before it is shown.
 const minId=list=>list.reduce((a,b)=>a.id<=b.id?a:b).id;
 export class ProductionDiagnostics {
-  constructor(scene){this.scene=scene;this.issues=new Map();this.memory=new Map();this.listeners=new Set();this.nextCheck=0;this.revision=0;this.unsubscribe=scene.activities?.on(event=>{if(event.type==='buildingCompleted')this.completed(event.objectIds??[]);});}
+  constructor(scene){this.scene=scene;this.issues=new Map();this.memory=new Map();this.closed=new Map();this.listeners=new Set();this.nextCheck=0;this.revision=0;this.unsubscribe=scene.activities?.on(event=>{if(event.type==='buildingCompleted')this.completed(event.objectIds??[]);});}
   dayMs(){return this.scene.gameTime?.dayDuration??DAY_DURATION;}
-  repeatMs(reason){return noticeRepeatDays(reason)*this.dayMs();}
+  repeatMs(issue){return noticeRepeatDays(issue.reason,issue.severity)*this.dayMs();}
   memoryKey(issue){return `${issue.key}:${issue.params?.resource??''}`;}
   // Chain advice is immediate for a building just completed (structural, independent of stock or staff).
   completed(ids){
@@ -28,26 +30,32 @@ export class ProductionDiagnostics {
   track(found,now){
     // One current reason per entity: a new reason replaces the old one (chain advice has its own key per chain).
     const key=found.key??`${found.entityId}:${found.reason}`;let issue=this.issues.get(key);
-    if(!issue){issue={...found,key,firstSeen:now,lastNotified:null,dismissed:false,count:0};this.issues.set(key,issue);}
-    issue.params=found.params;issue.entityId=found.entityId;return issue;
+    if(!issue){issue={...found,key,severity:found.severity??noticeSeverity(found.reason),firstSeen:now,lastNotified:null,dismissed:false,count:0};this.issues.set(key,issue);}
+    issue.params=found.params;issue.entityId=found.entityId;if(issue.lastNotified!=null)issue.updatedAt=now;return issue;
   }
   // True when the panel must render again.
   observe(issue,found,now,{immediate=false}={}){
+    const repeat=this.repeatMs(issue),memoryKey=this.memoryKey(issue);
     if(issue.lastNotified==null){
       if(!immediate&&now-issue.firstSeen<DIAGNOSTICS.persistence)return false;
-      const past=this.memory.get(this.memoryKey(issue));
-      if(past&&now-past.lastNotified<this.repeatMs(issue.reason)){issue.lastNotified=past.lastNotified;issue.dismissed=past.dismissed;issue.count=past.count+1;return true;}
+      if(repeat>0){
+        const past=this.memory.get(memoryKey),closedAt=this.closed.get(memoryKey);
+        // Closed by the player less than NOTICE_REPEAT_DAYS ago: it stays closed, only counted.
+        if(closedAt!=null&&now-closedAt<repeat){Object.assign(issue,{lastNotified:past?.lastNotified??closedAt,dismissed:true,closedAt,count:(past?.count??0)+1,updatedAt:now});return true;/* hidden; the building's icon may change */}
+        // Gone on its own and back soon: quietly back to its row, same place, no event, no feed line, no slide-out.
+        if(past&&!past.dismissed&&now-past.seenAt<repeat){Object.assign(issue,{lastNotified:past.lastNotified,dismissed:false,count:past.count+1,updatedAt:now});return true;}
+      }
       return this.notify(issue,found,now);
     }
-    // Danger (0 days) is never held back between separate events, but a lasting one is not repeated every check.
-    // A one-off notice (a depleted mine) is reported once while it lasts.
-    if(found.once)return false;
-    if(now-issue.lastNotified<Math.max(this.repeatMs(issue.reason),DIAGNOSTICS.persistence))return false;
-    return this.notify(issue,found,now);
+    // While it lasts an open row is not repeated (a one-off notice such as a depleted mine never is). A closed row
+    // comes back as a new notice once NOTICE_REPEAT_DAYS have passed since the close; a closed danger row stays closed
+    // while it lasts (a new danger event is a new occurrence and shows at once).
+    if(found.once||!issue.dismissed||repeat<=0||issue.closedAt==null||now-issue.closedAt<repeat)return false;
+    issue.count=0;return this.notify(issue,found,now);
   }
   notify(issue,found,now){
     if(!issue.count&&found.feed)this.scene.eventFeed?.push?.(`notice:${issue.key}:${now}`,noticeText(this.scene,issue));
-    issue.lastNotified=now;issue.dismissed=false;issue.count=(issue.count??0)+1;
+    issue.lastNotified=issue.updatedAt=now;issue.dismissed=false;issue.closedAt=null;this.closed.delete(this.memoryKey(issue));issue.count=(issue.count??0)+1;
     this.scene.activities?.emit('productionIssue',{reason:issue.reason,category:issue.category,objectIds:[issue.entityId],params:{...issue.params},...(issue.informational?{informational:true}:{})});return true;
   }
   // Request 70: a missing link of a production chain, from the recipes and crops (productionChains.js) – a consumer
@@ -62,8 +70,8 @@ export class ProductionDiagnostics {
   }
   forget(key,issue){
     this.issues.delete(key);if(issue.lastNotified==null)return false;
-    // Remembered for the repeat interval: if it comes back soon it returns to the same row, without a new line.
-    this.memory.set(this.memoryKey(issue),{lastNotified:issue.lastNotified,count:issue.count,dismissed:issue.dismissed});return true;
+    // Remembered for NOTICE_REPEAT_DAYS: if it comes back soon it returns to the same row (or stays closed).
+    this.memory.set(this.memoryKey(issue),{lastNotified:issue.lastNotified,count:issue.count,dismissed:issue.dismissed,seenAt:this.scene.gameTime?.totalElapsed??issue.lastNotified});return true;
   }
   chainIssues(){
     const s=this.scene,definitions=this.chainDefinitions(),found=[];if(!definitions.length||!s.buildings)return found;
@@ -187,12 +195,27 @@ export class ProductionDiagnostics {
     const seen=new Set();let changed=false;
     for(const found of this.detect()){const issue=this.track(found,now);seen.add(issue.key);changed=this.observe(issue,found,now)||changed;}
     for(const [key,issue]of [...this.issues])if(!seen.has(key)&&this.forget(key,issue))changed=true;
-    const keep=CHAIN_ADVICE.repeatDays*this.dayMs();for(const [key,past]of this.memory)if(now-past.lastNotified>=keep)this.memory.delete(key);
+    this.prune(now);
     if(changed)this.changed();
   }
   // Reported and not dismissed since its last reminder.
   // Chain advice gives way to an actual blocker of the same building (one row per building).
   active(){const shown=[...this.issues.values()].filter(issue=>issue.lastNotified!=null&&!issue.dismissed),blocking=new Set(shown.filter(i=>!i.informational).map(i=>i.entityId));return shown.filter(i=>!i.informational||!blocking.has(i.entityId)).sort((a,b)=>a.lastNotified-b.lastNotified||a.key.localeCompare(b.key));}
-  dismiss(key){const issue=this.issues.get(key);if(issue&&!issue.dismissed){issue.dismissed=true;this.changed();}}
-  destroy(){this.unsubscribe?.();this.listeners.clear();this.issues.clear();this.memory.clear();}
+  // Closing a row: remembered (and saved) so the same notice does not come back for NOTICE_REPEAT_DAYS. Danger is not.
+  dismiss(key){
+    const issue=this.issues.get(key);if(!issue||issue.dismissed)return;const now=this.scene.gameTime?.totalElapsed??0;
+    issue.dismissed=true;if(this.repeatMs(issue)>0){issue.closedAt=now;this.closed.set(this.memoryKey(issue),now);}this.changed();
+  }
+  prune(now){
+    const keep=NOTICE_REPEAT_MAX_DAYS*this.dayMs();
+    for(const [key,past]of this.memory)if(now-past.seenAt>=keep)this.memory.delete(key);
+    for(const [key,closedAt]of this.closed)if(now-closedAt>=keep)this.closed.delete(key);
+  }
+  // Save (schema 60, optional `notices`): the close times still holding a notice back, oldest first.
+  exportState(){
+    const now=this.scene.gameTime?.totalElapsed??0;this.prune(now);
+    return {closed:[...this.closed].filter(([,at])=>at<=now).sort((a,b)=>a[1]-b[1]||a[0].localeCompare(b[0])).slice(-NOTICE_CLOSED_LIMIT).map(([key,at])=>[key,at])};
+  }
+  importState(state){this.closed=new Map(state?.closed??[]);this.memory.clear();this.issues.clear();this.changed();}
+  destroy(){this.unsubscribe?.();this.listeners.clear();this.issues.clear();this.memory.clear();this.closed.clear();}
 }

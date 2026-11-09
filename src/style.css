@@ -488,16 +488,25 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .notices-heading h2 { cursor:pointer; }
 .notices-panel.collapsed :is(.notices-list,.notices-filters) { display:none; }
 .notices-panel.collapsed .notices-heading { margin-bottom:0; }
-.notices-panel.collapsed .notices-heading h2::after { content:' ▸'; color:var(--muted,#b9b598); }
 .notices-heading h2 { flex:0 0 auto; }
-/* m-notice-bar-hlasky (72): fold button with an unread count; a new notice flashes one line while folded. */
 .notices-toggle { position:relative; flex:0 0 auto; min-width:24px; padding:1px 6px; font-size:12px; line-height:1.2; }
-.notices-panel.collapsed .notices-heading h2::after { content:''; }
-.notices-toggle.has-unread { border-color:#e0b85a; color:#ffd77a; }
-.notices-unread { position:absolute; top:-7px; right:-7px; min-width:15px; padding:0 3px; border-radius:8px; background:#c4512f; color:#fff; font-size:10px; line-height:15px; text-align:center; }
-.notices-flash { flex:1 1 auto; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:12px; color:#f4e6b8; opacity:1; transition:opacity 1s ease; }
-.notices-flash.fading { opacity:0; }
-.notices-panel:not(.collapsed) .notices-flash { display:none; }
+/* m-notice-bar-zasunuti (80): collapsed, the bar slides off the right edge (past the stack's 12px) and only the tab
+   with the arrow and "!" stays at the edge; a new notice slides it out to one message (.peeking) for 4 s. */
+.notices-panel { position:relative; transition:transform .3s ease; }
+.notices-panel.collapsed { overflow:visible; min-height:30px; padding:0; transform:translateX(calc(100% + 12px)); }
+.notices-panel.collapsed.peeking { transform:none; padding:4px 6px; }
+.notices-panel.collapsed .notices-heading { display:none; }
+.notices-tab { position:absolute; top:0; right:100%; margin-right:6px; display:flex; align-items:center; gap:3px; min-width:28px; height:30px; padding:0 7px; border-radius:8px 0 0 8px; font-size:13px; line-height:1; box-shadow:0 4px 14px rgb(6 9 5 / .45); }
+.notices-panel.collapsed:not(.peeking) .notices-tab { margin-right:0; }
+.notices-tab.has-unread { border-color:#e0b85a; color:#ffd77a; }
+.notices-alert { font-weight:800; color:#ffb25a; }
+.notices-unread { min-width:14px; padding:0 3px; border-radius:7px; background:#c4512f; color:#fff; font-size:10px; line-height:14px; text-align:center; }
+.notices-peek { display:flex; align-items:center; gap:6px; width:100%; min-height:30px; padding:4px 8px; border:0; border-left:3px solid #d8a54f; border-radius:4px; background:#2f3626; text-align:left; font-size:12px; line-height:1.35; color:#f4e6b8; }
+.notices-peek[data-severity="info"] { border-left-color:#9fb37a; } .notices-peek[data-severity="danger"] { border-left-color:#e0574f; }
+.notices-peek-text { flex:1 1 auto; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.notices-more { flex:0 0 auto; padding:0 5px; border-radius:6px; background:#4a4524; color:#f4d98e; font-size:11px; }
+.notices-panel:not(.collapsed) .notices-peek, .notices-peek[hidden], .notices-tab[hidden] { display:none; }
+@media(prefers-reduced-motion:reduce){ .notices-panel { transition:none; } }
 .notice-count { display:inline-block; margin-left:4px; padding:0 4px; border-radius:6px; background:#4a4524; color:#f4d98e; font-size:11px; }
 .notices-filters { display:flex; gap:4px; }
 .notice-filter { font-size:11px; padding:3px 7px; }

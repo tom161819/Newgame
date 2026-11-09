@@ -14,18 +14,20 @@ function employ(s,home,profession,x=53){const w=s.workerSystem.create({x,y:44});
 // Advance game time only through the diagnostics' own clock, without simulating the whole kingdom.
 const advance=(s,ms)=>{for(let t=0;t<ms;t+=DIAGNOSTICS.checkInterval){s.gameTime.totalElapsed+=DIAGNOSTICS.checkInterval;s.diagnostics.update();}};
 const reasons=s=>s.diagnostics.active().map(i=>i.reason);
-// m-notice-bar-hlasky (72): the same notice repeats at most once per NOTICE_REPEAT game days (a warning: half a day).
+// m-hlasky-jednou (79, replaces the 0.68 intervals): an open notice is never repeated; a closed one comes back at the
+// earliest NOTICE_REPEAT game days (4) after the close.
 const repeat=(s,reason)=>noticeRepeatDays(reason)*s.gameTime.dayDuration;
 const REMINDER=60000;
 
-test('a supplied site with no Builder is reported after it lasts, repeated at most every half day, gone once a Builder exists',()=>{
+test('a supplied site with no Builder is reported after it lasts, never repeated while open, back 4 days after a close, gone once a Builder exists',()=>{
   const s=scene(),site=building(s,'tower',60,50,{blueprint:true});assert.equal(s.constructionSystem.materials.ready(site),true);
   advance(s,DIAGNOSTICS.persistence-DIAGNOSTICS.checkInterval);assert.deepEqual(reasons(s),[],'not before it has lasted');
   advance(s,DIAGNOSTICS.checkInterval*2);assert.deepEqual(reasons(s),['noBuilder']);assert.equal(s.log.length,1);
-  assert.equal(repeat(s,'noBuilder'),s.gameTime.dayDuration/2);
-  advance(s,repeat(s,'noBuilder')-DIAGNOSTICS.checkInterval*2);assert.equal(s.log.length,1,'no repeat within half a day');
-  advance(s,DIAGNOSTICS.checkInterval*2);assert.equal(s.log.length,2,'one reminder after half a day');assert.equal(s.diagnostics.active()[0].count,2,'one row with a count');
-  s.diagnostics.dismiss(s.diagnostics.active()[0].key);assert.deepEqual(reasons(s),[],'dismissed until the next reminder');
+  assert.equal(repeat(s,'noBuilder'),s.gameTime.dayDuration*4);
+  advance(s,s.gameTime.dayDuration*5);assert.equal(s.log.length,1,'an open notice is not repeated, however long it lasts');assert.equal(s.diagnostics.active()[0].count,1);
+  s.diagnostics.dismiss(s.diagnostics.active()[0].key);assert.deepEqual(reasons(s),[],'closed');
+  advance(s,repeat(s,'noBuilder')-DIAGNOSTICS.checkInterval*2);assert.equal(s.log.length,1,'not back within 4 days of the close');
+  advance(s,DIAGNOSTICS.checkInterval*2);assert.equal(s.log.length,2,'a new notice 4 days after the close');assert.deepEqual(reasons(s),['noBuilder']);
   employ(s,null,'builder');advance(s,DIAGNOSTICS.checkInterval);assert.equal(s.diagnostics.issues.size,0,'resolved');
   advance(s,REMINDER*2);assert.equal(s.log.length,2,'nothing more once resolved');
 });
@@ -66,13 +68,13 @@ test('C05 commanded Builders, Haulers and Farmers are not counted as working sou
  const miller=s.workplaceSystem.employees(mill)[0];s.workerSystem.commands.hold(farmer);s.workerSystem.commands.hold(miller);advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);assert.ok(!s.diagnostics.active().some(i=>i.entityId===mill.id),'a deliberately held production crew raises no production alarm');
 });
 
-test('completion advice is immediate despite stock and no staff, deduplicated across workers/buildings and reminded only every 3 days',()=>{
+test('completion advice is immediate despite stock and no staff, deduplicated across workers/buildings and back only 4 days after a close',()=>{
  const s=scene(),mill=building(s,'mill',54,45);s.foodStorage.locations.get(`input-${mill.id}`).stock.wheat=20;
  s.activities.emit('buildingCompleted',{objectIds:[mill.id]});assert.deepEqual(reasons(s),['missingChainSource']);assert.equal(s.log.length,1);assert.equal(s.log[0].informational,true);
  s.activities.emit('buildingCompleted',{objectIds:[mill.id]});const other=building(s,'mill',60,45);s.activities.emit('buildingCompleted',{objectIds:[other.id]});advance(s,REMINDER*3);assert.equal(s.log.length,1);assert.equal(s.diagnostics.active().length,1);
  s.diagnostics.dismiss(s.diagnostics.active()[0].key);advance(s,REMINDER*2);assert.deepEqual(reasons(s),[]);assert.equal(s.log.length,1);
- // m-notice-bar-hlasky (70): while the link is missing it is advised again once per 3 game days.
- advance(s,REMINDER);assert.deepEqual(reasons(s),['missingChainSource']);assert.equal(s.log.length,2);
+ // m-hlasky-jednou (79): while the link is missing it comes back 4 game days after the close (it had 3 days of its own).
+ advance(s,REMINDER*6-DIAGNOSTICS.checkInterval);assert.deepEqual(reasons(s),[]);advance(s,DIAGNOSTICS.checkInterval);assert.deepEqual(reasons(s),['missingChainSource']);assert.equal(s.log.length,2);
  building(s,'wheat_field',40,52);advance(s,DIAGNOSTICS.checkInterval);assert.equal([...s.diagnostics.issues.values()].filter(i=>i.reason==='missingChainSource').length,0);
 });
 test('Bakery requires a completed Mill; existing predecessors and reloaded buildings do not replay completion advice',()=>{

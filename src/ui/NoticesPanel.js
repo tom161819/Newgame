@@ -25,31 +25,46 @@ export class NoticesPanel {
       const target=event.target.closest('[data-notice-entity]');if(target?.dataset.noticeReason==='noBuilder'&&scene.employmentPanel){scene.employmentPanel.open();return;}const open=target?.dataset.noticeEntity;if(open)this.openEntity(Number(open));
     },options);
     // Request 28: a right click collapses the card (PanelDismiss); a click on its title opens it again. Page only.
-    // Request 72: a fold button in the header; folded or not is remembered in the browser. Folded, a new notice
-    // flashes its text next to the button and the button shows how many came until the bar is unfolded.
+    // m-notice-bar-zasunuti (owner point 80): collapsed, the bar slides away to the right edge (CSS, ~0.3 s) and leaves
+    // a tab with an arrow and "!" for unread notices; a new notice slides out one message for 4 s. Remembered in the
+    // browser. The fold button in the header slides it away.
     this.title=document.querySelector('#notices-title');this.title?.addEventListener('click',()=>this.setCollapsed(!this.collapsed),options);
-    this.bar=new NoticeBarState({collapsed:readCollapsed()});this.timers=[];
-    this.toggle=element('button','notices-toggle');this.toggle.type='button';this.toggle.id='notices-toggle';this.toggle.addEventListener('click',()=>this.setCollapsed(!this.collapsed),options);
-    this.flash=element('span','notices-flash');this.flash.hidden=true;this.flash.setAttribute('aria-hidden','true');
-    this.title?.before(this.toggle);this.title?.after(this.flash);this.setCollapsed(this.bar.collapsed,{persist:false});
+    this.bar=new NoticeBarState({collapsed:readCollapsed()});this.timer=null;this.clearTimer=null;
+    this.toggle=element('button','notices-toggle');this.toggle.type='button';this.toggle.id='notices-toggle';this.toggle.addEventListener('click',()=>this.setCollapsed(true),options);
+    this.tab=element('button','notices-tab');this.tab.type='button';this.tab.id='notices-tab';this.tab.addEventListener('click',()=>this.setCollapsed(false),options);
+    // The one message of a peek: a click opens it like a row (the panel's click handler reads its data).
+    this.peek=element('button','notices-peek');this.peek.type='button';this.peek.id='notices-peek';this.peek.hidden=true;
+    this.title?.before(this.toggle);this.panel.prepend(this.tab);this.panel.append(this.peek);
+    this.panel.addEventListener('pointerenter',()=>this.bar.hover(true,this.now()),options);
+    this.panel.addEventListener('pointerleave',()=>{this.bar.hover(false,this.now());this.schedule();},options);
+    this.setCollapsed(this.bar.collapsed,{persist:false});
     this.unsubscribe=scene.diagnostics.onChange(()=>this.render());this.render();
   }
+  now(){return globalThis.performance?.now?.()??Date.now();}
   setCollapsed(value,{persist=true}={}){
     this.collapsed=this.bar.setCollapsed(value);this.panel.classList.toggle('collapsed',this.collapsed);this.title?.setAttribute('aria-expanded',String(!this.collapsed));
-    if(persist)writeCollapsed(this.collapsed);if(!this.collapsed)this.hideFlash();this.drawToggle();
+    if(persist)writeCollapsed(this.collapsed);this.drawPeek();this.drawToggle();
   }
   drawToggle(){
-    const button=this.toggle;if(!button)return;const unread=this.bar.unread;button.setAttribute('aria-expanded',String(!this.collapsed));
-    button.textContent=this.collapsed?'▸':'▾';button.classList.toggle('has-unread',this.collapsed&&unread>0);
-    if(this.collapsed&&unread>0){const badge=element('span','notices-unread',unread>9?'9+':String(unread));button.append(badge);}
-    const label=this.collapsed?(unread?`${t('notice.expand')} – ${t('notice.unread',{count:unread})}`:t('notice.expand')):t('notice.collapse');button.title=label;button.setAttribute('aria-label',label);
+    const unread=this.bar.unread,alert=this.bar.alert;
+    this.toggle.textContent='▸';const fold=t('notice.collapse');this.toggle.title=fold;this.toggle.setAttribute('aria-label',fold);this.toggle.setAttribute('aria-expanded',String(!this.collapsed));
+    this.tab.replaceChildren(element('span','notices-tab-arrow','◂'));this.tab.classList.toggle('has-unread',alert);this.tab.hidden=!this.collapsed;this.tab.setAttribute('aria-expanded',String(!this.collapsed));
+    if(alert)this.tab.append(element('span','notices-alert','!'),element('span','notices-unread',unread>9?'9+':String(unread)));
+    const label=alert?`${t('notice.expand')} – ${t('notice.unread',{count:unread})}`:t('notice.expand');this.tab.title=label;this.tab.setAttribute('aria-label',label);
   }
-  // One line of the new notice: shown 2 s, then fading out over 1 s (page timers: UI only).
-  showFlash(text){
-    this.hideFlash();this.flash.textContent=text;this.flash.hidden=false;
-    this.timers.push(setTimeout(()=>this.flash.classList.add('fading'),NOTICE_BAR.flashMs),setTimeout(()=>this.hideFlash(),NOTICE_BAR.flashMs+NOTICE_BAR.fadeMs));
+  // The peek: the bar out to one message; after it ends the bar slides back and the text is cleared once it is away.
+  drawPeek(){
+    const peek=this.collapsed?this.bar.peek:null;clearTimeout(this.clearTimer);this.panel.classList.toggle('peeking',!!peek);
+    if(peek){
+      const issue=peek.issue;this.peek.replaceChildren(element('span','notices-peek-text',this.text(issue)));if(peek.more>0)this.peek.append(element('span','notices-more',t('notice.more',{count:peek.more})));
+      this.peek.dataset.noticeEntity=issue.entityId;this.peek.dataset.noticeReason=issue.reason;this.peek.dataset.severity=issue.severity??'warning';this.peek.hidden=false;this.schedule();
+    }else if(!this.peek.hidden)this.clearTimer=setTimeout(()=>{this.peek.hidden=true;this.peek.replaceChildren();},this.collapsed?NOTICE_BAR.slideMs:0);
   }
-  hideFlash(){for(const id of this.timers)clearTimeout(id);this.timers=[];if(this.flash){this.flash.hidden=true;this.flash.classList.remove('fading');}}
+  // Page timers (UI only, not game time): the peek ends after its time unless the pointer holds it.
+  schedule(){
+    clearTimeout(this.timer);const peek=this.bar.peek;if(!peek||!this.collapsed)return;
+    this.timer=setTimeout(()=>{if(this.bar.expire(this.now()))this.drawPeek();else this.schedule();},Math.max(50,peek.until-this.now()+10));
+  }
   text(issue){return noticeText(this.scene,issue);}
   openEntity(id){
     const s=this.scene,building=s.buildings.find(b=>b.id===id);if(!building||!s.fog.isVisibleObject(building))return;
@@ -69,8 +84,9 @@ export class NoticesPanel {
       const topic=WIKI_NOTICE_TOPICS[issue.reason];if(topic)close.before(wikiInfoButton(this.scene,topic));return row;
     }));
     // The panel stays visible while categories are muted so they can be switched back on.
-    this.panel.hidden=!visible.length&&!this.muted.size;
-    const fresh=this.bar.observe(visible);if(fresh)this.showFlash(this.text(fresh));this.drawToggle();
+    if(this.bar.observe(visible,this.now()))this.drawPeek();this.drawToggle();
+    // Slid away, the tab stays while it has unread notices (or a peek is out).
+    this.panel.hidden=!visible.length&&!this.muted.size&&!this.bar.alert&&!this.bar.peek;
   }
-  destroy(){this.hideFlash();this.controller.abort();this.unsubscribe();}
+  destroy(){clearTimeout(this.timer);clearTimeout(this.clearTimer);this.controller.abort();this.unsubscribe();}
 }
