@@ -6,6 +6,7 @@ import { JOBS,SKILLS } from '../data/jobs.js';
 import { element } from './objectLabels.js';
 import { jobChoices,changeProfession } from './jobChange.js';
 import { populationSummary,populationWindow,professionColor,humanPortrait,POPULATION_ROW_HEIGHT,populationDetails,residentWarnings,sortedPopulation,readPopulationPreferences,writePopulationPreferences } from './populationData.js';
+const names=new Intl.Collator('cs',{numeric:true,sensitivity:'base'});
 
 export class PopulationSidebar {
   constructor(scene){
@@ -14,6 +15,12 @@ export class PopulationSidebar {
     try{this.storage=window.localStorage;}catch{}this.preferences=readPopulationPreferences(this.storage);
     this.search=document.querySelector('#population-search');this.sort=document.querySelector('#population-sort');this.order=document.querySelector('#population-order');this.profession=document.querySelector('#population-profession');
     this.renderOptions();
+    // m-vojaci-chyba (owner point 87): the Soldiers group – every Soldier (the starting garrison included) with his unit
+    // type and where he is; a click centres the camera on him (or on the House or Castle he sleeps in).
+    this.soldiers=element('details','population-soldiers');this.soldiers.id='population-soldiers';this.soldiers.open=true;this.soldiers.hidden=true;
+    this.soldiersTitle=element('summary');this.soldiersList=element('div','population-soldier-list');this.soldiers.append(this.soldiersTitle,this.soldiersList);
+    document.querySelector('#population-needs')?.after(this.soldiers);
+    this.soldiersList.addEventListener('click',event=>{const b=event.target.closest?.('[data-soldier-id]');if(b)this.locateResident(b.dataset.soldierId);},options);
     this.sort.value=this.preferences.sortBy;this.order.value=this.preferences.direction;this.profession.value=this.preferences.profession;this.search.value='';
     const change=()=>{clearTimeout(this.inspectTimer);this.hideDetails();this.preferences={sortBy:this.sort.value,direction:this.order.value,profession:this.profession.value};writePopulationPreferences(this.storage,this.preferences);this.viewport.scrollTop=0;this.refresh(true);};
     for(const control of [this.sort,this.order,this.profession])control.addEventListener('change',change,options);this.search.addEventListener('input',change,options);
@@ -66,7 +73,16 @@ export class PopulationSidebar {
     const text=t('population.summary',{total:summary.total,employed:summary.employed,unemployed:summary.unemployed});
     const output=document.querySelector('#population-summary');if(output.textContent!==text)output.textContent=text;
     document.querySelector('#population-empty').hidden=this.records.length>0||this.deaths.length>0;document.querySelector('#population-filter-count').textContent=`${t('population.shown',{count:this.records.length,total:summary.total})}${this.deaths.length?` · ${t('population.recentDeathsCount',{count:this.deaths.length})}`:''}`;
-    this.list.style.height=`${this.displayRecords.length*POPULATION_ROW_HEIGHT}px`;this.renderVisible();this.refreshDetails();this.renderDeceased();
+    this.list.style.height=`${this.displayRecords.length*POPULATION_ROW_HEIGHT}px`;this.renderVisible();this.refreshDetails();this.renderDeceased();this.renderSoldiers(summary.residents);
+  }
+  renderSoldiers(residents){
+    if(!this.soldiers)return;const military=this.scene.military,soldiers=residents.filter(w=>w.profession==='soldier').sort((a,b)=>names.compare(a.name,b.name));
+    const items=soldiers.map(w=>{const unit=military?.unit(w),type=unit?t(`unit.type.${unit.type}`):JOBS.soldier.name,shelter=w.sleepingIn!=null?this.scene.buildings.find(b=>b.id===w.sleepingIn):null;
+      return {id:w.id,name:w.name,type,state:shelter?t('population.soldierAsleep',{building:this.scene.objectRegistry.get(shelter.type)?.name??shelter.type}):localized(`work.state.${w.workState}`,w.workState)};});
+    const sig=JSON.stringify([items,language()]);if(sig===this.soldiersSig)return;this.soldiersSig=sig;
+    this.soldiers.hidden=!items.length;this.soldiersTitle.textContent=t('population.soldiers',{count:items.length});
+    this.soldiersList.replaceChildren(...items.map(item=>{const b=element('button','population-soldier');b.type='button';b.dataset.soldierId=item.id;b.title=t('population.locateName',{name:item.name});
+      b.append(element('strong','',item.name),element('small','',`${item.type} · ${item.state}`));return b;}));
   }
   // m-hlasky-udalosti (41): the folding Deceased section – everyone who died (last 50), with the cause and the day.
   renderDeceased(){

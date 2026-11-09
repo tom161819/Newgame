@@ -15,7 +15,10 @@ import { tileKey } from '../game/stones.js';
 export const restStart=gameTime=>gameTime?.restStartFraction?.()??DAILY_REST.startFraction;
 export const isRestTime=gameTime=>!!gameTime&&gameTime.elapsed>=gameTime.dayDuration*restStart(gameTime);
 // Soldiers keep the night watch and sleep in the first third of the day instead (only with the day/night cycle).
-export const isSoldierRestTime=gameTime=>!!gameTime?.restStartFraction&&gameTime.elapsed>=gameTime.dayDuration*DAY_NIGHT.soldierRest.from&&gameTime.elapsed<gameTime.dayDuration*DAY_NIGHT.soldierRest.to;
+// m-vojaci-chyba (owner point 87): not on day 1 – they have stood no night watch yet. A new game starts at the dawn of
+// day 1, so the starting garrison used to walk into the Castle at once and sleep there, hidden, for the first third of
+// the day: "they are in the population but I can't find them".
+export const isSoldierRestTime=gameTime=>!!gameTime?.restStartFraction&&(gameTime.day??2)>1&&gameTime.elapsed>=gameTime.dayDuration*DAY_NIGHT.soldierRest.from&&gameTime.elapsed<gameTime.dayDuration*DAY_NIGHT.soldierRest.to;
 export const RESTING_STATES=Object.freeze(['Going Home','Resting']);
 
 export class DailyRest {

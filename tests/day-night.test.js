@@ -32,7 +32,8 @@ test('soldiers keep the night watch and rest in the first third of the day', () 
   const s=workerScene(undefined,{workplaces:true});const dn=new DayNightSystem(s),rest=new DailyRest(s.workerSystem);void dn;
   const soldier={profession:'soldier'};assert.equal(rest.nightWatch(soldier),true);
   s.gameTime.elapsed=s.gameTime.dayDuration*.9;assert.equal(rest.wants(soldier),false,'awake at night');
-  s.gameTime.elapsed=s.gameTime.dayDuration*.1;assert.equal(rest.wants(soldier),true,'sleeps in the morning');
+  s.gameTime.elapsed=s.gameTime.dayDuration*.1;assert.equal(rest.wants(soldier),false,'m-vojaci-chyba: no morning sleep on day 1, before any night watch');
+  s.gameTime.day=2;assert.equal(rest.wants(soldier),true,'sleeps in the morning');
   s.gameTime.elapsed=s.gameTime.dayDuration*.4;assert.equal(rest.done(soldier),true,'up again after a third of the day');
 });
 

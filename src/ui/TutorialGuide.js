@@ -49,6 +49,11 @@ export class TutorialGuide {
     // m-tutorial-v2 bugs 6–7: the progress also follows the world on a timer, so a step ends even on frames where the
     // scene's update returns early (a paused or blocked frame).
     this.timer=globalThis.setInterval?.(()=>{if(this.active)this.update();},500);this.timer?.unref?.();
+    // m-tutorial-v3 (point 74): arrow and bubble are measured again at once when the window is resized or a panel has
+    // finished opening or closing, not only on the next timer tick.
+    const relayout=()=>{if(this.active)this.update(true);else if(this.tip)this.placeTip();};
+    globalThis.addEventListener?.('resize',relayout,options);
+    doc.addEventListener?.('transitionend',e=>{if(e.target?.matches?.(TUTORIAL_WINDOWS))relayout();},options);
     // Settings: switch the tutorial off or back on (it resumes at the first step not done yet).
     this.tipSetting=doc.querySelector('#settings-tips');if(this.tipSetting){this.tipSetting.checked=tipsEnabled();this.tipSetting.addEventListener('change',()=>{try{localStorage.setItem(TIPS_KEY,this.tipSetting.checked?'on':'off');}catch{/* session */}if(!this.tipSetting.checked)this.closeTip();},options);}
     try{this.tipsSeen=new Set(JSON.parse(localStorage.getItem(SEEN_KEY)??'[]'));}catch{this.tipsSeen=new Set();}this.tip=null;this.lastTipCheck=-Infinity;
@@ -149,10 +154,13 @@ export class TutorialGuide {
     const w=Math.min(300,vw-24);this.bubble.style.width=`${w}px`;const h=this.bubble.offsetHeight||90;
     const boxes=[target.avoid??[]].flat().filter(visible).map(restingBox);
     const avoid=boxes.length?{left:Math.min(...boxes.map(b=>b.left)),right:Math.max(...boxes.map(b=>b.right)),top:Math.min(...boxes.map(b=>b.top)),bottom:Math.max(...boxes.map(b=>b.bottom))}:null;
-    const {arrow,bubble}=tutorialPlacement({point,rect,avoid,from:target.from??null,vw,vh,bubble:{w,h},windows:openWindowRects(this.doc,vw,vh)});
+    const {arrow,bubble}=tutorialPlacement({point,rect,avoid,from:target.from??null,vw,vh,bubble:{w,h},windows:openWindowRects(this.doc,vw,vh),arrowLength:this.arrowLength()});
     this.arrow.hidden=false;this.arrow.style.left=`${Math.round(arrow.x)}px`;this.arrow.style.top=`${Math.round(arrow.y)}px`;this.arrow.style.transform=`translate(-50%,-50%) rotate(${arrow.angle}rad)`;this.arrow.classList.toggle('offscreen',arrow.off);
     this.bubble.style.left=`${bubble.x}px`;this.bubble.style.top=`${bubble.y}px`;
   }
+  // The drawn length of the pointer in the current UI design (golden arrow 40 px, the medieval pointers 56 px), with the
+  // 12 % of its pulse animation, so the placement keeps the whole pointer off the target.
+  arrowLength(){const a=this.arrow,off=a.classList.contains('offscreen');if(off)a.classList.remove('offscreen');const w=parseFloat(globalThis.getComputedStyle?.(a)?.width)||0;if(off)a.classList.add('offscreen');return Math.round(Math.max(w,34)*1.12);}
   positionBubble(anchor){
     const b=this.bubble,w=Math.min(300,innerWidth-24);b.style.width=`${w}px`;const h=b.offsetHeight||90;
     if(anchor){b.style.left=`${Math.round(Math.max(12,Math.min(innerWidth-w-12,anchor.x)))}px`;b.style.top=`${Math.round(Math.max(70,Math.min(innerHeight-h-12,anchor.y)))}px`;return;}

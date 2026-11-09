@@ -57,11 +57,12 @@ test('training takes Gold, the exact items carried from the Armory by Haulers an
 });
 
 test('without the items nothing is trained; cancelling refunds Gold and returns delivered items; death drops the gear for Haulers',()=>{
-  const {s,armory,barracks}=kingdom({sword:1});const a=soldier(s,barracks,{x:50,y:54}),b=soldier(s,barracks,{x:51,y:54});
-  s.military.train(a,'soldier');s.military.train(b,'archer');
-  until(s,()=>s.military.order(a)?.state==='training');s.tick(30000);
-  assert.equal(s.military.order(b).state,'supplying','no Bow anywhere: the Archer waits');assert.equal(s.military.units.has(b.id),false);
+  const {s,armory,barracks}=kingdom({sword:1,bow:1});const a=soldier(s,barracks,{x:50,y:54}),b=soldier(s,barracks,{x:51,y:54}),c=soldier(s,barracks,{x:52,y:54});
+  assert.equal(s.military.train(a,'soldier'),null);assert.equal(s.military.train(b,'archer'),null);
+  // m-vojaci-chyba: with the only Bow promised to b, c cannot order an Archer – the button says why instead of waiting.
+  const before=s.inventory.count('gold');assert.equal(s.military.train(c,'archer'),'kit');assert.deepEqual(s.military.kitShortage('archer'),{bow:1});assert.equal(s.inventory.count('gold'),before);assert.equal(s.military.order(c),null);
   const gold=s.inventory.count('gold');assert.equal(s.military.cancel(s.military.order(b).id),true);assert.equal(s.inventory.count('gold'),gold+8);
+  until(s,()=>s.military.order(a)?.state==='training');
   until(s,()=>s.military.units.has(a.id));const sword=()=>(armoryStock(s,armory).sword??0)+[...s.dropSystem.drops.values()].filter(d=>d.resource==='sword').reduce((n,d)=>n+d.amount,0)+s.workerSystem.liveWorkers().filter(w=>w.cargo?.resource==='sword').reduce((n,w)=>n+w.cargo.amount,0);
   assert.equal(sword(),0);
   a.currentHP=0;s.combat.handleDeath(a);s.workerSystem.onDeath(a);
@@ -104,4 +105,16 @@ test('100 units train and update cheaply',()=>{
   for(const w of s.workerSystem.liveWorkers().slice(40))s.military.train(w,'soldier');
   const start=performance.now();for(let i=0;i<100;i++){s.military.update(50);s.military.candidates();}const per=(performance.now()-start)/100;
   assert.ok(per<10,`one military update took ${per.toFixed(2)} ms`);
+});
+
+// m-vojaci-chyba (owner point 87): a new game can train a Soldier once the kingdom has a Barracks, an Armory and a Sword,
+// and every missing piece is named.
+test('m-vojaci-chyba: from the start the lock names what is missing – Armory, then the Sword – and a Soldier trains once they exist',()=>{
+  const s=scene(),barracks=building(s,'barracks',50,50);s.inventory.add('gold',100);const w=soldier(s,barracks,{x:50,y:54});hauler(s,{x:56,y:48});
+  assert.equal(s.objectRegistry.require('barracks').requiresCompletedBuildings?.length??0,0,'the Barracks is unlocked at the start');
+  assert.equal(s.military.blocker(w,'soldier'),'armory');assert.equal(s.military.train(w,'soldier'),'armory');assert.equal(s.military.orders.size,0);
+  const armory=building(s,'armory',60,44);assert.equal(s.military.blocker(w,'soldier'),'kit');assert.deepEqual(s.military.kitShortage('soldier'),{sword:1});
+  s.foodStorage.deposit(`armory-${armory.id}`,'sword',1);assert.equal(s.military.blocker(w,'soldier'),null);
+  const gold=s.inventory.count('gold');s.inventory.spend('gold',gold);assert.equal(s.military.blocker(w,'soldier'),'gold');s.inventory.add('gold',gold);
+  assert.equal(s.military.train(w,'soldier'),null);until(s,()=>s.military.units.get(w.id)?.type==='soldier');
 });

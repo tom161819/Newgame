@@ -73,33 +73,39 @@ export const ARROW_LENGTH=34;
 // m-ui-prekryvy-076 (report 0.76.0 point 4): `windows` – the boxes of the open windows (the Build menu, Population, a side
 // card, a dialog). The bubble never covers one of them: when its place by the arrow is taken it goes to the free spot
 // nearest to the arrow; a target inside a window gets the arrow from above, so it does not cover the next button either.
-export function tutorialPlacement({point,rect=null,avoid=null,from=null,vw,vh,bubble:{w,h},margin=12,top=70,windows=[]}){
-  const m=28,cx=clamp(point.x,m,vw-m),cy=clamp(point.y,m,vh-m),off=cx!==point.x||cy!==point.y;
-  const r=rect??{left:point.x-4,right:point.x+4,top:point.y-4,bottom:point.y+4};
+// m-tutorial-v3 (owner point 74): `arrowLength` is the drawn length of the pointer (the UI-design pointers are 56 px and
+// pulse to 112 %), not the old 34 px constant, and a target is "off screen" only when no part of it is on screen. Before,
+// a target whose centre lay within 28 px of the screen edge (the Population tab on the right edge) counted as off screen
+// and the arrow was put on the clamped point – right over the tab.
+export function tutorialPlacement({point,rect=null,avoid=null,from=null,vw,vh,bubble:{w,h},margin=12,top=70,windows=[],arrowLength=ARROW_LENGTH}){
+  const m=28,visibleRect=rect&&rect.right>0&&rect.left<vw&&rect.bottom>0&&rect.top<vh;
+  const on=visibleRect||!rect&&point.x>=0&&point.x<=vw&&point.y>=0&&point.y<=vh,off=!on;
+  const cx=on?clamp(point.x,0,vw):clamp(point.x,m,vw-m),cy=on?clamp(point.y,0,vh):clamp(point.y,m,vh-m);
+  const r=rect?(visibleRect?{left:Math.max(0,rect.left),right:Math.min(vw,rect.right),top:Math.max(0,rect.top),bottom:Math.min(vh,rect.bottom)}:rect):{left:point.x-4,right:point.x+4,top:point.y-4,bottom:point.y+4};
   const box=avoid?{left:Math.min(r.left,avoid.left),right:Math.max(r.right,avoid.right),top:Math.min(r.top,avoid.top),bottom:Math.max(r.bottom,avoid.bottom)}:r;
-  const half=ARROW_LENGTH/2,gap=6;
+  const half=Math.max(ARROW_LENGTH,arrowLength)/2,gap=6,ARROW=half*2;
   let arrow,bubbleAt;
   if(off){
     // Off screen: the arrow sits at the edge and points towards the target; the bubble beside it, inside the screen.
     const angle=Math.atan2(point.y-cy,point.x-cx);arrow={x:cx,y:cy,angle,off:true};
     bubbleAt={x:cx-Math.cos(angle)*(w/2+half+gap)-w/2,y:cy-Math.sin(angle)*(h/2+half+gap)-h/2};
   }else{
-    const roomLeft=box.left,roomRight=vw-box.right,roomAbove=box.top-top,roomBelow=vh-box.bottom,need=w+ARROW_LENGTH+gap*2+margin;
+    const roomLeft=box.left,roomRight=vw-box.right,roomAbove=box.top-top,roomBelow=vh-box.bottom,need=w+ARROW+gap*2+margin;
     const ay=clamp(cy,box.top+8,box.bottom-8);
     let side=from;
-    if(!side&&!avoid&&windows.some(win=>contains(win,r)))side=r.top-top>=ARROW_LENGTH+gap*2?'above':'below';
+    if(!side&&!avoid&&windows.some(win=>contains(win,r)))side=r.top-top>=ARROW+gap*2?'above':'below';
     if(!side)side=!avoid&&r.bottom>vh-170?'above':roomLeft>=need||roomRight>=need?(roomLeft>=roomRight?'left':'right'):roomAbove>=roomBelow?'above':'below';
     if(side==='left'){arrow={x:box.left-gap-half,y:ay,angle:0};bubbleAt={x:arrow.x-half-gap-w,y:ay-h/2};}
     else if(side==='right'){arrow={x:box.right+gap+half,y:ay,angle:Math.PI};bubbleAt={x:arrow.x+half+gap,y:ay-h/2};}
-    else if(side==='below'){arrow={x:cx,y:box.bottom+gap+half,angle:-Math.PI/2};bubbleAt={x:cx-w/2,y:arrow.y+half+gap};}
-    else{arrow={x:cx,y:box.top-gap-half,angle:Math.PI/2};bubbleAt={x:cx-w/2,y:arrow.y-half-gap-h};}
+    else if(side==='below'){const ax=clamp(cx,m,vw-m);arrow={x:ax,y:box.bottom+gap+half,angle:-Math.PI/2};bubbleAt={x:ax-w/2,y:arrow.y+half+gap};}
+    else{const ax=clamp(cx,m,vw-m);arrow={x:ax,y:box.top-gap-half,angle:Math.PI/2};bubbleAt={x:ax-w/2,y:arrow.y-half-gap-h};}
     arrow.off=false;
   }
   let x=clamp(bubbleAt.x,margin,vw-w-margin),y=clamp(bubbleAt.y,top,vh-h-margin);
   // The screen edge may have pushed the bubble back over the target: move it above or below the box instead.
   const covers=()=>{const b={left:x,right:x+w,top:y,bottom:y+h};return overlaps(b,r)||!off&&overlaps(b,box);};
   if(covers()){
-    const below=box.bottom+ARROW_LENGTH+gap*2,above=box.top-ARROW_LENGTH-gap*2-h;
+    const below=box.bottom+ARROW+gap*2,above=box.top-ARROW-gap*2-h;
     if(below+h<=vh-margin)y=below;else if(above>=top)y=above;else if(box.left-w-margin>=0)x=box.left-w-gap;else if(box.right+w+margin<=vw)x=box.right+gap;
   }
   if(windows.length){

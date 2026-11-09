@@ -43,13 +43,12 @@ test('steps tick from the state of the world in order; Hauler and Miner are step
   assert.equal(current({buildings:path,jobs:[...jobs,'miner'],marked:true}),'house');
   assert.equal(current({buildings:[...path,b('quarry')],jobs:[...jobs,'miner']}),'house','a Quarry also ends the stone step');
 });
-test('bug 6: marking a rock (RockMiningWork records) ends the stone step; bug 7: a finished House ends the house step',()=>{
+test('bug 6: marking a rock (RockMiningWork records) ends the stone step; m-tutorial-v3: a placed House blueprint ends the house step',()=>{
   const jobs=['builder','hauler','miner'],path=[...base,b('granary'),b('hunting_lodge'),b('lumberjack_hut')];
   const s=scene({buildings:path,jobs});assert.equal(tutorialProgress(s,{seen:new Set(['fisherman','farm','mill','bakery'])}).current.id,'stone');
   s.naturalResources.miningWork.rocks.records.set(7,{id:7,tile:{x:3,y:3},marked:true,produced:0});
   assert.equal(tutorialProgress(s).current.id,'house','the world change is seen on the next recompute');
-  const house=b('house');s.buildings=[...path,house];assert.equal(tutorialProgress(s).current.id,'house','a House site is not enough');
-  house.construction.state='complete';assert.equal(tutorialProgress(s).current.id,'storage');
+  const house=b('house');s.buildings=[...path,house];assert.equal(tutorialProgress(s).current.id,'storage','the House blueprint is enough (owner point 76)');
   s.buildings.push(b('material_yard'),b('builder_workshop'));assert.equal(tutorialProgress(s).current.id,'speed');
   s.gameSpeed=2;assert.equal(tutorialProgress(s).allDone,true);
 });
@@ -98,4 +97,43 @@ test('point 2: the bubble and the arrow never cover the target or its panel (pur
     if(c.avoid)assert.ok(!inside(arrow,c.avoid),'the arrow sits beside the panel');
   }
   const rock=tutorialPlacement({point:{x:600,y:400},from:'above',vw:1280,vh:720,bubble});assert.equal(rock.arrow.angle,Math.PI/2,'above a rock, pointing down');assert.ok(rock.arrow.y<400);
+});
+
+// m-tutorial-v3 (owner points 74–76).
+test('m-tutorial-v3: the Granary comes right after the Hauler and only the player\'s own Granary ends it',()=>{
+  const ids=TUTORIAL_STEPS.map(s=>s.id),i=ids.indexOf('hauler');
+  assert.equal(ids[i+1],'granary');assert.equal(ids[i+2],'lumberjack_hut');
+  const jobs=['builder','hauler'],seen=new Set(['king']);
+  assert.equal(current({jobs},{seen}),'granary','the Castle and the Starter Stockpile are no Granary');
+  assert.equal(current({buildings:[...base,b('farmhouse'),b('warehouse')],jobs},{seen}),'granary','other stores do not end it');
+  assert.equal(current({buildings:[...base,b('granary')],jobs},{seen}),'lumberjack_hut');
+});
+test('m-tutorial-v3: every build step ends with the placed blueprint, not with the finished building',()=>{
+  assert.deepEqual(TUTORIAL_STEPS.filter(s=>s.check==='built').map(s=>s.id),[],'no step waits for a finished building');
+  for(const step of TUTORIAL_STEPS.filter(s=>s.check==='planned')){
+    const others=TUTORIAL_STEPS.filter(s=>s!==step&&s.check==='planned'&&!s.optional).flatMap(s=>s.buildingIds).filter(id=>!step.buildingIds.includes(id));
+    const before=tutorialProgress(scene({buildings:[...base,...others.map(id=>b(id))],jobs:['builder','hauler','miner'],marked:true}),{seen:new Set(['king','fisherman','farm','mill','bakery'])});
+    const after=tutorialProgress(scene({buildings:[...base,...others.map(id=>b(id)),...step.buildingIds.map(id=>b(id))],jobs:['builder','hauler','miner'],marked:true}),{seen:new Set(['king','fisherman','farm','mill','bakery'])});
+    if(!step.optional)assert.equal(before.steps.find(s=>s.id===step.id).done,false,`${step.id} is open before its blueprint`);
+    assert.equal(after.steps.find(s=>s.id===step.id).done,true,`${step.id}: blueprints (planned) are enough`);
+  }
+});
+test('m-tutorial-v3 point 74: the drawn arrow never overlaps its target, also at the screen edge and with the big pointers',()=>{
+  const ov=(a,b)=>a.left<b.right-.5&&a.right>b.left+.5&&a.top<b.bottom-.5&&a.bottom>b.top+.5;
+  const R=(l,t,w,h)=>({left:l,top:t,right:l+w,bottom:t+h,width:w,height:h}),bubble={w:300,h:126};
+  for(const [vw,vh] of [[1920,1080],[1366,768],[1280,720],[800,600]])for(const L of [34,45,63]){
+    const T=L*.65;
+    // The Population tab and the other side tabs hug the right edge; the build tab sits at the bottom left; HUD buttons on top.
+    for(const rect of [R(vw-42,vh*.45,34,118),R(vw-34,vh*.3,34,118),R(vw-20,200,20,60),R(20,vh-60,80,40),R(vw/2,80,40,30),R(0,300,30,30),R(vw/2-40,vh/2,80,50)]){
+      const point={x:rect.left+rect.width/2,y:rect.top+rect.height/2},{arrow,bubble:at}=tutorialPlacement({point,rect,vw,vh,bubble,arrowLength:L});
+      assert.equal(arrow.off,false,`an on-screen target is never "off screen" ${JSON.stringify(rect)}`);
+      const horizontal=Math.abs(Math.cos(arrow.angle))>.5,box=horizontal?R(arrow.x-L/2,arrow.y-T/2,L,T):R(arrow.x-T/2,arrow.y-L/2,T,L);
+      assert.ok(!ov(box,rect),`arrow ${L}px over the target ${vw}x${vh} ${JSON.stringify(rect)} ${JSON.stringify(arrow)}`);
+      assert.ok(!ov({left:at.x,top:at.y,right:at.x+bubble.w,bottom:at.y+bubble.h},rect),`bubble over the target ${JSON.stringify(rect)}`);
+      // It points at the target: the tip lies within reach of the box.
+      const tip={x:arrow.x+Math.cos(arrow.angle)*L/2,y:arrow.y+Math.sin(arrow.angle)*L/2};
+      assert.ok(tip.x>=rect.left-12&&tip.x<=rect.right+12&&tip.y>=rect.top-12&&tip.y<=rect.bottom+12,`the arrow points at the target ${JSON.stringify({rect,arrow})}`);
+    }
+  }
+  const away=tutorialPlacement({point:{x:2500,y:300},rect:R(2480,280,40,40),vw:1920,vh:1080,bubble,arrowLength:63});assert.equal(away.arrow.off,true,'a target outside the screen still gets the edge arrow');
 });

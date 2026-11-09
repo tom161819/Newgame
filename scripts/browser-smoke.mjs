@@ -32,6 +32,8 @@ import { farmhouseStoreSmoke } from './farmhouse-store-smoke.mjs';
 import { employment2Smoke } from './employment-2-smoke.mjs';
 import { animalLooksSmoke } from './animal-looks-smoke.mjs';
 import { tutorialSmoke } from './tutorial-smoke.mjs';
+import { tutorialV3Smoke } from './tutorial-v3-smoke.mjs';
+import { soldiersSmoke } from './soldiers-smoke.mjs';
 import { workplaceOutputSmoke } from './workplace-output-smoke.mjs';
 import { granaryCapacitySmoke } from './granary-capacity-smoke.mjs';
 import { farmerTendingSmoke } from './farmer-tending-smoke.mjs';
@@ -229,6 +231,8 @@ try{
   await step('animals-3',()=>animals3Smoke(context,origin+base,instrument));
   await step('farmhouse-store',()=>farmhouseStoreSmoke(context,origin+base,instrument));
   await step('tutorial',()=>tutorialSmoke(context,origin+base,instrument));
+  await step('tutorial-v3',()=>tutorialV3Smoke(context,origin+base,instrument));
+  await step('soldiers',()=>soldiersSmoke(context,origin+base,instrument));
   await step('marketplace',()=>marketplaceSmoke(context,origin+base,instrument));
   await step('gate',()=>gateSmoke(context,origin+base,instrument));
   await step('world',()=>worldSmoke(context,origin+base,instrument));

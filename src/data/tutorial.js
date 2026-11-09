@@ -9,6 +9,8 @@ export const TUTORIAL_STEPS=Object.freeze([
   {id:'king',check:'seen',target:'king'},
   {id:'builder',check:'job',job:'builder'},
   {id:'hauler',check:'job',job:'hauler'},
+  // m-tutorial-v3 (owner point 75): the Granary stays right after the Hauler. Only the player's own Granary ends it – the
+  // Castle and the Starter Stockpile never count (the step checks the building type `granary`).
   {id:'granary',check:'planned',buildingIds:['granary']},
   // m-drevo-start (playtest 0.76.0 #2): the Lumberjack Hut right after the Granary, so wood comes in from day 1.
   {id:'lumberjack_hut',check:'planned',buildingIds:['lumberjack_hut']},
@@ -19,7 +21,8 @@ export const TUTORIAL_STEPS=Object.freeze([
   {id:'bakery',check:'planned',optional:true,buildingIds:['bakery']},
   {id:'stone',check:'stone',target:'#mark-rocks',buildingIds:['quarry']},
   {id:'miner',check:'job',job:'miner'},
-  {id:'house',check:'built',buildingIds:['house']},
+  // m-tutorial-v3 (owner point 76): every build step ends with the placed blueprint; the House no longer waits to be finished.
+  {id:'house',check:'planned',buildingIds:['house']},
   {id:'storage',check:'planned',buildingIds:['material_yard','builder_workshop']},
   {id:'speed',check:'speed',target:'#speed-controls [data-speed="2"]'},
 ].map(step=>Object.freeze(step)));

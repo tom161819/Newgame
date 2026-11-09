@@ -23,8 +23,23 @@ export class MilitarySystem {
     if(!worker?.isAlive||worker.profession!=='soldier'||!this.barracks(worker.assignedWorkplaceId))return 'notSoldier';
     if(this.unit(worker))return 'trained';if(this.order(worker))return 'training';
     if((worker.skills.combat?.level??1)<spec.requiredCombatLevel)return 'skill';
+    return this.supplyBlocker(type);
+  }
+  // m-vojaci-chyba (owner point 87): what the kingdom lacks for this unit type, whoever trains: an Armory, the unit's
+  // items in it (not yet promised to an earlier order) or the Gold. Before, Train was enabled without any of that and
+  // the order waited for a Sword that nothing could make, with no word why.
+  supplyBlocker(type){
+    const spec=UNIT_TYPES[type];if(!spec)return 'unknown';
+    if(spec.mount==='horse'&&!this.scene.stables?.freeHorse())return 'horse';
+    if(!this.scene.buildings.some(b=>b.type==='armory'&&buildingIsComplete(b)))return 'armory';
+    if(Object.keys(this.kitShortage(type)).length)return 'kit';
     if(this.scene.inventory.count('gold')<spec.goldCost)return 'gold';
     return null;
+  }
+  // Items of one kit that the Armories cannot give now: their free stock minus what waiting orders still need.
+  kitShortage(type){
+    const out={};for(const[id,n]of Object.entries(unitKit(type))){const promised=this.scene.buildings.filter(b=>b.type==='barracks').reduce((sum,b)=>sum+this.missing(b.id,id),0);const free=this.available(id)-promised;if(free<n)out[id]=n-Math.max(0,free);}
+    return out;
   }
   // Items still missing for every waiting order at a Barracks, after what lies in its kit store or is on the way.
   kitNeeds(barracksId){const need={};for(const o of this.ordersAt(barracksId))if(o.state==='supplying')for(const[id,n]of Object.entries(unitKit(o.type)))need[id]=(need[id]??0)+n;return need;}
