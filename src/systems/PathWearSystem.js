@@ -21,6 +21,10 @@ export class PathWearSystem {
   speedMultiplier(actor,tile){const ground=this.groundSpeed?.(tile)??1;if(ground!==1)return ground;if(this.isPaved(tile)&&(actor.state==null||actor.state==='ground'||actor.mountedHorse))return PAVEMENT.speedMultiplier;return this.affects(actor)?PATH_WEAR.speedMultipliers[this.level(tile)]:1;}
   routingOptions(actor){const ground=actor.state&&actor.state!=='ground'?{definition:actor.definition,state:'ground'}:actor;return {speedMultiplier:tile=>this.speedMultiplier(ground,tile),maxSpeed:Math.max(PATH_WEAR.speedMultipliers[this.highestLevel],this.pavedCount?PAVEMENT.speedMultiplier:1)};}
   enter(actor,tile){
+    // Owner 9 Nov 2026 ("proč tam jsou zase kolečka"): residents shuffling between waiting spots around the Castle or
+    // their workplace (IdleGathering, a few tiles every few seconds) wore round patches and short straight trails there
+    // within a day. Paths come from real trips; a short idle step (actor.idleStep is that route) does not wear.
+    if(actor.idleStep&&actor.idleStep===actor.path)return;
     if(!this.affects(actor)||!this.isGrass(tile))return;
     const i=this.index(tile);this.scores[i]=Math.min(Number.MAX_SAFE_INTEGER,this.scores[i]+(actor.mountedHorse?2:1));
     this.lastPassDays[i]=this.time.day;this.active.add(i);this.revision++;this.refreshLevel(i);

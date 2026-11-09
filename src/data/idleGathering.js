@@ -1,5 +1,6 @@
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
-export const IDLE_GATHERING=Object.freeze({minimumMargin:2,maximumMargin:4,localRadius:3,retryMs:1500,dwellMs:2500});
+// idleStepTiles: idle routes up to this length are shuffles between waiting spots and wear no path.
+export const IDLE_GATHERING=Object.freeze({minimumMargin:2,maximumMargin:4,localRadius:3,retryMs:1500,dwellMs:2500,idleStepTiles:10});
 // Higher-priority work, cargo, commands and job-specific tending/seating run before this fallback.
 // A Builder's assigned workshop wins over the Castle; Haulers never acquire a workplace slot.
 export function idleHomes(scene,worker,{workplaceOnly=false}={}){

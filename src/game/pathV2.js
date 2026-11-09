@@ -33,7 +33,10 @@ export function topology(map) {
   // An area only where the ground is trodden on all sides (owner 8 Nov 2026): a tile belongs to an area when some full
   // 3 × 3 block of worn tiles contains it. Side-by-side paths or a zigzag (2 × 2 blocks) stay paths, not squares.
   const BLOCK3 = [-1, 0, 1].flatMap(dy => [-1, 0, 1].map(dx => [dx, dy]));
-  const area = (x, y) => worn(x, y) && BLOCK3.some(([ox, oy]) => BLOCK3.every(([dx, dy]) => worn(x + ox + dx, y + oy + dy)));
+  // Owner 9 Nov 2026 ("proč tam jsou zase kolečka"): only bare soil (level 2+) makes an area; a block of trampled grass
+  // (level 1) stays a mesh of thin trodden lines instead of a dark round patch.
+  const soil = (x, y) => map.get(x, y) >= 2;
+  const area = (x, y) => soil(x, y) && BLOCK3.some(([ox, oy]) => BLOCK3.every(([dx, dy]) => soil(x + ox + dx, y + oy + dy)));
   const nodes = new Map();
   for (let y = 0; y < map.size; y++) for (let x = 0; x < map.size; x++) if (worn(x, y)) nodes.set(key(x, y), { x, y, level: map.get(x, y), area: area(x, y), links: [] });
   for (const n of nodes.values()) for (const [dx, dy] of NEIGHBOURS) {

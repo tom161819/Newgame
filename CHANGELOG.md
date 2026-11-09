@@ -27,6 +27,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - The construction site window shows the resource name ("Wood: 6 needed …") instead of "wood:".
 - Marking for removal says what was marked, with the right number form: "Marked for removal: 4 rocks, 1 thicket." Cancelling uses the right number form too.
 
+## [0.83.2] - 2026-11-09
+<!-- version: {"title":"Paths: residents shuffling between waiting spots at the Castle or their workplace no longer wear round patches and short straight trails into the grass within a","type":"fix","reconstructed":false,"saveVersion":61} -->
+### Fixed
+- Paths: residents shuffling between waiting spots at the Castle or their workplace no longer wear round patches and short straight trails into the grass within a day. Paths now come from real trips.
+- Paths: only bare soil (from level 2) forms a flat worn area. A block of merely trampled grass stays thin trodden lines instead of a dark green circle.
+
+## [0.83.1] - 2026-11-09
+<!-- version: {"title":"Fog of War: land seen for the first time no longer stays black for seconds, in black jagged notches or as flat grey strips at the edge of sight.","type":"fix","reconstructed":false,"saveVersion":61} -->
+### Fixed
+- Fog of War: land seen for the first time no longer stays black for seconds, in black jagged notches or as flat grey strips at the edge of sight. This happened with many residents walking at the edge of the known land.
+
 ## [0.83.0] - 2026-11-09
 <!-- version: {"title":"Thickets, rock ridges and large deposits","type":"feature","reconstructed":false,"saveVersion":61} -->
 ### Added
