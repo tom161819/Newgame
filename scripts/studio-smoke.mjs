@@ -558,6 +558,32 @@ try {
     assert.deepEqual(await wl.evaluate(() => window.worldLab.reportB()), a, 'the same code gives the same world');
     assert.ok(await luminance(wl, '#wl-iso') > 20, 'the isometric window is drawn with the game art');
     assert.ok(await luminance(wl, '#wl-map') > 40, 'the map is drawn');
+    // Terrain height (m-teren-vyska step 1): on by default, water lower than its banks, sliders change the stats,
+    // the toggle, the top-down height view and the readability props.
+    assert.equal(await wl.evaluate(() => window.worldLab.heightOn()), true);
+    const hr = await wl.evaluate(() => window.worldLab.heightReport());
+    assert.equal(hr.waterLower, true, 'water lies below its banks');
+    assert.ok(hr.buildablePercent > 85 && hr.start.buildablePercent === 100, 'mostly buildable, the castle on level ground');
+    assert.match(await wl.locator('#wl-height-checks').textContent(), /Buildable land.*Water lower than its banksyes/s);
+    await wl.locator('#wl-height-settings [data-height-setting="plains"]').evaluate(input => { input.value = '9'; input.dispatchEvent(new Event('input', { bubbles: true })); });
+    await wl.waitForFunction(flat => window.worldLab.heightReport().flatPercent > flat + 5, hr.flatPercent);
+    assert.equal(await wl.evaluate(() => window.worldLab.heightLevels().plains), 9);
+    await wl.locator('#wl-height-reset').click();
+    await wl.waitForFunction(flat => Math.abs(window.worldLab.heightReport().flatPercent - flat) < 0.01, hr.flatPercent);
+    await wl.evaluate(() => window.worldLab.setFocus(50, 50));
+    const props = await wl.evaluate(() => window.worldLab.props());
+    assert.ok(props?.items.some(i => i.kind === 'house') && props.items.filter(i => i.kind === 'villager').length >= 3 && props.path.length > 10, 'house, villagers and a path on the slopes');
+    const lifted = await luminance(wl, '#wl-iso');
+    await wl.getByRole('button', { name: 'Height off', exact: true }).click();
+    assert.equal(await wl.evaluate(() => window.worldLab.heightOn()), false);
+    assert.equal(await wl.evaluate(() => window.worldLab.props()), null, 'no props with the height off');
+    assert.ok(await luminance(wl, '#wl-iso') > 20 && lifted > 20, 'the iso window is drawn with and without height');
+    await wl.getByRole('button', { name: 'Height on', exact: true }).click();
+    await wl.locator('#wl-overlay').selectOption('height');
+    assert.ok(await luminance(wl, '#wl-map') > 40, 'the height map is drawn');
+    await wl.locator('#wl-overlay').selectOption('slope');
+    await wl.locator('#wl-overlay').selectOption('none');
+    assert.equal(JSON.parse(await wl.evaluate(() => window.worldLab.exportHeight())).levels.plains, 5, 'the exported height-default.json');
     assert.deepEqual(wlErrors, []); await wl.close();
 
     const owner = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
@@ -572,15 +598,22 @@ try {
     const saved = await sw.evaluate(() => [...window.__fakeClaude.docs].find(([p]) => p.startsWith('worlds/ricni-udoli-'))?.[1]);
     assert.equal(saved.by, 'u-owner'); assert.equal(saved.name, 'Říční údolí'); assert.equal(saved.code, await sw.evaluate(() => window.worldLab.code()));
     assert.match(await sw.locator('.wl-fav[data-id="old"]').textContent(), /old generator.*Jana/s);
-    await sw.getByRole('button', { name: 'Propose as default' }).click();
+    await sw.locator('#wl-propose').click(); // two „Propose as default“ buttons: world settings and terrain height
     await sw.waitForFunction(() => window.__fakeClaude.docs.has('worldDefaults/proposal'));
     const proposal = await sw.evaluate(() => window.__fakeClaude.docs.get('worldDefaults/proposal'));
     assert.deepEqual(proposal.levels, await sw.evaluate(() => window.worldLab.levels())); assert.equal(proposal.by, 'u-owner'); assert.equal(proposal.generator, WORLD_GENERATOR_VERSION);
     await sw.waitForTimeout(100);
     assert.match(await sw.locator('#wl-summary').textContent(), /převzít svět/);
+    await sw.locator('#wl-height-settings [data-height-setting="hillHeight"]').evaluate(input => { input.value = '8'; input.dispatchEvent(new Event('input', { bubbles: true })); });
+    await sw.locator('#wl-height-note').fill('Vyšší kopce');
+    await sw.locator('#wl-height-propose').click();
+    await sw.waitForFunction(() => window.__fakeClaude.docs.has('heightDefaults/proposal'));
+    const heightProposal = await sw.evaluate(() => window.__fakeClaude.docs.get('heightDefaults/proposal'));
+    assert.deepEqual(heightProposal.levels, { hilliness: 5, hillHeight: 8, plains: 5, bankSlope: 5 }); assert.equal(heightProposal.by, 'u-owner'); assert.equal(heightProposal.note, 'Vyšší kopce');
+    assert.match(await sw.locator('#wl-height-status').textContent(), /převzít výšku/);
     assert.deepEqual(swErrors, []); await owner.close();
   }
-  pass('World Lab: the game generator from a code, sliders change the code, the same code gives the same world, game art in the isometric window, favourites and the default proposal in the page database');
+  pass('World Lab: the game generator from a code, sliders change the code, the same code gives the same world, game art in the isometric window, favourites and the default proposal in the page database, terrain height (stats, sliders, toggle, height map, props, proposal heightDefaults/proposal, export)');
 
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 } });
   for (const path of ['index.html#watchtower', 'index.html#style-guide', 'phaser-demo.html', 'path-lab.html', 'buildings.html', 'ui-lab.html', 'world-lab.html']) {

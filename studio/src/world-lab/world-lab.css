@@ -74,3 +74,8 @@
 .wl-fold { border: 1px solid var(--line, #444); border-radius: 8px; padding: 4px 10px; }
 .wl-fold > summary { cursor: pointer; font-weight: 600; font-size: 13.5px; padding: 4px 0; }
 .wl-fold[open] > summary { margin-bottom: 6px; }
+
+/* Terrain height (m-teren-vyska step 1) */
+.wl-proto { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 11px; color: var(--muted); margin-right: auto; margin-left: 6px; }
+.wl-height-toggles { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+#wl-height-checks:not(:empty) { margin-top: 8px; }

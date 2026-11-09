@@ -6,12 +6,13 @@ import { trackTopbarHeight } from '../lib/topbarHeight.js';
 import {
   WORLD_GENERATOR_VERSION, WORLD_SETTINGS, WORLD_PRESETS, DEFAULT_WORLD_LEVELS, applyPresets, presetsFromLevels, randomSeed,
   readCode, makeCode, worldFor, checks, readFavourite, defaultsProposal, slug, PLAYER_START, COLUMNS, ROWS,
+  HEIGHT_SETTINGS, DEFAULT_HEIGHT_LEVELS, BUILD_MAX_SLOPE, heightsFor, heightChecks, heightDefaultsProposal, heightDefaultFile, validHeightLevels,
 } from './model.js';
 import { drawTopDown, drawIso, preload, whenImagesLoad } from './render.js';
 import { GROUND_DEFAULTS, GROUND_SETTINGS, ZONE_NAMES, WATER_NAMES, WATER_KINDS, WATER_PRESETS, TIMES, ducklingsFor, drawDuck, SEASONS, WEATHERS, yearOf, seasonOf, OBJECT_KINDS } from './ground.js';
 
 const $ = selector => document.querySelector(selector);
-const STORAGE = 'asset-studio.world-lab.v1', FAVOURITES = 'worlds', DEFAULTS = 'worldDefaults', SPAN = 28;
+const STORAGE = 'asset-studio.world-lab.v1', FAVOURITES = 'worlds', DEFAULTS = 'worldDefaults', HEIGHT_DEFAULTS = 'heightDefaults', SPAN = 28;
 function h(tag, attrs = {}, ...children) {
   const node = document.createElement(tag);
   for (const [key, value] of Object.entries(attrs ?? {})) {
@@ -33,6 +34,9 @@ const state = {
   ground: { mode: saved?.ground?.mode === 'tiles' ? 'tiles' : 'continuous', settings: { ...structuredClone(GROUND_DEFAULTS), ...(saved?.ground?.settings ?? {}) } },
   // year: older saves only have a season name
   compare: '', worldB: null, reportB: null, favourites: new Map(), proposal: null,
+  // Terrain height prototype (m-teren-vyska step 1): on by default, sliders 0–9.
+  height: { on: saved?.height?.on ?? true, props: saved?.height?.props ?? true, unbuildable: !!saved?.height?.unbuildable, levels: validHeightLevels(saved?.height?.levels) ? { ...saved.height.levels } : { ...DEFAULT_HEIGHT_LEVELS } },
+  heights: null, heightReport: null, heightProposal: null,
 };
 const shared = { mode: 'local', db: null, user: null, uid: null, canWrite: null, names: new Map() };
 const code = () => makeCode(state.levels, state.seed);
@@ -43,25 +47,87 @@ const showAlert = text => { const el = $('#studio-alert'); el.textContent = text
 let pending = 0;
 function regenerate() {
   const id = ++pending;
-  try { localStorage.setItem(STORAGE, JSON.stringify({ levels: state.levels, seed: state.seed, ground: state.ground })); } catch { /* memory only */ }
+  try { localStorage.setItem(STORAGE, JSON.stringify({ levels: state.levels, seed: state.seed, ground: state.ground, height: state.height })); } catch { /* memory only */ }
   $('#wl-code').value = code();
   setStatus('Generating…');
   requestAnimationFrame(() => {
     if (id !== pending) return;
     const t = performance.now();
-    state.world = worldFor(state.levels, state.seed); state.report = checks(state.world);
+    state.world = worldFor(state.levels, state.seed); state.report = checks(state.world); computeHeights();
     setStatus(`Generated in ${Math.round(performance.now() - t)} ms · generator ${WORLD_GENERATOR_VERSION}`);
-    drawAll(); renderChecks(); renderSettings(false);
+    drawAll(); renderChecks(); renderSettings(false); renderHeightChecks();
   });
 }
+// ---------- terrain height (plan m-teren-vyska, step 1) ----------
+function computeHeights() {
+  if (!state.world) return;
+  state.heights = heightsFor(state.world, state.height.levels); state.heightReport = heightChecks(state.world, state.heights);
+}
+function saveHeight() { try { localStorage.setItem(STORAGE, JSON.stringify({ levels: state.levels, seed: state.seed, ground: state.ground, height: state.height })); } catch { /* memory only */ } }
+let heightTimer = null;
+function heightChanged() { saveHeight(); clearTimeout(heightTimer); heightTimer = setTimeout(() => { computeHeights(); drawAll(); renderHeightChecks(); }, 80); }
+function renderHeight() {
+  $('#wl-height-settings').replaceChildren(...HEIGHT_SETTINGS.map(s => {
+    const value = state.height.levels[s.key], out = h('output', {}, s.describe(value)), name = h('b', {}, ` ${value}`);
+    const input = h('input', { type: 'range', min: 0, max: s.max, step: 1, value, 'data-height-setting': s.key, 'aria-label': s.name, oninput: e => { state.height.levels[s.key] = Number(e.target.value); out.textContent = s.describe(state.height.levels[s.key]); name.textContent = ` ${state.height.levels[s.key]}`; row.classList.toggle('changed', state.height.levels[s.key] !== DEFAULT_HEIGHT_LEVELS[s.key]); heightChanged(); } });
+    const row = h('label', { class: 'wl-setting' + (value !== DEFAULT_HEIGHT_LEVELS[s.key] ? ' changed' : '') }, h('span', { class: 'wl-setting-name' }, s.name, name), input, out);
+    return row;
+  }));
+  for (const b of document.querySelectorAll('[data-height]')) b.setAttribute('aria-pressed', String((b.dataset.height === 'on') === state.height.on));
+  $('#wl-height-props').checked = state.height.props; $('#wl-height-unbuildable').checked = state.height.unbuildable;
+}
+function renderHeightChecks() {
+  const r = state.heightReport; if (!r) return;
+  const row = (label, value, ok = true) => h('div', { class: 'wl-check' + (ok ? '' : ' bad') }, h('span', {}, label), h('strong', {}, value));
+  $('#wl-height-checks').replaceChildren(
+    h('h4', {}, 'Terrain height'),
+    row(`Buildable land (slope ≤ ${BUILD_MAX_SLOPE})`, pct(r.buildablePercent), r.buildablePercent >= 75),
+    row('Nearly flat land', pct(r.flatPercent)),
+    row('Height mean · max', `${r.meanHeight.toFixed(1)} · ${r.maxHeight.toFixed(1)}`),
+    row('Bank slope (mean)', r.bankMeanSlope.toFixed(2)),
+    row(`Start buildable (radius ${r.start.radius})`, pct(r.start.buildablePercent), r.start.buildablePercent >= 95),
+    row('Start slope mean · max', `${r.start.meanSlope.toFixed(2)} · ${r.start.maxSlope.toFixed(2)}`, r.start.maxSlope <= BUILD_MAX_SLOPE),
+    row('Water lower than its banks', r.waterLower ? 'yes' : `no (${r.waterViolations})`, r.waterLower),
+    r.flushTiles ? row('Land pinched at water level', `${r.flushTiles} tiles`) : null,
+  );
+}
+function renderHeightSummary() {
+  const p = state.heightProposal;
+  $('#wl-height-status').textContent = p ? `Height proposal waiting (${HEIGHT_SETTINGS.map(s => p.levels?.[s.key] ?? '?').join('')}) — write „převzít výšku“ in the MK chat.` : `Defaults ${HEIGHT_SETTINGS.map(s => DEFAULT_HEIGHT_LEVELS[s.key]).join('')}`;
+}
+async function proposeHeight() {
+  let data;
+  try { data = heightDefaultsProposal(state.height.levels, { by: shared.uid, note: $('#wl-height-note').value.trim() }); } catch { return; }
+  try {
+    if (shared.mode === 'shared' || shared.db) await shared.db.doc(`${HEIGHT_DEFAULTS}/proposal`).set(data);
+    else localStorage.setItem(`${STORAGE}.heightProposal`, JSON.stringify(data));
+    state.heightProposal = data; renderHeightSummary();
+  } catch (error) { showAlert(error?.code === 'permission_denied' || error?.code === 'invalid_argument' ? 'Proposing needs Contributor access to the Studio page.' : `Not saved (${error?.code ?? 'unavailable'}).`); }
+}
+function exportHeight() {
+  const json = JSON.stringify(heightDefaultFile(state.height.levels), null, 2) + '\n', a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' })); a.download = 'height-default.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  $('#wl-height-status').textContent = 'Exported height-default.json (art/terrain/).';
+  return json;
+}
+for (const b of document.querySelectorAll('[data-height]')) b.addEventListener('click', () => { state.height.on = b.dataset.height === 'on'; saveHeight(); renderHeight(); drawAll(); });
+$('#wl-height-props').addEventListener('change', e => { state.height.props = e.target.checked; saveHeight(); drawAll(); });
+$('#wl-height-unbuildable').addEventListener('change', e => { state.height.unbuildable = e.target.checked; saveHeight(); drawAll(); });
+$('#wl-height-reset').addEventListener('click', () => { state.height.levels = { ...DEFAULT_HEIGHT_LEVELS }; renderHeight(); heightChanged(); });
+$('#wl-height-propose').addEventListener('click', proposeHeight);
+$('#wl-height-export').addEventListener('click', exportHeight);
+try { state.heightProposal = JSON.parse(localStorage.getItem(`${STORAGE}.heightProposal`) ?? 'null'); } catch { state.heightProposal = null; }
+renderHeight(); renderHeightSummary();
+
 function drawAll() {
   if (!state.world) return;
   const scale = Math.max(3, Math.min(6, Math.floor(($('#wl-map-wrap').clientWidth || 420) / COLUMNS)));
-  drawTopDown($('#wl-map'), state.world, { scale, overlay: state.overlay, focus: state.focus, span: SPAN });
-  drawIso($('#wl-iso'), state.world, { focus: state.focus, span: SPAN, ground: state.ground });
+  drawTopDown($('#wl-map'), state.world, { scale, overlay: state.overlay, focus: state.focus, span: SPAN, heights: state.heights });
+  drawIso($('#wl-iso'), state.world, { focus: state.focus, span: SPAN, ground: state.ground, height: { ...state.height, map: state.heights } });
   if (state.worldB) drawTopDown($('#wl-map-b'), state.worldB, { scale, overlay: state.overlay });
 }
-whenImagesLoad(() => { if (state.world) drawIso($('#wl-iso'), state.world, { focus: state.focus, span: SPAN }); });
+let imageTimer = null;
+whenImagesLoad(() => { clearTimeout(imageTimer); imageTimer = setTimeout(drawAll, 60); });
 
 // ---------- controls ----------
 function settingRow(setting, i) {
@@ -175,6 +241,7 @@ async function connectShared() {
   if (shared.canWrite === false) for (const b of document.querySelectorAll('[data-needs-write]')) b.disabled = true;
   db.collection(FAVOURITES).onSnapshot(snap => { shared.mode = 'shared'; loadFavourites(snap.docs.filter(d => d.exists).map(d => ({ id: d.id, data: d.data() }))); resolveNames(); },
     error => { if (error?.code !== 'revoked') showAlert(`Favourites stopped updating (${error?.code ?? 'unavailable'}). Reload the page.`); });
+  db.collection(HEIGHT_DEFAULTS).onSnapshot(snap => { const doc = snap.docs.find(d => d.exists && d.id === 'proposal'); state.heightProposal = doc ? doc.data() : null; renderHeightSummary(); }, () => {});
   db.collection(DEFAULTS).onSnapshot(snap => { shared.mode = 'shared'; const doc = snap.docs.find(d => d.exists && d.id === 'proposal'); state.proposal = doc ? doc.data() : null; renderSummary(); }, () => {});
 }
 async function resolveNames() {
@@ -231,7 +298,7 @@ connectShared();
 const readyCheck = setInterval(() => { if (state.world) { window.worldLab.ready = true; clearInterval(readyCheck); } }, 50);
 
 // ---------- continuous ground (plan g-souvisla-zeme) ----------
-function saveGround() { try { localStorage.setItem(STORAGE, JSON.stringify({ levels: state.levels, seed: state.seed, ground: state.ground })); } catch { /* memory only */ } }
+function saveGround() { try { localStorage.setItem(STORAGE, JSON.stringify({ levels: state.levels, seed: state.seed, ground: state.ground, height: state.height })); } catch { /* memory only */ } }
 let groundTimer = null;
 const openFolds = (() => { try { return new Set(JSON.parse(localStorage.getItem('mk-world-lab.folds') ?? '[]')); } catch { return new Set(); } })();
 function renderGround() {
@@ -266,6 +333,12 @@ $('#wl-ground-propose').addEventListener('click', async () => {
 });
 renderGround();
 window.worldLab = Object.assign(window.worldLab ?? {}, { ground: () => structuredClone(state.ground) });
+// Terrain height hooks (studio-smoke).
+Object.assign(window.worldLab, {
+  heightReport: () => state.heightReport, heightLevels: () => ({ ...state.height.levels }), heightOn: () => state.height.on, heightProposal: () => state.heightProposal,
+  setHeightLevel: (key, level) => { state.height.levels[key] = level; renderHeight(); computeHeights(); drawAll(); renderHeightChecks(); },
+  heightCorner: (x, y) => state.heights?.corners[y * (state.heights.width + 1) + x], props: () => $('#wl-iso')._props, exportHeight,
+});
 // Test hooks: jump the iso window to a river bank (beach or mud next to water).
 window.worldLab.setFocus = (x, y) => { state.focus = { x, y }; drawAll(); };
 window.worldLab.findBank = () => { const w = state.world; for (let r = 0; r < 120; r++) for (let y = Math.max(1, PLAYER_START.y - r); y <= Math.min(ROWS - 2, PLAYER_START.y + r); y++) for (let x = Math.max(1, PLAYER_START.x - r); x <= Math.min(COLUMNS - 2, PLAYER_START.x + r); x++) { const g = w.ground[y][x]; if ((g === 1 || g === 6 || g === 7) && [w.ground[y][x + 1], w.ground[y + 1][x]].some(n => n >= 3 && n <= 5)) return { x, y }; } return null; };
