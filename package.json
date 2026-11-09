@@ -29,6 +29,7 @@
     "studio": "vite --config studio/vite.config.js",
     "studio:build": "vite build --config studio/vite.config.js",
     "studio:smoke": "node scripts/studio-smoke.mjs",
+    "studio:lighting": "node scripts/studio-lighting.mjs",
     "studio:export": "node scripts/studio-export.mjs",
     "studio:sync": "node scripts/studio-sync.mjs",
     "studio:game-buildings": "node scripts/studio-game-buildings.mjs",

@@ -1,0 +1,76 @@
+{
+  "kind": "light-lab",
+  "schema": 1,
+  "by": null,
+  "at": "2026-11-09T07:46:51.991Z",
+  "note": "",
+  "types": {
+    "torch": {
+      "color": "#ffb25a",
+      "radius": 4,
+      "strength": 1,
+      "flicker": 0.12,
+      "height": 56,
+      "speed": 7,
+      "lamp": 60
+    },
+    "lantern": {
+      "color": "#ffd58c",
+      "radius": 2.4,
+      "strength": 0.8,
+      "flicker": 0.05,
+      "height": 30,
+      "speed": 3,
+      "lamp": 26
+    },
+    "campfire": {
+      "color": "#ff9a3c",
+      "radius": 5,
+      "strength": 1.1,
+      "flicker": 0.2,
+      "height": 40,
+      "speed": 6,
+      "lamp": 8
+    },
+    "brazier": {
+      "color": "#ff9d4a",
+      "radius": 5,
+      "strength": 1,
+      "flicker": 0.16,
+      "height": 50,
+      "speed": 5.5,
+      "lamp": 52
+    },
+    "forge": {
+      "color": "#ff7a2e",
+      "radius": 3.4,
+      "strength": 1,
+      "flicker": 0.1,
+      "height": 34,
+      "speed": 4,
+      "lamp": 16
+    },
+    "window": {
+      "color": "#ffcf7a",
+      "radius": 1.6,
+      "strength": 0.7,
+      "flicker": 0.03,
+      "height": 26,
+      "speed": 1.5,
+      "lamp": 30
+    }
+  },
+  "global": {
+    "nightColor": "#1c2a5c",
+    "duskColor": "#d9a27e",
+    "nightStrength": 0.78,
+    "directional": 0.6,
+    "shadows": true,
+    "shadowStrength": 0.35,
+    "quality": "full",
+    "resolution": 0.5,
+    "switchFrom": 0.15,
+    "switchSpread": 0.3,
+    "switchRamp": 0.2
+  }
+}
