@@ -1,4 +1,15 @@
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
+import { t } from '../i18n/index.js';
+
+// m-drobnosti-083 (report 0.83.0 point 7): the output line of a workplace window. Free places ("2 workers missing") and
+// assigned workers who are not at work just now ("1 away from the building") are told apart, so a Barracks with 1 of 5
+// assigned and that soldier walking home reads "4 workers missing, 1 away", not "5 missing (0 present)".
+// `summary`: WorkplaceSystem.summary – count (assigned), capacity, present, output.
+export function staffingLine({count=0,capacity=0,present=0,output=0}){
+  const open=Math.max(0,capacity-count),away=Math.max(0,count-present),parts=[];
+  if(open)parts.push(t('staffing.open',{count:open}));if(away)parts.push(t('staffing.away',{count:away}));
+  const head=t('staffing.output',{percent:Math.round(output*100)});return parts.length?`${head} – ${parts.join(', ')}`:head;
+}
 
 // Derived presentation data. Assigned residents occupy seats while travelling,
 // recovering or resting; physical presence and work activity do not define it.

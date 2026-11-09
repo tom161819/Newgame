@@ -912,6 +912,11 @@ html[data-ui-pointer="hand"] .tutorial-arrow { clip-path:none; -webkit-mask:url(
 .building-tooltip-stock .store-preview-usage { display:inline; margin:0 0 0 4px; }
 /* m-noc-zrychleni (82): the night speed-up step (moon) and the one-time tip. */
 .speed-button.is-night-auto { color:#cfd8ff; }
+/* m-drobnosti-083 (report 0.83.0 point 8): the icon look hides the button text (font-size 0), so the held step also gets a
+   small moon badge in its corner. */
+.speed-controls .speed-button.is-night-auto::after { content:"☾"; position:absolute; top:-6px; right:-5px; min-width:13px; height:13px; border-radius:50%; background:#26304a; color:#cfd8ff; font-size:10px; line-height:13px; text-align:center; box-shadow:0 0 0 1px #cfd8ff88; pointer-events:none; }
+/* m-tipy-mimo-listu: a tip folded into the Notices bar. */
+.notice-tip { border-left-color:#9fbf7a; }
 .night-speed-tip { position:fixed; top:56px; left:12px; z-index:61; max-width:280px; padding:8px 10px; border:1px solid var(--line); border-radius:var(--ui-radius,6px); background:var(--panel); color:var(--ink); box-shadow:0 4px 14px #0008; font-size:12px; }
 .night-speed-tip[hidden] { display:none; }
 .night-speed-tip-text { margin:0 0 6px; }

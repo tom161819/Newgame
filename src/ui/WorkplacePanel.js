@@ -8,6 +8,7 @@ import { CANDIDATE_GROUPS,candidateGroups } from './workplaceCandidates.js';
 import { buildingIssueLine } from './noticeText.js';
 import { buildingName } from '../game/depletedMine.js';
 import { renderMilitary,militarySignature,handleMilitaryClick } from './militaryPanel.js';
+import { staffingLine } from '../systems/StaffingStatus.js';
 
 export class WorkplacePanel {
   constructor(scene){
@@ -87,7 +88,7 @@ export class WorkplacePanel {
       const toggle=document.querySelector('#toggle-food-production');toggle.textContent=t('workplace.auto',{state:t(production.auto?'state.on':'state.off')});toggle.setAttribute('aria-pressed',String(production.auto));
     }
     document.querySelector('#workplace-name').textContent=buildingName(b);const image=document.querySelector('#workplace-image');image.src=s.assets.previewURL(spec);image.alt=buildingName(b);
-    this.staffingStatus.textContent=b.depleted?t('building.depletedInfo'):t('staffing.status',{count:summary.missing,percent:Math.round(summary.output*100),missing:summary.missing,present:summary.present});
+    this.staffingStatus.textContent=b.depleted?t('building.depletedInfo'):staffingLine(summary);
     document.querySelector('#workplace-count').textContent=t('workplace.workers',{count:summary.count,capacity:summary.capacity});
     document.querySelector('#workplace-wages').textContent=t('workplace.wages',{amount:summary.wages.toFixed(2)});
     document.querySelector('#workplace-average').textContent=t('workplace.average',{skill:SKILLS[spec.workplace.skill],value:summary.averageSkill.toFixed(2)});

@@ -3,6 +3,9 @@ import { buildingDefinition } from '../game/buildings.js';
 import { constructionPhase,CONSTRUCTION_RULES } from '../data/construction.js';
 import { element } from './objectLabels.js';
 
+// m-drobnosti-083 (report 0.83.0 point 4): one material row of a construction site, with the resource's name in the game
+// language ("Dřevo: potřeba 6 …"). The row's own `resource` id (wood) must not override the name.
+export const materialLine=(registry,row)=>t('construction.material',{...row,resource:registry?.get?.(row.resource)?.name??row.resource});
 export class ConstructionUI {
   constructor(scene){
     this.scene=scene;this.dialog=document.querySelector('#construction-dialog');this.controller=new AbortController();const options={signal:this.controller.signal};this.restored=true;
@@ -22,7 +25,7 @@ export class ConstructionUI {
     document.querySelector('#construction-eta').textContent=system.obstructed?.(site)?t('construction.obstructed'):!system.materials.ready(site)?t('construction.waitMaterials'):estimate==null?t(crop?'construction.waitFarmers':'construction.waitBuilders'):t('construction.remaining',{seconds:Math.ceil(estimate)});
     document.querySelector('#construction-king-task').textContent=crop?t('construction.farmerOnly'):t(s.kingLogistics.workflowSiteId===site.id?'construction.kingDelivering':kingHere?(system.atSite(s.character,king)?'construction.kingBuilding':'construction.kingTravelling'):'construction.kingNone');
     const ready=system.materials.ready(site),summary=system.materials.summary(site);
-    document.querySelector('#construction-materials').replaceChildren(...summary.map(row=>element('p','',t('construction.material',{resource:s.objectRegistry.require(row.resource).name,...row}))));
+    document.querySelector('#construction-materials').replaceChildren(...summary.map(row=>element('p','',materialLine(s.objectRegistry,row))));
     const button=document.querySelector('#construction-king-work');button.hidden=crop;button.disabled=crop||s.kingLogistics.workflowSiteId===site.id||kingHere||ready&&c.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders;document.querySelector('#construction-king-stop').hidden=crop||!kingHere;
     document.querySelector('#construction-refund').textContent=t(crop?'construction.refundNone':c.workDone>0?'construction.refundHalf':'construction.refundFull');document.querySelector('#construction-unreachable').textContent=site.unreachableReason??'';
   }

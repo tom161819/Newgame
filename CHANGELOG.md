@@ -4,6 +4,18 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+### Changed
+- Tips keep clear of the top bar (resources, speed, day), the side tabs, Settings and the Dev tool, "Follow the king", the bottom bar, the Notices bar and every open window, like the tutorial bubble. They move when the window size changes or a panel opens or closes.
+- A tip you leave alone for a game day folds into the Notices bar (the "!" tab). Click it there to read it again, or close it with ×.
+- Only one tip shows at a time; the others wait their turn. The night speed-up tip waits too.
+- The same notice for several buildings is one row with a count (×2).
+- The workplace window tells free places from workers who are away: "4 workers missing, 1 away from the building" instead of "5 workers missing (0 present)".
+- The Quarry step of the tutorial also points at large Stone Deposits and prefers a deposit you can see.
+- Night speed-up shows a small moon on the held speed button in the icon look too.
+### Fixed
+- Czech: the Woodcutter's "No mature trees in working radius" and other wait messages of Woodcutters, Miners and Fishermen are translated.
+- The construction site window shows the resource name ("Wood: 6 needed …") instead of "wood:".
+- Marking for removal says what was marked, with the right number form: "Marked for removal: 4 rocks, 1 thicket." Cancelling uses the right number form too.
 
 ## [0.83.0] - 2026-11-09
 <!-- version: {"title":"Thickets, rock ridges and large deposits","type":"feature","reconstructed":false,"saveVersion":61} -->

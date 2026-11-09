@@ -35,3 +35,11 @@ export class NoticeBarState {
   expire(now=0){if(this.peek&&!this.hovered&&now>=this.peek.until){this.peek=null;return true;}return false;}
   setCollapsed(value){this.collapsed=!!value;if(!this.collapsed){this.unread=0;this.peek=null;}return this.collapsed;}
 }
+// m-drobnosti-083 (report 0.83.0 point 6): notices with the same text (two Wheat Fields waiting for their farm's
+// Farmer) are one row with a count. Keeps the order of the first of each; `keys` are all keys of the row (closing the
+// row closes them all). `text` returns a notice's text.
+export function mergeNotices(issues,text){
+  const rows=new Map();
+  for(const issue of issues){const line=text(issue),row=rows.get(line);if(row){row.keys.push(issue.key);row.issues.push(issue);}else rows.set(line,{issue,text:line,keys:[issue.key],issues:[issue]});}
+  return [...rows.values()].map(row=>({...row,count:row.issues.length}));
+}

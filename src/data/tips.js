@@ -12,3 +12,5 @@ export const TIPS=Object.freeze([
   // m-wiki-napoveda (33): the first rats – get a cat; "More" opens the Wiki on Rats & Cats.
   {id:'rats',target:'#notices-panel',wiki:'rats'},
 ].map(tip=>Object.freeze(tip)));
+// m-tipy-mimo-listu (report 0.83.0 point 2): a tip nobody reacts to folds into the Notices bar after this many game days.
+export const TIP_PARK_DAYS=1;

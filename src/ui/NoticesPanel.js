@@ -6,7 +6,7 @@ import { NOTICE_CATEGORIES } from '../data/diagnostics.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { element } from './objectLabels.js';
 import { noticeText } from './noticeText.js';
-import { NOTICE_BAR,NoticeBarState,readCollapsed,writeCollapsed } from './noticeBar.js';
+import { NOTICE_BAR,NoticeBarState,readCollapsed,writeCollapsed,mergeNotices } from './noticeBar.js';
 
 const MUTED_KEY='newgame.notices.muted';
 const readMuted=()=>{try{const list=JSON.parse(localStorage.getItem(MUTED_KEY)??'[]');return new Set(Array.isArray(list)?list.filter(c=>NOTICE_CATEGORIES.includes(c)):[]);}catch{return new Set();}};
@@ -19,7 +19,11 @@ export class NoticesPanel {
     this.controller=new AbortController();const options={signal:this.controller.signal};
     for(const event of ['pointerdown','mousedown','mouseup','click','wheel'])this.panel.addEventListener(event,e=>e.stopPropagation(),options);
     this.panel.addEventListener('click',event=>{
-      const dismiss=event.target.closest('[data-dismiss-notice]')?.dataset.dismissNotice;if(dismiss){scene.diagnostics.dismiss(dismiss);return;}
+      // m-tipy-mimo-listu: a tip folded into the bar opens again on a click; its × drops it.
+      const dropTip=event.target.closest('[data-dismiss-tip]')?.dataset.dismissTip;if(dropTip){scene.tutorial?.dropTip?.(dropTip);return;}
+      const tip=event.target.closest('[data-notice-tip]')?.dataset.noticeTip;if(tip){scene.tutorial?.reopenTip?.(tip);return;}
+      // m-drobnosti-083: a merged row closes all its notices.
+      const dismiss=event.target.closest('[data-dismiss-notice]')?.dataset.dismissNotice;if(dismiss){for(const key of dismiss.split(' '))scene.diagnostics.dismiss(key);return;}
       const category=event.target.closest('[data-notice-category]')?.dataset.noticeCategory;if(category){if(this.muted.has(category))this.muted.delete(category);else this.muted.add(category);try{localStorage.setItem(MUTED_KEY,JSON.stringify([...this.muted]));}catch{/* still works without storage */}this.render();return;}
       const action=event.target.closest('[data-notice-action]')?.dataset.noticeAction;if(action){if(!hireUnemployed(scene,action))scene.populationSidebar?.setOpen(true);scene.diagnostics.recheck?.();return;}
       const target=event.target.closest('[data-notice-entity]');if(target?.dataset.noticeReason==='noBuilder'&&scene.employmentPanel){scene.employmentPanel.open();return;}const open=target?.dataset.noticeEntity;if(open)this.openEntity(Number(open));
@@ -73,7 +77,7 @@ export class NoticesPanel {
     const peek=this.collapsed?this.bar.peek:null;clearTimeout(this.clearTimer);this.panel.classList.toggle('peeking',!!peek);
     if(peek){
       const issue=peek.issue;this.peek.replaceChildren(element('span','notices-peek-text',this.text(issue)));if(peek.more>0)this.peek.append(element('span','notices-more',t('notice.more',{count:peek.more})));
-      this.peek.dataset.noticeEntity=issue.entityId;this.peek.dataset.noticeReason=issue.reason;this.peek.dataset.severity=issue.severity??'warning';this.peek.hidden=false;this.schedule();
+      this.peek.dataset.noticeEntity=issue.entityId;this.peek.dataset.noticeReason=issue.reason;if(issue.tip)this.peek.dataset.noticeTip=issue.tip;else delete this.peek.dataset.noticeTip;this.peek.dataset.severity=issue.severity??'warning';this.peek.hidden=false;this.schedule();
     }else if(!this.peek.hidden)this.clearTimer=setTimeout(()=>{this.peek.hidden=true;this.peek.replaceChildren();},this.collapsed?NOTICE_BAR.slideMs:0);
     this.placeTab();
   }
@@ -82,28 +86,33 @@ export class NoticesPanel {
     clearTimeout(this.timer);const peek=this.bar.peek;if(!peek||!this.collapsed)return;
     this.timer=setTimeout(()=>{if(this.bar.expire(this.now()))this.drawPeek();else this.schedule();},Math.max(50,peek.until-this.now()+10));
   }
-  text(issue){return noticeText(this.scene,issue);}
+  text(issue){return issue.tip?`${t('tips.label')}: ${issue.text}`:noticeText(this.scene,issue);}
   openEntity(id){
     const s=this.scene,building=s.buildings.find(b=>b.id===id);if(!building||!s.fog.isVisibleObject(building))return;
     if(!buildingIsComplete(building))s.constructionUI?.open(building);else if(buildingDefinition(building).workplace)s.workplacePanel.open(building);
   }
   render(){
-    const visible=this.scene.diagnostics.active().filter(issue=>!this.muted.has(issue.category));
+    const visible=this.scene.diagnostics.active().filter(issue=>!this.muted.has(issue.category)),tips=this.scene.tutorial?.parkedTips?.()??[];
     this.filters.replaceChildren(...NOTICE_CATEGORIES.map(category=>{const button=element('button','notice-filter',t(`notice.category.${category}`));button.type='button';button.dataset.noticeCategory=category;button.setAttribute('aria-pressed',String(!this.muted.has(category)));return button;}));
-    this.list.replaceChildren(...visible.map(issue=>{
-      const row=element('li',`notice notice-${issue.category}`),open=element('button','notice-text',this.text(issue)),close=element('button','notice-dismiss','×');
-      // Request 72: a notice that kept coming back stays one row with a count.
-      if((issue.count??1)>1){const count=element('span','notice-count',t('notice.repeated',{count:issue.count}));count.title=t('notice.repeatedTip',{count:issue.count});open.append(' ',count);}
-      open.type=close.type='button';open.dataset.noticeEntity=issue.entityId;open.dataset.noticeReason=issue.reason;close.dataset.dismissNotice=issue.key;close.setAttribute('aria-label',t('notice.dismiss'));row.dataset.noticeKey=issue.key;
+    this.list.replaceChildren(...mergeNotices(visible,issue=>this.text(issue)).map(({issue,text,keys,count:merged})=>{
+      const row=element('li',`notice notice-${issue.category}`),open=element('button','notice-text',text),close=element('button','notice-dismiss','×');
+      // m-drobnosti-083: the same text for several buildings is one row "×2"; request 72: a notice that kept coming back
+      // stays one row with a count.
+      if(merged>1){const count=element('span','notice-count notice-merged',t('notice.merged',{count:merged}));count.title=t('notice.mergedTip',{count:merged});open.append(' ',count);}
+      else if((issue.count??1)>1){const count=element('span','notice-count',t('notice.repeated',{count:issue.count}));count.title=t('notice.repeatedTip',{count:issue.count});open.append(' ',count);}
+      open.type=close.type='button';open.dataset.noticeEntity=issue.entityId;open.dataset.noticeReason=issue.reason;close.dataset.dismissNotice=keys.join(' ');close.setAttribute('aria-label',t('notice.dismiss'));row.dataset.noticeKey=issue.key;
       // A notice that one more Builder or Hauler fixes offers that hire right in the row.
       const hire=NOTICE_HIRES[issue.reason];if(hire){const button=element('button','notice-action',t(`notice.hire.${hire}`));button.type='button';button.dataset.noticeAction=hire;row.append(open,button,close);}else row.append(open,close);
       // m-wiki-napoveda: a notice with a Wiki topic has a small "i" that opens it.
       const topic=WIKI_NOTICE_TOPICS[issue.reason];if(topic)close.before(wikiInfoButton(this.scene,topic));return row;
+    }),...tips.map(tip=>{
+      const row=element('li','notice notice-tip'),open=element('button','notice-text',this.text(tip)),close=element('button','notice-dismiss','×');
+      open.type=close.type='button';open.dataset.noticeTip=tip.tip;open.title=t('tips.reopen');close.dataset.dismissTip=tip.tip;close.setAttribute('aria-label',t('notice.dismiss'));row.dataset.noticeKey=tip.key;row.append(open,close);return row;
     }));
     // The panel stays visible while categories are muted so they can be switched back on.
-    if(this.bar.observe(visible,this.now()))this.drawPeek();this.drawToggle();
+    if(this.bar.observe([...visible,...tips],this.now()))this.drawPeek();this.drawToggle();
     // Slid away, the tab stays while it has unread notices (or a peek is out).
-    this.panel.hidden=!visible.length&&!this.muted.size&&!this.bar.alert&&!this.bar.peek;this.placeTab();
+    this.panel.hidden=!visible.length&&!tips.length&&!this.muted.size&&!this.bar.alert&&!this.bar.peek;this.placeTab();
   }
   destroy(){clearTimeout(this.timer);clearTimeout(this.clearTimer);this.controller.abort();this.unsubscribe();}
 }

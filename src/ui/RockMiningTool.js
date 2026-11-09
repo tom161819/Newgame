@@ -1,6 +1,7 @@
 import { t } from '../i18n/index.js';
 import { tileCenter } from '../game/isometric.js';
 import { blockingDialog } from './dockedPanels.js';
+import { newTally,tallyCount,clearingSummary } from '../systems/RockMiningWork.js';
 export class RockMiningTool {
   constructor(scene){
     this.scene=scene;this.enabled=false;this.remove=false;this.graphics=scene.add.graphics().setDepth(999998);this.controller=new AbortController();const options={signal:this.controller.signal};
@@ -18,8 +19,8 @@ export class RockMiningTool {
   up(pointer){
     if(!this.enabled||!this.anchor)return false;const s=this.scene,start=this.anchor,end=s.pointerTile(pointer);this.anchor=null;
     if(!s.gameOver&&!s.gameTime.paused&&!blockingDialog(document)){
-      let count=0;for(let y=Math.max(0,Math.min(start.y,end.y));y<=Math.min(99,Math.max(start.y,end.y));y++)for(let x=Math.max(0,Math.min(start.x,end.x));x<=Math.min(99,Math.max(start.x,end.x));x++)count+=s.naturalResources.miningWork.rocks.markTile({x,y},!this.remove);
-      s.setStatus(t(this.remove?'rock.unmarked':'rock.marked',{count}));
+      const tally=newTally();for(let y=Math.max(0,Math.min(start.y,end.y));y<=Math.min(99,Math.max(start.y,end.y));y++)for(let x=Math.max(0,Math.min(start.x,end.x));x<=Math.min(99,Math.max(start.x,end.x));x++)s.naturalResources.miningWork.rocks.markTile({x,y},!this.remove,tally);
+      s.setStatus(this.remove?t('rock.unmarked',{count:tallyCount(tally)}):clearingSummary(tally));
     }return true;
   }
   cancelDrag(){this.anchor=null;}
