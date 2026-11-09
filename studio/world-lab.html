@@ -30,6 +30,14 @@
           <h3>All settings <button type="button" class="link" id="wl-reset">Game defaults</button></h3>
           <div id="wl-settings" class="wl-settings"></div>
         </section>
+        <section id="wl-height" aria-label="Terrain height">
+          <h3>Terrain height <small class="wl-proto">prototype</small> <button type="button" class="link" id="wl-height-reset">Defaults</button></h3>
+          <p class="wl-hint">Height at tile corners, 0–8 units (1 unit = ¼ of a tile's height on screen); water lies at 0 in the valleys. Not part of the world code yet.</p>
+          <div id="wl-height-settings" class="wl-settings"></div>
+          <input type="text" id="wl-height-note" placeholder="Why (optional)" aria-label="Note for the height proposal" />
+          <div class="wl-row"><button type="button" class="button primary" id="wl-height-propose" data-needs-write>Propose as default</button><button type="button" class="button" id="wl-height-export">Export height-default.json</button></div>
+          <span class="wl-hint" id="wl-height-status" aria-live="polite"></span>
+        </section>
         <section>
           <h3>Favourites</h3>
           <div class="wl-row"><input type="text" id="wl-fav-name" placeholder="Name" aria-label="Favourite name" /><button type="button" class="button" id="wl-fav-save" data-needs-write>Save to favourites</button></div>
@@ -45,7 +53,7 @@
       </aside>
       <main class="wl-main" aria-label="World preview">
         <div class="toolbar wl-toolbar">
-          <label class="tool">Overlay <select id="wl-overlay" aria-label="Overlay"><option value="none">None</option><option value="forest">Where forests grow</option><option value="stone">Where stones and ore grow</option></select></label>
+          <label class="tool">Overlay <select id="wl-overlay" aria-label="Overlay"><option value="none">None</option><option value="forest">Where forests grow</option><option value="stone">Where stones and ore grow</option><option value="height">Height (terrain)</option><option value="slope">Buildable slope (terrain)</option></select></label>
           <button type="button" class="button" id="wl-center">To the castle</button>
           <label class="tool">Compare with <input type="text" id="wl-compare-input" placeholder="Paste another world code" spellcheck="false" aria-label="World code to compare" /></label>
           <span class="feedback" id="wl-status" aria-live="polite"></span>
@@ -59,6 +67,7 @@
           <div class="wl-card">
             <h4>Checks</h4>
             <div id="wl-checks" class="wl-checks"></div>
+            <div id="wl-height-checks" class="wl-checks"></div>
           </div>
           <div class="wl-card wl-compare" id="wl-compare" hidden>
             <h4>B <code id="wl-compare-code"></code> <button type="button" class="link" id="wl-compare-close">Close</button></h4>
@@ -70,6 +79,9 @@
           <h4>In the game's art <small>28 × 28 tiles · drag to move · trees, stones and ore are placed when a game starts (use the overlays)</small></h4>
           <div class="wl-ground" id="wl-ground">
             <div class="segmented" role="group" aria-label="Ground drawing"><button type="button" data-ground="tiles">A · Tiles (today)</button><button type="button" data-ground="continuous">B · Continuous ground</button></div>
+            <div class="wl-height-toggles"><div class="segmented" role="group" aria-label="Terrain height"><button type="button" data-height="off">Height off</button><button type="button" data-height="on">Height on</button></div>
+              <label class="tool"><input type="checkbox" id="wl-height-props" /> Buildings, paths, people, trees and rocks</label>
+              <label class="tool"><input type="checkbox" id="wl-height-unbuildable" /> Unbuildable tiles</label></div>
             <div id="wl-ground-settings" class="wl-ground-settings"></div>
             <div class="wl-ground-actions"><button type="button" class="btn" id="wl-ground-reset">Reset</button><button type="button" class="btn" id="wl-ground-copy">Copy settings</button><button type="button" class="btn primary" id="wl-ground-propose">Propose for the game</button><span id="wl-ground-status" class="sub" aria-live="polite"></span></div>
           </div>

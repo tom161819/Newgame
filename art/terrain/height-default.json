@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "id": "terrain-height",
+  "version": 1,
+  "description": "Default terrain height settings (plan m-teren-vyska), exported by the World Lab. One level 0–9 per slider of its Terrain height section; src/game/terrainHeight.js turns them into the height map and keeps the same levels in DEFAULT_HEIGHT_LEVELS (the game does not import art/; a test keeps both equal). The owner proposes new values with \"Propose as default\" in the World Lab (page database heightDefaults/proposal) or exports this file from there.",
+  "levels": { "hilliness": 5, "hillHeight": 5, "plains": 5, "bankSlope": 5 }
+}

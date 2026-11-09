@@ -11,6 +11,17 @@ import {
   randomSeed, applyPresets, presetsFromLevels, WorldCodeError,
 } from '../../../src/data/worldCode.js';
 
+import { HEIGHT_SETTINGS, DEFAULT_HEIGHT_LEVELS, HEIGHT_MAX, HEIGHT_VERSION, BUILD_MAX_SLOPE, heightsForWorld, heightStats, heightDefaultsProposal, validHeightLevels } from '../../../src/game/terrainHeight.js';
+import HEIGHT_DEFAULT_FILE from '../../../art/terrain/height-default.json' with { type: 'json' };
+export { HEIGHT_SETTINGS, DEFAULT_HEIGHT_LEVELS, HEIGHT_MAX, BUILD_MAX_SLOPE, heightStats, heightDefaultsProposal, validHeightLevels };
+// The export art/terrain/height-default.json: the file's header with these levels.
+export function heightDefaultFile(levels) {
+  if (!validHeightLevels(levels)) throw new RangeError('Invalid height levels');
+  return { ...HEIGHT_DEFAULT_FILE, version: HEIGHT_VERSION, levels: Object.fromEntries(HEIGHT_SETTINGS.map(s => [s.key, levels[s.key]])) };
+}
+// Terrain height (m-teren-vyska step 1): the game's height algorithm for a Lab world (its own stream 'height').
+export const heightsFor = (world, levels = DEFAULT_HEIGHT_LEVELS) => heightsForWorld(world, world.seed, levels);
+export const heightChecks = (world, map) => heightStats(map, world.ground, { radius: WORLD_GENERATION.fairStart.radius / 2 });
 export { WORLD_GENERATOR_VERSION, WORLD_SETTINGS, WORLD_PRESETS, DEFAULT_WORLD_LEVELS, applyPresets, presetsFromLevels, randomSeed, COLUMNS, ROWS, PLAYER_START, GROUND, GRASS_ZONE };
 
 // Parse a code typed or pasted by the owner: { ok, code, levels, seed } or { ok: false, reason, message, generator }.
