@@ -31,7 +31,7 @@ export async function worldEditorSmoke(context, url, instrument) {
 
     // Sliders change the code; a ground-look slider on the River look tab.
     let n = await drawn(page); await tab(page, 'land'); await setRange(page, 'we-forest', 8); await waitDraw(page, n);
-    assert.match(await page.locator('#we-code').inputValue(), /^MKW4-155515558555-[0-9A-Z]+$/);
+    assert.match(await page.locator('#we-code').inputValue(), /^MKW5-155515558555-[0-9A-Z]+$/);
     await tab(page, 'river'); await setRange(page, 'we-reedBeds', 2);
     await tab(page, 'saved'); await page.locator('#we-preset-name').fill('Smoke world'); await page.locator('#we-preset-save').click();
     assert.match(await page.locator('#we-status').textContent(), /Saved “Smoke world”/);
@@ -47,12 +47,12 @@ export async function worldEditorSmoke(context, url, instrument) {
 
     // ↺ resets one tab only.
     await tab(page, 'land'); await page.locator('[data-reset-tab="land"]').click();
-    assert.match(await page.locator('#we-code').inputValue(), /^MKW4-155515555555-/); await tab(page, 'river'); assert.equal(await page.locator('input[name="we-reedBeds"]').inputValue(), '2', 'other tabs keep their values');
+    assert.match(await page.locator('#we-code').inputValue(), /^MKW5-155515555555-/); await tab(page, 'river'); assert.equal(await page.locator('input[name="we-reedBeds"]').inputValue(), '2', 'other tabs keep their values');
     // Default asks first; Cancel changes nothing; Reset restores everything, presets stay.
     await tab(page, 'water'); await setRange(page, 'we-lakes', 3); await page.locator('#we-default').click(); await page.locator('.we-confirm').waitFor();
-    await page.locator('#we-default-no').click(); assert.match(await page.locator('#we-code').inputValue(), /^MKW4-155535555555-/);
+    await page.locator('#we-default-no').click(); assert.match(await page.locator('#we-code').inputValue(), /^MKW5-155535555555-/);
     await page.locator('#we-default').click(); await page.locator('#we-default-yes').click();
-    assert.match(await page.locator('#we-code').inputValue(), /^MKW4-155515555555-/); await tab(page, 'river');
+    assert.match(await page.locator('#we-code').inputValue(), /^MKW5-155515555555-/); await tab(page, 'river');
     assert.notEqual(await page.locator('input[name="we-reedBeds"]').inputValue(), '2', 'ground look back at the game default');
     await tab(page, 'saved'); assert.equal(await page.locator('[data-preset="Smoke world"]').count(), 1, 'Default keeps presets');
 

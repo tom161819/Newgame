@@ -25,6 +25,14 @@ export function economyOverview(scene){
   return {day:last?.day??null,days:recent.length,gold:row('gold'),food:FOOD_RESOURCE_IDS.map(row),materials:MATERIALS.map(row),
     happiness:scene.needs?.summary?.()?.happiness??null,unemployed:workers.filter(w=>w.profession==='idle').length,residents:workers.length,freeBeds:Math.max(0,capacity-workers.length)};
 }
+// m-drevorubci-stromy: the forest around the Lumberjack Huts – mature and young (sapling, young tree) trees inside any
+// finished hut's radius (each tree once) and the Wood income a day (Ø of the last 3 closed days, else the last one).
+export function forestOverview(scene){
+  const forestry=scene.naturalResources?.forestry,huts=forestry?.huts?.()??[],seen=new Set();let mature=0,young=0;
+  for(const hut of huts)for(const tree of forestry.trees(hut)){if(seen.has(tree.natural.id))continue;seen.add(tree.natural.id);if(tree.natural.stage===3)mature++;else if(tree.natural.stage>0)young++;}
+  const recent=(scene.resourceLedger?.history??[]).slice(-3),woodPerDay=recent.length?recent.reduce((n,d)=>n+totals(d,'wood').income,0)/recent.length:0;
+  return {huts:huts.length,mature,young,woodPerDay};
+}
 // ---- quick actions: each returns what it did (0 / false when a limit stopped it).
 export function addDevGold(scene,amount=DEV_QUICK.gold){const before=scene.inventory.count('gold');scene.inventory.add('gold',amount,{source:SOURCE,type:'acquisition'});scene.updateInventory?.();return scene.inventory.count('gold')-before;}
 // Resources (materials and food) the stores hold.

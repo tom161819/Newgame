@@ -3,7 +3,7 @@ import { validNightThreatState } from './NightThreatSystem.js';
 import { validRoyalGoalState } from './RoyalGoals.js';
 import { validKingSkillState } from './KingSkills.js';
 import { validNightSpeedTipState } from '../data/dayNight.js';
-import { exportDevBalance,validDevBalanceState } from '../data/devBalance.js';
+import { exportDevBalance,validDevBalanceState,devRange } from '../data/devBalance.js';
 import { validNoticeState } from '../data/diagnostics.js';
 import { validLightFuelState } from './LightFuelSystem.js';
 import { validateRockMining } from './RockMiningState.js';
@@ -249,10 +249,10 @@ export function validateGameState(input,registry=objectRegistry){
   }
   for(const key of provisional)check(!occupied.has(key));
   repairTransportInstructions(s,registry,check);
-  const natural=s.naturalResources;check(natural&&Object.keys(natural).every(key=>['nextId','nextDepositId','growthClock','ageClock','refreshElapsed','kingTask','rockMining'].includes(key)));integer(natural.nextId,1);integer(natural.nextDepositId,1);number(natural.ageClock,0,s.time.totalElapsed/dayDuration+1e-6);number(natural.growthClock,0,natural.ageClock*1.25+1e-6);number(natural.refreshElapsed,0,FORESTRY.refreshInterval);check(natural.refreshElapsed<FORESTRY.refreshInterval);
+  const natural=s.naturalResources;check(natural&&Object.keys(natural).every(key=>['nextId','nextDepositId','growthClock','ageClock','refreshElapsed','kingTask','rockMining'].includes(key)));integer(natural.nextId,1);integer(natural.nextDepositId,1);number(natural.ageClock,0,s.time.totalElapsed/dayDuration+1e-6);number(natural.growthClock,0,natural.ageClock*1.25*devRange('forestGrowth').max+1e-6);/* m-drevorubci-stromy: Dev forest growth up to ×4 */number(natural.refreshElapsed,0,FORESTRY.refreshInterval);check(natural.refreshElapsed<FORESTRY.refreshInterval);
   const resourceTiles=new Set(),treeIds=new Map(),depositIds=new Map();
   for(const r of s.resources){const d=definition(r.type,'resource');tile(r.tile);
-    if(d.tree){const n=r.natural;check(n&&n.kind==='tree'&&Object.keys(n).every(key=>['id','kind','stage','ageDays','growthDays','cycle','workDone','growthCheckpoint','ageCheckpoint'].includes(key)));const id=String(n.id).match(/^tree-([1-9]\d*)$/);check(id&&Number(id[1])<natural.nextId&&!treeIds.has(n.id));treeIds.set(n.id,r);integer(n.stage,0,3);integer(n.cycle,0);number(n.ageDays);number(n.growthDays,0,n.stage===3?0:FORESTRY.stageDays[n.stage]);number(n.workDone,0,n.stage===3?Math.max(d.tree.chopDuration,FORESTRY.legacyChopDuration):0);number(n.growthCheckpoint,0,natural.growthClock+1e-8);number(n.ageCheckpoint,0,natural.ageClock+1e-8);}
+    if(d.tree){const n=r.natural;check(n&&n.kind==='tree'&&Object.keys(n).every(key=>['id','kind','stage','ageDays','growthDays','cycle','workDone','growthCheckpoint','ageCheckpoint'].includes(key)));const id=String(n.id).match(/^tree-([1-9]\d*)$/);check(id&&Number(id[1])<natural.nextId&&!treeIds.has(n.id));treeIds.set(n.id,r);integer(n.stage,0,3);integer(n.cycle,0);number(n.ageDays);number(n.growthDays,0,n.stage===3?0:FORESTRY.stageDays[n.stage]);number(n.workDone,0,n.stage===3?Math.max(d.tree.chopDuration*(s.devBalance?.chopTime??1),FORESTRY.legacyChopDuration):0);/* m-drevorubci-stromy: the save's chopping time */number(n.growthCheckpoint,0,natural.growthClock+1e-8);number(n.ageCheckpoint,0,natural.ageClock+1e-8);}
     else if(d.deposit){const n=r.natural;check(n&&n.kind==='deposit'&&Object.keys(n).every(key=>['id','kind','remaining','max','boundBuildingId'].includes(key)));const id=String(n.id).match(/^deposit-([1-9]\d*)$/);check(id&&Number(id[1])<natural.nextDepositId&&!depositIds.has(n.id));depositIds.set(n.id,r);integer(n.max,d.deposit.min,d.deposit.max);integer(n.remaining,0,n.max);check(n.boundBuildingId==null||bIds.has(n.boundBuildingId));}
     else check(r.natural===undefined);
     for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){

@@ -111,16 +111,18 @@ function mini({buildings=[],trees=[],locations=[],workers=[],registry}={}){
     workerSystem:{liveSubjects:()=>workers},objectRegistry:registry,activities:null,needs:null};
   s.diagnostics=new ProductionDiagnostics(s);s.feed=feed;return s;
 }
-test('a quarry or mine with its deposit used up and a lumberjack hut with no trees left get one notice each (feed once), gone when it comes back',()=>{
+// m-drevorubci-stromy (0.83.0 #1): the hut's notice is now "nothing to fell" (no MATURE tree in range); a young tree does not end it.
+test('a quarry or mine with its deposit used up and a lumberjack hut with no mature tree left get one notice each (feed once), gone when it comes back',()=>{
   const objectRegistry=null;
   const quarry={id:1,type:'quarry',x:10,y:10,quarryMode:'finite',depositId:'d1'},hut={id:2,type:'lumberjack_hut',x:40,y:40},legacy={id:3,type:'quarry',x:60,y:60,quarryMode:'legacy'};
   const s=mini({buildings:[quarry,hut,legacy],trees:[{x:80,y:80}],registry:objectRegistry});s.naturalResources.byId.set('d1',{natural:{remaining:0}});
   advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);
-  const depleted=s.diagnostics.active().filter(i=>i.reason==='depleted').map(i=>[i.entityId,i.params.resource]);assert.deepEqual(depleted.sort(),[[1,'stone'],[2,'wood']]);
+  const depleted=s.diagnostics.active().filter(i=>['depleted','noMatureTrees'].includes(i.reason)).map(i=>[i.entityId,i.reason,i.params.resource]);assert.deepEqual(depleted.sort(),[[1,'depleted','stone'],[2,'noMatureTrees','wood']]);
   assert.equal(s.feed.length,2,'one feed line each');advance(s,REMINDER*3);assert.equal(s.feed.length,2,'no spam');
   assert.match(s.feed.map(f=>f.text).join(' | '),/Quarry has run out of stone/i);assert.equal(s.diagnostics.buildingIssue(1).reason,'depleted');
   s.naturalResources.byId.get('d1').natural.remaining=5;s.naturalResources.byId.set('young',{x:41,y:41,definition:{tree:{}},natural:{stage:0}});advance(s,DIAGNOSTICS.checkInterval);
-  assert.equal(s.diagnostics.active().filter(i=>i.reason==='depleted').length,0,'gone: stone again, a young tree will grow');
+  assert.equal(s.diagnostics.active().filter(i=>i.reason==='depleted').length,0,'gone: stone again');assert.equal(s.diagnostics.active().filter(i=>i.reason==='noMatureTrees').length,1,'a young tree is not yet something to fell');
+  s.naturalResources.byId.get('young').natural.stage=3;advance(s,DIAGNOSTICS.checkInterval);assert.equal(s.diagnostics.active().filter(i=>i.reason==='noMatureTrees').length,0,'gone: a mature tree in range');
 });
 
 test('storage full: one notice naming the goods and the store to build; the stuck building gets its own line; gone once there is room',()=>{

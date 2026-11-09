@@ -17,7 +17,16 @@ import { farmReady } from '../data/farmPlots.js';
 // times (`notices` in the save); after Load a problem must last again before it is shown.
 const minId=list=>list.reduce((a,b)=>a.id<=b.id?a:b).id;
 export class ProductionDiagnostics {
-  constructor(scene){this.scene=scene;this.issues=new Map();this.memory=new Map();this.closed=new Map();this.listeners=new Set();this.nextCheck=0;this.revision=0;this.unsubscribe=scene.activities?.on(event=>{if(event.type==='buildingCompleted')this.completed(event.objectIds??[]);});}
+  constructor(scene){this.scene=scene;this.issues=new Map();this.memory=new Map();this.closed=new Map();this.listeners=new Set();this.nextCheck=0;this.revision=0;this.cancelledSites=new Map();this.unsubscribe=scene.activities?.on(event=>{if(event.type==='buildingCompleted')this.completed(event.objectIds??[]);if(event.type==='constructionCancelled')this.siteCancelled(event);});}
+  // m-zelezny-dul-misto (playtest 0.83.0 #5): a blueprint cancelled because the seen site was blocked is a notice at once
+  // (before: only the status line). The row names the building and the reason and pans the camera to the spot; it stays
+  // DIAGNOSTICS.cancelledDays (or until closed) and is not saved.
+  siteCancelled(event){
+    const time=this.scene.gameTime,id=event.objectIds?.[0];if(!time||id==null||event.reason!=='obstacle')return;const now=time.totalElapsed;
+    const found={key:`cancelled:${id}`,entityId:id,reason:'buildCancelled',category:'construction',params:{type:event.objectType,obstacle:event.obstacle??'access',tile:{...event.tile}},feed:true,once:true};
+    this.cancelledSites.set(found.key,{found,at:now});if(this.observe(this.track(found,now),found,now,{immediate:true}))this.changed();
+  }
+  cancelIssues(now){const keep=DIAGNOSTICS.cancelledDays*this.dayMs(),found=[];for(const [key,entry]of this.cancelledSites){if(now-entry.at>=keep)this.cancelledSites.delete(key);else found.push(entry.found);}return found;}
   dayMs(){return this.scene.gameTime?.dayDuration??DAY_DURATION;}
   repeatMs(issue){return noticeRepeatDays(issue.reason,issue.severity)*this.dayMs();}
   memoryKey(issue){return `${issue.key}:${issue.params?.resource??''}`;}
@@ -154,7 +163,9 @@ export class ProductionDiagnostics {
     const s=this.scene,natural=s.naturalResources,found=[];if(!natural&&!s.fishing)return found;
     for(const b of s.buildings){
       if(!natural||!buildingIsComplete(b)||b.unverified||!DEPLETION_SOURCES[b.type])continue;let empty=false;
-      if(b.type==='lumberjack_hut'){const c={x:b.x+.5,y:b.y+.5},r=buildingDefinition(b).workRadius??0;empty=![...natural.byId.values()].some(t=>t.definition?.tree&&Math.hypot(t.x-c.x,t.y-c.y)<=r);}
+      // m-drevorubci-stromy (playtest 0.83.0 #1): a Lumberjack Hut with no mature tree in its radius has nothing to fell
+      // (young trees still growing included) – one notice, gone as soon as a mature tree is in range again.
+      if(b.type==='lumberjack_hut'){const c={x:b.x+.5,y:b.y+.5},r=buildingDefinition(b).workRadius??0,mature=natural.forestry?natural.forestry.eligible(b).length:[...natural.byId.values()].filter(t=>t.definition?.tree&&t.natural?.stage===3&&Math.hypot(t.x-c.x,t.y-c.y)<=r).length;if(!mature)found.push({entityId:b.id,reason:'noMatureTrees',category:'production',params:{resource:'wood'},feed:true});continue;}
       else if(b.quarryMode!=='legacy'&&b.quarryMode!=='unbound'){const d=b.depositId!=null?natural.byId.get(b.depositId):null;empty=!!d&&d.natural.remaining===0;}
       // m-vytezeny-dul-ctverecky (64): a depleted mine keeps this one row ("The Iron Mine is exhausted"), never repeated.
       if(b.depleted)found.push({entityId:b.id,reason:'depleted',category:'production',params:{resource:GATHER_OUTPUTS[b.type],source:DEPLETION_SOURCES[b.type],exhausted:true},feed:true,once:true});
@@ -189,7 +200,7 @@ export class ProductionDiagnostics {
   // Plan m-e1-jidlo-vydrz: the kingdom's edible stores last less than 3 days (one kingdom notice with the days left).
   foodIssues(){const days=foodDays(this.scene.foodSystem);return days<FOOD_OUTLOOK.warnDays?[{entityId:0,reason:'foodLow',category:'production',params:{days:Math.floor(days)},feed:true}]:[];}
   detect(){
-    const found=[...this.constructionIssues(),...this.depletionIssues(),...this.storageIssues(),...this.foodIssues(),...this.chainIssues()];
+    const found=[...this.constructionIssues(),...this.cancelIssues(this.scene.gameTime?.totalElapsed??0),...this.depletionIssues(),...this.storageIssues(),...this.foodIssues(),...this.chainIssues()];
     for(const record of this.scene.foodProduction?.records.values()??[]){const issue=this.productionIssue(record);if(issue)found.push({entityId:record.buildingId,category:'production',...issue});}
     return found;
   }
@@ -219,6 +230,6 @@ export class ProductionDiagnostics {
     const now=this.scene.gameTime?.totalElapsed??0;this.prune(now);
     return {closed:[...this.closed].filter(([,at])=>at<=now).sort((a,b)=>a[1]-b[1]||a[0].localeCompare(b[0])).slice(-NOTICE_CLOSED_LIMIT).map(([key,at])=>[key,at])};
   }
-  importState(state){this.closed=new Map(state?.closed??[]);this.memory.clear();this.issues.clear();this.changed();}
+  importState(state){this.closed=new Map(state?.closed??[]);this.memory.clear();this.issues.clear();this.cancelledSites.clear();this.changed();}
   destroy(){this.unsubscribe?.();this.listeners.clear();this.issues.clear();this.memory.clear();this.closed.clear();}
 }

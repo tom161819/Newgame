@@ -7,7 +7,9 @@
 // A saved game keeps the code it was made with (decode with current:null); only New Game needs the current version.
 // Generator 4 (velke-prirodni-objekty): rock ridges (4 × 2) and 2 × 2 rock obstacles, thickets by the water and at forest
 // edges, large 3 × 3 Stone and Iron Deposits (one ordinary deposit of each fewer).
-export const WORLD_GENERATOR_VERSION=4;
+// Generator 5 (m-zelezny-dul-misto, playtest 0.83.0 #5): the Iron Deposit nearest to the Castle has a free Iron Mine spot
+// beside it (MineralSystem.ensureIronMine; an Iron Deposit with one is added when it has none).
+export const WORLD_GENERATOR_VERSION=5;
 export const WORLD_SEED_MAX=36**8-1;
 // key: id used in code and Studio; max: highest level; default: today's world; scale: level → multiplier (or value).
 const linear=(at0,at5,at9)=>level=>level<=5?at0+(at5-at0)*level/5:at5+(at9-at5)*(level-5)/4;

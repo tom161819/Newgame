@@ -4,6 +4,17 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+### Added
+- A Lumberjack Hut with no mature tree in its working radius gets the notice "The Lumberjack Hut has nothing to fell – build a new one near a forest". Clicking it moves the camera to the hut. The notice goes away once a tree in range is mature again.
+- The Lumberjack Hut window shows the young trees in its working radius and roughly how many days until the next one is mature. The estimate counts the season (nothing grows in winter).
+- When a planned building on unexplored ground is cancelled because something blocks the site, it now shows in Notices with the building and the reason, for example "Construction cancelled: House – Rock". Clicking it moves the camera to the spot.
+- Dev tool: a new "Forest and wood" group with forest growth, sapling chance after felling (0–100 %, default 50 %), growth near a Lumberjack Hut (×1–×3, default ×1.5), woodcutter radius, chopping time and wood per tree. The values are saved with the game and reset like the others. The economy overview has a line with the mature and young trees around the huts and the wood per day.
+### Changed
+- Automatic employment no longer sends Woodcutters to a Lumberjack Hut with nothing to fell. It sends no more Woodcutters than the hut has mature trees in range. A Woodcutter who has had nothing to fell for about a game day leaves a hut that has more Woodcutters than mature trees and can take other work.
+- Forests grow back faster around Lumberjack Huts. After felling, a Woodcutter plants a sapling on the spot half of the time, so the stump stage is skipped. Stumps and young trees inside a hut's radius grow 1.5 × as fast.
+- The kingdom's first Granary and first Lumberjack Hut are built and supplied before other sites. In the tutorial the hut is now ready right after the Granary.
+- In build mode the Iron Mine says why a spot is invalid: "Unexplored", "On the deposit – the mine stands beside it", "Rock", "Tree", "Out of deposit range" and so on. On unexplored ground it can only be planned near an Iron Deposit you have already seen, so a blind plan is no longer cancelled later.
+- New worlds use world generator 5 (codes MKW5-…). The Iron Deposit nearest to the Castle always has a free spot for an Iron Mine right beside it. Older world codes still work for their saved games, but not for a New Game.
 
 ## [0.83.0] - 2026-11-09
 <!-- version: {"title":"Thickets, rock ridges and large deposits","type":"feature","reconstructed":false,"saveVersion":61} -->

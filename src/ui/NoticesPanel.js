@@ -13,6 +13,8 @@ const readMuted=()=>{try{const list=JSON.parse(localStorage.getItem(MUTED_KEY)??
 // Right-bottom notices: lasting production and work problems. Each can be dismissed (until its next reminder) and
 // whole categories can be muted. Clicking one opens the building's panel when the building is in sight.
 const NOTICE_HIRES=Object.freeze({noBuilder:'builder',waitingMaterial:'hauler',pileNoHauler:'hauler'});
+// Notices whose click also pans the camera (the building, or the `tile` param of a site that is gone).
+const NOTICE_CAMERA=new Set(['noMatureTrees','buildCancelled']);
 export class NoticesPanel {
   constructor(scene){
     this.scene=scene;this.panel=document.querySelector('#notices-panel');this.list=document.querySelector('#notices-list');this.filters=document.querySelector('#notices-filters');this.muted=readMuted();
@@ -84,7 +86,10 @@ export class NoticesPanel {
   }
   text(issue){return noticeText(this.scene,issue);}
   openEntity(id){
-    const s=this.scene,building=s.buildings.find(b=>b.id===id);if(!building||!s.fog.isVisibleObject(building))return;
+    const s=this.scene,building=s.buildings.find(b=>b.id===id),issue=[...(s.diagnostics?.issues?.values?.()??[])].find(i=>i.entityId===id&&NOTICE_CAMERA.has(i.reason));
+    // m-drevorubci-stromy / m-zelezny-dul-misto: these notices move the camera to the hut or to the cancelled site.
+    if(issue){const tile=issue.params?.tile??(building?{x:building.x+buildingDefinition(building).width/2,y:building.y+buildingDefinition(building).height/2}:null);if(tile)s.worldCamera?.lookAt?.(tile);}
+    if(!building||!s.fog.isVisibleObject(building))return;
     if(!buildingIsComplete(building))s.constructionUI?.open(building);else if(buildingDefinition(building).workplace)s.workplacePanel.open(building);
   }
   render(){

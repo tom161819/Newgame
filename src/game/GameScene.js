@@ -82,6 +82,7 @@ import { EmploymentPanel } from '../ui/EmploymentPanel.js';
 import { ProductionDiagnostics } from '../systems/ProductionDiagnostics.js';
 import { NoticesPanel } from '../ui/NoticesPanel.js';
 import { isProvisional,knownPlacementError,knownContext } from './provisionalSites.js';
+import { mineSpotError,provisionalMineError } from './siteObstacles.js';
 import { MountSystem } from '../systems/MountSystem.js';
 import { SettingsPanel } from '../ui/SettingsPanel.js';
 import { FpsOverlay } from '../ui/FpsOverlay.js';
@@ -336,7 +337,9 @@ export class GameScene extends Phaser.Scene {
       this.naturalResources.generate(this.worldRandom('trees'),Math.round(WORLD_FORESTRY.initialTrees*settingsFromLevels(this.worldLevels).forest),{weight:weights?t=>at(weights.forest,t):null,start:settingsFromLevels(this.worldLevels).forest>=.5?{center:PLAYER_START,radius:F.radius,trees:F.trees}:null});
       this.naturalResources.mining.generate(this.worldRandom('minerals'),weights?t=>.25+.75*at(weights.stone,t):null);
       // m-kamenolom-u-hradu: a Quarry deposit 8–16 tiles from the Castle in every world (generator 3).
-      this.naturalResources.mining.ensureStartQuarry(this.worldRandom('start-quarry'));}
+      this.naturalResources.mining.ensureStartQuarry(this.worldRandom('start-quarry'));
+      // m-zelezny-dul-misto: a free Iron Mine spot beside the nearest Iron Deposit (generator 5).
+      this.naturalResources.mining.ensureIronMine(this.worldRandom('start-iron-mine'));}
     // velke-prirodni-objekty: a group with a tree, deposit or building on a tile is single bushes or rocks again.
     pruneNatureGroups(this);
     // World v2: a fingerprint of the starting world as generated (terrain, water, bushes, every placed resource, animals,
@@ -479,12 +482,13 @@ export class GameScene extends Phaser.Scene {
         this.dragAnchor={...goal};this.wallLastLine=null;this.previewTracking=true;this.previewKey=null;this.updateBuildingPreview();return;
       }
       // Outside sight a blueprint is provisional: checked against known ground now, against the real site once seen.
-      const provisional=isProvisional(this.fog,buildingTiles(goal,this.selectedBuilding)),known=provisional?knownPlacementError(this,goal,this.selectedBuilding):null;
+      // m-zelezny-dul-misto: an Iron Mine says why a spot is invalid, and outside sight it needs a known Iron Deposit.
+      const provisional=isProvisional(this.fog,buildingTiles(goal,this.selectedBuilding)),known=provisional?mineSpotError(this,goal,this.selectedBuilding,knownPlacementError(this,goal,this.selectedBuilding))??provisionalMineError(this,goal,this.selectedBuilding):null;
       if(known){this.previewKey=null;this.updateBuildingPreview();this.setStatus(known);return;}
       // m-staveni-zdi-studna (59): a Gate or Tower over Stone Wall segments replaces them; a Gate keeps the axis it was placed with.
       const fields=this.selectedBuilding.id==='wall_gate'?{gateAxis:gateAxis(wallIndex(this.buildings,true),{...goal,gateAxis:this.gateAxis})}:null;
       const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding,reserveMaterials:true,provisional,fields,replaceWalls:(walls,building)=>replaceWalls(this,walls,building)});
-      if(result.error){this.previewKey=null;this.updateBuildingPreview();this.setStatus(result.error);}
+      if(result.error){this.previewKey=null;this.updateBuildingPreview();this.setStatus(mineSpotError(this,goal,this.selectedBuilding,result.error));}
       else{
         this.constructionSystem.plan(result.building);
         this.towerViews.set(result.building.id,this.createBuildingView(this.selectedBuilding,result.building));if(provisional)this.rememberBlueprint(result.building);
@@ -629,8 +633,8 @@ export class GameScene extends Phaser.Scene {
     if(!this.buildMode||!anchor||anchor.x<0||anchor.y<0||anchor.x>=COLUMNS||anchor.y>=ROWS){this.preview.setVisible(false);return;}
     // Outside sight the preview is amber (provisional): only known ground decides, never a hidden obstacle.
     const provisional=isProvisional(this.fog,buildingTiles(anchor,definition));
-    const error=(provisional?knownPlacementError(this,anchor,definition):placementError(this.map,anchor,this.resourceOccupancy,this.reservedTiles(),definition,this.buildings,this.buildingUnlocks))
-      ??(!this.inventory.canAfford(definition.cost)?t('status.noFunds'):null);
+    const error=mineSpotError(this,anchor,definition,provisional?knownPlacementError(this,anchor,definition):placementError(this.map,anchor,this.resourceOccupancy,this.reservedTiles(),definition,this.buildings,this.buildingUnlocks))
+      ??(provisional?provisionalMineError(this,anchor,definition):null)??(!this.inventory.canAfford(definition.cost)?t('status.noFunds'):null);
     const gate=definition.id==='wall_gate'?gateAxis(wallIndex(this.buildings,true),{...anchor,gateAxis:this.gateAxis}):null;
     const key=`${tileKey(anchor)}:${provisional}:${error}:${gate}`;
     if(key!==this.previewKey){

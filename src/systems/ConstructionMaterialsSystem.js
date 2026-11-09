@@ -2,6 +2,7 @@ import { dataName } from '../i18n/names.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { pavementWorkArea } from '../game/pavement.js';
 import { paidCost } from '../data/demolition.js';
+import { CONSTRUCTION_RULES } from '../data/construction.js';
 
 // Site stock is part of the same physical storage ledger as warehouses. The
 // requirement is a recipe, not another copy of the invested resources.
@@ -53,11 +54,13 @@ export class ConstructionMaterialsSystem {
     const supply=building.materialSupply;if(!supply)return false;const location=this.storage.locations.get(this.owner(building.id));
     return !!location&&Object.entries(supply.required).every(([id,n])=>(location.stock[id]??0)>=n);
   }
+  // m-drevorubci-stromy: a priority site's materials (the first Granary, then the first Lumberjack Hut) are carried first.
+  priority(siteId){const site=this.site(siteId),c=this.construction;if(!site||!c.priorityRank)return 0;const rank=c.priorityRank(site),rules=CONSTRUCTION_RULES.firstPriority.length;return rank<rules?rank-rules:0;}
   candidates(siteId=null){
     if(!this.enabled)return [];
     const tasks=[];
-    for(const r of this.storage.reservations.values())if(r.kind==='stock'&&r.siteId!=null&&r.owner===this.owner(r.siteId)&&this.site(r.siteId)&&(siteId==null||r.siteId===siteId))tasks.push({priority:0,siteId:r.siteId,allocationId:r.id,sourceId:r.locationId,destinationId:this.owner(r.siteId),resource:r.resource,amount:r.amount});
-    for(const drop of this.scene.dropSystem.drops.values())if(drop.siteId!=null&&this.site(drop.siteId)&&(siteId==null||drop.siteId===siteId))tasks.push({priority:0,siteId:drop.siteId,sourceDropId:drop.id,destinationId:this.owner(drop.siteId),resource:drop.resource,amount:drop.amount});return tasks;
+    for(const r of this.storage.reservations.values())if(r.kind==='stock'&&r.siteId!=null&&r.owner===this.owner(r.siteId)&&this.site(r.siteId)&&(siteId==null||r.siteId===siteId))tasks.push({priority:this.priority(r.siteId),siteId:r.siteId,allocationId:r.id,sourceId:r.locationId,destinationId:this.owner(r.siteId),resource:r.resource,amount:r.amount});
+    for(const drop of this.scene.dropSystem.drops.values())if(drop.siteId!=null&&this.site(drop.siteId)&&(siteId==null||drop.siteId===siteId))tasks.push({priority:this.priority(drop.siteId),siteId:drop.siteId,sourceDropId:drop.id,destinationId:this.owner(drop.siteId),resource:drop.resource,amount:drop.amount});return tasks;
   }
   returnAllocation(id){
     const r=this.storage.reservations.get(id);if(!r)return;

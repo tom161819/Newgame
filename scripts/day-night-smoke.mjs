@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 export async function dayNightSmoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);
   try{
-    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW4-155515555555-1');await page.locator('#start-game').click();
+    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.dayNight);
     await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
     const state=()=>page.evaluate(()=>{const s=window.__game.registry.get('application').scene,radii=Object.fromEntries([...s.fog.painted].map(([id,v])=>[id,Number(v.key.split(',')[2])]));return {radii,part:s.dayNight.part(),hud:document.querySelector('#day-part').dataset.part,overlay:s.nightOverlay.dark.visible,

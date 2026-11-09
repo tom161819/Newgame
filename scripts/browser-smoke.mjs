@@ -28,6 +28,8 @@ import { kingXpSmoke } from './king-xp-smoke.mjs';
 import { notices2Smoke } from './notices-2-smoke.mjs';
 import { depletedMineSmoke } from './depleted-mine-smoke.mjs';
 import { bigNatureSmoke } from './big-nature-smoke.mjs';
+import { woodcutterTreesSmoke } from './woodcutter-trees-smoke.mjs';
+import { ironMineSpotSmoke } from './iron-mine-spot-smoke.mjs';
 import { animals3Smoke } from './animals-3-smoke.mjs';
 import { farmhouseStoreSmoke } from './farmhouse-store-smoke.mjs';
 import { buildingTooltipSmoke,nightSpeedSmoke } from './building-tooltip-smoke.mjs';
@@ -232,6 +234,8 @@ try{
   await step('notices-2',()=>notices2Smoke(context,origin+base,instrument));
   await step('depleted-mine',()=>depletedMineSmoke(context,origin+base,instrument));
   await step('big-nature',()=>bigNatureSmoke(context,origin+base,instrument));
+  await step('woodcutter-trees',()=>woodcutterTreesSmoke(context,origin+base,instrument));
+  await step('iron-mine-spot',()=>ironMineSpotSmoke(context,origin+base,instrument));
   await step('animals-3',()=>animals3Smoke(context,origin+base,instrument));
   await step('farmhouse-store',()=>farmhouseStoreSmoke(context,origin+base,instrument));
   await step('building-tooltip',()=>buildingTooltipSmoke(context,origin+base,instrument));

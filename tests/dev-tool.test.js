@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { workerScene } from './helpers/workerScene.js';
 import { gameSettings } from '../src/systems/GameSettings.js';
 import { POPULATION } from '../src/data/jobs.js';
-import { DEV_BALANCE_KEYS,DEV_QUICK,loadDevBalance,setDevFactor,devFactor,devProduction,resetDevBalance,devBalanceChanged,exportDevBalance,importDevBalance,validDevBalanceState } from '../src/data/devBalance.js';
+import { DEV_BALANCE_KEYS,DEV_QUICK,devDefault,loadDevBalance,setDevFactor,devFactor,devProduction,resetDevBalance,devBalanceChanged,exportDevBalance,importDevBalance,validDevBalanceState } from '../src/data/devBalance.js';
 import { price } from '../src/data/trade.js';
 import { arrivalForecast,economyOverview,addDevGold,addDevResources,advanceDevDay,summonDevCaravan,addDevResident,devResourceIds } from '../src/systems/DevTools.js';
 import { BackgroundSimulation } from '../src/systems/BackgroundSimulation.js';
@@ -44,7 +44,7 @@ test('m-91: coefficients are clamped to ×0.25–×4; Production multiplies the 
     fresh();assert.equal(devBalanceChanged(),false);assert.equal(exportDevBalance(),null);
     assert.equal(setDevFactor('wages',9),4);assert.equal(setDevFactor('wages',.1),.25);assert.equal(setDevFactor('wages',1.3),1.3);
     setDevFactor('production',2);setDevFactor('fisher',1.5);assert.equal(devProduction('fisher'),3);assert.equal(devProduction('bakery'),2);assert.equal(devProduction('smithy'),2,'every production building');
-    assert.equal(devBalanceChanged(),true);resetDevBalance();assert.ok(DEV_BALANCE_KEYS.every(k=>devFactor(k)===1));assert.equal(devBalanceChanged(),false);
+    assert.equal(devBalanceChanged(),true);resetDevBalance();assert.ok(DEV_BALANCE_KEYS.every(k=>devFactor(k)===devDefault(k)));assert.equal(devBalanceChanged(),false);
   }finally{fresh();}
 });
 test('m-91: Market buy and sell prices have separate coefficients, the buy price stays above the sell price',()=>{
@@ -60,7 +60,7 @@ test('m-91: devBalance needs no SAVE_VERSION bump (61 since velke-prirodni-objek
     setDevFactor('immigration',3);setDevFactor('buyPrice',.5);const saved=serializeGameState(s);assert.deepEqual(saved.devBalance,{immigration:3,buyPrice:.5});validateGameState(saved);
     for(const bad of [null,[],{},{immigration:5},{immigration:.2},{immigration:'2'},{immigration:1.33},{nonsense:2},{immigration:NaN},1,'x'])assert.throws(()=>validateGameState({...saved,devBalance:bad}),undefined,JSON.stringify(bad));
     resetDevBalance();loadGameState(s,saved);assert.equal(devFactor('immigration'),3,'restored from the save');assert.equal(devFactor('buyPrice'),.5);
-    loadGameState(s,plain);assert.ok(DEV_BALANCE_KEYS.every(k=>devFactor(k)===1),'a save without devBalance is ×1');
+    loadGameState(s,plain);assert.ok(DEV_BALANCE_KEYS.every(k=>devFactor(k)===devDefault(k)),'a save without devBalance is at the defaults (×1)');
     assert.equal(validDevBalanceState({wages:1.15}),true,'0.78 values on the 0.05 grid stay valid');assert.throws(()=>importDevBalance({wages:9}));
   }finally{fresh();}
 });

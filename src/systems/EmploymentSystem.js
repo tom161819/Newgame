@@ -1,5 +1,7 @@
 import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { EMPLOYMENT_PRESETS,EMPLOYMENT_PROFESSIONS,PRIORITY_RANGE,presetOf } from '../data/employment.js';
+import { FORESTRY } from '../data/naturalResources.js';
+import { DIAGNOSTICS } from '../data/diagnostics.js';
 
 // Automatic employment: fills free workplace seats with available Unemployed residents only. Seats are filled by
 // profession priority (5 → 1); within one priority the building with the fewest staff goes first, then by building id; for each seat the best resident is chosen across the whole
@@ -12,7 +14,7 @@ export const compareForSkill=skill=>(a,b)=>Number(b.naturalTalent===skill)-Numbe
 export class EmploymentSystem {
   constructor(scene,{enabled=true,state=null}={}){
     this.scene=scene;this.enabled=state?.enabled??enabled;this.priorities={...EMPLOYMENT_PRESETS.balanced,...(state?.priorities??{})};this.held=new Set(state?.held??[]);this.blockedBuildings=new Set(state?.blockedBuildings??[]);this.blockedTypes=new Set(state?.blockedTypes??[]);
-    this.listeners=new Set();this.dirty=true;this.running=false;
+    this.listeners=new Set();this.dirty=true;this.running=false;this.idleSince=new Map();this.nextForestCheck=0;
     this.unsubscribe=scene.workplaceSystem.onChange(()=>this.request());this.worldChanged=()=>this.request();scene.events?.on('buildings:changed',this.worldChanged);
   }
   get preset(){return presetOf(this.priorities);}
@@ -54,7 +56,10 @@ export class EmploymentSystem {
       const spec=buildingDefinition(building).workplace;if(!spec||!buildingIsComplete(building)||building.unverified||this.blockReason(building))continue;
       const production=s.foodProduction?.records.get(building.id);if(production&&!production.auto)continue;
       const record=s.workplaceSystem.register(building);if(!record)continue;
-      for(let i=record.workerIds.length;i<spec.capacity;i++)seats.push({building,spec,priority:this.priorities[spec.profession]??PRIORITY_RANGE.default});
+      // m-drevorubci-stromy (playtest 0.83.0 #1): a Lumberjack Hut takes no more Woodcutters than it has mature trees in
+      // its radius (none while it has nothing to fell).
+      const capacity=building.type==='lumberjack_hut'&&s.naturalResources?Math.min(spec.capacity,s.naturalResources.forestry.eligible(building).length):spec.capacity;
+      for(let i=record.workerIds.length;i<capacity;i++)seats.push({building,spec,priority:this.priorities[spec.profession]??PRIORITY_RANGE.default});
     }
     return seats.sort((a,b)=>b.priority-a.priority||a.building.id-b.building.id);
   }
@@ -87,7 +92,25 @@ export class EmploymentSystem {
     }finally{this.running=false;}
     return hired;
   }
-  update(){if(this.dirty&&this.enabled&&!this.scene.gameTime?.paused){this.dirty=false;this.run();}}
+  update(){if(this.enabled&&!this.scene.gameTime?.paused)this.releaseSurplusWoodcutters();if(this.dirty&&this.enabled&&!this.scene.gameTime?.paused){this.dirty=false;this.run();}}
+  // m-drevorubci-stromy: a Woodcutter who has had no tree to fell for FORESTRY.surplusDays leaves a hut with more Woodcutters
+  // than mature trees and becomes Unemployed (automatic employment then places him elsewhere, or not at this hut). Checked
+  // every DIAGNOSTICS.checkInterval of game time; the waiting times are not saved (after Load the day starts again).
+  releaseSurplusWoodcutters(){
+    const s=this.scene,now=s.gameTime?.totalElapsed??0,forestry=s.naturalResources?.forestry,ws=s.workplaceSystem;if(!forestry||!ws||now<this.nextForestCheck)return 0;this.nextForestCheck=now+DIAGNOSTICS.checkInterval;
+    const limit=FORESTRY.surplusDays*(s.gameTime?.dayDuration??0),seen=new Set();let released=0;
+    for(const hut of forestry.huts()){
+      const staff=ws.employees(hut);if(!staff.length)continue;let surplus=staff.length-forestry.eligible(hut).length;
+      for(const worker of staff){
+        // The time of his last felling work (a task or cargo); resting or eating in between does not reset it.
+        seen.add(worker.id);const task=worker.workTask,busy=['chopTree','clearMark'].includes(task?.kind)||!!task?.naturalHarvest||worker.cargo?.resource==='wood',since=this.idleSince.get(worker.id);
+        if(busy||since?.hut!==hut.id){this.idleSince.set(worker.id,{hut:hut.id,at:now});continue;}
+        if(surplus>0&&now-since.at>=limit){ws.remove(worker);this.idleSince.delete(worker.id);surplus--;released++;}
+      }
+    }
+    for(const id of [...this.idleSince.keys()])if(!seen.has(id))this.idleSince.delete(id);
+    if(released)this.request();return released;
+  }
   importState(data){this.enabled=data?.enabled??this.enabled;this.priorities={...EMPLOYMENT_PRESETS.balanced,...(data?.priorities??{})};this.held=new Set(data?.held??[]);this.blockedBuildings=new Set(data?.blockedBuildings??[]);this.blockedTypes=new Set(data?.blockedTypes??[]);this.request();this.changed();}
   exportState(){this.pruneExclusions();return {blockedBuildings:[...this.blockedBuildings].sort((a,b)=>a-b),blockedTypes:[...this.blockedTypes].sort(),enabled:this.enabled,priorities:{...this.priorities},held:[...this.held].sort()};}
   destroy(){this.unsubscribe();this.scene.events?.off('buildings:changed',this.worldChanged);this.listeners.clear();}

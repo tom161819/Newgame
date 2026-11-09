@@ -15,7 +15,7 @@ import { objectRegistry } from '../src/systems/ObjectRegistry.js';
 import { FoodSystem } from '../src/systems/FoodSystem.js';
 import { GameTimeSystem } from '../src/systems/GameTimeSystem.js';
 import { Inventory } from '../src/game/inventory.js';
-import { DEV_BALANCE_KEYS,DEV_BALANCE_STORAGE_KEY,loadDevBalance,devFactor,devMode,setDevMode,setDevFactor,resetDevBalance,devBalanceValues } from '../src/data/devBalance.js';
+import { DEV_BALANCE_KEYS,devDefault,DEV_BALANCE_STORAGE_KEY,loadDevBalance,devFactor,devMode,setDevMode,setDevFactor,resetDevBalance,devBalanceValues } from '../src/data/devBalance.js';
 import { DevBalancePanel } from '../src/ui/DevBalancePanel.js';
 
 const memory=()=>{const m=new Map();return {getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),map:m};};
@@ -42,7 +42,7 @@ test('m-91: dev multipliers act whether or not the Dev tool is shown, are clampe
   setDevMode(false);setDevFactor('hunter',2);assert.equal(devFactor('hunter'),2,'the coefficients belong to the game, the switch only hides the icon');
   setDevMode(true);assert.equal(setDevFactor('fisher',9),4);assert.equal(setDevFactor('taxes',0),.25);assert.equal(setDevFactor('nonsense',2),false);
   assert.equal(JSON.parse(storage.getItem(DEV_BALANCE_STORAGE_KEY)).values,undefined,'values are no longer stored in the browser');loadDevBalance(storage);assert.equal(devFactor('hunter'),1,'a new start is ×1 (the save brings its own values)');
-  setDevFactor('hunter',2);resetDevBalance();assert.ok(DEV_BALANCE_KEYS.every(k=>devFactor(k)===1));assert.deepEqual(Object.keys(devBalanceValues()),DEV_BALANCE_KEYS);
+  setDevFactor('hunter',2);resetDevBalance();assert.ok(DEV_BALANCE_KEYS.every(k=>devFactor(k)===devDefault(k)),'Reset: every value at its default (×1; the forest sapling chance and hut boost their own)');assert.deepEqual(Object.keys(devBalanceValues()),DEV_BALANCE_KEYS);
   storage.setItem(DEV_BALANCE_STORAGE_KEY,'{broken');assert.doesNotThrow(()=>loadDevBalance(storage));assert.equal(devMode(),true);
   assert.doesNotThrow(()=>loadDevBalance({getItem(){throw new Error('denied');}}));setDevMode(true);setDevMode(false);
 });

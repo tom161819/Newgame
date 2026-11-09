@@ -5,7 +5,9 @@ import { FOOD_RESOURCE_IDS } from './foodProduction.js';
 export const DIAGNOSTICS=Object.freeze({checkInterval:2000,persistence:10000,
   // Plan m-e1-stavitele-material: a site whose materials are in the stores but have not arrived for this long gets a
   // notice, and its Builders start carrying them themselves even while a Hauler is free (a quarter of a game day).
-  materialWait:30000});
+  materialWait:30000,
+  // m-zelezny-dul-misto: how long (game days) the notice of a blueprint cancelled for an obstacle stays in Notices.
+  cancelledDays:2});
 export const NOTICE_CATEGORIES=Object.freeze(['construction','production']);
 // Where a production input comes from: the building that makes it, a field it needs, and the profession that works it.
 export const INPUT_SOURCES=Object.freeze({

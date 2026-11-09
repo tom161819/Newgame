@@ -24,7 +24,7 @@ export class ResourceTransactionLedger {
   }
   activity(event){
     const d=this.scene.objectRegistry.get(event.objectType),id=`economic:${event.id}`,entityId=event.objectId??event.objectIds?.[0]??event.actor?.id??null;
-    if(event.type==='treeChopped'&&d?.tree)this.income('wood',d.tree.wood,'Woodcutting',{id,entityId,type:'production'});
+    if(event.type==='treeChopped'&&d?.tree)this.income('wood',event.wood??d.tree.wood,'Woodcutting',{id,entityId,type:'production'});
     if(event.type==='depositMined'&&d?.deposit)this.income(d.deposit.resource,1,d.deposit.resource==='stone'?'Mining':'Iron Mining',{id,entityId,type:'production'});
     if(event.type==='cropHarvested'&&d?.crop)this.income(d.crop.resource,d.crop.yield,d.crop.resource==='apple'?'Orchard Harvest':'Farming',{id,entityId,type:'production'});
   }

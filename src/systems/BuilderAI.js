@@ -51,6 +51,12 @@ export class BuilderAI {
       }
       for(const goal of goals)choices.set(tileKey(goal),{goal,site});
     }
+    // m-drevorubci-stromy: a priority site (the first Granary, then the first Lumberjack Hut) goes first when reachable.
+    const ranks=[...new Set([...choices.values()].map(c=>system.priorityRank(c.site)))].sort((a,b)=>a-b);
+    for(const rank of ranks.slice(0,-1)){
+      const first=[...choices.values()].filter(c=>system.priorityRank(c.site)===rank),route=findPathToAny(scene.workerSystem.navigationMap(worker),start,first.map(c=>c.goal),scene.pathWear?.routingOptions(worker));
+      if(route){const {site}=choices.get(tileKey(route.destination));if(system.reserve(site,worker,route.destination)){worker.path=route.path;worker.workState='Traveling to Target';worker.workMessage=`Travelling to ${dataName(site.definition)}`;site.unreachableReason='';}return;}
+    }
     const route=findPathToAny(scene.workerSystem.navigationMap(worker),start,[...choices.values()].map(c=>c.goal),scene.pathWear?.routingOptions(worker));
     if(!route){
       for(const site of new Set([...choices.values()].map(c=>c.site)))if(!findPathToAny(scene.map,start,system.goals(site,worker))){this.blocked.set(`${worker.id}:${site.id}`,system.revision);site.unreachableReason=t('status.siteUnreachableSome');}

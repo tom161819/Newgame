@@ -11,7 +11,7 @@ const settle=page=>page.evaluate(()=>{const d=window.__game.registry.get('applic
 export async function storageNoticesSmoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);
   try{
-    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW4-155515555555-1');await page.locator('#start-game').click();
+    await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.diagnostics);
     await page.locator('#help-dialog[open]').waitFor({timeout:10000});await page.keyboard.press('Escape');
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.inventory.add('wood',40);s.inventory.add('stone',40);s.updateInventory();});
@@ -26,6 +26,13 @@ export async function storageNoticesSmoke(context,url,instrument){
     const quarry={id:await page.waitForFunction(()=>window.__game.registry.get('application').scene.buildings.find(b=>b.type==='quarry')?.id,null,{timeout:8000}).then(h=>h.jsonValue())};
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;if(s.buildMode)s.cancelBuilding?.();for(const d of document.querySelectorAll('dialog[open]'))d.close();s.setPaused(false);});
     assert.deepEqual(await finish(page,[quarry.id,hut.id]),[true,true]);
+    // m-drevorubci-stromy: automatic employment only sends Woodcutters to a hut with mature trees in its radius; this
+    // world's hut site has none, so the fixture grows three beside it.
+    await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id),n=s.naturalResources,d=s.objectRegistry.require('oak_tree');let added=0;
+      for(let r=3;r<10&&added<3;r++)for(let y=b.y-r;y<=b.y+r&&added<3;y++)for(let x=b.x-r;x<=b.x+r&&added<3;x++){const t={x,y},key=`${x},${y}`;
+        if(s.map[y]?.[x]!==0||s.resourceOccupancy.has(key)||s.buildings.some(o=>o.tiles.some(p=>p.x===x&&p.y===y))||!n.preservesRoutes(t))continue;
+        s.addResource(d,t,{id:`tree-${n.nextId++}`,kind:'tree',stage:3,growthDays:0,ageDays:10,cycle:0,workDone:0,growthCheckpoint:n.growthClock,ageCheckpoint:n.ageClock});added++;}
+      s.employment.request();},hut.id);
     // 1. The Quarry's deposit runs out.
     await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id);s.naturalResources.byId.get(b.depositId).natural.remaining=0;},quarry.id);
     await settle(page);

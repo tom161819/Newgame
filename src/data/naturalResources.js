@@ -6,6 +6,11 @@ export const FORESTRY=Object.freeze({
   // stays, so 3 Woodcutters × 6 still fit the 20-unit hut pile and saves keep their reservations).
   // Saves from before keep partial chopping up to the earlier 15 s (the tree then falls at the next work step).
   legacyChopDuration:15000,
+  // m-drevorubci-stromy (playtest 0.83.0 #1): after felling, a Woodcutter plants a sapling on the stump with this chance
+  // (it skips the stump day); young trees and stumps inside a finished Lumberjack Hut's radius grow this much faster.
+  // Both are Dev tool values (Forest and wood); `surplusDays`: a Woodcutter without a tree to fell for this long leaves
+  // a hut with more Woodcutters than mature trees (automatic employment on).
+  saplingChance:.5,hutGrowthBoost:1.5,surplusDays:1,
   trees:Object.freeze({oak_tree:Object.freeze({wood:6,xp:15,chopDuration:7000}),pine_tree:Object.freeze({wood:5,xp:12,chopDuration:7000})}),
 });
 export const TREE_STAGES=Object.freeze(['Stump','Sapling','Young tree','Mature tree']);

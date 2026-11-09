@@ -9,6 +9,7 @@ import { ForestryWork } from './ForestryWork.js';
 import { MineralSystem } from './MineralSystem.js';
 import { resourceBlocks } from '../data/minerals.js';
 import { MiningWork } from './MiningWork.js';
+import { devFactor,devTreeWood,devChopDuration } from '../data/devBalance.js';
 
 // m-drobnosti-076 (report 0.76.0 point 10): "wood lies by the stump" only for the King's own felling while he is the
 // one the player controls (no residents selected) – he stands at that stump. A Woodcutter's felling stays silent (it
@@ -16,7 +17,7 @@ import { MiningWork } from './MiningWork.js';
 export const stumpMessageShown=(scene,actor)=>!!actor&&actor===scene?.character&&!(scene.unitSelection?.ids?.size>0);
 export class NaturalResourcesSystem {
   constructor(scene){
-    this.scene=scene;this.nextId=1;this.nextDepositId=1;this.growthClock=0;this.ageClock=0;this.refreshElapsed=0;this.byId=new Map();this.kingTask=null;this.topologyRevision=0;
+    this.scene=scene;this.nextId=1;this.nextDepositId=1;this.growthClock=0;this.ageClock=0;this.refreshElapsed=0;this.byId=new Map();this.kingTask=null;this.topologyRevision=0;this.random=Math.random;
     this.unsubscribe=scene.gameTime.onAdvance(delta=>this.advance(delta));
     this.forestry=new ForestryWork(scene,this);
     this.miningWork=new MiningWork(scene,this);
@@ -69,22 +70,26 @@ export class NaturalResourcesSystem {
     return added;
   }
   advance(delta){
-    this.ageClock+=delta/this.scene.gameTime.dayDuration;this.growthClock+=delta/this.scene.gameTime.dayDuration*this.growthModifier();this.refreshElapsed+=delta;
+    this.ageClock+=delta/this.scene.gameTime.dayDuration;this.growthClock+=delta/this.scene.gameTime.dayDuration*this.growthModifier()*devFactor('forestGrowth');this.refreshElapsed+=delta;
     if(this.refreshElapsed+1e-7>=FORESTRY.refreshInterval){this.refreshElapsed=Math.max(0,this.refreshElapsed-FORESTRY.refreshInterval*Math.floor((this.refreshElapsed+1e-7)/FORESTRY.refreshInterval));this.flushGrowth();}
   }
   flushGrowth(){
     // performance-1: building tiles and the reachable count are read once per pass (both change only with a stage).
     const reserved=this.reserved(),built=new Set(),routes={};for(const b of this.scene.buildings)for(const t of b.tiles)built.add(tileKey(t));
+    // m-drevorubci-stromy: stumps and young trees inside a finished Lumberjack Hut's radius grow faster (Dev tool value).
+    const huts=this.forestry.huts(),boost=devFactor('hutGrowthBoost');let matured=false;
     for(const object of this.byId.values()){
       if(!object.definition.tree)continue;
       const n=object.natural;n.ageDays+=Math.max(0,this.ageClock-n.ageCheckpoint);n.ageCheckpoint=this.ageClock;const growth=Math.max(0,this.growthClock-n.growthCheckpoint);n.growthCheckpoint=this.growthClock;
-      if(n.stage===3||built.has(tileKey(object)))continue;n.growthDays+=growth;
+      if(n.stage===3||built.has(tileKey(object)))continue;n.growthDays+=growth*(boost!==1&&huts.some(h=>this.forestry.inRadius(h,object))?boost:1);
       while(n.stage<3&&n.growthDays+1e-9>=FORESTRY.stageDays[n.stage]){
         if(this.growthModifier()===0)break;
         if(n.stage===2&&(reserved.has(tileKey(object))||this.scene.map[object.y][object.x]!==0||!this.preservesRoutes(object,routes))){n.growthDays=FORESTRY.stageDays[n.stage];break;}
-        n.growthDays=Math.max(0,n.growthDays-FORESTRY.stageDays[n.stage]);n.stage++;if(n.stage===3)n.growthDays=0;this.refreshMap(object);this.view(object)?.setNaturalState?.(object);routes.before=undefined;
+        n.growthDays=Math.max(0,n.growthDays-FORESTRY.stageDays[n.stage]);n.stage++;if(n.stage===3){n.growthDays=0;matured=true;}this.refreshMap(object);this.view(object)?.setNaturalState?.(object);routes.before=undefined;
       }
     }
+    // A new mature tree may open Woodcutter seats that automatic employment held back (no tree to fell).
+    if(matured)this.scene.employment?.request?.();
   }
   refreshSeason(){const season=this.scene.seasons?.season??'Spring';if(season===this.visualSeason)return;this.visualSeason=season;for(const object of this.byId.values())this.view(object)?.setSeason?.(season);}
   goals(object){return[{x:object.x-1,y:object.y},{x:object.x+1,y:object.y},{x:object.x,y:object.y-1},{x:object.x,y:object.y+1}].filter(t=>this.scene.map[t.y]?.[t.x]===0);}
@@ -111,14 +116,17 @@ export class NaturalResourcesSystem {
   }
   work(object,actor,delta){
     if(!Number.isFinite(delta)||delta<=0||this.scene.gameTime.paused||this.scene.gameOver||actor.mountedHorse)return false;
-    const n=object.natural,rule=object.definition.tree;if(n.stage!==3||!actor.isAlive||actor.nextTile||actor.path.length||!this.goals(object).some(t=>t.x===actor.tile.x&&t.y===actor.tile.y)||this.scene.workerSystem.reservations.owners.get(this.reservation(object))!==actor.id)return false;
-    n.workDone=Math.min(rule.chopDuration,n.workDone+delta*this.scene.skillSystem.workEfficiency(actor,'woodcutting'));this.view(object)?.showWork?.(n.workDone/rule.chopDuration);if(n.workDone+1e-7<rule.chopDuration)return false;
+    const n=object.natural,rule=object.definition.tree,duration=devChopDuration(rule),wood=devTreeWood(rule);if(n.stage!==3||!actor.isAlive||actor.nextTile||actor.path.length||!this.goals(object).some(t=>t.x===actor.tile.x&&t.y===actor.tile.y)||this.scene.workerSystem.reservations.owners.get(this.reservation(object))!==actor.id)return false;
+    n.workDone=Math.min(duration,n.workDone+delta*this.scene.skillSystem.workEfficiency(actor,'woodcutting'));this.view(object)?.showWork?.(n.workDone/duration);if(n.workDone+1e-7<duration)return false;
     // Commit the stump before drops/XP: another actor, frame or load cannot repeat a harvest.
     // m-oznacovani-tezby (51): a felled tree is no longer marked.
-    n.stage=0;n.growthDays=0;n.growthCheckpoint=this.growthClock;n.workDone=0;n.cycle++;this.miningWork.rocks.trees.delete(n.id);this.refreshMap(object);this.view(object)?.setNaturalState?.(object);this.scene.workerSystem.reservations.release(this.reservation(object),actor.id);if(actor.id==='king')this.kingTask=null;
+    // m-drevorubci-stromy: a Woodcutter plants a sapling on the stump (Dev tool chance) – not on a tree marked for
+    // removal or under a building plan, and never the King.
+    const marked=this.miningWork.rocks.trees.has(n.id),plant=actor.profession==='woodcutter'&&!marked&&!this.occupiedByBuilding(object)&&this.random()<devFactor('saplingChance');
+    n.stage=plant?1:0;n.growthDays=0;n.growthCheckpoint=this.growthClock;n.workDone=0;n.cycle++;this.miningWork.rocks.trees.delete(n.id);this.refreshMap(object);this.view(object)?.setNaturalState?.(object);this.scene.workerSystem.reservations.release(this.reservation(object),actor.id);if(actor.id==='king')this.kingTask=null;
     // m-oznacovani-tezby (56): a tree under a wall plan drops its wood where the cutter stands, not inside the site.
-    this.scene.dropSystem.create('wood',this.scene.map[object.y][object.x]===0?{x:object.x,y:object.y}:{...actor.tile},rule.wood,null,{rewardRemaining:0,rewardUnits:0});
-    this.scene.activities.emit('treeChopped',{actor,objectType:object.type,quantity:1,objectIds:[n.id]},`tree:${n.id}:${n.cycle}`);if(stumpMessageShown(this.scene,actor))this.scene.setStatus(t('status.woodBesideStump',{count:rule.wood}));return true;
+    this.scene.dropSystem.create('wood',this.scene.map[object.y][object.x]===0?{x:object.x,y:object.y}:{...actor.tile},wood,null,{rewardRemaining:0,rewardUnits:0});
+    this.scene.activities.emit('treeChopped',{actor,objectType:object.type,quantity:1,wood,objectIds:[n.id]},`tree:${n.id}:${n.cycle}`);if(stumpMessageShown(this.scene,actor))this.scene.setStatus(t('status.woodBesideStump',{count:wood}));return true;
   }
   exportState(){this.flushGrowth();return{nextId:this.nextId,nextDepositId:this.nextDepositId,growthClock:this.growthClock,ageClock:this.ageClock,refreshElapsed:this.refreshElapsed,kingTask:structuredClone(this.kingTask),rockMining:this.miningWork.rocks.exportState()};}
   importState(data){this.cancelKing();const {rockMining,...rest}=structuredClone(data);Object.assign(this,rest);this.miningWork.rocks.importState(rockMining);if(this.kingTask){const object=this.byId.get(this.kingTask.treeId);this.scene.workerSystem.reservations.reserve(this.reservation(object),'king');}this.refreshSeason();}

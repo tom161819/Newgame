@@ -6,7 +6,7 @@ import { mkdir } from 'node:fs/promises';
 // front tile (the screenshots carry a second copy with the footprint outlined); thickets and ridges change with the
 // season, a large deposit falls back to the medium pile once mined below two thirds, and Save/Load keeps them all.
 // Screenshots in /tmp/shots/ (SMOKE_SHOTS overrides the folder).
-const CODE='MKW4-155515555555-7KQ9X2';
+const CODE='MKW5-155515555555-7KQ9X2';
 export async function bigNatureSmoke(context,url,instrument){
   const shots=process.env.SMOKE_SHOTS??'/tmp/shots';await mkdir(shots,{recursive:true});
   const page=await context.newPage();await instrument?.(page);const missing=[],errors=[];

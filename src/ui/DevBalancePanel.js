@@ -1,8 +1,8 @@
 import { t,onLanguageChange } from '../i18n/index.js';
-import { DEV_MAIN_KEYS,DEV_ADVANCED_KEYS,DEV_BALANCE_RANGE,DEV_QUICK,loadDevBalance,devMode,setDevMode,setDevFactor,resetDevBalance,devBalanceValues,devBalanceJSON,devBalanceChanged,devTooltipDelay,setDevTooltipDelay,onDevBalanceChange } from '../data/devBalance.js';
+import { DEV_MAIN_KEYS,DEV_ADVANCED_KEYS,DEV_FOREST_KEYS,devRange,DEV_QUICK,loadDevBalance,devMode,setDevMode,setDevFactor,resetDevBalance,devBalanceValues,devBalanceJSON,devBalanceChanged,devTooltipDelay,setDevTooltipDelay,onDevBalanceChange } from '../data/devBalance.js';
 import { BUILDING_TOOLTIP } from '../data/buildingTooltip.js';
 import { FrameProfiler,PROFILER_RULES } from '../systems/FrameProfiler.js';
-import { arrivalForecast,economyOverview,addDevGold,addDevResources,advanceDevDay,summonDevCaravan,addDevResident } from '../systems/DevTools.js';
+import { arrivalForecast,economyOverview,forestOverview,addDevGold,addDevResources,advanceDevDay,summonDevCaravan,addDevResident } from '../systems/DevTools.js';
 
 // m-91-asset-library-dev (owner point 88): the Dev tool. An icon right under the Settings icon opens a pop-up menu
 // (click again or Esc closes): the coefficients of src/data/devBalance.js (saved in the save), the arrival forecast,
@@ -30,7 +30,7 @@ export class DevBalancePanel {
     this.title=el(doc,'h2',{id:'dev-balance-title'});this.close=el(doc,'button',{type:'button',id:'dev-balance-close',textContent:'×'});
     this.sliders=new Map();
     const slider=key=>{
-      const input=el(doc,'input',{type:'range',min:String(DEV_BALANCE_RANGE.min),max:String(DEV_BALANCE_RANGE.max),step:String(DEV_BALANCE_RANGE.step),id:`dev-balance-${key}`});input.dataset.devKey=key;
+      const r=devRange(key),input=el(doc,'input',{type:'range',min:String(r.min),max:String(r.max),step:String(r.step),id:`dev-balance-${key}`});input.dataset.devKey=key;
       const out=el(doc,'output',{htmlFor:input.id}),label=el(doc,'label',{htmlFor:input.id});
       input.addEventListener('input',()=>setDevFactor(key,+input.value),options);this.sliders.set(key,{input,out,label});
       return el(doc,'div',{className:'dev-balance-row'},[label,out,input]);
@@ -40,6 +40,8 @@ export class DevBalancePanel {
     const arrival=el(doc,'div',{className:'dev-balance-arrival'},[slider('immigration'),this.forecast]);
     const list=el(doc,'div',{className:'dev-balance-sliders'},DEV_MAIN_KEYS.filter(k=>k!=='immigration').map(slider));
     this.advancedSummary=el(doc,'summary');this.advanced=el(doc,'details',{id:'dev-balance-advanced',className:'dev-balance-advanced'},[this.advancedSummary,...DEV_ADVANCED_KEYS.map(slider)]);
+    // m-drevorubci-stromy: "Forest and wood" (saved and reset like the others).
+    this.forestSummary=el(doc,'summary');this.forest=el(doc,'details',{id:'dev-balance-forest',className:'dev-balance-advanced dev-balance-forest'},[this.forestSummary,...DEV_FOREST_KEYS.map(slider)]);
     // Economy overview (read only).
     this.overviewHeading=el(doc,'h3',{className:'dev-balance-subheading'});this.overview=el(doc,'div',{id:'dev-balance-overview',className:'dev-balance-overview'});
     // Quick actions.
@@ -56,7 +58,7 @@ export class DevBalancePanel {
     this.profileButton=el(doc,'button',{type:'button',id:'dev-profiler-toggle'});this.profileButton.setAttribute('aria-pressed','false');
     this.profileOut=el(doc,'pre',{id:'dev-profiler',className:'dev-profiler',hidden:true});this.profileOut.setAttribute('role','status');
     this.profiler=scene?.game?new FrameProfiler(scene.game,{scene:()=>this.scene}):null;
-    this.panel.append(el(doc,'div',{className:'settings-heading'},[this.title,this.close]),arrival,list,this.advanced,this.overviewHeading,this.overview,this.actionsHeading,quick,tooltipSection,el(doc,'div',{className:'dev-balance-actions'},[this.reset,this.copy,this.profileButton,this.status]));
+    this.panel.append(el(doc,'div',{className:'settings-heading'},[this.title,this.close]),arrival,list,this.advanced,this.forest,this.overviewHeading,this.overview,this.actionsHeading,quick,tooltipSection,el(doc,'div',{className:'dev-balance-actions'},[this.reset,this.copy,this.profileButton,this.status]));
     doc.body?.append(this.profileOut);doc.body?.append(this.panel);
     this.profileButton.addEventListener('click',()=>this.setProfiling(!this.profiler?.enabled),options);
     const view=doc.defaultView;
@@ -110,9 +112,9 @@ export class DevBalancePanel {
     this.row.querySelector('label').textContent=t('dev.mode');this.button.title=t('dev.tool.open');this.button.setAttribute('aria-label',t('dev.tool.open'));this.title.textContent=t('dev.tool.title');
     const changed=devBalanceChanged();this.dot.hidden=!changed;this.button.classList?.toggle?.('dev-tool-changed',changed);
     this.close.setAttribute('aria-label',t('dev.balance.close'));this.reset.textContent=t('dev.balance.reset');this.copy.textContent=t('dev.balance.copy');if(this.profileButton){this.profileButton.textContent=t('dev.profiler.toggle');this.profileButton.title=t('dev.profiler.hint');}
-    this.advancedSummary.textContent=t('dev.tool.advanced');this.overviewHeading.textContent=t('dev.tool.overview');this.actionsHeading.textContent=t('dev.tool.actions');
+    this.advancedSummary.textContent=t('dev.tool.advanced');this.forestSummary.textContent=t('dev.tool.forest');this.overviewHeading.textContent=t('dev.tool.overview');this.actionsHeading.textContent=t('dev.tool.actions');
     for(const [id,b]of this.actionButtons)b.textContent=t(`dev.action.${id}`,{gold:DEV_QUICK.gold,amount:DEV_QUICK.resources});
-    const values=devBalanceValues();for(const [key,{input,out,label}]of this.sliders){input.value=String(values[key]);out.textContent=`×${values[key].toFixed(2)}`;label.textContent=t(`dev.balance.key.${key}`);}
+    const values=devBalanceValues();for(const [key,{input,out,label}]of this.sliders){input.value=String(values[key]);out.textContent=key==='saplingChance'?`${Math.round(values[key]*100)} %`:`×${values[key].toFixed(2)}`;label.textContent=t(`dev.balance.key.${key}`);}
     const delay=devTooltipDelay();this.tooltipDelay.value=String(delay);this.tooltipOut.textContent=t('dev.tooltip.value',{seconds:delay.toFixed(1)});this.tooltipLabel.textContent=t('dev.tooltip.delay');this.tooltipHeading.textContent=t('dev.tooltip.title');
     this.renderLive();
   }
@@ -128,7 +130,9 @@ export class DevBalancePanel {
     const name=id=>this.scene.objectRegistry?.get?.(id)?.name??id,cell=v=>`+${f(v.income)} / −${f(v.expenses)}`;
     const head=el(doc,'tr',{},[el(doc,'th'),el(doc,'th',{textContent:o.day?t('dev.overview.lastDay',{day:o.day}):t('dev.overview.noDay')}),el(doc,'th',{textContent:o.days?t('dev.overview.average',{days:o.days}):'—'})]);
     const rows=[o.gold,...o.food,...o.materials].map(r=>el(doc,'tr',{},[el(doc,'th',{textContent:name(r.resource)}),el(doc,'td',{textContent:cell(r.last)}),el(doc,'td',{textContent:cell(r.average)})]));
-    this.overview.replaceChildren(el(doc,'table',{},[el(doc,'tbody',{},[head,...rows])]),el(doc,'p',{textContent:t('dev.overview.people',{happiness:o.happiness??'—',unemployed:o.unemployed,residents:o.residents,beds:o.freeBeds})}));
+    this.overview.replaceChildren(el(doc,'table',{},[el(doc,'tbody',{},[head,...rows])]),el(doc,'p',{textContent:t('dev.overview.people',{happiness:o.happiness??'—',unemployed:o.unemployed,residents:o.residents,beds:o.freeBeds})}),this.forestLine());
   }
+  // m-drevorubci-stromy: mature / young trees in the Lumberjack Huts' radii and Wood a day (ledger, Ø of the closed days).
+  forestLine(){const f=forestOverview(this.scene);return el(this.doc,'p',{id:'dev-forest-overview',textContent:t('dev.overview.forest',{huts:f.huts,mature:f.mature,young:f.young,wood:(Math.round(f.woodPerDay*10)/10).toString()})});}
   destroy(){this.controller.abort();clearInterval(this.timer);clearInterval(this.profileTimer);this.profiler?.destroy();this.profileOut?.remove();this.unsubscribeLanguage?.();this.unsubscribeValues?.();this.row?.remove();if(this.createdButton)this.button?.remove();else{this.button.hidden=true;this.dot.hidden=true;}this.panel?.remove();}
 }

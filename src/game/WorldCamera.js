@@ -42,6 +42,12 @@ export class WorldCamera {
     document.querySelector('#camera-mode').textContent = t('hud.cameraKing');
   }
 
+  // m-drevorubci-stromy / m-zelezny-dul-misto: a notice link pans the camera to a grid point (manual camera, like the minimap).
+  lookAt(point){
+    if(!point||this.scene.gameOver)return false;const p=gridToWorld(point.x,point.y);this.panTarget=clampMapCenter(p.x,p.y-25);this.following=false;
+    const mode=document.querySelector('#camera-mode');if(mode)mode.textContent=t('hud.cameraManual');return true;
+  }
+
   locate(unit){
     // m-obyvatele-jmena-spanek-pohyb (42): a resident asleep inside is found at his House (or the Castle).
     const shelter=unit.sleepingIn!=null?this.scene.buildings?.find(b=>b.id===unit.sleepingIn):null;

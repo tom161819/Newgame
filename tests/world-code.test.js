@@ -14,13 +14,13 @@ const snapshot=w=>JSON.stringify({terrain:w.terrain,ground:exportGround(w.ground
 const seeded=seed=>{let n=seed;return ()=>((n=Math.imul(n,1664525)+1013904223>>>0)/2**32);};
 
 test('world code: MKW<generator>-<levels>-<seed base36>, round trip, lower case accepted', () => {
-  assert.equal(WORLD_GENERATOR_VERSION,4,'velke-prirodni-objekty: generator 4 (thickets, rock ridges and groups, large deposits)');assert.equal(WORLD_SETTINGS.length,12);
-  const code=encodeWorldCode({levels:defaultWorldLevels(),seed:parseInt('7KQ9X2',36)});assert.equal(code,'MKW4-155515555555-7KQ9X2');
-  assert.deepEqual(decodeWorldCode(` ${code.toLowerCase()} `),{generator:4,levels:defaultWorldLevels(),seed:parseInt('7KQ9X2',36)});
+  assert.equal(WORLD_GENERATOR_VERSION,5,'m-zelezny-dul-misto: generator 5 (a free Iron Mine spot beside the nearest Iron Deposit)');assert.equal(WORLD_SETTINGS.length,12);
+  const code=encodeWorldCode({levels:defaultWorldLevels(),seed:parseInt('7KQ9X2',36)});assert.equal(code,'MKW5-155515555555-7KQ9X2');
+  assert.deepEqual(decodeWorldCode(` ${code.toLowerCase()} `),{generator:5,levels:defaultWorldLevels(),seed:parseInt('7KQ9X2',36)});
   assert.equal(decodeWorldCode(encodeWorldCode({seed:WORLD_SEED_MAX})).seed,WORLD_SEED_MAX);assert.equal(decodeWorldCode(encodeWorldCode({seed:0})).seed,0);
-  for(const bad of ['','MKW3','MKW4-15551555555-A','MKW4-155515555555-','MKW4-355515555555-A','MKW4-155545555555-A','MKW4-155515555555-123456789','XYZ3-155515555555-A',42,null])
+  for(const bad of ['','MKW4','MKW5-15551555555-A','MKW5-155515555555-','MKW5-355515555555-A','MKW5-155545555555-A','MKW5-155515555555-123456789','XYZ3-155515555555-A',42,null])
     assert.throws(()=>decodeWorldCode(bad),e=>e.reason==='invalid'&&e.message==='Invalid world code',String(bad));
-  assert.throws(()=>decodeWorldCode('MKW1-155515555555-A'),e=>e.reason==='generator'&&e.message==='This world code is for generator version 1; this build uses version 4.');
+  assert.throws(()=>decodeWorldCode('MKW1-155515555555-A'),e=>e.reason==='generator'&&e.message==='This world code is for generator version 1; this build uses version 5.');
   // m-kamenolom-u-hradu: a generator-2 code (0.77.x) is refused for a New Game, but a saved game keeps it (current:null).
   assert.throws(()=>decodeWorldCode('MKW2-155515555555-7KQ9X2'),e=>e.reason==='generator');
   assert.deepEqual(decodeWorldCode('MKW2-155515555555-7KQ9X2',{current:null}),{generator:2,levels:defaultWorldLevels(),seed:parseInt('7KQ9X2',36)});
@@ -28,8 +28,11 @@ test('world code: MKW<generator>-<levels>-<seed base36>, round trip, lower case 
   // velke-prirodni-objekty: a generator-3 code (0.78–0.82) is refused for a New Game too; its saved games keep it.
   assert.throws(()=>decodeWorldCode('MKW3-155515555555-7KQ9X2'),e=>e.reason==='generator');
   assert.equal(decodeWorldCode('MKW3-155515555555-7KQ9X2',{current:null}).generator,3);
+  // m-zelezny-dul-misto: a generator-4 code (0.83) is refused for a New Game too; its saved games keep it.
+  assert.throws(()=>decodeWorldCode('MKW4-155515555555-SU24BGPY'),e=>e.reason==='generator');
+  assert.equal(decodeWorldCode('MKW4-155515555555-SU24BGPY',{current:null}).generator,4);
   assert.throws(()=>encodeWorldCode({seed:-1}));assert.throws(()=>encodeWorldCode({seed:1,levels:[1,2]}));
-  assert.match(randomWorldCode(),/^MKW4-155515555555-[0-9A-Z]{1,8}$/);
+  assert.match(randomWorldCode(),/^MKW5-155515555555-[0-9A-Z]{1,8}$/);
 });
 
 test('world code: simple Water / Desert / Forest choices set their levels; other changes read as Custom', () => {

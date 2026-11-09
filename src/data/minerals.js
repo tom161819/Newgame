@@ -12,6 +12,11 @@ export const depositFamily=type=>{const id=typeof type==='string'?type:type?.id;
 // `min`–`max` tiles from the Castle's centre; the Quarry footprint keeps `clearance` tiles (footprint distance) from the
 // Castle and the Starter Stockpile. Manual rocks within `rocksWithin` tiles are checked by tests (the start walls).
 export const START_QUARRY=Object.freeze({min:8,max:16,clearance:3,rocksWithin:10,keepClearOf:Object.freeze(['castle','starter_stockpile'])});
+// m-zelezny-dul-misto (playtest 0.83.0 #5, generator 5): the Iron Deposit nearest to the Castle has a free Iron Mine spot
+// right beside it (footprint distance ≤ `beside`, not on the deposit, by the game's placement rules, clear of the start
+// buildings, reachable, cutting nothing off). When the nearest one has none, an ordinary Iron Deposit with such a spot is
+// added `min`–`max` tiles from the Castle (nearer than the old nearest), from its own stream.
+export const START_IRON_MINE=Object.freeze({min:12,max:24,beside:1});
 export const MINING_WORK=Object.freeze({
   quarry:Object.freeze({resource:'stone',depositType:'stone_deposit',duration:12000,xp:5,overlap:true}),
   iron_mine:Object.freeze({resource:'iron_ore',depositType:'iron_deposit',duration:20000,xp:8,range:4,overlap:false}),

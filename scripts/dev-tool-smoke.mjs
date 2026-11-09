@@ -15,7 +15,7 @@ export async function devToolSmoke(context,url,instrument){
     assert.ok(Math.abs((s.x+s.width/2)-(d.x+d.width/2))<=2&&d.y>s.y+s.height&&d.y-(s.y+s.height)<=16,`icon right under Settings (${JSON.stringify(s)} / ${JSON.stringify(d)})`);
     assert.equal(await page.locator('.dev-tool-dot').isVisible(),false,'no dot at ×1');
     await icon.click();await page.locator('#dev-balance-panel').waitFor({state:'visible'});
-    assert.equal(await page.locator('#dev-balance-panel input[type=range]').count(),17,'16 coefficients and the tooltip delay');
+    assert.equal(await page.locator('#dev-balance-panel input[type=range]').count(),23,'16 coefficients, 6 Forest and wood values (m-drevorubci-stromy) and the tooltip delay');
     const first=await page.locator('#dev-balance-panel input[type=range]').first().getAttribute('id');assert.equal(first,'dev-balance-immigration','Arrival first');
     assert.match(await page.locator('#dev-arrival-forecast').textContent(),/Next resident in ~[\d.]+ h/);
     const taxes=()=>page.evaluate(()=>window.__game.registry.get('application').scene.policy.dailyTaxes());const before=await taxes();

@@ -9,6 +9,7 @@ import { advanceConstruction } from './ConstructionProgress.js';
 import { devFactor } from '../data/devBalance.js';
 import { BuilderAI } from './BuilderAI.js';
 import { ConstructionMaterialsSystem } from './ConstructionMaterialsSystem.js';
+import { siteObstacle } from '../game/siteObstacles.js';
 
 export class ConstructionSystem {
   constructor(scene,{onProgress=()=>{},onComplete=()=>{},onCancel=()=>{}}={}){
@@ -21,6 +22,13 @@ export class ConstructionSystem {
     if(building.construction)return building;
     building.id=Math.max(building.id,this.nextId);this.nextId=building.id+1;if(building.type==='quarry'&&!building.depositId)building.quarryMode='unbound';initializeConstructionSite(building);this.materials.registerLegacy(building);// S11: a pavement blueprint never blocks the way; people keep walking over it while it is laid.
     if(!building.unverified&&!buildingDefinition(building).pavement)for(const tile of building.tiles)this.scene.map[tile.y][tile.x]=1;this.sites.set(building.id,building);this.clearing()?.markPlan(building);this.revision++;this.scene.events?.emit('buildings:changed');return building;
+  }
+  // m-drevorubci-stromy: 0 for the first Granary / Lumberjack Hut site while none of its type is finished (1 for the
+  // second type…), otherwise firstPriority.length. Builders take the lowest rank they can reach; Haulers supply it first.
+  priorityRank(site){
+    const rules=CONSTRUCTION_RULES.firstPriority,rank=rules.indexOf(site?.type);if(rank<0||site.demolition||site.unverified)return rules.length;
+    const s=this.scene;if(s.buildings.some(b=>b.type===site.type&&buildingIsComplete(b)))return rules.length;
+    const first=[...this.sites.values()].filter(b=>b.type===site.type&&!b.unverified&&!b.demolition).reduce((a,b)=>!a||b.id<a.id?b:a,null);return first===site?rank:rules.length;
   }
   getSite(id){return this.sites.get(id)??this.scene.demolition?.site(id)??null;}
   workSites(){return [...this.sites.values(),...(this.scene.demolition?.sites()??[])];}
@@ -85,7 +93,8 @@ export class ConstructionSystem {
   verifyProvisional(site){
     const fog=this.scene.fog;if(fog?.enabled&&!site.tiles.every(tile=>fog.isInSightTile(tile)))return false;
     const d=buildingDefinition(site),others=this.scene.buildings.filter(b=>b!==site);
-    if(placementError(this.scene.map,site,this.scene.resourceOccupancy,[],d,others,{status:()=>({unlocked:true})})){this.cancel(site,{obstacle:true});return false;}
+    // m-zelezny-dul-misto: the cancelled order names its reason (Rock, Tree, Out of deposit range…) in Notices.
+    if(placementError(this.scene.map,site,this.scene.resourceOccupancy,[],d,others,{status:()=>({unlocked:true})})){this.cancel(site,{obstacle:true,reason:siteObstacle(this.scene,{x:site.x,y:site.y},d,{ignore:site})});return false;}
     // reservedTiles() also lists building footprints (this site included); only units standing on the site make it wait.
     const footprints=new Set(this.scene.buildings.flatMap(b=>b.tiles).map(tileKey)),occupied=new Set((this.scene.reservedTiles?.()??[]).map(tileKey).filter(key=>!footprints.has(key)));
     if(site.tiles.some(tile=>occupied.has(tileKey(tile))))return false;
@@ -131,7 +140,7 @@ export class ConstructionSystem {
     this.scene.events?.emit('buildings:changed');this.onComplete(site);return true;
   }
   // obstacle: a provisional site found blocked; reported once as constructionCancelled (reason obstacle).
-  cancel(site,{obstacle=false}={}){
+  cancel(site,{obstacle=false,reason=null}={}){
     if(!this.sites.has(site.id))return false;
     const c=site.construction,refund=Object.fromEntries(Object.entries(c.investedMaterials).map(([id,n])=>[id,c.workDone>0?Math.floor(n*.5):n]));
     for(const id of [...c.assignedBuilders]){const actor=this.actor(id);if(!actor)continue;if(id==='king')this.stopKing();else this.scene.workerSystem.ai.cancel(actor);}
@@ -139,7 +148,7 @@ export class ConstructionSystem {
     // A provisional site never claimed its tiles, so the map under it is left exactly as it is.
     if(!site.unverified){for(const tile of site.tiles)this.scene.map[tile.y][tile.x]=this.scene.terrainGrid[tile.y][tile.x];this.scene.naturalResources?.mining.restoreTiles(site.tiles);}
     if(!this.materials.cancel(site,refund))for(const [id,n]of Object.entries(refund))this.scene.inventory.add(id,n,{source:'Construction Refund',type:'refund',id:`construction-refund:${site.id}:${id}`,entityId:site.id});this.revision++;this.scene.events?.emit('buildings:changed');this.onCancel(site,refund);
-    if(obstacle){this.scene.activities?.emit('constructionCancelled',{reason:'obstacle',objectType:site.type,objectIds:[site.id],tile:{x:site.x,y:site.y}});this.scene.setStatus?.(t('status.obstacleFound',{name:buildingDefinition(site).name}));}
+    if(obstacle){this.scene.activities?.emit('constructionCancelled',{reason:'obstacle',obstacle:reason,objectType:site.type,objectIds:[site.id],tile:{x:site.x,y:site.y}});this.scene.setStatus?.(t('status.obstacleFound',{name:buildingDefinition(site).name}));}
     return true;
   }
   estimatedSeconds(site){const rate=this.activeBuilders(site).reduce((sum,p)=>sum+this.workSpeed(site,p.actor),0);return rate?(site.construction.requiredWork-site.construction.workDone)/rate/1000:null;}

@@ -1,4 +1,4 @@
-import { MINERAL_DEPOSITS,START_QUARRY,resourceBlocks,depositFamily } from '../data/minerals.js';
+import { MINERAL_DEPOSITS,START_QUARRY,START_IRON_MINE,resourceBlocks,depositFamily } from '../data/minerals.js';
 import { reachableTiles } from '../game/pathfinding.js';
 import { buildingTiles,buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
@@ -69,6 +69,43 @@ export class MineralSystem {
       s.addResource(definition,anchor,state);return {deposit:this.natural.byId.get(state.id),added:true};
     }
     return {deposit:null,added:false};
+  }
+  // m-zelezny-dul-misto: an Iron Mine anchor right beside the Iron Deposit `deposit` ({x,y,definition}, placed or not)
+  // that the placement rules accept at the start (as startQuarrySite): every footprint tile free, not on the deposit,
+  // clear of the Castle and the Starter Stockpile, blocking mine and deposit cuts nothing off and both keep a reachable
+  // work position. Nearest spots first (ties by position). Null when there is none.
+  ironMineSite(deposit,{free=this.startFree(),before=null}={}){
+    const s=this.scene,mine=s.objectRegistry.require('iron_mine'),dep={x:deposit.x,y:deposit.y,definition:deposit.definition},depositTiles=buildingTiles(dep,dep.definition),near=START_IRON_MINE.beside;
+    const starts=s.buildings.filter(b=>START_QUARRY.keepClearOf.includes(b.type)).map(b=>({x:b.x,y:b.y,definition:buildingDefinition(b)})),king=s.character.tile,origins=this.natural.origins(),options=[];
+    for(let y=dep.y-mine.height-near;y<=dep.y+dep.definition.height+near;y++)for(let x=dep.x-mine.width-near;x<=dep.x+dep.definition.width+near;x++){const site={x,y,definition:mine};if(!rectanglesOverlap(site,dep)&&footprintDistance(site,dep)<=near)options.push(site);}
+    options.sort((a,b)=>footprintDistance(a,dep)-footprintDistance(b,dep)||a.y-b.y||a.x-b.x);
+    for(const site of options){
+      const tiles=buildingTiles(site,mine);if(!tiles.every(free)||tiles.some(t=>t.x===king.x&&t.y===king.y)||starts.some(b=>footprintDistance(site,b)<START_QUARRY.clearance))continue;
+      const blocked=[...tiles,...depositTiles].filter(t=>s.map[t.y][t.x]===0);before??=reachableTiles(s.map,origins).length;
+      for(const t of blocked)s.map[t.y][t.x]=1;const after=reachableTiles(s.map,origins);for(const t of blocked)s.map[t.y][t.x]=0;
+      if(after.length!==before-blocked.length)continue;const reachable=new Set(after.map(tileKey)),open=o=>towerNeighbors(o).some(t=>reachable.has(tileKey(t)));
+      if(open(site)&&open(dep))return {x:site.x,y:site.y};
+    }
+    return null;
+  }
+  // New Game only, after ensureStartQuarry(): keeps the world when the nearest Iron Deposit has a mine spot, otherwise adds
+  // an ordinary Iron Deposit that has one (a random qualifying spot from its own stream). Returns {deposit, site, added}.
+  ensureIronMine(random=Math.random){
+    const s=this.scene,centre=this.startCentre(),dist=a=>Math.hypot(a.x+(a.definition?.width??2)/2-centre.x,a.y+(a.definition?.height??2)/2-centre.y);
+    const iron=this.deposits().filter(d=>depositFamily(d.type)==='iron_deposit').sort((a,b)=>dist(a)-dist(b)||a.natural.id.localeCompare(b.natural.id,undefined,{numeric:true})),nearest=iron[0]??null;
+    const free=this.startFree();let site=nearest?this.ironMineSite(nearest,{free}):null;if(site)return {deposit:nearest,site,added:false};
+    const definition=s.objectRegistry.require('iron_deposit'),{min,max}=START_IRON_MINE,limit=nearest?Math.min(max,dist(nearest)):max,candidates=[];
+    for(let y=Math.floor(centre.y-limit-2);y<=centre.y+limit;y++)for(let x=Math.floor(centre.x-limit-2);x<=centre.x+limit;x++){const a={x,y,definition},d=dist(a);if(d>=min&&d<=limit&&buildingTiles(a,definition).every(free))candidates.push(a);}
+    for(let i=candidates.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[candidates[i],candidates[j]]=[candidates[j],candidates[i]];}
+    const before=reachableTiles(s.map,this.natural.origins()).length;
+    for(const anchor of candidates){
+      // The deposit itself must not cut anything off either (as in generate()).
+      const tiles=buildingTiles(anchor,definition);for(const t of tiles)s.map[t.y][t.x]=1;const cut=reachableTiles(s.map,this.natural.origins()).length!==before-tiles.length;for(const t of tiles)s.map[t.y][t.x]=0;if(cut)continue;
+      site=this.ironMineSite(anchor,{free,before});if(!site)continue;
+      const rule=MINERAL_DEPOSITS.iron_deposit,amount=rule.min+Math.floor(random()*(rule.max-rule.min+1)),state={id:`deposit-${this.natural.nextDepositId++}`,kind:'deposit',remaining:amount,max:amount,boundBuildingId:null};
+      s.addResource(definition,{x:anchor.x,y:anchor.y},state);return {deposit:this.natural.byId.get(state.id),site,added:true};
+    }
+    return {deposit:nearest,site:null,added:false};
   }
   candidates(definition,anchor){
     const footprint={...anchor,definition},spec=definition.mining;if(!spec)return[];
