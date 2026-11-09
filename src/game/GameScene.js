@@ -804,7 +804,7 @@ export class GameScene extends Phaser.Scene {
     // m-noc-zrychleni (82): the night speed-up now raises the game speed itself (indicator 3 with a moon, back at dawn).
     this.nightSpeedUp?.update();const steps=this.dayNight.speed(1),speed=this.playerPaused?0:(this.gameSpeed??1);let activeDelta=0;
     for(let g=0;g<speed;g++)for(let i=0;i<steps;i++){const step=this.simulationStep(delta);if(step===null)return;activeDelta+=step;if(i&&!this.dayNight.isNight())break;}
-    this.updateTimeDisplay();this.nightControls?.update();this.nightOverlay?.update();this.fuelIcons?.update();this.fireViews?.update(delta);this.fishShadows?.update(delta);if(this.terrain?.groundStyle==='continuous')this.riverLife?.update(delta);else this.riverLife?.graphics.clear();this.kingdomOverview?.update();this.helpArrow?.update();this.tutorial?.update();this.royalGoalsPanel?.update();this.completionFlash?.update(delta);this.dangerMarks?.update(delta);
+    this.updateTimeDisplay();this.nightControls?.update();this.nightOverlay?.update(delta);this.fuelIcons?.update();this.fireViews?.update(delta);this.fishShadows?.update(delta);if(this.terrain?.groundStyle==='continuous')this.riverLife?.update(delta);else this.riverLife?.graphics.clear();this.kingdomOverview?.update();this.helpArrow?.update();this.tutorial?.update();this.royalGoalsPanel?.update();this.completionFlash?.update(delta);this.dangerMarks?.update(delta);
     this.updateFoodDisplay();this.worldCamera.update(delta);this.refreshVisibility();this.lightSources.update(delta);
     if(this.buildMode&&!document.querySelector('dialog[open]')){if(this.previewTracking)this.previewAnchor=this.pointerTile(this.input.activePointer);this.updateBuildingPreview();}
   }

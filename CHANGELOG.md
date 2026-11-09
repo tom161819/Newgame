@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.88.0] - 2026-11-09
+<!-- version: {"title":"Night lighting now uses the approved \"lighting v1\" settings from the Light Lab: - A bluish night colour and a warm dusk colour.","type":"feature","reconstructed":false,"saveVersion":61} -->
+### Changed
+- Night lighting now uses the approved "lighting v1" settings from the Light Lab:
+  - A bluish night colour and a warm dusk colour.
+  - Each kind of light has its own colour, reach, strength and flicker: torches, lanterns, campfires, braziers, forges and house windows.
+  - The light also reaches up walls.
+  - Lights switch on one by one as it gets dark.
+
 ## [0.87.0] - 2026-11-09
 <!-- version: {"title":"The top bar shows the time of day (hours and minutes) next to the day.","type":"feature","reconstructed":false,"saveVersion":61} -->
 ### Changed
