@@ -84,7 +84,7 @@ import { isProvisional,knownPlacementError,knownContext } from './provisionalSit
 import { MountSystem } from '../systems/MountSystem.js';
 import { SettingsPanel } from '../ui/SettingsPanel.js';
 import { FpsOverlay } from '../ui/FpsOverlay.js';
-import { devFactor } from '../data/devBalance.js';
+import { devProduction } from '../data/devBalance.js';
 import { DevBalancePanel } from '../ui/DevBalancePanel.js';
 import { installPanelDismiss,closeOpenPanels } from '../ui/PanelDismiss.js';
 import { FortificationView } from './FortificationView.js';
@@ -743,7 +743,7 @@ export class GameScene extends Phaser.Scene {
       // m-hlasky-udalosti (41): every death has a cause; a danger mark where it happened (54).
       const by=killer?(killer.definition?.id??killer.type??null):null,cause=by&&/^[a-z_]{1,40}$/.test(by)?`killed:${by}`:'wounds';unit.deathCause=cause;
       if(unit.isSubject!==false)this.workerSystem.recordDeath(unit,cause);this.dangerMarks?.mark(unit.position);this.workerSystem.onDeath(unit);return;}
-    const tile={x:Math.floor(unit.position.x),y:Math.floor(unit.position.y)},amount=Math.round(unit.definition.gameplay.meatDrop*devFactor('hunter'));
+    const tile={x:Math.floor(unit.position.x),y:Math.floor(unit.position.y)},amount=Math.round(unit.definition.gameplay.meatDrop*devProduction('hunter'));
     if(killer){const event={type:'animalKilled',objectType:unit.type,quantity:1,objectId:unit.id};if(!this.workplaceSystem?.deferReward(killer,event))this.activities.emit(event.type,{...event,actor:killer});}
     this.mountSystem.onDeath(unit);this.animalSystem.remove(unit);this.combatFeedback.remove(unit.id);
     const drop=amount>0?this.dropSystem.create('meat',tile,amount):null;this.workerSystem.ai.animalDied(unit,killer,drop);

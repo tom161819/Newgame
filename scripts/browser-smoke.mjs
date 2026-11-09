@@ -94,6 +94,7 @@ import { fishingSmoke } from './fishing-smoke.mjs';
 import { pathsV2Smoke } from './paths-v2-smoke.mjs';
 import { policySmoke } from './policy-smoke.mjs';
 import { devBalanceSmoke } from './dev-balance-smoke.mjs';
+import { devToolSmoke } from './dev-tool-smoke.mjs';
 import { performanceSmoke } from './performance-smoke.mjs';
 import { backgroundSmoke } from './background-smoke.mjs';
 import { worldCodeSmoke } from './world-code-smoke.mjs';
@@ -244,6 +245,7 @@ try{
   await step('paths-v2',()=>pathsV2Smoke(context,origin+base,instrument));
   await step('policy',()=>policySmoke(context,origin+base,instrument));
   await step('dev-balance',()=>devBalanceSmoke(context,origin+base,instrument));
+  await step('dev-tool',()=>devToolSmoke(context,origin+base,instrument));
   await step('performance',()=>performanceSmoke(context,origin+base,instrument));
   await step('background',()=>backgroundSmoke(context,origin+base,instrument));
   await step('world-code',()=>worldCodeSmoke(context,origin+base,instrument));

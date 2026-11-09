@@ -6,6 +6,7 @@ import { tileKey } from '../game/stones.js';
 import { CONSTRUCTION_RULES } from '../data/construction.js';
 import { initializeConstructionSite } from './ConstructionSite.js';
 import { advanceConstruction } from './ConstructionProgress.js';
+import { devFactor } from '../data/devBalance.js';
 import { BuilderAI } from './BuilderAI.js';
 import { ConstructionMaterialsSystem } from './ConstructionMaterialsSystem.js';
 
@@ -36,7 +37,8 @@ export class ConstructionSystem {
     return buildingDefinition(site).crop?actor.id!=='king'&&actor.profession==='farmer'&&!!this.scene.farmingSystem?.inRange(actor,site):actor.id==='king'||actor.profession==='builder';
   }
   workSkill(site){return !site.demolition&&buildingDefinition(site).crop?'farming':'construction';}
-  workSpeed(site,actor){return this.scene.skillSystem.workEfficiency(actor,this.workSkill(site))*(!site.demolition&&buildingDefinition(site).crop?(this.scene.workplaceSystem?.workFactor?.(actor)??1):1)*(this.scene.builderWorkshops?.factor(actor)??1);}
+  // m-91 Dev tool: the Construction speed coefficient (also demolition and the time estimate).
+  workSpeed(site,actor){return devFactor('construction')*this.scene.skillSystem.workEfficiency(actor,this.workSkill(site))*(!site.demolition&&buildingDefinition(site).crop?(this.scene.workplaceSystem?.workFactor?.(actor)??1):1)*(this.scene.builderWorkshops?.factor(actor)??1);}
   reserve(site,actor,goal){
     if(!this.getSite(site.id)||!this.canWork(site,actor)||!this.ready(site)||!actor.isAlive||this.assignments.has(actor.id)||site.construction.assignedBuilders.length>=CONSTRUCTION_RULES.maximumBuilders)return false;
     if(!this.scene.workerSystem.reservations.reserve(this.slotKey(goal),actor.id))return false;

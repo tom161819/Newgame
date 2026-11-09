@@ -52,6 +52,7 @@ export const FREE_REGIONS = Object.freeze({
   buildingsBar: { label: 'Buildings bar', selector: '.buildings-bar' },
   header: { label: 'Game title', selector: '.game-header' },
   settings: { label: 'Settings tab', selector: '.settings-button' },
+  devTool: { label: 'Dev tool icon', selector: '.dev-tool-button' },
   population: { label: 'Population tab', selector: '.population-tab' },
   policy: { label: 'Kingdom policy', selector: '.kingdom-policy' },
   minimap: { label: 'Minimap', selector: '#minimap' },

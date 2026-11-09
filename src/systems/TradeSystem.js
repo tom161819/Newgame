@@ -1,3 +1,4 @@
+import { devFactor } from '../data/devBalance.js';
 import { price,tradeableResources,demand,merchantTypical,PRICE_MODEL,AUTO_TRADE,autoRule ,effectiveAutoRule,vehicleSalePrice} from '../data/trade.js';
 import { EDIBLE_RESOURCES } from '../data/seasons.js';
 import { t } from '../i18n/index.js';
@@ -32,7 +33,7 @@ export class TradeSystem {
   get caravan(){return this.scene.caravans?.active??null;}
   // Trade F2: the demand factor of a good now (kingdom's free stock, the caravan's stock against his type's usual load).
   marketContext(resource,caravan=this.caravan){
-    return demand({resource,kingdomStock:this.storage?.available?.(resource)??null,merchantStock:caravan?caravan.stock?.[resource]??0:null,merchantTypical:caravan?merchantTypical(caravan.type,resource):null});
+    return {...demand({resource,kingdomStock:this.storage?.available?.(resource)??null,merchantStock:caravan?caravan.stock?.[resource]??0:null,merchantTypical:caravan?merchantTypical(caravan.type,resource):null}),...(devFactor('buyPrice')!==1?{buyScale:devFactor('buyPrice')}:{}),...(devFactor('sellPrice')!==1?{sellScale:devFactor('sellPrice')}:{})};
   }
   unitPrice(resource,side,caravan=this.caravan){return price(resource,side,this.marketContext(resource,caravan));}
   today(){return this.scene.gameTime?.day??1;}

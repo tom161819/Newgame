@@ -1,5 +1,8 @@
 import { dataName } from '../i18n/names.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
+import { devFactor } from '../data/devBalance.js';
+// m-91 Dev tool: daily Gold income (the Castle) follows the Taxes / gold income coefficient.
+const dailyAmount=p=>p.resource==='gold'?Math.round(p.amount*devFactor('taxes')*100)/100:p.amount;
 
 export class ProductionSystem {
   constructor(time,inventory,getBuildings,onIncome=()=>{}){
@@ -11,7 +14,7 @@ export class ProductionSystem {
     for(const building of this.getBuildings()){
       if(!buildingIsComplete(building))continue;
       const production=buildingDefinition(building).production;
-      if(production?.interval==='day')totals[production.resource]=(totals[production.resource]??0)+production.amount;
+      if(production?.interval==='day')totals[production.resource]=(totals[production.resource]??0)+dailyAmount(production);
     }
     return totals;
   }
@@ -23,7 +26,7 @@ export class ProductionSystem {
     const totals=this.dailyIncome();
     for(const [index,building]of this.getBuildings().entries()){
       const p=buildingDefinition(building).production;if(!buildingIsComplete(building)||p?.interval!=='day')continue;
-      this.inventory.add(p.resource,p.amount,{source:building.type==='castle'?'Castle Income':`${dataName(buildingDefinition(building))} Income`,id:`daily-income:${building.id??index}:${day}:${p.resource}`,entityId:building.id??null,type:'production'});
+      this.inventory.add(p.resource,dailyAmount(p),{source:building.type==='castle'?'Castle Income':`${dataName(buildingDefinition(building))} Income`,id:`daily-income:${building.id??index}:${day}:${p.resource}`,entityId:building.id??null,type:'production'});
     }
     if(Object.keys(totals).length)this.onIncome(day,totals);
     return totals;

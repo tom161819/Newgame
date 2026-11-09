@@ -1,4 +1,4 @@
-import { devFactor } from '../data/devBalance.js';
+import { devProduction } from '../data/devBalance.js';
 import { dataName } from '../i18n/names.js';
 import { WORK_RULES } from '../data/jobs.js';
 import { tileKey } from '../game/stones.js';
@@ -73,7 +73,7 @@ export class ForestryWork {
     if(worker.nextTile||worker.path.length)return;
     if(!system.ai.atGoal(worker,task.goal)){system.ai.cancel(worker);this.wait(worker,'Waiting for a reachable work position');return;}
     worker.workState='Working';worker.workMessage=`Chopping ${dataName(object.definition)} ${Math.floor(object.natural.workDone/object.definition.tree.chopDuration*100)}%`;
-    if(!this.natural.work(object,worker,delta*(s.workplaceSystem.workFactor?.(worker)??1)*devFactor('woodcutter')))return;
+    if(!this.natural.work(object,worker,delta*(s.workplaceSystem.workFactor?.(worker)??1)*devProduction('woodcutter')))return;
     const record=s.workplaceSystem.records.get(building.id),day=s.gameTime.day,stats=record.forestry??{harvested:0,day,producedToday:0};if(stats.day!==day){stats.day=day;stats.producedToday=0;}stats.harvested+=object.definition.tree.wood;stats.producedToday+=object.definition.tree.wood;record.forestry=stats;
     system.reservations.release(this.slot(task.goal),worker.id);worker.workTask=null;const woodAt=tile=>[...s.dropSystem.drops.values()].find(d=>d.resource==='wood'&&d.siteId==null&&d.tile.x===tile.x&&d.tile.y===tile.y),drop=woodAt(object)??woodAt(worker.tile),pickup=drop&&system.ai.route(worker,[drop.tile]);
     if(!drop||!pickup||!system.reservations.reserve(`drop:${drop.id}`,worker.id)){s.foodStorage.release(task.capacityReservation);this.wait(worker,'Timber preserved on the ground');return;}

@@ -25,6 +25,12 @@ export class BackgroundSimulation {
     if(!this.pending)this.finish();
     return add;
   }
+  // m-91 Dev tool "Advance 1 day": queue game time to catch up like an absence (same overlay and summary, no cap).
+  queue(ms){
+    if(!this.canRun()||!(ms>0))return 0;
+    if(!this.session){this.session={away:0,queued:0,simulated:0,skipped:0,steps:0,before:this.snapshot(),events:[]};this.record();this.onStart(this.session);}
+    this.session.away+=ms;this.session.queued+=ms;this.pending+=ms;return ms;
+  }
   // Called by the scene every drawn frame while running: simulate within the frame budget.
   step(){
     if(!this.running)return false;const start=this.now(),s=this.session,step=this.rules.stepMs;

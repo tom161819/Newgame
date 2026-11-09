@@ -1,4 +1,4 @@
-import { devFactor } from '../data/devBalance.js';
+import { devProduction } from '../data/devBalance.js';
 import { RockMiningWork } from './RockMiningWork.js';
 import { WORK_RULES } from '../data/jobs.js';
 import { towerNeighbors } from '../game/buildings.js';
@@ -33,7 +33,7 @@ export class MiningWork {
     if(object.natural.remaining===0||s.map[task.goal.y]?.[task.goal.x]!==0||!s.foodStorage.reservations.has(task.capacityReservation)){system.ai.cancel(worker);this.wait(worker,object.natural.remaining===0?'Deposit Depleted':'Waiting for valid access and storage');return;}
     if(worker.nextTile||worker.path.length)return;
     if(!system.ai.atGoal(worker,task.goal)){system.ai.cancel(worker);this.wait(worker,'Waiting for reachable work position');return;}
-    worker.workState='Working';worker.workMessage=`Mining ${Math.floor(task.progressMs/rule.duration*100)}%`;task.progressMs=Math.min(rule.duration,task.progressMs+delta*s.skillSystem.workEfficiency(worker,'mining')*(s.workplaceSystem.workFactor?.(worker)??1)*devFactor('mining'));
+    worker.workState='Working';worker.workMessage=`Mining ${Math.floor(task.progressMs/rule.duration*100)}%`;task.progressMs=Math.min(rule.duration,task.progressMs+delta*s.skillSystem.workEfficiency(worker,'mining')*(s.workplaceSystem.workFactor?.(worker)??1)*devProduction('mining'));
     if(task.progressMs+1e-7<rule.duration)return;
     // Commit depletion before emitting rewards or creating material.
     object.natural.remaining--;this.natural.view(object)?.setNaturalState?.(object);

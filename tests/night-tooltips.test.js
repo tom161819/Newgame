@@ -122,10 +122,10 @@ test('86: construction site shows progress and lists the missing materials',()=>
   assert.deepEqual(text(site),['House','Construction 0 %','Needs 10 Wood']);
 });
 
-test('86: the delay comes from the data (0.8 s) or the Dev value (0.2–2 s, Dev mode only); when the tooltip may show',()=>{
+test('86: the delay comes from the data (0.8 s) or the Dev tool value (0.2–2 s, a browser preference); when the tooltip may show',()=>{
   assert.equal(BUILDING_TOOLTIP.delayMs,800);const storage=memory();loadDevBalance(storage);
-  assert.equal(buildingTooltipDelayMs(),800);setDevTooltipDelay(1.5);assert.equal(buildingTooltipDelayMs(),800,'without Dev mode the data value');
-  setDevMode(true);assert.equal(buildingTooltipDelayMs(),1500);assert.equal(setDevTooltipDelay(5),2);assert.equal(setDevTooltipDelay(0),.2);assert.equal(buildingTooltipDelayMs(),200);
+  assert.equal(buildingTooltipDelayMs(),800);setDevTooltipDelay(1.5);
+  setDevMode(false);assert.equal(buildingTooltipDelayMs(),1500,'m-91: in force whether or not the Dev tool icon is shown');setDevMode(true);assert.equal(setDevTooltipDelay(5),2);assert.equal(setDevTooltipDelay(0),.2);assert.equal(buildingTooltipDelayMs(),200);
   setDevTooltipDelay(1.2);loadDevBalance(storage);assert.equal(buildingTooltipDelayMs(),1200,'stored in the browser like the other dev values');assert.match(devBalanceJSON(),/"tooltipDelaySeconds": 1.2/);
   resetDevBalance();assert.equal(buildingTooltipDelayMs(),800,'Reset returns the default');setDevMode(false);loadDevBalance(memory());
   assert.equal(buildingTooltipAllowed({}),true);

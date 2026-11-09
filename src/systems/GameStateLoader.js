@@ -9,6 +9,7 @@ import { importCharacterExperience } from './ExperienceSystem.js';
 import { initializeNaturalTalent } from './NaturalTalentSystem.js';
 import { gameSettings,resourceSpawnSettings } from './GameSettings.js';
 import { seasonalCropStage } from '../data/seasons.js';
+import { importDevBalance } from '../data/devBalance.js';
 
 export function restoreActor(unit,data){
   for(const key of ['currentHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'])if(data[key]!==undefined)unit[key]=data[key];
@@ -112,6 +113,7 @@ export function loadGameState(scene,input){
   scene.royalGoals?.importState(state.royalGoals);
   scene.kingSkills?.importState(state.kingSkills);
   scene.nightSpeedUp?.importState(state.nightSpeedTip);
+  importDevBalance(state.devBalance);
   scene.diagnostics?.importState?.(state.notices);
   scene.wageSystem?.importState(state.wages);
   scene.resourceLedger?.importState(state.resourceLedger);

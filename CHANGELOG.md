@@ -5,6 +5,21 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.82.0] - 2026-11-09
+<!-- version: {"title":"Dev tool","type":"feature","reconstructed":false,"saveVersion":60} -->
+### Added
+- Dev tool: a wrench icon under Settings opens a menu for tuning the economy. You can hide it in Settings with "Show Dev tool".
+  - The first slider sets how fast new residents arrive. Next to it you see "Next resident in ~X h" and what is holding arrival back.
+  - More sliders (×0.25–×4) for production, food eaten, wages, taxes and gold income, market buy and sell prices, construction speed, and field and orchard growth.
+  - An Advanced section with the per-building multipliers.
+  - An economy overview for the last day and a 3-day average.
+  - Quick actions: +100 gold, +50 of each resource, advance 1 day, summon a caravan, add a resident.
+  - Reset, Copy values, the profiler (F8) and the tooltip delay.
+  - A dot on the icon shows when any value is not ×1.
+- The Dev tool values are kept in the save. A new game starts at ×1.
+### Changed
+- Settings now always shows "Show Dev tool". The hidden 5-click unlock is gone.
+
 ## [0.81.0] - 2026-11-09
 <!-- version: {"title":"Soldiers, notices, tooltips, night","type":"feature","reconstructed":false,"saveVersion":60} -->
 ### Added

@@ -1,4 +1,4 @@
-import { devFactor } from '../data/devBalance.js';
+import { devProduction } from '../data/devBalance.js';
 import { TORCHES } from '../data/torches.js';
 import { dataName } from '../i18n/names.js';
 import { FOOD_RULES,FOOD_RESOURCE_IDS } from '../data/foodProduction.js';
@@ -224,7 +224,7 @@ export class FoodProductionSystem {
         if(recipe.horse)this.scene.stables.reserveForWorkshop(horseId,building.id);
         record.nextCycle++;record.cycle={id,requiredWork:recipe.duration,workDone:0,progress:0,state:'building',contributions:{},inputs:{...recipe.input},outputReservation:capacity,startedAt:this.scene.gameTime.totalElapsed,...(record.recipe?{recipe:record.recipe}:{}),...(recipe.horse?{horseId}:{})};
       }
-      const cycle=record.cycle,participants=workers.map(w=>({id:w.id,speed:this.scene.skillSystem.workEfficiency(w,recipe.skill)*(this.scene.workplaceSystem.workFactor?.(w)??1)*devFactor(building.type==='mill'||building.type==='bakery'?building.type:''),available:Math.min(delta,w.availableWorkMs??0,Math.max(0,this.scene.gameTime.totalElapsed-cycle.startedAt))}));
+      const cycle=record.cycle,participants=workers.map(w=>({id:w.id,speed:this.scene.skillSystem.workEfficiency(w,recipe.skill)*(this.scene.workplaceSystem.workFactor?.(w)??1)*devProduction(building.type),available:Math.min(delta,w.availableWorkMs??0,Math.max(0,this.scene.gameTime.totalElapsed-cycle.startedAt))}));
       if(advanceConstruction({construction:cycle},participants,delta))this.finish(record,building);
     }
     for(const location of [...this.storage.locations.values()])if(location.buildingId!=null&&!this.scene.buildings.some(b=>b.id===location.buildingId)){

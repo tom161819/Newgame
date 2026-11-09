@@ -58,8 +58,10 @@ export function merchantTypical(type,resource){const range=MERCHANT_TYPES[type]?
 // (1 without it). A buy price is always above the sell price.
 export function price(resource,side,context={}){
   const base=(context.basePrice??BASE_PRICES[resource])*(context.factor??1);if(!Number.isFinite(base)||base<=0)return null;
-  if(side==='buy'){const sell=round(base*TRADE_RULES.sellFactor);return Math.max(round(base*TRADE_RULES.buyMarkup),sell+1);}
-  if(side==='sell')return round(base*TRADE_RULES.sellFactor);
+  // m-91 Dev tool: buyScale / sellScale are the Market price coefficients (the buy price still stays above the sell price).
+  const sell=round(base*TRADE_RULES.sellFactor*(context.sellScale??1));
+  if(side==='buy')return Math.max(round(base*TRADE_RULES.buyMarkup*(context.buyScale??1)),sell+1);
+  if(side==='sell')return sell;
   throw new TypeError(`Unknown trade side: ${side}`);
 }
 export function priceTable(registry,contextFor=()=>({})){return tradeableResources(registry).map(d=>{const context=contextFor(d.id)??{};return {resource:d.id,name:d.name,base:BASE_PRICES[d.id]??null,buy:price(d.id,'buy',context),sell:price(d.id,'sell',context),factor:context.factor??1,reasons:context.reasons??[]};});}
