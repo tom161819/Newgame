@@ -4,6 +4,9 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+
+## [0.83.0] - 2026-11-09
+<!-- version: {"title":"Thickets, rock ridges and large deposits","type":"feature","reconstructed":false,"saveVersion":61} -->
 ### Added
 - Large nature objects in new worlds, drawn with the approved Studio art:
   - Thickets of 2 × 1, 2 × 2 and 3 × 2 tiles along the water and at forest edges. They are hazel or bramble in spring and summer and have their own autumn and winter looks.
