@@ -67,3 +67,27 @@ test('fog report 0.83: an urgent chunk redraws its fog over the previous ground 
   assert.deepEqual(r.composite.touched,[key],'a fog-only repaint (chunk still dirty for its ground) still refreshes the composed ground');
   assert.equal(r.dirtyChunks.has(key),true,'the ground repaint stays pending');
 });
+
+test('owner 9 Nov: chunks beside unknown land redraw their fog (two a frame) ahead of the ground queue',()=>{
+  const r=Object.create(TerrainRenderer.prototype),keys=['0,0','1,0','2,0','3,0'],calls=[];
+  const image=()=>({setTexture(){return this;},setPosition(){return this;},setVisible(){return this;}});
+  Object.assign(r,{scene:{},dirtyTiles:new Map(),neededChunks:keys,chunks:new Map(keys.map(k=>[k,image()])),dirtyChunks:new Set(keys),groundStyle:'continuous',groundCache:new Map(keys.map(k=>[k,{stamp:'old'}])),fogDirty:new Set(keys),
+    chunkTexture(x,y){const key=`${x},${y}`;calls.push([key,!!this.fogOnlyPass]);this.fogDirty.delete(key);return {key,x,y,painted:true};}});
+  r.repaintDirty();
+  assert.equal(calls.filter(([,fogOnly])=>fogOnly).length,2,'two fog-only repaints this frame');
+  assert.equal(r.fogDirty.size,2);r.repaintDirty();assert.equal(r.fogDirty.size,0,'the rest the next frame');
+});
+
+test('owner 9 Nov: land leaving sight that was seen before is patched per tile, not queued for a chunk repaint',()=>{
+  const king={definition:objectRegistry.require('king'),state:'ground',position:{x:30.5,y:30.5}},fog=new FogOfWarSystem(king,true),r=renderer();
+  r.groundStyle='continuous';r.tileData=()=>[0,0,'Spring',0,0];
+  // Explore a band first (west to east), so the land the king later leaves is surrounded by known land.
+  const seen=()=>{for(const i of fog.visibleIndices)fog.explored[i]=1;}; // MapMemory marks seen land in the game
+  for(let x=20;x<=40;x+=2){king.position={x:x+.5,y:30.5};fog.update();seen();r.updateFog({},fog);}
+  king.position={x:30.5,y:30.5};fog.update();seen();r.updateFog({},fog);r.dirtyChunks.clear();r.dirtyTiles.clear();r.fogPatch?.clear();
+  king.position={x:31.5,y:30.5};fog.update();r.updateFog({},fog);
+  const patched=[...(r.fogPatch?.values()??[])].reduce((n,set)=>n+set.size,0);
+  assert.ok(patched>0,'tiles that left sight are queued as patches');
+  // Only the rim beside never-seen land (north and south of the explored band) still repaints its chunk.
+  for(const set of r.fogPatch.values())for(const i of set){const x=i%100,y=Math.floor(i/100);assert.ok(Math.abs(y-30)<10,`${x},${y}`);}
+});
