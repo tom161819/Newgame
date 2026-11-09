@@ -44,6 +44,54 @@ export const LAYOUT = Object.freeze({
   density: { label: 'Density', values: { comfortable: 'Comfortable', compact: 'Compact' } },
 });
 
+// Free placement (g-ui-lab-volne): every bar and tab can also be moved anywhere, snapped to an edge and resized. A frame
+// keeps the edge it is anchored to (ax left|center|right, ay top|center|bottom) and its distance from that edge in px,
+// so it stays in place on any screen size; w/h are optional sizes in px (null = the game's own size).
+export const FREE_REGIONS = Object.freeze({
+  hud: { label: 'Resource bar', selector: '.inventory' },
+  buildingsBar: { label: 'Buildings bar', selector: '.buildings-bar' },
+  header: { label: 'Game title', selector: '.game-header' },
+  settings: { label: 'Settings tab', selector: '.settings-button' },
+  population: { label: 'Population tab', selector: '.population-tab' },
+  policy: { label: 'Kingdom policy', selector: '.kingdom-policy' },
+  minimap: { label: 'Minimap', selector: '#minimap' },
+  notices: { label: 'Notices', selector: '#notices-panel' },
+  events: { label: 'Event feed', selector: '#event-feed' },
+  camera: { label: 'Camera chips', selector: '.camera-controls' },
+  status: { label: 'Status line', selector: '#status' },
+});
+export const ANCHORS_X = Object.freeze(['left', 'center', 'right']);
+export const ANCHORS_Y = Object.freeze(['top', 'center', 'bottom']);
+export function normalizeFrame(f) {
+  if (!f || typeof f !== 'object' || Array.isArray(f)) return null;
+  const size = v => (v === null || v === undefined ? null : typeof v === 'number' && Number.isFinite(v) ? Math.round(Math.min(4000, Math.max(16, v))) : null);
+  return {
+    ax: ANCHORS_X.includes(f.ax) ? f.ax : 'left', ay: ANCHORS_Y.includes(f.ay) ? f.ay : 'top',
+    x: Math.round(clampNum(f.x, -4000, 4000, 0)), y: Math.round(clampNum(f.y, -4000, 4000, 0)), w: size(f.w), h: size(f.h),
+  };
+}
+// Inline styles for a frame (position: fixed, relative to the game window).
+export function frameStyle(f) {
+  const st = { position: 'fixed', margin: '0', left: 'auto', right: 'auto', top: 'auto', bottom: 'auto', transform: 'none', 'max-width': 'none', 'max-height': 'none', width: f.w == null ? '' : `${f.w}px`, height: f.h == null ? '' : `${f.h}px`, 'box-sizing': 'border-box' };
+  const tx = [];
+  if (f.ax === 'left') st.left = `${f.x}px`; else if (f.ax === 'right') st.right = `${f.x}px`; else { st.left = `calc(50% + ${f.x}px)`; tx.push('translateX(-50%)'); }
+  if (f.ay === 'top') st.top = `${f.y}px`; else if (f.ay === 'bottom') st.bottom = `${f.y}px`; else { st.top = `calc(50% + ${f.y}px)`; tx.push('translateY(-50%)'); }
+  if (tx.length) st.transform = tx.join(' ');
+  if (f.h != null) st.overflow = 'auto';
+  return st;
+}
+function applyFree(doc, free = {}) {
+  for (const [key, { selector }] of Object.entries(FREE_REGIONS)) {
+    const el = doc.querySelector(selector); if (!el) continue;
+    const f = free[key], before = el.__uiFreeProps ?? [];
+    for (const prop of before) el.style.removeProperty(prop);
+    el.__uiFreeProps = [];
+    if (!f) { el.removeAttribute('data-ui-free'); continue; }
+    for (const [prop, value] of Object.entries(frameStyle(f))) { if (value === '') continue; el.style.setProperty(prop, value, 'important'); el.__uiFreeProps.push(prop); }
+    el.setAttribute('data-ui-free', key);
+  }
+}
+
 // Windows and panels whose sections can be reordered, hidden and resized. Ids are the game's element ids.
 export const PANELS = Object.freeze({
   'hud-details': 'Resources (expanded HUD)', 'buildings-panel': 'Buildings menu', 'population-panel': 'Population sidebar',
@@ -72,6 +120,7 @@ export const BASE_CONFIG = Object.freeze({
   },
   layout: { hud: 'top', buildingsBar: 'bottom', settings: 'left', population: 'right', cornerStack: 'bottom-right', dialogs: 'center', unitPanel: 'right', camera: 'bottom-left', header: 'shown', density: 'comfortable' },
   panels: {},
+  free: {},
 });
 
 // Untrusted input (a shared database document, a pasted JSON) → a complete, valid config, plus what was dropped.
@@ -111,9 +160,14 @@ export function normalizeUiConfig(input, base = BASE_CONFIG) {
     if (p.font !== undefined && Object.hasOwn(FONTS, p.font)) out.font = p.font;
     if (Object.keys(out).length) panels[id] = out;
   }
+  const free = {};
+  for (const [key, f] of Object.entries(src.free && typeof src.free === 'object' && !Array.isArray(src.free) ? src.free : {})) {
+    if (!Object.hasOwn(FREE_REGIONS, key)) { problems.push(`free.${key} ignored`); continue; }
+    const frame = normalizeFrame(f); if (frame) free[key] = frame; else problems.push(`free.${key} is not a frame`);
+  }
   const name = typeof src.name === 'string' && src.name.trim() ? src.name.trim().slice(0, 60) : base.name;
   const style = typeof src.style === 'string' && /^[a-z0-9-]{1,40}$/.test(src.style) ? src.style : base.style;
-  return { config: { schema: UI_SCHEMA, name, style, tokens, layout, panels }, problems };
+  return { config: { schema: UI_SCHEMA, name, style, tokens, layout, panels, ...(Object.keys(free).length ? { free } : {}) }, problems };
 }
 
 // Custom properties for the theme CSS.
@@ -193,7 +247,7 @@ export function applyUiConfig(doc, input, { observe = true } = {}) {
   const html = doc.documentElement, vars = cssVariables(config), attrs = rootAttributes(config);
   for (const [k, v] of Object.entries(vars)) html.style.setProperty(k, v);
   for (const [k, v] of Object.entries(attrs)) html.setAttribute(k, v);
-  const applyAll = () => { for (const id of Object.keys(PANELS)) { const el = doc.getElementById(id); if (el) applyPanel(el, config.panels[id]); } };
+  const applyAll = () => { for (const id of Object.keys(PANELS)) { const el = doc.getElementById(id); if (el) applyPanel(el, config.panels[id]); } applyFree(doc, config.free); };
   applyAll();
   let observer = null, queued = false;
   if (observe && typeof doc.defaultView?.MutationObserver === 'function') {
@@ -204,6 +258,7 @@ export function applyUiConfig(doc, input, { observe = true } = {}) {
     observer?.disconnect();
     for (const k of Object.keys(vars)) html.style.removeProperty(k);
     for (const k of Object.keys(attrs)) html.removeAttribute(k);
+    applyFree(doc, {});
     for (const id of Object.keys(PANELS)) {
       const el = doc.getElementById(id); if (!el) continue;
       applyPanel(el, {});

@@ -66,3 +66,28 @@
 .ul-notes-overview li { margin: 4px 0; font-size: 13px; }
 .ul-notes-overview li strong { display: block; font-size: 12px; }
 .ul-notes-overview li span { white-space: pre-wrap; }
+
+/* Free placement: boxes over the bars, resize handles, snap guides. */
+.ul-overlay.free { pointer-events: none; }
+.ul-free-box { position: absolute; border: 1.5px dashed rgb(227 197 122 / .75); background: rgb(227 197 122 / .06); border-radius: 3px; cursor: grab; touch-action: none; outline: none; }
+.ul-free-box:hover, .ul-free-box:focus-visible { background: rgb(227 197 122 / .14); }
+.ul-free-box.placed { border-style: solid; border-color: rgb(120 200 255 / .8); }
+.ul-free-box.selected { border: 2px solid #ffd76a; background: rgb(255 215 106 / .12); z-index: 2; }
+.ul-free-box.dragging { cursor: grabbing; opacity: .9; }
+.ul-free-label { position: absolute; left: -1px; top: -18px; white-space: nowrap; font: 600 11px/16px system-ui, sans-serif; color: #1d1a10; background: #e3c57a; padding: 0 5px; border-radius: 3px 3px 0 0; pointer-events: none; }
+.ul-free-box.placed .ul-free-label { background: #8fd0ff; }
+.ul-rs { position: absolute; width: 10px; height: 10px; background: #fff7dc; border: 1px solid #5a4a20; border-radius: 2px; opacity: 0; }
+.ul-free-box:hover .ul-rs, .ul-free-box.selected .ul-rs { opacity: 1; }
+.ul-rs-n { top: -6px; left: calc(50% - 5px); cursor: ns-resize; } .ul-rs-s { bottom: -6px; left: calc(50% - 5px); cursor: ns-resize; }
+.ul-rs-e { right: -6px; top: calc(50% - 5px); cursor: ew-resize; } .ul-rs-w { left: -6px; top: calc(50% - 5px); cursor: ew-resize; }
+.ul-rs-ne { right: -6px; top: -6px; cursor: nesw-resize; } .ul-rs-sw { left: -6px; bottom: -6px; cursor: nesw-resize; }
+.ul-rs-nw { left: -6px; top: -6px; cursor: nwse-resize; } .ul-rs-se { right: -6px; bottom: -6px; cursor: nwse-resize; }
+.ul-guide { position: absolute; pointer-events: none !important; background: #ff5fa2; z-index: 3; }
+.ul-guide.v { top: 0; bottom: 0; width: 1px; } .ul-guide.h { left: 0; right: 0; height: 1px; }
+.ul-free-list { list-style: none; padding: 0; margin: 6px 0; display: grid; gap: 6px; }
+.ul-free-row { border: 1px solid var(--line, #8886); border-radius: 6px; padding: 6px 8px; }
+.ul-free-row.selected { border-color: #ffd76a; }
+.ul-free-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.ul-free-head small { opacity: .7; }
+.ul-free-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 8px; margin-top: 6px; font-size: 12px; }
+.ul-free-grid input { width: 70px; }
