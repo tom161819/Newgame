@@ -582,8 +582,58 @@ try {
   }
   pass('World Lab: the game generator from a code, sliders change the code, the same code gives the same world, game art in the isometric window, favourites and the default proposal in the page database');
 
+  // Light Lab (m-osvetleni-noc step 1): night as a light map, sources placed with the mouse, Simple/Full, house
+  // windows by occupancy, the proposal in the page database (`lightingProposal/default`) and the exported file.
+  {
+    const { page: ll, errors: llErrors } = await open(context, 'light-lab.html');
+    await ll.waitForFunction(() => window.lightLab?.ready);
+    await ll.evaluate(() => window.lightLab.setTime(0.5));
+    await ll.waitForTimeout(400);
+    const day = await luminance(ll, '#ll-canvas');
+    assert.ok(day > 40, 'the scene with the game art is drawn by day');
+    await ll.evaluate(() => window.lightLab.setTime(0.95));
+    await ll.waitForTimeout(400);
+    assert.equal(await ll.evaluate(() => window.lightLab.darkness()), 1);
+    assert.ok(await luminance(ll, '#ll-canvas') < day * 0.75, 'night darkens the scene');
+    assert.ok(await ll.evaluate(() => window.lightLab.stats.drawn) > 0, 'lights in view are drawn into the light map');
+    assert.ok(await ll.evaluate(() => window.lightLab.stats.shaded) > 0, 'Full quality shades sprites by direction');
+    const before = await ll.evaluate(() => window.lightLab.sources().length);
+    await ll.locator('#ll-types [data-type="lantern"]').click();
+    await ll.locator('#ll-canvas').click({ position: { x: 40, y: 120 } });
+    assert.equal(await ll.evaluate(() => window.lightLab.sources().length), before + 1, 'a click adds a source');
+    assert.equal(await ll.evaluate(() => window.lightLab.sources().at(-1).type), 'lantern');
+    await ll.locator('#ll-canvas').click({ position: { x: 40, y: 120 }, button: 'right' });
+    assert.equal(await ll.evaluate(() => window.lightLab.sources().length), before, 'a right-click removes it');
+    await ll.locator('#ll-quality [data-quality="simple"]').click();
+    await ll.waitForTimeout(200);
+    assert.equal(await ll.evaluate(() => window.lightLab.stats.shaded), 0, 'Simple quality has no directional sprite lighting');
+    await ll.evaluate(() => window.lightLab.setTime(0.84));
+    await ll.locator('.ll-house').first().locator('input[type="checkbox"]').uncheck();
+    assert.equal(await ll.evaluate(() => window.lightLab.windows()[0].on), 0, 'nobody home: the window stays dark');
+    await ll.locator('#ll-type-params input[data-param="radius"]').evaluate(input => { input.value = '7'; input.dispatchEvent(new Event('input', { bubbles: true })); });
+    const file = await ll.evaluate(() => window.lightLab.exportJson());
+    assert.equal(file.kind, 'light-lab'); assert.equal(file.types.lantern.radius, 7); assert.equal(file.global.quality, 'simple');
+    assert.match(await ll.locator('#ll-fps').textContent(), /fps/);
+    assert.deepEqual(llErrors, []); await ll.close();
+
+    const owner = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+    await owner.addInitScript(fakeDb, true);
+    const { page: sl, errors: slErrors } = await open(owner, 'light-lab.html');
+    await sl.waitForFunction(() => window.lightLab?.ready);
+    await sl.locator('#ll-note').fill('Warmer torches');
+    await sl.getByRole('button', { name: 'Propose as default' }).click();
+    await sl.waitForFunction(() => window.__fakeClaude.docs.has('lightingProposal/default'));
+    const proposal = await sl.evaluate(() => window.__fakeClaude.docs.get('lightingProposal/default'));
+    assert.equal(proposal.by, 'u-owner'); assert.equal(proposal.note, 'Warmer torches'); assert.equal(proposal.schema, 1);
+    assert.deepEqual(proposal.settings, await sl.evaluate(() => window.lightLab.settings()));
+    await sl.waitForTimeout(100);
+    assert.match(await sl.locator('#ll-summary').textContent(), /revize/);
+    assert.deepEqual(slErrors, []); await owner.close();
+  }
+  pass('Light Lab: day and night with the game art, light map with visible lights only, click to add and right-click to remove sources, Simple/Full directional lighting, windows only with someone home, export file and the proposal in the page database');
+
   const phone = await browser.newContext({ viewport: { width: 390, height: 844 } });
-  for (const path of ['index.html#watchtower', 'index.html#style-guide', 'phaser-demo.html', 'path-lab.html', 'buildings.html', 'ui-lab.html', 'world-lab.html']) {
+  for (const path of ['index.html#watchtower', 'index.html#style-guide', 'phaser-demo.html', 'path-lab.html', 'buildings.html', 'ui-lab.html', 'world-lab.html', 'light-lab.html']) {
     const { page: small, errors: smallErrors } = await open(phone, path);
     await small.waitForTimeout(800);
     assert.equal(await small.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `${path} fits a phone`);

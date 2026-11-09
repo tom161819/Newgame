@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Asset Studio · Light Lab</title>
+    <meta name="claude:viewport-fit-sides" content="cover" />
+    <link rel="icon" href="data:," />
+    <meta name="description" content="Night as a light map: place torches, fires, lanterns and windows on a piece of the map and tune darkness, light and directional lighting for the game." />
+  </head>
+  <body class="world-lab-page light-lab-page">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><div><strong>Light Lab</strong><span class="brand-sub">Night as a light map · sources, darkness, directional light</span></div></div>
+      <nav class="views" aria-label="Studio views"><a href="./index.html#assets">Assets</a><a href="./index.html#style-guide">Style guide</a><a href="./buildings.html">Buildings in game</a><a href="./ui-lab.html">UI Lab</a><a href="./world-lab.html">World Lab</a><a href="./fire-lab.html">Fire Lab</a><a href="./light-lab.html" aria-current="page">Light Lab</a><a href="./phaser-demo.html">Phaser demo</a><a href="./path-lab.html">Path Lab</a></nav>
+      <div class="review-status"><span id="ll-summary" class="review-summary" aria-live="polite"></span></div>
+    </header>
+    <p id="studio-alert" class="studio-alert" role="alert" hidden></p>
+    <div class="wl-shell">
+      <aside class="wl-controls" aria-label="Light settings">
+        <section>
+          <h3>Time of day <span id="ll-clock" class="ll-clock"></span></h3>
+          <input type="range" id="ll-time" min="0" max="1" step="0.001" aria-label="Time of day" />
+          <div class="wl-row"><button type="button" class="button" id="ll-play" aria-pressed="false">Play</button><span id="ll-part" class="wl-hint"></span></div>
+          <div id="ll-seasons" class="wl-presets"></div>
+          <div id="ll-quality" class="wl-presets"></div>
+        </section>
+        <section>
+          <h3>Light sources <button type="button" class="link" id="ll-reset-scene">Reset scene</button></h3>
+          <div id="ll-types" class="ll-types" role="group" aria-label="Light type"></div>
+          <p class="wl-hint">Click the map to add the chosen type, drag a source (or a person) to move it, right-click a source to remove it. Shift-drag pans.</p>
+          <div class="wl-row"><button type="button" class="button" id="ll-remove" disabled>Remove selected</button><label class="ll-check"><input type="checkbox" id="ll-markers" /> Show sources</label></div>
+        </section>
+        <section>
+          <h3><span id="ll-type-title">Torch</span> <button type="button" class="link" id="ll-type-defaults">Defaults</button></h3>
+          <div id="ll-type-params" class="fl-params"></div>
+        </section>
+        <section>
+          <h3>Night and light <button type="button" class="link" id="ll-defaults">All defaults</button></h3>
+          <div id="ll-global" class="fl-params"></div>
+        </section>
+        <section>
+          <h3>Houses</h3>
+          <div id="ll-houses" class="ll-houses"></div>
+          <p class="wl-hint">A window glows from dusk only while someone is home and awake.</p>
+        </section>
+        <section>
+          <h3>For the game</h3>
+          <input type="text" id="ll-note" placeholder="Note (optional)" aria-label="Note for the proposal" />
+          <button type="button" class="button primary" id="ll-propose" data-needs-write>Propose as default</button>
+          <div class="wl-row"><button type="button" class="button" id="ll-export">Export JSON</button><button type="button" class="button" id="ll-copy">Copy JSON</button><button type="button" class="button" id="ll-open-proposal" hidden>Open proposal</button></div>
+          <p class="wl-hint">The proposal goes to the Studio database; Claude (chat Grafika) writes it to art/lighting/light-lab-default.json and Mechaniky takes it into the game.</p>
+        </section>
+      </aside>
+      <main class="wl-main ll-main" aria-label="Light preview">
+        <canvas id="ll-canvas" aria-label="Night scene preview"></canvas>
+        <div class="ll-overlay"><span id="ll-fps" class="ll-fps" aria-live="off"></span><span class="ll-zoom" id="ll-zoom"></span></div>
+      </main>
+    </div>
+  </body>
+  <script type="module" src="./src/light-lab/main.js"></script>
+</html>
