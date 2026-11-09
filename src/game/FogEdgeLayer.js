@@ -71,7 +71,7 @@ export class FogEdgeLayer {
     if(!fog?.enabled||!fog.sources?.length){this.hide();return;}
     const r=this.region(camera,fog);if(!r){this.hide();return;}
     const tiles=r.columns*r.rows,R=FOG_EDGE.levels.find(([max])=>tiles<=max)[1];
-    const key=`${fog.revision}|${fog.memoryBrightness}|${fog.explorationEnabled}|${r.left},${r.top},${r.columns},${r.rows},${R}`;
+    const key=`${fog.revision}|${fog.memoryBrightness}|${fog.explorationEnabled}|${this.scene.terrain?.groundStyle}|${r.left},${r.top},${r.columns},${r.rows},${R}`;
     // Sight changes as every resident walks: rebuild at most every `rebuildMs`. 0 since 0.74.1 (was 150 ms, a build takes ~1 ms): the continuous ground shows newly seen tiles at once, so a late mask let them flash as bright squares in the dark (a build takes ~1 ms).
     if(key!==this.key2&&(performance.now()>=this.next||!this.info)){this.build(r,R,fog);this.key2=key;this.next=performance.now()+FOG_EDGE.rebuildMs;}
     if(!this.gpu&&this.info)this.place(camera);
@@ -80,7 +80,12 @@ export class FogEdgeLayer {
     // Toward remembered ground the edge fades to a dark grey near the memory look (it is grey, not black), toward
     // unknown ground to black.
     const started=performance.now(),brightness=Math.min(1,fog.memoryBrightness+FOG_STYLE.edgeBrightness*.5),remembered=1-brightness,grey=Math.round(FOG_EDGE.memoryGrey*brightness);
-    const mask=fogEdgeMask({...r,resolution:R,buffers:this.buffers,visible:(x,y)=>fog.isInSightTile({x,y}),target:(x,y)=>x<0||y<0||x>=fog.width||y>=fog.height?1:fog.displayState({x,y})===VISIBILITY.UNEXPLORED?1:remembered});
+    // Owner 9 Nov ("furt je tam ta linka … za ním je zase světlá oblast"): on continuous ground the terrain itself fades
+    // from sight to the remembered grey (TerrainRenderer.shadeMemory). Darkening the visible side toward remembered
+    // ground as well stacked a dark line in front of the lighter remembered land, so there this layer fades to unknown
+    // land only.
+    const memoryFade=this.scene.terrain?.groundStyle!=='continuous';
+    const mask=fogEdgeMask({...r,resolution:R,buffers:this.buffers,visible:(x,y)=>fog.isInSightTile({x,y}),target:(x,y)=>x<0||y<0||x>=fog.width||y>=fog.height?1:fog.displayState({x,y})===VISIBILITY.UNEXPLORED?1:memoryFade?remembered:0});
     if(mask.empty){this.hide();}
     else{
       const data=this.pixels.data,W=mask.width,H=mask.height,alpha=mask.alpha,tgt=mask.tgt;let x0=W,y0=H,x1=-1,y1=-1;

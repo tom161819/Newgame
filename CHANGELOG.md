@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.85.2] - 2026-11-09
+<!-- version: {"title":"Fog of War: the edge of sight no longer has a dark line with lighter remembered land behind it.","type":"fix","reconstructed":false,"saveVersion":61} -->
+### Fixed
+- Fog of War: the edge of sight no longer has a dark line with lighter remembered land behind it. On the default ground the old edge darkening now only fades toward unknown land, and the ground's own soft fade to the remembered grey does the rest.
+
 ## [0.85.1] - 2026-11-09
 <!-- version: {"title":"Fog of War: the edge of sight is now soft too.","type":"feature","reconstructed":false,"saveVersion":61} -->
 ### Changed
