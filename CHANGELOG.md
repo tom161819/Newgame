@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.89.0] - 2026-11-09
+<!-- version: {"title":"Building window: - The two employment bans (this building, the whole building type) are two icons at the top right.","type":"feature","reconstructed":false,"saveVersion":61} -->
+### Changed
+- Building window:
+  - The two employment bans (this building, the whole building type) are two icons at the top right. Their explanation shows on hover, and a ban that is on is highlighted.
+  - The most important issue (for example "Output is full – no room in storage") is right under the title, with a blinking orange "!".
+  - The note about dismantling shows when you hover over the Dismantle button. The refund line stays.
+
 ## [0.88.0] - 2026-11-09
 <!-- version: {"title":"Night lighting now uses the approved \"lighting v1\" settings from the Light Lab: - A bluish night colour and a warm dusk colour.","type":"feature","reconstructed":false,"saveVersion":61} -->
 ### Changed

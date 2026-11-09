@@ -51,6 +51,8 @@ export class DemolitionUI {
     text(this.heading,t('demolition.title'));text(this.refund,t('demolition.refund',{refund:this.refundLabel(b)}));text(this.start,t('demolition.start'));text(this.cancel,t('demolition.cancel'));
     this.start.hidden=!!record||b.type==='starter_stockpile';this.start.disabled=!!reason;this.cancel.hidden=!record;this.progress.hidden=!record;this.progress.value=record?.progress??0;
     text(this.status,reason?t(`demolition.${reason}`):!record?t('demolition.note'):record.workDone>=record.requiredWork?t('demolition.waitSafe'):t(record.assignedBuilders.length?'demolition.progress':'demolition.waitBuilder',{percent:record.progress.toFixed(1),count:record.assignedBuilders.length}));
+    // Owner 9 Nov 2026: the explanation before dismantling shows on hovering the button (the refund line stays).
+    {const note=!reason&&!record;this.status.hidden=note;this.start.title=note?t('demolition.note'):'';}
     if(this.confirm.open){const pending=this.building(this.pendingId);document.querySelector('#demolition-confirm-accept').disabled=!!this.reason(pending)||!!pending?.demolition;}
   }
   destroy(){this.controller.abort();this.confirm.close();this.dialog.close();this.section.remove();this.inspect.hidden=true;}
