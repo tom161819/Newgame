@@ -4,21 +4,21 @@ export const HUNTING_RULES=Object.freeze({huntRadius:34,spawnNearLodge:30});
 export const WORKPLACE_RULES=Object.freeze({collectMeatDuration:700,patrolRadius:5,patrolWaitMin:2000,patrolWaitMax:4500});
 export const WORKPLACES=Object.freeze({
   iron_mine:Object.freeze({capacity:3,profession:'miner',skill:'mining'}),
-  lumberjack_hut:Object.freeze({capacity:3,profession:'woodcutter',skill:'woodcutting'}),
+  lumberjack_hut:Object.freeze({capacity:1,profession:'woodcutter',skill:'woodcutting'}),
   quarry:Object.freeze({capacity:3,profession:'miner',skill:'mining',staffingOutput:Object.freeze([0,.2,.5,1])}),
-  hunting_lodge:Object.freeze({capacity:2,profession:'hunter',skill:'hunting'}),
-  fisherman_hut:Object.freeze({capacity:2,profession:'fisher',skill:'fishing'}),
+  hunting_lodge:Object.freeze({capacity:1,profession:'hunter',skill:'hunting'}),
+  fisherman_hut:Object.freeze({capacity:1,profession:'fisher',skill:'fishing'}),
   barracks:Object.freeze({capacity:5,profession:'soldier',skill:'combat'}),
   farmhouse:Object.freeze({capacity:3,profession:'farmer',skill:'farming'}),
   smelter:Object.freeze({capacity:2,profession:'smelter_operator',skill:'smelting'}),
   mill:Object.freeze({capacity:2,profession:'miller',skill:'milling'}),
-  bakery:Object.freeze({capacity:2,profession:'baker',skill:'baking'}),
-  bowyer:Object.freeze({capacity:2,profession:'bowyer',skill:'crafting'}),
-  stables:Object.freeze({capacity:2,profession:'stablehand',skill:'hunting'}),
-  wheelwright_workshop:Object.freeze({capacity:2,profession:'wheelwright',skill:'crafting'}),
-  swordsmith:Object.freeze({capacity:2,profession:'swordsmith',skill:'crafting'}),
-  armorer:Object.freeze({capacity:2,profession:'armorer',skill:'crafting'}),
-  pitch_kiln:Object.freeze({capacity:2,profession:'pitch_maker',skill:'crafting'}),
+  bakery:Object.freeze({capacity:1,profession:'baker',skill:'baking'}),
+  bowyer:Object.freeze({capacity:1,profession:'bowyer',skill:'crafting'}),
+  stables:Object.freeze({capacity:1,profession:'stablehand',skill:'hunting'}),
+  wheelwright_workshop:Object.freeze({capacity:1,profession:'wheelwright',skill:'crafting'}),
+  swordsmith:Object.freeze({capacity:1,profession:'swordsmith',skill:'crafting'}),
+  armorer:Object.freeze({capacity:1,profession:'armorer',skill:'crafting'}),
+  pitch_kiln:Object.freeze({capacity:1,profession:'pitch_maker',skill:'crafting'}),
 });
 
 // Curves describe total output relative to a full workplace of equal-skill workers.

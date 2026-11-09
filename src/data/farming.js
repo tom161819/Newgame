@@ -6,9 +6,9 @@ export const FARMING_RULES = Object.freeze({
   // amount per harvest stays, so a harvest saved in progress keeps its reservation).
   growthRate: 1.2,
   crops: Object.freeze({
-    wheat_field: Object.freeze({ resource: 'wheat', growthDays: 2, yield: 8, workDuration: 4000, xp: 8,
+    wheat_field: Object.freeze({ resource: 'wheat', growthDays: 2, yield: 10, workDuration: 4000, xp: 8,
       stages: ['Prepared soil', 'Young wheat', 'Growing wheat', 'Ripe wheat'] }),
-    orchard: Object.freeze({ resource: 'apple', growthDays: 3, yield: 6, workDuration: 5000, xp: 10,
+    orchard: Object.freeze({ resource: 'apple', growthDays: 3, yield: 8, workDuration: 5000, xp: 10,
       stages: ['Resting trees', 'Blossoming trees', 'Small fruit', 'Ripe apples'] }),
   }),
 });
