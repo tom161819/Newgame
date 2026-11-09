@@ -1134,3 +1134,8 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
   .hud-row-bottom #king-cargo-deliver { min-height: 0; padding: .15rem .5rem; font-size: 12px; }
   .hud-row-bottom #king-cargo-status { width: auto; flex: 1 1 0; min-width: 0; }
 }
+.hud-clock #game-clock { font-variant-numeric: tabular-nums; color: var(--ink); }
+/* Owner 9 Nov 2026: the person hover label is plain – name, then occupation and level; no theme frame ornaments. */
+#object-tooltip.person-tooltip, html[data-ui-theme] #object-tooltip.person-tooltip { display: grid; gap: 1px; padding: 4px 9px; border: 1px solid var(--line-soft); border-radius: 7px; background: #232a1bf0; box-shadow: 0 4px 14px rgb(6 9 5 / .45); font-family: var(--font-ui); line-height: 1.3; }
+#object-tooltip.person-tooltip strong { font-size: 12px; font-weight: 650; color: var(--ink); }
+#object-tooltip.person-tooltip span { font-size: 11px; color: var(--muted); }

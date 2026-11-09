@@ -1,3 +1,5 @@
+import { clockMinutes,formatClock } from '../data/dayNight.js';
+import { personHover } from '../ui/personHover.js';
 import { TutorialGuide } from '../ui/TutorialGuide.js';
 import { SpeedControls } from '../ui/SpeedControls.js';
 import { FOOD_OUTLOOK,foodDays } from '../data/foodOutlook.js';
@@ -435,13 +437,16 @@ export class GameScene extends Phaser.Scene {
       const allowed=!!b&&buildingTooltipAllowed({dragging:!!pointer.isDown||!!this.unitSelection?.dragging,selected:selectedBuildingIds(this).has(b.id),touch:!!pointer.wasTouch||!!globalThis.matchMedia?.('(hover: none)').matches});
       this.storePreview?.hoverBuilding(b,rect.left+pointer.x*rect.width/this.scale.width,rect.top+pointer.y*rect.height/this.scale.height,{allowed});}
     if(hoverHit?.kind==='human'){
-      const unit=hoverHit.object;tooltip.hidden=false;tooltip.textContent=`${unit.name??unit.definition.name} — Level ${unit.experience.level}`;
+      const unit=hoverHit.object;tooltip.hidden=false;this.personTooltip(tooltip,personHover(unit,{king:unit===this.character}));
       const rect=this.game.canvas.getBoundingClientRect();tooltip.style.left=`${Math.min(window.innerWidth-150,rect.left+pointer.x*rect.width/this.scale.width+14)}px`;tooltip.style.top=`${Math.max(4,rect.top+pointer.y*rect.height/this.scale.height-32)}px`;return;
     }
+    // Owner 9 Nov 2026: a child shows its name and "Child" as its occupation.
+    if(hoverHit?.kind==='child'){const child=hoverHit.object;tooltip.hidden=false;this.personTooltip(tooltip,{name:this.childrenSystem.nameOf(child,{full:true}),role:t('hover.child')});
+      const rect=this.game.canvas.getBoundingClientRect();tooltip.style.left=`${Math.min(window.innerWidth-180,rect.left+pointer.x*rect.width/this.scale.width+14)}px`;tooltip.style.top=`${Math.max(4,rect.top+pointer.y*rect.height/this.scale.height-44)}px`;return;}
     const drop=this.dropSystem.atPoint(pointer.worldX,pointer.worldY);
     tooltip.hidden=!drop||hoverHit?.kind!=='drop';
     if(drop){
-      tooltip.textContent=`${this.objectRegistry.require(drop.resource).name} ×${drop.amount}`;
+      tooltip.classList.remove('person-tooltip');tooltip.textContent=`${this.objectRegistry.require(drop.resource).name} ×${drop.amount}`;
       const rect=this.game.canvas.getBoundingClientRect();
       tooltip.style.left=`${Math.min(window.innerWidth-110,rect.left+pointer.x*rect.width/this.scale.width+14)}px`;
       tooltip.style.top=`${Math.max(4,rect.top+pointer.y*rect.height/this.scale.height-32)}px`;
@@ -558,6 +563,8 @@ export class GameScene extends Phaser.Scene {
     }
     if(accepted)this.worldCamera.follow();
   }
+  // Owner 9 Nov 2026: the hover label of a person – the name, then the occupation (with its level), plain text.
+  personTooltip(tooltip,{name,role}){tooltip.classList.add('person-tooltip');const a=document.createElement('strong'),b=document.createElement('span');a.textContent=name;b.textContent=role;tooltip.replaceChildren(a,b);}
   pickInteraction(x,y,tile){
     const hits=[],building=this.towerAtPoint(x,y,tile),animal=this.animalSystem.atPoint(x,y),chest=this.treasureSystem.atPoint(x,y,tile);
     const drop=this.dropSystem.atPoint(x,y)??this.dropSystem.atTile(tile);
@@ -715,7 +722,7 @@ export class GameScene extends Phaser.Scene {
     this.updateTimeDisplay();this.updateFoodDisplay();this.updateWorldCount();this.updateMountUI?.();this.combatFeedback?.refresh();this.experienceFeedback?.refresh();this.workerSystem?.updateUI();this.inventoryBar?.update();this.gettingStarted?.relabel();this.marketplacePanel?.relabel();this.policyPanel?.render();this.buildingBar?.selectCategory?.(this.buildingBar.category);if(this.populationSidebar){this.populationSidebar.renderOptions();this.populationSidebar.lastRefresh=-Infinity;}this.updateBuildingUI();
     if(this.worldCamera?.following)document.querySelector('#camera-mode').textContent=t('hud.cameraKing');
   }
-  updateTimeDisplay(){const output=document.querySelector('#game-time');if(output.textContent!==this.gameTime.label)output.textContent=this.gameTime.label;output.title=this.gameTime.tooltip;const seasonTip=document.querySelector('#season-weather');if(seasonTip)seasonTip.title=this.seasons.tooltip;const seasons=document.querySelector('#season-weather');if(seasons.textContent!==this.seasons.label)seasons.textContent=this.seasons.label;}
+  updateTimeDisplay(){const output=document.querySelector('#game-time');if(output.textContent!==this.gameTime.label)output.textContent=this.gameTime.label;output.title=this.gameTime.tooltip;const clock=document.querySelector('#game-clock');if(clock&&this.dayNight){const text=formatClock(clockMinutes(this.dayNight.fraction(),this.dayNight.nightStart()));if(clock.textContent!==text)clock.textContent=text;clock.title=output.title;}const seasonTip=document.querySelector('#season-weather');if(seasonTip)seasonTip.title=this.seasons.tooltip;const seasons=document.querySelector('#season-weather');if(seasons.textContent!==this.seasons.label)seasons.textContent=this.seasons.label;}
   onDailyIncome(day,totals){
     const labels=new Set(this.buildings.map(b=>buildingDefinition(b).production).filter(p=>p?.interval==='day'&&totals[p.resource]).map(p=>localized(`production.${p.resource}`,p.label)).filter(Boolean));
     const details=Object.entries(totals).map(([id,amount])=>`+${amount} ${this.objectRegistry.require(id).name}`).join(' · ');

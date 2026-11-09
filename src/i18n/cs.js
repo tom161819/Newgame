@@ -136,7 +136,7 @@ export default {
   'hud.food':{one:'Jídlo: {count} porce/den',few:'Jídlo: {count} porce/den',many:'Jídlo: {count} porce/den',other:'Jídlo: {count} porcí/den'},'hud.foodShortage':'Nedostatek jídla · nenasycených: {count}',
   'hud.worldStones':'Mapa {columns} × {rows} · kameny {count} / {capacity}','hud.worldKnownStones':'Mapa {columns} × {rows} · známé kameny {count}',
   'hud.sight':{one:'Dohled: {count} pole · kruh',few:'Dohled: {count} pole · kruh',many:'Dohled: {count} pole · kruh',other:'Dohled: {count} polí · kruh'},'hud.fogOff':'Mlha války: VYP','hud.population':'Poddaní {count} / {maximum}',
-  'hud.hp':'Životy: {hp} / {max}','hud.kingLevel':'Král | úroveň {level}','hud.kingTitle':'Král — úroveň {level}',
+  'hover.role':'{role} · lvl {level}','hover.king':'Král','hover.child':'Dítě','hud.hp':'Životy: {hp} / {max}','hud.kingLevel':'Král | úroveň {level}','hud.kingTitle':'Král — úroveň {level}',
   'hud.cameraKing':'Kamera sleduje krále','hud.cameraUnit':'Vybraný poddaný: {name}','hud.cameraSleeping':'{name} spí uvnitř: {building}','hud.cameraManual':'Ruční posun · mezerník vrátí krále',
   'panel.gameOver':'Konec hry','panel.gameOverText':'Král padl. Začni znovu s novým světem a plnými životy.','panel.restart':'Začít znovu',
   'panel.baseDps':'Základní DPS','panel.finalDps':'Výsledné DPS','panel.baseArmor':'Základní brnění (%)','panel.finalArmor':'Výsledné brnění (%)','panel.hp':'Životy','panel.hpRegen':'Obnova životů','panel.takeAll':'Vzít vše',

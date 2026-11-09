@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.87.0] - 2026-11-09
+<!-- version: {"title":"The top bar shows the time of day (hours and minutes) next to the day.","type":"feature","reconstructed":false,"saveVersion":61} -->
+### Changed
+- The top bar shows the time of day (hours and minutes) next to the day. The day starts at dawn at 05:00, and the night begins at 20:00 in spring and autumn, about 21:30 in summer and 17:30 in winter.
+- Hovering over a resident shows the name, then the occupation and its level in that occupation (for example "Builder · lvl 48") instead of the overall level. The label is plain, without the frame ornaments. Hovering over a child shows its name and "Child".
+
 ## [0.86.0] - 2026-11-09
 <!-- version: {"title":"The map now fills the whole window from the left edge to the right edge and down to the bottom.","type":"feature","reconstructed":false,"saveVersion":61} -->
 ### Changed

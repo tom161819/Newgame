@@ -46,3 +46,15 @@ export function darknessAt(fraction,nightStart){
 export const moonLight=day=>(1-Math.cos(2*Math.PI*(((day-1)%DAY_NIGHT.moonDays)/DAY_NIGHT.moonDays)))/2;
 // m-noc-zrychleni (82): the optional save field `nightSpeedTip` – only `true` (the tip was shown in this game).
 export const validNightSpeedTipState=value=>value===true;
+
+// Owner 9 Nov 2026: the time of day (hours and minutes) next to the day in the top bar. The game day has no clock of its
+// own, so its parts are mapped onto a 24-hour clock: the day starts at dawn at 05:00 and runs 20 hours per day length up
+// to the night start (20:00 in spring and autumn, about 21:24 in summer, 17:24 in winter); the night fills the rest of
+// the 24 hours up to the next dawn. Returns minutes since midnight (0–1439).
+export const CLOCK=Object.freeze({dawnHour:5,dayHours:20});
+export function clockMinutes(fraction,nightStart){
+  const f=Math.max(0,Math.min(1,fraction||0)),n=Math.max(.05,Math.min(.95,nightStart||.75)),dusk=CLOCK.dawnHour+CLOCK.dayHours*n;
+  const hours=f<n?CLOCK.dawnHour+CLOCK.dayHours*f:dusk+(f-n)/(1-n)*(24+CLOCK.dawnHour-dusk);
+  return Math.floor(hours*60)%1440;
+}
+export const formatClock=minutes=>`${String(Math.floor(minutes/60)).padStart(2,'0')}:${String(minutes%60).padStart(2,'0')}`;

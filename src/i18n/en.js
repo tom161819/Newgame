@@ -135,7 +135,7 @@ export default {
   'hud.food':{one:'Food: {count} portion/day',other:'Food: {count} portions/day'},'hud.foodShortage':'Food shortage · {count} unfed',
   'hud.worldStones':'Map {columns} × {rows} · stones {count} / {capacity}','hud.worldKnownStones':'Map {columns} × {rows} · known stones {count}',
   'hud.sight':{one:'Sight: {count} tile · circle',other:'Sight: {count} tiles · circle'},'hud.fogOff':'Fog of War: OFF','hud.population':'Residents {count} / {maximum}',
-  'hud.hp':'HP: {hp} / {max}','hud.kingLevel':'King | LVL {level}','hud.kingTitle':'King — Level {level}',
+  'hover.role':'{role} · lvl {level}','hover.king':'King','hover.child':'Child','hud.hp':'HP: {hp} / {max}','hud.kingLevel':'King | LVL {level}','hud.kingTitle':'King — Level {level}',
   'hud.cameraKing':'Camera follows the king','hud.cameraUnit':'Selected resident: {name}','hud.cameraSleeping':'{name} is asleep inside: {building}','hud.cameraManual':'Manual pan · Space returns to the king',
   'panel.gameOver':'Game Over','panel.gameOverText':'The king has fallen. Start again with a new world and full health.','panel.restart':'Restart Game',
   'panel.baseDps':'Base DPS','panel.finalDps':'Final DPS','panel.baseArmor':'Base Armor (%)','panel.finalArmor':'Final Armor (%)','panel.hp':'HP','panel.hpRegen':'HP Regeneration','panel.takeAll':'Take All',
