@@ -4,6 +4,9 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+
+## [0.84.1] - 2026-11-09
+<!-- version: {"title":"Fog of War: land you walk away from turns grey right away.","type":"fix","reconstructed":false,"saveVersion":61} -->
 ### Fixed
 - Fog of War: land you walk away from turns grey right away. It no longer stays in full colour for seconds as squares beyond your sight.
 - Bushes that leave sight take their remembered look at once.
