@@ -5,6 +5,7 @@ import { chooseRenderer,parseRendererPreference,probeWebGL,rendererLabel } from 
 import '@fontsource-variable/figtree';
 import '@fontsource-variable/source-serif-4';
 import { initCompactHud } from './ui/CompactHud.js';
+import { initCompactHints } from './ui/compactHints.js';
 import './style.css';
 import '../art/ui/ui-fonts.js';
 import '../art/ui/ui-theme.css';
@@ -12,7 +13,7 @@ import { applyUiStyle } from './ui/UiTheme.js';
 
 for(const link of document.querySelectorAll('[data-version-archive]'))link.href=window.__NEWGAME_ARCHIVE_ROOT__??`${import.meta.env.BASE_URL}versions/`;
 
-initCompactHud();
+initCompactHud();initCompactHints();
 // UI Lab look and layout (owner's design from the Studio by default), before the main menu shows.
 applyUiStyle();
 

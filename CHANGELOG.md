@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.90.0] - 2026-11-09
+<!-- version: {"title":"Building windows (Marketplace, Builder's Workshop, storage, house, trees and deposits, food economy) show less text.","type":"feature","reconstructed":false,"saveVersion":61} -->
+### Changed
+- Building windows (Marketplace, Builder's Workshop, storage, house, trees and deposits, food economy) show less text. Their explanations are behind an "i" icon at the top right and show on hover.
+
 ## [0.89.0] - 2026-11-09
 <!-- version: {"title":"Building window: - The two employment bans (this building, the whole building type) are two icons at the top right.","type":"feature","reconstructed":false,"saveVersion":61} -->
 ### Changed
