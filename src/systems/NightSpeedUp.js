@@ -32,9 +32,10 @@ export class NightSpeedUp {
   // SpeedControls.setSpeed (buttons, keys 1–3, the tutorial) calls this before it sets the player's speed.
   manualChange(){if(!this.night)return;this.manual=true;this.engaged=false;this.before=null;}
   // The tip comes once per game after the first year; it is marked shown at that check even when the option is already
-  // on (then there is nothing to offer). Not during the tutorial.
+  // on (then there is nothing to offer). Not during the tutorial, and not while a tip bubble is open (m-tipy-mimo-listu:
+  // one tip at a time – it waits until the bubble is gone).
   checkTip(){
-    const s=this.scene;if(this.tipShown||(s.gameTime?.day??1)<NIGHT_SPEED_TIP_DAY||s.gameOver||s.tutorial?.active)return false;
+    const s=this.scene;if(this.tipShown||(s.gameTime?.day??1)<NIGHT_SPEED_TIP_DAY||s.gameOver||s.tutorial?.active||s.tutorial?.tip)return false;
     this.tipShown=true;if(this.read()>1)return false;this.tip?.show();return true;
   }
   enable(){this.save(3);this.scene.nightControls?.syncSpeed?.();}

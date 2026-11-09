@@ -16,7 +16,7 @@ export async function workplaceOutputSmoke(page){
   assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('newgame.workplace-authoring.v1')).workplaces.mill),{capacity:2,staffingOutput:[0,.25,1]});
   await page.click('#close-asset-gallery');
   const one=await page.evaluate(f=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===f.id),w=s.workerSystem.workers.get(f.workers[1]);w.path=[{x:w.tile.x+1,y:w.tile.y}];const summary=s.workplaceSystem.staffing(b);s.workplacePanel.open(b);return summary;},fixture);
-  assert.equal(one.present,1);assert.equal(one.output,.25);assert.match(await page.locator('#workplace-staffing-output').textContent(),/25%.*1 worker missing/);
+  assert.equal(one.present,1);assert.equal(one.output,.25);assert.match(await page.locator('#workplace-staffing-output').textContent(),/25%.*1 away from the building/);
   await page.click('#close-workplace');await page.evaluate(f=>{window.__game.registry.get('application').scene.workerSystem.workers.get(f.workers[1]).path=[];},fixture);
   await openAssetLibrary(page);await page.locator('[data-object-id="mill"]').click();await editor.locator('summary').click();await editor.locator('[data-staffing-capacity]').fill('1');await editor.locator('[data-staffing-curve]').fill('0, 100');await editor.locator('[data-staffing-apply]').click();await page.click('#close-asset-gallery');
   const reduced=await page.evaluate(f=>{const app=window.__game.registry.get('application'),s=app.scene,b=s.buildings.find(b=>b.id===f.id);return {workers:s.workplaceSystem.employees(b).map(w=>w.id),removed:s.workerSystem.workers.get(f.workers[1]).profession,held:s.employment.held.has(f.workers[1]),save:app.snapshot()};},fixture);

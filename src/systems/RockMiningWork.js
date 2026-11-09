@@ -1,10 +1,17 @@
 import { ROCK_MINING as RULES,CLEARING,clearsObstacles } from '../data/rockMining.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
-import { groupIndex,groupTiles } from '../game/natureGroups.js';
+import { groupIndex,groupTiles,groupKey } from '../game/natureGroups.js';
 import { carryCapacity } from '../data/logistics.js';
 import { t } from '../i18n/index.js';
 
+export const newTally=()=>({rock:new Set(),tree:new Set(),bush:new Set(),thicket:new Set()});
+export const tallyCount=tally=>Object.values(tally).reduce((n,set)=>n+set.size,0);
+// The status line after marking: "Označeno k odstranění: 4 skály, 1 houština." – each kind with its own plural form.
+export function clearingSummary(tally){
+  const list=['rock','tree','bush','thicket'].filter(kind=>tally[kind].size).map(kind=>t(`rock.kind.${kind}`,{count:tally[kind].size}));
+  return list.length?t('rock.marked',{list:list.join(', ')}):t('rock.markedNone');
+}
 // An optional finite target provider for MiningWork, not another worker scheduler.
 export class RockMiningWork {
   // m-oznacovani-tezby (51): trees and bushes marked for a Woodcutter (id → {id, planId}); planId: the wall plan that made the mark.
@@ -21,15 +28,17 @@ export class RockMiningWork {
   unmark(r){const s=this.scene;r.marked=false;delete r.planId;for(const w of s.workerSystem.liveWorkers())if(w.manualRockId===r.id){if(w.workTask?.kind==='mineRock')s.workerSystem.ai.cancel(w);w.manualRockId=null;}}
   // m-oznacovani-tezby (51): one tile of the marking tool (its rock, tree and bush); a tile under a wall plan keeps its marks.
   // velke-prirodni-objekty: a tile of a thicket or rock group marks (or unmarks) the whole group, tile by tile.
-  markTile(tile,enabled=true){
+  // m-drobnosti-083 (report 0.83.0 point 4): `tally` (newTally) collects what was marked by kind, each thing once even
+  // when a drag passes a group several times; the bushes of a thicket count as one thicket.
+  markTile(tile,enabled=true,tally=null){
     const group=groupIndex(this.scene.natureGroups).get(tileKey(tile));
-    return group?groupTiles(group).reduce((count,t)=>count+this.markOne(t,enabled),0):this.markOne(tile,enabled);
+    return group?groupTiles(group).reduce((count,t)=>count+this.markOne(t,enabled,tally,group),0):this.markOne(tile,enabled,tally);
   }
-  markOne(tile,enabled=true){
-    const s=this.scene;if(s.gameOver||s.gameTime.paused||!this.visible(tile)||!enabled&&this.plannedTiles().has(tileKey(tile)))return 0;
-    let count=0;if(s.terrainGrid[tile.y]?.[tile.x]===1&&this.mark(tile,enabled))count++;
-    const tree=this.treeAt(tile);if(tree&&this.markTree(tree,enabled))count++;
-    if(s.bushes?.has(tileKey(tile))&&this.markBush(tile,enabled))count++;
+  markOne(tile,enabled=true,tally=null,group=null){
+    const s=this.scene,key=tileKey(tile);if(s.gameOver||s.gameTime.paused||!this.visible(tile)||!enabled&&this.plannedTiles().has(key))return 0;
+    let count=0;if(s.terrainGrid[tile.y]?.[tile.x]===1&&this.mark(tile,enabled)){count++;tally?.rock.add(key);}
+    const tree=this.treeAt(tile);if(tree&&this.markTree(tree,enabled)){count++;tally?.tree.add(tree.natural.id);}
+    if(s.bushes?.has(key)&&this.markBush(tile,enabled)){count++;if(group?.kind==='thicket')tally?.thicket.add(groupKey(group));else tally?.bush.add(key);}
     return count;
   }
   treeAt(tile){const s=this.scene,object=s.resources.get(s.resourceOccupancy.get(tileKey(tile)))?.getData('object');return object?.definition.tree&&object.natural?.stage>0?object:null;}

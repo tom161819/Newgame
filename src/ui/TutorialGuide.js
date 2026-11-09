@@ -1,9 +1,10 @@
 import { t } from '../i18n/index.js';
-import { tutorialProgress,nearestRock,tutorialPlacement,markedRocks,freeBubbleSpot,rememberSpeed } from '../systems/Tutorial.js';
+import { tutorialProgress,nearestRock,tutorialPlacement,markedRocks,freeBubbleSpot,rememberSpeed,tutorialQuarryDeposit,depositCentre } from '../systems/Tutorial.js';
 import { tileCenter,gridToWorld } from '../game/isometric.js';
 import { FARM_PLOT_CAPACITY } from '../data/farmPlots.js';
 import { TUTORIAL_KING_MS } from '../data/tutorial.js';
-import { TIPS } from '../data/tips.js';
+import { TipQueue } from './tipQueue.js';
+import { DAY_DURATION } from '../systems/GameTimeSystem.js';
 import { foodDays } from '../data/foodOutlook.js';
 
 // E3 tutorial (plan m-e3-tutorial-sipka): a bubble with one sentence and an arrow at the place to click. The map is never
@@ -28,8 +29,22 @@ function movingTranslation(e){
   if(!e.getAnimations?.().some(a=>(a.playState==='running'||a.playState==='pending')&&(a.transitionProperty==null||a.transitionProperty==='transform'||a.transitionProperty==='all')))return null;
   try{const tr=getComputedStyle(e).transform;if(!tr||tr==='none')return null;const m=new DOMMatrixReadOnly(tr);return {x:m.m41,y:m.m42};}catch{return null;}
 }
-export function openWindowRects(doc=globalThis.document,vw=globalThis.innerWidth,vh=globalThis.innerHeight){
-  return [...(doc?.querySelectorAll?.(TUTORIAL_WINDOWS)??[])].filter(visible).map(e=>restingRect(e.getBoundingClientRect(),movingTranslation(e))).filter(r=>r.width>0&&r.height>0&&r.right>0&&r.bottom>0&&r.left<vw&&r.top<vh);
+export function openWindowRects(doc=globalThis.document,vw=globalThis.innerWidth,vh=globalThis.innerHeight,selector=TUTORIAL_WINDOWS){
+  return [...(doc?.querySelectorAll?.(selector)??[])].filter(visible).map(e=>restingRect(e.getBoundingClientRect(),movingTranslation(e))).filter(r=>r.width>0&&r.height>0&&r.right>0&&r.bottom>0&&r.left<vw&&r.top<vh);
+}
+// m-tipy-mimo-listu (report 0.83.0 point 2): a tip also keeps clear of the HUD – the top bar (resources, speed, day),
+// the side tabs, Settings and the Dev tool with its panel, the camera buttons ("Follow the king"), the bottom bar, the
+// Notices bar, the event lines and the minimap – on top of the open windows the tutorial bubble avoids.
+export const TIP_CLEAR='.inventory,.population-tab,#settings-button,#dev-tool-button,#dev-balance-panel,#follow-king,#dismount,.buildings-bar,#notices-panel,#event-feed,#minimap,#night-speed-tip';
+export const tipWindowRects=(doc=globalThis.document,vw=globalThis.innerWidth,vh=globalThis.innerHeight)=>[...openWindowRects(doc,vw,vh),...openWindowRects(doc,vw,vh,TIP_CLEAR)];
+// The highest a tip may sit: below the top bar (its box, when it spans the top of the screen), never above 70 px.
+export function tipTop(topBar,{gap=8,min=70}={}){return Math.max(min,topBar&&topBar.top<min?Math.ceil(topBar.bottom+gap):0);}
+// Pure (unit tested): where a tip's arrow and bubble go. Like tutorialPlacement, with the HUD boxes as windows and the
+// top bar as the upper limit; without a point the bubble takes the free spot nearest to the bottom left corner.
+export function tipPlacement({point=null,rect=null,from=null,vw,vh,bubble,windows=[],topBar=null,arrowLength}){
+  const top=tipTop(topBar),all=topBar?[topBar,...windows]:windows;
+  if(!point){const at=freeBubbleSpot({x:16,y:Math.max(top,vh-bubble.h-120),w:bubble.w,h:bubble.h,vw,vh,blocked:all,anchor:{x:16,y:vh},top});return {arrow:null,bubble:{x:Math.round(at.x),y:Math.round(at.y)}};}
+  return tutorialPlacement({point,rect,from,vw,vh,bubble,windows:all,top,arrowLength});
 }
 export class TutorialGuide {
   constructor(scene,{doc=globalThis.document}={}){
@@ -53,12 +68,17 @@ export class TutorialGuide {
     // finished opening or closing, not only on the next timer tick.
     const relayout=()=>{if(this.active)this.update(true);else if(this.tip)this.placeTip();};
     globalThis.addEventListener?.('resize',relayout,options);
-    doc.addEventListener?.('transitionend',e=>{if(e.target?.matches?.(TUTORIAL_WINDOWS))relayout();},options);
+    doc.addEventListener?.('transitionend',e=>{if(e.target?.matches?.(TUTORIAL_WINDOWS)||this.tip&&e.target?.matches?.(TIP_CLEAR))relayout();},options);
     // Settings: switch the tutorial off or back on (it resumes at the first step not done yet).
     this.tipSetting=doc.querySelector('#settings-tips');if(this.tipSetting){this.tipSetting.checked=tipsEnabled();this.tipSetting.addEventListener('change',()=>{try{localStorage.setItem(TIPS_KEY,this.tipSetting.checked?'on':'off');}catch{/* session */}if(!this.tipSetting.checked)this.closeTip();},options);}
-    try{this.tipsSeen=new Set(JSON.parse(localStorage.getItem(SEEN_KEY)??'[]'));}catch{this.tipsSeen=new Set();}this.tip=null;this.lastTipCheck=-Infinity;
+    let seen=[];try{seen=JSON.parse(localStorage.getItem(SEEN_KEY)??'[]');}catch{/* none */}this.tips=new TipQueue({seen:Array.isArray(seen)?seen:[]});this.lastTipCheck=-Infinity;
+    this.bubble.addEventListener('pointerenter',()=>{this.hovered=true;},options);this.bubble.addEventListener('pointerleave',()=>{this.hovered=false;},options);
     this.setting=doc.querySelector('#settings-tutorial');if(this.setting){this.setting.checked=tutorialEnabled();this.setting.addEventListener('change',()=>{setTutorialEnabled(this.setting.checked);if(this.setting.checked){this.skipped.clear();this.resume();}else{this.active=false;this.hide();}},options);}
   }
+  // The tip in the bubble (TipQueue.current); smoke scripts may set it directly.
+  get tip(){return this.tips?.current??null;}
+  set tip(value){if(this.tips)this.tips.current=value??null;}
+  get tipsSeen(){return this.tips.seen;}
   button(cls,action){const b=this.doc.createElement('button');b.type='button';b.className=cls;b.addEventListener('click',action,{signal:this.controller.signal});return b;}
   progress(){if(rememberSpeed(this.scene,this.seen))try{localStorage.setItem(SPEED_KEY,'1');}catch{/* session */}return tutorialProgress(this.scene,{seen:this.seen,skipped:this.skipped});}
   // A new game from the setup starts it; a loaded game resumes it while it is switched on and not finished.
@@ -94,7 +114,7 @@ export class TutorialGuide {
     if(step.id==='stone'&&s.rockMiningTool?.enabled&&!s.rockMiningTool.remove){const rock=this.rockTile();if(rock){const p=tileCenter(rock);return {world:{x:p.x,y:p.y-10},from:'above'};}}
     // m-kamenolom-u-hradu: with the Quarry chosen in the build menu, the arrow points down at the free Stone Deposit
     // nearest to the Castle (every new world has one 8–16 tiles out).
-    if(step.id==='stone'&&s.buildMode&&s.selectedBuilding?.id==='quarry'){const d=this.quarryDeposit();if(d){const p=gridToWorld(d.x+1,d.y+1);return {world:{x:p.x,y:p.y-30},from:'above',placing:true,quarry:true};}}
+    if(step.id==='stone'&&s.buildMode&&s.selectedBuilding?.id==='quarry'){const d=this.quarryDeposit();if(d){const c=depositCentre(d),p=gridToWorld(c.x,c.y);return {world:{x:p.x,y:p.y-30},from:'above',placing:true,quarry:true};}}
     if(step.target)return {el:q(step.target)};
     const id=this.pendingBuilding(step);if(!id)return {};
     if(s.buildMode&&s.selectedBuilding?.id===id)return {placing:true};
@@ -110,7 +130,9 @@ export class TutorialGuide {
   }
   quarryDeposit(){
     const s=this.scene,mining=s.naturalResources?.mining;if(!mining)return null;const c=mining.startCentre?.()??{x:50,y:50};
-    return mining.deposits().filter(d=>d.type==='stone_deposit'&&d.natural.remaining>0&&d.natural.boundBuildingId==null).sort((a,b)=>Math.hypot(a.x+1-c.x,a.y+1-c.y)-Math.hypot(b.x+1-c.x,b.y+1-c.y)||a.y-b.y||a.x-b.x)[0]??null;
+    // m-drobnosti-083: large deposits count too, and a deposit the player can see (or has explored) comes first.
+    const fog=s.fog,seen=d=>{if(!fog?.enabled||!fog.displayState)return 2;const w=d.definition?.width??2,h=d.definition?.height??w;let best=0;for(let y=0;y<h;y++)for(let x=0;x<w;x++)best=Math.max(best,fog.displayState({x:d.x+x,y:d.y+y}));return best;};
+    return tutorialQuarryDeposit(mining.deposits(),c,seen);
   }
   // The rock the stone step points at: kept while it is still an unmarked rock, otherwise the nearest one to the Castle.
   rockTile(){
@@ -149,6 +171,7 @@ export class TutorialGuide {
     }
     if(target.el&&visible(target.el)){rect=target.el.getBoundingClientRect();point={x:rect.left+rect.width/2,y:rect.top+rect.height/2};}
     else if(target.world){const sp=this.screenPoint(target.world);if(sp)point={x:sp.x,y:sp.y};}
+    if(this.tip&&!this.active){this.placeTipBubble(point,rect,target,vw,vh);return;}
     if(!point){this.arrow.hidden=true;this.positionBubble(null);return;}
     // m-tutorial-v2 point 2: arrow and bubble beside the target (and beside the panel it lives in), never over it.
     const w=Math.min(300,vw-24);this.bubble.style.width=`${w}px`;const h=this.bubble.offsetHeight||90;
@@ -156,6 +179,15 @@ export class TutorialGuide {
     const avoid=boxes.length?{left:Math.min(...boxes.map(b=>b.left)),right:Math.max(...boxes.map(b=>b.right)),top:Math.min(...boxes.map(b=>b.top)),bottom:Math.max(...boxes.map(b=>b.bottom))}:null;
     const {arrow,bubble}=tutorialPlacement({point,rect,avoid,from:target.from??null,vw,vh,bubble:{w,h},windows:openWindowRects(this.doc,vw,vh),arrowLength:this.arrowLength()});
     this.arrow.hidden=false;this.arrow.style.left=`${Math.round(arrow.x)}px`;this.arrow.style.top=`${Math.round(arrow.y)}px`;this.arrow.style.transform=`translate(-50%,-50%) rotate(${arrow.angle}rad)`;this.arrow.classList.toggle('offscreen',arrow.off);
+    this.bubble.style.left=`${bubble.x}px`;this.bubble.style.top=`${bubble.y}px`;
+  }
+  // m-tipy-mimo-listu: a tip is measured against the HUD and the open windows (tipPlacement).
+  placeTipBubble(point,rect,target,vw,vh){
+    const w=Math.min(300,vw-24);this.bubble.style.width=`${w}px`;const h=this.bubble.offsetHeight||90;
+    const bar=this.doc.querySelector?.('.inventory'),topBar=bar&&visible(bar)?bar.getBoundingClientRect():null;
+    const windows=tipWindowRects(this.doc,vw,vh).filter(r=>!topBar||r.left!==topBar.left||r.top!==topBar.top||r.right!==topBar.right||r.bottom!==topBar.bottom);
+    const {arrow,bubble}=tipPlacement({point,rect,from:target.from??null,vw,vh,bubble:{w,h},windows,topBar,arrowLength:this.arrowLength()});
+    this.arrow.hidden=!arrow;if(arrow){this.arrow.style.left=`${Math.round(arrow.x)}px`;this.arrow.style.top=`${Math.round(arrow.y)}px`;this.arrow.style.transform=`translate(-50%,-50%) rotate(${arrow.angle}rad)`;this.arrow.classList.toggle('offscreen',arrow.off);}
     this.bubble.style.left=`${bubble.x}px`;this.bubble.style.top=`${bubble.y}px`;
   }
   // The drawn length of the pointer in the current UI design (golden arrow 40 px, the medieval pointers 56 px), with the
@@ -184,13 +216,23 @@ export class TutorialGuide {
       default:return false;
     }
   }
+  gameNow(){return this.scene.gameTime?.totalElapsed??0;}
+  dayMs(){return this.scene.gameTime?.dayDuration??DAY_DURATION;}
+  saveSeen(){try{localStorage.setItem(SEEN_KEY,JSON.stringify([...this.tips.seen]));}catch{/* session */}}
   updateTips(){
-    const now=performance.now();if(this.tip&&!tipsEnabled())this.closeTip(false);if(this.tip){this.placeTip();return;}
+    const now=performance.now();if(this.tip&&!tipsEnabled())this.closeTip(false);
+    // m-tipy-mimo-listu: a tip left alone for a game day folds into the Notices bar (the "!" tab), the next one may come.
+    if(this.tip&&this.tips.due(this.gameNow(),this.dayMs(),{held:this.hovered})){this.parkTip();return;}
+    if(this.tip){this.placeTip();return;}
     if(now-this.lastTipCheck<1000||this.scene.gameOver||!tipsEnabled())return;this.lastTipCheck=now;
-    const tip=TIPS.find(tip=>!this.tipsSeen.has(tip.id)&&this.tipHolds(tip.id));if(!tip)return;
-    this.tip=tip;this.text.textContent=t(`tips.${tip.id}`);this.count.textContent=t('tips.label');
+    // One tip at a time: the night speed-up tip counts as one too.
+    if(this.scene.nightSpeedUp?.tip?.visible)return;
+    const tip=this.tips.next(id=>this.tipHolds(id),this.gameNow());if(tip)this.showTip(tip);
+  }
+  showTip(tip){
+    this.text.textContent=t(`tips.${tip.id}`);this.count.textContent=t('tips.label');
     this.showButton.hidden=false;this.showButton.textContent=t('tips.more');this.nextButton.hidden=false;this.nextButton.textContent=t('tips.gotIt');this.skipButton.hidden=true;this.closeButton.title=this.closeButton.ariaLabel=t('tips.off');
-    this.bubble.classList.add('is-tip');this.bubble.hidden=false;this.placeTip();
+    this.bubble.classList.add('is-tip');this.bubble.hidden=false;this.hovered=false;this.placeTip();
   }
   placeTip(){
     const tip=this.tip,s=this.scene;if(!tip)return;
@@ -198,7 +240,14 @@ export class TutorialGuide {
     else this.place(tip.target?{el:this.doc.querySelector(tip.target)}:{});
   }
   // "Got it" marks the tip seen; × switches tips off; "More" opens the help (the checklist and its answers).
-  closeTip(seen=true){if(!this.tip)return;if(seen){this.tipsSeen.add(this.tip.id);try{localStorage.setItem(SEEN_KEY,JSON.stringify([...this.tipsSeen]));}catch{/* session */}}this.tip=null;this.bubble.classList.remove('is-tip');this.hide();}
+  closeTip(seen=true){if(!this.tip)return;this.tips.close(seen);if(seen)this.saveSeen();this.bubble.classList.remove('is-tip');this.hide();}
+  // Folded into the Notices bar: seen (it does not pop up again), listed there until opened or closed.
+  parkTip(){if(!this.tips.park(this.gameNow()))return;this.saveSeen();this.bubble.classList.remove('is-tip');this.hide();this.scene.noticesPanel?.render?.();}
+  // The tips folded into the Notices bar, as notice rows (NoticesPanel).
+  parkedTips(){return this.tips.parkedList().map(({id,at})=>({key:`tip:${id}`,tip:id,reason:'tip',category:'tip',severity:'info',entityId:null,lastNotified:at,text:t(`tips.${id}`)}));}
+  // A parked tip clicked in the Notices bar opens again (not while the tutorial runs: it uses the same bubble).
+  reopenTip(id){if(this.active||!this.tips.reopen(id,this.gameNow()))return false;this.saveSeen();this.showTip(this.tip);this.scene.noticesPanel?.render?.();return true;}
+  dropTip(id){if(this.tips.drop(id))this.scene.noticesPanel?.render?.();}
   relabel(){this.update(true);}
   destroy(){this.controller.abort();globalThis.clearInterval?.(this.timer);clearTimeout(this.doneTimer);this.bubble.remove();this.arrow.remove();this.done.remove();}
 }

@@ -1,6 +1,17 @@
 import { TUTORIAL_STEPS } from '../data/tutorial.js';
 import { buildingIsComplete } from '../game/buildingState.js';
+import { depositFamily } from '../data/minerals.js';
 
+// m-drobnosti-083 (report 0.83.0 point 3): the Stone Deposit the Quarry step points at – an ordinary or a large one
+// (stone_deposit_large belongs to the stone_deposit family), free and not empty. One the player can see comes first,
+// then one already explored, then one still in the dark; nearest to `centre` (the Castle) within each. `seen(d)`:
+// 2 = visible, 1 = explored, 0 = unexplored (FogOfWarSystem.displayState, best tile of the deposit).
+export function tutorialQuarryDeposit(deposits,centre={x:50,y:50},seen=()=>2){
+  const mid=d=>{const w=d.definition?.width??2,h=d.definition?.height??w;return {x:d.x+w/2,y:d.y+h/2};},dist=d=>{const m=mid(d);return Math.hypot(m.x-centre.x,m.y-centre.y);};
+  return (deposits??[]).filter(d=>depositFamily(d.type)==='stone_deposit'&&d.natural?.remaining>0&&d.natural.boundBuildingId==null).map(d=>({d,seen:seen(d),dist:dist(d)}))
+    .sort((a,b)=>b.seen-a.seen||a.dist-b.dist||a.d.y-b.d.y||a.d.x-b.d.x)[0]?.d??null;
+}
+export const depositCentre=d=>{const w=d.definition?.width??2,h=d.definition?.height??w;return {x:d.x+w/2,y:d.y+h/2};};
 // Rocks marked to clear (or already mined). m-tutorial-v2 bug 6: the marks live in naturalResources.miningWork.rocks
 // (RockMiningWork); the old lookup read naturalResources.mining (the Mineral System, which has no rocks), so marking a
 // rock never ended the stone step and the House step behind it looked stuck too (bug 7).
