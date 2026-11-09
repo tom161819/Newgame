@@ -29,6 +29,7 @@ import { notices2Smoke } from './notices-2-smoke.mjs';
 import { depletedMineSmoke } from './depleted-mine-smoke.mjs';
 import { animals3Smoke } from './animals-3-smoke.mjs';
 import { farmhouseStoreSmoke } from './farmhouse-store-smoke.mjs';
+import { buildingTooltipSmoke,nightSpeedSmoke } from './building-tooltip-smoke.mjs';
 import { employment2Smoke } from './employment-2-smoke.mjs';
 import { animalLooksSmoke } from './animal-looks-smoke.mjs';
 import { tutorialSmoke } from './tutorial-smoke.mjs';
@@ -228,6 +229,8 @@ try{
   await step('depleted-mine',()=>depletedMineSmoke(context,origin+base,instrument));
   await step('animals-3',()=>animals3Smoke(context,origin+base,instrument));
   await step('farmhouse-store',()=>farmhouseStoreSmoke(context,origin+base,instrument));
+  await step('building-tooltip',()=>buildingTooltipSmoke(context,origin+base,instrument));
+  await step('night-speed',()=>nightSpeedSmoke(context,origin+base,instrument));
   await step('tutorial',()=>tutorialSmoke(context,origin+base,instrument));
   await step('marketplace',()=>marketplaceSmoke(context,origin+base,instrument));
   await step('gate',()=>gateSmoke(context,origin+base,instrument));

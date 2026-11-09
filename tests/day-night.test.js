@@ -45,9 +45,9 @@ test('at night everyone sees a third outside light, the full sight inside a torc
   sc.lightSources={lights:()=>[{type:'window',x:0,y:0,radius:64},{type:'torch',x:0,y:400,radius:96}]};assert.deepEqual(dn.lights().map(l=>l.radius),[3]);
 });
 
-test('Speed up nights: ×3 by default (×1 by day), Skip to dawn ×8 until dawn, a fight stops it', () => {
+test('Auto speed-up at night: off by default (m-noc-zrychleni), a stored choice is kept; Skip to dawn ×8 until dawn, a fight stops it', () => {
   const sc=scene({day:1,fraction:.9}),dn=new DayNightSystem(sc);
-  assert.equal(readNightSpeed({getItem:()=>null}),3);assert.equal(readNightSpeed({getItem:()=>'2'}),2);assert.equal(readNightSpeed({getItem:()=>'7'}),3);
+  assert.equal(readNightSpeed({getItem:()=>null}),1);assert.equal(readNightSpeed({getItem:()=>'2'}),2);assert.equal(readNightSpeed({getItem:()=>'3'}),3);assert.equal(readNightSpeed({getItem:()=>'7'}),1);
   assert.equal(dn.speed(3),3);assert.equal(dn.speed(1),1);assert.equal(dn.skipToDawn(),true);assert.equal(dn.speed(3),DAY_NIGHT.skipSpeed);
   dn.attention=()=>true;assert.equal(dn.speed(3),1);assert.equal(dn.skipping,false,'a fight cancels the skip');dn.attention=()=>false;
   dn.skipToDawn();sc.gameTime.day=2;sc.gameTime.elapsed=.1*120000;assert.equal(dn.speed(3),1,'day');assert.equal(dn.skipping,false);

@@ -2,6 +2,7 @@ import { fishingGround } from './FishingSystem.js';
 import { validNightThreatState } from './NightThreatSystem.js';
 import { validRoyalGoalState } from './RoyalGoals.js';
 import { validKingSkillState } from './KingSkills.js';
+import { validNightSpeedTipState } from '../data/dayNight.js';
 import { validNoticeState } from '../data/diagnostics.js';
 import { validLightFuelState } from './LightFuelSystem.js';
 import { validateRockMining } from './RockMiningState.js';
@@ -100,6 +101,8 @@ export function serializeGameState(scene){
     ...(scene.nightThreats?{nightThreats:scene.nightThreats.exportState()}:{}),
     ...(scene.royalGoals?{royalGoals:scene.royalGoals.exportState()}:{}),
     ...(scene.kingSkills?{kingSkills:scene.kingSkills.exportState()}:{}),
+    // m-noc-zrychleni (82): the night speed-up tip was shown in this game (optional; only `true`, absent = not yet).
+    ...(scene.nightSpeedUp?.exportState?.()?{nightSpeedTip:true}:{}),
     // m-hlasky-jednou (79): when the player closed which notice (optional; absent = none closed).
     ...(scene.diagnostics?.exportState?{notices:scene.diagnostics.exportState()}:{}),
     ...(scene.policy?{policy:scene.policy.exportState()}:{}),
@@ -522,6 +525,8 @@ export function validateGameState(input,registry=objectRegistry){
   if(s.royalGoals!==undefined)check(validRoyalGoalState(s.royalGoals));
   // m-kral-odmeny-xp: the King's unspent skill points and royal skill levels (optional; points come from finished tasks).
   if(s.kingSkills!==undefined)check(validKingSkillState(s.kingSkills,s.royalGoals?.done??[]));
+  // m-noc-zrychleni (82): the night speed-up tip shown (optional, only `true`).
+  if(s.nightSpeedTip!==undefined)check(validNightSpeedTipState(s.nightSpeedTip));
   // m-hlasky-jednou (79): closed notices – [memory key, game time of the close], unique, never in the future.
   if(s.notices!==undefined)check(validNoticeState(s.notices,s.time?.totalElapsed??0));
   if(s.children!==undefined)validateChildrenState(s.children,{check,number,integer,array,buildingIds:new Set(s.buildings.map(b=>b.id))});
