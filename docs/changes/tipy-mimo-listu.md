@@ -27,7 +27,13 @@ None. SAVE_VERSION unchanged; tips and their seen list stay in localStorage (`ne
 ## Testing
 - `tests/tipy-mimo-listu.test.js`: placement clear of the top bar, side tabs, Dev tool and "Follow the king" at 3 screen sizes (shots 03 and 11) and with no target; re-placement when a window opens; `tipTop`; folding after a game day (not before, not while hovered), the notice row and the "!" tab, reopen and drop; one tip at a time with the queue; the night speed-up tip waits.
 - `npm test` (1193 pass), `npm run build -- --base=/Newgame/` OK.
-- Browser: **not run** (the other agent used the browser). New smoke `scripts/tips-hud-smoke.mjs` (step `tips-hud` in `browser-smoke.mjs`) is written but has not been run.
+- Browser smoke `scripts/tips-hud-smoke.mjs` (`npm run smoke -- --current-only --keep-going --tips-hud`) passes after the merge into main. Fixes made at its first run:
+  - the MKW5 world code;
+  - the other tips are marked seen first, so another tip does not open as soon as the night tip folds;
+  - only rows inside `#notices-list` are counted;
+  - the night speed-up's own update is held while the badge is checked.
+  The game itself got one fix: the peek clears its `data-notice-tip` once it is hidden. Screenshots checked: the night tip sits below the top bar with its arrow up at "Svítání"; the folded tip shows on the "!" tab and slides out as one row; the ☾ badge sits on the ×3 button.
+- `--farmer-tending`, `--workplace-output` and the main smoke (no flag) pass.
 
 ## Notes for the next agent
 - Run the `tips-hud` smoke once and look at its shots (`SMOKE_SHOTS`); if the free spot in a small window is poor, the list in `TIP_CLEAR` is the knob.

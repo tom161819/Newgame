@@ -80,7 +80,7 @@ export class NoticesPanel {
     if(peek){
       const issue=peek.issue;this.peek.replaceChildren(element('span','notices-peek-text',this.text(issue)));if(peek.more>0)this.peek.append(element('span','notices-more',t('notice.more',{count:peek.more})));
       this.peek.dataset.noticeEntity=issue.entityId;this.peek.dataset.noticeReason=issue.reason;if(issue.tip)this.peek.dataset.noticeTip=issue.tip;else delete this.peek.dataset.noticeTip;this.peek.dataset.severity=issue.severity??'warning';this.peek.hidden=false;this.schedule();
-    }else if(!this.peek.hidden)this.clearTimer=setTimeout(()=>{this.peek.hidden=true;this.peek.replaceChildren();},this.collapsed?NOTICE_BAR.slideMs:0);
+    }else if(!this.peek.hidden)this.clearTimer=setTimeout(()=>{this.peek.hidden=true;this.peek.replaceChildren();delete this.peek.dataset.noticeTip;},this.collapsed?NOTICE_BAR.slideMs:0);
     this.placeTab();
   }
   // Page timers (UI only, not game time): the peek ends after its time unless the pointer holds it.

@@ -15,11 +15,11 @@ export async function tipsHudSmoke(context,url,instrument){
   try{
     await page.goto(url);saved=await page.evaluate(()=>Object.fromEntries(['newgame.language','newgame.tipsSeen','newgame.tips','newgame.notices.collapsed'].map(k=>[k,localStorage.getItem(k)])));
     await page.evaluate(()=>{localStorage.setItem('newgame.language','cs');localStorage.removeItem('newgame.tipsSeen');localStorage.setItem('newgame.tips','on');localStorage.setItem('newgame.notices.collapsed','1');});await page.reload();
-    await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW4-155515555555-SU24BGPY');await page.locator('#start-game').click();
+    await page.locator('#new-game:not([disabled])').click();await page.locator('#setup-world-code').fill('MKW5-155515555555-1');await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.tutorial);
     await page.locator('#help-dialog[open]').waitFor({timeout:10000}).then(()=>page.keyboard.press('Escape')).catch(()=>{});
-    // Shot 03: the night tip points at the day part in the top bar.
-    await page.evaluate(s=>{const g=eval(s),t=g.tutorial;t.active=false;t.hide();t.tips.open({id:'night',target:'#day-part'},t.gameNow());t.showTip(t.tip);},S);await page.waitForTimeout(200);
+    // Shot 03 (the other tips are marked seen so none follows once the night tip folds away): the night tip points at the day part in the top bar.
+    await page.evaluate(s=>{const g=eval(s),t=g.tutorial;t.active=false;t.hide();for(const tip of t.tips.tips)if(tip.id!=='night')t.tips.seen.add(tip.id);t.tips.waiting=[];t.tips.open({id:'night',target:'#day-part'},t.gameNow());t.showTip(t.tip);},S);await page.waitForTimeout(200);
     let bubble=await rect('#tutorial-bubble');assert.ok(bubble,'the night tip shows');
     for(const sel of ['.inventory','#speed-controls','#follow-king'])assert.ok(!ov(bubble,await rect(sel)),`the tip over ${sel} ${JSON.stringify(bubble)}`);
     for(const tab of await rects('.population-tab'))assert.ok(!ov(bubble,tab),'the tip over a side tab');
@@ -32,14 +32,17 @@ export async function tipsHudSmoke(context,url,instrument){
     await page.evaluate(s=>{const t=eval(s).tutorial;t.tips.shownAt-=t.dayMs();t.hovered=false;t.updateTips();},S);
     assert.equal(await page.locator('#tutorial-bubble').isHidden(),true,'folded away');
     await page.locator('#notices-tab .notices-alert').waitFor({timeout:3000});await shot('fold-tab');
-    await page.locator('#notices-tab').click();await page.locator('[data-notice-tip="night"]').first().click();
+    await page.locator('#notices-tab').click();await page.locator('#notices-list [data-notice-tip="night"]').click();
     assert.equal(await page.locator('#tutorial-bubble').isVisible(),true,'opened again from the Notices bar');
-    assert.equal(await page.locator('[data-notice-tip="night"]').count(),0,'its row is gone');
+    assert.equal(await page.locator('#notices-list [data-notice-tip="night"]').count(),0,'its row is gone');
     await page.evaluate(s=>eval(s).tutorial.closeTip(),S);
     // Point 8: the step held by the night speed-up has a moon badge in the icon look.
-    const badge=await page.evaluate(s=>{const g=eval(s);g.nightSpeedUp.engaged=true;g.gameSpeed=3;g.speedControls.render();const b=document.querySelector('#speed-controls [data-speed="3"]');return getComputedStyle(b,'::after').content;},S);
-    assert.match(badge,/☾/,'a moon on the held step');await shot('night-badge');
-    await page.evaluate(s=>{const g=eval(s);g.nightSpeedUp.engaged=false;g.speedControls.render();},S);
+    // The day's own update would release the held step at once: it is held still for the check.
+    const badge=await page.evaluate(s=>{const g=eval(s),n=g.nightSpeedUp;n.smokeUpdate=n.update;n.update=()=>{};n.engaged=true;g.gameSpeed=3;g.speedControls.render();const b=document.querySelector('#speed-controls [data-speed="3"]');return getComputedStyle(b,'::after').content;},S);
+    assert.match(badge,/☾/,'a moon on the held step');await page.waitForTimeout(200);
+    assert.equal(await page.locator('#speed-controls [data-speed="3"]').getAttribute('aria-pressed'),'true','×3 is the held step');
+    if(process.env.SMOKE_SHOTS){const r=await rect('#speed-controls');await page.screenshot({path:`${process.env.SMOKE_SHOTS}/tips-hud-night-badge.png`,clip:{x:r.left-20,y:r.top-20,width:r.right-r.left+40,height:r.bottom-r.top+40}});}
+    await page.evaluate(s=>{const g=eval(s),n=g.nightSpeedUp;n.update=n.smokeUpdate;delete n.smokeUpdate;n.engaged=false;g.gameSpeed=1;g.speedControls.render();},S);
     console.log('PASS tips and HUD 0.83 playtest: tips clear the top bar, side tabs and windows, fold into the Notices bar and open again, moon badge on the held speed step');
   }finally{
     if(saved)await page.evaluate(saved=>{for(const [k,v] of Object.entries(saved))if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,v);},saved).catch(()=>{});
