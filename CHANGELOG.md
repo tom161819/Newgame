@@ -4,6 +4,9 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+
+## [0.85.0] - 2026-11-09
+<!-- version: {"title":"Kingdom bar, smooth seasons and fish, Light Lab and terrain height lab","type":"feature","reconstructed":false,"saveVersion":61} -->
 ### Changed
 - Fish in rivers and lakes no longer pop in and out. They rise slowly from the depth and sink back. While they are up they drift slowly. Now and then a fish touches the surface and one or two light rings spread out. There are no rings under the winter ice.
 - Seasons now change gradually over about 3 game days around the turn of the season instead of all at once. Snow comes first in the shade and on stony ground and last by the water. The thaw starts by the water and on sunny meadows. In autumn the grass turns yellow in patches. Flowers, plants, trees and bushes change patch by patch with the ground. A game saved during the change loads at the same point.
