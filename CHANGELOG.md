@@ -4,6 +4,9 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+
+## [0.84.0] - 2026-11-09
+<!-- version: {"title":"Woodcutters and forests, iron mine spot, tips off the HUD","type":"feature","reconstructed":false,"saveVersion":61} -->
 ### Added
 - A Lumberjack Hut with no mature tree in its working radius gets the notice "The Lumberjack Hut has nothing to fell – build a new one near a forest". Clicking it moves the camera to the hut. The notice goes away once a tree in range is mature again.
 - The Lumberjack Hut window shows the young trees in its working radius and roughly how many days until the next one is mature. The estimate counts the season (nothing grows in winter).
