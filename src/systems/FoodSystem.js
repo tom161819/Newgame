@@ -2,6 +2,7 @@ import { devFactor } from '../data/devBalance.js';
 import { DAY_DURATION } from './GameTimeSystem.js';
 import { EDIBLE_RESOURCES,FOOD_ECONOMY_DAYS,HUNGRY_WORK_MULTIPLIER } from '../data/seasons.js';
 import { MEAL_VARIETY } from '../data/policy.js';
+import { t } from '../i18n/index.js';
 
 // One meal scheduler serves standalone models and the scene's central game clock.
 export class FoodSystem {
@@ -30,12 +31,25 @@ export class FoodSystem {
     if(!this.residents.has(actor.id))this.syncResidents();
     const record=this.residents.get(actor.id),last=record?.meals??{},day=this.time?.day??this.lastProcessedDay;
     const order=EDIBLE_RESOURCES.map((id,i)=>({id,i,day:this.variety?last[id]??-Infinity:0})).sort((a,b)=>a.day-b.day||a.i-b.i);
-    for(const {id}of order)if(this.inventory.count(id)>0&&this.inventory.spend(id,1,{source:source??(actor.id==='king'?'King Consumption':'Villager Consumption'),entityId:actor.id})){this.bucket().consumed++;if(record){record.meals={...last,[id]:day};}return true;}
+    for(const {id}of order)if(this.inventory.count(id)>0&&this.inventory.spend(id,1,{source:source??(actor.id==='king'?'King Consumption':'Villager Consumption'),entityId:actor.id})){this.bucket().consumed++;this.lastMeal=id;if(record){record.meals={...last,[id]:day};}return true;}
     return false;
   }
   // Kinds of food a resident ate within the last MEAL_VARIETY.days days (today included).
   recentKinds(id){const day=this.time?.day??this.lastProcessedDay,meals=this.residents.get(id)?.meals??{};return EDIBLE_RESOURCES.filter(k=>meals[k]!==undefined&&day-meals[k]<MEAL_VARIETY.days);}
-  recover(){if(this.time?.paused||this.scene?.gameOver)return false;let changed=false;for(const u of this.units())if(u.isAlive){const record=this.residents.get(u.id);if(record?.hungry&&this.eat(u)){record.hungry=false;changed=true;}}if(changed)this.onChange();return changed;}
+  // A hungry resident eats as soon as any food reaches a store, so a delivery to an empty kingdom can be eaten in the
+  // same frame and the stock in the top bar never rises (owner report 0.85.0: "the Fisher brought fish but nothing was
+  // added"). That is the intended food rule; the notice below says where the food went.
+  recover(){
+    if(this.time?.paused||this.scene?.gameOver)return false;let changed=false;const eaten={};
+    for(const u of this.units())if(u.isAlive){const record=this.residents.get(u.id);if(record?.hungry&&this.eat(u)){record.hungry=false;changed=true;eaten[this.lastMeal]=(eaten[this.lastMeal]??0)+1;}}
+    if(changed){this.onChange();this.reportHungryMeals(eaten);}return changed;
+  }
+  // ryby-nepricteny: one notice a game day when hungry residents ate food the moment it arrived.
+  reportHungryMeals(eaten){
+    const feed=this.scene?.eventFeed,entries=Object.entries(eaten).filter(([id,n])=>id&&n>0);if(!feed?.push||!entries.length)return;
+    const registry=this.scene.objectRegistry,items=entries.map(([id,n])=>`${registry?.get?.(id)?.name??id} ${n}`).join(', ');
+    feed.push(`hungry-ate:${this.time?.day??this.lastProcessedDay}`,t('food.hungryAte',{items}));
+  }
   advance(delta){
     if(!Number.isFinite(delta)||delta<=0||this.scene?.gameOver||this.time?.paused)return;
     this.syncResidents();let changed=this.recover();

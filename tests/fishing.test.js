@@ -110,3 +110,28 @@ test('m-ulozeni-brod: a Fisher on a bank next to a ford (fished as shallow water
   const data=validateGameState(JSON.parse(JSON.stringify(serializeGameState(s))));
   assert.equal(data.workers.find(x=>x.id===w.id).workTask.kind,'fish');
 });
+
+// ryby-nepricteny (owner report 0.85.0: "the Fisher brought fish to the Granary but nothing was added"): with hungry
+// residents the delivered basket is eaten in the same frame it reaches the store, so the stock never rises. The fish
+// must not vanish silently: the ledger shows today's +Fishing / −Villager Consumption and a notice says where it went.
+test('ryby-nepricteny: fish delivered to a Granary while residents are hungry is eaten at once, and the game says so',()=>{
+  const s=workerScene(undefined,{naturalResources:true,construction:true,logistics:true,ledger:true});s.workerSystem.unsubscribe();
+  s.groundGrid=emptyGround();for(let y=36;y<=50;y++)for(let x=51;x<=60;x++){s.groundGrid[y][x]=x>52&&x<59&&y>37&&y<49?GROUND.DEEP:GROUND.SHALLOW;s.map[y][x]=WATER_CELL;}
+  s.fishing=new FishingSystem(s);s.eventFeed={pushed:[],texts:[],push(key,text){if(this.pushed.includes(key))return false;this.pushed.push(key);this.texts.push(text);return true;}};
+  const g=objectRegistry.require('granary');ensureBuildingPrerequisites(s,g);for(const [r,n]of Object.entries(g.cost))s.inventory.add(r,n);
+  const placed=placeBuilding({map:s.map,anchor:{x:40,y:50},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:g});assert.ifError(placed.error);s.towerViews.set(placed.building.id,s.createBuildingView(g,placed.building));
+  const b=hut(s),w=fisher(s,b),granary=placed.building,location=s.foodStorage.locations.get(`granary-${granary.id}`);
+  assert.ok(location?.allowed.includes('fish'),'the Granary takes fish');
+  for(const l of s.foodStorage.locations.values())for(const r of ['apple','bread','meat','fish'])delete l.stock[r];s.foodStorage.changed();
+  for(let k=0;k<2;k++)s.workerSystem.create({x:38,y:44});s.foodSystem.syncResidents();
+  const hungry=[...s.foodSystem.residents.values()].slice(0,3);for(const r of hungry)r.hungry=true;assert.equal(s.foodSystem.hungryCount,3);
+  let delivered=0;const put=s.foodStorage.put.bind(s.foodStorage);s.foodStorage.put=(id,amount,o)=>{const r=s.foodStorage.reservations.get(id),ok=put(id,amount,o);if(ok&&r?.resource==='fish')delivered+=amount;return ok;};
+  for(let i=0;i<6000&&!delivered;i++){s.tick(50);s.foodSystem.recover();}
+  assert.ok(delivered>=3,`a basket reached a store (${delivered})`);
+  assert.equal(s.foodSystem.hungryCount,0,'the hungry residents ate');assert.equal(fishStock(s),delivered-3,'three fish were eaten the moment they arrived');
+  const today=s.resourceLedger.today('fish');assert.equal(today.incomeBySource.Fishing,delivered);assert.equal(today.expenses,3);assert.equal((today.expensesBySource['Villager Consumption']??0)+(today.expensesBySource['King Consumption']??0),3);
+  assert.equal(s.eventFeed.pushed.filter(k=>k.startsWith('hungry-ate:')).length,1);assert.match(s.eventFeed.texts.at(-1),/Fish 3/);
+  // Not hungry: the next basket simply adds to the stock.
+  const before=fishStock(s);delivered=0;for(let i=0;i<6000&&!delivered;i++){s.tick(50);s.foodSystem.recover();}
+  assert.equal(fishStock(s),before+delivered);assert.equal(s.eventFeed.pushed.filter(k=>k.startsWith('hungry-ate:')).length,1);
+});

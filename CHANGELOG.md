@@ -4,6 +4,8 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+### Fixed
+- When residents are hungry, food that reaches a store is eaten at once, so a Fisher's basket could vanish from the stock without a word ("the Fisher brought fish but nothing was added"). The game now says so with a notice ("Hungry residents ate food the moment it reached the stores: Fish 5"), and the resource tooltip in the top bar shows what came in and went out today so far (for example +5 Fishing, −5 Villager Consumption).
 
 ## [0.90.0] - 2026-11-09
 <!-- version: {"title":"Building windows (Marketplace, Builder's Workshop, storage, house, trees and deposits, food economy) show less text.","type":"feature","reconstructed":false,"saveVersion":61} -->

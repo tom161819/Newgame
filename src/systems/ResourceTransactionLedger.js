@@ -34,6 +34,8 @@ export class ResourceTransactionLedger {
   }
   get lastDay(){return this.history.at(-1)??null;}
   summary(resource){const value=this.lastDay?.totals[resource];return this.lastDay?{day:this.lastDay.day,partial:this.lastDay.partial,...(value??{income:0,expenses:0,net:0,incomeBySource:{},expensesBySource:{}})}:null;}
+  // ryby-nepricteny: the running totals of the current (unfinished) game day, or null while nothing moved today.
+  today(resource){const value=this.current?.totals[resource];return value?{day:this.current.day,...value}:null;}
   exportState(){return structuredClone({version:1,nextId:this.nextId,startedAt:this.startedAt,current:this.current,history:this.history,processedIds:[...this.processed]});}
   importState(data){const state=structuredClone(data);this.nextId=state.nextId;this.startedAt=state.startedAt;this.current=state.current;this.history=state.history;this.processed=new Set(state.processedIds);this.enabled=true;this.changed();}
   destroy(){this.unsubscribeDay();this.unsubscribeActivity();if(this.scene.inventory.ledger===this)delete this.scene.inventory.ledger;this.listeners.clear();}
