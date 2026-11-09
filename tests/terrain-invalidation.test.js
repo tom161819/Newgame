@@ -88,6 +88,6 @@ test('owner 9 Nov: land leaving sight that was seen before is patched per tile, 
   king.position={x:31.5,y:30.5};fog.update();r.updateFog({},fog);
   const patched=[...(r.fogPatch?.values()??[])].reduce((n,set)=>n+set.size,0);
   assert.ok(patched>0,'tiles that left sight are queued as patches');
-  // Only the rim beside never-seen land (north and south of the explored band) still repaints its chunk.
-  for(const set of r.fogPatch.values())for(const i of set){const x=i%100,y=Math.floor(i/100);assert.ok(Math.abs(y-30)<10,`${x},${y}`);}
+  // The smooth memory shading reaches 2 tiles: patched tiles lie within 2 tiles of a tile that changed.
+  for(const set of r.fogPatch.values())for(const i of set){const y=Math.floor(i/100);assert.ok(Math.abs(y-30)<=12,`row ${y}`);}
 });

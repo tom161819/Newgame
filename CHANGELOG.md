@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.85.1] - 2026-11-09
+<!-- version: {"title":"Fog of War: the edge of sight is now soft too.","type":"feature","reconstructed":false,"saveVersion":61} -->
+### Changed
+- Fog of War: the edge of sight is now soft too. Ground fades from full colour to the remembered grey over about two tiles, like the edge of unknown land, instead of switching tile by tile.
+
 ## [0.85.0] - 2026-11-09
 <!-- version: {"title":"Kingdom bar, smooth seasons and fish, Light Lab and terrain height lab","type":"feature","reconstructed":false,"saveVersion":61} -->
 ### Changed
