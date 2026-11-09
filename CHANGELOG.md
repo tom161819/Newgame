@@ -8,6 +8,10 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 - Fish in rivers and lakes no longer pop in and out. They rise slowly from the depth and sink back. While they are up they drift slowly. Now and then a fish touches the surface and one or two light rings spread out. There are no rings under the winter ice.
 - Seasons now change gradually over about 3 game days around the turn of the season instead of all at once. Snow comes first in the shade and on stony ground and last by the water. The thaw starts by the water and on sunny meadows. In autumn the grass turns yellow in patches. Flowers, plants, trees and bushes change patch by patch with the ground. A game saved during the change loads at the same point.
 - Dev tool: a new "World look" group sets how many game days the season change takes and in how many steps.
+- The Kingdom overview now has a fixed place in the bottom-left corner of the map: a permanent bar with residents and housing, the unemployed, the average needs, the mood and the Kingdom Attractiveness. It never covers the "Follow the king" chips, Notices, the minimap or the side buttons. The text is larger and the values are bold.
+- The Kingdom overview bar folds to a one-line strip with residents and mood (click its title, or the overview in the top bar). The browser remembers the choice.
+- The Buildings menu now opens across the whole width of the window, from the left edge to the right edge. While it is open, the Kingdom overview, "Follow the king" and the minimap with Notices move up above it.
+- The Notices bar can be dragged anywhere on the map by its grip (⠿). The browser remembers its place and keeps it on screen when the window size changes. Double-click the grip to put it back in the corner. Slid away, a moved bar folds to the nearer side edge of the map, and its "!" tab stays there.
 
 ## [0.84.0] - 2026-11-09
 <!-- version: {"title":"Woodcutters and forests, iron mine spot, tips off the HUD","type":"feature","reconstructed":false,"saveVersion":61} -->

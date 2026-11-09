@@ -126,6 +126,7 @@ import { wolvesSmoke } from './wolves-smoke.mjs';
 import { thievesSmoke } from './thieves-smoke.mjs';
 import { fireSmoke } from './fire-smoke.mjs';
 import { kingdomOverviewSmoke } from './kingdom-overview-smoke.mjs';
+import { kingdomBarSmoke } from './kingdom-bar-smoke.mjs';
 
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
@@ -282,6 +283,7 @@ try{
   await step('thieves',()=>thievesSmoke(context,origin+base,instrument));
   await step('fire',()=>fireSmoke(context,origin+base,instrument));
   await step('overview',()=>kingdomOverviewSmoke(context,origin+base,instrument));
+  await step('kingdom-bar',()=>kingdomBarSmoke(context,origin+base,instrument));
   await step('ledger',()=>ledgerSmoke(page));
   await step('smelting',()=>smeltingSmoke(page));
   await step('military',()=>militarySmoke(page));

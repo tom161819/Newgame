@@ -2,6 +2,7 @@ import { localized } from '../i18n/names.js';
 import { t } from '../i18n/index.js';
 import { element,formatCost,missingCost } from './objectLabels.js';
 import { BUILDING_CATEGORIES,buildingsInCategory } from '../data/buildingCategories.js';
+import { bottomLift,fromDom } from './hudLayout.js';
 
 export class BuildingBar {
   constructor({registry,assets,onSelect,onCancel,unlocks,freeOffer=()=>false}) {
@@ -18,7 +19,7 @@ export class BuildingBar {
     this.list.addEventListener('click',event=>{const button=event.target.closest('[data-building-id]');if(button&&!button.disabled&&onSelect(registry.require(button.dataset.buildingId)))this.close();},options);
     this.cancel.addEventListener('click',onCancel,options);
     this.prev?.addEventListener('click',()=>this.scrollBy(-1),options);this.next?.addEventListener('click',()=>this.scrollBy(1),options);
-    this.list.addEventListener('scroll',()=>this.updateScroll(),{...options,passive:true});window.addEventListener('resize',()=>this.updateScroll(),options);
+    this.list.addEventListener('scroll',()=>this.updateScroll(),{...options,passive:true});window.addEventListener('resize',()=>{this.updateScroll();this.updateLift();},options);
     // A vertical wheel or trackpad gesture over the strip moves it sideways; the map never receives it.
     this.list.addEventListener('wheel',event=>{if(this.list.scrollWidth<=this.list.clientWidth+1||Math.abs(event.deltaX)>=Math.abs(event.deltaY))return;event.preventDefault();this.list.scrollLeft+=event.deltaY;},{...options,passive:false});
     this.list.addEventListener('keydown',event=>{const step={ArrowRight:1,ArrowLeft:-1,Home:-Infinity,End:Infinity}[event.key];const current=event.target.closest?.('[data-building-id]');if(!step||!current)return;const buttons=[...this.list.querySelectorAll('[data-building-id]')],index=buttons.indexOf(current),target=buttons[Math.max(0,Math.min(buttons.length-1,Number.isFinite(step)?index+step:step<0?0:buttons.length-1))];if(target&&target!==current){event.preventDefault();target.focus();target.closest('.building-option')?.scrollIntoView({block:'nearest',inline:'nearest'});}},options);
@@ -44,7 +45,14 @@ export class BuildingBar {
       card.append(button,description,availability);this.choices.set(definition.id,{button,availability,definition,card,lock});return card;
     });
     this.list.replaceChildren(...(cards.length?cards:[element('p','building-empty',t('building.empty'))]));this.choice=this.choices.get('tower')?.button;
-    this.list.scrollLeft=0;if(this.inventory)this.update(this.inventory,this.selected);this.updateScroll();
+    this.list.scrollLeft=0;if(this.inventory)this.update(this.inventory,this.selected);this.updateScroll();this.updateLift();
+  }
+  // m-prehled-kralovstvi-pozice: the open strip spans the window; the map's bottom items move up above it (--buildings-lift
+  // on the map, read by the CSS of the camera chips and the corner stack); the Kingdom overview bar re-places itself.
+  updateLift(){
+    const view=document.querySelector('.viewport');if(!view)return;const open=!this.panel.hidden,lift=open?bottomLift(fromDom(view.getBoundingClientRect()),fromDom(this.panel.getBoundingClientRect())):0,value=lift?`${lift}px`:'';
+    if(view.style.getPropertyValue('--buildings-lift')!==value){if(value)view.style.setProperty('--buildings-lift',value);else view.style.removeProperty('--buildings-lift');}
+    document.dispatchEvent(new CustomEvent('hud-layout'));
   }
   scrollBy(direction){this.list.scrollBy({left:direction*Math.max(160,this.list.clientWidth*.8),behavior:'smooth'});}
   updateScroll(){if(!this.prev||!this.next)return;const max=this.list.scrollWidth-this.list.clientWidth,overflow=max>1;this.prev.hidden=this.next.hidden=!overflow;this.prev.disabled=this.list.scrollLeft<=1;this.next.disabled=this.list.scrollLeft>=max-1;}
@@ -54,8 +62,8 @@ export class BuildingBar {
     if(this.selected&&!buildingsInCategory(this.registry,category).some(d=>d.id===this.selected.id))this.onCancel();
     this.render();
   }
-  toggle(){this.panel.hidden=!this.panel.hidden;this.tab.setAttribute('aria-expanded',String(!this.panel.hidden));this.updateScroll();}
-  close(){this.panel.hidden=true;this.tab.setAttribute('aria-expanded','false');}
+  toggle(){this.panel.hidden=!this.panel.hidden;this.tab.setAttribute('aria-expanded',String(!this.panel.hidden));this.updateScroll();this.updateLift();}
+  close(){this.panel.hidden=true;this.tab.setAttribute('aria-expanded','false');this.updateLift();}
   update(inventory,selected){
     this.inventory=inventory;this.selected=selected;
     for(const {button,availability,definition,card,lock}of this.choices.values()){
@@ -71,5 +79,5 @@ export class BuildingBar {
     this.cancel.hidden=!selected;
     document.querySelector('#building-selection').textContent=selected?`${selected.name} · ${selected.width} × ${selected.height} · ${formatCost(selected.cost,this.registry)}`:'';
   }
-  destroy(){this.controller.abort();this.unsubscribe();this.unsubscribeAssets();this.unsubscribeUnlocks?.();}
+  destroy(){document.querySelector('.viewport')?.style.removeProperty('--buildings-lift');this.controller.abort();this.unsubscribe();this.unsubscribeAssets();this.unsubscribeUnlocks?.();}
 }

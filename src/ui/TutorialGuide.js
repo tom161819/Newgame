@@ -35,7 +35,7 @@ export function openWindowRects(doc=globalThis.document,vw=globalThis.innerWidth
 // m-tipy-mimo-listu (report 0.83.0 point 2): a tip also keeps clear of the HUD – the top bar (resources, speed, day),
 // the side tabs, Settings and the Dev tool with its panel, the camera buttons ("Follow the king"), the bottom bar, the
 // Notices bar, the event lines and the minimap – on top of the open windows the tutorial bubble avoids.
-export const TIP_CLEAR='.inventory,.population-tab,#settings-button,#dev-tool-button,#dev-balance-panel,#follow-king,#dismount,.buildings-bar,#notices-panel,#event-feed,#minimap,#night-speed-tip';
+export const TIP_CLEAR='.inventory,.population-tab,#settings-button,#dev-tool-button,#dev-balance-panel,#follow-king,#dismount,.buildings-bar,#notices-panel,#event-feed,#minimap,#night-speed-tip,#kingdom-bar';
 export const tipWindowRects=(doc=globalThis.document,vw=globalThis.innerWidth,vh=globalThis.innerHeight)=>[...openWindowRects(doc,vw,vh),...openWindowRects(doc,vw,vh,TIP_CLEAR)];
 // The highest a tip may sit: below the top bar (its box, when it spans the top of the screen), never above 70 px.
 export function tipTop(topBar,{gap=8,min=70}={}){return Math.max(min,topBar&&topBar.top<min?Math.ceil(topBar.bottom+gap):0);}
