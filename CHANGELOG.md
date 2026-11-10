@@ -4,6 +4,9 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+### Changed
+- Values from the owner's building table (9 Nov): one worker in the Lumberjack Hut, Hunting Lodge, Fisherman's Hut, Bakery, Bowyer, Swordsmith, Armorer, Wheelwright, Pitch Kiln and Stables; daily wage 2 for Bowyer, Swordsmith and Armorer; Wheat Field yields 10 Wheat, Orchard 8 Apples; Mill turns 4 Wheat into 2 Flour, Bakery 1 Flour into 6 Bread; Barracks equipment store holds 30.
+
 ### Fixed
 - When residents are hungry, food that reaches a store is eaten at once, so a Fisher's basket could vanish from the stock without a word ("the Fisher brought fish but nothing was added"). The game now says so with a notice ("Hungry residents ate food the moment it reached the stores: Fish 5"), and the resource tooltip in the top bar shows what came in and went out today so far (for example +5 Fishing, −5 Villager Consumption).
 
