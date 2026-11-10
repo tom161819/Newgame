@@ -87,7 +87,7 @@ test('world editor: ground look validation and the game override', () => {
 });
 
 test('world editor: the ground look is an optional, validated save field (no SAVE_VERSION bump of its own)', () => {
-  assert.equal(SAVE_VERSION, 61);
+  assert.equal(SAVE_VERSION, 62);
   const scene = workerScene();
   try {
     const plain = validateGameState(serializeGameState(scene)); assert.equal('groundLook' in plain, false, 'no override, no field');

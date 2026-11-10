@@ -12,7 +12,8 @@ export async function staffingIndicatorsSmoke(page){
       }
       if(!anchor)throw Error(`No staffing fixture space for ${type}`);const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,...anchor,tiles};s.buildings.push(b);if(planned)s.constructionSystem.plan(b);else for(const t of tiles)s.map[t.y][t.x]=1;s.towerViews.set(b.id,s.createBuildingView(d,b));s.events.emit('buildings:changed');return b;
     };
-    const q=add('quarry'),bakery=add('bakery'),planned=add('quarry',true),tower=add('tower'),hidden=add('quarry',false,true),base={x:3200+(q.x-q.y)*32,y:128+(q.x+q.y+6)*16};
+    // tabulka-budov-1: the Bakery has one seat (a full workplace shows no icon), so the second workplace is a Mill.
+    const q=add('quarry'),bakery=add('mill'),planned=add('quarry',true),tower=add('tower'),hidden=add('quarry',false,true),base={x:3200+(q.x-q.y)*32,y:128+(q.x+q.y+6)*16};
     while(s.workerSystem.liveSubjects().length<3)s.workerSystem.create({x:c.x+2+s.workerSystem.liveSubjects().length,y:c.y});for(const w of s.workerSystem.liveWorkers())w.aiCooldown=1e8;
     s.worldCamera.following=false;s.cameras.main.setZoom(1).centerOn(base.x,base.y-100);s.cameras.main.preRender();s.refreshVisibility();return{q:q.id,bakery:bakery.id,planned:planned.id,tower:tower.id,hidden:hidden.id,workers:s.workerSystem.liveSubjects().slice(0,3).map(w=>w.id),kingOrder:structuredClone(s.character.order)};
   });

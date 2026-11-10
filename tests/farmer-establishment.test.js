@@ -31,7 +31,7 @@ test('cancelling partial planting releases slots and workers without goods refun
 });
 
 test('ripe reachable harvest preempts establishment within 250ms; cargo delivers once before planting resumes',()=>{
-  const {s,home,plot}=fixture(),ripe=build(s,'wheat_field',49,45),w=farmer(s,home);until(s,()=>plot.construction.workDone>500);const record=s.farmingSystem.records.get(ripe.id);record.growthDays=ripe.definition.crop.growthDays;const start=s.gameTime.totalElapsed,progress=plot.construction.workDone;until(s,()=>w.workTask?.kind==='harvest',500);assert.ok(s.gameTime.totalElapsed-start<=250);assert.ok(plot.construction.workDone-progress<=250);until(s,()=>s.inventory.count('wheat')===8);assert.equal(w.skills.construction.totalXP,0);until(s,()=>w.workTask?.kind==='build'&&w.workTask.targetId===plot.id);until(s,()=>buildingIsComplete(plot));assert.equal(s.inventory.count('wheat'),8);
+  const {s,home,plot}=fixture(),ripe=build(s,'wheat_field',49,45),w=farmer(s,home);until(s,()=>plot.construction.workDone>500);const record=s.farmingSystem.records.get(ripe.id);record.growthDays=ripe.definition.crop.growthDays;const start=s.gameTime.totalElapsed,progress=plot.construction.workDone;until(s,()=>w.workTask?.kind==='harvest',500);assert.ok(s.gameTime.totalElapsed-start<=250);assert.ok(plot.construction.workDone-progress<=250);until(s,()=>s.inventory.count('wheat')===10);assert.equal(w.skills.construction.totalXP,0);until(s,()=>w.workTask?.kind==='build'&&w.workTask.targetId===plot.id);until(s,()=>buildingIsComplete(plot));assert.equal(s.inventory.count('wheat'),10);
 });
 
 test('Hold and losing the owning farm stop physical establishment without remote progress',()=>{

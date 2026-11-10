@@ -26,7 +26,7 @@ test('Horse Wagon: the Wheelwright\'s second recipe, 30 Wood + 6 Iron + a tamed 
 test('no tamed horse, no wagon: the batch waits without using materials; then the horse is reserved, harnessed and leaves the Stables; Save/Load mid-batch',()=>{
   let s=scene();const warehouse=building(s,'material_yard',40,44),shop=building(s,'wheelwright_workshop',52,50),stables=building(s,'stables',60,40);
   s.foodStorage.deposit(`yard-${warehouse.id}`,'wood',30);s.foodStorage.deposit(`yard-${warehouse.id}`,'iron',6);
-  const a=person(s,{x:50,y:55},{home:shop});person(s,{x:51,y:55},{home:shop});
+  const a=person(s,{x:50,y:55},{home:shop});/* tabulka-budov-1: one Wheelwright a workshop */
   assert.equal(s.foodProduction.setRecipe(shop.id,'horse_wagon'),true);assert.equal(s.foodProduction.setRecipe(shop.id,'cart'),false);
   until(s,()=>a.workMessage==='Waiting for a tamed horse in the Stables');
   s.tick(5000);assert.equal(s.foodProduction.records.get(shop.id).cycle,null);assert.equal(s.vehicles.vehicles.size,0);

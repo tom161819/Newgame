@@ -97,11 +97,11 @@ test('86: tooltip content by building type, at most 4 lines',()=>{
   assert.deepEqual(text(farm),['Farmhouse ⛔','Workers 0 / 3','Wheat 120 · 120 / 200'],'Farmhouse: a workplace with a store');
   assert.deepEqual(text(yard),['Material Yard','0 / 400']);
   // Workplace with a recipe: waiting for its input, then the product and its progress.
-  assert.deepEqual(text(bakery),['Bakery ⛔ ⏳','Workers 0 / 2','Waiting for Flour']);
+  assert.deepEqual(text(bakery),['Bakery ⛔ ⏳','Workers 0 / 1','Waiting for Flour']);
   const baker=s.workerSystem.create({x:52,y:66});assert.equal(s.workplaceSystem.assign(bakery,baker),true);
   const record=s.foodProduction.records.get(bakery.id);record.cycle={requiredWork:1000,workDone:600,inputs:{flour:1}};
-  assert.deepEqual(text(bakery),['Bakery','Workers 1 / 2','Bread – 60 %']);
-  record.auto=false;assert.deepEqual(text(bakery),['Bakery ⛔','Workers 1 / 2','Production paused']);record.auto=true;
+  assert.deepEqual(text(bakery),['Bakery','Workers 1 / 1','Bread – 60 %']);
+  record.auto=false;assert.deepEqual(text(bakery),['Bakery ⛔','Workers 1 / 1','Production paused']);record.auto=true;
   // House: residents and their happiness.
   for(let i=0;i<2;i++)s.workerSystem.create({x:32+i,y:66});s.needs.homes();
   const content=buildingTooltipContent(s,house);assert.match(content.lines[0].text,/^Residents 3 \/ 5$/,'the Baker and two more live there');assert.ok(['happy','neutral','unhappy','critical'].includes(content.lines[0].mood),'a happiness icon');
@@ -154,8 +154,8 @@ test('86: StorePreview shows the building tooltip after the delay and keeps the 
   }finally{globalThis.document=saved;}
 });
 
-test('86/82: nightSpeedTip needs no SAVE_VERSION bump (61 since velke-prirodni-objekty); nightSpeedTip is optional, strictly validated, and round-trips',()=>{
-  assert.equal(SAVE_VERSION,61);
+test('86/82: nightSpeedTip needs no SAVE_VERSION bump (62 since tabulka-budov-1); nightSpeedTip is optional, strictly validated, and round-trips',()=>{
+  assert.equal(SAVE_VERSION,62);
   const {s}=world();s.nightSpeedUp=new NightSpeedUp(s,{read:()=>1,save:()=>{},tip:null});
   const plain=serializeGameState(s);assert.equal(Object.hasOwn(plain,'nightSpeedTip'),false,'absent until shown');validateGameState(plain);
   s.nightSpeedUp.tipShown=true;const shown=serializeGameState(s);assert.equal(shown.nightSpeedTip,true);validateGameState(shown);

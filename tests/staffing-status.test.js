@@ -24,7 +24,8 @@ test('registry metadata excludes non-workplaces and blueprints; real world compl
   s.buildings.splice(s.buildings.indexOf(q),1);s.events.emit('buildings:changed');assert.equal(model.records.size,0);model.destroy();assert.equal(s.events.listenerCount('buildings:changed'),0);
 });
 test('reassignment, profession changes and death update both workplaces without stealing other seats',()=>{
-  const s=fixture(),q=build(s),bakery=build(s,'bakery',60,50),model=new StaffingStatus(s),w=s.workerSystem.create({x:46,y:50});s.workplaceSystem.assign(q,w);assert.equal(model.records.get(q.id).count,1);
+  // tabulka-budov-1: the Bakery has one seat now (a full workplace has no record), so the second workplace is a Mill.
+  const s=fixture(),q=build(s),bakery=build(s,'mill',60,50),model=new StaffingStatus(s),w=s.workerSystem.create({x:46,y:50});s.workplaceSystem.assign(q,w);assert.equal(model.records.get(q.id).count,1);
   s.workplaceSystem.assign(bakery,w);assert.equal(model.records.get(q.id).count,0);assert.equal(model.records.get(bakery.id).count,1);s.workerSystem.jobs.assign(w,'idle');assert.equal(model.records.get(bakery.id).count,0);
   s.workplaceSystem.assign(q,w);w.isAlive=false;w.currentHP=0;s.workerSystem.onDeath(w);assert.equal(model.records.get(q.id).count,0);assert.equal(s.workplaceSystem.records.get(q.id).workerIds.length,0);model.destroy();
 });

@@ -51,7 +51,9 @@ import { emptyLedgerState } from '../data/resourceLedger.js';
 import { validateResourceLedger } from './ResourceLedgerValidation.js';
 
 // 61 (velke-prirodni-objekty): `natureGroups` – thickets, rock obstacles and ridges drawn as one object.
-export const SAVE_VERSION=61;
+// 62 (tabulka-budov-1): workplace capacities, crop yields and Mill/Bakery recipes changed – saved workplaces, harvest
+// reservations and running batches of 61 no longer match the rules.
+export const SAVE_VERSION=62;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];

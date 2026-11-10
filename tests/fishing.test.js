@@ -29,12 +29,12 @@ function hut(s,anchor={x:49,y:43}){
 function fisher(s,b){const w=s.workerSystem.create({x:46,y:46});assert.equal(s.workplaceSystem.assign(b,w),true);w.naturalTalent='woodcutting';return w;}
 const fishStock=s=>s.inventory.count('fish');
 
-test('Fishing data: fish is food and a trade good; the hut is a food workplace for two Fishers that recommends a Granary',()=>{
+test('Fishing data: fish is food and a trade good; the hut is a food workplace for one Fisher (tabulka-budov-1) that recommends a Granary',()=>{
   assert.ok(EDIBLE_RESOURCES.includes('fish')&&FOOD_RESOURCE_IDS.includes('fish'));assert.equal(BASE_PRICES.fish,3);
   assert.ok(MERCHANT_TYPES.food.stock.fish&&MERCHANT_TYPES.general.stock.fish);
   const d=objectRegistry.require('fisherman_hut');
   assert.deepEqual([d.width,d.height,d.buildingCategory,d.cost,d.requiresCompletedBuildings,d.recommendsCompletedBuildings],[2,2,'food',{wood:10},undefined,['granary']]);
-  assert.deepEqual(d.workplace,{capacity:2,profession:'fisher',skill:'fishing'});
+  assert.deepEqual(d.workplace,{capacity:1,profession:'fisher',skill:'fishing'});
   assert.deepEqual([stockCapacity(3),stockCapacity(50),stockCapacity(500)],[40,200,400]);
   assert.deepEqual([stockFactor(.8),stockFactor(.25),stockFactor(.09)],[1,.5,0]);
   assert.deepEqual([stockState(.6),stockState(.3),stockState(.05)],['plentiful','thinning','overfished']);
@@ -94,7 +94,8 @@ test('the Fishers use the nearest reachable shore by walking distance, with no r
 });
 
 test('two Fishers never share a spot; a hut with no reachable water says so and gets a notice',async()=>{
-  const s=lakeScene(),b=hut(s),[w1,w2]=[fisher(s,b),fisher(s,b)];for(let i=0;i<200;i++)s.tick(50);
+  // tabulka-budov-1: one Fisher a hut, so the two Fishers come from two neighbouring huts.
+  const s=lakeScene(),b=hut(s),b2=hut(s,{x:49,y:47}),[w1,w2]=[fisher(s,b),fisher(s,b2)];for(let i=0;i<200;i++)s.tick(50);
   assert.ok(w1.workTask&&w2.workTask);assert.notDeepEqual(w1.workTask.goal,w2.workTask.goal);
   const dry=workerScene(undefined,{naturalResources:true,construction:true,logistics:true});dry.workerSystem.unsubscribe();dry.groundGrid=emptyGround();dry.fishing=new FishingSystem(dry);for(const a of [...dry.animalSystem.animals.values()])dry.animalSystem.remove(a);
   const h=hut(dry,{x:62,y:62});assert.deepEqual(dry.fishing.spots(h),[]);assert.equal(dry.fishing.summary(h),'No reachable water');assert.equal(dry.fishing.previewDistance({x:30,y:30},objectRegistry.require('fisherman_hut')),null);

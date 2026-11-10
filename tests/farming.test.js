@@ -49,24 +49,24 @@ test('pause and blueprint time do not grant plant growth; the growth modifier ho
   const {s,wheat}=farm();s.gameTime.setPaused(true);s.gameTime.update(999999);assert.equal(s.farmingSystem.sync(wheat).growthDays,0);s.gameTime.setPaused(false);
   s.farmingSystem.growthModifier=()=>0;s.gameTime.update(60000);assert.equal(s.farmingSystem.sync(wheat).growthDays,0);s.farmingSystem.growthModifier=()=>1.5;s.gameTime.update(60000);assert.ok(Math.abs(s.farmingSystem.sync(wheat).growthDays-1.5*FARMING_RULES.growthRate)<1e-9,'the hook times the crop growth rate (m-jidlo-balanc 1.2)');assert.equal(s.inventory.count('wheat'),0);
 });
-test('farmer physically visits a workplace and ripe field, works, then gains exactly 8 Wheat plus one overall/Farming XP reward',()=>{
+test('farmer physically visits a workplace and ripe field, works, then gains exactly 10 Wheat plus one overall/Farming XP reward',()=>{
   const {s,home,wheat}=farm();s.gameTime.update(120000);const w=farmer(s,home);w.naturalTalent='farming';const start={...w.position};
   s.tick(25);assert.equal(s.inventory.count('wheat'),0);assert.equal(w.experience.totalXP,0);until(s,()=>w.workTask?.kind==='harvest'&&w.workTask.progressMs>0);assert.notDeepEqual(w.position,start);assert.ok(w.tile.x>=wheat.x&&w.tile.x<wheat.x+3);assert.ok(w.workTask.progressMs<FARMING_RULES.crops.wheat_field.workDuration);assert.equal(s.inventory.count('wheat'),0);
-  const oldTask=structuredClone(w.workTask);until(s,()=>s.inventory.count('wheat')===8);assert.equal(w.experience.totalXP,8);assert.equal(w.skills.farming.totalXP,9.6);const record=s.farmingSystem.records.get(wheat.id);assert.equal(record.cycle,1);assert.equal(record.stage,0);assert.equal(record.reservedBy,null);assert.ok(s.pathWear.active.size>0);assert.equal(s.farmingSystem.harvest(w,wheat,record),false);assert.equal(s.inventory.count('wheat'),8);assert.ok(s.experienceSystem.processed.has(`harvest-${wheat.id}-${oldTask.cycle}`));
+  const oldTask=structuredClone(w.workTask);until(s,()=>s.inventory.count('wheat')===10);assert.equal(w.experience.totalXP,8);assert.equal(w.skills.farming.totalXP,9.6);const record=s.farmingSystem.records.get(wheat.id);assert.equal(record.cycle,1);assert.equal(record.stage,0);assert.equal(record.reservedBy,null);assert.ok(s.pathWear.active.size>0);assert.equal(s.farmingSystem.harvest(w,wheat,record),false);assert.equal(s.inventory.count('wheat'),10);assert.ok(s.experienceSystem.processed.has(`harvest-${wheat.id}-${oldTask.cycle}`));
 });
-test('orchard harvest yields exactly 6 Apple, retains the same trees/building and begins another fruit cycle',()=>{
+test('orchard harvest yields exactly 8 Apple, retains the same trees/building and begins another fruit cycle',()=>{
   const {s,home,wheat,orchard}=farm();s.gameTime.update(180000);s.farmingSystem.records.get(wheat.id).reservedBy='reserved-for-fixture';const w=farmer(s,home);const id=orchard.id;
-  until(s,()=>s.inventory.count('apple')===6,25000);assert.equal(s.buildings.find(b=>b.id===id),orchard);assert.equal(s.farmingSystem.records.get(id).cycle,1);assert.equal(s.farmingSystem.records.get(id).stage,0);assert.equal(w.experience.totalXP,10);assert.equal(w.skills.farming.totalXP,10);s.gameTime.update(180000);assert.equal(s.farmingSystem.ripe(orchard),true);assert.equal(s.inventory.count('apple'),6);
+  until(s,()=>s.inventory.count('apple')===8,25000);assert.equal(s.buildings.find(b=>b.id===id),orchard);assert.equal(s.farmingSystem.records.get(id).cycle,1);assert.equal(s.farmingSystem.records.get(id).stage,0);assert.equal(w.experience.totalXP,10);assert.equal(w.skills.farming.totalXP,10);s.gameTime.update(180000);assert.equal(s.farmingSystem.ripe(orchard),true);assert.equal(s.inventory.count('apple'),8);
 });
 test('multiple farmers reserve a ripe harvest exclusively and cannot duplicate its output or XP',()=>{
   const {s,home,wheat}=farm();s.gameTime.update(120000);const workers=[farmer(s,home,{x:44,y:40}),farmer(s,home,{x:44,y:41}),farmer(s,home,{x:45,y:39})];
-  until(s,()=>workers.some(w=>w.workTask?.kind==='harvest'));assert.equal(workers.filter(w=>w.workTask?.targetId===wheat.id).length,1);until(s,()=>s.inventory.count('wheat')===8);s.simulate(5000);
-  assert.equal(s.inventory.count('wheat'),8);assert.equal(workers.reduce((sum,w)=>sum+w.experience.totalXP,0),8);assert.equal(s.farmingSystem.records.get(wheat.id).cycle,1);
+  until(s,()=>workers.some(w=>w.workTask?.kind==='harvest'));assert.equal(workers.filter(w=>w.workTask?.targetId===wheat.id).length,1);until(s,()=>s.inventory.count('wheat')===10);s.simulate(5000);
+  assert.equal(s.inventory.count('wheat'),10);assert.equal(workers.reduce((sum,w)=>sum+w.experience.totalXP,0),8);assert.equal(s.farmingSystem.records.get(wheat.id).cycle,1);
 });
 test('Farming levels speed only active harvest work; biological growth and yield remain identical',()=>{
   const durations=[];
   for(const level of [1,50]){const {s,home,wheat}=farm();s.gameTime.update(120000);const w=farmer(s,home);s.skillSystem.addXP(w,'farming',totalXPForLevel(level));until(s,()=>w.workTask?.kind==='harvest'&&s.workerSystem.ai.atGoal(w,w.workTask.goal));
-    const start=s.gameTime.totalElapsed;until(s,()=>s.inventory.count('wheat')===8);durations.push(s.gameTime.totalElapsed-start);assert.equal(s.inventory.count('wheat'),8);assert.equal(s.farmingSystem.records.get(wheat.id).cycle,1);}
+    const start=s.gameTime.totalElapsed;until(s,()=>s.inventory.count('wheat')===10);durations.push(s.gameTime.totalElapsed-start);assert.equal(s.inventory.count('wheat'),10);assert.equal(s.farmingSystem.records.get(wheat.id).cycle,1);}
   assert.ok(durations[1]<durations[0]*.7);assert.ok(durations[1]>durations[0]*.64);
 });
 test('radius15, blocked routes, profession changes and death release reservations without remote or duplicated harvesting',()=>{
@@ -78,7 +78,7 @@ test('radius15, blocked routes, profession changes and death release reservation
 test('save/load preserves partial growth and active reserved harvest, resumes once, and rejects corrupt crop or reservation data',()=>{
   const {s,home,wheat}=farm();s.gameTime.update(120000);const w=farmer(s,home);until(s,()=>w.workTask?.progressMs>=1000);const data=validateGameState(serializeGameState(s));assert.equal(data.saveVersion,SAVE_VERSION);
   const r=scene();loadGameState(r,data);assert.deepEqual(serializeGameState(r),data);assert.equal(r.workerSystem.workers.get(w.id).workTask.reservation,`crop:${wheat.id}`);assert.equal(r.map[wheat.y][wheat.x],0);
-  until(s,()=>s.inventory.count('wheat')===8);until(r,()=>r.inventory.count('wheat')===8);assert.equal(s.workerSystem.workers.get(w.id).experience.totalXP,r.workerSystem.workers.get(w.id).experience.totalXP);assert.equal(r.farmingSystem.records.get(wheat.id).cycle,1);r.simulate(5000);assert.equal(r.inventory.count('wheat'),8);
+  until(s,()=>s.inventory.count('wheat')===10);until(r,()=>r.inventory.count('wheat')===10);assert.equal(s.workerSystem.workers.get(w.id).experience.totalXP,r.workerSystem.workers.get(w.id).experience.totalXP);assert.equal(r.farmingSystem.records.get(wheat.id).cycle,1);r.simulate(5000);assert.equal(r.inventory.count('wheat'),10);
   for(const change of [x=>x.farming.records[0].stage=0,x=>x.farming.records[0].reservedBy='missing',x=>x.workers.find(a=>a.id===w.id).workTask.cycle++,x=>x.farming.records.push(x.farming.records[0])]){const bad=structuredClone(data);change(bad);assert.throws(()=>validateGameState(bad));}
 });
 test('completed walkable crop plots remain free of stone spawns and accept real dropped cargo without save corruption',()=>{

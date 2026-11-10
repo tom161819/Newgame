@@ -99,7 +99,8 @@ test('same priority: the emptiest building first, so a Quarry and a Lumberjack H
   const s2=fixture(),q2=build(s2,'quarry',55,50),l2=build(s2,'lumberjack_hut',62,50);s2.employment.setPriority('miner',5);[1,2,3].forEach(i=>resident(s2,48+i));s2.employment.run();
   assert.deepEqual([s2.workplaceSystem.employees(q2).length,s2.workplaceSystem.employees(l2).length],[3,0],'higher priority first');
   const before=people.map(w=>w.assignedWorkplaceId);resident(s,52);s.employment.run();assert.deepEqual(people.map(w=>w.assignedWorkplaceId),before,'nobody is moved');
-  assert.equal(staff(lodge),2,'the newcomer goes to the emptier building');
+  // tabulka-budov-1: the Lumberjack Hut has one seat (owner table), so the newcomer fills the Quarry's last place.
+  assert.equal(staff(lodge),1,'the Lumberjack Hut is full with one');assert.equal(staff(quarry),3,'the newcomer goes to the building with room');
 });
 
 test('a manual profession change takes a free seat (emptiest, then nearest); with no room the resident stays without a workplace',()=>{

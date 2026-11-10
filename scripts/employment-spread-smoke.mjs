@@ -35,12 +35,15 @@ export async function employmentSpreadSmoke(context,url,instrument){
     assert.deepEqual(await finish(page,[quarry.id,hut.id]),[true,true]);
     await page.waitForFunction(({q,h})=>{const s=window.__game.registry.get('application').scene,n=id=>s.workplaceSystem.employees(s.buildings.find(b=>b.id===id)).length;return n(q)+n(h)>=3;},{q:quarry.id,h:hut.id},{timeout:30000});
     const staff=await page.evaluate(({q,h})=>{const s=window.__game.registry.get('application').scene,n=id=>s.workplaceSystem.employees(s.buildings.find(b=>b.id===id)).length;return [n(q),n(h)];},{q:quarry.id,h:hut.id});
-    assert.ok(staff[0]>=1&&staff[1]>=1&&Math.abs(staff[0]-staff[1])<=1,`both buildings get people (${staff})`);
+    // tabulka-budov-1: the Lumberjack Hut has a single seat (owner table), so it is full with one and the rest go to the Quarry.
+    assert.ok(staff[0]>=1&&staff[1]===1,`both buildings get people (${staff})`);
+    // If the Quarry filled up, one Miner is released (and held) so the manual change below has a free seat to take.
+    await page.evaluate(q=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===q),list=s.workplaceSystem.employees(b);s.employment.setEnabled(false);if(list.length>=b.definition.workplace.capacity){const w=list.at(-1);s.workplaceSystem.remove(w);s.employment.hold(w);}},quarry.id);
     // A manual change to Miner in the unit panel: the Quarry still has a free seat.
     const w=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,k=s.character.tile;let spot=null;for(let r=1;r<6&&!spot;r++)for(let dx=-r;dx<=r&&!spot;dx++)for(let dy=-r;dy<=r&&!spot;dy++)if(s.map[k.y+dy]?.[k.x+dx]===0)spot={x:k.x+dx,y:k.y+dy};const w=s.workerSystem.create(spot);s.employment.hold(w);s.unitPanel.open(w,{management:true});return w.id;});
     await page.locator('#assign-job').selectOption('miner');
     const placed=await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,w=s.workerSystem.workers.get(id);return {profession:w.profession,at:w.assignedWorkplaceId,text:document.querySelector('#unit-workplace').textContent};},w);
-    assert.equal(placed.profession,'miner');assert.equal(placed.at,quarry.id,'took the free Quarry seat');assert.match(placed.text,/Quarry/);
+    assert.equal(placed.profession,'miner');assert.equal(placed.at,quarry.id,'took the free Quarry seat '+JSON.stringify(placed));assert.match(placed.text,/Quarry/);
     await page.evaluate(()=>window.__game.registry.get('application').scene.unitPanel.close?.());
     // Assign Worker groups in the Quarry panel.
     await page.evaluate(id=>{const s=window.__game.registry.get('application').scene;s.workplacePanel.open(s.buildings.find(b=>b.id===id));},quarry.id);

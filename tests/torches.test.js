@@ -26,7 +26,7 @@ test('Pitch Kiln: 2 Wood → 1 Pitch and 1 Wood + 1 Pitch → 3 Torches; Torches
   assert.deepEqual(PITCH_RECIPES.pitch.input,{wood:2});assert.deepEqual(PITCH_RECIPES.pitch.output,{pitch:1});
   assert.deepEqual(PITCH_RECIPES.torches.input,{wood:1,pitch:1});assert.deepEqual(PITCH_RECIPES.torches.output,{torch:3});
   const kiln=objectRegistry.require('pitch_kiln');assert.deepEqual([kiln.width,kiln.height,kiln.buildingCategory],[2,2,'industry']);assert.deepEqual(kiln.cost,{wood:8,stone:4});
-  assert.equal(kiln.workplace.profession,'pitch_maker');assert.equal(kiln.workplace.capacity,2);
+  assert.equal(kiln.workplace.profession,'pitch_maker');assert.equal(kiln.workplace.capacity,1,'tabulka-budov-1: one Pitch Maker');
   const {s,place,store}=world(),b=place('pitch_kiln',60,60),record=s.foodProduction.records.get(b.id);
   s.foodProduction.chooseRecipes();assert.equal(record.recipe,'pitch','no Pitch yet: make Pitch');
   store().stock.pitch=2;s.foodProduction.chooseRecipes();assert.equal(record.recipe,'torches','Pitch at hand and few Torches: make Torches');

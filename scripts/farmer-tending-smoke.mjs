@@ -22,6 +22,6 @@ export async function farmerTendingSmoke(page){
  await page.evaluate(f=>{const s=window.__game.registry.get('application').scene;s.farmingSystem.records.get(f.field).growthDays=s.objectRegistry.require('wheat_field').crop.growthDays;},f);
  await page.waitForFunction(f=>window.__game.registry.get('application').scene.workerSystem.workers.get(f.worker).workTask?.kind==='harvest',f,{timeout:5000});
  assert.equal(await page.evaluate(f=>window.__game.registry.get('application').scene.farmingSystem.tending.has(f.worker),f),false);
- await page.waitForFunction(f=>window.__game.registry.get('application').scene.inventory.count('wheat')===f.stock+8,f,{timeout:25000});await page.evaluate(()=>window.__game.registry.get('application').snapshot());await load(saved);
+ await page.waitForFunction(f=>window.__game.registry.get('application').scene.inventory.count('wheat')===f.stock+10,f,{timeout:25000});await page.evaluate(()=>window.__game.registry.get('application').snapshot());await load(saved);
  console.log('PASS farmer tending: real walk, existing work animation, reposition, no idle XP/goods, Save/Load without new tasks and ripe harvest preemption with physical delivery');
 }

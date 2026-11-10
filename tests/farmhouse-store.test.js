@@ -41,7 +41,7 @@ test('a Farmer carries the harvest to the Farmhouse store; while no Farmhouse ha
   for(const full of [false,true]){
     const {s,starter,place,run,store}=world(),farm=place('farmhouse',44,40),granary=place('granary',58,40),field=place('wheat_field',44,45),f=s.workerSystem.create({x:43,y:40});
     assert.equal(s.workplaceSystem.assign(farm,f),true);if(full)assert.equal(s.foodStorage.deposit(store(farm).id,'flour',FARMHOUSE_STORE.capacity),true);
-    s.gameTime.update(240000);run(()=>(s.foodStorage.locations.get(full?starter:store(farm).id).stock.wheat??0)===8);
+    s.gameTime.update(240000);run(()=>(s.foodStorage.locations.get(full?starter:store(farm).id).stock.wheat??0)===10);
     assert.equal(s.foodStorage.locations.get(`granary-${granary.id}`).stock.wheat,undefined,'never into the Granary');
     if(!full)assert.equal(s.foodStorage.locations.get(starter).stock.wheat,undefined);
     assert.equal(s.farmingSystem.records.get(field.id).cycle,1);snapshot(s);
@@ -75,7 +75,7 @@ test('trade finds Farmhouse stock: Wheat sold from a Farmhouse, bought Flour sto
 });
 
 test('Farmhouse stores survive Save/Load in save schema 61; forged grain in a Granary or an overfull Farmhouse is rejected',()=>{
-  assert.equal(SAVE_VERSION,61);assert.equal(saveSchemaStatus({saveVersion:60}).compatible,false,'alpha policy: schema 60 saves are refused');
+  assert.equal(SAVE_VERSION,62);assert.equal(saveSchemaStatus({saveVersion:61}).compatible,false,'alpha policy: schema 61 saves are refused');
   const {s,place,store}=world(),farm=place('farmhouse',44,40),granary=place('granary',58,40);s.foodStorage.deposit(store(farm).id,'wheat',30);s.foodStorage.deposit(store(farm).id,'flour',12);s.foodStorage.deposit(`granary-${granary.id}`,'bread',5);
   const saved=snapshot(s),r=workerScene(saved.terrain,{construction:true,logistics:true,starter:false,gameSettings:gameSettings()});loadGameState(r,structuredClone(saved));
   assert.deepEqual(serializeGameState(r),saved);assert.deepEqual(r.foodStorage.locations.get(`farmhouse-${farm.id}`).stock,{wheat:30,flour:12});assert.equal(r.inventory.count('wheat'),30);

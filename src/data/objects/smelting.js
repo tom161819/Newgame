@@ -24,7 +24,7 @@ export const smeltingDefinitions=[
   {id:'pitch_kiln',name:'Pitch Kiln',czechName:'Smolárna',category:'building',buildingCategory:'industry',sprite:'/assets/buildings/pitch_kiln/pitch_kiln.svg',
     width:2,height:2,walkable:false,collectible:false,buildable:true,cost:{wood:8,stone:4},constructionTime:25000,
     workplace:WORKPLACES.pitch_kiln,recipe:PITCH_RECIPES.pitch,recipes:PITCH_RECIPES,recipeChoice:'torches',autoEmployment:true,bufferCapacity:FOOD_RULES.bufferCapacity,
-    interactions:['manage_workers'],description:`Two Pitch Makers burn 2 Wood into 1 Pitch, and dip 1 Wood in 1 Pitch for 3 Torches. They keep ${TORCHES.torchTarget} Torches in the stores first.`,
+    interactions:['manage_workers'],description:`A Pitch Maker burns 2 Wood into 1 Pitch, and dips 1 Wood in 1 Pitch for 3 Torches. He keeps ${TORCHES.torchTarget} Torches in the stores first.`,
     renderMode:'procedural',renderer:'food_building',origin:{x:.5,y:.9},visualHeight:96,depth:{offset:0},
     shadow:{baked:true,x:8,y:-12,width:118,height:42,color:0x30291c,alpha:.3}},
 ];

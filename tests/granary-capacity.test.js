@@ -46,8 +46,8 @@ test('current-schema saves preserve the Granary and Farmhouse stores and reject 
  const {s,id,storage}=fixture(),farm=building(s,'farmhouse',58,45),fid=`farmhouse-${farm.id}`;storage.deposit(id,'bread',FOOD);storage.deposit(fid,'wheat',RAW);const data=snapshot(s),r=scene(false);loadGameState(r,structuredClone(data));assert.deepEqual(serializeGameState(r),data);
  for(const [where,stock] of [[id,{bread:FOOD+1}],[id,{bread:FOOD-50,meat:51}],[id,{bread:FOOD-1,wheat:1}],[id,{bread:FOOD-1,flour:1}],[fid,{wheat:RAW+1}],[fid,{wheat:RAW-1,bread:1}]]){const bad=structuredClone(data);bad.foodStorage.locations.find(l=>l.id===where).stock=stock;for(const key of Object.keys(bad.inventory))if(['wheat','bread','flour','meat'].includes(key))delete bad.inventory[key];assert.throws(()=>validateGameState(bad));assert.deepEqual(serializeGameState(s),data);}
 });
-test('a Bakery cannot book four food outputs into only two food slots',()=>{
+test('a Bakery cannot book six food outputs into only two food slots',()=>{
  const {s,id,storage}=fixture(),bakery=building(s,'bakery',58,45),starter=[...storage.locations.values()].find(l=>l.kind==='fallback'&&l.allowed.includes('bread'));storage.deposit(id,'bread',FOOD-2);storage.deposit(starter.id,'bread',CAP);storage.deposit(`input-${bakery.id}`,'flour',2);
  const w=s.workerSystem.create({x:57,y:45});s.workplaceSystem.assign(bakery,w);s.simulate(6000);assert.equal(s.foodProduction.records.get(bakery.id).cycle,null);assert.equal(storage.room(id,'wheat'),0);assert.equal(storage.room(id,'bread'),2);
- storage.withdraw(id,'bread',4);until(s,()=>s.foodProduction.records.get(bakery.id).completed===1&&!w.cargo&&s.inventory.count('bread')===FOOD+CAP-1);/* m-jidlo-balanc: the batch makes 5 Bread (FOOD-6 + CAP + 5) */snapshot(s);
+ storage.withdraw(id,'bread',4);until(s,()=>s.foodProduction.records.get(bakery.id).completed===1&&!w.cargo&&s.inventory.count('bread')===FOOD+CAP);/* tabulka-budov-1: the batch makes 6 Bread from 1 Flour (FOOD-6 + CAP + 6) */snapshot(s);
 });

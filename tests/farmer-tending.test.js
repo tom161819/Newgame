@@ -20,7 +20,7 @@ test('Spring, Summer and Autumn farmers travel to crops and visibly tend/reposit
 });
 test('ripe harvest preempts tending within the bounded check interval and releases the idle destination reservation',()=>{
  const {s,home,field}=fixture(),w=farmer(s,home);until(s,()=>w.workMessage==='Tending crops');s.farmingSystem.records.get(field.id).growthDays=FARMING_RULES.crops.wheat_field.growthDays;
- const before={...w.position};until(s,()=>w.workTask?.kind==='harvest',FARMING_RULES.tending.harvestCheck+50);assert.equal(w.workTask.targetId,field.id);assert.equal(tending(s).length,0);assert.equal(s.farmingSystem.tending.size,0);assert.ok(Math.hypot(w.position.x-before.x,w.position.y-before.y)<2,'no teleport to harvest');until(s,()=>s.inventory.count('wheat')===8);assert.equal(w.skills.farming.totalXP,8);
+ const before={...w.position};until(s,()=>w.workTask?.kind==='harvest',FARMING_RULES.tending.harvestCheck+50);assert.equal(w.workTask.targetId,field.id);assert.equal(tending(s).length,0);assert.equal(s.farmingSystem.tending.size,0);assert.ok(Math.hypot(w.position.x-before.x,w.position.y-before.y)<2,'no teleport to harvest');until(s,()=>s.inventory.count('wheat')===10);assert.equal(w.skills.farming.totalXP,8);
 });
 test('Winter and removed or inaccessible plots return farmers to safe farmhouse waiting',()=>{
  for(const mode of ['winter','removed','blocked']){const {s,home,field,orchard}=fixture(),w=farmer(s,home);if(mode!=='blocked')until(s,()=>w.workMessage==='Tending crops');
@@ -42,8 +42,8 @@ test('current-schema in-flight Save/Load keeps the physical walk but rebuilds tr
 });
 test('real harvest cargo delivery takes precedence over any idle tending and deposits the original yield once',()=>{
  const {s,home,field}=fixture({logistics:true}),w=farmer(s,home);until(s,()=>w.workMessage==='Tending crops');s.farmingSystem.records.get(field.id).growthDays=FARMING_RULES.crops.wheat_field.growthDays;
- until(s,()=>w.cargo?.resource==='wheat');assert.equal(w.cargo.amount,8);assert.equal(s.farmingSystem.tending.has(w.id),false);assert.equal(tending(s).length,0);assert.equal(s.inventory.count('wheat'),0);
- until(s,()=>!w.cargo&&s.inventory.count('wheat')===8);s.simulate(5000);assert.equal(s.inventory.count('wheat'),8);assert.equal(w.skills.farming.totalXP,8);validateGameState(serializeGameState(s));
+ until(s,()=>w.cargo?.resource==='wheat');assert.equal(w.cargo.amount,10);assert.equal(s.farmingSystem.tending.has(w.id),false);assert.equal(tending(s).length,0);assert.equal(s.inventory.count('wheat'),0);
+ until(s,()=>!w.cargo&&s.inventory.count('wheat')===10);s.simulate(5000);assert.equal(s.inventory.count('wheat'),10);assert.equal(w.skills.farming.totalXP,8);validateGameState(serializeGameState(s));
 });
 test('steady tending does not pathfind on each frame and a removed destination is released without a repeated search storm',()=>{
  const {s,home,field,orchard}=fixture(),w=farmer(s,home);until(s,()=>w.workMessage==='Tending crops');let routes=0;const route=s.workerSystem.ai.route.bind(s.workerSystem.ai);s.workerSystem.ai.route=(...args)=>{routes++;return route(...args);};

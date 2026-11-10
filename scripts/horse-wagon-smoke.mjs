@@ -15,7 +15,8 @@ export async function horseWagonSmoke(page){
     // These three subjects are autonomous fixture staff. A prior scenario's manual Move/Hold
     // must not prevent a correctly assigned worker from ever reaching the recipe's blocker.
     for(const w of [a,c,h])s.workerSystem.commands.resume(w);
-    if(!s.workplaceSystem.assign(b,a)||!s.workplaceSystem.assign(b,c)||!s.workerSystem.jobs.assign(h,'hauler'))throw Error('Horse wagon fixture could not assign its staff');
+    // tabulka-budov-1: one Wheelwright a workshop (c stays in his job).
+    if(!s.workplaceSystem.assign(b,a)||!s.workerSystem.jobs.assign(h,'hauler'))throw Error('Horse wagon fixture could not assign its staff');
     h.stoneCollection={enabled:false,radius:80};s.workplacePanel.open(b);return{hauler:h.id,wheelwright:a.id};},shop.id);
   await page.locator('#workplace-dialog[open] #recipe-choice').waitFor();
   assert.deepEqual(await page.locator('#recipe-choice option').evaluateAll(o=>o.map(x=>x.value)),['wheelbarrow','horse_wagon']);

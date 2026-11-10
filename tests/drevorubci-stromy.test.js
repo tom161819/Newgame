@@ -48,20 +48,22 @@ test('2: automatic employment sends nobody to a hut with nothing to fell and no 
   const people=[0,1,2].map(i=>s.workerSystem.create({x:40+i,y:50}));s.employment.request();s.employment.update();
   assert.equal(s.workplaceSystem.employees(b).length,0,'no tree to fell: the hut takes nobody');
   tree(s,{x:49,y:45});s.employment.request();s.employment.update();assert.equal(s.workplaceSystem.employees(b).length,1,'one mature tree, one Woodcutter');
-  tree(s,{x:49,y:42});tree(s,{x:47,y:48});tree(s,{x:50,y:48});s.employment.request();s.employment.update();assert.equal(s.workplaceSystem.employees(b).length,3,'the seat limit stays 3');
-  assert.ok(people.every(w=>w.profession==='woodcutter'));
+  // tabulka-budov-1 (owner table 9 Nov 2026): a Lumberjack Hut has a single seat, however many trees stand around it.
+  tree(s,{x:49,y:42});tree(s,{x:47,y:48});tree(s,{x:50,y:48});s.employment.request();s.employment.update();assert.equal(s.workplaceSystem.employees(b).length,1,'the seat limit is 1');
+  assert.equal(people.filter(w=>w.profession==='woodcutter').length,1);
 });
 
-test('2: Woodcutters without a tree to fell leave after about a game day (one stays per mature tree); off = nobody moves',()=>{
+test('2: a Woodcutter without a tree to fell leaves after about a game day (a held mature tree keeps him); off = nobody moves',()=>{
+  // tabulka-budov-1: with one seat a hut keeps its Woodcutter while one mature tree stands in range, even one taken by the King.
   fresh();const s=fixture();s.employment=new EmploymentSystem(s);const b=hut(s),held=tree(s,{x:49,y:45});
-  // The one mature tree is taken (by the King's reservation): it still counts, but nobody can fell it.
   s.workerSystem.reservations.reserve(s.naturalResources.reservation(held),'king');
-  const people=[0,1,2].map(i=>{const w=s.workerSystem.create({x:40+i,y:50});assert.equal(s.workplaceSystem.assign(b,w),true);return w;});
-  const run=ms=>{for(let t=0;t<ms;t+=250){s.tick(250);s.employment.update();}},day=s.gameTime.dayDuration;
-  run(day*.5);assert.equal(s.workplaceSystem.employees(b).length,3,'not within half a day');assert.ok(people.every(w=>w.workState==='Waiting'));
-  run(day*.7);assert.equal(s.workplaceSystem.employees(b).length,1,'two surplus Woodcutters left, one stays for the one mature tree');
-  assert.equal(people.filter(w=>w.profession==='idle').length,2,'free for other work');
-  run(day*2);assert.equal(s.workplaceSystem.employees(b).length,1,'automatic employment does not send them back');
+  const w=s.workerSystem.create({x:40,y:50});assert.equal(s.workplaceSystem.assign(b,w),true);
+  const run=(sc,ms)=>{for(let t=0;t<ms;t+=250){sc.tick(250);sc.employment.update();}},day=s.gameTime.dayDuration;
+  run(s,day*1.5);assert.equal(s.workplaceSystem.employees(b).length,1,'the one mature tree (held by the King) still counts');
+  const bare=fixture();bare.employment=new EmploymentSystem(bare);const bb=hut(bare),bw=bare.workerSystem.create({x:40,y:50});assert.equal(bare.workplaceSystem.assign(bb,bw),true);
+  run(bare,day*.5);assert.equal(bare.workplaceSystem.employees(bb).length,1,'not within half a day');assert.equal(bw.workState,'Waiting');
+  run(bare,day*.7);assert.equal(bare.workplaceSystem.employees(bb).length,0,'the surplus Woodcutter left');assert.equal(bw.profession,'idle','free for other work');
+  run(bare,day*2);assert.equal(bare.workplaceSystem.employees(bb).length,0,'automatic employment does not send him back');
   const off=fixture();off.employment=new EmploymentSystem(off,{enabled:false});const ob=hut(off),ow=off.workerSystem.create({x:40,y:50});off.workplaceSystem.assign(ob,ow);
   for(let t=0;t<day*1.5;t+=250){off.tick(250);off.employment.update();}assert.equal(ow.assignedWorkplaceId,ob.id,'automatic employment off: nobody is moved');
 });

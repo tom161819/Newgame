@@ -13,10 +13,10 @@ export const farmingBuildings = [
   ...[
     {id:'wheat_field',name:'Wheat Field',menuOrder:30,cost:{},visualHeight:38,constructionTime:10000,
       recommendsCompletedBuildings:['farmhouse'],
-      description:'Wheat grows for two game days. A farmer must physically harvest the ripe crop for 8 Wheat.'},
+      description:'Wheat grows for two game days. A farmer must physically harvest the ripe crop for 10 Wheat.'},
     {id:'orchard',name:'Orchard',menuOrder:40,cost:{},visualHeight:83,constructionTime:15000,
       recommendsCompletedBuildings:['farmhouse'],
-      description:'Permanent fruit trees grow apples for three game days. A farmer harvests 6 Apple without replanting.'},
+      description:'Permanent fruit trees grow apples for three game days. A farmer harvests 8 Apple without replanting.'},
   ].map(d=>({...d,width:3,height:3,walkable:true,repeatPlacement:true,crop:FARMING_RULES.crops[d.id],interactions:['inspect_crop'],renderer:'crop'})),
 ].map(d=>({...d,category:'building',buildingCategory:'food',sprite:`/assets/buildings/${d.id}/${d.id}.svg`,collectible:false,buildable:true,
   renderMode:'procedural',origin:{x:.5,y:.9},depth:{offset:0},

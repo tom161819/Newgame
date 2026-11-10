@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { BASE_DAILY_WAGES } from '../src/data/economy.js';
 import { workerScene } from './helpers/workerScene.js';
 import { SKILL_IDS,JOBS } from '../src/data/jobs.js';
 import { createProgress,totalXPForLevel } from '../src/data/experience.js';
@@ -46,7 +47,7 @@ test('daily wage uses the current job skill with the exact 10/11 boundaries, nev
   for(const job of Object.keys(JOBS).filter(id=>id!=='idle')){
     s.workerSystem.jobs.assign(w,job);
     for(const n of [1,10,11,20,21,30,31,40,41,50]){
-      level(w,JOBS[job].skill,n);assert.equal(s.wageSystem.dailyWage(w),(job==='soldier'?2:1)+Math.floor((n-1)/10));
+      level(w,JOBS[job].skill,n);assert.equal(s.wageSystem.dailyWage(w),BASE_DAILY_WAGES[job]+Math.floor((n-1)/10));
     }
   }
   s.workerSystem.jobs.assign(w,'idle');assert.equal(s.wageSystem.dailyWage(w),0);

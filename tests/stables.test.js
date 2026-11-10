@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { objectRegistry } from '../src/systems/ObjectRegistry.js';
 import { workerScene,ensureBuildingPrerequisites } from './helpers/workerScene.js';
 import { placeBuilding } from '../src/game/buildings.js';
 import { totalXPForLevel,getXPRequired } from '../src/data/experience.js';
@@ -14,13 +15,15 @@ const horse=(s,tile)=>s.animalSystem.create(s.objectRegistry.require('horse'),ti
 function stablehand(s,stables,tile){const w=s.workerSystem.create(tile);assert.equal(s.workplaceSystem.assign(stables,w),true);assert.equal(w.profession,'stablehand');return w;}
 function until(s,p,max=200000){let t=0;while(!p()&&t<max){s.tick(50);t+=50;}assert.ok(p(),`not reached after ${t} ms`);return t;}
 
-test('Stables: 5×5, 20 Wood (owner price 0.49), two Stablehands, room for 4 tamed horses; six wild horses at a new game',()=>{
+test('Stables: 5×5, 20 Wood (owner price 0.49), one Stablehand (tabulka-budov-1), room for 4 tamed horses; six wild horses at a new game',()=>{
   const s=workerScene(),d=s.objectRegistry.require('stables');
-  assert.deepEqual([d.width,d.height,d.cost,d.workplace.capacity,d.workplace.profession,d.horseCapacity],[5,5,{wood:20},2,'stablehand',4]);
+  assert.deepEqual([d.width,d.height,d.cost,d.workplace.capacity,d.workplace.profession,d.horseCapacity],[5,5,{wood:20},1,'stablehand',4]);
   assert.equal(s.objectRegistry.require('horse').gameplay.initialCount,STABLE_RULES.wildHorses);
 });
 
 test('Stablehands tame wild horses on their own and lead them into the paddock; never the same horse twice; Save/Load mid-taming',()=>{
+  // tabulka-budov-1: one Stablehand a Stables by default; two seats here test that two never take the same horse.
+  objectRegistry.configureWorkplaces({version:1,workplaces:{stables:{capacity:2}}});try{
   let s=scene();const st=building(s,'stables',50,50),a=stablehand(s,st,{x:49,y:56}),b=stablehand(s,st,{x:51,y:56});
   const h1=horse(s,{x:60,y:56}),h2=horse(s,{x:62,y:58});
   until(s,()=>s.stables.jobs.size===2&&[...s.stables.jobs.values()].some(j=>j.phase==='taming'));
@@ -30,6 +33,7 @@ test('Stablehands tame wild horses on their own and lead them into the paddock; 
   for(const id of [h1.id,h2.id]){const animal=s.animalSystem.animals.get(id),t=animal.tile;assert.ok(t.x>=st.x&&t.x<st.x+5&&t.y>=st.y&&t.y<st.y+5,'inside the paddock');assert.equal(s.stables.tamed(animal),true);}
   assert.ok(s.workerSystem.workers.get(a.id).experience.totalXP>=0);
   const later=[...s.animalSystem.animals.values()].map(x=>({...x.tile}));s.tick(5000);assert.deepEqual([...s.animalSystem.animals.values()].map(x=>({...x.tile})),later,'stabled horses stay in the paddock');
+  }finally{objectRegistry.configureWorkplaces({version:1,workplaces:{}});}
 });
 
 test('a full Stables stops taming; the place is reserved when a job starts',()=>{

@@ -17,9 +17,9 @@ const item=(id,name,plural,order,description)=>({id,name,inventoryLabel:plural,q
   description,renderMode:'sprite',origin:{x:.5,y:.6},visualHeight:30,visual:{displayWidth:40,displayHeight:28},depth:{offset:.08}});
 
 export const militaryDefinitions=[
-  workshop('bowyer','Bowyer',{stone:5,wood:10},30000,'Two Bowyers turn 8 physically delivered Wood into 1 Bow with 30 seconds of active work. Bows are carried to an Armory.'),
-  workshop('swordsmith','Swordsmith',{stone:5,wood:10},35000,'Two Swordsmiths turn 3 Iron and 2 Wood into 1 Sword with 45 seconds of active work. Swords are carried to an Armory.'),
-  workshop('armorer','Armorer',{stone:5,wood:10},40000,'Two Armorers forge 5 Iron and 2 Wood into 1 metal Armor with 60 seconds of active work. Armor is carried to an Armory.'),
+  workshop('bowyer','Bowyer',{stone:5,wood:10},30000,'A Bowyer turns 8 physically delivered Wood into 1 Bow with 30 seconds of active work. Bows are carried to an Armory.'),
+  workshop('swordsmith','Swordsmith',{stone:5,wood:10},35000,'A Swordsmith turns 3 Iron and 2 Wood into 1 Sword with 45 seconds of active work. Swords are carried to an Armory.'),
+  workshop('armorer','Armorer',{stone:5,wood:10},40000,'An Armorer forges 5 Iron and 2 Wood into 1 metal Armor with 60 seconds of active work. Armor is carried to an Armory.'),
   {id:'armory',name:'Armory',category:'building',buildingCategory:'defense',sprite:ART.armory.sprite,width:3,height:3,walkable:false,collectible:false,buildable:true,
     cost:{stone:10,wood:12},constructionTime:40000,storage:{capacity:40,resources:['bow','sword','armor'],accepts:'equipment'},interactions:['open_storage'],
     description:'A guarded store for 40 Bows, Swords and Armor. Haulers bring finished equipment here; it takes nothing else.',renderMode:'sprite',origin:ART.armory.origin,visualHeight:159,depth:{offset:0}},
