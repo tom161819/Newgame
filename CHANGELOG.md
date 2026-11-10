@@ -4,6 +4,9 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+
+## [0.91.0] - 2026-11-10
+<!-- version: {"title":"Building table values and fish notice","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed
 - Values from the owner's building table (9 Nov): one worker in the Lumberjack Hut, Hunting Lodge, Fisherman's Hut, Bakery, Bowyer, Swordsmith, Armorer, Wheelwright, Pitch Kiln and Stables; daily wage 2 for Bowyer, Swordsmith and Armorer; Wheat Field yields 10 Wheat, Orchard 8 Apples; Mill turns 4 Wheat into 2 Flour, Bakery 1 Flour into 6 Bread; Barracks equipment store holds 30.
 
