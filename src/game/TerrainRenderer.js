@@ -1,4 +1,5 @@
 import { pathSurface } from '../render/pathSurface.js';
+import { RELIEF_RULES } from './terrainRelief.js';
 import PATH_SURFACE from '../data/pathSurface.json' with { type: 'json' };
 import { drawCobbles } from './cobbles.js';
 import { COLUMNS, ROWS, TILE_WIDTH, TILE_HEIGHT } from './config.js';
@@ -339,7 +340,8 @@ export class TerrainRenderer {
     const e=0.05,inside=(fx,fy)=>fx>=x0-e&&fy>=y0-e&&fx<x0+CHUNK_SIZE+e&&fy<y0+CHUNK_SIZE+e&&fx>=0&&fy>=0&&fx<COLUMNS&&fy<ROWS;
     const surface=this.pathStyle==='v2'&&this.v2?.geo?pathSurface(this.v2.geo,this.v2.index,PATH_SURFACE):null;
     const ground=(context,rect=null)=>{if(rect)context.clearRect(rect.x,rect.y,rect.w,rect.h);
-      paintContinuousGround(context,{width:context.canvas.width,height:context.canvas.height,toWorld,isGrass:isLand,zoneAt,depthAt,inWorld,inside,field,settings,step:GROUND_STEP,surface,rect});};
+      paintContinuousGround(context,{width:context.canvas.width,height:context.canvas.height,toWorld,isGrass:isLand,zoneAt,depthAt,inWorld,inside,field,settings,step:GROUND_STEP,surface,rect});
+      this.paintRelief(context,cx,cy,left,top,rect);};
     const screen=(fx,fy)=>{const p=gridToWorld(fx,fy);return [p.x-left,p.y-top];},name=seasonOf(settings.year),free=(fx,fy)=>own(fx,fy)&&!occupied.has(`${Math.floor(fx)},${Math.floor(fy)}`)&&this.map[Math.floor(fy)]?.[Math.floor(fx)]!==1;
     const plants=(context,rect=null)=>{if(rect){context.save();context.beginPath();context.rect(rect.x,rect.y,rect.w,rect.h);context.clip();}
     for(const p of waterObjectsFor({x0:x0-1,y0:y0-1,span:CHUNK_SIZE+2,field,depthAt,settings}))if(free(p.fx,p.fy)){const [sx,sy]=screen(p.fx,p.fy);drawPlant(context,p,sx,sy,name);}
@@ -347,6 +349,24 @@ export class TerrainRenderer {
     for(const p of list){const [sx,sy]=screen(p.fx,p.fy);drawPlant(context,p,sx,sy,name);}
     if(rect)context.restore();};
     return {ground,plants};
+  }
+  // m-teren-vyska: slope shading over a chunk's ground (whole picture or `rect`): light slopes facing the upper left of
+  // the screen, dark ones facing away, nothing on level ground and on water. One small image, a pixel per tile corner,
+  // stretched over the tiles with bilinear smoothing (like the memory mask) and kept inside the painted ground.
+  paintRelief(context,cx,cy,left,top,rect=null){
+    const relief=this.scene.relief;if(!relief||typeof document==='undefined')return;
+    const M=1,x0=cx*CHUNK_SIZE-M,y0=cy*CHUNK_SIZE-M,size=CHUNK_SIZE+1+M*2,CW=relief.width+1,hw=TILE_WIDTH/2,hh=TILE_HEIGHT/2,{shadeStrength,shadeMax}=RELIEF_RULES;
+    const canvas=this.reliefMask??=document.createElement('canvas');if(canvas.width!==size){canvas.width=size;canvas.height=size;}
+    const c=canvas.getContext('2d'),image=this.reliefImage??=c.createImageData(size,size),d=image.data;let any=false;
+    for(let j=0;j<size;j++)for(let i=0;i<size;i++){const x=Math.max(0,Math.min(relief.width,x0+i)),y=Math.max(0,Math.min(relief.height,y0+j)),k=y*CW+x,o=(j*size+i)*4;
+      const s=relief.map.corners[k]>0?relief.shade[k]:0,a=Math.min(shadeMax,Math.abs(s)*shadeStrength);
+      if(s>0){d[o]=255;d[o+1]=246;d[o+2]=222;d[o+3]=Math.round(a*.7*255);}else{d[o]=18;d[o+1]=22;d[o+2]=30;d[o+3]=Math.round(a*255);}
+      if(d[o+3])any=true;}
+    if(!any)return;c.putImageData(image,0,0);
+    context.save();if(rect){context.beginPath();context.rect(rect.x,rect.y,rect.w,rect.h);context.clip();}
+    // Mask pixel centre (i + .5) is corner x0 + i, a point of tile space; tile space to chunk pixels is the projection.
+    context.globalCompositeOperation='source-atop';context.imageSmoothingEnabled=true;context.imageSmoothingQuality='low';
+    context.setTransform(hw,hh,-hw,hh,ORIGIN.x-left+(x0-y0)*hw,ORIGIN.y-top+(x0+y0-1)*hh);context.drawImage(canvas,0,0);context.restore();
   }
   // performance-2: what the paths give a chunk's ground – distance and level on the painter's coarse grid (the only way a
   // path reaches the picture; plants are cleared by the same samples). Null without V2 paths.

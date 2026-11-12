@@ -38,6 +38,7 @@ function stamp(kinds,width,entry,kind){if(!kind)return;for(let dy=0;dy<(entry.he
 // Pure: RGBA pixels (one per tile) for the player's current knowledge. Never reads hidden live state.
 export function minimapPixels(scene,out){
   const fog=scene.fog,width=fog.width,height=fog.height,season=scene.seasons?.season??'Spring',memory=scene.mapMemory,wear=scene.pathWear,grid=scene.terrainGrid,groundGrid=scene.groundGrid;
+  const relief=scene.relief,shade=relief&&relief.width===width&&relief.height===height?relief.shade:null;
   const pixels=out??new Uint8ClampedArray(width*height*4),states=new Uint8Array(width*height),live=new Uint8Array(width*height),remembered=new Uint8Array(width*height);
   for(let y=0;y<height;y++)for(let x=0;x<width;x++)states[y*width+x]=fog.displayState({x,y});
   // Live objects only where they are in sight; remembered copies only where they are not.
@@ -59,6 +60,8 @@ export function minimapPixels(scene,out){
         if(!visible&&fog.enabled)color=mute(color);
       }
     }
+    // m-teren-vyska: slopes are shaded on known ground (light from the upper left of the screen).
+    if(shade&&state!==VISIBILITY.UNEXPLORED&&color!==MINIMAP_COLORS.unknown){const k=1+Math.max(-.3,Math.min(.3,shade[y*(width+1)+x]*1.8));color=[color[0]*k,color[1]*k,color[2]*k];}
     pixels[i*4]=color[0];pixels[i*4+1]=color[1];pixels[i*4+2]=color[2];pixels[i*4+3]=255;
   }
   return pixels;

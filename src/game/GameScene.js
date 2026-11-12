@@ -31,6 +31,7 @@ import { IssueIcons } from './IssueIcons.js';
 import { MaterialYardView,MaterialPiles } from './MaterialPiles.js';
 import { SideCards } from '../ui/SideCards.js';
 import { decodeWorldCode,randomWorldCode,defaultWorldLevels,settingsFromLevels } from '../data/worldCode.js';
+import { buildRelief,setRelief,sightBonus } from './terrainRelief.js';
 import { worldStreams } from './seededRandom.js';
 import { FORESTRY as WORLD_FORESTRY } from '../data/naturalResources.js';
 import { createBackgroundSimulation } from '../ui/BackgroundSimulationUI.js';
@@ -229,7 +230,9 @@ export class GameScene extends Phaser.Scene {
     this.worldLevels=worldCode?.levels??defaultWorldLevels();this.worldSeed=worldCode?.seed??0;this.worldRandom=worldCode?worldStreams(worldCode.seed):()=>Math.random;
     const world=this.loadState?{terrain:this.loadState.terrain.map(row=>[...row]),ground:this.loadState.ground?importGround(this.loadState.ground):emptyGround(),bushes:importBushes(this.loadState.bushes??[]),
       zones:this.loadState.grassZones?importZones(this.loadState.grassZones):emptyZones(),reeds:importReeds(this.loadState.reeds),natureGroups:importNatureGroups(this.loadState.natureGroups)}:generateWorld(Math.random,{levels:this.worldLevels,streams:this.worldRandom});
-    this.terrainGrid=world.terrain;this.groundGrid=world.ground;this.bushes=world.bushes;this.grassZones=world.zones;this.reeds=world.reeds;
+    this.terrainGrid=world.terrain;this.groundGrid=world.ground;
+    // m-teren-vyska: the hills of this world, from its ground and seed (not saved; the same after every load).
+    this.relief=setRelief(buildRelief(world.ground,this.worldSeed));this.bushes=world.bushes;this.grassZones=world.zones;this.reeds=world.reeds;
     // velke-prirodni-objekty: thickets and rock groups drawn as one object over their bushes and rock tiles.
     this.natureGroups=world.natureGroups??[];
     // Generator 2's weights for where forests and ore deposits grow (new games only; not saved).
@@ -294,6 +297,7 @@ export class GameScene extends Phaser.Scene {
     this.combat.on('death',(unit,killer)=>this.onUnitDeath(unit,killer));
     this.mountSystem=new MountSystem(this);this.fog=new FogOfWarSystem(this.character);
     // Day and night N1: a third of the sight outside light at night (one light list per fog update).
+    this.fog.sightBonus=center=>sightBonus(this.relief,center);
     this.fog.sightScale=()=>{if(this.dayNight.darkness()<=0)return null;const lights=this.dayNight.lights();return c=>this.dayNight.sightFactor(c,lights);};
     this.mapMemory=new MapMemory(this.fog);this.memoryRenderer=new MapMemoryRenderer(this,this.mapMemory);
     this.settingsPanel=new SettingsPanel(settings=>{this.fog.setEnabled(settings.fogOfWar);this.fog.setExplorationEnabled(settings.explorationMode);this.fog.setMemoryBrightness(settings.memoryBrightness);this.terrain.setDebug(settings.pathWearDebug);this.background?.setEnabled(settings.runInBackground);this.refreshVisibility();},open=>this.pauseManager.set('settings',open),{seasons:this.seasons,onSeasonsChange:enabled=>{this.gameSettings=gameSettings({...this.gameSettings,seasonsEnabled:enabled});this.seasons.setEnabled(enabled);this.refreshVisibility();}});

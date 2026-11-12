@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.94.0] - 2026-11-12
+<!-- version: {"title":"Terrain height: hills, slopes and their rules","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Terrain height, first part (owner, 12 Nov). Every world now has smooth hills, near-level plains and valleys around water, worked out from the world's ground and seed. Slopes are shaded on the map and on the minimap. Walking uphill is slower (down to half speed on the steepest slopes) and routes go round a steep hill when that is quicker. Buildings need nearly level ground ("The slope is too steep here"); fields and orchards take steeper ground; walls follow the terrain. From a hilltop people see up to 6 tiles further. The ground is not lifted on screen yet – that is the next part.
+
 ## [0.93.0] - 2026-11-12
 <!-- version: {"title":"Recruits in the Barracks","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

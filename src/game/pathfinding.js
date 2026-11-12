@@ -1,5 +1,6 @@
 import { isWalkable } from './map.js';
 import { profileHooks } from '../systems/FrameProfiler.js';
+import { currentRelief, RELIEF_RULES } from './terrainRelief.js';
 
 const DIRECTIONS = [[1, 0], [0, 1], [-1, 0], [0, -1], [1, 1], [-1, 1], [-1, -1], [1, -1]];
 const EPSILON = 1e-9;
@@ -97,6 +98,9 @@ function searchPathToAny(map, start, goals, {speedMultiplier=null,maxSpeed=1}={}
     for (let g=0;g<goalCount;g++) {const dx = Math.abs(x - goalX[g]), dy = Math.abs(y - goalY[g]);best = Math.min(best, Math.max(dx, dy) + SLOPE * Math.min(dx, dy));}
     return best/maximum;
   };
+  // m-teren-vyska: a step uphill takes longer (the same rule advanceMovement walks by), downhill costs nothing extra,
+  // so routes go round a steep hill when that is quicker. Costs only grow: the estimate stays admissible.
+  const relief = currentRelief(), heights = relief && relief.tiles.length === length ? relief.tiles : null, CLIMB = RELIEF_RULES.climbSlowdown, CLIMB_MAX = 1 / RELIEF_RULES.climbMinFactor - 1;
   const costs = new Float64Array(length).fill(Infinity);
   const parents = new Int32Array(length).fill(-1);
   const closed = new Uint8Array(length);
@@ -124,7 +128,8 @@ function searchPathToAny(map, start, goals, {speedMultiplier=null,maxSpeed=1}={}
       const next = ty * width + tx;
       // Center-to-center motion spends half the step in each tile, matching
       // advanceMovement's real boundary-based speed changes.
-      const cost = costs[index] + (dx && dy ? Math.SQRT2 : 1)*.5*(1/here+1/speedAt(tx,ty,next));
+      const length1 = dx && dy ? Math.SQRT2 : 1, rise = heights ? heights[next] - heights[index] : 0;
+      const cost = costs[index] + length1*.5*(1/here+1/speedAt(tx,ty,next)) * (rise > 0 ? 1 + Math.min(CLIMB_MAX, CLIMB * rise / length1) : 1);
       if (closed[next] || cost + EPSILON >= costs[next]) continue;
       costs[next] = cost; parents[next] = index;
       const h = heuristicAt(tx,ty);

@@ -1,4 +1,5 @@
 import { isFertileGround,isFordGround } from '../data/worldTerrain.js';
+import { currentRelief, tooSteep } from './terrainRelief.js';
 import { availableFarm } from '../data/farmPlots.js';
 import { t } from '../i18n/index.js';
 import { dataName } from '../i18n/names.js';
@@ -71,6 +72,8 @@ export function placementError(map,anchor,resources,reservedTiles=[],definition=
   // #100: fields and orchards need grass; nothing grows on beach or desert sand.
   // Fishing R1: a Fisherman's Hut must touch water on at least one side (remembered water counts outside sight).
   // Since 0.32.0 a Fisherman's Hut may stand anywhere; its Fishers walk to the nearest reachable shore.
+  // m-teren-vyska: buildings need nearly level ground; fields and orchards take a steeper slope.
+  if(tooSteep(currentRelief(),tiles.filter(tile=>!replaced(tile)),definition))return t('status.tooSteep');
   const ground=natural?.scene?.groundGrid;if(definition.crop&&ground&&tiles.some(tile=>!isFertileGround(ground[tile.y]?.[tile.x])))return t('status.needsGrass');
   // World v2: nothing is built on a ford.
   if(ground&&tiles.some(tile=>isFordGround(ground[tile.y]?.[tile.x])))return t('status.notOnFord');
