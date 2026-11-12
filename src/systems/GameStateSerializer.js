@@ -1,4 +1,5 @@
 import { fishingGround } from './FishingSystem.js';
+import { SQUAD_MAX } from '../ui/armySquads.js';
 import { validHaulPriority } from '../data/logistics.js';
 import { validNightThreatState } from './NightThreatSystem.js';
 import { validRoyalGoalState } from './RoyalGoals.js';
@@ -120,7 +121,7 @@ export function serializeGameState(scene){
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
     ...(scene.workerSystem?{population:scene.workerSystem.exportState(),workers:[...scene.workerSystem.workers.values()].map(w=>({...serializeActor(w),commandState:copy(w.commandState??{state:'Working',goal:null}),name:w.name,...(w.identity?{identity:copy(w.identity)}:{}),profession:w.profession,displayProfession:w.displayProfession,manualRockId:w.manualRockId,isSubject:w.isSubject!==false,diedAt:w.diedAt??null,
       ...(w.naturalTalent?{naturalTalent:w.naturalTalent,initialSkills:copy(w.initialSkills)}:{}),
-      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),...(w.haulPriority&&w.haulPriority.kind!=='any'?{haulPriority:copy(w.haulPriority)}:{}),workplaceReached:w.workplaceReached,...(w.restPhase?{restPhase:w.restPhase}:{}),...(w.tendTorches?{tendTorches:true}:{}),...(w.clearingLoan?{clearingLoan:true}:{}),cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
+      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),...(w.haulPriority&&w.haulPriority.kind!=='any'?{haulPriority:copy(w.haulPriority)}:{}),...(Number.isInteger(w.squad)?{squad:w.squad}:{}),workplaceReached:w.workplaceReached,...(w.restPhase?{restPhase:w.restPhase}:{}),...(w.tendTorches?{tendTorches:true}:{}),...(w.clearingLoan?{clearingLoan:true}:{}),cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
       workState:w.workState,workMessage:w.workMessage??'',workTask:copy(w.workTask),assignedWorkplaceId:w.assignedWorkplaceId,arriving:w.arriving,aiCooldown:w.aiCooldown}))}:{}),
     ...(scene.pathWear?{pathWear:scene.pathWear.exportState()}:{}),
     player:{...serializeActor(c),state:c.state,currentTowerId:c.currentTower?.id??null,horseId:c.mountedHorse?.id??null,
@@ -336,6 +337,8 @@ export function validateGameState(input,registry=objectRegistry){
       // #58 phase B: only a living resident goes home or rests.
       if(w.restPhase!==undefined)check(['going','resting'].includes(w.restPhase)&&w.isAlive&&w.isSubject);
       if(w.tendTorches!==undefined)check(w.tendTorches===true);
+      // Army squads (owner, 12 Nov): optional squad number of a soldier.
+      if(w.squad!==undefined){integer(w.squad,1,SQUAD_MAX);check(w.profession==='soldier');}
       // m-oznacovani-tezby (56): a Miner lent out to the rocks of a wall plan keeps his workplace.
       if(w.clearingLoan!==undefined)check(w.clearingLoan===true&&w.isAlive&&w.isSubject&&w.profession==='miner'&&w.assignedWorkplaceId!=null);
       check(typeof w.workMessage==='string'&&w.workMessage.length<200);

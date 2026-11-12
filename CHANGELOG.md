@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.100.0] - 2026-11-12
+<!-- version: {"title":"Army squads","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Army squads: with two or more soldiers chosen in the Army panel, a ⚑ at the right of their rows makes them a squad. Squads show as chips under the orders; a click on one chooses all its soldiers (Shift adds them), × dissolves it. A soldier is in one squad at most; squads are saved.
+
 ## [0.99.0] - 2026-11-12
 <!-- version: {"title":"Hauler priority, faster Pitch Kiln, hunters without range","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

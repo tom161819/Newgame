@@ -161,3 +161,18 @@ test('m-zalozka-vojsko: soldiers on Patrol walk a round of the settlement spread
   // Choosing: a click takes one, Shift + click adds and removes.
   let picked=armyPick(new Set(),a.id,false);picked=armyPick(picked,b.id,true);assert.deepEqual([...picked],[a.id,b.id]);picked=armyPick(picked,a.id,true);assert.deepEqual([...picked],[b.id]);assert.deepEqual([...armyPick(picked,c.id,false)],[c.id]);
 });
+
+test('army squads (owner, 12 Nov): chosen soldiers make a squad, a squad chooses all its soldiers, dissolving frees them, a soldier is in one squad at most; squads survive a save', async () => {
+  const { squads,makeSquad,dissolveSquad,squadMembers } = await import('../src/ui/armySquads.js');const { armyRows } = await import('../src/ui/ArmyPanel.js');
+  const {s,barracks}=kingdom(),[a,b,c,d]=[0,1,2,3].map(i=>soldier(s,barracks,{x:50+i,y:54}));
+  assert.equal(makeSquad(s,[a]),null,'one soldier is no squad');
+  assert.equal(makeSquad(s,[a,b,c]),1);assert.deepEqual(squads(s).map(g=>[g.id,g.members.length]),[[1,3]]);assert.equal(armyRows(s).find(r=>r.id===a.id).squad,1);
+  assert.equal(makeSquad(s,[c,d]),2,'the next free number');assert.deepEqual(squadMembers(s,1).map(w=>w.id).sort(),[a.id,b.id].sort(),'c moved to the new squad');
+  // Save and load keep the numbers.
+  const loaded=scene(false);loadGameState(loaded,validateGameState(serializeGameState(s)));assert.deepEqual(squads(loaded).map(g=>[g.id,g.members.map(w=>w.id).sort()]),[[1,[a.id,b.id].sort()],[2,[c.id,d.id].sort()]]);
+  // A squad left with one soldier ends; dissolving frees everyone; a soldier who leaves the army leaves the squad.
+  assert.equal(makeSquad(s,[a,d]),3);assert.deepEqual(squads(s).map(g=>g.id),[3],'squads 1 and 2 kept one soldier each – gone');assert.equal(b.squad,undefined);assert.equal(c.squad,undefined);
+  assert.equal(dissolveSquad(s,3),2);assert.deepEqual(squads(s).map(g=>g.id),[]);
+  makeSquad(s,[a,b]);s.workplaceSystem.remove(a);s.tick(50);assert.equal(a.profession==='soldier',false);squads(s);assert.equal(a.squad,undefined);
+  assert.doesNotThrow(()=>validateGameState(serializeGameState(s)));
+});

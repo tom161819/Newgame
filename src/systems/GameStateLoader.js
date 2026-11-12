@@ -52,6 +52,7 @@ export function loadGameState(scene,input){
     for(const key of ['profession','displayProfession','manualRockId','workState','workMessage','assignedWorkplaceId','arriving','aiCooldown'])worker[key]=data[key];
     if(data.stoneCollection)worker.stoneCollection=structuredClone(data.stoneCollection);
     if(data.haulPriority)worker.haulPriority=structuredClone(data.haulPriority);
+    if(Number.isInteger(data.squad))worker.squad=data.squad;
     worker.workplaceReached=data.workplaceReached??false;worker.restPhase=data.restPhase??null;worker.tendTorches=!!data.tendTorches;worker.clearingLoan=!!data.clearingLoan;worker.cargo=structuredClone(data.cargo??null);worker.pendingWorkRewards=structuredClone(data.pendingWorkRewards??[]);
     worker.commandState=structuredClone(data.commandState);worker.workTask=structuredClone(data.workTask);worker.active=worker.isAlive;
     if(worker.workTask)scene.workerSystem.reservations.reserve(worker.workTask.reservation,worker.id);
