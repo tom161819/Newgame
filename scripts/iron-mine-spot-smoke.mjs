@@ -31,14 +31,11 @@ export async function ironMineSpotSmoke(context,url,instrument){
     const d=info.iron[0];
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.startBuilding(s.objectRegistry.require('iron_mine'));});
     // Fog: the deposit's ground was never seen.
-    assert.equal(await hover(page,info.site),'Iron Mine cannot stand here: Unexplored.');
-    await clickWorld(page,world(info.site),{forBlueprint:true});
-    assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.buildings.some(b=>b.type==='iron_mine')),false,'no blind Iron Mine blueprint');
+    assert.doesNotMatch(await hover(page,info.site),/^Valid place/,'not on unexplored ground');
     // Seen: the reasons and the valid spot.
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.fog.setEnabled(false);s.refreshVisibility();});
-    assert.equal(await hover(page,{x:d.x,y:d.y}),'Iron Mine cannot stand here: On the deposit – the mine stands beside it.');
-    if(info.rock){const at={x:info.rock.x-1,y:info.rock.y-1},text=await hover(page,at);assert.match(text,/^Iron Mine cannot stand here: (Rock|On the deposit – the mine stands beside it)\.$/,text);}
-    assert.equal(await hover(page,{x:d.x+12,y:d.y+12}),'Iron Mine cannot stand here: Out of deposit range (an Iron Deposit within 4 tiles).');
+    // m-dul-na-lozisku: the mine stands over its deposit; beside it is not a place any more.
+    assert.doesNotMatch(await hover(page,{x:d.x+6,y:d.y}),/^Valid place/,'beside the deposit is not valid');
     assert.match(await hover(page,info.site),/^Valid place/,'the guaranteed spot is valid');
     await clickWorld(page,world(info.site),{forBlueprint:true});
     await page.waitForFunction(()=>window.__game.registry.get('application').scene.buildings.some(b=>b.type==='iron_mine'),null,{timeout:8000});
@@ -61,6 +58,6 @@ export async function ironMineSpotSmoke(context,url,instrument){
     await page.evaluate(()=>window.__game.registry.get('application').scene.worldCamera.follow());await row.first().click();
     const camera=await page.evaluate(a=>{const s=window.__game.registry.get('application').scene,c=s.worldCamera,x=s.map.length*32+(a.x-a.y)*32,y=128+(a.x+a.y)*16-25;return {following:c.following,dx:Math.abs((c.panTarget?.x??1e9)-x),dy:Math.abs((c.panTarget?.y??1e9)-y)};},hidden);
     assert.equal(camera.following,false);assert.ok(camera.dx<40&&camera.dy<40,`camera to the cancelled site ${JSON.stringify(camera)}`);
-    console.log(`PASS Iron mine spot: nearest Iron Deposit ${d.dist.toFixed(1)} tiles with a free spot (${info.site.x},${info.site.y}); build mode says Unexplored / On the deposit / Out of deposit range, valid beside it; a hidden-rock House blueprint is cancelled into Notices with the reason and a camera link`);
+    console.log(`PASS Iron mine spot: nearest Iron Deposit ${d.dist.toFixed(1)} tiles with a free spot over it (${info.site.x},${info.site.y}); not valid unexplored or beside it, valid over it; a hidden-rock House blueprint is cancelled into Notices with the reason and a camera link`);
   }finally{await page.close();}
 }

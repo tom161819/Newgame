@@ -1,6 +1,9 @@
 export const FORESTRY=Object.freeze({
   initialTrees:200,clusters:8,protectedRadius:7,refreshInterval:1000,
   stageDays:Object.freeze([1,3,4,Infinity]),
+  // m-cesta-bez-stromku (owner, 12 Nov): on a worn path of this level or more (and on paving) stumps do not sprout and
+  // young trees wither back to a stump; a grown tree stays.
+  pathBlocksGrowthLevel:2,
   seasonGrowth:Object.freeze({Spring:1.25,Summer:1.1,Autumn:.75,Winter:0}),
   // m-drevo-start (playtest 0.76.0 #2): the Lumberjack Hut +50 % – chopping takes 7 s instead of 15 s (the wood per tree
   // stays, so 3 Woodcutters × 6 still fit the 20-unit hut pile and saves keep their reservations).

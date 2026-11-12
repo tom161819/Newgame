@@ -81,7 +81,9 @@ export class NaturalResourcesSystem {
     for(const object of this.byId.values()){
       if(!object.definition.tree)continue;
       const n=object.natural;n.ageDays+=Math.max(0,this.ageClock-n.ageCheckpoint);n.ageCheckpoint=this.ageClock;const growth=Math.max(0,this.growthClock-n.growthCheckpoint);n.growthCheckpoint=this.growthClock;
-      if(n.stage===3||built.has(tileKey(object)))continue;n.growthDays+=growth*(boost!==1&&huts.some(h=>this.forestry.inRadius(h,object))?boost:1);
+      if(n.stage===3||built.has(tileKey(object)))continue;
+      const wear=this.scene.pathWear;if(wear&&((wear.level?.(object)??0)>=FORESTRY.pathBlocksGrowthLevel||wear.isPaved?.(object))){if(n.stage>0||n.growthDays>0){if(this.miningWork?.rocks?.trees?.has(n.id))this.miningWork.rocks.markTree(object,false);n.stage=0;n.growthDays=0;this.refreshMap(object);this.view(object)?.setNaturalState?.(object);routes.before=undefined;}continue;}
+      n.growthDays+=growth*(boost!==1&&huts.some(h=>this.forestry.inRadius(h,object))?boost:1);
       while(n.stage<3&&n.growthDays+1e-9>=FORESTRY.stageDays[n.stage]){
         if(this.growthModifier()===0)break;
         if(n.stage===2&&(reserved.has(tileKey(object))||this.scene.map[object.y][object.x]!==0||!this.preservesRoutes(object,routes))){n.growthDays=FORESTRY.stageDays[n.stage];break;}

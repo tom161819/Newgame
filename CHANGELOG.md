@@ -5,6 +5,20 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.102.0] - 2026-11-13
+<!-- version: {"title":"Stone ×2, Iron Mine over its deposit, building store","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Workshop and producer windows show the building's own store: input, output or the pile by the building, with amounts, what is on the way and when it is full.
+
+### Changed
+- Stone deposits hold twice the stone (160–320, large 400–640); deposits in saved games get twice their remaining stone.
+- An Iron Mine is built over its Iron Deposit, like a Quarry. Mines built earlier beside a deposit keep working.
+- Saplings do not regrow on a worn path (level 2 and up) or on paving; young trees there wither.
+
+### Fixed
+- The automatic trade section of the Marketplace no longer flickers and jumps.
+- A building window opened in the grey fog no longer closes at once.
+
 ## [0.101.0] - 2026-11-12
 <!-- version: {"title":"Saving fixed; stores, Barracks limit, miners and pitch maker","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Fixed

@@ -26,7 +26,7 @@ function hauler(s){const w=s.workerSystem.create(free(s));assert.ok(s.workerSyst
 function until(s,condition,limit=120000){for(let elapsed=0;elapsed<limit&&!condition();elapsed+=50)s.tick(50);assert.ok(condition(),JSON.stringify(s.workerSystem.liveWorkers().map(w=>({id:w.id,profession:w.profession,task:w.workTask?.kind,cargo:w.cargo,message:w.workMessage}))));}
 // Two Iron Mines: A runs out, B has one free seat left.
 function mines(){
-  const s=fixture(),da=deposit(s,'iron_deposit',{x:51,y:44},1),a=building(s,'iron_mine',{x:45,y:43}),db=deposit(s,'iron_deposit',{x:60,y:52},60),b=building(s,'iron_mine',{x:55,y:51});
+  const s=fixture(),da=deposit(s,'iron_deposit',{x:51,y:44},1),a=building(s,'iron_mine',{x:50,y:43}),db=deposit(s,'iron_deposit',{x:60,y:52},60),b=building(s,'iron_mine',{x:59,y:51});
   const crew=[miner(s,a),miner(s,a),miner(s,a)],other=[miner(s,b),miner(s,b)];
   return {s,a,b,da,db,crew,other,carrier:hauler(s)};
 }

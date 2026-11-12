@@ -70,21 +70,25 @@ export class MineralSystem {
     }
     return {deposit:null,added:false};
   }
-  // m-zelezny-dul-misto: an Iron Mine anchor right beside the Iron Deposit `deposit` ({x,y,definition}, placed or not)
+  // m-zelezny-dul-misto + m-dul-na-lozisku: an Iron Mine anchor over the Iron Deposit `deposit` ({x,y,definition}, placed or not)
   // that the placement rules accept at the start (as startQuarrySite): every footprint tile free, not on the deposit,
   // clear of the Castle and the Starter Stockpile, blocking mine and deposit cuts nothing off and both keep a reachable
   // work position. Nearest spots first (ties by position). Null when there is none.
   ironMineSite(deposit,{free=this.startFree(),before=null}={}){
     const s=this.scene,mine=s.objectRegistry.require('iron_mine'),dep={x:deposit.x,y:deposit.y,definition:deposit.definition},depositTiles=buildingTiles(dep,dep.definition),near=START_IRON_MINE.beside;
     const starts=s.buildings.filter(b=>START_QUARRY.keepClearOf.includes(b.type)).map(b=>({x:b.x,y:b.y,definition:buildingDefinition(b)})),king=s.character.tile,origins=this.natural.origins(),options=[];
-    for(let y=dep.y-mine.height-near;y<=dep.y+dep.definition.height+near;y++)for(let x=dep.x-mine.width-near;x<=dep.x+dep.definition.width+near;x++){const site={x,y,definition:mine};if(!rectanglesOverlap(site,dep)&&footprintDistance(site,dep)<=near)options.push(site);}
-    options.sort((a,b)=>footprintDistance(a,dep)-footprintDistance(b,dep)||a.y-b.y||a.x-b.x);
+    // m-dul-na-lozisku: the Iron Mine stands over its deposit (like a Quarry): every placement whose footprint overlaps
+    // the deposit, nearest to the deposit's centre first; the footprint outside the deposit must be free ground.
+    const depKeys=new Set(depositTiles.map(tileKey));
+    for(let y=dep.y-mine.height+1;y<=dep.y+dep.definition.height-1;y++)for(let x=dep.x-mine.width+1;x<=dep.x+dep.definition.width-1;x++){const site={x,y,definition:mine};if(rectanglesOverlap(site,dep))options.push(site);}
+    const centre=(o,d)=>Math.abs(o.x+d.width/2-(dep.x+dep.definition.width/2))+Math.abs(o.y+d.height/2-(dep.y+dep.definition.height/2));
+    options.sort((a,b)=>centre(a,mine)-centre(b,mine)||a.y-b.y||a.x-b.x);void near;
     for(const site of options){
-      const tiles=buildingTiles(site,mine);if(!tiles.every(free)||tiles.some(t=>t.x===king.x&&t.y===king.y)||starts.some(b=>footprintDistance(site,b)<START_QUARRY.clearance))continue;
-      const blocked=[...tiles,...depositTiles].filter(t=>s.map[t.y][t.x]===0);before??=reachableTiles(s.map,origins).length;
+      const tiles=buildingTiles(site,mine);if(!tiles.every(t=>depKeys.has(tileKey(t))||free(t))||tiles.some(t=>t.x===king.x&&t.y===king.y)||starts.some(b=>footprintDistance(site,b)<START_QUARRY.clearance))continue;
+      const blocked=tiles.filter(t=>s.map[t.y][t.x]===0);before??=reachableTiles(s.map,origins).length;
       for(const t of blocked)s.map[t.y][t.x]=1;const after=reachableTiles(s.map,origins);for(const t of blocked)s.map[t.y][t.x]=0;
       if(after.length!==before-blocked.length)continue;const reachable=new Set(after.map(tileKey)),open=o=>towerNeighbors(o).some(t=>reachable.has(tileKey(t)));
-      if(open(site)&&open(dep))return {x:site.x,y:site.y};
+      if(open(site))return {x:site.x,y:site.y};
     }
     return null;
   }
@@ -114,7 +118,7 @@ export class MineralSystem {
   select(definition,anchor){const candidates=this.candidates(definition,anchor);return definition.mining.overlap?candidates[0]??null:candidates.find(d=>d.natural.remaining>0&&d.natural.boundBuildingId==null&&this.scene.fog.isVisibleObject(d))??null;}
   placementError(definition,anchor){
     if(!definition.mining)return null;const candidates=this.candidates(definition,anchor),deposit=this.select(definition,anchor);
-    if(!deposit)return definition.mining.overlap?'Quarry must overlap a finite Stone Deposit.':'Iron Mine requires an available visible Iron Deposit within four tiles.';
+    if(!deposit)return definition.mining.overlap?(definition.id==='iron_mine'?'Iron Mine must overlap a finite Iron Deposit.':'Quarry must overlap a finite Stone Deposit.'):'Iron Mine requires an available visible Iron Deposit within four tiles.';
     if(deposit.natural.remaining===0)return 'Deposit Depleted';
     if(deposit.natural.boundBuildingId!=null)return 'This deposit is already assigned to another building.';
     if(!this.scene.fog.isVisibleObject(deposit))return 'Explore the deposit before placing this building.';

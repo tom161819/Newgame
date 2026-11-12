@@ -18,3 +18,11 @@ test('earlier-release saves of the current schema pass the save check',()=>{
     assert.doesNotThrow(()=>validateGameState(data),file);
   }
 });
+test('m-loziska-kamene-2x: stone deposits of an older save get twice their stone once; iron stays',()=>{
+  const data=JSON.parse(gunzipSync(readFileSync(new URL(fixtures[0],dir))).toString('utf8'));
+  const stone=data.resources.filter(r=>r.natural?.kind==='deposit'&&/^stone_deposit/.test(r.type)),iron=data.resources.filter(r=>r.natural?.kind==='deposit'&&/^iron_deposit/.test(r.type));
+  assert.ok(stone.length);const state=validateGameState(data);
+  for(const r of stone){const now=state.resources.find(x=>x.natural?.id===r.natural.id).natural;assert.equal(now.max,r.natural.max*2);assert.equal(now.remaining,r.natural.remaining*2);}
+  for(const r of iron){const now=state.resources.find(x=>x.natural?.id===r.natural.id).natural;assert.equal(now.max,r.natural.max);}
+  const again=validateGameState(state);for(const r of stone)assert.equal(again.resources.find(x=>x.natural?.id===r.natural.id).natural.max,r.natural.max*2,'not doubled twice');
+});

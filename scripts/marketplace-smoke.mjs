@@ -10,8 +10,7 @@ export async function marketplaceSmoke(context,url,instrument){
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.kingLogistics);
     await page.locator('#help-dialog').waitFor({timeout:10000});await page.evaluate(()=>{const d=document.querySelector('#help-dialog');if(d)d.open=false;});
     await page.locator('#buildings-tab').click();await page.locator('[data-building-category="logistics"]').click();
-    assert.equal(await page.locator('#marketplace-choice').isDisabled(),true,'locked without a finished Warehouse');
-    assert.match(await page.locator('#marketplace-availability').textContent(),/Warehouse/);
+    assert.equal(await page.locator('#marketplace-choice').isDisabled(),false,'m-trziste-bez-skladu: open without a Warehouse');
     await page.locator('#buildings-tab').click();
     // A finished building as a fixture (placed whole, like the starting Castle), so the test does not wait for builders.
     const finished=type=>page.evaluate(type=>{
@@ -86,6 +85,6 @@ export async function marketplaceSmoke(context,url,instrument){
     assert.ok(gold0>=gold1);
     const gone=await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.caravans.leave();for(let i=0;i<20000&&s.caravans.active;i++){s.caravans.update(100);s.caravanViews.update();}return {active:s.caravans.active,view:s.caravanViews.view,next:s.caravans.nextVisitAt};});
     assert.equal(gone.active,null);assert.equal(gone.view,null);assert.ok(gone.next>0);
-    console.log('PASS Marketplace: locked until a Warehouse is finished, placed from the Logistics menu, panel with goods space, loading spots and live prices with reasons; trade statistics and price history after a sale; automatic trade rules; a summoned caravan drives in from the edge, trades, leaves and the next one is scheduled');
+    console.log('PASS Marketplace: open without a Warehouse, placed from the Logistics menu, panel with goods space, loading spots and live prices with reasons; trade statistics and price history after a sale; automatic trade rules; a summoned caravan drives in from the edge, trades, leaves and the next one is scheduled');
   }finally{await page.close();}
 }

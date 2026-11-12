@@ -20,14 +20,14 @@ export class MarketplacePanel {
   goods(building){const stock=this.scene.trade?.market(building.id)?.stock??{};return Object.values(stock).reduce((n,v)=>n+v,0);}
   render(){
     const b=this.building,d=buildingDefinition(b),capacity=d.trade?.capacity??TRADE_RULES.marketplaceCapacity;
-    const status=document.querySelector('#marketplace-status');status.replaceChildren(
-      ...this.caravanLines(b),
-      element('p','',t('market.space',{used:this.goods(b),capacity})),
-      element('p','',t('market.loadingSpots',{count:d.trade?.loadingSpots??TRADE_RULES.loadingSpots})),
-      ...this.orderLines(b));
+    // m-trziste-auto-blikani (owner, 12 Nov): parts are rebuilt only when what they show changed, so nothing flickers or
+    // jumps on the periodic refresh (the panel refreshes every second and on every trade change).
+    const status=document.querySelector('#marketplace-status'),lines=[...this.caravanLines(b),element('p','',t('market.space',{used:this.goods(b),capacity})),element('p','',t('market.loadingSpots',{count:d.trade?.loadingSpots??TRADE_RULES.loadingSpots})),...this.orderLines(b)];
+    const statusKey=lines.map(l=>l.outerHTML??l.textContent).join('|');if(statusKey!==this.statusKey||!status.children.length){this.statusKey=statusKey;status.replaceChildren(...lines);}
     this.renderTrade(b);
-    const rows=this.prices().map(row=>{const tr=element('tr');tr.dataset.marketResource=row.resource;tr.append(element('th','',row.name),this.priceCell(row,'buy'),this.priceCell(row,'sell'));return tr;});
-    document.querySelector('#marketplace-prices tbody').replaceChildren(...rows);this.decorate(document.querySelector('#marketplace-prices'));
+    const prices=this.prices(),pricesKey=JSON.stringify(prices.map(r=>[r.resource,r.name,r.buy,r.sell,r.stock,r.caravan]));
+    if(pricesKey!==this.pricesKey){this.pricesKey=pricesKey;const rows=prices.map(row=>{const tr=element('tr');tr.dataset.marketResource=row.resource;tr.append(element('th','',row.name),this.priceCell(row,'buy'),this.priceCell(row,'sell'));return tr;});
+      document.querySelector('#marketplace-prices tbody').replaceChildren(...rows);this.decorate(document.querySelector('#marketplace-prices'));}
     this.renderAuto();
     this.renderStats();
   }
@@ -53,8 +53,12 @@ export class MarketplacePanel {
   renderAuto({force=false}={}){
     const root=document.querySelector('#marketplace-auto-body'),summary=document.querySelector('#marketplace-auto-summary'),trade=this.scene.trade;if(!root||!trade?.auto)return;
     const a=trade.auto,count=Object.keys(a.rules).length;
-    summary.textContent=t('market.auto.summary',{state:t(a.enabled?'market.auto.on':'market.auto.off'),count});
+    {const text=t('market.auto.summary',{state:t(a.enabled?'market.auto.on':'market.auto.off'),count});if(summary.textContent!==text)summary.textContent=text;}
     if(!force&&root.contains(document.activeElement))return;
+    // Same rules and goods: only the price hints and notes change – update them in place instead of rebuilding.
+    const structure=JSON.stringify([a.enabled,a.budget,a.rules,this.prices().map(r=>r.resource),document.documentElement.lang]);
+    if(!force&&structure===this.autoStructure&&root.children.length){for(const row of this.prices()){const hint=root.querySelector(`[data-auto-resource="${row.resource}"] .market-auto-hint`),text=t('market.auto.price',{buy:row.buy,sell:row.sell});if(hint&&hint.textContent!==text)hint.textContent=text;}for(const id of Object.keys(a.rules))this.renderAutoNote(id);return;}
+    this.autoStructure=structure;
     const enabled=element('label','market-auto-enabled'),box=element('input');box.type='checkbox';box.id='auto-trade-enabled';box.checked=a.enabled;
     box.addEventListener('change',()=>{trade.setAutoEnabled(box.checked);this.renderAuto({force:true});document.querySelector('#auto-trade-enabled')?.focus();});enabled.append(box,' ',t('market.auto.enable'));
     const budgetLabel=element('label','market-auto-budget',t('market.auto.budget')+' '),budget=this.number('auto-trade-budget',a.budget,0,AUTO_TRADE.maxBudget);
@@ -93,12 +97,13 @@ export class MarketplacePanel {
     const note=document.querySelector(`[data-auto-resource="${resource}"] .market-auto-note`);if(!note)return;const trade=this.scene.trade,w=trade.autoWarning(resource);
     const row=this.prices().find(r=>r.resource===resource),parts=[t('market.auto.price',{buy:row?.buy??'–',sell:row?.sell??'–'})];
     if(trade.auto.visit&&trade.auto.visit.caravanId===this.scene.caravans?.active?.id&&trade.auto.visit.done.includes(resource))parts.push(t('market.auto.doneThisVisit'));
-    note.textContent=parts.join(' · ');note.classList.toggle('warning',!!w);if(w)note.textContent+=' · '+t('market.auto.foodWarning',{left:w.left,reserve:w.reserve,days:AUTO_TRADE.foodReserveDays});
+    const text=parts.join(' · ')+(w?' · '+t('market.auto.foodWarning',{left:w.left,reserve:w.reserve,days:AUTO_TRADE.foodReserveDays}):'');if(note.textContent!==text)note.textContent=text;note.classList.toggle('warning',!!w);
   }
   // Trade F2: totals, the best goods, recent trades and a price history chart.
   renderStats(){
     const root=document.querySelector('#marketplace-stats');const trade=this.scene.trade;if(!root||!trade?.summary)return;
     const s=trade.summary(),name=id=>this.scene.objectRegistry.get(id)?.name??id;
+    {const key=JSON.stringify([trade.summary(),trade.stats.history,this.chartResource,document.documentElement.lang]);if(key===this.statsKey&&root.children.length&&!root.contains(document.activeElement))return;if(root.contains(document.activeElement))return;this.statsKey=key;}
     const parts=[element('h3','',t('market.stats.title')),element('p','market-stats-totals',t('market.stats.totals',{sold:s.sold,bought:s.bought,balance:(s.balance>0?'+':'')+s.balance,count:s.transactions}))];
     parts.push(element('p','market-stats-top',s.top.length?t('market.stats.top',{list:s.top.map(r=>`${name(r.resource)} (${r.value})`).join(', ')}):t('market.stats.none')));
     if(s.recent.length){const list=element('ul','market-recent');for(const r of s.recent.slice(0,6))list.append(element('li','',t(`market.stats.recent.${r.side}`,{day:r.day,quantity:r.quantity,good:name(r.resource),price:r.price})));parts.push(element('p','market-stats-sub',t('market.stats.recentTitle')),list);}
@@ -107,7 +112,7 @@ export class MarketplacePanel {
       if(!goods.includes(this.chartResource))this.chartResource=goods[0];
       const select=element('select','market-chart-good');select.id='marketplace-chart-good';select.setAttribute('aria-label',t('market.stats.chartGood'));
       for(const id of goods){const o=element('option','',name(id));o.value=id;o.selected=id===this.chartResource;select.append(o);}
-      select.addEventListener('change',()=>{this.chartResource=select.value;this.renderStats();});
+      select.addEventListener('change',()=>{this.chartResource=select.value;this.statsKey=null;select.blur();this.renderStats();});
       parts.push(element('p','market-stats-sub',t('market.stats.chart',{days:PRICE_MODEL.historyDays})),select,this.chart(trade.stats.history[this.chartResource]));
     }
     if(root.contains(document.activeElement))return;
@@ -210,11 +215,11 @@ export class MarketplacePanel {
     out.textContent=[done,...parts,...q.errors.map(e=>t(`market.error.${e}`))].filter(Boolean).join(' · ');out.classList.toggle('error',q.errors.length>0);this.lastResult=null;
   }
   open(building){
-    this.building=building;this.render();this.unsubscribe?.();this.unsubscribeTrade?.();this.unsubscribe=this.scene.caravans?.onChange(()=>{if(this.dialog.open)this.render();});this.unsubscribeTrade=this.scene.trade?.onChange(()=>{if(this.dialog.open)this.render();});
+    this.building=building;this.statusKey=this.pricesKey=this.autoStructure=this.statsKey=null;this.render();this.unsubscribe?.();this.unsubscribeTrade?.();this.unsubscribe=this.scene.caravans?.onChange(()=>{if(this.dialog.open)this.render();});this.unsubscribeTrade=this.scene.trade?.onChange(()=>{if(this.dialog.open)this.render();});
     if(!this.dialog.open){this.restored=false;this.scene.setGalleryInput(false);this.dialog.showModal();clearInterval(this.timer);this.timer=setInterval(()=>{if(this.dialog.open)this.render();},1000);}
   }
   restore(){clearInterval(this.timer);this.timer=null;if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){if(this.dialog.open)this.dialog.close();this.restore();}
-  relabel(){if(this.dialog.open)this.render();}
+  relabel(){this.statusKey=this.pricesKey=this.autoStructure=this.statsKey=null;if(this.dialog.open)this.render();}
   destroy(){this.close();this.unsubscribe?.();this.unsubscribeTrade?.();this.controller.abort();}
 }

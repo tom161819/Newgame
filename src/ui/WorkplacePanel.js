@@ -11,6 +11,14 @@ import { buildingName } from '../game/depletedMine.js';
 import { renderMilitary,militarySignature,handleMilitaryClick } from './militaryPanel.js';
 import { staffingLine } from '../systems/StaffingStatus.js';
 
+// m-okno-budovy-sklad: one row per own store of a building – input, output, pile by the building, kit store – with
+// what is in it, on the way in and promised out.
+export function ownStoreRows(scene,building){
+  const storage=scene.foodStorage;if(!storage)return [];const order={input:0,output:1,pile:2,kit:3,fuel:4,market:5};
+  return [...storage.locations.values()].filter(l=>l.buildingId===building.id&&!storage.isStock(l)).map(l=>{const used=storage.used(l),kind=l.kind in order?l.kind:'output';
+    const goods=l.allowed.map(resource=>({resource,amount:l.stock[resource]??0,incoming:storage.incoming(l.id,resource),reserved:storage.reserved(l.id,resource)})).filter(g=>g.amount||g.incoming||g.reserved);
+    return {kind,used,capacity:l.capacity,full:used>=l.capacity,goods};}).sort((a,b)=>order[a.kind]-order[b.kind]);
+}
 export class WorkplacePanel {
   constructor(scene){
     this.scene=scene;this.dialog=document.querySelector('#workplace-dialog');this.controller=new AbortController();const options={signal:this.controller.signal};this.restored=true;
@@ -20,6 +28,8 @@ export class WorkplacePanel {
     this.farmStoreButton=element('button','',t('workplace.openStore'));this.farmStoreButton.type='button';this.farmStoreButton.id='farm-store-open';
     this.farmStoreButton.addEventListener('click',()=>{const b=this.building;if(!b)return;this.close();scene.storagePanel?.open(b);},options);
     this.farmStore.append(this.farmStoreText,this.farmStoreButton);this.dialog.insertBefore(this.farmStore,document.querySelector('#food-production-details'));
+    // m-okno-budovy-sklad (owner, 12 Nov): the building's own stores (input, output, pile, kit store) with amounts.
+    this.ownStore=element('section','own-store');this.ownStore.id='own-store';this.ownStore.hidden=true;this.dialog.insertBefore(this.ownStore,document.querySelector('#food-production-details'));
     this.staffingStatus=element('p');this.staffingStatus.id='workplace-staffing-output';this.dialog.insertBefore(this.staffingStatus,document.querySelector('#food-production-details'));
     this.exclusions=element('section');this.exclusions.id='employment-exclusions';this.exclusionInputs={};this.exclusionLabels={};
     for(const kind of ['local','type']){const label=element('label','exclusion-toggle'),input=element('input'),text=element('span','exclusion-text'),icon=element('span','exclusion-icon',kind==='local'?'⊘':'⛔');icon.setAttribute('aria-hidden','true');label.dataset.kind=kind;input.type='checkbox';input.dataset.employmentExclusion=kind;this.exclusionInputs[kind]=input;this.exclusionLabels[kind]=text;label.append(input,icon,text);this.exclusions.append(label);
@@ -60,10 +70,23 @@ export class WorkplacePanel {
     this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.close();},options);this.dialog.addEventListener('close',()=>{if(!this.dialog.open)this.restoreInput();},options);
   }
   open(building){if(this.dialog.open)this.close();this.building=building;this.signature=null;this.pendingMove=null;this.restored=false;this.scene.setGalleryInput(false);document.querySelector('#workplace-candidates').hidden=true;this.dialog.classList.toggle('farm-workplace-dialog',building.type==='farmhouse');if(building.type==='farmhouse')this.dialog.show();else this.dialog.showModal();this.scene.demolitionUI?.attach(this.dialog,building);this.refresh();this.scene.farmConnections?.refresh();if(building.type==='farmhouse')this.scene.farmConnections?.focus(building,this.dialog);}
+  renderOwnStore(b){
+    const s=this.scene,storage=s.foodStorage,rows=ownStoreRows(s,b);this.ownStore.hidden=!rows.length;if(!rows.length)return;
+    const key=JSON.stringify(rows);if(key===this.ownStoreKey)return;this.ownStoreKey=key;
+    const parts=[element('h3','',t('ownStore.title'))];
+    for(const r of rows){const box=element('div',`own-store-location${r.full?' full':''}`);box.dataset.ownStore=r.kind;
+      const meter=element('meter');meter.min=0;meter.max=r.capacity;meter.value=r.used;meter.high=r.capacity*.85;meter.optimum=0;
+      box.append(element('strong','',`${t(`ownStore.kind.${r.kind}`)} ${r.used} / ${r.capacity}`),meter);
+      const list=element('ul','own-store-list');for(const g of r.goods){const li=element('li','',`${s.objectRegistry.get(g.resource)?.name??g.resource} ${g.amount}`);li.dataset.ownResource=g.resource;if(g.incoming||g.reserved)li.append(element('small','',' '+[g.incoming?t('ownStore.incoming',{count:g.incoming}):'',g.reserved?t('ownStore.reserved',{count:g.reserved}):''].filter(Boolean).join(' · ')));list.append(li);}
+      if(!r.goods.length)list.append(element('li','own-store-empty',t('ownStore.empty')));box.append(list);
+      if(r.full&&r.kind!=='input')box.append(element('p','own-store-full',t('ownStore.full')));parts.push(box);}
+    this.ownStore.replaceChildren(...parts);void storage;
+  }
   refresh(){
     if(this.pressing)return;
     if(!this.dialog.open||!this.building)return;
-    const s=this.scene,b=this.building;if(!s.buildings.includes(b)||!s.fog.isVisibleObject(b)){this.close();return;}
+    const s=this.scene,b=this.building;if(!s.buildings.includes(b)||!(s.buildingReachable?.(b)??s.fog.isVisibleObject(b))){this.close();return;}
+    this.renderOwnStore(b);
     const spec=buildingDefinition(b),summary=s.workplaceSystem.summary(b),employees=s.workplaceSystem.employees(b),candidates=s.workerSystem.liveSubjects();
     const plots=b.type==='farmhouse'?s.farmingSystem?.plotSummary(b):null;this.farmCount.hidden=!plots;if(plots)this.farmCount.textContent=t('farmPlots.count',plots);
     const store=spec.storage&&s.foodStorage?[...s.foodStorage.locations.values()].find(l=>l.buildingId===b.id&&s.foodStorage.isStock(l)):null;this.farmStore.hidden=!store;
@@ -99,6 +122,7 @@ export class WorkplacePanel {
       document.querySelector('#food-production-status').textContent=t('workplace.status',{state:!production.auto?t('workplace.paused'):cycle?t('workplace.producing'):employees[0]?.workMessage?workMessageLabel(employees[0].workMessage):t('workplace.waitingWorker'),count:production.completed});
       document.querySelector('#food-production-progress').value=cycle?.progress??0;
       const input=s.foodStorage.locations.get(`input-${b.id}`),output=s.foodStorage.locations.get(`output-${b.id}`);
+      document.querySelector('#food-production-buffers').hidden=!this.ownStore.hidden;/* m-okno-budovy-sklad: the Building store section shows the same */
       document.querySelector('#food-production-buffers').textContent=t('workplace.buffers',{input:format(input.stock)||t('transport.empty'),output:format(output.stock)||t('transport.empty')});
       document.querySelector('#food-production-missing').textContent=cycle?t('workplace.batch',{list:format(cycle.inputs)}):t('workplace.missing',{list:format(Object.fromEntries(Object.entries(recipe.input).map(([id,n])=>[id,Math.max(0,n-(input.stock[id]??0))])))});
       const toggle=document.querySelector('#toggle-food-production');toggle.textContent=t('workplace.auto',{state:t(production.auto?'state.on':'state.off')});toggle.setAttribute('aria-pressed',String(production.auto));

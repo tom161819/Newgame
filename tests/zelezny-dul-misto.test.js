@@ -39,7 +39,7 @@ const nearestIron=s=>{const c=castleCentre(s),dist=d=>Math.hypot(d.x+d.definitio
 function mineSpots(s,deposit){
   const mine=s.objectRegistry.require('iron_mine'),spots=[];
   for(let y=deposit.y-4;y<=deposit.y+deposit.definition.height+1;y++)for(let x=deposit.x-4;x<=deposit.x+deposit.definition.width+1;x++){
-    const site={x,y,definition:mine};if(rectanglesOverlap(site,deposit)||footprintDistance(site,deposit)>START_IRON_MINE.beside)continue;
+    const site={x,y,definition:mine};if(!rectanglesOverlap(site,deposit))continue;/* m-dul-na-lozisku: the mine stands over its deposit */
     if(placementError(s.map,{x,y},s.resourceOccupancy,s.reservedTiles(),mine,s.buildings,{status:()=>({unlocked:true})})===null)spots.push({x,y});
   }
   return spots;
@@ -57,7 +57,7 @@ test('generator 5: the nearest Iron Deposit has an Iron Mine spot beside it in e
 
 test('the reported world MKW…-SU24BGPY: the nearest Iron Deposit (18 tiles) already had free spots; the generator keeps it',()=>{
   const {s,result}=newWorld(parseInt('SU24BGPY',36));assert.equal(result.added,false);const d=nearestIron(s),c=castleCentre(s);
-  assert.ok(Math.abs(Math.hypot(d.x+1-c.x,d.y+1-c.y)-18.6)<1,'18–19 tiles from the Castle');assert.ok(mineSpots(s,d).length>=4);
+  assert.ok(Math.abs(Math.hypot(d.x+1-c.x,d.y+1-c.y)-18.6)<1,'18–19 tiles from the Castle');assert.ok(mineSpots(s,d).length>=1);
 });
 
 test('a nearest Iron Deposit walled in by rock gets a new Iron Deposit with a free spot nearer to the Castle',()=>{
@@ -73,26 +73,13 @@ test('a nearest Iron Deposit walled in by rock gets a new Iron Deposit with a fr
   assert.ok(mineSpots(s,deposit).some(p=>p.x===site.x&&p.y===site.y));assert.ok(deposit.natural.remaining>=60&&deposit.natural.remaining<=120);
 });
 
-test('build mode names why an Iron Mine spot is invalid (on the deposit, rock, tree, out of range, unexplored)',()=>{
-  setLanguage('en',{persist:false});const terrain=Array.from({length:100},()=>Array(100).fill(0));for(let x=60;x<=62;x++)terrain[36][x]=1;
+test('m-dul-na-lozisku: an Iron Mine stands over its deposit; beside it the game says it must overlap',()=>{
+  setLanguage('en',{persist:false});const terrain=Array.from({length:100},()=>Array(100).fill(0));
   const s=workerScene(terrain,{logistics:true,naturalResources:true,construction:true});s.workerSystem.unsubscribe();s.fog.setEnabled(false);s.terrainGrid=terrain.map(r=>[...r]);
   s.addResource(s.objectRegistry.require('iron_deposit'),{x:60,y:40},{id:'deposit-1',kind:'deposit',remaining:80,max:80,boundBuildingId:null});
-  const mine=s.objectRegistry.require('iron_mine'),reason=a=>siteObstacle(s,a,mine);
-  assert.deepEqual(SITE_REASONS.includes('deposit')&&SITE_REASONS.includes('outOfRange'),true);
-  assert.equal(reason({x:59,y:39}),'deposit','over the deposit');assert.equal(reason({x:60,y:34}),'rock');assert.equal(reason({x:80,y:80}),'outOfRange');
-  s.addResource(s.objectRegistry.require('oak_tree'),{x:63,y:41},{id:'tree-1',kind:'tree',stage:3,growthDays:0,ageDays:8,cycle:0,workDone:0,growthCheckpoint:0,ageCheckpoint:0});assert.equal(reason({x:62,y:40}),'tree');
-  const error=placementError(s.map,{x:59,y:39},s.resourceOccupancy,s.reservedTiles(),mine,s.buildings,{status:()=>({unlocked:true})});assert.ok(error);
-  assert.equal(mineSpotError(s,{x:59,y:39},mine,error),'Iron Mine cannot stand here: On the deposit – the mine stands beside it.');
-  setLanguage('cs',{persist:false});assert.equal(mineSpotError(s,{x:60,y:34},mine,'x'),'Železný důl sem nelze postavit: Skála.');assert.equal(mineSpotError(s,{x:80,y:80},mine,'x'),'Železný důl sem nelze postavit: Mimo ložisko (ložisko železa do 4 políček).');
-  setLanguage('en',{persist:false});
-  assert.equal(mineSpotError(s,{x:59,y:39},s.objectRegistry.require('quarry'),'whatever'),'whatever','other buildings keep their message');
-  assert.equal(placementError(s.map,{x:56,y:40},s.resourceOccupancy,s.reservedTiles(),mine,s.buildings,{status:()=>({unlocked:true})}),null,'beside the deposit is valid');
-  // Fog: an unknown deposit is "Unexplored"; once its ground is remembered the provisional plan may be placed.
-  s.fog.setEnabled(true);s.fog.update();assert.equal(isProvisional(s.fog,[{x:56,y:40}]),true);assert.equal(knownPlacementError(s,{x:56,y:40},mine),null,'known ground alone says nothing');
-  assert.equal(provisionalMineError(s,{x:56,y:40},mine),'Iron Mine cannot stand here: Unexplored.');
-  for(let y=40;y<=41;y++)for(let x=60;x<=61;x++)s.fog.explored[y*100+x]=1;assert.equal(provisionalMineError(s,{x:56,y:40},mine),null,'the deposit is remembered');
-  assert.equal(provisionalMineError(s,{x:80,y:80},mine),'Iron Mine cannot stand here: Unexplored.','nothing known there');
-  for(let y=80;y<=82;y++)for(let x=80;x<=82;x++)s.fog.explored[y*100+x]=1;assert.equal(provisionalMineError(s,{x:80,y:80},mine),'Iron Mine cannot stand here: Out of deposit range (an Iron Deposit within 4 tiles).');
+  const mine=s.objectRegistry.require('iron_mine'),place=a=>placementError(s.map,a,s.resourceOccupancy,s.reservedTiles(),mine,s.buildings,{status:()=>({unlocked:true})});
+  assert.equal(place({x:59,y:39}),null,'over the deposit is valid');assert.ok(place({x:56,y:40}),'beside it is not');
+  assert.equal(mineSpotError(s,{x:56,y:40},mine,'whatever'),'whatever','no beside-the-deposit reasons any more');void siteObstacle;void SITE_REASONS;void provisionalMineError;void knownPlacementError;void isProvisional;
 });
 
 test('a provisional blueprint cancelled for an obstacle is a notice at once, with the reason and the site as camera target; not repeated',()=>{

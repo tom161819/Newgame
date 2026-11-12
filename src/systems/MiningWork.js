@@ -1,3 +1,4 @@
+import { minesOver } from '../data/minerals.js';
 import { devProduction } from '../data/devBalance.js';
 import { RockMiningWork } from './RockMiningWork.js';
 import { WORK_RULES } from '../data/jobs.js';
@@ -20,7 +21,7 @@ export class MiningWork {
       if(worker.aiCooldown>0)return;
       if(object.natural.remaining===0){this.wait(worker,'Deposit Depleted');return;}
       if(this.claims(object.natural.id)>=object.natural.remaining){this.wait(worker,'Remaining deposit units are reserved');return;}
-      const goals=towerNeighbors(rule.overlap?home:object).filter(t=>s.map[t.y]?.[t.x]===0&&system.reservations.available(this.slot(t),worker.id)),route=system.ai.route(worker,goals);
+      const goals=towerNeighbors(minesOver(home)?home:object).filter(t=>s.map[t.y]?.[t.x]===0&&system.reservations.available(this.slot(t),worker.id)),route=system.ai.route(worker,goals);
       if(!route){this.wait(worker,'No reachable deposit work position');return;}
       const pile=s.foodStorage.pileFor(home);if(pile&&s.foodStorage.room(pile.id,rule.resource)<1){if(s.foodProduction?.carryOwnOutput(worker,home))return;this.wait(worker,'Output pile full');return;}
       // m-sklady-materialu-koncept (49): mined units go on the pile by the building; Haulers take them to a store.

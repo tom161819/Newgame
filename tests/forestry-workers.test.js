@@ -52,3 +52,10 @@ test('regrowth waits for real ground timber rather than embedding undelivered ma
 test('a newly blocked work position releases tree/output reservations instead of stranding a Woodcutter',()=>{
   const s=fixture(),b=hut(s),t=tree(s,{x:60,y:48}),w=worker(s,b);until(s,()=>w.workTask?.kind==='chopTree');const goal={...w.workTask.goal};s.map[goal.y][goal.x]=1;s.tick(50);assert.equal(w.workTask,null);assert.equal(s.foodStorage.reservations.size,0);assert.equal(s.workerSystem.reservations.owners.size,0);assert.equal(t.natural.workDone,0);assert.equal(totalWood(s),0);
 });
+test('m-cesta-bez-stromku: on a worn path (level 2+) a stump does not sprout and a young tree withers; a grown tree stays', () => {
+  const s=fixture(),young=tree(s);young.natural.stage=1;young.natural.growthDays=0;
+  s.pathWear={level:t=>t.x===young.x&&t.y===young.y?2:0,isPaved:()=>false};
+  s.naturalResources.flushGrowth();assert.equal(young.natural.stage,0,'the young tree withered');
+  s.naturalResources.growthClock+=10;s.naturalResources.flushGrowth();assert.equal(young.natural.stage,0,'no sprouting on the path');
+  s.pathWear={level:()=>1,isPaved:()=>false};s.naturalResources.growthClock+=2;s.naturalResources.flushGrowth();assert.ok(young.natural.stage>0,'grows again on a faint path');
+});

@@ -12,7 +12,7 @@ import { MaterialYardView,MaterialPiles,yardPileStages,producerPileStage } from 
 // drop output on a pile by their building and Haulers take it to the nearest yard.
 globalThis.document={querySelector:()=>({textContent:''})};
 const fixture=(starter=true)=>{const s=workerScene(undefined,{naturalResources:true,construction:true,logistics:true,starter});s.workerSystem.unsubscribe();return s;};
-function deposit(s,type,tile,remaining){const n={id:`deposit-${s.naturalResources.nextDepositId++}`,kind:'deposit',remaining,max:type==='stone_deposit'?80:60,boundBuildingId:null};s.addResource(s.objectRegistry.require(type),tile,n);return s.naturalResources.byId.get(n.id);}
+function deposit(s,type,tile,remaining){const n={id:`deposit-${s.naturalResources.nextDepositId++}`,kind:'deposit',remaining,max:type==='stone_deposit'?160:60,boundBuildingId:null};s.addResource(s.objectRegistry.require(type),tile,n);return s.naturalResources.byId.get(n.id);}
 function building(s,type,anchor){const d=s.objectRegistry.require(type);for(const [r,n]of Object.entries(d.cost))s.inventory.add(r,n);const result=placeBuilding({map:s.map,anchor,resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(result.error);s.towerViews.set(result.building.id,s.createBuildingView(d,result.building));return result.building;}
 function person(s,job,home=null){for(let y=46;y<55;y++)for(let x=40;x<45;x++)if(s.map[y][x]===0&&!s.reservedTiles().some(t=>t.x===x&&t.y===y)&&!s.workerSystem.liveWorkers().some(w=>w.tile.x===x&&w.tile.y===y)){const w=s.workerSystem.create({x,y});assert.ok(home?s.workplaceSystem.assign(home,w):s.workerSystem.jobs.assign(w,job));if(job==='hauler')w.stoneCollection={...w.stoneCollection,enabled:false};return w;}throw Error('No free tile');}
 function until(s,condition,limit=120000){for(let t=0;t<limit&&!condition();t+=50)s.tick(50);assert.ok(condition(),JSON.stringify(s.workerSystem.liveWorkers().map(w=>({p:w.profession,task:w.workTask?.kind,message:w.workMessage,cargo:w.cargo}))));}
@@ -30,7 +30,7 @@ test('a 4×2 Material Yard for 20 Wood, without workers, stores only wood, stone
   validateGameState(serializeGameState(s));
 });
 test('an Iron Mine fills its output pile; a Hauler carries the ore to the Material Yard ahead of the Starter Stockpile',()=>{
-  const s=fixture();deposit(s,'iron_deposit',{x:51,y:44},3);const mine=building(s,'iron_mine',{x:45,y:43}),yard=building(s,'material_yard',{x:56,y:50}),pile=`pile-${mine.id}`;
+  const s=fixture();deposit(s,'iron_deposit',{x:51,y:44},3);const mine=building(s,'iron_mine',{x:50,y:43}),yard=building(s,'material_yard',{x:56,y:50}),pile=`pile-${mine.id}`;
   assert.deepEqual(s.foodStorage.locations.get(pile),{...s.foodStorage.locations.get(pile),kind:'pile',capacity:LOGISTICS_RULES.outputPileCapacity,allowed:['iron_ore']});
   const miner=person(s,'miner',mine);until(s,()=>miner.workTask?.kind==='mineDeposit');assert.equal(miner.workTask.destinationId,pile,'the miner never walks to a store');
   until(s,()=>stock(s,pile,'iron_ore')===1);assert.equal(s.inventory.count('iron_ore'),0,'a pile is not a store');

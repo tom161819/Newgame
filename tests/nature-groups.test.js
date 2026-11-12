@@ -99,7 +99,7 @@ test('3 × 3 deposits: larger reserves, a Quarry over one and an Iron Mine near 
   const stone=add('stone_deposit_large',60,50,250),iron=add('iron_deposit_large',70,60,200);
   assert.equal(stone.tiles.length,9);assert.ok(stone.tiles.every(t=>s.map[t.y][t.x]===1));
   const quarry=build(s,'quarry',60,50);assert.equal(quarry.depositId,stone.natural.id);assert.equal(stone.natural.boundBuildingId,quarry.id);
-  const mine=build(s,'iron_mine',74,60);assert.equal(mine.depositId,iron.natural.id);
+  const mine=build(s,'iron_mine',70,60);assert.equal(mine.depositId,iron.natural.id);
   const state=validateGameState(serializeGameState(s)),restored=scene(false,state.terrain);loadGameState(restored,structuredClone(state));
   assert.deepEqual(serializeGameState(restored).resources.filter(r=>r.type.endsWith('_large')),state.resources.filter(r=>r.type.endsWith('_large')));
   const forged=structuredClone(state);forged.resources.find(r=>r.type==='stone_deposit_large').natural.max=100;assert.throws(()=>validateGameState(forged),'reserves below the large range');

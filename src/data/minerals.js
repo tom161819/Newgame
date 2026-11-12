@@ -1,9 +1,10 @@
 // velke-prirodni-objekty (generator 4): large 3 × 3 deposits with about twice the reserves; one of each family is
 // taken from the ordinary count. `family`: the deposit type a Quarry or an Iron Mine works (the large ones count as it).
 export const MINERAL_DEPOSITS=Object.freeze({
-  stone_deposit:Object.freeze({resource:'stone',count:4,min:80,max:160}),
+  // m-loziska-kamene-2x (owner, 12 Nov): twice the stone (was 80–160 and 200–320).
+  stone_deposit:Object.freeze({resource:'stone',count:4,min:160,max:320}),
   iron_deposit:Object.freeze({resource:'iron_ore',count:3,min:60,max:120}),
-  stone_deposit_large:Object.freeze({resource:'stone',count:2,min:200,max:320,family:'stone_deposit',size:3}),
+  stone_deposit_large:Object.freeze({resource:'stone',count:2,min:400,max:640,family:'stone_deposit',size:3}),
   iron_deposit_large:Object.freeze({resource:'iron_ore',count:1,min:150,max:240,family:'iron_deposit',size:3}),
 });
 // The deposit family of a deposit type or definition: stone_deposit_large → stone_deposit.
@@ -19,6 +20,11 @@ export const START_QUARRY=Object.freeze({min:8,max:16,clearance:3,rocksWithin:10
 export const START_IRON_MINE=Object.freeze({min:12,max:24,beside:1});
 export const MINING_WORK=Object.freeze({
   quarry:Object.freeze({resource:'stone',depositType:'stone_deposit',duration:12000,xp:5,overlap:true}),
-  iron_mine:Object.freeze({resource:'iron_ore',depositType:'iron_deposit',duration:20000,xp:8,range:4,overlap:false}),
+  // m-dul-na-lozisku (owner, 12 Nov): an Iron Mine stands over its deposit like a Quarry. Mines built before beside a
+  // deposit keep working it (building.miningMode 'adjacent', within range).
+  iron_mine:Object.freeze({resource:'iron_ore',depositType:'iron_deposit',duration:20000,xp:8,range:4,overlap:true}),
 });
 export const resourceBlocks=object=>object.natural?.kind==='tree'?object.natural.stage===3:!object.definition.walkable;
+
+// Does this building mine the deposit under it (true) or one beside it (an Iron Mine from before 0.102)?
+export const minesOver=building=>!!(building?.definition??null)?.mining?.overlap&&building.miningMode!=='adjacent';
