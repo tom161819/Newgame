@@ -19,8 +19,10 @@ export const HORSE_WAGON_RECIPE=Object.freeze({input:Object.freeze({wood:30,iron
 // Day and night N2: the Pitch Kiln burns Wood into Pitch, and dips Wood into Pitch for Torches. It makes Torches while
 // the stores hold fewer than TORCHES.torchTarget and it has Pitch, otherwise Pitch (FoodProductionSystem picks).
 export const PITCH_RECIPES=Object.freeze({
-  pitch:Object.freeze({input:Object.freeze({wood:2}),output:Object.freeze({pitch:1}),duration:30000,skill:'crafting',xp:8,inputSources:Object.freeze({wood:'Pitch Making'}),outputSource:'Pitch Kiln Production'}),
-  torches:Object.freeze({input:Object.freeze({wood:1,pitch:1}),output:Object.freeze({torch:3}),duration:20000,skill:'crafting',xp:8,inputSources:Object.freeze({wood:'Torch Making',pitch:'Torch Making'}),outputSource:'Pitch Kiln Production'}),
+  // m-smolarna-rychlost (owner, 12 Nov): half the time and twice the batch – four times as much an hour (before: 2 Wood →
+  // 1 Pitch in 30 s, 1 Wood + 1 Pitch → 3 Torches in 20 s).
+  pitch:Object.freeze({input:Object.freeze({wood:4}),output:Object.freeze({pitch:2}),duration:15000,skill:'crafting',xp:8,inputSources:Object.freeze({wood:'Pitch Making'}),outputSource:'Pitch Kiln Production'}),
+  torches:Object.freeze({input:Object.freeze({wood:2,pitch:2}),output:Object.freeze({torch:6}),duration:10000,skill:'crafting',xp:8,inputSources:Object.freeze({wood:'Torch Making',pitch:'Torch Making'}),outputSource:'Pitch Kiln Production'}),
 });
 export const WHEELWRIGHT_RECIPES=Object.freeze({wheelbarrow:PRODUCTION_RECIPES.wheelwright_workshop,horse_wagon:HORSE_WAGON_RECIPE});
 // A workshop with several recipes (definition.recipes) makes the one chosen in its production record; others use definition.recipe.

@@ -1,4 +1,5 @@
 import { fishingGround } from './FishingSystem.js';
+import { validHaulPriority } from '../data/logistics.js';
 import { validNightThreatState } from './NightThreatSystem.js';
 import { validRoyalGoalState } from './RoyalGoals.js';
 import { validKingSkillState } from './KingSkills.js';
@@ -119,7 +120,7 @@ export function serializeGameState(scene){
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
     ...(scene.workerSystem?{population:scene.workerSystem.exportState(),workers:[...scene.workerSystem.workers.values()].map(w=>({...serializeActor(w),commandState:copy(w.commandState??{state:'Working',goal:null}),name:w.name,...(w.identity?{identity:copy(w.identity)}:{}),profession:w.profession,displayProfession:w.displayProfession,manualRockId:w.manualRockId,isSubject:w.isSubject!==false,diedAt:w.diedAt??null,
       ...(w.naturalTalent?{naturalTalent:w.naturalTalent,initialSkills:copy(w.initialSkills)}:{}),
-      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),workplaceReached:w.workplaceReached,...(w.restPhase?{restPhase:w.restPhase}:{}),...(w.tendTorches?{tendTorches:true}:{}),...(w.clearingLoan?{clearingLoan:true}:{}),cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
+      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),...(w.haulPriority&&w.haulPriority.kind!=='any'?{haulPriority:copy(w.haulPriority)}:{}),workplaceReached:w.workplaceReached,...(w.restPhase?{restPhase:w.restPhase}:{}),...(w.tendTorches?{tendTorches:true}:{}),...(w.clearingLoan?{clearingLoan:true}:{}),cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
       workState:w.workState,workMessage:w.workMessage??'',workTask:copy(w.workTask),assignedWorkplaceId:w.assignedWorkplaceId,arriving:w.arriving,aiCooldown:w.aiCooldown}))}:{}),
     ...(scene.pathWear?{pathWear:scene.pathWear.exportState()}:{}),
     player:{...serializeActor(c),state:c.state,currentTowerId:c.currentTower?.id??null,horseId:c.mountedHorse?.id??null,
@@ -338,6 +339,8 @@ export function validateGameState(input,registry=objectRegistry){
       // m-oznacovani-tezby (56): a Miner lent out to the rocks of a wall plan keeps his workplace.
       if(w.clearingLoan!==undefined)check(w.clearingLoan===true&&w.isAlive&&w.isSubject&&w.profession==='miner'&&w.assignedWorkplaceId!=null);
       check(typeof w.workMessage==='string'&&w.workMessage.length<200);
+      // m-nosic-priorita: optional, so saves of 0.98 and older still load (SAVE_VERSION stays 62).
+      if(w.haulPriority!==undefined)check(validHaulPriority(w.haulPriority)&&w.haulPriority.kind!=='any');
       if(w.stoneCollection!==undefined){check(w.stoneCollection&&typeof w.stoneCollection.enabled==='boolean'&&Object.keys(w.stoneCollection).length===2);integer(w.stoneCollection.radius,0,IDLE_STONE.maxRadius);}if(w.profession==='hauler')check(w.stoneCollection);if(!w.isAlive)check(['Dead','Left Kingdom'].includes(w.workState)&&!w.workTask&&!w.arriving);else check(w.workState!=='Left Kingdom');
       check(Object.hasOwn(JOBS,w.displayProfession)&&['idle',w.profession].includes(w.displayProfession));
       const t=w.workTask;if(t){

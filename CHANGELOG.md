@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.99.0] - 2026-11-12
+<!-- version: {"title":"Hauler priority, faster Pitch Kiln, hunters without range","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Haulers: choose what a Hauler carries first – Anything (as before), Building materials, Food, Workshop inputs, Workshop products, or one good (e.g. only Stone). The choice is in the Hauler's window and, with several Haulers chosen on the map, in the command bar; the Population list shows it. With nothing of that kind to carry the Hauler carries anything else; food for the hungry still comes first.
+- A notice when goods wait in a producer's pile for over 2 game hours while the Haulers carry other things.
+
+### Changed
+- Pitch Kiln works twice as fast with double batches: 4 Wood → 2 Pitch in 15 s, 2 Wood + 2 Pitch → 6 Torches in 10 s (before 2 → 1 in 30 s and 1 + 1 → 3 in 20 s).
+- Hunters hunt anywhere on the known map, nearest to their lodge first (before: within 34 tiles). Fishers already had no range.
+- The right mouse button on the map closes the Buildings menu and the Army panel (with soldiers chosen in the Army panel it sends them, as before). Escape closes them too.
+
 ## [0.98.0] - 2026-11-12
 <!-- version: {"title":"Army tab; lifted terrain fix","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

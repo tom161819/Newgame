@@ -35,7 +35,10 @@ export class ArmyPanel {
     this.list.addEventListener('click',event=>{const row=event.target.closest('[data-army-id]');if(row)this.pick(row.dataset.armyId,event.shiftKey);},options);
     this.update(true);
   }
+  // For the right-click dismissal: open while shown and nobody is chosen (a right click with chosen soldiers sends them).
+  get dismissable(){const army=this;return {get open(){return !!army.panel&&!army.panel.hidden&&!(army.workers().length&&army.scene.unitSelection?.ids.size);},setOpen(v){if(!v)army.toggle(false);}};}
   workers(){return [...this.picked].map(id=>this.scene.workerSystem.workers.get(id)).filter(w=>w?.isAlive&&w.profession==='soldier');}
+  clearPick(){this.picked.clear();this.update(true);}
   toggle(open=this.panel.hidden){this.panel.hidden=!open;this.tab.setAttribute('aria-expanded',String(open));if(open){this.scene.buildingBar?.close?.();this.update(true);}}
   pick(id,shift=false){
     const s=this.scene;this.picked=armyPick(this.picked,id,shift);const workers=this.workers();

@@ -4,6 +4,7 @@ import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { DIAGNOSTICS,INPUT_SOURCES,GATHER_OUTPUTS,DEPLETION_SOURCES,STORAGE_WAIT_MESSAGES,CHAIN_ADVICE,noticeRepeatDays,noticeSeverity,NOTICE_REPEAT_MAX_DAYS,NOTICE_CLOSED_LIMIT } from '../data/diagnostics.js';
 import { chainLinks,isRawSource } from '../data/productionChains.js';
 import { DAY_DURATION } from './GameTimeSystem.js';
+const PILE_WAIT_HOURS=2;
 import { storageResources } from '../data/logistics.js';
 import { noticeText } from '../ui/noticeText.js';
 import { farmReady } from '../data/farmPlots.js';
@@ -187,6 +188,13 @@ export class ProductionDiagnostics {
     // m-sklady-materialu-koncept (49): a full producer pile with no Hauler to empty it stops the producer.
     if(!this.residents('hauler').length)for(const l of st.locations.values())if(l.kind==='pile'&&st.room(l.id)<=0)found.push({entityId:l.buildingId,reason:'pileNoHauler',category:'production',params:{resource:l.allowed[0]}});
     for(const l of st.locations.values())if(l.kind==='output'||l.kind==='pile')for(const [resource,n]of Object.entries(l.stock))if(n>0){add(pending,resource,null);if(st.room(l.id)<=0)add(blocked,resource,l.buildingId);}
+    // m-nosic-priorita (5): a producer pile whose goods nobody has come for in PILE_WAIT_HOURS game hours (Haulers exist
+    // but carry other things): a notice that points at choosing what a Hauler carries first.
+    const now=s.gameTime?.totalElapsed??0,since=this.pileSince??=new Map(),seen=new Set();
+    if(this.residents('hauler').length)for(const l of st.locations.values())if(l.kind==='pile'||l.kind==='output')for(const [resource,n]of Object.entries(l.stock)){
+      const key=`${l.id}:${resource}`;if(n<=0||st.free(l.id,resource)<n)continue;seen.add(key);if(!since.has(key))since.set(key,now);
+      if(now-since.get(key)>=PILE_WAIT_HOURS*DAY_DURATION/24)found.push({entityId:l.buildingId,reason:'pileWaiting',category:'production',params:{resource}});}
+    for(const key of [...since.keys()])if(!seen.has(key))since.delete(key);
     for(const w of s.workerSystem?.liveSubjects?.()??[]){
       if(!STORAGE_WAIT_MESSAGES.includes(w.workMessage))continue;const b=s.buildings.find(x=>x.id===w.assignedWorkplaceId),resource=w.cargo?.resource??GATHER_OUTPUTS[b?.type];
       if(resource){add(pending,resource,null);add(blocked,resource,b?.id??null);}

@@ -1,4 +1,6 @@
 import { t,language } from '../i18n/index.js';
+import { HAUL_PRIORITIES,HAULABLE_RESOURCES } from '../data/logistics.js';
+import { haulPriorityFromValue,haulPriorityValue,setHaulPriority } from '../systems/haulPriority.js';
 import { tileCenter } from '../game/isometric.js';
 import { blockingDialog } from './dockedPanels.js';
 
@@ -10,6 +12,9 @@ export class UnitSelection {
     this.panel=document.createElement('div');this.panel.id='unit-command-bar';this.panel.className='unit-command-bar';this.panel.hidden=true;this.panel.setAttribute('role','group');
     this.label=document.createElement('span');this.panel.append(this.label);this.buttons={};
     for(const action of ['hold','resume','inspect','clear']){const button=document.createElement('button');button.type='button';button.dataset.unitCommand=action;button.addEventListener('click',()=>this.act(action));this.panel.append(button);this.buttons[action]=button;}
+    // m-nosic-priorita: with several Haulers chosen, one choice of what they carry first sets it for all of them.
+    this.haul=document.createElement('select');this.haul.id='unit-haul-priority';this.haul.hidden=true;this.panel.append(this.haul);
+    this.haul.addEventListener('change',()=>{const p=haulPriorityFromValue(this.haul.value);for(const w of this.workers())if(w.profession==='hauler')setHaulPriority(w,p);this.signature=null;this.draw();});
     document.querySelector('#game')?.append(this.panel);
     if(!this.panel.isConnected)scene.game.canvas.parentElement.append(this.panel);
   }
@@ -51,11 +56,15 @@ export class UnitSelection {
     const s=this.scene,workers=this.workers();this.ids=new Set(workers.map(w=>w.id));this.graphics.clear();this.overlay.clear();
     // The open detail of the one selected villager already carries his commands.
     const detail=workers.length===1&&!!s.unitPanel?.dialog.open&&s.unitPanel.unit===workers[0];
-    const signature=JSON.stringify([workers.length,s.gameOver,s.gameTime.paused,language(),detail]);
+    const signature=JSON.stringify([workers.map(w=>w.id+':'+w.profession+':'+haulPriorityValue(w.haulPriority)),s.gameOver,s.gameTime.paused,language(),detail]);
     if(signature!==this.signature){
       this.signature=signature;this.panel.hidden=!workers.length||!!s.gameOver||detail;this.panel.setAttribute('aria-label',t('command.title'));this.label.textContent=t('command.selected',{count:workers.length});
       for(const [action,button]of Object.entries(this.buttons))button.textContent=t(`command.${action}`);
-      this.buttons.inspect.disabled=workers.length!==1;this.buttons.hold.disabled=this.buttons.resume.disabled=!!s.gameTime.paused;
+      this.buttons.inspect.disabled=workers.length!==1;
+      const haulers=workers.filter(w=>w.profession==='hauler');this.haul.hidden=haulers.length<2;
+      if(!this.haul.hidden){const option=(v,text)=>{const o=document.createElement('option');o.value=v;o.textContent=text;return o;};
+        this.haul.setAttribute('aria-label',t('haul.priority'));this.haul.replaceChildren(option('',t('haul.priority')+'…'),...HAUL_PRIORITIES.filter(k=>k!=='resource').map(k=>option(k,t(`haul.priority.${k}`))),...HAULABLE_RESOURCES.map(r=>option(`resource:${r}`,t('haul.priority.only',{resource:s.objectRegistry.get(r)?.name??r}))));
+        const values=new Set(haulers.map(w=>haulPriorityValue(w.haulPriority)));this.haul.value=values.size===1?[...values][0]:'';}this.buttons.hold.disabled=this.buttons.resume.disabled=!!s.gameTime.paused;
     }
     const zoom=s.cameras.main.zoom;
     for(const w of workers){

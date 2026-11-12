@@ -378,7 +378,9 @@ export class GameScene extends Phaser.Scene {
     this.unitSelection=new UnitSelection(this);this.armyPanel=new ArmyPanel(this);this.rockMiningTool=new RockMiningTool(this);this.minimap=new Minimap(this);this.eventFeed=new EventFeed(this);this.millSails=new MillSails(this);
     // #121: a right click on the map first closes open panels (and does nothing else); otherwise it commands as before.
     // Request 28: a right click inside any window closes that window (PanelDismiss.js, one delegated listener).
-    const sidePanels=()=>[this.settingsPanel,this.populationSidebar];
+    // m-pravy-klik-zavre-panel (owner, 12 Nov): the right mouse button on the map also closes the Buildings menu and the
+    // Army panel (the Army panel only when no soldier is chosen in it – then the right click sends them, as on the map).
+    const sidePanels=()=>[this.settingsPanel,this.populationSidebar,this.buildingBar?.dismissable,this.armyPanel?.dismissable];
     installPanelDismiss(document,{panels:sidePanels,scene:this,signal:this.controls.signal});
     this.input.on('pointerdown',pointer=>{if(pointer.rightButtonDown()&&closeOpenPanels(document,{panels:sidePanels()}))return;if(this.rockMiningTool.down(pointer))return;if(!this.unitSelection.down(pointer))this.handleClick(pointer);});
     this.input.on('pointerup',pointer=>{if(this.rockMiningTool.up(pointer))return;if(this.unitSelection.up(pointer))return;if(this.pavementTool?.anchor&&this.pavementTool.active()&&pointer.leftButtonReleased()){this.pavementTool.confirm(this.pointerTile(pointer));return;}if(this.dragAnchor&&pointer.leftButtonReleased())this.confirmWallLine(pointer);});

@@ -1187,3 +1187,11 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 .army-row[aria-pressed="true"] { outline:2px solid #ffd768; outline-offset:-2px; background:#4a4f33; }
 .army-row[data-order="guard"] .army-order { color:#ffd768; }
 .army-hp { font-variant-numeric:tabular-nums; }
+
+/* m-nosic-priorita: the Hauler's controls one per line (transport, what he carries first, loose stones). */
+#unit-stone-controls { display:flex; flex-wrap:wrap; align-items:center; column-gap:6px; }
+#unit-stone-controls > label { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:4px 0; flex:1 1 100%; }
+#unit-stone-controls > label[for="stone-radius"] { flex:0 1 auto; }
+#unit-stone-controls > label select { flex:1 1 12rem; min-width:0; }
+#unit-stone-controls > label input[type="number"] { width:5rem; }
+.unit-command-bar #unit-haul-priority { max-width:14rem; }

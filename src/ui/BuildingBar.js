@@ -63,6 +63,8 @@ export class BuildingBar {
     this.render();
   }
   toggle(){this.panel.hidden=!this.panel.hidden;this.tab.setAttribute('aria-expanded',String(!this.panel.hidden));this.updateScroll();this.updateLift();}
+  // For the right-click dismissal (PanelDismiss.closeOpenPanels): open while the menu shows.
+  get dismissable(){const bar=this;return {get open(){return !bar.panel.hidden;},setOpen(v){if(!v)bar.close();}};}
   close(){this.panel.hidden=true;this.tab.setAttribute('aria-expanded','false');this.updateLift();}
   update(inventory,selected){
     this.inventory=inventory;this.selected=selected;

@@ -58,7 +58,9 @@ export class GameApplication {
       event.preventDefault();
       if(this.scene.rockMiningTool?.enabled)this.scene.rockMiningTool.close();
       else if(this.scene.buildMode)this.scene.cancelBuilding();
-      else if(this.scene.unitSelection?.ids.size)this.scene.unitSelection.clear();
+      else if(this.scene.unitSelection?.ids.size){this.scene.unitSelection.clear();this.scene.armyPanel?.clearPick?.();}
+      else if(this.scene.armyPanel?.panel&&!this.scene.armyPanel.panel.hidden)this.scene.armyPanel.toggle(false);
+      else if(this.scene.buildingBar&&!this.scene.buildingBar.panel.hidden)this.scene.buildingBar.close();
       else if(this.scene.settingsPanel.open)this.scene.settingsPanel.setOpen(false);
       else if(this.scene.populationSidebar?.open)this.scene.populationSidebar.setOpen(false);
       else this.showPause();

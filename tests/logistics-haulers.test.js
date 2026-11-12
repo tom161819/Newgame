@@ -74,3 +74,33 @@ test('N03: idle Hauler collects loose stone near the Castle into storage, respec
   w.stoneCollection.radius=80;const before=quantity(s,'stone');until(s,()=>!s.resources.has(key),80000);until(s,()=>quantity(s,'stone')>=before+1&&!w.cargo,80000);
   const data=serializeGameState(s);assert.equal(data.workers.find(x=>x.id===w.id).stoneCollection.radius,80);validateGameState(data);
 });
+
+test('m-nosic-priorita (owner, 12 Nov): a Hauler set to carry Wood first takes Wood although the Mill wants wheat; with no Wood he carries anything; food for the hungry still comes first; the choice survives a save',async()=>{
+  const { setHaulPriority,haulPriorityValue,haulPriorityFromValue } = await import('../src/systems/haulPriority.js');const { matchesHaulPriority,validHaulPriority } = await import('../src/data/logistics.js');
+  // Plain order: wheat into the Mill (20) before Wood from the starter stockpile (40).
+  const setup=(choice,{wood=10,food=false}={})=>{const s=scene(),home=building(s,'material_yard',49,45),granary=building(s,'farmhouse',58,45),mill=building(s,'mill',62,45),w=worker(s,home);
+    if(wood)s.foodStorage.deposit(starter(s),'wood',wood);assert.equal(s.foodStorage.deposit(`farmhouse-${granary.id}`,'wheat',4),true);if(food)s.dropSystem.create('apple',{x:55,y:44},3);
+    if(choice)assert.equal(setHaulPriority(w,choice),true);until(s,()=>w.workTask?.kind==='foodPickup');return {s,w,mill};};
+  assert.equal(setup(null).w.workTask.resource,'wheat','no choice: the shared order');
+  assert.equal(setup({kind:'resource',resource:'wood'}).w.workTask.resource,'wood','Wood first');
+  assert.equal(setup({kind:'build'}).w.workTask.resource,'wood','building materials first');
+  assert.equal(setup({kind:'resource',resource:'wood'},{wood:0}).w.workTask.resource,'wheat','no Wood anywhere: anything else');
+  assert.equal(setup({kind:'resource',resource:'wood'},{food:true}).w.workTask.resource,'apple','food for the hungry still first');
+  // Save and load keep it; "Anything" clears it and is not saved.
+  const {s,w}=setup({kind:'resource',resource:'stone'});const data=validateGameState(serializeGameState(s)),again=restore(data);assert.deepEqual(again.workerSystem.workers.get(w.id).haulPriority,{kind:'resource',resource:'stone'});
+  assert.equal(setHaulPriority(w,{kind:'any'}),true);assert.equal(w.haulPriority,undefined);assert.equal(serializeGameState(s).workers.find(x=>x.id===w.id).haulPriority,undefined);
+  // Only Haulers, only known kinds.
+  assert.equal(setHaulPriority(w,{kind:'resource',resource:'gold'}),false);assert.equal(validHaulPriority({kind:'food',resource:'apple'}),false);
+  assert.equal(haulPriorityValue(haulPriorityFromValue('resource:stone')),'resource:stone');assert.equal(haulPriorityValue(undefined),'any');
+  assert.equal(matchesHaulPriority({resource:'flour',destinationId:'input-5'},{kind:'inputs'}),true);assert.equal(matchesHaulPriority({resource:'bread',sourceId:'output-5'},{kind:'outputs'}),true);assert.equal(matchesHaulPriority({resource:'bread',sourceId:'output-5'},{kind:'food'}),true);
+});
+
+test('m-nosic-priorita (5): goods left in a producer pile for 2 game hours while Haulers carry other things raise a notice; taking them clears it',async()=>{
+  const { DAY_DURATION } = await import('../src/systems/GameTimeSystem.js');
+  const s=scene(),hut=building(s,'lumberjack_hut',56,45),pile=`pile-${hut.id}`;s.buildings.find(b=>b.id===hut.id).constructionComplete=true;
+  assert.ok(s.foodStorage.locations.get(pile),'the hut has a pile');assert.equal(s.foodStorage.deposit(pile,'wood',3),true);
+  const { ProductionDiagnostics } = await import('../src/systems/ProductionDiagnostics.js');const d=s.diagnostics??new ProductionDiagnostics(s);d.residents=p=>p==='hauler'?[{}]:[];const issues=()=>d.storageIssues().filter(i=>i.reason==='pileWaiting');
+  assert.equal(issues().length,0,'not at once');s.gameTime.totalElapsed+=DAY_DURATION/24*2+1;
+  const [issue]=issues();assert.ok(issue);assert.equal(issue.entityId,hut.id);assert.equal(issue.params.resource,'wood');
+  s.foodStorage.take?.(pile,'wood',3)??(s.foodStorage.locations.get(pile).stock.wood=0);assert.equal(issues().length,0,'gone with the goods');
+});

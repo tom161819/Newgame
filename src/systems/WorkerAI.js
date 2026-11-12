@@ -1,4 +1,6 @@
 import { dataName } from '../i18n/names.js';
+import { VISIBILITY } from './FogOfWarSystem.js';
+const HUNT_CANDIDATES=12;
 import { findPathToAny } from '../game/pathfinding.js';
 import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
 import { tileKey } from '../game/stones.js';
@@ -20,6 +22,10 @@ export class WorkerAI {
   origin(worker){return this.system.origin(worker);}
   route(worker,goals){return findPathToAny(this.system.navigationMap(worker),worker.nextTile??worker.tile,goals,this.scene.pathWear?.routingOptions(worker));}
   withinRange(worker,tile){const origin=this.origin(worker),radius=worker.profession==='hunter'?HUNTING_RULES.huntRadius:WORK_RULES.workRadius;return Math.max(Math.abs(tile.x-origin.x),Math.abs(tile.y-origin.y))<=radius;}
+  // m-drevorubec-dosah, owner 12 Nov: Hunters have no range either – game and meat anywhere on the known map (inside the
+  // old radius always, beyond it on explored ground), the nearest HUNT_CANDIDATES to the lodge routed to.
+  huntable(worker,tile){if(this.withinRange(worker,tile))return true;const fog=this.scene.fog;return !fog?.displayState||fog.displayState(tile)!==VISIBILITY.UNEXPLORED;}
+  nearest(worker,items,tileOf,count=HUNT_CANDIDATES){const o=this.origin(worker);return items.map(item=>({item,d:Math.hypot(tileOf(item).x-o.x,tileOf(item).y-o.y)})).sort((a,b)=>a.d-b.d).slice(0,count).map(e=>e.item);}
   reserve(worker,key,task,route){
     if(!this.system.reservations.reserve(key,worker.id))return false;
     worker.workTask={...task,reservation:key,goal:{...route.destination},progressMs:0};worker.path=route.path;worker.workState=this.scene.workplaceSystem?'Traveling to Target':'Moving to Target';worker.workMessage=['mine','mineDrop'].includes(task.kind)?'Travelling to stone':task.kind==='hunt'?'Following game':'Collecting meat';return true;
@@ -150,14 +156,14 @@ export class WorkerAI {
   hunter(worker,delta){
     let task=worker.workTask;
     if(!task){if(worker.aiCooldown>0)return;worker.aiCooldown=WORK_RULES.searchInterval;worker.workState='Searching for Work';
-      const drops=[...this.scene.dropSystem.drops.values()].filter(d=>d.siteId==null&&d.resource==='meat'&&this.withinRange(worker,d.tile)
-        &&this.system.reservations.available(`drop:${d.id}`,worker.id)&&this.scene.character.order?.dropId!==d.id);
+      const drops=this.nearest(worker,[...this.scene.dropSystem.drops.values()].filter(d=>d.siteId==null&&d.resource==='meat'&&this.huntable(worker,d.tile)
+        &&this.system.reservations.available(`drop:${d.id}`,worker.id)&&this.scene.character.order?.dropId!==d.id),d=>d.tile);
       const dropRoute=this.route(worker,drops.map(d=>d.tile));
       if(dropRoute){const drop=drops.find(d=>tileKey(d.tile)===tileKey(dropRoute.destination));this.reserve(worker,`drop:${drop.id}`,{kind:'collectMeat',targetId:drop.id},dropRoute);}
       else{
         // Z2: game that the Hunter's dog tracks (within 8 tiles of it) can be chosen too.
-        const animals=[...this.scene.animalSystem.animals.values()].filter(a=>a.isAlive&&a.definition.gameplay.huntable&&(this.withinRange(worker,a.tile)||this.scene.domestic?.tracks?.(worker,a.tile))
-          &&this.system.reservations.available(`animal:${a.id}`,worker.id)&&this.scene.huntingSystem.target!==a);
+        const animals=this.nearest(worker,[...this.scene.animalSystem.animals.values()].filter(a=>a.isAlive&&a.definition.gameplay.huntable&&(this.huntable(worker,a.tile)||this.scene.domestic?.tracks?.(worker,a.tile))
+          &&this.system.reservations.available(`animal:${a.id}`,worker.id)&&this.scene.huntingSystem.target!==a),a=>a.tile);
         const goals=new Map();for(const animal of animals)for(const tile of adjacentTiles(animal,this.scene.map))if(this.scene.map[tile.y]?.[tile.x]===0)goals.set(tileKey(tile),{tile,animal});
         const route=this.route(worker,[...goals.values()].map(p=>p.tile));
         if(route){const a=goals.get(tileKey(route.destination)).animal;this.reserve(worker,`animal:${a.id}`,{kind:'hunt',targetId:a.id},route);}

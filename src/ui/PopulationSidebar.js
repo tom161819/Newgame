@@ -1,4 +1,5 @@
 import { deathCauseText } from './DangerMarks.js';
+import { haulPriorityLabel } from '../systems/haulPriority.js';
 import { localized } from '../i18n/names.js';
 import { t,language } from '../i18n/index.js';
 import { shortName } from '../data/names.js';
@@ -124,6 +125,8 @@ export class PopulationSidebar {
       const skill=this.preferences.sortBy.startsWith('skill:')?this.preferences.sortBy.slice(6):null,warnings=residentWarnings(this.scene,worker),signature=JSON.stringify([worker.name,worker.profession,worker.profession==='soldier'?this.scene.military?.unit(worker)?.type??'recruit':null,worker.experience,worker.definition.id,worker.workState,warnings,skill,skill?worker.skills[skill]:null,worker.isAlive,language()]);if(signature===record.signature)continue;record.signature=signature;
       record.row.classList.toggle('is-dead',!worker.isAlive);record.row.dataset.populationState=worker.isAlive?'living':'dead';record.row.tabIndex=worker.isAlive?-1:0;record.select.disabled=!worker.isAlive;record.locate.disabled=!worker.isAlive;
       record.name.textContent=worker.name;record.job.textContent=worker.profession==='soldier'?militaryRank(this.scene,worker):JOBS[worker.profession]?.name??worker.profession;
+      // m-nosic-priorita: a Hauler's own choice shows in his row.
+      if(worker.profession==='hauler'&&worker.haulPriority)record.job.textContent+=` · ${t('haul.priority.row',{what:haulPriorityLabel(this.scene,worker.haulPriority)})}`;
       const e=worker.experience;record.progress.textContent=`${t('unit.skillLevel',{level:e.level})} · ${skill?`${SKILLS[skill]} ${worker.skills[skill]?.level??1}`:e.level===e.maxLevel?t('unit.xpMax'):t('unit.skillXp',{current:Math.round(e.currentXP*100)/100,next:e.xpToNextLevel})}`;
       record.portrait.src=this.portrait(worker);record.portrait.alt=t('population.portrait',{name:worker.name});record.portrait.style.backgroundColor=professionColor(worker.profession);record.select.setAttribute('aria-label',t('population.inspect',{name:worker.name}));
       record.status.hidden=!warnings.length;record.status.textContent=warnings[0]?.icon??'';record.status.title=[localized(`work.state.${worker.workState}`,worker.workState),...warnings.map(warning=>warning.text)].join(' · ');

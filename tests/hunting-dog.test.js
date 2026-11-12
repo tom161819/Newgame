@@ -79,3 +79,11 @@ test('a dog roams irregularly around its Hunter within a small circle; at the lo
   assert.ok(sat>300,`mostly sits (${sat}/600)`);assert.ok(ran>0,'now and then runs a round');
   assert.ok(Math.hypot(dog.x-home.x,dog.y-home.y)<=DOGS.atLodge.runRadius+1,'stays by the lodge');
 });
+
+test('m-drevorubec-dosah (owner, 12 Nov): a Hunter has no range – game 50 tiles from the lodge on known ground is chosen; game on unexplored ground is not', () => {
+  const {s,hunter}=world(),h=hunter(41);s.buildings.push({id:'lodge-far',type:'hunting_lodge',x:40,y:40,constructionComplete:true});h.assignedWorkplaceId='lodge-far';
+  const ai=s.workerSystem.ai,far={x:90,y:46};
+  const fog=s.fog;s.fog={displayState:()=>2};assert.equal(ai.withinRange(h,far),false,'outside the old 34 tiles');assert.equal(ai.huntable(h,far),true,'known map: allowed');
+  s.fog={displayState:()=>0};assert.equal(ai.huntable(h,far),false,'unexplored: not');assert.equal(ai.huntable(h,{x:45,y:46}),true,'inside the old radius always');
+  const near=ai.nearest(h,[{tile:{x:120,y:40}},{tile:{x:60,y:40}},{tile:{x:42,y:41}}],e=>e.tile,2);assert.deepEqual(near.map(e=>e.tile.x),[42,60],'nearest to the lodge first');s.fog=fog;
+});

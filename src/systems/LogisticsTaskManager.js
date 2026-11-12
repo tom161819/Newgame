@@ -1,4 +1,5 @@
 import { reachableTiles } from '../game/pathfinding.js';
+import { HAUL_URGENT,matchesHaulPriority } from '../data/logistics.js';
 import { LOGISTICS_RULES,IDLE_STONE,carryCapacity } from '../data/logistics.js';
 import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
@@ -31,7 +32,7 @@ export class LogisticsTaskManager {
     // m-sklady-materialu-koncept (49): empty producer piles into the nearest Material Yard; the Starter Stockpile
     // (or any other store taking the good) only while no yard has room.
     for(const pile of storage.locations.values())if(pile.kind==='pile')for(const resource of Object.keys(pile.stock)){const amount=storage.free(pile.id,resource);if(amount>0)
-      for(const destination of stores)if(destination.allowed.includes(resource)&&storage.room(destination.id,resource)>0)this.catalog.push({priority:destination.kind==='storage'?30:32,sourceId:pile.id,destinationId:destination.id,resource,amount});}
+      for(const destination of stores)if(destination.allowed.includes(resource)&&storage.room(destination.id,resource)>0)this.catalog.push({priority:destination.kind==='storage'?30:32,sourceId:pile.id,destinationId:destination.id,resource,amount,pile:true});}
     // One-way consolidation only: never shuttle goods between dedicated stores.
     for(const source of stores.filter(l=>l.kind==='fallback'))for(const [resource]of Object.entries(source.stock))if(storage.free(source.id,resource)>0)
       for(const destination of stores.filter(l=>l.kind==='storage'&&l.allowed.includes(resource)&&storage.room(l.id,resource)>0))this.catalog.push({priority:40,sourceId:source.id,destinationId:destination.id,resource,amount:storage.free(source.id,resource)});
@@ -54,7 +55,10 @@ export class LogisticsTaskManager {
       return source&&target?Math.hypot(worker.position.x-source.x,worker.position.y-source.y)+Math.hypot(source.x-target.x,source.y-target.y):Infinity;
     };
     const inRange=task=>{if(!near)return true;const d=storage.locations.get(task.destinationId);return !!d&&Math.hypot(d.x-near.x,d.y-near.y)<=near.range;};
-    const candidates=this.catalog.filter(task=>(!constructionOnly||task.siteId!=null)&&(!fuelOnly||task.fuel)&&inRange(task)).map(task=>({task,score:score(task)})).filter(t=>Number.isFinite(t.score)).sort((a,b)=>a.task.priority-b.task.priority||a.score-b.score);
+    const candidates=this.catalog.filter(task=>(!constructionOnly||task.siteId!=null)&&(!fuelOnly||task.fuel)&&inRange(task)).map(task=>({task,score:score(task)})).filter(t=>Number.isFinite(t.score));
+    // m-nosic-priorita: the Hauler's own choice first (urgent food for the hungry before everything), then the shared order.
+    const want=worker.haulPriority,rank=task=>task.priority<=HAUL_URGENT?0:matchesHaulPriority(task,want)?1:2;
+    candidates.sort((a,b)=>rank(a.task)-rank(b.task)||(rank(a.task)===1?0:a.task.priority-b.task.priority)||a.score-b.score);
     let attempts=0;
     for(const {task}of candidates){
       const destination=storage.locations.get(task.destinationId),drop=task.sourceDropId&&this.scene.dropSystem.drops.get(task.sourceDropId),existingCap=storage.reservations.get(task.capacityReservation);

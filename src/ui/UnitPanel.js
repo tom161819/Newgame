@@ -1,4 +1,6 @@
 import { changeProfession } from './jobChange.js';
+import { HAUL_PRIORITIES,HAULABLE_RESOURCES } from '../data/logistics.js';
+import { haulPriorityFromValue,haulPriorityValue,setHaulPriority } from '../systems/haulPriority.js';
 import { localized,workMessageLabel } from '../i18n/names.js';
 import { t,language } from '../i18n/index.js';
 import { SKILLS,JOBS,WORK_RULES } from '../data/jobs.js';
@@ -22,6 +24,11 @@ export class UnitPanel {
     this.transportRow=document.createElement('label');this.transportRow.className='transport-mode';this.transportRow.append(document.createTextNode(t('transport.mode')+' '));
     this.transportMode=document.createElement('select');this.transportMode.id='transport-mode';for(const mode of TRANSPORT_MODES){const o=document.createElement('option');o.value=mode;o.textContent=t(`transport.mode.${mode}`);this.transportMode.append(o);}
     this.transportRow.append(this.transportMode);document.querySelector('#unit-stone-controls').append(this.transportRow);
+    // m-nosic-priorita (owner, 12 Nov): what this Hauler carries first; the choice also goes to every other chosen Hauler.
+    this.haulRow=document.createElement('label');this.haulRow.className='haul-priority';this.haulLabel=document.createTextNode('');this.haulRow.append(this.haulLabel);
+    this.haulSelect=document.createElement('select');this.haulSelect.id='haul-priority';this.haulRow.append(this.haulSelect);document.querySelector('#unit-stone-controls').append(this.haulRow);
+    this.haulSelect.addEventListener('change',()=>{if(this.unit?.profession!=='hauler')return;const priority=haulPriorityFromValue(this.haulSelect.value);
+      const chosen=scene.unitSelection?.workers?.()??[];for(const w of new Set([this.unit,...chosen.filter(w=>w.profession==='hauler')]))setHaulPriority(w,priority);this.refresh();},options);
     this.transportMode.addEventListener('change',()=>{if(this.unit?.profession==='hauler'){scene.vehicles?.setMode(this.unit,this.transportMode.value);this.refresh();}},options);
     this.stoneToggle.addEventListener('change',()=>{if(this.unit?.profession==='hauler'){(this.unit.stoneCollection??=defaultStoneCollection()).enabled=this.stoneToggle.checked;this.refresh();}},options);
     this.stoneRadius.addEventListener('change',()=>{if(this.unit?.profession==='hauler'){const v=Math.min(IDLE_STONE.maxRadius,Math.max(0,Math.round(Number(this.stoneRadius.value))));(this.unit.stoneCollection??=defaultStoneCollection()).radius=Number.isFinite(v)?v:IDLE_STONE.defaultRadius;this.refresh();}},options);
@@ -45,6 +52,12 @@ export class UnitPanel {
   }
   // Docked beside the map (no modal backdrop): the scene stays visible and clicking another villager switches the detail.
   open(unit,{management=false}={}){this.unit=unit;this.management=management&&this.scene.workerSystem?.workers.get(unit.id)===unit&&unit.isSubject!==false;this.restored=false;if(!this.dialog.open)this.dialog.show();this.refresh();this.scene.unitSelection?.draw();}
+  renderHaulPriority(u){
+    const s=this.scene,sig=language();if(this.haulSig!==sig){this.haulSig=sig;this.haulLabel.textContent=t('haul.priority')+' ';
+      const option=(value,text)=>{const o=document.createElement('option');o.value=value;o.textContent=text;return o;};
+      this.haulSelect.replaceChildren(...HAUL_PRIORITIES.filter(k=>k!=='resource').map(k=>option(k,t(`haul.priority.${k}`))),...HAULABLE_RESOURCES.map(r=>option(`resource:${r}`,t('haul.priority.only',{resource:s.objectRegistry.get(r)?.name??r}))));}
+    const value=haulPriorityValue(u.haulPriority);if(document.activeElement!==this.haulSelect&&this.haulSelect.value!==value)this.haulSelect.value=value;
+  }
   refresh(){
     if(!this.dialog.open||!this.unit)return;
     const s=this.scene,u=this.unit,view=u.view??u.sprite;
@@ -63,7 +76,7 @@ export class UnitPanel {
     // was lost. Texts change only when they differ, and the value is left alone while the list has focus.
     for(const option of this.jobSelect.options){const name=JOBS[option.value].name;if(option.textContent!==name)option.textContent=name;}if(document.activeElement!==this.jobSelect&&this.jobSelect.value!==u.profession)this.jobSelect.value=u.profession;document.querySelector('#unit-profession').textContent=JOBS[u.profession].name;document.querySelector('#unit-work-state').textContent=`${(['Holding','MovingToHold'].includes(u.commandState?.state)?t(`command.${u.commandState.state}`):localized(`work.state.${u.workState}`,u.workState))}${u.workMessage?` · ${workMessageLabel(u.workMessage)}`:''}${s.foodSystem.workMultiplier(u)<1?` · ${t('unit.hungry')}`:''}`;
       this.tendRow.hidden=u.profession!=='soldier';this.campfireButton.hidden=u.profession!=='soldier';if(!this.tendRow.hidden)this.tendToggle.checked=!!u.tendTorches;
-      const hauler=u.profession==='hauler'&&u.stoneCollection;document.querySelector('#unit-stone-controls').hidden=!hauler;if(hauler){this.transportMode.value=s.vehicles?.mode(u)??'auto';this.stoneToggle.checked=u.stoneCollection.enabled;if(document.activeElement!==this.stoneRadius)this.stoneRadius.value=u.stoneCollection.radius;}
+      const hauler=u.profession==='hauler'&&u.stoneCollection;document.querySelector('#unit-stone-controls').hidden=!hauler;if(hauler){this.renderHaulPriority(u);this.transportMode.value=s.vehicles?.mode(u)??'auto';this.stoneToggle.checked=u.stoneCollection.enabled;if(document.activeElement!==this.stoneRadius)this.stoneRadius.value=u.stoneCollection.radius;}
       document.querySelector('#unit-wage').textContent=t('unit.wage',{amount:s.wageSystem.dailyWage(u).toFixed(2)});
       document.querySelector('#unit-talent').textContent=t('unit.talent',{talent:localized(`talent.${u.naturalTalent}`,TALENTS[u.naturalTalent]),bonus:TALENT_XP_BONUS*100,skill:SKILLS[u.naturalTalent]});
       document.querySelector('#unit-unpaid').textContent=t('unit.unpaid',{amount:s.wageSystem.unpaid(u).toFixed(2)});

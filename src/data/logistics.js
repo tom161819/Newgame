@@ -33,3 +33,24 @@ export function loadCapacity(actor){return (LOGISTICS_RULES.loadUnits+(actor.pro
 // How many pieces of one resource fit in one trip (at least one, so heavy goods still move); without a resource, load units.
 export function carryCapacity(actor,resource=null){const units=loadCapacity(actor);return resource?Math.max(1,Math.floor(units/loadWeight(resource))):units;}
 export const stockLocationId=building=>`${building.type==='starter_stockpile'?'stockpile':building.type==='warehouse'?'warehouse':building.type==='material_yard'?'yard':building.type==='armory'?'armory':building.type==='farmhouse'?'farmhouse':'granary'}-${building.id}`;
+
+// m-nosic-priorita (owner, 12 Nov): what a Hauler carries first. 'any' is the shared order of the catalog (the default);
+// the others put matching tasks first (nearest first) and fall back to anything else so the Hauler never stands idle.
+// Food for the hungry (catalog priority HAUL_URGENT or less) always comes first.
+export const HAUL_PRIORITIES=Object.freeze(['any','build','food','inputs','outputs','resource']);
+export const HAUL_URGENT=10;
+export const BUILD_MATERIALS=Object.freeze(['stone','wood','iron','iron_ore']);
+export const HAULABLE_RESOURCES=Object.freeze(Object.keys(RESOURCE_WEIGHTS));
+const FOOD_IDS=new Set(['meat','wheat','flour','bread','apple','fish']);
+export function validHaulPriority(p){return !!p&&typeof p==='object'&&HAUL_PRIORITIES.includes(p.kind)&&(p.kind==='resource'?HAULABLE_RESOURCES.includes(p.resource):p.resource===undefined)&&Object.keys(p).length===(p.kind==='resource'?2:1);}
+// Does a catalog task match a Hauler's choice?
+export function matchesHaulPriority(task,priority){
+  const kind=priority?.kind??'any';if(kind==='any')return false;
+  const r=task.resource,dest=String(task.destinationId??''),src=String(task.sourceId??'');
+  if(kind==='resource')return r===priority.resource;
+  if(kind==='build')return task.siteId!=null||BUILD_MATERIALS.includes(r);
+  if(kind==='food')return FOOD_IDS.has(r);
+  if(kind==='inputs')return dest.startsWith('input-');
+  if(kind==='outputs')return src.startsWith('output-')||src.startsWith('pile-')||task.pile===true;
+  return false;
+}
