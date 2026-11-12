@@ -1,5 +1,5 @@
 import { t } from '../i18n/index.js';
-import { UNIT_TYPES,UNIT_TYPE_IDS,unitKit } from '../data/military.js';
+import { UNIT_TYPES,UNIT_TYPE_IDS,unitKit,barracksAutoHire } from '../data/military.js';
 import { MILITARY_ITEMS } from '../data/militaryEquipment.js';
 import { element } from './objectLabels.js';
 
@@ -43,7 +43,12 @@ export function renderMilitary(scene,building,root,employees){
   soldiers.dataset.list='recruits';units.dataset.list='units';
   soldiers.append(...(recruits.length?recruits.map(soldierRow):[element('li','empty-slot',t('military.noSoldiers'))]));units.append(...(trained.length?trained.map(soldierRow):[element('li','empty-slot',t('military.noUnits'))]));
   const places=element('p','military-places',t('military.places',{used:employees.length,capacity}));
-  root.replaceChildren(element('h3','',t('military.title')),places,cardList,element('h4','',t('military.recruits',{count:recruits.length})),soldiers,element('h4','',t('military.units',{count:trained.length})),units);
+  // m-kasarna-limit-zamestnani: the slider survives re-renders (kept on the root), so dragging is not interrupted.
+  let hire=root._autoHire;if(!hire){hire=element('label','barracks-auto-hire');const text=element('span','barracks-auto-hire-text'),range=element('input');range.type='range';range.id='barracks-auto-hire';range.min='0';range.step='1';
+    range.addEventListener('input',()=>{const b=hire._building;if(!b)return;b.autoHire=Number(range.value);text.textContent=t('military.autoHire',{count:b.autoHire,capacity:Number(range.max)});scene.employment?.request?.();});
+    hire.append(text,range);root._autoHire=hire;}
+  {const range=hire.querySelector('input'),text=hire.querySelector('.barracks-auto-hire-text'),value=barracksAutoHire(building,capacity);hire._building=building;range.max=String(capacity);if(document.activeElement!==range)range.value=String(value);text.textContent=t('military.autoHire',{count:value,capacity});}
+  root.replaceChildren(element('h3','',t('military.title')),places,hire,cardList,element('h4','',t('military.recruits',{count:recruits.length})),soldiers,element('h4','',t('military.units',{count:trained.length})),units);
 }
 export function handleMilitaryClick(scene,button){
   const m=scene.military;if(!m)return false;

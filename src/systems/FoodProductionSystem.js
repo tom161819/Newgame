@@ -57,6 +57,17 @@ export class FoodProductionSystem {
     worker.workTask={...data,kind,goal:{...route.destination},progressMs:0,reservation,transferId:id};worker.path=route.path;
     worker.workState=kind==='produce'?'Working':'Traveling to Target';worker.workMessage=kind==='produce'?'Producing resources':'Transporting resources';return true;
   }
+  // m-pracovnici-odnaseji-vyrobky (owner, 12 Nov): when a producer's own pile is full, one of its workers carries a load
+  // to the nearest store that takes it and then works on. Not while a Hauler already has the pile's goods reserved, and
+  // only one worker of the building at a time.
+  carryOwnOutput(worker,building){
+    const pile=this.storage.pileFor?.(building);if(!pile||worker.cargo||worker.workTask)return false;
+    const resource=pile.allowed[0],free=this.storage.free(pile.id,resource);if(free<=0)return false;
+    if(this.scene.workerSystem.liveWorkers().some(w=>w!==worker&&w.assignedWorkplaceId===building.id&&(w.workTask?.sourceId===pile.id)))return false;
+    const amount=Math.min(free,carryCapacity(worker,resource)),route=this.storage.findDestination(worker,resource,amount);
+    if(!route||route.location.id===pile.id||route.location.kind==='pile')return false;
+    return this.move(worker,pile.id,route.location.id,resource,amount);
+  }
   move(worker,sourceId,destinationId,resource,amount,{capacityReservation=null,outputBuildingId=null,hauling=false,siteId=null,allocationId=null}={}){
     const source=this.storage.locations.get(sourceId),destination=this.storage.locations.get(destinationId);if(!source||!destination)return false;
     if(sourceId===destinationId||amount>carryCapacity(worker,resource))return false;

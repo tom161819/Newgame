@@ -445,7 +445,7 @@ export class GameScene extends Phaser.Scene {
     if(this.buildMode||blockingDialog(document)){tooltip.hidden=true;this.storePreview?.hide();return;}
     pointer.updateWorldPoint(this.cameras.main);
     const hoverHit=this.pickInteraction(pointer.worldX,pointer.worldY,this.pointerTile(pointer));
-    {const rect=this.game.canvas.getBoundingClientRect(),b=hoverHit?.kind==='building'&&this.fog.isVisibleObject(hoverHit.object)?hoverHit.object:null;
+    {const rect=this.game.canvas.getBoundingClientRect(),b=hoverHit?.kind==='building'&&this.buildingReachable(hoverHit.object)?hoverHit.object:null;
       // m-budovy-tooltip (86): not while dragging, for the selected building or on touch (build mode returned above).
       const allowed=!!b&&buildingTooltipAllowed({dragging:!!pointer.isDown||!!this.unitSelection?.dragging,selected:selectedBuildingIds(this).has(b.id),touch:!!pointer.wasTouch||!!globalThis.matchMedia?.('(hover: none)').matches});
       this.storePreview?.hoverBuilding(b,rect.left+pointer.x*rect.width/this.scale.width,rect.top+pointer.y*rect.height/this.scale.height,{allowed});}
@@ -618,8 +618,11 @@ export class GameScene extends Phaser.Scene {
     this.gateAxis=turn.axis;this.previewKey=null;this.updateBuildingPreview();return true;
   }
   selectableHumans(){return this.workerSystem?.liveWorkers()??[];}
+  // m-budovy-klik-mimo-dohled (owner, 12 Nov): the King always knows his own buildings, so one on explored ground (grey
+  // fog) opens like one in sight; animals, loot and strangers in the fog stay out of reach.
+  buildingReachable(building){const f=this.fog;if(!f?.enabled||f.isVisibleObject(building))return true;if(building.unverified)return true;const w=f.width;return !!f.explored&&(building.tiles??[]).some(t=>f.explored[t.y*w+t.x]);}
   towerAtPoint(x,y,tile) {
-    return [...this.buildings].filter(building=>this.fog.isVisibleObject(building)).sort((a,b)=>towerBase(b).y-towerBase(a).y).find(building=>this.towerViews.get(building.id).contains(x,y)||building.tiles.some(part=>tileKey(part)===tileKey(tile)));
+    return [...this.buildings].filter(building=>this.buildingReachable(building)).sort((a,b)=>towerBase(b).y-towerBase(a).y).find(building=>this.towerViews.get(building.id).contains(x,y)||building.tiles.some(part=>tileKey(part)===tileKey(tile)));
   }
   startBuilding(definition=this.objectRegistry.require('tower')) {
     this.rockMiningTool?.close();

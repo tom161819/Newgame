@@ -89,3 +89,19 @@ test('Save/Load keeps tree, bush and plan marks; malformed marks are rejected',(
   }
   const old=structuredClone(state);delete old.naturalResources.rockMining.marks;validateGameState(old);
 });
+test('m-hornici-oznacene-skaly: marked rocks come first – of 3 Quarry Miners 2 go to 3 marked rocks, one stays; 1 Miner never leaves',()=>{
+  const s=scene(),quarry=build(s,'quarry',70,50),miners=[0,1,2].map(i=>person(s,'miner',66,52+i,quarry));for(const x of [58,60,62])rock(s,x,45);
+  until(s,()=>miners.every(w=>w.workplaceReached));for(const x of [58,60,62])assert.ok(marks(s).mark({x,y:45}));
+  until(s,()=>miners.filter(w=>w.clearingLoan).length===2,60000);s.simulate?.(5000);
+  assert.equal(miners.filter(w=>w.clearingLoan).length,2,'one Miner stays in the Quarry');
+  for(const w of miners.filter(w=>w.clearingLoan))assert.equal(w.assignedWorkplaceId,quarry.id,'keeps his workplace');
+  validateGameState(serializeGameState(s));
+  const t=scene(),q=build(t,'quarry',70,50),only=person(t,'miner',66,52,q);rock(t,60,45);until(t,()=>only.workplaceReached);assert.ok(marks(t).mark({x:60,y:45}));
+  for(let i=0;i<200;i++)t.tick(50);assert.equal(!!only.clearingLoan,false,'the only Miner stays');
+});
+test('m-pracovnici-odnaseji-vyrobky: with no Hauler a Quarry Miner carries stone from his full pile to the store and mines on',()=>{
+  const s=scene(),quarry=build(s,'quarry',70,50),m=person(s,'miner',66,52,quarry);
+  const pile=s.foodStorage.pileFor(quarry),stored=()=>[...s.foodStorage.locations.values()].filter(l=>s.foodStorage.isStock(l)).reduce((n,l)=>n+(l.stock.stone??0),0),before=stored();
+  until(s,()=>stored()>before,900000);assert.ok(pile);
+  validateGameState(serializeGameState(s));
+});

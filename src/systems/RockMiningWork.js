@@ -79,13 +79,23 @@ export class RockMiningWork {
     for(const id of [...this.bushes.keys()])if(!s.bushes?.has(id))this.bushes.delete(id);
     for(const b of this.plans())this.markPlan(b);
   }
-  // m-oznacovani-tezby (56): with no free Miner, one employed Miner leaves his workplace for the rocks of wall plans.
+  // m-oznacovani-tezby (56) + m-hornici-oznacene-skaly (owner, 12 Nov): marked rocks come first. Employed Miners leave
+  // their Quarry or Mine for them, nearest first, as many as there are rocks nobody works on; one Miner always stays in
+  // each workplace. A lent Miner keeps his workplace and wage and goes back when no marked rock is left.
+  lendable(worker){return worker?.profession==='miner'&&worker.assignedWorkplaceId!=null&&!worker.clearingLoan&&worker.isAlive&&worker.isSubject!==false&&!worker.arriving&&!worker.cargo&&(!worker.workTask||worker.workTask.kind==='mineDeposit');}
+  openRocks(){const taken=new Set(this.scene.workerSystem.liveWorkers().map(w=>w.manualRockId).filter(id=>id!=null));return [...this.records.values()].filter(r=>r.marked&&r.produced<RULES.yield&&!taken.has(r.id));}
   borrow(worker){
-    const s=this.scene;if(worker?.profession!=='miner'||worker.assignedWorkplaceId==null||worker.clearingLoan||!worker.isAlive||worker.isSubject===false||worker.arriving||worker.cargo||worker.workTask||s.gameTime.totalElapsed<this.loanRetryAt)return false;
-    if(![...this.records.values()].some(r=>r.marked&&r.produced<RULES.yield))return false;
-    const planned=this.plannedTiles();if(![...this.records.values()].some(r=>r.marked&&r.produced<RULES.yield&&planned.has(r.id)))return false;
-    if(s.workerSystem.liveWorkers().some(w=>w.clearingLoan||w.profession==='miner'&&w.assignedWorkplaceId==null&&w.isSubject!==false))return false;
-    s.workerSystem.ai.cancel(worker);worker.clearingLoan=true;worker.manualRockId=null;return true;
+    const s=this.scene;if(!this.lendable(worker)||s.gameTime.totalElapsed<this.loanRetryAt)return false;
+    const open=this.openRocks();if(!open.length)return false;
+    const live=s.workerSystem.liveWorkers(),free=live.filter(w=>w.profession==='miner'&&w.isSubject!==false&&(w.assignedWorkplaceId==null||w.clearingLoan)&&w.manualRockId==null).length;
+    if(free>=open.length)return false;
+    // One Miner stays: the workplace keeps at least one of its Miners at home.
+    const home=live.filter(w=>w.profession==='miner'&&w.assignedWorkplaceId===worker.assignedWorkplaceId&&!w.clearingLoan);if(home.length<2)return false;
+    // Nearest first: only the lendable Miner closest to an open rock goes now (others are asked again next update).
+    const dist=w=>Math.min(...open.map(r=>Math.abs(r.tile.x-w.tile.x)+Math.abs(r.tile.y-w.tile.y)));
+    const best=live.filter(w=>this.lendable(w)&&live.filter(o=>o.profession==='miner'&&o.assignedWorkplaceId===w.assignedWorkplaceId&&!o.clearingLoan).length>=2).sort((a,b)=>dist(a)-dist(b)||String(a.id).localeCompare(String(b.id)))[0];
+    if(best!==worker)return false;
+    s.workerSystem.ai.cancel(worker);worker.clearingLoan=true;worker.manualRockId=null;worker.workMessage=t('rock.lent');return true;
   }
   endLoan(worker){worker.clearingLoan=false;worker.manualRockId=null;worker.workplaceReached=false;worker.workState='Going to Workplace';worker.workMessage='';worker.aiCooldown=0;this.loanRetryAt=this.scene.gameTime.totalElapsed+CLEARING.loanRetryMs;}
   key(id){return `rock:${id}`;}
@@ -105,7 +115,7 @@ export class RockMiningWork {
     if(worker.aiCooldown>0&&!worker.workTask)return true;
     if(!record){
       // Rocks under wall plans first; a lent Miner takes only those and goes back when none is left.
-      const planned=this.plannedTiles(),choices=[...this.records.values()].filter(r=>r.marked&&(!worker.clearingLoan||planned.has(r.id)&&r.produced<RULES.yield)&&(![...system.liveWorkers()].some(w=>w!==worker&&w.manualRockId===r.id))).sort((a,b)=>planned.has(b.id)-planned.has(a.id));
+      const planned=this.plannedTiles(),choices=[...this.records.values()].filter(r=>r.marked&&(!worker.clearingLoan||r.produced<RULES.yield)&&(![...system.liveWorkers()].some(w=>w!==worker&&w.manualRockId===r.id))).sort((a,b)=>planned.has(b.id)-planned.has(a.id));
       for(const r of choices){const drop=s.dropSystem.drops.get(r.dropId),goals=r.produced===RULES.yield?(drop?[drop.tile]:[]):this.goals(r,worker),route=system.ai.route(worker,goals);if(route){record=r;break;}if(r.produced===RULES.yield&&!drop){r.marked=false;delete r.planId;}}
       if(!record){if(worker.clearingLoan)this.endLoan(worker);else this.wait(worker,'rock.noWork');return true;}worker.manualRockId=record.id;
     }

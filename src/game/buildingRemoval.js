@@ -53,3 +53,28 @@ export function finishDemolition(scene,building,refund){
   scene.constructionSystem.materials.syncAreas();scene.refreshWallConnections?.();
   scene.events?.emit('buildings:changed');scene.updateInventory?.();return true;
 }
+
+// m-ukladani-chyba: a building that is gone without demolition (burnt down at night) loses its functions like a demolished
+// one: workers, orders, production, storage and the workplace record go with it, so nothing points at a missing building.
+// Its stored goods are lost (they burn); nothing is refunded or spilled.
+export function detachLostBuilding(scene,building){
+  const storage=scene.foodStorage,locations=[...(storage?.locations?.values?.()??[])].filter(l=>l.buildingId===building.id),ids=new Set(locations.map(l=>l.id));
+  for(const l of locations)l.stock={};
+  for(const order of [...(scene.military?.orders?.values?.()??[])])if(order.barracksId===building.id)scene.military.cancel(order.id);
+  for(const worker of scene.workerSystem?.liveWorkers?.()??[]){
+    if(worker.assignedWorkplaceId===building.id){scene.stables?.cancel?.(worker);scene.military?.release?.(worker);scene.workplaceSystem?.remove?.(worker);}
+    const task=worker.workTask;
+    if(task&&(ids.has(task.sourceId)||ids.has(task.destinationId)||task.targetId===building.id))scene.workerSystem.ai.cancel(worker);
+  }
+  const kingTask=scene.kingLogistics?.task;if(kingTask&&(ids.has(kingTask.sourceId)||ids.has(kingTask.destinationId)))scene.kingLogistics.cancel();
+  scene.stables?.unreserveWorkshop?.(building.id);
+  const production=scene.foodProduction?.records?.get?.(building.id);
+  if(production){if(production.cycle)storage?.release?.(production.cycle.outputReservation);storage?.release?.(production.outputReservation);scene.foodProduction.records.delete(building.id);}
+  storage?.removeBuilding?.(building);
+  for(const record of scene.foodProduction?.records?.values?.()??[]){
+    if(record.cycle&&!storage.reservations.has(record.cycle.outputReservation))record.cycle.outputReservation=null;
+    if(record.outputReservation&&!storage.reservations.has(record.outputReservation))record.outputReservation=null;
+  }
+  if(scene.workplaceSystem?.records?.delete?.(building.id))scene.workplaceSystem.changed?.(building.id);
+  scene.stables?.removeBuilding?.(building);
+}

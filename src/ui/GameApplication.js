@@ -1,3 +1,4 @@
+import { recordSaveFailure } from '../systems/saveFailure.js';
 import { saveRecordStatus } from './SaveLoadMenu.js';
 import { SaveGameManager } from '../systems/SaveGameManager.js';
 import { serializeGameState,validateGameState } from '../systems/GameStateSerializer.js';
@@ -101,10 +102,15 @@ export class GameApplication {
     if(status?.type==='failed'&&this.autosave.enabled){this.autosaveFailure={...status,first:false};output.textContent=`${t('autosave.failed',{message:status.message})} ${last?t('autosave.kept',{time:time(last.at)}):''}`.trim();output.classList.add('failed');if(status.first)this.notify(t('autosave.failedNotice'));return;}
     if(status?.type==='saved')this.autosaveFailure=null;output.classList.remove('failed');output.textContent=base;if(status?.recovered)this.notify(t('autosave.recovered'));
   }
-  async load(input){const state=validateGameState(input);this.start(state);}
-  snapshot(){if(!this.scene||this.scene.gameOver)throw new Error(t('app.startFirst'));const state=serializeGameState(this.scene);
+  async load(input){let state;try{state=validateGameState(input);}catch(error){if(error?.savePart)recordSaveFailure('load',input,error);throw error;}this.start(state);}
+  snapshot(){if(!this.scene||this.scene.gameOver)throw new Error(t('app.startFirst'));
     // m-ulozeni-brod: a state that fails the check is a bug in the running game, not a damaged save – say so and keep playing.
-    try{return validateGameState(state);}catch(error){console.error('Save check failed:',error);throw new Error(t('saves.saveFailed'));}}
+    // m-ukladani-chyba: a passing state (someone mid-step) gets up to 3 more tries, each after one short simulation step.
+    let error;for(let attempt=0;attempt<4;attempt++){
+      if(attempt)this.scene.simulationStep?.(50);const state=serializeGameState(this.scene);
+      try{return validateGameState(state);}catch(e){error=e;if(attempt===3)recordSaveFailure('save',state,e);}
+    }
+    console.error('Save check failed:',error);throw new Error(t('saves.saveFailedPart',{part:error?.savePart??'?'}));}
   showPause(){
     if(!this.scene||this.scene.gameOver)return;
     this.scene.pauseManager.set('menu',true);this.scene.settingsPanel.setOpen(false);

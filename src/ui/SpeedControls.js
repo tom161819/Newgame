@@ -5,6 +5,9 @@ import { t } from '../i18n/index.js';
 // m-noc-zrychleni (82): at night the automatic speed-up (NightSpeedUp) may hold the speed; the held step shows a moon.
 export const GAME_SPEEDS=Object.freeze([1,2,3]);
 const KEY='newgame.gameSpeed';
+// m-klavesy-rychlost (owner, 12 Nov): + and − step the speed: pause ↔ 1× ↔ 2× ↔ 3× (no wrap-around).
+export function stepSpeed(paused,speed,direction){const steps=[0,...GAME_SPEEDS],at=paused?0:Math.max(0,steps.indexOf(speed));return steps[Math.min(steps.length-1,Math.max(0,at+Math.sign(direction)))];}
+const speedKey=event=>event.code==='NumpadAdd'||event.key==='+'||event.code==='Equal'?1:event.code==='NumpadSubtract'||event.key==='-'||event.key==='−'||event.code==='Minus'?-1:0;
 export function readGameSpeed(){try{const v=Number(localStorage.getItem(KEY));return GAME_SPEEDS.includes(v)?v:1;}catch{return 1;}}
 export class SpeedControls {
   constructor(scene){
@@ -19,12 +22,14 @@ export class SpeedControls {
       if(event.repeat||event.ctrlKey||event.metaKey||event.altKey||document.querySelector('dialog[open]')||/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName??''))return;
       if(event.code==='KeyP'){event.preventDefault();this.togglePause();}
       else{const n=['Digit1','Digit2','Digit3'].indexOf(event.code);if(n>=0){event.preventDefault();this.setSpeed(n+1);}}
+      if(speedKey(event)){event.preventDefault();this.step(speedKey(event));}
     },options);
     this.render();
   }
   setSpeed(speed){if(!GAME_SPEEDS.includes(speed))return;this.scene.nightSpeedUp?.manualChange();this.scene.gameSpeed=speed;this.scene.playerPaused=false;try{localStorage.setItem(KEY,String(speed));}catch{/* the speed still applies */}this.render();}
   // m-noc-zrychleni (82): the automatic night speed-up sets the speed for the night only (not remembered).
   applyAuto(speed){if(!GAME_SPEEDS.includes(speed))return;this.scene.gameSpeed=speed;this.render();}
+  step(direction){const s=this.scene,next=stepSpeed(!!s.playerPaused,s.gameSpeed,direction);if(next===0){if(!s.playerPaused)this.togglePause();}else this.setSpeed(next);s.setStatus?.(next?t('speed.label',{speed:next}):t('speed.paused'));}
   togglePause(){this.scene.playerPaused=!this.scene.playerPaused;this.render();}
   render(){
     if(!this.root)return;const s=this.scene;

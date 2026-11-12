@@ -29,13 +29,11 @@ test('a caravan sells at 115 % and buys at 80 %, rounded to whole Gold, at least
   assert.ok(BASE_PRICES.armor>=5*BASE_PRICES.iron+2*BASE_PRICES.wood);assert.ok(BASE_PRICES.bow>=8*BASE_PRICES.wood);
 });
 
-test('the Marketplace is a 3×3 Logistics building for 12 Stone + 8 Wood, unlocked by a completed Warehouse', () => {
+test('the Marketplace is a 3×3 Logistics building for 12 Stone + 8 Wood, open from the start (m-trziste-bez-skladu, owner 12 Nov)', () => {
   const d=objectRegistry.require('marketplace');
   assert.deepEqual([d.width,d.height,d.buildingCategory,d.buildable],[3,3,'logistics',true]);assert.deepEqual(d.cost,{stone:12,wood:8});
   assert.deepEqual(d.trade,{capacity:TRADE_RULES.marketplaceCapacity,loadingSpots:2});assert.equal(TRADE_RULES.marketplaceCapacity,80);
-  assert.equal(buildingUnlockStatus(d,[],objectRegistry).unlocked,false);
-  assert.equal(buildingUnlockStatus(d,[{type:'warehouse',construction:{state:'building'}}],objectRegistry).unlocked,false,'a Warehouse site is not enough');
-  assert.equal(buildingUnlockStatus(d,[{type:'warehouse'}],objectRegistry).unlocked,true);
+  assert.equal(buildingUnlockStatus(d,[],objectRegistry).unlocked,true,'no Warehouse needed');
 });
 
 test('a Marketplace site and a finished Marketplace survive Save/Load; only a finished one trades', () => {

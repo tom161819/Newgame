@@ -88,7 +88,7 @@ export class ForestryWork {
     const s=this.scene,system=s.workerSystem;let task;
     // m-drevorubci-stromy: with the Dev tool's Wood per tree above one load, he carries one load; the rest stays on the
     // ground for the Haulers.
-    const amount=Math.min(devTreeWood(object.definition.tree),carryCapacity(worker,'wood')),pile=s.foodStorage?.pileFor(this.workplace(worker));if(pile&&s.foodStorage.room(pile.id,'wood')<amount){this.wait(worker,'Output pile full');return;}
+    const amount=Math.min(devTreeWood(object.definition.tree),carryCapacity(worker,'wood')),pile=s.foodStorage?.pileFor(this.workplace(worker));if(pile&&s.foodStorage.room(pile.id,'wood')<amount){if(s.foodProduction?.carryOwnOutput(worker,this.workplace(worker)))return;this.wait(worker,'Output pile full');return;}
     // m-sklady-materialu-koncept (49): timber goes on the pile by the hut; Haulers take it to a store.
     const output=pile?{location:pile}:s.foodStorage?.findDestination(worker,'wood',amount);if(!output){this.wait(worker,'Waiting for reachable timber storage capacity');return;}
     const transferId=`food-transfer-${s.foodProduction.nextTransfer++}`,capacityReservation=s.foodStorage.reserve('capacity',output.location.id,'wood',amount,transferId);if(!capacityReservation)return;

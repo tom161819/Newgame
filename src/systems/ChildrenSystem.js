@@ -245,7 +245,7 @@ export class ChildrenSystem {
   exportState(){
     const round=v=>Math.round(v*100)/100;
     return {kids:[...this.children.values()].map(c=>({id:c.id,x:round(c.x),y:round(c.y),state:c.state==='leaving'?'leaving':c.state==='inside'?'inside':'out'})),
-      hidden:Object.fromEntries([...this.hidden].filter(([,until])=>until>this.now()).map(([id,until])=>[String(id),until])),snowmen:this.snowmen.map(s=>({...s})),alarmDay:this.alarmDay,seq:this.seq};
+      hidden:Object.fromEntries([...this.hidden].filter(([id,until])=>until>this.now()&&(!this.scene?.buildings||this.scene.buildings.some(b=>b.id===Number(id)))).map(([id,until])=>[String(id),until])),snowmen:this.snowmen.map(s=>({...s})),alarmDay:this.alarmDay,seq:this.seq};
   }
   // Which children exist follows from the homes again (deterministic); the saved part keeps them where they were.
   importState(state){
@@ -264,6 +264,8 @@ export function validateChildrenState(c,{check,number,integer,array,buildingIds,
   check(c&&typeof c==='object'&&Object.keys(c).sort().join()==='alarmDay,hidden,kids,seq,snowmen');integer(c.seq,0);
   array(c.kids,CHILDREN.max*4);const ids=new Set();
   for(const k of c.kids){check(k&&typeof k.id==='string'&&/^child-\d+-\d+$/.test(k.id)&&!ids.has(k.id));ids.add(k.id);number(k.x,0,COLUMNS);number(k.y,0,ROWS);check(['inside','out','leaving'].includes(k.state));}
+  // m-ukladani-chyba: a hidden house that is gone (burnt, demolished) drops out.
+  if(c.hidden&&typeof c.hidden==='object'&&!Array.isArray(c.hidden))for(const id of Object.keys(c.hidden))if(!buildingIds.has(Number(id)))delete c.hidden[id];
   check(c.hidden&&typeof c.hidden==='object'&&!Array.isArray(c.hidden));for(const [id,until]of Object.entries(c.hidden)){check(buildingIds.has(Number(id)));number(until,0);}
   array(c.snowmen,CHILDREN.snowman.max);for(const sm of c.snowmen){check(sm&&typeof sm.id==='string'&&[0,1].includes(sm.variant));number(sm.x,0,COLUMNS);number(sm.y,0,ROWS);}
   check(c.alarmDay===null||Number.isInteger(c.alarmDay)&&c.alarmDay>=1);

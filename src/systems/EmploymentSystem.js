@@ -1,3 +1,4 @@
+import { barracksAutoHire } from '../data/military.js';
 import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { EMPLOYMENT_PRESETS,EMPLOYMENT_PROFESSIONS,PRIORITY_RANGE,presetOf } from '../data/employment.js';
 import { FORESTRY } from '../data/naturalResources.js';
@@ -58,7 +59,7 @@ export class EmploymentSystem {
       const record=s.workplaceSystem.register(building);if(!record)continue;
       // m-drevorubci-stromy (playtest 0.83.0 #1): a Lumberjack Hut takes no more Woodcutters than it has mature trees in
       // its radius (none while it has nothing to fell).
-      const capacity=building.type==='lumberjack_hut'&&s.naturalResources?Math.min(spec.capacity,s.naturalResources.forestry.eligible(building).length):spec.capacity;
+      const capacity=building.type==='lumberjack_hut'&&s.naturalResources?Math.min(spec.capacity,s.naturalResources.forestry.eligible(building).length):building.type==='barracks'?barracksAutoHire(building,spec.capacity):spec.capacity;
       for(let i=record.workerIds.length;i<capacity;i++)seats.push({building,spec,priority:this.priorities[spec.profession]??PRIORITY_RANGE.default});
     }
     return seats.sort((a,b)=>b.priority-a.priority||a.building.id-b.building.id);

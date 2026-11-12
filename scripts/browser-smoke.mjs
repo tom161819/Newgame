@@ -127,6 +127,7 @@ import { thievesSmoke } from './thieves-smoke.mjs';
 import { fireSmoke } from './fire-smoke.mjs';
 import { kingdomOverviewSmoke } from './kingdom-overview-smoke.mjs';
 import { kingdomBarSmoke } from './kingdom-bar-smoke.mjs';
+import { saveCompatSmoke } from './save-compat-smoke.mjs';
 
 
 const root=fileURLToPath(new URL('../',import.meta.url)),args=process.argv.slice(2);
@@ -340,6 +341,7 @@ try{
   await step('i18n',()=>i18nGameSmoke(page));
   await step('save-transfer',()=>saveTransferSmoke(page));
   await step('autosave',()=>autosaveSmoke(page));
+  await step('save-compat',()=>saveCompatSmoke(page));
   await step('seasons-menu',()=>seasonsMenuSmoke(page));
   await step('season-transition',()=>seasonTransitionSmoke(page));
   await buildingMenuSmoke(page);

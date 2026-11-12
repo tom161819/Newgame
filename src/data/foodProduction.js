@@ -5,6 +5,4 @@ export const FOOD_RECIPES=Object.freeze({
   // tabulka-budov-1 (owner table 9 Nov 2026): Mill 4 Wheat → 2 Flour, Bakery 1 Flour → 6 Bread (4 Wheat → 12 Bread; was 7.5).
   bakery:Object.freeze({input:Object.freeze({flour:1}),output:Object.freeze({bread:6}),duration:30000,skill:'baking',xp:10}),
 });
-// A batch started before m-jidlo-balanc (saved with this output reserved) finishes with its reserved amount; only the save
-// check uses it, so older saves with a running Bakery batch still load.
-export const LEGACY_RECIPE_OUTPUTS=Object.freeze({bakery:Object.freeze({bread:4})});
+// Earlier recipe balance for saves with a running batch: RECIPE_HISTORY in production.js.

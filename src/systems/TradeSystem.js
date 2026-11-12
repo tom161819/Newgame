@@ -47,9 +47,11 @@ export class TradeSystem {
   }
   history(resource,prices){
     const day=this.today(),list=this.stats.history[resource]??=[];let entry=list.find(e=>e.day===day);if(!entry){entry={day};list.push(entry);}
-    Object.assign(entry,prices);
-    for(const [id,rows]of Object.entries(this.stats.history)){this.stats.history[id]=rows.filter(e=>e.day>day-PRICE_MODEL.historyDays);if(!this.stats.history[id].length)delete this.stats.history[id];}
+    Object.assign(entry,prices);this.pruneHistory(day);
   }
+  // m-ukladani-chyba: old prices also drop out when no caravan came for a while (before, only a new price pruned them,
+  // and a save 20 days after the last caravan failed its check).
+  pruneHistory(day=this.today()){for(const [id,rows]of Object.entries(this.stats.history)){this.stats.history[id]=rows.filter(e=>e.day>day-PRICE_MODEL.historyDays);if(!this.stats.history[id].length)delete this.stats.history[id];}}
   // On arrival: the offered prices of every good the caravan sells or would buy.
   recordOffers(caravan=this.caravan){if(!caravan)return;for(const d of tradeableResources(this.scene.objectRegistry)){const sell=this.unitPrice(d.id,'sell',caravan),buy=(caravan.stock[d.id]??0)>0?this.unitPrice(d.id,'buy',caravan):null;if(sell!==null)this.history(d.id,{...(buy!==null?{buy}:{}),sell});}this.changed();}
   summary(){const s=this.stats,top=Object.entries(s.byResource).sort((a,b)=>b[1].value-a[1].value).slice(0,3).map(([resource,row])=>({resource,...row}));return {sold:s.sold,bought:s.bought,balance:s.sold-s.bought,transactions:s.transactions,top,recent:s.recent};}
@@ -216,7 +218,7 @@ export class TradeSystem {
     return tasks;
   }
   // Open orders and the last 30 finished ones (for the panel) are kept.
-  exportState(){const closed=this.orders.filter(o=>!OPEN.has(o.status)).slice(-30);return {seq:this.seq,orders:this.orders.filter(o=>OPEN.has(o.status)||closed.includes(o)).map(o=>({...o})),stats:structuredClone(this.stats),auto:structuredClone(this.auto)};}
+  exportState(){this.pruneHistory();const closed=this.orders.filter(o=>!OPEN.has(o.status)).slice(-30);return {seq:this.seq,orders:this.orders.filter(o=>OPEN.has(o.status)||closed.includes(o)).map(o=>({...o})),stats:structuredClone(this.stats),auto:structuredClone(this.auto)};}
   importState(state){this.seq=state?.seq??0;this.orders=(state?.orders??[]).map(o=>({...o}));this.stats=state?.stats?structuredClone(state.stats):emptyTradeStats();this.auto=state?.auto?structuredClone(state.auto):emptyAutoTrade();this.autoCheckedAt=undefined;this.changed();}
   destroy(){this.listeners.clear();if(this.scene.caravans)this.scene.caravans.deliveryPending=()=>false;}
 }

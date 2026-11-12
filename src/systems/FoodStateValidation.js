@@ -1,9 +1,9 @@
 import { GRANARY_GROUP_CAPACITY,granaryUsage } from '../data/granaryCapacity.js';
 import { tradeableResources } from '../data/trade.js';
 import { paidCost } from '../data/demolition.js';
-import { FOOD_RESOURCE_IDS,FOOD_RULES,LEGACY_RECIPE_OUTPUTS } from '../data/foodProduction.js';
+import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
 import { pavementWorkArea } from '../game/pavement.js';
-import { recipeFor,recipeResources } from '../data/production.js';
+import { recipeFor,recipeResources,recipeVariants } from '../data/production.js';
 import { PLAYER_START } from '../game/config.js';
 import { buildingIsComplete } from '../game/buildings.js';
 import { devTreeWood } from '../data/devBalance.js';
@@ -81,13 +81,22 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     check(r.nextCycle===1+r.completed+(r.cycle?1:0));
     // S12: a workshop with recipe choices keeps the chosen one; a running batch keeps the recipe it started with.
     const d=registry.require(b.type);if(d.recipes){check(Object.hasOwn(d.recipes,r.recipe));if(r.cycle)check(Object.hasOwn(d.recipes,r.cycle.recipe));}else check(r.recipe===undefined&&r.cycle?.recipe===undefined);
-    const recipe=recipeFor(d,r.cycle?.recipe??r.recipe),[outId,current]=Object.entries(recipe.output)[0],legacy=LEGACY_RECIPE_OUTPUTS[b.type]?.[outId],held=id=>reservations.get(id)?.amount;
-    // m-jidlo-balanc: a batch reserved under the earlier output (LEGACY_RECIPE_OUTPUTS) is still valid.
-    const amountOf=id=>legacy!==undefined&&held(id)===legacy?legacy:current,outAmount=amountOf(r.cycle?.outputReservation??r.outputReservation);
+    const key=r.cycle?.recipe??r.recipe,recipe=recipeFor(d,key),[outId,current]=Object.entries(recipe.output)[0],held=id=>reservations.get(id)?.amount;
+    // m-ukladani-chyba: a batch started under an earlier balance (RECIPE_HISTORY) is valid with the recipe it started with.
+    const variants=recipeVariants(b.type,d.recipes?key:undefined,recipe).filter(v=>Object.keys(v.output)[0]===outId);
+    const same=(a,b)=>{const ka=Object.keys(a),kb=Object.keys(b);return ka.length===kb.length&&ka.every(k=>a[k]===b[k]);};
+    const started=r.cycle?variants.find(v=>v.duration===r.cycle.requiredWork&&same(v.input,r.cycle.inputs??{})&&(r.cycle.outputReservation==null||held(r.cycle.outputReservation)===v.output[outId])):null;
+    // m-ukladani-chyba: rats in 0.100 and older could eat part of a finished batch waiting in the output; the promise to
+    // the store shrinks to what is left (or goes when nothing is).
+    if(!r.cycle&&r.outputReservation){const res=reservations.get(r.outputReservation),left=locations.get(`output-${b.id}`)?.stock?.[outId]??0;
+      if(res&&res.kind==='capacity'&&res.resource===outId&&left<res.amount){if(left>=1)res.amount=left;else{reservations.delete(res.id);const i=storage.reservations.findIndex(x=>x.id===res.id);if(i>=0)storage.reservations.splice(i,1);r.outputReservation=null;}}}
+    const most=Math.max(...variants.map(v=>v.output[outId]??0));
+    const waiting=!r.cycle&&r.outputReservation?variants.find(v=>held(r.outputReservation)===v.output[outId])??(Number.isInteger(held(r.outputReservation))&&held(r.outputReservation)>=1&&held(r.outputReservation)<most?{output:{[outId]:held(r.outputReservation)}}:null):null;
+    const outAmount=(started??waiting??recipe).output[outId]??current;
     if(recipe.horse&&r.cycle)check(r.cycle.horseId!=null);else if(r.cycle)check(r.cycle.horseId===undefined);
     if(r.cycle){
       const c=r.cycle,match=String(c.id).match(new RegExp(`^food-cycle-${b.id}-(\\d+)$`));check(match);integer(Number(match[1]),1,r.nextCycle-1);
-      check(!r.outputReservation&&c.state==='building'&&c.requiredWork===recipe.duration&&JSON.stringify(c.inputs)===JSON.stringify(recipe.input));number(c.workDone,0,c.requiredWork);number(c.progress,0,100);check(Math.abs(c.progress-100*c.workDone/c.requiredWork)<1e-7);number(c.startedAt,0,s.time.totalElapsed);
+      check(!r.outputReservation&&c.state==='building'&&!!started);number(c.workDone,0,c.requiredWork);number(c.progress,0,100);check(Math.abs(c.progress-100*c.workDone/c.requiredWork)<1e-7);number(c.startedAt,0,s.time.totalElapsed);
       check(c.contributions&&typeof c.contributions==='object');let total=0;for(const [id,work]of Object.entries(c.contributions)){check(s.workers?.some(w=>w.id===id));number(work,0,c.requiredWork);total+=work;}check(Math.abs(total-c.workDone)<1e-5);
       capacity(c.outputReservation,c.id,outId,outAmount);
     }else if(r.outputReservation){const cap=reservations.get(r.outputReservation);capacity(r.outputReservation,cap?.owner,outId,outAmount);check((locations.get(`output-${b.id}`).stock[outId]??0)>=outAmount);}

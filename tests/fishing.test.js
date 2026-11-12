@@ -78,9 +78,10 @@ test('fish stocks and a Fisher mid-trip survive Save/Load; corrupt fishing state
   const r=workerScene(data.terrain,{naturalResources:true,construction:true,logistics:true,starter:false});r.groundGrid=s.groundGrid;r.fishing=new FishingSystem(r);loadGameState(r,data);
   assert.equal(r.fishing.stocks.get(0),321.5);const loaded=r.workerSystem.workers.get(w.id);assert.equal(loaded.workTask.kind,'fish');assert.equal(loaded.workTask.caught,w.workTask.caught);
   assert.equal(r.workerSystem.reservations.owners.get(loaded.workTask.reservation),w.id);
-  for(const corrupt of [d=>d.fishing.stocks[0][1]=401,d=>d.fishing.stocks.push([1,10]),d=>d.fishing.catches.push([999,1,1]),d=>{const x=d.workers.find(x=>x.id===w.id);x.workTask.caught=FISHING.basket;},d=>{const x=d.workers.find(x=>x.id===w.id);x.workTask.depth=1;}]){
+  for(const corrupt of [d=>d.fishing.stocks[0][1]=401,d=>d.fishing.stocks.push([1,10]),d=>{const x=d.workers.find(x=>x.id===w.id);x.workTask.caught=FISHING.basket;},d=>{const x=d.workers.find(x=>x.id===w.id);x.workTask.depth=1;}]){
     const copy=JSON.parse(JSON.stringify(data));corrupt(copy);assert.throws(()=>validateGameState(copy));
   }
+  {const copy=JSON.parse(JSON.stringify(data));copy.fishing.catches.push([999,1,1]);assert.equal(validateGameState(copy).fishing.catches.some(r=>r[0]===999),false,'m-ukladani-chyba: the count of a hut that is gone drops out');}
 });
 
 test('the Fishers use the nearest reachable shore by walking distance, with no radius; far away means fewer fish a day',()=>{

@@ -91,6 +91,6 @@ export default {
   'object.haystack.name':"Kupka sena",'object.haystack.description':"Kupka sena u farmy (do 6 políček od statku nebo pšeničného pole). Děti do ní skáčou.",
   'object.well.name':"Studna",'object.well.description':"Kamenná studna. Domy do 6 políček: +1 ke spokojenosti.",
   'object.village_green.name':"Náves",'object.village_green.description':"Travnaté prostranství s lípou, kde si hrají děti a večer se scházejí sousedé. Domy do 10 políček: +4 ke spokojenosti, rodinné domy ještě +2.",'object.village_green.unlock':"Náves jde postavit až po dokončeném Domě.",
-  'object.marketplace.name':'Tržiště','object.marketplace.description':'Náměstí se stánky, kde budou obchodovat kupecké karavany. Prostor na zboží pro 80 jednotek a 2 nakládací místa.','object.marketplace.unlock':'Tržiště jde postavit až po dokončeném Skladu.',
+  'object.marketplace.name':'Tržiště','object.marketplace.description':'Náměstí se stánky, kde budou obchodovat kupecké karavany. Prostor na zboží pro 80 jednotek a 2 nakládací místa.',
   'object.wall_gate.name':'Brána','object.wall_gate.description':'Brána ve zdi: lidé jí procházejí a z ní se vystupuje na hradby.',
 };

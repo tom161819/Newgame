@@ -38,5 +38,7 @@ export function validateRockMining(s,registry,{check,integer,number,array}){
       else{check(kind==='bush'&&bushes.has(id));const [x,y]=id.split(',').map(Number);check(Math.abs(x-t.goal.x)+Math.abs(y-t.goal.y)<=1);}
     }
   }
-  check(lent<=1);
+  // m-hornici-oznacene-skaly: several Miners may be lent out, but one of each workplace stays at home.
+  if(lent){const home=new Map(),away=new Map();for(const w of s.workers??[])if(w.profession==='miner'&&w.assignedWorkplaceId!=null){const m=w.clearingLoan?away:home;m.set(w.assignedWorkplaceId,(m.get(w.assignedWorkplaceId)??0)+1);}
+    for(const id of away.keys())check((home.get(id)??0)>=1);}
 }

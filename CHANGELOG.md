@@ -5,6 +5,24 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.101.0] - 2026-11-12
+<!-- version: {"title":"Saving fixed; stores, Barracks limit, miners and pitch maker","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Fixed
+- Saving works again. Saves were refused after a Hunter killed a wolf, after a workplace, Fisherman's Hut or house burnt down, after a resident died in his sleep, after a soldier in a squad left the army, and 20 days after the last caravan. Saves with a workshop mid-batch made before the Pitch Kiln change in 0.99.0 load again (the batch finishes as it started).
+- A failed save says which part failed and tries again up to 3 times; the Dev tool can download the failed data for a bug report.
+
+### Added
+- Stores (Warehouse, Material Yard, Granary, Armory, Starter Stockpile) list what is stored there, also goods at 0, and say when nobody makes a good yet ("Pitch – nobody makes it (build: Pitch Kiln)"), with a line on where other goods belong.
+- Barracks: a slider sets how many places automatic employment fills (default 4 of 12). Placing a soldier by hand may go above it; lowering it dismisses nobody.
+
+### Changed
+- The Marketplace no longer needs a Warehouse.
+- Keys + and − make the game faster or slower (pause, 1×, 2×, 3×).
+- Marked rocks come first: Quarry and Mine Miners go to break them, nearest first, as many as there are rocks; one Miner always stays in each workplace. A lent Miner keeps his workplace and wage.
+- When a Quarry, Mine or Lumberjack Hut pile is full and no Hauler comes, one of its workers carries a load to the store and works on.
+- The Pitch Maker fetches his Wood and carries Pitch and Torches to the store himself; Haulers no longer work for the Pitch Kiln.
+- Your own buildings can be opened and hovered also in the grey fog (explored ground out of sight).
+
 ## [0.100.0] - 2026-11-12
 <!-- version: {"title":"Army squads","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

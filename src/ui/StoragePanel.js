@@ -12,6 +12,14 @@ import { createPolicySlider } from './PolicySliders.js';
 export const STORAGE_GROUPS=Object.freeze(['materials','food','equipment']);
 export function storageGroup(resource,registry){return FOOD_RESOURCE_IDS.includes(resource)?'food':equipmentResources(registry).includes(resource)?'equipment':'materials';}
 
+// m-sklady-co-patri (owner, 12 Nov): a store says what it takes, with the amount of each (also 0), and why a good is
+// not coming (nobody makes it yet); one line says where the other goods belong.
+export const PRODUCERS=Object.freeze({wood:['lumberjack_hut'],stone:['quarry'],iron_ore:['iron_mine'],iron:['smelter'],pitch:['pitch_kiln'],torch:['pitch_kiln'],
+  wheat:['wheat_field'],flour:['mill'],bread:['bakery'],apple:['orchard'],meat:['hunting_lodge'],fish:['fisherman_hut'],sword:['swordsmith'],bow:['bowyer'],armor:['armorer']});
+export function storeAccepts(scene,location){
+  const complete=type=>scene.buildings.some(b=>b.type===type&&(b.construction?.state??'complete')==='complete');
+  return location.allowed.map(resource=>{const makers=PRODUCERS[resource]??[],made=!makers.length||makers.some(complete);return {resource,count:location.stock[resource]??0,missing:made?null:makers[0]};});
+}
 export class StoragePanel {
   constructor(scene){
     this.scene=scene;this.dialog=document.querySelector('#storage-dialog');this.controller=new AbortController();const options={signal:this.controller.signal};
@@ -90,7 +98,15 @@ export class StoragePanel {
     const wrap=element('div','storage-table-wrap');wrap.append(table);
     if(!table.children.length)wrap.append(element('p','storage-empty',t('storage.empty')));
     else if(hidden)wrap.append(element('p','storage-hidden',t('storage.hiddenEmpty',{count:hidden})));
+    if(this.building)wrap.append(this.accepts(l));
     return wrap;
+  }
+  accepts(l){
+    const scene=this.scene,registry=scene.objectRegistry,box=element('div','storage-accepts');box.dataset.storageAccepts=l.id;box.append(element('h4','',t('storage.accepts')));
+    const list=element('ul','storage-accepts-list');
+    for(const row of storeAccepts(scene,l)){const d=registry.require(row.resource),li=element('li',row.missing?'storage-accept missing':'storage-accept');li.dataset.acceptResource=row.resource;
+      li.append(this.icon(d),element('span','',`${d.name} ${row.count}`));if(row.missing)li.append(element('small','',t('storage.noMaker',{building:registry.get(row.missing)?.name??row.missing})));list.append(li);}
+    box.append(list);const key=`storage.elsewhere.${this.building?.type}`,text=t(key);if(text&&text!==key)box.append(element('p','storage-elsewhere',text));return box;
   }
   close(){this.confirmingStockpile=false;this.dialog.close();this.scene.setGalleryInput(true);}
   destroy(){this.close();this.controller.abort();this.rationSlider?.destroy();}

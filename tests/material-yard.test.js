@@ -38,7 +38,7 @@ test('an Iron Mine fills its output pile; a Hauler carries the ore to the Materi
   assert.equal(s.inventory.count('iron_ore'),3);assert.ok(h.skills.logistics.totalXP>0);assert.equal(s.workplaceSystem.records.get(mine.id).delivered.iron_ore,3);assert.equal(s.foodStorage.reservations.size,0);validateGameState(serializeGameState(s));
 });
 test('a full Quarry pile stops mining ("Output pile full"), survives Save/Load, and without a yard Haulers empty it into the Starter Stockpile',()=>{
-  const s=fixture(),rock=deposit(s,'stone_deposit',{x:49,y:44},80),quarry=building(s,'quarry',{x:47,y:43}),pile=`pile-${quarry.id}`,miner=person(s,'miner',quarry);
+  const s=fixture(),rock=deposit(s,'stone_deposit',{x:49,y:44},80),quarry=building(s,'quarry',{x:47,y:43}),pile=`pile-${quarry.id}`,miner=person(s,'miner',quarry);s.foodProduction.carryOwnOutput=()=>false;/* m-pracovnici-odnaseji-vyrobky: here as if no store had room */
   s.foodStorage.deposit(pile,'stone',LOGISTICS_RULES.outputPileCapacity);s.simulate(20000);assert.equal(rock.natural.remaining,80);assert.equal(miner.workTask,null);assert.equal(miner.workMessage,'Output pile full');
   const saved=validateGameState(serializeGameState(s));assert.equal(saved.saveVersion,SAVE_VERSION);const r=fixture(false);loadGameState(r,saved);assert.deepEqual(serializeGameState(r),saved);assert.equal(stock(r,pile,'stone'),LOGISTICS_RULES.outputPileCapacity);
   const before=stock(r,starterId(r),'stone');person(r,'hauler');until(r,()=>r.naturalResources.byId.get(rock.natural.id).natural.remaining<80&&stock(r,starterId(r),'stone')>=before+LOGISTICS_RULES.outputPileCapacity);validateGameState(serializeGameState(r));

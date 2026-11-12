@@ -9,7 +9,7 @@ import { exportDevBalance,validDevBalanceState,devRange } from '../data/devBalan
 import { validNoticeState } from '../data/diagnostics.js';
 import { validLightFuelState } from './LightFuelSystem.js';
 import { validateRockMining } from './RockMiningState.js';
-import { CARAVAN_RULES,MERCHANT_TYPES,validateAutoTrade } from '../data/trade.js';
+import { CARAVAN_RULES,MERCHANT_TYPES,PRICE_MODEL,validateAutoTrade } from '../data/trade.js';
 import { ORDER_STATUSES,validateTradeStats } from './TradeSystem.js';
 import { validateDomesticState } from './DomesticAnimalSystem.js';
 import { validateChildrenState } from './ChildrenSystem.js';
@@ -121,7 +121,7 @@ export function serializeGameState(scene){
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
     ...(scene.workerSystem?{population:scene.workerSystem.exportState(),workers:[...scene.workerSystem.workers.values()].map(w=>({...serializeActor(w),commandState:copy(w.commandState??{state:'Working',goal:null}),name:w.name,...(w.identity?{identity:copy(w.identity)}:{}),profession:w.profession,displayProfession:w.displayProfession,manualRockId:w.manualRockId,isSubject:w.isSubject!==false,diedAt:w.diedAt??null,
       ...(w.naturalTalent?{naturalTalent:w.naturalTalent,initialSkills:copy(w.initialSkills)}:{}),
-      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),...(w.haulPriority&&w.haulPriority.kind!=='any'?{haulPriority:copy(w.haulPriority)}:{}),...(Number.isInteger(w.squad)?{squad:w.squad}:{}),workplaceReached:w.workplaceReached,...(w.restPhase?{restPhase:w.restPhase}:{}),...(w.tendTorches?{tendTorches:true}:{}),...(w.clearingLoan?{clearingLoan:true}:{}),cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
+      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),...(w.haulPriority&&w.haulPriority.kind!=='any'?{haulPriority:copy(w.haulPriority)}:{}),...(Number.isInteger(w.squad)&&w.profession==='soldier'?{squad:w.squad}:{}),workplaceReached:w.workplaceReached,...(w.restPhase&&w.isAlive&&w.isSubject?{restPhase:w.restPhase}:{}),...(w.tendTorches?{tendTorches:true}:{}),...(w.clearingLoan&&w.isAlive&&w.isSubject&&w.profession==='miner'&&w.assignedWorkplaceId!=null?{clearingLoan:true}:{}),cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
       workState:w.workState,workMessage:w.workMessage??'',workTask:copy(w.workTask),assignedWorkplaceId:w.assignedWorkplaceId,arriving:w.arriving,aiCooldown:w.aiCooldown}))}:{}),
     ...(scene.pathWear?{pathWear:scene.pathWear.exportState()}:{}),
     player:{...serializeActor(c),state:c.state,currentTowerId:c.currentTower?.id??null,horseId:c.mountedHorse?.id??null,
@@ -131,7 +131,7 @@ export function serializeGameState(scene){
       render:{x:scene.player.x,y:scene.player.y,depth:scene.player.depth},
       transition:c.transitioning?{remaining:Math.max(1,(c.transitionTween?.duration??900)-(c.transitionTween?.elapsed??0))}:null},
     inventory:scene.inventory.exportState(),equipment:scene.equipment.exportState(),
-    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.burntFrom?{burntFrom:b.burntFrom}:{}),...(buildingDefinition(b).crop?{farmId:b.farmId??null}:{}),...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.depleted?{depleted:true}:{}),...(b.unverified?{unverified:true}:{}),...(b.type==='wall_gate'&&['x','y'].includes(b.gateAxis)?{gateAxis:b.gateAxis}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.demolition?{demolition:copy(b.demolition)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
+    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.burntFrom?{burntFrom:b.burntFrom}:{}),...(buildingDefinition(b).crop?{farmId:b.farmId??null}:{}),...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.depleted?{depleted:true}:{}),...(b.unverified?{unverified:true}:{}),...(b.type==='wall_gate'&&['x','y'].includes(b.gateAxis)?{gateAxis:b.gateAxis}:{}),...(b.type==='barracks'&&Number.isInteger(b.autoHire)?{autoHire:b.autoHire}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.demolition?{demolition:copy(b.demolition)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
     resources:[...scene.resources.values()].map(v=>({type:v.getData('objectId'),tile:point(v.getData('tile')),...(v.getData('object').natural?{natural:copy(v.getData('object').natural)}:{})})),
     drops:[...scene.dropSystem.drops.values()].map(d=>({id:d.id,resource:d.resource,tile:point(d.tile),amount:d.amount,rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0),haulEligible:d.haulEligible!==false,...(d.siteId!=null?{siteId:d.siteId}:{})})),
     animals:[...scene.animalSystem.animals.values()].map(a=>({...serializeActor(a),retaliationId:a.retaliationTarget?.id??null})),
@@ -163,7 +163,8 @@ export function saveSchemaStatus(input){
 // Validace proběhne ještě před zastavením právě běžící scény. Poškozený save
 // proto nemění současný svět ani záznam v IndexedDB.
 export function validateGameState(input,registry=objectRegistry){
-  const fail=()=>{throw new Error(t('saves.corrupt'));};
+  // m-ukladani-chyba: which part of the save failed, so the message (and a bug report) can say where.
+  let part='header';const fail=()=>{const error=new Error(`${t('saves.corrupt')} [${part}]`);error.savePart=part;throw error;};
   const check=value=>{if(!value)fail();};
   const number=(n,min=0,max=Number.MAX_SAFE_INTEGER)=>check(Number.isFinite(n)&&n>=min&&n<=max);
   const integer=(n,min=0,max=Number.MAX_SAFE_INTEGER)=>{number(n,min,max);check(Number.isInteger(n));};
@@ -184,7 +185,7 @@ export function validateGameState(input,registry=objectRegistry){
   if(s.groundLook!==undefined){try{s.groundLook=validateGroundLook(s.groundLook);}catch{fail();}}
   const dayDuration=s.gameSettings.dayLengthSeconds*1000;
   s.wildlifeRespawn??={elapsed:0};number(s.wildlifeRespawn.elapsed,0,(WILDLIFE_INTERVALS[s.gameSettings.wildlifeRespawn]||1)-1e-7);
-  array(s.terrain,ROWS);check(s.terrain.length===ROWS);for(const row of s.terrain){array(row,COLUMNS);check(row.length===COLUMNS&&row.every(n=>n===0||n===1));}
+  part='terrain';array(s.terrain,ROWS);check(s.terrain.length===ROWS);for(const row of s.terrain){array(row,COLUMNS);check(row.length===COLUMNS&&row.every(n=>n===0||n===1));}
   // #100 ground layer (water has no rock) and bushes (open ground, one per tile).
   s.ground??=exportGround(emptyGround());s.bushes??=[];check(validGroundRows(s.ground));const ground=importGround(s.ground),open=(x,y)=>s.terrain[y]?.[x]===0&&!isWaterGround(ground[y]?.[x]);
   for(let y=0;y<ROWS;y++)for(let x=0;x<COLUMNS;x++)if(isRiverGround(ground[y][x]))check(s.terrain[y][x]===0);
@@ -206,10 +207,12 @@ export function validateGameState(input,registry=objectRegistry){
   const siteAssignments=new Set();
   // A provisional site (placed outside sight) claims no tiles until verified: it may lie over hidden terrain or resources.
   const provisional=new Set();
-  for(const b of s.buildings){integer(b.id,1);const d=definition(b.type,'building');check(d.buildable||d.starter||d.pavement||d.id==='burnt_ruins');if(d.id==='burnt_ruins')check(buildingIsComplete(b));if(d.starter)check(buildingIsComplete(b));if(d.pavement)check(!buildingIsComplete(b));
+  part='buildings';for(const b of s.buildings){integer(b.id,1);const d=definition(b.type,'building');check(d.buildable||d.starter||d.pavement||d.id==='burnt_ruins');if(d.id==='burnt_ruins')check(buildingIsComplete(b));if(d.starter)check(buildingIsComplete(b));if(d.pavement)check(!buildingIsComplete(b));
     check(b.unverified===undefined||b.unverified===true&&b.construction?.state==='planned'&&!b.depositId);
     // m-staveni-zdi-studna (59): optional Gate axis chosen with R (older saves have none: 'y').
     check(b.gateAxis===undefined||b.type==='wall_gate'&&['x','y'].includes(b.gateAxis));
+    // m-kasarna-limit-zamestnani: optional automatic-employment limit of a Barracks (older saves: the default 4).
+    if(b.autoHire!==undefined){check(b.type==='barracks');integer(b.autoHire,0,d.workplace?.capacity??0);}
     check(b.burntFrom===undefined||b.type==='burnt_ruins'&&typeof b.burntFrom==='string'&&definition(b.burntFrom,'building')?.id===b.burntFrom);
     if(b.unverified){tile(b);for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){const x=b.x+dx,y=b.y+dy,key=`${x},${y}`;check(s.terrain[y]?.[x]!==undefined&&!provisional.has(key));provisional.add(key);}}
     // #150: a pavement site may lie on the floor of a finished building (not farmland); it claims no tile of its own.
@@ -253,7 +256,7 @@ export function validateGameState(input,registry=objectRegistry){
   }
   for(const key of provisional)check(!occupied.has(key));
   repairTransportInstructions(s,registry,check);
-  const natural=s.naturalResources;check(natural&&Object.keys(natural).every(key=>['nextId','nextDepositId','growthClock','ageClock','refreshElapsed','kingTask','rockMining'].includes(key)));integer(natural.nextId,1);integer(natural.nextDepositId,1);number(natural.ageClock,0,s.time.totalElapsed/dayDuration+1e-6);number(natural.growthClock,0,natural.ageClock*1.25*devRange('forestGrowth').max+1e-6);/* m-drevorubci-stromy: Dev forest growth up to ×4 */number(natural.refreshElapsed,0,FORESTRY.refreshInterval);check(natural.refreshElapsed<FORESTRY.refreshInterval);
+  part='nature';const natural=s.naturalResources;check(natural&&Object.keys(natural).every(key=>['nextId','nextDepositId','growthClock','ageClock','refreshElapsed','kingTask','rockMining'].includes(key)));integer(natural.nextId,1);integer(natural.nextDepositId,1);number(natural.ageClock,0,s.time.totalElapsed/dayDuration+1e-6);number(natural.growthClock,0,natural.ageClock*1.25*devRange('forestGrowth').max+1e-6);/* m-drevorubci-stromy: Dev forest growth up to ×4 */number(natural.refreshElapsed,0,FORESTRY.refreshInterval);check(natural.refreshElapsed<FORESTRY.refreshInterval);
   const resourceTiles=new Set(),treeIds=new Map(),depositIds=new Map();
   for(const r of s.resources){const d=definition(r.type,'resource');tile(r.tile);
     if(d.tree){const n=r.natural;check(n&&n.kind==='tree'&&Object.keys(n).every(key=>['id','kind','stage','ageDays','growthDays','cycle','workDone','growthCheckpoint','ageCheckpoint'].includes(key)));const id=String(n.id).match(/^tree-([1-9]\d*)$/);check(id&&Number(id[1])<natural.nextId&&!treeIds.has(n.id));treeIds.set(n.id,r);integer(n.stage,0,3);integer(n.cycle,0);number(n.ageDays);number(n.growthDays,0,n.stage===3?0:FORESTRY.stageDays[n.stage]);number(n.workDone,0,n.stage===3?Math.max(d.tree.chopDuration*(s.devBalance?.chopTime??1),FORESTRY.legacyChopDuration):0);/* m-drevorubci-stromy: the save's chopping time */number(n.growthCheckpoint,0,natural.growthClock+1e-8);number(n.ageCheckpoint,0,natural.ageClock+1e-8);}
@@ -271,12 +274,12 @@ export function validateGameState(input,registry=objectRegistry){
   }
   for(const r of depositIds.values())if(r.natural.boundBuildingId!=null)check(boundDeposits.has(r.natural.id));
   if(natural.kingTask!=null){const task=natural.kingTask,r=treeIds.get(task.treeId);check(r&&r.natural.stage===3&&!s.player.horseId&&typeof task.arrived==='boolean'&&Object.keys(task).every(key=>['treeId','goal','arrived'].includes(key)));tile(task.goal);check(Math.abs(task.goal.x-r.tile.x)+Math.abs(task.goal.y-r.tile.y)===1);}
-  for(const c of s.chests){check(typeof c.id==='string');occupy(c.tile);solid.add(`${c.tile.x},${c.tile.y}`);check(!resourceTiles.has(`${c.tile.x},${c.tile.y}`));
+  part='chests';for(const c of s.chests){check(typeof c.id==='string');occupy(c.tile);solid.add(`${c.tile.x},${c.tile.y}`);check(!resourceTiles.has(`${c.tile.x},${c.tile.y}`));
     check(typeof c.opened==='boolean'&&typeof c.opening==='boolean'&&typeof c.looted==='boolean'&&(!c.looted||c.opened));
     integer(c.contents?.gold,50,100);array(c.contents?.equipment,10);for(const id of c.contents.equipment)definition(id,'equipment');
     if(c.opening){number(c.animation?.elapsed,0,350);if(c.animation.lid){number(c.animation.lid.y,-100,100);number(c.animation.lid.rotation,-10,10);}}
   }
-  for(const d of s.drops){check(typeof d.id==='string');check(definition(d.resource,'resource').collectible);tile(d.tile);integer(d.amount,1);d.rewardRemaining??=1;number(d.rewardRemaining);d.rewardUnits??=d.resource==='stone'?d.amount:0;number(d.rewardUnits,0,d.amount);check(open(d.tile.x,d.tile.y)&&!solid.has(`${d.tile.x},${d.tile.y}`));}
+  part='drops';for(const d of s.drops){check(typeof d.id==='string');check(definition(d.resource,'resource').collectible);tile(d.tile);integer(d.amount,1);d.rewardRemaining??=1;number(d.rewardRemaining);d.rewardUnits??=d.resource==='stone'?d.amount:0;number(d.rewardUnits,0,d.amount);check(open(d.tile.x,d.tile.y)&&!solid.has(`${d.tile.x},${d.tile.y}`));}
   const skillsState=skills=>{
     check(skills&&typeof skills==='object'&&!Array.isArray(skills)&&Object.keys(skills).length===SKILL_IDS.length);
       for(const id of SKILL_IDS){const e=skills[id];check(e&&typeof e.enabled==='boolean');integer(e.maxLevel,1,50);integer(e.level,1,e.maxLevel);number(e.gainMultiplier,0,1e6);number(e.currentXP);number(e.totalXP,0,totalXPForLevel(e.maxLevel));
@@ -303,16 +306,16 @@ export function validateGameState(input,registry=objectRegistry){
       check(a.activitySkill==null||SKILL_IDS.includes(a.activitySkill));
     }
   };
-  const p=s.player;actor(p);check(p.id==='king'&&p.type==='king'&&p.isAlive);
+  part='king';const p=s.player;actor(p);check(p.id==='king'&&p.type==='king'&&p.isAlive);
   check(['ground','enteringTower','onTower','onWall','exitingTower'].includes(p.state));
   check(p.currentTowerId==null||bIds.has(p.currentTowerId));check(p.horseId==null||aIds.has(p.horseId));
   if(p.state!=='ground')check(bIds.has(p.currentTowerId)&&buildingIsComplete(s.buildings.find(b=>b.id===p.currentTowerId))&&!p.horseId);
   if(p.exitTile)tile(p.exitTile);
   if(['enteringTower','exitingTower'].includes(p.state)){number(p.transition?.remaining,1,900);if(p.state==='exitingTower')tile(p.exitTile);}
   number(p.render?.x,-1e6,1e6);number(p.render?.y,-1e6,1e6);number(p.render?.depth,-1e6,1e6);
-  for(const a of s.animals){definition(a.type,'animal');check(typeof a.id==='string');actor(a);number(a.wanderWait,-1e9,1e9);check(a.retaliationId==null||a.retaliationId==='king'||wIds.has(a.retaliationId));if(a.mounted)check(p.horseId===a.id&&a.type==='horse');}
+  part='animals';for(const a of s.animals){definition(a.type,'animal');check(typeof a.id==='string');actor(a);number(a.wanderWait,-1e9,1e9);check(a.retaliationId==null||a.retaliationId==='king'||wIds.has(a.retaliationId));if(a.mounted)check(p.horseId===a.id&&a.type==='horse');}
   const depositClaims=new Map(),reservations=new Set(natural.kingTask?[`natural:${natural.kingTask.treeId}`]:[]);
-  if(s.workers!==undefined){
+  part='workers';if(s.workers!==undefined){
     integer(s.population?.nextId,1);integer(s.population.lastMigrationDay,1,s.time?.day??Number.MAX_SAFE_INTEGER);
     if(s.population.deceased!==undefined){array(s.population.deceased,50);for(const d of s.population.deceased){check(d&&['cause,day,name,profession','cause,day,identity,name,profession'].includes(Object.keys(d).sort().join())&&(d.identity===undefined||validIdentity(d.identity))&&typeof d.name==='string'&&d.name.length<100&&Object.hasOwn(JOBS,d.profession)&&/^(wounds|killed:[a-z_]{1,40})$/.test(d.cause));integer(d.day,1);}}
     const identities=new Set();
@@ -384,12 +387,12 @@ export function validateGameState(input,registry=objectRegistry){
       if(w.workplaceReached!==undefined)check(typeof w.workplaceReached==='boolean');
       if(w.cargo){check(w.isAlive&&(w.assignedWorkplaceId!=null||(['hauler','builder'].includes(w.profession)||w.profession==='miner'&&w.cargo.rockId!=null))&&definition(w.cargo.resource).category==='resource'&&w.cargo.resource!=='gold');integer(w.cargo.amount,1,s.foodStorage?.physicalMaterials||s.foodStorage&&FOOD_RESOURCE_IDS.includes(w.cargo.resource)?carryCapacity({...w,vehicleType:s.vehicles?.vehicles.find(v=>v.operatorId===w.id&&v.state==='inUse')?.type??null},w.cargo.resource):Number.MAX_SAFE_INTEGER);if(w.cargo.transportCancelled!==undefined)check(typeof w.cargo.transportCancelled==='boolean');}
       if(w.pendingWorkRewards!==undefined){array(w.pendingWorkRewards,10000);for(const event of w.pendingWorkRewards){
-        check(w.isAlive&&w.assignedWorkplaceId!=null);check((event.type==='resourceCollected'&&event.objectType==='stone')||(event.type==='dropCollected'&&event.objectType==='meat')||(event.type==='animalKilled'&&['rabbit','deer','wild_boar'].includes(event.objectType)));integer(event.quantity??1,1);if(event.contributionRatio!==undefined)number(event.contributionRatio);
+        check(w.isAlive&&w.assignedWorkplaceId!=null);check((event.type==='resourceCollected'&&event.objectType==='stone')||(event.type==='dropCollected'&&event.objectType==='meat')||(event.type==='animalKilled'&&registry.get(event.objectType)?.category==='animal')/* m-ukladani-chyba: a Hunter who kills a wolf or a fox keeps that reward too */);integer(event.quantity??1,1);if(event.contributionRatio!==undefined)number(event.contributionRatio);
       }}
     }
   }
-  if(s.fishing!==undefined)validateFishingState(s.fishing,{bodies:waterBodies(ground).bodies,buildingIds:new Set(s.buildings.filter(b=>b.type==='fisherman_hut').map(b=>b.id)),check,integer,number});
-  if(s.workplaces!==undefined){
+  part='fishing';if(s.fishing!==undefined)validateFishingState(s.fishing,{bodies:waterBodies(ground).bodies,buildingIds:new Set(s.buildings.filter(b=>b.type==='fisherman_hut').map(b=>b.id)),check,integer,number});
+  part='workplaces';if(s.workplaces!==undefined){
     array(s.workplaces?.records);const recorded=new Set(),assigned=new Set();
     for(const record of s.workplaces.records){
       check(bIds.has(record.buildingId)&&!recorded.has(record.buildingId));recorded.add(record.buildingId);
@@ -402,7 +405,7 @@ export function validateGameState(input,registry=objectRegistry){
     check(s.buildings.filter(b=>buildingIsComplete(b)&&definition(b.type).workplace).every(b=>recorded.has(b.id)));
     for(const worker of s.workers??[])if(worker.assignedWorkplaceId!=null)check(assigned.has(worker.id));
   }
-  if(s.constructionSystem!==undefined){
+  part='construction';if(s.constructionSystem!==undefined){
     const c=s.constructionSystem;check(c);integer(c.nextId,Math.max(0,...s.buildings.map(b=>b.id))+1);
     check(c.kingSiteId==null||bIds.has(c.kingSiteId));
     if(c.kingSiteId!=null){const site=s.buildings.find(b=>b.id===c.kingSiteId);check(!buildingIsComplete(site)&&!definition(site.type).crop&&site.construction.assignedBuilders.includes('king'));tile(c.kingGoal);check(towerNeighbors(pavementHost(s.buildings,site,registry)??site).some(p=>p.x===c.kingGoal.x&&p.y===c.kingGoal.y));check(!reservations.has(`construction-slot:${c.kingGoal.x},${c.kingGoal.y}`));}
@@ -410,7 +413,7 @@ export function validateGameState(input,registry=objectRegistry){
     for(const id of siteAssignments)if(id!=='king'){const w=s.workers?.find(w=>w.id===id);check(w?.isAlive&&['build','dismantle'].includes(w.workTask?.kind)&&['builder','farmer'].includes(w.profession));}
   }else check(!s.buildings.some(b=>!buildingIsComplete(b)));
   const plots=s.buildings.filter(b=>buildingIsComplete(b)&&definition(b.type).crop);
-  if(s.farming!==undefined){
+  part='farming';if(s.farming!==undefined){
     const f=s.farming;check(f&&f.clocks&&typeof f.clocks==='object'&&Object.keys(f.clocks).length===Object.keys(FARMING_RULES.crops).length);
     for(const id of Object.keys(FARMING_RULES.crops))number(f.clocks[id]);number(f.refreshElapsed,0,FARMING_RULES.refreshInterval);array(f.records);check(f.records.length===plots.length);const recorded=new Set();
     for(const r of f.records){const plot=plots.find(b=>b.id===r.buildingId);check(plot&&!recorded.has(r.buildingId));recorded.add(r.buildingId);const crop=definition(plot.type).crop;
@@ -423,16 +426,16 @@ export function validateGameState(input,registry=objectRegistry){
     if(o.kind==='enter')check(bIds.has(o.buildingId)&&buildingIsComplete(s.buildings.find(b=>b.id===o.buildingId)));if(o.kind==='approachAnimal')check(aIds.has(o.animalId));if(o.kind==='drop')check(dIds.has(o.dropId));
     if(o.kind==='openChest')check(cIds.has(o.chestId));if(o.kind==='collect')check(s.resources.some(r=>`${r.tile.x},${r.tile.y}`===o.resourceKey));};
   order(p.order);if(p.roofContinuation){order(p.roofContinuation.order);tile(p.roofContinuation.exit);tile(p.roofContinuation.destination);array(p.roofContinuation.path);p.roofContinuation.path.forEach(tile);}
-  check(s.inventory&&typeof s.inventory==='object');for(const [id,count]of Object.entries(s.inventory)){const d=definition(id);check(['resource','equipment'].includes(d.category));if(id==='gold')number(count);else integer(count);}
+  part='inventory';check(s.inventory&&typeof s.inventory==='object');for(const [id,count]of Object.entries(s.inventory)){const d=definition(id);check(['resource','equipment'].includes(d.category));if(id==='gold')number(count);else integer(count);}
   check(s.equipment&&Object.keys(s.equipment).length===2);for(const slot of ['weapon','armor'])if(s.equipment[slot]!=null){const id=s.equipment[slot];check(definition(id,'equipment').equipment.slot===slot&&(s.inventory[id]??0)>0);}
-  integer(s.time?.day,1);number(s.time.elapsed,0,dayDuration-1e-7);number(s.time.totalElapsed);check(Math.abs(s.time.totalElapsed-((s.time.day-1)*dayDuration+s.time.elapsed))<.01);
+  part='time';integer(s.time?.day,1);number(s.time.elapsed,0,dayDuration-1e-7);number(s.time.totalElapsed);check(Math.abs(s.time.totalElapsed-((s.time.day-1)*dayDuration+s.time.elapsed))<.01);
   s.time.compensation??=0;number(s.time.compensation,-1e-6,1e-6);
-  validateResourceLedger(s.resourceLedger,registry,s.time,dayDuration,{check,number,integer,array});
+  part='ledger';validateResourceLedger(s.resourceLedger,registry,s.time,dayDuration,{check,number,integer,array});
   number(s.food?.elapsed,0,(s.food?.residents?dayDuration/2:registry.require('meat').consumption.interval)-1e-7);
   const spawnIds=new Set();for(const t of s.spawners){const d=definition(t.id,'resource');check(d.spawn&&!spawnIds.has(t.id));spawnIds.add(t.id);number(t.elapsed,0,d.spawn.interval-1e-7);}
   check(registry.byCategory('resource').filter(d=>d.spawn).every(d=>spawnIds.has(d.id)));
   integer(s.production?.lastProcessedDay,1,s.time.day);
-  if(s.wages!==undefined){
+  part='wages';if(s.wages!==undefined){
     const wages=s.wages;check(wages&&s.workers);integer(wages.lastProcessedDay,1,s.time.day);check(wages.lastProcessedDay===s.time.day);
     check(wages.accruals&&typeof wages.accruals==='object'&&!Array.isArray(wages.accruals));
     for(const [id,cost]of Object.entries(wages.accruals)){check(wIds.has(id)&&cost);number(cost.rateMilliseconds,0,s.time.elapsed*6+1e-6);number(cost.compensation,-1e-6,1e-6);}
@@ -446,7 +449,7 @@ export function validateGameState(input,registry=objectRegistry){
     array(w.paved,COLUMNS*ROWS);for(let i=0;i<w.paved.length;i++){integer(w.paved[i],0,COLUMNS*ROWS-1);if(i)check(w.paved[i]>w.paved[i-1]);check(open(w.paved[i]%COLUMNS,Math.floor(w.paved[i]/COLUMNS)));}
     for(let i=0;i<COLUMNS*ROWS;i++){integer(w.scores[i]);integer(w.levels[i],0,4);integer(w.lastPassDays[i],0,s.time.day);check(w.levels[i]===wearLevel(w.scores[i]));if(w.scores[i])check(w.lastPassDays[i]>0);}
   }
-  number(s.camera?.zoom,MIN_ZOOM,MAX_ZOOM);number(s.camera.x,-1e6,1e6);number(s.camera.y,-1e6,1e6);check(typeof s.camera.following==='boolean');
+  part='camera';number(s.camera?.zoom,MIN_ZOOM,MAX_ZOOM);number(s.camera.x,-1e6,1e6);number(s.camera.y,-1e6,1e6);check(typeof s.camera.following==='boolean');
   check(typeof s.settings?.fogOfWar==='boolean');if(s.settings.pathWearDebug!==undefined)check(typeof s.settings.pathWearDebug==='boolean');const c=s.commands;check(c);check(c.hunt==null||aIds.has(c.hunt));check(c.mount==null||aIds.has(c.mount));
   number(c.huntRepath,-1e9,1e9);number(c.mountRepath,-1e9,1e9);check(c.pendingChest==null||cIds.has(c.pendingChest));array(c.attacks,1000);
   for(const pair of c.attacks){array(pair,2);check(pair.length===2&&pair[0]!==pair[1]&&pair.every(id=>unitIds.has(id)));}
@@ -455,26 +458,26 @@ export function validateGameState(input,registry=objectRegistry){
     for(const object of objects){const match=String(object.id).match(new RegExp(`^${prefix}-(\\d+)$`));check(match&&Number(match[1])>0&&Number(match[1])<s.counters[key]);}
   }
   const dropKeys=s.drops.map(d=>`${d.resource}:${d.siteId??'free'}:${d.tile.x},${d.tile.y}`);check(new Set(dropKeys).size===dropKeys.length);
-  if(s.experienceSystem!==undefined){
+  part='experience';if(s.experienceSystem!==undefined){
     const e=s.experienceSystem;check(e);integer(e.nextEventId,1);array(e.processedEventIds,1000000);check(new Set(e.processedEventIds).size===e.processedEventIds.length);
     for(const id of e.processedEventIds){check(typeof id==='string'&&id.length>0&&id.length<=128);const match=id.match(/^activity-(\d+)$/);if(match)integer(Number(match[1]),1,e.nextEventId-1);}
   }
-  if(s.skillSystem!==undefined){
+  part='skills';if(s.skillSystem!==undefined){
     check(s.skillSystem?.damageAwards&&typeof s.skillSystem.damageAwards==='object'&&!Array.isArray(s.skillSystem.damageAwards));
     for(const [key,amount]of Object.entries(s.skillSystem.damageAwards)){const [actorId,targetId]=key.split(':');check((actorId==='king'||wIds.has(actorId))&&(targetId==='king'||wIds.has(targetId)||/^animal-\d+$/.test(targetId)));number(amount,0,WORK_RULES.combatXPPerTarget+1e-7);}
   }
-  validateFoodState(s,registry,{check,number,integer,array});
-  validateSeasonFoodState(s,{check,number,integer,array});
+  part='food';validateFoodState(s,registry,{check,number,integer,array});
+  part='seasonFood';validateSeasonFoodState(s,{check,number,integer,array});
   check(typeof s.settings.explorationMode==='boolean');
-  validateMapMemory(s.exploration,registry,{check,number,integer,array});
+  part='exploration';validateMapMemory(s.exploration,registry,{check,number,integer,array});
   // Automatic employment: ON/OFF, a 1–5 priority for every workplace profession, residents held Unemployed by hand.
-  if(s.employment!==undefined){const e=s.employment;check(e&&typeof e==='object'&&Object.keys(e).sort().join()==='blockedBuildings,blockedTypes,enabled,held,priorities'&&typeof e.enabled==='boolean');
+  part='employment';if(s.employment!==undefined){const e=s.employment;check(e&&typeof e==='object'&&Object.keys(e).sort().join()==='blockedBuildings,blockedTypes,enabled,held,priorities'&&typeof e.enabled==='boolean');
     check(e.priorities&&typeof e.priorities==='object'&&Object.keys(e.priorities).sort().join()===[...EMPLOYMENT_PROFESSIONS].sort().join());for(const value of Object.values(e.priorities))integer(value,PRIORITY_RANGE.min,PRIORITY_RANGE.max);
     array(e.held);check(new Set(e.held).size===e.held.length&&e.held.every(id=>wIds.has(id)));
     array(e.blockedBuildings);check(new Set(e.blockedBuildings).size===e.blockedBuildings.length);for(const id of e.blockedBuildings){integer(id,1);const b=s.buildings.find(b=>b.id===id);check(b&&buildingIsComplete(b)&&!b.unverified&&!!definition(b.type).workplace);}
     array(e.blockedTypes);check(new Set(e.blockedTypes).size===e.blockedTypes.length);for(const type of e.blockedTypes)check(typeof type==='string'&&!!definition(type,'building').workplace);}
   // S12 Stables: each tamed horse once, a living horse in an existing Stables within capacity; jobs by living Stablehands.
-  if(s.stables!==undefined){const st=s.stables;check(st&&typeof st==='object'&&Object.keys(st).sort().join()==='horses,jobs,ridden');array(st.horses);array(st.jobs);
+  part='stables';if(s.stables!==undefined){const st=s.stables;check(st&&typeof st==='object'&&Object.keys(st).sort().join()==='horses,jobs,ridden');array(st.horses);array(st.jobs);
     const animals=new Map(s.animals.map(a=>[a.id,a])),stables=new Map(s.buildings.filter(b=>b.type==='stables'&&buildingIsComplete(b)).map(b=>[b.id,b])),seen=new Set(),count=new Map();
     const riders=new Set();for(const h of st.horses){const keys=Object.keys(h).sort().join(),a=animals.get(h.id);check(a?.type==='horse'&&a.isAlive&&!seen.has(h.id));
       if(h.state==='stabled')check(keys==='id,stableId,state'&&!a.mounted&&stables.has(h.stableId));
@@ -486,7 +489,7 @@ export function validateGameState(input,registry=objectRegistry){
     for(const [id,n]of count)check(n<=registry.require('stables').horseCapacity);check(st.ridden==null||animals.get(st.ridden)?.mounted===true);}
   // S12 vehicles: unique ids on open ground; an operator is one living Hauler at most once; modes are known.
   // S13 needs: one record per living permanent resident at most, values 0–100, an attack time never in the future.
-  if(s.needs!==undefined){const n=s.needs;check(n&&typeof n==='object'&&Object.keys(n).sort().join()==='homes,pending,records');number(n.pending,0,s.time?.totalElapsed??Number.MAX_SAFE_INTEGER);array(n.records);array(n.homes);
+  part='needs';if(s.needs!==undefined){const n=s.needs;check(n&&typeof n==='object'&&Object.keys(n).sort().join()==='homes,pending,records');number(n.pending,0,s.time?.totalElapsed??Number.MAX_SAFE_INTEGER);array(n.records);array(n.homes);
     const residents=new Set((s.workers??[]).filter(w=>w.isAlive&&w.isSubject).map(w=>w.id)),seen=new Set();
     for(const r of n.records){check(r&&Object.keys(r).sort().join()==='attackedAt,criticalDays,food,hp,id,leaving,lowDays,rest,strike'&&residents.has(r.id)&&!seen.has(r.id));integer(r.lowDays,0,100000);integer(r.criticalDays,0,100000);check(typeof r.strike==='boolean'&&typeof r.leaving==='boolean'&&!(r.strike&&r.leaving));seen.add(r.id);number(r.food,0,100);number(r.rest,0,100);check(Number.isFinite(r.hp));if(r.attackedAt!==null)number(r.attackedAt,0,s.time?.totalElapsed??Number.MAX_SAFE_INTEGER);}
     // #58 phase B homes: each living resident at most once, a House seat in a completed House within its capacity,
@@ -497,20 +500,20 @@ export function validateGameState(input,registry=objectRegistry){
       check(h.kind==='house'&&Object.keys(h).sort().join()==='buildingId,id,kind');const house=s.buildings.find(b=>b.id===h.buildingId),d=house&&buildingDefinition(house);
       check(house&&d?.housing&&buildingIsComplete(house));seats.set(house.id,(seats.get(house.id)??0)+1);check(seats.get(house.id)<=(d.housing.capacity??POPULATION.houseCapacity));}
     check(base<=POPULATION.maximum);}
-  if(s.vehicles!==undefined){const v=s.vehicles;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='modes,nextId,vehicles');integer(v.nextId,1);array(v.vehicles);const ids=new Set(),operators=new Set(),workers=new Map(s.workers.map(w=>[w.id,w]));
+  part='vehicles';if(s.vehicles!==undefined){const v=s.vehicles;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='modes,nextId,vehicles');integer(v.nextId,1);array(v.vehicles);const ids=new Set(),operators=new Set(),workers=new Map(s.workers.map(w=>[w.id,w]));
     for(const x of v.vehicles){check(x&&Object.keys(x).sort().join()==='horseId,id,operatorId,state,type,x,y'&&(x.horseId===null||x.type==='horse_wagon'&&(s.stables?.horses??[]).some(h=>h.id===x.horseId&&h.state==='harnessed'&&h.vehicleId===x.id))&&Object.hasOwn(VEHICLES,x.type)&&['parked','reserved','inUse'].includes(x.state));const m=String(x.id).match(/^vehicle-(\d+)$/);check(m&&Number(m[1])<v.nextId&&!ids.has(x.id));ids.add(x.id);
       integer(x.x,0,COLUMNS-1);integer(x.y,0,ROWS-1);check(open(x.x,x.y));check((x.state==='parked')===(x.operatorId==null));if(x.operatorId!=null){const w=workers.get(x.operatorId);check(w?.isAlive&&w.profession==='hauler'&&!operators.has(x.operatorId));operators.add(x.operatorId);}}
     check(v.modes&&typeof v.modes==='object');for(const [id,mode]of Object.entries(v.modes))check(workers.has(id)&&TRANSPORT_MODES.includes(mode)&&mode!=='auto');}
   // C08 units and training orders: one per living Soldier, a known type, its exact kit; a Knight has his horse (S12).
   const st0=new Set((s.stables?.horses??[]).filter(h=>h.riderId).map(h=>h.riderId));
-  if(s.military!==undefined){const m=s.military;check(m&&typeof m==='object'&&Object.keys(m).sort().join()==='nextOrder,orders,units');integer(m.nextOrder,1);array(m.units);array(m.orders);
+  part='military';if(s.military!==undefined){const m=s.military;check(m&&typeof m==='object'&&Object.keys(m).sort().join()==='nextOrder,orders,units');integer(m.nextOrder,1);array(m.units);array(m.orders);
     const workers=new Map(s.workers.map(w=>[w.id,w])),seen=new Set(),kit=type=>Object.values(UNIT_TYPES[type].equipment);
     for(const u of m.units){check(u&&['equipment,type,workerId','equipment,garrison,type,workerId'].includes(Object.keys(u).sort().join())&&(u.garrison===undefined||u.garrison===true)&&Object.hasOwn(UNIT_TYPES,u.type)&&(!UNIT_TYPES[u.type].mount||st0.has(u.workerId))&&workers.get(u.workerId)?.isAlive&&!seen.has(u.workerId));seen.add(u.workerId);check(JSON.stringify(u.equipment)===JSON.stringify(UNIT_TYPES[u.type].equipment));}
     const ids=new Set();for(const o of m.orders){check(o&&Object.keys(o).sort().join()==='barracksId,id,items,required,state,type,workDone,workerId'&&Object.hasOwn(UNIT_TYPES,o.type)&&(!UNIT_TYPES[o.type].mount||st0.has(o.workerId)));integer(o.id,1,m.nextOrder-1);check(!ids.has(o.id)&&!seen.has(o.workerId));ids.add(o.id);seen.add(o.workerId);
       const w=workers.get(o.workerId);check(w?.isAlive&&w.profession==='soldier'&&w.assignedWorkplaceId===o.barracksId&&s.buildings.some(b=>b.id===o.barracksId&&b.type==='barracks'));check(o.required===UNIT_TYPES[o.type].trainingTime);number(o.workDone,0,o.required);
       check(['supplying','training'].includes(o.state));const items={};if(o.state==='training')for(const id of kit(o.type))items[id]=(items[id]??0)+1;check(o.items&&JSON.stringify(Object.entries(o.items).sort())===JSON.stringify(Object.entries(items).sort()));if(o.state==='supplying')check(o.workDone===0);}}
   // Trade F1.2: the merchant caravan (schema 38). Its stock and Gold are the merchant's own, never the kingdom's.
-  if(s.caravans!==undefined){
+  part='caravans';if(s.caravans!==undefined){
     const v=s.caravans,now=s.time?.totalElapsed??Number.MAX_SAFE_INTEGER;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='active,nextVisitAt,seq');integer(v.seq,0);
     check(v.nextVisitAt===null||(Number.isFinite(v.nextVisitAt)&&v.nextVisitAt>=0));
     if(v.active!==null){
@@ -525,7 +528,7 @@ export function validateGameState(input,registry=objectRegistry){
     }
   }
   // #103: kingdom policy (schema 40).
-  if(s.policy!==undefined){const p=s.policy;check(p&&typeof p==='object'&&Object.keys(p).sort().join()==='effect,feastUntil,lastFeastAt,lastTaxDay,pending,rations,tax');check(Object.hasOwn(TAX_RATES,p.tax)&&Object.hasOwn(RATIONS,p.rations));integer(p.lastTaxDay,1,s.time?.day??Number.MAX_SAFE_INTEGER);
+  part='policy';if(s.policy!==undefined){const p=s.policy;check(p&&typeof p==='object'&&Object.keys(p).sort().join()==='effect,feastUntil,lastFeastAt,lastTaxDay,pending,rations,tax');check(Object.hasOwn(TAX_RATES,p.tax)&&Object.hasOwn(RATIONS,p.rations));integer(p.lastTaxDay,1,s.time?.day??Number.MAX_SAFE_INTEGER);
     // Policy v2 P1 (schema 45): a pending policy for tomorrow and the Happiness effect on its way to the target.
     if(p.pending!==null){check(typeof p.pending==='object'&&Object.keys(p.pending).sort().join()==='rations,tax'&&Object.hasOwn(TAX_RATES,p.pending.tax)&&Object.hasOwn(RATIONS,p.pending.rations)&&(p.pending.tax!==p.tax||p.pending.rations!==p.rations));}
     const effects=Object.values(TAX_RATES).map(a=>a.happiness);number(p.effect,Math.min(...effects),Math.max(...effects)+LEGACY_RATIONS_EFFECT); // #68: older saves may hold the removed Generous +5
@@ -534,23 +537,25 @@ export function validateGameState(input,registry=objectRegistry){
   // Trade F1.3: orders (schema 39). Open orders belong to the active caravan and an existing Marketplace.
   // Children D1 (schema 54): which children exist follows from the homes; saved are positions, hidden houses, snowmen.
   // Day and night N2 (schema 56): which light places burn tonight and which soldiers carry a torch.
-  if(s.lightFuel!==undefined)check(validLightFuelState(s.lightFuel)&&s.lightFuel.lit.every(id=>s.buildings.some(b=>b.id===id)));
+  part='lightFuel';if(s.lightFuel!==undefined)check(validLightFuelState(s.lightFuel)&&s.lightFuel.lit.every(id=>s.buildings.some(b=>b.id===id)));
   // Day and night N3 (schema 57): threat switches and campfires.
-  if(s.nightThreats!==undefined)check(validNightThreatState(s.nightThreats,new Set(s.buildings.map(b=>b.id))));
+  part='nightThreats';if(s.nightThreats!==undefined)check(validNightThreatState(s.nightThreats,new Set(s.buildings.map(b=>b.id))));
   // E4: finished Royal tasks and counted production (optional, older saves start with none done).
-  if(s.royalGoals!==undefined)check(validRoyalGoalState(s.royalGoals));
+  part='royalGoals';if(s.royalGoals!==undefined)check(validRoyalGoalState(s.royalGoals));
   // m-kral-odmeny-xp: the King's unspent skill points and royal skill levels (optional; points come from finished tasks).
-  if(s.kingSkills!==undefined)check(validKingSkillState(s.kingSkills,s.royalGoals?.done??[]));
+  part='kingSkills';if(s.kingSkills!==undefined)check(validKingSkillState(s.kingSkills,s.royalGoals?.done??[]));
   // m-noc-zrychleni (82): the night speed-up tip shown (optional, only `true`).
   if(s.nightSpeedTip!==undefined)check(validNightSpeedTipState(s.nightSpeedTip));
   // m-91 Dev tool: known keys only, numbers on the 0.05 grid within ×0.25–×4, at least one key.
   if(s.devBalance!==undefined)check(validDevBalanceState(s.devBalance));
   // m-hlasky-jednou (79): closed notices – [memory key, game time of the close], unique, never in the future.
-  if(s.notices!==undefined)check(validNoticeState(s.notices,s.time?.totalElapsed??0));
-  if(s.children!==undefined)validateChildrenState(s.children,{check,number,integer,array,buildingIds:new Set(s.buildings.map(b=>b.id))});
-  if(s.domestic!==undefined)validateDomesticState(s.domestic,{check,number,integer,array,day:s.time?.day??1,buildingIds:new Set(s.buildings.map(b=>b.id)),locationIds:new Set((s.foodStorage?.locations??[]).map(l=>l.id)),workerIds:new Set((s.workers??[]).map(w=>w.id)),time:s.time});
-  if(s.trade!==undefined){
-    const v=s.trade;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='auto,orders,seq,stats');validateAutoTrade(v.auto,{check,integer,resource:id=>definition(id,'resource')});validateTradeStats(v.stats,{check,number,integer,array,resource:id=>definition(id,'resource'),day:s.time?.day??1});integer(v.seq,0);array(v.orders,200);const ids=new Set();
+  part='notices';if(s.notices!==undefined)check(validNoticeState(s.notices,s.time?.totalElapsed??0));
+  part='children';if(s.children!==undefined)validateChildrenState(s.children,{check,number,integer,array,buildingIds:new Set(s.buildings.map(b=>b.id))});
+  part='domestic';if(s.domestic!==undefined)validateDomesticState(s.domestic,{check,number,integer,array,day:s.time?.day??1,buildingIds:new Set(s.buildings.map(b=>b.id)),locationIds:new Set((s.foodStorage?.locations??[]).map(l=>l.id)),workerIds:new Set((s.workers??[]).map(w=>w.id)),time:s.time});
+  part='trade';if(s.trade!==undefined){
+    const v=s.trade;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='auto,orders,seq,stats');
+    // m-ukladani-chyba: saves of 0.100 and older may keep prices older than the history window; they drop out here.
+    {const day=s.time?.day??1,h=v.stats?.history;if(h&&typeof h==='object'&&Number.isInteger(day))for(const [id,rows]of Object.entries(h))if(Array.isArray(rows)){h[id]=rows.filter(e=>!(Number.isInteger(e?.day)&&e.day<=day-PRICE_MODEL.historyDays));if(!h[id].length)delete h[id];}}validateAutoTrade(v.auto,{check,integer,resource:id=>definition(id,'resource')});validateTradeStats(v.stats,{check,number,integer,array,resource:id=>definition(id,'resource'),day:s.time?.day??1});integer(v.seq,0);array(v.orders,200);const ids=new Set();
     for(const o of v.orders){
       check(o&&typeof o==='object'&&Object.keys(o).filter(k=>k!=='auto').sort().join()==='caravanId,delivered,id,marketplaceId,placedAt,price,quantity,resource,side,status'&&(o.auto===undefined||o.auto===true));
       check(typeof o.id==='string'&&/^trade-\d+$/.test(o.id)&&Number(o.id.slice(6))<=v.seq&&!ids.has(o.id));ids.add(o.id);
@@ -560,6 +565,6 @@ export function validateGameState(input,registry=objectRegistry){
       if(o.status==='Completed')check(o.delivered===o.quantity);
     }
   }
-  validateRockMining(s,registry,{check,integer,number,array});
+  part='rockMining';validateRockMining(s,registry,{check,integer,number,array});
   return s;
 }

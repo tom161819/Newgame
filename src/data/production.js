@@ -25,6 +25,19 @@ export const PITCH_RECIPES=Object.freeze({
   torches:Object.freeze({input:Object.freeze({wood:2,pitch:2}),output:Object.freeze({torch:6}),duration:10000,skill:'crafting',xp:8,inputSources:Object.freeze({wood:'Torch Making',pitch:'Torch Making'}),outputSource:'Pitch Kiln Production'}),
 });
 export const WHEELWRIGHT_RECIPES=Object.freeze({wheelbarrow:PRODUCTION_RECIPES.wheelwright_workshop,horse_wagon:HORSE_WAGON_RECIPE});
+// m-ukladani-chyba (owner, 12 Nov): earlier balance of recipes that changed while the save schema stayed the same. A batch
+// that was running (or finished and waiting) when the game was saved keeps the recipe it started with, so a save made
+// before a balance change still loads and that batch finishes as started. Key: building type, or type:recipe key.
+// Add the old recipe here whenever a recipe's input, output or duration changes without a save schema bump.
+const past=(input,output,duration)=>Object.freeze({input:Object.freeze(input),output:Object.freeze(output),duration});
+export const RECIPE_HISTORY=Object.freeze({
+  mill:Object.freeze([past({wheat:4},{flour:3},30000)]),
+  bakery:Object.freeze([past({flour:2},{bread:5},30000),past({flour:2},{bread:4},30000)]),
+  'pitch_kiln:pitch':Object.freeze([past({wood:2},{pitch:1},30000)]),
+  'pitch_kiln:torches':Object.freeze([past({wood:1,pitch:1},{torch:3},20000)]),
+});
+// The current recipe first, then its earlier versions (input, output, duration only).
+export const recipeVariants=(type,key,recipe)=>[recipe,...(RECIPE_HISTORY[key?`${type}:${key}`:type]??[])];
 // A workshop with several recipes (definition.recipes) makes the one chosen in its production record; others use definition.recipe.
 export const recipeFor=(definition,key)=>definition.recipes?.[key]??definition.recipe;
 export const defaultRecipeKey=definition=>definition.recipes?Object.keys(definition.recipes)[0]:undefined;

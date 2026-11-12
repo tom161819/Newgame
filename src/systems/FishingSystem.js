@@ -106,7 +106,7 @@ export class FishingSystem {
     if(body<0)return t('fishing.noWater');
     return t('fishing.water',{distance:this.distance(hut)})+' · '+t('fishing.summary',{state:t(`fishing.state.${this.state(body)}`),stock:Math.floor(this.stocks.get(body)??0),capacity:this.capacity(body),today:record.today,yesterday:record.yesterday,season:Math.round(this.modifier(GROUND.DEEP)/FISHING.depth[GROUND.DEEP]*100)});
   }
-  exportState(){return {version:1,nextCatch:this.nextCatch,stocks:[...this.stocks].map(([id,n])=>[id,Math.round(n*1000)/1000]),warned:[...this.warned],catches:[...this.catches].map(([id,r])=>[id,r.today,r.yesterday])};}
+  exportState(){return {version:1,nextCatch:this.nextCatch,stocks:[...this.stocks].map(([id,n])=>[id,Math.round(n*1000)/1000]),warned:[...this.warned],catches:[...this.catches].filter(([id])=>!this.scene?.buildings||this.scene.buildings.some(b=>b.id===id)).map(([id,r])=>[id,r.today,r.yesterday])};}
   importState(state){
     if(!state)return;this.nextCatch=state.nextCatch;for(const [id,n]of state.stocks)this.stocks.set(id,n);this.warned=new Set(state.warned);
     this.catches=new Map(state.catches.map(([id,today,yesterday])=>[id,{today,yesterday}]));
@@ -131,6 +131,8 @@ export function validateFishingState(state,{bodies,buildingIds,check,integer,num
   check(Array.isArray(state.stocks)&&state.stocks.length===bodies.length);
   state.stocks.forEach(([id,n],i)=>{check(id===i);number(n,0,bodies[i].capacity);});
   check(Array.isArray(state.warned)&&state.warned.every(id=>Number.isInteger(id)&&id>=0&&id<bodies.length)&&new Set(state.warned).size===state.warned.length);
+  // m-ukladani-chyba: the catch count of a hut that burnt down drops out (saves of 0.100 and older kept it).
+  if(Array.isArray(state.catches))state.catches=state.catches.filter(r=>!Array.isArray(r)||buildingIds.has(r[0]));
   check(Array.isArray(state.catches)&&new Set(state.catches.map(r=>r[0])).size===state.catches.length);
   for(const r of state.catches){check(Array.isArray(r)&&r.length===3&&buildingIds.has(r[0]));integer(r[1],0);integer(r[2],0);}
 }

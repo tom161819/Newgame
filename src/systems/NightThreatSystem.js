@@ -1,6 +1,6 @@
 import { NIGHT_THREATS } from '../data/nightThreats.js';
 import { buildingDefinition,buildingIsComplete,buildingTiles,placementError,campfireWood,towerNeighbors } from '../game/buildings.js';
-import { removeBuildingShell } from '../game/buildingRemoval.js';
+import { removeBuildingShell,detachLostBuilding } from '../game/buildingRemoval.js';
 import { adjacentTiles } from '../game/interaction.js';
 import { inAttackRange } from './CombatSystem.js';
 import { isWalkable } from '../game/map.js';
@@ -234,11 +234,9 @@ export class NightThreatSystem {
     }
   }
   burnDown(b){
-    const s=this.scene,name=s.objectRegistry.require(b.type).name,storage=s.foodStorage;this.fires.delete(b.id);
+    const s=this.scene,name=s.objectRegistry.require(b.type).name;this.fires.delete(b.id);
     // Stored goods burn with it (nothing spills), then the building and its functions go.
-    for(const l of [...(storage?.locations?.values?.()??[])])if(l.buildingId===b.id)l.stock={};
-    for(const w of s.workerSystem?.liveWorkers?.()??[])if(w.assignedWorkplaceId===b.id)s.workplaceSystem?.remove?.(w);
-    storage?.removeBuilding?.(b);s.foodProduction?.records?.delete?.(b.id);const d=buildingDefinition(b),anchor={x:b.x,y:b.y};removeBuildingShell(s,b);
+    detachLostBuilding(s,b);const d=buildingDefinition(b),anchor={x:b.x,y:b.y};removeBuildingShell(s,b);
     if(d.width>=2&&d.height>=2){const rd=ruinDefinition(s.objectRegistry,b.type),ruin={id:Math.max(0,...s.buildings.map(x=>x.id),b.id)+1,type:rd.id,burntFrom:b.type,definition:rd,...anchor,tiles:buildingTiles(anchor,rd)};
       for(const tl of ruin.tiles)s.map[tl.y][tl.x]=1;s.buildings.push(ruin);s.towerViews?.set(ruin.id,s.createBuildingView(rd,ruin));}
     s.events?.emit?.('buildings:changed');s.eventFeed?.push?.(`burnt:${b.id}`,t('threats.burntDown',{name}),{important:true,target:{x:b.x+1,y:b.y+1}});this.changed();

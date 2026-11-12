@@ -82,7 +82,10 @@ export class DomesticAnimalSystem {
       pop=clamp(pop,0,RATS.max);this.rats.set(l.id,pop);
       // Losses run continuously: whole units leave when a share adds up; reserved goods are never eaten.
       let acc=(this.loss.get(l.id)??0)+stored*RATS.loss[ratLevel(pop)]*days;
-      while(acc>=1){const id=RATS.lossOrder.find(r=>this.storage.free(l.id,r)>0);if(!id){acc=0;break;}this.storage.withdraw(l.id,id,1);this.scene.inventory?.ledger?.expense?.(id,1,RATS.ledgerSource);acc-=1;dirty=true;}
+      // m-ukladani-chyba: a finished batch waiting in a workshop's output is already promised to a store; rats leave it.
+      const held=l.kind==='output'&&l.buildingId!=null?this.storage.reservations.get(this.scene.foodProduction?.records?.get(l.buildingId)?.outputReservation):null;
+      const edible=r=>this.storage.free(l.id,r)-(held?.resource===r?held.amount:0)>0;
+      while(acc>=1){const id=RATS.lossOrder.find(edible);if(!id){acc=0;break;}this.storage.withdraw(l.id,id,1);this.scene.inventory?.ledger?.expense?.(id,1,RATS.ledgerSource);acc-=1;dirty=true;}
       this.loss.set(l.id,acc);
       const level=ratLevel(pop),last=this.notified.get(l.id)??'none';
       if((level==='many'||level==='infestation')&&level!==last&&(level==='infestation'||last!=='infestation')){this.notified.set(l.id,level);this.feed(`rats:${l.id}:${level}:${Math.floor(this.now()/this.day)}`,t(`pets.feed.${level}`,{building:this.buildingName(l.buildingId)}),level==='infestation');}

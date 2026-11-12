@@ -27,3 +27,8 @@ export function unitKit(type){const kit={};for(const id of Object.values(UNIT_TY
 // box of all finished buildings, a waypoint every `step` tiles – instead of milling around their Barracks. A settlement
 // smaller than `minBuildings` keeps the old patrol near the Barracks.
 export const PATROL=Object.freeze({margin:2,step:4,minBuildings:3,reach:3});
+
+// m-kasarna-limit-zamestnani (owner, 12 Nov): how many places of a Barracks automatic employment fills (default 4, the
+// player raises it with a slider up to the Barracks' places). Placed by hand a soldier may go above it.
+export const BARRACKS_AUTO_HIRE_DEFAULT=4;
+export const barracksAutoHire=(building,capacity)=>Math.max(0,Math.min(capacity,Number.isInteger(building?.autoHire)?building.autoHire:BARRACKS_AUTO_HIRE_DEFAULT));

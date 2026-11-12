@@ -176,3 +176,11 @@ test('army squads (owner, 12 Nov): chosen soldiers make a squad, a squad chooses
   makeSquad(s,[a,b]);s.workplaceSystem.remove(a);s.tick(50);assert.equal(a.profession==='soldier',false);squads(s);assert.equal(a.squad,undefined);
   assert.doesNotThrow(()=>validateGameState(serializeGameState(s)));
 });
+test('m-kasarna-limit-zamestnani: a Barracks hires 4 automatically by default; the chosen number is saved', async () => {
+  const { barracksAutoHire,BARRACKS_AUTO_HIRE_DEFAULT } = await import('../src/data/military.js');
+  assert.equal(BARRACKS_AUTO_HIRE_DEFAULT,4);assert.equal(barracksAutoHire({},12),4);assert.equal(barracksAutoHire({autoHire:9},12),9);assert.equal(barracksAutoHire({autoHire:20},12),12);
+  const {s,barracks}=kingdom();barracks.autoHire=7;const data=validateGameState(serializeGameState(s));assert.equal(data.buildings.find(b=>b.id===barracks.id).autoHire,7);
+  const bad=structuredClone(data);bad.buildings.find(b=>b.id===barracks.id).autoHire=13;assert.throws(()=>validateGameState(bad));
+  const { EmploymentSystem } = await import('../src/systems/EmploymentSystem.js');
+  if(s.employment){barracks.autoHire=2;const open=s.employment.seats().filter(x=>x.building.id===barracks.id).length;assert.ok(open<=2,'no more than the limit');}
+});

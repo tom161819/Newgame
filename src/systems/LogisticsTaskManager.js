@@ -16,7 +16,7 @@ export class LogisticsTaskManager {
     const storage=this.storage,stores=[...storage.locations.values()].filter(l=>storage.isStock(l));
     this.catalog.push(...(this.scene.constructionSystem?.materials.candidates()??[]),...(this.scene.military?.candidates()??[]),...(this.scene.trade?.candidates()??[]),...(this.scene.lightFuel?.candidates()??[]));
     for(const record of this.scene.foodProduction.records.values()){
-      const building=this.scene.foodProduction.building(record.buildingId);if(!building)continue;
+      const building=this.scene.foodProduction.building(record.buildingId);if(!building||buildingDefinition(building).selfSupplied)continue;
       const recipe=this.scene.foodProduction.recipe(building),input=storage.locations.get(`input-${building.id}`);
       // m-nosici-trakar-pracoviste (62): the catalog offers the vehicle target; updateWorker trims it per carrier.
       if(record.auto&&input&&!this.scene.foodProduction.inputShortage(building)){
@@ -139,6 +139,7 @@ export class LogisticsTaskManager {
     if(task.progressMs>=IDLE_STONE.pickupDuration){this.scene.collectResource(task.targetId,worker.tile,worker);ai.cancel(worker);worker.workState='Searching for Work';}
   }
   waitForHauler(building,kind){
+    if(buildingDefinition(building).selfSupplied)return false;
     const record=this.scene.foodProduction.records.get(building.id),now=this.scene.gameTime.totalElapsed,key=`${building.id}:${kind}`;
     let wait=this.producerWaits.get(key);if(!wait||wait.cycle!==record.nextCycle){wait={cycle:record.nextCycle,since:now,checkedAt:-Infinity,available:false};this.producerWaits.set(key,wait);}
     if(now-wait.since>=3000)return false;

@@ -95,3 +95,18 @@ test('m-smolar-pochodne: the player\'s choice at a Pitch Kiln holds (Torches, Pi
   assert.equal(fp.setRecipe(b.id,'nonsense'),false);
   const again=fp.exportState();fp.importState(again);assert.equal(fp.recipeMode(b),'auto');assert.equal(fp.torchTarget(b),40,'saved with the record');
 });
+test('m-ukladani-chyba: the Pitch Kiln keeps its recipes before 0.99.0 for running batches in older saves', async () => {
+  const { recipeVariants,RECIPE_HISTORY } = await import('../src/data/production.js');
+  assert.deepEqual(recipeVariants('pitch_kiln','pitch',PITCH_RECIPES.pitch).map(v=>[v.input,v.output,v.duration]),[[{wood:4},{pitch:2},15000],[{wood:2},{pitch:1},30000]]);
+  assert.deepEqual(recipeVariants('pitch_kiln','torches',PITCH_RECIPES.torches)[1].input,{wood:1,pitch:1});
+  assert.ok(RECIPE_HISTORY.mill&&RECIPE_HISTORY.bakery);
+});
+test('m-smolar-nosi-vyrobky: the Pitch Maker fetches Wood and carries Pitch to the store himself; Haulers get no Pitch Kiln jobs', () => {
+  const {s,place,store}=world(),b=place('pitch_kiln',60,60),record=s.foodProduction.records.get(b.id);
+  store().stock.wood=(store().stock.wood??0)+20;const w=s.workerSystem.create({x:63,y:63});assert.equal(s.workplaceSystem.assign(b,w),true);
+  for(let i=0;i<6000&&!((store().stock.pitch??0)>0);i++)s.tick(50);
+  assert.ok((store().stock.pitch??0)>0,'Pitch reached the store without a Hauler');
+  store().stock.wood=(store().stock.wood??0)+20;if(s.logisticsTasks){s.logisticsTasks.nextRefresh=0;s.logisticsTasks.update();}const catalog=s.logisticsTasks?.catalog??[];assert.ok(s.logisticsTasks,'logistics on');
+  assert.equal(catalog.some(t=>t.outputBuildingId===b.id||String(t.destinationId)===`input-${b.id}`),false,'no Hauler job for the Pitch Kiln');
+  void record;
+});

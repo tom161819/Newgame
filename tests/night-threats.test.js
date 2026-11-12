@@ -164,3 +164,19 @@ test('m-pozary: the first resident who answers rolls the fate – 10 % the build
   const state=validateGameState(serializeGameState(s));assert.equal(state.nightThreats.fires.find(f=>f.id===other.id).fate,'saved');assert.equal(state.buildings.find(b=>b.id===ruin.id).burntFrom,'house');
   assert.equal(validNightThreatState({...state.nightThreats,fires:[{id:other.id,intensity:10,health:10,fate:'maybe'}]},new Set([other.id])),false);
 });
+test('m-ukladani-chyba: a workplace that burns down leaves no workplace record or worker behind, so the game still saves', async () => {
+  const { placeBuilding } = await import('../src/game/buildings.js');
+  const {s,n}=world();const d=s.objectRegistry.require('hunting_lodge');for(const [id,k]of Object.entries(d.cost))s.inventory.add(id,k);
+  const r=placeBuilding({map:s.map,anchor:{x:60,y:60},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(r.error);
+  const lodge=r.building;s.towerViews.set(lodge.id,s.createBuildingView(d,lodge));s.workplaceSystem.sync?.();
+  if(!s.workplaceSystem.records.has(lodge.id))s.workplaceSystem.records.set(lodge.id,{buildingId:lodge.id,capacity:d.workplace.capacity,workerIds:[],delivered:{meat:5}});
+  const w=s.workerSystem.create({x:64,y:64});assert.equal(s.workplaceSystem.assign(lodge,w),true);
+  n.burnDown(lodge);
+  assert.equal(s.workplaceSystem.records.has(lodge.id),false,'the workplace record goes with the building');
+  assert.equal(w.assignedWorkplaceId??null,null,'the hunter is out of work');
+  validateGameState(serializeGameState(s));
+});
+test('m-ukladani-chyba: a squad number on someone who is no longer a soldier and a Hunter\'s deferred wolf kill do not block saving', () => {
+  const {s}=world();const w=s.workerSystem.create({x:64,y:64});w.squad=2;
+  const data=validateGameState(serializeGameState(s));assert.equal(data.workers.find(x=>x.id===w.id).squad,undefined);
+});

@@ -84,7 +84,7 @@ test('large ground meat piles are carried in trips of at most 40 (40 load units 
 });
 test('Save validation rejects duplicate quantity/reservations, incompatible storage and forged cycles before mutating a world',()=>{
   const {s,stock,record}=millFixture();s.foodStorage.deposit(stock,'wheat',4);until(s,()=>record.cycle?.workDone>=1000);const data=validateGameState(serializeGameState(s));
-  for(const change of [x=>x.foodStorage.locations[0].capacity=999,x=>x.foodStorage.locations.push(x.foodStorage.locations[0]),x=>x.foodStorage.reservations.push(x.foodStorage.reservations[0]),x=>x.foodStorage.reservations[0].amount++,x=>x.foodProduction.records[0].cycle.inputs.wheat++,x=>x.foodProduction.records[0].cycle.workDone++,x=>x.inventory.apple=8]){const bad=structuredClone(data);change(bad);assert.throws(()=>validateGameState(bad));}
+  for(const change of [x=>x.foodStorage.locations[0].capacity=999,x=>x.foodStorage.locations.push(x.foodStorage.locations[0]),x=>x.foodStorage.reservations.push(x.foodStorage.reservations[0]),x=>x.foodStorage.reservations[0].amount+=5/* +1 is the Mill before 9 Nov (RECIPE_HISTORY) */,x=>x.foodProduction.records[0].cycle.inputs.wheat++,x=>x.foodProduction.records[0].cycle.workDone++,x=>x.inventory.apple=8]){const bad=structuredClone(data);change(bad);assert.throws(()=>validateGameState(bad));}
   assert.equal(s.foodProduction.records.get(record.buildingId).cycle.workDone,data.foodProduction.records[0].cycle.workDone);
 });
 
@@ -100,4 +100,12 @@ test('a full Farmhouse store prevents wheat harvesting; a destroyed store preser
   s.foodStorage.deposit(`farmhouse-${home.id}`,'flour',RAW);s.foodStorage.deposit(`farmhouse-${barn.id}`,'flour',RAW);s.foodStorage.deposit(`granary-${granary.id}`,'bread',FOOD);s.gameTime.update(240000);s.simulate(5000);assert.equal(f.cargo,null);assert.equal(f.workTask,null);assert.equal(s.farmingSystem.records.get(field.id).cycle,0,'no Farmhouse room and the Granary takes no Wheat');
   s.buildings=s.buildings.filter(b=>b!==granary&&b!==barn);s.tick(25);assert.equal(quantities(s).bread,FOOD);assert.equal(quantities(s).flour,RAW*2);assert.equal(s.inventory.count('bread'),0);assert.equal(s.foodStorage.locations.has(`granary-${granary.id}`),false);assert.equal(s.foodStorage.locations.has(`farmhouse-${barn.id}`),false);
   s.inventory.spend('flour',RAW);until(s,()=>s.inventory.count('wheat')===10);assert.equal(s.foodStorage.locations.get(`farmhouse-${home.id}`).stock.wheat,10);assert.equal(s.farmingSystem.records.get(field.id).cycle,1);validateGameState(serializeGameState(s));
+});
+test('m-ukladani-chyba: a batch saved under an earlier recipe (RECIPE_HISTORY) loads and finishes as it started; a forged one is still rejected',()=>{
+  const {s,stock,record}=millFixture();s.foodStorage.deposit(stock,'wheat',4);until(s,()=>record.cycle?.workDone>=1000);
+  const data=validateGameState(serializeGameState(s)),old=structuredClone(data),cycle=old.foodProduction.records[0].cycle;
+  // The Mill made 3 Flour from 4 Wheat before the building table of 9 Nov.
+  old.foodStorage.reservations.find(r=>r.id===cycle.outputReservation).amount=3;
+  const r=restore(validateGameState(old));until(r,()=>r.inventory.count('flour')===3,120000);
+  const forged=structuredClone(data);forged.foodStorage.reservations.find(x=>x.id===forged.foodProduction.records[0].cycle.outputReservation).amount=7;assert.throws(()=>validateGameState(forged));
 });

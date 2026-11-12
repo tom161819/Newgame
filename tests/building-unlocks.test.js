@@ -23,7 +23,8 @@ test('Food menu (owner, 7 Nov): nothing is locked; a building without its earlie
   assert.equal(s.buildingUnlocks.status(definition('wheat_field')).warning,'Needs a Farmhouse to tend it');
   assert.equal(s.buildingUnlocks.status(definition('mill')).warning,'Needs a Wheat Field');assert.equal(s.buildingUnlocks.status(definition('bakery')).warning,'Needs a Mill for flour');
   assert.equal(s.buildingUnlocks.status(definition('granary')).warning,'');
-  for(const id of ['marketplace','village_green'])assert.equal(s.buildingUnlocks.status(definition(id)).unlocked,false,`other categories keep their locks (${id})`);
+  for(const id of ['village_green'])assert.equal(s.buildingUnlocks.status(definition(id)).unlocked,false,`other categories keep their locks (${id})`);
+  assert.equal(s.buildingUnlocks.status(definition('marketplace')).unlocked,true,'m-trziste-bez-skladu: a Marketplace needs no Warehouse');
 });
 test('a Hunting Lodge can be placed before a Granary; the warning stays for an unfinished Granary and goes once it is complete',()=>{
   const s=scene();(s.inventory.add('stone',40),s.inventory.add('wood',40));
@@ -36,7 +37,7 @@ test('a Hunting Lodge can be placed before a Granary; the warning stays for an u
 });
 test('the placement transaction still rejects locked objects (other categories) before payment, reservations, occupancy or world mutation',()=>{
   const s=scene();(s.inventory.add('stone',30),s.inventory.add('wood',30));s.inventory.add('wood',30);const before=serializeGameState(s);
-  for(const id of ['marketplace','village_green']){assert.ok(place(s,id).error);assert.deepEqual(serializeGameState(s),before);}
+  for(const id of ['village_green']){assert.ok(place(s,id).error);assert.deepEqual(serializeGameState(s),before);}
 });
 test('a Farmhouse before its Granary only warns; crops warn until a Farmhouse is complete',()=>{
   const s=scene();(s.inventory.add('stone',30),s.inventory.add('wood',40));const farmFirst=place(s,'farmhouse',56,44);assert.ifError(farmFirst.error,'Farmhouse without a Granary');s.constructionSystem.plan(farmFirst.building);

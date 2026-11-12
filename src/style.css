@@ -749,6 +749,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .storage-amount { text-align:right; font-variant-numeric:tabular-nums; width:4.5em; }
 .storage-reserved { text-align:right; font-size:11px; color:#9a9680; white-space:nowrap; }
 .storage-hidden, .storage-empty { font-size:12px; color:#9a9680; margin:4px 0 0; }
+.storage-accepts { margin:8px 0 0; padding-top:6px; border-top:1px solid rgba(255,255,255,.08); }
+.storage-accepts h4 { margin:0 0 4px; font-size:12px; color:#cfc9a8; }
+.storage-accepts-list { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:4px 10px; }
+.storage-accept { display:flex; align-items:center; gap:4px; font-size:12px; font-variant-numeric:tabular-nums; }
+.storage-accept.missing { color:#9a9680; }
+.storage-accept small { font-size:11px; color:#9a9680; }
+.storage-accept .storage-icon { width:16px; height:16px; }
+.storage-elsewhere { font-size:11px; color:#9a9680; margin:4px 0 0; }
 
 /* Kingdom Policy sliders (owner, 7 Nov): icon by level, slider, level name. */
 .policy-slider { display:grid; grid-template-columns:44px 1fr auto; grid-template-areas:"icon label level" "icon range range"; align-items:center; gap:2px 10px; margin:6px 0; }
@@ -1204,3 +1212,6 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 .army-squad-make { justify-self:end; width:1.6rem; text-align:center; border-radius:5px; font-size:1rem; line-height:1.5; }
 .army-squad-make[data-squad-make] { background:#6a5a2a; color:#ffe7a3; cursor:pointer; }
 .army-squad-make[data-squad-make]:hover { background:#8a7433; }
+.barracks-auto-hire { display:flex; flex-direction:column; gap:2px; margin:4px 0 8px; font-size:12px; }
+.barracks-auto-hire input[type=range] { appearance:auto; width:100%; height:18px; border:0; background:none; accent-color:#c9a85a; margin:0; }
+.barracks-auto-hire input[type=range]::before { content:none; }

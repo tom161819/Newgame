@@ -21,7 +21,7 @@ export const smeltingDefinitions=[
   {id:'torch',name:'Torch',inventoryLabel:'Torches',inventoryHideZero:true,symbol:'¡',inventoryOrder:17,quantityNames:['Torch','Torches','Torches'],category:'resource',resourceCategory:'processed_material',loadUnits:1,
     sprite:'/assets/resources/torch/torch.svg',width:1,height:1,walkable:true,collectible:true,buildable:false,cost:{},interactions:['collect'],
     description:'A pitch-dipped torch. Burns for one night in a Torch Post or a tower holder, or in a soldier\'s hand.',renderMode:'sprite',origin:{x:.5,y:.75},visualHeight:28,visual:{displayWidth:32,displayHeight:28},depth:{offset:.08}},
-  {id:'pitch_kiln',name:'Pitch Kiln',czechName:'Smolárna',category:'building',buildingCategory:'industry',sprite:'/assets/buildings/pitch_kiln/pitch_kiln.svg',
+  {id:'pitch_kiln',selfSupplied:true/* m-smolar-nosi-vyrobky (owner, 12 Nov): the Pitch Maker fetches Wood and carries Pitch and Torches himself; Haulers get no jobs here */,name:'Pitch Kiln',czechName:'Smolárna',category:'building',buildingCategory:'industry',sprite:'/assets/buildings/pitch_kiln/pitch_kiln.svg',
     width:2,height:2,walkable:false,collectible:false,buildable:true,cost:{wood:8,stone:4},constructionTime:25000,
     workplace:WORKPLACES.pitch_kiln,recipe:PITCH_RECIPES.pitch,recipes:PITCH_RECIPES,recipeChoice:'torches',autoEmployment:true,bufferCapacity:FOOD_RULES.bufferCapacity,
     interactions:['manage_workers'],description:`A Pitch Maker burns 2 Wood into 1 Pitch, and dips 1 Wood in 1 Pitch for 3 Torches. He keeps ${TORCHES.torchTarget} Torches in the stores first.`,
