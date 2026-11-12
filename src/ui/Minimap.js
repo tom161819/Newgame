@@ -14,6 +14,15 @@ export const MINIMAP_COLORS=Object.freeze({
 });
 // Request 55: + / − buttons change the minimap's on-screen size in a few steps (the content has no zoom of its own).
 // The step is remembered in this browser only (localStorage), never in a save.
+// m-minimapa-loziska (owner, 12 Nov): toggles that mark the found Stone and Iron deposits on the minimap – free ones
+// bright, ones with a Quarry or Mine dim. Only explored deposits (or all with the fog off); the choice is remembered.
+export const DEPOSIT_MARKS=Object.freeze({stone:Object.freeze({family:'stone_deposit',icon:'⛰',free:'#d9d4c4',bound:'rgba(160,156,146,.55)'}),iron:Object.freeze({family:'iron_deposit',icon:'◈',free:'#d9824a',bound:'rgba(160,100,70,.55)'})});
+const DEPOSIT_KEY='newgame.minimap.deposits';
+export function minimapDeposits(scene,kind){
+  const rule=DEPOSIT_MARKS[kind],f=scene.fog,mining=scene.naturalResources?.mining;if(!rule||!mining)return [];
+  const known=d=>!f?.enabled||[...Array(d.definition.width*d.definition.height).keys()].some(i=>f.explored?.[(d.y+Math.floor(i/d.definition.width))*f.width+d.x+i%d.definition.width]||f.isInSightTile?.({x:d.x+i%d.definition.width,y:d.y+Math.floor(i/d.definition.width)}));
+  return mining.deposits().filter(d=>(d.type===rule.family||d.type.startsWith(rule.family))&&d.natural.remaining>0&&known(d)).map(d=>({id:d.natural.id,x:d.x+d.definition.width/2,y:d.y+d.definition.height/2,free:d.natural.boundBuildingId==null}));
+}
 export const MINIMAP_SIZES=Object.freeze([.75,1,1.35,1.7]);
 export const MINIMAP_SIZE_DEFAULT=1;
 export const MINIMAP_SIZE_KEY='newgame.minimap.size';
@@ -87,10 +96,15 @@ export class Minimap {
     this.sizeControls=doc.createElement('div');this.sizeControls.className='minimap-size';
     const sizeButton=(delta,text)=>{const b=doc.createElement('button');b.type='button';b.textContent=text;b.setAttribute('data-minimap-size',delta>0?'bigger':'smaller');b.addEventListener('click',e=>{e.stopPropagation();this.resize(delta);},{signal:this.controller.signal});return b;};
     this.biggerButton=sizeButton(1,'+');this.smallerButton=sizeButton(-1,'−');this.sizeControls.append(this.biggerButton,this.smallerButton);this.root.append(this.sizeControls);
+    try{this.depositMarks=JSON.parse(storage?.getItem?.(DEPOSIT_KEY)??'{}')??{};}catch{this.depositMarks={};}
+    this.depositButtons={};for(const kind of Object.keys(DEPOSIT_MARKS)){const b=doc.createElement('button');b.type='button';b.className='minimap-deposit';b.textContent=DEPOSIT_MARKS[kind].icon;b.setAttribute('data-minimap-deposit',kind);
+      b.addEventListener('click',e=>{e.stopPropagation();this.depositMarks[kind]=!this.depositMarks[kind];try{storage?.setItem?.(DEPOSIT_KEY,JSON.stringify(this.depositMarks));}catch{/* works without storage */}this.markButtons();this.nextOverlay=0;},{signal:this.controller.signal});this.depositButtons[kind]=b;this.sizeControls.append(b);}
+    this.markButtons();
     this.root.addEventListener('pointerdown',e=>{if(e.target?.closest?.('.minimap-size')){e.stopPropagation();return;}e.preventDefault();e.stopPropagation();this.panTo(minimapPointToGrid(this.root.getBoundingClientRect(),{x:e.clientX,y:e.clientY},{size:fog.width,cssSize:this.canvas.offsetWidth||MINIMAP.cssSize}));},options);
     for(const type of ['click','mousedown','mouseup','wheel','contextmenu'])this.root.addEventListener(type,e=>e.stopPropagation(),options);
     (doc.querySelector('#corner-stack')??doc.querySelector('#game')??scene.game?.canvas?.parentElement)?.append(this.root);this.setSizeStep(readMinimapStep(storage),{save:false});this.label();this.offLanguage=onLanguageChange(()=>this.label());
   }
+  markButtons(){for(const [kind,b] of Object.entries(this.depositButtons??{})){const on=!!this.depositMarks?.[kind];b.setAttribute('aria-pressed',String(on));b.classList?.toggle?.('on',on);}}
   resize(delta){this.setSizeStep(this.sizeStep+delta);}
   setSizeStep(step,{save=true}={}){
     this.sizeStep=clampMinimapStep(step);this.root.style?.setProperty?.('--minimap-scale',String(MINIMAP_SIZES[this.sizeStep]));this.root.setAttribute('data-size',String(this.sizeStep));
@@ -98,8 +112,10 @@ export class Minimap {
     if(save)writeMinimapStep(this.sizeStep,this.storage);
   }
   label(){this.root.setAttribute('aria-label',t('minimap.label'));this.canvas.setAttribute('aria-label',t('minimap.label'));this.root.title=t('minimap.hint');
-    for(const [b,key] of [[this.biggerButton,'minimap.bigger'],[this.smallerButton,'minimap.smaller']])if(b){b.title=t(key);b.setAttribute('aria-label',t(key));}}
+    for(const [b,key] of [[this.biggerButton,'minimap.bigger'],[this.smallerButton,'minimap.smaller'],[this.depositButtons?.stone,'minimap.depositsStone'],[this.depositButtons?.iron,'minimap.depositsIron']])if(b){b.title=t(key);b.setAttribute('aria-label',t(key));}}
   panTo(point){
+    // A click near a shown deposit mark goes to that deposit.
+    for(const kind of Object.keys(DEPOSIT_MARKS))if(this.depositMarks?.[kind])for(const d of minimapDeposits(this.scene,kind))if(Math.hypot(d.x-point.x,d.y-point.y)<=3){point={x:d.x,y:d.y};break;}
     const s=this.scene,camera=s.worldCamera;if(!camera||s.gameOver)return;
     const x=Math.max(0,Math.min(this.size.width,point.x)),y=Math.max(0,Math.min(this.size.height,point.y)),world=gridToWorld(x,y);
     camera.panTarget=clampMapCenter(world.x,world.y);camera.following=false;const mode=document.querySelector('#camera-mode');if(mode)mode.textContent=t('hud.cameraManual');
@@ -119,6 +135,7 @@ export class Minimap {
     c.imageSmoothingEnabled=false;c.clearRect(0,0,this.canvas.width,this.canvas.height);c.drawImage(this.base,0,0,this.canvas.width,this.canvas.height);
     if(view){const corners=[[view.x,view.y],[view.right,view.y],[view.right,view.bottom],[view.x,view.bottom]].map(([x,y])=>worldToGrid(x,y));
       c.strokeStyle='#f6e7b0';c.lineWidth=1.5;c.beginPath();corners.forEach((p,i)=>i?c.lineTo(p.x*k,p.y*k):c.moveTo(p.x*k,p.y*k));c.closePath();c.stroke();}
+    for(const kind of Object.keys(DEPOSIT_MARKS))if(this.depositMarks?.[kind])for(const d of minimapDeposits(s,kind)){const r=DEPOSIT_MARKS[kind];c.fillStyle=d.free?r.free:r.bound;c.strokeStyle='#1c140a';c.lineWidth=1;c.beginPath();c.moveTo(d.x*k,d.y*k-4);c.lineTo(d.x*k+4,d.y*k);c.lineTo(d.x*k,d.y*k+4);c.lineTo(d.x*k-4,d.y*k);c.closePath();c.fill();c.stroke();}
     const king=s.character?.position??s.character?.tile;if(king){c.fillStyle='#ffd34d';c.strokeStyle='#2a1c08';c.lineWidth=1;c.beginPath();c.arc(king.x*k,king.y*k,3,0,Math.PI*2);c.fill();c.stroke();}
   }
   destroy(){this.controller.abort();this.offLanguage?.();this.root.remove();}

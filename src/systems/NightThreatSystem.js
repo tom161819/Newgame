@@ -15,7 +15,7 @@ export const hasLocalWood=(scene,tile,range=NIGHT_THREATS.campfire.woodRange)=>c
 export class NightThreatSystem {
   constructor(scene,settings=scene.gameSettings){
     this.scene=scene;this.enabled={wolves:settings?.nightWolves!==false,thieves:settings?.nightThieves!==false,fires:settings?.nightFires!==false};
-    this.campfires=new Map();this.listeners=new Set();this.wolfDay=null;this.wolvesNear=false;this.random=Math.random;
+    this.campfires=new Map();this.listeners=new Set();this.wolfDay=null;this.lurkSaved=new Map();this.wolvesNear=false;this.random=Math.random;
     this.thieves=new Map();this.thiefDay=null;this.reports=[];
     this.fires=new Map();this.fireDay=null;this.spreadIn=0;
   }
@@ -85,13 +85,33 @@ export class NightThreatSystem {
     const s=this.scene,rows=s.map.length,cols=s.map[0].length,{x,y}=wolf.tile,options=[{x:0,y},{x:cols-1,y},{x,y:0},{x,y:rows-1}];
     options.sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y));return options;
   }
+  // m-vlk-zustava: choose a den 15–25 tiles from the attack (wooded ground first), stay 2–4 days, tell the player.
+  lurk(wolf,state,now){
+    const s=this.scene,L=NIGHT_THREATS.wolves.lurk,a=state.attacked,options=[];
+    for(let i=0;i<60;i++){const ang=this.random()*Math.PI*2,d=L.den[0]+this.random()*(L.den[1]-L.den[0]),t={x:Math.round(a.x+Math.cos(ang)*d),y:Math.round(a.y+Math.sin(ang)*d)};
+      if(!isWalkable(s.map,t.x,t.y))continue;let trees=0;for(const o of s.resources?.values?.()??[]){const r=o.getData?.('object')??o;if(r?.definition?.tree&&Math.abs((r.tile?.x??r.x)-t.x)<=3&&Math.abs((r.tile?.y??r.y)-t.y)<=3)trees++;if(trees>=3)break;}options.push({t,trees});}
+    if(!options.length)return false;options.sort((x,y)=>y.trees-x.trees);const den=options[0].t,day=s.gameTime?.dayDuration??600000,days=L.days[0]+this.random()*(L.days[1]-L.days[0]);
+    Object.assign(state,{state:'lurking',den,until:now+days*day,victim:a.name,target:null});wolf.moveTo([den]);
+    s.eventFeed?.push?.(`wolf-lurks:${wolf.id}`,t('threats.wolfLurks',{name:a.name||t('threats.someone')}),{important:true,target:den});this.changed?.();return true;
+  }
+  lurkingWolves(){return this.wolves().filter(w=>w.wolf?.state==='lurking');}
   // Called by AnimalSystem for every wolf; true = handled this frame.
   leadsWolf(wolf,delta){
     const s=this.scene,W=NIGHT_THREATS.wolves,state=wolf.wolf??=({state:'hunting',repath:0,since:s.gameTime?.totalElapsed??0}),combat=s.combat;
     const part=s.dayNight?.part(),now=s.gameTime?.totalElapsed??0;
     const away=goal=>{combat?.stopAttack(wolf);wolf.retaliationTarget=null;state.target=null;state.repath-=delta;if(state.repath<=0||(!wolf.nextTile&&!wolf.path.length)){state.repath=W.repathMs*3;wolf.moveTo(goal);}};
+    // m-vlk-zustava: a saved lurking wolf picks up its den after loading.
+    if(this.lurkSaved.has(wolf.id)){Object.assign(state,{state:'lurking',...this.lurkSaved.get(wolf.id)});this.lurkSaved.delete(wolf.id);}
+    if(state.state==='lurking'){
+      if(now>=state.until){state.state='leaving';state.since=now;}
+      else if(part==='dawn'||part==='day'||wolf.currentHP<wolf.maxHP*W.lurk.hurt){combat?.stopAttack(wolf);state.target=null;state.repath-=delta;
+        if(state.repath<=0&&!wolf.nextTile&&!wolf.path.length){state.repath=W.lurk.repathMs;const r=wolf.currentHP<wolf.maxHP*W.lurk.hurt?1:W.lurk.roam;
+          for(let i=0;i<8;i++){const g={x:state.den.x+Math.round((this.random()*2-1)*r),y:state.den.y+Math.round((this.random()*2-1)*r)};if(isWalkable(s.map,g.x,g.y)){wolf.moveTo([g]);break;}}}
+        return true;}
+    }
     // Dawn: the pack leaves for the edge and is gone there (or after a while).
     if(part==='dawn'||part==='day'||state.state==='leaving'){
+      if(state.state!=='leaving'&&state.attacked&&this.lurk(wolf,state,now))return true;
       if(state.state!=='leaving'){state.state='leaving';state.since=now;}
       const edge=this.edgeGoal(wolf);if(edge.some(t=>t.x===wolf.tile.x&&t.y===wolf.tile.y)||now-state.since>W.leaveMs){combat?.stopAttack(wolf);s.animalSystem.remove(wolf);return true;}
       away(edge.slice(0,2).map(t=>({x:Math.max(0,Math.min(s.map[0].length-1,t.x)),y:Math.max(0,Math.min(s.map.length-1,t.y))})));return true;
@@ -110,7 +130,7 @@ export class NightThreatSystem {
     }
     if(!target){combat?.stopAttack(wolf);if(!wolf.nextTile&&!wolf.path.length){state.repath-=delta;if(state.repath<=0){state.repath=2500;const g={x:wolf.tile.x+Math.floor(this.random()*9)-4,y:wolf.tile.y+Math.floor(this.random()*9)-4};if(isWalkable(s.map,g.x,g.y)&&!this.lit(g,lights))wolf.moveTo([g]);}}return true;}
     if(combat?.canFight?.(target)!==false&&inAttackRange(wolf,target,s.map)){
-      wolf.path=[];combat.startAttack(wolf,target);const dx=target.position.x-wolf.position.x,dy=target.position.y-wolf.position.y,l=Math.hypot(dx,dy);if(l&&!wolf.nextTile)wolf.direction={x:dx/l,y:dy/l};return true;
+      wolf.path=[];combat.startAttack(wolf,target);if(target===s.character||s.workerSystem?.workers?.has?.(target.id))state.attacked??={x:Math.round(wolf.position.x),y:Math.round(wolf.position.y),name:target.name??''};const dx=target.position.x-wolf.position.x,dy=target.position.y-wolf.position.y,l=Math.hypot(dx,dy);if(l&&!wolf.nextTile)wolf.direction={x:dx/l,y:dy/l};return true;
     }
     combat?.stopAttack(wolf);state.repath-=delta;
     if(state.repath<=0){state.repath=W.repathMs;wolf.moveTo(adjacentTiles(target,s.map));
@@ -284,7 +304,7 @@ export class NightThreatSystem {
     if(this.scene.dayNight?.part()==='day')this.reportMorning(day);
     this.checkWolvesNear(day);
   }
-  exportState(){return {enabled:{...this.enabled},...(this.fireWarned?{fireWarned:true}:{}),wolfDay:this.wolfDay,thiefDay:this.thiefDay,thieves:[...this.thieves.values()].map(t=>({id:t.id,state:t.state,target:{...t.target},loot:t.loot?{...t.loot}:null,pursuer:t.pursuer})),reports:this.reports.map(r=>({...r})),fireDay:this.fireDay,fires:[...this.fires.values()].map(f=>({id:f.id,intensity:Math.round(f.intensity*100)/100,health:Math.round(f.health*100)/100,...(f.fate?{fate:f.fate}:{})})),campfires:[...this.campfires].map(([id,c])=>({id,litDay:c.litDay,ashesDay:c.ashesDay})).sort((a,b)=>a.id-b.id)};}
+  exportState(){const lurkers=this.lurkingWolves().map(w=>({id:w.id,den:{...w.wolf.den},until:Math.round(w.wolf.until),...(w.wolf.victim?{victim:String(w.wolf.victim).slice(0,60)}:{})}));return {...(lurkers.length?{lurkers}:{}),enabled:{...this.enabled},...(this.fireWarned?{fireWarned:true}:{}),wolfDay:this.wolfDay,thiefDay:this.thiefDay,thieves:[...this.thieves.values()].map(t=>({id:t.id,state:t.state,target:{...t.target},loot:t.loot?{...t.loot}:null,pursuer:t.pursuer})),reports:this.reports.map(r=>({...r})),fireDay:this.fireDay,fires:[...this.fires.values()].map(f=>({id:f.id,intensity:Math.round(f.intensity*100)/100,health:Math.round(f.health*100)/100,...(f.fate?{fate:f.fate}:{})})),campfires:[...this.campfires].map(([id,c])=>({id,litDay:c.litDay,ashesDay:c.ashesDay})).sort((a,b)=>a.id-b.id)};}
   // Threats wait until the kingdom stands: enough finished Houses or the start year passed (plan m-e1-hrozby-pozdeji).
   started(){
     const S=NIGHT_THREATS.start,s=this.scene;
@@ -292,7 +312,7 @@ export class NightThreatSystem {
     if(s.seasons?.enabled!==false&&s.seasons?.calendar)return s.seasons.calendar.year>=S.year;
     return (s.gameTime?.day??1)>S.daysWithoutSeasons;
   }
-  importState(data){if(!data)return;this.fireWarned=!!data.fireWarned;this.enabled={...this.enabled,...data.enabled};this.wolfDay=data.wolfDay??null;this.thiefDay=data.thiefDay??null;this.fireDay=data.fireDay??null;this.fires=new Map((data.fires??[]).map(f=>[f.id,{...f}]));this.reports=(data.reports??[]).map(r=>({...r}));
+  importState(data){if(!data)return;this.lurkSaved=new Map((data.lurkers??[]).map(l=>[l.id,{den:{...l.den},until:l.until,victim:l.victim??'',attacked:{...l.den}}]));this.fireWarned=!!data.fireWarned;this.enabled={...this.enabled,...data.enabled};this.wolfDay=data.wolfDay??null;this.thiefDay=data.thiefDay??null;this.fireDay=data.fireDay??null;this.fires=new Map((data.fires??[]).map(f=>[f.id,{...f}]));this.reports=(data.reports??[]).map(r=>({...r}));
     this.thieves=new Map((data.thieves??[]).map(t=>[t.id,{...t,target:{...t.target},loot:t.loot?{...t.loot}:null,since:this.scene?.gameTime?.totalElapsed??0,repath:0}]));this.campfires=new Map((data.campfires??[]).map(c=>[c.id,{litDay:c.litDay,ashesDay:c.ashesDay}]));}
   destroy(){this.listeners.clear();}
 }
@@ -304,7 +324,7 @@ export function ruinDefinition(registry,fromType){
 export function validNightThreatState(data,buildingIds){
   const n=v=>v===null||Number.isSafeInteger(v)&&v>=1;
   // `wolfDay` came in 0.44.0; saves of 0.43.0 (same schema 57) have none.
-  return !!data&&typeof data==='object'&&!!data.enabled&&(data.wolfDay===undefined||n(data.wolfDay))&&NIGHT_THREATS.ids.every(id=>typeof data.enabled[id]==='boolean')&&Object.keys(data.enabled).length===NIGHT_THREATS.ids.length&&Object.keys(data).every(k=>['enabled','campfires','wolfDay','thiefDay','thieves','reports','fireDay','fires','fireWarned'].includes(k))&&(data.fireWarned===undefined||data.fireWarned===true)&&(data.fireDay===undefined||n(data.fireDay))
+  return !!data&&typeof data==='object'&&!!data.enabled&&(data.wolfDay===undefined||n(data.wolfDay))&&NIGHT_THREATS.ids.every(id=>typeof data.enabled[id]==='boolean')&&Object.keys(data.enabled).length===NIGHT_THREATS.ids.length&&Object.keys(data).every(k=>['enabled','campfires','wolfDay','thiefDay','thieves','reports','fireDay','fires','fireWarned','lurkers'].includes(k))&&(data.lurkers===undefined||Array.isArray(data.lurkers)&&data.lurkers.every(l=>l&&typeof l.id==='string'&&Number.isInteger(l.den?.x)&&Number.isInteger(l.den?.y)&&Number.isFinite(l.until)&&(l.victim===undefined||typeof l.victim==='string')&&Object.keys(l).every(k=>['id','den','until','victim'].includes(k))))&&(data.fireWarned===undefined||data.fireWarned===true)&&(data.fireDay===undefined||n(data.fireDay))
     &&(data.fires===undefined||Array.isArray(data.fires)&&data.fires.every(f=>f&&buildingIds.has(f.id)&&Number.isFinite(f.intensity)&&f.intensity>0&&f.intensity<=100&&Number.isFinite(f.health)&&f.health>0&&f.health<=100&&(f.fate===undefined||f.fate==='saved'||f.fate==='lost')&&Object.keys(f).every(k=>['id','intensity','health','fate'].includes(k))))&&(data.thiefDay===undefined||n(data.thiefDay))
     &&(data.thieves===undefined||Array.isArray(data.thieves)&&data.thieves.every(t=>t&&typeof t.id==='string'&&['sneaking','escaping','fleeing'].includes(t.state)&&t.target&&typeof t.target.id==='string'&&(t.loot===null||Number.isFinite(t.loot.amount)&&t.loot.amount>0&&typeof t.loot.resource==='string')))
     &&(data.reports===undefined||Array.isArray(data.reports))

@@ -580,6 +580,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .minimap-size { position:absolute; top:0; right:0; z-index:1; display:flex; gap:3px; }
 .minimap-size button { width:20px; height:20px; min-height:0; padding:0; display:grid; place-items:center; border:1px solid var(--line, #79704b); border-radius:5px; background:var(--glass, rgb(30 35 25 / .86)); color:var(--ink, #ede5c9); font:700 13px/1 var(--font-ui, system-ui); cursor:pointer; }
 .minimap-size button:hover:not(:disabled) { border-color:var(--gold, #e3c57a); color:var(--gold, #e3c57a); }
+.minimap-size button.minimap-deposit { font-size:11px; opacity:.75; }
+.minimap-size button.minimap-deposit.on { opacity:1; border-color:var(--gold, #e3c57a); color:var(--gold, #e3c57a); }
 .minimap-size button:focus-visible { outline:2px solid var(--gold, #e3c57a); outline-offset:1px; }
 .minimap-size button:disabled { opacity:.4; cursor:default; }
 /* #105: the bottom-right column of the map, top to bottom notices → event feed → minimap, so none covers another. */

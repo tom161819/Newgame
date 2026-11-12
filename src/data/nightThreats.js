@@ -12,6 +12,9 @@ export const NIGHT_THREATS=Object.freeze({
   wolves:Object.freeze({
     chance:Object.freeze({Spring:.35,Summer:.25,Autumn:.4,Winter:.7}),pack:Object.freeze([2,4]),
     spawnDistance:28,edge:4,huntRange:40,nearHouses:12,fleeSoldiers:3,fleeRange:4,repathMs:400,leaveMs:40000,
+    // m-vlk-zustava (owner, 12 Nov): a wolf that attacked someone stays 2–4 days in a den 15–25 tiles from the attack,
+    // roams about 6 tiles round it by day (back to the den when hurt) and may hunt again at night.
+    lurk:Object.freeze({days:Object.freeze([2,4]),den:Object.freeze([15,25]),roam:6,hurt:.5,repathMs:3000}),
   }),
   // Thieves: the chance per night grows with unhappiness (kingdom average below 60) and only a store or the castle
   // without a burning light within 6 tiles is a target. A thief takes 10–30 Gold (castle) or 10–20 goods and runs to

@@ -184,3 +184,8 @@ test('m-kasarna-limit-zamestnani: a Barracks hires 4 automatically by default; t
   const { EmploymentSystem } = await import('../src/systems/EmploymentSystem.js');
   if(s.employment){barracks.autoHire=2;const open=s.employment.seats().filter(x=>x.building.id===barracks.id).length;assert.ok(open<=2,'no more than the limit');}
 });
+test('m-vlk-zustava: "Hunt the wolf" sends a soldier after a lurking wolf far from his Barracks', () => {
+  const {s,barracks}=kingdom();const w=soldier(s,barracks,{x:52,y:54},5);const wolf=s.animalSystem.create(s.objectRegistry.require('wolf'),{x:80,y:80});wolf.wolf={state:'lurking',den:{x:80,y:80},until:1e12,repath:0,since:0};
+  w.huntWolfId=wolf.id;let t=0;while(t<120000&&wolf.isAlive&&s.combat.attacks.get(w)!==wolf){s.tick(50);t+=50;}
+  assert.ok(!wolf.isAlive||s.combat.attacks.get(w)===wolf,'the soldier reaches the wolf and fights it');
+});

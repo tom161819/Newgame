@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.103.0] - 2026-11-13
+<!-- version: {"title":"The wolf stays, Towers turn, deposits on the minimap","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- A wolf that attacked someone at night does not leave at dawn: it hides in a den 15–25 tiles away for 2–4 days, roams there by day and may hunt again at night. A notice says so, and the Army tab has "Hunt the wolf" for the chosen soldiers.
+- R (or Shift + wheel) turns a Tower while placing it, like a Gate.
+- Minimap buttons ⛰ and ◈ mark the found Stone and Iron deposits (free ones bright, ones in use dim); a click on a mark goes there.
+
 ## [0.102.0] - 2026-11-13
 <!-- version: {"title":"Stone ×2, Iron Mine over its deposit, building store","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

@@ -126,7 +126,9 @@ export class MilitarySystem {
       if(!this.scene.workplaceSystem.atWorkplace(worker)&&!worker.nextTile&&!worker.path.length&&worker.aiCooldown<=0){worker.aiCooldown=1000;worker.moveTo(this.scene.workplaceSystem.goals(worker));}return true;}
     // kasarna-branci: Recruits defend near their Barracks too, with their basic stats.
     if(!(unit||this.isRecruit(worker))||worker.commandState?.state==='Holding')return false;
-    const target=combat.attacks.get(worker)?.isAlive&&combat.attacks.get(worker).definition?combat.attacks.get(worker):this.threat(worker);if(!target)return false;
+    // m-vlk-zustava: "Hunt the wolf" sends a soldier after a lurking wolf anywhere on the map until it is dead or gone.
+    let hunted=null;if(worker.huntWolfId){hunted=this.scene.animalSystem?.animals?.get?.(worker.huntWolfId)??[...(this.scene.animalSystem?.animals?.values?.()??[])].find(a=>a.id===worker.huntWolfId);if(!hunted?.isAlive||hunted.active===false){delete worker.huntWolfId;hunted=null;}}
+    const target=combat.attacks.get(worker)?.isAlive&&combat.attacks.get(worker).definition?combat.attacks.get(worker):this.threat(worker)??hunted;if(!target)return false;
     worker.workState='Working';worker.workMessage='Defending the kingdom';
     const ranged=worker.attackRange>1,ready=!worker.nextTile&&(ranged?inAttackRange(worker,target,this.scene.map)&&combat.canTarget(worker,target):canInteractAdjacent(this.scene.map,worker,target));
     if(ready){worker.path=[];combat.startAttack(worker,target);const dx=target.position.x-worker.position.x,dy=target.position.y-worker.position.y,n=Math.hypot(dx,dy);if(n)worker.direction={x:dx/n,y:dy/n};return true;}

@@ -28,7 +28,7 @@ export class WorldCamera {
     this.camera.preRender();
     // m-staveni-zdi-studna (59): Shift+wheel turns a Gate being placed instead of zooming (one turn per 200 ms).
     this.wheel = (pointer, objects, dx, dy) => {
-      if (pointer.event?.shiftKey && scene.buildMode && scene.selectedBuilding?.id === 'wall_gate') { const now = performance.now(); if (now - (this.lastGateTurn ?? -1e9) > 200) { this.lastGateTurn = now; scene.rotateGate(); } return; }
+      if (pointer.event?.shiftKey && scene.buildMode && ['wall_gate','tower'].includes(scene.selectedBuilding?.id)) { const now = performance.now(); if (now - (this.lastGateTurn ?? -1e9) > 200) { this.lastGateTurn = now; scene.rotateGate(); } return; }
       this.zoom(dy);
     };
     this.recenter = () => this.follow();

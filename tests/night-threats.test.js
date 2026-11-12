@@ -76,8 +76,14 @@ test('a wolf hunts people outdoors, never steps into a burning light, flees from
   s.dayNight.flameLights=()=>[];const near=[0,1,2].map(i=>{const w=s.workerSystem.create({x:wolf.tile.x+1,y:wolf.tile.y+i-1});w.profession='soldier';return w;});
   const before=Math.hypot(wolf.position.x-near[0].position.x,wolf.position.y-near[0].position.y);tick(s,3000);
   assert.ok(Math.hypot(wolf.position.x-near[0].position.x,wolf.position.y-near[0].position.y)>before,'runs from the soldiers');
-  // Dawn: gone.
-  const g=s.gameTime;g.update(g.dayDuration-g.elapsed+g.dayDuration*.02);tick(s,45000,100);assert.equal(s.animalSystem.animals.has(wolf.id),false,'left at dawn');
+  // Dawn: a wolf that attacked someone stays (m-vlk-zustava); one that did not is gone.
+  assert.ok(wolf.wolf.attacked,'the attack is remembered');const wolf2=s.animalSystem.create(def,{x:30,y:30});
+  const g=s.gameTime;g.update(g.dayDuration-g.elapsed+g.dayDuration*.02);tick(s,45000,100);assert.equal(s.animalSystem.animals.has(wolf2.id),false,'left at dawn');
+  assert.equal(s.animalSystem.animals.has(wolf.id),true,'the attacker stays');assert.equal(wolf.wolf.state,'lurking');assert.ok(wolf.wolf.den);
+  const d=Math.hypot(wolf.wolf.den.x-wolf.wolf.attacked.x,wolf.wolf.den.y-wolf.wolf.attacked.y);assert.ok(d>=14&&d<=26,`den 15–25 tiles away (${d})`);
+  const data=s.nightThreats.exportState();assert.equal(data.lurkers.length,1);assert.ok(validNightThreatState(data,new Set(s.buildings.map(b=>b.id))));
+  // After its days it leaves.
+  wolf.wolf.until=s.gameTime.totalElapsed;tick(s,45000,100);assert.equal(s.animalSystem.animals.has(wolf.id),false,'gone after its days');
 });
 
 test('wolves near the houses: one notice and the night speed-up stops; the wolf state survives Save', () => {
