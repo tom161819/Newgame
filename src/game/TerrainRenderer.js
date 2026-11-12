@@ -1,9 +1,11 @@
 import { pathSurface } from '../render/pathSurface.js';
 import { RELIEF_RULES } from './terrainRelief.js';
+import { gridToWorld as gridToWorldLifted, tileCenter as tileCenterLifted } from './isometric.js';
+import { HEIGHT_UNIT_PX, HEIGHT_MAX } from './terrainHeight.js';
 import PATH_SURFACE from '../data/pathSurface.json' with { type: 'json' };
 import { drawCobbles } from './cobbles.js';
 import { COLUMNS, ROWS, TILE_WIDTH, TILE_HEIGHT } from './config.js';
-import { tileCenter, worldToGrid, gridToWorld, ORIGIN } from './isometric.js';
+import { tileCenterFlat as tileCenter, worldToGridFlat as worldToGrid, gridToWorldFlat as gridToWorld, ORIGIN } from './isometric.js'; // flat: painted into the ground picture before it is lifted
 import { objectRegistry } from '../systems/ObjectRegistry.js';
 import { PATH_WEAR } from '../data/pathWear.js';
 import { canStep } from './pathfinding.js';
@@ -38,6 +40,16 @@ const FOG_PATCH_EVERY_MS = 150, FOG_PATCH_BUDGET_MS = 3;
 const pathOnlyChange=(a,b)=>{if(!a||!b||a===b)return false;const cut=v=>v.split('|').filter((_,i)=>i!==2).join('|');return cut(a)===cut(b);};
 const GREY_CHUNKS = 48;
 const GROUND_BAND = 36; // rows of ground a frame in a paint spread over frames (a multiple of GROUND_STEP)
+// m-teren-vyska (part 2): room above a chunk's picture for its highest ground (px).
+const LIFT_PAD = Math.ceil(HEIGHT_MAX * HEIGHT_UNIT_PX) + 2;
+// Neighbouring pieces of the lifted ground overlap by this many px on every edge (a clip edge is antialiased; without
+// the overlap a hairline of the background shows between tiles). `inflate` moves every edge of a convex polygon out.
+const LIFT_OVERLAP = 1;
+function inflate(points, d) {
+  const n = points.length, cx = points.reduce((a, p) => a + p[0], 0) / n, cy = points.reduce((a, p) => a + p[1], 0) / n, lines = [];
+  for (let i = 0; i < n; i++) { const [x1, y1] = points[i], [x2, y2] = points[(i + 1) % n]; let nx = y2 - y1, ny = x1 - x2; const len = Math.hypot(nx, ny) || 1; nx /= len; ny /= len; if (nx * (cx - x1) + ny * (cy - y1) > 0) { nx = -nx; ny = -ny; } lines.push([nx, ny, nx * x1 + ny * y1 + d]); }
+  return points.map((p, i) => { const [a1, b1, c1] = lines[(i + n - 1) % n], [a2, b2, c2] = lines[i], det = a1 * b2 - a2 * b1; if (Math.abs(det) < 1e-9) return p; const x = (c1 * b2 - c2 * b1) / det, y = (a1 * c2 - a2 * c1) / det; return Math.hypot(x - p[0], y - p[1]) > d * 6 ? [p[0] + (x - p[0]) * d * 6 / Math.hypot(x - p[0], y - p[1]), p[1] + (y - p[1]) * d * 6 / Math.hypot(x - p[0], y - p[1])] : [x, y]; });
+}
 const GROUND_STEP = 6, PATH_PLANT_REACH = 48, PATH_PARTIAL_SHARE = 0.4;
 const TILE_BLEED = .8;
 
@@ -349,6 +361,51 @@ export class TerrainRenderer {
     for(const p of list){const [sx,sy]=screen(p.fx,p.fy);drawPlant(context,p,sx,sy,name);}
     if(rect)context.restore();};
     return {ground,plants};
+  }
+  // m-teren-vyska (part 2): the chunk as it is shown – its flat picture (ground, paths, fog, memory) lifted by the
+  // height, as in the Studio's World Lab: each tile is two triangles of the flat picture, each moved up by an affine map
+  // (x stays, y rises by the height at that point), drawn back to front; a triangle turned away from the viewer is
+  // skipped (it lies behind its own hill). The lifted picture is LIFT_PAD px taller and is shown that much higher.
+  // Returns the lifted texture's key, or null for a level chunk (shown as it is).
+  liftChunk(key,rects=null){
+    const relief=this.scene.relief;if(!relief||this.scene.reliefLift===false||typeof document==='undefined')return null;
+    const [cx,cy]=key.split(',').map(Number),flatKey=`terrain-chunk-${cx}-${cy}`,name=`terrain-lift-${cx}-${cy}`,textures=this.scene.textures;if(!textures.exists(flatKey))return null;
+    const x0=cx*CHUNK_SIZE,y0=cy*CHUNK_SIZE,CW=relief.width+1,U=HEIGHT_UNIT_PX,corner=(x,y)=>relief.map.corners[Math.max(0,Math.min(relief.height,y))*CW+Math.max(0,Math.min(relief.width,x))]*U;
+    // What the chunk's relief asks for, worked out once: its highest and lowest corner, and whether any tile stands so
+    // far above the tile in front of it that it could cover it (then a part cannot be redrawn alone).
+    let shape=(this.liftShapes??=new Map()).get(key);
+    if(!shape){let top=0,low=Infinity,cover=false;for(let y=y0;y<=y0+CHUNK_SIZE;y++)for(let x=x0;x<=x0+CHUNK_SIZE;x++){const c=corner(x,y);top=Math.max(top,c);low=Math.min(low,c);if(corner(x+1,y+1)-c>TILE_HEIGHT/2-3||corner(x+1,y)-c>TILE_HEIGHT/2-3||corner(x,y+1)-c>TILE_HEIGHT/2-3)cover=true;}
+      shape={top,low,cover};this.liftShapes.set(key,shape);}
+    if(shape.top<.5){if(textures.exists(name))textures.remove(name);return null;}
+    const flat=textures.get(flatKey).getSourceImage(),W=flat.width,H=flat.height,fresh=!textures.exists(name),texture=fresh?textures.createCanvas(name,W,H+LIFT_PAD):textures.get(name),out=texture.getContext();
+    const origin=gridToWorld(x0,y0),left=origin.x-CHUNK_SIZE*32,topY=origin.y,hw=TILE_WIDTH/2,hh=TILE_HEIGHT/2;
+    out.setTransform(1,0,0,1,0,0);
+    // A nearly level chunk (a plain, a lake): one copy moved up.
+    if(shape.top-shape.low<.6){out.clearRect(0,0,W,H+LIFT_PAD);out.drawImage(flat,0,Math.round(LIFT_PAD-(shape.top+shape.low)/2));texture.refresh();this.paintStats.lifts=(this.paintStats.lifts??0)+1;return name;}
+    // `rects` (flat chunk px, fog patches): only the tiles they touch are drawn again, over what is there (ground is
+    // opaque) – unless a tile of this chunk may cover the one in front of it.
+    const partial=!!rects&&!fresh&&!shape.cover;if(!partial)out.clearRect(0,0,W,H+LIFT_PAD);
+    const piece=(p,l)=>{
+      // The affine map of the plane through the first three points: x stays, y rises by a·x + b·y + c.
+      const [[ax,ay],[bx,by],[qx,qy]]=p,det=(bx-ax)*(qy-ay)-(qx-ax)*(by-ay);if(!det)return;
+      const a=((l[1]-l[0])*(qy-ay)-(l[2]-l[0])*(by-ay))/det,b=((bx-ax)*(l[2]-l[0])-(qx-ax)*(l[1]-l[0]))/det,c=l[0]-a*ax-b*ay;
+      if(1-b<.05)return;
+      const d=p.map(([x,y])=>[x,y-(a*x+b*y+c)+LIFT_PAD]);
+      out.save();out.beginPath();inflate(d,LIFT_OVERLAP).forEach(([x,y],i)=>{if(i)out.lineTo(x,y);else out.moveTo(x,y);});out.closePath();out.clip();
+      out.setTransform(1,-a,0,1-b,0,-c+LIFT_PAD);
+      let sx=Infinity,sy=Infinity,ex=-Infinity,ey=-Infinity;for(const [x,y] of p){sx=Math.min(sx,x);sy=Math.min(sy,y);ex=Math.max(ex,x);ey=Math.max(ey,y);}
+      sx=Math.max(0,Math.floor(sx)-2);sy=Math.max(0,Math.floor(sy)-2);const sw=Math.min(W-sx,Math.ceil(ex)+2-sx),sh=Math.min(H-sy,Math.ceil(ey)+2-sy);
+      if(sw>0&&sh>0)out.drawImage(flat,sx,sy,sw,sh,sx,sy,sw,sh);out.restore();
+    };
+    let drawn=0;
+    for(let sum=0;sum<=2*(CHUNK_SIZE-1);sum++)for(let dx=0;dx<CHUNK_SIZE;dx++){const dy=sum-dx;if(dy<0||dy>=CHUNK_SIZE)continue;
+      const x=x0+dx,y=y0+dy,px=ORIGIN.x-left+(x-y)*hw,py=ORIGIN.y-topY+(x+y)*hh;
+      if(partial&&!rects.some(r=>px+hw+2>r.bx0&&px-hw-2<r.bx0+r.bw&&py+2*hh+2>r.by0&&py-2<r.by0+r.bh))continue;
+      const N=[px,py],E=[px+hw,py+hh],S=[px,py+2*hh],Wp=[px-hw,py+hh],c=[corner(x,y),corner(x+1,y),corner(x+1,y+1),corner(x,y+1)];drawn++;
+      // A tile whose four corners lie in one plane (within half a pixel) is one piece, otherwise two triangles.
+      if(Math.abs(c[0]+c[2]-c[1]-c[3])<.5)piece([N,E,Wp,S],[c[0],c[1],c[3],c[2]]);
+      else{piece([N,E,Wp],[c[0],c[1],c[3]]);piece([Wp,E,S],[c[3],c[1],c[2]]);}}
+    texture.refresh();this.paintStats.lifts=(this.paintStats.lifts??0)+1;this.paintStats.liftTiles=(this.paintStats.liftTiles??0)+drawn;return name;
   }
   // m-teren-vyska: slope shading over a chunk's ground (whole picture or `rect`): light slopes facing the upper left of
   // the screen, dark ones facing away, nothing on level ground and on water. One small image, a pixel per tile corner,
@@ -854,7 +911,7 @@ export class TerrainRenderer {
         if(!ok)continue;
         const key=groupKey(g),sprite=this.groupSprites.get(key)??this.groupPool.pop()??this.scene.add.image(0,0,'__WHITE');
         if(!this.paintGroup(sprite,g,fog)){sprite.setVisible(false);this.groupPool.push(sprite);this.groupSprites.delete(key);continue;}
-        const centre=gridToWorld(g.x+g.w/2,g.y+g.h/2),front=tileCenter(groupFront(g));
+        const centre=gridToWorldLifted(g.x+g.w/2,g.y+g.h/2),front=tileCenterLifted(groupFront(g));
         const offset=g.kind==='rocks'?this.outcrop.depth?.offset??0:this.registry.get?.('bush_meadow')?.depth?.offset??0;
         sprite.setPosition(centre.x,centre.y).setDepth(front.y+offset).setVisible(true);sprite.natureGroup=g;
         this.groupSprites.set(key,sprite);shown.add(key);for(const t of tiles)covered.set(`${t.x},${t.y}`,g);
@@ -984,7 +1041,10 @@ export class TerrainRenderer {
             context.save();diamond();context.clip();diamond();context.fill();context.restore();continue;}
           context.moveTo(px-33,py);context.lineTo(px,py-16.5);context.lineTo(px+33,py);context.lineTo(px,py+16.5);context.closePath();context.fill();}
         context.restore();}}
-      texture.refresh();this.composite?.touch(key,rects.map(r=>({x:left+r.bx0,y:top+r.by0,width:r.bw,height:r.bh})));this.paintStats.patches=(this.paintStats.patches??0)+indices.size;
+      texture.refresh();const liftedPatch=this.liftChunk(key,rects);
+      // Lifted, a patched rectangle lies up to the chunk's highest ground higher (and reaches a tile further each way).
+      const shape=liftedPatch?this.liftShapes.get(key):null;
+      this.composite?.touch(key,rects.map(r=>shape?{x:left+r.bx0-34,y:top+r.by0-Math.ceil(shape.top)-18,width:r.bw+68,height:r.bh+Math.ceil(shape.top-shape.low)+36}:{x:left+r.bx0,y:top+r.by0,width:r.bw,height:r.bh}));this.paintStats.patches=(this.paintStats.patches??0)+indices.size;
     }
   }
   // Performance: a newly visible chunk is painted at once (never a hole); already shown chunks that became dirty
@@ -997,7 +1057,10 @@ export class TerrainRenderer {
     const waiting=[],paint=(key,urgentPaint=false)=>{
       const [cx,cy] = key.split(',').map(Number);this.paintingUrgent=urgentPaint;let texture;try{texture=this.chunkTexture(cx,cy);}finally{this.paintingUrgent=false;}
       const image = this.chunks.get(key)??this.chunkPool.pop() ?? this.scene.add.image(0,0,texture.key).setOrigin(0,0).setDepth(-100);
-      image.setTexture(texture.key).setPosition(texture.x,texture.y).setVisible(true);
+      // The picture shown is the lifted one (liftChunk); a level chunk shows its flat picture.
+      const liftName=`terrain-lift-${cx}-${cy}`,lifted=texture.painted!==false||!this.scene.textures.exists(liftName)?this.liftChunk(key):liftName;
+      image.setTexture(lifted??texture.key).setPosition(texture.x,texture.y-(lifted?LIFT_PAD:0)).setVisible(true);
+      const shape=lifted?this.liftShapes?.get(key):null;image.tight=shape?{x:texture.x,y:Math.floor(texture.y-shape.top)-2,width:image.frame.cutWidth,height:Math.ceil(image.frame.cutHeight-LIFT_PAD+shape.top-shape.low)+4}:null;
       this.chunks.set(key,image);const done=!this.dirtyChunks.has(key);if(done||texture.painted)this.composite?.touch(key);return done||!!texture.painted;
     };
     for (const key of this.neededChunks??[]) {
@@ -1043,7 +1106,7 @@ export class TerrainRenderer {
     this.debugGraphics.clear();
     const padding = 100;
     const corners = [[view.x-padding,view.y-padding],[view.right+padding,view.y-padding],
-      [view.x-padding,view.bottom+padding],[view.right+padding,view.bottom+padding]].map(([x,y])=>worldToGrid(x,y));
+      [view.x-padding,view.bottom+padding+LIFT_PAD],[view.right+padding,view.bottom+padding+LIFT_PAD]].map(([x,y])=>worldToGrid(x,y));
     const minX=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.x)))-1);
     const maxX=Math.min(COLUMNS-1,Math.ceil(Math.max(...corners.map(p=>p.x)))+1);
     const minY=Math.max(0,Math.floor(Math.min(...corners.map(p=>p.y)))-1);
@@ -1053,7 +1116,8 @@ export class TerrainRenderer {
     let visibleCount = 0;
     for(let y=minY;y<=maxY;y++) for(let x=minX;x<=maxX;x++) {
       const p=tileCenter({x,y});
-      if(p.x<view.x-padding||p.x>view.right+padding||p.y<view.y-padding||p.y>view.bottom+padding)continue;
+      if(p.x<view.x-padding||p.x>view.right+padding||p.y<view.y-padding||p.y>view.bottom+padding+LIFT_PAD)continue;
+      const pl=tileCenterLifted({x,y}); // where things standing on this tile are drawn
       visibleCount++;
       if(this.debugEnabled&&this.wear?.isGrass({x,y})&&(!fog||fog.isVisibleTile({x,y}))){
         const colors=[0x87a18a,0x7fbf6a,0xc6cf75,0xdfac67,0xe38b57],level=this.wear.level({x,y});
@@ -1066,7 +1130,7 @@ export class TerrainRenderer {
         occupied??=this.buildingTiles();const state=fog?.displayState({x,y})??VISIBILITY.VISIBLE;
         if(state!==VISIBILITY.UNEXPLORED&&(!fog?.enabled||fog.isInSightTile({x,y})||fog.explored[y*fog.width+x])&&this.bushVisible(x,y,occupied)){
           const key=`${x},${y}`,id=BUSH_TYPES[bush],definition=this.registry.get?.(id),sprite=this.bushSprites.get(key)??this.bushPool.pop()??this.scene.add.image(0,0,this.assets?.textureKey(id)??'__DEFAULT');
-          const painted=this.paintBush(sprite,bush,state,fog,x,y);if(painted){if(painted!=='nature')sprite.setOrigin(definition?.origin?.x??.5,definition?.origin?.y??.6);sprite.setPosition(p.x,p.y).setDepth(p.y+(definition?.depth?.offset??0)).setVisible(true);this.bushSprites.set(key,sprite);shownBushes.add(key);}
+          const painted=this.paintBush(sprite,bush,state,fog,x,y);if(painted){if(painted!=='nature')sprite.setOrigin(definition?.origin?.x??.5,definition?.origin?.y??.6);sprite.setPosition(pl.x,pl.y).setDepth(pl.y+(definition?.depth?.offset??0)).setVisible(true);this.bushSprites.set(key,sprite);shownBushes.add(key);}
           else{sprite.setVisible(false);this.bushPool.push(sprite);this.bushSprites.delete(key);}
         }
       }
@@ -1078,7 +1142,7 @@ export class TerrainRenderer {
       const key=`${x},${y}`; visible.add(key);
       if(this.tiles.has(key)){this.paintWall(this.tiles.get(key),state,fog);continue;}
       const wall=this.wallPool.pop()??this.scene.add.image(0,0,this.wallTexture).setOrigin(this.outcrop.origin?.x??0.5,this.outcrop.origin?.y??1);
-      wall.tileX=x;wall.tileY=y;wall.setPosition(p.x,p.y).setDepth(p.y+(this.outcrop.depth?.offset??0)).setVisible(true);this.paintWall(wall,state,fog);
+      wall.tileX=x;wall.tileY=y;wall.setPosition(pl.x,pl.y).setDepth(pl.y+(this.outcrop.depth?.offset??0)).setVisible(true);this.paintWall(wall,state,fog);
       this.tiles.set(key,wall);
     }
     for(const [key,tile] of this.tiles) if(!visible.has(key)) {
@@ -1087,7 +1151,9 @@ export class TerrainRenderer {
     }
     for(const [key,sprite]of this.bushSprites)if(!shownBushes.has(key)){sprite.setVisible(false);this.bushPool.push(sprite);this.bushSprites.delete(key);}
     for (const [key, chunk] of this.chunks) if (!neededChunks.has(key)) {
-      chunk.setVisible(false); this.chunkPool.push(chunk); this.chunks.delete(key);
+      chunk.setVisible(false); chunk.tight=null; this.chunkPool.push(chunk); this.chunks.delete(key);
+      // The lifted picture of a chunk that left the view is freed (about 1 MB each); it is made again on return.
+      {const [lx,ly]=key.split(',');const flatKey=`terrain-chunk-${lx}-${ly}`,liftName=`terrain-lift-${lx}-${ly}`;if(this.scene.textures.exists(liftName)){if(this.scene.textures.exists(flatKey))chunk.setTexture(flatKey);this.scene.textures.remove(liftName);}}
     }
     this.neededChunks=neededChunks;this.repaintDirty();
     this.visibleCount=visibleCount;

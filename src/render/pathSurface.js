@@ -5,7 +5,7 @@
 // level with the ground's own grain, and the soil takes its colour from what it lies on (meadow earth, sand, mud,
 // stony gravel); in winter the path is packed, brownish snow. Used by the World/Path Lab and the game alike.
 import { fieldAt } from '../game/pathV2.js';
-import { gridToWorld } from '../game/isometric.js';
+import { gridToWorldFlat as gridToWorld } from '../game/isometric.js'; // flat: painted into the ground picture before it is lifted
 
 const hex = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
 const smooth = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };

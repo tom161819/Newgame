@@ -1,4 +1,4 @@
-import { ORIGIN, worldToGrid } from './isometric.js';
+import { ORIGIN, worldToGrid, projectionLift } from './isometric.js';
 import { TILE_WIDTH, TILE_HEIGHT, COLUMNS, ROWS } from './config.js';
 import { VISIBILITY, FOG_STYLE } from '../systems/FogOfWarSystem.js';
 
@@ -39,6 +39,7 @@ export function fogEdgeMask({left,top,columns,rows,resolution:R=FOG_EDGE.resolut
   return {alpha,tgt,width:W,height:H,empty:!any};
 }
 
+const LIFT_BLOCK=3,LIFT_ROOM=66;
 export class FogEdgeLayer {
   constructor(scene){
     this.scene=scene;this.key='fog:edge-mask';const size=FOG_EDGE.maxTiles*FOG_EDGE.resolution;const most=Math.max(...FOG_EDGE.levels.map(([max,R])=>Math.min(max,FOG_EDGE.maxTiles**2)*R*R));this.buffers={dist:new Float32Array(most),tgt:new Float32Array(most),alpha:new Float32Array(most)};
@@ -115,13 +116,26 @@ export class FogEdgeLayer {
     const ox=view.x-pad/z,oy=view.y-pad/z,e=(ORIGIN.x+(m.left-m.top)*32-ox)*z,f=(ORIGIN.y+(m.left+m.top)*16-oy)*z;
     // Mask pixel (u, v) → grid (left + u/R, top + v/R) → world (gridToWorld) → padded view pixel ((world − origin) · zoom).
     const corner=(u,v)=>({x:e+(u-v)*32*z/k,y:f+(u+v)*16*z/k}),q=[corner(c.x,c.y),corner(c.x+c.width,c.y),corner(c.x,c.y+c.height),corner(c.x+c.width,c.y+c.height)];
-    const bx=Math.max(0,Math.floor(Math.min(...q.map(p=>p.x)))-1),by=Math.max(0,Math.floor(Math.min(...q.map(p=>p.y)))-1),bw=Math.min(Math.ceil(fullW),Math.ceil(Math.max(...q.map(p=>p.x)))+1)-bx,bh=Math.min(Math.ceil(fullH),Math.ceil(Math.max(...q.map(p=>p.y)))+1)-by;
+    const liftRoom=this.scene.relief&&this.scene.reliefLift!==false?LIFT_ROOM*z:0;
+    const bx=Math.max(0,Math.floor(Math.min(...q.map(p=>p.x)))-1),by=Math.max(0,Math.floor(Math.min(...q.map(p=>p.y))-liftRoom)-1),bw=Math.min(Math.ceil(fullW),Math.ceil(Math.max(...q.map(p=>p.x)))+1)-bx,bh=Math.min(Math.ceil(fullH),Math.ceil(Math.max(...q.map(p=>p.y)))+1)-by;
     const base={zoom:z,width:camera.width,height:camera.height,ox,oy};
     if(bw<=0||bh<=0){this.cache={...base,empty:true};return;}
     if(this.screen.width<bw||this.screen.height<bh){this.texture.setSize(Math.max(this.screen.width,Math.ceil(bw/64)*64),Math.max(this.screen.height,Math.ceil(bh/64)*64));this.image.setSizeToFrame();this.used=null;}
     const ctx=this.screenContext;ctx.setTransform(1,0,0,1,0,0);if(this.used)ctx.clearRect(0,0,this.used[0],this.used[1]);
-    ctx.imageSmoothingEnabled=true;ctx.setTransform(32*z/k,16*z/k,-32*z/k,16*z/k,e-bx,f-by);
-    ctx.drawImage(this.canvas,c.x,c.y,c.width,c.height,c.x,c.y,c.width,c.height);ctx.setTransform(1,0,0,1,0,0);
+    ctx.imageSmoothingEnabled=true;
+    if(!this.scene.relief||this.scene.reliefLift===false){ctx.setTransform(32*z/k,16*z/k,-32*z/k,16*z/k,e-bx,f-by);ctx.drawImage(this.canvas,c.x,c.y,c.width,c.height,c.x,c.y,c.width,c.height);}
+    else{
+      // m-teren-vyska (part 2): the ground is lifted, so the mask is laid in blocks of LIFT_BLOCK × LIFT_BLOCK tiles, each
+      // moved up by the lift at its middle. Blocks reach one tile into their neighbours and replace what lies under them
+      // ('copy' inside their own outline), back to front, so no gap opens and no soft edge is darkened twice.
+      const B=LIFT_BLOCK,tx0=Math.floor(m.left+c.x/k),ty0=Math.floor(m.top+c.y/k),tx1=Math.ceil(m.left+(c.x+c.width)/k),ty1=Math.ceil(m.top+(c.y+c.height)/k),blocks=[];
+      for(let ty=Math.floor(ty0/B)*B;ty<ty1;ty+=B)for(let tx=Math.floor(tx0/B)*B;tx<tx1;tx+=B)blocks.push([tx,ty]);blocks.sort((p,q)=>p[0]+p[1]-q[0]-q[1]);
+      for(const [tx,ty] of blocks){
+        const u0=Math.max(c.x,(tx-1-m.left)*k),v0=Math.max(c.y,(ty-1-m.top)*k),u1=Math.min(c.x+c.width,(tx+B+1-m.left)*k),v1=Math.min(c.y+c.height,(ty+B+1-m.top)*k);if(u1<=u0||v1<=v0)continue;
+        ctx.save();ctx.setTransform(32*z/k,16*z/k,-32*z/k,16*z/k,e-bx,f-by-projectionLift(tx+B/2,ty+B/2)*z);ctx.beginPath();ctx.rect(u0,v0,u1-u0,v1-v0);ctx.clip();ctx.globalCompositeOperation='copy';
+        ctx.drawImage(this.canvas,u0,v0,u1-u0,v1-v0,u0,v0,u1-u0,v1-v0);ctx.restore();}
+    }
+    ctx.setTransform(1,0,0,1,0,0);
     this.texture.refresh();this.used=[bw,bh];this.cache={...base,x:ox+bx/z,y:oy+by/z};
     this.image.setCrop(0,0,bw,bh);
     this.stats.projects++;this.stats.projectMs+=performance.now()-started;this.stats.cachePixels=bw*bh;

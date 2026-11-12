@@ -18,7 +18,7 @@ async function measure(page,name,speed){
 export async function performanceSmoke(context,url,instrument){
   const page=await context.newPage();await instrument?.(page);let others=[];
   try{
-    await page.addInitScript(()=>{try{localStorage.setItem('newgame.tutorial','off');localStorage.setItem('newgame.devBalance',JSON.stringify({mode:true}));localStorage.removeItem('newgame.gameSpeed');}catch{}let state=77123;Math.random=()=>((state=Math.imul(state,1664525)+1013904223>>>0)/2**32);});
+    await page.addInitScript(()=>{try{localStorage.setItem('newgame.terrainLift','on');localStorage.setItem('newgame.tutorial','off');localStorage.setItem('newgame.devBalance',JSON.stringify({mode:true}));localStorage.removeItem('newgame.gameSpeed');}catch{}let state=77123;Math.random=()=>((state=Math.imul(state,1664525)+1013904223>>>0)/2**32);});
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.devBalancePanel?.profiler);
     // No Escape here: since 0.86 it opens the pause menu on the map, and a paused game neither builds nor advances.

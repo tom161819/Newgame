@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.96.0] - 2026-11-12
+<!-- version: {"title":"Terrain height: lifted ground","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Terrain height, second part: the ground is drawn lifted by its height, as in the Studio's World Lab – hills rise, valleys with water lie lower. Buildings, people, animals, trees, rocks, fields, piles and markers stand at the height of their place, the pointer picks the tile under the lifted ground, and the fog edge follows the hills. The address `?lift=off` draws the ground flat again (`?lift=on` back); the hills' rules stay either way.
+
 ## [0.95.0] - 2026-11-12
 <!-- version: {"title":"Approved tasks: woodcutters, pitch kiln, idle residents","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

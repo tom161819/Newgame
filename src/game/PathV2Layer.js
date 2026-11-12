@@ -1,5 +1,5 @@
 import { COLUMNS, ROWS } from './config.js';
-import { tileCenter, worldToGrid } from './isometric.js';
+import { tileCenterFlat as tileCenter, worldToGridFlat as worldToGrid } from './isometric.js'; // flat: painted into the ground picture before it is lifted
 import { geometry, buckets, fieldAt } from './pathV2.js';
 import { PATH_STYLE, PATH_STYLE_SEED } from '../data/pathStyle.js';
 

@@ -61,3 +61,25 @@ test('m-teren-vyska: sight bonus is read per tile and is nothing without relief'
   const r = ridge(6); r.sight[5 * 30 + 11] = 3;
   assert.equal(sightBonus(r, { x: 11.5, y: 5.5 }), 3); assert.equal(sightBonus(r, { x: 2.5, y: 5.5 }), 0); assert.equal(sightBonus(null, { x: 11.5, y: 5.5 }), 0); assert.equal(currentRelief(), null);
 });
+
+test('m-teren-vyska part 2: things on the map are drawn lifted by the height, and a screen point reads back to the same map point', async () => {
+  const { gridToWorld, gridToWorldFlat, worldToGrid, worldToTile, tileCenter } = await import('../src/game/isometric.js');
+  const { HEIGHT_UNIT_PX, heightAt } = await import('../src/game/terrainHeight.js');
+  const w = world(1234), relief = buildRelief(w.ground, 1234);
+  assert.deepEqual(gridToWorld(40.5, 60.5), gridToWorldFlat(40.5, 60.5), 'no relief: flat');
+  setRelief(relief);
+  try {
+    let lifted = 0, checked = 0;
+    for (let y = 2; y < ROWS - 2; y += 3) for (let x = 2; x < COLUMNS - 2; x += 3) {
+      const flat = gridToWorldFlat(x + .5, y + .5), p = tileCenter({ x, y }), h = heightAt(relief.map, x + .5, y + .5) * HEIGHT_UNIT_PX;
+      assert.equal(p.x, flat.x); assert.ok(Math.abs(flat.y - p.y - h) < 1e-9); if (h > 4) lifted++;
+      // Reading back works wherever the ground faces the viewer (not on the rare slope steeper than the view).
+      if (relief.slopes[y * relief.width + x] > 1.2) continue;
+      const g = worldToGrid(p.x, p.y); checked++;
+      assert.ok(Math.abs(g.x - x - .5) < .08 && Math.abs(g.y - y - .5) < .08, `tile ${x},${y} read back as ${g.x.toFixed(2)},${g.y.toFixed(2)}`);
+      assert.deepEqual(worldToTile(p.x, p.y), { x, y });
+    }
+    assert.ok(lifted > 50 && checked > 500);
+  } finally { setRelief(null); }
+  assert.deepEqual(gridToWorld(40.5, 60.5), gridToWorldFlat(40.5, 60.5), 'cleared again');
+});

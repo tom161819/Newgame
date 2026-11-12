@@ -1,6 +1,6 @@
 import { t,onLanguageChange } from '../i18n/index.js';
 import { VISIBILITY } from '../systems/FogOfWarSystem.js';
-import { gridToWorld,worldToGrid,clampMapCenter } from '../game/isometric.js';
+import { gridToWorldFlat as gridToWorld, worldToGridFlat as worldToGrid, clampMapCenter } from '../game/isometric.js'; // flat: painted into the ground picture before it is lifted
 
 // #104: a small map of the 100 × 100 grid in the bottom-right corner. It shows only what the player knows:
 // unexplored ground is grey, remembered ground and objects come from Map Memory (muted), the area in sight is live.

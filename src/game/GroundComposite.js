@@ -25,16 +25,18 @@ export class GroundComposite {
   shown(){
     const chunks=new Set();for(const image of this.terrain.chunks.values())if(image.visible)chunks.add(this.adopt(image));
     // The scene's own order (equal depth: insertion order), as Phaser drew them.
-    return this.scene.children.list.filter(o=>chunks.has(o));
+    // m-teren-vyska: lifted chunks overlap the ones behind them, so they are drawn back to front (by their top, then left).
+    return this.scene.children.list.filter(o=>chunks.has(o)).sort((a,b)=>a.y-b.y||a.x-b.x);
   }
-  bounds(image){const f=image.frame;return {x:image.x,y:image.y,width:f.cutWidth,height:f.cutHeight};}
+  // m-teren-vyska: a lifted chunk's picture is taller than what it holds; `image.tight` is the part with content.
+  bounds(image){const f=image.frame;return image.tight??{x:image.x,y:image.y,width:f.cutWidth,height:f.cutHeight};}
   // `clip`: only that world rectangle, cleared and drawn again from the parts of the chunks inside it (no clip path).
   draw(images,clip=null){
     const s=this.state,c=this.context,z=s.zoom;c.setTransform(z,0,0,z,-s.ox*z,-s.oy*z);if(clip)c.clearRect(clip.x,clip.y,clip.width,clip.height);
     for(const image of images){const b=this.bounds(image),f=image.frame;
-      if(!clip){c.drawImage(f.source.image,f.cutX,f.cutY,f.cutWidth,f.cutHeight,b.x,b.y,b.width,b.height);continue;}
+      if(!clip){c.drawImage(f.source.image,f.cutX+b.x-image.x,f.cutY+b.y-image.y,b.width,b.height,b.x,b.y,b.width,b.height);continue;}
       const x=Math.max(b.x,clip.x),y=Math.max(b.y,clip.y),w=Math.min(b.x+b.width,clip.x+clip.width)-x,h=Math.min(b.y+b.height,clip.y+clip.height)-y;if(w<=0||h<=0)continue;
-      c.drawImage(f.source.image,f.cutX+x-b.x,f.cutY+y-b.y,w,h,x,y,w,h);}
+      c.drawImage(f.source.image,f.cutX+x-image.x,f.cutY+y-image.y,w,h,x,y,w,h);}
     c.setTransform(1,0,0,1,0,0);
   }
   sync(camera){

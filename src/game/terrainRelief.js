@@ -3,7 +3,8 @@
 // from the world's ground and seed alone, so it is worked out again at every start and load and is not saved.
 // This first part keeps the map flat on screen (hills read through slope shading); lifting the ground and everything
 // on it is the next part.
-import { computeHeights, tileHeight, tileSlope, cornerShade, BUILD_MAX_SLOPE, DEFAULT_HEIGHT_LEVELS } from './terrainHeight.js';
+import { computeHeights, tileHeight, tileSlope, cornerShade, heightAt, BUILD_MAX_SLOPE, DEFAULT_HEIGHT_LEVELS, HEIGHT_UNIT_PX } from './terrainHeight.js';
+import { setProjectionLift } from './isometric.js';
 import { worldRandom } from './seededRandom.js';
 
 export const RELIEF_RULES = Object.freeze({
@@ -36,7 +37,9 @@ export function buildRelief(ground, seed, levels = DEFAULT_HEIGHT_LEVELS) {
   }
   return { map, width: W, height: H, tiles, slopes, sight, shade: cornerShade(map) };
 }
-export function setRelief(relief) { current = relief ?? null; return current; }
+// Setting the relief also sets the lift of the screen projection (isometric.js): everything standing on the map is
+// drawn that much higher, and a screen point is read back through the same lift.
+export function setRelief(relief, { lift = true } = {}) { current = relief ?? null; setProjectionLift(current && lift ? (x, y) => heightAt(current.map, x, y) * HEIGHT_UNIT_PX : null); return current; }
 export const currentRelief = () => current;
 
 const at = (relief, array, x, y) => x >= 0 && y >= 0 && x < relief.width && y < relief.height ? array[y * relief.width + x] : 0;

@@ -232,7 +232,11 @@ export class GameScene extends Phaser.Scene {
       zones:this.loadState.grassZones?importZones(this.loadState.grassZones):emptyZones(),reeds:importReeds(this.loadState.reeds),natureGroups:importNatureGroups(this.loadState.natureGroups)}:generateWorld(Math.random,{levels:this.worldLevels,streams:this.worldRandom});
     this.terrainGrid=world.terrain;this.groundGrid=world.ground;
     // m-teren-vyska: the hills of this world, from its ground and seed (not saved; the same after every load).
-    this.relief=setRelief(buildRelief(world.ground,this.worldSeed));this.bushes=world.bushes;this.grassZones=world.zones;this.reeds=world.reeds;
+    // Part 2: the ground and everything on it is drawn lifted by the height, unless localStorage newgame.terrainLift is
+    // 'off' (the browser smokes, which click by the flat projection; also a way out on a weak machine).
+    // The address ?lift=off / ?lift=on sets and remembers it (like ?renderer=).
+    let liftOn=true;try{const asked=new URLSearchParams(globalThis.location?.search??'').get('lift');if(asked==='off'||asked==='on')globalThis.localStorage?.setItem('newgame.terrainLift',asked);liftOn=globalThis.localStorage?.getItem('newgame.terrainLift')!=='off';}catch{}
+    this.reliefLift=liftOn;this.relief=setRelief(buildRelief(world.ground,this.worldSeed),{lift:liftOn});this.bushes=world.bushes;this.grassZones=world.zones;this.reeds=world.reeds;
     // velke-prirodni-objekty: thickets and rock groups drawn as one object over their bushes and rock tiles.
     this.natureGroups=world.natureGroups??[];
     // Generator 2's weights for where forests and ore deposits grow (new games only; not saved).
@@ -387,6 +391,7 @@ export class GameScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{this.events.off('buildings:changed',this.orientGates);
       this.rockMiningTool.destroy();this.unitSelection.destroy();this.minimap?.destroy();this.eventFeed?.destroy();this.millSails?.destroy();this.kingCargoControl.destroy();this.kingLogistics.destroy();this.lightSources.destroy();
       this.memoryRenderer.destroy();
+      setRelief(null);
       this.populationSidebar.destroy();
       this.staffingIndicators.destroy();
       this.naturalResourcePanel.destroy();this.naturalResources.destroy();this.resourceLedger.destroy();

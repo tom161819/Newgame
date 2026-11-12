@@ -3,7 +3,7 @@
 // tests/path-v2.test.js checks that this copy and the lab give the same geometry and field for the same map.
 // The painting differs from the lab only in where it happens: the lab paints the whole scene at once, the game paints
 // one tile diamond at a time into the terrain chunks (TerrainRenderer), from one geometry built for the whole map.
-import { tileCenter } from './isometric.js';
+import { tileCenterFlat as tileCenter } from './isometric.js'; // flat: painted into the ground picture before it is lifted
 import { PATH_STYLE } from '../data/pathStyle.js';
 
 const STEP = Math.hypot(32, 32); // ground distance between orthogonal tile centres

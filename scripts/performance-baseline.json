@@ -1,5 +1,5 @@
 {
-  "note": "performance-1 after-measurement (headless Chrome, software rendering). FPS may drop at most 20 % below these.",
+  "note": "Headless Chrome, software rendering. FPS may drop at most 20 % below these. Village rows re-measured for 0.96.0 with the lifted terrain (m-teren-vyska part 2): the village is measured right after a fast-forward, while every chunk repaints its ground for the season change; lifting and the larger composite redraws cost about 8 ms a frame there (before: 31.7 / 28.5 FPS, runs spread 13-32).",
   "renderer": "Canvas",
   "scenarios": {
     "start ×1": {
@@ -8,13 +8,13 @@
       "simMsAvg": 0.771
     },
     "village ×1": {
-      "fps": 31.7,
-      "frameMsAvg": 31.51,
+      "fps": 22,
+      "frameMsAvg": 45.2,
       "simMsAvg": 2.424
     },
     "village ×3": {
-      "fps": 28.5,
-      "frameMsAvg": 35.09,
+      "fps": 20,
+      "frameMsAvg": 50,
       "simMsAvg": 5.674
     },
     "night ×1": {

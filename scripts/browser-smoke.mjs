@@ -164,6 +164,10 @@ try{
   // UI Lab styles (m-ui-lab-do-hry): SMOKE_UI_STYLE=stone-castle (or olive, wood-iron, parchment, classic) runs the whole
   // smoke in that style; without it the game uses the owner's Studio design, as players get it.
   // E2: the New Game setup folds its form under Custom settings; the smokes work with it open.
+  // m-teren-vyska (part 2): the smokes click the map by the flat projection (ROWS*32+(x-y)*32, 128+(x+y+1)*16 in about
+  // twenty scripts), so they run with the ground drawn flat (hills and their rules stay on). The performance smoke turns
+  // the lift on again.
+  await context.addInitScript(()=>{try{if(!localStorage.getItem('newgame.terrainLift'))localStorage.setItem('newgame.terrainLift','off');}catch{}});
   await context.addInitScript(()=>{try{if(!localStorage.getItem('newgame.setupCustom'))localStorage.setItem('newgame.setupCustom','open');if(!localStorage.getItem('newgame.tutorial'))localStorage.setItem('newgame.tutorial','off');if(!localStorage.getItem('newgame.tips'))localStorage.setItem('newgame.tips','off');}catch{}});
   // E3: the smokes were written for the Getting started window after New Game; the arrow tutorial has its own smoke.
   if(process.env.SMOKE_UI_STYLE)await context.addInitScript(style=>{try{localStorage.setItem('newgame.uiStyle',style);}catch{}},process.env.SMOKE_UI_STYLE);page.on('request',request=>requests.push(request.url()));
