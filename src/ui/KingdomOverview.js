@@ -1,5 +1,5 @@
 import { t } from '../i18n/index.js';
-import { moodFor } from '../data/needs.js';
+import { moodFor,NEEDS } from '../data/needs.js';
 import { element } from './objectLabels.js';
 import { placeBottomLeft,fromDom,readBarCollapsed,writeBarCollapsed } from './hudLayout.js';
 
@@ -14,7 +14,13 @@ export function kingdomOverview(scene){
   const attraction=scene.attractiveness,factors=[];
   if(attraction){if(scene.foodSystem?.shortage)factors.push(['food',-40]);for(const [id,v] of attraction.modifiers??[])factors.push([id,v]);}
   const happiness=avg('happiness');
-  return {population:residents.length,capacity:workers?.capacity?.()??residents.length,unemployed:residents.filter(w=>w.profession==='idle').length,
+  // m-prehled-procenta-tooltip: what stands behind the percentages (for the explanations on hover).
+  const w=NEEDS.weights,part=key=>statuses.length?statuses.reduce((n,s)=>n+(s[key]??0),0)/statuses.length*w[key]:0,parts={food:part('food'),rest:part('rest'),housing:part('housing'),safety:part('safety')};
+  const weighted=parts.food+parts.rest+parts.housing+parts.safety,count=test=>statuses.filter(test).length;
+  const detail={parts:Object.fromEntries(Object.entries(parts).map(([k,v])=>[k,Math.round(v)])),other:happiness==null?0:Math.round(happiness-weighted),
+    hungry:count(s=>s.food<NEEDS.food.low),tired:count(s=>s.rest<NEEDS.rest.low),housed:count(s=>s.housing>=100),unhoused:count(s=>s.housing<100),unsafe:count(s=>s.safety<50),residents:statuses.length,
+    seats:scene.workplaceSystem?.employees?(scene.buildings??[]).reduce((n,b)=>{const spec=scene.objectRegistry?.get?.(b.type)?.workplace;if(!spec||b.construction&&b.construction.state!=='complete')return n;return n+Math.max(0,(spec.capacity??0)-scene.workplaceSystem.employees(b).length);},0):0};
+  return {detail,population:residents.length,capacity:workers?.capacity?.()??residents.length,unemployed:residents.filter(w=>w.profession==='idle').length,
     happiness,mood:happiness==null?null:moodFor(happiness).id,food:avg('food'),rest:avg('rest'),housing:avg('housing'),safety:avg('safety'),
     attractiveness:attraction?Math.round(attraction.value):null,factors,settleBlock:attraction?.blockReason?.()??null};
 }
@@ -22,6 +28,24 @@ export function kingdomOverview(scene){
 // permanent bar in the bottom-left corner of the map (#kingdom-bar), always in the same place, never over the camera
 // chips, Notices, minimap, side buttons or the open building strip (hudLayout.placeBottomLeft). It folds to a one-line
 // strip (kept in this browser); the summary chips in the top bar toggle it. Values as before (kingdomOverview()).
+// m-prehled-procenta-tooltip (owner, 12 Nov): for every value of the overview, what it is and how it is worked out
+// (with the current numbers), what moves it now, and at most one tip – the lines of its hover text.
+export function overviewExplain(o){
+  const d=o.detail,sign=v=>v>0?`+${v}`:String(v),lines={};if(!d)return lines;
+  const worst=Object.entries(NEEDS.weights).map(([k,weight])=>({k,loss:weight*(100-(o[k]??100))})).sort((a,b)=>b.loss-a.loss)[0];
+  lines.residents=[t('explain.residents',{count:o.population,capacity:o.capacity}),o.population>=o.capacity?t('explain.tip.capacity'):null];
+  lines.unemployed=[t('explain.unemployed',{count:o.unemployed,seats:d.seats}),o.unemployed>3?t('explain.tip.unemployed'):null];
+  if(o.happiness!=null){
+    lines.happiness=[t('explain.happiness',{value:o.happiness,count:d.residents}),t('explain.happinessParts',{food:d.parts.food,rest:d.parts.rest,housing:d.parts.housing,safety:d.parts.safety,other:sign(d.other)}),t('explain.happinessWeights'),
+      worst&&worst.loss>=5?t(`explain.tip.${worst.k}`,{count:worst.k==='housing'?d.unhoused:worst.k==='food'?d.hungry:worst.k==='rest'?d.tired:d.unsafe}):null];
+    lines.food=[t('explain.food',{value:o.food}),t('explain.foodNow',{hungry:d.hungry,count:d.residents}),d.hungry||o.food<70?t('explain.tip.food',{count:d.hungry}):null];
+    lines.rest=[t('explain.rest',{value:o.rest}),t('explain.restNow',{tired:d.tired,housed:d.housed,unhoused:d.unhoused}),o.rest<70?t('explain.tip.rest',{count:d.tired}):null];
+    lines.housing=[t('explain.housing',{value:o.housing,housed:d.housed,count:d.residents}),d.unhoused?t('explain.tip.housing',{count:d.unhoused}):null];
+    lines.safety=[t('explain.safety',{value:o.safety}),t('explain.safetyRule',{base:NEEDS.safety.base,castle:NEEDS.safety.castle.bonus,tower:NEEDS.safety.tower.bonus,guard:NEEDS.safety.guard.bonus,attack:NEEDS.safety.attack.penalty}),o.safety<70?t('explain.tip.safety',{count:d.unsafe}):null];
+  }
+  for(const k of Object.keys(lines))lines[k]=lines[k].filter(Boolean);
+  return lines;
+}
 export const KINGDOM_BAR_AVOID='.inventory,.camera-controls,#notices-panel,#event-feed,#minimap,#unit-command-bar,#settings-button,#dev-tool-button,.population-tab,.buildings-panel';
 export function kingdomBarSummary(o){return [t('overview.population',{count:o.population,capacity:o.capacity}),o.happiness==null?t('overview.moodNone'):t('overview.mood',{value:o.happiness})].join(' · ');}
 export class KingdomOverview {
@@ -61,14 +85,16 @@ export class KingdomOverview {
     set('#overview-population',t('overview.population',{count:o.population,capacity:o.capacity}),o.population>=o.capacity?'warn':'');
     set('#overview-unemployed',t('overview.unemployed',{count:o.unemployed}),o.unemployed>0?'warn':'');
     set('#overview-mood',o.happiness==null?t('overview.moodNone'):t('overview.mood',{value:o.happiness}),tone(o.happiness));
+    {const lines=overviewExplain(o);for(const [id,k] of [['#overview-population','residents'],['#overview-unemployed','unemployed'],['#overview-mood','happiness']]){const el=doc.querySelector(id),text=lines[k]?.join('\n')??'';if(el&&el.title!==text)el.title=text;}}
     if(!this.bar)return;const label=t(this.collapsed?'overview.expand':'overview.collapse');
     if(this.toggle&&this.toggle.title!==label){this.toggle.title=label;this.root.title=label;}
     if(this.summary){const text=kingdomBarSummary(o);if(this.summary.textContent!==text)this.summary.textContent=text;this.summary.dataset.tone=tone(o.happiness);}
     if(this.collapsed||!this.body)return;
     const row=(label,value,tn,title)=>{const r=element('div','overview-row');r.dataset.tone=tn??'';if(title)r.title=title;r.append(element('span','',label),element('strong','',value));return r;};
     const pct=v=>v==null?'—':`${v} %`;
-    const rows=[row(t('overview.bar.residents'),`${o.population} / ${o.capacity}`,o.population>=o.capacity?'warn':'',t('overview.residents')),row(t('overview.unemployedLabel'),String(o.unemployed),o.unemployed?'warn':''),
-      ...['happiness','food','rest','housing','safety'].map(k=>row(t(`overview.need.${k}`),pct(o[k]),tone(o[k]))),
+    const why=overviewExplain(o),tip=k=>why[k]?.join('\n')||undefined;
+    const rows=[row(t('overview.bar.residents'),`${o.population} / ${o.capacity}`,o.population>=o.capacity?'warn':'',tip('residents')??t('overview.residents')),row(t('overview.unemployedLabel'),String(o.unemployed),o.unemployed?'warn':'',tip('unemployed')),
+      ...['happiness','food','rest','housing','safety'].map(k=>row(t(`overview.need.${k}`),pct(o[k]),tone(o[k]),tip(k))),
       row(t('overview.moodLabel'),o.mood?t(`needs.mood.${o.mood}`):'—',tone(o.happiness))];
     if(o.attractiveness!=null){
       const factors=o.factors.map(([id,v])=>`${t(`overview.factor.${id}`)} ${v>0?`+${v}`:v}`).join('\n');

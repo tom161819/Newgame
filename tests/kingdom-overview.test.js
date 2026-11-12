@@ -22,3 +22,18 @@ test('the help arrow shows until the help is opened once (kept) or the first 10 
   scene.gameTime.totalElapsed=0;help.update();assert.equal(arrow.hidden,false);listeners[0]();assert.equal(arrow.hidden,true,'opening the help hides it');assert.equal(helpSeen(storage),true);
   const again=new HelpArrow({gameTime:{totalElapsed:0}},{document:doc,storage});void again;assert.equal(arrow.hidden,true,'and it never comes back (e.g. after Load)');
 });
+
+test('m-prehled-procenta-tooltip: every percentage explains itself – how it is worked out, what moves it now, one tip; the parts add up to Happiness', async () => {
+  const { overviewExplain } = await import('../src/ui/KingdomOverview.js');const { setLanguage } = await import('../src/i18n/index.js');
+  const s=workerScene(undefined,{workplaces:true});const people=[0,1,2,3].map(i=>s.workerSystem.create({x:40+i,y:40}));s.needs.update?.(0);
+  for(const w of people)s.needs.records.set(w.id,{food:100,rest:100,attackedAt:null});s.needs.records.get(people[0].id).food=5;s.needs.records.get(people[1].id).rest=10;
+  const o=kingdomOverview(s),d=o.detail;
+  assert.equal(d.parts.food+d.parts.rest+d.parts.housing+d.parts.safety+d.other,o.happiness,'the listed parts add up to the shown Happiness');
+  assert.equal(d.hungry,1);assert.equal(d.tired,1);assert.equal(d.housed+d.unhoused,4);assert.equal(d.residents,4);
+  setLanguage('en',{persist:false});const lines=overviewExplain(o);
+  for(const k of ['residents','unemployed','happiness','food','rest','housing','safety'])assert.ok(lines[k].length>=1&&lines[k].every(l=>typeof l==='string'&&l.length>10&&!l.includes('{')&&!l.startsWith('explain.')),k);
+  assert.match(lines.happiness[0],new RegExp(`Happiness ${o.happiness} % = the average of all 4 residents`));assert.match(lines.happiness[1],/food \d+ \+ rest \d+ \+ housing \d+ \+ safety \d+, other [+-]?\d+/);
+  assert.match(lines.food[1],/1 of 4 go hungry/);assert.ok(lines.food.some(l=>l.startsWith('Tip:')));assert.match(lines.housing[0],new RegExp(`Housing ${o.housing} % = ${d.housed} of 4 have a home`));assert.equal(lines.housing.some(l=>l.startsWith('Tip:')),d.unhoused>0);
+  assert.equal(lines.happiness.filter(l=>l.startsWith('Tip:')).length,1,'at most one tip');
+  setLanguage('cs',{persist:false});assert.match(overviewExplain(o).housing[0],/Bydlení \d+ % = \d z 4 má kde bydlet/);setLanguage('en',{persist:false});
+});

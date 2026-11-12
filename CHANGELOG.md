@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.97.0] - 2026-11-12
+<!-- version: {"title":"Kingdom overview explains its values","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Kingdom overview: every value explains itself on hover – how it is worked out with the current numbers, what moves it now, and one tip when something is low (Residents, Unemployed, Happiness, Food, Rest, Housing, Safety; also on the three chips in the top bar).
+
 ## [0.96.0] - 2026-11-12
 <!-- version: {"title":"Terrain height: lifted ground","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added
