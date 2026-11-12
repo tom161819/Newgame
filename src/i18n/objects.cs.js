@@ -30,7 +30,7 @@ export default {
   'object.builder_workshop.name':'Dílna stavitelů','object.builder_workshop.description':'Otevřená dílna a sklad stavebního materiálu. Každá dílna obslouží 4 stavitele; stavitelé bez dílny pracují o 50 % pomaleji.',
   'object.fisherman_hut.name':'Rybářská chata','object.fisherman_hut.description':"Chata pro jednoho rybáře. Může stát kdekoli: rybář chodí k nejbližšímu dosažitelnému břehu a úlovek nosí do sýpky, takže chata blízko vody uloví víc.",
   'object.hunting_lodge.name':'Lovecká chata','object.hunting_lodge.description':'Lovecká chata pro jednoho lovce. Lovec přináší maso ze skutečných úlovků.',
-  'object.barracks.name':'Kasárna','object.barracks.description':'Kasárna s pěti místy pro stávající poddané. Vojáci hlídkují v okolí. Sklad výstroje pojme 30 kusů.',
+  'object.barracks.name':'Kasárna','object.barracks.description':'Kasárna s dvanácti místy. Každý přijatý je branec, který hlídkuje v okolí; se zbraněmi ze zbrojnice se branec vycvičí na vojáka, lučištníka, šermíře nebo rytíře. Sklad výstroje pojme 30 kusů.',
   'object.farmhouse.name':'Statek','object.farmhouse.description':'Statek se třemi místy pro farmáře. Farmáři obdělávají pole do 15 políček. Jeho sklad pojme 200 pšenice a mouky.',
   'object.wheat_field.name':'Pšeničné pole','object.wheat_field.description':'Pšenice roste dva herní dny. Farmář musí zralou úrodu fyzicky sklidit a získá 10 pšenice.',
   'object.orchard.name':'Sad','object.orchard.description':'Trvalé ovocné stromy plodí jablka tři herní dny. Farmář sklidí 8 jablek bez nové výsadby.',

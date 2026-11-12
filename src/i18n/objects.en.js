@@ -30,7 +30,7 @@ export default {
   'object.builder_workshop.name':'Builder\'s Workshop','object.builder_workshop.description':'An open workshop and material yard for Builders. Each workshop serves 4 Builders; Builders without one work 50 % slower.',
   'object.fisherman_hut.name':'Fisherman\'s Hut','object.fisherman_hut.description':"A hut for one Fisher. It can stand anywhere: the Fisher walks to the nearest reachable shore and carries the catch to a Granary, so a hut close to water catches more.",
   'object.hunting_lodge.name':'Hunting Lodge','object.hunting_lodge.description':'A hunting lodge for one Hunter. The Hunter brings meat from real kills.',
-  'object.barracks.name':'Barracks','object.barracks.description':'Barracks with five places for existing residents. Soldiers patrol the surroundings. The kit store holds 30 items.',
+  'object.barracks.name':'Barracks','object.barracks.description':'Barracks with twelve places. Everyone hired here is a Recruit who patrols the surroundings; with weapons from an Armory a Recruit trains into a Soldier, Archer, Swordsman or Knight. The kit store holds 30 items.',
   'object.farmhouse.name':'Farmhouse','object.farmhouse.description':'A farmhouse with three Farmer workplaces. Farmers tend crops within 15 tiles. Its store keeps 200 Wheat and Flour.',
   'object.wheat_field.name':'Wheat Field','object.wheat_field.description':'Wheat grows for two game days. A farmer must physically harvest the ripe crop for 10 Wheat.',
   'object.orchard.name':'Orchard','object.orchard.description':'Permanent fruit trees grow apples for three game days. A farmer harvests 8 Apple without replanting.',

@@ -9,6 +9,11 @@ export const UNIT_TYPES=Object.freeze({
   archer:Object.freeze({equipment:Object.freeze({weapon:'bow'}),modifiers:Object.freeze({maxHP:10,attackRange:5}),trainingTime:30000,goldCost:8,wageBonus:1,requiredCombatLevel:1}),
   knight:Object.freeze({equipment:Object.freeze({weapon:'sword',armor:'armor'}),mount:'horse',modifiers:Object.freeze({maxHP:100,attackBonus:50,armor:10}),trainingTime:60000,goldCost:25,wageBonus:4,requiredCombatLevel:4}),
 });
+// kasarna-branci (owner 9 Nov 2026): everyone employed in a Barracks starts as a Recruit – no equipment, basic combat
+// stats (the resident's own 60 HP and 6 DPS plus `modifiers`), patrols and defends near the Barracks like a unit, and
+// earns BASE_DAILY_WAGES.recruit. With items in an Armory a Recruit trains into one of UNIT_TYPES and keeps the seat.
+// A Recruit is any resident with the `soldier` profession who is not (yet) a trained unit; nothing extra is saved.
+export const RECRUIT=Object.freeze({modifiers:Object.freeze({maxHP:10})});
 // m-start-v2 (owner 7 Nov 2026): a new game starts with this garrison at the Castle, with its own equipment.
 export const START_GARRISON=Object.freeze([Object.freeze({type:'soldier',count:2}),Object.freeze({type:'archer',count:2})]);
 export const UNIT_TYPE_IDS=Object.freeze(Object.keys(UNIT_TYPES));

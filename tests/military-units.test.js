@@ -2,9 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { workerScene,ensureBuildingPrerequisites } from './helpers/workerScene.js';
 import { placeBuilding } from '../src/game/buildings.js';
-import { UNIT_TYPES,UNIT_TYPE_IDS,unitKit } from '../src/data/military.js';
+import { UNIT_TYPES,UNIT_TYPE_IDS,unitKit,RECRUIT } from '../src/data/military.js';
 import { totalXPForLevel,getXPRequired } from '../src/data/experience.js';
 import { WageSystem } from '../src/systems/WageSystem.js';
+import { BASE_DAILY_WAGES } from '../src/data/economy.js';
 import { hasLineOfSight } from '../src/game/lineOfSight.js';
 import { inAttackRange } from '../src/systems/CombatSystem.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
@@ -53,7 +54,7 @@ test('training takes Gold, the exact items carried from the Armory by Haulers an
   const receipts=[...s.resourceLedger.history,s.resourceLedger.current].flatMap(d=>d.transactions).filter(t=>t.source==='Military Equipment');
   assert.deepEqual(receipts.map(t=>[t.resource,t.quantity]).sort(),[['bow',1],['sword',1],['sword',1]]);
   assert.equal(s.foodStorage.used(s.foodStorage.locations.get(`kit-${barracks.id}`)),0,'nothing left in the kit store');
-  const wages=new WageSystem(s),plain=soldier(s,s.buildings.find(x=>x.type==='barracks'),{x:53,y:54},3);assert.equal(wages.dailyWage(unit(b.id))-wages.dailyWage(plain),UNIT_TYPES.swordsman.wageBonus,'a trained unit earns its type’s extra wage');
+  const wages=new WageSystem(s),plain=soldier(s,s.buildings.find(x=>x.type==='barracks'),{x:53,y:54},3);assert.equal(wages.dailyWage(unit(b.id)),BASE_DAILY_WAGES.soldier+UNIT_TYPES.swordsman.wageBonus,'a trained unit earns the Soldier wage and its type’s extra wage');assert.equal(wages.dailyWage(plain),BASE_DAILY_WAGES.recruit,'kasarna-branci: an untrained Recruit earns the Recruit wage');
 });
 
 test('without the items nothing is trained; cancelling refunds Gold and returns delivered items; death drops the gear for Haulers',()=>{
@@ -117,4 +118,27 @@ test('m-vojaci-chyba: from the start the lock names what is missing – Armory, 
   s.foodStorage.deposit(`armory-${armory.id}`,'sword',1);assert.equal(s.military.blocker(w,'soldier'),null);
   const gold=s.inventory.count('gold');s.inventory.spend('gold',gold);assert.equal(s.military.blocker(w,'soldier'),'gold');s.inventory.add('gold',gold);
   assert.equal(s.military.train(w,'soldier'),null);until(s,()=>s.military.units.get(w.id)?.type==='soldier');
+});
+
+test('kasarna-branci: a Barracks takes 12; everyone hired is a Recruit with basic combat stats who defends, then trains into a unit and keeps the seat',()=>{
+  const {s,barracks}=kingdom();assert.equal(s.objectRegistry.require('barracks').workplace.capacity,12);
+  const plain=s.workerSystem.create({x:58,y:58}),baseHP=plain.maxHP;
+  const recruits=Array.from({length:12},(_,i)=>soldier(s,barracks,{x:46+i,y:54},3));
+  assert.equal(s.workplaceSystem.assign(barracks,plain),false,'the thirteenth is refused');
+  s.tick(50);const a=recruits[0];
+  assert.ok(s.military.isRecruit(a)&&!s.military.unit(a));assert.equal(a.maxHP,baseHP+RECRUIT.modifiers.maxHP,'a Recruit has the basic combat bonus');assert.equal(plain.maxHP,baseHP);
+  assert.equal(s.military.wageProfession(a),'recruit');assert.equal(s.military.wageProfession(plain),plain.profession);
+  // A Recruit defends a resident attacked near the Barracks.
+  const villager=s.workerSystem.create({x:54,y:56}),boar=s.animalSystem.create(s.objectRegistry.require('wild_boar'),{x:55,y:56});
+  s.animalSystem.onAttacked(boar,villager);assert.equal(s.military.threat(a),boar);until(s,()=>!boar.isAlive,120000);
+  // With a Sword in the Armory the Recruit trains into a Soldier and stays in his seat.
+  assert.equal(s.military.blocker(a,'soldier'),null);s.military.train(a,'soldier');until(s,()=>s.military.units.has(a.id));
+  assert.ok(!s.military.isRecruit(a));assert.equal(a.assignedWorkplaceId,barracks.id);assert.equal(s.workplaceSystem.summary(barracks).count,12);
+  assert.equal(a.maxHP,baseHP+UNIT_TYPES.soldier.modifiers.maxHP+(a.statModifiers.militaryEquipment.maxHP??0),'the unit wears its type’s stats, not the Recruit’s on top');
+  // Leaving the Barracks takes the Recruit stats away again.
+  const b=recruits[1];s.workplaceSystem.remove(b);s.tick(50);assert.equal(b.profession,'idle');assert.equal(b.maxHP,baseHP);assert.ok(!s.military.isRecruit(b));
+  // Save/Load: nothing extra is saved; Recruits are Recruits again after the load.
+  const loaded=scene(false);loadGameState(loaded,validateGameState(serializeGameState(s)));loaded.tick(50);
+  const c=loaded.workerSystem.workers.get(recruits[2].id);assert.ok(loaded.military.isRecruit(c));assert.equal(c.maxHP,baseHP+RECRUIT.modifiers.maxHP);
+  assert.ok(loaded.military.units.has(a.id));
 });

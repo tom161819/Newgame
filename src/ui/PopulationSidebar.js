@@ -5,6 +5,7 @@ import { shortName } from '../data/names.js';
 import { JOBS,SKILLS } from '../data/jobs.js';
 import { element } from './objectLabels.js';
 import { jobChoices,changeProfession } from './jobChange.js';
+import { militaryRank } from './militaryPanel.js';
 import { populationSummary,populationWindow,professionColor,humanPortrait,POPULATION_ROW_HEIGHT,populationDetails,residentWarnings,sortedPopulation,readPopulationPreferences,writePopulationPreferences } from './populationData.js';
 const names=new Intl.Collator('cs',{numeric:true,sensitivity:'base'});
 
@@ -77,10 +78,10 @@ export class PopulationSidebar {
   }
   renderSoldiers(residents){
     if(!this.soldiers)return;const military=this.scene.military,soldiers=residents.filter(w=>w.profession==='soldier').sort((a,b)=>names.compare(a.name,b.name));
-    const items=soldiers.map(w=>{const unit=military?.unit(w),type=unit?t(`unit.type.${unit.type}`):JOBS.soldier.name,shelter=w.sleepingIn!=null?this.scene.buildings.find(b=>b.id===w.sleepingIn):null;
+    const items=soldiers.map(w=>{const type=militaryRank(this.scene,w),shelter=w.sleepingIn!=null?this.scene.buildings.find(b=>b.id===w.sleepingIn):null;
       return {id:w.id,name:w.name,type,state:shelter?t('population.soldierAsleep',{building:this.scene.objectRegistry.get(shelter.type)?.name??shelter.type}):localized(`work.state.${w.workState}`,w.workState)};});
     const sig=JSON.stringify([items,language()]);if(sig===this.soldiersSig)return;this.soldiersSig=sig;
-    this.soldiers.hidden=!items.length;this.soldiersTitle.textContent=t('population.soldiers',{count:items.length});
+    this.soldiers.hidden=!items.length;this.soldiersTitle.textContent=t('population.soldiers',{count:items.length,recruits:soldiers.filter(w=>!military?.unit(w)).length});
     this.soldiersList.replaceChildren(...items.map(item=>{const b=element('button','population-soldier');b.type='button';b.dataset.soldierId=item.id;b.title=t('population.locateName',{name:item.name});
       b.append(element('strong','',item.name),element('small','',`${item.type} · ${item.state}`));return b;}));
   }
@@ -120,9 +121,9 @@ export class PopulationSidebar {
       if(!record){record=this.createRow(worker.id);this.rows.set(worker.id,record);this.list.append(record.row);}
       ordered.push(record.row);
       record.row.style.top=`${index*POPULATION_ROW_HEIGHT}px`;
-      const skill=this.preferences.sortBy.startsWith('skill:')?this.preferences.sortBy.slice(6):null,warnings=residentWarnings(this.scene,worker),signature=JSON.stringify([worker.name,worker.profession,worker.experience,worker.definition.id,worker.workState,warnings,skill,skill?worker.skills[skill]:null,worker.isAlive,language()]);if(signature===record.signature)continue;record.signature=signature;
+      const skill=this.preferences.sortBy.startsWith('skill:')?this.preferences.sortBy.slice(6):null,warnings=residentWarnings(this.scene,worker),signature=JSON.stringify([worker.name,worker.profession,worker.profession==='soldier'?this.scene.military?.unit(worker)?.type??'recruit':null,worker.experience,worker.definition.id,worker.workState,warnings,skill,skill?worker.skills[skill]:null,worker.isAlive,language()]);if(signature===record.signature)continue;record.signature=signature;
       record.row.classList.toggle('is-dead',!worker.isAlive);record.row.dataset.populationState=worker.isAlive?'living':'dead';record.row.tabIndex=worker.isAlive?-1:0;record.select.disabled=!worker.isAlive;record.locate.disabled=!worker.isAlive;
-      record.name.textContent=worker.name;record.job.textContent=JOBS[worker.profession]?.name??worker.profession;
+      record.name.textContent=worker.name;record.job.textContent=worker.profession==='soldier'?militaryRank(this.scene,worker):JOBS[worker.profession]?.name??worker.profession;
       const e=worker.experience;record.progress.textContent=`${t('unit.skillLevel',{level:e.level})} · ${skill?`${SKILLS[skill]} ${worker.skills[skill]?.level??1}`:e.level===e.maxLevel?t('unit.xpMax'):t('unit.skillXp',{current:Math.round(e.currentXP*100)/100,next:e.xpToNextLevel})}`;
       record.portrait.src=this.portrait(worker);record.portrait.alt=t('population.portrait',{name:worker.name});record.portrait.style.backgroundColor=professionColor(worker.profession);record.select.setAttribute('aria-label',t('population.inspect',{name:worker.name}));
       record.status.hidden=!warnings.length;record.status.textContent=warnings[0]?.icon??'';record.status.title=[localized(`work.state.${worker.workState}`,worker.workState),...warnings.map(warning=>warning.text)].join(' · ');

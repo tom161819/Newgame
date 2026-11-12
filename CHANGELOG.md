@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.93.0] - 2026-11-12
+<!-- version: {"title":"Recruits in the Barracks","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Recruits (owner, 9 Nov): everyone hired into a Barracks starts as a Recruit – no weapon, basic combat stats (10 more HP than a resident), patrols near the Barracks and defends residents like a unit, and earns 1 Gold a day. With weapons in an Armory a Recruit trains into a Soldier, Swordsman, Archer or Knight and keeps the place. The Barracks window shows the places used, Recruits with their Train buttons and trained units in two lists; Population shows the rank (Recruit or the unit type).
+
+### Changed
+- A Barracks has 12 places (before 5).
+
 ## [0.92.0] - 2026-11-12
 <!-- version: {"title":"Performance with 30 residents","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

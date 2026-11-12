@@ -1,4 +1,4 @@
-import { UNIT_TYPES,unitKit,KNIGHT_SPEED ,START_GARRISON} from '../data/military.js';
+import { UNIT_TYPES,unitKit,KNIGHT_SPEED,START_GARRISON,RECRUIT } from '../data/military.js';
 import { MILITARY_ITEMS } from '../data/militaryEquipment.js';
 import { buildingIsComplete } from '../game/buildings.js';
 import { recalculateStats } from './UnitStats.js';
@@ -14,14 +14,16 @@ export class MilitarySystem {
   get storage(){return this.scene.foodStorage;}
   barracks(id){return this.scene.buildings.find(b=>b.id===id&&b.type==='barracks'&&buildingIsComplete(b))??null;}
   unit(worker){return worker?this.units.get(worker.id)??null:null;}
+  // kasarna-branci: a Recruit is a living resident with the `soldier` profession who is not a trained unit.
+  isRecruit(worker){return !!worker?.isAlive&&worker.profession==='soldier'&&!this.units.has(worker.id);}
   order(worker){return [...this.orders.values()].find(o=>o.workerId===worker?.id)??null;}
   ordersAt(barracksId){return [...this.orders.values()].filter(o=>o.barracksId===barracksId).sort((a,b)=>a.id-b.id);}
   // Why a unit type cannot be trained for this Soldier right now, or null.
   blocker(worker,type){
     const spec=UNIT_TYPES[type];if(!spec)return 'unknown';
     if(spec.mount==='horse'&&!this.scene.stables?.freeHorse())return 'horse';
-    if(!worker?.isAlive||worker.profession!=='soldier'||!this.barracks(worker.assignedWorkplaceId))return 'notSoldier';
-    if(this.unit(worker))return 'trained';if(this.order(worker))return 'training';
+    if(this.unit(worker))return 'trained';
+    if(!this.isRecruit(worker)||!this.barracks(worker.assignedWorkplaceId))return 'notSoldier';if(this.order(worker))return 'training';
     if((worker.skills.combat?.level??1)<spec.requiredCombatLevel)return 'skill';
     return this.supplyBlocker(type);
   }
@@ -69,8 +71,9 @@ export class MilitarySystem {
     this.scene.updateInventory?.();return true;
   }
   tileOf(barracksId){const b=this.barracks(barracksId)??this.scene.buildings.find(b=>b.id===barracksId);return b?{x:b.x-1,y:b.y}:this.scene.character.tile;}
+  // A trained unit wears its type's modifiers and items; a Recruit the RECRUIT modifiers; anyone else neither.
   apply(worker){
-    const unit=this.unit(worker);if(!unit){delete worker.statModifiers.military;delete worker.statModifiers.militaryEquipment;recalculateStats(worker);if(worker.definition?.gameplay?.movementSpeed)worker.speed=worker.definition.gameplay.movementSpeed;return;}
+    const unit=this.unit(worker);if(!unit){delete worker.statModifiers.militaryEquipment;if(this.isRecruit(worker))worker.statModifiers.military={...RECRUIT.modifiers};else delete worker.statModifiers.military;recalculateStats(worker);if(worker.definition?.gameplay?.movementSpeed)worker.speed=worker.definition.gameplay.movementSpeed;return;}
     const items={};for(const id of Object.values(unit.equipment)){const item=MILITARY_ITEMS[id],mods=item.modifiers??this.scene.objectRegistry.require(item.modifiersFrom).equipment.modifiers;for(const[k,v]of Object.entries(mods))items[k]=(items[k]??0)+v;}
     worker.statModifiers.militaryEquipment=items;worker.statModifiers.military={...UNIT_TYPES[unit.type].modifiers};recalculateStats(worker);
     worker.speed=(worker.definition?.gameplay?.movementSpeed??worker.speed)*(UNIT_TYPES[unit.type].mount?KNIGHT_SPEED:1);
@@ -100,7 +103,8 @@ export class MilitarySystem {
     const order=this.order(worker),combat=this.scene.combat,unit=this.unit(worker);
     if(order?.state==='training'){combat.stopAttack(worker);worker.workState='Working';worker.workMessage='Training';
       if(!this.scene.workplaceSystem.atWorkplace(worker)&&!worker.nextTile&&!worker.path.length&&worker.aiCooldown<=0){worker.aiCooldown=1000;worker.moveTo(this.scene.workplaceSystem.goals(worker));}return true;}
-    if(!unit||worker.commandState?.state==='Holding')return false;
+    // kasarna-branci: Recruits defend near their Barracks too, with their basic stats.
+    if(!(unit||this.isRecruit(worker))||worker.commandState?.state==='Holding')return false;
     const target=combat.attacks.get(worker)?.isAlive&&combat.attacks.get(worker).definition?combat.attacks.get(worker):this.threat(worker);if(!target)return false;
     worker.workState='Working';worker.workMessage='Defending the kingdom';
     const ranged=worker.attackRange>1,ready=!worker.nextTile&&(ranged?inAttackRange(worker,target,this.scene.map)&&combat.canTarget(worker,target):canInteractAdjacent(this.scene.map,worker,target));
@@ -109,6 +113,13 @@ export class MilitarySystem {
     worker.militaryRetarget=(worker.militaryRetarget??0)-delta;
     if(worker.militaryRetarget<=0){worker.militaryRetarget=MILITARY_RULES.retarget;worker.moveTo(adjacentTiles(target,this.scene.map));}
     return true;
+  }
+  // kasarna-branci: the wage table entry for this resident (a Recruit is paid as `recruit`, a trained unit as `soldier`).
+  wageProfession(worker){return this.isRecruit(worker)?'recruit':worker?.profession;}
+  // Recruit stats follow the job: hired into a Barracks (or given the Soldier job) adds them, a new job removes them.
+  syncRecruits(){
+    for(const w of this.scene.workerSystem.liveWorkers()){if(this.units.has(w.id))continue;const want=this.isRecruit(w),has=!!w.statModifiers.military;
+      if(want!==has||has&&w.statModifiers.military.maxHP!==RECRUIT.modifiers.maxHP)this.apply(w);}
   }
   wageBonus(worker){const unit=this.unit(worker);return unit?UNIT_TYPES[unit.type].wageBonus:0;}
   // Logistics catalog: equipment from Armory stock to the kit store, and leftovers back.
@@ -127,6 +138,7 @@ export class MilitarySystem {
   update(delta){
     if(this.scene.gameOver||this.scene.gameTime?.paused||!this.storage)return;
     // A unit moved out of its Barracks (new job, Unemployed) hands its gear back: it drops where the resident stands.
+    this.syncRecruits();
     for(const workerId of [...this.units.keys()]){const w=this.scene.workerSystem.workers.get(workerId);if(!w?.isAlive)this.units.delete(workerId);else if(w.profession!=='soldier'||(!this.barracks(w.assignedWorkplaceId)&&!this.units.get(workerId).garrison))this.release(w);}
     for(const order of [...this.orders.values()].sort((a,b)=>a.id-b.id)){
       const worker=this.scene.workerSystem.workers.get(order.workerId);

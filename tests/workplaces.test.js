@@ -20,16 +20,16 @@ const MEAT=objectRegistry.require('rabbit').gameplay.meatDrop;
 function until(s,condition,max=30000){let elapsed=0;while(!condition()&&elapsed<max){s.tick(50);elapsed+=50;}assert.ok(condition(),`Condition not reached after ${elapsed}ms`);return elapsed;}
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} !== ${b}`);
 
-test('workplace definitions use exact prices/footprints, reject occupied cells and enforce 3/1/5 unique existing employees (tabulka-budov-1)',()=>{
+test('workplace definitions use exact prices/footprints, reject occupied cells and enforce 3/1/12 unique existing employees (tabulka-budov-1, kasarna-branci)',()=>{
   const s=scene(),q=build(s,'quarry'),l=build(s,'hunting_lodge',61,50),b=build(s,'barracks',67,50);
   assert.equal(s.inventory.count('stone'),0);assert.equal(q.tiles.length,9);assert.equal(l.tiles.length,4);assert.equal(b.tiles.length,9);
   assert.deepEqual(q.definition.cost,{wood:15});assert.deepEqual(l.definition.cost,{wood:8});assert.deepEqual(b.definition.cost,{stone:12,wood:10});
-  const workers=Array.from({length:10},(_,i)=>worker(s,45+i,56));let offset=0;
-  for(const [building,capacity,profession]of [[q,3,'miner'],[l,1,'hunter'],[b,5,'soldier']]){
+  const workers=Array.from({length:17},(_,i)=>worker(s,45+i,56));let offset=0;
+  for(const [building,capacity,profession]of [[q,3,'miner'],[l,1,'hunter'],[b,12,'soldier']]){
     for(let i=0;i<capacity;i++){const w=workers[offset++],old=structuredClone({id:w.id,skills:w.skills,initial:w.initialSkills,talent:w.naturalTalent,overall:w.experience,hp:w.currentHP});assert.equal(s.workplaceSystem.assign(building,w),true);assert.equal(w.profession,profession);assert.equal(w.assignedWorkplaceId,building.id);assert.deepEqual({id:w.id,skills:w.skills,initial:w.initialSkills,talent:w.naturalTalent,overall:w.experience,hp:w.currentHP},old);}
     assert.equal(s.workplaceSystem.assign(building,workers.at(-1)),false);assert.equal(s.workplaceSystem.summary(building).count,capacity);
   }
-  assert.equal(s.workerSystem.workers.size,10);const displaced=workers[0];s.workplaceSystem.remove(workers[3]);assert.equal(s.workplaceSystem.assign(l,displaced),true);assert.equal(s.workplaceSystem.summary(q).count,2);assert.equal(s.workplaceSystem.summary(l).count,1);assert.equal(displaced.profession,'hunter');
+  assert.equal(s.workerSystem.workers.size,17);const displaced=workers[0];s.workplaceSystem.remove(workers[3]);assert.equal(s.workplaceSystem.assign(l,displaced),true);assert.equal(s.workplaceSystem.summary(q).count,2);assert.equal(s.workplaceSystem.summary(l).count,1);assert.equal(displaced.profession,'hunter');
   s.workplaceSystem.remove(displaced);assert.equal(displaced.profession,'idle');assert.equal(displaced.assignedWorkplaceId,null);
   const fail=placeBuilding({map:s.map,anchor:{x:55,y:50},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:q.definition});assert.ok(fail.error);assert.equal(s.buildings.length,3,'quarry, lodge and barracks (the lodge only recommends a Granary since 0.33.0)');
   for(const type of ['quarry','hunting_lodge','barracks'])s.activities.emit('buildingCompleted',{actor:s.character,objectType:type},`built-${type}`);
