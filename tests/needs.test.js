@@ -129,3 +129,15 @@ test('S13 phase D: 100 residents update needs and derived effects quickly',()=>{
   assert.ok(per<50,`one needs update for ${n} residents takes ${per.toFixed(1)} ms (runs at most once per game second)`);
   assert.equal(s.needs.work.size,n);assert.equal(s.needs.summary().population,n);console.log(`# 100-resident needs update: ${per.toFixed(2)} ms`);
 });
+
+test('performance-2: homes are worked out once while residents and houses stay the same, and again when either changes',()=>{
+  const s=scene(),a=person(s,{x:40,y:40}),b=person(s,{x:41,y:40});
+  const first=s.needs.homes();assert.equal(s.needs.homes(),first,'the same answer object while nothing changed');
+  assert.equal(first.get(a.id).kind,'settlement');
+  const house=add(s,'house',45,45),second=s.needs.homes();assert.notEqual(second,first,'a finished house: worked out again');
+  assert.deepEqual(second.get(a.id),{kind:'house',buildingId:house.id});assert.equal(s.needs.homeOf(b).buildingId,house.id);
+  const c=person(s,{x:42,y:40}),third=s.needs.homes();assert.notEqual(third,second,'a newcomer: worked out again');assert.ok(third.has(c.id));
+  b.isAlive=false;assert.ok(!s.needs.homes().has(b.id),'a death: worked out again');
+  s.buildings.splice(s.buildings.indexOf(house),1);assert.equal(s.needs.homeOf(a).kind,'settlement','the house is gone: back to the settlement');
+  const state=s.needs.exportState();s.needs.importState(state);assert.equal(s.needs.homeOf(a).kind,'settlement','after a load the homes are worked out from the loaded assignments');
+});

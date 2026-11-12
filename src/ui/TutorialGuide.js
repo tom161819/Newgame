@@ -223,7 +223,8 @@ export class TutorialGuide {
     const now=performance.now();if(this.tip&&!tipsEnabled())this.closeTip(false);
     // m-tipy-mimo-listu: a tip left alone for a game day folds into the Notices bar (the "!" tab), the next one may come.
     if(this.tip&&this.tips.due(this.gameNow(),this.dayMs(),{held:this.hovered})){this.parkTip();return;}
-    if(this.tip){this.placeTip();return;}
+    // performance-2: the tip follows the layout five times a second (its placing reads many window rectangles).
+    if(this.tip){if(now-(this.lastTipPlace??0)>=200){this.lastTipPlace=now;this.placeTip();}return;}
     if(now-this.lastTipCheck<1000||this.scene.gameOver||!tipsEnabled())return;this.lastTipCheck=now;
     // One tip at a time: the night speed-up tip counts as one too.
     if(this.scene.nightSpeedUp?.tip?.visible)return;

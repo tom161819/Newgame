@@ -5,6 +5,16 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.92.0] - 2026-11-12
+<!-- version: {"title":"Performance with 30 residents","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- Performance with a larger village (owner, 12 Nov: about 6 FPS with 30 residents). The remembered (grey) ground under Fog of War is now drawn by the browser's own image blending instead of a pixel loop, sight changes are applied to the map a few times a second within a small time budget, and only inside the view. When a trodden path changes, only the part of the ground that really differs is painted again; a whole repaint is spread over several frames instead of freezing one.
+- The homes of residents are worked out once while residents and houses stay the same (before: many times a step for every resting resident).
+- Tips follow the window layout five times a second, the map hover is looked up eight times a second while the pointer rests, and the panels over the map no longer blur the map under them.
+
+### Fixed
+- The performance test no longer pauses the game by pressing Escape (since 0.86 Escape opens the pause menu).
+
 ## [0.91.0] - 2026-11-10
 <!-- version: {"title":"Building table values and fish notice","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

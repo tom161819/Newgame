@@ -16,11 +16,12 @@ export class GroundComposite {
     if(scene.textures.exists(GROUND_COMPOSITE.key))scene.textures.remove(GROUND_COMPOSITE.key);
     this.texture=scene.textures.addCanvas(GROUND_COMPOSITE.key,this.canvas);
     this.image=scene.add.image(0,0,GROUND_COMPOSITE.key).setOrigin(0,0).setDepth(GROUND_COMPOSITE.depth).setVisible(false);
-    this.state=null;this.touched=new Set();this.stats={full:0,partial:0};
+    this.state=null;this.touched=new Map();this.stats={full:0,partial:0};
   }
   // A chunk image the cache draws: Phaser no longer draws it itself.
   adopt(image){if(image&&image.renderCanvas!==skip)image.renderCanvas=skip;return image;}
-  touch(key){this.touched.add(key);}
+  // `rects`: only these world rectangles of the chunk changed (fog patches); none = the whole chunk.
+  touch(key,rects=null){const had=this.touched.get(key);if(!rects||had===null){this.touched.set(key,null);return;}this.touched.set(key,[...(had??[]),...rects]);}
   shown(){
     const chunks=new Set();for(const image of this.terrain.chunks.values())if(image.visible)chunks.add(this.adopt(image));
     // The scene's own order (equal depth: insertion order), as Phaser drew them.
@@ -48,7 +49,7 @@ export class GroundComposite {
       this.draw(images);this.touched.clear();this.stats.full++;
       this.image.setPosition(this.state.ox,this.state.oy).setScale(1/z).setVisible(images.length>0);
     }else if(this.touched.size){
-      for(const key of this.touched){const image=this.terrain.chunks.get(key);if(image?.visible)this.draw(images,this.bounds(image));}
+      for(const [key,rects] of this.touched){const image=this.terrain.chunks.get(key);if(!image?.visible)continue;if(rects)for(const r of rects)this.draw(images,r);else this.draw(images,this.bounds(image));}
       this.touched.clear();this.stats.partial++;
     }else return;
     this.texture.refresh();

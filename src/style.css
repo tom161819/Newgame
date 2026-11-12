@@ -1158,3 +1158,7 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 .ui-hint-icon { display: inline-grid; place-items: center; width: 24px; height: 24px; margin: 0 8px 0 auto; border: 1px solid var(--line-soft); border-radius: 50%; color: var(--gold); font: italic 700 13px Georgia, serif; cursor: help; flex: 0 0 auto; }
 .ui-hint-icon:hover, .ui-hint-icon:focus-visible { border-color: var(--gold); background: rgb(255 240 200 / .07); }
 #workplace-dialog .dialog-heading .ui-hint-icon { margin: 0 6px 0 0; }
+
+/* performance-2 (12 Nov 2026): no blur under the panels over the map. The glass is 86 % opaque, so the blur was hardly
+   seen, but the browser blurred the map under nine panels again on every frame. */
+.inventory, .camera-controls > *, .kingdom-bar, .status-row, .help-window { backdrop-filter: none; -webkit-backdrop-filter: none; }

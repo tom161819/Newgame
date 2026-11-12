@@ -21,7 +21,8 @@ export async function performanceSmoke(context,url,instrument){
     await page.addInitScript(()=>{try{localStorage.setItem('newgame.tutorial','off');localStorage.setItem('newgame.devBalance',JSON.stringify({mode:true}));localStorage.removeItem('newgame.gameSpeed');}catch{}let state=77123;Math.random=()=>((state=Math.imul(state,1664525)+1013904223>>>0)/2**32);});
     await page.goto(url);await page.locator('#new-game:not([disabled])').click();await page.locator('#start-game').click();
     await page.waitForFunction(()=>window.__game?.registry.get('application').scene?.devBalancePanel?.profiler);
-    await page.keyboard.press('Escape');await page.evaluate(()=>{for(const d of document.querySelectorAll('dialog[open]'))d.close();});
+    // No Escape here: since 0.86 it opens the pause menu on the map, and a paused game neither builds nor advances.
+    await page.evaluate(()=>{for(const d of document.querySelectorAll('dialog[open]'))d.close();});
     // F8 toggles the profiler in Dev mode and shows its table.
     await page.keyboard.press('F8');await page.waitForFunction(()=>/Profiler \(F8\) · [\d.]+ FPS/.test(document.querySelector('#dev-profiler')?.textContent??''));
     await page.keyboard.press('F8');assert.equal(await page.locator('#dev-profiler').isHidden(),true);

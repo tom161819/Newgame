@@ -68,14 +68,14 @@ export class DailyRest {
   // none on the Village Green or while it burns (sleepers come out of a burning house).
   shelter(worker,kind){
     if(worker.greenSeat)return null;
-    const b=kind==='house'?this.scene.buildings.find(x=>x.id===this.scene.needs.homeOf(worker)?.buildingId):kind==='settlement'?this.castle():null;
+    const homeId=kind==='house'?this.scene.needs.homeOf(worker)?.buildingId:null,b=kind==='house'?this.scene.buildings.find(x=>x.id===homeId):kind==='settlement'?this.castle():null;
     return b&&buildingIsComplete(b)&&!this.scene.nightThreats?.burning?.(b)?b:null;
   }
   castle(){return this.scene.buildings.find(b=>b.type==='castle'&&buildingIsComplete(b))??null;}
   goals(kind,worker){
     // Children D1: early in the evening a few neighbours (during a Feast everyone) sit on the Village Green first.
     const seat=this.scene.childrenSystem?.eveningSeat?.(worker);worker.greenSeat=!!seat;if(seat)return [seat];
-    const home=kind==='house'?this.scene.buildings.find(b=>b.id===this.scene.needs.homeOf(worker)?.buildingId):kind==='settlement'?this.castle():null;
+    const homeId=kind==='house'?this.scene.needs.homeOf(worker)?.buildingId:null,home=kind==='house'?this.scene.buildings.find(b=>b.id===homeId):kind==='settlement'?this.castle():null;
     return home?towerNeighbors(home).filter(t=>this.scene.map[t.y]?.[t.x]===0):[];
   }
   goHome(worker,kind){

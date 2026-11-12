@@ -8,7 +8,7 @@ import { buildingIsComplete } from '../game/buildings.js';
 // S13 (#58) phases A and B: every permanent resident has Food, Rest, Housing and Safety, a weighted Happiness, a mood and a
 // main problem. Updated from the central Game Time at most once per second (also off camera and under Fog of War);
 // the mood scales work speed and Kingdom Happiness feeds Kingdom Attractiveness (phase C); strikes and emigration follow.
-const order=id=>Number(String(id).replace(/\D+/g,''))||0;
+const orders=new Map(),order=id=>{let v=orders.get(id);if(v===undefined){v=Number(String(id).replace(/\D+/g,''))||0;if(orders.size>5000)orders.clear();orders.set(id,v);}return v;};
 export class NeedsSystem {
   constructor(scene,{subscribe=true}={}){
     this.scene=scene;this.records=new Map();this.assignments=new Map();this.pending=0;this.revision=0;this.work=new Map();
@@ -52,10 +52,16 @@ export class NeedsSystem {
   // #58 phase B: stored home assignments. A resident keeps a valid home. Residents in the settlement's base places move
   // into free House seats (oldest first); everyone else gets a free House seat, then a free base place, otherwise no home.
   // Deterministic and idempotent, so it may run on every update, before saving and after loading.
+  // performance-2: the homes follow from the residents, the finished houses and the last assignments only. Asked many
+  // times a step (every resting resident, every status), the answer is kept until one of those changes. Callers only
+  // read the returned map.
   homes(){
-    const registry=this.scene.objectRegistry,residents=this.residents().sort((a,b)=>order(a.id)-order(b.id));
-    const houses=(this.scene.buildings??[]).filter(b=>buildingIsComplete(b)&&registry?.get?.(b.type)?.housing).sort((a,b)=>a.id-b.id);
+    const registry=this.scene.objectRegistry,residents=this.residents();
+    const houses=(this.scene.buildings??[]).filter(b=>buildingIsComplete(b)&&registry?.get?.(b.type)?.housing);
     const capacity=new Map(houses.map(h=>[h.id,registry.get(h.type).housing.capacity??POPULATION.houseCapacity])),used=new Map(),next=new Map();
+    let key='';for(const w of residents)key+=`${w.id},`;key+='|';for(const h of houses)key+=`${h.id}:${capacity.get(h.id)},`;
+    if(this.homesCache?.key===key&&this.homesCache.assignments===this.assignments)return this.homesCache.map;
+    residents.sort((a,b)=>order(a.id)-order(b.id));houses.sort((a,b)=>a.id-b.id);
     const take=id=>used.set(id,(used.get(id)??0)+1),free=()=>houses.find(h=>(used.get(h.id)??0)<capacity.get(h.id));let base=0;
     for(const w of residents){const a=this.assignments.get(w.id);if(!a)continue;
       if(a.kind==='house'&&capacity.has(a.buildingId)&&(used.get(a.buildingId)??0)<capacity.get(a.buildingId)){take(a.buildingId);next.set(w.id,{kind:'house',buildingId:a.buildingId});}
@@ -65,7 +71,7 @@ export class NeedsSystem {
       if(house){if(a)base--;take(house.id);next.set(w.id,{kind:'house',buildingId:house.id});}
       else if(!a&&base<POPULATION.maximum){base++;next.set(w.id,{kind:'settlement'});}
     }
-    this.assignments=next;return new Map([...next].map(([id,a])=>[id,{...a}]));
+    this.assignments=next;const map=new Map([...next].map(([id,a])=>[id,{...a}]));this.homesCache={key,assignments:next,map};return map;
   }
   homeOf(worker){return this.homes().get(worker?.id)??null;}
   // Safety and the reasons behind it (shown as the tooltip of the Safety bar).

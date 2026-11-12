@@ -30,6 +30,14 @@ const CHUNK_SIZE = 10;
 // performance-1: already shown dirty chunks repainted a frame (continuous ground) and at most every REPAINT_EVERY_MS,
 // the least time between two repaints of one chunk, and between two path-only ground repaints.
 const REPAINT_PER_FRAME = 1, REPAINT_EVERY_MS = 50, REPAINT_GAP_MS = 200, GROUND_PATH_GAP_MS = 750;
+// performance-2: Fog of War patches (see applyFogPatches).
+const FOG_PATCH_EVERY_MS = 150, FOG_PATCH_BUDGET_MS = 3;
+// performance-2: the ground painter's coarse grid (px), and how far a plant sprite reaches from its foot (px).
+// Two ground stamps (season|buildings|paths|path style) that differ only in the paths.
+const pathOnlyChange=(a,b)=>{if(!a||!b||a===b)return false;const cut=v=>v.split('|').filter((_,i)=>i!==2).join('|');return cut(a)===cut(b);};
+const GREY_CHUNKS = 48;
+const GROUND_BAND = 36; // rows of ground a frame in a paint spread over frames (a multiple of GROUND_STEP)
+const GROUND_STEP = 6, PATH_PLANT_REACH = 48, PATH_PARTIAL_SHARE = 0.4;
 const TILE_BLEED = .8;
 
 // Season tints as RGBA, for blending between seasons during a transition.
@@ -200,6 +208,7 @@ export class TerrainRenderer {
   // Shades ground pixels toward the remembered look by the memory field. In place (full chunk paint), or from `src` (the
   // cached ground, for fog patches) over `region`, then only for pixels of the tiles in `only` (tile index set) whose
   // tile is known; the black of unknown land is never touched.
+  // Since performance-2 the game paints with applyMemory below; this pixel loop stays as the reference it is checked against.
   shadeMemory(context,cx,cy,left,top,{region=null,src=null,only=null,field=this.memoryField(cx,cy)}={}){
     if(!field.any&&!src)return;
     const W=context.canvas.width,H=context.canvas.height,rx=region?.x??0,ry=region?.y??0,rw=region?.w??W,rh=region?.h??H;
@@ -223,6 +232,36 @@ export class TerrainRenderer {
     }}
     context.putImageData(image,rx,ry);
   }
+  // performance-2: the same shading without a pixel loop per repaint. The remembered look of a chunk's whole ground
+  // (greyGround: the formula above at weight 1) is kept beside the ground picture; a repaint draws it over the ground
+  // through the memory field as an alpha mask (one small image, stretched over the tiles with bilinear smoothing – the
+  // same interpolation shadeMemory does by hand). 'source-atop' keeps the ground's own alpha. Called right after the
+  // ground is drawn, before the black of unknown land, so that black stays black.
+  greyGround(ck,cached){
+    const f=this.memoryFactor(),key=`${cached.rev??0}|${f}`,store=this.greyCache??=new Map();let entry=store.get(ck);
+    if(entry?.key===key&&entry.source===cached.canvas){store.delete(ck);store.set(ck,entry);return entry.canvas;}
+    const W=cached.canvas.width,H=cached.canvas.height,canvas=entry?.canvas??document.createElement('canvas');canvas.width=W;canvas.height=H;
+    const image=cached.canvas.getContext('2d').getImageData(0,0,W,H),d=image.data,sat=FOG_STYLE.saturation;
+    for(let o=0;o<d.length;o+=4){if(!d[o+3])continue;const r=d[o],g=d[o+1],b=d[o+2],l=.3*r+.59*g+.11*b;d[o]=(l+(r-l)*sat)*f;d[o+1]=(l+(g-l)*sat)*f;d[o+2]=(l+(b-l)*sat)*f;}
+    canvas.getContext('2d').putImageData(image,0,0);store.delete(ck);store.set(ck,{key,source:cached.canvas,canvas});this.paintStats.greyPaints=(this.paintStats.greyPaints??0)+1;
+    // Memory: ~0.8 MB each; chunks in view keep theirs, of the others only the most recently used.
+    if(store.size>GREY_CHUNKS){const view=this.neededChunks instanceof Set?this.neededChunks:new Set(this.neededChunks??[]);for(const k of [...store.keys()]){if(store.size<=GREY_CHUNKS)break;if(k!==ck&&!view.has(k))store.delete(k);}}
+    return canvas;
+  }
+  applyMemory(context,cx,cy,left,top,cached,{region=null,field=this.memoryField(cx,cy)}={}){
+    if(!field.any)return;
+    const W=context.canvas.width,H=context.canvas.height,rx=region?.x??0,ry=region?.y??0,rw=region?.w??W,rh=region?.h??H,hw=TILE_WIDTH/2,hh=TILE_HEIGHT/2;
+    const grey=this.greyGround(`${cx},${cy}`,cached),{x0,y0,size,values}=field;
+    const mask=this.memoryMask??=document.createElement('canvas');if(mask.width!==size||mask.height!==size){mask.width=size;mask.height=size;}
+    const m=mask.getContext('2d'),image=this.memoryMaskImage?.width===size?this.memoryMaskImage:this.memoryMaskImage=m.createImageData(size,size),a=image.data;
+    for(let i=0;i<values.length;i++)a[i*4+3]=Math.round(values[i]*255);m.putImageData(image,0,0);
+    const scratch=this.memoryScratch??=document.createElement('canvas');if(scratch.width!==W||scratch.height!==H){scratch.width=W;scratch.height=H;}
+    const c=scratch.getContext('2d');c.save();c.setTransform(1,0,0,1,0,0);c.beginPath();c.rect(rx,ry,rw,rh);c.clip();c.globalCompositeOperation='copy';
+    // Mask pixel (mx, my) is tile (x0 + mx, y0 + my); tile space to chunk pixels is the isometric projection.
+    c.imageSmoothingEnabled=true;c.imageSmoothingQuality='low';c.setTransform(hw,hh,-hw,hh,ORIGIN.x-left+(x0-y0)*hw,ORIGIN.y-top+(x0+y0)*hh);c.drawImage(mask,0,0);
+    c.setTransform(1,0,0,1,0,0);c.globalCompositeOperation='source-in';c.drawImage(grey,rx,ry,rw,rh,rx,ry,rw,rh);c.restore();
+    context.save();context.globalCompositeOperation='source-atop';context.drawImage(scratch,rx,ry,rw,rh,rx,ry,rw,rh);context.restore();
+  }
   // One chunk of continuous ground (land, water, plants, water plants) in chunk-canvas pixels.
   // m-plynule-prechody: the continuous ground's season look for a chunk – {key} while it shows one season, else the step
   // key of the gradual change with its mask (SeasonTransition.groundLook). The key is part of the chunk's ground stamp.
@@ -233,19 +272,45 @@ export class TerrainRenderer {
   // layer a finished change left). Mid-change the chunk keeps two plain layers – the old and the new season, each
   // painted once per change – and every step only blends them again through the noise mask (SeasonTransition
   // blendMask: a few ms instead of a full repaint), so the change comes in patches without repainting the ground.
-  groundPicture(ck,cx,cy,left,top,texture,occupied,stamp,cached){
+  // performance-2: returns null while a whole-chunk paint is still under way (see `plain`): the chunk keeps its previous
+  // picture and comes back next frame.
+  groundPicture(ck,cx,cy,left,top,texture,occupied,stamp,cached){const result=this.groundPictureStep(ck,cx,cy,left,top,texture,occupied,stamp,cached);if(result)this.pathChanges?.delete(ck);return result;}
+  groundJobActive(ck){if(this.groundJobs?.size)for(const key of this.groundJobs.keys())if(key.startsWith(`${ck}|`))return true;return false;}
+  groundPictureStep(ck,cx,cy,left,top,texture,occupied,stamp,cached){
     const look=this.groundLook(cx,cy),rest=stamp.slice(stamp.indexOf('|')),layers=this.seasonLayers??=new Map(),own=layers.get(ck)??{};
     const fresh=()=>{const c=document.createElement('canvas');c.width=texture.width;c.height=texture.height;return c;};
-    const plain=(season,canvas)=>{canvas.width=texture.width;canvas.height=texture.height;const c2=canvas.getContext('2d');c2.clearRect(0,0,canvas.width,canvas.height);this.paintContinuousChunk(c2,cx,cy,left,top,season,occupied);this.paintStats.groundPaints=(this.paintStats.groundPaints??0)+1;return canvas;};
+    const change=this.pathChange(ck,cx,cy,left,top,stamp,cached),sig=change.sig,progressive=!!cached&&this.groundPaintsLeft!==Infinity;
+    const count=()=>{this.paintStats.groundPaints=(this.paintStats.groundPaints??0)+1;};
+    // A whole paint of a chunk that already shows a picture is spread over frames: GROUND_BAND rows of ground a frame
+    // (about 12 ms without GPU instead of 110 ms at once), the plants last. A chunk without a picture is painted at once.
+    const plain=(season,canvas)=>{
+      if(!progressive){canvas.width=texture.width;canvas.height=texture.height;const c2=canvas.getContext('2d');c2.clearRect(0,0,canvas.width,canvas.height);this.paintContinuousChunk(c2,cx,cy,left,top,season,occupied);count();return canvas;}
+      const jobs=this.groundJobs??=new Map(),jk=`${ck}|${season}`,want=`${season}${rest}`;let job=jobs.get(jk);
+      if(!job||job.want!==want){const work=job?.canvas??fresh();work.width=texture.width;work.height=texture.height;job={want,canvas:work,y:0,painter:this.groundPainter(cx,cy,left,top,season,occupied)};jobs.set(jk,job);
+        // Jobs of chunks that left the view are dropped (their chunk paints afresh when it comes back).
+        if(jobs.size>8)for(const key of [...jobs.keys()]){if(jobs.size<=8)break;if(key!==jk)jobs.delete(key);}}
+      const c2=job.canvas.getContext('2d'),H=texture.height;
+      if(job.y<H){const h=Math.min(GROUND_BAND,H-job.y);job.painter.ground(c2,{x:0,y:job.y,w:texture.width,h});job.y+=h;this.paintStats.groundBands=(this.paintStats.groundBands??0)+1;return null;}
+      job.painter.plants(c2);jobs.delete(jk);count();return job.canvas;};
     if(!look.blend){
       // A finished change: the new season's layer is the picture; the old layer is dropped.
-      const done=own[look.key];layers.delete(ck);if(done?.stamp===stamp)return{canvas:done.canvas,stamp};
-      return{canvas:plain(look.key,cached?.canvas??fresh()),stamp};
+      const done=own[look.key];layers.delete(ck);
+      if(done?.stamp===stamp)return{canvas:done.canvas,stamp,sig};
+      // performance-2: only the paths changed and part of the picture differs: that part alone is painted again.
+      const rect=change.rect;
+      if(rect&&cached?.canvas&&cached.pathOnlyFor===stamp&&rect.w*rect.h<=texture.width*texture.height*PATH_PARTIAL_SHARE){
+        this.paintContinuousChunk(cached.canvas.getContext('2d'),cx,cy,left,top,look.key,occupied,rect);this.paintStats.groundPartial=(this.paintStats.groundPartial??0)+1;return{canvas:cached.canvas,stamp,sig};}
+      const canvas=plain(look.key,cached?.canvas??fresh());return canvas?{canvas,stamp,sig}:null;
     }
-    const layer=season=>{const want=`${season}${rest}`;if(own[season]?.stamp===want)return own[season].canvas;
-      if(cached?.stamp===want){own[season]={stamp:want,canvas:cached.canvas};cached=null;return own[season].canvas;}
-      own[season]={stamp:want,canvas:plain(season,own[season]?.canvas??fresh())};return own[season].canvas;};
-    const a=layer(look.from),b=layer(look.to);layers.delete(ck);layers.set(ck,own);
+    const layer=season=>{const want=`${season}${rest}`,have=own[season];if(have?.stamp===want)return have.canvas;
+      if(cached?.stamp===want){own[season]={stamp:want,sig:cached.sig,canvas:cached.canvas};cached=null;return own[season].canvas;}
+      // performance-2: only the paths changed since this layer was painted: the part that differs is painted again.
+      if(have?.sig&&sig&&pathOnlyChange(have.stamp,want)){const rect=this.pathDiffRect(have.sig,sig);
+        if(!rect||rect.w*rect.h<=texture.width*texture.height*PATH_PARTIAL_SHARE){
+          if(rect){this.paintContinuousChunk(have.canvas.getContext('2d'),cx,cy,left,top,season,occupied,rect);this.paintStats.groundPartial=(this.paintStats.groundPartial??0)+1;}
+          have.stamp=want;have.sig=sig;return have.canvas;}}
+      const painted=plain(season,have?.canvas??fresh());if(!painted)return null;own[season]={stamp:want,sig,canvas:painted};return painted;};
+    const a=layer(look.from),b=a&&layer(look.to);layers.delete(ck);layers.set(ck,own);if(!a||!b)return null;
     // Memory: two layers (~0.8 MB each) per chunk; chunks in view always keep theirs, of the others only the most
     // recently blended ones up to SEASON_TRANSITION.layerChunks in all.
     if(layers.size>SEASON_TRANSITION.layerChunks){const view=this.neededChunks instanceof Set?this.neededChunks:new Set(this.neededChunks??[]);for(const key of [...layers.keys()]){if(layers.size<=SEASON_TRANSITION.layerChunks)break;if(!view.has(key)&&key!==ck)layers.delete(key);}}
@@ -256,9 +321,12 @@ export class TerrainRenderer {
     const top_=this.blendCanvas??=document.createElement('canvas');top_.width=W;top_.height=H;const t2=top_.getContext('2d');t2.clearRect(0,0,W,H);t2.drawImage(b,0,0);
     t2.globalCompositeOperation='destination-in';t2.imageSmoothingEnabled=true;t2.drawImage(mask,0,0,gw,gh,0,0,gw*step,gh*step);t2.globalCompositeOperation='source-over';
     canvas.width=W;canvas.height=H;c.clearRect(0,0,W,H);c.drawImage(a,0,0);c.drawImage(top_,0,0);this.paintStats.groundBlends=(this.paintStats.groundBlends??0)+1;
-    return{canvas,stamp};
+    return{canvas,stamp,sig};
   }
-  paintContinuousChunk(context,cx,cy,left,top,season,occupied){
+  paintContinuousChunk(context,cx,cy,left,top,season,occupied,rect=null){const painter=this.groundPainter(cx,cy,left,top,season,occupied);painter.ground(context,rect);painter.plants(context,rect);}
+  // performance-2: the two halves of a ground paint – `ground` (land, water, paths: the pixel loop) and `plants` – each
+  // for the whole picture or for `rect` {x,y,w,h} only (a changed path; a band of a paint spread over several frames).
+  groundPainter(cx,cy,left,top,season,occupied){
     const x0=cx*CHUNK_SIZE,y0=cy*CHUNK_SIZE,cell=(x,y)=>this.groundAt(Math.max(0,Math.min(COLUMNS-1,x)),Math.max(0,Math.min(ROWS-1,y)));
     const isLand=(x,y)=>{const g=cell(x,y);return g===GROUND.GRASS||LAND_MATERIAL[g]!==undefined;},zoneAt=(x,y)=>{const g=cell(x,y);return g===GROUND.GRASS?(this.scene.grassZones?.[Math.max(0,Math.min(ROWS-1,y))]?.[Math.max(0,Math.min(COLUMNS-1,x))]??0):LAND_MATERIAL[g]??0;};
     const depthAt=(x,y)=>WATER_DEPTH[cell(x,y)]??-1,settings={...groundSettings(),year:SEASON_YEAR[season]??0.5};
@@ -270,12 +338,39 @@ export class TerrainRenderer {
     // A hair of bleed past the chunk's own tiles: chunk textures are filtered when zoomed, so a hard edge would show a dark line.
     const e=0.05,inside=(fx,fy)=>fx>=x0-e&&fy>=y0-e&&fx<x0+CHUNK_SIZE+e&&fy<y0+CHUNK_SIZE+e&&fx>=0&&fy>=0&&fx<COLUMNS&&fy<ROWS;
     const surface=this.pathStyle==='v2'&&this.v2?.geo?pathSurface(this.v2.geo,this.v2.index,PATH_SURFACE):null;
-    paintContinuousGround(context,{width:context.canvas.width,height:context.canvas.height,toWorld,isGrass:isLand,zoneAt,depthAt,inWorld,inside,field,settings,step:6,surface});
+    const ground=(context,rect=null)=>{if(rect)context.clearRect(rect.x,rect.y,rect.w,rect.h);
+      paintContinuousGround(context,{width:context.canvas.width,height:context.canvas.height,toWorld,isGrass:isLand,zoneAt,depthAt,inWorld,inside,field,settings,step:GROUND_STEP,surface,rect});};
     const screen=(fx,fy)=>{const p=gridToWorld(fx,fy);return [p.x-left,p.y-top];},name=seasonOf(settings.year),free=(fx,fy)=>own(fx,fy)&&!occupied.has(`${Math.floor(fx)},${Math.floor(fy)}`)&&this.map[Math.floor(fy)]?.[Math.floor(fx)]!==1;
+    const plants=(context,rect=null)=>{if(rect){context.save();context.beginPath();context.rect(rect.x,rect.y,rect.w,rect.h);context.clip();}
     for(const p of waterObjectsFor({x0:x0-1,y0:y0-1,span:CHUNK_SIZE+2,field,depthAt,settings}))if(free(p.fx,p.fy)){const [sx,sy]=screen(p.fx,p.fy);drawPlant(context,p,sx,sy,name);}
-    const plants=plantsFor({x0:x0-1,y0:y0-1,span:CHUNK_SIZE+2,isGrass:isLand,zoneAt,depthAt,field,settings,seed:this.scene.worldSeed??0}).filter(p=>free(p.fx,p.fy)&&(!surface||surface.plantKeep(p.fx,p.fy))).sort((a,b)=>a.fx+a.fy-b.fx-b.fy);
-    for(const p of plants){const [sx,sy]=screen(p.fx,p.fy);drawPlant(context,p,sx,sy,name);}
+    const list=plantsFor({x0:x0-1,y0:y0-1,span:CHUNK_SIZE+2,isGrass:isLand,zoneAt,depthAt,field,settings,seed:this.scene.worldSeed??0}).filter(p=>free(p.fx,p.fy)&&(!surface||surface.plantKeep(p.fx,p.fy))).sort((a,b)=>a.fx+a.fy-b.fx-b.fy);
+    for(const p of list){const [sx,sy]=screen(p.fx,p.fy);drawPlant(context,p,sx,sy,name);}
+    if(rect)context.restore();};
+    return {ground,plants};
   }
+  // performance-2: what the paths give a chunk's ground – distance and level on the painter's coarse grid (the only way a
+  // path reaches the picture; plants are cleared by the same samples). Null without V2 paths.
+  pathSignature(cx,cy,left,top,W=CHUNK_SIZE*64,H=CHUNK_SIZE*32){
+    const surface=this.pathStyle==='v2'&&this.v2?.geo?pathSurface(this.v2.geo,this.v2.index,PATH_SURFACE):null;if(!surface)return null;
+    const gw=Math.ceil(W/GROUND_STEP)+1,gh=Math.ceil(H/GROUND_STEP)+1,sig=new Float32Array(gw*gh*2);
+    for(let gy=0;gy<gh;gy++)for(let gx=0;gx<gw;gx++){const g=worldToGrid(gx*GROUND_STEP+.5+left,gy*GROUND_STEP+.5+top),[d,l]=surface.sample(g.x,g.y),i=(gy*gw+gx)*2;sig[i]=d;sig[i+1]=l;}
+    return sig;
+  }
+  // The canvas rectangle where two signatures differ (with the reach of the grid interpolation and of a plant sprite), or
+  // null when they are the same.
+  pathDiffRect(a,b,W=CHUNK_SIZE*64,H=CHUNK_SIZE*32){
+    const gw=Math.ceil(W/GROUND_STEP)+1,gh=Math.ceil(H/GROUND_STEP)+1;let x0=gw,y0=gh,x1=-1,y1=-1;
+    for(let gy=0,i=0;gy<gh;gy++)for(let gx=0;gx<gw;gx++,i+=2)if(a[i]!==b[i]||a[i+1]!==b[i+1]){if(gx<x0)x0=gx;if(gx>x1)x1=gx;if(gy<y0)y0=gy;if(gy>y1)y1=gy;}
+    if(x1<0)return null;
+    const M=PATH_PLANT_REACH,x=Math.max(0,(x0-1)*GROUND_STEP-M),y=Math.max(0,(y0-1)*GROUND_STEP-M),r=Math.min(W,(x1+2)*GROUND_STEP+M),bottom=Math.min(H,(y1+2)*GROUND_STEP+M);
+    return {x,y,w:r-x,h:bottom-y};
+  }
+  // The path change waiting for a chunk's ground: {stamp,sig,rect}, worked out once per ground stamp.
+  pathChange(ck,cx,cy,left,top,stamp,cached){
+    const store=this.pathChanges??=new Map();let entry=store.get(ck);if(entry?.stamp===stamp)return entry;
+    const sig=this.pathSignature(cx,cy,left,top);entry={stamp,sig,rect:sig&&cached?.sig?this.pathDiffRect(cached.sig,sig):undefined};store.set(ck,entry);return entry;
+  }
+
   // PathV2Layer tells which tiles' paths changed: their chunks get a new ground stamp (repainted one per frame).
   pathChanged(tiles,margin=2){if(!tiles){this.pathRevAll=(this.pathRevAll??0)+1;return;}this.pathRev??=new Map();const keys=new Set();for(const t of tiles)for(const [dx,dy] of [[-margin,-margin],[margin,-margin],[-margin,margin],[margin,margin],[0,0]])keys.add(`${Math.floor((t.x+dx)/CHUNK_SIZE)},${Math.floor((t.y+dy)/CHUNK_SIZE)}`);for(const k of keys)this.pathRev.set(k,(this.pathRev.get(k)??0)+1);}
   setDebug(value){this.debugEnabled=!!value;this.lastView='';if(!value)this.debugGraphics.clear();}
@@ -545,8 +640,17 @@ export class TerrainRenderer {
         groundStamp=`${this.groundLook(cx,cy).key}|${occ}|${this.pathRevAll??0}.${this.pathRev?.get(`${cx},${cy}`)??0}|${this.v2?.geo&&this.pathStyle==='v2'?1:0}`;const cached=this.groundCache?.get(`${cx},${cy}`);
         // performance-1: a change of the trodden paths alone (25 walking residents) repaints one chunk's ground (~40 ms
         // without GPU) at most every GROUND_PATH_GAP_MS; seasons and buildings keep the one-a-frame rule.
-        const pathOnly=cached&&cached.stamp!==groundStamp&&cached.stamp.split('|').filter((_,i)=>i!==2).join('|')===groundStamp.split('|').filter((_,i)=>i!==2).join('|');
-        const throttled=cached&&cached.stamp!==groundStamp&&(this.fogOnlyPass||!(this.groundPaintsLeft>0)||pathOnly&&performance.now()<(this.nextPathPaint??0))&&this.chunks.has(`${cx},${cy}`);
+        let pathOnly=!!cached&&pathOnlyChange(cached.stamp,groundStamp);
+        // performance-2: a path change elsewhere on a chain bumps this chunk's stamp too. When the paths give this chunk
+        // the same picture as before (pathSignature), the ground is kept and only the stamp moves on: no repaint, no wait.
+        if(pathOnly){const ck=`${cx},${cy}`,change=this.pathChange(ck,cx,cy,left,origin.y,groundStamp,cached);
+          if(change.rect===null){
+            // The season layers of a gradual change carry the same path state: their stamps move on with the chunk's.
+            const cut=v=>v.slice(v.indexOf('|')),oldRest=cut(cached.stamp),newRest=cut(groundStamp),own=this.seasonLayers?.get(ck);
+            if(own)for(const season of Object.keys(own))if(own[season].stamp===`${season}${oldRest}`){own[season].stamp=`${season}${newRest}`;own[season].sig=change.sig;}
+            cached.stamp=groundStamp;cached.sig=change.sig;this.pathChanges.delete(`${cx},${cy}`);this.paintStats.groundSkips=(this.paintStats.groundSkips??0)+1;pathOnly=false;}
+          else cached.pathOnlyFor=groundStamp;}
+        const throttled=cached&&cached.stamp!==groundStamp&&(this.fogOnlyPass||!(this.groundPaintsLeft>0)||pathOnly&&performance.now()<(this.nextPathPaint??0)&&!this.groundJobActive(`${cx},${cy}`))&&this.chunks.has(`${cx},${cy}`);
         // Fog fix (owner, report 0.83): a chunk where ground is seen for the first time must show it at once. When its
         // ground is due for a repaint that has to wait (one a frame, path wear every GROUND_PATH_GAP_MS), the fog is
         // still redrawn now over the previous ground picture; the chunk stays dirty and its ground follows in its turn.
@@ -559,15 +663,22 @@ export class TerrainRenderer {
         staleGround=!!throttled;
         if(pathOnly&&!staleGround)this.nextPathPaint=performance.now()+GROUND_PATH_GAP_MS;
       }
-      if(!dirty)context.clearRect(0,0,texture.width,texture.height);
+      // Continuous ground clears below, once its ground picture is ready (a paint spread over frames may leave here first).
+      if(!dirty&&!continuous)context.clearRect(0,0,texture.width,texture.height);
       // Ground first for every tile, tracks second: a neighbour's ground overlap can then never cover a track's edge.
       const paths=[],occupied=this.buildingTiles();
       if(continuous){
         // The painted ground (land, water, plants) does not depend on the fog: it is cached per chunk and only redrawn
         // when the season or the buildings on the chunk change. Fog changes then cost one drawImage plus the overlays.
         const ck=`${cx},${cy}`,stamp=groundStamp;let cached=(this.groundCache??=new Map()).get(ck);
-        if(!staleGround&&(!cached||cached.stamp!==stamp)){this.groundPaintsLeft--;const t0=performance.now();cached=this.groundPicture(ck,cx,cy,left,origin.y,texture,occupied,stamp,cached);this.paintStats.groundMs=(this.paintStats.groundMs??0)+performance.now()-t0;this.groundCache.set(ck,cached);}
-        context.drawImage(cached.canvas,0,0);
+        if(!staleGround&&(!cached||cached.stamp!==stamp)){this.groundPaintsLeft--;const t0=performance.now();const next=this.groundPicture(ck,cx,cy,left,origin.y,texture,occupied,stamp,cached);this.paintStats.groundMs=(this.paintStats.groundMs??0)+performance.now()-t0;
+          if(next){cached=next;cached.rev=this.groundRev=(this.groundRev??0)+1;this.groundCache.set(ck,cached);}
+          // The paint goes on next frame: a shown chunk with nothing new for the fog keeps its picture untouched.
+          else if(this.chunks.has(ck)&&!this.fogDirty?.has(ck)&&!this.paintingUrgent)return { key, x: left, y: origin.y, painted:false };
+          else staleGround=true;}
+        context.clearRect(0,0,texture.width,texture.height);context.drawImage(cached.canvas,0,0);
+        // Remembered ground (explored, not in sight): greyed and darkened, fading in smoothly (applyMemory).
+        this.applyMemory(context,cx,cy,left,origin.y,cached);
         // Plants near the chunk edge reach into neighbour tiles: black them out where that neighbour is unexplored.
         context.fillStyle='#000';
         for(let ty=cy*CHUNK_SIZE-1;ty<=(cy+1)*CHUNK_SIZE;ty++)for(let tx=cx*CHUNK_SIZE-1;tx<=(cx+1)*CHUNK_SIZE;tx++){
@@ -636,9 +747,6 @@ export class TerrainRenderer {
           context.restore();
         }
       }
-      // Remembered ground (explored, not in sight): greyed and darkened per pixel, by the same tile rule the ground was
-      // painted with (bleed included), so no light or dark lines show along tile or chunk edges.
-      if(continuous)this.shadeMemory(context,cx,cy,left,origin.y);
       // Continuous ground: paths are part of the cached ground (pathSurface), no tile overlays.
       // Owner 9 Nov ("proč tam jsou zase kolečka jako z prvních verzí?"): on continuous ground the paths are painted in
       // the ground itself (pathSurface). Since 0.77 this chain fell through to the old N12 tile overlay (a circle per
@@ -809,36 +917,54 @@ export class TerrainRenderer {
   // Applies the queued fog patches: the patched tiles' pixels are shaded again from the cached ground with the current
   // memory field (shadeMemory, the same rule as a full chunk paint). A chunk that also needs a full repaint is left to it.
   applyFogPatches(){
-    const patches=this.fogPatch;if(!patches?.size)return;this.fogPatch=new Map();const fog=this.fog;
+    const patches=this.fogPatch;if(!patches?.size)return;const fog=this.fog;
+    // performance-2 (30 residents: the patches took 6–30 ms a frame): patches are collected and applied every
+    // FOG_PATCH_EVERY_MS, at most FOG_PATCH_BUDGET_MS a frame (the rest follows next frame, oldest first). Chunks outside
+    // the view keep their patch waiting until they scroll in. A chunk's tiles are patched per quarter (5 × 5 tiles), so two
+    // residents at opposite corners no longer shade the whole chunk.
+    // At game speed 2 and 3 sight moves that much faster: the patches then come every 300 ms.
+    const now=performance.now();if(now<(this.nextFogPatch??0))return;this.nextFogPatch=now+FOG_PATCH_EVERY_MS*Math.max(1,Math.min(2,this.scene.gameTime?.speed??1));
+    const needed=this.neededChunks,deadline=now+FOG_PATCH_BUDGET_MS,half=Math.ceil(CHUNK_SIZE/2);
     for(const [key,indices] of patches){
+      if(needed instanceof Set&&!needed.has(key))continue;
+      if(performance.now()>deadline){this.nextFogPatch=0;break;}
+      patches.delete(key);
       const [cx,cy]=key.split(',').map(Number),cached=this.groundCache?.get(key),tex=`terrain-chunk-${cx}-${cy}`;
       if(cx<0||cy<0||cx*CHUNK_SIZE>=COLUMNS||cy*CHUNK_SIZE>=ROWS||this.fogDirty?.has(key))continue;
       if(!cached||!this.scene.textures.exists(tex)||!fog){this.dirtyChunks.add(key);continue;}
       const texture=this.scene.textures.get(tex),context=texture.getContext(),W=context.canvas.width,H=context.canvas.height;
       const origin=gridToWorld(cx*CHUNK_SIZE,cy*CHUNK_SIZE),left=origin.x-CHUNK_SIZE*32,top=origin.y;
+      const x0=cx*CHUNK_SIZE,y0=cy*CHUNK_SIZE,groups=new Map();
+      for(const index of indices){const tx=index%fog.width,ty=Math.floor(index/fog.width),q=(Math.max(0,Math.min(CHUNK_SIZE-1,ty-y0))>=half?2:0)+(Math.max(0,Math.min(CHUNK_SIZE-1,tx-x0))>=half?1:0);
+        let g=groups.get(q);if(!g)groups.set(q,g=[]);g.push({x:tx,y:ty});}
+      const field=this.memoryField(cx,cy);let paved=false;const rects=[];
+      for(const tiles of groups.values()){
       // The canvas rectangle around the patched tiles. Every pixel in it is shaded again from the cached ground, then the
       // black of unknown tiles in it is drawn again exactly as a full paint does (shading is linear, so the order does not
       // change the result). Pavement (cobbles drawn over the ground) in the rectangle: the chunk repaints instead.
       let bx0=W,by0=H,bx1=0,by1=0;
-      for(const index of indices){const t={x:index%fog.width,y:Math.floor(index/fog.width)},p=tileCenter(t),px=p.x-left,py=p.y-top;
+      for(const t of tiles){const p=tileCenter(t),px=p.x-left,py=p.y-top;
         bx0=Math.min(bx0,px-33);bx1=Math.max(bx1,px+33);by0=Math.min(by0,py-17);by1=Math.max(by1,py+17);}
       bx0=Math.max(0,Math.floor(bx0));by0=Math.max(0,Math.floor(by0));bx1=Math.min(W,Math.ceil(bx1));by1=Math.min(H,Math.ceil(by1));const bw=bx1-bx0,bh=by1-by0;if(bw<=0||bh<=0)continue;
       const inRect=t=>{const p=tileCenter(t),px=p.x-left,py=p.y-top;return px+34>bx0&&px-34<bx1&&py+18>by0&&py-18<by1;};
-      const x0=cx*CHUNK_SIZE,y0=cy*CHUNK_SIZE,unknownTiles=[];let paved=false;
+      const unknownTiles=[];
       for(let ty=y0-1;ty<=y0+CHUNK_SIZE&&!paved;ty++)for(let tx=x0-1;tx<=x0+CHUNK_SIZE;tx++){const t={x:tx,y:ty};if(!inRect(t))continue;
         const inside=tx>=0&&ty>=0&&tx<COLUMNS&&ty<ROWS,own=tx>=x0&&ty>=y0&&tx<x0+CHUNK_SIZE&&ty<y0+CHUNK_SIZE;
         if(own&&this.tileData(t)?.[4]===1){paved=true;break;}
         if(!inside||fog.displayState(t)===VISIBILITY.UNEXPLORED)unknownTiles.push({t,own});}
+      if(paved)break;
+      rects.push({bx0,by0,bw,bh,unknownTiles});}
       if(paved){(this.fogDirty??=new Set()).add(key);this.dirtyChunks.add(key);continue;}
-      const src=cached.canvas.getContext('2d').getImageData(bx0,by0,bw,bh).data;
-      this.shadeMemory(context,cx,cy,left,top,{region:{x:bx0,y:by0,w:bw,h:bh},src});
+      for(const {bx0,by0,bw,bh,unknownTiles} of rects){
+      context.save();context.beginPath();context.rect(bx0,by0,bw,bh);context.clip();context.globalCompositeOperation='copy';context.drawImage(cached.canvas,bx0,by0,bw,bh,bx0,by0,bw,bh);context.restore();
+      this.applyMemory(context,cx,cy,left,top,cached,{region:{x:bx0,y:by0,w:bw,h:bh},field});
       if(unknownTiles.length){context.save();context.beginPath();context.rect(bx0,by0,bw,bh);context.clip();context.fillStyle='#000';
         for(const {t,own} of unknownTiles){const p=tileCenter(t),px=p.x-left,py=p.y-top;context.beginPath();
           if(own){const diamond=()=>{context.beginPath();context.moveTo(px-32-TILE_BLEED,py);context.lineTo(px,py-16-TILE_BLEED/2);context.lineTo(px+32+TILE_BLEED,py);context.lineTo(px,py+16+TILE_BLEED/2);context.closePath();};
             context.save();diamond();context.clip();diamond();context.fill();context.restore();continue;}
           context.moveTo(px-33,py);context.lineTo(px,py-16.5);context.lineTo(px+33,py);context.lineTo(px,py+16.5);context.closePath();context.fill();}
-        context.restore();}
-      texture.refresh();this.composite?.touch(key);this.paintStats.patches=(this.paintStats.patches??0)+indices.size;
+        context.restore();}}
+      texture.refresh();this.composite?.touch(key,rects.map(r=>({x:left+r.bx0,y:top+r.by0,width:r.bw,height:r.bh})));this.paintStats.patches=(this.paintStats.patches??0)+indices.size;
     }
   }
   // Performance: a newly visible chunk is painted at once (never a hole); already shown chunks that became dirty

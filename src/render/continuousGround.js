@@ -167,15 +167,18 @@ export function wetness(fx, fy, depthAt, settings = GROUND_DEFAULTS) { // single
   const wx = fx - 0.5, wy = fy - 0.5, ix = Math.floor(wx), iy = Math.floor(wy), ax = smooth(wx - ix), ay = smooth(wy - iy), wet = (x, y) => (depthAt(x, y) >= 0 ? 1 : 0);
   return wet(ix, iy) * (1 - ax) * (1 - ay) + wet(ix + 1, iy) * ax * (1 - ay) + wet(ix, iy + 1) * (1 - ax) * ay + wet(ix + 1, iy + 1) * ax * ay;
 }
-export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zoneAt, depthAt = () => -1, inWorld = () => true, inside = null, field = null, settings = GROUND_DEFAULTS, step = 4, surface = null }) {
+export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zoneAt, depthAt = () => -1, inWorld = () => true, inside = null, field = null, settings = GROUND_DEFAULTS, step = 4, surface = null, rect = null }) {
+  // performance-2: `rect` {x, y, w, h} (canvas px) repaints only that part, with the same pixels a whole paint gives there.
+  const RX = rect ? Math.max(0, rect.x | 0) : 0, RY = rect ? Math.max(0, rect.y | 0) : 0, RW = rect ? Math.min(width - RX, rect.w | 0) : width, RH = rect ? Math.min(height - RY, rect.h | 0) : height;
   const wetAt = field ? field.wet : (fx, fy) => wetness(fx, fy, depthAt, settings), mask = new Uint8Array(width * height);
-  const s = { ...GROUND_DEFAULTS, ...settings }, img = ctx.getImageData(0, 0, width, height), out = img.data, grain = detail();
+  const s = { ...GROUND_DEFAULTS, ...settings }, img = ctx.getImageData(RX, RY, RW, RH), out = img.data, grain = detail();
   const warpScale = 1 / 3.2, warp = s.edgeWidth, colors = GROUND_DEFAULTS_BASE.zoneColors.map((c, i) => hex(s.zoneColors?.[i] ?? c)), wcolors = GROUND_DEFAULTS_BASE.waterColors.map((c, i) => hex(s.waterColors?.[i] ?? c)), season = seasonLook(s.year ?? yearOf(s.season));
   // The slow part (zone blend, patches, depth, current) is computed on a coarse grid every `step` pixels and
   // interpolated; grain, speckles, foam and the shoreline threshold stay per pixel, so edges remain sharp.
   const gw = Math.ceil(width / step) + 1, gh = Math.ceil(height / step) + 1, n = gw * gh;
+  const gx0 = Math.floor(RX / step), gy0 = Math.floor(RY / step), gx1 = Math.min(gw - 1, Math.floor((RX + RW - 1) / step) + 1), gy1 = Math.min(gh - 1, Math.floor((RY + RH - 1) / step) + 1);
   const LR = new Float32Array(n), LG = new Float32Array(n), LB = new Float32Array(n), P1 = new Float32Array(n), WR = new Float32Array(n), WG = new Float32Array(n), WB = new Float32Array(n), WET = new Float32Array(n), DEP = new Float32Array(n), SZ = new Uint8Array(n);
-  for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++) {
+  for (let gy = gy0; gy <= gy1; gy++) for (let gx = gx0; gx <= gx1; gx++) {
     const i = gy * gw + gx, [fx, fy] = toWorld(gx * step + 0.5, gy * step + 0.5), tx = Math.floor(fx), ty = Math.floor(fy);
     WET[i] = wetAt(fx, fy);
     const land = landBase(fx, fy, tx, ty), water = waterBase(fx, fy, s, wcolors, season, field);
@@ -184,7 +187,7 @@ export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zo
   }
   // Path surface (pathSurface.js): distance and level on the same coarse grid; skipped where no path is near.
   const PD = surface ? new Float32Array(n) : null, PL = surface ? new Float32Array(n) : null;
-  if (surface) for (let gy = 0; gy < gh; gy++) for (let gx = 0; gx < gw; gx++) { const i = gy * gw + gx, [fx, fy] = toWorld(gx * step + 0.5, gy * step + 0.5), [dd, ll] = surface.sample(fx, fy); PD[i] = dd; PL[i] = ll; }
+  if (surface) for (let gy = gy0; gy <= gy1; gy++) for (let gx = gx0; gx <= gx1; gx++) { const i = gy * gw + gx, [fx, fy] = toWorld(gx * step + 0.5, gy * step + 0.5), [dd, ll] = surface.sample(fx, fy); PD[i] = dd; PL[i] = ll; }
   function landBase(fx, fy, tx, ty) {
     const wx = fx + (fbm(fx * warpScale, fy * warpScale, 3) - 0.5) * warp * 2 - 0.5, wy = fy + (fbm(fx * warpScale, fy * warpScale, 7) - 0.5) * warp * 2 - 0.5;
     let r = 0, g = 0, b = 0, total = 0, zone = 0, best = -1;
@@ -211,15 +214,15 @@ export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zo
   // toWorld is affine (iso projection): fx = ax*px + bx*py + cx, fy = ay*px + by*py + cy.
   const [c0x, c0y] = toWorld(0.5, 0.5), [c1x, c1y] = toWorld(1.5, 0.5), [c2x, c2y] = toWorld(0.5, 1.5), ax = c1x - c0x, ay = c1y - c0y, bxw = c2x - c0x, byw = c2y - c0y;
   const snowy = season.snow < 0.5, sp = s.speckles, mul0 = season.mul[0], mul1 = season.mul[1], mul2 = season.mul[2];
-  for (let py = 0; py < height; py++) {
+  for (let py = RY; py < RY + RH; py++) {
     const gy = Math.min(gh - 2, Math.floor(py / step)), vy = (py - gy * step) / step, grow = (py % DH) * DW;
-    let fx = c0x + bxw * py - ax, fy = c0y + byw * py - ay;
-    for (let px = 0; px < width; px++) {
+    let fx = c0x + bxw * py + ax * (RX - 1), fy = c0y + byw * py + ay * (RX - 1);
+    for (let px = RX; px < RX + RW; px++) {
       fx += ax; fy += ay;
       if (inside ? !inside(fx, fy) : !inWorld(Math.floor(fx), Math.floor(fy))) continue;
       const gx = Math.min(gw - 2, Math.floor(px / step)), vx = (px - gx * step) / step, i = gy * gw + gx, i1 = i + 1, i2 = i + gw, i3 = i2 + 1;
       const w00 = (1 - vx) * (1 - vy), w10 = vx * (1 - vy), w01 = (1 - vx) * vy, w11 = vx * vy;
-      const wetV = WET[i] * w00 + WET[i1] * w10 + WET[i2] * w01 + WET[i3] * w11, o = (py * width + px) * 4;
+      const wetV = WET[i] * w00 + WET[i1] * w10 + WET[i2] * w01 + WET[i3] * w11, o = ((py - RY) * RW + px - RX) * 4;
       let r, g, b;
       if (wetV >= 0.5) {
         r = WR[i] * w00 + WR[i1] * w10 + WR[i2] * w01 + WR[i3] * w11; g = WG[i] * w00 + WG[i1] * w10 + WG[i2] * w01 + WG[i3] * w11; b = WB[i] * w00 + WB[i1] * w10 + WB[i2] * w01 + WB[i3] * w11;
@@ -243,7 +246,7 @@ export function paintContinuousGround(ctx, { width, height, toWorld, isGrass, zo
       out[o] = r; out[o + 1] = g; out[o + 2] = b; out[o + 3] = 255;
     }
   }
-  ctx.putImageData(img, 0, 0);
+  ctx.putImageData(img, RX, RY);
   return { mask };
 }
 // Water base colour at a point: ford → shallow → deep by depth, the current and ripples, the winter tint;
