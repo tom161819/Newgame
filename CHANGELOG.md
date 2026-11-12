@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.98.0] - 2026-11-12
+<!-- version: {"title":"Army tab; lifted terrain fix","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Army tab beside Buildings: every soldier (Recruits and trained units) by Barracks, with rank, health, order and what he is doing. A click moves the camera to the soldier and marks him; Shift + click chooses more. Two orders: Patrol (the default) and Guard (the soldier stands where he is; the right mouse button on the map sends the chosen ones to a guard post).
+- Soldiers on Patrol walk a round of the settlement, spread along it, instead of milling around their Barracks.
+
+### Fixed
+- Lifted terrain (0.96.0, 0.97.0): tiles were drawn through a crossed outline, which left a black checkerboard on gentle slopes. The outline now goes round the tile.
+
 ## [0.97.0] - 2026-11-12
 <!-- version: {"title":"Kingdom overview explains its values","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

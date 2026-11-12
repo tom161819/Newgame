@@ -30,6 +30,7 @@ import { VillagePanel } from '../ui/VillagePanel.js';
 import { IssueIcons } from './IssueIcons.js';
 import { MaterialYardView,MaterialPiles } from './MaterialPiles.js';
 import { SideCards } from '../ui/SideCards.js';
+import { ArmyPanel } from '../ui/ArmyPanel.js';
 import { decodeWorldCode,randomWorldCode,defaultWorldLevels,settingsFromLevels } from '../data/worldCode.js';
 import { buildRelief,setRelief,sightBonus } from './terrainRelief.js';
 import { worldStreams } from './seededRandom.js';
@@ -374,7 +375,7 @@ export class GameScene extends Phaser.Scene {
     const onRotate=event=>{if(!event.repeat&&!this.assetGallery.isOpen)this.rotateGate();};this.input.keyboard.on('keydown-R',onRotate);
     this.combatFeedback.refresh();
     this.input.mouse.disableContextMenu();
-    this.unitSelection=new UnitSelection(this);this.rockMiningTool=new RockMiningTool(this);this.minimap=new Minimap(this);this.eventFeed=new EventFeed(this);this.millSails=new MillSails(this);
+    this.unitSelection=new UnitSelection(this);this.armyPanel=new ArmyPanel(this);this.rockMiningTool=new RockMiningTool(this);this.minimap=new Minimap(this);this.eventFeed=new EventFeed(this);this.millSails=new MillSails(this);
     // #121: a right click on the map first closes open panels (and does nothing else); otherwise it commands as before.
     // Request 28: a right click inside any window closes that window (PanelDismiss.js, one delegated listener).
     const sidePanels=()=>[this.settingsPanel,this.populationSidebar];
@@ -392,7 +393,7 @@ export class GameScene extends Phaser.Scene {
       this.rockMiningTool.destroy();this.unitSelection.destroy();this.minimap?.destroy();this.eventFeed?.destroy();this.millSails?.destroy();this.kingCargoControl.destroy();this.kingLogistics.destroy();this.lightSources.destroy();
       this.memoryRenderer.destroy();
       setRelief(null);
-      this.populationSidebar.destroy();
+      this.populationSidebar.destroy();this.armyPanel?.destroy();
       this.staffingIndicators.destroy();
       this.naturalResourcePanel.destroy();this.naturalResources.destroy();this.resourceLedger.destroy();
       this.noticesPanel.destroy();this.diagnostics.destroy();this.employmentPanel.destroy();this.unsubscribeEmployment?.();this.employment.destroy();this.assetGallery.destroy();this.inventoryBar.destroy();this.buildingBar.destroy();this.worldCamera.destroy();this.assets.destroy();
@@ -814,7 +815,7 @@ export class GameScene extends Phaser.Scene {
     // m-noc-zrychleni (82): the night speed-up now raises the game speed itself (indicator 3 with a moon, back at dawn).
     this.nightSpeedUp?.update();const steps=this.dayNight.speed(1),speed=this.playerPaused?0:(this.gameSpeed??1);let activeDelta=0;
     for(let g=0;g<speed;g++)for(let i=0;i<steps;i++){const step=this.simulationStep(delta);if(step===null)return;activeDelta+=step;if(i&&!this.dayNight.isNight())break;}
-    this.updateTimeDisplay();this.nightControls?.update();this.nightOverlay?.update(delta);this.fuelIcons?.update();this.fireViews?.update(delta);this.fishShadows?.update(delta);if(this.terrain?.groundStyle==='continuous')this.riverLife?.update(delta);else this.riverLife?.graphics.clear();this.kingdomOverview?.update();this.helpArrow?.update();this.tutorial?.update();this.royalGoalsPanel?.update();this.completionFlash?.update(delta);this.dangerMarks?.update(delta);
+    this.updateTimeDisplay();this.nightControls?.update();this.nightOverlay?.update(delta);this.fuelIcons?.update();this.fireViews?.update(delta);this.fishShadows?.update(delta);if(this.terrain?.groundStyle==='continuous')this.riverLife?.update(delta);else this.riverLife?.graphics.clear();this.kingdomOverview?.update();this.armyPanel?.update();this.helpArrow?.update();this.tutorial?.update();this.royalGoalsPanel?.update();this.completionFlash?.update(delta);this.dangerMarks?.update(delta);
     this.updateFoodDisplay();this.worldCamera.update(delta);this.refreshVisibility();this.lightSources.update(delta);
     if(this.buildMode&&!document.querySelector('dialog[open]')){if(this.previewTracking)this.previewAnchor=this.pointerTile(this.input.activePointer);this.updateBuildingPreview();}
   }

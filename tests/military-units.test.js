@@ -142,3 +142,22 @@ test('kasarna-branci: a Barracks takes 12; everyone hired is a Recruit with basi
   const c=loaded.workerSystem.workers.get(recruits[2].id);assert.ok(loaded.military.isRecruit(c));assert.equal(c.maxHP,baseHP+RECRUIT.modifiers.maxHP);
   assert.ok(loaded.military.units.has(a.id));
 });
+
+test('m-zalozka-vojsko: soldiers on Patrol walk a round of the settlement spread along it; a Guard stands and is listed as Guard; Shift adds to the choice', async () => {
+  const { armyRows,armyPick } = await import('../src/ui/ArmyPanel.js');const { PATROL } = await import('../src/data/military.js');
+  const {s,barracks}=kingdom();assert.ok(s.buildings.filter(b=>b.construction==null||b.construction.state==='complete').length>=PATROL.minBuildings);
+  const route=s.military.patrolRoute();assert.ok(route.length>=4,'a round exists');assert.equal(s.military.patrolRoute(),route,'kept until the buildings change');
+  for(const p of route)assert.equal(s.map[p.y][p.x],0,'waypoints are walkable');
+  const a=soldier(s,barracks,{x:50,y:54}),b=soldier(s,barracks,{x:51,y:54}),c=soldier(s,barracks,{x:52,y:54});
+  const first=[a,b,c].map(w=>s.military.nextPatrolPoint(w));assert.equal(new Set(first.map(p=>`${p.x},${p.y}`)).size,3,'each starts at a point of his own');
+  const index=a.patrolIndex;assert.deepEqual(s.military.nextPatrolPoint(a),route[(index+1)%route.length],'then the next point in order');
+  until(s,()=>a.workMessage==='Patrolling the settlement'&&(a.path.length>0||a.nextTile),60000);
+  // Guard: the existing hold command; the list shows the order.
+  assert.equal(s.workerSystem.commands.hold(b),true);let rows=armyRows(s);
+  assert.equal(rows.length,3+0+[...s.military.units.keys()].filter(id=>![a.id,b.id,c.id].includes(id)).length);
+  assert.equal(rows.find(r=>r.id===b.id).order,'guard');assert.equal(rows.find(r=>r.id===a.id).order,'patrol');assert.ok(rows.every(r=>r.rank&&r.maxHp>0&&typeof r.state==='string'));
+  for(let i=0;i<40;i++)s.tick(50);const tile={...b.tile};for(let i=0;i<200;i++)s.tick(50);assert.deepEqual(b.tile,tile,'the Guard stays (after finishing the step he was on)');
+  s.workerSystem.commands.resume(b);assert.equal(armyRows(s).find(r=>r.id===b.id).order,'patrol');
+  // Choosing: a click takes one, Shift + click adds and removes.
+  let picked=armyPick(new Set(),a.id,false);picked=armyPick(picked,b.id,true);assert.deepEqual([...picked],[a.id,b.id]);picked=armyPick(picked,a.id,true);assert.deepEqual([...picked],[b.id]);assert.deepEqual([...armyPick(picked,c.id,false)],[c.id]);
+});

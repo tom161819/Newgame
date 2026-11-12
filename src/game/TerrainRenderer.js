@@ -403,7 +403,7 @@ export class TerrainRenderer {
       if(partial&&!rects.some(r=>px+hw+2>r.bx0&&px-hw-2<r.bx0+r.bw&&py+2*hh+2>r.by0&&py-2<r.by0+r.bh))continue;
       const N=[px,py],E=[px+hw,py+hh],S=[px,py+2*hh],Wp=[px-hw,py+hh],c=[corner(x,y),corner(x+1,y),corner(x+1,y+1),corner(x,y+1)];drawn++;
       // A tile whose four corners lie in one plane (within half a pixel) is one piece, otherwise two triangles.
-      if(Math.abs(c[0]+c[2]-c[1]-c[3])<.5)piece([N,E,Wp,S],[c[0],c[1],c[3],c[2]]);
+      if(Math.abs(c[0]+c[2]-c[1]-c[3])<.5)piece([N,E,S,Wp],[c[0],c[1],c[2],c[3]]); // corners in order round the tile (a crossed outline would clip a bow-tie)
       else{piece([N,E,Wp],[c[0],c[1],c[3]]);piece([Wp,E,S],[c[3],c[1],c[2]]);}}
     texture.refresh();this.paintStats.lifts=(this.paintStats.lifts??0)+1;this.paintStats.liftTiles=(this.paintStats.liftTiles??0)+drawn;return name;
   }

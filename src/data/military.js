@@ -22,3 +22,8 @@ export const KNIGHT_SPEED=1.5;
 export const MILITARY_RULES=Object.freeze({guardRadius:12,retarget:600,kitCapacityPerOrder:2});
 // The items one unit type needs, as {itemId: count}.
 export function unitKit(type){const kit={};for(const id of Object.values(UNIT_TYPES[type].equipment))kit[id]=(kit[id]??0)+1;return kit;}
+
+// m-zalozka-vojsko (owner, 12 Nov): soldiers on Patrol walk a round of the settlement – a ring `margin` tiles outside the
+// box of all finished buildings, a waypoint every `step` tiles – instead of milling around their Barracks. A settlement
+// smaller than `minBuildings` keeps the old patrol near the Barracks.
+export const PATROL=Object.freeze({margin:2,step:4,minBuildings:3,reach:3});

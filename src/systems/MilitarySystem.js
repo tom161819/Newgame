@@ -4,7 +4,7 @@ import { buildingIsComplete } from '../game/buildings.js';
 import { recalculateStats } from './UnitStats.js';
 import { adjacentTiles,canInteractAdjacent } from '../game/interaction.js';
 import { inAttackRange } from './CombatSystem.js';
-import { MILITARY_RULES } from '../data/military.js';
+import { MILITARY_RULES,PATROL } from '../data/military.js';
 
 // C08: Soldiers employed in a Barracks are trained into units. Training is paid in Gold, needs the unit's real items
 // (Haulers carry them from an Armory to the Barracks kit store) and game time at the Barracks. A trained unit wears
@@ -13,6 +13,27 @@ export class MilitarySystem {
   constructor(scene){this.scene=scene;this.units=new Map();this.orders=new Map();this.nextOrder=1;}
   get storage(){return this.scene.foodStorage;}
   barracks(id){return this.scene.buildings.find(b=>b.id===id&&b.type==='barracks'&&buildingIsComplete(b))??null;}
+  // m-zalozka-vojsko: the patrol round of the settlement – walkable waypoints on a ring around all finished buildings,
+  // in walking order; worked out again when a building is added, finished or removed. Empty for a tiny settlement.
+  patrolRoute(){
+    const s=this.scene,key=`${s.buildings.length}:${s.constructionSystem?.revision??0}`;if(this.routeKey===key)return this.route;this.routeKey=key;this.route=[];
+    const done=s.buildings.filter(b=>buildingIsComplete(b));if(done.length<PATROL.minBuildings)return this.route;
+    let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;for(const b of done)for(const t of b.tiles??[{x:b.x,y:b.y}]){x0=Math.min(x0,t.x);y0=Math.min(y0,t.y);x1=Math.max(x1,t.x);y1=Math.max(y1,t.y);}
+    const H=s.map.length,W=s.map[0].length,m=PATROL.margin;x0=Math.max(0,x0-m);y0=Math.max(0,y0-m);x1=Math.min(W-1,x1+m);y1=Math.min(H-1,y1+m);
+    const ring=[];for(let x=x0;x<x1;x+=PATROL.step)ring.push({x,y:y0});for(let y=y0;y<y1;y+=PATROL.step)ring.push({x:x1,y});for(let x=x1;x>x0;x-=PATROL.step)ring.push({x,y:y1});for(let y=y1;y>y0;y-=PATROL.step)ring.push({x:x0,y});
+    const free=t=>s.map[t.y]?.[t.x]===0&&!s.resourceOccupancy?.has(`${t.x},${t.y}`),seen=new Set();
+    for(const p of ring){let pick=null;for(let r=0;r<=PATROL.reach&&!pick;r++)for(let dy=-r;dy<=r&&!pick;dy++)for(let dx=-r;dx<=r&&!pick;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const t={x:p.x+dx,y:p.y+dy};if(free(t))pick=t;}
+      if(pick&&!seen.has(`${pick.x},${pick.y}`)){seen.add(`${pick.x},${pick.y}`);this.route.push(pick);}}
+    if(this.route.length<4)this.route=[];return this.route;
+  }
+  // The next waypoint of a soldier's round: everyone starts at a point of their own (spread by their place among the
+  // soldiers) and walks the ring in order.
+  nextPatrolPoint(worker){
+    const route=this.patrolRoute();if(!route.length)return null;
+    if(!Number.isInteger(worker.patrolIndex)||worker.patrolIndex>=route.length){const soldiers=this.scene.workerSystem.liveSubjects().filter(w=>w.profession==='soldier').map(w=>w.id).sort(),at=Math.max(0,soldiers.indexOf(worker.id));worker.patrolIndex=Math.floor(at*route.length/Math.max(1,soldiers.length))%route.length;}
+    else worker.patrolIndex=(worker.patrolIndex+1)%route.length;
+    return route[worker.patrolIndex];
+  }
   unit(worker){return worker?this.units.get(worker.id)??null:null;}
   // kasarna-branci: a Recruit is a living resident with the `soldier` profession who is not a trained unit.
   isRecruit(worker){return !!worker?.isAlive&&worker.profession==='soldier'&&!this.units.has(worker.id);}

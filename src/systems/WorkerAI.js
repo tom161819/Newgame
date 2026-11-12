@@ -87,6 +87,10 @@ export class WorkerAI {
     if(this.scene.combat.attacks.has(worker)){worker.path=[];worker.workState='Working';worker.workMessage='Defending self';return;}
     worker.workState='Patrolling';worker.workMessage='Guarding barracks';if(worker.nextTile||worker.path.length||worker.aiCooldown>0)return;
     worker.aiCooldown=WORKPLACE_RULES.patrolWaitMin+Math.random()*(WORKPLACE_RULES.patrolWaitMax-WORKPLACE_RULES.patrolWaitMin);
+    // m-zalozka-vojsko: a soldier walks the settlement's round, one waypoint after another; without a round (a tiny
+    // settlement) or when the waypoint cannot be reached, he keeps to the Barracks as before.
+    const point=worker.profession==='soldier'?this.scene.military?.nextPatrolPoint?.(worker):null;
+    if(point){worker.workMessage='Patrolling the settlement';worker.moveTo([point]);if(worker.path.length||worker.nextTile)return;}
     const origin=this.origin(worker),r=WORKPLACE_RULES.patrolRadius,tile={x:Math.round(origin.x)+Math.floor(Math.random()*(r*2+1))-r,y:Math.round(origin.y)+Math.floor(Math.random()*(r*2+1))-r};
     if(this.scene.map[tile.y]?.[tile.x]===0)worker.moveTo([tile]);
   }
