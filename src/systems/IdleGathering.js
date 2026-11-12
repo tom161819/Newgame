@@ -7,8 +7,10 @@ const IDLE_MESSAGES=new Set(['Waiting for transport','Waiting near Castle','Wait
 const salt=id=>[...String(id)].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,0);
 // Derived idle path ownership, using the existing worker reservations and normal movement. Not a job scheduler.
 export class IdleGathering {
-  constructor(system){this.system=system;this.scene=system.scene;this.claims=new Map();this.nextPlans=new Map();this.budgetAt=null;this.budget=0;}
+  constructor(system){this.system=system;this.scene=system.scene;this.claims=new Map();this.nextPlans=new Map();this.draws=new Map();this.budgetAt=null;this.budget=0;}
   key(tile){return `idle-anchor:${tileKey(tile)}`;}
+  // A number 0–1 of the worker's own: a hash of the id and a per-worker counter (the same in every run, no shared rhythm).
+  chance(worker){const n=(this.draws.get(worker.id)??0)+1;this.draws.set(worker.id,n);let h=(salt(worker.id)^Math.imul(n,2654435761))>>>0;h=Math.imul(h^(h>>>15),2246822519)>>>0;h=(h^(h>>>13))>>>0;return h/4294967296;}
   atHome(worker){const claim=this.claims.get(worker.id);return !!claim&&claim.kind!=='local'&&this.scene.buildings.some(b=>b.id===claim.homeId)&&!worker.nextTile&&!worker.path.length&&same(worker.tile,claim.goal);}
   release(worker,{stop=false}={}){
     const claim=this.claims.get(worker.id);this.nextPlans.delete(worker.id);if(!claim)return;
@@ -40,17 +42,21 @@ export class IdleGathering {
     if(claim){
       if(worker.nextTile||worker.path.length){worker.workState='Traveling to Target';message(claim.kind==='castle'?'Walking to Castle':claim.kind==='workplace'?'Walking to workplace':'Walking nearby');return true;}
       if(same(worker.tile,claim.goal)){
-        claim.until??=now+RULES.dwellMs+salt(worker.id)%2500;
+        claim.until??=now+RULES.dwellMinMs+this.chance(worker)*(RULES.dwellMaxMs-RULES.dwellMinMs);
         if(now<claim.until&&(claim.kind!=='local'||!homes.length||now<(this.nextPlans.get(worker.id)??0)))return true;
       }
     }
+    // A resident already standing by the Castle with no spot yet (start, load, morning) starts after a wait of their own.
+    if(!claim&&!this.nextPlans.has(worker.id)&&worker.profession==='idle'&&homes.some(h=>{const b=h.building,d=buildingDefinition(b);return Math.max(b.x-worker.tile.x,worker.tile.x-(b.x+d.width-1),b.y-worker.tile.y,worker.tile.y-(b.y+d.height-1))<=RULES.maximumMargin+2;})){this.nextPlans.set(worker.id,now+this.chance(worker)*RULES.firstWaitMs);return false;}
     if(now<(this.nextPlans.get(worker.id)??0))return !!claim;
     if(this.budgetAt!==now){this.budgetAt=now;this.budget=6;}if(!this.budget)return !!claim;this.budget--;
     const occupied=new Set([this.scene.character,...(this.scene.animalSystem?.animals.values()??[]),...this.system.liveWorkers()].filter(a=>a!==worker&&a.isAlive&&!a.mounted&&this.scene.stables?.horses.get(a.id)?.state!=='harnessed').flatMap(a=>a.reservedTiles()).map(tileKey));
     this.nextPlans.set(worker.id,now+RULES.retryMs);const goals=new Map(),expired=claim?.until!=null&&now>=claim.until;
     for(const home of homes)for(const tile of this.candidates(home))if(this.valid(tile,worker,doors,occupied)&&(!expired||!same(tile,claim.goal)))goals.set(tileKey(tile),{goal:tile,homeId:home.building.id,kind:home.kind});
     const nav=this.system.navigationMap(worker),start=worker.nextTile??worker.tile,routeFor=goals=>goals.size?findPathToAny(nav,start,[...goals.values()].map(g=>g.goal),this.scene.pathWear?.routingOptions(worker)):null;
-    let route=routeFor(goals),chosen=route&&goals.get(tileKey(route.destination));
+    // After a dwell the next spot is one of a few drawn at random (the nearest of those), not the nearest of all.
+    let pool=goals;if(expired&&goals.size>RULES.spotChoices){const list=[...goals],picked=new Map();for(let i=0;i<RULES.spotChoices;i++){const [k,v]=list[Math.floor(this.chance(worker)*list.length)];picked.set(k,v);}pool=picked;}
+    let route=routeFor(pool)??(pool!==goals?routeFor(goals):null),chosen=route&&goals.get(tileKey(route.destination));
     if(!route){
       if(claim&&!expired&&same(worker.tile,claim.goal))return true;
       const origin=claim?.localOrigin??{...worker.tile},local=new Map();

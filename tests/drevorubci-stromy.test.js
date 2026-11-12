@@ -33,12 +33,12 @@ function tree(s,tile,stage=3,growthDays=0){const n=treeState(`tree-${s.naturalRe
 function until(s,condition,limit=65000){for(let elapsed=0;elapsed<limit&&!condition();elapsed+=50)s.tick(50);assert.ok(condition(),'the action did not finish');}
 const advance=(s,ms)=>{for(let t=0;t<ms;t+=DIAGNOSTICS.checkInterval){s.gameTime.totalElapsed+=DIAGNOSTICS.checkInterval;s.diagnostics.update();}};
 
-test('1: a hut with no mature tree in its radius gets one notice (once), with the hut as its camera target; a mature tree in range ends it',()=>{
-  fresh();const s=fixture(),b=hut(s);tree(s,{x:44+30,y:44},3);const young=tree(s,{x:49,y:45},2,0);
+test('1: a hut with no mature tree on the known map gets one notice (once), with the hut as its camera target; a mature tree ends it',()=>{
+  fresh();const s=fixture(),b=hut(s);const young=tree(s,{x:49,y:45},2,0);
   advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);
   let rows=s.diagnostics.active().filter(i=>i.reason==='noMatureTrees');assert.equal(rows.length,1);assert.equal(rows[0].entityId,b.id);assert.equal(rows[0].category,'production');
-  setLanguage('cs',{persist:false});assert.equal(noticeText(s,rows[0]),'Dřevorubecká chata nemá co kácet – postav novou u lesa.');
-  setLanguage('en',{persist:false});assert.equal(noticeText(s,rows[0]),'The Lumberjack Hut has nothing to fell – build a new one near a forest.');
+  setLanguage('cs',{persist:false});assert.equal(noticeText(s,rows[0]),'Dřevorubecká chata nemá co kácet – na známé mapě nejsou vzrostlé stromy.');
+  setLanguage('en',{persist:false});assert.equal(noticeText(s,rows[0]),'The Lumberjack Hut has nothing to fell – there are no mature trees on the known map.');
   advance(s,s.gameTime.dayDuration*2);assert.equal(s.diagnostics.active().filter(i=>i.reason==='noMatureTrees').length,1,'one row, not repeated');assert.equal(s.diagnostics.active().find(i=>i.reason==='noMatureTrees').count,1);
   young.natural.stage=3;advance(s,DIAGNOSTICS.checkInterval);assert.equal(s.diagnostics.active().filter(i=>i.reason==='noMatureTrees').length,0,'gone once a tree in range is mature');
 });
@@ -117,7 +117,7 @@ test('6: Dev tool "Forest and wood": ranges, defaults, chop time, wood per tree,
     assert.equal(setDevFactor('saplingChance',2),1);assert.equal(setDevFactor('saplingChance',-1),0);assert.equal(setDevFactor('hutGrowthBoost',.5),1);assert.equal(setDevFactor('woodRadius',3),2);assert.equal(setDevFactor('woodYield',5),3);
     assert.equal(devBalanceChanged(),true);resetDevBalance();assert.ok(DEV_FOREST_KEYS.every(k=>devFactor(k)===devDefault(k)));
     const rule=FORESTRY.trees.oak_tree;setDevFactor('chopTime',.5);setDevFactor('woodYield',2);assert.equal(devChopDuration(rule),3500);assert.equal(devTreeWood(rule),12);setDevFactor('woodYield',.5);assert.equal(devTreeWood(rule),3);
-    const s=fixture(),b=hut(s);tree(s,{x:44+25,y:44});assert.equal(s.naturalResources.forestry.eligible(b).length,0,'25 tiles: outside 18');setDevFactor('woodRadius',1.5);assert.equal(s.naturalResources.forestry.eligible(b).length,1,'×1.5 = 27 tiles');
+    const s=fixture(),b=hut(s);const far=tree(s,{x:44+25,y:44});assert.equal(s.naturalResources.forestry.inRadius(b,far),false,'25 tiles: outside 18');assert.equal(s.naturalResources.forestry.eligible(b).length,1,'m-drevorubec-dosah: felled all the same');setDevFactor('woodRadius',1.5);assert.equal(s.naturalResources.forestry.inRadius(b,far),true,'×1.5 = 27 tiles');
     // A real felling at ×2 wood and ×0.5 time.
     resetDevBalance();setDevFactor('woodYield',2);setDevFactor('chopTime',.5);const r=fixture(),rb=hut(r),rt=tree(r,{x:49,y:45}),w=r.workerSystem.create({x:42,y:46});r.workplaceSystem.assign(rb,w);
     until(r,()=>rt.natural.workDone>0);const start=r.gameTime.totalElapsed;until(r,()=>rt.natural.cycle===1);assert.ok(r.gameTime.totalElapsed-start<=3600,'chopped in ~3.5 s');
@@ -138,4 +138,16 @@ test('6: the economy overview counts mature and young trees in hut radii (each o
   fresh();const s=fixture(),a=hut(s),b=hut(s,{x:50,y:43});tree(s,{x:49,y:47},3);tree(s,{x:47,y:48},1);tree(s,{x:46,y:49},2);tree(s,{x:45,y:40},0);tree(s,{x:90,y:90},3);
   s.resourceLedger={history:[{day:1,totals:{wood:{income:12,expenses:0}}},{day:2,totals:{wood:{income:18,expenses:3}}}]};
   assert.deepEqual(forestOverview(s),{huts:2,mature:1,young:2,woodPerDay:15});void a;void b;void gameSettings;
+});
+
+test('m-drevorubec-dosah: a Woodcutter fells a tree 40 tiles from the hut and brings the wood; an unexplored far tree is left alone; a far forest is told',()=>{
+  fresh();const s=fixture(),b=hut(s),far=tree(s,{x:44+40,y:46});
+  assert.equal(s.naturalResources.forestry.inRadius(b,far),false);assert.equal(Math.round(s.naturalResources.forestry.nearestDistance(b)),40);
+  const w=s.workerSystem.create({x:46,y:46});assert.equal(s.workplaceSystem.assign(b,w),true);
+  until(s,()=>w.workTask?.kind==='chopTree',60000);until(s,()=>far.natural.stage===0,600000);
+  // The notice for a far forest.
+  const t2=tree(s,{x:44+45,y:50});advance(s,DIAGNOSTICS.persistence+DIAGNOSTICS.checkInterval);const row=s.diagnostics.active().find(i=>i.reason==='treesFar');assert.ok(row);assert.equal(row.entityId,b.id);
+  setLanguage('en',{persist:false});assert.match(noticeText(s,row),/far from the forest \(4\d tiles\)/);
+  // Unexplored ground beyond the radius does not count.
+  s.fog.setEnabled(true);s.gameTime.totalElapsed+=5000;assert.equal(s.naturalResources.forestry.eligible(b).includes(t2),false);
 });

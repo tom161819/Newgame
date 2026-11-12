@@ -15,12 +15,12 @@ export async function woodcutterTreesSmoke(context,url,instrument){
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.fog.setEnabled(false);s.refreshVisibility();});
     assert.equal(await page.evaluate(()=>window.__game.registry.get('application').scene.employment.enabled),true,'automatic employment is on (New Game default)');
     const hut=await placeBlueprint(page,'lumberjack_hut');
-    // Finish it, then fell its forest: every tree in the radius becomes a young tree (stage 2, 0 days).
+    // Finish it, then fell every forest (m-drevorubec-dosah: no radius any more): every tree becomes a young tree (stage 2, 0 days).
     const before=await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id),m=s.constructionSystem.materials;
       if(b.materialSupply){for(const r of [...s.foodStorage.reservations.values()])if(r.siteId===b.id)s.foodStorage.release(r.id);const loc=s.foodStorage.locations.get(m.owner(b.id));loc.stock={...b.materialSupply.required};}b.construction.workDone=b.construction.requiredWork;b.construction.contributions={king:b.construction.requiredWork};s.constructionSystem.finish(b);
       for(const w of s.workplaceSystem.employees(b))s.workplaceSystem.remove(w);
-      const n=s.naturalResources,trees=n.forestry.trees(b);let felled=0;for(const t of trees)if(t.natural.stage===3){t.natural.stage=2;t.natural.growthDays=0;t.natural.workDone=0;t.natural.growthCheckpoint=n.growthClock;n.refreshMap(t);n.view(t)?.setNaturalState?.(t);felled++;}
-      s.employment.request();return {felled,young:trees.filter(t=>t.natural.stage===2).length,idle:s.workerSystem.liveSubjects().filter(w=>w.profession==='idle').length};},hut.id);
+      const n=s.naturalResources,trees=[...n.byId.values()].filter(t=>t.definition.tree);let felled=0;for(const t of trees)if(t.natural.stage>=2){t.natural.stage=2;t.natural.growthDays=0;t.natural.workDone=0;t.natural.growthCheckpoint=n.growthClock;n.refreshMap(t);n.view(t)?.setNaturalState?.(t);felled++;}
+      s.employment.request();return {felled,young:n.forestry.trees(b).filter(t=>t.natural.stage===2).length,idle:s.workerSystem.liveSubjects().filter(w=>w.profession==='idle').length};},hut.id);
     assert.ok(before.felled>0&&before.young>0,`the hut had a forest (${JSON.stringify(before)})`);
     // A few seconds of game time: the notice lasts, automatic employment runs (with Unemployed residents around).
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.setPaused?.(false);s.gameSpeed=1;});
@@ -28,7 +28,7 @@ export async function woodcutterTreesSmoke(context,url,instrument){
     const staff=await page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id);s.employment.request();s.employment.update();return {staff:s.workplaceSystem.employees(b).length,idle:s.workerSystem.liveSubjects().filter(w=>w.profession==='idle').length};},hut.id);
     assert.equal(staff.staff,0,`automatic employment skips the hut (${JSON.stringify(staff)})`);
     await page.locator('#notices-panel:not([hidden])').waitFor();
-    const row=page.locator('#notices-list .notice-text',{hasText:'has nothing to fell – build a new one near a forest'});await row.first().waitFor({timeout:10000});
+    const row=page.locator('#notices-list .notice-text',{hasText:'has nothing to fell – there are no mature trees on the known map'});await row.first().waitFor({timeout:10000});
     assert.equal(await row.count(),1,'one row');
     // The click pans the camera to the hut (manual camera) and opens its window.
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene;s.worldCamera.follow();});

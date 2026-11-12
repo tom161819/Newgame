@@ -803,7 +803,14 @@ html[data-ui-population="left"] :is(.policy-card, .employment-panel) { right:aut
    nothing the kingdom overview fills the slot, while he carries something the cargo controls do. */
 .hud-left-slot { display:flex; align-items:center; gap:8px; flex:0 0 auto; }
 .hud-left-slot #king-cargo-deliver[hidden], .hud-left-slot #king-cargo-status[hidden] { display:none !important; }
-.hud-left-slot:has(#king-cargo-deliver:not([hidden])) #kingdom-overview, .hud-left-slot:has(#king-cargo-status:not([hidden])) #kingdom-overview { display:none; }
+/* m-kral-panel-prekryv (owner, 12 Nov): the cargo controls no longer take the overview's place. They hang as a small
+   panel of their own under the bar's left end; the kingdom overview stays where it is. */
+.hud-left-slot { position:relative; }
+.hud-row-bottom .hud-left-slot { overflow:visible !important; }
+.king-cargo { position:absolute; left:-6px; top:calc(100% + 14px); z-index:3; display:flex; align-items:center; gap:8px; padding:5px 8px; border:1px solid #6f6540; border-radius:8px; background:var(--glass); box-shadow:0 4px 14px rgb(0 0 0 / .35); white-space:nowrap; }
+.king-cargo:not(:has(> :not([hidden]))) { display:none; }
+.king-cargo #king-cargo-deliver[hidden], .king-cargo #king-cargo-status[hidden] { display:none !important; visibility:visible; }
+.king-cargo #king-cargo-status { width:auto; max-width:22rem; }
 @media (min-width: 761px) { .hud-left-slot { width:24.5rem; } }
 
 /* Quick job menu in the Population list (owner 7. 11. 2026). */
@@ -1164,3 +1171,7 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 /* performance-2 (12 Nov 2026): no blur under the panels over the map. The glass is 86 % opaque, so the blur was hardly
    seen, but the browser blurred the map under nine panels again on every frame. */
 .inventory, .camera-controls > *, .kingdom-bar, .status-row, .help-window { backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+/* m-smolar-pochodne */
+.recipe-auto-row{display:flex;gap:.6rem;align-items:center;margin:.2rem 0 .4rem;font-size:.85rem}
+.recipe-auto-row input{flex:0 0 9rem}

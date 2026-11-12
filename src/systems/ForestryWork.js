@@ -8,6 +8,12 @@ import { tileKey } from '../game/stones.js';
 import { carryCapacity } from '../data/logistics.js';
 import { CLEARING } from '../data/rockMining.js';
 import { t } from '../i18n/index.js';
+import { VISIBILITY } from './FogOfWarSystem.js';
+
+// How long (game ms) a hut's sorted tree list is kept, how many of the nearest free trees a search routes to, and from
+// what distance (tiles) the hut is told to be far from the forest.
+const FORESTRY_SEARCH_MS=1000,FORESTRY_CANDIDATES=24;
+export const FORESTRY_FAR_TILES=40;
 
 // One job provider for the existing WorkerAI; trees, seats, cargo and stock
 // remain owned by the original natural/workplace/transport systems.
@@ -19,7 +25,20 @@ export class ForestryWork {
   inRadius(building,tile){return Math.hypot(tile.x-building.x-.5,tile.y-building.y-.5)<=this.radius(building);}
   huts(){return this.scene.buildings.filter(b=>b.type==='lumberjack_hut'&&!b.unverified&&!b.demolition&&buildingIsComplete(b));}
   trees(building){return[...this.natural.byId.values()].filter(t=>t.definition.tree&&this.inRadius(building,t));}
-  eligible(building){if(!building)return[];return this.trees(building).filter(t=>t.natural.stage===3);}
+  // m-drevorubec-dosah (owner, 12 Nov): Woodcutters fell mature trees anywhere on the known map, nearest to the hut
+  // first; the working radius only boosts growth now. The sorted list is kept for a second of game time per hut (it is
+  // asked by every searching Woodcutter, the employment and the diagnostics).
+  eligible(building){
+    if(!building)return[];const now=this.scene.gameTime?.totalElapsed??0,cache=this.eligibleCache??=new Map(),had=cache.get(building.id);
+    if(had&&now>=had.at&&now-had.at<FORESTRY_SEARCH_MS&&had.count===this.natural.byId.size)return had.list.filter(t=>t.natural.stage===3);
+    const fog=this.scene.fog,cx=building.x+.5,cy=building.y+.5;
+    // Trees inside the old working radius count as before; further ones only on explored ground (nobody is sent into the unknown).
+    const known=t=>this.inRadius(building,t)||!fog?.displayState||fog.displayState(t)!==VISIBILITY.UNEXPLORED;
+    const list=[...this.natural.byId.values()].filter(t=>t.definition.tree&&t.natural.stage===3&&known(t)).map(t=>({t,d:Math.hypot(t.x-cx,t.y-cy)})).sort((a,b)=>a.d-b.d||a.t.y-b.t.y||a.t.x-b.t.x).map(e=>e.t);
+    cache.set(building.id,{at:now,count:this.natural.byId.size,list});return list;
+  }
+  // Distance (tiles) from the hut to its nearest mature tree, or null.
+  nearestDistance(building){const t=this.eligible(building)[0];return t?Math.hypot(t.x-building.x-.5,t.y-building.y-.5):null;}
   slot(goal){return`natural-slot:${tileKey(goal)}`;}
   release(worker){
     const task=worker.workTask;if(task?.kind!=='chopTree')return;const object=this.natural.byId.get(task.targetId);if(object){this.scene.workerSystem.reservations.release(this.natural.reservation(object),worker.id);this.natural.view(object)?.showWork?.();}
@@ -34,7 +53,7 @@ export class ForestryWork {
       // m-oznacovani-tezby (51): marked trees and bushes come first, wherever they are (no working radius).
       const marked=this.markedTargets(worker),markedRoute=marked.length?system.ai.route(worker,marked.flatMap(c=>c.goals)):null,pick=markedRoute&&marked.find(c=>c.goals.some(g=>tileKey(g)===tileKey(markedRoute.destination)));
       if(pick){if(pick.tree?.natural.stage===3)this.beginChop(worker,pick.tree,markedRoute);else this.beginClear(worker,pick,markedRoute);}
-      else{const candidates=this.eligible(building).filter(t=>system.reservations.available(this.natural.reservation(t),worker.id));if(!candidates.length){this.wait(worker,'No mature trees in working radius');return;}
+      else{const candidates=this.eligible(building).filter(t=>system.reservations.available(this.natural.reservation(t),worker.id)).slice(0,FORESTRY_CANDIDATES);if(!candidates.length){this.wait(worker,'No mature trees in working radius');return;}
       const choices=candidates.map(tree=>({tree,goals:this.natural.goals(tree).filter(goal=>system.reservations.available(this.slot(goal),worker.id))})),route=system.ai.route(worker,choices.flatMap(c=>c.goals));if(!route){this.wait(worker,'No reachable mature tree');return;}
       const object=choices.find(c=>c.goals.some(t=>tileKey(t)===tileKey(route.destination)))?.tree;if(!object)return;
       this.beginChop(worker,object,route);}

@@ -15,7 +15,7 @@ const readMuted=()=>{try{const list=JSON.parse(localStorage.getItem(MUTED_KEY)??
 // whole categories can be muted. Clicking one opens the building's panel when the building is in sight.
 const NOTICE_HIRES=Object.freeze({noBuilder:'builder',waitingMaterial:'hauler',pileNoHauler:'hauler'});
 // Notices whose click also pans the camera (the building, or the `tile` param of a site that is gone).
-const NOTICE_CAMERA=new Set(['noMatureTrees','buildCancelled']);
+const NOTICE_CAMERA=new Set(['noMatureTrees','treesFar','buildCancelled']);
 export class NoticesPanel {
   constructor(scene){
     this.scene=scene;this.panel=document.querySelector('#notices-panel');this.list=document.querySelector('#notices-list');this.filters=document.querySelector('#notices-filters');this.muted=readMuted();

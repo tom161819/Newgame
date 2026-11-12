@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { treeState } from '../data/naturalResources.js';
 
+const TREE_BLOWS=7;
 export class TreeView extends Phaser.GameObjects.Container {
   constructor(scene,definition,context){
     super(scene,context.x,context.y);scene.add.existing(this);this.definition=definition;this.object=context.object??{natural:treeState('preview')};this.body=scene.add.graphics();this.bar=scene.add.graphics();this.art=scene.add.image(0,0,'__DEFAULT').setVisible(false);this.add([this.body,this.art,this.bar]);this.tile=context.tile??null;this.season=context.season??scene.seasons?.season??'Spring';this.setDepth(context.y+(definition.depth?.offset??0));this.paint();
@@ -38,7 +39,14 @@ export class TreeView extends Phaser.GameObjects.Container {
       const dark=autumn?0x965d2f:0x426738,light=autumn?0xc89343:0x78984b;g.fillStyle(dark);g.fillEllipse(0,-height*.59,55*scale,43*scale);g.fillCircle(-14*scale,-height*.75,18*scale);g.fillCircle(13*scale,-height*.77,19*scale);g.fillStyle(light);g.fillCircle(-5*scale,-height*.86,17*scale);g.fillCircle(-15*scale,-height*.73,12*scale);g.fillStyle(autumn?0xb27736:0x5a803c);g.fillCircle(16*scale,-height*.63,13*scale);
     }
   }
-  showWork(ratio=null){const g=this.bar.clear();if(ratio==null)return;const y=-this.definition.visualHeight-9;g.fillStyle(0x20291e,.95);g.fillRect(-20,y,40,6);g.fillStyle(0xd9bd73);g.fillRect(-19,y+1,38*Math.max(0,Math.min(1,ratio)),4);}
+  // m-stromy-bez-hp (owner, 12 Nov): no bar over a tree being felled. The tree shivers at every blow instead (the
+  // work is split into TREE_BLOWS blows; the shiver is a short rocking of the whole tree about its foot).
+  showWork(ratio=null){
+    this.bar.clear();if(ratio==null){this.blow=null;this.setAngle(0);return;}
+    const blow=Math.floor(Math.max(0,Math.min(.999,ratio))*TREE_BLOWS);if(blow===this.blow)return;this.blow=blow;
+    const side=blow%2?1:-1;this.shiver?.stop?.();this.setAngle(0);
+    this.shiver=this.scene.tweens?.add?.({targets:this,angle:{from:1.6*side,to:0},duration:220,ease:'Sine.easeOut'})??null;
+  }
   getMemoryState(){return{stage:this.object.natural.stage,season:this.season};}
   containsPoint(x,y){
     if(this.artLook){const frame=this.art.frame,px=Math.floor(x-this.x+this.art.originX*frame.width),py=Math.floor(y-this.y+this.art.originY*frame.height);return px>=0&&py>=0&&px<frame.width&&py<frame.height&&(this.scene.textures.getPixelAlpha(px,py,this.art.texture.key)??0)>=128;}

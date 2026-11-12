@@ -1,4 +1,5 @@
 import { FOOD_OUTLOOK,foodDays } from '../data/foodOutlook.js';
+import { FORESTRY_FAR_TILES } from './ForestryWork.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { DIAGNOSTICS,INPUT_SOURCES,GATHER_OUTPUTS,DEPLETION_SOURCES,STORAGE_WAIT_MESSAGES,CHAIN_ADVICE,noticeRepeatDays,noticeSeverity,NOTICE_REPEAT_MAX_DAYS,NOTICE_CLOSED_LIMIT } from '../data/diagnostics.js';
 import { chainLinks,isRawSource } from '../data/productionChains.js';
@@ -165,7 +166,9 @@ export class ProductionDiagnostics {
       if(!natural||!buildingIsComplete(b)||b.unverified||!DEPLETION_SOURCES[b.type])continue;let empty=false;
       // m-drevorubci-stromy (playtest 0.83.0 #1): a Lumberjack Hut with no mature tree in its radius has nothing to fell
       // (young trees still growing included) – one notice, gone as soon as a mature tree is in range again.
-      if(b.type==='lumberjack_hut'){const c={x:b.x+.5,y:b.y+.5},r=buildingDefinition(b).workRadius??0,mature=natural.forestry?natural.forestry.eligible(b).length:[...natural.byId.values()].filter(t=>t.definition?.tree&&t.natural?.stage===3&&Math.hypot(t.x-c.x,t.y-c.y)<=r).length;if(!mature)found.push({entityId:b.id,reason:'noMatureTrees',category:'production',params:{resource:'wood'},feed:true});continue;}
+      if(b.type==='lumberjack_hut'){const c={x:b.x+.5,y:b.y+.5},r=buildingDefinition(b).workRadius??0,mature=natural.forestry?natural.forestry.eligible(b).length:[...natural.byId.values()].filter(t=>t.definition?.tree&&t.natural?.stage===3&&Math.hypot(t.x-c.x,t.y-c.y)<=r).length;if(!mature)found.push({entityId:b.id,reason:'noMatureTrees',category:'production',params:{resource:'wood'},feed:true});
+        // m-drevorubec-dosah: no radius any more; a hut far from its nearest mature tree is told so.
+        else{const far=natural.forestry?.nearestDistance(b);if(far!=null&&far>=FORESTRY_FAR_TILES)found.push({entityId:b.id,reason:'treesFar',category:'production',params:{resource:'wood',distance:Math.round(far)},feed:true});}continue;}
       else if(b.quarryMode!=='legacy'&&b.quarryMode!=='unbound'){const d=b.depositId!=null?natural.byId.get(b.depositId):null;empty=!!d&&d.natural.remaining===0;}
       // m-vytezeny-dul-ctverecky (64): a depleted mine keeps this one row ("The Iron Mine is exhausted"), never repeated.
       if(b.depleted)found.push({entityId:b.id,reason:'depleted',category:'production',params:{resource:GATHER_OUTPUTS[b.type],source:DEPLETION_SOURCES[b.type],exhausted:true},feed:true,once:true});

@@ -30,7 +30,7 @@ test('point 3: the Quarry arrow takes large deposits too and prefers one the pla
 
 test('point 4: wait messages, construction materials and the marking line are Czech and grammatical',()=>{
   setLanguage('cs');
-  assert.equal(workMessageLabel('No mature trees in working radius'),'V pracovním okruhu nejsou vzrostlé stromy');
+  assert.equal(workMessageLabel('No mature trees in working radius'),'Na známé mapě nejsou vzrostlé stromy');
   for(const m of ['No reachable mature tree','Waiting for reachable timber storage capacity','Timber preserved on the ground','No fish biting','Overfished','Deposit Depleted','Waiting for an assigned finite deposit','Walking to the shore','Training'])assert.notEqual(workMessageLabel(m),m,`${m} is translated`);
   // Shot 08: "wood: potřeba 6 …" – the row's own resource id overrode the name.
   const line=materialLine(objectRegistry,{resource:'wood',required:6,reserved:0,carried:0,ground:0,delivered:0,missing:6});

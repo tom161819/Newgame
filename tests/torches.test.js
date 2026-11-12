@@ -83,3 +83,15 @@ test('save: which places burn tonight and who carries a torch (schema 56); Tend 
   const state=validateGameState(serializeGameState(s));assert.ok(SAVE_VERSION>=56);assert.deepEqual(state.lightFuel.lit,[post.id]);assert.equal(state.workers.find(w=>w.id===soldier.id).tendTorches,true);
   assert.equal(validLightFuelState({lit:['x'],hands:[],litDay:1,wasDark:true}),false);void f;
 });
+
+test('m-smolar-pochodne: the player\'s choice at a Pitch Kiln holds (Torches, Pitch, Automatic) and the Torch target can be set', () => {
+  const {s,place,store}=world(),b=place('pitch_kiln',60,60),record=s.foodProduction.records.get(b.id),fp=s.foodProduction;
+  assert.equal(fp.recipeMode(b),'auto');store().stock.pitch=2;store().stock.torch=TORCHES.torchTarget;
+  fp.chooseRecipes();assert.equal(record.recipe,'pitch');
+  assert.equal(fp.setRecipe(b.id,'torches'),true);fp.chooseRecipes();assert.equal(record.recipe,'torches','Torches chosen: made even above the target');assert.equal(fp.recipeMode(b),'torches');
+  store().stock.torch=0;assert.equal(fp.setRecipe(b.id,'pitch'),true);fp.chooseRecipes();assert.equal(record.recipe,'pitch','Pitch chosen: no Torches even when none are left');
+  assert.equal(fp.setRecipe(b.id,'auto'),true);assert.equal(record.recipe,'torches','Automatic again');
+  assert.equal(fp.setTorchTarget(b.id,0),true);assert.equal(record.recipe,'pitch','target 0: Pitch only');assert.equal(fp.setTorchTarget(b.id,61),false);assert.equal(fp.setTorchTarget(b.id,40),true);assert.equal(fp.torchTarget(b),40);assert.equal(record.recipe,'torches');
+  assert.equal(fp.setRecipe(b.id,'nonsense'),false);
+  const again=fp.exportState();fp.importState(again);assert.equal(fp.recipeMode(b),'auto');assert.equal(fp.torchTarget(b),40,'saved with the record');
+});

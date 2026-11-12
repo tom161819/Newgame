@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.95.0] - 2026-11-12
+<!-- version: {"title":"Approved tasks: woodcutters, pitch kiln, idle residents","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- Woodcutters fell mature trees anywhere on the known map, nearest to their hut first (before: within 18 tiles only). A hut 40 or more tiles from its nearest mature tree gets a notice to build a new one closer.
+- No bar over a tree being felled; the tree shivers at each blow instead.
+- Unemployed residents no longer move and stand all together: everyone waits for a time of their own (3–14 s) and picks one of a few spots at random.
+- The King's cargo controls ("Deliver to storage") hang in a small panel under the top bar and no longer replace the kingdom overview.
+
+### Fixed
+- Pitch Kiln: the choice between Pitch and Torches now holds (the kiln used to switch back by itself at once). The choice has three options – Automatic, Pitch, Torches – and in Automatic the window says what is made and why, with a slider for the Torch target.
+
 ## [0.94.0] - 2026-11-12
 <!-- version: {"title":"Terrain height: hills, slopes and their rules","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

@@ -1,5 +1,6 @@
 import { devProduction } from '../data/devBalance.js';
 import { TORCHES } from '../data/torches.js';
+export const TORCH_TARGET_MAX=60;
 import { dataName } from '../i18n/names.js';
 import { FOOD_RULES,FOOD_RESOURCE_IDS } from '../data/foodProduction.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
@@ -15,7 +16,17 @@ export class FoodProductionSystem {
   // S12: the recipe the next batch uses (a workshop with choices keeps the player's choice in its record).
   recipe(building){return recipeFor(buildingDefinition(building),this.records.get(building.id)?.recipe);}
   cycleRecipe(record,building){return recipeFor(buildingDefinition(building),record.cycle?.recipe??record.recipe);}
-  setRecipe(buildingId,key){const record=this.records.get(buildingId),b=record&&this.building(buildingId),d=b&&buildingDefinition(b);if(!d?.recipes||!Object.hasOwn(d.recipes,key))return false;record.recipe=key;this.scene.logisticsTasks?.invalidate?.();return true;}
+  // m-smolar-pochodne (owner, 12 Nov): at a workshop that picks its recipe itself (Pitch Kiln) the player's choice now
+  // holds – `recipeMode` is 'auto' (the workshop picks, as before) or the chosen recipe. Other workshops are unchanged.
+  setRecipe(buildingId,key){
+    const record=this.records.get(buildingId),b=record&&this.building(buildingId),d=b&&buildingDefinition(b);if(!d?.recipes)return false;
+    if(key==='auto'){if(!d.recipeChoice)return false;record.recipeMode='auto';this.chooseRecipes();this.scene.logisticsTasks?.invalidate?.();return true;}
+    if(!Object.hasOwn(d.recipes,key))return false;record.recipe=key;if(d.recipeChoice)record.recipeMode=key;this.scene.logisticsTasks?.invalidate?.();return true;
+  }
+  recipeMode(building){const record=this.records.get(building.id),d=buildingDefinition(building);return d.recipeChoice?record?.recipeMode??'auto':record?.recipe;}
+  // How many Torches the stores should hold before an automatic Pitch Kiln goes back to Pitch (per kiln, 0–torchTargetMax).
+  torchTarget(building){const v=this.records.get(building?.id)?.torchTarget;return Number.isInteger(v)?v:TORCHES.torchTarget;}
+  setTorchTarget(buildingId,value){const record=this.records.get(buildingId),v=Math.round(Number(value));if(!record||!Number.isFinite(v)||v<0||v>TORCH_TARGET_MAX)return false;record.torchTarget=v;this.chooseRecipes();return true;}
   // m-nosici-trakar-pracoviste (62): how much of one input a carrier tops the input buffer up to. A Hauler with a
   // Wheelbarrow or Horse Wagon fills a food workshop (Mill, Bakery) for as many whole batches as the buffer holds, also
   // while a batch runs, so one trip is a full load; everyone else (and every non-food workshop) brings one batch
@@ -193,8 +204,9 @@ export class FoodProductionSystem {
   chooseRecipes(){
     for(const record of this.records.values()){
       const building=this.building(record.buildingId),d=building&&buildingDefinition(building);if(!d?.recipeChoice)continue;
+      if(record.recipeMode&&record.recipeMode!=='auto'){if(Object.hasOwn(d.recipes,record.recipeMode)&&record.recipe!==record.recipeMode){record.recipe=record.recipeMode;this.scene.logisticsTasks?.invalidate?.();}continue;}
       const input=this.storage.locations.get(`input-${building.id}`),pitch=(input?.stock.pitch??0)+this.storage.incoming(input?.id,'pitch')+this.storage.available('pitch');
-      const key=this.storage.available('torch')<TORCHES.torchTarget&&pitch>0?d.recipeChoice:defaultRecipeKey(d);
+      const key=this.storage.available('torch')<this.torchTarget(building)&&pitch>0?d.recipeChoice:defaultRecipeKey(d);
       if(record.recipe!==key){record.recipe=key;this.scene.logisticsTasks?.invalidate?.();}
     }
   }

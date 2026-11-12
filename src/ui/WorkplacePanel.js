@@ -1,4 +1,5 @@
 import { localized,workMessageLabel } from '../i18n/names.js';
+import { TORCH_TARGET_MAX } from '../systems/FoodProductionSystem.js';
 import { t } from '../i18n/index.js';
 import { buildingDefinition } from '../game/buildings.js';
 import { JOBS,SKILLS } from '../data/jobs.js';
@@ -83,7 +84,17 @@ export class WorkplacePanel {
     if(production){
       const format=items=>Object.entries(items).map(([id,n])=>`${n} ${s.objectRegistry.require(id).name}`).join(' + '),cycle=production.cycle;
       const recipe=s.foodProduction.recipe(b),choice=document.querySelector('#recipe-choice'),choiceRow=document.querySelector('#recipe-choice-row');choiceRow.hidden=!spec.recipes;
-      if(spec.recipes){if(choice.dataset.building!==String(b.id)||choice.options.length!==Object.keys(spec.recipes).length){choice.replaceChildren(...Object.entries(spec.recipes).map(([key,r])=>{const o=document.createElement('option');o.value=key;o.textContent=s.objectRegistry.require(Object.keys(r.output)[0]).name;return o;}));choice.dataset.building=String(b.id);}choice.value=production.recipe;}
+      if(spec.recipes){const auto=spec.recipeChoice?1:0;
+        if(choice.dataset.building!==String(b.id)||choice.options.length!==Object.keys(spec.recipes).length+auto){const option=(value,text)=>{const o=document.createElement('option');o.value=value;o.textContent=text;return o;};
+          choice.replaceChildren(...(auto?[option('auto',t('workplace.recipeAuto'))]:[]),...Object.entries(spec.recipes).map(([key,r])=>option(key,s.objectRegistry.require(Object.keys(r.output)[0]).name)));choice.dataset.building=String(b.id);}
+        choice.value=s.foodProduction.recipeMode(b);}
+      // m-smolar-pochodne: the automatic choice says what it makes and why, with the Torch target to set.
+      let autoRow=document.querySelector('#recipe-auto-row');
+      if(!autoRow){autoRow=document.createElement('p');autoRow.id='recipe-auto-row';autoRow.className='recipe-auto-row';const text=document.createElement('span');text.id='recipe-auto-text';const range=document.createElement('input');range.type='range';range.id='recipe-torch-target';range.min='0';range.max=String(TORCH_TARGET_MAX);range.step='1';
+        range.addEventListener('input',()=>{if(this.building)s.foodProduction.setTorchTarget(this.building.id,range.value);this.refresh();});autoRow.append(text,range);choiceRow.after(autoRow);}
+      const isAuto=!!spec.recipeChoice&&s.foodProduction.recipeMode(b)==='auto';autoRow.hidden=!isAuto;
+      if(isAuto){const target=s.foodProduction.torchTarget(b),have=s.foodStorage.available('torch'),range=autoRow.querySelector('input');if(document.activeElement!==range)range.value=String(target);range.setAttribute('aria-label',t('workplace.torchTarget'));
+        autoRow.querySelector('span').textContent=t(production.recipe===spec.recipeChoice?'workplace.autoTorches':'workplace.autoPitch',{have,target});}
       document.querySelector('#food-production-recipe').textContent=t('workplace.recipe',{input:format(recipe.input),output:format(recipe.output),seconds:recipe.duration/1000})+(recipe.horse?` ${t('workplace.recipeHorse')}`:'');
       document.querySelector('#food-production-status').textContent=t('workplace.status',{state:!production.auto?t('workplace.paused'):cycle?t('workplace.producing'):employees[0]?.workMessage?workMessageLabel(employees[0].workMessage):t('workplace.waitingWorker'),count:production.completed});
       document.querySelector('#food-production-progress').value=cycle?.progress??0;

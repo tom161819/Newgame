@@ -1,6 +1,10 @@
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 // idleStepTiles: idle routes up to this length are shuffles between waiting spots and wear no path.
-export const IDLE_GATHERING=Object.freeze({minimumMargin:2,maximumMargin:4,localRadius:3,retryMs:1500,dwellMs:2500,idleStepTiles:10});
+export const IDLE_GATHERING=Object.freeze({minimumMargin:2,maximumMargin:4,localRadius:3,retryMs:1500,dwellMs:2500,idleStepTiles:10,
+  // m-necinni-pohyb (owner, 12 Nov): everyone waits for a time of their own between steps (before: 2.5–5 s for all, so
+  // the whole crowd moved and stood together), picks one of a few spots at random instead of always the nearest, and
+  // the first step after a start or load comes after a wait of its own.
+  dwellMinMs:3000,dwellMaxMs:14000,firstWaitMs:8000,spotChoices:4});
 // Higher-priority work, cargo, commands and job-specific tending/seating run before this fallback.
 // A Builder's assigned workshop wins over the Castle; Haulers never acquire a workplace slot.
 export function idleHomes(scene,worker,{workplaceOnly=false}={}){
