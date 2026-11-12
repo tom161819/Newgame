@@ -7,7 +7,7 @@ test('each implemented building has a central valid menu category; All contains 
   // #132: menuOrder only reorders inside a category; every other building keeps its place in All.
   objectRegistry.buildables().forEach((d,i)=>{if(d.buildingCategory!=='food')assert.equal(all[i],d);else assert.equal(all[i].buildingCategory,'food');});
   for(const d of objectRegistry.byCategory('building'))assert.ok(Object.hasOwn(BUILDING_CATEGORIES,d.buildingCategory));
-  assert.deepEqual(buildingsInCategory(objectRegistry,'defense').map(d=>d.id),['tower','castle','wall','wall_gate','barracks','bowyer','swordsmith','armorer','armory']);
+  assert.deepEqual(buildingsInCategory(objectRegistry,'defense').map(d=>d.id),['tower','castle','wall','gate','barracks','bowyer','swordsmith','armorer','armory']);
   assert.deepEqual(buildingsInCategory(objectRegistry,'food').map(d=>d.id),['granary','farmhouse','wheat_field','orchard','hunting_lodge','fisherman_hut','mill','bakery']);
   assert.deepEqual(buildingsInCategory(objectRegistry,'industry').map(d=>d.id),['builder_workshop','quarry','wheelwright_workshop','lumberjack_hut','iron_mine','smelter','pitch_kiln']);assert.deepEqual(buildingsInCategory(objectRegistry,'logistics').map(d=>d.id),['warehouse','material_yard','marketplace','stables']);
   assert.deepEqual(buildingsInCategory(objectRegistry,'housing').map(d=>d.id),['house','village_green','swing_tree','haystack','well']);assert.deepEqual(buildingsInCategory(objectRegistry,'infrastructure').map(d=>d.id),['stone_pavement','brazier','torch_post','campfire']);
@@ -29,7 +29,7 @@ test('#132 menuOrder sorts within a category and must be a number',()=>{
 // m-staveni-zdi-studna (59): Stone Wall, Tower and Gate keep their tool too.
 test('Farmhouse, Wheat Field, Orchard, Stone Wall, Tower and Gate keep their tool after an order; other buildings are placed once',()=>{
   const repeat=objectRegistry.buildables().filter(d=>d.repeatPlacement).map(d=>d.id).sort();
-  assert.deepEqual(repeat,['farmhouse','orchard','tower','wall','wall_gate','wheat_field']);
+  assert.deepEqual(repeat,['farmhouse','gate','orchard','tower','wall','wheat_field']);
   const registry=new ObjectRegistry(objectRegistry.all()),base=structuredClone(registry.require('tower'));
   assert.throws(()=>registry.register({...base,id:'bad_repeat',repeatPlacement:'yes'}),/opakované/);
 });

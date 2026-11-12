@@ -389,7 +389,7 @@ export class GameScene extends Phaser.Scene {
     this.input.on('gameout',()=>{/* Only a map building's tooltip: Phaser handles the queued canvas "out" after the HUD gauge's pointerenter, which would cancel its preview (map now under the HUD to the window edge, 9 Nov 2026). */if(this.storePreview?.key?.startsWith?.('building:'))this.storePreview.hide();this.rockMiningTool.cancelDrag();this.unitSelection.cancelDrag();this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;this.clearWallPreviews();document.querySelector('#object-tooltip').hidden=true;});
     // #97: a Gate opens across its wall: in a wall running east–west the opening faces the other way (mirrored sprite).
     // m-staveni-zdi-studna (59): the axis comes from the wall run, else from the Gate's stored gateAxis (gateAxis in walls.js).
-    this.orientGates=()=>{const index=wallIndex(this.buildings,true);for(const b of this.buildings)if(b.type==='wall_gate')this.flipGateView(this.towerViews.get(b.id),b,gateAxis(index,b)==='x');else if(b.type==='tower'&&b.facing)this.flipGateView(this.towerViews.get(b.id),b,b.facing%2===1);};
+    this.orientGates=()=>{const index=wallIndex(this.buildings,true);for(const b of this.buildings)if(b.type==='wall_gate'||b.type==='gate')this.flipGateView(this.towerViews.get(b.id),b,gateAxis(index,b)==='x');else if(b.type==='tower'&&b.facing)this.flipGateView(this.towerViews.get(b.id),b,b.facing%2===1);};
     this.events.on('buildings:changed',this.orientGates);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{this.events.off('buildings:changed',this.orientGates);
       this.rockMiningTool.destroy();this.unitSelection.destroy();this.minimap?.destroy();this.eventFeed?.destroy();this.millSails?.destroy();this.kingCargoControl.destroy();this.kingLogistics.destroy();this.lightSources.destroy();
@@ -504,7 +504,7 @@ export class GameScene extends Phaser.Scene {
       const provisional=isProvisional(this.fog,buildingTiles(goal,this.selectedBuilding)),known=provisional?mineSpotError(this,goal,this.selectedBuilding,knownPlacementError(this,goal,this.selectedBuilding))??provisionalMineError(this,goal,this.selectedBuilding):null;
       if(known){this.previewKey=null;this.updateBuildingPreview();this.setStatus(known);return;}
       // m-staveni-zdi-studna (59): a Gate or Tower over Stone Wall segments replaces them; a Gate keeps the axis it was placed with.
-      const fields=this.selectedBuilding.id==='wall_gate'?{gateAxis:gateAxis(wallIndex(this.buildings,true),{...goal,gateAxis:this.gateAxis})}:this.selectedBuilding.id==='tower'&&this.towerFacing?{facing:this.towerFacing}:null;
+      const fields=['wall_gate','gate'].includes(this.selectedBuilding.id)?{gateAxis:gateAxis(wallIndex(this.buildings,true),{...goal,definition:this.selectedBuilding,gateAxis:this.gateAxis})}:this.selectedBuilding.id==='tower'&&this.towerFacing?{facing:this.towerFacing}:null;
       const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding,reserveMaterials:true,provisional,fields,replaceWalls:(walls,building)=>replaceWalls(this,walls,building)});
       if(result.error){this.previewKey=null;this.updateBuildingPreview();this.setStatus(mineSpotError(this,goal,this.selectedBuilding,result.error));}
       else{
@@ -604,7 +604,7 @@ export class GameScene extends Phaser.Scene {
     let view=this.assets.createView(definition.id,{building:object,preview});
     if(!preview&&definition.lights?.length&&buildingIsComplete(building)&&this.lightSources)view=this.lightSources.attach(view,object);
     if(!preview&&definition.crop&&buildingIsComplete(building))view.setGrowth?.(this.farmingSystem?.records.get(building.id)?.stage??0);
-    if(!preview&&['wall_gate','tower'].includes(definition.id))this.time?.delayedCall?.(0,()=>this.orientGates?.());
+    if(!preview&&['wall_gate','gate','tower'].includes(definition.id))this.time?.delayedCall?.(0,()=>this.orientGates?.());
     return !preview&&!buildingIsComplete(building)?new ConstructionView(this,building,view):view;
   }
   flipGateView(view,building,flip){
@@ -614,8 +614,8 @@ export class GameScene extends Phaser.Scene {
   rotateGate(){
     // m-vez-otaceni (owner, 12 Nov): R turns a Tower by 90° too (4 facings; shown mirrored until four views exist).
     if(this.buildMode&&this.selectedBuilding?.id==='tower'){this.towerFacing=((this.towerFacing??0)+1)%4;this.previewKey=null;this.updateBuildingPreview();return true;}
-    if(!this.buildMode||this.selectedBuilding?.id!=='wall_gate')return false;
-    const turn=turnGate(wallIndex(this.buildings,true),this.previewAnchor,this.gateAxis);
+    if(!this.buildMode||!['wall_gate','gate'].includes(this.selectedBuilding?.id))return false;
+    const turn=turnGate(wallIndex(this.buildings,true),this.previewAnchor&&{...this.previewAnchor,definition:this.selectedBuilding},this.gateAxis);
     if(turn.locked){this.setStatus(t('status.gateFollowsWall'));return true;}
     this.gateAxis=turn.axis;this.previewKey=null;this.updateBuildingPreview();return true;
   }
@@ -660,7 +660,7 @@ export class GameScene extends Phaser.Scene {
     const provisional=isProvisional(this.fog,buildingTiles(anchor,definition));
     const error=mineSpotError(this,anchor,definition,provisional?knownPlacementError(this,anchor,definition):placementError(this.map,anchor,this.resourceOccupancy,this.reservedTiles(),definition,this.buildings,this.buildingUnlocks))
       ??(provisional?provisionalMineError(this,anchor,definition):null)??(!this.inventory.canAfford(definition.cost)?t('status.noFunds'):null);
-    const gate=definition.id==='wall_gate'?gateAxis(wallIndex(this.buildings,true),{...anchor,gateAxis:this.gateAxis}):null;
+    const gate=['wall_gate','gate'].includes(definition.id)?gateAxis(wallIndex(this.buildings,true),{...anchor,definition,gateAxis:this.gateAxis}):null;
     const facing=definition.id==='tower'?(this.towerFacing??0):null,key=`${tileKey(anchor)}:${provisional}:${error}:${gate}:${facing}`;
     if(key!==this.previewKey){
       this.preview.paint({x:anchor.x,y:anchor.y,type:definition.id,definition,tiles:buildingTiles(anchor,definition)},error?0xf27777:provisional?0xe3c46b:0x71dba6);

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { workerScene,ensureBuildingPrerequisites } from './helpers/workerScene.js';
 import { placeBuilding,placementError,wallsReplacedBy,buildingTiles } from '../src/game/buildings.js';
-import { placeWallLine,wallIndex,gateAxis,gateAxisLocked,turnGate } from '../src/game/walls.js';
+import { placeWallLine,wallIndex,gateAxis,gateAxisLocked,turnGate,isWallAccess } from '../src/game/walls.js';
 import { replaceWalls } from '../src/game/wallReplacement.js';
 import { ObjectRegistry,objectRegistry } from '../src/systems/ObjectRegistry.js';
 import { serializeGameState,validateGameState } from '../src/systems/GameStateSerializer.js';
@@ -25,23 +25,22 @@ const err=(s,type,anchor)=>placementError(s.map,anchor,s.resourceOccupancy,s.res
 const stone=s=>s.inventory.count('stone')+[...s.dropSystem.drops.values()].filter(d=>d.resource==='stone').reduce((n,d)=>n+d.amount,0);
 
 test('Stone Wall, Tower and Gate keep their placement tool; replacesWall is validated',()=>{
-  for(const id of ['wall','tower','wall_gate'])assert.equal(objectRegistry.require(id).repeatPlacement,true,id);
-  assert.deepEqual(objectRegistry.buildables().filter(d=>d.replacesWall).map(d=>d.id).sort(),['tower','wall_gate']);
+  for(const id of ['wall','tower','gate'])assert.equal(objectRegistry.require(id).repeatPlacement,true,id);
+  assert.deepEqual(objectRegistry.buildables().filter(d=>d.replacesWall).map(d=>d.id).sort(),['gate','tower']);
   const registry=new ObjectRegistry(objectRegistry.all()),base=structuredClone(registry.require('tower'));
   assert.throws(()=>registry.register({...base,id:'bad_replace',replacesWall:'yes'}),/hradby/);
 });
 
-test('a Gate replaces a planned wall segment: the site is cancelled with its refund and the joints stay connected',()=>{
-  const s=scene(),line=walls(s,row(60,50,5)),middle=line[2],before=stone(s);
-  assert.equal(err(s,'wall_gate',{x:62,y:50}),null,'a planned wall does not block a Gate');
-  assert.ok(err(s,'house',{x:62,y:50}),'other buildings are still blocked by a wall');
-  const result=place(s,'wall_gate',{x:62,y:50});assert.ifError(result.error);
-  assert.deepEqual(result.replaced.map(b=>b.id),[middle.id]);assert.equal(s.buildings.includes(middle),false);assert.equal(s.constructionSystem.sites.has(middle.id),false);
-  assert.equal(stone(s),before+1,'the unstarted segment returns its booked stone');assert.deepEqual(result.refund,{},'no demolition refund for a plan');
+test('m-brana-2x2: a 2 × 2 Gate replaces two planned wall segments: their sites are cancelled with refunds and the walls join its sides',()=>{
+  const s=scene(),line=walls(s,row(60,50,5)),before=stone(s);
+  assert.equal(err(s,'gate',{x:62,y:49}),null,'planned walls do not block a Gate');
+  assert.ok(err(s,'house',{x:62,y:49}),'other buildings are still blocked by a wall');
+  const result=place(s,'gate',{x:62,y:49});assert.ifError(result.error);
+  assert.deepEqual(result.replaced.map(b=>b.x).sort(),[62,63]);for(const b of result.replaced){assert.equal(s.buildings.includes(b),false);assert.equal(s.constructionSystem.sites.has(b.id),false);}
+  assert.equal(stone(s),before+2,'the unstarted segments return their booked stone');assert.deepEqual(result.refund,{},'no demolition refund for a plan');
   const gate=result.building,index=wallIndex(s.buildings,true);assert.equal(gateAxis(index,gate),'x','the Gate follows the east–west wall');
-  assert.equal(s.buildings.filter(b=>b.type==='wall'&&b.y===50).length,4);
-  assert.deepEqual(s.buildings.filter(b=>b.type==='wall'&&(b.x===61||b.x===63)).map(b=>wallIndex(s.buildings,true).has(`${b.x+(b.x===61?1:-1)},50`)),[true,true]);
-  assert.match(err(s,'wall_gate',{x:62,y:50}),/./,'a Gate never replaces a Gate');
+  assert.deepEqual(s.buildings.filter(b=>b.type==='wall'&&b.y===50).map(b=>b.x).sort(),[60,61,64]);void line;
+  assert.match(err(s,'gate',{x:62,y:49}),/./,'a Gate never replaces a Gate');
   validateGameState(serializeGameState(s));
 });
 
@@ -54,7 +53,7 @@ test('a Tower replaces finished wall segments and gives back the demolition refu
   for(const t of result.building.tiles)assert.equal(s.map[t.y][t.x],1);
   assert.ok(s.buildings.every(b=>b===result.building||!b.tiles.some(t=>result.building.tiles.some(p=>p.x===t.x&&p.y===t.y))),'nothing else stands under the Tower');
   // A single 1-stone segment refunds nothing (floor of 0.5); a priced one refunds half.
-  const g=place(s,'wall_gate',{x:61,y:50});assert.ifError(g.error);assert.deepEqual(g.refund,{});
+  const g=place(s,'gate',{x:64,y:49});assert.ifError(g.error);assert.deepEqual(g.refund,{stone:1},'two 1-stone segments: half of 2');
   const priced=s.buildings.find(b=>b.type==='wall'&&b.x===60);priced.construction={state:'complete',investedMaterials:{stone:4}};
   const direct=replaceWalls(s,[priced],{x:60,y:50,tiles:[{x:60,y:50}]})();assert.deepEqual(direct,{stone:2});
   validateGameState(serializeGameState(s));
@@ -74,17 +73,25 @@ test('the King standing on a finished segment blocks its replacement; without a 
 
 test('R turns a lone Gate; on a wall run the wall decides and R does nothing; the axis is saved',()=>{
   const s=scene();walls(s,row(60,50,3),{planned:false});
-  const index=wallIndex(s.buildings,true);
-  assert.deepEqual(turnGate(index,{x:70,y:70},'y'),{axis:'x',locked:false});assert.deepEqual(turnGate(index,{x:70,y:70},'x'),{axis:'y',locked:false});
-  assert.deepEqual(turnGate(index,{x:61,y:50},'y'),{axis:'y',locked:true},'east–west wall under the cursor');
-  assert.equal(gateAxisLocked(index,{x:61,y:51}),true,'a wall to the north decides too');assert.equal(gateAxisLocked(index,{x:62,y:51}),true);
-  const lone=place(s,'wall_gate',{x:70,y:70},{fields:{gateAxis:'x'}});assert.ifError(lone.error);
+  const index=wallIndex(s.buildings,true),gd=s.objectRegistry.require('gate'),at=(x,y)=>({x,y,definition:gd});
+  assert.deepEqual(turnGate(index,at(70,70),'y'),{axis:'x',locked:false});assert.deepEqual(turnGate(index,at(70,70),'x'),{axis:'y',locked:false});
+  assert.deepEqual(turnGate(index,at(63,49),'y'),{axis:'y',locked:true},'east–west wall beside the Gate');
+  assert.equal(gateAxisLocked(index,at(61,51)),true,'a wall to the north decides too');
+  const lone=place(s,'gate',{x:70,y:70},{fields:{gateAxis:'x'}});assert.ifError(lone.error);
   assert.equal(lone.building.gateAxis,'x');assert.equal(gateAxis(wallIndex(s.buildings,true),lone.building),'x');
   assert.equal(gateAxis(wallIndex(s.buildings,true),{x:80,y:80}),'y','older Gates without an axis keep the old look');
   const state=validateGameState(serializeGameState(s));assert.equal(state.buildings.find(b=>b.id===lone.building.id).gateAxis,'x');
   const r=workerScene(state.terrain,{construction:true,foodProduction:true,logistics:true,starter:false});loadGameState(r,structuredClone(state));
   assert.equal(r.buildings.find(b=>b.id===lone.building.id).gateAxis,'x');
   for(const mutate of [x=>{x.buildings.find(b=>b.id===lone.building.id).gateAxis='z';},x=>{x.buildings.find(b=>b.type==='wall').gateAxis='x';}]){const bad=structuredClone(state);mutate(bad);assert.throws(()=>validateGameState(bad));}
+});
+
+test('m-brana-2x2: walls touching a finished Gate are where the King climbs; the old 1 × 1 Gate still loads',()=>{
+  const s=scene(),line=walls(s,row(60,50,5),{planned:false});s.refreshWallConnections?.();
+  const g=place(s,'gate',{x:62,y:49});assert.ifError(g.error);g.building.construction.state='complete';g.building.construction.workDone=g.building.construction.requiredWork;
+  const beside=s.buildings.find(b=>b.type==='wall'&&b.x===61);assert.equal(isWallAccess(beside,s.buildings),true);
+  assert.equal(isWallAccess(s.buildings.find(b=>b.type==='wall'&&b.x===60),s.buildings),false,'a wall away from the Gate is not');void line;
+  assert.equal(objectRegistry.require('wall_gate').buildable,false,'the 1 × 1 Gate is no longer built');
 });
 
 test('a Well may stand anywhere buildable: far from every house and on a worn path; its housing bonus is unchanged',()=>{

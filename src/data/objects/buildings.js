@@ -48,10 +48,19 @@ export const buildings = [
   {
     id:'wall_gate',name:'Gate',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/wall_gate/wall-gate-open.v1.png',
     // m-staveni-zdi-studna (59): repeat placement; placed over a Stone Wall segment it replaces it; R turns it (gateAxis).
-    width:1,height:1,walkable:true,collectible:false,buildable:true,cost:{stone:5},constructionTime:12000,repeatPlacement:true,replacesWall:true,
+    width:1,height:1,walkable:true,collectible:false,buildable:false/* m-brana-2x2: older saves only */,cost:{stone:5},constructionTime:12000,repeatPlacement:true,replacesWall:true,
     interactions:['enter','exit','walk_top'],description:'A gate in the wall: people pass through it, and from it you climb up to the wall walk.',
     visibility:{multiplier:1.75},navigation:{walkableTop:true,access:true},
     renderMode:'sprite',origin:{x:.38372,y:.84348},visualHeight:113,platform:{x:0,y:-84},depth:{offset:0},
+  },
+  // m-brana-2x2 (owner, 12 Nov): the Gate is 2 × 2 and joins the walls at its sides; people pass through it on the ground
+  // and climb to the wall walk from the walls beside it (as at a Tower). The 1 × 1 Gate stays for older saves only.
+  {
+    id:'gate',name:'Gate',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/wall_gate/wall-gate-open.v1.png',
+    width:2,height:2,walkable:true,collectible:false,buildable:true,cost:{stone:12},constructionTime:20000,repeatPlacement:true,replacesWall:true,
+    interactions:[],description:'A 2 × 2 gate in the wall: people pass through it, and from the walls beside it you climb up to the wall walk.',
+    visibility:{multiplier:1.75},
+    renderMode:'sprite',origin:{x:.38372,y:.84348},visual:{displayWidth:150,displayHeight:200},visualHeight:180,depth:{offset:0},
   },
   // #118: Builders who have a place in a finished workshop (4 per workshop) work at full speed, others at half speed;
   // idle Builders wait at their workshop. Approved art: builders-workshop material yard (APPROVED_BUILDING_ART).

@@ -13,9 +13,9 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),regis
 const p=(buildingId,cost,at='2026-11-07T01:00:00Z')=>({buildingId,cost,by:'owner',at,note:''});
 
 test('the plan applies changed, added and removed resources and reports what it ignores', () => {
-  const plan=planPriceSync([p('house',{wood:6,gold:5}),p('mill',{wood:30}),p('nothing',{stone:1}),p('tower',{dragon:1}),p('wall_gate',{}),p('bakery',{stone:0}),p('quarry',{wood:15})],registry);
+  const plan=planPriceSync([p('house',{wood:6,gold:5}),p('mill',{wood:30}),p('nothing',{stone:1}),p('tower',{dragon:1}),p('gate',{}),p('bakery',{stone:0}),p('quarry',{wood:15})],registry);
   assert.deepEqual(plan.applied.map(c=>[c.buildingId,c.cost,c.added,c.removed]),[['house',{wood:6,gold:5},['gold'],[]],['mill',{wood:30},[],['stone']]]);
-  assert.deepEqual(plan.ignored.map(i=>[i.buildingId,i.reason]),[['nothing','unknown building'],['tower','unknown resource dragon'],['wall_gate','empty price'],['bakery','invalid amount of stone'],['quarry','unchanged']]);
+  assert.deepEqual(plan.ignored.map(i=>[i.buildingId,i.reason]),[['nothing','unknown building'],['tower','unknown resource dragon'],['gate','empty price'],['bakery','invalid amount of stone'],['quarry','unchanged']]);
   assert.deepEqual([...plan.remove].sort(),['house','mill','quarry'],'unchanged proposals are already in the game; invalid ones stay for the owner');
 });
 

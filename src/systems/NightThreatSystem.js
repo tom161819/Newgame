@@ -217,7 +217,7 @@ export class NightThreatSystem {
   }
   // --- fires -------------------------------------------------------------------------------------------------------
   // Wooden or thatched: more Wood than Stone in its cost (Houses, farms, huts…), never the castle, towers or walls.
-  flammable(b){const d=buildingDefinition(b);if(!buildingIsComplete(b)||d.campfire||d.fuel||['castle','tower','wall','wall_gate','burnt_ruins'].includes(d.id)||d.category!=='building')return false;if(d.flammable!=null)return !!d.flammable;const wood=d.cost?.wood??0;return wood>0&&wood>=(d.cost?.stone??0);}
+  flammable(b){const d=buildingDefinition(b);if(!buildingIsComplete(b)||d.campfire||d.fuel||['castle','tower','wall','wall_gate','gate','burnt_ruins'].includes(d.id)||d.category!=='building')return false;if(d.flammable!=null)return !!d.flammable;const wood=d.cost?.wood??0;return wood>0&&wood>=(d.cost?.stone??0);}
   center(b){const d=buildingDefinition(b);return {x:b.x+d.width/2,y:b.y+d.height/2};}
   // Distance from a point to the nearest tile of a building.
   gap(b,p){const d=buildingDefinition(b),dx=Math.max(b.x-p.x,0,p.x-(b.x+d.width)),dy=Math.max(b.y-p.y,0,p.y-(b.y+d.height));return Math.hypot(dx,dy);}

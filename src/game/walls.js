@@ -5,7 +5,7 @@ import { tileKey } from './stones.js';
 export const WALL_DIRECTIONS=Object.freeze([{name:'N',x:0,y:-1},{name:'E',x:1,y:0},{name:'S',x:0,y:1},{name:'W',x:-1,y:0}]);
 export const isWall=building=>buildingDefinition(building).navigation?.walkableTop===true;
 // #97: the wall walk is reached only at a Gate or where a wall touches a Tower (its stair).
-export const isWallAccess=(building,buildings)=>isWall(building)&&(buildingDefinition(building).navigation?.access===true||buildings.some(b=>b.type==='tower'&&buildingIsComplete(b)&&b.tiles?.some(t=>Math.abs(t.x-building.x)+Math.abs(t.y-building.y)===1)));
+export const isWallAccess=(building,buildings)=>isWall(building)&&(buildingDefinition(building).navigation?.access===true||buildings.some(b=>(b.type==='tower'||b.type==='gate')&&buildingIsComplete(b)&&b.tiles?.some(t=>Math.abs(t.x-building.x)+Math.abs(t.y-building.y)===1)));
 export const wallIndex=(buildings,includeUnfinished=false)=>new Map(buildings.filter(b=>isWall(b)&&(includeUnfinished||buildingIsComplete(b))).map(b=>[tileKey(b),b]));
 
 export function wallLine(start,end){
@@ -20,10 +20,14 @@ export function connectionsFor(index,building){
 // m-staveni-zdi-studna (59): a wall run on one axis turns a Gate along it ('x': joined E/W, drawn flipped; 'y': joined N/S).
 // A Gate with no such run (alone, at a corner or a crossing) keeps its stored gateAxis, chosen with R while placing.
 export function gateAxis(index,building){
+  // m-brana-2x2: a 2 × 2 Gate looks at the walls along its four sides.
+  const size=(building.definition??buildingDefinition(building))?.width??1;
+  if(size>1){const has=(x,y)=>index.has(tileKey({x,y}));let ew=false,ns=false;for(let i=0;i<size;i++){if(has(building.x-1,building.y+i)||has(building.x+size,building.y+i))ew=true;if(has(building.x+i,building.y-1)||has(building.x+i,building.y+size))ns=true;}
+    if(ew&&!ns)return 'x';if(ns&&!ew)return 'y';return building.gateAxis==='x'?'x':'y';}
   const n=connectionsFor(index,building),ew=n.E||n.W,ns=n.N||n.S;
   if(ew&&!ns)return 'x';if(ns&&!ew)return 'y';return building.gateAxis==='x'?'x':'y';
 }
-export const gateAxisLocked=(index,building)=>{const n=connectionsFor(index,building);return (n.E||n.W)!==(n.N||n.S);};
+export const gateAxisLocked=(index,building)=>{const a=gateAxis(index,{...building,gateAxis:'x'}),b=gateAxis(index,{...building,gateAxis:'y'});return a===b;};
 // R while placing: turns the pending axis unless the wall run under the cursor decides it (then it stays and locked is true).
 export function turnGate(index,anchor,axis){return anchor&&gateAxisLocked(index,anchor)?{axis:axis==='x'?'x':'y',locked:true}:{axis:axis==='x'?'y':'x',locked:false};}
 export function wallLinePlan({map,tiles,resources,reservedTiles=[],buildings,definition,inventory}){

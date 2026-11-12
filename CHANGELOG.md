@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.104.0] - 2026-11-13
+<!-- version: {"title":"Gate 2 × 2","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- The Gate is 2 × 2 and joins the walls at its sides; the King climbs to the wall walk from the walls beside it. Gates in saved games stay as they are (1 × 1) and keep working. The new Gate uses provisional art for now.
+
 ## [0.103.0] - 2026-11-13
 <!-- version: {"title":"The wolf stays, Towers turn, deposits on the minimap","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added
