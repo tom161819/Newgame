@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { directionName,DIRECTION_POSES } from './directions.js';
 import { CargoBundleView } from './CargoBundleView.js';
 import { HUMAN_APPEARANCE as COLORS } from '../data/humanAppearance.js';
-import { APPROVED_VILLAGER_ART,PROFESSION_LOOKS,FACING_INDEX,villagerSex,walkFrame,walkKey } from '../data/objects/approvedArt.js';
+import { APPROVED_VILLAGER_ART,PROFESSION_LOOKS,FACING_INDEX,villagerSex,walkFrame,walkKey,militaryLook } from '../data/objects/approvedArt.js';
 import { FISHER_WALK_ART,FISHER_LOOKS } from '../data/fisherWalkArt.js';
 // Approved looks with only a walk sheet (the Fisher): the walk sheet carries all eight directions.
 const villagerArt=look=>APPROVED_VILLAGER_ART[look]??FISHER_WALK_ART[look]??null;
@@ -18,11 +18,13 @@ function ensureLook(scene,look,ready){
   scene.__villagerLooks??=new Map();const state=scene.__villagerLooks.get(look);
   if(state==='ready')return true;if(state){state.add(ready);return false;}
   const art=villagerArt(look),waiting=new Set([ready]);scene.__villagerLooks.set(look,waiting);
-  if(art.walkSrc){ // walk-only look from a data URL
+  // g-vojaci-grafika: a look with a walk sheet loads only the sheet (its idle column is the standing pose), so the game
+  // ships one file per look instead of nine (the published game may hold 512 files).
+  if(art.walkSrc||art.walk){ // walk-only look (a data URL or the exported sheet)
     const done=()=>{scene.__villagerLooks.set(look,'ready');for(const fn of waiting)fn();};
     if(scene.textures.exists(walkKey(look))){done();return true;}
     scene.load.once(`filecomplete-spritesheet-${walkKey(look)}`,done);
-    scene.load.spritesheet(walkKey(look),art.walkSrc,{frameWidth:art.walk.frameWidth,frameHeight:art.walk.frameHeight});
+    scene.load.spritesheet(walkKey(look),art.walkSrc??assetURL(`${art.base}.walk.png`,scene.assets?.baseURL??import.meta.env?.BASE_URL??'/'),{frameWidth:art.walk.frameWidth,frameHeight:art.walk.frameHeight});
     if(!scene.load.isLoading())scene.load.start();return false;
   }
   for(let k=0;k<8;k++)if(!scene.textures.exists(lookKey(look,k)))scene.load.image(lookKey(look,k),assetURL(`${art.base}.facing-${k}.png`,scene.assets?.baseURL??import.meta.env?.BASE_URL??'/'));
@@ -43,7 +45,10 @@ export class HumanView extends Phaser.GameObjects.Container {
   // Profession and name decide the approved look; the procedural figure stays until it loads.
   updateLook(){
     const worker=this.getData?.('worker');if(!worker)return;
-    const look=professionLooks(worker.isSubject===false?worker.profession:(worker.displayProfession??'idle'))?.[worker.identity?(worker.identity.sex==='f'?'female':'male'):villagerSex(worker.name)]??null;
+    const sex=worker.identity?(worker.identity.sex==='f'?'female':'male'):villagerSex(worker.name),profession=worker.isSubject===false?worker.profession:(worker.displayProfession??'idle');
+    // g-vojaci-grafika: a soldier wears the look of his rank (Recruits the plain soldier look).
+    const unitType=worker.profession==='soldier'?this.scene?.military?.unit?.(worker)?.type:null;
+    const look=(unitType&&militaryLook(unitType,sex,worker.id))??professionLooks(profession)?.[sex]??null;
     if(look===this.look)return;this.look=look;this.lookReady=false;
     if(look&&villagerArt(look))this.lookReady=ensureLook(this.scene,look,()=>{if(this.look===look&&this.scene){this.lookReady=true;this.applyArt();}});
     this.applyArt();

@@ -7,8 +7,9 @@ const json=p=>JSON.parse(readFileSync(p,'utf8'));
 const pngSize=p=>{const b=readFileSync(p);return {width:b.readUInt32BE(16),height:b.readUInt32BE(20)};};
 
 test('every approved villager look has its walk sheet, byte for byte with the export and with the same numbers', () => {
-  assert.equal(Object.keys(APPROVED_VILLAGER_ART).length,19);
+  assert.equal(Object.keys(APPROVED_VILLAGER_ART).length,33);
   for(const [look,art] of Object.entries(APPROVED_VILLAGER_ART)){
+    if(look.startsWith('military-knight-')){assert.equal(art.walk,undefined,'Knights have eight still images, no walk sheet');continue;}
     const meta=json(art.artSource).walk,exported=art.artSource.replace('.json','.walk.png'),copy=`public${art.base}.walk.png`;
     assert.ok(readFileSync(copy).equals(readFileSync(exported)),`${look}: the game copy is the export`);
     assert.deepEqual({frameWidth:art.walk.frameWidth,frameHeight:art.walk.frameHeight,origin:art.walk.origin,fps:art.walk.fps},{frameWidth:meta.frameWidth,frameHeight:meta.frameHeight,origin:meta.origin,fps:meta.fps},look);

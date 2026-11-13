@@ -306,9 +306,17 @@ test('approved production buildings use their Asset Studio exports byte for byte
       assert.equal(record.specHash, meta.specHash);
       assert.equal(catalog.studio.find(a => a.id === meta.assetId).variants.find(v => v.id === meta.variantId).hash, meta.specHash);
     }
-    assert.deepEqual([definition.width, definition.height], [meta.footprint.width, meta.footprint.height], `${gameId}: footprint matches`);
     assert.ok(readFileSync(path.join(root, `public${definition.sprite}`)).equals(readFileSync(path.join(root, `art/sprites/${meta.assetId}/${meta.variantId}.v${meta.version}.png`))), `${gameId}: sprite equals the export`);
     assert.deepEqual(definition.origin, meta.baseOrigin);
+    // g-smolarna-vzhled: art drawn for a bigger footprint is shown scaled to the game footprint (Pitch Kiln 3 × 3 → 2 × 2).
+    const k = definition.width / meta.footprint.width;
+    if (k !== 1) {
+      assert.equal(definition.width / meta.footprint.width, definition.height / meta.footprint.height, `${gameId}: same scale both ways`);
+      assert.deepEqual(definition.visual, { displayWidth: Math.round(meta.width * k), displayHeight: Math.round(meta.height * k) }, gameId);
+      assert.equal(definition.visualHeight, Math.round(meta.visualHeight * k));
+      assert.equal((definition.lights ?? []).length, meta.gameLights.length);continue;
+    }
+    assert.deepEqual([definition.width, definition.height], [meta.footprint.width, meta.footprint.height], `${gameId}: footprint matches`);
     assert.equal(definition.visualHeight, meta.visualHeight);
     assert.deepEqual(definition.lights ?? [], meta.gameLights);
   }
@@ -367,6 +375,9 @@ test('villagers use the approved looks in eight directions, chosen by profession
     assert.equal(approvals.assets[meta.assetId].variants[look].specHash, meta.specHash);
     assert.equal(meta.facings.length, 8);
     for (let k = 0; k < 8; k++) {
+      // g-vojaci-grafika: a look with a walk sheet ships only the sheet (tests/walk-cycle.test.js checks it).
+      // (the plain villager looks keep theirs for the World Lab and Light Lab in the Studio)
+      if (art.walk && !existsSync(path.join(root, `public${art.base}.facing-${k}.png`))) { assert.deepEqual(art.origins[k], meta.facings[k].origin); continue; }
       assert.ok(readFileSync(path.join(root, `public${art.base}.facing-${k}.png`)).equals(readFileSync(path.join(root, `art/sprites/${meta.assetId}/${look}.v1.facing-${k}.png`))), `${look} ${k}`);
       assert.deepEqual(art.origins[k], meta.facings[k].origin);
     }

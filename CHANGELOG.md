@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.107.0] - 2026-11-13
+<!-- version: {"title":"Soldiers and Pitch Kiln in their approved art","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- Soldiers wear the look of their rank (Soldier, Archer, Swordsman, Knight, approved in the Asset Studio); Recruits keep the plain soldier look.
+- The Pitch Maker and the Pitch Kiln have their own approved looks (stone pitch house with a yard, glowing at night).
+
 ## [0.106.0] - 2026-11-13
 <!-- version: {"title":"Own caravan","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

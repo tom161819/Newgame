@@ -34,6 +34,7 @@ test('47: the pick is capped on screen and prefers the same tiles every time', (
 test('35: approved building art is drawn at Studio scale and anchored at the footprint front corner', () => {
   for(const [id,art]of Object.entries(APPROVED_BUILDING_ART)){
     const d=objectDefinitions.find(o=>o.id===id),meta=JSON.parse(readFileSync(new URL(`../${art.artSource}`,import.meta.url),'utf8'));
+    if(meta.footprint.width!==d.width){assert.equal(id,'pitch_kiln','only the Pitch Kiln is shown scaled (g-smolarna-vzhled)');continue;}
     assert.equal(d.visual?.displayWidth,undefined,`${id}: no placeholder display size stretches the PNG`);assert.equal(d.visual?.displayHeight,undefined,id);
     assert.deepEqual(d.origin,meta.baseOrigin,`${id}: origin is the export's base (front corner)`);assert.equal(meta.scale,1,id);
     assert.deepEqual([meta.footprint.width,meta.footprint.height],[d.width,d.height],`${id}: export footprint = game footprint`);
