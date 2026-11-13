@@ -102,6 +102,394 @@
           }
         ]
       }
+    },
+    {
+      "id": "fisherman-hut-gpt-0",
+      "name": "GPT fishing hut on stilts 0° (front-right)",
+      "version": 1,
+      "notes": "Stilt hut with a platform and ladder, lantern, drying rack with fish, nets, fish trap, buckets of fish. At the shared door scale it fills a 3 × 3 footprint (the game hut is 2 × 2): decide before it goes into the game. View 0° (front-right), cut out of the owner's GPT sheet and scaled to 0.4 (doors ≈ 48 px; 2× file at 0.8). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "body": {
+          "kind": "raised",
+          "walls": "timber",
+          "roofMaterial": "thatch",
+          "width": 0.9,
+          "depth": 0.8,
+          "wallHeight": 0.65,
+          "roofHeight": 0.55,
+          "ridge": "x",
+          "windows": 1,
+          "lift": 0.35,
+          "at": [
+            -0.4,
+            -0.38
+          ]
+        },
+        "props": [
+          {
+            "type": "wallNet",
+            "at": [
+              -0.42,
+              0.06
+            ],
+            "width": 0.72,
+            "height": 0.42,
+            "y": 0.38
+          },
+          {
+            "type": "pier",
+            "at": [
+              0.5,
+              -0.4
+            ],
+            "length": 0.8,
+            "width": 0.3,
+            "r": 1.5708
+          },
+          {
+            "type": "boat",
+            "at": [
+              0.45,
+              0.45
+            ],
+            "upturned": true
+          },
+          {
+            "type": "rodRack",
+            "at": [
+              -0.35,
+              0.62
+            ]
+          },
+          {
+            "type": "waterTub",
+            "at": [
+              0,
+              0.3
+            ]
+          },
+          {
+            "type": "fishRack",
+            "at": [
+              -0.72,
+              0.15
+            ],
+            "r": 1.5708,
+            "count": 5
+          },
+          {
+            "type": "eelTrap",
+            "at": [
+              0.75,
+              0
+            ],
+            "r": 1.2
+          },
+          {
+            "type": "fishBasket",
+            "at": [
+              0.12,
+              0.72
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "fisherman-hut-gpt-90",
+      "name": "GPT fishing hut on stilts 90° (rear-right)",
+      "version": 1,
+      "notes": "Stilt hut with a platform and ladder, lantern, drying rack with fish, nets, fish trap, buckets of fish. At the shared door scale it fills a 3 × 3 footprint (the game hut is 2 × 2): decide before it goes into the game. View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 0.4 (doors ≈ 48 px; 2× file at 0.8). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "raised",
+          "walls": "timber",
+          "roofMaterial": "thatch",
+          "width": 0.9,
+          "depth": 0.8,
+          "wallHeight": 0.65,
+          "roofHeight": 0.55,
+          "ridge": "x",
+          "windows": 1,
+          "lift": 0.35,
+          "at": [
+            -0.4,
+            -0.38
+          ]
+        },
+        "props": [
+          {
+            "type": "wallNet",
+            "at": [
+              -0.42,
+              0.06
+            ],
+            "width": 0.72,
+            "height": 0.42,
+            "y": 0.38
+          },
+          {
+            "type": "pier",
+            "at": [
+              0.5,
+              -0.4
+            ],
+            "length": 0.8,
+            "width": 0.3,
+            "r": 1.5708
+          },
+          {
+            "type": "boat",
+            "at": [
+              0.45,
+              0.45
+            ],
+            "upturned": true
+          },
+          {
+            "type": "rodRack",
+            "at": [
+              -0.35,
+              0.62
+            ]
+          },
+          {
+            "type": "waterTub",
+            "at": [
+              0,
+              0.3
+            ]
+          },
+          {
+            "type": "fishRack",
+            "at": [
+              -0.72,
+              0.15
+            ],
+            "r": 1.5708,
+            "count": 5
+          },
+          {
+            "type": "eelTrap",
+            "at": [
+              0.75,
+              0
+            ],
+            "r": 1.2
+          },
+          {
+            "type": "fishBasket",
+            "at": [
+              0.12,
+              0.72
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "fisherman-hut-gpt-180",
+      "name": "GPT fishing hut on stilts 180° (rear-left)",
+      "version": 1,
+      "notes": "Stilt hut with a platform and ladder, lantern, drying rack with fish, nets, fish trap, buckets of fish. At the shared door scale it fills a 3 × 3 footprint (the game hut is 2 × 2): decide before it goes into the game. View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 0.4 (doors ≈ 48 px; 2× file at 0.8). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "raised",
+          "walls": "timber",
+          "roofMaterial": "thatch",
+          "width": 0.9,
+          "depth": 0.8,
+          "wallHeight": 0.65,
+          "roofHeight": 0.55,
+          "ridge": "x",
+          "windows": 1,
+          "lift": 0.35,
+          "at": [
+            -0.4,
+            -0.38
+          ]
+        },
+        "props": [
+          {
+            "type": "wallNet",
+            "at": [
+              -0.42,
+              0.06
+            ],
+            "width": 0.72,
+            "height": 0.42,
+            "y": 0.38
+          },
+          {
+            "type": "pier",
+            "at": [
+              0.5,
+              -0.4
+            ],
+            "length": 0.8,
+            "width": 0.3,
+            "r": 1.5708
+          },
+          {
+            "type": "boat",
+            "at": [
+              0.45,
+              0.45
+            ],
+            "upturned": true
+          },
+          {
+            "type": "rodRack",
+            "at": [
+              -0.35,
+              0.62
+            ]
+          },
+          {
+            "type": "waterTub",
+            "at": [
+              0,
+              0.3
+            ]
+          },
+          {
+            "type": "fishRack",
+            "at": [
+              -0.72,
+              0.15
+            ],
+            "r": 1.5708,
+            "count": 5
+          },
+          {
+            "type": "eelTrap",
+            "at": [
+              0.75,
+              0
+            ],
+            "r": 1.2
+          },
+          {
+            "type": "fishBasket",
+            "at": [
+              0.12,
+              0.72
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "fisherman-hut-gpt-270",
+      "name": "GPT fishing hut on stilts 270° (front-left)",
+      "version": 1,
+      "notes": "Stilt hut with a platform and ladder, lantern, drying rack with fish, nets, fish trap, buckets of fish. At the shared door scale it fills a 3 × 3 footprint (the game hut is 2 × 2): decide before it goes into the game. View 270° (front-left), cut out of the owner's GPT sheet and scaled to 0.4 (doors ≈ 48 px; 2× file at 0.8). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "raised",
+          "walls": "timber",
+          "roofMaterial": "thatch",
+          "width": 0.9,
+          "depth": 0.8,
+          "wallHeight": 0.65,
+          "roofHeight": 0.55,
+          "ridge": "x",
+          "windows": 1,
+          "lift": 0.35,
+          "at": [
+            -0.4,
+            -0.38
+          ]
+        },
+        "props": [
+          {
+            "type": "wallNet",
+            "at": [
+              -0.42,
+              0.06
+            ],
+            "width": 0.72,
+            "height": 0.42,
+            "y": 0.38
+          },
+          {
+            "type": "pier",
+            "at": [
+              0.5,
+              -0.4
+            ],
+            "length": 0.8,
+            "width": 0.3,
+            "r": 1.5708
+          },
+          {
+            "type": "boat",
+            "at": [
+              0.45,
+              0.45
+            ],
+            "upturned": true
+          },
+          {
+            "type": "rodRack",
+            "at": [
+              -0.35,
+              0.62
+            ]
+          },
+          {
+            "type": "waterTub",
+            "at": [
+              0,
+              0.3
+            ]
+          },
+          {
+            "type": "fishRack",
+            "at": [
+              -0.72,
+              0.15
+            ],
+            "r": 1.5708,
+            "count": 5
+          },
+          {
+            "type": "eelTrap",
+            "at": [
+              0.75,
+              0
+            ],
+            "r": 1.2
+          },
+          {
+            "type": "fishBasket",
+            "at": [
+              0.12,
+              0.72
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }

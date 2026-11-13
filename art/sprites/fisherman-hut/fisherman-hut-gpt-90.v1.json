@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "fisherman-hut",
+  "variantId": "fisherman-hut-gpt-90",
+  "name": "GPT fishing hut on stilts 90° (rear-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "69d5e81e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 227,
+  "height": 190,
+  "anchor": {
+    "x": 113,
+    "y": 138
+  },
+  "origin": {
+    "x": 0.4978,
+    "y": 0.72632
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 113,
+    "y": 186
+  },
+  "baseOrigin": {
+    "x": 0.4978,
+    "y": 0.97895
+  },
+  "visualHeight": 186,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.74,
+  "lights": [],
+  "x2": {
+    "width": 454,
+    "height": 380,
+    "anchor": {
+      "x": 226,
+      "y": 276
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "assetId": "fisherman-hut",
+  "variantId": "fisherman-hut-gpt-0",
+  "name": "GPT fishing hut on stilts 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "69d5e81e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 230,
+  "height": 192,
+  "anchor": {
+    "x": 115,
+    "y": 141
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.73438
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 115,
+    "y": 189
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.98438
+  },
+  "visualHeight": 189,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -68,
+      "y": -112,
+      "color": "#ffb25a",
+      "radius": 96,
+      "intensity": 0.9,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 0.6
+    }
+  ],
+  "modelHeight": 1.74,
+  "lights": [],
+  "x2": {
+    "width": 460,
+    "height": 384,
+    "anchor": {
+      "x": 230,
+      "y": 282
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}
