@@ -79,6 +79,306 @@
           }
         ]
       }
+    },
+    {
+      "id": "armory-gpt-0",
+      "name": "GPT image 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's GPT turnaround sheet, view 0° (front-right). Cut out of the sheet, scaled to 1/3 and 2/3; anchor set on the bottom of the footprint by eye. For review of the 2D-image route (plan #40), not yet in the game.",
+      "spec": {
+        "body": {
+          "kind": "barn",
+          "walls": "stone",
+          "roofMaterial": "roof_shingle",
+          "width": 2,
+          "depth": 1.5,
+          "wallHeight": 1.25,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "ironBands": true,
+          "at": [
+            -0.25,
+            -0.4
+          ]
+        },
+        "props": [
+          {
+            "type": "banner",
+            "at": [
+              0.45,
+              0.98
+            ]
+          },
+          {
+            "type": "banner",
+            "at": [
+              -0.65,
+              0.98
+            ],
+            "material": "banner_blue"
+          },
+          {
+            "type": "shield",
+            "at": [
+              1.15,
+              0.4
+            ]
+          },
+          {
+            "type": "shield",
+            "at": [
+              1.15,
+              0
+            ],
+            "material": "banner_blue"
+          },
+          {
+            "type": "weaponCrate",
+            "at": [
+              0.95,
+              1.05
+            ]
+          },
+          {
+            "type": "swordRack",
+            "at": [
+              -0.1,
+              1.15
+            ],
+            "count": 3
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "armory-gpt-90",
+      "name": "GPT image 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's GPT turnaround sheet, view 90° (rear-right). Cut out of the sheet, scaled to 1/3 and 2/3; anchor set on the bottom of the footprint by eye. For review of the 2D-image route (plan #40), not yet in the game.",
+      "spec": {
+        "body": {
+          "kind": "barn",
+          "walls": "stone",
+          "roofMaterial": "roof_shingle",
+          "width": 2,
+          "depth": 1.5,
+          "wallHeight": 1.25,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "ironBands": true,
+          "at": [
+            -0.25,
+            -0.4
+          ]
+        },
+        "props": [
+          {
+            "type": "banner",
+            "at": [
+              0.45,
+              0.98
+            ]
+          },
+          {
+            "type": "banner",
+            "at": [
+              -0.65,
+              0.98
+            ],
+            "material": "banner_blue"
+          },
+          {
+            "type": "shield",
+            "at": [
+              1.15,
+              0.4
+            ]
+          },
+          {
+            "type": "shield",
+            "at": [
+              1.15,
+              0
+            ],
+            "material": "banner_blue"
+          },
+          {
+            "type": "weaponCrate",
+            "at": [
+              0.95,
+              1.05
+            ]
+          },
+          {
+            "type": "swordRack",
+            "at": [
+              -0.1,
+              1.15
+            ],
+            "count": 3
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "armory-gpt-180",
+      "name": "GPT image 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's GPT turnaround sheet, view 180° (rear-left). Cut out of the sheet, scaled to 1/3 and 2/3; anchor set on the bottom of the footprint by eye. For review of the 2D-image route (plan #40), not yet in the game.",
+      "spec": {
+        "body": {
+          "kind": "barn",
+          "walls": "stone",
+          "roofMaterial": "roof_shingle",
+          "width": 2,
+          "depth": 1.5,
+          "wallHeight": 1.25,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "ironBands": true,
+          "at": [
+            -0.25,
+            -0.4
+          ]
+        },
+        "props": [
+          {
+            "type": "banner",
+            "at": [
+              0.45,
+              0.98
+            ]
+          },
+          {
+            "type": "banner",
+            "at": [
+              -0.65,
+              0.98
+            ],
+            "material": "banner_blue"
+          },
+          {
+            "type": "shield",
+            "at": [
+              1.15,
+              0.4
+            ]
+          },
+          {
+            "type": "shield",
+            "at": [
+              1.15,
+              0
+            ],
+            "material": "banner_blue"
+          },
+          {
+            "type": "weaponCrate",
+            "at": [
+              0.95,
+              1.05
+            ]
+          },
+          {
+            "type": "swordRack",
+            "at": [
+              -0.1,
+              1.15
+            ],
+            "count": 3
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "armory-gpt-270",
+      "name": "GPT image 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's GPT turnaround sheet, view 270° (front-left). Cut out of the sheet, scaled to 1/3 and 2/3; anchor set on the bottom of the footprint by eye. For review of the 2D-image route (plan #40), not yet in the game.",
+      "spec": {
+        "body": {
+          "kind": "barn",
+          "walls": "stone",
+          "roofMaterial": "roof_shingle",
+          "width": 2,
+          "depth": 1.5,
+          "wallHeight": 1.25,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "ironBands": true,
+          "at": [
+            -0.25,
+            -0.4
+          ]
+        },
+        "props": [
+          {
+            "type": "banner",
+            "at": [
+              0.45,
+              0.98
+            ]
+          },
+          {
+            "type": "banner",
+            "at": [
+              -0.65,
+              0.98
+            ],
+            "material": "banner_blue"
+          },
+          {
+            "type": "shield",
+            "at": [
+              1.15,
+              0.4
+            ]
+          },
+          {
+            "type": "shield",
+            "at": [
+              1.15,
+              0
+            ],
+            "material": "banner_blue"
+          },
+          {
+            "type": "weaponCrate",
+            "at": [
+              0.95,
+              1.05
+            ]
+          },
+          {
+            "type": "swordRack",
+            "at": [
+              -0.1,
+              1.15
+            ],
+            "count": 3
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }

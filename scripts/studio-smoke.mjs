@@ -169,6 +169,15 @@ try {
   const bakedExport = await page.evaluate(() => window.assetStudio.exportSprite('ruined-wall', 'ruined-wall-blender'));
   assert.ok(bakedExport.baked && bakedExport.meta.generator === 'blender', 'export hands over the baked sprite unchanged');
   pass('Blender-baked variant: committed render shown with its anchor and render facts, export keeps it');
+  // Owner's GPT armory turnaround: four imported images, one per 90° view, shown for review.
+  await page.locator('.library-item', { hasText: 'Armory' }).first().click();
+  for (const deg of [0, 90, 180, 270]) {
+    const card = page.locator(`.variant-card[data-variant="armory-gpt-${deg}"]`);
+    assert.match(await card.locator('.baked-note').textContent(), new RegExp(`Imported image \\(GPT\\), view ${deg}°`));
+    assert.doesNotMatch(await card.locator('.baked-note').textContent(), /missing|Blender/);
+  }
+  await page.locator('.variant-card[data-variant="armory-gpt-0"]').screenshot({ path: '/tmp/armory/card-0.png' });
+  pass('GPT armory: four imported views shown as review variants');
 
   await page.locator('.library-item', { hasText: 'Watchtower' }).click();
   await page.waitForFunction(() => document.querySelectorAll('.variant-card canvas').length >= 1);

@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "armory",
+  "variantId": "armory-gpt-90",
+  "name": "GPT image 90° (rear-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "e181a614",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 201,
+  "height": 188,
+  "anchor": {
+    "x": 100,
+    "y": 135
+  },
+  "origin": {
+    "x": 0.49751,
+    "y": 0.71809
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 100,
+    "y": 183
+  },
+  "baseOrigin": {
+    "x": 0.49751,
+    "y": 0.9734
+  },
+  "visualHeight": 183,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.09,
+  "lights": [],
+  "x2": {
+    "width": 402,
+    "height": 376,
+    "anchor": {
+      "x": 200,
+      "y": 270
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

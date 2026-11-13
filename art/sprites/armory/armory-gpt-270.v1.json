@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "armory",
+  "variantId": "armory-gpt-270",
+  "name": "GPT image 270° (front-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "e181a614",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 192,
+  "anchor": {
+    "x": 97,
+    "y": 136
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.70833
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 184
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.95833
+  },
+  "visualHeight": 184,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.09,
+  "lights": [],
+  "x2": {
+    "width": 390,
+    "height": 384,
+    "anchor": {
+      "x": 194,
+      "y": 272
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

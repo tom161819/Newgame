@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.113.1] - 2026-11-13
+<!-- version: {"title":"GPT Armory views in the Asset Studio","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Asset Studio: the owner's GPT-made Armory in four views (0°, 90°, 180°, 270°) for review, as imported images next to the Studio designs.
+
 ## [0.113.0] - 2026-11-13
 <!-- version: {"title":"Castle and Barracks heating, Smelter burns 3 Wood","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added
