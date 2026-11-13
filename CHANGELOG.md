@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.114.2] - 2026-11-13
+<!-- version: {"title":"GPT buildings without the light rim, toned to the game","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- The new House, Bakery and Armory pictures sit on the ground without a light rim and are toned down to match the rest of the game.
+
 ## [0.114.1] - 2026-11-13
 <!-- version: {"title":"GPT logger's cabin in the Asset Studio","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

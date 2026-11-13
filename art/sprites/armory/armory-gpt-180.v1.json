@@ -2,7 +2,7 @@
   "schema": 1,
   "assetId": "armory",
   "variantId": "armory-gpt-180",
-  "name": "GPT image 180° (rear-left)",
+  "name": "GPT image 180\u00b0 (rear-left)",
   "category": "buildings",
   "version": 1,
   "specHash": "e181a614",
@@ -11,14 +11,14 @@
   "styleGuide": "medieval-kingdom-painted-isometric@1",
   "scale": 1,
   "width": 197,
-  "height": 197,
+  "height": 199,
   "anchor": {
     "x": 98,
-    "y": 139
+    "y": 141
   },
   "origin": {
     "x": 0.49746,
-    "y": 0.70558
+    "y": 0.70854
   },
   "footprint": {
     "width": 3,
@@ -26,13 +26,13 @@
   },
   "base": {
     "x": 98,
-    "y": 187
+    "y": 189
   },
   "baseOrigin": {
     "x": 0.49746,
-    "y": 0.94924
+    "y": 0.94975
   },
-  "visualHeight": 187,
+  "visualHeight": 189,
   "platform": null,
   "frontLayer": false,
   "gameLights": [],
@@ -40,10 +40,10 @@
   "lights": [],
   "x2": {
     "width": 394,
-    "height": 394,
+    "height": 398,
     "anchor": {
       "x": 196,
-      "y": 278
+      "y": 282
     }
   },
   "render": {
