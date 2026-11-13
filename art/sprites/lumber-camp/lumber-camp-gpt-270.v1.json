@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "lumber-camp",
+  "variantId": "lumber-camp-gpt-270",
+  "name": "GPT logger's cabin 270° (front-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "fb16ec6c",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 168,
+  "height": 146,
+  "anchor": {
+    "x": 84,
+    "y": 98
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.67123
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 84,
+    "y": 130
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.89041
+  },
+  "visualHeight": 130,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.64,
+  "lights": [],
+  "x2": {
+    "width": 336,
+    "height": 292,
+    "anchor": {
+      "x": 168,
+      "y": 196
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

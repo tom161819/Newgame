@@ -184,6 +184,9 @@ try {
   await page.locator('.library-item', { has: page.locator('.meta', { hasText: /^house ·/ }) }).first().click();
   for (const look of ['bench', 'woodshed', 'porch', 'garden']) assert.match(await page.locator(`.variant-card[data-variant="house-gpt-${look}-0"] .baked-note`).textContent(), /Imported image \(GPT\), view 0°/);
   pass('GPT houses: four looks, each in four views');
+  await page.locator('.library-item', { has: page.locator('.meta', { hasText: /^lumber-camp ·/ }) }).first().click();
+  for (const deg of [0, 90, 180, 270]) assert.match(await page.locator(`.variant-card[data-variant="lumber-camp-gpt-${deg}"] .baked-note`).textContent(), new RegExp(`Imported image \\(GPT\\), view ${deg}°`));
+  pass('GPT logger cabin: four views');
 
   await page.locator('.library-item', { hasText: 'Watchtower' }).click();
   await page.waitForFunction(() => document.querySelectorAll('.variant-card canvas').length >= 1);

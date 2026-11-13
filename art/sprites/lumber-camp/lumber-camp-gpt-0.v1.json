@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "assetId": "lumber-camp",
+  "variantId": "lumber-camp-gpt-0",
+  "name": "GPT logger's cabin 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "fb16ec6c",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 176,
+  "height": 148,
+  "anchor": {
+    "x": 104,
+    "y": 96
+  },
+  "origin": {
+    "x": 0.59091,
+    "y": 0.64865
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 104,
+    "y": 128
+  },
+  "baseOrigin": {
+    "x": 0.59091,
+    "y": 0.86486
+  },
+  "visualHeight": 128,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": 13,
+      "y": -41,
+      "color": "#ffb25a",
+      "radius": 96,
+      "intensity": 0.9,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 0.6
+    }
+  ],
+  "modelHeight": 1.64,
+  "lights": [],
+  "x2": {
+    "width": 352,
+    "height": 296,
+    "anchor": {
+      "x": 208,
+      "y": 192
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}
