@@ -1,3 +1,5 @@
+import { t } from '../i18n/index.js';
+import { towerNeighbors } from '../game/buildings.js';
 import { WallPatrol,WALL_PATROL } from './WallPatrol.js';
 import { UNIT_TYPES,unitKit,KNIGHT_SPEED,START_GARRISON,RECRUIT } from '../data/military.js';
 import { MILITARY_ITEMS } from '../data/militaryEquipment.js';
@@ -125,6 +127,9 @@ export class MilitarySystem {
     const order=this.order(worker),combat=this.scene.combat,unit=this.unit(worker);
     if(order?.state==='training'){combat.stopAttack(worker);worker.workState='Working';worker.workMessage='Training';
       if(!this.scene.workplaceSystem.atWorkplace(worker)&&!worker.nextTile&&!worker.path.length&&worker.aiCooldown<=0){worker.aiCooldown=1000;worker.moveTo(this.scene.workplaceSystem.goals(worker));}return true;}
+    // m-karavana-vyslat: escorts walk to the Marketplace while the caravan gathers.
+    if(worker.expeditionGather!=null){const m=this.scene.buildings.find(b=>b.id===worker.expeditionGather);if(m){worker.workState='Traveling to Target';worker.workMessage=t('expedition.gathering');
+      if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0&&Math.max(Math.abs(worker.tile.x-(m.x+1)),Math.abs(worker.tile.y-(m.y+1)))>4){worker.aiCooldown=1500;worker.moveTo(towerNeighbors(m));}return true;}delete worker.expeditionGather;}
     // m-hlidka-hradby: on the wall walk (or on the way up) the patrol leads; an Archer on a wall shoots threats in range.
     if(worker.wallPatrol){this.wallPatrol??=new WallPatrol(this.scene);if(worker.onWall&&worker.attackRange>1){const target=this.threat(worker);if(target&&inAttackRange(worker,target,this.scene.map)){worker.path=[];combat.startAttack(worker,target);return true;}}
       if(this.wallPatrol.update(worker,delta))return true;}

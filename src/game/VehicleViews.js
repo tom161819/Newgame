@@ -36,7 +36,7 @@ export class VehicleViews {
     for(const v of system.vehicles.values()){
       seen.add(v.id);let view=this.views.get(v.id);if(!view){view=s.add.image(0,0,textureFor(s,v.type)).setOrigin(.5,.8);this.views.set(v.id,view);}
       const p=system.position(v),ahead=p.direction?{x:p.x+p.direction.x*.45,y:p.y+p.direction.y*.45}:p,w=gridToWorld(ahead.x,ahead.y);
-      const visible=!s.fog?.enabled||s.fog.isVisibleTile({x:Math.floor(p.x),y:Math.floor(p.y)});
+      const away=s.trade?.expedition?.state?.phase==='away'&&s.trade.expedition.state.wagonId===v.id,visible=!away&&(!s.fog?.enabled||s.fog.isVisibleTile({x:Math.floor(p.x),y:Math.floor(p.y)}));
       // m-nasadit-schvalenou-grafiku: the approved wagon (horse in front, drawn at the standalone horse's size) or
       // barrow with the operator's load; the drawing above stays while it loads or if it fails.
       const art=visible?this.art(v):null,key=art&&stillKey(s,art);

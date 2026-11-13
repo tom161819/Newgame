@@ -38,7 +38,7 @@ export class VehicleSystem {
     let target=this.reservedBy(worker);
     if(!target){
       // Auto takes the best free vehicle: a Horse Wagon (with its horse) before a Wheelbarrow, then the nearest.
-      const wanted=mode==='auto'?['horse_wagon','wheelbarrow']:[mode],options=[...this.vehicles.values()].filter(v=>v.state==='parked'&&wanted.includes(v.type)&&this.usable(v));
+      const wanted=mode==='auto'?['horse_wagon','wheelbarrow']:[mode],options=[...this.vehicles.values()].filter(v=>v.state==='parked'&&wanted.includes(v.type)&&this.usable(v)&&v.id!==this.scene.trade?.expedition?.state?.wagonId/* m-karavana-vyslat: the caravan's wagon */);
       if(!options.length)return false;
       target=options.sort((a,b)=>wanted.indexOf(a.type)-wanted.indexOf(b.type)||Math.hypot(a.x-worker.tile.x,a.y-worker.tile.y)-Math.hypot(b.x-worker.tile.x,b.y-worker.tile.y))[0];
       target.operatorId=worker.id;target.state='reserved';this.changed();

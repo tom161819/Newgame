@@ -1,3 +1,4 @@
+import { Expedition } from './Expedition.js';
 import { devFactor } from '../data/devBalance.js';
 import { price,tradeableResources,demand,merchantTypical,PRICE_MODEL,AUTO_TRADE,autoRule ,effectiveAutoRule,vehicleSalePrice} from '../data/trade.js';
 import { EDIBLE_RESOURCES } from '../data/seasons.js';
@@ -26,7 +27,7 @@ export function validateTradeStats(st,{check,number,integer,array,resource,day})
 }
 export class TradeSystem {
   constructor(scene){
-    this.scene=scene;this.orders=[];this.seq=0;this.listeners=new Set();this.stats=emptyTradeStats();this.auto=emptyAutoTrade();
+    this.scene=scene;this.orders=[];this.seq=0;this.listeners=new Set();this.stats=emptyTradeStats();this.auto=emptyAutoTrade();this.expedition=new Expedition(this);
     if(scene.caravans)scene.caravans.deliveryPending=caravan=>this.openOrders(caravan.id).some(o=>o.status==='Transporting');
   }
   get storage(){return this.scene.foodStorage;}
@@ -168,6 +169,7 @@ export class TradeSystem {
   cancel(id){const o=this.orders.find(o=>o.id===id&&OPEN.has(o.status));if(!o)return false;o.status=o.delivered>0?'PartiallyCompleted':'Cancelled';this.changed();return true;}
   caravanLeft(caravan){let any=false;for(const o of this.openOrders(caravan.id)){o.status=o.delivered>0?'PartiallyCompleted':'Cancelled';any=true;}if(any)this.changed();}
   update(){
+    this.expedition.update();
     this.autoTrade();
     const c=this.caravan;let dirty=false;
     for(const o of this.openOrders()){
@@ -218,7 +220,7 @@ export class TradeSystem {
     return tasks;
   }
   // Open orders and the last 30 finished ones (for the panel) are kept.
-  exportState(){this.pruneHistory();const closed=this.orders.filter(o=>!OPEN.has(o.status)).slice(-30);return {seq:this.seq,orders:this.orders.filter(o=>OPEN.has(o.status)||closed.includes(o)).map(o=>({...o})),stats:structuredClone(this.stats),auto:structuredClone(this.auto)};}
-  importState(state){this.seq=state?.seq??0;this.orders=(state?.orders??[]).map(o=>({...o}));this.stats=state?.stats?structuredClone(state.stats):emptyTradeStats();this.auto=state?.auto?structuredClone(state.auto):emptyAutoTrade();this.autoCheckedAt=undefined;this.changed();}
+  exportState(){this.pruneHistory();const closed=this.orders.filter(o=>!OPEN.has(o.status)).slice(-30);return {seq:this.seq,orders:this.orders.filter(o=>OPEN.has(o.status)||closed.includes(o)).map(o=>({...o})),stats:structuredClone(this.stats),auto:structuredClone(this.auto),...(this.expedition.state?{expedition:this.expedition.exportState()}:{})};}
+  importState(state){this.expedition.importState(state?.expedition??null);this.seq=state?.seq??0;this.orders=(state?.orders??[]).map(o=>({...o}));this.stats=state?.stats?structuredClone(state.stats):emptyTradeStats();this.auto=state?.auto?structuredClone(state.auto):emptyAutoTrade();this.autoCheckedAt=undefined;this.changed();}
   destroy(){this.listeners.clear();if(this.scene.caravans)this.scene.caravans.deliveryPending=()=>false;}
 }

@@ -1225,3 +1225,4 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 .own-store-list { list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:2px 10px; }
 .own-store-list small, .own-store-empty { color:#9a9680; }
 .own-store-full { color:#d08a6a; margin:2px 0 0; }
+.market-expedition { margin:6px 0; } .market-expedition h3 { margin:0 0 4px; font-size:13px; } .market-expedition-goods { display:flex; flex-wrap:wrap; gap:4px 12px; font-size:12px; } .market-expedition-goods input { width:56px; } .market-expedition-reason, .market-expedition-heavy { color:#d08a6a; font-size:12px; }

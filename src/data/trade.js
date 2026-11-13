@@ -83,3 +83,9 @@ export const MERCHANT_TYPES=Object.freeze({
   ore_iron:{stock:{iron_ore:[20,60],iron:[3,10]}},
   arms:{stock:{bow:[1,4],sword:[1,3],armor:[1,2],iron:[2,6]}},
 });
+// m-karavana-vyslat (owner, 12 Nov): the kingdom's own caravan. A free Horse Wagon carries the goods (load units as a
+// Hauler with a Horse Wagon); soldiers may escort it. It is away 2–4 days; an ambush may take part of the goods (30 %
+// without escort, less per escort, at least 3 %); escorts never die. Goods sell at today's market price ± 10 %.
+export const EXPEDITION=Object.freeze({days:Object.freeze([2,4]),risk:.3,minRisk:.03,escort:Object.freeze({recruit:.05,soldier:.08,swordsman:.08,archer:.08,knight:.12}),
+  loss:Object.freeze([.2,.6]),spread:.1,gatherHours:2,hurt:.5});
+export function expeditionRisk(escortTypes){return Math.max(EXPEDITION.minRisk,EXPEDITION.risk-escortTypes.reduce((n,type)=>n+(EXPEDITION.escort[type]??EXPEDITION.escort.recruit),0));}

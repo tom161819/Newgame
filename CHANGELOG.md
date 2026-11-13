@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.106.0] - 2026-11-13
+<!-- version: {"title":"Own caravan","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Send your own caravan from the Marketplace: needs a free Horse Wagon (else the button says why). Choose goods (anything, weapons and armour too) up to the wagon's load and how many soldiers escort it; the window shows the estimated earnings and the risk of an ambush. It is away 2–4 days and comes back with gold; after an ambush part of the goods is lost and the escort is hurt (nobody dies).
+
 ## [0.105.0] - 2026-11-13
 <!-- version: {"title":"Wall patrol","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

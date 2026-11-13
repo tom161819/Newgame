@@ -1,3 +1,4 @@
+import { validExpedition } from './Expedition.js';
 import { fishingGround } from './FishingSystem.js';
 import { SQUAD_MAX } from '../ui/armySquads.js';
 import { validHaulPriority } from '../data/logistics.js';
@@ -561,7 +562,8 @@ export function validateGameState(input,registry=objectRegistry){
   part='children';if(s.children!==undefined)validateChildrenState(s.children,{check,number,integer,array,buildingIds:new Set(s.buildings.map(b=>b.id))});
   part='domestic';if(s.domestic!==undefined)validateDomesticState(s.domestic,{check,number,integer,array,day:s.time?.day??1,buildingIds:new Set(s.buildings.map(b=>b.id)),locationIds:new Set((s.foodStorage?.locations??[]).map(l=>l.id)),workerIds:new Set((s.workers??[]).map(w=>w.id)),time:s.time});
   part='trade';if(s.trade!==undefined){
-    const v=s.trade;check(v&&typeof v==='object'&&Object.keys(v).sort().join()==='auto,orders,seq,stats');
+    const v=s.trade;check(v&&typeof v==='object'&&['auto,orders,seq,stats','auto,expedition,orders,seq,stats'].includes(Object.keys(v).sort().join()));
+    /* m-karavana-vyslat: the kingdom's own caravan, optional */check(validExpedition(v.expedition,{workerIds:new Set((s.workers??[]).map(w=>w.id)),buildingIds:new Set(s.buildings.filter(b=>b.type==='marketplace').map(b=>b.id)),vehicleIds:new Set((s.vehicles?.vehicles??[]).filter(x=>x.type==='horse_wagon').map(x=>x.id)),registry}));
     // m-ukladani-chyba: saves of 0.100 and older may keep prices older than the history window; they drop out here.
     {const day=s.time?.day??1,h=v.stats?.history;if(h&&typeof h==='object'&&Number.isInteger(day))for(const [id,rows]of Object.entries(h))if(Array.isArray(rows)){h[id]=rows.filter(e=>!(Number.isInteger(e?.day)&&e.day<=day-PRICE_MODEL.historyDays));if(!h[id].length)delete h[id];}}validateAutoTrade(v.auto,{check,integer,resource:id=>definition(id,'resource')});validateTradeStats(v.stats,{check,number,integer,array,resource:id=>definition(id,'resource'),day:s.time?.day??1});integer(v.seq,0);array(v.orders,200);const ids=new Set();
     for(const o of v.orders){

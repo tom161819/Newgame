@@ -1,3 +1,5 @@
+import { wagonLoad } from '../systems/Expedition.js';
+import { expeditionRisk } from '../data/trade.js';
 import { t } from '../i18n/index.js';
 import { element } from './objectLabels.js';
 import { priceTable,price,TRADE_RULES,PRICE_MODEL,AUTO_TRADE } from '../data/trade.js';
@@ -24,12 +26,38 @@ export class MarketplacePanel {
     // jumps on the periodic refresh (the panel refreshes every second and on every trade change).
     const status=document.querySelector('#marketplace-status'),lines=[...this.caravanLines(b),element('p','',t('market.space',{used:this.goods(b),capacity})),element('p','',t('market.loadingSpots',{count:d.trade?.loadingSpots??TRADE_RULES.loadingSpots})),...this.orderLines(b)];
     const statusKey=lines.map(l=>l.outerHTML??l.textContent).join('|');if(statusKey!==this.statusKey||!status.children.length){this.statusKey=statusKey;status.replaceChildren(...lines);}
+    this.renderExpedition(b);
     this.renderTrade(b);
     const prices=this.prices(),pricesKey=JSON.stringify(prices.map(r=>[r.resource,r.name,r.buy,r.sell,r.stock,r.caravan]));
     if(pricesKey!==this.pricesKey){this.pricesKey=pricesKey;const rows=prices.map(row=>{const tr=element('tr');tr.dataset.marketResource=row.resource;tr.append(element('th','',row.name),this.priceCell(row,'buy'),this.priceCell(row,'sell'));return tr;});
       document.querySelector('#marketplace-prices tbody').replaceChildren(...rows);this.decorate(document.querySelector('#marketplace-prices'));}
     this.renderAuto();
     this.renderStats();
+  }
+  // m-karavana-vyslat: send the kingdom's own caravan. Grey with the reason while impossible; a form while open.
+  renderExpedition(b){
+    const root=document.querySelector('#marketplace-expedition'),x=this.scene.trade?.expedition;if(!root||!x)return;
+    if(root.contains(document.activeElement))return;
+    const st=x.state,blocker=x.blocker(),goods=x.goods(),escorts=x.escorts();this.expGoods??={};this.expEscort??=0;
+    const key=JSON.stringify([st?.phase,st?.returnAt,blocker,this.expOpen,goods.map(g=>[g.resource,g.available,g.unit]),escorts.length,this.expGoods,this.expEscort,this.expError]);if(key===this.expKey)return;this.expKey=key;
+    const parts=[element('h3','',t('expedition.title'))];
+    if(st){parts.push(element('p','',st.phase==='gathering'?t('expedition.gatheringStatus'):t('expedition.awayUntil',{days:Math.max(0,Math.round((st.returnAt-this.scene.gameTime.totalElapsed)/this.scene.gameTime.dayDuration*10)/10)})));
+      if(st.phase==='gathering'){const c=element('button','',t('expedition.cancel'));c.type='button';c.addEventListener('click',()=>{x.cancel();this.expKey=null;this.render();});parts.push(c);}
+      root.replaceChildren(...parts);return;}
+    const open=element('button','',t('expedition.button'));open.type='button';open.id='expedition-open';open.disabled=!!blocker;open.addEventListener('click',()=>{this.expOpen=!this.expOpen;this.expKey=null;this.render();});parts.push(open);
+    if(blocker)parts.push(element('p','market-expedition-reason',t(`expedition.block.${blocker}`)));
+    if(!blocker&&this.expOpen){
+      const capacity=wagonLoad(),load=x.load(this.expGoods),list=element('div','market-expedition-goods');
+      for(const g of goods){const label=element('label','',`${g.name} (${g.available}) `),input=element('input');input.type='number';input.min='0';input.max=String(g.available);input.step='1';input.value=String(this.expGoods[g.resource]??0);input.dataset.expeditionGood=g.resource;
+        input.addEventListener('change',()=>{const v=Math.max(0,Math.min(g.available,Math.floor(Number(input.value)||0)));if(v)this.expGoods[g.resource]=v;else delete this.expGoods[g.resource];this.expKey=null;input.blur();this.render();});label.append(input);list.append(label);}
+      const escort=element('label','',t('expedition.escort',{count:this.expEscort,max:escorts.length})+' '),range=element('input');range.type='range';range.min='0';range.max=String(escorts.length);range.value=String(Math.min(this.expEscort,escorts.length));range.id='expedition-escort';
+      range.addEventListener('change',()=>{this.expEscort=Number(range.value);this.expKey=null;range.blur();this.render();});escort.append(range);
+      const chosen=escorts.slice(0,this.expEscort),risk=expeditionRisk(chosen.map(w=>x.escortType(w)));
+      parts.push(list,element('p',load>capacity?'market-expedition-heavy':'',t('expedition.load',{load,capacity})),escort,element('p','',t('expedition.estimate',{gold:x.estimate(this.expGoods)})),element('p','',t('expedition.risk',{percent:Math.round(risk*100)})));
+      if(this.expError)parts.push(element('p','market-expedition-reason',t(`expedition.error.${this.expError}`)));
+      const send=element('button','',t('expedition.send'));send.type='button';send.id='expedition-send';send.addEventListener('click',()=>{const r=x.send(b.id,{...this.expGoods},chosen.map(w=>w.id));this.expError=r.ok?null:r.error;if(r.ok){this.expGoods={};this.expOpen=false;}this.expKey=null;this.render();});parts.push(send);
+    }
+    root.replaceChildren(...parts);
   }
   // Trade F2: live prices from the kingdom's and the caravan's stock.
   // m-ui-prehled-surovin (26): goods sorted by resource group, each row with the good's icon and the group's tint.
