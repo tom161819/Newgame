@@ -19,6 +19,18 @@ export async function wikiSmoke(context,url,instrument){
     await page.evaluate(()=>window.__game.registry.get('application').scene.eventFeed.push('rats:smoke','Rats in the Granary!',{important:true}));
     await page.locator('#event-feed .wiki-info[data-wiki-topic="rats"]').click();await page.locator('#wiki-dialog[open]').waitFor();
     assert.equal(await page.locator('#wiki-page').getAttribute('data-wiki-current'),'topic:rats');await page.keyboard.press('Escape');
-    console.log('PASS Wiki: button next to ?, categories, search, generated Granary page with facts, link to Rats & Cats and Back, "i" on a rats feed line opens the topic');
+    // m-wiki-v2: the "?" in a building window opens its page; the All chains page links into the bread chain.
+    await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(x=>(x.type??x.definition?.id)==='starter_stockpile');s.storagePanel.open(b);});
+    await page.locator('#storage-dialog[open] .wiki-help:not([hidden])').click();await page.locator('#wiki-dialog[open]').waitFor();
+    assert.equal(await page.locator('#wiki-page').getAttribute('data-wiki-current'),'building:starter_stockpile');
+    await page.evaluate(()=>window.__game.registry.get('application').scene.wikiPanel.show('topic:chains'));
+    assert.ok(await page.locator('.wiki-chain-row').count()>=10,'chains');
+    await page.locator('.wiki-section-chain [data-wiki-page="building:bakery"]').first().click();
+    assert.equal(await page.locator('#wiki-page').getAttribute('data-wiki-current'),'building:bakery');
+    for(const key of ['why','how','chain','numbers','tips'])assert.equal(await page.locator(`[data-wiki-section="${key}"]`).count(),1,key);
+    assert.ok(await page.locator('.wiki-step-here').count()>=2,'bakery marked in its chain');
+    if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/wiki-bakery.png`});
+    await page.keyboard.press('Escape');await page.evaluate(()=>window.__game.registry.get('application').scene.storagePanel.close?.());
+    console.log('PASS Wiki: button next to ?, "?" in a building window, All chains → Bakery with its sections, categories, search, generated Granary page with facts, link to Rats & Cats and Back, "i" on a rats feed line opens the topic');
   }finally{await page.close();}
 }

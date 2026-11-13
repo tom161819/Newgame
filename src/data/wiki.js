@@ -1,7 +1,11 @@
 // m-wiki-napoveda (owner 7 Nov 2026): the in-game Wiki. Pages for buildings, resources and professions are generated
 // from the game's own data (src/systems/Wiki.js), so they never go out of date. The topic pages below are written by
 // hand (texts `wiki.topic.<id>.title` / `.body` in i18n, EN and CS) and link to related pages.
-export const WIKI_CATEGORIES=Object.freeze(['buildings','resources','professions','animals','needs','policy','trade','seasons','events']);
+// m-wiki-v2: hand-written parts of a page (i18n key wiki.text.<kind>.<id>.<part>) and the ends of a chain.
+export const WIKI_TEXT_PARTS=Object.freeze(['why','how','tips']);
+export const wikiTextKey=(pageId,part)=>`wiki.text.${String(pageId).replace(':','.')}.${part}`;
+export const WIKI_SINKS=Object.freeze(['people','construction','haulers']);
+export const WIKI_CATEGORIES=Object.freeze(['chains','buildings','resources','professions','animals','needs','policy','trade','seasons','events']);
 export const WIKI_TOPICS=Object.freeze([
   Object.freeze({id:'rats',category:'animals',links:Object.freeze(['building:granary','building:farmhouse','topic:dogs','resource:bread'])}),
   Object.freeze({id:'dogs',category:'animals',links:Object.freeze(['building:hunting_lodge','profession:hunter','topic:rats'])}),

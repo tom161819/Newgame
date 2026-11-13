@@ -1001,6 +1001,21 @@ tr[data-resource-group="equipment"] { background:var(--group-equipment); }
 .wiki-facts dt { color:var(--muted); } .wiki-facts dd { margin:0; }
 .wiki-related a { color:var(--gold); }
 .wiki-back { margin-bottom:6px; padding:2px 8px; font-size:12px; }
+/* m-wiki-v2: sections, production chains and the "?" in window headings */
+.wiki-section { margin:0 0 12px; }
+.wiki-section-title { margin:0 0 4px; font-size:13px; color:var(--gold); text-transform:uppercase; letter-spacing:.05em; }
+.wiki-section .wiki-text { margin:0 0 6px; }
+.wiki-bullet { padding-left:10px; }
+.wiki-chain { display:grid; gap:5px; }
+.wiki-chain-row { display:flex; flex-wrap:wrap; align-items:center; gap:4px; }
+.wiki-step { padding:1px 7px; border:1px solid var(--line-soft); border-radius:4px; font-size:12.5px; white-space:nowrap; }
+.wiki-step-resource { border-style:dashed; color:var(--muted); }
+.wiki-step-resource.wiki-link { color:var(--ink); }
+.wiki-step-sink { border:0; font-style:italic; color:var(--muted); }
+.wiki-step-here { border-color:var(--gold); color:var(--gold); font-weight:700; }
+.wiki-chain-arrow { color:var(--muted); font-size:12px; }
+.wiki-help { min-width:0; padding:0 8px; font-weight:700; }
+.wiki-help[hidden] { display:none; }
 .wiki-info { display:inline-grid; place-items:center; width:16px; height:16px; min-width:0; min-height:0; padding:0; margin-left:4px; border-radius:50%; font:italic 700 11px/1 Georgia,serif; vertical-align:middle; pointer-events:auto; cursor:pointer; }
 .event-feed .wiki-info { pointer-events:auto !important; }
 @media (max-width:640px) { .wiki-body { grid-template-columns:1fr; } .wiki-nav { border-right:0; border-bottom:1px solid var(--line-soft); max-height:160px; } }

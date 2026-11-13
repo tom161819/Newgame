@@ -5,6 +5,18 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.109.0] - 2026-11-13
+<!-- version: {"title":"Wiki v2: sections and production chains","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Wiki: every page now has fixed sections – what it is for, how it works, where it comes from and where it goes, numbers, tips and unlocking.
+- Wiki: production chains drawn from the game data on building and resource pages (e.g. Wheat Field → Wheat → Mill → Flour → Bakery → Bread → eaten by the people), and a new All production chains page.
+- A "?" in building, unit and nature windows opens the matching Wiki page.
+- More numbers on pages: build time, work radius, batch time, mining speed and reach, harvest, stored goods, fuel, light radius, sight.
+- The bread chain (Farmhouse, Wheat Field, Mill, Bakery, Granary, Wheat, Flour, Bread, Farmer, Miller, Baker) is fully written up in English and Czech.
+
+### Changed
+- Wiki search also finds text inside the pages, not only titles.
+
 ## [0.108.0] - 2026-11-13
 <!-- version: {"title":"Map size choice","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

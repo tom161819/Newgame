@@ -28,3 +28,36 @@ test('topics are written in both languages; feed and notice mappings name existi
   assert.equal(wikiTopicForFeed('rats:house:12:3'),'rats');assert.equal(wikiTopicForFeed('built:7'),null);
   const tip=TIPS.find(x=>x.id==='rats');assert.equal(tip.wiki,'rats');assert.ok(en['tips.rats']&&cs['tips.rats']);
 });
+
+// m-wiki-v2 (plan 36): pages have sections in a fixed order, production chains come from the data, the "?" in
+// window headings points at existing dialogs, and the hand-written texts are tracked in both languages.
+import { readFileSync } from 'node:fs';
+import { wikiTextCoverage,wikiGraph,allChains } from '../src/systems/Wiki.js';
+import { WIKI_HELP_DIALOGS } from '../src/ui/WikiPanel.js';
+import { WIKI_TEXT_PARTS,wikiTextKey } from '../src/data/wiki.js';
+test('wiki v2: sections, chains and the All chains page',()=>{
+  const pages=buildWikiPages(objectRegistry,t,{has:k=>k in en});
+  const order=['why','how','chain','numbers','tips','unlock'];
+  for(const p of pages.values()){const keys=p.sections.map(s=>s.key).filter(k=>order.includes(k));assert.deepEqual(keys,[...keys].sort((a,b)=>order.indexOf(a)-order.indexOf(b)),p.id);
+    for(const s of p.sections)for(const row of s.rows??[])for(const st of row.steps){assert.ok(st.label,p.id);if(st.page)assert.ok(pages.has(st.page),`${p.id} → ${st.page}`);}}
+  const bakery=pages.get('building:bakery'),chain=bakery.sections.find(s=>s.key==='chain');
+  const line=row=>row.steps.map(s=>s.page??s.sink).join('>');
+  assert.ok(chain.rows.some(r=>line(r)==='building:wheat_field>resource:wheat>building:mill>resource:flour>building:bakery'));
+  assert.ok(chain.rows.some(r=>line(r)==='building:bakery>resource:bread>people'));
+  assert.ok(bakery.sections.find(s=>s.key==='numbers').facts.some(([k,v])=>k==='One batch takes'&&v==='30 s'));
+  const tower=pages.get('building:tower');assert.ok(tower.sections.find(s=>s.key==='chain').rows.some(r=>r.steps.at(-2)?.page==='resource:torch'));
+  const all=pages.get('topic:chains').sections.find(s=>s.key==='chain').rows.map(line);
+  for(const want of ['building:wheat_field>resource:wheat>building:mill>resource:flour>building:bakery>resource:bread>people','building:hunting_lodge>resource:meat>people'])assert.ok(all.includes(want),want);
+  assert.ok(all.some(l=>l.endsWith('resource:sword>building:barracks')));assert.equal(new Set(all).size,all.length);
+  assert.ok(allChains(wikiGraph(objectRegistry)).length>=10);
+  assert.ok(searchWiki(pages,'Farmhouse store').some(p=>p.id==='building:mill'),'search reads the sections');
+});
+test('wiki v2: the bread chain is written in both languages; the "?" buttons point at real dialogs',()=>{
+  const bread=['building:farmhouse','building:wheat_field','building:mill','building:bakery','building:granary','resource:wheat','resource:flour','resource:bread','profession:farmer','profession:miller','profession:baker'];
+  for(const id of bread)for(const part of WIKI_TEXT_PARTS)for(const lang of [en,cs])assert.ok(lang[wikiTextKey(id,part)]?.length>10,`${id} ${part}`);
+  // Texts must not exist for pages that do not exist, and the coverage report lists what is still missing.
+  const pages=buildWikiPages(objectRegistry,t,{has:k=>k in en});
+  for(const key of Object.keys(en).filter(k=>k.startsWith('wiki.text.'))){const [, ,kind,id]=key.split('.');assert.ok(pages.has(`${kind}:${id}`),key);assert.ok(cs[key],`cs ${key}`);}
+  const missing=wikiTextCoverage(pages,k=>k in en&&k in cs);for(const id of bread)assert.ok(!missing.some(k=>k.startsWith(wikiTextKey(id,''))),id);
+  const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');for(const id of Object.keys(WIKI_HELP_DIALOGS))assert.ok(html.includes(`id="${id}"`),id);
+});
