@@ -1,3 +1,4 @@
+import { advanceMovement } from './movement.js';
 import { workingCommand,commanded } from '../systems/UnitCommands.js';
 import { AnimalController } from './AnimalController.js';
 import { createExperience } from '../data/experience.js';
@@ -22,6 +23,7 @@ export class WorkerController extends AnimalController {
   reservedTiles(){return this.isAlive&&this.sleepingIn==null?super.reservedTiles():[];}
   moveTo(goals){const route=findPathToAny(this.scene.workerSystem?.navigationMap(this)??this.scene.map,this.nextTile??this.tile,goals,this.scene.pathWear?.routingOptions(this));this.path=route?.path??[];return !!route;}
   canEnterTile(tile){
+    if(this.onWall)return true;/* m-hlidka-hradby: on the wall walk the route is already a chain of joined walls */
     if(commanded(this))return this.scene.workerSystem.commands.canStep(this,tile);
     if(!this.scene.workplaceSystem)return true;
     if(canStep(this.scene.workerSystem.navigationMap(this),this.tile,tile))return true;
@@ -30,6 +32,10 @@ export class WorkerController extends AnimalController {
     this.path=[];this.aiCooldown=100+Math.floor(Math.random()*400);return false;
   }
   stop(){this.path=[];}
-  update(delta){super.update(delta);this.view.setWorkPose?.(delta,this.profession==='farmer'&&this.workState==='Working'&&!this.walking);this.view.setSeated?.(!!this.seated&&!this.walking);
+  update(delta){
+    // Anything else taking over (rest at night, a new job, death) brings him down from the wall first.
+    if(this.onWall&&(!this.isAlive||!this.wallPatrol||(this.scene.gameTime?.totalElapsed??0)-(this.wallPatrol.lastTick??0)>1500))this.scene.military?.wallPatrol?.leave(this);
+    if(this.onWall&&this.isAlive){this.availableWorkMs=0;advanceMovement(this,delta);this.scene.military?.wallPatrol?.place(this);this.view.animate?.(delta,this.walking,this.direction);return;}
+    super.update(delta);this.view.setWorkPose?.(delta,this.profession==='farmer'&&this.workState==='Working'&&!this.walking);this.view.setSeated?.(!!this.seated&&!this.walking);
     if(this.profession==='fisher'||this.fishingView)this.fishingView=!!this.view.setFishing?.(delta,fishingInfo(this,this.scene));}
 }

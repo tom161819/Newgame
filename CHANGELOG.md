@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.105.0] - 2026-11-13
+<!-- version: {"title":"Wall patrol","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Army order "Patrol – walls": chosen soldiers climb to the wall walk at a wall beside a Tower or Gate, walk the walls and stop 5–15 s at each Tower and Gate; they see 3 tiles farther from the wall, and Archers shoot from it.
+
 ## [0.104.0] - 2026-11-13
 <!-- version: {"title":"Gate 2 × 2","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

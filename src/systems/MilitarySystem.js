@@ -1,3 +1,4 @@
+import { WallPatrol,WALL_PATROL } from './WallPatrol.js';
 import { UNIT_TYPES,unitKit,KNIGHT_SPEED,START_GARRISON,RECRUIT } from '../data/military.js';
 import { MILITARY_ITEMS } from '../data/militaryEquipment.js';
 import { buildingIsComplete } from '../game/buildings.js';
@@ -10,7 +11,7 @@ import { MILITARY_RULES,PATROL } from '../data/military.js';
 // (Haulers carry them from an Armory to the Barracks kit store) and game time at the Barracks. A trained unit wears
 // its items; discharge or death drops them where the unit stands and Haulers return them to an Armory.
 export class MilitarySystem {
-  constructor(scene){this.scene=scene;this.units=new Map();this.orders=new Map();this.nextOrder=1;}
+  constructor(scene){this.scene=scene;this.units=new Map();this.orders=new Map();this.nextOrder=1;this.wallPatrol=new WallPatrol(scene);}
   get storage(){return this.scene.foodStorage;}
   barracks(id){return this.scene.buildings.find(b=>b.id===id&&b.type==='barracks'&&buildingIsComplete(b))??null;}
   // m-zalozka-vojsko: the patrol round of the settlement – walkable waypoints on a ring around all finished buildings,
@@ -124,6 +125,9 @@ export class MilitarySystem {
     const order=this.order(worker),combat=this.scene.combat,unit=this.unit(worker);
     if(order?.state==='training'){combat.stopAttack(worker);worker.workState='Working';worker.workMessage='Training';
       if(!this.scene.workplaceSystem.atWorkplace(worker)&&!worker.nextTile&&!worker.path.length&&worker.aiCooldown<=0){worker.aiCooldown=1000;worker.moveTo(this.scene.workplaceSystem.goals(worker));}return true;}
+    // m-hlidka-hradby: on the wall walk (or on the way up) the patrol leads; an Archer on a wall shoots threats in range.
+    if(worker.wallPatrol){this.wallPatrol??=new WallPatrol(this.scene);if(worker.onWall&&worker.attackRange>1){const target=this.threat(worker);if(target&&inAttackRange(worker,target,this.scene.map)){worker.path=[];combat.startAttack(worker,target);return true;}}
+      if(this.wallPatrol.update(worker,delta))return true;}
     // kasarna-branci: Recruits defend near their Barracks too, with their basic stats.
     if(!(unit||this.isRecruit(worker))||worker.commandState?.state==='Holding')return false;
     // m-vlk-zustava: "Hunt the wolf" sends a soldier after a lurking wolf anywhere on the map until it is dead or gone.

@@ -60,6 +60,8 @@ const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
 export function serializeActor(unit){
+  // m-hlidka-hradby: a soldier on the wall walk is saved on the ground where he climbed up (he climbs again after loading).
+  const ground=unit.onWall&&unit.wallPatrol?.ground;if(ground)unit={...unit,tile:{...ground},position:{x:ground.x+.5,y:ground.y+.5},nextTile:null,path:[]};
   return {...Object.fromEntries(actorFields.filter(k=>unit[k]!==undefined).map(k=>[k,unit[k]])),
     ...(unit.experience?{experience:copy(unit.experience)}:{}),
     ...(unit.skills?{skills:copy(unit.skills),activitySkill:unit.activitySkill??null}:{}),
@@ -121,7 +123,7 @@ export function serializeGameState(scene){
     ...(scene.foodStorage?{foodStorage:scene.foodStorage.exportState(),foodProduction:scene.foodProduction.exportState()}:{}),
     ...(scene.workerSystem?{population:scene.workerSystem.exportState(),workers:[...scene.workerSystem.workers.values()].map(w=>({...serializeActor(w),commandState:copy(w.commandState??{state:'Working',goal:null}),name:w.name,...(w.identity?{identity:copy(w.identity)}:{}),profession:w.profession,displayProfession:w.displayProfession,manualRockId:w.manualRockId,isSubject:w.isSubject!==false,diedAt:w.diedAt??null,
       ...(w.naturalTalent?{naturalTalent:w.naturalTalent,initialSkills:copy(w.initialSkills)}:{}),
-      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),...(w.haulPriority&&w.haulPriority.kind!=='any'?{haulPriority:copy(w.haulPriority)}:{}),...(Number.isInteger(w.squad)&&w.profession==='soldier'?{squad:w.squad}:{}),workplaceReached:w.workplaceReached,...(w.restPhase&&w.isAlive&&w.isSubject?{restPhase:w.restPhase}:{}),...(w.tendTorches?{tendTorches:true}:{}),...(w.clearingLoan&&w.isAlive&&w.isSubject&&w.profession==='miner'&&w.assignedWorkplaceId!=null?{clearingLoan:true}:{}),cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
+      ...(w.stoneCollection?{stoneCollection:copy(w.stoneCollection)}:{}),...(w.haulPriority&&w.haulPriority.kind!=='any'?{haulPriority:copy(w.haulPriority)}:{}),...(Number.isInteger(w.squad)&&w.profession==='soldier'?{squad:w.squad}:{}),...(w.wallPatrol&&w.profession==='soldier'&&w.isAlive?{wallPatrol:true}:{}),workplaceReached:w.workplaceReached,...(w.restPhase&&w.isAlive&&w.isSubject?{restPhase:w.restPhase}:{}),...(w.tendTorches?{tendTorches:true}:{}),...(w.clearingLoan&&w.isAlive&&w.isSubject&&w.profession==='miner'&&w.assignedWorkplaceId!=null?{clearingLoan:true}:{}),cargo:copy(w.cargo),pendingWorkRewards:copy(w.pendingWorkRewards),
       workState:w.workState,workMessage:w.workMessage??'',workTask:copy(w.workTask),assignedWorkplaceId:w.assignedWorkplaceId,arriving:w.arriving,aiCooldown:w.aiCooldown}))}:{}),
     ...(scene.pathWear?{pathWear:scene.pathWear.exportState()}:{}),
     player:{...serializeActor(c),state:c.state,currentTowerId:c.currentTower?.id??null,horseId:c.mountedHorse?.id??null,
@@ -346,6 +348,8 @@ export function validateGameState(input,registry=objectRegistry){
       if(w.tendTorches!==undefined)check(w.tendTorches===true);
       // Army squads (owner, 12 Nov): optional squad number of a soldier.
       if(w.squad!==undefined){integer(w.squad,1,SQUAD_MAX);check(w.profession==='soldier');}
+      // m-hlidka-hradby: optional wall patrol order of a soldier.
+      if(w.wallPatrol!==undefined)check(w.wallPatrol===true&&w.profession==='soldier');
       // m-oznacovani-tezby (56): a Miner lent out to the rocks of a wall plan keeps his workplace.
       if(w.clearingLoan!==undefined)check(w.clearingLoan===true&&w.isAlive&&w.isSubject&&w.profession==='miner'&&w.assignedWorkplaceId!=null);
       check(typeof w.workMessage==='string'&&w.workMessage.length<200);

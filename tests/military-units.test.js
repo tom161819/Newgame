@@ -189,3 +189,15 @@ test('m-vlk-zustava: "Hunt the wolf" sends a soldier after a lurking wolf far fr
   w.huntWolfId=wolf.id;let t=0;while(t<120000&&wolf.isAlive&&s.combat.attacks.get(w)!==wolf){s.tick(50);t+=50;}
   assert.ok(!wolf.isAlive||s.combat.attacks.get(w)===wolf,'the soldier reaches the wolf and fights it');
 });
+test('m-hlidka-hradby: a soldier on "Patrol – walls" climbs at a wall beside a Tower, walks the walls between stops and is saved on the ground', async () => {
+  const { placeWallLine } = await import('../src/game/walls.js');const { canPatrolWalls,wallStops } = await import('../src/systems/WallPatrol.js');
+  const {s,barracks}=kingdom();assert.equal(canPatrolWalls(s.buildings),false,'no walls yet');
+  const add=(type,x,y)=>{const d=s.objectRegistry.require(type),tiles=[];for(let j=0;j<d.height;j++)for(let i=0;i<d.width;i++)tiles.push({x:x+i,y:y+j});const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,x,y,tiles};s.buildings.push(b);for(const t of tiles)s.map[t.y][t.x]=d.walkable?0:1;s.towerViews.set(b.id,s.createBuildingView(d,b));return b;};
+  add('tower',62,60);for(let x=64;x<72;x++)add('wall',x,61);add('tower',72,60);s.events?.emit?.('buildings:changed');void placeWallLine;
+  assert.equal(wallStops(s.buildings).length,2,'two walls touch a Tower');
+  const w=soldier(s,barracks,{x:58,y:64},3);s.military.wallPatrol.set(w,true);
+  let onWall=false,moved=new Set();for(let i=0;i<4000;i++){s.tick(50);if(w.onWall){onWall=true;moved.add(`${w.tile.x},${w.tile.y}`);}if(moved.size>=6)break;}
+  assert.ok(onWall,'climbed up');assert.ok(moved.size>=6,`walks the walls (${moved.size} tiles)`);
+  const data=validateGameState(serializeGameState(s)),saved=data.workers.find(x=>x.id===w.id);assert.equal(saved.wallPatrol,true);
+  assert.equal(s.map[saved.tile.y][saved.tile.x],0,'saved on walkable ground');
+});

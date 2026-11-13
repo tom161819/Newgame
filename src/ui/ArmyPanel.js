@@ -1,3 +1,4 @@
+import { canPatrolWalls } from '../systems/WallPatrol.js';
 import { t,language } from '../i18n/index.js';
 import { localized,workMessageLabel } from '../i18n/names.js';
 import { element } from './objectLabels.js';
@@ -16,7 +17,7 @@ export function armyRows(scene){
   const rank=w=>{const type=military?.unit(w)?.type;return type?RANK_ORDER.indexOf(type):RANK_ORDER.length;};
   return (scene.workerSystem?.liveSubjects?.()??[]).filter(w=>w.profession==='soldier').map(w=>{
     const barracks=scene.buildings.find(b=>b.id===w.assignedWorkplaceId)??null,shelter=w.sleepingIn!=null?scene.buildings.find(b=>b.id===w.sleepingIn):null;
-    return {id:w.id,squad:Number.isInteger(w.squad)?w.squad:null,name:w.name,rank:militaryRank(scene,w),rankOrder:rank(w),barracksId:barracks?.id??null,hp:Math.round(w.currentHP),maxHp:Math.round(w.maxHP),order:w.huntWolfId?'hunt':commanded(w)?'guard':'patrol',
+    return {id:w.id,squad:Number.isInteger(w.squad)?w.squad:null,name:w.name,rank:militaryRank(scene,w),rankOrder:rank(w),barracksId:barracks?.id??null,hp:Math.round(w.currentHP),maxHp:Math.round(w.maxHP),order:w.huntWolfId?'hunt':w.wallPatrol?'walls':commanded(w)?'guard':'patrol',
       state:shelter?t('population.soldierAsleep',{building:scene.objectRegistry.get(shelter.type)?.name??shelter.type}):w.workMessage?workMessageLabel(w.workMessage):localized(`work.state.${w.workState}`,w.workState)};
   }).sort((a,b)=>(a.barracksId??1e9)-(b.barracksId??1e9)||a.rankOrder-b.rankOrder||names.compare(a.name,b.name));
 }
@@ -30,7 +31,7 @@ export class ArmyPanel {
     this.tab=element('button','army-tab');this.tab.id='army-tab';this.tab.type='button';this.tab.setAttribute('aria-expanded','false');this.tab.setAttribute('aria-controls','army-panel');anchor.after(this.tab);
     this.panel=element('div','army-panel');this.panel.id='army-panel';this.panel.hidden=true;
     this.title=element('h2');this.hint=element('p','army-hint');this.actions=element('div','army-actions');this.list=element('div','army-list');this.buttons={};
-    for(const action of ['patrol','guard','hunt']){const b=element('button');b.type='button';b.dataset.armyOrder=action;b.addEventListener('click',()=>this.order(action),options);this.actions.append(b);this.buttons[action]=b;}
+    for(const action of ['patrol','guard','walls','hunt']){const b=element('button');b.type='button';b.dataset.armyOrder=action;b.addEventListener('click',()=>this.order(action),options);this.actions.append(b);this.buttons[action]=b;}
     // Squads: a bar of squad chips under the orders (click = choose the whole squad, Shift adds it, × dissolves it).
     this.squadBar=element('div','army-squads');this.squadBar.id='army-squads';
     this.squadBar.addEventListener('click',event=>{const out=event.target.closest('[data-squad-dissolve]');if(out){dissolveSquad(this.scene,Number(out.dataset.squadDissolve));this.update(true);return;}
@@ -58,9 +59,11 @@ export class ArmyPanel {
   order(action){
     const s=this.scene,commands=s.workerSystem.commands;if(s.gameOver||s.gameTime.paused)return;
     if(action==='hunt'){const wolves=s.nightThreats?.lurkingWolves?.()??[];if(!wolves.length){s.setStatus?.(t('army.huntNone'));return;}
-      for(const w of this.workers()){if(commanded(w))commands.resume(w);const near=[...wolves].sort((a,b)=>Math.hypot(a.position.x-w.position.x,a.position.y-w.position.y)-Math.hypot(b.position.x-w.position.x,b.position.y-w.position.y))[0];w.huntWolfId=near.id;}
+      for(const w of this.workers()){if(commanded(w))commands.resume(w);s.military?.wallPatrol?.set(w,false);const near=[...wolves].sort((a,b)=>Math.hypot(a.position.x-w.position.x,a.position.y-w.position.y)-Math.hypot(b.position.x-w.position.x,b.position.y-w.position.y))[0];w.huntWolfId=near.id;}
       s.unitSelection?.draw?.();this.update(true);return;}
-    for(const w of this.workers()){delete w.huntWolfId;if(action==='guard')commands.hold(w);else if(commanded(w))commands.resume(w);}
+    if(action==='walls'){const wp=s.military?.wallPatrol;if(!wp||!canPatrolWalls(s.buildings)){s.setStatus?.(t('army.wallsNone'));return;}
+      for(const w of this.workers()){delete w.huntWolfId;if(commanded(w))commands.resume(w);wp.set(w,true);}s.unitSelection?.draw?.();this.update(true);return;}
+    for(const w of this.workers()){delete w.huntWolfId;s.military?.wallPatrol?.set(w,false);if(action==='guard')commands.hold(w);else if(commanded(w))commands.resume(w);}
     s.unitSelection?.draw?.();this.update(true);
   }
   update(force=false){
@@ -77,7 +80,7 @@ export class ArmyPanel {
     const canMake=this.workers().length>=2;
     const units=rows.filter(r=>r.rankOrder<RANK_ORDER.length).length;this.title.textContent=t('army.title',{count:rows.length,units,recruits:rows.length-units,guards:rows.filter(r=>r.order==='guard').length});
     this.hint.textContent=t(this.picked.size?'army.hintPicked':'army.hint',{count:this.picked.size});
-    for(const [action,b] of Object.entries(this.buttons)){b.textContent=t(`army.order.${action}Button`);b.disabled=!this.picked.size||!!s.gameTime?.paused||action==='hunt'&&!(s.nightThreats?.lurkingWolves?.().length);if(action==='hunt')b.title=b.disabled&&this.picked.size?t('army.huntNone'):'';}
+    for(const [action,b] of Object.entries(this.buttons)){b.textContent=t(`army.order.${action}Button`);b.disabled=!this.picked.size||!!s.gameTime?.paused||action==='hunt'&&!(s.nightThreats?.lurkingWolves?.().length)||action==='walls'&&!canPatrolWalls(s.buildings);if(action==='hunt')b.title=b.disabled&&this.picked.size?t('army.huntNone'):'';if(action==='walls')b.title=!canPatrolWalls(s.buildings)?t('army.wallsNone'):'';}
     const nodes=[];let group=undefined;
     for(const r of rows){
       if(r.barracksId!==group){group=r.barracksId;const b=s.buildings.find(x=>x.id===group);nodes.push(element('h3','army-group',b?`${s.objectRegistry.get(b.type)?.name??b.type} #${b.id}`:t('army.noBarracks')));}

@@ -11,5 +11,6 @@ export function visibilityProfile(character){
 // Snapping to the tile keeps the circle unchanged while the subject walks within one tile.
 export function subjectSight(worker){
   const size=worker.definition.gameplay.baseSight,center={x:Math.floor(worker.position.x)+.5,y:Math.floor(worker.position.y)+.5};
-  return {id:worker.id,size,radius:size/2,center};
+  // m-hlidka-hradby: a soldier on the wall walk sees 3 tiles farther.
+  return {id:worker.id,size,radius:size/2+(worker.onWall?3:0),center};
 }
