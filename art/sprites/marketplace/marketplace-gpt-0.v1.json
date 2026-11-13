@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "marketplace",
+  "variantId": "marketplace-gpt-0",
+  "name": "GPT market square 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "227e75b8",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 197,
+  "height": 134,
+  "anchor": {
+    "x": 98,
+    "y": 83
+  },
+  "origin": {
+    "x": 0.49746,
+    "y": 0.6194
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 98,
+    "y": 131
+  },
+  "baseOrigin": {
+    "x": 0.49746,
+    "y": 0.97761
+  },
+  "visualHeight": 131,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.88,
+  "lights": [],
+  "x2": {
+    "width": 394,
+    "height": 268,
+    "anchor": {
+      "x": 196,
+      "y": 166
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

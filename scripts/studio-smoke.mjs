@@ -202,6 +202,9 @@ try {
   await page.locator('.library-item', { has: page.locator('.meta', { hasText: /^pitch-kiln ·/ }) }).first().click();
   for (const deg of [0, 90, 180, 270]) assert.match(await page.locator(`.variant-card[data-variant="pitch-kiln-gpt-${deg}"] .baked-note`).textContent(), new RegExp(`Imported image \\(GPT\\), view ${deg}°`));
   pass('GPT pitch works: four views');
+  await page.locator('.library-item', { has: page.locator('.meta', { hasText: /^marketplace ·/ }) }).first().click();
+  for (const deg of [0, 90, 180, 270]) assert.match(await page.locator(`.variant-card[data-variant="marketplace-gpt-${deg}"] .baked-note`).textContent(), new RegExp(`Imported image \\(GPT\\), view ${deg}°`));
+  pass('GPT market square: four views');
 
   await page.locator('.library-item', { hasText: 'Watchtower' }).click();
   await page.waitForFunction(() => document.querySelectorAll('.variant-card canvas').length >= 1);

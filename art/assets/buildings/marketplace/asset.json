@@ -94,6 +94,362 @@
           }
         ]
       }
+    },
+    {
+      "id": "marketplace-gpt-0",
+      "name": "GPT market square 0° (front-right)",
+      "version": 1,
+      "notes": "Paved market square with three striped stalls (fruit, goods, fish), a well, banners, signpost and tie posts. The sheet's dashed footprint outline is removed. View 0° (front-right), cut out of the owner's GPT sheet and scaled to 0.274 (the paved square = 3 × 3; 2× file at 0.548). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "ground": "stone_light",
+        "props": [
+          {
+            "type": "stall",
+            "at": [
+              -0.75,
+              -0.95
+            ],
+            "cloth": "cloth_red",
+            "goods": "food"
+          },
+          {
+            "type": "stall",
+            "at": [
+              0.35,
+              -1
+            ],
+            "cloth": "cloth_blue",
+            "goods": "cloth"
+          },
+          {
+            "type": "stall",
+            "at": [
+              -1,
+              0.15
+            ],
+            "r": 1.5708,
+            "cloth": "cloth_ochre",
+            "goods": "tools"
+          },
+          {
+            "type": "well",
+            "at": [
+              0.15,
+              0.05
+            ]
+          },
+          {
+            "type": "scales",
+            "at": [
+              -0.35,
+              0.85
+            ]
+          },
+          {
+            "type": "goodsPile",
+            "at": [
+              0.75,
+              -0.45
+            ]
+          },
+          {
+            "type": "loadingBay",
+            "at": [
+              0.55,
+              0.65
+            ]
+          },
+          {
+            "type": "loadingBay",
+            "at": [
+              1.05,
+              0.15
+            ]
+          },
+          {
+            "type": "hitchingPost",
+            "at": [
+              -0.2,
+              1.25
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "marketplace-gpt-90",
+      "name": "GPT market square 90° (rear-right)",
+      "version": 1,
+      "notes": "Paved market square with three striped stalls (fruit, goods, fish), a well, banners, signpost and tie posts. The sheet's dashed footprint outline is removed. View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 0.274 (the paved square = 3 × 3; 2× file at 0.548). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "ground": "stone_light",
+        "props": [
+          {
+            "type": "stall",
+            "at": [
+              -0.75,
+              -0.95
+            ],
+            "cloth": "cloth_red",
+            "goods": "food"
+          },
+          {
+            "type": "stall",
+            "at": [
+              0.35,
+              -1
+            ],
+            "cloth": "cloth_blue",
+            "goods": "cloth"
+          },
+          {
+            "type": "stall",
+            "at": [
+              -1,
+              0.15
+            ],
+            "r": 1.5708,
+            "cloth": "cloth_ochre",
+            "goods": "tools"
+          },
+          {
+            "type": "well",
+            "at": [
+              0.15,
+              0.05
+            ]
+          },
+          {
+            "type": "scales",
+            "at": [
+              -0.35,
+              0.85
+            ]
+          },
+          {
+            "type": "goodsPile",
+            "at": [
+              0.75,
+              -0.45
+            ]
+          },
+          {
+            "type": "loadingBay",
+            "at": [
+              0.55,
+              0.65
+            ]
+          },
+          {
+            "type": "loadingBay",
+            "at": [
+              1.05,
+              0.15
+            ]
+          },
+          {
+            "type": "hitchingPost",
+            "at": [
+              -0.2,
+              1.25
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "marketplace-gpt-180",
+      "name": "GPT market square 180° (rear-left)",
+      "version": 1,
+      "notes": "Paved market square with three striped stalls (fruit, goods, fish), a well, banners, signpost and tie posts. The sheet's dashed footprint outline is removed. View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 0.274 (the paved square = 3 × 3; 2× file at 0.548). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "ground": "stone_light",
+        "props": [
+          {
+            "type": "stall",
+            "at": [
+              -0.75,
+              -0.95
+            ],
+            "cloth": "cloth_red",
+            "goods": "food"
+          },
+          {
+            "type": "stall",
+            "at": [
+              0.35,
+              -1
+            ],
+            "cloth": "cloth_blue",
+            "goods": "cloth"
+          },
+          {
+            "type": "stall",
+            "at": [
+              -1,
+              0.15
+            ],
+            "r": 1.5708,
+            "cloth": "cloth_ochre",
+            "goods": "tools"
+          },
+          {
+            "type": "well",
+            "at": [
+              0.15,
+              0.05
+            ]
+          },
+          {
+            "type": "scales",
+            "at": [
+              -0.35,
+              0.85
+            ]
+          },
+          {
+            "type": "goodsPile",
+            "at": [
+              0.75,
+              -0.45
+            ]
+          },
+          {
+            "type": "loadingBay",
+            "at": [
+              0.55,
+              0.65
+            ]
+          },
+          {
+            "type": "loadingBay",
+            "at": [
+              1.05,
+              0.15
+            ]
+          },
+          {
+            "type": "hitchingPost",
+            "at": [
+              -0.2,
+              1.25
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "marketplace-gpt-270",
+      "name": "GPT market square 270° (front-left)",
+      "version": 1,
+      "notes": "Paved market square with three striped stalls (fruit, goods, fish), a well, banners, signpost and tie posts. The sheet's dashed footprint outline is removed. View 270° (front-left), cut out of the owner's GPT sheet and scaled to 0.274 (the paved square = 3 × 3; 2× file at 0.548). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "ground": "stone_light",
+        "props": [
+          {
+            "type": "stall",
+            "at": [
+              -0.75,
+              -0.95
+            ],
+            "cloth": "cloth_red",
+            "goods": "food"
+          },
+          {
+            "type": "stall",
+            "at": [
+              0.35,
+              -1
+            ],
+            "cloth": "cloth_blue",
+            "goods": "cloth"
+          },
+          {
+            "type": "stall",
+            "at": [
+              -1,
+              0.15
+            ],
+            "r": 1.5708,
+            "cloth": "cloth_ochre",
+            "goods": "tools"
+          },
+          {
+            "type": "well",
+            "at": [
+              0.15,
+              0.05
+            ]
+          },
+          {
+            "type": "scales",
+            "at": [
+              -0.35,
+              0.85
+            ]
+          },
+          {
+            "type": "goodsPile",
+            "at": [
+              0.75,
+              -0.45
+            ]
+          },
+          {
+            "type": "loadingBay",
+            "at": [
+              0.55,
+              0.65
+            ]
+          },
+          {
+            "type": "loadingBay",
+            "at": [
+              1.05,
+              0.15
+            ]
+          },
+          {
+            "type": "hitchingPost",
+            "at": [
+              -0.2,
+              1.25
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }
