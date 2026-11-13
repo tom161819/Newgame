@@ -22,7 +22,29 @@ export { buildingIsComplete } from './buildingState.js';
 const towerDefinition = () => objectRegistry.require('tower');
 export const TOWER_COST = towerDefinition().cost.stone;
 export const TOWER_SIZE = towerDefinition().width;
-export const buildingDefinition = building => building.definition ?? objectRegistry.require(building.type ?? 'tower');
+// Owner 13 Nov 2026 (Farmhouse 3 × 3 → 4 × 4): a type whose footprint grew keeps `legacyFootprint`. Buildings placed since
+// carry `size` (= the new width); one without it (older saves) keeps the old footprint and shows the same art scaled down.
+const legacyDefinitions=new WeakMap();
+export function legacyDefinition(d){
+  if(!legacyDefinitions.has(d)){
+    const {width,height}=d.legacyFootprint,k=width/d.width,lv=d.legacyVisual;
+    legacyDefinitions.set(d,Object.freeze({...d,width,height,legacy:true,visualHeight:Math.round((d.visualHeight??64)*k),
+      ...(lv?{visual:{...(d.visual??{}),displayWidth:lv.displayWidth,displayHeight:lv.displayHeight}}:{}),
+      ...(d.lights?{lights:d.lights.map(l=>({...l,x:l.x*k,y:l.y*k,radius:l.radius*k}))}:{}),
+      ...(d.shadow?{shadow:{...d.shadow,width:d.shadow.width*k,height:d.shadow.height*k}}:{})}));
+  }
+  return legacyDefinitions.get(d);
+}
+export const usesLegacyFootprint=(building,d)=>!!d?.legacyFootprint&&!!building&&building.size!==d.width;
+export const withFootprint=(building,d)=>usesLegacyFootprint(building,d)?legacyDefinition(d):d;
+export function definitionFor(building,registry,soft=false){
+  const d=soft?registry.get?.(building.type):registry.require(building.type);if(!d||!building)return d;
+  // A live building knows its footprint from its definition (legacy or not); the registry stays the source of the rest
+  // (workplace capacities can be reconfigured at runtime). Save data has no definition: `size` decides.
+  if(building.definition&&building.definition.id===d.id)return building.definition.legacy&&d.legacyFootprint?legacyDefinition(d):d;
+  return withFootprint(building,d);
+}
+export const buildingDefinition = building => building.definition ?? withFootprint(building,objectRegistry.require(building.type ?? 'tower'));
 
 export function buildingTiles({x,y},definition) {
   const tiles=[];
@@ -120,6 +142,7 @@ export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,
   const building={id:Math.max(buildings.reduce((n,b)=>Math.max(n,b.id),0)+1,materials?construction.nextId:1),type:definition.id,definition,x:anchor.x,y:anchor.y,tiles:buildingTiles(anchor,definition),...(fields??{})};
   if(definition.crop)building.farmId=availableFarm(building,buildings,buildingDefinition)?.id??null;
   const look=nextBuildingLook(definition,buildings);if(look)building.look=look;
+  if(definition.legacyFootprint&&!definition.legacy)building.size=definition.width;
   if(!(materials?materials.prepare(building):inventory.pay(definition.cost,{source:`${dataName(definition)} Construction`,entityId:building.id})))return {error:t('status.noFunds')};
   const settle=walls.length?replaceWalls(walls,building):null,replaced=walls.length?{replaced:walls}:{};
   if(provisional){building.unverified=true;buildings.push(building);if(definition.id==='quarry')building.quarryMode='unbound';const refund=settle?.();return {building,...replaced,...(refund?{refund}:{})};}

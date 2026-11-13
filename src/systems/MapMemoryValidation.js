@@ -22,7 +22,8 @@ export function validateMapMemory(data,registry,{check,number,integer,array}){
     if(entry.kind==='drop')check(d.collectible);
     if(entry.kind==='stockpile')check(entry.type==='starter_stockpile');
     integer(entry.width,1,COLUMNS);integer(entry.height,1,ROWS);
-    check(entry.width===(entry.kind==='stockpile'?1:d.width)&&entry.height===(entry.kind==='stockpile'?1:d.height));
+    // Owner 13 Nov 2026: a Farmhouse remembered from an older save keeps its 3 × 3 footprint (legacyFootprint).
+    check(entry.kind==='stockpile'?entry.width===1&&entry.height===1:entry.width===d.width&&entry.height===d.height||entry.kind==='building'&&!!d.legacyFootprint&&entry.width===d.legacyFootprint.width&&entry.height===d.legacyFootprint.height);
     integer(entry.x,0,COLUMNS-entry.width);integer(entry.y,0,ROWS-entry.height);
     let discovered=false;for(let y=0;y<entry.height;y++)for(let x=0;x<entry.width;x++)if(explored.has((entry.y+y)*COLUMNS+entry.x+x))discovered=true;check(discovered);
     const v=entry.visual;check(v&&typeof v==='object'&&!Array.isArray(v));

@@ -1,8 +1,9 @@
+import { definitionFor } from './buildings.js';
 // Capture only visual data, never production contents, worker lists or loot.
 export function staticMemoryEntries(scene){
   const entries=[],fog=scene.fog;
   const add=(kind,key,type,object,visual)=>{
-    const definition=scene.objectRegistry.require(type),entry={key:`${kind}:${key}`,kind,type,x:object.x??object.tile.x,y:object.y??object.tile.y,width:definition.width,height:definition.height};
+    const definition=kind==='building'?definitionFor(object,scene.objectRegistry):scene.objectRegistry.require(type),entry={key:`${kind}:${key}`,kind,type,x:object.x??object.tile.x,y:object.y??object.tile.y,width:definition.width,height:definition.height};
     if(kind==='stockpile')entry.width=entry.height=1;
     if(fog.isInSightObject(entry))entry.visual=visual?.()??{};
     entries.push(entry);
@@ -35,6 +36,6 @@ export function captureMapKnowledge(scene,{force=false}={}){
 // Keep them visible in memory at runtime and recreate them from saved construction orders on Load.
 export function rememberBlueprint(scene,building){
   if(!scene.fog.enabled||!scene.mapMemory)return;
-  const d=scene.objectRegistry.require(building.type),key=`building:${building.id}`;
+  const d=definitionFor(building,scene.objectRegistry),key=`building:${building.id}`;
   scene.mapMemory.objects.set(key,{key,kind:'building',type:building.type,x:building.x,y:building.y,width:d.width,height:d.height,visual:{construction:{state:'planned',progress:0,workDone:0},...(d.crop?{stage:0,season:scene.seasons?.season??'Spring'}:{})}});scene.mapMemory.revision++;
 }

@@ -2,7 +2,7 @@
 import sys,numpy as np
 from PIL import Image
 from scipy import ndimage as ndi
-src,dst,bgl=sys.argv[1],sys.argv[2],float(sys.argv[3])
+src,dst,bgl=sys.argv[1],sys.argv[2],float(sys.argv[3]);ITER=int(sys.argv[4]) if len(sys.argv)>4 else 36
 a=np.asarray(Image.open(src).convert('RGBA')).astype(np.float32);H,W,_=a.shape
 rgb=a[...,:3];al=a[...,3]
 mx=rgb.max(2);mn=rgb.min(2);sat=(mx-mn)/np.maximum(mx,1);lum=rgb@np.array([.299,.587,.114],np.float32)
@@ -12,7 +12,7 @@ outside=al<128
 cand=(al>=128)&(sat<0.16)&(lum>120)&(lum<bgl-3)&(sd<19)&(rows>0.6*H)
 ground=np.zeros_like(outside)
 grow=outside.copy()
-for _ in range(36):
+for _ in range(ITER):
     nxt=ndi.binary_dilation(grow)&cand&~ground
     if not nxt.any():break
     ground|=nxt;grow|=nxt

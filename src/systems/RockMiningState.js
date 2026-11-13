@@ -1,10 +1,11 @@
+import { definitionFor } from '../game/buildings.js';
 import { COLUMNS,ROWS } from '../game/config.js';
 import { ROCK_MINING as RULES,clearsObstacles } from '../data/rockMining.js';
 export function validateRockMining(s,registry,{check,integer,number,array}){
   const state=s.naturalResources.rockMining;check(state&&Object.keys(state).every(key=>['records','marks'].includes(key)));array(state.records,10000);const records=new Map(),slots=new Set(),owners=new Set();
   // m-oznacovani-tezby (56): planId names an unfinished wall, tower or gate whose footprint holds the marked object.
-  const plans=new Map(s.buildings.filter(b=>!b.unverified&&b.construction&&b.construction.state!=='complete'&&clearsObstacles(registry.require(b.type))).map(b=>[b.id,b])),footprint=new Map();
-  for(const b of plans.values()){const d=registry.require(b.type);for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++)footprint.set(`${b.x+dx},${b.y+dy}`,b.id);}
+  const plans=new Map(s.buildings.filter(b=>!b.unverified&&b.construction&&b.construction.state!=='complete'&&clearsObstacles(definitionFor(b,registry))).map(b=>[b.id,b])),footprint=new Map();
+  for(const b of plans.values()){const d=definitionFor(b,registry);for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++)footprint.set(`${b.x+dx},${b.y+dy}`,b.id);}
   const plan=(m,key)=>{if(m.planId===undefined)return;integer(m.planId,1);check(plans.has(m.planId)&&footprint.get(key)===m.planId);};
   for(const r of state.records){
     check(r&&Object.keys(r).filter(k=>k!=='planId').sort().join()==='dropId,id,marked,outputTile,produced,tile,workDone');integer(r.tile.x,0,COLUMNS-1);integer(r.tile.y,0,ROWS-1);check(r.id===`${r.tile.x},${r.tile.y}`&&!records.has(r.id));records.set(r.id,r);
@@ -31,7 +32,7 @@ export function validateRockMining(s,registry,{check,integer,number,array}){
     if(w.cargo?.rockId!=null)check(w.profession==='miner'&&free&&w.cargo.resource==='stone'&&records.get(w.cargo.rockId)?.produced===RULES.yield);
     const t=w.workTask;if(t?.kind==='mineRock'){
       const r=records.get(t.targetId),slot=`${t.goal.x},${t.goal.y}`;check(r?.marked&&r.produced<RULES.yield&&w.manualRockId===r.id&&w.commandState.state==='Working'&&Math.abs(r.tile.x-t.goal.x)+Math.abs(r.tile.y-t.goal.y)===1&&!slots.has(slot));slots.add(slot);
-      check(t.progressMs===0&&s.terrain[t.goal.y][t.goal.x]===0&&!s.buildings.some(b=>t.goal.x>=b.x&&t.goal.x<b.x+registry.require(b.type).width&&t.goal.y>=b.y&&t.goal.y<b.y+registry.require(b.type).height));
+      check(t.progressMs===0&&s.terrain[t.goal.y][t.goal.x]===0&&!s.buildings.some(b=>t.goal.x>=b.x&&t.goal.x<b.x+definitionFor(b,registry).width&&t.goal.y>=b.y&&t.goal.y<b.y+definitionFor(b,registry).height));
     }
     if(t?.kind==='clearMark'){
       const split=t.targetId.indexOf(':'),kind=t.targetId.slice(0,split),id=t.targetId.slice(split+1);

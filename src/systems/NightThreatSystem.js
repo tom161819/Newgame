@@ -1,5 +1,5 @@
 import { NIGHT_THREATS } from '../data/nightThreats.js';
-import { buildingDefinition,buildingIsComplete,buildingTiles,placementError,campfireWood,towerNeighbors } from '../game/buildings.js';
+import { buildingDefinition,buildingIsComplete,buildingTiles,placementError,campfireWood,towerNeighbors, definitionFor } from '../game/buildings.js';
 import { removeBuildingShell,detachLostBuilding } from '../game/buildingRemoval.js';
 import { adjacentTiles } from '../game/interaction.js';
 import { inAttackRange } from './CombatSystem.js';
@@ -172,7 +172,7 @@ export class NightThreatSystem {
     if(state.target.kind==='castle'){const amount=Math.min(want,Math.floor(s.inventory.count('gold')));if(amount>0&&s.inventory.spend('gold',amount,{source:'Theft',id:`theft:${thief.id}`}))state.loot={resource:'gold',amount,from:'Castle'};}
     else{const l=s.foodStorage.locations.get(state.target.id);if(l){const [resource]=Object.entries(l.stock).filter(([r])=>s.foodStorage.free(l.id,r)>0).sort((a,b)=>b[1]-a[1])[0]??[];
       const amount=resource?Math.min(want,s.foodStorage.free(l.id,resource)):0;const b=s.buildings.find(x=>x.id===l.buildingId);
-      if(amount>0&&s.foodStorage.withdraw(l.id,resource,amount)){s.resourceLedger?.expense(resource,amount,'Theft',{id:`theft:${thief.id}`,entityId:l.buildingId});state.loot={resource,amount,from:b?s.objectRegistry.require(b.type).name:'store'};}}}
+      if(amount>0&&s.foodStorage.withdraw(l.id,resource,amount)){s.resourceLedger?.expense(resource,amount,'Theft',{id:`theft:${thief.id}`,entityId:l.buildingId});state.loot={resource,amount,from:b?definitionFor(b,s.objectRegistry).name:'store'};}}}
     state.state='escaping';state.repath=0;
   }
   // A soldier sees the thief within his sight (a third at night outside light, full with a torch or in light).
@@ -238,7 +238,7 @@ export class NightThreatSystem {
     const F=NIGHT_THREATS.fires,fire={id:b.id,intensity:F.startIntensity,health:100};this.fires.set(b.id,fire);
     // m-obyvatele-jmena-spanek-pohyb (42): sleepers wake and come out of a burning house.
     for(const w of this.scene.workerSystem?.sleepersIn?.(b.id)??[])this.scene.workerSystem.rest?.stop?.(w);
-    this.scene.eventFeed?.push?.(`fire:${b.id}:${this.scene.gameTime?.day??1}`,t('threats.fire',{name:this.scene.objectRegistry.require(b.type).name}),{important:true,target:b});this.scene.dangerMarks?.mark({x:b.x+1,y:b.y+1});this.changed();return fire;
+    this.scene.eventFeed?.push?.(`fire:${b.id}:${this.scene.gameTime?.day??1}`,t('threats.fire',{name:definitionFor(b,this.scene.objectRegistry).name}),{important:true,target:b});this.scene.dangerMarks?.mark({x:b.x+1,y:b.y+1});this.changed();return fire;
   }
   burning(b){return this.fires.has(b?.id);}
   // The fire grows, eats the building and may jump to a wooden neighbour; at 0 health it burns down.
@@ -254,7 +254,7 @@ export class NightThreatSystem {
     }
   }
   burnDown(b){
-    const s=this.scene,name=s.objectRegistry.require(b.type).name;this.fires.delete(b.id);
+    const s=this.scene,name=definitionFor(b,s.objectRegistry).name;this.fires.delete(b.id);
     // Stored goods burn with it (nothing spills), then the building and its functions go.
     detachLostBuilding(s,b);const d=buildingDefinition(b),anchor={x:b.x,y:b.y};removeBuildingShell(s,b);
     if(d.width>=2&&d.height>=2){const rd=ruinDefinition(s.objectRegistry,b.type),ruin={id:Math.max(0,...s.buildings.map(x=>x.id),b.id)+1,type:rd.id,burntFrom:b.type,definition:rd,...anchor,tiles:buildingTiles(anchor,rd)};
@@ -286,7 +286,7 @@ export class NightThreatSystem {
     if(job.phase==='toWater'){const water=this.waterGoals(fire);if(!water.goals.length){worker.firefight=null;return false;}if(at(water.goals)){job.phase='fill';job.t=F.fillMs;}else if(!worker.nextTile&&!worker.path.length&&!worker.moveTo(water.goals)){worker.firefight=null;return false;}}
     else if(job.phase==='fill'){job.t-=delta;if(job.t<=0)job.phase='toFire';}
     else if(job.phase==='toFire'){const goals=towerNeighbors(b).filter(g=>isWalkable(s.map,g.x,g.y));if(at(goals)){job.phase='throw';job.t=F.throwMs;}else if(!worker.nextTile&&!worker.path.length&&!worker.moveTo(goals)){worker.firefight=null;return false;}}
-    else if(job.phase==='throw'){job.t-=delta;if(job.t<=0){if(fire.fate!=='lost')fire.intensity-=F.bucket;job.phase='toWater';if(fire.intensity<=0){this.fires.delete(fire.id);s.eventFeed?.push?.(`fire-out:${fire.id}:${s.gameTime?.totalElapsed??0}`,t('threats.fireOut',{name:s.objectRegistry.require(b.type).name}));this.changed();}}}
+    else if(job.phase==='throw'){job.t-=delta;if(job.t<=0){if(fire.fate!=='lost')fire.intensity-=F.bucket;job.phase='toWater';if(fire.intensity<=0){this.fires.delete(fire.id);s.eventFeed?.push?.(`fire-out:${fire.id}:${s.gameTime?.totalElapsed??0}`,t('threats.fireOut',{name:definitionFor(b,s.objectRegistry).name}));this.changed();}}}
     return true;
   }
   checkWolvesNear(day){

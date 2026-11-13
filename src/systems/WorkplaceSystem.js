@@ -1,4 +1,4 @@
-import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
+import { buildingDefinition,buildingIsComplete,towerNeighbors, definitionFor } from '../game/buildings.js';
 import { WORKPLACES,staffingOutput,staffingWorkFactor } from '../data/workplaces.js';
 import { canInteractAdjacent } from '../game/interaction.js';
 import { tileKey } from '../game/stones.js';
@@ -36,7 +36,7 @@ export class WorkplaceSystem {
   workFactor(worker){const home=this.building(worker);return home?this.staffing(home).factor:1;}
   reconcileDefinitions(){
     for(const building of this.scene.buildings){
-      const definition=this.scene.objectRegistry.get(building.type);if(!definition?.workplace)continue;
+      const definition=definitionFor(building,this.scene.objectRegistry,true);if(!definition?.workplace)continue;
       building.definition=definition;const record=this.records.get(building.id);if(!record)continue;
       const excess=this.employees(building).slice(definition.workplace.capacity);record.capacity=definition.workplace.capacity;
       for(const worker of excess){this.scene.employment?.hold(worker);this.scene.stables?.cancel(worker);this.scene.military?.release(worker);this.remove(worker);}

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-13T18:32:36.510459Z",
+  "updatedAt": "2026-11-13T19:13:32.458135Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -310,7 +310,7 @@
       }
     },
     "farmstead": {
-      "preferred": "farmstead-thatched",
+      "preferred": "farmstead-gpt-0",
       "variants": {
         "farmstead-thatched": {
           "approvedAt": "2026-11-07T10:45:58.711Z",
@@ -342,6 +342,36 @@
               "at": "2026-11-07T10:14:38.880Z"
             }
           ]
+        },
+        "farmstead-gpt-0": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "d07ec7df",
+          "note": "Owner 13 Nov 2026 in chat: farmstead on 4 × 4 into the game (0° view).",
+          "updatedAt": "2026-11-13T19:13:32.458135Z",
+          "approvedAt": "2026-11-13T19:13:32.458135Z",
+          "decidedBy": "owner (chat)"
+        },
+        "farmstead-gpt-90": {
+          "status": "review",
+          "version": 1,
+          "specHash": "d07ec7df",
+          "note": "",
+          "updatedAt": "2026-11-13T19:13:32.458135Z"
+        },
+        "farmstead-gpt-180": {
+          "status": "review",
+          "version": 1,
+          "specHash": "d07ec7df",
+          "note": "",
+          "updatedAt": "2026-11-13T19:13:32.458135Z"
+        },
+        "farmstead-gpt-270": {
+          "status": "review",
+          "version": 1,
+          "specHash": "d07ec7df",
+          "note": "",
+          "updatedAt": "2026-11-13T19:13:32.458135Z"
         }
       }
     },

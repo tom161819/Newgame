@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "assetId": "farmstead",
+  "variantId": "farmstead-gpt-0",
+  "name": "GPT farmstead with fenced yard 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "d07ec7df",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 270,
+  "height": 238,
+  "anchor": {
+    "x": 145,
+    "y": 171
+  },
+  "origin": {
+    "x": 0.53704,
+    "y": 0.71849
+  },
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "base": {
+    "x": 145,
+    "y": 235
+  },
+  "baseOrigin": {
+    "x": 0.53704,
+    "y": 0.98739
+  },
+  "visualHeight": 235,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -38,
+      "y": -136,
+      "color": "#ffb25a",
+      "radius": 102.4,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 0.9
+    }
+  ],
+  "modelHeight": 2.29,
+  "lights": [],
+  "x2": {
+    "width": 540,
+    "height": 476,
+    "anchor": {
+      "x": 290,
+      "y": 342
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

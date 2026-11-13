@@ -1,3 +1,4 @@
+import { definitionFor } from '../game/buildings.js';
 import { canPatrolWalls } from '../systems/WallPatrol.js';
 import { t,language } from '../i18n/index.js';
 import { localized,workMessageLabel } from '../i18n/names.js';
@@ -83,7 +84,7 @@ export class ArmyPanel {
     for(const [action,b] of Object.entries(this.buttons)){b.textContent=t(`army.order.${action}Button`);b.disabled=!this.picked.size||!!s.gameTime?.paused||action==='hunt'&&!(s.nightThreats?.lurkingWolves?.().length)||action==='walls'&&!canPatrolWalls(s.buildings);if(action==='hunt')b.title=b.disabled&&this.picked.size?t('army.huntNone'):'';if(action==='walls')b.title=!canPatrolWalls(s.buildings)?t('army.wallsNone'):'';}
     const nodes=[];let group=undefined;
     for(const r of rows){
-      if(r.barracksId!==group){group=r.barracksId;const b=s.buildings.find(x=>x.id===group);nodes.push(element('h3','army-group',b?`${s.objectRegistry.get(b.type)?.name??b.type} #${b.id}`:t('army.noBarracks')));}
+      if(r.barracksId!==group){group=r.barracksId;const b=s.buildings.find(x=>x.id===group);nodes.push(element('h3','army-group',b?`${definitionFor(b,s.objectRegistry,true)?.name??b.type} #${b.id}`:t('army.noBarracks')));}
       const row=element('button','army-row');row.type='button';row.dataset.armyId=r.id;row.dataset.order=r.order;row.setAttribute('aria-pressed',String(this.picked.has(r.id)));row.title=t('population.locateName',{name:r.name});
       const make=element('span','army-squad-make');
       if(canMake&&this.picked.has(r.id)){make.textContent='⚑';make.dataset.squadMake='1';make.setAttribute('role','button');make.title=t('army.squad.make',{count:this.workers().length});make.setAttribute('aria-label',make.title);}

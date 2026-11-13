@@ -24,8 +24,8 @@ function farmer(s,home,tile={x:44,y:40}){const w=s.workerSystem.create(tile);ass
 function until(s,predicate,max=20000){let elapsed=0;while(!predicate()&&elapsed<max){s.tick(25);elapsed+=25;}assert.ok(predicate(),`Condition not reached after ${elapsed}ms`);return elapsed;}
 function farm(options={}){const s=scene(options),home=building(s,'farmhouse',45,40),wheat=building(s,'wheat_field',49,40),orchard=building(s,'orchard',49,46);return {s,home,wheat,orchard};}
 
-test('farm buildings retain exact costs, 3x3 footprints (the Farmhouse is 3x3 since 0.38.0) and original physical blueprints; unfinished sites neither grow nor employ farmers',()=>{
-  const s=scene();for(const [type,cost,width,x]of [['farmhouse',10,3,45],['wheat_field',0,3,50],['orchard',0,3,55]]){
+test('farm buildings retain exact costs, fields 3x3, the Farmhouse 4x4 (3x3 since 0.38.0, 4x4 since the GPT farmstead of 13 Nov 2026) and original physical blueprints; unfinished sites neither grow nor employ farmers',()=>{
+  const s=scene();for(const [type,cost,width,x]of [['farmhouse',10,4,45],['wheat_field',0,3,50],['orchard',0,3,55]]){
     const b=building(s,type,x,40,true);assert.equal(Object.values(b.definition.cost).reduce((a,n)=>a+n,0),cost);assert.equal(b.tiles.length,width*width);assert.equal(s.inventory.count('stone'),0);assert.equal(buildingIsComplete(b),false);for(const t of b.tiles)assert.equal(s.map[t.y][t.x],1);
     assert.equal(s.farmingSystem.records.has(b.id),false);const w=s.workerSystem.create({x:x-1,y:43});assert.equal(s.workplaceSystem.assign(b,w),false);
   }

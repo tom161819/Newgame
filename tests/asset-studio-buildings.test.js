@@ -128,9 +128,9 @@ test('revision 7 Nov (second): mine hill, builder yard v3, bakery v2 and farmste
     assert.ok(Math.abs(stall.at[0] - doorX) > 0.8, 'the stall is not in front of the door');
     assert.ok(PROPS.breadStall(0, 0, {}).filter(p => p.material === 'cloth_ochre').length >= 5, 'loaves on the stall');
     assert.deepEqual(checkModel(model, { footprint: a.footprint, style }), []); }
-  // Farmstead v2 on 3x3: haycocks, a tool rack, a plough, a hen house and grain sacks.
+  // Farmstead v2 (drawn for 3x3; the asset is 4x4 since the owner's GPT farmstead, 13 Nov 2026): haycocks, a tool rack, a plough, a hen house and grain sacks.
   { const { a, v, model } = build('farmstead', 'farmstead-thatched');
-    assert.deepEqual(a.footprint, { width: 3, height: 3 }); assert.equal(v.version, 2);
+    assert.deepEqual(a.footprint, { width: 4, height: 4 }); assert.equal(v.version, 2);
     for (const type of ['haycock', 'farmTools', 'plough', 'henHouse', 'sacks']) assert.ok(v.spec.props.some(p => p.type === type), type);
     assert.deepEqual(checkModel(model, { footprint: a.footprint, style }), []); }
 });

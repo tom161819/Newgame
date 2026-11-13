@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "farmstead",
+  "variantId": "farmstead-gpt-180",
+  "name": "GPT farmstead with fenced yard 180° (rear-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "d07ec7df",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 275,
+  "height": 236,
+  "anchor": {
+    "x": 138,
+    "y": 169
+  },
+  "origin": {
+    "x": 0.50182,
+    "y": 0.7161
+  },
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "base": {
+    "x": 138,
+    "y": 233
+  },
+  "baseOrigin": {
+    "x": 0.50182,
+    "y": 0.98729
+  },
+  "visualHeight": 233,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.29,
+  "lights": [],
+  "x2": {
+    "width": 550,
+    "height": 472,
+    "anchor": {
+      "x": 276,
+      "y": 338
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

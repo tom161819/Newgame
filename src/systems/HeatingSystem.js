@@ -1,6 +1,6 @@
 import { HEATING,HEATED,HEATED_BUILDINGS } from '../data/heating.js';
 import { calendar,SEASON_DAYS } from '../data/seasons.js';
-import { buildingIsComplete } from '../game/buildings.js';
+import { buildingIsComplete, definitionFor } from '../game/buildings.js';
 import { t } from '../i18n/index.js';
 
 // m-topeni-domu (plan 37): winter heating of Houses. Every House has a woodpile (`heat-<id>`, kind 'fuel'); Haulers
@@ -23,7 +23,7 @@ export class HeatingSystem {
   locationId(building){return `heat-${building.id}`;}
   // The woodpile is created when it is first needed (a House that is never heated has none).
   ensurePile(b){
-    const id=this.locationId(b),storage=this.storage;if(storage.locations.has(id))return;const d=this.scene.objectRegistry.require(b.type);
+    const id=this.locationId(b),storage=this.storage;if(storage.locations.has(id))return;const d=definitionFor(b,this.scene.objectRegistry);
     storage.locations.set(id,{buildingId:b.id,x:b.x,y:b.y,width:d.width,height:d.height,stock:{},legacyOverflow:0,id,kind:'fuel',capacity:HEATING.capacity,allowed:[HEATING.resource]});storage.changed();
   }
   stock(building){return this.storage?.locations.get(this.locationId(building))?.stock[HEATING.resource]??0;}

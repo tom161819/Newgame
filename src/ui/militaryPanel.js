@@ -1,3 +1,4 @@
+import { definitionFor } from '../game/buildings.js';
 import { t } from '../i18n/index.js';
 import { UNIT_TYPES,UNIT_TYPE_IDS,unitKit,barracksAutoHire } from '../data/military.js';
 import { MILITARY_ITEMS } from '../data/militaryEquipment.js';
@@ -38,7 +39,7 @@ export function renderMilitary(scene,building,root,employees){
     return row;
   };
   // kasarna-branci: Recruits (with Train buttons) and trained units (with Discharge) in two lists under the place count.
-  const recruits=employees.filter(w=>!m.unit(w)),trained=employees.filter(w=>m.unit(w)),capacity=scene.objectRegistry.get(building.type)?.workplace?.capacity??employees.length;
+  const recruits=employees.filter(w=>!m.unit(w)),trained=employees.filter(w=>m.unit(w)),capacity=definitionFor(building,scene.objectRegistry,true)?.workplace?.capacity??employees.length;
   const cardList=element('ul','unit-type-cards'),soldiers=element('ul','military-soldiers'),units=element('ul','military-soldiers military-units');cardList.append(...cards);
   soldiers.dataset.list='recruits';units.dataset.list='units';
   soldiers.append(...(recruits.length?recruits.map(soldierRow):[element('li','empty-slot',t('military.noSoldiers'))]));units.append(...(trained.length?trained.map(soldierRow):[element('li','empty-slot',t('military.noUnits'))]));

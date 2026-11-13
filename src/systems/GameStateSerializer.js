@@ -32,7 +32,7 @@ import { wearLevel } from '../data/pathWear.js';
 import { getXPRequired,totalXPForLevel,createProgress } from '../data/experience.js';
 import { JOBS,SKILL_IDS,WORK_RULES,POPULATION } from '../data/jobs.js';
 import { CONSTRUCTION_RULES } from '../data/construction.js';
-import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
+import { buildingDefinition,buildingIsComplete,towerNeighbors,withFootprint } from '../game/buildings.js';
 import { pavementHost } from '../game/pavement.js';
 import { gameSettings,WILDLIFE_INTERVALS } from './GameSettings.js';
 import { groundOverride,validateGroundLook } from '../data/groundLook.js';
@@ -137,7 +137,7 @@ export function serializeGameState(scene){
       render:{x:scene.player.x,y:scene.player.y,depth:scene.player.depth},
       transition:c.transitioning?{remaining:Math.max(1,(c.transitionTween?.duration??900)-(c.transitionTween?.elapsed??0))}:null},
     inventory:scene.inventory.exportState(),equipment:scene.equipment.exportState(),
-    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.burntFrom?{burntFrom:b.burntFrom}:{}),...(buildingDefinition(b).crop?{farmId:b.farmId??null}:{}),...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.depleted?{depleted:true}:{}),...(typeof b.look==='string'&&buildingDefinition(b).artLooks?.includes(b.look)?{look:b.look}:{}),...(b.unverified?{unverified:true}:{}),...(['wall_gate','gate'].includes(b.type)&&['x','y'].includes(b.gateAxis)?{gateAxis:b.gateAxis}:{}),...(b.type==='barracks'&&Number.isInteger(b.autoHire)?{autoHire:b.autoHire}:{}),...(b.type==='iron_mine'&&b.miningMode==='adjacent'?{miningMode:'adjacent'}:{}),...(b.type==='tower'&&[1,2,3].includes(b.facing)?{facing:b.facing}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.demolition?{demolition:copy(b.demolition)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
+    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.burntFrom?{burntFrom:b.burntFrom}:{}),...(buildingDefinition(b).crop?{farmId:b.farmId??null}:{}),...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.depleted?{depleted:true}:{}),...(buildingDefinition(b).legacyFootprint&&!buildingDefinition(b).legacy?{size:buildingDefinition(b).width}:{}),...(typeof b.look==='string'&&buildingDefinition(b).artLooks?.includes(b.look)?{look:b.look}:{}),...(b.unverified?{unverified:true}:{}),...(['wall_gate','gate'].includes(b.type)&&['x','y'].includes(b.gateAxis)?{gateAxis:b.gateAxis}:{}),...(b.type==='barracks'&&Number.isInteger(b.autoHire)?{autoHire:b.autoHire}:{}),...(b.type==='iron_mine'&&b.miningMode==='adjacent'?{miningMode:'adjacent'}:{}),...(b.type==='tower'&&[1,2,3].includes(b.facing)?{facing:b.facing}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.demolition?{demolition:copy(b.demolition)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
     resources:[...scene.resources.values()].map(v=>({type:v.getData('objectId'),tile:point(v.getData('tile')),...(v.getData('object').natural?{natural:copy(v.getData('object').natural)}:{})})),
     drops:[...scene.dropSystem.drops.values()].map(d=>({id:d.id,resource:d.resource,tile:point(d.tile),amount:d.amount,rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0),haulEligible:d.haulEligible!==false,...(d.siteId!=null?{siteId:d.siteId}:{})})),
     animals:[...scene.animalSystem.animals.values()].map(a=>({...serializeActor(a),retaliationId:a.retaliationTarget?.id??null})),
@@ -183,6 +183,8 @@ function validateAtSize(input,registry){
   const position=p=>{check(p&&typeof p==='object');number(p.x,0,COLUMNS);number(p.y,0,ROWS);};
   const array=(a,max=Math.max(20000,COLUMNS*ROWS))=>check(Array.isArray(a)&&a.length<=max);
   const definition=(id,category)=>{const d=registry.get(id);check(d&&(!category||d.category===category));return d;};
+  // Owner 13 Nov 2026: a Farmhouse of an older save (no `size`) keeps its 3 × 3 footprint.
+  const bdef=b=>withFootprint(b,definition(b.type));
   const unique=(array)=>{const ids=new Set();for(const a of array){check(a.id!=null&&!ids.has(a.id));ids.add(a.id);}return ids;};
   check(input&&typeof input==='object');
   const schema=saveSchemaStatus(input);if(!schema.compatible){if(schema.savedVersion!==null)throw new IncompatibleSaveError(schema.savedVersion);fail();}
@@ -218,7 +220,7 @@ function validateAtSize(input,registry){
   const siteAssignments=new Set();
   // A provisional site (placed outside sight) claims no tiles until verified: it may lie over hidden terrain or resources.
   const provisional=new Set();
-  part='buildings';for(const b of s.buildings){integer(b.id,1);const d=definition(b.type,'building');check(d.buildable||d.starter||d.pavement||d.id==='burnt_ruins'||d.id==='wall_gate'/* m-brana-2x2: the old 1 × 1 Gate of older saves */);if(d.id==='burnt_ruins')check(buildingIsComplete(b));if(d.starter)check(buildingIsComplete(b));if(d.pavement)check(!buildingIsComplete(b));
+  part='buildings';for(const b of s.buildings){integer(b.id,1);const d=withFootprint(b,definition(b.type,'building'));check(d.buildable||d.starter||d.pavement||d.id==='burnt_ruins'||d.id==='wall_gate'/* m-brana-2x2: the old 1 × 1 Gate of older saves */);if(d.id==='burnt_ruins')check(buildingIsComplete(b));if(d.starter)check(buildingIsComplete(b));if(d.pavement)check(!buildingIsComplete(b));
     check(b.unverified===undefined||b.unverified===true&&b.construction?.state==='planned'&&!b.depositId);
     // m-staveni-zdi-studna (59): optional Gate axis chosen with R (older saves have none: 'y').
     check(b.gateAxis===undefined||['wall_gate','gate'].includes(b.type)&&['x','y'].includes(b.gateAxis));
@@ -249,7 +251,7 @@ function validateAtSize(input,registry){
     }
   }
   for(const b of s.buildings)if(b.demolition!==undefined){
-    const d=definition(b.type),c=b.demolition;
+    const d=bdef(b),c=b.demolition;
     check(buildingIsComplete(b)&&d.buildable&&!d.starter&&!d.pavement&&b.type!=='castle'&&!b.unverified);
     check(c&&typeof c==='object'&&!Array.isArray(c)&&Object.keys(c).every(k=>['state','requiredWork','workDone','progress','contributions','assignedBuilders','refund'].includes(k)));
     check(['planned','building'].includes(c.state));number(c.requiredWork,1,86400000);check(c.requiredWork===(d.constructionTime??CONSTRUCTION_RULES.defaultTime));
@@ -262,9 +264,9 @@ function validateAtSize(input,registry){
   }
   const plotCounts=new Map();
   for(const b of s.buildings){
-    const d=definition(b.type);if(!d.crop){check(b.farmId===undefined);continue;}
+    const d=bdef(b);if(!d.crop){check(b.farmId===undefined);continue;}
     check(b.farmId===null||Number.isSafeInteger(b.farmId)&&b.farmId>0);
-    if(b.farmId!==null){const farm=s.buildings.find(f=>f.id===b.farmId);check(farmInRange(farm,b,x=>definition(x.type)));const count=(plotCounts.get(farm.id)??0)+1;check(count<=FARM_PLOT_CAPACITY);plotCounts.set(farm.id,count);}
+    if(b.farmId!==null){const farm=s.buildings.find(f=>f.id===b.farmId);check(farmInRange(farm,b,x=>bdef(x)));const count=(plotCounts.get(farm.id)??0)+1;check(count<=FARM_PLOT_CAPACITY);plotCounts.set(farm.id,count);}
   }
   for(const key of provisional)check(!occupied.has(key));
   repairTransportInstructions(s,registry,check);
@@ -276,14 +278,15 @@ function validateAtSize(input,registry){
     else check(r.natural===undefined);
     for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){
     // Rock edges may sit under a neighbouring Quarry; unique reciprocal primary bindings are checked below.
-    const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`,overlap=s.buildings.find(b=>!b.unverified&&x>=b.x&&x<b.x+definition(b.type).width&&y>=b.y&&y<b.y+definition(b.type).height),allowedOverlap=d.tree&&(r.natural.stage===0||!!overlap&&clearsObstacles(definition(overlap.type))&&!buildingIsComplete(overlap))||depositFamily(r.type)==='stone_deposit'&&overlap?.type==='quarry'&&overlap.quarryMode==='finite'||depositFamily(r.type)==='iron_deposit'&&overlap?.type==='iron_mine'&&overlap.miningMode!=='adjacent';check(open(x,y)&&(!occupied.has(key)||allowedOverlap)&&!resourceTiles.has(key));resourceTiles.add(key);if(d.deposit||d.tree&&r.natural.stage===3)solid.add(key);
+    const x=r.tile.x+dx,y=r.tile.y+dy,key=`${x},${y}`,overlap=s.buildings.find(b=>!b.unverified&&x>=b.x&&x<b.x+bdef(b).width&&y>=b.y&&y<b.y+bdef(b).height),allowedOverlap=d.tree&&(r.natural.stage===0||!!overlap&&clearsObstacles(bdef(overlap))&&!buildingIsComplete(overlap))||depositFamily(r.type)==='stone_deposit'&&overlap?.type==='quarry'&&overlap.quarryMode==='finite'||depositFamily(r.type)==='iron_deposit'&&overlap?.type==='iron_mine'&&overlap.miningMode!=='adjacent';check(open(x,y)&&(!occupied.has(key)||allowedOverlap)&&!resourceTiles.has(key));resourceTiles.add(key);if(d.deposit||d.tree&&r.natural.stage===3)solid.add(key);
   }}
   const boundDeposits=new Set();for(const b of s.buildings){
     if(b.type==='quarry'){check(['finite','legacy','unbound'].includes(b.quarryMode));if(b.quarryMode==='legacy')check(buildingIsComplete(b)&&b.depositId===undefined);if(b.quarryMode==='unbound')check(b.depositId===undefined);}
     // m-vytezeny-dul-ctverecky (64): optional `depleted: true` only on a finished mine whose bound deposit is empty.
-    check(b.look===undefined||(definition(b.type)?.artLooks??[]).includes(b.look));
+    check(b.size===undefined||!!definition(b.type).legacyFootprint&&b.size===definition(b.type).width);
+    check(b.look===undefined||(bdef(b)?.artLooks??[]).includes(b.look));
     check(b.depleted===undefined||b.depleted===true&&buildingIsComplete(b)&&(b.type==='iron_mine'||b.type==='quarry'&&b.quarryMode==='finite')&&depositIds.get(b.depositId)?.natural.remaining===0);
-    if(b.type==='iron_mine'||b.type==='quarry'&&b.quarryMode==='finite'){const r=depositIds.get(b.depositId),spec=definition(b.type).mining;check(r&&depositFamily(r.type)===spec.depositType&&r.natural.boundBuildingId===b.id&&!boundDeposits.has(b.depositId));boundDeposits.add(b.depositId);const rd=definition(r.type),bd=definition(b.type);const over=r.tile.x<b.x+bd.width&&r.tile.x+rd.width>b.x&&r.tile.y<b.y+bd.height&&r.tile.y+rd.height>b.y;
+    if(b.type==='iron_mine'||b.type==='quarry'&&b.quarryMode==='finite'){const r=depositIds.get(b.depositId),spec=bdef(b).mining;check(r&&depositFamily(r.type)===spec.depositType&&r.natural.boundBuildingId===b.id&&!boundDeposits.has(b.depositId));boundDeposits.add(b.depositId);const rd=bdef(r),bd=bdef(b);const over=r.tile.x<b.x+bd.width&&r.tile.x+rd.width>b.x&&r.tile.y<b.y+bd.height&&r.tile.y+rd.height>b.y;
       // m-dul-na-lozisku: an Iron Mine of an older save stands beside its deposit; it keeps working it.
       if(b.type==='iron_mine'&&b.miningMode===undefined&&!over)b.miningMode='adjacent';check(b.miningMode===undefined||b.type==='iron_mine'&&b.miningMode==='adjacent'&&!over);
       if(spec.overlap&&b.miningMode!=='adjacent')check(over);else{const dx=Math.max(0,b.x-r.tile.x-rd.width+1,r.tile.x-b.x-bd.width+1),dy=Math.max(0,b.y-r.tile.y-rd.height+1,r.tile.y-b.y-bd.height+1);check(Math.hypot(dx,dy)<=spec.range);}}
@@ -304,21 +307,21 @@ function validateAtSize(input,registry){
       }
   };
   const actor=a=>{
-    check(a&&typeof a.isAlive==='boolean');definition(a.type);tile(a.tile);position(a.position);if(a.nextTile)tile(a.nextTile);array(a.path,20000);a.path.forEach(tile);
+    check(a&&typeof a.isAlive==='boolean');bdef(a);tile(a.tile);position(a.position);if(a.nextTile)tile(a.nextTile);array(a.path,20000);a.path.forEach(tile);
     number(a.direction?.x,-1,1);number(a.direction?.y,-1,1);number(a.speed,0,100);
     number(a.maxHP,1,1e9);number(a.currentHP,0,a.maxHP);check(a.isAlive?a.currentHP>0:a.currentHP===0);
     const b=a.baseStats;check(b);number(b.maxHP,1,1e9);number(b.attackDPS,0,1e9);number(b.armor,0,90);number(b.attackRange,0,100);number(b.hpRegenPerSecond,0,1e6);
     check(a.statModifiers&&typeof a.statModifiers==='object'&&!Array.isArray(a.statModifiers));
     for(const [name,m]of Object.entries(a.statModifiers)){check(!['__proto__','prototype','constructor'].includes(name)&&m&&typeof m==='object');for(const [key,v]of Object.entries(m)){check(['maxHP','attackBonus','attackMultiplier','armor','hpRegenPerSecond','attackRange'].includes(key));number(v,key==='attackMultiplier'?0:-1e6,1e6);}}
     if(a.experience!==undefined){
-      const e=a.experience;check(definition(a.type).category==='character'&&e&&typeof e.enabled==='boolean');
+      const e=a.experience;check(bdef(a).category==='character'&&e&&typeof e.enabled==='boolean');
       integer(e.maxLevel,1,50);integer(e.level,1,e.maxLevel);number(e.gainMultiplier,0,1e6);number(e.currentXP);number(e.totalXP,0,totalXPForLevel(e.maxLevel));
       const required=e.level===e.maxLevel?0:getXPRequired(e.level);check(e.xpToNextLevel===required);check(required?e.currentXP<required:e.currentXP===0);
       check(Math.abs(e.totalXP-totalXPForLevel(e.level)-e.currentXP)<1e-6);check(e.modifiers&&typeof e.modifiers==='object'&&!Array.isArray(e.modifiers));
       for(const [key,value]of Object.entries(e.modifiers)){check(!['__proto__','constructor','prototype'].includes(key));number(value,0,1e6);}
     }
     if(a.skills!==undefined){
-      check(definition(a.type).category==='character');skillsState(a.skills);
+      check(bdef(a).category==='character');skillsState(a.skills);
       check(a.activitySkill==null||SKILL_IDS.includes(a.activitySkill));
     }
   };
@@ -382,24 +385,24 @@ function validateAtSize(input,registry){
         if(t.kind==='mineDrop')check(w.profession==='miner'&&s.drops.some(d=>d.id===t.targetId&&d.resource==='stone'));
         if(t.kind==='chopTree'){const target=treeIds.get(t.targetId),home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),slot=`natural-slot:${t.goal.x},${t.goal.y}`;check(w.profession==='woodcutter'&&home?.type==='lumberjack_hut'&&buildingIsComplete(home)&&target?.natural.stage===3&&Math.abs(target.tile.x-t.goal.x)+Math.abs(target.tile.y-t.goal.y)===1&&!reservations.has(slot));reservations.add(slot);}
         if(t.kind==='mineDeposit'){
-          const target=depositIds.get(t.targetId),home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),spec=home&&definition(home.type).mining,slot=`natural-slot:${t.goal.x},${t.goal.y}`;
+          const target=depositIds.get(t.targetId),home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),spec=home&&bdef(home).mining,slot=`natural-slot:${t.goal.x},${t.goal.y}`;
           check(w.profession==='miner'&&home&&buildingIsComplete(home)&&spec&&home.depositId===t.targetId&&target?.natural.remaining>0&&!reservations.has(slot)&&!solid.has(`${t.goal.x},${t.goal.y}`));reservations.add(slot);
-          const workObject=spec.overlap&&home.miningMode!=='adjacent'?{...home,definition:definition(home.type)}:{...target.tile,definition:definition(target.type)};check(towerNeighbors(workObject).some(p=>p.x===t.goal.x&&p.y===t.goal.y));
+          const workObject=spec.overlap&&home.miningMode!=='adjacent'?{...home,definition:bdef(home)}:{...target.tile,definition:bdef(target)};check(towerNeighbors(workObject).some(p=>p.x===t.goal.x&&p.y===t.goal.y));
           const count=(depositClaims.get(t.targetId)??0)+1;depositClaims.set(t.targetId,count);check(count<=target.natural.remaining);
         }
         if(t.kind==='dismantle'){
           const target=s.buildings.find(b=>b.id===t.targetId);check(target&&buildingIsComplete(target)&&target.demolition?.assignedBuilders.includes(w.id)&&w.profession==='builder');
-          check(towerNeighbors({...target,definition:definition(target.type)}).some(p=>p.x===t.goal.x&&p.y===t.goal.y));
+          check(towerNeighbors({...target,definition:bdef(target)}).some(p=>p.x===t.goal.x&&p.y===t.goal.y));
         }
         if(t.kind==='build'){
-          const site=s.buildings.find(b=>b.id===t.targetId);check(site&&!buildingIsComplete(site)&&site.construction.assignedBuilders.includes(w.id));if(definition(site.type).crop){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);check(w.profession==='farmer'&&home?.type==='farmhouse'&&buildingIsComplete(home)&&site.farmId===home.id);}else check(w.profession==='builder');
+          const site=s.buildings.find(b=>b.id===t.targetId);check(site&&!buildingIsComplete(site)&&site.construction.assignedBuilders.includes(w.id));if(bdef(site).crop){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);check(w.profession==='farmer'&&home?.type==='farmhouse'&&buildingIsComplete(home)&&site.farmId===home.id);}else check(w.profession==='builder');
           check(towerNeighbors(pavementHost(s.buildings,site,registry)??site).some(p=>p.x===t.goal.x&&p.y===t.goal.y));
         }
         if(t.kind==='harvest'){
           const plot=s.buildings.find(b=>b.id===t.targetId),record=s.farming?.records?.find(r=>r.buildingId===t.targetId),home=s.buildings.find(b=>b.id===w.assignedWorkplaceId);
-          check(w.profession==='farmer'&&plot&&home?.type==='farmhouse'&&buildingIsComplete(plot)&&buildingIsComplete(home)&&definition(plot.type).crop&&plot.farmId===home.id&&record?.reservedBy===w.id);
-          check(t.goal.x>=plot.x&&t.goal.x<plot.x+definition(plot.type).width&&t.goal.y>=plot.y&&t.goal.y<plot.y+definition(plot.type).height);
-          integer(t.cycle);check(t.cycle===record.cycle&&record.growthDays===definition(plot.type).crop.growthDays);number(t.startedAt,0,s.time?.totalElapsed??0);
+          check(w.profession==='farmer'&&plot&&home?.type==='farmhouse'&&buildingIsComplete(plot)&&buildingIsComplete(home)&&bdef(plot).crop&&plot.farmId===home.id&&record?.reservedBy===w.id);
+          check(t.goal.x>=plot.x&&t.goal.x<plot.x+bdef(plot).width&&t.goal.y>=plot.y&&t.goal.y<plot.y+bdef(plot).height);
+          integer(t.cycle);check(t.cycle===record.cycle&&record.growthDays===bdef(plot).crop.growthDays);number(t.startedAt,0,s.time?.totalElapsed??0);
         }
       }
       if(w.workplaceReached!==undefined)check(typeof w.workplaceReached==='boolean');
@@ -414,27 +417,27 @@ function validateAtSize(input,registry){
     array(s.workplaces?.records);const recorded=new Set(),assigned=new Set();
     for(const record of s.workplaces.records){
       check(bIds.has(record.buildingId)&&!recorded.has(record.buildingId));recorded.add(record.buildingId);
-      const b=s.buildings.find(b=>b.id===record.buildingId),spec=definition(b.type).workplace;check(spec&&buildingIsComplete(b)&&record.capacity===spec.capacity);
+      const b=s.buildings.find(b=>b.id===record.buildingId),spec=bdef(b).workplace;check(spec&&buildingIsComplete(b)&&record.capacity===spec.capacity);
       array(record.workerIds,spec.capacity);check(new Set(record.workerIds).size===record.workerIds.length&&(!b.depleted||!record.workerIds.length));
       for(const id of record.workerIds){const worker=s.workers?.find(w=>w.id===id);check(worker?.isAlive&&worker.isSubject&&worker.assignedWorkplaceId===b.id&&worker.profession===spec.profession&&!assigned.has(id));assigned.add(id);}
       check(record.delivered&&typeof record.delivered==='object'&&!Array.isArray(record.delivered));for(const [id,n]of Object.entries(record.delivered)){check(definition(id).category==='resource'&&id!=='gold');integer(n);}
       if(record.forestry){check(b.type==='lumberjack_hut');integer(record.forestry.harvested,0);integer(record.forestry.day,1,s.time.day);integer(record.forestry.producedToday,0,record.forestry.harvested);}
     }
-    check(s.buildings.filter(b=>buildingIsComplete(b)&&definition(b.type).workplace).every(b=>recorded.has(b.id)));
+    check(s.buildings.filter(b=>buildingIsComplete(b)&&bdef(b).workplace).every(b=>recorded.has(b.id)));
     for(const worker of s.workers??[])if(worker.assignedWorkplaceId!=null)check(assigned.has(worker.id));
   }
   part='construction';if(s.constructionSystem!==undefined){
     const c=s.constructionSystem;check(c);integer(c.nextId,Math.max(0,...s.buildings.map(b=>b.id))+1);
     check(c.kingSiteId==null||bIds.has(c.kingSiteId));
-    if(c.kingSiteId!=null){const site=s.buildings.find(b=>b.id===c.kingSiteId);check(!buildingIsComplete(site)&&!definition(site.type).crop&&site.construction.assignedBuilders.includes('king'));tile(c.kingGoal);check(towerNeighbors(pavementHost(s.buildings,site,registry)??site).some(p=>p.x===c.kingGoal.x&&p.y===c.kingGoal.y));check(!reservations.has(`construction-slot:${c.kingGoal.x},${c.kingGoal.y}`));}
+    if(c.kingSiteId!=null){const site=s.buildings.find(b=>b.id===c.kingSiteId);check(!buildingIsComplete(site)&&!bdef(site).crop&&site.construction.assignedBuilders.includes('king'));tile(c.kingGoal);check(towerNeighbors(pavementHost(s.buildings,site,registry)??site).some(p=>p.x===c.kingGoal.x&&p.y===c.kingGoal.y));check(!reservations.has(`construction-slot:${c.kingGoal.x},${c.kingGoal.y}`));}
     else check(c.kingGoal==null&&!siteAssignments.has('king'));
     for(const id of siteAssignments)if(id!=='king'){const w=s.workers?.find(w=>w.id===id);check(w?.isAlive&&['build','dismantle'].includes(w.workTask?.kind)&&['builder','farmer'].includes(w.profession));}
   }else check(!s.buildings.some(b=>!buildingIsComplete(b)));
-  const plots=s.buildings.filter(b=>buildingIsComplete(b)&&definition(b.type).crop);
+  const plots=s.buildings.filter(b=>buildingIsComplete(b)&&bdef(b).crop);
   part='farming';if(s.farming!==undefined){
     const f=s.farming;check(f&&f.clocks&&typeof f.clocks==='object'&&Object.keys(f.clocks).length===Object.keys(FARMING_RULES.crops).length);
     for(const id of Object.keys(FARMING_RULES.crops))number(f.clocks[id]);number(f.refreshElapsed,0,FARMING_RULES.refreshInterval);array(f.records);check(f.records.length===plots.length);const recorded=new Set();
-    for(const r of f.records){const plot=plots.find(b=>b.id===r.buildingId);check(plot&&!recorded.has(r.buildingId));recorded.add(r.buildingId);const crop=definition(plot.type).crop;
+    for(const r of f.records){const plot=plots.find(b=>b.id===r.buildingId);check(plot&&!recorded.has(r.buildingId));recorded.add(r.buildingId);const crop=bdef(plot).crop;
       number(r.growthDays,0,crop.growthDays);number(r.lastClock,0,f.clocks[plot.type]);integer(r.stage,0,3);check(r.stage===seasonalCropStage(plot.type,r.growthDays,crop.growthDays,s.seasons?.season));integer(r.cycle);
       check(r.reservedBy==null||s.workers?.some(w=>w.isAlive&&w.id===r.reservedBy&&w.profession==='farmer'&&w.workTask?.kind==='harvest'&&w.workTask.targetId===r.buildingId));
     }
@@ -492,7 +495,7 @@ function validateAtSize(input,registry){
   part='employment';if(s.employment!==undefined){const e=s.employment;check(e&&typeof e==='object'&&Object.keys(e).sort().join()==='blockedBuildings,blockedTypes,enabled,held,priorities'&&typeof e.enabled==='boolean');
     check(e.priorities&&typeof e.priorities==='object'&&Object.keys(e.priorities).sort().join()===[...EMPLOYMENT_PROFESSIONS].sort().join());for(const value of Object.values(e.priorities))integer(value,PRIORITY_RANGE.min,PRIORITY_RANGE.max);
     array(e.held);check(new Set(e.held).size===e.held.length&&e.held.every(id=>wIds.has(id)));
-    array(e.blockedBuildings);check(new Set(e.blockedBuildings).size===e.blockedBuildings.length);for(const id of e.blockedBuildings){integer(id,1);const b=s.buildings.find(b=>b.id===id);check(b&&buildingIsComplete(b)&&!b.unverified&&!!definition(b.type).workplace);}
+    array(e.blockedBuildings);check(new Set(e.blockedBuildings).size===e.blockedBuildings.length);for(const id of e.blockedBuildings){integer(id,1);const b=s.buildings.find(b=>b.id===id);check(b&&buildingIsComplete(b)&&!b.unverified&&!!bdef(b).workplace);}
     array(e.blockedTypes);check(new Set(e.blockedTypes).size===e.blockedTypes.length);for(const type of e.blockedTypes)check(typeof type==='string'&&!!definition(type,'building').workplace);}
   // S12 Stables: each tamed horse once, a living horse in an existing Stables within capacity; jobs by living Stablehands.
   part='stables';if(s.stables!==undefined){const st=s.stables;check(st&&typeof st==='object'&&Object.keys(st).sort().join()==='horses,jobs,ridden');array(st.horses);array(st.jobs);

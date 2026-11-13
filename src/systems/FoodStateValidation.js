@@ -7,14 +7,14 @@ import { FOOD_RESOURCE_IDS,FOOD_RULES } from '../data/foodProduction.js';
 import { pavementWorkArea } from '../game/pavement.js';
 import { recipeFor,recipeResources,recipeVariants } from '../data/production.js';
 import { PLAYER_START } from '../game/config.js';
-import { buildingIsComplete } from '../game/buildings.js';
+import { buildingIsComplete, definitionFor } from '../game/buildings.js';
 import { devTreeWood } from '../data/devBalance.js';
 import { physicalResources,materialResources,storageResources,stockLocationId,carryCapacity,equipmentResources,MAX_TRIP_UNITS,LOGISTICS_RULES,outputPile,pileLocationId } from '../data/logistics.js';
 
 export function validateFoodState(s,registry,{check,number,integer,array}){
   const storage=s.foodStorage,production=s.foodProduction;
   // farmhouse-store: a Farmhouse is first a workplace; a world without the storage system may still have one (its store is just absent).
-  if(!storage){check(!production&&!s.buildings.some(b=>buildingIsComplete(b)&&(registry.require(b.type).storage&&!registry.require(b.type).workplace||registry.require(b.type).recipe))&&!(s.workers??[]).some(w=>['foodPickup','foodDeliver','produce'].includes(w.workTask?.kind)));return;}
+  if(!storage){check(!production&&!s.buildings.some(b=>buildingIsComplete(b)&&(definitionFor(b,registry).storage&&!definitionFor(b,registry).workplace||definitionFor(b,registry).recipe))&&!(s.workers??[]).some(w=>['foodPickup','foodDeliver','produce'].includes(w.workTask?.kind)));return;}
   check(storage&&production);array(storage.locations);array(storage.reservations);array(production.records);integer(storage.nextReservation,1);integer(production.nextTransfer,1);
   const physical=storage.physicalMaterials===true,resources=physical?physicalResources(registry):[...FOOD_RESOURCE_IDS];
   const expected=physical?new Map():new Map([['food-camp',{kind:'fallback',buildingId:null,x:PLAYER_START.x,y:PLAYER_START.y,width:1,height:1,capacity:FOOD_RULES.fallbackCapacity,allowed:[...FOOD_RESOURCE_IDS]}]]);
@@ -25,9 +25,9 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
       expected.set(l.id,{kind:'fallback',buildingId:null,x:l.x,y:l.y,width:1,height:1,capacity:l.id==='legacy-materials'?40:30,allowed:l.id==='legacy-materials'?materialResources(registry):[...FOOD_RESOURCE_IDS]});
     }
   }
-  const producers=s.buildings.filter(b=>buildingIsComplete(b)&&registry.require(b.type).recipe);
+  const producers=s.buildings.filter(b=>buildingIsComplete(b)&&definitionFor(b,registry).recipe);
   for(const b of s.buildings)if(buildingIsComplete(b)){
-    const d=registry.require(b.type),base={buildingId:b.id,x:b.x,y:b.y,width:d.width,height:d.height};
+    const d=definitionFor(b,registry),base={buildingId:b.id,x:b.x,y:b.y,width:d.width,height:d.height};
     // A Starter Stockpile from a game started before 0.9.2 keeps its original 40 units (owner request: older saves unchanged).
     const savedCapacity=d.starter?storage.locations.find(l=>l.id===stockLocationId(b))?.capacity:undefined;
     if(d.storage&&(physical||!d.storage.accepts))expected.set(stockLocationId(b),{...base,kind:d.starter?'fallback':'storage',capacity:savedCapacity===LOGISTICS_RULES.legacyStarterCapacity?savedCapacity:d.storage.capacity,allowed:storageResources(d,registry)});
@@ -42,7 +42,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   if(physical)for(const b of s.buildings){
     if(!buildingIsComplete(b)&&s.logistics?.materialsVersion===1)check(b.materialSupply);
     if(!b.materialSupply)continue;check(!buildingIsComplete(b));
-    const d=registry.require(b.type),supply=b.materialSupply,required=Object.fromEntries(Object.entries(paidCost(b,d)).filter(([id])=>resources.includes(id)));
+    const d=definitionFor(b,registry),supply=b.materialSupply,required=Object.fromEntries(Object.entries(paidCost(b,d)).filter(([id])=>resources.includes(id)));
     check(supply.version===1&&typeof supply.legacyPaid==='boolean'&&JSON.stringify(supply.required)===JSON.stringify(required));sites.set(b.id,b);
     const area=d.pavement?pavementWorkArea(s.buildings,b,registry):{x:b.x,y:b.y,width:d.width,height:d.height};
     expected.set(`site-${b.id}`,{kind:'site',buildingId:b.id,x:area.x,y:area.y,width:area.width,height:area.height,capacity:Object.values(required).reduce((n,v)=>n+v,0),allowed:Object.keys(required)});
@@ -85,7 +85,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     const b=producers.find(b=>b.id===r.buildingId);check(b&&!records.has(b.id));records.set(b.id,r);check(typeof r.auto==='boolean');integer(r.nextCycle,1);integer(r.completed,0,r.nextCycle-1);
     check(r.nextCycle===1+r.completed+(r.cycle?1:0));
     // S12: a workshop with recipe choices keeps the chosen one; a running batch keeps the recipe it started with.
-    const d=registry.require(b.type);if(d.recipes){check(Object.hasOwn(d.recipes,r.recipe));if(r.cycle)check(Object.hasOwn(d.recipes,r.cycle.recipe));}else check(r.recipe===undefined&&r.cycle?.recipe===undefined);
+    const d=definitionFor(b,registry);if(d.recipes){check(Object.hasOwn(d.recipes,r.recipe));if(r.cycle)check(Object.hasOwn(d.recipes,r.cycle.recipe));}else check(r.recipe===undefined&&r.cycle?.recipe===undefined);
     // Fix (owner 13 Nov, save check "food"): a finished batch waiting in the output keeps the recipe it was made with,
     // also after the workshop switched to another one (Pitch Kiln: Torches wait, the kiln is back on Pitch).
     const waitingResource=!r.cycle&&r.outputReservation&&d.recipes?reservations.get(r.outputReservation)?.resource:null;
@@ -115,12 +115,12 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   for(const w of s.workers??[]){
     const t=w.workTask;if(!t)continue;
     if(['foodPickup','foodDeliver','produce','harvest','chopTree','mineDeposit'].includes(t.kind)&&t.transferId){const match=t.transferId.match(/^food-transfer-(\d+)$/);check(match);integer(Number(match[1]),1,production.nextTransfer-1);}
-    if(t.kind==='produce'){const b=producers.find(b=>b.id===t.targetId);check(b&&w.assignedWorkplaceId===b.id&&registry.require(b.type).workplace.profession===w.profession&&adjacent(locations.get(`input-${b.id}`),t.goal));continue;}
+    if(t.kind==='produce'){const b=producers.find(b=>b.id===t.targetId);check(b&&w.assignedWorkplaceId===b.id&&definitionFor(b,registry).workplace.profession===w.profession&&adjacent(locations.get(`input-${b.id}`),t.goal));continue;}
     if(t.kind==='harvest'){
       const crop=registry.require(s.buildings.find(b=>b.id===t.targetId).type).crop;check(t.capacityReservation&&locations.has(t.destinationId));capacity(t.capacityReservation,t.transferId,crop.resource,crop.yield);continue;
     }
     if(t.kind==='chopTree'){const tree=s.resources.find(r=>r.natural?.id===t.targetId),yieldAmount=devTreeWood(registry.require(tree?.type).tree,s.devBalance?.woodYield??1);/* m-drevorubci-stromy: the save's Wood per tree, at most one load */check(Number.isSafeInteger(t.amount)&&t.amount>=1&&t.amount<=yieldAmount&&(t.amount===yieldAmount||t.amount===carryCapacity({...w,vehicleType:null},'wood'))&&ownOutput(w,t.destinationId));capacity(t.capacityReservation,t.transferId,'wood',t.amount);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);continue;}
-    if(t.kind==='mineDeposit'){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),resource=registry.require(home.type).mining.resource;check(t.amount===1&&ownOutput(w,t.destinationId));capacity(t.capacityReservation,t.transferId,resource,1);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);continue;}
+    if(t.kind==='mineDeposit'){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),resource=definitionFor(home,registry).mining.resource;check(t.amount===1&&ownOutput(w,t.destinationId));capacity(t.capacityReservation,t.transferId,resource,1);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);continue;}
     if(!['foodPickup','foodDeliver'].includes(t.kind))continue;
     check(resources.includes(t.resource)&&locations.has(t.destinationId));integer(t.amount,1,carryCapacity({...w,vehicleType:s.vehicles?.vehicles.find(v=>v.operatorId===w.id&&v.state==='inUse')?.type??null},t.resource));
     const sourceDrop=t.sourceDropId&&s.drops.find(d=>d.id===t.sourceDropId);
@@ -133,7 +133,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     }else check(w.cargo?.resource===t.resource&&w.cargo.amount>=t.amount);
     if(t.naturalHarvest!==undefined)check(t.naturalHarvest===true&&w.profession==='woodcutter'&&s.buildings.some(b=>b.id===w.assignedWorkplaceId&&b.type==='lumberjack_hut')&&t.resource==='wood');
     if(t.manualMining!==undefined)check(t.manualMining===true&&w.profession==='miner'&&(w.assignedWorkplaceId==null||w.clearingLoan===true)&&t.resource==='stone'&&(t.kind!=='foodDeliver'||w.cargo?.rockId===t.rockId)&&s.naturalResources?.rockMining.records.some(r=>r.id===t.rockId&&r.produced===10)&&!t.naturalMining&&!t.naturalHarvest&&!t.hauling);
-    if(t.naturalMining!==undefined)check(t.naturalMining===true&&w.profession==='miner'&&s.buildings.some(b=>b.id===w.assignedWorkplaceId&&registry.require(b.type).mining?.resource===t.resource)&&!t.naturalHarvest);
+    if(t.naturalMining!==undefined)check(t.naturalMining===true&&w.profession==='miner'&&s.buildings.some(b=>b.id===w.assignedWorkplaceId&&definitionFor(b,registry).mining?.resource===t.resource)&&!t.naturalHarvest);
     const cap=reservations.get(t.capacityReservation);
     if(t.siteId!=null){check(sites.has(t.siteId)&&t.destinationId===`site-${t.siteId}`&&cap?.siteId===t.siteId);if(t.kind==='foodPickup')check(t.sourceDropId?sourceDrop?.siteId===t.siteId:reservations.get(t.stockReservation)?.siteId===t.siteId);else check(w.cargo?.siteId===t.siteId);}
     if(t.outputBuildingId&&t.kind==='foodPickup'&&records.get(t.outputBuildingId)?.outputReservation===t.capacityReservation){check(cap?.resource===t.resource&&cap.amount===t.amount);}

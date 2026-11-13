@@ -3,7 +3,8 @@ import { FARMING_RULES,FARMHOUSE_STORE } from '../farming.js';
 
 export const farmingBuildings = [
   {
-    id:'farmhouse',name:'Farmhouse',menuOrder:20,repeatPlacement:true,width:3,height:3,cost:{wood:10},constructionTime:25000,
+    // Owner 13 Nov 2026: the farmstead with its fenced yard is 4 × 4; Farmhouses of older saves (no `size`) stay 3 × 3.
+    id:'farmhouse',name:'Farmhouse',menuOrder:20,repeatPlacement:true,width:4,height:4,legacyFootprint:{width:3,height:3},cost:{wood:10},constructionTime:25000,
     recommendsCompletedBuildings:['granary'],
     description:`A farmhouse with three Farmer workplaces. Farmers tend crops within 15 tiles. Its store keeps ${FARMHOUSE_STORE.capacity} Wheat and Flour.`,
     storage:{capacity:FARMHOUSE_STORE.capacity,resources:[...FARMHOUSE_STORE.resources]},

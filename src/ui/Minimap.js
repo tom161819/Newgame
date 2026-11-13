@@ -1,3 +1,4 @@
+import { definitionFor } from '../game/buildings.js';
 import { t,onLanguageChange } from '../i18n/index.js';
 import { VISIBILITY } from '../systems/FogOfWarSystem.js';
 import { gridToWorldFlat as gridToWorld, worldToGridFlat as worldToGrid, clampMapCenter } from '../game/isometric.js'; // flat: painted into the ground picture before it is lifted
@@ -52,7 +53,7 @@ export function minimapPixels(scene,out){
   for(let y=0;y<height;y++)for(let x=0;x<width;x++)states[y*width+x]=fog.displayState({x,y});
   // Live objects only where they are in sight; remembered copies only where they are not.
   for(const building of scene.buildings??[])stamp(live,width,{x:building.x,y:building.y,width:building.definition?.width??1,height:building.definition?.height??1},objectKind(scene,{kind:'building',type:building.type}));
-  for(const view of scene.resources?.values?.()??[]){const o=view.getData?.('object');if(!o)continue;const d=scene.objectRegistry.require(o.type);stamp(live,width,{x:o.x??o.tile?.x,y:o.y??o.tile?.y,width:d.width,height:d.height},d.tree?KIND.tree:KIND.deposit);}
+  for(const view of scene.resources?.values?.()??[]){const o=view.getData?.('object');if(!o)continue;const d=definitionFor(o,scene.objectRegistry);stamp(live,width,{x:o.x??o.tile?.x,y:o.y??o.tile?.y,width:d.width,height:d.height},d.tree?KIND.tree:KIND.deposit);}
   if(fog.enabled&&memory)for(const entry of memory.objects.values())stamp(remembered,width,entry,objectKind(scene,entry));
   for(let i=0;i<width*height;i++){
     const state=states[i],x=i%width,y=(i-x)/width;let color;

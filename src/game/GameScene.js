@@ -64,7 +64,7 @@ import { ResourceTransactionLedger } from '../systems/ResourceTransactionLedger.
 import '../ui/resourceLedger.css';
 import { Inventory } from './inventory.js';
 import { drawStone, generateResourcePositions, resourceTiles, tileKey, ResourceSpawner } from './stones.js';
-import { placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors, buildingDefinition,buildingDepth,buildingIsComplete } from './buildings.js';
+import { placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors, buildingDefinition,buildingDepth,buildingIsComplete, definitionFor } from './buildings.js';
 import { footprintShown,applyFootprint,selectedBuildingIds } from './footprintHighlight.js';
 import { TowerView } from './TowerView.js';
 import { KingView } from './KingView.js';
@@ -251,7 +251,7 @@ export class GameScene extends Phaser.Scene {
     this.terrain=new TerrainRenderer(this,this.terrainGrid,this.objectRegistry,this.assets);
     this.inventory=new Inventory();if(!this.loadState)this.inventory.add('gold',this.gameSettings.startingGold);
     this.gameTime=new GameTimeSystem(this.gameSettings.dayLengthSeconds*1000);this.regeneration=new RegenerationSystem();
-    this.seasons=new SeasonSystem(this.gameTime,{enabled:this.gameSettings.seasonsEnabled,initialWeather:this.loadState?(this.loadState.seasons?.weather??'Sunny'):undefined});this.terrain.setSeason(this.seasons.season);for(const b of this.buildings??[])if((b.type==='village_green'||this.objectRegistry.get(b.type)?.decoration))this.towerViews.get(b.id)?.setSeason?.(this.seasons.season);
+    this.seasons=new SeasonSystem(this.gameTime,{enabled:this.gameSettings.seasonsEnabled,initialWeather:this.loadState?(this.loadState.seasons?.weather??'Sunny'):undefined});this.terrain.setSeason(this.seasons.season);for(const b of this.buildings??[])if((b.type==='village_green'||definitionFor(b,this.objectRegistry,true)?.decoration))this.towerViews.get(b.id)?.setSeason?.(this.seasons.season);
     this.dayNight=new DayNightSystem(this);this.lightFuel=new LightFuelSystem(this);this.nightThreats=new NightThreatSystem(this);this.heating=new HeatingSystem(this);
     this.nightThreats.onChange(()=>{for(const b of this.buildings??[])if(b.type==='campfire')(this.towerViews.get(b.id)?.inner??this.towerViews.get(b.id))?.refresh?.();});
     this.seasonTransition=new SeasonTransition(this);this.terrain.seasonMix=(x,y,season)=>this.seasonTransition.mix(x,y,season);this.terrain.seasonAt=(tile,season)=>this.seasonTransition.seasonAt(tile,season);this.terrain.seasonGroundLook=(cx,cy,season,size)=>this.seasonTransition.groundLook(cx,cy,season,size);

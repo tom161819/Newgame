@@ -1,6 +1,6 @@
 import { t } from '../i18n/index.js';
 import { tileKey } from './stones.js';
-import { buildingTiles,buildingIsComplete } from './buildings.js';
+import { buildingTiles,buildingIsComplete, definitionFor } from './buildings.js';
 import { PAVEMENT,pavementCost } from '../data/pavement.js';
 
 // S11 Stone Pavement orders: the tiles a tool selects, which of them are new, already paved or invalid, and the cost.
@@ -15,10 +15,10 @@ export function pavementTiles(mode,start,end=start){
 export const isPavementSite=b=>!!(b.definition??null)?.pavement||b.type==='stone_pavement'||b.type==='stone_pavement_joint';
 // #150: a finished building can get a paved floor (it covers it until it is gone). Fields and orchards cannot: their
 // ground is farmland. The Builder works from the building's edge, so the site's work area is the host's footprint.
-const tilesOf=(b,registry)=>b.tiles??buildingTiles(b,registry.require(b.type));
-const pavable=(b,registry)=>buildingIsComplete(b)&&!isPavementSite(b)&&!registry.require(b.type).crop;
+const tilesOf=(b,registry)=>b.tiles??buildingTiles(b,definitionFor(b,registry));
+const pavable=(b,registry)=>buildingIsComplete(b)&&!isPavementSite(b)&&!definitionFor(b,registry).crop;
 export function pavementHost(buildings,site,registry){if(!isPavementSite(site))return null;return buildings.find(b=>b!==site&&pavable(b,registry)&&tilesOf(b,registry).some(t=>t.x===site.x&&t.y===site.y))??null;}
-export function pavementWorkArea(buildings,site,registry){const host=pavementHost(buildings,site,registry),b=host??site,d=registry.require(b.type);return {x:b.x,y:b.y,width:d.width,height:d.height,host};}
+export function pavementWorkArea(buildings,site,registry){const host=pavementHost(buildings,site,registry),b=host??site,d=definitionFor(b,registry);return {x:b.x,y:b.y,width:d.width,height:d.height,host};}
 // Valid ground: open, no tree/deposit/stone, no other site (a pavement blueprint counts as already ordered); or the floor of a finished building.
 export function pavementPlan({map,tiles,resources,buildings,pathWear,inventory,registry}){
   const occupied=new Map();for(const b of buildings)for(const tile of tilesOf(b,registry)){const key=tileKey(tile),other=occupied.get(key);if(!other||isPavementSite(b)||!pavable(b,registry)&&!isPavementSite(other))occupied.set(key,b);}

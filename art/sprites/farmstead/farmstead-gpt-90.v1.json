@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "farmstead",
+  "variantId": "farmstead-gpt-90",
+  "name": "GPT farmstead with fenced yard 90° (rear-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "d07ec7df",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 277,
+  "height": 233,
+  "anchor": {
+    "x": 115,
+    "y": 166
+  },
+  "origin": {
+    "x": 0.41516,
+    "y": 0.71245
+  },
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "base": {
+    "x": 115,
+    "y": 230
+  },
+  "baseOrigin": {
+    "x": 0.41516,
+    "y": 0.98712
+  },
+  "visualHeight": 230,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.29,
+  "lights": [],
+  "x2": {
+    "width": 554,
+    "height": 466,
+    "anchor": {
+      "x": 230,
+      "y": 332
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

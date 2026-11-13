@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.115.0] - 2026-11-13
+<!-- version: {"title":"Farmhouse 4x4 with the GPT farmstead","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- New Farmhouse picture: a farmstead with a fenced, paved yard. The Farmhouse is now 4 × 4 tiles, so its doors are the same size as on the houses. Farmhouses in older saves keep their 3 × 3 place and show the new picture a little smaller.
+
 ## [0.114.3] - 2026-11-13
 <!-- version: {"title":"GPT buildings at one scale; no rim under houses","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

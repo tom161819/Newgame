@@ -1,3 +1,4 @@
+import { definitionFor } from '../game/buildings.js';
 import { ruinDefinition } from './NightThreatSystem.js';
 import { rememberBlueprint } from '../game/mapMemoryObjects.js';
 import { t } from '../i18n/index.js';
@@ -34,7 +35,7 @@ export function loadGameState(scene,input){
   scene.inventory.importState(state.inventory);
   scene.restoringFarmPlots=true;
   try{for(const data of state.buildings){
-    const definition=data.burntFrom?ruinDefinition(scene.objectRegistry,data.burntFrom):scene.objectRegistry.require(data.type),building={...data,definition,tiles:buildingTiles(data,definition)};
+    const definition=data.burntFrom?ruinDefinition(scene.objectRegistry,data.burntFrom):definitionFor(data,scene.objectRegistry),building={...data,definition,tiles:buildingTiles(data,definition)};
     if(!building.unverified)for(const t of building.tiles)scene.map[t.y][t.x]=definition.walkable&&(!building.construction||building.construction.state==='complete')?0:1;
     scene.buildings.push(building);scene.towerViews.set(building.id,scene.createBuildingView(definition,building));
   }}finally{scene.restoringFarmPlots=false;}
