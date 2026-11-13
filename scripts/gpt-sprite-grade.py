@@ -9,7 +9,7 @@ mx=rgb.max(2);mn=rgb.min(2);sat=(mx-mn)/np.maximum(mx,1);lum=rgb@np.array([.299,
 wt=(al>200).astype(np.float32);ww=np.maximum(ndi.uniform_filter(wt,5),1e-3);lm=ndi.uniform_filter(lum*wt,5)/ww;sd=np.sqrt(np.maximum(ndi.uniform_filter(lum*lum*wt,5)/ww-lm*lm,0))
 rows=np.arange(H)[:,None]*np.ones((1,W))
 outside=al<128
-cand=(al>=128)&(sat<0.14)&(lum>135)&(lum<bgl-3)&(sd<11)&(rows>0.55*H)
+cand=(al>=128)&(sat<0.16)&(lum>120)&(lum<bgl-3)&(sd<19)&(rows>0.6*H)
 ground=np.zeros_like(outside)
 grow=outside.copy()
 for _ in range(36):
@@ -17,7 +17,7 @@ for _ in range(36):
     if not nxt.any():break
     ground|=nxt;grow|=nxt
 # also the soft anti-aliased rim: semi-opaque pale pixels next to the outside
-rim=(al>8)&(al<250)&(sat<0.14)&(lum>150)&(rows>0.5*H)
+rim=(al>8)&(al<250)&(sat<0.18)&(lum>110)&(rows>0.55*H)
 ground|=rim
 shade=np.clip((bgl-lum)/90,0,1)*170
 out=a.copy()

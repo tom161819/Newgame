@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.114.3] - 2026-11-13
+<!-- version: {"title":"GPT buildings at one scale; no rim under houses","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- Houses, the Bakery and the Armory are drawn at one scale: doors and windows are the same size on every building. The light rim under the houses is gone.
+
 ## [0.114.2] - 2026-11-13
 <!-- version: {"title":"GPT buildings without the light rim, toned to the game","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed
