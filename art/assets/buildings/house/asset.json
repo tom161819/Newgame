@@ -58,6 +58,870 @@
           }
         ]
       }
+    },
+    {
+      "id": "house-gpt-bench-0",
+      "name": "GPT cottage with bench 0° (front-right)",
+      "version": 1,
+      "notes": "House look 1 of 4 (bench, crate, barrel). View 0° (front-right), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "house-gpt-bench-90",
+      "name": "GPT cottage with bench 90° (rear-right)",
+      "version": 1,
+      "notes": "House look 1 of 4 (bench, crate, barrel). View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "house-gpt-bench-180",
+      "name": "GPT cottage with bench 180° (rear-left)",
+      "version": 1,
+      "notes": "House look 1 of 4 (bench, crate, barrel). View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "house-gpt-bench-270",
+      "name": "GPT cottage with bench 270° (front-left)",
+      "version": 1,
+      "notes": "House look 1 of 4 (bench, crate, barrel). View 270° (front-left), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "house-gpt-woodshed-0",
+      "name": "GPT cottage with woodshed 0° (front-right)",
+      "version": 1,
+      "notes": "House look 2 of 4 (lean-to woodshed). View 0° (front-right), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "house-gpt-woodshed-90",
+      "name": "GPT cottage with woodshed 90° (rear-right)",
+      "version": 1,
+      "notes": "House look 2 of 4 (lean-to woodshed). View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "house-gpt-woodshed-180",
+      "name": "GPT cottage with woodshed 180° (rear-left)",
+      "version": 1,
+      "notes": "House look 2 of 4 (lean-to woodshed). View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "house-gpt-woodshed-270",
+      "name": "GPT cottage with woodshed 270° (front-left)",
+      "version": 1,
+      "notes": "House look 2 of 4 (lean-to woodshed). View 270° (front-left), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "house-gpt-porch-0",
+      "name": "GPT cottage with porch 0° (front-right)",
+      "version": 1,
+      "notes": "House look 3 of 4 (porch with lantern). View 0° (front-right), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "house-gpt-porch-90",
+      "name": "GPT cottage with porch 90° (rear-right)",
+      "version": 1,
+      "notes": "House look 3 of 4 (porch with lantern). View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "house-gpt-porch-180",
+      "name": "GPT cottage with porch 180° (rear-left)",
+      "version": 1,
+      "notes": "House look 3 of 4 (porch with lantern). View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "house-gpt-porch-270",
+      "name": "GPT cottage with porch 270° (front-left)",
+      "version": 1,
+      "notes": "House look 3 of 4 (porch with lantern). View 270° (front-left), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "house-gpt-garden-0",
+      "name": "GPT cottage with garden 0° (front-right)",
+      "version": 1,
+      "notes": "House look 4 of 4 (fenced garden, washing line). View 0° (front-right), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "house-gpt-garden-90",
+      "name": "GPT cottage with garden 90° (rear-right)",
+      "version": 1,
+      "notes": "House look 4 of 4 (fenced garden, washing line). View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "house-gpt-garden-180",
+      "name": "GPT cottage with garden 180° (rear-left)",
+      "version": 1,
+      "notes": "House look 4 of 4 (fenced garden, washing line). View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "house-gpt-garden-270",
+      "name": "GPT cottage with garden 270° (front-left)",
+      "version": 1,
+      "notes": "House look 4 of 4 (fenced garden, washing line). View 270° (front-left), cut out of the owner's GPT sheet and scaled to 1/3 (2× file at 2/3). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "walls": "timber",
+        "width": 1.35,
+        "depth": 1.15,
+        "wallHeight": 1.15,
+        "ridge": "z",
+        "roofHeight": 0.85,
+        "roofMaterial": "thatch",
+        "windows": 1,
+        "chimney": true,
+        "lantern": false,
+        "details": true,
+        "props": [
+          {
+            "type": "bench",
+            "at": [
+              0.15,
+              0.82
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.82,
+              -0.55
+            ]
+          },
+          {
+            "type": "barrel",
+            "at": [
+              0.82,
+              0.2
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.6,
+              0.8
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }

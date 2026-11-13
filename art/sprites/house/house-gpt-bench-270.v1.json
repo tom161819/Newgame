@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "house",
+  "variantId": "house-gpt-bench-270",
+  "name": "GPT cottage with bench 270° (front-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "8f5ca01a",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 161,
+  "height": 176,
+  "anchor": {
+    "x": 80,
+    "y": 129
+  },
+  "origin": {
+    "x": 0.49689,
+    "y": 0.73295
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 80,
+    "y": 161
+  },
+  "baseOrigin": {
+    "x": 0.49689,
+    "y": 0.91477
+  },
+  "visualHeight": 161,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.49,
+  "lights": [],
+  "x2": {
+    "width": 322,
+    "height": 352,
+    "anchor": {
+      "x": 160,
+      "y": 258
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

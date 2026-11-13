@@ -97,6 +97,18 @@ export function wallsReplacedBy(buildings,tiles,definition){
   if(!definition.replacesWall)return [];const keys=new Set(tiles.map(tileKey));
   return buildings.filter(b=>b.type==='wall'&&b.tiles.some(p=>keys.has(tileKey(p))));
 }
+// Owner 13 Nov 2026 ("ať se při stavbě vždycky změní a postaví se jiná varianta"): a building type with several looks
+// (definition.artLooks, e.g. the four House cottages) gives each new building the look after the one of the last
+// building of that type placed, so neighbours never repeat. A saved building without a look keeps a stable one by id.
+export function nextBuildingLook(definition,buildings){
+  const looks=definition?.artLooks;if(!looks?.length)return null;
+  const last=buildings.filter(b=>b.type===definition.id&&looks.includes(b.look)).reduce((a,b)=>!a||b.id>a.id?b:a,null);
+  return looks[last?(looks.indexOf(last.look)+1)%looks.length:0];
+}
+export function buildingLook(definition,building){
+  const looks=definition?.artLooks;if(!looks?.length||!building)return null;
+  return looks.includes(building.look)?building.look:looks[(Number(building.id)||0)%looks.length];
+}
 // provisional: a blueprint outside sight, already validated by knownPlacementError; it claims no map tiles until verified.
 // replaceWalls(walls,building): removes the replaced wall segments after payment and returns a settle() callback run once the
 // new building stands (refunds). Without it a footprint over a wall is refused.
@@ -107,6 +119,7 @@ export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,
   const construction=inventory.storage?.scene.constructionSystem,materials=reserveMaterials&&construction?.materials.enabled?construction.materials:null;
   const building={id:Math.max(buildings.reduce((n,b)=>Math.max(n,b.id),0)+1,materials?construction.nextId:1),type:definition.id,definition,x:anchor.x,y:anchor.y,tiles:buildingTiles(anchor,definition),...(fields??{})};
   if(definition.crop)building.farmId=availableFarm(building,buildings,buildingDefinition)?.id??null;
+  const look=nextBuildingLook(definition,buildings);if(look)building.look=look;
   if(!(materials?materials.prepare(building):inventory.pay(definition.cost,{source:`${dataName(definition)} Construction`,entityId:building.id})))return {error:t('status.noFunds')};
   const settle=walls.length?replaceWalls(walls,building):null,replaced=walls.length?{replaced:walls}:{};
   if(provisional){building.unverified=true;buildings.push(building);if(definition.id==='quarry')building.quarryMode='unbound';const refund=settle?.();return {building,...replaced,...(refund?{refund}:{})};}

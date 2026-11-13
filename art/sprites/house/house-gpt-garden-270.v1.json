@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "house",
+  "variantId": "house-gpt-garden-270",
+  "name": "GPT cottage with garden 270° (front-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "8f5ca01a",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 175,
+  "height": 178,
+  "anchor": {
+    "x": 87,
+    "y": 133
+  },
+  "origin": {
+    "x": 0.49714,
+    "y": 0.74719
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 87,
+    "y": 165
+  },
+  "baseOrigin": {
+    "x": 0.49714,
+    "y": 0.92697
+  },
+  "visualHeight": 165,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.49,
+  "lights": [],
+  "x2": {
+    "width": 350,
+    "height": 356,
+    "anchor": {
+      "x": 174,
+      "y": 266
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

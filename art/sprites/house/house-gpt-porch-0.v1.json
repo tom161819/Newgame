@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "house",
+  "variantId": "house-gpt-porch-0",
+  "name": "GPT cottage with porch 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "8f5ca01a",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 156,
+  "height": 180,
+  "anchor": {
+    "x": 78,
+    "y": 138
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.76667
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 78,
+    "y": 170
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.94444
+  },
+  "visualHeight": 170,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.49,
+  "lights": [],
+  "x2": {
+    "width": 312,
+    "height": 360,
+    "anchor": {
+      "x": 156,
+      "y": 276
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

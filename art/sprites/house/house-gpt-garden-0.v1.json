@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "house",
+  "variantId": "house-gpt-garden-0",
+  "name": "GPT cottage with garden 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "8f5ca01a",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 170,
+  "height": 181,
+  "anchor": {
+    "x": 77,
+    "y": 141
+  },
+  "origin": {
+    "x": 0.45294,
+    "y": 0.77901
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 77,
+    "y": 173
+  },
+  "baseOrigin": {
+    "x": 0.45294,
+    "y": 0.9558
+  },
+  "visualHeight": 173,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.49,
+  "lights": [],
+  "x2": {
+    "width": 340,
+    "height": 362,
+    "anchor": {
+      "x": 154,
+      "y": 282
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

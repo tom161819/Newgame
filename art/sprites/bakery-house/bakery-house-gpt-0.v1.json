@@ -13,37 +13,51 @@
   "width": 167,
   "height": 161,
   "anchor": {
-    "x": 83,
-    "y": 115
+    "x": 58,
+    "y": 108
   },
   "origin": {
-    "x": 0.49701,
-    "y": 0.71429
+    "x": 0.34731,
+    "y": 0.67081
   },
   "footprint": {
     "width": 3,
     "height": 2
   },
   "base": {
-    "x": 83,
-    "y": 155
+    "x": 74,
+    "y": 148
   },
   "baseOrigin": {
-    "x": 0.49701,
-    "y": 0.96273
+    "x": 0.44311,
+    "y": 0.91925
   },
-  "visualHeight": 155,
+  "visualHeight": 148,
   "platform": null,
   "frontLayer": false,
-  "gameLights": [],
+  "gameLights": [
+    {
+      "type": "brazier",
+      "x": 41,
+      "y": -31,
+      "color": "#ff9d4a",
+      "radius": 134.4,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1.2
+    }
+  ],
   "modelHeight": 2.24,
   "lights": [],
   "x2": {
     "width": 334,
     "height": 322,
     "anchor": {
-      "x": 166,
-      "y": 230
+      "x": 116,
+      "y": 216
     }
   },
   "render": {

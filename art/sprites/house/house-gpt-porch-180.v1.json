@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "house",
+  "variantId": "house-gpt-porch-180",
+  "name": "GPT cottage with porch 180° (rear-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "8f5ca01a",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 156,
+  "height": 176,
+  "anchor": {
+    "x": 78,
+    "y": 128
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.72727
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 78,
+    "y": 160
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.90909
+  },
+  "visualHeight": 160,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.49,
+  "lights": [],
+  "x2": {
+    "width": 312,
+    "height": 352,
+    "anchor": {
+      "x": 156,
+      "y": 256
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

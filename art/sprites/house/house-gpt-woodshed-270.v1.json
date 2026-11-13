@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "house",
+  "variantId": "house-gpt-woodshed-270",
+  "name": "GPT cottage with woodshed 270° (front-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "8f5ca01a",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 165,
+  "height": 174,
+  "anchor": {
+    "x": 82,
+    "y": 129
+  },
+  "origin": {
+    "x": 0.49697,
+    "y": 0.74138
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 82,
+    "y": 161
+  },
+  "baseOrigin": {
+    "x": 0.49697,
+    "y": 0.92529
+  },
+  "visualHeight": 161,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.49,
+  "lights": [],
+  "x2": {
+    "width": 330,
+    "height": 348,
+    "anchor": {
+      "x": 164,
+      "y": 258
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

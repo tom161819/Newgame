@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "house",
+  "variantId": "house-gpt-garden-90",
+  "name": "GPT cottage with garden 90° (rear-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "8f5ca01a",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 176,
+  "height": 180,
+  "anchor": {
+    "x": 88,
+    "y": 139
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.77222
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 88,
+    "y": 171
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.95
+  },
+  "visualHeight": 171,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.49,
+  "lights": [],
+  "x2": {
+    "width": 352,
+    "height": 360,
+    "anchor": {
+      "x": 176,
+      "y": 278
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

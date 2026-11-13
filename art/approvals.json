@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-13T18:20:36.929Z",
+  "updatedAt": "2026-11-13T18:32:36.510459Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -18,7 +18,7 @@
       }
     },
     "armory": {
-      "preferred": "armory-fortified",
+      "preferred": "armory-gpt-0",
       "variants": {
         "armory-fortified": {
           "status": "approved",
@@ -29,11 +29,13 @@
           "approvedAt": "2026-11-04T21:39:15.015Z"
         },
         "armory-gpt-0": {
-          "status": "review",
-          "version": 2,
-          "specHash": "e17aea4f",
+          "approvedAt": "2026-11-13T18:24:49.219Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T18:20:36.928Z",
+          "specHash": "e17aea4f",
+          "status": "approved",
+          "updatedAt": "2026-11-13T18:24:49.219Z",
+          "version": 2,
           "comments": [
             {
               "at": "2026-11-13T18:16:56.351Z",
@@ -81,7 +83,7 @@
       }
     },
     "bakery-house": {
-      "preferred": "bakery-house-yard-oven",
+      "preferred": "bakery-house-gpt-0",
       "variants": {
         "bakery-house-yard-oven": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -131,6 +133,42 @@
               "at": "2026-11-07T10:45:00.454Z"
             }
           ]
+        },
+        "bakery-house-gpt-0": {
+          "approvedAt": "2026-11-13T18:24:53.410Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2a77f463",
+          "status": "approved",
+          "updatedAt": "2026-11-13T18:24:53.410Z",
+          "version": 1
+        },
+        "bakery-house-gpt-90": {
+          "approvedAt": "2026-11-13T18:24:54.181Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2a77f463",
+          "status": "approved",
+          "updatedAt": "2026-11-13T18:24:54.181Z",
+          "version": 1
+        },
+        "bakery-house-gpt-180": {
+          "approvedAt": "2026-11-13T18:24:55.778Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2a77f463",
+          "status": "approved",
+          "updatedAt": "2026-11-13T18:24:55.778Z",
+          "version": 1
+        },
+        "bakery-house-gpt-270": {
+          "approvedAt": "2026-11-13T18:24:58.474Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2a77f463",
+          "status": "approved",
+          "updatedAt": "2026-11-13T18:24:58.474Z",
+          "version": 1
         }
       }
     },
@@ -359,7 +397,7 @@
       }
     },
     "house": {
-      "preferred": "house-timber",
+      "preferred": "house-gpt-bench-0",
       "variants": {
         "house-timber": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -409,6 +447,126 @@
               "at": "2026-11-07T10:46:29.767Z"
             }
           ]
+        },
+        "house-gpt-bench-0": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "Owner 13 Nov 2026 in chat: put the four houses into the game (0° view).",
+          "updatedAt": "2026-11-13T18:32:36.510459Z",
+          "approvedAt": "2026-11-13T18:32:36.510459Z",
+          "decidedBy": "owner (chat)"
+        },
+        "house-gpt-bench-90": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "",
+          "updatedAt": "2026-11-13T18:32:36.510459Z"
+        },
+        "house-gpt-bench-180": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "",
+          "updatedAt": "2026-11-13T18:32:36.510459Z"
+        },
+        "house-gpt-bench-270": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "",
+          "updatedAt": "2026-11-13T18:32:36.510459Z"
+        },
+        "house-gpt-woodshed-0": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "Owner 13 Nov 2026 in chat: put the four houses into the game (0° view).",
+          "updatedAt": "2026-11-13T18:32:36.510459Z",
+          "approvedAt": "2026-11-13T18:32:36.510459Z",
+          "decidedBy": "owner (chat)"
+        },
+        "house-gpt-woodshed-90": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "",
+          "updatedAt": "2026-11-13T18:32:36.510459Z"
+        },
+        "house-gpt-woodshed-180": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "",
+          "updatedAt": "2026-11-13T18:32:36.510459Z"
+        },
+        "house-gpt-woodshed-270": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "",
+          "updatedAt": "2026-11-13T18:32:36.510459Z"
+        },
+        "house-gpt-porch-0": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "Owner 13 Nov 2026 in chat: put the four houses into the game (0° view).",
+          "updatedAt": "2026-11-13T18:32:36.510459Z",
+          "approvedAt": "2026-11-13T18:32:36.510459Z",
+          "decidedBy": "owner (chat)"
+        },
+        "house-gpt-porch-90": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "",
+          "updatedAt": "2026-11-13T18:32:36.510459Z"
+        },
+        "house-gpt-porch-180": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "",
+          "updatedAt": "2026-11-13T18:32:36.510459Z"
+        },
+        "house-gpt-porch-270": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "",
+          "updatedAt": "2026-11-13T18:32:36.510459Z"
+        },
+        "house-gpt-garden-0": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "Owner 13 Nov 2026 in chat: put the four houses into the game (0° view).",
+          "updatedAt": "2026-11-13T18:32:36.510459Z",
+          "approvedAt": "2026-11-13T18:32:36.510459Z",
+          "decidedBy": "owner (chat)"
+        },
+        "house-gpt-garden-90": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "",
+          "updatedAt": "2026-11-13T18:32:36.510459Z"
+        },
+        "house-gpt-garden-180": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "",
+          "updatedAt": "2026-11-13T18:32:36.510459Z"
+        },
+        "house-gpt-garden-270": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8f5ca01a",
+          "note": "",
+          "updatedAt": "2026-11-13T18:32:36.510459Z"
         }
       }
     },

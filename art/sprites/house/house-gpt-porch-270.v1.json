@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "house",
+  "variantId": "house-gpt-porch-270",
+  "name": "GPT cottage with porch 270° (front-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "8f5ca01a",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 163,
+  "height": 175,
+  "anchor": {
+    "x": 81,
+    "y": 125
+  },
+  "origin": {
+    "x": 0.49693,
+    "y": 0.71429
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 81,
+    "y": 157
+  },
+  "baseOrigin": {
+    "x": 0.49693,
+    "y": 0.89714
+  },
+  "visualHeight": 157,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.49,
+  "lights": [],
+  "x2": {
+    "width": 326,
+    "height": 350,
+    "anchor": {
+      "x": 162,
+      "y": 250
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

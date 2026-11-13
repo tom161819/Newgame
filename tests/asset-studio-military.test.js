@@ -27,10 +27,10 @@ test('V02 military buildings: C07 footprints, at least three variants, trade pro
     for (const variant of asset.variants) assert.ok(['approved', 'review', 'rejected', undefined].includes(approvals.assets[id]?.variants?.[variant.id]?.status), variant.id);
     const game = objectDefinitions.find(d => d.id === id);
     // C07 built it: the game shows an approved export of it, byte for byte, never a look still in review.
-    const used = asset.variants.find(v => game.sprite.endsWith(`/${v.id}.v1.png`));
+    const used = asset.variants.find(v => game.sprite.endsWith(`/${v.id}.v${v.version}.png`));
     assert.ok(used, `${id}: the game sprite is a Studio export`);
     assert.equal(approvals.assets[id].variants[used.id].status, 'approved', `${id}: ${used.id} is approved`);
-    assert.ok(readFileSync(path.join(root, `public${game.sprite}`)).equals(readFileSync(path.join(root, `art/sprites/${id}/${used.id}.v1.png`))), `${id}: same bytes as the export`);
+    assert.ok(readFileSync(path.join(root, `public${game.sprite}`)).equals(readFileSync(path.join(root, `art/sprites/${id}/${used.id}.v${used.version}.png`))), `${id}: same bytes as the export`);
   }
   for (const variant of byId('swordsmith').variants) assert.ok(build(byId('swordsmith'), variant).lights.some(l => l.type === 'brazier'), `${variant.id}: forge glows`);
   for (const variant of byId('stables').variants) {

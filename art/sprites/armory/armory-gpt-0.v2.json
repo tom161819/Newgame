@@ -13,26 +13,26 @@
   "width": 190,
   "height": 193,
   "anchor": {
-    "x": 95,
-    "y": 142
+    "x": 104,
+    "y": 109
   },
   "origin": {
-    "x": 0.5,
-    "y": 0.73575
+    "x": 0.54737,
+    "y": 0.56477
   },
   "footprint": {
     "width": 3,
     "height": 3
   },
   "base": {
-    "x": 95,
-    "y": 190
+    "x": 104,
+    "y": 157
   },
   "baseOrigin": {
-    "x": 0.5,
-    "y": 0.98446
+    "x": 0.54737,
+    "y": 0.81347
   },
-  "visualHeight": 190,
+  "visualHeight": 157,
   "platform": null,
   "frontLayer": false,
   "gameLights": [],
@@ -42,8 +42,8 @@
     "width": 380,
     "height": 386,
     "anchor": {
-      "x": 190,
-      "y": 284
+      "x": 208,
+      "y": 218
     }
   },
   "render": {

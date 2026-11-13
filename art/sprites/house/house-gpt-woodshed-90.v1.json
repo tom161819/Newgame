@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "house",
+  "variantId": "house-gpt-woodshed-90",
+  "name": "GPT cottage with woodshed 90° (rear-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "8f5ca01a",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 176,
+  "height": 179,
+  "anchor": {
+    "x": 88,
+    "y": 138
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.77095
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 88,
+    "y": 170
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.94972
+  },
+  "visualHeight": 170,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.49,
+  "lights": [],
+  "x2": {
+    "width": 352,
+    "height": 358,
+    "anchor": {
+      "x": 176,
+      "y": 276
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

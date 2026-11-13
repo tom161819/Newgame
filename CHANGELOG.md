@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.114.0] - 2026-11-13
+<!-- version: {"title":"Four House looks; new Bakery and Armory art","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Four new House looks (with a bench, a woodshed, a porch, a garden). Each new House takes the next look, so neighbouring houses differ.
+
+### Changed
+- New Bakery and Armory pictures, approved by the owner in the Asset Studio. The Bakery oven glows at night.
+
 ## [0.113.2] - 2026-11-13
 <!-- version: {"title":"GPT Bakery views; Armory roof fix in the Asset Studio","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

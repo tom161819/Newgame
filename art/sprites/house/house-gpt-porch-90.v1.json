@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "house",
+  "variantId": "house-gpt-porch-90",
+  "name": "GPT cottage with porch 90° (rear-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "8f5ca01a",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 160,
+  "height": 177,
+  "anchor": {
+    "x": 80,
+    "y": 131
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.74011
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 80,
+    "y": 163
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.9209
+  },
+  "visualHeight": 163,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.49,
+  "lights": [],
+  "x2": {
+    "width": 320,
+    "height": 354,
+    "anchor": {
+      "x": 160,
+      "y": 262
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

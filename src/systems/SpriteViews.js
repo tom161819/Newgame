@@ -1,5 +1,5 @@
 import { directionName } from '../game/directions.js';
-import { towerBase, buildingDepth } from '../game/buildings.js';
+import { towerBase, buildingDepth, buildingLook } from '../game/buildings.js';
 import { tilePolygon } from '../game/isometric.js';
 import { DEPLETED_TINT } from '../game/depletedMine.js';
 
@@ -77,7 +77,9 @@ export class SpriteBuildingView {
     const base=towerBase(building);
     // #99: a building with a rotor (the Mill) shows its still body and turns the sails alone (see game/MillSails.js).
     const rotor=definition.rotor&&manager.hasTexture(definition.id,'still')&&manager.hasTexture(definition.id,'rotor');
-    this.back=new SpriteObjectView(manager,definition,base.x,base.y,rotor?{key:manager.textureKey(definition.id,'still')}:{});
+    // Owner 13 Nov 2026: a building with several looks (House) shows the look it was built with (building.look).
+    const look=buildingLook(definition,building),art=look&&manager.hasTexture(definition.id,`art-${look}`)?definition.artSprites[look]:null;
+    this.back=new SpriteObjectView(manager,definition,base.x,base.y,rotor?{key:manager.textureKey(definition.id,'still')}:art?{key:manager.key(definition.id,`art-${look}`),origin:art.origin}:{});
     this.rotor=rotor?manager.scene.add.image(base.x+definition.rotor.pivot.x,base.y+definition.rotor.pivot.y,manager.textureKey(definition.id,'rotor')).setOrigin(definition.rotor.origin.x,definition.rotor.origin.y):null;
     this.front=manager.hasTexture(definition.id,'front')
       ? new SpriteObjectView(manager,definition,base.x,base.y,{key:manager.textureKey(definition.id,'front'),origin:definition.frontOrigin??definition.origin,front:true})
