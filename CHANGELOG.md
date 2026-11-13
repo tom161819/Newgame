@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.111.0] - 2026-11-13
+<!-- version: {"title":"Wiki v2: units, animals, how the game works, guides","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Wiki: Units and people (resident, king, recruit, soldier, archer, swordsman, knight, merchant caravan) with their kit, health, attack, armour, range, training cost and wage from the game data.
+- Wiki: animals (rabbit, deer, wild boar, wolf, horse, cat) with health, attack and meat.
+- Wiki: How the game works – 14 pages: night and threats, seasons and weather, work speed, experience, employment, stores and haulers, paths, forests, deposits, walls and patrols, own caravan, children, fog, map size.
+- Wiki: five guides – the first day, bread, weapons and army, surviving winter, defending the night.
+- Wiki: "In your kingdom" on building and resource pages – how many stand, are being built, lack workers or report a problem, and how much is in stock.
+
 ## [0.110.0] - 2026-11-13
 <!-- version: {"title":"Wiki v2: every building, resource and profession explained","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

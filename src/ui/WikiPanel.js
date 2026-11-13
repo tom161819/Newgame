@@ -2,6 +2,8 @@ import { t } from '../i18n/index.js';
 import { element } from './objectLabels.js';
 import { buildWikiPages,wikiCategories,searchWiki } from '../systems/Wiki.js';
 import { WIKI_CATEGORIES } from '../data/wiki.js';
+import { buildingIsComplete } from '../game/buildingState.js';
+import { buildingIssueLine } from './noticeText.js';
 
 // m-wiki-napoveda: the Wiki window next to "?" – search, categories with their pages, and the page itself (icon,
 // facts, text, "See also" links). Pages are rebuilt from the game data when the language changes.
@@ -41,6 +43,7 @@ export class WikiPanel {
     const p=this.pages().get(id);if(!p)return false;if(push&&this.current&&this.current!==id)this.history.push(this.current);this.current=id;
     const title=element('h3','wiki-page-title');if(p.definition){const img=element('img','wiki-icon');img.alt='';img.src=this.scene.assets?.previewURL?.(p.definition)??'';title.append(img);}title.append(p.title);
     const parts=[element('small','wiki-page-category',t(`wiki.cat.${p.category}`)),title];
+    {const live=this.live(p);if(live)parts.push(live);}
     // m-wiki-v2: the page's sections in their fixed order (why, how, chain, numbers, tips, unlock).
     for(const section of p.sections??[]){
       const box=element('section',`wiki-section wiki-section-${section.key}`);box.dataset.wikiSection=section.key;
@@ -53,6 +56,20 @@ export class WikiPanel {
     if(p.links.length){const see=element('p','wiki-related');see.append(element('strong','',`${t('wiki.related')}: `));p.links.forEach((l,i)=>{const a=this.link(l);if(a){if(i)see.append(', ');see.append(a);}});parts.push(see);}
     if(this.history.length){const back=element('button','wiki-back',`← ${t('wiki.back')}`);back.type='button';back.addEventListener('click',()=>{const prev=this.history.pop();if(prev)this.show(prev,{push:false});});parts.unshift(back);}
     this.page.replaceChildren(...parts);this.page.dataset.wikiCurrent=id;this.renderNav();return true;
+  }
+  // m-wiki-v2 (c): what the page means in this game – how many such buildings stand, are being built, lack workers or
+  // report a problem; how much of a resource is in stock.
+  live(p){
+    const s=this.scene,[kind,id]=p.id.split(':'),lines=[];
+    if(kind==='building'){
+      const list=(s.buildings??[]).filter(b=>(b.type??b.definition?.id)===id),done=list.filter(buildingIsComplete);
+      if(!list.length)lines.push(t('wiki.live.none'));else{lines.push(t('wiki.live.built',{n:done.length}));if(list.length>done.length)lines.push(t('wiki.live.building',{n:list.length-done.length}));
+        if(p.definition.workplace){let short=0;for(const b of done){try{if(s.workplaceSystem?.staffing?.(b)?.missing>0)short++;}catch{}}if(short)lines.push(t('wiki.live.unstaffed',{n:short}));}
+        const issues=new Set();for(const b of done){try{const line=buildingIssueLine(s,s.diagnostics?.buildingIssue?.(b.id));if(line)issues.add(line);}catch{}}for(const line of [...issues].slice(0,3))lines.push(line);}
+    }else if(kind==='resource'){let n=null;try{n=s.inventory?.count?.(id);}catch{}if(Number.isFinite(n))lines.push(t('wiki.live.stock',{n:Math.floor(n)}));}
+    if(!lines.length)return null;
+    const box=element('section','wiki-section wiki-section-live');box.dataset.wikiSection='live';box.append(element('h4','wiki-section-title',t('wiki.section.live')));
+    const ul=element('ul','wiki-live');for(const line of lines)ul.append(element('li','',line));box.append(ul);return box;
   }
   // A production chain: one line of steps per row, each step a link to its page (the page itself in bold).
   chain(rows){

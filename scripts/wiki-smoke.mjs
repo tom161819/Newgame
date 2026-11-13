@@ -23,6 +23,10 @@ export async function wikiSmoke(context,url,instrument){
     await page.evaluate(()=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(x=>(x.type??x.definition?.id)==='starter_stockpile');s.storagePanel.open(b);});
     await page.locator('#storage-dialog[open] .wiki-help:not([hidden])').click();await page.locator('#wiki-dialog[open]').waitFor();
     assert.equal(await page.locator('#wiki-page').getAttribute('data-wiki-current'),'building:starter_stockpile');
+    assert.match(await page.locator('[data-wiki-section="live"]').textContent(),/Built: 1/);
+    await page.evaluate(()=>window.__game.registry.get('application').scene.wikiPanel.show('unit:knight'));
+    assert.match(await page.locator('[data-wiki-section="numbers"]').textContent(),/Combat level needed\s*4/);
+    for(const c of ['guides','units','systems'])assert.equal(await page.locator(`.wiki-category[data-wiki-category="${c}"]`).count(),1,c);
     await page.evaluate(()=>window.__game.registry.get('application').scene.wikiPanel.show('topic:chains'));
     assert.ok(await page.locator('.wiki-chain-row').count()>=10,'chains');
     await page.locator('.wiki-section-chain [data-wiki-page="building:bakery"]').first().click();
@@ -31,6 +35,6 @@ export async function wikiSmoke(context,url,instrument){
     assert.ok(await page.locator('.wiki-step-here').count()>=2,'bakery marked in its chain');
     if(process.env.SMOKE_SHOTS)await page.screenshot({path:`${process.env.SMOKE_SHOTS}/wiki-bakery.png`});
     await page.keyboard.press('Escape');await page.evaluate(()=>window.__game.registry.get('application').scene.storagePanel.close?.());
-    console.log('PASS Wiki: button next to ?, "?" in a building window, All chains → Bakery with its sections, categories, search, generated Granary page with facts, link to Rats & Cats and Back, "i" on a rats feed line opens the topic');
+    console.log('PASS Wiki: button next to ?, "?" in a building window, live state, Knight numbers, guides/units/systems, All chains → Bakery with its sections, categories, search, generated Granary page with facts, link to Rats & Cats and Back, "i" on a rats feed line opens the topic');
   }finally{await page.close();}
 }

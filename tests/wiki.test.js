@@ -9,7 +9,7 @@ import { TIPS } from '../src/data/tips.js';
 import en from '../src/i18n/en.js';
 import cs from '../src/i18n/cs.js';
 
-const t=(key,params={})=>String(en[key]??key).replace(/\{(\w+)\}/g,(_,k)=>params[k]??'');
+const t=(key,params={})=>{const v=en[key]??key;return String(typeof v==='object'?v.other:v).replace(/\{(\w+)\}/g,(_,k)=>params[k]??'');};
 test('every buildable building, collectible resource and profession has a page; links lead to pages',()=>{
   const pages=buildWikiPages(objectRegistry,t);
   for(const d of objectRegistry.buildables())assert.ok(pages.has(`building:${d.id}`),d.id);
