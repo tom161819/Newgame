@@ -65,6 +65,246 @@
         ]
       },
       "notes": "Recommended concept for review."
+    },
+    {
+      "id": "hunting-lodge-gpt-0",
+      "name": "GPT hunting hut with dog kennel 0° (front-right)",
+      "version": 1,
+      "notes": "Timber hunting hut with a tiled roof, antlers over the door, lantern, bow and quiver, hide rack, dog kennel; trophies and traps on the other sides. View 0° (front-right), cut out of the owner's GPT sheet and scaled to 0.287 (doors ≈ 48 px; 2× file at 0.574). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.1,
+          "depth": 0.95,
+          "wallHeight": 0.85,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 1,
+          "chimney": true,
+          "at": [
+            -0.25,
+            -0.3
+          ]
+        },
+        "props": [
+          {
+            "type": "antlers",
+            "at": [
+              -0.45,
+              0.21
+            ],
+            "y": 0.82
+          },
+          {
+            "type": "hideRack",
+            "at": [
+              0.55,
+              0.35
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.55,
+              -0.62
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.05,
+              0.72
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "hunting-lodge-gpt-90",
+      "name": "GPT hunting hut with dog kennel 90° (rear-right)",
+      "version": 1,
+      "notes": "Timber hunting hut with a tiled roof, antlers over the door, lantern, bow and quiver, hide rack, dog kennel; trophies and traps on the other sides. View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 0.287 (doors ≈ 48 px; 2× file at 0.574). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.1,
+          "depth": 0.95,
+          "wallHeight": 0.85,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 1,
+          "chimney": true,
+          "at": [
+            -0.25,
+            -0.3
+          ]
+        },
+        "props": [
+          {
+            "type": "antlers",
+            "at": [
+              -0.45,
+              0.21
+            ],
+            "y": 0.82
+          },
+          {
+            "type": "hideRack",
+            "at": [
+              0.55,
+              0.35
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.55,
+              -0.62
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.05,
+              0.72
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "hunting-lodge-gpt-180",
+      "name": "GPT hunting hut with dog kennel 180° (rear-left)",
+      "version": 1,
+      "notes": "Timber hunting hut with a tiled roof, antlers over the door, lantern, bow and quiver, hide rack, dog kennel; trophies and traps on the other sides. View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 0.287 (doors ≈ 48 px; 2× file at 0.574). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.1,
+          "depth": 0.95,
+          "wallHeight": 0.85,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 1,
+          "chimney": true,
+          "at": [
+            -0.25,
+            -0.3
+          ]
+        },
+        "props": [
+          {
+            "type": "antlers",
+            "at": [
+              -0.45,
+              0.21
+            ],
+            "y": 0.82
+          },
+          {
+            "type": "hideRack",
+            "at": [
+              0.55,
+              0.35
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.55,
+              -0.62
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.05,
+              0.72
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "hunting-lodge-gpt-270",
+      "name": "GPT hunting hut with dog kennel 270° (front-left)",
+      "version": 1,
+      "notes": "Timber hunting hut with a tiled roof, antlers over the door, lantern, bow and quiver, hide rack, dog kennel; trophies and traps on the other sides. View 270° (front-left), cut out of the owner's GPT sheet and scaled to 0.287 (doors ≈ 48 px; 2× file at 0.574). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.1,
+          "depth": 0.95,
+          "wallHeight": 0.85,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 1,
+          "chimney": true,
+          "at": [
+            -0.25,
+            -0.3
+          ]
+        },
+        "props": [
+          {
+            "type": "antlers",
+            "at": [
+              -0.45,
+              0.21
+            ],
+            "y": 0.82
+          },
+          {
+            "type": "hideRack",
+            "at": [
+              0.55,
+              0.35
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.55,
+              -0.62
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.05,
+              0.72
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }

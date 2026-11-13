@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "hunting-lodge",
+  "variantId": "hunting-lodge-gpt-90",
+  "name": "GPT hunting hut with dog kennel 90° (rear-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "29c42966",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 175,
+  "height": 139,
+  "anchor": {
+    "x": 87,
+    "y": 99
+  },
+  "origin": {
+    "x": 0.49714,
+    "y": 0.71223
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 87,
+    "y": 131
+  },
+  "baseOrigin": {
+    "x": 0.49714,
+    "y": 0.94245
+  },
+  "visualHeight": 131,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.04,
+  "lights": [],
+  "x2": {
+    "width": 350,
+    "height": 278,
+    "anchor": {
+      "x": 174,
+      "y": 198
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

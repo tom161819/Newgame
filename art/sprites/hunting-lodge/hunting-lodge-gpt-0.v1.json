@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "assetId": "hunting-lodge",
+  "variantId": "hunting-lodge-gpt-0",
+  "name": "GPT hunting hut with dog kennel 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "29c42966",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 174,
+  "height": 139,
+  "anchor": {
+    "x": 90,
+    "y": 92
+  },
+  "origin": {
+    "x": 0.51724,
+    "y": 0.66187
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 90,
+    "y": 124
+  },
+  "baseOrigin": {
+    "x": 0.51724,
+    "y": 0.89209
+  },
+  "visualHeight": 124,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -68,
+      "y": -49,
+      "color": "#ffb25a",
+      "radius": 96,
+      "intensity": 0.9,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 0.6
+    }
+  ],
+  "modelHeight": 2.04,
+  "lights": [],
+  "x2": {
+    "width": 348,
+    "height": 278,
+    "anchor": {
+      "x": 180,
+      "y": 184
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}
