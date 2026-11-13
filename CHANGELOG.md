@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.111.1] - 2026-11-13
+<!-- version: {"title":"Pitch Kiln no longer stops after its first batch","type":"fix","reconstructed":false,"saveVersion":62} -->
+### Fixed
+- The Pitch Kiln no longer stops after its first batch. When it switched between Pitch and Torches, the finished goods of the other recipe stayed in its output and blocked every next batch; the Pitch Maker now carries them out. Haulers also take such leftovers from any workshop.
+
 ## [0.111.0] - 2026-11-13
 <!-- version: {"title":"Wiki v2: units, animals, how the game works, guides","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

@@ -60,6 +60,11 @@ export class FoodProductionSystem {
   // m-pracovnici-odnaseji-vyrobky (owner, 12 Nov): when a producer's own pile is full, one of its workers carries a load
   // to the nearest store that takes it and then works on. Not while a Hauler already has the pile's goods reserved, and
   // only one worker of the building at a time.
+  // Resources lying free in a production output buffer, `first` (the current recipe's product) leading.
+  outputResources(outputId,first){
+    const location=this.storage.locations.get(outputId);if(!location)return [];
+    return [...new Set([first,...Object.keys(location.stock??{})])].filter(resource=>this.storage.free(outputId,resource)>0);
+  }
   carryOwnOutput(worker,building){
     const pile=this.storage.pileFor?.(building);if(!pile||worker.cargo||worker.workTask)return false;
     const resource=pile.allowed[0],free=this.storage.free(pile.id,resource);if(free<=0)return false;
@@ -142,16 +147,24 @@ export class FoodProductionSystem {
     const recipe=record.cycle?this.cycleRecipe(record,building):this.recipe(building),outputId=`output-${building.id}`,inputId=`input-${building.id}`;
     if(worker.workTask?.kind==='produce'){
       if(!record.auto){this.scene.workerSystem.ai.cancel(worker);worker.workState='Waiting';worker.workMessage='Auto Production OFF';return;}
+      // A worker waiting at the bench for a batch that cannot start because the output buffer is still full goes to
+      // carry it out (the Pitch Kiln stalled here after switching recipe).
+      if(!record.cycle&&this.outputResources(outputId,first(recipe.output)[0]).length&&!this.scene.workerSystem.liveWorkers().some(w=>w!==worker&&w.assignedWorkplaceId===building.id&&w.workTask?.sourceId===outputId)){this.scene.workerSystem.ai.cancel(worker);worker.aiCooldown=0;}
+      else{
       if(!this.scene.workplaceSystem.atWorkplace(worker)&&!worker.nextTile&&!worker.path.length)worker.moveTo(this.scene.workplaceSystem.goals(worker));
-      worker.workState='Working';worker.workMessage=`Producing ${first(recipe.output)[0]}`;return;
+      worker.workState='Working';worker.workMessage=`Producing ${first(recipe.output)[0]}`;return;}
     }
     if(worker.workTask||worker.aiCooldown>0)return;
     worker.aiCooldown=FOOD_RULES.searchInterval;
-    const [outputResource,outputAmount]=first(recipe.output),outputAvailable=this.storage.free(outputId,outputResource);
-    if(outputAvailable){
-      let cap=this.storage.reservations.get(record.outputReservation),destination=cap&&this.storage.locations.get(cap.locationId);
-      if(!destination){const route=this.storage.findDestination(worker,outputResource,Math.min(outputAvailable,carryCapacity(worker,outputResource)));if(route)destination=route.location;}
-      if(destination&&!this.scene.logisticsTasks?.waitForHauler(building,'output')&&this.move(worker,outputId,destination.id,outputResource,Math.min(outputAvailable,carryCapacity(worker,outputResource)),{capacityReservation:cap?.id,outputBuildingId:building.id}))return;
+    const [outputResource,outputAmount]=first(recipe.output);
+    // Fix (owner 13 Nov, Pitch Kiln stops after its first batch): the output buffer can still hold the product of the
+    // other recipe (Pitch after the kiln switched to Torches). A new batch waits for an empty buffer, so the workers
+    // carry out whatever lies there, the current recipe's product first.
+    for(const resource of this.outputResources(outputId,outputResource)){
+      const outputAvailable=this.storage.free(outputId,resource),own=resource===outputResource;
+      let cap=own?this.storage.reservations.get(record.outputReservation):null,destination=cap&&this.storage.locations.get(cap.locationId);
+      if(!destination){const route=this.storage.findDestination(worker,resource,Math.min(outputAvailable,carryCapacity(worker,resource)));if(route)destination=route.location;}
+      if(destination&&!this.scene.logisticsTasks?.waitForHauler(building,'output')&&this.move(worker,outputId,destination.id,resource,Math.min(outputAvailable,carryCapacity(worker,resource)),{capacityReservation:cap?.id,outputBuildingId:building.id}))return;
     }
     if(!record.auto){worker.workState='Waiting';worker.workMessage='Auto Production OFF';return;}
     const input=this.storage.locations.get(inputId),missing=Object.entries(recipe.input).find(([resource,needed])=>(input.stock[resource]??0)+this.storage.incoming(inputId,resource)<needed);

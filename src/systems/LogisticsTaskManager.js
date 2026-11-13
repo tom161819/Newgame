@@ -23,9 +23,10 @@ export class LogisticsTaskManager {
         for(const resource of Object.keys(recipe.input)){const missing=this.scene.foodProduction.inputTarget(building,resource,{bulk:true})-(input.stock[resource]??0)-storage.incoming(input.id,resource);
           if(missing>0)for(const source of stores)if(storage.free(source.id,resource)>0)this.catalog.push({priority:20,sourceId:source.id,destinationId:input.id,resource,amount:missing});}
       }
-      const [outputResource]=Object.entries(recipe.output)[0],output=storage.locations.get(`output-${building.id}`),available=storage.free(output.id,outputResource);
-      if(available>0){
-        const cap=storage.reservations.get(record.outputReservation);
+      // Every product lying in the output buffer is offered, also one of a recipe the workshop has switched away from.
+      const [current]=Object.entries(recipe.output)[0],output=storage.locations.get(`output-${building.id}`);
+      for(const outputResource of this.scene.foodProduction.outputResources(output.id,current)){
+        const available=storage.free(output.id,outputResource),cap=outputResource===current?storage.reservations.get(record.outputReservation):null;
         for(const destination of stores)if(destination.allowed.includes(outputResource)&&(cap?destination.id===cap.locationId:storage.room(destination.id,outputResource)>0))this.catalog.push({priority:30,sourceId:output.id,destinationId:destination.id,resource:outputResource,amount:available,capacityReservation:cap?.id,outputBuildingId:building.id});
       }
     }
