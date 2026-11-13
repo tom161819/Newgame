@@ -109,7 +109,7 @@ export class NeedsSystem {
     // Children D2: a Swing Tree (+1) and a Well (+1) nearby; all of it together is capped at +8 (`surroundingsCapped`).
     const around=this.scene.childrenSystem?.surroundings?.(house,homes)??{green:0,family:0,swing:0,well:0,total:0,capped:0},green=around.green,greenFamily=around.family,swing=around.swing,well=around.well;
     // m-topeni-domu: a warm House in autumn and winter (+), a cold one (−).
-    const heat=this.scene.heating?.happiness?.(house)??0;
+    const heat=this.scene.heating?.happiness?.(house??(home?.kind==='settlement'?this.scene.heating?.castle?.():null))??0;
     const happiness=happinessOf(needs,penalty-policy+contextTotal-feast-cat-around.total-heat),mood=moodFor(happiness);
     return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,policyTarget:this.scene.policy?.target?.()??0,policyContext:context,foodRations:this.scene.policy?.rations??'normal',foodBase:food.base,foodKinds:food.kinds,foodVariety:food.variety,foodTarget:food.target,foodUnfed:food.hungry,feast,heat,cat,green,greenFamily,swing,well,surroundingsCapped:around.capped,feastDaysLeft:this.scene.policy?.feastDaysLeft?.()??0,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty,Math.max(0,-policy)+contextTotal),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
   }

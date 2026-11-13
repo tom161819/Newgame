@@ -1,3 +1,4 @@
+import { HEATED_BUILDINGS } from '../data/heating.js';
 import { validExpedition } from './Expedition.js';
 import { fishingGround } from './FishingSystem.js';
 import { SQUAD_MAX } from '../ui/armySquads.js';
@@ -555,7 +556,7 @@ function validateAtSize(input,registry){
   // Day and night N2 (schema 56): which light places burn tonight and which soldiers carry a torch.
   part='lightFuel';if(s.lightFuel!==undefined)check(validLightFuelState(s.lightFuel)&&s.lightFuel.lit.every(id=>s.buildings.some(b=>b.id===id)));
   // Day and night N3 (schema 57): threat switches and campfires.
-  part='heating';if(s.heating!==undefined)check(validHeatingState(s.heating,new Set(s.buildings.filter(b=>b.type==='house').map(b=>b.id))));
+  part='heating';if(s.heating!==undefined)check(validHeatingState(s.heating,new Set(s.buildings.filter(b=>HEATED_BUILDINGS.includes(b.type)).map(b=>b.id))));
   part='nightThreats';if(s.nightThreats!==undefined)check(validNightThreatState(s.nightThreats,new Set(s.buildings.map(b=>b.id))));
   // E4: finished Royal tasks and counted production (optional, older saves start with none done).
   part='royalGoals';if(s.royalGoals!==undefined)check(validRoyalGoalState(s.royalGoals));

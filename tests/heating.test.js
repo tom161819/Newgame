@@ -58,3 +58,18 @@ test('Haulers fill woodpiles only in autumn and winter; the state saves and load
   assert.deepEqual(validateGameState(serializeGameState(r)),saved);
   assert.throws(()=>validateGameState({...saved,heating:{...saved.heating,warm:[999999]}}));
 });
+
+// Owner 13 Nov: the Castle (twice a House's Wood, felt by residents sleeping in the settlement) and the Barracks
+// (felt by its soldiers in combat) heat too.
+test('the Castle and the Barracks heat: Castle burns double, a cold Barracks weakens its soldiers by 10 %',()=>{
+  const s=scene(),castle=house(s,60,60),barracks=house(s,70,60);castle.type='castle';barracks.type='barracks';
+  const res=resident(s);s.needs.assignments=new Map([[res.id,{kind:'settlement'}]]);s.needs.revision++;
+  const soldier=resident(s,{x:42,y:40});soldier.profession='soldier';soldier.assignedWorkplaceId=barracks.id;
+  s.seasons.weather='Sunny';pile(s,castle,12);pile(s,barracks,0);
+  s.heating.newDay(winterDay);
+  assert.equal(s.heating.status.get(castle.id),'warm');assert.equal(s.heating.stock(castle),12-2*HEATING.perDay.Winter);
+  assert.equal(s.needs.status(res,s.needs.homes()).heat,HEATING.warmBonus,'a resident sleeping in the settlement feels the Castle');
+  assert.equal(s.heating.status.get(barracks.id),'cold');assert.equal(s.heating.combatFactor(soldier),HEATING.coldCombat);
+  assert.equal(s.heating.combatFactor(res),1);
+  pile(s,barracks,12);s.heating.newDay(winterDay+1);assert.equal(s.heating.combatFactor(soldier),1);
+});

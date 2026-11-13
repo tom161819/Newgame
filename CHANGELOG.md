@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.113.0] - 2026-11-13
+<!-- version: {"title":"Castle and Barracks heating, Smelter burns 3 Wood","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- The Castle and the Barracks heat in autumn and winter too. The Castle burns twice a House's Wood and warms the residents who sleep in the settlement; in a cold Barracks soldiers fight 10 % weaker.
+
+### Changed
+- The Smelter burns 3 Wood a batch (was 2): 3 Iron Ore + 3 Wood → 1 Iron.
+
 ## [0.112.0] - 2026-11-13
 <!-- version: {"title":"Winter heating and wood as fuel","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

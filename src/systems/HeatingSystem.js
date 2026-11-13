@@ -1,4 +1,4 @@
-import { HEATING,HEATED_BUILDINGS } from '../data/heating.js';
+import { HEATING,HEATED,HEATED_BUILDINGS } from '../data/heating.js';
 import { calendar,SEASON_DAYS } from '../data/seasons.js';
 import { buildingIsComplete } from '../game/buildings.js';
 import { t } from '../i18n/index.js';
@@ -31,14 +31,21 @@ export class HeatingSystem {
   need(day=this.scene.gameTime?.day??1,weather=this.scene.seasons?.weather){
     const base=HEATING.perDay[this.season(day)]??0;return base?Math.ceil(base*(HEATING.weather[weather]??1)):0;
   }
-  occupied(){const out=new Map();for(const h of this.scene.needs?.homes?.()?.values?.()??[])if(h.kind==='house')out.set(h.buildingId,(out.get(h.buildingId)??0)+1);return out;}
+  // Who uses each heated building today: residents of a House, the Castle always (the King's seat), soldiers of a Barracks.
+  occupied(){
+    const out=new Map();for(const h of this.scene.needs?.homes?.()?.values?.()??[])if(h.kind==='house')out.set(h.buildingId,(out.get(h.buildingId)??0)+1);
+    for(const b of this.houses()){if(b.type==='castle')out.set(b.id,1);
+      if(b.type==='barracks'){const n=(this.scene.workerSystem?.liveWorkers?.()??[]).filter(w=>w.profession==='soldier'&&w.assignedWorkplaceId===b.id).length;if(n)out.set(b.id,n);}}
+    return out;
+  }
+  dayNeed(building,need){return Math.ceil(need*(HEATED[building.type]?.factor??1));}
   newDay(day){
     this.day=day;this.status.clear();
     if(!this.active()){this.changed();return;}
     const need=this.need(day),people=this.occupied(),cold=[];
     if(need>0)for(const b of this.houses()){
-      if(!people.get(b.id))continue;const id=this.locationId(b);this.ensurePile(b);
-      if(this.stock(b)>=need&&this.storage.withdraw(id,HEATING.resource,need)!==false){this.status.set(b.id,'warm');this.scene.resourceLedger?.expense(HEATING.resource,need,'Heating',{id:`heat:${b.id}:${day}`,entityId:b.id});}
+      if(!people.get(b.id))continue;const id=this.locationId(b),burn=this.dayNeed(b,need);this.ensurePile(b);
+      if(this.stock(b)>=burn&&this.storage.withdraw(id,HEATING.resource,burn)!==false){this.status.set(b.id,'warm');this.scene.resourceLedger?.expense(HEATING.resource,burn,'Heating',{id:`heat:${b.id}:${day}`,entityId:b.id});}
       else{this.status.set(b.id,'cold');cold.push(b);}
     }
     this.notify(day,cold);this.changed();
@@ -53,9 +60,9 @@ export class HeatingSystem {
   }
   // Wood in the stores and woodpiles against what autumn's rest and the winter will burn in the occupied Houses.
   winterEstimate(){
-    const houses=this.occupied().size,day=this.scene.gameTime?.day??1,info=calendar(day);
+    const used=this.occupied(),houses=used.size,factors=[...used.keys()].reduce((n,id)=>n+(HEATED[this.houses().find(b=>b.id===id)?.type]?.factor??1),0),day=this.scene.gameTime?.day??1,info=calendar(day);
     const autumnLeft=info.season==='Autumn'?SEASON_DAYS-info.dayInSeason+1:0,winterLeft=info.season==='Winter'?SEASON_DAYS-info.dayInSeason+1:info.season==='Autumn'?SEASON_DAYS:0;
-    const needed=houses*(autumnLeft*(HEATING.perDay.Autumn??0)+winterLeft*(HEATING.perDay.Winter??0)),inPiles=this.houses().reduce((n,b)=>n+this.stock(b),0);
+    const needed=factors*(autumnLeft*(HEATING.perDay.Autumn??0)+winterLeft*(HEATING.perDay.Winter??0)),inPiles=this.houses().reduce((n,b)=>n+this.stock(b),0);
     let stored=0;try{stored=this.storage?.available?.(HEATING.resource)??0;}catch{}
     return {houses,needed,stored:Math.floor(stored+inPiles)};
   }
@@ -63,6 +70,11 @@ export class HeatingSystem {
   happiness(house){
     const state=house&&this.status.get(house.id);if(!state)return 0;const f=HEATING.seasonEffect[this.season(this.day??undefined)]??0;
     return Math.round((state==='warm'?HEATING.warmBonus:-HEATING.coldPenalty)*f);
+  }
+  // Residents sleeping in the settlement's base places feel the Castle; soldiers of a cold Barracks fight weaker.
+  castle(){return this.houses().find(b=>b.type==='castle')??null;}
+  combatFactor(unit){
+    if(unit?.profession!=='soldier'||unit.assignedWorkplaceId==null)return 1;return this.status.get(unit.assignedWorkplaceId)==='cold'?HEATING.coldCombat:1;
   }
   isCold(house){return !!house&&this.status.get(house.id)==='cold';}
   isWarm(house){return !!house&&this.status.get(house.id)==='warm';}

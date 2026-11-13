@@ -13,9 +13,9 @@ const scene=(starter=true)=>workerScene(undefined,{construction:true,logistics:t
 function building(s,type,x=52,y=45){const definition=s.objectRegistry.require(type),b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition,x,y,tiles:buildingTiles({x,y},definition)};s.buildings.push(b);for(const t of b.tiles)s.map[t.y][t.x]=definition.walkable?0:1;s.towerViews.set(b.id,s.createBuildingView(definition,b));s.foodProduction.register(b);return b;}
 function until(s,p,max=90000){for(let t=0;t<max&&!p();t+=25)s.tick(25);assert.ok(p(),'condition not reached');}
 
-test('fuel is part of the input: Bakery 1 Flour + 1 Wood, Smelter 2 Wood, forges 1 of 2 Wood',()=>{
+test('fuel is part of the input: Bakery 1 Flour + 1 Wood, Smelter 3 Wood, forges 1 of 2 Wood',()=>{
   assert.deepEqual([FOOD_RECIPES.bakery.input,FOOD_RECIPES.bakery.fuel],[{flour:1,wood:1},{wood:1}]);
-  assert.deepEqual(PRODUCTION_RECIPES.smelter.fuel,{wood:2});assert.deepEqual([PRODUCTION_RECIPES.swordsmith.fuel,PRODUCTION_RECIPES.armorer.fuel],[{wood:1},{wood:1}]);
+  assert.deepEqual([PRODUCTION_RECIPES.smelter.input,PRODUCTION_RECIPES.smelter.fuel],[{iron_ore:3,wood:3},{wood:3}]);assert.deepEqual([PRODUCTION_RECIPES.swordsmith.fuel,PRODUCTION_RECIPES.armorer.fuel],[{wood:1},{wood:1}]);
   for(const r of Object.values(PRODUCTION_RECIPES))for(const [id,n]of Object.entries(r.fuel??{}))assert.ok(r.input[id]>=n,'fuel is never more than the input');
 });
 test('a Bakery with Flour but no Wood does not bake; with Wood it does',()=>{

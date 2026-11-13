@@ -17,8 +17,8 @@ export function inAttackRange(attacker,target,map=null) {
 // Integruje DPS po časových úsecích až k nejbližší smrti. Odvetný útok tak
 // nekončí o celý snímek dříve nebo později podle FPS či pořadí jednotek.
 export class CombatSystem {
-  constructor({map=null,canFight=()=>true,regenerationRate=()=>0,canTarget=()=>true}={}) {
-    this.map=map;this.canFight=canFight;this.canTarget=canTarget;this.regenerationRate=regenerationRate;this.attacks=new Map();this.listeners=new Map();this.dead=new WeakSet();
+  constructor({map=null,canFight=()=>true,regenerationRate=()=>0,canTarget=()=>true,damageScale=()=>1}={}) {
+    this.map=map;this.canFight=canFight;this.canTarget=canTarget;this.regenerationRate=regenerationRate;this.damageScale=damageScale;this.attacks=new Map();this.listeners=new Map();this.dead=new WeakSet();
   }
   on(event,listener){if(!this.listeners.has(event))this.listeners.set(event,new Set());this.listeners.get(event).add(listener);return()=>this.listeners.get(event)?.delete(listener);}
   emit(event,...args){for(const listener of this.listeners.get(event)??[])listener(...args);}
@@ -50,7 +50,7 @@ export class CombatSystem {
       for(const [attacker,target]of this.attacks){
         if(!attacker.isAlive||!target.isAlive){this.stopAttack(attacker);continue;}
         if(!this.canFight(attacker)||!this.canFight(target)||!inAttackRange(attacker,target,this.map)||!this.canTarget(attacker,target))continue;
-        const rate=Math.max(0,attacker.attackDPS)*(attacker.damageFactor??1)*(1-clampArmor(target.armor)/100);
+        const rate=Math.max(0,attacker.attackDPS)*(attacker.damageFactor??1)*this.damageScale(attacker)*(1-clampArmor(target.armor)/100);
         // Domestic animals Z2: a hunting dog close to its Hunter takes the bites meant for him.
         const shield=rate>0?this.shield?.(target,attacker):null;if(shield){shield.absorb(rate*remaining);continue;}
         if(rate>0){rates.set(target,(rates.get(target)??0)+rate);if(!contributors.has(target))contributors.set(target,[]);contributors.get(target).push({attacker,rate});}

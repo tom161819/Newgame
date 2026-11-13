@@ -19,7 +19,17 @@ export const HEATING=Object.freeze({
   selfFetchBelow:6,selfFetchCheckMs:3000,
   // A resident of a cold House rests like one sleeping in the settlement (DAILY_REST.recoverPerDay).
   coldRestAs:'settlement',
+  // Soldiers of a cold Barracks fight weaker (damage multiplier).
+  coldCombat:.9,
   // The autumn warning: stored Wood below this share of the winter's estimated need.
   warnShare:1,
 });
-export const HEATED_BUILDINGS=Object.freeze(['house']);
+// Heated buildings: `factor` multiplies the day's Wood; `effect` – who feels it: the House's residents, the residents
+// sleeping in the settlement's base places (the Castle), or the Barracks' soldiers (combat).
+// Owner 13 Nov: the Castle and the Barracks heat too.
+export const HEATED=Object.freeze({
+  house:Object.freeze({factor:1,effect:'residents'}),
+  castle:Object.freeze({factor:2,effect:'settlement'}),
+  barracks:Object.freeze({factor:1,effect:'soldiers'}),
+});
+export const HEATED_BUILDINGS=Object.freeze(Object.keys(HEATED));
