@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "granary-store",
+  "variantId": "granary-store-gpt-wood-90",
+  "name": "GPT pantry, wooden 90° (rear-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "8b920f31",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 173,
+  "height": 180,
+  "anchor": {
+    "x": 86,
+    "y": 117
+  },
+  "origin": {
+    "x": 0.49711,
+    "y": 0.65
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 86,
+    "y": 165
+  },
+  "baseOrigin": {
+    "x": 0.49711,
+    "y": 0.91667
+  },
+  "visualHeight": 165,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.32,
+  "lights": [],
+  "x2": {
+    "width": 346,
+    "height": 360,
+    "anchor": {
+      "x": 172,
+      "y": 234
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

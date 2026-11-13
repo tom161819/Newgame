@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "assetId": "granary-store",
+  "variantId": "granary-store-gpt-wood-0",
+  "name": "GPT pantry, wooden 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "8b920f31",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 172,
+  "height": 182,
+  "anchor": {
+    "x": 94,
+    "y": 122
+  },
+  "origin": {
+    "x": 0.54651,
+    "y": 0.67033
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 94,
+    "y": 170
+  },
+  "baseOrigin": {
+    "x": 0.54651,
+    "y": 0.93407
+  },
+  "visualHeight": 170,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -81,
+      "y": -86,
+      "color": "#ffb25a",
+      "radius": 96,
+      "intensity": 0.9,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 0.6
+    }
+  ],
+  "modelHeight": 2.32,
+  "lights": [],
+  "x2": {
+    "width": 344,
+    "height": 364,
+    "anchor": {
+      "x": 188,
+      "y": 244
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

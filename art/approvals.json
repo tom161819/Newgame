@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-13T19:13:32.458135Z",
+  "updatedAt": "2026-11-13T20:06:27.232184Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -406,7 +406,7 @@
       }
     },
     "granary-store": {
-      "preferred": "granary-store-raised",
+      "preferred": "granary-store-gpt-wood-0",
       "variants": {
         "granary-store-raised": {
           "status": "approved",
@@ -423,6 +423,64 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:04:04.114Z",
           "approvedAt": "2026-11-04T19:04:04.114Z"
+        },
+        "granary-store-gpt-wood-0": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "8b920f31",
+          "note": "Owner 13 Nov 2026 in chat: use the wooden pantry in the game.",
+          "updatedAt": "2026-11-13T20:06:27.232184Z",
+          "approvedAt": "2026-11-13T20:06:27.232184Z",
+          "decidedBy": "owner (chat)"
+        },
+        "granary-store-gpt-wood-90": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8b920f31",
+          "note": "",
+          "updatedAt": "2026-11-13T20:06:27.232184Z"
+        },
+        "granary-store-gpt-wood-180": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8b920f31",
+          "note": "",
+          "updatedAt": "2026-11-13T20:06:27.232184Z"
+        },
+        "granary-store-gpt-wood-270": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8b920f31",
+          "note": "",
+          "updatedAt": "2026-11-13T20:06:27.232184Z"
+        },
+        "granary-store-gpt-stone-0": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8b920f31",
+          "note": "",
+          "updatedAt": "2026-11-13T20:06:27.232184Z"
+        },
+        "granary-store-gpt-stone-90": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8b920f31",
+          "note": "",
+          "updatedAt": "2026-11-13T20:06:27.232184Z"
+        },
+        "granary-store-gpt-stone-180": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8b920f31",
+          "note": "",
+          "updatedAt": "2026-11-13T20:06:27.232184Z"
+        },
+        "granary-store-gpt-stone-270": {
+          "status": "review",
+          "version": 1,
+          "specHash": "8b920f31",
+          "note": "",
+          "updatedAt": "2026-11-13T20:06:27.232184Z"
         }
       }
     },

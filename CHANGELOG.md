@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.115.6] - 2026-11-13
+<!-- version: {"title":"Wooden GPT pantry as the Granary; stone version in the Studio","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- New Granary picture: a wooden pantry with shelves of jars and fruit and a lantern. A stone version is ready in the Asset Studio for a later choice of material.
+
 ## [0.115.5] - 2026-11-13
 <!-- version: {"title":"GPT market square in the Asset Studio","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

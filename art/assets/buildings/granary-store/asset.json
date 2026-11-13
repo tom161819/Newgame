@@ -22,7 +22,7 @@
           "roofMaterial": "thatch",
           "width": 1.8,
           "depth": 1.4,
-          "wallHeight": 1.0,
+          "wallHeight": 1,
           "roofHeight": 0.9,
           "ridge": "x",
           "windows": 0,
@@ -51,7 +51,7 @@
           {
             "type": "cart",
             "at": [
-              1.0,
+              1,
               -0.25
             ]
           },
@@ -120,6 +120,494 @@
             ]
           }
         ]
+      }
+    },
+    {
+      "id": "granary-store-gpt-wood-0",
+      "name": "GPT pantry, wooden 0° (front-right)",
+      "version": 1,
+      "notes": "Timber pantry with a thatched roof, open shelves of jars and fruit, lantern, sign. Wooden material: the one the game uses (owner 13 Nov 2026). View 0° (front-right), cut out of the owner's GPT sheet and scaled to 0.48 (doors ≈ 48 px; 2× file at 0.96). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "body": {
+          "kind": "raised",
+          "walls": "wood",
+          "roofMaterial": "thatch",
+          "width": 1.8,
+          "depth": 1.4,
+          "wallHeight": 1,
+          "roofHeight": 0.9,
+          "ridge": "x",
+          "windows": 0,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "sacks",
+            "at": [
+              0.55,
+              0.6
+            ],
+            "count": 5
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -1.05,
+              0.8
+            ],
+            "count": 4
+          },
+          {
+            "type": "cart",
+            "at": [
+              1,
+              -0.25
+            ]
+          },
+          {
+            "type": "sacks",
+            "at": [
+              0.98,
+              0.15
+            ],
+            "count": 2
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "granary-store-gpt-wood-90",
+      "name": "GPT pantry, wooden 90° (rear-right)",
+      "version": 1,
+      "notes": "Timber pantry with a thatched roof, open shelves of jars and fruit, lantern, sign. Wooden material: the one the game uses (owner 13 Nov 2026). View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 0.48 (doors ≈ 48 px; 2× file at 0.96). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "raised",
+          "walls": "wood",
+          "roofMaterial": "thatch",
+          "width": 1.8,
+          "depth": 1.4,
+          "wallHeight": 1,
+          "roofHeight": 0.9,
+          "ridge": "x",
+          "windows": 0,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "sacks",
+            "at": [
+              0.55,
+              0.6
+            ],
+            "count": 5
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -1.05,
+              0.8
+            ],
+            "count": 4
+          },
+          {
+            "type": "cart",
+            "at": [
+              1,
+              -0.25
+            ]
+          },
+          {
+            "type": "sacks",
+            "at": [
+              0.98,
+              0.15
+            ],
+            "count": 2
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "granary-store-gpt-wood-180",
+      "name": "GPT pantry, wooden 180° (rear-left)",
+      "version": 1,
+      "notes": "Timber pantry with a thatched roof, open shelves of jars and fruit, lantern, sign. Wooden material: the one the game uses (owner 13 Nov 2026). View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 0.48 (doors ≈ 48 px; 2× file at 0.96). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "raised",
+          "walls": "wood",
+          "roofMaterial": "thatch",
+          "width": 1.8,
+          "depth": 1.4,
+          "wallHeight": 1,
+          "roofHeight": 0.9,
+          "ridge": "x",
+          "windows": 0,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "sacks",
+            "at": [
+              0.55,
+              0.6
+            ],
+            "count": 5
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -1.05,
+              0.8
+            ],
+            "count": 4
+          },
+          {
+            "type": "cart",
+            "at": [
+              1,
+              -0.25
+            ]
+          },
+          {
+            "type": "sacks",
+            "at": [
+              0.98,
+              0.15
+            ],
+            "count": 2
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "granary-store-gpt-wood-270",
+      "name": "GPT pantry, wooden 270° (front-left)",
+      "version": 1,
+      "notes": "Timber pantry with a thatched roof, open shelves of jars and fruit, lantern, sign. Wooden material: the one the game uses (owner 13 Nov 2026). View 270° (front-left), cut out of the owner's GPT sheet and scaled to 0.48 (doors ≈ 48 px; 2× file at 0.96). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "raised",
+          "walls": "wood",
+          "roofMaterial": "thatch",
+          "width": 1.8,
+          "depth": 1.4,
+          "wallHeight": 1,
+          "roofHeight": 0.9,
+          "ridge": "x",
+          "windows": 0,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "sacks",
+            "at": [
+              0.55,
+              0.6
+            ],
+            "count": 5
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -1.05,
+              0.8
+            ],
+            "count": 4
+          },
+          {
+            "type": "cart",
+            "at": [
+              1,
+              -0.25
+            ]
+          },
+          {
+            "type": "sacks",
+            "at": [
+              0.98,
+              0.15
+            ],
+            "count": 2
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "granary-store-gpt-stone-0",
+      "name": "GPT pantry, stone 0° (front-right)",
+      "version": 1,
+      "notes": "Stone pantry with a tiled roof and an arched door. Stone material: for the planned material choice, not used by the game yet. View 0° (front-right), cut out of the owner's GPT sheet and scaled to 0.48 (doors ≈ 48 px; 2× file at 0.96). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "body": {
+          "kind": "raised",
+          "walls": "wood",
+          "roofMaterial": "thatch",
+          "width": 1.8,
+          "depth": 1.4,
+          "wallHeight": 1,
+          "roofHeight": 0.9,
+          "ridge": "x",
+          "windows": 0,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "sacks",
+            "at": [
+              0.55,
+              0.6
+            ],
+            "count": 5
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -1.05,
+              0.8
+            ],
+            "count": 4
+          },
+          {
+            "type": "cart",
+            "at": [
+              1,
+              -0.25
+            ]
+          },
+          {
+            "type": "sacks",
+            "at": [
+              0.98,
+              0.15
+            ],
+            "count": 2
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "granary-store-gpt-stone-90",
+      "name": "GPT pantry, stone 90° (rear-right)",
+      "version": 1,
+      "notes": "Stone pantry with a tiled roof and an arched door. Stone material: for the planned material choice, not used by the game yet. View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 0.48 (doors ≈ 48 px; 2× file at 0.96). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "raised",
+          "walls": "wood",
+          "roofMaterial": "thatch",
+          "width": 1.8,
+          "depth": 1.4,
+          "wallHeight": 1,
+          "roofHeight": 0.9,
+          "ridge": "x",
+          "windows": 0,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "sacks",
+            "at": [
+              0.55,
+              0.6
+            ],
+            "count": 5
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -1.05,
+              0.8
+            ],
+            "count": 4
+          },
+          {
+            "type": "cart",
+            "at": [
+              1,
+              -0.25
+            ]
+          },
+          {
+            "type": "sacks",
+            "at": [
+              0.98,
+              0.15
+            ],
+            "count": 2
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "granary-store-gpt-stone-180",
+      "name": "GPT pantry, stone 180° (rear-left)",
+      "version": 1,
+      "notes": "Stone pantry with a tiled roof and an arched door. Stone material: for the planned material choice, not used by the game yet. View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 0.48 (doors ≈ 48 px; 2× file at 0.96). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "raised",
+          "walls": "wood",
+          "roofMaterial": "thatch",
+          "width": 1.8,
+          "depth": 1.4,
+          "wallHeight": 1,
+          "roofHeight": 0.9,
+          "ridge": "x",
+          "windows": 0,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "sacks",
+            "at": [
+              0.55,
+              0.6
+            ],
+            "count": 5
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -1.05,
+              0.8
+            ],
+            "count": 4
+          },
+          {
+            "type": "cart",
+            "at": [
+              1,
+              -0.25
+            ]
+          },
+          {
+            "type": "sacks",
+            "at": [
+              0.98,
+              0.15
+            ],
+            "count": 2
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "granary-store-gpt-stone-270",
+      "name": "GPT pantry, stone 270° (front-left)",
+      "version": 1,
+      "notes": "Stone pantry with a tiled roof and an arched door. Stone material: for the planned material choice, not used by the game yet. View 270° (front-left), cut out of the owner's GPT sheet and scaled to 0.48 (doors ≈ 48 px; 2× file at 0.96). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "raised",
+          "walls": "wood",
+          "roofMaterial": "thatch",
+          "width": 1.8,
+          "depth": 1.4,
+          "wallHeight": 1,
+          "roofHeight": 0.9,
+          "ridge": "x",
+          "windows": 0,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "sacks",
+            "at": [
+              0.55,
+              0.6
+            ],
+            "count": 5
+          },
+          {
+            "type": "barrels",
+            "at": [
+              -1.05,
+              0.8
+            ],
+            "count": 4
+          },
+          {
+            "type": "cart",
+            "at": [
+              1,
+              -0.25
+            ]
+          },
+          {
+            "type": "sacks",
+            "at": [
+              0.98,
+              0.15
+            ],
+            "count": 2
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
       }
     }
   ]

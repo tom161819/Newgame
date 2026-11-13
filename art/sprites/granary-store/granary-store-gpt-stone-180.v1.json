@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "granary-store",
+  "variantId": "granary-store-gpt-stone-180",
+  "name": "GPT pantry, stone 180° (rear-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "8b920f31",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 175,
+  "height": 182,
+  "anchor": {
+    "x": 87,
+    "y": 119
+  },
+  "origin": {
+    "x": 0.49714,
+    "y": 0.65385
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 87,
+    "y": 167
+  },
+  "baseOrigin": {
+    "x": 0.49714,
+    "y": 0.91758
+  },
+  "visualHeight": 167,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.32,
+  "lights": [],
+  "x2": {
+    "width": 350,
+    "height": 364,
+    "anchor": {
+      "x": 174,
+      "y": 238
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "granary-store",
+  "variantId": "granary-store-gpt-stone-0",
+  "name": "GPT pantry, stone 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "8b920f31",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 176,
+  "height": 180,
+  "anchor": {
+    "x": 96,
+    "y": 122
+  },
+  "origin": {
+    "x": 0.54545,
+    "y": 0.67778
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 96,
+    "y": 170
+  },
+  "baseOrigin": {
+    "x": 0.54545,
+    "y": 0.94444
+  },
+  "visualHeight": 170,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.32,
+  "lights": [],
+  "x2": {
+    "width": 352,
+    "height": 360,
+    "anchor": {
+      "x": 192,
+      "y": 244
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}
