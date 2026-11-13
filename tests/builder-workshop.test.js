@@ -22,11 +22,11 @@ function workshop(s,x,y,{finished=true}={}){
 function builder(s,x=40,y=40){const w=s.workerSystem.create({x,y});s.workerSystem.jobs.assign(w,'builder');return w;}
 function tower(s){const d=objectRegistry.require('tower');Object.entries(d.cost).forEach(([r,k])=>s.inventory.add(r,k));const r=placeBuilding({map:s.map,anchor:{x:70,y:70},resources:s.resourceOccupancy,reservedTiles:[],inventory:s.inventory,buildings:s.buildings,definition:d,reserveMaterials:true});assert.ifError(r.error);return r.building;}
 
-test("#118 Builder's Workshop is a 3x3 industry building available from the start with the approved material-yard art",()=>{
+test("#118 Builder's Workshop is a 3x3 industry building available from the start with the approved art (GPT wooden workshop since 13 Nov 2026)",()=>{
   const d=objectRegistry.require('builder_workshop');
   assert.deepEqual([d.width,d.height,d.buildingCategory,d.buildable],[3,3,'industry',true]);
   assert.deepEqual(d.cost,{wood:20});assert.equal(d.builderWorkshop.capacity,4);assert.equal(d.requiresCompletedBuildings,undefined);
-  assert.equal(d.renderMode,'sprite');assert.equal(d.sprite,'/assets/buildings/builder_workshop/builders-workshop-material-yard.v4.png');
+  assert.equal(d.renderMode,'sprite');assert.equal(d.sprite,'/assets/buildings/builder_workshop/builders-workshop-gpt-wood-0.v1.png');
   assert.equal(d.workplace,undefined,'not a workplace: Builders never need it to work');
 });
 

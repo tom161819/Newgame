@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "builders-workshop",
+  "variantId": "builders-workshop-gpt-wood-270",
+  "name": "GPT builder's workshop, wooden 270° (front-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "260bdc21",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 186,
+  "height": 170,
+  "anchor": {
+    "x": 93,
+    "y": 118
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.69412
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 93,
+    "y": 166
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.97647
+  },
+  "visualHeight": 166,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.952,
+  "lights": [],
+  "x2": {
+    "width": 372,
+    "height": 340,
+    "anchor": {
+      "x": 186,
+      "y": 236
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

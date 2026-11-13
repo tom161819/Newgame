@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "builders-workshop",
+  "variantId": "builders-workshop-gpt-wood-90",
+  "name": "GPT builder's workshop, wooden 90° (rear-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "260bdc21",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 161,
+  "height": 162,
+  "anchor": {
+    "x": 80,
+    "y": 110
+  },
+  "origin": {
+    "x": 0.49689,
+    "y": 0.67901
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 80,
+    "y": 158
+  },
+  "baseOrigin": {
+    "x": 0.49689,
+    "y": 0.97531
+  },
+  "visualHeight": 158,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.952,
+  "lights": [],
+  "x2": {
+    "width": 322,
+    "height": 324,
+    "anchor": {
+      "x": 160,
+      "y": 220
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

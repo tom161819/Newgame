@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-13T20:06:27.232184Z",
+  "updatedAt": "2026-11-13T20:16:13.635528Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -201,7 +201,7 @@
       }
     },
     "builders-workshop": {
-      "preferred": "builders-workshop-material-yard",
+      "preferred": "builders-workshop-gpt-wood-0",
       "variants": {
         "builders-workshop-material-yard": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -251,6 +251,64 @@
               "at": "2026-11-07T10:47:13.445Z"
             }
           ]
+        },
+        "builders-workshop-gpt-wood-0": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "260bdc21",
+          "note": "Owner 13 Nov 2026 in chat: the wooden workshop is the default in the game.",
+          "updatedAt": "2026-11-13T20:16:13.635528Z",
+          "approvedAt": "2026-11-13T20:16:13.635528Z",
+          "decidedBy": "owner (chat)"
+        },
+        "builders-workshop-gpt-wood-90": {
+          "status": "review",
+          "version": 1,
+          "specHash": "260bdc21",
+          "note": "",
+          "updatedAt": "2026-11-13T20:16:13.635528Z"
+        },
+        "builders-workshop-gpt-wood-180": {
+          "status": "review",
+          "version": 1,
+          "specHash": "260bdc21",
+          "note": "",
+          "updatedAt": "2026-11-13T20:16:13.635528Z"
+        },
+        "builders-workshop-gpt-wood-270": {
+          "status": "review",
+          "version": 1,
+          "specHash": "260bdc21",
+          "note": "",
+          "updatedAt": "2026-11-13T20:16:13.635528Z"
+        },
+        "builders-workshop-gpt-stone-0": {
+          "status": "review",
+          "version": 1,
+          "specHash": "260bdc21",
+          "note": "",
+          "updatedAt": "2026-11-13T20:16:13.635528Z"
+        },
+        "builders-workshop-gpt-stone-90": {
+          "status": "review",
+          "version": 1,
+          "specHash": "260bdc21",
+          "note": "",
+          "updatedAt": "2026-11-13T20:16:13.635528Z"
+        },
+        "builders-workshop-gpt-stone-180": {
+          "status": "review",
+          "version": 1,
+          "specHash": "260bdc21",
+          "note": "",
+          "updatedAt": "2026-11-13T20:16:13.635528Z"
+        },
+        "builders-workshop-gpt-stone-270": {
+          "status": "review",
+          "version": 1,
+          "specHash": "260bdc21",
+          "note": "",
+          "updatedAt": "2026-11-13T20:16:13.635528Z"
         }
       }
     },

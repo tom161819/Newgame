@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "assetId": "builders-workshop",
+  "variantId": "builders-workshop-gpt-wood-0",
+  "name": "GPT builder's workshop, wooden 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "260bdc21",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 172,
+  "anchor": {
+    "x": 97,
+    "y": 119
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.69186
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 167
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.97093
+  },
+  "visualHeight": 167,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -71,
+      "y": -82,
+      "color": "#ffb25a",
+      "radius": 96,
+      "intensity": 0.9,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 0.6
+    }
+  ],
+  "modelHeight": 0.952,
+  "lights": [],
+  "x2": {
+    "width": 390,
+    "height": 344,
+    "anchor": {
+      "x": 194,
+      "y": 238
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "builders-workshop",
+  "variantId": "builders-workshop-gpt-stone-180",
+  "name": "GPT builder's workshop, stone 180° (rear-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "260bdc21",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 162,
+  "height": 164,
+  "anchor": {
+    "x": 81,
+    "y": 112
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.68293
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 81,
+    "y": 160
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.97561
+  },
+  "visualHeight": 160,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.952,
+  "lights": [],
+  "x2": {
+    "width": 324,
+    "height": 328,
+    "anchor": {
+      "x": 162,
+      "y": 224
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

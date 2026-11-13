@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "builders-workshop",
+  "variantId": "builders-workshop-gpt-stone-0",
+  "name": "GPT builder's workshop, stone 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "260bdc21",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 201,
+  "height": 181,
+  "anchor": {
+    "x": 100,
+    "y": 128
+  },
+  "origin": {
+    "x": 0.49751,
+    "y": 0.70718
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 100,
+    "y": 176
+  },
+  "baseOrigin": {
+    "x": 0.49751,
+    "y": 0.97238
+  },
+  "visualHeight": 176,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.952,
+  "lights": [],
+  "x2": {
+    "width": 402,
+    "height": 362,
+    "anchor": {
+      "x": 200,
+      "y": 256
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

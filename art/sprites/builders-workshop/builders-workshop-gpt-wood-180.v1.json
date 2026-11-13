@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "builders-workshop",
+  "variantId": "builders-workshop-gpt-wood-180",
+  "name": "GPT builder's workshop, wooden 180° (rear-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "260bdc21",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 162,
+  "height": 163,
+  "anchor": {
+    "x": 81,
+    "y": 111
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.68098
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 81,
+    "y": 159
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.97546
+  },
+  "visualHeight": 159,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 0.952,
+  "lights": [],
+  "x2": {
+    "width": 324,
+    "height": 326,
+    "anchor": {
+      "x": 162,
+      "y": 222
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

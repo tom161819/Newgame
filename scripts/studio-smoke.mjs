@@ -208,6 +208,9 @@ try {
   await page.locator('.library-item', { has: page.locator('.meta', { hasText: /^granary-store ·/ }) }).first().click();
   for (const mat of ['wood', 'stone']) for (const deg of [0, 90, 180, 270]) assert.match(await page.locator(`.variant-card[data-variant="granary-store-gpt-${mat}-${deg}"] .baked-note`).textContent(), new RegExp(`Imported image \\(GPT\\), view ${deg}°`));
   pass('GPT pantry: wooden and stone, four views each');
+  await page.locator('.library-item', { has: page.locator('.meta', { hasText: /^builders-workshop ·/ }) }).first().click();
+  for (const mat of ['wood', 'stone']) for (const deg of [0, 90, 180, 270]) assert.match(await page.locator(`.variant-card[data-variant="builders-workshop-gpt-${mat}-${deg}"] .baked-note`).textContent(), new RegExp(`Imported image \\(GPT\\), view ${deg}°`));
+  pass('GPT builder workshop: wooden and stone, four views each');
 
   await page.locator('.library-item', { hasText: 'Watchtower' }).click();
   await page.waitForFunction(() => document.querySelectorAll('.variant-card canvas').length >= 1);
