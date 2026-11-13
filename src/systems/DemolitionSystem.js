@@ -15,7 +15,7 @@ export class DemolitionSystem {
   target(id){return this.scene.buildings.find(b=>b.id===id);}
   eligible(building){
     if(!building||!this.scene.buildings.includes(building)||!buildingIsComplete(building)||['castle','starter_stockpile'].includes(building.type))return false;
-    const d=buildingDefinition(building);return d.buildable&&!d.pavement;
+    const d=buildingDefinition(building);return (d.buildable||d.id==='burnt_ruins'/* owner 13 Nov 2026: builders clear burnt ruins */)&&!d.pavement;
   }
   roofBlocked(building){const king=this.scene.character;return buildingDefinition(building).interactions?.includes('enter')&&(king.state!=='ground'||king.transitioning);}
   request(building){

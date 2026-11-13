@@ -252,7 +252,7 @@ function validateAtSize(input,registry){
   }
   for(const b of s.buildings)if(b.demolition!==undefined){
     const d=bdef(b),c=b.demolition;
-    check(buildingIsComplete(b)&&d.buildable&&!d.starter&&!d.pavement&&b.type!=='castle'&&!b.unverified);
+    check(buildingIsComplete(b)&&(d.buildable||d.id==='burnt_ruins')&&!d.starter&&!d.pavement&&b.type!=='castle'&&!b.unverified);
     check(c&&typeof c==='object'&&!Array.isArray(c)&&Object.keys(c).every(k=>['state','requiredWork','workDone','progress','contributions','assignedBuilders','refund'].includes(k)));
     check(['planned','building'].includes(c.state));number(c.requiredWork,1,86400000);check(c.requiredWork===(d.constructionTime??CONSTRUCTION_RULES.defaultTime));
     number(c.workDone,0,c.requiredWork);number(c.progress,0,100);check(Math.abs(c.progress-100*c.workDone/c.requiredWork)<1e-6);check(c.state==='planned'?c.workDone===0:c.workDone>0);

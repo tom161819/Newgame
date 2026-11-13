@@ -186,3 +186,14 @@ test('m-ukladani-chyba: a squad number on someone who is no longer a soldier and
   const {s}=world();const w=s.workerSystem.create({x:64,y:64});w.squad=2;
   const data=validateGameState(serializeGameState(s));assert.equal(data.workers.find(x=>x.id===w.id).squad,undefined);
 });
+test('m-pozar-imunita: a building whose fire was put out cannot catch fire again for half a day; Save/Load keeps the protection', () => {
+  const {s,n,at}=world();const place=(type,x,y)=>{const d=s.objectRegistry.require(type);const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,x,y,tiles:[]};for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++){b.tiles.push({x:x+dx,y:y+dy});s.map[y+dy][x+dx]=1;}s.buildings.push(b);return b;};
+  const house=place('house',60,60);place('well',63,63);const helpers=[0,1].map(i=>s.workerSystem.create({x:64+i,y:64}));
+  n.random=()=>.5;n.ignite(house);for(let i=0;i<1200&&n.burning(house);i++){for(const w of helpers){n.firefight(w,50);w.update(50);}n.updateFires(50);}
+  assert.equal(n.burning(house),false,'put out');assert.equal(n.fireproof(house),true,'protected right after');
+  s.lightSources={lights:()=>[{type:'torch',...gridToWorld(62.5,61),radius:100}]};n.random=()=>0;assert.equal(n.igniteFires(s.gameTime.day).includes?.(house)??n.burning(house),false);assert.equal(n.burning(house),false,'no new fire while protected');
+  const state=validateGameState(serializeGameState(s));assert.ok(state.nightThreats.fireSafe.some(f=>f.id===house.id&&f.ms>0));
+  assert.equal(validNightThreatState({...state.nightThreats,fireSafe:[{id:house.id,ms:-1}]},new Set([house.id])),false);
+  const back=new NightThreatSystem(s);back.importState(state.nightThreats);assert.equal(back.fireproof(house),true,'kept by Save/Load');
+  s.gameTime.update(s.gameTime.dayDuration*.6);assert.equal(n.fireproof(house),false,'half a day later it can burn again');
+});

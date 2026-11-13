@@ -17,7 +17,7 @@ export class NightThreatSystem {
     this.scene=scene;this.enabled={wolves:settings?.nightWolves!==false,thieves:settings?.nightThieves!==false,fires:settings?.nightFires!==false};
     this.campfires=new Map();this.listeners=new Set();this.wolfDay=null;this.lurkSaved=new Map();this.wolvesNear=false;this.random=Math.random;
     this.thieves=new Map();this.thiefDay=null;this.reports=[];
-    this.fires=new Map();this.fireDay=null;this.spreadIn=0;
+    this.fires=new Map();this.fireDay=null;this.spreadIn=0;this.fireSafe=new Map();
   }
   onChange(l){this.listeners.add(l);return()=>this.listeners.delete(l);}
   changed(){for(const l of this.listeners)l();}
@@ -227,7 +227,7 @@ export class NightThreatSystem {
     this.fireDay=day;if(!this.enabled.fires||!this.started())return [];const F=NIGHT_THREATS.fires,s=this.scene,flames=[];
     for(const l of s.lightSources?.lights?.()??[]){if(!['torch','brazier','campfire'].includes(l.type))continue;const p=worldToGrid(l.x,l.y);flames.push({x:p.x,y:p.y,buildingId:l.buildingId});}
     const out=[],risk=this.fireRisk();
-    for(const b of s.buildings??[]){if(!this.flammable(b)||this.fires.has(b.id))continue;
+    for(const b of s.buildings??[]){if(!this.flammable(b)||this.fires.has(b.id)||this.fireproof(b))continue;
       if(!flames.some(f=>f.buildingId!==b.id&&this.gap(b,f)<=F.range))continue;if(this.random()<risk){
         // The first spark only warns: neighbours put it out, the building stays.
         if(!this.fireWarned){this.fireWarned=true;s.eventFeed?.push?.(`fire-warning:${day}`,t('nightThreats.fireWarning',{name:buildingDefinition(b).name}),{important:true});return out;}
@@ -241,6 +241,10 @@ export class NightThreatSystem {
     this.scene.eventFeed?.push?.(`fire:${b.id}:${this.scene.gameTime?.day??1}`,t('threats.fire',{name:definitionFor(b,this.scene.objectRegistry).name}),{important:true,target:b});this.scene.dangerMarks?.mark({x:b.x+1,y:b.y+1});this.changed();return fire;
   }
   burning(b){return this.fires.has(b?.id);}
+  // Owner 13 Nov 2026: right after a fire is put out the building is safe from fire for a while (fireSafe: id → game ms).
+  now(){return this.scene.gameTime?.totalElapsed??0;}
+  fireproof(b){const until=this.fireSafe.get(b?.id);if(until===undefined)return false;if(until>this.now())return true;this.fireSafe.delete(b.id);return false;}
+  protect(id){this.fireSafe.set(id,this.now()+NIGHT_THREATS.fires.safeAfterDays*(this.scene.gameTime?.dayDuration??120000));}
   // The fire grows, eats the building and may jump to a wooden neighbour; at 0 health it burns down.
   updateFires(delta){
     const F=NIGHT_THREATS.fires,s=this.scene,seconds=delta/1000,day=s.gameTime?.dayDuration??120000;if(!this.fires.size)return;
@@ -250,7 +254,7 @@ export class NightThreatSystem {
       fire.intensity=Math.min(100,fire.intensity+F.regrowPerSecond*seconds);
       fire.health-=100*(delta/(day*F.burnDays))*(fire.intensity/100);if(fire.fate==='saved')fire.health=Math.max(F.savedHealth,fire.health);
       if(fire.health<=0){this.burnDown(b);continue;}
-      if(spread&&this.enabled.fires)for(const other of s.buildings){if(other===b||!this.flammable(other)||this.fires.has(other.id))continue;if(this.gap(other,this.center(b))<=F.range+buildingDefinition(b).width/2&&this.random()<F.spreadChance)this.ignite(other);}
+      if(spread&&this.enabled.fires)for(const other of s.buildings){if(other===b||!this.flammable(other)||this.fires.has(other.id)||this.fireproof(other))continue;if(this.gap(other,this.center(b))<=F.range+buildingDefinition(b).width/2&&this.random()<F.spreadChance)this.ignite(other);}
     }
   }
   burnDown(b){
@@ -286,7 +290,7 @@ export class NightThreatSystem {
     if(job.phase==='toWater'){const water=this.waterGoals(fire);if(!water.goals.length){worker.firefight=null;return false;}if(at(water.goals)){job.phase='fill';job.t=F.fillMs;}else if(!worker.nextTile&&!worker.path.length&&!worker.moveTo(water.goals)){worker.firefight=null;return false;}}
     else if(job.phase==='fill'){job.t-=delta;if(job.t<=0)job.phase='toFire';}
     else if(job.phase==='toFire'){const goals=towerNeighbors(b).filter(g=>isWalkable(s.map,g.x,g.y));if(at(goals)){job.phase='throw';job.t=F.throwMs;}else if(!worker.nextTile&&!worker.path.length&&!worker.moveTo(goals)){worker.firefight=null;return false;}}
-    else if(job.phase==='throw'){job.t-=delta;if(job.t<=0){if(fire.fate!=='lost')fire.intensity-=F.bucket;job.phase='toWater';if(fire.intensity<=0){this.fires.delete(fire.id);s.eventFeed?.push?.(`fire-out:${fire.id}:${s.gameTime?.totalElapsed??0}`,t('threats.fireOut',{name:definitionFor(b,s.objectRegistry).name}));this.changed();}}}
+    else if(job.phase==='throw'){job.t-=delta;if(job.t<=0){if(fire.fate!=='lost')fire.intensity-=F.bucket;job.phase='toWater';if(fire.intensity<=0){this.fires.delete(fire.id);this.protect(fire.id);s.eventFeed?.push?.(`fire-out:${fire.id}:${s.gameTime?.totalElapsed??0}`,t('threats.fireOut',{name:definitionFor(b,s.objectRegistry).name}));this.changed();}}}
     return true;
   }
   checkWolvesNear(day){
@@ -304,7 +308,7 @@ export class NightThreatSystem {
     if(this.scene.dayNight?.part()==='day')this.reportMorning(day);
     this.checkWolvesNear(day);
   }
-  exportState(){const lurkers=this.lurkingWolves().map(w=>({id:w.id,den:{...w.wolf.den},until:Math.round(w.wolf.until),...(w.wolf.victim?{victim:String(w.wolf.victim).slice(0,60)}:{})}));return {...(lurkers.length?{lurkers}:{}),enabled:{...this.enabled},...(this.fireWarned?{fireWarned:true}:{}),wolfDay:this.wolfDay,thiefDay:this.thiefDay,thieves:[...this.thieves.values()].map(t=>({id:t.id,state:t.state,target:{...t.target},loot:t.loot?{...t.loot}:null,pursuer:t.pursuer})),reports:this.reports.map(r=>({...r})),fireDay:this.fireDay,fires:[...this.fires.values()].map(f=>({id:f.id,intensity:Math.round(f.intensity*100)/100,health:Math.round(f.health*100)/100,...(f.fate?{fate:f.fate}:{})})),campfires:[...this.campfires].map(([id,c])=>({id,litDay:c.litDay,ashesDay:c.ashesDay})).sort((a,b)=>a.id-b.id)};}
+  exportState(){const lurkers=this.lurkingWolves().map(w=>({id:w.id,den:{...w.wolf.den},until:Math.round(w.wolf.until),...(w.wolf.victim?{victim:String(w.wolf.victim).slice(0,60)}:{})}));return {...(lurkers.length?{lurkers}:{}),enabled:{...this.enabled},...(this.fireWarned?{fireWarned:true}:{}),wolfDay:this.wolfDay,thiefDay:this.thiefDay,thieves:[...this.thieves.values()].map(t=>({id:t.id,state:t.state,target:{...t.target},loot:t.loot?{...t.loot}:null,pursuer:t.pursuer})),reports:this.reports.map(r=>({...r})),fireDay:this.fireDay,fires:[...this.fires.values()].map(f=>({id:f.id,intensity:Math.round(f.intensity*100)/100,health:Math.round(f.health*100)/100,...(f.fate?{fate:f.fate}:{})})),campfires:[...this.campfires].map(([id,c])=>({id,litDay:c.litDay,ashesDay:c.ashesDay})).sort((a,b)=>a.id-b.id),...(()=>{const now=this.now(),safe=[...this.fireSafe].filter(([,u])=>u>now).map(([id,u])=>({id,ms:Math.ceil(u-now)}));return safe.length?{fireSafe:safe}:{};})()};}
   // Threats wait until the kingdom stands: enough finished Houses or the start year passed (plan m-e1-hrozby-pozdeji).
   started(){
     const S=NIGHT_THREATS.start,s=this.scene;
@@ -312,7 +316,7 @@ export class NightThreatSystem {
     if(s.seasons?.enabled!==false&&s.seasons?.calendar)return s.seasons.calendar.year>=S.year;
     return (s.gameTime?.day??1)>S.daysWithoutSeasons;
   }
-  importState(data){if(!data)return;this.lurkSaved=new Map((data.lurkers??[]).map(l=>[l.id,{den:{...l.den},until:l.until,victim:l.victim??'',attacked:{...l.den}}]));this.fireWarned=!!data.fireWarned;this.enabled={...this.enabled,...data.enabled};this.wolfDay=data.wolfDay??null;this.thiefDay=data.thiefDay??null;this.fireDay=data.fireDay??null;this.fires=new Map((data.fires??[]).map(f=>[f.id,{...f}]));this.reports=(data.reports??[]).map(r=>({...r}));
+  importState(data){if(!data)return;this.lurkSaved=new Map((data.lurkers??[]).map(l=>[l.id,{den:{...l.den},until:l.until,victim:l.victim??'',attacked:{...l.den}}]));this.fireWarned=!!data.fireWarned;this.enabled={...this.enabled,...data.enabled};this.wolfDay=data.wolfDay??null;this.thiefDay=data.thiefDay??null;this.fireDay=data.fireDay??null;this.fires=new Map((data.fires??[]).map(f=>[f.id,{...f}]));this.fireSafe=new Map((data.fireSafe??[]).map(f=>[f.id,this.now()+f.ms]));this.reports=(data.reports??[]).map(r=>({...r}));
     this.thieves=new Map((data.thieves??[]).map(t=>[t.id,{...t,target:{...t.target},loot:t.loot?{...t.loot}:null,since:this.scene?.gameTime?.totalElapsed??0,repath:0}]));this.campfires=new Map((data.campfires??[]).map(c=>[c.id,{litDay:c.litDay,ashesDay:c.ashesDay}]));}
   destroy(){this.listeners.clear();}
 }
@@ -324,9 +328,10 @@ export function ruinDefinition(registry,fromType){
 export function validNightThreatState(data,buildingIds){
   const n=v=>v===null||Number.isSafeInteger(v)&&v>=1;
   // `wolfDay` came in 0.44.0; saves of 0.43.0 (same schema 57) have none.
-  return !!data&&typeof data==='object'&&!!data.enabled&&(data.wolfDay===undefined||n(data.wolfDay))&&NIGHT_THREATS.ids.every(id=>typeof data.enabled[id]==='boolean')&&Object.keys(data.enabled).length===NIGHT_THREATS.ids.length&&Object.keys(data).every(k=>['enabled','campfires','wolfDay','thiefDay','thieves','reports','fireDay','fires','fireWarned','lurkers'].includes(k))&&(data.lurkers===undefined||Array.isArray(data.lurkers)&&data.lurkers.every(l=>l&&typeof l.id==='string'&&Number.isInteger(l.den?.x)&&Number.isInteger(l.den?.y)&&Number.isFinite(l.until)&&(l.victim===undefined||typeof l.victim==='string')&&Object.keys(l).every(k=>['id','den','until','victim'].includes(k))))&&(data.fireWarned===undefined||data.fireWarned===true)&&(data.fireDay===undefined||n(data.fireDay))
+  return !!data&&typeof data==='object'&&!!data.enabled&&(data.wolfDay===undefined||n(data.wolfDay))&&NIGHT_THREATS.ids.every(id=>typeof data.enabled[id]==='boolean')&&Object.keys(data.enabled).length===NIGHT_THREATS.ids.length&&Object.keys(data).every(k=>['enabled','campfires','wolfDay','thiefDay','thieves','reports','fireDay','fires','fireWarned','lurkers','fireSafe'].includes(k))&&(data.lurkers===undefined||Array.isArray(data.lurkers)&&data.lurkers.every(l=>l&&typeof l.id==='string'&&Number.isInteger(l.den?.x)&&Number.isInteger(l.den?.y)&&Number.isFinite(l.until)&&(l.victim===undefined||typeof l.victim==='string')&&Object.keys(l).every(k=>['id','den','until','victim'].includes(k))))&&(data.fireWarned===undefined||data.fireWarned===true)&&(data.fireDay===undefined||n(data.fireDay))
     &&(data.fires===undefined||Array.isArray(data.fires)&&data.fires.every(f=>f&&buildingIds.has(f.id)&&Number.isFinite(f.intensity)&&f.intensity>0&&f.intensity<=100&&Number.isFinite(f.health)&&f.health>0&&f.health<=100&&(f.fate===undefined||f.fate==='saved'||f.fate==='lost')&&Object.keys(f).every(k=>['id','intensity','health','fate'].includes(k))))&&(data.thiefDay===undefined||n(data.thiefDay))
     &&(data.thieves===undefined||Array.isArray(data.thieves)&&data.thieves.every(t=>t&&typeof t.id==='string'&&['sneaking','escaping','fleeing'].includes(t.state)&&t.target&&typeof t.target.id==='string'&&(t.loot===null||Number.isFinite(t.loot.amount)&&t.loot.amount>0&&typeof t.loot.resource==='string')))
     &&(data.reports===undefined||Array.isArray(data.reports))
+    &&(data.fireSafe===undefined||Array.isArray(data.fireSafe)&&data.fireSafe.every(f=>f&&buildingIds.has(f.id)&&Number.isFinite(f.ms)&&f.ms>0&&Object.keys(f).every(k=>['id','ms'].includes(k))))
     &&Array.isArray(data.campfires)&&data.campfires.every(c=>c&&buildingIds.has(c.id)&&n(c.litDay)&&n(c.ashesDay));
 }

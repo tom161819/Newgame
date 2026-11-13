@@ -38,7 +38,7 @@ export const lightingBuildings = [
     // Day and night N3: what a burnt-down building leaves (approved Studio art burnt-building-timber, 2×2). Not built by
     // the player; it can be demolished like any building.
     id: 'burnt_ruins', name: 'Burnt Ruins', category: 'building', buildingCategory: 'infrastructure', sprite: '/assets/buildings/burnt_ruins/burnt-building-timber.v1.png',
-    artSource: 'art/sprites/burnt-building/burnt-building-timber.v1.json', width: 2, height: 2, walkable: false, collectible: false, buildable: false, cost: {}, constructionTime: 1000,
+    artSource: 'art/sprites/burnt-building/burnt-building-timber.v1.json', width: 2, height: 2, walkable: false, collectible: false, buildable: false, cost: {}, constructionTime: 8000/* demolition work for a Builder (owner 13 Nov 2026) */,
     interactions: [], description: 'The charred remains of a building that burnt down.', renderMode: 'sprite', origin: { x: 0.48507, y: 0.98058 }, visualHeight: 101, depth: { offset: 0 },
   },
 ];

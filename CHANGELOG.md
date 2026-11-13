@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.117.1] - 2026-11-13
+<!-- version: {"title":"Fire immunity after extinguishing; Builders clear Burnt Ruins","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Fixed
+- A building whose fire was put out is now safe from fire for half a game day, so it no longer catches fire again straight away.
+
+### Added
+- Builders can now clear Burnt Ruins: mark them for removal like any other building. Ruins return no materials.
+
 ## [0.117.0] - 2026-11-13
 <!-- version: {"title":"GPT barracks 4x5; Marketplace 4x4","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed
