@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "windmill",
+  "variantId": "windmill-gpt-90",
+  "name": "GPT stone windmill 90° (rear-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "dfe4b764",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 144,
+  "height": 227,
+  "anchor": {
+    "x": 72,
+    "y": 189
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.8326
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 72,
+    "y": 221
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.97357
+  },
+  "visualHeight": 221,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.4,
+  "lights": [],
+  "x2": {
+    "width": 288,
+    "height": 454,
+    "anchor": {
+      "x": 144,
+      "y": 378
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

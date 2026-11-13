@@ -53,6 +53,198 @@
         ]
       },
       "notes": "Recommended concept for review."
+    },
+    {
+      "id": "windmill-gpt-0",
+      "name": "GPT stone windmill 0° (front-right)",
+      "version": 1,
+      "notes": "Tall stone tower mill with a thatched cap and lattice sails; sacks, grain crate, cart. Sails are painted in: the game's turning sails need a separate rotor layer before this can replace the current mill. View 0° (front-right), cut out of the owner's GPT sheet and scaled to 0.466 (doors ≈ 48 px; 2× file at 0.932). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "body": {
+          "kind": "windmill",
+          "radius": 0.5,
+          "height": 1.7,
+          "sail": 0.75,
+          "roofMaterial": "thatch",
+          "at": [
+            -0.18,
+            -0.18
+          ]
+        },
+        "props": [
+          {
+            "type": "sacks",
+            "at": [
+              0.5,
+              -0.55
+            ],
+            "count": 4
+          },
+          {
+            "type": "millstone",
+            "at": [
+              -0.65,
+              0.65
+            ]
+          },
+          {
+            "type": "cart",
+            "at": [
+              0.25,
+              0.75
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "windmill-gpt-90",
+      "name": "GPT stone windmill 90° (rear-right)",
+      "version": 1,
+      "notes": "Tall stone tower mill with a thatched cap and lattice sails; sacks, grain crate, cart. Sails are painted in: the game's turning sails need a separate rotor layer before this can replace the current mill. View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 0.466 (doors ≈ 48 px; 2× file at 0.932). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "windmill",
+          "radius": 0.5,
+          "height": 1.7,
+          "sail": 0.75,
+          "roofMaterial": "thatch",
+          "at": [
+            -0.18,
+            -0.18
+          ]
+        },
+        "props": [
+          {
+            "type": "sacks",
+            "at": [
+              0.5,
+              -0.55
+            ],
+            "count": 4
+          },
+          {
+            "type": "millstone",
+            "at": [
+              -0.65,
+              0.65
+            ]
+          },
+          {
+            "type": "cart",
+            "at": [
+              0.25,
+              0.75
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "windmill-gpt-180",
+      "name": "GPT stone windmill 180° (rear-left)",
+      "version": 1,
+      "notes": "Tall stone tower mill with a thatched cap and lattice sails; sacks, grain crate, cart. Sails are painted in: the game's turning sails need a separate rotor layer before this can replace the current mill. View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 0.466 (doors ≈ 48 px; 2× file at 0.932). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "windmill",
+          "radius": 0.5,
+          "height": 1.7,
+          "sail": 0.75,
+          "roofMaterial": "thatch",
+          "at": [
+            -0.18,
+            -0.18
+          ]
+        },
+        "props": [
+          {
+            "type": "sacks",
+            "at": [
+              0.5,
+              -0.55
+            ],
+            "count": 4
+          },
+          {
+            "type": "millstone",
+            "at": [
+              -0.65,
+              0.65
+            ]
+          },
+          {
+            "type": "cart",
+            "at": [
+              0.25,
+              0.75
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "windmill-gpt-270",
+      "name": "GPT stone windmill 270° (front-left)",
+      "version": 1,
+      "notes": "Tall stone tower mill with a thatched cap and lattice sails; sacks, grain crate, cart. Sails are painted in: the game's turning sails need a separate rotor layer before this can replace the current mill. View 270° (front-left), cut out of the owner's GPT sheet and scaled to 0.466 (doors ≈ 48 px; 2× file at 0.932). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "windmill",
+          "radius": 0.5,
+          "height": 1.7,
+          "sail": 0.75,
+          "roofMaterial": "thatch",
+          "at": [
+            -0.18,
+            -0.18
+          ]
+        },
+        "props": [
+          {
+            "type": "sacks",
+            "at": [
+              0.5,
+              -0.55
+            ],
+            "count": 4
+          },
+          {
+            "type": "millstone",
+            "at": [
+              -0.65,
+              0.65
+            ]
+          },
+          {
+            "type": "cart",
+            "at": [
+              0.25,
+              0.75
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }

@@ -190,6 +190,9 @@ try {
   await page.locator('.library-item', { has: page.locator('.meta', { hasText: /^farmstead ·/ }) }).first().click();
   for (const deg of [0, 90, 180, 270]) assert.match(await page.locator(`.variant-card[data-variant="farmstead-gpt-${deg}"] .baked-note`).textContent(), new RegExp(`Imported image \\(GPT\\), view ${deg}°`));
   pass('GPT farmstead: four views, 4 × 4');
+  await page.locator('.library-item', { has: page.locator('.meta', { hasText: /^windmill ·/ }) }).first().click();
+  for (const deg of [0, 90, 180, 270]) assert.match(await page.locator(`.variant-card[data-variant="windmill-gpt-${deg}"] .baked-note`).textContent(), new RegExp(`Imported image \\(GPT\\), view ${deg}°`));
+  pass('GPT windmill: four views');
 
   await page.locator('.library-item', { hasText: 'Watchtower' }).click();
   await page.waitForFunction(() => document.querySelectorAll('.variant-card canvas').length >= 1);

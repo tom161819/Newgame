@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "windmill",
+  "variantId": "windmill-gpt-270",
+  "name": "GPT stone windmill 270° (front-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "dfe4b764",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 147,
+  "height": 226,
+  "anchor": {
+    "x": 73,
+    "y": 188
+  },
+  "origin": {
+    "x": 0.4966,
+    "y": 0.83186
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 73,
+    "y": 220
+  },
+  "baseOrigin": {
+    "x": 0.4966,
+    "y": 0.97345
+  },
+  "visualHeight": 220,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.4,
+  "lights": [],
+  "x2": {
+    "width": 294,
+    "height": 452,
+    "anchor": {
+      "x": 146,
+      "y": 376
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "windmill",
+  "variantId": "windmill-gpt-0",
+  "name": "GPT stone windmill 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "dfe4b764",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 166,
+  "height": 229,
+  "anchor": {
+    "x": 83,
+    "y": 192
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.83843
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 83,
+    "y": 224
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.97817
+  },
+  "visualHeight": 224,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.4,
+  "lights": [],
+  "x2": {
+    "width": 332,
+    "height": 458,
+    "anchor": {
+      "x": 166,
+      "y": 384
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}
