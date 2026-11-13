@@ -1,5 +1,7 @@
+import { COLUMNS,ROWS,mapArea } from '../game/config.js';
+import { byArea } from './GameSettings.js';
 import { MINERAL_DEPOSITS,START_QUARRY,START_IRON_MINE,resourceBlocks,depositFamily } from '../data/minerals.js';
-import { reachableTiles } from '../game/pathfinding.js';
+import { reachableTiles,reachableMask,blockKeepsReach } from '../game/pathfinding.js';
 import { buildingTiles,buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
 import { clearsObstacles } from '../data/rockMining.js';
@@ -14,11 +16,14 @@ export class MineralSystem {
   deposits(){return [...this.natural.byId.values()].filter(o=>o.definition.deposit);}
   // World v2: `weight(anchor)` 0–1 makes deposits more likely in stony country (generator 2's stone weights).
   generate(random=Math.random,weight=null){
-    const s=this.scene,protectedTiles=this.natural.reserved(),start=s.character.tile;let added=0;
-    for(const [type,rule]of Object.entries(MINERAL_DEPOSITS))for(let count=0,attempt=0;count<rule.count&&attempt<5000;attempt++){
-      const anchor={x:2+Math.floor(random()*95),y:2+Math.floor(random()*95)},definition=s.objectRegistry.require(type),tiles=buildingTiles(anchor,definition);
+    const s=this.scene,protectedTiles=this.natural.reserved(),start=s.character.tile;let added=0;const origins=this.natural.origins(),mask=reachableMask(s.map,origins);
+    for(const [type,rule]of Object.entries(MINERAL_DEPOSITS))for(let count=0,attempt=0,want=byArea(rule.count);count<want&&attempt<5000*mapArea();attempt++){
+      const anchor={x:2+Math.floor(random()*(COLUMNS-5)),y:2+Math.floor(random()*(ROWS-5))},definition=s.objectRegistry.require(type),tiles=buildingTiles(anchor,definition);
       if(Math.hypot(anchor.x-start.x,anchor.y-start.y)<=9||weight&&random()>weight(anchor)||!tiles.every(t=>s.map[t.y]?.[t.x]===0&&!s.isFordTile?.(t)&&!s.resourceOccupancy.has(tileKey(t))&&!protectedTiles.has(tileKey(t))))continue;
-      const before=reachableTiles(s.map,this.natural.origins()).length;for(const t of tiles)s.map[t.y][t.x]=1;const after=reachableTiles(s.map,this.natural.origins()).length;for(const t of tiles)s.map[t.y][t.x]=0;if(after!==before-tiles.length)continue;
+      // m-velikost-mapy: a local test first, the two flood fills only when it cannot tell.
+      const quick=blockKeepsReach(s.map,tiles,mask,origins);
+      if(quick===false)continue;if(quick===null){const before=reachableTiles(s.map,origins).length;for(const t of tiles)s.map[t.y][t.x]=1;const after=reachableTiles(s.map,origins).length;for(const t of tiles)s.map[t.y][t.x]=0;if(after!==before-tiles.length)continue;}
+      for(const t of tiles)mask[t.y*s.map[0].length+t.x]=0;
       const max=rule.min+Math.floor(random()*(rule.max-rule.min+1)),state={id:`deposit-${this.natural.nextDepositId++}`,kind:'deposit',remaining:max,max,boundBuildingId:null};s.addResource(definition,anchor,state);count++;added++;
     }
     return added;

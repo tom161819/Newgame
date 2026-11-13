@@ -1,4 +1,4 @@
-import { COLUMNS, ROWS, PLAYER_START } from './config.js';
+import { COLUMNS, ROWS, PLAYER_START, onMapSize } from './config.js';
 import { GROUND, GROUND_CODES, WORLD_GENERATION as W, WATER_CELL, BUSH_TYPES, GRASS_BUSHES, GRASS_ZONE, GRASS_ZONE_CODES, isWaterGround, isRiverGround } from '../data/worldTerrain.js';
 import { settingsFromLevels } from '../data/worldCode.js';
 import { rockGroupFor,mergeThickets,groupTiles } from './natureGroups.js';
@@ -13,7 +13,11 @@ import { rockGroupFor,mergeThickets,groupTiles } from './natureGroups.js';
 // - a fair start: grass and water near the castle (trees and stones are checked where they are placed).
 // Without `streams`, every part draws from the one `random` (tests).
 const between=(random,[a,b])=>a+random()*(b-a);
-const START={x:PLAYER_START.x+.5,y:PLAYER_START.y+.5};
+let START={x:PLAYER_START.x+.5,y:PLAYER_START.y+.5};
+// m-velikost-mapy: positions scale with the side (MID = the middle line, SCALE = side / 100), counts with the area
+// (AREA = tiles / 10 000); at 100 × 100 every number is the same as before, so old world codes give the same world.
+let MID=50,SCALE=1,AREA=1;
+onMapSize((c,r)=>{START={x:PLAYER_START.x+.5,y:PLAYER_START.y+.5};MID=c/2;SCALE=c/100;AREA=c*r/10000;});
 const centre=(x,y)=>({x:x+.5,y:y+.5});
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const inside=(x,y)=>x>=0&&y>=0&&x<COLUMNS&&y<ROWS;
@@ -37,7 +41,7 @@ export function valueNoise(random,scale){
 // A meandering centre line, as points every half tile with their position `t` along the axis.
 function riverLine(random,o,{base=null,vertical=null,amplitudeRange=W.river.amplitude}={}){
   for(let attempt=0;attempt<24;attempt++){
-    const v=vertical??random()<.5,side=random()<.5?-1:1,at=base??50+side*between(random,[17,31]);
+    const v=vertical??random()<.5,side=random()<.5?-1:1,at=base??MID+side*between(random,[17,31])*SCALE;
     const amplitude=between(random,amplitudeRange)*o.meanders*(attempt>12?.5:1),wavelength=between(random,W.river.wavelength),phase=random()*Math.PI*2;
     const ripple=between(random,W.river.ripple)*Math.min(1,o.meanders),rippleLength=between(random,W.river.rippleWavelength),ripplePhase=random()*Math.PI*2;
     const points=[];
@@ -116,7 +120,7 @@ function paintLake(ground,near,random,o,others=[]){
 }
 function paintDesert(ground,near,lakes,random,o){
   if(!o.desert)return null;
-  const radius=between(random,W.desert.radius)*o.desert;
+  const radius=between(random,W.desert.radius)*o.desert*Math.sqrt(SCALE);
   const at=pickCentre(random,p=>distance(p,START)>=W.desert.startDistance+Math.max(0,radius-15)&&nearAt(near,p)>=radius*.6+W.desert.riverDistance&&lakes.every(lake=>distance(p,lake)>=radius+lake.radius+4),6);
   if(!at)return null;
   const shape=blob(random,radius),tiles=[];
@@ -138,9 +142,9 @@ function distanceField(grid,test,cap=40){
 
 // Rock outcrops (2×2 or 3×2) weighted towards stony country and the desert's edge, never in water or near the start.
 function placeRocks(terrain,ground,random,o,stony,desertDistance){
-  const count=Math.round(65*o.rocks),widths=W.rocks.widths,groups=[];let placed=0;
+  const count=Math.round(65*o.rocks*AREA),widths=W.rocks.widths,groups=[];let placed=0;
   for(let attempt=0;attempt<count*40&&placed<count;attempt++){
-    const x=2+Math.floor(random()*94),y=2+Math.floor(random()*94),dd=desertDistance[index(x,y)],weight=.2+.8*Math.max(stony(x,y),dd>0&&dd<W.rocks.desertRim?.9:0);
+    const x=2+Math.floor(random()*(COLUMNS-6)),y=2+Math.floor(random()*(ROWS-6)),dd=desertDistance[index(x,y)],weight=.2+.8*Math.max(stony(x,y),dd>0&&dd<W.rocks.desertRim?.9:0);
     if(random()>weight)continue;
     const w=widths[placed%widths.length],tiles=[];for(let dy=0;dy<2;dy++)for(let dx=0;dx<w;dx++)tiles.push({x:x+dx,y:y+dy});
     if(tiles.some(t=>!inside(t.x,t.y)||Math.abs(t.x-PLAYER_START.x)<5&&Math.abs(t.y-PLAYER_START.y)<5||![GROUND.GRASS,GROUND.DESERT,GROUND.SHORE_ROCKS].includes(ground[t.y][t.x])))continue;
@@ -150,8 +154,9 @@ function placeRocks(terrain,ground,random,o,stony,desertDistance){
   }
   // The original walls near the start show pathfinding around obstacles (kept from the first prototype).
   const walls=new Set();
-  for(let y=44;y<=52;y++)if(y!==50){terrain[y][46]=1;walls.add(`46,${y}`);}
-  for(let x=52;x<=58;x++){terrain[47][x]=1;walls.add(`${x},47`);}
+  const sx=PLAYER_START.x,sy=PLAYER_START.y;
+  for(let y=sy-6;y<=sy+2;y++)if(y!==sy){terrain[y][sx-4]=1;walls.add(`${sx-4},${y}`);}
+  for(let x=sx+2;x<=sx+8;x++){terrain[sy-3][x]=1;walls.add(`${x},${sy-3}`);}
   // A group that later rocks grew onto stays a group (its own tiles are still its own); one touching the walls does not.
   return groups.filter(g=>groupTiles(g).every(t=>!walls.has(`${t.x},${t.y}`)));
 }
@@ -160,7 +165,7 @@ function weighted(random,list){let r=random();for(const [value,weight]of list){i
 function placeBushes(terrain,ground,desert,random,o,lane,bankDensity,waterDistance){
   const bushes=new Map(),free=(x,y)=>inside(x,y)&&terrain[y][x]===0&&distance(centre(x,y),START)>W.bushClear&&!lane(x,y);
   const grass=[];for(let y=2;y<ROWS-2;y++)for(let x=2;x<COLUMNS-2;x++)if(ground[y][x]===GROUND.GRASS&&free(x,y))grass.push({x,y});
-  const clusters=Math.round(W.bushes.clusters*o.bushes);
+  const clusters=Math.round(W.bushes.clusters*o.bushes*AREA);
   for(let cluster=0;cluster<clusters&&grass.length;cluster++){
     const at=grass[Math.floor(random()*grass.length)],count=Math.round(between(random,W.bushes.perCluster)),kind=weighted(random,GRASS_BUSHES);
     for(let attempt=0,placed=0;attempt<count*4&&placed<count;attempt++){
@@ -173,7 +178,7 @@ function placeBushes(terrain,ground,desert,random,o,lane,bankDensity,waterDistan
   for(const t of grass){const d=waterDistance[index(t.x,t.y)];if(d<1||d>3.5)continue;const key=`${t.x},${t.y}`;if(bushes.has(key))continue;
     if(random()<W.bankVegetation.bushes*o.bankVegetation*bankDensity(t.x,t.y)*2)bushes.set(key,weighted(random,GRASS_BUSHES));}
   const sand=(desert?.tiles??[]).filter(t=>free(t.x,t.y));
-  for(let i=0;i<W.desert.scrub&&sand.length;i++){const [t]=sand.splice(Math.floor(random()*sand.length),1);bushes.set(`${t.x},${t.y}`,BUSH_TYPES.indexOf('bush_scrub'));}
+  for(let i=0;i<W.desert.scrub*AREA&&sand.length;i++){const [t]=sand.splice(Math.floor(random()*sand.length),1);bushes.set(`${t.x},${t.y}`,BUSH_TYPES.indexOf('bush_scrub'));}
   return bushes;
 }
 
@@ -187,7 +192,7 @@ function generateOnce(rng,o){
   }
   if(o.rivers>=2&&main){
     // A narrower river from the map edge across the main river's course, until it flows into it.
-    const random=rng('tributary'),line=riverLine(random,o,{vertical:!main.vertical,base:50+(random()<.5?-1:1)*between(random,[14,30]),amplitudeRange:W.tributary.amplitude});
+    const random=rng('tributary'),line=riverLine(random,o,{vertical:!main.vertical,base:MID+(random()<.5?-1:1)*between(random,[14,30])*SCALE,amplitudeRange:W.tributary.amplitude});
     if(line){
       const fromEnd=random()<.5,points=fromEnd?[...line.points].reverse():line.points,join=points.findIndex(p=>nearAt(fields.near,p)<1);
       if(join>16){
@@ -198,7 +203,7 @@ function generateOnce(rng,o){
     }
   }
   const lakes=[];
-  for(let i=0;i<o.lakes;i++){const lake=paintLake(ground,fields.near,rng(i?`lake${i+1}`:'lake'),o,lakes);if(lake)lakes.push(lake);}
+  for(let i=0;i<Math.round(o.lakes*AREA);i++){const lake=paintLake(ground,fields.near,rng(i?`lake${i+1}`:'lake'),o,lakes);if(lake)lakes.push(lake);}
   const desert=paintDesert(ground,fields.near,lakes,rng('desert'),o);
   // Noise maps for the landscape (separate streams: they never shift the water or the desert).
   const zoneScale=Math.max(.4,o.grassScale);

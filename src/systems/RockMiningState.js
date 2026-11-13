@@ -1,3 +1,4 @@
+import { COLUMNS,ROWS } from '../game/config.js';
 import { ROCK_MINING as RULES,clearsObstacles } from '../data/rockMining.js';
 export function validateRockMining(s,registry,{check,integer,number,array}){
   const state=s.naturalResources.rockMining;check(state&&Object.keys(state).every(key=>['records','marks'].includes(key)));array(state.records,10000);const records=new Map(),slots=new Set(),owners=new Set();
@@ -6,9 +7,9 @@ export function validateRockMining(s,registry,{check,integer,number,array}){
   for(const b of plans.values()){const d=registry.require(b.type);for(let dy=0;dy<d.height;dy++)for(let dx=0;dx<d.width;dx++)footprint.set(`${b.x+dx},${b.y+dy}`,b.id);}
   const plan=(m,key)=>{if(m.planId===undefined)return;integer(m.planId,1);check(plans.has(m.planId)&&footprint.get(key)===m.planId);};
   for(const r of state.records){
-    check(r&&Object.keys(r).filter(k=>k!=='planId').sort().join()==='dropId,id,marked,outputTile,produced,tile,workDone');integer(r.tile.x,0,99);integer(r.tile.y,0,99);check(r.id===`${r.tile.x},${r.tile.y}`&&!records.has(r.id));records.set(r.id,r);
+    check(r&&Object.keys(r).filter(k=>k!=='planId').sort().join()==='dropId,id,marked,outputTile,produced,tile,workDone');integer(r.tile.x,0,COLUMNS-1);integer(r.tile.y,0,ROWS-1);check(r.id===`${r.tile.x},${r.tile.y}`&&!records.has(r.id));records.set(r.id,r);
     check(typeof r.marked==='boolean');integer(r.produced,0,RULES.yield);number(r.workDone,0,RULES.duration);check(r.workDone<RULES.duration);check(s.terrain[r.tile.y][r.tile.x]===(r.produced===RULES.yield?0:1));
-    if(r.outputTile){integer(r.outputTile.x,0,99);integer(r.outputTile.y,0,99);check(Math.abs(r.outputTile.x-r.tile.x)+Math.abs(r.outputTile.y-r.tile.y)===1);}else check(r.produced===0&&r.dropId==null);
+    if(r.outputTile){integer(r.outputTile.x,0,COLUMNS-1);integer(r.outputTile.y,0,ROWS-1);check(Math.abs(r.outputTile.x-r.tile.x)+Math.abs(r.outputTile.y-r.tile.y)===1);}else check(r.produced===0&&r.dropId==null);
     if(r.dropId!=null){check(typeof r.dropId==='string'&&/^drop-\d+$/.test(r.dropId));const d=s.drops.find(d=>d.id===r.dropId);if(d)check(d.resource==='stone'&&d.siteId==null&&d.tile.x===r.outputTile.x&&d.tile.y===r.outputTile.y);}
     if(r.produced===RULES.yield)check(r.workDone===0);
     if(r.planId!==undefined){check(r.marked);plan(r,r.id);}

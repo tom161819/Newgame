@@ -10,7 +10,7 @@ import { VISIBILITY, FOG_STYLE } from '../systems/FogOfWarSystem.js';
 // Canvas renderer (the default, often without a GPU) pays per covered pixel for a rotated or sub-pixel image, so there the
 // mask is projected once per change into a screen-sized cache that is blitted 1:1 at whole pixels every frame.
 // Mask pixels per tile by the size of the region (fine near the King, coarse when zoomed far out).
-export const FOG_EDGE=Object.freeze({width:1.5,strength:1,resolution:4,levels:Object.freeze([[3000,4],[Infinity,2]]),margin:3,quantum:4,rebuildMs:0,pad:96,depth:-60,memoryGrey:110,maxTiles:COLUMNS+8});
+export const FOG_EDGE=Object.freeze({width:1.5,strength:1,resolution:4,levels:Object.freeze([[3000,4],[Infinity,2]]),margin:3,quantum:4,rebuildMs:0,pad:96,depth:-60,memoryGrey:110,get maxTiles(){return COLUMNS+8;}});
 const smooth=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
 
 // Pure mask: alpha 0..1 per pixel over a grid rectangle (row-major, columns*resolution wide). `visible(x,y)` is the

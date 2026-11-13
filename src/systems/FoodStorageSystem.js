@@ -1,3 +1,4 @@
+import { COLUMNS } from '../game/config.js';
 import { removeBuildingShell } from '../game/buildingRemoval.js';
 import { tradeableResources } from '../data/trade.js';
 import { GRANARY_GROUP_CAPACITY,granaryGroup,granaryUsage } from '../data/granaryCapacity.js';
@@ -189,7 +190,7 @@ export class FoodStorageSystem {
       for(const r of [...this.reservations.values()])if(r.locationId===l.id)this.release(r.id);this.locations.delete(l.id);this.changed();}
   }
   safeLegacyPosition(){
-    const origin=this.scene.character.tile;for(let radius=0;radius<100;radius++)for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){const tile={x:origin.x+dx,y:origin.y+dy};if(this.scene.map[tile.y]?.[tile.x]===0)return tile;}throw new Error('No safe location for preserved legacy stock.');
+    const origin=this.scene.character.tile;for(let radius=0;radius<COLUMNS;radius++)for(let dy=-radius;dy<=radius;dy++)for(let dx=-radius;dx<=radius;dx++){const tile={x:origin.x+dx,y:origin.y+dy};if(this.scene.map[tile.y]?.[tile.x]===0)return tile;}throw new Error('No safe location for preserved legacy stock.');
   }
   migrateMaterials(inventory,{ensure=false}={}){
     const allowed=materialResources(this.scene.objectRegistry);if(!ensure&&!allowed.some(id=>inventory[id]>0))return;

@@ -19,7 +19,7 @@ import { ROCK_MINING,CLEARING,clearsObstacles } from '../data/rockMining.js';
 import { buildingDemolitionRefund } from '../data/demolition.js';
 import { t } from '../i18n/index.js';
 import { objectRegistry } from './ObjectRegistry.js';
-import { COLUMNS,ROWS } from '../game/config.js';
+import { COLUMNS,ROWS,validMapSize,withMapSize } from '../game/config.js';
 import { exportGround,importGround,validGroundRows,exportBushes,emptyGround,exportZones,emptyZones,validZoneRows,exportReeds } from '../game/worldGeneration.js';
 import { isWaterGround,isRiverGround,BUSH_TYPES,GROUND } from '../data/worldTerrain.js';
 import { exportNatureGroups,validateNatureGroups,pruneNatureGroups } from '../game/natureGroups.js';
@@ -165,7 +165,12 @@ export function saveSchemaStatus(input){
 
 // Validace proběhne ještě před zastavením právě běžící scény. Poškozený save
 // proto nemění současný svět ani záznam v IndexedDB.
+// m-velikost-mapy: a save is checked at its own map size (its terrain's height), whatever map is running now.
 export function validateGameState(input,registry=objectRegistry){
+  const size=Array.isArray(input?.terrain)?input.terrain.length:0;
+  return validMapSize(size)?withMapSize(size,()=>validateAtSize(input,registry)):validateAtSize(input,registry);
+}
+function validateAtSize(input,registry){
   // m-ukladani-chyba: which part of the save failed, so the message (and a bug report) can say where.
   let part='header';const fail=()=>{const error=new Error(`${t('saves.corrupt')} [${part}]`);error.savePart=part;throw error;};
   const check=value=>{if(!value)fail();};
@@ -173,7 +178,7 @@ export function validateGameState(input,registry=objectRegistry){
   const integer=(n,min=0,max=Number.MAX_SAFE_INTEGER)=>{number(n,min,max);check(Number.isInteger(n));};
   const tile=p=>{check(p&&typeof p==='object');integer(p.x,0,COLUMNS-1);integer(p.y,0,ROWS-1);};
   const position=p=>{check(p&&typeof p==='object');number(p.x,0,COLUMNS);number(p.y,0,ROWS);};
-  const array=(a,max=20000)=>check(Array.isArray(a)&&a.length<=max);
+  const array=(a,max=Math.max(20000,COLUMNS*ROWS))=>check(Array.isArray(a)&&a.length<=max);
   const definition=(id,category)=>{const d=registry.get(id);check(d&&(!category||d.category===category));return d;};
   const unique=(array)=>{const ids=new Set();for(const a of array){check(a.id!=null&&!ids.has(a.id));ids.add(a.id);}return ids;};
   check(input&&typeof input==='object');
@@ -183,7 +188,7 @@ export function validateGameState(input,registry=objectRegistry){
     for(const actor of [s.player,...(s.workers??[])])for(const key of ['skills','initialSkills'])if(actor?.[key])actor[key].logistics??=createProgress();
   }else check(s.logistics.version===1);
   for(const d of s.drops??[]){d.haulEligible??=true;check(typeof d.haulEligible==='boolean');}
-  try{const settings=gameSettings(s.gameSettings);s.gameSettings={...settings,fogOfWar:s.gameSettings?.fogOfWar??s.settings?.fogOfWar??settings.fogOfWar};}catch{fail();}
+  try{if(s.gameSettings&&typeof s.gameSettings==='object'&&Array.isArray(s.terrain))s.gameSettings={...s.gameSettings,mapSize:s.terrain.length};const settings=gameSettings(s.gameSettings);s.gameSettings={...settings,fogOfWar:s.gameSettings?.fogOfWar??s.settings?.fogOfWar??settings.fogOfWar};}catch{fail();}
   s.saveVersion=SAVE_VERSION;
   if(s.groundLook!==undefined){try{s.groundLook=validateGroundLook(s.groundLook);}catch{fail();}}
   const dayDuration=s.gameSettings.dayLengthSeconds*1000;

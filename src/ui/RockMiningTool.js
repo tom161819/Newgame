@@ -1,3 +1,4 @@
+import { COLUMNS,ROWS } from '../game/config.js';
 import { t } from '../i18n/index.js';
 import { tileCenter } from '../game/isometric.js';
 import { blockingDialog } from './dockedPanels.js';
@@ -19,7 +20,7 @@ export class RockMiningTool {
   up(pointer){
     if(!this.enabled||!this.anchor)return false;const s=this.scene,start=this.anchor,end=s.pointerTile(pointer);this.anchor=null;
     if(!s.gameOver&&!s.gameTime.paused&&!blockingDialog(document)){
-      const tally=newTally();for(let y=Math.max(0,Math.min(start.y,end.y));y<=Math.min(99,Math.max(start.y,end.y));y++)for(let x=Math.max(0,Math.min(start.x,end.x));x<=Math.min(99,Math.max(start.x,end.x));x++)s.naturalResources.miningWork.rocks.markTile({x,y},!this.remove,tally);
+      const tally=newTally();for(let y=Math.max(0,Math.min(start.y,end.y));y<=Math.min(ROWS-1,Math.max(start.y,end.y));y++)for(let x=Math.max(0,Math.min(start.x,end.x));x<=Math.min(COLUMNS-1,Math.max(start.x,end.x));x++)s.naturalResources.miningWork.rocks.markTile({x,y},!this.remove,tally);
       s.setStatus(this.remove?t('rock.unmarked',{count:tallyCount(tally)}):clearingSummary(tally));
     }return true;
   }
@@ -34,7 +35,7 @@ export class RockMiningTool {
     for(const r of rocks.records.values())if(r.marked&&r.produced<10)mark(r.tile);
     for(const m of rocks.trees.values()){const o=s.naturalResources.byId.get(m.id);if(o)mark(o);}
     for(const m of rocks.bushes.values()){const [x,y]=m.id.split(',').map(Number);mark({x,y});}
-    if(this.enabled&&this.anchor&&this.end)for(let y=Math.max(0,Math.min(this.anchor.y,this.end.y));y<=Math.min(99,Math.max(this.anchor.y,this.end.y));y++)for(let x=Math.max(0,Math.min(this.anchor.x,this.end.x));x<=Math.min(99,Math.max(this.anchor.x,this.end.x));x++)if(s.fog.isVisibleTile({x,y})&&(s.terrainGrid[y][x]===1||rocks.treeAt({x,y})||s.bushes?.has(`${x},${y}`)))diamond({x,y},this.remove?0xf27777:0xffd768,.65);
+    if(this.enabled&&this.anchor&&this.end)for(let y=Math.max(0,Math.min(this.anchor.y,this.end.y));y<=Math.min(ROWS-1,Math.max(this.anchor.y,this.end.y));y++)for(let x=Math.max(0,Math.min(this.anchor.x,this.end.x));x<=Math.min(COLUMNS-1,Math.max(this.anchor.x,this.end.x));x++)if(s.fog.isVisibleTile({x,y})&&(s.terrainGrid[y][x]===1||rocks.treeAt({x,y})||s.bushes?.has(`${x},${y}`)))diamond({x,y},this.remove?0xf27777:0xffd768,.65);
   }
   destroy(){this.enabled=false;this.anchor=null;this.scene.game.canvas.style.cursor='';this.controller.abort();this.graphics.destroy();}
 }

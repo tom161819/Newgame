@@ -1,12 +1,15 @@
 import { LOGISTICS_RULES } from '../data/logistics.js';
 import { decodeWorldCode } from '../data/worldCode.js';
+import { DEFAULT_MAP_SIZE,validMapSize,mapArea } from '../game/config.js';
 export const DEFAULT_GAME_SETTINGS=Object.freeze({difficulty:'normal',wildlifePopulation:'normal',treasureCount:1,initialStoneCount:30,
   fogOfWar:true,explorationMode:true,seasonsEnabled:true,startingCastle:false,dayLengthSeconds:120,wildlifeRespawn:'normal',startingGold:0,
   startingStone:0,startingWood:0,startingIronOre:0,startingBread:0,autoEmployment:true,worldCode:null,
   // Day and night N3: night threats (each can be switched off).
   nightWolves:true,nightThieves:true,nightFires:true,
   // m-start-v2: 2 Soldiers and 2 Archers at the start (New Game proposes it; scenarios and older settings start without).
-  startingGarrison:false});
+  startingGarrison:false,
+  // m-velikost-mapy (34): side of the square map in tiles (MAP_SIZES); older settings and saves are 100.
+  mapSize:DEFAULT_MAP_SIZE});
 // Owner request 7 Nov 2026: the New Game Setup proposes a built Castle (can be switched off), Gold at its limit (500)
 // and starting resources that fill the Starter Stockpile (m-start-v2: 40 Stone + 60 Wood + 200 Bread = 300; m-tutorial-v2: 30 + 90 + 180). DEFAULT_GAME_SETTINGS stays the
 // neutral base for older saves and automated scenarios.
@@ -41,7 +44,7 @@ export function gameSettings(input=DEFAULT_GAME_SETTINGS){
     ||!Number.isInteger(s.initialStoneCount)||s.initialStoneCount<0||s.initialStoneCount>100||s.initialStoneCount%5!==0
     ||typeof s.fogOfWar!=='boolean'||['nightWolves','nightThieves','nightFires'].some(k=>typeof s[k]!=='boolean')||typeof s.explorationMode!=='boolean'||typeof s.seasonsEnabled!=='boolean'||typeof s.autoEmployment!=='boolean'||typeof s.startingGarrison!=='boolean'||typeof s.startingCastle!=='boolean'||![60,120,240].includes(s.dayLengthSeconds)
     ||!Object.hasOwn(WILDLIFE_INTERVALS,s.wildlifeRespawn)||!Number.isInteger(s.startingGold)||s.startingGold<0||s.startingGold>500||s.startingGold%25!==0
-    ||!validWorldCode(s.worldCode)
+    ||!validWorldCode(s.worldCode)||!validMapSize(s.mapSize)
     ||Object.keys(STARTING_RESOURCES).some(k=>!Number.isInteger(s[k])||s[k]<0||s[k]>STARTING_RESOURCE_CAPACITY||s[k]%STARTING_RESOURCE_STEP!==0)||startingResourceTotal(s)>STARTING_RESOURCE_CAPACITY)throw new Error('Neplatné nastavení nové hry.');
   return Object.freeze(Object.fromEntries(Object.keys(DEFAULT_GAME_SETTINGS).map(k=>[k,s[k]])));
 }
@@ -51,5 +54,9 @@ export function configuredStats(definition,settings){
   else if(definition.gameplay?.huntable){stats.maxHP*=d.animalHP;stats.attackDPS*=d.animalDPS;}
   return stats;
 }
-export const animalInitialCount=(definition,settings)=>definition.gameplay.nightPredator?0:definition.gameplay.huntable?WILDLIFE_COUNTS[settings?.wildlifePopulation??'normal']:definition.gameplay.initialCount;
-export const resourceSpawnSettings=(definition,settings)=>definition.id==='stone'?{...definition.spawn,initial:settings?.initialStoneCount??definition.spawn.initial,max:Math.max(definition.spawn.max,settings?.initialStoneCount??0)}:definition.spawn;
+// m-velikost-mapy: wild animals, stones and the like grow with the map's area (the same numbers at 100 × 100).
+export const byArea=n=>Math.round(n*mapArea());
+export const wildlifeTarget=settings=>byArea(WILDLIFE_COUNTS[settings?.wildlifePopulation??'normal']);
+export const animalInitialCount=(definition,settings)=>definition.gameplay.nightPredator?0:definition.gameplay.huntable?wildlifeTarget(settings):definition.gameplay.initialCount;
+export const resourceSpawnSettings=(definition,settings)=>{const spawn=definition.id==='stone'?{...definition.spawn,initial:settings?.initialStoneCount??definition.spawn.initial,max:Math.max(definition.spawn.max,settings?.initialStoneCount??0)}:definition.spawn;
+  if(mapArea()===1||!spawn)return spawn;return {...spawn,...(Number.isFinite(spawn.initial)?{initial:byArea(spawn.initial)}:{}),...(Number.isFinite(spawn.max)?{max:byArea(spawn.max)}:{})};};

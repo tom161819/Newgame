@@ -1,4 +1,4 @@
-import { COLUMNS, ROWS, TILE_WIDTH, TILE_HEIGHT, MAP_HEADROOM } from './config.js';
+import { COLUMNS, ROWS, TILE_WIDTH, TILE_HEIGHT, MAP_HEADROOM, onMapSize } from './config.js';
 
 export const ORIGIN = { x: ROWS * TILE_WIDTH / 2, y: MAP_HEADROOM };
 export const WORLD_BOUNDS = {
@@ -6,6 +6,8 @@ export const WORLD_BOUNDS = {
   width: (COLUMNS + ROWS) * TILE_WIDTH / 2,
   height: (COLUMNS + ROWS) * TILE_HEIGHT / 2 + MAP_HEADROOM + 32,
 };
+// m-velikost-mapy: the projection follows the map size (the objects are changed in place, importers keep them).
+onMapSize((columns, rows) => { ORIGIN.x = rows * TILE_WIDTH / 2; WORLD_BOUNDS.width = (columns + rows) * TILE_WIDTH / 2; WORLD_BOUNDS.height = (columns + rows) * TILE_HEIGHT / 2 + MAP_HEADROOM + 32; });
 
 // m-teren-vyska (part 2): the ground is lifted on screen by its height. `lift(x, y)` gives the lift in px at a map
 // point (terrainRelief sets it for the running world; null = a flat world, as in every unit test). The projection used

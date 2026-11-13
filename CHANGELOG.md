@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.108.0] - 2026-11-13
+<!-- version: {"title":"Map size choice","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- New Game: choose the map size – 100 × 100 (as before), 150, 200, 250 or 300 tiles a side. A bigger map has more trees, stones, ore, lakes, rocks and wild animals; the castle stays in the middle. Bigger maps are heavier on performance.
+
+### Changed
+- Starting a new world is faster (the check that trees and deposits do not cut off a route is now mostly local).
+
 ## [0.107.0] - 2026-11-13
 <!-- version: {"title":"Soldiers and Pitch Kiln in their approved art","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

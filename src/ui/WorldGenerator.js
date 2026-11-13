@@ -3,7 +3,7 @@
 // code makes. The result is only a world code (MKW…); the game builds the world from that code at start, as before.
 import { generateWorld } from '../game/worldGeneration.js';
 import { worldStreams } from '../game/seededRandom.js';
-import { COLUMNS, ROWS, PLAYER_START } from '../game/config.js';
+import { COLUMNS, ROWS, PLAYER_START, DEFAULT_MAP_SIZE, validMapSize, withMapSize } from '../game/config.js';
 import { GROUND, GRASS_ZONE } from '../data/worldTerrain.js';
 import { WORLD_SETTINGS } from '../data/worldCode.js';
 import { t } from '../i18n/index.js';
@@ -48,8 +48,8 @@ export function describe(setting, level) {
 
 export class WorldGenerator {
   // host: element to fill; get/set the setup's {levels, seed}; onChange after a slider moves.
-  constructor(host, { get, set }) {
-    this.host = host; this.get = get; this.set = set;
+  constructor(host, { get, set, size = () => DEFAULT_MAP_SIZE }) {
+    this.host = host; this.get = get; this.set = set; this.size = size;
     host.innerHTML = `<canvas class="world-preview" width="${COLUMNS}" height="${ROWS}" role="img"></canvas><p class="setup-help world-preview-note"></p><div class="world-sliders"></div>`;
     this.canvas = host.querySelector('canvas'); this.note = host.querySelector('.world-preview-note');
     this.sliders = WORLD_SETTINGS.map((s, i) => {
@@ -72,9 +72,13 @@ export class WorldGenerator {
     if (this.host.closest('details:not([open])') || this.host.closest('[hidden]')) { this.stale = true; return; }
     this.stale = false;
     const { levels, seed } = this.get(), started = performance.now();
-    const world = previewWorld(levels, seed), ctx = this.canvas.getContext('2d');
-    ctx.putImageData(new ImageData(previewPixels(world), COLUMNS, ROWS), 0, 0);
-    ctx.fillStyle = '#b3261e'; ctx.fillRect(PLAYER_START.x - 1, PLAYER_START.y - 1, 3, 3);
+    // m-velikost-mapy: the preview is generated at the chosen map size (and the running size is put back).
+    const size = validMapSize(this.size()) ? this.size() : DEFAULT_MAP_SIZE;
+    withMapSize(size, () => {
+      const world = previewWorld(levels, seed); this.canvas.width = COLUMNS; this.canvas.height = ROWS; const ctx = this.canvas.getContext('2d');
+      ctx.putImageData(new ImageData(previewPixels(world), COLUMNS, ROWS), 0, 0);
+      ctx.fillStyle = '#b3261e'; ctx.fillRect(PLAYER_START.x - 1, PLAYER_START.y - 1, 3, 3);
+    });
     this.note.textContent = t('setup.gen.note');
     this.lastMs = performance.now() - started;
   }

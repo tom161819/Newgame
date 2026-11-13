@@ -189,3 +189,87 @@ export function reachableTiles(map, origins) {
   }
   return tiles;
 }
+
+// m-velikost-mapy: a quick local check used while a world is filled with trees and deposits (two flood fills per
+// candidate grew with the square of the map area). `mask` = reachableMask before the change. Blocking `tiles` loses
+// exactly those tiles when they are all reachable, none is an origin and the open tiles around them stay connected
+// to each other through that ring alone (any route through the block can then go round it). Returns true when that
+// holds, false when a tile is not reachable (blocking it would lose nothing – the flood answer is "not -n"), and null
+// when only a full flood can tell.
+export function reachableMask(map, origins) {
+  const width = map[0]?.length ?? 0, seen = new Uint8Array(width * map.length);
+  for (const t of reachableTiles(map, origins)) seen[t.y * width + t.x] = 1;
+  return seen;
+}
+export function blockKeepsReach(map, tiles, mask, origins = [], reach = 3) {
+  const width = map[0]?.length ?? 0, own = new Set(tiles.map(t => t.y * width + t.x));
+  for (const t of tiles) { if (map[t.y]?.[t.x] !== 0) return null; if (mask && !mask[t.y * width + t.x]) return false; }
+  if (origins.some(o => own.has(o.y * width + o.x))) return null;
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  const ring = new Set();
+  for (const t of tiles) {
+    x0 = Math.min(x0, t.x); y0 = Math.min(y0, t.y); x1 = Math.max(x1, t.x); y1 = Math.max(y1, t.y);
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      const x = t.x + dx, y = t.y + dy, i = y * width + x;
+      if (x >= 0 && y >= 0 && x < width && y < map.length && !own.has(i) && map[y][x] === 0) ring.add(i);
+    }
+  }
+  if (!ring.size) return null;
+  // The open tiles of a small window round the block (`reach` tiles beyond it) must join every open neighbour.
+  x0 = Math.max(0, x0 - reach); y0 = Math.max(0, y0 - reach); x1 = Math.min(width - 1, x1 + reach); y1 = Math.min(map.length - 1, y1 + reach);
+  const open = (x, y) => x >= x0 && y >= y0 && x <= x1 && y <= y1 && map[y][x] === 0 && !own.has(y * width + x);
+  const [first] = ring, seen = new Set([first]), queue = [first];let found = 1;
+  while (queue.length && found < ring.size) {
+    const i = queue.pop(), px = i % width, py = (i - px) / width;
+    for (const [dx, dy] of DIRECTIONS) {
+      const x = px + dx, y = py + dy, j = y * width + x;
+      if (seen.has(j) || !open(x, y)) continue;
+      if (dx && dy && (!open(x, py) || !open(px, y))) continue;
+      seen.add(j); queue.push(j); if (ring.has(j)) found++;
+    }
+  }
+  return found === ring.size ? true : tiles.length === 1 && mask ? blockSplitsSearch(map, tiles[0], mask, origins) : null;
+}
+
+// The exact answer for one tile when the window cannot tell: a search from every reachable open neighbour, taken in
+// turns, with searches joining where they meet. All of them joined = nothing is lost; one closing on its own without
+// an origin = those tiles would be cut off. A search closing round an origin (rare) is left to the full flood (null).
+// The small side of a cut closes quickly, so this is far cheaper than a flood of the map.
+let scratch = null, scratchStamp = 0;
+function blockSplitsSearch(map, tile, mask, origins) {
+  const width = map[0]?.length ?? 0, size = width * map.length, centre = tile.y * width + tile.x;
+  if (!scratch || scratch.owner.length !== size) { scratch = { owner: new Int32Array(size), stamp: new Uint32Array(size) }; scratchStamp = 0; }
+  const stamp = ++scratchStamp, { owner } = scratch, marks = scratch.stamp, originSet = new Set(origins.map(o => o.y * width + o.x));
+  const open = i => { const x = i % width, y = (i - x) / width; return i !== centre && map[y]?.[x] === 0; };
+  const starts = [];
+  for (const [dx, dy] of DIRECTIONS) { const x = tile.x + dx, y = tile.y + dy; if (x < 0 || y < 0 || x >= width || y >= map.length) continue; const i = y * width + x; if (map[y][x] === 0 && mask[i]) starts.push(i); }
+  if (starts.length <= 1) return starts.length === 1 ? true : null;
+  const parent = starts.map((_, k) => k), root = k => { while (parent[k] !== k) k = parent[k] = parent[parent[k]]; return k; };
+  const queues = starts.map(i => [i]), heads = starts.map(() => 0), anchored = starts.map(() => false);
+  starts.forEach((i, k) => { marks[i] = stamp; owner[i] = k; if (originSet.has(i)) anchored[k] = true; });
+  let groups = starts.length;
+  for (let guard = 0; guard < size * 2; guard++) {
+    let progressed = false;
+    for (let k = 0; k < starts.length; k++) {
+      if (heads[k] >= queues[k].length) continue;
+      progressed = true;
+      const i = queues[k][heads[k]++], px = i % width, py = (i - px) / width;
+      for (const [dx, dy] of DIRECTIONS) {
+        const x = px + dx, y = py + dy;
+        if (x < 0 || y < 0 || x >= width || y >= map.length) continue;
+        const j = y * width + x;
+        if (!open(j)) continue;
+        if (dx && dy && (!open(y * width + px) || !open(py * width + x))) continue;
+        if (marks[j] === stamp) { const a = root(k), b = root(owner[j]); if (a !== b) { parent[b] = a; anchored[a] = anchored[a] || anchored[b]; if (--groups === 1) return true; } continue; }
+        marks[j] = stamp; owner[j] = k; queues[k].push(j); if (originSet.has(j)) anchored[root(k)] = true;
+      }
+      // A group whose searches all ran out is closed.
+      if (heads[k] >= queues[k].length) {
+        const r = root(k);
+        if (!starts.some((_, m) => root(m) === r && heads[m] < queues[m].length)) return anchored[r] ? null : false;
+      }
+    }
+    if (!progressed) break;
+  }
+  return null;
+}

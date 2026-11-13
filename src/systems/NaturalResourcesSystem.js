@@ -1,8 +1,9 @@
+import { COLUMNS,ROWS } from '../game/config.js';
 import { thicketTiles } from '../game/natureGroups.js';
 import { isFertileGround } from '../data/worldTerrain.js';
 import { t } from '../i18n/index.js';
 import { FORESTRY,treeBlocks,treeState } from '../data/naturalResources.js';
-import { reachableTiles,reachableCount,findPathToAny } from '../game/pathfinding.js';
+import { reachableTiles,reachableCount,findPathToAny,reachableMask,blockKeepsReach } from '../game/pathfinding.js';
 import { tileKey } from '../game/stones.js';
 import { buildingIsComplete,buildingDefinition } from '../game/buildings.js';
 import { ForestryWork } from './ForestryWork.js';
@@ -45,12 +46,14 @@ export class NaturalResourcesSystem {
   // World v2: `weight(tile)` 0–1 (generator 2's forest weights) puts forests where the landscape wants them;
   // `start` {radius, trees} adds a grove near the castle when the start would have too few trees (fair start).
   generate(random=Math.random,count=FORESTRY.initialTrees,{weight=null,start:fair=null}={}){
-    const s=this.scene,start=s.character.tile,reserved=this.reserved(),possible=reachableTiles(s.map,[start]).filter(t=>t.x>1&&t.y>1&&t.x<98&&t.y<98&&Math.hypot(t.x-start.x,t.y-start.y)>FORESTRY.protectedRadius&&!reserved.has(tileKey(t))&&!s.resourceOccupancy.has(tileKey(t)));
-    if(!possible.length)return 0;const reachable=new Set(possible.map(tileKey)),pick=()=>{for(let i=0;i<60;i++){const t=possible[Math.floor(random()*possible.length)];if(!weight||random()<weight(t))return t;}return possible[Math.floor(random()*possible.length)];},centers=Array.from({length:FORESTRY.clusters},pick);let added=0;
+    const s=this.scene,start=s.character.tile,reserved=this.reserved(),possible=reachableTiles(s.map,[start]).filter(t=>t.x>1&&t.y>1&&t.x<COLUMNS-2&&t.y<ROWS-2&&Math.hypot(t.x-start.x,t.y-start.y)>FORESTRY.protectedRadius&&!reserved.has(tileKey(t))&&!s.resourceOccupancy.has(tileKey(t)));
+    if(!possible.length)return 0;
+    // m-velikost-mapy: the route check answers from a local test first (the same answers as two flood fills per tree).
+    const origins=this.origins(),mask=reachableMask(s.map,origins),width=s.map[0].length,keeps=tile=>{const quick=blockKeepsReach(s.map,[tile],mask,origins),ok=quick===null?this.preservesRoutes(tile):quick;if(ok)mask[tile.y*width+tile.x]=0;return ok;};const reachable=new Set(possible.map(tileKey)),pick=()=>{for(let i=0;i<60;i++){const t=possible[Math.floor(random()*possible.length)];if(!weight||random()<weight(t))return t;}return possible[Math.floor(random()*possible.length)];},centers=Array.from({length:FORESTRY.clusters},pick);let added=0;
     for(let attempt=0;attempt<count*80&&added<count;attempt++){
       const center=centers[attempt%centers.length],radius=Math.sqrt(random())*(5+random()*5),angle=random()*Math.PI*2,tile={x:Math.round(center.x+Math.cos(angle)*radius),y:Math.round(center.y+Math.sin(angle)*radius)},key=tileKey(tile);
-      if(!reachable.has(key)||weight&&random()>Math.max(.15,weight(tile))||s.map[tile.y]?.[tile.x]!==0||!isFertileGround(s.groundGrid?.[tile.y]?.[tile.x])||tile.x<2||tile.y<2||tile.x>97||tile.y>97||reserved.has(key)||s.resourceOccupancy.has(key)||Math.hypot(tile.x-start.x,tile.y-start.y)<=FORESTRY.protectedRadius)continue;
-      const stage=random()<.6?3:random()<.8?2:1;if(stage===3&&!this.preservesRoutes(tile))continue;
+      if(!reachable.has(key)||weight&&random()>Math.max(.15,weight(tile))||s.map[tile.y]?.[tile.x]!==0||!isFertileGround(s.groundGrid?.[tile.y]?.[tile.x])||tile.x<2||tile.y<2||tile.x>COLUMNS-3||tile.y>ROWS-3||reserved.has(key)||s.resourceOccupancy.has(key)||Math.hypot(tile.x-start.x,tile.y-start.y)<=FORESTRY.protectedRadius)continue;
+      const stage=random()<.6?3:random()<.8?2:1;if(stage===3&&!keeps(tile))continue;
       const growthDays=stage<3?random()*FORESTRY.stageDays[stage]:0,state=treeState(`tree-${this.nextId++}`,{stage,growthDays,ageDays:stage===3?8+random()*20:(stage===1?1:4)+growthDays});state.growthCheckpoint=this.growthClock;state.ageCheckpoint=this.ageClock;
       s.addResource(s.objectRegistry.require(random()<.6?'oak_tree':'pine_tree'),tile,state);added++;
     }
@@ -61,7 +64,7 @@ export class NaturalResourcesSystem {
         const center=ring[Math.floor(random()*ring.length)];
         for(let attempt=0;attempt<400&&near()<fair.trees;attempt++){
           const r=Math.sqrt(random())*5,a=random()*Math.PI*2,tile={x:Math.round(center.x+Math.cos(a)*r),y:Math.round(center.y+Math.sin(a)*r)},key=tileKey(tile);
-          if(!reachable.has(key)||s.map[tile.y]?.[tile.x]!==0||!isFertileGround(s.groundGrid?.[tile.y]?.[tile.x])||reserved.has(key)||s.resourceOccupancy.has(key)||Math.hypot(tile.x-fair.center.x,tile.y-fair.center.y)<=FORESTRY.protectedRadius||!this.preservesRoutes(tile))continue;
+          if(!reachable.has(key)||s.map[tile.y]?.[tile.x]!==0||!isFertileGround(s.groundGrid?.[tile.y]?.[tile.x])||reserved.has(key)||s.resourceOccupancy.has(key)||Math.hypot(tile.x-fair.center.x,tile.y-fair.center.y)<=FORESTRY.protectedRadius||!keeps(tile))continue;
           const state=treeState(`tree-${this.nextId++}`,{stage:3,growthDays:0,ageDays:8+random()*20});state.growthCheckpoint=this.growthClock;state.ageCheckpoint=this.ageClock;
           s.addResource(s.objectRegistry.require(random()<.6?'oak_tree':'pine_tree'),tile,state);added++;
         }
@@ -76,6 +79,9 @@ export class NaturalResourcesSystem {
   flushGrowth(){
     // performance-1: building tiles and the reachable count are read once per pass (both change only with a stage).
     const reserved=this.reserved(),built=new Set(),routes={};for(const b of this.scene.buildings)for(const t of b.tiles)built.add(tileKey(t));
+    // m-velikost-mapy: a local route test first, against the reachable tiles read once per pass (kept up to date as
+    // trees grow); the flood fills only when it cannot tell. Same answers as before, far fewer floods on a big map.
+    let mask=null;const map=this.scene.map,width=map[0]?.length??0,origins=this.origins(),keeps=tile=>{mask??=reachableMask(map,origins);const quick=blockKeepsReach(map,[tile],mask,origins),ok=quick===null?this.preservesRoutes(tile,routes):quick;if(ok)mask[tile.y*width+tile.x]=0;return ok;};
     // m-drevorubci-stromy: stumps and young trees inside a finished Lumberjack Hut's radius grow faster (Dev tool value).
     const huts=this.forestry.huts(),boost=devFactor('hutGrowthBoost');let matured=false;
     for(const object of this.byId.values()){
@@ -86,7 +92,7 @@ export class NaturalResourcesSystem {
       n.growthDays+=growth*(boost!==1&&huts.some(h=>this.forestry.inRadius(h,object))?boost:1);
       while(n.stage<3&&n.growthDays+1e-9>=FORESTRY.stageDays[n.stage]){
         if(this.growthModifier()===0)break;
-        if(n.stage===2&&(reserved.has(tileKey(object))||this.scene.map[object.y][object.x]!==0||!this.preservesRoutes(object,routes))){n.growthDays=FORESTRY.stageDays[n.stage];break;}
+        if(n.stage===2&&(reserved.has(tileKey(object))||this.scene.map[object.y][object.x]!==0||!keeps(object))){n.growthDays=FORESTRY.stageDays[n.stage];break;}
         n.growthDays=Math.max(0,n.growthDays-FORESTRY.stageDays[n.stage]);n.stage++;if(n.stage===3){n.growthDays=0;matured=true;}this.refreshMap(object);this.view(object)?.setNaturalState?.(object);routes.before=undefined;
       }
     }

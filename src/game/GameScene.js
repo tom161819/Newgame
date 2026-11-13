@@ -52,6 +52,7 @@ import { t } from '../i18n/index.js';
 import { localized } from '../i18n/names.js';
 import Phaser from 'phaser';
 import { COLUMNS, ROWS, PLAYER_START, isWalkable, tileCenter } from './map.js';
+import { setMapSize,mapArea } from './config.js';
 import { generateWorld, mapFromWorld, emptyGround, importGround, importBushes, emptyZones, importZones, importReeds } from './worldGeneration.js';
 import { importNatureGroups, pruneNatureGroups, exportNatureGroups, thicketTiles } from './natureGroups.js';
 import { isFertileGround, isFordGround, FORD_SPEED, WORLD_GENERATION } from '../data/worldTerrain.js';
@@ -181,7 +182,9 @@ import { bindSoundSetting } from '../ui/sound.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() { super('Game'); }
-  init({state=null,settings}={}){this.loadState=state;this.gameSettings=gameSettings(state?.gameSettings??settings);}
+  // m-velikost-mapy: the map size is set before anything is built; a loaded game takes it from its saved terrain.
+  init({state=null,settings}={}){this.loadState=state;const size=Array.isArray(state?.terrain)?state.terrain.length:null;
+    this.gameSettings=gameSettings({...(state?.gameSettings??settings??{}),...(size?{mapSize:size}:{})});setMapSize(this.gameSettings.mapSize);}
 
   preload() {
     this.objectRegistry=objectRegistry;
@@ -345,7 +348,7 @@ export class GameScene extends Phaser.Scene {
     this.setStatus(t('status.idle'));
     this.worldCamera=new WorldCamera(this,this.player);this.staffingIndicators=new MissingWorkersIndicators(this);
     this.naturalResources=new NaturalResourcesSystem(this);this.naturalResourcePanel=new NaturalResourcePanel(this);if(!this.loadState){const weights=this.worldWeights,at=(grid,t)=>grid[t.y*this.groundGrid[0].length+t.x]??0,F=WORLD_GENERATION.fairStart;
-      this.naturalResources.generate(this.worldRandom('trees'),Math.round(WORLD_FORESTRY.initialTrees*settingsFromLevels(this.worldLevels).forest),{weight:weights?t=>at(weights.forest,t):null,start:settingsFromLevels(this.worldLevels).forest>=.5?{center:PLAYER_START,radius:F.radius,trees:F.trees}:null});
+      this.naturalResources.generate(this.worldRandom('trees'),Math.round(WORLD_FORESTRY.initialTrees*settingsFromLevels(this.worldLevels).forest*mapArea()),{weight:weights?t=>at(weights.forest,t):null,start:settingsFromLevels(this.worldLevels).forest>=.5?{center:PLAYER_START,radius:F.radius,trees:F.trees}:null});
       this.naturalResources.mining.generate(this.worldRandom('minerals'),weights?t=>.25+.75*at(weights.stone,t):null);
       // m-kamenolom-u-hradu: a Quarry deposit 8–16 tiles from the Castle in every world (generator 3).
       this.naturalResources.mining.ensureStartQuarry(this.worldRandom('start-quarry'));

@@ -1,3 +1,4 @@
+import { COLUMNS,ROWS } from '../game/config.js';
 import { GRANARY_GROUP_CAPACITY,granaryUsage } from '../data/granaryCapacity.js';
 import { tradeableResources } from '../data/trade.js';
 import { paidCost } from '../data/demolition.js';
@@ -19,7 +20,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   if(physical){
     check(s.buildings.filter(b=>b.type==='starter_stockpile').length<=1);
     for(const l of storage.locations)if(l.kind==='fallback'&&l.buildingId==null){
-      check(['food-camp','legacy-materials'].includes(l.id));integer(l.x,0,99);integer(l.y,0,99);
+      check(['food-camp','legacy-materials'].includes(l.id));integer(l.x,0,COLUMNS-1);integer(l.y,0,ROWS-1);
       expected.set(l.id,{kind:'fallback',buildingId:null,x:l.x,y:l.y,width:1,height:1,capacity:l.id==='legacy-materials'?40:30,allowed:l.id==='legacy-materials'?materialResources(registry):[...FOOD_RESOURCE_IDS]});
     }
   }
@@ -117,7 +118,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     const sourceDrop=t.sourceDropId&&s.drops.find(d=>d.id===t.sourceDropId);
     if(t.kind==='foodPickup'&&t.sourceDropId){check(sourceDrop&&sourceDrop.resource===t.resource&&sourceDrop.amount>=t.amount&&t.goal.x===sourceDrop.tile.x&&t.goal.y===sourceDrop.tile.y&&!groundRefs.has(t.sourceDropId));groundRefs.add(t.sourceDropId);}
     else check(adjacent(locations.get(t.kind==='foodPickup'?t.sourceId:t.destinationId),t.goal));
-    if(t.hauling!==undefined){check(t.hauling===true&&w.profession==='hauler');if(t.kind==='foodDeliver'){number(t.loadedDistance);number(t.loadedPosition?.x,0,100);number(t.loadedPosition?.y,0,100);}}
+    if(t.hauling!==undefined){check(t.hauling===true&&w.profession==='hauler');if(t.kind==='foodDeliver'){number(t.loadedDistance);number(t.loadedPosition?.x,0,COLUMNS);number(t.loadedPosition?.y,0,ROWS);}}
     if(t.kind==='foodPickup'){
       if(t.sourceDropId)check(!t.stockReservation&&(t.hauling||t.naturalHarvest===true||t.naturalMining===true||t.manualMining===true||t.siteId!=null&&w.profession==='builder'));
       else{const stock=reservations.get(t.stockReservation);check(stock?.kind==='stock'&&stock.locationId===t.sourceId&&stock.resource===t.resource&&stock.amount===t.amount&&stock.owner===t.transferId&&!stockRefs.has(stock.id));stockRefs.add(stock.id);}check(!w.cargo);
