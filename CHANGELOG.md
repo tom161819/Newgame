@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.113.2] - 2026-11-13
+<!-- version: {"title":"GPT Bakery views; Armory roof fix in the Asset Studio","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Asset Studio: the owner's GPT-made Bakery in four views for review.
+
+### Fixed
+- Asset Studio: the GPT Armory front view (0°) had the roof ridge cut off; v2 shows the whole roof.
+
 ## [0.113.1] - 2026-11-13
 <!-- version: {"title":"GPT Armory views in the Asset Studio","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

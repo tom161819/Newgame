@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-08T22:15:46.050Z",
+  "updatedAt": "2026-11-13T18:20:36.929Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -27,6 +27,56 @@
           "note": "",
           "updatedAt": "2026-11-04T21:39:15.015Z",
           "approvedAt": "2026-11-04T21:39:15.015Z"
+        },
+        "armory-gpt-0": {
+          "status": "review",
+          "version": 2,
+          "specHash": "e17aea4f",
+          "note": "",
+          "updatedAt": "2026-11-13T18:20:36.928Z",
+          "comments": [
+            {
+              "at": "2026-11-13T18:16:56.351Z",
+              "by": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+              "text": "vypadá to super, ale proč je nahoře useknutá ta střecha? jde to opravit?",
+              "version": 1
+            }
+          ],
+          "history": [
+            {
+              "version": 1,
+              "specHash": "e181a614",
+              "status": "revision-requested",
+              "at": "2026-11-13T18:16:56.351Z"
+            }
+          ]
+        },
+        "armory-gpt-90": {
+          "approvedAt": "2026-11-13T18:17:06.207Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e181a614",
+          "status": "approved",
+          "updatedAt": "2026-11-13T18:17:06.207Z",
+          "version": 1
+        },
+        "armory-gpt-180": {
+          "approvedAt": "2026-11-13T18:17:07.175Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e181a614",
+          "status": "approved",
+          "updatedAt": "2026-11-13T18:17:07.175Z",
+          "version": 1
+        },
+        "armory-gpt-270": {
+          "approvedAt": "2026-11-13T18:17:08.388Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "e181a614",
+          "status": "approved",
+          "updatedAt": "2026-11-13T18:17:08.388Z",
+          "version": 1
         }
       }
     },

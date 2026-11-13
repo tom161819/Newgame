@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "bakery-house",
+  "variantId": "bakery-house-gpt-180",
+  "name": "GPT image 180° (rear-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "2a77f463",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 162,
+  "height": 153,
+  "anchor": {
+    "x": 81,
+    "y": 103
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.6732
+  },
+  "footprint": {
+    "width": 3,
+    "height": 2
+  },
+  "base": {
+    "x": 81,
+    "y": 143
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.93464
+  },
+  "visualHeight": 143,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.24,
+  "lights": [],
+  "x2": {
+    "width": 324,
+    "height": 306,
+    "anchor": {
+      "x": 162,
+      "y": 206
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

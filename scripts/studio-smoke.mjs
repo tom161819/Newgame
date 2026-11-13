@@ -178,6 +178,9 @@ try {
   }
   await page.locator('.variant-card[data-variant="armory-gpt-0"]').screenshot({ path: '/tmp/armory/card-0.png' });
   pass('GPT armory: four imported views shown as review variants');
+  await page.locator('.library-item', { hasText: 'Bakery' }).first().click();
+  for (const deg of [0, 90, 180, 270]) assert.match(await page.locator(`.variant-card[data-variant="bakery-house-gpt-${deg}"] .baked-note`).textContent(), new RegExp(`Imported image \\(GPT\\), view ${deg}°`));
+  pass('GPT bakery: four imported views shown as review variants');
 
   await page.locator('.library-item', { hasText: 'Watchtower' }).click();
   await page.waitForFunction(() => document.querySelectorAll('.variant-card canvas').length >= 1);
