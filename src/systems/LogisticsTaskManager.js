@@ -72,7 +72,7 @@ export class LogisticsTaskManager {
       if(++attempts>8)break;
       if(!storage.route(worker,[destination])){this.failedRoutes.set(routeKey,this.scene.gameTime.totalElapsed+2000);continue;}
       const options={...task,hauling:worker.profession==='hauler'},success=drop?this.scene.foodProduction.moveGround(worker,drop,destination.id,amount,options):this.scene.foodProduction.move(worker,task.sourceId,destination.id,task.resource,amount,options);
-      if(success)return true;this.failedRoutes.set(routeKey,this.scene.gameTime.totalElapsed+2000);
+      if(success)return true;if(task.allocationId&&this.scene.constructionSystem?.materials.rebook?.(task.allocationId,worker))this.nextRefresh=0;this.failedRoutes.set(routeKey,this.scene.gameTime.totalElapsed+2000);
     }
     return false;
   }

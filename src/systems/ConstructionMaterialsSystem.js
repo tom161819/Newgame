@@ -62,6 +62,24 @@ export class ConstructionMaterialsSystem {
     for(const r of this.storage.reservations.values())if(r.kind==='stock'&&r.siteId!=null&&r.owner===this.owner(r.siteId)&&this.site(r.siteId)&&(siteId==null||r.siteId===siteId))tasks.push({priority:this.priority(r.siteId),siteId:r.siteId,allocationId:r.id,sourceId:r.locationId,destinationId:this.owner(r.siteId),resource:r.resource,amount:r.amount});
     for(const drop of this.scene.dropSystem.drops.values())if(drop.siteId!=null&&this.site(drop.siteId)&&(siteId==null||drop.siteId===siteId))tasks.push({priority:this.priority(drop.siteId),siteId:drop.siteId,sourceDropId:drop.id,destinationId:this.owner(drop.siteId),resource:drop.resource,amount:drop.amount});return tasks;
   }
+  // m-sklad-zazdeny (economy test 13 Nov 2026): a site's materials are booked in one store when it is placed. A store that
+  // was walled in by buildings afterwards kept the booking for ever and the site never got its materials. When a carrier
+  // cannot reach the booked store, the booking moves to a store he can reach that has the goods (all or a part).
+  rebook(allocationId,worker){
+    const s=this.storage,first=s.reservations.get(allocationId);if(!first||first.kind!=='stock'||first.siteId==null||first.owner!==this.owner(first.siteId))return false;
+    const from=s.locations.get(first.locationId);if(from&&s.route(worker,[from]))return false;let moved=false;const reach=new Map();
+    // Every good of this site booked in that store (one failed trip stands for all of them).
+    for(const r of [...s.reservations.values()]){
+      if(r.kind!=='stock'||r.owner!==first.owner||r.locationId!==first.locationId)continue;
+      for(const l of s.locations.values()){
+        if(l.id===r.locationId||!s.isStock(l))continue;const amount=Math.min(r.amount,s.free(l.id,r.resource));if(!(amount>0))continue;
+        if(!reach.has(l.id))reach.set(l.id,!!s.route(worker,[l]));if(!reach.get(l.id))continue;
+        const id=s.reserve('stock',l.id,r.resource,amount,r.owner);if(!id)continue;s.reservations.get(id).siteId=r.siteId;moved=true;
+        r.amount-=amount;if(r.amount<=0){s.release(r.id);break;}
+      }
+    }
+    if(moved)s.changed();return moved;
+  }
   returnAllocation(id){
     const r=this.storage.reservations.get(id);if(!r)return;
     if(!this.site(r.siteId)){this.storage.release(id);return;}

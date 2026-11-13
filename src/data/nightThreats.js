@@ -25,7 +25,10 @@ export const NIGHT_THREATS=Object.freeze({
   // a quarter of a day and can jump to a wooden neighbour within 2 tiles. Residents within 15 tiles fight it with
   // buckets from the nearest Well or shore; a Well close by makes the trips short.
   fires:Object.freeze({chance:.02,range:2,weather:Object.freeze({Drought:2,Rainy:.3}),winter:.5,burnDays:.25,regrowPerSecond:2,bucket:15,
-    spreadEverySeconds:5,spreadChance:.15,helpers:6,helperRange:15,destroyChance:.1,savedHealth:5,fillMs:1000,throwMs:800,startIntensity:60,
+    spreadEverySeconds:5,
+    // Economy test 13 Nov 2026: at 15 % every 5 s one fire took 10 of 19 buildings of a village with a Well (each
+    // neighbour had a 62 % chance to catch during one fire). 5 % gives a neighbour about 26 %.
+    spreadChance:.05,helpers:6,helperRange:15,destroyChance:.1,savedHealth:5,fillMs:1000,throwMs:800,startIntensity:60,
     // Owner 13 Nov 2026: a building whose fire was just put out cannot catch fire again for half a game day.
     safeAfterDays:.5}),
   campfire:Object.freeze({

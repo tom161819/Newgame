@@ -5,6 +5,16 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.118.0] - 2026-11-13
+<!-- version: {"title":"Zoom-out and big-map performance; fire spreads less; walled-in store fix","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Fixed
+- Zooming out no longer freezes the game, also on big maps: far ground is painted as a quick draft and new ground comes in over a few frames.
+- The tip bubble no longer slows every frame while it is open.
+- A building site no longer waits for ever when its materials were booked in a store that got walled in by buildings: they are taken from another store.
+
+### Changed
+- Fire jumps to a neighbouring building less often (5 % instead of 15 % every 5 seconds).
+
 ## [0.117.1] - 2026-11-13
 <!-- version: {"title":"Fire immunity after extinguishing; Builders clear Burnt Ruins","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Fixed

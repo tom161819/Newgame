@@ -39,22 +39,32 @@ export class GroundComposite {
       c.drawImage(f.source.image,f.cutX+x-image.x,f.cutY+y-image.y,w,h,x,y,w,h);}
     c.setTransform(1,0,0,1,0,0);
   }
+  // performance-3 (owner 13 Nov 2026: zooming out lags): the cache is no longer redrawn in full every frame of a zoom or
+  // for every chunk that comes into view. (1) While the zoom is moving, a cache of a lower resolution is kept (shown
+  // stretched for those few frames); zooming out builds the cache once for the view the zoom is heading to. (2) A chunk
+  // that joins the shown ones is drawn alone into the cache; a chunk that left stays as it is (it lies outside the view).
   sync(camera){
     if(!camera?.worldView)return;
-    const z=camera.zoom,view=camera.worldView,pad=GROUND_COMPOSITE.pad,images=this.shown(),signature=images.map(i=>`${i.texture.key}@${i.x},${i.y}`).join(';'),s=this.state;
-    const inside=s&&s.zoom===z&&s.width===camera.width&&s.height===camera.height&&view.x>=s.ox&&view.y>=s.oy&&view.right<=s.ox+s.w/z&&view.bottom<=s.oy+s.h/z;
-    if(!inside||s.signature!==signature){
+    const z=camera.zoom,view=camera.worldView,pad=GROUND_COMPOSITE.pad,images=this.shown(),s=this.state;
+    const target=this.scene.worldCamera?.zoomTarget??z,moving=Math.abs(target-z)>1e-4;
+    const inside=s&&s.width===camera.width&&s.height===camera.height&&(s.zoom===z||moving&&s.zoom<z)&&view.x>=s.ox&&view.y>=s.oy&&view.right<=s.ox+s.w/s.zoom&&view.bottom<=s.oy+s.h/s.zoom;
+    const names=new Map(images.map(i=>[`${i.texture.key}@${i.x},${i.y}`,i]));
+    if(!inside){
       // Whole world pixels at the cache origin: at zoom 1 the cache pixels are exactly the chunk pixels.
-      const w=Math.ceil(camera.width+2*pad),h=Math.ceil(camera.height+2*pad);
+      const w=Math.ceil(camera.width+2*pad),h=Math.ceil(camera.height+2*pad),cz=moving?Math.min(z,target):z,mx=view.x+view.width/2,my=view.y+view.height/2;
       if(this.canvas.width!==w||this.canvas.height!==h){this.texture.setSize(w,h);this.image.setSizeToFrame();}else this.context.clearRect(0,0,w,h);
-      this.state={zoom:z,width:camera.width,height:camera.height,ox:Math.floor(view.x-pad/z),oy:Math.floor(view.y-pad/z),w,h,signature};
+      this.state={zoom:cz,width:camera.width,height:camera.height,ox:Math.floor(mx-w/2/cz),oy:Math.floor(my-h/2/cz),w,h,names:new Set(names.keys())};
       this.draw(images);this.touched.clear();this.stats.full++;
-      this.image.setPosition(this.state.ox,this.state.oy).setScale(1/z).setVisible(images.length>0);
-    }else if(this.touched.size){
-      for(const [key,rects] of this.touched){const image=this.terrain.chunks.get(key);if(!image?.visible)continue;if(rects)for(const r of rects)this.draw(images,r);else this.draw(images,this.bounds(image));}
-      this.touched.clear();this.stats.partial++;
-    }else return;
+      this.image.setPosition(this.state.ox,this.state.oy).setScale(1/cz).setVisible(images.length>0);
+    }else{
+      let drawn=false;
+      for(const [name,image] of names)if(!s.names.has(name)){this.draw(images,this.bounds(image));this.touched.delete(this.keyOf(image));drawn=true;}
+      s.names=new Set(names.keys());
+      for(const [key,rects] of this.touched){const image=this.terrain.chunks.get(key);if(!image?.visible)continue;drawn=true;if(rects)for(const r of rects)this.draw(images,r);else this.draw(images,this.bounds(image));}
+      this.touched.clear();if(!drawn)return;this.stats.partial++;this.image.setVisible(images.length>0);
+    }
     this.texture.refresh();
   }
+  keyOf(image){for(const [key,value] of this.terrain.chunks)if(value===image)return key;return null;}
   destroy(){this.image.destroy();if(this.scene.textures.exists(GROUND_COMPOSITE.key))this.scene.textures.remove(GROUND_COMPOSITE.key);}
 }

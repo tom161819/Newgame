@@ -46,6 +46,7 @@ export function tipPlacement({point=null,rect=null,from=null,vw,vh,bubble,window
   if(!point){const at=freeBubbleSpot({x:16,y:Math.max(top,vh-bubble.h-120),w:bubble.w,h:bubble.h,vw,vh,blocked:all,anchor:{x:16,y:vh},top});return {arrow:null,bubble:{x:Math.round(at.x),y:Math.round(at.y)}};}
   return tutorialPlacement({point,rect,from,vw,vh,bubble,windows:all,top,arrowLength});
 }
+const box=r=>r?{left:r.left,right:r.right,top:r.top,bottom:r.bottom}:null;
 export class TutorialGuide {
   constructor(scene,{doc=globalThis.document}={}){
     this.scene=scene;this.doc=doc;this.active=false;this.seen=new Set();this.skipped=new Set();this.lastCheck=-Infinity;this.currentId=null;
@@ -177,16 +178,19 @@ export class TutorialGuide {
     const w=Math.min(300,vw-24);this.bubble.style.width=`${w}px`;const h=this.bubble.offsetHeight||90;
     const boxes=[target.avoid??[]].flat().filter(visible).map(restingBox);
     const avoid=boxes.length?{left:Math.min(...boxes.map(b=>b.left)),right:Math.max(...boxes.map(b=>b.right)),top:Math.min(...boxes.map(b=>b.top)),bottom:Math.max(...boxes.map(b=>b.bottom))}:null;
-    const {arrow,bubble}=tutorialPlacement({point,rect,avoid,from:target.from??null,vw,vh,bubble:{w,h},windows:openWindowRects(this.doc,vw,vh),arrowLength:this.arrowLength()});
+    const {arrow,bubble}=this.placed('step',{point,rect:box(rect),avoid,from:target.from??null,vw,vh,bubble:{w,h},windows:openWindowRects(this.doc,vw,vh).map(box),arrowLength:this.arrowLength()},tutorialPlacement);
     this.arrow.hidden=false;this.arrow.style.left=`${Math.round(arrow.x)}px`;this.arrow.style.top=`${Math.round(arrow.y)}px`;this.arrow.style.transform=`translate(-50%,-50%) rotate(${arrow.angle}rad)`;this.arrow.classList.toggle('offscreen',arrow.off);
     this.bubble.style.left=`${bubble.x}px`;this.bubble.style.top=`${bubble.y}px`;
   }
+  // performance-3: the search for a free spot (thousands of candidate places) runs only when something it depends on
+  // moved; with the same boxes as last time the last answer stands.
+  placed(kind,input,solve){const key=kind+JSON.stringify(input);if(this.placedKey!==key){this.placedKey=key;this.placedResult=solve(input);}return this.placedResult;}
   // m-tipy-mimo-listu: a tip is measured against the HUD and the open windows (tipPlacement).
   placeTipBubble(point,rect,target,vw,vh){
     const w=Math.min(300,vw-24);this.bubble.style.width=`${w}px`;const h=this.bubble.offsetHeight||90;
     const bar=this.doc.querySelector?.('.inventory'),topBar=bar&&visible(bar)?bar.getBoundingClientRect():null;
     const windows=tipWindowRects(this.doc,vw,vh).filter(r=>!topBar||r.left!==topBar.left||r.top!==topBar.top||r.right!==topBar.right||r.bottom!==topBar.bottom);
-    const {arrow,bubble}=tipPlacement({point,rect,from:target.from??null,vw,vh,bubble:{w,h},windows,topBar,arrowLength:this.arrowLength()});
+    const {arrow,bubble}=this.placed('tip',{point,rect:box(rect),from:target.from??null,vw,vh,bubble:{w,h},windows:windows.map(box),topBar:box(topBar),arrowLength:this.arrowLength()},tipPlacement);
     this.arrow.hidden=!arrow;if(arrow){this.arrow.style.left=`${Math.round(arrow.x)}px`;this.arrow.style.top=`${Math.round(arrow.y)}px`;this.arrow.style.transform=`translate(-50%,-50%) rotate(${arrow.angle}rad)`;this.arrow.classList.toggle('offscreen',arrow.off);}
     this.bubble.style.left=`${bubble.x}px`;this.bubble.style.top=`${bubble.y}px`;
   }
