@@ -32,15 +32,15 @@ test('four unit types from central data: Soldier and Swordsman differ, the Arche
   assert.ok(b.modifiers.maxHP>a.modifiers.maxHP&&b.modifiers.armor>0&&b.trainingTime>a.trainingTime&&b.goldCost>a.goldCost&&b.requiredCombatLevel>a.requiredCombatLevel,'the Swordsman is the stronger, dearer infantry');
   assert.equal(c.modifiers.attackRange,5);assert.equal(k.mount,'horse');
   assert.deepEqual(unitKit('knight'),{sword:1,armor:1});
-  const {s,barracks}=kingdom(),w=soldier(s,barracks,{x:50,y:54},9);
+  const {s,barracks}=kingdom(),w=soldier(s,barracks,{x:50,y:56},9);
   assert.equal(s.military.blocker(w,'knight'),'horse');assert.equal(s.military.train(w,'knight'),'horse');assert.equal(s.military.orders.size,0);
   assert.equal(s.military.blocker(w,'swordsman'),null);
-  const novice=soldier(s,barracks,{x:51,y:54},1);assert.equal(s.military.blocker(novice,'swordsman'),'skill');
-  const civilian=s.workerSystem.create({x:52,y:54});assert.equal(s.military.blocker(civilian,'soldier'),'notSoldier');
+  const novice=soldier(s,barracks,{x:51,y:56},1);assert.equal(s.military.blocker(novice,'swordsman'),'skill');
+  const civilian=s.workerSystem.create({x:52,y:56});assert.equal(s.military.blocker(civilian,'soldier'),'notSoldier');
 });
 
 test('training takes Gold, the exact items carried from the Armory by Haulers and game time; Save/Load mid-way keeps everything once',()=>{
-  let {s,armory,barracks}=kingdom();const a=soldier(s,barracks,{x:50,y:54}),b=soldier(s,barracks,{x:51,y:54},3),c=soldier(s,barracks,{x:52,y:54});
+  let {s,armory,barracks}=kingdom();const a=soldier(s,barracks,{x:50,y:56}),b=soldier(s,barracks,{x:51,y:56},3),c=soldier(s,barracks,{x:52,y:56});
   const gold=s.inventory.count('gold');
   for(const [w,type]of [[a,'soldier'],[b,'swordsman'],[c,'archer']])assert.equal(s.military.train(w,type),null);
   assert.equal(s.inventory.count('gold'),gold-5-12-8);assert.equal(s.military.train(a,'archer'),'training','one order per Soldier');
@@ -54,11 +54,11 @@ test('training takes Gold, the exact items carried from the Armory by Haulers an
   const receipts=[...s.resourceLedger.history,s.resourceLedger.current].flatMap(d=>d.transactions).filter(t=>t.source==='Military Equipment');
   assert.deepEqual(receipts.map(t=>[t.resource,t.quantity]).sort(),[['bow',1],['sword',1],['sword',1]]);
   assert.equal(s.foodStorage.used(s.foodStorage.locations.get(`kit-${barracks.id}`)),0,'nothing left in the kit store');
-  const wages=new WageSystem(s),plain=soldier(s,s.buildings.find(x=>x.type==='barracks'),{x:53,y:54},3);assert.equal(wages.dailyWage(unit(b.id)),BASE_DAILY_WAGES.soldier+UNIT_TYPES.swordsman.wageBonus,'a trained unit earns the Soldier wage and its type’s extra wage');assert.equal(wages.dailyWage(plain),BASE_DAILY_WAGES.recruit,'kasarna-branci: an untrained Recruit earns the Recruit wage');
+  const wages=new WageSystem(s),plain=soldier(s,s.buildings.find(x=>x.type==='barracks'),{x:53,y:56},3);assert.equal(wages.dailyWage(unit(b.id)),BASE_DAILY_WAGES.soldier+UNIT_TYPES.swordsman.wageBonus,'a trained unit earns the Soldier wage and its type’s extra wage');assert.equal(wages.dailyWage(plain),BASE_DAILY_WAGES.recruit,'kasarna-branci: an untrained Recruit earns the Recruit wage');
 });
 
 test('without the items nothing is trained; cancelling refunds Gold and returns delivered items; death drops the gear for Haulers',()=>{
-  const {s,armory,barracks}=kingdom({sword:1,bow:1});const a=soldier(s,barracks,{x:50,y:54}),b=soldier(s,barracks,{x:51,y:54}),c=soldier(s,barracks,{x:52,y:54});
+  const {s,armory,barracks}=kingdom({sword:1,bow:1});const a=soldier(s,barracks,{x:50,y:56}),b=soldier(s,barracks,{x:51,y:56}),c=soldier(s,barracks,{x:52,y:56});
   assert.equal(s.military.train(a,'soldier'),null);assert.equal(s.military.train(b,'archer'),null);
   // m-vojaci-chyba: with the only Bow promised to b, c cannot order an Archer – the button says why instead of waiting.
   const before=s.inventory.count('gold');assert.equal(s.military.train(c,'archer'),'kit');assert.deepEqual(s.military.kitShortage('archer'),{bow:1});assert.equal(s.inventory.count('gold'),before);assert.equal(s.military.order(c),null);
@@ -73,7 +73,7 @@ test('without the items nothing is trained; cancelling refunds Gold and returns 
 
 test('two Barracks train at the same time without taking each other’s items; Discharge drops the gear',()=>{
   const {s,armory}=kingdom({sword:2}),second=building(s,'barracks',40,50),first=s.buildings.find(b=>b.type==='barracks');
-  const a=soldier(s,first,{x:50,y:54}),b=soldier(s,second,{x:40,y:54});s.military.train(a,'soldier');s.military.train(b,'soldier');
+  const a=soldier(s,first,{x:50,y:56}),b=soldier(s,second,{x:40,y:56});s.military.train(a,'soldier');s.military.train(b,'soldier');
   until(s,()=>s.military.units.size===2);assert.equal(armoryStock(s,armory).sword??0,0);
   assert.equal(s.military.release(a),true);assert.equal(s.workerSystem.workers.get(a.id).attackDPS,6,'back to a plain resident');
   until(s,()=>(armoryStock(s,armory).sword??0)===1);
@@ -91,8 +91,8 @@ test('archers need a clear line: trees, walls and rock block the shot; they neve
 });
 
 test('a trained unit defends residents near its Barracks and never targets the people it guards',()=>{
-  const {s,barracks}=kingdom();const a=soldier(s,barracks,{x:50,y:54});s.military.train(a,'soldier');until(s,()=>s.military.units.has(a.id));
-  const villager=s.workerSystem.create({x:54,y:56}),boar=s.animalSystem.create(s.objectRegistry.require('wild_boar'),{x:55,y:56});
+  const {s,barracks}=kingdom();const a=soldier(s,barracks,{x:50,y:56});s.military.train(a,'soldier');until(s,()=>s.military.units.has(a.id));
+  const villager=s.workerSystem.create({x:47,y:52}),boar=s.animalSystem.create(s.objectRegistry.require('wild_boar'),{x:46,y:52});
   s.animalSystem.onAttacked(boar,villager);assert.equal(s.military.threat(a),boar);
   until(s,()=>!boar.isAlive,60000);assert.ok(s.workerSystem.workers.get(a.id).experience.totalXP>0||a.skills.combat.totalXP>0,"the unit fought the boar");
   for(const [attacker,target]of s.combat.attacks)assert.ok(!(s.workerSystem.workers.has(attacker.id)&&s.workerSystem.workers.has(target.id)),'never resident on resident');
@@ -111,7 +111,7 @@ test('100 units train and update cheaply',()=>{
 // m-vojaci-chyba (owner point 87): a new game can train a Soldier once the kingdom has a Barracks, an Armory and a Sword,
 // and every missing piece is named.
 test('m-vojaci-chyba: from the start the lock names what is missing – Armory, then the Sword – and a Soldier trains once they exist',()=>{
-  const s=scene(),barracks=building(s,'barracks',50,50);s.inventory.add('gold',100);const w=soldier(s,barracks,{x:50,y:54});hauler(s,{x:56,y:48});
+  const s=scene(),barracks=building(s,'barracks',50,50);s.inventory.add('gold',100);const w=soldier(s,barracks,{x:50,y:56});hauler(s,{x:56,y:48});
   assert.equal(s.objectRegistry.require('barracks').requiresCompletedBuildings?.length??0,0,'the Barracks is unlocked at the start');
   assert.equal(s.military.blocker(w,'soldier'),'armory');assert.equal(s.military.train(w,'soldier'),'armory');assert.equal(s.military.orders.size,0);
   const armory=building(s,'armory',60,44);assert.equal(s.military.blocker(w,'soldier'),'kit');assert.deepEqual(s.military.kitShortage('soldier'),{sword:1});
@@ -148,7 +148,7 @@ test('m-zalozka-vojsko: soldiers on Patrol walk a round of the settlement spread
   const {s,barracks}=kingdom();assert.ok(s.buildings.filter(b=>b.construction==null||b.construction.state==='complete').length>=PATROL.minBuildings);
   const route=s.military.patrolRoute();assert.ok(route.length>=4,'a round exists');assert.equal(s.military.patrolRoute(),route,'kept until the buildings change');
   for(const p of route)assert.equal(s.map[p.y][p.x],0,'waypoints are walkable');
-  const a=soldier(s,barracks,{x:50,y:54}),b=soldier(s,barracks,{x:51,y:54}),c=soldier(s,barracks,{x:52,y:54});
+  const a=soldier(s,barracks,{x:50,y:56}),b=soldier(s,barracks,{x:51,y:56}),c=soldier(s,barracks,{x:52,y:56});
   const first=[a,b,c].map(w=>s.military.nextPatrolPoint(w));assert.equal(new Set(first.map(p=>`${p.x},${p.y}`)).size,3,'each starts at a point of his own');
   const index=a.patrolIndex;assert.deepEqual(s.military.nextPatrolPoint(a),route[(index+1)%route.length],'then the next point in order');
   until(s,()=>a.workMessage==='Patrolling the settlement'&&(a.path.length>0||a.nextTile),60000);
@@ -185,7 +185,7 @@ test('m-kasarna-limit-zamestnani: a Barracks hires 4 automatically by default; t
   if(s.employment){barracks.autoHire=2;const open=s.employment.seats().filter(x=>x.building.id===barracks.id).length;assert.ok(open<=2,'no more than the limit');}
 });
 test('m-vlk-zustava: "Hunt the wolf" sends a soldier after a lurking wolf far from his Barracks', () => {
-  const {s,barracks}=kingdom();const w=soldier(s,barracks,{x:52,y:54},5);const wolf=s.animalSystem.create(s.objectRegistry.require('wolf'),{x:80,y:80});wolf.wolf={state:'lurking',den:{x:80,y:80},until:1e12,repath:0,since:0};
+  const {s,barracks}=kingdom();const w=soldier(s,barracks,{x:52,y:56},5);const wolf=s.animalSystem.create(s.objectRegistry.require('wolf'),{x:80,y:80});wolf.wolf={state:'lurking',den:{x:80,y:80},until:1e12,repath:0,since:0};
   w.huntWolfId=wolf.id;let t=0;while(t<120000&&wolf.isAlive&&s.combat.attacks.get(w)!==wolf){s.tick(50);t+=50;}
   assert.ok(!wolf.isAlive||s.combat.attacks.get(w)===wolf,'the soldier reaches the wolf and fights it');
 });

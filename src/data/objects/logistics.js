@@ -11,7 +11,7 @@ export const logisticsBuildings=[
   {id:'starter_stockpile',name:'Starter Stockpile',width:2,height:2,cost:{},visualHeight:55,buildable:false,starter:true,
     storage:{capacity:LOGISTICS_RULES.starterCapacity,resources:['stone','wood','iron',...FOOD_RESOURCE_IDS],accepts:'all'},description:`A starting store with space for ${LOGISTICS_RULES.starterCapacity} materials and food units combined.`},
   // Trade F1.1 (#59): goods space and loading spots; caravans and orders follow in F1.2 and F1.3.
-  {id:'marketplace',name:'Marketplace',width:3,height:3,cost:{stone:12,wood:8},constructionTime:30000,visualHeight:90,buildable:true,
+  {id:'marketplace',name:'Marketplace',width:4,height:4,legacyFootprint:{width:3,height:3}/* owner 13 Nov 2026: the GPT market square is 4 × 4; markets of older saves stay 3 × 3 */,cost:{stone:12,wood:8},constructionTime:30000,visualHeight:90,buildable:true,
     // m-trziste-bez-skladu (owner, 12 Nov): no longer needs a Warehouse; goods come from any store.
     trade:{capacity:TRADE_RULES.marketplaceCapacity,loadingSpots:TRADE_RULES.loadingSpots},
     // Provisional sprite (stalls on a paved square) scaled to the 3×3 footprint; the plate's front corner is the anchor.

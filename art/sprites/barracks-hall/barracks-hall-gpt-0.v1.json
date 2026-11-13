@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "assetId": "barracks-hall",
+  "variantId": "barracks-hall-gpt-0",
+  "name": "GPT stone barracks with tower 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "0b7359ac",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 284,
+  "height": 310,
+  "anchor": {
+    "x": 184,
+    "y": 236
+  },
+  "origin": {
+    "x": 0.64789,
+    "y": 0.76129
+  },
+  "footprint": {
+    "width": 4,
+    "height": 5
+  },
+  "base": {
+    "x": 168,
+    "y": 308
+  },
+  "baseOrigin": {
+    "x": 0.59155,
+    "y": 0.99355
+  },
+  "visualHeight": 308,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -97,
+      "y": -120,
+      "color": "#ffb25a",
+      "radius": 102,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 0.7
+    },
+    {
+      "type": "torch",
+      "x": -36,
+      "y": -101,
+      "color": "#ffb25a",
+      "radius": 102,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 0.7
+    }
+  ],
+  "modelHeight": 1.99,
+  "lights": [],
+  "x2": {
+    "width": 568,
+    "height": 620,
+    "anchor": {
+      "x": 368,
+      "y": 472
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

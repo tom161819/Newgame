@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "barracks-hall",
+  "variantId": "barracks-hall-gpt-90",
+  "name": "GPT stone barracks with tower 90° (rear-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "0b7359ac",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 284,
+  "height": 273,
+  "anchor": {
+    "x": 158,
+    "y": 197
+  },
+  "origin": {
+    "x": 0.55634,
+    "y": 0.72161
+  },
+  "footprint": {
+    "width": 4,
+    "height": 5
+  },
+  "base": {
+    "x": 142,
+    "y": 269
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.98535
+  },
+  "visualHeight": 269,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.99,
+  "lights": [],
+  "x2": {
+    "width": 568,
+    "height": 546,
+    "anchor": {
+      "x": 316,
+      "y": 394
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

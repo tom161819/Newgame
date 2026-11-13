@@ -29,9 +29,9 @@ test('a caravan sells at 115 % and buys at 80 %, rounded to whole Gold, at least
   assert.ok(BASE_PRICES.armor>=5*BASE_PRICES.iron+2*BASE_PRICES.wood);assert.ok(BASE_PRICES.bow>=8*BASE_PRICES.wood);
 });
 
-test('the Marketplace is a 3×3 Logistics building for 12 Stone + 8 Wood, open from the start (m-trziste-bez-skladu, owner 12 Nov)', () => {
+test('the Marketplace is a 4×4 Logistics building (3×3 until the GPT square, 13 Nov 2026) for 12 Stone + 8 Wood, open from the start (m-trziste-bez-skladu, owner 12 Nov)', () => {
   const d=objectRegistry.require('marketplace');
-  assert.deepEqual([d.width,d.height,d.buildingCategory,d.buildable],[3,3,'logistics',true]);assert.deepEqual(d.cost,{stone:12,wood:8});
+  assert.deepEqual([d.width,d.height,d.legacyFootprint,d.buildingCategory,d.buildable],[4,4,{width:3,height:3},'logistics',true]);assert.deepEqual(d.cost,{stone:12,wood:8});
   assert.deepEqual(d.trade,{capacity:TRADE_RULES.marketplaceCapacity,loadingSpots:2});assert.equal(TRADE_RULES.marketplaceCapacity,80);
   assert.equal(buildingUnlockStatus(d,[],objectRegistry).unlocked,true,'no Warehouse needed');
 });

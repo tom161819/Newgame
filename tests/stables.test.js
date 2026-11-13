@@ -55,7 +55,7 @@ test('a Knight needs a free stabled horse: reserved for training, ridden afterwa
   let s=scene();const st=building(s,'stables',50,50),barracks=building(s,'barracks',34,46),armory=building(s,'armory',62,40);
   s.foodStorage.register(armory);s.foodStorage.register(barracks);s.foodStorage.deposit(`armory-${armory.id}`,'sword',1);s.foodStorage.deposit(`armory-${armory.id}`,'armor',1);s.inventory.add('gold',100);
   for(const t of [{x:56,y:44},{x:57,y:44}]){const h=s.workerSystem.create(t);s.workerSystem.jobs.assign(h,'hauler');}
-  const knight=s.workerSystem.create({x:35,y:50});assert.equal(s.workplaceSystem.assign(barracks,knight),true);Object.assign(knight.skills.combat,{level:4,currentXP:0,totalXP:totalXPForLevel(4),xpToNextLevel:getXPRequired(4)});
+  const knight=s.workerSystem.create({x:35,y:52});assert.equal(s.workplaceSystem.assign(barracks,knight),true);Object.assign(knight.skills.combat,{level:4,currentXP:0,totalXP:totalXPForLevel(4),xpToNextLevel:getXPRequired(4)});
   assert.equal(s.military.blocker(knight,'knight'),'horse','no tamed horse yet');
   const horseAnimal=horse(s,{x:30,y:30});s.stables.horses.set(horseAnimal.id,{state:'stabled',stableId:st.id});s.stables.place(horseAnimal.id);
   assert.equal(s.military.blocker(knight,'knight'),null);

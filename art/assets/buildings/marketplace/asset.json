@@ -3,10 +3,10 @@
   "id": "marketplace",
   "name": "Marketplace",
   "category": "buildings",
-  "description": "Obchod F1 (#59): marketplace 3 × 3 where the merchant caravan stops. Stalls with goods, two marked loading places where the wagon unloads, a hitching post. Concepts for review; until one is approved the game uses a temporary look.",
+  "description": "Obchod F1 (#59): marketplace 3 \u00d7 3 where the merchant caravan stops. Stalls with goods, two marked loading places where the wagon unloads, a hitching post. Concepts for review; until one is approved the game uses a temporary look.",
   "footprint": {
-    "width": 3,
-    "height": 3
+    "width": 4,
+    "height": 4
   },
   "generator": "workshop",
   "plannedGameObjectId": "marketplace",
@@ -97,9 +97,9 @@
     },
     {
       "id": "marketplace-gpt-0",
-      "name": "GPT market square 0° (front-right)",
+      "name": "GPT market square 0\u00b0 (front-right)",
       "version": 1,
-      "notes": "Paved market square with three striped stalls (fruit, goods, fish), a well, banners, signpost and tie posts. The sheet's dashed footprint outline is removed. View 0° (front-right), cut out of the owner's GPT sheet and scaled to 0.274 (the paved square = 3 × 3; 2× file at 0.548). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "notes": "Paved market square with three striped stalls (fruit, goods, fish), a well, banners, signpost and tie posts. The sheet's dashed footprint outline is removed. Owner 13 Nov 2026: grown to 4 \u00d7 4 so the stalls match the other buildings. View 0\u00b0 (front-right), cut out of the owner's GPT sheet and scaled to 0.365 (the paved square = 4 \u00d7 4; 2\u00d7 file at 0.73). Front corner of the plinth set by hand; this view is the one the game uses.",
       "spec": {
         "body": {
           "kind": "none"
@@ -186,9 +186,9 @@
     },
     {
       "id": "marketplace-gpt-90",
-      "name": "GPT market square 90° (rear-right)",
+      "name": "GPT market square 90\u00b0 (rear-right)",
       "version": 1,
-      "notes": "Paved market square with three striped stalls (fruit, goods, fish), a well, banners, signpost and tie posts. The sheet's dashed footprint outline is removed. View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 0.274 (the paved square = 3 × 3; 2× file at 0.548). Footprint corner estimated from the image bottom.",
+      "notes": "Paved market square with three striped stalls (fruit, goods, fish), a well, banners, signpost and tie posts. The sheet's dashed footprint outline is removed. Owner 13 Nov 2026: grown to 4 \u00d7 4 so the stalls match the other buildings. View 90\u00b0 (rear-right), cut out of the owner's GPT sheet and scaled to 0.365 (the paved square = 4 \u00d7 4; 2\u00d7 file at 0.73). Footprint corner estimated from the image bottom.",
       "spec": {
         "body": {
           "kind": "none"
@@ -275,9 +275,9 @@
     },
     {
       "id": "marketplace-gpt-180",
-      "name": "GPT market square 180° (rear-left)",
+      "name": "GPT market square 180\u00b0 (rear-left)",
       "version": 1,
-      "notes": "Paved market square with three striped stalls (fruit, goods, fish), a well, banners, signpost and tie posts. The sheet's dashed footprint outline is removed. View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 0.274 (the paved square = 3 × 3; 2× file at 0.548). Footprint corner estimated from the image bottom.",
+      "notes": "Paved market square with three striped stalls (fruit, goods, fish), a well, banners, signpost and tie posts. The sheet's dashed footprint outline is removed. Owner 13 Nov 2026: grown to 4 \u00d7 4 so the stalls match the other buildings. View 180\u00b0 (rear-left), cut out of the owner's GPT sheet and scaled to 0.365 (the paved square = 4 \u00d7 4; 2\u00d7 file at 0.73). Footprint corner estimated from the image bottom.",
       "spec": {
         "body": {
           "kind": "none"
@@ -364,9 +364,9 @@
     },
     {
       "id": "marketplace-gpt-270",
-      "name": "GPT market square 270° (front-left)",
+      "name": "GPT market square 270\u00b0 (front-left)",
       "version": 1,
-      "notes": "Paved market square with three striped stalls (fruit, goods, fish), a well, banners, signpost and tie posts. The sheet's dashed footprint outline is removed. View 270° (front-left), cut out of the owner's GPT sheet and scaled to 0.274 (the paved square = 3 × 3; 2× file at 0.548). Footprint corner estimated from the image bottom.",
+      "notes": "Paved market square with three striped stalls (fruit, goods, fish), a well, banners, signpost and tie posts. The sheet's dashed footprint outline is removed. Owner 13 Nov 2026: grown to 4 \u00d7 4 so the stalls match the other buildings. View 270\u00b0 (front-left), cut out of the owner's GPT sheet and scaled to 0.365 (the paved square = 4 \u00d7 4; 2\u00d7 file at 0.73). Footprint corner estimated from the image bottom.",
       "spec": {
         "body": {
           "kind": "none"

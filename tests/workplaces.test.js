@@ -22,7 +22,7 @@ const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} !== ${b}`);
 
 test('workplace definitions use exact prices/footprints, reject occupied cells and enforce 3/1/12 unique existing employees (tabulka-budov-1, kasarna-branci)',()=>{
   const s=scene(),q=build(s,'quarry'),l=build(s,'hunting_lodge',61,50),b=build(s,'barracks',67,50);
-  assert.equal(s.inventory.count('stone'),0);assert.equal(q.tiles.length,9);assert.equal(l.tiles.length,4);assert.equal(b.tiles.length,9);
+  assert.equal(s.inventory.count('stone'),0);assert.equal(q.tiles.length,9);assert.equal(l.tiles.length,4);assert.equal(b.tiles.length,20);assert.deepEqual(b.definition.legacyFootprint,{width:3,height:3});
   assert.deepEqual(q.definition.cost,{wood:15});assert.deepEqual(l.definition.cost,{wood:8});assert.deepEqual(b.definition.cost,{stone:12,wood:10});
   const workers=Array.from({length:17},(_,i)=>worker(s,45+i,56));let offset=0;
   for(const [building,capacity,profession]of [[q,3,'miner'],[l,1,'hunter'],[b,12,'soldier']]){

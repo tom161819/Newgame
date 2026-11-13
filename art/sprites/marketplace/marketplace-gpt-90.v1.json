@@ -10,40 +10,40 @@
   "generatorVersion": 1,
   "styleGuide": "medieval-kingdom-painted-isometric@1",
   "scale": 1,
-  "width": 196,
-  "height": 121,
+  "width": 261,
+  "height": 162,
   "anchor": {
-    "x": 93,
-    "y": 72
+    "x": 124,
+    "y": 96
   },
   "origin": {
-    "x": 0.47449,
-    "y": 0.59504
+    "x": 0.4751,
+    "y": 0.59259
   },
   "footprint": {
-    "width": 3,
-    "height": 3
+    "width": 4,
+    "height": 4
   },
   "base": {
-    "x": 93,
-    "y": 120
+    "x": 124,
+    "y": 160
   },
   "baseOrigin": {
-    "x": 0.47449,
-    "y": 0.99174
+    "x": 0.4751,
+    "y": 0.98765
   },
-  "visualHeight": 120,
+  "visualHeight": 160,
   "platform": null,
   "frontLayer": false,
   "gameLights": [],
   "modelHeight": 0.88,
   "lights": [],
   "x2": {
-    "width": 392,
-    "height": 242,
+    "width": 522,
+    "height": 324,
     "anchor": {
-      "x": 186,
-      "y": 144
+      "x": 248,
+      "y": 192
     }
   },
   "render": {

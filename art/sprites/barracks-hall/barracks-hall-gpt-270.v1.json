@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "barracks-hall",
+  "variantId": "barracks-hall-gpt-270",
+  "name": "GPT stone barracks with tower 270° (front-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "0b7359ac",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 287,
+  "height": 292,
+  "anchor": {
+    "x": 159,
+    "y": 216
+  },
+  "origin": {
+    "x": 0.55401,
+    "y": 0.73973
+  },
+  "footprint": {
+    "width": 4,
+    "height": 5
+  },
+  "base": {
+    "x": 143,
+    "y": 288
+  },
+  "baseOrigin": {
+    "x": 0.49826,
+    "y": 0.9863
+  },
+  "visualHeight": 288,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.99,
+  "lights": [],
+  "x2": {
+    "width": 574,
+    "height": 584,
+    "anchor": {
+      "x": 318,
+      "y": 432
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

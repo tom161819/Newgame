@@ -74,7 +74,7 @@ test('the castle gate is a passable wall tile and the stair climbs to the wall w
 });
 
 test('marketplace, merchant wagon and bushes are concepts that fit their tiles', () => {
-  for (const id of ['marketplace', 'builders-workshop']) assert.deepEqual(json(`art/assets/buildings/${id}/asset.json`).footprint, { width: 3, height: 3 }, `${id} is 3 × 3`);
+  assert.deepEqual(json('art/assets/buildings/builders-workshop/asset.json').footprint, { width: 3, height: 3 });assert.deepEqual(json('art/assets/buildings/marketplace/asset.json').footprint, { width: 4, height: 4 }, 'the market square is 4 × 4 since 13 Nov 2026');
   const wagon = load => PROPS.wagon(0, 0, { load });
   for (const load of ['full', 'unloading', 'empty']) assert.deepEqual(checkModel({ primitives: wagon(load) }, { footprint: { width: 3, height: 3 }, style }), [], load);
   assert.ok(wagon('full').some(p => p.shape === 'prism' && p.material === 'cloth_linen') && !wagon('empty').some(p => p.shape === 'prism'), 'cover only when loaded');

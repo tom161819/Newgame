@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-13T20:24:43.920Z",
+  "updatedAt": "2026-11-13T20:40:52.751642Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -173,7 +173,7 @@
       }
     },
     "barracks-hall": {
-      "preferred": "barracks-hall-stone",
+      "preferred": "barracks-hall-gpt-0",
       "variants": {
         "barracks-hall-stone": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -183,6 +183,36 @@
           "updatedAt": "2026-11-07T10:10:10.121Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:10:10.121Z"
+        },
+        "barracks-hall-gpt-0": {
+          "status": "approved",
+          "version": 1,
+          "specHash": "0b7359ac",
+          "note": "Owner 13 Nov 2026 in chat: barracks into the game, footprint grown to fit.",
+          "updatedAt": "2026-11-13T20:40:52.751642Z",
+          "approvedAt": "2026-11-13T20:40:52.751642Z",
+          "decidedBy": "owner (chat)"
+        },
+        "barracks-hall-gpt-90": {
+          "status": "review",
+          "version": 1,
+          "specHash": "0b7359ac",
+          "note": "",
+          "updatedAt": "2026-11-13T20:40:52.751642Z"
+        },
+        "barracks-hall-gpt-180": {
+          "status": "review",
+          "version": 1,
+          "specHash": "0b7359ac",
+          "note": "",
+          "updatedAt": "2026-11-13T20:40:52.751642Z"
+        },
+        "barracks-hall-gpt-270": {
+          "status": "review",
+          "version": 1,
+          "specHash": "0b7359ac",
+          "note": "",
+          "updatedAt": "2026-11-13T20:40:52.751642Z"
         }
       }
     },

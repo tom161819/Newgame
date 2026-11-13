@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.117.0] - 2026-11-13
+<!-- version: {"title":"GPT barracks 4x5; Marketplace 4x4","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- New Barracks picture: a stone barracks with a tower, flag, lanterns and an armoury lean-to. The Barracks is now 4 × 5 tiles.
+- The Marketplace is now 4 × 4 tiles, so its stalls are the same size as other buildings.
+- Barracks and Marketplaces in older saves keep their 3 × 3 place and show the new picture smaller.
+
 ## [0.116.0] - 2026-11-13
 <!-- version: {"title":"Approved GPT buildings: Lumberjack Hut, Hunting Lodge, Marketplace, Pitch Kiln, Fisherman's Hut, Mill","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed
