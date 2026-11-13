@@ -97,7 +97,7 @@ test('86: tooltip content by building type, at most 4 lines',()=>{
   assert.deepEqual(text(farm),['Farmhouse ⛔','Workers 0 / 3','Wheat 120 · 120 / 200'],'Farmhouse: a workplace with a store');
   assert.deepEqual(text(yard),['Material Yard','0 / 400']);
   // Workplace with a recipe: waiting for its input, then the product and its progress.
-  assert.deepEqual(text(bakery),['Bakery ⛔ ⏳','Workers 0 / 1','Waiting for Flour']);
+  assert.deepEqual(text(bakery),['Bakery ⛔ ⏳','Workers 0 / 1','Waiting for Flour, Wood']);
   const baker=s.workerSystem.create({x:52,y:66});assert.equal(s.workplaceSystem.assign(bakery,baker),true);
   const record=s.foodProduction.records.get(bakery.id);record.cycle={requiredWork:1000,workDone:600,inputs:{flour:1}};
   assert.deepEqual(text(bakery),['Bakery','Workers 1 / 1','Bread – 60 %']);

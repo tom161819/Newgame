@@ -35,7 +35,7 @@ export class WorkerAI {
   update(worker,delta){
     // m-karavana-vyslat: an escort away with the caravan is off the map until it comes home.
     if(worker.away){worker.workState='Waiting';worker.workMessage=t('expedition.awayShort');worker.view?.setVisible?.(false);return;}
-    if(this.scene.nightThreats?.firefight(worker,delta)){worker.update(delta);return;}this.step(worker,delta);this.scene.lightFuel?.help(worker);this.scene.nightThreats?.pursue(worker);this.scene.porches?.check(worker);}
+    if(this.scene.nightThreats?.firefight(worker,delta)){worker.update(delta);return;}this.step(worker,delta);this.scene.lightFuel?.help(worker);this.scene.heating?.help(worker);this.scene.nightThreats?.pursue(worker);this.scene.porches?.check(worker);}
   step(worker,delta){
     if(!worker.isAlive)return;
     if(this.system.commands.update(worker,delta)){if(worker.restPhase)this.system.rest?.stop(worker);return;}

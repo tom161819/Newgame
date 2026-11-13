@@ -118,7 +118,7 @@ export class WorkplacePanel {
       const isAuto=!!spec.recipeChoice&&s.foodProduction.recipeMode(b)==='auto';autoRow.hidden=!isAuto;
       if(isAuto){const target=s.foodProduction.torchTarget(b),have=s.foodStorage.available('torch'),range=autoRow.querySelector('input');if(document.activeElement!==range)range.value=String(target);range.setAttribute('aria-label',t('workplace.torchTarget'));
         autoRow.querySelector('span').textContent=t(production.recipe===spec.recipeChoice?'workplace.autoTorches':'workplace.autoPitch',{have,target});}
-      document.querySelector('#food-production-recipe').textContent=t('workplace.recipe',{input:format(recipe.input),output:format(recipe.output),seconds:recipe.duration/1000})+(recipe.horse?` ${t('workplace.recipeHorse')}`:'');
+      document.querySelector('#food-production-recipe').textContent=t('workplace.recipe',{input:format(recipe.input),output:format(recipe.output),seconds:recipe.duration/1000})+(recipe.horse?` ${t('workplace.recipeHorse')}`:'')+(recipe.fuel?` ${t('workplace.recipeFuel',{list:format(recipe.fuel)})}`:'');
       document.querySelector('#food-production-status').textContent=t('workplace.status',{state:!production.auto?t('workplace.paused'):cycle?t('workplace.producing'):employees[0]?.workMessage?workMessageLabel(employees[0].workMessage):t('workplace.waitingWorker'),count:production.completed});
       document.querySelector('#food-production-progress').value=cycle?.progress??0;
       const input=s.foodStorage.locations.get(`input-${b.id}`),output=s.foodStorage.locations.get(`output-${b.id}`);

@@ -33,7 +33,7 @@ test('m-drevo-start: the New Game start (30 Stone, 110 Wood, 160 Bread) fills th
 });
 test('m-jidlo-balanc: more food and fewer portions come from data',()=>{
   // tabulka-budov-1 (owner table 9 Nov 2026): Mill 4 Wheat → 2 Flour, Bakery 1 Flour → 6 Bread, fields 10 Wheat, orchards 8 Apples.
-  assert.deepEqual([FOOD_RECIPES.mill.input,FOOD_RECIPES.mill.output,FOOD_RECIPES.bakery.input],[{wheat:4},{flour:2},{flour:1}]);assert.deepEqual([FARMING_RULES.crops.wheat_field.yield,FARMING_RULES.crops.orchard.yield],[10,8]);
+  assert.deepEqual([FOOD_RECIPES.mill.input,FOOD_RECIPES.mill.output,FOOD_RECIPES.bakery.input],[{wheat:4},{flour:2},{flour:1,wood:1}]);assert.deepEqual(FOOD_RECIPES.bakery.fuel,{wood:1});assert.deepEqual([FARMING_RULES.crops.wheat_field.yield,FARMING_RULES.crops.orchard.yield],[10,8]);
   assert.deepEqual(['rabbit','deer','wild_boar'].map(id=>objectRegistry.require(id).gameplay.meatDrop),[7,13,20]);
   assert.ok(HUNTING_RULES.huntRadius>WORK_RULES.workRadius);assert.equal(FISHING.perDay,9);assert.ok(FISHING.plentiful>1);
   assert.equal(FARMING_RULES.growthRate,1.2);assert.deepEqual(FOOD_RECIPES.bakery.output,{bread:6});

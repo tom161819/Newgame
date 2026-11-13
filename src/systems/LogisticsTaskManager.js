@@ -14,7 +14,7 @@ export class LogisticsTaskManager {
     for(const [key,expires]of this.failedRoutes)if(expires<=now)this.failedRoutes.delete(key);
     for(const key of this.producerWaits.keys())if(!this.scene.foodProduction.records.has(Number(key.split(':')[0])))this.producerWaits.delete(key);
     const storage=this.storage,stores=[...storage.locations.values()].filter(l=>storage.isStock(l));
-    this.catalog.push(...(this.scene.constructionSystem?.materials.candidates()??[]),...(this.scene.military?.candidates()??[]),...(this.scene.trade?.candidates()??[]),...(this.scene.lightFuel?.candidates()??[]));
+    this.catalog.push(...(this.scene.constructionSystem?.materials.candidates()??[]),...(this.scene.military?.candidates()??[]),...(this.scene.trade?.candidates()??[]),...(this.scene.lightFuel?.candidates()??[]),...(this.scene.heating?.candidates()??[]));
     for(const record of this.scene.foodProduction.records.values()){
       const building=this.scene.foodProduction.building(record.buildingId);if(!building||buildingDefinition(building).selfSupplied)continue;
       const recipe=this.scene.foodProduction.recipe(building),input=storage.locations.get(`input-${building.id}`);
@@ -48,7 +48,7 @@ export class LogisticsTaskManager {
   freeHauler(){return this.scene.workerSystem.liveWorkers().some(w=>(!w.commandState||w.commandState.state==='Working')&&w.profession==='hauler'&&!w.arriving&&!w.restPhase&&!w.workTask&&!w.cargo&&!['Fleeing','Recovering'].includes(w.workState));}
   // Day and night N2: `fuelOnly` (a Pitch Maker or a soldier tending torches) takes only light-fuel deliveries, `near`
   // keeps them within a range of a point.
-  updateWorker(worker,{constructionOnly=false,fuelOnly=false,near=null}={}){
+  updateWorker(worker,{constructionOnly=false,fuelOnly=false,near=null,heatFor=null}={}){
     if(worker.workTask||worker.cargo||worker.aiCooldown>0)return false;
     worker.aiCooldown=LOGISTICS_RULES.planningInterval;worker.workState='Waiting';worker.workMessage='Waiting for transport';this.update();
     const storage=this.storage,cap=resource=>carryCapacity(worker,resource),score=task=>{
@@ -56,7 +56,7 @@ export class LogisticsTaskManager {
       return source&&target?Math.hypot(worker.position.x-source.x,worker.position.y-source.y)+Math.hypot(source.x-target.x,source.y-target.y):Infinity;
     };
     const inRange=task=>{if(!near)return true;const d=storage.locations.get(task.destinationId);return !!d&&Math.hypot(d.x-near.x,d.y-near.y)<=near.range;};
-    const candidates=this.catalog.filter(task=>(!constructionOnly||task.siteId!=null)&&(!fuelOnly||task.fuel)&&inRange(task)).map(task=>({task,score:score(task)})).filter(t=>Number.isFinite(t.score));
+    const candidates=this.catalog.filter(task=>(!constructionOnly||task.siteId!=null)&&(!fuelOnly||task.fuel)&&(!heatFor||task.heating&&task.destinationId===heatFor)&&inRange(task)).map(task=>({task,score:score(task)})).filter(t=>Number.isFinite(t.score));
     // m-nosic-priorita: the Hauler's own choice first (urgent food for the hungry before everything), then the shared order.
     const want=worker.haulPriority,rank=task=>task.priority<=HAUL_URGENT?0:matchesHaulPriority(task,want)?1:2;
     candidates.sort((a,b)=>rank(a.task)-rank(b.task)||(rank(a.task)===1?0:a.task.priority-b.task.priority)||a.score-b.score);

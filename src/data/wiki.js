@@ -48,6 +48,7 @@ export const WIKI_ENTRIES=Object.freeze([
   entry('animal:horse','animals',['building:stables','unit:knight','resource:horse_wagon']),
   entry('animal:cat','animals',['topic:rats','building:granary','building:house']),
   entry('system:night','systems',['animal:wolf','topic:fire','building:torch_post','building:brazier','building:tower','unit:recruit']),
+  entry('system:heating','systems',['building:house','resource:wood','building:lumberjack_hut','guide:winter','system:seasons']),
   entry('system:seasons','systems',['topic:winter','building:wheat_field','building:fisherman_hut']),
   entry('system:work_speed','systems',['topic:needs','system:experience','building:builder_workshop']),
   entry('system:experience','systems',['unit:resident','unit:king']),

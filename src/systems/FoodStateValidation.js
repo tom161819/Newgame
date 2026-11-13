@@ -1,3 +1,4 @@
+import { HEATING,HEATED_BUILDINGS } from '../data/heating.js';
 import { COLUMNS,ROWS } from '../game/config.js';
 import { GRANARY_GROUP_CAPACITY,granaryUsage } from '../data/granaryCapacity.js';
 import { tradeableResources } from '../data/trade.js';
@@ -33,6 +34,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     if(d.recipe)for(const kind of ['input','output'])expected.set(`${kind}-${b.id}`,{...base,kind,capacity:d.bufferCapacity,allowed:recipeResources(d,kind)});
     if(d.kit)expected.set(`kit-${b.id}`,{...base,kind:'kit',capacity:d.kit.capacity,allowed:equipmentResources(registry)});
     if(d.fuel&&physical)expected.set(`fuel-${b.id}`,{...base,kind:'fuel',capacity:d.fuel.capacity,allowed:[d.fuel.resource]});
+    if(HEATED_BUILDINGS.includes(b.type)&&physical)expected.set(`heat-${b.id}`,{...base,kind:'fuel',capacity:HEATING.capacity,allowed:[HEATING.resource]});
     const pile=physical&&outputPile(d);if(pile)expected.set(pileLocationId(b),{...base,kind:'pile',capacity:pile.capacity,allowed:[pile.resource]});
     if(d.trade&&physical)expected.set(`market-${b.id}`,{...base,kind:'market',capacity:d.trade.capacity,allowed:tradeableResources(registry).map(r=>r.id)});
   }
@@ -48,10 +50,12 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
   const granaries=new Set(s.buildings.filter(b=>b.type==='granary'&&buildingIsComplete(b)).map(stockLocationId));
   const locations=new Map(),reservations=new Map(),used=l=>Object.values(l.stock).reduce((n,v)=>n+v,0);
   // N2: a light place's fuel store is created when the place is registered (or on the first refill), so it may be absent.
-  for(const id of [...expected.keys()])if(id.startsWith('fuel-')&&!storage.locations.some(l=>l.id===id))expected.delete(id);
+  for(const id of [...expected.keys()])if((id.startsWith('fuel-')||id.startsWith('heat-'))&&!storage.locations.some(l=>l.id===id))expected.delete(id);
   check(storage.locations.length===expected.size);
   for(const l of storage.locations){
     const e=expected.get(l.id);check(e&&!locations.has(l.id));locations.set(l.id,l);
+    // m-palivo-vyroba: a workshop whose recipe gained an input (Wood as fuel) keeps an older save's buffer with the new list.
+    if(e&&['input','output'].includes(l.kind)&&Array.isArray(l.allowed)&&l.allowed.every(r=>e.allowed.includes(r)))l.allowed=[...e.allowed];
     for(const [key,value]of Object.entries(e))check(JSON.stringify(l[key])===JSON.stringify(value));
     check(l.stock&&typeof l.stock==='object'&&!Array.isArray(l.stock));for(const [id,n]of Object.entries(l.stock)){check(l.allowed.includes(id));integer(n,1);}
     if(l.haulExcluded!==undefined){check(l.haulExcluded&&typeof l.haulExcluded==='object'&&!Array.isArray(l.haulExcluded));for(const [id,n]of Object.entries(l.haulExcluded)){check(l.allowed.includes(id));integer(n,1,l.stock[id]??0);}}

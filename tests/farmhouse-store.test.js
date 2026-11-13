@@ -52,6 +52,8 @@ test('Haulers run the Farmhouse → Mill → Farmhouse → Bakery chain; Bread g
   const {s,place,run,store}=world({haulers:2}),farm=place('farmhouse',44,40),granary=place('granary',44,52),mill=place('mill',52,40),bakery=place('bakery',58,40);
   const miller=s.workerSystem.create({x:52,y:43}),baker=s.workerSystem.create({x:58,y:43});assert.equal(s.workplaceSystem.assign(mill,miller),true);assert.equal(s.workplaceSystem.assign(bakery,baker),true);
   assert.equal(s.foodStorage.deposit(store(farm).id,'wheat',8),true);
+  // m-palivo-vyroba: the oven burns 1 Wood a batch.
+  s.foodStorage.deposit(`stockpile-${s.buildings.find(b=>b.type==='starter_stockpile').id}`,'wood',10);
   const seen={wheatFromFarm:false,flourToFarm:false,flourFromFarm:false};
   const step=()=>{for(const w of s.workerSystem.liveWorkers()){const t=w.workTask;if(w.profession!=='hauler'||!t)continue;
     if(t.resource==='wheat'&&t.sourceId===store(farm).id&&t.destinationId===`input-${mill.id}`)seen.wheatFromFarm=true;

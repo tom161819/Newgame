@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.112.0] - 2026-11-13
+<!-- version: {"title":"Winter heating and wood as fuel","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Winter heating: every House has a woodpile for 12 Wood. From summer on, Haulers fill it, and a resident with nothing to do carries Wood to his own House. In autumn an occupied House burns 1 Wood a day, in winter 3 (half again in frost). A warm House gives its residents +6 Happiness (+3 in autumn); a cold one −12 (−6 in autumn) and poorer rest at home.
+- Heating notices: "N houses are cold" in winter and a warning at the start of autumn when the stored Wood will not last the winter. The Food Economy window shows Wood for winter; a House's tooltip shows its woodpile and whether it is warm.
+- New switch "Winter heating" in New Game and in Settings (on by default; seasons off = no heating).
+- Wiki: Winter heating page; the winter guide covers firewood.
+
+### Changed
+- The Bakery's oven burns 1 Wood a batch (1 Flour + 1 Wood → 6 Bread). The Smelter's 2 Wood and 1 of the 2 Wood of the Swordsmith and Armorer are now shown as fuel in the workshop window and the Wiki.
+
 ## [0.111.2] - 2026-11-13
 <!-- version: {"title":"Saving works while the Pitch Kiln switches recipes","type":"fix","reconstructed":false,"saveVersion":62} -->
 ### Fixed

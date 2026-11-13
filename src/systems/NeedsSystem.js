@@ -1,3 +1,4 @@
+import { HEATING } from '../data/heating.js';
 import { TORCHES } from '../data/torches.js';
 import { CATS ,HOUSE_RATS} from '../data/domesticAnimals.js';
 import { NEEDS,DAILY_REST,DISCONTENT,clampNeed,moodFor,happinessOf,mainProblem,attractivenessFor } from '../data/needs.js';
@@ -25,7 +26,7 @@ export class NeedsSystem {
       // #68: the Food need moves towards its target (rations + variety, 0 when hungry) at the usual rates, never jumps.
       r.food=r.food>target?Math.max(target,r.food-NEEDS.food.declinePerDay*fraction):Math.min(target,r.food+NEEDS.food.recoverPerDay*fraction);
       // Phase B: resting at home recovers fastest, in the settlement's base places a little slower, without a home slowly.
-      const rate=worker.workState==='Resting'?DAILY_REST.recoverPerDay[homes.get(worker.id)?.kind??'homeless']:NEEDS.activeStates.includes(worker.workState)?-NEEDS.rest.drainPerDay:NEEDS.rest.recoverPerDay;
+      const home=homes.get(worker.id),coldHome=home?.kind==='house'&&this.scene.heating?.isCold?.({id:home.buildingId}),rate=worker.workState==='Resting'?DAILY_REST.recoverPerDay[coldHome?HEATING.coldRestAs:home?.kind??'homeless']:NEEDS.activeStates.includes(worker.workState)?-NEEDS.rest.drainPerDay:NEEDS.rest.recoverPerDay;
       r.rest=clampNeed(r.rest+rate*fraction);
       if(Number.isFinite(worker.currentHP)&&worker.currentHP<r.hp)r.attackedAt=now;r.hp=worker.currentHP;
     }
@@ -107,8 +108,10 @@ export class NeedsSystem {
     // Children D1: a Village Green within reach of the house (+4) and, for a family house, a place for the children (+2).
     // Children D2: a Swing Tree (+1) and a Well (+1) nearby; all of it together is capped at +8 (`surroundingsCapped`).
     const around=this.scene.childrenSystem?.surroundings?.(house,homes)??{green:0,family:0,swing:0,well:0,total:0,capped:0},green=around.green,greenFamily=around.family,swing=around.swing,well=around.well;
-    const happiness=happinessOf(needs,penalty-policy+contextTotal-feast-cat-around.total),mood=moodFor(happiness);
-    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,policyTarget:this.scene.policy?.target?.()??0,policyContext:context,foodRations:this.scene.policy?.rations??'normal',foodBase:food.base,foodKinds:food.kinds,foodVariety:food.variety,foodTarget:food.target,foodUnfed:food.hungry,feast,cat,green,greenFamily,swing,well,surroundingsCapped:around.capped,feastDaysLeft:this.scene.policy?.feastDaysLeft?.()??0,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty,Math.max(0,-policy)+contextTotal),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
+    // m-topeni-domu: a warm House in autumn and winter (+), a cold one (−).
+    const heat=this.scene.heating?.happiness?.(house)??0;
+    const happiness=happinessOf(needs,penalty-policy+contextTotal-feast-cat-around.total-heat),mood=moodFor(happiness);
+    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,policyTarget:this.scene.policy?.target?.()??0,policyContext:context,foodRations:this.scene.policy?.rations??'normal',foodBase:food.base,foodKinds:food.kinds,foodVariety:food.variety,foodTarget:food.target,foodUnfed:food.hungry,feast,heat,cat,green,greenFamily,swing,well,surroundingsCapped:around.capped,feastDaysLeft:this.scene.policy?.feastDaysLeft?.()??0,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty,Math.max(0,-policy)+contextTotal),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
   }
   summary(){
     const homes=this.homes(),list=this.residents().map(w=>this.status(w,homes));

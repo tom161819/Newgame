@@ -1,3 +1,4 @@
+import { HEATING } from '../data/heating.js';
 import { t } from '../i18n/index.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { buildingName } from '../game/depletedMine.js';
@@ -56,6 +57,8 @@ export function buildingTooltipContent(scene,b){
     if(b.depleted)addIcon('notWorking');
     if(scene.diagnostics?.buildingIssue?.(b.id))addIcon('notWorking');
     if(d.housing)lines.push(houseLine(scene,b,d));
+    // m-topeni-domu: the woodpile and whether the House is warm today (only while heating runs).
+    if(d.housing&&scene.heating?.active?.()&&(scene.heating.status.has(b.id)||scene.heating.need()>0||scene.heating.stock(b)>0)){const st=scene.heating.status.get(b.id);lines.push({kind:'text',text:t('heating.tooltip',{stock:scene.heating.stock(b),capacity:HEATING.capacity,state:st?t(`heating.state.${st}`):'—'})});if(st==='cold')addIcon('cold');}
     const locations=storeLocations(scene,b);
     if(locations.length){const {used,capacity,items}=storeContents(scene,locations);lines.push({kind:'stock',items:[...items].sort((x,y)=>y.count-x.count).slice(0,BUILDING_TOOLTIP.maxItems),used,capacity});}
   }

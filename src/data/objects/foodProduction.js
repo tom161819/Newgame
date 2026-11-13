@@ -7,7 +7,7 @@ export const foodBuildings=[
   {id:'mill',name:'Mill',menuOrder:60,recommendsCompletedBuildings:['wheat_field'],width:2,height:2,cost:{stone:4,wood:20},constructionTime:25000,visualHeight:150,
     workplace:WORKPLACES.mill,recipe:FOOD_RECIPES.mill,description:'Two Millers grind 4 Wheat into 2 Flour with 30 seconds of active work. Inputs and outputs are physically carried.'},
   {id:'bakery',name:'Bakery',menuOrder:70,recommendsCompletedBuildings:['mill'],width:3,height:2,cost:{stone:10,wood:10},constructionTime:25000,visualHeight:110,
-    workplace:WORKPLACES.bakery,recipe:FOOD_RECIPES.bakery,description:'A Baker turns 1 Flour into 6 Bread with 30 seconds of active work and physical deliveries.'},
+    workplace:WORKPLACES.bakery,recipe:FOOD_RECIPES.bakery,description:'A Baker turns 1 Flour and 1 Wood (oven fuel) into 6 Bread with 30 seconds of active work and physical deliveries.'},
   {id:'granary',name:'Granary',menuOrder:10,width:3,height:3,cost:{wood:12},constructionTime:30000,visualHeight:125,
     // farmhouse-store (owner 8 Nov 2026): Wheat and Flour live in Farmhouse stores; the Granary keeps the edible food.
     storage:{capacity:GRANARY_GROUP_CAPACITY.food,resources:FOOD_RESOURCE_IDS.filter(id=>!FARMHOUSE_STORE.resources.includes(id))},description:'A physical store for 1000 units of food (meat, fish, apples, bread). Wheat and Flour are kept in Farmhouses. Haulers serve every store in the kingdom.'},

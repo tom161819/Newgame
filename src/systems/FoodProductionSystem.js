@@ -7,15 +7,19 @@ import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { advanceConstruction } from './ConstructionProgress.js';
 import { tileKey } from '../game/stones.js';
 import { carryCapacity,VEHICLES } from '../data/logistics.js';
-import { recipeFor,defaultRecipeKey } from '../data/production.js';
+import { recipeFor,defaultRecipeKey ,withoutFuel} from '../data/production.js';
 
 const first=object=>Object.entries(object)[0];
 export class FoodProductionSystem {
   constructor(scene){this.scene=scene;this.records=new Map();this.nextTransfer=1;this.nextEmployment=0;for(const b of scene.buildings)this.register(b);}
   get storage(){return this.scene.foodStorage;}
   // S12: the recipe the next batch uses (a workshop with choices keeps the player's choice in its record).
-  recipe(building){return recipeFor(buildingDefinition(building),this.records.get(building.id)?.recipe);}
-  cycleRecipe(record,building){return recipeFor(buildingDefinition(building),record.cycle?.recipe??record.recipe);}
+  recipe(building){return this.fuelled(recipeFor(buildingDefinition(building),this.records.get(building.id)?.recipe));}
+  // A running batch keeps the inputs it started with (a batch from before a recipe gained fuel finishes without it).
+  cycleRecipe(record,building){const recipe=this.fuelled(recipeFor(buildingDefinition(building),record.cycle?.recipe??record.recipe));const inputs=record.cycle?.inputs;
+    if(!inputs||JSON.stringify(Object.keys(inputs).sort())===JSON.stringify(Object.keys(recipe.input).sort())&&Object.entries(inputs).every(([k,v])=>recipe.input[k]===v))return recipe;
+    return {...recipe,input:{...inputs}};}
+  fuelled(recipe){return this.storage?.physicalMaterials?recipe:withoutFuel(recipe);}
   // m-smolar-pochodne (owner, 12 Nov): at a workshop that picks its recipe itself (Pitch Kiln) the player's choice now
   // holds – `recipeMode` is 'auto' (the workshop picks, as before) or the chosen recipe. Other workshops are unchanged.
   setRecipe(buildingId,key){
@@ -33,7 +37,7 @@ export class FoodProductionSystem {
   // between batches, as before. `bulk` true asks for the vehicle target (the Hauler catalog, which has no worker yet).
   inputTarget(building,resource,{bulk=false}={}){
     const recipe=this.recipe(building),need=recipe.input[resource]??0,record=this.records.get(building.id);if(!need)return 0;
-    if(!bulk||!Object.keys(recipe.input).every(id=>FOOD_RESOURCE_IDS.includes(id)))return record?.cycle?0:need;
+    if(!bulk||!Object.keys(recipe.input).every(id=>FOOD_RESOURCE_IDS.includes(id)||recipe.fuel?.[id]))return record?.cycle?0:need;
     const batch=Object.values(recipe.input).reduce((a,b)=>a+b,0);return need*Math.max(1,Math.floor((buildingDefinition(building).bufferCapacity??batch)/batch));
   }
   bulkCarrier(worker){return worker?.profession==='hauler'&&!!VEHICLES[worker.vehicleType];}

@@ -51,7 +51,7 @@ test('non-food workshops keep one batch per trip, even for a Hauler with a Wheel
   const s=scene(),shop=building(s,'wheelwright_workshop',54,44),fp=s.foodProduction;
   assert.deepEqual([fp.inputTarget(shop,'wood',{bulk:true}),fp.inputTarget(shop,'iron',{bulk:true})],[10,2]);
   const mill=building(s,'mill',44,54);assert.deepEqual([fp.inputTarget(mill,'wheat'),fp.inputTarget(mill,'wheat',{bulk:true})],[4,20]);
-  const bakery=building(s,'bakery',60,54);assert.equal(fp.inputTarget(bakery,'flour',{bulk:true}),20);
+  const bakery=building(s,'bakery',60,54);/* m-palivo-vyroba: Flour + Wood fill the buffer of 20 in pairs */assert.deepEqual([fp.inputTarget(bakery,'flour',{bulk:true}),fp.inputTarget(bakery,'wood',{bulk:true})],[10,10]);
 });
 
 const person=(id,profession,{workplace=null,level=1}={})=>({id,profession,assignedWorkplaceId:workplace,naturalTalent:'hunting',isAlive:true,isSubject:true,skills:{milling:{level,totalXP:0}},experience:{level:1}});

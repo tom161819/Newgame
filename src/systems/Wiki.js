@@ -101,6 +101,8 @@ export function buildWikiPages(registry,t,{has=key=>t(key)!==key}={}){
     if(d.workRadius)facts.push([t('wiki.fact.radius'),t('wiki.tiles',{n:d.workRadius,count:d.workRadius})]);
     const recipes=recipesOf(d);
     if(recipes.length){facts.push([t('wiki.fact.uses'),recipes.map(r=>amounts(registry,t,r.input)||'—').join(' / ')],[t('wiki.fact.makes'),recipes.map(r=>amounts(registry,t,r.output)).join(' / ')],[t('wiki.fact.duration'),recipes.map(r=>t('wiki.seconds',{n:seconds(r.duration)})).join(' / ')]);
+      // m-palivo-vyroba: the part of the input that is burnt.
+      if(recipes.some(r=>r.fuel))facts.push([t('wiki.fact.burns'),recipes.map(r=>r.fuel?amounts(registry,t,r.fuel):'—').join(' / ')]);
       for(const r of recipes)for(const id of [...Object.keys(r.input??{}),...Object.keys(r.output??{})])links.push(`resource:${id}`);}
     if(d.mining){facts.push([t('wiki.fact.mines'),t('wiki.mining',{resource:name(d.mining.resource),n:seconds(d.mining.duration)})]);links.push(`resource:${d.mining.resource}`);if(d.mining.range)facts.push([t('wiki.fact.reach'),t('wiki.tiles',{n:d.mining.range,count:d.mining.range})]);}
     if(d.crop){facts.push([t('wiki.fact.crop'),t('wiki.crop',{n:d.crop.yield,resource:name(d.crop.resource),days:d.crop.growthDays})]);links.push(`resource:${d.crop.resource}`);}

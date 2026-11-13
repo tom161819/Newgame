@@ -19,9 +19,11 @@ export class NightControls {
     // N3: night threat switches in Settings (the game's own switches, saved with the game).
     this.threatBoxes=Object.fromEntries(['wolves','thieves','fires'].map(id=>[id,document.querySelector(`#settings-threat-${id}`)]));
     for(const [id,box] of Object.entries(this.threatBoxes)){if(!box)continue;box.checked=scene.nightThreats?.enabled[id]!==false;box.addEventListener('change',()=>scene.nightThreats?.setEnabled(id,box.checked),options);}
+    // m-topeni-domu: the winter heating switch (saved with the game).
+    this.heatingBox=document.querySelector('#settings-heating');if(this.heatingBox){this.heatingBox.checked=scene.heating?.enabled!==false;this.heatingBox.addEventListener('change',()=>scene.heating?.setEnabled(this.heatingBox.checked),options);}
     this.update();
   }
-  syncThreats(){for(const [id,box] of Object.entries(this.threatBoxes??{}))if(box)box.checked=this.scene.nightThreats?.enabled[id]!==false;}
+  syncThreats(){if(this.heatingBox)this.heatingBox.checked=this.scene.heating?.enabled!==false;for(const [id,box] of Object.entries(this.threatBoxes??{}))if(box)box.checked=this.scene.nightThreats?.enabled[id]!==false;}
   plannedCount(){return (this.scene.buildings??[]).filter(b=>b.construction&&b.construction.state!=='complete').length;}
   syncSpeed(){if(this.select)this.select.value=String(readNightSpeed());}
   update(){

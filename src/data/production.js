@@ -3,14 +3,16 @@ import { FOOD_RECIPES } from './foodProduction.js';
 // Shared recipes: food and material workshops use the same physical pipeline.
 export const PRODUCTION_RECIPES=Object.freeze({
   ...FOOD_RECIPES,
-  smelter:Object.freeze({input:Object.freeze({iron_ore:3,wood:2}),output:Object.freeze({iron:1}),duration:40000,skill:'smelting',xp:10,
+  // m-palivo-vyroba (38): its 2 Wood are fuel (the furnace); the amount is unchanged until the owner decides on +1.
+  smelter:Object.freeze({input:Object.freeze({iron_ore:3,wood:2}),fuel:Object.freeze({wood:2}),output:Object.freeze({iron:1}),duration:40000,skill:'smelting',xp:10,
     inputSources:Object.freeze({iron_ore:'Smelting',wood:'Smelting Fuel'}),outputSource:'Smelter Production'}),
   // Military workshops (C07): balance lives here and may change.
   // S12: a Wheelbarrow is a vehicle: the finished one leaves the output buffer as a real object beside the workshop.
   wheelwright_workshop:Object.freeze({input:Object.freeze({wood:10,iron:2}),output:Object.freeze({wheelbarrow:1}),duration:300000/* m-obchod-vylepseni (57): 10× slower, was 30 s */,skill:'crafting',xp:12,vehicle:true,inputSources:Object.freeze({wood:'Wheelwrighting',iron:'Wheelwrighting'}),outputSource:'Wheelwright Production'}),
   bowyer:Object.freeze({input:Object.freeze({wood:8}),output:Object.freeze({bow:1}),duration:30000,skill:'crafting',xp:10,inputSources:Object.freeze({wood:'Bowmaking'}),outputSource:'Bowyer Production'}),
-  swordsmith:Object.freeze({input:Object.freeze({iron:3,wood:2}),output:Object.freeze({sword:1}),duration:45000,skill:'crafting',xp:12,inputSources:Object.freeze({iron:'Swordsmithing',wood:'Forge Fuel'}),outputSource:'Swordsmith Production'}),
-  armorer:Object.freeze({input:Object.freeze({iron:5,wood:2}),output:Object.freeze({armor:1}),duration:60000,skill:'crafting',xp:14,inputSources:Object.freeze({iron:'Armorsmithing',wood:'Forge Fuel'}),outputSource:'Armorer Production'}),
+  // m-palivo-vyroba: of the 2 Wood, 1 is the grip and 1 feeds the forge.
+  swordsmith:Object.freeze({input:Object.freeze({iron:3,wood:2}),fuel:Object.freeze({wood:1}),output:Object.freeze({sword:1}),duration:45000,skill:'crafting',xp:12,inputSources:Object.freeze({iron:'Swordsmithing',wood:'Forge Fuel'}),outputSource:'Swordsmith Production'}),
+  armorer:Object.freeze({input:Object.freeze({iron:5,wood:2}),fuel:Object.freeze({wood:1}),output:Object.freeze({armor:1}),duration:60000,skill:'crafting',xp:14,inputSources:Object.freeze({iron:'Armorsmithing',wood:'Forge Fuel'}),outputSource:'Armorer Production'}),
 });
 // S12: the Horse Wagon is the Wheelwright's second recipe. It also needs one tamed horse from the Stables, reserved when
 // the batch starts and harnessed to the finished wagon; the horse is never consumed.
@@ -32,7 +34,7 @@ export const WHEELWRIGHT_RECIPES=Object.freeze({wheelbarrow:PRODUCTION_RECIPES.w
 const past=(input,output,duration)=>Object.freeze({input:Object.freeze(input),output:Object.freeze(output),duration});
 export const RECIPE_HISTORY=Object.freeze({
   mill:Object.freeze([past({wheat:4},{flour:3},30000)]),
-  bakery:Object.freeze([past({flour:2},{bread:5},30000),past({flour:2},{bread:4},30000)]),
+  bakery:Object.freeze([past({flour:1},{bread:6},30000),past({flour:2},{bread:5},30000),past({flour:2},{bread:4},30000)]),
   'pitch_kiln:pitch':Object.freeze([past({wood:2},{pitch:1},30000)]),
   'pitch_kiln:torches':Object.freeze([past({wood:1,pitch:1},{torch:3},20000)]),
 });
@@ -40,5 +42,7 @@ export const RECIPE_HISTORY=Object.freeze({
 export const recipeVariants=(type,key,recipe)=>[recipe,...(RECIPE_HISTORY[key?`${type}:${key}`:type]??[])];
 // A workshop with several recipes (definition.recipes) makes the one chosen in its production record; others use definition.recipe.
 export const recipeFor=(definition,key)=>definition.recipes?.[key]??definition.recipe;
+// m-palivo-vyroba: a recipe without its fuel (a world without physical materials keeps Wood out of the food stores).
+export const withoutFuel=recipe=>{if(!recipe?.fuel)return recipe;const input={...recipe.input};for(const [id,n]of Object.entries(recipe.fuel)){input[id]=(input[id]??0)-n;if(input[id]<=0)delete input[id];}return {...recipe,input,fuel:undefined};};
 export const defaultRecipeKey=definition=>definition.recipes?Object.keys(definition.recipes)[0]:undefined;
 export const recipeResources=(definition,kind)=>[...new Set([definition.recipe,...Object.values(definition.recipes??{})].flatMap(r=>Object.keys(r[kind])))];

@@ -11,7 +11,7 @@ export const BUILDING_TOOLTIP=Object.freeze({
   storageKey:'newgame.buildingTooltips',
 });
 // Status icons after the name (the icon is the text, the meaning goes to its title).
-export const BUILDING_TOOLTIP_ICONS=Object.freeze({notWorking:'⛔',missingInput:'⏳',fire:'🔥',rats:'🐀'});
+export const BUILDING_TOOLTIP_ICONS=Object.freeze({notWorking:'⛔',missingInput:'⏳',fire:'🔥',rats:'🐀',cold:'❄'});
 // Happiness of a house's residents (needs.moods ids).
 export const BUILDING_TOOLTIP_MOODS=Object.freeze({happy:'☺',neutral:'😐',unhappy:'☹',critical:'⚠'});
 // Store locations shown as contents (the store preview's kinds plus the Marketplace's goods space).
