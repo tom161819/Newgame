@@ -50,9 +50,9 @@ test('#211 export keeps repository comments and history and appends local commen
 
 test('#211 In Game is derived from the game data: exactly the exported sprite of the current version', () => {
   const sources = gameArtSources({ definitions: objectDefinitions.map(withApprovedArt), villagerArt: APPROVED_VILLAGER_ART });
-  assert.equal(inGame({ spriteMeta: 'art/sprites/windmill/windmill-tower.v1.json' }, sources), true, 'the approved Mill is in the game');
-  assert.equal(inGame({ spriteMeta: 'art/sprites/windmill/windmill-post.v1.json' }, sources), false, 'its unapproved sibling is not');
-  assert.equal(inGame({ spriteMeta: 'art/sprites/windmill/windmill-tower.v2.json' }, sources), false, 'a newer version is not in the game until integrated');
+  assert.equal(inGame({ spriteMeta: 'art/sprites/windmill/windmill-gpt-0.v1.json' }, sources), true, 'the approved GPT Mill is in the game (owner 13 Nov 2026)');
+  assert.equal(inGame({ spriteMeta: 'art/sprites/windmill/windmill-tower.v1.json' }, sources), false, 'the replaced tower mill is not');
+  assert.equal(inGame({ spriteMeta: 'art/sprites/windmill/windmill-gpt-0.v2.json' }, sources), false, 'a newer version is not in the game until integrated');
   assert.equal(inGame({ spriteMeta: 'art/sprites/miner/miner-male.v1.json' }, sources), true, 'villager looks count');
   assert.equal(inGame({ spriteMeta: 'art/sprites/builders-workshop/builders-workshop-open-shed.v1.json' }, sources), false, 'concepts in review are not in the game');
 });

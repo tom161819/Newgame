@@ -54,7 +54,7 @@ function lakeScene(){
 }
 function fisherAt(s){
   const d=objectRegistry.require('fisherman_hut');ensureBuildingPrerequisites(s,d);for(const [r,n]of Object.entries(d.cost))s.inventory.add(r,n);
-  const r=placeBuilding({map:s.map,anchor:{x:49,y:43},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(r.error);
+  const r=placeBuilding({map:s.map,anchor:{x:48,y:43},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(r.error);
   s.towerViews.set(r.building.id,s.createBuildingView(d,r.building));const w=s.workerSystem.create({x:46,y:46});assert.equal(s.workplaceSystem.assign(r.building,w),true);w.naturalTalent='woodcutting';return {hut:r.building,w};
 }
 

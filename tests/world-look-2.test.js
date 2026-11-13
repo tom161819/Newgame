@@ -42,7 +42,7 @@ test('35: approved building art is drawn at Studio scale and anchored at the foo
     assert.ok(Math.abs(meta.base.x-meta.anchor.x-(d.width-d.height)*16)<=2,`${id}: base x at the front corner`);
     assert.ok(Math.abs(meta.base.y-meta.anchor.y-(d.width+d.height)*8)<=2,`${id}: base is the front corner, ${(d.width+d.height)*8}px below the centre`);
   }
-  const market=objectDefinitions.find(o=>o.id==='marketplace');assert.equal(market.renderMode,'sprite');assert.equal(market.visualHeight,114);
+  const market=objectDefinitions.find(o=>o.id==='marketplace');assert.equal(market.renderMode,'sprite');assert.equal(market.visualHeight,JSON.parse(readFileSync(new URL('../art/sprites/marketplace/marketplace-gpt-0.v1.json',import.meta.url),'utf8')).visualHeight,'the GPT market square (owner 13 Nov 2026)');
   assert.equal(objectDefinitions.find(o=>o.id==='smelter').visual?.displayHeight,undefined,'the 3×3 Smelter had the same stretch');
 });
 

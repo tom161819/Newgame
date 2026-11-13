@@ -21,7 +21,7 @@ function lakeScene(){
   for(let y=36;y<=50;y++)for(let x=51;x<=60;x++){s.groundGrid[y][x]=x>52&&x<59&&y>37&&y<49?GROUND.DEEP:GROUND.SHALLOW;s.map[y][x]=WATER_CELL;}
   s.fishing=new FishingSystem(s);s.eventFeed={pushed:[],push(key,text){this.pushed.push(key);return true;}};return s;
 }
-function hut(s,anchor={x:49,y:43}){
+function hut(s,anchor={x:48,y:43}){
   const d=objectRegistry.require('fisherman_hut');ensureBuildingPrerequisites(s,d);for(const [r,n]of Object.entries(d.cost))s.inventory.add(r,n);
   const r=placeBuilding({map:s.map,anchor,resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(r.error);
   s.towerViews.set(r.building.id,s.createBuildingView(d,r.building));return r.building;
@@ -33,7 +33,7 @@ test('Fishing data: fish is food and a trade good; the hut is a food workplace f
   assert.ok(EDIBLE_RESOURCES.includes('fish')&&FOOD_RESOURCE_IDS.includes('fish'));assert.equal(BASE_PRICES.fish,3);
   assert.ok(MERCHANT_TYPES.food.stock.fish&&MERCHANT_TYPES.general.stock.fish);
   const d=objectRegistry.require('fisherman_hut');
-  assert.deepEqual([d.width,d.height,d.buildingCategory,d.cost,d.requiresCompletedBuildings,d.recommendsCompletedBuildings],[2,2,'food',{wood:10},undefined,['granary']]);
+  assert.deepEqual([d.width,d.height,d.legacyFootprint,d.buildingCategory,d.cost,d.requiresCompletedBuildings,d.recommendsCompletedBuildings],[3,3,{width:2,height:2},'food',{wood:10},undefined,['granary']]);
   assert.deepEqual(d.workplace,{capacity:1,profession:'fisher',skill:'fishing'});
   assert.deepEqual([stockCapacity(3),stockCapacity(50),stockCapacity(500)],[40,200,400]);
   assert.deepEqual([stockFactor(.8),stockFactor(.25),stockFactor(.09)],[1,.5,0]);
@@ -45,7 +45,7 @@ test('water bodies are found by flood fill; since 0.32.0 a hut may stand anywher
   const water=waterBodies(ground);assert.equal(water.bodies.length,2);assert.deepEqual(water.bodies.map(b=>[b.tiles,b.capacity]),[[10,40],[9,40]]);
   const s=lakeScene();ensureBuildingPrerequisites(s,objectRegistry.require('fisherman_hut'));
   const error=anchor=>placementError(s.map,anchor,s.resourceOccupancy,[],objectRegistry.require('fisherman_hut'),s.buildings);
-  assert.equal(error({x:49,y:43}),null);assert.equal(error({x:30,y:30}),null,'far from water is allowed');
+  assert.equal(error({x:48,y:43}),null);assert.equal(error({x:30,y:30}),null,'far from water is allowed');
   assert.equal(s.fishing.bodies.length,1);assert.equal(s.fishing.capacity(0),400);
 });
 
@@ -96,7 +96,7 @@ test('the Fishers use the nearest reachable shore by walking distance, with no r
 
 test('two Fishers never share a spot; a hut with no reachable water says so and gets a notice',async()=>{
   // tabulka-budov-1: one Fisher a hut, so the two Fishers come from two neighbouring huts.
-  const s=lakeScene(),b=hut(s),b2=hut(s,{x:49,y:47}),[w1,w2]=[fisher(s,b),fisher(s,b2)];for(let i=0;i<200;i++)s.tick(50);
+  const s=lakeScene(),b=hut(s),b2=hut(s,{x:48,y:47}),[w1,w2]=[fisher(s,b),fisher(s,b2)];for(let i=0;i<200;i++)s.tick(50);
   assert.ok(w1.workTask&&w2.workTask);assert.notDeepEqual(w1.workTask.goal,w2.workTask.goal);
   const dry=workerScene(undefined,{naturalResources:true,construction:true,logistics:true});dry.workerSystem.unsubscribe();dry.groundGrid=emptyGround();dry.fishing=new FishingSystem(dry);for(const a of [...dry.animalSystem.animals.values()])dry.animalSystem.remove(a);
   const h=hut(dry,{x:62,y:62});assert.deepEqual(dry.fishing.spots(h),[]);assert.equal(dry.fishing.summary(h),'No reachable water');assert.equal(dry.fishing.previewDistance({x:30,y:30},objectRegistry.require('fisherman_hut')),null);

@@ -2,7 +2,7 @@
   "schema": 1,
   "assetId": "windmill",
   "variantId": "windmill-gpt-0",
-  "name": "GPT stone windmill 0° (front-right)",
+  "name": "GPT stone windmill 0\u00b0 (front-right)",
   "category": "buildings",
   "version": 1,
   "specHash": "dfe4b764",
@@ -49,5 +49,24 @@
   "render": {
     "source": "gpt",
     "view": 0
+  },
+  "rotor": {
+    "pivot": {
+      "x": 55.92,
+      "y": 74.09
+    },
+    "gamePivot": {
+      "x": -27,
+      "y": -150
+    },
+    "sails": {
+      "width": 140,
+      "height": 140
+    },
+    "origin": {
+      "x": 0.5,
+      "y": 0.5
+    },
+    "note": "Sails cut out of the GPT picture (one arm repeated four times around the hub); the body behind them filled from the 90\u00b0 view."
   }
 }

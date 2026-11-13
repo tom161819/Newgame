@@ -94,15 +94,15 @@ test('children\'s game loops: all eight approved sheets are deployed and each ga
 });
 
 // m-svet-vzhled-2 (32): the Fisherman's Hut uses the approved, preferred stilt hut (v2) instead of the temporary drawing.
-test('32: the Fisherman\'s Hut is the approved stilt hut, byte for byte, anchored at the front corner, 2 × 2 like its export',async()=>{
+test('32: the Fisherman\'s Hut is the approved GPT fishing hut (owner 13 Nov 2026), byte for byte, anchored at the front corner, 3 × 3 like its export',async()=>{
   const { APPROVED_BUILDING_ART }=await import('../src/data/objects/approvedArt.js');
   const art=APPROVED_BUILDING_ART.fisherman_hut,d=objectDefinitions.find(o=>o.id==='fisherman_hut'),meta=json(art.artSource),repo=approvals['fisherman-hut'];
-  assert.equal(repo.preferred,'fisherman-hut-stilt-net-loft');assert.equal(meta.variantId,repo.preferred);
+  assert.equal(repo.preferred,'fisherman-hut-gpt-0');assert.equal(meta.variantId,repo.preferred);
   const record=repo.variants[meta.variantId];assert.equal(record.status,'approved');assert.equal(record.version,meta.version);assert.equal(record.specHash,meta.specHash);
   assert.equal(d.renderMode,'sprite');assert.equal(d.renderer,'workplace','the procedural hut stays as the fallback if the image fails');
-  assert.equal(d.sprite,'/assets/buildings/fisherman_hut/fisherman-hut-stilt-net-loft.v2.png');assert.ok(existsSync(new URL(`public${d.sprite}`,root)));
-  assert.equal(sha(`public${d.sprite}`),sha('art/sprites/fisherman-hut/fisherman-hut-stilt-net-loft.v2.png'));
+  assert.equal(d.sprite,'/assets/buildings/fisherman_hut/fisherman-hut-gpt-0.v1.png');assert.ok(existsSync(new URL(`public${d.sprite}`,root)));
+  assert.equal(sha(`public${d.sprite}`),sha('art/sprites/fisherman-hut/fisherman-hut-gpt-0.v1.png'));
   assert.deepEqual(d.origin,meta.baseOrigin,'origin = the export base (footprint front corner)');assert.equal(d.visualHeight,meta.visualHeight);assert.deepEqual(d.lights??[],meta.gameLights);
   const spec=json('art/assets/buildings/fisherman-hut/asset.json');
-  assert.deepEqual([d.width,d.height],[2,2]);assert.deepEqual([meta.footprint.width,meta.footprint.height],[2,2]);assert.deepEqual([spec.footprint.width,spec.footprint.height],[2,2]);
+  assert.deepEqual([d.width,d.height],[3,3]);assert.deepEqual(d.legacyFootprint,{width:2,height:2});assert.deepEqual([meta.footprint.width,meta.footprint.height],[3,3]);
 });

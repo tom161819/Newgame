@@ -25,8 +25,8 @@ test('#99 grinding means a Miller with a produce task at this Mill while a cycle
 });
 
 test('#99 the Mill uses the approved art split into a still body and a sails layer from the same export', () => {
-  const mill = withApprovedArt(objectDefinitions.find(d => d.id === 'mill')), meta = JSON.parse(readFileSync(new URL('../art/sprites/windmill/windmill-tower.v1.json', import.meta.url)));
-  assert.equal(mill.sprite, '/assets/buildings/mill/windmill-tower.v1.png', 'the approved full sprite is unchanged');
-  assert.deepEqual(mill.rotor.pivot, meta.rotor.gamePivot);assert.ok(Math.abs(mill.rotor.origin.x - meta.rotor.pivot.x / meta.width) < 1e-4 && Math.abs(mill.rotor.origin.y - meta.rotor.pivot.y / meta.height) < 1e-4);
-  for (const layer of ['still', 'rotor']) assert.deepEqual(readFileSync(new URL(`../public${mill.rotor[layer === 'rotor' ? 'sprite' : 'still']}`, import.meta.url)), readFileSync(new URL(`../art/sprites/windmill/windmill-tower.v1.${layer}.png`, import.meta.url)), `${layer} matches the export`);
+  const mill = withApprovedArt(objectDefinitions.find(d => d.id === 'mill')), meta = JSON.parse(readFileSync(new URL('../art/sprites/windmill/windmill-gpt-0.v1.json', import.meta.url)));
+  assert.equal(mill.sprite, '/assets/buildings/mill/windmill-gpt-0.v1.png', 'the approved GPT mill (owner 13 Nov 2026)');
+  assert.deepEqual(mill.rotor.pivot, meta.rotor.gamePivot);assert.deepEqual(mill.rotor.origin, meta.rotor.origin);
+  for (const layer of ['still', 'rotor']) assert.deepEqual(readFileSync(new URL(`../public${mill.rotor[layer === 'rotor' ? 'sprite' : 'still']}`, import.meta.url)), readFileSync(new URL(`../art/sprites/windmill/windmill-gpt-0.v1.${layer}.png`, import.meta.url)), `${layer} matches the export`);
 });

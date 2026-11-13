@@ -115,8 +115,8 @@ try {
   const live = await page.locator('.library-item .name').allTextContents();
   assert.ok(live.includes('Mill') && !live.includes('Ruined tower'), `In game lists approved art in use only ${JSON.stringify(live.slice(0, 8))}`);
   await page.locator('.library-item', { hasText: /^Mill/ }).first().click();
-  assert.ok(await page.locator('.variant-card[data-variant="windmill-tower"] .pill.ingame').count() === 1, 'the Mill variant in use shows In game');
-  assert.equal(await page.locator('.variant-card[data-variant="windmill-post"] .pill.ingame').count(), 0, 'its sibling does not');
+  assert.ok(await page.locator('.variant-card[data-variant="windmill-gpt-0"] .pill.ingame').count() === 1, 'the Mill variant in use shows In game');
+  assert.equal(await page.locator('.variant-card[data-variant="windmill-tower"] .pill.ingame').count(), 0, 'the replaced tower mill does not');
   await page.locator('#library-review [data-review="all"]').click();
   // Request revision needs a comment; it is stored with the exact version and the design moves to Revision requested.
   await page.locator('.library-item', { hasText: 'Ruined tower' }).first().click();

@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.116.0] - 2026-11-13
+<!-- version: {"title":"Approved GPT buildings: Lumberjack Hut, Hunting Lodge, Marketplace, Pitch Kiln, Fisherman's Hut, Mill","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- New pictures approved in the Asset Studio: Lumberjack Hut, Hunting Lodge, Marketplace, Pitch Kiln, Fisherman's Hut and the Mill (its sails still turn).
+- The Pitch Kiln and the Fisherman's Hut are now 3 × 3 tiles, so their doors are the same size as on other buildings. Kilns and huts in older saves keep their 2 × 2 place and show the new picture smaller.
+
 ## [0.115.7] - 2026-11-13
 <!-- version: {"title":"Wooden GPT builder's workshop; stone version in the Studio","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

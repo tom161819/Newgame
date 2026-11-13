@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-13T20:16:13.635528Z",
+  "updatedAt": "2026-11-13T20:24:43.920Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -262,18 +262,22 @@
           "decidedBy": "owner (chat)"
         },
         "builders-workshop-gpt-wood-90": {
-          "status": "review",
-          "version": 1,
-          "specHash": "260bdc21",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:16:13.635528Z"
+          "specHash": "260bdc21",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "builders-workshop-gpt-wood-180": {
-          "status": "review",
-          "version": 1,
-          "specHash": "260bdc21",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:16:13.635528Z"
+          "specHash": "260bdc21",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "builders-workshop-gpt-wood-270": {
           "status": "review",
@@ -411,30 +415,36 @@
           "decidedBy": "owner (chat)"
         },
         "farmstead-gpt-90": {
-          "status": "review",
-          "version": 1,
-          "specHash": "d07ec7df",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T19:13:32.458135Z"
+          "specHash": "d07ec7df",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "farmstead-gpt-180": {
-          "status": "review",
-          "version": 1,
-          "specHash": "d07ec7df",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T19:13:32.458135Z"
+          "specHash": "d07ec7df",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "farmstead-gpt-270": {
-          "status": "review",
-          "version": 1,
-          "specHash": "d07ec7df",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T19:13:32.458135Z"
+          "specHash": "d07ec7df",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         }
       }
     },
     "fisherman-hut": {
-      "preferred": "fisherman-hut-stilt-net-loft",
+      "preferred": "fisherman-hut-gpt-0",
       "variants": {
         "fisherman-hut-stilt-net-loft": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -460,6 +470,42 @@
               "at": "2026-11-07T16:25:24.015Z"
             }
           ]
+        },
+        "fisherman-hut-gpt-0": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "69d5e81e",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "fisherman-hut-gpt-90": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "69d5e81e",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "fisherman-hut-gpt-180": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "69d5e81e",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "fisherman-hut-gpt-270": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "69d5e81e",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         }
       }
     },
@@ -492,53 +538,67 @@
           "decidedBy": "owner (chat)"
         },
         "granary-store-gpt-wood-90": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8b920f31",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:06:27.232184Z"
+          "specHash": "8b920f31",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "granary-store-gpt-wood-180": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8b920f31",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:06:27.232184Z"
+          "specHash": "8b920f31",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "granary-store-gpt-wood-270": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8b920f31",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:06:27.232184Z"
+          "specHash": "8b920f31",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "granary-store-gpt-stone-0": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8b920f31",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:06:27.232184Z"
+          "specHash": "8b920f31",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "granary-store-gpt-stone-90": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8b920f31",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:06:27.232184Z"
+          "specHash": "8b920f31",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "granary-store-gpt-stone-180": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8b920f31",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:06:27.232184Z"
+          "specHash": "8b920f31",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "granary-store-gpt-stone-270": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8b920f31",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:06:27.232184Z"
+          "specHash": "8b920f31",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         }
       }
     },
@@ -604,25 +664,31 @@
           "decidedBy": "owner (chat)"
         },
         "house-gpt-bench-90": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8f5ca01a",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T18:32:36.510459Z"
+          "specHash": "8f5ca01a",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "house-gpt-bench-180": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8f5ca01a",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T18:32:36.510459Z"
+          "specHash": "8f5ca01a",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "house-gpt-bench-270": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8f5ca01a",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T18:32:36.510459Z"
+          "specHash": "8f5ca01a",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "house-gpt-woodshed-0": {
           "status": "approved",
@@ -634,25 +700,31 @@
           "decidedBy": "owner (chat)"
         },
         "house-gpt-woodshed-90": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8f5ca01a",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T18:32:36.510459Z"
+          "specHash": "8f5ca01a",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "house-gpt-woodshed-180": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8f5ca01a",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T18:32:36.510459Z"
+          "specHash": "8f5ca01a",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "house-gpt-woodshed-270": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8f5ca01a",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T18:32:36.510459Z"
+          "specHash": "8f5ca01a",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "house-gpt-porch-0": {
           "status": "approved",
@@ -664,25 +736,31 @@
           "decidedBy": "owner (chat)"
         },
         "house-gpt-porch-90": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8f5ca01a",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T18:32:36.510459Z"
+          "specHash": "8f5ca01a",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "house-gpt-porch-180": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8f5ca01a",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T18:32:36.510459Z"
+          "specHash": "8f5ca01a",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "house-gpt-porch-270": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8f5ca01a",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T18:32:36.510459Z"
+          "specHash": "8f5ca01a",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "house-gpt-garden-0": {
           "status": "approved",
@@ -694,30 +772,36 @@
           "decidedBy": "owner (chat)"
         },
         "house-gpt-garden-90": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8f5ca01a",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T18:32:36.510459Z"
+          "specHash": "8f5ca01a",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "house-gpt-garden-180": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8f5ca01a",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T18:32:36.510459Z"
+          "specHash": "8f5ca01a",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         },
         "house-gpt-garden-270": {
-          "status": "review",
-          "version": 1,
-          "specHash": "8f5ca01a",
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T18:32:36.510459Z"
+          "specHash": "8f5ca01a",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         }
       }
     },
     "hunting-lodge": {
-      "preferred": "hunting-lodge-log",
+      "preferred": "hunting-lodge-gpt-0",
       "variants": {
         "hunting-lodge-log": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -727,6 +811,42 @@
           "updatedAt": "2026-11-07T10:15:20.816Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:15:20.816Z"
+        },
+        "hunting-lodge-gpt-0": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "29c42966",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "hunting-lodge-gpt-90": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "29c42966",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "hunting-lodge-gpt-180": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "29c42966",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "hunting-lodge-gpt-270": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "29c42966",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         }
       }
     },
@@ -761,7 +881,7 @@
       }
     },
     "lumber-camp": {
-      "preferred": "lumber-camp-hut",
+      "preferred": "lumber-camp-gpt-0",
       "variants": {
         "lumber-camp-hut": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -771,11 +891,47 @@
           "updatedAt": "2026-11-07T10:15:39.652Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:15:39.652Z"
+        },
+        "lumber-camp-gpt-0": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fb16ec6c",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "lumber-camp-gpt-90": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fb16ec6c",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "lumber-camp-gpt-180": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fb16ec6c",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "lumber-camp-gpt-270": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fb16ec6c",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         }
       }
     },
     "marketplace": {
-      "preferred": "marketplace-square",
+      "preferred": "marketplace-gpt-0",
       "variants": {
         "marketplace-square": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -785,11 +941,47 @@
           "updatedAt": "2026-11-07T10:15:45.674Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:15:45.674Z"
+        },
+        "marketplace-gpt-0": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "227e75b8",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "marketplace-gpt-90": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "227e75b8",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "marketplace-gpt-180": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "227e75b8",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "marketplace-gpt-270": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "227e75b8",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         }
       }
     },
     "pitch-kiln": {
-      "preferred": "pitch-kiln-stone-oven",
+      "preferred": "pitch-kiln-gpt-0",
       "variants": {
         "pitch-kiln-stone-oven": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -815,6 +1007,42 @@
               "at": "2026-11-07T16:26:23.158Z"
             }
           ]
+        },
+        "pitch-kiln-gpt-0": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2d99957e",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "pitch-kiln-gpt-90": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2d99957e",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "pitch-kiln-gpt-180": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2d99957e",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "pitch-kiln-gpt-270": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2d99957e",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         }
       }
     },
@@ -1156,7 +1384,7 @@
       }
     },
     "windmill": {
-      "preferred": "windmill-tower",
+      "preferred": "windmill-gpt-0",
       "variants": {
         "windmill-tower": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -1166,6 +1394,42 @@
           "updatedAt": "2026-11-07T10:16:00.556Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:16:00.556Z"
+        },
+        "windmill-gpt-0": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "dfe4b764",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "windmill-gpt-90": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "dfe4b764",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "windmill-gpt-180": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "dfe4b764",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "windmill-gpt-270": {
+          "approvedAt": "2026-11-13T20:23:40.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "dfe4b764",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
         }
       }
     },

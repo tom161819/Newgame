@@ -25,7 +25,7 @@ function world(){
 test('Pitch Kiln: 2 Wood → 1 Pitch and 1 Wood + 1 Pitch → 3 Torches; Torches first while below 20 and Pitch is at hand', () => {
   assert.deepEqual(PITCH_RECIPES.pitch.input,{wood:4});assert.deepEqual(PITCH_RECIPES.pitch.output,{pitch:2});assert.equal(PITCH_RECIPES.pitch.duration,15000);
   assert.deepEqual(PITCH_RECIPES.torches.input,{wood:2,pitch:2});assert.deepEqual(PITCH_RECIPES.torches.output,{torch:6});assert.equal(PITCH_RECIPES.torches.duration,10000);
-  const kiln=objectRegistry.require('pitch_kiln');assert.deepEqual([kiln.width,kiln.height,kiln.buildingCategory],[2,2,'industry']);assert.deepEqual(kiln.cost,{wood:8,stone:4});
+  const kiln=objectRegistry.require('pitch_kiln');assert.deepEqual([kiln.width,kiln.height,kiln.legacyFootprint,kiln.buildingCategory],[3,3,{width:2,height:2},'industry']);/* 3 × 3 since the GPT pitch works (owner 13 Nov 2026) */assert.deepEqual(kiln.cost,{wood:8,stone:4});
   assert.equal(kiln.workplace.profession,'pitch_maker');assert.equal(kiln.workplace.capacity,1,'tabulka-budov-1: one Pitch Maker');
   const {s,place,store}=world(),b=place('pitch_kiln',60,60),record=s.foodProduction.records.get(b.id);
   s.foodProduction.chooseRecipes();assert.equal(record.recipe,'pitch','no Pitch yet: make Pitch');
