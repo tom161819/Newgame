@@ -52,12 +52,12 @@ test('wiki v2: sections, chains and the All chains page',()=>{
   assert.ok(allChains(wikiGraph(objectRegistry)).length>=10);
   assert.ok(searchWiki(pages,'Farmhouse store').some(p=>p.id==='building:mill'),'search reads the sections');
 });
-test('wiki v2: the bread chain is written in both languages; the "?" buttons point at real dialogs',()=>{
+test('wiki v2: every building, resource and profession is written in both languages; the "?" buttons point at real dialogs',()=>{
   const bread=['building:farmhouse','building:wheat_field','building:mill','building:bakery','building:granary','resource:wheat','resource:flour','resource:bread','profession:farmer','profession:miller','profession:baker'];
   for(const id of bread)for(const part of WIKI_TEXT_PARTS)for(const lang of [en,cs])assert.ok(lang[wikiTextKey(id,part)]?.length>10,`${id} ${part}`);
   // Texts must not exist for pages that do not exist, and the coverage report lists what is still missing.
   const pages=buildWikiPages(objectRegistry,t,{has:k=>k in en});
   for(const key of Object.keys(en).filter(k=>k.startsWith('wiki.text.'))){const [, ,kind,id]=key.split('.');assert.ok(pages.has(`${kind}:${id}`),key);assert.ok(cs[key],`cs ${key}`);}
-  const missing=wikiTextCoverage(pages,k=>k in en&&k in cs);for(const id of bread)assert.ok(!missing.some(k=>k.startsWith(wikiTextKey(id,''))),id);
+  const missing=wikiTextCoverage(pages,k=>k in en&&k in cs);assert.deepEqual(missing,[],'every building, resource and profession page is written in both languages');
   const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');for(const id of Object.keys(WIKI_HELP_DIALOGS))assert.ok(html.includes(`id="${id}"`),id);
 });

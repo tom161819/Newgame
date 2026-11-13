@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.110.0] - 2026-11-13
+<!-- version: {"title":"Wiki v2: every building, resource and profession explained","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Wiki: every building, resource and profession now explains what it is for, how it works and gives tips and common problems, in English and Czech (62 more pages).
+
 ## [0.109.0] - 2026-11-13
 <!-- version: {"title":"Wiki v2: sections and production chains","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added
