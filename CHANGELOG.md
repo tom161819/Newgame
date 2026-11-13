@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.111.2] - 2026-11-13
+<!-- version: {"title":"Saving works while the Pitch Kiln switches recipes","type":"fix","reconstructed":false,"saveVersion":62} -->
+### Fixed
+- Saving no longer fails with "check: food" while a Pitch Kiln has finished Torches (or Pitch) waiting and has already switched to its other recipe.
+
 ## [0.111.1] - 2026-11-13
 <!-- version: {"title":"Pitch Kiln no longer stops after its first batch","type":"fix","reconstructed":false,"saveVersion":62} -->
 ### Fixed

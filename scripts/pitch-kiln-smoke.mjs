@@ -20,7 +20,7 @@ const placeBlueprint=(page,type)=>page.evaluate(type=>{const s=window.__game.reg
     s.pointerTile=orig;if(s.buildings.length>before){s.cancelBuilding?.();return {id:s.buildings.at(-1).id};}}
   throw new Error('no site');},type);
 const finish=(id)=>page.evaluate(id=>{const s=window.__game.registry.get('application').scene,b=s.buildings.find(b=>b.id===id),m=s.constructionSystem.materials;
-  if(b.materialSupply){const loc=s.foodStorage.locations.get(m.owner(b.id));loc.stock={...b.materialSupply.required};}delete b.unverified;b.construction.workDone=b.construction.requiredWork;return s.constructionSystem.finish(b);},id);
+  if(b.materialSupply){const loc=s.foodStorage.locations.get(m.owner(b.id));loc.stock={...b.materialSupply.required};}delete b.unverified;b.construction.workDone=b.construction.requiredWork;b.construction.contributions={king:b.construction.requiredWork};const done=s.constructionSystem.finish(b);for(const [rid,r] of [...s.foodStorage.reservations])if(r.siteId===id)s.foodStorage.release(rid);return done;},id);
 await page.goto(url);await page.waitForFunction(()=>window.__game?.registry.get('application'));
 await page.evaluate(()=>{const app=window.__game.registry.get('application');app.start(null,{...app.setup.value(),worldCode:'MKW5-155515555555-1'});});
 await page.waitForFunction(()=>window.__game.registry.get('application').scene?.lightFuel&&window.__game.registry.get('application').scene?.workerSystem);await page.waitForTimeout(1500);
@@ -40,6 +40,9 @@ for(let i=0;i<Number(process.env.STEPS??16);i++){
     const w=s.workerSystem.liveWorkers().find(w=>w.assignedWorkplaceId===id);
     return {t:Math.round(s.gameTime.totalElapsed/1000),pitch:st.available('pitch'),torch:st.available('torch'),wood:st.available('wood'),recipe:r?.recipe,cycle:r?.cycle?Math.round(r.cycle.progress*100):null,
       input:st.locations.get(`input-${id}`)?.stock,output:st.locations.get(`output-${id}`)?.stock,worker:w&&`${w.profession}:${w.workState}:${w.workMessage}`,made:r?.nextCycle};},kiln.id);
+  // The game must stay saveable in every state of the kiln (owner 13 Nov: save check 'food' failed).
+  const saveError=await page.evaluate(()=>{const app=window.__game.registry.get('application');const log=console.error;let detail='';console.error=(...a)=>{detail=a.map(x=>(x?.stack??String(x)).split("\n").slice(0,4).join(" @ ")).join(" ");};try{app.snapshot();return null;}catch(e){return `${e.message} | ${detail}`;}finally{console.error=log;}});
+  if(saveError){row.saveError=saveError;fail??=`save failed: ${saveError}`;}
   console.log(JSON.stringify(row));
   // Stuck = no batch running, products lying in the output buffer and the Pitch Maker not resting, three samples in a row.
   stuck=!row.cycle&&Object.values(row.output??{}).some(n=>n>0)&&!/Resting/.test(row.worker)?stuck+1:0;if(stuck>=3)fail='output buffer stuck';

@@ -162,7 +162,7 @@ export class FoodProductionSystem {
     // carry out whatever lies there, the current recipe's product first.
     for(const resource of this.outputResources(outputId,outputResource)){
       const outputAvailable=this.storage.free(outputId,resource),own=resource===outputResource;
-      let cap=own?this.storage.reservations.get(record.outputReservation):null,destination=cap&&this.storage.locations.get(cap.locationId);
+      let cap=this.storage.reservations.get(record.outputReservation);if(cap?.resource!==resource)cap=null;let destination=cap&&this.storage.locations.get(cap.locationId);
       if(!destination){const route=this.storage.findDestination(worker,resource,Math.min(outputAvailable,carryCapacity(worker,resource)));if(route)destination=route.location;}
       if(destination&&!this.scene.logisticsTasks?.waitForHauler(building,'output')&&this.move(worker,outputId,destination.id,resource,Math.min(outputAvailable,carryCapacity(worker,resource)),{capacityReservation:cap?.id,outputBuildingId:building.id}))return;
     }

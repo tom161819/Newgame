@@ -82,7 +82,11 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     check(r.nextCycle===1+r.completed+(r.cycle?1:0));
     // S12: a workshop with recipe choices keeps the chosen one; a running batch keeps the recipe it started with.
     const d=registry.require(b.type);if(d.recipes){check(Object.hasOwn(d.recipes,r.recipe));if(r.cycle)check(Object.hasOwn(d.recipes,r.cycle.recipe));}else check(r.recipe===undefined&&r.cycle?.recipe===undefined);
-    const key=r.cycle?.recipe??r.recipe,recipe=recipeFor(d,key),[outId,current]=Object.entries(recipe.output)[0],held=id=>reservations.get(id)?.amount;
+    // Fix (owner 13 Nov, save check "food"): a finished batch waiting in the output keeps the recipe it was made with,
+    // also after the workshop switched to another one (Pitch Kiln: Torches wait, the kiln is back on Pitch).
+    const waitingResource=!r.cycle&&r.outputReservation&&d.recipes?reservations.get(r.outputReservation)?.resource:null;
+    const waitingKey=waitingResource?Object.keys(d.recipes).find(k=>Object.keys(d.recipes[k].output)[0]===waitingResource):null;
+    const key=r.cycle?.recipe??waitingKey??r.recipe,recipe=recipeFor(d,key),[outId,current]=Object.entries(recipe.output)[0],held=id=>reservations.get(id)?.amount;
     // m-ukladani-chyba: a batch started under an earlier balance (RECIPE_HISTORY) is valid with the recipe it started with.
     const variants=recipeVariants(b.type,d.recipes?key:undefined,recipe).filter(v=>Object.keys(v.output)[0]===outId);
     const same=(a,b)=>{const ka=Object.keys(a),kb=Object.keys(b);return ka.length===kb.length&&ka.every(k=>a[k]===b[k]);};
