@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "assetId": "pitch-kiln",
+  "variantId": "pitch-kiln-gpt-0",
+  "name": "GPT pitch works (Smolárna) 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "2d99957e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 192,
+  "height": 150,
+  "anchor": {
+    "x": 92,
+    "y": 101
+  },
+  "origin": {
+    "x": 0.47917,
+    "y": 0.67333
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 92,
+    "y": 149
+  },
+  "baseOrigin": {
+    "x": 0.47917,
+    "y": 0.99333
+  },
+  "visualHeight": 149,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -75,
+      "y": -73,
+      "color": "#ffb25a",
+      "radius": 96,
+      "intensity": 0.9,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 0.6
+    },
+    {
+      "type": "brazier",
+      "x": 60,
+      "y": -42,
+      "color": "#ff9d4a",
+      "radius": 110,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 1
+    }
+  ],
+  "modelHeight": 2.14,
+  "lights": [],
+  "x2": {
+    "width": 384,
+    "height": 300,
+    "anchor": {
+      "x": 184,
+      "y": 202
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

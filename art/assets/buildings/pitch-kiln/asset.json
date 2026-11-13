@@ -103,6 +103,398 @@
           }
         ]
       }
+    },
+    {
+      "id": "pitch-kiln-gpt-0",
+      "name": "GPT pitch works (Smolárna) 0° (front-right)",
+      "version": 1,
+      "notes": "Stone pitch works with an arched gate, a lean-to with a cauldron over fire, pitch barrels, torches and a wood store on a paved base. Painted chimney smoke and the sheet's title badge removed. Its paved base is 3 × 3 (the game Pitch Kiln is 2 × 2): decide before it goes into the game. View 0° (front-right), cut out of the owner's GPT sheet and scaled to 0.31 (paved base = 3 × 3; gate ≈ 45 px; 2× file at 0.62). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "stone",
+          "roofMaterial": "roof_shingle",
+          "width": 1.75,
+          "depth": 1.15,
+          "wallHeight": 0.95,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 2,
+          "chimney": true,
+          "at": [
+            -0.4,
+            -0.5
+          ]
+        },
+        "props": [
+          {
+            "type": "oven",
+            "at": [
+              0.95,
+              -0.75
+            ]
+          },
+          {
+            "type": "tarCauldron",
+            "at": [
+              0.95,
+              0.05
+            ]
+          },
+          {
+            "type": "tarBarrels",
+            "at": [
+              0.8,
+              0.75
+            ],
+            "count": 4
+          },
+          {
+            "type": "torchBundle",
+            "at": [
+              0.15,
+              0.95
+            ]
+          },
+          {
+            "type": "torchBundle",
+            "at": [
+              -0.1,
+              1.1
+            ]
+          },
+          {
+            "type": "stumpPile",
+            "at": [
+              -1,
+              0.95
+            ]
+          },
+          {
+            "type": "billets",
+            "at": [
+              -0.55,
+              0.85
+            ],
+            "r": 1.5708
+          },
+          {
+            "type": "lanternPole",
+            "at": [
+              1.25,
+              1.25
+            ]
+          },
+          {
+            "type": "groundPatch",
+            "at": [
+              0.3,
+              0.55
+            ],
+            "width": 2.4,
+            "depth": 0.9
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "pitch-kiln-gpt-90",
+      "name": "GPT pitch works (Smolárna) 90° (rear-right)",
+      "version": 1,
+      "notes": "Stone pitch works with an arched gate, a lean-to with a cauldron over fire, pitch barrels, torches and a wood store on a paved base. Painted chimney smoke and the sheet's title badge removed. Its paved base is 3 × 3 (the game Pitch Kiln is 2 × 2): decide before it goes into the game. View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 0.31 (paved base = 3 × 3; gate ≈ 45 px; 2× file at 0.62). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "stone",
+          "roofMaterial": "roof_shingle",
+          "width": 1.75,
+          "depth": 1.15,
+          "wallHeight": 0.95,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 2,
+          "chimney": true,
+          "at": [
+            -0.4,
+            -0.5
+          ]
+        },
+        "props": [
+          {
+            "type": "oven",
+            "at": [
+              0.95,
+              -0.75
+            ]
+          },
+          {
+            "type": "tarCauldron",
+            "at": [
+              0.95,
+              0.05
+            ]
+          },
+          {
+            "type": "tarBarrels",
+            "at": [
+              0.8,
+              0.75
+            ],
+            "count": 4
+          },
+          {
+            "type": "torchBundle",
+            "at": [
+              0.15,
+              0.95
+            ]
+          },
+          {
+            "type": "torchBundle",
+            "at": [
+              -0.1,
+              1.1
+            ]
+          },
+          {
+            "type": "stumpPile",
+            "at": [
+              -1,
+              0.95
+            ]
+          },
+          {
+            "type": "billets",
+            "at": [
+              -0.55,
+              0.85
+            ],
+            "r": 1.5708
+          },
+          {
+            "type": "lanternPole",
+            "at": [
+              1.25,
+              1.25
+            ]
+          },
+          {
+            "type": "groundPatch",
+            "at": [
+              0.3,
+              0.55
+            ],
+            "width": 2.4,
+            "depth": 0.9
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "pitch-kiln-gpt-180",
+      "name": "GPT pitch works (Smolárna) 180° (rear-left)",
+      "version": 1,
+      "notes": "Stone pitch works with an arched gate, a lean-to with a cauldron over fire, pitch barrels, torches and a wood store on a paved base. Painted chimney smoke and the sheet's title badge removed. Its paved base is 3 × 3 (the game Pitch Kiln is 2 × 2): decide before it goes into the game. View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 0.31 (paved base = 3 × 3; gate ≈ 45 px; 2× file at 0.62). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "stone",
+          "roofMaterial": "roof_shingle",
+          "width": 1.75,
+          "depth": 1.15,
+          "wallHeight": 0.95,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 2,
+          "chimney": true,
+          "at": [
+            -0.4,
+            -0.5
+          ]
+        },
+        "props": [
+          {
+            "type": "oven",
+            "at": [
+              0.95,
+              -0.75
+            ]
+          },
+          {
+            "type": "tarCauldron",
+            "at": [
+              0.95,
+              0.05
+            ]
+          },
+          {
+            "type": "tarBarrels",
+            "at": [
+              0.8,
+              0.75
+            ],
+            "count": 4
+          },
+          {
+            "type": "torchBundle",
+            "at": [
+              0.15,
+              0.95
+            ]
+          },
+          {
+            "type": "torchBundle",
+            "at": [
+              -0.1,
+              1.1
+            ]
+          },
+          {
+            "type": "stumpPile",
+            "at": [
+              -1,
+              0.95
+            ]
+          },
+          {
+            "type": "billets",
+            "at": [
+              -0.55,
+              0.85
+            ],
+            "r": 1.5708
+          },
+          {
+            "type": "lanternPole",
+            "at": [
+              1.25,
+              1.25
+            ]
+          },
+          {
+            "type": "groundPatch",
+            "at": [
+              0.3,
+              0.55
+            ],
+            "width": 2.4,
+            "depth": 0.9
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "pitch-kiln-gpt-270",
+      "name": "GPT pitch works (Smolárna) 270° (front-left)",
+      "version": 1,
+      "notes": "Stone pitch works with an arched gate, a lean-to with a cauldron over fire, pitch barrels, torches and a wood store on a paved base. Painted chimney smoke and the sheet's title badge removed. Its paved base is 3 × 3 (the game Pitch Kiln is 2 × 2): decide before it goes into the game. View 270° (front-left), cut out of the owner's GPT sheet and scaled to 0.31 (paved base = 3 × 3; gate ≈ 45 px; 2× file at 0.62). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "stone",
+          "roofMaterial": "roof_shingle",
+          "width": 1.75,
+          "depth": 1.15,
+          "wallHeight": 0.95,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 2,
+          "chimney": true,
+          "at": [
+            -0.4,
+            -0.5
+          ]
+        },
+        "props": [
+          {
+            "type": "oven",
+            "at": [
+              0.95,
+              -0.75
+            ]
+          },
+          {
+            "type": "tarCauldron",
+            "at": [
+              0.95,
+              0.05
+            ]
+          },
+          {
+            "type": "tarBarrels",
+            "at": [
+              0.8,
+              0.75
+            ],
+            "count": 4
+          },
+          {
+            "type": "torchBundle",
+            "at": [
+              0.15,
+              0.95
+            ]
+          },
+          {
+            "type": "torchBundle",
+            "at": [
+              -0.1,
+              1.1
+            ]
+          },
+          {
+            "type": "stumpPile",
+            "at": [
+              -1,
+              0.95
+            ]
+          },
+          {
+            "type": "billets",
+            "at": [
+              -0.55,
+              0.85
+            ],
+            "r": 1.5708
+          },
+          {
+            "type": "lanternPole",
+            "at": [
+              1.25,
+              1.25
+            ]
+          },
+          {
+            "type": "groundPatch",
+            "at": [
+              0.3,
+              0.55
+            ],
+            "width": 2.4,
+            "depth": 0.9
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }

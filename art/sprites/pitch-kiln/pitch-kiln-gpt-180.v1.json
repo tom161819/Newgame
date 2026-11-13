@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "pitch-kiln",
+  "variantId": "pitch-kiln-gpt-180",
+  "name": "GPT pitch works (Smolárna) 180° (rear-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "2d99957e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 193,
+  "height": 151,
+  "anchor": {
+    "x": 96,
+    "y": 100
+  },
+  "origin": {
+    "x": 0.49741,
+    "y": 0.66225
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 96,
+    "y": 148
+  },
+  "baseOrigin": {
+    "x": 0.49741,
+    "y": 0.98013
+  },
+  "visualHeight": 148,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.14,
+  "lights": [],
+  "x2": {
+    "width": 386,
+    "height": 302,
+    "anchor": {
+      "x": 192,
+      "y": 200
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

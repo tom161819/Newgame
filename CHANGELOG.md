@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.115.4] - 2026-11-13
+<!-- version: {"title":"GPT pitch works in the Asset Studio","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Asset Studio: the owner's GPT pitch works (Smolárna) in four views for review.
+
 ## [0.115.3] - 2026-11-13
 <!-- version: {"title":"GPT hunting hut in the Asset Studio","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added
