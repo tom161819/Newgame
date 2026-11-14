@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "pitch-kiln",
+  "variantId": "pitch-kiln-render-90",
+  "name": "Stone pitch works with tiled roof 90° (rear-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "2d99957e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 191,
+  "height": 150,
+  "anchor": {
+    "x": 95,
+    "y": 99
+  },
+  "origin": {
+    "x": 0.49738,
+    "y": 0.66
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 95,
+    "y": 147
+  },
+  "baseOrigin": {
+    "x": 0.49738,
+    "y": 0.98
+  },
+  "visualHeight": 147,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.14,
+  "lights": [],
+  "x2": {
+    "width": 382,
+    "height": 300,
+    "anchor": {
+      "x": 190,
+      "y": 198
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

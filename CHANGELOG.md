@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.119.4] - 2026-11-14
+<!-- version: {"title":"Asset Studio: Pitch Kiln render for review","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Asset Studio: stone Pitch Kiln with a tiled roof from the owner's renders (4 views) for review. The game still uses the current one.
+
 ## [0.119.3] - 2026-11-14
 <!-- version: {"title":"Asset Studio: Fisherman's Hut render for review","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

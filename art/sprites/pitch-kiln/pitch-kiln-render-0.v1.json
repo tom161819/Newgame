@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "assetId": "pitch-kiln",
+  "variantId": "pitch-kiln-render-0",
+  "name": "Stone pitch works with tiled roof 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "2d99957e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 191,
+  "height": 155,
+  "anchor": {
+    "x": 95,
+    "y": 104
+  },
+  "origin": {
+    "x": 0.49738,
+    "y": 0.67097
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 95,
+    "y": 152
+  },
+  "baseOrigin": {
+    "x": 0.49738,
+    "y": 0.98065
+  },
+  "visualHeight": 152,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -73,
+      "y": -92,
+      "color": "#ffb25a",
+      "radius": 90,
+      "intensity": 0.85,
+      "flicker": {
+        "amplitude": 0.1,
+        "speed": 6
+      },
+      "flameSize": 0.5
+    },
+    {
+      "type": "brazier",
+      "x": 46,
+      "y": -43,
+      "color": "#ff9d4a",
+      "radius": 110,
+      "intensity": 1,
+      "flicker": {
+        "amplitude": 0.16,
+        "speed": 5.5
+      },
+      "flameSize": 0.9
+    }
+  ],
+  "modelHeight": 2.14,
+  "lights": [],
+  "x2": {
+    "width": 382,
+    "height": 310,
+    "anchor": {
+      "x": 190,
+      "y": 208
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

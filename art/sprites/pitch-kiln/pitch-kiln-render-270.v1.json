@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "pitch-kiln",
+  "variantId": "pitch-kiln-render-270",
+  "name": "Stone pitch works with tiled roof 270° (front-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "2d99957e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 192,
+  "height": 158,
+  "anchor": {
+    "x": 96,
+    "y": 107
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.67722
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 96,
+    "y": 155
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.98101
+  },
+  "visualHeight": 155,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.14,
+  "lights": [],
+  "x2": {
+    "width": 384,
+    "height": 316,
+    "anchor": {
+      "x": 192,
+      "y": 214
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}
