@@ -298,6 +298,434 @@
           }
         ]
       }
+    },
+    {
+      "id": "village-green-render-0",
+      "name": "Paved green with tree, bell and notice board 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): a round cobbled square on bare ground with a big tree and a bench around it, a small bell tower with a shingle roof and a notice board. Drawn for 4 × 4 (owner: \"rozměr 4x4\"); the game Village Green is 3 × 3 now. View 0° (front-right), cut out of the owner's render and scaled to 0.272 wide and 0.239 high (the render's view is a little steeper than the game's). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "groundPatch",
+            "at": [
+              0.1,
+              0.1
+            ],
+            "width": 1.5,
+            "depth": 1.5,
+            "material": "soil"
+          },
+          {
+            "type": "stones",
+            "at": [
+              0.1,
+              0.1
+            ],
+            "count": 7,
+            "spread": 0.95,
+            "material": "fieldstone"
+          },
+          {
+            "type": "greenTree",
+            "at": [
+              -0.15,
+              -0.2
+            ],
+            "size": 1.35
+          },
+          {
+            "type": "ropeSwing",
+            "at": [
+              0.05,
+              0.05
+            ],
+            "height": 0.6
+          },
+          {
+            "type": "stoneWell",
+            "at": [
+              0.85,
+              -0.75
+            ]
+          },
+          {
+            "type": "bench",
+            "at": [
+              -0.75,
+              0.55
+            ],
+            "length": 0.5
+          },
+          {
+            "type": "bench",
+            "at": [
+              0.35,
+              0.85
+            ],
+            "length": 0.5,
+            "r": 1.5708
+          },
+          {
+            "type": "flowerBed",
+            "at": [
+              -0.95,
+              -0.95
+            ]
+          },
+          {
+            "type": "ball",
+            "at": [
+              0.65,
+              0.45
+            ]
+          },
+          {
+            "type": "hoop",
+            "at": [
+              -0.4,
+              0.9
+            ]
+          },
+          {
+            "type": "stones",
+            "at": [
+              1.1,
+              1.05
+            ],
+            "count": 5
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "village-green-render-90",
+      "name": "Paved green with tree, bell and notice board 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): a round cobbled square on bare ground with a big tree and a bench around it, a small bell tower with a shingle roof and a notice board. Drawn for 4 × 4 (owner: \"rozměr 4x4\"); the game Village Green is 3 × 3 now. View 90° (rear-right), cut out of the owner's render and scaled to 0.272 wide and 0.239 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "groundPatch",
+            "at": [
+              0.1,
+              0.1
+            ],
+            "width": 1.5,
+            "depth": 1.5,
+            "material": "soil"
+          },
+          {
+            "type": "stones",
+            "at": [
+              0.1,
+              0.1
+            ],
+            "count": 7,
+            "spread": 0.95,
+            "material": "fieldstone"
+          },
+          {
+            "type": "greenTree",
+            "at": [
+              -0.15,
+              -0.2
+            ],
+            "size": 1.35
+          },
+          {
+            "type": "ropeSwing",
+            "at": [
+              0.05,
+              0.05
+            ],
+            "height": 0.6
+          },
+          {
+            "type": "stoneWell",
+            "at": [
+              0.85,
+              -0.75
+            ]
+          },
+          {
+            "type": "bench",
+            "at": [
+              -0.75,
+              0.55
+            ],
+            "length": 0.5
+          },
+          {
+            "type": "bench",
+            "at": [
+              0.35,
+              0.85
+            ],
+            "length": 0.5,
+            "r": 1.5708
+          },
+          {
+            "type": "flowerBed",
+            "at": [
+              -0.95,
+              -0.95
+            ]
+          },
+          {
+            "type": "ball",
+            "at": [
+              0.65,
+              0.45
+            ]
+          },
+          {
+            "type": "hoop",
+            "at": [
+              -0.4,
+              0.9
+            ]
+          },
+          {
+            "type": "stones",
+            "at": [
+              1.1,
+              1.05
+            ],
+            "count": 5
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "village-green-render-180",
+      "name": "Paved green with tree, bell and notice board 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): a round cobbled square on bare ground with a big tree and a bench around it, a small bell tower with a shingle roof and a notice board. Drawn for 4 × 4 (owner: \"rozměr 4x4\"); the game Village Green is 3 × 3 now. View 180° (rear-left), cut out of the owner's render and scaled to 0.272 wide and 0.239 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "groundPatch",
+            "at": [
+              0.1,
+              0.1
+            ],
+            "width": 1.5,
+            "depth": 1.5,
+            "material": "soil"
+          },
+          {
+            "type": "stones",
+            "at": [
+              0.1,
+              0.1
+            ],
+            "count": 7,
+            "spread": 0.95,
+            "material": "fieldstone"
+          },
+          {
+            "type": "greenTree",
+            "at": [
+              -0.15,
+              -0.2
+            ],
+            "size": 1.35
+          },
+          {
+            "type": "ropeSwing",
+            "at": [
+              0.05,
+              0.05
+            ],
+            "height": 0.6
+          },
+          {
+            "type": "stoneWell",
+            "at": [
+              0.85,
+              -0.75
+            ]
+          },
+          {
+            "type": "bench",
+            "at": [
+              -0.75,
+              0.55
+            ],
+            "length": 0.5
+          },
+          {
+            "type": "bench",
+            "at": [
+              0.35,
+              0.85
+            ],
+            "length": 0.5,
+            "r": 1.5708
+          },
+          {
+            "type": "flowerBed",
+            "at": [
+              -0.95,
+              -0.95
+            ]
+          },
+          {
+            "type": "ball",
+            "at": [
+              0.65,
+              0.45
+            ]
+          },
+          {
+            "type": "hoop",
+            "at": [
+              -0.4,
+              0.9
+            ]
+          },
+          {
+            "type": "stones",
+            "at": [
+              1.1,
+              1.05
+            ],
+            "count": 5
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "village-green-render-270",
+      "name": "Paved green with tree, bell and notice board 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): a round cobbled square on bare ground with a big tree and a bench around it, a small bell tower with a shingle roof and a notice board. Drawn for 4 × 4 (owner: \"rozměr 4x4\"); the game Village Green is 3 × 3 now. View 270° (front-left), cut out of the owner's render and scaled to 0.272 wide and 0.239 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "groundPatch",
+            "at": [
+              0.1,
+              0.1
+            ],
+            "width": 1.5,
+            "depth": 1.5,
+            "material": "soil"
+          },
+          {
+            "type": "stones",
+            "at": [
+              0.1,
+              0.1
+            ],
+            "count": 7,
+            "spread": 0.95,
+            "material": "fieldstone"
+          },
+          {
+            "type": "greenTree",
+            "at": [
+              -0.15,
+              -0.2
+            ],
+            "size": 1.35
+          },
+          {
+            "type": "ropeSwing",
+            "at": [
+              0.05,
+              0.05
+            ],
+            "height": 0.6
+          },
+          {
+            "type": "stoneWell",
+            "at": [
+              0.85,
+              -0.75
+            ]
+          },
+          {
+            "type": "bench",
+            "at": [
+              -0.75,
+              0.55
+            ],
+            "length": 0.5
+          },
+          {
+            "type": "bench",
+            "at": [
+              0.35,
+              0.85
+            ],
+            "length": 0.5,
+            "r": 1.5708
+          },
+          {
+            "type": "flowerBed",
+            "at": [
+              -0.95,
+              -0.95
+            ]
+          },
+          {
+            "type": "ball",
+            "at": [
+              0.65,
+              0.45
+            ]
+          },
+          {
+            "type": "hoop",
+            "at": [
+              -0.4,
+              0.9
+            ]
+          },
+          {
+            "type": "stones",
+            "at": [
+              1.1,
+              1.05
+            ],
+            "count": 5
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }

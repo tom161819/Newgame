@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "village-green",
+  "variantId": "village-green-render-270",
+  "name": "Paved green with tree, bell and notice board 270° (front-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "1017e4b6",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 257,
+  "height": 166,
+  "anchor": {
+    "x": 128,
+    "y": 99
+  },
+  "origin": {
+    "x": 0.49805,
+    "y": 0.59639
+  },
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "base": {
+    "x": 128,
+    "y": 163
+  },
+  "baseOrigin": {
+    "x": 0.49805,
+    "y": 0.98193
+  },
+  "visualHeight": 163,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.066,
+  "lights": [],
+  "x2": {
+    "width": 514,
+    "height": 332,
+    "anchor": {
+      "x": 256,
+      "y": 198
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

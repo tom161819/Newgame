@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.125.3] - 2026-11-14
+<!-- version: {"title":"Studio: Village Green render","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Asset Studio: the owner's render of a new Village Green (cobbled round square with a tree and bench, a bell and a notice board; four views, drawn for 4 × 4) waits for review. The game is unchanged.
+
 ## [0.125.2] - 2026-11-14
 <!-- version: {"title":"Well and Fountain: cut repaired","type":"fix","reconstructed":false,"saveVersion":62} -->
 ### Fixed
