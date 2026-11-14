@@ -142,7 +142,7 @@
       "id": "stables-gpt-0",
       "name": "GPT thatched stables with paddock 0° (front-right)",
       "version": 1,
-      "notes": "Thatched timber stable with a gate (horseshoe above it, torch beside it), three open stalls, a stone water trough, a hay rack and a fenced paddock. Footprint 8 × 6 (owner 14 Nov 2026; the game Stables are 5 × 5): decide before it goes into the game. View 0° (front-right), cut out of the owner's GPT sheet and scaled to 0.9 wide and 0.81 high (the sheet's view is a little steeper than the game's; gate ≈ 42 px; fenced yard = 8 × 6; 2× file enlarged from the sheet). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "notes": "Thatched timber stable with a gate (horseshoe above it, torch beside it), three open stalls, a stone water trough, a hay rack and a fenced paddock. Footprint 6 × 8 (owner 14 Nov 2026; the game Stables are 5 × 5): decide before it goes into the game. View 0° (front-right), cut out of the owner's GPT sheet and scaled to 0.9 wide and 0.81 high (the sheet's view is a little steeper than the game's; gate ≈ 42 px; fenced yard = 6 × 8 (6 wide, 8 deep); 2× file enlarged from the sheet). Front corner of the plinth set by hand; this view is the one the game uses.",
       "spec": {
         "body": {
           "kind": "house",
@@ -275,7 +275,7 @@
       "id": "stables-gpt-90",
       "name": "GPT thatched stables with paddock 90° (rear-right)",
       "version": 1,
-      "notes": "Thatched timber stable with a gate (horseshoe above it, torch beside it), three open stalls, a stone water trough, a hay rack and a fenced paddock. Footprint 8 × 6 (owner 14 Nov 2026; the game Stables are 5 × 5): decide before it goes into the game. View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 0.9 wide and 0.81 high (the sheet's view is a little steeper than the game's; gate ≈ 42 px; fenced yard = 8 × 6; 2× file enlarged from the sheet). Footprint corner estimated from the image bottom.",
+      "notes": "Thatched timber stable with a gate (horseshoe above it, torch beside it), three open stalls, a stone water trough, a hay rack and a fenced paddock. Footprint 6 × 8 (owner 14 Nov 2026; the game Stables are 5 × 5): decide before it goes into the game. View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 0.9 wide and 0.81 high (the sheet's view is a little steeper than the game's; gate ≈ 42 px; fenced yard = 6 × 8 (6 wide, 8 deep); 2× file enlarged from the sheet). Footprint corner estimated from the image bottom.",
       "spec": {
         "body": {
           "kind": "house",
@@ -408,7 +408,7 @@
       "id": "stables-gpt-180",
       "name": "GPT thatched stables with paddock 180° (rear-left)",
       "version": 1,
-      "notes": "Thatched timber stable with a gate (horseshoe above it, torch beside it), three open stalls, a stone water trough, a hay rack and a fenced paddock. Footprint 8 × 6 (owner 14 Nov 2026; the game Stables are 5 × 5): decide before it goes into the game. View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 0.9 wide and 0.81 high (the sheet's view is a little steeper than the game's; gate ≈ 42 px; fenced yard = 8 × 6; 2× file enlarged from the sheet). Footprint corner estimated from the image bottom.",
+      "notes": "Thatched timber stable with a gate (horseshoe above it, torch beside it), three open stalls, a stone water trough, a hay rack and a fenced paddock. Footprint 6 × 8 (owner 14 Nov 2026; the game Stables are 5 × 5): decide before it goes into the game. View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 0.9 wide and 0.81 high (the sheet's view is a little steeper than the game's; gate ≈ 42 px; fenced yard = 6 × 8 (6 wide, 8 deep); 2× file enlarged from the sheet). Footprint corner estimated from the image bottom.",
       "spec": {
         "body": {
           "kind": "house",
@@ -541,7 +541,7 @@
       "id": "stables-gpt-270",
       "name": "GPT thatched stables with paddock 270° (front-left)",
       "version": 1,
-      "notes": "Thatched timber stable with a gate (horseshoe above it, torch beside it), three open stalls, a stone water trough, a hay rack and a fenced paddock. Footprint 8 × 6 (owner 14 Nov 2026; the game Stables are 5 × 5): decide before it goes into the game. View 270° (front-left), cut out of the owner's GPT sheet and scaled to 0.9 wide and 0.81 high (the sheet's view is a little steeper than the game's; gate ≈ 42 px; fenced yard = 8 × 6; 2× file enlarged from the sheet). Footprint corner estimated from the image bottom.",
+      "notes": "Thatched timber stable with a gate (horseshoe above it, torch beside it), three open stalls, a stone water trough, a hay rack and a fenced paddock. Footprint 6 × 8 (owner 14 Nov 2026; the game Stables are 5 × 5): decide before it goes into the game. View 270° (front-left), cut out of the owner's GPT sheet and scaled to 0.9 wide and 0.81 high (the sheet's view is a little steeper than the game's; gate ≈ 42 px; fenced yard = 6 × 8 (6 wide, 8 deep); 2× file enlarged from the sheet). Footprint corner estimated from the image bottom.",
       "spec": {
         "body": {
           "kind": "house",

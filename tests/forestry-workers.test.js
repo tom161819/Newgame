@@ -20,8 +20,8 @@ function hauler(s){for(let y=46;y<55;y++)for(let x=40;x<45;x++)if(s.map[y][x]===
 const pileWood=s=>[...s.foodStorage.locations.values()].filter(l=>l.kind==='pile').reduce((n,l)=>n+(l.stock.wood??0),0);
 const totalWood=s=>s.inventory.count('wood')+pileWood(s)+[...s.dropSystem.drops.values()].filter(d=>d.resource==='wood').reduce((n,d)=>n+d.amount,0)+s.workerSystem.liveWorkers().filter(w=>w.cargo?.resource==='wood').reduce((n,w)=>n+w.cargo.amount,0);
 
-test('Lumberjack Hut uses 6 Wood (0.49),2×2,one actual seat (tabulka-budov-1) and waits for blueprint completion',()=>{
-  const s=fixture(),b=hut(s),d=b.definition;assert.equal(s.inventory.count('wood'),0);assert.equal(b.tiles.length,4);assert.equal(d.workRadius,18);assert.deepEqual(d.workplace,{capacity:1,profession:'woodcutter',skill:'woodcutting'});
+test('Lumberjack Hut uses 6 Wood (0.49),4×2 (owner 14 Nov 2026),one actual seat (tabulka-budov-1) and waits for blueprint completion',()=>{
+  const s=fixture(),b=hut(s),d=b.definition;assert.equal(s.inventory.count('wood'),0);assert.equal(b.tiles.length,8);assert.equal(d.workRadius,18);assert.deepEqual(d.workplace,{capacity:1,profession:'woodcutter',skill:'woodcutting'});
   s.workplaceSystem.records.delete(b.id);s.constructionSystem.plan(b);const w=s.workerSystem.create({x:42,y:46});assert.equal(s.workplaceSystem.assign(b,w),false);s.tick(100);assert.equal(w.profession,'idle');assert.equal(s.inventory.count('wood'),0);
 });
 test('a Woodcutter reserves real tree/output capacity, approaches, cuts, picks ground Wood and walks to the hut pile',()=>{
@@ -31,7 +31,7 @@ test('a Woodcutter reserves real tree/output capacity, approaches, cuts, picks g
 });
 test('three workers reserve different trees and work positions without duplicating timber or harvest XP',()=>{
   // tabulka-budov-1: one Woodcutter a hut, so three neighbouring huts share the same trees.
-  const s=fixture(),huts=[hut(s),hut(s,{x:41,y:43}),hut(s,{x:44,y:40})],b=huts[0],trees=[tree(s,{x:49,y:42}),tree(s,{x:49,y:45}),tree(s,{x:47,y:48})],workers=huts.map(h=>worker(s,h));hauler(s);until(s,()=>workers.every(w=>w.workTask?.kind==='chopTree'));assert.equal(new Set(workers.map(w=>w.workTask.targetId)).size,3);assert.equal(new Set(workers.map(w=>`${w.workTask.goal.x},${w.workTask.goal.y}`)).size,3);
+  const s=fixture(),huts=[hut(s),hut(s,{x:39,y:43}),hut(s,{x:44,y:38})],b=huts[0],trees=[tree(s,{x:49,y:42}),tree(s,{x:49,y:45}),tree(s,{x:47,y:48})],workers=huts.map(h=>worker(s,h));hauler(s);until(s,()=>workers.every(w=>w.workTask?.kind==='chopTree'));assert.equal(new Set(workers.map(w=>w.workTask.targetId)).size,3);assert.equal(new Set(workers.map(w=>`${w.workTask.goal.x},${w.workTask.goal.y}`)).size,3);
   until(s,()=>trees.every(t=>t.natural.stage===0));assert.equal(totalWood(s),18);until(s,()=>s.inventory.count('wood')===18);s.simulate(5000);assert.equal(totalWood(s),18);assert.equal(huts.reduce((n,h)=>n+s.naturalResources.forestry.summary(h).harvested,0),18);for(const w of workers){assert.equal(w.experience.totalXP,15);assert.equal(w.skills.woodcutting.totalXP,18);}assert.equal(s.foodStorage.reservations.size,0);
 });
 test('a full hut pile prevents a new cutting cycle; releasing capacity permits exactly one real harvest',()=>{

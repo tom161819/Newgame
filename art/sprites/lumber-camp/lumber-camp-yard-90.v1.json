@@ -13,16 +13,16 @@
   "width": 195,
   "height": 149,
   "anchor": {
-    "x": 129,
+    "x": 65,
     "y": 98
   },
   "origin": {
-    "x": 0.66154,
+    "x": 0.33333,
     "y": 0.65772
   },
   "footprint": {
-    "width": 2,
-    "height": 4
+    "width": 4,
+    "height": 2
   },
   "base": {
     "x": 97,
@@ -42,7 +42,7 @@
     "width": 390,
     "height": 298,
     "anchor": {
-      "x": 258,
+      "x": 130,
       "y": 196
     }
   },

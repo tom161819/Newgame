@@ -15,22 +15,22 @@ const horse=(s,tile)=>s.animalSystem.create(s.objectRegistry.require('horse'),ti
 function stablehand(s,stables,tile){const w=s.workerSystem.create(tile);assert.equal(s.workplaceSystem.assign(stables,w),true);assert.equal(w.profession,'stablehand');return w;}
 function until(s,p,max=200000){let t=0;while(!p()&&t<max){s.tick(50);t+=50;}assert.ok(p(),`not reached after ${t} ms`);return t;}
 
-test('Stables: 5×5, 20 Wood (owner price 0.49), one Stablehand (tabulka-budov-1), room for 4 tamed horses; six wild horses at a new game',()=>{
+test('Stables: 6×8 (owner 14 Nov 2026), 20 Wood (owner price 0.49), one Stablehand (tabulka-budov-1), room for 4 tamed horses; six wild horses at a new game',()=>{
   const s=workerScene(),d=s.objectRegistry.require('stables');
-  assert.deepEqual([d.width,d.height,d.cost,d.workplace.capacity,d.workplace.profession,d.horseCapacity],[5,5,{wood:20},1,'stablehand',4]);
+  assert.deepEqual([d.width,d.height,d.cost,d.workplace.capacity,d.workplace.profession,d.horseCapacity],[6,8,{wood:20},1,'stablehand',4]);
   assert.equal(s.objectRegistry.require('horse').gameplay.initialCount,STABLE_RULES.wildHorses);
 });
 
 test('Stablehands tame wild horses on their own and lead them into the paddock; never the same horse twice; Save/Load mid-taming',()=>{
   // tabulka-budov-1: one Stablehand a Stables by default; two seats here test that two never take the same horse.
   objectRegistry.configureWorkplaces({version:1,workplaces:{stables:{capacity:2}}});try{
-  let s=scene();const st=building(s,'stables',50,50),a=stablehand(s,st,{x:49,y:56}),b=stablehand(s,st,{x:51,y:56});
+  let s=scene();const st=building(s,'stables',50,50),a=stablehand(s,st,{x:49,y:56}),b=stablehand(s,st,{x:51,y:58});
   const h1=horse(s,{x:60,y:56}),h2=horse(s,{x:62,y:58});
   until(s,()=>s.stables.jobs.size===2&&[...s.stables.jobs.values()].some(j=>j.phase==='taming'));
   assert.notEqual(s.stables.jobs.get(a.id).horseId,s.stables.jobs.get(b.id).horseId,'each Stablehand has his own horse');
   const saved=validateGameState(serializeGameState(s)),r=scene(false);loadGameState(r,structuredClone(saved));assert.deepEqual(validateGameState(serializeGameState(r)),saved);s=r;
   until(s,()=>s.stables.horses.size===2);
-  for(const id of [h1.id,h2.id]){const animal=s.animalSystem.animals.get(id),t=animal.tile;assert.ok(t.x>=st.x&&t.x<st.x+5&&t.y>=st.y&&t.y<st.y+5,'inside the paddock');assert.equal(s.stables.tamed(animal),true);}
+  for(const id of [h1.id,h2.id]){const animal=s.animalSystem.animals.get(id),t=animal.tile;assert.ok(t.x>=st.x&&t.x<st.x+6&&t.y>=st.y+3&&t.y<st.y+8,'inside the paddock, in front of the stable');assert.equal(s.stables.tamed(animal),true);}
   assert.ok(s.workerSystem.workers.get(a.id).experience.totalXP>=0);
   const later=[...s.animalSystem.animals.values()].map(x=>({...x.tile}));s.tick(5000);assert.deepEqual([...s.animalSystem.animals.values()].map(x=>({...x.tile})),later,'stabled horses stay in the paddock');
   }finally{objectRegistry.configureWorkplaces({version:1,workplaces:{}});}
@@ -66,7 +66,7 @@ test('a Knight needs a free stabled horse: reserved for training, ridden afterwa
 });
 
 test('#163: a blocked way home never loses a tamed horse, and the led horse does not block its Stablehand',()=>{
-  const s=scene(),st=building(s,'stables',50,50),w=stablehand(s,st,{x:49,y:56}),h=horse(s,{x:56,y:58});
+  const s=scene(),st=building(s,'stables',50,50),w=stablehand(s,st,{x:49,y:56}),h=horse(s,{x:60,y:60});
   until(s,()=>s.stables.jobs.get(w.id)?.phase==='leading');
   const job=s.stables.jobs.get(w.id);
   // The horse one step behind is not an obstacle on the Stablehand's own navigation map.

@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.120.0] - 2026-11-14
+<!-- version: {"title":"Approved art: Stables 6 x 8, Lumberjack Hut 4 x 2, Fisherman's Hut, Pitch Kiln","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- New art from the owner's approved pictures: Stables (now 6 × 8 tiles with a paddock), Lumberjack Hut (now 4 × 2 with a saw yard), Fisherman's Hut and Pitch Kiln (both stay 3 × 3). Stables and Lumberjack Huts of older saves keep their old size and show the new picture smaller.
+
 ## [0.119.4] - 2026-11-14
 <!-- version: {"title":"Asset Studio: Pitch Kiln render for review","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

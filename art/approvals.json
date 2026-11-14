@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-13T20:40:52.751642Z",
+  "updatedAt": "2026-11-14T18:01:06.458Z",
   "note": "Committed review state for Asset Studio. Reviewers decide in the shared Studio page; Claude takes the decisions over into this file at the start of a chat.",
   "assets": {
     "armorer": {
@@ -194,25 +194,31 @@
           "decidedBy": "owner (chat)"
         },
         "barracks-hall-gpt-90": {
-          "status": "review",
-          "version": 1,
-          "specHash": "0b7359ac",
+          "approvedAt": "2026-11-14T17:55:07.022Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:40:52.751642Z"
+          "specHash": "0b7359ac",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:07.022Z",
+          "version": 1
         },
         "barracks-hall-gpt-180": {
-          "status": "review",
-          "version": 1,
-          "specHash": "0b7359ac",
+          "approvedAt": "2026-11-14T17:55:07.617Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:40:52.751642Z"
+          "specHash": "0b7359ac",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:07.617Z",
+          "version": 1
         },
         "barracks-hall-gpt-270": {
-          "status": "review",
-          "version": 1,
-          "specHash": "0b7359ac",
+          "approvedAt": "2026-11-14T17:55:08.069Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:40:52.751642Z"
+          "specHash": "0b7359ac",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:08.069Z",
+          "version": 1
         }
       }
     },
@@ -310,39 +316,49 @@
           "version": 1
         },
         "builders-workshop-gpt-wood-270": {
-          "status": "review",
-          "version": 1,
-          "specHash": "260bdc21",
+          "approvedAt": "2026-11-13T20:23:39.904Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:16:13.635528Z"
+          "specHash": "260bdc21",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:39.904Z",
+          "version": 1
         },
         "builders-workshop-gpt-stone-0": {
-          "status": "review",
-          "version": 1,
-          "specHash": "260bdc21",
+          "approvedAt": "2026-11-13T20:23:40.491Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:16:13.635528Z"
+          "specHash": "260bdc21",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.491Z",
+          "version": 1
         },
         "builders-workshop-gpt-stone-90": {
-          "status": "review",
-          "version": 1,
-          "specHash": "260bdc21",
+          "approvedAt": "2026-11-13T20:23:40.972Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:16:13.635528Z"
+          "specHash": "260bdc21",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:40.972Z",
+          "version": 1
         },
         "builders-workshop-gpt-stone-180": {
-          "status": "review",
-          "version": 1,
-          "specHash": "260bdc21",
+          "approvedAt": "2026-11-13T20:23:41.764Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:16:13.635528Z"
+          "specHash": "260bdc21",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:41.764Z",
+          "version": 1
         },
         "builders-workshop-gpt-stone-270": {
-          "status": "review",
-          "version": 1,
-          "specHash": "260bdc21",
+          "approvedAt": "2026-11-13T20:23:42.641Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
           "note": "",
-          "updatedAt": "2026-11-13T20:16:13.635528Z"
+          "specHash": "260bdc21",
+          "status": "approved",
+          "updatedAt": "2026-11-13T20:23:42.641Z",
+          "version": 1
         }
       }
     },
@@ -474,7 +490,7 @@
       }
     },
     "fisherman-hut": {
-      "preferred": "fisherman-hut-gpt-0",
+      "preferred": "fisherman-hut-render-0",
       "variants": {
         "fisherman-hut-stilt-net-loft": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -535,6 +551,42 @@
           "specHash": "69d5e81e",
           "status": "approved",
           "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "fisherman-hut-render-0": {
+          "approvedAt": "2026-11-14T17:55:15.907Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "69d5e81e",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:15.907Z",
+          "version": 1
+        },
+        "fisherman-hut-render-90": {
+          "approvedAt": "2026-11-14T17:55:16.764Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "69d5e81e",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:16.764Z",
+          "version": 1
+        },
+        "fisherman-hut-render-180": {
+          "approvedAt": "2026-11-14T17:55:17.799Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "69d5e81e",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:17.799Z",
+          "version": 1
+        },
+        "fisherman-hut-render-270": {
+          "approvedAt": "2026-11-14T17:55:18.593Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "69d5e81e",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:18.593Z",
           "version": 1
         }
       }
@@ -911,7 +963,7 @@
       }
     },
     "lumber-camp": {
-      "preferred": "lumber-camp-gpt-0",
+      "preferred": "lumber-camp-yard-0",
       "variants": {
         "lumber-camp-hut": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -956,6 +1008,42 @@
           "specHash": "fb16ec6c",
           "status": "approved",
           "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "lumber-camp-yard-0": {
+          "approvedAt": "2026-11-14T17:55:22.049Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fb16ec6c",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:22.049Z",
+          "version": 1
+        },
+        "lumber-camp-yard-90": {
+          "approvedAt": "2026-11-14T17:55:22.543Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fb16ec6c",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:22.543Z",
+          "version": 1
+        },
+        "lumber-camp-yard-180": {
+          "approvedAt": "2026-11-14T17:55:22.969Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fb16ec6c",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:22.969Z",
+          "version": 1
+        },
+        "lumber-camp-yard-270": {
+          "approvedAt": "2026-11-14T17:55:23.396Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "fb16ec6c",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:23.396Z",
           "version": 1
         }
       }
@@ -1011,7 +1099,7 @@
       }
     },
     "pitch-kiln": {
-      "preferred": "pitch-kiln-gpt-0",
+      "preferred": "pitch-kiln-render-0",
       "variants": {
         "pitch-kiln-stone-oven": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -1072,6 +1160,42 @@
           "specHash": "2d99957e",
           "status": "approved",
           "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "pitch-kiln-render-0": {
+          "approvedAt": "2026-11-14T18:00:30.846Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2d99957e",
+          "status": "approved",
+          "updatedAt": "2026-11-14T18:00:30.846Z",
+          "version": 1
+        },
+        "pitch-kiln-render-90": {
+          "approvedAt": "2026-11-14T18:00:31.652Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2d99957e",
+          "status": "approved",
+          "updatedAt": "2026-11-14T18:00:31.652Z",
+          "version": 1
+        },
+        "pitch-kiln-render-180": {
+          "approvedAt": "2026-11-14T18:00:32.169Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2d99957e",
+          "status": "approved",
+          "updatedAt": "2026-11-14T18:00:32.169Z",
+          "version": 1
+        },
+        "pitch-kiln-render-270": {
+          "approvedAt": "2026-11-14T18:00:32.636Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "2d99957e",
+          "status": "approved",
+          "updatedAt": "2026-11-14T18:00:32.636Z",
           "version": 1
         }
       }
@@ -1142,7 +1266,7 @@
       }
     },
     "stables": {
-      "preferred": "stables-shelter",
+      "preferred": "stables-gpt-0",
       "variants": {
         "stables-shelter": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -1152,6 +1276,42 @@
           "updatedAt": "2026-11-07T10:16:36.985Z",
           "version": 1,
           "approvedAt": "2026-11-07T10:16:36.985Z"
+        },
+        "stables-gpt-0": {
+          "approvedAt": "2026-11-14T17:55:29.303Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "03d361a6",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:29.303Z",
+          "version": 1
+        },
+        "stables-gpt-90": {
+          "approvedAt": "2026-11-14T17:55:30.067Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "03d361a6",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:30.067Z",
+          "version": 1
+        },
+        "stables-gpt-180": {
+          "approvedAt": "2026-11-14T17:55:30.555Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "03d361a6",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:30.555Z",
+          "version": 1
+        },
+        "stables-gpt-270": {
+          "approvedAt": "2026-11-14T17:55:31.899Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "",
+          "specHash": "03d361a6",
+          "status": "approved",
+          "updatedAt": "2026-11-14T17:55:31.899Z",
+          "version": 1
         }
       }
     },
