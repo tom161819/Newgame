@@ -4,7 +4,7 @@ export const SKILL_IDS=Object.freeze(Object.keys(SKILLS));
 export const WORK_RULES=Object.freeze({efficiencyPerLevel:.01,miningDuration:1500,searchInterval:500,workRadius:24,
   fleeRatio:.3,recoverRatio:.8,combatXPPerDamage:1,combatXPPerTarget:40});
 // m-start-v2 (owner 7 Nov 2026): the Castle settlement holds 10 people (was 20); Houses add their capacity.
-export const POPULATION=Object.freeze({initial:3,maximum:10,houseCapacity:5,migrantsPerDay:1,wanderRadius:5,recentDeathDays:3});
+export const POPULATION=Object.freeze({initial:3,maximum:10,houseCapacity:5,migrantsPerDay:1,migrantsPerResidents:10,migrantsMaxPerDay:5,wanderRadius:5,recentDeathDays:3});
 export const JOBS=Object.freeze(localizeJobs({
   idle:Object.freeze({portraitColor:'#62655d',name:'Unemployed',skill:null}),
   woodcutter:Object.freeze({portraitColor:'#365e42',name:'Woodcutter',skill:'woodcutting',workplace:'lumberjack_hut',requiresWorkplace:true}),
@@ -25,3 +25,7 @@ export const JOBS=Object.freeze(localizeJobs({
   armorer:Object.freeze({portraitColor:'#58606b',name:'Armorer',skill:'crafting',workplace:'armorer',requiresWorkplace:true}),
   pitch_maker:Object.freeze({portraitColor:'#4a3a2a',name:'Pitch Maker',skill:'crafting',workplace:'pitch_kiln',requiresWorkplace:true}),
 }));
+
+// m-prichody-odchody (owner 14 Nov 2026): a bigger settlement draws more newcomers a day – one, plus one for every
+// ten residents, at most five. Each still settles with the Kingdom Attractiveness chance.
+export const migrantsPerDay=residents=>Math.min(POPULATION.migrantsMaxPerDay,POPULATION.migrantsPerDay+Math.floor(Math.max(0,residents)/POPULATION.migrantsPerResidents));

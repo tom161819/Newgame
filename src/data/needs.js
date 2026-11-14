@@ -42,5 +42,6 @@ export function mainProblem(needs,unpaidPenalty=0,policyLoss=0){
   const worst=losses.filter(l=>['wages','policy'].includes(l.id)||l.value<70).sort((a,b)=>b.loss-a.loss)[0];return worst?worst.id:null;
 }
 
-// #58 phase C2 (S13 §8–9): strikes and emigration.
-export const DISCONTENT=Object.freeze({strikeBelow:25,strikeDays:2,strikeEndsAt:45,emigrateBelow:15,emigrateDays:3,retryMs:5000});
+// #58 phase C2 (S13 §8–9): strikes and emigration. m-prichody-odchody (owner 14 Nov 2026): residents strike and leave
+// sooner – a strike below 35 (was 25), leaving below 25 for two days (was 15 for three).
+export const DISCONTENT=Object.freeze({strikeBelow:35,strikeDays:2,strikeEndsAt:50,emigrateBelow:25,emigrateDays:2,retryMs:5000});

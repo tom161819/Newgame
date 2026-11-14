@@ -3,9 +3,9 @@ import { edgeTiles } from './CaravanSystem.js';
 import { WORK_RULES } from '../data/jobs.js';
 
 // #58 phase C2 (S13 §8–9). The day counters live in the needs records (NeedsSystem.closeDay):
-// - Strike: Happiness below 25 for two whole days. A striker finishes the task in hand, then goes home and does no work
-//   (no goods, no XP, no wages accrue); he keeps profession and workplace and returns to work at Happiness 45.
-// - Emigration: Happiness below 15 for three days. The resident finishes what he carries, gives up his workplace, walks to a
+// - Strike: Happiness below 35 for two whole days. A striker finishes the task in hand, then goes home and does no work
+//   (no goods, no XP, no wages accrue); he keeps profession and workplace and returns to work at Happiness 50.
+// - Emigration: Happiness below 25 for two days. The resident finishes what he carries, gives up his workplace, walks to a
 //   map edge and leaves the kingdom ("Left Kingdom", kept like the dead for wage records; never counted as a death).
 export const DISCONTENT_STATES=Object.freeze(['On Strike','Leaving Kingdom']);
 export class Discontent {

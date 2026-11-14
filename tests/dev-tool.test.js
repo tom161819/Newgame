@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { workerScene } from './helpers/workerScene.js';
 import { gameSettings } from '../src/systems/GameSettings.js';
-import { POPULATION } from '../src/data/jobs.js';
+import { POPULATION,migrantsPerDay } from '../src/data/jobs.js';
 import { DEV_BALANCE_KEYS,DEV_QUICK,devDefault,loadDevBalance,setDevFactor,devFactor,devProduction,resetDevBalance,devBalanceChanged,exportDevBalance,importDevBalance,validDevBalanceState } from '../src/data/devBalance.js';
 import { price } from '../src/data/trade.js';
 import { arrivalForecast,economyOverview,addDevGold,addDevResources,advanceDevDay,summonDevCaravan,addDevResident,devResourceIds } from '../src/systems/DevTools.js';
@@ -18,13 +18,15 @@ const fresh=()=>loadDevBalance(memory());
 // Residents who arrive over `days` new days with the Arrival coefficient (beds and the edge never limit here).
 function arrivals(factor,days=12){
   fresh();setDevFactor('immigration',factor);const s=workerScene();s.workerSystem.capacity=()=>1000;
-  const before=s.workerSystem.liveSubjects().length;for(let d=2;d<2+days;d++)s.workerSystem.onNewDay(d);
+  const before=s.workerSystem.liveSubjects().length;arrivals.start=before;for(let d=2;d<2+days;d++)s.workerSystem.onNewDay(d);
   const n=s.workerSystem.liveSubjects().length-before;s.workerSystem.destroy?.();return n;
 }
 test('m-91: the Arrival coefficient speeds up and slows down arrival proportionally',()=>{
   try{
-    const one=arrivals(1);assert.equal(one,12*POPULATION.migrantsPerDay);
-    assert.equal(arrivals(2),2*one);assert.equal(arrivals(4),4*one);assert.equal(arrivals(.5),one/2);assert.equal(arrivals(.25),one/4);
+    // m-prichody-odchody: the daily number grows with the settlement, so the expected count is walked day by day.
+    const one=arrivals(1),start=arrivals.start,expected=factor=>{let n=start,carry=0;for(let d=0;d<12;d++){const want=migrantsPerDay(n)*factor+carry,come=Math.floor(want+1e-9);carry=want-come;n+=come;}return n-start;};
+    assert.ok(one>=12*POPULATION.migrantsPerDay);
+    for(const factor of [1,2,4,.5,.25])assert.equal(arrivals(factor),expected(factor));assert.ok(arrivals(2)>one&&arrivals(.5)<one);
   }finally{fresh();}
 });
 test('m-91: the forecast gives the next resident in game hours and what limits arrival',()=>{

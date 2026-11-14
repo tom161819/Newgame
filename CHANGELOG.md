@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.123.0] - 2026-11-14
+<!-- version: {"title":"Arrivals and departures rework","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- Newcomers: a bigger settlement draws more people a day – one, plus one for every ten residents, at most five. Each still settles with the Kingdom Attractiveness chance.
+- Unhappy residents act sooner: a strike after two days below Happiness 35 (was 25), leaving after two days below 25 (was three days below 15). A striker returns at Happiness 50 (was 45).
+### Fixed
+- The building window no longer shows a second, dead "Building store" section left over from the game played before (after loading or starting another game).
+
 ## [0.122.1] - 2026-11-14
 <!-- version: {"title":"Sight border: slivers and hairlines on lifted ground","type":"fix","reconstructed":false,"saveVersion":62} -->
 ### Fixed

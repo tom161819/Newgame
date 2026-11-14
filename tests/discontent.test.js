@@ -14,20 +14,20 @@ function world(){
 }
 const until=(s,p,max=200000)=>{let n=0;while(!p()&&n<max){s.tick(50);n+=50;}assert.ok(p(),`not reached after ${n} ms`);};
 
-test('two whole days below 25 start a strike: no work, no wages; Happiness 45 ends it', () => {
+test('two whole days below 35 start a strike: no work, no wages; Happiness 50 ends it', () => {
   const {s,w,feed,set,endDay}=world();s.needs.step(1000);
-  set(20);endDay();assert.equal(s.needs.records.get(w.id).strike,false,'one day is not enough');
+  set(30);endDay();assert.equal(s.needs.records.get(w.id).strike,false,'one day is not enough');
   set(60);endDay();assert.equal(s.needs.records.get(w.id).lowDays,0,'a good day resets the count');
-  set(20);endDay();endDay();const r=s.needs.records.get(w.id);assert.equal(r.strike,true);assert.ok(feed.some(t=>/on strike/.test(t)));
+  set(30);endDay();endDay();const r=s.needs.records.get(w.id);assert.equal(r.strike,true);assert.ok(feed.some(t=>/on strike/.test(t)));
   s.tick(50);assert.equal(w.workState,'On Strike');assert.equal(w.profession,'hauler','keeps the profession');assert.equal(s.wageSystem.dailyWage(w),0);
   assert.ok(s.needs.summary().striking>=1);assert.equal(s.needs.status(w).strike,true);
-  set(44);s.needs.step(1000);assert.equal(r.strike,true);set(45);s.needs.step(1000);assert.equal(r.strike,false);
+  set(49);s.needs.step(1000);assert.equal(r.strike,true);set(50);s.needs.step(1000);assert.equal(r.strike,false);
   s.tick(50);assert.notEqual(w.workState,'On Strike');assert.ok(s.wageSystem.dailyWage(w)>0);
 });
 
-test('three days below 15: the resident gives up his job, walks to the map edge and leaves the kingdom', () => {
+test('two days below 25: the resident gives up his job, walks to the map edge and leaves the kingdom', () => {
   const {s,w,feed,set,endDay}=world();const before=s.workerSystem.liveSubjects().length;s.needs.step(1000);
-  set(10);endDay();endDay();assert.equal(s.needs.records.get(w.id).strike,true);endDay();
+  set(20);endDay();assert.equal(s.needs.records.get(w.id).leaving,false,'one day is not enough');endDay();
   assert.equal(s.needs.records.get(w.id).leaving,true);assert.equal(s.needs.records.get(w.id).strike,false);
   s.tick(50);assert.equal(w.workState,'Leaving Kingdom');assert.equal(w.profession,'idle');
   const mid=validateGameState(serializeGameState(s));assert.equal(mid.needs.records.find(r=>r.id===w.id).leaving,true);

@@ -154,5 +154,5 @@ export class WorkplacePanel {
   }
   restoreInput(){if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){this.dialog.close();this.restoreInput();this.scene.farmConnections?.refresh();}
-  destroy(){this.close();this.controller.abort();this.farmCount.remove();this.staffingStatus.remove();this.exclusions.remove();this.forestryDetails.remove();this.miningDetails.remove();this.issueLine.remove();this.militaryDetails.remove();}
+  destroy(){this.close();this.controller.abort();this.farmCount.remove();this.farmStore.remove();this.ownStore.remove();this.staffingStatus.remove();this.exclusions.remove();this.forestryDetails.remove();this.miningDetails.remove();this.issueLine.remove();this.militaryDetails.remove();}
 }

@@ -1,4 +1,4 @@
-import { POPULATION } from '../data/jobs.js';
+import { migrantsPerDay } from '../data/jobs.js';
 import { FOOD_RESOURCE_IDS } from '../data/foodProduction.js';
 import { resourceGroup } from '../data/resourceGroups.js';
 import { devFactor,DEV_QUICK } from '../data/devBalance.js';
@@ -8,7 +8,7 @@ const live=scene=>scene.workerSystem?.liveSubjects?.()??[];
 // When the next resident arrives (game hours) and what limits arrival now. Migrants come at the day boundary
 // (WorkerSystem.onNewDay): migrantsPerDay × the Arrival coefficient a day, the fraction carried over.
 export function arrivalForecast(scene){
-  const ws=scene.workerSystem,time=scene.gameTime,factor=devFactor('immigration'),perDay=POPULATION.migrantsPerDay*factor,carry=ws?.migrantCarry??0;
+  const ws=scene.workerSystem,time=scene.gameTime,factor=devFactor('immigration'),perDay=migrantsPerDay(live(scene).length)*factor,carry=ws?.migrantCarry??0;
   const days=Math.max(1,Math.ceil((1-carry-1e-9)/perDay)),toBoundary=time?(time.dayDuration-time.elapsed)/time.dayDuration:1;
   const hours=Math.round((toBoundary+days-1)*HOURS_PER_DAY*10)/10,count=live(scene).length,capacity=ws?.capacity?.()??count,limits=[];
   if(count>=capacity)limits.push({id:'beds'});

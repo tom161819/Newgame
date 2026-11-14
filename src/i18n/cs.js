@@ -357,7 +357,7 @@ export default {
   'policy.rations.small':'Malé (½ porce denně)','policy.rations.normal':'Běžné (1 porce denně)','policy.rations.generous':'Štědré (1½ porce denně)',
   'policy.taxEffect':'{each} zlata za obyvatele každé ráno: {total} zlata/den od {count} obyvatel. Spokojenost {happiness}.',
   'policy.rationsEffect':'Každý obyvatel sní {portions} porce denně; potřeba jídla je {base} % + 5 % za každý druh jídla snědený za poslední 3 dny (nejvýš 100 %).','ledger.Taxes':'Daně',
-  'needs.policyLine':'Politika království: spokojenost {value}','needs.strikeLine':'Stávkuje: do práce se vrátí při spokojenosti 45.','needs.leavingLine':'Odchází z království.','needs.riskLine':'Nespokojený {days} den/dny: stávka po 2 dnech pod 25, odchod po 3 dnech pod 15.',
+  'needs.policyLine':'Politika království: spokojenost {value}','needs.strikeLine':'Stávkuje: do práce se vrátí při spokojenosti 50.','needs.leavingLine':'Odchází z království.','needs.riskLine':'Nespokojený {days} den/dny: stávka po 2 dnech pod 35, odchod po 2 dnech pod 25.',
   // m-kral-odmeny-xp: body dovedností krále z královských úkolů.
   'kingSkills.earned':{one:'Král získal {count} bod dovedností.',few:'Král získal {count} body dovedností.',other:'Král získal {count} bodů dovedností.'},'goals.res.points':{one:'{count} bod dovedností',few:'{count} body dovedností',other:'{count} bodů dovedností'},
   'kingSkills.title':'Dovednosti krále','kingSkills.points':'Volné body dovedností: {count}','kingSkills.level':'{level} / {max}',

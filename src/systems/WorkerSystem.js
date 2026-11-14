@@ -8,7 +8,7 @@ import { tileCenter,PLAYER_START } from '../game/map.js';
 import { reachableTiles } from '../game/pathfinding.js';
 import { towerNeighbors,buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
-import { POPULATION } from '../data/jobs.js';
+import { POPULATION,migrantsPerDay } from '../data/jobs.js';
 import { CASTLE_START_EXTRA_RESIDENTS } from './GameSettings.js';
 import { TaskReservationSystem } from './TaskReservationSystem.js';
 import { JobSystem } from './JobSystem.js';
@@ -86,7 +86,7 @@ export class WorkerSystem {
     // m-start-v2: a full settlement says so once per capacity (the line comes back after new Houses fill up too).
     const capacity=this.capacity();if(this.liveSubjects().length>=capacity&&this.scene.eventFeed?.push)this.scene.eventFeed.push(`population-full:${capacity}`,t('feed.populationFull',{capacity}));
     // m-jidlo-balanc dev multiplier: fractional migrants carry over to the next day (not saved; 1× = exactly migrantsPerDay).
-    const want=POPULATION.migrantsPerDay*devFactor('immigration')+(this.migrantCarry??0),migrants=Math.floor(want+1e-9);this.migrantCarry=want-migrants;
+    const want=migrantsPerDay(this.liveSubjects().length)*devFactor('immigration')+(this.migrantCarry??0),migrants=Math.floor(want+1e-9);this.migrantCarry=want-migrants;
     for(let i=0;i<migrants&&this.liveSubjects().length<this.capacity();i++){
       if(this.scene.attractiveness&&!this.scene.attractiveness.shouldSettle())continue;
       const map=this.scene.map,origin=this.origin(),candidates=this.candidates().filter(t=>(t.x<=1||t.y<=1||t.x>=map[0].length-2||t.y>=map.length-2)&&Math.hypot(t.x-origin.x,t.y-origin.y)>25);
