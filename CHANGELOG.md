@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.119.3] - 2026-11-14
+<!-- version: {"title":"Asset Studio: Fisherman's Hut render for review","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Asset Studio: shingled Fisherman's Hut on stilts from the owner's renders (4 views) for review. The game still uses the current hut.
+
 ## [0.119.2] - 2026-11-14
 <!-- version: {"title":"Asset Studio: Lumberjack Hut with saw yard 4 x 2 for review","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

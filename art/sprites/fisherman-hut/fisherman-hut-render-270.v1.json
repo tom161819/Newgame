@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "fisherman-hut",
+  "variantId": "fisherman-hut-render-270",
+  "name": "Shingled fishing hut on stilts 270° (front-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "69d5e81e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 191,
+  "height": 155,
+  "anchor": {
+    "x": 95,
+    "y": 104
+  },
+  "origin": {
+    "x": 0.49738,
+    "y": 0.67097
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 95,
+    "y": 152
+  },
+  "baseOrigin": {
+    "x": 0.49738,
+    "y": 0.98065
+  },
+  "visualHeight": 152,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.74,
+  "lights": [],
+  "x2": {
+    "width": 382,
+    "height": 310,
+    "anchor": {
+      "x": 190,
+      "y": 208
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

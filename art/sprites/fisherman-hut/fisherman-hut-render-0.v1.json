@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "assetId": "fisherman-hut",
+  "variantId": "fisherman-hut-render-0",
+  "name": "Shingled fishing hut on stilts 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "69d5e81e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 191,
+  "height": 169,
+  "anchor": {
+    "x": 95,
+    "y": 118
+  },
+  "origin": {
+    "x": 0.49738,
+    "y": 0.69822
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 95,
+    "y": 166
+  },
+  "baseOrigin": {
+    "x": 0.49738,
+    "y": 0.98225
+  },
+  "visualHeight": 166,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -62,
+      "y": -108,
+      "color": "#ffb25a",
+      "radius": 90,
+      "intensity": 0.85,
+      "flicker": {
+        "amplitude": 0.1,
+        "speed": 6
+      },
+      "flameSize": 0.5
+    }
+  ],
+  "modelHeight": 1.74,
+  "lights": [],
+  "x2": {
+    "width": 382,
+    "height": 338,
+    "anchor": {
+      "x": 190,
+      "y": 236
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}
