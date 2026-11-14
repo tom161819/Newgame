@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { treeState } from '../data/naturalResources.js';
+import { treeState,stumpGone } from '../data/naturalResources.js';
 
 const TREE_BLOWS=7;
 export class TreeView extends Phaser.GameObjects.Container {
@@ -18,6 +18,8 @@ export class TreeView extends Phaser.GameObjects.Container {
     return look&&art[look]&&assets.hasTexture(this.definition.id,`art-${look}`)?look:null;
   }
   paint(){
+    // m-parezy-na-ceste: a stump that rotted away on a worn path is not drawn.
+    if(stumpGone(this.object.natural)){this.art.setVisible(false);this.artLook=null;this.body.clear();this.bar?.clear?.();return;}
     const look=this.artKey();
     if(look){
       const art=this.definition.artSprites[look],key=this.scene.assets.key(this.definition.id,`art-${look}`);
@@ -49,6 +51,7 @@ export class TreeView extends Phaser.GameObjects.Container {
   }
   getMemoryState(){return{stage:this.object.natural.stage,season:this.season};}
   containsPoint(x,y){
+    if(stumpGone(this.object.natural))return false;
     if(this.artLook){const frame=this.art.frame,px=Math.floor(x-this.x+this.art.originX*frame.width),py=Math.floor(y-this.y+this.art.originY*frame.height);return px>=0&&py>=0&&px<frame.width&&py<frame.height&&(this.scene.textures.getPixelAlpha(px,py,this.art.texture.key)??0)>=128;}
     const stage=this.object.natural.stage,dx=x-this.x,dy=y-this.y;if(stage===0)return Math.abs(dx)<12&&dy>=-15&&dy<=8;const scale=stage===1?.25:stage===2?.58:1,pine=this.definition.id==='pine_tree',height=(pine?100:84)*scale;
     if(Math.abs(dx)<=6*scale&&dy>=-height*.7&&dy<=8)return true;

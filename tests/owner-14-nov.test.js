@@ -40,3 +40,31 @@ test('m-trosky-znovu: Burnt Ruins can be built again as the burnt building for i
   assert.ok(result.building.construction&&result.building.construction.state!=='complete','a building site, Builders build it');
   assert.ok(rebuildRuin(s,result.building).error,'only ruins');
 });
+
+test('m-uzavreny-hrad: ground inside closed walls is found; a gap opens it; Burnt Ruins inside lower the Attractiveness', async () => {
+  const { enclosure,ruinsPenalty,ENCLOSURE }=await import('../src/game/enclosure.js');const { KingdomAttractivenessSystem }=await import('../src/systems/KingdomAttractivenessSystem.js');
+  const map=Array.from({length:30},()=>Array(30).fill(0)),buildings=[];let id=1;
+  const put=(type,x,y,w=1,h=1)=>{const tiles=[];for(let j=0;j<h;j++)for(let i=0;i<w;i++)tiles.push({x:x+i,y:y+j});const b={id:id++,type,x,y,tiles,definition:{id:type,width:w,height:h,navigation:type==='wall'?{walkableTop:true}:undefined}};buildings.push(b);return b;};
+  for(let x=10;x<=18;x++){put('wall',x,10);put('wall',x,18);}for(let y=11;y<=17;y++)put('wall',10,y);for(let y=11;y<=16;y++)put('wall',18,y);
+  const scene={map,buildings};assert.equal(enclosure(scene).any,false,'one piece is missing: open');assert.equal(enclosure(scene).inside(14,14),false);
+  put('wall',18,17);const e=enclosure(scene);assert.equal(e.any,true);assert.equal(e.inside(14.5,14.5),true);assert.equal(e.inside(5,5),false);assert.equal(e.inside(10,10),false,'the wall itself is not inside');
+  const house=put('house',12,12,2,2),outside=put('house',2,2,2,2);assert.equal(e.holds(house),true);assert.equal(e.holds(outside),false);
+  put('burnt_ruins',14,14,2,2);put('burnt_ruins',3,20,2,2);assert.equal(ruinsPenalty(scene),ENCLOSURE.ruins.each,'only the ruins inside the walls count');
+  const a=new KingdomAttractivenessSystem({...scene,foodSystem:{shortage:false}});assert.equal(a.value,100-ENCLOSURE.ruins.each);
+  for(let i=0;i<8;i++)put('burnt_ruins',11+i%4,15+Math.floor(i/4));assert.equal(ruinsPenalty(scene),ENCLOSURE.ruins.max);
+});
+
+test('m-uzavreny-hrad: who stands, lives or works inside closed walls has more Safety', async () => {
+  const { NeedsSystem }=await import('../src/systems/NeedsSystem.js');const { ENCLOSURE }=await import('../src/game/enclosure.js');
+  const s=workerScene(undefined,{workplaces:true});const needs=s.needs??new NeedsSystem(s);
+  const w=s.workerSystem.create({x:60,y:60}),value=()=>needs.safetyDetail(w,{},null);
+  const before=value();assert.equal(before.factors.some(([k])=>k==='walls'),false);
+  const d=s.objectRegistry.require('wall'),wall=(x,y)=>s.buildings.push({id:Math.max(0,...s.buildings.map(b=>b.id))+1,type:'wall',definition:d,x,y,tiles:[{x,y}]});
+  for(let x=56;x<=64;x++){wall(x,56);wall(x,64);}for(let y=57;y<=63;y++){wall(56,y);wall(64,y);}
+  const after=value();assert.deepEqual(after.factors.find(([k])=>k==='walls'),['walls',ENCLOSURE.safetyBonus]);assert.equal(after.value,Math.min(100,before.value+ENCLOSURE.safetyBonus));
+});
+
+test('m-parezy-na-ceste: a stump on a worn path rots away after 3 days and comes back when the path fades', async () => {
+  const { FORESTRY,stumpGone,treeState }=await import('../src/data/naturalResources.js');
+  assert.equal(stumpGone(treeState('tree-1',{stage:0})),false);assert.equal(stumpGone({...treeState('tree-1',{stage:0}),rot:FORESTRY.stumpRotDays}),true);assert.equal(stumpGone({...treeState('tree-1',{stage:3}),rot:FORESTRY.stumpRotDays}),false,'only stumps');
+});

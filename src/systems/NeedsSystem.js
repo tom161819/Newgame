@@ -1,3 +1,4 @@
+import { enclosure,ENCLOSURE } from '../game/enclosure.js';
 import { HEATING } from '../data/heating.js';
 import { TORCHES } from '../data/torches.js';
 import { CATS ,HOUSE_RATS} from '../data/domesticAnimals.js';
@@ -83,6 +84,9 @@ export class NeedsSystem {
     if(done.some(b=>b.type==='castle'&&near(b,s.castle.range)))factors.push(['castle',s.castle.bonus]);
     if(done.some(b=>b.type==='tower'&&near(b,s.tower.range)))factors.push(['tower',s.tower.bonus]);
     if(done.some(b=>b.type==='barracks'&&near(b,s.guard.range))||this.residents().some(o=>o!==worker&&o.profession==='soldier'&&Math.hypot(o.position.x-p.x,o.position.y-p.y)<=s.guard.range))factors.push(['guard',s.guard.bonus]);
+    // m-uzavreny-hrad (point 34): closed walls protect who stands, lives or works inside them.
+    {const e=enclosure(this.scene);if(e.any){if(home===undefined)home=this.homeOf(worker);const b=id=>id==null?null:(this.scene.buildings??[]).find(x=>x.id===id);
+      if(e.inside(p.x,p.y)||e.holds(b(worker.assignedWorkplaceId))||e.holds(b(home?.buildingId)))factors.push(['walls',ENCLOSURE.safetyBonus]);}}
     // Day and night N2: at night a house without a burning light within 6 tiles is dark: −30.
     if(home===undefined&&this.scene.dayNight?.isNight())home=this.homeOf(worker);const house=home?.kind==='house'?(this.scene.buildings??[]).find(b=>b.id===home.buildingId):null;
     if(house&&this.scene.dayNight){const d=house.definition??this.scene.objectRegistry?.get?.(house.type)??{width:2,height:2};if(this.scene.dayNight.darkAt({x:house.x+d.width/2,y:house.y+d.height/2}))factors.push(['dark',-TORCHES.darkHouse.penalty]);}

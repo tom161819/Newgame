@@ -59,3 +59,11 @@ test('m-cesta-bez-stromku: on a worn path (level 2+) a stump does not sprout and
   s.naturalResources.growthClock+=10;s.naturalResources.flushGrowth();assert.equal(young.natural.stage,0,'no sprouting on the path');
   s.pathWear={level:()=>1,isPaved:()=>false};s.naturalResources.growthClock+=2;s.naturalResources.flushGrowth();assert.ok(young.natural.stage>0,'grows again on a faint path');
 });
+test('m-parezy-na-ceste: a stump on a worn path rots away in 3 days (kept in Save/Load) and is back when the path fades', async () => {
+  const { stumpGone,FORESTRY }=await import('../src/data/naturalResources.js');
+  const s=fixture(),stump=tree(s);stump.natural.stage=0;stump.natural.growthDays=0;s.naturalResources.refreshMap(stump);
+  s.pathWear={level:t=>t.x===stump.x&&t.y===stump.y?2:0,isPaved:()=>false};
+  s.naturalResources.ageClock+=1;s.naturalResources.flushGrowth();assert.equal(stumpGone(stump.natural),false,'one day: still there');
+  s.naturalResources.ageClock+=2.5;s.naturalResources.flushGrowth();assert.equal(stumpGone(stump.natural),true);assert.equal(stump.natural.rot,FORESTRY.stumpRotDays);
+  s.pathWear={level:()=>0,isPaved:()=>false};s.naturalResources.flushGrowth();assert.equal(stump.natural.rot,undefined);assert.equal(stumpGone(stump.natural),false,'the path faded: the stump is back');
+});

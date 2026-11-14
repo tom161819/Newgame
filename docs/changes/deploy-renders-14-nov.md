@@ -9,12 +9,12 @@ The owner approved the four new buildings in the Asset Studio and asked to deplo
 - src/data/objects/vehicles.js: Stables 6 × 8, `legacyFootprint` 5 × 5.
 - src/data/objects/naturalResources.js: Lumberjack Hut 4 × 2, `legacyFootprint` 2 × 2.
 - src/systems/StableSystem.js `paddock`: horse spots for the 6 × 8 Stables.
-- art/sprites/stables, art/sprites/lumber-camp: footprints corrected; the Lumberjack Hut picture is no longer darkened.
+- art/sprites/stables, art/sprites/lumber-camp: footprints corrected.
 
 ## Implementation decisions
 - **Footprint orientation.** In the game the edge from the front corner to the right corner has the length of `height`, the edge to the left corner the length of `width`. /tmp/fit/overlay.py draws them the other way round, so the Studio variants of 0.119.1 and 0.119.2 had width and height swapped (8 × 6 and 2 × 4). Corrected to 6 × 8 (Stables) and 4 × 2 (Lumberjack Hut). For square buildings it makes no difference.
 - The stable building stands along the back edge (rows 0–2), the paddock is in front; horses stand at [0,5], [2,6], [4,6], [5,4].
-- The Lumberjack Hut render was too dark in the game after grading, so the ungraded render is used.
+- The Lumberjack Hut picture stays as approved (graded). It looks darker than its neighbours in the game; an ungraded version is an option if the owner asks.
 
 ## Save/Load impact
 None in the format. Stables and Lumberjack Huts without `size` (older saves) keep 5 × 5 and 2 × 2.

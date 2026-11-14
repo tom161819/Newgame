@@ -201,3 +201,19 @@ test('m-hlidka-hradby: a soldier on "Patrol – walls" climbs at a wall beside a
   const data=validateGameState(serializeGameState(s)),saved=data.workers.find(x=>x.id===w.id);assert.equal(saved.wallPatrol,true);
   assert.equal(s.map[saved.tile.y][saved.tile.x],0,'saved on walkable ground');
 });
+test('m-vojaci-na-hradby: soldiers sent to a wall piece or a Tower climb up and stay there; several take neighbouring pieces; Save/Load keeps the post', async () => {
+  const { postTiles } = await import('../src/systems/WallPatrol.js');const { loadGameState } = await import('../src/systems/GameStateLoader.js');
+  const {s,barracks}=kingdom();
+  const add=(type,x,y)=>{const d=s.objectRegistry.require(type),tiles=[];for(let j=0;j<d.height;j++)for(let i=0;i<d.width;i++)tiles.push({x:x+i,y:y+j});const b={id:Math.max(0,...s.buildings.map(b=>b.id))+1,type,definition:d,x,y,tiles};s.buildings.push(b);for(const t of tiles)s.map[t.y][t.x]=d.walkable?0:1;s.towerViews.set(b.id,s.createBuildingView(d,b));return b;};
+  const tower=add('tower',62,60);const walls=[];for(let x=64;x<72;x++)walls.push(add('wall',x,61));add('tower',72,60);s.events?.emit?.('buildings:changed');
+  const target=walls[4];assert.deepEqual(postTiles(s.buildings,target,3).map(t=>`${t.x},${t.y}`),['68,61','69,61','67,61'],'the piece itself, then its neighbours');
+  assert.deepEqual(postTiles(s.buildings,tower,2),[{x:62,y:60,tower:tower.id},{x:64,y:61}],'a Tower: its platform, then the wall beside it');
+  const a=soldier(s,barracks,{x:58,y:64},3),b=soldier(s,barracks,{x:59,y:64},3),c=soldier(s,barracks,{x:60,y:66},3);
+  assert.equal(s.military.wallPatrol.post([a,b],target),2);assert.equal(s.military.wallPatrol.post([c],tower),1);
+  for(let i=0;i<6000;i++){s.tick(50);if([a,b,c].every(w=>w.wallPatrol?.phase==='post'))break;}
+  assert.deepEqual([a.tile,b.tile].map(t=>`${t.x},${t.y}`).sort(),['68,61','69,61']);assert.equal(c.onWall,tower,'on the Tower');
+  const before=`${a.tile.x},${a.tile.y}`;for(let i=0;i<600;i++)s.tick(50);assert.equal(`${a.tile.x},${a.tile.y}`,before,'he stays on his post');
+  const data=validateGameState(serializeGameState(s)),saved=id=>data.workers.find(x=>x.id===id);assert.deepEqual(saved(a.id).wallPatrol,{post:{x:a.wallPatrol.post.x,y:a.wallPatrol.post.y}});assert.deepEqual(saved(c.id).wallPatrol,{post:{x:62,y:60,tower:tower.id}});
+  assert.throws(()=>validateGameState({...data,workers:data.workers.map(x=>x.id===a.id?{...x,wallPatrol:{post:{x:1.5,y:2}}}:x)}));
+  s.military.wallPatrol.set(a,true);assert.equal(a.wallPatrol.post,undefined,'"Patrol – walls" ends the post');
+});

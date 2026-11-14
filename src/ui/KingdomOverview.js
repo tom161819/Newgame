@@ -12,7 +12,7 @@ export function kingdomOverview(scene){
   const workers=scene.workerSystem,needs=scene.needs,residents=workers?.liveSubjects?.()??[],homes=needs?.homes?.()??new Map();
   const statuses=residents.map(w=>needs?.status?.(w,homes)).filter(Boolean),avg=key=>statuses.length?Math.round(statuses.reduce((n,s)=>n+(s[key]??0),0)/statuses.length):null;
   const attraction=scene.attractiveness,factors=[];
-  if(attraction){if(scene.foodSystem?.shortage)factors.push(['food',-40]);for(const [id,v] of attraction.modifiers??[])factors.push([id,v]);}
+  if(attraction){if(scene.foodSystem?.shortage)factors.push(['food',-40]);if(attraction.ruins)factors.push(['ruins',attraction.ruins]);for(const [id,v] of attraction.modifiers??[])factors.push([id,v]);}
   const happiness=avg('happiness');
   // m-prehled-procenta-tooltip: what stands behind the percentages (for the explanations on hover).
   const w=NEEDS.weights,part=key=>statuses.length?statuses.reduce((n,s)=>n+(s[key]??0),0)/statuses.length*w[key]:0,parts={food:part('food'),rest:part('rest'),housing:part('housing'),safety:part('safety')};

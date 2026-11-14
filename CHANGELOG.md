@@ -5,6 +5,16 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.121.0] - 2026-11-14
+<!-- version: {"title":"Stumps on paths, closed walls, ruins inside, soldiers on walls","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Soldiers can be posted on the walls: select them and right-click a finished Stone Wall, Tower or Gate. They climb up and stay there until another order.
+- Closed walls give +15 Safety to everyone who stands, lives or works inside them.
+- Burnt Ruins inside closed walls lower the kingdom's Attractiveness (5 points each, at most 25).
+
+### Changed
+- A stump on a well-worn path disappears after 3 days.
+
 ## [0.120.0] - 2026-11-14
 <!-- version: {"title":"Approved art: Stables 6 x 8, Lumberjack Hut 4 x 2, Fisherman's Hut, Pitch Kiln","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

@@ -1,3 +1,5 @@
+import { buildingIsComplete,buildingDefinition } from '../game/buildings.js';
+import { isWall } from '../game/walls.js';
 import { t,language } from '../i18n/index.js';
 import { HAUL_PRIORITIES,HAULABLE_RESOURCES } from '../data/logistics.js';
 import { haulPriorityFromValue,haulPriorityValue,setHaulPriority } from '../systems/haulPriority.js';
@@ -30,7 +32,11 @@ export class UnitSelection {
   down(pointer){
     const s=this.scene;if(s.gameOver||s.gameTime.paused||s.buildMode||blockingDialog(document))return false;
     if(pointer.rightButtonDown()){
-      if(this.ids.size){const count=s.workerSystem.commands.move(this.workers(),s.pointerTile(pointer));s.setStatus(t(count?'command.moving':'command.noRoute',{count}));return true;}
+      if(this.ids.size){
+        // m-vojaci-na-hradby: a right click on a finished Stone Wall, Tower or Gate posts the selected soldiers on it.
+        const tile=s.pointerTile(pointer),target=tile&&s.buildings.find(b=>buildingIsComplete(b)&&(isWall(b)||b.type==='tower'||b.type==='gate')&&b.tiles?.some(tl=>tl.x===tile.x&&tl.y===tile.y)),soldiers=this.workers().filter(w=>w.profession==='soldier');
+        if(target&&soldiers.length){const posted=s.military?.wallPatrol?.post(soldiers,target)??0;if(posted){s.setStatus(t('army.posted',{count:posted,name:buildingDefinition(target).name}));this.draw();return true;}s.setStatus(t('army.postNoWay'));return true;}
+        const count=s.workerSystem.commands.move(this.workers(),s.pointerTile(pointer));s.setStatus(t(count?'command.moving':'command.noRoute',{count}));return true;}
       return false;
     }
     if(!pointer.leftButtonDown())return false;

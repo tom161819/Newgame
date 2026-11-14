@@ -1,5 +1,5 @@
-import { buildingIsComplete,towerTop,buildingDepth } from '../game/buildings.js';
-import { wallIndex,isWallAccess } from '../game/walls.js';
+import { buildingIsComplete,towerTop,buildingDepth,buildingDefinition } from '../game/buildings.js';
+import { wallIndex,isWallAccess,isWall } from '../game/walls.js';
 import { tileKey } from '../game/stones.js';
 import { tileCenter,gridToWorld } from '../game/isometric.js';
 import { towerNeighbors } from '../game/buildings.js';
@@ -19,22 +19,51 @@ export function wallRoute(walls,start,goal){
     for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const n={x:at.x+dx,y:at.y+dy},k=key(n);if(!walls.has(k)||prev.has(k))continue;prev.set(k,at);queue.push(n);}}
   if(!prev.has(key(goal)))return null;const path=[];for(let at=goal;at&&key(at)!==key(start);at=prev.get(key(at)))path.unshift({x:at.x,y:at.y});return path;
 }
+// m-vojaci-na-hradby (owner 14 Nov 2026, point 36): a post. Selected soldiers sent (right click) to a Stone Wall, a
+// Tower or a Gate climb up and stand there until another order: on the wall piece itself (several soldiers take the
+// pieces next to it), on the Tower's platform, or on the walls beside the Gate.
+export function postTiles(buildings,target,count){
+  const walls=wallIndex(buildings),out=[];
+  if(target.type==='tower'&&buildingIsComplete(target))out.push({x:target.x,y:target.y,tower:target.id});
+  const starts=isWall(target)?[target]:[...walls.values()].filter(w=>target.tiles?.some(t=>Math.abs(t.x-w.x)+Math.abs(t.y-w.y)===1));
+  const seen=new Set(),queue=[];for(const w of starts)if(walls.has(tileKey(w))&&!seen.has(tileKey(w))){seen.add(tileKey(w));queue.push(w);}
+  for(let i=0;i<queue.length&&out.length<count;i++){const at=queue[i];out.push({x:at.x,y:at.y});
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const n=walls.get(tileKey({x:at.x+dx,y:at.y+dy}));if(n&&!seen.has(tileKey(n))){seen.add(tileKey(n));queue.push(n);}}}
+  return out.slice(0,count);
+}
 export class WallPatrol {
   constructor(scene){this.scene=scene;}
   walls(){return wallIndex(this.scene.buildings);}
   // Start or stop the order for a soldier.
   set(worker,on){
-    if(on){worker.wallPatrol={phase:'toWall'};return true;}
+    if(on){if(worker.wallPatrol?.onWall)this.leave(worker);worker.wallPatrol={phase:'toWall',...(on.x!==undefined?{post:{x:on.x,y:on.y,...(on.tower?{tower:on.tower}:{})}}:{})};return true;}
     if(worker.wallPatrol?.onWall)this.leave(worker);delete worker.wallPatrol;return true;
+  }
+  // Sends soldiers to a wall piece, Tower or Gate; returns how many got a post.
+  post(workers,target){
+    const soldiers=workers.filter(w=>w.profession==='soldier'&&w.isAlive),tiles=postTiles(this.scene.buildings,target,soldiers.length);
+    soldiers.slice(0,tiles.length).forEach((w,i)=>{delete w.huntWolfId;this.scene.workerSystem.commands?.resume?.(w);this.set(w,tiles[i]);});return Math.min(soldiers.length,tiles.length);
   }
   leave(worker){const p=worker.wallPatrol,ground=p?.ground??worker.wallGround??worker.tile;delete worker.wallGround;worker.onWall=null;worker.path=[];worker.nextTile=null;worker.tile={...ground};worker.position={x:ground.x+.5,y:ground.y+.5};if(p){p.onWall=false;p.phase='toWall';}}
   update(worker,delta){
     const s=this.scene,p=worker.wallPatrol,walls=this.walls(),stops=wallStops(s.buildings,walls);p.lastTick=s.gameTime?.totalElapsed??0;
+    if(p.post?.tower){
+      // On a Tower: walk to its foot, climb, stand on the platform.
+      const tower=s.buildings.find(b=>b.id===p.post.tower&&buildingIsComplete(b));if(!tower){if(p.onWall)this.leave(worker);delete p.post;return true;}
+      worker.workState='Patrolling';worker.workMessage=t('army.order.postActive');if(p.onWall)return true;
+      const goals=towerNeighbors(tower).filter(g=>s.map[g.y]?.[g.x]===0);
+      if(goals.some(g=>g.x===worker.tile.x&&g.y===worker.tile.y)&&!worker.nextTile){const d=buildingDefinition(tower);p.onWall=true;p.ground={...worker.tile};worker.wallGround={...worker.tile};worker.onWall=tower;worker.path=[];worker.tile={x:tower.x,y:tower.y};worker.position={x:tower.x+d.width/2,y:tower.y+d.height/2};p.phase='post';return true;}
+      if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=WALL_PATROL.retry;worker.moveTo(goals);}return true;
+    }
+    if(p.post&&!walls.has(tileKey(p.post)))delete p.post;
     if(!stops.length){if(p.onWall)this.leave(worker);worker.workState='Waiting';worker.workMessage=t('army.wallsNone');return false;}
-    worker.workState='Patrolling';worker.workMessage=t('army.order.wallsActive');
+    worker.workState='Patrolling';worker.workMessage=t(p.post?'army.order.postActive':'army.order.wallsActive');
     if(!p.onWall){
       // Walk to the ground beside the nearest stop, then climb.
-      const near=[...stops].sort((a,b)=>Math.hypot(a.x-worker.tile.x,a.y-worker.tile.y)-Math.hypot(b.x-worker.tile.x,b.y-worker.tile.y));
+      // With a post: only stops joined to it over the wall walk, the nearest to the post first.
+      const usable=p.post?stops.filter(st=>tileKey(st)===tileKey(p.post)||wallRoute(walls,st,p.post)):stops,from=p.post??worker.tile;
+      if(p.post&&!usable.length){worker.workState='Waiting';worker.workMessage=t('army.postNoWay');return true;}
+      const near=[...usable].sort((a,b)=>Math.hypot(a.x-from.x,a.y-from.y)-Math.hypot(b.x-from.x,b.y-from.y));
       for(const stop of near.slice(0,4)){const goals=towerNeighbors(stop).filter(g=>s.map[g.y]?.[g.x]===0);
         if(goals.some(g=>g.x===worker.tile.x&&g.y===worker.tile.y)&&!worker.nextTile){p.onWall=true;p.ground={...worker.tile};worker.wallGround={...worker.tile};p.at={x:stop.x,y:stop.y};worker.onWall=stop;worker.path=[];worker.tile={x:stop.x,y:stop.y};worker.position={x:stop.x+.5,y:stop.y+.5};p.phase='pause';p.until=(s.gameTime?.totalElapsed??0)+WALL_PATROL.pause[0];return true;}
         if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=WALL_PATROL.retry;if(worker.moveTo(goals))return true;}else if(worker.path.length||worker.nextTile)return true;}
@@ -43,6 +72,7 @@ export class WallPatrol {
     worker.onWall=walls.get(tileKey(worker.nextTile??worker.tile))??worker.onWall;
     if(worker.nextTile||worker.path.length)return true;
     const now=s.gameTime?.totalElapsed??0;
+    if(p.post){if(tileKey(worker.tile)===tileKey(p.post)){p.phase='post';return true;}const route=wallRoute(walls,worker.tile,p.post);if(route){p.target={x:p.post.x,y:p.post.y};worker.path=route;p.phase='walk';}else this.leave(worker);return true;}
     if(p.phase==='pause'&&now<p.until)return true;
     // Next stop: the one fewest other wall soldiers head for, then the farthest along the walk (spread out).
     const others=s.workerSystem.liveWorkers().filter(w=>w!==worker&&w.wallPatrol?.target).map(w=>tileKey(w.wallPatrol.target));

@@ -2,7 +2,7 @@ import { COLUMNS,ROWS } from '../game/config.js';
 import { thicketTiles } from '../game/natureGroups.js';
 import { isFertileGround } from '../data/worldTerrain.js';
 import { t } from '../i18n/index.js';
-import { FORESTRY,treeBlocks,treeState } from '../data/naturalResources.js';
+import { FORESTRY,treeBlocks,treeState,stumpGone } from '../data/naturalResources.js';
 import { reachableTiles,reachableCount,findPathToAny,reachableMask,blockKeepsReach } from '../game/pathfinding.js';
 import { tileKey } from '../game/stones.js';
 import { buildingIsComplete,buildingDefinition } from '../game/buildings.js';
@@ -86,9 +86,12 @@ export class NaturalResourcesSystem {
     const huts=this.forestry.huts(),boost=devFactor('hutGrowthBoost');let matured=false;
     for(const object of this.byId.values()){
       if(!object.definition.tree)continue;
-      const n=object.natural;n.ageDays+=Math.max(0,this.ageClock-n.ageCheckpoint);n.ageCheckpoint=this.ageClock;const growth=Math.max(0,this.growthClock-n.growthCheckpoint);n.growthCheckpoint=this.growthClock;
+      const n=object.natural,aged=Math.max(0,this.ageClock-n.ageCheckpoint);n.ageDays+=aged;n.ageCheckpoint=this.ageClock;const growth=Math.max(0,this.growthClock-n.growthCheckpoint);n.growthCheckpoint=this.growthClock;
       if(n.stage===3||built.has(tileKey(object)))continue;
-      const wear=this.scene.pathWear;if(wear&&((wear.level?.(object)??0)>=FORESTRY.pathBlocksGrowthLevel||wear.isPaved?.(object))){if(n.stage>0||n.growthDays>0){if(this.miningWork?.rocks?.trees?.has(n.id))this.miningWork.rocks.markTree(object,false);n.stage=0;n.growthDays=0;this.refreshMap(object);this.view(object)?.setNaturalState?.(object);routes.before=undefined;}continue;}
+      const wear=this.scene.pathWear;if(wear&&((wear.level?.(object)??0)>=FORESTRY.pathBlocksGrowthLevel||wear.isPaved?.(object))){if(n.stage>0||n.growthDays>0){if(this.miningWork?.rocks?.trees?.has(n.id))this.miningWork.rocks.markTree(object,false);n.stage=0;n.growthDays=0;this.refreshMap(object);this.view(object)?.setNaturalState?.(object);routes.before=undefined;}
+        // m-parezy-na-ceste: the stump rots away on the path.
+        {const was=stumpGone(n);n.rot=Math.min(FORESTRY.stumpRotDays,(n.rot??0)+aged);if(!was&&stumpGone(n))this.view(object)?.setNaturalState?.(object);}continue;}
+      if(n.rot!==undefined){const was=stumpGone(n);delete n.rot;if(was)this.view(object)?.setNaturalState?.(object);}
       n.growthDays+=growth*(boost!==1&&huts.some(h=>this.forestry.inRadius(h,object))?boost:1);
       while(n.stage<3&&n.growthDays+1e-9>=FORESTRY.stageDays[n.stage]){
         if(this.growthModifier()===0)break;
