@@ -29,6 +29,11 @@ test('wall dragging snaps to the dominant logical axis in either direction',()=>
   assert.deepEqual(wallLine({x:5,y:5},{x:2,y:6}),[{x:5,y:5},{x:4,y:5},{x:3,y:5},{x:2,y:5}]);
   assert.deepEqual(wallLine({x:2,y:2},{x:3,y:5}),[{x:2,y:2},{x:2,y:3},{x:2,y:4},{x:2,y:5}]);
   assert.deepEqual(wallLine({x:1,y:1},{x:1,y:1}),[{x:1,y:1}]);
+  // m-hradby-8-smeru: a diagonal drag gives steps whose pieces touch side by side, in all four diagonal directions.
+  assert.deepEqual(wallLine({x:2,y:2},{x:4,y:4}),[{x:2,y:2},{x:3,y:2},{x:3,y:3},{x:4,y:3},{x:4,y:4}]);
+  assert.deepEqual(wallLine({x:5,y:5},{x:3,y:7}),[{x:5,y:5},{x:4,y:5},{x:4,y:6},{x:3,y:6},{x:3,y:7}]);
+  for(const end of [{x:9,y:9},{x:1,y:9},{x:9,y:1},{x:1,y:1},{x:9,y:8},{x:2,y:8}]){const line=wallLine({x:5,y:5},end);for(let i=1;i<line.length;i++)assert.equal(Math.abs(line[i].x-line[i-1].x)+Math.abs(line[i].y-line[i-1].y),1,'neighbouring pieces share a side');assert.equal(new Set(line.map(t=>`${t.x},${t.y}`)).size,line.length);}
+  assert.deepEqual(wallLine({x:5,y:5},{x:9,y:6}).at(-1),{x:9,y:5},'a shallow drag stays straight');
 });
 
 test('a complete wall line is validated and paid atomically; existing segments are not paid again',()=>{

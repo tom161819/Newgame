@@ -899,7 +899,7 @@ export class GameScene extends Phaser.Scene {
     // values below 1); MapMemoryRenderer draws its dark copy over it with the rest.
     const fades=this.sightFade??=new Map(),fading=this.fog.enabled,frame=this.game?.loop?.delta??16;if(!fading&&fades.size)fades.clear();
     for(const building of this.buildings){const visual=this.towerViews.get(building.id),seen=this.fog.isVisibleObject(building);let lit=seen?1:0;
-      if(fading){const key=`building:${building.id}`;if(buildingIsComplete(building)&&this.mapMemory?.objects.has(key)){const target=seen?1:edgeLight(this.fog,building,buildingDefinition(building));lit=fadeStep(visual.sightLit??target,target,frame);}visual.sightLit=lit;if(lit<1&&lit>0)fades.set(key,lit);else fades.delete(key);}
+      if(fading){const key=`building:${building.id}`;if(buildingIsComplete(building)&&this.mapMemory?.objects.has(key)){const target=edgeLight(this.fog,building,buildingDefinition(building));lit=fadeStep(visual.sightLit??target,target,frame);}visual.sightLit=lit;if(lit<1&&lit>0)fades.set(key,lit);else fades.delete(key);}
       const shown=(seen||lit>0)&&visual.inView(view);visual.setVisible(shown);
       if(shown&&buildingIsComplete(building))applyFootprint(visual,footprintShown({selected:selectedIds.has(building.id),buildMode:!!this.buildMode}));}
     this.player.setVisible(this.player.x>view.x-40&&this.player.x<view.right+40&&this.player.y>view.y-20&&this.player.y<view.bottom+70);

@@ -76,11 +76,14 @@ test('bod 37: a remembered Stone Wall is dimmed like a Tower – its art pieces 
   assert.equal(memoryParts({art:image('one')}).some(p=>p.name==='one'),false,'only groups of pieces, not a single object called art');
 });
 
-test('m-plynuly-prechod-dohledu: a building near the sight range is lit in part, and the change takes time', async () => {
+test('m-plynuly-prechod-dohledu: buildings on both sides of the sight border are lit in part, in small steps; the change takes time', async () => {
   const { edgeLight,fadeStep,SIGHT_FADE }=await import('../src/game/sightFade.js');
-  const seen=new Set(['10,10']),fog={revision:1,isInSightTile:t=>seen.has(`${t.x},${t.y}`)},d={width:1,height:1};
-  assert.equal(edgeLight(fog,{x:11,y:10},d),.75);assert.equal(edgeLight(fog,{x:12,y:10},d),.5);assert.equal(edgeLight(fog,{x:13,y:11},d),.25);assert.equal(edgeLight(fog,{x:14,y:10},d),0,'beyond the reach: fully dark');
-  assert.equal(edgeLight(fog,{x:11,y:9},{width:2,height:2}),.75,'the nearest tile of a big building counts');
-  const wall={x:12,y:10};assert.equal(edgeLight(fog,wall,d),.5);seen.add('11,10');assert.equal(edgeLight(fog,wall,d),.5,'same sight revision: remembered');fog.revision=2;assert.equal(edgeLight(fog,wall,d),.75);
+  // Everything with x < 10 is in sight.
+  const fog={revision:1,isInSightTile:t=>t.x<10},d={width:1,height:1},at=x=>edgeLight(fog,{x,y:20},d),values=[];
+  for(let x=3;x<=16;x++)values.push(at(x));
+  assert.equal(values[0],1,'deep inside: fully lit');assert.equal(values.at(-1),0,'far outside: fully dark');
+  for(let i=1;i<values.length;i++){assert.ok(values[i]<=values[i-1],'never brighter farther out');assert.ok(values[i-1]-values[i]<=.15,`small steps (${values[i-1]} → ${values[i]})`);}
+  assert.ok(at(9)>.5&&at(9)<1,'just inside the range: already a little dark');assert.ok(at(10)<.5&&at(10)>0,'just outside: still a little lit');
+  const wall={x:10,y:20},before=edgeLight(fog,wall,d);fog.isInSightTile=t=>t.x<12;assert.equal(edgeLight(fog,wall,d),before,'same sight revision: remembered');fog.revision=2;assert.ok(edgeLight(fog,wall,d)>before);
   assert.equal(fadeStep(0,1,SIGHT_FADE.ms/4),.25);assert.equal(fadeStep(.9,1,SIGHT_FADE.ms),1);assert.equal(fadeStep(1,0,SIGHT_FADE.ms/2),.5);assert.equal(fadeStep(.5,.5,16),.5);
 });

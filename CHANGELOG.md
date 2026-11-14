@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.122.0] - 2026-11-14
+<!-- version: {"title":"Walls in eight directions; softer sight border on buildings","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Stone Walls can be dragged in eight directions. A diagonal line is built as steps whose pieces still join, so the wall walk continues and nobody slips through.
+
+### Changed
+- The change between lit and dark buildings at the edge of the sight range is now spread over several tiles on both sides of the border, in small steps, like the soft edge on the ground.
+
 ## [0.121.2] - 2026-11-14
 <!-- version: {"title":"Soft change between lit and remembered buildings","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

@@ -8,12 +8,21 @@ export const isWall=building=>buildingDefinition(building).navigation?.walkableT
 export const isWallAccess=(building,buildings)=>isWall(building)&&(buildingDefinition(building).navigation?.access===true||buildings.some(b=>(b.type==='tower'||b.type==='gate')&&buildingIsComplete(b)&&b.tiles?.some(t=>Math.abs(t.x-building.x)+Math.abs(t.y-building.y)===1)));
 export const wallIndex=(buildings,includeUnfinished=false)=>new Map(buildings.filter(b=>isWall(b)&&(includeUnfinished||buildingIsComplete(b))).map(b=>[tileKey(b),b]));
 
+// m-hradby-8-smeru (owner 14 Nov 2026): a dragged wall line goes in eight directions. Straight along the tile rows as
+// before; when the drag is closer to a diagonal (more than 26.6° off a row), the line runs as steps – one tile along x,
+// one along y – so the pieces still join side by side: the wall walk continues and nobody slips through.
 export function wallLine(start,end){
-  const dx=end.x-start.x,dy=end.y-start.y,horizontal=Math.abs(dx)>=Math.abs(dy);
-  const length=Math.abs(horizontal?dx:dy),step=Math.sign(horizontal?dx:dy),tiles=[];
+  const dx=end.x-start.x,dy=end.y-start.y,ax=Math.abs(dx),ay=Math.abs(dy),tiles=[];
+  if(Math.min(ax,ay)*2>Math.max(ax,ay)){
+    const n=Math.round((ax+ay)/2),sx=Math.sign(dx),sy=Math.sign(dy);
+    for(let i=0;i<=n;i++){tiles.push({x:start.x+i*sx,y:start.y+i*sy});if(i<n)tiles.push({x:start.x+(i+1)*sx,y:start.y+i*sy});}
+    return tiles;
+  }
+  const horizontal=ax>=ay,length=horizontal?ax:ay,step=Math.sign(horizontal?dx:dy);
   for(let i=0;i<=length;i++)tiles.push({x:start.x+(horizontal?i*step:0),y:start.y+(horizontal?0:i*step)});
   return tiles;
 }
+
 export function connectionsFor(index,building){
   return Object.fromEntries(WALL_DIRECTIONS.map(d=>[d.name,index.has(tileKey({x:building.x+d.x,y:building.y+d.y}))]));
 }
