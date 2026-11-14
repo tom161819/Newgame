@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "oak-tree",
+  "variantId": "oak-tree-render-young-180",
+  "name": "Oak render, young 180° (rear-left)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "ad828bf4",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 27,
+  "height": 43,
+  "anchor": {
+    "x": 14,
+    "y": 26
+  },
+  "origin": {
+    "x": 0.51852,
+    "y": 0.60465
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 14,
+    "y": 42
+  },
+  "baseOrigin": {
+    "x": 0.51852,
+    "y": 0.97674
+  },
+  "visualHeight": 42,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.488,
+  "lights": [],
+  "x2": {
+    "width": 54,
+    "height": 86,
+    "anchor": {
+      "x": 28,
+      "y": 52
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

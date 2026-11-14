@@ -4,7 +4,10 @@
   "name": "Oak",
   "category": "trees",
   "description": "Broadleaf tree on one tile. Variants cover growth stages used by forestry.",
-  "footprint": { "width": 1, "height": 1 },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
   "generator": "tree",
   "gameObjectId": "oak_tree",
   "variants": [
@@ -13,21 +16,270 @@
       "name": "Mature oak",
       "version": 1,
       "notes": "Full crown, ready to harvest.",
-      "spec": { "kind": "oak", "height": 2.9, "crown": 0.66, "trunk": 0.1, "clusters": 6, "seed": 11 }
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      }
     },
     {
       "id": "oak-tree-broad",
       "name": "Broad oak",
       "version": 1,
       "notes": "Lower and rounder, for variety in groves.",
-      "spec": { "kind": "oak", "height": 2.4, "crown": 0.72, "trunk": 0.12, "clusters": 5, "seed": 23 }
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      }
     },
     {
       "id": "oak-tree-young",
       "name": "Young oak",
       "version": 1,
       "notes": "Growth stage before maturity.",
-      "spec": { "kind": "oak", "height": 1.7, "crown": 0.42, "trunk": 0.06, "clusters": 4, "seed": 5 }
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      }
+    },
+    {
+      "id": "oak-tree-render-young-0",
+      "name": "Oak render, young 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026). Young oak, about as tall as a person. View 0° (front-right), cut out of the owner's render and scaled to 0.0547 (about 45 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-render-young-90",
+      "name": "Oak render, young 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026). Young oak, about as tall as a person. View 90° (rear-right), cut out of the owner's render and scaled to 0.0547 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-render-young-180",
+      "name": "Oak render, young 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026). Young oak, about as tall as a person. View 180° (rear-left), cut out of the owner's render and scaled to 0.0547 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-render-young-270",
+      "name": "Oak render, young 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026). Young oak, about as tall as a person. View 270° (front-left), cut out of the owner's render and scaled to 0.0547 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "oak-tree-render-broad-0",
+      "name": "Oak render, broad 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026). Grown oak with a broad crown on one tile. View 0° (front-right), cut out of the owner's render and scaled to 0.1564 (about 125 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-render-broad-90",
+      "name": "Oak render, broad 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026). Grown oak with a broad crown on one tile. View 90° (rear-right), cut out of the owner's render and scaled to 0.1564 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-render-broad-180",
+      "name": "Oak render, broad 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026). Grown oak with a broad crown on one tile. View 180° (rear-left), cut out of the owner's render and scaled to 0.1564 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-render-broad-270",
+      "name": "Oak render, broad 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026). Grown oak with a broad crown on one tile. View 270° (front-left), cut out of the owner's render and scaled to 0.1564 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "oak-tree-render-mature-0",
+      "name": "Oak render, mature 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026). Old oak, taller and wider than before; drawn for 2 × 2. View 0° (front-right), cut out of the owner's render and scaled to 0.2384 (about 195 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-render-mature-90",
+      "name": "Oak render, mature 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026). Old oak, taller and wider than before; drawn for 2 × 2. View 90° (rear-right), cut out of the owner's render and scaled to 0.2384 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-render-mature-180",
+      "name": "Oak render, mature 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026). Old oak, taller and wider than before; drawn for 2 × 2. View 180° (rear-left), cut out of the owner's render and scaled to 0.2384 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-render-mature-270",
+      "name": "Oak render, mature 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026). Old oak, taller and wider than before; drawn for 2 × 2. View 270° (front-left), cut out of the owner's render and scaled to 0.2384 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }

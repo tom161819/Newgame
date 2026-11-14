@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "oak-tree",
+  "variantId": "oak-tree-render-mature-270",
+  "name": "Oak render, mature 270° (front-left)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "b727122d",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 136,
+  "height": 193,
+  "anchor": {
+    "x": 64,
+    "y": 154
+  },
+  "origin": {
+    "x": 0.47059,
+    "y": 0.79793
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 64,
+    "y": 186
+  },
+  "baseOrigin": {
+    "x": 0.47059,
+    "y": 0.96373
+  },
+  "visualHeight": 186,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.539,
+  "lights": [],
+  "x2": {
+    "width": 272,
+    "height": 386,
+    "anchor": {
+      "x": 128,
+      "y": 308
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

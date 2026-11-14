@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.128.3] - 2026-11-15
+<!-- version: {"title":"Studio: oak renders","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Asset Studio: the owner's renders of the oak in three stages (young about as tall as a person, grown, old on 2 × 2), four views each, wait for review. The game is unchanged.
+
 ## [0.128.2] - 2026-11-15
 <!-- version: {"title":"Studio: Castle level footprints","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

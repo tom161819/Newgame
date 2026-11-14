@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "oak-tree",
+  "variantId": "oak-tree-render-broad-180",
+  "name": "Oak render, broad 180° (rear-left)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "63410ccd",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 107,
+  "height": 116,
+  "anchor": {
+    "x": 49,
+    "y": 96
+  },
+  "origin": {
+    "x": 0.45794,
+    "y": 0.82759
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 49,
+    "y": 112
+  },
+  "baseOrigin": {
+    "x": 0.45794,
+    "y": 0.96552
+  },
+  "visualHeight": 112,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.132,
+  "lights": [],
+  "x2": {
+    "width": 214,
+    "height": 232,
+    "anchor": {
+      "x": 98,
+      "y": 192
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

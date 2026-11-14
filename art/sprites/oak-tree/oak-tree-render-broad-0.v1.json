@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "oak-tree",
+  "variantId": "oak-tree-render-broad-0",
+  "name": "Oak render, broad 0° (front-right)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "63410ccd",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 107,
+  "height": 122,
+  "anchor": {
+    "x": 56,
+    "y": 101
+  },
+  "origin": {
+    "x": 0.52336,
+    "y": 0.82787
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 56,
+    "y": 117
+  },
+  "baseOrigin": {
+    "x": 0.52336,
+    "y": 0.95902
+  },
+  "visualHeight": 117,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.132,
+  "lights": [],
+  "x2": {
+    "width": 214,
+    "height": 244,
+    "anchor": {
+      "x": 112,
+      "y": 202
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

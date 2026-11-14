@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "oak-tree",
+  "variantId": "oak-tree-render-young-0",
+  "name": "Oak render, young 0° (front-right)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "ad828bf4",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 27,
+  "height": 44,
+  "anchor": {
+    "x": 13,
+    "y": 27
+  },
+  "origin": {
+    "x": 0.48148,
+    "y": 0.61364
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 13,
+    "y": 43
+  },
+  "baseOrigin": {
+    "x": 0.48148,
+    "y": 0.97727
+  },
+  "visualHeight": 43,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.488,
+  "lights": [],
+  "x2": {
+    "width": 54,
+    "height": 88,
+    "anchor": {
+      "x": 26,
+      "y": 54
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}
