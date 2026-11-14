@@ -310,6 +310,250 @@
         "source": "gpt",
         "view": 270
       }
+    },
+    {
+      "id": "lumber-camp-yard-0",
+      "name": "Logger's cabin with saw yard 4 × 2 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): plank cabin with a shingle roof and lantern, log shed, two saw horses, chopping stump and log piles on a 4 × 2 yard (2 wide, 4 deep in the 0° view). The game Lumberjack Hut is 2 × 2: decide before it goes into the game. View 0° (front-right), cut out of the owner's GPT sheet and scaled to 0.22 wide and 0.19 high (the render's view is a little steeper than the game's; door ≈ 28 px). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1,
+          "depth": 0.9,
+          "wallHeight": 0.85,
+          "roofHeight": 0.65,
+          "ridge": "z",
+          "windows": 1,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "logs",
+            "at": [
+              0.25,
+              0.45
+            ],
+            "count": 6,
+            "length": 0.55
+          },
+          {
+            "type": "stump",
+            "at": [
+              -0.55,
+              0.62
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.6,
+              -0.55
+            ]
+          },
+          {
+            "type": "toolRack",
+            "at": [
+              0.85,
+              -0.05
+            ],
+            "r": 1.5708
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "lumber-camp-yard-90",
+      "name": "Logger's cabin with saw yard 4 × 2 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): plank cabin with a shingle roof and lantern, log shed, two saw horses, chopping stump and log piles on a 4 × 2 yard (2 wide, 4 deep in the 0° view). The game Lumberjack Hut is 2 × 2: decide before it goes into the game. View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 0.22 wide and 0.19 high (the render's view is a little steeper than the game's; door ≈ 28 px). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1,
+          "depth": 0.9,
+          "wallHeight": 0.85,
+          "roofHeight": 0.65,
+          "ridge": "z",
+          "windows": 1,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "logs",
+            "at": [
+              0.25,
+              0.45
+            ],
+            "count": 6,
+            "length": 0.55
+          },
+          {
+            "type": "stump",
+            "at": [
+              -0.55,
+              0.62
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.6,
+              -0.55
+            ]
+          },
+          {
+            "type": "toolRack",
+            "at": [
+              0.85,
+              -0.05
+            ],
+            "r": 1.5708
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "lumber-camp-yard-180",
+      "name": "Logger's cabin with saw yard 4 × 2 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): plank cabin with a shingle roof and lantern, log shed, two saw horses, chopping stump and log piles on a 4 × 2 yard (2 wide, 4 deep in the 0° view). The game Lumberjack Hut is 2 × 2: decide before it goes into the game. View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 0.22 wide and 0.19 high (the render's view is a little steeper than the game's; door ≈ 28 px). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1,
+          "depth": 0.9,
+          "wallHeight": 0.85,
+          "roofHeight": 0.65,
+          "ridge": "z",
+          "windows": 1,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "logs",
+            "at": [
+              0.25,
+              0.45
+            ],
+            "count": 6,
+            "length": 0.55
+          },
+          {
+            "type": "stump",
+            "at": [
+              -0.55,
+              0.62
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.6,
+              -0.55
+            ]
+          },
+          {
+            "type": "toolRack",
+            "at": [
+              0.85,
+              -0.05
+            ],
+            "r": 1.5708
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "lumber-camp-yard-270",
+      "name": "Logger's cabin with saw yard 4 × 2 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): plank cabin with a shingle roof and lantern, log shed, two saw horses, chopping stump and log piles on a 4 × 2 yard (2 wide, 4 deep in the 0° view). The game Lumberjack Hut is 2 × 2: decide before it goes into the game. View 270° (front-left), cut out of the owner's GPT sheet and scaled to 0.22 wide and 0.19 high (the render's view is a little steeper than the game's; door ≈ 28 px). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1,
+          "depth": 0.9,
+          "wallHeight": 0.85,
+          "roofHeight": 0.65,
+          "ridge": "z",
+          "windows": 1,
+          "at": [
+            -0.3,
+            -0.35
+          ]
+        },
+        "props": [
+          {
+            "type": "logs",
+            "at": [
+              0.25,
+              0.45
+            ],
+            "count": 6,
+            "length": 0.55
+          },
+          {
+            "type": "stump",
+            "at": [
+              -0.55,
+              0.62
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.6,
+              -0.55
+            ]
+          },
+          {
+            "type": "toolRack",
+            "at": [
+              0.85,
+              -0.05
+            ],
+            "r": 1.5708
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }

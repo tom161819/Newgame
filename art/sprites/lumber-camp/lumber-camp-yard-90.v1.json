@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "lumber-camp",
+  "variantId": "lumber-camp-yard-90",
+  "name": "Logger's cabin with saw yard 4 × 2 90° (rear-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "fb16ec6c",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 149,
+  "anchor": {
+    "x": 129,
+    "y": 98
+  },
+  "origin": {
+    "x": 0.66154,
+    "y": 0.65772
+  },
+  "footprint": {
+    "width": 2,
+    "height": 4
+  },
+  "base": {
+    "x": 97,
+    "y": 146
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.97987
+  },
+  "visualHeight": 146,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.64,
+  "lights": [],
+  "x2": {
+    "width": 390,
+    "height": 298,
+    "anchor": {
+      "x": 258,
+      "y": 196
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

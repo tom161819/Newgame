@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "assetId": "lumber-camp",
+  "variantId": "lumber-camp-yard-0",
+  "name": "Logger's cabin with saw yard 4 × 2 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "fb16ec6c",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 192,
+  "height": 152,
+  "anchor": {
+    "x": 162,
+    "y": 101
+  },
+  "origin": {
+    "x": 0.84375,
+    "y": 0.66447
+  },
+  "footprint": {
+    "width": 2,
+    "height": 4
+  },
+  "base": {
+    "x": 130,
+    "y": 149
+  },
+  "baseOrigin": {
+    "x": 0.67708,
+    "y": 0.98026
+  },
+  "visualHeight": 149,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": -60,
+      "y": -84,
+      "color": "#ffb25a",
+      "radius": 90,
+      "intensity": 0.85,
+      "flicker": {
+        "amplitude": 0.1,
+        "speed": 6
+      },
+      "flameSize": 0.5
+    }
+  ],
+  "modelHeight": 1.64,
+  "lights": [],
+  "x2": {
+    "width": 384,
+    "height": 304,
+    "anchor": {
+      "x": 324,
+      "y": 202
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}
