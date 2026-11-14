@@ -43,6 +43,262 @@
         "roof": "roof_shingle",
         "banner": "banner"
       }
+    },
+    {
+      "id": "castle-l1-0",
+      "name": "Level 1: thatched hall 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle Wooden hall on a stone base with a thatched roof, the stag shield over the door, two torches, a banner pole, a bench and barrels on bare ground. Drawn for 4 × 4. View 0° (front-right), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "castle-l1-90",
+      "name": "Level 1: thatched hall 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle Wooden hall on a stone base with a thatched roof, the stag shield over the door, two torches, a banner pole, a bench and barrels on bare ground. Drawn for 4 × 4. View 90° (rear-right), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "castle-l1-180",
+      "name": "Level 1: thatched hall 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle Wooden hall on a stone base with a thatched roof, the stag shield over the door, two torches, a banner pole, a bench and barrels on bare ground. Drawn for 4 × 4. View 180° (rear-left), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "castle-l1-270",
+      "name": "Level 1: thatched hall 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle Wooden hall on a stone base with a thatched roof, the stag shield over the door, two torches, a banner pole, a bench and barrels on bare ground. Drawn for 4 × 4. View 270° (front-left), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "castle-l2-0",
+      "name": "Level 2: hall with tower and palisade 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle The thatched hall with a wooden watchtower and a palisade around the yard. Drawn for 3 × 3. View 0° (front-right), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "castle-l2-90",
+      "name": "Level 2: hall with tower and palisade 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle The thatched hall with a wooden watchtower and a palisade around the yard. Drawn for 3 × 3. View 90° (rear-right), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "castle-l2-180",
+      "name": "Level 2: hall with tower and palisade 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle The thatched hall with a wooden watchtower and a palisade around the yard. Drawn for 3 × 3. View 180° (rear-left), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "castle-l2-270",
+      "name": "Level 2: hall with tower and palisade 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle The thatched hall with a wooden watchtower and a palisade around the yard. Drawn for 3 × 3. View 270° (front-left), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "castle-l3-0",
+      "name": "Level 3: stone keep and wall 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle Half-timbered hall on stone with a tiled roof, a stone tower with banners, a paved yard and a low battlemented wall with a gate arch. Drawn for 3 × 3. View 0° (front-right), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "castle-l3-90",
+      "name": "Level 3: stone keep and wall 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle Half-timbered hall on stone with a tiled roof, a stone tower with banners, a paved yard and a low battlemented wall with a gate arch. Drawn for 3 × 3. View 90° (rear-right), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "castle-l3-180",
+      "name": "Level 3: stone keep and wall 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle Half-timbered hall on stone with a tiled roof, a stone tower with banners, a paved yard and a low battlemented wall with a gate arch. Drawn for 3 × 3. View 180° (rear-left), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "castle-l3-270",
+      "name": "Level 3: stone keep and wall 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle Half-timbered hall on stone with a tiled roof, a stone tower with banners, a paved yard and a low battlemented wall with a gate arch. Drawn for 3 × 3. View 270° (front-left), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "castle-l4-0",
+      "name": "Level 4: castle with two halls 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle The stone castle grown: a second hall, a round turret, stairs, banners at the gate, a battlemented wall around a paved yard. Drawn for 4 × 4. View 0° (front-right), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "castle-l4-90",
+      "name": "Level 4: castle with two halls 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle The stone castle grown: a second hall, a round turret, stairs, banners at the gate, a battlemented wall around a paved yard. Drawn for 4 × 4. View 90° (rear-right), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "castle-l4-180",
+      "name": "Level 4: castle with two halls 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle The stone castle grown: a second hall, a round turret, stairs, banners at the gate, a battlemented wall around a paved yard. Drawn for 4 × 4. View 180° (rear-left), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "castle-l4-270",
+      "name": "Level 4: castle with two halls 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026), Castle The stone castle grown: a second hall, a round turret, stairs, banners at the gate, a battlemented wall around a paved yard. Drawn for 4 × 4. View 270° (front-left), cut out of the owner's render and scaled to 0.3137 wide and 0.276 high (one scale for all four levels, so the hall keeps its size). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "layout": "keep",
+        "roof": "roof_shingle",
+        "banner": "banner"
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }

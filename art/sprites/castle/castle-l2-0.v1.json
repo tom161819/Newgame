@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "castle",
+  "variantId": "castle-l2-0",
+  "name": "Level 2: hall with tower and palisade 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "5cd38fa0",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 192,
+  "height": 163,
+  "anchor": {
+    "x": 96,
+    "y": 112
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.68712
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 96,
+    "y": 160
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.9816
+  },
+  "visualHeight": 160,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 4.603,
+  "lights": [],
+  "x2": {
+    "width": 384,
+    "height": 326,
+    "anchor": {
+      "x": 192,
+      "y": 224
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

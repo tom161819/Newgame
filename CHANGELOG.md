@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.128.1] - 2026-11-14
+<!-- version: {"title":"Studio: Castle in four levels","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Asset Studio: the owner's renders of the Castle in four levels (thatched hall; hall with tower and palisade; stone keep with wall; castle with two halls), four views each, wait for review. The game is unchanged.
+
 ## [0.128.0] - 2026-11-14
 <!-- version: {"title":"Season squares fixed; hit points of fortifications","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

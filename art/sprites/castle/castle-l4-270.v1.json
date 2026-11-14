@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "castle",
+  "variantId": "castle-l4-270",
+  "name": "Level 4: castle with two halls 270° (front-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "5cd38fa0",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 237,
+  "height": 189,
+  "anchor": {
+    "x": 118,
+    "y": 122
+  },
+  "origin": {
+    "x": 0.49789,
+    "y": 0.6455
+  },
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "base": {
+    "x": 118,
+    "y": 186
+  },
+  "baseOrigin": {
+    "x": 0.49789,
+    "y": 0.98413
+  },
+  "visualHeight": 186,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 4.603,
+  "lights": [],
+  "x2": {
+    "width": 474,
+    "height": 378,
+    "anchor": {
+      "x": 236,
+      "y": 244
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

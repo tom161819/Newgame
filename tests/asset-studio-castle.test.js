@@ -15,8 +15,10 @@ const game = objectDefinitions.find(d => d.id === 'castle');
 test('castle concepts keep the game footprint and stay within 20 % of today’s height', () => {
   assert.deepEqual(spec.footprint, { width: game.width, height: game.height }, 'the footprint does not change (saves, gathering)');
   assert.equal(spec.gameObjectId, 'castle');
-  assert.deepEqual(spec.variants.map(v => v.spec.layout), ['curtain', 'keep', 'motte']);
-  for (const variant of spec.variants) {
+  // The owner's renders of the four Castle levels (castle-l1 … l4, 14 Nov 2026) are imported pictures, not concepts.
+  const concepts = spec.variants.filter(v => !v.baked);
+  assert.deepEqual(concepts.map(v => v.spec.layout), ['curtain', 'keep', 'motte']);
+  for (const variant of concepts) {
     const meta = json(`art/sprites/castle/${variant.id}.v${variant.version}.json`);
     assert.ok(meta.height <= Math.round(game.visualHeight * 1.2), `${variant.id}: ${meta.height} px ≤ ${Math.round(game.visualHeight * 1.2)} px`);
     assert.ok(meta.platform, `${variant.id}: a platform for the king`);
