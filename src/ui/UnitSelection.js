@@ -6,6 +6,8 @@ import { haulPriorityFromValue,haulPriorityValue,setHaulPriority } from '../syst
 import { tileCenter } from '../game/isometric.js';
 import { blockingDialog } from './dockedPanels.js';
 
+export const isEnemy=animal=>animal?.type==='wolf'||!!animal?.definition?.gameplay?.hostile;
+const ATTACK_CURSOR=`url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g stroke="#1b1a14" stroke-width="1.2" stroke-linejoin="round"><path d="M4 3l3 0 14 14-3 3L4 6z" fill="#dfe3e6"/><path d="M28 3l-3 0-14 14 3 3L28 6z" fill="#c9ced2"/><path d="M15 21l5-5 3 3-5 5z" fill="#b8892f"/><path d="M17 21l-5-5-3 3 5 5z" fill="#b8892f"/><path d="M21 22l3-3 5 6-3 3z" fill="#6b4a2a"/><path d="M11 22l-3-3-5 6 3 3z" fill="#6b4a2a"/></g></svg>')}") 16 16, crosshair`;
 // Screen-space drag rectangle; selected rings and order markers are projected
 // from world positions each frame, so pan/zoom never change who was selected.
 export class UnitSelection {
@@ -35,6 +37,9 @@ export class UnitSelection {
     if(pointer.rightButtonDown()){
       if(this.ids.size||this.king){
         // m-vojaci-na-hradby: a right click on a finished Stone Wall, Tower or Gate posts the selected soldiers on it.
+        // m-vojaci-utok (point 39): a right click on an enemy (a wolf now, other enemies later) sends the selected soldiers at it.
+        {const enemy=this.enemyAt(pointer),fighters=this.workers().filter(w=>w.profession==='soldier');
+          if(enemy&&fighters.length){for(const w of fighters){s.workerSystem.commands.resume(w);s.military?.wallPatrol?.set(w,false);w.huntWolfId=enemy.id;w.militaryRetarget=0;}s.setStatus(t('army.attack',{count:fighters.length,name:enemy.definition.name}));if(this.king)s.kingOrder(pointer);this.draw();return true;}}
         const tile=s.pointerTile(pointer),target=tile&&s.buildings.find(b=>buildingIsComplete(b)&&(isWall(b)||b.type==='tower'||b.type==='gate')&&b.tiles?.some(tl=>tl.x===tile.x&&tl.y===tile.y)),soldiers=this.workers().filter(w=>w.profession==='soldier');
         if(target&&soldiers.length){const posted=s.military?.wallPatrol?.post(soldiers,target)??0;if(posted){s.setStatus(t('army.posted',{count:posted,name:buildingDefinition(target).name}));this.draw();return true;}s.setStatus(t('army.postNoWay'));return true;}
         if(this.ids.size){const count=s.workerSystem.commands.move(this.workers(),s.pointerTile(pointer));s.setStatus(t(count?'command.moving':'command.noRoute',{count}));}
@@ -44,7 +49,7 @@ export class UnitSelection {
     if(!pointer.leftButtonDown())return false;
     this.anchor={x:pointer.x,y:pointer.y};this.dragging=false;return true;
   }
-  move(pointer){if(!this.anchor)return;this.current={x:pointer.x,y:pointer.y};if(Math.hypot(pointer.x-this.anchor.x,pointer.y-this.anchor.y)>6)this.dragging=true;this.draw();}
+  move(pointer){this.hover(pointer);if(!this.anchor)return;this.current={x:pointer.x,y:pointer.y};if(Math.hypot(pointer.x-this.anchor.x,pointer.y-this.anchor.y)>6)this.dragging=true;this.draw();}
   up(pointer){
     if(!this.anchor)return false;
     const anchor=this.anchor;this.anchor=null;
@@ -64,6 +69,11 @@ export class UnitSelection {
   }
   // The King's picture as a click target (his view is a container; a little room around it helps on small zoom).
   onKing(x,y){const b=this.scene.player?.getBounds?.();return !!b&&this.scene.character.state==='ground'&&x>=b.x-6&&x<=b.x+b.width+6&&y>=b.y-24&&y<=b.y+b.height+4;}
+  // An enemy under the pointer that soldiers may be sent at.
+  enemyAt(pointer){const s=this.scene;pointer.updateWorldPoint(s.cameras.main);const a=s.animalSystem?.atPoint(pointer.worldX,pointer.worldY);return a&&a.isAlive&&isEnemy(a)&&s.fog.isVisibleObject(a)?a:null;}
+  // The pointer turns into crossed swords over an enemy while soldiers are selected.
+  hover(pointer){const s=this.scene,canvas=s.game.canvas;if(s.buildMode||s.rockMiningTool?.enabled)return;const attack=this.ids.size>0&&this.workers().some(w=>w.profession==='soldier')&&!!this.enemyAt(pointer);
+    if(attack!==this.attackCursor){this.attackCursor=attack;canvas.style.cursor=attack?ATTACK_CURSOR:'';}}
   cancelDrag(){this.anchor=null;this.dragging=false;this.overlay.clear();}
   draw(){
     const s=this.scene,workers=this.workers();this.ids=new Set(workers.map(w=>w.id));this.graphics.clear();this.overlay.clear();

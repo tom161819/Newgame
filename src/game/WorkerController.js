@@ -23,6 +23,7 @@ export class WorkerController extends AnimalController {
   reservedTiles(){return this.isAlive&&this.sleepingIn==null?super.reservedTiles():[];}
   moveTo(goals){const route=findPathToAny(this.scene.workerSystem?.navigationMap(this)??this.scene.map,this.nextTile??this.tile,goals,this.scene.pathWear?.routingOptions(this));this.path=route?.path??[];return !!route;}
   canEnterTile(tile){
+    /* Point 45: a resident standing under a new blueprint may always step off it. */if(this.steppingAside!=null){const site=this.scene.buildings?.find(b=>b.id===this.steppingAside),inside=t=>!!site?.tiles?.some(p=>p.x===t.x&&p.y===t.y);if(site&&inside(this.tile)&&!this.scene.buildings.some(b=>b!==site&&b.tiles?.some(p=>p.x===tile.x&&p.y===tile.y)))return true;if(!site||!inside(this.tile))this.steppingAside=null;}
     if(this.onWall)return true;/* m-hlidka-hradby: on the wall walk the route is already a chain of joined walls */
     if(commanded(this))return this.scene.workerSystem.commands.canStep(this,tile);
     if(!this.scene.workplaceSystem)return true;

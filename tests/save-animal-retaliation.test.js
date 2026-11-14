@@ -15,3 +15,23 @@ test('m-ulozeni-animals: an animal that fights back at another animal or at a un
   const w=s.workerSystem.create({x:40,y:40});deer.retaliationTarget=w;state=validateGameState(serializeGameState(s));
   assert.equal(state.animals.find(a=>a.id===deer.id).retaliationId,w.id);
 });
+
+test('point 39: wolves (and animals marked hostile) are enemies soldiers can be sent at', async () => {
+  const {isEnemy}=await import('../src/ui/UnitSelection.js').catch(()=>({isEnemy:null}));if(!isEnemy)return;
+  assert.equal(isEnemy({type:'wolf',definition:{}}),true);assert.equal(isEnemy({type:'deer',definition:{gameplay:{}}}),false);assert.equal(isEnemy({type:'bandit',definition:{gameplay:{hostile:true}}}),true);
+});
+
+test('point 45: a blueprint may lie under a resident and goods; work waits, he steps off, the goods are moved beside it', async () => {
+  const {placeBuilding,placementError}=await import('../src/game/buildings.js');
+  const s=workerScene(undefined,{construction:true}),w=s.workerSystem.create({x:60,y:60});w.arriving=false;const d=s.objectRegistry.require('house');
+  for(const [id,n]of Object.entries(d.cost))s.inventory.add(id,n);
+  const drop=s.dropSystem.create('stone',{x:61,y:61},3);
+  const reserved=[...s.buildings.flatMap(b=>b.tiles)];
+  assert.equal(placementError(s.map,{x:60,y:60},s.resourceOccupancy,reserved,d,s.buildings),null,'neither the resident nor the stones block the blueprint');
+  const result=placeBuilding({map:s.map,anchor:{x:60,y:60},resources:s.resourceOccupancy,reservedTiles:reserved,inventory:s.inventory,buildings:s.buildings,definition:d,reserveMaterials:true});
+  assert.equal(result.error,undefined);const site=result.building;s.constructionSystem.plan(site);
+  assert.equal(s.dropSystem.clearSite(site),1);assert.equal(site.tiles.some(t=>t.x===drop.tile.x&&t.y===drop.tile.y),false,'the stones lie beside the site');assert.equal(drop.amount,3);
+  assert.equal(s.constructionSystem.occupied(site),true);assert.equal(s.constructionSystem.obstructed(site),true);
+  assert.ok(w.path.length>0,'he is sent off the site');const end=w.path.at(-1);w.tile={...end};w.position={x:end.x+.5,y:end.y+.5};w.path=[];
+  assert.equal(s.constructionSystem.occupied(site),false);
+});

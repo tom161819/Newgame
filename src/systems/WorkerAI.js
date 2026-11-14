@@ -38,6 +38,8 @@ export class WorkerAI {
     if(this.scene.nightThreats?.firefight(worker,delta)){worker.update(delta);return;}this.step(worker,delta);this.scene.lightFuel?.help(worker);this.scene.heating?.help(worker);this.scene.nightThreats?.pursue(worker);this.scene.porches?.check(worker);}
   step(worker,delta){
     if(!worker.isAlive)return;
+    // Point 45: stepping off a new blueprint comes first; the usual work goes on once he is beside it.
+    if(worker.steppingAside!=null){if(worker.path.length||worker.nextTile){worker.update(delta);return;}worker.steppingAside=null;}
     if(this.system.commands.update(worker,delta)){if(worker.restPhase)this.system.rest?.stop(worker);return;}
     worker.aiCooldown-=delta;
     if(worker.arriving){this.arrival(worker);worker.update(delta);return;}

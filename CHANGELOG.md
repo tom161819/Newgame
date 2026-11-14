@@ -5,6 +5,17 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.127.0] - 2026-11-14
+<!-- version: {"title":"Attack orders, Show links, blueprints over people","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Soldiers attack on command: with soldiers selected, a right click on a wolf sends them at it. The pointer turns into crossed swords over an enemy.
+- "Show links" switch in the top right corner of the Buildings panel (explained on hover). While a blueprint is being placed, thin lines run to the buildings it will work with: orange where the worker takes what he needs, blue where he carries what he makes.
+### Changed
+- A blueprint can be placed over people, animals and goods lying on the ground. The goods are put beside it at once, residents step off it, and building starts when nobody stands there.
+- Newcomers walking in from the map edge reveal nothing of the map until they reach the Castle.
+- A Gate keeps the direction it was placed with; walls built later no longer turn it. It still turns by itself when placed into an existing wall.
+- Stone Pavement starts in the Area mode: drag a rectangle in both directions (Single, Line and Remove are still in the mode bar).
+
 ## [0.126.0] - 2026-11-14
 <!-- version: {"title":"King selected like other units; profession numbers; save fix","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

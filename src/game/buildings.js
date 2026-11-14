@@ -108,7 +108,9 @@ export function placementError(map,anchor,resources,reservedTiles=[],definition=
     const range=definition.decoration.farmRange;
     if(range&&!buildings.some(b=>HOUSE_DECORATIONS.haystack.farms.includes(b.type)&&Math.hypot(b.x+buildingDefinition(b).width/2-(anchor.x+.5),b.y+buildingDefinition(b).height/2-(anchor.y+.5))<=range))return t('status.needsFarmNearby',{range});
   }
-  if(tiles.some(tile=>resources.has(tileKey(tile))&&!natural?.mining.canBuildOver(definition,tile)))return t('status.resourceHere');
+  // Point 45 (owner 14 Nov 2026): goods lying on the ground do not block a blueprint; they are moved off it.
+  const loose=tile=>String(resources.get?.(tileKey(tile))??'').startsWith('drop-');
+  if(tiles.some(tile=>resources.has(tileKey(tile))&&!loose(tile)&&!natural?.mining.canBuildOver(definition,tile)))return t('status.resourceHere');
   if(tiles.some(tile=>!replaced(tile)&&reservedTiles.some(p=>tileKey(p)===tileKey(tile))))return t('status.unitHere');
   if(tiles.some(tile=>buildings.some(building=>!walls.includes(building)&&building.tiles.some(p=>tileKey(p)===tileKey(tile)))))return t('status.buildingHere');
   return natural?.mining.accessError(map,definition,anchor)??null;

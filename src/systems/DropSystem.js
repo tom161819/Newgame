@@ -17,6 +17,16 @@ export class DropSystem {
     const drop={id,resource,tile:{...tile},amount,rewardRemaining,rewardUnits,haulEligible,...(siteId!=null?{siteId}:{}),view};view.setData('drop',drop);this.drops.set(id,drop);
     this.refreshOccupancy(tile);return drop;
   }
+  // Point 45 (owner 14 Nov 2026): goods lying under a new blueprint are put on the nearest free tile beside it (same
+  // drop, same id), from where Haulers take them to a store as usual.
+  clearSite(site){
+    const s=this.scene,d=site.definition??s.objectRegistry.get(site.type);if(!site.tiles||d?.pavement||d?.walkable)return 0;const inside=new Set(site.tiles.map(tileKey));let moved=0;
+    for(const drop of [...this.drops.values()]){if(!inside.has(tileKey(drop.tile)))continue;let best=null;
+      for(let r=1;r<12&&!best;r++)for(let dy=-r;dy<=r&&!best;dy++)for(let dx=-r;dx<=r&&!best;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const tile={x:drop.tile.x+dx,y:drop.tile.y+dy},key=tileKey(tile);
+        if(!inside.has(key)&&s.map[tile.y]?.[tile.x]===0&&!s.resourceOccupancy.has(key))best=tile;}
+      if(!best)continue;const old=drop.tile;drop.tile={...best};const p=tileCenter(best);drop.view.setPosition?.(p.x,p.y);drop.view.setData?.('tile',{...best});drop.view.setDepth?.(p.y);this.refreshOccupancy(old);this.refreshOccupancy(best);moved++;}
+    return moved;
+  }
   refreshOccupancy(tile){
     const key=tileKey(tile),drop=[...this.drops.values()].find(d=>tileKey(d.tile)===key);
     const resource=[...this.scene.resources.values()].find(view=>view.getData('object')?.tiles.some(p=>tileKey(p)===key));

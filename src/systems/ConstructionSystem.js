@@ -34,8 +34,25 @@ export class ConstructionSystem {
   workSites(){return [...this.sites.values(),...(this.scene.demolition?.sites()??[])];}
   // m-oznacovani-tezby (56): a wall, tower or gate is built only once its rocks and trees are gone (bushes do not block).
   clearing(){return this.scene.naturalResources?.miningWork.rocks??null;}
-  obstructed(site){return !!this.clearing()?.obstructed(site);}
+  obstructed(site){return !!this.clearing()?.obstructed(site)||this.occupied(site);}
+  // Point 45 (owner 14 Nov 2026): a blueprint may lie under people, animals or goods; building waits until they are
+  // gone. An idle resident standing there is sent beside the site.
+  occupied(site){
+    const s=this.scene,d=buildingDefinition(site);if(site.demolition===true||d.pavement||d.walkable||!site.tiles)return false;
+    const inside=new Set(site.tiles.map(t=>`${t.x},${t.y}`)),on=u=>!!u?.isAlive&&u.tile&&inside.has(`${u.tile.x},${u.tile.y}`);let found=false;
+    if(s.character?.state==='ground'&&on(s.character))found=true;
+    for(const a of s.animalSystem?.animals.values()??[])if(!a.mounted&&on(a)){found=true;break;}
+    for(const w of s.workerSystem?.liveWorkers()??[])if(on(w)){found=true;if(!w.nextTile&&!w.path?.length&&w.commandState?.state!=='Holding'&&(w.stepAside??0)<=(s.gameTime?.totalElapsed??0)){w.stepAside=(s.gameTime?.totalElapsed??0)+3000;this.stepAside(w,site);}}
+    if(!found)for(const drop of s.dropSystem?.drops.values()??[])if(inside.has(`${drop.tile.x},${drop.tile.y}`)){found=true;s.dropSystem.clearSite?.(site);break;}
+    return found;
+  }
   ready(site){return site.demolition===true||this.materials.ready(site)&&!this.obstructed(site);}
+  // The site's tiles are already closed, so the way out is searched with the resident's own tile opened.
+  stepAside(worker,site){
+    const s=this.scene,base=s.workerSystem?.navigationMap?.(worker)??s.map,map=base.map(row=>[...row]);for(const t of site.tiles)map[t.y][t.x]=0;
+    const goals=towerNeighbors(site).filter(t=>base[t.y]?.[t.x]===0),route=goals.length?findPathToAny(map,worker.tile,goals,s.pathWear?.routingOptions(worker)):null;
+    if(route?.path?.length){worker.path=route.path;worker.steppingAside=site.id;return true;}return false;
+  }
   actor(id){return id==='king'?this.scene.character:this.scene.workerSystem.workers.get(id);}
   slotKey(goal){return `construction-slot:${tileKey(goal)}`;}
   goals(site,actor){const area=buildingDefinition(site).pavement?this.materials.area(site):null;return towerNeighbors(area?.host??site).filter(t=>this.scene.map[t.y]?.[t.x]===0&&this.scene.workerSystem.reservations.available(this.slotKey(t),actor.id));}
@@ -105,6 +122,8 @@ export class ConstructionSystem {
   update(delta){
     this.materials.syncAreas();
     for(const site of [...this.sites.values()])if(site.unverified)this.verifyProvisional(site);
+    // Point 45: people under a blueprint are asked to step off even before its materials arrive (twice a second).
+    this.asideTick=(this.asideTick??0)+delta;if(this.asideTick>=500){this.asideTick=0;for(const site of this.sites.values())if(!site.unverified)this.occupied(site);}
     for(const site of [...this.sites.values()]){
       if(site.unverified||!this.materials.ready(site)||this.obstructed(site))continue;
       const participants=[];

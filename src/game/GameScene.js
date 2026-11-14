@@ -1,3 +1,4 @@
+import { buildLinks,drawBuildLinks,linksEnabled } from './buildLinks.js';
 import { clockMinutes,formatClock } from '../data/dayNight.js';
 import { personHover } from '../ui/personHover.js';
 import { TutorialGuide } from '../ui/TutorialGuide.js';
@@ -327,7 +328,8 @@ export class GameScene extends Phaser.Scene {
     this.equipmentPanel=new EquipmentPanel(this);
     this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=t('hud.population',{count,maximum});}});if(!this.loadState)this.workerSystem.spawnInitial(this.worldRandom('villagers'));this.builderWorkshops=new BuilderWorkshopSystem(this);this.fishing=new FishingSystem(this);
     // Every living subject is a moving sight source (diameter 15); leaving, dying or emigrating removes it.
-    this.fog.registerSource('subjects',()=>this.workerSystem.liveSubjects().map(subjectSight));
+    // Point 42 (owner 14 Nov 2026): a newcomer on his way from the map edge reveals nothing until he reaches the Castle.
+    this.fog.registerSource('subjects',()=>this.workerSystem.liveSubjects().filter(w=>!w.arriving).map(subjectSight));
     this.workplaceSystem=new WorkplaceSystem(this);this.workplacePanel=new WorkplacePanel(this);
     this.constructionSystem=new ConstructionSystem(this,{onProgress:site=>this.towerViews.get(site.id)?.updateProgress?.(site),
       onComplete:site=>{this.towerViews.get(site.id)?.destroy();if(buildingDefinition(site).pavement){this.towerViews.delete(site.id);this.terrain.invalidateArea([site]);this.updateInventory();this.constructionUI?.refresh();return;}this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.built',{name:buildingDefinition(site).name}));this.completionFlash?.flash(site);},
@@ -395,7 +397,7 @@ export class GameScene extends Phaser.Scene {
     this.input.on('gameout',()=>{/* Only a map building's tooltip: Phaser handles the queued canvas "out" after the HUD gauge's pointerenter, which would cancel its preview (map now under the HUD to the window edge, 9 Nov 2026). */if(this.storePreview?.key?.startsWith?.('building:'))this.storePreview.hide();this.rockMiningTool.cancelDrag();this.unitSelection.cancelDrag();this.previewAnchor=null;this.previewTracking=false;this.preview.setVisible(false);this.previewKey=null;this.clearWallPreviews();document.querySelector('#object-tooltip').hidden=true;});
     // #97: a Gate opens across its wall: in a wall running east–west the opening faces the other way (mirrored sprite).
     // m-staveni-zdi-studna (59): the axis comes from the wall run, else from the Gate's stored gateAxis (gateAxis in walls.js).
-    this.orientGates=()=>{const index=wallIndex(this.buildings,true);for(const b of this.buildings)if(b.type==='wall_gate'||b.type==='gate')this.flipGateView(this.towerViews.get(b.id),b,gateAxis(index,b)==='x');else if(b.type==='tower'&&b.facing)this.flipGateView(this.towerViews.get(b.id),b,b.facing%2===1);};
+    this.orientGates=()=>{const index=wallIndex(this.buildings,true);for(const b of this.buildings)if(b.type==='wall_gate'||b.type==='gate'){/* Point 48 (owner 14 Nov 2026): the axis chosen with the blueprint stays; walls built later never turn a Gate. A Gate of an older save takes its axis once. */b.gateAxis??=gateAxis(index,b);this.flipGateView(this.towerViews.get(b.id),b,b.gateAxis==='x');}else if(b.type==='tower'&&b.facing)this.flipGateView(this.towerViews.get(b.id),b,b.facing%2===1);};
     this.events.on('buildings:changed',this.orientGates);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{this.events.off('buildings:changed',this.orientGates);
       this.rockMiningTool.destroy();this.unitSelection.destroy();this.minimap?.destroy();this.eventFeed?.destroy();this.millSails?.destroy();this.kingCargoControl.destroy();this.kingLogistics.destroy();this.lightSources.destroy();
@@ -440,6 +442,9 @@ export class GameScene extends Phaser.Scene {
   // velke-prirodni-objekty: loose stones, new trees and deposits keep off thickets (they would split them).
   thicketTileList(){return [...thicketTiles(this.natureGroups)].map(k=>{const [x,y]=k.split(',').map(Number);return {x,y};});}
   fordTiles(){return [...(this.fordKeys??[])].map(k=>{const [x,y]=k.split(',').map(Number);return {x,y};});}
+  // Point 45 (owner 14 Nov 2026): a blueprint may be placed over people and animals (they walk off; work starts when
+  // the site is empty), so only stores and buildings reserve ground for placement.
+  placementReserved(){return [...(this.foodStorage?.reservedTiles()??[]),...this.buildings.flatMap(b=>b.tiles)];}
   reservedTiles(){return [...this.character.reservedTiles(),...(this.animalSystem?.reservedTiles()??[]),...(this.workerSystem?.reservedTiles()??[]),...(this.foodStorage?.reservedTiles()??[]),...this.buildings.flatMap(b=>b.tiles)];}
   updateHover(pointer){
     this.hoverX=pointer.x;this.hoverY=pointer.y;this.hoverAt=performance.now();
@@ -509,10 +514,10 @@ export class GameScene extends Phaser.Scene {
       if(known){this.previewKey=null;this.updateBuildingPreview();this.setStatus(known);return;}
       // m-staveni-zdi-studna (59): a Gate or Tower over Stone Wall segments replaces them; a Gate keeps the axis it was placed with.
       const fields=['wall_gate','gate'].includes(this.selectedBuilding.id)?{gateAxis:gateAxis(wallIndex(this.buildings,true),{...goal,definition:this.selectedBuilding,gateAxis:this.gateAxis})}:this.selectedBuilding.id==='tower'&&this.towerFacing?{facing:this.towerFacing}:null;
-      const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.reservedTiles(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding,reserveMaterials:true,provisional,fields,replaceWalls:(walls,building)=>replaceWalls(this,walls,building)});
+      const result=placeBuilding({map:this.map,anchor:goal,resources:this.resourceOccupancy,reservedTiles:this.placementReserved(),inventory:this.inventory,buildings:this.buildings,definition:this.selectedBuilding,reserveMaterials:true,provisional,fields,replaceWalls:(walls,building)=>replaceWalls(this,walls,building)});
       if(result.error){this.previewKey=null;this.updateBuildingPreview();this.setStatus(mineSpotError(this,goal,this.selectedBuilding,result.error));}
       else{
-        this.constructionSystem.plan(result.building);
+        this.constructionSystem.plan(result.building);this.dropSystem.clearSite?.(result.building);
         this.towerViews.set(result.building.id,this.createBuildingView(this.selectedBuilding,result.building));if(provisional)this.rememberBlueprint(result.building);
         let message=this.selectedBuilding.crop&&result.building.farmId==null?t('farmPlots.orphan'):t(provisional?'status.blueprintProvisional':'status.blueprintReady',{name:this.selectedBuilding.name,cost:formatCost(this.selectedBuilding.cost,this.objectRegistry)});
         if(result.replaced)message+=` ${t('status.wallReplaced',{count:result.replaced.length,refund:Object.keys(result.refund??{}).length?formatCost(result.refund,this.objectRegistry):t('demolition.noRefund')})}`;
@@ -664,21 +669,24 @@ export class GameScene extends Phaser.Scene {
   }
   cancelBuilding(message=t('status.buildCancelled')) {
     this.clearWallPreviews();
-    this.buildMode=false;this.pavementTool?.clear();this.selectedBuilding=null;this.previewAnchor=null;this.previewTracking=false;this.previewKey=null;
+    this.buildLinkGraphics?.setVisible(false);this.buildMode=false;this.pavementTool?.clear();this.selectedBuilding=null;this.previewAnchor=null;this.previewTracking=false;this.previewKey=null;
     this.preview.setVisible(false);this.game.canvas.style.cursor='';this.updateBuildingUI();this.setStatus(message);
   }
   // The player sees the provisional blueprint they placed, as a remembered site, until someone sees the real ground.
   rememberBlueprint(building){
     rememberBlueprint(this,building);
   }
+  // Point 44: the lines of "Show links" follow the blueprint under the pointer.
+  updateBuildLinks(){const g=this.buildLinkGraphics??=this.add.graphics().setDepth(9997);const d=this.selectedBuilding,on=this.buildMode&&this.previewAnchor&&d&&!d.construction?.mode&&linksEnabled();g.setVisible(!!on);if(on)drawBuildLinks(g,buildLinks(this,d,this.previewAnchor),this.cameras.main.zoom);}
   updateBuildingPreview() {
+    this.updateBuildLinks();
     const anchor=this.previewAnchor,definition=this.selectedBuilding;
     if(this.buildMode&&anchor&&definition.construction?.mode==='line'){this.updateWallPreview(anchor);return;}
     if(this.buildMode&&anchor&&definition.construction?.mode==='pavement'){this.pavementTool.preview(anchor);return;}
     if(!this.buildMode||!anchor||anchor.x<0||anchor.y<0||anchor.x>=COLUMNS||anchor.y>=ROWS){this.preview.setVisible(false);return;}
     // Outside sight the preview is amber (provisional): only known ground decides, never a hidden obstacle.
     const provisional=isProvisional(this.fog,buildingTiles(anchor,definition));
-    const error=mineSpotError(this,anchor,definition,provisional?knownPlacementError(this,anchor,definition):placementError(this.map,anchor,this.resourceOccupancy,this.reservedTiles(),definition,this.buildings,this.buildingUnlocks))
+    const error=mineSpotError(this,anchor,definition,provisional?knownPlacementError(this,anchor,definition):placementError(this.map,anchor,this.resourceOccupancy,this.placementReserved(),definition,this.buildings,this.buildingUnlocks))
       ??(provisional?provisionalMineError(this,anchor,definition):null)??(!this.inventory.canAfford(definition.cost)?t('status.noFunds'):null);
     const gate=['wall_gate','gate'].includes(definition.id)?gateAxis(wallIndex(this.buildings,true),{...anchor,definition,gateAxis:this.gateAxis}):null;
     const facing=definition.id==='tower'?(this.towerFacing??0):null,key=`${tileKey(anchor)}:${provisional}:${error}:${gate}:${facing}`;

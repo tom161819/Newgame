@@ -1,3 +1,5 @@
+import { linksEnabled,setLinksEnabled } from '../game/buildLinks.js';
+import { GameTip } from './KingdomOverview.js';
 import { localized } from '../i18n/names.js';
 import { t } from '../i18n/index.js';
 import { element,formatCost,missingCost } from './objectLabels.js';
@@ -12,6 +14,9 @@ export class BuildingBar {
     let saved=null;try{saved=localStorage.getItem('newgame.buildingCategory');}catch{/* default */}this.category=saved==='all'||Object.hasOwn(BUILDING_CATEGORIES,saved??'')?saved:'food';
     this.controller=new AbortController();
     this.tab=document.querySelector('#buildings-tab');this.panel=document.querySelector('#buildings-panel');
+    // Point 44 (owner 14 Nov 2026): "Show links" – a switch in the panel's top right corner, explained on hover.
+    {const b=document.querySelector('#building-links-toggle');if(b){const paint=()=>{const on=linksEnabled();b.setAttribute('aria-checked',String(on));b.dataset.tip=`${t('links.title')}\n${t(on?'links.on':'links.off')}\n${t('links.help')}`;b.setAttribute('aria-label',t('links.title'));};paint();
+      b.addEventListener('click',e=>{e.stopPropagation();setLinksEnabled(!linksEnabled());paint();this.linkTip?.refresh();globalThis.document.dispatchEvent(new CustomEvent('build-links'));});this.linkTip=new GameTip(document,[b.parentElement],{});}}
     this.list=document.querySelector('#building-options');this.cancel=document.querySelector('#cancel-building');
     this.categories=document.querySelector('#building-categories');this.prev=document.querySelector('#building-scroll-prev');this.next=document.querySelector('#building-scroll-next');
     const options={signal:this.controller.signal};

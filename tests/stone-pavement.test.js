@@ -24,7 +24,7 @@ test('Infrastructure lists Stone Pavement; Single, Line (also diagonal) and Area
   assert.deepEqual(pavementTiles('single',{x:3,y:3},{x:9,y:9}),[{x:3,y:3}]);
   assert.deepEqual(pavementTiles('line',{x:0,y:0},{x:3,y:0}),[{x:0,y:0},{x:1,y:0},{x:2,y:0},{x:3,y:0}]);
   assert.deepEqual(pavementTiles('line',{x:0,y:0},{x:3,y:3}),[{x:0,y:0},{x:1,y:1},{x:2,y:2},{x:3,y:3}]);
-  assert.equal(pavementTiles('area',{x:5,y:5},{x:2,y:3}).length,12);assert.equal(PAVEMENT.defaultMode,'line');
+  assert.equal(pavementTiles('area',{x:5,y:5},{x:2,y:3}).length,12);assert.equal(PAVEMENT.defaultMode,'area');
 });
 
 test('cost is 1 Stone per 2 new tiles of an order; paved, ordered and invalid tiles are not paid',()=>{
