@@ -1,36 +1,36 @@
 {
   "schema": 1,
-  "assetId": "well",
-  "variantId": "well-render-90",
-  "name": "Stone well with shingle roof 90° (rear-right)",
+  "assetId": "fountain",
+  "variantId": "fountain-render-180",
+  "name": "Octagonal stone fountain 180° (rear-left)",
   "category": "decorations",
-  "version": 1,
-  "specHash": "937f5ec1",
+  "version": 2,
+  "specHash": "937d202a",
   "generator": "image",
   "generatorVersion": 1,
   "styleGuide": "medieval-kingdom-painted-isometric@1",
   "scale": 1,
-  "width": 73,
-  "height": 86,
+  "width": 129,
+  "height": 85,
   "anchor": {
-    "x": 36,
-    "y": 68
+    "x": 64,
+    "y": 52
   },
   "origin": {
-    "x": 0.49315,
-    "y": 0.7907
+    "x": 0.49612,
+    "y": 0.61176
   },
   "footprint": {
-    "width": 1,
-    "height": 1
+    "width": 2,
+    "height": 2
   },
   "base": {
-    "x": 36,
+    "x": 64,
     "y": 84
   },
   "baseOrigin": {
-    "x": 0.49315,
-    "y": 0.97674
+    "x": 0.49612,
+    "y": 0.98824
   },
   "visualHeight": 84,
   "platform": null,
@@ -39,15 +39,15 @@
   "modelHeight": 1,
   "lights": [],
   "x2": {
-    "width": 146,
-    "height": 172,
+    "width": 258,
+    "height": 170,
     "anchor": {
-      "x": 72,
-      "y": 136
+      "x": 128,
+      "y": 104
     }
   },
   "render": {
     "source": "gpt",
-    "view": 90
+    "view": 180
   }
 }

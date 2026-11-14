@@ -75,8 +75,8 @@
     {
       "id": "well-render-0",
       "name": "Stone well with shingle roof 0° (front-right)",
-      "version": 1,
-      "notes": "Owner's render (14 Nov 2026): round ashlar well on a stone step with a shingle roof, windlass and bucket. The dirt patch under it is cut away so it sits on the terrain or paving. View 0° (front-right), cut out of the owner's render and scaled to 0.12 wide and 0.106 high (the render's view is a little steeper than the game's). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "version": 2,
+      "notes": "Owner's render (14 Nov 2026): round ashlar well on a stone step with a shingle roof, windlass and bucket. The dirt patch under it is cut away so it sits on the terrain or paving. v2: the cut repaired (v1 lost stone joints and left a ragged rim). View 0° (front-right), cut out of the owner's render and scaled to 0.12 wide and 0.106 high (the render's view is a little steeper than the game's). Front corner of the plinth set by hand; this view is the one the game uses.",
       "spec": {
         "body": {
           "kind": "none"
@@ -100,8 +100,8 @@
     {
       "id": "well-render-90",
       "name": "Stone well with shingle roof 90° (rear-right)",
-      "version": 1,
-      "notes": "Owner's render (14 Nov 2026): round ashlar well on a stone step with a shingle roof, windlass and bucket. The dirt patch under it is cut away so it sits on the terrain or paving. View 90° (rear-right), cut out of the owner's render and scaled to 0.12 wide and 0.106 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
+      "version": 2,
+      "notes": "Owner's render (14 Nov 2026): round ashlar well on a stone step with a shingle roof, windlass and bucket. The dirt patch under it is cut away so it sits on the terrain or paving. v2: the cut repaired (v1 lost stone joints and left a ragged rim). View 90° (rear-right), cut out of the owner's render and scaled to 0.12 wide and 0.106 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
       "spec": {
         "body": {
           "kind": "none"
@@ -125,8 +125,8 @@
     {
       "id": "well-render-180",
       "name": "Stone well with shingle roof 180° (rear-left)",
-      "version": 1,
-      "notes": "Owner's render (14 Nov 2026): round ashlar well on a stone step with a shingle roof, windlass and bucket. The dirt patch under it is cut away so it sits on the terrain or paving. View 180° (rear-left), cut out of the owner's render and scaled to 0.12 wide and 0.106 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
+      "version": 2,
+      "notes": "Owner's render (14 Nov 2026): round ashlar well on a stone step with a shingle roof, windlass and bucket. The dirt patch under it is cut away so it sits on the terrain or paving. v2: the cut repaired (v1 lost stone joints and left a ragged rim). View 180° (rear-left), cut out of the owner's render and scaled to 0.12 wide and 0.106 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
       "spec": {
         "body": {
           "kind": "none"
@@ -150,8 +150,8 @@
     {
       "id": "well-render-270",
       "name": "Stone well with shingle roof 270° (front-left)",
-      "version": 1,
-      "notes": "Owner's render (14 Nov 2026): round ashlar well on a stone step with a shingle roof, windlass and bucket. The dirt patch under it is cut away so it sits on the terrain or paving. View 270° (front-left), cut out of the owner's render and scaled to 0.12 wide and 0.106 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
+      "version": 2,
+      "notes": "Owner's render (14 Nov 2026): round ashlar well on a stone step with a shingle roof, windlass and bucket. The dirt patch under it is cut away so it sits on the terrain or paving. v2: the cut repaired (v1 lost stone joints and left a ragged rim). View 270° (front-left), cut out of the owner's render and scaled to 0.12 wide and 0.106 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
       "spec": {
         "body": {
           "kind": "none"

@@ -5,8 +5,8 @@
 // The procedural renderer stays as the fallback if an image cannot load.
 export const APPROVED_BUILDING_ART=Object.freeze({
   // Owner 14 Nov 2026 (Mechaniky chat): renders of the Well (1 × 1) and the new Fountain (2 × 2), the dirt patch cut away.
-  well:{"sprite":"/assets/buildings/well/well-render-0.v1.png","artSource":"art/sprites/well/well-render-0.v1.json","origin":{"x":0.49315,"y":0.97647},"visualHeight":83},
-  fountain:{"sprite":"/assets/buildings/fountain/fountain-render-0.v1.png","artSource":"art/sprites/fountain/fountain-render-0.v1.json","origin":{"x":0.5,"y":0.98824},"visualHeight":84},
+  well:{"sprite":"/assets/buildings/well/well-render-0.v2.png","artSource":"art/sprites/well/well-render-0.v2.json","origin":{"x":0.49315,"y":0.97647},"visualHeight":83},
+  fountain:{"sprite":"/assets/buildings/fountain/fountain-render-0.v2.png","artSource":"art/sprites/fountain/fountain-render-0.v2.json","origin":{"x":0.5,"y":0.98824},"visualHeight":84},
   // Owner 9 Nov 2026 ("proč není ve hře úprava dočasného skladiště?"): approved 7 Nov (plan g-docasny-sklad), wired in now.
   starter_stockpile:{"sprite":"/assets/buildings/starter_stockpile/starter-stockpile-tarp-camp.v1.png","artSource":"art/sprites/starter-stockpile/starter-stockpile-tarp-camp.v1.json","origin":{"x":0.49618,"y":0.97561},"visualHeight":80,"lights":[{"type":"torch","x":-46.4,"y":-55.89,"color":"#ffb25a","radius":102.4,"intensity":0.95,"flicker":{"amplitude":0.12,"speed":7},"flameSize":1}]},
   // Owner 13 Nov 2026: four GPT cottage looks; each new House takes the next look (placeBuilding, building.look).

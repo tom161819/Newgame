@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.125.2] - 2026-11-14
+<!-- version: {"title":"Well and Fountain: cut repaired","type":"fix","reconstructed":false,"saveVersion":62} -->
+### Fixed
+- Well and Fountain: the cut of the ground under them is repaired – no missing pieces of stone, joints or ragged rim.
+
 ## [0.125.1] - 2026-11-14
 <!-- version: {"title":"Studio: Hunting Lodge render","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

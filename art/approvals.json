@@ -2271,13 +2271,13 @@
           "approvedAt": "2026-11-07T16:27:24.808Z"
         },
         "well-render-0": {
-          "approvedAt": "2026-11-14T20:50:00.000Z",
+          "approvedAt": "2026-11-14T21:15:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 14 Nov 2026: add this render to the game.",
-          "specHash": "937f5ec1",
+          "note": "Owner in the Mechaniky chat, 14 Nov 2026: add this render to the game; v2 after his note that the cut was poor.",
+          "specHash": "937d202a",
           "status": "approved",
-          "updatedAt": "2026-11-14T20:50:00.000Z",
-          "version": 1
+          "updatedAt": "2026-11-14T21:15:00.000Z",
+          "version": 2
         }
       }
     },
@@ -6628,13 +6628,13 @@
       "preferred": "fountain-render-0",
       "variants": {
         "fountain-render-0": {
-          "approvedAt": "2026-11-14T20:50:00.000Z",
+          "approvedAt": "2026-11-14T21:15:00.000Z",
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
-          "note": "Owner in the Mechaniky chat, 14 Nov 2026: add this render to the game.",
-          "specHash": "937f5ec1",
+          "note": "Owner in the Mechaniky chat, 14 Nov 2026: add this render to the game; v2 after his note that the cut was poor.",
+          "specHash": "937d202a",
           "status": "approved",
-          "updatedAt": "2026-11-14T20:50:00.000Z",
-          "version": 1
+          "updatedAt": "2026-11-14T21:15:00.000Z",
+          "version": 2
         }
       }
     }

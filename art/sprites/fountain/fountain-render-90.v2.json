@@ -1,24 +1,24 @@
 {
   "schema": 1,
   "assetId": "fountain",
-  "variantId": "fountain-render-180",
-  "name": "Octagonal stone fountain 180° (rear-left)",
+  "variantId": "fountain-render-90",
+  "name": "Octagonal stone fountain 90° (rear-right)",
   "category": "decorations",
-  "version": 1,
-  "specHash": "937f5ec1",
+  "version": 2,
+  "specHash": "937d202a",
   "generator": "image",
   "generatorVersion": 1,
   "styleGuide": "medieval-kingdom-painted-isometric@1",
   "scale": 1,
   "width": 129,
-  "height": 85,
+  "height": 86,
   "anchor": {
     "x": 64,
-    "y": 52
+    "y": 53
   },
   "origin": {
     "x": 0.49612,
-    "y": 0.61176
+    "y": 0.61628
   },
   "footprint": {
     "width": 2,
@@ -26,13 +26,13 @@
   },
   "base": {
     "x": 64,
-    "y": 84
+    "y": 85
   },
   "baseOrigin": {
     "x": 0.49612,
-    "y": 0.98824
+    "y": 0.98837
   },
-  "visualHeight": 84,
+  "visualHeight": 85,
   "platform": null,
   "frontLayer": false,
   "gameLights": [],
@@ -40,14 +40,14 @@
   "lights": [],
   "x2": {
     "width": 258,
-    "height": 170,
+    "height": 172,
     "anchor": {
       "x": 128,
-      "y": 104
+      "y": 106
     }
   },
   "render": {
     "source": "gpt",
-    "view": 180
+    "view": 90
   }
 }

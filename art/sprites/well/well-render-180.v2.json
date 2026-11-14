@@ -4,21 +4,21 @@
   "variantId": "well-render-180",
   "name": "Stone well with shingle roof 180° (rear-left)",
   "category": "decorations",
-  "version": 1,
-  "specHash": "937f5ec1",
+  "version": 2,
+  "specHash": "937d202a",
   "generator": "image",
   "generatorVersion": 1,
   "styleGuide": "medieval-kingdom-painted-isometric@1",
   "scale": 1,
   "width": 73,
-  "height": 85,
+  "height": 88,
   "anchor": {
     "x": 36,
-    "y": 66
+    "y": 70
   },
   "origin": {
     "x": 0.49315,
-    "y": 0.77647
+    "y": 0.79545
   },
   "footprint": {
     "width": 1,
@@ -26,13 +26,13 @@
   },
   "base": {
     "x": 36,
-    "y": 82
+    "y": 86
   },
   "baseOrigin": {
     "x": 0.49315,
-    "y": 0.96471
+    "y": 0.97727
   },
-  "visualHeight": 82,
+  "visualHeight": 86,
   "platform": null,
   "frontLayer": false,
   "gameLights": [],
@@ -40,10 +40,10 @@
   "lights": [],
   "x2": {
     "width": 146,
-    "height": 170,
+    "height": 176,
     "anchor": {
       "x": 72,
-      "y": 132
+      "y": 140
     }
   },
   "render": {

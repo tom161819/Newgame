@@ -1,53 +1,53 @@
 {
   "schema": 1,
-  "assetId": "fountain",
-  "variantId": "fountain-render-270",
-  "name": "Octagonal stone fountain 270° (front-left)",
+  "assetId": "well",
+  "variantId": "well-render-0",
+  "name": "Stone well with shingle roof 0° (front-right)",
   "category": "decorations",
-  "version": 1,
-  "specHash": "937f5ec1",
+  "version": 2,
+  "specHash": "937d202a",
   "generator": "image",
   "generatorVersion": 1,
   "styleGuide": "medieval-kingdom-painted-isometric@1",
   "scale": 1,
-  "width": 128,
+  "width": 73,
   "height": 85,
   "anchor": {
-    "x": 64,
-    "y": 52
+    "x": 36,
+    "y": 67
   },
   "origin": {
-    "x": 0.5,
-    "y": 0.61176
+    "x": 0.49315,
+    "y": 0.78824
   },
   "footprint": {
-    "width": 2,
-    "height": 2
+    "width": 1,
+    "height": 1
   },
   "base": {
-    "x": 64,
-    "y": 84
+    "x": 36,
+    "y": 83
   },
   "baseOrigin": {
-    "x": 0.5,
-    "y": 0.98824
+    "x": 0.49315,
+    "y": 0.97647
   },
-  "visualHeight": 84,
+  "visualHeight": 83,
   "platform": null,
   "frontLayer": false,
   "gameLights": [],
   "modelHeight": 1,
   "lights": [],
   "x2": {
-    "width": 256,
+    "width": 146,
     "height": 170,
     "anchor": {
-      "x": 128,
-      "y": 104
+      "x": 72,
+      "y": 134
     }
   },
   "render": {
     "source": "gpt",
-    "view": 270
+    "view": 0
   }
 }
