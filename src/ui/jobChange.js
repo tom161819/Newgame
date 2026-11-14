@@ -19,12 +19,26 @@ export function freeSeats(scene){
   }
   return seats;
 }
+// m-profese-pocty (point 46): for every profession how many residents have it now and how many the buildings (or the
+// wanted number of Haulers, the Builders' Workshops) hold; capacity null = no limit known.
+export function jobStats(scene){
+  const out=new Map(Object.keys(JOBS).map(id=>[id,{count:0,capacity:null}])),hasWorkplaces=p=>scene.workplaceSystem?.hasWorkplaces?.(p)??false;
+  for(const w of scene.workerSystem?.liveSubjects?.()??[])if(out.has(w.profession))out.get(w.profession).count++;
+  for(const [id,row]of out)if(hasWorkplaces(id))row.capacity=0;
+  for(const building of scene.buildings??[]){const spec=buildingDefinition(building).workplace;if(!spec?.profession||!buildingIsComplete(building)||building.unverified||!out.has(spec.profession))continue;out.get(spec.profession).capacity+=spec.capacity;}
+  const e=scene.employment;if(e?.haulerTarget&&out.has('hauler'))out.get('hauler').capacity=e.haulerTarget();if(e?.builderPlaces&&out.has('builder')&&e.builderPlaces()>0)out.get('builder').capacity=e.builderPlaces();
+  out.get('idle').capacity=null;return out;
+}
+export const jobStatLabel=(name,stat)=>stat?`${name} (${stat.count}${stat.capacity==null?'':` / ${stat.capacity}`})`:name;
+// m-profese-bez-budovy (point 38): a profession whose buildings have no free seat (or none is built) cannot be picked;
+// Builder, Hauler and the other professions without a workplace building always can.
+export const jobBlocked=choice=>!!choice.full&&!choice.current;
 // The choices of the quick job menu for one resident, in the order of the Employments window (JOBS order).
 export function jobChoices(scene,worker){
-  const seats=freeSeats(scene),hasWorkplaces=profession=>scene.workplaceSystem?.hasWorkplaces?.(profession)??false;
+  const seats=freeSeats(scene),stats=jobStats(scene),hasWorkplaces=profession=>scene.workplaceSystem?.hasWorkplaces?.(profession)??false;
   return Object.entries(JOBS).filter(([id])=>id!=='idle').map(([id,job])=>{
     const needsSeat=hasWorkplaces(id),free=needsSeat?seats.get(id)??0:null;
-    return {id,name:job.name,color:job.portraitColor,free,full:needsSeat&&free===0,current:worker?.profession===id};
+    return {id,name:job.name,color:job.portraitColor,free,full:needsSeat&&free===0,current:worker?.profession===id,stat:stats.get(id)};
   });
 }
 

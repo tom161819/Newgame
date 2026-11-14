@@ -140,7 +140,9 @@ export function serializeGameState(scene){
     buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.burntFrom?{burntFrom:b.burntFrom}:{}),...(buildingDefinition(b).crop?{farmId:b.farmId??null}:{}),...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.depleted?{depleted:true}:{}),...(buildingDefinition(b).legacyFootprint&&!buildingDefinition(b).legacy?{size:buildingDefinition(b).width}:{}),...(typeof b.look==='string'&&buildingDefinition(b).artLooks?.includes(b.look)?{look:b.look}:{}),...(b.unverified?{unverified:true}:{}),...(['wall_gate','gate'].includes(b.type)&&['x','y'].includes(b.gateAxis)?{gateAxis:b.gateAxis}:{}),...(b.type==='barracks'&&Number.isInteger(b.autoHire)?{autoHire:b.autoHire}:{}),...(b.type==='iron_mine'&&b.miningMode==='adjacent'?{miningMode:'adjacent'}:{}),...(b.type==='tower'&&[1,2,3].includes(b.facing)?{facing:b.facing}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.demolition?{demolition:copy(b.demolition)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
     resources:[...scene.resources.values()].map(v=>({type:v.getData('objectId'),tile:point(v.getData('tile')),...(v.getData('object').natural?{natural:copy(v.getData('object').natural)}:{})})),
     drops:[...scene.dropSystem.drops.values()].map(d=>({id:d.id,resource:d.resource,tile:point(d.tile),amount:d.amount,rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0),haulEligible:d.haulEligible!==false,...(d.siteId!=null?{siteId:d.siteId}:{})})),
-    animals:[...scene.animalSystem.animals.values()].map(a=>({...serializeActor(a),retaliationId:a.retaliationTarget?.id??null})),
+    // m-ulozeni-animals (owner 14 Nov 2026): an animal may fight back at another animal (a hunter's dog, a wolf) or at
+    // somebody who is gone by now (left, removed); only a target that is still in the game is saved.
+    animals:[...scene.animalSystem.animals.values()].map(a=>{const target=a.retaliationTarget,known=target&&(target===scene.character||scene.animalSystem.animals.get(target.id)===target||scene.workerSystem?.workers.get(target.id)===target);return {...serializeActor(a),retaliationId:known?target.id:null};}),
     chests:[...scene.treasureSystem.chests.values()].map(c=>({id:c.id,tile:point(c.tile),opened:c.opened,opening:c.opening,looted:c.looted,contents:copy(c.contents),
       animation:c.opening?{elapsed:c.view.openTween?.elapsed??0,lid:c.view.lid?{y:c.view.lid.y,rotation:c.view.lid.rotation}:null}:null})),
     time:scene.gameTime.exportState(),food:scene.foodSystem.exportState(),wildlifeRespawn:scene.wildlifeRespawn?.exportState()??{elapsed:0},
@@ -332,7 +334,7 @@ function validateAtSize(input,registry){
   if(p.exitTile)tile(p.exitTile);
   if(['enteringTower','exitingTower'].includes(p.state)){number(p.transition?.remaining,1,900);if(p.state==='exitingTower')tile(p.exitTile);}
   number(p.render?.x,-1e6,1e6);number(p.render?.y,-1e6,1e6);number(p.render?.depth,-1e6,1e6);
-  part='animals';for(const a of s.animals){definition(a.type,'animal');check(typeof a.id==='string');actor(a);number(a.wanderWait,-1e9,1e9);check(a.retaliationId==null||a.retaliationId==='king'||wIds.has(a.retaliationId));if(a.mounted)check(p.horseId===a.id&&a.type==='horse');}
+  part='animals';for(const a of s.animals){definition(a.type,'animal');check(typeof a.id==='string');actor(a);number(a.wanderWait,-1e9,1e9);check(a.retaliationId==null||unitIds.has(a.retaliationId));if(a.mounted)check(p.horseId===a.id&&a.type==='horse');}
   const depositClaims=new Map(),reservations=new Set(natural.kingTask?[`natural:${natural.kingTask.treeId}`]:[]);
   part='workers';if(s.workers!==undefined){
     integer(s.population?.nextId,1);integer(s.population.lastMigrationDay,1,s.time?.day??Number.MAX_SAFE_INTEGER);

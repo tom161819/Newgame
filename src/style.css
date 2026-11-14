@@ -1259,3 +1259,8 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 .game-tip p { margin:0; }
 .game-tip-factor { font-variant-numeric:tabular-nums; color:#f1e7c6; padding-left:10px; border-left:2px solid rgb(162 139 86 / .6); }
 .game-tip-advice { margin-top:3px !important; padding:5px 8px; border-radius:6px; background:rgb(227 197 122 / .1); color:#ecd9a0; }
+
+/* Points 38, 40, 46 (owner 14 Nov 2026) */
+.population-haulers { margin:6px 0 8px; }
+.population-job-item:disabled:not([aria-checked="true"]) { opacity:.45; cursor:not-allowed; }
+#assign-job option:disabled { color:#8a8672; }

@@ -21,8 +21,9 @@ export class UnitSelection {
     if(!this.panel.isConnected)scene.game.canvas.parentElement.append(this.panel);
   }
   workers(){return [...this.ids].map(id=>this.scene.workerSystem.workers.get(id)).filter(w=>this.scene.workerSystem.commands.selectable(w));}
-  set(workers){this.ids=new Set(workers.filter(w=>this.scene.workerSystem.commands.selectable(w)).map(w=>w.id));this.draw();}
-  clear(){this.ids.clear();this.anchor=null;this.draw();}
+  // m-kral-vyber (point 52): the King is selected like the others (click or drag) and ordered with the right button.
+  set(workers){this.king=workers.includes(this.scene.character)&&this.scene.character.isAlive;this.ids=new Set(workers.filter(w=>this.scene.workerSystem.commands.selectable(w)).map(w=>w.id));this.draw();}
+  clear(){this.ids.clear();this.king=false;this.anchor=null;this.draw();}
   act(action){
     const workers=this.workers(),s=this.scene;if(action==='clear'){this.clear();return;}
     if(action==='inspect'){if(workers.length===1)s.unitPanel.open(workers[0]);return;}
@@ -32,11 +33,12 @@ export class UnitSelection {
   down(pointer){
     const s=this.scene;if(s.gameOver||s.gameTime.paused||s.buildMode||blockingDialog(document))return false;
     if(pointer.rightButtonDown()){
-      if(this.ids.size){
+      if(this.ids.size||this.king){
         // m-vojaci-na-hradby: a right click on a finished Stone Wall, Tower or Gate posts the selected soldiers on it.
         const tile=s.pointerTile(pointer),target=tile&&s.buildings.find(b=>buildingIsComplete(b)&&(isWall(b)||b.type==='tower'||b.type==='gate')&&b.tiles?.some(tl=>tl.x===tile.x&&tl.y===tile.y)),soldiers=this.workers().filter(w=>w.profession==='soldier');
         if(target&&soldiers.length){const posted=s.military?.wallPatrol?.post(soldiers,target)??0;if(posted){s.setStatus(t('army.posted',{count:posted,name:buildingDefinition(target).name}));this.draw();return true;}s.setStatus(t('army.postNoWay'));return true;}
-        const count=s.workerSystem.commands.move(this.workers(),s.pointerTile(pointer));s.setStatus(t(count?'command.moving':'command.noRoute',{count}));return true;}
+        if(this.ids.size){const count=s.workerSystem.commands.move(this.workers(),s.pointerTile(pointer));s.setStatus(t(count?'command.moving':'command.noRoute',{count}));}
+        if(this.king)s.kingOrder(pointer);return true;}
       return false;
     }
     if(!pointer.leftButtonDown())return false;
@@ -48,23 +50,29 @@ export class UnitSelection {
     const anchor=this.anchor;this.anchor=null;
     if(this.dragging){
       const camera=this.scene.cameras.main,a=camera.getWorldPoint(anchor.x,anchor.y),b=camera.getWorldPoint(pointer.x,pointer.y);
-      this.set(this.scene.workerSystem.liveSubjects().filter(w=>{const v=w.view;return v.x>=Math.min(a.x,b.x)&&v.x<=Math.max(a.x,b.x)&&v.y>=Math.min(a.y,b.y)&&v.y<=Math.max(a.y,b.y);}));
+      const inside=v=>v.x>=Math.min(a.x,b.x)&&v.x<=Math.max(a.x,b.x)&&v.y>=Math.min(a.y,b.y)&&v.y<=Math.max(a.y,b.y),s=this.scene;
+      this.set([...(s.character.state==='ground'&&inside(s.player)?[s.character]:[]),...s.workerSystem.liveSubjects().filter(w=>inside(w.view))]);
     }else{
       const s=this.scene;pointer.updateWorldPoint(s.cameras.main);const hit=s.pickInteraction(pointer.worldX,pointer.worldY,s.pointerTile(pointer));
       // #120: one click on an own villager opens his detail at once; a click on another villager switches it.
-      if(hit?.kind==='human'&&s.workerSystem.commands.selectable(hit.object)){this.set([hit.object]);s.unitPanel?.open(hit.object);}
+      const onKing=s.player?.visible!==false&&s.fog?.isVisibleObject?.(s.character)!==false&&this.onKing(pointer.worldX,pointer.worldY)&&!(hit?.kind==='human'&&hit.depth>s.player.depth);
+      if(onKing){this.set([s.character]);s.unitPanel?.open(s.character);}
+      else if(hit?.kind==='human'&&s.workerSystem.commands.selectable(hit.object)){this.set([hit.object]);s.unitPanel?.open(hit.object);}
       else{this.clear();if(s.unitPanel?.dialog.open&&s.unitPanel.unit?.id!=null&&s.workerSystem.workers.get(s.unitPanel.unit.id)===s.unitPanel.unit)s.unitPanel.close();s.handleClick(pointer,true);}
     }
     this.dragging=false;this.draw();return true;
   }
+  // The King's picture as a click target (his view is a container; a little room around it helps on small zoom).
+  onKing(x,y){const b=this.scene.player?.getBounds?.();return !!b&&this.scene.character.state==='ground'&&x>=b.x-6&&x<=b.x+b.width+6&&y>=b.y-24&&y<=b.y+b.height+4;}
   cancelDrag(){this.anchor=null;this.dragging=false;this.overlay.clear();}
   draw(){
     const s=this.scene,workers=this.workers();this.ids=new Set(workers.map(w=>w.id));this.graphics.clear();this.overlay.clear();
     // The open detail of the one selected villager already carries his commands.
     const detail=workers.length===1&&!!s.unitPanel?.dialog.open&&s.unitPanel.unit===workers[0];
-    const signature=JSON.stringify([workers.map(w=>w.id+':'+w.profession+':'+haulPriorityValue(w.haulPriority)),s.gameOver,s.gameTime.paused,language(),detail]);
+    const count=workers.length+(this.king?1:0);if(this.king&&!s.character.isAlive)this.king=false;
+    const signature=JSON.stringify([this.king,workers.map(w=>w.id+':'+w.profession+':'+haulPriorityValue(w.haulPriority)),s.gameOver,s.gameTime.paused,language(),detail]);
     if(signature!==this.signature){
-      this.signature=signature;this.panel.hidden=!workers.length||!!s.gameOver||detail;this.panel.setAttribute('aria-label',t('command.title'));this.label.textContent=t('command.selected',{count:workers.length});
+      this.signature=signature;this.panel.hidden=!count||!!s.gameOver||detail||(this.king&&!workers.length&&!!s.unitPanel?.dialog.open);this.panel.setAttribute('aria-label',t('command.title'));this.label.textContent=t('command.selected',{count});
       for(const [action,button]of Object.entries(this.buttons))button.textContent=t(`command.${action}`);
       this.buttons.inspect.disabled=workers.length!==1;
       const haulers=workers.filter(w=>w.profession==='hauler');this.haul.hidden=haulers.length<2;
@@ -73,6 +81,7 @@ export class UnitSelection {
         const values=new Set(haulers.map(w=>haulPriorityValue(w.haulPriority)));this.haul.value=values.size===1?[...values][0]:'';}this.buttons.hold.disabled=this.buttons.resume.disabled=!!s.gameTime.paused;
     }
     const zoom=s.cameras.main.zoom;
+    if(this.king&&s.player)this.graphics.lineStyle(2/zoom,0xffd768,1).strokeEllipse(s.player.x,s.player.y,34,16);
     for(const w of workers){
       this.graphics.lineStyle(2/zoom,0xffd768,1).strokeEllipse(w.view.x,w.view.y,30,14);
       const goal=w.commandState?.goal;if(goal){const p=tileCenter(goal);this.graphics.lineStyle(2/zoom,0xffd768,.8).strokeEllipse(p.x,p.y,20,10);}

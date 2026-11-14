@@ -5,7 +5,8 @@ import { t,language } from '../i18n/index.js';
 import { shortName } from '../data/names.js';
 import { JOBS,SKILLS } from '../data/jobs.js';
 import { element } from './objectLabels.js';
-import { jobChoices,changeProfession } from './jobChange.js';
+import { jobChoices,jobStats,jobStatLabel,jobBlocked,changeProfession } from './jobChange.js';
+import { renderHaulerBox,haulerBoxKey } from './haulerBox.js';
 import { militaryRank } from './militaryPanel.js';
 import { populationSummary,populationWindow,professionColor,humanPortrait,POPULATION_ROW_HEIGHT,populationDetails,residentWarnings,sortedPopulation,readPopulationPreferences,writePopulationPreferences } from './populationData.js';
 const names=new Intl.Collator('cs',{numeric:true,sensitivity:'base'});
@@ -22,6 +23,9 @@ export class PopulationSidebar {
     this.soldiers=element('details','population-soldiers');this.soldiers.id='population-soldiers';this.soldiers.open=true;this.soldiers.hidden=true;
     this.soldiersTitle=element('summary');this.soldiersList=element('div','population-soldier-list');this.soldiers.append(this.soldiersTitle,this.soldiersList);
     document.querySelector('#population-needs')?.after(this.soldiers);
+    // m-nosici-panel (point 40): the wanted number of Haulers lives here, above the soldiers (it was in the Castle's Employment card).
+    this.haulerBox=element('div','employment-haulers population-haulers');this.haulerBox.id='population-haulers';this.soldiers.before(this.haulerBox);
+    this.haulerBox.addEventListener('click',event=>{const step=event.target.closest('[data-haulers]')?.dataset.haulers;if(!step)return;const e=scene.employment;e.setHaulers(step==='auto'?null:Math.max(0,e.haulerTarget()+Number(step)));this.haulerKey=null;this.lastRefresh=-Infinity;this.refresh(true);},options);
     this.soldiersList.addEventListener('click',event=>{const b=event.target.closest?.('[data-soldier-id]');if(b)this.locateResident(b.dataset.soldierId);},options);
     this.sort.value=this.preferences.sortBy;this.order.value=this.preferences.direction;this.profession.value=this.preferences.profession;this.search.value='';
     const change=()=>{clearTimeout(this.inspectTimer);this.hideDetails();this.preferences={sortBy:this.sort.value,direction:this.order.value,profession:this.profession.value};writePopulationPreferences(this.storage,this.preferences);this.viewport.scrollTop=0;this.refresh(true);};
@@ -51,7 +55,7 @@ export class PopulationSidebar {
   renderOptions(){
     const option=(value,name)=>{const node=element('option','',name);node.value=value;return node;},skills=element('optgroup'),sort=this.sort.value,profession=this.profession.value;skills.label=t('population.skills');skills.append(...Object.entries(SKILLS).map(([id,name])=>option(`skill:${id}`,name)));
     this.sort.replaceChildren(...['level','xp','name','profession','happiness'].map(value=>option(value,t(`population.sort.${value}`))),skills);
-    this.profession.replaceChildren(option('all',t('buildingCategory.all')),...Object.entries(JOBS).map(([id,job])=>option(id,job.name)));
+    {const stats=jobStats(this.scene);this.profession.replaceChildren(option('all',t('buildingCategory.all')),...Object.entries(JOBS).map(([id,job])=>option(id,jobStatLabel(job.name,stats.get(id)))));this.professionKey=this.statsKey(stats);}
     if(sort)this.sort.value=sort;if(profession)this.profession.value=profession;
   }
   updateCount(count){document.querySelector('#population-tab-count').textContent=count;this.lastRefresh=-Infinity;}
@@ -64,6 +68,7 @@ export class PopulationSidebar {
     let url;try{if(this.scene.assets.usesSprite(worker.definition))url=this.scene.assets.previewURL(worker.definition);}catch{/* A readable portrait still works when an optional asset is unavailable. */}
     url??=humanPortrait();this.portraits.set(key,url);return url;
   }
+  statsKey(stats){return [...stats].map(([id,s])=>`${id}:${s.count}/${s.capacity}`).join();}
   refresh(force=false){
     // While the job menu is open the list holds still, so the row under the pointer cannot move away.
     if(!this.open||this.jobMenuWorkerId!=null)return;const now=performance.now();if(!force&&now-this.lastRefresh<200)return;this.lastRefresh=now;
@@ -76,6 +81,9 @@ export class PopulationSidebar {
     const output=document.querySelector('#population-summary');if(output.textContent!==text)output.textContent=text;
     document.querySelector('#population-empty').hidden=this.records.length>0||this.deaths.length>0;document.querySelector('#population-filter-count').textContent=`${t('population.shown',{count:this.records.length,total:summary.total})}${this.deaths.length?` · ${t('population.recentDeathsCount',{count:this.deaths.length})}`:''}`;
     this.list.style.height=`${this.displayRecords.length*POPULATION_ROW_HEIGHT}px`;this.renderVisible();this.refreshDetails();this.renderDeceased();this.renderSoldiers(summary.residents);
+    // Point 46: the profession filter shows the numbers; rebuilt only when they change and the list is not in use. Point 40: the Haulers box.
+    if(document.activeElement!==this.profession&&this.statsKey(jobStats(this.scene))!==this.professionKey)this.renderOptions();
+    if(this.scene.employment){const key=haulerBoxKey(this.scene);if(key!==this.haulerKey){this.haulerKey=key;renderHaulerBox(this.scene,this.haulerBox);}}
   }
   renderSoldiers(residents){
     if(!this.soldiers)return;const military=this.scene.military,soldiers=residents.filter(w=>w.profession==='soldier').sort((a,b)=>names.compare(a.name,b.name));
@@ -143,7 +151,7 @@ export class PopulationSidebar {
     this.jobMenuWorkerId=id;this.jobMenuAnchor=anchor;anchor.setAttribute('aria-expanded','true');this.jobMenu.setAttribute('aria-label',t('population.jobMenu',{name:worker.name}));
     const item=(text,{value,checked=false,full=false,className=''}={})=>{const node=element('button',`population-job-item${full?' is-full':''}${className?` ${className}`:''}`);node.type='button';node.dataset.job=value;node.setAttribute('role',value==='idle'?'menuitem':'menuitemradio');if(value!=='idle')node.setAttribute('aria-checked',String(checked));node.disabled=checked;node.tabIndex=-1;
       const mark=element('span','population-job-check',checked?'✓':'');node.append(mark,element('span','population-job-name',text));node.addEventListener('click',()=>this.chooseJob(id,value));return node;};
-    const items=jobChoices(this.scene,worker).map(choice=>{const node=item(choice.free==null?choice.name:t(choice.full?'population.jobFull':'population.jobFree',{name:choice.name,count:choice.free}),{value:choice.id,checked:choice.current,full:choice.full});node.style.setProperty('--job-color',choice.color);return node;});
+    const items=jobChoices(this.scene,worker).map(choice=>{const node=item(jobStatLabel(choice.name,choice.stat),{value:choice.id,checked:choice.current,full:choice.full});if(jobBlocked(choice)){node.disabled=true;node.title=t('population.jobNoSeat');}node.style.setProperty('--job-color',choice.color);return node;});
     const nodes=[...items];if(worker.profession!=='idle')nodes.push(element('hr','population-job-separator'),item(t('population.unemploy'),{value:'idle',className:'population-job-unemploy'}));
     this.jobMenu.replaceChildren(...nodes);this.jobMenu.hidden=false;this.positionJobMenu();
     (this.jobMenu.querySelector('.population-job-item:not(:disabled)'))?.focus();return true;

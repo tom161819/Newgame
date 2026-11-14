@@ -495,9 +495,7 @@ export class GameScene extends Phaser.Scene {
     if(this.gameOver||this.gameTime.paused||blockingDialog(document))return;
     if(pointer.rightButtonDown()){if(this.buildMode)this.cancelBuilding();return;}
     if(!released&&!pointer.leftButtonDown())return;
-    this.naturalResources?.cancelKing();
     this.populationSidebar?.clearSelection();
-    this.treasureSystem.cancelRequest();
     let goal=this.pointerTile(pointer);
     if(this.buildMode){
       this.previewAnchor=goal;
@@ -522,7 +520,8 @@ export class GameScene extends Phaser.Scene {
         // Keep the same tool after each accepted order of a repeat-placement building (Farmhouse, Wheat Field, Orchard;
         // m-staveni-zdi-studna (59): Stone Wall, Tower and Gate too).
         // Revalidate the occupied footprint immediately so a second click cannot create or pay for another order there.
-        if(this.selectedBuilding.repeatPlacement){
+        // Point 43 (owner 14 Nov 2026): with Shift held any building stays selected for the next one.
+        if(this.selectedBuilding.repeatPlacement||pointer.event?.shiftKey){
           this.previewKey=null;this.updateBuildingPreview();this.updateBuildingUI();this.setStatus(message);
         }else this.cancelBuilding(message);
       }
@@ -536,7 +535,7 @@ export class GameScene extends Phaser.Scene {
     if(selected?.kind==='human'){this.unitPanel.open(selected.object);return;}
     if(selected?.kind==='cat'){if(selected.object.id.startsWith('dog-'))this.catPanel.openDog(selected.object);else this.catPanel.open(selected.object);return;}
     if(selected?.kind==='stockpile'){this.storagePanel.open(null,selected.object.location.id);return;}
-    if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){if(this.kingLogistics.workflowSiteId!==selected.object.id){this.kingLogistics.cancel();this.constructionSystem.commandKing(selected.object);}this.constructionUI.open(selected.object);return;}
+    if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){this.constructionUI.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).crop){this.farmingPanel.open(selected.object);return;}
     if(selected?.kind==='child'){this.villagePanel.open('child',selected.object);return;}
     if(selected?.kind==='building'&&selected.object.type==='village_green'){this.villagePanel.open('green',selected.object);return;}
@@ -547,7 +546,22 @@ export class GameScene extends Phaser.Scene {
     // farmhouse-store: a workplace with its own store (the Farmhouse) opens the workplace panel, which links to the store.
     if(selected?.kind==='building'&&buildingDefinition(selected.object).storage&&!buildingDefinition(selected.object).workplace){this.storagePanel.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).workplace){this.workplacePanel.open(selected.object);return;}
-    if(this.character.transitioning){this.setStatus(t('status.waitClimb'));return;}
+    // m-kral-vyber (point 52, owner 14 Nov 2026): a left click no longer orders the King. He is selected like anybody
+    // else and sent with the right button (kingOrder). Point 49: a finished building without its own window (Tower,
+    // Gate, Stone Wall, Well…) opens the building detail with demolition.
+    if(selected?.kind==='building'){this.demolitionUI.openSelected();return;}
+    if(selected?.kind==='resource'){const object=selected.object.getData('object'),definition=object.definition;if(definition.tree||definition.deposit){this.naturalResourcePanel.open(object);return;}this.setStatus(definition.description);return;}
+    if(selected&&!this.unitSelection?.king)this.setStatus(t('status.kingSelectFirst'));
+  }
+  // The King's order (right click with the King selected): walk, pick up, hunt, mount, enter a Tower, build, open a chest.
+  kingOrder(pointer){
+    if(this.gameOver||this.gameTime.paused||this.buildMode||blockingDialog(document))return false;
+    this.naturalResources?.cancelKing();this.treasureSystem.cancelRequest();
+    pointer.updateWorldPoint(this.cameras.main);let goal=this.pointerTile(pointer);
+    const selected=this.pickInteraction(pointer.worldX,pointer.worldY,goal),unknown=!selected&&!this.fog.isVisibleTile(goal);
+    if(unknown&&!this.fog.isInMap(goal)){this.setStatus(OUTSIDE_SIGHT);return true;}
+    if(selected?.kind==='building'&&!buildingIsComplete(selected.object)){if(this.kingLogistics.workflowSiteId!==selected.object.id){this.kingLogistics.cancel();this.constructionSystem.commandKing(selected.object);}return true;}
+    if(this.character.transitioning){this.setStatus(t('status.waitClimb'));return true;}
     this.constructionSystem.stopKing();
     this.kingLogistics.cancel();
     this.character.order=null;
@@ -557,7 +571,7 @@ export class GameScene extends Phaser.Scene {
     let accepted=false;
     if(building){
       if(buildingDefinition(building).interactions.includes('enter')){
-        if(this.character.mountedHorse&&!this.mountSystem.dismount())return;
+        if(this.character.mountedHorse&&!this.mountSystem.dismount())return true;
         accepted=this.character.command({kind:'enter',tower:building});
       }
       else this.setStatus(buildingDefinition(building).description);
@@ -571,8 +585,8 @@ export class GameScene extends Phaser.Scene {
       const resource=hit?.kind==='resource'?hit.object:null;
       if(resource){
         const object=resource.getData('object'),definition=object.definition;
-        if(definition.tree||definition.deposit){this.naturalResourcePanel.open(object);return;}
-        if(!definition.collectible){this.setStatus(definition.description);return;}
+        if(definition.tree||definition.deposit){this.naturalResourcePanel.open(object);return true;}
+        if(!definition.collectible){this.setStatus(definition.description);return true;}
         goal=resource.getData('tile');
         if(!definition.walkable)accepted=this.character.command({kind:'collect',resource:object,pickupKey:tileKey(goal)});
         else accepted=this.character.command({kind:'move',goal,pickupKey:tileKey(goal)});
@@ -580,7 +594,7 @@ export class GameScene extends Phaser.Scene {
       else if(!isWalkable(this.map,goal.x,goal.y))this.setStatus(t('status.obstacle'));
       else accepted=this.character.command({kind:'move',goal,pickupKey:null});
     }
-    if(accepted)this.worldCamera.follow();
+    return true;
   }
   // Owner 9 Nov 2026: the hover label of a person – the name, then the occupation (with its level), plain text.
   personTooltip(tooltip,{name,role}){tooltip.classList.add('person-tooltip');const a=document.createElement('strong'),b=document.createElement('span');a.textContent=name;b.textContent=role;tooltip.replaceChildren(a,b);}

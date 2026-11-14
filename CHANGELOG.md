@@ -5,6 +5,18 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.126.0] - 2026-11-14
+<!-- version: {"title":"King selected like other units; profession numbers; save fix","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- The King is no longer moved by a left click. Click him (or drag a frame over him) to select him, then use the right button to send him, hunt, pick up, mount, enter a Tower or build. He has a health bar over his head when hurt, fighting or selected.
+- A left click on a Tower, Gate, Stone Wall or another building without its own window opens the building detail with demolition.
+- A profession whose buildings have no free seat (or none is built) is greyed out and cannot be picked, in the resident's window and in the Population list. Builder and Hauler can always be picked.
+- Profession lists show how many residents have the profession and how many places there are, e.g. "Lumberjack (2 / 4)".
+- The wanted number of Haulers moved from the Castle's Employment card to the Population panel, above the soldiers.
+- Holding Shift while placing a building keeps the same building selected for the next one.
+### Fixed
+- Saving failed with "check: animals" when an animal was fighting back at another animal (a hunter's dog, a wolf) or at somebody who had already left.
+
 ## [0.125.3] - 2026-11-14
 <!-- version: {"title":"Studio: Village Green render","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added
