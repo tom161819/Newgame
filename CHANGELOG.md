@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.121.1] - 2026-11-14
+<!-- version: {"title":"Remembered Stone Walls are dimmed like Towers","type":"fix","reconstructed":false,"saveVersion":62} -->
+### Fixed
+- Stone Walls out of sight are now dimmed like Towers and Gates. Before they stayed fully lit, so the Towers next to them looked switched off.
+
 ## [0.121.0] - 2026-11-14
 <!-- version: {"title":"Stumps on paths, closed walls, ruins inside, soldiers on walls","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

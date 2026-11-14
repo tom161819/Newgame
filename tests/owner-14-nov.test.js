@@ -68,3 +68,10 @@ test('m-parezy-na-ceste: a stump on a worn path rots away after 3 days and comes
   const { FORESTRY,stumpGone,treeState }=await import('../src/data/naturalResources.js');
   assert.equal(stumpGone(treeState('tree-1',{stage:0})),false);assert.equal(stumpGone({...treeState('tree-1',{stage:0}),rot:FORESTRY.stumpRotDays}),true);assert.equal(stumpGone({...treeState('tree-1',{stage:3}),rot:FORESTRY.stumpRotDays}),false,'only stumps');
 });
+
+test('bod 37: a remembered Stone Wall is dimmed like a Tower – its art pieces and shadows are reached', async () => {
+  const { memoryParts }=await import('../src/game/MapMemoryRenderer.js');
+  const image=name=>({type:'Image',name}),wall={back:{type:'Graphics'},front:{type:'Graphics'},footprint:{type:'Graphics'},art:{block:image('block'),N:image('n')},shadows:{block:image('shadow')},artShown:{}};
+  const found=memoryParts(wall).filter(p=>p.type==='Image').map(p=>p.name).sort();assert.deepEqual(found,['block','n','shadow']);
+  assert.equal(memoryParts({art:image('one')}).some(p=>p.name==='one'),false,'only groups of pieces, not a single object called art');
+});

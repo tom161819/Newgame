@@ -100,6 +100,7 @@ export class FortificationView {
       shadow.setOrigin(art.origin.x,art.origin.y).setPosition(this.base.x,this.base.y).setDepth(this.preview?10000:WALL_SHADOW_DEPTH).setVisible(this.back.visible).setAlpha(this.back.alpha);
       if(tint==null)image.clearTint();else image.setTint(tint);
     }
+    this.afterPaint?.();
     return use;
   }
   get artImages(){return [...Object.values(this.art),...Object.values(this.shadows)];}

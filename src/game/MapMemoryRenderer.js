@@ -13,8 +13,12 @@ export function memoryColor(color,brightness=FOG_STYLE.brightness){
 function parts(view,callback,seen=new Set()){
   if(!view||seen.has(view))return;seen.add(view);callback(view);
   for(const name of ['inner','container','body','back','front','rotor','footprint','floor','sprite','overlay','bar','lid'])parts(view[name],callback,seen);
+  // Bod 37 (owner 14 Nov 2026): the Stone Wall keeps its art pieces and shadows in plain objects (`art`, `shadows`);
+  // they were skipped, so remembered walls stayed fully lit next to dimmed Towers and Gates.
+  for(const name of ['art','shadows']){const group=view[name];if(group&&typeof group==='object'&&!group.type&&!Array.isArray(group))for(const child of Object.values(group))parts(child,callback,seen);}
   for(const child of [...(view.list??[]),...(view.plants??[])])parts(child,callback,seen);
 }
+export const memoryParts=view=>{const out=[];parts(view,part=>out.push(part));return out;};
 function frozenAppearance(scene,view,repaint,brightness=FOG_STYLE.brightness){
   parts(view,part=>{
     if(part.type==='Text')part.setColor('#4a4e48');
@@ -30,6 +34,8 @@ function frozenAppearance(scene,view,repaint,brightness=FOG_STYLE.brightness){
     if(key)part.setTexture(key);
   });
 }
+// Wall art that arrives or is repainted later (FortificationView.paintArt) is muted the same way.
+function muteLater(scene,view,brightness){if(view&&'artShown' in view)view.afterPaint=()=>parts(view,part=>{if(!['Image','Sprite'].includes(part.type)||String(part.texture?.key).startsWith('memory-texture:'))return;const key=memoryTexture(scene,part.texture,part.frame,brightness);if(key)part.setTexture(key);});}
 
 // These copies never enter resources, buildings, occupation or interaction maps.
 export class MapMemoryRenderer {
@@ -41,7 +47,7 @@ export class MapMemoryRenderer {
       view=s.assets.createView(d.id,{building,preview:false});
       view.setGrowth?.(entry.visual.stage??0);view.setSeason?.(entry.visual.season??'Spring');
       if(building.construction?.state!=='complete'&&building.construction)view=new ConstructionView(s,building,view);
-      frozenAppearance(s,view,()=>view.paint(building),b);
+      frozenAppearance(s,view,()=>view.paint(building),b);muteLater(s,view.inner??view,b);
     }else if(entry.kind==='stockpile'){
       view=s.legacyStockpiles.createMarker({id:entry.visual.id});frozenAppearance(s,view,()=>view.paint(),b);view.setPosition(point.x,point.y).setDepth(point.y+.12);
     }else{
