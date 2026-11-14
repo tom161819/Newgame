@@ -33,6 +33,8 @@ export class DemolitionUI {
     if(this.scene.character.state==='ground'&&this.scene.character.order?.kind==='enter'&&this.scene.character.order.tower?.id===b.id)this.scene.character.stopForBuilding();
     text(document.querySelector('#building-detail-title'),`${buildingName(b)} #${b.id}`);text(document.querySelector('#building-detail-description'),buildingDefinition(b).description);
     {const hp=buildingHP(b),box=document.querySelector('#building-detail-hp');if(box){box.hidden=!hp;if(hp){text(document.querySelector('#building-detail-hp-text'),t('building.hp',{hp:Math.ceil(hp.hp),max:hp.max}));const bar=document.querySelector('#building-detail-hp-bar');bar.max=hp.max;bar.value=hp.hp;}}}
+    // m-hrad-urovne: the detail of a Castle points to its card, where the upgrade is.
+    if(b.type==='castle')text(document.querySelector('#building-detail-description'),`${b.level?t('castle.level',{level:b.level,max:4}):buildingDefinition(b).description} ${t('castle.cardHint')}`);
     this.scene.setGalleryInput(false);if(!this.dialog.open)this.dialog.showModal();this.attach(this.dialog,b);this.refresh();
   }
   reason(b){

@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.129.1] - 2026-11-15
+<!-- version: {"title":"Castle card opens on click","type":"fix","reconstructed":false,"saveVersion":62} -->
+### Fixed
+- A click on the new Castle opened only the building detail without the upgrade. It now opens the Castle's card with the level and the Upgrade button; the detail of an old Castle says where the upgrade is.
+- A resident asked to step off a new blueprint no longer waits for good when his way is blocked.
+
 ## [0.129.0] - 2026-11-15
 <!-- version: {"title":"Castle levels and upgrade","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

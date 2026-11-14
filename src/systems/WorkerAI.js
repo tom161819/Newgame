@@ -39,7 +39,7 @@ export class WorkerAI {
   step(worker,delta){
     if(!worker.isAlive)return;
     // Point 45: stepping off a new blueprint comes first; the usual work goes on once he is beside it.
-    if(worker.steppingAside!=null){if(worker.path.length||worker.nextTile){worker.update(delta);return;}worker.steppingAside=null;}
+    if(worker.steppingAside!=null){const late=(this.scene.gameTime?.totalElapsed??0)>(worker.stepAside??0)+6000;/* safety: never wait on a blocked way for good */if(!late&&(worker.path.length||worker.nextTile)){worker.update(delta);return;}if(late)worker.path=[];worker.steppingAside=null;}
     if(this.system.commands.update(worker,delta)){if(worker.restPhase)this.system.rest?.stop(worker);return;}
     worker.aiCooldown-=delta;
     if(worker.arriving){this.arrival(worker);worker.update(delta);return;}
