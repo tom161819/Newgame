@@ -111,8 +111,8 @@ test('children, hidden houses and snowmen survive a save; the same children come
 test('D2 decorations: Swing Tree within 4 tiles +1, Well within 6 tiles +1, one of each counts, shown in the needs; all of it capped at +8', () => {
   const {s,c,place,people}=world(),family=place('house',40,40),far=place('house',70,40);const folk=people(6);let homes=s.needs.homes();
   place('swing_tree',43,40);place('well',40,45);homes=s.needs.homes();
-  assert.deepEqual(c.decorBonus(family),{swing:1,well:1});assert.deepEqual(c.decorBonus(far),{swing:0,well:0});
-  place('swing_tree',39,43);assert.deepEqual(c.decorBonus(family),{swing:1,well:1},'a second swing tree adds nothing');
+  assert.deepEqual(c.decorBonus(family),{swing:1,well:1,fountain:0});assert.deepEqual(c.decorBonus(far),{swing:0,well:0,fountain:0});
+  place('swing_tree',39,43);assert.deepEqual(c.decorBonus(family),{swing:1,well:1,fountain:0},'a second swing tree adds nothing');
   const inFamily=folk.find(w=>homes.get(w.id)?.buildingId===family.id),st=s.needs.status(inFamily);
   assert.equal(st.swing,1);assert.equal(st.well,1);assert.equal(st.surroundingsCapped,0);
   place('village_green',44,43);const all=c.surroundings(family,s.needs.homes());
@@ -139,4 +139,11 @@ test('D2 play: children swing on a Swing Tree and jump into a Haystack near thei
   const tree=place('swing_tree',44,40),farm=place('farmhouse',46,44),hay=place('haystack',44,43);void farm;
   const seen={swing:0,hay:0};for(let i=0;i<240;i++){tick(1000);seen.swing=Math.max(seen.swing,c.playingAtDecoration(tree.id));seen.hay=Math.max(seen.hay,c.playingAtDecoration(hay.id));}
   assert.ok(seen.swing>0,'someone swings');assert.ok(seen.hay>0,'someone jumps into the hay');
+});
+
+test('Fountain (owner 14 Nov 2026): 2×2, houses within 8 tiles +2, may stand on paving, counts under the +8 cap', () => {
+  const {s,c,place}=world(),near=place('house',40,40),far=place('house',70,40);place('fountain',45,40);
+  const d=s.objectRegistry.require('fountain');assert.deepEqual([d.width,d.height,d.buildingCategory,d.renderMode],[2,2,'housing','sprite']);
+  assert.equal(c.decorBonus(near).fountain,2);assert.equal(c.decorBonus(far).fountain,0);
+  const all=c.surroundings(near,s.needs.homes());assert.equal(all.fountain,2);assert.ok(all.total<=8);
 });

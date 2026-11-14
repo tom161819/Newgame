@@ -33,6 +33,8 @@ export const CHILDREN=Object.freeze({
 export const HOUSE_DECORATIONS=Object.freeze({
   swing_tree:Object.freeze({range:4,happiness:1,play:'swing'}),
   well:Object.freeze({range:6,happiness:1}),
+  // Owner 14 Nov 2026: a Fountain (2×2) gives houses within 8 tiles +2 and water for fighting fires like a Well.
+  fountain:Object.freeze({range:8,happiness:2}),
   haystack:Object.freeze({farmRange:6,farms:Object.freeze(['farmhouse','wheat_field']),play:'hay'}),
   // Children of a house within this many tiles may go to play at a swing tree or a haystack.
   playReach:8,playChance:.35,

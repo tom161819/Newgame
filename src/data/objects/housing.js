@@ -30,5 +30,9 @@ housingBuildings.push(...[
   {id:'well',name:'Well',cost:{stone:6,wood:2},constructionTime:10000,visualHeight:60,requiresCompletedBuildings:['house'],
     unlockDescription:'Requires a completed House before placing a Well.',decoration:{kind:'well',range:W.well.range,happiness:W.well.happiness},
     description:`A stone well. Houses within ${W.well.range} tiles: +${W.well.happiness} happiness.`},
-].map(d=>({...d,width:1,height:1,buildable:true,category:'building',buildingCategory:'housing',sprite:`/assets/buildings/${d.id}/${d.id}.svg`,walkable:false,
+  // Owner 14 Nov 2026: a stone Fountain on 2×2 (Housing); the art comes from APPROVED_BUILDING_ART.
+  {id:'fountain',name:'Fountain',width:2,height:2,cost:{stone:20,wood:2},constructionTime:20000,visualHeight:84,requiresCompletedBuildings:['house'],
+    unlockDescription:'Requires a completed House before placing a Fountain.',decoration:{kind:'fountain',range:W.fountain.range,happiness:W.fountain.happiness},
+    description:`A stone fountain. Houses within ${W.fountain.range} tiles: +${W.fountain.happiness} happiness; its water helps to fight fires.`},
+].map(d=>({width:1,height:1,...d,buildable:true,category:'building',buildingCategory:'housing',sprite:`/assets/buildings/${d.id}/${d.id}.svg`,walkable:false,
   collectible:false,interactions:[],renderMode:'procedural',renderer:'decoration',origin:{x:.5,y:.9},depth:{offset:0}})));

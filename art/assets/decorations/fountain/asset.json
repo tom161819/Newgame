@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "id": "fountain",
+  "name": "Fountain",
+  "category": "decorations",
+  "description": "Fountain (owner 14 Nov 2026, 2×2, Housing): a stone fountain for the houses around it.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "workshop",
+  "gameObjectId": "fountain",
+  "variants": [
+    {
+      "id": "fountain-render-0",
+      "name": "Octagonal stone fountain 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): octagonal stone basin on steps with a raised bowl, a bronze spout and four jets. The dirt patch under it is cut away so it sits on the terrain or paving. View 0° (front-right), cut out of the owner's render and scaled to 0.145 wide and 0.128 high (the render's view is a little steeper than the game's). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "stoneWell",
+            "at": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "fountain-render-90",
+      "name": "Octagonal stone fountain 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): octagonal stone basin on steps with a raised bowl, a bronze spout and four jets. The dirt patch under it is cut away so it sits on the terrain or paving. View 90° (rear-right), cut out of the owner's render and scaled to 0.145 wide and 0.128 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "stoneWell",
+            "at": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "fountain-render-180",
+      "name": "Octagonal stone fountain 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): octagonal stone basin on steps with a raised bowl, a bronze spout and four jets. The dirt patch under it is cut away so it sits on the terrain or paving. View 180° (rear-left), cut out of the owner's render and scaled to 0.145 wide and 0.128 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "stoneWell",
+            "at": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "fountain-render-270",
+      "name": "Octagonal stone fountain 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): octagonal stone basin on steps with a raised bowl, a bronze spout and four jets. The dirt patch under it is cut away so it sits on the terrain or paving. View 270° (front-left), cut out of the owner's render and scaled to 0.145 wide and 0.128 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "none"
+        },
+        "props": [
+          {
+            "type": "stoneWell",
+            "at": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    }
+  ]
+}

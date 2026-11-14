@@ -20,7 +20,7 @@ function build(s,x,y,{complete=true}={}){
 test('the House is a 2×2 Housing building with the approved art; each completed one adds 5 residents',()=>{
   const s=workerScene(),d=s.objectRegistry.require('house');
   assert.deepEqual([d.width,d.height,d.buildingCategory,d.renderMode,d.housing.capacity],[2,2,'housing','sprite',5]);
-  assert.deepEqual(buildingsInCategory(s.objectRegistry,'housing').map(b=>b.id),['house','village_green','swing_tree','haystack','well']);
+  assert.deepEqual(buildingsInCategory(s.objectRegistry,'housing').map(b=>b.id),['house','village_green','swing_tree','haystack','well','fountain']);
   assert.equal(s.workerSystem.capacity(),POPULATION.maximum);
   build(s,60,60);build(s,64,60);assert.equal(s.workerSystem.capacity(),POPULATION.maximum+10);
   const site=build(s,68,60,{complete:false});assert.equal(s.workerSystem.capacity(),POPULATION.maximum+10,'a blueprint gives no room yet');

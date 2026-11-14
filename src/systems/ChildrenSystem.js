@@ -50,14 +50,14 @@ export class ChildrenSystem {
   decorations(kind){return (this.scene.buildings??[]).filter(b=>b.type===kind&&buildingIsComplete(b));}
   // Swing Tree within 4 tiles +1, Well within 6 tiles +1 (one of each counts).
   decorBonus(house){
-    if(!this.isHouse(house))return {swing:0,well:0};const c=this.center(house);
+    if(!this.isHouse(house))return {swing:0,well:0,fountain:0};const c=this.center(house);
     const near=kind=>this.decorations(kind).some(d=>this.distance(this.center(d),c)<=HOUSE_DECORATIONS[kind].range)?HOUSE_DECORATIONS[kind].happiness:0;
-    return {swing:near('swing_tree'),well:near('well')};
+    return {swing:near('swing_tree'),well:near('well'),fountain:near('fountain')};
   }
   // Everything "around the house" (green, family, swing, well), capped at +8; `capped` is what the cap took away.
   surroundings(house,homes){
-    const g=this.greenBonus(house,homes),d=this.decorBonus(house),sum=g.near+g.family+d.swing+d.well,total=Math.min(SURROUNDINGS_CAP,sum);
-    return {green:g.near,family:g.family,swing:d.swing,well:d.well,total,capped:sum-total};
+    const g=this.greenBonus(house,homes),d=this.decorBonus(house),sum=g.near+g.family+d.swing+d.well+d.fountain,total=Math.min(SURROUNDINGS_CAP,sum);
+    return {green:g.near,family:g.family,swing:d.swing,well:d.well,fountain:d.fountain,total,capped:sum-total};
   }
   housesInRange(green){const c=this.center(green);return (this.scene.buildings??[]).filter(b=>this.isHouse(b)&&this.distance(this.center(b),c)<=VILLAGE_GREEN.range);}
   nearestGreen(point,reach=CHILDREN.greenReach){let best=null,bestD=Infinity;for(const g of this.greens()){const d=this.distance(this.center(g),point);if(d<=reach&&d<bestD){best=g;bestD=d;}}return best;}

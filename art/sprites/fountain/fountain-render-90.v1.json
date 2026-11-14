@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "fountain",
+  "variantId": "fountain-render-90",
+  "name": "Octagonal stone fountain 90° (rear-right)",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "937f5ec1",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 129,
+  "height": 86,
+  "anchor": {
+    "x": 64,
+    "y": 53
+  },
+  "origin": {
+    "x": 0.49612,
+    "y": 0.61628
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 64,
+    "y": 85
+  },
+  "baseOrigin": {
+    "x": 0.49612,
+    "y": 0.98837
+  },
+  "visualHeight": 85,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1,
+  "lights": [],
+  "x2": {
+    "width": 258,
+    "height": 172,
+    "anchor": {
+      "x": 128,
+      "y": 106
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

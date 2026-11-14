@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "well",
+  "variantId": "well-render-90",
+  "name": "Stone well with shingle roof 90° (rear-right)",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "937f5ec1",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 73,
+  "height": 86,
+  "anchor": {
+    "x": 36,
+    "y": 68
+  },
+  "origin": {
+    "x": 0.49315,
+    "y": 0.7907
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 36,
+    "y": 84
+  },
+  "baseOrigin": {
+    "x": 0.49315,
+    "y": 0.97674
+  },
+  "visualHeight": 84,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1,
+  "lights": [],
+  "x2": {
+    "width": 146,
+    "height": 172,
+    "anchor": {
+      "x": 72,
+      "y": 136
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

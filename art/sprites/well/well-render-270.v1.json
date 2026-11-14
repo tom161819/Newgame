@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "well",
+  "variantId": "well-render-270",
+  "name": "Stone well with shingle roof 270° (front-left)",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "937f5ec1",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 73,
+  "height": 83,
+  "anchor": {
+    "x": 36,
+    "y": 65
+  },
+  "origin": {
+    "x": 0.49315,
+    "y": 0.78313
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 36,
+    "y": 81
+  },
+  "baseOrigin": {
+    "x": 0.49315,
+    "y": 0.9759
+  },
+  "visualHeight": 81,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1,
+  "lights": [],
+  "x2": {
+    "width": 146,
+    "height": 166,
+    "anchor": {
+      "x": 72,
+      "y": 130
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

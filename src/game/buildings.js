@@ -104,7 +104,7 @@ export function placementError(map,anchor,resources,reservedTiles=[],definition=
   // Children D2: decorations stay off worn paths and paving; a Haystack only stands near a farm.
   // m-staveni-zdi-studna (61): a Well may stand anywhere buildable, paths and paving included.
   if(definition.decoration){
-    const wear=natural?.scene?.pathWear;if(wear&&definition.decoration.kind!=='well'&&tiles.some(tile=>wear.isPaved(tile)||wear.level(tile)>=HOUSE_DECORATIONS.pathLevel))return t('status.notOnPath');
+    const wear=natural?.scene?.pathWear;if(wear&&!['well','fountain'].includes(definition.decoration.kind)&&tiles.some(tile=>wear.isPaved(tile)||wear.level(tile)>=HOUSE_DECORATIONS.pathLevel))return t('status.notOnPath');
     const range=definition.decoration.farmRange;
     if(range&&!buildings.some(b=>HOUSE_DECORATIONS.haystack.farms.includes(b.type)&&Math.hypot(b.x+buildingDefinition(b).width/2-(anchor.x+.5),b.y+buildingDefinition(b).height/2-(anchor.y+.5))<=range))return t('status.needsFarmNearby',{range});
   }

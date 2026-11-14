@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "fountain",
+  "variantId": "fountain-render-270",
+  "name": "Octagonal stone fountain 270° (front-left)",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "937f5ec1",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 128,
+  "height": 85,
+  "anchor": {
+    "x": 64,
+    "y": 52
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.61176
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 64,
+    "y": 84
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.98824
+  },
+  "visualHeight": 84,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1,
+  "lights": [],
+  "x2": {
+    "width": 256,
+    "height": 170,
+    "anchor": {
+      "x": 128,
+      "y": 104
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

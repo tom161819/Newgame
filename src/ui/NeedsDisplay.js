@@ -35,6 +35,7 @@ export function renderNeeds(root,status){
   if(status.greenFamily)lines.push(element('p','need-green-family',t('needs.greenFamilyLine',{value:`+${status.greenFamily}`})));
   if(status.swing)lines.push(element('p','need-swing',t('needs.swingLine',{value:`+${status.swing}`})));
   if(status.well)lines.push(element('p','need-well',t('needs.wellLine',{value:`+${status.well}`})));
+  if(status.fountain)lines.push(element('p','need-well',t('needs.fountainLine',{value:`+${status.fountain}`})));
   if(status.surroundingsCapped)lines.push(element('p','need-surroundings-cap',t('needs.surroundingsCapLine',{cap:8,value:`−${status.surroundingsCapped}`})));
   if(status.feast)lines.push(element('p','need-feast',t('needs.feastLine',{value:`+${status.feast}`,days:status.feastDaysLeft.toFixed(1)})));
   for(const c of status.policyContext??[])lines.push(element('p','need-policy-context',t(`needs.context.${c.id}`,{value:`−${c.value}`})));

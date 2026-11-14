@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.125.0] - 2026-11-14
+<!-- version: {"title":"Well art and the Fountain","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Fountain: a new 2×2 building in Housing (20 Stone, 2 Wood, after the first House). Houses within 8 tiles get +2 Happiness (under the +8 cap of everything around a house); its water serves for fighting fires like a Well. It may stand on paths and paving.
+### Changed
+- The Well has new art: a round stone well with a shingle roof. Its picture and the Fountain's have no dirt patch, so they sit straight on the terrain or paving.
+
 ## [0.124.0] - 2026-11-14
 <!-- version: {"title":"Kingdom overview: styled info panels","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

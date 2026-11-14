@@ -2241,7 +2241,7 @@
       }
     },
     "well": {
-      "preferred": "well-roofed",
+      "preferred": "well-render-0",
       "variants": {
         "well-roofed": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -2269,6 +2269,15 @@
           "updatedAt": "2026-11-07T16:27:24.808Z",
           "version": 1,
           "approvedAt": "2026-11-07T16:27:24.808Z"
+        },
+        "well-render-0": {
+          "approvedAt": "2026-11-14T20:50:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 14 Nov 2026: add this render to the game.",
+          "specHash": "937f5ec1",
+          "status": "approved",
+          "updatedAt": "2026-11-14T20:50:00.000Z",
+          "version": 1
         }
       }
     },
@@ -6612,6 +6621,20 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:07:23.159Z",
           "approvedAt": "2026-11-04T19:07:23.159Z"
+        }
+      }
+    },
+    "fountain": {
+      "preferred": "fountain-render-0",
+      "variants": {
+        "fountain-render-0": {
+          "approvedAt": "2026-11-14T20:50:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 14 Nov 2026: add this render to the game.",
+          "specHash": "937f5ec1",
+          "status": "approved",
+          "updatedAt": "2026-11-14T20:50:00.000Z",
+          "version": 1
         }
       }
     }

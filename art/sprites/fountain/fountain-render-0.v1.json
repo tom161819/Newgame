@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "fountain",
+  "variantId": "fountain-render-0",
+  "name": "Octagonal stone fountain 0° (front-right)",
+  "category": "decorations",
+  "version": 1,
+  "specHash": "937f5ec1",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 130,
+  "height": 85,
+  "anchor": {
+    "x": 65,
+    "y": 52
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.61176
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 84
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.98824
+  },
+  "visualHeight": 84,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1,
+  "lights": [],
+  "x2": {
+    "width": 260,
+    "height": 170,
+    "anchor": {
+      "x": 130,
+      "y": 104
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

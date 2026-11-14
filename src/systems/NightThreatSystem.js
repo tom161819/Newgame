@@ -267,7 +267,7 @@ export class NightThreatSystem {
   }
   // Water: the nearest completed Well's neighbours, otherwise walkable tiles beside water near the fire.
   waterGoals(fire){
-    const s=this.scene,b=s.buildings.find(x=>x.id===fire.id),c=this.center(b),wells=(s.buildings??[]).filter(x=>x.type==='well'&&buildingIsComplete(x)).sort((a,z)=>Math.hypot(a.x-c.x,a.y-c.y)-Math.hypot(z.x-c.x,z.y-c.y));
+    const s=this.scene,b=s.buildings.find(x=>x.id===fire.id),c=this.center(b),wells=(s.buildings??[]).filter(x=>['well','fountain'].includes(x.type)&&buildingIsComplete(x)).sort((a,z)=>Math.hypot(a.x-c.x,a.y-c.y)-Math.hypot(z.x-c.x,z.y-c.y));
     if(wells.length&&Math.hypot(wells[0].x-c.x,wells[0].y-c.y)<=25)return {kind:'well',goals:towerNeighbors(wells[0]).filter(g=>isWalkable(s.map,g.x,g.y))};
     const shore=[];for(let r=1;r<=25&&shore.length<8;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=Math.floor(c.x)+dx,y=Math.floor(c.y)+dy;
       if(isWalkable(s.map,x,y)&&[[1,0],[-1,0],[0,1],[0,-1]].some(([ax,ay])=>isWaterGround(s.groundGrid?.[y+ay]?.[x+ax])))shore.push({x,y});}
