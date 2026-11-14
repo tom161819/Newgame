@@ -75,3 +75,12 @@ test('bod 37: a remembered Stone Wall is dimmed like a Tower – its art pieces 
   const found=memoryParts(wall).filter(p=>p.type==='Image').map(p=>p.name).sort();assert.deepEqual(found,['block','n','shadow']);
   assert.equal(memoryParts({art:image('one')}).some(p=>p.name==='one'),false,'only groups of pieces, not a single object called art');
 });
+
+test('m-plynuly-prechod-dohledu: a building near the sight range is lit in part, and the change takes time', async () => {
+  const { edgeLight,fadeStep,SIGHT_FADE }=await import('../src/game/sightFade.js');
+  const seen=new Set(['10,10']),fog={revision:1,isInSightTile:t=>seen.has(`${t.x},${t.y}`)},d={width:1,height:1};
+  assert.equal(edgeLight(fog,{x:11,y:10},d),.75);assert.equal(edgeLight(fog,{x:12,y:10},d),.5);assert.equal(edgeLight(fog,{x:13,y:11},d),.25);assert.equal(edgeLight(fog,{x:14,y:10},d),0,'beyond the reach: fully dark');
+  assert.equal(edgeLight(fog,{x:11,y:9},{width:2,height:2}),.75,'the nearest tile of a big building counts');
+  const wall={x:12,y:10};assert.equal(edgeLight(fog,wall,d),.5);seen.add('11,10');assert.equal(edgeLight(fog,wall,d),.5,'same sight revision: remembered');fog.revision=2;assert.equal(edgeLight(fog,wall,d),.75);
+  assert.equal(fadeStep(0,1,SIGHT_FADE.ms/4),.25);assert.equal(fadeStep(.9,1,SIGHT_FADE.ms),1);assert.equal(fadeStep(1,0,SIGHT_FADE.ms/2),.5);assert.equal(fadeStep(.5,.5,16),.5);
+});

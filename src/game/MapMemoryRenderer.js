@@ -60,12 +60,13 @@ export class MapMemoryRenderer {
   update(camera){
     const fog=this.memory.fog,needed=new Set();
     if(fog.enabled)for(const [key,entry]of this.memory.objects){
-      if(fog.isInSightObject(entry))continue;
+      // m-plynuly-prechod-dohledu: a building still fading in keeps its dark copy until it is fully lit.
+      const lit=this.scene.sightFade?.get(key);if(fog.isInSightObject(entry)&&lit===undefined)continue;
       const d=this.scene.objectRegistry.require(entry.type),point=gridToWorld(entry.x+d.width/2,entry.y+d.height/2),padding=(d.width+d.height)*32;
       if(point.x+padding<camera.x||point.x-padding>camera.right||point.y+padding<camera.y||point.y-(d.visualHeight??64)-padding>camera.bottom)continue;
       needed.add(key);let record=this.views.get(key);
       if(record?.entry!==entry||record.brightness!==fog.memoryBrightness){record?.view.destroy();record={entry,brightness:fog.memoryBrightness,view:this.create(entry)};this.views.set(key,record);}
-      record.view.setVisible(true);
+      record.view.setVisible(true);if(lit!==undefined){record.view.setAlpha?.(1-lit);record.faded=true;}else if(record.faded){record.view.setAlpha?.(1);record.faded=false;}
       // m-vytezeny-dul-ctverecky (63): a remembered finished building shows its footprint only while placing.
       if(entry.kind==='building')applyFootprint(record.view,footprintShown({complete:!entry.visual.construction||entry.visual.construction.state==='complete',buildMode:!!this.scene.buildMode}));
     }

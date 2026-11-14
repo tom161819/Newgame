@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.121.2] - 2026-11-14
+<!-- version: {"title":"Soft change between lit and remembered buildings","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- Buildings at the edge of the sight range no longer switch hard between lit and dark: within 3 tiles of the range they are lit in part, and the change takes a moment.
+
 ## [0.121.1] - 2026-11-14
 <!-- version: {"title":"Remembered Stone Walls are dimmed like Towers","type":"fix","reconstructed":false,"saveVersion":62} -->
 ### Fixed
