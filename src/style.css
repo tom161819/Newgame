@@ -1268,3 +1268,7 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 /* Point 44: Show links switch in the Buildings panel */
 .building-links-toggle { margin-left:auto; margin-right:6px; min-height:0; width:28px; height:24px; padding:0; border:1px solid var(--line-soft,#5b5a40); border-radius:6px; background:none; color:var(--ink,#ede5c9); font-size:14px; cursor:pointer; }
 .building-links-toggle[aria-checked="true"] { background:rgb(227 197 122 / .22); border-color:#e3c57a; color:#f2a24a; }
+
+/* Point 49: hit points in the building detail */
+.building-hp { display:grid; gap:4px; margin:8px 0; font-weight:650; }
+.building-hp progress { width:100%; height:10px; accent-color:#85aa64; }

@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.128.0] - 2026-11-14
+<!-- version: {"title":"Season squares fixed; hit points of fortifications","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Fortifications have hit points (Stone Wall 200, Gate 300, Tower 400, Castle 1500), shown in the building detail. Nothing attacks buildings yet.
+### Fixed
+- Season change: squares of ground stayed in the old season for a long time (at fast speed for good), with hard edges to their neighbours. The ground now catches up within seconds.
+
 ## [0.127.0] - 2026-11-14
 <!-- version: {"title":"Attack orders, Show links, blueprints over people","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

@@ -1,3 +1,4 @@
+import { buildingHP } from '../game/buildingHealth.js';
 import { countName } from '../i18n/names.js';
 import { t } from '../i18n/index.js';
 import { element } from './objectLabels.js';
@@ -31,6 +32,7 @@ export class DemolitionUI {
     const b=this.building(this.selectedId);if(!b||!this.scene.fog.isVisibleObject(b))return;
     if(this.scene.character.state==='ground'&&this.scene.character.order?.kind==='enter'&&this.scene.character.order.tower?.id===b.id)this.scene.character.stopForBuilding();
     text(document.querySelector('#building-detail-title'),`${buildingName(b)} #${b.id}`);text(document.querySelector('#building-detail-description'),buildingDefinition(b).description);
+    {const hp=buildingHP(b),box=document.querySelector('#building-detail-hp');if(box){box.hidden=!hp;if(hp){text(document.querySelector('#building-detail-hp-text'),t('building.hp',{hp:Math.ceil(hp.hp),max:hp.max}));const bar=document.querySelector('#building-detail-hp-bar');bar.max=hp.max;bar.value=hp.hp;}}}
     this.scene.setGalleryInput(false);if(!this.dialog.open)this.dialog.showModal();this.attach(this.dialog,b);this.refresh();
   }
   reason(b){

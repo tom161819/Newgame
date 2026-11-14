@@ -1,3 +1,4 @@
+import { buildingMaxHP } from '../game/buildingHealth.js';
 import { HEATED_BUILDINGS } from '../data/heating.js';
 import { validExpedition } from './Expedition.js';
 import { fishingGround } from './FishingSystem.js';
@@ -137,7 +138,7 @@ export function serializeGameState(scene){
       render:{x:scene.player.x,y:scene.player.y,depth:scene.player.depth},
       transition:c.transitioning?{remaining:Math.max(1,(c.transitionTween?.duration??900)-(c.transitionTween?.elapsed??0))}:null},
     inventory:scene.inventory.exportState(),equipment:scene.equipment.exportState(),
-    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.burntFrom?{burntFrom:b.burntFrom}:{}),...(buildingDefinition(b).crop?{farmId:b.farmId??null}:{}),...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.depleted?{depleted:true}:{}),...(buildingDefinition(b).legacyFootprint&&!buildingDefinition(b).legacy?{size:buildingDefinition(b).width}:{}),...(typeof b.look==='string'&&buildingDefinition(b).artLooks?.includes(b.look)?{look:b.look}:{}),...(b.unverified?{unverified:true}:{}),...(['wall_gate','gate'].includes(b.type)&&['x','y'].includes(b.gateAxis)?{gateAxis:b.gateAxis}:{}),...(b.type==='barracks'&&Number.isInteger(b.autoHire)?{autoHire:b.autoHire}:{}),...(b.type==='iron_mine'&&b.miningMode==='adjacent'?{miningMode:'adjacent'}:{}),...(b.type==='tower'&&[1,2,3].includes(b.facing)?{facing:b.facing}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.demolition?{demolition:copy(b.demolition)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
+    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.burntFrom?{burntFrom:b.burntFrom}:{}),...(buildingDefinition(b).crop?{farmId:b.farmId??null}:{}),...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.depleted?{depleted:true}:{}),...(buildingDefinition(b).legacyFootprint&&!buildingDefinition(b).legacy?{size:buildingDefinition(b).width}:{}),...(typeof b.look==='string'&&buildingDefinition(b).artLooks?.includes(b.look)?{look:b.look}:{}),...(b.unverified?{unverified:true}:{}),...(['wall_gate','gate'].includes(b.type)&&['x','y'].includes(b.gateAxis)?{gateAxis:b.gateAxis}:{}),...(b.type==='barracks'&&Number.isInteger(b.autoHire)?{autoHire:b.autoHire}:{}),...(b.type==='iron_mine'&&b.miningMode==='adjacent'?{miningMode:'adjacent'}:{}),...(b.type==='tower'&&[1,2,3].includes(b.facing)?{facing:b.facing}:{}),...(b.hp!=null&&buildingMaxHP(b)!=null&&b.hp<buildingMaxHP(b)?{hp:b.hp}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.demolition?{demolition:copy(b.demolition)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
     resources:[...scene.resources.values()].map(v=>({type:v.getData('objectId'),tile:point(v.getData('tile')),...(v.getData('object').natural?{natural:copy(v.getData('object').natural)}:{})})),
     drops:[...scene.dropSystem.drops.values()].map(d=>({id:d.id,resource:d.resource,tile:point(d.tile),amount:d.amount,rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0),haulEligible:d.haulEligible!==false,...(d.siteId!=null?{siteId:d.siteId}:{})})),
     // m-ulozeni-animals (owner 14 Nov 2026): an animal may fight back at another animal (a hunter's dog, a wolf) or at
@@ -226,7 +227,8 @@ function validateAtSize(input,registry){
     check(b.unverified===undefined||b.unverified===true&&b.construction?.state==='planned'&&!b.depositId);
     // m-staveni-zdi-studna (59): optional Gate axis chosen with R (older saves have none: 'y').
     check(b.gateAxis===undefined||['wall_gate','gate'].includes(b.type)&&['x','y'].includes(b.gateAxis));
-    check(b.facing===undefined||b.type==='tower'&&[1,2,3].includes(b.facing));/* m-vez-otaceni: optional facing of a Tower */
+    check(b.facing===undefined||b.type==='tower'&&[1,2,3].includes(b.facing));
+    /* m-budovy-hp: optional hit points of a damaged fortification */if(b.hp!==undefined){check(buildingMaxHP(b)!=null);number(b.hp,0,buildingMaxHP(b));}/* m-vez-otaceni: optional facing of a Tower */
     // m-kasarna-limit-zamestnani: optional automatic-employment limit of a Barracks (older saves: the default 4).
     if(b.autoHire!==undefined){check(b.type==='barracks');integer(b.autoHire,0,d.workplace?.capacity??0);}
     check(b.burntFrom===undefined||b.type==='burnt_ruins'&&typeof b.burntFrom==='string'&&definition(b.burntFrom,'building')?.id===b.burntFrom);

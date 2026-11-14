@@ -48,6 +48,7 @@ export const DRAFT_VIEW=Object.freeze([{zoom:.3,scale:4,until:.36},{zoom:.5,scal
 export const draftScale=zoom=>DRAFT_VIEW.find(d=>zoom<=d.zoom)?.scale??1;
 export const draftStale=(scale,zoom)=>!!scale&&zoom>(DRAFT_VIEW.find(d=>d.scale===scale)?.until??0);
 const FIRST_PAINT_MS = 12;
+const BACKLOG_CHUNKS = 6, BACKLOG_SLICE_MS = 10, BACKLOG_EVERY_MS = 30;
 const GROUND_BAND = 36; // rows of ground a frame in a paint spread over frames (a multiple of GROUND_STEP)
 // m-teren-vyska (part 2): room above a chunk's picture for its highest ground (px).
 const LIFT_PAD = Math.ceil(HEIGHT_MAX * HEIGHT_UNIT_PX) + 2;
@@ -1103,8 +1104,17 @@ export class TerrainRenderer {
     if(!all&&this.groundStyle==='continuous')budget=performance.now()<(this.nextFogPaint??0)?0:REPAINT_PER_FRAME;
     // A chunk repainted in the last REPAINT_GAP_MS waits (its fog edge catches up a moment later), so the cost stays
     // bounded per second however high the frame rate or however many residents walk at the edge of sight.
-    const order=this.paintOrder??=new Map(),painted=this.paintedAt??=new Map(),started=all?0:performance.now();if(!all)waiting.sort((a,b)=>(order.get(a)??0)-(order.get(b)??0));
-    for(const key of waiting){if(budget<=0)break;if(!all&&started-(painted.get(key)??-Infinity)<REPAINT_GAP_MS)continue;if(!paint(key))continue;budget--;order.set(key,this.paintTick=(this.paintTick??0)+1);if(all)painted.delete(key);else{painted.set(key,started);this.nextFogPaint=started+REPAINT_EVERY_MS;}}
+    const order=this.paintOrder??=new Map(),painted=this.paintedAt??=new Map(),started=all?0:performance.now();// Point 47: a chunk whose ground is half painted goes first. Taking turns over a full screen started a new band job on every chunk, and with only eight jobs kept the older ones were thrown away before they finished.
+    if(!all){const active=this.groundJobs?.size?new Set([...this.groundJobs.keys()].map(k=>k.slice(0,k.indexOf('|')))):null;waiting.sort((a,b)=>(active?(active.has(b)?1:0)-(active.has(a)?1:0):0)||(order.get(a)??0)-(order.get(b)??0));}
+    // m-obdobi-svy-zeme (point 47, owner 14 Nov 2026): one ground band every 50 ms let a season step take 40 s over a
+    // full screen, so neighbouring chunks stood in different steps for long (hard squares), and at fast speed the next
+    // step came before the last one finished. With many chunks waiting the pass now works for BACKLOG_SLICE_MS and
+    // comes back sooner; with a few (Fog of War edges, paths) nothing changes.
+    const backlog=!all&&waiting.length>BACKLOG_CHUNKS;
+    for(let i=0;i<waiting.length;i++){const key=waiting[i];if(budget<=0)break;if(!all&&!backlog&&!this.groundJobActive(key)&&started-(painted.get(key)??-Infinity)<REPAINT_GAP_MS)continue;
+      // A band of a half painted chunk shows nothing yet: with a backlog the same chunk gets further bands in this slice.
+      if(!paint(key)){if(backlog&&this.groundJobActive(key)&&performance.now()-started<BACKLOG_SLICE_MS){this.groundPaintsLeft=1;i--;}continue;}budget--;order.set(key,this.paintTick=(this.paintTick??0)+1);if(all)painted.delete(key);else{painted.set(key,started);this.nextFogPaint=started+(backlog?BACKLOG_EVERY_MS:REPAINT_EVERY_MS);
+      if(backlog&&performance.now()-started<BACKLOG_SLICE_MS){budget=1;this.groundPaintsLeft=1;}}}
     this.composite?.sync(this.camera??this.scene.cameras?.main);
   }
   update(camera,fog=null,memory=this.memory) {

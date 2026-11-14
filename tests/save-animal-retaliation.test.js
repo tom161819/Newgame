@@ -35,3 +35,10 @@ test('point 45: a blueprint may lie under a resident and goods; work waits, he s
   assert.ok(w.path.length>0,'he is sent off the site');const end=w.path.at(-1);w.tile={...end};w.position={x:end.x+.5,y:end.y+.5};w.path=[];
   assert.equal(s.constructionSystem.occupied(site),false);
 });
+
+test('point 49: fortifications have hit points; a damaged one is saved with them', async () => {
+  const {buildingHP,damageBuilding,repairBuilding,BUILDING_HP}=await import('../src/game/buildingHealth.js');
+  const tower={type:'tower'},house={type:'house'};assert.deepEqual(buildingHP(tower),{hp:BUILDING_HP.tower,max:BUILDING_HP.tower});assert.equal(buildingHP(house),null);
+  assert.equal(damageBuilding(tower,150).hp,250);assert.equal(tower.hp,250);assert.equal(damageBuilding(tower,999).destroyed,true);
+  repairBuilding(tower,1e9);assert.equal(tower.hp,undefined,'full health stores nothing');assert.equal(damageBuilding(house,10),null);
+});
