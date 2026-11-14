@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.125.1] - 2026-11-14
+<!-- version: {"title":"Studio: Hunting Lodge render","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Asset Studio: the owner's render of a new Hunting Lodge (shingled log cabin with a porch and a dog kennel, four views, drawn for 3 × 3) waits for review. The game is unchanged.
+
 ## [0.125.0] - 2026-11-14
 <!-- version: {"title":"Well art and the Fountain","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

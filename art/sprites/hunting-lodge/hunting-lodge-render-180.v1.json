@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "hunting-lodge",
+  "variantId": "hunting-lodge-render-180",
+  "name": "Shingled hunting cabin with porch and kennel 180° (rear-left)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "29c42966",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 189,
+  "height": 146,
+  "anchor": {
+    "x": 94,
+    "y": 95
+  },
+  "origin": {
+    "x": 0.49735,
+    "y": 0.65068
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 94,
+    "y": 143
+  },
+  "baseOrigin": {
+    "x": 0.49735,
+    "y": 0.97945
+  },
+  "visualHeight": 143,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.04,
+  "lights": [],
+  "x2": {
+    "width": 378,
+    "height": 292,
+    "anchor": {
+      "x": 188,
+      "y": 190
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

@@ -305,6 +305,246 @@
         "source": "gpt",
         "view": 270
       }
+    },
+    {
+      "id": "hunting-lodge-render-0",
+      "name": "Shingled hunting cabin with porch and kennel 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): log cabin with a shingle roof and stone chimney, a porch with steps, a torch, a skull with antlers over the porch, bow and arrows, hides on a rail, a dog kennel with a water bowl. Drawn for 3 × 3; the game Hunting Lodge is 2 × 2 now. View 0° (front-right), cut out of the owner's render and scaled to 0.24 wide and 0.211 high (the render's view is a little steeper than the game's). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.1,
+          "depth": 0.95,
+          "wallHeight": 0.85,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 1,
+          "chimney": true,
+          "at": [
+            -0.25,
+            -0.3
+          ]
+        },
+        "props": [
+          {
+            "type": "antlers",
+            "at": [
+              -0.45,
+              0.21
+            ],
+            "y": 0.82
+          },
+          {
+            "type": "hideRack",
+            "at": [
+              0.55,
+              0.35
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.55,
+              -0.62
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.05,
+              0.72
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "hunting-lodge-render-90",
+      "name": "Shingled hunting cabin with porch and kennel 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): log cabin with a shingle roof and stone chimney, a porch with steps, a torch, a skull with antlers over the porch, bow and arrows, hides on a rail, a dog kennel with a water bowl. Drawn for 3 × 3; the game Hunting Lodge is 2 × 2 now. View 90° (rear-right), cut out of the owner's render and scaled to 0.24 wide and 0.211 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.1,
+          "depth": 0.95,
+          "wallHeight": 0.85,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 1,
+          "chimney": true,
+          "at": [
+            -0.25,
+            -0.3
+          ]
+        },
+        "props": [
+          {
+            "type": "antlers",
+            "at": [
+              -0.45,
+              0.21
+            ],
+            "y": 0.82
+          },
+          {
+            "type": "hideRack",
+            "at": [
+              0.55,
+              0.35
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.55,
+              -0.62
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.05,
+              0.72
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "hunting-lodge-render-180",
+      "name": "Shingled hunting cabin with porch and kennel 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): log cabin with a shingle roof and stone chimney, a porch with steps, a torch, a skull with antlers over the porch, bow and arrows, hides on a rail, a dog kennel with a water bowl. Drawn for 3 × 3; the game Hunting Lodge is 2 × 2 now. View 180° (rear-left), cut out of the owner's render and scaled to 0.24 wide and 0.211 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.1,
+          "depth": 0.95,
+          "wallHeight": 0.85,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 1,
+          "chimney": true,
+          "at": [
+            -0.25,
+            -0.3
+          ]
+        },
+        "props": [
+          {
+            "type": "antlers",
+            "at": [
+              -0.45,
+              0.21
+            ],
+            "y": 0.82
+          },
+          {
+            "type": "hideRack",
+            "at": [
+              0.55,
+              0.35
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.55,
+              -0.62
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.05,
+              0.72
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "hunting-lodge-render-270",
+      "name": "Shingled hunting cabin with porch and kennel 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (14 Nov 2026): log cabin with a shingle roof and stone chimney, a porch with steps, a torch, a skull with antlers over the porch, bow and arrows, hides on a rail, a dog kennel with a water bowl. Drawn for 3 × 3; the game Hunting Lodge is 2 × 2 now. View 270° (front-left), cut out of the owner's render and scaled to 0.24 wide and 0.211 high (the render's view is a little steeper than the game's). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "roof_shingle",
+          "width": 1.1,
+          "depth": 0.95,
+          "wallHeight": 0.85,
+          "roofHeight": 0.7,
+          "ridge": "x",
+          "windows": 1,
+          "chimney": true,
+          "at": [
+            -0.25,
+            -0.3
+          ]
+        },
+        "props": [
+          {
+            "type": "antlers",
+            "at": [
+              -0.45,
+              0.21
+            ],
+            "y": 0.82
+          },
+          {
+            "type": "hideRack",
+            "at": [
+              0.55,
+              0.35
+            ]
+          },
+          {
+            "type": "firewood",
+            "at": [
+              0.55,
+              -0.62
+            ]
+          },
+          {
+            "type": "stump",
+            "at": [
+              0.05,
+              0.72
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }
