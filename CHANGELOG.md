@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.124.0] - 2026-11-14
+<!-- version: {"title":"Kingdom overview: styled info panels","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Kingdom overview: hovering Residents shows how people come (how many a day, with what chance, what stops them) and when they strike or leave; hovering Attractiveness lists everything that moves it now and the rules.
+### Changed
+- The explanations of the Kingdom overview are panels in the game's style instead of the browser's white hover box.
+
 ## [0.123.0] - 2026-11-14
 <!-- version: {"title":"Arrivals and departures rework","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

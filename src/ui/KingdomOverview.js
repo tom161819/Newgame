@@ -1,5 +1,7 @@
 import { t } from '../i18n/index.js';
-import { moodFor,NEEDS } from '../data/needs.js';
+import { moodFor,NEEDS,DISCONTENT } from '../data/needs.js';
+import { migrantsPerDay,POPULATION } from '../data/jobs.js';
+import { ENCLOSURE } from '../game/enclosure.js';
 import { element } from './objectLabels.js';
 import { placeBottomLeft,fromDom,readBarCollapsed,writeBarCollapsed } from './hudLayout.js';
 
@@ -18,6 +20,7 @@ export function kingdomOverview(scene){
   const w=NEEDS.weights,part=key=>statuses.length?statuses.reduce((n,s)=>n+(s[key]??0),0)/statuses.length*w[key]:0,parts={food:part('food'),rest:part('rest'),housing:part('housing'),safety:part('safety')};
   const weighted=parts.food+parts.rest+parts.housing+parts.safety,count=test=>statuses.filter(test).length;
   const detail={parts:Object.fromEntries(Object.entries(parts).map(([k,v])=>[k,Math.round(v)])),other:happiness==null?0:Math.round(happiness-weighted),
+    perDay:migrantsPerDay(residents.length),striking:count(s=>s.strike),leaving:count(s=>s.leaving),atRisk:count(s=>!s.strike&&!s.leaving&&(s.lowDays>0||s.criticalDays>0)),base:attraction?.base??100,
     hungry:count(s=>s.food<NEEDS.food.low),tired:count(s=>s.rest<NEEDS.rest.low),housed:count(s=>s.housing>=100),unhoused:count(s=>s.housing<100),unsafe:count(s=>s.safety<50),residents:statuses.length,
     seats:scene.workplaceSystem?.employees?(scene.buildings??[]).reduce((n,b)=>{const spec=scene.objectRegistry?.get?.(b.type)?.workplace;if(!spec||b.construction&&b.construction.state!=='complete')return n;return n+Math.max(0,(spec.capacity??0)-scene.workplaceSystem.employees(b).length);},0):0};
   return {detail,population:residents.length,capacity:workers?.capacity?.()??residents.length,unemployed:residents.filter(w=>w.profession==='idle').length,
@@ -33,7 +36,12 @@ export function kingdomOverview(scene){
 export function overviewExplain(o){
   const d=o.detail,sign=v=>v>0?`+${v}`:String(v),lines={};if(!d)return lines;
   const worst=Object.entries(NEEDS.weights).map(([k,weight])=>({k,loss:weight*(100-(o[k]??100))})).sort((a,b)=>b.loss-a.loss)[0];
-  lines.residents=[t('explain.residents',{count:o.population,capacity:o.capacity}),o.population>=o.capacity?t('explain.tip.capacity'):null];
+  // m-prehled-info-panely (owner 14 Nov 2026): Residents also say how people come and go; Attractiveness lists what moves it.
+  lines.residents=[t('explain.residents',{count:o.population,capacity:o.capacity}),t('explain.arrivals',{perDay:d.perDay,per:POPULATION.migrantsPerResidents,max:POPULATION.migrantsMaxPerDay,chance:o.attractiveness??100}),
+    o.settleBlock?t(`overview.settleBlock.${o.settleBlock}`):null,t('explain.departures',{strike:DISCONTENT.strikeBelow,strikeDays:DISCONTENT.strikeDays,leave:DISCONTENT.emigrateBelow,leaveDays:DISCONTENT.emigrateDays}),
+    d.striking||d.leaving||d.atRisk?t('explain.departuresNow',{striking:d.striking,leaving:d.leaving,atRisk:d.atRisk}):null,o.population>=o.capacity?t('explain.tip.capacity'):null];
+  if(o.attractiveness!=null)lines.attractiveness=[t('explain.attractiveness',{value:o.attractiveness}),t('explain.attractivenessBase',{base:d.base}),...o.factors.map(([id,v])=>`${t(`overview.factor.${id}`)}: ${sign(v)}`),
+    t('explain.attractivenessHappiness'),t('explain.attractivenessOther',{each:ENCLOSURE.ruins.each,max:ENCLOSURE.ruins.max}),o.settleBlock?t(`overview.settleBlock.${o.settleBlock}`):null];
   lines.unemployed=[t('explain.unemployed',{count:o.unemployed,seats:d.seats}),o.unemployed>3?t('explain.tip.unemployed'):null];
   if(o.happiness!=null){
     lines.happiness=[t('explain.happiness',{value:o.happiness,count:d.residents}),t('explain.happinessParts',{food:d.parts.food,rest:d.parts.rest,housing:d.parts.housing,safety:d.parts.safety,other:sign(d.other)}),t('explain.happinessWeights'),
@@ -45,6 +53,31 @@ export function overviewExplain(o){
   }
   for(const k of Object.keys(lines))lines[k]=lines[k].filter(Boolean);
   return lines;
+}
+// m-prehled-info-panely (owner 14 Nov 2026): the explanations are a panel in the game's style, not the browser's white
+// hover box. Any element with `data-tip` under the given roots shows it: the first line is the heading, a line starting
+// with "Tip:" is set apart. The panel follows the text while it changes and never leaves the window.
+export const tipParts=text=>{const lines=String(text??'').split('\n').filter(Boolean);return {title:lines[0]??'',lines:lines.slice(1).map(l=>({text:l,tip:/^Tip:/.test(l),number:/[+\u2212-]\d+$/.test(l)}))};};
+export class GameTip {
+  constructor(doc,roots,options){
+    this.doc=doc;if(!doc?.createElement||!doc.body)return;this.box=doc.createElement('div');this.box.className='game-tip';this.box.hidden=true;this.box.setAttribute('role','tooltip');doc.body.append(this.box);
+    const find=event=>event.target?.closest?.('[data-tip]');
+    for(const root of roots.filter(Boolean)){
+      root.addEventListener('pointerover',event=>{const el=find(event);if(el)this.show(el);},options);
+      root.addEventListener('pointerout',event=>{if(this.target&&!this.target.contains(event.relatedTarget))this.hide();},options);
+      root.addEventListener('focusin',event=>{const el=find(event);if(el)this.show(el);},options);root.addEventListener('focusout',()=>this.hide(),options);
+    }
+  }
+  show(el){this.target=el;this.text=null;this.refresh();}
+  hide(){this.target=null;if(this.box)this.box.hidden=true;}
+  refresh(){
+    const el=this.target,box=this.box;if(!el||!box)return;if(!el.isConnected||!el.dataset.tip){this.hide();return;}
+    if(el.dataset.tip!==this.text){this.text=el.dataset.tip;const parts=tipParts(this.text),kids=[element('strong','game-tip-title',parts.title)];
+      for(const l of parts.lines)kids.push(element('p',l.tip?'game-tip-advice':l.number?'game-tip-factor':'',l.text));box.replaceChildren(...kids);}
+    box.hidden=false;const r=el.getBoundingClientRect(),w=box.offsetWidth,h=box.offsetHeight,view=this.doc.documentElement,vw=view.clientWidth,vh=view.clientHeight;
+    const left=Math.max(8,Math.min(vw-w-8,r.left)),top=r.top-h-8>=8?r.top-h-8:Math.min(vh-h-8,r.bottom+8);box.style.left=`${Math.round(left)}px`;box.style.top=`${Math.round(Math.max(8,top))}px`;
+  }
+  destroy(){this.box?.remove();this.box=null;this.target=null;}
 }
 export const KINGDOM_BAR_AVOID='.inventory,.camera-controls,#notices-panel,#event-feed,#minimap,#unit-command-bar,#settings-button,#dev-tool-button,.population-tab,.buildings-panel';
 export function kingdomBarSummary(o){return [t('overview.population',{count:o.population,capacity:o.capacity}),o.happiness==null?t('overview.moodNone'):t('overview.mood',{value:o.happiness})].join(' · ');}
@@ -62,6 +95,7 @@ export class KingdomOverview {
       globalThis.addEventListener?.('resize',()=>this.place(),options);doc.addEventListener('hud-layout',()=>this.place(),options);
       this.bar.hidden=false;
     }
+    this.tip=new GameTip(doc,[this.root,this.bar],options);
     this.setCollapsed(readBarCollapsed(storage),{persist:false});
   }
   setCollapsed(value,{persist=true}={}){
@@ -85,35 +119,34 @@ export class KingdomOverview {
     set('#overview-population',t('overview.population',{count:o.population,capacity:o.capacity}),o.population>=o.capacity?'warn':'');
     set('#overview-unemployed',t('overview.unemployed',{count:o.unemployed}),o.unemployed>0?'warn':'');
     set('#overview-mood',o.happiness==null?t('overview.moodNone'):t('overview.mood',{value:o.happiness}),tone(o.happiness));
-    {const lines=overviewExplain(o);for(const [id,k] of [['#overview-population','residents'],['#overview-unemployed','unemployed'],['#overview-mood','happiness']]){const el=doc.querySelector(id),text=lines[k]?.join('\n')??'';if(el&&el.title!==text&&!el.matches?.(':hover'))el.title=text;}}
+    {const lines=overviewExplain(o);for(const [id,k] of [['#overview-population','residents'],['#overview-unemployed','unemployed'],['#overview-mood','happiness']]){const el=doc.querySelector(id),text=lines[k]?.join('\n')??'';if(el?.dataset&&el.dataset.tip!==text)el.dataset.tip=text;}}
     if(!this.bar)return;const label=t(this.collapsed?'overview.expand':'overview.collapse');
-    if(this.toggle&&this.toggle.title!==label){this.toggle.title=label;this.root.title=label;}
+    if(this.toggle?.dataset&&this.toggle.dataset.tip!==label){this.toggle.dataset.tip=label;this.toggle.setAttribute?.('aria-label',label);}
     if(this.summary){const text=kingdomBarSummary(o);if(this.summary.textContent!==text)this.summary.textContent=text;this.summary.dataset.tone=tone(o.happiness);}
     if(this.collapsed||!this.body)return;
-    const row=(label,value,tn,title)=>{const r=element('div','overview-row');r.dataset.tone=tn??'';if(title)r.title=title;r.append(element('span','',label),element('strong','',value));return r;};
+    const row=(label,value,tn,title)=>{const r=element('div','overview-row');r.dataset.tone=tn??'';if(title)r.dataset.tip=title;r.append(element('span','',label),element('strong','',value));return r;};
     const pct=v=>v==null?'—':`${v} %`;
     const why=overviewExplain(o),tip=k=>why[k]?.join('\n')||undefined;
     const rows=[row(t('overview.bar.residents'),`${o.population} / ${o.capacity}`,o.population>=o.capacity?'warn':'',tip('residents')??t('overview.residents')),row(t('overview.unemployedLabel'),String(o.unemployed),o.unemployed?'warn':'',tip('unemployed')),
       ...['happiness','food','rest','housing','safety'].map(k=>row(t(`overview.need.${k}`),pct(o[k]),tone(o[k]),tip(k))),
       row(t('overview.moodLabel'),o.mood?t(`needs.mood.${o.mood}`):'—',tone(o.happiness))];
     if(o.attractiveness!=null){
-      const factors=o.factors.map(([id,v])=>`${t(`overview.factor.${id}`)} ${v>0?`+${v}`:v}`).join('\n');
-      rows.push(row(t('overview.bar.attractiveness'),`${o.attractiveness} %`,tone(o.attractiveness),[t('overview.attractiveness'),t('overview.attractivenessValue'),factors].filter(Boolean).join('\n')));
+      rows.push(row(t('overview.bar.attractiveness'),`${o.attractiveness} %`,tone(o.attractiveness),tip('attractiveness')));
       if(o.settleBlock)rows.push(element('p','overview-block',t(`overview.settleBlock.${o.settleBlock}`)));
     }
     // Rebuilt only when a value changed, so the 0.5 s refresh does not wake the UI config observer for nothing.
-    const key=rows.map(r=>`${r.textContent}|${r.dataset?.tone??''}|${r.title??''}`).join('#');if(key===this.drawn)return;this.drawn=key;
+    const key=rows.map(r=>`${r.textContent}|${r.dataset?.tone??''}|${r.dataset?.tip??''}`).join('#');if(key===this.drawn)return;this.drawn=key;
     // m-prehled-tooltip-mizi (owner 14 Nov 2026): the browser hides a hover text whenever its element is replaced or its
     // `title` changes, so with a percentage moving every half second the explanation could not be read. While the
     // pointer is over the list, the rows stay and only their values change; the hover text is renewed afterwards.
     const old=[...this.body.children];
     if(this.body.matches?.(':hover')&&old.length===rows.length&&old.every((r,i)=>r.tagName===rows[i].tagName)){
-      old.forEach((r,i)=>{const next=rows[i];r.dataset.tone=next.dataset.tone??'';if(r.children.length&&r.children.length===next.children.length)[...r.children].forEach((c,j)=>{const text=next.children[j].textContent;if(c.textContent!==text)c.textContent=text;});else if(r.textContent!==next.textContent)r.textContent=next.textContent;});
-      this.drawn=null;return;
+      old.forEach((r,i)=>{const next=rows[i];r.dataset.tone=next.dataset.tone??'';if(next.dataset.tip!=null)r.dataset.tip=next.dataset.tip;if(r.children.length&&r.children.length===next.children.length)[...r.children].forEach((c,j)=>{const text=next.children[j].textContent;if(c.textContent!==text)c.textContent=text;});else if(r.textContent!==next.textContent)r.textContent=next.textContent;});
+      this.drawn=null;this.tip?.refresh();return;
     }
-    this.body.replaceChildren(...rows);
+    this.body.replaceChildren(...rows);this.tip?.refresh();
   }
-  destroy(){this.abort?.abort();if(this.bar){this.bar.hidden=true;this.body?.replaceChildren();this.drawn=null;}}
+  destroy(){this.abort?.abort();this.tip?.destroy();if(this.bar){this.bar.hidden=true;this.body?.replaceChildren();this.drawn=null;}}
 }
 
 // The "?" help button: until the player first opens the help (or for the first 10 minutes of game time) a soft arrow

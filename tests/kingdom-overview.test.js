@@ -37,3 +37,10 @@ test('m-prehled-procenta-tooltip: every percentage explains itself – how it is
   assert.equal(lines.happiness.filter(l=>l.startsWith('Tip:')).length,1,'at most one tip');
   setLanguage('cs',{persist:false});assert.match(overviewExplain(o).housing[0],/Bydlení \d+ % = \d z 4 má kde bydlet/);setLanguage('en',{persist:false});
 });
+
+test('m-prehled-info-panely: a hover text splits into a heading, factor lines and the tip', async () => {
+  const {tipParts}=await import('../src/ui/KingdomOverview.js');
+  const p=tipParts('Attractiveness 75 %\nBase: +100\nFood shortage: -40\nSome rule.\nTip: build a farm.');
+  assert.equal(p.title,'Attractiveness 75 %');assert.deepEqual(p.lines.map(l=>[l.tip,l.number]),[[false,true],[false,true],[false,false],[true,false]]);
+  assert.deepEqual(tipParts(''),{title:'',lines:[]});
+});

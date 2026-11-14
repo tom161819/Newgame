@@ -1251,3 +1251,11 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 .employment-hauler-count.is-recommended { color:#b9e08a; }
 .employment-recommended { justify-self:start; padding:4px 10px; font:inherit; font-size:12px; background:#26321f; color:#b9e08a; border:1px solid #7fa457; border-radius:4px; cursor:pointer; }
 .employment-recommended:disabled { opacity:.5; cursor:default; }
+
+/* m-prehled-info-panely (owner 14 Nov 2026): explanations of the Kingdom overview in the game's style (GameTip). */
+.game-tip { position:fixed; z-index:60; display:grid; gap:4px; width:max-content; max-width:min(340px,calc(100vw - 16px)); padding:10px 12px 11px; pointer-events:none; color:var(--ink,#ede5c9); background:linear-gradient(#2b3323f7,#20271bf7); border:1px solid #a28b56; border-radius:9px; box-shadow:0 10px 28px rgb(6 9 5 / .55),inset 0 0 0 1px rgb(255 235 180 / .06); font-size:12px; line-height:1.45; }
+.game-tip[hidden] { display:none; }
+.game-tip-title { padding-bottom:5px; margin-bottom:1px; border-bottom:1px solid rgb(162 139 86 / .45); font-family:var(--font-display,Georgia,serif); font-size:14px; font-weight:650; color:var(--accent,#e3c57a); }
+.game-tip p { margin:0; }
+.game-tip-factor { font-variant-numeric:tabular-nums; color:#f1e7c6; padding-left:10px; border-left:2px solid rgb(162 139 86 / .6); }
+.game-tip-advice { margin-top:3px !important; padding:5px 8px; border-radius:6px; background:rgb(227 197 122 / .1); color:#ecd9a0; }
