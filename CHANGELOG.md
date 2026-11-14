@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.119.1] - 2026-11-14
+<!-- version: {"title":"Asset Studio: GPT Stables for review","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Asset Studio: Stables from the owner's sheet (thatched stable with a paddock, 4 views) for review. The game still uses the old Stables.
+
 ## [0.119.0] - 2026-11-14
 <!-- version: {"title":"Automatic Haulers and Builders; hunger; rebuild ruins; unreachable notice","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

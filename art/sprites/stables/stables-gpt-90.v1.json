@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "stables",
+  "variantId": "stables-gpt-90",
+  "name": "GPT thatched stables with paddock 90° (rear-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "03d361a6",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 449,
+  "height": 256,
+  "anchor": {
+    "x": 192,
+    "y": 140
+  },
+  "origin": {
+    "x": 0.42762,
+    "y": 0.54688
+  },
+  "footprint": {
+    "width": 8,
+    "height": 6
+  },
+  "base": {
+    "x": 224,
+    "y": 252
+  },
+  "baseOrigin": {
+    "x": 0.49889,
+    "y": 0.98438
+  },
+  "visualHeight": 252,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.79,
+  "lights": [],
+  "x2": {
+    "width": 898,
+    "height": 512,
+    "anchor": {
+      "x": 384,
+      "y": 280
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

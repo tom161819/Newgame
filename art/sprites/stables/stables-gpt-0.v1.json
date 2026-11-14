@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "assetId": "stables",
+  "variantId": "stables-gpt-0",
+  "name": "GPT thatched stables with paddock 0° (front-right)",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "03d361a6",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 449,
+  "height": 308,
+  "anchor": {
+    "x": 154,
+    "y": 192
+  },
+  "origin": {
+    "x": 0.34298,
+    "y": 0.62338
+  },
+  "footprint": {
+    "width": 8,
+    "height": 6
+  },
+  "base": {
+    "x": 186,
+    "y": 304
+  },
+  "baseOrigin": {
+    "x": 0.41425,
+    "y": 0.98701
+  },
+  "visualHeight": 304,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [
+    {
+      "type": "torch",
+      "x": 53,
+      "y": -210,
+      "color": "#ffb25a",
+      "radius": 100,
+      "intensity": 0.95,
+      "flicker": {
+        "amplitude": 0.12,
+        "speed": 7
+      },
+      "flameSize": 0.7
+    }
+  ],
+  "modelHeight": 1.79,
+  "lights": [],
+  "x2": {
+    "width": 898,
+    "height": 616,
+    "anchor": {
+      "x": 308,
+      "y": 384
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

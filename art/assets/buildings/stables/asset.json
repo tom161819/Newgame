@@ -137,6 +137,538 @@
           }
         ]
       }
+    },
+    {
+      "id": "stables-gpt-0",
+      "name": "GPT thatched stables with paddock 0° (front-right)",
+      "version": 1,
+      "notes": "Thatched timber stable with a gate (horseshoe above it, torch beside it), three open stalls, a stone water trough, a hay rack and a fenced paddock. Footprint 8 × 6 (owner 14 Nov 2026; the game Stables are 5 × 5): decide before it goes into the game. View 0° (front-right), cut out of the owner's GPT sheet and scaled to 0.9 wide and 0.81 high (the sheet's view is a little steeper than the game's; gate ≈ 42 px; fenced yard = 8 × 6; 2× file enlarged from the sheet). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "thatch",
+          "width": 1.6,
+          "depth": 1,
+          "wallHeight": 0.9,
+          "roofHeight": 0.75,
+          "ridge": "x",
+          "windows": 0,
+          "at": [
+            -1.3,
+            -1.55
+          ]
+        },
+        "props": [
+          {
+            "type": "awning",
+            "at": [
+              0.9,
+              -1.6
+            ],
+            "width": 1.6,
+            "depth": 0.9,
+            "height": 0.9
+          },
+          {
+            "type": "horse",
+            "at": [
+              0.8,
+              -1.55
+            ],
+            "angle": 0,
+            "coat": "horse_dark"
+          },
+          {
+            "type": "fence",
+            "from": [
+              -2.35,
+              -0.6
+            ],
+            "to": [
+              -2.35,
+              2.35
+            ]
+          },
+          {
+            "type": "fence",
+            "from": [
+              2.35,
+              -0.6
+            ],
+            "to": [
+              2.35,
+              2.35
+            ]
+          },
+          {
+            "type": "fence",
+            "from": [
+              -2.35,
+              2.35
+            ],
+            "to": [
+              -0.45,
+              2.35
+            ]
+          },
+          {
+            "type": "fence",
+            "from": [
+              0.45,
+              2.35
+            ],
+            "to": [
+              2.35,
+              2.35
+            ]
+          },
+          {
+            "type": "horse",
+            "at": [
+              -1.1,
+              0.8
+            ],
+            "angle": -0.785,
+            "coat": "horse_chestnut"
+          },
+          {
+            "type": "horse",
+            "at": [
+              0.6,
+              0.7
+            ],
+            "angle": -2,
+            "coat": "horse_grey"
+          },
+          {
+            "type": "horse",
+            "at": [
+              -0.1,
+              1.7
+            ],
+            "angle": -0.4
+          },
+          {
+            "type": "hayStack",
+            "at": [
+              1.5,
+              0.3
+            ]
+          },
+          {
+            "type": "troughs",
+            "at": [
+              -1.7,
+              1.9
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "stables-gpt-90",
+      "name": "GPT thatched stables with paddock 90° (rear-right)",
+      "version": 1,
+      "notes": "Thatched timber stable with a gate (horseshoe above it, torch beside it), three open stalls, a stone water trough, a hay rack and a fenced paddock. Footprint 8 × 6 (owner 14 Nov 2026; the game Stables are 5 × 5): decide before it goes into the game. View 90° (rear-right), cut out of the owner's GPT sheet and scaled to 0.9 wide and 0.81 high (the sheet's view is a little steeper than the game's; gate ≈ 42 px; fenced yard = 8 × 6; 2× file enlarged from the sheet). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "thatch",
+          "width": 1.6,
+          "depth": 1,
+          "wallHeight": 0.9,
+          "roofHeight": 0.75,
+          "ridge": "x",
+          "windows": 0,
+          "at": [
+            -1.3,
+            -1.55
+          ]
+        },
+        "props": [
+          {
+            "type": "awning",
+            "at": [
+              0.9,
+              -1.6
+            ],
+            "width": 1.6,
+            "depth": 0.9,
+            "height": 0.9
+          },
+          {
+            "type": "horse",
+            "at": [
+              0.8,
+              -1.55
+            ],
+            "angle": 0,
+            "coat": "horse_dark"
+          },
+          {
+            "type": "fence",
+            "from": [
+              -2.35,
+              -0.6
+            ],
+            "to": [
+              -2.35,
+              2.35
+            ]
+          },
+          {
+            "type": "fence",
+            "from": [
+              2.35,
+              -0.6
+            ],
+            "to": [
+              2.35,
+              2.35
+            ]
+          },
+          {
+            "type": "fence",
+            "from": [
+              -2.35,
+              2.35
+            ],
+            "to": [
+              -0.45,
+              2.35
+            ]
+          },
+          {
+            "type": "fence",
+            "from": [
+              0.45,
+              2.35
+            ],
+            "to": [
+              2.35,
+              2.35
+            ]
+          },
+          {
+            "type": "horse",
+            "at": [
+              -1.1,
+              0.8
+            ],
+            "angle": -0.785,
+            "coat": "horse_chestnut"
+          },
+          {
+            "type": "horse",
+            "at": [
+              0.6,
+              0.7
+            ],
+            "angle": -2,
+            "coat": "horse_grey"
+          },
+          {
+            "type": "horse",
+            "at": [
+              -0.1,
+              1.7
+            ],
+            "angle": -0.4
+          },
+          {
+            "type": "hayStack",
+            "at": [
+              1.5,
+              0.3
+            ]
+          },
+          {
+            "type": "troughs",
+            "at": [
+              -1.7,
+              1.9
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "stables-gpt-180",
+      "name": "GPT thatched stables with paddock 180° (rear-left)",
+      "version": 1,
+      "notes": "Thatched timber stable with a gate (horseshoe above it, torch beside it), three open stalls, a stone water trough, a hay rack and a fenced paddock. Footprint 8 × 6 (owner 14 Nov 2026; the game Stables are 5 × 5): decide before it goes into the game. View 180° (rear-left), cut out of the owner's GPT sheet and scaled to 0.9 wide and 0.81 high (the sheet's view is a little steeper than the game's; gate ≈ 42 px; fenced yard = 8 × 6; 2× file enlarged from the sheet). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "thatch",
+          "width": 1.6,
+          "depth": 1,
+          "wallHeight": 0.9,
+          "roofHeight": 0.75,
+          "ridge": "x",
+          "windows": 0,
+          "at": [
+            -1.3,
+            -1.55
+          ]
+        },
+        "props": [
+          {
+            "type": "awning",
+            "at": [
+              0.9,
+              -1.6
+            ],
+            "width": 1.6,
+            "depth": 0.9,
+            "height": 0.9
+          },
+          {
+            "type": "horse",
+            "at": [
+              0.8,
+              -1.55
+            ],
+            "angle": 0,
+            "coat": "horse_dark"
+          },
+          {
+            "type": "fence",
+            "from": [
+              -2.35,
+              -0.6
+            ],
+            "to": [
+              -2.35,
+              2.35
+            ]
+          },
+          {
+            "type": "fence",
+            "from": [
+              2.35,
+              -0.6
+            ],
+            "to": [
+              2.35,
+              2.35
+            ]
+          },
+          {
+            "type": "fence",
+            "from": [
+              -2.35,
+              2.35
+            ],
+            "to": [
+              -0.45,
+              2.35
+            ]
+          },
+          {
+            "type": "fence",
+            "from": [
+              0.45,
+              2.35
+            ],
+            "to": [
+              2.35,
+              2.35
+            ]
+          },
+          {
+            "type": "horse",
+            "at": [
+              -1.1,
+              0.8
+            ],
+            "angle": -0.785,
+            "coat": "horse_chestnut"
+          },
+          {
+            "type": "horse",
+            "at": [
+              0.6,
+              0.7
+            ],
+            "angle": -2,
+            "coat": "horse_grey"
+          },
+          {
+            "type": "horse",
+            "at": [
+              -0.1,
+              1.7
+            ],
+            "angle": -0.4
+          },
+          {
+            "type": "hayStack",
+            "at": [
+              1.5,
+              0.3
+            ]
+          },
+          {
+            "type": "troughs",
+            "at": [
+              -1.7,
+              1.9
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "stables-gpt-270",
+      "name": "GPT thatched stables with paddock 270° (front-left)",
+      "version": 1,
+      "notes": "Thatched timber stable with a gate (horseshoe above it, torch beside it), three open stalls, a stone water trough, a hay rack and a fenced paddock. Footprint 8 × 6 (owner 14 Nov 2026; the game Stables are 5 × 5): decide before it goes into the game. View 270° (front-left), cut out of the owner's GPT sheet and scaled to 0.9 wide and 0.81 high (the sheet's view is a little steeper than the game's; gate ≈ 42 px; fenced yard = 8 × 6; 2× file enlarged from the sheet). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "body": {
+          "kind": "house",
+          "walls": "wood",
+          "roofMaterial": "thatch",
+          "width": 1.6,
+          "depth": 1,
+          "wallHeight": 0.9,
+          "roofHeight": 0.75,
+          "ridge": "x",
+          "windows": 0,
+          "at": [
+            -1.3,
+            -1.55
+          ]
+        },
+        "props": [
+          {
+            "type": "awning",
+            "at": [
+              0.9,
+              -1.6
+            ],
+            "width": 1.6,
+            "depth": 0.9,
+            "height": 0.9
+          },
+          {
+            "type": "horse",
+            "at": [
+              0.8,
+              -1.55
+            ],
+            "angle": 0,
+            "coat": "horse_dark"
+          },
+          {
+            "type": "fence",
+            "from": [
+              -2.35,
+              -0.6
+            ],
+            "to": [
+              -2.35,
+              2.35
+            ]
+          },
+          {
+            "type": "fence",
+            "from": [
+              2.35,
+              -0.6
+            ],
+            "to": [
+              2.35,
+              2.35
+            ]
+          },
+          {
+            "type": "fence",
+            "from": [
+              -2.35,
+              2.35
+            ],
+            "to": [
+              -0.45,
+              2.35
+            ]
+          },
+          {
+            "type": "fence",
+            "from": [
+              0.45,
+              2.35
+            ],
+            "to": [
+              2.35,
+              2.35
+            ]
+          },
+          {
+            "type": "horse",
+            "at": [
+              -1.1,
+              0.8
+            ],
+            "angle": -0.785,
+            "coat": "horse_chestnut"
+          },
+          {
+            "type": "horse",
+            "at": [
+              0.6,
+              0.7
+            ],
+            "angle": -2,
+            "coat": "horse_grey"
+          },
+          {
+            "type": "horse",
+            "at": [
+              -0.1,
+              1.7
+            ],
+            "angle": -0.4
+          },
+          {
+            "type": "hayStack",
+            "at": [
+              1.5,
+              0.3
+            ]
+          },
+          {
+            "type": "troughs",
+            "at": [
+              -1.7,
+              1.9
+            ]
+          }
+        ]
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }
