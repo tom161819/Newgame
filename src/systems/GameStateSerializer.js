@@ -492,7 +492,7 @@ function validateAtSize(input,registry){
   check(typeof s.settings.explorationMode==='boolean');
   part='exploration';validateMapMemory(s.exploration,registry,{check,number,integer,array});
   // Automatic employment: ON/OFF, a 1–5 priority for every workplace profession, residents held Unemployed by hand.
-  part='employment';if(s.employment!==undefined){const e=s.employment;check(e&&typeof e==='object'&&Object.keys(e).sort().join()==='blockedBuildings,blockedTypes,enabled,held,priorities'&&typeof e.enabled==='boolean');
+  part='employment';if(s.employment!==undefined){const e=s.employment;check(e&&typeof e==='object'&&Object.keys(e).filter(k=>k!=='haulers').sort().join()==='blockedBuildings,blockedTypes,enabled,held,priorities'&&typeof e.enabled==='boolean'&&(e.haulers===undefined||Number.isInteger(e.haulers)&&e.haulers>=0&&e.haulers<=30));
     check(e.priorities&&typeof e.priorities==='object'&&Object.keys(e.priorities).sort().join()===[...EMPLOYMENT_PROFESSIONS].sort().join());for(const value of Object.values(e.priorities))integer(value,PRIORITY_RANGE.min,PRIORITY_RANGE.max);
     array(e.held);check(new Set(e.held).size===e.held.length&&e.held.every(id=>wIds.has(id)));
     array(e.blockedBuildings);check(new Set(e.blockedBuildings).size===e.blockedBuildings.length);for(const id of e.blockedBuildings){integer(id,1);const b=s.buildings.find(b=>b.id===id);check(b&&buildingIsComplete(b)&&!b.unverified&&!!bdef(b).workplace);}
@@ -512,7 +512,7 @@ function validateAtSize(input,registry){
   // S13 needs: one record per living permanent resident at most, values 0–100, an attack time never in the future.
   part='needs';if(s.needs!==undefined){const n=s.needs;check(n&&typeof n==='object'&&Object.keys(n).sort().join()==='homes,pending,records');number(n.pending,0,s.time?.totalElapsed??Number.MAX_SAFE_INTEGER);array(n.records);array(n.homes);
     const residents=new Set((s.workers??[]).filter(w=>w.isAlive&&w.isSubject).map(w=>w.id)),seen=new Set();
-    for(const r of n.records){check(r&&Object.keys(r).sort().join()==='attackedAt,criticalDays,food,hp,id,leaving,lowDays,rest,strike'&&residents.has(r.id)&&!seen.has(r.id));integer(r.lowDays,0,100000);integer(r.criticalDays,0,100000);check(typeof r.strike==='boolean'&&typeof r.leaving==='boolean'&&!(r.strike&&r.leaving));seen.add(r.id);number(r.food,0,100);number(r.rest,0,100);check(Number.isFinite(r.hp));if(r.attackedAt!==null)number(r.attackedAt,0,s.time?.totalElapsed??Number.MAX_SAFE_INTEGER);}
+    for(const r of n.records){check(r&&Object.keys(r).filter(k=>k!=='unfedDays').sort().join()==='attackedAt,criticalDays,food,hp,id,leaving,lowDays,rest,strike'&&residents.has(r.id)&&!seen.has(r.id));if(r.unfedDays!==undefined)number(r.unfedDays,0,100000);integer(r.lowDays,0,100000);integer(r.criticalDays,0,100000);check(typeof r.strike==='boolean'&&typeof r.leaving==='boolean'&&!(r.strike&&r.leaving));seen.add(r.id);number(r.food,0,100);number(r.rest,0,100);check(Number.isFinite(r.hp));if(r.attackedAt!==null)number(r.attackedAt,0,s.time?.totalElapsed??Number.MAX_SAFE_INTEGER);}
     // #58 phase B homes: each living resident at most once, a House seat in a completed House within its capacity,
     // or one of the settlement's base places.
     const homed=new Set(),seats=new Map();let base=0;

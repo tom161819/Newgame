@@ -11,9 +11,11 @@ export class DemolitionUI {
     this.inspect=document.querySelector('#inspect-selected-building');this.dialog=document.querySelector('#building-detail-dialog');this.confirm=document.querySelector('#demolition-confirm-dialog');
     this.section=element('section','demolition-actions');this.section.id='demolition-actions';this.heading=element('h3');this.refund=element('p');this.status=element('p');this.status.setAttribute('role','status');
     this.progress=element('progress');this.progress.max=100;this.progress.setAttribute('aria-label',t('demolition.title'));this.start=element('button');this.start.id='demolition-start';this.start.type='button';this.cancel=element('button');this.cancel.id='demolition-cancel';this.cancel.type='button';
-    this.section.append(this.heading,this.refund,this.status,this.progress,this.start,this.cancel);
+    this.rebuild=element('button');this.rebuild.id='ruins-rebuild';this.rebuild.type='button';this.rebuildNote=element('p','ruins-rebuild-note');
+    this.section.append(this.rebuildNote,this.rebuild,this.heading,this.refund,this.status,this.progress,this.start,this.cancel);
     this.inspect.addEventListener('click',()=>this.openSelected(),options);document.querySelector('#close-building-detail').addEventListener('click',()=>this.dialog.close(),options);
     this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.dialog.close();},options);this.dialog.addEventListener('close',()=>scene.setGalleryInput(true),options);
+    this.rebuild.addEventListener('click',()=>{const b=this.building(this.buildingId),result=scene.rebuildRuin(b);scene.setStatus(result.error??t('ruins.rebuildPlanned',{name:buildingDefinition(result.building).name}));if(!result.error&&this.host?.open)this.host.close();this.refresh();},options);
     this.start.addEventListener('click',()=>this.ask(),options);this.cancel.addEventListener('click',()=>{scene.demolition.cancel(this.buildingId);this.refresh();},options);
     document.querySelector('#demolition-confirm-cancel').addEventListener('click',()=>this.confirm.close(),options);
     this.confirm.addEventListener('cancel',e=>{e.preventDefault();this.confirm.close();},options);this.confirm.addEventListener('close',()=>{this.pendingId=null;scene.setGalleryInput(true);},options);
@@ -47,6 +49,9 @@ export class DemolitionUI {
     const b=this.building(this.buildingId);if(!b){this.section.hidden=true;if(this.host?.open)this.host.close();return;}
     this.section.hidden=!this.host?.open;if(this.section.hidden)return;
     const reason=this.reason(b),record=b.demolition;
+    // m-trosky-znovu: Burnt Ruins offer the burnt building again for its full price.
+    {const from=b.type==='burnt_ruins'&&b.burntFrom?this.scene.objectRegistry.require(b.burntFrom):null,show=!!from?.buildable&&!record;this.rebuild.hidden=this.rebuildNote.hidden=!show;
+      if(show){const cost=Object.entries(from.cost).map(([id,n])=>countName(this.scene.objectRegistry.require(id),n)).join(', '),can=this.scene.inventory.canAfford(from.cost);text(this.rebuild,t('ruins.rebuild',{name:from.name}));text(this.rebuildNote,t(can?'ruins.rebuildCost':'ruins.rebuildCostMissing',{cost}));this.rebuild.disabled=!can;}}
     this.progress.setAttribute('aria-label',t('demolition.title'));
     text(this.heading,t('demolition.title'));text(this.refund,t('demolition.refund',{refund:this.refundLabel(b)}));text(this.start,t('demolition.start'));text(this.cancel,t('demolition.cancel'));
     this.start.hidden=!!record||b.type==='starter_stockpile';this.start.disabled=!!reason;this.cancel.hidden=!record;this.progress.hidden=!record;this.progress.value=record?.progress??0;

@@ -6,7 +6,10 @@ import { tileKey } from '../game/stones.js';
 
 // Derived catalog only: physical ownership stays in storage, drops and cargo.
 export class LogisticsTaskManager {
-  constructor(scene){this.scene=scene;this.catalog=[];this.nextRefresh=0;this.failedRoutes=new Map();this.producerWaits=new Map();this.stoneAreaCache=null;}
+  constructor(scene){this.scene=scene;this.catalog=[];this.nextRefresh=0;this.failedRoutes=new Map();this.unreachable=new Map();this.producerWaits=new Map();this.stoneAreaCache=null;}
+  // m-nedostupny-sklad (owner 14 Nov 2026): a store, pile or site no carrier can walk to is remembered (building id →
+  // game time of the last failed trip) so that Notices can say so (ProductionDiagnostics.accessIssues).
+  noteUnreachable(worker,location){if(location?.buildingId!=null&&!this.scene.foodStorage.route(worker,[location]))this.unreachable.set(location.buildingId,this.scene.gameTime.totalElapsed);}
   get storage(){return this.scene.foodStorage;}
   update(){
     const now=this.scene.gameTime.totalElapsed;if(now<this.nextRefresh)return;
@@ -70,9 +73,9 @@ export class LogisticsTaskManager {
       const routeKey=`${worker.id}:${task.sourceDropId??task.sourceId}:${task.destinationId}`;
       if(this.failedRoutes.has(routeKey))continue;
       if(++attempts>8)break;
-      if(!storage.route(worker,[destination])){this.failedRoutes.set(routeKey,this.scene.gameTime.totalElapsed+2000);continue;}
+      if(!storage.route(worker,[destination])){this.noteUnreachable(worker,destination);this.failedRoutes.set(routeKey,this.scene.gameTime.totalElapsed+2000);continue;}
       const options={...task,hauling:worker.profession==='hauler'},success=drop?this.scene.foodProduction.moveGround(worker,drop,destination.id,amount,options):this.scene.foodProduction.move(worker,task.sourceId,destination.id,task.resource,amount,options);
-      if(success)return true;if(task.allocationId&&this.scene.constructionSystem?.materials.rebook?.(task.allocationId,worker))this.nextRefresh=0;this.failedRoutes.set(routeKey,this.scene.gameTime.totalElapsed+2000);
+      if(success)return true;if(task.allocationId&&this.scene.constructionSystem?.materials.rebook?.(task.allocationId,worker))this.nextRefresh=0;this.noteUnreachable(worker,storage.locations.get(task.sourceId));this.failedRoutes.set(routeKey,this.scene.gameTime.totalElapsed+2000);
     }
     return false;
   }

@@ -1,7 +1,7 @@
 import { HEATING } from '../data/heating.js';
 import { TORCHES } from '../data/torches.js';
 import { CATS ,HOUSE_RATS} from '../data/domesticAnimals.js';
-import { NEEDS,DAILY_REST,DISCONTENT,clampNeed,moodFor,happinessOf,mainProblem,attractivenessFor } from '../data/needs.js';
+import { NEEDS,DAILY_REST,DISCONTENT,clampNeed,moodFor,happinessOf,mainProblem,attractivenessFor,starvingPenalty } from '../data/needs.js';
 import { foodNeedTarget } from '../data/policy.js';
 import { POPULATION } from '../data/jobs.js';
 import { buildingIsComplete } from '../game/buildings.js';
@@ -24,6 +24,7 @@ export class NeedsSystem {
     for(const worker of this.residents()){
       live.add(worker.id);const r=this.record(worker),target=this.foodDetail(worker).target;
       // #68: the Food need moves towards its target (rations + variety, 0 when hungry) at the usual rates, never jumps.
+      r.unfedDays=this.scene.foodSystem?.residents?.get(worker.id)?.hungry?(r.unfedDays??0)+fraction:0;
       r.food=r.food>target?Math.max(target,r.food-NEEDS.food.declinePerDay*fraction):Math.min(target,r.food+NEEDS.food.recoverPerDay*fraction);
       // Phase B: resting at home recovers fastest, in the settlement's base places a little slower, without a home slowly.
       const home=homes.get(worker.id),coldHome=home?.kind==='house'&&this.scene.heating?.isCold?.({id:home.buildingId}),rate=worker.workState==='Resting'?DAILY_REST.recoverPerDay[coldHome?HEATING.coldRestAs:home?.kind??'homeless']:NEEDS.activeStates.includes(worker.workState)?-NEEDS.rest.drainPerDay:NEEDS.rest.recoverPerDay;
@@ -102,7 +103,7 @@ export class NeedsSystem {
     // Policy v2 P2: situation penalties (unpaid but taxed, promised food missing, taxed while hungry) act at once.
     const penalty=this.unpaidPenalty(worker),policy=this.scene.policy?.happiness?.()??0,context=this.scene.policy?.contextPenalties?.(worker,{hungry:needs.food<NEEDS.food.low})??[],contextTotal=context.reduce((n,c)=>n+c.value,0);
     // Policy v2 P3: a running Feast adds to Happiness at once (#68: meal variety acts through the Food need).
-    const feast=this.scene.policy?.feastBonus?.()??0,food=this.foodDetail(worker);
+    const feast=this.scene.policy?.feastBonus?.()??0,food=this.foodDetail(worker),starving=starvingPenalty(r.unfedDays);
     // Domestic animals Z1: a cat living in the resident's house.
     const house=home?.kind==='house'?this.scene.buildings?.find(b=>b.id===home.buildingId):null,cat=(this.scene.domestic?.catAtHome?.(house)?CATS.homeHappiness:0)+(this.scene.domestic?.houseHasRats?.(house)?HOUSE_RATS.happiness:0);
     // Children D1: a Village Green within reach of the house (+4) and, for a family house, a place for the children (+2).
@@ -110,8 +111,8 @@ export class NeedsSystem {
     const around=this.scene.childrenSystem?.surroundings?.(house,homes)??{green:0,family:0,swing:0,well:0,total:0,capped:0},green=around.green,greenFamily=around.family,swing=around.swing,well=around.well;
     // m-topeni-domu: a warm House in autumn and winter (+), a cold one (−).
     const heat=this.scene.heating?.happiness?.(house??(home?.kind==='settlement'?this.scene.heating?.castle?.():null))??0;
-    const happiness=happinessOf(needs,penalty-policy+contextTotal-feast-cat-around.total-heat),mood=moodFor(happiness);
-    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,policy,policyTarget:this.scene.policy?.target?.()??0,policyContext:context,foodRations:this.scene.policy?.rations??'normal',foodBase:food.base,foodKinds:food.kinds,foodVariety:food.variety,foodTarget:food.target,foodUnfed:food.hungry,feast,heat,cat,green,greenFamily,swing,well,surroundingsCapped:around.capped,feastDaysLeft:this.scene.policy?.feastDaysLeft?.()??0,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty,Math.max(0,-policy)+contextTotal),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
+    const happiness=happinessOf(needs,penalty-policy+contextTotal-feast-cat-around.total-heat+starving),mood=moodFor(happiness);
+    return {...needs,safetyFactors:safety.factors,happiness,mood:mood.id,workModifier:mood.work,unpaidPenalty:penalty,starving,unfedDays:r.unfedDays??0,policy,policyTarget:this.scene.policy?.target?.()??0,policyContext:context,foodRations:this.scene.policy?.rations??'normal',foodBase:food.base,foodKinds:food.kinds,foodVariety:food.variety,foodTarget:food.target,foodUnfed:food.hungry,feast,heat,cat,green,greenFamily,swing,well,surroundingsCapped:around.capped,feastDaysLeft:this.scene.policy?.feastDaysLeft?.()??0,strike:!!r.strike,leaving:!!r.leaving,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,mainProblem:mainProblem(needs,penalty,Math.max(0,-policy)+contextTotal),home,hungry:needs.food<NEEDS.food.low,tired:needs.rest<NEEDS.rest.low,homeless:!home};
   }
   summary(){
     const homes=this.homes(),list=this.residents().map(w=>this.status(w,homes));
@@ -121,7 +122,7 @@ export class NeedsSystem {
   get kingdomHappiness(){return this.summary().happiness;}
   // Only living residents are saved: a record of someone who died or left since the last update is dropped here.
   exportState(){const live=new Set(this.residents().map(w=>w.id)),homes=this.homes();return {pending:this.pending,
-    homes:[...homes].sort(([a],[b])=>order(a)-order(b)).map(([id,h])=>({id,kind:h.kind,...(h.kind==='house'?{buildingId:h.buildingId}:{})})),records:[...this.records.values()].filter(r=>live.has(r.id)).sort((a,b)=>order(a.id)-order(b.id)).map(r=>({id:r.id,food:r.food,rest:r.rest,hp:r.hp,attackedAt:r.attackedAt,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,strike:!!r.strike,leaving:!!r.leaving}))};}
+    homes:[...homes].sort(([a],[b])=>order(a)-order(b)).map(([id,h])=>({id,kind:h.kind,...(h.kind==='house'?{buildingId:h.buildingId}:{})})),records:[...this.records.values()].filter(r=>live.has(r.id)).sort((a,b)=>order(a.id)-order(b.id)).map(r=>({id:r.id,food:r.food,rest:r.rest,hp:r.hp,attackedAt:r.attackedAt,lowDays:r.lowDays??0,criticalDays:r.criticalDays??0,strike:!!r.strike,leaving:!!r.leaving,...(r.unfedDays>0?{unfedDays:r.unfedDays}:{})}))};}
   importState(data){this.pending=data?.pending??0;this.records=new Map((data?.records??[]).map(r=>[r.id,{...r}]));
     this.assignments=new Map((data?.homes??[]).map(h=>[h.id,h.kind==='house'?{kind:'house',buildingId:h.buildingId}:{kind:'settlement'}]));this.revision++;this.refresh();}
   destroy(){this.unsubscribe?.();this.unsubscribeDay?.();this.records.clear();this.assignments.clear();this.work.clear();this.scene.attractiveness?.modifiers?.delete('happiness');}

@@ -64,6 +64,7 @@ import { ResourceTransactionLedger } from '../systems/ResourceTransactionLedger.
 import '../ui/resourceLedger.css';
 import { Inventory } from './inventory.js';
 import { drawStone, generateResourcePositions, resourceTiles, tileKey, ResourceSpawner } from './stones.js';
+import { rebuildRuin } from './ruinRebuild.js';
 import { placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors, buildingDefinition,buildingDepth,buildingIsComplete, definitionFor } from './buildings.js';
 import { footprintShown,applyFootprint,selectedBuildingIds } from './footprintHighlight.js';
 import { TowerView } from './TowerView.js';
@@ -674,6 +675,9 @@ export class GameScene extends Phaser.Scene {
     }
     this.preview.setVisible(true);
   }
+  // m-trosky-znovu (owner 14 Nov 2026): "Build again" on Burnt Ruins plans the building that burnt down on the same spot
+  // for its full price; Builders then build it like any new building. Nothing changes when it cannot be placed or paid.
+  rebuildRuin(ruin){const result=rebuildRuin(this,ruin);if(!result.error)this.updateInventory();return result;}
   clearWallPreviews(){
     for(const view of this.wallPreviews.values())view.destroy();this.wallPreviews.clear();this.dragAnchor=null;this.wallLastLine=null;
   }

@@ -111,6 +111,12 @@ export class ProductionDiagnostics {
   // Construction: one kingdom notice while any construction waits and no Builder can build it. It no longer waits for
   // the materials: with physical delivery a site never gets its materials when nobody delivers them, so the old
   // check (supplied sites only, C04) never fired in a new game. Fields wait for their Farmer instead.
+  // m-nedostupny-sklad: a building carriers tried to reach in the last few seconds and could not (walled in, cut off).
+  accessIssues(){
+    const log=this.scene.logisticsTasks?.unreachable,now=this.scene.gameTime?.totalElapsed??0,found=[];if(!log)return found;
+    for(const [id,at] of [...log]){if(now-at>DIAGNOSTICS.checkInterval*4||!this.scene.buildings.some(b=>b.id===id)){log.delete(id);continue;}found.push({entityId:id,reason:'unreachable',category:'production',params:{}});}
+    return found;
+  }
   constructionIssues(){
     const c=this.scene.constructionSystem;if(!c)return [];
     const found=[],builders=this.availableBuilders(),waiting=[],orphans=[];
@@ -211,7 +217,7 @@ export class ProductionDiagnostics {
   // Plan m-e1-jidlo-vydrz: the kingdom's edible stores last less than 3 days (one kingdom notice with the days left).
   foodIssues(){const days=foodDays(this.scene.foodSystem);return days<FOOD_OUTLOOK.warnDays?[{entityId:0,reason:'foodLow',category:'production',params:{days:Math.floor(days)},feed:true}]:[];}
   detect(){
-    const found=[...this.constructionIssues(),...this.cancelIssues(this.scene.gameTime?.totalElapsed??0),...this.depletionIssues(),...this.storageIssues(),...this.foodIssues(),...this.chainIssues()];
+    const found=[...this.accessIssues(),...this.constructionIssues(),...this.cancelIssues(this.scene.gameTime?.totalElapsed??0),...this.depletionIssues(),...this.storageIssues(),...this.foodIssues(),...this.chainIssues()];
     for(const record of this.scene.foodProduction?.records.values()??[]){const issue=this.productionIssue(record);if(issue)found.push({entityId:record.buildingId,category:'production',...issue});}
     return found;
   }

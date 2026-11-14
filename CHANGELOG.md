@@ -5,6 +5,20 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.119.0] - 2026-11-14
+<!-- version: {"title":"Automatic Haulers and Builders; hunger; rebuild ruins; unreachable notice","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- The game now hires Haulers by itself. In the Castle panel (Employments) you set the wanted number; the recommended number is 1 Hauler for every 10 residents and is marked.
+- Builders join by themselves once a Builder's Workshop stands (1 Builder for every 2 building sites, at most the workshop places).
+- Burnt Ruins have a "Build again" button: the same building is planned on the spot for its full price.
+- A notice when nobody can reach a store, pile or building site.
+
+### Changed
+- Hunger now costs more Happiness the longer it lasts. After about 4 days hungry residents strike, after about a week they leave.
+
+### Fixed
+- The explanations in the Kingdom Overview no longer vanish every time a percentage changes.
+
 ## [0.118.0] - 2026-11-13
 <!-- version: {"title":"Zoom-out and big-map performance; fire spreads less; walled-in store fix","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Fixed

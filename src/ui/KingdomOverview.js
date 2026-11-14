@@ -85,7 +85,7 @@ export class KingdomOverview {
     set('#overview-population',t('overview.population',{count:o.population,capacity:o.capacity}),o.population>=o.capacity?'warn':'');
     set('#overview-unemployed',t('overview.unemployed',{count:o.unemployed}),o.unemployed>0?'warn':'');
     set('#overview-mood',o.happiness==null?t('overview.moodNone'):t('overview.mood',{value:o.happiness}),tone(o.happiness));
-    {const lines=overviewExplain(o);for(const [id,k] of [['#overview-population','residents'],['#overview-unemployed','unemployed'],['#overview-mood','happiness']]){const el=doc.querySelector(id),text=lines[k]?.join('\n')??'';if(el&&el.title!==text)el.title=text;}}
+    {const lines=overviewExplain(o);for(const [id,k] of [['#overview-population','residents'],['#overview-unemployed','unemployed'],['#overview-mood','happiness']]){const el=doc.querySelector(id),text=lines[k]?.join('\n')??'';if(el&&el.title!==text&&!el.matches?.(':hover'))el.title=text;}}
     if(!this.bar)return;const label=t(this.collapsed?'overview.expand':'overview.collapse');
     if(this.toggle&&this.toggle.title!==label){this.toggle.title=label;this.root.title=label;}
     if(this.summary){const text=kingdomBarSummary(o);if(this.summary.textContent!==text)this.summary.textContent=text;this.summary.dataset.tone=tone(o.happiness);}
@@ -103,6 +103,14 @@ export class KingdomOverview {
     }
     // Rebuilt only when a value changed, so the 0.5 s refresh does not wake the UI config observer for nothing.
     const key=rows.map(r=>`${r.textContent}|${r.dataset?.tone??''}|${r.title??''}`).join('#');if(key===this.drawn)return;this.drawn=key;
+    // m-prehled-tooltip-mizi (owner 14 Nov 2026): the browser hides a hover text whenever its element is replaced or its
+    // `title` changes, so with a percentage moving every half second the explanation could not be read. While the
+    // pointer is over the list, the rows stay and only their values change; the hover text is renewed afterwards.
+    const old=[...this.body.children];
+    if(this.body.matches?.(':hover')&&old.length===rows.length&&old.every((r,i)=>r.tagName===rows[i].tagName)){
+      old.forEach((r,i)=>{const next=rows[i];r.dataset.tone=next.dataset.tone??'';if(r.children.length&&r.children.length===next.children.length)[...r.children].forEach((c,j)=>{const text=next.children[j].textContent;if(c.textContent!==text)c.textContent=text;});else if(r.textContent!==next.textContent)r.textContent=next.textContent;});
+      this.drawn=null;return;
+    }
     this.body.replaceChildren(...rows);
   }
   destroy(){this.abort?.abort();if(this.bar){this.bar.hidden=true;this.body?.replaceChildren();this.drawn=null;}}

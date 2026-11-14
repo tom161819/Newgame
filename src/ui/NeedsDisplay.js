@@ -24,6 +24,7 @@ export function renderNeeds(root,status){
   const work=element('p','need-work',t('needs.workLine',{factor:status.workModifier.toFixed(2)}));work.dataset.work=String(status.workModifier);
   const lines=[element('h3','',t('needs.title')),...NEED_IDS.map(id=>bar(id,status[id])),bar('happiness',status.happiness),mood,work,element('p','need-problem',t('needs.problemLine',{problem:problemLabel(status.mainProblem)})),element('p','need-home',t('needs.homeLine',{home:homeLabel(status.home)}))];
   if(status.unpaidPenalty>0)lines.push(element('p','need-unpaid',t('needs.unpaidLine',{penalty:status.unpaidPenalty})));
+  if(status.starving>0)lines.push(element('p','need-unpaid',t('needs.starvingLine',{penalty:status.starving,days:Math.floor(status.unfedDays)})));
   // #103 policy and #58 C2 strike / emigration state.
   // Policy v2 P1: the effect moves towards its target; the line shows both while it is on its way.
   const signed=n=>`${n>0?'+':n<0?'−':''}${Math.abs(n)}`,policyNow=Math.round(status.policy??0),policyTarget=status.policyTarget??policyNow;

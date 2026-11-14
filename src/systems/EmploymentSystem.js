@@ -1,6 +1,6 @@
 import { barracksAutoHire } from '../data/military.js';
 import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
-import { EMPLOYMENT_PRESETS,EMPLOYMENT_PROFESSIONS,PRIORITY_RANGE,presetOf } from '../data/employment.js';
+import { EMPLOYMENT_PRESETS,EMPLOYMENT_PROFESSIONS,FREE_ROLES,PRIORITY_RANGE,presetOf,recommendedHaulers,wantedBuilders } from '../data/employment.js';
 import { FORESTRY } from '../data/naturalResources.js';
 import { DIAGNOSTICS } from '../data/diagnostics.js';
 
@@ -14,11 +14,30 @@ export const compareForSkill=skill=>(a,b)=>Number(b.naturalTalent===skill)-Numbe
 
 export class EmploymentSystem {
   constructor(scene,{enabled=true,state=null}={}){
-    this.scene=scene;this.enabled=state?.enabled??enabled;this.priorities={...EMPLOYMENT_PRESETS.balanced,...(state?.priorities??{})};this.held=new Set(state?.held??[]);this.blockedBuildings=new Set(state?.blockedBuildings??[]);this.blockedTypes=new Set(state?.blockedTypes??[]);
-    this.listeners=new Set();this.dirty=true;this.running=false;this.idleSince=new Map();this.nextForestCheck=0;
+    this.scene=scene;this.enabled=state?.enabled??enabled;this.priorities={...EMPLOYMENT_PRESETS.balanced,...(state?.priorities??{})};this.held=new Set(state?.held??[]);this.blockedBuildings=new Set(state?.blockedBuildings??[]);this.blockedTypes=new Set(state?.blockedTypes??[]);this.haulers=Number.isInteger(state?.haulers)?state.haulers:null;
+    this.listeners=new Set();this.dirty=true;this.running=false;this.idleSince=new Map();this.nextForestCheck=0;this.nextRoleCheck=0;
     this.unsubscribe=scene.workplaceSystem.onChange(()=>this.request());this.worldChanged=()=>this.request();scene.events?.on('buildings:changed',this.worldChanged);
   }
   get preset(){return presetOf(this.priorities);}
+  // m-nosici-auto: the wanted number of Haulers (null = the recommended number, which follows the population).
+  residentCount(){return this.scene.workerSystem.liveSubjects().length;}
+  recommendedHaulers(){return recommendedHaulers(this.residentCount());}
+  haulerTarget(){return this.haulers??this.recommendedHaulers();}
+  count(profession){return this.scene.workerSystem.liveSubjects().filter(w=>w.profession===profession&&!w.leaving).length;}
+  setHaulers(value){
+    if(value!==null&&(!Number.isInteger(value)||value<0||value>FREE_ROLES.haulers.max))return false;this.haulers=value;
+    // A lower number lets the surplus go at once (those with empty hands first); automatic employment may place them elsewhere.
+    if(this.enabled){const all=this.scene.workerSystem.liveSubjects().filter(w=>w.profession==='hauler').sort((a,b)=>Number(!!(a.cargo||a.workTask))-Number(!!(b.cargo||b.workTask)));
+      for(let extra=all.length-this.haulerTarget(),i=0;extra>0&&i<all.length;i++,extra--)this.scene.workerSystem.jobs.assign(all[i],'idle');}
+    this.request();this.changed();return true;
+  }
+  builderPlaces(){return this.scene.buildings.filter(b=>buildingIsComplete(b)&&!b.unverified&&buildingDefinition(b).builderWorkshop).reduce((n,b)=>n+buildingDefinition(b).builderWorkshop.capacity,0);}
+  builderTarget(){return wantedBuilders(this.scene.buildings.filter(b=>b.construction&&!buildingIsComplete(b)).length,this.builderPlaces());}
+  // Fills the free roles from the pool before the workplace seats: nothing is built or carried without them.
+  fillFreeRoles(pool){
+    let hired=0;const take=(profession,skill,target)=>{for(let n=this.count(profession);n<target&&pool.length;n++){const worker=[...pool].sort(compareForSkill(skill))[0];pool.splice(pool.indexOf(worker),1);this.scene.workerSystem.jobs.assign(worker,profession);this.scene.workplaceSystem?.assignFree?.(worker);hired++;}};
+    take('hauler','logistics',this.haulerTarget());take('builder','construction',this.builderTarget());return hired;
+  }
   onChange(listener){this.listeners.add(listener);return()=>this.listeners.delete(listener);}
   changed(){for(const listener of this.listeners)listener();}
   // Events only mark the plan as due; it runs once in the next update, never inside the event that asked for it.
@@ -70,7 +89,7 @@ export class EmploymentSystem {
   run(){
     if(!this.enabled||this.running||this.scene.gameOver)return 0;this.running=true;let hired=0;
     try{
-      const pool=this.scene.workerSystem.liveSubjects().filter(w=>this.available(w)),seats=this.seats(),reach=new Map();
+      const pool=this.scene.workerSystem.liveSubjects().filter(w=>this.available(w));hired+=this.fillFreeRoles(pool);const seats=this.seats(),reach=new Map();
       const reachable=(worker,building)=>{const key=`${worker.id}:${building.id}`;if(!reach.has(key))reach.set(key,!!this.scene.workerSystem.ai.route(worker,towerNeighbors(building)));return reach.get(key);};
       const stronger=(a,b)=>{for(let i=0;i<a.length;i++)if(a[i]!==b[i])return a[i]>b[i];return false;};
       const strength=(worker,skill)=>[Number(worker.naturalTalent===skill),worker.skills?.[skill]?.level??1,worker.skills?.[skill]?.totalXP??0,worker.experience?.level??1];
@@ -93,7 +112,9 @@ export class EmploymentSystem {
     }finally{this.running=false;}
     return hired;
   }
-  update(){if(this.enabled&&!this.scene.gameTime?.paused)this.releaseSurplusWoodcutters();if(this.dirty&&this.enabled&&!this.scene.gameTime?.paused){this.dirty=false;this.run();}}
+  // The wanted numbers follow the population and the building sites; looked at every DIAGNOSTICS.checkInterval.
+  checkFreeRoles(){const now=this.scene.gameTime?.totalElapsed??0;if(now<(this.nextRoleCheck??0))return;this.nextRoleCheck=now+DIAGNOSTICS.checkInterval;if(this.count('hauler')<this.haulerTarget()||this.count('builder')<this.builderTarget())this.dirty=true;}
+  update(){if(this.enabled&&!this.scene.gameTime?.paused){this.releaseSurplusWoodcutters();this.checkFreeRoles();}if(this.dirty&&this.enabled&&!this.scene.gameTime?.paused){this.dirty=false;this.run();}}
   // m-drevorubci-stromy: a Woodcutter who has had no tree to fell for FORESTRY.surplusDays leaves a hut with more Woodcutters
   // than mature trees and becomes Unemployed (automatic employment then places him elsewhere, or not at this hut). Checked
   // every DIAGNOSTICS.checkInterval of game time; the waiting times are not saved (after Load the day starts again).
@@ -112,7 +133,7 @@ export class EmploymentSystem {
     for(const id of [...this.idleSince.keys()])if(!seen.has(id))this.idleSince.delete(id);
     if(released)this.request();return released;
   }
-  importState(data){this.enabled=data?.enabled??this.enabled;this.priorities={...EMPLOYMENT_PRESETS.balanced,...(data?.priorities??{})};this.held=new Set(data?.held??[]);this.blockedBuildings=new Set(data?.blockedBuildings??[]);this.blockedTypes=new Set(data?.blockedTypes??[]);this.request();this.changed();}
-  exportState(){this.pruneExclusions();return {blockedBuildings:[...this.blockedBuildings].sort((a,b)=>a-b),blockedTypes:[...this.blockedTypes].sort(),enabled:this.enabled,priorities:{...this.priorities},held:[...this.held].sort()};}
+  importState(data){this.enabled=data?.enabled??this.enabled;this.priorities={...EMPLOYMENT_PRESETS.balanced,...(data?.priorities??{})};this.held=new Set(data?.held??[]);this.blockedBuildings=new Set(data?.blockedBuildings??[]);this.blockedTypes=new Set(data?.blockedTypes??[]);this.haulers=Number.isInteger(data?.haulers)?data.haulers:null;this.request();this.changed();}
+  exportState(){this.pruneExclusions();return {blockedBuildings:[...this.blockedBuildings].sort((a,b)=>a-b),blockedTypes:[...this.blockedTypes].sort(),enabled:this.enabled,priorities:{...this.priorities},held:[...this.held].sort(),...(this.haulers===null?{}:{haulers:this.haulers})};}
   destroy(){this.unsubscribe();this.scene.events?.off('buildings:changed',this.worldChanged);this.listeners.clear();}
 }

@@ -44,7 +44,7 @@ test('1: a hut with no mature tree on the known map gets one notice (once), with
 });
 
 test('2: automatic employment sends nobody to a hut with nothing to fell and no more Woodcutters than mature trees',()=>{
-  fresh();const s=fixture();s.employment=new EmploymentSystem(s);const b=hut(s);
+  fresh();const s=fixture();s.employment=Object.assign(new EmploymentSystem(s),{haulers:0});const b=hut(s);
   const people=[0,1,2].map(i=>s.workerSystem.create({x:40+i,y:50}));s.employment.request();s.employment.update();
   assert.equal(s.workplaceSystem.employees(b).length,0,'no tree to fell: the hut takes nobody');
   tree(s,{x:49,y:45});s.employment.request();s.employment.update();assert.equal(s.workplaceSystem.employees(b).length,1,'one mature tree, one Woodcutter');
@@ -55,12 +55,12 @@ test('2: automatic employment sends nobody to a hut with nothing to fell and no 
 
 test('2: a Woodcutter without a tree to fell leaves after about a game day (a held mature tree keeps him); off = nobody moves',()=>{
   // tabulka-budov-1: with one seat a hut keeps its Woodcutter while one mature tree stands in range, even one taken by the King.
-  fresh();const s=fixture();s.employment=new EmploymentSystem(s);const b=hut(s),held=tree(s,{x:49,y:45});
+  fresh();const s=fixture();s.employment=Object.assign(new EmploymentSystem(s),{haulers:0});const b=hut(s),held=tree(s,{x:49,y:45});
   s.workerSystem.reservations.reserve(s.naturalResources.reservation(held),'king');
   const w=s.workerSystem.create({x:40,y:50});assert.equal(s.workplaceSystem.assign(b,w),true);
   const run=(sc,ms)=>{for(let t=0;t<ms;t+=250){sc.tick(250);sc.employment.update();}},day=s.gameTime.dayDuration;
   run(s,day*1.5);assert.equal(s.workplaceSystem.employees(b).length,1,'the one mature tree (held by the King) still counts');
-  const bare=fixture();bare.employment=new EmploymentSystem(bare);const bb=hut(bare),bw=bare.workerSystem.create({x:40,y:50});assert.equal(bare.workplaceSystem.assign(bb,bw),true);
+  const bare=fixture();bare.employment=Object.assign(new EmploymentSystem(bare),{haulers:0});const bb=hut(bare),bw=bare.workerSystem.create({x:40,y:50});assert.equal(bare.workplaceSystem.assign(bb,bw),true);
   run(bare,day*.5);assert.equal(bare.workplaceSystem.employees(bb).length,1,'not within half a day');assert.equal(bw.workState,'Waiting');
   run(bare,day*.7);assert.equal(bare.workplaceSystem.employees(bb).length,0,'the surplus Woodcutter left');assert.equal(bw.profession,'idle','free for other work');
   run(bare,day*2);assert.equal(bare.workplaceSystem.employees(bb).length,0,'automatic employment does not send him back');

@@ -1243,3 +1243,11 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 .own-store-list small, .own-store-empty { color:#9a9680; }
 .own-store-full { color:#d08a6a; margin:2px 0 0; }
 .market-expedition { margin:6px 0; } .market-expedition h3 { margin:0 0 4px; font-size:13px; } .market-expedition-goods { display:flex; flex-wrap:wrap; gap:4px 12px; font-size:12px; } .market-expedition-goods input { width:56px; } .market-expedition-reason, .market-expedition-heavy { color:#d08a6a; font-size:12px; }
+/* m-nosici-auto: wanted number of Haulers in the Castle panel */
+.employment-haulers { display:grid; gap:6px; margin:8px 0; padding:8px; border:1px solid #91835b55; border-radius:6px; }
+.employment-stepper { display:inline-flex; align-items:center; gap:8px; }
+.employment-stepper button { width:28px; height:28px; font:inherit; font-weight:700; background:#26321f; color:#ece2c4; border:1px solid #91835b; border-radius:4px; cursor:pointer; }
+.employment-hauler-count { min-width:2ch; text-align:center; font-size:16px; }
+.employment-hauler-count.is-recommended { color:#b9e08a; }
+.employment-recommended { justify-self:start; padding:4px 10px; font:inherit; font-size:12px; background:#26321f; color:#b9e08a; border:1px solid #7fa457; border-radius:4px; cursor:pointer; }
+.employment-recommended:disabled { opacity:.5; cursor:default; }

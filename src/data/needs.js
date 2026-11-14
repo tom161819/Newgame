@@ -2,7 +2,10 @@
 export const NEEDS=Object.freeze({
   weights:Object.freeze({food:.35,rest:.25,housing:.25,safety:.15}),
   // Food follows only the existing daily meal: a resident without a missed meal recovers, a hungry one declines.
-  food:Object.freeze({recoverPerDay:100,declinePerDay:50,low:20}),
+  // m-hlad-nasledky (owner 14 Nov 2026): a resident without food loses more Happiness the longer it lasts – after the
+  // first full day `perDay` points for every further day, at most `max`. So about 3 days of hunger bring a strike and
+  // about a week makes the resident leave (DISCONTENT); the kingdom's Happiness and with it new arrivals fall too.
+  food:Object.freeze({recoverPerDay:100,declinePerDay:50,low:20,starving:Object.freeze({afterDays:1,perDay:12,max:50})}),
   // Active work tires; waiting and idling restore. The daily rest at home (phase B) replaces the idle recovery.
   rest:Object.freeze({drainPerDay:30,recoverPerDay:60,low:20}),
   safety:Object.freeze({base:45,castle:{bonus:25,range:12},tower:{bonus:15,range:10},guard:{bonus:10,range:10},attack:{penalty:30,days:1}}),
@@ -20,6 +23,7 @@ export const DAILY_REST=Object.freeze({
   recoverPerDay:Object.freeze({house:400,settlement:300,homeless:150}),
   exempt:Object.freeze(['soldier']),
 });
+export const starvingPenalty=days=>{const r=NEEDS.food.starving;return Math.round(Math.min(r.max,Math.max(0,(days??0)-r.afterDays)*r.perDay));};
 export const clampNeed=value=>Math.max(0,Math.min(100,value));
 // Kingdom Happiness (average of residents) as a modifier of the existing Kingdom Attractiveness (#58 phase C).
 export const HAPPINESS_ATTRACTIVENESS=Object.freeze([{min:75,value:15},{min:50,value:0},{min:30,value:-20},{min:0,value:-45}]);

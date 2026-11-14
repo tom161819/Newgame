@@ -10,7 +10,7 @@ import { loadGameState } from '../src/systems/GameStateLoader.js';
 
 globalThis.document??={querySelector:()=>({textContent:''})};
 
-function fixture(options={}){const s=workerScene(undefined,{workplaces:true,...options});s.events=new EventEmitter();s.employment=new EmploymentSystem(s);return s;}
+function fixture(options={}){const s=workerScene(undefined,{workplaces:true,...options});s.events=new EventEmitter();s.employment=Object.assign(new EmploymentSystem(s),{haulers:0});return s;}
 function build(s,type,x,y,{complete=true}={}){
   const d=s.objectRegistry.require(type);for(const[id,n]of Object.entries(d.cost))s.inventory.add(id,n);
   const r=placeBuilding({map:s.map,anchor:{x,y},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d});assert.ifError(r.error);
@@ -58,8 +58,8 @@ test('OFF hires nobody; blueprints, held and busy residents are skipped; a manua
 
 test('settings, priorities and held residents survive Save/Load in the current schema',()=>{
   const s=fixture(),w=resident(s,50);s.employment.applyPreset('production');s.employment.setPriority('farmer',4);s.employment.hold(w);s.employment.setEnabled(false);
-  const state=validateGameState(serializeGameState(s));assert.deepEqual(state.employment,{blockedBuildings:[],blockedTypes:[],enabled:false,priorities:{...EMPLOYMENT_PRESETS.production,farmer:4},held:[w.id]});
-  for(const bad of [{...state.employment,priorities:{...state.employment.priorities,farmer:6}},{...state.employment,held:['worker-999']},{...state.employment,extra:1}])assert.throws(()=>validateGameState({...structuredClone(state),employment:bad}));
+  const state=validateGameState(serializeGameState(s));assert.deepEqual(state.employment,{blockedBuildings:[],blockedTypes:[],enabled:false,priorities:{...EMPLOYMENT_PRESETS.production,farmer:4},held:[w.id],haulers:0});
+  for(const bad of [{...state.employment,priorities:{...state.employment.priorities,farmer:6}},{...state.employment,held:['worker-999']},{...state.employment,extra:1},{...state.employment,haulers:-1},{...state.employment,haulers:31}])assert.throws(()=>validateGameState({...structuredClone(state),employment:bad}));
   const r=fixture({starter:false});loadGameState(r,structuredClone(state));assert.deepEqual(r.employment.exportState(),state.employment);assert.equal(r.employment.preset,'custom');
 });
 
