@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "castle",
+  "variantId": "castle-l1-270",
+  "name": "Level 1: thatched hall 270° (front-left)",
+  "category": "buildings",
+  "version": 2,
+  "specHash": "5ccb40db",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 250,
+  "height": 173,
+  "anchor": {
+    "x": 125,
+    "y": 106
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.61272
+  },
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "base": {
+    "x": 125,
+    "y": 170
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.98266
+  },
+  "visualHeight": 170,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 4.603,
+  "lights": [],
+  "x2": {
+    "width": 500,
+    "height": 346,
+    "anchor": {
+      "x": 250,
+      "y": 212
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

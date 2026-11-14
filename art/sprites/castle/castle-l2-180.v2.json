@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "castle",
+  "variantId": "castle-l2-180",
+  "name": "Level 2: hall with tower and palisade 180° (rear-left)",
+  "category": "buildings",
+  "version": 2,
+  "specHash": "5ccb40db",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 198,
+  "height": 184,
+  "anchor": {
+    "x": 99,
+    "y": 119
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.64674
+  },
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "base": {
+    "x": 99,
+    "y": 183
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.99457
+  },
+  "visualHeight": 183,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 4.603,
+  "lights": [],
+  "x2": {
+    "width": 396,
+    "height": 368,
+    "anchor": {
+      "x": 198,
+      "y": 238
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

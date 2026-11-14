@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "castle",
+  "variantId": "castle-l4-180",
+  "name": "Level 4: castle with two halls 180° (rear-left)",
+  "category": "buildings",
+  "version": 2,
+  "specHash": "5ccb40db",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 384,
+  "height": 258,
+  "anchor": {
+    "x": 192,
+    "y": 159
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.61628
+  },
+  "footprint": {
+    "width": 6,
+    "height": 6
+  },
+  "base": {
+    "x": 192,
+    "y": 255
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.98837
+  },
+  "visualHeight": 255,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 4.603,
+  "lights": [],
+  "x2": {
+    "width": 768,
+    "height": 516,
+    "anchor": {
+      "x": 384,
+      "y": 318
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

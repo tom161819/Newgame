@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "castle",
+  "variantId": "castle-l3-270",
+  "name": "Level 3: stone keep and wall 270° (front-left)",
+  "category": "buildings",
+  "version": 2,
+  "specHash": "5ccb40db",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 320,
+  "height": 303,
+  "anchor": {
+    "x": 160,
+    "y": 220
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.72607
+  },
+  "footprint": {
+    "width": 5,
+    "height": 5
+  },
+  "base": {
+    "x": 160,
+    "y": 300
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.9901
+  },
+  "visualHeight": 300,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 4.603,
+  "lights": [],
+  "x2": {
+    "width": 640,
+    "height": 606,
+    "anchor": {
+      "x": 320,
+      "y": 440
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

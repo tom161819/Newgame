@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "castle",
+  "variantId": "castle-l1-90",
+  "name": "Level 1: thatched hall 90° (rear-right)",
+  "category": "buildings",
+  "version": 2,
+  "specHash": "5ccb40db",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 250,
+  "height": 181,
+  "anchor": {
+    "x": 125,
+    "y": 115
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.63536
+  },
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "base": {
+    "x": 125,
+    "y": 179
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.98895
+  },
+  "visualHeight": 179,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 4.603,
+  "lights": [],
+  "x2": {
+    "width": 500,
+    "height": 362,
+    "anchor": {
+      "x": 250,
+      "y": 230
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

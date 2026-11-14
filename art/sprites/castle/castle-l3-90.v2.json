@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "castle",
+  "variantId": "castle-l3-90",
+  "name": "Level 3: stone keep and wall 90° (rear-right)",
+  "category": "buildings",
+  "version": 2,
+  "specHash": "5ccb40db",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 320,
+  "height": 222,
+  "anchor": {
+    "x": 160,
+    "y": 139
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.62613
+  },
+  "footprint": {
+    "width": 5,
+    "height": 5
+  },
+  "base": {
+    "x": 160,
+    "y": 219
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.98649
+  },
+  "visualHeight": 219,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 4.603,
+  "lights": [],
+  "x2": {
+    "width": 640,
+    "height": 444,
+    "anchor": {
+      "x": 320,
+      "y": 278
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

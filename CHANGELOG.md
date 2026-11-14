@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.128.2] - 2026-11-15
+<!-- version: {"title":"Studio: Castle level footprints","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- Asset Studio: the four Castle levels are sized for footprints 4 × 4, 4 × 4, 5 × 5 and 6 × 6 (owner's choice to try). The game is unchanged.
+
 ## [0.128.1] - 2026-11-14
 <!-- version: {"title":"Studio: Castle in four levels","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added
