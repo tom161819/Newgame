@@ -75,7 +75,8 @@ export class AssetManager {
   registerRenderer(name,factory) { this.renderers.set(name,factory);return this; }
 
   createView(id,context) {
-    const definition=this.registry.require(id),factory=this.renderers.get(definition.renderer);
+    // m-hrad-urovne: a building with a level (the Castle) is drawn from its level definition.
+    const own=context?.building?.definition,definition=own?.level&&own.id===id?own:this.registry.require(id),factory=this.renderers.get(definition.renderer);
     if((definition.renderMode==='procedural'||!this.hasTexture(id))&&factory){
       const view=factory(definition,context);view.setData?.('objectId',id);view.setData?.('definition',definition);return view;
     }

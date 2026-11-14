@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.129.0] - 2026-11-15
+<!-- version: {"title":"Castle levels and upgrade","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- The Castle has four levels with new art: a thatched hall (4 × 4), the hall with a tower and palisade (4 × 4), a stone keep with a wall (5 × 5) and a castle with two halls (6 × 6). A new Castle is level 1 (the starting one for free, otherwise 40 Wood). "Upgrade" is in the Castle's card: 70 Wood, 50 Stone, 100 Stone. When the bigger footprint has no room, the card says the ground must be cleared.
+- Higher levels give more hit points, room for residents (+2, +4, +6), Safety (+5, +10, +15) and income (7, 10, 14 Gold a day). From level 2 the Castle sees around itself.
+### Changed
+- A Castle of an older save stays the stone keep the King can climb. It counts as level 1 and can be upgraded to level 2. The new levels cannot be climbed.
+
 ## [0.128.3] - 2026-11-15
 <!-- version: {"title":"Studio: oak renders","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

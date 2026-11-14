@@ -23,7 +23,7 @@ export function validateMapMemory(data,registry,{check,number,integer,array}){
     if(entry.kind==='stockpile')check(entry.type==='starter_stockpile');
     integer(entry.width,1,COLUMNS);integer(entry.height,1,ROWS);
     // Owner 13 Nov 2026: a Farmhouse remembered from an older save keeps its 3 × 3 footprint (legacyFootprint).
-    check(entry.kind==='stockpile'?entry.width===1&&entry.height===1:entry.width===d.width&&entry.height===d.height||entry.kind==='building'&&!!d.legacyFootprint&&entry.width===d.legacyFootprint.width&&entry.height===d.legacyFootprint.height);
+    check(entry.kind==='stockpile'?entry.width===1&&entry.height===1:entry.width===d.width&&entry.height===d.height||entry.kind==='building'&&!!d.legacyFootprint&&entry.width===d.legacyFootprint.width&&entry.height===d.legacyFootprint.height||entry.kind==='building'&&!!d.levels&&entry.width===entry.height&&Object.values(d.levels).some(l=>l.size===entry.width));/* m-hrad-urovne: a remembered Castle has the footprint of its level */
     integer(entry.x,0,COLUMNS-entry.width);integer(entry.y,0,ROWS-entry.height);
     let discovered=false;for(let y=0;y<entry.height;y++)for(let x=0;x<entry.width;x++)if(explored.has((entry.y+y)*COLUMNS+entry.x+x))discovered=true;check(discovered);
     const v=entry.visual;check(v&&typeof v==='object'&&!Array.isArray(v));

@@ -25,12 +25,12 @@ test('advanced central defaults validate all fields, including the four starting
   // m-kamenolom-u-hradu: a saved game keeps the code of the generator it was made with (New Game refuses old codes elsewhere).
   assert.equal(gameSettings({worldCode:'MKW2-155515555555-7KQ9X2'}).worldCode,'MKW2-155515555555-7KQ9X2');
 });
-test('starting castle is one finished reachable 3x3 building for free across random maps and has existing production and roof interactions',()=>{
+test('starting castle is one finished reachable level 1 building (4x4, m-hrad-urovne) for free across random maps and has existing production and roof interactions',()=>{
   for(let seed=1;seed<=15;seed++){
     let n=seed;const terrain=createMap(()=>((n=Math.imul(n,1664525)+1013904223>>>0)/2**32)),s=workerScene(terrain,{gameSettings:gameSettings({startingCastle:true})});
     s.character.tile={x:50,y:50};s.character.position={x:50.5,y:50.5};const before=s.inventory.exportState(),b=createStartingCastle(s,s.character.tile);
-    assert.equal(s.buildings.length,1);assert.equal(b.type,'castle');assert.equal(b.tiles.length,9);assert.ok(buildingIsComplete(b));assert.equal(b.construction,undefined);assert.deepEqual(s.inventory.exportState(),before);
-    assert.ok(approachTower(s.map,s.character.tile,b));assert.ok(b.definition.interactions.includes('enter'));assert.equal(b.definition.visibility.multiplier,1.75);for(const t of b.tiles)assert.equal(s.map[t.y][t.x],1);
+    assert.equal(s.buildings.length,1);assert.equal(b.type,'castle');assert.equal(b.tiles.length,16);assert.equal(b.level,1);assert.ok(buildingIsComplete(b));assert.equal(b.construction,undefined);assert.deepEqual(s.inventory.exportState(),before);
+    assert.ok(approachTower(s.map,s.character.tile,b));assert.equal(b.definition.interactions.includes('enter'),false,'the hall has no platform to climb');for(const t of b.tiles)assert.equal(s.map[t.y][t.x],1);
     assert.equal(s.production.dailyIncome().gold,5);s.gameTime.update(s.gameTime.dayDuration);assert.equal(s.inventory.count('gold'),5);
   }
   const s=configured({startingCastle:false});assert.equal(createStartingCastle(s,s.character.tile),null);assert.equal(s.buildings.length,0);

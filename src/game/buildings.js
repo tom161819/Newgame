@@ -35,12 +35,23 @@ export function legacyDefinition(d){
   }
   return legacyDefinitions.get(d);
 }
+// m-hrad-urovne: a building type with `levels` (the Castle) has a definition per level: footprint, look, income. A
+// building without a level (older saves) keeps the type's own definition.
+const levelDefinitions=new WeakMap();
+export function levelDefinition(d,level){
+  const rules=d?.levels?.[level];if(!rules)return d;let map=levelDefinitions.get(d);if(!map){map=new Map();levelDefinitions.set(d,map);}
+  if(!map.has(level)){const art=d.artSprites?.[`l${level}`],{frontSprite,frontOrigin,platform,visibility,lights,shadow,...rest}=d;
+    map.set(level,Object.freeze({...rest,level,width:rules.size,height:rules.size,cost:rules.cost,interactions:Object.freeze([]),renderer:'leveled',noFront:true,artLooks:Object.freeze([`l${level}`]),
+      origin:art?.origin??d.origin,visualHeight:art?.visualHeight??d.visualHeight,visual:{},...(d.production?{production:{...d.production,amount:rules.income}}:{})}));}
+  return map.get(level);
+}
 export const usesLegacyFootprint=(building,d)=>!!d?.legacyFootprint&&!!building&&building.size!==d.width;
 export const withFootprint=(building,d)=>usesLegacyFootprint(building,d)?legacyDefinition(d):d;
 export function definitionFor(building,registry,soft=false){
   const d=soft?registry.get?.(building.type):registry.require(building.type);if(!d||!building)return d;
   // A live building knows its footprint from its definition (legacy or not); the registry stays the source of the rest
   // (workplace capacities can be reconfigured at runtime). Save data has no definition: `size` decides.
+  if(d.levels&&building.level)return levelDefinition(d,building.level);
   if(building.definition&&building.definition.id===d.id)return building.definition.legacy&&d.legacyFootprint?legacyDefinition(d):d;
   return withFootprint(building,d);
 }
@@ -145,6 +156,7 @@ export function placeBuilding({map,anchor,stones,resources=stones,reservedTiles,
   if(definition.crop)building.farmId=availableFarm(building,buildings,buildingDefinition)?.id??null;
   const look=nextBuildingLook(definition,buildings);if(look)building.look=look;
   if(definition.legacyFootprint&&!definition.legacy)building.size=definition.width;
+  if(definition.level)building.level=definition.level;
   if(!(materials?materials.prepare(building):inventory.pay(definition.cost,{source:`${dataName(definition)} Construction`,entityId:building.id})))return {error:t('status.noFunds')};
   const settle=walls.length?replaceWalls(walls,building):null,replaced=walls.length?{replaced:walls}:{};
   if(provisional){building.unverified=true;buildings.push(building);if(definition.id==='quarry')building.quarryMode='unbound';const refund=settle?.();return {building,...replaced,...(refund?{refund}:{})};}

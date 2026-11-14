@@ -1,3 +1,4 @@
+import { castleLevel,castleRules } from '../data/castle.js';
 import { enclosure,ENCLOSURE } from '../game/enclosure.js';
 import { HEATING } from '../data/heating.js';
 import { TORCHES } from '../data/torches.js';
@@ -81,7 +82,7 @@ export class NeedsSystem {
   safetyDetail(worker,record,home){
     const s=NEEDS.safety,p=worker.position??{x:worker.tile?.x??0,y:worker.tile?.y??0},near=(b,range)=>{const d=b.definition??this.scene.objectRegistry?.get?.(b.type)??{width:1,height:1};return Math.hypot(b.x+d.width/2-p.x,b.y+d.height/2-p.y)<=range;};
     const done=(this.scene.buildings??[]).filter(b=>buildingIsComplete(b)),factors=[['base',s.base]];
-    if(done.some(b=>b.type==='castle'&&near(b,s.castle.range)))factors.push(['castle',s.castle.bonus]);
+    {const castle=done.filter(b=>b.type==='castle'&&near(b,s.castle.range)).sort((a,b)=>castleLevel(b)-castleLevel(a))[0];if(castle)factors.push(['castle',s.castle.bonus+(castle.level?castleRules(castle).safety:0)]);}
     if(done.some(b=>b.type==='tower'&&near(b,s.tower.range)))factors.push(['tower',s.tower.bonus]);
     if(done.some(b=>b.type==='barracks'&&near(b,s.guard.range))||this.residents().some(o=>o!==worker&&o.profession==='soldier'&&Math.hypot(o.position.x-p.x,o.position.y-p.y)<=s.guard.range))factors.push(['guard',s.guard.bonus]);
     // m-uzavreny-hrad (point 34): closed walls protect who stands, lives or works inside them.

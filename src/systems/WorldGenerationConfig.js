@@ -1,17 +1,18 @@
 import { PLAYER_START } from '../game/config.js';
-import { placementError,buildingTiles,towerNeighbors,buildingDefinition } from '../game/buildings.js';
+import { levelDefinition, placementError,buildingTiles,towerNeighbors,buildingDefinition } from '../game/buildings.js';
 import { findPathToAny,reachableTiles } from '../game/pathfinding.js';
 import { STARTING_RESOURCES } from './GameSettings.js';
 
 // Volá se pouze při New Game, před rozmístěním surovin a jednotek.
 export function createStartingCastle(scene,start=PLAYER_START){
   if(!scene.gameSettings.startingCastle)return null;
-  const definition=scene.objectRegistry.require('castle'),candidates=[];
+  // m-hrad-urovne: the starting Castle is level 1 (the thatched hall on 4 × 4).
+  const definition=levelDefinition(scene.objectRegistry.require('castle'),1),candidates=[];
   for(let dy=-10;dy<=10;dy++)for(let dx=-10;dx<=10;dx++)candidates.push({x:start.x+dx,y:start.y+dy});
   candidates.sort((a,b)=>Math.hypot(a.x+1.5-start.x-.5,a.y+1.5-start.y-.5)-Math.hypot(b.x+1.5-start.x-.5,b.y+1.5-start.y-.5));
   for(const anchor of candidates){
     if(placementError(scene.map,anchor,scene.resourceOccupancy,[start],definition,scene.buildings))continue;
-    const building={id:Math.max(0,...scene.buildings.map(b=>b.id))+1,type:definition.id,definition,...anchor,tiles:buildingTiles(anchor,definition)};
+    const building={id:Math.max(0,...scene.buildings.map(b=>b.id))+1,type:definition.id,definition,...anchor,tiles:buildingTiles(anchor,definition),...(definition.level?{level:definition.level}:{})};
     for(const t of building.tiles)scene.map[t.y][t.x]=1;
     if(!findPathToAny(scene.map,start,towerNeighbors(building))){for(const t of building.tiles)scene.map[t.y][t.x]=0;continue;}
     scene.buildings.push(building);scene.towerViews.set(building.id,scene.createBuildingView(definition,building));return building;

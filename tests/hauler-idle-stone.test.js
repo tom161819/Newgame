@@ -89,7 +89,7 @@ test('a new real delivery preempts an at-goal stone pickup before any material i
   assert.equal(h.workTask?.siteId,site.id);assert.equal(s.resources.has(key),true);assert.equal(s.workerSystem.reservations.available(`resource:${key}`,'other'),true);snapshot(s);
 });
 test('map edges and invalid settings: radius beyond the map is fine, saves reject out-of-range radii',()=>{
-  const s=scene(),edge={x:98,y:97};s.addResource(s.objectRegistry.require('stone'),edge);const h=hauler(s);assert.ok(Math.hypot(edge.x-centre(s).x,edge.y-centre(s).y)>80,'beyond the default radius');
+  const s=scene(),edge={x:99,y:99};s.addResource(s.objectRegistry.require('stone'),edge);const h=hauler(s);assert.ok(Math.hypot(edge.x-centre(s).x,edge.y-centre(s).y)>80,'beyond the default radius');
   s.simulate(8000);assert.ok(s.resources.has(`${edge.x},${edge.y}`));h.stoneCollection.radius=IDLE_STONE.maxRadius;until(s,()=>!s.resources.has(`${edge.x},${edge.y}`),120000);
   const data=serializeGameState(s),bad=structuredClone(data);bad.workers.find(w=>w.id===h.id).stoneCollection.radius=IDLE_STONE.maxRadius+1;assert.throws(()=>validateGameState(bad));
   const none=structuredClone(data);delete none.workers.find(w=>w.id===h.id).stoneCollection;assert.throws(()=>validateGameState(none));validateGameState(data);

@@ -1,3 +1,4 @@
+import { castleRules } from '../data/castle.js';
 import { buildLinks,drawBuildLinks,linksEnabled } from './buildLinks.js';
 import { clockMinutes,formatClock } from '../data/dayNight.js';
 import { personHover } from '../ui/personHover.js';
@@ -66,7 +67,7 @@ import '../ui/resourceLedger.css';
 import { Inventory } from './inventory.js';
 import { drawStone, generateResourcePositions, resourceTiles, tileKey, ResourceSpawner } from './stones.js';
 import { rebuildRuin } from './ruinRebuild.js';
-import { placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors, buildingDefinition,buildingDepth,buildingIsComplete, definitionFor } from './buildings.js';
+import { levelDefinition, placeBuilding, placementError, buildingTiles, towerBase, towerNeighbors, buildingDefinition,buildingDepth,buildingIsComplete, definitionFor } from './buildings.js';
 import { edgeLight,fadeStep } from './sightFade.js';
 import { footprintShown,applyFootprint,selectedBuildingIds } from './footprintHighlight.js';
 import { TowerView } from './TowerView.js';
@@ -329,6 +330,8 @@ export class GameScene extends Phaser.Scene {
     this.workerSystem=new WorkerSystem(this,{onChange:(count,maximum)=>{document.querySelector('#population-count').textContent=t('hud.population',{count,maximum});}});if(!this.loadState)this.workerSystem.spawnInitial(this.worldRandom('villagers'));this.builderWorkshops=new BuilderWorkshopSystem(this);this.fishing=new FishingSystem(this);
     // Every living subject is a moving sight source (diameter 15); leaving, dying or emigrating removes it.
     // Point 42 (owner 14 Nov 2026): a newcomer on his way from the map edge reveals nothing until he reaches the Castle.
+    // m-hrad-urovne: from level 2 the Castle sees around itself (its tower), without the King climbing it.
+    this.fog.registerSource('castles',()=>this.buildings.filter(b=>b.type==='castle'&&buildingIsComplete(b)&&castleRules(b)?.sight>0&&b.level>1).map(b=>({id:b.id,center:{x:b.x+buildingDefinition(b).width/2,y:b.y+buildingDefinition(b).height/2},radius:castleRules(b).sight})));
     this.fog.registerSource('subjects',()=>this.workerSystem.liveSubjects().filter(w=>!w.arriving).map(subjectSight));
     this.workplaceSystem=new WorkplaceSystem(this);this.workplacePanel=new WorkplacePanel(this);
     this.constructionSystem=new ConstructionSystem(this,{onProgress:site=>this.towerViews.get(site.id)?.updateProgress?.(site),
@@ -657,6 +660,7 @@ export class GameScene extends Phaser.Scene {
     if(this.character.transitioning){this.setStatus(t('status.finishClimb'));return false;}
     definition=this.objectRegistry.get(definition.id);if(!definition?.buildable)return false;
     const status=this.buildingUnlocks.status(definition,{live:true});if(!status.unlocked){this.setStatus(status.description);return false;}
+    if(definition.levels)definition=levelDefinition(definition,1);/* m-hrad-urovne: a new Castle is level 1 (4 × 4, 40 Wood) */
     this.kingLogistics?.cancel();
     this.huntingSystem.cancel();this.mountSystem.cancel();
     this.treasureSystem.cancelRequest();

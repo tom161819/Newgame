@@ -1272,3 +1272,8 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 /* Point 49: hit points in the building detail */
 .building-hp { display:grid; gap:4px; margin:8px 0; font-weight:650; }
 .building-hp progress { width:100%; height:10px; accent-color:#85aa64; }
+
+/* m-hrad-urovne: the Castle's level and upgrade in the Castle card */
+.castle-upgrade { display:grid; gap:6px; margin:8px 0; padding:8px; border:1px solid #91835b55; border-radius:6px; }
+.castle-upgrade h3 { margin:0; font-size:15px; }
+.castle-upgrade-error { margin:0; color:#e6b062; font-size:12px; }

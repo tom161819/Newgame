@@ -1,3 +1,4 @@
+import { CASTLE_LEVELS,CASTLE_ART } from '../castle.js';
 import { TORCHES } from '../torches.js';
 import { WORKPLACES } from '../workplaces.js';
 import { MINING_WORK } from '../minerals.js';
@@ -23,7 +24,7 @@ export const buildings = [
     // on the keep platform behind the front battlements. FortificationView stays the fallback.
     id:'castle',name:'Castle',category:'building',buildingCategory:'defense',sprite:'/assets/buildings/castle/castle-keep.v1.png',
     frontSprite:'/assets/buildings/castle/castle-keep.v1.front.png',artSource:'art/sprites/castle/castle-keep.v1.json',
-    width:3,height:3,walkable:false,collectible:false,buildable:true,cost:{stone:20},maxCount:1,
+    width:3,height:3,walkable:false,collectible:false,buildable:true,cost:{stone:20},maxCount:1,levels:CASTLE_LEVELS,artSprites:CASTLE_ART,
     constructionTime:45000,
     production:{resource:'gold',amount:5,interval:'day',label:'Castle income'},
     interactions:['enter','exit'],description:'Kamenná pevnost s horní plošinou a cimbuřím. Z plošiny poskytuje o 75 % větší dohled.',

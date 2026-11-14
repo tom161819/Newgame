@@ -6,6 +6,8 @@ import { element,formatCost,missingCost } from './objectLabels.js';
 import { BUILDING_CATEGORIES,buildingsInCategory } from '../data/buildingCategories.js';
 import { bottomLift,fromDom } from './hudLayout.js';
 
+// m-hrad-urovne: the menu shows the price of level 1 of a building with levels (the Castle).
+const menuCost=definition=>definition.levels?.[1]?.cost??definition.cost;
 export class BuildingBar {
   constructor({registry,assets,onSelect,onCancel,unlocks,freeOffer=()=>false}) {
     this.freeOffer=freeOffer;
@@ -43,7 +45,7 @@ export class BuildingBar {
       button.setAttribute('aria-pressed','false');button.setAttribute('aria-describedby',`${definition.id}-description ${definition.id}-availability`);
       const image=element('img','tower-icon');image.src=this.assets.previewURL(definition);image.alt='';
       const names=element('span','building-name');names.append(element('strong','',definition.name),element('small','',t('building.size',{width:definition.width,height:definition.height})));
-      button.append(image,names,element('span','building-price',formatCost(definition.cost,this.registry)));
+      button.append(image,names,element('span','building-price',formatCost(menuCost(definition),this.registry)));
       const description=element('p','',definition.description);description.id=`${definition.id}-description`;
       const availability=element('p','building-availability');availability.id=`${definition.id}-availability`;availability.setAttribute('role','status');
       const lock=element('span','building-lock');button.append(lock);
@@ -79,8 +81,8 @@ export class BuildingBar {
       const warning=status.unlocked?status.warning??'':'';
       card.title=status.unlocked?[definition.description,warning].filter(Boolean).join('\n'):status.description;
       const free=status.unlocked&&this.freeOffer(definition);
-      availability.textContent=status.unlocked?[warning,free?t('building.freeOffer'):missingCost(definition.cost,inventory,this.registry)].filter(Boolean).join(' · '):status.description;
-      availability.classList.toggle('shortage',!status.unlocked||!free&&!inventory.canAfford(definition.cost)||!!warning);card.classList.toggle('building-free',!!free);availability.classList.toggle('building-warning',!!warning);card.classList.toggle('building-warned',!!warning);
+      availability.textContent=status.unlocked?[warning,free?t('building.freeOffer'):missingCost(menuCost(definition),inventory,this.registry)].filter(Boolean).join(' · '):status.description;
+      availability.classList.toggle('shortage',!status.unlocked||!free&&!inventory.canAfford(menuCost(definition))||!!warning);card.classList.toggle('building-free',!!free);availability.classList.toggle('building-warning',!!warning);card.classList.toggle('building-warned',!!warning);
       button.setAttribute('aria-pressed',String(selected?.id===definition.id));
     }
     this.cancel.hidden=!selected;
