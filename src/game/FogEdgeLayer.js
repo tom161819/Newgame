@@ -39,7 +39,7 @@ export function fogEdgeMask({left,top,columns,rows,resolution:R=FOG_EDGE.resolut
   return {alpha,tgt,width:W,height:H,empty:!any};
 }
 
-const LIFT_BLOCK=3,LIFT_ROOM=66;
+const LIFT_ROOM=66;
 export class FogEdgeLayer {
   constructor(scene){
     this.scene=scene;this.key='fog:edge-mask';const size=FOG_EDGE.maxTiles*FOG_EDGE.resolution;const most=Math.max(...FOG_EDGE.levels.map(([max,R])=>Math.min(max,FOG_EDGE.maxTiles**2)*R*R));this.buffers={dist:new Float32Array(most),tgt:new Float32Array(most),alpha:new Float32Array(most)};
@@ -128,12 +128,24 @@ export class FogEdgeLayer {
       // m-teren-vyska (part 2): the ground is lifted, so the mask is laid in blocks of LIFT_BLOCK × LIFT_BLOCK tiles, each
       // moved up by the lift at its middle. Blocks reach one tile into their neighbours and replace what lies under them
       // ('copy' inside their own outline), back to front, so no gap opens and no soft edge is darkened twice.
-      const B=LIFT_BLOCK,tx0=Math.floor(m.left+c.x/k),ty0=Math.floor(m.top+c.y/k),tx1=Math.ceil(m.left+(c.x+c.width)/k),ty1=Math.ceil(m.top+(c.y+c.height)/k),blocks=[];
-      for(let ty=Math.floor(ty0/B)*B;ty<ty1;ty+=B)for(let tx=Math.floor(tx0/B)*B;tx<tx1;tx+=B)blocks.push([tx,ty]);blocks.sort((p,q)=>p[0]+p[1]-q[0]-q[1]);
-      for(const [tx,ty] of blocks){
-        const u0=Math.max(c.x,(tx-1-m.left)*k),v0=Math.max(c.y,(ty-1-m.top)*k),u1=Math.min(c.x+c.width,(tx+B+1-m.left)*k),v1=Math.min(c.y+c.height,(ty+B+1-m.top)*k);if(u1<=u0||v1<=v0)continue;
-        ctx.save();ctx.setTransform(32*z/k,16*z/k,-32*z/k,16*z/k,e-bx,f-by-projectionLift(tx+B/2,ty+B/2)*z);ctx.beginPath();ctx.rect(u0,v0,u1-u0,v1-v0);ctx.clip();ctx.globalCompositeOperation='copy';
-        ctx.drawImage(this.canvas,u0,v0,u1-u0,v1-v0,u0,v0,u1-u0,v1-v0);ctx.restore();}
+      // Owner 14 Nov 2026 ("artefakty na hranici dohledu"): blocks of 3 × 3 tiles took the lift of their middle, so on a
+      // slope the mask sat up to a few pixels off the ground – bright slivers of lit ground and hairlines along the
+      // block seams outside the dark edge. Now every tile that holds some darkness is laid with its own lift: first with
+      // one tile of overlap (closes gaps between tiles lifted differently), then each tile itself over that.
+      const tx0=Math.floor(m.left+c.x/k),ty0=Math.floor(m.top+c.y/k),tx1=Math.ceil(m.left+(c.x+c.width)/k),ty1=Math.ceil(m.top+(c.y+c.height)/k),data=this.pixels.data,CW=this.canvas.width,dark=[];
+      const has=(tx,ty)=>{const u=(tx-m.left)*k,v=(ty-m.top)*k;if(u<0||v<0||u+k>m.W||v+k>m.H)return false;for(let j=0;j<k;j++){let i=((v+j)*CW+u)*4+3;for(let n=0;n<k;n++,i+=4)if(data[i])return true;}return false;};
+      for(let ty=ty0;ty<ty1;ty++)for(let tx=tx0;tx<tx1;tx++)if(has(tx,ty))dark.push([tx,ty]);
+      const order=(p,q)=>p[0]+p[1]-q[0]-q[1]||p[0]-q[0],lay=(tx,ty,reach)=>{
+        const u0=Math.max(c.x,(tx-reach-m.left)*k),v0=Math.max(c.y,(ty-reach-m.top)*k),u1=Math.min(c.x+c.width,(tx+1+reach-m.left)*k),v1=Math.min(c.y+c.height,(ty+1+reach-m.top)*k);if(u1<=u0||v1<=v0)return;
+        ctx.save();ctx.setTransform(32*z/k,16*z/k,-32*z/k,16*z/k,e-bx,f-by-projectionLift(tx+.5,ty+.5)*z);ctx.beginPath();ctx.rect(u0,v0,u1-u0,v1-v0);ctx.clip();
+        // The picture is drawn one mask pixel wider than the clip: its own soft outline must not fall on the clip's edge,
+        // or the two half coverages multiply and leave a lighter hairline along every piece.
+        // 'copy' inside a soft clip first clears with the edge coverage and then draws with it again, which leaves the
+        // edge pixels lighter – a hairline round every piece. Wiping (destination-out) and adding (lighter) with the
+        // same coverage puts back exactly what belongs there.
+        const a0=Math.max(0,u0-1),b0=Math.max(0,v0-1),a1=Math.min(m.W,u1+1),b1=Math.min(m.H,v1+1);ctx.globalCompositeOperation='destination-out';ctx.fillStyle='#000';ctx.fillRect(a0,b0,a1-a0,b1-b0);ctx.globalCompositeOperation='lighter';ctx.drawImage(this.canvas,a0,b0,a1-a0,b1-b0,a0,b0,a1-a0,b1-b0);ctx.restore();};
+      for(const [tx,ty] of dark.sort(order))lay(tx,ty,1);
+      for(const [tx,ty] of dark)lay(tx,ty,.5/k);
     }
     ctx.setTransform(1,0,0,1,0,0);
     this.texture.refresh();this.used=[bw,bh];this.cache={...base,x:ox+bx/z,y:oy+by/z};

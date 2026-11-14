@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.122.1] - 2026-11-14
+<!-- version: {"title":"Sight border: slivers and hairlines on lifted ground","type":"fix","reconstructed":false,"saveVersion":62} -->
+### Fixed
+- Bright slivers and thin lines of lit ground along the sight border on sloping ground are gone.
+
 ## [0.122.0] - 2026-11-14
 <!-- version: {"title":"Walls in eight directions; softer sight border on buildings","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

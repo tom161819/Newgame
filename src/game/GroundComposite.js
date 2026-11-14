@@ -42,24 +42,28 @@ export class GroundComposite {
   // performance-3 (owner 13 Nov 2026: zooming out lags): the cache is no longer redrawn in full every frame of a zoom or
   // for every chunk that comes into view. (1) While the zoom is moving, a cache of a lower resolution is kept (shown
   // stretched for those few frames); zooming out builds the cache once for the view the zoom is heading to. (2) A chunk
-  // that joins the shown ones is drawn alone into the cache; a chunk that left stays as it is (it lies outside the view).
+  // that joins the shown ones is drawn alone into the cache; a chunk that left is wiped where it was.
   sync(camera){
     if(!camera?.worldView)return;
     const z=camera.zoom,view=camera.worldView,pad=GROUND_COMPOSITE.pad,images=this.shown(),s=this.state;
     const target=this.scene.worldCamera?.zoomTarget??z,moving=Math.abs(target-z)>1e-4;
     const inside=s&&s.width===camera.width&&s.height===camera.height&&(s.zoom===z||moving&&s.zoom<z)&&view.x>=s.ox&&view.y>=s.oy&&view.right<=s.ox+s.w/s.zoom&&view.bottom<=s.oy+s.h/s.zoom;
-    const names=new Map(images.map(i=>[`${i.texture.key}@${i.x},${i.y}`,i]));
+    const names=new Map(images.map(i=>{const b=this.bounds(i);return [`${i.texture.key}@${i.x},${i.y}:${b.x},${b.y},${b.width},${b.height}`,i];})),boxes=()=>new Map([...names].map(([name,i])=>[name,{...this.bounds(i)}]));
     if(!inside){
       // Whole world pixels at the cache origin: at zoom 1 the cache pixels are exactly the chunk pixels.
       const w=Math.ceil(camera.width+2*pad),h=Math.ceil(camera.height+2*pad),cz=moving?Math.min(z,target):z,mx=view.x+view.width/2,my=view.y+view.height/2;
       if(this.canvas.width!==w||this.canvas.height!==h){this.texture.setSize(w,h);this.image.setSizeToFrame();}else this.context.clearRect(0,0,w,h);
-      this.state={zoom:cz,width:camera.width,height:camera.height,ox:Math.floor(mx-w/2/cz),oy:Math.floor(my-h/2/cz),w,h,names:new Set(names.keys())};
+      this.state={zoom:cz,width:camera.width,height:camera.height,ox:Math.floor(mx-w/2/cz),oy:Math.floor(my-h/2/cz),w,h,names:boxes()};
       this.draw(images);this.touched.clear();this.stats.full++;
       this.image.setPosition(this.state.ox,this.state.oy).setScale(1/cz).setVisible(images.length>0);
     }else{
       let drawn=false;
+      // A chunk that left the shown ones, or changed its place or size (a fresh sight border has a smaller picture), is
+      // wiped where it was: 0.118.0 left it standing, which showed as bright slivers of ground past the sight border
+      // (owner 14 Nov 2026).
+      for(const [name,box] of s.names)if(!names.has(name)){this.draw(images,box);drawn=true;}
       for(const [name,image] of names)if(!s.names.has(name)){this.draw(images,this.bounds(image));this.touched.delete(this.keyOf(image));drawn=true;}
-      s.names=new Set(names.keys());
+      s.names=boxes();
       for(const [key,rects] of this.touched){const image=this.terrain.chunks.get(key);if(!image?.visible)continue;drawn=true;if(rects)for(const r of rects)this.draw(images,r);else this.draw(images,this.bounds(image));}
       this.touched.clear();if(!drawn)return;this.stats.partial++;this.image.setVisible(images.length>0);
     }

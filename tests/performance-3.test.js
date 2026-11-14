@@ -20,6 +20,8 @@ test('performance-3: the ground cache draws a newly shown chunk alone and surviv
   c.sync(camera(1));assert.deepEqual(c.stats,{full:1,partial:0});
   chunks.set('1,0',b);calls.length=0;c.sync(camera(1));assert.deepEqual(c.stats,{full:1,partial:1},'a chunk that joined is drawn alone');assert.ok(calls.length>=1&&calls.length<=2);
   c.sync(camera(1));assert.deepEqual(c.stats,{full:1,partial:1},'nothing changed: nothing drawn');
+  // A chunk that left (or shrank) is wiped where it stood.
+  const cleared=[];context.clearRect=(...r)=>cleared.push(r);chunks.delete('1,0');scene.children.list=[a];c.sync(camera(1));assert.deepEqual(cleared,[[640,0,640,320]],'the old place of the chunk is cleared');assert.equal(c.stats.partial,2);scene.children.list=[a,b];chunks.set('1,0',b);c.sync(camera(1));
   // Zooming out: one cache for the view the zoom is heading to, kept while the zoom moves and when it arrives.
   scene.worldCamera.zoomTarget=.5;c.sync(camera(.9,-40,-30));assert.equal(c.stats.full,2);assert.equal(c.state.zoom,.5);assert.equal(c.image.scale,2);
   c.sync(camera(.7,-170,-130));c.sync(camera(.5,-400,-300));assert.equal(c.stats.full,2,'no full redraw on the way out');
