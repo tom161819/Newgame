@@ -49,6 +49,8 @@ export const draftScale=zoom=>DRAFT_VIEW.find(d=>zoom<=d.zoom)?.scale??1;
 export const draftStale=(scale,zoom)=>!!scale&&zoom>(DRAFT_VIEW.find(d=>d.scale===scale)?.until??0);
 const FIRST_PAINT_MS = 12;
 const BACKLOG_CHUNKS = 6, BACKLOG_SLICE_MS = 10, BACKLOG_EVERY_MS = 30;
+// owner 15 Nov: a season step is blended ahead SEASON_PREP.sliceMs a frame, at most maxMs before it is shown anyway.
+const SEASON_PREP = Object.freeze({ sliceMs: 8, maxMs: 3000, pool: 96 });
 const GROUND_BAND = 36; // rows of ground a frame in a paint spread over frames (a multiple of GROUND_STEP)
 // m-teren-vyska (part 2): room above a chunk's picture for its highest ground (px).
 const LIFT_PAD = Math.ceil(HEIGHT_MAX * HEIGHT_UNIT_PX) + 2;
@@ -298,9 +300,48 @@ export class TerrainRenderer {
   // performance-2: returns null while a whole-chunk paint is still under way (see `plain`): the chunk keeps its previous
   // picture and comes back next frame.
   groundPicture(ck,cx,cy,left,top,texture,occupied,stamp,cached){const result=this.groundPictureStep(ck,cx,cy,left,top,texture,occupied,stamp,cached);if(result)this.pathChanges?.delete(ck);return result;}
+  // The ground stamp of a chunk for a season look key: look, buildings on it, path state.
+  groundStampFor(cx,cy,lookKey){
+    let occ='';for(const b of this.scene.buildings??[])for(const t of b.tiles??[])if(Math.floor(t.x/CHUNK_SIZE)===cx&&Math.floor(t.y/CHUNK_SIZE)===cy)occ+=`${t.x},${t.y};`;
+    return`${lookKey}|${occ}|${this.pathRevAll??0}.${this.pathRev?.get(`${cx},${cy}`)??0}|${this.v2?.geo&&this.pathStyle==='v2'?1:0}`;
+  }
+  // owner 15 Nov ("někde je stále ostrá hrana"): the next step of a gradual season change is blended ahead for every
+  // chunk in view, a time slice a frame, while the screen keeps the previous step; then SeasonTransition commits it and
+  // all chunks take it in one frame (a few tenths of a ms each). Chunks whose season layers are not ready are skipped
+  // and repaint the old way after the commit. `job` = {look(cx,cy,season,size), commit()} or null.
+  prepareSeasonStep(job){
+    if(!job){this.seasonPrep=null;return;}
+    this.seasonPrep={...job,since:this.seasonPrep?.since??performance.now()};
+  }
+  recycleGround(ck,canvas){
+    if(!canvas)return;const own=this.seasonLayers?.get(ck);if(own&&Object.values(own).some(layer=>layer.canvas===canvas))return;
+    for(const job of this.groundJobs?.values()??[])if(job.canvas===canvas)return;
+    const pool=this.groundPool??=[];if(pool.length<SEASON_PREP.pool&&!pool.includes(canvas))pool.push(canvas);
+  }
+  prepareSeasonWork(){
+    const job=this.seasonPrep;if(!job)return;
+    const t0=performance.now(),prepared=this.preparedGround??=new Map();let done=true;
+    for(const ck of this.neededChunks??[]){
+      if(!this.chunks.has(ck))continue;const [cx,cy]=ck.split(',').map(Number),look=job.look(cx,cy,this.season,CHUNK_SIZE),stamp=this.groundStampFor(cx,cy,look.key),cached=this.groundCache?.get(ck);
+      if(cached?.stamp===stamp)continue;const have=prepared.get(ck);if(have?.stamp===stamp)continue;
+      if(performance.now()-t0>SEASON_PREP.sliceMs){done=false;break;}
+      const result=this.prepareGround(ck,cx,cy,look,stamp);prepared.set(ck,{stamp,result});
+    }
+    if(done||performance.now()-job.since>SEASON_PREP.maxMs){this.seasonPrep=null;job.commit();}
+  }
+  // The ground picture of one chunk for a look, into a canvas of its own, only from season layers already painted
+  // (cheap). Null when a layer would need a full paint.
+  prepareGround(ck,cx,cy,look,stamp){
+    const own=this.seasonLayers?.get(ck),rest=stamp.slice(stamp.indexOf('|')),ready=season=>{const layer=own?.[season];return!!layer&&layer.stamp===`${season}${rest}`&&!draftStale(layer.canvas?.draft,this.viewZoom??1);};
+    if(!(look.blend?ready(look.from)&&ready(look.to):ready(look.key)))return null;
+    if(!look.blend)return{canvas:own[look.key].canvas,stamp,sig:own[look.key].sig};
+    const origin=gridToWorld(cx*CHUNK_SIZE,cy*CHUNK_SIZE),left=origin.x-CHUNK_SIZE*32,size={width:CHUNK_SIZE*64,height:CHUNK_SIZE*32};
+    const out=this.groundPool?.pop()??document.createElement('canvas');
+    return this.groundPictureStep(ck,cx,cy,left,origin.y,size,this.buildingTiles(),stamp,null,{look,out});
+  }
   groundJobActive(ck){if(this.groundJobs?.size)for(const key of this.groundJobs.keys())if(key.startsWith(`${ck}|`))return true;return false;}
-  groundPictureStep(ck,cx,cy,left,top,texture,occupied,stamp,cached){
-    const look=this.groundLook(cx,cy),rest=stamp.slice(stamp.indexOf('|')),layers=this.seasonLayers??=new Map(),own=layers.get(ck)??{};
+  groundPictureStep(ck,cx,cy,left,top,texture,occupied,stamp,cached,options={}){
+    const look=options.look??this.groundLook(cx,cy),rest=stamp.slice(stamp.indexOf('|')),layers=this.seasonLayers??=new Map(),own=layers.get(ck)??{};
     const fresh=()=>{const c=document.createElement('canvas');c.width=texture.width;c.height=texture.height;return c;};
     const change=this.pathChange(ck,cx,cy,left,top,stamp,cached),sig=change.sig,progressive=!!cached&&this.groundPaintsLeft!==Infinity;
     const count=()=>{this.paintStats.groundPaints=(this.paintStats.groundPaints??0)+1;};
@@ -339,7 +380,7 @@ export class TerrainRenderer {
     // Memory: two layers (~0.8 MB each) per chunk; chunks in view always keep theirs, of the others only the most
     // recently blended ones up to SEASON_TRANSITION.layerChunks in all.
     if(layers.size>SEASON_TRANSITION.layerChunks){const view=this.neededChunks instanceof Set?this.neededChunks:new Set(this.neededChunks??[]);for(const key of [...layers.keys()]){if(layers.size<=SEASON_TRANSITION.layerChunks)break;if(!view.has(key)&&key!==ck)layers.delete(key);}}
-    const canvas=cached?.canvas&&cached.canvas!==a&&cached.canvas!==b?cached.canvas:fresh(),c=canvas.getContext('2d'),W=texture.width,H=texture.height;
+    const canvas=options.out??(cached?.canvas&&cached.canvas!==a&&cached.canvas!==b?cached.canvas:fresh()),c=canvas.getContext('2d'),W=texture.width,H=texture.height;
     // The new season through the mask (alpha = blend weight on a coarse grid, smoothed up), over the old one.
     const step=8,gw=Math.ceil(W/step)+1,gh=Math.ceil(H/step)+1,mask=this.maskCanvas??=document.createElement('canvas');mask.width=gw;mask.height=gh;
     const m=mask.getContext('2d'),image=m.createImageData(gw,gh);blendMask(image.data,gw,gh,(px,py)=>{const g=worldToGrid(px*step+left,py*step+top);return[g.x,g.y];},look.blend.weight);m.putImageData(image,0,0);
@@ -732,8 +773,11 @@ export class TerrainRenderer {
       if(continuous){
         // A season change or a new building repaints the ground of one chunk per frame (about 50 ms each); the others
         // keep their old picture (and stay dirty) until their turn, so the change rolls over the view without a freeze.
-        let occ='';for(const b of this.scene.buildings??[])for(const t of b.tiles??[])if(Math.floor(t.x/CHUNK_SIZE)===cx&&Math.floor(t.y/CHUNK_SIZE)===cy)occ+=`${t.x},${t.y};`;
-        groundStamp=`${this.groundLook(cx,cy).key}|${occ}|${this.pathRevAll??0}.${this.pathRev?.get(`${cx},${cy}`)??0}|${this.v2?.geo&&this.pathStyle==='v2'?1:0}`;const cached=this.groundCache?.get(`${cx},${cy}`);
+        groundStamp=this.groundStampFor(cx,cy,this.groundLook(cx,cy).key);let cached=this.groundCache?.get(`${cx},${cy}`);
+        // A season step prepared ahead (prepareSeasonStep) is taken over without painting.
+        const prepared=this.preparedGround?.get(`${cx},${cy}`);
+        if(prepared?.result&&prepared.stamp===groundStamp&&cached&&cached.stamp!==groundStamp){this.preparedGround.delete(`${cx},${cy}`);this.recycleGround(`${cx},${cy}`,cached.canvas);
+          cached={...prepared.result};cached.rev=this.groundRev=(this.groundRev??0)+1;this.groundCache.set(`${cx},${cy}`,cached);this.paintStats.groundPrepared=(this.paintStats.groundPrepared??0)+1;}
         // performance-1: a change of the trodden paths alone (25 walking residents) repaints one chunk's ground (~40 ms
         // without GPU) at most every GROUND_PATH_GAP_MS; seasons and buildings keep the one-a-frame rule.
         let pathOnly=!!cached&&pathOnlyChange(cached.stamp,groundStamp);
@@ -1070,6 +1114,7 @@ export class TerrainRenderer {
   // Performance: a newly visible chunk is painted at once (never a hole); already shown chunks that became dirty
   // (fog, path wear, pavement, season) repaint at most two per frame, so a wave of changes never freezes a frame.
   repaintDirty(){
+    if(!this.repaintAll)this.prepareSeasonWork();
     this.groundPaintsLeft=this.repaintAll&&!this.chunks.size?Infinity:1;let budget=this.repaintAll?Infinity:2;const all=this.repaintAll,urgent=this.urgentChunks;this.repaintAll=false;
     // performance-1: shown dirty chunks (mostly Fog of War edges moving with 25 residents) take turns, least recently
     // painted first: REPAINT_PER_FRAME (continuous ground) or two a frame. Before, the first eight in view order took

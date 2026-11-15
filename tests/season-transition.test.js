@@ -12,7 +12,7 @@ const move = (s, season, day) => { const t = at(season, day); s.cycleDay = t.cyc
 const at = (season, day) => seasons(SEASON_DAYS * season + 1 + Math.floor(day), (day - Math.floor(day)) * DAY); // season 0 = first spring
 
 test('the transition runs over 3 game days around the season boundary, never into the first season or with Seasons OFF', () => {
-  assert.equal(DAYS, 3); assert.equal(transitionDays(), 3); assert.ok(transitionSteps() >= 8 && transitionSteps() <= 10);
+  assert.equal(DAYS, 3); assert.equal(transitionDays(), 3); assert.ok(transitionSteps() >= 20 && transitionSteps() <= 28);
   assert.equal(transitionState(seasons(1)), null, 'a new game starts in plain spring');
   assert.equal(transitionState(seasons(3)), null, 'the middle of a season is plain');
   assert.deepEqual(transitionState(at(0, SEASON_DAYS - HALF)), { from: 'Spring', to: 'Summer', progress: 0 }, 'starts HALF days before the boundary');
@@ -95,4 +95,27 @@ test('an explicit complete transition flush relays immediate painting, while a n
  const calls=[],transition=new SeasonTransition({}, {seasons:at(2,0),terrain:{invalidateChunksOf(tiles,options){calls.push({tiles:tiles.length,...options});}}});
  transition.update();transition.flush();assert.equal(calls.at(-1).immediate,false);assert.equal(calls.at(-1).tiles,SEASON_TRANSITION.chunksPerFrame);
  transition.flush(Infinity);assert.equal(calls.at(-1).immediate,true);assert.ok(calls.at(-1).tiles>SEASON_TRANSITION.chunksPerFrame);
+});
+
+// owner 15 Nov ("někde je stále ostrá hrana"): a further step of a change in play is held until the renderer has it
+// prepared for the whole view, then every chunk takes it at once.
+test('a season step is held until the renderer commits it, then shown everywhere at once', () => {
+  const s = at(1, SEASON_DAYS - HALF + 0.2), jobs = [], invalidated = [];
+  const terrain = { prepareSeasonStep(job) { jobs.push(job); }, invalidateChunksOf(tiles, options) { invalidated.push({ tiles: tiles.length, ...options }); } };
+  const transition = new SeasonTransition({}, { seasons: s, terrain, trees: () => [], paused: () => false });
+  transition.update();const first = transition.state();
+  assert.ok(first && first.from === 'Summer' && first.to === 'Autumn');
+  // Next step: the shown state stays, the renderer gets a job with the new look.
+  s.cycleElapsed += DAY * DAYS / transitionSteps();
+  assert.equal(transition.update(), false);
+  assert.equal(transition.state().step, first.step, 'the shown step is held');
+  const job = jobs.filter(Boolean).at(-1);assert.ok(job, 'the renderer was asked to prepare');
+  assert.match(job.look(3, 3, 'Summer', 10).key ?? '', /Summer|Autumn/);
+  const before = invalidated.length;job.commit();
+  assert.equal(transition.state().step, first.step + 1, 'the new step is shown after the commit');
+  assert.ok(invalidated.slice(before).some(call => call.immediate), 'the chunks repaint at once');
+  // Paused (menus, tests): no hold.
+  const paused = new SeasonTransition({}, { seasons: s, terrain, trees: () => [], paused: () => true });
+  paused.update();s.cycleElapsed += DAY * DAYS / transitionSteps();paused.update();
+  assert.equal(paused.state().step, transition.liveState().step);
 });

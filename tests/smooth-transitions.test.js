@@ -66,7 +66,7 @@ test('the ground of a chunk mid-change is the new season over the old one throug
 
 test('Dev tool: season change length and steps, with their defaults and ranges', () => {
   assert.deepEqual(DEV_LOOK_KEYS, ['seasonDays', 'seasonSteps']);
-  assert.equal(devDefault('seasonDays'), 3); assert.equal(devDefault('seasonSteps'), 9); assert.deepEqual({ ...devRange('seasonDays') }, { min: 1, max: 5, step: 0.5 });
+  assert.equal(devDefault('seasonDays'), 3); assert.equal(devDefault('seasonSteps'), 24); assert.deepEqual({ ...devRange('seasonDays') }, { min: 1, max: 5, step: 0.5 });
   setDevFactor('seasonDays', 2); setDevFactor('seasonSteps', 12); assert.equal(transitionDays(), 2); assert.equal(transitionSteps(), 12); assert.equal(devFactor('seasonDays'), 2);
-  resetDevBalance(); assert.equal(transitionDays(), 3); assert.equal(transitionSteps(), 9);
+  resetDevBalance(); assert.equal(transitionDays(), 3); assert.equal(transitionSteps(), 24);
 });

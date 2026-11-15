@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.138.1] - 2026-11-15
+<!-- version: {"title":"Season change without hard edges","type":"fix","reconstructed":false,"saveVersion":62} -->
+### Fixed
+- Season change: the ground no longer shows hard square edges between parts of the view. The next step is prepared for the whole view first and then shown everywhere at once. The change also moves in smaller steps (24 instead of 9).
+
 ## [0.138.0] - 2026-11-15
 <!-- version: {"title":"Spruces in four seasons","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

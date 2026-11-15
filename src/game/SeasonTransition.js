@@ -94,7 +94,11 @@ export class SeasonTransition{
   }
   destroy(){this.unsubscribe?.();this.unsubscribe=null;}
   // Progress is stepped, so places repaint a handful of times (SEASON_TRANSITION.steps), not every frame.
-  state(){
+  // owner 15 Nov ("někde je stále ostrá hrana"): the shown step. While the renderer prepares the next step of the
+  // ground for every chunk in view (prepareSeasonStep), the picture holds the previous step and then changes everywhere
+  // in one frame; before, chunks took the new step one by one over seconds and neighbours showed hard edges.
+  state(){return this.held??this.liveState();}
+  liveState(){
     const state=transitionState(this.seasons);if(!state)return null;
     const steps=transitionSteps(),step=Math.floor(state.progress*steps);
     return{...state,step,steps,progress:step/steps};
@@ -138,8 +142,7 @@ export class SeasonTransition{
   }
   // The continuous ground of one 10 × 10 chunk (TerrainRenderer): {key: season} while the whole chunk shows one season,
   // else the step key with from, to and blend.weight (the mask). Start bounds per chunk are sampled once per change.
-  groundLook(cx,cy,season,size=10){
-    const state=this.state();if(!state||(season!==state.to&&season!==state.from))return{key:season};
+  groundLook(cx,cy,season,size=10,state=this.state()){if(!state||(season!==state.to&&season!==state.from))return{key:season};
     const ck=`${cx},${cy}:${state.to}`;let range=this.chunkRange.get(ck);
     if(!range){let lo=Infinity,hi=-Infinity;for(let y=-1;y<=size+1;y++)for(let x=-1;x<=size+1;x++){const fx=cx*size+x,fy=cy*size+y,v=transitionStart(fx,fy,state.to,this.bias(fx,fy,state.to));if(v<lo)lo=v;if(v>hi)hi=v;}
       range=[lo-.12,hi+.12];this.chunkRange.set(ck,range);}
@@ -150,8 +153,23 @@ export class SeasonTransition{
   }
   // Once per progress step: queue the 10 × 10 chunks whose tiles changed blend level and update trees.
   update(){
-    const state=this.state(),key=state?`${state.from}>${state.to}:${state.step}/${state.steps}`:'none';
-    if(key===this.key)return false;
+    const live=this.liveState(),key=live?`${live.from}>${live.to}:${live.step}/${live.steps}`:'none';
+    if(key===this.key){if(this.held)this.commit();return false;}
+    if(key===this.targetKey)return false;
+    // A further step of the same change while playing: hold the shown step until the renderer has the new one ready.
+    const shown=this.held??this.shown,prepare=this.terrain?.prepareSeasonStep;
+    if(live&&shown&&shown.from===live.from&&shown.to===live.to&&typeof prepare==='function'&&!this.paused()){
+      this.held=shown;this.targetKey=key;
+      prepare.call(this.terrain,{look:(cx,cy,season,size)=>this.groundLook(cx,cy,season,size,live),commit:()=>this.commit()});
+      return false;
+    }
+    return this.commit();
+  }
+  // The new step goes on screen: tiles, chunks and trees take it, the chunks in view all in the next frame.
+  commit(){
+    const held=!!this.held;this.held=null;this.targetKey=null;this.terrain?.prepareSeasonStep?.(null);
+    const state=this.liveState(),key=state?`${state.from}>${state.to}:${state.step}/${state.steps}`:'none';
+    this.shown=state;if(key===this.key)return false;
     this.key=key;const changed=[],levels=SEASON_TRANSITION.levels;
     for(let y=0;y<ROWS;y++)for(let x=0;x<COLUMNS;x++){
       const index=y*COLUMNS+x,level=state?Math.round(this.weight(x+.5,y+.5,state)*levels):levels;
@@ -163,6 +181,7 @@ export class SeasonTransition{
     const looks=this.chunkLooks??=new Map();
     for(let cy=0;cy<ROWS/10;cy++)for(let cx=0;cx<COLUMNS/10;cx++){const key=`${cx},${cy}`,look=state?this.groundLook(cx,cy,state.to).key:'none';if(looks.get(key)!==look){looks.set(key,look);if(!this.pending.has(key))this.pending.set(key,{x:cx*10,y:cy*10});}}
     for(const object of this.trees())this.view(object)?.applySeason?.();
+    if(held)this.flush(Infinity);
     return true;
   }
   // Repaint queued chunks: a few per frame while playing, all at once when asked. A
