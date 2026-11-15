@@ -147,3 +147,14 @@ test('Fountain (owner 14 Nov 2026): 2×2, houses within 8 tiles +2, may stand on
   assert.equal(c.decorBonus(near).fountain,2);assert.equal(c.decorBonus(far).fountain,0);
   const all=c.surroundings(near,s.needs.homes());assert.equal(all.fountain,2);assert.ok(all.total<=8);
 });
+test('náves 4 × 4: the render is an art sprite of the export; nobody plays on the tree, bell or board tile; older greens stay 3 × 3',async()=>{
+  const {readFileSync}=await import('node:fs'),{VILLAGE_GREEN}=await import('../src/data/children.js'),{legacyDefinition}=await import('../src/game/buildings.js');
+  const {s,c,place}=world(),d=s.objectRegistry.require('village_green'),art=d.artSprites.render,meta=JSON.parse(readFileSync(new URL(`../${art.artSource}`,import.meta.url)));
+  assert.equal(d.width,4);assert.equal(d.height,4);assert.deepEqual(d.legacyFootprint,{width:3,height:3});assert.equal(d.renderer,'village_green');assert.equal(d.walkable,true);
+  assert.deepEqual(art.origin,meta.baseOrigin);assert.equal(VILLAGE_GREEN.art.height,meta.height);assert.deepEqual(meta.footprint,{width:4,height:4});
+  assert.ok(readFileSync(new URL(`../public${art.sprite}`,import.meta.url)).equals(readFileSync(new URL('../art/sprites/village-green/village-green-render-0.v1.png',import.meta.url))));
+  for(const part of VILLAGE_GREEN.art.parts)for(const [x,y]of part.polygon)assert.ok(x>=0&&x<=meta.width&&y>=0&&y<=meta.height,part.id);
+  place('house',38,38);const green=place('village_green',44,44),tiles=c.greenTiles(green);assert.equal(green.tiles.length,16);assert.equal(tiles.length,13);
+  for(const part of VILLAGE_GREEN.art.parts)assert.ok(!tiles.some(t=>t.x===44+part.tile.x&&t.y===44+part.tile.y),part.id);
+  assert.equal(legacyDefinition(d).width,3);
+});

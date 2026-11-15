@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import { gridToWorld,tileCenter } from './isometric.js';
 import { buildingDefinition,towerBase } from './buildings.js';
 import { VILLAGE_GREEN } from '../data/children.js';
+import { cutoutKey } from '../render/artCutout.js';
+import { seasonTextureKey } from '../render/treeSeasonTexture.js';
 
 // Children and the Village Green D1: provisional drawing of the green (grass square, worn play patch, linden tree with a
 // swing, bench) until the Studio art (plan g-deti-naves-grafika) is approved. The ground lies under people like a
@@ -10,16 +12,31 @@ import { VILLAGE_GREEN } from '../data/children.js';
 export class VillageGreenView {
   constructor(scene,building,preview=false){
     this.scene=scene;this.preview=preview;this.floor=scene.add.image(0,0,'__WHITE');this.tree=scene.add.image(0,0,'__WHITE').setOrigin(.5,1);this.bench=scene.add.image(0,0,'__WHITE').setOrigin(.5,1);
-    this.range=scene.add.graphics().setVisible(false);this.alpha=preview?.6:1;this.rangeOn=preview;this.season=scene.seasons?.season??'Summer';this.paint(building);
+    this.parts=[];this.range=scene.add.graphics().setVisible(false);this.alpha=preview?.6:1;this.rangeOn=preview;this.season=scene.seasons?.season??'Summer';this.paint(building);
   }
   paint(building,tint=null){
     this.building=building;this.definition=buildingDefinition(building);this.base=towerBase(building);this.tint=tint;const d=this.definition,b=building;
     const back=gridToWorld(b.x,b.y);this.floor.setTexture(this.floorTexture(tint)).setOrigin(d.height/(d.width+d.height),0).setPosition(back.x,back.y).setDepth(this.preview?10000:-89);
+    if(this.paintArt(tint))return;
+    for(const part of this.parts)part.setVisible(false);this.tree.setVisible(true);this.bench.setVisible(true);this.artMode=false;
     const treeAt=tileCenter({x:b.x+1,y:b.y}),benchAt=tileCenter({x:b.x+2,y:b.y+1});
     this.tree.setTexture(this.treeTexture(tint)).setPosition(treeAt.x,treeAt.y+6).setDepth(this.preview?10001:treeAt.y+.2);
     this.bench.setTexture(this.benchTexture(tint)).setPosition(benchAt.x,benchAt.y+4).setDepth(this.preview?10001:benchAt.y+.1);
     this.hitArea=new Phaser.Geom.Polygon([gridToWorld(b.x,b.y),gridToWorld(b.x+d.width,b.y),gridToWorld(b.x+d.width,b.y+d.height),gridToWorld(b.x,b.y+d.height)]);
     this.drawRange();this.setAlpha(this.alpha);
+  }
+  // Owner 15 Nov 2026: a green of the new size shows the approved render. The whole picture lies on the ground (people
+  // walk over it); the tree, the bell and the board are drawn again as cut-outs at the depth of their foot, so a person
+  // behind them is hidden and one in front is not. Leaves follow spring and autumn like the oaks.
+  paintArt(tint){
+    const d=this.definition,art=d.artSprites?.render,A=VILLAGE_GREEN.art,assets=this.scene.assets;
+    if(!art||d.width!==A.size||!assets?.hasTexture?.(d.id,'art-render'))return false;
+    const key=seasonTextureKey(this.scene,assets.key(d.id,'art-render'),this.season,0),place=o=>{o.setOrigin(art.origin.x,art.origin.y).setPosition(this.base.x,this.base.y);if(tint!=null)o.setTint(tint);else o.clearTint();return o;};
+    place(this.floor.setTexture(key)).setDepth(this.preview?10000:-89);this.tree.setVisible(false);this.bench.setVisible(false);
+    A.parts.forEach((part,i)=>{const cut=cutoutKey(this.scene,key,part.id,part.polygon);if(!cut)return;
+      const image=this.parts[i]??=this.scene.add.image(0,0,cut);place(image.setTexture(cut)).setVisible(true).setDepth(this.preview?10001:this.base.y-(A.height*art.origin.y-part.foot));});
+    this.hitArea=new Phaser.Geom.Polygon([gridToWorld(this.building.x,this.building.y),gridToWorld(this.building.x+d.width,this.building.y),gridToWorld(this.building.x+d.width,this.building.y+d.height),gridToWorld(this.building.x,this.building.y+d.height)]);
+    this.artMode=true;this.drawRange();this.setAlpha(this.alpha);return true;
   }
   floorTexture(tint){
     const d=this.definition,key=`village-green:floor:${this.season}:${tint??'n'}`;
@@ -63,9 +80,10 @@ export class VillageGreenView {
   }
   showRange(on){this.rangeOn=!!on;this.drawRange();return this;}
   setSeason(season){if(season===this.season)return;this.season=season;this.paint(this.building,this.tint);}
-  contains(x,y){return Phaser.Geom.Polygon.Contains(this.hitArea,x,y)||Math.abs(x-this.tree.x)<24&&y<=this.tree.y&&y>=this.tree.y-90;}
+  contains(x,y){return Phaser.Geom.Polygon.Contains(this.hitArea,x,y)||(this.artMode?Math.abs(x-(this.base.x-6))<45&&y<=this.base.y-95&&y>=this.base.y-195:Math.abs(x-this.tree.x)<24&&y<=this.tree.y&&y>=this.tree.y-90);}
   inView(view){const w=(this.definition.width+this.definition.height)*32;return this.base.x+w>=view.x&&this.base.x-w<=view.right&&this.base.y+10>=view.y&&this.base.y-this.definition.visualHeight-60<=view.bottom;}
-  setAlpha(value){this.alpha=value;for(const o of [this.floor,this.tree,this.bench])o.setAlpha(value);return this;}
-  setVisible(value){for(const o of [this.floor,this.tree,this.bench])o.setVisible(value);if(!value)this.range.setVisible(false);else this.drawRange();return this;}
-  destroy(){for(const o of [this.floor,this.tree,this.bench,this.range])o.destroy();}
+  layers(){return this.artMode?[this.floor,...this.parts]:[this.floor,this.tree,this.bench];}
+  setAlpha(value){this.alpha=value;for(const o of this.layers())o.setAlpha(value);return this;}
+  setVisible(value){for(const o of this.layers())o.setVisible(value);if(!value)this.range.setVisible(false);else this.drawRange();return this;}
+  destroy(){for(const o of [this.floor,this.tree,this.bench,this.range,...this.parts])o.destroy();}
 }

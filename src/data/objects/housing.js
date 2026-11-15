@@ -10,10 +10,14 @@ export const housingBuildings=[
 // Children and the Village Green D1: a 3×3 grass square in the middle of the houses. People walk across it (it is not
 // a path and nothing can be built on it). Houses within 10 tiles get +4 happiness, family houses +2 more; children
 // play there and a few residents sit there in the evening. Provisional drawing until the Studio art is approved.
-housingBuildings.push({id:'village_green',name:'Village Green',width:3,height:3,cost:{wood:6},constructionTime:15000,visualHeight:70,buildable:true,
+// Owner 15 Nov 2026: the approved render is a paved square on 4 × 4 with a tree, a bell and a notice board; greens of
+// older saves stay 3 × 3 with the earlier drawing. The picture is an art sprite (not APPROVED_BUILDING_ART), because the
+// green keeps its own view: ground under people, tall parts sorted among them, reach circle.
+housingBuildings.push({id:'village_green',name:'Village Green',width:4,height:4,legacyFootprint:{width:3,height:3},cost:{wood:6},constructionTime:15000,visualHeight:195,buildable:true,
+  artSprites:{render:{sprite:'/assets/buildings/village_green/village-green-render-0.v1.png',artSource:'art/sprites/village-green/village-green-render-0.v1.json',origin:{"x":0.49805,"y":0.98485}}},
   requiresCompletedBuildings:['house'],unlockDescription:'Requires a completed House before placing a Village Green.',
   villageGreen:{range:VILLAGE_GREEN.range,happiness:VILLAGE_GREEN.happiness,familyBonus:VILLAGE_GREEN.familyBonus},
-  description:`A grass square with a linden tree where children play and neighbours meet in the evening. Houses within ${VILLAGE_GREEN.range} tiles: +${VILLAGE_GREEN.happiness} happiness, family houses +${VILLAGE_GREEN.familyBonus} more.`,
+  description:`A paved square with an old tree, a bell and a notice board where children play and neighbours meet in the evening. Houses within ${VILLAGE_GREEN.range} tiles: +${VILLAGE_GREEN.happiness} happiness, family houses +${VILLAGE_GREEN.familyBonus} more.`,
   category:'building',buildingCategory:'housing',sprite:'/assets/buildings/village_green/village_green.svg',walkable:true,collectible:false,interactions:[],
   renderMode:'procedural',renderer:'village_green',origin:{x:.5,y:.9},depth:{offset:0}});
 // Children and the Village Green D2: decorations by the houses (1×1, Housing menu). Provisional drawings until the

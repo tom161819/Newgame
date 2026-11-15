@@ -91,7 +91,7 @@ export default {
   'object.haystack.name':"Haystack",'object.haystack.description':"A stack of hay by a farm (within 6 tiles of a Farmhouse or Wheat Field). Children jump into it.",
   'object.fountain.name':"Fountain",'object.fountain.description':"A stone fountain. Houses within 8 tiles: +2 happiness; its water helps to fight fires.",
   'object.well.name':"Well",'object.well.description':"A stone well. Houses within 6 tiles: +1 happiness.",
-  'object.village_green.name':"Village Green",'object.village_green.description':"A grass square with a linden tree where children play and neighbours meet in the evening. Houses within 10 tiles: +4 happiness, family houses +2 more.",'object.village_green.unlock':"Requires a completed House before placing a Village Green.",
+  'object.village_green.name':"Village Green",'object.village_green.description':"A paved square with an old tree, a bell and a notice board where children play and neighbours meet in the evening. Houses within 10 tiles: +4 happiness, family houses +2 more.",'object.village_green.unlock':"Requires a completed House before placing a Village Green.",
   'object.marketplace.name':'Marketplace','object.marketplace.description':'A market square with stalls where merchant caravans will trade. Goods space for 80 units and 2 loading spots.',
   'object.gate.name':'Gate','object.gate.description':'A 2 × 2 gate in the wall: people pass through it, and from the walls beside it you climb up to the wall walk.','object.wall_gate.name':'Gate (old 1 × 1)','object.wall_gate.description':'A gate in the wall: people pass through it, and from it you climb up to the wall walk.',
 };

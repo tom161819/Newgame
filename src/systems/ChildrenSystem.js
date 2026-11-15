@@ -161,7 +161,7 @@ export class ChildrenSystem {
     this.snowmen.push({id:`snowman-${++this.seq}`,x:a.center.x+.5,y:a.center.y+.5,variant:this.seq%2});this.changed();
   }
   meltSnowmen(){if(this.snowmen.length&&this.scene.seasons?.season!=='Winter'){this.snowmen=[];this.changed();}}
-  greenTiles(green){const d=buildingDefinition(green),out=[];for(let y=green.y;y<green.y+d.height;y++)for(let x=green.x;x<green.x+d.width;x++)if(this.scene.map[y]?.[x]===0)out.push({x,y});return out.length?out:[{x:green.x,y:green.y}];}
+  greenTiles(green){const d=buildingDefinition(green),out=[],taken=d.width===VILLAGE_GREEN.art.size?VILLAGE_GREEN.art.parts.map(p=>p.tile):[];for(let y=green.y;y<green.y+d.height;y++)for(let x=green.x;x<green.x+d.width;x++)if(this.scene.map[y]?.[x]===0&&!taken.some(t=>t.x===x-green.x&&t.y===y-green.y))out.push({x,y});return out.length?out:[{x:green.x,y:green.y}];}
   spotNear(c,radius,house){
     const map=this.scene.map;for(let i=0;i<30;i++){const a=this.random()*Math.PI*2,r=1.5+this.random()*(radius-1.5),x=Math.floor(c.x+Math.cos(a)*r),y=Math.floor(c.y+Math.sin(a)*r);
       if(map[y]?.[x]===0&&!this.inside(house,x,y))return {x,y};}

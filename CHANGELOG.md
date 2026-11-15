@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.132.0] - 2026-11-15
+<!-- version: {"title":"Village Green on 4 × 4 with the new picture","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- The Village Green has its new picture: a paved square on 4 × 4 with an old tree and a bench, a bell and a notice board. People walk across it and pass behind the tree, the bell and the board. Greens built earlier stay 3 × 3 with the old drawing.
+
 ## [0.131.0] - 2026-11-15
 <!-- version: {"title":"New oaks and the new Hunting Lodge","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

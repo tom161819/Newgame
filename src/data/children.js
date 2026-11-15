@@ -47,6 +47,13 @@ export const VILLAGE_GREEN=Object.freeze({
   range:10,happiness:4,familyBonus:2,
   // Evening: in the first part of rest time a few residents living in range sit on the green, then go home.
   eveningSeats:4,eveningFraction:.45,
+  // Owner 15 Nov 2026: the approved render (4 × 4). `parts` are its tall things in picture pixels (polygon, the y of
+  // the foot, the tile they stand on): they are drawn again above people who walk behind them, and nobody plays or
+  // sits on their tiles.
+  art:Object.freeze({size:4,height:198,parts:Object.freeze([
+    Object.freeze({id:'tree',foot:100,tile:Object.freeze({x:0,y:0}),polygon:Object.freeze([[78,0],[166,0],[166,66],[147,72],[147,94],[118,103],[96,93],[96,72],[78,62]])}),
+    Object.freeze({id:'bell',foot:143,tile:Object.freeze({x:3,y:0}),polygon:Object.freeze([[194,80],[240,80],[240,142],[217,148],[196,140]])}),
+    Object.freeze({id:'board',foot:174,tile:Object.freeze({x:3,y:2}),polygon:Object.freeze([[120,144],[151,144],[151,176],[120,176]])})])}),
 });
 
 // A small deterministic hash (FNV-1a) so the same house gives the same children.
