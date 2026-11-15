@@ -32,3 +32,11 @@ test('m-karavana-vyslat: an ambush takes part of the goods and hurts the escort,
   const {x,scene,soldiers,gold}=world({rand:()=>0});assert.ok(x.send(9,{wood:40},['worker-1','worker-2']).ok);x.update();assert.equal(x.state.ambush,true);
   scene.gameTime.totalElapsed=x.state.returnAt;x.update();assert.ok(soldiers.every(w=>w.currentHP>=1&&w.currentHP<100));assert.ok(gold.n<40*4,'less gold than the full load');
 });
+test('caravan home with the real ledger: the gold is booked as a sale and the game goes on (day-98 freeze)',async()=>{
+  const {ResourceTransactionLedger}=await import('../src/systems/ResourceTransactionLedger.js');
+  const {x,scene,gold}=world();Object.assign(scene.gameTime,{day:1,elapsed:0,onDayClosed:()=>()=>{}});scene.activities={on:()=>()=>{}};
+  scene.resourceLedger=new ResourceTransactionLedger(scene);
+  assert.ok(x.send(9,{wood:40},[]).ok);x.update();scene.gameTime.totalElapsed=x.state.returnAt;
+  assert.doesNotThrow(()=>x.update());assert.equal(x.state,null);const once=gold.n;assert.ok(once>0);x.update();assert.equal(gold.n,once,'paid once');
+  const tx=scene.resourceLedger.current.transactions.at(-1);assert.equal(tx.type,'sale');assert.equal(tx.source,'Own Caravan');assert.equal(tx.quantity,once);
+});

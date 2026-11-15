@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.130.3] - 2026-11-15
+<!-- version: {"title":"Caravan return no longer freezes the game","type":"fix","reconstructed":false,"saveVersion":62} -->
+### Fixed
+- The game froze when your own caravan came home with gold (for example on day 98 at 18:11). The caravan now returns, the gold is paid once and booked as a sale.
+
 ## [0.130.2] - 2026-11-15
 <!-- version: {"title":"Save download inside the Claude page","type":"fix","reconstructed":false,"saveVersion":62} -->
 ### Fixed

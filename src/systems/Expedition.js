@@ -49,7 +49,7 @@ export class Expedition {
   home(){
     const s=this.scene,st=this.state;let gold=0;const lost={};
     for(const [id,q]of Object.entries(st.goods)){const gone=st.ambush?Math.round(q*st.lossShare):0;if(gone)lost[id]=gone;gold+=(q-gone)*(price(id,'sell',this.trade.marketContext(id,null))??0);}
-    gold=Math.round(gold*(1-EXPEDITION.spread+2*EXPEDITION.spread*(st.spread??.5)));if(gold>0){s.inventory.add('gold',gold);s.resourceLedger?.income?.('gold',gold,'Own Caravan',{id:`expedition-gold:${st.since}`,type:'trade'});}
+    gold=Math.round(gold*(1-EXPEDITION.spread+2*EXPEDITION.spread*(st.spread??.5)));if(gold>0){s.inventory.add('gold',gold);s.resourceLedger?.income?.('gold',gold,'Own Caravan',{id:`expedition-gold:${st.since}`,type:'sale'});}
     for(const w of this.escortWorkers()){w.away=false;w.view?.setVisible?.(true);if(st.ambush&&w.isAlive)w.currentHP=Math.max(1,Math.round(w.currentHP*EXPEDITION.hurt));}
     const lostText=Object.entries(lost).map(([id,n])=>`${n} ${s.objectRegistry.get(id)?.name??id}`).join(', ');
     s.eventFeed?.push?.(`expedition-home:${st.since}`,st.ambush?t('expedition.homeAmbush',{gold,lost:lostText}):t('expedition.home',{gold}),{important:true});
