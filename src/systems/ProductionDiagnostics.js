@@ -131,7 +131,7 @@ export class ProductionDiagnostics {
         waiting.push(site);
         // Materials the stores hold but nobody brings (plan m-e1-stavitele-material).
         const now=this.scene.gameTime.totalElapsed;
-        if(c.materials.enabled&&!c.materials.ready(site)&&this.materialsInStock(site)){site.materialWaitSince??=now;if(now-site.materialWaitSince>=DIAGNOSTICS.materialWait)found.push({entityId:site.id,reason:'waitingMaterial',category:'construction',params:{}});}
+        if(c.materials.enabled&&!c.materials.ready(site)&&this.materialsInStock(site)){site.materialWaitSince??=now;if(now-site.materialWaitSince>=DIAGNOSTICS.materialNoticeDays*(this.scene.gameTime.dayDuration??DIAGNOSTICS.materialWait))found.push({entityId:site.id,reason:'waitingMaterial',category:'construction',params:{}});}
         else delete site.materialWaitSince;
       }
     }

@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.140.1] - 2026-11-15
+<!-- version: {"title":"Material notice after a day; soldiers on walls, Gates and Towers","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Changed
+- The "nobody brings the material" notice comes only after a whole day of waiting (it came after about two hours).
+- Soldiers can stand on a Gate (like on a Tower) and climb onto any piece of wall they are sent to, even when no Tower or Gate touches that wall.
+
 ## [0.140.0] - 2026-11-15
 <!-- version: {"title":"Move a building","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added

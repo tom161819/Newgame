@@ -24,7 +24,8 @@ export function wallRoute(walls,start,goal){
 // pieces next to it), on the Tower's platform, or on the walls beside the Gate.
 export function postTiles(buildings,target,count){
   const walls=wallIndex(buildings),out=[];
-  if(target.type==='tower'&&buildingIsComplete(target))out.push({x:target.x,y:target.y,tower:target.id});
+  // Owner 15 Nov 2026 (65): a Gate has a platform too (like a Tower), so soldiers can stand on it.
+  if(['tower','gate','wall_gate'].includes(target.type)&&buildingIsComplete(target))out.push({x:target.x,y:target.y,tower:target.id});
   const starts=isWall(target)?[target]:[...walls.values()].filter(w=>target.tiles?.some(t=>Math.abs(t.x-w.x)+Math.abs(t.y-w.y)===1));
   const seen=new Set(),queue=[];for(const w of starts)if(walls.has(tileKey(w))&&!seen.has(tileKey(w))){seen.add(tileKey(w));queue.push(w);}
   for(let i=0;i<queue.length&&out.length<count;i++){const at=queue[i];out.push({x:at.x,y:at.y});
@@ -56,12 +57,13 @@ export class WallPatrol {
       if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0){worker.aiCooldown=WALL_PATROL.retry;worker.moveTo(goals);}return true;
     }
     if(p.post&&!walls.has(tileKey(p.post)))delete p.post;
-    if(!stops.length){if(p.onWall)this.leave(worker);worker.workState='Waiting';worker.workMessage=t('army.wallsNone');return false;}
+    if(!stops.length&&!(p.post&&walls.has(tileKey(p.post)))){if(p.onWall)this.leave(worker);worker.workState='Waiting';worker.workMessage=t('army.wallsNone');return false;}
     worker.workState='Patrolling';worker.workMessage=t(p.post?'army.order.postActive':'army.order.wallsActive');
     if(!p.onWall){
       // Walk to the ground beside the nearest stop, then climb.
       // With a post: only stops joined to it over the wall walk, the nearest to the post first.
-      const usable=p.post?stops.filter(st=>tileKey(st)===tileKey(p.post)||wallRoute(walls,st,p.post)):stops,from=p.post??worker.tile;
+      // Owner 15 Nov 2026 (65): a soldier sent to a wall piece may also climb at that piece itself (the King still needs a Tower or a Gate).
+      const own=p.post?walls.get(tileKey(p.post)):null,usable=p.post?[...stops.filter(st=>tileKey(st)===tileKey(p.post)||wallRoute(walls,st,p.post)),...(own&&!stops.includes(own)?[own]:[])]:stops,from=p.post??worker.tile;
       if(p.post&&!usable.length){worker.workState='Waiting';worker.workMessage=t('army.postNoWay');return true;}
       const near=[...usable].sort((a,b)=>Math.hypot(a.x-from.x,a.y-from.y)-Math.hypot(b.x-from.x,b.y-from.y));
       for(const stop of near.slice(0,4)){const goals=towerNeighbors(stop).filter(g=>s.map[g.y]?.[g.x]===0);

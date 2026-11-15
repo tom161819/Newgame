@@ -147,7 +147,9 @@ test('E1: a site whose booked materials sit in a store gets a waiting-for-materi
   const r=placeBuilding({map:s.map,anchor:{x:56,y:44},resources:s.resourceOccupancy,reservedTiles:s.reservedTiles(),inventory:s.inventory,buildings:s.buildings,definition:d,reserveMaterials:true});assert.ifError(r.error);s.constructionSystem.plan(r.building);
   const site=r.building;assert.equal(s.constructionSystem.materials.ready(site),false);assert.equal(s.diagnostics.materialsInStock(site),true,'the booked stone is still in the starter stockpile');
   s.diagnostics.constructionIssues();assert.equal(typeof site.materialWaitSince,'number');
-  s.gameTime.totalElapsed+=DIAGNOSTICS.materialWait;assert.ok(s.diagnostics.constructionIssues().some(i=>i.reason==='waitingMaterial'&&i.entityId===site.id));
+  // Owner 15 Nov 2026 (64): the notice only after a whole game day (not after materialWait).
+  s.gameTime.totalElapsed+=DIAGNOSTICS.materialWait;assert.ok(!s.diagnostics.constructionIssues().some(i=>i.reason==='waitingMaterial'),'not yet after materialWait');
+  s.gameTime.totalElapsed+=s.gameTime.dayDuration;assert.ok(s.diagnostics.constructionIssues().some(i=>i.reason==='waitingMaterial'&&i.entityId===site.id));
   // Hire from the notice: the unemployed resident with the best skill.
   const a=s.workerSystem.create({x:50,y:44}),b=s.workerSystem.create({x:51,y:44});b.skills.construction.level=4;
   assert.equal(hireUnemployed(s,'builder'),b);assert.equal(b.profession,'builder');assert.equal(hireUnemployed(s,'hauler'),a);assert.equal(hireUnemployed(s,'hauler'),null,'nobody left');
