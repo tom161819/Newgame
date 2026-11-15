@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.138.4] - 2026-11-15
+<!-- version: {"title":"Statistics switched on","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- Anonymous play statistics are on in the GitHub Pages version (the author's GoatCounter site).
+
 ## [0.138.3] - 2026-11-15
 <!-- version: {"title":"Report a problem and anonymous statistics","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

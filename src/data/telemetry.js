@@ -4,7 +4,7 @@
 // Report: Web3Forms mails the message to the owner. Its access key is public by design (it can only send mail to him).
 export const TELEMETRY=Object.freeze({
   hosts:Object.freeze(['tom161819.github.io']),
-  goatcounter:'',
+  goatcounter:'hra1616',
   dayMilestones:Object.freeze([2,5,10,25,50,100,150,200,300]),
   minuteMilestones:Object.freeze([5,15,30,60,120,240]),
   storageKey:'mk.telemetry',
