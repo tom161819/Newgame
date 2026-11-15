@@ -1,3 +1,4 @@
+import { downloadFile } from './saveFileDownload.js';
 import { element } from './objectLabels.js';
 import { t,language } from '../i18n/index.js';
 import { IncompatibleSaveError,saveSchemaStatus } from '../systems/GameStateSerializer.js';
@@ -31,9 +32,8 @@ export class SaveLoadMenu {
   // Download: the stored slot as one JSON file; nothing is uploaded anywhere.
   async download(id){
     const record=await this.app.saves.get(id);if(!record)throw new Error(t('saves.missing'));
-    const blob=new Blob([exportSaveFile(record,{gameVersion:this.app.gameVersion??null})],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');
-    link.href=url;link.download=saveFileName(record);document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),0);
-    this.notice(t('saves.downloaded',{file:link.download}));
+    const file=saveFileName(record),result=await downloadFile(file,exportSaveFile(record,{gameVersion:this.app.gameVersion??null}));
+    this.notice(t(result==='declined'?'saves.downloadDeclined':'saves.downloaded',{file}));
   }
   // Import: validated completely before storing; a new slot, or the same slot only after confirmation.
   async importFile(file){

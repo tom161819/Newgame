@@ -234,7 +234,7 @@ export default {
   'saves.confirmDelete':'Opravdu odstranit tuto uloženou hru?','saves.confirmOverwrite':'Přepsat tuto uloženou hru současným stavem?',
   'saves.incompatibleError':'Nekompatibilní uložená hra: schéma {saved} nelze načíst schématem {current}.','saves.startNew':'Začít novou hru',
   'saves.incompatibleMessage':'„{name}“ používá schéma uložení {saved}. Tato alfa verze načítá jen schéma {current}, takže starší pozice nelze dohrát. Uložená hra zůstane uložená, dokud ji nesmažeš. Začít místo toho novou hru?',
-  'saves.downloaded':'Soubor „{file}“ byl stažen.','saves.tooLarge':'Soubor je větší než {size} MB a nebyl importován.',
+  'saves.downloadDeclined':'Stažení souboru „{file}“ bylo zrušeno.','saves.downloaded':'Soubor „{file}“ byl stažen.','saves.tooLarge':'Soubor je větší než {size} MB a nebyl importován.',
   'saves.incompatibleFile':'Nekompatibilní soubor: schéma {saved} nelze importovat schématem {current}. Nic se nezměnilo.',
   'saves.importExists':'„{name}“ už na tomto zařízení existuje. Nahradit ji importovaným souborem? Volbou „Ponechat obě“ ji importuješ jako novou pozici.','saves.replace':'Nahradit','saves.keepBoth':'Ponechat obě',
   'saves.imported':'Importováno „{name}“ (den {day}). Načti ji ze seznamu.','saves.autosaveBadge':'Automatické uložení',

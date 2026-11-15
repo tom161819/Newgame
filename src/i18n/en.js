@@ -233,7 +233,7 @@ export default {
   'saves.confirmDelete':'Really delete this saved game?','saves.confirmOverwrite':'Overwrite this saved game with the current state?',
   'saves.incompatibleError':'Incompatible save: schema {saved} cannot be loaded by schema {current}.','saves.startNew':'Start New Game',
   'saves.incompatibleMessage':'"{name}" uses save schema {saved}. This alpha build loads only schema {current}, so older saves cannot be continued. The save stays stored until you delete it. Start a new game instead?',
-  'saves.downloaded':'Save file "{file}" downloaded.','saves.tooLarge':'The file is larger than {size} MB and was not imported.',
+  'saves.downloadDeclined':'The download of "{file}" was cancelled.','saves.downloaded':'Save file "{file}" downloaded.','saves.tooLarge':'The file is larger than {size} MB and was not imported.',
   'saves.incompatibleFile':'Incompatible save file: schema {saved} cannot be imported by schema {current}. Nothing was changed.',
   'saves.importExists':'"{name}" already exists on this device. Replace it with the imported file? Choose "Keep both" to import it as a new save.','saves.replace':'Replace','saves.keepBoth':'Keep both',
   'saves.imported':'Imported "{name}" (Day {day}). Load it from the list.','saves.autosaveBadge':'Autosave',

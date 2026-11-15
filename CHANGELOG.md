@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.130.2] - 2026-11-15
+<!-- version: {"title":"Save download inside the Claude page","type":"fix","reconstructed":false,"saveVersion":62} -->
+### Fixed
+- Downloading a saved game inside the Claude page did nothing (the game said the file was downloaded). The page now asks to save the file and saves it.
+
 ## [0.130.1] - 2026-11-15
 <!-- version: {"title":"Full screen; wider scroll edge","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added
