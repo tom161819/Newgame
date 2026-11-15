@@ -34,6 +34,9 @@ export class WorldCamera {
     this.recenter = () => this.follow();
     scene.input.on('wheel', this.wheel);
     scene.input.keyboard.on('keydown-SPACE', this.recenter);
+    // Owner 15 Nov 2026: K selects the King (then the right button sends him).
+    this.selectKing=()=>{const s=this.scene,el=globalThis.document?.activeElement;if(el&&/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))return;if(s.gameOver||!s.character?.isAlive||!s.unitSelection)return;s.unitSelection.set([s.character]);s.setStatus?.(t('status.kingSelected'));};
+    scene.input.keyboard.on('keydown-K', this.selectKing);
     document.querySelector('#follow-king').addEventListener('click', this.recenter);
   }
 
@@ -104,7 +107,7 @@ export class WorldCamera {
   destroy() {
     this.resizeObserver.disconnect();
     this.scene.input.off('wheel', this.wheel);
-    this.scene.input.keyboard.off('keydown-SPACE', this.recenter);
+    this.scene.input.keyboard.off('keydown-SPACE', this.recenter);this.scene.input.keyboard.off('keydown-K', this.selectKing);
     document.querySelector('#follow-king').removeEventListener('click', this.recenter);
   }
 }

@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.129.3] - 2026-11-15
+<!-- version: {"title":"K selects the King","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- The K key selects the King.
+
 ## [0.129.2] - 2026-11-15
 <!-- version: {"title":"Castle upgrade in the detail; level 2 size","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed
