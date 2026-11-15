@@ -17,6 +17,8 @@ export class VillagePanel {
   open(kind,object){
     this.showRange(false);this.kind=kind;this.object=object;this.render();this.showRange(kind==='green');
     if(!this.dialog.open){this.restored=false;this.scene.setGalleryInput?.(false);this.dialog.showModal();}
+    // Owner 15 Nov 2026 (59): a House or the Village Green can be moved or dismantled from its window too.
+    if(kind!=='child'&&object?.tiles)this.scene.demolitionUI?.attach?.(this.dialog,object);
   }
   showRange(on){if(this.kind==='green'&&this.object)this.scene.towerViews?.get(this.object.id)?.showRange?.(on);}
   houseName(house){return t('village.houseName',{id:house.id});}

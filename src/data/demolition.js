@@ -5,4 +5,5 @@ export const paidCost=(building,definition)=>building?.construction?.investedMat
 export const refundOf=cost=>Object.fromEntries(Object.entries(cost).map(([id,n])=>[id,Math.floor(n/2)]).filter(([,n])=>n>0));
 export const demolitionRefund=definition=>refundOf(definition.cost);
 // Demolition returns half of what the building really cost.
-export const buildingDemolitionRefund=(building,definition)=>refundOf(paidCost(building,definition));
+// Owner 15 Nov 2026 (59): a building being moved returns nothing (the move is paid as half a new building).
+export const buildingDemolitionRefund=(building,definition)=>building?.relocation?{}:refundOf(paidCost(building,definition));

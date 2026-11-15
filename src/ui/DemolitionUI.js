@@ -4,6 +4,7 @@ import { countName } from '../i18n/names.js';
 import { t } from '../i18n/index.js';
 import { element,formatCost } from './objectLabels.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
+import { canRelocate,relocationDefinition } from '../game/relocation.js';
 import { buildingDemolitionRefund } from '../data/demolition.js';
 import { buildingName } from '../game/depletedMine.js';
 const text=(node,value)=>{if(node.textContent!==value)node.textContent=value;};
@@ -14,7 +15,10 @@ export class DemolitionUI {
     this.section=element('section','demolition-actions');this.section.id='demolition-actions';this.heading=element('h3');this.refund=element('p');this.status=element('p');this.status.setAttribute('role','status');
     this.progress=element('progress');this.progress.max=100;this.progress.setAttribute('aria-label',t('demolition.title'));this.start=element('button');this.start.id='demolition-start';this.start.type='button';this.cancel=element('button');this.cancel.id='demolition-cancel';this.cancel.type='button';
     this.rebuild=element('button');this.rebuild.id='ruins-rebuild';this.rebuild.type='button';this.rebuildNote=element('p','ruins-rebuild-note');
-    this.section.append(this.rebuildNote,this.rebuild,this.heading,this.refund,this.status,this.progress,this.start,this.cancel);
+    // Owner 15 Nov 2026 (59): Move the building for half a new one's materials.
+    this.move=element('button');this.move.id='relocation-start';this.move.type='button';this.moveNote=element('p','relocation-note');
+    this.section.append(this.rebuildNote,this.rebuild,this.heading,this.refund,this.status,this.progress,this.start,this.cancel,this.move,this.moveNote);
+    this.move.addEventListener('click',()=>{const b=this.building(this.buildingId);if(!b)return;if(this.host?.open)this.host.close();if(this.dialog.open)this.dialog.close();scene.startRelocation(b);});
     this.inspect.addEventListener('click',()=>this.openSelected(),options);
     this.dialog.addEventListener('click',event=>{if(!event.target.closest('[data-castle-upgrade]'))return;const result=clickCastleUpgrade(scene);if(result.done){const castle=scene.buildings.find(b=>b.type==='castle');this.select(castle);this.openSelected();}else this.openSelected();},options);document.querySelector('#close-building-detail').addEventListener('click',()=>this.dialog.close(),options);
     this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.dialog.close();},options);this.dialog.addEventListener('close',()=>scene.setGalleryInput(true),options);
@@ -64,6 +68,9 @@ export class DemolitionUI {
     text(this.status,reason?t(`demolition.${reason}`):!record?t('demolition.note'):record.workDone>=record.requiredWork?t('demolition.waitSafe'):t(record.assignedBuilders.length?'demolition.progress':'demolition.waitBuilder',{percent:record.progress.toFixed(1),count:record.assignedBuilders.length}));
     // Owner 9 Nov 2026: the explanation before dismantling shows on hovering the button (the refund line stays).
     {const note=!reason&&!record;this.status.hidden=note;this.start.title=note?t('demolition.note'):'';}
+    {const can=canRelocate(this.scene,b),plan=b.relocation;this.move.hidden=!can;this.moveNote.hidden=!plan&&!can;
+      if(can){const cost=relocationDefinition(b).cost;text(this.move,t('relocation.button',{cost:formatCost(cost,this.scene.objectRegistry)}));this.move.disabled=!this.scene.inventory.canAfford(cost);text(this.moveNote,t('relocation.note'));}
+      else if(plan)text(this.moveNote,t(plan.siteId!=null?'relocation.inProgress':'relocation.inProgressLater'));}
     if(this.confirm.open){const pending=this.building(this.pendingId);document.querySelector('#demolition-confirm-accept').disabled=!!this.reason(pending)||!!pending?.demolition;}
   }
   destroy(){this.controller.abort();this.confirm.close();this.dialog.close();this.section.remove();this.inspect.hidden=true;}

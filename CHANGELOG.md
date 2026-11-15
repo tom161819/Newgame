@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.140.0] - 2026-11-15
+<!-- version: {"title":"Move a building","type":"feature","reconstructed":false,"saveVersion":64} -->
+### Added
+- Move a building: the building window has a Move button. Place the building's plan elsewhere – it may cover the building itself – for half the materials of a new one. Builders dismantle the old building (nothing is returned) and build it at the new place; a plan over the old ground is placed once the old building is gone. Cancelling the dismantling cancels the move. Not for the Castle, the Starter Stockpile, walls, towers, gates and fields.
+
 ## [0.139.0] - 2026-11-15
 <!-- version: {"title":"Castle upgrade by Builders, start layout, build menu order","type":"feature","reconstructed":false,"saveVersion":63} -->
 ### Changed

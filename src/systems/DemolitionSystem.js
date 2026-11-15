@@ -4,6 +4,7 @@ import { CONSTRUCTION_RULES } from '../data/construction.js';
 import { advanceConstruction } from './ConstructionProgress.js';
 
 import { buildingDemolitionRefund } from '../data/demolition.js';
+import { cancelRelocation } from '../game/relocation.js';
 export { demolitionRefund } from '../data/demolition.js';
 // Uses ConstructionSystem's existing BuilderAI, perimeter reservations and physical work allocation.
 // The completion callback must reconcile the real building lifecycle atomically before returning true.
@@ -30,7 +31,7 @@ export class DemolitionSystem {
     const record=this.jobs.get(id);for(const workerId of [...(record?.assignedBuilders??[])]){const worker=this.scene.workerSystem.workers.get(workerId);if(worker)this.scene.workerSystem.ai.cancel(worker);}
   }
   cancel(id){
-    if(!this.jobs.has(id))return false;this.releaseWorkers(id);const building=this.target(id);if(building)delete building.demolition;
+    if(!this.jobs.has(id))return false;this.releaseWorkers(id);const building=this.target(id);if(building){delete building.demolition;cancelRelocation(this.scene,building);}
     this.jobs.delete(id);this.scene.constructionSystem.revision++;return true;
   }
   update(delta){

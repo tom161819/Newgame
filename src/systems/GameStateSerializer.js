@@ -60,7 +60,7 @@ import { validateResourceLedger } from './ResourceLedgerValidation.js';
 // 62 (tabulka-budov-1): workplace capacities, crop yields and Mill/Bakery recipes changed – saved workplaces, harvest
 // reservations and running batches of 61 no longer match the rules.
 import { CASTLE_LEVELS,CASTLE_MAX_LEVEL,castleLevel } from '../data/castle.js';
-export const SAVE_VERSION=63;
+export const SAVE_VERSION=64;
 const copy=value=>value==null?null:structuredClone(value);
 const point=value=>value?{x:value.x,y:value.y}:null;
 const actorFields=['id','type','currentHP','maxHP','isAlive','speed','walking','wanderWait','mounted','retaliationRepath'];
@@ -139,7 +139,7 @@ export function serializeGameState(scene){
       render:{x:scene.player.x,y:scene.player.y,depth:scene.player.depth},
       transition:c.transitioning?{remaining:Math.max(1,(c.transitionTween?.duration??900)-(c.transitionTween?.elapsed??0))}:null},
     inventory:scene.inventory.exportState(),equipment:scene.equipment.exportState(),
-    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.burntFrom?{burntFrom:b.burntFrom}:{}),...(buildingDefinition(b).crop?{farmId:b.farmId??null}:{}),...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.depleted?{depleted:true}:{}),...(buildingDefinition(b).legacyFootprint&&!buildingDefinition(b).legacy?{size:buildingDefinition(b).width}:{}),...(typeof b.look==='string'&&buildingDefinition(b).artLooks?.includes(b.look)?{look:b.look}:{}),...(b.unverified?{unverified:true}:{}),...(['wall_gate','gate'].includes(b.type)&&['x','y'].includes(b.gateAxis)?{gateAxis:b.gateAxis}:{}),...(b.type==='barracks'&&Number.isInteger(b.autoHire)?{autoHire:b.autoHire}:{}),...(b.type==='iron_mine'&&b.miningMode==='adjacent'?{miningMode:'adjacent'}:{}),...(b.type==='tower'&&[1,2,3].includes(b.facing)?{facing:b.facing}:{}),...(b.level?{level:b.level}:{}),...(b.hp!=null&&buildingMaxHP(b)!=null&&b.hp<buildingMaxHP(b)?{hp:b.hp}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.demolition?{demolition:copy(b.demolition)}:{}),...(b.repair?{repair:copy(b.repair)}:{}),...(b.upgrade?{upgrade:copy(b.upgrade)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
+    buildings:scene.buildings.map(b=>({id:b.id,type:b.type,x:b.x,y:b.y,...(b.burntFrom?{burntFrom:b.burntFrom}:{}),...(buildingDefinition(b).crop?{farmId:b.farmId??null}:{}),...(b.type==='quarry'?{quarryMode:b.quarryMode??(buildingIsComplete(b)?'legacy':'unbound')}:{}),...(b.depositId?{depositId:b.depositId}:{}),...(b.depleted?{depleted:true}:{}),...(buildingDefinition(b).legacyFootprint&&!buildingDefinition(b).legacy?{size:buildingDefinition(b).width}:{}),...(typeof b.look==='string'&&buildingDefinition(b).artLooks?.includes(b.look)?{look:b.look}:{}),...(b.unverified?{unverified:true}:{}),...(['wall_gate','gate'].includes(b.type)&&['x','y'].includes(b.gateAxis)?{gateAxis:b.gateAxis}:{}),...(b.type==='barracks'&&Number.isInteger(b.autoHire)?{autoHire:b.autoHire}:{}),...(b.type==='iron_mine'&&b.miningMode==='adjacent'?{miningMode:'adjacent'}:{}),...(b.type==='tower'&&[1,2,3].includes(b.facing)?{facing:b.facing}:{}),...(b.level?{level:b.level}:{}),...(b.hp!=null&&buildingMaxHP(b)!=null&&b.hp<buildingMaxHP(b)?{hp:b.hp}:{}),...(b.construction?{construction:copy(b.construction)}:{}),...(b.demolition?{demolition:copy(b.demolition)}:{}),...(b.repair?{repair:copy(b.repair)}:{}),...(b.upgrade?{upgrade:copy(b.upgrade)}:{}),...(b.relocation?{relocation:copy(b.relocation)}:{}),...(b.materialSupply?{materialSupply:copy(b.materialSupply)}:{})})),
     resources:[...scene.resources.values()].map(v=>({type:v.getData('objectId'),tile:point(v.getData('tile')),...(v.getData('object').natural?{natural:copy(v.getData('object').natural)}:{})})),
     drops:[...scene.dropSystem.drops.values()].map(d=>({id:d.id,resource:d.resource,tile:point(d.tile),amount:d.amount,rewardRemaining:d.rewardRemaining??1,rewardUnits:d.rewardUnits??(d.resource==='stone'?d.amount:0),haulEligible:d.haulEligible!==false,...(d.siteId!=null?{siteId:d.siteId}:{})})),
     // m-ulozeni-animals (owner 14 Nov 2026): an animal may fight back at another animal (a hunter's dog, a wolf) or at
@@ -288,6 +288,13 @@ function validateAtSize(input,registry){
     check(c.contributions&&typeof c.contributions==='object'&&!Array.isArray(c.contributions));let work=0;for(const [id,amount]of Object.entries(c.contributions)){check(wIds.has(id));number(amount,Number.MIN_VALUE,c.requiredWork);work+=amount;}check(Math.abs(work-c.workDone)<1e-6);
     array(c.assignedBuilders,CONSTRUCTION_RULES.maximumBuilders);check(new Set(c.assignedBuilders).size===c.assignedBuilders.length);
     for(const id of c.assignedBuilders){const w=s.workers?.find(w=>w.id===id);check(w?.isAlive&&w.profession==='builder'&&w.workTask?.kind==='repair'&&w.workTask.targetId===b.id&&!siteAssignments.has(id));siteAssignments.add(id);}
+  }
+  // Owner 15 Nov 2026 (59, schema 64): a building being moved – its dismantling returns nothing; `siteId` is the new site
+  // (same type, unfinished, at x/y) when it was placed beside it, absent while it waits for the old one to be gone.
+  for(const b of s.buildings)if(b.relocation!==undefined){
+    const r=b.relocation;check(r&&typeof r==='object'&&!Array.isArray(r)&&Object.keys(r).every(k=>['x','y','siteId'].includes(k))&&Number.isSafeInteger(r.x)&&Number.isSafeInteger(r.y));
+    check(buildingIsComplete(b)&&b.demolition&&Object.keys(b.demolition.refund??{}).length===0&&b.type!=='castle');
+    if(r.siteId!==undefined){const site=s.buildings.find(x=>x.id===r.siteId);check(site&&site.type===b.type&&!buildingIsComplete(site)&&site.x===r.x&&site.y===r.y);}
   }
   const plotCounts=new Map();
   for(const b of s.buildings){

@@ -151,6 +151,7 @@ import { SeasonTransition } from './SeasonTransition.js';
 import { ConstructionUI } from '../ui/ConstructionUI.js';
 import { gameSettings,resourceSpawnSettings } from '../systems/GameSettings.js';
 import { createStartingCastle,createStartingStockpile,depositStartingResources,placeKingInFront } from '../systems/WorldGenerationConfig.js';
+import { completeRelocation,orderRelocation,relocationDefinition,relocationError,canRelocate } from './relocation.js';
 import { WildlifeRespawnSystem } from '../systems/WildlifeRespawnSystem.js';
 import { FarmingSystem } from '../systems/FarmingSystem.js';
 import { CropPlotView } from './CropPlotView.js';
@@ -338,7 +339,7 @@ export class GameScene extends Phaser.Scene {
     this.constructionSystem=new ConstructionSystem(this,{onProgress:site=>this.towerViews.get(site.id)?.updateProgress?.(site),
       onComplete:site=>{this.towerViews.get(site.id)?.destroy();if(buildingDefinition(site).pavement){this.towerViews.delete(site.id);this.terrain.invalidateArea([site]);this.updateInventory();this.constructionUI?.refresh();return;}this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.built',{name:buildingDefinition(site).name}));this.completionFlash?.flash(site);},
       onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);if(this.mapMemory?.objects.delete(`building:${site.id}`))this.mapMemory.revision++;this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.siteCancelled'));}});
-    this.demolition=new DemolitionSystem(this,{complete:(building,refund)=>finishDemolition(this,building,refund)});this.repairs=new RepairSystem(this);
+    this.demolition=new DemolitionSystem(this,{complete:(building,refund)=>{const done=finishDemolition(this,building,refund);if(done)completeRelocation(this,building);return done;}});this.repairs=new RepairSystem(this);
     this.constructionUI=new ConstructionUI(this);
     this.foodProduction=new FoodProductionSystem(this);this.military=new MilitarySystem(this);if(!this.loadState&&this.gameSettings.startingGarrison)this.military.enlistStartingGarrison(this.worldRandom('villagers'));this.vehicles=new VehicleSystem(this);this.stables=new StableSystem(this);this.needs=new NeedsSystem(this);this.kingdomHappiness=new KingdomHappinessIndicator(this);this.vehicleViews=new VehicleViews(this);this.caravans=new CaravanSystem(this);this.trade=new TradeSystem(this);this.caravanViews=new CaravanViews(this);this.employment=new EmploymentSystem(this,{enabled:this.gameSettings.autoEmployment});this.diagnostics=new ProductionDiagnostics(this);this.employmentPanel=new EmploymentPanel(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.kingCargoControl=new KingCargoControl(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
     this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);this.farmConnections=new FarmConnections(this);
@@ -516,6 +517,11 @@ export class GameScene extends Phaser.Scene {
       if(this.selectedBuilding.construction?.mode==='line'){
         this.dragAnchor={...goal};this.wallLastLine=null;this.previewTracking=true;this.previewKey=null;this.updateBuildingPreview();return;
       }
+      if(this.selectedBuilding.relocateFrom!=null){
+        const moved=this.buildings.find(b=>b.id===this.selectedBuilding.relocateFrom),result=moved?orderRelocation(this,moved,goal):{error:t('relocation.unavailable')};
+        if(result.error){this.previewKey=null;this.updateBuildingPreview();this.setStatus(result.error);return;}
+        this.updateInventory();this.cancelBuilding(t(result.site?'relocation.ordered':'relocation.orderedLater',{name:buildingDefinition(moved).name}));return;
+      }
       // Outside sight a blueprint is provisional: checked against known ground now, against the real site once seen.
       // m-zelezny-dul-misto: an Iron Mine says why a spot is invalid, and outside sight it needs a known Iron Deposit.
       const provisional=isProvisional(this.fog,buildingTiles(goal,this.selectedBuilding)),known=provisional?mineSpotError(this,goal,this.selectedBuilding,knownPlacementError(this,goal,this.selectedBuilding))??provisionalMineError(this,goal,this.selectedBuilding):null;
@@ -679,6 +685,15 @@ export class GameScene extends Phaser.Scene {
     this.updateBuildingUI();this.setStatus(t('status.placing',{name:definition.name,size:t('building.size',{width:definition.width,height:definition.height}),cost:formatCost(definition.cost,this.objectRegistry)})+(definition.id==='wall_gate'?` · ${t('build.rotateHint')}`:''));
     return true;
   }
+  // Owner 15 Nov 2026 (59): "Move" – the building's blueprint follows the pointer (it may cover the building itself); a
+  // click orders the move (relocation.js).
+  startRelocation(building){
+    if(!canRelocate(this,building)){this.setStatus(t('relocation.unavailable'));return false;}
+    if(!this.startBuilding(buildingDefinition(building)))return false;
+    const definition=relocationDefinition(building);this.selectedBuilding={...definition,relocateFrom:building.id};
+    this.preview.destroy();this.preview=this.createBuildingView(definition,{x:0,y:0},true);this.preview.setVisible(false);this.previewKey=null;
+    this.setStatus(t('relocation.placing',{name:definition.name,cost:formatCost(definition.cost,this.objectRegistry)}));return true;
+  }
   cancelBuilding(message=t('status.buildCancelled')) {
     this.clearWallPreviews();
     this.buildLinkGraphics?.setVisible(false);this.buildMode=false;this.pavementTool?.clear();this.selectedBuilding=null;this.previewAnchor=null;this.previewTracking=false;this.previewKey=null;
@@ -698,7 +713,8 @@ export class GameScene extends Phaser.Scene {
     if(!this.buildMode||!anchor||anchor.x<0||anchor.y<0||anchor.x>=COLUMNS||anchor.y>=ROWS){this.preview.setVisible(false);return;}
     // Outside sight the preview is amber (provisional): only known ground decides, never a hidden obstacle.
     const provisional=isProvisional(this.fog,buildingTiles(anchor,definition));
-    const error=mineSpotError(this,anchor,definition,provisional?knownPlacementError(this,anchor,definition):placementError(this.map,anchor,this.resourceOccupancy,this.placementReserved(),definition,this.buildings,this.buildingUnlocks))
+    const moved=definition.relocateFrom!=null?this.buildings.find(b=>b.id===definition.relocateFrom):null;
+    const error=moved?relocationError(this,moved,anchor):mineSpotError(this,anchor,definition,provisional?knownPlacementError(this,anchor,definition):placementError(this.map,anchor,this.resourceOccupancy,this.placementReserved(),definition,this.buildings,this.buildingUnlocks))
       ??(provisional?provisionalMineError(this,anchor,definition):null)??(!this.inventory.canAfford(definition.cost)?t('status.noFunds'):null);
     const gate=['wall_gate','gate'].includes(definition.id)?gateAxis(wallIndex(this.buildings,true),{...anchor,definition,gateAxis:this.gateAxis}):null;
     const facing=definition.id==='tower'?(this.towerFacing??0):null,key=`${tileKey(anchor)}:${provisional}:${error}:${gate}:${facing}`;

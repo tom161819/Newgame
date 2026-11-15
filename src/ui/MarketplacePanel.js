@@ -245,6 +245,7 @@ export class MarketplacePanel {
   open(building){
     this.building=building;this.statusKey=this.pricesKey=this.autoStructure=this.statsKey=null;this.render();this.unsubscribe?.();this.unsubscribeTrade?.();this.unsubscribe=this.scene.caravans?.onChange(()=>{if(this.dialog.open)this.render();});this.unsubscribeTrade=this.scene.trade?.onChange(()=>{if(this.dialog.open)this.render();});
     if(!this.dialog.open){this.restored=false;this.scene.setGalleryInput(false);this.dialog.showModal();clearInterval(this.timer);this.timer=setInterval(()=>{if(this.dialog.open)this.render();},1000);}
+    this.scene.demolitionUI?.attach?.(this.dialog,building);/* owner 15 Nov 2026 (59): Move and Dismantle here too */
   }
   restore(){clearInterval(this.timer);this.timer=null;if(!this.restored){this.restored=true;this.scene.setGalleryInput(true);}}
   close(){if(this.dialog.open)this.dialog.close();this.restore();}
