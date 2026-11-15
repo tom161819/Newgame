@@ -1,7 +1,10 @@
 import Phaser from 'phaser';
 import { treeState,stumpGone } from '../data/naturalResources.js';
 
+import { seasonTextureKey,oakLook,treeHash } from '../render/treeSeasonTexture.js';
+
 const TREE_BLOWS=7;
+const OAK_WINTER_SCALE=Object.freeze({broad:1.05,grand:1.6});
 export class TreeView extends Phaser.GameObjects.Container {
   constructor(scene,definition,context){
     super(scene,context.x,context.y);scene.add.existing(this);this.definition=definition;this.object=context.object??{natural:treeState('preview')};this.body=scene.add.graphics();this.bar=scene.add.graphics();this.art=scene.add.image(0,0,'__DEFAULT').setVisible(false);this.add([this.body,this.art,this.bar]);this.tile=context.tile??null;this.season=context.season??scene.seasons?.season??'Spring';this.setDepth(context.y+(definition.depth?.offset??0));this.paint();
@@ -11,10 +14,11 @@ export class TreeView extends Phaser.GameObjects.Container {
   setSeason(value){this.targetSeason=value;return this.applySeason();}
   applySeason(){const target=this.targetSeason??this.season,o=this.object,value=Number.isFinite(o?.x)?this.scene.seasonTransition?.seasonAt(o,target)??target:target;if(value!==this.season){this.season=value;this.paint();}return this;}
   // Approved Asset Studio art for this stage, season and tile, or null (procedural drawing).
+  // m-duby: an oak shows one of the four render views, picked by its tile (owner 15 Nov 2026: "v náhodném směru
+  // otočení"); the same hash gives one of two autumn colours.
   artKey(){
     const art=this.definition.artSprites,assets=this.scene.assets,stage=this.object.natural.stage;if(!art||!assets||stage<2)return null;
-    const pine=this.definition.id==='pine_tree',season=this.season,tile=this.tile??this.object,hash=((Math.imul((tile?.x??0)+17,374761393)^Math.imul((tile?.y??0)+29,668265263))>>>0)%2;
-    const look=stage===2?(pine||season==='Spring'||season==='Summer'?'young':null):season==='Winter'?'winter':pine?'mature':season==='Spring'?'spring':season==='Autumn'?'autumn':hash&&art.broad?'broad':'mature';
+    const pine=this.definition.id==='pine_tree',season=this.season,look=pine?(stage===2?'young':season==='Winter'?'winter':'mature'):oakLook(this.object.natural,season,treeHash(this.tile??this.object));
     return look&&art[look]&&assets.hasTexture(this.definition.id,`art-${look}`)?look:null;
   }
   paint(){
@@ -22,8 +26,11 @@ export class TreeView extends Phaser.GameObjects.Container {
     if(stumpGone(this.object.natural)){this.art.setVisible(false);this.artLook=null;this.body.clear();this.bar?.clear?.();return;}
     const look=this.artKey();
     if(look){
-      const art=this.definition.artSprites[look],key=this.scene.assets.key(this.definition.id,`art-${look}`);
-      this.art.setTexture(key).setOrigin(art.origin.x,art.origin.y).setVisible(true);this.artLook=look;this.body.clear();
+      const art=this.definition.artSprites[look],oak=this.definition.id==='oak_tree',winter=oak&&look==='winter',grand=oak&&!!this.object.natural.grand;
+      const key=seasonTextureKey(this.scene,this.scene.assets.key(this.definition.id,`art-${look}`),oak&&!winter?this.season:'Summer',treeHash(this.tile??this.object)>>2&1);
+      // The bare winter oak is the earlier, smaller drawing: it is scaled to the render's size. A grand oak stands on the
+      // middle of its 2 × 2 (the corner behind its own tile).
+      this.art.setTexture(key).setOrigin(art.origin.x,art.origin.y).setScale(winter?(grand?OAK_WINTER_SCALE.grand:OAK_WINTER_SCALE.broad):1).setPosition(0,grand?-16:0).setVisible(true);this.artLook=look;this.body.clear();
       this.setDepth(this.y+(this.object.natural.stage<3?-.15:this.definition.depth?.offset??0));
       return;
     }
@@ -52,7 +59,7 @@ export class TreeView extends Phaser.GameObjects.Container {
   getMemoryState(){return{stage:this.object.natural.stage,season:this.season};}
   containsPoint(x,y){
     if(stumpGone(this.object.natural))return false;
-    if(this.artLook){const frame=this.art.frame,px=Math.floor(x-this.x+this.art.originX*frame.width),py=Math.floor(y-this.y+this.art.originY*frame.height);return px>=0&&py>=0&&px<frame.width&&py<frame.height&&(this.scene.textures.getPixelAlpha(px,py,this.art.texture.key)??0)>=128;}
+    if(this.artLook){const frame=this.art.frame,k=this.art.scaleX||1,px=Math.floor((x-this.x-this.art.x)/k+this.art.originX*frame.width),py=Math.floor((y-this.y-this.art.y)/k+this.art.originY*frame.height);return px>=0&&py>=0&&px<frame.width&&py<frame.height&&(this.scene.textures.getPixelAlpha(px,py,this.art.texture.key)??0)>=128;}
     const stage=this.object.natural.stage,dx=x-this.x,dy=y-this.y;if(stage===0)return Math.abs(dx)<12&&dy>=-15&&dy<=8;const scale=stage===1?.25:stage===2?.58:1,pine=this.definition.id==='pine_tree',height=(pine?100:84)*scale;
     if(Math.abs(dx)<=6*scale&&dy>=-height*.7&&dy<=8)return true;
     if(pine){for(let tier=0;tier<3;tier++){const distance=dy+height*(1-tier*.22);if(distance>=0&&distance<=height*.38&&Math.abs(dx)<=(13+tier*7)*scale*distance/(height*.38))return true;}return false;}

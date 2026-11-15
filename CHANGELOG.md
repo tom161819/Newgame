@@ -5,6 +5,15 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.131.0] - 2026-11-15
+<!-- version: {"title":"New oaks and the new Hunting Lodge","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- New oak pictures: a small young oak and a bigger grown oak. Each oak shows one of four views, so a forest no longer looks like a row of copies.
+- Oaks turn light green in spring and orange or yellow-brown in autumn.
+
+### Changed
+- The Hunting Lodge has its new picture (a shingled cabin with a porch and a kennel) and stands on 3 × 3. Lodges built earlier stay 2 × 2.
+
 ## [0.130.3] - 2026-11-15
 <!-- version: {"title":"Caravan return no longer freezes the game","type":"fix","reconstructed":false,"saveVersion":62} -->
 ### Fixed

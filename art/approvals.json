@@ -919,7 +919,7 @@
       }
     },
     "hunting-lodge": {
-      "preferred": "hunting-lodge-gpt-0",
+      "preferred": "hunting-lodge-render-0",
       "variants": {
         "hunting-lodge-log": {
           "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
@@ -964,6 +964,42 @@
           "specHash": "29c42966",
           "status": "approved",
           "updatedAt": "2026-11-13T20:23:40.000Z",
+          "version": 1
+        },
+        "hunting-lodge-render-0": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "29c42966",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "hunting-lodge-render-180": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "29c42966",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "hunting-lodge-render-270": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "29c42966",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "hunting-lodge-render-90": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "29c42966",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
           "version": 1
         }
       }
@@ -1422,6 +1458,42 @@
           "updatedAt": "2026-11-07T16:27:05.795Z",
           "version": 1,
           "approvedAt": "2026-11-07T16:27:05.795Z"
+        },
+        "village-green-render-0": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "1017e4b6",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "village-green-render-180": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "1017e4b6",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "village-green-render-270": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "1017e4b6",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "village-green-render-90": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "1017e4b6",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
         }
       }
     },
@@ -4111,6 +4183,114 @@
           "note": "Approved by the developer in Asset Studio on 2026-11-04.",
           "updatedAt": "2026-11-04T19:05:31.540Z",
           "approvedAt": "2026-11-04T19:05:31.540Z"
+        },
+        "oak-tree-render-broad-0": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "63410ccd",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-broad-180": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "63410ccd",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-broad-270": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "63410ccd",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-broad-90": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "63410ccd",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-mature-0": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "b727122d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-mature-180": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "b727122d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-mature-270": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "b727122d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-mature-90": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "b727122d",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-young-0": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-young-180": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-young-270": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
+        },
+        "oak-tree-render-young-90": {
+          "approvedAt": "2026-11-15T01:00:00.000Z",
+          "decidedBy": "u_j1ZMpkyV91EhU6dsT7h4Ow",
+          "note": "Owner in the Mechaniky chat, 15 Nov 2026: \"všechny nové grafiky jsou approved, nasaď je do hry\".",
+          "specHash": "ad828bf4",
+          "status": "approved",
+          "updatedAt": "2026-11-15T01:00:00.000Z",
+          "version": 1
         }
       }
     },

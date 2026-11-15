@@ -337,7 +337,9 @@ test('trees use the approved Asset Studio art for each look, byte for byte with 
       assert.deepEqual(art.origin, meta.origin, `${gameId} ${look}: trees stand on the tile centre, the studio anchor`);
     }
   }
-  assert.ok(APPROVED_TREE_ART.oak_tree.spring && APPROVED_TREE_ART.oak_tree.autumn && APPROVED_TREE_ART.oak_tree.winter && APPROVED_TREE_ART.pine_tree.winter);
+  // m-duby: the oak has four views of each render (young, broad, grand); spring and autumn are recoloured at run time.
+  for (const look of ['young', 'broad', 'grand']) for (const view of [0, 90, 180, 270]) assert.ok(APPROVED_TREE_ART.oak_tree[`${look}-${view}`], `${look}-${view}`);
+  assert.ok(APPROVED_TREE_ART.oak_tree.winter && APPROVED_TREE_ART.pine_tree.winter);
 });
 
 test('construction sites use the approved scaffold art by stage, byte for byte with the export anchor', async () => {
