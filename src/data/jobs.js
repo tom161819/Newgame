@@ -8,7 +8,7 @@ export const POPULATION=Object.freeze({initial:3,maximum:10,houseCapacity:5,migr
 export const JOBS=Object.freeze(localizeJobs({
   idle:Object.freeze({portraitColor:'#62655d',name:'Unemployed',skill:null}),
   woodcutter:Object.freeze({portraitColor:'#365e42',name:'Woodcutter',skill:'woodcutting',workplace:'lumberjack_hut',requiresWorkplace:true}),
-  miner:Object.freeze({portraitColor:'#4b6980',name:'Miner',skill:'mining',workplace:'quarry',requiresWorkplace:false}),
+  miner:Object.freeze({portraitColor:'#4b6980',name:'Miner',skill:'mining',workplace:'quarry',requiresWorkplace:false,noSeatNeeded:true}),
   hunter:Object.freeze({portraitColor:'#304d3b',name:'Hunter',skill:'hunting',workplace:'hunting_lodge',requiresWorkplace:false}),
   fisher:Object.freeze({portraitColor:'#3f7a8c',name:'Fisher',skill:'fishing',workplace:'fisherman_hut',requiresWorkplace:true}),
   builder:Object.freeze({portraitColor:'#8b603e',name:'Builder',skill:'construction',workplace:null,requiresWorkplace:false}),

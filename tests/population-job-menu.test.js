@@ -30,3 +30,12 @@ test('choosing a job from the menu: the unemployed get the job and a free seat, 
   changeProfession(s,w,'idle');assert.equal(w.profession,'idle');assert.equal(w.assignedWorkplaceId,null);assert.equal(choice(s,late,'miner').free,1,'the freed seat is offered again');
   assert.equal(changeProfession(s,w,'nonsense'),false);
 });
+
+// Owner 15 Nov ("v tutoriálu nejde vybrat horník, když nemám kamenolom"): a Miner can be chosen without a quarry.
+test('the Miner stays selectable without a quarry or with a full one', async () => {
+  const { jobBlocked } = await import('../src/ui/jobChange.js');
+  assert.equal(jobBlocked({ full: true, current: false, anywhere: true }), false);
+  assert.equal(jobBlocked({ full: true, current: false, anywhere: false }), true);
+  const { JOBS } = await import('../src/data/jobs.js');
+  assert.equal(JOBS.miner.noSeatNeeded, true);assert.notEqual(JOBS.hunter.noSeatNeeded, true);
+});

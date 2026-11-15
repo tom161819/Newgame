@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.138.2] - 2026-11-15
+<!-- version: {"title":"Miner without a quarry","type":"fix","reconstructed":false,"saveVersion":62} -->
+### Fixed
+- A Miner can be chosen in the job menu (and in the tutorial) without a quarry or when the quarry is full. He mines marked rocks.
+
 ## [0.138.1] - 2026-11-15
 <!-- version: {"title":"Season change without hard edges","type":"fix","reconstructed":false,"saveVersion":62} -->
 ### Fixed

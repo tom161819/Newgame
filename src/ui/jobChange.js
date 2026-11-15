@@ -32,13 +32,14 @@ export function jobStats(scene){
 export const jobStatLabel=(name,stat)=>stat?`${name} (${stat.count}${stat.capacity==null?'':` / ${stat.capacity}`})`:name;
 // m-profese-bez-budovy (point 38): a profession whose buildings have no free seat (or none is built) cannot be picked;
 // Builder, Hauler and the other professions without a workplace building always can.
-export const jobBlocked=choice=>!!choice.full&&!choice.current;
+// Owner 15 Nov: a job that also works without a workplace (Miner on marked rocks, JOBS.noSeatNeeded) stays selectable when seats are full or missing.
+export const jobBlocked=choice=>!!choice.full&&!choice.current&&!choice.anywhere;
 // The choices of the quick job menu for one resident, in the order of the Employments window (JOBS order).
 export function jobChoices(scene,worker){
   const seats=freeSeats(scene),stats=jobStats(scene),hasWorkplaces=profession=>scene.workplaceSystem?.hasWorkplaces?.(profession)??false;
   return Object.entries(JOBS).filter(([id])=>id!=='idle').map(([id,job])=>{
     const needsSeat=hasWorkplaces(id),free=needsSeat?seats.get(id)??0:null;
-    return {id,name:job.name,color:job.portraitColor,free,full:needsSeat&&free===0,current:worker?.profession===id,stat:stats.get(id)};
+    return {id,name:job.name,color:job.portraitColor,free,full:needsSeat&&free===0,anywhere:job.noSeatNeeded===true,current:worker?.profession===id,stat:stats.get(id)};
   });
 }
 
