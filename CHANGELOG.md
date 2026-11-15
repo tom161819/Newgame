@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.135.0] - 2026-11-15
+<!-- version: {"title":"Haulers carry twice as much","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- Haulers carry twice as much as other subjects (8 Stone, 16 Wood or 80 food by hand).
+- A worker in a workshop (mill, bakery, smelter…) now waits up to half a day for a Hauler to bring his inputs, then fetches them himself. Before he went after 3 seconds.
+
 ## [0.134.0] - 2026-11-15
 <!-- version: {"title":"Oaks in four seasons","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

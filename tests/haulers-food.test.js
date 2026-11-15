@@ -26,10 +26,10 @@ function loads(s,h,ms){const seen=[];let last=null;for(let t=0;t<ms;t+=50){s.tic
 test('a Hauler with a Wheelbarrow or Horse Wagon carries a full load of food into the Granary; by hand as before (Apples: Wheat now goes to a Farmhouse)',()=>{
   for(const [vehicle,factor]of [[null,1],['wheelbarrow',5],['horse_wagon',10]]){
     const s=scene(),granary=building(s,'granary',44,44),h=hauler(s,{x:50,y:50},vehicle),stockpile=s.buildings.find(b=>b.type==='starter_stockpile');
-    assert.equal(carryCapacity(h,'apple'),40*factor);
+    assert.equal(carryCapacity(h,'apple'),80*factor);
     s.foodStorage.deposit(`stockpile-${stockpile.id}`,'apple',Math.min(250,s.foodStorage.locations.get(`stockpile-${stockpile.id}`).capacity));
     const amount=s.foodStorage.locations.get(`stockpile-${stockpile.id}`).stock.apple;
-    until(s,()=>h.cargo?.resource==='apple');assert.equal(h.cargo.amount,Math.min(amount,40*factor),`${vehicle??'hands'}: one trip takes the full load`);
+    until(s,()=>h.cargo?.resource==='apple');assert.equal(h.cargo.amount,Math.min(amount,80*factor),`${vehicle??'hands'}: one trip takes the full load`);
     until(s,()=>(s.foodStorage.locations.get(`granary-${granary.id}`).stock.apple??0)===amount);
   }
 });

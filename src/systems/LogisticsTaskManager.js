@@ -1,5 +1,5 @@
 import { reachableTiles } from '../game/pathfinding.js';
-import { HAUL_URGENT,matchesHaulPriority } from '../data/logistics.js';
+import { HAUL_URGENT,matchesHaulPriority ,PRODUCER_WAIT } from '../data/logistics.js';
 import { LOGISTICS_RULES,IDLE_STONE,carryCapacity } from '../data/logistics.js';
 import { buildingDefinition,buildingIsComplete,towerNeighbors } from '../game/buildings.js';
 import { tileKey } from '../game/stones.js';
@@ -146,7 +146,7 @@ export class LogisticsTaskManager {
     if(buildingDefinition(building).selfSupplied)return false;
     const record=this.scene.foodProduction.records.get(building.id),now=this.scene.gameTime.totalElapsed,key=`${building.id}:${kind}`;
     let wait=this.producerWaits.get(key);if(!wait||wait.cycle!==record.nextCycle){wait={cycle:record.nextCycle,since:now,checkedAt:-Infinity,available:false};this.producerWaits.set(key,wait);}
-    if(now-wait.since>=3000)return false;
+    const limit=kind==='input'?PRODUCER_WAIT.inputDays*(this.scene.gameTime.dayDuration??120000):PRODUCER_WAIT.outputMs;if(now-wait.since>=limit)return false;
     if(now-wait.checkedAt>=500){
       wait.checkedAt=now;const location=this.storage.locations.get(`${kind}-${building.id}`);
       wait.available=this.scene.workerSystem.liveWorkers().filter(w=>(!w.commandState||w.commandState.state==='Working')&&w.profession==='hauler'&&!w.arriving&&!w.restPhase).slice(0,6).some(w=>!!this.storage.route(w,[location]));

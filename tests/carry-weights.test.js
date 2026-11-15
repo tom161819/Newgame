@@ -9,10 +9,10 @@ test('every physical resource has a central load weight; gold is never carried',
   assert.deepEqual(['stone','wood','iron_ore','meat','wheat','apple','flour','bread'].map(loadWeight),[10,5,10,1,1,1,1,1]);
 });
 
-test('a person carries 40 load units: 4 Stone, 8 Wood or 40 food; Logistics adds 2 units every 5 levels for Haulers only',()=>{
+test('a person carries 40 load units: 4 Stone, 8 Wood or 40 food; a Hauler twice that (owner 15 Nov 2026) and 2 units more every 5 Logistics levels',()=>{
   assert.equal(LOGISTICS_RULES.loadUnits,40);const king={},hauler=level=>({profession:'hauler',skills:{logistics:{level}}});
   assert.deepEqual(['stone','wood','meat'].map(id=>carryCapacity(king,id)),[4,8,40]);
-  assert.deepEqual([1,5,6,50].map(l=>loadCapacity(hauler(l))),[40,40,42,58]);
+  assert.deepEqual([1,5,6,50].map(l=>loadCapacity(hauler(l))),[80,80,82,98]);assert.deepEqual(['stone','wood','meat'].map(id=>carryCapacity(hauler(1),id)),[8,16,80]);
   assert.equal(loadCapacity({profession:'miner',skills:{logistics:{level:50}}}),40);
   assert.equal(carryCapacity({},'armor'),5);
 });

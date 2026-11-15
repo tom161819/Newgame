@@ -28,8 +28,13 @@ export const loadWeight=resource=>RESOURCE_WEIGHTS[resource]??1;
 export const VEHICLES=Object.freeze({wheelbarrow:Object.freeze({multiplier:5,speed:.9}),horse_wagon:Object.freeze({multiplier:10,speed:1.1,requiresHorse:true})});
 export const TRANSPORT_MODES=Object.freeze(['auto','hands','wheelbarrow','horse_wagon']);
 // The largest load one trip can ever hold (best Hauler on a Horse Wagon), for Save validation.
-export const MAX_TRIP_UNITS=(LOGISTICS_RULES.loadUnits+20)*Math.max(...Object.values(VEHICLES).map(v=>v.multiplier));
-export function loadCapacity(actor){return (LOGISTICS_RULES.loadUnits+(actor.profession==='hauler'?Math.floor(((actor.skills?.logistics?.level??1)-1)/5)*2:0))*(VEHICLES[actor.vehicleType]?.multiplier??1);}
+export const MAX_TRIP_UNITS=(LOGISTICS_RULES.loadUnits*2+20)*Math.max(...Object.values(VEHICLES).map(v=>v.multiplier));
+// m-noseni-zamestnanci (owner 15 Nov 2026: "nosič toho unese 2x víc než zaměstnanec"): a Hauler carries twice the hand load.
+export const HAULER_LOAD_FACTOR=2;
+// How long a producer's worker waits for a Hauler before he carries himself: inputs half a game day (owner 15 Nov
+// 2026: "půl dne, pak si dojde sám"), outputs a moment (a full output buffer stops the next batch).
+export const PRODUCER_WAIT=Object.freeze({inputDays:.5,outputMs:3000});
+export function loadCapacity(actor){const hauler=actor.profession==='hauler';return (LOGISTICS_RULES.loadUnits*(hauler?HAULER_LOAD_FACTOR:1)+(hauler?Math.floor(((actor.skills?.logistics?.level??1)-1)/5)*2:0))*(VEHICLES[actor.vehicleType]?.multiplier??1);}
 // How many pieces of one resource fit in one trip (at least one, so heavy goods still move); without a resource, load units.
 export function carryCapacity(actor,resource=null){const units=loadCapacity(actor);return resource?Math.max(1,Math.floor(units/loadWeight(resource))):units;}
 export const stockLocationId=building=>`${building.type==='starter_stockpile'?'stockpile':building.type==='warehouse'?'warehouse':building.type==='material_yard'?'yard':building.type==='armory'?'armory':building.type==='farmhouse'?'farmhouse':'granary'}-${building.id}`;
