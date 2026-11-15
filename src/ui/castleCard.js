@@ -15,5 +15,5 @@ export function renderCastleUpgrade(scene,box,castle,drawnKey=null){
   box.replaceChildren(...parts);return key;
 }
 export function clickCastleUpgrade(scene){
-  const castle=scene.buildings.find(b=>b.type==='castle'),result=upgradeCastle(scene,castle);scene.setStatus?.(result.error??t('castle.upgraded',{level:result.next}));return result;
+  const castle=scene.buildings.find(b=>b.type==='castle'),result=upgradeCastle(scene,castle);scene.setStatus?.(result.error??t(result.ordered?'castle.upgradeOrdered':'castle.upgraded',{level:result.next}));return result;
 }

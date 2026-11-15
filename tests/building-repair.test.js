@@ -39,3 +39,19 @@ test('a burning building is not repaired; the fire takes its hit points and a fi
   const fire=n.ignite(b);assert.ok(Math.abs(fire.health-75)<1e-6);assert.equal(s.repairs.eligible(b),false);
   n.updateFires(5000);assert.ok(buildingHP(b).hp<max*.75);
 });
+
+// Owner 15 Nov 2026 (61): the Castle's upgrade is paid when ordered and built by Builders over the level's work; the new
+// level stands when the work is done; the job saves and loads.
+test('the Castle upgrade is built by Builders over time and the new level stands when the work is done',async()=>{
+  const {levelDefinition,buildingTiles}=await import('../src/game/buildings.js'),{upgradeCastle,castleUpgradePlan}=await import('../src/game/castleUpgrade.js'),{CASTLE_LEVELS}=await import('../src/data/castle.js');
+  const s=workerScene(undefined,{construction:true,foodProduction:true,logistics:true});s.workerSystem.unsubscribe();for(const a of [...s.animalSystem.animals.values()])s.animalSystem.remove(a);
+  s.repairs=new RepairSystem(s);const tick=s.tick;s.tick=delta=>{tick(delta);s.repairs.update(delta);};
+  const d=levelDefinition(s.objectRegistry.require('castle'),1),castle={id:500,type:'castle',definition:d,x:60,y:60,level:1,tiles:buildingTiles({x:60,y:60},d)};s.buildings.push(castle);for(const t of castle.tiles)s.map[t.y][t.x]=1;
+  s.inventory.add('wood',70);const r=upgradeCastle(s,castle);assert.equal(r.ordered,true);assert.equal(castle.level,1,'not yet');assert.equal(s.inventory.count('wood'),0,'paid when ordered');
+  assert.equal(castle.upgrade.requiredWork,CASTLE_LEVELS[2].work);assert.match(castleUpgradePlan(s,castle).error,/2/,'a second order is refused while it is built');
+  const w=s.workerSystem.create({x:57,y:58});s.workerSystem.jobs.assign(w,'builder');
+  until(s,()=>w.workTask?.kind==='repair'&&w.workTask.targetId===castle.id);until(s,()=>castle.upgrade?.workDone>500);assert.equal(castle.level,1);
+  const {serializeGameState,validateGameState}=await import('../src/systems/GameStateSerializer.js');const state=validateGameState(serializeGameState(s));
+  assert.equal(state.buildings.find(b=>b.id===castle.id).upgrade.level,2);const bad=structuredClone(state);bad.buildings.find(b=>b.id===castle.id).upgrade.level=4;assert.throws(()=>validateGameState(bad));
+  until(s,()=>castle.level===2,400000);assert.equal(castle.upgrade,undefined);assert.equal(w.workTask,null);
+});

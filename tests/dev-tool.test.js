@@ -54,8 +54,8 @@ test('m-91: Market buy and sell prices have separate coefficients, the buy price
   assert.ok(price('wood','sell',{sellScale:2})>sell);assert.ok(price('wood','sell',{sellScale:.5})<sell);
   assert.ok(price('wood','buy',{buyScale:2})>base);assert.equal(price('wood','buy',{sellScale:4,buyScale:.25}),price('wood','sell',{sellScale:4})+1);
 });
-test('m-91: devBalance needs no SAVE_VERSION bump (62 since tabulka-budov-1); devBalance is optional, strictly validated and round-trips; a save without it loads ×1',()=>{
-  assert.equal(SAVE_VERSION,62);
+test('m-91: devBalance needs no SAVE_VERSION bump (63 since the castle upgrade); devBalance is optional, strictly validated and round-trips; a save without it loads ×1',()=>{
+  assert.equal(SAVE_VERSION,63);
   try{
     fresh();const s=workerScene(undefined,{construction:true,logistics:true,gameSettings:gameSettings()});
     const plain=serializeGameState(s);assert.equal(Object.hasOwn(plain,'devBalance'),false,'absent at ×1');validateGameState(plain);

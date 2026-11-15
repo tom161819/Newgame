@@ -28,7 +28,7 @@ export class BuilderAI {
     if(worker.workTask){
       const site=system.getSite(worker.workTask.targetId),assignment=system.assignments.get(worker.id);
       if(!site||!assignment||!system.canWork(site,worker)){scene.workerSystem.ai.cancel(worker);return;}
-      if(system.atSite(worker,assignment)){worker.workState='Working';worker.workMessage=`${site.demolition?'Dismantling':site.repair?'Repairing':buildingDefinition(site).crop?'Establishing':'Building'} ${dataName(site.definition)}`;return;}
+      if(system.atSite(worker,assignment)){worker.workState='Working';worker.workMessage=`${site.demolition?'Dismantling':site.upgrade?'Upgrading':site.repair?'Repairing':buildingDefinition(site).crop?'Establishing':'Building'} ${dataName(site.definition)}`;return;}
       worker.workState='Traveling to Target';worker.workMessage=`Travelling to ${dataName(site.definition)}`;
       if(!worker.nextTile&&!worker.path.length&&worker.aiCooldown<=0){
         worker.aiCooldown=CONSTRUCTION_RULES.retryInterval;

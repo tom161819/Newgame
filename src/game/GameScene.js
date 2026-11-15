@@ -150,7 +150,7 @@ import { ConstructionView } from './ConstructionView.js';
 import { SeasonTransition } from './SeasonTransition.js';
 import { ConstructionUI } from '../ui/ConstructionUI.js';
 import { gameSettings,resourceSpawnSettings } from '../systems/GameSettings.js';
-import { createStartingCastle,createStartingStockpile,depositStartingResources } from '../systems/WorldGenerationConfig.js';
+import { createStartingCastle,createStartingStockpile,depositStartingResources,placeKingInFront } from '../systems/WorldGenerationConfig.js';
 import { WildlifeRespawnSystem } from '../systems/WildlifeRespawnSystem.js';
 import { FarmingSystem } from '../systems/FarmingSystem.js';
 import { CropPlotView } from './CropPlotView.js';
@@ -369,6 +369,8 @@ export class GameScene extends Phaser.Scene {
     pruneNatureGroups(this);
     // World v2: a fingerprint of the starting world as generated (terrain, water, bushes, every placed resource, animals,
     // chests), so tests and the Studio can check that a world code always gives the same world.
+    // Owner 15 Nov 2026 (62): the King starts in front of the Castle, on a tile left free by the whole generation.
+    if(!this.loadState)placeKingInFront(this);
     this.startWorldFingerprint=this.loadState?null:this.worldFingerprint();
     this.resourceLedger=new ResourceTransactionLedger(this);if(this.loadState)this.resourceLedger.suspend();this.inventoryBar.setLedger(this.resourceLedger);
     const onBackground=()=>{this.background?.hide();this.visibilityPaused=true;this.tweens.pauseAll();this.setGalleryInput(false);};
@@ -660,6 +662,8 @@ export class GameScene extends Phaser.Scene {
   }
   startBuilding(definition=this.objectRegistry.require('tower')) {
     this.rockMiningTool?.close();
+    // Owner 15 Nov 2026 (63): the Castle in the build menu is not locked once it stands – it opens its window with the Upgrade.
+    if(definition.id==='castle'){const castle=this.buildings.find(b=>b.type==='castle'&&buildingIsComplete(b));if(castle&&this.demolitionUI){this.demolitionUI.select(castle);this.demolitionUI.openSelected();return true;}}
     if(this.gameOver||this.gameTime.paused)return false;
     if(this.character.transitioning){this.setStatus(t('status.finishClimb'));return false;}
     definition=this.objectRegistry.get(definition.id);if(!definition?.buildable)return false;

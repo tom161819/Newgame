@@ -6,10 +6,11 @@
 // Later the upgrades are to be tied to the kingdom's rank (Settlement → Village → Small town → Town); for now free.
 export const CASTLE_LEVELS=Object.freeze({
   1:Object.freeze({size:4,cost:Object.freeze({wood:40}),hp:800,residents:0,safety:0,income:5,sight:0}),
-  2:Object.freeze({size:4,cost:Object.freeze({wood:70}),hp:1100,residents:2,safety:5,income:7,sight:9}),
-  3:Object.freeze({size:5,cost:Object.freeze({stone:50}),hp:1600,residents:4,safety:10,income:10,sight:11}),
-  4:Object.freeze({size:6,cost:Object.freeze({stone:100}),hp:2200,residents:6,safety:15,income:14,sight:13}),
+  2:Object.freeze({size:4,work:60000,cost:Object.freeze({wood:70}),hp:1100,residents:2,safety:5,income:7,sight:9}),
+  3:Object.freeze({size:5,work:90000,cost:Object.freeze({stone:50}),hp:1600,residents:4,safety:10,income:10,sight:11}),
+  4:Object.freeze({size:6,work:120000,cost:Object.freeze({stone:100}),hp:2200,residents:6,safety:15,income:14,sight:13}),
 });
+// Owner 15 Nov 2026 (61): `work` = Builder work (ms, like constructionTime) of the upgrade to that level.
 export const CASTLE_MAX_LEVEL=4;
 export const castleLevel=building=>building?.type==='castle'?Math.min(CASTLE_MAX_LEVEL,Math.max(1,building.level??1)):0;
 export const castleRules=building=>CASTLE_LEVELS[castleLevel(building)]??null;

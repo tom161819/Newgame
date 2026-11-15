@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.139.0] - 2026-11-15
+<!-- version: {"title":"Castle upgrade by Builders, start layout, build menu order","type":"feature","reconstructed":false,"saveVersion":63} -->
+### Changed
+- The Castle upgrade is now built by Builders: it is paid when ordered and the new level stands when their work is done (1, 1.5 and 2 minutes of one Builder's work for levels 2–4). The Castle window shows the progress.
+- The Castle in the build menu is no longer locked once it stands: its card opens the Castle window with the upgrade.
+- New order in the build menu: Food & Farming – Granary, Hunting Lodge, Fisherman's Hut, Farmhouse, Orchard, Wheat Field, Mill, Bakery; Castle & Defense – Castle, Gate, Wall, Tower, Barracks, Armory, weapon makers; Mining & Industry – Lumberjack Hut, Builder's Workshop, Quarry, Iron Mine, Smelter, Pitch Kiln, Wheelwright; Logistics & Trade – Material Yard, Warehouse, Marketplace, Stables.
+- A new game puts the King in front of the Castle and the Starter Stockpile at least 2 tiles away from it, so the Castle has room to grow.
+
 ## [0.138.8] - 2026-11-15
 <!-- version: {"title":"Haulers box on one line","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

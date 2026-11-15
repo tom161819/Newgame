@@ -76,13 +76,15 @@ export class BuildingBar {
   update(inventory,selected){
     this.inventory=inventory;this.selected=selected;
     for(const {button,availability,definition,card,lock}of this.choices.values()){
-      const status=this.unlocks?.status(definition)??{unlocked:true};
+      let status=this.unlocks?.status(definition)??{unlocked:true};
+      // Owner 15 Nov 2026 (63): the standing Castle is not shown locked; its card opens the Castle window with the Upgrade.
+      if(status.limit&&definition.levels)status={unlocked:true,upgrade:true};
       button.disabled=!status.unlocked;card.classList.toggle('building-locked',!status.unlocked);lock.textContent=status.unlocked?'':`🔒 ${t('building.locked')}`;
       const warning=status.unlocked?status.warning??'':'';
       card.title=status.unlocked?[definition.description,warning].filter(Boolean).join('\n'):status.description;
       const free=status.unlocked&&this.freeOffer(definition);
-      availability.textContent=status.unlocked?[warning,free?t('building.freeOffer'):missingCost(menuCost(definition),inventory,this.registry)].filter(Boolean).join(' · '):status.description;
-      availability.classList.toggle('shortage',!status.unlocked||!free&&!inventory.canAfford(menuCost(definition))||!!warning);card.classList.toggle('building-free',!!free);availability.classList.toggle('building-warning',!!warning);card.classList.toggle('building-warned',!!warning);
+      availability.textContent=status.upgrade?t('castle.menuUpgrade'):status.unlocked?[warning,free?t('building.freeOffer'):missingCost(menuCost(definition),inventory,this.registry)].filter(Boolean).join(' · '):status.description;
+      availability.classList.toggle('shortage',!status.upgrade&&(!status.unlocked||!free&&!inventory.canAfford(menuCost(definition))||!!warning));card.classList.toggle('building-free',!!free);availability.classList.toggle('building-warning',!!warning);card.classList.toggle('building-warned',!!warning);
       button.setAttribute('aria-pressed',String(selected?.id===definition.id));
     }
     this.cancel.hidden=!selected;
