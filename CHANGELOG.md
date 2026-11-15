@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.138.8] - 2026-11-15
+<!-- version: {"title":"Haulers box on one line","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- Population panel: the wanted number of Haulers takes one line; its explanation, the recommended-number button and the Builders line open when the pointer is over it, so the list of residents keeps its room.
+
 ## [0.138.7] - 2026-11-15
 <!-- version: {"title":"Start guide in every new game","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

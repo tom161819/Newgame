@@ -1281,3 +1281,8 @@ html[data-ui-buildings-bar="top"] .buildings-bar:not([data-ui-free]) { bottom: a
 
 /* Owner 15 Nov 2026: the start guide (Wiki, Getting started) uses a big arrow. */
 html .tutorial-arrow.big:not(.offscreen) { width:84px; height:54px; }
+/* Owner 15 Nov 2026: the Haulers box is one line; its details open above it on hover or focus. */
+.population-haulers { position:relative; padding:4px 8px; }
+.population-haulers .employment-row { margin:0; }
+.population-haulers .hauler-info { display:none; position:absolute; left:-1px; right:-1px; bottom:calc(100% + 4px); z-index:6; padding:4px 10px 8px; background:#1d2117f2; border:1px solid #978657; border-radius:6px; box-shadow:0 6px 18px #000a; }
+.population-haulers:hover .hauler-info, .population-haulers:focus-within .hauler-info { display:grid; gap:2px; }

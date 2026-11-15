@@ -11,5 +11,8 @@ export function renderHaulerBox(scene,box){
   const note=element('p','employment-help',t(auto?'employment.haulers.auto':'employment.haulers.manual',{recommended,now:e.count('hauler'),residents:e.residentCount()}));
   const reset=button(t('employment.haulers.useRecommended',{recommended}),'auto');reset.className='employment-recommended';reset.disabled=auto;
   const builders=element('p','employment-help',t(e.builderPlaces()?'employment.builders.auto':'employment.builders.none',{now:e.count('builder'),target:e.builderTarget(),places:e.builderPlaces()}));
-  box.replaceChildren(row,note,reset,builders);
+  // Owner 15 Nov 2026 ("ať je to jenom jeden řádek, info se objeví až po najetí myší"): one line in the panel; the
+  // explanation, the recommended-number button and the Builders line open over it on hover or keyboard focus.
+  const info=element('div','hauler-info');info.append(note,reset,builders);row.title='';
+  box.replaceChildren(row,info);
 }
