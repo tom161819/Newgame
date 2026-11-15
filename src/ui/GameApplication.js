@@ -14,6 +14,8 @@ import { VersionArchivePanel } from './VersionArchivePanel.js';
 import { gameVersion,releases } from 'virtual:game-release';
 import { AutosaveService,readAutosaveSettings,saveAutosaveSettings,AUTOSAVE_INTERVALS } from '../systems/AutosaveService.js';
 import { t,language,LANGUAGES,initLanguage,setLanguage,onLanguageChange } from '../i18n/index.js';
+import { Telemetry } from '../systems/Telemetry.js';
+import { ReportDialog } from './ReportDialog.js';
 
 export class GameApplication {
   constructor(game){
@@ -22,6 +24,10 @@ export class GameApplication {
     initLanguage(storage);this.languageSelects=[...document.querySelectorAll('[data-language-select]')];
     for(const select of this.languageSelects){select.replaceChildren(...Object.entries(LANGUAGES).map(([id,{label}])=>{const option=document.createElement('option');option.value=id;option.textContent=label;return option;}));select.value=language();select.addEventListener('change',()=>setLanguage(select.value,{storage}));}
     this.storage=storage;this.game=game;this.scene=null;this.gameVersion=gameVersion;this.saves=new SaveGameManager();this.saveMenu=new SaveLoadMenu(this);
+    // Owner 15 Nov: anonymous play statistics and "Report a problem" (GitHub Pages build only, see data/telemetry.js).
+    this.telemetry=new Telemetry({storage,version:gameVersion});this.telemetry.visit();
+    this.report=new ReportDialog({storage,version:gameVersion,telemetry:this.telemetry,context:()=>({day:this.scene?.gameTime?.day??'—',population:this.scene?.workerSystem?.liveSubjects?.().length??'—',language:language(),screen:`${innerWidth}×${innerHeight}`})});
+    setInterval(()=>{const scene=this.scene;if(scene?.gameTime)this.telemetry.tick(scene.gameTime.day,!scene.pauseManager?.paused&&!document.hidden);},1000);
     this.autosave=new AutosaveService({saves:this.saves,snapshot:()=>this.snapshot(),settings:readAutosaveSettings(storage),onStatus:status=>this.autosaveStatus(status)});
     const autosaveToggle=document.querySelector('#autosave-toggle'),autosaveInterval=document.querySelector('#autosave-interval');
     if(autosaveToggle&&autosaveInterval){
@@ -85,9 +91,10 @@ export class GameApplication {
     this.changelog.close(false);
     this.setup.close();
     this.pauseDialog.close();this.main.hidden=true;document.body.classList.add('in-game');document.querySelector('main').inert=false;
+    this.startedFromSave=!!state;
     this.game.scene.stop('MainMenu');this.game.scene.stop('Game');this.scene=null;this.game.scene.start('Game',{state,settings});
   }
-  onGameReady(scene){this.scene=scene;
+  onGameReady(scene){this.scene=scene;this.telemetry.gameStarted(this.startedFromSave);
     // Developer console (trade F1.2): mkDev.summonCaravan() brings the next caravan now when a Marketplace is finished.
     try{globalThis.mkDev={summonCaravan:()=>this.scene?.caravans?.summon()??false,fillChildren:count=>{this.scene?.childrenSystem?.setDev(count);return !!this.scene?.childrenSystem;},setPathRenderer:style=>this.scene?.terrain?.setPathStyle(style)??false,setShoreStyle:style=>this.scene?.terrain?.setShoreStyle(style)??false,setGroundStyle:style=>this.scene?.terrain?.setGroundStyle(style)??false,pathStats:()=>this.scene?.terrain?.v2?.stats,scene:()=>this.scene};}catch{/* no global object */}
     this.autosave.reset();if(this.pendingGettingStarted){this.pendingGettingStarted=false;if(!scene.tutorial?.start())scene.gettingStarted?.show();}else scene.tutorial?.resume();}

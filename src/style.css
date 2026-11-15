@@ -192,6 +192,7 @@ body:not(.in-game) > .settings-button, body:not(.in-game) > .settings-panel { di
 .main-menu-content small { color:#a9b4a7; }
 .settings-actions { display:grid; gap:12px; margin-top:24px; }
 .pause-menu { max-width:400px; }
+.report-dialog { max-width:460px; } .report-dialog form { display:grid; gap:10px; } .report-field { display:grid; gap:4px; text-align:left; } .report-field textarea, .report-field input, .report-field select { width:100%; box-sizing:border-box; font:inherit; } .report-stats { font-size:12px; text-align:left; } .report-status { min-height:1.2em; margin:0; font-size:13px; }
 .save-load-dialog { width:min(880px,calc(100vw - 28px)); }
 #new-save-form { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:24px 0; }
 #new-save-form[hidden] { display:none; }

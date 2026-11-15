@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.138.3] - 2026-11-15
+<!-- version: {"title":"Report a problem and anonymous statistics","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Report a problem: a button in the main menu and the game menu sends a message to the author (with the version, day and population). Only in the GitHub Pages version.
+- Anonymous play statistics for the author (no cookies, no IP address); the player can turn them off in the report window. Only in the GitHub Pages version, active once the statistics key is set.
+
 ## [0.138.2] - 2026-11-15
 <!-- version: {"title":"Miner without a quarry","type":"fix","reconstructed":false,"saveVersion":62} -->
 ### Fixed
