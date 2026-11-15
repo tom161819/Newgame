@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.138.7] - 2026-11-15
+<!-- version: {"title":"Start guide in every new game","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- The start guide (the arrow at the Wiki, then at Getting started) shows at the start of every new game, also when the old tutorial was switched off before.
+
 ## [0.138.6] - 2026-11-15
 <!-- version: {"title":"Fog edge in WebGL","type":"fix","reconstructed":false,"saveVersion":62} -->
 ### Fixed

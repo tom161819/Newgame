@@ -89,9 +89,11 @@ export class TutorialGuide {
   button(cls,action){const b=this.doc.createElement('button');b.type='button';b.className=cls;b.addEventListener('click',action,{signal:this.controller.signal});return b;}
   progress(){if(rememberSpeed(this.scene,this.seen))try{localStorage.setItem(SPEED_KEY,'1');}catch{/* session */}return tutorialProgress(this.scene,{seen:this.seen,skipped:this.skipped});}
   // A new game from the setup starts it; a loaded game resumes it while it is switched on and not finished.
-  start(){if(!tutorialEnabled()||introDone())return false;this.active=true;this.startedAt=performance.now();this.update(true);return true;}
+  // Owner 15 Nov 2026 ("ať je tam zatím při každé nové hře"): every new game starts the start guide again, whatever
+  // was chosen before; a loaded game does not.
+  start(){this.seen.delete('wiki');this.seen.delete('tasks');this.skipped.clear();this.active=true;this.startedAt=performance.now();this.update(true);return true;}
   resume(){if(tutorialEnabled()&&!introDone()&&!this.progress().allDone){this.active=true;this.startedAt=performance.now();this.update(true);}}
-  end(){if(this.tip){this.closeTip();try{localStorage.setItem(TIPS_KEY,'off');}catch{/* session */}if(this.tipSetting)this.tipSetting.checked=false;return;}this.active=false;setTutorialEnabled(false);if(this.setting)this.setting.checked=false;this.hide();}
+  end(){if(this.tip){this.closeTip();try{localStorage.setItem(TIPS_KEY,'off');}catch{/* session */}if(this.tipSetting)this.tipSetting.checked=false;return;}this.active=false;try{localStorage.setItem(INTRO_KEY,'done');}catch{/* session */}this.hide();}
   hide(){this.bubble.hidden=true;this.arrow.hidden=true;}
   next(){if(this.tip){this.closeTip();return;}const p=this.progress();if(p.current){this.seen.add(p.current.id);if(p.current.id==='speed')try{localStorage.setItem(SPEED_KEY,'1');}catch{/* session */}}this.update(true);}
   skip(){const p=this.progress();if(p.current)this.skipped.add(p.current.id);this.update(true);}
@@ -157,7 +159,7 @@ export class TutorialGuide {
   }
   update(force=false){
     if(!this.active){this.updateTips();return;}const now=performance.now();if(!force&&now-this.lastCheck<150)return;this.lastCheck=now;
-    if(this.scene.gameOver||!tutorialEnabled()){this.hide();return;}
+    if(this.scene.gameOver){this.hide();return;}
     if(this.scene.wikiPanel?.isOpen)this.seen.add('wiki');
     const p=this.progress();
     if(p.current?.id==='king'&&now-(this.startedAt??now)>=TUTORIAL_KING_MS)this.seen.add('king');
