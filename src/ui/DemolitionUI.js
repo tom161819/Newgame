@@ -1,8 +1,8 @@
 import { renderCastleUpgrade,clickCastleUpgrade } from './castleCard.js';
-import { buildingHP } from '../game/buildingHealth.js';
+import { buildingHP,repairPlan } from '../game/buildingHealth.js';
 import { countName } from '../i18n/names.js';
 import { t } from '../i18n/index.js';
-import { element } from './objectLabels.js';
+import { element,formatCost } from './objectLabels.js';
 import { buildingDefinition,buildingIsComplete } from '../game/buildings.js';
 import { buildingDemolitionRefund } from '../data/demolition.js';
 import { buildingName } from '../game/depletedMine.js';
@@ -34,7 +34,7 @@ export class DemolitionUI {
     const b=this.building(this.selectedId);if(!b||!this.scene.fog.isVisibleObject(b))return;
     if(this.scene.character.state==='ground'&&this.scene.character.order?.kind==='enter'&&this.scene.character.order.tower?.id===b.id)this.scene.character.stopForBuilding();
     text(document.querySelector('#building-detail-title'),`${buildingName(b)} #${b.id}`);text(document.querySelector('#building-detail-description'),buildingDefinition(b).description);
-    {const hp=buildingHP(b),box=document.querySelector('#building-detail-hp');if(box){box.hidden=!hp;if(hp){text(document.querySelector('#building-detail-hp-text'),t('building.hp',{hp:Math.ceil(hp.hp),max:hp.max}));const bar=document.querySelector('#building-detail-hp-bar');bar.max=hp.max;bar.value=hp.hp;}}}
+    {const hp=buildingHP(b),box=document.querySelector('#building-detail-hp');if(box){box.hidden=!hp;if(hp){const r=b.repair,plan=!r&&hp.hp<hp.max?repairPlan(b):null,note=this.scene.nightThreats?.burning?.(b)?t('building.repairFire'):r?(r.assignedBuilders.length||r.workDone>0?t('building.repairWork',{percent:Math.floor(r.progress),count:r.assignedBuilders.length}):t('building.repairWait')):plan?t('building.repairCost',{cost:formatCost(plan.cost,this.scene.objectRegistry)}):'';text(document.querySelector('#building-detail-hp-text'),t('building.hp',{hp:Math.ceil(hp.hp),max:hp.max})+(note?` · ${note}`:''));const bar=document.querySelector('#building-detail-hp-bar');bar.max=hp.max;bar.value=hp.hp;}}}
     // m-hrad-urovne (owner 15 Nov 2026): the Upgrade is in this window.
     {const box=document.querySelector('#building-detail-upgrade');if(box){box.hidden=b.type!=='castle';if(b.type==='castle'){if(b.level)text(document.querySelector('#building-detail-description'),'');renderCastleUpgrade(this.scene,box,b);}}}
     this.scene.setGalleryInput(false);if(!this.dialog.open)this.dialog.showModal();this.attach(this.dialog,b);this.refresh();

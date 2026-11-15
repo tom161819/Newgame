@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.136.0] - 2026-11-15
+<!-- version: {"title":"Building hit points and repairs","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Every building has hit points now (fortifications as before; other buildings 100 + 8 for each unit of their price). Fields, paving, campfires and ruins have none.
+- Fire takes a building's hit points. After the fire is put out the building stays damaged.
+- Builders repair damaged buildings on their own. A repair costs half the price of what is missing and is paid from the stores when it starts; the hit points come back as the Builders work.
+- The building detail shows the hit points and the repair state.
+
 ## [0.135.0] - 2026-11-15
 <!-- version: {"title":"Haulers carry twice as much","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

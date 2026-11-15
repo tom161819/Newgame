@@ -26,19 +26,19 @@ export class ConstructionSystem {
   // m-drevorubci-stromy: 0 for the first Granary / Lumberjack Hut site while none of its type is finished (1 for the
   // second type…), otherwise firstPriority.length. Builders take the lowest rank they can reach; Haulers supply it first.
   priorityRank(site){
-    const rules=CONSTRUCTION_RULES.firstPriority,rank=rules.indexOf(site?.type);if(rank<0||site.demolition||site.unverified)return rules.length;
+    const rules=CONSTRUCTION_RULES.firstPriority,rank=rules.indexOf(site?.type);if(rank<0||site.demolition||site.repair||site.unverified)return rules.length;
     const s=this.scene;if(s.buildings.some(b=>b.type===site.type&&buildingIsComplete(b)))return rules.length;
     const first=[...this.sites.values()].filter(b=>b.type===site.type&&!b.unverified&&!b.demolition).reduce((a,b)=>!a||b.id<a.id?b:a,null);return first===site?rank:rules.length;
   }
-  getSite(id){return this.sites.get(id)??this.scene.demolition?.site(id)??null;}
-  workSites(){return [...this.sites.values(),...(this.scene.demolition?.sites()??[])];}
+  getSite(id){return this.sites.get(id)??this.scene.demolition?.site(id)??this.scene.repairs?.site(id)??null;}
+  workSites(){return [...this.sites.values(),...(this.scene.demolition?.sites()??[]),...(this.scene.repairs?.sites()??[])];}
   // m-oznacovani-tezby (56): a wall, tower or gate is built only once its rocks and trees are gone (bushes do not block).
   clearing(){return this.scene.naturalResources?.miningWork.rocks??null;}
   obstructed(site){return !!this.clearing()?.obstructed(site)||this.occupied(site);}
   // Point 45 (owner 14 Nov 2026): a blueprint may lie under people, animals or goods; building waits until they are
   // gone. An idle resident standing there is sent beside the site.
   occupied(site){
-    const s=this.scene,d=buildingDefinition(site);if(site.demolition===true||d.pavement||d.walkable||!site.tiles)return false;
+    const s=this.scene,d=buildingDefinition(site);if(site.demolition===true||site.repair===true||d.pavement||d.walkable||!site.tiles)return false;
     const inside=new Set(site.tiles.map(t=>`${t.x},${t.y}`)),on=u=>!!u?.isAlive&&u.tile&&inside.has(`${u.tile.x},${u.tile.y}`);let found=false;
     if(s.character?.state==='ground'&&on(s.character))found=true;
     for(const a of s.animalSystem?.animals.values()??[])if(!a.mounted&&on(a)){found=true;break;}
@@ -46,7 +46,7 @@ export class ConstructionSystem {
     if(!found)for(const drop of s.dropSystem?.drops.values()??[])if(inside.has(`${drop.tile.x},${drop.tile.y}`)){found=true;s.dropSystem.clearSite?.(site);break;}
     return found;
   }
-  ready(site){return site.demolition===true||this.materials.ready(site)&&!this.obstructed(site);}
+  ready(site){return site.demolition===true||site.repair===true||this.materials.ready(site)&&!this.obstructed(site);}
   // The site's tiles are already closed, so the way out is searched with the resident's own tile opened.
   stepAside(worker,site){
     const s=this.scene,base=s.workerSystem?.navigationMap?.(worker)??s.map,map=base.map(row=>[...row]);for(const t of site.tiles)map[t.y][t.x]=0;
@@ -58,6 +58,7 @@ export class ConstructionSystem {
   goals(site,actor){const area=buildingDefinition(site).pavement?this.materials.area(site):null;return towerNeighbors(area?.host??site).filter(t=>this.scene.map[t.y]?.[t.x]===0&&this.scene.workerSystem.reservations.available(this.slotKey(t),actor.id));}
   canWork(site,actor){
     if(site?.demolition===true)return this.scene.demolition?.canWork(site,actor)??false;
+    if(site?.repair===true)return this.scene.repairs?.canWork(site,actor)??false;
     if(!site||!actor||actor.commandState&&actor.commandState.state!=='Working')return false;
     return buildingDefinition(site).crop?actor.id!=='king'&&actor.profession==='farmer'&&!!this.scene.farmingSystem?.inRange(actor,site):actor.id==='king'||actor.profession==='builder';
   }
@@ -69,7 +70,7 @@ export class ConstructionSystem {
     if(!this.scene.workerSystem.reservations.reserve(this.slotKey(goal),actor.id))return false;
     this.scene.workerSystem.gather?.release(actor);
     this.assignments.set(actor.id,{siteId:site.id,goal:{...goal}});site.construction.assignedBuilders.push(actor.id);
-    if(actor.id!=='king')actor.workTask={kind:site.demolition?'dismantle':'build',targetId:site.id,reservation:this.slotKey(goal),goal:{...goal},progressMs:0};
+    if(actor.id!=='king')actor.workTask={kind:site.demolition?'dismantle':site.repair?'repair':'build',targetId:site.id,reservation:this.slotKey(goal),goal:{...goal},progressMs:0};
     return true;
   }
   release(actor){
@@ -174,7 +175,7 @@ export class ConstructionSystem {
   exportState(){const king=this.assignments.get('king');return {nextId:Math.max(this.nextId,Math.max(0,...this.scene.buildings.map(b=>b.id))+1),kingSiteId:king?.siteId??null,kingGoal:king?.goal?{...king.goal}:null};}
   importState(data){
     this.sites=new Map(this.scene.buildings.filter(b=>!buildingIsComplete(b)).map(b=>[b.id,b]));this.assignments.clear();this.nextId=data?.nextId??Math.max(0,...this.scene.buildings.map(b=>b.id))+1;
-    for(const worker of this.scene.workerSystem.workers.values())if(['build','dismantle'].includes(worker.workTask?.kind))this.assignments.set(worker.id,{siteId:worker.workTask.targetId,goal:{...worker.workTask.goal}});
+    for(const worker of this.scene.workerSystem.workers.values())if(['build','dismantle','repair'].includes(worker.workTask?.kind))this.assignments.set(worker.id,{siteId:worker.workTask.targetId,goal:{...worker.workTask.goal}});
     if(data?.kingSiteId){const goal={...data.kingGoal};this.assignments.set('king',{siteId:data.kingSiteId,goal});this.scene.workerSystem.reservations.reserve(this.slotKey(goal),'king');}this.revision++;
   }
   destroy(){this.scene.workerSystem.jobs.setConstructionProvider(null);this.assignments.clear();this.sites.clear();}

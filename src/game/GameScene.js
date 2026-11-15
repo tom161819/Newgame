@@ -41,6 +41,7 @@ import { FORESTRY as WORLD_FORESTRY,grandTiles } from '../data/naturalResources.
 import { createBackgroundSimulation } from '../ui/BackgroundSimulationUI.js';
 import { RockMiningTool } from '../ui/RockMiningTool.js';
 import { DemolitionSystem } from '../systems/DemolitionSystem.js';
+import { RepairSystem } from '../systems/RepairSystem.js';
 import { finishDemolition } from './buildingRemoval.js';
 import { DemolitionUI } from '../ui/DemolitionUI.js';
 import { KingdomHappinessIndicator } from '../ui/NeedsDisplay.js';
@@ -337,7 +338,7 @@ export class GameScene extends Phaser.Scene {
     this.constructionSystem=new ConstructionSystem(this,{onProgress:site=>this.towerViews.get(site.id)?.updateProgress?.(site),
       onComplete:site=>{this.towerViews.get(site.id)?.destroy();if(buildingDefinition(site).pavement){this.towerViews.delete(site.id);this.terrain.invalidateArea([site]);this.updateInventory();this.constructionUI?.refresh();return;}this.towerViews.set(site.id,this.createBuildingView(buildingDefinition(site),site));this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.built',{name:buildingDefinition(site).name}));this.completionFlash?.flash(site);},
       onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);if(this.mapMemory?.objects.delete(`building:${site.id}`))this.mapMemory.revision++;this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.siteCancelled'));}});
-    this.demolition=new DemolitionSystem(this,{complete:(building,refund)=>finishDemolition(this,building,refund)});
+    this.demolition=new DemolitionSystem(this,{complete:(building,refund)=>finishDemolition(this,building,refund)});this.repairs=new RepairSystem(this);
     this.constructionUI=new ConstructionUI(this);
     this.foodProduction=new FoodProductionSystem(this);this.military=new MilitarySystem(this);if(!this.loadState&&this.gameSettings.startingGarrison)this.military.enlistStartingGarrison(this.worldRandom('villagers'));this.vehicles=new VehicleSystem(this);this.stables=new StableSystem(this);this.needs=new NeedsSystem(this);this.kingdomHappiness=new KingdomHappinessIndicator(this);this.vehicleViews=new VehicleViews(this);this.caravans=new CaravanSystem(this);this.trade=new TradeSystem(this);this.caravanViews=new CaravanViews(this);this.employment=new EmploymentSystem(this,{enabled:this.gameSettings.autoEmployment});this.diagnostics=new ProductionDiagnostics(this);this.employmentPanel=new EmploymentPanel(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.kingCargoControl=new KingCargoControl(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
     this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);this.farmConnections=new FarmConnections(this);
@@ -420,7 +421,7 @@ export class GameScene extends Phaser.Scene {
       this.equipmentPanel.destroy();this.treasurePanel.destroy();this.gettingStarted.destroy();this.wikiPanel?.destroy();this.royalGoalsPanel?.destroy();this.royalGoals?.destroy();this.kingSkills?.destroy();this.completionFlash?.destroy();this.storePreview?.destroy();this.dangerMarks?.destroy();this.soundController?.abort();this.marketplacePanel.destroy();this.catPanel?.destroy();this.domesticViews?.destroy();this.domestic?.destroy();this.villagePanel?.destroy();this.issueIcons?.destroy();this.materialPiles?.destroy();this.sideCards?.destroy();this.childViews?.destroy();this.childrenSystem?.destroy();this.porches?.destroy();this.lightFuel?.destroy();this.nightThreats?.destroy();this.heating?.destroy();this.fuelIcons?.destroy();this.fireViews?.destroy();this.kingdomOverview?.destroy();this.speedControls?.destroy();this.tutorial?.destroy();this.helpArrow?.destroy();this.nightOverlay?.destroy();this.fogEdge?.destroy();this.fishShadows?.destroy();this.nightControls?.destroy();this.nightSpeedUp?.destroy();this.background?.destroy();this.builderWorkshopPanel.destroy();this.fishing?.destroy();this.caravanViews.destroy();this.trade.destroy();this.caravans.destroy();this.policyPanel.destroy();this.policy.destroy();this.treasureSystem.destroy();this.production.destroy();this.gameTime.destroy();
       this.pathWear.destroy();this.terrain.destroy();
       this.experienceFeedback.destroy();this.pavementTool.destroy();this.unitPanel.destroy();this.experienceSystem.destroy();this.activities.destroy();
-      this.demolitionUI.destroy();this.demolition.destroy();this.farmConnections.destroy();this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
+      this.demolitionUI.destroy();this.demolition.destroy();this.repairs.destroy();this.farmConnections.destroy();this.farmingPanel.destroy();this.farmingSystem.destroy();this.constructionUI.destroy();this.constructionSystem.destroy();this.workplacePanel.destroy();this.workplaceSystem.destroy();this.workerSystem.destroy();this.skillSystem.destroy();this.wageSystem.destroy();
       this.storagePanel.destroy();this.legacyStockpiles.destroy();this.logisticsTasks.destroy();this.foodProduction.destroy();this.foodStorage.destroy();
       this.foodEconomyPanel.destroy();this.foodSystem.destroy();this.needs?.destroy();this.unsubscribeSeason();this.seasonTransition?.destroy();this.seasons.destroy();
       this.game.events.off(Phaser.Core.Events.PAUSE,onBackground);this.game.events.off(Phaser.Core.Events.RESUME,onForeground);
@@ -885,7 +886,7 @@ export class GameScene extends Phaser.Scene {
     this.logisticsTasks.update();
     this.animalSystem.update(delta);this.huntingSystem.update(delta);this.mountSystem.update(delta);this.workerSystem.update(delta);this.naturalResources.mining.updateDepletion();const covered=this.combat.update(delta);
     if(this.gameOver)return null;
-    this.constructionSystem.update(delta);this.demolition.update(delta);
+    this.constructionSystem.update(delta);this.demolition.update(delta);this.repairs.update(delta);
     this.farmingSystem.update(delta);
     this.foodProduction.update(delta);this.military.update(delta);this.vehicles.update();this.stables.update(delta);this.caravans.update(delta);this.trade.update();this.caravanViews.update();this.vehicleViews.update();this.employment.update();this.diagnostics.update();
     this.regeneration.update(delta,[this.character,...this.animalSystem.animals.values(),...this.workerSystem.liveWorkers()],covered);

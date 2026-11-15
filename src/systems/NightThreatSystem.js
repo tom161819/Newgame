@@ -1,3 +1,4 @@
+import { buildingHP,buildingMaxHP } from '../game/buildingHealth.js';
 import { NIGHT_THREATS } from '../data/nightThreats.js';
 import { buildingDefinition,buildingIsComplete,buildingTiles,placementError,campfireWood,towerNeighbors, definitionFor } from '../game/buildings.js';
 import { removeBuildingShell,detachLostBuilding } from '../game/buildingRemoval.js';
@@ -235,7 +236,8 @@ export class NightThreatSystem {
     return out;
   }
   ignite(b){
-    const F=NIGHT_THREATS.fires,fire={id:b.id,intensity:F.startIntensity,health:100};this.fires.set(b.id,fire);
+    // m-budovy-hp: a damaged building starts burning with what is left of its hit points.
+    const F=NIGHT_THREATS.fires,hp=buildingHP(b),fire={id:b.id,intensity:F.startIntensity,health:hp?100*hp.hp/hp.max:100};this.fires.set(b.id,fire);this.scene.repairs?.cancel?.(b.id);
     // m-obyvatele-jmena-spanek-pohyb (42): sleepers wake and come out of a burning house.
     for(const w of this.scene.workerSystem?.sleepersIn?.(b.id)??[])this.scene.workerSystem.rest?.stop?.(w);
     this.scene.eventFeed?.push?.(`fire:${b.id}:${this.scene.gameTime?.day??1}`,t('threats.fire',{name:definitionFor(b,this.scene.objectRegistry).name}),{important:true,target:b});this.scene.dangerMarks?.mark({x:b.x+1,y:b.y+1});this.changed();return fire;
@@ -254,6 +256,8 @@ export class NightThreatSystem {
       fire.intensity=Math.min(100,fire.intensity+F.regrowPerSecond*seconds);
       fire.health-=100*(delta/(day*F.burnDays))*(fire.intensity/100);if(fire.fate==='saved')fire.health=Math.max(F.savedHealth,fire.health);
       if(fire.health<=0){this.burnDown(b);continue;}
+      // m-budovy-hp: the fire takes the building's hit points; what is left after the fire stays until it is repaired.
+      {const max=buildingMaxHP(b);if(max){const hp=Math.max(0,Math.round(max*fire.health)/100);if(hp<max)b.hp=Math.min(b.hp??max,hp);}}
       if(spread&&this.enabled.fires)for(const other of s.buildings){if(other===b||!this.flammable(other)||this.fires.has(other.id)||this.fireproof(other))continue;if(this.gap(other,this.center(b))<=F.range+buildingDefinition(b).width/2&&this.random()<F.spreadChance)this.ignite(other);}
     }
   }
