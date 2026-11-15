@@ -24,7 +24,7 @@ export default {
   'object.iron_deposit_large.name':'Velké ložisko železa','object.iron_deposit_large.description':'Velké konečné ložisko 150–240 železné rudy (3 × 3). Nikdy se neobnoví; po vytěžení zůstane skalní útvar.',
   'object.iron_ore.name':'Železná ruda','object.iron_ore.description':'Surová železná ruda. Huť z ní s dřevem vyrobí železo.',
   'object.tower.name':'Kamenná věž','object.tower.description':'Kamenná strážní věž s horní plošinou a cimbuřím.',
-  'object.castle.name':'Hrad','object.castle.description':'Kamenná pevnost s horní plošinou a cimbuřím. Z plošiny poskytuje o 75 % větší dohled.',
+  'object.castle.name':'Hrad','object.castle.description':'Sídlo krále. Začíná jako dřevěný dvorec a dá se třikrát vylepšit až na kamenný hrad. Každá úroveň přidá výdrž, příjem zlata, bezpečí a místo pro obyvatele; od úrovně 2 hlídá okolí.',
   'object.wall.name':'Kamenná hradba','object.wall.description':'Spojitelná kamenná hradba. Tažením postavíš rovnou řadu a po vrcholu lze chodit mezi spojenými segmenty.',
   'object.quarry.name':'Kamenolom','object.quarry.description':'Kamenolom se třemi místy pro horníky. Musí překrývat skutečné kamenné ložisko a mít dostupný přístup. Těží pouze svou přiřazenou konečnou zásobu.',
   'object.builder_workshop.name':'Dílna stavitelů','object.builder_workshop.description':'Otevřená dílna a sklad stavebního materiálu. Každá dílna obslouží 4 stavitele; stavitelé bez dílny pracují o 50 % pomaleji.',

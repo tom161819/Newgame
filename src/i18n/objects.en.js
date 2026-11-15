@@ -24,7 +24,7 @@ export default {
   'object.iron_deposit_large.name':'Large Iron Deposit','object.iron_deposit_large.description':'A large finite 150–240 Iron Ore deposit (3 × 3). Never regenerates; depletion leaves a rocky formation.',
   'object.iron_ore.name':'Iron Ore','object.iron_ore.description':'Raw iron-bearing ore. A Smelter processes it with Wood into finished Iron.',
   'object.tower.name':'Stone Tower','object.tower.description':'A stone watchtower with a platform and battlements.',
-  'object.castle.name':'Castle','object.castle.description':'A stone fortress with a platform and battlements. Its platform gives 75 % more sight.',
+  'object.castle.name':'Castle','object.castle.description':"The King's seat. It starts as a timber hall and can be upgraded three times up to a stone castle. Each level adds hit points, gold income, Safety and room for residents; from level 2 it watches its surroundings.",
   'object.wall.name':'Stone Wall','object.wall.description':'A connectable stone wall. Drag to build a straight line; you can walk along the top between connected segments.',
   'object.quarry.name':'Quarry','object.quarry.description':'A quarry with three Miner workplaces. It must cover a real stone deposit and be reachable. It mines only its assigned finite deposit.',
   'object.builder_workshop.name':'Builder\'s Workshop','object.builder_workshop.description':'An open workshop and material yard for Builders. Each workshop serves 4 Builders; Builders without one work 50 % slower.',

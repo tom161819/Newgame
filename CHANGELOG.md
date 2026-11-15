@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.133.3] - 2026-11-15
+<!-- version: {"title":"Castle menu shows level 1","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- The Castle in the building menu shows its first level (the timber hall, 4 × 4) instead of the old stone keep, and its description explains the four levels.
+
 ## [0.133.2] - 2026-11-15
 <!-- version: {"title":"Studio: diagonal wall pieces for review","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

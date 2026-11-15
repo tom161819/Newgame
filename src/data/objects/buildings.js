@@ -27,7 +27,7 @@ export const buildings = [
     width:3,height:3,walkable:false,collectible:false,buildable:true,cost:{stone:20},maxCount:1,levels:CASTLE_LEVELS,artSprites:CASTLE_ART,
     constructionTime:45000,
     production:{resource:'gold',amount:5,interval:'day',label:'Castle income'},
-    interactions:['enter','exit'],description:'Kamenná pevnost s horní plošinou a cimbuřím. Z plošiny poskytuje o 75 % větší dohled.',
+    interactions:['enter','exit'],description:'Sídlo krále. Začíná jako dřevěný dvorec a dá se třikrát vylepšit až na kamenný hrad. Každá úroveň přidá výdrž, příjem zlata, bezpečí a místo pro obyvatele; od úrovně 2 hlídá okolí.',
     visibility:{multiplier:1.75},renderMode:'sprite',renderer:'fortification',
     origin:{"x": 0.4899, "y": 0.99206},frontOrigin:{"x": 0.4899, "y": 0.99206},visualHeight:250,platform:{"x": 0, "y": -199},depth:{offset:0},
     lights:[{"type": "window", "x": -23.36, "y": -156.49, "color": "#ffcf7a", "radius": 28.8, "intensity": 0.75, "flicker": {"amplitude": 0.03, "speed": 1.5}, "flameSize": 0}, {"type": "window", "x": 13.44, "y": -151.85, "color": "#ffcf7a", "radius": 28.8, "intensity": 0.75, "flicker": {"amplitude": 0.03, "speed": 1.5}, "flameSize": 0}, {"type": "window", "x": 16.96, "y": -64.47, "color": "#ffcf7a", "radius": 28.8, "intensity": 0.75, "flicker": {"amplitude": 0.03, "speed": 1.5}, "flameSize": 0}, {"type": "torch", "x": -43.52, "y": -69, "color": "#ffb25a", "radius": 102.4, "intensity": 0.95, "flicker": {"amplitude": 0.12, "speed": 7}, "flameSize": 1}, {"type": "torch", "x": -24.32, "y": -59.4, "color": "#ffb25a", "radius": 102.4, "intensity": 0.95, "flicker": {"amplitude": 0.12, "speed": 7}, "flameSize": 1}],

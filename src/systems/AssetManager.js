@@ -97,7 +97,9 @@ export class AssetManager {
 
   previewURL(definition) {
     if(this.previews.has(definition.id))return this.previews.get(definition.id);
-    const key=this.textureKey(definition.id),texture=this.scene.textures.get(key);
+    // m-hrad-urovne: a building with levels (the Castle) shows its level 1 in the menu, not the old keep.
+    const first=definition.levels&&definition.artSprites?.l1&&this.hasTexture(definition.id,'art-l1')?this.key(definition.id,'art-l1'):null;
+    const key=first??this.textureKey(definition.id),texture=this.scene.textures.get(key);
     const frame=texture.get(definition.spritesheet&&key!==this.fallbackKey?definition.visual?.previewFrame??0:undefined);
     const canvas=document.createElement('canvas');canvas.width=frame.cutWidth;canvas.height=frame.cutHeight;
     canvas.getContext('2d').drawImage(frame.source.image,frame.cutX,frame.cutY,frame.cutWidth,frame.cutHeight,0,0,canvas.width,canvas.height);

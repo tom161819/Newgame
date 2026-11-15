@@ -44,7 +44,7 @@ export class BuildingBar {
       button.type='button';button.id=`${definition.id}-choice`;button.dataset.buildingId=definition.id;
       button.setAttribute('aria-pressed','false');button.setAttribute('aria-describedby',`${definition.id}-description ${definition.id}-availability`);
       const image=element('img','tower-icon');image.src=this.assets.previewURL(definition);image.alt='';
-      const names=element('span','building-name');names.append(element('strong','',definition.name),element('small','',t('building.size',{width:definition.width,height:definition.height})));
+      const names=element('span','building-name');names.append(element('strong','',definition.name),element('small','',t('building.size',{width:definition.levels?.[1]?.size??definition.width,height:definition.levels?.[1]?.size??definition.height})));
       button.append(image,names,element('span','building-price',formatCost(menuCost(definition),this.registry)));
       const description=element('p','',definition.description);description.id=`${definition.id}-description`;
       const availability=element('p','building-availability');availability.id=`${definition.id}-availability`;availability.setAttribute('role','status');
