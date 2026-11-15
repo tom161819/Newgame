@@ -1,4 +1,4 @@
-import { devProduction,devFactor,devTreeWood,devChopDuration } from '../data/devBalance.js';
+import { devProduction,devFactor,devTreeWood,devObjectWood,devChopDuration } from '../data/devBalance.js';
 import { FORESTRY } from '../data/naturalResources.js';
 import { calendar } from '../data/seasons.js';
 import { buildingIsComplete } from '../game/buildingState.js';
@@ -88,7 +88,7 @@ export class ForestryWork {
     const s=this.scene,system=s.workerSystem;let task;
     // m-drevorubci-stromy: with the Dev tool's Wood per tree above one load, he carries one load; the rest stays on the
     // ground for the Haulers.
-    const amount=Math.min(devTreeWood(object.definition.tree),carryCapacity(worker,'wood')),pile=s.foodStorage?.pileFor(this.workplace(worker));if(pile&&s.foodStorage.room(pile.id,'wood')<amount){if(s.foodProduction?.carryOwnOutput(worker,this.workplace(worker)))return;this.wait(worker,'Output pile full');return;}
+    const amount=Math.min(devObjectWood(object),carryCapacity(worker,'wood')),pile=s.foodStorage?.pileFor(this.workplace(worker));if(pile&&s.foodStorage.room(pile.id,'wood')<amount){if(s.foodProduction?.carryOwnOutput(worker,this.workplace(worker)))return;this.wait(worker,'Output pile full');return;}
     // m-sklady-materialu-koncept (49): timber goes on the pile by the hut; Haulers take it to a store.
     const output=pile?{location:pile}:s.foodStorage?.findDestination(worker,'wood',amount);if(!output){this.wait(worker,'Waiting for reachable timber storage capacity');return;}
     const transferId=`food-transfer-${s.foodProduction.nextTransfer++}`,capacityReservation=s.foodStorage.reserve('capacity',output.location.id,'wood',amount,transferId);if(!capacityReservation)return;
@@ -103,8 +103,8 @@ export class ForestryWork {
     if(worker.nextTile||worker.path.length)return;
     if(!system.ai.atGoal(worker,task.goal)){system.ai.cancel(worker);this.wait(worker,'Waiting for a reachable work position');return;}
     worker.workState='Working';worker.workMessage=`Chopping ${dataName(object.definition)} ${Math.floor(object.natural.workDone/devChopDuration(object.definition.tree)*100)}%`;
-    if(!this.natural.work(object,worker,delta*(s.workplaceSystem.workFactor?.(worker)??1)*devProduction('woodcutter')))return;
-    const record=s.workplaceSystem.records.get(building.id),day=s.gameTime.day,stats=record.forestry??{harvested:0,day,producedToday:0};if(stats.day!==day){stats.day=day;stats.producedToday=0;}const felled=devTreeWood(object.definition.tree);stats.harvested+=felled;stats.producedToday+=felled;record.forestry=stats;
+    const felled=devObjectWood(object);/* read before the tree falls: a grand oak is a plain stump afterwards */if(!this.natural.work(object,worker,delta*(s.workplaceSystem.workFactor?.(worker)??1)*devProduction('woodcutter')))return;
+    const record=s.workplaceSystem.records.get(building.id),day=s.gameTime.day,stats=record.forestry??{harvested:0,day,producedToday:0};if(stats.day!==day){stats.day=day;stats.producedToday=0;}stats.harvested+=felled;stats.producedToday+=felled;record.forestry=stats;
     system.reservations.release(this.slot(task.goal),worker.id);worker.workTask=null;const woodAt=tile=>[...s.dropSystem.drops.values()].find(d=>d.resource==='wood'&&d.siteId==null&&d.tile.x===tile.x&&d.tile.y===tile.y),drop=woodAt(object)??woodAt(worker.tile),pickup=drop&&system.ai.route(worker,[drop.tile]);
     if(!drop||!pickup||!system.reservations.reserve(`drop:${drop.id}`,worker.id)){s.foodStorage.release(task.capacityReservation);this.wait(worker,'Timber preserved on the ground');return;}
     if(!s.foodProduction.setTask(worker,'foodPickup',pickup,{transferId:task.transferId,capacityReservation:task.capacityReservation,destinationId:task.destinationId,sourceDropId:drop.id,resource:'wood',amount:task.amount,naturalHarvest:true})){system.reservations.release(`drop:${drop.id}`,worker.id);s.foodStorage.release(task.capacityReservation);this.wait(worker,'Timber preserved on the ground');}

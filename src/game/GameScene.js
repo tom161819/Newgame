@@ -37,7 +37,7 @@ import { ArmyPanel } from '../ui/ArmyPanel.js';
 import { decodeWorldCode,randomWorldCode,defaultWorldLevels,settingsFromLevels } from '../data/worldCode.js';
 import { buildRelief,setRelief,sightBonus } from './terrainRelief.js';
 import { worldStreams } from './seededRandom.js';
-import { FORESTRY as WORLD_FORESTRY } from '../data/naturalResources.js';
+import { FORESTRY as WORLD_FORESTRY,grandTiles } from '../data/naturalResources.js';
 import { createBackgroundSimulation } from '../ui/BackgroundSimulationUI.js';
 import { RockMiningTool } from '../ui/RockMiningTool.js';
 import { DemolitionSystem } from '../systems/DemolitionSystem.js';
@@ -361,7 +361,9 @@ export class GameScene extends Phaser.Scene {
       // m-kamenolom-u-hradu: a Quarry deposit 8–16 tiles from the Castle in every world (generator 3).
       this.naturalResources.mining.ensureStartQuarry(this.worldRandom('start-quarry'));
       // m-zelezny-dul-misto: a free Iron Mine spot beside the nearest Iron Deposit (generator 5).
-      this.naturalResources.mining.ensureIronMine(this.worldRandom('start-iron-mine'));}
+      this.naturalResources.mining.ensureIronMine(this.worldRandom('start-iron-mine'));
+      // m-duby: lone oaks and the grand oaks of the starting world (after everything else, so the rest stays as it was).
+      if(settingsFromLevels(this.worldLevels).forest>0)this.naturalResources.generateOaks();}
     // velke-prirodni-objekty: a group with a tree, deposit or building on a tile is single bushes or rocks again.
     pruneNatureGroups(this);
     // World v2: a fingerprint of the starting world as generated (terrain, water, bushes, every placed resource, animals,
@@ -489,7 +491,7 @@ export class GameScene extends Phaser.Scene {
   resourceCount(id) { let count=0;for(const view of this.resources.values())if(view.getData('objectId')===id)count++;return count; }
   addResource(definition,tile,natural=null) {
     const point=gridToWorld(tile.x+definition.width/2,tile.y+definition.height/2),key=tileKey(tile);
-    const object={x:tile.x,y:tile.y,type:definition.id,definition,tiles:resourceTiles(tile,definition),...(natural?{natural:structuredClone(natural)}:{})};
+    const object={x:tile.x,y:tile.y,type:definition.id,definition,tiles:natural?.grand?grandTiles(tile):resourceTiles(tile,definition),...(natural?{natural:structuredClone(natural)}:{})};
     const view=this.assets.createView(definition.id,{...point,tile,object});
     view.setData('tile',{...tile});view.setData('object',object);
     this.resources.set(key,view);

@@ -29,9 +29,9 @@ export class TreeView extends Phaser.GameObjects.Container {
       const art=this.definition.artSprites[look],oak=this.definition.id==='oak_tree',winter=oak&&look==='winter',grand=oak&&!!this.object.natural.grand;
       const key=seasonTextureKey(this.scene,this.scene.assets.key(this.definition.id,`art-${look}`),oak&&!winter?this.season:'Summer',treeHash(this.tile??this.object)>>2&1);
       // The bare winter oak is the earlier, smaller drawing: it is scaled to the render's size. A grand oak stands on the
-      // middle of its 2 × 2 (the corner behind its own tile).
-      this.art.setTexture(key).setOrigin(art.origin.x,art.origin.y).setScale(winter?(grand?OAK_WINTER_SCALE.grand:OAK_WINTER_SCALE.broad):1).setPosition(0,grand?-16:0).setVisible(true);this.artLook=look;this.body.clear();
-      this.setDepth(this.y+(this.object.natural.stage<3?-.15:this.definition.depth?.offset??0));
+      // middle of its 2 × 2 (the corner in front of its own tile) and sorts by that point.
+      this.art.setTexture(key).setOrigin(art.origin.x,art.origin.y).setScale(winter?(grand?OAK_WINTER_SCALE.grand:OAK_WINTER_SCALE.broad):1).setPosition(0,grand?16:0).setVisible(true);this.artLook=look;this.body.clear();
+      this.setDepth(this.y+(grand?16:0)+(this.object.natural.stage<3?-.15:this.definition.depth?.offset??0));
       return;
     }
     this.art.setVisible(false);this.artLook=null;
@@ -56,7 +56,7 @@ export class TreeView extends Phaser.GameObjects.Container {
     const side=blow%2?1:-1;this.shiver?.stop?.();this.setAngle(0);
     this.shiver=this.scene.tweens?.add?.({targets:this,angle:{from:1.6*side,to:0},duration:220,ease:'Sine.easeOut'})??null;
   }
-  getMemoryState(){return{stage:this.object.natural.stage,season:this.season};}
+  getMemoryState(){return{stage:this.object.natural.stage,season:this.season,...(this.object.natural.grand?{grand:true}:{})};}
   containsPoint(x,y){
     if(stumpGone(this.object.natural))return false;
     if(this.artLook){const frame=this.art.frame,k=this.art.scaleX||1,px=Math.floor((x-this.x-this.art.x)/k+this.art.originX*frame.width),py=Math.floor((y-this.y-this.art.y)/k+this.art.originY*frame.height);return px>=0&&py>=0&&px<frame.width&&py<frame.height&&(this.scene.textures.getPixelAlpha(px,py,this.art.texture.key)??0)>=128;}

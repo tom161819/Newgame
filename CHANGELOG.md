@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.133.0] - 2026-11-15
+<!-- version: {"title":"Old oaks on 2 × 2","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Old oaks on 2 × 2. A grown oak that is old enough and has free land beside it spreads into a big old oak, taller and wider than the others. Where there is no room it stays the middle oak. About half of the oaks can do this, so forests keep both sizes.
+- A big old oak gives 10 Wood (a normal oak 6). It can be felled from any side.
+- New worlds have small groups of 1–4 oaks standing alone outside the forests, and some forest oaks start big with a gap around them.
+
 ## [0.132.0] - 2026-11-15
 <!-- version: {"title":"Village Green on 4 × 4 with the new picture","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

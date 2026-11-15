@@ -19,6 +19,18 @@ export const FORESTRY=Object.freeze({
   saplingChance:.5,hutGrowthBoost:1.5,surplusDays:1,
   trees:Object.freeze({oak_tree:Object.freeze({wood:6,xp:15,chopDuration:7000}),pine_tree:Object.freeze({wood:5,xp:12,chopDuration:7000})}),
 });
+// m-duby (owner 15 Nov 2026): an old oak on 2 × 2. A grown oak (stage 3, one tile) that is `ageDays` old tries once a
+// day to spread onto the three tiles beside it (x+1, y+1); where there is no room it stays the middle oak. A grand
+// oak gives `wood`. World: `worldShare` of the grown oaks get a gap in the forest and start grand; `lone` small groups
+// of 1–4 oaks per 1 000 land tiles stand outside the forests.
+export const GRAND_OAK=Object.freeze({wood:10,ageDays:14,worldShare:.14,lonePer1000:1.2,loneGroup:Object.freeze([1,1,2,2,3,4])});
+export const grandTiles=tile=>[{x:tile.x,y:tile.y},{x:tile.x+1,y:tile.y},{x:tile.x,y:tile.y+1},{x:tile.x+1,y:tile.y+1}];
+// A fixed number per tile: which oaks can ever become grand (half of them, so forests keep both sizes) and which get
+// a gap when the world is made.
+export const tileHash=tile=>(Math.imul((tile?.x??0)+17,374761393)^Math.imul((tile?.y??0)+29,668265263))>>>0;
+export const oakCanSpread=tile=>(tileHash(tile)>>>6)%2===0;
+export const oakStartsGrand=tile=>(tileHash(tile)>>>9)%1000<GRAND_OAK.worldShare*1000;
+export const isGrand=object=>object?.type==='oak_tree'&&object.natural?.stage===3&&object.natural.grand===true;
 export const TREE_STAGES=Object.freeze(['Stump','Sapling','Young tree','Mature tree']);
 export const stumpGone=natural=>!!natural&&natural.stage===0&&(natural.rot??0)>=FORESTRY.stumpRotDays;
 export const treeBlocks=object=>!!object?.natural&&object.natural.stage===3;

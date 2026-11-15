@@ -8,7 +8,7 @@ import { pavementWorkArea } from '../game/pavement.js';
 import { recipeFor,recipeResources,recipeVariants } from '../data/production.js';
 import { PLAYER_START } from '../game/config.js';
 import { buildingIsComplete, definitionFor } from '../game/buildings.js';
-import { devTreeWood } from '../data/devBalance.js';
+import { devTreeWood,devObjectWood } from '../data/devBalance.js';
 import { physicalResources,materialResources,storageResources,stockLocationId,carryCapacity,equipmentResources,MAX_TRIP_UNITS,LOGISTICS_RULES,outputPile,pileLocationId } from '../data/logistics.js';
 
 export function validateFoodState(s,registry,{check,number,integer,array}){
@@ -119,7 +119,7 @@ export function validateFoodState(s,registry,{check,number,integer,array}){
     if(t.kind==='harvest'){
       const crop=registry.require(s.buildings.find(b=>b.id===t.targetId).type).crop;check(t.capacityReservation&&locations.has(t.destinationId));capacity(t.capacityReservation,t.transferId,crop.resource,crop.yield);continue;
     }
-    if(t.kind==='chopTree'){const tree=s.resources.find(r=>r.natural?.id===t.targetId),yieldAmount=devTreeWood(registry.require(tree?.type).tree,s.devBalance?.woodYield??1);/* m-drevorubci-stromy: the save's Wood per tree, at most one load */check(Number.isSafeInteger(t.amount)&&t.amount>=1&&t.amount<=yieldAmount&&(t.amount===yieldAmount||t.amount===carryCapacity({...w,vehicleType:null},'wood'))&&ownOutput(w,t.destinationId));capacity(t.capacityReservation,t.transferId,'wood',t.amount);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);continue;}
+    if(t.kind==='chopTree'){const tree=s.resources.find(r=>r.natural?.id===t.targetId),yieldAmount=devObjectWood({natural:tree?.natural,definition:registry.require(tree?.type)},s.devBalance?.woodYield??1);/* m-drevorubci-stromy: the save's Wood per tree, at most one load */check(Number.isSafeInteger(t.amount)&&t.amount>=1&&t.amount<=yieldAmount&&(t.amount===yieldAmount||t.amount===carryCapacity({...w,vehicleType:null},'wood'))&&ownOutput(w,t.destinationId));capacity(t.capacityReservation,t.transferId,'wood',t.amount);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);continue;}
     if(t.kind==='mineDeposit'){const home=s.buildings.find(b=>b.id===w.assignedWorkplaceId),resource=definitionFor(home,registry).mining.resource;check(t.amount===1&&ownOutput(w,t.destinationId));capacity(t.capacityReservation,t.transferId,resource,1);check(reservations.get(t.capacityReservation)?.locationId===t.destinationId);continue;}
     if(!['foodPickup','foodDeliver'].includes(t.kind))continue;
     check(resources.includes(t.resource)&&locations.has(t.destinationId));integer(t.amount,1,carryCapacity({...w,vehicleType:s.vehicles?.vehicles.find(v=>v.operatorId===w.id&&v.state==='inUse')?.type??null},t.resource));

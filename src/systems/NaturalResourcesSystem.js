@@ -2,7 +2,7 @@ import { COLUMNS,ROWS } from '../game/config.js';
 import { thicketTiles } from '../game/natureGroups.js';
 import { isFertileGround } from '../data/worldTerrain.js';
 import { t } from '../i18n/index.js';
-import { FORESTRY,treeBlocks,treeState,stumpGone } from '../data/naturalResources.js';
+import { FORESTRY,GRAND_OAK,grandTiles,oakCanSpread,oakStartsGrand,treeBlocks,treeState,stumpGone } from '../data/naturalResources.js';
 import { reachableTiles,reachableCount,findPathToAny,reachableMask,blockKeepsReach } from '../game/pathfinding.js';
 import { tileKey } from '../game/stones.js';
 import { buildingIsComplete,buildingDefinition } from '../game/buildings.js';
@@ -10,7 +10,7 @@ import { ForestryWork } from './ForestryWork.js';
 import { MineralSystem } from './MineralSystem.js';
 import { resourceBlocks } from '../data/minerals.js';
 import { MiningWork } from './MiningWork.js';
-import { devFactor,devTreeWood,devChopDuration } from '../data/devBalance.js';
+import { devFactor,devTreeWood,devObjectWood,devChopDuration } from '../data/devBalance.js';
 
 // m-drobnosti-076 (report 0.76.0 point 10): "wood lies by the stump" only for the King's own felling while he is the
 // one the player controls (no residents selected) – he stands at that stump. A Woodcutter's felling stays silent (it
@@ -76,7 +76,8 @@ export class NaturalResourcesSystem {
     this.ageClock+=delta/this.scene.gameTime.dayDuration;this.growthClock+=delta/this.scene.gameTime.dayDuration*this.growthModifier()*devFactor('forestGrowth');this.refreshElapsed+=delta;
     if(this.refreshElapsed+1e-7>=FORESTRY.refreshInterval){this.refreshElapsed=Math.max(0,this.refreshElapsed-FORESTRY.refreshInterval*Math.floor((this.refreshElapsed+1e-7)/FORESTRY.refreshInterval));this.flushGrowth();}
   }
-  flushGrowth(){
+  // `spread:false` (saving): growth is brought up to date, but no oak turns grand inside a save.
+  flushGrowth({spread=true}={}){
     // performance-1: building tiles and the reachable count are read once per pass (both change only with a stage).
     const reserved=this.reserved(),built=new Set(),routes={};for(const b of this.scene.buildings)for(const t of b.tiles)built.add(tileKey(t));
     // m-velikost-mapy: a local route test first, against the reachable tiles read once per pass (kept up to date as
@@ -87,7 +88,8 @@ export class NaturalResourcesSystem {
     for(const object of this.byId.values()){
       if(!object.definition.tree)continue;
       const n=object.natural,aged=Math.max(0,this.ageClock-n.ageCheckpoint);n.ageDays+=aged;n.ageCheckpoint=this.ageClock;const growth=Math.max(0,this.growthClock-n.growthCheckpoint);n.growthCheckpoint=this.growthClock;
-      if(n.stage===3||built.has(tileKey(object)))continue;
+      if(n.stage===3){if(spread&&!built.has(tileKey(object))&&this.growGrand(object,reserved,()=>mask??=reachableMask(map,origins))){mask=null;routes.before=undefined;}continue;}
+      if(built.has(tileKey(object)))continue;
       const wear=this.scene.pathWear;if(wear&&((wear.level?.(object)??0)>=FORESTRY.pathBlocksGrowthLevel||wear.isPaved?.(object))){if(n.stage>0||n.growthDays>0){if(this.miningWork?.rocks?.trees?.has(n.id))this.miningWork.rocks.markTree(object,false);n.stage=0;n.growthDays=0;this.refreshMap(object);this.view(object)?.setNaturalState?.(object);routes.before=undefined;}
         // m-parezy-na-ceste: the stump rots away on the path.
         {const was=stumpGone(n);n.rot=Math.min(FORESTRY.stumpRotDays,(n.rot??0)+aged);if(!was&&stumpGone(n))this.view(object)?.setNaturalState?.(object);}continue;}
@@ -103,7 +105,59 @@ export class NaturalResourcesSystem {
     if(matured)this.scene.employment?.request?.();
   }
   refreshSeason(){const season=this.scene.seasons?.season??'Spring';if(season===this.visualSeason)return;this.visualSeason=season;for(const object of this.byId.values())this.view(object)?.setSeason?.(season);}
-  goals(object){return[{x:object.x-1,y:object.y},{x:object.x+1,y:object.y},{x:object.x,y:object.y-1},{x:object.x,y:object.y+1}].filter(t=>this.scene.map[t.y]?.[t.x]===0);}
+  // A place to stand beside the tree: next to its tile, or next to any of the four tiles of a grand oak.
+  goals(object){const own=new Set(object.tiles.map(tileKey)),out=new Map();for(const p of object.tiles)for(const t of [{x:p.x-1,y:p.y},{x:p.x+1,y:p.y},{x:p.x,y:p.y-1},{x:p.x,y:p.y+1}])if(!own.has(tileKey(t))&&this.scene.map[t.y]?.[t.x]===0)out.set(tileKey(t),t);return [...out.values()];}
+  // m-duby: the three tiles a grown oak would take to become grand are free: plain fertile land, nothing on it or
+  // planned there, nobody standing there, no path, and closing them cuts nobody off.
+  grandRoom(object,{reserved=this.reserved(),mask=null}={}){
+    const s=this.scene,extra=grandTiles(object).slice(1);
+    for(const t of extra){const key=tileKey(t);if(t.x<2||t.y<2||t.x>COLUMNS-3||t.y>ROWS-3||s.map[t.y]?.[t.x]!==0||s.terrainGrid?.[t.y]?.[t.x]||!isFertileGround(s.groundGrid?.[t.y]?.[t.x])||s.resourceOccupancy.has(key)||reserved.has(key)||s.isFordTile?.(t)||(s.pathWear?.level?.(t)??0)>0||s.pathWear?.isPaved?.(t)||s.buildings.some(b=>b.tiles.some(p=>p.x===t.x&&p.y===t.y)))return false;}
+    const taken=new Set(extra.map(tileKey)),stands=u=>!!u&&(u.tile&&taken.has(tileKey(u.tile))||u.nextTile&&taken.has(tileKey(u.nextTile)));
+    if(stands(s.character)||(s.workerSystem?.liveWorkers?.()??[]).some(stands))return false;
+    return blockKeepsReach(s.map,extra,(typeof mask==='function'?mask():mask)??reachableMask(s.map,this.origins()),this.origins())===true;
+  }
+  // Makes a grown oak grand (its four tiles are taken and blocked) or plain again (felled).
+  setGrand(object,on){
+    const s=this.scene,key=tileKey(object),all=grandTiles(object);if(!!object.natural.grand===!!on)return false;
+    if(on){object.natural.grand=true;object.tiles=all;for(const t of all)s.resourceOccupancy.set(tileKey(t),key);}
+    else{delete object.natural.grand;object.tiles=[all[0]];for(const t of all.slice(1))if(s.resourceOccupancy.get(tileKey(t))===key)s.resourceOccupancy.delete(tileKey(t));}
+    this.mining.restoreTiles(all);this.view(object)?.setNaturalState?.(object);this.topologyRevision++;return true;
+  }
+  // Once a day of its age an old enough grown oak tries to spread.
+  growGrand(object,reserved,mask=null){
+    const n=object.natural;if(object.type!=='oak_tree'||n.stage!==3||n.grand||n.ageDays<GRAND_OAK.ageDays||!oakCanSpread(object))return false;const day=Math.floor(n.ageDays);if(object.grandTry===day)return false;object.grandTry=day;
+    if(n.workDone>0||this.scene.workerSystem.reservations.owners.has(this.reservation(object))||this.miningWork.rocks.trees.has(n.id)||!this.grandRoom(object,{reserved,mask}))return false;return this.setGrand(object,true);
+  }
+  // A tree taken out of the world (only when the world is made: a gap for a grand oak).
+  removeTree(object){
+    const s=this.scene,key=tileKey(object);if(object.natural.grand)this.setGrand(object,false);s.resources.get(key)?.destroy();s.resources.delete(key);s.resourceOccupancy.delete(key);this.byId.delete(object.natural.id);
+    this.mining.restoreTiles([{x:object.x,y:object.y}]);this.topologyRevision++;
+  }
+  // m-duby, new world: small groups of 1–4 oaks away from the forests, then the oaks picked by their tile get a gap
+  // (trees on the three tiles beside them go) and start grand. Its own number sequence, so the rest of the world for a
+  // seed stays as it was.
+  generateOaks(){
+    const s=this.scene,start=s.character.tile,reserved=this.reserved(),oak=s.objectRegistry.require('oak_tree');let seed=(Math.imul(this.byId.size+1,2654435761)^Math.imul(COLUMNS,40503)^ROWS)>>>0;
+    const random=()=>{seed=seed+0x6D2B79F5>>>0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};
+    const nearDeposit=new Set();for(const o of this.byId.values())if(o.definition.deposit)for(const p of o.tiles)for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++)nearDeposit.add(`${p.x+dx},${p.y+dy}`);
+    const free=t=>t.x>1&&t.y>1&&t.x<COLUMNS-2&&t.y<ROWS-2&&!nearDeposit.has(tileKey(t))&&s.map[t.y]?.[t.x]===0&&isFertileGround(s.groundGrid?.[t.y]?.[t.x])&&!reserved.has(tileKey(t))&&!s.resourceOccupancy.has(tileKey(t))&&Math.hypot(t.x-start.x,t.y-start.y)>FORESTRY.protectedRadius;
+    const possible=reachableTiles(s.map,[start]).filter(free),trees=[...this.byId.values()].filter(o=>o.definition.tree),origins=this.origins();let mask=reachableMask(s.map,origins),lone=0,grand=0;
+    const add=(tile,stage)=>{const growthDays=stage<3?random()*FORESTRY.stageDays[stage]:0,state=treeState(`tree-${this.nextId++}`,{stage,growthDays,ageDays:stage===3?8+random()*20:4+growthDays});state.growthCheckpoint=this.growthClock;state.ageCheckpoint=this.ageClock;s.addResource(oak,tile,state);trees.push(this.byId.get(state.id));lone++;};
+    const groups=Math.round(possible.length/1000*GRAND_OAK.lonePer1000);
+    for(let g=0,tries=0;g<groups&&tries<groups*30&&possible.length;tries++){
+      const center=possible[Math.floor(random()*possible.length)];if(trees.some(o=>Math.abs(o.x-center.x)<6&&Math.abs(o.y-center.y)<6))continue;g++;
+      const size=GRAND_OAK.loneGroup[Math.floor(random()*GRAND_OAK.loneGroup.length)];
+      for(let k=0,a=0;k<size&&a<20;a++){const tile=k?{x:center.x+Math.round((random()-.5)*5),y:center.y+Math.round((random()-.5)*5)}:center;if(!free(tile))continue;const stage=random()<.75?3:2;
+        if(stage===3){if(blockKeepsReach(s.map,[tile],mask,origins)!==true)continue;}add(tile,stage);if(stage===3)mask=reachableMask(s.map,origins);k++;}
+    }
+    const at=t=>s.resources.get(s.resourceOccupancy.get(tileKey(t)))?.getData('object')??null;
+    for(const object of [...this.byId.values()]){
+      if(object.type!=='oak_tree'||object.natural.stage!==3||object.natural.grand||!this.byId.has(object.natural.id)||!oakStartsGrand(object))continue;
+      const beside=grandTiles(object).slice(1).map(at).filter(Boolean);if(beside.some(o=>!o.definition.tree||o.natural.grand))continue;
+      for(const o of beside)this.removeTree(o);if(this.grandRoom(object,{reserved})&&this.setGrand(object,true))grand++;
+    }
+    return {lone,grand};
+  }
   reservation(object){return`natural:${object.natural.id}`;}
   cancelKing(){if(!this.kingTask)return;const object=this.byId.get(this.kingTask.treeId);if(object){this.scene.workerSystem.reservations.release(this.reservation(object),'king');this.view(object)?.showWork?.();}this.kingTask=null;}
   beginKingChop(object){
@@ -127,19 +181,19 @@ export class NaturalResourcesSystem {
   }
   work(object,actor,delta){
     if(!Number.isFinite(delta)||delta<=0||this.scene.gameTime.paused||this.scene.gameOver||actor.mountedHorse)return false;
-    const n=object.natural,rule=object.definition.tree,duration=devChopDuration(rule),wood=devTreeWood(rule);if(n.stage!==3||!actor.isAlive||actor.nextTile||actor.path.length||!this.goals(object).some(t=>t.x===actor.tile.x&&t.y===actor.tile.y)||this.scene.workerSystem.reservations.owners.get(this.reservation(object))!==actor.id)return false;
+    const n=object.natural,rule=object.definition.tree,duration=devChopDuration(rule),wood=devObjectWood(object);if(n.stage!==3||!actor.isAlive||actor.nextTile||actor.path.length||!this.goals(object).some(t=>t.x===actor.tile.x&&t.y===actor.tile.y)||this.scene.workerSystem.reservations.owners.get(this.reservation(object))!==actor.id)return false;
     n.workDone=Math.min(duration,n.workDone+delta*this.scene.skillSystem.workEfficiency(actor,'woodcutting'));this.view(object)?.showWork?.(n.workDone/duration);if(n.workDone+1e-7<duration)return false;
     // Commit the stump before drops/XP: another actor, frame or load cannot repeat a harvest.
     // m-oznacovani-tezby (51): a felled tree is no longer marked.
     // m-drevorubci-stromy: a Woodcutter plants a sapling on the stump (Dev tool chance) – not on a tree marked for
     // removal or under a building plan, and never the King.
     const marked=this.miningWork.rocks.trees.has(n.id),plant=actor.profession==='woodcutter'&&!marked&&!this.occupiedByBuilding(object)&&this.random()<devFactor('saplingChance');
-    n.stage=plant?1:0;n.growthDays=0;n.growthCheckpoint=this.growthClock;n.workDone=0;n.cycle++;this.miningWork.rocks.trees.delete(n.id);this.refreshMap(object);this.view(object)?.setNaturalState?.(object);this.scene.workerSystem.reservations.release(this.reservation(object),actor.id);if(actor.id==='king')this.kingTask=null;
+    if(n.grand)this.setGrand(object,false);n.stage=plant?1:0;n.growthDays=0;n.growthCheckpoint=this.growthClock;n.workDone=0;n.cycle++;this.miningWork.rocks.trees.delete(n.id);this.refreshMap(object);this.view(object)?.setNaturalState?.(object);this.scene.workerSystem.reservations.release(this.reservation(object),actor.id);if(actor.id==='king')this.kingTask=null;
     // m-oznacovani-tezby (56): a tree under a wall plan drops its wood where the cutter stands, not inside the site.
     this.scene.dropSystem.create('wood',this.scene.map[object.y][object.x]===0?{x:object.x,y:object.y}:{...actor.tile},wood,null,{rewardRemaining:0,rewardUnits:0});
     this.scene.activities.emit('treeChopped',{actor,objectType:object.type,quantity:1,wood,objectIds:[n.id]},`tree:${n.id}:${n.cycle}`);if(stumpMessageShown(this.scene,actor))this.scene.setStatus(t('status.woodBesideStump',{count:wood}));return true;
   }
-  exportState(){this.flushGrowth();return{nextId:this.nextId,nextDepositId:this.nextDepositId,growthClock:this.growthClock,ageClock:this.ageClock,refreshElapsed:this.refreshElapsed,kingTask:structuredClone(this.kingTask),rockMining:this.miningWork.rocks.exportState()};}
+  exportState(){this.flushGrowth({spread:false});return{nextId:this.nextId,nextDepositId:this.nextDepositId,growthClock:this.growthClock,ageClock:this.ageClock,refreshElapsed:this.refreshElapsed,kingTask:structuredClone(this.kingTask),rockMining:this.miningWork.rocks.exportState()};}
   importState(data){this.cancelKing();const {rockMining,...rest}=structuredClone(data);Object.assign(this,rest);this.miningWork.rocks.importState(rockMining);if(this.kingTask){const object=this.byId.get(this.kingTask.treeId);this.scene.workerSystem.reservations.reserve(this.reservation(object),'king');}this.refreshSeason();}
   destroy(){this.cancelKing();this.unsubscribe();this.scene.events?.off('buildings:changed',this.worldChanged);if(this.scene.resourceOccupancy.naturalContext===this)delete this.scene.resourceOccupancy.naturalContext;this.byId.clear();}
 }

@@ -1,5 +1,5 @@
 import { BUILDING_TOOLTIP } from './buildingTooltip.js';
-import { FORESTRY } from './naturalResources.js';
+import { FORESTRY,GRAND_OAK } from './naturalResources.js';
 import { SEASON_TRANSITION } from './seasonTransition.js';
 // m-91-asset-library-dev (owner point 88): the Dev tool coefficients. ONE module read at the points where yields,
 // consumption, wages, taxes, prices, construction and growth are computed (devFactor(key) / devProduction(key)).
@@ -71,4 +71,6 @@ export const devBalanceJSON=()=>JSON.stringify({...devBalanceValues(),...(state.
 // m-drevorubci-stromy: wood per felled tree and the chopping time with the Dev tool's "Forest and wood" factors
 // (`factor` lets save validation use the save's own value). At least 1 Wood a tree.
 export const devTreeWood=(rule,factor=devFactor('woodYield'))=>Math.max(1,Math.round(rule.wood*factor));
+// m-duby: a grand oak (2 × 2) gives its own amount of wood.
+export const devObjectWood=(object,factor=devFactor('woodYield'))=>object?.natural?.grand?Math.max(1,Math.round(GRAND_OAK.wood*factor)):devTreeWood(object.definition?.tree??object.tree,factor);
 export const devChopDuration=rule=>rule.chopDuration*devFactor('chopTime');
