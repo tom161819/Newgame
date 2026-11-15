@@ -106,7 +106,7 @@ export function loadGameState(scene,input){
   scene.treasureSystem.pending=state.commands.pendingChest;
   scene.animalSystem.nextId=state.counters.animal;scene.dropSystem.nextId=state.counters.drop;scene.treasureSystem.nextId=state.counters.chest;
   scene.gameTime.importState(state.time);scene.seasons?.importState(state.seasons);scene.foodSystem.importState(state.food);scene.production.importState(state.production);
-  scene.naturalResources?.importState(state.naturalResources);scene.fishing?.importState(state.fishing);scene.employment?.importState(state.employment);scene.military?.importState(state.military);scene.vehicles?.importState(state.vehicles);scene.stables?.importState(state.stables);scene.needs?.importState(state.needs);scene.caravans?.importState(state.caravans);scene.trade?.importState(state.trade);scene.domestic?.importState(state.domestic);scene.policy?.importState(state.policy);
+  scene.naturalResources?.importState(state.naturalResources);scene.fishing?.importState(state.fishing);scene.employment?.importState(state.employment);scene.military?.importState(state.military);scene.vehicles?.importState(state.vehicles);scene.stables?.importState(state.stables);scene.needs?.importState(state.needs);scene.caravans?.importState(state.caravans);scene.trade?.importState(state.trade);scene.scouting?.importState(state.scouting);scene.domestic?.importState(state.domestic);scene.policy?.importState(state.policy);
   scene.experienceSystem?.importState(state.experienceSystem);
   scene.skillSystem?.importState(state.skillSystem);scene.workerSystem?.importState(state.population);
   if(scene.workerSystem&&state.workers===undefined)scene.workerSystem.spawnInitial();

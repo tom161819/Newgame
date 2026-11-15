@@ -1,3 +1,5 @@
+import { WorldPanel } from '../ui/WorldPanel.js';
+import { ScoutingSystem } from '../systems/ScoutingSystem.js';
 import { castleRules } from '../data/castle.js';
 import { buildLinks,drawBuildLinks,linksEnabled } from './buildLinks.js';
 import { clockMinutes,formatClock } from '../data/dayNight.js';
@@ -341,7 +343,7 @@ export class GameScene extends Phaser.Scene {
       onCancel:site=>{this.towerViews.get(site.id)?.destroy();this.towerViews.delete(site.id);if(this.mapMemory?.objects.delete(`building:${site.id}`))this.mapMemory.revision++;this.terrain.invalidateArea(site.tiles);this.refreshWallConnections();this.updateInventory();this.constructionUI?.refresh();this.setStatus(t('status.siteCancelled'));}});
     this.demolition=new DemolitionSystem(this,{complete:(building,refund)=>{const done=finishDemolition(this,building,refund);if(done)completeRelocation(this,building);return done;}});this.repairs=new RepairSystem(this);
     this.constructionUI=new ConstructionUI(this);
-    this.foodProduction=new FoodProductionSystem(this);this.military=new MilitarySystem(this);if(!this.loadState&&this.gameSettings.startingGarrison)this.military.enlistStartingGarrison(this.worldRandom('villagers'));this.vehicles=new VehicleSystem(this);this.stables=new StableSystem(this);this.needs=new NeedsSystem(this);this.kingdomHappiness=new KingdomHappinessIndicator(this);this.vehicleViews=new VehicleViews(this);this.caravans=new CaravanSystem(this);this.trade=new TradeSystem(this);this.caravanViews=new CaravanViews(this);this.employment=new EmploymentSystem(this,{enabled:this.gameSettings.autoEmployment});this.diagnostics=new ProductionDiagnostics(this);this.employmentPanel=new EmploymentPanel(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.kingCargoControl=new KingCargoControl(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
+    this.foodProduction=new FoodProductionSystem(this);this.military=new MilitarySystem(this);if(!this.loadState&&this.gameSettings.startingGarrison)this.military.enlistStartingGarrison(this.worldRandom('villagers'));this.vehicles=new VehicleSystem(this);this.stables=new StableSystem(this);this.needs=new NeedsSystem(this);this.kingdomHappiness=new KingdomHappinessIndicator(this);this.vehicleViews=new VehicleViews(this);this.caravans=new CaravanSystem(this);this.trade=new TradeSystem(this);this.scouting=new ScoutingSystem(this);this.caravanViews=new CaravanViews(this);this.employment=new EmploymentSystem(this,{enabled:this.gameSettings.autoEmployment});this.diagnostics=new ProductionDiagnostics(this);this.employmentPanel=new EmploymentPanel(this);this.logisticsTasks=new LogisticsTaskManager(this);this.storagePanel=new StoragePanel(this);this.kingCargoControl=new KingCargoControl(this);this.legacyStockpiles=new LegacyStockpileMarkers(this);
     this.farmingSystem=new FarmingSystem(this,{growthModifier:()=>this.seasons.growthMultiplier(),onHarvest:result=>this.foodProduction.harvest(result)});this.farmingPanel=new FarmingPanel(this);this.farmConnections=new FarmConnections(this);
     this.experienceFeedback=new ExperienceFeedback(this);this.unitPanel=new UnitPanel(this);this.demolitionUI=new DemolitionUI(this);this.populationSidebar=new PopulationSidebar(this);this.noticesPanel=new NoticesPanel(this);
     this.treasureSystem=new TreasureSystem(this,{onReady:chest=>this.treasurePanel.open(chest),canShow:()=>!document.querySelector('dialog[open]'),onChange:()=>this.updateInventory()});
@@ -392,7 +394,7 @@ export class GameScene extends Phaser.Scene {
     const onRotate=event=>{if(!event.repeat&&!this.assetGallery.isOpen)this.rotateGate();};this.input.keyboard.on('keydown-R',onRotate);
     this.combatFeedback.refresh();
     this.input.mouse.disableContextMenu();
-    this.unitSelection=new UnitSelection(this);this.armyPanel=new ArmyPanel(this);this.rockMiningTool=new RockMiningTool(this);this.minimap=new Minimap(this);this.eventFeed=new EventFeed(this);this.millSails=new MillSails(this);
+    this.unitSelection=new UnitSelection(this);this.armyPanel=new ArmyPanel(this);this.rockMiningTool=new RockMiningTool(this);this.minimap=new Minimap(this);this.worldPanel=new WorldPanel(this);this.eventFeed=new EventFeed(this);this.millSails=new MillSails(this);
     // #121: a right click on the map first closes open panels (and does nothing else); otherwise it commands as before.
     // Request 28: a right click inside any window closes that window (PanelDismiss.js, one delegated listener).
     // m-pravy-klik-zavre-panel (owner, 12 Nov): the right mouse button on the map also closes the Buildings menu and the
@@ -409,7 +411,7 @@ export class GameScene extends Phaser.Scene {
     this.orientGates=()=>{const index=wallIndex(this.buildings,true);for(const b of this.buildings)if(b.type==='wall_gate'||b.type==='gate'){/* Point 48 (owner 14 Nov 2026): the axis chosen with the blueprint stays; walls built later never turn a Gate. A Gate of an older save takes its axis once. */b.gateAxis??=gateAxis(index,b);this.flipGateView(this.towerViews.get(b.id),b,b.gateAxis==='x');}else if(b.type==='tower'&&b.facing)this.flipGateView(this.towerViews.get(b.id),b,b.facing%2===1);};
     this.events.on('buildings:changed',this.orientGates);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>{this.events.off('buildings:changed',this.orientGates);
-      this.rockMiningTool.destroy();this.unitSelection.destroy();this.minimap?.destroy();this.eventFeed?.destroy();this.millSails?.destroy();this.kingCargoControl.destroy();this.kingLogistics.destroy();this.lightSources.destroy();
+      this.rockMiningTool.destroy();this.unitSelection.destroy();this.minimap?.destroy();this.worldPanel?.destroy();this.eventFeed?.destroy();this.millSails?.destroy();this.kingCargoControl.destroy();this.kingLogistics.destroy();this.lightSources.destroy();
       this.memoryRenderer.destroy();
       setRelief(null);
       this.populationSidebar.destroy();this.armyPanel?.destroy();
@@ -908,7 +910,7 @@ export class GameScene extends Phaser.Scene {
     if(this.gameOver)return null;
     this.constructionSystem.update(delta);this.demolition.update(delta);this.repairs.update(delta);
     this.farmingSystem.update(delta);
-    this.foodProduction.update(delta);this.military.update(delta);this.vehicles.update();this.stables.update(delta);this.caravans.update(delta);this.trade.update();this.caravanViews.update();this.vehicleViews.update();this.employment.update();this.diagnostics.update();
+    this.foodProduction.update(delta);this.military.update(delta);this.vehicles.update();this.stables.update(delta);this.caravans.update(delta);this.trade.update();this.scouting.update();this.caravanViews.update();this.vehicleViews.update();this.employment.update();this.diagnostics.update();
     this.regeneration.update(delta,[this.character,...this.animalSystem.animals.values(),...this.workerSystem.liveWorkers()],covered);
     this.combatFeedback.update(activeDelta);this.foodSystem.update(activeDelta);
     this.experienceFeedback.update(activeDelta);

@@ -34,7 +34,7 @@ export class WorkerAI {
   // #98: after the job step an idle worker sits on his workplace's porch (or gets up when there is work again).
   update(worker,delta){
     // m-karavana-vyslat: an escort away with the caravan is off the map until it comes home.
-    if(worker.away){worker.workState='Waiting';worker.workMessage=t('expedition.awayShort');worker.view?.setVisible?.(false);return;}
+    if(worker.away){worker.workState='Waiting';worker.workMessage=t(worker.scoutZone!=null?'scouting.awayShort':'expedition.awayShort');worker.view?.setVisible?.(false);return;}
     if(this.scene.nightThreats?.firefight(worker,delta)){worker.update(delta);return;}this.step(worker,delta);this.scene.lightFuel?.help(worker);this.scene.heating?.help(worker);this.scene.nightThreats?.pursue(worker);this.scene.porches?.check(worker);}
   step(worker,delta){
     if(!worker.isAlive)return;

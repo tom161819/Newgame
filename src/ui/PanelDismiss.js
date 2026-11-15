@@ -4,7 +4,7 @@
 // - In a text input, textarea or select the browser context menu stays and nothing closes.
 // Confirmations, the pause and Save/Load menus, Game Over and the progress/summary dialogs are never closed this way;
 // while one of them is open a map right click does nothing. The click that closes panels is consumed: no Move order.
-export const DISMISSIBLE_PANELS=Object.freeze(['building-detail-dialog','report-dialog','workplace-dialog','unit-dialog','storage-dialog','construction-dialog','farming-dialog','equipment-dialog','treasure-dialog','food-economy-dialog','natural-resource-dialog','asset-gallery','marketplace-dialog','wiki-dialog','village-dialog','cat-dialog','builder-workshop-dialog']);
+export const DISMISSIBLE_PANELS=Object.freeze(['building-detail-dialog','report-dialog','world-dialog','workplace-dialog','unit-dialog','storage-dialog','construction-dialog','farming-dialog','equipment-dialog','treasure-dialog','food-economy-dialog','natural-resource-dialog','asset-gallery','marketplace-dialog','wiki-dialog','village-dialog','cat-dialog','builder-workshop-dialog']);
 // Dialogs a right click deliberately leaves alone (they ask for a decision, block the game or belong to the menus).
 export const NEVER_DISMISSED=Object.freeze(['game-over','pause-menu','save-load-dialog','save-confirm','demolition-confirm-dialog','catch-up-dialog','away-summary','changelog-dialog','version-archive-dialog']);
 // Non-dialog windows (side cards, folding cards): root id → how to close it. `scene` is the GameScene.

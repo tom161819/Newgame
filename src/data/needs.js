@@ -8,7 +8,9 @@ export const NEEDS=Object.freeze({
   food:Object.freeze({recoverPerDay:100,declinePerDay:50,low:20,starving:Object.freeze({afterDays:1,perDay:12,max:50})}),
   // Active work tires; waiting and idling restore. The daily rest at home (phase B) replaces the idle recovery.
   rest:Object.freeze({drainPerDay:30,recoverPerDay:60,low:20}),
-  safety:Object.freeze({base:45,castle:{bonus:25,range:12},tower:{bonus:15,range:10},guard:{bonus:10,range:10},attack:{penalty:30,days:1}}),
+  safety:Object.freeze({base:45,castle:{bonus:25,range:12},tower:{bonus:15,range:10},guard:{bonus:10,range:10},attack:{penalty:30,days:1},
+    // Owner 15 Nov 2026: one soldier at home per `perResidents` residents gives the full garrison bonus; fewer give less.
+    garrison:{bonus:15,perResidents:5}}),
   unpaid:Object.freeze({perGold:5,max:30}),
   // Work speed of every task (phase C): FinalWorkSpeed = base × skill × hunger × mood.work. Walking and combat are not affected.
   moods:Object.freeze([{id:'happy',min:70,work:1.1},{id:'neutral',min:40,work:1},{id:'unhappy',min:25,work:.8},{id:'critical',min:0,work:.8}]),

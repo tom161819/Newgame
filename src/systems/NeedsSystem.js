@@ -12,6 +12,11 @@ import { buildingIsComplete } from '../game/buildings.js';
 // main problem. Updated from the central Game Time at most once per second (also off camera and under Fog of War);
 // the mood scales work speed and Kingdom Happiness feeds Kingdom Attractiveness (phase C); strikes and emigration follow.
 const orders=new Map(),order=id=>{let v=orders.get(id);if(v===undefined){v=Number(String(id).replace(/\D+/g,''))||0;if(orders.size>5000)orders.clear();orders.set(id,v);}return v;};
+// Soldiers at home per the soldiers the residents want (1 per NEEDS.safety.garrison.perResidents).
+export function garrisonRatio(people){
+  const residents=people.filter(w=>w.profession!=='soldier').length,home=people.filter(w=>w.profession==='soldier'&&!w.away).length,wanted=Math.ceil(residents/NEEDS.safety.garrison.perResidents);
+  return {residents,home,wanted,ratio:wanted?Math.min(1,home/wanted):1};
+}
 export class NeedsSystem {
   constructor(scene,{subscribe=true}={}){
     this.scene=scene;this.records=new Map();this.assignments=new Map();this.pending=0;this.revision=0;this.work=new Map();
@@ -85,6 +90,8 @@ export class NeedsSystem {
     {const castle=done.filter(b=>b.type==='castle'&&near(b,s.castle.range)).sort((a,b)=>castleLevel(b)-castleLevel(a))[0];if(castle)factors.push(['castle',s.castle.bonus+(castle.level?castleRules(castle).safety:0)]);}
     if(done.some(b=>b.type==='tower'&&near(b,s.tower.range)))factors.push(['tower',s.tower.bonus]);
     if(done.some(b=>b.type==='barracks'&&near(b,s.guard.range))||this.residents().some(o=>o!==worker&&o.profession==='soldier'&&Math.hypot(o.position.x-p.x,o.position.y-p.y)<=s.guard.range))factors.push(['guard',s.guard.bonus]);
+    // Owner 15 Nov 2026: the garrison – soldiers at home (not away on an expedition or scouting) against the residents.
+    {const g=garrisonRatio(this.residents());if(g.wanted>0)factors.push(['garrison',Math.round(s.garrison.bonus*g.ratio)]);}
     // m-uzavreny-hrad (point 34): closed walls protect who stands, lives or works inside them.
     {const e=enclosure(this.scene);if(e.any){if(home===undefined)home=this.homeOf(worker);const b=id=>id==null?null:(this.scene.buildings??[]).find(x=>x.id===id);
       if(e.inside(p.x,p.y)||e.holds(b(worker.assignedWorkplaceId))||e.holds(b(home?.buildingId)))factors.push(['walls',ENCLOSURE.safetyBonus]);}}

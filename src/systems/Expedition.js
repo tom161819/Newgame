@@ -12,7 +12,7 @@ export class Expedition {
   freeWagon(){const v=this.scene.vehicles;if(!v)return null;return [...v.vehicles.values()].find(x=>x.type==='horse_wagon'&&x.state==='parked'&&v.usable(x))??null;}
   // Why the button is grey (null = it may be sent).
   blocker(){if(this.state)return 'away';if(!this.freeWagon())return 'wagon';return null;}
-  escorts(){const m=this.scene.military;return this.scene.workerSystem.liveWorkers().filter(w=>w.profession==='soldier'&&!w.away&&!w.restPhase&&!this.scene.combat?.attacks?.get?.(w));}
+  escorts(){const m=this.scene.military;return this.scene.workerSystem.liveWorkers().filter(w=>w.profession==='soldier'&&!w.away&&w.scoutZone==null&&!w.restPhase&&!this.scene.combat?.attacks?.get?.(w));}
   escortType(w){return this.scene.military?.unit?.(w)?.type??'recruit';}
   available(resource){return this.trade.storage?.available?.(resource)??0;}
   goods(){return tradeableResources(this.scene.objectRegistry).map(d=>({resource:d.id,name:d.name,available:this.available(d.id),weight:loadWeight(d.id),unit:price(d.id,'sell',this.trade.marketContext(d.id,null))??0})).filter(g=>g.available>0);}

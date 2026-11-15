@@ -96,7 +96,9 @@ export class Minimap {
     // Navigation: a click centres the camera on that known or unknown spot; it reveals nothing.
     this.sizeControls=doc.createElement('div');this.sizeControls.className='minimap-size';
     const sizeButton=(delta,text)=>{const b=doc.createElement('button');b.type='button';b.textContent=text;b.setAttribute('data-minimap-size',delta>0?'bigger':'smaller');b.addEventListener('click',e=>{e.stopPropagation();this.resize(delta);},{signal:this.controller.signal});return b;};
-    this.biggerButton=sizeButton(1,'+');this.smallerButton=sizeButton(-1,'−');this.sizeControls.append(this.biggerButton,this.smallerButton);this.root.append(this.sizeControls);
+    this.biggerButton=sizeButton(1,'+');this.smallerButton=sizeButton(-1,'−');this.sizeControls.append(this.biggerButton,this.smallerButton);
+    // m-mapa-kraje: the World window (scouting the zones around the map).
+    this.worldButton=doc.createElement('button');this.worldButton.type='button';this.worldButton.className='minimap-world';this.worldButton.textContent='🌍';this.worldButton.setAttribute('data-minimap-world','');this.worldButton.addEventListener('click',e=>{e.stopPropagation();scene.worldPanel?.open();},{signal:this.controller.signal});this.sizeControls.append(this.worldButton);this.root.append(this.sizeControls);
     try{this.depositMarks=JSON.parse(storage?.getItem?.(DEPOSIT_KEY)??'{}')??{};}catch{this.depositMarks={};}
     this.depositButtons={};for(const kind of Object.keys(DEPOSIT_MARKS)){const b=doc.createElement('button');b.type='button';b.className='minimap-deposit';b.textContent=DEPOSIT_MARKS[kind].icon;b.setAttribute('data-minimap-deposit',kind);
       b.addEventListener('click',e=>{e.stopPropagation();this.depositMarks[kind]=!this.depositMarks[kind];try{storage?.setItem?.(DEPOSIT_KEY,JSON.stringify(this.depositMarks));}catch{/* works without storage */}this.markButtons();this.nextOverlay=0;},{signal:this.controller.signal});this.depositButtons[kind]=b;this.sizeControls.append(b);}
@@ -112,7 +114,7 @@ export class Minimap {
     if(this.biggerButton){this.biggerButton.disabled=this.sizeStep>=MINIMAP_SIZES.length-1;this.smallerButton.disabled=this.sizeStep<=0;}
     if(save)writeMinimapStep(this.sizeStep,this.storage);
   }
-  label(){this.root.setAttribute('aria-label',t('minimap.label'));this.canvas.setAttribute('aria-label',t('minimap.label'));this.root.title=t('minimap.hint');
+  label(){this.root.setAttribute('aria-label',t('minimap.label'));if(this.worldButton){this.worldButton.title=t('scouting.button');this.worldButton.setAttribute('aria-label',t('scouting.button'));}this.canvas.setAttribute('aria-label',t('minimap.label'));this.root.title=t('minimap.hint');
     for(const [b,key] of [[this.biggerButton,'minimap.bigger'],[this.smallerButton,'minimap.smaller'],[this.depositButtons?.stone,'minimap.depositsStone'],[this.depositButtons?.iron,'minimap.depositsIron']])if(b){b.title=t(key);b.setAttribute('aria-label',t(key));}}
   panTo(point){
     // A click near a shown deposit mark goes to that deposit.

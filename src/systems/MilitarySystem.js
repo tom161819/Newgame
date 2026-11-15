@@ -127,6 +127,8 @@ export class MilitarySystem {
     const order=this.order(worker),combat=this.scene.combat,unit=this.unit(worker);
     if(order?.state==='training'){combat.stopAttack(worker);worker.workState='Working';worker.workMessage='Training';
       if(!this.scene.workplaceSystem.atWorkplace(worker)&&!worker.nextTile&&!worker.path.length&&worker.aiCooldown<=0){worker.aiCooldown=1000;worker.moveTo(this.scene.workplaceSystem.goals(worker));}return true;}
+    // m-mapa-kraje: a scouting party walks to the map edge.
+    if(worker.scoutZone!=null&&this.scene.scouting?.updateSoldier(worker))return true;
     // m-karavana-vyslat: escorts walk to the Marketplace while the caravan gathers.
     if(worker.expeditionGather!=null){const m=this.scene.buildings.find(b=>b.id===worker.expeditionGather);if(m){worker.workState='Traveling to Target';worker.workMessage=t('expedition.gathering');
       if(!worker.nextTile&&!worker.path.length&&(worker.aiCooldown??0)<=0&&Math.max(Math.abs(worker.tile.x-(m.x+1)),Math.abs(worker.tile.y-(m.y+1)))>4){worker.aiCooldown=1500;worker.moveTo(towerNeighbors(m));}return true;}delete worker.expeditionGather;}
