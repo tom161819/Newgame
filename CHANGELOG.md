@@ -5,6 +5,13 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.130.1] - 2026-11-15
+<!-- version: {"title":"Full screen; wider scroll edge","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Full screen: a button in the Settings and the Alt+Enter shortcut.
+### Changed
+- The view scrolls when the pointer is within 15 px of the window edge (was 4 px), so it works before the pointer leaves for the browser's bars.
+
 ## [0.130.0] - 2026-11-15
 <!-- version: {"title":"Points 53-58","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

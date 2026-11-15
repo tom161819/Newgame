@@ -4,7 +4,7 @@ import { buildingDefinition } from './buildings.js';
 import { MIN_ZOOM,MAX_ZOOM,DEFAULT_ZOOM,ZOOM_RESPONSE_MS,clampZoom } from '../data/camera.js';
 export { MIN_ZOOM,MAX_ZOOM } from '../data/camera.js';
 
-const EDGE_SCROLL_PX=4;
+const EDGE_SCROLL_PX=15;
 export class WorldCamera {
   constructor(scene, target) {
     this.scene = scene;
@@ -39,6 +39,11 @@ export class WorldCamera {
     // Owner 15 Nov 2026: K selects the King (then the right button sends him).
     this.selectKing=()=>{const s=this.scene,el=globalThis.document?.activeElement;if(el&&/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))return;if(s.gameOver||!s.character?.isAlive||!s.unitSelection)return;s.unitSelection.set([s.character]);s.setStatus?.(t('status.kingSelected'));};
     scene.input.keyboard.on('keydown-K', this.selectKing);
+    // Owner 15 Nov 2026: full screen from the Settings and with Alt+Enter (F11 is the browser's own key and works too).
+    this.fullscreen=()=>{const d=globalThis.document,root=d?.documentElement;if(!root)return;const fail=()=>this.scene.setStatus?.(t('settings.fullscreenBlocked'));
+      try{const p=d.fullscreenElement?d.exitFullscreen?.():root.requestFullscreen?.();if(p?.catch)p.catch(fail);else if(!root.requestFullscreen)fail();}catch{fail();}};
+    this.fullscreenKey=e=>{if(e.altKey&&e.key==='Enter'){e.preventDefault();this.fullscreen();}};globalThis.addEventListener?.('keydown',this.fullscreenKey);
+    this.fullscreenButton=globalThis.document?.querySelector?.('#settings-fullscreen');this.fullscreenButton?.addEventListener('click',this.fullscreen);
     document.querySelector('#follow-king').addEventListener('click', this.recenter);
   }
 
@@ -112,6 +117,7 @@ export class WorldCamera {
   destroy() {
     this.resizeObserver.disconnect();
     this.scene.input.off('wheel', this.wheel);
+    globalThis.removeEventListener?.('keydown',this.fullscreenKey);this.fullscreenButton?.removeEventListener('click',this.fullscreen);
     globalThis.removeEventListener?.('mousemove',this.edgeMove);globalThis.document?.removeEventListener?.('mouseleave',this.edgeLeave);globalThis.removeEventListener?.('blur',this.edgeLeave);
     this.scene.input.keyboard.off('keydown-SPACE', this.recenter);this.scene.input.keyboard.off('keydown-K', this.selectKing);
     document.querySelector('#follow-king').removeEventListener('click', this.recenter);
