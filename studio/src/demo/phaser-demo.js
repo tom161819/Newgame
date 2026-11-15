@@ -12,7 +12,7 @@ import approvals from '../../../art/approvals.json';
 import { TIMES, timePreset, lightStrength, hexToRgb } from '../lib/lighting.js';
 import { TILE_WIDTH, TILE_HEIGHT } from '../lib/projection.js';
 
-const pngs = import.meta.glob('../../../art/sprites/**/*.png', { eager: true, query: '?url', import: 'default' });
+const pngs = import.meta.glob(['../../../art/sprites/**/*.png', '!../../../art/sprites/{oak-tree,pine-tree}/*-season-*.x2.png'], { eager: true, query: '?url', import: 'default' });
 const metas = import.meta.glob('../../../art/sprites/**/*.json', { eager: true, import: 'default' });
 const params = new URLSearchParams(location.search);
 const rendererChoice = params.get('renderer') === 'webgl' ? 'webgl' : 'canvas';

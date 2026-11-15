@@ -17,7 +17,7 @@ function h(tag, attrs = {}, ...children) {
 }
 // Exported sprites: newest version of each building variant (and the decorations that are small houses).
 const metas = import.meta.glob('../../../art/sprites/*/*.json', { eager: true, import: 'default' });
-const pngs = import.meta.glob('../../../art/sprites/*/*.png', { eager: true, query: '?url', import: 'default' });
+const pngs = import.meta.glob(['../../../art/sprites/*/*.png', '!../../../art/sprites/{oak-tree,pine-tree}/*-season-*.x2.png'], { eager: true, query: '?url', import: 'default' });
 const latest = new Map();
 for (const [path, meta] of Object.entries(metas)) {
   if (meta?.category !== 'buildings' || !meta.variantId) continue;
