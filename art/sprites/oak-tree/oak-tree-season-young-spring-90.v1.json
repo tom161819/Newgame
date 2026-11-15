@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "oak-tree",
+  "variantId": "oak-tree-season-young-spring-90",
+  "name": "Oak young, spring 90° (rear-right)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "ad828bf4",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 33,
+  "height": 45,
+  "anchor": {
+    "x": 15,
+    "y": 27
+  },
+  "origin": {
+    "x": 0.45455,
+    "y": 0.6
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 15,
+    "y": 43
+  },
+  "baseOrigin": {
+    "x": 0.45455,
+    "y": 0.95556
+  },
+  "visualHeight": 43,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.488,
+  "lights": [],
+  "x2": {
+    "width": 66,
+    "height": 90,
+    "anchor": {
+      "x": 30,
+      "y": 54
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

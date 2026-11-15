@@ -3,7 +3,7 @@
   "id": "wall-diagonal",
   "name": "Wall, diagonal run",
   "category": "buildings",
-  "description": "Diagonal Stone Wall (point 41, m-hradby-diagonala). diagonal: a tile in the middle of a run – a band turned 45°, as thick as the straight wall, corner to corner, parapets on both long sides. elbow: the tile where a run ends (at a straight wall or free) – the wall block and half of the band in one piece; the parapet follows the outer edge round the bend and never crosses the wall. All drawn on the tile centre. Made by Claude with the wall-kit generator at the owner's request (15 Nov 2026); waits for the owner's approval.",
+  "description": "Diagonal Stone Wall (point 41, m-hradby-diagonala). diagonal: a tile in the middle of a run – a band turned 45°, as wide on screen as the straight wall (its sides run through the tile's side corners), corner to corner, parapets on both long sides. elbow: the tile where a run ends (at a straight wall or free) – the wall block and half of the band in one piece; the outline bends at the block's corners and never crosses the wall. All drawn on the tile centre. Made by Claude with the wall-kit generator at the owner's request (15 Nov 2026); waits for the owner's approval.",
   "footprint": {
     "width": 3,
     "height": 3
@@ -13,7 +13,7 @@
     {
       "id": "wall-diagonal-se",
       "name": "Run down the screen",
-      "version": 3,
+      "version": 4,
       "notes": "Towards grid (x+1, y+1). On screen the wall runs straight down, seen from its end.",
       "spec": {
         "piece": "diagonal",
@@ -24,7 +24,7 @@
     {
       "id": "wall-diagonal-ne",
       "name": "Run across the screen",
-      "version": 3,
+      "version": 4,
       "notes": "Towards grid (x+1, y−1). On screen the wall runs straight across, seen from its face.",
       "spec": {
         "piece": "diagonal",
@@ -35,7 +35,7 @@
     {
       "id": "wall-diagonal-elbow-ne",
       "name": "Elbow NE",
-      "version": 3,
+      "version": 4,
       "notes": "End of a diagonal run: the block and half the band leaving through its NE corner (towards grid (x+1, y−1)).",
       "spec": {
         "piece": "elbow",
@@ -46,7 +46,7 @@
     {
       "id": "wall-diagonal-elbow-se",
       "name": "Elbow SE",
-      "version": 3,
+      "version": 4,
       "notes": "End of a diagonal run: the block and half the band leaving through its SE corner (towards grid (x+1, y+1)).",
       "spec": {
         "piece": "elbow",
@@ -57,7 +57,7 @@
     {
       "id": "wall-diagonal-elbow-sw",
       "name": "Elbow SW",
-      "version": 3,
+      "version": 4,
       "notes": "End of a diagonal run: the block and half the band leaving through its SW corner (towards grid (x−1, y+1)).",
       "spec": {
         "piece": "elbow",
@@ -68,7 +68,7 @@
     {
       "id": "wall-diagonal-elbow-nw",
       "name": "Elbow NW",
-      "version": 3,
+      "version": 4,
       "notes": "End of a diagonal run: the block and half the band leaving through its NW corner (towards grid (x−1, y−1)).",
       "spec": {
         "piece": "elbow",

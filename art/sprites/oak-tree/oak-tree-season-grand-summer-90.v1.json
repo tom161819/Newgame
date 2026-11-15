@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "oak-tree",
+  "variantId": "oak-tree-season-grand-summer-90",
+  "name": "Oak grand, summer 90° (rear-right)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "b727122d",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 175,
+  "height": 215,
+  "anchor": {
+    "x": 92,
+    "y": 166
+  },
+  "origin": {
+    "x": 0.52571,
+    "y": 0.77209
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 92,
+    "y": 198
+  },
+  "baseOrigin": {
+    "x": 0.52571,
+    "y": 0.92093
+  },
+  "visualHeight": 198,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.539,
+  "lights": [],
+  "x2": {
+    "width": 350,
+    "height": 430,
+    "anchor": {
+      "x": 184,
+      "y": 332
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

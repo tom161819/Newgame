@@ -11,12 +11,12 @@ test('m-duby: autumn and spring recolour only the leaves; trunk, shadow and empt
   for(const out of [a,b,sp]){assert.deepEqual([...out.slice(4)],[...px().slice(4)]);assert.equal(out[3],255);}
   assert.equal(isLeaf(100,.5),true);assert.equal(isLeaf(25,.5),false);
 });
-test('m-duby: the oak has four views of young, broad and grand; a tile always picks the same view',async()=>{
-    const looks=Object.keys(objectRegistry.require('oak_tree').artSprites);assert.equal(looks.length,13);
-  const seen=new Set();for(let x=0;x<40;x++){const look=oakLook({stage:3},'Summer',treeHash({x,y:7}));assert.ok(looks.includes(look));seen.add(look);assert.equal(look,oakLook({stage:3},'Autumn',treeHash({x,y:7})));}
+test('m-duby: the oak has young, broad and grand in four seasons and four views; a tile always picks the same view',async()=>{
+    const looks=Object.keys(objectRegistry.require('oak_tree').artSprites);assert.equal(looks.length,48);
+  const seen=new Set();for(let x=0;x<40;x++){const look=oakLook({stage:3},'Summer',treeHash({x,y:7}));assert.ok(looks.includes(look));seen.add(look);assert.equal(look.replace('-summer-','-autumn-'),oakLook({stage:3},'Autumn',treeHash({x,y:7})));}
   assert.equal(seen.size,4,'all four views appear');
-  assert.match(oakLook({stage:2},'Spring',1),/^young-/);assert.match(oakLook({stage:3,grand:true},'Summer',2),/^grand-180$/);
-  assert.equal(oakLook({stage:3},'Winter',1),'winter');assert.equal(oakLook({stage:2},'Winter',1),null);
+  assert.match(oakLook({stage:2},'Spring',1),/^young-spring-/);assert.equal(oakLook({stage:3,grand:true},'Summer',2),'grand-summer-180');
+  assert.equal(oakLook({stage:3},'Winter',1),'broad-winter-90');assert.equal(oakLook({stage:2},'Winter',1),'young-winter-90');
 });
 
 // --- the grand oak on 2 × 2 -------------------------------------------------------------------------------------

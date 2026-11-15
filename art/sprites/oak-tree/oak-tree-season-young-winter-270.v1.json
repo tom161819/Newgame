@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "oak-tree",
+  "variantId": "oak-tree-season-young-winter-270",
+  "name": "Oak young, winter 270° (front-left)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "ad828bf4",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 33,
+  "height": 48,
+  "anchor": {
+    "x": 18,
+    "y": 30
+  },
+  "origin": {
+    "x": 0.54545,
+    "y": 0.625
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 18,
+    "y": 46
+  },
+  "baseOrigin": {
+    "x": 0.54545,
+    "y": 0.95833
+  },
+  "visualHeight": 46,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.488,
+  "lights": [],
+  "x2": {
+    "width": 66,
+    "height": 96,
+    "anchor": {
+      "x": 36,
+      "y": 60
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

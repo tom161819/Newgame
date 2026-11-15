@@ -280,6 +280,918 @@
         "source": "gpt",
         "view": 270
       }
+    },
+    {
+      "id": "oak-tree-season-broad-autumn-0",
+      "name": "Oak broad, autumn 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 0° (front-right), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-autumn-90",
+      "name": "Oak broad, autumn 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-autumn-180",
+      "name": "Oak broad, autumn 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-autumn-270",
+      "name": "Oak broad, autumn 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 270° (front-left), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-spring-0",
+      "name": "Oak broad, spring 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 0° (front-right), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-spring-90",
+      "name": "Oak broad, spring 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-spring-180",
+      "name": "Oak broad, spring 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-spring-270",
+      "name": "Oak broad, spring 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 270° (front-left), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-summer-0",
+      "name": "Oak broad, summer 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 0° (front-right), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-summer-90",
+      "name": "Oak broad, summer 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-summer-180",
+      "name": "Oak broad, summer 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-summer-270",
+      "name": "Oak broad, summer 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 270° (front-left), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-winter-0",
+      "name": "Oak broad, winter 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 0° (front-right), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-winter-90",
+      "name": "Oak broad, winter 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-winter-180",
+      "name": "Oak broad, winter 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-season-broad-winter-270",
+      "name": "Oak broad, winter 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'mature' model). View 270° (front-left), cut out of the owner's render and scaled to 0.16645 (about 125 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.4,
+        "crown": 0.72,
+        "trunk": 0.12,
+        "clusters": 5,
+        "seed": 23
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-autumn-0",
+      "name": "Oak grand, autumn 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 0° (front-right), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-autumn-90",
+      "name": "Oak grand, autumn 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-autumn-180",
+      "name": "Oak grand, autumn 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-autumn-270",
+      "name": "Oak grand, autumn 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 270° (front-left), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-spring-0",
+      "name": "Oak grand, spring 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 0° (front-right), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-spring-90",
+      "name": "Oak grand, spring 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-spring-180",
+      "name": "Oak grand, spring 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-spring-270",
+      "name": "Oak grand, spring 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 270° (front-left), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-summer-0",
+      "name": "Oak grand, summer 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 0° (front-right), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-summer-90",
+      "name": "Oak grand, summer 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-summer-180",
+      "name": "Oak grand, summer 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-summer-270",
+      "name": "Oak grand, summer 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 270° (front-left), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-winter-0",
+      "name": "Oak grand, winter 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 0° (front-right), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-winter-90",
+      "name": "Oak grand, winter 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-winter-180",
+      "name": "Oak grand, winter 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-season-grand-winter-270",
+      "name": "Oak grand, winter 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'broad' model). View 270° (front-left), cut out of the owner's render and scaled to 0.26912 (about 195 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 2.9,
+        "crown": 0.66,
+        "trunk": 0.1,
+        "clusters": 6,
+        "seed": 11
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "oak-tree-season-young-autumn-0",
+      "name": "Oak young, autumn 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 0° (front-right), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-season-young-autumn-90",
+      "name": "Oak young, autumn 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-season-young-autumn-180",
+      "name": "Oak young, autumn 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-season-young-autumn-270",
+      "name": "Oak young, autumn 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 270° (front-left), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "oak-tree-season-young-spring-0",
+      "name": "Oak young, spring 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 0° (front-right), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-season-young-spring-90",
+      "name": "Oak young, spring 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-season-young-spring-180",
+      "name": "Oak young, spring 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-season-young-spring-270",
+      "name": "Oak young, spring 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 270° (front-left), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "oak-tree-season-young-summer-0",
+      "name": "Oak young, summer 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 0° (front-right), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-season-young-summer-90",
+      "name": "Oak young, summer 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-season-young-summer-180",
+      "name": "Oak young, summer 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-season-young-summer-270",
+      "name": "Oak young, summer 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 270° (front-left), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "oak-tree-season-young-winter-0",
+      "name": "Oak young, winter 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 0° (front-right), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "oak-tree-season-young-winter-90",
+      "name": "Oak young, winter 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "oak-tree-season-young-winter-180",
+      "name": "Oak young, winter 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "oak-tree-season-young-winter-270",
+      "name": "Oak young, winter 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, 48 views: 3 oaks × 4 seasons × 4 views; his 'young' model). View 270° (front-left), cut out of the owner's render and scaled to 0.05872 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "oak",
+        "height": 1.7,
+        "crown": 0.42,
+        "trunk": 0.06,
+        "clusters": 4,
+        "seed": 5
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }

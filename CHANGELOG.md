@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.134.0] - 2026-11-15
+<!-- version: {"title":"Oaks in four seasons","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Oaks in all four seasons from the owner's new pictures: light green in spring, dark green in summer, orange in autumn and bare in winter, for the young, the grown and the big old oak, each in four views.
+
+### Changed
+- Asset Studio: the diagonal wall is as wide on screen as the straight wall (a full tile). Still waiting for approval.
+
 ## [0.133.5] - 2026-11-15
 <!-- version: {"title":"Studio: diagonal wall v3","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

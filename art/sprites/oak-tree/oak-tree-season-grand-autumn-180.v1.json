@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "oak-tree",
+  "variantId": "oak-tree-season-grand-autumn-180",
+  "name": "Oak grand, autumn 180° (rear-left)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "b727122d",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 184,
+  "height": 200,
+  "anchor": {
+    "x": 89,
+    "y": 151
+  },
+  "origin": {
+    "x": 0.4837,
+    "y": 0.755
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 89,
+    "y": 183
+  },
+  "baseOrigin": {
+    "x": 0.4837,
+    "y": 0.915
+  },
+  "visualHeight": 183,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.539,
+  "lights": [],
+  "x2": {
+    "width": 368,
+    "height": 400,
+    "anchor": {
+      "x": 178,
+      "y": 302
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

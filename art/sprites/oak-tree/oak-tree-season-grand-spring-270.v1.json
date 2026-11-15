@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "oak-tree",
+  "variantId": "oak-tree-season-grand-spring-270",
+  "name": "Oak grand, spring 270° (front-left)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "b727122d",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 175,
+  "height": 202,
+  "anchor": {
+    "x": 83,
+    "y": 157
+  },
+  "origin": {
+    "x": 0.47429,
+    "y": 0.77723
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 83,
+    "y": 189
+  },
+  "baseOrigin": {
+    "x": 0.47429,
+    "y": 0.93564
+  },
+  "visualHeight": 189,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.539,
+  "lights": [],
+  "x2": {
+    "width": 350,
+    "height": 404,
+    "anchor": {
+      "x": 166,
+      "y": 314
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}

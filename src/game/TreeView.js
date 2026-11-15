@@ -1,10 +1,9 @@
 import Phaser from 'phaser';
 import { treeState,stumpGone } from '../data/naturalResources.js';
 
-import { seasonTextureKey,oakLook,treeHash } from '../render/treeSeasonTexture.js';
+import { oakLook,treeHash } from '../render/treeSeasonTexture.js';
 
 const TREE_BLOWS=7;
-const OAK_WINTER_SCALE=Object.freeze({broad:1.05,grand:1.6});
 export class TreeView extends Phaser.GameObjects.Container {
   constructor(scene,definition,context){
     super(scene,context.x,context.y);scene.add.existing(this);this.definition=definition;this.object=context.object??{natural:treeState('preview')};this.body=scene.add.graphics();this.bar=scene.add.graphics();this.art=scene.add.image(0,0,'__DEFAULT').setVisible(false);this.add([this.body,this.art,this.bar]);this.tile=context.tile??null;this.season=context.season??scene.seasons?.season??'Spring';this.setDepth(context.y+(definition.depth?.offset??0));this.paint();
@@ -26,11 +25,9 @@ export class TreeView extends Phaser.GameObjects.Container {
     if(stumpGone(this.object.natural)){this.art.setVisible(false);this.artLook=null;this.body.clear();this.bar?.clear?.();return;}
     const look=this.artKey();
     if(look){
-      const art=this.definition.artSprites[look],oak=this.definition.id==='oak_tree',winter=oak&&look==='winter',grand=oak&&!!this.object.natural.grand;
-      const key=seasonTextureKey(this.scene,this.scene.assets.key(this.definition.id,`art-${look}`),oak&&!winter?this.season:'Summer',treeHash(this.tile??this.object)>>2&1);
-      // The bare winter oak is the earlier, smaller drawing: it is scaled to the render's size. A grand oak stands on the
-      // middle of its 2 × 2 (the corner in front of its own tile) and sorts by that point.
-      this.art.setTexture(key).setOrigin(art.origin.x,art.origin.y).setScale(winter?(grand?OAK_WINTER_SCALE.grand:OAK_WINTER_SCALE.broad):1).setPosition(0,grand?16:0).setVisible(true);this.artLook=look;this.body.clear();
+      const art=this.definition.artSprites[look],grand=this.definition.id==='oak_tree'&&!!this.object.natural.grand,key=this.scene.assets.key(this.definition.id,`art-${look}`);
+      // A grand oak stands on the middle of its 2 × 2 (the corner in front of its own tile) and sorts by that point.
+      this.art.setTexture(key).setOrigin(art.origin.x,art.origin.y).setPosition(0,grand?16:0).setVisible(true);this.artLook=look;this.body.clear();
       this.setDepth(this.y+(grand?16:0)+(this.object.natural.stage<3?-.15:this.definition.depth?.offset??0));
       return;
     }

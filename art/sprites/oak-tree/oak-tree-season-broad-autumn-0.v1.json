@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "oak-tree",
+  "variantId": "oak-tree-season-broad-autumn-0",
+  "name": "Oak broad, autumn 0° (front-right)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "63410ccd",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 94,
+  "height": 132,
+  "anchor": {
+    "x": 44,
+    "y": 109
+  },
+  "origin": {
+    "x": 0.46809,
+    "y": 0.82576
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 44,
+    "y": 125
+  },
+  "baseOrigin": {
+    "x": 0.46809,
+    "y": 0.94697
+  },
+  "visualHeight": 125,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.132,
+  "lights": [],
+  "x2": {
+    "width": 188,
+    "height": 264,
+    "anchor": {
+      "x": 88,
+      "y": 218
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

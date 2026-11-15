@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "oak-tree",
+  "variantId": "oak-tree-season-broad-spring-180",
+  "name": "Oak broad, spring 180° (rear-left)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "63410ccd",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 94,
+  "height": 131,
+  "anchor": {
+    "x": 50,
+    "y": 107
+  },
+  "origin": {
+    "x": 0.53191,
+    "y": 0.81679
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 50,
+    "y": 123
+  },
+  "baseOrigin": {
+    "x": 0.53191,
+    "y": 0.93893
+  },
+  "visualHeight": 123,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.132,
+  "lights": [],
+  "x2": {
+    "width": 188,
+    "height": 262,
+    "anchor": {
+      "x": 100,
+      "y": 214
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}
