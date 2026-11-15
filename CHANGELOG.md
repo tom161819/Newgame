@@ -4,6 +4,9 @@ All notable released changes to Medieval Kingdom are documented here, following 
 Ongoing development belongs in Unreleased and is not shown in the player-facing history.
 
 ## [Unreleased]
+
+## [0.141.0] - 2026-11-15
+<!-- version: {"title":"Scouting the surroundings and the garrison","type":"feature","reconstructed":false,"saveVersion":64} -->
 ### Added
 - The World window (🌍 by the minimap): the home map with eight lands around it. With a level 3 Castle and finished Barracks you can send a scouting party of any number of soldiers to a land marked "?". The soldiers walk to the map edge on that side, travel about half a day, report what they found (dense forest, iron deposits or stone deposits – always the same for the same world) and come back after another half day.
 - Safety has a new part, Garrison: one soldier at home for every 5 residents gives the full bonus; fewer soldiers (or soldiers away on a scouting party or with the caravan) give less.
