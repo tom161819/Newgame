@@ -12,7 +12,7 @@ test('m-duby: autumn and spring recolour only the leaves; trunk, shadow and empt
   assert.equal(isLeaf(100,.5),true);assert.equal(isLeaf(25,.5),false);
 });
 test('m-duby: the oak has young, broad and grand in four seasons and four views; a tile always picks the same view',async()=>{
-    const looks=Object.keys(objectRegistry.require('oak_tree').artSprites);assert.equal(looks.length,48);
+    const {TREE_WIND}=await import('../src/data/objects/treeWind.js'),looks=Object.keys(TREE_WIND.sheets.oak_tree).flatMap(n=>[0,90,180,270].map(v=>`${n}-${v}`));assert.equal(looks.length,48);
   const seen=new Set();for(let x=0;x<40;x++){const look=oakLook({stage:3},'Summer',treeHash({x,y:7}));assert.ok(looks.includes(look));seen.add(look);assert.equal(look.replace('-summer-','-autumn-'),oakLook({stage:3},'Autumn',treeHash({x,y:7})));}
   assert.equal(seen.size,4,'all four views appear');
   assert.match(oakLook({stage:2},'Spring',1),/^young-spring-/);assert.equal(oakLook({stage:3,grand:true},'Summer',2),'grand-summer-180');
@@ -63,4 +63,12 @@ test('m-duby: a new world gets lone oaks outside the forests and grand oaks with
   for(const o of grand){assert.equal(o.type,'oak_tree');for(const t of grandTiles(o)){assert.equal(s.map[t.y][t.x],1);assert.equal(s.resourceOccupancy.get(`${t.x},${t.y}`),`${o.x},${o.y}`);}assert.ok(N.goals(o).length>0,'can be reached');}
   const a=fixture();seed=4711;a.naturalResources.generate(random);assert.deepEqual(a.naturalResources.generateOaks(),result,'the same world again');
   validateGameState(serializeGameState(s));assert.ok(reachableTiles(s.map,[s.character.tile]).length>1000);
+});
+
+test('m-smrky: a spruce is young, medium, then mature when old; four seasons, four views',async()=>{
+  const {treeLook,PINE_OLD_DAYS}=await import('../src/render/treeSeasonTexture.js');
+  assert.deepEqual(treeLook('pine_tree',{stage:2,ageDays:3},'Winter',1),{name:'young-winter',view:90});
+  assert.deepEqual(treeLook('pine_tree',{stage:3,ageDays:PINE_OLD_DAYS-1},'Spring',2),{name:'medium-spring',view:180});
+  assert.deepEqual(treeLook('pine_tree',{stage:3,ageDays:PINE_OLD_DAYS},'Autumn',3),{name:'mature-autumn',view:270});
+  assert.equal(treeLook('pine_tree',{stage:1},'Summer',0),null);
 });

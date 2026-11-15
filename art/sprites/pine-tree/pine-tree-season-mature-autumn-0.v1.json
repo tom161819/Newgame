@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "pine-tree",
+  "variantId": "pine-tree-season-mature-autumn-0",
+  "name": "Spruce mature, autumn 0° (front-right)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "fa63223e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 94,
+  "height": 191,
+  "anchor": {
+    "x": 45,
+    "y": 168
+  },
+  "origin": {
+    "x": 0.47872,
+    "y": 0.87958
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 45,
+    "y": 184
+  },
+  "baseOrigin": {
+    "x": 0.47872,
+    "y": 0.96335
+  },
+  "visualHeight": 184,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 3.307,
+  "lights": [],
+  "x2": {
+    "width": 188,
+    "height": 382,
+    "anchor": {
+      "x": 90,
+      "y": 336
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 0
+  }
+}

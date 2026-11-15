@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "pine-tree",
+  "variantId": "pine-tree-season-young-spring-90",
+  "name": "Spruce young, spring 90° (rear-right)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "59fc743d",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 28,
+  "height": 47,
+  "anchor": {
+    "x": 14,
+    "y": 29
+  },
+  "origin": {
+    "x": 0.5,
+    "y": 0.61702
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 14,
+    "y": 45
+  },
+  "baseOrigin": {
+    "x": 0.5,
+    "y": 0.95745
+  },
+  "visualHeight": 45,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.893,
+  "lights": [],
+  "x2": {
+    "width": 56,
+    "height": 94,
+    "anchor": {
+      "x": 28,
+      "y": 58
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 90
+  }
+}

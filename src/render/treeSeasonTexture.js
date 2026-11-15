@@ -26,9 +26,13 @@ export function seasonTextureKey(scene,key,season,tone=0){
 }
 const OAK_VIEWS=Object.freeze([0,90,180,270]);
 export const treeHash=tile=>((Math.imul((tile?.x??0)+17,374761393)^Math.imul((tile?.y??0)+29,668265263))>>>0)%64;
-// The oak's look: young (stage 2), broad (grown, one tile) or grand (2 × 2), in its season (the owner's season renders,
-// 15 Nov 2026) and one of four views.
-export function oakLook(natural,season,hash=0){
-  const s=['Spring','Summer','Autumn','Winter'].includes(season)?season.toLowerCase():'summer';
-  return `${natural.stage===2?'young':natural.grand?'grand':'broad'}-${s}-${OAK_VIEWS[hash%4]}`;
+// m-smrky: a spruce at least this many days old shows the tall one.
+export const PINE_OLD_DAYS=14;
+// The tree's sheet and view: young (stage 2), then for oaks broad (one tile) or grand (2 × 2), for spruces medium or
+// mature (old); in its season and one of four views. Stumps and saplings have no sheet (procedural drawing).
+export function treeLook(species,natural,season,hash=0){
+  if(natural.stage<2)return null;const s=['Spring','Summer','Autumn','Winter'].includes(season)?season.toLowerCase():'summer';
+  const kind=natural.stage===2?'young':species==='pine_tree'?(natural.ageDays>=PINE_OLD_DAYS?'mature':'medium'):natural.grand?'grand':'broad';
+  return {name:`${kind}-${s}`,view:OAK_VIEWS[hash%4]};
 }
+export const oakLook=(natural,season,hash=0)=>{const l=treeLook('oak_tree',natural,season,hash);return l&&`${l.name}-${l.view}`;};

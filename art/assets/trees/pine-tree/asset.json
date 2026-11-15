@@ -4,7 +4,10 @@
   "name": "Pine",
   "category": "trees",
   "description": "Conifer on one tile. Variants cover growth stages used by forestry.",
-  "footprint": { "width": 1, "height": 1 },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
   "generator": "tree",
   "gameObjectId": "pine_tree",
   "variants": [
@@ -13,14 +16,890 @@
       "name": "Mature pine",
       "version": 1,
       "notes": "Tall, four tiers.",
-      "spec": { "kind": "pine", "height": 3.3, "crown": 0.56, "trunk": 0.08, "tiers": 4 }
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      }
     },
     {
       "id": "pine-tree-young",
       "name": "Young pine",
       "version": 1,
       "notes": "Growth stage before maturity.",
-      "spec": { "kind": "pine", "height": 1.8, "crown": 0.38, "trunk": 0.05, "tiers": 3 }
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-autumn-0",
+      "name": "Spruce mature, autumn 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 0° (front-right), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-autumn-90",
+      "name": "Spruce mature, autumn 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-autumn-180",
+      "name": "Spruce mature, autumn 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-autumn-270",
+      "name": "Spruce mature, autumn 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 270° (front-left), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-spring-0",
+      "name": "Spruce mature, spring 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 0° (front-right), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-spring-90",
+      "name": "Spruce mature, spring 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-spring-180",
+      "name": "Spruce mature, spring 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-spring-270",
+      "name": "Spruce mature, spring 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 270° (front-left), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-summer-0",
+      "name": "Spruce mature, summer 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 0° (front-right), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-summer-90",
+      "name": "Spruce mature, summer 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-summer-180",
+      "name": "Spruce mature, summer 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-summer-270",
+      "name": "Spruce mature, summer 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 270° (front-left), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-winter-0",
+      "name": "Spruce mature, winter 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 0° (front-right), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-winter-90",
+      "name": "Spruce mature, winter 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-winter-180",
+      "name": "Spruce mature, winter 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "pine-tree-season-mature-winter-270",
+      "name": "Spruce mature, winter 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'mature' model). View 270° (front-left), cut out of the owner's render and scaled to 0.23029 (about 183 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-autumn-0",
+      "name": "Spruce medium, autumn 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 0° (front-right), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-autumn-90",
+      "name": "Spruce medium, autumn 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-autumn-180",
+      "name": "Spruce medium, autumn 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-autumn-270",
+      "name": "Spruce medium, autumn 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 270° (front-left), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-spring-0",
+      "name": "Spruce medium, spring 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 0° (front-right), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-spring-90",
+      "name": "Spruce medium, spring 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-spring-180",
+      "name": "Spruce medium, spring 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-spring-270",
+      "name": "Spruce medium, spring 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 270° (front-left), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-summer-0",
+      "name": "Spruce medium, summer 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 0° (front-right), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-summer-90",
+      "name": "Spruce medium, summer 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-summer-180",
+      "name": "Spruce medium, summer 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-summer-270",
+      "name": "Spruce medium, summer 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 270° (front-left), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-winter-0",
+      "name": "Spruce medium, winter 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 0° (front-right), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-winter-90",
+      "name": "Spruce medium, winter 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-winter-180",
+      "name": "Spruce medium, winter 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "pine-tree-season-medium-winter-270",
+      "name": "Spruce medium, winter 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'medium' model). View 270° (front-left), cut out of the owner's render and scaled to 0.14093 (about 112 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 3.3,
+        "crown": 0.56,
+        "trunk": 0.08,
+        "tiers": 4
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "pine-tree-season-young-autumn-0",
+      "name": "Spruce young, autumn 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 0° (front-right), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "pine-tree-season-young-autumn-90",
+      "name": "Spruce young, autumn 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "pine-tree-season-young-autumn-180",
+      "name": "Spruce young, autumn 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "pine-tree-season-young-autumn-270",
+      "name": "Spruce young, autumn 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 270° (front-left), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "pine-tree-season-young-spring-0",
+      "name": "Spruce young, spring 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 0° (front-right), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "pine-tree-season-young-spring-90",
+      "name": "Spruce young, spring 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "pine-tree-season-young-spring-180",
+      "name": "Spruce young, spring 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "pine-tree-season-young-spring-270",
+      "name": "Spruce young, spring 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 270° (front-left), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "pine-tree-season-young-summer-0",
+      "name": "Spruce young, summer 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 0° (front-right), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "pine-tree-season-young-summer-90",
+      "name": "Spruce young, summer 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "pine-tree-season-young-summer-180",
+      "name": "Spruce young, summer 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "pine-tree-season-young-summer-270",
+      "name": "Spruce young, summer 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 270° (front-left), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
+    },
+    {
+      "id": "pine-tree-season-young-winter-0",
+      "name": "Spruce young, winter 0° (front-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 0° (front-right), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 0
+      }
+    },
+    {
+      "id": "pine-tree-season-young-winter-90",
+      "name": "Spruce young, winter 90° (rear-right)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 90° (rear-right), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 90
+      }
+    },
+    {
+      "id": "pine-tree-season-young-winter-180",
+      "name": "Spruce young, winter 180° (rear-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 180° (rear-left), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 180
+      }
+    },
+    {
+      "id": "pine-tree-season-young-winter-270",
+      "name": "Spruce young, winter 270° (front-left)",
+      "version": 1,
+      "notes": "Owner's render (15 Nov 2026, Smrky_obdobi: 3 spruces × 4 seasons × 4 views; his 'young' model). View 270° (front-left), cut out of the owner's render and scaled to 0.0575 (about 45 px tall). Footprint corner estimated from the image bottom.",
+      "spec": {
+        "kind": "pine",
+        "height": 1.8,
+        "crown": 0.38,
+        "trunk": 0.05,
+        "tiers": 3
+      },
+      "baked": {
+        "renderer": "image",
+        "source": "gpt",
+        "view": 270
+      }
     }
   ]
 }

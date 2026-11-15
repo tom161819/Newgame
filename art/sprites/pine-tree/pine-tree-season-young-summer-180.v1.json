@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "pine-tree",
+  "variantId": "pine-tree-season-young-summer-180",
+  "name": "Spruce young, summer 180° (rear-left)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "59fc743d",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 29,
+  "height": 46,
+  "anchor": {
+    "x": 16,
+    "y": 29
+  },
+  "origin": {
+    "x": 0.55172,
+    "y": 0.63043
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 16,
+    "y": 45
+  },
+  "baseOrigin": {
+    "x": 0.55172,
+    "y": 0.97826
+  },
+  "visualHeight": 45,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 1.893,
+  "lights": [],
+  "x2": {
+    "width": 58,
+    "height": 92,
+    "anchor": {
+      "x": 32,
+      "y": 58
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

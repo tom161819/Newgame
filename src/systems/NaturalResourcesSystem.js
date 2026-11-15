@@ -1,3 +1,4 @@
+import { PINE_OLD_DAYS } from '../render/treeSeasonTexture.js';
 import { COLUMNS,ROWS } from '../game/config.js';
 import { thicketTiles } from '../game/natureGroups.js';
 import { isFertileGround } from '../data/worldTerrain.js';
@@ -87,7 +88,9 @@ export class NaturalResourcesSystem {
     const huts=this.forestry.huts(),boost=devFactor('hutGrowthBoost');let matured=false;
     for(const object of this.byId.values()){
       if(!object.definition.tree)continue;
-      const n=object.natural,aged=Math.max(0,this.ageClock-n.ageCheckpoint);n.ageDays+=aged;n.ageCheckpoint=this.ageClock;const growth=Math.max(0,this.growthClock-n.growthCheckpoint);n.growthCheckpoint=this.growthClock;
+      const n=object.natural,aged=Math.max(0,this.ageClock-n.ageCheckpoint),young=n.ageDays<PINE_OLD_DAYS;n.ageDays+=aged;n.ageCheckpoint=this.ageClock;
+      // m-smrky: a grown spruce turns into the tall one when it is old enough.
+      if(object.type==='pine_tree'&&n.stage===3&&young&&n.ageDays>=PINE_OLD_DAYS)this.view(object)?.setNaturalState?.(object);const growth=Math.max(0,this.growthClock-n.growthCheckpoint);n.growthCheckpoint=this.growthClock;
       if(n.stage===3){if(spread&&!built.has(tileKey(object))&&this.growGrand(object,reserved,()=>mask??=reachableMask(map,origins))){mask=null;routes.before=undefined;}continue;}
       if(built.has(tileKey(object)))continue;
       const wear=this.scene.pathWear;if(wear&&((wear.level?.(object)??0)>=FORESTRY.pathBlocksGrowthLevel||wear.isPaved?.(object))){if(n.stage>0||n.growthDays>0){if(this.miningWork?.rocks?.trees?.has(n.id))this.miningWork.rocks.markTree(object,false);n.stage=0;n.growthDays=0;this.refreshMap(object);this.view(object)?.setNaturalState?.(object);routes.before=undefined;}

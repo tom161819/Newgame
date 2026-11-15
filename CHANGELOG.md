@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.138.0] - 2026-11-15
+<!-- version: {"title":"Spruces in four seasons","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Spruces in three sizes (young, medium, mature) for all four seasons, each seen from four directions. They move in the wind like the oaks. A spruce looks mature from 14 days of age.
+
+### Changed
+- Oaks and spruces are now drawn from shared tree sheets. This saves about 40 files in the game.
+
 ## [0.137.1] - 2026-11-15
 <!-- version: {"title":"Studio: diagonal wall v5","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

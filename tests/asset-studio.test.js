@@ -322,24 +322,22 @@ test('approved production buildings use their Asset Studio exports byte for byte
   }
 });
 
-test('trees use the approved Asset Studio art for each look, byte for byte with the studio anchor', async () => {
-  const { APPROVED_TREE_ART } = await import('../src/data/objects/approvedArt.js');
-  const definitions = new Map(objectDefinitions.map(d => [d.id, d]));
-  for (const [gameId, looks] of Object.entries(APPROVED_TREE_ART)) {
-    const definition = definitions.get(gameId);
-    assert.equal(definition.renderer, 'tree', `${gameId}: TreeView keeps stumps, saplings and the fallback`);
-    assert.deepEqual(Object.keys(definition.artSprites).sort(), Object.keys(looks).sort());
-    for (const [look, art] of Object.entries(looks)) {
-      const meta = json(art.artSource), repo = approvals.assets[meta.assetId];
-      assert.equal(repo.variants[meta.variantId]?.status, 'approved', `${gameId} ${look}`);
-      assert.equal(repo.variants[meta.variantId].specHash, meta.specHash);
-      assert.ok(readFileSync(path.join(root, `public${art.sprite}`)).equals(readFileSync(path.join(root, `art/sprites/${meta.assetId}/${meta.variantId}.v1.png`))), `${gameId} ${look}`);
-      assert.deepEqual(art.origin, meta.origin, `${gameId} ${look}: trees stand on the tile centre, the studio anchor`);
+test('trees use the approved Asset Studio art: every view of every tree sheet comes from an approved export', async () => {
+  // m-duby-vitr, m-smrky: oaks and spruces are drawn from sheets (frame 0 = the approved picture, scripts/tree-wind.py).
+  const { TREE_WIND } = await import('../src/data/objects/treeWind.js'), definitions = new Map(objectDefinitions.map(d => [d.id, d]));
+  for (const [gameId, sheets] of Object.entries(TREE_WIND.sheets)) {
+    assert.equal(definitions.get(gameId).renderer, 'tree', `${gameId}: TreeView keeps stumps, saplings and the fallback`);
+    const looks = gameId === 'oak_tree' ? ['young', 'broad', 'grand'] : ['young', 'medium', 'mature'];
+    for (const look of looks) for (const season of ['spring', 'summer', 'autumn', 'winter']) {
+      const s = sheets[`${look}-${season}`];assert.ok(s, `${gameId} ${look}-${season}`);assert.deepEqual(s.views, [0, 90, 180, 270]);
+      const png = readFileSync(path.join(root, `public${s.sprite}`));assert.equal(png.readUInt32BE(16), s.frameWidth * TREE_WIND.frames);assert.equal(png.readUInt32BE(20), s.frameHeight * 4);
+      for (const source of s.sources) {
+        const meta = json(source), repo = approvals.assets[meta.assetId];
+        assert.equal(repo.variants[meta.variantId]?.status, 'approved', source);assert.equal(repo.variants[meta.variantId].specHash, meta.specHash);
+        assert.ok(meta.width <= s.frameWidth && meta.height <= s.frameHeight, `${source} fits its frame`);
+      }
     }
   }
-  // m-duby: the owner's season oaks (young, broad, grand × four seasons × four views).
-  for (const look of ['young', 'broad', 'grand']) for (const season of ['spring', 'summer', 'autumn', 'winter']) for (const view of [0, 90, 180, 270]) assert.ok(APPROVED_TREE_ART.oak_tree[`${look}-${season}-${view}`], `${look}-${season}-${view}`);
-  assert.ok(APPROVED_TREE_ART.pine_tree.winter);
 });
 
 test('construction sites use the approved scaffold art by stage, byte for byte with the export anchor', async () => {

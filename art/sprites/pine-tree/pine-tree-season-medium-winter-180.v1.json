@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "pine-tree",
+  "variantId": "pine-tree-season-medium-winter-180",
+  "name": "Spruce medium, winter 180° (rear-left)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "fa63223e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 64,
+  "height": 115,
+  "anchor": {
+    "x": 33,
+    "y": 95
+  },
+  "origin": {
+    "x": 0.51563,
+    "y": 0.82609
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 33,
+    "y": 111
+  },
+  "baseOrigin": {
+    "x": 0.51563,
+    "y": 0.96522
+  },
+  "visualHeight": 111,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 3.307,
+  "lights": [],
+  "x2": {
+    "width": 128,
+    "height": 230,
+    "anchor": {
+      "x": 66,
+      "y": 190
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 180
+  }
+}

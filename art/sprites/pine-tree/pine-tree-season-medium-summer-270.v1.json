@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "assetId": "pine-tree",
+  "variantId": "pine-tree-season-medium-summer-270",
+  "name": "Spruce medium, summer 270° (front-left)",
+  "category": "trees",
+  "version": 1,
+  "specHash": "fa63223e",
+  "generator": "image",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 63,
+  "height": 116,
+  "anchor": {
+    "x": 32,
+    "y": 96
+  },
+  "origin": {
+    "x": 0.50794,
+    "y": 0.82759
+  },
+  "footprint": {
+    "width": 1,
+    "height": 1
+  },
+  "base": {
+    "x": 32,
+    "y": 112
+  },
+  "baseOrigin": {
+    "x": 0.50794,
+    "y": 0.96552
+  },
+  "visualHeight": 112,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 3.307,
+  "lights": [],
+  "x2": {
+    "width": 126,
+    "height": 232,
+    "anchor": {
+      "x": 64,
+      "y": 192
+    }
+  },
+  "render": {
+    "source": "gpt",
+    "view": 270
+  }
+}
