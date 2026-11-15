@@ -6,11 +6,13 @@
 import { box, clamp, rotateParts } from './shapes.js';
 
 export const params = [
-  { key: 'piece', values: ['block', 'parapet', 'gate', 'stair', 'assembly'], description: 'Wall block, one parapet, a gate (#97: a passable wall tile with doors), a stair up to the wall walk, or a preview of connected cells.' },
+  { key: 'piece', values: ['block', 'parapet', 'gate', 'stair', 'diagonal', 'assembly'], description: 'Wall block, one parapet, a gate (#97: a passable wall tile with doors), a stair up to the wall walk, a diagonal run (m-hradby-diagonala) or a preview of connected cells.' },
+  { key: 'run', values: ['se', 'ne'], description: 'Diagonal: the run goes to grid (x+1, y+1) – straight down the screen – or to (x+1, y−1) – straight across the screen.' },
   { key: 'axis', values: ['x', 'z'], description: 'Gate: direction of the passage (grid x or grid y). Stair: direction the steps climb.' },
   { key: 'state', values: ['closed', 'open', 'portcullis'], description: 'Gate: closed doors, doors swung open, or open doors behind a half-raised portcullis.' },
   { key: 'gates', description: 'Assembly: [{ cell: [x, z], axis, state }] wall cells that are gates.' },
   { key: 'stairs', description: 'Assembly: [{ cell: [x, z], axis }] stairs (not wall cells) leading up to the walk.' },
+  { key: 'diagonals', description: 'Assembly: [{ cell: [x, z], run }] tiles drawn as a diagonal piece (not wall cells).' },
   { key: 'side', values: ['N', 'E', 'S', 'W'], description: 'Parapet: which edge of the tile it stands on.' },
   { key: 'merlons', description: 'Merlons per parapet (2–4).' },
   { key: 'cells', description: 'Assembly: [x, z] grid cells of wall inside the footprint.' },
@@ -76,6 +78,26 @@ function stairLocal() {
   parts.push(box([1, h * 0.45, 0.16], [0, 0, -0.38], 'stone'), box([1.0, 0.05, 0.18], [0, h * 0.45, -0.38], 'stone_light'));
   return parts;
 }
+// m-hradby-diagonala (owner 14–15 Nov 2026: a wall dragged diagonally must be one straight line, not steps). One tile of
+// a diagonal run: a wall from corner to corner of the tile, turned 45°, as tall as the block, with a parapet on both
+// long sides. It is a little longer than the tile's diagonal, so the pieces of a run overlap into one wall and the
+// end reaches into the corner of a straight block or a tower. Local frame: the run along x.
+export const DIAGONAL = { length: Math.SQRT2 + 0.24, thickness: 0.62 };
+function diagonalLocal(merlons) {
+  const h = WALL_HEIGHT, { length: L, thickness: T } = DIAGONAL, parts = [
+    box([L, 0.16, T + 0.02], [0, 0, 0], 'stone_dark'),
+    box([L - 0.02, h - 0.24, T], [0, 0.16, 0], 'stone'),
+    box([L, 0.08, T + 0.02], [0, h - 0.08, 0], 'stone_light'),
+  ];
+  const count = clamp(Math.round(merlons) + 1, 3, 5), width = L / (count * 2);
+  for (const s of [-1, 1]) {
+    const z = s * (T / 2 - 0.05);
+    parts.push(box([L, 0.1, 0.12], [0, h, z], 'stone'));
+    for (let i = 0; i < count; i++) parts.push(box([width, 0.24, 0.12], [-L / 2 + (i + 0.5) * L / count, h + 0.1, z], 'stone_light'));
+  }
+  return parts;
+}
+const diagonal = (run, merlons, [cx, cz] = [0, 0]) => rotateParts(diagonalLocal(merlons), run === 'ne' ? Math.PI / 4 : -Math.PI / 4).map(p => ({ ...p, at: [p.at[0] + cx, p.at[1], p.at[2] + cz] }));
 const turnAxis = (parts, axis, [cx, cz] = [0, 0]) => (axis === 'z' ? rotateParts(parts, -Math.PI / 2) : parts).map(p => ({ ...p, at: [p.at[0] + cx, p.at[1], p.at[2] + cz] }));
 
 export function build(spec, { footprint }) {
@@ -86,6 +108,7 @@ export function build(spec, { footprint }) {
     for (const side of axis === 'x' ? ['E', 'W'] : ['N', 'S']) parts.push(...parapet([0, 0], side, merlons));
     return { primitives: parts, lights: [], height: WALL_HEIGHT + 0.34 };
   }
+  if (spec.piece === 'diagonal') return { primitives: diagonal(spec.run === 'ne' ? 'ne' : 'se', merlons), lights: [], height: WALL_HEIGHT + 0.34 };
   if (spec.piece === 'stair') return { primitives: turnAxis(stairLocal(), spec.axis === 'z' ? 'z' : 'x'), lights: [], height: WALL_HEIGHT };
   if (spec.piece === 'parapet') return { primitives: parapet([0, 0], SIDES[spec.side] ? spec.side : 'S', merlons), lights: [], height: WALL_HEIGHT + 0.34 };
   if (spec.piece === 'assembly') {
@@ -93,6 +116,7 @@ export function build(spec, { footprint }) {
     const centre = ([x, z]) => [x - footprint.width / 2 + 0.5, z - footprint.height / 2 + 0.5];
     const gates = new Map((spec.gates ?? []).map(g => [key(...g.cell), g]));
     for (const g of spec.gates ?? []) if (!set.has(key(...g.cell))) set.add(key(...g.cell));
+    for (const dg of spec.diagonals ?? []) parts.push(...diagonal(dg.run === 'ne' ? 'ne' : 'se', merlons, centre(dg.cell)));
     for (const st of spec.stairs ?? []) parts.push(...turnAxis(stairLocal(), st.axis === 'z' ? 'z' : 'x', centre(st.cell)));
     for (const cell of [...cells, ...(spec.gates ?? []).map(g => g.cell).filter(c => !cells.some(([x, z]) => x === c[0] && z === c[1]))]) {
       const gate = gates.get(key(...cell));

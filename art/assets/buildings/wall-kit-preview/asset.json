@@ -178,6 +178,78 @@
           }
         ]
       }
+    },
+    {
+      "id": "wall-kit-preview-diagonal",
+      "name": "Diagonal run",
+      "version": 1,
+      "notes": "m-hradby-diagonala: two diagonal tiles between two straight blocks, down the screen. For review of how the diagonal pieces join.",
+      "spec": {
+        "piece": "assembly",
+        "merlons": 3,
+        "cells": [
+          [
+            0,
+            0
+          ],
+          [
+            3,
+            3
+          ]
+        ],
+        "diagonals": [
+          {
+            "cell": [
+              1,
+              1
+            ],
+            "run": "se"
+          },
+          {
+            "cell": [
+              2,
+              2
+            ],
+            "run": "se"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wall-kit-preview-diagonal-across",
+      "name": "Diagonal run across",
+      "version": 1,
+      "notes": "m-hradby-diagonala: two diagonal tiles between two straight blocks, across the screen.",
+      "spec": {
+        "piece": "assembly",
+        "merlons": 3,
+        "cells": [
+          [
+            0,
+            3
+          ],
+          [
+            3,
+            0
+          ]
+        ],
+        "diagonals": [
+          {
+            "cell": [
+              1,
+              2
+            ],
+            "run": "ne"
+          },
+          {
+            "cell": [
+              2,
+              1
+            ],
+            "run": "ne"
+          }
+        ]
+      }
     }
   ]
 }

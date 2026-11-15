@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wall-diagonal",
+  "variantId": "wall-diagonal-se",
+  "name": "Run down the screen",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "7cf59171",
+  "generator": "wallkit",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 131,
+  "height": 133,
+  "anchor": {
+    "x": 65,
+    "y": 99
+  },
+  "origin": {
+    "x": 0.49618,
+    "y": 0.74436
+  },
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "base": {
+    "x": 65,
+    "y": 131
+  },
+  "baseOrigin": {
+    "x": 0.49618,
+    "y": 0.98496
+  },
+  "visualHeight": 131,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.075,
+  "lights": []
+}

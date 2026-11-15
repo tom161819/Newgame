@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "wall-diagonal",
+  "name": "Wall, diagonal run",
+  "category": "buildings",
+  "description": "One tile of a Stone Wall that runs diagonally (point 41, m-hradby-diagonala): a wall from corner to corner of the tile, turned 45°, as tall as the wall block, with a parapet on both long sides. Tiles of a diagonal run touch at their corners; these pieces join them into one straight wall. Drawn on the tile's centre. Made by Claude with the wall-kit generator at the owner's request (15 Nov 2026: \"připrav je ty\"); waits for the owner's approval.",
+  "footprint": {
+    "width": 2,
+    "height": 2
+  },
+  "generator": "wallkit",
+  "variants": [
+    {
+      "id": "wall-diagonal-se",
+      "name": "Run down the screen",
+      "version": 1,
+      "notes": "Towards grid (x+1, y+1). On screen the wall runs straight down, seen from its end.",
+      "spec": {
+        "piece": "diagonal",
+        "run": "se",
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-diagonal-ne",
+      "name": "Run across the screen",
+      "version": 1,
+      "notes": "Towards grid (x+1, y−1). On screen the wall runs straight across, seen from its face.",
+      "spec": {
+        "piece": "diagonal",
+        "run": "ne",
+        "merlons": 3
+      }
+    }
+  ]
+}

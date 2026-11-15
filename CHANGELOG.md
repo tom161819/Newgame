@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.133.2] - 2026-11-15
+<!-- version: {"title":"Studio: diagonal wall pieces for review","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Asset Studio: two new wall pieces for a wall that runs diagonally (one straight line instead of steps) and two previews of how they join straight walls. They wait for approval; the game does not use them yet.
+
 ## [0.133.1] - 2026-11-15
 <!-- version: {"title":"Uneven paving edges","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

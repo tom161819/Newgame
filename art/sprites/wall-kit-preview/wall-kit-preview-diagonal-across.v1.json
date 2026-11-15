@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wall-kit-preview",
+  "variantId": "wall-kit-preview-diagonal-across",
+  "name": "Diagonal run across",
+  "category": "buildings",
+  "version": 1,
+  "specHash": "3d5b592a",
+  "generator": "wallkit",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 278,
+  "height": 163,
+  "anchor": {
+    "x": 129,
+    "y": 97
+  },
+  "origin": {
+    "x": 0.46403,
+    "y": 0.59509
+  },
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "base": {
+    "x": 129,
+    "y": 161
+  },
+  "baseOrigin": {
+    "x": 0.46403,
+    "y": 0.98773
+  },
+  "visualHeight": 161,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.075,
+  "lights": []
+}
