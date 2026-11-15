@@ -6,6 +6,7 @@ import { buildCatalog, filterCatalog, CATEGORIES } from './lib/specs.js';
 import { STATUS_LABELS, readLocal, writeLocal, reviewState, reviewSummary, updateLocal, discardLocal, buildExportManifest, pendingChanges, gameArtSources, inGame } from './lib/approvals.js';
 import { REVIEWS, PREFERRED, layerFromDocs, docWrites, reviewerIds } from './lib/sharedReview.js';
 import { withApprovedArt, APPROVED_VILLAGER_ART } from '../../src/data/objects/approvedArt.js';
+import { buildSubmission, groups, issueUrl, issueBody, confirmReceipt, readOutbox, writeOutbox, upsertOutbox } from './lib/reviewSubmit.js';
 import { TIMES, timePreset } from './lib/lighting.js';
 import { heightInPixels, projectPoint } from './lib/projection.js';
 import { renderModel, spriteMetadata, rendererAvailable } from './render/spriteRenderer.js';
@@ -779,8 +780,48 @@ function openExport() {
   $('.danger-zone').hidden = sharedMode();
   $('#export-dialog').showModal();
 }
+// ---------- #213 Submit review ----------
+let submission = null;
+const outbox = () => readOutbox(storage);
+function renderSubmit(status = '') {
+  const g = submission ? groups(submission) : null, list = (title, items, comment = false) => items.length ? [h('h3', {}, `${title} (${items.length})`), h('ul', { class: 'change-list' }, items.map(i => h('li', {}, h('span', { class: 'mono' }, `${i.variantId} v${i.version}`), comment && i.comment ? ` — “${i.comment}”` : '')))] : [];
+  $('#submit-summary').replaceChildren(...(g ? [...list('Approved', g.approved), ...list('Revision requested', g.revision, true), ...list('Rejected', g.rejected, true), ...list('Back to review', g.other), ...list('Preferred', g.preferred)] : [h('p', { class: 'empty' }, 'No decisions waiting to be sent. Decide on variants first (Approve, Request revision, Reject or Prefer).')]));
+  const sent = submission && submission.state !== 'draft';
+  $('#submit-send').hidden = !submission; $('#submit-send').textContent = sent ? 'Open the GitHub issue again' : 'Open the GitHub issue';
+  $('#submit-check').hidden = !sent || submission.state === 'confirmed'; $('#submit-copy').hidden = !submission?.manual;
+  const link = $('#submit-link'); link.hidden = !submission?.issueUrl; if (submission?.issueUrl) { link.href = submission.issueUrl; link.textContent = `Open issue #${submission.issue}`; }
+  $('#submit-status').textContent = status || (submission ? { draft: 'Not sent yet.', waiting: 'Waiting for GitHub to confirm the issue. Your decisions stay in this browser until then.', confirmed: `Sent: GitHub confirmed issue #${submission.issue}. Claude takes it from there.` }[submission.state] ?? submission.message ?? '' : '');
+  $('#submit-outbox').replaceChildren(...outbox().slice(-5).reverse().map(s => h('li', {}, h('span', { class: 'mono' }, s.submissionId), ` · ${s.items.length} decision${s.items.length === 1 ? '' : 's'} · ${s.state === 'confirmed' ? `issue #${s.issue}` : s.state}`)));
+}
+function openSubmit() {
+  submission = buildSubmission({ repo: data.approvals, local: state.local, catalog: catalog.studio, outbox: outbox() });
+  renderSubmit(); $('#submit-dialog').showModal();
+}
+async function checkSubmit() {
+  if (!submission) return;
+  $('#submit-status').textContent = 'Checking GitHub…';
+  const result = await confirmReceipt(submission);
+  submission = { ...submission, state: result.state === 'confirmed' ? 'confirmed' : submission.state === 'confirmed' ? 'confirmed' : 'waiting', message: result.message, ...(result.state === 'confirmed' ? { issue: result.issue, issueUrl: result.url, confirmedAt: new Date().toISOString() } : {}) };
+  writeOutbox(storage, upsertOutbox(outbox(), submission));
+  renderSubmit(result.message);
+}
+function bindSubmit() {
+  $('#open-submit').addEventListener('click', openSubmit);
+  $('#submit-send').addEventListener('click', () => {
+    if (!submission) return;
+    const { url, manual } = issueUrl(submission);
+    // Not "sent" yet: only GitHub's confirmation (Check GitHub) marks it sent; local decisions are kept meanwhile.
+    submission = { ...submission, state: submission.state === 'confirmed' ? 'confirmed' : 'waiting', manual };
+    writeOutbox(storage, upsertOutbox(outbox(), submission));
+    window.open(url, '_blank', 'noopener');
+    renderSubmit(manual ? 'The review is too long for a link: the GitHub form opened with the title; press "Copy issue text", paste it into the description and submit. Then press Check GitHub.' : 'GitHub opened in a new tab. Press "Submit new issue" there, then Check GitHub here.');
+  });
+  $('#submit-check').addEventListener('click', checkSubmit);
+  $('#submit-copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText(issueBody(submission)); $('#submit-status').textContent = 'Issue text copied.'; } catch { $('#submit-status').textContent = 'Copy failed: use Export review as a fallback.'; } });
+}
 let discardArmed = false;
 function bindExport() {
+  bindSubmit();
   $('#open-export').addEventListener('click', openExport);
   $('#export-copy').addEventListener('click', async () => {
     const text = $('#export-json').value;
@@ -924,6 +965,8 @@ window.assetStudio = Object.freeze({
   exportManifest,
   local: () => structuredClone(state.local),
   reviewMode: () => shared.mode,
+  submission: () => submission && structuredClone(submission),
+  outbox: () => outbox(),
   sceneLights: () => structuredClone(lastSceneLights),
 });
 });

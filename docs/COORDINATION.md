@@ -31,6 +31,7 @@ Set the plan item to `rozpracovano` instead of adding rows here. Add a line only
 
 ## Done (GitHub era)
 
+- 2026-11-06 Claude: #210 asset review workflow AR-1…AR-5: manifest statuses/comments/history ([#217](https://github.com/tom161819/Newgame/pull/217)), Studio review UI ([#218](https://github.com/tom161819/Newgame/pull/218)), Submit review ([#219](https://github.com/tom161819/Newgame/pull/219)), intake workflow + approval guard ([#220](https://github.com/tom161819/Newgame/pull/220)), `art:revise`/`art:integrate` + AGENTS.md procedure ([#221](https://github.com/tom161819/Newgame/pull/221)).
 - 2026-11-06 Claude: #99 mill sails ([#207](https://github.com/tom161819/Newgame/pull/207), 0.8.1); #92 visual fallbacks audit + six profession concepts ([#208](https://github.com/tom161819/Newgame/pull/208)) and Barracks/Wheelwright/Iron Mine concepts ([#209](https://github.com/tom161819/Newgame/pull/209)), awaiting the owner's choice.
 - 2026-11-06 Claude: #116 Path renderer V2 in the Path Lab ([#205](https://github.com/tom161819/Newgame/pull/205)), awaiting the owner's preset choice; Pages deploy retries ([#206](https://github.com/tom161819/Newgame/pull/206)).
 - 2026-11-06 Claude: #115 Path Lab in the Asset Studio ([#204](https://github.com/tom161819/Newgame/pull/204)).

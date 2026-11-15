@@ -23,7 +23,8 @@
       </nav>
       <div class="review-status">
         <span id="review-summary" class="review-summary" aria-live="polite"></span>
-        <button id="open-export" type="button" class="button primary">Export review</button>
+        <button id="open-submit" type="button" class="button primary" hidden>Submit review</button>
+        <button id="open-export" type="button" class="button">Export review</button>
       </div>
     </header>
     <p id="studio-alert" class="studio-alert" role="alert" hidden></p>
@@ -58,6 +59,21 @@
           <button type="button" id="discard-local" class="button danger">Discard local review</button>
           <span id="discard-hint" class="feedback"></span>
         </div>
+      </form>
+    </dialog>
+    <dialog id="submit-dialog" aria-labelledby="submit-title">
+      <form method="dialog" class="dialog-body" id="submit-form">
+        <header class="dialog-head"><h2 id="submit-title">Submit review</h2><button type="submit" class="button ghost" aria-label="Close">Close</button></header>
+        <p class="dialog-lede">Your decisions go to GitHub as one issue in <code>tom161819/Newgame</code>. GitHub opens in a new tab with everything filled in: check it and press <em>Submit new issue</em>. Claude then revises or integrates the graphics through pull requests. No password or token is stored here.</p>
+        <div id="submit-summary" class="submit-summary"></div>
+        <div class="dialog-actions">
+          <button type="button" id="submit-send" class="button primary">Open the GitHub issue</button>
+          <button type="button" id="submit-check" class="button" hidden>Check GitHub</button>
+          <button type="button" id="submit-copy" class="button ghost" hidden>Copy issue text</button>
+          <a id="submit-link" class="button ghost" target="_blank" rel="noopener noreferrer" hidden>Open issue</a>
+        </div>
+        <p id="submit-status" class="feedback" role="status" aria-live="polite"></p>
+        <ul id="submit-outbox" class="change-list"></ul>
       </form>
     </dialog>
     <script type="module" src="./src/main.js"></script>

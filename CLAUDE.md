@@ -10,3 +10,4 @@
 - Historical builds in `public/versions/` are generated and immutable. Do not read minified snapshots to learn the architecture; use the source, catalog and manifests.
 - The source is dense (many statements per line). Never reformat existing code; keep diffs minimal so chats merge cleanly.
 - Versions and releases follow *Versions, releases and change records* in AGENTS.md: a game change ships as the next PATCH (MINOR for a new `SAVE_VERSION`) through `npm run release:prepare`, every commit outside `docs/` adds `docs/changes/<slug>.md` with a "Notes for the next agent" section, and `npm run version:check -- --base=HEAD^1` passes before the commit is pushed.
+- Graphics follow the loop in AGENTS.md *Graphics: designs, owner review and integration*: `asset-review` issues are applied by a PR with `review: {issue, submissionId}`; use `npm run art:revise` and `npm run art:integrate`; never approve your own designs.
