@@ -5,6 +5,14 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.133.1] - 2026-11-15
+<!-- version: {"title":"Uneven paving edges","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- Stone paving no longer ends in a straight cut line. Where it meets grass or path dirt, loose kerb stones of different sizes reach a little over the edge.
+
+### Fixed
+- A thin line of ground showed through paving in some places (where two ground pieces meet).
+
 ## [0.133.0] - 2026-11-15
 <!-- version: {"title":"Old oaks on 2 × 2","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added
