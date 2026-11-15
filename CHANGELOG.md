@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.138.6] - 2026-11-15
+<!-- version: {"title":"Fog edge in WebGL","type":"fix","reconstructed":false,"saveVersion":62} -->
+### Fixed
+- With WebGL the edge of the explored land showed a bright jagged strip outside the dark fog edge. The fog edge is now drawn the same way as with Canvas.
+
 ## [0.138.5] - 2026-11-15
 <!-- version: {"title":"Start guide, tips and WebGL","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

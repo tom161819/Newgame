@@ -46,7 +46,10 @@ export class FogEdgeLayer {
     this.canvas=document.createElement('canvas');this.canvas.width=size;this.canvas.height=size;this.context=this.canvas.getContext('2d');
     this.pixels=this.context.createImageData(size,size);this.info=null;this.key2='';this.next=0;this.stats={builds:0,buildMs:0,lastMs:0,pixels:0,projects:0,projectMs:0};
     for(const key of [this.key,`${this.key}-screen`])if(scene.textures.exists(key))scene.textures.remove(key);
-    this.gpu=!!scene.sys.game.renderer.gl;
+    // Owner 15 Nov 2026 (WebGL default, "při startu hry vzniklo tohle"): the rotated, cropped GPU image drew the edge
+    // in the wrong place (a bright jagged strip outside the dark edge). The screen-space path, right in Canvas, is used
+    // in WebGL too; its texture is refreshed after each projection.
+    this.gpu=false;
     if(this.gpu){
       // Container scale (TW/√2, TH/√2) after a 45° rotation is exactly gridToWorld; the image stands at Rot45(left, top).
       this.texture=scene.textures.addCanvas(this.key,this.canvas);
