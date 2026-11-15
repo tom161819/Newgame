@@ -79,25 +79,27 @@ function stairLocal() {
   return parts;
 }
 // m-hradby-diagonala (owner 14–15 Nov 2026: a wall dragged diagonally must be one straight line, not steps). One tile of
-// a diagonal run: a wall from corner to corner of the tile, turned 45°, as tall as the block, with a parapet on both
-// long sides. It is a little longer than the tile's diagonal, so the pieces of a run overlap into one wall and the
-// end reaches into the corner of a straight block or a tower. Local frame: the run along x.
-export const DIAGONAL = { length: Math.SQRT2 + 0.24, thickness: 0.62 };
-function diagonalLocal(merlons) {
-  const h = WALL_HEIGHT, { length: L, thickness: T } = DIAGONAL, parts = [
-    box([L, 0.16, T + 0.02], [0, 0, 0], 'stone_dark'),
-    box([L - 0.02, h - 0.24, T], [0, 0.16, 0], 'stone'),
-    box([L, 0.08, T + 0.02], [0, h - 0.08, 0], 'stone_light'),
+// a diagonal run: a wall turned 45°, as tall and as thick as the straight wall (owner 15 Nov: "stejně opticky široká"),
+// with a parapet on both long sides. The body reaches half a tile past each corner of its tile, so neighbouring pieces
+// overlap into one band and the end runs into a straight block or a tower until its sides meet the block's sides – no
+// notch at the joint. Merlons stand only on the piece's own tile diagonal, four per tile at fixed places, so the
+// overlapping pieces of a run show one even row. Local frame: the run along x, centred on the tile.
+export const DIAGONAL = { thickness: 1, reach: 0.5, merlons: 4 };
+function diagonalLocal() {
+  const h = WALL_HEIGHT, { thickness: T, reach, merlons } = DIAGONAL, own = Math.SQRT2, L = own + 2 * reach, parts = [
+    box([L, 0.16, T], [0, 0, 0], 'stone_dark'),
+    box([L - 0.02, h - 0.24, T - 0.02], [0, 0.16, 0], 'stone'),
+    box([L, 0.08, T], [0, h - 0.08, 0], 'stone_light'),
   ];
-  const count = clamp(Math.round(merlons) + 1, 3, 5), width = L / (count * 2);
+  const edge = T / 2 - 0.06, width = own / (merlons * 2);
   for (const s of [-1, 1]) {
-    const z = s * (T / 2 - 0.05);
-    parts.push(box([L, 0.1, 0.12], [0, h, z], 'stone'));
-    for (let i = 0; i < count; i++) parts.push(box([width, 0.24, 0.12], [-L / 2 + (i + 0.5) * L / count, h + 0.1, z], 'stone_light'));
+    // The parapet's low wall runs the whole length (identical where pieces overlap); merlons only on the own tile.
+    parts.push(box([L, 0.1, 0.12], [0, h, s * edge], 'stone'));
+    for (let i = 0; i < merlons; i++) parts.push(box([width, 0.24, 0.12], [-own / 2 + (i + 0.5) * own / merlons, h + 0.1, s * edge], 'stone_light'));
   }
   return parts;
 }
-const diagonal = (run, merlons, [cx, cz] = [0, 0]) => rotateParts(diagonalLocal(merlons), run === 'ne' ? Math.PI / 4 : -Math.PI / 4).map(p => ({ ...p, at: [p.at[0] + cx, p.at[1], p.at[2] + cz] }));
+const diagonal = (run, merlons, [cx, cz] = [0, 0]) => rotateParts(diagonalLocal(), run === 'ne' ? Math.PI / 4 : -Math.PI / 4).map(p => ({ ...p, at: [p.at[0] + cx, p.at[1], p.at[2] + cz] }));
 const turnAxis = (parts, axis, [cx, cz] = [0, 0]) => (axis === 'z' ? rotateParts(parts, -Math.PI / 2) : parts).map(p => ({ ...p, at: [p.at[0] + cx, p.at[1], p.at[2] + cz] }));
 
 export function build(spec, { footprint }) {

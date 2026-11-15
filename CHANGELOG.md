@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.133.4] - 2026-11-15
+<!-- version: {"title":"Studio: diagonal wall pieces v2","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- Asset Studio: the diagonal wall pieces are now as thick as the straight wall and reach into the neighbouring blocks, so the joints have no gaps. Still waiting for approval; the game does not use them yet.
+
 ## [0.133.3] - 2026-11-15
 <!-- version: {"title":"Castle menu shows level 1","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed

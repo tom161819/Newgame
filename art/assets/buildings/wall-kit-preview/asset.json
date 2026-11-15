@@ -182,7 +182,7 @@
     {
       "id": "wall-kit-preview-diagonal",
       "name": "Diagonal run",
-      "version": 1,
+      "version": 2,
       "notes": "m-hradby-diagonala: two diagonal tiles between two straight blocks, down the screen. For review of how the diagonal pieces join.",
       "spec": {
         "piece": "assembly",
@@ -218,7 +218,7 @@
     {
       "id": "wall-kit-preview-diagonal-across",
       "name": "Diagonal run across",
-      "version": 1,
+      "version": 2,
       "notes": "m-hradby-diagonala: two diagonal tiles between two straight blocks, across the screen.",
       "spec": {
         "piece": "assembly",
