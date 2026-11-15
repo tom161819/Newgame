@@ -548,8 +548,8 @@ export class GameScene extends Phaser.Scene {
     if(selected?.kind==='child'){this.villagePanel.open('child',selected.object);return;}
     if(selected?.kind==='building'&&selected.object.type==='village_green'){this.villagePanel.open('green',selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).housing){this.villagePanel.open('house',selected.object);return;}
-    // m-hrad-urovne: a click on the Castle opens its card (level, upgrade, employment); a Castle with a level has no other window.
-    if(selected?.kind==='building'&&selected.object.type==='castle'){this.employmentPanel.open();if(selected.object.level)return;}
+    // m-hrad-urovne: a click on the Castle opens its detail (with the level and the Upgrade button) and its Employment card.
+    if(selected?.kind==='building'&&selected.object.type==='castle')this.employmentPanel.open();
     if(selected?.kind==='building'&&buildingDefinition(selected.object).trade){this.marketplacePanel.open(selected.object);return;}
     if(selected?.kind==='building'&&buildingDefinition(selected.object).builderWorkshop){this.builderWorkshopPanel.open(selected.object);return;}
     // farmhouse-store: a workplace with its own store (the Farmhouse) opens the workplace panel, which links to the store.

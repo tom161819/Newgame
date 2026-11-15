@@ -1,53 +1,53 @@
 {
   "schema": 1,
   "assetId": "castle",
-  "variantId": "castle-l2-0",
-  "name": "Level 2: hall with tower and palisade 0° (front-right)",
+  "variantId": "castle-l2-90",
+  "name": "Level 2: hall with tower and palisade 90° (rear-right)",
   "category": "buildings",
-  "version": 2,
-  "specHash": "5ccb40db",
+  "version": 3,
+  "specHash": "60cd85be",
   "generator": "image",
   "generatorVersion": 1,
   "styleGuide": "medieval-kingdom-painted-isometric@1",
   "scale": 1,
-  "width": 198,
-  "height": 183,
+  "width": 249,
+  "height": 181,
   "anchor": {
-    "x": 99,
-    "y": 119
+    "x": 125,
+    "y": 114
   },
   "origin": {
-    "x": 0.5,
-    "y": 0.65027
+    "x": 0.50201,
+    "y": 0.62983
   },
   "footprint": {
     "width": 4,
     "height": 4
   },
   "base": {
-    "x": 99,
-    "y": 183
+    "x": 125,
+    "y": 178
   },
   "baseOrigin": {
-    "x": 0.5,
-    "y": 1
+    "x": 0.50201,
+    "y": 0.98343
   },
-  "visualHeight": 183,
+  "visualHeight": 178,
   "platform": null,
   "frontLayer": false,
   "gameLights": [],
   "modelHeight": 4.603,
   "lights": [],
   "x2": {
-    "width": 396,
-    "height": 366,
+    "width": 498,
+    "height": 362,
     "anchor": {
-      "x": 198,
-      "y": 238
+      "x": 250,
+      "y": 228
     }
   },
   "render": {
     "source": "gpt",
-    "view": 0
+    "view": 90
   }
 }

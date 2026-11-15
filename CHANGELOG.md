@@ -5,6 +5,12 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.129.2] - 2026-11-15
+<!-- version: {"title":"Castle upgrade in the detail; level 2 size","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- The Upgrade button of the Castle is in the window a click on the Castle opens (level, what it gives, the next level, the price); it stays in the Castle's Employment card too.
+- The level 2 Castle fills its whole 4 × 4 footprint like level 1 (it looked smaller after the upgrade).
+
 ## [0.129.1] - 2026-11-15
 <!-- version: {"title":"Castle card opens on click","type":"fix","reconstructed":false,"saveVersion":62} -->
 ### Fixed

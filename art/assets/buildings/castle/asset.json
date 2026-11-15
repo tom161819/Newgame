@@ -111,8 +111,8 @@
     {
       "id": "castle-l2-0",
       "name": "Level 2: hall with tower and palisade 0° (front-right)",
-      "version": 2,
-      "notes": "Owner's render (14 Nov 2026), Castle The thatched hall with a wooden watchtower and a palisade around the yard. Drawn for 4 × 4 (owner 15 Nov 2026: levels on 4 × 4, 4 × 4, 5 × 5 and 6 × 6). View 0° (front-right), cut out of the owner's render and scaled to 0.3228 wide (the picture fills a 4 × 4 footprint; same scale as level 1, the smaller ground sits in the middle). Front corner of the plinth set by hand; this view is the one the game uses.",
+      "version": 3,
+      "notes": "Owner's render (14 Nov 2026), Castle The thatched hall with a wooden watchtower and a palisade around the yard. Drawn for 4 × 4 (owner 15 Nov 2026: levels on 4 × 4, 4 × 4, 5 × 5 and 6 × 6). v3: fills the whole 4 × 4 like level 1 (owner: it must not look smaller). View 0° (front-right), cut out of the owner's render and scaled to 0.4183 wide (the picture fills the 4 × 4 footprint). Front corner of the plinth set by hand; this view is the one the game uses.",
       "spec": {
         "layout": "keep",
         "roof": "roof_shingle",
@@ -127,8 +127,8 @@
     {
       "id": "castle-l2-90",
       "name": "Level 2: hall with tower and palisade 90° (rear-right)",
-      "version": 2,
-      "notes": "Owner's render (14 Nov 2026), Castle The thatched hall with a wooden watchtower and a palisade around the yard. Drawn for 4 × 4 (owner 15 Nov 2026: levels on 4 × 4, 4 × 4, 5 × 5 and 6 × 6). View 90° (rear-right), cut out of the owner's render and scaled to 0.3228 wide (the picture fills a 4 × 4 footprint; same scale as level 1, the smaller ground sits in the middle). Footprint corner estimated from the image bottom.",
+      "version": 3,
+      "notes": "Owner's render (14 Nov 2026), Castle The thatched hall with a wooden watchtower and a palisade around the yard. Drawn for 4 × 4 (owner 15 Nov 2026: levels on 4 × 4, 4 × 4, 5 × 5 and 6 × 6). v3: fills the whole 4 × 4 like level 1 (owner: it must not look smaller). View 90° (rear-right), cut out of the owner's render and scaled to 0.4183 wide (the picture fills the 4 × 4 footprint). Footprint corner estimated from the image bottom.",
       "spec": {
         "layout": "keep",
         "roof": "roof_shingle",
@@ -143,8 +143,8 @@
     {
       "id": "castle-l2-180",
       "name": "Level 2: hall with tower and palisade 180° (rear-left)",
-      "version": 2,
-      "notes": "Owner's render (14 Nov 2026), Castle The thatched hall with a wooden watchtower and a palisade around the yard. Drawn for 4 × 4 (owner 15 Nov 2026: levels on 4 × 4, 4 × 4, 5 × 5 and 6 × 6). View 180° (rear-left), cut out of the owner's render and scaled to 0.3228 wide (the picture fills a 4 × 4 footprint; same scale as level 1, the smaller ground sits in the middle). Footprint corner estimated from the image bottom.",
+      "version": 3,
+      "notes": "Owner's render (14 Nov 2026), Castle The thatched hall with a wooden watchtower and a palisade around the yard. Drawn for 4 × 4 (owner 15 Nov 2026: levels on 4 × 4, 4 × 4, 5 × 5 and 6 × 6). v3: fills the whole 4 × 4 like level 1 (owner: it must not look smaller). View 180° (rear-left), cut out of the owner's render and scaled to 0.4183 wide (the picture fills the 4 × 4 footprint). Footprint corner estimated from the image bottom.",
       "spec": {
         "layout": "keep",
         "roof": "roof_shingle",
@@ -159,8 +159,8 @@
     {
       "id": "castle-l2-270",
       "name": "Level 2: hall with tower and palisade 270° (front-left)",
-      "version": 2,
-      "notes": "Owner's render (14 Nov 2026), Castle The thatched hall with a wooden watchtower and a palisade around the yard. Drawn for 4 × 4 (owner 15 Nov 2026: levels on 4 × 4, 4 × 4, 5 × 5 and 6 × 6). View 270° (front-left), cut out of the owner's render and scaled to 0.3228 wide (the picture fills a 4 × 4 footprint; same scale as level 1, the smaller ground sits in the middle). Footprint corner estimated from the image bottom.",
+      "version": 3,
+      "notes": "Owner's render (14 Nov 2026), Castle The thatched hall with a wooden watchtower and a palisade around the yard. Drawn for 4 × 4 (owner 15 Nov 2026: levels on 4 × 4, 4 × 4, 5 × 5 and 6 × 6). v3: fills the whole 4 × 4 like level 1 (owner: it must not look smaller). View 270° (front-left), cut out of the owner's render and scaled to 0.4183 wide (the picture fills the 4 × 4 footprint). Footprint corner estimated from the image bottom.",
       "spec": {
         "layout": "keep",
         "roof": "roof_shingle",

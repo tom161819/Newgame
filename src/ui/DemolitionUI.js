@@ -1,3 +1,4 @@
+import { renderCastleUpgrade,clickCastleUpgrade } from './castleCard.js';
 import { buildingHP } from '../game/buildingHealth.js';
 import { countName } from '../i18n/names.js';
 import { t } from '../i18n/index.js';
@@ -14,7 +15,8 @@ export class DemolitionUI {
     this.progress=element('progress');this.progress.max=100;this.progress.setAttribute('aria-label',t('demolition.title'));this.start=element('button');this.start.id='demolition-start';this.start.type='button';this.cancel=element('button');this.cancel.id='demolition-cancel';this.cancel.type='button';
     this.rebuild=element('button');this.rebuild.id='ruins-rebuild';this.rebuild.type='button';this.rebuildNote=element('p','ruins-rebuild-note');
     this.section.append(this.rebuildNote,this.rebuild,this.heading,this.refund,this.status,this.progress,this.start,this.cancel);
-    this.inspect.addEventListener('click',()=>this.openSelected(),options);document.querySelector('#close-building-detail').addEventListener('click',()=>this.dialog.close(),options);
+    this.inspect.addEventListener('click',()=>this.openSelected(),options);
+    this.dialog.addEventListener('click',event=>{if(!event.target.closest('[data-castle-upgrade]'))return;const result=clickCastleUpgrade(scene);if(result.done){const castle=scene.buildings.find(b=>b.type==='castle');this.select(castle);this.openSelected();}else this.openSelected();},options);document.querySelector('#close-building-detail').addEventListener('click',()=>this.dialog.close(),options);
     this.dialog.addEventListener('cancel',e=>{e.preventDefault();this.dialog.close();},options);this.dialog.addEventListener('close',()=>scene.setGalleryInput(true),options);
     this.rebuild.addEventListener('click',()=>{const b=this.building(this.buildingId),result=scene.rebuildRuin(b);scene.setStatus(result.error??t('ruins.rebuildPlanned',{name:buildingDefinition(result.building).name}));if(!result.error&&this.host?.open)this.host.close();this.refresh();},options);
     this.start.addEventListener('click',()=>this.ask(),options);this.cancel.addEventListener('click',()=>{scene.demolition.cancel(this.buildingId);this.refresh();},options);
@@ -33,8 +35,8 @@ export class DemolitionUI {
     if(this.scene.character.state==='ground'&&this.scene.character.order?.kind==='enter'&&this.scene.character.order.tower?.id===b.id)this.scene.character.stopForBuilding();
     text(document.querySelector('#building-detail-title'),`${buildingName(b)} #${b.id}`);text(document.querySelector('#building-detail-description'),buildingDefinition(b).description);
     {const hp=buildingHP(b),box=document.querySelector('#building-detail-hp');if(box){box.hidden=!hp;if(hp){text(document.querySelector('#building-detail-hp-text'),t('building.hp',{hp:Math.ceil(hp.hp),max:hp.max}));const bar=document.querySelector('#building-detail-hp-bar');bar.max=hp.max;bar.value=hp.hp;}}}
-    // m-hrad-urovne: the detail of a Castle points to its card, where the upgrade is.
-    if(b.type==='castle')text(document.querySelector('#building-detail-description'),`${b.level?t('castle.level',{level:b.level,max:4}):buildingDefinition(b).description} ${t('castle.cardHint')}`);
+    // m-hrad-urovne (owner 15 Nov 2026): the Upgrade is in this window.
+    {const box=document.querySelector('#building-detail-upgrade');if(box){box.hidden=b.type!=='castle';if(b.type==='castle'){if(b.level)text(document.querySelector('#building-detail-description'),'');renderCastleUpgrade(this.scene,box,b);}}}
     this.scene.setGalleryInput(false);if(!this.dialog.open)this.dialog.showModal();this.attach(this.dialog,b);this.refresh();
   }
   reason(b){
@@ -47,7 +49,7 @@ export class DemolitionUI {
     this.pendingId=b.id;text(document.querySelector('#demolition-confirm-text'),t('demolition.confirmText',{name:buildingName(b),refund:this.refundLabel(b)}));
     this.scene.setGalleryInput(false);this.confirm.showModal();
   }
-  refresh(){
+  refresh(){/* m-hrad-urovne: the Upgrade button follows the stores while the detail is open */{const b=this.dialog?.open?this.building(this.buildingId):null,box=b?.type==='castle'?document.querySelector('#building-detail-upgrade'):null;if(box)this.castleKey=renderCastleUpgrade(this.scene,box,b,this.castleKey);}
     const selected=this.building(this.selectedId);this.inspect.hidden=!selected||!this.scene.fog.isVisibleObject(selected);
     if(selected){const label=t('demolition.inspect',{name:buildingName(selected)});text(this.inspect,label);this.inspect.title=label;}
     const b=this.building(this.buildingId);if(!b){this.section.hidden=true;if(this.host?.open)this.host.close();return;}
