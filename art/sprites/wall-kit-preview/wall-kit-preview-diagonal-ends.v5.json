@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wall-kit-preview",
+  "variantId": "wall-kit-preview-diagonal-ends",
+  "name": "Diagonal run, free ends",
+  "category": "buildings",
+  "version": 5,
+  "specHash": "339b8b13",
+  "generator": "wallkit",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 259,
+  "height": 211,
+  "anchor": {
+    "x": 129,
+    "y": 145
+  },
+  "origin": {
+    "x": 0.49807,
+    "y": 0.6872
+  },
+  "footprint": {
+    "width": 4,
+    "height": 4
+  },
+  "base": {
+    "x": 129,
+    "y": 209
+  },
+  "baseOrigin": {
+    "x": 0.49807,
+    "y": 0.99052
+  },
+  "visualHeight": 209,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.075,
+  "lights": []
+}

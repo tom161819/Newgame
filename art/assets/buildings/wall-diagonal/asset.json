@@ -3,7 +3,7 @@
   "id": "wall-diagonal",
   "name": "Wall, diagonal run",
   "category": "buildings",
-  "description": "Diagonal Stone Wall (point 41, m-hradby-diagonala). diagonal: a tile in the middle of a run – a band turned 45°, as wide on screen as the straight wall (its sides run through the tile's side corners), corner to corner, parapets on both long sides. elbow: the tile where a run ends (at a straight wall or free) – the wall block and half of the band in one piece; the outline bends at the block's corners and never crosses the wall. All drawn on the tile centre. Made by Claude with the wall-kit generator at the owner's request (15 Nov 2026); waits for the owner's approval.",
+  "description": "Diagonal Stone Wall (point 41, m-hradby-diagonala). diagonal: a tile in the middle of a run – a band turned 45°, as thick as the straight wall, corner to corner, parapets on both sides. elbow-<corner>-<z><x>: the tile where a run ends – the straight wall and half of the band meet in a mitre (no corner sticking out), parapets along the whole outline. All drawn on the tile centre. Made by Claude with the wall-kit generator at the owner's request (15 Nov 2026); waits for the owner's approval.",
   "footprint": {
     "width": 3,
     "height": 3
@@ -13,7 +13,7 @@
     {
       "id": "wall-diagonal-se",
       "name": "Run down the screen",
-      "version": 4,
+      "version": 5,
       "notes": "Towards grid (x+1, y+1). On screen the wall runs straight down, seen from its end.",
       "spec": {
         "piece": "diagonal",
@@ -24,7 +24,7 @@
     {
       "id": "wall-diagonal-ne",
       "name": "Run across the screen",
-      "version": 4,
+      "version": 5,
       "notes": "Towards grid (x+1, y−1). On screen the wall runs straight across, seen from its face.",
       "spec": {
         "piece": "diagonal",
@@ -33,46 +33,210 @@
       }
     },
     {
-      "id": "wall-diagonal-elbow-ne",
-      "name": "Elbow NE",
-      "version": 4,
-      "notes": "End of a diagonal run: the block and half the band leaving through its NE corner (towards grid (x+1, y−1)).",
+      "id": "wall-diagonal-elbow-ne-11",
+      "name": "Elbow NE 11",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the NE corner (towards grid (x+1, y−1)); the side across in z open, in x open.",
       "spec": {
         "piece": "elbow",
         "corner": "NE",
+        "openZ": true,
+        "openX": true,
         "merlons": 3
       }
     },
     {
-      "id": "wall-diagonal-elbow-se",
-      "name": "Elbow SE",
-      "version": 4,
-      "notes": "End of a diagonal run: the block and half the band leaving through its SE corner (towards grid (x+1, y+1)).",
+      "id": "wall-diagonal-elbow-ne-10",
+      "name": "Elbow NE 10",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the NE corner (towards grid (x+1, y−1)); the side across in z open, in x joined.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "NE",
+        "openZ": true,
+        "openX": false,
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-ne-01",
+      "name": "Elbow NE 01",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the NE corner (towards grid (x+1, y−1)); the side across in z joined, in x open.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "NE",
+        "openZ": false,
+        "openX": true,
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-ne-00",
+      "name": "Elbow NE 00",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the NE corner (towards grid (x+1, y−1)); the side across in z joined, in x joined.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "NE",
+        "openZ": false,
+        "openX": false,
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-se-11",
+      "name": "Elbow SE 11",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the SE corner (towards grid (x+1, y+1)); the side across in z open, in x open.",
       "spec": {
         "piece": "elbow",
         "corner": "SE",
+        "openZ": true,
+        "openX": true,
         "merlons": 3
       }
     },
     {
-      "id": "wall-diagonal-elbow-sw",
-      "name": "Elbow SW",
-      "version": 4,
-      "notes": "End of a diagonal run: the block and half the band leaving through its SW corner (towards grid (x−1, y+1)).",
+      "id": "wall-diagonal-elbow-se-10",
+      "name": "Elbow SE 10",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the SE corner (towards grid (x+1, y+1)); the side across in z open, in x joined.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "SE",
+        "openZ": true,
+        "openX": false,
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-se-01",
+      "name": "Elbow SE 01",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the SE corner (towards grid (x+1, y+1)); the side across in z joined, in x open.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "SE",
+        "openZ": false,
+        "openX": true,
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-se-00",
+      "name": "Elbow SE 00",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the SE corner (towards grid (x+1, y+1)); the side across in z joined, in x joined.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "SE",
+        "openZ": false,
+        "openX": false,
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-sw-11",
+      "name": "Elbow SW 11",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the SW corner (towards grid (x−1, y+1)); the side across in z open, in x open.",
       "spec": {
         "piece": "elbow",
         "corner": "SW",
+        "openZ": true,
+        "openX": true,
         "merlons": 3
       }
     },
     {
-      "id": "wall-diagonal-elbow-nw",
-      "name": "Elbow NW",
-      "version": 4,
-      "notes": "End of a diagonal run: the block and half the band leaving through its NW corner (towards grid (x−1, y−1)).",
+      "id": "wall-diagonal-elbow-sw-10",
+      "name": "Elbow SW 10",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the SW corner (towards grid (x−1, y+1)); the side across in z open, in x joined.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "SW",
+        "openZ": true,
+        "openX": false,
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-sw-01",
+      "name": "Elbow SW 01",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the SW corner (towards grid (x−1, y+1)); the side across in z joined, in x open.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "SW",
+        "openZ": false,
+        "openX": true,
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-sw-00",
+      "name": "Elbow SW 00",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the SW corner (towards grid (x−1, y+1)); the side across in z joined, in x joined.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "SW",
+        "openZ": false,
+        "openX": false,
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-nw-11",
+      "name": "Elbow NW 11",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the NW corner (towards grid (x−1, y−1)); the side across in z open, in x open.",
       "spec": {
         "piece": "elbow",
         "corner": "NW",
+        "openZ": true,
+        "openX": true,
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-nw-10",
+      "name": "Elbow NW 10",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the NW corner (towards grid (x−1, y−1)); the side across in z open, in x joined.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "NW",
+        "openZ": true,
+        "openX": false,
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-nw-01",
+      "name": "Elbow NW 01",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the NW corner (towards grid (x−1, y−1)); the side across in z joined, in x open.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "NW",
+        "openZ": false,
+        "openX": true,
+        "merlons": 3
+      }
+    },
+    {
+      "id": "wall-diagonal-elbow-nw-00",
+      "name": "Elbow NW 00",
+      "version": 5,
+      "notes": "End of a diagonal run leaving through the NW corner (towards grid (x−1, y−1)); the side across in z joined, in x joined.",
+      "spec": {
+        "piece": "elbow",
+        "corner": "NW",
+        "openZ": false,
+        "openX": false,
         "merlons": 3
       }
     }

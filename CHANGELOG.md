@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.137.1] - 2026-11-15
+<!-- version: {"title":"Studio: diagonal wall v5","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- Asset Studio: diagonal wall v5 – as thick as the straight wall again, and the straight wall and the diagonal meet in a clean mitre without teeth. Still waiting for approval.
+
 ## [0.137.0] - 2026-11-15
 <!-- version: {"title":"Oaks move in the wind","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added

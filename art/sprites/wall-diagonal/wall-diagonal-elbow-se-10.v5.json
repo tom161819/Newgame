@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "assetId": "wall-diagonal",
+  "variantId": "wall-diagonal-elbow-se-10",
+  "name": "Elbow SE 10",
+  "category": "buildings",
+  "version": 5,
+  "specHash": "e15d35d4",
+  "generator": "wallkit",
+  "generatorVersion": 1,
+  "styleGuide": "medieval-kingdom-painted-isometric@1",
+  "scale": 1,
+  "width": 195,
+  "height": 147,
+  "anchor": {
+    "x": 97,
+    "y": 97
+  },
+  "origin": {
+    "x": 0.49744,
+    "y": 0.65986
+  },
+  "footprint": {
+    "width": 3,
+    "height": 3
+  },
+  "base": {
+    "x": 97,
+    "y": 145
+  },
+  "baseOrigin": {
+    "x": 0.49744,
+    "y": 0.98639
+  },
+  "visualHeight": 145,
+  "platform": null,
+  "frontLayer": false,
+  "gameLights": [],
+  "modelHeight": 2.075,
+  "lights": []
+}
