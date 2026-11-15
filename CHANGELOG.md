@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.133.5] - 2026-11-15
+<!-- version: {"title":"Studio: diagonal wall v3","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Changed
+- Asset Studio: diagonal wall v3. The end of a diagonal run is one piece (the block and half the band) with a smooth bend, and battlements run only along the outer edges. Still waiting for approval.
+
 ## [0.133.4] - 2026-11-15
 <!-- version: {"title":"Studio: diagonal wall pieces v2","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Changed
