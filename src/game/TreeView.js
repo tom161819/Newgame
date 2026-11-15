@@ -2,12 +2,19 @@ import Phaser from 'phaser';
 import { treeState,stumpGone } from '../data/naturalResources.js';
 
 import { oakLook,treeHash } from '../render/treeSeasonTexture.js';
+import { trackOak,untrackOak } from '../render/oakWind.js';
 
 const TREE_BLOWS=7;
 export class TreeView extends Phaser.GameObjects.Container {
   constructor(scene,definition,context){
     super(scene,context.x,context.y);scene.add.existing(this);this.definition=definition;this.object=context.object??{natural:treeState('preview')};this.body=scene.add.graphics();this.bar=scene.add.graphics();this.art=scene.add.image(0,0,'__DEFAULT').setVisible(false);this.add([this.body,this.art,this.bar]);this.tile=context.tile??null;this.season=context.season??scene.seasons?.season??'Spring';this.setDepth(context.y+(definition.depth?.offset??0));this.paint();
+    // m-duby-vitr: live oaks move in the wind (remembered ones under the fog stay still).
+    if(definition.id==='oak_tree'&&context.object?.natural?.id!=null)trackOak(this);
   }
+  // Wind frame from oakWind.js (sheet texture, frame name, the sheet's common anchor); stopWind shows the picture again.
+  showWind(key,frame,origin){if(this.art.texture.key!==key||this.art.frame.name!==frame){this.art.setTexture(key,frame).setOrigin(origin.x,origin.y);}this.windOn=true;}
+  stopWind(){this.windOn=false;this.paint();}
+  destroy(fromScene){untrackOak(this);super.destroy(fromScene);}
   setNaturalState(object){this.object=object;this.paint();return this;}
   // Live trees follow the gradual season change of their tile; remembered (map memory) trees keep what was seen.
   setSeason(value){this.targetSeason=value;return this.applySeason();}
@@ -56,7 +63,7 @@ export class TreeView extends Phaser.GameObjects.Container {
   getMemoryState(){return{stage:this.object.natural.stage,season:this.season,...(this.object.natural.grand?{grand:true}:{})};}
   containsPoint(x,y){
     if(stumpGone(this.object.natural))return false;
-    if(this.artLook){const frame=this.art.frame,k=this.art.scaleX||1,px=Math.floor((x-this.x-this.art.x)/k+this.art.originX*frame.width),py=Math.floor((y-this.y-this.art.y)/k+this.art.originY*frame.height);return px>=0&&py>=0&&px<frame.width&&py<frame.height&&(this.scene.textures.getPixelAlpha(px,py,this.art.texture.key)??0)>=128;}
+    if(this.artLook){const frame=this.art.frame,k=this.art.scaleX||1,px=Math.floor((x-this.x-this.art.x)/k+this.art.originX*frame.width),py=Math.floor((y-this.y-this.art.y)/k+this.art.originY*frame.height);return px>=0&&py>=0&&px<frame.width&&py<frame.height&&(this.scene.textures.getPixelAlpha(px,py,this.art.texture.key,this.art.frame.name)??0)>=128;}
     const stage=this.object.natural.stage,dx=x-this.x,dy=y-this.y;if(stage===0)return Math.abs(dx)<12&&dy>=-15&&dy<=8;const scale=stage===1?.25:stage===2?.58:1,pine=this.definition.id==='pine_tree',height=(pine?100:84)*scale;
     if(Math.abs(dx)<=6*scale&&dy>=-height*.7&&dy<=8)return true;
     if(pine){for(let tier=0;tier<3;tier++){const distance=dy+height*(1-tier*.22);if(distance>=0&&distance<=height*.38&&Math.abs(dx)<=(13+tier*7)*scale*distance/(height*.38))return true;}return false;}

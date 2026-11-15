@@ -5,6 +5,11 @@ Ongoing development belongs in Unreleased and is not shown in the player-facing 
 
 ## [Unreleased]
 
+## [0.137.0] - 2026-11-15
+<!-- version: {"title":"Oaks move in the wind","type":"feature","reconstructed":false,"saveVersion":62} -->
+### Added
+- Oaks move in the wind: the trunk stays still, the crown bends a little and the leaves flutter. Each tree moves at its own time, so a forest does not sway in step. Trees far away or off screen stand still.
+
 ## [0.136.0] - 2026-11-15
 <!-- version: {"title":"Building hit points and repairs","type":"feature","reconstructed":false,"saveVersion":62} -->
 ### Added
